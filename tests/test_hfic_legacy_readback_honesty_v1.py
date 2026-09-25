@@ -281,7 +281,7 @@ class LegacyReadbackHonestyTests(unittest.TestCase):
                 )
             second = evaluate_forge_run(ROOT, data_root, owner_focus="AUTO", persist=False)
         self.assertNotIn(str(second.get("next_action")), {"START_BASE", "START_V1"})
-        self.assertIn("CURRENT_MARKET_HISTORY_UNREADABLE", second.get("blocking_reason_codes") or [])
+        self.assertIn("SCIENTIFIC_IDENTITY_CONFLICT", second.get("blocking_reason_codes") or [])
 
     def test_t7_session_placeholder_under_invalid_correction_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

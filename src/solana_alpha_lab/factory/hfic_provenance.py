@@ -300,9 +300,6 @@ def _validate_correction_body(
         for pair in covered:
             if pair not in committed_identities:
                 raise HficSessionError("PROVENANCE_CORRECTION_CORRUPT")
-    hash_matches = body.get("inventory_sha256") == inventory.get("inventory_sha256")
-    if missing and not hash_matches:
-        raise HficSessionError("PROVENANCE_CORRECTION_MISMATCH", uncovered_count=len(missing))
     if missing:
         covered_count = len(expected) - len(missing)
         code = "PROVENANCE_CORRECTION_PARTIAL" if covered_count else "PROVENANCE_TIME_UNCOVERED"

@@ -674,10 +674,10 @@ class HficProvenanceCorrectionTests(unittest.TestCase):
             )
             with self.assertRaises(HficSessionError) as raised:
                 apply_provenance_correction(store, repo_root=ROOT, clock=FrozenClock(CORRECTION_TIME))
-            self.assertEqual(str(raised.exception), "PROVENANCE_CORRECTION_MISMATCH")
+            self.assertEqual(str(raised.exception), "PROVENANCE_CORRECTION_PARTIAL")
             with self.assertRaises(HficSessionError) as raised:
                 resolve_provenance_status(store)
-            self.assertEqual(str(raised.exception), "PROVENANCE_CORRECTION_MISMATCH")
+            self.assertEqual(str(raised.exception), "PROVENANCE_CORRECTION_PARTIAL")
 
     def test_corrupt_and_partial_correction_fail_closed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

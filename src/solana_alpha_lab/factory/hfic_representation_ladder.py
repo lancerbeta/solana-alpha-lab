@@ -2280,6 +2280,17 @@ def _discover_ladder_stages(
     grouped: dict[str, list[tuple[str, dict[str, Any], Mapping[str, Any]]]] = {}
     skipped: list[dict[str, str]] = []
     current_market_unreadable = False
+    current_market_block_code = "CURRENT_MARKET_HISTORY_UNREADABLE"
+
+    def _note_market_skip(item: Mapping[str, Any], code: str) -> None:
+        nonlocal current_market_unreadable, current_market_block_code
+        listed_market = str(item.get("market_evidence_epoch_sha256") or "")
+        if not (current_market_epoch and listed_market and listed_market == current_market_epoch):
+            return
+        current_market_unreadable = True
+        if code == "SCIENTIFIC_IDENTITY_CONFLICT":
+            current_market_block_code = code
+
     for item in list_hfic_sessions(store):
         sid = str(item.get("session_id") or "")
         if not sid:
@@ -2289,19 +2300,18 @@ def _discover_ladder_stages(
         except HficSessionError as exc:
             suffix = sid.removeprefix("HFIC-SESS-")
             skipped.append({"session_suffix": suffix, "code": str(exc)})
-            listed_market = str(item.get("market_evidence_epoch_sha256") or "")
-            if (
-                current_market_epoch
-                and listed_market
-                and listed_market == current_market_epoch
-            ):
-                current_market_unreadable = True
+            _note_market_skip(item, str(exc))
             continue
         except Exception as exc:
             suffix = sid.removeprefix("HFIC-SESS-")
-            skipped.append({"session_suffix": suffix, "code": type(exc).__name__})
+            code = type(exc).__name__
+            skipped.append({"session_suffix": suffix, "code": code})
+            _note_market_skip(item, code)
             continue
         if bundle is None:
+            suffix = sid.removeprefix("HFIC-SESS-")
+            skipped.append({"session_suffix": suffix, "code": "SESSION_NOT_FOUND"})
+            _note_market_skip(item, "SESSION_NOT_FOUND")
             continue
         packet = _packet_for_bundle(Path(data_root), bundle, store)
         receipt_doc = (
@@ -2590,6 +2600,7 @@ def _discover_ladder_stages(
         legacy_epoch if isinstance(legacy_epoch, str) else None,
         skipped,
         current_market_unreadable,
+        current_market_block_code,
     )
 
 
@@ -2651,6 +2662,7 @@ def evaluate_forge_run(
     legacy_epoch = None
     history_skips: list[dict[str, str]] = []
     current_market_unreadable = False
+    current_market_block_code = "CURRENT_MARKET_HISTORY_UNREADABLE"
     used_cohorts: list[str] = []
     saved_draft_representation_id: str | None = None
     if stages is not None:
@@ -2710,6 +2722,7 @@ def evaluate_forge_run(
             legacy_epoch,
             history_skips,
             current_market_unreadable,
+            current_market_block_code,
         ) = _discover_ladder_stages(
             data_root=Path(data_root),
             store=store,
@@ -3058,7 +3071,7 @@ def evaluate_forge_run(
         next_action = ACTION_OBSERVABILITY_BLOCKED
         owner_final = None
         decision = dict(decision)
-        decision["reason_code"] = "CURRENT_MARKET_HISTORY_UNREADABLE"
+        decision["reason_code"] = current_market_block_code
     else:
         from solana_alpha_lab.factory.hfic_provenance import store_provenance_label
 
