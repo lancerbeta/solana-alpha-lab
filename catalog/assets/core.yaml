@@ -29936,7 +29936,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_REMOTE_HOST.md', repository_path: docs/operator/FACTORY_REMOTE_HOST.md}
-  integrity: {kind: sha256, sha256: c7d257b3790d8de3d8d13c43f15dff8aa382a1b2dce5dca02eeac20aea2d90c1}
+  integrity: {kind: sha256, sha256: 09f9183f9b87bc76b50754c16fe8753c4833279a19fd45598e8429cacc3baeb9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -33075,7 +33075,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_lifecycle.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_lifecycle.py}
-  integrity: {kind: sha256, sha256: c6c9854822689903fc190978b8d6f4abef261839a1990854413e0476592e3cd7}
+  integrity: {kind: sha256, sha256: 9a4d63794654dbd941dc26dee48a9b9daa488d072d45a7681d9a30b56e422d27}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33127,7 +33127,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/observation_schedule.py', repository_path: scripts/observation_schedule.py}
-  integrity: {kind: sha256, sha256: 0f79505eb17d24f73ca5556155ffd7411503ab33a453c74233c2d276d058b35c}
+  integrity: {kind: sha256, sha256: 2a38237afde7e55168be0af54c5b9d2d6d963638023190d5bd3a141eca0e469e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-COMPILER-001}
@@ -34244,7 +34244,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: 47ae0ad0409040737fba234053ee7141accb57d608411bc3ecb972ea42a84bc2}
+  integrity: {kind: sha256, sha256: 2504fcdfc42116a337e1e52f269299173b7d0752ffd0216feabc61bdd973f513}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}

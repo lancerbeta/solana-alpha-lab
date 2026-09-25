@@ -1,0 +1,33 @@
+{
+  "as_of": "2026-09-25",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_REUSE_EXISTING_RELEASE_SCRIPT",
+    "context_efficiency": "PASS_ONE_TASK_CONTRACT",
+    "execution_to_cashflow": "NOT_APPLICABLE",
+    "flexibility_and_history": "PASS_NO_HISTORY_REWRITE",
+    "mission": "PASS_CANONICAL_MAIN_LINE_GUARD",
+    "monitoring_and_recovery": "PASS_QUIESCE_AND_VERIFIED_ROLLBACK",
+    "owner_operability": "PASS_ONE_FORWARD_RELEASE",
+    "red_team": "PASS_NO_GENERIC_FORCE_FLAG",
+    "research_truth": "PASS_NO_C3_OR_ESTIMAND_CHANGE",
+    "security": "PASS_SECRET_FREE_TRACKED_EVIDENCE"
+  },
+  "limits": [
+    "NO_DEPLOY",
+    "NO_VPS_OR_DRIVE_MUTATION",
+    "NO_C3_PLAN"
+  ],
+  "mode": "FAST_PATH",
+  "recovery": "REVERT_THIS_BRANCH_ONLY",
+  "review_id": "FACTORY-PRODUCTION-LINE-CONVERGENCE-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "141135f9abc22c6fb14c5cba4dcd72808694ba376f9286f01235e6529b39f555",
+  "reviewed_inventory_sha256": "8ae98c6a5ffb46f707a65da86d8cc27191b4d49738ea47dc4fa94ce9972901e2",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_PRODUCTION_LINE_CONVERGENCE_V1",
+  "verdict": "PASS"
+}

@@ -1,8 +1,8 @@
 ---
 task_id: FACTORY_LIVE_MAIN_PARITY_CONVERGENCE_V1
 task_version: '1.0'
-status: IN_PROGRESS
-as_of: '2026-09-24'
+status: DONE
+as_of: '2026-09-25'
 owner: GOAL_OWNER
 allowed_routes:
   - DIRECT_CURSOR_DELIVERY
@@ -67,6 +67,12 @@ context_requirements:
 ---
 
 # FACTORY_LIVE_MAIN_PARITY_CONVERGENCE_V1
+
+Superseded by `FACTORY_PRODUCTION_LINE_CONVERGENCE_V1`. The merged parity
+did not prove deploy equivalence: live
+`aaf7f89c3bfc71de9d56618fdda0d3d69cfaf236` still lacked
+`activation_transition_research_event_proven` on main. History and evidence
+stay. This file is no longer the production-line owner.
 
 Git-only parity. Live `aaf7f89c` stays the running host. This branch copies
 the proven invariants onto `11bdb434` main.
