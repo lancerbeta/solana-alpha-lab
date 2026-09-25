@@ -9,11 +9,12 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/factory_production_line_convergence_v1/delivery_factory_fit_v1.json",
-    "sha256": "f898763ff9c6ea2d2278978aad36fea9c4881360dc5bf539958a8c358b6bc95c",
+    "sha256": "841a8fba2d056a4d3b03bf2477b79120127a167f35286725444327d5493b2b5e",
     "verdict": "PASS"
   },
   "implementation_bindings": {
     "catalog/assets/core.yaml": "468e44d799a715a5feb49540b3d331db20f7256139aef9f0e0fe62cfe4ebcf60",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "3066f0ddca4f74e5e66bf300898400f74dbed76a3ffb05ec1abf1d4146fb2e09",
     "docs/operator/FACTORY_REMOTE_HOST.md": "4020217fea69647cbd48bc63de0e3a73b913f8626435b996fc62bbbb6a2af985",
     "docs/tasks/FACTORY_PRODUCTION_LINE_CONVERGENCE_V1.md": "8e1b10952a56155f25409ca373dbe8941bc24215003604980fccfe43ca66cea3",
     "scripts/factory_live_release.py": "a71a5ea877d8074ac29bdd7e0235a28861d40164b609e4f3070895032b14e6c6",
@@ -51,7 +52,7 @@
     "targeted": "PASS_PRODUCTION_LINE_RELEASE_TESTS",
     "independent_review": {
       "path": "docs/evidence/factory_production_line_convergence_v1/delivery_independent_review_v1.json",
-      "sha256": "28fcfa07a54daf85cdcdee69db58abf764934d8f52c4ee84b726b9d35173cdb4",
+      "sha256": "42c944118484d3d8139265718944f8eb1d9ff307511969c2d9478e4d2a6f1523",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
