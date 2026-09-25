@@ -36,6 +36,9 @@ managed_write_set:
   - src/solana_alpha_lab/factory/collector_operational_packet.py
   - tests/test_factory_production_line_convergence_v1.py
   - tests/test_collector_continuity_boundaries_v1.py
+  - docs/evidence/factory_production_line_convergence_v1/delivery_completion_evidence_v1.json
+  - docs/evidence/factory_production_line_convergence_v1/delivery_independent_review_v1.json
+  - docs/evidence/factory_production_line_convergence_v1/delivery_factory_fit_v1.json
 external_caps:
   network: false
   credentials: false
@@ -57,7 +60,10 @@ context_requirements:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/factory_production_line_convergence_v1/delivery_completion_evidence_v1.json
+      - docs/evidence/factory_production_line_convergence_v1/delivery_independent_review_v1.json
+      - docs/evidence/factory_production_line_convergence_v1/delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

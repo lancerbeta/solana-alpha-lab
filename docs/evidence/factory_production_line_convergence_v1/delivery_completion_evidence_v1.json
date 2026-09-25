@@ -1,0 +1,59 @@
+{
+  "acceptance_id": "FACTORY-PRODUCTION-LINE-CONVERGENCE-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-09-25",
+  "base_main": "971e0a09e600ae3210b07094dd071824708d6bbd",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/factory_production_line_convergence_v1/delivery_factory_fit_v1.json",
+    "sha256": "a3e8204a20716487a5adf5e99f0600663e77db52367de9bcd27beba65e9baf60",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "docs/tasks/FACTORY_PRODUCTION_LINE_CONVERGENCE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "non_claims": [
+    "NO_DEPLOY",
+    "NO_VPS_OR_DRIVE_MUTATION",
+    "NO_C3_PLAN",
+    "NO_PROVIDER_CALLS"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": true,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "PRODUCTION_LINE_CANDIDATE_READY_FOR_OWNER_MERGE",
+  "task_id": "FACTORY_PRODUCTION_LINE_CONVERGENCE_V1",
+  "validation": {
+    "targeted": "PASS_PRODUCTION_LINE_RELEASE_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/factory_production_line_convergence_v1/delivery_independent_review_v1.json",
+      "sha256": "01ae6a251e094890773660102c866c4ba9ac29cd5a634ff25b76ff2fcd4a844f",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_PRODUCTION_LINE_RELEASE_TESTS"
+    ]
+  }
+}
