@@ -14,6 +14,7 @@
     ".agents/skills/hypothesis-forge/SKILL.md": "07731d34493883f9f877a62f658542c93ca8086bfcd0396f17d89e3499520659",
     "catalog/assets/core.yaml": "77bd4013fe96658b13cfec616bbc62c142aebbbec2c5d89ad7e5854e9c08debc",
     "docs/evidence/hfic_legacy_readback_honesty/a1_real_copy_rehearsal_v1.json": "d48be5547bbce68a2d38e60b2795c897b8aa5a8d765c72fc5fc394b8e83423ef",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "9772f8db6077d532dd678a0ca64269bbc7ab56e6a1eb7b5df9e51184afe89d45",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "a14eeae4f23b7bfe6d9d03f4cea31bd2d772155549725c44a8a8e90ee11795e6",
     "docs/reports/hfic_legacy_readback_honesty/a1_owner_readout_v1.md": "fe54c33c0dac7d4139092caac35cb8551e1c61ae33d49814ecb07ceee447fd7a",
     "docs/tasks/HFIC_LEGACY_READBACK_HONESTY_V1.md": "a033756f8951c41b346b5f03b9923d37644f5a71170872d5583c034f54bdccd5",
@@ -39,14 +40,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_legacy_readback_honesty/a1_delivery_factory_fit_v1.json",
-    "sha256": "6e611f95d9b520c60f1408f248d164b45e315b35aac66c4aeee4aa220d0578f4",
+    "sha256": "e6e3575cfc56dfbc2ba19e635c23110e095b3c0933fefb81141b1b7672a08397",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_LEGACY_READBACK_HONESTY_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/hfic_legacy_readback_honesty/a1_delivery_independent_review_v1.json",
-      "sha256": "180b65d18a82ef787f6f1e2eaaf82c0bd1591cd598ef1a764b906690a620ed3c",
+      "sha256": "05ac9a29124bb44a0eccc2dd0d8f80bbd0ea19a751ac0054c2d5a00cf346ea2a",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

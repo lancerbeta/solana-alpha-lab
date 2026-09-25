@@ -4,8 +4,8 @@
   "review_id": "HFIC-LEGACY-READBACK-HONESTY-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-25",
   "task_id": "HFIC_LEGACY_READBACK_HONESTY_V1",
-  "reviewed_bindings_sha256": "00461fcc7fb94aca15e693ac2446087e9bd876dab1479faed0e8e72dc89dea4e",
-  "reviewed_inventory_sha256": "4f4e1442f9483f2c258a79a9951e54dbd873c726654373e762bd83007823a486",
+  "reviewed_bindings_sha256": "921d524b27b86aefa25f01a7cf00039189cfac71c4f38c6139e5e42daf96e254",
+  "reviewed_inventory_sha256": "f4c0c29bedf3f7e7a92f3ba2ca9920b205bc36a7c0e09de9b967f7992dfca413",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
