@@ -517,8 +517,15 @@ def cmd_forge_run(
     )
 
     def _emit_run(payload: dict[str, Any], *, exit_code: int) -> int:
-        if payload.get("no_write") is True or not payload.get("owner_readout"):
+        existing = str(payload.get("owner_readout") or "")
+        history = next(
+            (line for line in existing.splitlines() if line.startswith("history:")),
+            "",
+        )
+        if payload.get("no_write") is True or not existing:
             payload["owner_readout"] = format_forge_run_owner_readout(payload)
+        if history and "history:" not in str(payload.get("owner_readout") or ""):
+            payload["owner_readout"] = str(payload.get("owner_readout") or "").rstrip() + "\n" + history
         _assert_no_path_leak(payload, str(repo_root))
         readout = payload.get("owner_readout")
         if isinstance(readout, str) and readout.strip():
