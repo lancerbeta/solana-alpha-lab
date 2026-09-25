@@ -7065,17 +7065,29 @@ def _classification_owner_readout(bundle: Mapping[str, Any]) -> str:
             reasons = [str(item) for item in raw_reasons]
         if not classifier_terminal:
             classifier_terminal = receipt.get("lane_classifier_terminal")
-    parts = [
-        f"terminal={bundle.get('critic_terminal') or bundle.get('final_session_terminal')}",
-        f"classifier={classifier_terminal}",
-    ]
-    if isinstance(route, str) and route:
-        parts.append(f"route={route}")
-    if reasons:
-        parts.append("reasons=" + ",".join(reasons))
     claimed = bundle.get("critic_claimed_terminal")
+    if bundle.get("runner_up_failover_used"):
+        parts = [
+            f"primary_terminal={bundle.get('primary_critic_terminal')}",
+            f"final_terminal={bundle.get('final_session_terminal') or bundle.get('critic_terminal')}",
+        ]
+    else:
+        parts = [
+            f"terminal={bundle.get('critic_terminal') or bundle.get('final_session_terminal')}",
+            f"classifier={classifier_terminal}",
+        ]
+        if isinstance(route, str) and route:
+            parts.append(f"route={route}")
+        if reasons:
+            parts.append("reasons=" + ",".join(reasons))
     if isinstance(claimed, str) and claimed:
         parts.append(f"critic_claimed={claimed}")
+    if (
+        bundle.get("critic_terminal") == "KILL_UNBOUND_EVIDENCE"
+        or bundle.get("primary_critic_terminal") == "KILL_UNBOUND_EVIDENCE"
+        or classifier_terminal == "DENY_HFIC_AVAILABILITY_GATE"
+    ):
+        parts.append("gate_denial=persisted_KILL_not_error")
     return " ".join(parts)
 
 

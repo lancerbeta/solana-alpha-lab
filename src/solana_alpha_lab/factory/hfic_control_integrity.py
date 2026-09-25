@@ -213,16 +213,21 @@ def fast_lane_availability_denial_codes(selected: Mapping[str, Any]) -> list[str
     grounding = selected.get("grounding")
     bindings = grounding.get("feature_bindings") if isinstance(grounding, Mapping) else None
     by_id: dict[str, list[str]] = {}
+    binding_unreadable = False
     if isinstance(bindings, list):
         for item in bindings:
             if not isinstance(item, Mapping):
+                binding_unreadable = True
                 continue
             feat = item.get("feature_id")
             if not isinstance(feat, str) or not feat:
+                binding_unreadable = True
                 continue
             availability = item.get("availability_class")
             class_name = availability if isinstance(availability, str) else ""
             by_id.setdefault(feat, []).append(class_name)
+    if binding_unreadable:
+        codes.append("REQUIRED_BINDING_NOT_PIT_READY")
     for feat in required_ids:
         observed = by_id.get(feat)
         if observed is None or len(observed) != 1 or observed[0] != PIT_READY_AVAILABILITY_CLASS:

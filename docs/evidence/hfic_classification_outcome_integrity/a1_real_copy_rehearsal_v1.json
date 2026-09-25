@@ -1,0 +1,74 @@
+{
+  "schema": "smial.hfic-classification-outcome-integrity-rehearsal",
+  "schema_version": "1.0",
+  "head": "c18ae65f6e56fe28246f12ef6e3ffa1c775f0016",
+  "base": "6bd7cfca0c33d18149b52cc4e95801952f0736fb",
+  "marker": "SYNTHETIC_AUDIT_FIXTURE",
+  "market_evidence_epoch_sha256": "3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9",
+  "capability_epoch_sha256": "f330465d6cf7b7082f2da8dcea5280c35a30b5eead6238e1d276118feb9ba603",
+  "real_rdp_manifest_sha256": "4c8b0b2c8c740221b86e70e87a1493808da90824772e44315c19e1c137034e1f",
+  "real_rdp_manifest_unchanged": true,
+  "verdict": "GO",
+  "journeys": [
+    {
+      "journey": "j1a",
+      "availability_class": "PIT_READY",
+      "session_id": "HFIC-SESS-BD1FAD3C0C96DFD3",
+      "stages": [
+        {"name": "preflight", "action": "START_NEW_SESSION", "writes": {"forge_context": 1, "research_store": 1, "session": 0}},
+        {"name": "freeze", "session_state": "FROZEN_AWAITING_CRITIC", "readback_ok": true},
+        {"name": "finalize", "session_state": "AWAITING_CLASSIFICATION", "critic_terminal": "PASS_TO_CLASSIFICATION"},
+        {"name": "classify", "session_state": "SYNTHESIS_COMPLETE", "final_terminal": "PASS_FAST_LANE_READY", "lane_classifier_terminal": "FAST_LANE_READY", "readback_ok": true}
+      ],
+      "final_terminal": "PASS_FAST_LANE_READY"
+    },
+    {
+      "journey": "j1b",
+      "availability_class": "FORWARD_ONLY",
+      "runner_up_availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+      "session_id": "HFIC-SESS-BD1FAD3C0C96DFD3",
+      "stages": [
+        {"name": "classify_primary", "session_state": "RUNNER_UP_AWAITING_CRITIC", "final_terminal": "KILL_UNBOUND_EVIDENCE", "classifier_route_terminal": "FAST_LANE_READY", "reason_codes": ["REQUIRED_BINDING_NOT_PIT_READY:FEAT-QUOTE-AVAILABILITY"], "readback_ok": true},
+        {"name": "classify_runner_up", "session_state": "SYNTHESIS_COMPLETE", "final_terminal": "KILL_UNBOUND_EVIDENCE", "critic_screen_count": 2}
+      ],
+      "final_terminal": "KILL_UNBOUND_EVIDENCE",
+      "c3": false
+    },
+    {
+      "journey": "j1c",
+      "availability_class": "FORWARD_ONLY",
+      "session_id": "HFIC-SESS-BD1FAD3C0C96DFD3",
+      "stages": [
+        {"name": "classify", "session_state": "SYNTHESIS_COMPLETE", "lane_classifier_terminal": "SCHEDULE_ACTIVATION_REQUIRED", "final_terminal": "OWNER_DECISION_REQUIRED", "readback_ok": true}
+      ],
+      "final_terminal": "OWNER_DECISION_REQUIRED"
+    },
+    {
+      "journey": "j2",
+      "stages": [
+        {"name": "forge-run", "next_action": "OWNER_CANDIDATE", "writes": {"forge_run": 0, "research_store": 0, "session": 0}},
+        {"name": "preflight", "action": "RETURN_EXISTING_SESSION", "session_id": "HFIC-SESS-BD1FAD3C0C96DFD3", "writes": {"forge_context": 0, "research_store": 0, "session": 0}}
+      ]
+    },
+    {
+      "journey": "j3",
+      "stages": [
+        {"name": "forge-run_after_freeze", "next_action": "RESUME_BASE", "reason": "FROZEN_AWAITING_CRITIC", "session_id": "HFIC-SESS-BD1FAD3C0C96DFD3", "writes": {"forge_run": 0, "research_store": 0, "session": 0}}
+      ]
+    },
+    {
+      "journey": "j5",
+      "stages": [
+        {"name": "freeze", "session_state": "SYNTHESIS_COMPLETE", "critic_terminal": "NO_WORTHY_HYPOTHESIS", "critic_launched": false, "selected_candidate_id": null},
+        {"name": "forge-run", "next_action": "START_BASE", "blocked_by": "CONTROL_SURFACE_REQUIRED", "writes": {"forge_run": 0, "research_store": 0, "session": 0}}
+      ],
+      "final_terminal": "NO_WORTHY_HYPOTHESIS"
+    }
+  ],
+  "follow_ups": [
+    "prove-runtime on the completed PIT session returned PROVENANCE_CORRECTION_CORRUPT. Not repaired here; placeholder-time honesty is atom 2.",
+    "Unreadable legacy session suffix 60FB3DA7C8EB33FC stays atom 2 (F3).",
+    "J2 forge-run next_action is OWNER_CANDIDATE with writes 0. Preflight is RETURN_EXISTING_SESSION for the same session and does not open a new session.",
+    "J3 new-process forge-run was captured after freeze (RESUME_BASE, same session). Awaiting and runner-up checkpoints were continued by later CLI processes, not a separate forge-run snapshot."
+  ]
+}

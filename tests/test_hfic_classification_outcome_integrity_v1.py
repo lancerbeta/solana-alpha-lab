@@ -368,7 +368,8 @@ class ClassificationOutcomeIntegrityTests(unittest.TestCase):
             self.assertEqual(done.get("critic_terminal"), "KILL_UNBOUND_EVIDENCE")
             self.assertEqual(done.get("critic_claimed_terminal"), "PASS_FAST_LANE_READY")
             shown = show_session(store, frozen["session_id"], repo_root=ROOT)
-            self.assertIn("route=", shown["owner_readout"])
+            self.assertEqual(shown.get("classifier_route_terminal"), "FAST_LANE_READY")
+            self.assertIn("persisted_KILL_not_error", shown["owner_readout"])
             self.assertIn("PASS_FAST_LANE_READY", shown["owner_readout"])
             self.assertNotIn(str(data_root), shown["owner_readout"])
         with tempfile.TemporaryDirectory() as tmp:
