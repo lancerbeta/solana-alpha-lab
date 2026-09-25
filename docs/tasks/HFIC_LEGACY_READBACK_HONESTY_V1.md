@@ -17,9 +17,9 @@ required_review_roles:
 expected_repository: lancerbeta/solana-alpha-lab
 
 git_binding:
-  expected_base: 94a4ea74afb6c921f4972312840be2de5eeba4f9
+  expected_base: ae678372f2a96fbc20c519c23905ae5c44332458
   expected_upstream: origin/main
-  expected_upstream_oid: 94a4ea74afb6c921f4972312840be2de5eeba4f9
+  expected_upstream_oid: ae678372f2a96fbc20c519c23905ae5c44332458
   expected_branch: cursor/hfic-legacy-readback-honesty-v1
   dirty_mode: ALLOW_REPORTED
 

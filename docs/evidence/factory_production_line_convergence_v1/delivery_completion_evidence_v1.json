@@ -1,0 +1,72 @@
+{
+  "acceptance_id": "FACTORY-PRODUCTION-LINE-CONVERGENCE-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-09-25",
+  "base_main": "94a4ea74afb6c921f4972312840be2de5eeba4f9",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/factory_production_line_convergence_v1/delivery_factory_fit_v1.json",
+    "sha256": "d6f0f32660683b8e3ae7e1b0a79262aa4a8af5a1f50806ed9e26632acf61bf9a",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "cd9fe3fde60cd4c0bfb90af1c2fc90f2eac0d77b6d0b5b0ec0d5af62de711b22",
+    "docs/evidence/factory_production_line_convergence_v1/live_delta_disposition_v1.json": "33a69dc3929bd10f01f75888dc508eeecde0f532230e663bcfd2dd05e7de1296",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "79b1e5a7775868d035a667680f548d602b8518c6b214b0e01288849e729920b6",
+    "docs/operator/FACTORY_REMOTE_HOST.md": "09f9183f9b87bc76b50754c16fe8753c4833279a19fd45598e8429cacc3baeb9",
+    "docs/tasks/FACTORY_LIVE_MAIN_PARITY_CONVERGENCE_V1.md": "27ee2c8afbdd35254cfe111326e88e54f4c88f6947b47bf720d3c9bfeacadbd4",
+    "docs/tasks/FACTORY_PRODUCTION_LINE_CONVERGENCE_V1.md": "8a04a5eab47457b7d902f510fc9a5e5dca196eb336ee92afa33c483adfed0e1b",
+    "scripts/factory_live_release.py": "750c92d901be3415ebb6426a5be812f22b244ea9a11a579d879348f10dca30db",
+    "scripts/observation_schedule.py": "2a38237afde7e55168be0af54c5b9d2d6d963638023190d5bd3a141eca0e469e",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "2504fcdfc42116a337e1e52f269299173b7d0752ffd0216feabc61bdd973f513",
+    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "9a4d63794654dbd941dc26dee48a9b9daa488d072d45a7681d9a30b56e422d27",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "36d8d7cc9ea8b8fcfce781534c0f4498bdf7130aaf26c81bb6bf3920470aa197",
+    "src/solana_alpha_lab/factory/production_lineage.py": "bc488157ecd327ad215c29ce74ea34054a2c1b75903b7684da481e4b7ccebbc2",
+    "tests/test_collector_continuity_boundaries_v1.py": "1c35e6cdd85071c85100a12727cf383e5b5d8b31c9522a213121b279d7dd1c59",
+    "tests/test_factory_production_line_convergence_v1.py": "79f5065c18850413cff312fe5996cc0f02b5cf78a631c48998567fef8551e4af"
+  },
+  "non_claims": [
+    "NO_DEPLOY",
+    "NO_VPS_OR_DRIVE_MUTATION",
+    "NO_C3_PLAN",
+    "NO_PROVIDER_CALLS"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "PRODUCTION_LINE_CANDIDATE_READY_FOR_OWNER_MERGE",
+  "task_id": "FACTORY_PRODUCTION_LINE_CONVERGENCE_V1",
+  "validation": {
+    "targeted": "PASS_PRODUCTION_LINE_RELEASE_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/factory_production_line_convergence_v1/delivery_independent_review_v1.json",
+      "sha256": "45a902a16b6009da508095801874a45784d446cc65466aed407d1c84ac1706d7",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_PRODUCTION_LINE_RELEASE_TESTS"
+    ]
+  }
+}

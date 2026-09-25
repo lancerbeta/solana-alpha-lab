@@ -99,6 +99,31 @@ volume/mount**. Пустой env = Git-side parent-independent sink под
 `local/factory_v1_backup_sink` (тот же диск, другой parent). Это не
 volume-independent и не DoD live RPO.
 
+## Production software line
+
+Git identity of the deploy tree is `.factory_deploy_sha`. That pin is not
+health and not acceptance. Runtime health is a fresh doctor / status /
+operational-packet readback.
+
+Steady state: the pin is on the first-parent history of canonical `main`.
+Production may lag `main`. It may not run a side branch. `local/` and host
+secrets stay outside Git.
+
+Normal release is one forward `--mode canonical-forward` via
+`scripts/factory_live_release.py`. It stops scheduled code timers, waits for
+an already running oneshot, stops long-running workbench/health only if they
+are not already inactive, installs one exact archive, then restores the prior
+timer and service state. It does not kill a collector tick and does not run
+target-rollback-target. `--mode canonical-rollback` is an explicit owner
+rollback. Automatic recovery after a failed install is not that mode: it
+puts the previous tree back before any unit is started again. `ABORT_DEPLOY`
+means the oneshot did not drain, the tree was not changed, and triggers were
+put back. `UNRESOLVED_RECOVERY` means the new tree failed and the previous
+tree could not be verified; timers and long-running services stay stopped.
+The one divergent host SHA
+`aaf7f89c3bfc71de9d56618fdda0d3d69cfaf236` may move only onto the current
+`main` that contains this repair, as `--mode legacy-convergence`.
+
 ## Live apply
 
 Фраза `OK FACTORY_REMOTE_OPERATIONS_V1 LIVE HOST:` уже получена.

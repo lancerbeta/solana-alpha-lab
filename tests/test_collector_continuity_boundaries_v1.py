@@ -281,7 +281,7 @@ class CollectorContinuityBoundaryTests(unittest.TestCase):
             )
             self.assertEqual(packet["activation_selection_status"], "SCOPED")
             self.assertEqual(packet["activation_id"], "ACT-LIVE")
-            self.assertEqual(packet["activation_state"], "ACTIVE")
+            self.assertEqual(packet["activation_state"], "UNKNOWN")
             self.assertEqual(packet["due_pressure"]["due_now_count"], 0)
             self.assertEqual(packet["due_pressure"]["actually_overdue_count"], 0)
             self.assertNotIn("RDP_PUBLICATION_STALE", set(packet["health_classes"]))
