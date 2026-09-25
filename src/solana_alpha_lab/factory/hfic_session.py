@@ -148,8 +148,9 @@ _INTERMEDIATE_CRITIC_TERMINALS = frozenset({"REVISE_ONCE", "PASS_TO_CLASSIFICATI
 class HficSessionError(ValueError):
     """Fail-closed HFIC session/protocol error."""
 
-    def __init__(self, code: str) -> None:
+    def __init__(self, code: str, *, uncovered_count: int | None = None) -> None:
         self.code = code
+        self.uncovered_count = uncovered_count
         super().__init__(code)
 
 
@@ -6615,7 +6616,26 @@ def _validate_json_schema(document: Mapping[str, Any], schema_path: Path) -> Non
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
 
 
-def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
+_READ_IDENTITY_FIELDS = (
+    "evidence_epoch_sha256",
+    "memory_eligibility_sha256",
+    "market_evidence_epoch_sha256",
+    "capability_epoch_sha256",
+    "market_evidence_basis",
+    "representation_semantic_version",
+    "representation_payload_sha256",
+    "scientific_slot_sha256",
+    "execution_binding_sha256",
+    "model_provenance_sha256",
+)
+
+
+def load_session_bundle(
+    store: Any,
+    session_id: str,
+    *,
+    read_mode: bool = False,
+) -> dict[str, Any] | None:
     cycles: list[dict[str, Any]] = []
     candidate_cards: list[dict[str, Any]] = []
     decisions: list[dict[str, Any]] = []
@@ -6687,6 +6707,7 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         return None
 
     _MISSING_IDENTITY = object()
+    identity_conflict_fields: list[str] = []
 
     def _historical_identity_value(key: str) -> Any:
         """Read immutable identity across cycles without reviving explicit UNKNOWN."""
@@ -6703,6 +6724,9 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
             if value not in observed:
                 observed.append(value)
         if len(observed) > 1 or (explicit_unknown and observed):
+            if read_mode and key in _READ_IDENTITY_FIELDS:
+                identity_conflict_fields.append(key)
+                return None
             raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
         if explicit_unknown:
             return None
@@ -7006,6 +7030,19 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         _verify_forge_context_artifact(store, context_digest)
     if state == "SYNTHESIS_COMPLETE":
         _verify_store_reference_resolution(store, bundle)
+    if read_mode:
+        if identity_conflict_fields:
+            from solana_alpha_lab.factory.hfic_evidence_identity import (
+                DISPOSITION_UNRESOLVED,
+            )
+
+            bundle["identity_status"] = DISPOSITION_UNRESOLVED
+            bundle["identity_conflict_fields"] = list(identity_conflict_fields)
+            for key in identity_conflict_fields:
+                bundle[key] = None
+        else:
+            bundle["identity_status"] = "BOUND"
+            bundle["identity_conflict_fields"] = []
     return bundle
 
 
@@ -7092,7 +7129,7 @@ def _classification_owner_readout(bundle: Mapping[str, Any]) -> str:
 
 
 def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[str, Any]:
-    bundle = load_session_bundle(store, session_id)
+    bundle = load_session_bundle(store, session_id, read_mode=True)
     if bundle is None:
         raise HficSessionError("SESSION_NOT_FOUND")
     digest = store.diagnostics().committed_inventory_sha256
@@ -7152,6 +7189,8 @@ def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[
         "session_receipt": _display_session_receipt(
             bundle.get("session_receipt"), provenance_status
         ),
+        "identity_status": bundle.get("identity_status"),
+        "identity_conflict_fields": list(bundle.get("identity_conflict_fields") or []),
         "provenance_time_status": provenance_status,
         "no_git_fence_receipt": (
             (bundle.get("session_receipt") or {}).get("no_git_fence_receipt")
@@ -7257,9 +7296,19 @@ def prove_runtime(
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
 
     before = repository_git_snapshot(Path(repo_root))
-    bundle = load_session_bundle(store, session_id)
+    bundle = load_session_bundle(store, session_id, read_mode=True)
     if bundle is None:
         raise HficSessionError("SESSION_NOT_FOUND")
+    if bundle.get("identity_status") == "UNRESOLVED_BINDING":
+        from solana_alpha_lab.factory.hfic_provenance import store_provenance_label
+
+        shown = show_session(store, session_id, repo_root=repo_root)
+        return {
+            **shown,
+            "runtime_no_git": "UNRESOLVED_BINDING",
+            "proof_status": "NOT_A_PROOF",
+            "store_provenance_time_status": store_provenance_label(store),
+        }
     receipt = bundle.get("session_receipt")
     if not isinstance(receipt, Mapping):
         raise HficSessionError("SESSION_RECEIPT_MISSING")
@@ -7327,18 +7376,26 @@ def prove_runtime(
     _verify_store_reference_resolution(store, bundle)
     from solana_alpha_lab.factory.hfic_provenance import (
         PROVENANCE_CORRECTED,
-        resolve_provenance_status,
+        provenance_status_for_session,
+        store_provenance_label,
     )
 
-    provenance_status = resolve_provenance_status(store)
+    provenance_status = provenance_status_for_session(store, session_id)
+    store_provenance = store_provenance_label(store)
+    warning = ""
+    if store_provenance.startswith("INVALID:") and provenance_status == "VALID":
+        warning = f" store_provenance={store_provenance} warning=UNRELATED_HISTORY"
     payload = {
         **shown,
         "runtime_no_git": "PROVEN",
+        "proof_status": "PROVEN",
         "provider_calls_actual": provider_calls,
         "git_composite_unchanged": True,
         "candidates_retrievable": shown["candidates_retrievable"],
         "artifacts_retrievable": shown["artifacts_retrievable"],
         "provenance_time_status": provenance_status,
+        "store_provenance_time_status": store_provenance,
+        "owner_readout": str(shown.get("owner_readout") or "") + warning,
         "recovered_exact_time": False,
     }
     if provenance_status == PROVENANCE_CORRECTED:

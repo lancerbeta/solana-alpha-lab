@@ -674,10 +674,10 @@ class HficProvenanceCorrectionTests(unittest.TestCase):
             )
             with self.assertRaises(HficSessionError) as raised:
                 apply_provenance_correction(store, repo_root=ROOT, clock=FrozenClock(CORRECTION_TIME))
-            self.assertEqual(str(raised.exception), "PROVENANCE_CORRECTION_MISMATCH")
+            self.assertEqual(str(raised.exception), "PROVENANCE_CORRECTION_PARTIAL")
             with self.assertRaises(HficSessionError) as raised:
                 resolve_provenance_status(store)
-            self.assertEqual(str(raised.exception), "PROVENANCE_CORRECTION_MISMATCH")
+            self.assertEqual(str(raised.exception), "PROVENANCE_CORRECTION_PARTIAL")
 
     def test_corrupt_and_partial_correction_fail_closed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -840,9 +840,14 @@ class HficProvenanceCorrectionTests(unittest.TestCase):
             )
             shown_valid = show_session(store, str(frozen["session_id"]), repo_root=ROOT)
             self.assertEqual(shown_valid["provenance_time_status"], PROVENANCE_VALID)
-            with self.assertRaises(HficSessionError) as other_uncovered:
-                prove_runtime(store, str(frozen["session_id"]), repo_root=ROOT)
-            self.assertEqual(str(other_uncovered.exception), "PROVENANCE_TIME_UNCOVERED")
+            unrelated = prove_runtime(store, str(frozen["session_id"]), repo_root=ROOT)
+            self.assertEqual(unrelated["runtime_no_git"], "PROVEN")
+            self.assertEqual(unrelated["provenance_time_status"], PROVENANCE_VALID)
+            self.assertEqual(
+                unrelated["store_provenance_time_status"],
+                "INVALID:PROVENANCE_TIME_UNCOVERED",
+            )
+            self.assertIn("UNRELATED_HISTORY", unrelated["owner_readout"])
             store.append(
                 [
                     _placeholder_event(

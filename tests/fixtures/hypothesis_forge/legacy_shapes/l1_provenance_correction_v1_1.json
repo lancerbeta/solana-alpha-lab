@@ -1,0 +1,47 @@
+{
+  "fixture": "SYNTHETIC_AUDIT_FIXTURE",
+  "schema": "smial.hfic-provenance-time-correction",
+  "schema_version": "1.0",
+  "correction_id": "HFIC-ART-PROVENANCE-CORR-LEGACYV11SYN",
+  "artifact_kind": "PROVENANCE_TIME_CORRECTION",
+  "hfic_protocol": "HFIC-V1.1",
+  "affected_records": [
+    {
+      "record_id": "HFIC-ART-LEGACY-PLACEHOLDER-A",
+      "payload_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "record_kind": "RESEARCH_ARTIFACT",
+      "artifact_kind": "SESSION_RECEIPT",
+      "session_id": "HFIC-SESS-LEGACYPLACE01",
+      "affected_fields": ["created_at", "payload.created_at"]
+    },
+    {
+      "record_id": "HFIC-CYCLE-LEGACY-PLACEHOLDER-B",
+      "payload_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "record_kind": "RESEARCH_CYCLE",
+      "artifact_kind": null,
+      "session_id": "HFIC-SESS-LEGACYPLACE01",
+      "affected_fields": ["created_at"]
+    },
+    {
+      "record_id": "HFIC-HYP-LEGACY-PLACEHOLDER-C",
+      "payload_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "record_kind": "HYPOTHESIS_VERSION",
+      "artifact_kind": null,
+      "session_id": null,
+      "affected_fields": ["created_at", "payload.created_at"]
+    }
+  ],
+  "original_placeholder_value": "1970-01-01T00:00:00Z",
+  "original_exact_time_status": "UNKNOWN",
+  "chronological_use_forbidden": true,
+  "correction_created_at": "2026-08-27T15:00:00Z",
+  "producer_git_sha": "0123456789abcdef0123456789abcdef01234567",
+  "reason_code": "HFIC_PLACEHOLDER_PROVENANCE_TIME",
+  "inventory_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "authority": {
+    "git_mutation": 0,
+    "experiment_execution": 0,
+    "provider_api_rpc_wss_calls": 0
+  },
+  "non_claims": ["NO_RECOVERED_EXACT_TIME", "NO_RDP_REWRITE", "NO_SESSION_REGENERATION"]
+}

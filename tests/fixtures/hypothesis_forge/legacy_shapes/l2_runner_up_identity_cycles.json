@@ -1,0 +1,29 @@
+{
+  "fixture": "SYNTHETIC_AUDIT_FIXTURE",
+  "session_id": "HFIC-SESS-LEGACYRUNNER01",
+  "cycles": [
+    {
+      "session_id": "HFIC-SESS-LEGACYRUNNER01",
+      "hfic_protocol": "HFIC-V1.1",
+      "phase": "FROZEN_AWAITING_CRITIC",
+      "hfic_cycle_seq": 1,
+      "owner_focus": "AUTO",
+      "memory_eligibility_sha256": "ab0123456789ab0123456789ab0123456789ab0123456789ab0123456789ab01"
+    },
+    {
+      "session_id": "HFIC-SESS-LEGACYRUNNER01",
+      "hfic_protocol": "HFIC-V1.1",
+      "phase": "RUNNER_UP_AWAITING_CRITIC",
+      "hfic_cycle_seq": 2,
+      "owner_focus": "AUTO"
+    },
+    {
+      "session_id": "HFIC-SESS-LEGACYRUNNER01",
+      "hfic_protocol": "HFIC-V1.1",
+      "phase": "SYNTHESIS_COMPLETE",
+      "hfic_cycle_seq": 3,
+      "owner_focus": "AUTO",
+      "memory_eligibility_sha256": null
+    }
+  ]
+}

@@ -464,13 +464,20 @@ def resolve_authoritative_hypothesis_registered_at(
         ) == hypothesis_definition_sha256
         if not version_match and not definition_match:
             continue
-        instant = record.created_at
+        from solana_alpha_lab.factory.hfic_clock import is_placeholder_timestamp
+
+        candidates: list[datetime] = []
+        if not is_placeholder_timestamp(record.created_at):
+            candidates.append(record.created_at)
         payload_created = payload.get("created_at")
-        if isinstance(payload_created, str):
+        if isinstance(payload_created, str) and not is_placeholder_timestamp(payload_created):
             try:
-                instant = min(instant, parse_utc(payload_created))
+                candidates.append(parse_utc(payload_created))
             except Exception:
                 pass
+        if not candidates:
+            continue
+        instant = min(candidates)
         if earliest is None or instant < earliest:
             earliest = instant
     return earliest

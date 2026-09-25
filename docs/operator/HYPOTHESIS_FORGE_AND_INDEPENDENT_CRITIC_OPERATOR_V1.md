@@ -84,8 +84,14 @@ read-only `inventory-placeholder-times` then append-only
 rewrite RDP bytes, does not recover an exact original time, and is not a
 slash-cycle step. `show-session` reports session-local
 `provenance_time_status` = `VALID` or `CORRECTED_ORIGINAL_UNKNOWN` and never
-presents 1970 as an operational date. Uncovered placeholder HFIC records make
-`prove-runtime` fail closed with `PROVENANCE_TIME_UNCOVERED`.
+presents 1970 as an operational date. `prove-runtime` fails closed with
+`PROVENANCE_TIME_UNCOVERED` only when the session under proof itself has an
+uncovered placeholder. An unrelated store-wide invalid correction does not
+fail a clean session: the proof stays `PROVEN`, with
+`store_provenance_time_status=INVALID:<code>` and an `UNRELATED_HISTORY`
+warning. `original_exact_time_status=UNKNOWN` and
+`chronological_use_forbidden=true` are set only when that session's own
+provenance is `CORRECTED_ORIGINAL_UNKNOWN`.
 
 **Search-memory policy (не часть `/hypothesis-forge`).** Completed HFIC sessions
 can be excluded from *future HFIC search memory* by an append-only ResearchStore
@@ -349,6 +355,10 @@ typed `AUTO_HANDOFF_UNAVAILABLE`.
 | `OWNER_DECISION_REQUIRED` | Принять только названное материальное решение; не выдавать общее разрешение. |
 
 ---
+
+## FORGE RUN history line
+
+The `owner_readout` `history:` line is mandatory. `CURRENT_MARKET_HISTORY_UNREADABLE` or store provenance `INVALID:` is STOP before Prompt A. Other skips and legacy rows are a visible warning only.
 
 # PROMPT A — HYPOTHESIS FORGE V1
 
