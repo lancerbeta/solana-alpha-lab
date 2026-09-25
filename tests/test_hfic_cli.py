@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -111,24 +112,41 @@ def populate_real_c1_c2(data_root: Path, workspace: Path) -> None:
         assert imported["status"] == "IMPORTED"
 
 
-def seed_minimal_market_basis(data_root: Path) -> None:
-    """Attach a synthetic live corpus so a legacy fixture can pass A5 admission.
+_C1_C2_TEMPLATE: Path | None = None
 
-    Empty RDP is not a scientific market. Tests of version lock, replay, or
-    clock identity call this before preflight; they do not weaken the
-    production incomplete-market stop.
+
+def c1_c2_template_data_root() -> Path:
+    """Build one process-local C1/C2 corpus through the production seal+import path."""
+
+    global _C1_C2_TEMPLATE
+    if _C1_C2_TEMPLATE is not None and (_C1_C2_TEMPLATE / "datasets" / "manifests").is_dir():
+        return _C1_C2_TEMPLATE
+    import tempfile
+
+    holder = Path(tempfile.mkdtemp(prefix="a5-c1c2-template-"))
+    data_root = holder / "data"
+    populate_real_c1_c2(data_root, holder / "workspace")
+    _C1_C2_TEMPLATE = data_root
+    return data_root
+
+
+def seed_minimal_market_basis(data_root: Path) -> None:
+    """Copy the process-local production C1/C2 template into an isolated data root.
+
+    Empty roots are not given a basis. Callers that must keep
+    MARKET_EVIDENCE_BASIS_INCOMPLETE do not call this helper.
     """
 
-    from test_live_cohort_to_forge_operational_closure_v1 import (
-        _commission,
-        _write_stub_live_corpus,
-    )
-
+    source = c1_c2_template_data_root()
     data_root.mkdir(parents=True, exist_ok=True)
     if (data_root / "datasets" / "manifests").is_dir():
         return
-    _commission(data_root)
-    _write_stub_live_corpus(data_root, cohort_id="COHORT-A5-MIN-001")
+    for child in source.iterdir():
+        target = data_root / child.name
+        if child.is_dir():
+            shutil.copytree(child, target, symlinks=False)
+        else:
+            shutil.copy2(child, target)
 
 
 def bind_draft(draft: dict, receipt: dict) -> dict:
@@ -152,6 +170,8 @@ def run_cli(*args: str, data_root: Path, env: dict[str, str] | None = None) -> s
     if env:
         merged.update(env)
     merged["SMIAL_DATA_ROOT"] = str(data_root)
+    merged["PYTHONUTF8"] = "1"
+    merged["PYTHONIOENCODING"] = "utf-8"
     return subprocess.run(
         [
             sys.executable,
@@ -168,7 +188,7 @@ def run_cli(*args: str, data_root: Path, env: dict[str, str] | None = None) -> s
         capture_output=True,
         text=True,
         encoding="utf-8",
-        errors="strict",
+        errors="replace",
         check=False,
     )
 

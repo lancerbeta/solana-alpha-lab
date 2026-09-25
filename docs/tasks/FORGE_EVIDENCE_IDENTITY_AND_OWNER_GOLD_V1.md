@@ -68,6 +68,8 @@ managed_write_set:
   - tests/test_hfic_reopened_prior_search_routing_v1.py
   - tests/test_live_cohort_to_forge_operational_closure_v1.py
   - tests/test_hfic_cli.py
+  - tests/test_hfic_legacy_science_rebase.py
+  - tests/test_hfic_fresh_control_decision_integrity_closure_v1.py
   - tests/test_hfic_critic_prior_memory_closure_v1.py
   - tests/test_hfic_discovery_prospects_and_next_action.py
   - tests/test_hfic_forge_context_and_no_worthy.py

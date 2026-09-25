@@ -67,6 +67,8 @@ def bind_draft(draft: dict, receipt: dict) -> dict:
 def run_cli(*args: str, data_root: Path) -> subprocess.CompletedProcess[str]:
     env = dict(os.environ)
     env["SMIAL_DATA_ROOT"] = str(data_root)
+    env["PYTHONUTF8"] = "1"
+    env["PYTHONIOENCODING"] = "utf-8"
     return subprocess.run(
         [
             sys.executable,
@@ -83,7 +85,7 @@ def run_cli(*args: str, data_root: Path) -> subprocess.CompletedProcess[str]:
         capture_output=True,
         text=True,
         encoding="utf-8",
-        errors="strict",
+        errors="replace",
         check=False,
     )
 

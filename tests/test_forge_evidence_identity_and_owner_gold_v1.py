@@ -2607,25 +2607,14 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             store = ResearchStore(data_root)
             _no_worthy_base(data_root, store, production_preflight=True)
             clone = Path(tmp) / "repo"
-            current_branch = subprocess.check_output(
-                ["git", "branch", "--show-current"], cwd=ROOT, text=True
-            ).strip()
-            subprocess.check_call(
-                [
-                    "git",
-                    "clone",
-                    "--no-local",
-                    "--branch",
-                    current_branch,
-                    str(ROOT),
-                    str(clone),
-                ],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
             current_head = subprocess.check_output(
                 ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
             ).strip()
+            subprocess.check_call(
+                ["git", "clone", "--no-local", str(ROOT), str(clone)],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
             _git(clone, "checkout", "--detach", current_head)
             candidate_diff = subprocess.check_output(
                 ["git", "diff", "--binary", "HEAD"], cwd=ROOT
