@@ -9,11 +9,23 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/factory_production_line_convergence_v1/delivery_factory_fit_v1.json",
-    "sha256": "a3e8204a20716487a5adf5e99f0600663e77db52367de9bcd27beba65e9baf60",
+    "sha256": "686c1635228725e25a34b95c777806ab6f5f14e7d7f262e1fa35c367ff515738",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "docs/tasks/FACTORY_PRODUCTION_LINE_CONVERGENCE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "be5bd0d8aa2414dbf0862c832fdd46e497b9f5a07bf1f773dd4f8f9ffe4fbdb8",
+    "docs/evidence/factory_production_line_convergence_v1/live_delta_disposition_v1.json": "33a69dc3929bd10f01f75888dc508eeecde0f532230e663bcfd2dd05e7de1296",
+    "docs/operator/FACTORY_REMOTE_HOST.md": "09f9183f9b87bc76b50754c16fe8753c4833279a19fd45598e8429cacc3baeb9",
+    "docs/tasks/FACTORY_LIVE_MAIN_PARITY_CONVERGENCE_V1.md": "27ee2c8afbdd35254cfe111326e88e54f4c88f6947b47bf720d3c9bfeacadbd4",
+    "docs/tasks/FACTORY_PRODUCTION_LINE_CONVERGENCE_V1.md": "4952dee5a36c9720919b9e8f8f60fdc88b60ee8419ebf44a3178875582fbf5e6",
+    "scripts/factory_live_release.py": "750c92d901be3415ebb6426a5be812f22b244ea9a11a579d879348f10dca30db",
+    "scripts/observation_schedule.py": "2a38237afde7e55168be0af54c5b9d2d6d963638023190d5bd3a141eca0e469e",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "2504fcdfc42116a337e1e52f269299173b7d0752ffd0216feabc61bdd973f513",
+    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "9a4d63794654dbd941dc26dee48a9b9daa488d072d45a7681d9a30b56e422d27",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "36d8d7cc9ea8b8fcfce781534c0f4498bdf7130aaf26c81bb6bf3920470aa197",
+    "src/solana_alpha_lab/factory/production_lineage.py": "bc488157ecd327ad215c29ce74ea34054a2c1b75903b7684da481e4b7ccebbc2",
+    "tests/test_collector_continuity_boundaries_v1.py": "1c35e6cdd85071c85100a12727cf383e5b5d8b31c9522a213121b279d7dd1c59",
+    "tests/test_factory_production_line_convergence_v1.py": "79f5065c18850413cff312fe5996cc0f02b5cf78a631c48998567fef8551e4af"
   },
   "non_claims": [
     "NO_DEPLOY",
@@ -47,7 +59,7 @@
     "targeted": "PASS_PRODUCTION_LINE_RELEASE_TESTS",
     "independent_review": {
       "path": "docs/evidence/factory_production_line_convergence_v1/delivery_independent_review_v1.json",
-      "sha256": "01ae6a251e094890773660102c866c4ba9ac29cd5a634ff25b76ff2fcd4a844f",
+      "sha256": "ea155f0010d85505223f74355d93bb55bfecf8cb4faf83b7d2e56ab90855be46",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
