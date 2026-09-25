@@ -17,6 +17,7 @@ if str(SRC) not in sys.path:
 from solana_alpha_lab.factory.observation_schedule import (  # noqa: E402
     ObservationScheduleError,
     load_observation_schedule,
+    parse_utc,
 )
 from solana_alpha_lab.factory.observation_schedule_compiler import (  # noqa: E402
     compile_schedule_document,
@@ -24,6 +25,7 @@ from solana_alpha_lab.factory.observation_schedule_compiler import (  # noqa: E4
 from solana_alpha_lab.factory.observation_schedule_lifecycle import (  # noqa: E402
     ObservationLifecycleError,
     _require_live_authority,
+    activation_transition_research_event_proven,
     activate_schedule,
     abort_schedule,
     authorize_schedule,
@@ -483,6 +485,45 @@ def main(
                     },
                     2,
                 )
+            if current_state == "ACTIVE":
+                current_row = next(
+                    (
+                        row
+                        for row in activations
+                        if str(row.get("schedule_sha256") or "")
+                        == str(current_report.get("current_schedule_sha256") or "")
+                        and str(row.get("activation_id") or "")
+                        == str(current_report.get("current_activation_id") or "")
+                    ),
+                    None,
+                )
+                try:
+                    active_transition_proven = (
+                        current_row is not None
+                        and activation_transition_research_event_proven(
+                            data_root, current_row, now=now
+                        )
+                    )
+                except Exception:
+                    active_transition_proven = False
+                if not active_transition_proven:
+                    return _emit(
+                        {
+                            **current_timing,
+                            "terminal": "DOCTOR_ACTIVE_TRANSITION_PROOF_UNAVAILABLE",
+                            "live_activation": False,
+                            "current_activation_id": current_report.get(
+                                "current_activation_id"
+                            ),
+                            "current_activation_state": "UNKNOWN",
+                            "activation_selection_status": "UNKNOWN",
+                            "restore_marker_unresolved": False,
+                            "activation_count": len(activations),
+                            "collector": collector,
+                            "next_action": "RECONCILE_ACTIVE_TRANSITION_PROOF",
+                        },
+                        2,
+                    )
             if current_report["terminal"] == "DOCTOR_NO_LIVE_ACTIVATION":
                 return _emit(
                     {
@@ -596,7 +637,8 @@ def main(
                         },
                         2,
                     )
-                if str(activation["state"]) == "PAUSED_OPERATOR":
+                activation_state = str(activation["state"])
+                if activation_state == "PAUSED_OPERATOR":
                     return _emit(
                         {
                             "terminal": "PAUSED_OPERATOR",
@@ -607,6 +649,64 @@ def main(
                         },
                         2,
                     )
+                if activation_state == "ACTIVE":
+                    try:
+                        active_transition_proven = activation_transition_research_event_proven(
+                            data_root, activation, now=now
+                        )
+                    except Exception:
+                        active_transition_proven = False
+                    if not active_transition_proven:
+                        return _emit(
+                            {
+                                "terminal": "TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE",
+                                "schedule_sha256": digest,
+                                "activation_id": activation_id,
+                                "provider_calls": 0,
+                                "credential_reads": 0,
+                                "next_action": "RECONCILE_ACTIVE_TRANSITION_PROOF",
+                            },
+                            2,
+                        )
+                elif activation_state == "DRAINING":
+                    transition_payload = activation.get("payload")
+                    if isinstance(transition_payload, str):
+                        try:
+                            transition_payload = json.loads(transition_payload)
+                        except json.JSONDecodeError:
+                            transition_payload = None
+                    try:
+                        if not isinstance(transition_payload, dict):
+                            raise ValueError("TRANSITION_PAYLOAD_UNAVAILABLE")
+                        transition_effective_at = parse_utc(
+                            str(transition_payload["transition_effective_at"])
+                        )
+                    except (KeyError, TypeError, ValueError):
+                        return _emit(
+                            {
+                                "terminal": "TICK_REFUSED_DRAINING_TRANSITION_PROOF_UNAVAILABLE",
+                                "schedule_sha256": digest,
+                                "activation_id": activation_id,
+                                "provider_calls": 0,
+                                "credential_reads": 0,
+                                "next_action": "RECONCILE_DRAINING_TRANSITION_PROOF",
+                            },
+                            2,
+                        )
+                    if transition_effective_at > now and not activation_transition_research_event_proven(
+                        data_root, activation, now=now
+                    ):
+                        return _emit(
+                            {
+                                "terminal": "TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE",
+                                "schedule_sha256": digest,
+                                "activation_id": activation_id,
+                                "provider_calls": 0,
+                                "credential_reads": 0,
+                                "next_action": "RECONCILE_ACTIVE_TRANSITION_PROOF",
+                            },
+                            2,
+                        )
                 try:
                     authority = _require_live_authority(
                         store,

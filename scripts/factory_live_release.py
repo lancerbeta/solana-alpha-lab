@@ -27,6 +27,12 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from solana_alpha_lab.factory.live_ops_hardening import LiveOpsHardeningError, _now
+from solana_alpha_lab.factory.production_lineage import (
+    DENY_CANONICAL_MAIN_UNVERIFIED,
+    classify_forward,
+    classify_legacy_convergence,
+    classify_rollback,
+)
 
 DEPLOY_SHA_NAME = ".factory_deploy_sha"
 UNITS = [
@@ -36,6 +42,20 @@ UNITS = [
     "factory-remote-backup.timer",
 ]
 PRESERVE_NAMES = frozenset({"local", ".venv", DEPLOY_SHA_NAME})
+# Timers that execute tracked code. Stop these before tree replacement.
+# Do not stop their oneshot services; wait for a running tick to finish.
+SCHEDULED_CODE_TIMERS = (
+    "factory-observation-schedule.timer",
+    "factory-remote-backup.timer",
+    "factory-remote-backup-gdrive.timer",
+    "factory-remote-backup-gdrive-delta.timer",
+    "factory-paper-heartbeat.timer",
+    "factory-hot90-closed-day-archive.timer",
+    "factory-collector-owner-pulse.timer",
+    "factory-operability-watch.timer",
+)
+ONESHOT_DRAIN_SECONDS = 180
+DRAIN_POLL_SECONDS = 1
 
 
 def _run(cmd: list[str], *, cwd: Path | None = None) -> str:
@@ -177,6 +197,141 @@ def deploy_exact_sha(
     }
 
 
+def verify_installed_tree(*, staging: Path, deploy_root: Path) -> None:
+    for path in staging.rglob("*"):
+        if not path.is_file():
+            continue
+        relative = path.relative_to(staging)
+        if relative.parts and relative.parts[0] in PRESERVE_NAMES:
+            continue
+        installed = deploy_root / relative
+        if installed.read_bytes() != path.read_bytes():
+            raise LiveOpsHardeningError(f"INSTALL_TREE_MISMATCH:{relative.as_posix()}")
+
+
+def snapshot_timer_state(systemctl) -> dict[str, str]:
+    state: dict[str, str] = {}
+    for unit in SCHEDULED_CODE_TIMERS:
+        active = systemctl("is-active", unit).strip()
+        state[unit] = "active" if active == "active" else "inactive"
+    return state
+
+
+def quiesce_scheduled_code(*, systemctl, sleep, budget_seconds: int = ONESHOT_DRAIN_SECONDS) -> dict[str, str]:
+    prior = snapshot_timer_state(systemctl)
+    for unit, active in prior.items():
+        if active == "active":
+            systemctl("stop", unit)
+    waited = 0
+    while waited < budget_seconds:
+        busy = []
+        for timer in SCHEDULED_CODE_TIMERS:
+            service = timer.replace(".timer", ".service")
+            if systemctl("is-active", service).strip() == "active":
+                busy.append(service)
+        if not busy:
+            return prior
+        sleep(DRAIN_POLL_SECONDS)
+        waited += DRAIN_POLL_SECONDS
+    for unit, active in prior.items():
+        if active == "active":
+            systemctl("start", unit)
+    raise LiveOpsHardeningError("ABORT_DEPLOY")
+
+
+def restore_timer_state(prior: dict[str, str], systemctl) -> None:
+    for unit, active in prior.items():
+        if active == "active":
+            systemctl("start", unit)
+        else:
+            systemctl("stop", unit)
+
+
+def forward_release(
+    *,
+    repo: Path,
+    deploy_root: Path,
+    target_sha: str,
+    main_sha: str,
+    live_sha: str,
+    mode: str = "canonical-forward",
+    evidence: dict[str, Any] | None = None,
+    expected_evidence_sha256: str = "",
+    sync_env: bool = True,
+    systemctl=systemctl,
+    sleep=None,
+) -> dict[str, Any]:
+    import time
+
+    if sleep is None:
+        sleep = time.sleep
+    if mode == "legacy-convergence":
+        if evidence is None:
+            raise LiveOpsHardeningError("DENY_CONVERGENCE_EVIDENCE_INCOMPLETE")
+        classify_legacy_convergence(
+            repo=repo,
+            main_sha=main_sha,
+            live_sha=live_sha,
+            target_sha=target_sha,
+            evidence=evidence,
+            expected_evidence_sha256=expected_evidence_sha256,
+        )
+        line_mode = "LEGACY_CONVERGENCE"
+    elif mode == "canonical-rollback":
+        classify_rollback(
+            repo=repo,
+            main_sha=main_sha,
+            live_sha=live_sha,
+            rollback_sha=target_sha,
+        )
+        line_mode = "CANONICAL_ROLLBACK"
+    elif mode == "canonical-forward":
+        classify_forward(
+            repo=repo,
+            main_sha=main_sha,
+            live_sha=live_sha,
+            target_sha=target_sha,
+        )
+        line_mode = "CANONICAL_FORWARD"
+    else:
+        raise LiveOpsHardeningError(DENY_CANONICAL_MAIN_UNVERIFIED)
+    prior = quiesce_scheduled_code(systemctl=systemctl, sleep=sleep)
+    mutated = False
+    try:
+        with tempfile.TemporaryDirectory(prefix="factory-release-") as tmp:
+            staging = Path(tmp) / target_sha
+            archive_sha_to_staging(repo=repo, sha=target_sha, staging=staging)
+            sync_staging_into_deploy(staging=staging, deploy_root=deploy_root)
+            mutated = True
+            write_deploy_sha(deploy_root, target_sha)
+            verify_installed_tree(staging=staging, deploy_root=deploy_root)
+            if sync_env:
+                uv_sync(deploy_root)
+    except Exception as exc:
+        restore_timer_state(prior, systemctl)
+        if mutated:
+            try:
+                deploy_exact_sha(
+                    repo=repo,
+                    deploy_root=deploy_root,
+                    sha=live_sha,
+                    sync_env=False,
+                    restart=False,
+                )
+            except Exception as recover_exc:
+                raise LiveOpsHardeningError("UNRESOLVED_RECOVERY") from recover_exc
+        raise exc
+    restore_timer_state(prior, systemctl)
+    return {
+        "sha": target_sha,
+        "line_mode": line_mode,
+        "forward_transitions": 1,
+        "rollback_performed": False,
+        "timer_state_restored": prior,
+        "at": _now(),
+    }
+
+
 def release_sequence(
     *,
     repo: Path,
@@ -225,15 +380,30 @@ def main() -> int:
     parser.add_argument("--repo", type=Path, required=True, help="Git repository with object SHAs")
     parser.add_argument("--deploy-root", type=Path, default=Path("/opt/solana-alpha-lab"))
     parser.add_argument("--target-sha", required=True)
-    parser.add_argument("--previous-sha", required=True)
+    parser.add_argument("--main-sha", required=True)
+    parser.add_argument("--live-sha", required=True)
+    parser.add_argument(
+        "--mode",
+        choices=("canonical-forward", "canonical-rollback", "legacy-convergence"),
+        default="canonical-forward",
+    )
+    parser.add_argument("--evidence", type=Path)
+    parser.add_argument("--evidence-sha256", default="")
     parser.add_argument("--skip-uv-sync", action="store_true")
     parser.add_argument("--json-out", type=Path)
     args = parser.parse_args()
-    result = release_sequence(
+    evidence = None
+    if args.evidence is not None:
+        evidence = json.loads(args.evidence.read_text(encoding="utf-8"))
+    result = forward_release(
         repo=args.repo.resolve(),
         deploy_root=args.deploy_root.resolve(),
         target_sha=args.target_sha,
-        previous_sha=args.previous_sha,
+        main_sha=args.main_sha,
+        live_sha=args.live_sha,
+        mode=args.mode,
+        evidence=evidence,
+        expected_evidence_sha256=args.evidence_sha256,
         sync_env=not args.skip_uv_sync,
     )
     payload = json.dumps(result, indent=2, sort_keys=True) + "\n"

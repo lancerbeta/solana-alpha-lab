@@ -1219,6 +1219,22 @@ def build_collector_operational_packet(
     if cohort_id:
         release["cohort_id"] = cohort_id
 
+    reported_activation_state = base.get("activation_state") or UNKNOWN
+    if reported_activation_state == "ACTIVE" and digest and act_id:
+        try:
+            from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+                activation_transition_research_event_proven,
+            )
+
+            proof_row = store.get_activation(digest, act_id)
+            proven = proof_row is not None and activation_transition_research_event_proven(
+                rdp, proof_row, now=clock
+            )
+        except Exception:
+            proven = False
+        if not proven:
+            reported_activation_state = "UNKNOWN"
+
     packet: dict[str, Any] = {
         "schema": "smial.collector-operational-packet",
         "schema_version": "1.0",
@@ -1228,7 +1244,7 @@ def build_collector_operational_packet(
         "deploy_git_sha": base.get("deploy_git_sha") or UNKNOWN,
         "schedule_sha256": base.get("schedule_sha256") or UNKNOWN,
         "activation_id": base.get("activation_id") or UNKNOWN,
-        "activation_state": base.get("activation_state") or UNKNOWN,
+        "activation_state": reported_activation_state,
         "activation_selection_status": base.get("activation_selection_status") or UNKNOWN,
         "campaign_id": campaign_id or UNKNOWN,
         "cohort_id": release.get("cohort_id") or UNKNOWN,

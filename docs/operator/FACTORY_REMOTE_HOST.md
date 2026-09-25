@@ -99,6 +99,26 @@ volume/mount**. Пустой env = Git-side parent-independent sink под
 `local/factory_v1_backup_sink` (тот же диск, другой parent). Это не
 volume-independent и не DoD live RPO.
 
+## Production software line
+
+Git identity of the deploy tree is `.factory_deploy_sha`. That pin is not
+health and not acceptance. Runtime health is a fresh doctor / status /
+operational-packet readback.
+
+Steady state: the pin is on the first-parent history of canonical `main`.
+Production may lag `main`. It may not run a side branch. `local/` and host
+secrets stay outside Git.
+
+Normal release is one forward `CANONICAL_FORWARD` via
+`scripts/factory_live_release.py`. It stops scheduled code timers, waits for
+an already running oneshot, installs one exact archive, then restores the
+prior timer state. It does not kill a collector tick and does not run
+target-rollback-target. Rollback is recovery or an explicit
+`canonical-rollback`. The one divergent host SHA
+`aaf7f89c3bfc71de9d56618fdda0d3d69cfaf236` may move onto main only as
+`legacy-convergence` with the disposition evidence from
+`FACTORY_PRODUCTION_LINE_CONVERGENCE_V1`.
+
 ## Live apply
 
 Фраза `OK FACTORY_REMOTE_OPERATIONS_V1 LIVE HOST:` уже получена.
