@@ -2,21 +2,19 @@
 task_id: FACTORY_PRODUCTION_LINE_CONVERGENCE_V1
 task_version: '1.0'
 status: IN_PROGRESS
-as_of: '2026-09-25'
+as_of: '2026-09-26'
 owner: GOAL_OWNER
 allowed_routes:
   - DIRECT_CURSOR_DELIVERY
 required_review_roles:
   - CODE_REVIEWER
   - ARCHITECTURE_CRITIC
-  - GOAL_DOD_CRITIC
-  - OWNER_UX_CRITIC
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 94a4ea74afb6c921f4972312840be2de5eeba4f9
+  expected_base: ae678372f2a96fbc20c519c23905ae5c44332458
   expected_upstream: origin/main
-  expected_upstream_oid: 94a4ea74afb6c921f4972312840be2de5eeba4f9
-  expected_branch: cursor/factory-production-line-convergence-v1
+  expected_upstream_oid: ae678372f2a96fbc20c519c23905ae5c44332458
+  expected_branch: cursor/factory-release-quiesce-failed-terminal
   dirty_mode: ALLOW_REPORTED
 objective: >-
   Reconcile live Factory runtime semantics onto canonical main and make
@@ -78,3 +76,9 @@ carry `activation_transition_research_event_proven`.
 This atom ports that continuity proof, keeps C3 `--plan-only`, and changes
 `scripts/factory_live_release.py` to one forward release with timer quiesce.
 Deploy of the merged SHA is a later owner gate. C3 plan-only stays unrun.
+
+A live `legacy-convergence` attempt aborted because `systemctl stop` left
+`factory-v1-workbench.service` `failed` after SIGTERM/143 and quiesce treated
+`failed` as still busy. `inactive`, `failed`, and `not-found` are non-running
+terminals. Only `active` long-running units are stopped. Transitional state
+aborts before the tree changes.

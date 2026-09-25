@@ -264,12 +264,17 @@ def verify_installed_tree(*, staging: Path, deploy_root: Path) -> None:
             raise LiveOpsHardeningError(f"INSTALL_TREE_MISMATCH:{relative.as_posix()}")
 
 
+# Terminal states with no running process. `failed` after SIGTERM is one of them.
+_NONRUNNING_TERMINAL = frozenset({"inactive", "failed", "not-found"})
+_LONG_RUNNING_DECIDABLE = frozenset({"active", *_NONRUNNING_TERMINAL})
+
+
 def _unit_busy(state: str) -> bool:
-    return state in {"active", "unknown"}
+    return state not in _NONRUNNING_TERMINAL
 
 
 def _long_running_must_stop(state: str) -> bool:
-    return state not in {"inactive", "not-found"}
+    return state == "active"
 
 
 def snapshot_units(units: tuple[str, ...], probe) -> dict[str, str]:
@@ -313,11 +318,13 @@ def quiesce_for_release(*, probe, control, sleep, timers: tuple[str, ...], servi
             sleep(DRAIN_POLL_SECONDS)
             waited += DRAIN_POLL_SECONDS
         for unit, state in prior_services.items():
+            if state not in _LONG_RUNNING_DECIDABLE:
+                raise LiveOpsHardeningError("ABORT_DEPLOY")
             if _long_running_must_stop(state):
                 control("stop", unit)
                 stopped_services.append(unit)
                 waited = 0
-                while _unit_busy(probe(unit)) or probe(unit) == "failed":
+                while _unit_busy(probe(unit)):
                     if waited >= budget_seconds:
                         raise LiveOpsHardeningError("ABORT_DEPLOY")
                     sleep(DRAIN_POLL_SECONDS)

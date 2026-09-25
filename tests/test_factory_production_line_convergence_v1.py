@@ -324,6 +324,147 @@ class ReleaseQuiesceTests(unittest.TestCase):
             self.assertNotIn("start:factory-remote-health.service", order)
             self.assertEqual(state["factory-remote-health.service"], "inactive")
 
+    def test_sigterm_failed_workbench_quiesces_then_restarts(self) -> None:
+        module = self._module()
+        order: list[str] = []
+        sleeps: list[str] = []
+        state = {
+            "tick.timer": "inactive",
+            "tick.service": "inactive",
+            "factory-v1-workbench.service": "active",
+        }
+
+        def probe(unit: str) -> str:
+            return state.get(unit, "inactive")
+
+        def control(action: str, unit: str) -> str:
+            order.append(f"{action}:{unit}")
+            if action == "stop":
+                state[unit] = "failed"
+            if action == "start":
+                state[unit] = "active"
+            return "ok"
+
+        def sleep(_seconds: int) -> None:
+            sleeps.append(state["factory-v1-workbench.service"])
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp) / "repo"
+            repo.mkdir()
+            _git(repo, "init", "-b", "main")
+            older = _commit(repo, "older.txt")
+            newer = _commit(repo, "newer.txt")
+            deploy = Path(tmp) / "deploy"
+            deploy.mkdir()
+            (deploy / "local").mkdir()
+            real_install = module._install_exact_tree
+
+            def install(**kwargs):
+                order.append("mutate")
+                self.assertEqual(state["factory-v1-workbench.service"], "failed")
+                return real_install(**kwargs)
+
+            module._install_exact_tree = install
+            result = module.forward_release(
+                repo=repo,
+                deploy_root=deploy,
+                target_sha=newer,
+                main_sha=newer,
+                live_sha=older,
+                sync_env=False,
+                probe=probe,
+                control=control,
+                sleep=sleep,
+                timers=("tick.timer",),
+            )
+        self.assertEqual(result["forward_transitions"], 1)
+        self.assertLess(order.index("stop:factory-v1-workbench.service"), order.index("mutate"))
+        self.assertLess(order.index("mutate"), order.index("start:factory-v1-workbench.service"))
+        self.assertEqual(state["factory-v1-workbench.service"], "active")
+        self.assertNotIn("failed", sleeps)
+
+    def test_initially_failed_long_running_is_not_started(self) -> None:
+        module = self._module()
+        starts: list[str] = []
+        stops: list[str] = []
+        state = {"factory-v1-workbench.service": "failed"}
+
+        def probe(unit: str) -> str:
+            return state.get(unit, "inactive")
+
+        def control(action: str, unit: str) -> str:
+            if action == "start":
+                starts.append(unit)
+            if action == "stop":
+                stops.append(unit)
+            return "ok"
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp) / "repo"
+            repo.mkdir()
+            _git(repo, "init", "-b", "main")
+            older = _commit(repo, "older.txt")
+            newer = _commit(repo, "newer.txt")
+            deploy = Path(tmp) / "deploy"
+            deploy.mkdir()
+            (deploy / "local").mkdir()
+            result = module.forward_release(
+                repo=repo,
+                deploy_root=deploy,
+                target_sha=newer,
+                main_sha=newer,
+                live_sha=older,
+                sync_env=False,
+                probe=probe,
+                control=control,
+                sleep=lambda _seconds: None,
+                timers=("tick.timer",),
+            )
+        self.assertEqual(result["forward_transitions"], 1)
+        self.assertNotIn("factory-v1-workbench.service", starts)
+        self.assertNotIn("factory-v1-workbench.service", stops)
+        self.assertEqual(state["factory-v1-workbench.service"], "failed")
+
+    def test_unknown_long_running_aborts_before_tree_mutation(self) -> None:
+        module = self._module()
+        mutated: list[str] = []
+
+        def probe(unit: str) -> str:
+            if unit == "factory-v1-workbench.service":
+                return "unknown"
+            return "inactive"
+
+        def control(*_args: str) -> str:
+            return "ok"
+
+        def install(**_kwargs):
+            mutated.append("mutate")
+            raise AssertionError("tree mutation")
+
+        module._install_exact_tree = install
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp) / "repo"
+            repo.mkdir()
+            _git(repo, "init", "-b", "main")
+            older = _commit(repo, "older.txt")
+            newer = _commit(repo, "newer.txt")
+            deploy = Path(tmp) / "deploy"
+            deploy.mkdir()
+            with self.assertRaisesRegex(LiveOpsHardeningError, "ABORT_DEPLOY"):
+                module.forward_release(
+                    repo=repo,
+                    deploy_root=deploy,
+                    target_sha=newer,
+                    main_sha=newer,
+                    live_sha=older,
+                    sync_env=False,
+                    probe=probe,
+                    control=control,
+                    sleep=lambda _seconds: None,
+                    timers=("tick.timer",),
+                )
+        self.assertEqual(mutated, [])
+
     def test_no_start_before_verified_rollback(self) -> None:
         module = self._module()
         starts: list[str] = []
