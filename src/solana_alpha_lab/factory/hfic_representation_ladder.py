@@ -45,6 +45,7 @@ from solana_alpha_lab.factory.hfic_representation_probe import (
     representation_status,
 )
 from solana_alpha_lab.factory.hfic_session import (
+    HficSessionError,
     PROMPT_VERSION,
     RUNNER_UP_AWAITING_CRITIC,
     RUNNER_UP_REVISION_REQUIRED,
@@ -952,6 +953,26 @@ def _next_active_after(
     return None
 
 
+def _history_readout_line(
+    store: Any,
+    *,
+    listed_sessions: Sequence[Mapping[str, Any]],
+    skipped: Sequence[Mapping[str, str]],
+) -> str:
+    from solana_alpha_lab.factory.hfic_provenance import store_provenance_label
+
+    listed = len(listed_sessions)
+    skipped_n = len(skipped)
+    readable = max(0, listed - skipped_n)
+    codes = ",".join(
+        f"{item.get('session_suffix')}:{item.get('code')}" for item in skipped
+    ) or "none"
+    return (
+        f"history: readable {readable}/{listed}; unresolved 0; "
+        f"skipped {skipped_n} ({codes}); provenance: {store_provenance_label(store)}"
+    )
+
+
 def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     stages = receipt.get("stages") or []
     owner_focus = str(receipt.get("owner_focus") or "AUTO")
@@ -1444,6 +1465,9 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "owner_note_ru: Следующий шаг ещё не является DONE и не разрешает "
             "научный запуск"
         )
+    history_line = receipt.get("_history_line")
+    if isinstance(history_line, str) and history_line:
+        lines.append(history_line)
     return "\n".join(lines)
 
 
@@ -2245,13 +2269,28 @@ def _discover_ladder_stages(
     current_capability_epoch: str | None = None,
 ) -> tuple[list[dict[str, Any]], str | None, str | None]:
     grouped: dict[str, list[tuple[str, dict[str, Any], Mapping[str, Any]]]] = {}
+    skipped: list[dict[str, str]] = []
+    current_market_unreadable = False
     for item in list_hfic_sessions(store):
         sid = str(item.get("session_id") or "")
         if not sid:
             continue
         try:
             bundle = load_session_bundle(store, sid)
-        except Exception:
+        except HficSessionError as exc:
+            suffix = sid.removeprefix("HFIC-SESS-")
+            skipped.append({"session_suffix": suffix, "code": str(exc)})
+            listed_market = str(item.get("market_evidence_epoch_sha256") or "")
+            if (
+                current_market_epoch
+                and listed_market
+                and listed_market == current_market_epoch
+            ):
+                current_market_unreadable = True
+            continue
+        except Exception as exc:
+            suffix = sid.removeprefix("HFIC-SESS-")
+            skipped.append({"session_suffix": suffix, "code": type(exc).__name__})
             continue
         if bundle is None:
             continue
@@ -2536,7 +2575,13 @@ def _discover_ladder_stages(
         pick_id = str(picked.get("session_id") or "")
         _, stage, _ = next(item for item in matching if item[0] == pick_id)
         resolved.append(stage)
-    return resolved, control_session_id, legacy_epoch if isinstance(legacy_epoch, str) else None
+    return (
+        resolved,
+        control_session_id,
+        legacy_epoch if isinstance(legacy_epoch, str) else None,
+        skipped,
+        current_market_unreadable,
+    )
 
 
 def _parent_control_id(
@@ -2595,6 +2640,8 @@ def evaluate_forge_run(
     resolved_stages: list[dict[str, Any]]
     control_session_id = None
     legacy_epoch = None
+    history_skips: list[dict[str, str]] = []
+    current_market_unreadable = False
     used_cohorts: list[str] = []
     saved_draft_representation_id: str | None = None
     if stages is not None:
@@ -2648,7 +2695,13 @@ def evaluate_forge_run(
                     raw_representation = generated.get("ladder_representation_id")
                     if isinstance(raw_representation, str) and raw_representation:
                         saved_draft_representation_id = raw_representation
-        resolved_stages, control_session_id, legacy_epoch = _discover_ladder_stages(
+        (
+            resolved_stages,
+            control_session_id,
+            legacy_epoch,
+            history_skips,
+            current_market_unreadable,
+        ) = _discover_ladder_stages(
             data_root=Path(data_root),
             store=store,
             owner_focus=owner_focus,
@@ -2992,6 +3045,11 @@ def evaluate_forge_run(
                         else EXEC_PROVENANCE_HISTORICAL_UNKNOWN
                     )
                 )
+    if current_market_unreadable:
+        next_action = ACTION_OBSERVABILITY_BLOCKED
+        owner_final = None
+        decision = dict(decision)
+        decision["reason_code"] = "CURRENT_MARKET_HISTORY_UNREADABLE"
     if owner_class_input == OWNER_CLASS_INPUT_NOT_READY:
         owner_class = OWNER_CLASS_INPUT_NOT_READY
     elif owner_class_input == OWNER_CLASS_OBSERVABILITY_BLOCKED or next_action == ACTION_OBSERVABILITY_BLOCKED:
@@ -3113,7 +3171,13 @@ def evaluate_forge_run(
     unsigned["receipt_sha256"] = canonical_sha256(
         {key: value for key, value in unsigned.items() if key != "owner_readout"}
     )
+    unsigned["_history_line"] = _history_readout_line(
+        store,
+        listed_sessions=list_hfic_sessions(store),
+        skipped=history_skips,
+    )
     unsigned["owner_readout"] = format_forge_run_owner_readout(unsigned)
+    unsigned.pop("_history_line", None)
     errors = list(_validator().iter_errors(unsigned))
     if errors:
         raise LadderError("FORGE_RUN_RECEIPT_INVALID")
@@ -3128,7 +3192,13 @@ def evaluate_forge_run(
         unsigned["receipt_sha256"] = canonical_sha256(
             {key: value for key, value in unsigned.items() if key != "owner_readout"}
         )
+        unsigned["_history_line"] = _history_readout_line(
+            store,
+            listed_sessions=list_hfic_sessions(store),
+            skipped=history_skips,
+        )
         unsigned["owner_readout"] = format_forge_run_owner_readout(unsigned)
+        unsigned.pop("_history_line", None)
         errors = list(_validator().iter_errors(unsigned))
         if errors:
             raise LadderError("FORGE_RUN_RECEIPT_INVALID")

@@ -139,7 +139,10 @@ Happy path — no owner copy/paste between the slash command and the final termi
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write --format json --owner-focus AUTO
 ```
    Immediately print the `owner_readout` field (`FORGE RUN` block) as the owner
-   result. Do not treat the raw JSON dump as the owner result. `--persist`
+   result, including the `history:` line. An unreadable current market or
+   store provenance `INVALID:` is STOP before Prompt A. Any other history
+   warning stays visible and does not by itself stop the slash. Do not treat
+   the raw JSON dump as the owner result. `--persist`
    records `RESEARCH_ARTIFACT` `FORGE_RUN_RECEIPT`; the readout `persisted`
    line names that kind, not a filesystem path.
    Identity (A5): `market_evidence_epoch_sha256` is the scientific admission

@@ -350,6 +350,10 @@ typed `AUTO_HANDOFF_UNAVAILABLE`.
 
 ---
 
+## FORGE RUN history line
+
+The `owner_readout` `history:` line is mandatory. `CURRENT_MARKET_HISTORY_UNREADABLE` or store provenance `INVALID:` is STOP before Prompt A. Other skips and legacy rows are a visible warning only.
+
 # PROMPT A — HYPOTHESIS FORGE V1
 
 Скопируйте весь раздел от `BEGIN PROMPT A` до `END PROMPT A`.

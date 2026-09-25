@@ -1449,6 +1449,7 @@ def cmd_diagnostics(
         HficGroundingError,
         aggregate_diagnostics,
         collect_session_receipts,
+        session_read_census,
     )
 
     data_root = _store_root(repo_root, explicit_data_root)
@@ -1456,6 +1457,7 @@ def cmd_diagnostics(
     try:
         receipts = collect_session_receipts(store)
         payload = aggregate_diagnostics(receipts, last_n)
+        payload.update(session_read_census(store))
     except HficGroundingError as exc:
         raise HficCliError(str(exc)) from exc
     payload["action"] = "DIAGNOSTICS"

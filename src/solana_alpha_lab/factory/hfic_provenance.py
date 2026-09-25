@@ -23,6 +23,8 @@ from solana_alpha_lab.factory.run_passport import canonical_json_bytes, canonica
 CORRECTION_SCHEMA = "smial.hfic-provenance-time-correction"
 CORRECTION_SCHEMA_VERSION = "1.0"
 CORRECTION_ARTIFACT_KIND = "PROVENANCE_TIME_CORRECTION"
+# Reading uses this set, equal to the correction schema enum. Not PROMPT_VERSION.
+SUPPORTED_CORRECTION_PROTOCOLS = frozenset({"HFIC-V1.1", "HFIC-V1.2"})
 _HFIC_ARTIFACT_KINDS = frozenset(
     {
         "FORGE_CONTEXT_PACKET",
@@ -233,7 +235,7 @@ def _validate_correction_body(body: Mapping[str, Any], inventory: Mapping[str, A
         raise HficSessionError("PROVENANCE_CORRECTION_CORRUPT")
     if body.get("artifact_kind") != CORRECTION_ARTIFACT_KIND:
         raise HficSessionError("PROVENANCE_CORRECTION_CORRUPT")
-    if body.get("hfic_protocol") != PROMPT_VERSION:
+    if body.get("hfic_protocol") not in SUPPORTED_CORRECTION_PROTOCOLS:
         raise HficSessionError("PROVENANCE_CORRECTION_CORRUPT")
     if body.get("reason_code") != CORRECTION_REASON:
         raise HficSessionError("PROVENANCE_CORRECTION_CORRUPT")
@@ -268,12 +270,27 @@ def _validate_correction_body(body: Mapping[str, Any], inventory: Mapping[str, A
     non_claims = body.get("non_claims")
     if not isinstance(non_claims, list) or not non_claims:
         raise HficSessionError("PROVENANCE_CORRECTION_CORRUPT")
-    if body.get("inventory_sha256") != inventory.get("inventory_sha256"):
-        raise HficSessionError("PROVENANCE_CORRECTION_MISMATCH")
     affected = body.get("affected_records")
-    expected = inventory.get("records")
-    if not isinstance(affected, list) or affected != expected:
-        raise HficSessionError("PROVENANCE_CORRECTION_PARTIAL")
+    if not isinstance(affected, list):
+        raise HficSessionError("PROVENANCE_CORRECTION_CORRUPT")
+    covered: set[tuple[str, str]] = set()
+    for item in affected:
+        if not isinstance(item, Mapping):
+            raise HficSessionError("PROVENANCE_CORRECTION_CORRUPT")
+        covered.add((str(item.get("record_id") or ""), str(item.get("payload_sha256") or "")))
+    expected = list(inventory.get("records") or [])
+    missing = [
+        item
+        for item in expected
+        if (str(item.get("record_id") or ""), str(item.get("payload_sha256") or "")) not in covered
+    ]
+    hash_matches = body.get("inventory_sha256") == inventory.get("inventory_sha256")
+    if missing and not hash_matches:
+        raise HficSessionError("PROVENANCE_CORRECTION_MISMATCH", uncovered_count=len(missing))
+    if missing:
+        covered_count = len(expected) - len(missing)
+        code = "PROVENANCE_CORRECTION_PARTIAL" if covered_count else "PROVENANCE_TIME_UNCOVERED"
+        raise HficSessionError(code, uncovered_count=len(missing))
 
 
 def resolve_provenance_status(store: Any, inventory: Mapping[str, Any] | None = None) -> str:
@@ -309,7 +326,19 @@ def provenance_status_for_session(store: Any, session_id: str) -> str:
     ]
     if not session_records:
         return PROVENANCE_VALID
-    return resolve_provenance_status(store, inventory)
+    scoped = dict(inventory)
+    scoped["records"] = session_records
+    scoped["record_count"] = len(session_records)
+    return resolve_provenance_status(store, scoped)
+
+
+def store_provenance_label(store: Any) -> str:
+    """Store-wide provenance. Never fails the caller; invalid history is typed."""
+
+    try:
+        return resolve_provenance_status(store)
+    except HficSessionError as exc:
+        return f"INVALID:{exc}"
 
 
 def apply_provenance_correction(
