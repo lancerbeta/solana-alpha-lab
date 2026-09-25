@@ -149,6 +149,10 @@ Use exactly one terminal from operator pack **B4** — the sole PASS entry befor
 classification is `PASS_TO_CLASSIFICATION`. Do not emit `PASS_FAST_LANE_READY`,
 `PASS_CHANGE_LANE_REQUIRED` or `PASS_DATA_OPTION_REQUIRED` without completing
 **B5**: schema-valid ExperimentSpec plus deterministic offline `classify_lane()`.
+Offline `classify_lane()` in B5 is only a hint. The authoritative terminal is
+the HFIC `classify` path. A claimed final `PASS_*` can be downgraded to a
+persisted `KILL_UNBOUND_EVIDENCE` when the availability gate denies the route.
+That denial is a saved terminal, not an error.
 
 B4 terminals (choose one):
 

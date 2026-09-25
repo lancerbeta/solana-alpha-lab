@@ -27,13 +27,23 @@ PROBE_PERMIT_TERMINALS = frozenset(
         "KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED",
     }
 )
-FAST_LANE_CLASSIFIER_TERMINALS = frozenset(
-    {
-        "FAST_LANE_READY",
-        "REPLAY_AVAILABLE",
-    }
-)
 PIT_READY_AVAILABILITY_CLASS = "PIT_READY"
+DENY_HFIC_AVAILABILITY_GATE = "DENY_HFIC_AVAILABILITY_GATE"
+UNRESOLVED_REQUIREMENT_REASON = "UNRESOLVED_REQUIREMENT"
+PASS_FAST_LANE_READY_TERMINAL = "PASS_FAST_LANE_READY"
+# Non-observation classifier terminals. The availability gate is not this
+# table; it fires only when the mapped HFIC terminal is PASS_FAST_LANE_READY.
+DIRECT_CLASSIFIER_HFIC_TERMINAL = {
+    "FAST_LANE_READY": PASS_FAST_LANE_READY_TERMINAL,
+    "REPLAY_AVAILABLE": PASS_FAST_LANE_READY_TERMINAL,
+    "BLOCKED_DATA": "PASS_DATA_OPTION_REQUIRED",
+    "CHANGE_LANE_CAPABILITY_GAP": "PASS_CHANGE_LANE_REQUIRED",
+    "FAST_LANE_OWNER_GATE_REQUIRED": "OWNER_DECISION_REQUIRED",
+    "PROMOTION_LANE_REQUIRED": "OWNER_DECISION_REQUIRED",
+    "DENY_INVALID_SPEC": KILL_UNBOUND_EVIDENCE,
+    "DENY_INTEGRITY_MISMATCH": KILL_UNBOUND_EVIDENCE,
+    DENY_HFIC_AVAILABILITY_GATE: KILL_UNBOUND_EVIDENCE,
+}
 CASE_C_KILL_TERMINALS = frozenset(
     {
         "KILL_UNBOUND_EVIDENCE",
@@ -150,16 +160,88 @@ def assert_experiment_spec_grounding(
         raise ValueError(EXPERIMENT_SPEC_GROUNDING_MISMATCH)
 
 
+def classifier_route_requires_availability_gate(classifier_terminal: str) -> bool:
+    """True when the shared mapping sends this raw terminal to PASS_FAST_LANE_READY."""
+
+    from solana_alpha_lab.factory.observation_fast_lane_terminals import (
+        hfic_terminal_for_classifier,
+    )
+
+    mapped = hfic_terminal_for_classifier(classifier_terminal)
+    if mapped is None:
+        mapped = DIRECT_CLASSIFIER_HFIC_TERMINAL.get(classifier_terminal)
+    return mapped == PASS_FAST_LANE_READY_TERMINAL
+
+
+def _unresolved_requirements(selected: Mapping[str, Any]) -> list[str]:
+    unresolved = text_list(selected.get("unresolved_requirements"))
+    if unresolved:
+        return unresolved
+    grounding = selected.get("grounding")
+    if isinstance(grounding, Mapping):
+        return text_list(grounding.get("unresolved_requirements"))
+    return []
+
+
+def fast_lane_availability_denial_codes(selected: Mapping[str, Any]) -> list[str]:
+    """Typed denial codes. Empty means the PIT/unresolved gate allows the route."""
+
+    codes: list[str] = []
+    if _unresolved_requirements(selected):
+        codes.append(UNRESOLVED_REQUIREMENT_REASON)
+    raw_required = selected.get("required_feature_ids")
+    if raw_required is None:
+        return codes
+    if not isinstance(raw_required, list):
+        codes.append("REQUIRED_BINDING_NOT_PIT_READY")
+        return codes
+    required_ids: list[str] = []
+    seen: set[str] = set()
+    malformed = False
+    for item in raw_required:
+        if not isinstance(item, str) or not item:
+            malformed = True
+            continue
+        if item in seen:
+            continue
+        seen.add(item)
+        required_ids.append(item)
+    if malformed:
+        codes.append("REQUIRED_BINDING_NOT_PIT_READY")
+    if not required_ids:
+        return codes
+    grounding = selected.get("grounding")
+    bindings = grounding.get("feature_bindings") if isinstance(grounding, Mapping) else None
+    by_id: dict[str, list[str]] = {}
+    binding_unreadable = False
+    if isinstance(bindings, list):
+        for item in bindings:
+            if not isinstance(item, Mapping):
+                binding_unreadable = True
+                continue
+            feat = item.get("feature_id")
+            if not isinstance(feat, str) or not feat:
+                binding_unreadable = True
+                continue
+            availability = item.get("availability_class")
+            class_name = availability if isinstance(availability, str) else ""
+            by_id.setdefault(feat, []).append(class_name)
+    if binding_unreadable:
+        codes.append("REQUIRED_BINDING_NOT_PIT_READY")
+    for feat in required_ids:
+        observed = by_id.get(feat)
+        if observed is None or len(observed) != 1 or observed[0] != PIT_READY_AVAILABILITY_CLASS:
+            codes.append(f"REQUIRED_BINDING_NOT_PIT_READY:{feat}")
+    return codes
+
+
 def deny_unresolved_fast_lane(
     selected: Mapping[str, Any],
     classifier_terminal: str,
 ) -> None:
-    unresolved = text_list(selected.get("unresolved_requirements"))
-    if not unresolved:
-        grounding = selected.get("grounding")
-        if isinstance(grounding, Mapping):
-            unresolved = text_list(grounding.get("unresolved_requirements"))
-    if unresolved and classifier_terminal in FAST_LANE_CLASSIFIER_TERMINALS:
+    if not classifier_route_requires_availability_gate(classifier_terminal):
+        return
+    if UNRESOLVED_REQUIREMENT_REASON in fast_lane_availability_denial_codes(selected):
         raise ValueError(KILL_UNBOUND_EVIDENCE)
 
 
@@ -167,53 +249,23 @@ def deny_non_pit_fast_lane(
     selected: Mapping[str, Any],
     classifier_terminal: str,
 ) -> None:
-    """Refuse Fast Lane unless every required freeze-owned binding is PIT_READY.
+    """Refuse a PASS_FAST_LANE_READY route unless required bindings are PIT_READY.
 
-    Packet 1.4 HFIC classify path only. Does not read
+    Packet 1.4 HFIC classify path only. The switch is the mapped HFIC terminal,
+    not a hand-listed classifier set. Does not read
     available_to_strategy_semantics as the machine switch. Does not re-resolve
     Catalog or RDP. Extra unrelated bindings cannot substitute for a required
     feature.
     """
-    if classifier_terminal not in FAST_LANE_CLASSIFIER_TERMINALS:
+    if not classifier_route_requires_availability_gate(classifier_terminal):
         return
-    raw_required = selected.get("required_feature_ids")
-    if raw_required is None:
-        return
-    if not isinstance(raw_required, list):
+    pit_codes = [
+        code
+        for code in fast_lane_availability_denial_codes(selected)
+        if code.startswith("REQUIRED_BINDING_NOT_PIT_READY")
+    ]
+    if pit_codes:
         raise ValueError(KILL_UNBOUND_EVIDENCE)
-    required_ids: list[str] = []
-    seen: set[str] = set()
-    for item in raw_required:
-        if not isinstance(item, str) or not item:
-            raise ValueError(KILL_UNBOUND_EVIDENCE)
-        if item in seen:
-            continue
-        seen.add(item)
-        required_ids.append(item)
-    if not required_ids:
-        return
-    grounding = selected.get("grounding")
-    if not isinstance(grounding, Mapping):
-        raise ValueError(KILL_UNBOUND_EVIDENCE)
-    bindings = grounding.get("feature_bindings")
-    if not isinstance(bindings, list):
-        raise ValueError(KILL_UNBOUND_EVIDENCE)
-    by_id: dict[str, list[str]] = {}
-    for item in bindings:
-        if not isinstance(item, Mapping):
-            raise ValueError(KILL_UNBOUND_EVIDENCE)
-        feat = item.get("feature_id")
-        if not isinstance(feat, str) or not feat:
-            raise ValueError(KILL_UNBOUND_EVIDENCE)
-        availability = item.get("availability_class")
-        class_name = availability if isinstance(availability, str) else ""
-        by_id.setdefault(feat, []).append(class_name)
-    for feat in required_ids:
-        observed = by_id.get(feat)
-        if observed is None or len(observed) != 1:
-            raise ValueError(KILL_UNBOUND_EVIDENCE)
-        if observed[0] != PIT_READY_AVAILABILITY_CLASS:
-            raise ValueError(KILL_UNBOUND_EVIDENCE)
 
 
 def resolve_control_corpus_yield(

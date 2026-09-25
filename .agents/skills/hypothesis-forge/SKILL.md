@@ -375,7 +375,11 @@ Immediately after a valid frozen `CRITIC_INPUT_PACKET` (selected path only):
    post-classification (`PASS_FAST_LANE_READY`, `PASS_CHANGE_LANE_REQUIRED`,
    `PASS_DATA_OPTION_REQUIRED`): `classifier_receipt_present: true` plus
    `lane_classifier_terminal` from offline `classify_lane()`. `PASS_*` is readiness
-   / `PAUSE`, never promotion or alpha.
+   / `PAUSE`, never promotion or alpha. A packet-1.4 availability-gate denial is a
+   persisted `KILL_UNBOUND_EVIDENCE` (`DENY_HFIC_AVAILABILITY_GATE`), not an
+   exception and not `AWAITING_CLASSIFICATION`. The owner readout shows
+   `route=` and `reasons=`. A Critic-claimed final `PASS_*` may be downgraded
+   to that KILL; the machine never upgrades a claim.
 
    The v1.1 synthesis handoff schema is `additionalProperties: false` and cannot
    carry v1.3 `final_session_terminal` / `runner_up_critic_terminal`. On runner-up

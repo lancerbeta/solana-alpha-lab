@@ -1,0 +1,76 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-CLASSIFICATION-OUTCOME-INTEGRITY-COMPLETION-001",
+  "as_of": "2026-09-25",
+  "task_id": "HFIC_CLASSIFICATION_OUTCOME_INTEGRITY_V1",
+  "state_change": "PACKET_1_4_CLASSIFICATION_ENDS_IN_ONE_PERSISTED_TERMINAL",
+  "base_main": "6bd7cfca0c33d18149b52cc4e95801952f0736fb",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "84660074b1f35cd9907ab236d32e0cf07d236c4b6ec2fcff373d4a07b7f981ef",
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "f9ae4b6437314ac4bdfdd19480806b1e664b1a3d73fea6366ceacebfe442abed",
+    "catalog/assets/core.yaml": "a1047ed6fd5c70637b4dd1c58511de350f69354e454c377d571db5aad1c20810",
+    "docs/evidence/hfic_classification_outcome_integrity/a1_real_copy_rehearsal_v1.json": "0704afd358e5fe0f64b51b964a8c5fc8f50d89e7dbe4826ca3fe5cf437e0edb1",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "fd7772b3aeac225c5bd222c8f9605766f2ff6d24a8dc503e0acdfa06058c5ec4",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "65619ae758330501eedff46f191983bdd89606c065119d563b54427ca9b873fc",
+    "docs/reports/hfic_classification_outcome_integrity/a1_owner_readout_v1.md": "0d896afea88acb3bcfb12b67147d01031d4b090d54724c541a9a7fd2b528217b",
+    "docs/tasks/HFIC_CLASSIFICATION_OUTCOME_INTEGRITY_V1.md": "1bb6849fce4165a4d952657dfb5946b35d8601a266e67277c9e210d9077548da",
+    "src/solana_alpha_lab/factory/hfic_control_integrity.py": "11a966a652bfe6c92ef96de0ac6b462e7fcd5100761244a2e059119a1d9f7d24",
+    "src/solana_alpha_lab/factory/hfic_session.py": "ab783abe254959cc44189c0c1d8d11d0e5a0d1f2516316f06f4ec3ca1beba5e6",
+    "tests/test_hfic_classification_outcome_integrity_v1.py": "e7e00ad02529a722ce855e12e831c4ac73b817df08a5c96d1daef851c5e374e6",
+    "tests/test_hfic_fresh_control_decision_integrity_closure_v1.py": "a7076019be7edc1e6fe1ca5ee4ea6a9ce215324dba7f22a361bd8df1949a2302",
+    "tests/test_hfic_packet14_availability_fast_lane_guard_v1.py": "ca85f4428360ba2e4d84c2675d67ed1fa369d863b76aa0c0667f7e92c9c7402f"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_classification_outcome_integrity/a1_delivery_factory_fit_v1.json",
+    "sha256": "0783eb881d8f7660936a0a34cb3a655f00fa82e4b92daa3ec43328f92f894dac",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_HFIC_CLASSIFICATION_OUTCOME_INTEGRITY_FOCUSED_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_classification_outcome_integrity/a1_delivery_independent_review_v1.json",
+      "sha256": "98cba81c86e1e892cf04804a1411b435de1ab6138f75cb394a9b5b59b9019f27",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_TASK_CONTRACT",
+      "PASS_RED_T_A_AND_T_B",
+      "PASS_FOCUSED_HFIC_REGRESSION",
+      "PASS_MUTATION_A_B_C",
+      "PASS_CATALOG_SYNC",
+      "PASS_REAL_COPY_REHEARSAL_GO",
+      "PASS_SEMANTIC_PACKET_AND_LAUNCH_VALIDATION"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_SCIENTIFIC_FORGE",
+    "NO_LANE_CLASSIFIER_CHANGE",
+    "NO_A5_IDENTITY_CHANGE",
+    "NO_FORWARD_ONLY_DATA_OPTION",
+    "NO_HISTORICAL_RECEIPT_REWRITE",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "network_calls": 0,
+    "local_writes": 0,
+    "external_actions": 0
+  }
+}

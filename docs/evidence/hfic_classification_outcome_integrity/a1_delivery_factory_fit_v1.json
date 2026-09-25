@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-CLASSIFICATION-OUTCOME-INTEGRITY-FACTORY-FIT-001",
+  "as_of": "2026-09-25",
+  "task_id": "HFIC_CLASSIFICATION_OUTCOME_INTEGRITY_V1",
+  "reviewed_bindings_sha256": "1cd50cff6eab8f9697de8c04578281d3afcb317e2cb08479f6d7717f9862f13d",
+  "reviewed_inventory_sha256": "50a25bb3aa85303a5be961fab4a993ab6ed4b1a7e6689978fae095a01c64fd39",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_NARROW_HFIC_CLASSIFY_GATE_NOT_ALPHA",
+    "flexibility_and_history": "PASS_PACKET_1_3_AND_NON_PASS_ROUTES_UNCHANGED",
+    "context_efficiency": "PASS_REUSE_EXISTING_MAPPING_AND_DENY_HELPERS",
+    "research_truth": "PASS_PIT_READY_ALLOWLIST_FAIL_CLOSED_DENIAL",
+    "owner_operability": "PASS_ROUTE_AND_REASON_IN_READOUT",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_EXPERIMENT_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_ROLLBACK_IS_GIT_REVERT",
+    "build_vs_buy": "PASS_NO_NEW_FRAMEWORK",
+    "security": "PASS_NO_SECRETS_OR_ABSOLUTE_PATHS",
+    "red_team": "PASS_OBSERVATION_ROUTE_AND_RECEIPT_FORGERY"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "AUTHORIZED_HYPOTHESIS_FORGE_AFTER_MERGE_AND_SEPARATE_OK"
+  },
+  "recovery": "Ordinary Git revert of the HFIC classify gate, tests, and operator notes. Do not rewrite historical receipts.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_LANE_CLASSIFIER_CHANGE",
+    "NO_A5_IDENTITY_CHANGE",
+    "NO_FORWARD_ONLY_DATA_OPTION",
+    "PROPORTIONAL_HFIC_GATE"
+  ]
+}
