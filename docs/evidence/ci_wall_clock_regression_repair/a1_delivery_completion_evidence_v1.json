@@ -10,7 +10,17 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".github/workflows/ci.yml": "9f11ee664ac75970e035c575eb71dd2ac1410fbc116d99bca6ca5514cba7c439",
+    "catalog/assets/core.yaml": "c7f3216b557f942b5e7d41b3f59e551c0401810f182fc7e4a9ab06a7d35f06eb",
+    "docs/reports/ci_wall_clock_regression_repair/a1_owner_readout_v1.md": "c6d7a731e3244d82f3b98b4a0c17d6f153370fc80a7e35da108cd094f2a63f66",
+    "docs/tasks/CI_WALL_CLOCK_REGRESSION_REPAIR_V1.md": "535196a90e7e43d48108c307a4c407f0e05a355478b9971825bfd25d649371e1",
+    "scripts/run_ci_test_shard.py": "76b71b72af9bb553426103d220dfdcaa23aee16a23e5c2a1405293958a95c2de",
+    "scripts/validate_ci.py": "bc9ea327fb96e00496355d3328ecaf71ae26d95e6c3dd9fb1b7700de140177b5",
+    "src/solana_alpha_lab/factory_semantic_operability.py": "26e34c0c1f9bb219e7e5d7c3f24ab685cb925f4dc9dc6ee2489a3407773741c0",
+    "tests/test_factory_semantic_operability.py": "efe9eeb816ca02e19b7abb5e286f75520ea2d05e74cadb1e181681e02c74768c",
+    "tests/test_run_ci_test_shard.py": "ddcf1fc0c2fb28282a8627233d6d994b8f314d0e3939085641cc943924a3403b"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +31,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/ci_wall_clock_regression_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "2fe5f4d2d3393e51d93771887d855a9b555b301cd84c7ed70aecc75435be9a33",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_CI_WALL_CLOCK_REGRESSION_REPAIR_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/ci_wall_clock_regression_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "8d903a0453f8c38ce68a7353a678f0bf6ff213b4c32b4be3389d6af589841e8f",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
