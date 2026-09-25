@@ -81,6 +81,9 @@ def _commission(data_root: Path) -> None:
 
 
 def _preflight(data_root: Path, clock: object, owner_focus: str = "AUTO") -> dict:
+    from tests.test_hfic_cli import seed_minimal_market_basis
+
+    seed_minimal_market_basis(data_root)
     return run_preflight(
         ROOT,
         data_root,
@@ -197,6 +200,7 @@ class HficPreflightClockTests(unittest.TestCase):
                 "schema": "smial.forge-context-packet",
                 "owner_focus": "AUTO",
                 "evidence_epoch_sha256": "aa" * 32,
+                "market_evidence_epoch_sha256": "aa" * 32,
             }
             first = persist_forge_context_packet(
                 data_root,
@@ -235,6 +239,7 @@ class HficPersistBoundTimeTests(unittest.TestCase):
                 **{
                     "receipt_id": "HFIC-PREFLIGHT-FIXTURE-001",
                     "evidence_epoch_sha256": "aa" * 32,
+                "market_evidence_epoch_sha256": "aa" * 32,
                     "focus_key_sha256": "bb" * 32,
                     "search_key_sha256": "cc" * 32,
                     "owner_focus": "AUTO",
@@ -255,6 +260,7 @@ class HficPersistBoundTimeTests(unittest.TestCase):
             no_worthy_receipt = {
                 **receipt,
                 "evidence_epoch_sha256": "11" * 32,
+                "market_evidence_epoch_sha256": "11" * 32,
                 "focus_key_sha256": "22" * 32,
                 "search_key_sha256": "33" * 32,
                 "forge_context_packet_sha256": "dd" * 32,
@@ -300,6 +306,7 @@ class HficPersistBoundTimeTests(unittest.TestCase):
             receipt = {
                 "receipt_id": "HFIC-PREFLIGHT-FIXTURE-001",
                 "evidence_epoch_sha256": "aa" * 32,
+                "market_evidence_epoch_sha256": "aa" * 32,
                 "focus_key_sha256": "bb" * 32,
                 "search_key_sha256": "cc" * 32,
                 "owner_focus": "AUTO",
@@ -329,6 +336,7 @@ class HficPersistBoundTimeTests(unittest.TestCase):
             receipt = {
                 "receipt_id": "HFIC-PREFLIGHT-FIXTURE-001",
                 "evidence_epoch_sha256": "aa" * 32,
+                "market_evidence_epoch_sha256": "aa" * 32,
                 "focus_key_sha256": "bb" * 32,
                 "search_key_sha256": "cc" * 32,
                 "owner_focus": "AUTO",
@@ -373,6 +381,7 @@ class HficPersistBoundTimeTests(unittest.TestCase):
             receipt = {
                 "receipt_id": "HFIC-PREFLIGHT-FIXTURE-001",
                 "evidence_epoch_sha256": "aa" * 32,
+                "market_evidence_epoch_sha256": "aa" * 32,
                 "focus_key_sha256": "bb" * 32,
                 "search_key_sha256": "cc" * 32,
                 "owner_focus": "AUTO",
@@ -446,10 +455,28 @@ class HficReplayAndReceiptSchemaTests(unittest.TestCase):
             first = _preflight(data_root, FrozenClock(STARTED))
             self.assertEqual(first["action"], "START_NEW_SESSION")
             session_id = "HFIC-SESS-" + str(first["search_key_sha256"])[:16].upper()
+            market = str(
+                first.get("market_evidence_epoch_sha256")
+                or first["evidence_epoch_sha256"]
+            )
+            from solana_alpha_lab.factory.hfic_evidence_identity import (
+                scientific_slot_sha256,
+            )
+
+            version = str(first.get("prompt_version") or PROMPT_VERSION)
             receipt_body = {
                 "session_id": session_id,
                 "session_state": "SYNTHESIS_COMPLETE",
                 "evidence_epoch_sha256": first["evidence_epoch_sha256"],
+                "market_evidence_epoch_sha256": market,
+                "ladder_representation_id": "BASE",
+                "representation_semantic_version": version,
+                "scientific_slot_sha256": scientific_slot_sha256(
+                    market_evidence_epoch_sha256=market,
+                    representation_id="BASE",
+                    representation_semantic_version=version,
+                    owner_focus=str(first.get("owner_focus") or "AUTO"),
+                ),
                 "focus_key_sha256": first["focus_key_sha256"],
                 "search_key_sha256": first["search_key_sha256"],
                 "prompt_version": PROMPT_VERSION,
@@ -497,6 +524,12 @@ class HficReplayAndReceiptSchemaTests(unittest.TestCase):
                             "prompt_version": PROMPT_VERSION,
                             "owner_focus": "AUTO",
                             "evidence_epoch_sha256": first["evidence_epoch_sha256"],
+                            "market_evidence_epoch_sha256": market,
+                            "ladder_representation_id": "BASE",
+                            "representation_semantic_version": version,
+                            "scientific_slot_sha256": receipt_body["scientific_slot_sha256"],
+                            "capability_epoch_sha256": first.get("capability_epoch_sha256"),
+                            "memory_eligibility_sha256": first.get("memory_eligibility_sha256"),
                             "focus_key_sha256": first["focus_key_sha256"],
                             "search_key_sha256": first["search_key_sha256"],
                             "selected_candidate_id": None,
@@ -769,6 +802,7 @@ class HficProvenanceCorrectionTests(unittest.TestCase):
             receipt = {
                 "receipt_id": "HFIC-PREFLIGHT-FIXTURE-001",
                 "evidence_epoch_sha256": "aa" * 32,
+                "market_evidence_epoch_sha256": "aa" * 32,
                 "focus_key_sha256": "bb" * 32,
                 "search_key_sha256": "cc" * 32,
                 "owner_focus": "AUTO",

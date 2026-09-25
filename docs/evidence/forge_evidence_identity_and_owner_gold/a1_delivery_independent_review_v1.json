@@ -1,0 +1,64 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-24",
+  "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
+  "reviewed_bindings_sha256": "88537dd5fb90b6fee26d8f880920b4f8977d8154db7d4d258fa07018acedeaac",
+  "reviewed_inventory_sha256": "22f029089a6bea0d91815b65367dd785f8d0df6a21a4f2b58ea0ed253d3f3546",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=eef7ab314422da931d29c08137b0de365610f1f793caba5d2ce7cbe210d92312",
+        "PASS_VERSION_LOCK",
+        "PASS_PENDING_RESUME_REUSES_SAVED_DRAFT",
+        "PASS_KNOWN_PROVENANCE_MISMATCH_IS_CONFLICT",
+        "PASS_DIAGNOSTIC_STOP_BEFORE_SYNTHESIS"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_KNOWN_HASH_MISMATCH_IS_CONFLICT",
+        "PASS_MISSING_HISTORICAL_STAYS_UNKNOWN",
+        "PASS_DIAGNOSTIC_STOP_AND_AUTHORIZED_CONTROL_ENTRY"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_VERSION_LOCK",
+        "PASS_UNKNOWN_MODEL_NOT_DIFFERENT_BINDING",
+        "PASS_PENDING_RESUME_KEEPS_SAVED_DRAFT",
+        "PASS_NO_WRITE_STOP_BEFORE_SYNTHESIS"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_DIAGNOSTIC_NO_EXECUTABLE_CONTROL",
+        "PASS_AUTHORIZED_SLASH_KEEPS_A4_CONTINUATION"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SCIENTIFIC_PASS",
+    "NO_ALPHA",
+    "NO_SCIENTIFIC_FORGE",
+    "NO_A6",
+    "NO_MERGE"
+  ]
+}

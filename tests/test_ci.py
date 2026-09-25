@@ -81,7 +81,7 @@ class CiWorkflowTests(unittest.TestCase):
         )
         self.assertEqual(
             tests["timeout-minutes"],
-            str(ci.GITHUB_VALIDATE_TIMEOUT_MINUTES),
+            str(ci.GITHUB_VALIDATE_TESTS_TIMEOUT_MINUTES),
         )
         self.assertEqual(
             final["timeout-minutes"],

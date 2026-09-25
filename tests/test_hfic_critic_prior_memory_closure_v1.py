@@ -29,7 +29,7 @@ from solana_alpha_lab.factory.hfic_prior_memory import (
 )
 from solana_alpha_lab.factory.hfic_session import HficSessionError, freeze_draft, lookup_prior
 from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, ResearchStore
-from tests.test_hfic_cli import bind_draft, run_cli
+from tests.test_hfic_cli import bind_draft, run_cli, seed_minimal_market_basis
 from tests.test_hfic_session import valid_draft
 from tests.test_hypothesis_forge_independent_critic_v1 import CRITIC_PACKET_FIXTURE
 
@@ -415,6 +415,7 @@ class PriorMemoryFreezeE2ETests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             first = run_cli(
                 "preflight",
                 "--owner-focus",

@@ -24,6 +24,7 @@
     "schema_version": {"const": "1.0"},
     "run_id": {"type": "string", "minLength": 1},
     "run_identity_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "owner_focus": {"type": "string", "minLength": 1},
     "owner_class": {
       "enum": [
         "FORGE_RUN_IN_PROGRESS",
@@ -53,6 +54,11 @@
       "minItems": 1,
       "items": {"type": "string"}
     },
+    "frozen_representation_versions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
     "stages": {
       "type": "array",
       "items": {
@@ -66,6 +72,46 @@
         ],
         "properties": {
           "representation_id": {"type": "string"},
+          "representation_semantic_version": {"type": ["string", "null"]},
+          "representation_payload_sha256": {
+            "type": ["string", "null"],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "scientific_slot_sha256": {
+            "type": ["string", "null"],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "execution_binding_sha256": {
+            "type": ["string", "null"],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "execution_provenance_status": {
+            "type": ["string", "null"],
+            "enum": [
+              null,
+              "VERIFIED_EXECUTION_BINDING",
+              "HISTORICAL_READBACK_UNKNOWN",
+              "NOT_APPLICABLE",
+              "EXECUTION_BINDING_CONFLICT"
+            ]
+          },
+          "control_session_id": {"type": ["string", "null"]},
+          "model_provenance_sha256": {
+            "type": ["string", "null"],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "memory_eligibility_sha256": {
+            "type": ["string", "null"],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "market_evidence_epoch_sha256": {
+            "type": ["string", "null"],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "capability_epoch_sha256": {
+            "type": ["string", "null"],
+            "pattern": "^[0-9a-f]{64}$"
+          },
           "execution_status": {
             "enum": ["EXECUTED", "REUSED_VALID", "NOT_RUN", "BLOCKED"]
           },
@@ -88,6 +134,33 @@
       }
     },
     "legacy_epoch_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "market_evidence_epoch_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "capability_epoch_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "session_id": {"type": ["string", "null"]},
+    "scientific_slot_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "execution_binding_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "execution_provenance_status": {
+      "type": ["string", "null"],
+      "enum": [
+        null,
+        "VERIFIED_EXECUTION_BINDING",
+        "HISTORICAL_READBACK_UNKNOWN",
+        "NOT_APPLICABLE",
+        "EXECUTION_BINDING_CONFLICT"
+      ]
+    },
     "control_session_id": {"type": ["string", "null"]},
     "blocking_reason_codes": {"type": "array", "items": {"type": "string"}},
     "owner_readout": {"type": "string"},

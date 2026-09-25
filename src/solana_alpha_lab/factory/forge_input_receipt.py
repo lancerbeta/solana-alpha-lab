@@ -94,14 +94,45 @@ def format_forge_input_owner_block(receipt: Mapping[str, Any]) -> str:
         "FORGE INPUT",
         f"visible_cohorts: {visible}",
         f"active_evidence_set: manifest={mid} corpus_version={version}",
+        (
+            "market_evidence_epoch: "
+            + (
+                str(receipt.get("market_evidence_epoch_sha256"))
+                if isinstance(receipt.get("market_evidence_epoch_sha256"), str)
+                and len(str(receipt.get("market_evidence_epoch_sha256"))) == 64
+                else "(unset)"
+            )
+            + "  # admission/budget key"
+        ),
+        (
+            "capability_epoch: "
+            + (
+                str(receipt.get("capability_epoch_sha256"))
+                if isinstance(receipt.get("capability_epoch_sha256"), str)
+                and len(str(receipt.get("capability_epoch_sha256"))) == 64
+                else "(unset)"
+            )
+            + "  # protocol; does not free market budget"
+        ),
         f"historical_calibration: {hist_text}",
         f"visibility: {', '.join(vis_bits)}",
         f"representations: {'; '.join(reps) if reps else '(none)'}",
         f"forge_runnable: {bool(receipt.get('forge_runnable'))}",
+        (
+            "forge_input_readiness: READY — market input admitted; "
+            "STOP_BEFORE_SYNTHESIS is the phase boundary"
+            if bool(receipt.get("forge_runnable"))
+            else "forge_input_readiness: NOT_READY — resolve the typed blocker"
+        ),
         f"owner_class: {receipt.get('owner_class')}",
         f"forge_input_next: {forge_input_owner_next(receipt)}",
         "evidence_surface_mode: "
         + str(receipt.get("evidence_surface_mode") or "ordinary"),
+        "writes: research_store={store} forge_context={context} session={session}".format(
+            store=int((receipt.get("writes") or {}).get("research_store") or 0),
+            context=int((receipt.get("writes") or {}).get("forge_context") or 0),
+            session=int((receipt.get("writes") or {}).get("session") or 0),
+        ),
     ]
     codes = [str(item) for item in (receipt.get("blocking_reason_codes") or [])]
     if codes:
@@ -254,6 +285,12 @@ def build_forge_input_receipt(
         blocking.append(CURRENT_CORPUS_MISSING)
         owner_class = OWNER_CLASS_INPUT_NOT_READY
 
+    if readback is not None and not lineage_ok:
+        # The visible corpus may be present while its current lineage is
+        # UNKNOWN/FAIL.  That is an observability stop, never a market epoch.
+        blocking.append("LINEAGE_INTEGRITY_UNVERIFIED")
+        owner_class = OWNER_CLASS_OBSERVABILITY_BLOCKED
+
     if imported_cohort_id and imported_cohort_id not in visible_ids:
         blocking.append(IMPORTED_COHORT_MISSING)
         if owner_class == OWNER_CLASS_READY:
@@ -261,12 +298,9 @@ def build_forge_input_receipt(
 
     datasets, _warnings = enumerate_rdp_datasets(Path(data_root))
     selected, trunc = select_forge_packet_datasets(datasets)
+    current_datasets = list(select_current_datasets_for_forge(datasets))
     live_in_packet = bool(trunc.get("live_corpus_in_packet"))
-    current_live = [
-        item
-        for item in select_current_datasets_for_forge(datasets)
-        if is_live_corpus_dataset(item)
-    ]
+    current_live = [item for item in current_datasets if is_live_corpus_dataset(item)]
     chosen = None
     for item in selected:
         if is_live_corpus_dataset(item):
@@ -350,6 +384,52 @@ def build_forge_input_receipt(
         if not blocking:
             blocking.append(CURRENT_CORPUS_MISSING)
 
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        EvidenceIdentityError,
+        build_market_evidence_basis,
+        compute_capability_epoch_for_repo,
+        lineage_cohort_bindings,
+        market_evidence_epoch_sha256 as _hash_market_basis,
+    )
+
+    market_basis = build_market_evidence_basis(
+        # Packet membership remains bounded; market identity covers every
+        # current logical dataset so an out-of-packet decision-bearing source
+        # cannot change without changing the admission epoch.
+        datasets=current_datasets,
+        visible_cohort_ids=visible_ids,
+        current_dataset_manifest_id=current_mid,
+        corpus_version=corpus_version,
+        lineage_bindings=lineage_cohort_bindings(
+            Path(data_root),
+            verified_dataset_manifest_ids={
+                str(item.get("dataset_manifest_id") or "")
+                for item in datasets
+                if isinstance(item, Mapping) and item.get("dataset_manifest_id")
+            },
+        ),
+    )
+    market_epoch: str | None = None
+    if lineage_ok and readback is not None:
+        try:
+            market_epoch = _hash_market_basis(market_basis)
+        except EvidenceIdentityError:
+            if "MARKET_EVIDENCE_BASIS_INCOMPLETE" not in blocking:
+                blocking.append("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+            forge_runnable = False
+            if owner_class == OWNER_CLASS_READY:
+                owner_class = OWNER_CLASS_INPUT_NOT_READY
+    else:
+        forge_runnable = False
+    capability_epoch: str | None
+    try:
+        capability_epoch, _cap_basis = compute_capability_epoch_for_repo(Path(repo_root))
+    except Exception:
+        capability_epoch = None
+        blocking.append("CAPABILITY_IDENTITY_UNAVAILABLE")
+        forge_runnable = False
+        owner_class = OWNER_CLASS_OBSERVABILITY_BLOCKED
+
     body = {
         "schema": SCHEMA,
         "schema_version": SCHEMA_VERSION,
@@ -365,6 +445,7 @@ def build_forge_input_receipt(
                 corpus_version=corpus_version,
             ),
         },
+        "market_evidence_basis": market_basis,
         "historical_calibration": historical,
         "representation_input_scope": {
             "scope": "REPRESENTATION_INPUT_SCOPE",
@@ -392,6 +473,10 @@ def build_forge_input_receipt(
         "writes": {"research_store": 0, "forge_context": 0, "session": 0},
         "data_root_instance_fingerprint_sha256": instance_fingerprint(Path(data_root)),
     }
+    if market_epoch is not None:
+        body["market_evidence_epoch_sha256"] = market_epoch
+    if capability_epoch is not None:
+        body["capability_epoch_sha256"] = capability_epoch
     hashed = dict(body)
     hashed["receipt_sha256"] = canonical_sha256(body)
     return hashed

@@ -31,10 +31,15 @@ from solana_alpha_lab.factory.data_root import (  # noqa: E402
 )
 from solana_alpha_lab.factory.document_runner import repository_git_snapshot  # noqa: E402
 from solana_alpha_lab.factory.hfic_identity import assign_portfolio_ids  # noqa: E402
+from solana_alpha_lab.factory.hfic_evidence_identity import (  # noqa: E402
+    compute_split_identity,
+)
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     RUNNER_UP_AWAITING_CRITIC,
     HficSessionError,
     apply_classification,
+    canonical_preflight_receipt_sha256,
+    focus_key_sha256,
     find_session_by_epoch_focus,
     freeze_draft,
     list_hfic_sessions,
@@ -69,6 +74,9 @@ from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
 )
 from solana_alpha_lab.factory.research_store import ResearchStore  # noqa: E402
 from solana_alpha_lab.factory.run_passport import canonical_sha256  # noqa: E402
+from solana_alpha_lab.factory.hfic_evidence_identity import (  # noqa: E402
+    execution_binding_sha256,
+)
 from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     ACTION_CONTROL_REQUIRED,
     ACTION_FINISH_RUNNER_UP,
@@ -85,6 +93,9 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     EXEC_BLOCKED,
     EXEC_EXECUTED,
     EXEC_NOT_RUN,
+    EXEC_PROVENANCE_CONFLICT,
+    EXEC_PROVENANCE_HISTORICAL_UNKNOWN,
+    EXEC_PROVENANCE_VERIFIED,
     EXEC_REUSED,
     EXISTING_V1_CONTROL_SESSION_ID,
     HANDLER_SYNTHETIC_LATER_V2,
@@ -93,6 +104,7 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     consume_start_v1_envelope,
     control_preflight_from_bundle,
     evaluate_forge_run,
+    _execution_provenance_status,
     format_forge_run_owner_readout,
     load_ladder_registry,
     prepare_ladder_freeze_preflight,
@@ -122,6 +134,39 @@ from tests.test_hfic_session import (  # noqa: E402
     valid_draft,
 )
 
+
+def _submission_for_frozen(frozen: Mapping[str, object]) -> dict[str, object]:
+    """Classifier packet grounded to the frozen candidate's required features."""
+
+    from tests.test_fast_lane_classifier import submission
+
+    packet = submission()
+    spec = dict(packet["experiment_spec"])
+    critic = frozen.get("critic_input_packet")
+    selected = critic.get("selected_candidate") if isinstance(critic, Mapping) else None
+    feats = list(selected.get("required_feature_ids") or []) if isinstance(selected, Mapping) else []
+    if feats:
+        spec["required_feature_ids"] = feats
+    bound = dict(packet)
+    bound["experiment_spec"] = spec
+    bound["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+    return bound
+
+
+def _current_v12_draft(preflight: Mapping[str, object] | None = None) -> dict[str, object]:
+    """Fresh HFIC-V1.2 generator reply. V1.1 ``valid_draft()`` stays historical."""
+
+    draft = json.loads(
+        (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    if preflight is None:
+        return draft
+    from tests.test_hfic_cli import bind_draft
+
+    return bind_draft(draft, preflight)
+
 NO_WORTHY_DRAFT = ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1.json"
 
 
@@ -135,56 +180,38 @@ def _load_hypothesis_forge_cli():
     return module
 
 
-def _control_preflight(data_root: Path, store: ResearchStore) -> dict[str, object]:
-    """CONTROL preflight for disposable tests.
+def _control_preflight(
+    data_root: Path,
+    store: ResearchStore,
+    *,
+    repo_root: Path = ROOT,
+) -> dict[str, object]:
+    """CONTROL preflight through the production packet/identity writer.
 
-    Cohort scope is stamped via the same production helper used by
-    ``build_forge_context_packet`` (A3-compatible lineage readback). Do not use
-    this as a substitute for the G1 normal-entry path that calls the real
-    packet builder.
+    These tests exercise lifecycle boundaries, so they must carry the same
+    market/capability split and cohort binding as the real entry path. Legacy
+    combined-only receipts belong in explicit historical-disposition tests.
     """
 
-    from solana_alpha_lab.factory.hfic_preflight import (
-        _control_bound_visible_cohort_ids,
-    )
-
-    git = repository_git_snapshot(ROOT)
-    bound = _control_bound_visible_cohort_ids(data_root) or ["REL-C1", "REL-C2"]
-    packet = {
-        "schema": "smial.forge-context-packet",
-        "owner_focus": "AUTO",
-        "evidence_epoch_sha256": "aa" * 32,
-        "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
-        "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
-        "vision_integrity": {"status": "PASS"},
-        "ladder_representation_id": "BASE",
-        "bound_visible_cohort_ids": list(bound),
-    }
-    digest = persist_forge_context_packet(
-        data_root,
-        packet,
-        store=store,
-        repo_root=ROOT,
-    )
-    return {
-        "receipt_id": "HFIC-PREFLIGHT-FIXTURE-001",
-        "evidence_epoch_sha256": "aa" * 32,
-        "focus_key_sha256": "bb" * 32,
-        "search_key_sha256": "cc" * 32,
-        "owner_focus": "AUTO",
-        "live_git_head": git.head_sha.lower(),
-        "git_composite_sha256": git.composite_sha256,
-        "session_started_at": "2026-08-27T12:00:00Z",
-        "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
-        "forge_context_packet_sha256": digest,
-        "forge_context_packet": packet,
-    }
+    return _production_control_preflight(data_root, store, repo_root=repo_root)
 
 
-def _production_control_preflight(data_root: Path, store: ResearchStore) -> dict[str, object]:
+def _production_control_preflight(
+    data_root: Path,
+    store: ResearchStore,
+    *,
+    evidence_surface_mode: str | None = CURRENT_REPRESENTATION_CONTROL_V1,
+    repo_root: Path = ROOT,
+) -> dict[str, object]:
     """Normal CONTROL packet via production writer (G1 acceptance path)."""
 
     from solana_alpha_lab.factory.hfic_preflight import build_forge_context_packet
+    from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
+    from solana_alpha_lab.factory.hfic_session import (
+        PROMPT_VERSION,
+        focus_key_sha256,
+        search_key_sha256,
+    )
 
     def _enumerate_production(_root: Path):
         # Fixture enumerate returns thin rows; stamp the same evidence_role /
@@ -203,36 +230,80 @@ def _production_control_preflight(data_root: Path, store: ResearchStore) -> dict
             enriched.append(row)
         return enriched, warnings
 
-    git = repository_git_snapshot(ROOT)
+    git = repository_git_snapshot(repo_root)
+    from solana_alpha_lab.factory.hfic_evidence_identity import compute_split_identity
+
     with patch(
         "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
         side_effect=_enumerate_production,
     ):
+        from solana_alpha_lab.factory.forge_input_receipt import (
+            build_forge_input_receipt,
+        )
+        split = compute_split_identity(repo_root, data_root)
+        policy = effective_policy(store)
+        market_epoch = str(split["market_evidence_epoch_sha256"])
+        owner_focus = "AUTO"
+        memory_eligibility = str(policy["memory_eligibility_sha256"])
+        focus_key = focus_key_sha256(owner_focus)
+        search_key = search_key_sha256(
+            market_epoch,
+            owner_focus,
+            PROMPT_VERSION,
+            memory_eligibility,
+            evidence_surface_mode,
+        )
         packet, digest = build_forge_context_packet(
-            ROOT,
+            repo_root,
             data_root,
-            owner_focus="AUTO",
-            evidence_epoch="aa" * 32,
-            search_key="cc" * 32,
+            owner_focus=owner_focus,
+            evidence_epoch=market_epoch,
+            search_key=search_key,
             commissioning_status="FAST_LANE_COMMISSIONED",
             research_memory_as_of="2026-09-16T12:00:00Z",
             store=store,
             persist=True,
-            evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+            evidence_surface_mode=evidence_surface_mode,
         )
-    return {
+        forge_input = build_forge_input_receipt(
+            data_root,
+            repo_root=repo_root,
+            evidence_surface_mode=evidence_surface_mode,
+            owner_focus=owner_focus,
+        )
+    result: dict[str, object] = {
         "receipt_id": "HFIC-PREFLIGHT-PRODUCTION-001",
-        "evidence_epoch_sha256": "aa" * 32,
-        "focus_key_sha256": "bb" * 32,
-        "search_key_sha256": "cc" * 32,
-        "owner_focus": "AUTO",
+        "evidence_epoch_sha256": market_epoch,
+        "focus_key_sha256": focus_key,
+        "search_key_sha256": search_key,
+        "owner_focus": owner_focus,
         "live_git_head": git.head_sha.lower(),
         "git_composite_sha256": git.composite_sha256,
         "session_started_at": "2026-08-27T12:00:00Z",
-        "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+        "memory_eligibility_sha256": memory_eligibility,
         "forge_context_packet_sha256": digest,
         "forge_context_packet": packet,
+        "forge_input_receipt": forge_input,
+        # Same production split axes as run_preflight / forge-input admission.
+        "market_evidence_epoch_sha256": split["market_evidence_epoch_sha256"],
+        "capability_epoch_sha256": split["capability_epoch_sha256"],
+        "legacy_combined_evidence_epoch_sha256": split[
+            "legacy_combined_evidence_epoch_sha256"
+        ],
     }
+    if evidence_surface_mode is not None:
+        result["evidence_surface_mode"] = evidence_surface_mode
+    return result
+
+
+def _ordinary_stamped_preflight(
+    data_root: Path, store: ResearchStore, *, repo_root: Path = ROOT
+) -> dict[str, object]:
+    """Production split identity with the ordinary (non-CONTROL) surface."""
+
+    return _production_control_preflight(
+        data_root, store, evidence_surface_mode=None, repo_root=repo_root
+    )
 
 
 def _rel_c2_corpus_binding() -> LifecycleCorpusBinding:
@@ -350,6 +421,8 @@ def _v1_freeze_preflight_from_envelope(
     *,
     control_session_id: str,
     control_preflight: Mapping[str, object] | None = None,
+    repo_root: Path = ROOT,
+    model_provenance_sha256: str | None = None,
 ) -> tuple[dict[str, object], dict[str, object]]:
     """Envelope → representation-aware freeze preflight (production binding path).
 
@@ -364,7 +437,7 @@ def _v1_freeze_preflight_from_envelope(
             control = control_preflight_from_bundle(bundle, packet_loaded)
         else:
             # Disposable orphan-parent probes may name a non-persisted CONTROL id.
-            control = _control_preflight(data_root, store)
+            control = _control_preflight(data_root, store, repo_root=repo_root)
     else:
         control = dict(control_preflight)
     control_receipt = _forge_control_receipt_from_preflight(
@@ -389,15 +462,17 @@ def _v1_freeze_preflight_from_envelope(
         control_session_id=parent,
         challenger=challenger,
         control_receipt=control_receipt,
+        model_provenance_sha256=model_provenance_sha256,
     )
     packet = v1_pre["forge_context_packet"]
     assert isinstance(packet, dict)
     # Production embed owns release-local scope; do not assign after build.
     assert packet.get("bound_visible_cohort_ids") == ["REL-C2"]
     digest = persist_forge_context_packet(
-        data_root, packet, store=store, repo_root=ROOT
+        data_root, packet, store=store, repo_root=repo_root
     )
     v1_pre["forge_context_packet_sha256"] = digest
+    v1_pre["preflight_receipt_sha256"] = canonical_preflight_receipt_sha256(v1_pre)
     return v1_pre, envelope
 
 
@@ -439,6 +514,46 @@ def _v1(**kwargs: object) -> dict[str, object]:
     }
     row.update(kwargs)
     return row
+
+
+def _provenance_status(**overrides: str | None) -> str:
+    slot = "aa" * 32
+    parent = "HFIC-SESS-BASE"
+    fields = {
+        "capability_epoch_sha256": "11" * 32,
+        "representation_payload_sha256": "33" * 32,
+        "memory_eligibility_sha256": "44" * 32,
+        "model_provenance_sha256": "55" * 32,
+    }
+    binding = execution_binding_sha256(
+        scientific_slot_sha256=slot,
+        control_session_id=parent,
+        **fields,
+    )
+    packet = {"control_session_id": parent, **fields}
+    receipt = {"control_session_id": parent, **fields}
+    bundle = {
+        "control_session_id": parent,
+        "execution_binding_sha256": binding,
+        **fields,
+    }
+    if "control_session_id" in overrides:
+        packet["control_session_id"] = overrides.pop("control_session_id")
+    for key, value in overrides.items():
+        if value is None:
+            packet.pop(key, None)
+            receipt.pop(key, None)
+            bundle.pop(key, None)
+        else:
+            packet[key] = value
+    return _execution_provenance_status(
+        bundle,
+        receipt=receipt,
+        packet=packet,
+        scientific_slot_sha256=slot,
+        stored_binding=binding,
+        execution_status=EXEC_EXECUTED,
+    )
 
 
 class ResolveNextActionTests(unittest.TestCase):
@@ -595,7 +710,289 @@ class ResolveNextActionTests(unittest.TestCase):
         )
         self.assertIn("status: NEXT", text)
         self.assertIn("CONTROL-compatible BASE", text)
+        self.assertIn("/hypothesis-forge CURRENT_REPRESENTATION_CONTROL", text)
         self.assertNotIn("status: DONE", text)
+        self.assertNotIn("STOP_BEFORE_SYNTHESIS", text)
+
+    def test_no_write_control_required_readout_is_not_slash_authority(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "owner_class": "FORGE_RUN_IN_PROGRESS",
+                "next_action": ACTION_START_BASE,
+                "owner_final": None,
+                "stages": [],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": ["CONTROL_SURFACE_REQUIRED"],
+                "no_write": True,
+            }
+        )
+        self.assertIn("START_BASE", text)
+        self.assertIn("CONTROL_SURFACE_REQUIRED", text)
+        self.assertIn("next: STOP_BEFORE_SYNTHESIS", text)
+        self.assertNotIn("/hypothesis-forge", text)
+        self.assertNotIn("CONTROL_ENTRY", text)
+
+    def test_authorized_control_required_readout_keeps_slash_action(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "owner_class": "FORGE_RUN_IN_PROGRESS",
+                "next_action": ACTION_START_BASE,
+                "owner_final": None,
+                "stages": [],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": ["CONTROL_SURFACE_REQUIRED"],
+                "no_write": False,
+            }
+        )
+        self.assertIn("CONTROL-compatible BASE", text)
+        self.assertIn("next: CONTROL_ENTRY", text)
+        self.assertIn("/hypothesis-forge CURRENT_REPRESENTATION_CONTROL", text)
+        self.assertNotIn("STOP_BEFORE_SYNTHESIS", text)
+
+    def test_known_hash_mismatch_is_execution_binding_conflict(self) -> None:
+        fields = (
+            "capability_epoch_sha256",
+            "representation_payload_sha256",
+            "memory_eligibility_sha256",
+            "model_provenance_sha256",
+        )
+        for key in fields:
+            with self.subTest(key=key):
+                status = _provenance_status(**{key: "22" * 32})
+                self.assertEqual(status, EXEC_PROVENANCE_CONFLICT)
+
+    def test_differing_control_session_id_is_conflict(self) -> None:
+        self.assertEqual(
+            _provenance_status(control_session_id="HFIC-SESS-OTHER"),
+            EXEC_PROVENANCE_CONFLICT,
+        )
+
+    def test_missing_historical_hash_is_not_a_false_conflict(self) -> None:
+        self.assertEqual(
+            _provenance_status(model_provenance_sha256=None),
+            EXEC_PROVENANCE_HISTORICAL_UNKNOWN,
+        )
+
+    def test_matching_known_provenance_stays_verified(self) -> None:
+        self.assertEqual(_provenance_status(), EXEC_PROVENANCE_VERIFIED)
+
+    def test_occupied_slot_readback_block_has_owner_recovery_next(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "session_id": "HFIC-SESS-OCCUPIED-READBACK",
+                "owner_class": ACTION_OBSERVABILITY_BLOCKED,
+                "next_action": ACTION_OBSERVABILITY_BLOCKED,
+                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
+                "stages": [],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": ["SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING"],
+            }
+        )
+        self.assertIn("occupied slot has no readable lifecycle row", text)
+        self.assertIn("RECOVER_EXISTING_READBACK", text)
+        self.assertIn(
+            "show-session --session-id HFIC-SESS-OCCUPIED-READBACK --format json",
+            text,
+        )
+        self.assertIn("do not rewrite receipts, regenerate, or reset budget", text)
+        self.assertIn("Блокировка не является научным отрицательным результатом", text)
+        self.assertIn(
+            "uv run --locked --managed-python python -B scripts/hypothesis_forge.py show-session",
+            text,
+        )
+
+    def test_execution_binding_conflict_has_exact_readback_recovery(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "session_id": "HFIC-SESS-IDENTITY-CONFLICT",
+                "owner_class": ACTION_OBSERVABILITY_BLOCKED,
+                "next_action": ACTION_OBSERVABILITY_BLOCKED,
+                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
+                "stages": [],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": [
+                    "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
+                ],
+            }
+        )
+        self.assertIn("VERIFY_EXECUTION_COMPATIBILITY", text)
+        self.assertIn(
+            "show-session --session-id HFIC-SESS-IDENTITY-CONFLICT --format json",
+            text,
+        )
+        self.assertIn("historical result remains occupied", text)
+        self.assertIn("do not replay, regenerate, or reset budget", text)
+        self.assertNotIn("start a new explicitly authorized /hypothesis-forge slash", text)
+
+    def test_budget_exhaustion_is_final_stop_and_reports_all_read_only_counters(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "owner_class": ACTION_OBSERVABILITY_BLOCKED,
+                "next_action": ACTION_OBSERVABILITY_BLOCKED,
+                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
+                "stages": [],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": ["SEARCH_BUDGET_EXHAUSTED"],
+            }
+        )
+        self.assertIn("status: STOP", text)
+        self.assertIn("Лимит поиска", text)
+        self.assertIn("повторять", text)
+        self.assertIn("writes: store=0 forge_run=0 session=0 forge_context=0", text)
+        self.assertNotIn("восстановите указанное readback/evidence", text)
+
+    def test_resume_readout_exposes_exact_draft_recovery_command(self) -> None:
+        draft_sha = "ab" * 32
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "owner_class": "FORGE_RUN_IN_PROGRESS",
+                "next_action": ACTION_RESUME_V1,
+                "owner_final": None,
+                "owner_focus": "ALT focus",
+                "stages": [
+                    {"representation_id": "BASE", "draft_sha256": "cd" * 32},
+                    {
+                        "representation_id": "NORMALIZED_TRAJECTORY_V1",
+                        "draft_sha256": draft_sha,
+                    },
+                ],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": ["PASS_TO_CLASSIFICATION"],
+            }
+        )
+        self.assertIn("RESUME_EXISTING_SESSION", text)
+        self.assertIn("--saved-draft-sha256 " + draft_sha, text)
+        self.assertIn(
+            "uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write",
+            text,
+        )
+        self.assertIn("--owner-focus 'ALT focus'", text)
+        self.assertIn("continue classification/finalize in the same session", text)
+        self.assertNotIn("persist/freeze that exact draft", text)
+        self.assertIn("forge_context=0", text)
+
+    def test_historical_execution_readback_is_not_readiness(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "owner_class": "FORGE_RUN_IN_PROGRESS",
+                "next_action": ACTION_RETURN_EXISTING,
+                "owner_final": None,
+                "execution_provenance_status": EXEC_PROVENANCE_HISTORICAL_UNKNOWN,
+                "stages": [],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": [],
+            }
+        )
+        self.assertIn("historical readback is UNKNOWN", text)
+        self.assertIn("not a readiness receipt", text)
+
+    def test_missing_current_market_identity_is_not_currently_applicable(self) -> None:
+        from solana_alpha_lab.factory.hfic_representation_ladder import (
+            _session_applicable_to_current_market,
+        )
+
+        self.assertFalse(
+            _session_applicable_to_current_market(
+                {"market_evidence_epoch_sha256": "aa" * 32},
+                current_market_epoch=None,
+                visible=[],
+            )
+        )
+
+    def test_current_reuse_requires_full_visible_cohort_scope(self) -> None:
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            scientific_slot_sha256,
+        )
+        from solana_alpha_lab.factory.hfic_representation_ladder import (
+            _session_applicable_to_current_market,
+        )
+
+        market = "aa" * 32
+        slot = scientific_slot_sha256(
+            market_evidence_epoch_sha256=market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+        )
+        partial = {
+            "market_evidence_epoch_sha256": market,
+            "scientific_slot_sha256": slot,
+            "representation_semantic_version": "HFIC-V1.2",
+            "owner_focus": "AUTO",
+            "bound_visible_cohort_ids": ["REL-C1"],
+        }
+        self.assertFalse(
+            _session_applicable_to_current_market(
+                partial,
+                current_market_epoch=market,
+                visible=["REL-C1", "REL-C2"],
+            )
+        )
+        complete = {**partial, "bound_visible_cohort_ids": ["REL-C1", "REL-C2"]}
+        self.assertTrue(
+            _session_applicable_to_current_market(
+                complete,
+                current_market_epoch=market,
+                visible=["REL-C1", "REL-C2"],
+            )
+        )
+
+    def test_stage_unknown_readback_is_not_false_done(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "next_action": ACTION_RETURN_EXISTING,
+                "owner_final": ACTION_OWNER_CANDIDATE,
+                "execution_provenance_status": "NOT_APPLICABLE",
+                "stages": [
+                    {
+                        "representation_id": "BASE",
+                        "execution_status": EXEC_REUSED,
+                        "execution_provenance_status": EXEC_PROVENANCE_HISTORICAL_UNKNOWN,
+                        "effective_terminal": "PASS",
+                        "input_scope": "ORDINARY_BASE",
+                    }
+                ],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": [],
+            }
+        )
+        self.assertIn("execution provenance UNKNOWN — not a readiness receipt", text)
+        self.assertIn("historical readback is UNKNOWN", text)
+        self.assertIn("execution_scope: NOT_SCIENTIFIC_EXECUTION", text)
+
+    def test_execution_binding_conflict_is_blocked_not_done(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "next_action": ACTION_RETURN_EXISTING,
+                "owner_final": ACTION_OWNER_CANDIDATE,
+                "execution_provenance_status": "NOT_APPLICABLE",
+                "stages": [
+                    {
+                        "representation_id": "BASE",
+                        "execution_status": EXEC_REUSED,
+                        "execution_provenance_status": EXEC_PROVENANCE_CONFLICT,
+                        "effective_terminal": "PASS",
+                        "input_scope": "ORDINARY_BASE",
+                    }
+                ],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": [],
+            }
+        )
+        self.assertIn("status: BLOCKED", text)
+        self.assertIn("execution binding conflict", text)
+        self.assertIn("not a readiness receipt", text)
+        self.assertNotIn("status: DONE", text)
+        self.assertNotIn("status: READBACK", text)
 
     def test_pass_to_classification_resumes_until_classify(self) -> None:
         decision = resolve_next_action(
@@ -683,6 +1080,15 @@ class ResolveNextActionTests(unittest.TestCase):
     def test_retry_completed_run_is_readback(self) -> None:
         decision = resolve_next_action([_base()], existing_completed=True)
         self.assertEqual(decision["next_action"], ACTION_RETURN_EXISTING)
+
+    def test_input_block_precedes_completed_readback(self) -> None:
+        decision = resolve_next_action(
+            [_base()],
+            existing_completed=True,
+            input_owner_class=OWNER_CLASS_OBSERVABILITY_BLOCKED,
+        )
+        self.assertEqual(decision["next_action"], ACTION_OBSERVABILITY_BLOCKED)
+        self.assertEqual(decision["owner_final"], ACTION_OBSERVABILITY_BLOCKED)
 
     def test_future_leak_stays_observability(self) -> None:
         decision = resolve_next_action(
@@ -865,12 +1271,16 @@ class ScopeAndPersistenceTests(unittest.TestCase):
             data_root = Path(tmp)
             _write_lineage(data_root)
             ResearchStore(data_root)
-            receipt = evaluate_forge_run(
-                ROOT,
-                data_root,
-                persist=False,
-                stages=[_base(), _v1(execution_status=EXEC_EXECUTED, effective_terminal="NO_WORTHY_HYPOTHESIS", stage_ref_sha256="aa" * 32)],
-            )
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                receipt = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    persist=False,
+                    stages=[_base(), _v1(execution_status=EXEC_EXECUTED, effective_terminal="NO_WORTHY_HYPOTHESIS", stage_ref_sha256="aa" * 32)],
+                )
         self.assertIn("REL-C1", receipt["stages"][0]["used_cohort_ids"])
         self.assertEqual(receipt["stages"][1]["used_cohort_ids"], ["REL-C2"])
         self.assertNotEqual(
@@ -893,13 +1303,21 @@ class ScopeAndPersistenceTests(unittest.TestCase):
                     stage_ref_sha256="aa" * 32,
                 ),
             ]
-            first = evaluate_forge_run(
-                ROOT, data_root, persist=True, stages=stages, existing_completed=False
-            )
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                first = evaluate_forge_run(
+                    ROOT, data_root, persist=True, stages=stages, existing_completed=False
+                )
             self.assertEqual(first["writes"]["forge_run"], 1)
-            second = evaluate_forge_run(
-                ROOT, data_root, persist=False, stages=stages, existing_completed=False
-            )
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                second = evaluate_forge_run(
+                    ROOT, data_root, persist=False, stages=stages, existing_completed=False
+                )
             self.assertEqual(second["run_identity_sha256"], first["run_identity_sha256"])
             self.assertEqual(second["next_action"], ACTION_RETURN_EXISTING)
             self.assertEqual(second["owner_final"], ACTION_SEARCH_EXHAUSTED)
@@ -928,17 +1346,25 @@ class ScopeAndPersistenceTests(unittest.TestCase):
                     draft_sha256="ab" * 32,
                 )
             ]
-            first = evaluate_forge_run(
-                ROOT, data_root, persist=True, stages=stages, existing_completed=False
-            )
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                first = evaluate_forge_run(
+                    ROOT, data_root, persist=True, stages=stages, existing_completed=False
+                )
             self.assertEqual(first["next_action"], ACTION_RESUME_BASE)
-            replay = evaluate_forge_run(
-                ROOT,
-                data_root,
-                persist=False,
-                stages=first["stages"],
-                existing_completed=False,
-            )
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                replay = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    persist=False,
+                    stages=first["stages"],
+                    existing_completed=False,
+                )
         self.assertEqual(replay["next_action"], ACTION_RESUME_BASE)
         self.assertNotEqual(replay["next_action"], ACTION_SEARCH_EXHAUSTED)
 
@@ -982,14 +1408,13 @@ class RealNoWriteVerticalTests(unittest.TestCase):
         self.assertEqual(receipt["writes"]["research_store"], 0)
         self.assertEqual(receipt["writes"]["session"], 0)
         self.assertEqual(fp, instance_fingerprint(data_root))
-        self.assertEqual(receipt["control_session_id"], EXISTING_V1_CONTROL_SESSION_ID)
-        self.assertEqual(receipt["next_action"], ACTION_START_V1)
+        self.assertIsNone(receipt["control_session_id"])
+        self.assertEqual(receipt["next_action"], ACTION_START_BASE)
         self.assertIsNone(receipt["owner_final"])
-        self.assertNotEqual(receipt["next_action"], ACTION_SEARCH_EXHAUSTED)
-        self.assertEqual(
-            receipt["legacy_epoch_sha256"],
-            "456411903174e403092f115cddf62fd38c9ae1bb943ebba0048c5b6bd070854e",
-        )
+        self.assertIn("CONTROL_SURFACE_REQUIRED", receipt["blocking_reason_codes"])
+        self.assertEqual(receipt["stages"][0]["reason_code"], "CONTROL_SURFACE_REQUIRED")
+        self.assertIsInstance(receipt["market_evidence_epoch_sha256"], str)
+        self.assertEqual(len(receipt["market_evidence_epoch_sha256"]), 64)
 
 
 class RegistryLoadTests(unittest.TestCase):
@@ -1407,6 +1832,7 @@ def _v1_preflight(
     *,
     control_session_id: str,
     cohorts: list[str] | None = None,
+    repo_root: Path = ROOT,
 ) -> dict[str, object]:
     """V1 freeze preflight via envelope challenger (not marker-only CONTROL copy)."""
 
@@ -1414,6 +1840,7 @@ def _v1_preflight(
         data_root,
         store,
         control_session_id=control_session_id,
+        repo_root=repo_root,
     )
     if cohorts is not None:
         packet = v1_pre["forge_context_packet"]
@@ -1421,7 +1848,7 @@ def _v1_preflight(
         packet["bound_visible_cohort_ids"] = list(cohorts)
         packet.pop("visible_cohort_ids", None)
         digest = persist_forge_context_packet(
-            data_root, packet, store=store, repo_root=ROOT
+            data_root, packet, store=store, repo_root=repo_root
         )
         v1_pre["forge_context_packet_sha256"] = digest
     return v1_pre
@@ -1433,14 +1860,24 @@ def _v2_preflight(
     *,
     control_session_id: str,
 ) -> dict[str, object]:
+    with patch(
+        "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+        side_effect=_enumerate_live,
+    ):
+        split = compute_split_identity(ROOT, data_root)
+    market_epoch = str(split["market_evidence_epoch_sha256"])
+    capability_epoch = str(split["capability_epoch_sha256"])
     git = repository_git_snapshot(ROOT)
     packet = {
         "schema": "smial.forge-context-packet",
         "owner_focus": "AUTO",
-        "evidence_epoch_sha256": "aa" * 32,
+        "evidence_epoch_sha256": market_epoch,
+        "market_evidence_epoch_sha256": market_epoch,
+        "capability_epoch_sha256": capability_epoch,
         "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
         "vision_integrity": {"status": "PASS"},
         "ladder_representation_id": "SYNTHETIC_LATER_V2",
+        "representation_semantic_version": "1.0",
         "visible_cohort_ids": ["REL-C2"],
         "bound_visible_cohort_ids": ["REL-C2"],
         "control_session_id": control_session_id,
@@ -1450,8 +1887,10 @@ def _v2_preflight(
     )
     return {
         "receipt_id": "HFIC-PREFLIGHT-V2-FIXTURE-001",
-        "evidence_epoch_sha256": "aa" * 32,
-        "focus_key_sha256": "bb" * 32,
+        "evidence_epoch_sha256": market_epoch,
+        "market_evidence_epoch_sha256": market_epoch,
+        "capability_epoch_sha256": capability_epoch,
+        "focus_key_sha256": focus_key_sha256("AUTO"),
         "search_key_sha256": "ee" * 32,
         "owner_focus": "AUTO",
         "live_git_head": git.head_sha.lower(),
@@ -1463,7 +1902,13 @@ def _v2_preflight(
 
 
 def _distinct_no_worthy_draft(*, label: str) -> dict[str, object]:
-    draft = json.loads(NO_WORTHY_DRAFT.read_text(encoding="utf-8"))
+    """Current-prompt no-worthy reply. Historical 1.1 lives in NO_WORTHY_DRAFT."""
+
+    draft = json.loads(
+        (ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1_2.json").read_text(
+            encoding="utf-8"
+        )
+    )
     for card in draft.get("candidates") or []:
         if isinstance(card, dict):
             claim = str(card.get("claim") or "")
@@ -1523,10 +1968,19 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             store = ResearchStore(data_root)
             draft = json.loads(NO_WORTHY_DRAFT.read_text(encoding="utf-8"))
             git = repository_git_snapshot(ROOT)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                split = compute_split_identity(ROOT, data_root)
+            market_epoch = str(split["market_evidence_epoch_sha256"])
+            capability_epoch = str(split["capability_epoch_sha256"])
             packet = {
                 "schema": "smial.forge-context-packet",
                 "owner_focus": "AUTO",
-                "evidence_epoch_sha256": "aa" * 32,
+                "evidence_epoch_sha256": market_epoch,
+                "market_evidence_epoch_sha256": market_epoch,
+                "capability_epoch_sha256": capability_epoch,
                 "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
                 "vision_integrity": {"status": "PASS"},
                 "ladder_representation_id": "BASE",
@@ -1536,8 +1990,10 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             )
             ordinary = {
                 "receipt_id": "HFIC-PREFLIGHT-ORDINARY-001",
-                "evidence_epoch_sha256": "aa" * 32,
-                "focus_key_sha256": "bb" * 32,
+                "evidence_epoch_sha256": market_epoch,
+                "market_evidence_epoch_sha256": market_epoch,
+                "capability_epoch_sha256": capability_epoch,
+                "focus_key_sha256": focus_key_sha256("AUTO"),
                 "search_key_sha256": "cc" * 32,
                 "owner_focus": "AUTO",
                 "live_git_head": git.head_sha.lower(),
@@ -1638,8 +2094,6 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(alt_focus["next_action"], ACTION_START_BASE)
 
     def test_f2_v1_candidate_from_real_artifacts_then_readback(self) -> None:
-        from tests.test_fast_lane_classifier import submission
-
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
@@ -1663,7 +2117,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 v1_pre["forge_context_packet"].get("representation_payload_sha256"),
                 envelope["challenger"].get("representation_payload_sha256"),
             )
-            draft = valid_draft()
+            draft = _current_v12_draft(v1_pre)
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             persist_frozen_session(
                 store,
@@ -1698,8 +2152,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             self.assertEqual(pending["next_action"], ACTION_RESUME_V1)
             self.assertIsNone(pending["owner_final"])
             self.assertIn("classify then finalize", pending["owner_readout"])
-            spec = submission()
-            spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+            spec = _submission_for_frozen(frozen)
             done = apply_classification(
                 frozen,
                 spec,
@@ -1777,8 +2230,6 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(retry["next_action"], ACTION_RETURN_EXISTING)
 
     def test_f3_completed_v2_is_not_restarted_on_normal_entry(self) -> None:
-        from tests.test_fast_lane_classifier import submission
-
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
@@ -1804,6 +2255,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 repo_root=ROOT,
                 identities=assign_portfolio_ids(v2_draft["candidates"]),
                 draft=v2_draft,
+                representation_registry=_later_registry(),
             )
             packet = v2_frozen["critic_input_packet"]
             assert isinstance(packet, dict)
@@ -1814,8 +2266,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 repo_root=ROOT,
             )
             self.assertEqual(awaiting["session_state"], "AWAITING_CLASSIFICATION")
-            spec = submission()
-            spec["hypothesis_definition_sha256"] = v2_frozen["selected_definition_sha256"]
+            spec = _submission_for_frozen(v2_frozen)
             apply_classification(
                 v2_frozen,
                 spec,
@@ -1863,7 +2314,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 control_session_id=str(base["session_id"]),
                 control_preflight=control,
             )
-            draft = valid_draft()
+            draft = _current_v12_draft(v1_pre)
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             persist_frozen_session(
                 store,
@@ -1897,8 +2348,6 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(found_base_again["session_id"], base["session_id"])
 
     def test_f2_cli_preflight_store_freeze_is_distinct_from_control(self) -> None:
-        from tests.test_fast_lane_classifier import submission
-
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
@@ -1941,7 +2390,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             )
             self.assertEqual(packet.get("ladder_representation_id"), "NORMALIZED_TRAJECTORY_V1")
             self.assertIsNone(base.get("critic_input_packet"))
-            draft = valid_draft()
+            draft = _current_v12_draft(v1_pre)
             frozen = freeze_draft(
                 draft,
                 preflight_receipt=v1_pre,
@@ -1983,8 +2432,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 pending = evaluate_forge_run(ROOT, data_root, persist=True)
             self.assertEqual(pending["next_action"], ACTION_RESUME_V1)
             self.assertIsNone(pending["owner_final"])
-            spec = submission()
-            spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+            spec = _submission_for_frozen(frozen)
             done = apply_classification(
                 frozen,
                 spec,
@@ -2061,7 +2509,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 data_root, packet, store=store, repo_root=ROOT
             )
             orphan_pre["forge_context_packet_sha256"] = digest
-            draft = valid_draft()
+            draft = _current_v12_draft(orphan_pre)
             frozen = freeze_draft(draft, preflight_receipt=orphan_pre, repo_root=ROOT)
             persist_frozen_session(
                 store,
@@ -2081,9 +2529,18 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             for row in started["stages"]
             if row["representation_id"] == "NORMALIZED_TRAJECTORY_V1"
         )
-        self.assertEqual(started["next_action"], ACTION_START_V1)
+        self.assertEqual(started["next_action"], ACTION_OBSERVABILITY_BLOCKED)
+        self.assertIn(
+            "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
+            started["blocking_reason_codes"],
+        )
         self.assertIsNone(v1["session_id"])
         self.assertEqual(v1["execution_status"], EXEC_NOT_RUN)
+        self.assertIsInstance(started.get("session_id"), str)
+        self.assertIn(
+            "show-session --session-id " + str(started["session_id"]),
+            started["owner_readout"],
+        )
 
     def test_g4_marker_only_v1_freeze_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -2188,8 +2645,6 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
     def test_g4_classify_after_store_reload_keeps_ladder_slot(self) -> None:
         """PASS_TO_CLASSIFICATION intermediate must stamp slot before classify reload."""
 
-        from tests.test_fast_lane_classifier import submission
-
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
@@ -2200,7 +2655,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 store,
                 control_session_id=str(base["session_id"]),
             )
-            draft = valid_draft()
+            draft = _current_v12_draft(v1_pre)
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             persist_frozen_session(
                 store,
@@ -2227,8 +2682,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             )
             self.assertEqual(awaiting.get("control_session_id"), base["session_id"])
             # Classify from store-reloaded bundle only (no in-memory freeze object).
-            spec = submission()
-            spec["hypothesis_definition_sha256"] = awaiting["selected_definition_sha256"]
+            spec = _submission_for_frozen(awaiting)
             done = apply_classification(
                 awaiting,
                 spec,
@@ -2273,6 +2727,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 repo_root=ROOT,
                 identities=assign_portfolio_ids(v2_draft["candidates"]),
                 draft=v2_draft,
+                representation_registry=_later_registry(),
             )
             packet = v2_frozen["critic_input_packet"]
             assert isinstance(packet, dict)
@@ -2315,36 +2770,11 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(base["reason_code"], "CONTROL_SURFACE_REQUIRED")
 
     def test_n1_ordinary_final_pass_is_honest_candidate_readback(self) -> None:
-        from tests.test_fast_lane_classifier import submission
-
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            git = repository_git_snapshot(ROOT)
-            packet = {
-                "schema": "smial.forge-context-packet",
-                "owner_focus": "AUTO",
-                "evidence_epoch_sha256": "aa" * 32,
-                "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
-                "vision_integrity": {"status": "PASS"},
-                "ladder_representation_id": "BASE",
-            }
-            digest = persist_forge_context_packet(
-                data_root, packet, store=store, repo_root=ROOT
-            )
-            ordinary = {
-                "receipt_id": "HFIC-PREFLIGHT-ORDINARY-PASS-001",
-                "evidence_epoch_sha256": "aa" * 32,
-                "focus_key_sha256": "bb" * 32,
-                "search_key_sha256": "cc" * 32,
-                "owner_focus": "AUTO",
-                "live_git_head": git.head_sha.lower(),
-                "git_composite_sha256": git.composite_sha256,
-                "session_started_at": "2026-08-27T12:00:00Z",
-                "forge_context_packet_sha256": digest,
-                "forge_context_packet": packet,
-            }
+            ordinary = _ordinary_stamped_preflight(data_root, store)
             draft = valid_draft()
             frozen = freeze_draft(draft, preflight_receipt=ordinary, repo_root=ROOT)
             persist_frozen_session(
@@ -2363,8 +2793,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 repo_root=ROOT,
             )
             store.rebuild_projection()
-            spec = submission()
-            spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+            spec = _submission_for_frozen(frozen)
             done = apply_classification(
                 frozen,
                 spec,
@@ -2393,30 +2822,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            git = repository_git_snapshot(ROOT)
-            packet = {
-                "schema": "smial.forge-context-packet",
-                "owner_focus": "AUTO",
-                "evidence_epoch_sha256": "aa" * 32,
-                "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
-                "vision_integrity": {"status": "PASS"},
-                "ladder_representation_id": "BASE",
-            }
-            digest = persist_forge_context_packet(
-                data_root, packet, store=store, repo_root=ROOT
-            )
-            ordinary = {
-                "receipt_id": "HFIC-PREFLIGHT-ORDINARY-PENDING-001",
-                "evidence_epoch_sha256": "aa" * 32,
-                "focus_key_sha256": "bb" * 32,
-                "search_key_sha256": "cc" * 32,
-                "owner_focus": "AUTO",
-                "live_git_head": git.head_sha.lower(),
-                "git_composite_sha256": git.composite_sha256,
-                "session_started_at": "2026-08-27T12:00:00Z",
-                "forge_context_packet_sha256": digest,
-                "forge_context_packet": packet,
-            }
+            ordinary = _ordinary_stamped_preflight(data_root, store)
             draft = valid_draft()
             frozen = freeze_draft(draft, preflight_receipt=ordinary, repo_root=ROOT)
             persist_frozen_session(

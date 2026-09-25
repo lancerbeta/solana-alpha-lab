@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-FACTORY-FIT-001",
+  "as_of": "2026-09-23",
+  "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
+  "reviewed_bindings_sha256": "88537dd5fb90b6fee26d8f880920b4f8977d8154db7d4d258fa07018acedeaac",
+  "reviewed_inventory_sha256": "22f029089a6bea0d91815b65367dd785f8d0df6a21a4f2b58ea0ed253d3f3546",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_BOUNDED_IDENTITY_NOT_ALPHA",
+    "flexibility_and_history": "PASS_LEGACY_DISPOSITION_WITHOUT_RDP_REWRITE",
+    "context_efficiency": "PASS_SHARED_HELPER_REUSE",
+    "research_truth": "PASS_MARKET_STAMP_BUDGET_AND_FAIL_CLOSED_INCOMPLETE",
+    "owner_operability": "PASS_START_RESUME_REUSED_AND_BLOCKED_GLOSS",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_FORGE_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_ROLLBACK_IS_GIT_REVERT",
+    "build_vs_buy": "PASS_NO_NEW_FRAMEWORK",
+    "security": "PASS_NO_SECRETS_PROVIDERS_OR_ABSOLUTE_PATHS",
+    "red_team": "PASS_INCOMPLETE_MARKET_AND_TAMPER_FAIL_CLOSED"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "AUTHORIZED_NORMAL_HYPOTHESIS_FORGE_AFTER_A5_MERGE"
+  },
+  "recovery": "Ordinary Git revert of identity helper, consumer wiring, schemas, gold, disposition, operator/slash gloss. Do not rewrite historical HFIC receipts or destroy imported LIVE CORPUS.",
+  "limits": [
+    "NO_SCIENTIFIC_FORGE",
+    "NO_ALPHA",
+    "NO_A6",
+    "NO_HISTORICAL_RECEIPT_REWRITE",
+    "NO_ABSOLUTE_MACHINE_PATHS",
+    "NO_PROVIDER_OR_DEPLOYMENT",
+    "NO_QUOTA_EXPANSION"
+  ]
+}

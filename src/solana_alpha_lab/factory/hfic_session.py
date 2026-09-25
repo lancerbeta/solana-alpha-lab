@@ -6,6 +6,7 @@ import copy
 import hashlib
 import json
 import re
+import time
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
@@ -206,6 +207,274 @@ def search_key_sha256(
     )
 
 
+def _split_identity_fields(
+    *sources: Mapping[str, Any] | None,
+) -> dict[str, str]:
+    """Copy A5 market/capability stamps from the first source that carries them."""
+
+    out: dict[str, str] = {}
+    for source in sources:
+        if not isinstance(source, Mapping):
+            continue
+        for key in (
+            "market_evidence_epoch_sha256",
+            "capability_epoch_sha256",
+        ):
+            if key in out:
+                continue
+            value = source.get(key)
+            if isinstance(value, str) and len(value) == 64:
+                out[key] = value
+    return out
+
+
+def _stamp_split_identity(
+    target: dict[str, Any],
+    *sources: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    fields = _split_identity_fields(*sources)
+    if fields:
+        target.update(fields)
+    return target
+
+
+def _market_evidence_basis_from_sources(
+    *sources: Mapping[str, Any] | None,
+) -> dict[str, Any] | None:
+    """Return the production A3 market basis retained for lifecycle readback."""
+
+    for source in sources:
+        if not isinstance(source, Mapping):
+            continue
+        direct = source.get("market_evidence_basis")
+        if isinstance(direct, Mapping):
+            return dict(direct)
+        nested = source.get("forge_input_receipt")
+        if isinstance(nested, Mapping):
+            basis = nested.get("market_evidence_basis")
+            if isinstance(basis, Mapping):
+                return dict(basis)
+    return None
+
+
+def _stamp_market_evidence_basis(
+    target: dict[str, Any],
+    *sources: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    basis = _market_evidence_basis_from_sources(*sources)
+    if basis is not None:
+        target["market_evidence_basis"] = basis
+    return target
+
+
+def _first_valid_hash(
+    sources: Sequence[Mapping[str, Any] | None], key: str
+) -> str | None:
+    for source in sources:
+        if not isinstance(source, Mapping):
+            continue
+        value = source.get(key)
+        if isinstance(value, str) and len(value) == 64 and re.fullmatch(
+            r"[0-9a-f]{64}", value
+        ):
+            return value
+    return None
+
+
+def _consistent_valid_hash(
+    sources: Sequence[Mapping[str, Any] | None], key: str
+) -> str | None:
+    """Return one hash only when every observed valid value agrees.
+
+    A lifecycle writer may receive the same identity through the outer
+    receipt, the forge-input receipt, and the context packet.  First-wins
+    would let a stale outer value silently mask a newer production value.
+    Conflicting valid values are therefore an admission conflict, not a
+    preference decision.
+    """
+
+    observed: list[str] = []
+    for source in sources:
+        if not isinstance(source, Mapping):
+            continue
+        if key not in source:
+            continue
+        value = source.get(key)
+        if value in (None, ""):
+            continue
+        if isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value):
+            if value not in observed:
+                observed.append(value)
+            continue
+        # A malformed nested identity is not equivalent to an absent legacy
+        # field.  Silently dropping it could let a valid outer receipt mask a
+        # corrupted production context.
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+    if len(observed) > 1:
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+    return observed[0] if observed else None
+
+
+def _consistent_hash_state(
+    sources: Sequence[Mapping[str, Any] | None], key: str
+) -> tuple[str | None, bool]:
+    """Return (known value, explicit unknown) without resurrecting UNKNOWN."""
+
+    observed: list[str] = []
+    explicit_unknown = False
+    for source in sources:
+        if not isinstance(source, Mapping) or key not in source:
+            continue
+        value = source.get(key)
+        if value in (None, ""):
+            explicit_unknown = True
+            continue
+        if isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value):
+            if value not in observed:
+                observed.append(value)
+            continue
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+    if len(observed) > 1 or (explicit_unknown and observed):
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+    return (observed[0] if observed else None), explicit_unknown
+
+
+def _execution_identity_fields(
+    *sources: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Project one immutable slot/provenance binding from production inputs."""
+
+    source_list = [source for source in sources if isinstance(source, Mapping)]
+    expanded: list[Mapping[str, Any] | None] = list(source_list)
+    for source in source_list:
+        packet = source.get("forge_context_packet")
+        if isinstance(packet, Mapping):
+            expanded.append(packet)
+        normalized = source.get("normalized_trajectory_v1")
+        if isinstance(normalized, Mapping):
+            expanded.append(normalized)
+
+    initial_representation, initial_parent = _preflight_ladder_slot(
+        source_list[0] if source_list else None
+    )
+    observed_representations: list[str] = []
+    observed_parents: list[str] = []
+    if initial_representation != "BASE":
+        observed_representations.append(initial_representation)
+    if initial_parent:
+        observed_parents.append(initial_parent)
+    for source in expanded:
+        observed, observed_parent = _mapping_ladder_slot(source)
+        if observed != "BASE":
+            observed_representations.append(observed)
+        if observed_parent:
+            observed_parents.append(observed_parent)
+    if len(set(observed_representations)) > 1 or len(set(observed_parents)) > 1:
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+    representation = observed_representations[0] if observed_representations else "BASE"
+    parent = observed_parents[0] if observed_parents else None
+
+    semantic_version: str | None = None
+    for source in expanded:
+        if not isinstance(source, Mapping):
+            continue
+        for key in (
+            "representation_semantic_version",
+            "semantic_version",
+            "representation_version",
+        ):
+            value = source.get(key)
+            if isinstance(value, (str, int, float)) and not isinstance(value, bool):
+                rendered = str(value).strip()
+                if rendered:
+                    semantic_version = rendered
+                    break
+        if semantic_version:
+            break
+    if semantic_version is None and representation == "BASE":
+        semantic_version = PROMPT_VERSION
+
+    fields: dict[str, Any] = {
+        "ladder_representation_id": representation,
+    }
+    if parent:
+        fields["control_session_id"] = parent
+    if semantic_version:
+        fields["representation_semantic_version"] = semantic_version
+
+    market = _consistent_valid_hash(expanded, "market_evidence_epoch_sha256")
+    capability = _consistent_valid_hash(expanded, "capability_epoch_sha256")
+    focus_key = _consistent_valid_hash(expanded, "focus_key_sha256")
+    focus_values: list[tuple[str, str]] = []
+    for source in expanded:
+        if isinstance(source, Mapping) and isinstance(source.get("owner_focus"), str):
+            raw_focus = str(source["owner_focus"])
+            focus_values.append((normalize_text(raw_focus), raw_focus))
+    if len({normalized for normalized, _raw in focus_values}) > 1:
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+    owner_focus = focus_values[0][1] if focus_values else "AUTO"
+    if focus_key is None:
+        focus_key = focus_key_sha256(owner_focus)
+    payload_sha = _consistent_valid_hash(expanded, "representation_payload_sha256")
+    memory_sha = _consistent_valid_hash(expanded, "memory_eligibility_sha256")
+    model_sha = _consistent_valid_hash(expanded, "model_provenance_sha256")
+    stored_binding, binding_unknown = _consistent_hash_state(
+        expanded, "execution_binding_sha256"
+    )
+    if market and semantic_version:
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            execution_binding_sha256,
+            scientific_slot_sha256,
+        )
+
+        slot = scientific_slot_sha256(
+            market_evidence_epoch_sha256=market,
+            representation_id=representation,
+            representation_semantic_version=semantic_version,
+            owner_focus=owner_focus,
+        )
+        fields["scientific_slot_sha256"] = slot
+        # A binding digest is provenance for an actual execution context.  A
+        # tuple of null payload/memory/model fields is still UNKNOWN and must
+        # not be upgraded into a readiness-looking hash.  The parent control
+        # session is part of the binding whenever a representation is bound.
+        fields["execution_binding_sha256"] = stored_binding
+        if binding_unknown:
+            # An explicit durable UNKNOWN is authoritative; complete sibling
+            # fields do not grant permission to mint a new binding.
+            fields["execution_binding_sha256"] = None
+        elif capability and payload_sha and memory_sha and model_sha:
+            expected_binding = execution_binding_sha256(
+                scientific_slot_sha256=slot,
+                capability_epoch_sha256=capability,
+                control_session_id=parent,
+                representation_payload_sha256=payload_sha,
+                memory_eligibility_sha256=memory_sha,
+                model_provenance_sha256=model_sha,
+            )
+            if stored_binding is not None and stored_binding != expected_binding:
+                raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+            fields["execution_binding_sha256"] = expected_binding
+        elif stored_binding is None and binding_unknown:
+            fields["execution_binding_sha256"] = None
+    elif stored_binding is not None or binding_unknown:
+        fields["execution_binding_sha256"] = stored_binding
+    if payload_sha:
+        fields["representation_payload_sha256"] = payload_sha
+    if model_sha:
+        fields["model_provenance_sha256"] = model_sha
+    return fields
+
+
+def _stamp_execution_identity(
+    target: dict[str, Any],
+    *sources: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    fields = _execution_identity_fields(target, *sources)
+    target.update(fields)
+    return target
+
+
 def closed_family_terminals_from_receipt(receipt: Mapping[str, Any] | None) -> list[str]:
     return family_hard_close_terminals(ledger_from_receipt(receipt))
 
@@ -390,6 +659,7 @@ def bind_preflight_receipt(
     store: Any,
     repo_root: Any,
     require_current_store_digest: bool = True,
+    require_current_market_identity: bool = False,
 ) -> dict[str, Any]:
     from solana_alpha_lab.factory.commissioning_proof import (
         CommissioningProofError,
@@ -397,19 +667,42 @@ def bind_preflight_receipt(
     )
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
 
-    if receipt.get("action") != "START_NEW_SESSION":
+    action = receipt.get("action")
+    if action not in {"START_NEW_SESSION", "RESUME_EXISTING_SESSION"}:
         raise HficSessionError("PREFLIGHT_ACTION_INVALID")
     if receipt.get("prompt_version") != PROMPT_VERSION:
         raise HficSessionError("PREFLIGHT_PROMPT_VERSION_INVALID")
     _reject_stale_fresh_session_draft(draft, receipt)
+    if action == "RESUME_EXISTING_SESSION":
+        draft_sha = hashlib.sha256(_canonical_bytes(draft)).hexdigest()
+        if receipt.get("draft_lifecycle") != "GENERATED_BEFORE_FREEZE":
+            raise HficSessionError("PREFLIGHT_ACTION_INVALID")
+        if receipt.get("generated_draft_sha256") != draft_sha:
+            raise HficSessionError("GENERATED_DRAFT_CONFLICT")
     observed_hash = receipt.get("preflight_receipt_sha256")
     expected_hash = canonical_preflight_receipt_sha256(receipt)
     if observed_hash != expected_hash:
         raise HficSessionError("PREFLIGHT_RECEIPT_HASH_MISMATCH")
-    if draft.get("preflight_receipt_id") != receipt.get("receipt_id"):
-        raise HficSessionError("PREFLIGHT_RECEIPT_ID_MISMATCH")
-    if draft.get("preflight_receipt_sha256") != observed_hash:
-        raise HficSessionError("PREFLIGHT_RECEIPT_HASH_MISMATCH")
+    if action == "RESUME_EXISTING_SESSION":
+        # A generated draft is immutable across restart. Its reference points
+        # to the original preflight, while this newly issued receipt records
+        # the verified restart/readback. Persist both links; never rewrite the
+        # draft merely to make its bytes resemble the restart receipt.
+        source_receipt_id = receipt.get(
+            "generated_draft_source_preflight_receipt_id"
+        )
+        source_receipt_hash = receipt.get(
+            "generated_draft_source_preflight_receipt_sha256"
+        )
+        if draft.get("preflight_receipt_id") != source_receipt_id:
+            raise HficSessionError("PREFLIGHT_RECEIPT_ID_MISMATCH")
+        if draft.get("preflight_receipt_sha256") != source_receipt_hash:
+            raise HficSessionError("PREFLIGHT_RECEIPT_HASH_MISMATCH")
+    else:
+        if draft.get("preflight_receipt_id") != receipt.get("receipt_id"):
+            raise HficSessionError("PREFLIGHT_RECEIPT_ID_MISMATCH")
+        if draft.get("preflight_receipt_sha256") != observed_hash:
+            raise HficSessionError("PREFLIGHT_RECEIPT_HASH_MISMATCH")
     _authority_zero(receipt.get("authority"))
     _authority_zero(draft.get("authority"))
     commissioning = receipt.get("commissioning")
@@ -445,6 +738,12 @@ def bind_preflight_receipt(
     receipt_memory = session_memory_eligibility(receipt)
     if receipt.get("memory_eligibility_sha256") and receipt_memory != current_memory:
         raise HficSessionError("PREFLIGHT_STORE_DIGEST_MISMATCH")
+    _validate_split_identity_binding(
+        receipt,
+        repo_root=Path(repo_root),
+        data_root=data_root,
+        require_current_market_identity=require_current_market_identity,
+    )
     git = repository_git_snapshot(Path(repo_root))
     receipt_head = str(receipt.get("live_git_head") or "")
     if receipt_head != git.head_sha.lower():
@@ -473,7 +772,78 @@ def bind_preflight_receipt(
         "commissioning_run_id": proof.get("run_id"),
         "provider_calls_actual": 0,
         "session_started_at": render_canonical_utc(started),
+        **_split_identity_fields(receipt),
     }
+
+
+def _validate_split_identity_binding(
+    receipt: Mapping[str, Any],
+    *,
+    repo_root: Path,
+    data_root: Path | None = None,
+    require_current_market_identity: bool = False,
+) -> None:
+    """Verify split stamps against the production receipt before freeze writes."""
+
+    market = receipt.get("market_evidence_epoch_sha256")
+    capability = receipt.get("capability_epoch_sha256")
+    forge_input = receipt.get("forge_input_receipt")
+    if not isinstance(market, str) or re.fullmatch(r"[0-9a-f]{64}", market) is None:
+        raise HficSessionError("MARKET_IDENTITY_UNAVAILABLE")
+    if not isinstance(capability, str) or re.fullmatch(r"[0-9a-f]{64}", capability) is None:
+        raise HficSessionError("CAPABILITY_IDENTITY_UNAVAILABLE")
+
+    # The normal production preflight carries the no-write Forge-input
+    # receipt.  Rehash its market basis instead of trusting a caller-provided
+    # stamp.  This also keeps lineage UNKNOWN/FAIL from becoming an admission.
+    if not isinstance(forge_input, Mapping):
+        raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")
+    input_market = forge_input.get("market_evidence_epoch_sha256")
+    if input_market != market:
+        raise HficSessionError("MARKET_IDENTITY_DRIFT")
+    if forge_input.get("forge_runnable") is not True:
+        raise HficSessionError("MARKET_IDENTITY_DRIFT")
+    basis = forge_input.get("market_evidence_basis")
+    if not isinstance(basis, Mapping):
+        raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        EvidenceIdentityError,
+        market_evidence_epoch_sha256,
+    )
+
+    try:
+        if market_evidence_epoch_sha256(basis) != market:
+            raise HficSessionError("MARKET_IDENTITY_DRIFT")
+    except EvidenceIdentityError as exc:
+        raise HficSessionError(str(exc)) from exc
+
+    if require_current_market_identity:
+        if data_root is None:
+            raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            compute_market_epoch_for_data_root,
+        )
+
+        try:
+            current_market, _current_basis = compute_market_epoch_for_data_root(
+                repo_root, data_root
+            )
+        except EvidenceIdentityError as exc:
+            raise HficSessionError(str(exc)) from exc
+        if current_market != market:
+            raise HficSessionError("MARKET_IDENTITY_DRIFT")
+
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        EvidenceIdentityError,
+        compute_capability_epoch_for_repo,
+    )
+
+    try:
+        computed_capability, _basis = compute_capability_epoch_for_repo(repo_root)
+    except EvidenceIdentityError as exc:
+        raise HficSessionError(str(exc)) from exc
+    if computed_capability != capability:
+        raise HficSessionError("CAPABILITY_IDENTITY_DRIFT")
 
 
 def _resolve_ref(ref: object, identities: Sequence[Any]) -> int:
@@ -1022,6 +1392,7 @@ def freeze_draft(
     store: Any = None,
     repo_root: Any = None,
     next_action_draft: Mapping[str, Any] | None = None,
+    verify_current_market_identity: bool = False,
 ) -> dict[str, Any]:
     if not isinstance(draft, Mapping):
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
@@ -1063,6 +1434,7 @@ def freeze_draft(
             grounded_candidates=grounded_candidates,
             prompt_version=prompt_version,
             packet_version=packet_version,
+            verify_current_market_identity=verify_current_market_identity,
         )
 
     if next_action_draft is not None:
@@ -1123,6 +1495,7 @@ def freeze_draft(
             store=store,
             repo_root=repo_root,
             memory_as_of=memory_as_of,
+            verify_current_market_identity=verify_current_market_identity,
         )
         if existing_ladder is not None:
             return existing_ladder
@@ -1224,6 +1597,9 @@ def freeze_draft(
         if isinstance(maybe_composite, str) and len(maybe_composite) == 64:
             git_composite = maybe_composite
         owner_focus = str(preflight_receipt.get("owner_focus") or owner_focus)
+    _stamp_split_identity(packet, bound, preflight_receipt)
+    if epoch:
+        packet.setdefault("evidence_epoch_sha256", epoch)
     if not focus_key:
         focus_key = focus_key_sha256(owner_focus)
     if epoch and not search_key:
@@ -1403,6 +1779,9 @@ def freeze_draft(
         preflight_receipt if isinstance(preflight_receipt, Mapping) else None,
     )
     _stamp_ladder_slot(result, preflight_receipt if isinstance(preflight_receipt, Mapping) else None)
+    _stamp_split_identity(result, bound, preflight_receipt)
+    _stamp_market_evidence_basis(result, bound, preflight_receipt)
+    _stamp_execution_identity(result, bound, preflight_receipt)
     if closed_or_suppressed_collision_count is not None:
         result["closed_or_suppressed_collision_count"] = (
             closed_or_suppressed_collision_count
@@ -1463,6 +1842,7 @@ def _freeze_no_worthy(
     grounded_candidates: Sequence[Mapping[str, Any]] | None = None,
     prompt_version: str = PROMPT_VERSION_V1_1,
     packet_version: str = "1.1",
+    verify_current_market_identity: bool = False,
 ) -> dict[str, Any]:
     _assert_vision_integrity_for_surface(
         preflight_receipt, prompt_version=prompt_version
@@ -1511,6 +1891,7 @@ def _freeze_no_worthy(
             store=store,
             repo_root=repo_root,
             memory_as_of=memory_as_of,
+            verify_current_market_identity=verify_current_market_identity,
         )
         if existing_ladder is not None:
             return existing_ladder
@@ -1643,6 +2024,9 @@ def _freeze_no_worthy(
         preflight_receipt if isinstance(preflight_receipt, Mapping) else None,
     )
     _stamp_ladder_slot(result, preflight_receipt if isinstance(preflight_receipt, Mapping) else None)
+    _stamp_split_identity(result, bound, preflight_receipt)
+    _stamp_market_evidence_basis(result, bound, preflight_receipt)
+    _stamp_execution_identity(result, bound, preflight_receipt)
     if closed_or_suppressed_collision_count is not None:
         result["closed_or_suppressed_collision_count"] = (
             closed_or_suppressed_collision_count
@@ -1858,6 +2242,7 @@ def persist_no_worthy_session(
     preflight_receipt: Mapping[str, Any] | None = None,
     next_action_draft: Mapping[str, Any] | None = None,
     stage_time: datetime | None = None,
+    representation_registry: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
@@ -1875,6 +2260,25 @@ def persist_no_worthy_session(
         if referenced:
             raise HficSessionError("HFIC_NEXT_ACTION_ARTIFACT_MISSING")
         return {"action_type": str(existing.get("next") or "STOP")}
+    _assert_scientific_admission(
+        store,
+        frozen,
+        repo_root=repo_root,
+        representation_registry=representation_registry,
+    )
+    # Admission is the first lifecycle boundary: legacy combined-only input
+    # must receive SCIENTIFIC_ADMISSION_REQUIRED before any current-protocol
+    # provenance diagnosis.  Once the split slot is admissible, recheck the
+    # nested A3 no-write receipt so a caller cannot replace production lineage
+    # with two self-proclaimed 64-hex stamps.
+    if (
+        isinstance(preflight_receipt, Mapping)
+        and isinstance(preflight_receipt.get("forge_input_receipt"), Mapping)
+    ):
+        _validate_split_identity_binding(
+            preflight_receipt,
+            repo_root=Path(repo_root),
+        )
     git = repository_git_snapshot(Path(repo_root))
     now = (
         _stage_datetime(lambda: stage_time)
@@ -1941,6 +2345,13 @@ def persist_no_worthy_session(
         repo_root=Path(repo_root),
         created_at=created_at,
     )
+    persist_scientific_slot_admission(
+        store,
+        frozen,
+        repo_root=repo_root,
+        stage_time=stage_time,
+        representation_registry=representation_registry,
+    )
     action_bytes = _canonical_bytes(action)
     action_sha = hashlib.sha256(action_bytes).hexdigest()
     prompt_version = str(frozen.get("prompt_version") or PROMPT_VERSION)
@@ -1979,6 +2390,8 @@ def persist_no_worthy_session(
         "created_at": created_at,
         "session_started_at": started_at,
     }
+    _stamp_split_identity(receipt, frozen)
+    _stamp_execution_identity(receipt, frozen, preflight_receipt)
     diagnostics = _diagnostics_for_receipt(
         prompt_version=prompt_version,
         grounded_candidates=frozen.get("grounded_candidates")
@@ -2045,6 +2458,13 @@ def persist_no_worthy_session(
                 "git_composite_sha256": frozen.get("git_composite_sha256"),
                 "research_memory_as_of": frozen.get("research_memory_as_of"),
                 "revision_count": 0,
+                **_execution_identity_fields(frozen),
+                **_split_identity_fields(frozen),
+                **(
+                    {"market_evidence_basis": dict(frozen["market_evidence_basis"])}
+                    if isinstance(frozen.get("market_evidence_basis"), Mapping)
+                    else {}
+                ),
                 **(
                     {"evidence_surface_mode": frozen["evidence_surface_mode"]}
                     if frozen.get("evidence_surface_mode")
@@ -2212,6 +2632,1076 @@ def backfill_legacy(
     return result
 
 
+def _existing_scientific_slot_admission(
+    store: Any,
+    scientific_slot_sha256: str,
+) -> dict[str, Any] | None:
+    for body in list_scientific_slot_admissions(store):
+        if body.get("scientific_slot_sha256") == scientific_slot_sha256:
+            return dict(body)
+    return None
+
+
+def _scientific_slot_admission_matches_binding(
+    admission: Mapping[str, Any], binding: Mapping[str, Any]
+) -> bool:
+    """Require an orphan reservation to retain its complete immutable bind."""
+
+    if admission.get("identity_binding_status") == "CONFLICT":
+        return False
+    try:
+        observed = _execution_identity_fields(admission)
+        expected = _execution_identity_fields(binding)
+    except HficSessionError:
+        return False
+    for key in (
+        "scientific_slot_sha256",
+        "ladder_representation_id",
+        "representation_semantic_version",
+        "control_session_id",
+        "representation_payload_sha256",
+        "model_provenance_sha256",
+        "execution_binding_sha256",
+    ):
+        if observed.get(key) != expected.get(key):
+            return False
+    for key in (
+        "market_evidence_epoch_sha256",
+        "capability_epoch_sha256",
+        "memory_eligibility_sha256",
+        "focus_key_sha256",
+    ):
+        if _first_valid_hash([admission], key) != _first_valid_hash([binding], key):
+            return False
+    if normalize_text(str(admission.get("owner_focus") or "AUTO")) != normalize_text(
+        str(binding.get("owner_focus") or "AUTO")
+    ):
+        return False
+    return admission.get("evidence_surface_mode") == binding.get(
+        "evidence_surface_mode"
+    )
+
+
+def _build_scientific_slot_admission_event(
+    binding: Mapping[str, Any],
+    *,
+    repo_root: Any,
+    transaction_id: str,
+    stage_time: datetime | None = None,
+    git_snapshot: Any = None,
+) -> tuple[dict[str, Any], Any]:
+    """Build, but do not append, the durable occupancy event."""
+
+    from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+    from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
+
+    fields = _execution_identity_fields(binding)
+    slot = fields.get("scientific_slot_sha256")
+    if not isinstance(slot, str) or re.fullmatch(r"[0-9a-f]{64}", slot) is None:
+        raise HficSessionError("SCIENTIFIC_SLOT_REQUIRED")
+    session_id = str(binding.get("session_id") or "")
+    if not session_id:
+        raise HficSessionError("SCIENTIFIC_SLOT_SESSION_REQUIRED")
+    now = (
+        _stage_datetime(lambda: stage_time)
+        if stage_time is not None
+        else _stage_datetime(None)
+    )
+    git = git_snapshot or repository_git_snapshot(Path(repo_root))
+    body: dict[str, Any] = {
+        "schema": "smial.scientific-slot-admission",
+        "schema_version": "1.0",
+        "scientific_slot_sha256": slot,
+        "session_id": session_id,
+        "market_evidence_epoch_sha256": _first_valid_hash(
+            [binding], "market_evidence_epoch_sha256"
+        ),
+        "ladder_representation_id": fields.get("ladder_representation_id"),
+        "representation_semantic_version": fields.get(
+            "representation_semantic_version"
+        ),
+        "owner_focus": binding.get("owner_focus") or "AUTO",
+        "focus_key_sha256": _first_valid_hash([binding], "focus_key_sha256"),
+        "evidence_surface_mode": binding.get("evidence_surface_mode"),
+        "control_session_id": fields.get("control_session_id"),
+        "representation_payload_sha256": fields.get("representation_payload_sha256"),
+        "capability_epoch_sha256": _first_valid_hash(
+            [binding], "capability_epoch_sha256"
+        ),
+        "memory_eligibility_sha256": _first_valid_hash(
+            [binding], "memory_eligibility_sha256"
+        ),
+        "model_provenance_sha256": fields.get("model_provenance_sha256"),
+        "execution_binding_sha256": fields.get("execution_binding_sha256"),
+        "admission_state": "RESERVED",
+    }
+    canonical = _canonical_bytes(body)
+    digest = hashlib.sha256(canonical).hexdigest()
+    record_id = f"HFIC-ART-SLOT-ADMISSION-{slot.upper()}"
+    payload = {
+        "research_artifact_id": record_id,
+        "session_id": session_id,
+        "hfic_protocol": str(binding.get("prompt_version") or PROMPT_VERSION),
+        "artifact_kind": "SCIENTIFIC_SLOT_ADMISSION",
+        "payload_canonical": canonical.decode("utf-8"),
+        "payload_sha256": digest,
+    }
+    payload_json = json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
+    )
+    event = ResearchEvent(
+        record_id=record_id,
+        record_kind=RecordKind.RESEARCH_ARTIFACT,
+        entity_id=record_id,
+        hypothesis_version_id=None,
+        run_id=None,
+        transaction_id=transaction_id,
+        effective_at=now,
+        first_reliable_available_at=now,
+        supersedes_record_id=None,
+        payload_json=payload_json,
+        payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+        schema_version="1.0",
+        producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+        producer_git_sha=git.head_sha,
+        created_at=now,
+    )
+    return body, event
+
+
+def list_scientific_slot_admissions(store: Any) -> list[dict[str, Any]]:
+    """Read append-only slot reservations, including pre-freeze reservations."""
+
+    rows: dict[str, dict[str, Any]] = {}
+    conflicts: set[str] = set()
+    unscoped_conflicts: list[dict[str, Any]] = []
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if kind != "RESEARCH_ARTIFACT":
+            continue
+        record_id = str(getattr(record, "record_id", "") or "")
+        record_slot_match = re.fullmatch(
+            r"HFIC-ART-SLOT-ADMISSION-([0-9A-Fa-f]{64})", record_id
+        )
+        record_slot = record_slot_match.group(1).lower() if record_slot_match else None
+        try:
+            wrapper = json.loads(record.payload_json)
+            if not isinstance(wrapper, Mapping):
+                if record_slot:
+                    conflicts.add(record_slot)
+                    rows.setdefault(
+                        record_slot,
+                        {
+                            "scientific_slot_sha256": record_slot,
+                            "identity_binding_status": "CONFLICT",
+                            "identity_conflict_fields": [
+                                "scientific_slot_admission_integrity"
+                            ],
+                        },
+                    )
+                continue
+            if wrapper.get("artifact_kind") != "SCIENTIFIC_SLOT_ADMISSION":
+                if record_slot:
+                    conflicts.add(record_slot)
+                    rows.setdefault(
+                        record_slot,
+                        {
+                            "scientific_slot_sha256": record_slot,
+                            "identity_binding_status": "CONFLICT",
+                            "identity_conflict_fields": [
+                                "scientific_slot_admission_integrity"
+                            ],
+                        },
+                    )
+                continue
+            raw = wrapper.get("payload_canonical")
+            digest = wrapper.get("payload_sha256")
+            body = json.loads(raw) if isinstance(raw, str) else None
+        except (TypeError, ValueError, json.JSONDecodeError):
+            if record_slot:
+                conflicts.add(record_slot)
+                rows.setdefault(
+                    record_slot,
+                    {
+                        "scientific_slot_sha256": record_slot,
+                        "identity_binding_status": "CONFLICT",
+                        "identity_conflict_fields": [
+                            "scientific_slot_admission_integrity"
+                        ],
+                    },
+                )
+            continue
+        if not isinstance(body, Mapping):
+            if record_slot:
+                conflicts.add(record_slot)
+                rows.setdefault(
+                    record_slot,
+                    {
+                        "scientific_slot_sha256": record_slot,
+                        "identity_binding_status": "CONFLICT",
+                        "identity_conflict_fields": [
+                            "scientific_slot_admission_integrity"
+                        ],
+                    },
+                )
+            continue
+        body_slot = body.get("scientific_slot_sha256")
+        slot = body_slot
+        if not isinstance(slot, str) or re.fullmatch(r"[0-9a-f]{64}", slot) is None:
+            slot = record_slot
+        market = body.get("market_evidence_epoch_sha256")
+        if not isinstance(market, str) or re.fullmatch(r"[0-9a-f]{64}", market) is None:
+            market = None
+        valid_inner = (
+            slot is not None
+            and isinstance(raw, str)
+            and isinstance(digest, str)
+            and hashlib.sha256(raw.encode("utf-8")).hexdigest() == digest
+            and hashlib.sha256(_canonical_bytes(body)).hexdigest() == digest
+            and body_slot == slot
+            and (record_slot is None or record_slot == slot)
+        )
+        if not valid_inner:
+            conflict_slots = {
+                value
+                for value in (record_slot, slot)
+                if isinstance(value, str)
+                and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+            }
+            if conflict_slots:
+                for conflict_slot in conflict_slots:
+                    conflicts.add(conflict_slot)
+                    rows.setdefault(
+                        conflict_slot,
+                        {
+                            "scientific_slot_sha256": conflict_slot,
+                            "identity_binding_status": "CONFLICT",
+                            "identity_conflict_fields": [
+                                "scientific_slot_admission_integrity"
+                            ],
+                        },
+                    )
+            else:
+                unscoped_conflicts.append(
+                    {
+                        "session_id": str(
+                            wrapper.get("session_id") or body.get("session_id") or ""
+                        )
+                        or None,
+                        "identity_binding_status": "CONFLICT",
+                        "identity_conflict_fields": [
+                            "scientific_slot_admission_integrity"
+                        ],
+                    }
+                )
+            continue
+        wrapper_session = str(wrapper.get("session_id") or "")
+        body_session = str(body.get("session_id") or "")
+        if wrapper_session and body_session and wrapper_session != body_session:
+            conflicts.add(slot)
+            continue
+        observed = rows.get(slot)
+        if observed is not None and observed != dict(body):
+            conflicts.add(slot)
+            continue
+        rows[slot] = dict(body)
+    for slot in conflicts:
+        body = dict(rows.get(slot) or {})
+        body["scientific_slot_sha256"] = slot
+        # Any integrity conflict invalidates market ownership derived from the
+        # same damaged row; admission cannot scope it away as another market.
+        body.pop("market_evidence_epoch_sha256", None)
+        body["identity_binding_status"] = "CONFLICT"
+        body["identity_conflict_fields"] = ["scientific_slot_admission"]
+        rows[slot] = body
+    return [*rows.values(), *unscoped_conflicts]
+
+
+def _assert_scientific_admission(
+    store: Any,
+    binding: Mapping[str, Any],
+    *,
+    repo_root: Any | None = None,
+    representation_registry: Mapping[str, Any] | None = None,
+) -> dict[str, Any] | None:
+    """Apply the shared admission rule before freeze/lifecycle writes."""
+
+    fields = _execution_identity_fields(binding)
+    market = _first_valid_hash([binding], "market_evidence_epoch_sha256")
+    version = fields.get("representation_semantic_version")
+    if not isinstance(market, str) or not isinstance(version, str):
+        # Legacy combined-only receipts remain read-only; they cannot mint a
+        # new A5 slot without a current market split from production preflight.
+        raise HficSessionError("SCIENTIFIC_ADMISSION_REQUIRED")
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        resolve_scientific_admission,
+    )
+
+    visible_cohort_ids = binding.get("visible_cohort_ids")
+    if not isinstance(visible_cohort_ids, list):
+        input_receipt = binding.get("forge_input_receipt")
+        active_set = (
+            input_receipt.get("active_evidence_set")
+            if isinstance(input_receipt, Mapping)
+            else None
+        )
+        visible_cohort_ids = (
+            active_set.get("visible_cohort_ids")
+            if isinstance(active_set, Mapping)
+            else None
+        )
+    admission = resolve_scientific_admission(
+        list_hfic_sessions(store),
+        reservations=list_scientific_slot_admissions(store),
+        market_evidence_epoch=market,
+        representation_id=str(fields.get("ladder_representation_id") or "BASE"),
+        representation_semantic_version=version,
+        owner_focus=str(binding.get("owner_focus") or "AUTO"),
+        representation_registry=representation_registry,
+        repo_root=Path(repo_root) if repo_root is not None else None,
+        memory_eligibility_sha256=(
+            str(binding.get("memory_eligibility_sha256"))
+            if isinstance(binding.get("memory_eligibility_sha256"), str)
+            else None
+        ),
+        evidence_surface_mode=(
+            str(binding.get("evidence_surface_mode"))
+            if isinstance(binding.get("evidence_surface_mode"), str)
+            else None
+        ),
+        current_visible_cohort_ids=(
+            list(visible_cohort_ids or [])
+            if isinstance(visible_cohort_ids, list)
+            else None
+        ),
+        execution_context={
+            key: fields.get(key) or binding.get(key)
+            for key in (
+                "capability_epoch_sha256",
+                "representation_payload_sha256",
+                "model_provenance_sha256",
+            )
+            if isinstance(fields.get(key) or binding.get(key), str)
+        },
+    )
+    action = str(admission.get("action") or "")
+    if action == "STOP" and str(admission.get("reason_code") or "") == (
+        "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING"
+    ):
+        draft = find_generated_draft(
+            store,
+            market_evidence_epoch_sha256=market,
+            owner_focus=str(binding.get("owner_focus") or "AUTO"),
+            representation_id=str(fields.get("ladder_representation_id") or "BASE"),
+            representation_semantic_version=version,
+            scientific_slot_sha256=str(fields.get("scientific_slot_sha256") or ""),
+        )
+        draft_session = str(draft.get("session_id") or "") if draft else ""
+        session_id = str(binding.get("session_id") or "")
+        admission_session = str(admission.get("session_id") or "")
+        if draft_session and draft_session == session_id == admission_session:
+            draft_matches = generated_draft_matches_preflight_context(
+                draft,
+                market_evidence_epoch_sha256=market,
+                scientific_slot_sha256=str(fields.get("scientific_slot_sha256") or ""),
+                representation_id=str(fields.get("ladder_representation_id") or "BASE"),
+                representation_semantic_version=version,
+                owner_focus=str(binding.get("owner_focus") or "AUTO"),
+                capability_epoch_sha256=(
+                    str(fields.get("capability_epoch_sha256") or binding.get("capability_epoch_sha256"))
+                    if fields.get("capability_epoch_sha256") or binding.get("capability_epoch_sha256")
+                    else None
+                ),
+                memory_eligibility_sha256=(
+                    str(binding.get("memory_eligibility_sha256"))
+                    if isinstance(binding.get("memory_eligibility_sha256"), str)
+                    else None
+                ),
+                evidence_surface_mode=(
+                    str(binding.get("evidence_surface_mode"))
+                    if isinstance(binding.get("evidence_surface_mode"), str)
+                    else None
+                ),
+                control_session_id=(
+                    str(fields.get("control_session_id"))
+                    if isinstance(fields.get("control_session_id"), str)
+                    else None
+                ),
+                representation_payload_sha256=(
+                    str(fields.get("representation_payload_sha256"))
+                    if isinstance(fields.get("representation_payload_sha256"), str)
+                    else None
+                ),
+                execution_binding_sha256=(
+                    str(fields.get("execution_binding_sha256"))
+                    if isinstance(fields.get("execution_binding_sha256"), str)
+                    else None
+                ),
+                model_provenance_sha256=(
+                    str(fields.get("model_provenance_sha256"))
+                    if isinstance(fields.get("model_provenance_sha256"), str)
+                    else None
+                ),
+            )
+            if draft_matches:
+                return {
+                    **admission,
+                    "action": "RESUME_EXISTING_SESSION",
+                    "reason_code": "GENERATED_DRAFT_READBACK",
+                    "session_id": session_id,
+                    "occupancy": "OCCUPIED_RESUMABLE_DRAFT",
+                }
+            raise HficSessionError(
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
+            )
+    if action == "START_NEW_SESSION":
+        return admission
+    session_id = str(binding.get("session_id") or "")
+    admitted_id = str(admission.get("session_id") or "")
+    if admitted_id == session_id and action in {
+        "RESUME_EXISTING_SESSION",
+        "RETURN_EXISTING_SESSION",
+    }:
+        return admission
+    raise HficSessionError(
+        str(admission.get("reason_code") or "SCIENTIFIC_SLOT_OCCUPIED")
+    )
+
+
+def persist_scientific_slot_admission(
+    store: Any,
+    binding: Mapping[str, Any],
+    *,
+    repo_root: Any,
+    stage_time: datetime | None = None,
+    representation_registry: Mapping[str, Any] | None = None,
+) -> dict[str, Any] | None:
+    """Atomically reserve a scientific slot before lifecycle artifacts are written."""
+
+    fields = _execution_identity_fields(binding)
+    slot = fields.get("scientific_slot_sha256")
+    if not isinstance(slot, str) or len(slot) != 64:
+        return None
+    session_id = str(binding.get("session_id") or "")
+    if not session_id:
+        raise HficSessionError("SCIENTIFIC_SLOT_SESSION_REQUIRED")
+    existing = _existing_scientific_slot_admission(store, slot)
+    if existing is not None:
+        if str(existing.get("session_id") or "") != session_id:
+            raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED")
+        if not _scientific_slot_admission_matches_binding(existing, binding):
+            raise HficSessionError(
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
+            )
+        return existing
+
+    from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+    from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
+
+    now = (
+        _stage_datetime(lambda: stage_time)
+        if stage_time is not None
+        else bound_session_started_at(binding)
+        if isinstance(binding.get("session_started_at"), str)
+        and str(binding.get("session_started_at") or "").strip()
+        else _stage_datetime(None)
+    )
+    git = repository_git_snapshot(Path(repo_root))
+    body: dict[str, Any] = {
+        "schema": "smial.scientific-slot-admission",
+        "schema_version": "1.0",
+        "scientific_slot_sha256": slot,
+        "session_id": session_id,
+        "market_evidence_epoch_sha256": _first_valid_hash(
+            [binding], "market_evidence_epoch_sha256"
+        ),
+        "ladder_representation_id": fields.get("ladder_representation_id"),
+        "representation_semantic_version": fields.get(
+            "representation_semantic_version"
+        ),
+        "owner_focus": binding.get("owner_focus") or "AUTO",
+        "focus_key_sha256": _first_valid_hash([binding], "focus_key_sha256"),
+        "evidence_surface_mode": binding.get("evidence_surface_mode"),
+        "control_session_id": fields.get("control_session_id"),
+        "representation_payload_sha256": fields.get("representation_payload_sha256"),
+        "capability_epoch_sha256": _first_valid_hash(
+            [binding], "capability_epoch_sha256"
+        ),
+        "memory_eligibility_sha256": _first_valid_hash(
+            [binding], "memory_eligibility_sha256"
+        ),
+        "model_provenance_sha256": fields.get("model_provenance_sha256"),
+        "execution_binding_sha256": fields.get("execution_binding_sha256"),
+        "admission_state": "RESERVED",
+    }
+    canonical = _canonical_bytes(body)
+    digest = hashlib.sha256(canonical).hexdigest()
+    transaction_id = f"RESEARCH-TXN-SLOT-{slot.upper()}"
+    payload = {
+        "research_artifact_id": f"HFIC-ART-SLOT-ADMISSION-{slot.upper()}",
+        "session_id": session_id,
+        "hfic_protocol": str(binding.get("prompt_version") or PROMPT_VERSION),
+        "artifact_kind": "SCIENTIFIC_SLOT_ADMISSION",
+        "payload_canonical": canonical.decode("utf-8"),
+        "payload_sha256": digest,
+    }
+    payload_json = json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
+    )
+    event = ResearchEvent(
+        record_id=f"HFIC-ART-SLOT-ADMISSION-{slot.upper()}",
+        record_kind=RecordKind.RESEARCH_ARTIFACT,
+        entity_id=f"HFIC-ART-SLOT-ADMISSION-{slot.upper()}",
+        hypothesis_version_id=None,
+        run_id=None,
+        transaction_id=transaction_id,
+        effective_at=now,
+        first_reliable_available_at=now,
+        supersedes_record_id=None,
+        payload_json=payload_json,
+        payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+        schema_version="1.0",
+        producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+        producer_git_sha=git.head_sha,
+        created_at=now,
+    )
+
+    def _recheck_admission_under_writer_lease() -> None:
+        # The budget/readback decision must be made while ResearchStore's
+        # cross-process writer lease is held.  A pre-check outside the lease
+        # alone allows two different slots to both observe the same free AUTO
+        # budget and then append.
+        observed = _existing_scientific_slot_admission(store, slot)
+        if observed is not None:
+            if str(observed.get("session_id") or "") != session_id:
+                raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED")
+            if not _scientific_slot_admission_matches_binding(observed, binding):
+                raise HficSessionError(
+                    "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
+                )
+            return
+        _assert_scientific_admission(
+            store,
+            binding,
+            repo_root=repo_root,
+            representation_registry=representation_registry,
+        )
+
+    for attempt in range(4):
+        try:
+            store.append(
+                [event],
+                transaction_id=transaction_id,
+                before_commit=_recheck_admission_under_writer_lease,
+            )
+            break
+        except Exception as exc:
+            # A competing writer may hold the lease briefly. Re-read after a
+            # bounded retry so the loser reports the occupied slot instead of
+            # leaking an implementation-level WRITER_BUSY error.
+            observed = _existing_scientific_slot_admission(store, slot)
+            if observed is not None:
+                if str(observed.get("session_id") or "") != session_id:
+                    raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED")
+                if not _scientific_slot_admission_matches_binding(observed, binding):
+                    raise HficSessionError(
+                        "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
+                    )
+                return observed
+            if (
+                getattr(exc, "code", None) == "WRITER_BUSY"
+                and attempt < 3
+            ):
+                time.sleep(0.05 * (attempt + 1))
+                continue
+            raise
+    return body
+
+
+def find_generated_draft(
+    store: Any,
+    *,
+    market_evidence_epoch_sha256: str,
+    owner_focus: str,
+    representation_id: str | None = None,
+    representation_semantic_version: str | None = None,
+    scientific_slot_sha256: str | None = None,
+) -> dict[str, Any] | None:
+    """Read a pre-freeze generator artifact; never treats embedded old drafts as new."""
+
+    wanted_focus = focus_key_sha256(owner_focus)
+    found: list[dict[str, Any]] = []
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if kind != "RESEARCH_ARTIFACT":
+            continue
+        try:
+            wrapper = json.loads(record.payload_json)
+        except (TypeError, ValueError, json.JSONDecodeError):
+            continue
+        if wrapper.get("artifact_kind") != "FORGE_DRAFT":
+            continue
+        if wrapper.get("draft_lifecycle") != "GENERATED_BEFORE_FREEZE":
+            continue
+        if wrapper.get("market_evidence_epoch_sha256") != market_evidence_epoch_sha256:
+            continue
+        if wrapper.get("focus_key_sha256") != wanted_focus:
+            continue
+        if representation_id is not None and wrapper.get("ladder_representation_id") != representation_id:
+            continue
+        if (
+            representation_semantic_version is not None
+            and wrapper.get("representation_semantic_version")
+            != representation_semantic_version
+        ):
+            continue
+        if (
+            scientific_slot_sha256 is not None
+            and wrapper.get("scientific_slot_sha256") != scientific_slot_sha256
+        ):
+            continue
+        raw = wrapper.get("payload_canonical")
+        digest = wrapper.get("payload_sha256")
+        if not isinstance(raw, str) or not isinstance(digest, str):
+            continue
+        if hashlib.sha256(raw.encode("utf-8")).hexdigest() != digest:
+            continue
+        try:
+            draft = json.loads(raw)
+        except (TypeError, ValueError, json.JSONDecodeError):
+            continue
+        if not isinstance(draft, Mapping):
+            continue
+        if hashlib.sha256(_canonical_bytes(draft)).hexdigest() != digest:
+            continue
+        found.append({**dict(wrapper), "draft": dict(draft)})
+    if not found:
+        return None
+    found.sort(key=lambda item: str(item.get("created_at") or ""), reverse=True)
+    return found[0]
+
+
+def generated_draft_matches_preflight_context(
+    generated_draft: Mapping[str, Any],
+    *,
+    market_evidence_epoch_sha256: str,
+    scientific_slot_sha256: str,
+    representation_id: str,
+    representation_semantic_version: str,
+    owner_focus: str,
+    capability_epoch_sha256: str | None,
+    memory_eligibility_sha256: str | None,
+    evidence_surface_mode: str | None,
+    control_session_id: str | None = None,
+    representation_payload_sha256: str | None = None,
+    execution_binding_sha256: str | None = None,
+    model_provenance_sha256: str | None = None,
+) -> bool:
+    """Validate that a durable pre-freeze draft still belongs to this entry.
+
+    The draft bytes and their source-preflight reference are immutable. A new
+    preflight may resume them only while market, slot, capability, memory,
+    representation and focus identities still agree.
+    """
+
+    if not isinstance(generated_draft, Mapping):
+        return False
+    raw_draft = generated_draft.get("draft")
+    if not isinstance(raw_draft, Mapping):
+        raw = generated_draft.get("payload_canonical")
+        if not isinstance(raw, str):
+            return False
+        try:
+            parsed = json.loads(raw)
+        except (TypeError, ValueError, json.JSONDecodeError):
+            return False
+        if not isinstance(parsed, Mapping):
+            return False
+        raw_draft = parsed
+    digest = generated_draft.get("payload_sha256")
+    if (
+        not isinstance(digest, str)
+        or re.fullmatch(r"[0-9a-f]{64}", digest) is None
+        or hashlib.sha256(_canonical_bytes(raw_draft)).hexdigest() != digest
+    ):
+        return False
+    source_id = generated_draft.get("source_preflight_receipt_id")
+    source_sha = generated_draft.get("source_preflight_receipt_sha256")
+    if (
+        not isinstance(source_id, str)
+        or not source_id
+        or not isinstance(source_sha, str)
+        or re.fullmatch(r"[0-9a-f]{64}", source_sha) is None
+        or raw_draft.get("preflight_receipt_id") != source_id
+        or raw_draft.get("preflight_receipt_sha256") != source_sha
+    ):
+        return False
+    expected = {
+        "market_evidence_epoch_sha256": market_evidence_epoch_sha256,
+        "scientific_slot_sha256": scientific_slot_sha256,
+        "focus_key_sha256": focus_key_sha256(owner_focus),
+        "ladder_representation_id": representation_id,
+        "representation_semantic_version": representation_semantic_version,
+        "capability_epoch_sha256": capability_epoch_sha256,
+        "memory_eligibility_sha256": memory_eligibility_sha256,
+        "evidence_surface_mode": evidence_surface_mode,
+        "control_session_id": control_session_id,
+        "representation_payload_sha256": representation_payload_sha256,
+        "execution_binding_sha256": execution_binding_sha256,
+    }
+    if any(generated_draft.get(key) != value for key, value in expected.items()):
+        return False
+    model = generated_draft.get("model_provenance_sha256")
+    if model not in (None, "") and (
+        not isinstance(model, str) or re.fullmatch(r"[0-9a-f]{64}", model) is None
+    ):
+        return False
+    if model_provenance_sha256 is not None and model != model_provenance_sha256:
+        return False
+    return True
+
+
+def persist_generated_draft(
+    store: Any,
+    draft: Mapping[str, Any],
+    *,
+    preflight_receipt: Mapping[str, Any],
+    repo_root: Any,
+    representation_id: str = "BASE",
+    model_provenance_sha256: str | None = None,
+    stage_time: datetime | None = None,
+    representation_registry: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Persist generator bytes before freeze so restart resumes the same draft."""
+
+    if not isinstance(draft, Mapping):
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    if preflight_receipt.get("action") != "START_NEW_SESSION":
+        raise HficSessionError("PREFLIGHT_ACTION_INVALID")
+    receipt = dict(preflight_receipt)
+    receipt["ladder_representation_id"] = representation_id
+    if model_provenance_sha256 is not None:
+        receipt["model_provenance_sha256"] = model_provenance_sha256
+    source_receipt_id = receipt.get("receipt_id")
+    source_receipt_hash = receipt.get("preflight_receipt_sha256")
+    if not isinstance(source_receipt_id, str) or not source_receipt_id:
+        raise HficSessionError("PREFLIGHT_RECEIPT_ID_MISMATCH")
+    if (
+        not isinstance(source_receipt_hash, str)
+        or re.fullmatch(r"[0-9a-f]{64}", source_receipt_hash) is None
+        or source_receipt_hash != canonical_preflight_receipt_sha256(preflight_receipt)
+    ):
+        raise HficSessionError("PREFLIGHT_RECEIPT_HASH_MISMATCH")
+    if draft.get("preflight_receipt_id") != source_receipt_id:
+        raise HficSessionError("PREFLIGHT_RECEIPT_ID_MISMATCH")
+    if draft.get("preflight_receipt_sha256") != source_receipt_hash:
+        raise HficSessionError("PREFLIGHT_RECEIPT_HASH_MISMATCH")
+    if repo_root is None:
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    _reject_stale_fresh_session_draft(draft, receipt)
+    _validate_json_schema(draft, _draft_schema_path(repo_root, draft))
+    _draft_prompt_version(draft)
+    candidates = draft.get("candidates")
+    if not isinstance(candidates, list) or not (
+        MIN_CANDIDATES <= len(candidates) <= MAX_CANDIDATES
+    ):
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    try:
+        identities = assign_portfolio_ids(candidates)
+    except HficIdentityError as exc:
+        raise HficSessionError(str(exc)) from exc
+    selected_ref = draft.get("selected_candidate_ref")
+    if selected_ref not in (None, ""):
+        selected_index = _resolve_ref(selected_ref, identities)
+        runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
+        rejected_index = _resolve_ref(
+            draft.get("strongest_rejected_alternative"), identities
+        )
+        if min(selected_index, runner_up_index, rejected_index) < 0:
+            raise HficSessionError("CROSS_REFERENCE_MISMATCH")
+        if selected_index == runner_up_index:
+            raise HficSessionError("SELECTED_EQUALS_RUNNER_UP")
+    _nonempty_str_list(draft.get("truth_roots_used"), code="TRUTH_ROOTS_REQUIRED")
+    _nonempty_str_list(
+        draft.get("prior_work_receipts") or draft.get("prior_work_queries"),
+        code="PRIOR_WORK_RECEIPTS_REQUIRED",
+    )
+    _require_memory_timestamp(draft.get("research_memory_as_of"))
+    _authority_zero(draft.get("authority"))
+    context_bound = {
+        "owner_focus": str(receipt.get("owner_focus") or "AUTO"),
+        "evidence_epoch_sha256": str(receipt.get("evidence_epoch_sha256") or ""),
+        "search_key_sha256": str(receipt.get("search_key_sha256") or ""),
+    }
+    _validate_draft_forge_context_binding(draft, receipt, context_bound)
+    fields = _execution_identity_fields(receipt)
+    slot = fields.get("scientific_slot_sha256")
+    if not isinstance(slot, str) or re.fullmatch(r"[0-9a-f]{64}", slot) is None:
+        raise HficSessionError("SCIENTIFIC_SLOT_REQUIRED")
+    search_key = str(receipt.get("search_key_sha256") or "")
+    if re.fullmatch(r"[0-9a-f]{64}", search_key) is None:
+        raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
+    market = str(
+        receipt.get("market_evidence_epoch_sha256")
+        or receipt.get("evidence_epoch_sha256")
+        or ""
+    )
+    version = fields.get("representation_semantic_version")
+    capability = fields.get("capability_epoch_sha256") or receipt.get(
+        "capability_epoch_sha256"
+    )
+    memory = fields.get("memory_eligibility_sha256") or receipt.get(
+        "memory_eligibility_sha256"
+    )
+    evidence_mode = receipt.get("evidence_surface_mode")
+    if (
+        re.fullmatch(r"[0-9a-f]{64}", market) is None
+        or not isinstance(version, str)
+        or not isinstance(capability, str)
+        or not isinstance(memory, str)
+    ):
+        raise HficSessionError("SCIENTIFIC_ADMISSION_REQUIRED")
+    data_root = getattr(store, "_root", None)
+    if data_root is None:
+        raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")
+    _validate_split_identity_binding(
+        receipt,
+        repo_root=Path(repo_root),
+        data_root=Path(data_root),
+        require_current_market_identity=True,
+    )
+    session_id = "HFIC-SESS-" + search_key[:16].upper()
+    binding = {**receipt, **fields, "session_id": session_id}
+    draft_bytes = _canonical_bytes(draft)
+    draft_sha = hashlib.sha256(draft_bytes).hexdigest()
+    existing = find_generated_draft(
+        store,
+        market_evidence_epoch_sha256=market,
+        owner_focus=str(receipt.get("owner_focus") or "AUTO"),
+        representation_id=representation_id,
+        representation_semantic_version=version,
+        scientific_slot_sha256=slot,
+    )
+    if existing is not None:
+        if (
+            existing.get("payload_sha256") == draft_sha
+            and existing.get("session_id") == session_id
+            and existing.get("model_provenance_sha256")
+            == fields.get("model_provenance_sha256")
+            and generated_draft_matches_preflight_context(
+                existing,
+                market_evidence_epoch_sha256=market,
+                scientific_slot_sha256=slot,
+                representation_id=representation_id,
+                representation_semantic_version=version,
+                owner_focus=str(receipt.get("owner_focus") or "AUTO"),
+                capability_epoch_sha256=capability,
+                memory_eligibility_sha256=memory,
+                evidence_surface_mode=(
+                    str(evidence_mode) if isinstance(evidence_mode, str) else None
+                ),
+                control_session_id=(
+                    str(fields.get("control_session_id"))
+                    if isinstance(fields.get("control_session_id"), str)
+                    else None
+                ),
+                representation_payload_sha256=(
+                    str(fields.get("representation_payload_sha256"))
+                    if isinstance(fields.get("representation_payload_sha256"), str)
+                    else None
+                ),
+                execution_binding_sha256=(
+                    str(fields.get("execution_binding_sha256"))
+                    if isinstance(fields.get("execution_binding_sha256"), str)
+                    else None
+                ),
+                model_provenance_sha256=(
+                    str(fields.get("model_provenance_sha256"))
+                    if isinstance(fields.get("model_provenance_sha256"), str)
+                    else None
+                ),
+            )
+        ):
+            return existing
+        raise HficSessionError("GENERATED_DRAFT_CONFLICT")
+    from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+    from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
+
+    now = (
+        _stage_datetime(lambda: stage_time)
+        if stage_time is not None
+        else _stage_datetime(None)
+    )
+    git = repository_git_snapshot(Path(repo_root))
+    transaction_id = f"RESEARCH-TXN-GENERATED-DRAFT-{slot.upper()}"
+    admission, admission_event = _build_scientific_slot_admission_event(
+        binding,
+        repo_root=repo_root,
+        transaction_id=transaction_id,
+        stage_time=now,
+        git_snapshot=git,
+    )
+    payload = {
+        "research_artifact_id": f"HFIC-ART-FORGE-DRAFT-GENERATED-{draft_sha[:16].upper()}",
+        "session_id": session_id,
+        "hfic_protocol": str(receipt.get("prompt_version") or PROMPT_VERSION),
+        "artifact_kind": "FORGE_DRAFT",
+        "draft_lifecycle": "GENERATED_BEFORE_FREEZE",
+        "source_preflight_receipt_id": source_receipt_id,
+        "source_preflight_receipt_sha256": source_receipt_hash,
+        "ladder_representation_id": representation_id,
+        "scientific_slot_sha256": slot,
+        "market_evidence_epoch_sha256": receipt.get("market_evidence_epoch_sha256")
+        or receipt.get("evidence_epoch_sha256"),
+        "focus_key_sha256": receipt.get("focus_key_sha256") or focus_key_sha256(
+            str(receipt.get("owner_focus") or "AUTO")
+        ),
+        "representation_semantic_version": fields.get("representation_semantic_version"),
+        "control_session_id": fields.get("control_session_id"),
+        "capability_epoch_sha256": capability,
+        "memory_eligibility_sha256": memory,
+        "evidence_surface_mode": evidence_mode,
+        "representation_payload_sha256": fields.get("representation_payload_sha256"),
+        "execution_binding_sha256": fields.get("execution_binding_sha256"),
+        "model_provenance_sha256": fields.get("model_provenance_sha256"),
+        "payload_canonical": draft_bytes.decode("utf-8"),
+        "payload_sha256": draft_sha,
+    }
+    payload_json = json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
+    )
+    event = ResearchEvent(
+        record_id=f"HFIC-ART-FORGE-DRAFT-GENERATED-{draft_sha[:16].upper()}",
+        record_kind=RecordKind.RESEARCH_ARTIFACT,
+        entity_id=f"HFIC-ART-FORGE-DRAFT-GENERATED-{draft_sha[:16].upper()}",
+        hypothesis_version_id=None,
+        run_id=None,
+        transaction_id=transaction_id,
+        effective_at=now,
+        first_reliable_available_at=now,
+        supersedes_record_id=None,
+        payload_json=payload_json,
+        payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+        schema_version="1.0",
+        producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+        producer_git_sha=git.head_sha,
+        created_at=now,
+    )
+    current_reservation = _existing_scientific_slot_admission(store, slot)
+
+    def _recheck_generated_draft_under_writer_lease() -> None:
+        observed_draft = find_generated_draft(
+            store,
+            market_evidence_epoch_sha256=market,
+            owner_focus=str(receipt.get("owner_focus") or "AUTO"),
+            representation_id=representation_id,
+            representation_semantic_version=version,
+            scientific_slot_sha256=slot,
+        )
+        if observed_draft is not None:
+            if (
+                observed_draft.get("payload_sha256") == draft_sha
+                and observed_draft.get("session_id") == session_id
+                and observed_draft.get("model_provenance_sha256")
+                == fields.get("model_provenance_sha256")
+                and generated_draft_matches_preflight_context(
+                    observed_draft,
+                    market_evidence_epoch_sha256=market,
+                    scientific_slot_sha256=slot,
+                    representation_id=representation_id,
+                    representation_semantic_version=version,
+                    owner_focus=str(receipt.get("owner_focus") or "AUTO"),
+                    capability_epoch_sha256=capability,
+                    memory_eligibility_sha256=memory,
+                    evidence_surface_mode=(
+                        str(evidence_mode)
+                        if isinstance(evidence_mode, str)
+                        else None
+                    ),
+                    control_session_id=(
+                        str(fields.get("control_session_id"))
+                        if isinstance(fields.get("control_session_id"), str)
+                        else None
+                    ),
+                    representation_payload_sha256=(
+                        str(fields.get("representation_payload_sha256"))
+                        if isinstance(fields.get("representation_payload_sha256"), str)
+                        else None
+                    ),
+                    execution_binding_sha256=(
+                        str(fields.get("execution_binding_sha256"))
+                        if isinstance(fields.get("execution_binding_sha256"), str)
+                        else None
+                    ),
+                    model_provenance_sha256=(
+                        str(fields.get("model_provenance_sha256"))
+                        if isinstance(fields.get("model_provenance_sha256"), str)
+                        else None
+                    ),
+                )
+            ):
+                raise HficSessionError("GENERATED_DRAFT_ALREADY_PERSISTED")
+            raise HficSessionError("GENERATED_DRAFT_CONFLICT")
+        observed_reservation = _existing_scientific_slot_admission(store, slot)
+        if observed_reservation is not None:
+            if observed_reservation.get("identity_binding_status") == "CONFLICT":
+                raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+            if str(observed_reservation.get("session_id") or "") != session_id:
+                raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED")
+            if not _scientific_slot_admission_matches_binding(
+                observed_reservation, binding
+            ):
+                raise HficSessionError(
+                    "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
+                )
+            if any(item.record_id == admission_event.record_id for item in append_records):
+                raise HficSessionError("GENERATED_DRAFT_RESERVATION_APPEARED")
+            return
+        _assert_scientific_admission(
+            store,
+            binding,
+            repo_root=repo_root,
+            representation_registry=representation_registry,
+        )
+
+    append_records = [event]
+    if current_reservation is None:
+        append_records.insert(0, admission_event)
+    for attempt in range(4):
+        try:
+            store.append(
+                append_records,
+                transaction_id=transaction_id,
+                before_commit=_recheck_generated_draft_under_writer_lease,
+            )
+            break
+        except HficSessionError as exc:
+            if str(exc) == "GENERATED_DRAFT_RESERVATION_APPEARED":
+                append_records = [event]
+                continue
+            if str(exc) == "GENERATED_DRAFT_ALREADY_PERSISTED":
+                replay = find_generated_draft(
+                    store,
+                    market_evidence_epoch_sha256=market,
+                    owner_focus=str(receipt.get("owner_focus") or "AUTO"),
+                    representation_id=representation_id,
+                    representation_semantic_version=version,
+                    scientific_slot_sha256=slot,
+                )
+                if replay is not None:
+                    return replay
+            raise
+        except Exception as exc:
+            if (
+                getattr(exc, "code", None) == "WRITER_BUSY"
+                and attempt < 3
+            ):
+                time.sleep(0.05 * (attempt + 1))
+                continue
+            raise
+    return payload
+
+
 def persist_frozen_session(
     store: Any,
     frozen: Mapping[str, Any],
@@ -2220,6 +3710,7 @@ def persist_frozen_session(
     identities: Sequence[Any],
     draft: Mapping[str, Any] | None = None,
     stage_time: datetime | None = None,
+    representation_registry: Mapping[str, Any] | None = None,
 ) -> None:
     """Append freeze records to an existing ResearchStore. Optional for unit tests."""
 
@@ -2232,6 +3723,21 @@ def persist_frozen_session(
     existing = load_session_bundle(store, session_id)
     if existing is not None:
         return
+    if stage_time is not None:
+        _stage_datetime(lambda: stage_time)
+    _assert_scientific_admission(
+        store,
+        frozen,
+        repo_root=repo_root,
+        representation_registry=representation_registry,
+    )
+    persist_scientific_slot_admission(
+        store,
+        frozen,
+        repo_root=repo_root,
+        stage_time=stage_time,
+        representation_registry=representation_registry,
+    )
     git = repository_git_snapshot(Path(repo_root))
     now = (
         _stage_datetime(lambda: stage_time)
@@ -2309,8 +3815,11 @@ def persist_frozen_session(
                 "research_memory_as_of": frozen.get("research_memory_as_of"),
                 "revision_count": int(frozen.get("revision_count") or 0),
                 "hfic_cycle_seq": 1,
+                **_execution_identity_fields(frozen),
             }
     _copy_evidence_surface_mode(cycle_payload, frozen)
+    _stamp_split_identity(cycle_payload, frozen)
+    _stamp_market_evidence_basis(cycle_payload, frozen)
     if isinstance(frozen.get("grounded_candidates"), list):
         cycle_payload["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -2567,8 +4076,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
             continue
         if payload.get("hfic_protocol") is None or not session_id:
             continue
-        cycles.append(
-            {
+        cycle_row = {
                 "session_id": session_id,
                 "session_state": payload.get("phase"),
                 "phase": payload.get("phase"),
@@ -2582,8 +4090,41 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                 "record_id": str(getattr(record, "record_id", "") or ""),
                 "hfic_cycle_seq": int(payload.get("hfic_cycle_seq") or 0),
                 "evidence_surface_mode": payload.get("evidence_surface_mode"),
+                "market_evidence_epoch_sha256": payload.get(
+                    "market_evidence_epoch_sha256"
+                ),
+                "capability_epoch_sha256": payload.get("capability_epoch_sha256"),
+                "ladder_representation_id": payload.get("ladder_representation_id"),
+                "control_session_id": payload.get("control_session_id"),
+                "representation_semantic_version": payload.get(
+                    "representation_semantic_version"
+                ),
+                "representation_payload_sha256": payload.get(
+                    "representation_payload_sha256"
+                ),
+                "scientific_slot_sha256": payload.get("scientific_slot_sha256"),
+                "execution_binding_sha256": payload.get(
+                    "execution_binding_sha256"
+                ),
+                "model_provenance_sha256": payload.get("model_provenance_sha256"),
             }
-        )
+        cycle_row["_identity_fields_present"] = {
+            key
+            for key in (
+                "evidence_epoch_sha256",
+                "market_evidence_epoch_sha256",
+                "capability_epoch_sha256",
+                "ladder_representation_id",
+                "control_session_id",
+                "representation_semantic_version",
+                "representation_payload_sha256",
+                "scientific_slot_sha256",
+                "execution_binding_sha256",
+                "model_provenance_sha256",
+            )
+            if key in payload
+        }
+        cycles.append(cycle_row)
     latest: dict[str, dict[str, Any]] = {}
     for candidate in cycles:
         session_id = str(candidate["session_id"])
@@ -2596,6 +4137,80 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
         current = latest.get(session_id)
         if current is None or _cycle_better(candidate, current):
             latest[session_id] = candidate
+    # Immutable admission: restore identity from an earlier stamped cycle only
+    # when the complete history remains self-consistent.  A partial head must
+    # not be assembled from contradictory market/slot/binding rows.
+    by_session_cycles: dict[str, list[dict[str, Any]]] = {}
+    for candidate in cycles:
+        by_session_cycles.setdefault(str(candidate["session_id"]), []).append(candidate)
+    identity_fields = (
+        "market_evidence_epoch_sha256",
+        "capability_epoch_sha256",
+        "ladder_representation_id",
+        "control_session_id",
+        "representation_semantic_version",
+        "representation_payload_sha256",
+        "scientific_slot_sha256",
+        "execution_binding_sha256",
+        "model_provenance_sha256",
+    )
+    for sid, rows in by_session_cycles.items():
+        head = latest.get(sid)
+        if head is None:
+            continue
+        head_present = set(head.pop("_identity_fields_present", set()))
+        ordered = sorted(rows, key=lambda item: int(item.get("hfic_cycle_seq") or 0))
+        conflicts: set[str] = set()
+        for row in ordered:
+            fields = {
+                **_split_identity_fields(row),
+                **{
+                    key: row[key]
+                    for key in identity_fields
+                    if row.get(key) not in (None, "")
+                },
+            }
+            if not fields:
+                continue
+            for key, value in fields.items():
+                current = head.get(key)
+                if key in head_present:
+                    if current not in (None, "") and current != value:
+                        conflicts.add(key)
+                    elif current in (None, ""):
+                        # A durable explicit UNKNOWN is not reconstructable
+                        # from an older cycle.  Keep it unknown and surface a
+                        # conflict instead of reviving a current slot.
+                        conflicts.add(key)
+                else:
+                    head[key] = value
+        # An explicit slot must reproduce from its durable market,
+        # representation, version and focus fields.  Otherwise this history
+        # is occupied-but-unresolved, never a free budget slot.
+        if head.get("scientific_slot_sha256") not in (None, ""):
+            from solana_alpha_lab.factory.hfic_evidence_identity import (
+                session_scientific_slot_sha256,
+            )
+
+            if session_scientific_slot_sha256(head) is None:
+                conflicts.add("scientific_slot_sha256")
+        if conflicts:
+            head["identity_binding_status"] = "CONFLICT"
+            head["identity_conflict_fields"] = sorted(conflicts)
+            known_markets: set[str] = set()
+            market_scope_complete = True
+            for row in rows:
+                present = set(row.get("_identity_fields_present", set()))
+                has_a5_identity = bool(present.intersection(identity_fields))
+                value = row.get("market_evidence_epoch_sha256")
+                if isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value):
+                    known_markets.add(value)
+                elif has_a5_identity:
+                    market_scope_complete = False
+            head["identity_conflict_market_epochs"] = sorted(known_markets)
+            head["identity_conflict_market_scope_complete"] = (
+                market_scope_complete and bool(known_markets)
+            )
     return list(latest.values())
 
 
@@ -2622,7 +4237,7 @@ def _mapping_ladder_slot(source: Mapping[str, Any] | None) -> tuple[str, str | N
     return representation, parent
 
 
-def _bundle_ladder_slot(
+def bundle_ladder_slot(
     bundle: Mapping[str, Any], packet: Mapping[str, Any] | None = None
 ) -> tuple[str, str | None]:
     embedded = (
@@ -2649,6 +4264,11 @@ def _bundle_ladder_slot(
     if parent == session_id:
         parent = None
     return representation, parent
+
+
+# Compatibility alias for historical internal callers; new production code
+# uses the explicit public seam above.
+_bundle_ladder_slot = bundle_ladder_slot
 
 
 def _preflight_ladder_slot(
@@ -2688,10 +4308,20 @@ def _lookup_existing_freeze_session(
     focus_hint = str(preflight_receipt.get("focus_key_sha256") or "")
     if not epoch_hint or not focus_hint:
         return None
-    return find_session_by_epoch_focus(
-        store,
-        epoch_hint,
-        focus_hint,
+    identity = _execution_identity_fields(preflight_receipt)
+    execution_context: dict[str, str] = {}
+    for key in (
+        "capability_epoch_sha256",
+        "representation_payload_sha256",
+        "model_provenance_sha256",
+    ):
+        value = preflight_receipt.get(key)
+        if not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{64}", value) is None:
+            value = identity.get(key)
+        if isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value):
+            execution_context[key] = value
+
+    lookup_args = dict(
         memory_eligibility_sha256=str(
             preflight_receipt.get("memory_eligibility_sha256") or ""
         )
@@ -2700,7 +4330,37 @@ def _lookup_existing_freeze_session(
         or None,
         ladder_representation_id=_preflight_ladder_slot(preflight_receipt)[0],
         control_session_id=_preflight_ladder_slot(preflight_receipt)[1],
+        representation_semantic_version=identity.get("representation_semantic_version"),
+        scientific_slot_sha256=identity.get("scientific_slot_sha256"),
     )
+    existing = find_session_by_epoch_focus(
+        store,
+        epoch_hint,
+        focus_hint,
+        **lookup_args,
+        execution_context=execution_context or None,
+    )
+    if existing is not None or not execution_context:
+        return existing
+    # The slot identity is occupied but the stored execution context is not
+    # compatible with this freeze input.  Re-run the lookup without the
+    # current binding only to distinguish that typed STOP from an available
+    # slot; never let the caller create a second lifecycle row in its place.
+    historical = find_session_by_epoch_focus(
+        store,
+        epoch_hint,
+        focus_hint,
+        **{
+            **lookup_args,
+            "memory_eligibility_sha256": None,
+            "execution_context": None,
+            "ignore_memory_eligibility": True,
+            "ignore_evidence_surface_mode": True,
+        },
+    )
+    if historical is not None:
+        raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING")
+    return None
 
 
 def _bound_from_ladder_challenger_preflight(
@@ -2709,6 +4369,7 @@ def _bound_from_ladder_challenger_preflight(
     store: Any,
     repo_root: Any,
     memory_as_of: str,
+    verify_current_market_identity: bool = False,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Persist a stamped V1/V2 freeze without START_NEW_SESSION bind.
 
@@ -2778,6 +4439,16 @@ def _bound_from_ladder_challenger_preflight(
         baseline_focus = baseline.focus_key_sha256
         if isinstance(baseline_focus, str) and baseline_focus and focus_key != baseline_focus:
             raise HficSessionError("LADDER_FOCUS_KEY_DRIFT")
+        # Validate the production A3 market/capability receipt only after the
+        # ladder envelope's own immutable keys.  A caller that mutates the
+        # outer search key must receive the precise ladder drift reason before
+        # any market-basis diagnosis, and no write may occur either way.
+        _validate_split_identity_binding(
+            preflight,
+            repo_root=Path(repo_root),
+            data_root=Path(getattr(store, "_root")),
+            require_current_market_identity=verify_current_market_identity,
+        )
     else:
         epoch = str(preflight.get("evidence_epoch_sha256") or "")
         focus_key = str(preflight.get("focus_key_sha256") or "")
@@ -2818,8 +4489,21 @@ def _bind_store_freeze_preflight(
     store: Any,
     repo_root: Any,
     memory_as_of: str,
+    verify_current_market_identity: bool = False,
 ) -> tuple[Mapping[str, Any], dict[str, Any] | None, dict[str, Any] | None]:
     """Return (receipt, existing_bundle, bound). Ladder slots skip START_NEW_SESSION."""
+
+    # Existing ladder rows are a readback shortcut, not a way around the
+    # current-input identity boundary.  The normal freeze path may reuse a
+    # historical row, but callers that explicitly require current-market
+    # verification must validate it before returning the existing bundle.
+    if _is_ladder_challenger_preflight(preflight_receipt) and verify_current_market_identity:
+        _validate_split_identity_binding(
+            preflight_receipt,
+            repo_root=Path(repo_root),
+            data_root=Path(getattr(store, "_root")),
+            require_current_market_identity=True,
+        )
 
     existing = _lookup_existing_freeze_session(store, preflight_receipt)
     if existing is not None and _is_ladder_challenger_preflight(preflight_receipt):
@@ -2834,6 +4518,7 @@ def _bind_store_freeze_preflight(
             store=store,
             repo_root=repo_root,
             memory_as_of=memory_as_of,
+            verify_current_market_identity=verify_current_market_identity,
         )
         return receipt, None, bound
     bound = bind_preflight_receipt(
@@ -2842,6 +4527,7 @@ def _bind_store_freeze_preflight(
         store=store,
         repo_root=repo_root,
         require_current_store_digest=existing is None,
+        require_current_market_identity=verify_current_market_identity,
     )
     if bound["research_memory_as_of"] != memory_as_of:
         raise HficSessionError("RESEARCH_MEMORY_AS_OF_MISMATCH")
@@ -2871,6 +4557,11 @@ def find_session_by_epoch_focus(
     evidence_surface_mode: str | None = None,
     ladder_representation_id: str | None = None,
     control_session_id: str | None = None,
+    representation_semantic_version: str | None = None,
+    scientific_slot_sha256: str | None = None,
+    execution_context: Mapping[str, Any] | None = None,
+    ignore_memory_eligibility: bool = False,
+    ignore_evidence_surface_mode: bool = False,
 ) -> dict[str, Any] | None:
     from solana_alpha_lab.factory.hfic_control_integrity import (
         session_evidence_surface_mode,
@@ -2886,16 +4577,37 @@ def find_session_by_epoch_focus(
     wanted_parent = control_session_id if isinstance(control_session_id, str) and control_session_id else None
     matched: list[dict[str, Any]] = []
     for item in list_hfic_sessions(store):
-        if item.get("evidence_epoch_sha256") != epoch:
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            session_matches_epoch_for_lookup,
+        )
+
+        if not session_matches_epoch_for_lookup(item, epoch):
             continue
         if item.get("focus_key_sha256") != focus_key:
             continue
-        if session_memory_eligibility(item) != session_memory_eligibility(
+        if not ignore_memory_eligibility and session_memory_eligibility(
+            item
+        ) != session_memory_eligibility(
             {"memory_eligibility_sha256": memory_eligibility_sha256}
         ):
             continue
-        if session_evidence_surface_mode(item) != expected_mode:
+        if (
+            not ignore_evidence_surface_mode
+            and session_evidence_surface_mode(item) != expected_mode
+        ):
             continue
+        if isinstance(execution_context, Mapping):
+            from solana_alpha_lab.factory.hfic_evidence_identity import (
+                session_slot_matches_execution_context,
+            )
+
+            if not session_slot_matches_execution_context(
+                item,
+                memory_eligibility_sha256=memory_eligibility_sha256,
+                evidence_surface_mode=expected_mode,
+                execution_context=execution_context,
+            ):
+                continue
         bundle = load_session_bundle(store, str(item.get("session_id") or ""))
         if bundle is None:
             continue
@@ -2920,6 +4632,24 @@ def find_session_by_epoch_focus(
             continue
         if observed_parent != wanted_parent:
             continue
+        if (
+            representation_semantic_version is not None
+            and bundle.get("representation_semantic_version")
+            != representation_semantic_version
+        ):
+            continue
+        if (
+            scientific_slot_sha256 is not None
+            and bundle.get("scientific_slot_sha256") != scientific_slot_sha256
+        ):
+            # Split-era BASE rows may predate the explicit slot stamp. They
+            # remain a known occupied market look and must not be duplicated.
+            if not (
+                wanted_rep == "BASE"
+                and not bundle.get("scientific_slot_sha256")
+                and item.get("market_evidence_epoch_sha256") == epoch
+            ):
+                continue
         matched.append(item)
     if not matched:
         return None
@@ -3597,12 +5327,15 @@ def persist_intermediate_cycle(
                     else None
                 ),
                 "hfic_cycle_seq": cycle_seq,
+                **_execution_identity_fields(existing, frozen),
             }
     source = existing if existing is not None else frozen
     _attach_runner_up_fields(intermediate_cycle, source)
     _attach_runner_up_fields(intermediate_cycle, frozen)
     _copy_evidence_surface_mode(intermediate_cycle, source)
     _copy_evidence_surface_mode(intermediate_cycle, frozen)
+    _stamp_split_identity(intermediate_cycle, source, frozen)
+    _stamp_market_evidence_basis(intermediate_cycle, source, frozen)
     if isinstance(frozen.get("grounded_candidates"), list):
         intermediate_cycle["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -3935,6 +5668,10 @@ def apply_revision(
                 "evidence_epoch_sha256": existing.get("evidence_epoch_sha256") or "",
                 "focus_key_sha256": existing.get("focus_key_sha256") or "",
                 "search_key_sha256": existing.get("search_key_sha256") or "",
+                "memory_eligibility_sha256": existing.get(
+                    "memory_eligibility_sha256"
+                )
+                or frozen.get("memory_eligibility_sha256"),
                 "selected_candidate_id": selected_identity.candidate_id,
                 "runner_up_candidate_id": runner_up_id,
                 "rejected_alternative_id": rejected_id,
@@ -3948,11 +5685,14 @@ def apply_revision(
                 "forge_context_packet_sha256": existing.get("forge_context_packet_sha256")
                 or frozen.get("forge_context_packet_sha256"),
                 "hfic_cycle_seq": _next_cycle_seq(existing),
+                **_execution_identity_fields(existing, frozen),
             }
     _attach_runner_up_fields(revision_cycle, existing)
     _attach_runner_up_fields(revision_cycle, frozen)
     _copy_evidence_surface_mode(revision_cycle, existing)
     _copy_evidence_surface_mode(revision_cycle, frozen)
+    _stamp_split_identity(revision_cycle, existing, frozen)
+    _stamp_market_evidence_basis(revision_cycle, existing, frozen)
     if prompt_version == PROMPT_VERSION and repo_root is not None:
         grounded_candidates = _ground_v12_candidates(
             revised_draft.get("candidates") or [],
@@ -4157,6 +5897,8 @@ def persist_primary_kill_awaiting_runner_up(
         "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
         "focus_key_sha256": frozen.get("focus_key_sha256") or "",
         "search_key_sha256": frozen.get("search_key_sha256") or "",
+        "memory_eligibility_sha256": frozen.get("memory_eligibility_sha256")
+        or (existing.get("memory_eligibility_sha256") if existing else None),
         "selected_candidate_id": primary_id,
         "runner_up_candidate_id": frozen.get("runner_up_candidate_id"),
         "rejected_alternative_id": frozen.get("rejected_alternative_id"),
@@ -4179,9 +5921,12 @@ def persist_primary_kill_awaiting_runner_up(
         "runner_up_failover_used": True,
         "critic_screen_count": 1,
         "hfic_cycle_seq": _next_cycle_seq(existing),
+        **_execution_identity_fields(existing, frozen),
     }
     _copy_evidence_surface_mode(pending_cycle, existing)
     _copy_evidence_surface_mode(pending_cycle, frozen)
+    _stamp_split_identity(pending_cycle, existing, frozen)
+    _stamp_market_evidence_basis(pending_cycle, existing, frozen)
     if isinstance(frozen.get("grounded_candidates"), list):
         pending_cycle["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -4675,6 +6420,8 @@ def finalize_session(
     if isinstance(started, str) and started.strip():
         receipt["session_started_at"] = started
     _copy_evidence_surface_mode(receipt, frozen)
+    _stamp_split_identity(receipt, frozen, existing)
+    _stamp_execution_identity(receipt, frozen, existing)
     diagnostics = _diagnostics_for_receipt(
         prompt_version=prompt_version,
         grounded_candidates=frozen.get("grounded_candidates")
@@ -4706,6 +6453,75 @@ def finalize_session(
             _session_receipt_schema_path(repo_root, prompt_version),
         )
     receipt_bytes = _canonical_bytes(receipt)
+    complete_cycle = {
+        "research_cycle_id": f"{session_id}-COMPLETE",
+        "session_id": session_id,
+        "phase": "SYNTHESIS_COMPLETE",
+        "hfic_protocol": prompt_version,
+        "prompt_version": prompt_version,
+        "owner_focus": frozen.get("owner_focus") or "AUTO",
+        "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
+        "focus_key_sha256": frozen.get("focus_key_sha256") or "",
+        "search_key_sha256": frozen.get("search_key_sha256") or "",
+        "memory_eligibility_sha256": frozen.get("memory_eligibility_sha256"),
+        "selected_candidate_id": forge_selected_id,
+        "runner_up_candidate_id": frozen.get("runner_up_candidate_id"),
+        "candidate_ids": list(frozen.get("candidate_ids") or []),
+        "critic_terminal": receipt_terminal,
+        "final_session_terminal": terminal,
+        "effective_control_terminal": terminal,
+        "next": str(critic_result.get("next") or "STOP"),
+        "critic_input_packet_sha256": receipt_packet_sha,
+        "critic_result_sha256": receipt_result_sha,
+        "session_receipt_sha256": hashlib.sha256(receipt_bytes).hexdigest(),
+        "selected_definition_sha256": frozen.get("selected_definition_sha256"),
+        "git_composite_sha256": git_after.composite_sha256,
+        "research_memory_as_of": frozen.get("research_memory_as_of"),
+        "revision_count": int(frozen.get("revision_count") or 0),
+        "primary_critic_input_packet_sha256": receipt.get(
+            "primary_critic_input_packet_sha256"
+        )
+        or frozen.get("primary_critic_input_packet_sha256"),
+        "primary_critic_result_sha256": receipt.get("primary_critic_result_sha256")
+        or frozen.get("primary_critic_result_sha256"),
+        "primary_critic_terminal": receipt.get("primary_critic_terminal")
+        or frozen.get("primary_critic_terminal"),
+        "runner_up_critic_input_packet_sha256": frozen.get(
+            "runner_up_critic_input_packet_sha256"
+        ),
+        "runner_up_critic_result_sha256": (
+            critic_result_sha256 if failover_used else None
+        ),
+        "runner_up_critic_terminal": (
+            observed_terminal if failover_used else None
+        ),
+        "runner_up_definition_sha256": frozen.get("runner_up_definition_sha256"),
+        "runner_up_failover_used": failover_used,
+        "critic_screen_count": 2 if failover_used else 1,
+        "hfic_cycle_seq": _next_cycle_seq(existing),
+        "forge_context_packet_sha256": frozen.get("forge_context_packet_sha256")
+        or (
+            existing.get("forge_context_packet_sha256")
+            if isinstance(existing, Mapping)
+            else None
+        ),
+        "ladder_representation_id": frozen.get("ladder_representation_id")
+        or (
+            existing.get("ladder_representation_id")
+            if isinstance(existing, Mapping)
+            else None
+        ),
+        "control_session_id": frozen.get("control_session_id")
+        or (
+            existing.get("control_session_id")
+            if isinstance(existing, Mapping)
+            else None
+        ),
+        **_execution_identity_fields(existing, frozen, receipt),
+    }
+    _copy_evidence_surface_mode(complete_cycle, frozen)
+    _stamp_split_identity(complete_cycle, frozen, existing, receipt)
+    _stamp_market_evidence_basis(complete_cycle, frozen, existing, receipt)
     records.extend(
         [
             event(
@@ -4726,84 +6542,7 @@ def finalize_session(
                 record_id=f"HFIC-CYCLE-{session_id}-COMPLETE",
                 kind=RecordKind.RESEARCH_CYCLE,
                 entity_id=session_id,
-                payload={
-                    "research_cycle_id": f"{session_id}-COMPLETE",
-                    "session_id": session_id,
-                    "phase": "SYNTHESIS_COMPLETE",
-                    "hfic_protocol": prompt_version,
-                    "prompt_version": prompt_version,
-                    "owner_focus": frozen.get("owner_focus") or "AUTO",
-                    "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
-                    "focus_key_sha256": frozen.get("focus_key_sha256") or "",
-                    "search_key_sha256": frozen.get("search_key_sha256") or "",
-                "memory_eligibility_sha256": frozen.get("memory_eligibility_sha256"),
-                    "selected_candidate_id": forge_selected_id,
-                    "runner_up_candidate_id": frozen.get("runner_up_candidate_id"),
-                    "candidate_ids": list(frozen.get("candidate_ids") or []),
-                    "critic_terminal": receipt_terminal,
-                    "final_session_terminal": terminal,
-                    "effective_control_terminal": terminal,
-                    "next": str(critic_result.get("next") or "STOP"),
-                    "critic_input_packet_sha256": receipt_packet_sha,
-                    "critic_result_sha256": receipt_result_sha,
-                    "session_receipt_sha256": hashlib.sha256(receipt_bytes).hexdigest(),
-                    "selected_definition_sha256": frozen.get("selected_definition_sha256"),
-                    "git_composite_sha256": git_after.composite_sha256,
-                    "research_memory_as_of": frozen.get("research_memory_as_of"),
-                    "revision_count": int(frozen.get("revision_count") or 0),
-                    "primary_critic_input_packet_sha256": receipt.get(
-                        "primary_critic_input_packet_sha256"
-                    )
-                    or frozen.get("primary_critic_input_packet_sha256"),
-                    "primary_critic_result_sha256": receipt.get(
-                        "primary_critic_result_sha256"
-                    )
-                    or frozen.get("primary_critic_result_sha256"),
-                    "primary_critic_terminal": receipt.get("primary_critic_terminal")
-                    or frozen.get("primary_critic_terminal"),
-                    "runner_up_critic_input_packet_sha256": frozen.get(
-                        "runner_up_critic_input_packet_sha256"
-                    ),
-                    "runner_up_critic_result_sha256": (
-                        critic_result_sha256 if failover_used else None
-                    ),
-                    "runner_up_critic_terminal": (
-                        observed_terminal if failover_used else None
-                    ),
-                    "runner_up_definition_sha256": frozen.get(
-                        "runner_up_definition_sha256"
-                    ),
-                    "runner_up_failover_used": failover_used,
-                    "critic_screen_count": 2 if failover_used else 1,
-                    "hfic_cycle_seq": _next_cycle_seq(existing),
-                    "forge_context_packet_sha256": frozen.get(
-                        "forge_context_packet_sha256"
-                    )
-                    or (
-                        existing.get("forge_context_packet_sha256")
-                        if isinstance(existing, Mapping)
-                        else None
-                    ),
-                    "ladder_representation_id": frozen.get("ladder_representation_id")
-                    or (
-                        existing.get("ladder_representation_id")
-                        if isinstance(existing, Mapping)
-                        else None
-                    ),
-                    "control_session_id": frozen.get("control_session_id")
-                    or (
-                        existing.get("control_session_id")
-                        if isinstance(existing, Mapping)
-                        else None
-                    ),
-                    **(
-                        {
-                            "evidence_surface_mode": frozen["evidence_surface_mode"]
-                        }
-                        if frozen.get("evidence_surface_mode")
-                        else {}
-                    ),
-                },
+                payload=complete_cycle,
                 transaction_id=transaction_id,
             ),
         ]
@@ -4915,6 +6654,36 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         if cycle is None or _cycle_better(ranked, cycle):
             cycle = ranked
     if cycle is None:
+        return None
+
+    _MISSING_IDENTITY = object()
+
+    def _historical_identity_value(key: str) -> Any:
+        """Read immutable identity across cycles without reviving explicit UNKNOWN."""
+
+        observed: list[Any] = []
+        explicit_unknown = False
+        for row in cycles:
+            if key not in row:
+                continue
+            value = row.get(key)
+            if value in (None, ""):
+                explicit_unknown = True
+                continue
+            if value not in observed:
+                observed.append(value)
+        if len(observed) > 1 or (explicit_unknown and observed):
+            raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+        if explicit_unknown:
+            return None
+        return observed[0] if observed else _MISSING_IDENTITY
+
+    def _durable_identity_value(key: str) -> Any:
+        value = _historical_identity_value(key)
+        if value is not _MISSING_IDENTITY:
+            return value
+        if isinstance(session_receipt, Mapping) and key in session_receipt:
+            return session_receipt.get(key)
         return None
     unique_ids: list[str] = []
     for card in candidate_cards:
@@ -5047,10 +6816,20 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         "session_state": state,
         "prompt_version": cycle.get("prompt_version") or PROMPT_VERSION,
         "owner_focus": cycle.get("owner_focus") or "AUTO",
-        "evidence_epoch_sha256": cycle.get("evidence_epoch_sha256") or "",
+        "evidence_epoch_sha256": _durable_identity_value("evidence_epoch_sha256")
+        or "",
         "focus_key_sha256": cycle.get("focus_key_sha256") or "",
         "search_key_sha256": cycle.get("search_key_sha256") or "",
-        "memory_eligibility_sha256": cycle.get("memory_eligibility_sha256"),
+        "memory_eligibility_sha256": _durable_identity_value(
+            "memory_eligibility_sha256"
+        ),
+        "market_evidence_epoch_sha256": _durable_identity_value(
+            "market_evidence_epoch_sha256"
+        ),
+        "capability_epoch_sha256": _durable_identity_value(
+            "capability_epoch_sha256"
+        ),
+        "market_evidence_basis": _durable_identity_value("market_evidence_basis"),
         "selected_candidate_id": cycle.get("selected_candidate_id"),
         "runner_up_candidate_id": cycle.get("runner_up_candidate_id"),
         "rejected_alternative_id": cycle.get("rejected_alternative_id"),
@@ -5123,6 +6902,21 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         ),
         "ladder_representation_id": cycle.get("ladder_representation_id"),
         "control_session_id": cycle.get("control_session_id"),
+        "representation_semantic_version": _durable_identity_value(
+            "representation_semantic_version"
+        ),
+        "representation_payload_sha256": _durable_identity_value(
+            "representation_payload_sha256"
+        ),
+        "scientific_slot_sha256": _durable_identity_value(
+            "scientific_slot_sha256"
+        ),
+        "execution_binding_sha256": _durable_identity_value(
+            "execution_binding_sha256"
+        ),
+        "model_provenance_sha256": _durable_identity_value(
+            "model_provenance_sha256"
+        ),
         "next_action": None,
         "next_action_status": "LEGACY_NOT_RECORDED",
         "grounded_candidates": cycle.get("grounded_candidates"),

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import inspect
+import hashlib
 import json
 import os
 import shutil
@@ -316,6 +317,7 @@ def _publish_dataset(
     census_n: int,
     obs_n: int,
     cohort_id: str,
+    release_id: str = FROZEN_RELEASE,
 ) -> str:
     created = datetime(2026, 9, 13, 11, 57, 49, tzinfo=UTC)
     manifest_id = compute_dataset_manifest_id(dataset_id, dataset_version)
@@ -372,6 +374,32 @@ def _publish_dataset(
     )
     (partitions / f"{obs_part.partition_manifest_id}.json").write_bytes(
         canonical_manifest_bytes(obs_part)
+    )
+    source_sha = hashlib.sha256((census_sha + obs_sha).encode("ascii")).hexdigest()
+    (manifests / f"{manifest_id}.published").write_text(
+        json.dumps(
+            {
+                "dataset_manifest_id": manifest_id,
+                "dataset_fingerprint": "cd" * 32,
+            },
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+    (manifests / f"{manifest_id}.validation.json").write_text(
+        json.dumps(
+            {
+                "corpus_composition": [
+                    {
+                        "cohort_id": cohort_id,
+                        "release_id": release_id,
+                        "content_sha256": source_sha,
+                    }
+                ]
+            },
+            sort_keys=True,
+        ),
+        encoding="utf-8",
     )
     return manifest_id
 
@@ -442,6 +470,7 @@ def _install_canonical_corpus(
         census_n=census_n,
         obs_n=obs_n,
         cohort_id=cohort_id,
+        release_id=release_id,
     )
     _write_lineage(
         data_root,
@@ -458,6 +487,11 @@ def _install_canonical_corpus(
                 "corpus_version": 1,
                 "dataset_manifest_id": manifest_id,
                 "dataset_version": dataset_version,
+                # Synthetic source binding keeps the fixture a complete A3
+                # market basis; it is not a production/provider result.
+                "source_sha256": hashlib.sha256(
+                    (census_sha + obs_sha).encode("ascii")
+                ).hexdigest(),
             }
         ],
     )

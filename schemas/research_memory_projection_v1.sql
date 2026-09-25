@@ -301,6 +301,24 @@ scored AS (
         END AS session_state,
         json_extract_string(cycle.payload_json, '$.evidence_epoch_sha256')
             AS evidence_epoch_sha256,
+        json_extract_string(cycle.payload_json, '$.market_evidence_epoch_sha256')
+            AS market_evidence_epoch_sha256,
+        json_extract_string(cycle.payload_json, '$.capability_epoch_sha256')
+            AS capability_epoch_sha256,
+        json_extract_string(cycle.payload_json, '$.ladder_representation_id')
+            AS ladder_representation_id,
+        json_extract_string(cycle.payload_json, '$.control_session_id')
+            AS control_session_id,
+        json_extract_string(cycle.payload_json, '$.representation_semantic_version')
+            AS representation_semantic_version,
+        json_extract_string(cycle.payload_json, '$.representation_payload_sha256')
+            AS representation_payload_sha256,
+        json_extract_string(cycle.payload_json, '$.scientific_slot_sha256')
+            AS scientific_slot_sha256,
+        json_extract_string(cycle.payload_json, '$.execution_binding_sha256')
+            AS execution_binding_sha256,
+        json_extract_string(cycle.payload_json, '$.model_provenance_sha256')
+            AS model_provenance_sha256,
         json_extract_string(cycle.payload_json, '$.focus_key_sha256')
             AS focus_key_sha256,
         json_extract_string(cycle.payload_json, '$.search_key_sha256')
@@ -371,6 +389,15 @@ SELECT
     session_id,
     session_state,
     evidence_epoch_sha256,
+    market_evidence_epoch_sha256,
+    capability_epoch_sha256,
+    ladder_representation_id,
+    control_session_id,
+    representation_semantic_version,
+    representation_payload_sha256,
+    scientific_slot_sha256,
+    execution_binding_sha256,
+    model_provenance_sha256,
     focus_key_sha256,
     search_key_sha256,
     memory_eligibility_sha256,
@@ -453,6 +480,11 @@ WHERE record_kind = 'DECISION_EVENT'
 CREATE VIEW hfic_search_budget AS
 SELECT
     evidence_epoch_sha256,
+    market_evidence_epoch_sha256,
+    capability_epoch_sha256,
+    ladder_representation_id,
+    representation_semantic_version,
+    scientific_slot_sha256,
     focus_key_sha256,
     search_key_sha256,
     prompt_version,

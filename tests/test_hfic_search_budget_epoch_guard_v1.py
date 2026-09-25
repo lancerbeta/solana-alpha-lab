@@ -35,6 +35,8 @@ def _session(
         "session_id": session_id,
         "session_state": state,
         "evidence_epoch_sha256": epoch,
+        # A5 budget is stamp-only on market_evidence_epoch_sha256.
+        "market_evidence_epoch_sha256": epoch,
         "owner_focus": owner_focus,
         "focus_key_sha256": focus_key,
         "search_key_sha256": search_key_sha256(
@@ -72,6 +74,24 @@ class HficSearchBudgetEpochGuardTests(unittest.TestCase):
         self.assertEqual(action, "STOP")
         self.assertEqual(terminal, "SEARCH_BUDGET_EXHAUSTED")
         usage = epoch_search_budget_usage(sessions, evidence_epoch=EPOCH_A)
+        self.assertEqual(usage["auto_sessions_used"], 1)
+
+    def test_child_representation_does_not_consume_second_auto_slot(self) -> None:
+        base = _session(
+            session_id="HFIC-SESS-AUTO-BASE",
+            epoch=EPOCH_A,
+            owner_focus="AUTO",
+            memory_eligibility=MEM_Q1,
+        )
+        child = {
+            **base,
+            "session_id": "HFIC-SESS-AUTO-V1",
+            "ladder_representation_id": "NORMALIZED_TRAJECTORY_V1",
+            "representation_semantic_version": "1.0",
+        }
+        usage = epoch_search_budget_usage(
+            [base, child], evidence_epoch=EPOCH_A
+        )
         self.assertEqual(usage["auto_sessions_used"], 1)
 
     def test_three_distinct_focuses_across_eligibility_exhaust_epoch(self) -> None:

@@ -31,6 +31,11 @@ interpreter. Required runtime is CPython 3.13.14 via that prefix.
 Read and follow `.agents/skills/hypothesis-forge/SKILL.md` and
 `docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md`.
 
+A5 identity: market epoch admits/resumes/budgets; capability epoch does not
+free AUTO/focus quota; START ≠ RESUME ≠ REUSED; incomplete market is BLOCKED
+(not a synthetic digest). Merge phrase and scientific market run stay separate
+owner gates after this atom.
+
 Optional owner focus (default `AUTO`):
 
 ```
@@ -69,6 +74,10 @@ stop; do not synthesize even if ordinary `action` is `START_NEW_SESSION`. Typed
 `STOP_BEFORE_SYNTHESIS` (FORGE INPUT visibility, not slash authority, not
 CONTROL next, not an observability halt). Always show `evidence_surface_mode`
 (`ordinary` when JSON is null).
+When the caller supplies a model provenance digest, pass it to `preflight` and
+`forge-run`; the digest is only a caller-supplied compatibility label, not
+model attestation. Without a known matching model digest, completed-session
+reuse is blocked rather than inferred.
 No-write diagnostic (same `--owner-focus` as preflight):
 
 ```
@@ -90,15 +99,20 @@ execution). Bare `forge-run` without envelope may leave
 `ladder_freeze_pending_reason` and print `freeze_pending:` while
 `next_action` stays `START_V1` (continue envelope). Present-but-corrupt
 challenger / CONTROL bind failure is `OBSERVABILITY_BLOCKED` (`status:
-BLOCKED`, `freeze_block:`) — stop, not soft-pend. After a draft, `forge-run --persist
---saved-draft-sha256`. Freeze/Critic only after a V1 candidate exists
+BLOCKED`, `freeze_block:`) — stop, not soft-pend. Persist actual generated
+draft bytes with `persist-draft --representation-id NORMALIZED_TRAJECTORY_V1`
+before freeze; `forge-run --persist` records only the aggregate receipt and
+does not save those bytes. Freeze/Critic only after a V1 candidate exists
 (fixture stubs allowed). `PASS_TO_CLASSIFICATION` → classify then finalize
 (`RESUME_V1`, not owner-final); then re-run `forge-run` to read real V1
 artifacts. That wiring does not execute the scientific V1 probe. Do not
 launch Critic on empty BASE. `RESUME_V1` uses `--saved-draft-sha256` or
 pending classify, not the START helper.
 Prompt C `WAIT` is not the owner-final while V1 is eligible.
-`RETURN_EXISTING_RUN` is readback. `KEEP_PAUSE` is a typed pause (`status: NEXT`);
+`RETURN_EXISTING_RUN` is run-level readback. The preflight/session action
+`RETURN_EXISTING_SESSION` means the bound lifecycle session was found; the
+ladder then exposes that result as `RETURN_EXISTING_RUN`. Owner prose may use
+`RETURN_EXISTING` as the short display label for either scope. `KEEP_PAUSE` is a typed pause (`status: NEXT`);
 print readout and stop — do not start V1. Session `RETURN_EXISTING_SESSION` does not
 mask `START_V1`. Resume a saved draft with `--saved-draft-sha256`. Persist on
 an already-authorized slash:
@@ -111,12 +125,19 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write --format json --owner-focus AUTO
 ```
 
+When the caller supplied `--model-provenance-sha256` to `preflight`, repeat
+the exact same digest on `forge-run`; missing or changed model provenance
+blocks completed-result reuse as UNKNOWN.
+
 ## Representation mode boundary
 
-The normal slash remains one bounded run. Fresh empty stores and ordinary BASE
-`NO_WORTHY` without CONTROL surface yield `START_BASE` + `CONTROL_SURFACE_REQUIRED`
-(`status: NEXT`): continue CONTROL-compatible BASE inside this slash, not
-evening DONE. Ordinary final PASS and pending Critic/classify stay honest
+The normal slash remains one bounded run. A no-write diagnostic
+(`forge-run --no-write` or `forge-input --no-write`) that reports
+`START_BASE` + `CONTROL_SURFACE_REQUIRED` shows the factual CONTROL-required
+state and `STOP_BEFORE_SYNTHESIS`. STOP. Do not launch
+`/hypothesis-forge CURRENT_REPRESENTATION_CONTROL` from that diagnostic.
+Inside an already owner-authorized `/hypothesis-forge` bounded run, the same
+state continues CONTROL-compatible BASE inside this slash, not evening DONE. Ordinary final PASS and pending Critic/classify stay honest
 readback/resume of that session — do not replace them with BASE NOT_RUN to
 force a CONTROL rewrite. `--control-current-representation` remains the trajectory-blind
 `CONTROL` mode and is expert-only. `NORMALIZED_TRAJECTORY_V1` is a `REPRESENTATION_CHALLENGER`

@@ -28,7 +28,7 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
 )
 from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, ResearchStore  # noqa: E402
 from solana_alpha_lab.storage.manifests import canonical_manifest_bytes  # noqa: E402
-from tests.test_hfic_cli import bind_draft, critic_result_from_packet_only, run_cli  # noqa: E402
+from tests.test_hfic_cli import bind_draft, critic_result_from_packet_only, run_cli, seed_minimal_market_basis  # noqa: E402
 
 HAPPY = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
 TAKER_FAMILY = "CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY"
@@ -165,6 +165,7 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",
@@ -175,7 +176,12 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
             )
             self.assertEqual(preflight.returncode, 0, preflight.stderr)
             before = json.loads(preflight.stdout)
-            epoch = before["evidence_epoch_sha256"]
+            # A5: receipt evidence_epoch_sha256 is the market admission key;
+            # legacy_combined remains the HFIC-excluded combined digest.
+            legacy_epoch = before.get("legacy_combined_evidence_epoch_sha256") or before[
+                "evidence_epoch_sha256"
+            ]
+            market_epoch = before.get("market_evidence_epoch_sha256")
             self.assertEqual(before["action"], "START_NEW_SESSION")
             receipt_path = Path(tmp) / "preflight.json"
             receipt_path.write_text(preflight.stdout, encoding="utf-8")
@@ -232,8 +238,8 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
                     data_root=data_root,
                 )
                 self.assertEqual(c2.returncode, 0, c2.stderr)
-            after_epoch = evidence_epoch_sha256(evidence_epoch_material(ROOT, data_root))
-            self.assertEqual(after_epoch, epoch)
+            after_legacy = evidence_epoch_sha256(evidence_epoch_material(ROOT, data_root))
+            self.assertEqual(after_legacy, legacy_epoch)
             replay = run_cli(
                 "preflight",
                 "--owner-focus",
@@ -247,11 +253,21 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
             self.assertEqual(replayed["action"], "RETURN_EXISTING_SESSION")
             self.assertEqual(replayed["session_id"], frozen["session_id"])
             self.assertNotEqual(replayed["action"], "START_NEW_SESSION")
+            if market_epoch:
+                self.assertEqual(
+                    replayed.get("market_evidence_epoch_sha256"), market_epoch
+                )
+            self.assertEqual(
+                replayed.get("legacy_combined_evidence_epoch_sha256")
+                or replayed["evidence_epoch_sha256"],
+                legacy_epoch,
+            )
 
     def test_untagged_hfic_identity_still_excluded_from_epoch(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",
@@ -261,17 +277,29 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
                 data_root=data_root,
             )
             self.assertEqual(preflight.returncode, 0, preflight.stderr)
-            epoch = json.loads(preflight.stdout)["evidence_epoch_sha256"]
+            before = json.loads(preflight.stdout)
+            legacy_epoch = before.get("legacy_combined_evidence_epoch_sha256") or before[
+                "evidence_epoch_sha256"
+            ]
+            market_epoch = before.get("market_evidence_epoch_sha256")
             _append_hfic_untagged_candidate(ResearchStore(data_root))
             self.assertEqual(
                 evidence_epoch_sha256(evidence_epoch_material(ROOT, data_root)),
-                epoch,
+                legacy_epoch,
             )
+            if market_epoch:
+                from solana_alpha_lab.factory.hfic_evidence_identity import (
+                    compute_market_epoch_for_data_root,
+                )
+
+                after_market, _ = compute_market_epoch_for_data_root(ROOT, data_root)
+                self.assertEqual(after_market, market_epoch)
 
     def test_a2_real_external_dataset_advances_epoch(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",
@@ -298,6 +326,7 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             fingerprint = "33" * 32
             _publish_labeled_dataset(
                 data_root,
@@ -343,6 +372,7 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             fingerprint = "44" * 32
             _publish_labeled_dataset(
                 data_root,
@@ -405,6 +435,7 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             fingerprint = "77" * 32
             _publish_labeled_dataset(
                 data_root,
@@ -459,6 +490,7 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             fingerprint = "88" * 32
             _publish_labeled_dataset(
                 data_root,
@@ -497,6 +529,7 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             fingerprint = "66" * 32
             _publish_labeled_dataset(
                 data_root,

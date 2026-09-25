@@ -42,6 +42,33 @@
     "session_id": {"type": "string", "minLength": 1},
     "session_state": {"const": "SYNTHESIS_COMPLETE"},
     "evidence_epoch_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "market_evidence_epoch_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "capability_epoch_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "ladder_representation_id": {"type": "string", "minLength": 1},
+    "control_session_id": {"type": ["string", "null"]},
+    "representation_semantic_version": {"type": "string", "minLength": 1},
+    "representation_payload_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "scientific_slot_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "execution_binding_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "model_provenance_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
     "focus_key_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "search_key_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "prompt_version": {"const": "HFIC-V1.2"},
@@ -190,6 +217,18 @@
     }
   },
   "allOf": [
+    {
+      "if": {"required": ["market_evidence_epoch_sha256"]},
+      "then": {
+        "required": [
+          "capability_epoch_sha256",
+          "ladder_representation_id",
+          "representation_semantic_version",
+          "scientific_slot_sha256",
+          "execution_binding_sha256"
+        ]
+      }
+    },
     {
       "if": {
         "required": ["runner_up_failover_used"],

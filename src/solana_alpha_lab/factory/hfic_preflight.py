@@ -40,6 +40,7 @@ from solana_alpha_lab.factory.hfic_session import (
     PROMPT_VERSION,
     evidence_epoch_sha256,
     focus_key_sha256,
+    generated_draft_matches_preflight_context,
     list_hfic_sessions,
     load_session_bundle,
     pick_session,
@@ -282,8 +283,8 @@ def evidence_epoch_material(
     try:
         semantic_digest = semantic_capability_digest_for_repo(root)
     except SemanticOperabilityError:
-        semantic_digest = hashlib.sha256(b"SEMANTIC-DIGEST-UNAVAILABLE").hexdigest()
-    return {
+        semantic_digest = None
+    material = {
         "catalog_root_hashes": hashes,
         "dataset_manifest_ids": dataset_manifest_ids,
         "dataset_fingerprints": dataset_fingerprints,
@@ -294,6 +295,9 @@ def evidence_epoch_material(
         "prior_work_digest": prior_digest,
         "semantic_capability_digest_sha256": semantic_digest,
     }
+    if semantic_digest is None:
+        material.pop("semantic_capability_digest_sha256", None)
+    return material
 
 
 def build_offline_commission_packet(repo_root: Path) -> dict[str, Any]:
@@ -340,7 +344,13 @@ def build_offline_commission_packet(repo_root: Path) -> dict[str, Any]:
 def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
     projection = Path(data_root) / RESEARCH_PROJECTION_LOCATION
     if not projection.is_file() or projection.is_symlink():
-        return _sessions_from_store(data_root)
+        raw = _sessions_from_store(data_root)
+        if raw is None:
+            # Missing projection and unreadable raw history are not an empty
+            # budget.  Treating the failure as [] would free an occupied slot
+            # after restart and permit an unsafe regeneration.
+            raise HficPreflightError("RESEARCH_MEMORY_RAW_UNAVAILABLE")
+        return raw
     connection = duckdb.connect(
         str(projection),
         read_only=True,
@@ -357,6 +367,15 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
                     session_id,
                     session_state,
                     evidence_epoch_sha256,
+                    market_evidence_epoch_sha256,
+                    capability_epoch_sha256,
+                    ladder_representation_id,
+                    control_session_id,
+                    representation_semantic_version,
+                    representation_payload_sha256,
+                    scientific_slot_sha256,
+                    execution_binding_sha256,
+                    model_provenance_sha256,
                     focus_key_sha256,
                     search_key_sha256,
                     prompt_version,
@@ -366,7 +385,10 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
                 """
             ).fetchall()
         except duckdb.Error:
-            return _sessions_from_store(data_root)
+            raw = _sessions_from_store(data_root)
+            if raw is None:
+                raise HficPreflightError("RESEARCH_MEMORY_RAW_UNAVAILABLE")
+            return raw
     finally:
         connection.close()
     sessions = []
@@ -376,21 +398,99 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
                 "session_id": row[0],
                 "session_state": row[1],
                 "evidence_epoch_sha256": row[2],
-                "focus_key_sha256": row[3],
-                "search_key_sha256": row[4],
-                "prompt_version": row[5],
-                "owner_focus": row[6],
-                "memory_eligibility_sha256": row[7],
+                "market_evidence_epoch_sha256": row[3],
+                "capability_epoch_sha256": row[4],
+                "ladder_representation_id": row[5],
+                "control_session_id": row[6],
+                "representation_semantic_version": row[7],
+                "representation_payload_sha256": row[8],
+                "scientific_slot_sha256": row[9],
+                "execution_binding_sha256": row[10],
+                "model_provenance_sha256": row[11],
+                "focus_key_sha256": row[12],
+                "search_key_sha256": row[13],
+                "prompt_version": row[14],
+                "owner_focus": row[15],
+                "memory_eligibility_sha256": row[16],
             }
         )
-    return sessions
+    # The SQL view is a derived read model and cannot express the append-only
+    # identity consistency check performed over cycle history.  When the raw
+    # ResearchStore is available, use that authoritative projection so a
+    # mixed market/slot row cannot silently become an available budget slot.
+    raw_sessions = _sessions_from_store(data_root)
+    if raw_sessions is None:
+        raise HficPreflightError("RESEARCH_MEMORY_RAW_UNAVAILABLE")
+    return raw_sessions
 
 
-def _sessions_from_store(data_root: Path) -> list[dict[str, Any]]:
+_ADMITTED_SESSION_READBACK_ACTIONS = frozenset(
+    {
+        "RETURN_EXISTING_SESSION",
+        "RESUME_EXISTING_SESSION",
+        "RESUME_CRITIC",
+        "RESUME_FINALIZE",
+        "RESUME_REVISE",
+        "RESUME_CLASSIFY",
+    }
+)
+
+
+def _exact_admitted_session_readback(
+    sessions: list[dict[str, Any]],
+    *,
+    action: str,
+    session_id: str | None,
+    search_key: str,
+    focus_key: str,
+    has_current_surface: bool,
+) -> bool:
+    """Incomplete-market bypass for one already-admitted session only.
+
+    Store occupancy is not enough. A different focus, slot, or search key
+    cannot reuse the bypass, and a current surface that is still not an
+    admissible market basis cannot inherit an older session.
+    """
+
+    if action not in _ADMITTED_SESSION_READBACK_ACTIONS:
+        return False
+    if not session_id or has_current_surface:
+        return False
+    chosen = next(
+        (
+            item
+            for item in sessions
+            if str(item.get("session_id") or "") == session_id
+        ),
+        None,
+    )
+    if chosen is None:
+        return False
+    slot = chosen.get("scientific_slot_sha256")
+    if not isinstance(slot, str) or len(slot) != 64:
+        return False
+    if str(chosen.get("search_key_sha256") or "") != search_key:
+        return False
+    if str(chosen.get("focus_key_sha256") or "") != focus_key:
+        return False
+    return True
+
+
+def query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
+    """Public read-model entry used by A5 consumers.
+
+    Keep the private name as a compatibility shim for older callers, but do
+    not make cross-module production paths depend on a private helper.
+    """
+
+    return _query_hfic_sessions(Path(data_root))
+
+
+def _sessions_from_store(data_root: Path) -> list[dict[str, Any]] | None:
     try:
         store = ResearchStore(Path(data_root), create_if_missing=False)
     except ResearchStoreError:
-        return []
+        return None
     return list_hfic_sessions(store)
 
 
@@ -407,6 +507,13 @@ def decide_preflight_action(
     owner_focus: str,
     memory_eligibility_sha256: str | None = None,
     evidence_surface_mode: str | None = None,
+    representation_id: str | None = None,
+    representation_semantic_version: str | None = None,
+    reservations: Sequence[Mapping[str, Any]] | None = None,
+    generated_draft: Mapping[str, Any] | None = None,
+    current_visible_cohort_ids: Sequence[str] | None = None,
+    execution_context: Mapping[str, Any] | None = None,
+    repo_root: Path | None = None,
 ) -> tuple[str, str | None]:
     from solana_alpha_lab.factory.hfic_control_integrity import (
         session_evidence_surface_mode,
@@ -421,10 +528,106 @@ def decide_preflight_action(
         if evidence_surface_mode
         else None
     )
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        resolve_scientific_admission,
+        session_matches_epoch_for_lookup,
+        sessions_for_market_budget,
+    )
+
+    if representation_id is not None:
+        admission = resolve_scientific_admission(
+            sessions,
+            market_evidence_epoch=evidence_epoch,
+            representation_id=representation_id,
+            representation_semantic_version=(
+                representation_semantic_version or PROMPT_VERSION
+            ),
+            owner_focus=owner_focus,
+            reservations=reservations,
+            current_visible_cohort_ids=current_visible_cohort_ids,
+            execution_context=execution_context,
+            memory_eligibility_sha256=memory_eligibility_sha256,
+            evidence_surface_mode=evidence_surface_mode,
+            repo_root=repo_root,
+            auto_sessions_per_market=AUTO_SESSIONS_PER_EPOCH,
+            max_distinct_focuses=MAX_DISTINCT_FOCUSES_PER_EPOCH,
+        )
+        if admission.get("action") == "STOP":
+            if (
+                admission.get("reason_code") == "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING"
+                and isinstance(generated_draft, Mapping)
+            ):
+                draft_session = str(generated_draft.get("session_id") or "")
+                admission_session = str(admission.get("session_id") or "")
+                model_provenance = (
+                    execution_context.get("model_provenance_sha256")
+                    if isinstance(execution_context, Mapping)
+                    else None
+                )
+                if draft_session and draft_session == admission_session:
+                    draft_matches = generated_draft_matches_preflight_context(
+                        generated_draft,
+                        market_evidence_epoch_sha256=evidence_epoch,
+                        scientific_slot_sha256=str(
+                            admission.get("scientific_slot_sha256") or ""
+                        ),
+                        representation_id=representation_id,
+                        representation_semantic_version=(
+                            representation_semantic_version or PROMPT_VERSION
+                        ),
+                        owner_focus=owner_focus,
+                        capability_epoch_sha256=(
+                            str(execution_context.get("capability_epoch_sha256"))
+                            if isinstance(execution_context, Mapping)
+                            and isinstance(
+                                execution_context.get("capability_epoch_sha256"), str
+                            )
+                            else None
+                        ),
+                        memory_eligibility_sha256=memory_eligibility_sha256,
+                        evidence_surface_mode=evidence_surface_mode,
+                        model_provenance_sha256=(
+                            str(model_provenance)
+                            if isinstance(model_provenance, str)
+                            else None
+                        ),
+                    )
+                    if draft_matches:
+                        return ("RESUME_EXISTING_SESSION", draft_session)
+                    return (
+                        "STOP",
+                        "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+                    )
+            return ("STOP", str(admission.get("reason_code") or "SEARCH_BUDGET_EXHAUSTED"))
+        if admission.get("action") == "START_NEW_SESSION":
+            return ("START_NEW_SESSION", None)
+        admitted_id = str(admission.get("session_id") or "")
+        chosen = next(
+            (
+                item
+                for item in [*(sessions or []), *(reservations or [])]
+                if str(item.get("session_id") or "") == admitted_id
+            ),
+            None,
+        )
+        if chosen is not None:
+            state = str(chosen.get("session_state") or "")
+            if state == "CRITIC_RESULT_READY":
+                return ("RESUME_FINALIZE", admitted_id)
+            if state == "REVISION_REQUIRED":
+                return ("RESUME_REVISE", admitted_id)
+            if state == "AWAITING_CLASSIFICATION":
+                return ("RESUME_CLASSIFY", admitted_id)
+            if state in PENDING_STATES:
+                return ("RESUME_CRITIC", admitted_id)
+            return ("RETURN_EXISTING_SESSION", admitted_id)
+
+    # Resume/reuse: market stamp preferred; unstamped legacy may match on
+    # evidence_epoch_sha256. Budget counters stay stamp-only below.
     same_focus = [
         item
         for item in sessions
-        if item.get("evidence_epoch_sha256") == evidence_epoch
+        if session_matches_epoch_for_lookup(item, evidence_epoch)
         and item.get("focus_key_sha256") == focus_key
         and session_memory_eligibility(item) == expected_memory
         and session_evidence_surface_mode(item) == expected_mode
@@ -450,19 +653,17 @@ def decide_preflight_action(
         chosen = pick_session(matching)
         return ("RETURN_EXISTING_SESSION", str(chosen.get("session_id") or ""))
 
-    # Search-budget accounting is per evidence epoch only. memory_eligibility
-    # remains in search_key / same_focus / exact replay identity above, but must
-    # not reset AUTO or distinct-focus counters after quarantine/restore.
-    same_epoch_for_budget = [
-        item
-        for item in sessions
-        if item.get("evidence_epoch_sha256") == evidence_epoch
-    ]
+    # Search-budget accounting is per market evidence epoch (A5). Capability /
+    # Git / memory_eligibility must not reset AUTO or distinct-focus counters.
+    same_epoch_for_budget = list(
+        sessions_for_market_budget(sessions, market_evidence_epoch=evidence_epoch)
+    )
     if _is_auto_focus(owner_focus):
-        auto_count = sum(
-            1
-            for item in same_epoch_for_budget
-            if _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
+        auto_count = int(
+            any(
+                _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
+                for item in same_epoch_for_budget
+            )
         )
         if auto_count >= AUTO_SESSIONS_PER_EPOCH:
             return ("STOP", "SEARCH_BUDGET_EXHAUSTED")
@@ -482,23 +683,69 @@ def epoch_search_budget_usage(
     sessions: Sequence[Mapping[str, Any]],
     *,
     evidence_epoch: str,
+    reservations: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    """Epoch-scoped AUTO / distinct-focus usage (independent of memory eligibility)."""
-    same_epoch = [
-        item
-        for item in sessions
-        if item.get("evidence_epoch_sha256") == evidence_epoch
+    """Market-epoch-scoped AUTO / distinct-focus usage (A5; not capability/Git)."""
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        representation_identity_from_session,
+        session_scientific_slot_sha256,
+        sessions_for_market_budget,
+    )
+
+    observed_sessions: list[Mapping[str, Any]] = [
+        *(sessions or []), *(reservations or [])
     ]
-    auto_used = sum(
-        1
-        for item in same_epoch
-        if _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
+    same_epoch = list(
+        sessions_for_market_budget(
+            observed_sessions, market_evidence_epoch=evidence_epoch
+        )
+    )
+    deduped_epoch: list[Mapping[str, Any]] = []
+    seen_slots: set[tuple[str, str]] = set()
+    for item in same_epoch:
+        slot = session_scientific_slot_sha256(item)
+        session_id = str(item.get("session_id") or "")
+        identity = (session_id, slot or "")
+        if session_id and slot and identity in seen_slots:
+            continue
+        if session_id and slot:
+            seen_slots.add(identity)
+        deduped_epoch.append(item)
+    same_epoch = deduped_epoch
+    # AUTO=1 is a market-scoped search admission; child representation rows
+    # must not consume another AUTO budget unit.
+    auto_used = int(
+        any(
+            _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
+            for item in same_epoch
+        )
     )
     distinct = {
         str(item.get("focus_key_sha256") or "")
         for item in same_epoch
         if item.get("focus_key_sha256")
     }
+    representation_slots: dict[str, dict[str, Any]] = {}
+    legacy_market_occupancy = 0
+    for item in same_epoch:
+        slot = session_scientific_slot_sha256(item)
+        representation, version = representation_identity_from_session(item)
+        if slot is None:
+            legacy_market_occupancy += 1
+            continue
+        key = f"{representation or 'UNKNOWN'}@{version or 'UNKNOWN'}"
+        entry = representation_slots.setdefault(
+            key,
+            {
+                "representation_id": representation,
+                "representation_semantic_version": version,
+                "scientific_slot_sha256": slot,
+                "session_ids": [],
+            },
+        )
+        session_id = item.get("session_id")
+        if isinstance(session_id, str) and session_id:
+            entry["session_ids"].append(session_id)
     return {
         "evidence_epoch_sha256": evidence_epoch,
         "auto_sessions_used": auto_used,
@@ -509,10 +756,12 @@ def epoch_search_budget_usage(
             0, MAX_DISTINCT_FOCUSES_PER_EPOCH - len(distinct)
         ),
         "focus_key_sha256_set": sorted(distinct),
+        "representation_slots": list(representation_slots.values()),
+        "legacy_market_occupancy": legacy_market_occupancy,
     }
 
 
-def _term_set(value: str) -> set[str]:
+def term_set(value: str) -> set[str]:
     return {token for token in value.casefold().replace("_", " ").replace("-", " ").split() if token}
 
 
@@ -528,10 +777,10 @@ def rank_prior_candidate_ids(
         iter_search_memory_hypothesis_payloads,
     )
 
-    focus_terms = _term_set(owner_focus)
+    focus_terms = term_set(owner_focus)
     feature_terms = set()
     for hint in feature_hints:
-        feature_terms.update(_term_set(hint))
+        feature_terms.update(term_set(hint))
     if feature_hints:
         feature_terms.update(
             {"taker", "volume", "mix", "valuation", "liquidity", "divergence"}
@@ -558,7 +807,7 @@ def rank_prior_candidate_ids(
                 "primary_x_family",
             )
         )
-        tokens = _term_set(blob)
+        tokens = term_set(blob)
         score = 3 * len(tokens & feature_terms) + 2 * len(tokens & focus_terms)
         scored.append((score, hyp_id))
     scored.sort(key=lambda item: (-item[0], item[1]))
@@ -637,6 +886,7 @@ def enumerate_rdp_datasets(
             labels = loaded_labels
         partition_dir = manifests_dir / "partitions"
         matching: list[Path] = []
+        matching_manifests: list[PartitionManifest] = []
         if partition_dir.is_dir():
             for part_path in sorted(partition_dir.glob("*.json")):
                 if _is_symlink_path(part_path):
@@ -644,9 +894,10 @@ def enumerate_rdp_datasets(
                         {
                             "code": "PARTITION_MANIFEST_SYMLINK",
                             "dataset_manifest_id": manifest.dataset_manifest_id,
-                        }
+                    }
                     )
                     matching = []
+                    matching_manifests = []
                     break
                 try:
                     part = PartitionManifest.model_validate_json(part_path.read_bytes())
@@ -654,6 +905,7 @@ def enumerate_rdp_datasets(
                     continue
                 if part.dataset_manifest_id == manifest.dataset_manifest_id:
                     matching.append(part_path)
+                    matching_manifests.append(part)
                     parquet_path = Path(data_root) / part.logical_location
                     if (
                         not parquet_path.is_file()
@@ -668,6 +920,7 @@ def enumerate_rdp_datasets(
                             }
                         )
                         matching = []
+                        matching_manifests = []
                         break
         if not matching:
             if not any(
@@ -682,6 +935,21 @@ def enumerate_rdp_datasets(
                     }
                 )
             continue
+        a3_pit_availability_validation_sha256 = canonical_sha256(
+            {
+                "identity_version": (
+                    "A3_DATASET_MANIFEST_PIT_AVAILABILITY_VALIDATION_V1"
+                ),
+                "dataset_manifest": manifest.model_dump(mode="json"),
+                "partition_manifests": [
+                    item.model_dump(mode="json")
+                    for item in sorted(
+                        matching_manifests,
+                        key=lambda item: item.partition_manifest_id,
+                    )
+                ],
+            }
+        )
         evidence_role = "UNSPECIFIED"
         if labels is not None:
             role = labels.get("evidence_role")
@@ -741,6 +1009,9 @@ def enumerate_rdp_datasets(
                 "dataset_id": manifest.dataset_id,
                 "dataset_version": manifest.dataset_version,
                 "dataset_fingerprint": manifest.dataset_fingerprint,
+                "a3_pit_availability_validation_sha256": (
+                    a3_pit_availability_validation_sha256
+                ),
                 "evidence_role": evidence_role,
                 "labels": labels,
                 "yield_eligible": yield_eligible,
@@ -1408,9 +1679,7 @@ def build_forge_context_packet(
     except SemanticOperabilityError:
         semantic_slice = {
             "semantic_capability_entries": [],
-            "semantic_capability_digest_sha256": hashlib.sha256(
-                b"SEMANTIC-DIGEST-UNAVAILABLE"
-            ).hexdigest(),
+            "semantic_capability_digest_sha256": None,
             "kept_semantic_routes": [],
             "dropped_semantic_routes": [],
             "semantic_projection_truncated": True,
@@ -1656,9 +1925,58 @@ def compute_slash_packet_identity(
         if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1
         else None
     )
-    epoch = evidence_epoch_sha256(
-        evidence_epoch_material(repo_root, data_root, store=store)
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        EvidenceIdentityError,
+        compute_split_identity,
     )
+
+    try:
+        split = compute_split_identity(repo_root, data_root, store=store)
+    except EvidenceIdentityError:
+        # Commissioning / incomplete market: keep legacy search-key continuity
+        # without claiming a scientific market admission digest.
+        from solana_alpha_lab.factory.hfic_session import (
+            evidence_epoch_sha256 as legacy_hash,
+        )
+
+        legacy_material = evidence_epoch_material(
+            Path(repo_root), Path(data_root), store=store
+        )
+        legacy_epoch = legacy_hash(legacy_material)
+        policy_head = effective_policy(store)
+        memory_eligibility = str(policy_head["memory_eligibility_sha256"])
+        search_key = search_key_sha256(
+            legacy_epoch, focus, PROMPT_VERSION, memory_eligibility, control_mode
+        )
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            compute_capability_epoch_for_repo,
+        )
+
+        capability_epoch, _capability_basis = compute_capability_epoch_for_repo(
+            Path(repo_root)
+        )
+        return {
+            "owner_focus": focus,
+            "evidence_epoch": legacy_epoch,
+            "market_evidence_epoch_sha256": legacy_epoch,
+            "capability_epoch_sha256": capability_epoch,
+            "legacy_combined_evidence_epoch_sha256": legacy_epoch,
+            "search_key": search_key,
+            "commissioning_status": str(proof.get("status") or ""),
+            "research_memory_as_of": str(
+                proof.get("research_memory_as_of") or "2026-08-25T00:00:00Z"
+            ),
+            "selection_caveat": selection_caveat,
+            "policy_head": policy_head,
+            "memory_eligibility": memory_eligibility,
+            "control_mode": control_mode,
+            "focus_key": focus_key_sha256(focus),
+            "market_admission_ready": False,
+        }
+
+    # Scientific admission key is market evidence only (A5). Capability stays
+    # in search_key / execution binding via prompt_version and capability stamp.
+    epoch = str(split["market_evidence_epoch_sha256"])
     policy_head = effective_policy(store)
     memory_eligibility = str(policy_head["memory_eligibility_sha256"])
     search_key = search_key_sha256(
@@ -1667,6 +1985,11 @@ def compute_slash_packet_identity(
     return {
         "owner_focus": focus,
         "evidence_epoch": epoch,
+        "market_evidence_epoch_sha256": split["market_evidence_epoch_sha256"],
+        "capability_epoch_sha256": split["capability_epoch_sha256"],
+        "legacy_combined_evidence_epoch_sha256": split[
+            "legacy_combined_evidence_epoch_sha256"
+        ],
         "search_key": search_key,
         "commissioning_status": str(proof.get("status") or ""),
         "research_memory_as_of": str(
@@ -1677,6 +2000,7 @@ def compute_slash_packet_identity(
         "memory_eligibility": memory_eligibility,
         "control_mode": control_mode,
         "focus_key": focus_key_sha256(focus),
+        "market_admission_ready": True,
     }
 
 
@@ -1835,8 +2159,26 @@ def _forge_input_requires_preflight_stop(
 
     if forge_input.get("forge_runnable"):
         return False
+    codes = [str(item) for item in (forge_input.get("blocking_reason_codes") or [])]
+    # Incomplete market stops before CONTROL yield. Yield owns CONTROL only
+    # after the market basis is complete.
+    if "MARKET_EVIDENCE_BASIS_INCOMPLETE" in codes:
+        active = forge_input.get("active_evidence_set")
+        packet = forge_input.get("packet")
+        has_current_surface = bool(
+            isinstance(active, Mapping)
+            and (
+                active.get("current_dataset_manifest_id")
+                or active.get("visible_cohort_ids")
+            )
+        ) or bool(forge_input.get("live_corpus")) or bool(
+            isinstance(packet, Mapping) and packet.get("live_corpus_in_packet")
+        )
+        if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
+            return True
+        return has_current_surface
     if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
-        return True
+        return False
     return str(forge_input.get("owner_class") or "") == OWNER_CLASS_OBSERVABILITY_BLOCKED
 
 
@@ -1856,6 +2198,8 @@ def _forge_input_stop_terminal(
     codes = list(forge_input.get("blocking_reason_codes") or [])
     if FORGE_VISION_INTEGRITY_BLOCKED in codes:
         return FORGE_VISION_INTEGRITY_BLOCKED
+    if "MARKET_EVIDENCE_BASIS_INCOMPLETE" in codes:
+        return "MARKET_EVIDENCE_BASIS_INCOMPLETE"
     terminal = str(codes[0] if codes else CURRENT_CORPUS_MISSING)
     if (
         control_mode == CURRENT_REPRESENTATION_CONTROL_V1
@@ -1875,6 +2219,8 @@ def _forge_input_stop_next(terminal: str, owner_class: object) -> str:
 
     if terminal == "CONTROL_CORPUS_UNRESOLVABLE":
         return "STOP_CORPUS_UNRESOLVABLE"
+    if terminal == "MARKET_EVIDENCE_BASIS_INCOMPLETE":
+        return "RESTORE_CURRENT_EVIDENCE"
     if (
         terminal == FORGE_VISION_INTEGRITY_BLOCKED
         or owner_class == OWNER_CLASS_OBSERVABILITY_BLOCKED
@@ -1893,6 +2239,7 @@ def run_preflight(
     git_snapshot: Mapping[str, Any] | None = None,
     clock: Clock | None = None,
     evidence_surface_mode: str | None = None,
+    model_provenance_sha256: str | None = None,
     persist: bool = True,
 ) -> dict[str, Any]:
     from solana_alpha_lab.factory.forge_input_receipt import (
@@ -1916,7 +2263,7 @@ def run_preflight(
         owner_focus=focus,
     )
     stop_input = _forge_input_requires_preflight_stop(forge_input, control_mode)
-    if stop_input and not persist:
+    if stop_input:
         focus = owner_focus if owner_focus.strip() else AUTO_FOCUS
         epoch = "0" * 64
         focus_key = focus_key_sha256(focus)
@@ -1939,6 +2286,7 @@ def run_preflight(
             "forge_context_packet": {},
             "forge_input_receipt": forge_input,
             "owner_forge_input": format_forge_input_owner_block(forge_input),
+            "writes": {"research_store": 0, "forge_context": 0, "session": 0},
             "authority": {
                 "git_mutation": 0,
                 "experiment_execution": 0,
@@ -1991,6 +2339,20 @@ def run_preflight(
         else:
             raise
 
+    # Auto-commission is an in-scope append-only compatibility step, but it
+    # can publish a dataset into the same data root.  The market identity must
+    # describe the bytes that the following lifecycle step will actually
+    # read, not the pre-commission snapshot.
+    forge_input = build_forge_input_receipt(
+        Path(data_root),
+        repo_root=Path(repo_root),
+        evidence_surface_mode=control_mode,
+        owner_focus=focus,
+    )
+    pre_context_store_writes = int(commissioned_now) + int(
+        compatibility_repair.get("appended") or 0
+    )
+
     try:
         if persist:
             store = ResearchStore(Path(data_root))
@@ -2028,12 +2390,42 @@ def run_preflight(
         proof=proof,
         selection_caveat=None,
     )
+
+    # A legacy combined epoch is search continuity only. Incomplete market
+    # cannot mint START_NEW_SESSION. Exact readback of an already-admitted
+    # session is decided after session lookup.
+    active_surface = forge_input.get("active_evidence_set")
+    input_packet = forge_input.get("packet")
+    has_current_surface = bool(
+        isinstance(active_surface, Mapping)
+        and (
+            active_surface.get("current_dataset_manifest_id")
+            or active_surface.get("visible_cohort_ids")
+        )
+    ) or bool(forge_input.get("live_corpus")) or bool(
+        isinstance(input_packet, Mapping) and input_packet.get("live_corpus_in_packet")
+    )
+    market_admission_ready = ident.get("market_admission_ready") is True
+
     epoch = str(ident["evidence_epoch"])
     focus = str(ident["owner_focus"])
     focus_key = str(ident["focus_key"])
     policy_head = ident["policy_head"]
     memory_eligibility = str(ident["memory_eligibility"])
     search_key = str(ident["search_key"])
+    market_epoch = ident.get("market_evidence_epoch_sha256")
+    capability_epoch = ident.get("capability_epoch_sha256")
+    legacy_combined_epoch = ident.get("legacy_combined_evidence_epoch_sha256")
+
+    def _stamp_split_identity(body: dict[str, Any]) -> dict[str, Any]:
+        if isinstance(market_epoch, str) and len(market_epoch) == 64:
+            body["market_evidence_epoch_sha256"] = market_epoch
+        if isinstance(capability_epoch, str) and capability_epoch:
+            body["capability_epoch_sha256"] = capability_epoch
+        if isinstance(legacy_combined_epoch, str) and legacy_combined_epoch:
+            body["legacy_combined_evidence_epoch_sha256"] = legacy_combined_epoch
+        return body
+
     if stop_input:
         terminal = _forge_input_stop_terminal(forge_input, control_mode)
         stop_body = {
@@ -2053,6 +2445,7 @@ def run_preflight(
             "forge_context_packet": {},
             "forge_input_receipt": forge_input,
             "owner_forge_input": format_forge_input_owner_block(forge_input),
+            "writes": {"research_store": 0, "forge_context": 0, "session": 0},
             "authority": {
                 "git_mutation": 0,
                 "experiment_execution": 0,
@@ -2061,7 +2454,7 @@ def run_preflight(
         }
         if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
             stop_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
-        return stop_body
+        return _stamp_split_identity(stop_body)
     if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
         datasets, _warnings = enumerate_rdp_datasets(Path(data_root))
         if datasets:
@@ -2076,7 +2469,7 @@ def run_preflight(
             repo_root=Path(repo_root),
         )
         if gate != "OK":
-            return {
+            return _stamp_split_identity({
                 "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
                 "action": "STOP",
                 "terminal": gate,
@@ -2101,13 +2494,53 @@ def run_preflight(
                 "forge_context_packet": {},
                 "forge_input_receipt": forge_input,
                 "owner_forge_input": format_forge_input_owner_block(forge_input),
+                "writes": {
+                    "research_store": pre_context_store_writes,
+                    "forge_context": 0,
+                    "session": 0,
+                },
                 "authority": {
                     "git_mutation": 0,
                     "experiment_execution": 0,
                     "provider_api_rpc_wss_calls": 0,
                 },
-            }
+            })
     sessions = _query_hfic_sessions(data_root)
+    from solana_alpha_lab.factory.hfic_session import (
+        find_generated_draft,
+        list_scientific_slot_admissions,
+    )
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        scientific_slot_sha256,
+    )
+
+    reservations = list_scientific_slot_admissions(store)
+    visible_cohort_ids = (
+        forge_input.get("active_evidence_set", {}).get("visible_cohort_ids")
+        if isinstance(forge_input.get("active_evidence_set"), Mapping)
+        else None
+    )
+    generated_draft = None
+    if isinstance(market_epoch, str) and len(market_epoch) == 64:
+        draft_slot = scientific_slot_sha256(
+            market_evidence_epoch_sha256=market_epoch,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus=focus,
+        )
+        generated_draft = find_generated_draft(
+            store,
+            market_evidence_epoch_sha256=market_epoch,
+            owner_focus=focus,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            scientific_slot_sha256=draft_slot,
+        )
+    execution_context: dict[str, Any] = {}
+    if isinstance(capability_epoch, str) and len(capability_epoch) == 64:
+        execution_context["capability_epoch_sha256"] = capability_epoch
+    if model_provenance_sha256 is not None:
+        execution_context["model_provenance_sha256"] = model_provenance_sha256
     action, bound_session = decide_preflight_action(
         sessions,
         search_key=search_key,
@@ -2116,8 +2549,81 @@ def run_preflight(
         owner_focus=focus,
         memory_eligibility_sha256=memory_eligibility,
         evidence_surface_mode=control_mode,
+        representation_id="BASE",
+        representation_semantic_version="HFIC-V1.2",
+        reservations=reservations,
+        generated_draft=generated_draft,
+        current_visible_cohort_ids=visible_cohort_ids,
+        execution_context=execution_context or None,
+        repo_root=Path(repo_root),
     )
-    search_budget = epoch_search_budget_usage(sessions, evidence_epoch=epoch)
+    if (
+        not market_admission_ready
+        and not _exact_admitted_session_readback(
+            sessions,
+            action=action,
+            session_id=bound_session,
+            search_key=search_key,
+            focus_key=focus_key,
+            has_current_surface=has_current_surface,
+        )
+    ):
+        return {
+            "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
+            "action": "STOP",
+            "terminal": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+            "owner_class": forge_input.get("owner_class"),
+            "owner_focus": focus,
+            "prompt_version": PROMPT_VERSION,
+            "evidence_epoch_sha256": epoch,
+            "evidence_epoch_kind": "LEGACY_SEARCH_CONTINUITY_ONLY",
+            "focus_key_sha256": focus_key,
+            "search_key_sha256": search_key,
+            "legacy_combined_evidence_epoch_sha256": legacy_combined_epoch or None,
+            "memory_policy_head_sha256": policy_head["policy_sha256"],
+            "memory_eligibility_sha256": memory_eligibility,
+            "next": "RESTORE_CURRENT_EVIDENCE",
+            "session_id": None,
+            "commissioning": {
+                "status": str(proof.get("status") or ""),
+                "auto_commissioned": commissioned_now,
+                "provider_calls_actual": int(proof.get("provider_calls_actual") or 0),
+                "git_mutation_count": int(proof.get("git_mutation_count") or 0),
+                "run_id": proof.get("run_id"),
+                "compatibility_repair": compatibility_repair,
+            },
+            "forge_context_packet": {},
+            "forge_input_receipt": forge_input,
+            "owner_forge_input": format_forge_input_owner_block(forge_input),
+            "writes": {"research_store": 0, "forge_context": 0, "session": 0},
+            "authority": {
+                "git_mutation": 0,
+                "experiment_execution": 0,
+                "provider_api_rpc_wss_calls": 0,
+            },
+        }
+    if not market_admission_ready and bound_session:
+        frozen = next(
+            (
+                item
+                for item in sessions
+                if str(item.get("session_id") or "") == bound_session
+            ),
+            None,
+        )
+        if frozen is not None:
+            saved_market = frozen.get("market_evidence_epoch_sha256")
+            saved_capability = frozen.get("capability_epoch_sha256")
+            saved_evidence = frozen.get("evidence_epoch_sha256")
+            if isinstance(saved_market, str) and len(saved_market) == 64:
+                market_epoch = saved_market
+            if isinstance(saved_capability, str) and len(saved_capability) == 64:
+                capability_epoch = saved_capability
+            if isinstance(saved_evidence, str) and len(saved_evidence) == 64:
+                epoch = saved_evidence
+    search_budget = epoch_search_budget_usage(
+        sessions, evidence_epoch=epoch, reservations=reservations
+    )
     live_git_head = "0" * 40
     git_composite = None
     if isinstance(git_snapshot, Mapping):
@@ -2202,10 +2708,15 @@ def run_preflight(
                 "experiment_execution": 0,
                 "provider_api_rpc_wss_calls": 0,
             },
+            "writes": {
+                "research_store": pre_context_store_writes,
+                "forge_context": 0,
+                "session": 0,
+            },
         }
         if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
             stop_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
-        return stop_body
+        return _stamp_split_identity(stop_body)
     if selection_gate_view.get("caveat"):
         selection_caveat = selection_gate_view
 
@@ -2249,6 +2760,7 @@ def run_preflight(
             "compatibility_repair": compatibility_repair,
         },
         "forge_context_packet": {},
+        "writes": {"research_store": pre_context_store_writes, "forge_context": 0, "session": 0},
         "authority": {
             "git_mutation": 0,
             "experiment_execution": 0,
@@ -2257,9 +2769,12 @@ def run_preflight(
     }
     if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
         receipt_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
+    if model_provenance_sha256 is not None:
+        receipt_body["model_provenance_sha256"] = model_provenance_sha256
     if action == "STOP" and bound_session == "SEARCH_BUDGET_EXHAUSTED":
         receipt_body["terminal"] = "SEARCH_BUDGET_EXHAUSTED"
         receipt_body["session_id"] = None
+    persist_context_packet = bool(persist and action != "STOP")
     packet, packet_digest = build_forge_context_packet(
         repo_root,
         data_root,
@@ -2271,11 +2786,35 @@ def run_preflight(
         store=store,
         stage_time=session_started,
         evidence_surface_mode=control_mode,
-        persist=persist,
+        persist=persist_context_packet,
         selection_caveat=selection_caveat,
     )
     receipt_body["forge_context_packet"] = packet
     receipt_body["forge_context_packet_sha256"] = packet_digest
+    receipt_body["writes"] = {
+        "research_store": pre_context_store_writes + int(persist_context_packet),
+        "forge_context": int(persist_context_packet),
+        "session": 0,
+    }
+    if isinstance(generated_draft, Mapping) and action == "RESUME_EXISTING_SESSION":
+        receipt_body["generated_draft_sha256"] = generated_draft.get("payload_sha256")
+        receipt_body["draft_lifecycle"] = "GENERATED_BEFORE_FREEZE"
+        receipt_body["generated_draft_source_preflight_receipt_id"] = (
+            generated_draft.get("source_preflight_receipt_id")
+        )
+        receipt_body["generated_draft_source_preflight_receipt_sha256"] = (
+            generated_draft.get("source_preflight_receipt_sha256")
+        )
+        # Model provenance was bound when the generator reply was persisted.
+        # Carry that known identity through restart so freeze cannot silently
+        # downgrade the resumed execution to an unknown model context.
+        model_provenance = generated_draft.get("model_provenance_sha256")
+        if isinstance(model_provenance, str):
+            receipt_body["model_provenance_sha256"] = model_provenance
+        receipt_body["next"] = (
+            "RESUME_GENERATED_DRAFT — continue freeze from persisted draft; "
+            "do not regenerate"
+        )
     if selection_gate_view and selection_gate_view.get("applicable"):
         receipt_body["router_decision"] = selection_gate_view.get("router_decision")
         receipt_body["selection_gate"] = {
@@ -2288,6 +2827,14 @@ def run_preflight(
                 selection_gate_view.get("full_lifecycle_equivalent")
             ),
         }
+        if selection_gate_view.get("caveat"):
+            # The historical gate is scoped evidence, not a second admission
+            # engine.  Make the allowed owner next explicit so a START result
+            # cannot be misread as silently ignoring BLOCK_FORGE_SELECTION_RISK.
+            receipt_body["owner_next"] = "CONTINUE_WITH_SCOPED_SELECTION_CAVEAT"
+            receipt_body["selection_gate"]["owner_next"] = (
+                "CONTINUE_WITH_SCOPED_SELECTION_CAVEAT"
+            )
     try:
         digest = store.diagnostics().committed_inventory_sha256
     except ResearchStoreError as exc:
@@ -2348,5 +2895,6 @@ def run_preflight(
                 receipt_body["next"] = bundle.get("next")
     receipt_body["forge_input_receipt"] = forge_input
     receipt_body["owner_forge_input"] = format_forge_input_owner_block(forge_input)
+    _stamp_split_identity(receipt_body)
     receipt_body["preflight_receipt_sha256"] = canonical_sha256(receipt_body)
     return receipt_body

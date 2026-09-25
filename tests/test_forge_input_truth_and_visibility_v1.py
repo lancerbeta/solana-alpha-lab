@@ -139,6 +139,32 @@ class ForgeInputReceiptTests(unittest.TestCase):
         self.assertIn("evidence_surface_mode: ordinary", block)
         self.assertIn("forge_input_next: STOP_BEFORE_SYNTHESIS", block)
 
+    def test_g_a3_lineage_unknown_never_mints_market_epoch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            unverified = {
+                "visible_cohorts": [
+                    {"cohort_id": "REL-C1"},
+                    {"cohort_id": "REL-C2"},
+                ],
+                "current_dataset_manifest_id": "MID-CURRENT",
+                "corpus_version": 2,
+                "lineage_integrity": "UNKNOWN",
+            }
+            with patch(
+                "solana_alpha_lab.factory.forge_input_receipt._load_readback",
+                return_value=unverified,
+            ), patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                receipt = build_forge_input_receipt(data_root, repo_root=ROOT)
+        self.assertFalse(receipt["forge_runnable"])
+        self.assertEqual(receipt["owner_class"], OWNER_CLASS_OBSERVABILITY_BLOCKED)
+        self.assertIn("LINEAGE_INTEGRITY_UNVERIFIED", receipt["blocking_reason_codes"])
+        self.assertNotIn("market_evidence_epoch_sha256", receipt)
+
     def test_g_a3_1_linked_worktree_sees_same_c1_c2(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             principal = Path(tmp) / "principal"

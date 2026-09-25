@@ -35,6 +35,7 @@ from solana_alpha_lab.factory.hfic_session import (
 )
 from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, ResearchStore
 from tests.test_early_market_panel_importer import write_temp_capture
+from tests.test_hfic_cli import seed_minimal_market_basis
 from solana_alpha_lab.factory.early_market_panel_importer import import_early_market_panel
 
 CLI = ROOT / "scripts/hypothesis_forge.py"
@@ -66,6 +67,8 @@ def bind_draft(draft: dict, receipt: dict) -> dict:
 def run_cli(*args: str, data_root: Path) -> subprocess.CompletedProcess[str]:
     env = dict(os.environ)
     env["SMIAL_DATA_ROOT"] = str(data_root)
+    env["PYTHONUTF8"] = "1"
+    env["PYTHONIOENCODING"] = "utf-8"
     return subprocess.run(
         [
             sys.executable,
@@ -81,6 +84,8 @@ def run_cli(*args: str, data_root: Path) -> subprocess.CompletedProcess[str]:
         env=env,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         check=False,
     )
 
@@ -296,6 +301,7 @@ class NextActionPersistTests(unittest.TestCase):
         write_temp_capture(source, eligible=10)
         data_root = Path(cls._tmp.name) / "rdp"
         data_root.mkdir()
+        seed_minimal_market_basis(data_root)
         import_early_market_panel(
             source_root=source,
             data_root=data_root,

@@ -89,8 +89,31 @@ can be excluded from *future HFIC search memory* by an append-only ResearchStore
 policy. Historical records stay immutable. Quarantine is not scientific
 rejection, deletion, supersession, CLOSE/PARK change, or a raise of
 `prior_memory.max_records=64`. Non-HFIC hypothesis versions stay eligible.
-The policy does not change `evidence_epoch_sha256`. After this capability is
-merged once, later quarantine/restore must not require Git mutation.
+The policy does not change `evidence_epoch_sha256` / market evidence epoch.
+After this capability is merged once, later quarantine/restore must not
+require Git mutation. Memory eligibility remains in search-key / exact
+replay identity; it must not reset AUTO or distinct-focus counters for the
+same market evidence epoch (A5).
+
+**A5 identity gloss (owner path).** Scientific admission, resume, and budget
+use `market_evidence_epoch_sha256`. `capability_epoch_sha256` is protocol
+provenance and does **not** free AUTO/focus budget. Owner readout actions:
+
+| next_action | Owner meaning |
+|---|---|
+| `START_BASE` / `START_V1` | New scientific look on this market (or next representation slot) |
+| `RESUME_BASE` / `RESUME_V1` | Continue saved artifacts; not a new trial |
+| `RETURN_EXISTING` / REUSED_VALID | Already answered on this market; scientific writes=0 |
+
+`RETURN_EXISTING` is the owner-facing short label. Machine scopes are explicit:
+preflight/session admission returns `RETURN_EXISTING_SESSION`; the aggregate
+ladder/`forge-run` readback returns `RETURN_EXISTING_RUN`. The latter is not a
+new session and neither action authorizes a second trial.
+| incomplete market | BLOCKED — restore decision-bearing datasets/lineage; do not invent a digest |
+
+Docs-only / Git-only capability drift must not reset an occupied market slot.
+Legacy combined `evidence_epoch_sha256` without a market stamp is historical
+or unresolved — never silent current reuse.
 
 Status:
 

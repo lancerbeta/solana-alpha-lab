@@ -34,7 +34,7 @@ from solana_alpha_lab.factory.hfic_suppression_semantics import (  # noqa: E402
     family_hard_close_terminals,
 )
 from solana_alpha_lab.factory.research_store import ResearchStore  # noqa: E402
-from tests.test_hfic_cli import bind_draft, critic_result_from_packet_only, run_cli  # noqa: E402
+from tests.test_hfic_cli import bind_draft, critic_result_from_packet_only, run_cli, seed_minimal_market_basis  # noqa: E402
 from tests.test_hfic_epistemic_memory_semantics import (  # noqa: E402
     TAKER_FAMILY,
     TAKER_MANIFEST_ID,
@@ -197,6 +197,7 @@ class LegacyScienceRebaseTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",
@@ -330,6 +331,7 @@ class LegacyScienceRebaseTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             store = ResearchStore(data_root)
             before = evidence_epoch_sha256(evidence_epoch_material(ROOT, data_root))
             _append_hfic_untagged_candidate(store)
@@ -375,6 +377,7 @@ class LegacyScienceRebaseTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             fingerprint = "66" * 32
             _publish_labeled_dataset(
                 data_root,
@@ -421,6 +424,7 @@ class LegacyScienceRebaseTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",

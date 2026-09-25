@@ -100,6 +100,11 @@ commissioning when Fast Lane proof is absent and safe, design packets.
 Happy path — no owner copy/paste between the slash command and the final terminal:
 
 1. Run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py preflight --owner-focus <AUTO|text> --format json`.
+   If the executing model provenance digest is available from the caller,
+   pass `--model-provenance-sha256 <64-hex>`; this is a caller-supplied
+   compatibility label, not an attestation that the model actually ran.
+   Missing model identity remains UNKNOWN and cannot authorize completed-result
+   reuse.
    For the preregistered unchanged-representation CONTROL only, add
    `--control-current-representation` so the receipt carries
    `evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1`. Do not use this
@@ -126,6 +131,10 @@ Happy path — no owner copy/paste between the slash command and the final termi
    Then resolve the bounded run (default no-write diagnostic; persist only
    when this slash continues past READY):
 
+   If the available model-provenance digest was supplied to `preflight`, pass
+   the exact same `--model-provenance-sha256 <64-hex>` to `forge-run`; omitting
+   or changing it makes completed-result compatibility UNKNOWN/blocked.
+
 ```
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write --format json --owner-focus AUTO
 ```
@@ -133,6 +142,15 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
    result. Do not treat the raw JSON dump as the owner result. `--persist`
    records `RESEARCH_ARTIFACT` `FORGE_RUN_RECEIPT`; the readout `persisted`
    line names that kind, not a filesystem path.
+   Identity (A5): `market_evidence_epoch_sha256` is the scientific admission
+   key (declared datasets/cohorts/lineage). `capability_epoch_sha256` is
+   protocol provenance and does **not** alone reset AUTO/distinct-focus
+   budget. Docs/Git-only changes must not free a market slot. Completed
+   replay is `RETURN_EXISTING` with scientific writes=0 for the same market
+   + frozen representations + focus. A new cohort after a completed run is a
+   new market snapshot — do not return the old PASS/NO_WORTHY as the current
+   answer. Legacy sessions without market stamps are historical/unresolved
+   unless exact compatibility is proven; focus-only match is insufficient.
    Branch on `forge-run` `next_action` **before** Prompt A and **before**
    session-level `RETURN_EXISTING_SESSION` stop:
    - `START_V1` auto-advances from effective BASE
@@ -154,9 +172,10 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
      A present-but-corrupt challenger or CONTROL bind failure is
      `OBSERVABILITY_BLOCKED` (`status: BLOCKED`, `freeze_block:`) — stop; not
      soft-pend. Do **not** freeze from a CONTROL
-     packet copy with only a V1 marker. After a generator draft exists,
-     immediately `forge-run --persist --saved-draft-sha256 <hash>` before
-     freeze so retry is `RESUME_V1`. Freeze/Critic only after a V1 candidate
+     packet copy with only a V1 marker. Persist a generated V1 draft with
+     `persist-draft --representation-id NORMALIZED_TRAJECTORY_V1` before
+     freeze; `forge-run --persist` records only the aggregate receipt and is
+     not a substitute for storing draft bytes. Freeze/Critic only after a V1 candidate
      exists on that envelope (fixture stubs allowed). After freeze/finalize,
      if terminal is `PASS_TO_CLASSIFICATION`, run network-free
      `classify` then finalize — that intermediate is `RESUME_V1`, not
@@ -171,10 +190,14 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
      existing freeze identity) **or** pending classify after
      `PASS_TO_CLASSIFICATION`. Do **not** call `consume_start_v1_envelope`
      (that helper is START_V1 only).
-   - `START_BASE` → continue to preflight `START_NEW_SESSION` / Prompt A.
-     When `blocking_reason_codes` includes `CONTROL_SURFACE_REQUIRED`, use
-     CONTROL-compatible BASE (`evidence_surface_mode=
-     CURRENT_REPRESENTATION_CONTROL_V1`) inside this same slash — print
+   - `START_BASE` from a no-write diagnostic (`forge-run --no-write` or
+     `forge-input --no-write`) is not slash authority. When
+     `blocking_reason_codes` includes `CONTROL_SURFACE_REQUIRED`, the factual
+     next state is CONTROL required and `next:` is `STOP_BEFORE_SYNTHESIS`:
+     STOP. Do **not** launch `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
+     Inside an already owner-authorized `/hypothesis-forge` bounded run, the
+     same state still continues CONTROL-compatible BASE
+     (`evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1`) — print
      `owner_readout` (`status: NEXT`); do **not** treat it as evening DONE.
      Fresh empty stores and ordinary V1-trigger negatives both emit this code
      so the first generation is CONTROL-compatible; do **not** invent a second
@@ -191,8 +214,10 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
      `owner_readout` and stop — do **not** start V1 and do **not** report
      evening DONE / success. Persisted pause must not lock the run as
      completed readback; later slash re-resolves from live session state.
-   - Do **not** treat a missing CONTROL surface as owner-final: that path is
-     `START_BASE` + `CONTROL_SURFACE_REQUIRED` (`status: NEXT`) above.
+   - Do **not** treat a missing CONTROL surface as owner-final. On a no-write
+     diagnostic that state is `STOP_BEFORE_SYNTHESIS`, not a CONTROL launch.
+     Inside the authorized slash it remains `START_BASE` +
+     `CONTROL_SURFACE_REQUIRED` (`status: NEXT`) above.
      `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL` remains expert-only
      and is not a separate owner evening.
    Technical / visibility failures stay `OBSERVABILITY_BLOCKED`, never
@@ -249,7 +274,19 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-inp
    Prompt A search still uses only the bounded `ranked_prior_candidate_ids`
    shortlist; do not change candidate-generation strategy to recover omitted priors.
    Do **not** query prospects or include prospect IDs/research text in Prompt A.
-4. Write machine `FORGE_DRAFT` to an OS temp file.
+4. Write machine `FORGE_DRAFT` to an OS temp file, then immediately persist
+   those exact bytes against their source preflight before freeze:
+
+   ```text
+   uv run --locked --managed-python python -B scripts/hypothesis_forge.py persist-draft --draft <temp> --preflight-receipt <preflight-temp> --representation-id BASE --format json
+   ```
+
+   For the V1 envelope path, use the prepared representation-aware receipt and
+   `--representation-id NORMALIZED_TRAJECTORY_V1`. Pass
+   `--model-provenance-sha256 <64-hex>` only when that digest is actually
+   supplied by the caller. The command revalidates current market/capability
+   identity and atomically persists slot occupancy plus draft when the slot is
+   new. Freeze must consume the same draft bytes and original preflight receipt.
 5. If Prompt A returned `NO_WORTHY_HYPOTHESIS` (empty `selected_candidate_ref`):
    - query `uv run --locked --managed-python python -B scripts/hypothesis_forge.py prospects --trigger POST_NO_WORTHY_REVIEW --max-results 3 --format json`;
    - run **PROMPT C** (`HFIC-NEXT-V1.0`) from the operator pack using only the

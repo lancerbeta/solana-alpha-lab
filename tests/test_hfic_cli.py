@@ -3,12 +3,16 @@ from __future__ import annotations
 import io
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
-from contextlib import redirect_stderr
+from contextlib import redirect_stderr, redirect_stdout
+from datetime import timedelta
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -16,6 +20,11 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 CLI = ROOT / "scripts" / "hypothesis_forge.py"
+SCRIPTS = ROOT / "scripts"
+if str(SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS))
+
+from hypothesis_forge import _preflight_owner_readout  # noqa: E402
 
 
 def critic_result_from_packet_only(
@@ -60,6 +69,86 @@ def critic_result_from_packet_only(
     }
 
 
+def populate_real_c1_c2(data_root: Path, workspace: Path) -> None:
+    """Build the disposable C1/C2 corpus through the production import path."""
+
+    from solana_alpha_lab.factory.live_cohort_discovery_release import (
+        cohort_id_for_admission,
+        import_live_cohort,
+        seal_live_cohort,
+        write_observation_rdp_source,
+    )
+    from tests.test_live_cohort_discovery_release_series import (
+        CAMPAIGN_STARTS,
+        CAMPAIGN_STOPS,
+        _snapshot_for_week,
+    )
+
+    data_root.mkdir(parents=True, exist_ok=True)
+    for week in range(2):
+        admission = CAMPAIGN_STARTS + timedelta(days=7 * week)
+        as_of = admission + timedelta(days=10)
+        cohort_id = cohort_id_for_admission(
+            admission,
+            starts_at=CAMPAIGN_STARTS,
+            stops_admitting_at=CAMPAIGN_STOPS,
+        )
+        assert cohort_id is not None
+        observation_root = workspace / f"observation-rdp-{week}"
+        release_root = workspace / f"release-{week}"
+        write_observation_rdp_source(observation_root, _snapshot_for_week(week))
+        seal_live_cohort(
+            observation_rdp_root=observation_root,
+            cohort_id=cohort_id,
+            release_root=release_root,
+            sealed_at=as_of,
+            as_of=as_of,
+        )
+        imported = import_live_cohort(
+            release_root=release_root,
+            data_root=data_root,
+            import_time=as_of + timedelta(hours=1),
+        )
+        assert imported["status"] == "IMPORTED"
+
+
+_C1_C2_TEMPLATE: Path | None = None
+
+
+def c1_c2_template_data_root() -> Path:
+    """Build one process-local C1/C2 corpus through the production seal+import path."""
+
+    global _C1_C2_TEMPLATE
+    if _C1_C2_TEMPLATE is not None and (_C1_C2_TEMPLATE / "datasets" / "manifests").is_dir():
+        return _C1_C2_TEMPLATE
+    import tempfile
+
+    holder = Path(tempfile.mkdtemp(prefix="a5-c1c2-template-"))
+    data_root = holder / "data"
+    populate_real_c1_c2(data_root, holder / "workspace")
+    _C1_C2_TEMPLATE = data_root
+    return data_root
+
+
+def seed_minimal_market_basis(data_root: Path) -> None:
+    """Copy the process-local production C1/C2 template into an isolated data root.
+
+    Empty roots are not given a basis. Callers that must keep
+    MARKET_EVIDENCE_BASIS_INCOMPLETE do not call this helper.
+    """
+
+    source = c1_c2_template_data_root()
+    data_root.mkdir(parents=True, exist_ok=True)
+    if (data_root / "datasets" / "manifests").is_dir():
+        return
+    for child in source.iterdir():
+        target = data_root / child.name
+        if child.is_dir():
+            shutil.copytree(child, target, symlinks=False)
+        else:
+            shutil.copy2(child, target)
+
+
 def bind_draft(draft: dict, receipt: dict) -> dict:
     bound = dict(draft)
     bound["preflight_receipt_id"] = receipt["receipt_id"]
@@ -81,6 +170,8 @@ def run_cli(*args: str, data_root: Path, env: dict[str, str] | None = None) -> s
     if env:
         merged.update(env)
     merged["SMIAL_DATA_ROOT"] = str(data_root)
+    merged["PYTHONUTF8"] = "1"
+    merged["PYTHONIOENCODING"] = "utf-8"
     return subprocess.run(
         [
             sys.executable,
@@ -96,6 +187,8 @@ def run_cli(*args: str, data_root: Path, env: dict[str, str] | None = None) -> s
         env=merged,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         check=False,
     )
 
@@ -106,6 +199,7 @@ class HficCliContractTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 0, completed.stderr)
         for command in (
             "preflight",
+            "persist-draft",
             "freeze",
             "finalize",
             "show-session",
@@ -137,6 +231,32 @@ class HficCliContractTests(unittest.TestCase):
             )
         self.assertNotEqual(completed.returncode, 0, completed.stdout)
         self.assertIn("SCIENCE_REBASE_CONFIRM_REQUIRED", completed.stderr)
+
+    def test_blocked_forge_run_emits_schema_shaped_receipt(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            completed = run_cli(
+                "forge-run",
+                "--format",
+                "json",
+                "--no-write",
+                data_root=Path(tmp),
+            )
+        self.assertEqual(completed.returncode, 2, completed.stdout)
+        payload = json.loads(completed.stdout)
+        for key in (
+            "run_id",
+            "run_identity_sha256",
+            "input_receipt_sha256",
+            "visible_cohort_ids",
+            "frozen_representation_ids",
+            "stages",
+            "legacy_epoch_sha256",
+            "receipt_sha256",
+        ):
+            self.assertIn(key, payload)
+        self.assertEqual(payload["schema"], "smial.forge-run-receipt")
+        self.assertEqual(payload["owner_focus"], "AUTO")
+        self.assertEqual(payload["stages"], [])
 
     def test_apply_provenance_correction_requires_confirm_flag(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -192,7 +312,146 @@ class HficCliContractTests(unittest.TestCase):
                     "STOP",
                 })
 
-    def test_preflight_accepts_multiline_owner_focus(self) -> None:
+    def test_preflight_block_has_owner_recovery_readout(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            completed = run_cli(
+                "preflight",
+                "--owner-focus",
+                "AUTO",
+                "--format",
+                "json",
+                "--no-auto-commission",
+                data_root=Path(tmp),
+            )
+        self.assertNotEqual(completed.returncode, 0, completed.stdout)
+        payload = json.loads(completed.stdout)
+        self.assertEqual(payload["owner_class"], "INPUT_NOT_READY")
+        self.assertIn("owner_readout", payload)
+        self.assertIn("RESOLVE_TYPED_PREFLIGHT_BLOCK", payload["owner_readout"])
+        self.assertIn("не научный", payload["owner_readout"])
+
+    def test_typed_preflight_owner_readout_preserves_slot_and_budget(self) -> None:
+        cases = {
+            "SEARCH_BUDGET_EXHAUSTED": "BUDGET_EXHAUSTED",
+            "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING": "RESTORE_SLOT_READBACK",
+            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING": (
+                "RESOLVE_EXECUTION_BINDING"
+            ),
+            "SCIENTIFIC_IDENTITY_CONFLICT": "RESOLVE_IDENTITY_CONFLICT",
+        }
+        for terminal, expected_next in cases.items():
+            with self.subTest(terminal=terminal):
+                readout = _preflight_owner_readout(
+                    {
+                        "terminal": terminal,
+                        "owner_class": "OBSERVABILITY_BLOCKED",
+                        "writes": {
+                            "research_store": 0,
+                            "forge_context": 0,
+                            "session": 0,
+                        },
+                    }
+                )
+                self.assertIn(expected_next, readout)
+                self.assertIn("не создавайте trial", readout)
+                self.assertIn("writes: research_store=0", readout)
+                if terminal == "SEARCH_BUDGET_EXHAUSTED":
+                    self.assertIn("не сбрасывайте budget", readout)
+
+    def test_selection_gate_integrity_stop_routes_outside_a5_without_trial(self) -> None:
+        cases = [
+            ("SELECTION_GATE_RECEIPT_UNUSABLE", {}),
+            ("SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH", {}),
+            (
+                "BLOCK_FORGE_EVIDENCE_GAP",
+                {
+                    "selection_gate": {
+                        "integrity_invalid": True,
+                        "router_decision": "BLOCK_FORGE_EVIDENCE_GAP",
+                    }
+                },
+            ),
+        ]
+        for terminal, extra in cases:
+            with self.subTest(terminal=terminal, extra=extra):
+                readout = _preflight_owner_readout(
+                    {
+                        "terminal": terminal,
+                        "owner_class": "OBSERVABILITY_BLOCKED",
+                        **extra,
+                        "writes": {
+                            "research_store": 0,
+                            "forge_context": 0,
+                            "session": 0,
+                        },
+                    }
+                )
+                self.assertIn("RESTORE_SELECTION_GATE", readout)
+                self.assertIn(
+                    "docs/reports/hfic_selection_robustness_gate/a1_owner_readout_v1.md",
+                    readout,
+                )
+                self.assertIn("не запускайте diagnostic в рамках A5", readout)
+                self.assertIn("не создавайте trial", readout)
+                self.assertIn("не сбрасывайте budget", readout)
+
+    def test_forge_run_passes_model_context_into_freeze_preflight(self) -> None:
+        from hypothesis_forge import cmd_forge_run
+        from solana_alpha_lab.factory.hfic_representation_ladder import (
+            ACTION_START_V1,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        model_sha = "ab" * 32
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            ResearchStore(data_root)
+            resolved = SimpleNamespace(
+                status="PRESENT",
+                root=data_root,
+                error=None,
+                selection_reason="explicit-test-root",
+            )
+            payload = {
+                "owner_class": "IN_PROGRESS",
+                "next_action": ACTION_START_V1,
+                "owner_final": None,
+                "stages": [],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "owner_readout": "test readout",
+            }
+            with (
+                patch(
+                    "hypothesis_forge.resolve_existing_data_root",
+                    return_value=resolved,
+                ),
+                patch(
+                    "solana_alpha_lab.factory.hfic_representation_ladder.evaluate_forge_run",
+                    return_value=payload,
+                ) as evaluate,
+                patch(
+                    "solana_alpha_lab.factory.hfic_representation_ladder.attach_ladder_freeze_preflight",
+                    side_effect=lambda value, **_kwargs: value,
+                ) as attach,
+                redirect_stdout(io.StringIO()),
+                redirect_stderr(io.StringIO()),
+            ):
+                result = cmd_forge_run(
+                    ROOT,
+                    explicit_data_root=data_root,
+                    model_provenance_sha256=model_sha,
+                )
+
+        self.assertEqual(result, 0)
+        expected_context = {"model_provenance_sha256": model_sha}
+        self.assertEqual(
+            evaluate.call_args.kwargs["execution_context"], expected_context
+        )
+        self.assertEqual(
+            attach.call_args.kwargs["execution_context"], expected_context
+        )
+
+    def test_preflight_accepts_multiline_owner_focus_without_legacy_admission(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             completed = run_cli(
@@ -203,9 +462,13 @@ class HficCliContractTests(unittest.TestCase):
                 "json",
                 data_root=data_root,
             )
-            self.assertEqual(completed.returncode, 0, completed.stderr)
+            self.assertEqual(completed.returncode, 2, completed.stderr)
             payload = json.loads(completed.stdout)
-            self.assertEqual(payload["action"], "START_NEW_SESSION")
+            self.assertEqual(payload["action"], "STOP")
+            self.assertEqual(
+                payload["terminal"], "MARKET_EVIDENCE_BASIS_INCOMPLETE"
+            )
+            self.assertIn("Use existing declarative primitives only.", payload["owner_focus"])
             self.assertNotIn(str(data_root), completed.stdout)
             self.assertNotIn(str(ROOT), completed.stdout)
 
@@ -454,8 +717,9 @@ class HficTempRootE2ETests(unittest.TestCase):
         git_before = repository_git_snapshot(ROOT)
         happy = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
         with tempfile.TemporaryDirectory() as tmp:
-            data_root = Path(tmp) / "rdp"
-            data_root.mkdir()
+            workspace = Path(tmp)
+            data_root = workspace / "rdp"
+            populate_real_c1_c2(data_root, workspace)
             snapshot_root = Path(tmp) / "snapshot"
             restore_root = Path(tmp) / "restored"
             preflight = run_cli(
@@ -636,7 +900,11 @@ class HficTempRootE2ETests(unittest.TestCase):
                 "json",
                 data_root=data_root,
             )
-            self.assertEqual(resume_runner.returncode, 0, resume_runner.stderr)
+            self.assertEqual(
+                resume_runner.returncode,
+                0,
+                resume_runner.stderr + resume_runner.stdout,
+            )
             resume_runner_payload = json.loads(resume_runner.stdout)
             self.assertEqual(resume_runner_payload["action"], "RESUME_CRITIC")
             c2 = critic_result_from_packet_only(
@@ -750,8 +1018,9 @@ class HficTempRootE2ETests(unittest.TestCase):
         git_before = repository_git_snapshot(ROOT)
         happy = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
         with tempfile.TemporaryDirectory() as tmp:
-            data_root = Path(tmp) / "rdp"
-            data_root.mkdir()
+            workspace = Path(tmp)
+            data_root = workspace / "rdp"
+            populate_real_c1_c2(data_root, workspace)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",

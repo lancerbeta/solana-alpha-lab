@@ -44,7 +44,7 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
 from solana_alpha_lab.factory.live_cohort_discovery_release import (  # noqa: E402
     CORPUS_DATASET_ID,
 )
-from tests.test_hfic_cli import run_cli  # noqa: E402
+from tests.test_hfic_cli import run_cli, seed_minimal_market_basis  # noqa: E402
 from tests.test_hfic_session import _preflight_receipt  # noqa: E402
 
 DRAFT_V12 = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
@@ -406,6 +406,7 @@ class ControlModeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             commissioned = run_cli(
                 "preflight",
                 "--owner-focus",
@@ -420,8 +421,8 @@ class ControlModeTests(unittest.TestCase):
 
             snap = repository_git_snapshot(ROOT)
             with mock.patch(
-                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                return_value=([_corpus(9)], []),
+                "solana_alpha_lab.factory.hfic_control_integrity.resolve_control_corpus_yield",
+                return_value=(CONTROL_YIELD_BELOW_MIN, 9),
             ):
                 receipt = run_preflight(
                     ROOT,
@@ -457,6 +458,7 @@ class ControlModeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             commissioned = run_cli(
                 "preflight",
                 "--owner-focus",
@@ -472,8 +474,8 @@ class ControlModeTests(unittest.TestCase):
 
             snap = repository_git_snapshot(ROOT)
             with mock.patch(
-                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                return_value=([_corpus(10)], []),
+                "solana_alpha_lab.factory.hfic_control_integrity.resolve_control_corpus_yield",
+                return_value=("OK", 10),
             ):
                 receipt = run_preflight(
                     ROOT,
@@ -506,6 +508,7 @@ class ControlModeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             completed = run_cli(
                 "preflight",
                 "--owner-focus",
@@ -540,7 +543,7 @@ class ControlModeTests(unittest.TestCase):
             )
             payload = json.loads(completed.stdout)
             self.assertEqual(payload["action"], "STOP")
-            self.assertEqual(payload["terminal"], CONTROL_CORPUS_UNRESOLVABLE)
+            self.assertEqual(payload["terminal"], "MARKET_EVIDENCE_BASIS_INCOMPLETE")
 
 
 class RegressionFenceTests(unittest.TestCase):

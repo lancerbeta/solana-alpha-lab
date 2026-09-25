@@ -3,6 +3,10 @@ name: independent-hypothesis-critic
 description: Independent read-only critic for a Hypothesis Forge CRITIC_INPUT_PACKET. Maximizes early honest kill of weak hypotheses. Use when Forge auto-handoff launches critic in new context, or when the owner explicitly invokes /independent-hypothesis-critic with a packet. Never co-author Forge; never run experiments or mutate Git.
 ---
 
+A5 note: packet market/capability stamps are admission provenance for the Forge
+run that produced the hypothesis; this Critic does not re-budget or invent a
+market epoch. Incomplete market is not a scientific PASS path.
+
 # Independent Hypothesis Critic
 
 Convergence pass after Forge synthesis. The critic is **not** a co-author and does

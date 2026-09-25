@@ -424,7 +424,8 @@ class LegacyCommissioningCompatibilityTests(unittest.TestCase):
                 clock=_CLOCK,
             )
             self.assertEqual(commission_calls["count"], 0)
-            self.assertEqual(receipt["action"], "START_NEW_SESSION")
+            self.assertEqual(receipt["action"], "STOP")
+            self.assertEqual(receipt["terminal"], "MARKET_EVIDENCE_BASIS_INCOMPLETE")
             self.assertEqual(
                 receipt["commissioning"]["status"],
                 "NO_GIT_FAST_LANE_PROVEN",
@@ -476,6 +477,8 @@ class LegacyCommissioningCompatibilityTests(unittest.TestCase):
                 second["commissioning"]["status"],
                 "NO_GIT_FAST_LANE_PROVEN",
             )
+            self.assertEqual(second["action"], "STOP")
+            self.assertEqual(second["terminal"], "MARKET_EVIDENCE_BASIS_INCOMPLETE")
             self.assertEqual(
                 len(_compat_records(ResearchStore(data_root))),
                 compat_after_first,
@@ -625,7 +628,8 @@ class LegacyCommissioningCompatibilityTests(unittest.TestCase):
                 git_snapshot=_git_snapshot(),
                 clock=_CLOCK,
             )
-            self.assertEqual(receipt["action"], "START_NEW_SESSION")
+            self.assertEqual(receipt["action"], "STOP")
+            self.assertEqual(receipt["terminal"], "MARKET_EVIDENCE_BASIS_INCOMPLETE")
             self.assertEqual(
                 receipt["commissioning"]["status"],
                 "NO_GIT_FAST_LANE_PROVEN",

@@ -71,6 +71,7 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     freeze_draft,
     list_hfic_sessions,
     lookup_prior,
+    persist_generated_draft,
     prove_runtime,
     show_session,
 )
@@ -215,6 +216,121 @@ def _active_root(repo_root: Path, explicit_data_root: Path | None):
     )
 
 
+def _owner_class_for_preflight_stop(body: Mapping[str, Any]) -> str:
+    terminal = str(body.get("terminal") or "")
+    router = str(body.get("router_decision") or "")
+    if terminal in {
+        "SEARCH_BUDGET_EXHAUSTED",
+        "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
+        "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+        "SCIENTIFIC_IDENTITY_CONFLICT",
+        "BLOCK_FORGE_EVIDENCE_GAP",
+        "SELECTION_GATE_RECEIPT_UNUSABLE",
+        "SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH",
+    } or router == "BLOCK_FORGE_EVIDENCE_GAP":
+        return "OBSERVABILITY_BLOCKED"
+    return "INPUT_NOT_READY"
+
+
+def _preflight_writes_note(body: Mapping[str, Any]) -> str:
+    writes = body.get("writes") if isinstance(body.get("writes"), Mapping) else {}
+    return (
+        "writes: research_store={research_store} forge_context={forge_context} "
+        "session={session}".format(
+            research_store=int(writes.get("research_store") or 0),
+            forge_context=int(writes.get("forge_context") or 0),
+            session=int(writes.get("session") or 0),
+        )
+    )
+
+
+def _preflight_owner_readout(body: Mapping[str, Any]) -> str:
+    terminal = str(body.get("terminal") or "PREFLIGHT_BLOCKED")
+    owner_class = str(body.get("owner_class") or "INPUT_NOT_READY")
+    selection_gate = (
+        body.get("selection_gate")
+        if isinstance(body.get("selection_gate"), Mapping)
+        else {}
+    )
+    selection_router = str(
+        body.get("router_decision") or selection_gate.get("router_decision") or ""
+    )
+    selection_caveat = bool(selection_gate.get("caveat"))
+    if selection_gate.get("integrity_invalid") or terminal in {
+        "SELECTION_GATE_RECEIPT_UNUSABLE",
+        "SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH",
+    }:
+        next_line = (
+            "next: RESTORE_SELECTION_GATE — STOP; не создавайте trial, "
+            "не сбрасывайте budget и не редактируйте receipt. Следуйте "
+            "owning procedure "
+            "docs/reports/hfic_selection_robustness_gate/a1_owner_readout_v1.md "
+            "только после отдельной авторизации; не запускайте diagnostic "
+            "в рамках A5. После восстановления повторите canonical preflight"
+        )
+    elif terminal == "SEARCH_BUDGET_EXHAUSTED":
+        next_line = (
+            "next: BUDGET_EXHAUSTED — не повторяйте тот же market/focus, "
+            "не сбрасывайте budget и не создавайте новый trial; дождитесь "
+            "нового market evidence или отдельного owner решения"
+        )
+    elif terminal == "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING":
+        next_line = (
+            "next: RESTORE_SLOT_READBACK — восстановите read-only session "
+            "readback; occupied slot не свободен, не создавайте новый trial "
+            "и не переписывайте receipt"
+        )
+    elif terminal == "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING":
+        next_line = (
+            "next: RESOLVE_EXECUTION_BINDING — восстановите authoritative "
+            "capability/model/payload readback; не перебинживайте старый "
+            "результат и не создавайте новый trial"
+        )
+    elif terminal == "SCIENTIFIC_IDENTITY_CONFLICT":
+        next_line = (
+            "next: RESOLVE_IDENTITY_CONFLICT — восстановите согласованный "
+            "market/representation/focus readback; не регенерируйте и не "
+            "сбрасывайте budget"
+        )
+    elif owner_class == "OBSERVABILITY_BLOCKED":
+        next_line = (
+            "next: STOP_TYPED_PREFLIGHT_BLOCK — не повторяйте вход, "
+            "не сбрасывайте budget и не создавайте новый trial"
+        )
+    elif selection_router == "BLOCK_FORGE_SELECTION_RISK" or selection_caveat:
+        next_line = (
+            "next: RESOLVE_SELECTION_GATE — normal entry остаётся "
+            "заблокированным до разрешения selection gate; не запускайте "
+            "Forge, не повторяйте trial и не трактуйте caveat как scientific "
+            "negative"
+        )
+    elif terminal == "MARKET_EVIDENCE_BASIS_INCOMPLETE":
+        next_line = (
+            "next: RESTORE_CURRENT_EVIDENCE — восстановите decision-bearing "
+            "datasets/lineage и повторите normal entry"
+        )
+    else:
+        next_line = (
+            "next: RESOLVE_TYPED_PREFLIGHT_BLOCK — восстановите указанный "
+            "input/readback и повторите normal entry"
+        )
+    selection_line = (
+        f"selection_router: {selection_router}\n"
+        f"selection_caveat: {str(selection_caveat).lower()}\n"
+        if selection_router or selection_caveat
+        else ""
+    )
+    return (
+        "PREFLIGHT\n"
+        "status: BLOCKED — preflight не разрешил scientific admission; "
+        "это не научный negative\n"
+        f"reason: {terminal}\n"
+        + selection_line
+        + f"{next_line}; не создавайте trial вручную\n"
+        + _preflight_writes_note(body)
+    )
+
+
 def cmd_preflight(
     repo_root: Path,
     *,
@@ -222,8 +338,15 @@ def cmd_preflight(
     auto_commission: bool,
     explicit_data_root: Path | None,
     control_current_representation: bool = False,
+    model_provenance_sha256: str | None = None,
 ) -> int:
-    _assert_no_path_leak({"owner_focus": owner_focus}, str(repo_root))
+    _assert_no_path_leak(
+        {
+            "owner_focus": owner_focus,
+            "model_provenance_sha256": model_provenance_sha256,
+        },
+        str(repo_root),
+    )
     try:
         active = _active_root(repo_root, explicit_data_root)
         data_root = active.root
@@ -231,8 +354,19 @@ def cmd_preflight(
         payload = {
             "action": "STOP",
             "terminal": str(exc),
+            "owner_class": "INPUT_NOT_READY",
             "owner_focus": owner_focus,
             "data_root_instance_fingerprint": None,
+            "owner_readout": (
+                "PREFLIGHT\n"
+                "status: BLOCKED — canonical current corpus/data root unavailable; "
+                "scientific admission did not start\n"
+                f"reason: {exc}\n"
+                "next: RESTORE_CURRENT_DATA_ROOT — restore the canonical current "
+                "corpus/data root, then retry normal /hypothesis-forge; do not "
+                "create a trial manually\n"
+                "writes: research_store=0 forge_context=0 session=0"
+            ),
         }
         _assert_no_path_leak(payload, str(repo_root))
         return emit(payload, exit_code=2)
@@ -257,20 +391,45 @@ def cmd_preflight(
                 if control_current_representation
                 else None
             ),
+            model_provenance_sha256=model_provenance_sha256,
+            persist=auto_commission,
         )
     except HficPreflightError as exc:
         payload = {
             "action": "STOP",
             "terminal": str(exc),
+            "owner_class": _owner_class_for_preflight_stop({"terminal": str(exc)}),
             "owner_focus": owner_focus,
             **active.redacted_receipt(),
+            "next": "RESOLVE_TYPED_PREFLIGHT_BLOCK",
+            "writes": {
+                "research_store": int(auto_commission),
+                "forge_context": 0,
+                "session": 0,
+            },
         }
+        payload["owner_readout"] = _preflight_owner_readout(payload)
         _assert_no_path_leak(payload, str(data_root), str(repo_root))
         return emit(payload, exit_code=2)
     payload = {
         **active.redacted_receipt(),
         **receipt,
     }
+    if payload.get("action") == "STOP":
+        payload["owner_class"] = _owner_class_for_preflight_stop(payload)
+        payload["owner_readout"] = _preflight_owner_readout(payload)
+    elif isinstance(payload.get("selection_gate"), Mapping) and payload["selection_gate"].get("caveat"):
+        router = str(payload["selection_gate"].get("router_decision") or "UNKNOWN")
+        payload["owner_readout"] = (
+            "PREFLIGHT\n"
+            "status: READY — normal admission may continue with a scoped "
+            "selection caveat; this is not a selection-robustness claim\n"
+            f"selection_router: {router}\n"
+            "next: CONTINUE_WITH_SCOPED_SELECTION_CAVEAT — run the canonical "
+            "forge-run no-write/readback path; do not launch a new diagnostic "
+            "or treat the caveat as a scientific terminal\n"
+            + _preflight_writes_note(payload)
+        )
     payload["preflight_receipt_sha256"] = canonical_preflight_receipt_sha256(payload)
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     exit_code = 0 if receipt["action"] != "STOP" else 2
@@ -348,15 +507,17 @@ def cmd_forge_run(
     owner_focus: str = "AUTO",
     persist: bool = False,
     saved_draft_sha256: str | None = None,
+    model_provenance_sha256: str | None = None,
 ) -> int:
     """Bounded Forge run receipt. persist=False never writes."""
     from solana_alpha_lab.factory.hfic_representation_ladder import (
+        LadderError,
         evaluate_forge_run,
         format_forge_run_owner_readout,
     )
 
     def _emit_run(payload: dict[str, Any], *, exit_code: int) -> int:
-        if not payload.get("owner_readout"):
+        if payload.get("no_write") is True or not payload.get("owner_readout"):
             payload["owner_readout"] = format_forge_run_owner_readout(payload)
         _assert_no_path_leak(payload, str(repo_root))
         readout = payload.get("owner_readout")
@@ -364,39 +525,88 @@ def cmd_forge_run(
             print(readout, file=sys.stderr)
         return emit(payload, exit_code=exit_code)
 
+    from solana_alpha_lab.factory.run_passport import canonical_sha256
+
+    def _blocked_run_payload(code: str, owner_class: str) -> dict[str, Any]:
+        run_identity = canonical_sha256(
+            {"kind": "FORGE_RUN_BLOCKED", "owner_class": owner_class, "code": code}
+        )
+        body: dict[str, Any] = {
+            "schema": "smial.forge-run-receipt",
+            "schema_version": "1.0",
+            "run_id": f"HFIC-RUN-BLOCKED-{run_identity[:16].upper()}",
+            "run_identity_sha256": run_identity,
+            "owner_focus": owner_focus if owner_focus.strip() else "AUTO",
+            "owner_class": owner_class,
+            "next_action": owner_class,
+            "owner_final": owner_class,
+            "input_receipt_sha256": None,
+            "visible_cohort_ids": [],
+            "frozen_representation_ids": ["BASE"],
+            "stages": [],
+            "legacy_epoch_sha256": None,
+            "blocking_reason_codes": [code],
+            "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+        }
+        body["receipt_sha256"] = canonical_sha256(body)
+        return body
+
+    def _ladder_error_payload(code: str) -> dict[str, Any]:
+        input_codes = {
+            "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+            "CURRENT_CORPUS_MISSING",
+            "CAPABILITY_PROTOCOL_SURFACE_INCOMPLETE",
+            "CAPABILITY_SEMANTIC_SURFACE_INCOMPLETE",
+            "CAPABILITY_IDENTITY_UNAVAILABLE",
+        }
+        owner_class = "INPUT_NOT_READY" if code in input_codes else "OBSERVABILITY_BLOCKED"
+        return _blocked_run_payload(code, owner_class)
+
+    execution_context = (
+        {"model_provenance_sha256": model_provenance_sha256}
+        if model_provenance_sha256
+        else None
+    )
+
     try:
         resolved = resolve_existing_data_root(
             repo_root, explicit_data_root=explicit_data_root
         )
     except DataRootError as exc:
-        payload = {
-            "schema": "smial.forge-run-receipt",
-            "schema_version": "1.0",
-            "owner_class": "INPUT_NOT_READY",
-            "next_action": "INPUT_NOT_READY",
-            "owner_final": "INPUT_NOT_READY",
-            "blocking_reason_codes": [str(exc)],
-            "writes": {"research_store": 0, "forge_run": 0, "session": 0},
-        }
+        reason = str(exc)
+        payload = _blocked_run_payload(reason, "INPUT_NOT_READY")
+        payload["owner_readout"] = (
+            "FORGE RUN\n"
+            "status: BLOCKED — current corpus/data root unavailable; no scientific admission\n"
+            f"blocking: {reason}\n"
+            "NEXT — restore the canonical current corpus/data root, then retry /hypothesis-forge\n"
+            "writes: store=0 forge_run=0 session=0"
+        )
         return _emit_run(payload, exit_code=2)
     if resolved.status != "PRESENT" or resolved.root is None:
-        payload = {
-            "schema": "smial.forge-run-receipt",
-            "schema_version": "1.0",
-            "owner_class": "INPUT_NOT_READY",
-            "next_action": "INPUT_NOT_READY",
-            "owner_final": "INPUT_NOT_READY",
-            "blocking_reason_codes": [resolved.error or "CURRENT_CORPUS_MISSING"],
-            "writes": {"research_store": 0, "forge_run": 0, "session": 0},
-        }
+        reason = resolved.error or "CURRENT_CORPUS_MISSING"
+        payload = _blocked_run_payload(reason, "INPUT_NOT_READY")
+        payload["owner_readout"] = (
+            "FORGE RUN\n"
+            "status: BLOCKED — current corpus/data root unavailable; no scientific admission\n"
+            f"blocking: {reason}\n"
+            "NEXT — restore/import the canonical current corpus, then retry /hypothesis-forge\n"
+            "writes: store=0 forge_run=0 session=0"
+        )
         return _emit_run(payload, exit_code=2)
-    receipt = evaluate_forge_run(
-        repo_root,
-        resolved.root,
-        owner_focus=owner_focus if owner_focus.strip() else "AUTO",
-        persist=False,
-        saved_draft_sha256=saved_draft_sha256,
-    )
+    try:
+        receipt = evaluate_forge_run(
+            repo_root,
+            resolved.root,
+            owner_focus=owner_focus if owner_focus.strip() else "AUTO",
+            persist=False,
+            saved_draft_sha256=saved_draft_sha256,
+            execution_context=execution_context,
+        )
+    except LadderError as exc:
+        payload = _ladder_error_payload(str(exc))
+        payload["owner_readout"] = format_forge_run_owner_readout(payload)
+        return _emit_run(payload, exit_code=2)
     payload = {**receipt, "no_write": not persist, "selection_reason": resolved.selection_reason}
     from solana_alpha_lab.factory.hfic_representation_ladder import (
         attach_ladder_freeze_preflight,
@@ -405,22 +615,34 @@ def cmd_forge_run(
 
     store = ResearchStore(resolved.root, create_if_missing=False)
     payload = attach_ladder_freeze_preflight(
-        payload, data_root=resolved.root, store=store
+        payload,
+        data_root=resolved.root,
+        store=store,
+        execution_context=execution_context,
     )
     if persist and payload.get("owner_class") not in {
         "INPUT_NOT_READY",
         "OBSERVABILITY_BLOCKED",
     }:
-        receipt = evaluate_forge_run(
-            repo_root,
-            resolved.root,
-            owner_focus=owner_focus if owner_focus.strip() else "AUTO",
-            persist=True,
-            saved_draft_sha256=saved_draft_sha256,
-        )
+        try:
+            receipt = evaluate_forge_run(
+                repo_root,
+                resolved.root,
+                owner_focus=owner_focus if owner_focus.strip() else "AUTO",
+                persist=True,
+                saved_draft_sha256=saved_draft_sha256,
+                execution_context=execution_context,
+            )
+        except LadderError as exc:
+            payload = _ladder_error_payload(str(exc))
+            payload["owner_readout"] = format_forge_run_owner_readout(payload)
+            return _emit_run(payload, exit_code=2)
         payload = {**receipt, "no_write": False, "selection_reason": resolved.selection_reason}
         payload = attach_ladder_freeze_preflight(
-            payload, data_root=resolved.root, store=store
+            payload,
+            data_root=resolved.root,
+            store=store,
+            execution_context=execution_context,
         )
     _assert_no_path_leak(payload, str(resolved.root), str(repo_root))
     return _emit_run(payload, exit_code=(
@@ -853,6 +1075,10 @@ def cmd_freeze(
         store=store,
         repo_root=repo_root,
         next_action_draft=next_action_draft,
+        # A production freeze must re-read the current A3 market surface
+        # before writing lifecycle bytes.  Fixture/unit callers retain the
+        # explicit default and do not gain a synthetic market authority.
+        verify_current_market_identity=True,
     )
     git_after = repository_git_snapshot(repo_root)
     if not git_before.unchanged(git_after):
@@ -864,6 +1090,53 @@ def cmd_freeze(
     }
     _assert_no_path_leak(frozen, str(data_root), str(repo_root))
     return emit(frozen)
+
+
+def cmd_persist_draft(
+    repo_root: Path,
+    draft_path: Path,
+    preflight_path: Path,
+    explicit_data_root: Path | None,
+    *,
+    representation_id: str,
+    model_provenance_sha256: str | None,
+) -> int:
+    git_before = repository_git_snapshot(repo_root)
+    draft = _load_json_file(draft_path)
+    receipt = _load_json_file(preflight_path)
+    _assert_no_path_leak(draft, str(repo_root))
+    _assert_no_path_leak(receipt, str(repo_root))
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    before_digest = store.diagnostics().committed_inventory_sha256
+    generated = persist_generated_draft(
+        store,
+        draft,
+        preflight_receipt=receipt,
+        repo_root=repo_root,
+        representation_id=representation_id,
+        model_provenance_sha256=model_provenance_sha256,
+    )
+    git_after = repository_git_snapshot(repo_root)
+    if not git_before.unchanged(git_after):
+        raise HficCliError("GIT_MUTATION_DETECTED")
+    after_digest = ResearchStore(data_root, create_if_missing=False).diagnostics().committed_inventory_sha256
+    payload = {
+        **generated,
+        "writes": {
+            "research_store": int(after_digest != before_digest),
+            "forge_context": 0,
+            "session": 0,
+        },
+        "authority": {
+            "git_mutation": 0,
+            "experiment_execution": 0,
+            "provider_api_rpc_wss_calls": 0,
+        },
+        "model_provenance_semantics": "CALLER_SUPPLIED_DIGEST_NOT_MODEL_ATTESTATION",
+    }
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
 
 
 def cmd_prospects(
@@ -1295,6 +1568,14 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="CURRENT_REPRESENTATION_CONTROL_V1 evidence-surface mode",
     )
+    preflight.add_argument(
+        "--model-provenance-sha256",
+        default=None,
+        help=(
+            "Caller-supplied model/reasoning provenance digest; retained for "
+            "reuse checks, not an attestation of the model actually used"
+        ),
+    )
 
     forge_input = subparsers.add_parser(
         "forge-input",
@@ -1331,6 +1612,28 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Resume the exact saved draft; do not regenerate",
     )
+    forge_run.add_argument(
+        "--model-provenance-sha256",
+        default=None,
+        help=(
+            "Optional caller-supplied model/reasoning provenance for admission "
+            "readback; mismatch blocks reuse and never resets market budget"
+        ),
+    )
+
+    persist_draft = subparsers.add_parser(
+        "persist-draft",
+        help="Durably bind generated draft bytes to their source preflight before freeze",
+    )
+    persist_draft.add_argument("--draft", type=Path, required=True)
+    persist_draft.add_argument("--preflight-receipt", type=Path, required=True)
+    persist_draft.add_argument("--representation-id", default="BASE")
+    persist_draft.add_argument(
+        "--model-provenance-sha256",
+        default=None,
+        help="Caller-supplied digest, not model attestation",
+    )
+    persist_draft.add_argument("--format", choices=("json",), default="json")
 
     freeze = subparsers.add_parser("freeze")
     freeze.add_argument("--draft", type=Path, required=True)
@@ -1534,6 +1837,9 @@ def main(argv: list[str] | None = None) -> int:
                 control_current_representation=bool(
                     getattr(args, "control_current_representation", False)
                 ),
+                model_provenance_sha256=getattr(
+                    args, "model_provenance_sha256", None
+                ),
             )
         if args.command == "forge-input":
             return cmd_forge_input(
@@ -1548,6 +1854,20 @@ def main(argv: list[str] | None = None) -> int:
                 owner_focus=str(getattr(args, "owner_focus", "AUTO") or "AUTO"),
                 persist=bool(getattr(args, "persist", False)),
                 saved_draft_sha256=getattr(args, "saved_draft_sha256", None),
+                model_provenance_sha256=getattr(
+                    args, "model_provenance_sha256", None
+                ),
+            )
+        if args.command == "persist-draft":
+            return cmd_persist_draft(
+                repo_root,
+                args.draft,
+                args.preflight_receipt,
+                args.data_root,
+                representation_id=str(args.representation_id),
+                model_provenance_sha256=getattr(
+                    args, "model_provenance_sha256", None
+                ),
             )
         if args.command == "freeze":
             return cmd_freeze(

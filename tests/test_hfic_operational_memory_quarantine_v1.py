@@ -109,6 +109,8 @@ def _session_records(
         "prompt_version": "HFIC-V1.1",
         "owner_focus": "AUTO",
         "evidence_epoch_sha256": "aa" * 32,
+        # A5: DuckDB budget path requires an explicit market stamp.
+        "market_evidence_epoch_sha256": "aa" * 32,
         "focus_key_sha256": "bb" * 32,
         "search_key_sha256": session_id.replace("HFIC-SESS-", "").lower() + "0" * 32,
         "memory_eligibility_sha256": memory_eligibility_sha256,
@@ -581,7 +583,7 @@ class HficOperationalMemoryQuarantineTests(unittest.TestCase):
             try:
                 row = connection.execute(
                     """
-                    SELECT memory_eligibility_sha256
+                    SELECT memory_eligibility_sha256, market_evidence_epoch_sha256
                     FROM hfic_sessions
                     WHERE session_id = ?
                     """,
@@ -590,9 +592,13 @@ class HficOperationalMemoryQuarantineTests(unittest.TestCase):
             finally:
                 connection.close()
             self.assertEqual(row[0], eligibility)
+            self.assertEqual(row[1], "aa" * 32)
             listed = _query_hfic_sessions(root)
             by_id = {str(item["session_id"]): item for item in listed}
             self.assertEqual(by_id[extra]["memory_eligibility_sha256"], eligibility)
+            self.assertEqual(
+                by_id[extra]["market_evidence_epoch_sha256"], "aa" * 32
+            )
             action, sid = decide_preflight_action(
                 listed,
                 search_key=search_key_sha256(
