@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "CI-WALL-CLOCK-REGRESSION-REPAIR-FACTORY-FIT-001",
+  "as_of": "2026-09-25",
+  "task_id": "CI_WALL_CLOCK_REGRESSION_REPAIR_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_REPAIR_CI_WALL_CLOCK_NOT_PRODUCT_REDESIGN",
+    "flexibility_and_history": "PASS_IDENTITY_NEUTRAL_ROLLBACK_IS_REVERT",
+    "context_efficiency": "PASS_ONE_FILE_PARSE_CACHE_NO_NEW_SURFACE",
+    "research_truth": "PASS_I1_DIGESTS_EQUAL_BASE_I2_UNTOUCHED",
+    "owner_operability": "PASS_SHARD_MODULE_TELEMETRY_AND_BUDGETS",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_EXPERIMENT_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_SOFT_BUDGET_WARNING_NAMES_SLOW_MODULES",
+    "build_vs_buy": "PASS_USE_EXISTING_PYYAML_CSAFELOADER",
+    "security": "PASS_NO_SECRETS_OR_ABSOLUTE_PATHS",
+    "red_team": "PASS_NO_DIGEST_CACHE_NO_SHARED_MUTATION"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "Ordinary Git revert of the merge commit. In-process cache only; no persisted identity or schema change.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_CI_OPTIMIZATION_CHAIN",
+    "NO_REMOTE_HOST_ACTION",
+    "NO_RUNNER_OR_SHARD_COUNT_CHANGE",
+    "EXACT_HEAD_CI_STILL_REQUIRED",
+    "PROPORTIONAL_WALL_CLOCK_REPAIR"
+  ]
+}
