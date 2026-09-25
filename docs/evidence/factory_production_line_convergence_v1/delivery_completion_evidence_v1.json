@@ -37,7 +37,7 @@
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
     "external_material_action": false,
-    "material_owner_decision": true,
+    "material_owner_decision": false,
     "unresolved_safety_or_truth_conflict": false,
     "user_only_activation": false
   },
