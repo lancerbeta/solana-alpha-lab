@@ -101,6 +101,7 @@ TRANSITIONS: dict[str, set[str]] = {
     "UNRESOLVED": {"RECONCILED"},
     "RECONCILED": set(),
 }
+CLOSING_STATES = frozenset({"CLOSED", "RECONCILED"})
 FORBIDDEN_SIGNAL_KINDS = frozenset({"REAL_FILL"})
 OPEN_RISK_STATES = frozenset(
     {"WATCHED", "SIGNALLED", "INTENT_CREATED", "ATTEMPTING", "OPEN", "PARTIAL", "UNKNOWN"}
@@ -537,22 +538,28 @@ class PaperPlaneStore:
     def transition(
         self, position_id: str, to_state: str, *, commit: bool = True
     ) -> dict[str, Any]:
-        row = self._conn.execute(
-            "SELECT * FROM positions WHERE position_id = ?", (position_id,)
-        ).fetchone()
-        if row is None:
-            raise PaperPlaneError("POSITION_NOT_FOUND")
-        current = str(row["state"])
-        if to_state not in TRANSITIONS.get(current, set()):
-            raise PaperPlaneError(f"ILLEGAL_TRANSITION:{current}->{to_state}")
-        closed_at = _now() if to_state in {"CLOSED", "RECONCILED"} else None
-        self._conn.execute(
-            "UPDATE positions SET state = ?, closed_at = COALESCE(?, closed_at) WHERE position_id = ?",
-            (to_state, closed_at, position_id),
-        )
-        if commit:
-            self._commit()
-        updated = self.get_position(position_id)
+        # `commit` is kept for call-site compatibility; every transition is atomic.
+        del commit
+        with self.immediate_write():
+            row = self._conn.execute(
+                "SELECT state FROM positions WHERE position_id = ?", (position_id,)
+            ).fetchone()
+            if row is None:
+                raise PaperPlaneError("POSITION_NOT_FOUND")
+            current = str(row["state"])
+            if to_state not in TRANSITIONS.get(current, set()):
+                raise PaperPlaneError(f"ILLEGAL_TRANSITION:{current}->{to_state}")
+            closed_at = _now() if to_state in CLOSING_STATES else None
+            cursor = self._conn.execute(
+                """
+                UPDATE positions SET state = ?, closed_at = COALESCE(?, closed_at)
+                WHERE position_id = ? AND state = ?
+                """,
+                (to_state, closed_at, position_id, current),
+            )
+            if cursor.rowcount != 1:
+                raise PaperPlaneError(f"STALE_STATE:{current}->{to_state}")
+            updated = self.get_position(position_id)
         assert updated is not None
         return updated
 
@@ -592,14 +599,15 @@ class PaperPlaneStore:
         return [dict(row) for row in rows]
 
     def set_entries_paused(self, bot_instance_id: str, *, paused: bool) -> None:
-        bot = self.get_bot(bot_instance_id)
-        if bot is None:
-            raise PaperPlaneError("BOT_NOT_FOUND")
-        self._conn.execute(
-            "UPDATE bot_instances SET entries_paused = ? WHERE bot_instance_id = ?",
-            (1 if paused else 0, bot_instance_id),
-        )
-        self._commit()
+        with self.immediate_write():
+            bot = self.get_bot(bot_instance_id)
+            if bot is None:
+                raise PaperPlaneError("BOT_NOT_FOUND")
+            self._conn.execute(
+                "UPDATE bot_instances SET entries_paused = ? WHERE bot_instance_id = ?",
+                (1 if paused else 0, bot_instance_id),
+            )
+            self._commit()
 
     def set_bot_status(
         self,
@@ -608,18 +616,19 @@ class PaperPlaneStore:
         *,
         stopped_at: str | None = None,
     ) -> None:
-        bot = self.get_bot(bot_instance_id)
-        if bot is None:
-            raise PaperPlaneError("BOT_NOT_FOUND")
-        self._conn.execute(
-            """
-            UPDATE bot_instances
-            SET status = ?, stopped_at = COALESCE(?, stopped_at)
-            WHERE bot_instance_id = ?
-            """,
-            (status, stopped_at, bot_instance_id),
-        )
-        self._commit()
+        with self.immediate_write():
+            bot = self.get_bot(bot_instance_id)
+            if bot is None:
+                raise PaperPlaneError("BOT_NOT_FOUND")
+            self._conn.execute(
+                """
+                UPDATE bot_instances
+                SET status = ?, stopped_at = COALESCE(?, stopped_at)
+                WHERE bot_instance_id = ?
+                """,
+                (status, stopped_at, bot_instance_id),
+            )
+            self._commit()
 
     def append_execution_event(
         self,
@@ -652,7 +661,7 @@ class PaperPlaneStore:
 
     def execution_events(self) -> list[dict[str, Any]]:
         rows = self._conn.execute(
-            "SELECT * FROM execution_events ORDER BY created_at, event_id"
+            "SELECT * FROM execution_events ORDER BY rowid"
         ).fetchall()
         out: list[dict[str, Any]] = []
         for row in rows:
@@ -890,71 +899,72 @@ class PaperPlaneStore:
         }
         if evidence_class not in allowed:
             raise PaperPlaneError("MARK_EVIDENCE_CLASS_INVALID")
-        mark_id = f"MARK-{uuid4().hex[:12].upper()}"
-        self._conn.execute(
-            """
-            INSERT INTO position_marks(
-                mark_id, position_id, mark_price_dec, as_of, evidence_class, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?)
-            """,
-            (mark_id, position_id, mark_price_dec, as_of, evidence_class, _now()),
-        )
-        unrealized = None
-        unrealized_net = None
-        position = self.get_position(position_id)
-        if (
-            position is not None
-            and mark_price_dec is not None
-            and evidence_class != "UNKNOWN"
-            and position.get("entry_price_dec")
-            and position.get("qty_dec")
-            and position.get("entered_notional_usd_dec") is not None
-        ):
-            qty = Decimal(str(position["qty_dec"]))
-            mark = Decimal(str(mark_price_dec))
-            entry_notional = Decimal(str(position["entered_notional_usd_dec"]))
-            entry_fee_raw = position.get("entry_fee_usd_dec")
-            fee_bps_raw = position.get("fee_bps")
-            if entry_fee_raw not in {None, ""} and fee_bps_raw is not None:
-                derived = modeled_unrealized_mark(
-                    mark_price=mark,
-                    qty=qty,
-                    entered_notional=entry_notional,
-                    entry_fee=Decimal(str(entry_fee_raw)),
-                    fee_bps=int(fee_bps_raw),
-                )
-                unrealized = format(derived["unrealized_gross"], "f")
-                unrealized_net = format(derived["unrealized_net"], "f")
-            else:
-                mark_value = (mark * qty).quantize(
-                    Decimal("0.01"), rounding=ROUND_HALF_UP
-                )
-                gross = (mark_value - entry_notional).quantize(
-                    Decimal("0.01"), rounding=ROUND_HALF_UP
-                )
-                unrealized = format(gross, "f")
-                unrealized_net = None
-        self._conn.execute(
-            """
-            UPDATE positions
-            SET mark_price_dec = ?,
-                mark_as_of = ?,
-                unrealized_gross_pnl_usd_dec = ?,
-                unrealized_net_pnl_usd_dec = ?,
-                unrealized_evidence_class = ?
-            WHERE position_id = ?
-            """,
-            (
-                mark_price_dec,
-                as_of,
-                unrealized,
-                unrealized_net,
-                evidence_class,
-                position_id,
-            ),
-        )
-        self._commit()
-        return mark_id
+        with self.immediate_write():
+            mark_id = f"MARK-{uuid4().hex[:12].upper()}"
+            self._conn.execute(
+                """
+                INSERT INTO position_marks(
+                    mark_id, position_id, mark_price_dec, as_of, evidence_class, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (mark_id, position_id, mark_price_dec, as_of, evidence_class, _now()),
+            )
+            unrealized = None
+            unrealized_net = None
+            position = self.get_position(position_id)
+            if (
+                position is not None
+                and mark_price_dec is not None
+                and evidence_class != "UNKNOWN"
+                and position.get("entry_price_dec")
+                and position.get("qty_dec")
+                and position.get("entered_notional_usd_dec") is not None
+            ):
+                qty = Decimal(str(position["qty_dec"]))
+                mark = Decimal(str(mark_price_dec))
+                entry_notional = Decimal(str(position["entered_notional_usd_dec"]))
+                entry_fee_raw = position.get("entry_fee_usd_dec")
+                fee_bps_raw = position.get("fee_bps")
+                if entry_fee_raw not in {None, ""} and fee_bps_raw is not None:
+                    derived = modeled_unrealized_mark(
+                        mark_price=mark,
+                        qty=qty,
+                        entered_notional=entry_notional,
+                        entry_fee=Decimal(str(entry_fee_raw)),
+                        fee_bps=int(fee_bps_raw),
+                    )
+                    unrealized = format(derived["unrealized_gross"], "f")
+                    unrealized_net = format(derived["unrealized_net"], "f")
+                else:
+                    mark_value = (mark * qty).quantize(
+                        Decimal("0.01"), rounding=ROUND_HALF_UP
+                    )
+                    gross = (mark_value - entry_notional).quantize(
+                        Decimal("0.01"), rounding=ROUND_HALF_UP
+                    )
+                    unrealized = format(gross, "f")
+                    unrealized_net = None
+            self._conn.execute(
+                """
+                UPDATE positions
+                SET mark_price_dec = ?,
+                    mark_as_of = ?,
+                    unrealized_gross_pnl_usd_dec = ?,
+                    unrealized_net_pnl_usd_dec = ?,
+                    unrealized_evidence_class = ?
+                WHERE position_id = ?
+                """,
+                (
+                    mark_price_dec,
+                    as_of,
+                    unrealized,
+                    unrealized_net,
+                    evidence_class,
+                    position_id,
+                ),
+            )
+            self._commit()
+            return mark_id
 
     def apply_paper_entry_fill(
         self,
@@ -967,77 +977,78 @@ class PaperPlaneStore:
     ) -> dict[str, Any]:
         if mode not in {"PAPER", "SHADOW"}:
             raise PaperPlaneError("BOT_MODE_INVALID")
-        position = self.get_position(position_id)
-        if position is None:
-            raise PaperPlaneError("POSITION_NOT_FOUND")
-        state = str(position["state"])
-        if state in {"CLOSED", "RECONCILED", "UNRESOLVED", "EXIT_REQUIRED", "EXITING"}:
-            raise PaperPlaneError(f"ENTRY_FILL_STATE_INVALID:{state}")
-        if state in {"WATCHED", "SIGNALLED", "INTENT_CREATED"}:
-            raise PaperPlaneError(f"ENTRY_FILL_STATE_INVALID:{state}")
-        if state == "ATTEMPTING":
-            self.transition(position_id, "OPEN")
+        with self.immediate_write():
             position = self.get_position(position_id)
-            assert position is not None
-        elif state not in {"OPEN", "PARTIAL", "UNKNOWN"}:
-            raise PaperPlaneError(f"ENTRY_FILL_STATE_INVALID:{state}")
-        price = Decimal(str(entry_unit_price_usd))
-        notional = Decimal(str(entry_gross_notional_usd))
-        if price <= 0 or notional <= 0:
-            raise PaperPlaneError("ENTRY_FILL_INVALID")
-        quantity = (notional / price).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_UP)
-        entry_fee = (notional * Decimal(fee_bps) / Decimal(10000)).quantize(
-            Decimal("0.01"), rounding=ROUND_HALF_UP
-        )
-        evidence = (
-            "PAPER_RECONCILED_MODEL" if mode == "PAPER" else "SHADOW_RECONCILED_QUOTE_MODEL"
-        )
-        # Entry alone is not yet reconciled; keep class for lineage, PnL null until exit.
-        self._conn.execute(
-            """
-            UPDATE positions
-            SET entry_price_dec = ?,
-                qty_dec = ?,
-                fee_bps = ?,
-                entry_fee_usd_dec = ?,
-                entered_notional_usd = ?,
-                entered_notional_usd_dec = ?,
-                pnl_evidence_class = NULL,
-                realized_gross_pnl_usd_dec = NULL,
-                realized_net_pnl_usd_dec = NULL
-            WHERE position_id = ?
-            """,
-            (
-                format(price, "f"),
-                format(quantity, "f"),
-                fee_bps,
-                format(entry_fee, "f"),
-                float(notional),
-                format(notional, "f"),
-                position_id,
-            ),
-        )
-        event_type = (
-            "PAPER_SIMULATION_OBSERVED" if mode == "PAPER" else "SHADOW_EXECUTABLE_OBSERVED"
-        )
-        self.append_execution_event(
-            event_type=event_type,
-            bot_instance_id=str(position["bot_instance_id"]),
-            position_id=position_id,
-            payload={
-                **_identity_fields(position),
-                "side": "ENTRY",
-                "entry_price_dec": format(price, "f"),
-                "qty_dec": format(quantity, "f"),
-                "entry_fee_usd_dec": format(entry_fee, "f"),
-                "entry_gross_notional_usd_dec": format(notional, "f"),
-                "mode": mode,
-                "pending_reconcile_class": evidence,
-            },
-        )
-        updated = self.get_position(position_id)
-        assert updated is not None
-        return updated
+            if position is None:
+                raise PaperPlaneError("POSITION_NOT_FOUND")
+            state = str(position["state"])
+            if state in {"CLOSED", "RECONCILED", "UNRESOLVED", "EXIT_REQUIRED", "EXITING"}:
+                raise PaperPlaneError(f"ENTRY_FILL_STATE_INVALID:{state}")
+            if state in {"WATCHED", "SIGNALLED", "INTENT_CREATED"}:
+                raise PaperPlaneError(f"ENTRY_FILL_STATE_INVALID:{state}")
+            if state == "ATTEMPTING":
+                self.transition(position_id, "OPEN")
+                position = self.get_position(position_id)
+                assert position is not None
+            elif state not in {"OPEN", "PARTIAL", "UNKNOWN"}:
+                raise PaperPlaneError(f"ENTRY_FILL_STATE_INVALID:{state}")
+            price = Decimal(str(entry_unit_price_usd))
+            notional = Decimal(str(entry_gross_notional_usd))
+            if price <= 0 or notional <= 0:
+                raise PaperPlaneError("ENTRY_FILL_INVALID")
+            quantity = (notional / price).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_UP)
+            entry_fee = (notional * Decimal(fee_bps) / Decimal(10000)).quantize(
+                Decimal("0.01"), rounding=ROUND_HALF_UP
+            )
+            evidence = (
+                "PAPER_RECONCILED_MODEL" if mode == "PAPER" else "SHADOW_RECONCILED_QUOTE_MODEL"
+            )
+            # Entry alone is not yet reconciled; keep class for lineage, PnL null until exit.
+            self._conn.execute(
+                """
+                UPDATE positions
+                SET entry_price_dec = ?,
+                    qty_dec = ?,
+                    fee_bps = ?,
+                    entry_fee_usd_dec = ?,
+                    entered_notional_usd = ?,
+                    entered_notional_usd_dec = ?,
+                    pnl_evidence_class = NULL,
+                    realized_gross_pnl_usd_dec = NULL,
+                    realized_net_pnl_usd_dec = NULL
+                WHERE position_id = ?
+                """,
+                (
+                    format(price, "f"),
+                    format(quantity, "f"),
+                    fee_bps,
+                    format(entry_fee, "f"),
+                    float(notional),
+                    format(notional, "f"),
+                    position_id,
+                ),
+            )
+            event_type = (
+                "PAPER_SIMULATION_OBSERVED" if mode == "PAPER" else "SHADOW_EXECUTABLE_OBSERVED"
+            )
+            self.append_execution_event(
+                event_type=event_type,
+                bot_instance_id=str(position["bot_instance_id"]),
+                position_id=position_id,
+                payload={
+                    **_identity_fields(position),
+                    "side": "ENTRY",
+                    "entry_price_dec": format(price, "f"),
+                    "qty_dec": format(quantity, "f"),
+                    "entry_fee_usd_dec": format(entry_fee, "f"),
+                    "entry_gross_notional_usd_dec": format(notional, "f"),
+                    "mode": mode,
+                    "pending_reconcile_class": evidence,
+                },
+            )
+            updated = self.get_position(position_id)
+            assert updated is not None
+            return updated
 
     def apply_paper_exit_fill(
         self,
@@ -1049,36 +1060,36 @@ class PaperPlaneStore:
     ) -> dict[str, Any]:
         if mode not in {"PAPER", "SHADOW"}:
             raise PaperPlaneError("BOT_MODE_INVALID")
-        position = self.get_position(position_id)
-        if position is None:
-            raise PaperPlaneError("POSITION_NOT_FOUND")
-        state0 = str(position["state"])
-        if state0 == "RECONCILED":
-            raise PaperPlaneError(f"EXIT_FILL_STATE_INVALID:{state0}")
-
-        def _advance_to_exiting(current: dict[str, Any]) -> dict[str, Any]:
-            state = str(current["state"])
-            if state in {"OPEN", "PARTIAL", "UNKNOWN"}:
-                current = self.transition(position_id, "EXIT_REQUIRED", commit=False)
-                state = str(current["state"])
-            if state == "EXIT_REQUIRED":
-                current = self.transition(position_id, "EXITING", commit=False)
-            return current
-
-        if unresolved or exit_unit_price_usd is None:
-            if state0 not in {
-                "OPEN",
-                "PARTIAL",
-                "UNKNOWN",
-                "EXIT_REQUIRED",
-                "EXITING",
-                "UNRESOLVED",
-            }:
+        with self.immediate_write():
+            position = self.get_position(position_id)
+            if position is None:
+                raise PaperPlaneError("POSITION_NOT_FOUND")
+            state0 = str(position["state"])
+            if state0 == "RECONCILED":
                 raise PaperPlaneError(f"EXIT_FILL_STATE_INVALID:{state0}")
-            with self.immediate_write():
+
+            def _advance_to_exiting(current: dict[str, Any]) -> dict[str, Any]:
+                state = str(current["state"])
+                if state in {"OPEN", "PARTIAL", "UNKNOWN"}:
+                    current = self.transition(position_id, "EXIT_REQUIRED")
+                    state = str(current["state"])
+                if state == "EXIT_REQUIRED":
+                    current = self.transition(position_id, "EXITING")
+                return current
+
+            if unresolved or exit_unit_price_usd is None:
+                if state0 not in {
+                    "OPEN",
+                    "PARTIAL",
+                    "UNKNOWN",
+                    "EXIT_REQUIRED",
+                    "EXITING",
+                    "UNRESOLVED",
+                }:
+                    raise PaperPlaneError(f"EXIT_FILL_STATE_INVALID:{state0}")
                 position = _advance_to_exiting(position)
                 if str(position["state"]) == "EXITING":
-                    position = self.transition(position_id, "UNRESOLVED", commit=False)
+                    position = self.transition(position_id, "UNRESOLVED")
                 elif str(position["state"]) != "UNRESOLVED":
                     raise PaperPlaneError(f"EXIT_FILL_STATE_INVALID:{position['state']}")
                 self._conn.execute(
@@ -1091,55 +1102,54 @@ class PaperPlaneStore:
                     """,
                     (position_id,),
                 )
-            self.append_execution_event(
-                event_type="RECONCILIATION",
-                bot_instance_id=str(position["bot_instance_id"]),
-                position_id=position_id,
-                payload={
-                    **_identity_fields(position),
-                    "result": "UNRESOLVED",
-                    "mode": mode,
-                    "pnl_status": "UNKNOWN",
-                },
-            )
-            updated = self.get_position(position_id)
-            assert updated is not None
-            return updated
+                self.append_execution_event(
+                    event_type="RECONCILIATION",
+                    bot_instance_id=str(position["bot_instance_id"]),
+                    position_id=position_id,
+                    payload={
+                        **_identity_fields(position),
+                        "result": "UNRESOLVED",
+                        "mode": mode,
+                        "pnl_status": "UNKNOWN",
+                    },
+                )
+                updated = self.get_position(position_id)
+                assert updated is not None
+                return updated
 
-        if not position.get("entry_price_dec") or not position.get("qty_dec"):
-            raise PaperPlaneError("EXIT_FILL_REQUIRES_ENTRY")
-        notional_raw = position.get("entered_notional_usd_dec")
-        if notional_raw is None:
-            raise PaperPlaneError("EXIT_FILL_REQUIRES_ENTRY_NOTIONAL")
-        if position.get("entry_fee_usd_dec") in {None, ""}:
-            raise PaperPlaneError("EXIT_FILL_REQUIRES_ENTRY_FEE")
-        qty = Decimal(str(position["qty_dec"]))
-        fee_bps = int(position["fee_bps"] or 0)
-        price = Decimal(str(exit_unit_price_usd))
-        entry_notional = Decimal(str(notional_raw))
-        entry_fee = Decimal(str(position["entry_fee_usd_dec"]))
-        exit_gross = (price * qty).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-        exit_fee = (exit_gross * Decimal(fee_bps) / Decimal(10000)).quantize(
-            Decimal("0.01"), rounding=ROUND_HALF_UP
-        )
-        gross = (exit_gross - entry_notional).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-        net = (gross - entry_fee - exit_fee).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-        evidence = (
-            "PAPER_RECONCILED_MODEL" if mode == "PAPER" else "SHADOW_RECONCILED_QUOTE_MODEL"
-        )
-        with self.immediate_write():
+            if not position.get("entry_price_dec") or not position.get("qty_dec"):
+                raise PaperPlaneError("EXIT_FILL_REQUIRES_ENTRY")
+            notional_raw = position.get("entered_notional_usd_dec")
+            if notional_raw is None:
+                raise PaperPlaneError("EXIT_FILL_REQUIRES_ENTRY_NOTIONAL")
+            if position.get("entry_fee_usd_dec") in {None, ""}:
+                raise PaperPlaneError("EXIT_FILL_REQUIRES_ENTRY_FEE")
+            qty = Decimal(str(position["qty_dec"]))
+            fee_bps = int(position["fee_bps"] or 0)
+            price = Decimal(str(exit_unit_price_usd))
+            entry_notional = Decimal(str(notional_raw))
+            entry_fee = Decimal(str(position["entry_fee_usd_dec"]))
+            exit_gross = (price * qty).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            exit_fee = (exit_gross * Decimal(fee_bps) / Decimal(10000)).quantize(
+                Decimal("0.01"), rounding=ROUND_HALF_UP
+            )
+            gross = (exit_gross - entry_notional).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            net = (gross - entry_fee - exit_fee).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            evidence = (
+                "PAPER_RECONCILED_MODEL" if mode == "PAPER" else "SHADOW_RECONCILED_QUOTE_MODEL"
+            )
             if state0 == "UNRESOLVED":
-                self.transition(position_id, "RECONCILED", commit=False)
+                self.transition(position_id, "RECONCILED")
             elif state0 == "CLOSED":
-                self.transition(position_id, "RECONCILED", commit=False)
+                self.transition(position_id, "RECONCILED")
             else:
                 position = _advance_to_exiting(position)
                 if str(position["state"]) == "EXITING":
-                    self.transition(position_id, "CLOSED", commit=False)
+                    self.transition(position_id, "CLOSED")
                 closed = self.get_position(position_id)
                 assert closed is not None
                 if str(closed["state"]) == "CLOSED":
-                    self.transition(position_id, "RECONCILED", commit=False)
+                    self.transition(position_id, "RECONCILED")
             self._conn.execute(
                 """
                 UPDATE positions
@@ -1167,36 +1177,36 @@ class PaperPlaneStore:
                     position_id,
                 ),
             )
-        exit_event = "PAPER_EXIT_OBSERVED" if mode == "PAPER" else "SHADOW_EXIT_EXECUTABLE_OBSERVED"
-        self.append_execution_event(
-            event_type=exit_event,
-            bot_instance_id=str(position["bot_instance_id"]),
-            position_id=position_id,
-            payload={
-                **_identity_fields(position),
-                "side": "EXIT",
-                "exit_price_dec": format(price, "f"),
-                "exit_fee_usd_dec": format(exit_fee, "f"),
-                "realized_net_pnl_usd_dec": format(net, "f"),
-                "mode": mode,
-            },
-        )
-        self.append_execution_event(
-            event_type="RECONCILIATION",
-            bot_instance_id=str(position["bot_instance_id"]),
-            position_id=position_id,
-            payload={
-                **_identity_fields(position),
-                "result": "RECONCILED",
-                "pnl_status": "KNOWN",
-                "net_pnl_usd_dec": format(net, "f"),
-                "pnl_evidence_class": evidence,
-                "mode": mode,
-            },
-        )
-        updated = self.get_position(position_id)
-        assert updated is not None
-        return updated
+            exit_event = "PAPER_EXIT_OBSERVED" if mode == "PAPER" else "SHADOW_EXIT_EXECUTABLE_OBSERVED"
+            self.append_execution_event(
+                event_type=exit_event,
+                bot_instance_id=str(position["bot_instance_id"]),
+                position_id=position_id,
+                payload={
+                    **_identity_fields(position),
+                    "side": "EXIT",
+                    "exit_price_dec": format(price, "f"),
+                    "exit_fee_usd_dec": format(exit_fee, "f"),
+                    "realized_net_pnl_usd_dec": format(net, "f"),
+                    "mode": mode,
+                },
+            )
+            self.append_execution_event(
+                event_type="RECONCILIATION",
+                bot_instance_id=str(position["bot_instance_id"]),
+                position_id=position_id,
+                payload={
+                    **_identity_fields(position),
+                    "result": "RECONCILED",
+                    "pnl_status": "KNOWN",
+                    "net_pnl_usd_dec": format(net, "f"),
+                    "pnl_evidence_class": evidence,
+                    "mode": mode,
+                },
+            )
+            updated = self.get_position(position_id)
+            assert updated is not None
+            return updated
 
     def pre_trade_risk_snapshot(
         self,
@@ -1282,16 +1292,16 @@ class PaperPlaneStore:
                     "UPDATE positions SET signal_kind=? WHERE position_id=?",
                     (signal_kind, position_id),
                 )
-                self.transition(position_id, "SIGNALLED", commit=False)
+                self.transition(position_id, "SIGNALLED")
                 state = "SIGNALLED"
             if state == "SIGNALLED":
-                self.transition(position_id, "INTENT_CREATED", commit=False)
+                self.transition(position_id, "INTENT_CREATED")
                 state = "INTENT_CREATED"
             if state == "INTENT_CREATED":
-                self.transition(position_id, "ATTEMPTING", commit=False)
+                self.transition(position_id, "ATTEMPTING")
                 state = "ATTEMPTING"
             if state == "ATTEMPTING":
-                self.transition(position_id, "OPEN", commit=False)
+                self.transition(position_id, "OPEN")
             self._conn.execute(
                 "UPDATE positions SET entered_notional_usd=?, signal_kind=? WHERE position_id=?",
                 (float(notional_usd), signal_kind, position_id),
@@ -1304,18 +1314,40 @@ class PaperPlaneStore:
         exit_decision: Mapping[str, Any],
     ) -> dict[str, Any]:
         position_id = str(exit_decision["position_id"])
-        position = self.get_position(position_id)
-        if position is None:
-            raise PaperPlaneError("POSITION_NOT_FOUND")
-        action = str(exit_decision["action"])
-        if action != "EXIT":
-            return {
-                "position_id": position_id,
-                "applied": False,
-                "action": action,
-                "state": position["state"],
-            }
-        if position["state"] == "EXIT_REQUIRED":
+        with self.immediate_write():
+            position = self.get_position(position_id)
+            if position is None:
+                raise PaperPlaneError("POSITION_NOT_FOUND")
+            action = str(exit_decision["action"])
+            if action != "EXIT":
+                return {
+                    "position_id": position_id,
+                    "applied": False,
+                    "action": action,
+                    "state": position["state"],
+                }
+            if position["state"] == "EXIT_REQUIRED":
+                self._conn.execute(
+                    "UPDATE positions SET exit_decision_id=?, reason_code=? WHERE position_id=?",
+                    (
+                        str(exit_decision["exit_decision_id"]),
+                        str(exit_decision["reason_code"]),
+                        position_id,
+                    ),
+                )
+                self._commit()
+                updated = self.get_position(position_id)
+                assert updated is not None
+                return {
+                    "position_id": position_id,
+                    "applied": True,
+                    "action": action,
+                    "state": updated["state"],
+                    "fill_claimed": False,
+                }
+            if position["state"] not in {"OPEN", "PARTIAL", "UNKNOWN"}:
+                raise PaperPlaneError(f"EXIT_DECISION_STATE_INVALID:{position['state']}")
+            updated = self.transition(position_id, "EXIT_REQUIRED")
             self._conn.execute(
                 "UPDATE positions SET exit_decision_id=?, reason_code=? WHERE position_id=?",
                 (
@@ -1325,36 +1357,15 @@ class PaperPlaneStore:
                 ),
             )
             self._commit()
-            updated = self.get_position(position_id)
-            assert updated is not None
+            refreshed = self.get_position(position_id)
+            assert refreshed is not None
             return {
                 "position_id": position_id,
                 "applied": True,
                 "action": action,
-                "state": updated["state"],
+                "state": refreshed["state"],
                 "fill_claimed": False,
             }
-        if position["state"] not in {"OPEN", "PARTIAL", "UNKNOWN"}:
-            raise PaperPlaneError(f"EXIT_DECISION_STATE_INVALID:{position['state']}")
-        updated = self.transition(position_id, "EXIT_REQUIRED")
-        self._conn.execute(
-            "UPDATE positions SET exit_decision_id=?, reason_code=? WHERE position_id=?",
-            (
-                str(exit_decision["exit_decision_id"]),
-                str(exit_decision["reason_code"]),
-                position_id,
-            ),
-        )
-        self._commit()
-        refreshed = self.get_position(position_id)
-        assert refreshed is not None
-        return {
-            "position_id": position_id,
-            "applied": True,
-            "action": action,
-            "state": refreshed["state"],
-            "fill_claimed": False,
-        }
 
 
 def resolve_activation_epoch(
@@ -1613,36 +1624,40 @@ def accept_signal_decision(
             "fill_deferred": True,
         }
     signal_kind = "SHADOW_EXECUTABLE" if mode == "SHADOW" else "SIMULATED_FILL"
-    opened_id, realized = store.fill_paper_from_signal(
-        bot_instance_id=bot_instance_id,
-        signal_decision=decision,
-        notional_usd=admitted_notional,
-        signal_kind=signal_kind,
-    )
-    store.append_execution_event(
-        event_type="EXECUTION_INTENT_CREATED",
-        bot_instance_id=bot_instance_id,
-        position_id=opened_id,
-        payload={
-            **_identity_fields(decision),
-            "strategy_id": strategy["strategy_id"],
-            "strategy_version": strategy["strategy_version"],
-            "signal_kind": realized,
-            "mode": mode,
-        },
-    )
-    store.append_execution_event(
-        event_type="POSITION_TRANSITION",
-        bot_instance_id=bot_instance_id,
-        position_id=opened_id,
-        payload={
-            **_identity_fields(decision),
-            "strategy_id": strategy["strategy_id"],
-            "strategy_version": strategy["strategy_version"],
-            "to_state": "OPEN",
-            "signal_kind": realized,
-        },
-    )
+    with store.immediate_write():
+        before = store.get_position(position_id)
+        filled_now = before is None or str(before["state"]) != "OPEN"
+        opened_id, realized = store.fill_paper_from_signal(
+            bot_instance_id=bot_instance_id,
+            signal_decision=decision,
+            notional_usd=admitted_notional,
+            signal_kind=signal_kind,
+        )
+        if filled_now:
+            store.append_execution_event(
+                event_type="EXECUTION_INTENT_CREATED",
+                bot_instance_id=bot_instance_id,
+                position_id=opened_id,
+                payload={
+                    **_identity_fields(decision),
+                    "strategy_id": strategy["strategy_id"],
+                    "strategy_version": strategy["strategy_version"],
+                    "signal_kind": realized,
+                    "mode": mode,
+                },
+            )
+            store.append_execution_event(
+                event_type="POSITION_TRANSITION",
+                bot_instance_id=bot_instance_id,
+                position_id=opened_id,
+                payload={
+                    **_identity_fields(decision),
+                    "strategy_id": strategy["strategy_id"],
+                    "strategy_version": strategy["strategy_version"],
+                    "to_state": "OPEN",
+                    "signal_kind": realized,
+                },
+            )
     refreshed = store.get_position(opened_id)
     assert refreshed is not None
     return {

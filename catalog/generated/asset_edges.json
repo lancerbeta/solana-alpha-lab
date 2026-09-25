@@ -4248,6 +4248,26 @@
       "target_asset_id": "TEST-OWNER-OPERATIONS-COCKPIT-001"
     },
     {
+      "source_asset_id": "CTRL-PAPER-PLANE-WRITE-INTEGRITY-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-PAPER-SHADOW-EXECUTION-INTEGRITY-PRD-SSD-001"
+    },
+    {
+      "source_asset_id": "CTRL-PAPER-PLANE-WRITE-INTEGRITY-001",
+      "relation": "contains",
+      "target_asset_id": "TEST-PAPER-SHADOW-EXECUTION-INTEGRITY-VERTICAL-001"
+    },
+    {
+      "source_asset_id": "CTRL-PAPER-PLANE-WRITE-INTEGRITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "CTRL-PAPER-PLANE-WRITE-INTEGRITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-SHADOW-COMMANDS-001"
+    },
+    {
       "source_asset_id": "CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001",
       "relation": "contains",
       "target_asset_id": "MODULE-PAPER-SHADOW-COMMANDS-001"
@@ -5836,6 +5856,11 @@
       "source_asset_id": "DOC-OWNER-LIFECYCLE-PROJECTION-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "DOC-PAPER-SHADOW-EXECUTION-INTEGRITY-PRD-SSD-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PAPER-PLANE-WRITE-INTEGRITY-001"
     },
     {
       "source_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001",
@@ -17211,6 +17236,21 @@
       "source_asset_id": "TEST-PAPER-SHADOW-ACCOUNTING-CONTROL-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001"
+    },
+    {
+      "source_asset_id": "TEST-PAPER-SHADOW-EXECUTION-INTEGRITY-VERTICAL-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "TEST-PAPER-SHADOW-EXECUTION-INTEGRITY-VERTICAL-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-SHADOW-COMMANDS-001"
+    },
+    {
+      "source_asset_id": "TEST-PAPER-SHADOW-EXECUTION-INTEGRITY-VERTICAL-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PAPER-PLANE-WRITE-INTEGRITY-001"
     },
     {
       "source_asset_id": "TEST-PATHRISK-CALIBRATION-001",
