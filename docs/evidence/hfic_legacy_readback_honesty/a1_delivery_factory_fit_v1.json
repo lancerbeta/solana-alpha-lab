@@ -6,7 +6,7 @@
   "task_id": "HFIC_LEGACY_READBACK_HONESTY_V1",
   "reviewed_bindings_sha256": "2c321694e9c8e53254ec515127c25d67b1a7565e56da7b8adb8d8dc0ecc5f3d2",
   "reviewed_inventory_sha256": "2c321694e9c8e53254ec515127c25d67b1a7565e56da7b8adb8d8dc0ecc5f3d2",
-  "mode": "PROPORTIONAL",
+  "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
     "mission": "PASS_NARROW_HFIC_LEGACY_READBACK_NOT_ALPHA",
@@ -24,7 +24,6 @@
     "now": "NONE",
     "watch": "AUTHORIZED_HYPOTHESIS_FORGE_AFTER_MERGE_AND_SEPARATE_OK"
   },
-  "product_horizon_now": "NONE",
   "recovery": "Ordinary Git revert of the legacy readback changes. Do not rewrite historical RDP records.",
   "limits": [
     "NO_ALPHA",
