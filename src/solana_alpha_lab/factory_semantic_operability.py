@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -75,6 +77,18 @@ _RUNTIME_FABRICATION_TOKENS = frozenset(
     }
 )
 
+_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+
+
+@lru_cache(maxsize=16)
+def _parse_yaml_text(text: str) -> Any:
+    return yaml.load(text, Loader=_YAML_LOADER)
+
+
+def _load_yaml_text(text: str) -> Any:
+    # Parse trees are shared across callers; only a copy may leave the cache.
+    return copy.deepcopy(_parse_yaml_text(text))
+
 
 class SemanticOperabilityError(CatalogDiscoveryError):
     """Typed semantic-route contract error."""
@@ -85,7 +99,7 @@ def load_semantic_projection(root: Path) -> dict[str, Any]:
     if not path.is_file():
         raise SemanticOperabilityError("SEMANTIC_PROJECTION_MISSING")
     try:
-        payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+        payload = _load_yaml_text(path.read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError) as exc:
         raise SemanticOperabilityError("SEMANTIC_PROJECTION_INVALID") from exc
     if not isinstance(payload, dict):
@@ -108,19 +122,19 @@ def load_semantic_catalog_views(
     """Load assets/bindings/queries for semantic routing without full Catalog validation."""
 
     root = Path(root)
-    manifest = yaml.safe_load((root / MANIFEST_RELATIVE).read_text(encoding="utf-8"))
+    manifest = _load_yaml_text((root / MANIFEST_RELATIVE).read_text(encoding="utf-8"))
     if not isinstance(manifest, dict):
         raise SemanticOperabilityError("SEMANTIC_MANIFEST_INVALID")
     assets: dict[str, dict[str, Any]] = {}
     for relative in (manifest.get("root_resolver") or {}).get("asset_registries") or []:
-        document = yaml.safe_load((root / relative).read_text(encoding="utf-8"))
+        document = _load_yaml_text((root / relative).read_text(encoding="utf-8"))
         for record in (document or {}).get("records") or []:
             asset_id = record.get("asset_id")
             if isinstance(asset_id, str):
                 assets[asset_id] = record
     queries: dict[str, Any] = {}
     for relative in (manifest.get("root_resolver") or {}).get("query_registries") or []:
-        document = yaml.safe_load((root / relative).read_text(encoding="utf-8"))
+        document = _load_yaml_text((root / relative).read_text(encoding="utf-8"))
         records = []
         if isinstance(document, dict):
             records = document.get("recipes") or document.get("records") or []

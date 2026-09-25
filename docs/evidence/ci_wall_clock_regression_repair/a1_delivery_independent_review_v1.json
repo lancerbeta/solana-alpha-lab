@@ -1,0 +1,67 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "CI-WALL-CLOCK-REGRESSION-REPAIR-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-25",
+  "task_id": "CI_WALL_CLOCK_REGRESSION_REPAIR_V1",
+  "reviewed_bindings_sha256": "ca0f652e7f5483eb79688f81365dcd7e0c39cd7978d714763c66c2395e63b4e3",
+  "reviewed_inventory_sha256": "ebcf3a8810f9f68843936e83fb014e75cbeeead3c5326f36eebadb182c91a296",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_CACHE_KEY_IS_EXACT_TEXT",
+        "PASS_PRIVATE_DEEPCOPY_NO_SHARED_MUTATION",
+        "PASS_NO_DIGEST_OR_VALIDATION_CACHED",
+        "PASS_EXCEPTION_AND_ERROR_CODES_UNCHANGED",
+        "PASS_LRU_MAXSIZE_16_BOUNDED",
+        "PASS_I2_PROTECTED_PATHS_UNTOUCHED",
+        "PASS_I1_DIGEST_EQUALITY_CLOSES_EPOCH_DRIFT",
+        "RESIDUAL_FUTURE_CATALOG_MUST_KEEP_LOADER_EQUIVALENCE"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "I1_DIGEST_PATH_NEUTRAL",
+        "I2_PROTECTED_NOT_IN_PRODUCT_DIFF",
+        "I3_PARSE_CACHE_ONLY_NO_DIGEST_CACHE",
+        "I4_DEEPCOPY_PRIVATE_COPIES",
+        "I5_TEXT_KEYED_REPARSE",
+        "I6_LRU_MAXSIZE_16",
+        "I7_CSAFELOADER_EQUIV_TESTED",
+        "I8_BUDGETS_ONLY_NO_ARCH_WEAKEN",
+        "FOUR_LOAD_SITES_CONTRACT_MATCH",
+        "SOFT_BUDGET_WARN_NONFAILING",
+        "MODULE_DONE_STREAM_FLUSH"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DOD_FALSIFIABLE",
+        "CHEAPEST_FALSIFIER_SATISFIED",
+        "NAMED_CONSUMERS_ORIENTED",
+        "CI_GATE_CORRECTLY_DEFERRED",
+        "FULL_DOD4_OPEN",
+        "BUDGETS_RESTORED"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_CI_OPTIMIZATION_CHAIN",
+    "NO_REMOTE_HOST_ACTION",
+    "NO_MERGE"
+  ]
+}
