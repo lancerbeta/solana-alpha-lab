@@ -13,6 +13,7 @@
   "implementation_bindings": {
     ".github/workflows/ci.yml": "9f11ee664ac75970e035c575eb71dd2ac1410fbc116d99bca6ca5514cba7c439",
     "catalog/assets/core.yaml": "c7f3216b557f942b5e7d41b3f59e551c0401810f182fc7e4a9ab06a7d35f06eb",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "a5c10ce455aa3f4282c97421501304801ecb3c8d196489a92108f0ec08f257e4",
     "docs/reports/ci_wall_clock_regression_repair/a1_owner_readout_v1.md": "c6d7a731e3244d82f3b98b4a0c17d6f153370fc80a7e35da108cd094f2a63f66",
     "docs/tasks/CI_WALL_CLOCK_REGRESSION_REPAIR_V1.md": "535196a90e7e43d48108c307a4c407f0e05a355478b9971825bfd25d649371e1",
     "scripts/run_ci_test_shard.py": "76b71b72af9bb553426103d220dfdcaa23aee16a23e5c2a1405293958a95c2de",
@@ -31,14 +32,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/ci_wall_clock_regression_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "2fe5f4d2d3393e51d93771887d855a9b555b301cd84c7ed70aecc75435be9a33",
+    "sha256": "97d3effcd59c0cb9acbdd5cc653b0954b7b2fa01486440ccb8cbd118881df99b",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_CI_WALL_CLOCK_REGRESSION_REPAIR_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/ci_wall_clock_regression_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "8d903a0453f8c38ce68a7353a678f0bf6ff213b4c32b4be3389d6af589841e8f",
+      "sha256": "3b31d35c37584aebbc75803aad5d5d32f0cf3323a4542fb7d9b6da68cd47bdee",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
