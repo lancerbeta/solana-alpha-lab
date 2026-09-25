@@ -9,6 +9,8 @@ allowed_routes:
 required_review_roles:
   - CODE_REVIEWER
   - ARCHITECTURE_CRITIC
+  - GOAL_DOD_CRITIC
+  - OWNER_UX_CRITIC
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
   expected_base: ae678372f2a96fbc20c519c23905ae5c44332458
