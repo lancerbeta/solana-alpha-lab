@@ -70,7 +70,10 @@ Slash **не** даёт Git mutation, experiment execution, provider/API/RPC/WSS
 деньги, holdout, wallet/signer/tx, deployment/promotion, destructive RDP,
 новый capability atom, reopen completed search,
 `apply-provenance-correction` или `memory-policy-apply`. `PASS_FAST_LANE_READY` —
-стоп до experiment. `PASS_CHANGE_LANE_REQUIRED` — один PRD+SSD, без PR.
+стоп до experiment. Отказ availability-гейта packet 1.4 — это сохранённый
+`KILL_UNBOUND_EVIDENCE`, не ошибка и не застрявший `AWAITING_CLASSIFICATION`.
+Офлайн `classify_lane` в B5 Критика — только подсказка; авторитетен HFIC classify.
+Заявленный финальный `PASS_*` машина может только понизить. `PASS_CHANGE_LANE_REQUIRED` — один PRD+SSD, без PR.
 `PASS_DATA_OPTION_REQUIRED` — data option, без collection.
 
 **Provenance clock (не часть `/hypothesis-forge`).** Future HFIC writes use an

@@ -291,14 +291,15 @@ class ExperimentSpecBindTests(unittest.TestCase):
             "solana_alpha_lab.factory.run_passport.experiment_spec_sha256",
             return_value="cd" * 32,
         ):
-            with self.assertRaises(HficSessionError) as raised:
-                run_live_classifier(
-                    {"experiment_spec": {"schema": "smial.experiment-spec"}},
-                    frozen,
-                    repo_root=ROOT,
-                    data_root=ROOT,
-                )
-        self.assertEqual(str(raised.exception), KILL_UNBOUND_EVIDENCE)
+            receipt = run_live_classifier(
+                {"experiment_spec": {"schema": "smial.experiment-spec"}},
+                frozen,
+                repo_root=ROOT,
+                data_root=ROOT,
+            )
+        self.assertEqual(receipt["lane_classifier_terminal"], "DENY_HFIC_AVAILABILITY_GATE")
+        self.assertEqual(receipt["classifier_route_terminal"], "FAST_LANE_READY")
+        self.assertIn("UNRESOLVED_REQUIREMENT", receipt["reason_codes"])
 
     def test_t14_unresolved_gap_lanes_allowed(self) -> None:
         selected = {

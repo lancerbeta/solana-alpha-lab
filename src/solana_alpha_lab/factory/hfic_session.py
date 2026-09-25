@@ -5054,6 +5054,9 @@ def _effective_cycle_phase(
 
 def _classifier_to_hfic_terminal(receipt: Mapping[str, Any]) -> str:
     outcome = str(receipt.get("lane_classifier_terminal") or "")
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        DIRECT_CLASSIFIER_HFIC_TERMINAL,
+    )
     from solana_alpha_lab.factory.observation_fast_lane_terminals import (
         hfic_terminal_for_classifier,
     )
@@ -5061,17 +5064,7 @@ def _classifier_to_hfic_terminal(receipt: Mapping[str, Any]) -> str:
     observation_mapped = hfic_terminal_for_classifier(outcome)
     if observation_mapped is not None:
         return observation_mapped
-    mapping = {
-        "FAST_LANE_READY": "PASS_FAST_LANE_READY",
-        "REPLAY_AVAILABLE": "PASS_FAST_LANE_READY",
-        "BLOCKED_DATA": "PASS_DATA_OPTION_REQUIRED",
-        "CHANGE_LANE_CAPABILITY_GAP": "PASS_CHANGE_LANE_REQUIRED",
-        "FAST_LANE_OWNER_GATE_REQUIRED": "OWNER_DECISION_REQUIRED",
-        "PROMOTION_LANE_REQUIRED": "OWNER_DECISION_REQUIRED",
-        "DENY_INVALID_SPEC": "KILL_UNBOUND_EVIDENCE",
-        "DENY_INTEGRITY_MISMATCH": "KILL_UNBOUND_EVIDENCE",
-    }
-    mapped = mapping.get(outcome)
+    mapped = DIRECT_CLASSIFIER_HFIC_TERMINAL.get(outcome)
     if mapped is None:
         raise HficSessionError("CLASSIFIER_TERMINAL_MISMATCH")
     return mapped
@@ -5195,22 +5188,27 @@ def run_live_classifier(
         data_root=Path(data_root),
         as_of=as_of,
     )
-    if selected is not None:
-        from solana_alpha_lab.factory.hfic_control_integrity import (
-            deny_non_pit_fast_lane,
-            deny_unresolved_fast_lane,
-        )
-
-        try:
-            deny_unresolved_fast_lane(selected, str(decision.terminal))
-            deny_non_pit_fast_lane(selected, str(decision.terminal))
-        except ValueError as exc:
-            raise HficSessionError(str(exc)) from exc
-    return build_classifier_receipt(
+    receipt = build_classifier_receipt(
         frozen=frozen,
         decision=decision,
         spec_sha256=spec_sha,
     )
+    if selected is not None and _classifier_to_hfic_terminal(receipt) == "PASS_FAST_LANE_READY":
+        from solana_alpha_lab.factory.hfic_control_integrity import (
+            DENY_HFIC_AVAILABILITY_GATE,
+            fast_lane_availability_denial_codes,
+        )
+
+        reasons = fast_lane_availability_denial_codes(selected)
+        if reasons:
+            receipt = {
+                **receipt,
+                "lane": "DENY",
+                "lane_classifier_terminal": DENY_HFIC_AVAILABILITY_GATE,
+                "reason_codes": reasons,
+                "classifier_route_terminal": str(decision.terminal),
+            }
+    return receipt
 
 
 def validate_live_classifier_receipt(
@@ -5242,10 +5240,13 @@ def validate_live_classifier_receipt(
         "experiment_spec_sha256",
         "lane",
         "lane_classifier_terminal",
+        "classifier_route_terminal",
         "network_free",
     ):
         if observed.get(key) != expected.get(key):
             raise HficSessionError("CLASSIFIER_RECEIPT_INVALID")
+    if list(observed.get("reason_codes") or []) != list(expected.get("reason_codes") or []):
+        raise HficSessionError("CLASSIFIER_RECEIPT_INVALID")
     if int(observed.get("provider_calls_actual", -1)) != 0:
         raise HficSessionError("CLASSIFIER_RECEIPT_INVALID")
     return expected
@@ -5919,6 +5920,7 @@ def persist_primary_kill_awaiting_runner_up(
         "revision_count": int(frozen.get("revision_count") or 0),
         "forge_context_packet_sha256": frozen.get("forge_context_packet_sha256"),
         "runner_up_failover_used": True,
+        "critic_claimed_terminal": frozen.get("critic_claimed_terminal"),
         "critic_screen_count": 1,
         "hfic_cycle_seq": _next_cycle_seq(existing),
         **_execution_identity_fields(existing, frozen),
@@ -6133,15 +6135,8 @@ def finalize_session(
             phase="AWAITING_CLASSIFICATION",
             clock=clock,
         )
-    if _runner_up_failover_eligible(frozen, existing, terminal):
-        return persist_primary_kill_awaiting_runner_up(
-            store,
-            frozen,
-            critic_result,
-            repo_root=repo_root,
-            clock=clock,
-        )
     classifier_receipt = None
+    claimed_terminal = None
     classifier_view = _classifier_frozen_view(frozen, critic_result)
     if terminal in _FINAL_PASS_TERMINALS:
         root_for_data = data_root if data_root is not None else getattr(store, "_root")
@@ -6155,7 +6150,33 @@ def finalize_session(
         critic_result["classifier_receipt"] = classifier_receipt
         mapped = _classifier_to_hfic_terminal(classifier_receipt)
         if terminal != mapped:
-            raise HficSessionError("CLASSIFIER_TERMINAL_MISMATCH")
+            from solana_alpha_lab.factory.hfic_control_integrity import (
+                DENY_HFIC_AVAILABILITY_GATE,
+            )
+
+            if (
+                mapped == "KILL_UNBOUND_EVIDENCE"
+                and classifier_receipt.get("lane_classifier_terminal")
+                == DENY_HFIC_AVAILABILITY_GATE
+            ):
+                claimed_terminal = terminal
+                terminal = mapped
+                critic_result["critic_terminal"] = mapped
+                critic_result["next"] = "STOP"
+            else:
+                raise HficSessionError("CLASSIFIER_TERMINAL_MISMATCH")
+    if _runner_up_failover_eligible(frozen, existing, terminal):
+        if claimed_terminal is not None:
+            frozen = {**dict(frozen), "critic_claimed_terminal": claimed_terminal}
+        return persist_primary_kill_awaiting_runner_up(
+            store,
+            frozen,
+            critic_result,
+            repo_root=repo_root,
+            clock=clock,
+        )
+    if terminal in _FINAL_PASS_TERMINALS:
+        pass
     else:
         observed = critic_result.get("classifier_receipt")
         if isinstance(observed, Mapping) and observed.get("schema") == _CLASSIFIER_RECEIPT_SCHEMA:
@@ -6445,6 +6466,15 @@ def finalize_session(
         },
     )
     if diagnostics is not None:
+        if isinstance(classifier_receipt, Mapping):
+            route = classifier_receipt.get("classifier_route_terminal")
+            if isinstance(route, str) and route:
+                diagnostics["classifier_route_terminal"] = route
+            reasons = classifier_receipt.get("reason_codes")
+            if isinstance(reasons, list) and reasons:
+                diagnostics["availability_gate_reason_codes"] = list(reasons)
+        if claimed_terminal:
+            diagnostics["critic_claimed_terminal"] = claimed_terminal
         receipt["diagnostics"] = diagnostics
     if repo_root is not None:
         _verify_failover_receipt_identity(receipt)
@@ -6866,6 +6896,13 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         "session_receipt": session_receipt,
         "session_receipt_sha256": expected_receipt_sha or None,
         "classifier_receipt": classifier_receipt,
+        "critic_claimed_terminal": cycle.get("critic_claimed_terminal")
+        or (
+            session_receipt.get("diagnostics", {}).get("critic_claimed_terminal")
+            if isinstance(session_receipt, Mapping)
+            and isinstance(session_receipt.get("diagnostics"), Mapping)
+            else None
+        ),
         "revision_count": int(cycle.get("revision_count") or 0),
         "git_composite_sha256": cycle.get("git_composite_sha256"),
         "research_memory_as_of": cycle.get("research_memory_as_of"),
@@ -7016,6 +7053,32 @@ def _session_provenance_status(store: Any, session_id: str) -> str:
         raise
 
 
+def _classification_owner_readout(bundle: Mapping[str, Any]) -> str:
+    receipt = bundle.get("classifier_receipt")
+    route = None
+    reasons: list[str] = []
+    classifier_terminal = bundle.get("lane_classifier_terminal")
+    if isinstance(receipt, Mapping):
+        route = receipt.get("classifier_route_terminal")
+        raw_reasons = receipt.get("reason_codes")
+        if isinstance(raw_reasons, list):
+            reasons = [str(item) for item in raw_reasons]
+        if not classifier_terminal:
+            classifier_terminal = receipt.get("lane_classifier_terminal")
+    parts = [
+        f"terminal={bundle.get('critic_terminal') or bundle.get('final_session_terminal')}",
+        f"classifier={classifier_terminal}",
+    ]
+    if isinstance(route, str) and route:
+        parts.append(f"route={route}")
+    if reasons:
+        parts.append("reasons=" + ",".join(reasons))
+    claimed = bundle.get("critic_claimed_terminal")
+    if isinstance(claimed, str) and claimed:
+        parts.append(f"critic_claimed={claimed}")
+    return " ".join(parts)
+
+
 def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[str, Any]:
     bundle = load_session_bundle(store, session_id)
     if bundle is None:
@@ -7056,6 +7119,18 @@ def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[
         "runner_up_failover_used": bool(bundle.get("runner_up_failover_used")),
         "critic_screen_count": bundle.get("critic_screen_count"),
         "lane_classifier_terminal": bundle.get("lane_classifier_terminal"),
+        "classifier_route_terminal": (bundle.get("classifier_receipt") or {}).get(
+            "classifier_route_terminal"
+        )
+        if isinstance(bundle.get("classifier_receipt"), Mapping)
+        else None,
+        "availability_gate_reason_codes": list(
+            (bundle.get("classifier_receipt") or {}).get("reason_codes") or []
+        )
+        if isinstance(bundle.get("classifier_receipt"), Mapping)
+        else [],
+        "critic_claimed_terminal": bundle.get("critic_claimed_terminal"),
+        "owner_readout": _classification_owner_readout(bundle),
         "decision_event_ids": bundle.get("decision_event_ids") or [],
         "next": bundle.get("next") or "STOP",
         "next_action": bundle.get("next_action"),

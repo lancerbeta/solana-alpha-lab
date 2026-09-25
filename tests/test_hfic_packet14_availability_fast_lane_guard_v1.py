@@ -115,6 +115,14 @@ def _lane_decision(terminal: str) -> mock.Mock:
     )
 
 
+def _expect_gate_denial(test: unittest.TestCase, receipt: dict, *, route: str) -> None:
+    test.assertEqual(receipt["lane"], "DENY")
+    test.assertEqual(receipt["lane_classifier_terminal"], "DENY_HFIC_AVAILABILITY_GATE")
+    test.assertEqual(receipt["classifier_route_terminal"], route)
+    test.assertEqual(_classifier_to_hfic_terminal(receipt), KILL_UNBOUND_EVIDENCE)
+    test.assertTrue(receipt["reason_codes"])
+
+
 def _mocked_classify(frozen: dict, spec: dict, terminal: str) -> dict:
     with mock.patch(
         "solana_alpha_lab.factory.lane_classifier.classify_lane",
@@ -155,9 +163,11 @@ class AvailabilityFastLaneGuardTests(unittest.TestCase):
             selected["grounding"]["feature_bindings"][0]["availability_class"],
             "FORWARD_ONLY",
         )
-        with self.assertRaises(HficSessionError) as raised:
-            _classify(frozen, _spec_for(selected["required_feature_ids"]))
-        self.assertEqual(str(raised.exception), KILL_UNBOUND_EVIDENCE)
+        _expect_gate_denial(
+            self,
+            _classify(frozen, _spec_for(selected["required_feature_ids"])),
+            route="FAST_LANE_READY",
+        )
 
     def test_t3_historical_reconstructible_denied(self) -> None:
         frozen = _freeze(
@@ -169,9 +179,11 @@ class AvailabilityFastLaneGuardTests(unittest.TestCase):
             selected["grounding"]["feature_bindings"][0]["availability_class"],
             "HISTORICAL_RECONSTRUCTIBLE",
         )
-        with self.assertRaises(HficSessionError) as raised:
-            _classify(frozen, _spec_for(selected["required_feature_ids"]))
-        self.assertEqual(str(raised.exception), KILL_UNBOUND_EVIDENCE)
+        _expect_gate_denial(
+            self,
+            _classify(frozen, _spec_for(selected["required_feature_ids"])),
+            route="FAST_LANE_READY",
+        )
 
     def test_t4_missing_denied(self) -> None:
         frozen = _freeze(
@@ -185,9 +197,11 @@ class AvailabilityFastLaneGuardTests(unittest.TestCase):
             selected["grounding"]["feature_bindings"][0]["availability_class"],
             "MISSING",
         )
-        with self.assertRaises(HficSessionError) as raised:
-            _classify(frozen, _spec_for(selected["required_feature_ids"]))
-        self.assertEqual(str(raised.exception), KILL_UNBOUND_EVIDENCE)
+        _expect_gate_denial(
+            self,
+            _classify(frozen, _spec_for(selected["required_feature_ids"])),
+            route="FAST_LANE_READY",
+        )
 
     def test_t5_missing_capability_denied(self) -> None:
         frozen = _freeze(
@@ -200,9 +214,11 @@ class AvailabilityFastLaneGuardTests(unittest.TestCase):
             selected["grounding"]["feature_bindings"][0]["availability_class"],
             "MISSING_CAPABILITY",
         )
-        with self.assertRaises(HficSessionError) as raised:
-            _classify(frozen, _spec_for(selected["required_feature_ids"]))
-        self.assertEqual(str(raised.exception), KILL_UNBOUND_EVIDENCE)
+        _expect_gate_denial(
+            self,
+            _classify(frozen, _spec_for(selected["required_feature_ids"])),
+            route="FAST_LANE_READY",
+        )
 
     def test_t6_partial_denied(self) -> None:
         frozen = _freeze(
@@ -216,9 +232,11 @@ class AvailabilityFastLaneGuardTests(unittest.TestCase):
                 "PARTIAL",
             ),
         )
-        with self.assertRaises(HficSessionError) as raised:
-            _classify(mutated, _spec_for(_selected(mutated)["required_feature_ids"]))
-        self.assertEqual(str(raised.exception), KILL_UNBOUND_EVIDENCE)
+        _expect_gate_denial(
+            self,
+            _classify(mutated, _spec_for(_selected(mutated)["required_feature_ids"])),
+            route="FAST_LANE_READY",
+        )
 
     def test_t7_unknown_class_fail_closed(self) -> None:
         frozen = _freeze(
@@ -232,9 +250,11 @@ class AvailabilityFastLaneGuardTests(unittest.TestCase):
                 "FUTURE_STRATEGY_USABLE",
             ),
         )
-        with self.assertRaises(HficSessionError) as raised:
-            _classify(mutated, _spec_for(_selected(mutated)["required_feature_ids"]))
-        self.assertEqual(str(raised.exception), KILL_UNBOUND_EVIDENCE)
+        _expect_gate_denial(
+            self,
+            _classify(mutated, _spec_for(_selected(mutated)["required_feature_ids"])),
+            route="FAST_LANE_READY",
+        )
 
     def test_t8_replay_available_non_pit_denied(self) -> None:
         cases = (
@@ -244,13 +264,15 @@ class AvailabilityFastLaneGuardTests(unittest.TestCase):
         for selected_ref, runner in cases:
             frozen = _freeze(selected_ref, runner)
             selected = _selected(frozen)
-            with self.assertRaises(HficSessionError) as raised:
+            _expect_gate_denial(
+                self,
                 _mocked_classify(
                     frozen,
                     _spec_for(selected["required_feature_ids"]),
                     "REPLAY_AVAILABLE",
-                )
-            self.assertEqual(str(raised.exception), KILL_UNBOUND_EVIDENCE)
+                ),
+                route="REPLAY_AVAILABLE",
+            )
             mapped = _classifier_to_hfic_terminal(
                 {"lane_classifier_terminal": "REPLAY_AVAILABLE"}
             )
@@ -269,9 +291,11 @@ class AvailabilityFastLaneGuardTests(unittest.TestCase):
         }
         self.assertEqual(classes[PIT_FEAT], PIT_READY_AVAILABILITY_CLASS)
         self.assertEqual(classes[FORWARD_FEAT], "FORWARD_ONLY")
-        with self.assertRaises(HficSessionError) as raised:
-            _classify(frozen, _spec_for(selected["required_feature_ids"]))
-        self.assertEqual(str(raised.exception), KILL_UNBOUND_EVIDENCE)
+        _expect_gate_denial(
+            self,
+            _classify(frozen, _spec_for(selected["required_feature_ids"])),
+            route="FAST_LANE_READY",
+        )
 
     def test_t10_missing_binding_denied(self) -> None:
         frozen = _freeze(
@@ -285,9 +309,11 @@ class AvailabilityFastLaneGuardTests(unittest.TestCase):
                 [],
             ),
         )
-        with self.assertRaises(HficSessionError) as raised:
-            _classify(mutated, _spec_for(_selected(mutated)["required_feature_ids"]))
-        self.assertEqual(str(raised.exception), KILL_UNBOUND_EVIDENCE)
+        _expect_gate_denial(
+            self,
+            _classify(mutated, _spec_for(_selected(mutated)["required_feature_ids"])),
+            route="FAST_LANE_READY",
+        )
 
     def test_t11_duplicate_binding_denied(self) -> None:
         frozen = _freeze(
@@ -300,9 +326,11 @@ class AvailabilityFastLaneGuardTests(unittest.TestCase):
             bindings.append(copy.deepcopy(bindings[0]))
 
         mutated = _mutate_selected(frozen, duplicate)
-        with self.assertRaises(HficSessionError) as raised:
-            _classify(mutated, _spec_for(_selected(mutated)["required_feature_ids"]))
-        self.assertEqual(str(raised.exception), KILL_UNBOUND_EVIDENCE)
+        _expect_gate_denial(
+            self,
+            _classify(mutated, _spec_for(_selected(mutated)["required_feature_ids"])),
+            route="FAST_LANE_READY",
+        )
 
     def test_t12_extra_unrelated_binding_cannot_weaken(self) -> None:
         frozen = _freeze(
@@ -333,12 +361,14 @@ class AvailabilityFastLaneGuardTests(unittest.TestCase):
             salvaged,
             lambda selected: selected["grounding"]["feature_bindings"].append(extra_pit),
         )
-        with self.assertRaises(HficSessionError) as raised:
+        _expect_gate_denial(
+            self,
             _classify(
                 mutated_forward,
                 _spec_for(_selected(mutated_forward)["required_feature_ids"]),
-            )
-        self.assertEqual(str(raised.exception), KILL_UNBOUND_EVIDENCE)
+            ),
+            route="FAST_LANE_READY",
+        )
 
     def test_t13_non_fast_lanes_unchanged(self) -> None:
         frozen = _freeze(
@@ -382,14 +412,16 @@ class AvailabilityFastLaneGuardTests(unittest.TestCase):
             "solana_alpha_lab.factory.run_passport.experiment_spec_sha256",
             return_value="cd" * 32,
         ):
-            with self.assertRaises(HficSessionError) as live:
+            _expect_gate_denial(
+                self,
                 run_live_classifier(
                     {"experiment_spec": spec},
                     frozen,
                     repo_root=ROOT,
                     data_root=ROOT,
-                )
-        self.assertEqual(str(live.exception), KILL_UNBOUND_EVIDENCE)
+                ),
+                route="FAST_LANE_READY",
+            )
 
     def test_t15_historical_packet_1_3_skips_new_guard(self) -> None:
         frozen = _freeze(
