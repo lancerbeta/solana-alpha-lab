@@ -29606,7 +29606,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
-  integrity: {kind: sha256, sha256: 3713dc407eac35a829fe48430c08fa98f2fc4da911dcd5bf37a44f6688284dcb}
+  integrity: {kind: sha256, sha256: cd6bc3c843f285b39d1973871e576158d7cd69edc0e1310adb2048c919b8e844}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
@@ -34938,7 +34938,7 @@ records:
   as_of: '2026-09-26'
   truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_paper_shadow_execution_integrity_vertical_v1.py', repository_path: tests/test_paper_shadow_execution_integrity_vertical_v1.py}
-  integrity: {kind: sha256, sha256: 5c814d180d335b4eb99fd425eccf73ad69cf1b824a2468360bd604015579cdd4}
+  integrity: {kind: sha256, sha256: e4009bbd962c6a827d28d21cd5e2d4477af0ceefb849d47c80a8175bfc3d8c92}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001}

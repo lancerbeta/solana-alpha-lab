@@ -786,6 +786,26 @@ class PaperPlaneStore:
         runtime_policy_revision: int | None,
         runtime_policy_sha256: str | None,
     ) -> None:
+        with self.immediate_write():
+            self._freeze_admission_binding_locked(
+                position_id,
+                admitted_entry_notional_usd_dec=admitted_entry_notional_usd_dec,
+                strategy_requested_notional_usd_dec=strategy_requested_notional_usd_dec,
+                runtime_policy_mode=runtime_policy_mode,
+                runtime_policy_revision=runtime_policy_revision,
+                runtime_policy_sha256=runtime_policy_sha256,
+            )
+
+    def _freeze_admission_binding_locked(
+        self,
+        position_id: str,
+        *,
+        admitted_entry_notional_usd_dec: str,
+        strategy_requested_notional_usd_dec: str,
+        runtime_policy_mode: str | None,
+        runtime_policy_revision: int | None,
+        runtime_policy_sha256: str | None,
+    ) -> None:
         self._conn.execute(
             """
             UPDATE positions
@@ -1237,21 +1257,21 @@ class PaperPlaneStore:
         }
 
     def fill_paper(self, *, bot_instance_id: str, mint: str, notional_usd: Decimal) -> tuple[str, str]:
-        position_id = self.open_position(
-            bot_instance_id=bot_instance_id,
-            mint=mint,
-            signal_kind="SIMULATED_FILL",
-        )
-        self.transition(position_id, "SIGNALLED")
-        self.transition(position_id, "INTENT_CREATED")
-        self.transition(position_id, "ATTEMPTING")
-        self.transition(position_id, "OPEN")
-        self._conn.execute(
-            "UPDATE positions SET entered_notional_usd=? WHERE position_id=?",
-            (float(notional_usd), position_id),
-        )
-        self._commit()
-        return position_id, "SIMULATED_FILL"
+        with self.immediate_write():
+            position_id = self.open_position(
+                bot_instance_id=bot_instance_id,
+                mint=mint,
+                signal_kind="SIMULATED_FILL",
+            )
+            self.transition(position_id, "SIGNALLED")
+            self.transition(position_id, "INTENT_CREATED")
+            self.transition(position_id, "ATTEMPTING")
+            self.transition(position_id, "OPEN")
+            self._conn.execute(
+                "UPDATE positions SET entered_notional_usd=? WHERE position_id=?",
+                (float(notional_usd), position_id),
+            )
+            return position_id, "SIMULATED_FILL"
 
     def fill_paper_from_signal(
         self,
@@ -1790,21 +1810,21 @@ def observe_shadow(
 ) -> tuple[str, str]:
     """SHADOW observation lifecycle. Never REAL_FILL."""
 
-    position_id = store.open_position(
-        bot_instance_id=bot_instance_id,
-        mint=mint,
-        signal_kind="SHADOW_EXECUTABLE",
-    )
-    store.transition(position_id, "SIGNALLED")
-    store.transition(position_id, "INTENT_CREATED")
-    store.transition(position_id, "ATTEMPTING")
-    store.transition(position_id, "OPEN")
-    store._conn.execute(
-        "UPDATE positions SET entered_notional_usd=? WHERE position_id=?",
-        (float(notional_usd), position_id),
-    )
-    store._conn.commit()
-    return position_id, "SHADOW_EXECUTABLE"
+    with store.immediate_write():
+        position_id = store.open_position(
+            bot_instance_id=bot_instance_id,
+            mint=mint,
+            signal_kind="SHADOW_EXECUTABLE",
+        )
+        store.transition(position_id, "SIGNALLED")
+        store.transition(position_id, "INTENT_CREATED")
+        store.transition(position_id, "ATTEMPTING")
+        store.transition(position_id, "OPEN")
+        store._conn.execute(
+            "UPDATE positions SET entered_notional_usd=? WHERE position_id=?",
+            (float(notional_usd), position_id),
+        )
+        return position_id, "SHADOW_EXECUTABLE"
 
 
 def run_shadow_tick(

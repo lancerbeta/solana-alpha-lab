@@ -29,6 +29,7 @@ from solana_alpha_lab.factory.paper_plane import (  # noqa: E402
 )
 from solana_alpha_lab.factory.paper_shadow_commands import apply_operator_command  # noqa: E402
 from solana_alpha_lab.factory.strategy_runtime import load_strategy_version  # noqa: E402
+from solana_alpha_lab.factory.trading_operations import compose_trading_operations  # noqa: E402
 
 STRAT_REL = "tests/fixtures/paper_shadow_accounting_control/strategy_v1_1_accounting.yaml"
 EPOCH = "ACTIVATION-EPOCH-ACCOUNTING-PAPER-001"
@@ -358,6 +359,43 @@ class WriteIntegrityTests(StoreCase):
                 "RECONCILIATION",
             ],
         )
+
+    def test_trading_operations_scalars_ignore_legacy_event_sort(self) -> None:
+        """DoD: first-wins trace fields stay put when only event order changes."""
+
+        store = self.store()
+        pid = open_filled(store, self.strategy, "SIGDEC-VERT-TO-1")
+        store.apply_paper_exit_fill(position_id=pid, exit_unit_price_usd="1.10", mode="PAPER")
+        causal = compose_trading_operations(ROOT, store)
+        legacy_events = sorted(
+            store.execution_events(),
+            key=lambda event: (str(event.get("created_at") or ""), str(event.get("event_id") or "")),
+        )
+        store.execution_events = lambda: legacy_events  # type: ignore[method-assign]
+        legacy = compose_trading_operations(ROOT, store)
+        fields = (
+            "signal_decision_id",
+            "position_id",
+            "strategy_id",
+            "activation_epoch_id",
+            "mint",
+            "decision_at",
+            "action",
+            "reason_code",
+            "blocker",
+            "stop_stage",
+            "stages",
+        )
+
+        def slim(document: dict[str, Any]) -> dict[str, Any]:
+            row = next(
+                item
+                for item in document["traces"]
+                if item.get("signal_decision_id") == "SIGDEC-VERT-TO-1"
+            )
+            return {field: row.get(field) for field in fields}
+
+        self.assertEqual(slim(causal), slim(legacy))
 
 
 if __name__ == "__main__":
