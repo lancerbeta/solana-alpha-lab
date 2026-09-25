@@ -29,6 +29,7 @@ if str(SRC) not in sys.path:
 from solana_alpha_lab.factory.live_ops_hardening import LiveOpsHardeningError, _now
 from solana_alpha_lab.factory.production_lineage import (
     DENY_CANONICAL_MAIN_UNVERIFIED,
+    ProductionLineageError,
     classify_forward,
     classify_legacy_convergence,
     classify_rollback,
@@ -140,8 +141,9 @@ def scheduled_code_timers(config_dir: Path) -> tuple[str, ...]:
     return tuple(names)
 
 
-def load_scheduled_code_timers() -> tuple[str, ...]:
-    return scheduled_code_timers(PROJECT_ROOT / "configs" / "factory_remote_ops")
+def load_scheduled_code_timers(repo: Path | None = None) -> tuple[str, ...]:
+    root = repo if repo is not None else PROJECT_ROOT
+    return scheduled_code_timers(root / "configs" / "factory_remote_ops")
 
 
 def stop_units() -> None:
@@ -266,6 +268,10 @@ def _unit_busy(state: str) -> bool:
     return state in {"active", "unknown"}
 
 
+def _long_running_must_stop(state: str) -> bool:
+    return state not in {"inactive", "not-found"}
+
+
 def snapshot_units(units: tuple[str, ...], probe) -> dict[str, str]:
     return {unit: probe(unit) for unit in units}
 
@@ -307,16 +313,34 @@ def quiesce_for_release(*, probe, control, sleep, timers: tuple[str, ...], servi
             sleep(DRAIN_POLL_SECONDS)
             waited += DRAIN_POLL_SECONDS
         for unit, state in prior_services.items():
-            if state == "active":
+            if _long_running_must_stop(state):
                 control("stop", unit)
                 stopped_services.append(unit)
-    except Exception:
+                waited = 0
+                while _unit_busy(probe(unit)) or probe(unit) == "failed":
+                    if waited >= budget_seconds:
+                        raise LiveOpsHardeningError("ABORT_DEPLOY")
+                    sleep(DRAIN_POLL_SECONDS)
+                    waited += DRAIN_POLL_SECONDS
+    except Exception as exc:
+        restore_errors: list[str] = []
         for unit in reversed(stopped_services):
             if prior_services.get(unit) == "active":
-                control("start", unit)
+                try:
+                    control("start", unit)
+                except Exception as restore_exc:
+                    restore_errors.append(f"{unit}:{restore_exc}")
         for unit in reversed(stopped_timers):
             if prior_timers.get(unit) == "active":
-                control("start", unit)
+                try:
+                    control("start", unit)
+                except Exception as restore_exc:
+                    restore_errors.append(f"{unit}:{restore_exc}")
+        if restore_errors:
+            raise LiveOpsHardeningError(
+                "ABORT_DEPLOY:tree-not-changed;trigger-restore-incomplete:"
+                + ",".join(restore_errors)
+            ) from exc
         raise
     return {
         "phase": "QUIESCED",
@@ -366,7 +390,7 @@ def forward_release(
         probe = read_unit_state
     if control is None:
         control = systemctl
-    timer_units = timers if timers is not None else load_scheduled_code_timers()
+    timer_units = timers if timers is not None else load_scheduled_code_timers(repo)
     if mode == "legacy-convergence":
         classify_legacy_convergence(
             repo=repo,
@@ -442,6 +466,7 @@ def release_sequence(
     previous_sha: str,
     sync_env: bool = True,
 ) -> dict[str, Any]:
+    raise LiveOpsHardeningError("ROUTINE_TRIPLE_RELEASE_RETIRED")
     if target_sha == previous_sha:
         raise LiveOpsHardeningError("TARGET_EQUALS_PREVIOUS")
     start = read_deploy_sha(deploy_root)
@@ -519,6 +544,6 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except LiveOpsHardeningError as exc:
+    except (LiveOpsHardeningError, ProductionLineageError) as exc:
         sys.stderr.write(f"{exc}\n")
         raise SystemExit(2) from exc
