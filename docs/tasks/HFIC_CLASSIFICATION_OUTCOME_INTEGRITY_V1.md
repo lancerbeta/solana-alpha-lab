@@ -55,6 +55,7 @@ managed_write_set:
   - docs/evidence/hfic_classification_outcome_integrity/a1_delivery_completion_evidence_v1.json
   - docs/evidence/hfic_classification_outcome_integrity/a1_delivery_independent_review_v1.json
   - docs/evidence/hfic_classification_outcome_integrity/a1_delivery_factory_fit_v1.json
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
 
 external_caps:
   network: false
