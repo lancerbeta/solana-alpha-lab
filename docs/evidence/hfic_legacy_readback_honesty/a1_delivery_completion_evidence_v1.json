@@ -1,0 +1,77 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-LEGACY-READBACK-HONESTY-COMPLETION-001",
+  "as_of": "2026-09-25",
+  "task_id": "HFIC_LEGACY_READBACK_HONESTY_V1",
+  "state_change": "LEGACY_HFIC_HISTORY_READS_AS_TYPED_TRUTH",
+  "base_main": "ae678372f2a96fbc20c519c23905ae5c44332458",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "07731d34493883f9f877a62f658542c93ca8086bfcd0396f17d89e3499520659",
+    "catalog/assets/core.yaml": "1e59cb02d325cd9e1a980ba8185d1d59bbabe92fc5470933cafa65ac8d37a825",
+    "docs/evidence/hfic_legacy_readback_honesty/a1_real_copy_rehearsal_v1.json": "d48be5547bbce68a2d38e60b2795c897b8aa5a8d765c72fc5fc394b8e83423ef",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "f1b61d17ffd09b403ffbb446d7feccf41b8315460cc06810935b0057dccbd948",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "a14eeae4f23b7bfe6d9d03f4cea31bd2d772155549725c44a8a8e90ee11795e6",
+    "docs/reports/hfic_legacy_readback_honesty/a1_owner_readout_v1.md": "fe54c33c0dac7d4139092caac35cb8551e1c61ae33d49814ecb07ceee447fd7a",
+    "docs/tasks/HFIC_LEGACY_READBACK_HONESTY_V1.md": "3434ef532ee330891349bd41a3fdf2038255f939486822e39b49eef64c1879a0",
+    "scripts/hypothesis_forge.py": "1212ac45a662c29aadc4fdf026165ebde06c6bb0f5cc791980f1a5d1bfe84c54",
+    "src/solana_alpha_lab/factory/hfic_grounding.py": "75c27310030535b09a4713f363e265cb39ccd47af9e0bd1855d7f89860dfa4b2",
+    "src/solana_alpha_lab/factory/hfic_provenance.py": "17303a652b572d47a8c406bffbfad0a7c87e926e9507578ba48cf040a1b41fc9",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "d0c22f4a38081ad00196e937cea80dbeaee9e05ae8cb6a3080b7bd6fb65871fa",
+    "src/solana_alpha_lab/factory/hfic_session.py": "d581b79e947c212dc0e55bacaf0f441d120022865c1106e7bf11507d97ec65f0",
+    "src/solana_alpha_lab/factory/observation_panel_coverage.py": "785501e50d16925a38e430dfd73ee15030804c4fb399609dbab4e22920a1e9c5",
+    "tests/fixtures/hypothesis_forge/legacy_shapes/l1_provenance_correction_v1_1.json": "aaa4a139540eeec32318f582898cf13ecc7152722f13ce558ca0bb98ecbc2a27",
+    "tests/fixtures/hypothesis_forge/legacy_shapes/l2_runner_up_identity_cycles.json": "d751b7ef0ea1bdc5d9856f6991f6ecf6c76c13a48329432074bb78e5b83c4b66",
+    "tests/fixtures/hypothesis_forge/legacy_shapes/l3_hypothesis_placeholder_created_at.json": "84436452b8e7b2682382b7540b12c5ee564adb118f492348ac148bc138fbf58b",
+    "tests/test_hfic_legacy_readback_honesty_v1.py": "666af98da153d51a5f1a05a1ab672fec01e875f4089ac365b69c3e8234da49d4",
+    "tests/test_hfic_provenance_clock.py": "16f6c6feec5224360501a311d63dc88c4f1f7ba57f6dfe257cd14ecdb9528d98"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_legacy_readback_honesty/a1_delivery_factory_fit_v1.json",
+    "sha256": "86ebdaf335367ef10e3cfb29d6069aeed48770b6c8f82274883a6fbc468738ff",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_HFIC_LEGACY_READBACK_HONESTY_FOCUSED_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_legacy_readback_honesty/a1_delivery_independent_review_v1.json",
+      "sha256": "3346351d9ca0f061fba80acf89a0cd7c48b675e69de1609e7cf4270bd3c381ec",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_TASK_CONTRACT",
+      "PASS_RED_THEN_GREEN_T1_T5",
+      "PASS_FOCUSED_HFIC_REGRESSION",
+      "PASS_REAL_COPY_REHEARSAL_GO",
+      "PASS_J3_EXPECTED_NEXT_ACTION_TABLE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_SCIENTIFIC_FORGE",
+    "NO_RDP_REWRITE",
+    "NO_A5_ADMISSION_WEAKENING",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "network_calls": 0,
+    "local_writes": 0,
+    "external_actions": 0
+  }
+}

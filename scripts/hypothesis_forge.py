@@ -517,8 +517,15 @@ def cmd_forge_run(
     )
 
     def _emit_run(payload: dict[str, Any], *, exit_code: int) -> int:
-        if payload.get("no_write") is True or not payload.get("owner_readout"):
+        existing = str(payload.get("owner_readout") or "")
+        history = next(
+            (line for line in existing.splitlines() if line.startswith("history:")),
+            "",
+        )
+        if payload.get("no_write") is True or not existing:
             payload["owner_readout"] = format_forge_run_owner_readout(payload)
+        if history and "history:" not in str(payload.get("owner_readout") or ""):
+            payload["owner_readout"] = str(payload.get("owner_readout") or "").rstrip() + "\n" + history
         _assert_no_path_leak(payload, str(repo_root))
         readout = payload.get("owner_readout")
         if isinstance(readout, str) and readout.strip():
@@ -1334,7 +1341,8 @@ def cmd_prove_runtime(
     store = ResearchStore(data_root)
     payload = prove_runtime(store, session_id, repo_root=repo_root)
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
-    return emit(payload)
+    exit_code = 1 if payload.get("proof_status") == "NOT_A_PROOF" else 0
+    return emit(payload, exit_code=exit_code)
 
 
 def cmd_inventory_placeholder_times(
@@ -1449,6 +1457,7 @@ def cmd_diagnostics(
         HficGroundingError,
         aggregate_diagnostics,
         collect_session_receipts,
+        session_read_census,
     )
 
     data_root = _store_root(repo_root, explicit_data_root)
@@ -1456,6 +1465,7 @@ def cmd_diagnostics(
     try:
         receipts = collect_session_receipts(store)
         payload = aggregate_diagnostics(receipts, last_n)
+        payload.update(session_read_census(store))
     except HficGroundingError as exc:
         raise HficCliError(str(exc)) from exc
     payload["action"] = "DIAGNOSTICS"

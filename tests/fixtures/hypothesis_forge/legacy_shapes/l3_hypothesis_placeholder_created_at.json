@@ -1,0 +1,13 @@
+{
+  "fixture": "SYNTHETIC_AUDIT_FIXTURE",
+  "hypothesis_version_id": "HFIC-HYP-LEGACY-EPOCH-0001",
+  "definition_sha256": "ee0123456789ee0123456789ee0123456789ee0123456789ee0123456789ee01",
+  "created_at": "1970-01-01T00:00:00Z",
+  "family_id": "HYP-FAMILY-LEGACY-EPOCH",
+  "version_ordinal": 1,
+  "origin_id": "HYP-ORIGIN-LEGACY-EPOCH",
+  "origin_kind": "DATA_ANALYSIS",
+  "statement": "SYNTHETIC_AUDIT_FIXTURE",
+  "mechanism": "placeholder clock",
+  "falsifier": "unknown registration time"
+}

@@ -427,6 +427,59 @@ def aggregate_diagnostics(
     }
 
 
+def session_read_census(store: Any) -> dict[str, Any]:
+    """Read-only session census. Does not admit or reuse a conflicted row."""
+
+    from solana_alpha_lab.factory.hfic_evidence_identity import DISPOSITION_UNRESOLVED
+    from solana_alpha_lab.factory.hfic_provenance import store_provenance_label
+    from solana_alpha_lab.factory.hfic_session import (
+        HficSessionError,
+        list_hfic_sessions,
+        load_session_bundle,
+    )
+
+    listed = list_hfic_sessions(store)
+    readable = 0
+    unresolved = 0
+    unreadable: list[dict[str, str]] = []
+    for item in listed:
+        session_id = str(item.get("session_id") or "")
+        if not session_id:
+            continue
+        try:
+            bundle = load_session_bundle(store, session_id, read_mode=True)
+        except HficSessionError as exc:
+            unreadable.append(
+                {
+                    "session_suffix": session_id.removeprefix("HFIC-SESS-"),
+                    "code": str(exc),
+                }
+            )
+            continue
+        if bundle is None:
+            unreadable.append(
+                {
+                    "session_suffix": session_id.removeprefix("HFIC-SESS-"),
+                    "code": "SESSION_NOT_FOUND",
+                }
+            )
+            continue
+        if bundle.get("identity_status") == DISPOSITION_UNRESOLVED:
+            unresolved += 1
+        else:
+            readable += 1
+    from solana_alpha_lab.factory.hfic_provenance import inventory_digest_drift
+
+    return {
+        "sessions_listed": len(listed),
+        "sessions_readable": readable,
+        "sessions_unresolved": unresolved,
+        "sessions_unreadable": unreadable,
+        "provenance_time_status": store_provenance_label(store),
+        "inventory_digest_drift": inventory_digest_drift(store),
+    }
+
+
 def collect_session_receipts(store: Any) -> list[dict[str, Any]]:
     """Read-only extract of SESSION_RECEIPT payloads from ResearchStore."""
     receipts: list[dict[str, Any]] = []

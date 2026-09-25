@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-LEGACY-READBACK-HONESTY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-25",
+  "task_id": "HFIC_LEGACY_READBACK_HONESTY_V1",
+  "reviewed_bindings_sha256": "56b632a0c34a0d55f955fd8f48e543ed4e6a072e6bc9b8ee97aa2d01f9b6440b",
+  "reviewed_inventory_sha256": "7a9ae208abe8347468dc2103cf5888ac003ff92bde16161ac75457d9781c09e9",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=e18cd69f3f808f1b262ae967145f579bfe570b4ac1f64c721bf7b552bb4a2197",
+        "PASS_R1_OWNER_HOLD_IDENTITY_COVERAGE",
+        "PASS_PHANTOM_CORRUPT_AND_DIGEST_DRIFT_VISIBLE",
+        "PASS_CLEAN_SESSION_PROOF_SEPARATE_FROM_STORE"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_PARTIAL_OR_UNCOVERED_NOT_MISMATCH",
+        "PASS_NOT_A_PROOF_EXITS_NONZERO",
+        "PASS_INVALID_STORE_AND_CURRENT_MARKET_CONFLICT_BLOCK_START"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_J3_TABLE_RESUME_BASE_AND_FINISH_RUNNER_UP",
+        "PASS_J5_NO_WORTHY_CRITIC_NOT_LAUNCHED",
+        "PASS_PLACEHOLDER_TIME_EXPLORATORY_REUSE"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_PROVE_RUNTIME_SESSION_SCOPED",
+        "PASS_HISTORY_LINE_AND_STOP_BEFORE_PROMPT_A",
+        "PASS_NOT_A_PROOF_DOES_NOT_LOOK_PROVEN"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_RDP_REWRITE",
+    "NO_MERGE",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}
