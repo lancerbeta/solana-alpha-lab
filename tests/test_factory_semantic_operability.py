@@ -26,6 +26,7 @@ from solana_alpha_lab.factory_semantic_operability import (  # noqa: E402
     semantic_capability_digest_sha256,
     validate_semantic_projection,
 )
+from solana_alpha_lab import factory_semantic_operability as fso  # noqa: E402
 from validate_catalog import load_and_validate  # noqa: E402
 
 GOLD_PATH = ROOT / "catalog/fixtures/semantic_route_gold_queries_v1.yaml"
@@ -367,6 +368,47 @@ class FactorySemanticOperabilityTests(unittest.TestCase):
             8 * 1024,
         )
         self.assertNotIn("PROJECT_MAP", json.dumps(sample))
+
+
+class SemanticCatalogParseCacheTests(unittest.TestCase):
+    def test_repeated_digest_parses_each_catalog_file_once(self) -> None:
+        fso._parse_yaml_text.cache_clear()
+        first = fso.semantic_capability_digest_for_repo(ROOT)
+        parsed = fso._parse_yaml_text.cache_info().misses
+        second = fso.semantic_capability_digest_for_repo(ROOT)
+        self.assertEqual(first, second)
+        self.assertGreater(parsed, 0)
+        self.assertEqual(fso._parse_yaml_text.cache_info().misses, parsed)
+
+    def test_cached_views_are_private_copies(self) -> None:
+        assets, bindings, _queries = load_semantic_catalog_views(ROOT)
+        asset_id = sorted(assets)[0]
+        assets[asset_id]["status"] = "MUTATED_BY_TEST"
+        bindings["MUTATED_BY_TEST"] = {}
+        again_assets, again_bindings, _ = load_semantic_catalog_views(ROOT)
+        self.assertNotEqual(again_assets[asset_id].get("status"), "MUTATED_BY_TEST")
+        self.assertNotIn("MUTATED_BY_TEST", again_bindings)
+
+    def test_changed_text_is_reparsed(self) -> None:
+        self.assertEqual(fso._load_yaml_text("value: 1\n"), {"value": 1})
+        self.assertEqual(fso._load_yaml_text("value: 2\n"), {"value": 2})
+        self.assertEqual(fso._load_yaml_text("value: 1\n"), {"value": 1})
+
+    def test_fast_loader_matches_safe_loader_on_catalog_files(self) -> None:
+        manifest = yaml.safe_load(
+            (ROOT / fso.MANIFEST_RELATIVE).read_text(encoding="utf-8")
+        )
+        resolver = manifest.get("root_resolver") or {}
+        relatives = [fso.PROJECTION_RELATIVE, fso.MANIFEST_RELATIVE]
+        relatives += list(resolver.get("asset_registries") or [])
+        relatives += list(resolver.get("query_registries") or [])
+        for relative in relatives:
+            text = (ROOT / relative).read_text(encoding="utf-8")
+            with self.subTest(path=relative):
+                self.assertEqual(
+                    fso._load_yaml_text(text),
+                    yaml.load(text, Loader=yaml.SafeLoader),
+                )
 
 
 if __name__ == "__main__":

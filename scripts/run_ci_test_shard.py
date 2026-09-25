@@ -24,10 +24,48 @@ import profile_test_wall_clock as profiler  # noqa: E402
 STALE_UNPLANNED_COUNT = 8
 STALE_UNPLANNED_FRACTION = 0.05
 STALE_PROFILE_WARNING = "CI_SHARD_PROFILE_STALE_REBALANCE_RECOMMENDED"
+SHARD_SOFT_BUDGET_SECONDS = 20 * 60
+SHARD_OVER_SOFT_BUDGET = "CI_SHARD_OVER_SOFT_BUDGET"
+SLOWEST_MODULES_SHOWN = 10
 
 
 class ShardError(ValueError):
     """Fail-closed shard runner error."""
+
+
+class ModuleTimingResult(unittest.TextTestResult):
+    """Attribute wall time between test completions to each test module."""
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.module_seconds: dict[str, float] = {}
+        self.module_cases: dict[str, int] = {}
+        self._module: str | None = None
+        self._mark = time.perf_counter()
+
+    def stopTest(self, test) -> None:
+        super().stopTest(test)
+        now = time.perf_counter()
+        module = type(test).__module__
+        if self._module is not None and module != self._module:
+            self._report(self._module)
+        self._module = module
+        self.module_seconds[module] = self.module_seconds.get(module, 0.0) + now - self._mark
+        self.module_cases[module] = self.module_cases.get(module, 0) + 1
+        self._mark = now
+
+    def stopTestRun(self) -> None:
+        super().stopTestRun()
+        if self._module is not None:
+            self._report(self._module)
+
+    def _report(self, module: str) -> None:
+        # Streamed so a job cancelled at its timeout still names finished modules.
+        print(
+            f"module_done seconds={self.module_seconds[module]:.1f} "
+            f"cases={self.module_cases[module]} module={module}",
+            flush=True,
+        )
 
 
 def stale_profile_warning(
@@ -225,7 +263,9 @@ def run_shard(
     if case_count < 1:
         raise ShardError("SHARD_ZERO_CASES")
     stream = io.StringIO()
-    runner = unittest.TextTestRunner(stream=stream, verbosity=1)
+    runner = unittest.TextTestRunner(
+        stream=stream, verbosity=1, resultclass=ModuleTimingResult
+    )
     started = time.perf_counter()
     result = runner.run(suite)
     elapsed = time.perf_counter() - started
@@ -240,6 +280,22 @@ def run_shard(
         f"skipped={len(result.skipped)} unexpected_successes={len(unexpected)} "
         f"elapsed_seconds={elapsed:.3f}"
     )
+    slowest = sorted(
+        result.module_seconds.items(), key=lambda item: (-item[1], item[0])
+    )[:SLOWEST_MODULES_SHOWN]
+    print(f"slowest_modules={len(slowest)}")
+    for module, seconds in slowest:
+        print(
+            f"slow_module seconds={seconds:.1f} "
+            f"cases={result.module_cases[module]} module={module}"
+        )
+    if elapsed > SHARD_SOFT_BUDGET_SECONDS:
+        top = ",".join(f"{module}:{seconds:.0f}s" for module, seconds in slowest[:3])
+        print(
+            f"::warning title={SHARD_OVER_SOFT_BUDGET}::shard_index={index} "
+            f"elapsed_seconds={elapsed:.0f} "
+            f"budget_seconds={SHARD_SOFT_BUDGET_SECONDS} top={top}"
+        )
     if (
         (not result.wasSuccessful())
         or result.failures

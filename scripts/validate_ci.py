@@ -33,12 +33,11 @@ DELIVERY_PREFLIGHT_COMMAND = (
 DELIVERY_PREFLIGHT_SCHEMA = (
     "solana-alpha-lab.tracked-only-delivery-preflight.v1"
 )
-# Work jobs use a 25-minute wall so shard variance does not cancel green runs.
-# Tracked-only delivery preflight still keeps a separate local full-gate cap.
-GITHUB_VALIDATE_TIMEOUT_MINUTES = 60
-# Temporary headroom for the final A5 test shards only. Core and execution
-# stay on GITHUB_VALIDATE_TIMEOUT_MINUTES.
-GITHUB_VALIDATE_TESTS_TIMEOUT_MINUTES = 80
+# CI job limits are budgets, not headroom: a job near its limit is a
+# regression to diagnose from the shard log's module_done/slow_module lines.
+# Tracked-only delivery preflight keeps its separate local full-gate cap.
+GITHUB_VALIDATE_TIMEOUT_MINUTES = 25
+GITHUB_VALIDATE_TESTS_TIMEOUT_MINUTES = 30
 GITHUB_AGGREGATOR_TIMEOUT_MINUTES = 5
 DELIVERY_PREFLIGHT_TIMEOUT_MINUTES = 25
 DELIVERY_PREFLIGHT_TIMEOUT_SECONDS = DELIVERY_PREFLIGHT_TIMEOUT_MINUTES * 60
