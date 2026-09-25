@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-25",
+  "as_of": "2026-09-26",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "REVIEW_IS_NOT_SEMANTIC_DONE",
@@ -18,37 +18,38 @@
   "reviews": [
     {
       "findings": [
-        "ab4b1399: activating/failed long-running units could survive tree swap",
-        "ab4b1399: quiesce restore start failure could leave earlier triggers stopped",
-        "REMEDIATED_IN_2c0bf99f: stop non-inactive long-running units and continue restore after a start error"
+        "SIGTERM stop leaving workbench failed is not treated as busy",
+        "only active long-running units are stopped",
+        "unknown long-running state aborts before tree mutation"
       ],
       "role": "CODE_REVIEWER",
       "verdict": "PASS"
     },
     {
       "findings": [
-        "CHECKED_ONESHOT_DRAIN_BEFORE_TREE_MUTATION",
-        "CHECKED_START_ONLY_AFTER_VERIFIED_ROLLBACK",
-        "CHECKED_LEGACY_TARGET_EQUALS_CURRENT_MAIN_AND_EVIDENCE_BLOB",
-        "CHECKED_EXTERNAL_HEARTBEAT_TIMER_IN_INVENTORY",
-        "CHECKED_ORDINARY_FORWARD_REJECTS_SIDE_BRANCH"
+        "non-running terminals inactive/failed/not-found do not false-drain",
+        "active and unknown oneshots still drain or abort before mutation",
+        "running state is not treated as quiesced",
+        "rollback starts units only after a verified tree"
       ],
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS"
     },
     {
       "findings": [
-        "CHECKED_ONE_FORWARD_TRANSITION",
-        "CHECKED_C3_PLAN_ONLY_STILL_PRESENT",
-        "CHECKED_NO_VPS_DEPLOY"
+        "failed after SIGTERM proceeds to one forward install",
+        "initially failed unit is not started",
+        "unknown aborts before mutate",
+        "C3 plan-only remains asserted"
       ],
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS"
     },
     {
       "findings": [
-        "ab4b1399: ABORT_DEPLOY and UNRESOLVED_RECOVERY were bare codes",
-        "REMEDIATED_IN_2c0bf99f: runbook states tree-not-changed versus units-stay-stopped"
+        "runbook states failed after SIGTERM is already quiesced",
+        "only active workbench/health are stopped",
+        "ABORT_DEPLOY still means the tree was not changed"
       ],
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS"

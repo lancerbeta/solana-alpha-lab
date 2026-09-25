@@ -1,7 +1,7 @@
 {
   "acceptance_id": "FACTORY-PRODUCTION-LINE-CONVERGENCE-COMPLETION-001",
   "active_stop_conditions": [],
-  "as_of": "2026-09-25",
+  "as_of": "2026-09-26",
   "base_main": "94a4ea74afb6c921f4972312840be2de5eeba4f9",
   "capability_radar_now": "NONE",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
