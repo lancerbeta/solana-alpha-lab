@@ -1,0 +1,120 @@
+{
+  "schema": "smial.hfic-legacy-readback-honesty-rehearsal",
+  "schema_version": "1.0",
+  "head": "6d3f674721682aa264221fb5811b1d930aa545aa",
+  "rehearsed_code_head": "859271a8f2c5d3a8cef74de7465af1726ec67709",
+  "base": "971e0a09e600ae3210b07094dd071824708d6bbd",
+  "marker": "SYNTHETIC_AUDIT_FIXTURE",
+  "market_evidence_epoch_sha256": "3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9",
+  "capability_epoch_sha256": "88121b6e0b939a776c90d864f93bb6cea8181126dd461427e3aecc9d46d72335",
+  "real_rdp_manifest_unchanged": true,
+  "verdict": "GO",
+  "owner_r1_choice": "KEEP_EXTRA_COMMITTED_AFFECTED_RECORDS",
+  "j3_checks": [
+    {
+      "point": "after_freeze",
+      "expected_next_action": "RESUME_BASE",
+      "actual_next_action": "RESUME_BASE",
+      "session_id": "HFIC-SESS-E320480A0425A3ED",
+      "scientific_slot_sha256": "212149f7d9afdcffa3dc7a0df69f8f53bea0af080722c4f2cc5cc05813a5299c",
+      "start_seen": false,
+      "pass": true
+    },
+    {
+      "point": "after_awaiting_classification",
+      "expected_next_action": "RESUME_BASE",
+      "actual_next_action": "RESUME_BASE",
+      "session_id": "HFIC-SESS-E320480A0425A3ED",
+      "scientific_slot_sha256": "212149f7d9afdcffa3dc7a0df69f8f53bea0af080722c4f2cc5cc05813a5299c",
+      "start_seen": false,
+      "pass": true
+    },
+    {
+      "point": "after_runner_up_awaiting_critic",
+      "expected_next_action": "FINISH_RUNNER_UP",
+      "actual_next_action": "FINISH_RUNNER_UP",
+      "session_id": "HFIC-SESS-E320480A0425A3ED",
+      "scientific_slot_sha256": "212149f7d9afdcffa3dc7a0df69f8f53bea0af080722c4f2cc5cc05813a5299c",
+      "start_seen": false,
+      "pass": true
+    }
+  ],
+  "history": {
+    "h1_sessions": 17,
+    "h1_crashes": 0,
+    "h1_identity_status": "UNRESOLVED_BINDING",
+    "h1_identity_conflict_fields": ["memory_eligibility_sha256"],
+    "h2_sessions_listed": 17,
+    "h2_sessions_readable": 16,
+    "h2_sessions_unresolved": 1,
+    "h2_provenance_time_status": "CORRECTED_ORIGINAL_UNKNOWN",
+    "h2_inventory_digest_drift": false,
+    "h4_placeholder_count": 20,
+    "h4_exploratory_reuse": 20,
+    "h4_e2e_compile_evidence_role": "EXPLORATORY_REUSE"
+  },
+  "journeys": [
+    {
+      "journey": "j1a",
+      "session_id": "HFIC-SESS-E320480A0425A3ED",
+      "evidence_surface_mode": "CURRENT_REPRESENTATION_CONTROL_V1",
+      "final_terminal": "PASS_FAST_LANE_READY",
+      "runtime_no_git": "PROVEN",
+      "proof_status": "PROVEN",
+      "provenance_time_status": "VALID",
+      "store_provenance_time_status": "CORRECTED_ORIGINAL_UNKNOWN",
+      "session_time_flags_absent": true
+    },
+    {
+      "journey": "j1b",
+      "primary_state": "RUNNER_UP_AWAITING_CRITIC",
+      "primary_terminal": "KILL_UNBOUND_EVIDENCE",
+      "final_terminal": "KILL_MECHANISM",
+      "critic_screen_count": 2,
+      "c3": false
+    },
+    {
+      "journey": "j1c",
+      "lane_classifier_terminal": "SCHEDULE_ACTIVATION_REQUIRED",
+      "final_terminal": "OWNER_DECISION_REQUIRED"
+    },
+    {
+      "journey": "j2",
+      "selection_gate_points": [
+        {
+          "point": "before_cycle",
+          "integrity": "PASS",
+          "router_decision": "BLOCK_FORGE_SELECTION_RISK",
+          "integrity_invalid": false,
+          "preflight_action": "START_NEW_SESSION"
+        },
+        {
+          "point": "after_freeze",
+          "integrity": "PASS",
+          "router_decision": "BLOCK_FORGE_SELECTION_RISK",
+          "integrity_invalid": false
+        },
+        {
+          "point": "after_synthesis_complete",
+          "integrity": "PASS",
+          "router_decision": "BLOCK_FORGE_SELECTION_RISK",
+          "integrity_invalid": false
+        }
+      ],
+      "control_flag_preflight_action": "STOP",
+      "control_flag_preflight_next": "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
+      "clean_preflight_action": "RETURN_EXISTING_SESSION",
+      "clean_preflight_session_id": "HFIC-SESS-E320480A0425A3ED",
+      "forge_run_next_action": "OWNER_CANDIDATE",
+      "writes": {"forge_run": 0, "research_store": 0, "session": 0, "forge_context": 0}
+    },
+    {
+      "journey": "j5",
+      "session_id": "HFIC-SESS-E320480A0425A3ED",
+      "session_state": "SYNTHESIS_COMPLETE",
+      "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+      "critic_launched": false,
+      "forge_run_next_action": "RESUME_V1"
+    }
+  ]
+}
