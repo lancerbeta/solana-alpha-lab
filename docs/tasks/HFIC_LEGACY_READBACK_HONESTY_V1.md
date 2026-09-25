@@ -101,7 +101,6 @@ context_requirements:
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
     DELIVERY_EVIDENCE:
-      - docs/evidence/hfic_legacy_readback_honesty/a1_real_copy_rehearsal_v1.json
       - docs/evidence/hfic_legacy_readback_honesty/a1_delivery_completion_evidence_v1.json
       - docs/evidence/hfic_legacy_readback_honesty/a1_delivery_independent_review_v1.json
       - docs/evidence/hfic_legacy_readback_honesty/a1_delivery_factory_fit_v1.json
