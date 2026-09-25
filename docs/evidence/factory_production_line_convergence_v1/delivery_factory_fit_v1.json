@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-25",
+  "as_of": "2026-09-26",
   "capability_radar": {
     "now": "NONE",
     "watch": "NONE"
@@ -24,8 +24,8 @@
   "mode": "FAST_PATH",
   "recovery": "REVERT_THIS_BRANCH_ONLY",
   "review_id": "FACTORY-PRODUCTION-LINE-CONVERGENCE-FACTORY-FIT-001",
-  "reviewed_bindings_sha256": "141135f9abc22c6fb14c5cba4dcd72808694ba376f9286f01235e6529b39f555",
-  "reviewed_inventory_sha256": "8ae98c6a5ffb46f707a65da86d8cc27191b4d49738ea47dc4fa94ce9972901e2",
+  "reviewed_bindings_sha256": "4edc3f47cea1452d3d96170eaa3e866de9da76b117f30177f13fecf987b839d4",
+  "reviewed_inventory_sha256": "8e13195a17719716f4245c85942ddebe63858d88924de6740bf1f05c96f82692",
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
   "task_id": "FACTORY_PRODUCTION_LINE_CONVERGENCE_V1",
