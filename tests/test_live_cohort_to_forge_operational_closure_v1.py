@@ -447,6 +447,20 @@ def _write_stub_live_corpus(data_root: Path, *, cohort_id: str) -> None:
         ),
         encoding="utf-8",
     )
+    # Linux glob dataset-*.published is case-sensitive. The uppercase stub
+    # manifest name is not that layout marker, so a lineage row that already
+    # carries dataset_manifest_id is dropped and visible cohorts no longer
+    # match lineage bindings.
+    (manifests / f"dataset-{file_sha}.published").write_text(
+        json.dumps(
+            {
+                "dataset_manifest_id": STUB_CORPUS_MANIFEST,
+                "dataset_fingerprint": fingerprint,
+            },
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
     (manifests / f"{STUB_CORPUS_MANIFEST}.published").write_text(
         json.dumps(
             {

@@ -2650,6 +2650,8 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 capability_doc.read_text(encoding="utf-8") + "\nA5-G7-REAL-GIT-DOC-CHANGE\n",
                 encoding="utf-8",
             )
+            _git(clone, "config", "user.name", "A5 G7")
+            _git(clone, "config", "user.email", "a5-g7@example.invalid")
             _git(clone, "add", capability_doc.relative_to(clone).as_posix())
             _git(clone, "commit", "-m", "test: change capability document")
             with patch(

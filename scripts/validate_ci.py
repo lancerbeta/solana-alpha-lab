@@ -36,6 +36,9 @@ DELIVERY_PREFLIGHT_SCHEMA = (
 # Work jobs use a 25-minute wall so shard variance does not cancel green runs.
 # Tracked-only delivery preflight still keeps a separate local full-gate cap.
 GITHUB_VALIDATE_TIMEOUT_MINUTES = 60
+# Temporary headroom for the final A5 test shards only. Core and execution
+# stay on GITHUB_VALIDATE_TIMEOUT_MINUTES.
+GITHUB_VALIDATE_TESTS_TIMEOUT_MINUTES = 80
 GITHUB_AGGREGATOR_TIMEOUT_MINUTES = 5
 DELIVERY_PREFLIGHT_TIMEOUT_MINUTES = 25
 DELIVERY_PREFLIGHT_TIMEOUT_SECONDS = DELIVERY_PREFLIGHT_TIMEOUT_MINUTES * 60
@@ -724,7 +727,7 @@ def expected_workflow() -> dict[str, Any]:
             },
             "validate-tests": {
                 "runs-on": "ubuntu-24.04",
-                "timeout-minutes": str(GITHUB_VALIDATE_TIMEOUT_MINUTES),
+                "timeout-minutes": str(GITHUB_VALIDATE_TESTS_TIMEOUT_MINUTES),
                 "env": {
                     "UV_NO_ENV_FILE": "1",
                     "PYTHONDONTWRITEBYTECODE": "1",

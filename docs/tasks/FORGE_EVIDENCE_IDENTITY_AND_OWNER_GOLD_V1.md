@@ -46,6 +46,7 @@ managed_write_set:
   - schemas/research_memory_projection_v1.sql
   - .github/workflows/ci.yml
   - scripts/validate_ci.py
+  - tests/test_ci.py
   - configs/hypothesis_forge_independent_critic_v1.yaml
   - configs/hfic_representation_ladder_v1.yaml
   - catalog/schemas/forge_run_receipt_v1.schema.json
