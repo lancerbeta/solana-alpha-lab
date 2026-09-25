@@ -10,7 +10,20 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "84660074b1f35cd9907ab236d32e0cf07d236c4b6ec2fcff373d4a07b7f981ef",
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "f9ae4b6437314ac4bdfdd19480806b1e664b1a3d73fea6366ceacebfe442abed",
+    "catalog/assets/core.yaml": "a1047ed6fd5c70637b4dd1c58511de350f69354e454c377d571db5aad1c20810",
+    "docs/evidence/hfic_classification_outcome_integrity/a1_real_copy_rehearsal_v1.json": "0704afd358e5fe0f64b51b964a8c5fc8f50d89e7dbe4826ca3fe5cf437e0edb1",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "65619ae758330501eedff46f191983bdd89606c065119d563b54427ca9b873fc",
+    "docs/reports/hfic_classification_outcome_integrity/a1_owner_readout_v1.md": "0d896afea88acb3bcfb12b67147d01031d4b090d54724c541a9a7fd2b528217b",
+    "docs/tasks/HFIC_CLASSIFICATION_OUTCOME_INTEGRITY_V1.md": "7f2cad67995bf0e590f49db516c586dbce886580bd1abfbb088545b53174926a",
+    "src/solana_alpha_lab/factory/hfic_control_integrity.py": "11a966a652bfe6c92ef96de0ac6b462e7fcd5100761244a2e059119a1d9f7d24",
+    "src/solana_alpha_lab/factory/hfic_session.py": "ab783abe254959cc44189c0c1d8d11d0e5a0d1f2516316f06f4ec3ca1beba5e6",
+    "tests/test_hfic_classification_outcome_integrity_v1.py": "e7e00ad02529a722ce855e12e831c4ac73b817df08a5c96d1daef851c5e374e6",
+    "tests/test_hfic_fresh_control_decision_integrity_closure_v1.py": "a7076019be7edc1e6fe1ca5ee4ea6a9ce215324dba7f22a361bd8df1949a2302",
+    "tests/test_hfic_packet14_availability_fast_lane_guard_v1.py": "ca85f4428360ba2e4d84c2675d67ed1fa369d863b76aa0c0667f7e92c9c7402f"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +34,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_classification_outcome_integrity/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "eecdfa2a1532070ecb4626d3f43b0a938fab726d2baad89cbdaba5efca0cbe7f",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_CLASSIFICATION_OUTCOME_INTEGRITY_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/hfic_classification_outcome_integrity/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "673d34c379fefd125ee959d866b276197772624249de70f67effb00106f12969",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
