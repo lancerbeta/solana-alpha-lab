@@ -7299,6 +7299,13 @@ def prove_runtime(
     bundle = load_session_bundle(store, session_id, read_mode=True)
     if bundle is None:
         raise HficSessionError("SESSION_NOT_FOUND")
+    if bundle.get("identity_status") == "UNRESOLVED_BINDING":
+        shown = show_session(store, session_id, repo_root=repo_root)
+        return {
+            **shown,
+            "runtime_no_git": "UNRESOLVED_BINDING",
+            "store_provenance_time_status": "NOT_A_PROOF",
+        }
     receipt = bundle.get("session_receipt")
     if not isinstance(receipt, Mapping):
         raise HficSessionError("SESSION_RECEIPT_MISSING")

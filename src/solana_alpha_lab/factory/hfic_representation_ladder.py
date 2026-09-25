@@ -959,17 +959,25 @@ def _history_readout_line(
     listed_sessions: Sequence[Mapping[str, Any]],
     skipped: Sequence[Mapping[str, str]],
 ) -> str:
+    from solana_alpha_lab.factory.hfic_grounding import session_read_census
     from solana_alpha_lab.factory.hfic_provenance import store_provenance_label
 
-    listed = len(listed_sessions)
-    skipped_n = len(skipped)
-    readable = max(0, listed - skipped_n)
-    codes = ",".join(
-        f"{item.get('session_suffix')}:{item.get('code')}" for item in skipped
+    census = session_read_census(store)
+    listed = int(census.get("sessions_listed") or len(listed_sessions))
+    unresolved = int(census.get("sessions_unresolved") or 0)
+    unreadable = [item for item in (census.get("sessions_unreadable") or []) if isinstance(item, Mapping)]
+    unresolved_codes = ",".join(
+        f"{item.get('session_suffix')}:{item.get('code')}"
+        for item in skipped
+        if item.get("code") == "SCIENTIFIC_IDENTITY_CONFLICT"
     ) or "none"
+    skip_codes = ",".join(
+        f"{item.get('session_suffix')}:{item.get('code')}" for item in unreadable
+    ) or "none"
+    readable = int(census.get("sessions_readable") or 0)
     return (
-        f"history: readable {readable}/{listed}; unresolved 0; "
-        f"skipped {skipped_n} ({codes}); provenance: {store_provenance_label(store)}"
+        f"history: readable {readable}/{listed}; unresolved {unresolved} ({unresolved_codes}); "
+        f"skipped {len(unreadable)} ({skip_codes}); provenance: {store_provenance_label(store)}"
     )
 
 
@@ -3050,6 +3058,15 @@ def evaluate_forge_run(
         owner_final = None
         decision = dict(decision)
         decision["reason_code"] = "CURRENT_MARKET_HISTORY_UNREADABLE"
+    else:
+        from solana_alpha_lab.factory.hfic_provenance import store_provenance_label
+
+        store_provenance = store_provenance_label(store)
+        if store_provenance.startswith("INVALID:"):
+            next_action = ACTION_OBSERVABILITY_BLOCKED
+            owner_final = None
+            decision = dict(decision)
+            decision["reason_code"] = "STORE_PROVENANCE_INVALID"
     if owner_class_input == OWNER_CLASS_INPUT_NOT_READY:
         owner_class = OWNER_CLASS_INPUT_NOT_READY
     elif owner_class_input == OWNER_CLASS_OBSERVABILITY_BLOCKED or next_action == ACTION_OBSERVABILITY_BLOCKED:
