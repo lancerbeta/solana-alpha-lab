@@ -12,12 +12,12 @@
   "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "07731d34493883f9f877a62f658542c93ca8086bfcd0396f17d89e3499520659",
-    "catalog/assets/core.yaml": "77bd4013fe96658b13cfec616bbc62c142aebbbec2c5d89ad7e5854e9c08debc",
+    "catalog/assets/core.yaml": "1e59cb02d325cd9e1a980ba8185d1d59bbabe92fc5470933cafa65ac8d37a825",
     "docs/evidence/hfic_legacy_readback_honesty/a1_real_copy_rehearsal_v1.json": "d48be5547bbce68a2d38e60b2795c897b8aa5a8d765c72fc5fc394b8e83423ef",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "9772f8db6077d532dd678a0ca64269bbc7ab56e6a1eb7b5df9e51184afe89d45",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "f1b61d17ffd09b403ffbb446d7feccf41b8315460cc06810935b0057dccbd948",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "a14eeae4f23b7bfe6d9d03f4cea31bd2d772155549725c44a8a8e90ee11795e6",
     "docs/reports/hfic_legacy_readback_honesty/a1_owner_readout_v1.md": "fe54c33c0dac7d4139092caac35cb8551e1c61ae33d49814ecb07ceee447fd7a",
-    "docs/tasks/HFIC_LEGACY_READBACK_HONESTY_V1.md": "a033756f8951c41b346b5f03b9923d37644f5a71170872d5583c034f54bdccd5",
+    "docs/tasks/HFIC_LEGACY_READBACK_HONESTY_V1.md": "3434ef532ee330891349bd41a3fdf2038255f939486822e39b49eef64c1879a0",
     "scripts/hypothesis_forge.py": "1212ac45a662c29aadc4fdf026165ebde06c6bb0f5cc791980f1a5d1bfe84c54",
     "src/solana_alpha_lab/factory/hfic_grounding.py": "75c27310030535b09a4713f363e265cb39ccd47af9e0bd1855d7f89860dfa4b2",
     "src/solana_alpha_lab/factory/hfic_provenance.py": "17303a652b572d47a8c406bffbfad0a7c87e926e9507578ba48cf040a1b41fc9",
@@ -40,14 +40,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_legacy_readback_honesty/a1_delivery_factory_fit_v1.json",
-    "sha256": "e6e3575cfc56dfbc2ba19e635c23110e095b3c0933fefb81141b1b7672a08397",
+    "sha256": "86ebdaf335367ef10e3cfb29d6069aeed48770b6c8f82274883a6fbc468738ff",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_LEGACY_READBACK_HONESTY_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/hfic_legacy_readback_honesty/a1_delivery_independent_review_v1.json",
-      "sha256": "05ac9a29124bb44a0eccc2dd0d8f80bbd0ea19a751ac0054c2d5a00cf346ea2a",
+      "sha256": "3346351d9ca0f061fba80acf89a0cd7c48b675e69de1609e7cf4270bd3c381ec",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

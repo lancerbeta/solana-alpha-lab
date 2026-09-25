@@ -4,8 +4,8 @@
   "review_id": "HFIC-LEGACY-READBACK-HONESTY-FACTORY-FIT-001",
   "as_of": "2026-09-25",
   "task_id": "HFIC_LEGACY_READBACK_HONESTY_V1",
-  "reviewed_bindings_sha256": "921d524b27b86aefa25f01a7cf00039189cfac71c4f38c6139e5e42daf96e254",
-  "reviewed_inventory_sha256": "f4c0c29bedf3f7e7a92f3ba2ca9920b205bc36a7c0e09de9b967f7992dfca413",
+  "reviewed_bindings_sha256": "56b632a0c34a0d55f955fd8f48e543ed4e6a072e6bc9b8ee97aa2d01f9b6440b",
+  "reviewed_inventory_sha256": "7a9ae208abe8347468dc2103cf5888ac003ff92bde16161ac75457d9781c09e9",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
