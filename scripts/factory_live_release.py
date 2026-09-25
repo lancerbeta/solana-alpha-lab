@@ -44,18 +44,16 @@ UNITS = [
 PRESERVE_NAMES = frozenset({"local", ".venv", DEPLOY_SHA_NAME})
 # Timers that execute tracked code. Stop these before tree replacement.
 # Do not stop their oneshot services; wait for a running tick to finish.
-SCHEDULED_CODE_TIMERS = (
-    "factory-observation-schedule.timer",
-    "factory-remote-backup.timer",
-    "factory-remote-backup-gdrive.timer",
-    "factory-remote-backup-gdrive-delta.timer",
-    "factory-paper-heartbeat.timer",
-    "factory-hot90-closed-day-archive.timer",
-    "factory-collector-owner-pulse.timer",
-    "factory-operability-watch.timer",
+LONG_RUNNING_CODE_SERVICES = (
+    "factory-v1-workbench.service",
+    "factory-remote-health.service",
 )
 ONESHOT_DRAIN_SECONDS = 180
 DRAIN_POLL_SECONDS = 1
+_KNOWN_IS_ACTIVE_CODES = frozenset({0, 3, 4})
+_NORMAL_IS_ACTIVE_TEXT = frozenset(
+    {"active", "inactive", "failed", "activating", "deactivating", "reloading"}
+)
 
 
 def _run(cmd: list[str], *, cwd: Path | None = None) -> str:
@@ -89,6 +87,61 @@ def write_deploy_sha(root: Path, sha: str) -> None:
 
 def systemctl(*args: str) -> str:
     return _run(["sudo", "systemctl", *args])
+
+
+def interpret_is_active(returncode: int, stdout: str, stderr: str) -> str:
+    """Map systemctl is-active exit semantics. inactive/not-found are not errors."""
+
+    text = (stdout or "").strip()
+    err = (stderr or "").lower()
+    if returncode not in _KNOWN_IS_ACTIVE_CODES:
+        raise LiveOpsHardeningError(
+            f"SYSTEMCTL_STATE_ERROR:{returncode}:{text or err}"
+        )
+    if returncode == 4 or "could not be found" in err or "not found" in err:
+        return "not-found"
+    if text == "active":
+        return "active"
+    if text == "inactive":
+        return "inactive"
+    if text == "failed":
+        return "failed"
+    if text in _NORMAL_IS_ACTIVE_TEXT:
+        return "unknown"
+    if text == "":
+        return "unknown"
+    raise LiveOpsHardeningError(f"SYSTEMCTL_STATE_ERROR:{returncode}:{text}")
+
+
+def read_unit_state(unit: str) -> str:
+    completed = subprocess.run(
+        ["sudo", "systemctl", "is-active", unit],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    return interpret_is_active(completed.returncode, completed.stdout, completed.stderr)
+
+
+def scheduled_code_timers(config_dir: Path) -> tuple[str, ...]:
+    """Timers under factory_remote_ops whose paired service runs tracked code."""
+
+    names: list[str] = []
+    for timer in sorted(config_dir.glob("*.timer")):
+        service = config_dir / f"{timer.stem}.service"
+        if service.is_file() is False:
+            continue
+        text = service.read_text(encoding="utf-8")
+        if "scripts/" not in text:
+            continue
+        if "Type=simple" in text:
+            continue
+        names.append(timer.name)
+    return tuple(names)
+
+
+def load_scheduled_code_timers() -> tuple[str, ...]:
+    return scheduled_code_timers(PROJECT_ROOT / "configs" / "factory_remote_ops")
 
 
 def stop_units() -> None:
@@ -209,42 +262,85 @@ def verify_installed_tree(*, staging: Path, deploy_root: Path) -> None:
             raise LiveOpsHardeningError(f"INSTALL_TREE_MISMATCH:{relative.as_posix()}")
 
 
-def snapshot_timer_state(systemctl) -> dict[str, str]:
-    state: dict[str, str] = {}
-    for unit in SCHEDULED_CODE_TIMERS:
-        active = systemctl("is-active", unit).strip()
-        state[unit] = "active" if active == "active" else "inactive"
-    return state
+def _unit_busy(state: str) -> bool:
+    return state in {"active", "unknown"}
 
 
-def quiesce_scheduled_code(*, systemctl, sleep, budget_seconds: int = ONESHOT_DRAIN_SECONDS) -> dict[str, str]:
-    prior = snapshot_timer_state(systemctl)
-    for unit, active in prior.items():
-        if active == "active":
-            systemctl("stop", unit)
-    waited = 0
-    while waited < budget_seconds:
-        busy = []
-        for timer in SCHEDULED_CODE_TIMERS:
-            service = timer.replace(".timer", ".service")
-            if systemctl("is-active", service).strip() == "active":
-                busy.append(service)
-        if not busy:
-            return prior
-        sleep(DRAIN_POLL_SECONDS)
-        waited += DRAIN_POLL_SECONDS
-    for unit, active in prior.items():
-        if active == "active":
-            systemctl("start", unit)
-    raise LiveOpsHardeningError("ABORT_DEPLOY")
+def snapshot_units(units: tuple[str, ...], probe) -> dict[str, str]:
+    return {unit: probe(unit) for unit in units}
 
 
-def restore_timer_state(prior: dict[str, str], systemctl) -> None:
-    for unit, active in prior.items():
-        if active == "active":
-            systemctl("start", unit)
-        else:
-            systemctl("stop", unit)
+def restore_unit_state(prior: dict[str, str], control) -> None:
+    for unit, state in prior.items():
+        if state == "active":
+            control("start", unit)
+        elif state == "inactive":
+            control("stop", unit)
+
+
+def quiesce_for_release(*, probe, control, sleep, timers: tuple[str, ...], services: tuple[str, ...], budget_seconds: int = ONESHOT_DRAIN_SECONDS) -> dict[str, Any]:
+    """Stop triggers, drain oneshots, then stop long-running code services.
+
+    If this does not reach QUIESCED, already-stopped triggers are restored.
+    """
+
+    prior_timers = snapshot_units(timers, probe)
+    prior_services = snapshot_units(services, probe)
+    stopped_timers: list[str] = []
+    stopped_services: list[str] = []
+    try:
+        for unit, state in prior_timers.items():
+            if state == "active":
+                control("stop", unit)
+                stopped_timers.append(unit)
+        waited = 0
+        while True:
+            busy = []
+            for timer in timers:
+                service = timer.replace(".timer", ".service")
+                if _unit_busy(probe(service)):
+                    busy.append(service)
+            if not busy:
+                break
+            if waited >= budget_seconds:
+                raise LiveOpsHardeningError("ABORT_DEPLOY")
+            sleep(DRAIN_POLL_SECONDS)
+            waited += DRAIN_POLL_SECONDS
+        for unit, state in prior_services.items():
+            if state == "active":
+                control("stop", unit)
+                stopped_services.append(unit)
+    except Exception:
+        for unit in reversed(stopped_services):
+            if prior_services.get(unit) == "active":
+                control("start", unit)
+        for unit in reversed(stopped_timers):
+            if prior_timers.get(unit) == "active":
+                control("start", unit)
+        raise
+    return {
+        "phase": "QUIESCED",
+        "timers": prior_timers,
+        "services": prior_services,
+    }
+
+
+def _restore_prior_units(prior: dict[str, Any], control) -> None:
+    restore_unit_state(prior["services"], control)
+    restore_unit_state(prior["timers"], control)
+
+
+def _install_exact_tree(*, repo: Path, deploy_root: Path, sha: str, sync_env: bool) -> None:
+    with tempfile.TemporaryDirectory(prefix="factory-release-") as tmp:
+        staging = Path(tmp) / sha
+        archive_sha_to_staging(repo=repo, sha=sha, staging=staging)
+        sync_staging_into_deploy(staging=staging, deploy_root=deploy_root)
+        write_deploy_sha(deploy_root, sha)
+        verify_installed_tree(staging=staging, deploy_root=deploy_root)
+        if sync_env:
+            uv_sync(deploy_root)
+        if read_deploy_sha(deploy_root) != sha:
+            raise LiveOpsHardeningError("INSTALL_SHA_MISMATCH")
 
 
 def forward_release(
@@ -255,26 +351,29 @@ def forward_release(
     main_sha: str,
     live_sha: str,
     mode: str = "canonical-forward",
-    evidence: dict[str, Any] | None = None,
-    expected_evidence_sha256: str = "",
+    supplemental_evidence_sha256: str = "",
     sync_env: bool = True,
-    systemctl=systemctl,
+    probe=None,
+    control=None,
     sleep=None,
+    timers: tuple[str, ...] | None = None,
 ) -> dict[str, Any]:
     import time
 
     if sleep is None:
         sleep = time.sleep
+    if probe is None:
+        probe = read_unit_state
+    if control is None:
+        control = systemctl
+    timer_units = timers if timers is not None else load_scheduled_code_timers()
     if mode == "legacy-convergence":
-        if evidence is None:
-            raise LiveOpsHardeningError("DENY_CONVERGENCE_EVIDENCE_INCOMPLETE")
         classify_legacy_convergence(
             repo=repo,
             main_sha=main_sha,
             live_sha=live_sha,
             target_sha=target_sha,
-            evidence=evidence,
-            expected_evidence_sha256=expected_evidence_sha256,
+            supplemental_sha256=supplemental_evidence_sha256,
         )
         line_mode = "LEGACY_CONVERGENCE"
     elif mode == "canonical-rollback":
@@ -295,39 +394,42 @@ def forward_release(
         line_mode = "CANONICAL_FORWARD"
     else:
         raise LiveOpsHardeningError(DENY_CANONICAL_MAIN_UNVERIFIED)
-    prior = quiesce_scheduled_code(systemctl=systemctl, sleep=sleep)
-    mutated = False
+    prior = quiesce_for_release(
+        probe=probe,
+        control=control,
+        sleep=sleep,
+        timers=timer_units,
+        services=LONG_RUNNING_CODE_SERVICES,
+    )
+    if prior.get("phase") != "QUIESCED":
+        raise LiveOpsHardeningError("ABORT_DEPLOY")
     try:
-        with tempfile.TemporaryDirectory(prefix="factory-release-") as tmp:
-            staging = Path(tmp) / target_sha
-            archive_sha_to_staging(repo=repo, sha=target_sha, staging=staging)
-            sync_staging_into_deploy(staging=staging, deploy_root=deploy_root)
-            mutated = True
-            write_deploy_sha(deploy_root, target_sha)
-            verify_installed_tree(staging=staging, deploy_root=deploy_root)
-            if sync_env:
-                uv_sync(deploy_root)
+        _install_exact_tree(
+            repo=repo,
+            deploy_root=deploy_root,
+            sha=target_sha,
+            sync_env=sync_env,
+        )
     except Exception as exc:
-        restore_timer_state(prior, systemctl)
-        if mutated:
-            try:
-                deploy_exact_sha(
-                    repo=repo,
-                    deploy_root=deploy_root,
-                    sha=live_sha,
-                    sync_env=False,
-                    restart=False,
-                )
-            except Exception as recover_exc:
-                raise LiveOpsHardeningError("UNRESOLVED_RECOVERY") from recover_exc
+        try:
+            _install_exact_tree(
+                repo=repo,
+                deploy_root=deploy_root,
+                sha=live_sha,
+                sync_env=sync_env,
+            )
+        except Exception as recover_exc:
+            raise LiveOpsHardeningError("UNRESOLVED_RECOVERY") from recover_exc
+        _restore_prior_units(prior, control)
         raise exc
-    restore_timer_state(prior, systemctl)
+    _restore_prior_units(prior, control)
     return {
         "sha": target_sha,
         "line_mode": line_mode,
         "forward_transitions": 1,
         "rollback_performed": False,
-        "timer_state_restored": prior,
+        "timer_state_restored": prior["timers"],
+        "service_state_restored": prior["services"],
         "at": _now(),
     }
 
@@ -387,14 +489,14 @@ def main() -> int:
         choices=("canonical-forward", "canonical-rollback", "legacy-convergence"),
         default="canonical-forward",
     )
-    parser.add_argument("--evidence", type=Path)
-    parser.add_argument("--evidence-sha256", default="")
+    parser.add_argument(
+        "--evidence-sha256",
+        default="",
+        help="Optional extra check of the target-tree disposition blob. Not the trust anchor.",
+    )
     parser.add_argument("--skip-uv-sync", action="store_true")
     parser.add_argument("--json-out", type=Path)
     args = parser.parse_args()
-    evidence = None
-    if args.evidence is not None:
-        evidence = json.loads(args.evidence.read_text(encoding="utf-8"))
     result = forward_release(
         repo=args.repo.resolve(),
         deploy_root=args.deploy_root.resolve(),
@@ -402,8 +504,7 @@ def main() -> int:
         main_sha=args.main_sha,
         live_sha=args.live_sha,
         mode=args.mode,
-        evidence=evidence,
-        expected_evidence_sha256=args.evidence_sha256,
+        supplemental_evidence_sha256=args.evidence_sha256,
         sync_env=not args.skip_uv_sync,
     )
     payload = json.dumps(result, indent=2, sort_keys=True) + "\n"

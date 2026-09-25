@@ -20,6 +20,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (
     activation_transition_research_event_proven,
 )
 from solana_alpha_lab.factory.production_lineage import (
+    CONVERGENCE_EVIDENCE_PATH,
     DENY_CONVERGENCE_EVIDENCE_INCOMPLETE,
     DENY_LIVE_MAIN_DIVERGENCE,
     DENY_NON_MAINLINE_TARGET,
@@ -27,7 +28,6 @@ from solana_alpha_lab.factory.production_lineage import (
     ProductionLineageError,
     classify_forward,
     classify_legacy_convergence,
-    evidence_sha256,
 )
 
 
@@ -93,48 +93,58 @@ class ProductionLineageTests(unittest.TestCase):
             )
         self.assertEqual(caught.exception.code, DENY_LIVE_MAIN_DIVERGENCE)
 
-    def test_legacy_convergence_requires_exact_source_and_closed_evidence(self) -> None:
-        payload = {
-            "source_sha": LEGACY_DIVERGENT_SOURCE,
-            "target_binding": "CANONICAL_MAINLINE_CONTAINING_THIS_EVIDENCE",
-            "dispositions": [{"path": "src/example.py", "disposition": "PORT_REQUIRED"}],
-        }
-        digest = evidence_sha256(payload)
+    def _commit_evidence(self, payload: dict) -> str:
+        path = self.repo / CONVERGENCE_EVIDENCE_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(payload), encoding="utf-8")
+        _git(self.repo, "add", CONVERGENCE_EVIDENCE_PATH)
+        _git(
+            self.repo,
+            "-c",
+            "user.email=test@example.com",
+            "-c",
+            "user.name=test",
+            "commit",
+            "-m",
+            "evidence",
+        )
+        return _git(self.repo, "rev-parse", "HEAD")
+
+    def _closed_evidence(self) -> dict:
+        raw = json.loads((ROOT / CONVERGENCE_EVIDENCE_PATH).read_text(encoding="utf-8"))
+        return raw
+
+    def test_legacy_convergence_requires_exact_current_main(self) -> None:
+        payload = self._closed_evidence()
+        head = self._commit_evidence(payload)
         mode = classify_legacy_convergence(
             repo=self.repo,
-            main_sha=self.newer,
+            main_sha=head,
             live_sha=LEGACY_DIVERGENT_SOURCE,
-            target_sha=self.newer,
-            evidence=payload,
-            expected_evidence_sha256=digest,
+            target_sha=head,
         )
         self.assertEqual(mode, "LEGACY_CONVERGENCE")
-        payload["source_sha"] = "b" * 40
+
+    def test_legacy_convergence_denies_older_mainline_without_repair(self) -> None:
         with self.assertRaises(ProductionLineageError) as caught:
             classify_legacy_convergence(
                 repo=self.repo,
                 main_sha=self.newer,
                 live_sha=LEGACY_DIVERGENT_SOURCE,
                 target_sha=self.newer,
-                evidence=payload,
-                expected_evidence_sha256=digest,
             )
         self.assertEqual(caught.exception.code, DENY_CONVERGENCE_EVIDENCE_INCOMPLETE)
 
-    def test_unknown_disposition_denies_convergence(self) -> None:
-        payload = {
-            "source_sha": LEGACY_DIVERGENT_SOURCE,
-            "target_binding": "CANONICAL_MAINLINE_CONTAINING_THIS_EVIDENCE",
-            "dispositions": [{"path": "src/example.py", "disposition": "UNKNOWN"}],
-        }
+    def test_legacy_evidence_outside_target_tree_is_denied(self) -> None:
+        payload = self._closed_evidence()
+        payload["source_sha"] = "b" * 40
+        head = self._commit_evidence(payload)
         with self.assertRaises(ProductionLineageError) as caught:
             classify_legacy_convergence(
                 repo=self.repo,
-                main_sha=self.newer,
+                main_sha=head,
                 live_sha=LEGACY_DIVERGENT_SOURCE,
-                target_sha=self.newer,
-                evidence=payload,
-                expected_evidence_sha256=evidence_sha256(payload),
+                target_sha=head,
             )
         self.assertEqual(caught.exception.code, DENY_CONVERGENCE_EVIDENCE_INCOMPLETE)
 
@@ -189,46 +199,227 @@ class ReleaseQuiesceTests(unittest.TestCase):
         spec.loader.exec_module(module)
         return module
 
-    def test_inactive_service_stops_timer_and_restores_prior_state(self) -> None:
+    def test_inactive_is_normal_not_a_command_failure(self) -> None:
+        module = self._module()
+        self.assertEqual(module.interpret_is_active(3, "inactive\n", ""), "inactive")
+        self.assertEqual(module.interpret_is_active(3, "failed\n", ""), "failed")
+        self.assertEqual(module.interpret_is_active(4, "", "Unit foo.service could not be found.\n"), "not-found")
+        self.assertEqual(module.interpret_is_active(0, "active\n", ""), "active")
+        with self.assertRaisesRegex(LiveOpsHardeningError, "SYSTEMCTL_STATE_ERROR"):
+            module.interpret_is_active(1, "", "Failed to connect to bus")
+
+    def test_inactive_oneshot_quiesce_does_not_fail(self) -> None:
         module = self._module()
         calls: list[tuple[str, ...]] = []
-        state = {"factory-observation-schedule.timer": "active", "factory-observation-schedule.service": "inactive"}
-
-        def systemctl(*args: str) -> str:
-            calls.append(args)
-            if args[0] == "is-active":
-                return state.get(args[1], "inactive")
-            if args[0] == "stop" and args[1].endswith(".timer"):
-                state[args[1]] = "inactive"
-            if args[0] == "start" and args[1].endswith(".timer"):
-                state[args[1]] = "active"
-            return "ok"
-
-        prior = module.quiesce_scheduled_code(systemctl=systemctl, sleep=lambda _seconds: None, budget_seconds=2)
-        self.assertEqual(prior["factory-observation-schedule.timer"], "active")
-        self.assertIn(("stop", "factory-observation-schedule.timer"), calls)
-        module.restore_timer_state(prior, systemctl)
-        self.assertEqual(state["factory-observation-schedule.timer"], "active")
-
-    def test_active_tick_aborts_before_tree_change(self) -> None:
-        module = self._module()
         state = {
             "factory-observation-schedule.timer": "active",
-            "factory-observation-schedule.service": "active",
+            "factory-observation-schedule.service": "inactive",
         }
 
-        def systemctl(*args: str) -> str:
-            if args[0] == "is-active":
-                return state.get(args[1], "inactive")
-            if args[0] == "stop":
-                state[args[1]] = "inactive"
-            if args[0] == "start":
-                state[args[1]] = "active"
+        def probe(unit: str) -> str:
+            return state.get(unit, "inactive")
+
+        def control(action: str, unit: str) -> str:
+            calls.append((action, unit))
+            if action == "stop":
+                state[unit] = "inactive"
+            if action == "start":
+                state[unit] = "active"
             return "ok"
 
-        with self.assertRaisesRegex(LiveOpsHardeningError, "ABORT_DEPLOY"):
-            module.quiesce_scheduled_code(systemctl=systemctl, sleep=lambda _seconds: None, budget_seconds=2)
+        prior = module.quiesce_for_release(
+            probe=probe,
+            control=control,
+            sleep=lambda _seconds: None,
+            timers=("factory-observation-schedule.timer",),
+            services=("factory-v1-workbench.service",),
+            budget_seconds=2,
+        )
+        self.assertEqual(prior["phase"], "QUIESCED")
+        self.assertIn(("stop", "factory-observation-schedule.timer"), calls)
+        self.assertNotIn(("start", "factory-v1-workbench.service"), calls)
+
+    def test_quiesce_exception_restores_stopped_triggers(self) -> None:
+        module = self._module()
+        state = {"factory-observation-schedule.timer": "active"}
+        probes = {"n": 0}
+
+        def probe(unit: str) -> str:
+            probes["n"] += 1
+            if probes["n"] >= 2 and unit.endswith(".service"):
+                raise RuntimeError("probe blew up")
+            return state.get(unit, "inactive")
+
+        def control(action: str, unit: str) -> str:
+            if action == "stop":
+                state[unit] = "inactive"
+            if action == "start":
+                state[unit] = "active"
+            return "ok"
+
+        with self.assertRaises(RuntimeError):
+            module.quiesce_for_release(
+                probe=probe,
+                control=control,
+                sleep=lambda _seconds: None,
+                timers=("factory-observation-schedule.timer",),
+                services=(),
+                budget_seconds=1,
+            )
         self.assertEqual(state["factory-observation-schedule.timer"], "active")
+
+    def test_active_long_running_stops_before_tree_and_restores_after(self) -> None:
+        module = self._module()
+        order: list[str] = []
+        state = {
+            "tick.timer": "inactive",
+            "tick.service": "inactive",
+            "factory-v1-workbench.service": "active",
+            "factory-remote-health.service": "inactive",
+        }
+
+        def probe(unit: str) -> str:
+            return state.get(unit, "inactive")
+
+        def control(action: str, unit: str) -> str:
+            order.append(f"{action}:{unit}")
+            if action == "stop":
+                state[unit] = "inactive"
+            if action == "start":
+                state[unit] = "active"
+            return "ok"
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp) / "repo"
+            repo.mkdir()
+            _git(repo, "init", "-b", "main")
+            older = _commit(repo, "older.txt")
+            newer = _commit(repo, "newer.txt")
+            deploy = Path(tmp) / "deploy"
+            deploy.mkdir()
+            (deploy / "local").mkdir()
+            real_install = module._install_exact_tree
+
+            def install(**kwargs):
+                order.append("mutate")
+                self.assertEqual(state["factory-v1-workbench.service"], "inactive")
+                return real_install(**kwargs)
+
+            module._install_exact_tree = install
+            result = module.forward_release(
+                repo=repo,
+                deploy_root=deploy,
+                target_sha=newer,
+                main_sha=newer,
+                live_sha=older,
+                sync_env=False,
+                probe=probe,
+                control=control,
+                sleep=lambda _seconds: None,
+                timers=("tick.timer",),
+            )
+            self.assertEqual(result["forward_transitions"], 1)
+            self.assertLess(order.index("stop:factory-v1-workbench.service"), order.index("mutate"))
+            self.assertLess(order.index("mutate"), order.index("start:factory-v1-workbench.service"))
+            self.assertNotIn("start:factory-remote-health.service", order)
+            self.assertEqual(state["factory-remote-health.service"], "inactive")
+
+    def test_no_start_before_verified_rollback(self) -> None:
+        module = self._module()
+        starts: list[str] = []
+        verified = {"n": 0}
+
+        def probe(unit: str) -> str:
+            return "active" if unit == "tick.timer" else "inactive"
+
+        def control(action: str, unit: str) -> str:
+            if action == "start":
+                self.assertGreaterEqual(verified["n"], 2)
+                starts.append(f"{verified['n']}:{unit}")
+            return "ok"
+
+        real_verify = module.verify_installed_tree
+
+        def verify(**kwargs):
+            verified["n"] += 1
+            if verified["n"] == 1:
+                raise LiveOpsHardeningError("INSTALL_TREE_MISMATCH")
+            return real_verify(**kwargs)
+
+        module.verify_installed_tree = verify
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp) / "repo"
+            repo.mkdir()
+            _git(repo, "init", "-b", "main")
+            older = _commit(repo, "older.txt")
+            newer = _commit(repo, "newer.txt")
+            deploy = Path(tmp) / "deploy"
+            deploy.mkdir()
+            (deploy / "local").mkdir()
+            with self.assertRaisesRegex(LiveOpsHardeningError, "INSTALL_TREE_MISMATCH"):
+                module.forward_release(
+                    repo=repo,
+                    deploy_root=deploy,
+                    target_sha=newer,
+                    main_sha=newer,
+                    live_sha=older,
+                    sync_env=False,
+                    probe=probe,
+                    control=control,
+                    sleep=lambda _seconds: None,
+                    timers=("tick.timer",),
+                )
+            self.assertEqual((deploy / ".factory_deploy_sha").read_text(encoding="utf-8").strip(), older)
+            self.assertEqual(starts, ["2:tick.timer"])
+
+    def test_unresolved_recovery_leaves_units_quiesced(self) -> None:
+        module = self._module()
+        starts: list[str] = []
+
+        def probe(_unit: str) -> str:
+            return "active" if _unit == "tick.timer" else "inactive"
+
+        def control(action: str, unit: str) -> str:
+            if action == "start":
+                starts.append(unit)
+            return "ok"
+
+        def boom(**_kwargs):
+            raise LiveOpsHardeningError("INSTALL_TREE_MISMATCH")
+
+        module._install_exact_tree = boom
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp) / "repo"
+            repo.mkdir()
+            _git(repo, "init", "-b", "main")
+            older = _commit(repo, "older.txt")
+            newer = _commit(repo, "newer.txt")
+            deploy = Path(tmp) / "deploy"
+            deploy.mkdir()
+            with self.assertRaisesRegex(LiveOpsHardeningError, "UNRESOLVED_RECOVERY"):
+                module.forward_release(
+                    repo=repo,
+                    deploy_root=deploy,
+                    target_sha=newer,
+                    main_sha=newer,
+                    live_sha=older,
+                    sync_env=False,
+                    probe=probe,
+                    control=control,
+                    sleep=lambda _seconds: None,
+                    timers=("tick.timer",),
+                )
+        self.assertEqual(starts, [])
+
+    def test_timer_inventory_includes_external_heartbeat(self) -> None:
+        module = self._module()
+        timers = module.load_scheduled_code_timers()
+        self.assertIn("factory-external-heartbeat.timer", timers)
+        configured = {
+            path.name
+            for path in (ROOT / "configs" / "factory_remote_ops").glob("*.timer")
+        }
+        self.assertEqual(set(timers), configured)
 
     def test_forward_release_is_one_transition(self) -> None:
         module = self._module()
@@ -242,10 +433,12 @@ class ReleaseQuiesceTests(unittest.TestCase):
             deploy.mkdir()
             (deploy / "local").mkdir()
             (deploy / "local" / "keep.txt").write_text("preserve\n", encoding="utf-8")
-            (deploy / ".factory_deploy_sha").write_text(older + "\n", encoding="utf-8")
 
-            def systemctl(*args: str) -> str:
+            def probe(_unit: str) -> str:
                 return "inactive"
+
+            def control(*_args: str) -> str:
+                return "ok"
 
             result = module.forward_release(
                 repo=repo,
@@ -255,8 +448,10 @@ class ReleaseQuiesceTests(unittest.TestCase):
                 live_sha=older,
                 mode="canonical-forward",
                 sync_env=False,
-                systemctl=systemctl,
+                probe=probe,
+                control=control,
                 sleep=lambda _seconds: None,
+                timers=("tick.timer",),
             )
             self.assertEqual(result["forward_transitions"], 1)
             self.assertFalse(result["rollback_performed"])

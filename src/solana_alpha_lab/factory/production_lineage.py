@@ -9,6 +9,21 @@ from pathlib import Path
 from typing import Any, Callable
 
 LEGACY_DIVERGENT_SOURCE = "aaf7f89c3bfc71de9d56618fdda0d3d69cfaf236"
+LEGACY_MERGE_BASE = "b652a66af554d96fb4ce3e2de3410c1d04e8bfd1"
+LEGACY_DELTA_COMMITS = 28
+LEGACY_DELTA_PATH_COUNT = 27
+CONVERGENCE_EVIDENCE_PATH = (
+    "docs/evidence/factory_production_line_convergence_v1/live_delta_disposition_v1.json"
+)
+CLOSED_DISPOSITIONS = frozenset(
+    {
+        "EQUIVALENT_ON_MAIN",
+        "PORT_REQUIRED",
+        "HISTORICAL_ONLY",
+        "TEST_OR_EVIDENCE_ONLY",
+        "OBSOLETE_NOT_CONSUMED",
+    }
+)
 DENY_CANONICAL_MAIN_UNVERIFIED = "DENY_CANONICAL_MAIN_UNVERIFIED"
 DENY_NON_MAINLINE_TARGET = "DENY_NON_MAINLINE_TARGET"
 DENY_LIVE_MAIN_DIVERGENCE = "DENY_LIVE_MAIN_DIVERGENCE"
@@ -85,25 +100,58 @@ def evidence_sha256(payload: dict[str, Any]) -> str:
     return hashlib.sha256(body).hexdigest()
 
 
+def read_convergence_evidence_blob(repo: Path, target_sha: str) -> dict[str, Any]:
+    completed = subprocess.run(
+        ["git", "show", f"{target_sha}:{CONVERGENCE_EVIDENCE_PATH}"],
+        cwd=str(repo),
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode != 0:
+        raise ProductionLineageError(DENY_CONVERGENCE_EVIDENCE_INCOMPLETE)
+    try:
+        payload = json.loads(completed.stdout)
+    except json.JSONDecodeError as exc:
+        raise ProductionLineageError(DENY_CONVERGENCE_EVIDENCE_INCOMPLETE) from exc
+    if not isinstance(payload, dict):
+        raise ProductionLineageError(DENY_CONVERGENCE_EVIDENCE_INCOMPLETE)
+    return payload
+
+
 def convergence_evidence_ready(
     payload: dict[str, Any],
     *,
-    expected_sha256: str,
     source_sha: str,
     target_sha: str,
+    main_sha: str,
+    supplemental_sha256: str = "",
 ) -> None:
-    if evidence_sha256(payload) != expected_sha256:
+    if target_sha != main_sha:
+        raise ProductionLineageError(DENY_NON_MAINLINE_TARGET)
+    if supplemental_sha256 and evidence_sha256(payload) != supplemental_sha256:
         raise ProductionLineageError(DENY_CONVERGENCE_EVIDENCE_INCOMPLETE)
     if str(payload.get("source_sha") or "") != source_sha:
         raise ProductionLineageError(DENY_CONVERGENCE_EVIDENCE_INCOMPLETE)
-    if str(payload.get("source_sha") or "") != LEGACY_DIVERGENT_SOURCE:
+    if source_sha != LEGACY_DIVERGENT_SOURCE:
+        raise ProductionLineageError(DENY_CONVERGENCE_EVIDENCE_INCOMPLETE)
+    if str(payload.get("merge_base") or "") != LEGACY_MERGE_BASE:
+        raise ProductionLineageError(DENY_CONVERGENCE_EVIDENCE_INCOMPLETE)
+    if int(payload.get("live_delta_commits") or 0) != LEGACY_DELTA_COMMITS:
         raise ProductionLineageError(DENY_CONVERGENCE_EVIDENCE_INCOMPLETE)
     dispositions = payload.get("dispositions")
-    if not isinstance(dispositions, list) or not dispositions:
+    if not isinstance(dispositions, list) or len(dispositions) != LEGACY_DELTA_PATH_COUNT:
         raise ProductionLineageError(DENY_CONVERGENCE_EVIDENCE_INCOMPLETE)
-    if any(str(item.get("disposition") or "") == "UNKNOWN" for item in dispositions if isinstance(item, dict)):
-        raise ProductionLineageError(DENY_CONVERGENCE_EVIDENCE_INCOMPLETE)
-    if any(not isinstance(item, dict) or not item.get("disposition") for item in dispositions):
+    paths: list[str] = []
+    for item in dispositions:
+        if not isinstance(item, dict):
+            raise ProductionLineageError(DENY_CONVERGENCE_EVIDENCE_INCOMPLETE)
+        disposition = str(item.get("disposition") or "")
+        path = str(item.get("path") or "")
+        if disposition not in CLOSED_DISPOSITIONS or not path:
+            raise ProductionLineageError(DENY_CONVERGENCE_EVIDENCE_INCOMPLETE)
+        paths.append(path)
+    if len(set(paths)) != LEGACY_DELTA_PATH_COUNT:
         raise ProductionLineageError(DENY_CONVERGENCE_EVIDENCE_INCOMPLETE)
     if str(payload.get("target_binding") or "") != "CANONICAL_MAINLINE_CONTAINING_THIS_EVIDENCE":
         raise ProductionLineageError(DENY_CONVERGENCE_EVIDENCE_INCOMPLETE)
@@ -155,20 +203,23 @@ def classify_legacy_convergence(
     main_sha: str,
     live_sha: str,
     target_sha: str,
-    evidence: dict[str, Any],
-    expected_evidence_sha256: str,
+    supplemental_sha256: str = "",
     git: GitRunner | None = None,
 ) -> str:
     prove_canonical_main(repo, main_sha, git=git)
     if live_sha != LEGACY_DIVERGENT_SOURCE:
         raise ProductionLineageError(DENY_LIVE_MAIN_DIVERGENCE)
+    if target_sha != main_sha:
+        raise ProductionLineageError(DENY_NON_MAINLINE_TARGET)
     history = first_parent_history(repo, main_sha, git=git)
     if target_sha not in history:
         raise ProductionLineageError(DENY_NON_MAINLINE_TARGET)
+    evidence = read_convergence_evidence_blob(repo, target_sha)
     convergence_evidence_ready(
         evidence,
-        expected_sha256=expected_evidence_sha256,
         source_sha=live_sha,
         target_sha=target_sha,
+        main_sha=main_sha,
+        supplemental_sha256=supplemental_sha256,
     )
     return "LEGACY_CONVERGENCE"
