@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-CLASSIFICATION-OUTCOME-INTEGRITY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-25",
+  "task_id": "HFIC_CLASSIFICATION_OUTCOME_INTEGRITY_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=b6f8a0c0d96d78e55bb8e39d0567adaf003ba02af954880a84c6a000417ad789",
+        "PASS_GATE_FOLLOWS_MAPPED_PASS_FAST_LANE_READY",
+        "PASS_DENIAL_PERSISTED_NOT_EXCEPTION",
+        "RESIDUAL_LAST_CANDIDATE_DENIAL_NOT_LOCKED_BY_RUNNER_UP_FIXTURES",
+        "RESIDUAL_FUTURE_PASS_TERMINAL_STAYS_UNGATED_UNTIL_MAPPING_SAYS_PASS"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_GATE_USES_SHARED_MAPPING",
+        "PASS_FORGED_RECEIPT_IS_CLASSIFIER_RECEIPT_INVALID",
+        "PASS_PACKET_1_3_AND_NON_PASS_ROUTES_UNCHANGED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_T_A_FALSE_PASS_AND_T_B_STRAND",
+        "PASS_T_D_ROUTE_CLOSURE",
+        "PASS_REHEARSAL_TYPED_TERMINALS"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_FAILOVER_READOUT_SEPARATES_PRIMARY_AND_FINAL",
+        "PASS_OWNER_TEXT_SAYS_KILL_IS_PERSISTED_NOT_AN_ERROR",
+        "PASS_CLAIMED_PASS_CAN_ONLY_BE_DOWNGRADED"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_MERGE"
+  ]
+}
