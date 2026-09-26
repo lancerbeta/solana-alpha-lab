@@ -1,0 +1,73 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "PAPER-SHADOW-ENTRY-INTENT-INTEGRITY-COMPLETION-001",
+  "as_of": "2026-09-26",
+  "task_id": "PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1",
+  "state_change": "UNFILLED_ENTRY_INTENTS_END_CANCELLED",
+  "base_main": "b6ab5f699ad2b2bee3286171ad2728e1bcee1638",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "82a49cd435cc7bf398ef397426d86731d37865f7c692069bde31b6f50a217bc5",
+    "catalog/assets/lifecycle.yaml": "2346fc6b053af16aca72e9315c49263cdbda4ccbacd190508b39586098ad8a22",
+    "catalog/catalog_manifest.yaml": "3af70416febf1d18ff0df8050d157a0a8f64503bb28461c5ca598114f4b80d95",
+    "catalog/generated/asset_edges.json": "47c717d46c3062b2e55361b7d21ced117f1536891f66230208b661545d0ff3b3",
+    "docs/PROJECT_MAP.md": "caf4c43f437182e7574685358b53a2cd8b59f183343adef9728aa89e569bf917",
+    "docs/architecture/PAPER_SHADOW_EXECUTION_INTEGRITY_PRD_SSD_V1.md": "c841af00127a1d1a7a3a85ec061bdb374370d04751ae5e2db1752183eb20f6fc",
+    "docs/contracts/risk_and_economics_v1.md": "b637d2438d88595c9d2789d8fa54637aaafdb698a2159ee1fe8ad2e44dced109",
+    "docs/contracts/trading_operations_workbench_v2.md": "c8faf6a735cbcadf51473f026a3a61ac0c63144ce874db43ba8e59da5cf7087e",
+    "docs/contracts/trading_runtime_policy_v1.md": "d81fc10b24afc0f6e093c44d4117d05e655b61bd4d19a02db207bd3fe661b326",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "7bb8dc52f57ac9a827193f28e7ea71c1b5ab6c3c934b2b2430e1573a4824e896",
+    "docs/reports/paper_shadow_entry_intent_integrity/a1_owner_readout_v1.md": "071f842fde73807723f4f8cde5ba03b7e8ec227926cb0e7d079ffc3df32dec66",
+    "docs/tasks/PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1.md": "849231b16352df2af1561419bcb103bd7408d1accca51909618d271b9688f8c6",
+    "src/solana_alpha_lab/factory/paper_plane.py": "3be6c95265675db9ddc8b0c0915c1a59a8199c372ae6756e278f1e584b804968",
+    "src/solana_alpha_lab/factory/paper_shadow_commands.py": "8ffb3d10cffa9b181e8b32aa0d23906dd8a606cfbb48332d3e821fb2ed463b49",
+    "src/solana_alpha_lab/factory/paper_shadow_operations.py": "9649fa8fe6103787ac25af8ad7379ef816d9f85dca1cfbfa0e2ff0d1e2569e82",
+    "src/solana_alpha_lab/factory/trading_operations.py": "5bae6dcd4d944196e3e3703e0b4181a8de2fc3aec8478607411704d166d9d9ae",
+    "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "11538bbf3933e409fb2436045e20a76b9b4b6d685a1ae250c0fed756566c0179"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/paper_shadow_entry_intent_integrity/a1_delivery_factory_fit_v1.json",
+    "sha256": "f0817f973b78a0a0f3921aa340fa370c5ba6278637294eb5895d882f328cc33b",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_ENTRY_INTENT_INTEGRITY_VERTICAL_AND_DOMAIN",
+    "independent_review": {
+      "path": "docs/evidence/paper_shadow_entry_intent_integrity/a1_delivery_independent_review_v1.json",
+      "sha256": "1021c4fcffb844f2a838eb213e47ab54507277d7557c2a94ad67416a15780017",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_ENTRY_INTENT_VERTICAL",
+      "PASS_EXECUTION_DOMAIN_MODULES",
+      "PASS_FILL_BINDING",
+      "PASS_STOP_MATRIX"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE_TRADING",
+    "NO_MERGE",
+    "STOPPED_BOT_PAPER_ECONOMICS_NOT_COMPARABLE_TO_PRE_A2"
+  ],
+  "side_effects": {
+    "network_calls": 0,
+    "local_writes": 0,
+    "external_actions": 0
+  }
+}

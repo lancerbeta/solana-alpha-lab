@@ -6,28 +6,16 @@ import json
 from datetime import UTC, datetime
 from typing import Any, Mapping
 
-from solana_alpha_lab.factory.paper_plane import PaperPlaneError, PaperPlaneStore
+from solana_alpha_lab.factory.paper_plane import (
+    DRAIN_CLEARED_STATES,
+    OPERATOR_SETTLED_STATES,
+    PRE_ATTEMPT_STATES,
+    PaperPlaneError,
+    PaperPlaneStore,
+)
 from solana_alpha_lab.factory.paper_shadow_operations import open_position_set_sha256
 
-ACTIVE_INVENTORY = frozenset(
-    {
-        "WATCHED",
-        "SIGNALLED",
-        "INTENT_CREATED",
-        "ATTEMPTING",
-        "OPEN",
-        "PARTIAL",
-        "UNKNOWN",
-        "EXIT_REQUIRED",
-        "EXITING",
-        "UNRESOLVED",
-    }
-)
 CLOSEABLE = frozenset({"OPEN", "PARTIAL", "UNKNOWN"})
-# Operator open-set excludes settled lifecycle ends.
-TERMINAL_SETTLED = frozenset({"CLOSED", "RECONCILED"})
-# STOP/DRAIN completes only after reconcile (CLOSED alone still needs work).
-DRAIN_CLEARED = frozenset({"RECONCILED"})
 
 
 def _now() -> str:
@@ -40,7 +28,7 @@ def _inventory_position_ids(store: PaperPlaneStore, bot_instance_id: str | None)
     for row in rows:
         if bot_instance_id is not None and row["bot_instance_id"] != bot_instance_id:
             continue
-        if str(row["state"]) not in TERMINAL_SETTLED:
+        if str(row["state"]) not in OPERATOR_SETTLED_STATES:
             out.append(str(row["position_id"]))
     return sorted(out)
 
@@ -51,7 +39,7 @@ def _drain_remaining_ids(store: PaperPlaneStore, bot_instance_id: str) -> list[s
     for row in rows:
         if row["bot_instance_id"] != bot_instance_id:
             continue
-        if str(row["state"]) not in DRAIN_CLEARED:
+        if str(row["state"]) not in DRAIN_CLEARED_STATES:
             out.append(str(row["position_id"]))
     return sorted(out)
 
@@ -126,9 +114,19 @@ def _apply_operator_command_locked(
             )
             applied = True
             new_state = "EXIT_REQUIRED"
-        elif state == "EXIT_REQUIRED":
+        elif state in {"EXIT_REQUIRED", "CANCELLED"}:
             applied = True
             new_state = state
+        elif state in PRE_ATTEMPT_STATES:
+            store.cancel_entry_intent(position_id, reason_code="OPERATOR_CANCEL")
+            store.append_execution_event(
+                event_type="OPERATOR_COMMAND_APPLIED",
+                bot_instance_id=str(position["bot_instance_id"]),
+                position_id=position_id,
+                payload={"command_type": command_type, "from_state": state},
+            )
+            applied = True
+            new_state = "CANCELLED"
         else:
             raise PaperPlaneError(f"CLOSE_POSITION_STATE_INVALID:{state}")
         result = {
@@ -168,7 +166,18 @@ def _apply_operator_command_locked(
             position = store.get_position(position_id)
             assert position is not None
             state = str(position["state"])
-            if state in CLOSEABLE:
+            if state in PRE_ATTEMPT_STATES:
+                store.cancel_entry_intent(position_id, reason_code="OPERATOR_CLOSE_ALL")
+                fanout.append({"position_id": position_id, "state": "CANCELLED"})
+            elif state == "ATTEMPTING":
+                fanout.append(
+                    {
+                        "position_id": position_id,
+                        "state": state,
+                        "skipped": "ATTEMPT_IN_FLIGHT_RECONCILE_REQUIRED",
+                    }
+                )
+            elif state in CLOSEABLE:
                 store.transition(position_id, "EXIT_REQUIRED")
                 store.append_execution_event(
                     event_type="OPERATOR_COMMAND_APPLIED",
@@ -205,6 +214,16 @@ def _apply_operator_command_locked(
         bot = store.get_bot(bot_id)
         if bot is None:
             raise PaperPlaneError("BOT_NOT_FOUND")
+        cancelled_intents: list[str] = []
+        for row in store.positions():
+            if row["bot_instance_id"] != bot_id:
+                continue
+            if str(row["state"]) not in PRE_ATTEMPT_STATES:
+                continue
+            position_id = str(row["position_id"])
+            store.cancel_entry_intent(position_id, reason_code="OPERATOR_STOP")
+            cancelled_intents.append(position_id)
+        cancelled_intents.sort()
         inventory = _drain_remaining_ids(store, bot_id)
         store.set_entries_paused(bot_id, paused=True)
         if inventory:
@@ -217,7 +236,11 @@ def _apply_operator_command_locked(
             event_type="OPERATOR_COMMAND_APPLIED",
             bot_instance_id=bot_id,
             position_id=None,
-            payload={"command_type": command_type, "status": status},
+            payload={
+                "command_type": command_type,
+                "status": status,
+                "cancelled_intents": cancelled_intents,
+            },
         )
         result = {
             "command_type": command_type,
@@ -225,6 +248,7 @@ def _apply_operator_command_locked(
             "bot_instance_id": bot_id,
             "bot_status": status,
             "remaining_inventory": inventory,
+            "cancelled_intents": cancelled_intents,
         }
     else:
         raise PaperPlaneError(f"COMMAND_TYPE_INVALID:{command_type}")

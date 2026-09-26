@@ -8,7 +8,7 @@ allowed_routes:
   - DIRECT_CURSOR_DELIVERY
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: b6ab5f699ad2b2bee3286171ad2728e1bcee1638
+  expected_base: 4213755922fec0142a69ba1b0df52268c026240b
   expected_upstream: origin/main
   expected_upstream_oid: 4213755922fec0142a69ba1b0df52268c026240b
   expected_branch: cursor/live-cohort-vanilla-owner-path-v1

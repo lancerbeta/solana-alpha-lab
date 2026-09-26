@@ -8,13 +8,17 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 
-from solana_alpha_lab.factory.paper_plane import OPEN_RISK_STATES, PaperPlaneStore
+from solana_alpha_lab.factory.paper_plane import (
+    OPEN_RISK_STATES,
+    OPERATOR_SETTLED_STATES,
+    PaperPlaneStore,
+)
 
 OPEN_LIKE = frozenset({"OPEN", "PARTIAL"})
 UNKNOWN_LIKE = frozenset({"UNKNOWN"})
 EXIT_REQUIRED_LIKE = frozenset({"EXIT_REQUIRED", "EXITING"})
 UNRESOLVED_LIKE = frozenset({"UNRESOLVED"})
-TERMINAL_SETTLED = frozenset({"CLOSED", "RECONCILED"})
+TERMINAL_SETTLED = OPERATOR_SETTLED_STATES  # public alias used by risk_economics
 
 
 def _now() -> str:
@@ -37,6 +41,12 @@ def position_pnl_view(position: dict[str, Any]) -> dict[str, Any]:
     """Map store columns to operator pnl_status / net_pnl_usd."""
 
     state = str(position.get("state"))
+    if state == "CANCELLED":
+        return {
+            "net_pnl_usd": None,
+            "pnl_status": "NOT_APPLICABLE",
+            "pnl_evidence_class": None,
+        }
     evidence = position.get("pnl_evidence_class")
     net = position.get("realized_net_pnl_usd_dec")
     if state == "RECONCILED" and net is not None and evidence:
@@ -373,6 +383,7 @@ def build_operations_projection(
         "unknown_positions": sum(1 for p in positions if str(p["state"]) in UNKNOWN_LIKE),
         "exit_required": sum(1 for p in positions if str(p["state"]) in EXIT_REQUIRED_LIKE),
         "unresolved_positions": sum(1 for p in positions if str(p["state"]) in UNRESOLVED_LIKE),
+        "cancelled_intents": sum(1 for p in positions if str(p["state"]) == "CANCELLED"),
         "known_open_exposure_usd": None
         if known_open_exposure_status in {"UNKNOWN", "EMPTY"}
         else format(known_open_exposure, "f"),
