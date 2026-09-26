@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "PAPER-SHADOW-ENTRY-INTENT-INTEGRITY-FACTORY-FIT-001",
+  "as_of": "2026-09-26",
+  "task_id": "PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_PAPER_ENTRY_INTENT_CANCELLED_NOT_ALPHA",
+    "flexibility_and_history": "PASS_CANCELLED_ADDITIVE_OPEN_RISK_UNCHANGED",
+    "context_efficiency": "PASS_ONE_STORE_NO_NEW_DEPENDENCY",
+    "research_truth": "PASS_STOPPED_BOT_ECONOMICS_NOT_COMPARABLE_TO_PRE_A2",
+    "owner_operability": "PASS_CLOSE_AND_STOP_SAY_CANCELLED",
+    "execution_to_cashflow": "NOT_APPLICABLE_PAPER_SHADOW_NO_CASHFLOW",
+    "monitoring_and_recovery": "PASS_ROLLBACK_IS_GIT_REVERT",
+    "build_vs_buy": "PASS_NO_NEW_FRAMEWORK",
+    "security": "PASS_NO_SECRETS_NO_ABSOLUTE_PATHS_NO_SIGNER",
+    "red_team": "PASS_STOP_MATRIX_AND_IN_FLIGHT_RETRY"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "DECISION_IDENTITY_AND_LINEAGE_GATES_V1_AFTER_THIS_MERGE"
+  },
+  "recovery": "Revert the merge commit. CANCELLED rows then render as unknown states to older code. Acceptable for paper data.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_LIVE_TRADING",
+    "STOPPED_BOT_PAPER_ECONOMICS_NOT_COMPARABLE_TO_PRE_A2",
+    "PARTIAL_KEEPS_LEGACY_MEANING",
+    "NO_A3_UNTIL_POST_MERGE_READBACK"
+  ]
+}

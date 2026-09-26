@@ -1,0 +1,57 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "PAPER-SHADOW-ENTRY-INTENT-INTEGRITY-COMPLETION-001",
+  "as_of": "2026-09-26",
+  "task_id": "PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1",
+  "state_change": "UNFILLED_ENTRY_INTENTS_END_CANCELLED",
+  "base_main": "0e0b4793b1f511c589d51bb53c5bb2ea7c048faa",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "docs/tasks/PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/paper_shadow_entry_intent_integrity/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_ENTRY_INTENT_INTEGRITY_VERTICAL_AND_DOMAIN",
+    "independent_review": {
+      "path": "docs/evidence/paper_shadow_entry_intent_integrity/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_ENTRY_INTENT_VERTICAL",
+      "PASS_EXECUTION_DOMAIN_MODULES",
+      "PASS_FILL_BINDING",
+      "PASS_STOP_MATRIX"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE_TRADING",
+    "NO_MERGE",
+    "STOPPED_BOT_PAPER_ECONOMICS_NOT_COMPARABLE_TO_PRE_A2"
+  ],
+  "side_effects": {
+    "network_calls": 0,
+    "local_writes": 0,
+    "external_actions": 0
+  }
+}
