@@ -35070,6 +35070,77 @@ records:
   evidence: []
   search_terms: [PAPER_SHADOW, ENTRY_INTENT, FACTORY_FIT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-DECISION-IDENTITY-AND-LINEAGE-GATES-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for SignalDecision clock, one-id-one-body, strategy spec drift and position lineage.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: DECISION_IDENTITY_AND_LINEAGE_GATES_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/DECISION_IDENTITY_AND_LINEAGE_GATES_V1.md', repository_path: docs/tasks/DECISION_IDENTITY_AND_LINEAGE_GATES_V1.md}
+  integrity: {kind: sha256, sha256: 328684ec3de639ec536a3053a8495f23a20fdbecf2273adfd3c143093f2cb479}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: DOC-PAPER-SHADOW-EXECUTION-INTEGRITY-PRD-SSD-001}
+  - {relation_type: contains, target_asset_id: TEST-PAPER-SHADOW-EXECUTION-INTEGRITY-VERTICAL-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-TRADING-OPERATIONS-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [DECISION_IDENTITY, LINEAGE, AS_OF, SPEC_DRIFT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-DECISION-IDENTITY-AND-LINEAGE-GATES-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Completion evidence for decision identity and position lineage gates.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: DECISION_IDENTITY_AND_LINEAGE_GATES_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/decision_identity_and_lineage_gates/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/decision_identity_and_lineage_gates/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DECISION-IDENTITY-AND-LINEAGE-GATES-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [DECISION_IDENTITY, LINEAGE, COMPLETION_EVIDENCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-DECISION-IDENTITY-AND-LINEAGE-GATES-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Independent review evidence for the decision-identity atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: DECISION_IDENTITY_AND_LINEAGE_GATES_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/decision_identity_and_lineage_gates/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/decision_identity_and_lineage_gates/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DECISION-IDENTITY-AND-LINEAGE-GATES-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [DECISION_IDENTITY, LINEAGE, INDEPENDENT_REVIEW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-DECISION-IDENTITY-AND-LINEAGE-GATES-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Factory-fit review for the decision-identity atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: DECISION_IDENTITY_AND_LINEAGE_GATES_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/decision_identity_and_lineage_gates/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/decision_identity_and_lineage_gates/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DECISION-IDENTITY-AND-LINEAGE-GATES-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [DECISION_IDENTITY, LINEAGE, FACTORY_FIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 
 - asset_id: CTRL-OWNER-OPERATIONS-COCKPIT-001
   record_version: '1.0'
