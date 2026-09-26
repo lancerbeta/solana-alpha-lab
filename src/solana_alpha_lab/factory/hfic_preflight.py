@@ -828,6 +828,10 @@ _ENUMERATE_WORK = {
     "datasets_partition_scanned": 0,
     "parquet_bytes_hashed": 0,
     "superseded_live_corpus_skipped": 0,
+    "superseded_corpus_metadata_only": 0,
+    "named_partition_manifests_opened": 0,
+    "directory_partition_files_read": 0,
+    "superseded_corpus_parquet_bytes_hashed": 0,
 }
 
 
@@ -838,6 +842,80 @@ def reset_enumerate_work() -> None:
 
 def enumerate_work() -> dict[str, int]:
     return dict(_ENUMERATE_WORK)
+
+
+def _claimed_partition_manifest_ids(manifests_dir: Path) -> set[str]:
+    """Partition ids already named by a validation receipt.
+
+    Callers skip those files instead of reading every historical partition
+    manifest to discover that it belongs to a corpus root.
+    """
+
+    claimed: set[str] = set()
+    if not manifests_dir.is_dir():
+        return claimed
+    for path in manifests_dir.glob("*.validation.json"):
+        if path.is_symlink():
+            continue
+        dataset_manifest_id = path.name[: -len(".validation.json")]
+        ids = _receipt_partition_manifest_ids(manifests_dir, dataset_manifest_id)
+        if ids:
+            claimed.update(ids)
+    return claimed
+
+
+def _receipt_partition_manifest_ids(
+    manifests_dir: Path, dataset_manifest_id: str
+) -> list[str] | None:
+    path = manifests_dir / f"{dataset_manifest_id}.validation.json"
+    if not path.is_file() or path.is_symlink():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, dict):
+        return None
+    raw = payload.get("partition_manifest_ids")
+    if not isinstance(raw, list) or not raw:
+        return None
+    ids = [str(item) for item in raw if isinstance(item, str) and item]
+    return ids or None
+
+
+def _hash_named_parquet(data_root: Path, part: PartitionManifest) -> bool:
+    parquet_path = Path(data_root) / part.logical_location
+    if not parquet_path.is_file() or _is_symlink_path(parquet_path):
+        return False
+    size = int(parquet_path.stat().st_size)
+    _ENUMERATE_WORK["parquet_bytes_hashed"] += size
+    return hashlib.sha256(parquet_path.read_bytes()).hexdigest() == part.file_sha256
+
+
+def _named_corpus_partitions(
+    data_root: Path,
+    partition_dir: Path,
+    manifest_ids: list[str],
+    *,
+    dataset_manifest_id: str,
+) -> tuple[list[Path], list[PartitionManifest], bool]:
+    matching: list[Path] = []
+    parsed: list[PartitionManifest] = []
+    for manifest_id in manifest_ids:
+        path = partition_dir / f"{manifest_id}.json"
+        if not path.is_file() or path.is_symlink():
+            return [], [], True
+        try:
+            part = PartitionManifest.model_validate_json(path.read_bytes())
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError, Exception):
+            return [], [], True
+        if part.dataset_manifest_id != dataset_manifest_id:
+            return [], [], True
+        if not _hash_named_parquet(data_root, part):
+            return [], [], True
+        matching.append(path)
+        parsed.append(part)
+    return matching, parsed, False
 
 
 def _current_live_corpus_manifest_id(data_root: Path) -> str | None:
@@ -864,9 +942,8 @@ def enumerate_rdp_datasets(
     manifests_dir = Path(data_root) / "datasets" / "manifests"
     warnings: list[dict[str, Any]] = []
     entries: list[dict[str, Any]] = []
-    current_corpus_id = (
-        _current_live_corpus_manifest_id(data_root) if live_corpus_current_only else None
-    )
+    current_corpus_id = _current_live_corpus_manifest_id(data_root)
+    claimed_partition_ids = _claimed_partition_manifest_ids(manifests_dir)
     from solana_alpha_lab.factory.live_cohort_discovery_release import CORPUS_DATASET_ID
     if not manifests_dir.is_dir():
         return [], warnings
@@ -927,18 +1004,53 @@ def enumerate_rdp_datasets(
                 continue
             labels = loaded_labels
         if (
-            live_corpus_current_only
-            and manifest.dataset_id == CORPUS_DATASET_ID
+            manifest.dataset_id == CORPUS_DATASET_ID
+            and current_corpus_id
             and manifest.dataset_manifest_id != current_corpus_id
         ):
-            _ENUMERATE_WORK["superseded_live_corpus_skipped"] += 1
+            if live_corpus_current_only:
+                _ENUMERATE_WORK["superseded_live_corpus_skipped"] += 1
+                continue
+            entries.append(
+                {
+                    "dataset_manifest_id": manifest.dataset_manifest_id,
+                    "dataset_fingerprint": manifest.dataset_fingerprint,
+                    "dataset_id": manifest.dataset_id,
+                    "parquet_verified": False,
+                    "labels": labels,
+                }
+            )
+            _ENUMERATE_WORK["superseded_corpus_metadata_only"] += 1
             continue
         partition_dir = manifests_dir / "partitions"
-        _ENUMERATE_WORK["datasets_partition_scanned"] += 1
-        matching: list[Path] = []
-        matching_manifests: list[PartitionManifest] = []
-        if partition_dir.is_dir():
+        named_ids = _receipt_partition_manifest_ids(
+            manifests_dir, manifest.dataset_manifest_id
+        )
+        if named_ids is not None:
+            _ENUMERATE_WORK["named_partition_manifests_opened"] += len(named_ids)
+            matching, matching_manifests, corrupt = _named_corpus_partitions(
+                data_root,
+                partition_dir,
+                named_ids,
+                dataset_manifest_id=manifest.dataset_manifest_id,
+            )
+            if corrupt:
+                warnings.append(
+                    {
+                        "code": "DATASET_PARTITION_CORRUPT",
+                        "dataset_manifest_id": manifest.dataset_manifest_id,
+                    }
+                )
+                continue
+        else:
+            _ENUMERATE_WORK["datasets_partition_scanned"] += 1
+            matching = []
+            matching_manifests = []
+        if named_ids is None and partition_dir.is_dir():
             for part_path in sorted(partition_dir.glob("*.json")):
+                if part_path.stem in claimed_partition_ids:
+                    continue
+                _ENUMERATE_WORK["directory_partition_files_read"] += 1
                 if _is_symlink_path(part_path):
                     warnings.append(
                         {

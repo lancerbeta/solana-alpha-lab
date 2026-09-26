@@ -735,7 +735,7 @@ stops at `FORGE_CONTROL_READY`. The next owner action is
 Forge.
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py unpack-next-live-cohort --observation-rdp <local-mirror-rdp> --resolution <activation-rollover.json> --closure-receipt <frozen-closure-receipt.json> --data-root local/factory_v1/data_plane --plan-only
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py unpack-next-live-cohort --data-root local/factory_v1/data_plane
 ```
 
 Drop `--plan-only` only when the mirror already contains that receipt's

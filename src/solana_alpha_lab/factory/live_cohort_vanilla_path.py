@@ -176,6 +176,9 @@ def collect_bounded_transfer_manifest(
         if unit is None or seq is None:
             _add_file(entries, root, location, "member_location")
             continue
+        unit_rel = str(info.get("unit_rel") or "")
+        if unit_rel:
+            _add_file(entries, root, unit_rel, "member_unit")
         for publication in unit.get("publications") or []:
             if not isinstance(publication, Mapping):
                 continue
@@ -193,7 +196,9 @@ def collect_bounded_transfer_manifest(
                     _add_file(entries, root, layout, "member_layout")
             mid = str(publication.get("dataset_manifest_id") or "")
             if mid:
-                _add_file(entries, root, f"datasets/manifests/{mid}.json", "dataset_manifest")
+                manifest_rel = f"datasets/manifests/{mid}.json"
+                if (root / manifest_rel).is_file():
+                    _add_file(entries, root, manifest_rel, "dataset_manifest")
                 published = f"datasets/manifests/{mid}.published"
                 if (root / published).is_file():
                     _add_file(entries, root, published, "dataset_published")
@@ -263,12 +268,15 @@ def classify_mirror(
             reused += 1
             continue
         conflicts += 1
+    unique = reused + missing + conflicts
     return {
         "conflicts": conflicts,
         "missing_bytes": missing_bytes,
         "missing_files": missing,
         "missing_paths": missing_paths,
         "reused_files": reused,
+        "unique_paths_total": unique,
+        "verified_paths_total": reused,
         "status": "CONFLICT" if conflicts else "READY",
     }
 
@@ -303,6 +311,108 @@ def place_missing(
             raise LiveCohortReleaseError(f"TRANSFER_SHA_MISMATCH:{relative}")
         moved += 1
     return moved
+
+
+def capture_freeze_export(
+    *,
+    observation_rdp: Path,
+    ops_store: Path,
+    imported_cohort_ids: set[str],
+    as_of: datetime,
+) -> dict[str, Any]:
+    """VPS capture phase: resolve, freeze a closure receipt, list dependencies.
+
+    This function has no materialization, seal, or import call.
+    """
+
+    from solana_alpha_lab.factory.live_cohort_to_forge import build_closure_receipt
+    from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+
+    store = ObservationScheduleStore(ops_store)
+    try:
+        activations = store.list_activations()
+        rollovers = store.list_rollovers()
+    finally:
+        store.close()
+    chosen = select_next_mature_unimported_cohort(
+        activations=activations,
+        rollovers=rollovers,
+        imported_cohort_ids=imported_cohort_ids,
+        as_of=as_of,
+    )
+    if chosen is None:
+        raise LiveCohortReleaseError("NO_MATURE_UNIMPORTED_COHORT")
+    receipt = build_closure_receipt(
+        ops_store=Path(ops_store),
+        observation_rdp=Path(observation_rdp),
+        schedule_sha256=str(chosen["schedule_sha256"]),
+        activation_id=str(chosen["activation_id"]),
+        cohort_id=str(chosen["cohort_id"]),
+        as_of=as_of,
+    )
+    assert_closure_ready(receipt)
+    manifest = collect_bounded_transfer_manifest(
+        observation_rdp=Path(observation_rdp),
+        schedule_sha256=str(chosen["schedule_sha256"]),
+        activation_id=str(chosen["activation_id"]),
+        cohort_id=str(chosen["cohort_id"]),
+        closure_receipt=receipt,
+    )
+    return {
+        "activations": activations,
+        "closure_receipt": receipt,
+        "cohort_id": chosen["cohort_id"],
+        "rollovers": rollovers,
+        "transfer_manifest": manifest,
+    }
+
+
+def run_owner_live_cohort(
+    *,
+    capture,
+    transfer,
+    mirror_root: Path,
+    data_root: Path,
+    repo_root: Path,
+    as_of: datetime,
+    release_builder_git_sha: str | None = None,
+) -> dict[str, Any]:
+    """One owner operation: capture/export, then local consume. No VPS build."""
+
+    packet = capture()
+    manifest = packet["transfer_manifest"]
+    before = classify_mirror(manifest, mirror_root)
+    accounted = (
+        int(before["reused_files"]) + int(before["missing_files"]) + int(before["conflicts"])
+    )
+    if accounted != int(before["unique_paths_total"]):
+        raise LiveCohortReleaseError("TRANSFER_ACCOUNTING")
+    if before["conflicts"]:
+        raise LiveCohortReleaseError("MIRROR_CONFLICT")
+    if before["missing_files"]:
+        transfer(manifest, list(before["missing_paths"]))
+    after = classify_mirror(manifest, mirror_root)
+    if (
+        after["missing_files"]
+        or after["conflicts"]
+        or int(after["verified_paths_total"]) != int(after["unique_paths_total"])
+    ):
+        raise LiveCohortReleaseError("MIRROR_INCOMPLETE")
+    result = unpack_next_live_cohort(
+        observation_rdp=Path(mirror_root),
+        data_root=Path(data_root),
+        repo_root=Path(repo_root),
+        activations=list(packet["activations"]),
+        rollovers=list(packet["rollovers"]),
+        closure_receipt=packet["closure_receipt"],
+        as_of=as_of,
+        mirror_root=Path(mirror_root),
+        release_builder_git_sha=release_builder_git_sha,
+        plan_only=False,
+    )
+    result["unique_paths_total"] = before["unique_paths_total"]
+    result["verified_paths_total"] = after["verified_paths_total"]
+    return result
 
 
 def imported_cohort_ids(data_root: Path) -> set[str]:

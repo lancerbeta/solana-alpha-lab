@@ -220,12 +220,31 @@ def _verify_lineage_release_binding(
     # A3's enumerate_rdp_datasets owns partition/file integrity.  A5
     # consumes that verified basis instead of re-reading and re-hashing raw
     # corpus bytes for every identity consumer invocation.
-    if (
-        verified_dataset_manifest_ids is None
-        or manifest_id not in verified_dataset_manifest_ids
-    ):
-        return False
+    if verified_dataset_manifest_ids is not None and manifest_id in verified_dataset_manifest_ids:
+        return _composition_binds_release(
+            data_root,
+            manifest_id,
+            cohort_id=str(item.get("cohort_id") or ""),
+            release_id=release_id,
+            source_sha=source_sha,
+        )
+    return _current_receipt_binds_historical_release(
+        data_root,
+        cohort_id=str(item.get("cohort_id") or ""),
+        release_id=release_id,
+        source_sha=source_sha,
+    )
 
+
+def _composition_binds_release(
+    data_root: Path,
+    manifest_id: str,
+    *,
+    cohort_id: str,
+    release_id: str,
+    source_sha: str,
+) -> bool:
+    manifests_root = Path(data_root) / "datasets" / "manifests"
     published_path = manifests_root / f"{manifest_id}.published"
     validation_path = manifests_root / f"{manifest_id}.validation.json"
     if (
@@ -244,8 +263,21 @@ def _verify_lineage_release_binding(
         return False
     if published.get("dataset_manifest_id") != manifest_id:
         return False
-    cohort_id = str(item.get("cohort_id") or "")
-    composition = validation.get("corpus_composition")
+    return _composition_contains(
+        validation.get("corpus_composition"),
+        cohort_id=cohort_id,
+        release_id=release_id,
+        source_sha=source_sha,
+    )
+
+
+def _composition_contains(
+    composition: Any,
+    *,
+    cohort_id: str,
+    release_id: str,
+    source_sha: str,
+) -> bool:
     if not isinstance(composition, Sequence) or isinstance(composition, (str, bytes)):
         return False
     for row in composition:
@@ -258,6 +290,36 @@ def _verify_lineage_release_binding(
         ):
             return True
     return False
+
+
+def _current_receipt_binds_historical_release(
+    data_root: Path,
+    *,
+    cohort_id: str,
+    release_id: str,
+    source_sha: str,
+) -> bool:
+    """Historical cohort rows bind through the current root receipt, not old parquet."""
+
+    lineage_path = Path(data_root) / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+    if not lineage_path.is_file() or lineage_path.is_symlink():
+        return False
+    try:
+        lineage = json.loads(lineage_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, json.JSONDecodeError):
+        return False
+    if not isinstance(lineage, Mapping):
+        return False
+    current = str(lineage.get("current_dataset_manifest_id") or "")
+    if not current:
+        return False
+    return _composition_binds_release(
+        data_root,
+        current,
+        cohort_id=cohort_id,
+        release_id=release_id,
+        source_sha=source_sha,
+    )
 
 
 def build_market_evidence_basis(
@@ -1207,7 +1269,9 @@ def compute_market_epoch_for_data_root(
         verified_dataset_manifest_ids = {
             str(item.get("dataset_manifest_id") or "")
             for item in enumerated
-            if isinstance(item, Mapping) and item.get("dataset_manifest_id")
+            if isinstance(item, Mapping)
+            and item.get("dataset_manifest_id")
+            and item.get("parquet_verified", True) is not False
         }
         datasets = list(select_current_datasets_for_forge(enumerated))
         try:

@@ -173,6 +173,114 @@ def _spawn_source_build_worker(argv: list[str]) -> int:
     return int(proc.returncode)
 
 
+def _owner_unpack_over_ssh(
+    *,
+    data_root: Path,
+    repo_root: Path,
+    as_of: datetime,
+    release_builder_git_sha: str | None,
+    plan_only: bool,
+) -> dict:
+    """One owner operation. Capture SSH only freezes; materialization stays local."""
+
+    import yaml
+
+    from solana_alpha_lab.factory.live_cohort_vanilla_path import (
+        classify_mirror,
+        imported_cohort_ids,
+        run_owner_live_cohort,
+    )
+
+    host = yaml.safe_load(
+        (ROOT / "docs/operator/factory_remote_host_v1.yaml").read_text(encoding="utf-8")
+    )
+    identity = Path.home() / ".ssh" / str(host["ssh"]["identity_basename"])
+    remote = f"{host['ssh']['user_live']}@{host['ipv4']}"
+    ssh = [
+        "ssh",
+        "-i",
+        str(identity),
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "BatchMode=yes",
+        remote,
+    ]
+    deploy = str(host["paths"]["deploy_root"])
+    imported = sorted(imported_cohort_ids(data_root))
+    remote_py = f"""
+import json, sys
+from datetime import datetime, timezone
+sys.path.insert(0, {deploy!r} + "/src")
+from solana_alpha_lab.factory.live_cohort_vanilla_path import capture_freeze_export
+packet = capture_freeze_export(
+    observation_rdp=__import__("pathlib").Path({deploy!r}) / "local/factory_v1/observation_rdp",
+    ops_store=__import__("pathlib").Path({deploy!r}) / "local/factory_v1/observation_schedule_state.sqlite",
+    imported_cohort_ids=set({imported!r}),
+    as_of=datetime.fromisoformat({as_of.isoformat()!r}),
+)
+json.dump(packet, sys.stdout)
+"""
+    proc = subprocess.run(
+        ssh
+        + [
+            "cd "
+            + deploy
+            + " && sudo -n /usr/bin/uv run --locked --managed-python python -B -"
+        ],
+        input=remote_py.encode("utf-8"),
+        capture_output=True,
+        check=False,
+    )
+    if proc.returncode != 0:
+        raise LiveCohortReleaseError("CAPTURE_EXPORT_FAILED")
+    packet = json.loads(proc.stdout.decode("utf-8"))
+    mirror = repo_root / "local/factory_mirror/observation_rdp"
+
+    def _transfer(manifest: dict, missing: list[str]) -> None:
+        del manifest
+        if not missing:
+            return
+        listing = "\n".join(missing) + "\n"
+        remote_tar = subprocess.run(
+            ssh
+            + [
+                "sudo -n tar -C "
+                + deploy
+                + "/local/factory_v1/observation_rdp -cf - -T -"
+            ],
+            input=listing.encode("utf-8"),
+            capture_output=True,
+            check=False,
+        )
+        if remote_tar.returncode != 0:
+            raise LiveCohortReleaseError("CAPTURE_EXPORT_FAILED")
+        extract = subprocess.run(
+            ["tar", "-xf", "-", "-C", str(mirror)],
+            input=remote_tar.stdout,
+            check=False,
+        )
+        if extract.returncode != 0:
+            raise LiveCohortReleaseError("CAPTURE_EXPORT_FAILED")
+
+    if plan_only:
+        classified = classify_mirror(packet["transfer_manifest"], mirror)
+        return {
+            "terminal": "PLAN_READY",
+            "mirror": classified,
+            "cohort_id": packet["cohort_id"],
+        }
+    return run_owner_live_cohort(
+        capture=lambda: packet,
+        transfer=_transfer,
+        mirror_root=mirror,
+        data_root=data_root,
+        repo_root=repo_root,
+        as_of=as_of,
+        release_builder_git_sha=release_builder_git_sha,
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -296,7 +404,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     unpack.add_argument("--data-root", type=Path, default=None)
     unpack.add_argument("--repo-root", type=Path, default=None)
-    unpack.add_argument("--closure-receipt", type=Path, required=True)
+    unpack.add_argument("--closure-receipt", type=Path, default=None)
     unpack.add_argument("--mirror-rdp", type=Path, default=None)
     unpack.add_argument("--source-rdp", type=Path, default=None)
     unpack.add_argument("--as-of", type=str, default=None)
@@ -433,39 +541,52 @@ def main(argv: list[str] | None = None) -> int:
             _print_import_success(result, data_root)
             return 0
         elif args.command == "unpack-next-live-cohort":
-            from solana_alpha_lab.factory.live_cohort_vanilla_path import (
-                unpack_next_live_cohort,
-            )
-            from solana_alpha_lab.factory.observation_schedule_store import (
-                ObservationScheduleStore,
-            )
-
             data_root = _resolved_data_root(args.data_root)
-            if args.resolution is not None:
-                resolution = json.loads(_path(args.resolution).read_text(encoding="utf-8"))
-                activations = list(resolution.get("activations") or [])
-                rollovers = list(resolution.get("rollovers") or [])
-            elif args.ops_store is not None:
-                store = ObservationScheduleStore(_path(args.ops_store))
-                activations = store.list_activations()
-                rollovers = store.list_rollovers()
+            repo_root = ROOT if args.repo_root is None else _path(args.repo_root)
+            as_of = _parse_utc(args.as_of) or datetime.now().astimezone()
+            if args.closure_receipt is None and args.resolution is None:
+                result = _owner_unpack_over_ssh(
+                    data_root=data_root,
+                    repo_root=repo_root,
+                    as_of=as_of,
+                    release_builder_git_sha=args.release_builder_git_sha,
+                    plan_only=bool(args.plan_only),
+                )
             else:
-                raise LiveCohortReleaseError("COHORT_RESOLUTION_MISSING")
-            receipt = json.loads(_path(args.closure_receipt).read_text(encoding="utf-8"))
-            result = unpack_next_live_cohort(
-                observation_rdp=_path(args.observation_rdp),
-                data_root=data_root,
-                repo_root=ROOT if args.repo_root is None else _path(args.repo_root),
-                activations=activations,
-                rollovers=rollovers,
-                closure_receipt=receipt,
-                as_of=_parse_utc(args.as_of) or datetime.now().astimezone(),
-                mirror_root=None if args.mirror_rdp is None else _path(args.mirror_rdp),
-                source_root=None if args.source_rdp is None else _path(args.source_rdp),
-                release_builder_git_sha=args.release_builder_git_sha,
-                plan_only=bool(args.plan_only),
-                manifest_out=None if args.manifest_out is None else _path(args.manifest_out),
-            )
+                from solana_alpha_lab.factory.live_cohort_vanilla_path import (
+                    unpack_next_live_cohort,
+                )
+                from solana_alpha_lab.factory.observation_schedule_store import (
+                    ObservationScheduleStore,
+                )
+
+                if args.closure_receipt is None:
+                    raise LiveCohortReleaseError("COHORT_RESOLUTION_MISSING")
+                if args.resolution is not None:
+                    resolution = json.loads(_path(args.resolution).read_text(encoding="utf-8"))
+                    activations = list(resolution.get("activations") or [])
+                    rollovers = list(resolution.get("rollovers") or [])
+                elif args.ops_store is not None:
+                    store = ObservationScheduleStore(_path(args.ops_store))
+                    activations = store.list_activations()
+                    rollovers = store.list_rollovers()
+                else:
+                    raise LiveCohortReleaseError("COHORT_RESOLUTION_MISSING")
+                receipt = json.loads(_path(args.closure_receipt).read_text(encoding="utf-8"))
+                result = unpack_next_live_cohort(
+                    observation_rdp=_path(args.observation_rdp),
+                    data_root=data_root,
+                    repo_root=repo_root,
+                    activations=activations,
+                    rollovers=rollovers,
+                    closure_receipt=receipt,
+                    as_of=as_of,
+                    mirror_root=None if args.mirror_rdp is None else _path(args.mirror_rdp),
+                    source_root=None if args.source_rdp is None else _path(args.source_rdp),
+                    release_builder_git_sha=args.release_builder_git_sha,
+                    plan_only=bool(args.plan_only),
+                    manifest_out=None if args.manifest_out is None else _path(args.manifest_out),
+                )
         elif args.command == "list-live-cohorts":
             result = list_live_cohorts(
                 observation_rdp=_path(args.observation_rdp),
