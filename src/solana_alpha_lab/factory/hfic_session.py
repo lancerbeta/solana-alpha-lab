@@ -3188,7 +3188,7 @@ def persist_scientific_slot_admission(
             representation_registry=representation_registry,
         )
 
-    for attempt in range(4):
+    for attempt in range(8):
         try:
             store.append(
                 [event],
@@ -3211,9 +3211,9 @@ def persist_scientific_slot_admission(
                 return observed
             if (
                 getattr(exc, "code", None) in {"WRITER_BUSY", "WRITER_LEASE_INVALID"}
-                and attempt < 3
+                and attempt < 7
             ):
-                time.sleep(0.05 * (attempt + 1))
+                time.sleep(0.2 * (attempt + 1))
                 continue
             raise
     return body
