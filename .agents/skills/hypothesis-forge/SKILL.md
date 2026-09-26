@@ -104,7 +104,7 @@ commissioning when Fast Lane proof is absent and safe, design packets.
 
 Happy path — no owner copy/paste between the slash command and the final terminal:
 
-1. Run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py preflight --owner-focus <AUTO|text> --discovery-contract --format json`.
+1. Run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py preflight --owner-focus <AUTO|text> --format json`.
    If the executing model provenance digest is available from the caller,
    pass `--model-provenance-sha256 <64-hex>`; this is a caller-supplied
    compatibility label, not an attestation that the model actually ran.

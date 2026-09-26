@@ -393,8 +393,10 @@ evidence, a mundane alternative, a counterexample or disconfirming observation,
 practical relevance and a cheap falsifier. It does not need a proven actor
 story or literature novelty. A causal claim keeps the stricter identification
 bar. Do not invent a mechanism to fill a schema field. Zero grounded sketches
-are allowed. Do not force four candidates. At most six sketches, one selected
-candidate and one frozen runner-up. Cohort id is not a trading feature.
+are allowed. Do not force four candidates. At most six sketches. One
+selected candidate is persisted without a second card or a runner-up. When
+two or more sketches exist, name one runner-up and the strongest rejected
+alternative. Cohort id is not a trading feature.
 Discovery queries use `BASE_X` only, price/liquidity fields, and a target point
 strictly after the decision points. Missing outcomes are not zeros. A scoped
 CONTROL negative does not hard-close an unseen richer ordinary question.
@@ -411,7 +413,7 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
 Ordinary numeric recipe. The store argument is explicit. Do not point it at the live store in this repair. Role and holdout come from the binding file. `--journal-scope` is the preflight `search_key_sha256`. Copy the whole returned object onto the draft as `grounded_evidence`. When cohort hashes differ, pass `--cohort-partition COHORT CENSUS OBSERVATIONS` once per cohort and do not replace those hashes with a combined file. Ordinary non-CONTROL preflight always stamps the discovery contract; `--discovery-contract` does not toggle it. That receipt requires the evidence object for 0, 1, 4, and 6 candidates. One selected candidate is persisted without a runner-up. Do not hand-write the contract field:
 
 ```text
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <scope> --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
 ```
 
 ## A0. Authority и hard boundaries
@@ -1025,15 +1027,13 @@ decision after collection
     "provider_api_rpc_wss_calls": 0
   },
   "candidates": [],
-  "selected_candidate_ref": "<label>",
-  "runner_up_candidate_ref": "<label>",
-  "strongest_rejected_alternative": "<label>",
+  "selected_candidate_ref": "<label-or-omit-when-no-worthy>",
   "pareto_factors": [],
   "non_claims": ["NO_ALPHA"]
 }
 ```
 
-Если поле невозможно заполнить из truth, используй `UNKNOWN` и объясни blocker. Не фабрикуй stable IDs или hashes.
+`runner_up_candidate_ref` и `strongest_rejected_alternative` указывай только когда `candidates` содержит две или больше карточек. Для одного selected оба поля опусти. Не выдумывай вторую карточку, чтобы заполнить шаблон. Если поле невозможно заполнить из truth, используй `UNKNOWN` и объясни blocker. Не фабрикуй stable IDs или hashes.
 
 ## A15. Final self-check
 
