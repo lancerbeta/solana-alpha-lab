@@ -476,6 +476,31 @@ def _stamp_execution_identity(
     return target
 
 
+def _stamp_prefreeze_capability_repair(
+    target: dict[str, Any],
+    receipt: Mapping[str, Any] | None,
+) -> None:
+    """Record original and current capability epochs as two different facts."""
+
+    if not isinstance(receipt, Mapping) or receipt.get("prefreeze_capability_repair") is not True:
+        return
+    original = receipt.get("generated_draft_capability_epoch_sha256")
+    current = target.get("capability_epoch_sha256") or receipt.get("capability_epoch_sha256")
+    if (
+        not _hash64(original)
+        or not _hash64(current)
+        or original == current
+    ):
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+    target["prefreeze_capability_repair"] = True
+    target["generated_draft_capability_epoch_sha256"] = original
+    target["generated_draft_execution_binding_sha256"] = receipt.get(
+        "generated_draft_execution_binding_sha256"
+    )
+    target["recovery_capability_epoch_sha256"] = current
+    target["recovery_execution_binding_sha256"] = target.get("execution_binding_sha256")
+
+
 def closed_family_terminals_from_receipt(receipt: Mapping[str, Any] | None) -> list[str]:
     return family_hard_close_terminals(ledger_from_receipt(receipt))
 
@@ -1783,6 +1808,9 @@ def freeze_draft(
     _stamp_split_identity(result, bound, preflight_receipt)
     _stamp_market_evidence_basis(result, bound, preflight_receipt)
     _stamp_execution_identity(result, bound, preflight_receipt)
+    _stamp_prefreeze_capability_repair(
+        result, preflight_receipt if isinstance(preflight_receipt, Mapping) else None
+    )
     if closed_or_suppressed_collision_count is not None:
         result["closed_or_suppressed_collision_count"] = (
             closed_or_suppressed_collision_count
@@ -2028,6 +2056,9 @@ def _freeze_no_worthy(
     _stamp_split_identity(result, bound, preflight_receipt)
     _stamp_market_evidence_basis(result, bound, preflight_receipt)
     _stamp_execution_identity(result, bound, preflight_receipt)
+    _stamp_prefreeze_capability_repair(
+        result, preflight_receipt if isinstance(preflight_receipt, Mapping) else None
+    )
     if closed_or_suppressed_collision_count is not None:
         result["closed_or_suppressed_collision_count"] = (
             closed_or_suppressed_collision_count
@@ -2646,13 +2677,34 @@ def _existing_scientific_slot_admission(
 def _scientific_slot_admission_matches_binding(
     admission: Mapping[str, Any], binding: Mapping[str, Any]
 ) -> bool:
-    """Require an orphan reservation to retain its complete immutable bind."""
+    """Require an orphan reservation to retain its complete immutable bind.
+
+    A pre-freeze capability repair compares the reservation to the original
+    capability and execution binding. The current recovery capability stays on
+    the lifecycle row and is not written back onto the reservation.
+    """
 
     if admission.get("identity_binding_status") == "CONFLICT":
         return False
+    compared: Mapping[str, Any] = binding
+    if binding.get("prefreeze_capability_repair") is True:
+        original_capability = binding.get("generated_draft_capability_epoch_sha256")
+        current_capability = binding.get("recovery_capability_epoch_sha256") or binding.get(
+            "capability_epoch_sha256"
+        )
+        if not _hash64(original_capability) or not _hash64(current_capability):
+            return False
+        if original_capability == current_capability:
+            return False
+        repaired = dict(binding)
+        repaired["capability_epoch_sha256"] = original_capability
+        repaired["execution_binding_sha256"] = binding.get(
+            "generated_draft_execution_binding_sha256"
+        )
+        compared = repaired
     try:
         observed = _execution_identity_fields(admission)
-        expected = _execution_identity_fields(binding)
+        expected = _execution_identity_fields(compared)
     except HficSessionError:
         return False
     for key in (
@@ -2672,13 +2724,13 @@ def _scientific_slot_admission_matches_binding(
         "memory_eligibility_sha256",
         "focus_key_sha256",
     ):
-        if _first_valid_hash([admission], key) != _first_valid_hash([binding], key):
+        if _first_valid_hash([admission], key) != _first_valid_hash([compared], key):
             return False
     if normalize_text(str(admission.get("owner_focus") or "AUTO")) != normalize_text(
-        str(binding.get("owner_focus") or "AUTO")
+        str(compared.get("owner_focus") or "AUTO")
     ):
         return False
-    return admission.get("evidence_surface_mode") == binding.get(
+    return admission.get("evidence_surface_mode") == compared.get(
         "evidence_surface_mode"
     )
 
@@ -3001,49 +3053,59 @@ def _assert_scientific_admission(
         session_id = str(binding.get("session_id") or "")
         admission_session = str(admission.get("session_id") or "")
         if draft_session and draft_session == session_id == admission_session:
-            draft_matches = generated_draft_matches_preflight_context(
-                draft,
-                market_evidence_epoch_sha256=market,
-                scientific_slot_sha256=str(fields.get("scientific_slot_sha256") or ""),
-                representation_id=str(fields.get("ladder_representation_id") or "BASE"),
-                representation_semantic_version=version,
-                owner_focus=str(binding.get("owner_focus") or "AUTO"),
-                capability_epoch_sha256=(
+            match_kwargs = {
+                "market_evidence_epoch_sha256": market,
+                "scientific_slot_sha256": str(fields.get("scientific_slot_sha256") or ""),
+                "representation_id": str(fields.get("ladder_representation_id") or "BASE"),
+                "representation_semantic_version": version,
+                "owner_focus": str(binding.get("owner_focus") or "AUTO"),
+                "capability_epoch_sha256": (
                     str(fields.get("capability_epoch_sha256") or binding.get("capability_epoch_sha256"))
                     if fields.get("capability_epoch_sha256") or binding.get("capability_epoch_sha256")
                     else None
                 ),
-                memory_eligibility_sha256=(
+                "memory_eligibility_sha256": (
                     str(binding.get("memory_eligibility_sha256"))
                     if isinstance(binding.get("memory_eligibility_sha256"), str)
                     else None
                 ),
-                evidence_surface_mode=(
+                "evidence_surface_mode": (
                     str(binding.get("evidence_surface_mode"))
                     if isinstance(binding.get("evidence_surface_mode"), str)
                     else None
                 ),
-                control_session_id=(
+                "control_session_id": (
                     str(fields.get("control_session_id"))
                     if isinstance(fields.get("control_session_id"), str)
                     else None
                 ),
-                representation_payload_sha256=(
+                "representation_payload_sha256": (
                     str(fields.get("representation_payload_sha256"))
                     if isinstance(fields.get("representation_payload_sha256"), str)
                     else None
                 ),
-                execution_binding_sha256=(
+                "execution_binding_sha256": (
                     str(fields.get("execution_binding_sha256"))
                     if isinstance(fields.get("execution_binding_sha256"), str)
                     else None
                 ),
-                model_provenance_sha256=(
+                "model_provenance_sha256": (
                     str(fields.get("model_provenance_sha256"))
                     if isinstance(fields.get("model_provenance_sha256"), str)
                     else None
                 ),
-            )
+            }
+            draft_matches = generated_draft_matches_preflight_context(draft, **match_kwargs)
+            if not draft_matches:
+                # Capability repair is only this orphan-draft branch. A
+                # lifecycle row takes the strict path above and never arrives
+                # here, because its admission is not READBACK_MISSING.
+                draft_matches = prefreeze_generated_draft_recovery(
+                    draft,
+                    sessions=list_hfic_sessions(store),
+                    reservations=list_scientific_slot_admissions(store),
+                    **match_kwargs,
+                )
             if draft_matches:
                 return {
                     **admission,
@@ -3297,12 +3359,15 @@ def generated_draft_matches_preflight_context(
     representation_payload_sha256: str | None = None,
     execution_binding_sha256: str | None = None,
     model_provenance_sha256: str | None = None,
+    allow_prefreeze_capability_repair: bool = False,
 ) -> bool:
     """Validate that a durable pre-freeze draft still belongs to this entry.
 
     The draft bytes and their source-preflight reference are immutable. A new
-    preflight may resume them only while market, slot, capability, memory,
-    representation and focus identities still agree.
+    preflight may resume them only while market, slot, memory, representation
+    and focus identities still agree. Capability epoch may differ only when
+    ``allow_prefreeze_capability_repair`` is set, and only for the pre-freeze
+    orphan checked by ``prefreeze_generated_draft_recovery``.
     """
 
     if not isinstance(generated_draft, Mapping):
@@ -3343,13 +3408,14 @@ def generated_draft_matches_preflight_context(
         "focus_key_sha256": focus_key_sha256(owner_focus),
         "ladder_representation_id": representation_id,
         "representation_semantic_version": representation_semantic_version,
-        "capability_epoch_sha256": capability_epoch_sha256,
         "memory_eligibility_sha256": memory_eligibility_sha256,
         "evidence_surface_mode": evidence_surface_mode,
         "control_session_id": control_session_id,
         "representation_payload_sha256": representation_payload_sha256,
-        "execution_binding_sha256": execution_binding_sha256,
     }
+    if not allow_prefreeze_capability_repair:
+        expected["capability_epoch_sha256"] = capability_epoch_sha256
+        expected["execution_binding_sha256"] = execution_binding_sha256
     if any(generated_draft.get(key) != value for key, value in expected.items()):
         return False
     model = generated_draft.get("model_provenance_sha256")
@@ -3359,7 +3425,261 @@ def generated_draft_matches_preflight_context(
         return False
     if model_provenance_sha256 is not None and model != model_provenance_sha256:
         return False
-    return True
+    if not allow_prefreeze_capability_repair:
+        return True
+    return _prefreeze_capability_drift_is_consistent(
+        generated_draft,
+        scientific_slot_sha256=scientific_slot_sha256,
+        capability_epoch_sha256=capability_epoch_sha256,
+        memory_eligibility_sha256=memory_eligibility_sha256,
+        control_session_id=control_session_id,
+        representation_payload_sha256=representation_payload_sha256,
+        execution_binding_sha256=execution_binding_sha256,
+        model_provenance_sha256=model if isinstance(model, str) else model_provenance_sha256,
+    )
+
+
+def _hash64(value: object) -> bool:
+    return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+
+
+def _prefreeze_capability_drift_is_consistent(
+    generated_draft: Mapping[str, Any],
+    *,
+    scientific_slot_sha256: str,
+    capability_epoch_sha256: str | None,
+    memory_eligibility_sha256: str | None,
+    control_session_id: str | None,
+    representation_payload_sha256: str | None,
+    execution_binding_sha256: str | None,
+    model_provenance_sha256: str | None,
+) -> bool:
+    """Allow a capability-only change while the original binding stays readable.
+
+    Unknown execution bindings (no model provenance) may differ in capability
+    epoch alone. A known binding must still be the digest of the capability
+    epoch that wrote it, and the caller's current binding must be the digest
+    of the capability epoch performing recovery. The two epochs are not
+    rewritten to look equal.
+    """
+
+    stored_capability = generated_draft.get("capability_epoch_sha256")
+    stored_binding = generated_draft.get("execution_binding_sha256")
+    if not _hash64(stored_capability) or not _hash64(capability_epoch_sha256):
+        return False
+    if (
+        stored_capability == capability_epoch_sha256
+        and stored_binding == execution_binding_sha256
+    ):
+        return True
+    if stored_binding in (None, "") and execution_binding_sha256 in (None, ""):
+        return True
+    if not all(
+        _hash64(value)
+        for value in (
+            representation_payload_sha256,
+            memory_eligibility_sha256,
+            model_provenance_sha256,
+            stored_binding,
+            execution_binding_sha256,
+        )
+    ):
+        return False
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        EvidenceIdentityError,
+        execution_binding_sha256 as execution_binding_digest,
+    )
+
+    try:
+        original_binding = execution_binding_digest(
+            scientific_slot_sha256=scientific_slot_sha256,
+            capability_epoch_sha256=stored_capability,
+            control_session_id=control_session_id,
+            representation_payload_sha256=representation_payload_sha256,
+            memory_eligibility_sha256=memory_eligibility_sha256,
+            model_provenance_sha256=model_provenance_sha256,
+        )
+        current_binding = execution_binding_digest(
+            scientific_slot_sha256=scientific_slot_sha256,
+            capability_epoch_sha256=capability_epoch_sha256,
+            control_session_id=control_session_id,
+            representation_payload_sha256=representation_payload_sha256,
+            memory_eligibility_sha256=memory_eligibility_sha256,
+            model_provenance_sha256=model_provenance_sha256,
+        )
+    except EvidenceIdentityError:
+        return False
+    return stored_binding == original_binding and execution_binding_sha256 == current_binding
+
+
+def prefreeze_generated_draft_recovery(
+    generated_draft: Mapping[str, Any] | None,
+    *,
+    sessions: Sequence[Mapping[str, Any]],
+    reservations: Sequence[Mapping[str, Any]],
+    market_evidence_epoch_sha256: str,
+    scientific_slot_sha256: str,
+    representation_id: str,
+    representation_semantic_version: str,
+    owner_focus: str,
+    capability_epoch_sha256: str | None,
+    memory_eligibility_sha256: str | None,
+    evidence_surface_mode: str | None,
+    control_session_id: str | None = None,
+    representation_payload_sha256: str | None = None,
+    execution_binding_sha256: str | None = None,
+    model_provenance_sha256: str | None = None,
+    assert_evidence_surface: bool = True,
+) -> bool:
+    """True only for one exact pre-freeze draft whose lifecycle row does not exist.
+
+    Capability epoch may differ. Market, slot, representation, focus, memory,
+    evidence surface, model provenance, draft bytes and the original
+    reservation may not. A later lifecycle row loses this exception.
+    """
+
+    if not isinstance(generated_draft, Mapping):
+        return False
+    if generated_draft.get("draft_lifecycle") != "GENERATED_BEFORE_FREEZE":
+        return False
+    session_id = str(generated_draft.get("session_id") or "")
+    if not session_id:
+        return False
+    if any(
+        str(item.get("session_id") or "") == session_id
+        for item in sessions
+        if isinstance(item, Mapping)
+    ):
+        return False
+    reservation = next(
+        (
+            item
+            for item in reservations
+            if isinstance(item, Mapping)
+            and str(item.get("session_id") or "") == session_id
+            and item.get("scientific_slot_sha256") == scientific_slot_sha256
+        ),
+        None,
+    )
+    if not isinstance(reservation, Mapping):
+        return False
+    if reservation.get("identity_binding_status") == "CONFLICT":
+        return False
+    if reservation.get("capability_epoch_sha256") != generated_draft.get(
+        "capability_epoch_sha256"
+    ):
+        return False
+    if reservation.get("execution_binding_sha256") != generated_draft.get(
+        "execution_binding_sha256"
+    ):
+        return False
+    if reservation.get("market_evidence_epoch_sha256") != generated_draft.get(
+        "market_evidence_epoch_sha256"
+    ):
+        return False
+    if reservation.get("evidence_surface_mode") != generated_draft.get(
+        "evidence_surface_mode"
+    ):
+        return False
+    if reservation.get("memory_eligibility_sha256") != generated_draft.get(
+        "memory_eligibility_sha256"
+    ):
+        return False
+    if reservation.get("ladder_representation_id") != generated_draft.get(
+        "ladder_representation_id"
+    ):
+        return False
+    if reservation.get("representation_semantic_version") != generated_draft.get(
+        "representation_semantic_version"
+    ):
+        return False
+    if reservation.get("focus_key_sha256") != generated_draft.get("focus_key_sha256"):
+        return False
+    if normalize_text(str(reservation.get("owner_focus") or "AUTO")) != normalize_text(
+        str(generated_draft.get("owner_focus") or "AUTO")
+    ):
+        return False
+    surface = evidence_surface_mode
+    if not assert_evidence_surface:
+        surface = (
+            str(generated_draft.get("evidence_surface_mode"))
+            if isinstance(generated_draft.get("evidence_surface_mode"), str)
+            else None
+        )
+    return generated_draft_matches_preflight_context(
+        generated_draft,
+        market_evidence_epoch_sha256=market_evidence_epoch_sha256,
+        scientific_slot_sha256=scientific_slot_sha256,
+        representation_id=representation_id,
+        representation_semantic_version=representation_semantic_version,
+        owner_focus=owner_focus,
+        capability_epoch_sha256=capability_epoch_sha256,
+        memory_eligibility_sha256=memory_eligibility_sha256,
+        evidence_surface_mode=surface,
+        control_session_id=control_session_id,
+        representation_payload_sha256=representation_payload_sha256,
+        execution_binding_sha256=execution_binding_sha256,
+        model_provenance_sha256=model_provenance_sha256,
+        allow_prefreeze_capability_repair=True,
+    )
+
+
+def orphan_prefreeze_draft_resumable(
+    store: Any,
+    *,
+    market_evidence_epoch_sha256: str,
+    representation_id: str,
+    representation_semantic_version: str,
+    owner_focus: str,
+    capability_epoch_sha256: str | None,
+    memory_eligibility_sha256: str | None,
+    model_provenance_sha256: str | None = None,
+) -> bool:
+    """Forge-run readback: an orphan generated draft is resumable, not missing.
+
+    Surface mode is not asserted here. Preflight remains the mode gate.
+    """
+
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        scientific_slot_sha256 as slot_digest,
+    )
+
+    representation = representation_id
+    if representation in {"CURRENT_REPRESENTATION_CONTROL_V1", "ORDINARY_BASE"}:
+        representation = "BASE"
+    if not _hash64(market_evidence_epoch_sha256):
+        return False
+    slot = slot_digest(
+        market_evidence_epoch_sha256=market_evidence_epoch_sha256,
+        representation_id=representation,
+        representation_semantic_version=representation_semantic_version,
+        owner_focus=owner_focus,
+    )
+    draft = find_generated_draft(
+        store,
+        market_evidence_epoch_sha256=market_evidence_epoch_sha256,
+        owner_focus=owner_focus,
+        representation_id=representation,
+        representation_semantic_version=representation_semantic_version,
+        scientific_slot_sha256=slot,
+    )
+    if draft is None:
+        return False
+    return prefreeze_generated_draft_recovery(
+        draft,
+        sessions=list_hfic_sessions(store),
+        reservations=list_scientific_slot_admissions(store),
+        market_evidence_epoch_sha256=market_evidence_epoch_sha256,
+        scientific_slot_sha256=slot,
+        representation_id=representation,
+        representation_semantic_version=representation_semantic_version,
+        owner_focus=owner_focus,
+        capability_epoch_sha256=capability_epoch_sha256,
+        memory_eligibility_sha256=memory_eligibility_sha256,
+        evidence_surface_mode=None,
+        model_provenance_sha256=model_provenance_sha256,
+        assert_evidence_surface=False,
+    )
 
 
 def persist_generated_draft(
@@ -3465,6 +3785,15 @@ def persist_generated_draft(
     data_root = getattr(store, "_root", None)
     if data_root is None:
         raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")
+    from solana_alpha_lab.factory.research_store import (
+        ResearchStoreError,
+        assert_no_physical_paths,
+    )
+
+    try:
+        assert_no_physical_paths(draft)
+    except ResearchStoreError as exc:
+        raise HficSessionError(exc.code) from exc
     _validate_split_identity_binding(
         receipt,
         repo_root=Path(repo_root),
@@ -3827,6 +4156,20 @@ def persist_frozen_session(
         cycle_payload["closed_or_suppressed_collision_count"] = frozen[
             "closed_or_suppressed_collision_count"
         ]
+    if frozen.get("prefreeze_capability_repair") is True:
+        cycle_payload["prefreeze_capability_repair"] = True
+        cycle_payload["generated_draft_capability_epoch_sha256"] = frozen.get(
+            "generated_draft_capability_epoch_sha256"
+        )
+        cycle_payload["generated_draft_execution_binding_sha256"] = frozen.get(
+            "generated_draft_execution_binding_sha256"
+        )
+        cycle_payload["recovery_capability_epoch_sha256"] = frozen.get(
+            "recovery_capability_epoch_sha256"
+        )
+        cycle_payload["recovery_execution_binding_sha256"] = frozen.get(
+            "recovery_execution_binding_sha256"
+        )
     records = [
         event(
             record_id=f"HFIC-CYCLE-{session_id}-FROZEN",

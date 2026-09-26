@@ -1,0 +1,56 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-PREFREEZE-DRAFT-RECOVERY-ACCEPTANCE-001",
+  "as_of": "2026-09-26",
+  "task_id": "HFIC_PREFREEZE_DRAFT_RECOVERY_V1",
+  "state_change": "PREFREEZE_DRAFT_RECOVERY_READY_FOR_REVIEW",
+  "base_main": "72c9dc9827f633d891675e00125699e17f98918d",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "research_store.py": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [
+    "REAL_RDP_WRITE",
+    "MERGE_WITHOUT_OWNER_PHRASE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": true,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_prefreeze_draft_recovery/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_PREFREEZE_RECOVERY_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/hfic_prefreeze_draft_recovery/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": ["PASS_DELIVERY_HARNESS_CHECK"]
+  },
+  "non_claims": [
+    "THIS_REPAIR_DOES_NOT_CREATE_A_NEW_SCIENTIFIC_LOOK",
+    "EXACT_GENERATED_DRAFT_RECOVERY_ONLY",
+    "NO_REAL_RDP_WRITE",
+    "NO_ALPHA",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "git_mutation_count": 0,
+    "provider_calls": 0,
+    "cash_spend": 0
+  }
+}

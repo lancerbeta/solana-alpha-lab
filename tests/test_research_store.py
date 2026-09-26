@@ -26,6 +26,7 @@ from solana_alpha_lab.factory.research_store import (
     ResearchStore,
     ResearchStoreError,
     _timestamp_text,
+    assert_no_physical_paths,
     probe_local_pid,
 )
 
@@ -191,6 +192,22 @@ class ResearchStoreTests(unittest.TestCase):
                             [event_fixture(payload={"artifact": value})],
                             transaction_id="RESEARCH-TXN-001",
                         )
+
+    def test_prose_colon_is_not_a_physical_path(self) -> None:
+        for value in ("Weak: overlap", "Reason: because", "Note: see the note"):
+            assert_no_physical_paths({"text": value})
+        for value in (
+            "file:///tmp/x",
+            "FILE:///tmp/x",
+            "/tmp/x",
+            r"C:\tmp\x",
+            "http://example.test/a",
+            "../secret",
+        ):
+            with self.subTest(value=value):
+                with self.assertRaises(ResearchStoreError) as raised:
+                    assert_no_physical_paths(value)
+                self.assertEqual(raised.exception.code, "PHYSICAL_PATH_FORBIDDEN")
 
     def test_payload_rejects_file_uris_without_committing_records(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

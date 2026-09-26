@@ -2941,18 +2941,51 @@ def evaluate_forge_run(
             memory_eligibility_sha256=current_memory_eligibility,
             repo_root=Path(repo_root),
         )
+        from solana_alpha_lab.factory.hfic_session import (
+            orphan_prefreeze_draft_resumable,
+        )
+
+        resumable_orphan = orphan_prefreeze_draft_resumable(
+            store,
+            market_evidence_epoch_sha256=str(market_epoch),
+            representation_id=active_rep,
+            representation_semantic_version=active_version,
+            owner_focus=owner_focus,
+            capability_epoch_sha256=(
+                str(admission_execution_context.get("capability_epoch_sha256"))
+                if isinstance(
+                    admission_execution_context.get("capability_epoch_sha256"), str
+                )
+                else None
+            ),
+            memory_eligibility_sha256=current_memory_eligibility,
+            model_provenance_sha256=(
+                str(admission_execution_context.get("model_provenance_sha256"))
+                if isinstance(
+                    admission_execution_context.get("model_provenance_sha256"), str
+                )
+                else None
+            ),
+        )
         if admission.get("action") == "STOP":
             reason = str(
                 admission.get("reason_code") or "SCIENTIFIC_SLOT_ADMISSION_STOP"
             )
-            decision = {
-                "next_action": ACTION_OBSERVABILITY_BLOCKED,
-                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
-                "reason_code": reason,
-                "session_id": str(admission.get("session_id") or "") or None,
-            }
-            next_action = ACTION_OBSERVABILITY_BLOCKED
-            owner_final = ACTION_OBSERVABILITY_BLOCKED
+            # A generated draft with no lifecycle row is the pre-freeze resume
+            # path, including a capability-only repair. Do not report it as a
+            # missing readback and do not open a second trial.
+            if not (
+                reason == "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING"
+                and resumable_orphan
+            ):
+                decision = {
+                    "next_action": ACTION_OBSERVABILITY_BLOCKED,
+                    "owner_final": ACTION_OBSERVABILITY_BLOCKED,
+                    "reason_code": reason,
+                    "session_id": str(admission.get("session_id") or "") or None,
+                }
+                next_action = ACTION_OBSERVABILITY_BLOCKED
+                owner_final = ACTION_OBSERVABILITY_BLOCKED
         elif admission.get("action") in {
             "RESUME_EXISTING_SESSION",
             "RETURN_EXISTING_SESSION",
@@ -2963,7 +2996,7 @@ def evaluate_forge_run(
                 for row in resolved_stages
                 if isinstance(row, Mapping)
             }
-            if admitted_id and admitted_id not in observed_ids:
+            if admitted_id and admitted_id not in observed_ids and not resumable_orphan:
                 # The reservation is authoritative for occupancy, but the
                 # lifecycle row is not safely bound/readable (for example an
                 # orphan V1 parent). Do not expose the reservation's internal
