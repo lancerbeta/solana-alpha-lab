@@ -18,6 +18,7 @@
     "configs/execution_domain_v1.json": "3ec51dbeeed53532123f0019724a11e6865cbb3c95bdb19cde84dead27d33311",
     "docs/PROJECT_MAP.md": "cd8fec497496f92039618923ca5ee635393c0bbb1e1e57ba7b4fdcec96eb91ef",
     "docs/architecture/PAPER_SHADOW_EXECUTION_INTEGRITY_PRD_SSD_V1.md": "0c512cecb044c492864513f17d1309436539dfae7410cf163c30d63c085acb29",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "ed94ad556eefe8af7fd758b837adacd5d78f3190a9d1700686a69bf28ab2a56b",
     "docs/reports/paper_plane_write_integrity/a1_owner_readout_v1.md": "4f12af6db18d229303e276df1e642ca082c07a910cc7109af59d4b9ac630f2c0",
     "docs/tasks/PAPER_PLANE_WRITE_INTEGRITY_V1.md": "e0d2a142ed9a21c7b1bb3267568203f2ba17c88cf94bce12e5aa5fe05d97a5be",
     "src/solana_alpha_lab/factory/paper_plane.py": "cd6bc3c843f285b39d1973871e576158d7cd69edc0e1310adb2048c919b8e844",
@@ -34,14 +35,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/paper_plane_write_integrity/a1_delivery_factory_fit_v1.json",
-    "sha256": "074001e494c67d49dae04d61656b544d152d758ffe120922d0c3e51fb1ed3a5c",
+    "sha256": "10ca624ade69e4ed9c98768391fabd17bf4e9cba8350a0a1aae6e6b094ca3ef9",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PAPER_PLANE_WRITE_INTEGRITY_VERTICAL_AND_DOMAIN",
     "independent_review": {
       "path": "docs/evidence/paper_plane_write_integrity/a1_delivery_independent_review_v1.json",
-      "sha256": "d49ec45f96042c34a68569ad4a35b80f0eb213624f721617552e3e88a9e86bae",
+      "sha256": "036872bb0b5f40743bed8d1a41f5670a4cf8f0ad756069566fa070634319cade",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
