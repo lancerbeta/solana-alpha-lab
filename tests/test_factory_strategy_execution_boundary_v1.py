@@ -100,6 +100,7 @@ class StrategyExecutionBoundaryTests(unittest.TestCase):
                     strategy=strategy,
                     signal_decision=decision,
                     known_activation_epochs=KNOWN_EPOCHS,
+                    as_of=decision["decision_at"],
                 )
                 self.assertTrue(result["opened"])
                 position = store.get_position(result["position_id"])
@@ -132,6 +133,7 @@ class StrategyExecutionBoundaryTests(unittest.TestCase):
                         strategy=strategy,
                         signal_decision=_load_json(name),
                         known_activation_epochs=KNOWN_EPOCHS,
+                        as_of=_load_json(name)["decision_at"],
                     )
                     self.assertFalse(result["opened"])
                     self.assertEqual(store.positions(), [])
@@ -155,6 +157,7 @@ class StrategyExecutionBoundaryTests(unittest.TestCase):
                         strategy=strategy,
                         signal_decision=_load_json("signal_decision_future_available.json"),
                         known_activation_epochs=KNOWN_EPOCHS,
+                        as_of=_load_json("signal_decision_future_available.json")["decision_at"],
                     )
             finally:
                 store.close()
@@ -174,6 +177,7 @@ class StrategyExecutionBoundaryTests(unittest.TestCase):
                         strategy=strategy,
                         signal_decision=_load_json("signal_decision_enter_a.json"),
                         known_activation_epochs={},
+                        as_of=_load_json("signal_decision_enter_a.json")["decision_at"],
                     )
             finally:
                 store.close()
@@ -192,6 +196,7 @@ class StrategyExecutionBoundaryTests(unittest.TestCase):
                     strategy=strategy,
                     signal_decision=_load_json("signal_decision_enter_a.json"),
                     known_activation_epochs=KNOWN_EPOCHS,
+                    as_of=_load_json("signal_decision_enter_a.json")["decision_at"],
                 )
                 b = accept_signal_decision(
                     ROOT,
@@ -199,6 +204,7 @@ class StrategyExecutionBoundaryTests(unittest.TestCase):
                     strategy=strategy,
                     signal_decision=_load_json("signal_decision_enter_b_same_mint.json"),
                     known_activation_epochs=KNOWN_EPOCHS,
+                    as_of=_load_json("signal_decision_enter_b_same_mint.json")["decision_at"],
                 )
                 self.assertNotEqual(a["position_id"], b["position_id"])
                 self.assertEqual(len(store.positions()), 2)
@@ -222,6 +228,7 @@ class StrategyExecutionBoundaryTests(unittest.TestCase):
                     strategy=strategy,
                     signal_decision=decision,
                     known_activation_epochs=KNOWN_EPOCHS,
+                    as_of=decision["decision_at"],
                 )
                 second = accept_signal_decision(
                     ROOT,
@@ -229,6 +236,7 @@ class StrategyExecutionBoundaryTests(unittest.TestCase):
                     strategy=strategy,
                     signal_decision=decision,
                     known_activation_epochs=KNOWN_EPOCHS,
+                    as_of=decision["decision_at"],
                 )
                 self.assertTrue(second.get("idempotent"))
                 self.assertEqual(first["position_id"], second["position_id"])
@@ -250,6 +258,7 @@ class StrategyExecutionBoundaryTests(unittest.TestCase):
                     strategy=strategy,
                     signal_decision=_load_json("signal_decision_enter_a.json"),
                     known_activation_epochs=KNOWN_EPOCHS,
+                    as_of=_load_json("signal_decision_enter_a.json")["decision_at"],
                 )
                 exit_decision = _load_json("exit_decision_exit.json")
                 self.assertEqual(exit_decision["position_id"], opened["position_id"])
@@ -639,6 +648,7 @@ class StrategyExecutionBoundaryTests(unittest.TestCase):
                     strategy=strategy,
                     signal_decision=decision,
                     known_activation_epochs=KNOWN_EPOCHS,
+                    as_of=decision["decision_at"],
                 )
                 pid = opened["position_id"]
                 store.transition(pid, "EXIT_REQUIRED")
@@ -650,6 +660,7 @@ class StrategyExecutionBoundaryTests(unittest.TestCase):
                     strategy=strategy,
                     signal_decision=decision,
                     known_activation_epochs=KNOWN_EPOCHS,
+                    as_of=decision["decision_at"],
                 )
                 self.assertEqual(again["state"], "CLOSED")
                 self.assertFalse(again["opened"])
@@ -675,10 +686,11 @@ class StrategyExecutionBoundaryTests(unittest.TestCase):
                         EPOCH: {},
                         "ACTIVATION-EPOCH-BOUNDARY-PAPER-002": {},
                     },
+                    as_of=d1["decision_at"],
                 )
                 d2 = dict(d1)
                 d2["activation_epoch_id"] = "ACTIVATION-EPOCH-BOUNDARY-PAPER-002"
-                with self.assertRaisesRegex(PaperPlaneError, "SIGNAL_ACTIVATION_EPOCH_MISMATCH"):
+                with self.assertRaisesRegex(PaperPlaneError, "SIGNAL_DECISION_IDEMPOTENCY_MISMATCH"):
                     accept_signal_decision(
                         ROOT,
                         store,
@@ -688,6 +700,7 @@ class StrategyExecutionBoundaryTests(unittest.TestCase):
                             EPOCH: {},
                             "ACTIVATION-EPOCH-BOUNDARY-PAPER-002": {},
                         },
+                        as_of=d2["decision_at"],
                     )
                 self.assertEqual(len(store.bots()), 1)
             finally:

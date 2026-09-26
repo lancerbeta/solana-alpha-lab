@@ -266,6 +266,7 @@ class OwnerLifecycleProjectionSpineTests(unittest.TestCase):
                     strategy=v11,
                     signal_decision=decision,
                     known_activation_epochs={"ACTIVATION-EPOCH-BOUNDARY-PAPER-001": {"mode": "PAPER"}},
+                    as_of=decision["decision_at"],
                 )
                 projection = build_lifecycle_projection(
                     ROOT,

@@ -21,12 +21,15 @@ from uuid import uuid4
 
 from solana_alpha_lab.factory.strategy_runtime import (
     PaperPlaneError,
+    canonical_spec_sha256,
     load_strategy_version,
     normalize_strategy,
     position_id_for_signal_decision,
     validate_exit_decision,
     validate_signal_decision,
 )
+
+SIGNAL_MAX_CLOCK_SKEW_SECONDS = 2
 
 # Re-export for legacy callers/tests.
 __all__ = [
@@ -275,6 +278,7 @@ class PaperPlaneStore:
         self._migrate_accounting_control_v1()
         self._migrate_trading_runtime_policy_v1()
         self._migrate_entry_intent_integrity_v1()
+        self._migrate_decision_identity_v1()
         self._commit()
 
     def _migrate_v1_1_lineage(self) -> None:
@@ -398,6 +402,14 @@ class PaperPlaneStore:
         _ensure_column(self._conn, "positions", "cancel_reason_code", "TEXT")
         _ensure_column(self._conn, "positions", "admitted_fee_bps", "INTEGER")
 
+    def _migrate_decision_identity_v1(self) -> None:
+        """Idempotent decision fingerprint and separate exit reason. Legacy rows may be NULL."""
+
+        _ensure_column(self._conn, "positions", "signal_decision_sha256", "TEXT")
+        _ensure_column(self._conn, "positions", "strategy_spec_sha256", "TEXT")
+        _ensure_column(self._conn, "positions", "exit_reason_code", "TEXT")
+        _ensure_column(self._conn, "bot_instances", "strategy_spec_sha256", "TEXT")
+
     def _commit(self) -> None:
         # Writable connections use isolation_level=None. Statements persist
         # immediately unless immediate_write() opened BEGIN IMMEDIATE.
@@ -450,8 +462,26 @@ class PaperPlaneStore:
                 f"BOT-{strategy['strategy_id']}-{strategy['strategy_version']}-{mode}"
             )
             activation_epoch_id = None
+        spec = str(strategy.get("spec_sha256") or "") or None
         existing = self.get_bot(bot_instance_id)
         if existing is not None:
+            known_raw = existing.get("strategy_spec_sha256")
+            known = str(known_raw) if known_raw not in {None, ""} else ""
+            if known and spec and known != spec:
+                raise PaperPlaneError("STRATEGY_SPEC_DRIFT")
+            if not known and spec:
+                self._conn.execute(
+                    """
+                    UPDATE bot_instances
+                    SET strategy_spec_sha256 = ?
+                    WHERE bot_instance_id = ? AND strategy_spec_sha256 IS NULL
+                    """,
+                    (spec, bot_instance_id),
+                )
+                self._commit()
+                refreshed = self.get_bot(bot_instance_id)
+                assert refreshed is not None
+                return refreshed
             status = str(existing.get("status") or "")
             if status == "RUNNING":
                 return existing
@@ -474,8 +504,8 @@ class PaperPlaneStore:
             INSERT INTO bot_instances(
                 bot_instance_id, strategy_id, strategy_version, mode,
                 status, started_at, stopped_at, activation_epoch_id,
-                runtime_schema_version
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                runtime_schema_version, strategy_spec_sha256
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(bot_instance_id) DO UPDATE SET
                 status=CASE
                     WHEN bot_instances.status IN ('DRAINING','STOPPED')
@@ -488,7 +518,8 @@ class PaperPlaneStore:
                     ELSE excluded.stopped_at
                 END,
                 activation_epoch_id=COALESCE(excluded.activation_epoch_id, bot_instances.activation_epoch_id),
-                runtime_schema_version=COALESCE(excluded.runtime_schema_version, bot_instances.runtime_schema_version)
+                runtime_schema_version=COALESCE(excluded.runtime_schema_version, bot_instances.runtime_schema_version),
+                strategy_spec_sha256=COALESCE(bot_instances.strategy_spec_sha256, excluded.strategy_spec_sha256)
             """,
             (
                 record["bot_instance_id"],
@@ -500,6 +531,7 @@ class PaperPlaneStore:
                 None,
                 record["activation_epoch_id"],
                 record["runtime_schema_version"],
+                spec,
             ),
         )
         self._commit()
@@ -542,6 +574,8 @@ class PaperPlaneStore:
         bot_instance_id: str,
         signal_decision: Mapping[str, Any],
         signal_kind: str = "SIMULATED_FILL",
+        signal_decision_sha256: str | None = None,
+        strategy_spec_sha256: str | None = None,
     ) -> str:
         signal_decision_id = str(signal_decision["signal_decision_id"])
         position_id = position_id_for_signal_decision(signal_decision_id)
@@ -550,8 +584,9 @@ class PaperPlaneStore:
             INSERT INTO positions(
                 position_id, bot_instance_id, mint, state, signal_kind,
                 opened_at, signal_decision_id, activation_epoch_id,
-                strategy_id, strategy_version_label, reason_code
-            ) VALUES (?, ?, ?, 'WATCHED', ?, ?, ?, ?, ?, ?, ?)
+                strategy_id, strategy_version_label, reason_code,
+                signal_decision_sha256, strategy_spec_sha256
+            ) VALUES (?, ?, ?, 'WATCHED', ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(position_id) DO NOTHING
             """,
             (
@@ -565,6 +600,8 @@ class PaperPlaneStore:
                 str(signal_decision["strategy_id"]),
                 str(signal_decision["strategy_version"]),
                 str(signal_decision["reason_code"]),
+                signal_decision_sha256,
+                strategy_spec_sha256,
             ),
         )
         self._commit()
@@ -1427,7 +1464,7 @@ class PaperPlaneStore:
                 }
             if position["state"] == "EXIT_REQUIRED":
                 self._conn.execute(
-                    "UPDATE positions SET exit_decision_id=?, reason_code=? WHERE position_id=?",
+                    "UPDATE positions SET exit_decision_id=?, exit_reason_code=? WHERE position_id=?",
                     (
                         str(exit_decision["exit_decision_id"]),
                         str(exit_decision["reason_code"]),
@@ -1446,14 +1483,29 @@ class PaperPlaneStore:
                 }
             if position["state"] not in {"OPEN", "PARTIAL", "UNKNOWN"}:
                 raise PaperPlaneError(f"EXIT_DECISION_STATE_INVALID:{position['state']}")
-            updated = self.transition(position_id, "EXIT_REQUIRED")
+            from_state = str(position["state"])
+            self.transition(position_id, "EXIT_REQUIRED")
             self._conn.execute(
-                "UPDATE positions SET exit_decision_id=?, reason_code=? WHERE position_id=?",
+                "UPDATE positions SET exit_decision_id=?, exit_reason_code=? WHERE position_id=?",
                 (
                     str(exit_decision["exit_decision_id"]),
                     str(exit_decision["reason_code"]),
                     position_id,
                 ),
+            )
+            self.append_execution_event(
+                event_type="EXIT_DECISION_ACCEPTED",
+                bot_instance_id=str(position["bot_instance_id"]),
+                position_id=position_id,
+                payload={
+                    **_identity_fields(position),
+                    "exit_decision_id": str(exit_decision["exit_decision_id"]),
+                    "exit_reason_code": str(exit_decision["reason_code"]),
+                    "from_state": from_state,
+                    "to_state": "EXIT_REQUIRED",
+                    "exit_decision_at": exit_decision.get("decision_at"),
+                    "evidence_refs": list(exit_decision.get("evidence_refs") or []),
+                },
             )
             self._commit()
             refreshed = self.get_position(position_id)
@@ -1533,6 +1585,8 @@ def accept_signal_decision(
 
     if mode not in {"PAPER", "SHADOW"}:
         raise PaperPlaneError("BOT_MODE_INVALID")
+    if not as_of:
+        raise PaperPlaneError("SIGNAL_AS_OF_REQUIRED")
     normalized = normalize_strategy(strategy)
     if normalized["runtime_path"] != "CANDIDATE_V1_1":
         raise PaperPlaneError("SIGNAL_DECISION_REQUIRES_V1_1")
@@ -1552,11 +1606,26 @@ def accept_signal_decision(
         str(decision["activation_epoch_id"]),
         known_activation_epochs=known_activation_epochs,
     )
-    if _parse_utc(decision["first_reliable_available_at"]) > _parse_utc(decision["decision_at"]):
+    decision_sha256 = canonical_spec_sha256(decision)
+    as_of_dt = _parse_utc(as_of)
+    decision_at = _parse_utc(decision["decision_at"])
+    if (decision_at - as_of_dt).total_seconds() > SIGNAL_MAX_CLOCK_SKEW_SECONDS:
+        raise PaperPlaneError("SIGNAL_DECISION_FROM_FUTURE")
+    if _parse_utc(decision["first_reliable_available_at"]) > decision_at:
         if decision["action"] == "ENTER":
             raise PaperPlaneError("SIGNAL_FUTURE_AVAILABLE_ENTER_FORBIDDEN")
+    lineage = {
+        "signal_decision_sha256": decision_sha256,
+        "evidence_refs": list(decision["evidence_refs"]),
+        "source_hypothesis_refs": list(decision["source_hypothesis_refs"]),
+        "first_reliable_available_at": decision["first_reliable_available_at"],
+        "strategy_spec_sha256": strategy.get("spec_sha256"),
+    }
+    position_id = position_id_for_signal_decision(str(decision["signal_decision_id"]))
     action = str(decision["action"])
     if action != "ENTER":
+        if store.get_position(position_id) is not None:
+            raise PaperPlaneError("SIGNAL_DECISION_IDEMPOTENCY_MISMATCH")
         store.append_execution_event(
             event_type="SIGNAL_DECISION_ACCEPTED",
             bot_instance_id=None,
@@ -1566,6 +1635,7 @@ def accept_signal_decision(
                 "strategy_id": strategy["strategy_id"],
                 "strategy_version": strategy["strategy_version"],
                 "opened": False,
+                **lineage,
             },
         )
         return {
@@ -1575,11 +1645,8 @@ def accept_signal_decision(
             "signal_decision_id": decision["signal_decision_id"],
             "position_id": None,
         }
-    as_of_dt = _parse_utc(as_of) if as_of else _parse_utc(decision["decision_at"])
-    decision_at = _parse_utc(decision["decision_at"])
     max_age = int(strategy["signal_input"]["max_age_seconds"])
     stale = (as_of_dt - decision_at).total_seconds() > max_age
-    position_id = position_id_for_signal_decision(str(decision["signal_decision_id"]))
     if stale and store.get_position(position_id) is None:
         raise PaperPlaneError("SIGNAL_DECISION_STALE")
     admitted_notional = Decimal(str(strategy["notional_policy"]["notional_usd"]))
@@ -1590,6 +1657,9 @@ def accept_signal_decision(
     with store.immediate_write():
         existing = store.get_position(position_id)
         if existing is not None:
+            stored = existing.get("signal_decision_sha256")
+            if stored not in {None, ""} and str(stored) != decision_sha256:
+                raise PaperPlaneError("SIGNAL_DECISION_IDEMPOTENCY_MISMATCH")
             if existing.get("activation_epoch_id") and str(existing["activation_epoch_id"]) != str(
                 decision["activation_epoch_id"]
             ):
@@ -1694,6 +1764,12 @@ def accept_signal_decision(
                         bot_instance_id=bot["bot_instance_id"],
                         signal_decision=decision,
                         signal_kind="SHADOW_EXECUTABLE" if mode == "SHADOW" else "SIMULATED_FILL",
+                        signal_decision_sha256=decision_sha256,
+                        strategy_spec_sha256=(
+                            None
+                            if strategy.get("spec_sha256") in {None, ""}
+                            else str(strategy.get("spec_sha256"))
+                        ),
                     )
                 admitted_notional = Decimal(str(risk["effective_entry_notional_usd_dec"]))
                 store.freeze_admission_binding(
@@ -1728,6 +1804,7 @@ def accept_signal_decision(
                         "runtime_policy_sha256": None
                         if current_policy.get("policy") is None
                         else current_policy["policy"].get("policy_sha256"),
+                        **lineage,
                     },
                 )
         bot_instance_id = bot["bot_instance_id"]
@@ -1833,6 +1910,9 @@ def accept_exit_decision(
         raise PaperPlaneError("EXIT_ACTIVATION_EPOCH_MISMATCH")
     if position.get("strategy_id") and str(position["strategy_id"]) != str(decision["strategy_id"]):
         raise PaperPlaneError("EXIT_POSITION_STRATEGY_MISMATCH")
+    label = position.get("strategy_version_label")
+    if label and str(label) != str(decision["strategy_version"]):
+        raise PaperPlaneError("EXIT_POSITION_VERSION_MISMATCH")
     result = store.apply_exit_decision(exit_decision=decision)
     result["exit_decision_id"] = decision["exit_decision_id"]
     result["fill_claimed"] = False

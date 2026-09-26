@@ -1,0 +1,57 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "DECISION-IDENTITY-AND-LINEAGE-GATES-COMPLETION-001",
+  "as_of": "2026-09-26",
+  "task_id": "DECISION_IDENTITY_AND_LINEAGE_GATES_V1",
+  "state_change": "SIGNAL_DECISIONS_REQUIRE_CLOCK_IDENTITY_AND_LINEAGE",
+  "base_main": "4213755922fec0142a69ba1b0df52268c026240b",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "docs/tasks/DECISION_IDENTITY_AND_LINEAGE_GATES_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/decision_identity_and_lineage_gates/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_DECISION_IDENTITY_VERTICAL_AND_DOMAIN",
+    "independent_review": {
+      "path": "docs/evidence/decision_identity_and_lineage_gates/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_DECISION_IDENTITY_VERTICAL",
+      "PASS_EXECUTION_DOMAIN_MODULES",
+      "PASS_SMOKE_WRITES_NOTHING_IN_REPO"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE_TRADING",
+    "NO_MERGE",
+    "LEGACY_NULL_FINGERPRINT_SKIPS_ENTER_COMPARISON",
+    "EVIDENCE_REF_ORDER_IS_PART_OF_THE_BODY"
+  ],
+  "side_effects": {
+    "network_calls": 0,
+    "local_writes": 0,
+    "external_actions": 0
+  }
+}
