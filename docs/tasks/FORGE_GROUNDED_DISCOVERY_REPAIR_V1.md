@@ -50,6 +50,7 @@ managed_write_set:
   - catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json
   - catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json
   - catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json
+  - catalog/schemas/hfic_next_epistemic_action_v1.schema.json
   - catalog/schemas/hypothesis_critic_input_v1.schema.json
   - catalog/schemas/forge_run_receipt_v1.schema.json
   - configs/hypothesis_forge_independent_critic_v1.yaml

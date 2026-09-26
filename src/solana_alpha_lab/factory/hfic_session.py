@@ -1480,9 +1480,8 @@ def freeze_draft(
     if repo_root is not None:
         _validate_json_schema(draft, _draft_schema_path(repo_root, draft))
     candidates = draft.get("candidates")
-    if not isinstance(candidates, list) or not (
-        MIN_CANDIDATES <= len(candidates) <= MAX_CANDIDATES
-    ):
+    floor = 0 if _ordinary_discovery_requested(draft, preflight_receipt) else 4
+    if not isinstance(candidates, list) or not (floor <= len(candidates) <= MAX_CANDIDATES):
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
     try:
         identities = assign_portfolio_ids(candidates)
@@ -1956,6 +1955,8 @@ def _freeze_no_worthy(
             draft.get("strongest_rejected_alternative"),
             identities,
         )
+        if runner_up_index < 0 or rejected_index < 0:
+            raise HficSessionError("CROSS_REFERENCE_MISMATCH")
     truth_roots = _nonempty_str_list(
         draft.get("truth_roots_used"),
         code="TRUTH_ROOTS_REQUIRED",

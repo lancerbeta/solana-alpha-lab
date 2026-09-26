@@ -1041,7 +1041,7 @@ decision after collection
 
 - найден ли механизм, а не набор features;
 - отличается ли он от prior work по существу;
-- кто является counterparty и почему edge может сохраняться;
+- для `CAUSAL`: кто является counterparty и почему edge может сохраняться; для `PREDICTIVE` не выдумывай actor, если его нет;
 - существует ли observable до decision;
 - не открыт ли новый/untouched outcome;
 - разделены ли Touch/Fillable/Realized/Net/PathRisk;
