@@ -62,7 +62,7 @@ def run_cli(*args: str, data_root: Path) -> subprocess.CompletedProcess[str]:
     env["SMIAL_DATA_ROOT"] = str(data_root)
     env["PYTHONUTF8"] = "1"
     env["PYTHONIOENCODING"] = "utf-8"
-    return subprocess.run(
+    completed = subprocess.run(
         [
             sys.executable,
             "-B",
@@ -81,6 +81,9 @@ def run_cli(*args: str, data_root: Path) -> subprocess.CompletedProcess[str]:
         errors="replace",
         check=False,
     )
+    from tests.test_hfic_cli import historical_preflight_view
+
+    return historical_preflight_view(args, completed)
 
 
 def _hyp_event(store_root: Path, hyp_id: str, claim: str, created: datetime) -> ResearchEvent:

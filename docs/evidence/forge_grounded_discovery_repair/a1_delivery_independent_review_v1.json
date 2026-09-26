@@ -1,0 +1,53 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-GROUNDED-DISCOVERY-REPAIR-REVIEW-001",
+  "as_of": "2026-09-27",
+  "task_id": "FORGE_GROUNDED_DISCOVERY_REPAIR_V1",
+  "reviewed_bindings_sha256": "f2d7c83a4ac78ff33c3543fed0ee914ef7493a4737294620a06a9182db1335bc",
+  "reviewed_inventory_sha256": "1f2a250deaefbc9c331aa3e54d63afb213fc15bba4f55d6147cda766be28d425",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "At HEAD 642e728d, discovery-execute hashes each cohort partition before pooling. One ordinary selected candidate persists and freezes without a runner-up. Non-CONTROL preflight stamps FORGE_GROUNDED_DISCOVERY_V1 and the public CLI receipt hash matches canonical_preflight_receipt_sha256 with that stamp present."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Two physical cohorts with distinct hashes pass discovery-execute; swap and tamper return BINDING_HASH_MISMATCH. The singleton path persists, freezes, keeps critic result_refs, finalizes, and restarts. Stamped ordinary 0/1/4/6 without evidence raise GROUNDED_EVIDENCE_REQUIRED. One-card Pareto is NONE. Market Prompt A was not run."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=b7ba5f81c5cc30ff2c920bd3253213211a7deb80cdf11b4daad332187a967520",
+        "Non-CONTROL preflight stamps FORGE_GROUNDED_DISCOVERY_V1 before canonical_preflight_receipt_sha256. The public CLI test shows that hash includes the stamp. Partition checks precede pooling. One selected candidate does not require a fabricated runner-up."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Skill, slash command, operator A0/A14, and the owner readout copy the whole discovery object, set journal-scope to the preflight search key, and persist one selected candidate without a fabricated runner-up. CONTROL does not run discovery-execute."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MERGE",
+    "NO_ALPHA",
+    "NO_MARKET_FORGE"
+  ]
+}

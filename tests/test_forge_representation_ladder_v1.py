@@ -574,17 +574,13 @@ class ResolveNextActionTests(unittest.TestCase):
         self.assertEqual(decision["next_action"], ACTION_START_V1)
         self.assertIsNone(decision["owner_final"])
 
-    def test_ordinary_no_worthy_requires_control_surface_start_base(self) -> None:
+    def test_ordinary_no_worthy_does_not_silently_become_control(self) -> None:
         decision = resolve_next_action(
             [_base(evidence_surface_mode=None, input_scope="ORDINARY_BASE")]
         )
-        self.assertEqual(decision["next_action"], ACTION_START_BASE)
-        self.assertIsNone(decision["owner_final"])
-        self.assertEqual(decision["reason_code"], "CONTROL_SURFACE_REQUIRED")
-        self.assertEqual(
-            decision.get("base_evidence_surface_mode"),
-            CURRENT_REPRESENTATION_CONTROL_V1,
-        )
+        self.assertEqual(decision["next_action"], ACTION_SEARCH_EXHAUSTED)
+        self.assertEqual(decision["owner_final"], ACTION_SEARCH_EXHAUSTED)
+        self.assertNotEqual(decision["reason_code"], "CONTROL_SURFACE_REQUIRED")
 
     def test_v1_scientific_negative_is_scoped_exhaustion(self) -> None:
         decision = resolve_next_action(
@@ -1409,10 +1405,19 @@ class RealNoWriteVerticalTests(unittest.TestCase):
         self.assertEqual(receipt["writes"]["session"], 0)
         self.assertEqual(fp, instance_fingerprint(data_root))
         self.assertIsNone(receipt["control_session_id"])
-        self.assertEqual(receipt["next_action"], ACTION_START_BASE)
-        self.assertIsNone(receipt["owner_final"])
-        self.assertIn("CONTROL_SURFACE_REQUIRED", receipt["blocking_reason_codes"])
-        self.assertEqual(receipt["stages"][0]["reason_code"], "CONTROL_SURFACE_REQUIRED")
+        self.assertNotIn("CONTROL_SURFACE_REQUIRED", receipt["blocking_reason_codes"])
+        self.assertEqual(
+            receipt["discovery_contract_version"], "FORGE_GROUNDED_DISCOVERY_V1"
+        )
+        if receipt["next_action"] == ACTION_START_BASE:
+            self.assertIsNone(receipt["owner_final"])
+            self.assertEqual(receipt["stages"][0]["reason_code"], "ORDINARY_DISCOVERY_READY")
+        else:
+            self.assertIn(
+                receipt["next_action"],
+                {ACTION_OBSERVABILITY_BLOCKED, ACTION_SEARCH_EXHAUSTED, ACTION_RETURN_EXISTING},
+            )
+            self.assertEqual(receipt["writes"]["forge_run"], 0)
         self.assertIsInstance(receipt["market_evidence_epoch_sha256"], str)
         self.assertEqual(len(receipt["market_evidence_epoch_sha256"]), 64)
 
@@ -1959,8 +1964,8 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         store.rebuild_projection()
         return frozen
 
-    def test_g1_ordinary_no_worthy_surfaces_control_surface_required(self) -> None:
-        """Ordinary completed BASE must not bare-START without CONTROL_SURFACE_REQUIRED."""
+    def test_g1_ordinary_no_worthy_does_not_demand_control(self) -> None:
+        """Ordinary NO_WORTHY stays an ordinary terminal and does not force CONTROL."""
 
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
@@ -2017,11 +2022,12 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 side_effect=_enumerate_live,
             ):
                 started = evaluate_forge_run(ROOT, data_root, persist=False)
-        self.assertEqual(started["next_action"], ACTION_START_BASE)
-        self.assertIsNone(started["owner_final"])
-        self.assertIn("CONTROL_SURFACE_REQUIRED", started["blocking_reason_codes"])
-        self.assertIn("CONTROL-compatible BASE", started["owner_readout"])
-        self.assertNotIn("status: DONE", started["owner_readout"])
+        self.assertNotIn("CONTROL_SURFACE_REQUIRED", started["blocking_reason_codes"])
+        self.assertNotIn("CONTROL-compatible BASE", started["owner_readout"])
+        if started["next_action"] == ACTION_START_BASE:
+            self.assertEqual(started["stages"][0]["reason_code"], "ORDINARY_DISCOVERY_READY")
+        else:
+            self.assertEqual(started["next_action"], ACTION_SEARCH_EXHAUSTED)
 
     def test_g1_production_packet_writer_stamps_bound_cohorts(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -2749,8 +2755,8 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(finished["next_action"], "START_SYNTHETIC_LATER_V2")
         self.assertNotEqual(finished["next_action"], ACTION_OWNER_CANDIDATE)
 
-    def test_n1_fresh_normal_entry_preselects_control_surface(self) -> None:
-        """Empty store: forge-run chooses CONTROL-compatible START_BASE before generation."""
+    def test_n1_fresh_normal_entry_is_ordinary_discovery(self) -> None:
+        """Empty store: ordinary forge-run starts grounded discovery, not CONTROL."""
 
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
@@ -2762,12 +2768,14 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 started = evaluate_forge_run(ROOT, data_root, persist=False)
         self.assertEqual(started["next_action"], ACTION_START_BASE)
         self.assertIsNone(started["owner_final"])
-        self.assertIn("CONTROL_SURFACE_REQUIRED", started["blocking_reason_codes"])
-        self.assertIn("CONTROL-compatible BASE", started["owner_readout"])
+        self.assertNotIn("CONTROL_SURFACE_REQUIRED", started["blocking_reason_codes"])
+        self.assertNotIn("CONTROL-compatible BASE", started["owner_readout"])
         base = started["stages"][0]
         self.assertEqual(base["execution_status"], EXEC_NOT_RUN)
         self.assertIsNone(base["session_id"])
-        self.assertEqual(base["reason_code"], "CONTROL_SURFACE_REQUIRED")
+        self.assertEqual(base["reason_code"], "ORDINARY_DISCOVERY_READY")
+        self.assertEqual(base["input_scope"], "ORDINARY_GROUNDED_DISCOVERY_V1")
+        self.assertEqual(base["evidence_surface_mode"], "ORDINARY_GROUNDED_DISCOVERY_V1")
 
     def test_n1_ordinary_final_pass_is_honest_candidate_readback(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

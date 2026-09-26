@@ -23,7 +23,7 @@ session_memory:
   persist_all_candidates: true
   resume_incomplete: true
 candidate_policy:
-  min_candidates: 4
+  min_candidates: 0
   max_candidates: 6
   selected_count: 1
   runner_up_count: 1

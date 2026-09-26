@@ -185,17 +185,15 @@ def structural_signature_v1_sha256(card: Mapping[str, Any]) -> str:
         "primary_y": _norm_required("primary_y"),
         "horizon_notional": _norm_required("horizon_notional"),
     }
-    if any(
-        not payload[key]
-        for key in (
-            "actor_counterparty",
-            "mechanism",
-            "population",
-            "decision_timestamp",
-            "primary_y",
-            "horizon_notional",
-        )
-    ):
+    required_signature = [
+        "population",
+        "decision_timestamp",
+        "primary_y",
+        "horizon_notional",
+    ]
+    if card.get("claim_form") != "PREDICTIVE":
+        required_signature = ["actor_counterparty", "mechanism", *required_signature]
+    if any(not payload[key] for key in required_signature):
         raise HficGroundingError("STRUCTURAL_SIGNATURE_FIELD_INVALID")
     return canonical_sha256(payload)
 

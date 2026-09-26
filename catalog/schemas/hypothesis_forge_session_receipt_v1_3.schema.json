@@ -77,7 +77,7 @@
     "store_inventory_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "candidate_ids": {
       "type": "array",
-      "minItems": 4,
+      "minItems": 0,
       "maxItems": 6,
       "items": {"type": "string", "pattern": "^HFIC-CAND-[0-9A-F]{12,64}$"}
     },
@@ -95,8 +95,10 @@
       "pattern": "^[0-9a-f]{64}$"
     },
     "runner_up_candidate_id": {
-      "type": "string",
-      "pattern": "^HFIC-CAND-[0-9A-F]{12,64}$"
+      "anyOf": [
+        {"type": "string", "pattern": "^HFIC-CAND-[0-9A-F]{12,64}$"},
+        {"type": "null"}
+      ]
     },
     "critic_input_packet_sha256": {
       "type": "string",

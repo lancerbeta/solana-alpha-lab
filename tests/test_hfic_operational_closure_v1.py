@@ -55,7 +55,7 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         )
         self.assertEqual(config["search_budget"]["auto_sessions_per_evidence_epoch"], 1)
         self.assertEqual(config["search_budget"]["distinct_focus_sessions_per_evidence_epoch"], 3)
-        self.assertEqual(config["candidate_policy"]["min_candidates"], 4)
+        self.assertEqual(config["candidate_policy"]["min_candidates"], 0)
         self.assertEqual(config["candidate_policy"]["max_candidates"], 6)
         prior_memory = config["prior_memory"]
         self.assertEqual(prior_memory["max_records"], 64)
