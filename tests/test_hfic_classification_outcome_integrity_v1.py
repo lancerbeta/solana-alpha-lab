@@ -498,6 +498,7 @@ class ClassificationOutcomeIntegrityTests(unittest.TestCase):
             validate_live_classifier_receipt(
                 {
                     "experiment_spec": packet["experiment_spec"],
+                    "hypothesis_definition_sha256": packet["hypothesis_definition_sha256"],
                     "classifier_receipt": forged,
                 },
                 frozen,
@@ -519,7 +520,10 @@ def mock_classify(frozen: dict, spec: dict, terminal: str) -> dict:
         return_value=decision,
     ):
         return run_live_classifier(
-            {"experiment_spec": spec},
+            {
+                "experiment_spec": spec,
+                "hypothesis_definition_sha256": frozen["selected_definition_sha256"],
+            },
             frozen,
             repo_root=ROOT,
             data_root=ROOT,

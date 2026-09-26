@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-FAST-LANE-DEFINITION-HASH-BIND-FACTORY-FIT-001",
+  "as_of": "2026-09-26",
+  "task_id": "HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1",
+  "reviewed_bindings_sha256": "096fe85061e509c993f2bcba964f5addebbc55f397d89db714f7d8aae769bb62",
+  "reviewed_inventory_sha256": "1c1fdb155e36dea8cd9564575b96a32875e1c9ad9c44aca07378c3f9c58163fe",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_BARE_SPEC_CANNOT_ENTER_FAST_LANE",
+    "flexibility_and_history": "PASS_PRIOR_PIT_TESTS_KEEP_REAL_FROZEN_HASH",
+    "context_efficiency": "PASS_ONE_CLASSIFIER_BIND_NO_NEW_SCHEMA",
+    "research_truth": "PASS_UNBOUND_IS_NOT_FAST_LANE_READY",
+    "owner_operability": "PASS_OPERATOR_SENTENCE_AND_RUSSIAN_READOUT",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_EXPERIMENT_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_ROLLBACK_IS_GIT_REVERT",
+    "build_vs_buy": "PASS_NO_NEW_FRAMEWORK",
+    "security": "PASS_NO_SECRETS_OR_PROVIDER",
+    "red_team": "PASS_BARE_SPEC_AND_FOREIGN_HASH_FAIL_CLOSED"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NO_EXPERIMENT_AUTHORITY_FROM_THIS_BIND"
+  },
+  "recovery": "Revert this commit. Frozen hash is not injected again.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_EXPERIMENT",
+    "NO_SPEC_PRODUCER",
+    "NO_HYP_EQUALS_HFIC_CAND",
+    "NO_HANDOFF_MANIFEST_EDIT",
+    "NO_MERGE"
+  ]
+}
