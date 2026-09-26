@@ -154,7 +154,7 @@ from tests.test_live_corpus_manifest_contract_repair_v1 import (  # noqa: E402
 )
 
 
-def _enumerate_c3(_data_root: Path):
+def _enumerate_c3(_data_root: Path, **_kwargs: object):
     live = _enumerate_production_fixture(_data_root)[0]
     extra = dict(live[0])
     extra["dataset_manifest_id"] = "MID-C3"
@@ -236,12 +236,12 @@ def _with_control_projection_rows(datasets: list[dict[str, object]]):
     return enriched
 
 
-def _enumerate_production_fixture(root: Path):
+def _enumerate_production_fixture(root: Path, **_kwargs: object):
     live, warnings = _enumerate_live(root)
     return _with_control_projection_rows(live), warnings
 
 
-def _enumerate_imported_control_fixture(root: Path):
+def _enumerate_imported_control_fixture(root: Path, **_kwargs: object):
     datasets, warnings = _enumerate_repository_datasets(root)
     return _with_control_projection_rows(list(datasets)), warnings
 
@@ -2331,7 +2331,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
 
             _commission(data_root)
 
-            def _enumerate_production(root: Path):
+            def _enumerate_production(root: Path, **_kwargs: object):
                 live, warnings = _enumerate_live(root)
                 enriched = []
                 for item in live:

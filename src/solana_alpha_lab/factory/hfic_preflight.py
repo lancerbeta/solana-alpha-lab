@@ -272,10 +272,13 @@ def evidence_epoch_material(
     dataset_fingerprints = [commissioning_dataset_fingerprint(root)]
     lifecycle_terminals = ["NO_GIT_FAST_LANE_PROVEN"]
     if data_root is not None:
-        enumerated, _warnings = enumerate_rdp_datasets(
-            Path(data_root),
-            live_corpus_current_only=live_corpus_current_only,
-        )
+        if live_corpus_current_only:
+            enumerated, _warnings = enumerate_rdp_datasets(
+                Path(data_root),
+                live_corpus_current_only=True,
+            )
+        else:
+            enumerated, _warnings = enumerate_rdp_datasets(Path(data_root))
         if enumerated:
             dataset_manifest_ids = [item["dataset_manifest_id"] for item in enumerated]
             dataset_fingerprints = [item["dataset_fingerprint"] for item in enumerated]
