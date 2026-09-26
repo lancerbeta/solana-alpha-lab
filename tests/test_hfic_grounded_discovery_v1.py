@@ -1046,6 +1046,9 @@ class OrdinaryOwnerPathTests(unittest.TestCase):
             self.assertIsInstance(packet, dict)
             self.assertEqual(packet.get("strongest_rejected_alternative"), "NONE")
             self.assertIsNone(frozen.get("runner_up_critic_input_packet"))
+            handed = packet.get("grounded_evidence")
+            self.assertIsInstance(handed, dict)
+            self.assertEqual(handed.get("result_refs"), evidence["result_refs"])
             session_id = str(frozen["session_id"])
             critic = {
                 "schema": "smial.hypothesis-critic-result",
