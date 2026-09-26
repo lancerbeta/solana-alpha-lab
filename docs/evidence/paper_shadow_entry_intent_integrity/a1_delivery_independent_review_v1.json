@@ -15,34 +15,45 @@
   "reviews": [
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_REVIEW_ON_ENTRY_INTENT_HEAD"
+        "packet_fingerprint_sha256=72a58c5656a25941116ae02ebd23eed223f5f6801dabd1550d4781ee2c2ae2be",
+        "PASS_E1_STOP_DOMINANCE",
+        "PASS_E2_NO_AUTOFILL",
+        "PASS_E4_ADMISSION_BINDING",
+        "PASS_E6_CANCELLED_NOT_OPEN_RISK"
       ]
     },
     {
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_REVIEW_ON_ENTRY_INTENT_HEAD"
+        "PASS_E1_THROUGH_E9",
+        "PASS_WRITE_SET",
+        "PASS_NO_TEST_WEAKENING"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_REVIEW_ON_ENTRY_INTENT_HEAD"
+        "PASS_DOD_1_STOP_MATRIX_AND_J4",
+        "PASS_DOD_2_CANCELLED_EXCLUDED",
+        "PASS_DOD_3_FILL_BINDING",
+        "PASS_DOD_4_SINGLE_STATE_SETS",
+        "PASS_DOD_5_NO_WEAKENED_TESTS"
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_REVIEW_ON_ENTRY_INTENT_HEAD"
+        "PASS_CLOSE_STOP_SAY_CANCELLED",
+        "PASS_ATTEMPTING_SKIPPED_UNTIL_RECONCILE"
       ]
     }
   ],
-  "verdict": "PENDING",
+  "verdict": "PASS",
   "non_claims": [
     "NO_ALPHA",
     "NO_LIVE_TRADING",
