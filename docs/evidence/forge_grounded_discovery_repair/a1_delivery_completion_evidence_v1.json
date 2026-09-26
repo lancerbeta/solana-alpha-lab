@@ -2,7 +2,7 @@
   "schema": "smial.delivery-completion-evidence",
   "schema_version": "1.0",
   "acceptance_id": "FORGE-GROUNDED-DISCOVERY-REPAIR-ACCEPTANCE-001",
-  "as_of": "2026-09-26",
+  "as_of": "2026-09-27",
   "task_id": "FORGE_GROUNDED_DISCOVERY_REPAIR_V1",
   "state_change": "ORDINARY_GROUNDED_DISCOVERY_ROUTE_BOUND",
   "base_main": "30ee1f561224f91e0557650dc7fecfae5e1603f6",
