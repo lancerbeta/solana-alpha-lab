@@ -4,30 +4,50 @@
   "review_id": "FORGE-GROUNDED-DISCOVERY-REPAIR-REVIEW-001",
   "as_of": "2026-09-26",
   "task_id": "FORGE_GROUNDED_DISCOVERY_REPAIR_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "8c23017e32fc3ec67e4f6387ac865e887bb3b230d236ca01ae48c88d75201e41",
+  "reviewed_inventory_sha256": "3926f3f53202e65c0de7884d26da4250745db1f1fd24b66ce487d21787b434e2",
   "required_roles": [
+    "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
-    "ARCHITECTURE_CRITIC"
+    "OWNER_UX_CRITIC"
   ],
   "reviews": [
     {
       "role": "CODE_REVIEWER",
-      "verdict": "PENDING",
-      "findings": ["PENDING_ISOLATED_REVIEW"]
+      "verdict": "PASS",
+      "findings": [
+        "At HEAD 29dfeb5d, omitted overlap_members stays independent_replication false unless an explicit overlap list is passed. Ordinary forge-run emits ORDINARY_DISCOVERY_READY unless --control-current-representation. discovery-coverage does not select typed_value. EXACT_PRIOR_SCOPE_MATCH blocks freeze. V1 triggers do not include KILL_MECHANISM. AUTO is not released."
+      ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "PENDING",
-      "findings": ["PENDING_ISOLATED_REVIEW"]
+      "verdict": "PASS",
+      "findings": [
+        "Synthetic fixtures cover ordinary routing distinct from CONTROL, pooled versus conditional and calendar views, leakage and missingness, scoped CONTROL versus exact duplicate, and a finite look budget. The coverage receipt is state-only. Market Prompt A, market Critic, and the post-merge ordinary slash stay outside this atom."
+      ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "PENDING",
-      "findings": ["PENDING_ISOLATED_REVIEW"]
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=e2c48ba152a21c6a59208ab35828cacf8fee352bc608a02d18f84880c0e81525",
+        "Omitted overlap is unknown, not independent. Prefix counts are gated on the PIT liquidity base. Freeze calls bind_prior_scope_evidence and rejects an exact prior scope match. A CONTROL exhaustion readout is not a raw-corpus negative."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "The exact discovery-coverage command is on the skill, slash command, operator pack, and owner readout. Ordinary versus CONTROL and the CONTROL scope_exhausted line are visible without opening code."
+      ]
     }
   ],
-  "verdict": "PENDING",
-  "non_claims": ["NO_MERGE", "NO_ALPHA", "NO_MARKET_FORGE"]
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MERGE",
+    "NO_ALPHA",
+    "NO_MARKET_FORGE"
+  ]
 }

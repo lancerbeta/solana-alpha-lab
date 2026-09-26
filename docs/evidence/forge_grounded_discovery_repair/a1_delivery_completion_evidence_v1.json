@@ -9,9 +9,32 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "2377418e37a255f9bc4925f18784694e3f5cc96ae8fa8966a66124c277f17b57",
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "053e28f66d051dde3b877cac20e2a23510bc100284593aa656d793d2ebfa5890",
+    ".cursor/commands/hypothesis-forge.md": "cba56a995bc7bc41f3a611442bbc76c3874ba0f9e5f7e5ded62f31b36de15324",
+    "catalog/assets/core.yaml": "9a62c31f6a749a5e8d17003e31fca7b02bebd25a48560e3bb3d3703a54ab6999",
+    "catalog/schemas/forge_run_receipt_v1.schema.json": "cceaeb26aec06517a08e540abbbf1612e49390da68eb6a7009eb611c0a15d642",
+    "catalog/schemas/hypothesis_critic_input_v1.schema.json": "9982f142bba427e58038fedad3266bf250ad5d5a72fecefc2c763f7ae905a205",
+    "catalog/schemas/hypothesis_forge_draft_v1_2.schema.json": "fa0abcd97d545b636cf9552db49e25e26da4361cad7ab1e556a05c5367df95fb",
+    "configs/factory_semantic_operability_v1.yaml": "ade92f2131ddf3954ed8f1621a4dee7aa0f5d2f46dbf90ce5a419fd8ad0d0ab7",
+    "configs/hypothesis_forge_independent_critic_v1.yaml": "f84067df32eb355a806b45fa810b3f6f143d4a6bc12ba96d21ac35ea0bc5ee32",
+    "docs/evidence/forge_grounded_discovery_repair/a1_state_only_coverage_v1.json": "48de612acec9cd17147c0637fcec97fefba0e5da8cf784edc74cef069804eb4d",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "a07de6788af6ab38ceaef7e788dd1141f001251ee0033a5102391e63143a185b",
+    "docs/reports/forge_grounded_discovery_repair/a1_owner_readout_v1.md": "197f984136071c5e71f08c6d145cccb6b1c7ee37956be342be95dd8606e618c7",
+    "docs/tasks/FORGE_GROUNDED_DISCOVERY_REPAIR_V1.md": "79cead533eaa3616c1ae76bfc07ef6e5fdcac44a8aee279be4447ee274b19105",
+    "scripts/hypothesis_forge.py": "6e743941f4cb79c673928710af27821adab0cd849d4fcf73a67f1d110aa8f633",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "0bcfb02c956e1d6d23ede48fe5e1e3a9150feb8675d5d473b780f73d502b59ad",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "f3112f980a0677fb86a7b1dcd5c026b31ffcbf8071497670d054b7c501f42b01",
+    "src/solana_alpha_lab/factory/hfic_session.py": "abd1f695fea54075d32ed908b9c8a92de01ef0b2cb158e51bf322e59cc31dc1b",
+    "tests/test_forge_representation_ladder_v1.py": "208d906615f4d6a83ec00ead1b554a761f192f4c7148f322ed4b85b8a0de7c38",
+    "tests/test_hfic_grounded_discovery_v1.py": "dbc7e450422ec4fec32b909d362243d3717a07bbbeb7a07617e8269cecd39a41",
+    "tests/test_hfic_operational_closure_v1.py": "4521ccfa4d9058a86d8ed4e87939520f42f5f7b6723e4af2246d9e220c4fc21d"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -22,20 +45,21 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_grounded_discovery_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-    "verdict": "PASS",
-    "mode": "FAST_PATH"
+    "sha256": "7bb00d1ceef6646e822ad20c3b327b68c744db8469851c68022bf8274605cd83",
+    "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_GROUNDED_DISCOVERY_AND_LADDER_TESTS",
     "independent_review": {
       "path": "docs/evidence/forge_grounded_discovery_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "ad1e48dd904485b3804544b754fac87387b056d890b368a2164e6dd3ad726551",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
-    "project_checks": ["PASS_DELIVERY_HARNESS_CHECK"]
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK"
+    ]
   },
   "non_claims": [
     "NO_MARKET_PROMPT_A",
