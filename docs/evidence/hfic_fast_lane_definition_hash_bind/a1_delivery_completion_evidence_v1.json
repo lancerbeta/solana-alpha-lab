@@ -11,7 +11,19 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
-    "docs/tasks/HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "8905514cc32aa7b1269303f3469dfae562b278a2c19a06708bdad8ae0d0b8b1f",
+    "catalog/assets/lifecycle.yaml": "6c06895c013a3f4efd5536b7da0f40a6ff6cacb71963410df61922c56dd99e98",
+    "catalog/catalog_manifest.yaml": "7af8921ffee55d6f698b73b64c15fc3c738550395b201b5859f32ffaeadf6756",
+    "catalog/generated/asset_edges.json": "1eea41aa457f54b233f74a0da5bafaaa6f0514f710978dc6fbc4a44d71615e4c",
+    "docs/PROJECT_MAP.md": "98b6ce969f278b389efee751208fc9d39061cda07f31025be651333e95efcab9",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "32398a982fcde8d2f572f9a8d147f7adb660eb151c5f923b45c5b6f0c2b9c090",
+    "docs/reports/hfic_fast_lane_definition_hash_bind/a1_owner_readout_v1.md": "4b996b086ec8743889b38a38df9d6d915fa11fecc990f127cf02cd9f7a66fa14",
+    "docs/tasks/HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1.md": "eb53d4949db183554b81f24f52431bb4701c7fe64f3a1601a5c4c0732f834eeb",
+    "src/solana_alpha_lab/factory/hfic_session.py": "1729d57d7196531dc1675612c504fa73ae8efbe1caf0287be1211fd85a5b6581",
+    "tests/test_hfic_classification_outcome_integrity_v1.py": "674793a56c260f97c385f32c9f80b8e562547c8f0a698eacad852c98d70c9e08",
+    "tests/test_hfic_fast_lane_definition_hash_bind_v1.py": "a2e2233ef9304a3f49c2d459e26c0aa005c0bd203fe6d9bb089806e331314f8e",
+    "tests/test_hfic_fresh_control_decision_integrity_closure_v1.py": "d7eafd1bdf185d28f251f7ffdd738252693b785ba508e1d3436e74a86ab1cfe2",
+    "tests/test_hfic_packet14_availability_fast_lane_guard_v1.py": "65f2f72053a401500e3d3b38f61566364c81cb8fd47c7c988209053573812b1f"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +35,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_fast_lane_definition_hash_bind/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "b885ca45c0ea16e13716bd8f04148c8e6bc532552e0b92d80279cdb9b16d9cf1",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_FAST_LANE_DEFINITION_HASH_BIND_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/hfic_fast_lane_definition_hash_bind/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "a54124f835f84f8b4a28198453d9811a98a3e32c00b7470b22894e43ac6e747d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
