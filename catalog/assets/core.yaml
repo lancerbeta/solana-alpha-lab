@@ -25728,7 +25728,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: 0880be62a5765ee00f4ae0857b8bd97113fedcc8b178ffa6eb11675d4742d93c}
+  integrity: {kind: sha256, sha256: e959369b6c2fa3395838a391bccf38beab37ffd3193ca1ce28b7f01172fa53dc}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -27664,7 +27664,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 945e61cc8fc5e49b6a2474e679a0edb64ba5cebf60efd94a0002f39d7eab5ec5}
+  integrity: {kind: sha256, sha256: 9d52000af8e17eccaf8ecba4cf3b8e8ae65f019f03b7df2ab646ec2dc16baac0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -36937,7 +36937,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: OWNER_TRADING_OPERABILITY_FOUNDATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_owner_trading_operability_workbench_v1.py', repository_path: tests/test_owner_trading_operability_workbench_v1.py}
-  integrity: {kind: sha256, sha256: e04a2726b8d4f571e34ea00e5f32cb8ea597901b2974846df48a799e3d2d602d}
+  integrity: {kind: sha256, sha256: a3de45831d76bc443339b35f6c238af96d82536050efe2a43d841e2176643479}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-RUNTIME-POLICY-001}
