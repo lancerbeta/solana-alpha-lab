@@ -135,7 +135,7 @@ No-write state-only joint coverage. It does not select `typed_value` and does no
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-coverage --format json
 ```
 
-Ordinary numeric recipe. `--store` is explicit and is not the live store unless the owner points it there. Role and holdout come from `--binding`. `--journal-scope` is the preflight `search_key_sha256`. Copy the whole JSON object onto the draft as `grounded_evidence`, not only `result_refs`. CONTROL does not use this command:
+Ordinary numeric recipe. `--store` is explicit and is not the live store unless the owner points it there. Role and holdout come from `--binding`. `--journal-scope` is the preflight `search_key_sha256`. Copy the whole JSON object onto the draft as `grounded_evidence`, not only `result_refs`. When cohort hashes differ, pass `--cohort-partition COHORT CENSUS OBSERVATIONS` once per cohort. Do not replace those hashes with a combined file. Ordinary preflight passes `--discovery-contract`; that stamped receipt requires the evidence object for 0, 1, 4, and 6 candidates. One selected candidate is persisted without a runner-up. Do not hand-write the contract field. CONTROL does not use this command:
 
 ```text
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <scope> --format json

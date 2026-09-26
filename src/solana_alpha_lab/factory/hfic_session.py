@@ -1433,12 +1433,7 @@ def _ordinary_discovery_requested(
         or surface == ORDINARY_GROUNDED_DISCOVERY_V1
         or contract == DISCOVERY_CONTRACT_VERSION
     )
-    if not machine_contract:
-        return False
-    evidence = draft.get("grounded_evidence")
-    candidates = draft.get("candidates")
-    candidate_count = len(candidates) if isinstance(candidates, list) else 0
-    return isinstance(evidence, Mapping) or candidate_count < 4
+    return machine_contract
 
 
 def _enforce_ordinary_grounded_evidence(
@@ -3855,14 +3850,24 @@ def persist_generated_draft(
     selected_ref = draft.get("selected_candidate_ref")
     if selected_ref not in (None, ""):
         selected_index = _resolve_ref(selected_ref, identities)
-        runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
-        rejected_index = _resolve_ref(
-            draft.get("strongest_rejected_alternative"), identities
+        optional_single = (
+            _ordinary_discovery_requested(draft, receipt)
+            and len(identities) == 1
+            and not str(draft.get("runner_up_candidate_ref") or "").strip()
+            and not str(draft.get("strongest_rejected_alternative") or "").strip()
         )
-        if min(selected_index, runner_up_index, rejected_index) < 0:
-            raise HficSessionError("CROSS_REFERENCE_MISMATCH")
-        if selected_index == runner_up_index:
-            raise HficSessionError("SELECTED_EQUALS_RUNNER_UP")
+        if optional_single:
+            if selected_index < 0:
+                raise HficSessionError("SELECTED_CANDIDATE_MISSING")
+        else:
+            runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
+            rejected_index = _resolve_ref(
+                draft.get("strongest_rejected_alternative"), identities
+            )
+            if min(selected_index, runner_up_index, rejected_index) < 0:
+                raise HficSessionError("CROSS_REFERENCE_MISMATCH")
+            if selected_index == runner_up_index:
+                raise HficSessionError("SELECTED_EQUALS_RUNNER_UP")
     _nonempty_str_list(draft.get("truth_roots_used"), code="TRUTH_ROOTS_REQUIRED")
     _nonempty_str_list(
         draft.get("prior_work_receipts") or draft.get("prior_work_queries"),

@@ -104,7 +104,7 @@ commissioning when Fast Lane proof is absent and safe, design packets.
 
 Happy path — no owner copy/paste between the slash command and the final terminal:
 
-1. Run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py preflight --owner-focus <AUTO|text> --format json`.
+1. Run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py preflight --owner-focus <AUTO|text> --discovery-contract --format json`.
    If the executing model provenance digest is available from the caller,
    pass `--model-provenance-sha256 <64-hex>`; this is a caller-supplied
    compatibility label, not an attestation that the model actually ran.
@@ -271,7 +271,12 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
    Pass `--journal-scope` as the preflight `search_key_sha256`. Copy the
    whole returned evidence object onto the draft as `grounded_evidence`.
    Do not copy only `result_refs` and do not hand-write the summary.
-   Ordinary preflight already carries `discovery_contract_version`.
+   When the binding lists different census or observation hashes, pass one
+   `--cohort-partition COHORT CENSUS OBSERVATIONS` per cohort. Do not replace
+   those hashes with the hash of a combined file. A stamped ordinary receipt
+   requires that evidence object for 0, 1, 4, and 6 candidates.
+   Ordinary preflight with `--discovery-contract` carries
+   `discovery_contract_version`. Do not hand-write that field.
    `evidence_surface_mode` stays unset unless the run is explicit CONTROL.
    Do not invent those fields.
    CONTROL does not run this command. This repair atom
@@ -311,7 +316,10 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
    `--model-provenance-sha256 <64-hex>` only when that digest is actually
    supplied by the caller. The command revalidates current market/capability
    identity and atomically persists slot occupancy plus draft when the slot is
-   new. Freeze must consume the same draft bytes and original preflight receipt.
+   new. One ordinary selected candidate omits `runner_up_candidate_ref` and
+   `strongest_rejected_alternative`. After persist, run preflight again.
+   Freeze consumes that restart receipt and the same draft bytes. The draft
+   stays bound to the source preflight hash.
 5. If Prompt A returned `NO_WORTHY_HYPOTHESIS` (empty `selected_candidate_ref`):
    - query `uv run --locked --managed-python python -B scripts/hypothesis_forge.py prospects --trigger POST_NO_WORTHY_REVIEW --max-results 3 --format json`;
    - run **PROMPT C** (`HFIC-NEXT-V1.0`) from the operator pack using only the

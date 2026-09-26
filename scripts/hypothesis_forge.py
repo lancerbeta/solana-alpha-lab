@@ -340,6 +340,7 @@ def cmd_preflight(
     explicit_data_root: Path | None,
     control_current_representation: bool = False,
     model_provenance_sha256: str | None = None,
+    discovery_contract: bool = False,
 ) -> int:
     _assert_no_path_leak(
         {
@@ -416,6 +417,16 @@ def cmd_preflight(
         **active.redacted_receipt(),
         **receipt,
     }
+    if (
+        discovery_contract
+        and not control_current_representation
+        and payload.get("evidence_surface_mode") != "CURRENT_REPRESENTATION_CONTROL_V1"
+    ):
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            DISCOVERY_CONTRACT_VERSION,
+        )
+
+        payload["discovery_contract_version"] = DISCOVERY_CONTRACT_VERSION
     if payload.get("action") == "STOP":
         payload["owner_class"] = _owner_class_for_preflight_stop(payload)
         payload["owner_readout"] = _preflight_owner_readout(payload)
@@ -674,12 +685,13 @@ def cmd_discovery_execute(
     repo_root: Path,
     *,
     store_root: Path,
-    census_path: Path,
-    observations_path: Path,
+    census_path: Path | None,
+    observations_path: Path | None,
     binding_path: Path,
     spec_path: Path,
     journal_scope: str,
     candidate_scope_path: Path,
+    cohort_partitions: list[tuple[str, Path, Path]] | None = None,
 ) -> int:
     """Compute one ordinary discovery query into a caller-selected store.
 
@@ -712,17 +724,48 @@ def cmd_discovery_execute(
         admit_discovery_binding(cohorts)
     except GroundedDiscoveryError as exc:
         return emit_error(exc.code)
-    census_sha = hashlib.sha256(census_path.read_bytes()).hexdigest()
-    observations_sha = hashlib.sha256(observations_path.read_bytes()).hexdigest()
-    for item in cohorts:
-        if (
-            item.get("census_sha256") != census_sha
-            or item.get("observations_sha256") != observations_sha
-        ):
-            return emit_error("BINDING_HASH_MISMATCH")
+    by_cohort = {str(item.get("cohort_id")): item for item in cohorts}
+    partitions = list(cohort_partitions or [])
+    census: list[dict] = []
+    observations: list[dict] = []
     try:
-        census = load_parquet_rows(census_path)
-        observations = load_parquet_rows(observations_path)
+        if partitions:
+            for cohort_id, census_file, obs_file in partitions:
+                binding_row = by_cohort.get(cohort_id)
+                if binding_row is None:
+                    return emit_error("BINDING_COHORT_MISMATCH")
+                census_sha = hashlib.sha256(Path(census_file).read_bytes()).hexdigest()
+                observations_sha = hashlib.sha256(Path(obs_file).read_bytes()).hexdigest()
+                if (
+                    binding_row.get("census_sha256") != census_sha
+                    or binding_row.get("observations_sha256") != observations_sha
+                ):
+                    return emit_error("BINDING_HASH_MISMATCH")
+                for row in load_parquet_rows(census_file):
+                    stamped = dict(row)
+                    stamped["cohort_id"] = cohort_id
+                    stamped["release_id"] = binding_row.get("release_id")
+                    census.append(stamped)
+                for row in load_parquet_rows(obs_file):
+                    stamped = dict(row)
+                    stamped["cohort_id"] = cohort_id
+                    stamped["release_id"] = binding_row.get("release_id")
+                    observations.append(stamped)
+        else:
+            if census_path is None or observations_path is None:
+                return emit_error("BINDING_PARTITION_REQUIRED")
+            distinct = {
+                (item.get("census_sha256"), item.get("observations_sha256"))
+                for item in cohorts
+            }
+            if len(distinct) != 1:
+                return emit_error("BINDING_PARTITION_REQUIRED")
+            census_sha = hashlib.sha256(census_path.read_bytes()).hexdigest()
+            observations_sha = hashlib.sha256(observations_path.read_bytes()).hexdigest()
+            if distinct != {(census_sha, observations_sha)}:
+                return emit_error("BINDING_HASH_MISMATCH")
+            census = load_parquet_rows(census_path)
+            observations = load_parquet_rows(observations_path)
     except (OSError, ValueError):
         return emit_error("DISCOVERY_ROWS_UNREADABLE")
     store = ResearchStore(store_root)
@@ -1700,6 +1743,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="CURRENT_REPRESENTATION_CONTROL_V1 evidence-surface mode",
     )
     preflight.add_argument(
+        "--discovery-contract",
+        action="store_true",
+        help=(
+            "Stamp FORGE_GROUNDED_DISCOVERY_V1. Freeze then requires "
+            "computed grounded evidence for every candidate count."
+        ),
+    )
+    preflight.add_argument(
         "--model-provenance-sha256",
         default=None,
         help=(
@@ -1769,8 +1820,15 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     discovery_execute.add_argument("--store", type=Path, required=True)
-    discovery_execute.add_argument("--census", type=Path, required=True)
-    discovery_execute.add_argument("--observations", type=Path, required=True)
+    discovery_execute.add_argument("--census", type=Path)
+    discovery_execute.add_argument("--observations", type=Path)
+    discovery_execute.add_argument(
+        "--cohort-partition",
+        action="append",
+        nargs=3,
+        metavar=("COHORT", "CENSUS", "OBSERVATIONS"),
+        default=None,
+    )
     discovery_execute.add_argument("--binding", type=Path, required=True)
     discovery_execute.add_argument("--spec", type=Path, required=True)
     discovery_execute.add_argument("--candidate-scope", type=Path, required=True)
@@ -1996,6 +2054,7 @@ def main(argv: list[str] | None = None) -> int:
                 model_provenance_sha256=getattr(
                     args, "model_provenance_sha256", None
                 ),
+                discovery_contract=bool(getattr(args, "discovery_contract", False)),
             )
         if args.command == "forge-input":
             return cmd_forge_input(
@@ -2029,6 +2088,10 @@ def main(argv: list[str] | None = None) -> int:
                 spec_path=args.spec,
                 journal_scope=str(args.journal_scope),
                 candidate_scope_path=args.candidate_scope,
+                cohort_partitions=[
+                    (str(item[0]), Path(item[1]), Path(item[2]))
+                    for item in (args.cohort_partition or [])
+                ],
             )
         if args.command == "persist-draft":
             return cmd_persist_draft(

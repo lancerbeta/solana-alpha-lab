@@ -40,6 +40,8 @@ from solana_alpha_lab.factory.hfic_identity import (  # noqa: E402
 )
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     HficSessionError,
+    _enforce_ordinary_grounded_evidence,
+    _ordinary_discovery_requested,
     freeze_draft,
 )
 from solana_alpha_lab.factory.research_store import ResearchStore  # noqa: E402
@@ -408,6 +410,70 @@ def _spec() -> dict:
     }
 
 
+def _cohort_partitions(directory: Path, census: list, observations: list):
+    """Write one census/observation pair per cohort and keep each file hash."""
+
+    grouped: dict[str, dict[str, list]] = {}
+    for row in census:
+        grouped.setdefault(str(row["cohort_id"]), {"census": [], "observations": []})[
+            "census"
+        ].append(row)
+    for row in observations:
+        grouped.setdefault(str(row["cohort_id"]), {"census": [], "observations": []})[
+            "observations"
+        ].append(row)
+    template = {item["cohort_id"]: item for item in _binding()}
+    cohorts: list[dict] = []
+    argv: list[str] = []
+    files: dict[str, tuple[Path, Path]] = {}
+    for cohort_id, payload in grouped.items():
+        if not payload["census"] or not payload["observations"]:
+            continue
+        census_path = directory / f"census-{cohort_id}.parquet"
+        obs_path = directory / f"obs-{cohort_id}.parquet"
+        pq.write_table(pa.Table.from_pylist(payload["census"]), census_path)
+        pq.write_table(pa.Table.from_pylist(payload["observations"]), obs_path)
+        copied = dict(template[cohort_id])
+        copied["census_sha256"] = hashlib.sha256(census_path.read_bytes()).hexdigest()
+        copied["observations_sha256"] = hashlib.sha256(obs_path.read_bytes()).hexdigest()
+        cohorts.append(copied)
+        files[cohort_id] = (census_path, obs_path)
+        argv.extend(
+            ["--cohort-partition", cohort_id, str(census_path), str(obs_path)]
+        )
+    return argv, cohorts, files
+
+
+def _discovery_execute(store: Path, binding: Path, spec: Path, scope: Path, journal: str, extra: list[str]):
+    return subprocess.run(
+        [
+            sys.executable,
+            "-B",
+            "scripts/hypothesis_forge.py",
+            "--root",
+            str(ROOT),
+            "discovery-execute",
+            "--store",
+            str(store),
+            *extra,
+            "--binding",
+            str(binding),
+            "--spec",
+            str(spec),
+            "--candidate-scope",
+            str(scope),
+            "--journal-scope",
+            journal,
+            "--format",
+            "json",
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
 def _scope() -> dict:
     return {
         "question_id": "PRICE_LIQ_PREFIX",
@@ -651,6 +717,25 @@ class ProductionRowRecipeTests(unittest.TestCase):
         }
         self.assertTrue(_ordinary_discovery_requested({}, receipt))
         self.assertFalse(_ordinary_discovery_requested({}, {"evidence_surface_mode": None}))
+        for count in (0, 1, 4, 6):
+            counted = {"candidates": [{}] * count}
+            self.assertTrue(_ordinary_discovery_requested(counted, receipt))
+            with self.assertRaises(HficSessionError) as missing:
+                _enforce_ordinary_grounded_evidence(
+                    counted,
+                    preflight_receipt=receipt,
+                    store=object(),
+                )
+            self.assertEqual(str(missing.exception), "GROUNDED_EVIDENCE_REQUIRED")
+        historical = {"candidates": [{}] * 6}
+        self.assertFalse(
+            _ordinary_discovery_requested(historical, {"action": "START_NEW_SESSION"})
+        )
+        _enforce_ordinary_grounded_evidence(
+            historical,
+            preflight_receipt={"action": "START_NEW_SESSION"},
+            store=object(),
+        )
 
 
 class DiscoveryExecuteCliTests(unittest.TestCase):
@@ -659,56 +744,21 @@ class DiscoveryExecuteCliTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
             store = root / "store"
-            census_path = root / "census.parquet"
-            obs_path = root / "observations.parquet"
-            pq.write_table(pa.Table.from_pylist(census), census_path)
-            pq.write_table(pa.Table.from_pylist(observations), obs_path)
+            argv, cohorts, _files = _cohort_partitions(root, census, observations)
+            hashes = {item["census_sha256"] for item in cohorts}
+            self.assertEqual(len(cohorts), 2)
+            self.assertEqual(len(hashes), 2)
             binding_path = root / "binding.json"
             spec_path = root / "spec.json"
             scope_path = root / "scope.json"
-            cohorts = _binding()
-            census_sha = hashlib.sha256(census_path.read_bytes()).hexdigest()
-            obs_sha = hashlib.sha256(obs_path.read_bytes()).hexdigest()
-            for item in cohorts:
-                item["census_sha256"] = census_sha
-                item["observations_sha256"] = obs_sha
             binding_path.write_text(
                 json.dumps({"cohorts": cohorts, "priors": []}),
                 encoding="utf-8",
             )
             spec_path.write_text(json.dumps(_spec()), encoding="utf-8")
             scope_path.write_text(json.dumps(_scope()), encoding="utf-8")
-            completed = subprocess.run(
-                [
-                    "uv",
-                    "run",
-                    "--locked",
-                    "--managed-python",
-                    "python",
-                    "-B",
-                    "scripts/hypothesis_forge.py",
-                    "discovery-execute",
-                    "--store",
-                    str(store),
-                    "--census",
-                    str(census_path),
-                    "--observations",
-                    str(obs_path),
-                    "--binding",
-                    str(binding_path),
-                    "--spec",
-                    str(spec_path),
-                    "--candidate-scope",
-                    str(scope_path),
-                    "--journal-scope",
-                    "SYNTH-CLI",
-                    "--format",
-                    "json",
-                ],
-                cwd=ROOT,
-                check=False,
-                capture_output=True,
-                text=True,
+            completed = _discovery_execute(
+                store, binding_path, spec_path, scope_path, "SYNTH-CLI", argv
             )
             self.assertEqual(completed.returncode, 0, completed.stderr)
             payload = json.loads(completed.stdout)
@@ -730,6 +780,7 @@ class OrdinaryOwnerPathTests(unittest.TestCase):
             populate_real_c1_c2(data_root, workspace)
             preflight = run_cli(
                 "preflight",
+                "--discovery-contract",
                 "--owner-focus",
                 "ORDINARY-DISCOVERY-SYNTH",
                 "--format",
@@ -741,65 +792,29 @@ class OrdinaryOwnerPathTests(unittest.TestCase):
             self.assertNotIn("evidence_surface_mode", receipt)
             self.assertEqual(receipt.get("discovery_contract_version"), "FORGE_GROUNDED_DISCOVERY_V1")
             census, observations = _rows()
-            census_path = workspace / "census.parquet"
-            obs_path = workspace / "observations.parquet"
-            pq.write_table(pa.Table.from_pylist(census), census_path)
-            pq.write_table(pa.Table.from_pylist(observations), obs_path)
-            cohorts = _binding()
-            census_sha = hashlib.sha256(census_path.read_bytes()).hexdigest()
-            obs_sha = hashlib.sha256(obs_path.read_bytes()).hexdigest()
-            for item in cohorts:
-                item["census_sha256"] = census_sha
-                item["observations_sha256"] = obs_sha
+            argv, cohorts, _files = _cohort_partitions(workspace, census, observations)
+            self.assertEqual(len({item["census_sha256"] for item in cohorts}), 2)
             binding_path = workspace / "binding.json"
             spec_path = workspace / "spec.json"
             scope_path = workspace / "scope.json"
             binding_path.write_text(json.dumps({"cohorts": cohorts}), encoding="utf-8")
             spec_path.write_text(json.dumps(_spec()), encoding="utf-8")
             scope_path.write_text(json.dumps(_scope()), encoding="utf-8")
-            completed = subprocess.run(
-                [
-                    "uv", "run", "--locked", "--managed-python", "python", "-B",
-                    "scripts/hypothesis_forge.py", "discovery-execute",
-                    "--store", str(data_root),
-                    "--census", str(census_path),
-                    "--observations", str(obs_path),
-                    "--binding", str(binding_path),
-                    "--spec", str(spec_path),
-                    "--candidate-scope", str(scope_path),
-                    "--journal-scope", str(receipt["search_key_sha256"]),
-                    "--format", "json",
-                ],
-                cwd=ROOT,
-                check=False,
-                capture_output=True,
-                text=True,
+            journal = str(receipt["search_key_sha256"])
+            completed = _discovery_execute(
+                data_root, binding_path, spec_path, scope_path, journal, argv
             )
             self.assertEqual(completed.returncode, 0, completed.stderr)
             evidence = json.loads(completed.stdout)
-            restarted = subprocess.run(
-                [
-                    "uv", "run", "--locked", "--managed-python", "python", "-B",
-                    "scripts/hypothesis_forge.py", "discovery-execute",
-                    "--store", str(data_root),
-                    "--census", str(census_path),
-                    "--observations", str(obs_path),
-                    "--binding", str(binding_path),
-                    "--spec", str(spec_path),
-                    "--candidate-scope", str(scope_path),
-                    "--journal-scope", str(receipt["search_key_sha256"]),
-                    "--format", "json",
-                ],
-                cwd=ROOT,
-                check=False,
-                capture_output=True,
-                text=True,
+            restarted = _discovery_execute(
+                data_root, binding_path, spec_path, scope_path, journal, argv
             )
             self.assertEqual(restarted.returncode, 0, restarted.stderr)
             self.assertFalse(json.loads(restarted.stdout)["queries"][0]["new_look"])
             self.assertEqual(json.loads(restarted.stdout)["result_refs"], evidence["result_refs"])
             preflight_after = run_cli(
                 "preflight",
+                "--discovery-contract",
                 "--owner-focus",
                 "ORDINARY-DISCOVERY-SYNTH",
                 "--format",
@@ -830,6 +845,233 @@ class OrdinaryOwnerPathTests(unittest.TestCase):
                 frozen["grounded_evidence"]["result_refs"],
                 evidence["result_refs"],
             )
+
+    def test_two_partitions_persist_one_selected_and_block_tamper(self) -> None:
+        from tests.test_hfic_cli import bind_draft, populate_real_c1_c2, run_cli
+
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            data_root = workspace / "rdp"
+            populate_real_c1_c2(data_root, workspace)
+            preflight = run_cli(
+                "preflight",
+                "--discovery-contract",
+                "--owner-focus",
+                "ORDINARY-SINGLETON-SYNTH",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(preflight.returncode, 0, preflight.stderr)
+            receipt = json.loads(preflight.stdout)
+            self.assertEqual(
+                receipt.get("discovery_contract_version"),
+                "FORGE_GROUNDED_DISCOVERY_V1",
+            )
+            source = json.loads(
+                (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            card = source["candidates"][0]
+
+            def without_evidence(candidates: list[dict]) -> dict:
+                draft = bind_draft({**source, "candidates": candidates}, receipt)
+                draft.pop("grounded_evidence", None)
+                if len(candidates) < 2:
+                    draft.pop("runner_up_candidate_ref", None)
+                    draft.pop("strongest_rejected_alternative", None)
+                    if candidates:
+                        draft["selected_candidate_ref"] = candidates[0]["label"]
+                    else:
+                        draft.pop("selected_candidate_ref", None)
+                return draft
+
+            six = []
+            for index in range(6):
+                copied = dict(card)
+                copied["label"] = f"HFIC-V12-C{index + 1}-COUNT"
+                copied["display_ordinal"] = index + 1
+                copied["claim"] = f"{card['claim']} count {index}"
+                six.append(copied)
+            four = without_evidence(source["candidates"])
+            one = without_evidence([card])
+            zero = without_evidence([])
+            six_draft = without_evidence(six)
+            six_draft["runner_up_candidate_ref"] = six[1]["label"]
+            six_draft["strongest_rejected_alternative"] = six[2]["label"]
+            six_draft["selected_candidate_ref"] = six[0]["label"]
+            for draft in (zero, one, four, six_draft):
+                with self.assertRaises(HficSessionError) as missing:
+                    freeze_draft(
+                        draft,
+                        preflight_receipt=receipt,
+                        store=ResearchStore(data_root),
+                        repo_root=ROOT,
+                    )
+                self.assertEqual(str(missing.exception), "GROUNDED_EVIDENCE_REQUIRED")
+
+            census, observations = _rows()
+            argv, cohorts, files = _cohort_partitions(workspace, census, observations)
+            self.assertEqual(len({item["census_sha256"] for item in cohorts}), 2)
+            binding_path = workspace / "binding.json"
+            spec_path = workspace / "spec.json"
+            scope_path = workspace / "scope.json"
+            binding_path.write_text(json.dumps({"cohorts": cohorts}), encoding="utf-8")
+            spec_path.write_text(json.dumps(_spec()), encoding="utf-8")
+            scope_path.write_text(json.dumps(_scope()), encoding="utf-8")
+            journal = str(receipt["search_key_sha256"])
+            cohort_ids = list(files)
+            swapped = []
+            for cohort_id in cohort_ids:
+                other = cohort_ids[1] if cohort_id == cohort_ids[0] else cohort_ids[0]
+                swapped.extend(
+                    [
+                        "--cohort-partition",
+                        cohort_id,
+                        str(files[other][0]),
+                        str(files[cohort_id][1]),
+                    ]
+                )
+            blocked = _discovery_execute(
+                data_root, binding_path, spec_path, scope_path, journal, swapped
+            )
+            self.assertNotEqual(blocked.returncode, 0, blocked.stdout)
+            self.assertIn("BINDING_HASH_MISMATCH", blocked.stderr)
+            census_path = files[cohort_ids[0]][0]
+            original = census_path.read_bytes()
+            census_path.write_bytes(original + b"\x00")
+            tampered = _discovery_execute(
+                data_root, binding_path, spec_path, scope_path, journal, argv
+            )
+            self.assertNotEqual(tampered.returncode, 0, tampered.stdout)
+            self.assertIn("BINDING_HASH_MISMATCH", tampered.stderr)
+            census_path.write_bytes(original)
+            completed = _discovery_execute(
+                data_root, binding_path, spec_path, scope_path, journal, argv
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            evidence = json.loads(completed.stdout)
+            readout = format_discovery_readout(evidence)
+            self.assertFalse(readout["engine_emits_alpha"])
+            self.assertEqual(readout["result_refs"], evidence["result_refs"])
+            preflight_after = run_cli(
+                "preflight",
+                "--discovery-contract",
+                "--owner-focus",
+                "ORDINARY-SINGLETON-SYNTH",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(preflight_after.returncode, 0, preflight_after.stderr)
+            source_receipt = json.loads(preflight_after.stdout)
+            self.assertEqual(source_receipt.get("action"), "START_NEW_SESSION")
+            self.assertEqual(source_receipt.get("search_key_sha256"), evidence["journal_scope"])
+            selected = dict(card)
+            draft = bind_draft({**source, "candidates": [selected]}, source_receipt)
+            draft.pop("runner_up_candidate_ref", None)
+            draft.pop("strongest_rejected_alternative", None)
+            draft["selected_candidate_ref"] = selected["label"]
+            draft["grounded_evidence"] = evidence
+            draft_path = workspace / "draft.json"
+            receipt_path = workspace / "preflight.json"
+            draft_path.write_text(json.dumps(draft), encoding="utf-8")
+            receipt_path.write_text(json.dumps(source_receipt), encoding="utf-8")
+            persisted = run_cli(
+                "persist-draft",
+                "--draft",
+                str(draft_path),
+                "--preflight-receipt",
+                str(receipt_path),
+                "--representation-id",
+                "BASE",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(persisted.returncode, 0, persisted.stderr)
+            resumed = run_cli(
+                "preflight",
+                "--discovery-contract",
+                "--owner-focus",
+                "ORDINARY-SINGLETON-SYNTH",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(resumed.returncode, 0, resumed.stderr)
+            resume_receipt = json.loads(resumed.stdout)
+            self.assertEqual(resume_receipt.get("action"), "RESUME_EXISTING_SESSION")
+            resume_path = workspace / "resume.json"
+            resume_path.write_text(json.dumps(resume_receipt), encoding="utf-8")
+            frozen_run = run_cli(
+                "freeze",
+                "--draft",
+                str(draft_path),
+                "--preflight-receipt",
+                str(resume_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(frozen_run.returncode, 0, frozen_run.stderr)
+            frozen = json.loads(frozen_run.stdout)
+            packet = frozen.get("critic_input_packet")
+            self.assertIsInstance(packet, dict)
+            self.assertEqual(packet.get("strongest_rejected_alternative"), "NONE")
+            self.assertIsNone(frozen.get("runner_up_critic_input_packet"))
+            session_id = str(frozen["session_id"])
+            critic = {
+                "schema": "smial.hypothesis-critic-result",
+                "schema_version": "1.1",
+                "session_id": session_id,
+                "critic_input_packet_sha256": frozen["critic_input_packet_sha256"],
+                "selected_candidate_id": frozen["selected_candidate_id"],
+                "selected_definition_sha256": frozen["selected_definition_sha256"],
+                "critic_prompt_version": "HFIC-V1.1",
+                "isolated_context_attestation": "NEW_CONTEXT_REQUIRED",
+                "critic_terminal": "KILL_PREPARATORY_LOOP",
+                "next": "STOP",
+                "authority": {
+                    "git_mutation": 0,
+                    "experiment_execution": 0,
+                    "provider_api_rpc_wss_calls": 0,
+                },
+                "non_claims": ["NO_ALPHA", "FIXTURE_CRITIC"],
+            }
+            critic_path = workspace / "critic.json"
+            critic_path.write_text(json.dumps(critic), encoding="utf-8")
+            finalized = run_cli(
+                "finalize",
+                "--session-id",
+                session_id,
+                "--critic-result",
+                str(critic_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(finalized.returncode, 0, finalized.stderr)
+            shown = run_cli(
+                "show-session",
+                "--session-id",
+                session_id,
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(shown.returncode, 0, shown.stderr)
+            shown_payload = json.loads(shown.stdout)
+            self.assertIn("owner_readout", shown_payload)
+            self.assertEqual(shown_payload.get("session_id"), session_id)
+            restarted = _discovery_execute(
+                data_root, binding_path, spec_path, scope_path, journal, argv
+            )
+            self.assertEqual(restarted.returncode, 0, restarted.stderr)
+            restarted_payload = json.loads(restarted.stdout)
+            self.assertFalse(restarted_payload["queries"][0]["new_look"])
+            self.assertEqual(restarted_payload["result_refs"], evidence["result_refs"])
 
 
 if __name__ == "__main__":
