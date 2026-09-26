@@ -4,8 +4,8 @@
   "review_id": "LIVE-COHORT-VANILLA-OWNER-PATH-FACTORY-FIT-001",
   "as_of": "2026-09-26",
   "task_id": "LIVE_COHORT_VANILLA_OWNER_PATH_V1",
-  "reviewed_bindings_sha256": "d70e75d0d3c8b110c824b65b677fd15e962040e5be5b3b891b5b8388ea3969eb",
-  "reviewed_inventory_sha256": "abdc6404951413ddcf2885e7fe865b505e35c0b316e6cfe3d8c607eaf2134ba0",
+  "reviewed_bindings_sha256": "c51420b497818e594e149b6c2a3ed7e081bfa8c841c6a9e667ec4e4290c35880",
+  "reviewed_inventory_sha256": "2b58203c22245319f8fa4abb5dd49ea686e513cd630622a3a481fef742f06f45",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
