@@ -10,7 +10,27 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "USE_VANILLA_COHORT_OWNER_PATH",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "474745d334da9f4110511b7ddb1c1318c03abdd5d9b51ee4895aad67fad00d61",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "02493fc2bd23e6413ae449df1c7cb149ce180752737801ad14a54b507b864276",
+    "docs/tasks/LIVE_COHORT_VANILLA_OWNER_PATH_V1.md": "73219a507b380d25ba7c86660a0386e04f41ab37552fdf499feb927fb79467a8",
+    "scripts/discovery_evidence_release.py": "e8f6d23604d470d796ae213e8618b3e54f59560718361ac693b1be7da6d9c60d",
+    "src/solana_alpha_lab/factory/bounded_cohort_materialization.py": "e64a0ff6198efddb8b95eb6cc78aac18928c1e48df08c53c5c1be89603e11024",
+    "src/solana_alpha_lab/factory/forge_input_receipt.py": "64b609bff4f672a004af1c9ac5164754f32c8f90977306fb44ac72c24fa6305e",
+    "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "9d3ca6bf6efa27de3414aa2aaf5e44840b96c7072f7ab4a446bde52cb8bbd9d2",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "d7bf6d42184977adfc9fb23f8b1e1e929db63f88eec0c8abcb623b0c762bcdd7",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "b2a133ea282e27012835c4ddf0463acbb9ca281444f8252a79ec640d3267d841",
+    "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "b04ad703cb3240c91ce6100ba020bdbc99c7ee2c301ff162f189e7c7c325c978",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "dcc49de97a93c4c0723e879730fbb8d0ab444304099318b52623feb18e45af03",
+    "src/solana_alpha_lab/factory/live_cohort_vanilla_path.py": "a188aa614df98f549ee6ff58d52c50a81e1c76afaef9e87b7e139d100029b62b",
+    "src/solana_alpha_lab/factory/live_corpus_manifest_publish.py": "c65e935b6a5621788b1d883fe0c2d97885c3d4f2953ecd453cc745c55190eaf3",
+    "src/solana_alpha_lab/factory/research_store.py": "c65fb6e7e8cf022ba90d11ff2cf112dde27996909dda53c4eab5d5499e46a653",
+    "tests/test_bounded_cohort_materialization_v1.py": "c777bcdb9a8a11a67f24d9bffcdd7cb182d6a499f82fcf593fe4dc489fa780d2",
+    "tests/test_forge_evidence_identity_and_owner_gold_v1.py": "0aad5e8a45312f2e91117d8c559ec415bb7a64f3c0ff3fd62841a01d00b2aeeb",
+    "tests/test_forge_input_truth_and_visibility_v1.py": "0bedd96c5fdfb9935ae4b643adcb0381c14ae2971b7a569f7af048a643c841ff",
+    "tests/test_forge_representation_ladder_v1.py": "378942e76641d282536b4d89d5980d56b14684b0c094d799ea268f4194554b74",
+    "tests/test_live_cohort_vanilla_owner_path_v1.py": "d46407f6eac7b6d2b5f9755764edc79e6a38a364e01ffdb8de9f54d0f9c93a09"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +41,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/live_cohort_vanilla_owner_path/a1_delivery_factory_fit_v1.json",
-    "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "sha256": "f7e8925537a30c31dcfa0fa9e89b5b09e78835caf3a957874ae38cf8076a91ab",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LIVE_COHORT_VANILLA_OWNER_PATH",
     "independent_review": {
       "path": "docs/evidence/live_cohort_vanilla_owner_path/a1_delivery_independent_review_v1.json",
-      "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "sha256": "ae2e769fda6cb520430fa0bfe368ef52c77e23dfc3d18a38afd3d26bb6c66baa",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
