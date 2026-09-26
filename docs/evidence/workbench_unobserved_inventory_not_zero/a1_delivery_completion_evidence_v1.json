@@ -11,7 +11,12 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "src/solana_alpha_lab/factory/workbench.py": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "7c9129d04f1c9a2d531470b9543c89eabf7211474b6e553e4b4632bc8bbd3ff0",
+    "docs/tasks/WORKBENCH_UNOBSERVED_INVENTORY_NOT_ZERO_V1.md": "735f8f67e5680db351388f4ba069b6cd74300a9aca6c8d1d88de26b19d8a1c2b",
+    "src/solana_alpha_lab/factory/workbench.py": "e959369b6c2fa3395838a391bccf38beab37ffd3193ca1ce28b7f01172fa53dc",
+    "tests/test_factory_ordinary_market_hypothesis.py": "9d52000af8e17eccaf8ecba4cf3b8e8ae65f019f03b7df2ab646ec2dc16baac0",
+    "tests/test_owner_trading_operability_workbench_v1.py": "a3de45831d76bc443339b35f6c238af96d82536050efe2a43d841e2176643479",
+    "tests/test_owner_workbench_predeploy_experience_qa_v1.py": "74dffefd5a88b8a07780fee294a38eabc24845e740938077ae043c90cff5c134"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +28,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/workbench_unobserved_inventory_not_zero/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "c5cdf9f66967783f22dbd6c3fc2b8405c34e71c43e7d5663ca7efffe47ac0f3f",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_WORKBENCH_UNOBSERVED_INVENTORY_NOT_ZERO",
     "independent_review": {
       "path": "docs/evidence/workbench_unobserved_inventory_not_zero/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "600e8f9a9c60fb05d8ddeb5db521b04e29bf1c54cf0dcd5b43b036cc967cfef9",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
