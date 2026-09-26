@@ -4,8 +4,8 @@
   "review_id": "WORKBENCH-UNOBSERVED-INVENTORY-NOT-ZERO-REVIEW-001",
   "as_of": "2026-09-26",
   "task_id": "WORKBENCH_UNOBSERVED_INVENTORY_NOT_ZERO_V1",
-  "reviewed_bindings_sha256": "2eeeab459c28c95bef9af642f34c4a507b1fe0daca1e5ab2b23a38259a6e6586",
-  "reviewed_inventory_sha256": "6ad36e5ecad32a58b131d98180d502f2d168be49db37f70364951610ac7dbea2",
+  "reviewed_bindings_sha256": "1b250e049b0db7256e498eb5451e60cd6992cb944a5bdd5a378af40016209b21",
+  "reviewed_inventory_sha256": "9ea1ed4ce1a571add00c53452b9791159b8aa646022abd4b50884da53c151d51",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
