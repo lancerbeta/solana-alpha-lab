@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-GROUNDED-DISCOVERY-REPAIR-FACTORY-FIT-001",
+  "as_of": "2026-09-26",
+  "task_id": "FORGE_GROUNDED_DISCOVERY_REPAIR_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_ORDINARY_ROUTE_NOT_SILENT_CONTROL",
+    "flexibility_and_history": "PASS_CONTROL_AND_V1_TRIGGERS_UNCHANGED",
+    "context_efficiency": "PASS_EXISTING_FORGE_CLI",
+    "research_truth": "PASS_STATE_ONLY_COVERAGE_NO_TYPED_VALUES",
+    "owner_operability": "PASS_EXPLICIT_CONTROL_FLAG",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_EXPERIMENT_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_REVERT_LIVE_STORE_UNTOUCHED",
+    "build_vs_buy": "PASS_NO_NEW_PLATFORM",
+    "red_team": "PASS_SCOPED_CONTROL_DOES_NOT_CLOSE_RAW",
+    "security": "PASS_NO_HOLDOUT_NO_PROVIDER"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "POST_MERGE_ORDINARY_FOCUS_ONLY"
+  },
+  "recovery": "Revert this PR. Historical ResearchStore rows and the occupied AUTO slot stay.",
+  "limits": [
+    "NO_MARKET_PROMPT_A",
+    "NO_MARKET_CRITIC",
+    "NO_EXPERIMENT",
+    "NO_LIVE_RDP_WRITE",
+    "NO_AUTO_RELEASE",
+    "NO_ALPHA"
+  ]
+}

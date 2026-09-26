@@ -117,6 +117,7 @@
           },
           "effective_terminal": {"type": ["string", "null"]},
           "input_scope": {"type": "string"},
+          "evidence_surface_mode": {"type": ["string", "null"]},
           "session_id": {"type": ["string", "null"]},
           "session_state": {"type": ["string", "null"]},
           "selected_candidate_id": {"type": ["string", "null"]},
@@ -163,6 +164,7 @@
     },
     "control_session_id": {"type": ["string", "null"]},
     "blocking_reason_codes": {"type": "array", "items": {"type": "string"}},
+    "discovery_contract_version": {"type": ["string", "null"]},
     "owner_readout": {"type": "string"},
     "writes": {
       "type": "object",

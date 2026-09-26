@@ -143,6 +143,16 @@ This skill expects **new context** relative to Forge:
 When invoked from Forge auto-handoff via subagent, treat the subagent session as
 the required isolated context.
 
+## Grounded evidence
+
+When `grounded_evidence` is present, judge that computation: denominators,
+missingness, query refs, and temporal support. A `PREDICTIVE` claim does not
+need a proven actor story. Do not invent one. A `CAUSAL` claim keeps the
+identification bar. `prior_scope_relations` of `SCOPED_CONTROL_DOES_NOT_BLOCK`
+is not `KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED`. `EXACT_SCOPE_MATCH` still is.
+Missing outcomes are not zeros and not alpha. The engine field
+`engine_emits_alpha=false` is not a positive result.
+
 ## Terminals
 
 Use exactly one terminal from operator pack **B4** — the sole PASS entry before

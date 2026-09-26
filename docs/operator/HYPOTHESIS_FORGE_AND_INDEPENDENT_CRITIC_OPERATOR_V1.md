@@ -280,11 +280,15 @@ Only then invoke `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
 
 **Ручной fallback (если slash недоступен):** paste-блоки ниже эквивалентны, но owner должен
 сам открыть шаг 2 — предпочтительнее slash + auto-handoff. После Prompt A / freeze
-всё равно выполните `forge-run` (bounded run). Fresh empty store или ordinary BASE `NO_WORTHY` без
-CONTROL surface даёт `START_BASE` + `CONTROL_SURFACE_REQUIRED` (`status: NEXT`) —
-тот же slash продолжает CONTROL-compatible BASE, не evening DONE. Ordinary final
+всё равно выполните `forge-run` (bounded run). Fresh ordinary focus даёт
+`START_BASE` + `ORDINARY_DISCOVERY_READY`
+(`ORDINARY_GROUNDED_DISCOVERY_V1`), не CONTROL. `CONTROL_SURFACE_REQUIRED`
+остаётся только для явного `--control-current-representation`, когда CONTROL
+сессии нет (`STOP_BEFORE_SYNTHESIS` на no-write diagnostic). Ordinary final
 PASS и pending Critic/classify читаются/резюмируются честно; их нельзя подменять
-BASE NOT_RUN ради переключения mode.
+BASE NOT_RUN ради переключения mode. CONTROL `SEARCH_EXHAUSTED` с
+`scope_exhausted: CURRENT_REPRESENTATION_CONTROL_V1` не означает, что raw
+корпус исчерпан.
 
 ### Шаг 1 — Forge (manual fallback)
 
@@ -379,6 +383,23 @@ The `owner_readout` `history:` line is mandatory. `CURRENT_MARKET_HISTORY_UNREAD
 5. использует существующие данные и capabilities либо обосновывает один конкретный reusable gap.
 
 Веди внутренний поиск глубоко, но не публикуй скрытый scratchpad или длинную цепочку рассуждений. Выводи только проверяемые факты, явные inference, структурированные candidate cards и краткую причинную аргументацию.
+
+## A0. Grounded discovery contract
+
+`FORGE_GROUNDED_DISCOVERY_V1` applies to ordinary `/hypothesis-forge` only.
+CONTROL stays an explicit `--control-current-representation` mode and does not
+see raw trajectories. A predictive sketch needs a PIT prediction, query-backed
+evidence, a mundane alternative, a counterexample or disconfirming observation,
+practical relevance and a cheap falsifier. It does not need a proven actor
+story or literature novelty. A causal claim keeps the stricter identification
+bar. Do not invent a mechanism to fill a schema field. Zero grounded sketches
+are allowed. Do not force four candidates. At most six sketches, one selected
+candidate and one frozen runner-up. Cohort id is not a trading feature.
+Discovery queries use `BASE_X` only, price/liquidity fields, and a target point
+strictly after the decision points. Missing outcomes are not zeros. A scoped
+CONTROL negative does not hard-close a different raw question; an exact scope
+match still blocks a duplicate. Query budget is at most six main specifications
+and two adaptive refinements. Identical spec bytes are a retry, not a new look.
 
 ## A0. Authority и hard boundaries
 

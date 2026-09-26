@@ -508,6 +508,7 @@ def cmd_forge_run(
     persist: bool = False,
     saved_draft_sha256: str | None = None,
     model_provenance_sha256: str | None = None,
+    control_current_representation: bool = False,
 ) -> int:
     """Bounded Forge run receipt. persist=False never writes."""
     from solana_alpha_lab.factory.hfic_representation_ladder import (
@@ -601,6 +602,15 @@ def cmd_forge_run(
             "writes: store=0 forge_run=0 session=0"
         )
         return _emit_run(payload, exit_code=2)
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+
+    requested_surface = (
+        CURRENT_REPRESENTATION_CONTROL_V1
+        if control_current_representation
+        else None
+    )
     try:
         receipt = evaluate_forge_run(
             repo_root,
@@ -609,6 +619,7 @@ def cmd_forge_run(
             persist=False,
             saved_draft_sha256=saved_draft_sha256,
             execution_context=execution_context,
+            requested_surface=requested_surface,
         )
     except LadderError as exc:
         payload = _ladder_error_payload(str(exc))
@@ -639,6 +650,7 @@ def cmd_forge_run(
                 persist=True,
                 saved_draft_sha256=saved_draft_sha256,
                 execution_context=execution_context,
+                requested_surface=requested_surface,
             )
         except LadderError as exc:
             payload = _ladder_error_payload(str(exc))
@@ -655,6 +667,35 @@ def cmd_forge_run(
     return _emit_run(payload, exit_code=(
         0 if payload.get("owner_class") not in {"INPUT_NOT_READY", "OBSERVABILITY_BLOCKED"} else 2
     ))
+
+
+def cmd_discovery_coverage(repo_root: Path, explicit_data_root: Path | None) -> int:
+    """State-only joint coverage. Writes nothing and does not reserve a slot."""
+
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        live_state_only_coverage,
+    )
+
+    git_before = repository_git_snapshot(repo_root)
+    try:
+        data_root = _existing_data_root(repo_root, explicit_data_root)
+    except HficCliError as exc:
+        return emit_error(str(exc))
+    try:
+        payload = live_state_only_coverage(data_root)
+    except GroundedDiscoveryError as exc:
+        return emit_error(exc.code)
+    git_after = repository_git_snapshot(repo_root)
+    if not git_before.unchanged(git_after):
+        return emit_error("GIT_MUTATION_DETECTED")
+    payload["authority"] = {
+        "git_mutation": 0,
+        "experiment_execution": 0,
+        "provider_api_rpc_wss_calls": 0,
+    }
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
 
 
 def _store_root(repo_root: Path, explicit_data_root: Path | None) -> Path:
@@ -1630,6 +1671,16 @@ def build_parser() -> argparse.ArgumentParser:
             "readback; mismatch blocks reuse and never resets market budget"
         ),
     )
+    forge_run.add_argument(
+        "--control-current-representation",
+        action="store_true",
+        help="Explicit CURRENT_REPRESENTATION_CONTROL_V1. Ordinary forge-run does not imply it.",
+    )
+    discovery_coverage = subparsers.add_parser(
+        "discovery-coverage",
+        help="No-write state-only joint coverage. Never selects typed_value.",
+    )
+    discovery_coverage.add_argument("--format", choices=("json",), default="json")
 
     persist_draft = subparsers.add_parser(
         "persist-draft",
@@ -1867,7 +1918,12 @@ def main(argv: list[str] | None = None) -> int:
                 model_provenance_sha256=getattr(
                     args, "model_provenance_sha256", None
                 ),
+                control_current_representation=bool(
+                    getattr(args, "control_current_representation", False)
+                ),
             )
+        if args.command == "discovery-coverage":
+            return cmd_discovery_coverage(repo_root, args.data_root)
         if args.command == "persist-draft":
             return cmd_persist_draft(
                 repo_root,

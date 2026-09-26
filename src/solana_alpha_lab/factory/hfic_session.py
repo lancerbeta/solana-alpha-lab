@@ -60,7 +60,7 @@ SESSION_RECEIPT_SCHEMA_V1_3 = (
 )
 RUNNER_UP_AWAITING_CRITIC = "RUNNER_UP_AWAITING_CRITIC"
 RUNNER_UP_REVISION_REQUIRED = "RUNNER_UP_REVISION_REQUIRED"
-MIN_CANDIDATES = 4
+MIN_CANDIDATES = 0
 MAX_CANDIDATES = 6
 PHASE_RANK = {
     "SYNTHESIS_COMPLETE": 0,
@@ -1671,6 +1671,9 @@ def freeze_draft(
             )
         except (PriorMemoryCapacityError, PriorMemoryUnidentifiedError) as exc:
             raise HficSessionError(exc.code) from exc
+    grounded = draft.get("grounded_evidence")
+    if isinstance(grounded, Mapping):
+        packet["grounded_evidence"] = dict(grounded)
     if repo_root is not None:
         _validate_json_schema(
             packet,

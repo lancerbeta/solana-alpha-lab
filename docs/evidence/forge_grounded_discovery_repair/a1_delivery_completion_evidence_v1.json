@@ -1,0 +1,54 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-GROUNDED-DISCOVERY-REPAIR-ACCEPTANCE-001",
+  "as_of": "2026-09-26",
+  "task_id": "FORGE_GROUNDED_DISCOVERY_REPAIR_V1",
+  "state_change": "ORDINARY_GROUNDED_DISCOVERY_ROUTE_BOUND",
+  "base_main": "30ee1f561224f91e0557650dc7fecfae5e1603f6",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_grounded_discovery_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS",
+    "mode": "FAST_PATH"
+  },
+  "validation": {
+    "targeted": "PASS_GROUNDED_DISCOVERY_AND_LADDER_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/forge_grounded_discovery_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": ["PASS_DELIVERY_HARNESS_CHECK"]
+  },
+  "non_claims": [
+    "NO_MARKET_PROMPT_A",
+    "NO_MARKET_CRITIC",
+    "NO_EXPERIMENT",
+    "NO_LIVE_RDP_WRITE",
+    "NO_AUTO_RELEASE",
+    "NO_ALPHA",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "git_mutation_count": 0,
+    "provider_calls": 0,
+    "cash_spend": 0
+  }
+}

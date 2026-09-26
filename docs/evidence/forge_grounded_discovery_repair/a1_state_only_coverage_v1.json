@@ -1,0 +1,97 @@
+{
+  "authority": {
+    "experiment_execution": 0,
+    "git_mutation": 0,
+    "provider_api_rpc_wss_calls": 0
+  },
+  "binding": {
+    "allowed_fields": [
+      "FIELD-LIQUIDITY-USD-001",
+      "FIELD-USD-PRICE-001"
+    ],
+    "cohorts": [
+      {
+        "census_sha256": "cfa7d8404dc5400c4e223c4d5303193ad2209f92cac3af2d61862e384ebfd5bf",
+        "cohort_id": "REL-20260902T111900Z-20260909T111900Z",
+        "evidence_role": "EXPLORATORY_REUSE",
+        "observations_sha256": "7b26425c69cc95baf8a9e0b9ea506de1042b98b83d48a2dae07f5a33a7d66d7d",
+        "release_id": "633a57088a5eb16dcc75a56aa2eb2521bbc76d1874aeb75aceb1ecc795bf1154"
+      },
+      {
+        "census_sha256": "4eb619c41054d3b562c7df706a6a56b91f43cc990ee624e3f667b63c43cf3fe9",
+        "cohort_id": "REL-20260909T111900Z-20260916T111900Z",
+        "evidence_role": "EXPLORATORY_REUSE",
+        "observations_sha256": "0e350afc1b07370925e4af893a15620087c7d72f79f8c27b6ab762e2173c2f73",
+        "release_id": "bf6b242a717fb168a3c22f00e5bfdb4d828156a8b4e4229f15c1f1bccdd260c9"
+      },
+      {
+        "census_sha256": "9697ff819bc8b161076c0375a66df00cc587bca6a68d1ba1effc312eab1e7687",
+        "cohort_id": "REL-20260914T173510Z-20260921T173510Z",
+        "evidence_role": "EXPLORATORY_REUSE",
+        "observations_sha256": "4e4c7701ca664f241ed85902a8f771fb7c22eefe04b76f83d7533b1fcea5886c",
+        "release_id": "732d4a37227f62cceded5d4f5d8c7187ba9c45a1819e18080791a6fde3abd19a"
+      }
+    ],
+    "contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
+    "holdouts_not_touched": [
+      "UNTOUCHED_FORWARD_HOLDOUT"
+    ],
+    "not_all_census_rows": true,
+    "population": "BASE_X"
+  },
+  "cohorts": [
+    {
+      "base_x_like": 475,
+      "census_rows": 138844,
+      "cohort_id": "REL-20260902T111900Z-20260909T111900Z",
+      "evidence_role": "EXPLORATORY_REUSE",
+      "joint_prefix_price_liquidity_through_y1800": 332,
+      "joint_x300_price_and_liquidity": 475,
+      "release_id": "633a57088a5eb16dcc75a56aa2eb2521bbc76d1874aeb75aceb1ecc795bf1154",
+      "typed_value_selected": false,
+      "x_eligible": 475
+    },
+    {
+      "base_x_like": 249,
+      "census_rows": 113107,
+      "cohort_id": "REL-20260909T111900Z-20260916T111900Z",
+      "evidence_role": "EXPLORATORY_REUSE",
+      "joint_prefix_price_liquidity_through_y1800": 128,
+      "joint_x300_price_and_liquidity": 249,
+      "release_id": "bf6b242a717fb168a3c22f00e5bfdb4d828156a8b4e4229f15c1f1bccdd260c9",
+      "typed_value_selected": false,
+      "x_eligible": 253
+    },
+    {
+      "base_x_like": 425,
+      "census_rows": 223399,
+      "cohort_id": "REL-20260914T173510Z-20260921T173510Z",
+      "evidence_role": "EXPLORATORY_REUSE",
+      "joint_prefix_price_liquidity_through_y1800": 342,
+      "joint_x300_price_and_liquidity": 425,
+      "release_id": "732d4a37227f62cceded5d4f5d8c7187ba9c45a1819e18080791a6fde3abd19a",
+      "typed_value_selected": false,
+      "x_eligible": 425
+    }
+  ],
+  "collection_window_overlaps": [
+    {
+      "independent_replication": false,
+      "left_cohort_id": "REL-20260909T111900Z-20260916T111900Z",
+      "overlap_end": "2026-09-16T11:19:00Z",
+      "overlap_start": "2026-09-14T17:35:10Z",
+      "right_cohort_id": "REL-20260914T173510Z-20260921T173510Z"
+    }
+  ],
+  "contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
+  "denominator_note": "joint counts are inside base_x-like PIT liquidity, not census rows and not per-cell margins",
+  "excluded_from_first_scope": [
+    "TRADERS_COMPLETE_PREFIX"
+  ],
+  "first_supported_scope": [
+    "X300_PRICE_LIQUIDITY_BASELINE",
+    "PRICE_LIQUIDITY_PREFIX_THROUGH_Y1800"
+  ],
+  "scientific_writes": 0,
+  "typed_value_selected": false
+}
