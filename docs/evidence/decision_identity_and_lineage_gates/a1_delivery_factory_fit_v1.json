@@ -4,8 +4,8 @@
   "review_id": "DECISION-IDENTITY-AND-LINEAGE-GATES-FACTORY-FIT-001",
   "as_of": "2026-09-26",
   "task_id": "DECISION_IDENTITY_AND_LINEAGE_GATES_V1",
-  "reviewed_bindings_sha256": "2022fc00eed8390f724fcd2b8853fdb3df1a66dec7b2f0961a67cc7e840c1b07",
-  "reviewed_inventory_sha256": "5e0933d1c960b6ad298d9ba3bdce14b34457ec1ba2e30d0c26d38eac9348540c",
+  "reviewed_bindings_sha256": "90f266d115aa58de1149f90a20e5563c233289f5200b0c79729d727351a7cc1e",
+  "reviewed_inventory_sha256": "f4e51aea2a0d9051fa42d0487c900532a80284baf21f8900324b499f90e41a90",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
