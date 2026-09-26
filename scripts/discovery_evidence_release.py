@@ -301,6 +301,7 @@ def main(argv: list[str] | None = None) -> int:
     unpack.add_argument("--source-rdp", type=Path, default=None)
     unpack.add_argument("--as-of", type=str, default=None)
     unpack.add_argument("--release-builder-git-sha", default=None)
+    unpack.add_argument("--manifest-out", type=Path, default=None)
     unpack.add_argument("--plan-only", action="store_true")
 
     forge_ready = sub.add_parser(
@@ -318,9 +319,10 @@ def main(argv: list[str] | None = None) -> int:
         "seal-live-cohort",
         "verify-live",
         "live-status",
+        "unpack-next-live-cohort",
     }:
         argv = argv if argv is not None else sys.argv[1:]
-        skip_worker = args.command == "build-live-source" and "--plan-only" in argv
+        skip_worker = args.command in {"build-live-source", "unpack-next-live-cohort"} and "--plan-only" in argv
         if os.environ.get(SOURCE_BUILD_WORKER_ENV) != "1" and not skip_worker:
             return _spawn_source_build_worker(list(argv))
         if not skip_worker:
@@ -462,6 +464,7 @@ def main(argv: list[str] | None = None) -> int:
                 source_root=None if args.source_rdp is None else _path(args.source_rdp),
                 release_builder_git_sha=args.release_builder_git_sha,
                 plan_only=bool(args.plan_only),
+                manifest_out=None if args.manifest_out is None else _path(args.manifest_out),
             )
         elif args.command == "list-live-cohorts":
             result = list_live_cohorts(

@@ -20,14 +20,17 @@ from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
     reset_enumerate_work,
 )
 from solana_alpha_lab.factory.live_cohort_discovery_release import (  # noqa: E402
+    LiveCohortReleaseError,
     import_live_cohort,
     seal_live_cohort,
     verify_live_cohort,
     write_observation_rdp_source,
 )
+from solana_alpha_lab.factory.live_cohort_to_forge import synthetic_closed_receipt  # noqa: E402
 from solana_alpha_lab.factory.live_cohort_vanilla_path import (  # noqa: E402
     classify_mirror,
     select_next_mature_unimported_cohort,
+    unpack_next_live_cohort,
 )
 from solana_alpha_lab.storage.manifests import (  # noqa: E402
     build_dataset_manifest,
@@ -80,6 +83,30 @@ class VanillaOwnerPathTests(unittest.TestCase):
         self.assertEqual(chosen["activation_id"], "ACT-SUCCESSOR")
         self.assertNotEqual(chosen["cohort_id"], "REL-20260916T111900Z-20260923T111900Z")
         self.assertGreaterEqual(cutover, chosen["window_start"])
+
+    def test_unpack_rejects_open_future_before_build(self) -> None:
+        receipt = synthetic_closed_receipt(
+            schedule_sha256="b" * 64,
+            activation_id="ACT-SUCCESSOR",
+            cohort_id="REL-20260914T173510Z-20260921T173510Z",
+            as_of=datetime(2026, 9, 26, tzinfo=UTC),
+            members_total=1,
+        )
+        receipt["due_states"] = {"OBSERVED": 1}
+        receipt["pending_future"] = 1
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(LiveCohortReleaseError) as raised:
+                unpack_next_live_cohort(
+                    observation_rdp=Path(tmp),
+                    data_root=Path(tmp),
+                    repo_root=ROOT,
+                    activations=[],
+                    rollovers=[],
+                    closure_receipt=receipt,
+                    as_of=datetime(2026, 9, 26, tzinfo=UTC),
+                    plan_only=True,
+                )
+        self.assertEqual(str(raised.exception), "COHORT_PENDING_FUTURE")
 
     def test_mirror_conflict_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

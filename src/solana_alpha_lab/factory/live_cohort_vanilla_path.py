@@ -28,12 +28,16 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
     campaign_cohort_windows,
     import_live_cohort,
     last_bounded_research_rels,
+    live_cohort_status,
     seal_live_cohort,
     verify_live_cohort,
 )
 from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
 from solana_alpha_lab.factory.live_cohort_to_forge import (
     CONTROL_NEXT,
+    MIN_USABLE_YIELD_ELIGIBLE,
+    assert_closure_ready,
+    assert_source_matches_receipt,
     default_sealed_release_root,
     forge_control_ready,
 )
@@ -228,6 +232,14 @@ def collect_bounded_transfer_manifest(
     return body
 
 
+def write_transfer_manifest(path: Path, manifest: Mapping[str, Any]) -> None:
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    Path(path).write_text(
+        json.dumps(dict(manifest), sort_keys=True, separators=(",", ":")),
+        encoding="utf-8",
+    )
+
+
 def classify_mirror(
     manifest: Mapping[str, Any],
     mirror_root: Path,
@@ -318,9 +330,11 @@ def unpack_next_live_cohort(
     source_root: Path | None = None,
     release_builder_git_sha: str | None = None,
     plan_only: bool = False,
+    manifest_out: Path | None = None,
 ) -> dict[str, Any]:
     """Local half of the owner path. Capture/export supplies the frozen receipt."""
 
+    assert_closure_ready(closure_receipt)
     chosen = select_next_mature_unimported_cohort(
         activations=activations,
         rollovers=rollovers,
@@ -355,8 +369,12 @@ def unpack_next_live_cohort(
             classification=classification,
         )
         classification = classify_mirror(manifest, mirror)
-        if classification["missing_files"] or classification["conflicts"]:
-            raise LiveCohortReleaseError("MIRROR_INCOMPLETE")
+    if manifest_out is not None:
+        write_transfer_manifest(manifest_out, manifest)
+    if classification["missing_files"] or classification["conflicts"]:
+        raise LiveCohortReleaseError(
+            "MIRROR_CONFLICT" if classification["conflicts"] else "MIRROR_INCOMPLETE"
+        )
     plan = build_live_observation_source_from_rdp(
         observation_rdp_root=mirror,
         schedule_sha256=str(chosen["schedule_sha256"]),
@@ -388,7 +406,7 @@ def unpack_next_live_cohort(
             "mirror": classification,
             "placed_files": placed,
         }
-    build_live_observation_source_from_rdp(
+    source = build_live_observation_source_from_rdp(
         observation_rdp_root=mirror,
         schedule_sha256=str(chosen["schedule_sha256"]),
         activation_id=str(chosen["activation_id"]),
@@ -397,6 +415,27 @@ def unpack_next_live_cohort(
         ops_store=None,
         plan_only=False,
     )
+    assert_source_matches_receipt(source, closure_receipt)
+    readiness = live_cohort_status(
+        observation_rdp_root=mirror,
+        cohort_id=str(chosen["cohort_id"]),
+        as_of=as_of,
+    )["readiness"]
+    state = str(readiness.get("state") or "")
+    if state not in {"READY_VALID", "READY_VALID_WITH_COVERAGE_LIMITATION"}:
+        raise LiveCohortReleaseError(state or "NOT_READY")
+    this_yield = int((readiness.get("denominator") or {}).get("observed") or 0)
+    lineage_path = Path(data_root) / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+    current_yield = 0
+    if lineage_path.is_file():
+        lineage = json.loads(lineage_path.read_text(encoding="utf-8"))
+        current_yield = sum(
+            int(item.get("yield_eligible") or 0)
+            for item in (lineage.get("cohorts") or [])
+            if isinstance(item, Mapping)
+        )
+    if current_yield + this_yield < MIN_USABLE_YIELD_ELIGIBLE:
+        raise LiveCohortReleaseError("LOW_YIELD")
     release_root = default_sealed_release_root(mirror, str(chosen["cohort_id"]))
     if not (release_root / "release_manifest.json").is_file():
         seal_live_cohort(
