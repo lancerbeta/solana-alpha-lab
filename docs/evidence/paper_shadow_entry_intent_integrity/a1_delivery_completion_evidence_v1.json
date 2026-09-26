@@ -46,7 +46,7 @@
     "targeted": "PASS_ENTRY_INTENT_INTEGRITY_VERTICAL_AND_DOMAIN",
     "independent_review": {
       "path": "docs/evidence/paper_shadow_entry_intent_integrity/a1_delivery_independent_review_v1.json",
-      "sha256": "664df78f4496fa64f7ee04c9b32ee7a082fb95628095f8f99ff10ed8e03ae2f1",
+      "sha256": "1021c4fcffb844f2a838eb213e47ab54507277d7557c2a94ad67416a15780017",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
