@@ -11,9 +11,9 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "7c9129d04f1c9a2d531470b9543c89eabf7211474b6e553e4b4632bc8bbd3ff0",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "75fa9f4092c2438a6b11686085cc7262e4bc3cc732cd918908fed442bd7c121f",
-    "docs/tasks/WORKBENCH_UNOBSERVED_INVENTORY_NOT_ZERO_V1.md": "e3b2df4f865b175aca7c1de1fa1110df6b4ed196604457ed7370330f0dda77a8",
+    "catalog/assets/core.yaml": "a5288424357dc160e920ed49fe3ae7c4d75467c70d61fbe5ea0c5e8523c0ca58",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "b9454d01c376d6b8ca0e21153da27fc7ca7e7e2d41646cca7ad4bab9412069ba",
+    "docs/tasks/WORKBENCH_UNOBSERVED_INVENTORY_NOT_ZERO_V1.md": "fe05a91f512aaad4baa4e29de3c683d4d064b10ed051128553021b6291fb9922",
     "src/solana_alpha_lab/factory/workbench.py": "e959369b6c2fa3395838a391bccf38beab37ffd3193ca1ce28b7f01172fa53dc",
     "tests/test_factory_ordinary_market_hypothesis.py": "9d52000af8e17eccaf8ecba4cf3b8e8ae65f019f03b7df2ab646ec2dc16baac0",
     "tests/test_owner_trading_operability_workbench_v1.py": "a3de45831d76bc443339b35f6c238af96d82536050efe2a43d841e2176643479",
@@ -29,14 +29,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/workbench_unobserved_inventory_not_zero/a1_delivery_factory_fit_v1.json",
-    "sha256": "0deb43abf67ec783c8c6d6e29901810e0a724a1c696bbcd97d2d53ba0e440ff2",
+    "sha256": "8f8dd4db16ff7392c8e478f9f7411ccc45ddc3b6d6f739dc1f122b85e470e36d",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_WORKBENCH_UNOBSERVED_INVENTORY_NOT_ZERO",
     "independent_review": {
       "path": "docs/evidence/workbench_unobserved_inventory_not_zero/a1_delivery_independent_review_v1.json",
-      "sha256": "c340bcb3f826a5a2a87f9d4af99febb45f544aad0cfa151a09ec24af0651658c",
+      "sha256": "dcbcf8da0425b3826122f8ac2cd680a03c977270cfaf5277fb4d5eba2d65abd5",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

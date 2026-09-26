@@ -4,8 +4,8 @@
   "review_id": "WORKBENCH-UNOBSERVED-INVENTORY-NOT-ZERO-FACTORY-FIT-001",
   "as_of": "2026-09-26",
   "task_id": "WORKBENCH_UNOBSERVED_INVENTORY_NOT_ZERO_V1",
-  "reviewed_bindings_sha256": "1b250e049b0db7256e498eb5451e60cd6992cb944a5bdd5a378af40016209b21",
-  "reviewed_inventory_sha256": "9ea1ed4ce1a571add00c53452b9791159b8aa646022abd4b50884da53c151d51",
+  "reviewed_bindings_sha256": "647e22d2a9a6a39ab5fdd55916743528e90b3a12346c4ca2d209383a8336dadb",
+  "reviewed_inventory_sha256": "002a1f8510d92fa2f91f6244930f4d3a01c312ba64db5bd202ef947573dabae6",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
