@@ -1428,11 +1428,17 @@ def _ordinary_discovery_requested(
     if isinstance(preflight_receipt, Mapping):
         surface = str(preflight_receipt.get("evidence_surface_mode") or "")
         contract = str(preflight_receipt.get("discovery_contract_version") or "")
-    return (
+    machine_contract = (
         str(draft.get("discovery_contract_version") or "") == DISCOVERY_CONTRACT_VERSION
         or surface == ORDINARY_GROUNDED_DISCOVERY_V1
         or contract == DISCOVERY_CONTRACT_VERSION
     )
+    if not machine_contract:
+        return False
+    evidence = draft.get("grounded_evidence")
+    candidates = draft.get("candidates")
+    candidate_count = len(candidates) if isinstance(candidates, list) else 0
+    return isinstance(evidence, Mapping) or candidate_count < 4
 
 
 def _enforce_ordinary_grounded_evidence(

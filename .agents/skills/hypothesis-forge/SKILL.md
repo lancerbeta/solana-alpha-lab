@@ -271,8 +271,9 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
    Pass `--journal-scope` as the preflight `search_key_sha256`. Copy the
    whole returned evidence object onto the draft as `grounded_evidence`.
    Do not copy only `result_refs` and do not hand-write the summary.
-   Ordinary preflight already carries `evidence_surface_mode` and
-   `discovery_contract_version`. Do not invent those fields.
+   Ordinary preflight already carries `discovery_contract_version`.
+   `evidence_surface_mode` stays unset unless the run is explicit CONTROL.
+   Do not invent those fields.
    CONTROL does not run this command. This repair atom
    does not point it at the live market corpus.
    Then run **PROMPT A** from the operator pack using

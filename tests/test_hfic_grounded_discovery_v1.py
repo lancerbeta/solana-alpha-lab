@@ -738,7 +738,7 @@ class OrdinaryOwnerPathTests(unittest.TestCase):
             )
             self.assertEqual(preflight.returncode, 0, preflight.stderr)
             receipt = json.loads(preflight.stdout)
-            self.assertEqual(receipt.get("evidence_surface_mode"), "ORDINARY_GROUNDED_DISCOVERY_V1")
+            self.assertNotIn("evidence_surface_mode", receipt)
             self.assertEqual(receipt.get("discovery_contract_version"), "FORGE_GROUNDED_DISCOVERY_V1")
             census, observations = _rows()
             census_path = workspace / "census.parquet"

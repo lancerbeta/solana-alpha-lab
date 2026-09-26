@@ -2956,10 +2956,8 @@ def run_preflight(
     else:
         from solana_alpha_lab.factory.hfic_grounded_discovery import (
             DISCOVERY_CONTRACT_VERSION,
-            ORDINARY_GROUNDED_DISCOVERY_V1,
         )
 
-        receipt_body["evidence_surface_mode"] = ORDINARY_GROUNDED_DISCOVERY_V1
         receipt_body["discovery_contract_version"] = DISCOVERY_CONTRACT_VERSION
     if model_provenance_sha256 is not None:
         receipt_body["model_provenance_sha256"] = model_provenance_sha256

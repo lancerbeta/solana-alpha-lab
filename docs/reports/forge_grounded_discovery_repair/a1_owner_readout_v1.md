@@ -19,9 +19,12 @@ stays missing. Empty cohorts stay in the table with a zero usable count.
 An explanatory rule later than the decision points is rejected. Overlapping
 collection windows are not independent replication. Mint overlap that was
 not measured is not reported as independent. The result carries
-`engine_emits_alpha=false`. Ordinary preflight stamps the discovery
-contract, and freeze reads that receipt. Zero candidates can freeze. One
-selected candidate does not need a fabricated runner-up. File hashes,
+`engine_emits_alpha=false`. Ordinary preflight carries
+`discovery_contract_version`. Freeze reads that receipt when the draft
+includes computed `grounded_evidence` or fewer than four candidates.
+`evidence_surface_mode` on the preflight receipt stays unset unless the run
+is explicit CONTROL. Zero candidates can freeze. One selected candidate
+does not need a fabricated runner-up. File hashes,
 cohort and release must match the binding. `holdout` must be explicit
 false. A later cell revision does not erase an earlier PIT observation.
 A different explanatory condition is not the same prior close. A predictive
