@@ -7083,6 +7083,21 @@
       "target_asset_id": "TEST-OWNER-AUTHORITY-PACKET-A2-001"
     },
     {
+      "source_asset_id": "EVIDENCE-PAPER-PLANE-WRITE-INTEGRITY-COMPLETION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PAPER-PLANE-WRITE-INTEGRITY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PAPER-PLANE-WRITE-INTEGRITY-FACTORY-FIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PAPER-PLANE-WRITE-INTEGRITY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PAPER-PLANE-WRITE-INTEGRITY-REVIEW-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PAPER-PLANE-WRITE-INTEGRITY-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-PMF-QUOTE-ATTEMPT-PREP-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-PMF-QUOTE-OWNER-FORK-ACCEPTANCE-001"

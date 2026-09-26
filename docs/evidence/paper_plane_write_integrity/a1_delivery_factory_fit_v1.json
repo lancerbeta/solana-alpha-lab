@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "PAPER-PLANE-WRITE-INTEGRITY-FACTORY-FIT-001",
+  "as_of": "2026-09-26",
+  "task_id": "PAPER_PLANE_WRITE_INTEGRITY_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_PAPER_SHADOW_WRITE_ATOMICITY_NOT_ALPHA",
+    "flexibility_and_history": "PASS_NO_SCHEMA_CHANGE_LEGACY_PATHS_KEEP_WORKING",
+    "context_efficiency": "PASS_ONE_STORE_NO_NEW_DEPENDENCY",
+    "research_truth": "PASS_ROW_ID_IS_INSERTION_ORDER_NOT_POST_VACUUM_CHRONOLOGY",
+    "owner_operability": "PASS_STALE_STATE_AND_READOUT_NAME_THE_RACE",
+    "execution_to_cashflow": "NOT_APPLICABLE_PAPER_SHADOW_NO_CASHFLOW",
+    "monitoring_and_recovery": "PASS_ROLLBACK_IS_GIT_REVERT_BUSY_TIMEOUT_UNCHANGED",
+    "build_vs_buy": "PASS_SQLITE_IMMEDIATE_NO_NEW_FRAMEWORK",
+    "security": "PASS_NO_SECRETS_NO_ABSOLUTE_PATHS_NO_SIGNER",
+    "red_team": "PASS_RACE_500_AND_CONFLICTING_FIRST_WINS"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1_AFTER_THIS_MERGE"
+  },
+  "recovery": "Revert the merge commit. The SQLite file format is unchanged.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_LIVE_TRADING",
+    "NO_SCHEMA_CHANGE",
+    "VACUUM_MAY_RENUMBER_ROWID",
+    "ADMISSION_AND_FILL_REMAIN_TWO_TRANSACTIONS",
+    "NO_A2_UNTIL_POST_MERGE_READBACK"
+  ]
+}
