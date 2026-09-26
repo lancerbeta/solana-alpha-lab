@@ -11,7 +11,7 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "298ae92c3fecb6c7a0ac8502fcbf603fba91c01605a671159c456ec6eee2e05a",
+    "catalog/assets/core.yaml": "e9ade5a9bfdc5f2c0647c3c1930eb155918f82fd92f890a4063a5fc9b8743b9f",
     "catalog/assets/lifecycle.yaml": "2346fc6b053af16aca72e9315c49263cdbda4ccbacd190508b39586098ad8a22",
     "catalog/catalog_manifest.yaml": "3af70416febf1d18ff0df8050d157a0a8f64503bb28461c5ca598114f4b80d95",
     "catalog/generated/asset_edges.json": "47c717d46c3062b2e55361b7d21ced117f1536891f66230208b661545d0ff3b3",
@@ -20,10 +20,10 @@
     "docs/contracts/risk_and_economics_v1.md": "b637d2438d88595c9d2789d8fa54637aaafdb698a2159ee1fe8ad2e44dced109",
     "docs/contracts/trading_operations_workbench_v2.md": "c8faf6a735cbcadf51473f026a3a61ac0c63144ce874db43ba8e59da5cf7087e",
     "docs/contracts/trading_runtime_policy_v1.md": "d81fc10b24afc0f6e093c44d4117d05e655b61bd4d19a02db207bd3fe661b326",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "718aa211ed729570814b48825295a4cc7b6feeb87d87364f890e6624c0f1aea5",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "e3bbf22e2d20bc1eb859e40ab55a89b79f1c3119e56e8b8c9c1c84f21b393cb9",
     "docs/reports/paper_shadow_entry_intent_integrity/a1_owner_readout_v1.md": "e2e72b3af2cb30c49e6126e683659ca69d968ff049a0b1bb2302264cee1b7d80",
     "docs/tasks/PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1.md": "3ef737383e8a7356694a69e79a098d521898f28ea0bd37d127b3f5775bf8eec5",
-    "src/solana_alpha_lab/factory/hfic_session.py": "c74c09affba480d3e768f0ac37446590c6d239db9c213a94e06b794f0b0fa54b",
+    "src/solana_alpha_lab/factory/hfic_session.py": "c61012dac813231556945d310a51ff1d617dd66e92919965857491e062aea933",
     "src/solana_alpha_lab/factory/paper_plane.py": "3be6c95265675db9ddc8b0c0915c1a59a8199c372ae6756e278f1e584b804968",
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "8ffb3d10cffa9b181e8b32aa0d23906dd8a606cfbb48332d3e821fb2ed463b49",
     "src/solana_alpha_lab/factory/paper_shadow_operations.py": "9649fa8fe6103787ac25af8ad7379ef816d9f85dca1cfbfa0e2ff0d1e2569e82",
@@ -40,14 +40,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/paper_shadow_entry_intent_integrity/a1_delivery_factory_fit_v1.json",
-    "sha256": "9460b76f00dd1fae58a9f14b5a35aab624bc582ea2e8f162eb3ffe692fc83064",
+    "sha256": "43410399e7761b687183d039a320937346da9a63f446ee97d871fec65c032c4a",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_ENTRY_INTENT_INTEGRITY_VERTICAL_AND_DOMAIN",
     "independent_review": {
       "path": "docs/evidence/paper_shadow_entry_intent_integrity/a1_delivery_independent_review_v1.json",
-      "sha256": "052af0722d4244e318d6d8e5ac3cc76ac80887c66efa4cf287973c6e11783e3c",
+      "sha256": "b5dab773ae3cf81fcd18b50f6ec7c0a8192357b038b633896f655ed8b4515f65",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
