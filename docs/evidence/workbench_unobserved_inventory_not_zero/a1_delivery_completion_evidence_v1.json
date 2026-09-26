@@ -5,7 +5,7 @@
   "as_of": "2026-09-26",
   "task_id": "WORKBENCH_UNOBSERVED_INVENTORY_NOT_ZERO_V1",
   "state_change": "WORKBENCH_UNOBSERVED_INVENTORY_NOT_ZERO_PASS",
-  "base_main": "ac5b761e4746cebc81b416a843a8a23080d71649",
+  "base_main": "0e0b4793b1f511c589d51bb53c5bb2ea7c048faa",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,

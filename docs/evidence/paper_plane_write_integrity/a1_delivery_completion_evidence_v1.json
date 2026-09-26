@@ -1,0 +1,69 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "PAPER-PLANE-WRITE-INTEGRITY-COMPLETION-001",
+  "as_of": "2026-09-26",
+  "task_id": "PAPER_PLANE_WRITE_INTEGRITY_V1",
+  "state_change": "PAPER_PLANE_STATE_WRITES_ARE_ATOMIC_WITH_CAUSAL_EVENTS",
+  "base_main": "ac5b761e4746cebc81b416a843a8a23080d71649",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "91c5cea6a9f3ed4db5dee180d6234a83d2591057bd760d7eb782dd867e6cfe21",
+    "catalog/assets/lifecycle.yaml": "f163eb0c06c942b497243b52affeb22bbf203a70df5b24ee9547d983b601ad77",
+    "catalog/catalog_manifest.yaml": "59b6582769f4eb915edd9478b1d49421ab8ad609133b45c83567d7dfd2784ede",
+    "catalog/generated/asset_edges.json": "9bc86788487551e6b114b686b71bf2d4c5fc6ea4e9199e4e94162ecb6834409a",
+    "configs/execution_domain_v1.json": "3ec51dbeeed53532123f0019724a11e6865cbb3c95bdb19cde84dead27d33311",
+    "docs/PROJECT_MAP.md": "cd8fec497496f92039618923ca5ee635393c0bbb1e1e57ba7b4fdcec96eb91ef",
+    "docs/architecture/PAPER_SHADOW_EXECUTION_INTEGRITY_PRD_SSD_V1.md": "0c512cecb044c492864513f17d1309436539dfae7410cf163c30d63c085acb29",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "ed94ad556eefe8af7fd758b837adacd5d78f3190a9d1700686a69bf28ab2a56b",
+    "docs/reports/paper_plane_write_integrity/a1_owner_readout_v1.md": "4f12af6db18d229303e276df1e642ca082c07a910cc7109af59d4b9ac630f2c0",
+    "docs/tasks/PAPER_PLANE_WRITE_INTEGRITY_V1.md": "e0d2a142ed9a21c7b1bb3267568203f2ba17c88cf94bce12e5aa5fe05d97a5be",
+    "src/solana_alpha_lab/factory/paper_plane.py": "cd6bc3c843f285b39d1973871e576158d7cd69edc0e1310adb2048c919b8e844",
+    "src/solana_alpha_lab/factory/paper_shadow_commands.py": "f99b44adb7304f27ec8a60548370711c6588c89197b41969f9fbfb297add0ef7",
+    "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "0ab3db54cb64f2df8eea8896e03120c9f9032537d8eef6a7f07220cd921f789e"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/paper_plane_write_integrity/a1_delivery_factory_fit_v1.json",
+    "sha256": "10ca624ade69e4ed9c98768391fabd17bf4e9cba8350a0a1aae6e6b094ca3ef9",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_PAPER_PLANE_WRITE_INTEGRITY_VERTICAL_AND_DOMAIN",
+    "independent_review": {
+      "path": "docs/evidence/paper_plane_write_integrity/a1_delivery_independent_review_v1.json",
+      "sha256": "036872bb0b5f40743bed8d1a41f5670a4cf8f0ad756069566fa070634319cade",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_VERTICAL_MODULE",
+      "PASS_STOCHASTIC_500",
+      "PASS_EXECUTION_DOMAIN_MODULES",
+      "PASS_ACCOUNTING_FIXTURE_PROJECTION_ORDER"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE_TRADING",
+    "NO_SCHEMA_CHANGE",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "network_calls": 0,
+    "local_writes": 0,
+    "external_actions": 0
+  }
+}

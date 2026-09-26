@@ -60,7 +60,7 @@ def apply_operator_command(
     store: PaperPlaneStore,
     command: Mapping[str, Any],
 ) -> dict[str, Any]:
-    """Apply one idempotent operator command.
+    """Apply one idempotent operator command atomically with its record.
 
     Required keys: command_type, idempotency_key
     Optional: bot_instance_id, position_id, expected_open_position_set_sha256
@@ -70,7 +70,16 @@ def apply_operator_command(
     idempotency_key = str(command["idempotency_key"])
     if not idempotency_key:
         raise PaperPlaneError("COMMAND_IDEMPOTENCY_KEY_REQUIRED")
+    with store.immediate_write():
+        return _apply_operator_command_locked(store, command, command_type, idempotency_key)
 
+
+def _apply_operator_command_locked(
+    store: PaperPlaneStore,
+    command: Mapping[str, Any],
+    command_type: str,
+    idempotency_key: str,
+) -> dict[str, Any]:
     existing = store.get_operator_command(idempotency_key)
     if existing is not None:
         payload = json.loads(existing["result_json"])
@@ -230,13 +239,14 @@ def apply_operator_command(
 
 
 def maybe_finish_drain(store: PaperPlaneStore, bot_instance_id: str) -> dict[str, Any]:
-    bot = store.get_bot(bot_instance_id)
-    if bot is None:
-        raise PaperPlaneError("BOT_NOT_FOUND")
-    if str(bot.get("status")) != "DRAINING":
-        return {"bot_status": bot.get("status"), "changed": False}
-    inventory = _drain_remaining_ids(store, bot_instance_id)
-    if inventory:
-        return {"bot_status": "DRAINING", "changed": False, "remaining_inventory": inventory}
-    store.set_bot_status(bot_instance_id, "STOPPED", stopped_at=_now())
-    return {"bot_status": "STOPPED", "changed": True, "remaining_inventory": []}
+    with store.immediate_write():
+        bot = store.get_bot(bot_instance_id)
+        if bot is None:
+            raise PaperPlaneError("BOT_NOT_FOUND")
+        if str(bot.get("status")) != "DRAINING":
+            return {"bot_status": bot.get("status"), "changed": False}
+        inventory = _drain_remaining_ids(store, bot_instance_id)
+        if inventory:
+            return {"bot_status": "DRAINING", "changed": False, "remaining_inventory": inventory}
+        store.set_bot_status(bot_instance_id, "STOPPED", stopped_at=_now())
+        return {"bot_status": "STOPPED", "changed": True, "remaining_inventory": []}

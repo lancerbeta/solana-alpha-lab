@@ -29606,7 +29606,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
-  integrity: {kind: sha256, sha256: bd2bcb50d0c75d78a9c594f6b837fd96a37863757842e6dada1a15bd652c21c2}
+  integrity: {kind: sha256, sha256: cd6bc3c843f285b39d1973871e576158d7cd69edc0e1310adb2048c919b8e844}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
@@ -34843,7 +34843,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_shadow_commands.py', repository_path: src/solana_alpha_lab/factory/paper_shadow_commands.py}
-  integrity: {kind: sha256, sha256: dec61a05973d7bd9ccc6da90c06bc6d6a2d84d0ba2afe501a5b1379eff01acaa}
+  integrity: {kind: sha256, sha256: f99b44adb7304f27ec8a60548370711c6588c89197b41969f9fbfb297add0ef7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001}
@@ -34890,6 +34890,114 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [PAPER_SHADOW, ACCOUNTING, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for atomic PaperPlane writes, conditional state updates and causal execution-event order.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/PAPER_PLANE_WRITE_INTEGRITY_V1.md', repository_path: docs/tasks/PAPER_PLANE_WRITE_INTEGRITY_V1.md}
+  integrity: {kind: sha256, sha256: e0d2a142ed9a21c7b1bb3267568203f2ba17c88cf94bce12e5aa5fe05d97a5be}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: DOC-PAPER-SHADOW-EXECUTION-INTEGRITY-PRD-SSD-001}
+  - {relation_type: contains, target_asset_id: TEST-PAPER-SHADOW-EXECUTION-INTEGRITY-VERTICAL-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-COMMANDS-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PAPER_PLANE, WRITE_INTEGRITY, STALE_STATE, CAUSAL_ORDER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-PAPER-SHADOW-EXECUTION-INTEGRITY-PRD-SSD-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Series design for PAPER/SHADOW execution integrity from accepted hypothesis to closed position.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/architecture/PAPER_SHADOW_EXECUTION_INTEGRITY_PRD_SSD_V1.md', repository_path: docs/architecture/PAPER_SHADOW_EXECUTION_INTEGRITY_PRD_SSD_V1.md}
+  integrity: {kind: sha256, sha256: 0c512cecb044c492864513f17d1309436539dfae7410cf163c30d63c085acb29}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PAPER_SHADOW, EXECUTION_INTEGRITY, SERIES_DESIGN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-PAPER-SHADOW-EXECUTION-INTEGRITY-VERTICAL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Vertical acceptance for the PAPER/SHADOW execution integrity series. Atom 1 covers write atomicity and causal order.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_paper_shadow_execution_integrity_vertical_v1.py', repository_path: tests/test_paper_shadow_execution_integrity_vertical_v1.py}
+  integrity: {kind: sha256, sha256: 0ab3db54cb64f2df8eea8896e03120c9f9032537d8eef6a7f07220cd921f789e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-COMMANDS-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PAPER_SHADOW, EXECUTION_INTEGRITY, VERTICAL_TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-PAPER-PLANE-WRITE-INTEGRITY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Completion evidence for atomic PaperPlane writes and causal execution-event order.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/paper_plane_write_integrity/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/paper_plane_write_integrity/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PAPER_PLANE, WRITE_INTEGRITY, COMPLETION_EVIDENCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-PAPER-PLANE-WRITE-INTEGRITY-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Independent review evidence for the PaperPlane write-integrity atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/paper_plane_write_integrity/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/paper_plane_write_integrity/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PAPER_PLANE, WRITE_INTEGRITY, INDEPENDENT_REVIEW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-PAPER-PLANE-WRITE-INTEGRITY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Factory-fit review for the PaperPlane write-integrity atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/paper_plane_write_integrity/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/paper_plane_write_integrity/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PAPER_PLANE, WRITE_INTEGRITY, FACTORY_FIT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 
 - asset_id: CTRL-OWNER-OPERATIONS-COCKPIT-001
