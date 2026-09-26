@@ -26,10 +26,7 @@
     "tests/test_hfic_prefreeze_draft_recovery_v1.py": "386b14af69f6647c390106b47882a3262f9699f8a3e31d5c24237ca526b688a6",
     "tests/test_research_store.py": "da4d5c8906c93713b28a83c089ab5f412a194aff3e58e825b3f0a60107a6d7d1"
   },
-  "active_stop_conditions": [
-    "REAL_RDP_WRITE",
-    "MERGE_WITHOUT_OWNER_PHRASE"
-  ],
+  "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
     "material_owner_decision": false,
