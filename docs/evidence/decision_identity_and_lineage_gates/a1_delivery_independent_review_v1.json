@@ -13,28 +13,49 @@
   ],
   "reviews": [
     {
-      "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_ISOLATED_CRITIC"
+        "CLOCK_REQUIRED_ON_ACCEPT",
+        "FP_SORT_KEYS_LIST_ORDER",
+        "LEGACY_NULL_SKIP_ENTER",
+        "SHADOW_TICK_SPEC_DRIFT_MATCH",
+        "AS_OF_NONE_FAILS_LOUD",
+        "AS_OF_EQ_DECISION_AT_VACUOUS",
+        "BOUNDARIES_ADDITIVE_OK"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "WRITE_SET_OK",
+        "HFIC_ABSENT",
+        "G1_CLOCK_OK",
+        "G2_IDENTITY_OK",
+        "G3_SPEC_DRIFT_OK",
+        "G4_EXIT_VERSION_OK",
+        "G5_LINEAGE_OK",
+        "G6_ASOF_ONLY_OK",
+        "EPOCH_EXPECT_NOT_WEAKENING",
+        "NO_PROD_ASOF_OMISSION",
+        "ZERO_SKIP_DELETE",
+        "REVIEW_PLAN_OK"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_ISOLATED_CRITIC"
-      ]
-    },
-    {
-      "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
-      "findings": [
-        "AWAITING_ISOLATED_CRITIC"
+        "PASS_DOD_1_IDENTITY_CLASSES",
+        "PASS_DOD_2_AUDIT_CODES_AND_REPLAY",
+        "PASS_DOD_3_LINEAGE_AND_EXIT_STAGE",
+        "PASS_DOD_4_SPEC_DRIFT_AND_NULL_BACKFILL",
+        "PASS_DOD_5_ASOF_ONLY_NO_WEAKENING"
       ]
     }
   ],
-  "verdict": "PENDING",
+  "verdict": "PASS",
   "non_claims": [
     "NO_ALPHA",
     "NO_LIVE_TRADING",
