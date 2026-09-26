@@ -245,6 +245,7 @@ def build_forge_input_receipt(
     imported_cohort_id: str | None = None,
     evidence_surface_mode: str | None = None,
     owner_focus: str = "AUTO",
+    live_corpus_current_only: bool = False,
 ) -> dict[str, Any]:
     """Build the canonical Forge input/visibility receipt. No writes."""
 
@@ -296,7 +297,15 @@ def build_forge_input_receipt(
         if owner_class == OWNER_CLASS_READY:
             owner_class = OWNER_CLASS_INPUT_NOT_READY
 
-    datasets, _warnings = enumerate_rdp_datasets(Path(data_root))
+    if live_corpus_current_only:
+        datasets, _warnings = enumerate_rdp_datasets(
+            Path(data_root),
+            live_corpus_current_only=True,
+        )
+    else:
+        # Default callers, including fixtures that mock the historical
+        # one-argument enumerate, must keep that signature.
+        datasets, _warnings = enumerate_rdp_datasets(Path(data_root))
     selected, trunc = select_forge_packet_datasets(datasets)
     current_datasets = list(select_current_datasets_for_forge(datasets))
     live_in_packet = bool(trunc.get("live_corpus_in_packet"))

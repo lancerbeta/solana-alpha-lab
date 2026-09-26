@@ -82,7 +82,7 @@ def _live_dataset(mid: str = "MID-CURRENT") -> dict[str, object]:
     }
 
 
-def _enumerate_live(_data_root: Path):
+def _enumerate_live(_data_root: Path, **_kwargs: object):
     return [_live_dataset()], []
 
 

@@ -96,6 +96,7 @@ _EXTRACTION_COUNTERS = {
     "research_event_partitions_skipped_by_time": 0,
     "research_event_partitions_opened_unknown_bounds": 0,
     "research_event_lifecycle_partitions_total": 0,
+    "observation_partition_index_files_read": 0,
 }
 
 
