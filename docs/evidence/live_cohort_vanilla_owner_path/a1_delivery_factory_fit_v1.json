@@ -12,10 +12,10 @@
     "mission": "PASS_ONE_OWNER_PATH_TO_FORGE_CONTROL_READY",
     "flexibility_and_history": "PASS_ROLLOVER_SAFE_RESOLUTION_AND_FROZEN_CLOSURE",
     "context_efficiency": "PASS_NO_NEW_DAEMON_DB_SERVICE_OR_FRAMEWORK",
-    "research_truth": "PASS_MARKET_EPOCH_UNCHANGED_AND_C200_CURRENT_VIEW",
+    "research_truth": "PASS_MARKET_EPOCH_UNCHANGED_SIZE_MATCH_IS_NOT_A_HASH_PROOF",
     "owner_operability": "PASS_ONE_COMMAND_WITHOUT_PREBUILT_RESOLUTION",
     "execution_to_cashflow": "NOT_APPLICABLE_STOPS_AT_FORGE_CONTROL_READY",
-    "monitoring_and_recovery": "PASS_MIRROR_FAIL_CLOSED_AND_SIZE_DRIFT_REJECTED",
+    "monitoring_and_recovery": "PASS_MIRROR_CONFLICT_ABORTS_AND_SIZE_DRIFT_REJECTED",
     "build_vs_buy": "PASS_REUSE_EXISTING_CAPTURE_AND_LOCAL_BUILD",
     "red_team": "PASS_VPS_CAPTURE_CANNOT_REACH_REAL_MATERIALIZATION",
     "security": "PASS_NO_PROVIDER_NO_CREDENTIALS_NO_WALLET_NO_DEPLOY"
@@ -29,6 +29,7 @@
     "NO_DEPLOY",
     "NO_NEW_COHORT_MACHINERY",
     "NO_FURTHER_COHORT_MACHINERY_WITHOUT_NEW_MATERIAL_EVIDENCE",
+    "SAME_SIZE_PARQUET_FLIP_IS_NOT_DETECTED",
     "NO_CANONICAL_DONE"
   ],
   "recovery": "Revert cursor/live-cohort-vanilla-owner-path-v1. No runtime reconciliation and no deploy rollback."

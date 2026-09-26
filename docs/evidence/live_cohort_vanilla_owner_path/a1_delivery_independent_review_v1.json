@@ -17,21 +17,21 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Ordinary unpack parses with only --data-root. Capture freezes and lists dependencies. Local consume builds, seals, and imports. A recorded size mismatch fails closed as CORPUS_PARQUET_SHA_MISMATCH. Current corpus partitions open by validation receipt id."
+        "Ordinary unpack parses with only --data-root. Capture freezes and lists dependencies. Local consume builds, seals, and imports. A mirror byte conflict aborts before transfer. A recorded size mismatch fails closed. Matching size skips rehash and is not a content hash proof. Current corpus partitions open by validation receipt id."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "The stale-mirror vertical reaches FORGE_CONTROL_READY. C200 forge_control_ready keeps the market epoch and hashes zero superseded corpus parquet. The path stops before /hypothesis-forge."
+        "The stale-mirror vertical reaches FORGE_CONTROL_READY. The owner path raises MIRROR_CONFLICT before transfer. C200 forge_control_ready keeps the market epoch and hashes zero superseded corpus parquet. The path stops before /hypothesis-forge."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Capture and the SSH owner script do not call build_live_observation_source_from_rdp. Historical cohort rows bind through the current validation receipt. No new transport service or framework."
+        "Capture and the SSH owner script do not call build_live_observation_source_from_rdp. Historical cohort rows bind through the current validation receipt composition, not a per-cohort parquet rehash. No new transport service or framework."
       ]
     },
     {

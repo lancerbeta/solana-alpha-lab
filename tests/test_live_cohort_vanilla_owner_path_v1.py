@@ -271,6 +271,32 @@ class VanillaOwnerPathTests(unittest.TestCase):
             classified = classify_mirror(manifest, mirror)
             self.assertEqual(classified["conflicts"], 1)
             self.assertEqual(classified["status"], "CONFLICT")
+            from solana_alpha_lab.factory.live_cohort_vanilla_path import (
+                run_owner_live_cohort,
+            )
+
+            transferred: list[str] = []
+
+            def _capture() -> dict:
+                return {
+                    "activations": [],
+                    "closure_receipt": {},
+                    "cohort_id": "REL-CONFLICT",
+                    "rollovers": [],
+                    "transfer_manifest": manifest,
+                }
+
+            with self.assertRaises(LiveCohortReleaseError) as raised:
+                run_owner_live_cohort(
+                    capture=_capture,
+                    transfer=lambda _manifest, missing: transferred.extend(missing),
+                    mirror_root=mirror,
+                    data_root=mirror / "data",
+                    repo_root=ROOT,
+                    as_of=datetime(2026, 9, 26, tzinfo=UTC),
+                )
+            self.assertEqual(str(raised.exception), "MIRROR_CONFLICT")
+            self.assertEqual(transferred, [])
 
     def test_ordinary_append_does_not_rehash_historical_parquet(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
