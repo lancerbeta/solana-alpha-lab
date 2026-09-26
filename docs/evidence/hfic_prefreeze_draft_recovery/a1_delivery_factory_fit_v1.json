@@ -4,8 +4,8 @@
   "review_id": "HFIC-PREFREEZE-DRAFT-RECOVERY-FACTORY-FIT-001",
   "as_of": "2026-09-26",
   "task_id": "HFIC_PREFREEZE_DRAFT_RECOVERY_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "fbc6bef2f216a004cca762d8bc57f1549cf01e119a768dc7bc16c45a2feb3b34",
+  "reviewed_inventory_sha256": "dd8bc41871b48b1f45bf5bd888145ec7b5236cb4c595cb464859c2f1e102d921",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {

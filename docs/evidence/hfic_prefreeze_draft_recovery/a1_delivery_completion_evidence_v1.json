@@ -4,15 +4,26 @@
   "acceptance_id": "HFIC-PREFREEZE-DRAFT-RECOVERY-ACCEPTANCE-001",
   "as_of": "2026-09-26",
   "task_id": "HFIC_PREFREEZE_DRAFT_RECOVERY_V1",
-  "state_change": "PREFREEZE_DRAFT_RECOVERY_READY_FOR_REVIEW",
+  "state_change": "PREFREEZE_DRAFT_RECOVERY_BOUND",
   "base_main": "72c9dc9827f633d891675e00125699e17f98918d",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "research_store.py": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "d1c335d7cef3d06d929bf72876e6e9401b1e9bd329429126c315fba9610aa556",
+    "docs/evidence/hfic_prefreeze_draft_recovery/a1_real_slot_readonly_proof_v1.json": "115e1af99a17646ccb69d354bbbf655216ca951c0bc4cc875607b812448e275d",
+    "docs/reports/hfic_prefreeze_draft_recovery/a1_owner_readout_v1.md": "9a052552329cbfc026851a4eb6b13045d88f2bd263194e10dfb9a9938d4a464f",
+    "docs/tasks/HFIC_PREFREEZE_DRAFT_RECOVERY_V1.md": "0ebac0a882cd503d1a4d1d44fe187a58ddb1fde32ad5b089d2793868a2289663",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "54b85daa9c9878d38638bc587df24d2b72ee842b6c957ec0e2c41ae7dd07b5c7",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "75f4a4e36b2471d77af739489429828629a538f4c791ddc6b76d2049ed330143",
+    "src/solana_alpha_lab/factory/hfic_session.py": "2a9e889257c6835dec2797b40d199fe85b8d76f204a04221051c66895efcef36",
+    "src/solana_alpha_lab/factory/research_store.py": "eb5680928a1c72ed8ef2103192aae66c7ace46c4b9d3b1950dc7d63635e72faa",
+    "tests/test_hfic_prefreeze_draft_recovery_v1.py": "386b14af69f6647c390106b47882a3262f9699f8a3e31d5c24237ca526b688a6",
+    "tests/test_research_store.py": "da4d5c8906c93713b28a83c089ab5f412a194aff3e58e825b3f0a60107a6d7d1"
   },
   "active_stop_conditions": [
     "REAL_RDP_WRITE",
@@ -27,19 +38,21 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_prefreeze_draft_recovery/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "c026fd4c26d7e971587207c891c58a525b25ce72cc540e89e8a964d26d9598b4",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PREFREEZE_RECOVERY_TESTS",
     "independent_review": {
       "path": "docs/evidence/hfic_prefreeze_draft_recovery/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "verdict": "PENDING"
+      "sha256": "9eb953efa8cb9fbd814cb5c5ce775a6554d453eef7640752036923a5dc6e4037",
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
-    "project_checks": ["PASS_DELIVERY_HARNESS_CHECK"]
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK"
+    ]
   },
   "non_claims": [
     "THIS_REPAIR_DOES_NOT_CREATE_A_NEW_SCIENTIFIC_LOOK",
