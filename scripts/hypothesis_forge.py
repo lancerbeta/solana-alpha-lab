@@ -669,6 +669,77 @@ def cmd_forge_run(
     ))
 
 
+def cmd_discovery_execute(
+    repo_root: Path,
+    *,
+    store_root: Path,
+    census_path: Path,
+    observations_path: Path,
+    binding_path: Path,
+    spec_path: Path,
+    journal_scope: str,
+    candidate_scope_path: Path,
+) -> int:
+    """Compute one ordinary discovery query into a caller-selected store.
+
+    Does not default to the live ResearchStore and does not reserve a slot.
+    """
+
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        admit_discovery_binding,
+        load_parquet_rows,
+        run_recorded_discovery_query,
+    )
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    git_before = repository_git_snapshot(repo_root)
+    try:
+        binding_doc = json.loads(binding_path.read_text(encoding="utf-8"))
+        spec = json.loads(spec_path.read_text(encoding="utf-8"))
+        candidate_scope = json.loads(candidate_scope_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return emit_error("DISCOVERY_INPUT_INVALID")
+    if not isinstance(binding_doc, dict) or not isinstance(spec, dict):
+        return emit_error("DISCOVERY_INPUT_INVALID")
+    cohorts = binding_doc.get("cohorts")
+    if not isinstance(cohorts, list) or not isinstance(candidate_scope, dict):
+        return emit_error("DISCOVERY_INPUT_INVALID")
+    if any(not isinstance(item, dict) or "holdout" not in item for item in cohorts):
+        return emit_error("HOLDOUT_UNRESOLVED")
+    try:
+        admit_discovery_binding(cohorts)
+    except GroundedDiscoveryError as exc:
+        return emit_error(exc.code)
+    try:
+        census = load_parquet_rows(census_path)
+        observations = load_parquet_rows(observations_path)
+    except (OSError, ValueError):
+        return emit_error("DISCOVERY_ROWS_UNREADABLE")
+    store = ResearchStore(store_root)
+    try:
+        evidence = run_recorded_discovery_query(
+            store,
+            census=census,
+            observations=observations,
+            spec=spec,
+            binding=cohorts,
+            journal_scope=journal_scope,
+            candidate_scope=candidate_scope,
+            priors=binding_doc.get("priors") or [],
+            git_sha=git_before.head_sha,
+        )
+    except GroundedDiscoveryError as exc:
+        return emit_error(exc.code)
+    git_after = repository_git_snapshot(repo_root)
+    if git_before.head_sha != git_after.head_sha:
+        return emit_error("GIT_MUTATION_FORBIDDEN")
+    evidence["scientific_writes"] = 0
+    evidence["live_store_selected"] = False
+    _assert_no_path_leak(evidence, str(store_root), str(repo_root))
+    return emit(evidence)
+
+
 def cmd_discovery_coverage(repo_root: Path, explicit_data_root: Path | None) -> int:
     """State-only joint coverage. Writes nothing and does not reserve a slot."""
 
@@ -1681,6 +1752,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="No-write state-only joint coverage. Never selects typed_value.",
     )
     discovery_coverage.add_argument("--format", choices=("json",), default="json")
+    discovery_execute = subparsers.add_parser(
+        "discovery-execute",
+        help=(
+            "Compute one BASE_X price/liquidity query from census and observation "
+            "rows into an explicit store. Does not select the live store."
+        ),
+    )
+    discovery_execute.add_argument("--store", type=Path, required=True)
+    discovery_execute.add_argument("--census", type=Path, required=True)
+    discovery_execute.add_argument("--observations", type=Path, required=True)
+    discovery_execute.add_argument("--binding", type=Path, required=True)
+    discovery_execute.add_argument("--spec", type=Path, required=True)
+    discovery_execute.add_argument("--candidate-scope", type=Path, required=True)
+    discovery_execute.add_argument("--journal-scope", required=True)
+    discovery_execute.add_argument("--format", choices=("json",), default="json")
 
     persist_draft = subparsers.add_parser(
         "persist-draft",
@@ -1924,6 +2010,17 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.command == "discovery-coverage":
             return cmd_discovery_coverage(repo_root, args.data_root)
+        if args.command == "discovery-execute":
+            return cmd_discovery_execute(
+                repo_root,
+                store_root=args.store,
+                census_path=args.census,
+                observations_path=args.observations,
+                binding_path=args.binding,
+                spec_path=args.spec,
+                journal_scope=str(args.journal_scope),
+                candidate_scope_path=args.candidate_scope,
+            )
         if args.command == "persist-draft":
             return cmd_persist_draft(
                 repo_root,

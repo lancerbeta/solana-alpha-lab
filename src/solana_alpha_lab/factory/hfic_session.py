@@ -1411,6 +1411,57 @@ def _assert_vision_integrity_for_surface(
         raise HficSessionError("FORGE_VISION_INTEGRITY_BLOCKED")
 
 
+def _ordinary_discovery_requested(
+    draft: Mapping[str, Any],
+    preflight_receipt: Mapping[str, Any] | None,
+) -> bool:
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        DISCOVERY_CONTRACT_VERSION,
+        ORDINARY_GROUNDED_DISCOVERY_V1,
+    )
+
+    surface = ""
+    if isinstance(preflight_receipt, Mapping):
+        surface = str(preflight_receipt.get("evidence_surface_mode") or "")
+    return (
+        str(draft.get("discovery_contract_version") or "") == DISCOVERY_CONTRACT_VERSION
+        or surface == ORDINARY_GROUNDED_DISCOVERY_V1
+    )
+
+
+def _enforce_ordinary_grounded_evidence(
+    draft: Mapping[str, Any],
+    *,
+    preflight_receipt: Mapping[str, Any] | None,
+    store: Any,
+) -> None:
+    if not _ordinary_discovery_requested(draft, preflight_receipt):
+        return
+    evidence = draft.get("grounded_evidence")
+    if not isinstance(evidence, Mapping):
+        raise HficSessionError("GROUNDED_EVIDENCE_REQUIRED")
+    if store is None:
+        raise HficSessionError("GROUNDED_STORE_REQUIRED")
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        assert_computed_grounded_evidence,
+    )
+
+    try:
+        assert_computed_grounded_evidence(store, evidence)
+    except GroundedDiscoveryError as exc:
+        raise HficSessionError(exc.code) from exc
+
+
+def _no_worthy_grounded_evidence(draft: Mapping[str, Any]) -> dict[str, Any] | None:
+    evidence = draft.get("grounded_evidence")
+    if not isinstance(evidence, Mapping):
+        return None
+    from solana_alpha_lab.factory.hfic_grounded_discovery import no_worthy_scope_record
+
+    return no_worthy_scope_record(evidence)
+
+
 def freeze_draft(
     draft: Mapping[str, Any],
     *,
@@ -1437,6 +1488,11 @@ def freeze_draft(
     except HficIdentityError as exc:
         raise HficSessionError(str(exc)) from exc
 
+    _enforce_ordinary_grounded_evidence(
+        draft,
+        preflight_receipt=preflight_receipt,
+        store=store,
+    )
     grounded_candidates: list[dict[str, Any]] | None = None
     if packet_version == "1.2":
         if repo_root is None:
@@ -2036,6 +2092,7 @@ def _freeze_no_worthy(
         "critic_input_packet_sha256": None,
         "critic_launched": False,
         "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+        "grounded_evidence": _no_worthy_grounded_evidence(draft),
         "next": "STOP",
         "next_action": None,
         "next_action_status": None,

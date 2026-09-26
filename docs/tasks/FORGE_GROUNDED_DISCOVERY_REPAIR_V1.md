@@ -24,12 +24,12 @@ git_binding:
   dirty_mode: ALLOW_REPORTED
 
 objective: >-
-  Restore ordinary /hypothesis-forge as ORDINARY_GROUNDED_DISCOVERY_V1 so a
-  fresh focus is not silently rewritten to CONTROL, and give that route a
-  state-only discovery contract for pooled and cohort views on BASE_X
-  price/liquidity. Do not run market Prompt A, Critic, or an experiment.
-  Do not free the occupied AUTO slot. CONTROL remains explicit and
-  trajectory-blind. NORMALIZED_TRAJECTORY_V1 triggers stay unchanged.
+  Restore ordinary /hypothesis-forge so a fresh focus is not silently rewritten
+  to CONTROL, and so that route computes BASE_X price/liquidity evidence from
+  production-shaped rows, records look provenance, and carries those refs
+  through freeze. Predictive sketches do not require an actor story. Do not
+  run market Prompt A, market Critic, or an experiment. Do not free the
+  occupied AUTO slot. CONTROL remains explicit. V1 triggers stay unchanged.
 
 managed_write_set:
   - docs/tasks/FORGE_GROUNDED_DISCOVERY_REPAIR_V1.md
@@ -117,25 +117,28 @@ authority. `FORGE_DISCOVERY_SURFACE_AUDIT_V1` is a hint, not this receipt.
   numeric discovery on C1–C3 without being rewritten into CONTROL.
 - **Named consumer:** a later authorized ordinary `/hypothesis-forge` with
   focus `COHORT_STRATIFIED_LIFECYCLE_PATHS`.
-- **Cheapest falsifier:** synthetic query fixtures plus one no-write
-  state-only coverage read of the local corpus.
+- **Cheapest falsifier:** one public `discovery-execute` path on synthetic
+  census and observation rows, plus prior-scope regression cases.
 - **Non-goals:** market Prompt A, market Critic, experiment, provider calls,
-  holdout reads, live RDP writes, freeing AUTO, changing V1 trigger terminals.
-- **Evidence budget:** unit/integration fixtures and metadata-only coverage.
-  `SCIENTIFIC_WRITES=0`.
+  holdout reads, live RDP writes, freeing AUTO, changing V1 trigger terminals,
+  spending a live focus slot.
+- **Evidence budget:** synthetic rows and a temporary ResearchStore.
+  `SCIENTIFIC_WRITES=0` on the live store. `LIVE_FOCUS_SLOT_SPENT=0`.
 
 ## Decision capsule
 
-- **DECISION_DELTA:** fresh ordinary `forge-run` returns
-  `ORDINARY_DISCOVERY_READY` / `ORDINARY_GROUNDED_DISCOVERY_V1`.
-  `CONTROL_SURFACE_REQUIRED` stays explicit-control-only. Discovery queries
-  are BASE_X price/liquidity, pooled and by cohort, with a finite look budget.
-- **UNCERTAINTY_REMOVED:** both the X300 price/liquidity baseline and the
-  price/liquidity prefix through Y1800 have joint state support on the current
-  corpus. Traders-complete prefixes stay out of the first scope. The two
-  CONTROL hard-closes do not match that question.
-- **CAPABILITY_OR_EVIDENCE:** routing change, `hfic_grounded_discovery`,
-  no-write `discovery-coverage`, synthetic E2E tests, coverage receipt.
+- **DECISION_DELTA:** ordinary Forge computes BASE_X price/liquidity from
+  production-shaped rows, records the look, and freeze rejects unbound or
+  tampered evidence. CONTROL stays explicit. A question-id rename does not
+  lift a valid close. A richer ordinary surface is not closed by a CONTROL
+  negative. Predictive sketches are 0–6 and do not require an actor story.
+- **UNCERTAINTY_REMOVED:** the synthetic path shows a hidden conditional
+  split, temporal blocks, empty strata, leakage, missingness, and an
+  ineligible mint kept out of the denominator. The two published CONTROL
+  closes stay scoped to their own targets.
+- **CAPABILITY_OR_EVIDENCE:** `discovery-execute`, durable
+  `DISCOVERY_QUERY_LOOK` artifacts, freeze binding check, prior relation,
+  aligned Producer/Critic instructions.
 - **STOP:** merge phrase. No market discovery in this atom.
 - **NEXT:** after merge, one ordinary slash with
   `OWNER_FOCUS=COHORT_STRATIFIED_LIFECYCLE_PATHS`.

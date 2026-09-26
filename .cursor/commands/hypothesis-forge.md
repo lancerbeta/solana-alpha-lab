@@ -135,6 +135,12 @@ No-write state-only joint coverage. It does not select `typed_value` and does no
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-coverage --format json
 ```
 
+Ordinary numeric recipe. `--store` is explicit and is not the live store unless the owner points it there. Role and holdout come from `--binding`. CONTROL does not use this command:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <scope> --format json
+```
+
 ## Representation mode boundary
 
 The normal slash remains one bounded run. A fresh ordinary focus reports

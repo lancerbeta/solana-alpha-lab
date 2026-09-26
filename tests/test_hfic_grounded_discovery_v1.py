@@ -2,9 +2,16 @@
 
 from __future__ import annotations
 
+import json
+import subprocess
 import sys
+import tempfile
 import unittest
+from datetime import UTC, datetime
 from pathlib import Path
+
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 SRC = Path(__file__).resolve().parents[1] / "src"
 if str(SRC) not in sys.path:
@@ -14,14 +21,24 @@ from solana_alpha_lab.factory.hfic_control_integrity import (  # noqa: E402
     CURRENT_REPRESENTATION_CONTROL_V1,
 )
 from solana_alpha_lab.factory.hfic_grounded_discovery import (  # noqa: E402
+    CALCULATION_VERSION,
+    ORDINARY_GROUNDED_DISCOVERY_V1,
     GroundedDiscoveryError,
     admit_discovery_binding,
     bind_prior_scope_evidence,
     classify_query_look,
+    execute_discovery_from_rows,
+    format_discovery_readout,
     prior_scope_relation,
+    run_recorded_discovery_query,
     summarize_discovery_query,
     validate_query_spec,
 )
+from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
+    HficSessionError,
+    freeze_draft,
+)
+from solana_alpha_lab.factory.research_store import ResearchStore  # noqa: E402
 
 PRICE = "FIELD-USD-PRICE-001"
 LIQ = "FIELD-LIQUIDITY-USD-001"
@@ -154,31 +171,71 @@ class GroundedDiscoveryTests(unittest.TestCase):
 
     def test_control_scope_does_not_block_a_different_question(self) -> None:
         prior = {
-            "question_id": "TICKET_ASYMMETRY",
+            "question_id": "HFIC-CAND-2E0C5E5A8ABC",
             "population": "BASE_X",
             "decision_timestamp": "X300",
-            "target": "Y1800_PRICE",
-            "estimand": "reported_path",
+            "target": "Y1800_REPORTED_PRICE_PATH",
+            "estimand": "ticket_asymmetry",
             "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+            "representation_scope": CURRENT_REPRESENTATION_CONTROL_V1,
+            "memory_status": "HARD_CLOSE",
+            "reason_code": "KILL_PREPARATORY_LOOP",
         }
-        candidate = {**prior, "question_id": "PRICE_LIQ_STATE"}
+        renamed = {**prior, "question_id": "RENAMED_ONLY"}
+        self.assertEqual(prior_scope_relation(renamed, prior), "EXACT_VALID_CLOSE")
+        richer = {
+            **prior,
+            "question_id": "PRICE_LIQ_STATE",
+            "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+            "representation_scope": "PRICE_LIQUIDITY_PREFIX_THROUGH_Y1800",
+            "target": "Y1800:FIELD-USD-PRICE-001",
+            "estimand": "price_liquidity_prefix",
+        }
         self.assertEqual(
-            prior_scope_relation(candidate, prior),
+            prior_scope_relation(richer, prior),
+            "SCOPE_DISTINCT",
+        )
+        same_content_richer_surface = {
+            **prior,
+            "question_id": "SAME_CONTENT_RICHER",
+            "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+            "representation_scope": "PRICE_LIQUIDITY_PREFIX_THROUGH_Y1800",
+        }
+        self.assertEqual(
+            prior_scope_relation(same_content_richer_surface, prior),
             "SCOPED_CONTROL_DOES_NOT_BLOCK",
         )
-        self.assertEqual(prior_scope_relation(prior, prior), "EXACT_SCOPE_MATCH")
+        holder = {
+            **prior,
+            "question_id": "HFIC-CAND-3232D00BED03",
+            "target": "Y3600_HOLDER_BREADTH",
+            "estimand": "holder_breadth",
+            "reason_code": "KILL_MECHANISM",
+        }
+        self.assertEqual(prior_scope_relation(richer, holder), "SCOPE_DISTINCT")
+        self.assertEqual(prior_scope_relation(prior, prior), "EXACT_VALID_CLOSE")
+        with self.assertRaises(GroundedDiscoveryError) as exact:
+            bind_prior_scope_evidence(
+                {"candidate_scope": renamed, "priors": [prior]}
+            )
+        self.assertEqual(exact.exception.code, "EXACT_PRIOR_SCOPE_MATCH")
         bound = bind_prior_scope_evidence(
-            {"candidate_scope": candidate, "priors": [prior]}
+            {"candidate_scope": same_content_richer_surface, "priors": [prior]}
         )
         self.assertEqual(
             bound["prior_scope_relations"][0]["relation"],
             "SCOPED_CONTROL_DOES_NOT_BLOCK",
         )
-        with self.assertRaises(GroundedDiscoveryError) as exact:
+        incomplete = {key: prior[key] for key in prior if key != "estimand"}
+        self.assertEqual(
+            prior_scope_relation(incomplete, prior),
+            "UNKNOWN_SCOPE_NEEDS_RESOLUTION",
+        )
+        with self.assertRaises(GroundedDiscoveryError) as unknown:
             bind_prior_scope_evidence(
-                {"candidate_scope": prior, "priors": [prior]}
+                {"candidate_scope": incomplete, "priors": [prior]}
             )
-        self.assertEqual(exact.exception.code, "EXACT_PRIOR_SCOPE_MATCH")
+        self.assertEqual(unknown.exception.code, "UNKNOWN_PRIOR_SCOPE")
 
     def test_same_bytes_are_not_a_new_look_and_budget_is_finite(self) -> None:
         first = classify_query_look([], SPEC)
@@ -203,6 +260,314 @@ class GroundedDiscoveryTests(unittest.TestCase):
                 {**SPEC, "query_id": "Q-EXTRA", "target_point": "Y900"},
             )
         self.assertEqual(exc.exception.code, "QUERY_MAIN_BUDGET_EXHAUSTED")
+
+
+ROOT = Path(__file__).resolve().parents[1]
+GIT_SHA = "ab" * 20
+ANCHOR = "2026-09-03T00:00:00Z"
+DECISION_AT = "2026-09-03T00:10:00Z"
+TARGET_AT = "2026-09-03T00:40:00Z"
+
+
+def _binding() -> list[dict]:
+    return [
+        {
+            "dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+            "evidence_role": "EXPLORATORY_REUSE",
+            "holdout": False,
+            "cohort_id": "REL-20260902T111900Z-20260909T111900Z",
+            "release_id": "aa" * 32,
+            "census_sha256": "bb" * 32,
+            "observations_sha256": "cc" * 32,
+            "window_start": "2026-09-02T11:19:00Z",
+            "window_end": "2026-09-09T11:19:00Z",
+        },
+        {
+            "dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+            "evidence_role": "EXPLORATORY_REUSE",
+            "holdout": False,
+            "cohort_id": "C-EMPTY",
+            "release_id": "dd" * 32,
+            "census_sha256": "ee" * 32,
+            "observations_sha256": "ff" * 32,
+            "window_start": "2026-09-10T00:00:00Z",
+            "window_end": "2026-09-11T00:00:00Z",
+        },
+        {
+            "dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+            "evidence_role": "EXPLORATORY_REUSE",
+            "holdout": False,
+            "cohort_id": "REL-20260914T173510Z-20260921T173510Z",
+            "release_id": "11" * 32,
+            "census_sha256": "22" * 32,
+            "observations_sha256": "33" * 32,
+            "window_start": "2026-09-08T00:00:00Z",
+            "window_end": "2026-09-16T00:00:00Z",
+        },
+    ]
+
+
+def _census(
+    mint: str,
+    cohort: str,
+    state: str = "X_ELIGIBLE",
+    anchor: str = ANCHOR,
+) -> dict:
+    return {
+        "mint": mint,
+        "cohort_id": cohort,
+        "candidate_state": state,
+        "authoritative_anchor": anchor,
+    }
+
+
+def _obs(mint: str, point: str, field: str, value: float | None, *, at: str, state: str = "OBSERVED") -> dict:
+    return {
+        "mint": mint,
+        "point_id": point,
+        "field_id": field,
+        "state": state,
+        "first_reliable_available_at": at,
+        "typed_value": None if value is None else value,
+    }
+
+
+def _rows():
+    c1 = "REL-20260902T111900Z-20260909T111900Z"
+    c3 = "REL-20260914T173510Z-20260921T173510Z"
+    later_anchor = "2026-09-15T00:00:00Z"
+    later_decision = "2026-09-15T00:10:00Z"
+    later_target = "2026-09-15T00:40:00Z"
+    census = [
+        _census("high", c1),
+        _census("low", c1),
+        _census("high2", c3, anchor=later_anchor),
+        _census("low2", c3, anchor=later_anchor),
+        _census("late", c1),
+        _census("nofeat", c1),
+        _census("out", c1, "ADMITTED"),
+    ]
+    plan = (
+        ("high", 5000.0, 1.0, DECISION_AT, TARGET_AT, "OBSERVED"),
+        ("low", 10.0, -1.0, DECISION_AT, TARGET_AT, "OBSERVED"),
+        ("high2", 5000.0, 1.0, later_decision, later_target, "OBSERVED"),
+        ("low2", 10.0, -1.0, later_decision, later_target, "OBSERVED"),
+        ("late", 5000.0, 99.0, DECISION_AT, DECISION_AT, "OBSERVED"),
+        ("nofeat", None, None, DECISION_AT, TARGET_AT, "MISSING_TYPED"),
+        ("out", 5000.0, 99.0, DECISION_AT, TARGET_AT, "OBSERVED"),
+    )
+    observations = []
+    for mint, rule_liquidity, target, decision_at, target_at, target_state in plan:
+        observations.append(_obs(mint, "X300", PRICE, 1.0, at=decision_at))
+        observations.append(_obs(mint, "X300", LIQ, 100.0, at=decision_at))
+        if rule_liquidity is not None:
+            observations.append(_obs(mint, "Y900", LIQ, rule_liquidity, at=decision_at))
+        observations.append(
+            _obs(mint, "Y1800", PRICE, target, at=target_at, state=target_state)
+        )
+    return census, observations
+
+
+def _spec() -> dict:
+    return {
+        **SPEC,
+        "explanatory_rules": [
+            {
+                "name": "liquidity_high",
+                "field_id": LIQ,
+                "point_id": "Y900",
+                "op": "gte",
+                "threshold": 1000,
+            }
+        ],
+    }
+
+
+def _scope() -> dict:
+    return {
+        "question_id": "PRICE_LIQ_PREFIX",
+        "population": "BASE_X",
+        "decision_timestamp": "X300",
+        "target": "Y1800:FIELD-USD-PRICE-001",
+        "estimand": "price_liquidity_prefix",
+        "evidence_surface_mode": ORDINARY_GROUNDED_DISCOVERY_V1,
+        "representation_scope": "PRICE_LIQUIDITY_PREFIX_THROUGH_Y1800",
+    }
+
+
+class ProductionRowRecipeTests(unittest.TestCase):
+    def test_rows_show_conditional_effect_empty_strata_and_leakage(self) -> None:
+        census, observations = _rows()
+        computed = execute_discovery_from_rows(census, observations, _spec(), _binding())
+        summary = computed["summary"]
+        self.assertFalse(summary["engine_emits_alpha"])
+        self.assertFalse(summary["eligibility_uses_target"])
+        self.assertFalse(summary["traders_complete_required"])
+        self.assertEqual(summary["base_x_n"], 6)
+        self.assertAlmostEqual(summary["pooled"]["mean_target"], 0.0)
+        self.assertGreaterEqual(len(summary["by_calendar_block"]), 2)
+        high = next(item for item in summary["by_explanatory"] if "liquidity_high=True" in item["view"])
+        low = next(item for item in summary["by_explanatory"] if "liquidity_high=False" in item["view"])
+        missing = next(item for item in summary["by_explanatory"] if "liquidity_high=MISSING" in item["view"])
+        self.assertEqual(high["mean_target"], 1.0)
+        self.assertEqual(low["mean_target"], -1.0)
+        self.assertIsNone(missing["mean_target"])
+        self.assertGreater(missing["denominator_base_x"], 0)
+        empty = next(item for item in summary["by_cohort"] if item["view"] == "C-EMPTY")
+        self.assertEqual(empty["denominator_base_x"], 0)
+        self.assertEqual(empty["target_observed_after_decision"], 0)
+        self.assertTrue(summary["calendar_overlap_is_not_independent_replication"])
+        self.assertFalse(summary["pooled"]["independent_replication"])
+        self.assertGreaterEqual(summary["missing"]["leaked"], 1)
+        self.assertGreaterEqual(summary["missing"]["missing_typed"], 1)
+        self.assertEqual(summary["exclusion_reasons"].get("NOT_X_ELIGIBLE"), 1)
+
+    def test_ambiguous_role_stops_before_a_result(self) -> None:
+        census, observations = _rows()
+        binding = _binding()
+        binding[0]["evidence_role"] = "UNSPECIFIED"
+        with self.assertRaises(GroundedDiscoveryError) as exc:
+            execute_discovery_from_rows(census, observations, _spec(), binding)
+        self.assertEqual(exc.exception.code, "DISCOVERY_ROLE_AMBIGUOUS")
+
+    def test_journal_retries_resume_and_counts_a_changed_binding(self) -> None:
+        census, observations = _rows()
+        scope = _scope()
+        with tempfile.TemporaryDirectory() as raw:
+            store = ResearchStore(Path(raw))
+            clock = datetime(2026, 9, 26, 12, 0, tzinfo=UTC)
+            first = run_recorded_discovery_query(
+                store,
+                census=census,
+                observations=observations,
+                spec=_spec(),
+                binding=_binding(),
+                journal_scope="SYNTH-ACCEPT",
+                candidate_scope=scope,
+                git_sha=GIT_SHA,
+                clock=clock,
+            )
+            self.assertTrue(first["queries"][0]["new_look"])
+            self.assertEqual(first["budget"]["main_count"], 1)
+            resumed = ResearchStore(Path(raw))
+            second = run_recorded_discovery_query(
+                resumed,
+                census=census,
+                observations=observations,
+                spec=_spec(),
+                binding=_binding(),
+                journal_scope="SYNTH-ACCEPT",
+                candidate_scope=scope,
+                git_sha=GIT_SHA,
+                clock=clock,
+            )
+            self.assertFalse(second["queries"][0]["new_look"])
+            self.assertEqual(second["result_refs"], first["result_refs"])
+            self.assertEqual(second["budget"]["main_count"], 1)
+            changed = [dict(row) for row in observations]
+            changed.append(_obs("extra", "X300", PRICE, 1.0, at=DECISION_AT))
+            third = run_recorded_discovery_query(
+                resumed,
+                census=census,
+                observations=changed,
+                spec=_spec(),
+                binding=_binding(),
+                journal_scope="SYNTH-ACCEPT",
+                candidate_scope=scope,
+                git_sha=GIT_SHA,
+                clock=clock,
+            )
+            self.assertTrue(third["queries"][0]["new_look"])
+            self.assertNotEqual(third["result_refs"], first["result_refs"])
+            self.assertEqual(third["calculation_version"], CALCULATION_VERSION)
+            readout = format_discovery_readout(third)
+            self.assertIn("NO_ALPHA", readout["non_claims"])
+            self.assertEqual(readout["result_refs"], third["result_refs"])
+            tampered = json.loads(json.dumps(third))
+            tampered["result"]["pooled"]["mean_target"] = 99.0
+            draft = {
+                "packet_version": "1.1",
+                "discovery_contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
+                "candidates": [],
+                "grounded_evidence": tampered,
+            }
+            with self.assertRaises(HficSessionError) as mismatch:
+                freeze_draft(draft, store=resumed)
+            self.assertEqual(mismatch.exception.code, "GROUNDED_RESULT_MISMATCH")
+            draft["grounded_evidence"] = third
+            with self.assertRaises(HficSessionError) as accepted:
+                freeze_draft(draft, store=resumed)
+            self.assertEqual(accepted.exception.code, "CROSS_REFERENCE_MISMATCH")
+
+    def test_ordinary_freeze_requires_computed_evidence(self) -> None:
+        draft = {
+            "packet_version": "1.1",
+            "discovery_contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
+            "candidates": [],
+        }
+        with self.assertRaises(HficSessionError) as exc:
+            freeze_draft(draft, store=object())
+        self.assertEqual(exc.exception.code, "GROUNDED_EVIDENCE_REQUIRED")
+
+
+class DiscoveryExecuteCliTests(unittest.TestCase):
+    def test_public_cli_computes_without_a_handwritten_summary(self) -> None:
+        census, observations = _rows()
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            store = root / "store"
+            census_path = root / "census.parquet"
+            obs_path = root / "observations.parquet"
+            pq.write_table(pa.Table.from_pylist(census), census_path)
+            pq.write_table(pa.Table.from_pylist(observations), obs_path)
+            binding_path = root / "binding.json"
+            spec_path = root / "spec.json"
+            scope_path = root / "scope.json"
+            binding_path.write_text(
+                json.dumps({"cohorts": _binding(), "priors": []}),
+                encoding="utf-8",
+            )
+            spec_path.write_text(json.dumps(_spec()), encoding="utf-8")
+            scope_path.write_text(json.dumps(_scope()), encoding="utf-8")
+            completed = subprocess.run(
+                [
+                    "uv",
+                    "run",
+                    "--locked",
+                    "--managed-python",
+                    "python",
+                    "-B",
+                    "scripts/hypothesis_forge.py",
+                    "discovery-execute",
+                    "--store",
+                    str(store),
+                    "--census",
+                    str(census_path),
+                    "--observations",
+                    str(obs_path),
+                    "--binding",
+                    str(binding_path),
+                    "--spec",
+                    str(spec_path),
+                    "--candidate-scope",
+                    str(scope_path),
+                    "--journal-scope",
+                    "SYNTH-CLI",
+                    "--format",
+                    "json",
+                ],
+                cwd=ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            payload = json.loads(completed.stdout)
+            self.assertEqual(payload["scientific_writes"], 0)
+            self.assertFalse(payload["scientific_slot_reserved"])
+            self.assertEqual(payload["result"]["pooled"]["mean_target"], 0.0)
+            self.assertTrue(payload["result_refs"])
+            self.assertNotIn("typed_value", json.dumps(payload["result"]))
 
 
 if __name__ == "__main__":

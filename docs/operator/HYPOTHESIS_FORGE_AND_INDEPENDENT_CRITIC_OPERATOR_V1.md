@@ -397,8 +397,10 @@ are allowed. Do not force four candidates. At most six sketches, one selected
 candidate and one frozen runner-up. Cohort id is not a trading feature.
 Discovery queries use `BASE_X` only, price/liquidity fields, and a target point
 strictly after the decision points. Missing outcomes are not zeros. A scoped
-CONTROL negative does not hard-close a different raw question; an exact scope
-match still blocks a duplicate. Query budget is at most six main specifications
+CONTROL negative does not hard-close an unseen richer ordinary question.
+Renaming `question_id` does not lift a valid close. Missing scope axes are
+`UNKNOWN_SCOPE_NEEDS_RESOLUTION`, not a match and not a free pass. An exact
+content match on the same surface still blocks a duplicate. Query budget is at most six main specifications
 and two adaptive refinements. Identical spec bytes are a retry, not a new look.
 Re-check joint state coverage without a scientific look:
 
@@ -659,9 +661,11 @@ authority limits
 
 ## A2. Отдели поиск гипотезы от поиска параметров
 
-Не ищи лучший threshold, комбинацию indicators или максимальный backtest. Сначала ищи **механизм**.
+Не ищи лучший threshold, комбинацию indicators или максимальный backtest.
 
-Минимальная форма механизма:
+`PREDICTIVE` sketch: проверяемое PIT-предсказание, рассчитанное evidence с result refs, mundane alternative, disconfirming prediction и cheap falsifier. Actor story не обязательна. Не выдумывай участника или механизм, чтобы заполнить поле. `CAUSAL` claim сохраняет прежнюю форму identification ниже. Ноль sketches допустим. Не размножай слабые идеи ради количества.
+
+Минимальная форма для `CAUSAL`:
 
 ```text
 В population/state C действие или ограничение участника A
@@ -702,7 +706,7 @@ whether resolving it changes a real decision
 
 ## A4. Divergence engine: создай причинно разные кандидаты
 
-Создай от 4 до 6 mechanism sketches. Используй релевантные линзы, но не обязан по одной идее на каждую:
+Для ordinary grounded `PREDICTIVE` поиска создай от 0 до 6 sketches. Не требуй 4 sketches и не требуй три mechanism classes. Для `CAUSAL` портфеля по-прежнему нужно причинное различие, а не переименование. Используй релевантные линзы, но не обязан по одной идее на каждую:
 
 1. **Market microstructure:** inventory risk, adverse selection, route/depth persistence, convex impact, queue/latency, liquidity withdrawal.
 2. **Actor/game theory:** creator, funder, LP, market maker, searcher, bot farm, retail cohort, launchpad, provider; кто платит edge и почему не устраняет его.
@@ -717,7 +721,7 @@ whether resolving it changes a real decision
 
 Ограничения разнообразия:
 
-- минимум три разных mechanism classes;
+- для `CAUSAL` портфеля — минимум три разных mechanism classes; для `PREDICTIVE` grounded поиска этот минимум не действует;
 - два кандидата считаются различными, только если расходятся минимум по двум осям: actor, mechanism, state transition, primary observable, horizon, payoff asymmetry;
 - generic momentum, volume spike, whale activity, raw buy/sell ratio, generic sentiment, time-of-day и «ML найдёт паттерн» не допускаются без конкретного нового механизма и disconfirming prediction;
 - один кандидат использует не более 1–3 primary explanatory variables; остальные — controls/gates;

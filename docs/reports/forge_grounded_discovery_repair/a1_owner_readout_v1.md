@@ -2,56 +2,55 @@
 
 Date: 2026-09-26 · Route: DIRECT_CURSOR_DELIVERY · MODEL_EFFORT: `SOL_XHIGH`
 
-Ordinary `/hypothesis-forge` no longer turns a fresh focus into CONTROL.
-Explicit `--control-current-representation` stays trajectory-blind.
-`NORMALIZED_TRAJECTORY_V1` triggers are unchanged. AUTO was not released.
-Market Prompt A, Critic, and experiments were not run.
+Ordinary `/hypothesis-forge` is no longer a silent CONTROL run.
+The ordinary route can compute BASE_X price and liquidity from
+production-shaped census and observation rows, store the look, and require
+those refs at freeze. Explicit `--control-current-representation` stays
+trajectory-blind. V1 triggers are unchanged. AUTO was not released.
+Market Prompt A, market Critic, and experiments were not run.
 
-## What changed
+## What the ordinary path does
 
-- Fresh ordinary `forge-run` returns `START_BASE` with
-  `ORDINARY_DISCOVERY_READY` and
-  `evidence_surface_mode=ORDINARY_GROUNDED_DISCOVERY_V1`.
-- `CONTROL_SURFACE_REQUIRED` remains only for explicit CONTROL when no CONTROL
-  session matches.
-- A CONTROL `SEARCH_EXHAUSTED` readout says
-  `scope_exhausted: CURRENT_REPRESENTATION_CONTROL_V1` and
-  `raw ordinary discovery NOT_RUN`.
-- Discovery contract `FORGE_GROUNDED_DISCOVERY_V1` admits only
-  `EXPLORATORY_REUSE` on `DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001`,
-  population `BASE_X`, fields price and liquidity. Ambiguous role stops before
-  a value read. Cohort id is not a feature. Target point must be after the
-  decision points. Missing outcomes are not zeros. The engine does not emit
-  alpha.
-- Look budget: 6 main query specs, 2 adaptive refinements. Identical spec
-  bytes are a retry.
-- Draft minimum is 0 candidates, maximum 6. Critic packets may carry
-  `grounded_evidence`. A scoped CONTROL negative does not block a different
-  raw question. An exact scope match still does.
+`discovery-execute` admits role and holdout from the binding document before
+it reads row values. It does not default to the live store. BASE_X is
+`X_ELIGIBLE` plus PIT X300 liquidity. The target is not an eligibility
+filter. Traders completeness is not required. A missing explanatory flag
+stays missing. Empty cohorts stay in the table with a zero usable count.
+Overlapping collection windows are not independent replication. The result
+carries `engine_emits_alpha=false`.
 
-## No-write live coverage
+The look is a `RESEARCH_ARTIFACT` of kind `DISCOVERY_QUERY_LOOK`. The same
+spec, data binding, and calculation version resume the previous bytes and
+do not add a look. A changed binding counts. Freeze rejects a missing ref
+and a tampered summary. `NO_WORTHY` keeps the scope record and is not a
+raw-corpus negative.
 
-Re-run without reserving a slot:
+A valid close still blocks the same content on the same surface, including
+a renamed `question_id`. A CONTROL negative does not close an unseen richer
+ordinary scope. Missing scope axes are unresolved.
+
+Predictive sketches are 0–6 and do not require an actor story. Causal
+claims keep the identification bar.
+
+## Synthetic acceptance
+
+Public entry, temporary store, no handwritten summary:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <scope> --format json
+```
+
+On the synthetic panel the pooled mean is 0 while liquidity-high and
+liquidity-low means are +1 and -1. Two calendar blocks are present. One
+cohort has denominator 0. A late target is leakage. An ineligible mint
+stays out of BASE_X. Live scientific writes and the live focus slot were
+not spent.
+
+State-only coverage, still without `typed_value`:
 
 ```text
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-coverage --format json
 ```
-
-`scientific_writes=0`. `typed_value` was not selected.
-
-| Cohort | base_x-like | joint X300 price+liquidity | prefix through Y1800 inside base_x-like |
-|---|---:|---:|---:|
-| `REL-20260902T111900Z-20260909T111900Z` | 475 | 475 | 332 |
-| `REL-20260909T111900Z-20260916T111900Z` | 249 | 249 | 128 |
-| `REL-20260914T173510Z-20260921T173510Z` | 425 | 425 | 342 |
-
-First supported scope: `X300_PRICE_LIQUIDITY_BASELINE` and
-`PRICE_LIQUIDITY_PREFIX_THROUGH_Y1800`.
-Excluded: `TRADERS_COMPLETE_PREFIX`.
-No-write ordinary focus `COHORT_STRATIFIED_LIFECYCLE_PATHS`:
-`next_action=START_BASE`, stage `ORDINARY_DISCOVERY_READY`,
-`control_session_id=NONE`, writes 0. It would consume one remaining
-distinct-focus slot only if a later slash persists a session.
 
 ## After merge
 
@@ -68,5 +67,5 @@ OWNER_FOCUS=COHORT_STRATIFIED_LIFECYCLE_PATHS
 Expected scope: `ORDINARY_GROUNDED_DISCOVERY_V1`, not CONTROL, not V1.
 That slash is a separate owner authorization. This PR does not run it.
 
-Rollback: ordinary revert of this PR. Historical ResearchStore rows stay.
-The occupied AUTO slot stays occupied.
+Rollback: revert this PR. Historical ResearchStore rows and the occupied
+AUTO slot stay.

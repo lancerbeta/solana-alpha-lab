@@ -149,7 +149,10 @@ When `grounded_evidence` is present, judge that computation: denominators,
 missingness, query refs, and temporal support. A `PREDICTIVE` claim does not
 need a proven actor story. Do not invent one. A `CAUSAL` claim keeps the
 identification bar. `prior_scope_relations` of `SCOPED_CONTROL_DOES_NOT_BLOCK`
-is not `KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED`. `EXACT_SCOPE_MATCH` still is.
+is not `KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED`. `EXACT_SCOPE_MATCH` and
+`EXACT_VALID_CLOSE` still are. A renamed `question_id` is not a scientific
+difference. `UNKNOWN_SCOPE_NEEDS_RESOLUTION` is not a pass. Predictive
+sketches are 0–6 and do not need three mechanism classes.
 Missing outcomes are not zeros and not alpha. The engine field
 `engine_emits_alpha=false` is not a positive result.
 

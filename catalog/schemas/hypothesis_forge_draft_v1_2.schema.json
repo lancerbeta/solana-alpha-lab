@@ -65,8 +65,6 @@
           "label",
           "claim",
           "novelty_class",
-          "actor_counterparty",
-          "mechanism",
           "population",
           "decision_timestamp",
           "estimand",
@@ -99,8 +97,10 @@
               "DUPLICATE"
             ]
           },
-          "actor_counterparty": {"type": "string", "minLength": 1},
-          "mechanism": {"type": "string", "minLength": 1},
+          "claim_form": {"type": "string", "enum": ["PREDICTIVE", "CAUSAL"]},
+          "actor_counterparty": {"type": "string"},
+          "mechanism": {"type": "string"},
+          "mundane_alternative": {"type": "string", "minLength": 1},
           "population": {"type": "string", "minLength": 1},
           "decision_timestamp": {"type": "string", "minLength": 1},
           "estimand": {"type": "string", "minLength": 1},
@@ -135,6 +135,45 @@
           },
           "decision_unlocked": {"type": "string", "minLength": 1}
         },
+        "allOf": [
+          {
+            "if": {
+              "not": {
+                "properties": {"claim_form": {"const": "PREDICTIVE"}},
+                "required": ["claim_form"]
+              }
+            },
+            "then": {
+              "required": ["actor_counterparty", "mechanism"],
+              "properties": {
+                "actor_counterparty": {"type": "string", "minLength": 1},
+                "mechanism": {"type": "string", "minLength": 1}
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {"claim_form": {"const": "PREDICTIVE"}},
+              "required": ["claim_form"]
+            },
+            "then": {
+              "required": ["mundane_alternative", "disconfirming_prediction", "cheapest_falsifier"]
+            }
+          },
+          {
+            "if": {
+              "properties": {"claim_form": {"const": "CAUSAL"}},
+              "required": ["claim_form"]
+            },
+            "then": {
+              "required": ["actor_counterparty", "mechanism"],
+              "properties": {
+                "actor_counterparty": {"type": "string", "minLength": 1},
+                "mechanism": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        ],
         "anyOf": [
           {
             "properties": {

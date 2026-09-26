@@ -259,7 +259,19 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-inp
      For `CONTROL_CORPUS_UNRESOLVABLE`: `OWNER NEXT=STOP_CORPUS_UNRESOLVABLE`.
      Same recovery fence.
    - `START_NEW_SESSION` → continue only when `forge-run` next is `START_BASE`.
-3. Only for `START_NEW_SESSION`, run **PROMPT A** from the operator pack using
+3. Only for ordinary `START_NEW_SESSION` (no `--control-current-representation`),
+   before Prompt A, run the production recipe. Resolve role and holdout from
+   the runtime binding. Do not substitute `EXPLORATORY_REUSE` or `holdout=false`.
+   Ambiguous role or an unresolved holdout stops before row values. Then:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <scope> --format json
+```
+
+   Put the returned `result_refs` on the draft as `grounded_evidence`. Do not
+   hand-write the summary. CONTROL does not run this command. This repair atom
+   does not point it at the live market corpus.
+   Then run **PROMPT A** from the operator pack using
    `HFIC-V1.2` and only the bounded `FORGE_CONTEXT_PACKET` plus explicitly
    resolved evidence. In `CURRENT_REPRESENTATION_CONTROL_V1`, "explicitly
    resolved evidence" does **not** authorize reading raw current lifecycle
