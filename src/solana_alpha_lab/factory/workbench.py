@@ -254,9 +254,17 @@ def _attention_scan_card(
     heading = f"{esc(priority + ' ' if priority else '')}{canon(code)}"
     if summary_badge:
         heading = f"{esc(summary_badge)} {heading}"
-    summary = f"{heading}: {why_text}"
-    if next_scan:
-        summary += f" → {esc(next_scan)}"
+    action = str(next_scan or "").strip()
+    gloss, canonical, _unknown = (
+        token_gloss(NEXT_ACTION_GLOSS, action) if action else ("", "", True)
+    )
+    if gloss:
+        tail = f"{esc(gloss)} {canon(canonical)}"
+    elif action and action != "UNKNOWN":
+        tail = canon(action)
+    else:
+        tail = ""
+    summary = f"{heading}: {tail}" if tail else heading
     return (
         f'<details class="{_attention_css(priority)}">'
         f"<summary>{summary}</summary>"
@@ -344,6 +352,7 @@ def _daily_attention(items: list[dict[str, Any]], *, empty: str) -> str:
                 next_html=_next_action_html(_cell(item.get("NEXT_SAFE_ACTION"))),
                 drill_html=new_mark + drill,
                 summary_badge=new_badge,
+                next_scan=_cell(item.get("NEXT_SAFE_ACTION")),
             )
         )
     return "".join(cards)
@@ -893,27 +902,36 @@ def _operations_section(
         f"aria-label=\"{esc(surface_copy('OPERATIONS', 'search_ops'))}\">"
         f"<button type=\"submit\">{esc(research_copy('search'))}</button></form>"
     )
-    active_html = (
-        f"<p>ACTIVE POSITIONS = {active_page['total']}</p>"
-        + pager_html(active_page, base_path="/operations", params=pager_params)
-        + _position_table(
-            list(active_page["rows"]),
-            start_ordinal=int(active_page["start_ordinal"] or 1),
+    if present:
+        active_html = (
+            f"<p>ACTIVE POSITIONS = {active_page['total']}</p>"
+            + pager_html(active_page, base_path="/operations", params=pager_params)
+            + _position_table(
+                list(active_page["rows"]),
+                start_ordinal=int(active_page["start_ordinal"] or 1),
+            )
         )
-    )
-    history_html = (
-        pager_html(
-            history_page,
-            base_path="/operations",
-            params=pager_params,
-            page_param="hist_page",
+        history_html = (
+            pager_html(
+                history_page,
+                base_path="/operations",
+                params=pager_params,
+                page_param="hist_page",
+            )
+            + _position_table(
+                list(history_page["rows"]),
+                start_ordinal=int(history_page["start_ordinal"] or 1),
+                history=True,
+            )
         )
-        + _position_table(
-            list(history_page["rows"]),
-            start_ordinal=int(history_page["start_ordinal"] or 1),
-            history=True,
+    else:
+        absent_key = (
+            "source_unavailable" if source_status == "UNAVAILABLE" else "source_absent"
         )
-    )
+        absent_copy = surface_copy("OPERATIONS", absent_key)
+        unobserved = f"<p class=\"semantic-unknown\">{esc(absent_copy)}</p>"
+        active_html = unobserved
+        history_html = unobserved
     return (
         source_banner
         + _runtime_policy_zone(envelope)
@@ -1402,6 +1420,7 @@ def _research_overview_html(view: Mapping[str, Any]) -> str:
     truth_plane = html.escape(str(filters.get("truth_plane") or ""))
     evidence_class = html.escape(str(filters.get("evidence_class") or ""))
     universe = list(view.get("universe") or [])
+    unavailable = str(view.get("completeness") or "") == "UNAVAILABLE"
     total = int(view.get("universe_total") or len(universe))
     page = int(filters.get("page") or 1)
     limit = int(filters.get("limit") or 25)
@@ -1485,7 +1504,11 @@ def _research_overview_html(view: Mapping[str, Any]) -> str:
         )
         + "</div>"
         + f"<h3>{html.escape(research_copy('needs_attention'))}</h3>"
-        + _research_rows(list(view.get("needs_attention") or []))
+        + (
+            f"<p class=\"empty semantic-unknown\">{html.escape(research_copy('not_available'))}</p>"
+            if unavailable
+            else _research_rows(list(view.get("needs_attention") or []))
+        )
         + f"<h3>{html.escape(research_copy('current_activity'))}</h3>"
         + (
             f"<p class=\"empty semantic-unknown\">{html.escape(research_copy('not_available'))}</p>"
@@ -1508,8 +1531,12 @@ def _research_overview_html(view: Mapping[str, Any]) -> str:
         + f"<input type=\"hidden\" name=\"truth_plane\" value=\"{truth_plane}\">"
         + f"<input type=\"hidden\" name=\"evidence_class\" value=\"{evidence_class}\">"
         + f"<button type=\"submit\">{html.escape(research_copy('search'))}</button></form>"
-        + pager_html(pager_info, base_path="/research", params=pager_params)
-        + _research_rows(universe, start_ordinal=start or 1)
+        + (
+            f"<p class=\"empty semantic-unknown\">{html.escape(research_copy('not_available'))}</p>"
+            if unavailable
+            else pager_html(pager_info, base_path="/research", params=pager_params)
+            + _research_rows(universe, start_ordinal=start or 1)
+        )
         + technical(source_table, title=surface_copy("RESEARCH", "sources"))
         + "</section>"
     )

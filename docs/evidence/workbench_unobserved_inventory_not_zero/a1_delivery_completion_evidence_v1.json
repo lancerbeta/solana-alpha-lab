@@ -1,0 +1,68 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "WORKBENCH-UNOBSERVED-INVENTORY-NOT-ZERO-COMPLETION-001",
+  "as_of": "2026-09-26",
+  "task_id": "WORKBENCH_UNOBSERVED_INVENTORY_NOT_ZERO_V1",
+  "state_change": "WORKBENCH_UNOBSERVED_INVENTORY_NOT_ZERO_PASS",
+  "base_main": "0e0b4793b1f511c589d51bb53c5bb2ea7c048faa",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "a5288424357dc160e920ed49fe3ae7c4d75467c70d61fbe5ea0c5e8523c0ca58",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "b9454d01c376d6b8ca0e21153da27fc7ca7e7e2d41646cca7ad4bab9412069ba",
+    "docs/tasks/WORKBENCH_UNOBSERVED_INVENTORY_NOT_ZERO_V1.md": "79969619edee17db0e6c5fdae4bafa1f549d3ce819701a3cb18fb88219afbdca",
+    "src/solana_alpha_lab/factory/workbench.py": "e959369b6c2fa3395838a391bccf38beab37ffd3193ca1ce28b7f01172fa53dc",
+    "tests/test_factory_ordinary_market_hypothesis.py": "9d52000af8e17eccaf8ecba4cf3b8e8ae65f019f03b7df2ab646ec2dc16baac0",
+    "tests/test_owner_trading_operability_workbench_v1.py": "a3de45831d76bc443339b35f6c238af96d82536050efe2a43d841e2176643479",
+    "tests/test_owner_workbench_predeploy_experience_qa_v1.py": "74dffefd5a88b8a07780fee294a38eabc24845e740938077ae043c90cff5c134"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/workbench_unobserved_inventory_not_zero/a1_delivery_factory_fit_v1.json",
+    "sha256": "d4bbaec23a4011c27dba078b1874b0d023a60bf9197b948bac6e5736c8067553",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_WORKBENCH_UNOBSERVED_INVENTORY_NOT_ZERO",
+    "independent_review": {
+      "path": "docs/evidence/workbench_unobserved_inventory_not_zero/a1_delivery_independent_review_v1.json",
+      "sha256": "6c54c509de53e4a24d1663beafe4b1c04c3ac25cb1462a9e8f177683475edab9",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_OWNER_TRADING_OPERABILITY_WORKBENCH",
+      "PASS_PREDEPLOY_EXPERIENCE_QA",
+      "PASS_ORDINARY_HYPOTHESIS_WORKBENCH_PIN"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_PROVIDER",
+    "NO_DEPLOY",
+    "NO_CANONICAL_DONE",
+    "NO_SHADOW_ENVELOPE_CHANGE",
+    "NO_REHOST_ALLOWLIST_CHANGE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0
+  }
+}

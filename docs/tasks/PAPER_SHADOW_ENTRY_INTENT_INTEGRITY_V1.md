@@ -14,9 +14,9 @@ required_review_roles:
   - OWNER_UX_CRITIC
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 0e0b4793b1f511c589d51bb53c5bb2ea7c048faa
+  expected_base: b6ab5f699ad2b2bee3286171ad2728e1bcee1638
   expected_upstream: origin/main
-  expected_upstream_oid: 0e0b4793b1f511c589d51bb53c5bb2ea7c048faa
+  expected_upstream_oid: b6ab5f699ad2b2bee3286171ad2728e1bcee1638
   expected_branch: cursor/paper-shadow-entry-intent-integrity-v1
   dirty_mode: ALLOW_REPORTED
 objective: >-

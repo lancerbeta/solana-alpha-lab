@@ -40,7 +40,7 @@ FACTORY_CORE = {
     "src/solana_alpha_lab/factory/runner.py": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
     "src/solana_alpha_lab/factory/capabilities.py": "bff643190dac24712086cd58c2ce5bd8731fc4927feaf837188156c0e6115cc9",
     "src/solana_alpha_lab/factory/read_model.py": "107e91ef8e9aef8e09e2733fd93407c873f80ddf8feeeaab07bf5d4a3684ed9a",
-    "src/solana_alpha_lab/factory/workbench.py": "0880be62a5765ee00f4ae0857b8bd97113fedcc8b178ffa6eb11675d4742d93c",
+    "src/solana_alpha_lab/factory/workbench.py": "e959369b6c2fa3395838a391bccf38beab37ffd3193ca1ce28b7f01172fa53dc",
     "src/solana_alpha_lab/factory/market_feature_surface.py": "e6bbb655629da5582eaf30571a07ca37dac28aefdb93a4b808cf57ae45958e2b",
     "src/solana_alpha_lab/factory/application.py": "0373815dae821687180eeb37f86920c95e02968735819563de91864a177f65ce",
 }
