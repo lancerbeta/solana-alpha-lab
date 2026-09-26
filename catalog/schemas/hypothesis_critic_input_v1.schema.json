@@ -75,8 +75,9 @@
         "candidate_id": {"type": "string", "minLength": 1},
         "claim": {"type": "string", "minLength": 1},
         "nearest_prior_and_difference": {"type": "string", "minLength": 1},
-        "actor_counterparty": {"type": "string", "minLength": 1},
-        "mechanism": {"type": "string", "minLength": 1},
+        "claim_form": {"type": "string", "enum": ["PREDICTIVE", "CAUSAL"]},
+        "actor_counterparty": {"type": "string"},
+        "mechanism": {"type": "string"},
         "why_not_arbitraged": {"type": "string", "minLength": 1},
         "population": {"type": "string", "minLength": 1},
         "decision_timestamp": {"type": "string", "minLength": 1},
@@ -401,6 +402,29 @@
       },
       "then": {
         "properties": {"prior_memory": false}
+      }
+    },
+    {
+      "if": {
+        "not": {
+          "properties": {
+            "selected_candidate": {
+              "properties": {"claim_form": {"const": "PREDICTIVE"}},
+              "required": ["claim_form"]
+            }
+          },
+          "required": ["selected_candidate"]
+        }
+      },
+      "then": {
+        "properties": {
+          "selected_candidate": {
+            "properties": {
+              "actor_counterparty": {"type": "string", "minLength": 1},
+              "mechanism": {"type": "string", "minLength": 1}
+            }
+          }
+        }
       }
     }
   ]

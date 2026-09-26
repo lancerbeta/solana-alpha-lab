@@ -621,6 +621,12 @@ def execute_discovery_from_rows(
     rule_names = [str(item.get("name")) for item in rules if isinstance(item, Mapping)]
     if rule_names != list(bound_spec["explanatory"]):
         raise GroundedDiscoveryError("EXPLANATORY_INVALID")
+    decision_max = max(_point_offset(point) for point in bound_spec["decision_points"])
+    for rule in rules:
+        if not isinstance(rule, Mapping):
+            raise GroundedDiscoveryError("EXPLANATORY_INVALID")
+        if _point_offset(rule.get("point_id") or "X300") > decision_max:
+            raise GroundedDiscoveryError("EXPLANATORY_AFTER_DECISION")
     cells = _latest_cells(observations)
     decision_offset = max(_point_offset(point) for point in bound_spec["decision_points"])
     members: list[dict[str, Any]] = []
@@ -691,9 +697,16 @@ def execute_discovery_from_rows(
                 target_state = str(target.get("state") or "ABSENT")
                 target_at_dt = _parse_time(target.get("first_reliable_available_at"))
                 deadline = _deadline(anchor, decision_offset)
+                due = anchor + timedelta(
+                    seconds=_point_offset(bound_spec["target_point"]) + PIT_LATENESS_SECONDS
+                )
                 if target_at_dt is not None and target_at_dt <= deadline:
                     target_state = "LEAKED"
                     target_at = target_at_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+                elif target_at_dt is not None and target_at_dt > due:
+                    target_state = "CENSORED_LATE"
+                    target_at = target_at_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+                    target_value = None
                 elif target_state == "OBSERVED":
                     target_value = _as_float(target.get("typed_value"))
                     if target_value is None:
@@ -720,10 +733,11 @@ def execute_discovery_from_rows(
     summary = summarize_discovery_query(
         members,
         spec,
-        overlap_members=[],
+        overlap_members=None,
         required_cohorts=cohort_ids,
         overlapping_cohorts=sorted(_window_overlaps(binding)),
     )
+    summary["mint_overlap_known"] = False
     summary["traders_complete_required"] = False
     summary["eligibility_uses_target"] = False
     summary["calculation_version"] = CALCULATION_VERSION

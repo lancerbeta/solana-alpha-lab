@@ -16,8 +16,11 @@ it reads row values. It does not default to the live store. BASE_X is
 `X_ELIGIBLE` plus PIT X300 liquidity. The target is not an eligibility
 filter. Traders completeness is not required. A missing explanatory flag
 stays missing. Empty cohorts stay in the table with a zero usable count.
-Overlapping collection windows are not independent replication. The result
-carries `engine_emits_alpha=false`.
+An explanatory rule later than the decision points is rejected. Overlapping
+collection windows are not independent replication. Mint overlap that was
+not measured is not reported as independent. The result carries
+`engine_emits_alpha=false`. A predictive card can freeze without an actor
+story. A causal card still requires one.
 
 The look is a `RESEARCH_ARTIFACT` of kind `DISCOVERY_QUERY_LOOK`. The same
 spec, data binding, and calculation version resume the previous bytes and

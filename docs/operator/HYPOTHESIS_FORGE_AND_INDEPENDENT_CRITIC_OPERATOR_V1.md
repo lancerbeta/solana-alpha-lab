@@ -408,6 +408,12 @@ Re-check joint state coverage without a scientific look:
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-coverage --format json
 ```
 
+Ordinary numeric recipe. The store argument is explicit. Do not point it at the live store in this repair. Role and holdout come from the binding file:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <scope> --format json
+```
+
 ## A0. Authority и hard boundaries
 
 Режим: `ORIENTATION + HYPOTHESIS + RESEARCH + DECISION / DESIGN_ONLY`.
@@ -738,8 +744,8 @@ one_sentence_claim
 novelty_class: NEW_MECHANISM | NEW_STATE_INTERACTION | NEW_MEASUREMENT | REFORMULATION | DUPLICATE
 nearest_prior_hypotheses_and_terminals
 material_difference_from_prior
-actor_and_counterparty
-mechanism
+actor_and_counterparty (required for CAUSAL; omit for PREDICTIVE rather than inventing one)
+mechanism (required for CAUSAL; omit for PREDICTIVE rather than inventing one)
 why_not_arbitraged
 point_in_time_population
 decision_timestamp
@@ -975,7 +981,7 @@ decision after collection
 1. `EXECUTIVE RESULT` — selected terminal и одна фраза почему.
 2. `REALITY_RECEIPT`.
 3. `OPPORTUNITY_MAP` — 3–7 tension records.
-4. `CANDIDATE_PORTFOLIO` — 4–6 Candidate Cards.
+4. `CANDIDATE_PORTFOLIO` — 0–6 Candidate Cards for ordinary predictive grounded search. Do not invent cards to reach four. A causal portfolio still keeps the A4 identification bar. If nothing is selected, write `NO_WORTHY_HYPOTHESIS` and do not fabricate a runner-up.
 5. `PRIOR_AND_NOVELTY_AUDIT`.
 6. `HARD_VETO_RESULTS`.
 7. `PARETO_SELECTION` — finalists, winner, strongest rejected alternative.

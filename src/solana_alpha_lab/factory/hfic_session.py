@@ -1063,6 +1063,7 @@ def _selected_candidate_block(
         ),
         "actor_counterparty": str(card.get("actor_counterparty") or ""),
         "mechanism": str(card.get("mechanism") or ""),
+        "claim_form": str(card.get("claim_form") or "CAUSAL"),
         "why_not_arbitraged": str(card.get("why_not_arbitraged") or "NOT_DECLARED_IN_DRAFT"),
         "population": str(card.get("population") or ""),
         "decision_timestamp": str(card.get("decision_timestamp") or ""),
@@ -1943,15 +1944,18 @@ def _freeze_no_worthy(
     _assert_vision_integrity_for_surface(
         preflight_receipt, prompt_version=prompt_version
     )
-    runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
-    if runner_up_index < 0:
-        raise HficSessionError("CROSS_REFERENCE_MISMATCH")
-    rejected_index = _resolve_ref(
-        draft.get("strongest_rejected_alternative"),
-        identities,
+    empty_ordinary = not identities and _ordinary_discovery_requested(
+        draft, preflight_receipt
     )
-    if rejected_index < 0:
-        raise HficSessionError("CROSS_REFERENCE_MISMATCH")
+    if empty_ordinary:
+        runner_up_index = -1
+        rejected_index = -1
+    else:
+        runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
+        rejected_index = _resolve_ref(
+            draft.get("strongest_rejected_alternative"),
+            identities,
+        )
     truth_roots = _nonempty_str_list(
         draft.get("truth_roots_used"),
         code="TRUTH_ROOTS_REQUIRED",
@@ -2084,8 +2088,12 @@ def _freeze_no_worthy(
         )
         or None,
         "selected_candidate_id": None,
-        "runner_up_candidate_id": identities[runner_up_index].candidate_id,
-        "rejected_alternative_id": identities[rejected_index].candidate_id,
+        "runner_up_candidate_id": (
+            None if runner_up_index < 0 else identities[runner_up_index].candidate_id
+        ),
+        "rejected_alternative_id": (
+            None if rejected_index < 0 else identities[rejected_index].candidate_id
+        ),
         "selected_definition_sha256": None,
         "candidate_ids": [item.candidate_id for item in identities],
         "critic_input_packet": None,

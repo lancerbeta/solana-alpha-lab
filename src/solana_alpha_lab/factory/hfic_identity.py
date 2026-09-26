@@ -59,11 +59,23 @@ def normalize_text(value: object) -> str:
 
 
 def canonical_candidate_definition(card: Mapping[str, Any]) -> dict[str, str]:
-    missing = [field for field in IDENTITY_FIELDS if field not in card]
+    predictive = card.get("claim_form") == "PREDICTIVE"
+    optional = {"actor_counterparty", "mechanism"} if predictive else set()
+    missing = [
+        field
+        for field in IDENTITY_FIELDS
+        if field not in card and field not in optional
+    ]
     if missing:
         raise HficIdentityError("CANDIDATE_DEFINITION_INCOMPLETE")
-    definition = {field: normalize_text(card[field]) for field in IDENTITY_FIELDS}
-    if any(not definition[field] for field in IDENTITY_FIELDS):
+    definition: dict[str, str] = {}
+    for field in IDENTITY_FIELDS:
+        raw = card.get(field, "")
+        if field in optional and (not isinstance(raw, str) or not raw.strip()):
+            definition[field] = ""
+            continue
+        definition[field] = normalize_text(raw)
+    if any(not definition[field] for field in IDENTITY_FIELDS if field not in optional):
         raise HficIdentityError("CANDIDATE_DEFINITION_INCOMPLETE")
     return definition
 

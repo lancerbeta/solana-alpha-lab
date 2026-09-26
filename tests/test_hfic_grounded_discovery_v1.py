@@ -34,6 +34,9 @@ from solana_alpha_lab.factory.hfic_grounded_discovery import (  # noqa: E402
     summarize_discovery_query,
     validate_query_spec,
 )
+from solana_alpha_lab.factory.hfic_identity import (  # noqa: E402
+    canonical_candidate_definition,
+)
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     HficSessionError,
     freeze_draft,
@@ -266,7 +269,7 @@ ROOT = Path(__file__).resolve().parents[1]
 GIT_SHA = "ab" * 20
 ANCHOR = "2026-09-03T00:00:00Z"
 DECISION_AT = "2026-09-03T00:10:00Z"
-TARGET_AT = "2026-09-03T00:40:00Z"
+TARGET_AT = "2026-09-03T00:20:00Z"
 
 
 def _binding() -> list[dict]:
@@ -337,7 +340,7 @@ def _rows():
     c3 = "REL-20260914T173510Z-20260921T173510Z"
     later_anchor = "2026-09-15T00:00:00Z"
     later_decision = "2026-09-15T00:10:00Z"
-    later_target = "2026-09-15T00:40:00Z"
+    later_target = "2026-09-15T00:20:00Z"
     census = [
         _census("high", c1),
         _census("low", c1),
@@ -348,20 +351,19 @@ def _rows():
         _census("out", c1, "ADMITTED"),
     ]
     plan = (
-        ("high", 5000.0, 1.0, DECISION_AT, TARGET_AT, "OBSERVED"),
-        ("low", 10.0, -1.0, DECISION_AT, TARGET_AT, "OBSERVED"),
-        ("high2", 5000.0, 1.0, later_decision, later_target, "OBSERVED"),
-        ("low2", 10.0, -1.0, later_decision, later_target, "OBSERVED"),
-        ("late", 5000.0, 99.0, DECISION_AT, DECISION_AT, "OBSERVED"),
+        ("high", 5.0, 1.0, DECISION_AT, TARGET_AT, "OBSERVED"),
+        ("low", 1.0, -1.0, DECISION_AT, TARGET_AT, "OBSERVED"),
+        ("high2", 5.0, 1.0, later_decision, later_target, "OBSERVED"),
+        ("low2", 1.0, -1.0, later_decision, later_target, "OBSERVED"),
+        ("late", 5.0, 99.0, DECISION_AT, DECISION_AT, "OBSERVED"),
         ("nofeat", None, None, DECISION_AT, TARGET_AT, "MISSING_TYPED"),
-        ("out", 5000.0, 99.0, DECISION_AT, TARGET_AT, "OBSERVED"),
+        ("out", 5.0, 99.0, DECISION_AT, TARGET_AT, "OBSERVED"),
     )
     observations = []
-    for mint, rule_liquidity, target, decision_at, target_at, target_state in plan:
-        observations.append(_obs(mint, "X300", PRICE, 1.0, at=decision_at))
+    for mint, price, target, decision_at, target_at, target_state in plan:
+        if price is not None:
+            observations.append(_obs(mint, "X300", PRICE, price, at=decision_at))
         observations.append(_obs(mint, "X300", LIQ, 100.0, at=decision_at))
-        if rule_liquidity is not None:
-            observations.append(_obs(mint, "Y900", LIQ, rule_liquidity, at=decision_at))
         observations.append(
             _obs(mint, "Y1800", PRICE, target, at=target_at, state=target_state)
         )
@@ -371,13 +373,14 @@ def _rows():
 def _spec() -> dict:
     return {
         **SPEC,
+        "explanatory": ["price_high"],
         "explanatory_rules": [
             {
-                "name": "liquidity_high",
-                "field_id": LIQ,
-                "point_id": "Y900",
+                "name": "price_high",
+                "field_id": PRICE,
+                "point_id": "X300",
                 "op": "gte",
-                "threshold": 1000,
+                "threshold": 2,
             }
         ],
     }
@@ -406,9 +409,11 @@ class ProductionRowRecipeTests(unittest.TestCase):
         self.assertEqual(summary["base_x_n"], 6)
         self.assertAlmostEqual(summary["pooled"]["mean_target"], 0.0)
         self.assertGreaterEqual(len(summary["by_calendar_block"]), 2)
-        high = next(item for item in summary["by_explanatory"] if "liquidity_high=True" in item["view"])
-        low = next(item for item in summary["by_explanatory"] if "liquidity_high=False" in item["view"])
-        missing = next(item for item in summary["by_explanatory"] if "liquidity_high=MISSING" in item["view"])
+        self.assertFalse(summary["mint_overlap_known"])
+        self.assertFalse(summary["pooled"]["independent_replication"])
+        high = next(item for item in summary["by_explanatory"] if "price_high=True" in item["view"])
+        low = next(item for item in summary["by_explanatory"] if "price_high=False" in item["view"])
+        missing = next(item for item in summary["by_explanatory"] if "price_high=MISSING" in item["view"])
         self.assertEqual(high["mean_target"], 1.0)
         self.assertEqual(low["mean_target"], -1.0)
         self.assertIsNone(missing["mean_target"])
@@ -419,7 +424,7 @@ class ProductionRowRecipeTests(unittest.TestCase):
         self.assertTrue(summary["calendar_overlap_is_not_independent_replication"])
         self.assertFalse(summary["pooled"]["independent_replication"])
         self.assertGreaterEqual(summary["missing"]["leaked"], 1)
-        self.assertGreaterEqual(summary["missing"]["missing_typed"], 1)
+        self.assertGreaterEqual(summary["exclusion_reasons"].get("DECISION_NOT_READY", 0), 1)
         self.assertEqual(summary["exclusion_reasons"].get("NOT_X_ELIGIBLE"), 1)
 
     def test_ambiguous_role_stops_before_a_result(self) -> None:
@@ -497,7 +502,7 @@ class ProductionRowRecipeTests(unittest.TestCase):
             draft["grounded_evidence"] = third
             with self.assertRaises(HficSessionError) as accepted:
                 freeze_draft(draft, store=resumed)
-            self.assertEqual(accepted.exception.code, "CROSS_REFERENCE_MISMATCH")
+            self.assertEqual(accepted.exception.code, "TRUTH_ROOTS_REQUIRED")
 
     def test_ordinary_freeze_requires_computed_evidence(self) -> None:
         draft = {
@@ -508,6 +513,44 @@ class ProductionRowRecipeTests(unittest.TestCase):
         with self.assertRaises(HficSessionError) as exc:
             freeze_draft(draft, store=object())
         self.assertEqual(exc.exception.code, "GROUNDED_EVIDENCE_REQUIRED")
+
+
+    def test_explanatory_after_decision_and_censored_target_are_refused(self) -> None:
+        census, observations = _rows()
+        late_spec = _spec()
+        late_spec["explanatory_rules"][0]["point_id"] = "Y900"
+        with self.assertRaises(GroundedDiscoveryError) as late_rule:
+            execute_discovery_from_rows(census, observations, late_spec, _binding())
+        self.assertEqual(late_rule.exception.code, "EXPLANATORY_AFTER_DECISION")
+        censored = [
+            _census("slow", "REL-20260902T111900Z-20260909T111900Z"),
+        ]
+        rows = [
+            _obs("slow", "X300", PRICE, 5.0, at=DECISION_AT),
+            _obs("slow", "X300", LIQ, 100.0, at=DECISION_AT),
+            _obs("slow", "Y1800", PRICE, 99.0, at="2026-09-03T00:50:00Z"),
+        ]
+        binding = [_binding()[0]]
+        summary = execute_discovery_from_rows(censored, rows, _spec(), binding)["summary"]
+        self.assertEqual(summary["missing"]["censored_late"], 1)
+        self.assertEqual(summary["later_target_observed_n"], 0)
+
+    def test_predictive_identity_does_not_require_an_actor(self) -> None:
+        definition = canonical_candidate_definition(
+            {
+                "claim_form": "PREDICTIVE",
+                "claim": "X300 price predicts Y1800 price",
+                "population": "BASE_X",
+                "decision_timestamp": "X300",
+                "primary_x_family": "FIELD-USD-PRICE-001",
+                "primary_y": "FIELD-USD-PRICE-001",
+                "horizon_notional": "Y1800",
+                "negative_control": "flat price path",
+                "cheapest_falsifier": "pooled mean stays near the conditional split",
+            }
+        )
+        self.assertEqual(definition["actor_counterparty"], "")
+        self.assertEqual(definition["mechanism"], "")
 
 
 class DiscoveryExecuteCliTests(unittest.TestCase):
