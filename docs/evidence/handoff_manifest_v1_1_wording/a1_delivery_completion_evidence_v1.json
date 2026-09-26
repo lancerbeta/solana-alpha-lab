@@ -11,15 +11,15 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "e245e32e68baacba495a04bf663cd6a5eb96dc73289a1ebd7ace24d097ce75f6",
+    "catalog/assets/core.yaml": "8871dfb71e0beff5dc020dbfdb25c9078e5654136cca721e66bf2f1ddb087c02",
     "catalog/assets/lifecycle.yaml": "4bf1a469f5860858a65ac2cecac0240dae96f1adc5d2fa02563e957fe731ffc3",
     "catalog/catalog_manifest.yaml": "d04d55d9781657aaf2ee328b2f6241419339683f8de9d6f268875ac75ba185c3",
     "catalog/generated/asset_edges.json": "7976d221e401616a44df32aa83af32dcb25c5839de4806bd14a61c9c82b1e1f5",
     "docs/PROJECT_MAP.md": "8a6b73bf9743d1104e7637dfefee3063ad2d0872a0ad7d5bdbe78d3b237b5d57",
     "docs/contracts/science_to_strategy_handoff_v1.md": "e0d063385564b41986eca07cb9a32e04a124f526d4f294e54797d639aa63c9ff",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "70ff631b243f827e5e6bff446e77e806dffbadfb8c3bc5116c0a01097e7bcbcb",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "66029d56c8bb625bd573e8e17bdeabcce8d4e16977346b33f8492f5d0e0bf113",
     "docs/reports/handoff_manifest_v1_1_wording/a1_owner_readout_v1.md": "387c8b1b34b27bb83787a162d653465c6241e1bca6b31e8cc4fd45835e73846e",
-    "docs/tasks/HANDOFF_MANIFEST_V1_1_WORDING_V1.md": "770d14e0e4a3a16beeed37e5df0f39b6611873031c85f91ceedd7b2b3e9fac50",
+    "docs/tasks/HANDOFF_MANIFEST_V1_1_WORDING_V1.md": "871dd3a8685d02f33f0cd4c2d8a0b9b91c06a8294cbdc193bdeef25918ba4705",
     "tests/test_science_to_strategy_handoff_v1.py": "c61812f14497fb03d8a03cd3acf0a113a2791ebee0bef92e41e375970fe5d8c7"
   },
   "active_stop_conditions": [],
@@ -32,14 +32,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/handoff_manifest_v1_1_wording/a1_delivery_factory_fit_v1.json",
-    "sha256": "9e18a75c9c9202e4e2bd203f70236aa7b443f4edc1c2e540c088b7611bd029ac",
+    "sha256": "1b9a581844eaf41c05358e48561ea1350c1511ca42fd86c7d6101e94f27349fe",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HANDOFF_MANIFEST_V1_1_WORDING",
     "independent_review": {
       "path": "docs/evidence/handoff_manifest_v1_1_wording/a1_delivery_independent_review_v1.json",
-      "sha256": "b6557be9aa98558cf40022da8e1295f52be5756e52f5de74cd80c7ec49dc76ba",
+      "sha256": "87cf0143900805d309a371d256a67b2988cd4f66486f9e5b3eb8d706d84e932c",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
