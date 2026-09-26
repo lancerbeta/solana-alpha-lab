@@ -1,0 +1,44 @@
+{
+  "schema": "smial.hfic-prefreeze-draft-readonly-proof",
+  "schema_version": "1.0",
+  "as_of": "2026-09-26",
+  "task_id": "HFIC_PREFREEZE_DRAFT_RECOVERY_V1",
+  "store": {
+    "status": "PRESENT",
+    "selection_reason": "DEFAULT_EXISTING",
+    "error": null
+  },
+  "draft_readable": true,
+  "sha_prefix_matches": true,
+  "lifecycle_session_present": false,
+  "reservation_count_for_slot": 1,
+  "inventory_unchanged": true,
+  "real_rdp_writes": 0,
+  "draft": {
+    "record_id": "HFIC-ART-FORGE-DRAFT-GENERATED-A857B48FD253A941",
+    "draft_lifecycle": "GENERATED_BEFORE_FREEZE",
+    "payload_sha256": "a857b48fd253a941110d1492d875d7a59a0ba4aaf7161b70d91574438902b278",
+    "session_id": "HFIC-SESS-481C699406A919C1",
+    "market_evidence_epoch_sha256": "ae771cf5c1e7692c007b442c0048e7547005dc09125eeb9eb75e24406e429749",
+    "scientific_slot_sha256": "683b3ed3d3b4840c88406cca80905c0cf04ae1f642dd01afa6b81e5cddbc58f1",
+    "focus_key_sha256": "929260ad9b9ea9fe0f3553dd964f4ff3deb5792efd031a2b90f573fe91f012bb",
+    "ladder_representation_id": "BASE",
+    "representation_semantic_version": "HFIC-V1.2",
+    "capability_epoch_sha256": "e276c58cd5e5899fa4c6c5a1cb182499f8a66987c523ea644d8f945eace964ec",
+    "memory_eligibility_sha256": "be64c8a3c5fd683dbb1aae896e498b905a7318c327a48fc4552b9c9e7f69173e",
+    "evidence_surface_mode": "CURRENT_REPRESENTATION_CONTROL_V1",
+    "execution_binding_sha256": null,
+    "model_provenance_sha256": null
+  },
+  "reservation_matches_draft": true,
+  "statements": [
+    "THIS_REPAIR_DOES_NOT_CREATE_A_NEW_SCIENTIFIC_LOOK",
+    "EXACT_GENERATED_DRAFT_RECOVERY_ONLY"
+  ],
+  "non_claims": [
+    "NO_REAL_RDP_WRITE",
+    "NO_FREEZE",
+    "NO_PROMPT_A",
+    "NO_CRITIC"
+  ]
+}

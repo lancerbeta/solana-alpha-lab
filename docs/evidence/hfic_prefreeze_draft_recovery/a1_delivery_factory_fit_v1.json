@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-PREFREEZE-DRAFT-RECOVERY-FACTORY-FIT-001",
+  "as_of": "2026-09-26",
+  "task_id": "HFIC_PREFREEZE_DRAFT_RECOVERY_V1",
+  "reviewed_bindings_sha256": "e944e87c4829f907b18031595df1829ec8f4574158ba063af2032346a2e82810",
+  "reviewed_inventory_sha256": "19fc3509d3064bf8c20538556e33eb245c58deb3bc9ede1b47a6ad6a819239df",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_EXACT_DRAFT_RECOVERY_ONLY",
+    "flexibility_and_history": "PASS_APPEND_ONLY_NO_SLOT_RELEASE",
+    "context_efficiency": "PASS_EXISTING_RESUME_PATH",
+    "research_truth": "PASS_BOTH_CAPABILITY_EPOCHS_RETAINED",
+    "owner_operability": "PASS_RESUME_BASE_NOT_MISSING_READBACK",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_EXPERIMENT_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_REVERT_COMMIT_REAL_SLOT_UNTOUCHED",
+    "build_vs_buy": "PASS_NO_NEW_RECOVERY_SERVICE",
+    "red_team": "PASS_FROZEN_SESSION_STAYS_STRICT",
+    "security": "PASS_PHYSICAL_PATHS_STILL_REJECTED"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NO_NEW_SCIENTIFIC_LOOK"
+  },
+  "recovery": "Revert the repair commit. The real generated draft and its reservation stay as they were.",
+  "limits": [
+    "THIS_REPAIR_DOES_NOT_CREATE_A_NEW_SCIENTIFIC_LOOK",
+    "EXACT_GENERATED_DRAFT_RECOVERY_ONLY",
+    "NO_REAL_RDP_WRITE",
+    "NO_PROMPT_A",
+    "NO_CRITIC_EXECUTION",
+    "NO_ALPHA"
+  ]
+}

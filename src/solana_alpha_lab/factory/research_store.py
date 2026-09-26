@@ -103,7 +103,6 @@ _TRANSACTION_ID_RE = re.compile(
 )
 _SAFE_IDENTIFIER_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,255}")
 _WINDOWS_DRIVE_RE = re.compile(r"^[A-Za-z]:")
-_URI_SCHEME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
 _HASH64_RE = re.compile(r"[0-9a-f]{64}")
 _GIT_SHA_RE = re.compile(r"[0-9a-f]{40}")
 _UNIX_EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
@@ -618,14 +617,29 @@ def _validate_no_physical_paths(value: Any, *, key: str | None = None) -> None:
         _validate_logical_uri(value)
         return
     normalized = value.replace("\\", "/")
+    # A colon in prose ("Weak:", "Reason:", "Note:") is not a filesystem URI.
+    # Keep the physical-path rejects: absolute paths, drive paths, file: URIs,
+    # "://" forms, and ".." segments. Do not treat every scheme-shaped word
+    # as a path.
     if (
         value.startswith(("/", "\\"))
         or _WINDOWS_DRIVE_RE.match(value) is not None
-        or _URI_SCHEME_RE.match(value) is not None
+        or value.casefold().startswith("file:")
         or "://" in value
         or ".." in normalized.split("/")
     ):
         raise ResearchStoreError("PHYSICAL_PATH_FORBIDDEN")
+
+
+def assert_no_physical_paths(value: Any) -> None:
+    """Reject physical/local path leakage before a payload is stored.
+
+    Callers that later append the same object through ResearchStore must use
+    this check so a forbidden value fails before slot reservation. Ordinary
+    prose containing a colon remains valid.
+    """
+
+    _validate_no_physical_paths(value)
 
 
 def _canonical_payload(payload_json: str) -> tuple[str, str]:

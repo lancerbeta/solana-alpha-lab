@@ -572,33 +572,47 @@ def decide_preflight_action(
                     else None
                 )
                 if draft_session and draft_session == admission_session:
+                    slot = str(admission.get("scientific_slot_sha256") or "")
+                    version = representation_semantic_version or PROMPT_VERSION
+                    capability = (
+                        str(execution_context.get("capability_epoch_sha256"))
+                        if isinstance(execution_context, Mapping)
+                        and isinstance(
+                            execution_context.get("capability_epoch_sha256"), str
+                        )
+                        else None
+                    )
+                    model = (
+                        str(model_provenance)
+                        if isinstance(model_provenance, str)
+                        else None
+                    )
+                    match_kwargs = {
+                        "market_evidence_epoch_sha256": evidence_epoch,
+                        "scientific_slot_sha256": slot,
+                        "representation_id": representation_id,
+                        "representation_semantic_version": version,
+                        "owner_focus": owner_focus,
+                        "capability_epoch_sha256": capability,
+                        "memory_eligibility_sha256": memory_eligibility_sha256,
+                        "evidence_surface_mode": evidence_surface_mode,
+                        "model_provenance_sha256": model,
+                    }
                     draft_matches = generated_draft_matches_preflight_context(
                         generated_draft,
-                        market_evidence_epoch_sha256=evidence_epoch,
-                        scientific_slot_sha256=str(
-                            admission.get("scientific_slot_sha256") or ""
-                        ),
-                        representation_id=representation_id,
-                        representation_semantic_version=(
-                            representation_semantic_version or PROMPT_VERSION
-                        ),
-                        owner_focus=owner_focus,
-                        capability_epoch_sha256=(
-                            str(execution_context.get("capability_epoch_sha256"))
-                            if isinstance(execution_context, Mapping)
-                            and isinstance(
-                                execution_context.get("capability_epoch_sha256"), str
-                            )
-                            else None
-                        ),
-                        memory_eligibility_sha256=memory_eligibility_sha256,
-                        evidence_surface_mode=evidence_surface_mode,
-                        model_provenance_sha256=(
-                            str(model_provenance)
-                            if isinstance(model_provenance, str)
-                            else None
-                        ),
+                        **match_kwargs,
                     )
+                    if not draft_matches:
+                        from solana_alpha_lab.factory.hfic_session import (
+                            prefreeze_generated_draft_recovery,
+                        )
+
+                        draft_matches = prefreeze_generated_draft_recovery(
+                            generated_draft,
+                            sessions=sessions,
+                            reservations=list(reservations or []),
+                            **match_kwargs,
+                        )
                     if draft_matches:
                         return ("RESUME_EXISTING_SESSION", draft_session)
                     return (
@@ -2985,6 +2999,58 @@ def run_preflight(
             "RESUME_GENERATED_DRAFT — continue freeze from persisted draft; "
             "do not regenerate"
         )
+        stored_capability = generated_draft.get("capability_epoch_sha256")
+        draft_session_id = str(generated_draft.get("session_id") or "")
+        lifecycle_exists = any(
+            isinstance(item, Mapping)
+            and str(item.get("session_id") or "") == draft_session_id
+            for item in sessions
+        )
+        if (
+            isinstance(stored_capability, str)
+            and isinstance(capability_epoch, str)
+            and stored_capability != capability_epoch
+            and not lifecycle_exists
+        ):
+            from solana_alpha_lab.factory.hfic_session import (
+                prefreeze_generated_draft_recovery,
+            )
+
+            if prefreeze_generated_draft_recovery(
+                generated_draft,
+                sessions=sessions,
+                reservations=reservations,
+                market_evidence_epoch_sha256=str(market_epoch or ""),
+                scientific_slot_sha256=str(
+                    generated_draft.get("scientific_slot_sha256") or ""
+                ),
+                representation_id=str(
+                    generated_draft.get("ladder_representation_id") or "BASE"
+                ),
+                representation_semantic_version=str(
+                    generated_draft.get("representation_semantic_version")
+                    or PROMPT_VERSION
+                ),
+                owner_focus=focus,
+                capability_epoch_sha256=capability_epoch,
+                memory_eligibility_sha256=memory_eligibility,
+                evidence_surface_mode=control_mode,
+                model_provenance_sha256=(
+                    str(generated_draft.get("model_provenance_sha256"))
+                    if isinstance(generated_draft.get("model_provenance_sha256"), str)
+                    else None
+                ),
+            ):
+                # Keep both epochs. capability_epoch_sha256 on this receipt
+                # stays the current recovery identity; the generated-draft
+                # field is the capability that reserved the slot.
+                receipt_body["prefreeze_capability_repair"] = True
+                receipt_body["generated_draft_capability_epoch_sha256"] = (
+                    stored_capability
+                )
+                receipt_body["generated_draft_execution_binding_sha256"] = (
+                    generated_draft.get("execution_binding_sha256")
+                )
     if selection_gate_view and selection_gate_view.get("applicable"):
         receipt_body["router_decision"] = selection_gate_view.get("router_decision")
         receipt_body["selection_gate"] = {

@@ -1,0 +1,44 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-PREFREEZE-DRAFT-RECOVERY-REVIEW-001",
+  "as_of": "2026-09-26",
+  "task_id": "HFIC_PREFREEZE_DRAFT_RECOVERY_V1",
+  "reviewed_bindings_sha256": "e944e87c4829f907b18031595df1829ec8f4574158ba063af2032346a2e82810",
+  "reviewed_inventory_sha256": "19fc3509d3064bf8c20538556e33eb245c58deb3bc9ede1b47a6ad6a819239df",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "When SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING meets a resumable pre-freeze orphan, evaluate_forge_run sets RESUME_BASE with GENERATED_DRAFT_READBACK instead of leaving START_BASE. A known model on the saved draft must be repeated by the caller or capability repair is denied. persist_generated_draft rejects a physical path before slot admission."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "The capability-repair test freezes only the exact draft, keeps one reservation, and asserts forge-run next_action RESUME_BASE without SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING. A frozen session does not gain the exception. THIS_REPAIR_DOES_NOT_CREATE_A_NEW_SCIENTIFIC_LOOK. EXACT_GENERATED_DRAFT_RECOVERY_ONLY."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=0678b08f37d5b16fba386ca5b78582f0144b940c05a1f65621a44202b8c454ee",
+        "Clearing the missing-readback block now binds RESUME, so it does not fall through to a new BASE trial. The existing reservation stays the only occupancy for that slot and is not rewritten to the recovery capability epoch."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_MERGE",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_REAL_RDP_WRITE"
+  ]
+}
