@@ -259,6 +259,30 @@ def reset_import_parquet_accounting() -> None:
     _IMPORT_PARQUET_BYTES["new"] = 0
 
 
+def _parquet_size_path(data_root: Path, partition_id: str) -> Path:
+    return _manifests_dir(data_root) / "partitions" / f"{partition_id}.bytes"
+
+
+def _recorded_parquet_size(data_root: Path, partition_id: str) -> int | None:
+    path = _parquet_size_path(data_root, partition_id)
+    if not path.is_file() or path.is_symlink():
+        return None
+    try:
+        text = path.read_text(encoding="utf-8").strip()
+        size = int(text)
+    except (OSError, UnicodeDecodeError, ValueError):
+        return None
+    if size < 0:
+        return None
+    return size
+
+
+def _write_recorded_parquet_size(data_root: Path, partition_id: str, size: int) -> None:
+    path = _parquet_size_path(data_root, partition_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _publish_bytes(path, str(int(size)).encode("utf-8"))
+
+
 def import_parquet_accounting() -> dict[str, int]:
     return dict(_IMPORT_PARQUET_BYTES)
 
@@ -338,12 +362,19 @@ def inspect_canonical_root(
         if parquet_path.is_symlink() or not parquet_path.is_file():
             parquet_ok = False
             break
-        if not verify_parquet_bytes:
+        size = int(parquet_path.stat().st_size)
+        recorded = _recorded_parquet_size(data_root, part.partition_id)
+        if recorded is not None and recorded != size:
+            parquet_ok = False
+            break
+        if not verify_parquet_bytes and recorded == size:
             continue
-        _note_import_parquet_bytes("historical", int(parquet_path.stat().st_size))
+        _note_import_parquet_bytes("historical", size)
         if sha256_file_streaming(parquet_path) != part.file_sha256:
             parquet_ok = False
             break
+        if recorded is None:
+            _write_recorded_parquet_size(data_root, part.partition_id, size)
     complete = artifacts_ok and labels_ok and published_ok and parquet_ok
     if not labels_ok:
         reason = "LABELS_MISSING"
@@ -600,6 +631,11 @@ def _commit_canonical_root(
             manifests / "partitions" / f"{part.partition_manifest_id}.json",
             canonical_manifest_bytes(part),
         )
+        parquet_path = root / part.logical_location
+        if parquet_path.is_file() and not parquet_path.is_symlink():
+            _write_recorded_parquet_size(
+                root, part.partition_id, int(parquet_path.stat().st_size)
+            )
     _publish_bytes(
         manifests / f"{dataset.dataset_manifest_id}.validation.json",
         receipt_bytes,
@@ -650,6 +686,15 @@ def _claims_for_cohort(
             claim = prior_by_id[part_id]
             _require(claim.file_sha256 == expected_file, "CORPUS_PARQUET_SHA_MISMATCH")
             _require(claim.logical_location == rel, "CORPUS_PARTITION_LOCATION_MISMATCH")
+            size = int(parquet_path.stat().st_size)
+            recorded = _recorded_parquet_size(data_root, part_id)
+            if recorded is None:
+                _note_import_parquet_bytes("historical", size)
+                disk_sha = sha256_file_streaming(parquet_path)
+                _require(disk_sha == expected_file, "CORPUS_PARQUET_SHA_MISMATCH")
+                _write_recorded_parquet_size(data_root, part_id, size)
+            elif recorded != size:
+                raise LiveCohortReleaseError("CORPUS_PARQUET_SHA_MISMATCH")
             out.append(claim)
             continue
         _note_import_parquet_bytes("new", int(parquet_path.stat().st_size))
