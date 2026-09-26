@@ -43,6 +43,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hfic_session.py
   - scripts/hypothesis_forge.py
   - catalog/assets/core.yaml
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
   - catalog/schemas/hypothesis_forge_draft_v1_2.schema.json
   - catalog/schemas/hypothesis_critic_input_v1.schema.json
   - catalog/schemas/forge_run_receipt_v1.schema.json
