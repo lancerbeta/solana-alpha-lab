@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "DECISION-IDENTITY-AND-LINEAGE-GATES-FACTORY-FIT-001",
+  "as_of": "2026-09-26",
+  "task_id": "DECISION_IDENTITY_AND_LINEAGE_GATES_V1",
+  "reviewed_bindings_sha256": "90f266d115aa58de1149f90a20e5563c233289f5200b0c79729d727351a7cc1e",
+  "reviewed_inventory_sha256": "f4e51aea2a0d9051fa42d0487c900532a80284baf21f8900324b499f90e41a90",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_DECISION_IDENTITY_FAILS_CLOSED_NOT_ALPHA",
+    "flexibility_and_history": "PASS_NULL_FINGERPRINT_SKIPS_ENTER_COMPARISON",
+    "context_efficiency": "PASS_ONE_STORE_NO_NEW_DEPENDENCY",
+    "research_truth": "PASS_AS_OF_NONE_FAILS_CLOSED_AND_REF_ORDER_IS_BODY",
+    "owner_operability": "PASS_TRACE_SHOWS_EXIT_DECISION_STEP",
+    "execution_to_cashflow": "NOT_APPLICABLE_PAPER_SHADOW_NO_CASHFLOW",
+    "monitoring_and_recovery": "PASS_SPEC_DRIFT_STOPS_HEARTBEAT_ROLLBACK_IS_REVERT",
+    "build_vs_buy": "PASS_NO_NEW_FRAMEWORK",
+    "security": "PASS_NO_SECRETS_NO_ABSOLUTE_PATHS_NO_SIGNER",
+    "red_team": "PASS_CLOCK_IDENTITY_DRIFT_AND_EXIT_VERSION"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "PAPER_PLANE_READ_FRESHNESS_V1_AFTER_THIS_MERGE"
+  },
+  "recovery": "Revert the merge commit. Added columns are ignored by older code.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_LIVE_TRADING",
+    "LEGACY_NULL_FINGERPRINT_SKIPS_ENTER_COMPARISON",
+    "EVIDENCE_REF_ORDER_IS_PART_OF_THE_BODY",
+    "STRATEGY_SPEC_DRIFT_STOPS_UNCHANGED_VERSION_HEARTBEAT"
+  ]
+}

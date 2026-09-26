@@ -141,6 +141,22 @@ admissions in that mode and also cancels admitted, unattempted intents
 (`NEW_ENTRIES_DISABLED`). Existing per-bot `PAUSE_NEW_ENTRIES` remains and
 cancels those same intents (`ENTRIES_PAUSED`).
 
+### Decision identity
+
+A SignalDecision is accepted only with an explicit `as_of`. `decision_at` more
+than 2 seconds after `as_of` is `SIGNAL_DECISION_FROM_FUTURE`. One
+`signal_decision_id` binds one canonical body: a different body, or any
+non-ENTER decision, under an id that already owns a position is
+`SIGNAL_DECISION_IDEMPOTENCY_MISMATCH`. Legacy rows with a NULL fingerprint
+skip the ENTER comparison. `start_bot` stores `strategy_spec_sha256`,
+backfills NULL, and raises `STRATEGY_SPEC_DRIFT` when stored and loaded
+hashes differ. An ExitDecision whose `strategy_version` differs from
+`positions.strategy_version_label` is `EXIT_POSITION_VERSION_MISMATCH`.
+Positions keep `signal_decision_sha256`, `strategy_spec_sha256` and a
+separate `exit_reason_code`; entry `reason_code` is not overwritten.
+`SIGNAL_DECISION_ACCEPTED` carries the fingerprint and evidence refs.
+`EXIT_DECISION_ACCEPTED` is a `POSITION` stage event.
+
 ## 8. GET / persistence
 
 Workbench GET never creates the policy table, a revision, or a SQLite

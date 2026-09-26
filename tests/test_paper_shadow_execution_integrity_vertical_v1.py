@@ -25,6 +25,7 @@ import solana_alpha_lab.factory.paper_plane as paper_plane  # noqa: E402
 from solana_alpha_lab.factory.paper_plane import (  # noqa: E402
     PaperPlaneError,
     PaperPlaneStore,
+    accept_exit_decision,
     accept_signal_decision,
 )
 from solana_alpha_lab.factory.lifecycle_projection import build_lifecycle_projection  # noqa: E402
@@ -32,7 +33,10 @@ from solana_alpha_lab.factory.paper_shadow_commands import (  # noqa: E402
     apply_operator_command,
     maybe_finish_drain,
 )
-from solana_alpha_lab.factory.strategy_runtime import load_strategy_version  # noqa: E402
+from solana_alpha_lab.factory.strategy_runtime import (  # noqa: E402
+    canonical_spec_sha256,
+    load_strategy_version,
+)
 from solana_alpha_lab.factory.paper_shadow_operations import (  # noqa: E402
     build_operations_projection,
 )
@@ -690,6 +694,107 @@ class EntryIntentIntegrityTests(StoreCase):
             git_sha="0" * 40,
         )
         self.assertIn("CANCELLED", {e.get("native_state") for e in lifecycle["entities"]})
+
+
+def exit_decision(
+    position_id: str,
+    *,
+    exit_id: str = "EXITDEC-VERT-1",
+    strategy_version: str = "V1",
+    reason_code: str = "VERTICAL_EXIT",
+) -> dict[str, Any]:
+    return {
+        "schema": "smial.exit-decision",
+        "schema_version": "1.0",
+        "exit_decision_id": exit_id,
+        "position_id": position_id,
+        "strategy_id": "STRAT-ACCOUNTING-CONTROL-A",
+        "strategy_version": strategy_version,
+        "activation_epoch_id": EPOCH,
+        "decision_at": "2026-09-03T12:20:00Z",
+        "first_reliable_available_at": "2026-09-03T12:19:00Z",
+        "action": "EXIT",
+        "reason_code": reason_code,
+        "evidence_refs": ["sha256:" + "e" * 64],
+    }
+
+
+class DecisionIdentityGateTests(StoreCase):
+    """A3 DECISION_IDENTITY_AND_LINEAGE_GATES_V1."""
+
+    def test_as_of_is_required(self) -> None:
+        with self.assertRaisesRegex(PaperPlaneError, "SIGNAL_AS_OF_REQUIRED"):
+            accept(self.store(), self.strategy, "SIGDEC-VERT-NOCLOCK", as_of=None)
+
+    def test_future_decision_is_rejected_beyond_skew(self) -> None:
+        store = self.store()
+        with self.assertRaisesRegex(PaperPlaneError, "SIGNAL_DECISION_FROM_FUTURE"):
+            accept(store, self.strategy, "SIGDEC-VERT-FUT-3", decision_at="2026-09-03T12:10:03Z")
+        self.assertTrue(
+            accept(store, self.strategy, "SIGDEC-VERT-FUT-2", decision_at="2026-09-03T12:10:02Z")["opened"]
+        )
+
+    def test_one_id_binds_one_body(self) -> None:
+        store = self.store()
+        self.assertTrue(accept(store, self.strategy, "SIGDEC-VERT-ID")["opened"])
+        with self.assertRaisesRegex(PaperPlaneError, "SIGNAL_DECISION_IDEMPOTENCY_MISMATCH"):
+            accept(store, self.strategy, "SIGDEC-VERT-ID", mint=MINT_B)
+        with self.assertRaisesRegex(PaperPlaneError, "SIGNAL_DECISION_IDEMPOTENCY_MISMATCH"):
+            accept(store, self.strategy, "SIGDEC-VERT-ID", action="NO_ENTER")
+        again = accept(store, self.strategy, "SIGDEC-VERT-ID")
+        self.assertEqual((again["idempotent"], again["state"]), (True, "OPEN"))
+        self.assertEqual(store.get_position("POS-SIG-SIGDEC-VERT-ID")["mint"], MINT)
+
+    def test_exit_decision_version_must_match_the_position(self) -> None:
+        store = self.store()
+        pid = open_filled(store, self.strategy, "SIGDEC-VERT-XVER")
+        v2 = dict(self.strategy, strategy_version="V2")
+        with self.assertRaisesRegex(PaperPlaneError, "EXIT_POSITION_VERSION_MISMATCH"):
+            accept_exit_decision(
+                ROOT,
+                store,
+                strategy=v2,
+                exit_decision=exit_decision(pid, strategy_version="V2"),
+                known_activation_epochs=KNOWN_EPOCHS,
+            )
+        self.assertEqual(store.get_position(pid)["state"], "OPEN")
+
+    def test_strategy_spec_drift_fails_closed(self) -> None:
+        store = self.store()
+        store.start_bot(self.strategy, mode="PAPER", activation_epoch_id=EPOCH)
+        drifted = dict(self.strategy, spec_sha256="0" * 64)
+        with self.assertRaisesRegex(PaperPlaneError, "STRATEGY_SPEC_DRIFT"):
+            store.start_bot(drifted, mode="PAPER", activation_epoch_id=EPOCH)
+
+    def test_position_lineage_is_queryable_from_the_store(self) -> None:
+        store = self.store()
+        pid = open_filled(store, self.strategy, "SIGDEC-VERT-LINEAGE")
+        accept_exit_decision(
+            ROOT,
+            store,
+            strategy=self.strategy,
+            exit_decision=exit_decision(pid),
+            known_activation_epochs=KNOWN_EPOCHS,
+        )
+        row = store.get_position(pid)
+        self.assertEqual(row["signal_decision_sha256"], canonical_spec_sha256(signal("SIGDEC-VERT-LINEAGE")))
+        self.assertEqual(row["strategy_spec_sha256"], self.strategy["spec_sha256"])
+        self.assertEqual((row["reason_code"], row["exit_reason_code"]), ("VERTICAL_ENTER", "VERTICAL_EXIT"))
+        events = {
+            e["event_type"]: e["payload"]
+            for e in store.execution_events()
+            if e.get("position_id") == pid
+            or (e.get("payload") or {}).get("signal_decision_id") == "SIGDEC-VERT-LINEAGE"
+        }
+        self.assertEqual(
+            events["SIGNAL_DECISION_ACCEPTED"]["evidence_refs"],
+            signal("SIGDEC-VERT-LINEAGE")["evidence_refs"],
+        )
+        self.assertEqual(events["EXIT_DECISION_ACCEPTED"]["exit_decision_id"], "EXITDEC-VERT-1")
+        trading = compose_trading_operations(ROOT, store)
+        trace = next(t for t in trading["traces"] if t.get("signal_decision_id") == "SIGDEC-VERT-LINEAGE")
+        stages = {item["event_type"]: item["stage"] for item in trace["events"]}
+        self.assertEqual(stages["EXIT_DECISION_ACCEPTED"], "POSITION")
 
 
 if __name__ == "__main__":

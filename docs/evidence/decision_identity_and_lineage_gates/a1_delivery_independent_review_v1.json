@@ -1,0 +1,54 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "DECISION-IDENTITY-AND-LINEAGE-GATES-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-26",
+  "task_id": "DECISION_IDENTITY_AND_LINEAGE_GATES_V1",
+  "reviewed_bindings_sha256": "90f266d115aa58de1149f90a20e5563c233289f5200b0c79729d727351a7cc1e",
+  "reviewed_inventory_sha256": "f4e51aea2a0d9051fa42d0487c900532a80284baf21f8900324b499f90e41a90",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_PAPER_PLANE_UNCHANGED_VS_1f66fd66"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "WRITE_SET_OK",
+        "HFIC_ABSENT",
+        "PAPER_PLANE_PINNED",
+        "CATALOG_RESTORE_OK",
+        "EPOCH_EXPECT_NOT_WEAKENING",
+        "REVIEW_PLAN_OK"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_DOD_1_IDENTITY_CLASSES",
+        "PASS_DOD_2_AUDIT_CODES_AND_REPLAY",
+        "PASS_DOD_3_LINEAGE_AND_EXIT_STAGE",
+        "PASS_DOD_4_SPEC_DRIFT",
+        "NULL_BACKFILL_UNFALSIFIED",
+        "PASS_DOD_5_ASOF_ONLY_NO_WEAKENING"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE_TRADING",
+    "NO_MERGE",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}
