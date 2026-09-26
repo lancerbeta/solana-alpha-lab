@@ -849,7 +849,7 @@ fragility to one week/entity/regime
 preparatory-loop risk
 ```
 
-Не суммируй произвольные баллы. Покажи dominance logic и strongest rejected alternative.
+Не суммируй произвольные баллы. Покажи dominance logic и strongest rejected alternative. Если selected одна карточка, не выдумывай rejected alternative: это `NONE`.
 
 Разрешён выбор только одного:
 
@@ -986,7 +986,7 @@ decision after collection
 4. `CANDIDATE_PORTFOLIO` — 0–6 Candidate Cards for ordinary predictive grounded search. Do not invent cards to reach four. A causal portfolio still keeps the A4 identification bar. If nothing is selected, write `NO_WORTHY_HYPOTHESIS` and do not fabricate a runner-up.
 5. `PRIOR_AND_NOVELTY_AUDIT`.
 6. `HARD_VETO_RESULTS`.
-7. `PARETO_SELECTION` — finalists, winner, strongest rejected alternative.
+7. `PARETO_SELECTION` — finalists, winner, strongest rejected alternative. Если selected одна карточка, напиши `NONE` и не создавай вторую.
 8. `SELECTED_HYPOTHESIS_CONTRACT` — либо `NONE`.
 9. `CHEAPEST_CREDIBLE_FALSIFIER` — либо `NONE`.
 10. `PROVISIONAL_LANE_AND_SYSTEM_DELTA`.
