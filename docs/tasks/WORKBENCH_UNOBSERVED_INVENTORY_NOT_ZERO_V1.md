@@ -27,6 +27,7 @@ managed_write_set:
   - tests/test_owner_workbench_predeploy_experience_qa_v1.py
   - tests/test_factory_ordinary_market_hypothesis.py
   - catalog/assets/core.yaml
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
 external_caps:
   network: false
   credentials: false
