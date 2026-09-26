@@ -13,9 +13,9 @@ required_review_roles:
   - ARCHITECTURE_CRITIC
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: ae678372f2a96fbc20c519c23905ae5c44332458
+  expected_base: ac5b761e4746cebc81b416a843a8a23080d71649
   expected_upstream: origin/main
-  expected_upstream_oid: ae678372f2a96fbc20c519c23905ae5c44332458
+  expected_upstream_oid: ac5b761e4746cebc81b416a843a8a23080d71649
   expected_branch: cursor/paper-plane-write-integrity-v1
   dirty_mode: ALLOW_REPORTED
 objective: >-

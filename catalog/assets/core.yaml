@@ -34901,7 +34901,7 @@ records:
   as_of: '2026-09-26'
   truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/PAPER_PLANE_WRITE_INTEGRITY_V1.md', repository_path: docs/tasks/PAPER_PLANE_WRITE_INTEGRITY_V1.md}
-  integrity: {kind: sha256, sha256: e8f2b229638617a8a9d8950ba122b0c8b9d8ae96b814dc15a164a4a0b8c8f2c8}
+  integrity: {kind: sha256, sha256: e0d2a142ed9a21c7b1bb3267568203f2ba17c88cf94bce12e5aa5fe05d97a5be}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: DOC-PAPER-SHADOW-EXECUTION-INTEGRITY-PRD-SSD-001}
