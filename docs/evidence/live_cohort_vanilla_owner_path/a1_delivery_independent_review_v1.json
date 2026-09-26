@@ -1,0 +1,51 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "LIVE-COHORT-VANILLA-OWNER-PATH-REVIEW-001",
+  "as_of": "2026-09-26",
+  "task_id": "LIVE_COHORT_VANILLA_OWNER_PATH_V1",
+  "reviewed_bindings_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+  "reviewed_inventory_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Ordinary unpack parses with only --data-root. Capture freezes and lists dependencies. Local consume builds, seals, and imports. A recorded size mismatch fails closed as CORPUS_PARQUET_SHA_MISMATCH. Current corpus partitions open by validation receipt id."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "The stale-mirror vertical reaches FORGE_CONTROL_READY. C200 forge_control_ready keeps the market epoch and hashes zero superseded corpus parquet. The path stops before /hypothesis-forge."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Capture and the SSH owner script do not call build_live_observation_source_from_rdp. Historical cohort rows bind through the current validation receipt. No new transport service or framework."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "The owner runs one command and does not supply a resolution file, closure receipt, schedule SHA, activation id, or cohort id. Real cohort build stays on the local consume phase."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_DEPLOY",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}
