@@ -4,8 +4,8 @@
   "review_id": "HFIC-PREFREEZE-DRAFT-RECOVERY-REVIEW-001",
   "as_of": "2026-09-26",
   "task_id": "HFIC_PREFREEZE_DRAFT_RECOVERY_V1",
-  "reviewed_bindings_sha256": "fbc6bef2f216a004cca762d8bc57f1549cf01e119a768dc7bc16c45a2feb3b34",
-  "reviewed_inventory_sha256": "dd8bc41871b48b1f45bf5bd888145ec7b5236cb4c595cb464859c2f1e102d921",
+  "reviewed_bindings_sha256": "0e6657834765da425cc655f44cea38dbdbde6880b318dcc387578c9d9bca4656",
+  "reviewed_inventory_sha256": "313de48befa62c8e7290351d9c23dbff37358c26d7fba7e1592849b624f0f040",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
