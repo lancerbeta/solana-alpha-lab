@@ -1,0 +1,34 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HANDOFF-MANIFEST-V1-1-WORDING-FACTORY-FIT-001",
+  "as_of": "2026-09-26",
+  "task_id": "HANDOFF_MANIFEST_V1_1_WORDING_V1",
+  "reviewed_bindings_sha256": "308108356fe01f807d5f711d0d68631238fa89147629383c9dd508e81cd41cb7",
+  "reviewed_inventory_sha256": "36b971a428f9beff4791968db0219b38e5c78fd74fa16fe2874902630924ea5a",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_CONTRACT_NAMES_SHIPPED_FREEZE",
+    "flexibility_and_history": "PASS_HISTORICAL_1_0_BYTES_UNCHANGED",
+    "context_efficiency": "PASS_ONE_PARAGRAPH",
+    "research_truth": "PASS_1_1_WITH_BINDING_1_0_WITHOUT",
+    "owner_operability": "PASS_RUSSIAN_READOUT",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_EXPERIMENT_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_REVERT_COMMIT",
+    "build_vs_buy": "PASS_WORDING_ONLY",
+    "red_team": "PASS_NO_CODE_CHANGE",
+    "security": "PASS_NO_AUTHORITY"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NO_PROMOTION_AUTHORITY_FROM_THIS_WORDING"
+  },
+  "recovery": "Revert this commit. The shipped freeze is unchanged.",
+  "limits": [
+    "NO_CODE_CHANGE",
+    "NO_HISTORICAL_REWRITE",
+    "NO_MERGE",
+    "NO_ALPHA"
+  ]
+}
