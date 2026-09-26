@@ -93,8 +93,12 @@ class OwnerWorkbenchPredeployExperienceQaTests(unittest.TestCase):
         )
         self.assertIn("details class=\"attention attention-p0 attention-scan\"", html)
         self.assertIn("<summary>", html)
-        self.assertIn("PNL_UNKNOWN_OR_STALE", html)
+        summary = html.split("</summary>", 1)[0]
+        self.assertIn("PNL_UNKNOWN_OR_STALE", summary)
+        self.assertIn("Смотреть evidence марки", summary)
+        self.assertNotIn("Known inventory lacks a known mark", summary)
         self.assertIn("WHY_NOW", html)
+        self.assertIn("Known inventory lacks a known mark", html)
         self.assertIn("INSPECT_MARK", html)
         self.assertIn("Открыть источник", html)
         self.assertIn("/operations", html)

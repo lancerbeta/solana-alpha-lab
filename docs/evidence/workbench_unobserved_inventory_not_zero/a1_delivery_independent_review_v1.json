@@ -1,0 +1,43 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "WORKBENCH-UNOBSERVED-INVENTORY-NOT-ZERO-REVIEW-001",
+  "as_of": "2026-09-26",
+  "task_id": "WORKBENCH_UNOBSERVED_INVENTORY_NOT_ZERO_V1",
+  "reviewed_bindings_sha256": "61bb9c91151f331caaa5d08e6e9e076b6da0aecbc354fd9e0241d9867a9357c7",
+  "reviewed_inventory_sha256": "e942884a23be7f667c93be0b4b645053b3557716e753519cafacec3e6910f1cd",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Counts render only for PRESENT inventory. NOT_PRESENT and UNAVAILABLE omit ACTIVE POSITIONS and Всего 0. English WHY_NOW stays inside the opened card."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Named HTML tests lock absent-source non-zero, the present empty-book zero, and the Russian closed attention line."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Unobserved Operations no longer reads as an empty book. Research UNAVAILABLE says недоступно. Closed summary is the Russian next action."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_DEPLOY",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}

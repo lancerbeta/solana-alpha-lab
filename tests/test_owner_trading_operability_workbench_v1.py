@@ -21,7 +21,11 @@ from solana_alpha_lab.factory.paper_plane import PaperPlaneStore
 from solana_alpha_lab.factory.runtime import copy_rehost_allowlist, load_runtime_config
 from solana_alpha_lab.factory.trading_runtime_policy import apply_policy, compose_runtime_envelope
 from solana_alpha_lab.factory.visual_os import visual_os_layout_css
-from solana_alpha_lab.factory.workbench import _operations_section, serve
+from solana_alpha_lab.factory.workbench import (
+    _operations_section,
+    _research_overview_html,
+    serve,
+)
 
 VISUAL_OS = ROOT / "configs/smial_visual_operating_system_v1.yaml"
 
@@ -113,6 +117,7 @@ class OwnerTradingOperabilityWorkbenchTests(unittest.TestCase):
             }
         )
         self.assertIn("ACTIVE POSITIONS = 0", html)
+        self.assertIn("Всего 0", html)
         self.assertIn("Торговые ограничения", html)
         self.assertIn("<h2>Активные позиции</h2>", html)
         self.assertIn("<h2>История</h2>", html)
@@ -120,6 +125,66 @@ class OwnerTradingOperabilityWorkbenchTests(unittest.TestCase):
         self.assertIn("entity-id", html)
         self.assertNotIn("Баланс", html)
         self.assertNotIn("Доступные деньги", html)
+
+    def test_unobserved_inventory_is_not_a_numeric_zero(self) -> None:
+        for status in ("NOT_PRESENT", "UNAVAILABLE"):
+            html = _operations_section(
+                {
+                    "operations": {
+                        "source_status": status,
+                        "position_rows": [],
+                        "bots": [],
+                    },
+                    "trading_operations": {
+                        "source_status": status,
+                        "runtime_envelope": {"modes": {}, "by_strategy": []},
+                        "contexts": [],
+                        "traces": [],
+                        "attention": [],
+                    },
+                }
+            )
+            self.assertNotIn("ACTIVE POSITIONS =", html)
+            self.assertNotIn("Всего 0", html)
+            self.assertNotIn("Нет позиций.", html)
+            if status == "NOT_PRESENT":
+                self.assertIn("NOT_PRESENT", html)
+                self.assertIn("не пустая здоровая система", html)
+            else:
+                self.assertIn("RUNTIME_SOURCE_UNAVAILABLE", html)
+
+    def test_unavailable_research_overview_is_not_a_numeric_zero(self) -> None:
+        html = _research_overview_html(
+            {
+                "completeness": "UNAVAILABLE",
+                "degraded": True,
+                "degraded_copy": (
+                    "Проекция жизненного цикла этой рабочей панели недоступна. "
+                    "(FileNotFoundError)"
+                ),
+                "counters": {
+                    "ACTIVE NOW": None,
+                    "ATTENTION": None,
+                    "GAPS": None,
+                    "TRIALS": None,
+                    "DECISIONS": None,
+                    "NEGATIVES": None,
+                    "SCIENTIFIC PROMOTE": None,
+                    "READY TO STRATEGY": None,
+                    "HANDOFF BLOCKED": None,
+                    "STRATEGY MATERIALIZED": None,
+                },
+                "needs_attention": [],
+                "current_activity": [],
+                "universe": [],
+                "universe_total": 0,
+                "filters": {},
+            }
+        )
+        self.assertIn("недоступна", html)
+        self.assertIn("недоступно", html)
+        self.assertNotIn("Всего 0", html)
+        self.assertNotIn(">нет<", html)
 
     def test_operations_shows_requested_runtime_effective(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
@@ -266,7 +331,9 @@ class OwnerTradingOperabilityWorkbenchTests(unittest.TestCase):
                 self.assertIn("Торговые ограничения", pages["/operations"])
                 research = pages["/research"]
                 self.assertIn("research-overview", research)
-                self.assertIn("Всего", research)
+                self.assertIn("недоступна", research)
+                self.assertNotIn("Всего 0", research)
+                self.assertNotIn(">нет<", research)
                 self.assertIn("td.num", visual_os_layout_css())
                 self.assertIn("runtime-конверт", pages["/economics"])
                 self.assertIn("NO OWNER FCF", pages["/economics"])
