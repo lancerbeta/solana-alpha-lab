@@ -29,7 +29,7 @@
     "tests/test_forge_evidence_identity_and_owner_gold_v1.py": "0aad5e8a45312f2e91117d8c559ec415bb7a64f3c0ff3fd62841a01d00b2aeeb",
     "tests/test_forge_input_truth_and_visibility_v1.py": "0bedd96c5fdfb9935ae4b643adcb0381c14ae2971b7a569f7af048a643c841ff",
     "tests/test_forge_representation_ladder_v1.py": "378942e76641d282536b4d89d5980d56b14684b0c094d799ea268f4194554b74",
-    "tests/test_live_cohort_vanilla_owner_path_v1.py": "d46407f6eac7b6d2b5f9755764edc79e6a38a364e01ffdb8de9f54d0f9c93a09"
+    "tests/test_live_cohort_vanilla_owner_path_v1.py": "2325817b2e068ce477e4edcb3dfe204f477a39666d3ca6606b0633fa310913cc"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -41,14 +41,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/live_cohort_vanilla_owner_path/a1_delivery_factory_fit_v1.json",
-    "sha256": "f7e8925537a30c31dcfa0fa9e89b5b09e78835caf3a957874ae38cf8076a91ab",
+    "sha256": "bceca042ca607743a509085603712d3b59edae9dbed82c2f1f1c82a32746023f",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LIVE_COHORT_VANILLA_OWNER_PATH",
     "independent_review": {
       "path": "docs/evidence/live_cohort_vanilla_owner_path/a1_delivery_independent_review_v1.json",
-      "sha256": "ae2e769fda6cb520430fa0bfe368ef52c77e23dfc3d18a38afd3d26bb6c66baa",
+      "sha256": "ebb74bd827d8beaf9f26bc9b100ea9f9e6c2d8fd6e37ed64f76aca73118a42e0",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
