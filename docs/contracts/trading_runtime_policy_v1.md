@@ -110,9 +110,17 @@ Owner projection must not mix those scopes into one scalar: family
 inventory is shown against the runtime family cap (`NOT_SET` when
 absent); StrategyVersion max is labeled bot-local.
 
-Admission freezes `admitted_entry_notional_usd_dec` and policy
-mode/revision/sha256. Later policy revisions do not resize existing
-admissions. Actual entered notional remains a separate fill field.
+Admission freezes `admitted_entry_notional_usd_dec`, `admitted_fee_bps`,
+and policy mode/revision/sha256. Later policy revisions do not resize
+existing admissions. Actual entered notional remains a separate fill field.
+A fill whose fee differs from `admitted_fee_bps` is
+`ENTRY_FILL_FEE_MISMATCH`. A notional above the frozen admission is
+`ENTRY_FILL_NOTIONAL_EXCEEDS_ADMISSION`.
+
+Resume of an admitted pre-attempt intent re-checks staleness, bot status,
+pause, policy validity and `new_entries_enabled`, in that order. A match
+cancels the intent with a reason and raises the same block code. `ATTEMPTING`
+and `UNKNOWN` never auto-fill; the retry answers `reconciliation_required`.
 PRE_TRADE_RISK_SNAPSHOT records StrategyVersion bot-local max and
 runtime family max as separate fields; it does not emit a mixed-scope
 minimum as canonical capacity.
@@ -129,7 +137,9 @@ request produces one revision. Stale current hash →
 `POLICY_STALE_WRITE_DENIED`.
 
 `new_entries_enabled=false` is the gitless emergency stop for NEW
-admissions in that mode. Existing per-bot `PAUSE_NEW_ENTRIES` remains.
+admissions in that mode and also cancels admitted, unattempted intents
+(`NEW_ENTRIES_DISABLED`). Existing per-bot `PAUSE_NEW_ENTRIES` remains and
+cancels those same intents (`ENTRIES_PAUSED`).
 
 ## 8. GET / persistence
 
