@@ -3188,7 +3188,7 @@ def persist_scientific_slot_admission(
             representation_registry=representation_registry,
         )
 
-    for attempt in range(8):
+    for attempt in range(4):
         try:
             store.append(
                 [event],
@@ -3199,7 +3199,7 @@ def persist_scientific_slot_admission(
         except Exception as exc:
             # A competing writer may hold the lease briefly. Re-read after a
             # bounded retry so the loser reports the occupied slot instead of
-            # leaking an implementation-level WRITER_BUSY or WRITER_LEASE_INVALID error.
+            # leaking an implementation-level WRITER_BUSY error.
             observed = _existing_scientific_slot_admission(store, slot)
             if observed is not None:
                 if str(observed.get("session_id") or "") != session_id:
@@ -3210,10 +3210,10 @@ def persist_scientific_slot_admission(
                     )
                 return observed
             if (
-                getattr(exc, "code", None) in {"WRITER_BUSY", "WRITER_LEASE_INVALID"}
-                and attempt < 7
+                getattr(exc, "code", None) == "WRITER_BUSY"
+                and attempt < 3
             ):
-                time.sleep(0.2 * (attempt + 1))
+                time.sleep(0.05 * (attempt + 1))
                 continue
             raise
     return body

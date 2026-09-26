@@ -32,7 +32,6 @@ managed_write_set:
   - src/solana_alpha_lab/factory/paper_shadow_commands.py
   - src/solana_alpha_lab/factory/paper_shadow_operations.py
   - src/solana_alpha_lab/factory/trading_operations.py
-  - src/solana_alpha_lab/factory/hfic_session.py
   - tests/test_paper_shadow_execution_integrity_vertical_v1.py
   - tests/test_paper_shadow_accounting_and_control_v1.py
   - tests/test_trading_operations_workbench_v2.py

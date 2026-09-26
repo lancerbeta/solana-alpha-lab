@@ -32309,7 +32309,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: c61012dac813231556945d310a51ff1d617dd66e92919965857491e062aea933}
+  integrity: {kind: sha256, sha256: d581b79e947c212dc0e55bacaf0f441d120022865c1106e7bf11507d97ec65f0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -35008,7 +35008,7 @@ records:
   as_of: '2026-09-26'
   truth_owner: PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1.md', repository_path: docs/tasks/PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1.md}
-  integrity: {kind: sha256, sha256: 624f444b7f39d9c9007279007eb8f2bb7b1d93acab349b18634efb0bd181de78}
+  integrity: {kind: sha256, sha256: 849231b16352df2af1561419bcb103bd7408d1accca51909618d271b9688f8c6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: DOC-PAPER-SHADOW-EXECUTION-INTEGRITY-PRD-SSD-001}
