@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import hashlib
 import json
 import re
 import sys
@@ -711,6 +712,14 @@ def cmd_discovery_execute(
         admit_discovery_binding(cohorts)
     except GroundedDiscoveryError as exc:
         return emit_error(exc.code)
+    census_sha = hashlib.sha256(census_path.read_bytes()).hexdigest()
+    observations_sha = hashlib.sha256(observations_path.read_bytes()).hexdigest()
+    for item in cohorts:
+        if (
+            item.get("census_sha256") != census_sha
+            or item.get("observations_sha256") != observations_sha
+        ):
+            return emit_error("BINDING_HASH_MISMATCH")
     try:
         census = load_parquet_rows(census_path)
         observations = load_parquet_rows(observations_path)

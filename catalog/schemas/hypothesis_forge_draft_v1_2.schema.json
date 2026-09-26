@@ -203,7 +203,7 @@
   "allOf": [
     {
       "if": {
-        "properties": {"candidates": {"minItems": 1}},
+        "properties": {"candidates": {"minItems": 2}},
         "required": ["candidates"]
       },
       "then": {

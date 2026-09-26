@@ -1422,11 +1422,14 @@ def _ordinary_discovery_requested(
     )
 
     surface = ""
+    contract = ""
     if isinstance(preflight_receipt, Mapping):
         surface = str(preflight_receipt.get("evidence_surface_mode") or "")
+        contract = str(preflight_receipt.get("discovery_contract_version") or "")
     return (
         str(draft.get("discovery_contract_version") or "") == DISCOVERY_CONTRACT_VERSION
         or surface == ORDINARY_GROUNDED_DISCOVERY_V1
+        or contract == DISCOVERY_CONTRACT_VERSION
     )
 
 
@@ -1449,7 +1452,16 @@ def _enforce_ordinary_grounded_evidence(
     )
 
     try:
-        assert_computed_grounded_evidence(store, evidence)
+        expected_scope = None
+        if isinstance(preflight_receipt, Mapping):
+            expected_scope = preflight_receipt.get("search_key_sha256")
+        assert_computed_grounded_evidence(
+            store,
+            evidence,
+            expected_journal_scope=(
+                str(expected_scope) if isinstance(expected_scope, str) else None
+            ),
+        )
     except GroundedDiscoveryError as exc:
         raise HficSessionError(exc.code) from exc
 
@@ -1528,23 +1540,33 @@ def freeze_draft(
     selected_index = _resolve_ref(selected_ref, identities)
     if selected_index < 0:
         raise HficSessionError("SELECTED_CANDIDATE_MISSING")
-    runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
-    if runner_up_index < 0:
-        raise HficSessionError("CROSS_REFERENCE_MISMATCH")
-    if selected_index == runner_up_index:
-        raise HficSessionError("SELECTED_EQUALS_RUNNER_UP")
-    rejected_index = _resolve_ref(
-        draft.get("strongest_rejected_alternative"),
-        identities,
+    optional_single = (
+        _ordinary_discovery_requested(draft, preflight_receipt)
+        and len(identities) == 1
+        and not str(draft.get("runner_up_candidate_ref") or "").strip()
+        and not str(draft.get("strongest_rejected_alternative") or "").strip()
     )
-    if rejected_index < 0:
-        raise HficSessionError("CROSS_REFERENCE_MISMATCH")
+    if optional_single:
+        runner_up_index = -1
+        rejected_index = -1
+    else:
+        runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
+        if runner_up_index < 0:
+            raise HficSessionError("CROSS_REFERENCE_MISMATCH")
+        if selected_index == runner_up_index:
+            raise HficSessionError("SELECTED_EQUALS_RUNNER_UP")
+        rejected_index = _resolve_ref(
+            draft.get("strongest_rejected_alternative"),
+            identities,
+        )
+        if rejected_index < 0:
+            raise HficSessionError("CROSS_REFERENCE_MISMATCH")
 
     selected = identities[selected_index]
-    runner_up = identities[runner_up_index]
-    rejected = identities[rejected_index]
+    runner_up = None if runner_up_index < 0 else identities[runner_up_index]
+    rejected = None if rejected_index < 0 else identities[rejected_index]
     selected_card = candidates[selected_index]
-    runner_up_card = candidates[runner_up_index]
+    runner_up_card = None if runner_up_index < 0 else candidates[runner_up_index]
     closed_family_ledger = ledger_from_receipt(
         preflight_receipt if isinstance(preflight_receipt, Mapping) else None
     )
@@ -1743,12 +1765,16 @@ def freeze_draft(
             packet,
             Path(repo_root) / "catalog/schemas/hypothesis_critic_input_v1.schema.json",
         )
-    runner_up_transport = (
-        grounded_candidates[runner_up_index]
-        if grounded_candidates is not None
-        else runner_up_card
-    )
-    if critic_packet_version == CRITIC_PACKET_VERSION_CURRENT:
+    runner_up_packet = None
+    if runner_up is None:
+        runner_up_transport = None
+    else:
+        runner_up_transport = (
+            grounded_candidates[runner_up_index]
+            if grounded_candidates is not None
+            else runner_up_card
+        )
+    if runner_up is not None and critic_packet_version == CRITIC_PACKET_VERSION_CURRENT:
         from solana_alpha_lab.factory.hfic_control_integrity import (
             CRITIC_PACKET_GROUNDING_MISMATCH,
             assert_packet_grounding_consistent,
@@ -1772,19 +1798,20 @@ def freeze_draft(
             )
         except ValueError as exc:
             raise HficSessionError(str(exc)) from exc
-    else:
+    elif runner_up is not None:
         runner_up_packet = _build_runner_up_critic_packet(
             packet,
             runner_up=runner_up,
             runner_up_card=runner_up_card,
             packet_version=critic_packet_version,
         )
-    _bind_packet_session_id(runner_up_packet, session_id)
-    if repo_root is not None:
-        _validate_json_schema(
-            runner_up_packet,
-            Path(repo_root) / "catalog/schemas/hypothesis_critic_input_v1.schema.json",
-        )
+    if runner_up_packet is not None:
+        _bind_packet_session_id(runner_up_packet, session_id)
+        if repo_root is not None:
+            _validate_json_schema(
+                runner_up_packet,
+                Path(repo_root) / "catalog/schemas/hypothesis_critic_input_v1.schema.json",
+            )
     packet_bytes = json.dumps(
         packet,
         ensure_ascii=False,
@@ -1793,7 +1820,7 @@ def freeze_draft(
         allow_nan=False,
     )
     runner_up_packet_bytes = json.dumps(
-        runner_up_packet,
+        {} if runner_up_packet is None else runner_up_packet,
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
@@ -1818,12 +1845,12 @@ def freeze_draft(
         )
         or None,
         "selected_candidate_id": selected.candidate_id,
-        "runner_up_candidate_id": runner_up.candidate_id,
-        "rejected_alternative_id": rejected.candidate_id,
+        "runner_up_candidate_id": None if runner_up is None else runner_up.candidate_id,
+        "rejected_alternative_id": None if rejected is None else rejected.candidate_id,
         "selected_definition_sha256": selected.full_sha256,
         "selected_display_ordinal": selected.display_ordinal,
-        "runner_up_definition_sha256": runner_up.full_sha256,
-        "runner_up_display_ordinal": runner_up.display_ordinal,
+        "runner_up_definition_sha256": None if runner_up is None else runner_up.full_sha256,
+        "runner_up_display_ordinal": None if runner_up is None else runner_up.display_ordinal,
         "candidate_ids": [item.candidate_id for item in identities],
         "critic_input_packet": packet,
         "critic_input_packet_sha256": hashlib.sha256(

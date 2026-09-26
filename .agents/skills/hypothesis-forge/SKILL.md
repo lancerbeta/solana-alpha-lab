@@ -268,8 +268,12 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-inp
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <scope> --format json
 ```
 
-   Put the returned `result_refs` on the draft as `grounded_evidence`. Do not
-   hand-write the summary. CONTROL does not run this command. This repair atom
+   Pass `--journal-scope` as the preflight `search_key_sha256`. Copy the
+   whole returned evidence object onto the draft as `grounded_evidence`.
+   Do not copy only `result_refs` and do not hand-write the summary.
+   Ordinary preflight already carries `evidence_surface_mode` and
+   `discovery_contract_version`. Do not invent those fields.
+   CONTROL does not run this command. This repair atom
    does not point it at the live market corpus.
    Then run **PROMPT A** from the operator pack using
    `HFIC-V1.2` and only the bounded `FORGE_CONTEXT_PACKET` plus explicitly

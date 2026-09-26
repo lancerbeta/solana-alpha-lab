@@ -41,6 +41,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
   - src/solana_alpha_lab/factory/hfic_representation_ladder.py
   - src/solana_alpha_lab/factory/hfic_session.py
+  - src/solana_alpha_lab/factory/hfic_preflight.py
   - src/solana_alpha_lab/factory/hfic_identity.py
   - src/solana_alpha_lab/factory/hfic_grounding.py
   - scripts/hypothesis_forge.py

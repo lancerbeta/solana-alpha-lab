@@ -19,8 +19,13 @@ stays missing. Empty cohorts stay in the table with a zero usable count.
 An explanatory rule later than the decision points is rejected. Overlapping
 collection windows are not independent replication. Mint overlap that was
 not measured is not reported as independent. The result carries
-`engine_emits_alpha=false`. A predictive card can freeze without an actor
-story. A causal card still requires one.
+`engine_emits_alpha=false`. Ordinary preflight stamps the discovery
+contract, and freeze reads that receipt. Zero candidates can freeze. One
+selected candidate does not need a fabricated runner-up. File hashes,
+cohort and release must match the binding. `holdout` must be explicit
+false. A later cell revision does not erase an earlier PIT observation.
+A different explanatory condition is not the same prior close. A predictive
+card can freeze without an actor story. A causal card still requires one.
 
 The look is a `RESEARCH_ARTIFACT` of kind `DISCOVERY_QUERY_LOOK`. The same
 spec, data binding, and calculation version resume the previous bytes and

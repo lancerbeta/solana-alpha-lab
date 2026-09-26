@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 import sys
@@ -181,6 +182,7 @@ class GroundedDiscoveryTests(unittest.TestCase):
             "estimand": "ticket_asymmetry",
             "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
             "representation_scope": CURRENT_REPRESENTATION_CONTROL_V1,
+            "explanatory_condition": "PRICE_GE_2",
             "memory_status": "HARD_CLOSE",
             "reason_code": "KILL_PREPARATORY_LOOP",
         }
@@ -310,6 +312,13 @@ def _binding() -> list[dict]:
     ]
 
 
+def _release_for(cohort: str) -> str:
+    for item in _binding():
+        if item["cohort_id"] == cohort:
+            return str(item["release_id"])
+    raise KeyError(cohort)
+
+
 def _census(
     mint: str,
     cohort: str,
@@ -319,14 +328,26 @@ def _census(
     return {
         "mint": mint,
         "cohort_id": cohort,
+        "release_id": _release_for(cohort),
         "candidate_state": state,
         "authoritative_anchor": anchor,
     }
 
 
-def _obs(mint: str, point: str, field: str, value: float | None, *, at: str, state: str = "OBSERVED") -> dict:
+def _obs(
+    mint: str,
+    point: str,
+    field: str,
+    value: float | None,
+    *,
+    at: str,
+    cohort: str,
+    state: str = "OBSERVED",
+) -> dict:
     return {
         "mint": mint,
+        "cohort_id": cohort,
+        "release_id": _release_for(cohort),
         "point_id": point,
         "field_id": field,
         "state": state,
@@ -361,11 +382,12 @@ def _rows():
     )
     observations = []
     for mint, price, target, decision_at, target_at, target_state in plan:
+        cohort = c3 if mint in {"high2", "low2"} else c1
         if price is not None:
-            observations.append(_obs(mint, "X300", PRICE, price, at=decision_at))
-        observations.append(_obs(mint, "X300", LIQ, 100.0, at=decision_at))
+            observations.append(_obs(mint, "X300", PRICE, price, at=decision_at, cohort=cohort))
+        observations.append(_obs(mint, "X300", LIQ, 100.0, at=decision_at, cohort=cohort))
         observations.append(
-            _obs(mint, "Y1800", PRICE, target, at=target_at, state=target_state)
+            _obs(mint, "Y1800", PRICE, target, at=target_at, state=target_state, cohort=cohort)
         )
     return census, observations
 
@@ -470,7 +492,16 @@ class ProductionRowRecipeTests(unittest.TestCase):
             self.assertEqual(second["result_refs"], first["result_refs"])
             self.assertEqual(second["budget"]["main_count"], 1)
             changed = [dict(row) for row in observations]
-            changed.append(_obs("extra", "X300", PRICE, 1.0, at=DECISION_AT))
+            changed.append(
+                _obs(
+                    "extra",
+                    "X300",
+                    PRICE,
+                    1.0,
+                    at=DECISION_AT,
+                    cohort="REL-20260902T111900Z-20260909T111900Z",
+                )
+            )
             third = run_recorded_discovery_query(
                 resumed,
                 census=census,
@@ -525,10 +556,11 @@ class ProductionRowRecipeTests(unittest.TestCase):
         censored = [
             _census("slow", "REL-20260902T111900Z-20260909T111900Z"),
         ]
+        slow_cohort = "REL-20260902T111900Z-20260909T111900Z"
         rows = [
-            _obs("slow", "X300", PRICE, 5.0, at=DECISION_AT),
-            _obs("slow", "X300", LIQ, 100.0, at=DECISION_AT),
-            _obs("slow", "Y1800", PRICE, 99.0, at="2026-09-03T00:50:00Z"),
+            _obs("slow", "X300", PRICE, 5.0, at=DECISION_AT, cohort=slow_cohort),
+            _obs("slow", "X300", LIQ, 100.0, at=DECISION_AT, cohort=slow_cohort),
+            _obs("slow", "Y1800", PRICE, 99.0, at="2026-09-03T00:50:00Z", cohort=slow_cohort),
         ]
         binding = [_binding()[0]]
         summary = execute_discovery_from_rows(censored, rows, _spec(), binding)["summary"]
@@ -552,6 +584,65 @@ class ProductionRowRecipeTests(unittest.TestCase):
         self.assertEqual(definition["actor_counterparty"], "")
         self.assertEqual(definition["mechanism"], "")
 
+    def test_r2_boundaries_do_not_admit_foreign_or_late_rows(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import _ordinary_discovery_requested
+
+        census, observations = _rows()
+        foreign = [dict(row) for row in observations]
+        for row in foreign:
+            row["cohort_id"] = "PROTECTED_COHORT"
+            row["release_id"] = "99" * 32
+        foreign_summary = execute_discovery_from_rows(census, foreign, _spec(), _binding())["summary"]
+        self.assertEqual(foreign_summary["base_x_n"], 0)
+        unresolved = _binding()
+        unresolved[0]["holdout"] = None
+        with self.assertRaises(GroundedDiscoveryError) as holdout:
+            execute_discovery_from_rows(census, observations, _spec(), unresolved)
+        self.assertEqual(holdout.exception.code, "HOLDOUT_UNRESOLVED")
+        forbidden = _spec()
+        forbidden["explanatory_rules"][0]["field_id"] = "FIELD-HOLDER-COUNT-001"
+        with self.assertRaises(GroundedDiscoveryError) as field:
+            execute_discovery_from_rows(census, observations, forbidden, _binding())
+        self.assertEqual(field.exception.code, "FIELD_NOT_IN_ALLOWLIST")
+        c1 = "REL-20260902T111900Z-20260909T111900Z"
+        early = [
+            _census("keep", c1),
+        ]
+        early_rows = [
+            _obs("keep", "X300", PRICE, 5.0, at=DECISION_AT, cohort=c1),
+            _obs("keep", "X300", LIQ, 100.0, at=DECISION_AT, cohort=c1),
+            _obs("keep", "X300", LIQ, 1.0, at="2026-09-03T00:20:00Z", cohort=c1),
+            _obs("keep", "Y1800", PRICE, 1.0, at=TARGET_AT, cohort=c1),
+        ]
+        kept = execute_discovery_from_rows(early, early_rows, _spec(), [_binding()[0]])["summary"]
+        self.assertEqual(kept["base_x_n"], 1)
+        price = {
+            "question_id": "PRICE_RULE",
+            "population": "BASE_X",
+            "decision_timestamp": "X300",
+            "target": "Y1800:FIELD-USD-PRICE-001",
+            "estimand": "later_price",
+            "explanatory_condition": "PRICE_GE_2",
+            "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+            "representation_scope": "PRICE_LIQUIDITY_PREFIX_THROUGH_Y1800",
+            "memory_status": "HARD_CLOSE",
+            "reason_code": "KILL_MECHANISM",
+        }
+        liquidity = {**price, "question_id": "LIQ_RULE", "explanatory_condition": "LIQUIDITY_LT_100"}
+        self.assertEqual(prior_scope_relation(liquidity, price), "SCOPE_DISTINCT")
+        label_only = {
+            **price,
+            "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+            "representation_scope": price["representation_scope"],
+        }
+        self.assertEqual(prior_scope_relation(price, label_only), "EXACT_VALID_CLOSE")
+        receipt = {
+            "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+            "discovery_contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
+        }
+        self.assertTrue(_ordinary_discovery_requested({}, receipt))
+        self.assertFalse(_ordinary_discovery_requested({}, {"evidence_surface_mode": None}))
+
 
 class DiscoveryExecuteCliTests(unittest.TestCase):
     def test_public_cli_computes_without_a_handwritten_summary(self) -> None:
@@ -566,8 +657,14 @@ class DiscoveryExecuteCliTests(unittest.TestCase):
             binding_path = root / "binding.json"
             spec_path = root / "spec.json"
             scope_path = root / "scope.json"
+            cohorts = _binding()
+            census_sha = hashlib.sha256(census_path.read_bytes()).hexdigest()
+            obs_sha = hashlib.sha256(obs_path.read_bytes()).hexdigest()
+            for item in cohorts:
+                item["census_sha256"] = census_sha
+                item["observations_sha256"] = obs_sha
             binding_path.write_text(
-                json.dumps({"cohorts": _binding(), "priors": []}),
+                json.dumps({"cohorts": cohorts, "priors": []}),
                 encoding="utf-8",
             )
             spec_path.write_text(json.dumps(_spec()), encoding="utf-8")
@@ -611,6 +708,119 @@ class DiscoveryExecuteCliTests(unittest.TestCase):
             self.assertEqual(payload["result"]["pooled"]["mean_target"], 0.0)
             self.assertTrue(payload["result_refs"])
             self.assertNotIn("typed_value", json.dumps(payload["result"]))
+            self.assertIn("spec", json.dumps(payload))
+
+
+class OrdinaryOwnerPathTests(unittest.TestCase):
+    def test_stamped_preflight_freezes_zero_candidates_with_computed_evidence(self) -> None:
+        from tests.test_hfic_cli import bind_draft, populate_real_c1_c2, run_cli
+
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            data_root = workspace / "rdp"
+            populate_real_c1_c2(data_root, workspace)
+            preflight = run_cli(
+                "preflight",
+                "--owner-focus",
+                "ORDINARY-DISCOVERY-SYNTH",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(preflight.returncode, 0, preflight.stderr)
+            receipt = json.loads(preflight.stdout)
+            self.assertEqual(receipt.get("evidence_surface_mode"), "ORDINARY_GROUNDED_DISCOVERY_V1")
+            self.assertEqual(receipt.get("discovery_contract_version"), "FORGE_GROUNDED_DISCOVERY_V1")
+            census, observations = _rows()
+            census_path = workspace / "census.parquet"
+            obs_path = workspace / "observations.parquet"
+            pq.write_table(pa.Table.from_pylist(census), census_path)
+            pq.write_table(pa.Table.from_pylist(observations), obs_path)
+            cohorts = _binding()
+            census_sha = hashlib.sha256(census_path.read_bytes()).hexdigest()
+            obs_sha = hashlib.sha256(obs_path.read_bytes()).hexdigest()
+            for item in cohorts:
+                item["census_sha256"] = census_sha
+                item["observations_sha256"] = obs_sha
+            binding_path = workspace / "binding.json"
+            spec_path = workspace / "spec.json"
+            scope_path = workspace / "scope.json"
+            binding_path.write_text(json.dumps({"cohorts": cohorts}), encoding="utf-8")
+            spec_path.write_text(json.dumps(_spec()), encoding="utf-8")
+            scope_path.write_text(json.dumps(_scope()), encoding="utf-8")
+            completed = subprocess.run(
+                [
+                    "uv", "run", "--locked", "--managed-python", "python", "-B",
+                    "scripts/hypothesis_forge.py", "discovery-execute",
+                    "--store", str(data_root),
+                    "--census", str(census_path),
+                    "--observations", str(obs_path),
+                    "--binding", str(binding_path),
+                    "--spec", str(spec_path),
+                    "--candidate-scope", str(scope_path),
+                    "--journal-scope", str(receipt["search_key_sha256"]),
+                    "--format", "json",
+                ],
+                cwd=ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            evidence = json.loads(completed.stdout)
+            restarted = subprocess.run(
+                [
+                    "uv", "run", "--locked", "--managed-python", "python", "-B",
+                    "scripts/hypothesis_forge.py", "discovery-execute",
+                    "--store", str(data_root),
+                    "--census", str(census_path),
+                    "--observations", str(obs_path),
+                    "--binding", str(binding_path),
+                    "--spec", str(spec_path),
+                    "--candidate-scope", str(scope_path),
+                    "--journal-scope", str(receipt["search_key_sha256"]),
+                    "--format", "json",
+                ],
+                cwd=ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(restarted.returncode, 0, restarted.stderr)
+            self.assertFalse(json.loads(restarted.stdout)["queries"][0]["new_look"])
+            self.assertEqual(json.loads(restarted.stdout)["result_refs"], evidence["result_refs"])
+            preflight_after = run_cli(
+                "preflight",
+                "--owner-focus",
+                "ORDINARY-DISCOVERY-SYNTH",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(preflight_after.returncode, 0, preflight_after.stderr)
+            receipt = json.loads(preflight_after.stdout)
+            self.assertEqual(receipt.get("search_key_sha256"), evidence["journal_scope"])
+            draft = json.loads(
+                (ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1_2.json").read_text(encoding="utf-8")
+            )
+            draft["candidates"] = []
+            draft.pop("selected_candidate_ref", None)
+            draft.pop("runner_up_candidate_ref", None)
+            draft.pop("strongest_rejected_alternative", None)
+            draft = bind_draft(draft, receipt)
+            draft["grounded_evidence"] = evidence
+            frozen = freeze_draft(
+                draft,
+                preflight_receipt=receipt,
+                store=ResearchStore(data_root),
+                repo_root=ROOT,
+            )
+            self.assertEqual(frozen["critic_terminal"], "NO_WORTHY_HYPOTHESIS")
+            self.assertFalse(frozen["grounded_evidence"]["raw_corpus_negative"])
+            self.assertEqual(
+                frozen["grounded_evidence"]["result_refs"],
+                evidence["result_refs"],
+            )
 
 
 if __name__ == "__main__":

@@ -40,7 +40,13 @@ MAX_ADAPTIVE_REFINEMENTS = 2
 MAX_EXPLANATORY = 3
 CALCULATION_VERSION = "FORGE_GROUNDED_DISCOVERY_CALC_V1"
 PIT_LATENESS_SECONDS = 300
-_CONTENT_AXES = ("population", "decision_timestamp", "target", "estimand")
+_CONTENT_AXES = (
+    "population",
+    "decision_timestamp",
+    "target",
+    "estimand",
+    "explanatory_condition",
+)
 _BLOCKING_RELATIONS = frozenset({"EXACT_SCOPE_MATCH", "EXACT_VALID_CLOSE"})
 _REL_RE = re.compile(
     r"^REL-(\d{8}T\d{6}Z)-(\d{8}T\d{6}Z)$"
@@ -131,8 +137,8 @@ def admit_discovery_binding(cohorts: Sequence[Mapping[str, Any]]) -> dict[str, A
             value = item.get(key)
             if not isinstance(value, str) or not value:
                 raise GroundedDiscoveryError("DISCOVERY_BINDING_INCOMPLETE")
-        if item.get("holdout") is True:
-            raise GroundedDiscoveryError("HOLDOUT_PROTECTED")
+        if item.get("holdout") is not False:
+            raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED")
         admitted.append(
             {
                 "cohort_id": item["cohort_id"],
@@ -213,6 +219,8 @@ def summarize_discovery_query(
     block_denoms: dict[str, int] = defaultdict(int)
     flag_denoms: dict[str, int] = defaultdict(int)
     cohort_admissible: dict[str, int] = defaultdict(int)
+    block_admissible: dict[str, int] = defaultdict(int)
+    flag_admissible: dict[str, int] = defaultdict(int)
     cohort_overlap: dict[str, int] = defaultdict(int)
     block_overlap: dict[str, int] = defaultdict(int)
     for cohort in required_cohorts or []:
@@ -245,6 +253,8 @@ def summarize_discovery_query(
             continue
         admissible_n += 1
         cohort_admissible[cohort] += 1
+        block_admissible[block] += 1
+        flag_admissible[flag_key] += 1
         decision_at = _parse_time(member.get("decision_at"))
         target_at = _parse_time(member.get("target_at"))
         state = str(member.get("target_state") or "ABSENT")
@@ -353,11 +363,18 @@ def summarize_discovery_query(
                 by_block.get(key, []),
                 block_denoms[key],
                 independent=overlap_known and block_overlap[key] == 0 and not calendar_overlap,
+                admissible=block_admissible[key],
             )
             for key in sorted(block_denoms)
         ],
         "by_explanatory": [
-            _view(key, by_flag.get(key, []), flag_denoms[key], independent=False)
+            _view(
+                key,
+                by_flag.get(key, []),
+                flag_denoms[key],
+                independent=False,
+                admissible=flag_admissible[key],
+            )
             for key in sorted(flag_denoms)
         ],
         "overlap_exposed_base_x": overlap_n,
@@ -489,6 +506,10 @@ def prior_scope_relation(
         if _valid_close(prior):
             return "EXACT_VALID_CLOSE"
         return "EXACT_SCOPE_MATCH"
+    if content_same and not richer_ordinary:
+        if _valid_close(prior):
+            return "EXACT_VALID_CLOSE"
+        return "EXACT_SCOPE_MATCH"
     if not content_same:
         return "SCOPE_DISTINCT"
     if richer_ordinary:
@@ -518,24 +539,37 @@ def _deadline(anchor: datetime, offset_seconds: int) -> datetime:
     return anchor + timedelta(seconds=offset_seconds + PIT_LATENESS_SECONDS)
 
 
-def _latest_cells(observations: Sequence[Mapping[str, Any]]) -> dict[tuple[str, str, str], Mapping[str, Any]]:
-    best: dict[tuple[str, str, str], Mapping[str, Any]] = {}
+def _grouped_cells(
+    observations: Sequence[Mapping[str, Any]],
+) -> dict[tuple[str, str, str, str, str], list[Mapping[str, Any]]]:
+    grouped: dict[tuple[str, str, str, str, str], list[Mapping[str, Any]]] = defaultdict(list)
     for row in observations:
+        cohort = str(row.get("cohort_id") or "")
+        release = str(row.get("release_id") or "")
         mint = str(row.get("mint") or "")
         point = str(row.get("point_id") or "")
         field = str(row.get("field_id") or "")
-        if not mint or not point or not field:
+        if not cohort or not release or not mint or not point or not field:
             continue
-        key = (mint, point, field)
-        previous = best.get(key)
-        if previous is None:
-            best[key] = row
+        grouped[(cohort, release, mint, point, field)].append(row)
+    return grouped
+
+
+def _pit_cell(
+    grouped: Mapping[tuple[str, str, str, str, str], Sequence[Mapping[str, Any]]],
+    key: tuple[str, str, str, str, str],
+    deadline: datetime,
+) -> Mapping[str, Any] | None:
+    """Latest revision among rows already available at the deadline."""
+
+    chosen: tuple[datetime, Mapping[str, Any]] | None = None
+    for row in grouped.get(key, ()):
+        available = _parse_time(row.get("first_reliable_available_at"))
+        if available is None or available > deadline:
             continue
-        current_at = _parse_time(row.get("first_reliable_available_at"))
-        previous_at = _parse_time(previous.get("first_reliable_available_at"))
-        if current_at is not None and (previous_at is None or current_at >= previous_at):
-            best[key] = row
-    return best
+        if chosen is None or available >= chosen[0]:
+            chosen = (available, row)
+    return None if chosen is None else chosen[1]
 
 
 def _window_overlaps(cohorts: Sequence[Mapping[str, Any]]) -> set[str]:
@@ -560,10 +594,12 @@ def _window_overlaps(cohorts: Sequence[Mapping[str, Any]]) -> set[str]:
 
 
 def _explanatory_flags(
-    cells: Mapping[tuple[str, str, str], Mapping[str, Any]],
+    grouped: Mapping[tuple[str, str, str, str, str], Sequence[Mapping[str, Any]]],
+    *,
+    cohort: str,
+    release: str,
     mint: str,
     rules: Sequence[Mapping[str, Any]],
-    *,
     anchor: datetime,
 ) -> dict[str, bool | None]:
     flags: dict[str, bool | None] = {}
@@ -573,12 +609,14 @@ def _explanatory_flags(
             raise GroundedDiscoveryError("COHORT_NOT_A_FEATURE")
         point = str(rule.get("point_id") or "X300")
         field = str(rule.get("field_id") or "")
-        cell = cells.get((mint, point, field))
+        if field not in ALLOWED_FIELDS:
+            raise GroundedDiscoveryError("FIELD_NOT_IN_ALLOWLIST")
+        cell = _pit_cell(
+            grouped,
+            (cohort, release, mint, point, field),
+            _deadline(anchor, _point_offset(point)),
+        )
         if cell is None or str(cell.get("state") or "") != "OBSERVED":
-            flags[name] = None
-            continue
-        available = _parse_time(cell.get("first_reliable_available_at"))
-        if available is None or available > _deadline(anchor, _point_offset(point)):
             flags[name] = None
             continue
         observed = _as_float(cell.get("typed_value"))
@@ -627,15 +665,19 @@ def execute_discovery_from_rows(
             raise GroundedDiscoveryError("EXPLANATORY_INVALID")
         if _point_offset(rule.get("point_id") or "X300") > decision_max:
             raise GroundedDiscoveryError("EXPLANATORY_AFTER_DECISION")
-    cells = _latest_cells(observations)
+    grouped = _grouped_cells(observations)
     decision_offset = max(_point_offset(point) for point in bound_spec["decision_points"])
     members: list[dict[str, Any]] = []
     cohort_ids = [str(item["cohort_id"]) for item in admitted["cohorts"]]
+    admitted_pairs = {
+        (str(item["cohort_id"]), str(item["release_id"])) for item in admitted["cohorts"]
+    }
     for row in census:
         mint = str(row.get("mint") or "")
         if not mint:
             continue
-        cohort = str(row.get("cohort_id") or "UNKNOWN")
+        cohort = str(row.get("cohort_id") or "")
+        release = str(row.get("release_id") or "")
         anchor = _parse_time(row.get("authoritative_anchor"))
         state = str(row.get("candidate_state") or "")
         block = str(row.get("calendar_block") or "")
@@ -645,22 +687,17 @@ def execute_discovery_from_rows(
             block = "UNANCHORED"
         exclusion = None
         in_base = False
-        if state != "X_ELIGIBLE" or anchor is None:
+        if (cohort, release) not in admitted_pairs:
+            exclusion = "BINDING_COHORT_MISMATCH"
+        elif state != "X_ELIGIBLE" or anchor is None:
             exclusion = "NOT_X_ELIGIBLE" if state != "X_ELIGIBLE" else "ANCHOR_MISSING"
         else:
-            liquidity = cells.get((mint, "X300", LIQUIDITY))
-            available = (
-                _parse_time(liquidity.get("first_reliable_available_at"))
-                if isinstance(liquidity, Mapping)
-                else None
+            liquidity = _pit_cell(
+                grouped,
+                (cohort, release, mint, "X300", LIQUIDITY),
+                _deadline(anchor, 300),
             )
-            liquid_ok = (
-                isinstance(liquidity, Mapping)
-                and str(liquidity.get("state") or "") == "OBSERVED"
-                and available is not None
-                and available <= _deadline(anchor, 300)
-            )
-            if not liquid_ok:
+            if not isinstance(liquidity, Mapping) or str(liquidity.get("state") or "") != "OBSERVED":
                 exclusion = "PIT_LIQUIDITY_MISSING"
             else:
                 in_base = True
@@ -672,49 +709,66 @@ def execute_discovery_from_rows(
             decision_ready = True
             for point in bound_spec["decision_points"]:
                 for field in bound_spec["decision_fields"]:
-                    cell = cells.get((mint, str(point), str(field)))
-                    cell_at = (
-                        _parse_time(cell.get("first_reliable_available_at"))
-                        if isinstance(cell, Mapping)
-                        else None
+                    cell = _pit_cell(
+                        grouped,
+                        (cohort, release, mint, str(point), str(field)),
+                        _deadline(anchor, _point_offset(point)),
                     )
-                    if (
-                        not isinstance(cell, Mapping)
-                        or str(cell.get("state") or "") != "OBSERVED"
-                        or cell_at is None
-                        or cell_at > _deadline(anchor, _point_offset(point))
-                    ):
+                    if not isinstance(cell, Mapping) or str(cell.get("state") or "") != "OBSERVED":
                         decision_ready = False
-            flags = _explanatory_flags(cells, mint, [item for item in rules if isinstance(item, Mapping)], anchor=anchor)
+            flags = _explanatory_flags(
+                grouped,
+                cohort=cohort,
+                release=release,
+                mint=mint,
+                rules=[item for item in rules if isinstance(item, Mapping)],
+                anchor=anchor,
+            )
         target_state = "ABSENT"
         target_at = None
         target_value = None
         if in_base and anchor is not None:
-            target = cells.get((mint, str(bound_spec["target_point"]), str(bound_spec["target_field"])))
-            if not isinstance(target, Mapping):
-                target_state = "ABSENT"
-            else:
+            deadline = _deadline(anchor, decision_offset)
+            due = anchor + timedelta(
+                seconds=_point_offset(bound_spec["target_point"]) + PIT_LATENESS_SECONDS
+            )
+            target_key = (
+                cohort,
+                release,
+                mint,
+                str(bound_spec["target_point"]),
+                str(bound_spec["target_field"]),
+            )
+            valid_targets = []
+            leaked_row = None
+            censored_row = None
+            for target_row in grouped.get(target_key, ()):
+                target_at_dt = _parse_time(target_row.get("first_reliable_available_at"))
+                if target_at_dt is None:
+                    continue
+                if target_at_dt <= deadline:
+                    leaked_row = target_row
+                elif target_at_dt <= due:
+                    valid_targets.append((target_at_dt, target_row))
+                else:
+                    censored_row = target_row
+            if valid_targets:
+                valid_targets.sort(key=lambda item: item[0])
+                target_at_dt, target = valid_targets[-1]
                 target_state = str(target.get("state") or "ABSENT")
-                target_at_dt = _parse_time(target.get("first_reliable_available_at"))
-                deadline = _deadline(anchor, decision_offset)
-                due = anchor + timedelta(
-                    seconds=_point_offset(bound_spec["target_point"]) + PIT_LATENESS_SECONDS
-                )
-                if target_at_dt is not None and target_at_dt <= deadline:
-                    target_state = "LEAKED"
-                    target_at = target_at_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
-                elif target_at_dt is not None and target_at_dt > due:
-                    target_state = "CENSORED_LATE"
-                    target_at = target_at_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
-                    target_value = None
-                elif target_state == "OBSERVED":
+                target_at = target_at_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+                if target_state == "OBSERVED":
                     target_value = _as_float(target.get("typed_value"))
                     if target_value is None:
                         target_state = "MISSING_TYPED"
-                    elif target_at_dt is not None:
-                        target_at = target_at_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
-                    else:
-                        target_state = "ABSENT"
+            elif leaked_row is not None:
+                target_state = "LEAKED"
+                leaked_at = _parse_time(leaked_row.get("first_reliable_available_at"))
+                target_at = leaked_at.strftime("%Y-%m-%dT%H:%M:%SZ") if leaked_at else None
+            elif censored_row is not None:
+                target_state = "CENSORED_LATE"
+                censored_at = _parse_time(censored_row.get("first_reliable_available_at"))
+                target_at = censored_at.strftime("%Y-%m-%dT%H:%M:%SZ") if censored_at else None
         members.append(
             {
                 "member_id": mint,
@@ -815,7 +869,12 @@ def list_discovery_looks(store: Any, journal_scope: str) -> list[dict[str, Any]]
     return found
 
 
-def assert_computed_grounded_evidence(store: Any, evidence: Mapping[str, Any]) -> dict[str, Any]:
+def assert_computed_grounded_evidence(
+    store: Any,
+    evidence: Mapping[str, Any],
+    *,
+    expected_journal_scope: str | None = None,
+) -> dict[str, Any]:
     """Freeze gate: evidence refs must match a durable computed artifact."""
 
     bound = bind_prior_scope_evidence(evidence)
@@ -831,6 +890,8 @@ def assert_computed_grounded_evidence(store: Any, evidence: Mapping[str, Any]) -
     if bound.get("calculation_version") != CALCULATION_VERSION:
         raise GroundedDiscoveryError("GROUNDED_RESULT_MISMATCH")
     journal_scope = str(bound.get("journal_scope") or "")
+    if expected_journal_scope and journal_scope != expected_journal_scope:
+        raise GroundedDiscoveryError("JOURNAL_SCOPE_MISMATCH")
     looks = {item.get("record_id"): item for item in list_discovery_looks(store, journal_scope)}
     last = looks.get(str(refs[-1]))
     if not isinstance(last, Mapping):
@@ -945,8 +1006,10 @@ def run_recorded_discovery_query(
             store,
             record_id=record_id,
             journal_scope=journal_scope,
+            spec=_stored_query_spec(spec),
             spec_sha256=summary["spec_sha256"],
             binding_sha=binding_sha,
+            data_refs=list(computed["admitted"]["cohorts"]),
             digest=digest,
             identity=identity,
             summary=summary,
@@ -984,13 +1047,21 @@ def run_recorded_discovery_query(
     return assert_computed_grounded_evidence(store, evidence)
 
 
+def _stored_query_spec(spec: Mapping[str, Any]) -> dict[str, Any]:
+    stored = validate_query_spec(spec)
+    stored["explanatory_rules"] = _jsonable(spec.get("explanatory_rules") or [])
+    return stored
+
+
 def _append_discovery_look(
     store: Any,
     *,
     record_id: str,
     journal_scope: str,
+    spec: Mapping[str, Any],
     spec_sha256: str,
     binding_sha: str,
+    data_refs: Sequence[Mapping[str, Any]],
     digest: str,
     identity: str,
     summary: Mapping[str, Any],
@@ -1009,7 +1080,9 @@ def _append_discovery_look(
         "journal_scope": journal_scope,
         "calculation_version": CALCULATION_VERSION,
         "query_id": summary.get("query_id"),
+        "spec": dict(spec),
         "spec_sha256": spec_sha256,
+        "data_refs": [dict(item) for item in data_refs],
         "data_binding_sha256": binding_sha,
         "result_sha256": digest,
         "result": summary,
