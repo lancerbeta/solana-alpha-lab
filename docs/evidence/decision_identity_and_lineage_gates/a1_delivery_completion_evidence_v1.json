@@ -11,7 +11,22 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
-    "docs/tasks/DECISION_IDENTITY_AND_LINEAGE_GATES_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "a7b26a9be1cb2ca20ae1c19be89dc4f61762be42b8068e7495e42def39d0a175",
+    "catalog/assets/lifecycle.yaml": "dca32eb45b6206a53e3fad00d9d0fa7168d12065bcc7ec7f1639015248f966cc",
+    "catalog/catalog_manifest.yaml": "4f01b4f19158c0f6fbfb91a6a946f1082176f58d1268880c0036ca49533f2661",
+    "catalog/generated/asset_edges.json": "2d67eb50eaed5ac0946416be6d308da19a3c4d4cd91d5f55a0258b978d823cb1",
+    "docs/PROJECT_MAP.md": "b0c0c80d5ba67137b98c302df76c13be0a3d3a191bb6d058df460730d9ce9cd0",
+    "docs/architecture/PAPER_SHADOW_EXECUTION_INTEGRITY_PRD_SSD_V1.md": "11c8e2bf3f2be1499ca502c1d1d04cc7a49db0c6871a83f8936630b7d4413951",
+    "docs/contracts/trading_runtime_policy_v1.md": "e563665d195ed7fb6454e1a62ea5e71a1c89d2b021b8062235aa435e8e8657e8",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "28b6c92690fdad1b2299fcb8f274cca1d6891d28a006a68847da928df7cd0ccf",
+    "docs/reports/decision_identity_and_lineage_gates/a1_owner_readout_v1.md": "47529fb7c1962596957b3f3620fc37030a7c674e16c114ab3967268d7f28c2bf",
+    "docs/tasks/DECISION_IDENTITY_AND_LINEAGE_GATES_V1.md": "03026dfd88f0ba06df008c2df6b3ec08e2aea2e62f09749634d8c5e3dfdef010",
+    "src/solana_alpha_lab/factory/paper_plane.py": "95c78c4522379e512c29ad63f08c4dd29c45e7fcc951189b3109028dcf0b2e35",
+    "src/solana_alpha_lab/factory/trading_operations.py": "5411aca4daa1fd03ca0a2101856ddc3cedd4bc454bf11777b16aac5de9d2e642",
+    "tests/test_factory_strategy_execution_boundary_v1.py": "708fda2d4a2fe1b0127d08c160399384de28df5e0250c849ca2fc9ffd1fc5728",
+    "tests/test_owner_lifecycle_projection_spine_v1.py": "e401b2b3b68d09ffd7bfab901299ecaff98deabd54c1dd42f24741a829e678f3",
+    "tests/test_paper_shadow_accounting_and_control_v1.py": "6c6e378c24e6f5854fed946b2349bb558be380034bb0b7c7743561369edbcf09",
+    "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "40f4d25af2f016f5a892fde423d8633d590c5b85a1a5e35fdd6be8629c177535"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +38,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/decision_identity_and_lineage_gates/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "ebdcc9a981af318bbe4e7340707d480479d571ccda74942b878d9561437f9aff",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_DECISION_IDENTITY_VERTICAL_AND_DOMAIN",
     "independent_review": {
       "path": "docs/evidence/decision_identity_and_lineage_gates/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "37e908754795b65559d728f374f2cc3cd484e3c9dea56eb1e4024e66593f2f0e",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
