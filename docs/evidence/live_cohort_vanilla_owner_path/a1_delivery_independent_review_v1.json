@@ -4,8 +4,8 @@
   "review_id": "LIVE-COHORT-VANILLA-OWNER-PATH-REVIEW-001",
   "as_of": "2026-09-26",
   "task_id": "LIVE_COHORT_VANILLA_OWNER_PATH_V1",
-  "reviewed_bindings_sha256": "7a507f03e18bac0a914d68a1a6e9aeb5afe60b2a50392a2d45151a7e75c4fdb1",
-  "reviewed_inventory_sha256": "1f0c8bf43962366e461cbecf24b90ab655df04c0540829f92bf93c7847d11fe7",
+  "reviewed_bindings_sha256": "cf707e4e71723decbdb80501d8bd9314e1e50791737ba629518e7b77f639e261",
+  "reviewed_inventory_sha256": "8e896fba9949ee6aedbe9182bde76f379850a05e059c31c7ef1cf352283abb8b",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -17,28 +17,28 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Isolated CODE_REVIEWER of inventory 1f0c8bf43962366e461cbecf24b90ab655df04c0540829f92bf93c7847d11fe7 found no product defect. This PASS row was written after that inventory's GOAL, ARCHITECTURE, and OWNER_UX critics completed. Ordinary unpack uses only --data-root. A mirror conflict aborts before transfer. A size match is not a content hash proof."
+        "Isolated CODE_REVIEWER of inventory 8e896fba9949ee6aedbe9182bde76f379850a05e059c31c7ef1cf352283abb8b found no product defect. This PASS row was written after that inventory's GOAL, ARCHITECTURE, and OWNER_UX critics completed. Ordinary unpack uses only --data-root. A mirror conflict aborts before transfer. A size match is not a content hash proof."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Isolated GOAL_DOD_CRITIC PASS on inventory 1f0c8bf43962366e461cbecf24b90ab655df04c0540829f92bf93c7847d11fe7. test_mirror_conflict_fails_closed calls run_owner_live_cohort and asserts MIRROR_CONFLICT with an empty transfer list. The stale-mirror vertical reaches FORGE_CONTROL_READY and stops before /hypothesis-forge."
+        "Isolated GOAL_DOD_CRITIC PASS on inventory 8e896fba9949ee6aedbe9182bde76f379850a05e059c31c7ef1cf352283abb8b. test_mirror_conflict_fails_closed calls run_owner_live_cohort and asserts MIRROR_CONFLICT with an empty transfer list. The stale-mirror vertical reaches FORGE_CONTROL_READY and stops before /hypothesis-forge."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Isolated ARCHITECTURE_CRITIC PASS. packet_fingerprint_sha256=d17bd47161c7ad26f334f52da485ce9995a1add5e39cdfa3a40e2cc92b4f363b. Capture does not materialize. Historical bind is current-receipt composition, not a per-cohort parquet rehash. Same-size parquet flip is not claimed as detected."
+        "Isolated ARCHITECTURE_CRITIC PASS on the same owner-path claims after the upstream oid alignment. Capture does not materialize. Historical bind is current-receipt composition, not a per-cohort parquet rehash. Same-size parquet flip is not claimed as detected."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Isolated OWNER_UX_CRITIC PASS on inventory 1f0c8bf43962366e461cbecf24b90ab655df04c0540829f92bf93c7847d11fe7. One command uses only --data-root. VPS heavy build is unreachable because the remote script only calls capture_freeze_export."
+        "Isolated OWNER_UX_CRITIC PASS on inventory 8e896fba9949ee6aedbe9182bde76f379850a05e059c31c7ef1cf352283abb8b. One command uses only --data-root. VPS heavy build is unreachable because the remote script only calls capture_freeze_export."
       ]
     }
   ],
