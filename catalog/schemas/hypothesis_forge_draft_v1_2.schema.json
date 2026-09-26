@@ -15,8 +15,6 @@
     "prior_work_receipts",
     "authority",
     "candidates",
-    "runner_up_candidate_ref",
-    "strongest_rejected_alternative",
     "pareto_factors",
     "non_claims"
   ],
@@ -201,5 +199,16 @@
     "strongest_rejected_alternative": {"type": "string", "minLength": 1},
     "pareto_factors": {"type": "array", "items": {"type": "string"}},
     "non_claims": {"type": "array", "items": {"type": "string"}}
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"candidates": {"minItems": 1}},
+        "required": ["candidates"]
+      },
+      "then": {
+        "required": ["runner_up_candidate_ref", "strongest_rejected_alternative"]
+      }
+    }
+  ]
 }

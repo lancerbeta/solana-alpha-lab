@@ -78,8 +78,10 @@
       "pattern": "^[0-9a-f]{64}$"
     },
     "runner_up_candidate_id": {
-      "type": "string",
-      "pattern": "^HFIC-CAND-[0-9A-F]{12,64}$"
+      "anyOf": [
+        {"type": "string", "pattern": "^HFIC-CAND-[0-9A-F]{12,64}$"},
+        {"type": "null"}
+      ]
     },
     "critic_input_packet_sha256": {
       "type": ["string", "null"],

@@ -32361,7 +32361,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json', repository_path: catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json}
-  integrity: {kind: sha256, sha256: 4d789dc34bbbf9a83245e3bc39a2fa11bf31f55c37ab9d61204e6feb75bee99e}
+  integrity: {kind: sha256, sha256: 62e28ff61dfe29f5ed238416da2088ddcbd794a9418436e9d7a378f44927c44e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}

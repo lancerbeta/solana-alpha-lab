@@ -47,6 +47,9 @@ managed_write_set:
   - catalog/assets/core.yaml
   - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
   - catalog/schemas/hypothesis_forge_draft_v1_2.schema.json
+  - catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json
+  - catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json
+  - catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json
   - catalog/schemas/hypothesis_critic_input_v1.schema.json
   - catalog/schemas/forge_run_receipt_v1.schema.json
   - configs/hypothesis_forge_independent_critic_v1.yaml
