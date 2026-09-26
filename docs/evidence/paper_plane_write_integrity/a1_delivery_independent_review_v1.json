@@ -14,27 +14,36 @@
   "reviews": [
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_REPLAY_ON_RETARGETED_HEAD"
+        "packet_fingerprint_sha256=6bb71a12b77cadf9dcd714a5738c326bf97b4a9853bc447dc8a2efcd21d14b13",
+        "PASS_W1_CONDITIONAL_TRANSITION",
+        "PASS_W2_SCOPED_LINEAGE",
+        "PASS_W4_ORDER_BY_ROWID",
+        "PASS_W6_NO_SCHEMA_OR_WEAKENING"
       ]
     },
     {
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_REPLAY_ON_RETARGETED_HEAD"
+        "PASS_W1_STALE_STATE",
+        "PASS_W2_W3_ONE_TRANSACTION",
+        "PASS_W4_ORDER_BY_ROWID",
+        "PASS_W6_WRITE_SET_CLEAN"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_REPLAY_ON_RETARGETED_HEAD"
+        "PASS_DOD_RACE_CRASH_ORDER",
+        "PASS_STOCHASTIC_500",
+        "PASS_ACCOUNTING_FIXTURE_PROJECTION"
       ]
     }
   ],
-  "verdict": "PENDING",
+  "verdict": "PASS",
   "non_claims": [
     "NO_ALPHA",
     "NO_LIVE_TRADING",
