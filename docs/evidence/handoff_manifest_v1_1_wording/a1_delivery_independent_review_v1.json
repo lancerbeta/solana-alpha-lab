@@ -1,0 +1,45 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HANDOFF-MANIFEST-V1-1-WORDING-REVIEW-001",
+  "as_of": "2026-09-26",
+  "task_id": "HANDOFF_MANIFEST_V1_1_WORDING_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Section 3 names schema_version 1.1 for a PROMOTE with ExecutionEvidenceBinding, keeps 1.0 without a binding, and leaves decision_event_id, clock, and no-coercion rules in place. The diff does not touch src/."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "The reader test locks the 1.1-with-binding phrase, the 1.0-without-binding phrase, and the absence of the old New PROMOTE events freeze schema_version 1.0 sentence."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=caa30350e4a2633e45efcfb3b2f93d00c3a7e0f408b199e51faab598cef8d6ca",
+        "The sentence attests the already-shipped freeze. It is not a schema or code change. Historical 1.0 bytes stay in place."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CODE_CHANGE",
+    "NO_HISTORICAL_REWRITE",
+    "NO_MERGE",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}

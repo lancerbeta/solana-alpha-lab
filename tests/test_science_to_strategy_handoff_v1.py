@@ -289,6 +289,24 @@ def _stored_binding(store: ResearchStore, event_id: str) -> dict | None:
 
 
 class ScienceToStrategyHandoffTests(unittest.TestCase):
+    def test_handoff_contract_names_manifest_1_1_when_binding_is_present(self) -> None:
+        text = (ROOT / "docs/contracts/science_to_strategy_handoff_v1.md").read_text(encoding="utf-8")
+        collapsed = " ".join(text.split())
+        self.assertIn(
+            "A new PROMOTE that includes an ExecutionEvidenceBinding freezes "
+            "`promotion_handoff_manifest` schema_version `1.1`",
+            collapsed,
+        )
+        self.assertIn(
+            "A manifest without that binding stays schema_version `1.0`",
+            collapsed,
+        )
+        self.assertNotIn("New PROMOTE events freeze", collapsed)
+        self.assertNotRegex(
+            collapsed,
+            r"New PROMOTE events freeze .*schema_version `1\.0`",
+        )
+
     def test_scenario_a_happy_path_vertical(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"

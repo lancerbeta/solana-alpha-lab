@@ -52,8 +52,11 @@ workflow-state database.
 
 ## 3. Manifest meaning
 
-New PROMOTE events freeze `promotion_handoff_manifest` schema_version `1.0`
-inside the scientific decision payload. The signed manifest binds
+A new PROMOTE that includes an ExecutionEvidenceBinding freezes
+`promotion_handoff_manifest` schema_version `1.1` inside the scientific
+decision payload. A manifest without that binding stays schema_version
+`1.0`. Historical `1.0` bytes are not rewritten. Materializing a `1.0`
+manifest remains `EXECUTION_EVIDENCE_BINDING_GAP`. The signed manifest binds
 `decision_event_id` and `decision_effective_at`; CHECK/RENDER/VERIFY must
 refuse a mismatched caller identity or clock. Execution/risk inputs are
 accepted only as exact JSON types; strings and bool-as-int are not coerced.
