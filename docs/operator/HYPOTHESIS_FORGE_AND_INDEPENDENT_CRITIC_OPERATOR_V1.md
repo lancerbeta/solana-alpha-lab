@@ -280,11 +280,15 @@ Only then invoke `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
 
 **Ручной fallback (если slash недоступен):** paste-блоки ниже эквивалентны, но owner должен
 сам открыть шаг 2 — предпочтительнее slash + auto-handoff. После Prompt A / freeze
-всё равно выполните `forge-run` (bounded run). Fresh empty store или ordinary BASE `NO_WORTHY` без
-CONTROL surface даёт `START_BASE` + `CONTROL_SURFACE_REQUIRED` (`status: NEXT`) —
-тот же slash продолжает CONTROL-compatible BASE, не evening DONE. Ordinary final
+всё равно выполните `forge-run` (bounded run). Fresh ordinary focus даёт
+`START_BASE` + `ORDINARY_DISCOVERY_READY`
+(`ORDINARY_GROUNDED_DISCOVERY_V1`), не CONTROL. `CONTROL_SURFACE_REQUIRED`
+остаётся только для явного `--control-current-representation`, когда CONTROL
+сессии нет (`STOP_BEFORE_SYNTHESIS` на no-write diagnostic). Ordinary final
 PASS и pending Critic/classify читаются/резюмируются честно; их нельзя подменять
-BASE NOT_RUN ради переключения mode.
+BASE NOT_RUN ради переключения mode. CONTROL `SEARCH_EXHAUSTED` с
+`scope_exhausted: CURRENT_REPRESENTATION_CONTROL_V1` не означает, что raw
+корпус исчерпан.
 
 ### Шаг 1 — Forge (manual fallback)
 
@@ -379,6 +383,36 @@ The `owner_readout` `history:` line is mandatory. `CURRENT_MARKET_HISTORY_UNREAD
 5. использует существующие данные и capabilities либо обосновывает один конкретный reusable gap.
 
 Веди внутренний поиск глубоко, но не публикуй скрытый scratchpad или длинную цепочку рассуждений. Выводи только проверяемые факты, явные inference, структурированные candidate cards и краткую причинную аргументацию.
+
+## A0. Grounded discovery contract
+
+`FORGE_GROUNDED_DISCOVERY_V1` applies to ordinary `/hypothesis-forge` only.
+CONTROL stays an explicit `--control-current-representation` mode and does not
+see raw trajectories. A predictive sketch needs a PIT prediction, query-backed
+evidence, a mundane alternative, a counterexample or disconfirming observation,
+practical relevance and a cheap falsifier. It does not need a proven actor
+story or literature novelty. A causal claim keeps the stricter identification
+bar. Do not invent a mechanism to fill a schema field. Zero grounded sketches
+are allowed. Do not force four candidates. At most six sketches, one selected
+candidate and one frozen runner-up. Cohort id is not a trading feature.
+Discovery queries use `BASE_X` only, price/liquidity fields, and a target point
+strictly after the decision points. Missing outcomes are not zeros. A scoped
+CONTROL negative does not hard-close an unseen richer ordinary question.
+Renaming `question_id` does not lift a valid close. Missing scope axes are
+`UNKNOWN_SCOPE_NEEDS_RESOLUTION`, not a match and not a free pass. An exact
+content match on the same surface still blocks a duplicate. Query budget is at most six main specifications
+and two adaptive refinements. Identical spec bytes are a retry, not a new look.
+Re-check joint state coverage without a scientific look:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-coverage --format json
+```
+
+Ordinary numeric recipe. The store argument is explicit. Do not point it at the live store in this repair. Role and holdout come from the binding file. `--journal-scope` is the preflight `search_key_sha256`. Copy the whole returned object onto the draft as `grounded_evidence`. Ordinary preflight already stamps the discovery contract; do not invent that field:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <scope> --format json
+```
 
 ## A0. Authority и hard boundaries
 
@@ -633,9 +667,11 @@ authority limits
 
 ## A2. Отдели поиск гипотезы от поиска параметров
 
-Не ищи лучший threshold, комбинацию indicators или максимальный backtest. Сначала ищи **механизм**.
+Не ищи лучший threshold, комбинацию indicators или максимальный backtest.
 
-Минимальная форма механизма:
+`PREDICTIVE` sketch: проверяемое PIT-предсказание, рассчитанное evidence с result refs, mundane alternative, disconfirming prediction и cheap falsifier. Actor story не обязательна. Не выдумывай участника или механизм, чтобы заполнить поле. `CAUSAL` claim сохраняет прежнюю форму identification ниже. Ноль sketches допустим. Не размножай слабые идеи ради количества.
+
+Минимальная форма для `CAUSAL`:
 
 ```text
 В population/state C действие или ограничение участника A
@@ -676,7 +712,7 @@ whether resolving it changes a real decision
 
 ## A4. Divergence engine: создай причинно разные кандидаты
 
-Создай от 4 до 6 mechanism sketches. Используй релевантные линзы, но не обязан по одной идее на каждую:
+Для ordinary grounded `PREDICTIVE` поиска создай от 0 до 6 sketches. Не требуй 4 sketches и не требуй три mechanism classes. Для `CAUSAL` портфеля по-прежнему нужно причинное различие, а не переименование. Используй релевантные линзы, но не обязан по одной идее на каждую:
 
 1. **Market microstructure:** inventory risk, adverse selection, route/depth persistence, convex impact, queue/latency, liquidity withdrawal.
 2. **Actor/game theory:** creator, funder, LP, market maker, searcher, bot farm, retail cohort, launchpad, provider; кто платит edge и почему не устраняет его.
@@ -691,7 +727,7 @@ whether resolving it changes a real decision
 
 Ограничения разнообразия:
 
-- минимум три разных mechanism classes;
+- для `CAUSAL` портфеля — минимум три разных mechanism classes; для `PREDICTIVE` grounded поиска этот минимум не действует;
 - два кандидата считаются различными, только если расходятся минимум по двум осям: actor, mechanism, state transition, primary observable, horizon, payoff asymmetry;
 - generic momentum, volume spike, whale activity, raw buy/sell ratio, generic sentiment, time-of-day и «ML найдёт паттерн» не допускаются без конкретного нового механизма и disconfirming prediction;
 - один кандидат использует не более 1–3 primary explanatory variables; остальные — controls/gates;
@@ -708,8 +744,8 @@ one_sentence_claim
 novelty_class: NEW_MECHANISM | NEW_STATE_INTERACTION | NEW_MEASUREMENT | REFORMULATION | DUPLICATE
 nearest_prior_hypotheses_and_terminals
 material_difference_from_prior
-actor_and_counterparty
-mechanism
+actor_and_counterparty (required for CAUSAL; omit for PREDICTIVE rather than inventing one)
+mechanism (required for CAUSAL; omit for PREDICTIVE rather than inventing one)
 why_not_arbitraged
 point_in_time_population
 decision_timestamp
@@ -945,7 +981,7 @@ decision after collection
 1. `EXECUTIVE RESULT` — selected terminal и одна фраза почему.
 2. `REALITY_RECEIPT`.
 3. `OPPORTUNITY_MAP` — 3–7 tension records.
-4. `CANDIDATE_PORTFOLIO` — 4–6 Candidate Cards.
+4. `CANDIDATE_PORTFOLIO` — 0–6 Candidate Cards for ordinary predictive grounded search. Do not invent cards to reach four. A causal portfolio still keeps the A4 identification bar. If nothing is selected, write `NO_WORTHY_HYPOTHESIS` and do not fabricate a runner-up.
 5. `PRIOR_AND_NOVELTY_AUDIT`.
 6. `HARD_VETO_RESULTS`.
 7. `PARETO_SELECTION` — finalists, winner, strongest rejected alternative.
@@ -1005,7 +1041,7 @@ decision after collection
 
 - найден ли механизм, а не набор features;
 - отличается ли он от prior work по существу;
-- кто является counterparty и почему edge может сохраняться;
+- для `CAUSAL`: кто является counterparty и почему edge может сохраняться; для `PREDICTIVE` не выдумывай actor, если его нет;
 - существует ли observable до decision;
 - не открыт ли новый/untouched outcome;
 - разделены ли Touch/Fillable/Realized/Net/PathRisk;

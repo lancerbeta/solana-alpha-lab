@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import hashlib
 import json
 import re
 import sys
@@ -508,6 +509,7 @@ def cmd_forge_run(
     persist: bool = False,
     saved_draft_sha256: str | None = None,
     model_provenance_sha256: str | None = None,
+    control_current_representation: bool = False,
 ) -> int:
     """Bounded Forge run receipt. persist=False never writes."""
     from solana_alpha_lab.factory.hfic_representation_ladder import (
@@ -601,6 +603,15 @@ def cmd_forge_run(
             "writes: store=0 forge_run=0 session=0"
         )
         return _emit_run(payload, exit_code=2)
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+
+    requested_surface = (
+        CURRENT_REPRESENTATION_CONTROL_V1
+        if control_current_representation
+        else None
+    )
     try:
         receipt = evaluate_forge_run(
             repo_root,
@@ -609,6 +620,7 @@ def cmd_forge_run(
             persist=False,
             saved_draft_sha256=saved_draft_sha256,
             execution_context=execution_context,
+            requested_surface=requested_surface,
         )
     except LadderError as exc:
         payload = _ladder_error_payload(str(exc))
@@ -639,6 +651,7 @@ def cmd_forge_run(
                 persist=True,
                 saved_draft_sha256=saved_draft_sha256,
                 execution_context=execution_context,
+                requested_surface=requested_surface,
             )
         except LadderError as exc:
             payload = _ladder_error_payload(str(exc))
@@ -655,6 +668,114 @@ def cmd_forge_run(
     return _emit_run(payload, exit_code=(
         0 if payload.get("owner_class") not in {"INPUT_NOT_READY", "OBSERVABILITY_BLOCKED"} else 2
     ))
+
+
+def cmd_discovery_execute(
+    repo_root: Path,
+    *,
+    store_root: Path,
+    census_path: Path,
+    observations_path: Path,
+    binding_path: Path,
+    spec_path: Path,
+    journal_scope: str,
+    candidate_scope_path: Path,
+) -> int:
+    """Compute one ordinary discovery query into a caller-selected store.
+
+    Does not default to the live ResearchStore and does not reserve a slot.
+    """
+
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        admit_discovery_binding,
+        load_parquet_rows,
+        run_recorded_discovery_query,
+    )
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    git_before = repository_git_snapshot(repo_root)
+    try:
+        binding_doc = json.loads(binding_path.read_text(encoding="utf-8"))
+        spec = json.loads(spec_path.read_text(encoding="utf-8"))
+        candidate_scope = json.loads(candidate_scope_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return emit_error("DISCOVERY_INPUT_INVALID")
+    if not isinstance(binding_doc, dict) or not isinstance(spec, dict):
+        return emit_error("DISCOVERY_INPUT_INVALID")
+    cohorts = binding_doc.get("cohorts")
+    if not isinstance(cohorts, list) or not isinstance(candidate_scope, dict):
+        return emit_error("DISCOVERY_INPUT_INVALID")
+    if any(not isinstance(item, dict) or "holdout" not in item for item in cohorts):
+        return emit_error("HOLDOUT_UNRESOLVED")
+    try:
+        admit_discovery_binding(cohorts)
+    except GroundedDiscoveryError as exc:
+        return emit_error(exc.code)
+    census_sha = hashlib.sha256(census_path.read_bytes()).hexdigest()
+    observations_sha = hashlib.sha256(observations_path.read_bytes()).hexdigest()
+    for item in cohorts:
+        if (
+            item.get("census_sha256") != census_sha
+            or item.get("observations_sha256") != observations_sha
+        ):
+            return emit_error("BINDING_HASH_MISMATCH")
+    try:
+        census = load_parquet_rows(census_path)
+        observations = load_parquet_rows(observations_path)
+    except (OSError, ValueError):
+        return emit_error("DISCOVERY_ROWS_UNREADABLE")
+    store = ResearchStore(store_root)
+    try:
+        evidence = run_recorded_discovery_query(
+            store,
+            census=census,
+            observations=observations,
+            spec=spec,
+            binding=cohorts,
+            journal_scope=journal_scope,
+            candidate_scope=candidate_scope,
+            priors=binding_doc.get("priors") or [],
+            git_sha=git_before.head_sha,
+        )
+    except GroundedDiscoveryError as exc:
+        return emit_error(exc.code)
+    git_after = repository_git_snapshot(repo_root)
+    if git_before.head_sha != git_after.head_sha:
+        return emit_error("GIT_MUTATION_FORBIDDEN")
+    evidence["scientific_writes"] = 0
+    evidence["live_store_selected"] = False
+    _assert_no_path_leak(evidence, str(store_root), str(repo_root))
+    return emit(evidence)
+
+
+def cmd_discovery_coverage(repo_root: Path, explicit_data_root: Path | None) -> int:
+    """State-only joint coverage. Writes nothing and does not reserve a slot."""
+
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        live_state_only_coverage,
+    )
+
+    git_before = repository_git_snapshot(repo_root)
+    try:
+        data_root = _existing_data_root(repo_root, explicit_data_root)
+    except HficCliError as exc:
+        return emit_error(str(exc))
+    try:
+        payload = live_state_only_coverage(data_root)
+    except GroundedDiscoveryError as exc:
+        return emit_error(exc.code)
+    git_after = repository_git_snapshot(repo_root)
+    if not git_before.unchanged(git_after):
+        return emit_error("GIT_MUTATION_DETECTED")
+    payload["authority"] = {
+        "git_mutation": 0,
+        "experiment_execution": 0,
+        "provider_api_rpc_wss_calls": 0,
+    }
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
 
 
 def _store_root(repo_root: Path, explicit_data_root: Path | None) -> Path:
@@ -1630,6 +1751,31 @@ def build_parser() -> argparse.ArgumentParser:
             "readback; mismatch blocks reuse and never resets market budget"
         ),
     )
+    forge_run.add_argument(
+        "--control-current-representation",
+        action="store_true",
+        help="Explicit CURRENT_REPRESENTATION_CONTROL_V1. Ordinary forge-run does not imply it.",
+    )
+    discovery_coverage = subparsers.add_parser(
+        "discovery-coverage",
+        help="No-write state-only joint coverage. Never selects typed_value.",
+    )
+    discovery_coverage.add_argument("--format", choices=("json",), default="json")
+    discovery_execute = subparsers.add_parser(
+        "discovery-execute",
+        help=(
+            "Compute one BASE_X price/liquidity query from census and observation "
+            "rows into an explicit store. Does not select the live store."
+        ),
+    )
+    discovery_execute.add_argument("--store", type=Path, required=True)
+    discovery_execute.add_argument("--census", type=Path, required=True)
+    discovery_execute.add_argument("--observations", type=Path, required=True)
+    discovery_execute.add_argument("--binding", type=Path, required=True)
+    discovery_execute.add_argument("--spec", type=Path, required=True)
+    discovery_execute.add_argument("--candidate-scope", type=Path, required=True)
+    discovery_execute.add_argument("--journal-scope", required=True)
+    discovery_execute.add_argument("--format", choices=("json",), default="json")
 
     persist_draft = subparsers.add_parser(
         "persist-draft",
@@ -1867,6 +2013,22 @@ def main(argv: list[str] | None = None) -> int:
                 model_provenance_sha256=getattr(
                     args, "model_provenance_sha256", None
                 ),
+                control_current_representation=bool(
+                    getattr(args, "control_current_representation", False)
+                ),
+            )
+        if args.command == "discovery-coverage":
+            return cmd_discovery_coverage(repo_root, args.data_root)
+        if args.command == "discovery-execute":
+            return cmd_discovery_execute(
+                repo_root,
+                store_root=args.store,
+                census_path=args.census,
+                observations_path=args.observations,
+                binding_path=args.binding,
+                spec_path=args.spec,
+                journal_scope=str(args.journal_scope),
+                candidate_scope_path=args.candidate_scope,
             )
         if args.command == "persist-draft":
             return cmd_persist_draft(

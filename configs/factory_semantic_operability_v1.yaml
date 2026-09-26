@@ -44,7 +44,7 @@ routes:
     related_route_ids: [SEM-AUTHORITY-BOUNDARIES, SEM-HYPOTHESIS-FORGE]
 
   - semantic_route_id: SEM-HYPOTHESIS-FORGE
-    purpose: Bounded Forge run; V1 seam RUNTIME_READY_NOT_EXECUTED.
+    purpose: Bounded Forge run. Ordinary is not silent CONTROL. V1 seam RUNTIME_READY_NOT_EXECUTED.
     owner_questions:
       - How do I generate or review a hypothesis?
       - Where do hypotheses enter?

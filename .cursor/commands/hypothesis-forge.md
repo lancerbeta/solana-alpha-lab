@@ -129,18 +129,33 @@ When the caller supplied `--model-provenance-sha256` to `preflight`, repeat
 the exact same digest on `forge-run`; missing or changed model provenance
 blocks completed-result reuse as UNKNOWN.
 
+No-write state-only joint coverage. It does not select `typed_value` and does not reserve a scientific slot:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-coverage --format json
+```
+
+Ordinary numeric recipe. `--store` is explicit and is not the live store unless the owner points it there. Role and holdout come from `--binding`. `--journal-scope` is the preflight `search_key_sha256`. Copy the whole JSON object onto the draft as `grounded_evidence`, not only `result_refs`. CONTROL does not use this command:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <scope> --format json
+```
+
 ## Representation mode boundary
 
-The normal slash remains one bounded run. A no-write diagnostic
-(`forge-run --no-write` or `forge-input --no-write`) that reports
-`START_BASE` + `CONTROL_SURFACE_REQUIRED` shows the factual CONTROL-required
-state and `STOP_BEFORE_SYNTHESIS`. STOP. Do not launch
-`/hypothesis-forge CURRENT_REPRESENTATION_CONTROL` from that diagnostic.
-Inside an already owner-authorized `/hypothesis-forge` bounded run, the same
-state continues CONTROL-compatible BASE inside this slash, not evening DONE. Ordinary final PASS and pending Critic/classify stay honest
-readback/resume of that session — do not replace them with BASE NOT_RUN to
-force a CONTROL rewrite. `--control-current-representation` remains the trajectory-blind
-`CONTROL` mode and is expert-only. `NORMALIZED_TRAJECTORY_V1` is a `REPRESENTATION_CHALLENGER`
+The normal slash remains one bounded run. A fresh ordinary focus reports
+`START_BASE` + `ORDINARY_DISCOVERY_READY`
+(`evidence_surface_mode=ORDINARY_GROUNDED_DISCOVERY_V1`). It does not continue
+as CONTROL. `CONTROL_SURFACE_REQUIRED` remains only for
+`forge-run --control-current-representation` when no CONTROL session matches;
+that diagnostic `next` is `STOP_BEFORE_SYNTHESIS`. Do not launch
+`/hypothesis-forge CURRENT_REPRESENTATION_CONTROL` from an ordinary diagnostic.
+Ordinary final PASS and pending Critic/classify stay honest readback/resume of
+that session — do not replace them with BASE NOT_RUN to force a CONTROL
+rewrite. `--control-current-representation` remains the trajectory-blind
+`CONTROL` mode and is expert-only. A CONTROL `SEARCH_EXHAUSTED` readout with
+`scope_exhausted: CURRENT_REPRESENTATION_CONTROL_V1` is not a raw-corpus
+negative. `NORMALIZED_TRAJECTORY_V1` is a `REPRESENTATION_CHALLENGER`
 capability whose adapter is runtime-ready and not executed: it clones the
 exact CONTROL context (Forge context for completed `NO_WORTHY`, critic packet
 when a candidate was selected) and carries one anonymous histogram beside it.

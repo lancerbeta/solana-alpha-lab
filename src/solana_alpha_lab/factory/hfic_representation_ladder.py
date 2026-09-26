@@ -32,6 +32,11 @@ from solana_alpha_lab.factory.hfic_control_integrity import (
     effective_control_terminal,
     session_evidence_surface_mode,
 )
+from solana_alpha_lab.factory.hfic_grounded_discovery import (
+    DISCOVERY_CONTRACT_VERSION,
+    ORDINARY_DISCOVERY_READY,
+    ORDINARY_GROUNDED_DISCOVERY_V1,
+)
 from solana_alpha_lab.factory.hfic_preflight import (
     FORGE_CONTEXT_ARTIFACT_DIR,
     FORGE_CONTEXT_ARTIFACT_KIND,
@@ -469,15 +474,8 @@ def resolve_next_action(
         and isinstance(base_terminal, str)
         and base_terminal in set(v1_row["trigger_terminals"])
         and control_probe_permitted(base_terminal)
+        and str(base.get("evidence_surface_mode") or "") == CURRENT_REPRESENTATION_CONTROL_V1
     ):
-        if str(base.get("evidence_surface_mode") or "") != CURRENT_REPRESENTATION_CONTROL_V1:
-            # V1 needs CONTROL-compatible BASE inside the same slash — not evening DONE.
-            return {
-                "next_action": ACTION_START_BASE,
-                "owner_final": None,
-                "reason_code": "CONTROL_SURFACE_REQUIRED",
-                "base_evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
-            }
         return _consume_representation_chain(
             registry=active,
             stage_map=stage_map,
@@ -1200,6 +1198,19 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         lines.append(
             "execution_provenance_note: historical readback is UNKNOWN; this is "
             "not a readiness receipt and not permission to rerun"
+        )
+    control_exhausted = owner_final == ACTION_SEARCH_EXHAUSTED and any(
+        isinstance(stage, Mapping)
+        and (
+            stage.get("evidence_surface_mode") == CURRENT_REPRESENTATION_CONTROL_V1
+            or stage.get("input_scope") == CURRENT_REPRESENTATION_CONTROL_V1
+        )
+        for stage in stages
+    )
+    if control_exhausted:
+        lines.append(
+            "scope_exhausted: CURRENT_REPRESENTATION_CONTROL_V1; "
+            "raw ordinary discovery NOT_RUN; not a raw-corpus negative"
         )
     for stage in stages:
         if not isinstance(stage, Mapping):
@@ -2276,6 +2287,7 @@ def _discover_ladder_stages(
     v1_snapshot: Mapping[str, Any] | None,
     current_market_epoch: str | None = None,
     current_capability_epoch: str | None = None,
+    requested_surface: str | None = None,
 ) -> tuple[list[dict[str, Any]], str | None, str | None]:
     grouped: dict[str, list[tuple[str, dict[str, Any], Mapping[str, Any]]]] = {}
     skipped: list[dict[str, str]] = []
@@ -2459,14 +2471,28 @@ def _discover_ladder_stages(
             base_stage["input_scope"] = "ORDINARY_BASE"
             resolved.append(base_stage)
         else:
+            explicit_control = requested_surface == CURRENT_REPRESENTATION_CONTROL_V1
             fresh_base = {
                 "representation_id": "BASE",
                 "execution_status": EXEC_NOT_RUN,
                 "effective_terminal": None,
-                "input_scope": "ORDINARY_BASE",
+                "input_scope": (
+                    "ORDINARY_BASE"
+                    if explicit_control
+                    else ORDINARY_GROUNDED_DISCOVERY_V1
+                ),
+                "evidence_surface_mode": (
+                    CURRENT_REPRESENTATION_CONTROL_V1
+                    if explicit_control
+                    else ORDINARY_GROUNDED_DISCOVERY_V1
+                ),
                 "session_id": None,
                 "used_cohort_ids": [],
-                "reason_code": "CONTROL_SURFACE_REQUIRED",
+                "reason_code": (
+                    "CONTROL_SURFACE_REQUIRED"
+                    if explicit_control
+                    else ORDINARY_DISCOVERY_READY
+                ),
             }
             if saved_draft_sha256 and saved_draft_representation_id == "BASE":
                 fresh_base.update(
@@ -2629,6 +2655,7 @@ def evaluate_forge_run(
     saved_draft_sha256: str | None = None,
     v1_snapshot: Mapping[str, Any] | None = None,
     execution_context: Mapping[str, Any] | None = None,
+    requested_surface: str | None = None,
 ) -> dict[str, Any]:
     """Assemble A3 input + existing sessions into one bounded run receipt.
 
@@ -2744,6 +2771,7 @@ def evaluate_forge_run(
                 and len(str(input_receipt.get("capability_epoch_sha256"))) == 64
                 else None
             ),
+            requested_surface=requested_surface,
         )
         for row in resolved_stages:
             used_cohorts.extend(list(row.get("used_cohort_ids") or []))
@@ -3212,6 +3240,7 @@ def evaluate_forge_run(
                 "execution_status": stage_status,
                 "effective_terminal": row.get("effective_terminal"),
                 "input_scope": row.get("input_scope") or "UNDECLARED",
+                "evidence_surface_mode": row.get("evidence_surface_mode"),
                 "session_id": row.get("session_id"),
                 "session_state": row.get("session_state"),
                 "selected_candidate_id": row.get("selected_candidate_id"),
@@ -3262,6 +3291,11 @@ def evaluate_forge_run(
         "control_session_id": control_session_id,
         "blocking_reason_codes": blocking,
         "writes": writes,
+        "discovery_contract_version": (
+            None
+            if requested_surface == CURRENT_REPRESENTATION_CONTROL_V1
+            else DISCOVERY_CONTRACT_VERSION
+        ),
     }
     unsigned["receipt_sha256"] = canonical_sha256(
         {key: value for key, value in unsigned.items() if key != "owner_readout"}

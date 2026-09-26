@@ -16,6 +16,11 @@ diagnostics-only `structural_signature_v1_sha256` (not HFIC-CAND identity),
 and read-only `diagnostics --last N` (1..20).
 
 Canonical entrypoint: `scripts/hypothesis_forge.py`.
+No-write state-only coverage, never selecting `typed_value` and never reserving a slot:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-coverage --format json
+```
 Operator-executable prefix:
 `uv run --locked --managed-python python -B scripts/hypothesis_forge.py`.
 Required interpreter: CPython `3.13.14`. Do not invoke a bare workstation `python`.
@@ -194,17 +199,19 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
      `PASS_TO_CLASSIFICATION`. Do **not** call `consume_start_v1_envelope`
      (that helper is START_V1 only).
    - `START_BASE` from a no-write diagnostic (`forge-run --no-write` or
-     `forge-input --no-write`) is not slash authority. When
-     `blocking_reason_codes` includes `CONTROL_SURFACE_REQUIRED`, the factual
-     next state is CONTROL required and `next:` is `STOP_BEFORE_SYNTHESIS`:
-     STOP. Do **not** launch `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
-     Inside an already owner-authorized `/hypothesis-forge` bounded run, the
-     same state still continues CONTROL-compatible BASE
-     (`evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1`) — print
-     `owner_readout` (`status: NEXT`); do **not** treat it as evening DONE.
-     Fresh empty stores and ordinary V1-trigger negatives both emit this code
-     so the first generation is CONTROL-compatible; do **not** invent a second
-     BASE trial to switch mode after an ordinary PASS or pending session.
+     `forge-input --no-write`) is not slash authority. A fresh ordinary focus
+     emits `ORDINARY_DISCOVERY_READY` and
+     `evidence_surface_mode=ORDINARY_GROUNDED_DISCOVERY_V1`. It does **not**
+     continue as CONTROL. `CONTROL_SURFACE_REQUIRED` remains only when
+     `forge-run` is invoked with `--control-current-representation` and no
+     CONTROL session matches; that diagnostic `next:` is
+     `STOP_BEFORE_SYNTHESIS`. Do **not** launch
+     `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL` from an ordinary
+     diagnostic. Explicit CONTROL stays trajectory-blind. A completed CONTROL
+     `KILL_*` readback is that CONTROL scope only: the readout line
+     `scope_exhausted: CURRENT_REPRESENTATION_CONTROL_V1` means raw ordinary
+     discovery was `NOT_RUN`. Do **not** invent a second BASE trial to switch
+     mode after an ordinary PASS or pending session.
    - `RESUME_BASE` → resume the exact pending BASE stage from the saved draft;
      do not regenerate.
    - `RETURN_EXISTING_RUN` is readback; stop; no second trial.
@@ -217,10 +224,8 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
      `owner_readout` and stop — do **not** start V1 and do **not** report
      evening DONE / success. Persisted pause must not lock the run as
      completed readback; later slash re-resolves from live session state.
-   - Do **not** treat a missing CONTROL surface as owner-final. On a no-write
-     diagnostic that state is `STOP_BEFORE_SYNTHESIS`, not a CONTROL launch.
-     Inside the authorized slash it remains `START_BASE` +
-     `CONTROL_SURFACE_REQUIRED` (`status: NEXT`) above.
+   - Do **not** treat a missing CONTROL surface as owner-final. Ordinary
+     `START_BASE` is `ORDINARY_DISCOVERY_READY`, not `CONTROL_SURFACE_REQUIRED`.
      `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL` remains expert-only
      and is not a separate owner evening.
    Technical / visibility failures stay `OBSERVABILITY_BLOCKED`, never
@@ -254,7 +259,24 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-inp
      For `CONTROL_CORPUS_UNRESOLVABLE`: `OWNER NEXT=STOP_CORPUS_UNRESOLVABLE`.
      Same recovery fence.
    - `START_NEW_SESSION` → continue only when `forge-run` next is `START_BASE`.
-3. Only for `START_NEW_SESSION`, run **PROMPT A** from the operator pack using
+3. Only for `START_NEW_SESSION` on the ordinary route (no `--control-current-representation`),
+   before Prompt A, run the production recipe. Resolve role and holdout from
+   the runtime binding. Do not substitute `EXPLORATORY_REUSE` or `holdout=false`.
+   Ambiguous role or an unresolved holdout stops before row values. Then:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
+```
+
+   Pass `--journal-scope` as the preflight `search_key_sha256`. Copy the
+   whole returned evidence object onto the draft as `grounded_evidence`.
+   Do not copy only `result_refs` and do not hand-write the summary.
+   Ordinary preflight already carries `discovery_contract_version`.
+   `evidence_surface_mode` stays unset unless the run is explicit CONTROL.
+   Do not invent those fields.
+   CONTROL does not run this command. This repair atom
+   does not point it at the live market corpus.
+   Then run **PROMPT A** from the operator pack using
    `HFIC-V1.2` and only the bounded `FORGE_CONTEXT_PACKET` plus explicitly
    resolved evidence. In `CURRENT_REPRESENTATION_CONTROL_V1`, "explicitly
    resolved evidence" does **not** authorize reading raw current lifecycle

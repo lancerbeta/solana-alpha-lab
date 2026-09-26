@@ -1,0 +1,53 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-GROUNDED-DISCOVERY-REPAIR-REVIEW-001",
+  "as_of": "2026-09-26",
+  "task_id": "FORGE_GROUNDED_DISCOVERY_REPAIR_V1",
+  "reviewed_bindings_sha256": "30fa92639a5d6ebb3976fb74d3093308604033c19aaaf3ba933b25d4af599e1a",
+  "reviewed_inventory_sha256": "e9faf33b375b437d00493007331c2f3ee4ef94c3f860c96eefe9f9346fbaec34",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "At HEAD 69cbcd44, a missing rejected alternative is the token NONE, an empty runner id skips the runner packet, and a late-only liquidity cell stays out of base_x. Ordinary preflight stamps the discovery contract. Binding hashes, cohort, release, and explicit holdout false constrain the public CLI."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Stamped ordinary preflight plus discovery-execute freezes NO_WORTHY with the computed result refs. The late-only mint falsifies absolute-latest selection. Market Prompt A, market Critic, and the live focus slot stay outside this atom."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=d5664536c1bb29007e0d5951d94a3494389e1784137438daffd7b2441a49a10d",
+        "Ordinary preflight stamps the contract. PIT keeps the latest row available by the deadline, so a late-only mint is not base_x. explanatory_condition separates priors. Journal scope must match the preflight search key."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Skill, slash command, operator A0, and the owner readout say journal-scope is the preflight search_key_sha256 and that the whole discovery-execute object is grounded_evidence."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MERGE",
+    "NO_ALPHA",
+    "NO_MARKET_FORGE"
+  ]
+}

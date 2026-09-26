@@ -60,7 +60,7 @@ SESSION_RECEIPT_SCHEMA_V1_3 = (
 )
 RUNNER_UP_AWAITING_CRITIC = "RUNNER_UP_AWAITING_CRITIC"
 RUNNER_UP_REVISION_REQUIRED = "RUNNER_UP_REVISION_REQUIRED"
-MIN_CANDIDATES = 4
+MIN_CANDIDATES = 0
 MAX_CANDIDATES = 6
 PHASE_RANK = {
     "SYNTHESIS_COMPLETE": 0,
@@ -1063,6 +1063,7 @@ def _selected_candidate_block(
         ),
         "actor_counterparty": str(card.get("actor_counterparty") or ""),
         "mechanism": str(card.get("mechanism") or ""),
+        "claim_form": str(card.get("claim_form") or "CAUSAL"),
         "why_not_arbitraged": str(card.get("why_not_arbitraged") or "NOT_DECLARED_IN_DRAFT"),
         "population": str(card.get("population") or ""),
         "decision_timestamp": str(card.get("decision_timestamp") or ""),
@@ -1215,6 +1216,8 @@ def _require_fresh_v12_runner_up_declaration(
     if str(frozen.get("prompt_version") or "") != PROMPT_VERSION:
         return
     if not frozen.get("selected_candidate_id"):
+        return
+    if not frozen.get("runner_up_candidate_id"):
         return
     declared_sha = frozen.get("runner_up_critic_input_packet_sha256")
     if not (isinstance(declared_sha, str) and len(declared_sha) == 64):
@@ -1411,6 +1414,75 @@ def _assert_vision_integrity_for_surface(
         raise HficSessionError("FORGE_VISION_INTEGRITY_BLOCKED")
 
 
+def _ordinary_discovery_requested(
+    draft: Mapping[str, Any],
+    preflight_receipt: Mapping[str, Any] | None,
+) -> bool:
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        DISCOVERY_CONTRACT_VERSION,
+        ORDINARY_GROUNDED_DISCOVERY_V1,
+    )
+
+    surface = ""
+    contract = ""
+    if isinstance(preflight_receipt, Mapping):
+        surface = str(preflight_receipt.get("evidence_surface_mode") or "")
+        contract = str(preflight_receipt.get("discovery_contract_version") or "")
+    machine_contract = (
+        str(draft.get("discovery_contract_version") or "") == DISCOVERY_CONTRACT_VERSION
+        or surface == ORDINARY_GROUNDED_DISCOVERY_V1
+        or contract == DISCOVERY_CONTRACT_VERSION
+    )
+    if not machine_contract:
+        return False
+    evidence = draft.get("grounded_evidence")
+    candidates = draft.get("candidates")
+    candidate_count = len(candidates) if isinstance(candidates, list) else 0
+    return isinstance(evidence, Mapping) or candidate_count < 4
+
+
+def _enforce_ordinary_grounded_evidence(
+    draft: Mapping[str, Any],
+    *,
+    preflight_receipt: Mapping[str, Any] | None,
+    store: Any,
+) -> None:
+    if not _ordinary_discovery_requested(draft, preflight_receipt):
+        return
+    evidence = draft.get("grounded_evidence")
+    if not isinstance(evidence, Mapping):
+        raise HficSessionError("GROUNDED_EVIDENCE_REQUIRED")
+    if store is None:
+        raise HficSessionError("GROUNDED_STORE_REQUIRED")
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        assert_computed_grounded_evidence,
+    )
+
+    try:
+        expected_scope = None
+        if isinstance(preflight_receipt, Mapping):
+            expected_scope = preflight_receipt.get("search_key_sha256")
+        assert_computed_grounded_evidence(
+            store,
+            evidence,
+            expected_journal_scope=(
+                str(expected_scope) if isinstance(expected_scope, str) else None
+            ),
+        )
+    except GroundedDiscoveryError as exc:
+        raise HficSessionError(exc.code) from exc
+
+
+def _no_worthy_grounded_evidence(draft: Mapping[str, Any]) -> dict[str, Any] | None:
+    evidence = draft.get("grounded_evidence")
+    if not isinstance(evidence, Mapping):
+        return None
+    from solana_alpha_lab.factory.hfic_grounded_discovery import no_worthy_scope_record
+
+    return no_worthy_scope_record(evidence)
+
+
 def freeze_draft(
     draft: Mapping[str, Any],
     *,
@@ -1428,15 +1500,19 @@ def freeze_draft(
     if repo_root is not None:
         _validate_json_schema(draft, _draft_schema_path(repo_root, draft))
     candidates = draft.get("candidates")
-    if not isinstance(candidates, list) or not (
-        MIN_CANDIDATES <= len(candidates) <= MAX_CANDIDATES
-    ):
+    floor = 0 if _ordinary_discovery_requested(draft, preflight_receipt) else 4
+    if not isinstance(candidates, list) or not (floor <= len(candidates) <= MAX_CANDIDATES):
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
     try:
         identities = assign_portfolio_ids(candidates)
     except HficIdentityError as exc:
         raise HficSessionError(str(exc)) from exc
 
+    _enforce_ordinary_grounded_evidence(
+        draft,
+        preflight_receipt=preflight_receipt,
+        store=store,
+    )
     grounded_candidates: list[dict[str, Any]] | None = None
     if packet_version == "1.2":
         if repo_root is None:
@@ -1472,23 +1548,33 @@ def freeze_draft(
     selected_index = _resolve_ref(selected_ref, identities)
     if selected_index < 0:
         raise HficSessionError("SELECTED_CANDIDATE_MISSING")
-    runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
-    if runner_up_index < 0:
-        raise HficSessionError("CROSS_REFERENCE_MISMATCH")
-    if selected_index == runner_up_index:
-        raise HficSessionError("SELECTED_EQUALS_RUNNER_UP")
-    rejected_index = _resolve_ref(
-        draft.get("strongest_rejected_alternative"),
-        identities,
+    optional_single = (
+        _ordinary_discovery_requested(draft, preflight_receipt)
+        and len(identities) == 1
+        and not str(draft.get("runner_up_candidate_ref") or "").strip()
+        and not str(draft.get("strongest_rejected_alternative") or "").strip()
     )
-    if rejected_index < 0:
-        raise HficSessionError("CROSS_REFERENCE_MISMATCH")
+    if optional_single:
+        runner_up_index = -1
+        rejected_index = -1
+    else:
+        runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
+        if runner_up_index < 0:
+            raise HficSessionError("CROSS_REFERENCE_MISMATCH")
+        if selected_index == runner_up_index:
+            raise HficSessionError("SELECTED_EQUALS_RUNNER_UP")
+        rejected_index = _resolve_ref(
+            draft.get("strongest_rejected_alternative"),
+            identities,
+        )
+        if rejected_index < 0:
+            raise HficSessionError("CROSS_REFERENCE_MISMATCH")
 
     selected = identities[selected_index]
-    runner_up = identities[runner_up_index]
-    rejected = identities[rejected_index]
+    runner_up = None if runner_up_index < 0 else identities[runner_up_index]
+    rejected = None if rejected_index < 0 else identities[rejected_index]
     selected_card = candidates[selected_index]
-    runner_up_card = candidates[runner_up_index]
+    runner_up_card = None if runner_up_index < 0 else candidates[runner_up_index]
     closed_family_ledger = ledger_from_receipt(
         preflight_receipt if isinstance(preflight_receipt, Mapping) else None
     )
@@ -1578,7 +1664,9 @@ def freeze_draft(
         "selected_candidate": selected_block,
         "provisional_lane": _provisional_lane(selected_required_caps),
         "provisional_execution_unit": "NONE",
-        "strongest_rejected_alternative": rejected.candidate_id,
+        "strongest_rejected_alternative": (
+            "NONE" if rejected is None else rejected.candidate_id
+        ),
         "known_unknowns": critic_known_unknowns_with_closed_families(
             family_hard_close_terminals(closed_family_ledger)
         ),
@@ -1671,17 +1759,32 @@ def freeze_draft(
             )
         except (PriorMemoryCapacityError, PriorMemoryUnidentifiedError) as exc:
             raise HficSessionError(exc.code) from exc
+    grounded = draft.get("grounded_evidence")
+    if isinstance(grounded, Mapping):
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            GroundedDiscoveryError,
+            bind_prior_scope_evidence,
+        )
+
+        try:
+            packet["grounded_evidence"] = bind_prior_scope_evidence(grounded)
+        except GroundedDiscoveryError as exc:
+            raise HficSessionError(exc.code) from exc
     if repo_root is not None:
         _validate_json_schema(
             packet,
             Path(repo_root) / "catalog/schemas/hypothesis_critic_input_v1.schema.json",
         )
-    runner_up_transport = (
-        grounded_candidates[runner_up_index]
-        if grounded_candidates is not None
-        else runner_up_card
-    )
-    if critic_packet_version == CRITIC_PACKET_VERSION_CURRENT:
+    runner_up_packet = None
+    if runner_up is None:
+        runner_up_transport = None
+    else:
+        runner_up_transport = (
+            grounded_candidates[runner_up_index]
+            if grounded_candidates is not None
+            else runner_up_card
+        )
+    if runner_up is not None and critic_packet_version == CRITIC_PACKET_VERSION_CURRENT:
         from solana_alpha_lab.factory.hfic_control_integrity import (
             CRITIC_PACKET_GROUNDING_MISMATCH,
             assert_packet_grounding_consistent,
@@ -1705,19 +1808,20 @@ def freeze_draft(
             )
         except ValueError as exc:
             raise HficSessionError(str(exc)) from exc
-    else:
+    elif runner_up is not None:
         runner_up_packet = _build_runner_up_critic_packet(
             packet,
             runner_up=runner_up,
             runner_up_card=runner_up_card,
             packet_version=critic_packet_version,
         )
-    _bind_packet_session_id(runner_up_packet, session_id)
-    if repo_root is not None:
-        _validate_json_schema(
-            runner_up_packet,
-            Path(repo_root) / "catalog/schemas/hypothesis_critic_input_v1.schema.json",
-        )
+    if runner_up_packet is not None:
+        _bind_packet_session_id(runner_up_packet, session_id)
+        if repo_root is not None:
+            _validate_json_schema(
+                runner_up_packet,
+                Path(repo_root) / "catalog/schemas/hypothesis_critic_input_v1.schema.json",
+            )
     packet_bytes = json.dumps(
         packet,
         ensure_ascii=False,
@@ -1726,7 +1830,7 @@ def freeze_draft(
         allow_nan=False,
     )
     runner_up_packet_bytes = json.dumps(
-        runner_up_packet,
+        {} if runner_up_packet is None else runner_up_packet,
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
@@ -1751,12 +1855,12 @@ def freeze_draft(
         )
         or None,
         "selected_candidate_id": selected.candidate_id,
-        "runner_up_candidate_id": runner_up.candidate_id,
-        "rejected_alternative_id": rejected.candidate_id,
+        "runner_up_candidate_id": None if runner_up is None else runner_up.candidate_id,
+        "rejected_alternative_id": None if rejected is None else rejected.candidate_id,
         "selected_definition_sha256": selected.full_sha256,
         "selected_display_ordinal": selected.display_ordinal,
-        "runner_up_definition_sha256": runner_up.full_sha256,
-        "runner_up_display_ordinal": runner_up.display_ordinal,
+        "runner_up_definition_sha256": None if runner_up is None else runner_up.full_sha256,
+        "runner_up_display_ordinal": None if runner_up is None else runner_up.display_ordinal,
         "candidate_ids": [item.candidate_id for item in identities],
         "critic_input_packet": packet,
         "critic_input_packet_sha256": hashlib.sha256(
@@ -1766,9 +1870,11 @@ def freeze_draft(
             packet_bytes.encode("utf-8")
         ).hexdigest(),
         "runner_up_critic_input_packet": runner_up_packet,
-        "runner_up_critic_input_packet_sha256": hashlib.sha256(
-            runner_up_packet_bytes.encode("utf-8")
-        ).hexdigest(),
+        "runner_up_critic_input_packet_sha256": (
+            None
+            if runner_up_packet is None
+            else hashlib.sha256(runner_up_packet_bytes.encode("utf-8")).hexdigest()
+        ),
         "store_inventory_digest": store_digest,
         "git_composite_sha256": git_composite,
         "research_memory_as_of": memory_as_of,
@@ -1876,15 +1982,20 @@ def _freeze_no_worthy(
     _assert_vision_integrity_for_surface(
         preflight_receipt, prompt_version=prompt_version
     )
-    runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
-    if runner_up_index < 0:
-        raise HficSessionError("CROSS_REFERENCE_MISMATCH")
-    rejected_index = _resolve_ref(
-        draft.get("strongest_rejected_alternative"),
-        identities,
+    empty_ordinary = not identities and _ordinary_discovery_requested(
+        draft, preflight_receipt
     )
-    if rejected_index < 0:
-        raise HficSessionError("CROSS_REFERENCE_MISMATCH")
+    if empty_ordinary:
+        runner_up_index = -1
+        rejected_index = -1
+    else:
+        runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
+        rejected_index = _resolve_ref(
+            draft.get("strongest_rejected_alternative"),
+            identities,
+        )
+        if runner_up_index < 0 or rejected_index < 0:
+            raise HficSessionError("CROSS_REFERENCE_MISMATCH")
     truth_roots = _nonempty_str_list(
         draft.get("truth_roots_used"),
         code="TRUTH_ROOTS_REQUIRED",
@@ -2017,14 +2128,19 @@ def _freeze_no_worthy(
         )
         or None,
         "selected_candidate_id": None,
-        "runner_up_candidate_id": identities[runner_up_index].candidate_id,
-        "rejected_alternative_id": identities[rejected_index].candidate_id,
+        "runner_up_candidate_id": (
+            None if runner_up_index < 0 else identities[runner_up_index].candidate_id
+        ),
+        "rejected_alternative_id": (
+            None if rejected_index < 0 else identities[rejected_index].candidate_id
+        ),
         "selected_definition_sha256": None,
         "candidate_ids": [item.candidate_id for item in identities],
         "critic_input_packet": None,
         "critic_input_packet_sha256": None,
         "critic_launched": False,
         "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+        "grounded_evidence": _no_worthy_grounded_evidence(draft),
         "next": "STOP",
         "next_action": None,
         "next_action_status": None,
