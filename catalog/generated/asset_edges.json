@@ -2533,26 +2533,6 @@
       "target_asset_id": "SCRIPT-BATON-VALIDATE-001"
     },
     {
-      "source_asset_id": "CTRL-DECISION-IDENTITY-AND-LINEAGE-GATES-001",
-      "relation": "contains",
-      "target_asset_id": "DOC-PAPER-SHADOW-EXECUTION-INTEGRITY-PRD-SSD-001"
-    },
-    {
-      "source_asset_id": "CTRL-DECISION-IDENTITY-AND-LINEAGE-GATES-001",
-      "relation": "contains",
-      "target_asset_id": "TEST-PAPER-SHADOW-EXECUTION-INTEGRITY-VERTICAL-001"
-    },
-    {
-      "source_asset_id": "CTRL-DECISION-IDENTITY-AND-LINEAGE-GATES-001",
-      "relation": "depends_on",
-      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
-    },
-    {
-      "source_asset_id": "CTRL-DECISION-IDENTITY-AND-LINEAGE-GATES-001",
-      "relation": "depends_on",
-      "target_asset_id": "MODULE-TRADING-OPERATIONS-001"
-    },
-    {
       "source_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001",
       "relation": "depends_on",
       "target_asset_id": "ADR-006-HYPOTHESIS-FAST-LANE-001"
@@ -3446,6 +3426,21 @@
       "source_asset_id": "CTRL-HFIC-EPISTEMIC-MEMORY-SEMANTICS-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-HFIC-EPISTEMIC-MEMORY-SEMANTICS-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-FAST-LANE-DEFINITION-HASH-BIND-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-FAST-LANE-DEFINITION-HASH-BIND-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-FAST-LANE-DEFINITION-HASH-BIND-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HFIC-FAST-LANE-DEFINITION-HASH-BIND-001"
     },
     {
       "source_asset_id": "CTRL-HFIC-FORGE-CONTROL-READY-NEGATIVE-PRIOR-REPAIR-001",
@@ -6141,21 +6136,6 @@
       "source_asset_id": "EVIDENCE-CANARY-SPECIFICATION-ONLY-A2-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-CANARY-SPECIFICATION-ONLY-A2-001"
-    },
-    {
-      "source_asset_id": "EVIDENCE-DECISION-IDENTITY-AND-LINEAGE-GATES-COMPLETION-001",
-      "relation": "governed_by",
-      "target_asset_id": "CTRL-DECISION-IDENTITY-AND-LINEAGE-GATES-001"
-    },
-    {
-      "source_asset_id": "EVIDENCE-DECISION-IDENTITY-AND-LINEAGE-GATES-FACTORY-FIT-001",
-      "relation": "governed_by",
-      "target_asset_id": "CTRL-DECISION-IDENTITY-AND-LINEAGE-GATES-001"
-    },
-    {
-      "source_asset_id": "EVIDENCE-DECISION-IDENTITY-AND-LINEAGE-GATES-REVIEW-001",
-      "relation": "governed_by",
-      "target_asset_id": "CTRL-DECISION-IDENTITY-AND-LINEAGE-GATES-001"
     },
     {
       "source_asset_id": "EVIDENCE-DELIVERY-HARNESS-ACCEPTANCE-001",
@@ -13933,6 +13913,11 @@
       "target_asset_id": "CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001"
     },
     {
+      "source_asset_id": "REPORT-HFIC-FAST-LANE-DEFINITION-HASH-BIND-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-FAST-LANE-DEFINITION-HASH-BIND-001"
+    },
+    {
       "source_asset_id": "REPORT-HFIC-FORGE-CONTROL-READY-NEGATIVE-PRIOR-REPAIR-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HFIC-FORGE-CONTROL-READY-NEGATIVE-PRIOR-REPAIR-001"
@@ -16761,6 +16746,16 @@
       "source_asset_id": "TEST-HFIC-EPISTEMIC-MEMORY-SEMANTICS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HFIC-EPISTEMIC-MEMORY-SEMANTICS-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-FAST-LANE-DEFINITION-HASH-BIND-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-FAST-LANE-DEFINITION-HASH-BIND-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-FAST-LANE-DEFINITION-HASH-BIND-001"
     },
     {
       "source_asset_id": "TEST-HFIC-LEGACY-SCIENCE-REBASE-001",

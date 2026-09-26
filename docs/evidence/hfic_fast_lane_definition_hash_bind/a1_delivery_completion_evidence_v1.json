@@ -1,0 +1,68 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-FAST-LANE-DEFINITION-HASH-BIND-COMPLETION-001",
+  "as_of": "2026-09-26",
+  "task_id": "HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1",
+  "state_change": "BARE_EXPERIMENT_SPEC_IS_HYPOTHESIS_DEFINITION_UNBOUND",
+  "base_main": "4213755922fec0142a69ba1b0df52268c026240b",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "dc0afe2a0c9ffede2b98e7d6e1578c653f85d14b77b5f829ee7d4e8ec94863b7",
+    "catalog/assets/lifecycle.yaml": "2c6556f7cb933893590730fd8ec2b632540c01f3971fca01a35bb0ca3e9934fe",
+    "catalog/catalog_manifest.yaml": "af0b22d71f132f4f76cfa6db1bbfbcbe8d315657a34602cca9b77246a8fc01cf",
+    "catalog/generated/asset_edges.json": "c1d6e05e2b0cf8bb8b46ade282bbff90d9f480110926a08d20d8f1739f27dd35",
+    "docs/PROJECT_MAP.md": "d155f355c362268af0b01a45766f99b7d99994e1c19608796020610fc385719a",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "d77618a4096f1343fe547a6421cd15af8ead3b8676845dfa20090cce81863a2f",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "32398a982fcde8d2f572f9a8d147f7adb660eb151c5f923b45c5b6f0c2b9c090",
+    "docs/reports/hfic_fast_lane_definition_hash_bind/a1_owner_readout_v1.md": "4b996b086ec8743889b38a38df9d6d915fa11fecc990f127cf02cd9f7a66fa14",
+    "docs/tasks/HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1.md": "6893338a54b0a6e739c3efb5b0e25959bdf486721583d6a6ce09050b6464d61a",
+    "src/solana_alpha_lab/factory/hfic_session.py": "1729d57d7196531dc1675612c504fa73ae8efbe1caf0287be1211fd85a5b6581",
+    "tests/test_hfic_classification_outcome_integrity_v1.py": "674793a56c260f97c385f32c9f80b8e562547c8f0a698eacad852c98d70c9e08",
+    "tests/test_hfic_fast_lane_definition_hash_bind_v1.py": "a2e2233ef9304a3f49c2d459e26c0aa005c0bd203fe6d9bb089806e331314f8e",
+    "tests/test_hfic_fresh_control_decision_integrity_closure_v1.py": "d7eafd1bdf185d28f251f7ffdd738252693b785ba508e1d3436e74a86ab1cfe2",
+    "tests/test_hfic_packet14_availability_fast_lane_guard_v1.py": "65f2f72053a401500e3d3b38f61566364c81cb8fd47c7c988209053573812b1f"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_fast_lane_definition_hash_bind/a1_delivery_factory_fit_v1.json",
+    "sha256": "99147d4f9640fdf1d5d2ebe122ebc580350031dc43e783d1284da4c8feaa1425",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_HFIC_FAST_LANE_DEFINITION_HASH_BIND_FOCUSED_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_fast_lane_definition_hash_bind/a1_delivery_independent_review_v1.json",
+      "sha256": "6382122aff2aa6beee7f87a6eaa53fb5158edb33a40b6e0191944a801668fde1",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_CASES_A_B_C",
+      "PASS_PACKET14_AND_CLASSIFICATION_REGRESSION"
+    ]
+  },
+  "non_claims": [
+    "NO_MERGE",
+    "NO_HFIC_CAND_EQUALS_HYP",
+    "NO_SPEC_PRODUCER",
+    "NO_HANDOFF_CONTRACT_EDIT"
+  ],
+  "side_effects": {
+    "network_calls": 0,
+    "local_writes": 0,
+    "external_actions": 0
+  }
+}

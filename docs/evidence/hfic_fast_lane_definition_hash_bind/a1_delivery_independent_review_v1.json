@@ -1,0 +1,54 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-FAST-LANE-DEFINITION-HASH-BIND-REVIEW-001",
+  "as_of": "2026-09-26",
+  "task_id": "HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1",
+  "reviewed_bindings_sha256": "096fe85061e509c993f2bcba964f5addebbc55f397d89db714f7d8aae769bb62",
+  "reviewed_inventory_sha256": "1c1fdb155e36dea8cd9564575b96a32875e1c9ad9c44aca07378c3f9c58163fe",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Bare spec does not inherit the frozen hash; unequal hash is HYPOTHESIS_DEFINITION_UNBOUND; packet 1.4 fixtures only pass the real frozen hash."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Cases A/B/C falsify bare FAST_LANE_READY, keep the PIT path, and keep EXPERIMENT_SPEC_GROUNDING_MISMATCH."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=dca580834fb6af748a6e04a273bc076193b235262ef9c8efbfb7dc9182798600",
+        "Bind is caller attestation to frozen selected_definition_sha256, not an ExperimentSpec content digest. HYP-* is not rewritten to HFIC-CAND-*."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Operator sentence and Russian readout name hypothesis_definition_sha256 and HYPOTHESIS_DEFINITION_UNBOUND."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_MERGE",
+    "NO_HFIC_CAND_EQUALS_HYP",
+    "NO_SPEC_PRODUCER",
+    "NO_HANDOFF_CONTRACT_EDIT",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}
