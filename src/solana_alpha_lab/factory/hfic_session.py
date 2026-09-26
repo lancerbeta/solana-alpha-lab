@@ -3427,6 +3427,11 @@ def generated_draft_matches_preflight_context(
         return False
     if not allow_prefreeze_capability_repair:
         return True
+    # A known model on the saved draft is part of the execution identity.
+    # Capability repair may proceed only when the caller repeats that same
+    # model. Omitting it is not "unknown"; it is a different binding.
+    if _hash64(model) and model_provenance_sha256 != model:
+        return False
     return _prefreeze_capability_drift_is_consistent(
         generated_draft,
         scientific_slot_sha256=scientific_slot_sha256,
@@ -3435,7 +3440,7 @@ def generated_draft_matches_preflight_context(
         control_session_id=control_session_id,
         representation_payload_sha256=representation_payload_sha256,
         execution_binding_sha256=execution_binding_sha256,
-        model_provenance_sha256=model if isinstance(model, str) else model_provenance_sha256,
+        model_provenance_sha256=model if _hash64(model) else None,
     )
 
 
