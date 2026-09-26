@@ -4,8 +4,8 @@
   "review_id": "PAPER-PLANE-WRITE-INTEGRITY-FACTORY-FIT-001",
   "as_of": "2026-09-26",
   "task_id": "PAPER_PLANE_WRITE_INTEGRITY_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "fbeab24043477a454858d1858001fb7c217ffbaf21667f45fae152bab69b5d35",
+  "reviewed_inventory_sha256": "de55145fcfc1f3882e9b34aa5c50b429c61dbf7286244c10cb2ea39fcbb27f27",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
