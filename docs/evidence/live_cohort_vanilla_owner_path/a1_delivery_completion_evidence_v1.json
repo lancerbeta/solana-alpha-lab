@@ -11,8 +11,8 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "USE_VANILLA_COHORT_OWNER_PATH",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "f93a0a54c65c513b393ecef9d7d4f6c44b4c46a705953a32dc451ea4e80dd3a0",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "d2bad8191a9461e2a0e64f8f4d751345f4b1c4765c1d714b3d996e5372ef057f",
+    "catalog/assets/core.yaml": "19049f823a94757574d49f68d6813195403bcf99a5d967383b8384bf0d285e1b",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "f81dbe0d8aebba60a076ff86db3f251d272d5b4891cff67e7b81e14660e6ce0a",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "02493fc2bd23e6413ae449df1c7cb149ce180752737801ad14a54b507b864276",
     "docs/tasks/LIVE_COHORT_VANILLA_OWNER_PATH_V1.md": "d0d688d000890105bd5613f0f1f0fcd9043bf1b75d01c046dc35f1b3d5133c0e",
     "scripts/discovery_evidence_release.py": "e8f6d23604d470d796ae213e8618b3e54f59560718361ac693b1be7da6d9c60d",
@@ -27,7 +27,7 @@
     "src/solana_alpha_lab/factory/live_corpus_manifest_publish.py": "c65e935b6a5621788b1d883fe0c2d97885c3d4f2953ecd453cc745c55190eaf3",
     "src/solana_alpha_lab/factory/research_store.py": "c65fb6e7e8cf022ba90d11ff2cf112dde27996909dda53c4eab5d5499e46a653",
     "tests/test_bounded_cohort_materialization_v1.py": "c777bcdb9a8a11a67f24d9bffcdd7cb182d6a499f82fcf593fe4dc489fa780d2",
-    "tests/test_forge_evidence_identity_and_owner_gold_v1.py": "0aad5e8a45312f2e91117d8c559ec415bb7a64f3c0ff3fd62841a01d00b2aeeb",
+    "tests/test_forge_evidence_identity_and_owner_gold_v1.py": "40600c4e4cb97a399819ba73b224a81b56cfbaa5cb81063f310c0fec87a9ee69",
     "tests/test_forge_input_truth_and_visibility_v1.py": "0bedd96c5fdfb9935ae4b643adcb0381c14ae2971b7a569f7af048a643c841ff",
     "tests/test_forge_representation_ladder_v1.py": "378942e76641d282536b4d89d5980d56b14684b0c094d799ea268f4194554b74",
     "tests/test_live_cohort_vanilla_owner_path_v1.py": "2325817b2e068ce477e4edcb3dfe204f477a39666d3ca6606b0633fa310913cc"
@@ -42,14 +42,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/live_cohort_vanilla_owner_path/a1_delivery_factory_fit_v1.json",
-    "sha256": "9512cd8d19f3aca892d40a82ed6d73f164cbd66a95e2b2e038d2cd82216f1571",
+    "sha256": "84728e22eec749e6f381545491e2e77944a44ed082c23b61c5bccbf59b570e03",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LIVE_COHORT_VANILLA_OWNER_PATH",
     "independent_review": {
       "path": "docs/evidence/live_cohort_vanilla_owner_path/a1_delivery_independent_review_v1.json",
-      "sha256": "d444112c0b473c55587ecb8a8736e41c6fd3821d2ef53001493724066333364e",
+      "sha256": "4eed1fa3108a1da1c0302773cdc62175b22fd138f88a77ac4dbc6cc9c6085d9c",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
