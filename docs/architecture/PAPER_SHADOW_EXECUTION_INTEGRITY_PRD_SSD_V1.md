@@ -349,7 +349,7 @@ or `UNRESOLVED` position. `OFF → STRATEGY/GLOBAL` = TIGHTENING; the reverse = 
 ```text
 A1 PAPER_PLANE_WRITE_INTEGRITY_V1          (S, SOL_XHIGH)  primitives: atomic + conditional + causal
 A2 PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1  (M, SOL_XHIGH)  CANCELLED, stop dominance, no auto-fill, binding — A2 delivered in this PR
-A3 DECISION_IDENTITY_AND_LINEAGE_GATES_V1  (S, LUNA_MAX)   as_of, fingerprint, spec drift, exit identity
+A3 DECISION_IDENTITY_AND_LINEAGE_GATES_V1  (S, LUNA_MAX)   as_of, fingerprint, spec drift, exit identity — A3 delivered in this PR
 A4 PAPER_PLANE_READ_FRESHNESS_V1           (XS, LUNA_MAX)  WAL-aware readonly, GET purity kept
 A5 EXECUTION_ATTEMPT_SEAM_V1               (M, SOL_XHIGH)  attempt ledger + observation mapping (owner go)
 A6 UNRESOLVED_INVENTORY_ENTRY_VETO_V1      (S, LUNA_MAX)   only if OD-1 asks for it

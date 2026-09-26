@@ -360,6 +360,7 @@ class PaperShadowAccountingControlTests(unittest.TestCase):
                     signal_decision=_signal("SIGDEC-SHADOW-1"),
                     known_activation_epochs={EPOCH: {"mode": "SHADOW"}},
                     mode="SHADOW",
+                    as_of="2026-09-03T12:10:00Z",
                 )
                 pid = str(accepted["position_id"])
                 store.apply_paper_entry_fill(

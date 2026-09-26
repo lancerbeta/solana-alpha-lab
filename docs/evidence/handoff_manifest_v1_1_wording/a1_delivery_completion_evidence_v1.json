@@ -5,7 +5,7 @@
   "as_of": "2026-09-26",
   "task_id": "HANDOFF_MANIFEST_V1_1_WORDING_V1",
   "state_change": "HANDOFF_CONTRACT_NAMES_MANIFEST_1_1_WITH_BINDING",
-  "base_main": "05abd3b328f28af671d2086012b4562f9cf414f1",
+  "base_main": "0ecc322ac45c1b77c80ae2a33e8d5cce0db472c7",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,

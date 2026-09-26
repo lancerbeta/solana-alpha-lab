@@ -29606,7 +29606,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
-  integrity: {kind: sha256, sha256: 3be6c95265675db9ddc8b0c0915c1a59a8199c372ae6756e278f1e584b804968}
+  integrity: {kind: sha256, sha256: 95c78c4522379e512c29ad63f08c4dd29c45e7fcc951189b3109028dcf0b2e35}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
@@ -34784,7 +34784,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: FACTORY_STRATEGY_EXECUTION_BOUNDARY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_strategy_execution_boundary_v1.py', repository_path: tests/test_factory_strategy_execution_boundary_v1.py}
-  integrity: {kind: sha256, sha256: 88335d34904700d0dce3d7598d68c1fe4e932bceefc4daff9d33e677f3930d1f}
+  integrity: {kind: sha256, sha256: 708fda2d4a2fe1b0127d08c160399384de28df5e0250c849ca2fc9ffd1fc5728}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001}
@@ -34880,7 +34880,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_paper_shadow_accounting_and_control_v1.py', repository_path: tests/test_paper_shadow_accounting_and_control_v1.py}
-  integrity: {kind: sha256, sha256: 3123e9691b49aa441ae8dead2f88b5e839b8a8c156c8b8beb87f1b58755ffad1}
+  integrity: {kind: sha256, sha256: 6c6e378c24e6f5854fed946b2349bb558be380034bb0b7c7743561369edbcf09}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001}
@@ -34921,7 +34921,7 @@ records:
   as_of: '2026-09-26'
   truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/architecture/PAPER_SHADOW_EXECUTION_INTEGRITY_PRD_SSD_V1.md', repository_path: docs/architecture/PAPER_SHADOW_EXECUTION_INTEGRITY_PRD_SSD_V1.md}
-  integrity: {kind: sha256, sha256: c841af00127a1d1a7a3a85ec061bdb374370d04751ae5e2db1752183eb20f6fc}
+  integrity: {kind: sha256, sha256: 11c8e2bf3f2be1499ca502c1d1d04cc7a49db0c6871a83f8936630b7d4413951}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001}
@@ -34938,7 +34938,7 @@ records:
   as_of: '2026-09-26'
   truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_paper_shadow_execution_integrity_vertical_v1.py', repository_path: tests/test_paper_shadow_execution_integrity_vertical_v1.py}
-  integrity: {kind: sha256, sha256: 11538bbf3933e409fb2436045e20a76b9b4b6d685a1ae250c0fed756566c0179}
+  integrity: {kind: sha256, sha256: 40f4d25af2f016f5a892fde423d8633d590c5b85a1a5e35fdd6be8629c177535}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001}
@@ -35069,6 +35069,77 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [PAPER_SHADOW, ENTRY_INTENT, FACTORY_FIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-DECISION-IDENTITY-AND-LINEAGE-GATES-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for SignalDecision clock, one-id-one-body, strategy spec drift and position lineage.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: DECISION_IDENTITY_AND_LINEAGE_GATES_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/DECISION_IDENTITY_AND_LINEAGE_GATES_V1.md', repository_path: docs/tasks/DECISION_IDENTITY_AND_LINEAGE_GATES_V1.md}
+  integrity: {kind: sha256, sha256: 9f19d78f7224320c7c8104ec9f9e85a2a446bc50dca6cbf85f90f339d78ffbbd}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: DOC-PAPER-SHADOW-EXECUTION-INTEGRITY-PRD-SSD-001}
+  - {relation_type: contains, target_asset_id: TEST-PAPER-SHADOW-EXECUTION-INTEGRITY-VERTICAL-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-TRADING-OPERATIONS-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [DECISION_IDENTITY, LINEAGE, AS_OF, SPEC_DRIFT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-DECISION-IDENTITY-AND-LINEAGE-GATES-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Completion evidence for decision identity and position lineage gates.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: DECISION_IDENTITY_AND_LINEAGE_GATES_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/decision_identity_and_lineage_gates/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/decision_identity_and_lineage_gates/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DECISION-IDENTITY-AND-LINEAGE-GATES-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [DECISION_IDENTITY, LINEAGE, COMPLETION_EVIDENCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-DECISION-IDENTITY-AND-LINEAGE-GATES-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Independent review evidence for the decision-identity atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: DECISION_IDENTITY_AND_LINEAGE_GATES_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/decision_identity_and_lineage_gates/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/decision_identity_and_lineage_gates/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DECISION-IDENTITY-AND-LINEAGE-GATES-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [DECISION_IDENTITY, LINEAGE, INDEPENDENT_REVIEW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-DECISION-IDENTITY-AND-LINEAGE-GATES-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Factory-fit review for the decision-identity atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: DECISION_IDENTITY_AND_LINEAGE_GATES_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/decision_identity_and_lineage_gates/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/decision_identity_and_lineage_gates/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-DECISION-IDENTITY-AND-LINEAGE-GATES-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [DECISION_IDENTITY, LINEAGE, FACTORY_FIT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 
 - asset_id: CTRL-OWNER-OPERATIONS-COCKPIT-001
@@ -35935,7 +36006,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_owner_lifecycle_projection_spine_v1.py', repository_path: tests/test_owner_lifecycle_projection_spine_v1.py}
-  integrity: {kind: sha256, sha256: 72b92e16c8e2f54d764b073635cd5accc7f1ba120fea368bb6b9bf4b6b17b169}
+  integrity: {kind: sha256, sha256: e401b2b3b68d09ffd7bfab901299ecaff98deabd54c1dd42f24741a829e678f3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -36356,7 +36427,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: TRADING_OPERATIONS_WORKBENCH_V2
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/trading_operations.py', repository_path: src/solana_alpha_lab/factory/trading_operations.py}
-  integrity: {kind: sha256, sha256: 5bae6dcd4d944196e3e3703e0b4181a8de2fc3aec8478607411704d166d9d9ae}
+  integrity: {kind: sha256, sha256: 5411aca4daa1fd03ca0a2101856ddc3cedd4bc454bf11777b16aac5de9d2e642}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-OPERATIONS-WORKBENCH-001}
@@ -36974,7 +37045,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: OWNER_TRADING_OPERABILITY_FOUNDATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/trading_runtime_policy_v1.md', repository_path: docs/contracts/trading_runtime_policy_v1.md}
-  integrity: {kind: sha256, sha256: d81fc10b24afc0f6e093c44d4117d05e655b61bd4d19a02db207bd3fe661b326}
+  integrity: {kind: sha256, sha256: e563665d195ed7fb6454e1a62ea5e71a1c89d2b021b8062235aa435e8e8657e8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-RUNTIME-POLICY-001}
@@ -38390,7 +38461,7 @@ records:
   as_of: '2026-09-26'
   truth_owner: HANDOFF_MANIFEST_V1_1_WORDING_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HANDOFF_MANIFEST_V1_1_WORDING_V1.md', repository_path: docs/tasks/HANDOFF_MANIFEST_V1_1_WORDING_V1.md}
-  integrity: {kind: sha256, sha256: 871dd3a8685d02f33f0cd4c2d8a0b9b91c06a8294cbdc193bdeef25918ba4705}
+  integrity: {kind: sha256, sha256: a9194368d545d7c7cbda4d70605685e4983b4aac24a873355f255edb2b38100f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
