@@ -17,7 +17,8 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=72a58c5656a25941116ae02ebd23eed223f5f6801dabd1550d4781ee2c2ae2be",
+        "packet_fingerprint_sha256=5859a13544eba2d2584c4e865e53c35de10b07bd2fa842669ea98b9f0106d345",
+        "PASS_HFIC_SESSION_ABSENT",
         "PASS_E1_STOP_DOMINANCE",
         "PASS_E2_NO_AUTOFILL",
         "PASS_E4_ADMISSION_BINDING",
