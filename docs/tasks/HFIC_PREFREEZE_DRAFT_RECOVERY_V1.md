@@ -38,6 +38,7 @@ managed_write_set:
   - tests/test_research_store.py
   - tests/test_hfic_prefreeze_draft_recovery_v1.py
   - catalog/assets/core.yaml
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
   - docs/reports/hfic_prefreeze_draft_recovery/a1_owner_readout_v1.md
   - docs/evidence/hfic_prefreeze_draft_recovery/a1_real_slot_readonly_proof_v1.json
   - docs/evidence/hfic_prefreeze_draft_recovery/a1_delivery_completion_evidence_v1.json
