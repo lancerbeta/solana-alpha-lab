@@ -11,15 +11,15 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "5a6667e62223f98304866b6de26d39dc9d29b837033d47d0b364fb8e53c71a61",
-    "catalog/assets/lifecycle.yaml": "6c06895c013a3f4efd5536b7da0f40a6ff6cacb71963410df61922c56dd99e98",
-    "catalog/catalog_manifest.yaml": "7af8921ffee55d6f698b73b64c15fc3c738550395b201b5859f32ffaeadf6756",
-    "catalog/generated/asset_edges.json": "1eea41aa457f54b233f74a0da5bafaaa6f0514f710978dc6fbc4a44d71615e4c",
-    "docs/PROJECT_MAP.md": "98b6ce969f278b389efee751208fc9d39061cda07f31025be651333e95efcab9",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "777d652e3c32f5e2a48ad5422c5af8b6f0bcacb1c8fc1edbb11d09dc3e134fb5",
+    "catalog/assets/core.yaml": "dc0afe2a0c9ffede2b98e7d6e1578c653f85d14b77b5f829ee7d4e8ec94863b7",
+    "catalog/assets/lifecycle.yaml": "2c6556f7cb933893590730fd8ec2b632540c01f3971fca01a35bb0ca3e9934fe",
+    "catalog/catalog_manifest.yaml": "af0b22d71f132f4f76cfa6db1bbfbcbe8d315657a34602cca9b77246a8fc01cf",
+    "catalog/generated/asset_edges.json": "c1d6e05e2b0cf8bb8b46ade282bbff90d9f480110926a08d20d8f1739f27dd35",
+    "docs/PROJECT_MAP.md": "d155f355c362268af0b01a45766f99b7d99994e1c19608796020610fc385719a",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "d77618a4096f1343fe547a6421cd15af8ead3b8676845dfa20090cce81863a2f",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "32398a982fcde8d2f572f9a8d147f7adb660eb151c5f923b45c5b6f0c2b9c090",
     "docs/reports/hfic_fast_lane_definition_hash_bind/a1_owner_readout_v1.md": "4b996b086ec8743889b38a38df9d6d915fa11fecc990f127cf02cd9f7a66fa14",
-    "docs/tasks/HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1.md": "0be39e63ceb4fac52ecae32b9d04f25133cc0987565c9eb70e608b38c968cb42",
+    "docs/tasks/HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1.md": "6893338a54b0a6e739c3efb5b0e25959bdf486721583d6a6ce09050b6464d61a",
     "src/solana_alpha_lab/factory/hfic_session.py": "1729d57d7196531dc1675612c504fa73ae8efbe1caf0287be1211fd85a5b6581",
     "tests/test_hfic_classification_outcome_integrity_v1.py": "674793a56c260f97c385f32c9f80b8e562547c8f0a698eacad852c98d70c9e08",
     "tests/test_hfic_fast_lane_definition_hash_bind_v1.py": "a2e2233ef9304a3f49c2d459e26c0aa005c0bd203fe6d9bb089806e331314f8e",
@@ -36,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_fast_lane_definition_hash_bind/a1_delivery_factory_fit_v1.json",
-    "sha256": "122f40b141c853b7b730b999ca1d326fbef0cd165b3d59757a2a3844df7f460e",
+    "sha256": "99147d4f9640fdf1d5d2ebe122ebc580350031dc43e783d1284da4c8feaa1425",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_FAST_LANE_DEFINITION_HASH_BIND_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/hfic_fast_lane_definition_hash_bind/a1_delivery_independent_review_v1.json",
-      "sha256": "1f1990ab859728efee42c3f5b0d851735195177efd554d8cd81918b1da13c3da",
+      "sha256": "6382122aff2aa6beee7f87a6eaa53fb5158edb33a40b6e0191944a801668fde1",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

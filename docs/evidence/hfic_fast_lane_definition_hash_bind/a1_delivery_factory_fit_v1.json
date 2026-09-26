@@ -4,8 +4,8 @@
   "review_id": "HFIC-FAST-LANE-DEFINITION-HASH-BIND-FACTORY-FIT-001",
   "as_of": "2026-09-26",
   "task_id": "HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1",
-  "reviewed_bindings_sha256": "4359d76cfccfe32ece6703f260a2129dda4c0ff3519a63910091ef23f49f22cc",
-  "reviewed_inventory_sha256": "12355f75afabfa02dbbea642c217d63cd0ce19ad1fb91233c9e7d93b74312953",
+  "reviewed_bindings_sha256": "096fe85061e509c993f2bcba964f5addebbc55f397d89db714f7d8aae769bb62",
+  "reviewed_inventory_sha256": "1c1fdb155e36dea8cd9564575b96a32875e1c9ad9c44aca07378c3f9c58163fe",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
