@@ -17,29 +17,29 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "At HEAD 29dfeb5d, omitted overlap_members stays independent_replication false unless an explicit overlap list is passed. Ordinary forge-run emits ORDINARY_DISCOVERY_READY unless --control-current-representation. discovery-coverage does not select typed_value. EXACT_PRIOR_SCOPE_MATCH blocks freeze. V1 triggers do not include KILL_MECHANISM. AUTO is not released."
+        "At HEAD 58bf8192, discovery-execute computes BASE_X from rows, records DISCOVERY_QUERY_LOOK, and freeze rejects a tampered result. Explanatory points after the decision are rejected. Empty ordinary receipts allow candidate_ids minItems 0 and a null runner. freeze_draft keeps a floor of 4 unless the draft is ordinary discovery. Non-empty unresolved runner refs still raise CROSS_REFERENCE_MISMATCH."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Synthetic fixtures cover ordinary routing distinct from CONTROL, pooled versus conditional and calendar views, leakage and missingness, scoped CONTROL versus exact duplicate, and a finite look budget. The coverage receipt is state-only. Market Prompt A, market Critic, and the post-merge ordinary slash stay outside this atom."
+        "The synthetic public path covers pooled versus conditional means, calendar blocks, empty strata, leakage, censored lateness, missing flags, prior rename versus richer CONTROL scope, and predictive identity without an actor. Market Prompt A, market Critic, and the live focus slot stay outside this atom."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=e2c48ba152a21c6a59208ab35828cacf8fee352bc608a02d18f84880c0e81525",
-        "Omitted overlap is unknown, not independent. Prefix counts are gated on the PIT liquidity base. Freeze calls bind_prior_scope_evidence and rejects an exact prior scope match. A CONTROL exhaustion readout is not a raw-corpus negative."
+        "packet_fingerprint_sha256=8efecf24bfc89aa299918cbb410000785a00a6cca19d8f2b08170fbb9256ffe5",
+        "Production execute passes overlap_members null, so unmeasured mint overlap is not independent_replication true. PREDICTIVE identity stores an empty actor instead of inventing one. Empty ordinary NO_WORTHY persists no fabricated candidate id. CONTROL freeze still uses floor 4."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "The exact discovery-coverage command is on the skill, slash command, operator pack, and owner readout. Ordinary versus CONTROL and the CONTROL scope_exhausted line are visible without opening code."
+        "Ordinary versus CONTROL, discovery-execute, discovery-coverage, predictive 0-6 without a forced actor, and the post-merge slash are on the skill, slash command, operator A0/A2/A4/A5/A13/A15, and the owner readout."
       ]
     }
   ],

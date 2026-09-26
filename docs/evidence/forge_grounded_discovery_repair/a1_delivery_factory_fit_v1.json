@@ -9,7 +9,7 @@
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
-    "mission": "PASS_ORDINARY_ROUTE_NOT_SILENT_CONTROL",
+    "mission": "PASS_ORDINARY_ROW_RECIPE_AND_FREEZE_BINDING",
     "flexibility_and_history": "PASS_CONTROL_AND_V1_TRIGGERS_UNCHANGED",
     "context_efficiency": "PASS_EXISTING_FORGE_CLI",
     "research_truth": "PASS_STATE_ONLY_COVERAGE_NO_TYPED_VALUES",
