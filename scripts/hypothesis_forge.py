@@ -440,6 +440,7 @@ def cmd_preflight(
             "or treat the caveat as a scientific terminal\n"
             + _preflight_writes_note(payload)
         )
+    # Stamp and readout edits are inside the receipt hash.
     payload["preflight_receipt_sha256"] = canonical_preflight_receipt_sha256(payload)
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     exit_code = 0 if receipt["action"] != "STOP" else 2

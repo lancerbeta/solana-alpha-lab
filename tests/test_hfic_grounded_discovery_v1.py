@@ -799,9 +799,18 @@ class OrdinaryOwnerPathTests(unittest.TestCase):
                 text=True,
             )
             self.assertEqual(raw_preflight.returncode, 0, raw_preflight.stderr)
+            stamped = json.loads(raw_preflight.stdout)
             self.assertEqual(
-                json.loads(raw_preflight.stdout).get("discovery_contract_version"),
+                stamped.get("discovery_contract_version"),
                 "FORGE_GROUNDED_DISCOVERY_V1",
+            )
+            from solana_alpha_lab.factory.hfic_session import (
+                canonical_preflight_receipt_sha256,
+            )
+
+            self.assertEqual(
+                stamped.get("preflight_receipt_sha256"),
+                canonical_preflight_receipt_sha256(stamped),
             )
             preflight = run_cli(
                 "preflight",
