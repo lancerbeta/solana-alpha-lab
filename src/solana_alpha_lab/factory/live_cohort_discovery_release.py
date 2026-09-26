@@ -108,7 +108,6 @@ from solana_alpha_lab.factory.bounded_cohort_materialization import (
     WallBudget,
     file_size_for_rel,
     inspect_member_target,
-    load_observation_partition_index,
     plan_is_unbounded,
     resolve_observation_panel_location,
     select_member_batches,
@@ -143,6 +142,15 @@ from solana_alpha_lab.factory.tokens_v2_typed_projection import (
 )
 
 CORPUS_DATASET_ID = "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001"
+_LAST_BOUNDED_RESEARCH_RELS: tuple[str, ...] = ()
+
+
+def last_bounded_research_rels() -> tuple[str, ...]:
+    """Partition parquet and manifest paths selected by the last bounded read."""
+
+    return _LAST_BOUNDED_RESEARCH_RELS
+
+
 CORPUS_SCHEMA_ID = "SCHEMA-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001"
 LIVE_EVIDENCE_ROLE = "EXPLORATORY_REUSE"
 COMMIT_POINT_KIND = "LIVE_LIFECYCLE_DISCOVERY_CORPUS_PUBLICATION_V1"
@@ -250,13 +258,26 @@ def _compact_utc(value: datetime) -> str:
     return value.astimezone(UTC).strftime("%Y%m%dT%H%M%SZ")
 
 
+def _rel_encoded_instant(value: datetime) -> datetime:
+    """UTC instant at the second precision stored in a REL-* cohort id.
+
+    Activation timestamps stay unchanged. Cohort identity bounds are the
+    instants that round-trip through ``cohort_window_bounds``.
+    """
+    return datetime.strptime(_compact_utc(value), "%Y%m%dT%H%M%SZ").replace(tzinfo=UTC)
+
+
 def campaign_cohort_windows(
     starts_at: datetime,
     stops_admitting_at: datetime,
 ) -> list[tuple[str, datetime, datetime]]:
-    """Half-open [S+k*7d, S+(k+1)*7d) windows until stops_admitting_at."""
-    start = starts_at.astimezone(UTC)
-    stop = stops_admitting_at.astimezone(UTC)
+    """Half-open [S+k*7d, S+(k+1)*7d) windows until stops_admitting_at.
+
+    Bounds use REL-* second precision so the generated id parses back to the
+    same instants. Subsecond activation fields are not rewritten.
+    """
+    start = _rel_encoded_instant(starts_at)
+    stop = _rel_encoded_instant(stops_admitting_at)
     _require(stop > start, "CAMPAIGN_WINDOW_INVALID")
     windows: list[tuple[str, datetime, datetime]] = []
     cursor = start
@@ -1056,6 +1077,7 @@ def _lineage_from_rdp(
     window is supplied, only overlapping partitions plus a newest-first
     predecessor search are verified/decoded.
     """
+    global _LAST_BOUNDED_RESEARCH_RELS
     wanted = str(activation_id or "").strip()
     _require(bool(wanted), "LIVE_SOURCE_ACTIVATION_MISSING")
     try:
@@ -1072,6 +1094,9 @@ def _lineage_from_rdp(
         )
     except ResearchStoreError as exc:
         raise LiveCohortReleaseError("LIVE_SOURCE_RDP_UNREADABLE") from exc
+    _LAST_BOUNDED_RESEARCH_RELS = tuple(telemetry.selected_parquet_locations) + tuple(
+        telemetry.selected_partition_manifest_rels
+    )
     _apply_research_bound_telemetry(telemetry)
     schedule_docs: list[dict[str, Any]] = []
     schedule_producers: set[str] = set()
@@ -1758,7 +1783,7 @@ def latest_c1_observation_manifest_at(
             """
         )
         insert = conn.execute
-        partition_index = load_observation_partition_index(Path(observation_rdp_root))
+        partition_index = None
         seen_locations: set[str] = set()
         panels: list[tuple[datetime, Path]] = []
         for record in records:
@@ -1918,7 +1943,7 @@ def _cohort_observations_into_sqlite(
         )
     )
     seen_locations: set[str] = set()
-    partition_index = load_observation_partition_index(Path(observation_rdp_root))
+    partition_index = None
     for row in selected:
         if wall is not None:
             wall.check(stage="observations")
@@ -2121,7 +2146,7 @@ def plan_live_source_materialization(
     predicted_obs_locations = 0
     seen_obs: set[str] = set()
     global_glob = False
-    partition_index = load_observation_partition_index(root)
+    partition_index = None
     for row in selected_obs:
         payload = row.get("payload") if isinstance(row.get("payload"), Mapping) else {}
         try:
@@ -2194,6 +2219,9 @@ def plan_live_source_materialization(
         ),
         "research_event_payload_bytes_read": int(
             counters.get("research_event_payload_bytes_read") or 0
+        ),
+        "observation_partition_index_files_read": int(
+            counters.get("observation_partition_index_files_read") or 0
         ),
     }
     return plan

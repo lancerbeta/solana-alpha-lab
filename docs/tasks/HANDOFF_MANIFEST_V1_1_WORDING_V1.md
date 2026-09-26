@@ -16,9 +16,9 @@ required_review_roles:
 expected_repository: lancerbeta/solana-alpha-lab
 
 git_binding:
-  expected_base: 1147ce2c03db2f7d68e1622b82c7fee4e92bb183
+  expected_base: 05abd3b328f28af671d2086012b4562f9cf414f1
   expected_upstream: origin/main
-  expected_upstream_oid: 1147ce2c03db2f7d68e1622b82c7fee4e92bb183
+  expected_upstream_oid: 05abd3b328f28af671d2086012b4562f9cf414f1
   expected_branch: cursor/handoff-manifest-v1-1-wording-v1
   dirty_mode: ALLOW_REPORTED
 
@@ -87,7 +87,7 @@ context_requirements:
 # HANDOFF_MANIFEST_V1_1_WORDING_V1
 
 SPEC_ROUTE=PRD_LITE. FACTORY_FIT=FAST_PATH. MODEL_EFFORT=`LUNA_MAX`.
-Route `DIRECT_CURSOR_DELIVERY`. Base `1147ce2c03db2f7d68e1622b82c7fee4e92bb183`.
+Route `DIRECT_CURSOR_DELIVERY`. Base `05abd3b328f28af671d2086012b4562f9cf414f1`.
 
 `freeze_promotion_handoff_manifest` already writes schema_version `1.1` when
 the caller supplies an ExecutionEvidenceBinding, and `1.0` when it does not.

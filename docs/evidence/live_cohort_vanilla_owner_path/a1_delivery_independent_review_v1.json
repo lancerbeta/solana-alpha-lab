@@ -1,0 +1,51 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "LIVE-COHORT-VANILLA-OWNER-PATH-REVIEW-001",
+  "as_of": "2026-09-26",
+  "task_id": "LIVE_COHORT_VANILLA_OWNER_PATH_V1",
+  "reviewed_bindings_sha256": "7af920567b2c8bd18817789f0a39c88366f7175873bbc55007f26609de992969",
+  "reviewed_inventory_sha256": "8ead6a53f645d09b812503246bebbfa79015a548624914a9ff490a515c84eccd",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated CODE_REVIEWER of inventory 8ead6a53f645d09b812503246bebbfa79015a548624914a9ff490a515c84eccd found no product defect. This PASS row was written after that inventory's GOAL, ARCHITECTURE, and OWNER_UX critics completed. Ordinary unpack uses only --data-root. A mirror conflict aborts before transfer. A size match is not a content hash proof."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated GOAL_DOD_CRITIC PASS on inventory 8ead6a53f645d09b812503246bebbfa79015a548624914a9ff490a515c84eccd. test_mirror_conflict_fails_closed calls run_owner_live_cohort and asserts MIRROR_CONFLICT with an empty transfer list. The stale-mirror vertical reaches FORGE_CONTROL_READY and stops before /hypothesis-forge."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated ARCHITECTURE_CRITIC PASS on the same owner-path claims after the upstream oid alignment. Capture does not materialize. Historical bind is current-receipt composition, not a per-cohort parquet rehash. Same-size parquet flip is not claimed as detected."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated OWNER_UX_CRITIC PASS on inventory 8ead6a53f645d09b812503246bebbfa79015a548624914a9ff490a515c84eccd. One command uses only --data-root. VPS heavy build is unreachable because the remote script only calls capture_freeze_export."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_DEPLOY",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}

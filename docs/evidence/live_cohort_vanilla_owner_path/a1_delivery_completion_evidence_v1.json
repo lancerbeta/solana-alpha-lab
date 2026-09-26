@@ -1,0 +1,82 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LIVE-COHORT-VANILLA-OWNER-PATH-COMPLETION-001",
+  "as_of": "2026-09-26",
+  "task_id": "LIVE_COHORT_VANILLA_OWNER_PATH_V1",
+  "state_change": "LIVE_COHORT_VANILLA_OWNER_PATH_PASS",
+  "base_main": "1147ce2c03db2f7d68e1622b82c7fee4e92bb183",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "USE_VANILLA_COHORT_OWNER_PATH",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "19049f823a94757574d49f68d6813195403bcf99a5d967383b8384bf0d285e1b",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "f81dbe0d8aebba60a076ff86db3f251d272d5b4891cff67e7b81e14660e6ce0a",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "02493fc2bd23e6413ae449df1c7cb149ce180752737801ad14a54b507b864276",
+    "docs/tasks/LIVE_COHORT_VANILLA_OWNER_PATH_V1.md": "d0d688d000890105bd5613f0f1f0fcd9043bf1b75d01c046dc35f1b3d5133c0e",
+    "scripts/discovery_evidence_release.py": "e8f6d23604d470d796ae213e8618b3e54f59560718361ac693b1be7da6d9c60d",
+    "src/solana_alpha_lab/factory/bounded_cohort_materialization.py": "e64a0ff6198efddb8b95eb6cc78aac18928c1e48df08c53c5c1be89603e11024",
+    "src/solana_alpha_lab/factory/forge_input_receipt.py": "64b609bff4f672a004af1c9ac5164754f32c8f90977306fb44ac72c24fa6305e",
+    "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "9d3ca6bf6efa27de3414aa2aaf5e44840b96c7072f7ab4a446bde52cb8bbd9d2",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "d7bf6d42184977adfc9fb23f8b1e1e929db63f88eec0c8abcb623b0c762bcdd7",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "b2a133ea282e27012835c4ddf0463acbb9ca281444f8252a79ec640d3267d841",
+    "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "b04ad703cb3240c91ce6100ba020bdbc99c7ee2c301ff162f189e7c7c325c978",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "dcc49de97a93c4c0723e879730fbb8d0ab444304099318b52623feb18e45af03",
+    "src/solana_alpha_lab/factory/live_cohort_vanilla_path.py": "a188aa614df98f549ee6ff58d52c50a81e1c76afaef9e87b7e139d100029b62b",
+    "src/solana_alpha_lab/factory/live_corpus_manifest_publish.py": "c65e935b6a5621788b1d883fe0c2d97885c3d4f2953ecd453cc745c55190eaf3",
+    "src/solana_alpha_lab/factory/research_store.py": "c65fb6e7e8cf022ba90d11ff2cf112dde27996909dda53c4eab5d5499e46a653",
+    "tests/test_bounded_cohort_materialization_v1.py": "c777bcdb9a8a11a67f24d9bffcdd7cb182d6a499f82fcf593fe4dc489fa780d2",
+    "tests/test_forge_evidence_identity_and_owner_gold_v1.py": "40600c4e4cb97a399819ba73b224a81b56cfbaa5cb81063f310c0fec87a9ee69",
+    "tests/test_forge_input_truth_and_visibility_v1.py": "0bedd96c5fdfb9935ae4b643adcb0381c14ae2971b7a569f7af048a643c841ff",
+    "tests/test_forge_representation_ladder_v1.py": "378942e76641d282536b4d89d5980d56b14684b0c094d799ea268f4194554b74",
+    "tests/test_live_cohort_vanilla_owner_path_v1.py": "2325817b2e068ce477e4edcb3dfe204f477a39666d3ca6606b0633fa310913cc"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/live_cohort_vanilla_owner_path/a1_delivery_factory_fit_v1.json",
+    "sha256": "84728e22eec749e6f381545491e2e77944a44ed082c23b61c5bccbf59b570e03",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_LIVE_COHORT_VANILLA_OWNER_PATH",
+    "independent_review": {
+      "path": "docs/evidence/live_cohort_vanilla_owner_path/a1_delivery_independent_review_v1.json",
+      "sha256": "4eed1fa3108a1da1c0302773cdc62175b22fd138f88a77ac4dbc6cc9c6085d9c",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_VANILLA_OWNER_STALE_MIRROR_TO_FORGE_CONTROL_READY",
+      "PASS_C200_FORGE_CURRENT_VIEW_WITHOUT_SUPERSEDED_PARQUET_REHASH",
+      "PASS_MARKET_EPOCH_UNCHANGED_FOR_SAME_EVIDENCE",
+      "PASS_CAPTURE_PHASE_HAS_NO_MATERIALIZATION"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_PROVIDER",
+    "NO_DEPLOY",
+    "NO_CANONICAL_DONE",
+    "NO_NEW_COHORT_MACHINERY",
+    "NO_AUTOMATIC_HYPOTHESIS_FORGE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0
+  }
+}
