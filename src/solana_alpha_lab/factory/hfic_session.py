@@ -1673,7 +1673,15 @@ def freeze_draft(
             raise HficSessionError(exc.code) from exc
     grounded = draft.get("grounded_evidence")
     if isinstance(grounded, Mapping):
-        packet["grounded_evidence"] = dict(grounded)
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            GroundedDiscoveryError,
+            bind_prior_scope_evidence,
+        )
+
+        try:
+            packet["grounded_evidence"] = bind_prior_scope_evidence(grounded)
+        except GroundedDiscoveryError as exc:
+            raise HficSessionError(exc.code) from exc
     if repo_root is not None:
         _validate_json_schema(
             packet,

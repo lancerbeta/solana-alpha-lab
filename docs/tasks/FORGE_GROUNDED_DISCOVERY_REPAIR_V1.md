@@ -12,6 +12,7 @@ required_review_roles:
   - CODE_REVIEWER
   - GOAL_DOD_CRITIC
   - ARCHITECTURE_CRITIC
+  - OWNER_UX_CRITIC
 
 expected_repository: lancerbeta/solana-alpha-lab
 

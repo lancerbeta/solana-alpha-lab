@@ -16,6 +16,7 @@ from solana_alpha_lab.factory.hfic_control_integrity import (  # noqa: E402
 from solana_alpha_lab.factory.hfic_grounded_discovery import (  # noqa: E402
     GroundedDiscoveryError,
     admit_discovery_binding,
+    bind_prior_scope_evidence,
     classify_query_look,
     prior_scope_relation,
     summarize_discovery_query,
@@ -147,6 +148,7 @@ class GroundedDiscoveryTests(unittest.TestCase):
         )
         self.assertTrue(result["overlap_is_not_independent_replication"])
         self.assertEqual(result["overlap_exposed_base_x"], 1)
+        self.assertFalse(result["by_calendar_block"][0]["independent_replication"])
 
     def test_control_scope_does_not_block_a_different_question(self) -> None:
         prior = {
@@ -163,6 +165,18 @@ class GroundedDiscoveryTests(unittest.TestCase):
             "SCOPED_CONTROL_DOES_NOT_BLOCK",
         )
         self.assertEqual(prior_scope_relation(prior, prior), "EXACT_SCOPE_MATCH")
+        bound = bind_prior_scope_evidence(
+            {"candidate_scope": candidate, "priors": [prior]}
+        )
+        self.assertEqual(
+            bound["prior_scope_relations"][0]["relation"],
+            "SCOPED_CONTROL_DOES_NOT_BLOCK",
+        )
+        with self.assertRaises(GroundedDiscoveryError) as exact:
+            bind_prior_scope_evidence(
+                {"candidate_scope": prior, "priors": [prior]}
+            )
+        self.assertEqual(exact.exception.code, "EXACT_PRIOR_SCOPE_MATCH")
 
     def test_same_bytes_are_not_a_new_look_and_budget_is_finite(self) -> None:
         first = classify_query_look([], SPEC)

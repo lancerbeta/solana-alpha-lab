@@ -33,7 +33,7 @@ Market Prompt A, Critic, and experiments were not run.
 
 `scientific_writes=0`. `typed_value` was not selected.
 
-| Cohort | base_x-like | joint X300 price+liquidity | prefix through Y1800 |
+| Cohort | base_x-like | joint X300 price+liquidity | prefix through Y1800 inside base_x-like |
 |---|---:|---:|---:|
 | `REL-20260902T111900Z-20260909T111900Z` | 475 | 475 | 332 |
 | `REL-20260909T111900Z-20260916T111900Z` | 249 | 249 | 128 |

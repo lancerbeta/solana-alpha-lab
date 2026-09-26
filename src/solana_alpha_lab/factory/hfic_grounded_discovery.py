@@ -185,6 +185,8 @@ def summarize_discovery_query(
     cohort_denoms: dict[str, int] = defaultdict(int)
     block_denoms: dict[str, int] = defaultdict(int)
     flag_denoms: dict[str, int] = defaultdict(int)
+    cohort_overlap: dict[str, int] = defaultdict(int)
+    block_overlap: dict[str, int] = defaultdict(int)
     base_n = 0
     for member in members:
         if member.get("in_base_x") is not True:
@@ -194,6 +196,9 @@ def summarize_discovery_query(
         block = str(member.get("calendar_block") or "UNBLOCKED")
         cohort_denoms[cohort] += 1
         block_denoms[block] += 1
+        if str(member.get("member_id") or "") in overlap:
+            cohort_overlap[cohort] += 1
+            block_overlap[block] += 1
         flags = member.get("explanatory") or {}
         if not isinstance(flags, Mapping):
             raise GroundedDiscoveryError("EXPLANATORY_INVALID")
@@ -242,13 +247,19 @@ def summarize_discovery_query(
         if item.get("synthetic_target") is not None
     ]
 
-    def _view(name: str, values: Sequence[float], denominator: int) -> dict[str, Any]:
+    def _view(
+        name: str,
+        values: Sequence[float],
+        denominator: int,
+        *,
+        independent: bool,
+    ) -> dict[str, Any]:
         return {
             "view": name,
             "denominator_base_x": denominator,
             "target_observed_after_decision": len(values),
             "mean_synthetic_target": _mean(list(values)),
-            "independent_replication": name not in overlap and not name.endswith(":OVERLAP"),
+            "independent_replication": independent,
         }
 
     overlap_n = sum(
@@ -266,15 +277,18 @@ def summarize_discovery_query(
         "engine_emits_alpha": False,
         "missing_is_not_zero": True,
         "missing": missing,
-        "pooled": _view("pooled", pooled_values, base_n),
+        "pooled": _view("pooled", pooled_values, base_n, independent=overlap_n == 0),
         "by_cohort": [
-            _view(key, values, cohort_denoms[key]) for key, values in sorted(by_cohort.items())
+            _view(key, values, cohort_denoms[key], independent=cohort_overlap[key] == 0)
+            for key, values in sorted(by_cohort.items())
         ],
         "by_calendar_block": [
-            _view(key, values, block_denoms[key]) for key, values in sorted(by_block.items())
+            _view(key, values, block_denoms[key], independent=block_overlap[key] == 0)
+            for key, values in sorted(by_block.items())
         ],
         "by_explanatory": [
-            _view(key, values, flag_denoms[key]) for key, values in sorted(by_flag.items())
+            _view(key, values, flag_denoms[key], independent=False)
+            for key, values in sorted(by_flag.items())
         ],
         "overlap_exposed_base_x": overlap_n,
         "overlap_is_not_independent_replication": overlap_n > 0,
@@ -323,6 +337,31 @@ def classify_query_look(
         "main_count": len(mains) + int(look_class == "MAIN"),
         "adaptive_count": len(adaptive) + int(look_class == "ADAPTIVE"),
     }
+
+
+def bind_prior_scope_evidence(evidence: Mapping[str, Any]) -> dict[str, Any]:
+    """Attach relations. An exact scope match is a duplicate and must not freeze."""
+
+    body = dict(evidence)
+    candidate_scope = body.get("candidate_scope")
+    priors = body.get("priors")
+    if not isinstance(candidate_scope, Mapping) or not isinstance(priors, list):
+        return body
+    relations = []
+    for prior in priors:
+        if not isinstance(prior, Mapping):
+            continue
+        relation = prior_scope_relation(candidate_scope, prior)
+        if relation == "EXACT_SCOPE_MATCH":
+            raise GroundedDiscoveryError("EXACT_PRIOR_SCOPE_MATCH")
+        relations.append(
+            {
+                "question_id": prior.get("question_id"),
+                "relation": relation,
+            }
+        )
+    body["prior_scope_relations"] = relations
+    return body
 
 
 def prior_scope_relation(
@@ -442,7 +481,13 @@ def live_state_only_coverage(data_root: Path) -> dict[str, Any]:
             ).fetchone()
             prefix = connection.execute(
                 f"""
-                WITH latest AS (
+                WITH census AS (
+                  SELECT mint, candidate_state, authoritative_anchor
+                  FROM read_parquet(?)
+                ), x_elig AS (
+                  SELECT mint, authoritative_anchor
+                  FROM census WHERE candidate_state = 'X_ELIGIBLE'
+                ), latest AS (
                   SELECT mint, point_id, field_id, state,
                          first_reliable_available_at AS available_at,
                          row_number() OVER (
@@ -452,16 +497,28 @@ def live_state_only_coverage(data_root: Path) -> dict[str, Any]:
                   FROM read_parquet(?)
                   WHERE field_id IN ('{PRICE}', '{LIQUIDITY}')
                     AND point_id IN ('X300', 'Y900', 'Y1800')
+                ), cell AS (
+                  SELECT * FROM latest WHERE rn = 1
+                ), base AS (
+                  SELECT x.mint
+                  FROM x_elig x
+                  JOIN cell liq
+                    ON liq.mint = x.mint AND liq.point_id = 'X300'
+                   AND liq.field_id = '{LIQUIDITY}' AND liq.state = 'OBSERVED'
+                  WHERE try_cast(liq.available_at AS TIMESTAMPTZ)
+                        <= try_cast(x.authoritative_anchor AS TIMESTAMPTZ)
+                           + INTERVAL 600 SECOND
                 )
                 SELECT count(*) FROM (
-                  SELECT mint
-                  FROM latest
-                  WHERE rn = 1 AND state = 'OBSERVED' AND available_at IS NOT NULL
-                  GROUP BY mint
+                  SELECT cell.mint
+                  FROM cell
+                  JOIN base ON base.mint = cell.mint
+                  WHERE cell.state = 'OBSERVED' AND cell.available_at IS NOT NULL
+                  GROUP BY cell.mint
                   HAVING count(*) = 6
                 )
                 """,
-                [str(obs)],
+                [str(census), str(obs)],
             ).fetchone()
             reports.append(
                 {
