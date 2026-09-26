@@ -27,12 +27,17 @@ from solana_alpha_lab.factory.paper_plane import (  # noqa: E402
     PaperPlaneStore,
     accept_signal_decision,
 )
-from solana_alpha_lab.factory.paper_shadow_commands import apply_operator_command  # noqa: E402
+from solana_alpha_lab.factory.lifecycle_projection import build_lifecycle_projection  # noqa: E402
+from solana_alpha_lab.factory.paper_shadow_commands import (  # noqa: E402
+    apply_operator_command,
+    maybe_finish_drain,
+)
 from solana_alpha_lab.factory.strategy_runtime import load_strategy_version  # noqa: E402
 from solana_alpha_lab.factory.paper_shadow_operations import (  # noqa: E402
     build_operations_projection,
 )
 from solana_alpha_lab.factory.trading_operations import compose_trading_operations  # noqa: E402
+from solana_alpha_lab.factory.trading_runtime_policy import apply_policy, show_policy  # noqa: E402
 
 STRAT_REL = "tests/fixtures/paper_shadow_accounting_control/strategy_v1_1_accounting.yaml"
 EPOCH = "ACTIVATION-EPOCH-ACCOUNTING-PAPER-001"
@@ -475,6 +480,216 @@ class WriteIntegrityTests(StoreCase):
                 if key in flipped_reasons
             )
         )
+
+
+POLICY_PHRASE = "AUTHORIZE PAPER SHADOW TRADING RUNTIME POLICY APPLY"
+
+
+def apply_paper_policy(store: PaperPlaneStore, key: str, **fields: Any) -> dict[str, Any]:
+    body: dict[str, Any] = {"new_entries_enabled": True, "strategy_overrides": {}}
+    body.update(fields)
+    return apply_policy(
+        ROOT,
+        store,
+        mode="PAPER",
+        candidate_raw=body,
+        expected_current_sha256=str(show_policy(store, "PAPER")["policy_sha256"]),
+        idempotency_key=key,
+        owner_authorization_phrase=POLICY_PHRASE,
+        reason="VERTICAL",
+    )
+
+
+def walk_to(store: PaperPlaneStore, pid: str, *states: str) -> None:
+    for state in states:
+        store.transition(pid, state)
+
+
+class _NoResearch:
+    def iter_committed_records(self) -> list[Any]:
+        return []
+
+
+class EntryIntentIntegrityTests(StoreCase):
+    """A2 PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1."""
+
+    def reserve(self, store: PaperPlaneStore, sid: str) -> dict[str, Any]:
+        reserved = accept(store, self.strategy, sid, skip_fill=True)
+        self.assertEqual(store.get_position(reserved["position_id"])["state"], "WATCHED")
+        return reserved
+
+    def test_stops_cancel_reserved_intents_instead_of_opening_them(self) -> None:
+        cases = {
+            "PAUSE": ("ENTRIES_PAUSED", "ENTRIES_PAUSED"),
+            "DISABLED": ("BLOCK_NEW_ENTRIES_DISABLED", "NEW_ENTRIES_DISABLED"),
+            "INVALID": ("RUNTIME_POLICY_INVALID", "RUNTIME_POLICY_INVALID"),
+            "DRAINING": ("BOT_STATUS_BLOCKS_ENTRY:DRAINING", "BOT_DRAINING"),
+        }
+        for variant, (code, reason) in cases.items():
+            with self.subTest(variant=variant):
+                store = self.store(f"stop-{variant}.sqlite")
+                sid = f"SIGDEC-VERT-STOP-{variant}"
+                reserved = self.reserve(store, sid)
+                bot = reserved["bot_instance_id"]
+                if variant == "PAUSE":
+                    apply_operator_command(
+                        store,
+                        {
+                            "command_type": "PAUSE_NEW_ENTRIES",
+                            "idempotency_key": f"IDEM-{variant}",
+                            "bot_instance_id": bot,
+                        },
+                    )
+                elif variant == "DISABLED":
+                    apply_paper_policy(store, f"IDEM-{variant}", new_entries_enabled=False)
+                elif variant == "INVALID":
+                    apply_paper_policy(store, f"IDEM-{variant}")
+                    store._conn.execute(
+                        "UPDATE trading_runtime_policy_revisions SET policy_json = '{' WHERE mode = 'PAPER'"
+                    )
+                else:
+                    store.set_bot_status(bot, "DRAINING")
+                with self.assertRaisesRegex(PaperPlaneError, code):
+                    accept(store, self.strategy, sid)
+                row = store.get_position(reserved["position_id"])
+                self.assertEqual((row["state"], row["cancel_reason_code"]), ("CANCELLED", reason))
+                self.assertNotIn(
+                    "PAPER_SIMULATION_OBSERVED",
+                    event_types(store, position_id=row["position_id"]),
+                )
+
+    def test_stop_bot_cancels_pre_attempt_intents_and_reaches_stopped(self) -> None:
+        store = self.store()
+        reserved = self.reserve(store, "SIGDEC-VERT-J4")
+        stop = apply_operator_command(
+            store,
+            {
+                "command_type": "STOP_BOT",
+                "idempotency_key": "IDEM-VERT-J4",
+                "bot_instance_id": reserved["bot_instance_id"],
+            },
+        )
+        self.assertEqual(stop["bot_status"], "STOPPED")
+        self.assertEqual(stop["cancelled_intents"], [reserved["position_id"]])
+        row = store.get_position(reserved["position_id"])
+        self.assertEqual((row["state"], row["cancel_reason_code"]), ("CANCELLED", "OPERATOR_STOP"))
+        again = accept(store, self.strategy, "SIGDEC-VERT-J4")
+        self.assertEqual((again["opened"], again["state"]), (False, "CANCELLED"))
+        self.assertFalse(maybe_finish_drain(store, reserved["bot_instance_id"])["changed"])
+
+    def test_close_all_cancels_pre_attempt_and_skips_in_flight(self) -> None:
+        store = self.store()
+        pending = self.reserve(store, "SIGDEC-VERT-CA-PENDING")
+        flying = self.reserve(store, "SIGDEC-VERT-CA-FLYING")
+        walk_to(store, flying["position_id"], "SIGNALLED", "INTENT_CREATED", "ATTEMPTING")
+        bot = pending["bot_instance_id"]
+        sha = build_operations_projection(store)["open_position_set_sha256_by_bot"][bot]
+        result = apply_operator_command(
+            store,
+            {
+                "command_type": "REQUEST_CLOSE_ALL",
+                "idempotency_key": "IDEM-VERT-CA",
+                "bot_instance_id": bot,
+                "expected_open_position_set_sha256": sha,
+            },
+        )
+        fanout = {item["position_id"]: item for item in result["fanout"]}
+        self.assertEqual(fanout[pending["position_id"]]["state"], "CANCELLED")
+        self.assertEqual(
+            fanout[flying["position_id"]].get("skipped"),
+            "ATTEMPT_IN_FLIGHT_RECONCILE_REQUIRED",
+        )
+        self.assertEqual(store.get_position(flying["position_id"])["state"], "ATTEMPTING")
+
+    def test_close_position_cancels_a_pre_attempt_intent(self) -> None:
+        store = self.store()
+        pid = self.reserve(store, "SIGDEC-VERT-CP")["position_id"]
+        result = self.close_request(store, pid, "IDEM-VERT-CP")
+        self.assertEqual(result["state"], "CANCELLED")
+        self.assertEqual(store.get_position(pid)["cancel_reason_code"], "OPERATOR_CANCEL")
+        self.assertTrue(self.close_request(store, pid, "IDEM-VERT-CP-2")["applied"])
+
+    def test_retry_never_fills_an_in_flight_attempt(self) -> None:
+        for target in ("ATTEMPTING", "UNKNOWN"):
+            with self.subTest(state=target):
+                store = self.store(f"inflight-{target}.sqlite")
+                sid = f"SIGDEC-VERT-FLY-{target}"
+                pid = self.reserve(store, sid)["position_id"]
+                walk_to(store, pid, "SIGNALLED", "INTENT_CREATED", "ATTEMPTING")
+                if target == "UNKNOWN":
+                    walk_to(store, pid, "UNKNOWN")
+                before = event_types(store, position_id=pid)
+                again = accept(store, self.strategy, sid)
+                self.assertFalse(again["opened"])
+                self.assertTrue(again["reconciliation_required"])
+                self.assertEqual(store.get_position(pid)["state"], target)
+                self.assertEqual(event_types(store, position_id=pid), before)
+
+    def test_cancel_rules(self) -> None:
+        store = self.store()
+        open_pid = open_filled(store, self.strategy, "SIGDEC-VERT-CXL-OPEN")
+        with self.assertRaisesRegex(PaperPlaneError, "CANCEL_STATE_INVALID:OPEN"):
+            store.cancel_entry_intent(open_pid, reason_code="OPERATOR_CANCEL")
+        pid = self.reserve(store, "SIGDEC-VERT-CXL-ATT")["position_id"]
+        walk_to(store, pid, "SIGNALLED", "INTENT_CREATED", "ATTEMPTING")
+        with self.assertRaisesRegex(PaperPlaneError, "CANCEL_REQUIRES_DEFINITIVE_NON_FILL:ATTEMPTING"):
+            store.cancel_entry_intent(pid, reason_code="OPERATOR_CANCEL")
+        first = store.cancel_entry_intent(pid, reason_code="REJECTED_BEFORE_SEND")
+        again = store.cancel_entry_intent(pid, reason_code="REJECTED_BEFORE_SEND")
+        self.assertEqual((first["state"], again["state"]), ("CANCELLED", "CANCELLED"))
+        self.assertEqual(event_types(store, position_id=pid).count("ENTRY_INTENT_CANCELLED"), 1)
+        with self.assertRaisesRegex(PaperPlaneError, "CANCEL_REASON_INVALID"):
+            store.cancel_entry_intent(pid, reason_code="NOT_A_REASON")
+
+    def test_cancelled_intent_releases_its_entry_slot(self) -> None:
+        store = self.store()
+        apply_paper_policy(store, "IDEM-VERT-SLOT-POLICY", max_total_open_positions=1)
+        first = self.reserve(store, "SIGDEC-VERT-SLOT-A")
+        with self.assertRaisesRegex(PaperPlaneError, "BLOCK_GLOBAL_MAX_OPEN_POSITIONS"):
+            accept(store, self.strategy, "SIGDEC-VERT-SLOT-B")
+        self.close_request(store, first["position_id"], "IDEM-VERT-SLOT-CLOSE")
+        self.assertTrue(accept(store, self.strategy, "SIGDEC-VERT-SLOT-B")["opened"])
+
+    def test_stale_resume_cancels_the_reserved_intent(self) -> None:
+        store = self.store()
+        pid = self.reserve(store, "SIGDEC-VERT-STALE")["position_id"]
+        with self.assertRaisesRegex(PaperPlaneError, "SIGNAL_DECISION_STALE"):
+            accept(store, self.strategy, "SIGDEC-VERT-STALE", as_of="2026-09-03T12:25:01Z")
+        row = store.get_position(pid)
+        self.assertEqual((row["state"], row["cancel_reason_code"]), ("CANCELLED", "SIGNAL_EXPIRED"))
+
+    def test_entry_fill_is_bound_to_the_admission(self) -> None:
+        store = self.store()
+        pid = str(accept(store, self.strategy, "SIGDEC-VERT-BIND")["position_id"])
+        base = {"position_id": pid, "entry_unit_price_usd": "1.00", "mode": "PAPER"}
+        with self.assertRaisesRegex(PaperPlaneError, "ENTRY_FILL_FEE_MISMATCH"):
+            store.apply_paper_entry_fill(entry_gross_notional_usd="100", fee_bps=1, **base)
+        with self.assertRaisesRegex(PaperPlaneError, "ENTRY_FILL_NOTIONAL_EXCEEDS_ADMISSION"):
+            store.apply_paper_entry_fill(entry_gross_notional_usd="150", **base)
+        filled = store.apply_paper_entry_fill(entry_gross_notional_usd="100", **base)
+        self.assertEqual((filled["fee_bps"], filled["entry_fee_usd_dec"]), (10, "0.10"))
+
+    def test_consumers_treat_cancelled_as_settled_without_pnl(self) -> None:
+        store = self.store()
+        pid = self.reserve(store, "SIGDEC-VERT-PROJ")["position_id"]
+        self.close_request(store, pid, "IDEM-VERT-PROJ")
+        ops = build_operations_projection(store)
+        self.assertNotIn(pid, ops["open_position_ids"])
+        self.assertEqual(ops["cancelled_intents"], 1)
+        self.assertEqual(ops["known_open_exposure_status"], "EMPTY")
+        row = next(item for item in ops["position_rows"] if item["position_id"] == pid)
+        self.assertEqual(row["pnl_status"], "NOT_APPLICABLE")
+        trading = compose_trading_operations(ROOT, store)
+        trace = next(t for t in trading["traces"] if t.get("signal_decision_id") == "SIGDEC-VERT-PROJ")
+        self.assertEqual(trace["blocker"], "INTENT_CANCELLED")
+        lifecycle = build_lifecycle_projection(
+            ROOT,
+            paper_plane_store=store,
+            research_store=_NoResearch(),
+            projected_at=T0,
+            git_sha="0" * 40,
+        )
+        self.assertIn("CANCELLED", {e.get("native_state") for e in lifecycle["entities"]})
 
 
 if __name__ == "__main__":

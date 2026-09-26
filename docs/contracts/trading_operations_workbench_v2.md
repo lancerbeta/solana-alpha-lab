@@ -90,6 +90,12 @@ Reuse: `PAUSE_NEW_ENTRIES`, `RESUME_NEW_ENTRIES`, `REQUEST_CLOSE_POSITION`,
 Each surfaced command names TARGET, CURRENT PRECONDITION, EXPECTED EFFECT,
 FAIL-CLOSED CONDITION, IDEMPOTENCY, POST-ACTION READBACK.
 
+`REQUEST_CLOSE_POSITION` on a pre-attempt intent ends `CANCELLED`.
+`REQUEST_CLOSE_ALL` cancels pre-attempt intents and skips `ATTEMPTING`
+until reconcile. `STOP_BOT` cancels pre-attempt intents, then reaches
+`STOPPED` when the drain-cleared set is only `RECONCILED` or `CANCELLED`.
+A cancelled intent's trace blocker is `INTENT_CANCELLED`.
+
 HTTP 200 / button click is not proof. Fresh projection after the domain
 command is the proof. Routine command must not mutate Git.
 

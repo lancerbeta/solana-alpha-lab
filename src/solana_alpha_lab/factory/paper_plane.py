@@ -40,6 +40,12 @@ __all__ = [
     "run_commissioning",
     "run_shadow_tick",
     "signal_kind_for",
+    "PRE_ATTEMPT_STATES",
+    "IN_FLIGHT_STATES",
+    "OPERATOR_SETTLED_STATES",
+    "DRAIN_CLEARED_STATES",
+    "DEFINITIVE_NON_FILL_REASONS",
+    "CANCEL_REASONS",
 ]
 
 
@@ -86,12 +92,13 @@ POSITION_STATES = (
     "CLOSED",
     "UNRESOLVED",
     "RECONCILED",
+    "CANCELLED",
 )
 TRANSITIONS: dict[str, set[str]] = {
-    "WATCHED": {"SIGNALLED"},
-    "SIGNALLED": {"INTENT_CREATED"},
-    "INTENT_CREATED": {"ATTEMPTING"},
-    "ATTEMPTING": {"OPEN", "PARTIAL", "UNKNOWN", "UNRESOLVED"},
+    "WATCHED": {"SIGNALLED", "CANCELLED"},
+    "SIGNALLED": {"INTENT_CREATED", "CANCELLED"},
+    "INTENT_CREATED": {"ATTEMPTING", "CANCELLED"},
+    "ATTEMPTING": {"OPEN", "PARTIAL", "UNKNOWN", "UNRESOLVED", "CANCELLED"},
     "OPEN": {"EXIT_REQUIRED", "EXITING"},
     "PARTIAL": {"EXIT_REQUIRED", "EXITING"},
     "UNKNOWN": {"EXIT_REQUIRED", "EXITING", "UNRESOLVED", "RECONCILED"},
@@ -100,8 +107,29 @@ TRANSITIONS: dict[str, set[str]] = {
     "CLOSED": {"RECONCILED"},
     "UNRESOLVED": {"RECONCILED"},
     "RECONCILED": set(),
+    "CANCELLED": set(),
 }
-CLOSING_STATES = frozenset({"CLOSED", "RECONCILED"})
+PRE_ATTEMPT_STATES = frozenset({"WATCHED", "SIGNALLED", "INTENT_CREATED"})
+IN_FLIGHT_STATES = frozenset({"ATTEMPTING", "UNKNOWN"})
+OPERATOR_SETTLED_STATES = frozenset({"CLOSED", "RECONCILED", "CANCELLED"})
+DRAIN_CLEARED_STATES = frozenset({"RECONCILED", "CANCELLED"})
+CLOSING_STATES = frozenset({"CLOSED", "RECONCILED", "CANCELLED"})
+DEFINITIVE_NON_FILL_REASONS = frozenset(
+    {"REJECTED_BEFORE_SEND", "DROPPED_OR_EXPIRED_NOT_PROCESSED"}
+)
+CANCEL_REASONS = frozenset(
+    {
+        "OPERATOR_CANCEL",
+        "OPERATOR_CLOSE_ALL",
+        "OPERATOR_STOP",
+        "ENTRIES_PAUSED",
+        "NEW_ENTRIES_DISABLED",
+        "RUNTIME_POLICY_INVALID",
+        "BOT_DRAINING",
+        "BOT_STOPPED",
+        "SIGNAL_EXPIRED",
+    }
+) | DEFINITIVE_NON_FILL_REASONS
 FORBIDDEN_SIGNAL_KINDS = frozenset({"REAL_FILL"})
 OPEN_RISK_STATES = frozenset(
     {"WATCHED", "SIGNALLED", "INTENT_CREATED", "ATTEMPTING", "OPEN", "PARTIAL", "UNKNOWN"}
@@ -246,6 +274,7 @@ class PaperPlaneStore:
         self._migrate_v1_1_lineage()
         self._migrate_accounting_control_v1()
         self._migrate_trading_runtime_policy_v1()
+        self._migrate_entry_intent_integrity_v1()
         self._commit()
 
     def _migrate_v1_1_lineage(self) -> None:
@@ -362,6 +391,12 @@ class PaperPlaneStore:
             ("runtime_policy_sha256", "TEXT"),
         ):
             _ensure_column(self._conn, "positions", col, typ)
+
+    def _migrate_entry_intent_integrity_v1(self) -> None:
+        """Idempotent cancel reason and frozen admission fee. Legacy rows may be NULL."""
+
+        _ensure_column(self._conn, "positions", "cancel_reason_code", "TEXT")
+        _ensure_column(self._conn, "positions", "admitted_fee_bps", "INTEGER")
 
     def _commit(self) -> None:
         # Writable connections use isolation_level=None. Statements persist
@@ -776,6 +811,41 @@ class PaperPlaneStore:
             ),
         )
 
+    def cancel_entry_intent(self, position_id: str, *, reason_code: str) -> dict[str, Any]:
+        if reason_code not in CANCEL_REASONS:
+            raise PaperPlaneError("CANCEL_REASON_INVALID")
+        with self.immediate_write():
+            position = self.get_position(position_id)
+            if position is None:
+                raise PaperPlaneError("POSITION_NOT_FOUND")
+            state = str(position["state"])
+            if state == "CANCELLED":
+                return position
+            if state == "ATTEMPTING" and reason_code not in DEFINITIVE_NON_FILL_REASONS:
+                raise PaperPlaneError("CANCEL_REQUIRES_DEFINITIVE_NON_FILL:ATTEMPTING")
+            if state not in PRE_ATTEMPT_STATES and state != "ATTEMPTING":
+                raise PaperPlaneError(f"CANCEL_STATE_INVALID:{state}")
+            if position.get("entry_price_dec") not in {None, ""}:
+                raise PaperPlaneError("CANCEL_AFTER_FILL_FORBIDDEN")
+            self.transition(position_id, "CANCELLED")
+            self._conn.execute(
+                "UPDATE positions SET cancel_reason_code = ? WHERE position_id = ?",
+                (reason_code, position_id),
+            )
+            self.append_execution_event(
+                event_type="ENTRY_INTENT_CANCELLED",
+                bot_instance_id=str(position["bot_instance_id"]),
+                position_id=position_id,
+                payload={
+                    **_identity_fields(position),
+                    "from_state": state,
+                    "cancel_reason_code": reason_code,
+                },
+            )
+            updated = self.get_position(position_id)
+        assert updated is not None
+        return updated
+
     def freeze_admission_binding(
         self,
         position_id: str,
@@ -785,6 +855,7 @@ class PaperPlaneStore:
         runtime_policy_mode: str | None,
         runtime_policy_revision: int | None,
         runtime_policy_sha256: str | None,
+        admitted_fee_bps: int | None = None,
     ) -> None:
         with self.immediate_write():
             self._freeze_admission_binding_locked(
@@ -794,6 +865,7 @@ class PaperPlaneStore:
                 runtime_policy_mode=runtime_policy_mode,
                 runtime_policy_revision=runtime_policy_revision,
                 runtime_policy_sha256=runtime_policy_sha256,
+                admitted_fee_bps=admitted_fee_bps,
             )
 
     def _freeze_admission_binding_locked(
@@ -805,6 +877,7 @@ class PaperPlaneStore:
         runtime_policy_mode: str | None,
         runtime_policy_revision: int | None,
         runtime_policy_sha256: str | None,
+        admitted_fee_bps: int | None = None,
     ) -> None:
         self._conn.execute(
             """
@@ -813,7 +886,8 @@ class PaperPlaneStore:
                 strategy_requested_notional_usd_dec = COALESCE(strategy_requested_notional_usd_dec, ?),
                 runtime_policy_mode = COALESCE(runtime_policy_mode, ?),
                 runtime_policy_revision = COALESCE(runtime_policy_revision, ?),
-                runtime_policy_sha256 = COALESCE(runtime_policy_sha256, ?)
+                runtime_policy_sha256 = COALESCE(runtime_policy_sha256, ?),
+                admitted_fee_bps = COALESCE(admitted_fee_bps, ?)
             WHERE position_id = ?
             """,
             (
@@ -822,6 +896,7 @@ class PaperPlaneStore:
                 runtime_policy_mode,
                 runtime_policy_revision,
                 runtime_policy_sha256,
+                admitted_fee_bps,
                 position_id,
             ),
         )
@@ -992,7 +1067,7 @@ class PaperPlaneStore:
         position_id: str,
         entry_unit_price_usd: str,
         entry_gross_notional_usd: str,
-        fee_bps: int,
+        fee_bps: int | None = None,
         mode: str,
     ) -> dict[str, Any]:
         if mode not in {"PAPER", "SHADOW"}:
@@ -1006,16 +1081,20 @@ class PaperPlaneStore:
                 raise PaperPlaneError(f"ENTRY_FILL_STATE_INVALID:{state}")
             if state in {"WATCHED", "SIGNALLED", "INTENT_CREATED"}:
                 raise PaperPlaneError(f"ENTRY_FILL_STATE_INVALID:{state}")
-            if state == "ATTEMPTING":
-                self.transition(position_id, "OPEN")
-                position = self.get_position(position_id)
-                assert position is not None
-            elif state not in {"OPEN", "PARTIAL", "UNKNOWN"}:
+            if state not in {"ATTEMPTING", "OPEN", "PARTIAL", "UNKNOWN"}:
                 raise PaperPlaneError(f"ENTRY_FILL_STATE_INVALID:{state}")
             price = Decimal(str(entry_unit_price_usd))
             notional = Decimal(str(entry_gross_notional_usd))
             if price <= 0 or notional <= 0:
                 raise PaperPlaneError("ENTRY_FILL_INVALID")
+            fee_bps = _bound_entry_fee_bps(position, fee_bps)
+            admitted = position.get("admitted_entry_notional_usd_dec")
+            if admitted not in {None, ""} and notional > Decimal(str(admitted)):
+                raise PaperPlaneError("ENTRY_FILL_NOTIONAL_EXCEEDS_ADMISSION")
+            if state == "ATTEMPTING":
+                self.transition(position_id, "OPEN")
+                position = self.get_position(position_id)
+                assert position is not None
             quantity = (notional / price).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_UP)
             entry_fee = (notional * Decimal(fee_bps) / Decimal(10000)).quantize(
                 Decimal("0.01"), rounding=ROUND_HALF_UP
@@ -1401,6 +1480,44 @@ def resolve_activation_epoch(
         raise PaperPlaneError("ACTIVATION_EPOCH_UNRESOLVED")
 
 
+def _bound_entry_fee_bps(position: Mapping[str, Any], requested: int | None) -> int:
+    admitted = position.get("admitted_fee_bps")
+    if admitted is not None:
+        if requested is not None and int(requested) != int(admitted):
+            raise PaperPlaneError("ENTRY_FILL_FEE_MISMATCH")
+        return int(admitted)
+    if requested is None:
+        raise PaperPlaneError("ENTRY_FILL_FEE_REQUIRED")
+    return int(requested)
+
+
+def _resume_block(
+    store: PaperPlaneStore, bot: Mapping[str, Any], mode: str, *, stale: bool
+) -> tuple[str | None, str | None]:
+    """Stop dominance for an admitted, unattempted intent (design §6.1 order)."""
+
+    if stale:
+        return "SIGNAL_DECISION_STALE", "SIGNAL_EXPIRED"
+    status = str(bot.get("status") or "")
+    if status in {"DRAINING", "STOPPED"}:
+        return f"BOT_STATUS_BLOCKS_ENTRY:{status}", f"BOT_{status}"
+    if int(bot.get("entries_paused") or 0) == 1:
+        return "ENTRIES_PAUSED", "ENTRIES_PAUSED"
+    from solana_alpha_lab.factory.trading_runtime_policy import (
+        STATUS_INVALID,
+        STATUS_VALID,
+        resolve_current_policy,
+    )
+
+    current = resolve_current_policy(store, mode)
+    if current["status"] == STATUS_INVALID:
+        return "RUNTIME_POLICY_INVALID", "RUNTIME_POLICY_INVALID"
+    policy = current.get("policy")
+    if current["status"] == STATUS_VALID and policy is not None and not policy.get("new_entries_enabled"):
+        return "BLOCK_NEW_ENTRIES_DISABLED", "NEW_ENTRIES_DISABLED"
+    return None, None
+
+
 def accept_signal_decision(
     root: Path,
     store: PaperPlaneStore,
@@ -1461,10 +1578,10 @@ def accept_signal_decision(
     as_of_dt = _parse_utc(as_of) if as_of else _parse_utc(decision["decision_at"])
     decision_at = _parse_utc(decision["decision_at"])
     max_age = int(strategy["signal_input"]["max_age_seconds"])
-    age_seconds = (as_of_dt - decision_at).total_seconds()
-    if age_seconds > max_age:
-        raise PaperPlaneError("SIGNAL_DECISION_STALE")
+    stale = (as_of_dt - decision_at).total_seconds() > max_age
     position_id = position_id_for_signal_decision(str(decision["signal_decision_id"]))
+    if stale and store.get_position(position_id) is None:
+        raise PaperPlaneError("SIGNAL_DECISION_STALE")
     admitted_notional = Decimal(str(strategy["notional_policy"]["notional_usd"]))
     was_existing = False
     resume_only = False
@@ -1495,55 +1612,43 @@ def accept_signal_decision(
         if existing is not None:
             was_existing = True
             state = str(existing["state"])
+            base = {
+                "action": action,
+                "reason_code": decision["reason_code"],
+                "signal_decision_id": decision["signal_decision_id"],
+                "position_id": position_id,
+                "idempotent": True,
+                "state": state,
+                "bot_instance_id": bot["bot_instance_id"],
+                "activation_epoch_id": decision["activation_epoch_id"],
+            }
             if state == "OPEN":
-                return {
-                    "opened": True,
-                    "action": action,
-                    "reason_code": decision["reason_code"],
-                    "signal_decision_id": decision["signal_decision_id"],
-                    "position_id": position_id,
-                    "idempotent": True,
-                    "state": state,
-                    "bot_instance_id": bot["bot_instance_id"],
-                    "activation_epoch_id": decision["activation_epoch_id"],
-                }
-            if state in {
-                "PARTIAL",
-                "EXIT_REQUIRED",
-                "EXITING",
-                "CLOSED",
-                "RECONCILED",
-                "UNRESOLVED",
-                "UNKNOWN",
-            }:
-                return {
-                    "opened": state in {"PARTIAL", "UNKNOWN"},
-                    "action": action,
-                    "reason_code": decision["reason_code"],
-                    "signal_decision_id": decision["signal_decision_id"],
-                    "position_id": position_id,
-                    "idempotent": True,
-                    "state": state,
-                    "bot_instance_id": bot["bot_instance_id"],
-                    "activation_epoch_id": decision["activation_epoch_id"],
-                }
-            frozen = existing.get("admitted_entry_notional_usd_dec")
-            if frozen not in {None, ""}:
-                admitted_notional = Decimal(str(frozen))
+                return {**base, "opened": True}
+            if state in IN_FLIGHT_STATES:
+                return {**base, "opened": False, "reconciliation_required": True}
+            if state not in PRE_ATTEMPT_STATES:
+                return {**base, "opened": state == "PARTIAL"}
+            block_code, cancel_reason = _resume_block(store, bot, mode, stale=stale)
+            if block_code is not None:
+                store.cancel_entry_intent(position_id, reason_code=str(cancel_reason))
             else:
-                from solana_alpha_lab.factory.trading_runtime_policy import (
-                    STATUS_INVALID,
-                    STATUS_VALID,
-                    resolve_current_policy,
-                )
+                frozen = existing.get("admitted_entry_notional_usd_dec")
+                if frozen not in {None, ""}:
+                    admitted_notional = Decimal(str(frozen))
+                else:
+                    from solana_alpha_lab.factory.trading_runtime_policy import (
+                        STATUS_INVALID,
+                        STATUS_VALID,
+                        resolve_current_policy,
+                    )
 
-                if str(resolve_current_policy(store, mode)["status"]) in {
-                    STATUS_VALID,
-                    STATUS_INVALID,
-                }:
-                    raise PaperPlaneError("ADMISSION_BINDING_MISSING")
-            resume_only = True
-        if not resume_only:
+                    if str(resolve_current_policy(store, mode)["status"]) in {
+                        STATUS_VALID,
+                        STATUS_INVALID,
+                    }:
+                        raise PaperPlaneError("ADMISSION_BINDING_MISSING")
+                resume_only = True
+        if block_code is None and not resume_only:
             if str(bot.get("status")) in {"DRAINING", "STOPPED"}:
                 raise PaperPlaneError(f"BOT_STATUS_BLOCKS_ENTRY:{bot['status']}")
             if int(bot.get("entries_paused") or 0) == 1:
@@ -1595,6 +1700,7 @@ def accept_signal_decision(
                     position_id,
                     admitted_entry_notional_usd_dec=format(admitted_notional, "f"),
                     strategy_requested_notional_usd_dec=str(risk["strategy_requested_notional_usd_dec"]),
+                    admitted_fee_bps=int(strategy["notional_policy"]["fee_bps"]),
                     runtime_policy_mode=mode if current_policy.get("policy") else None,
                     runtime_policy_revision=(
                         None
