@@ -10,7 +10,7 @@ expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
   expected_base: ac5b761e4746cebc81b416a843a8a23080d71649
   expected_upstream: origin/main
-  expected_upstream_oid: ac5b761e4746cebc81b416a843a8a23080d71649
+  expected_upstream_oid: 0e0b4793b1f511c589d51bb53c5bb2ea7c048faa
   expected_branch: cursor/workbench-unobserved-inventory-not-zero-v1
   dirty_mode: FORBIDDEN
 objective: >-
