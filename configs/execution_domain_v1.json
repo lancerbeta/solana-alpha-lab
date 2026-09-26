@@ -27,7 +27,8 @@
     "tests/test_factory_unattended_shadow_vertical_slice.py",
     "tests/test_factory_v1_owner_cockpit.py",
     "tests/test_execution_domain_modularity_and_fast_ci_v1.py",
-    "tests/test_risk_and_economics_v1.py"
+    "tests/test_risk_and_economics_v1.py",
+    "tests/test_paper_shadow_execution_integrity_vertical_v1.py"
   ],
   "runtime_mode_scope": [
     "PAPER",

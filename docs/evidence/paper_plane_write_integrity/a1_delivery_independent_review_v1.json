@@ -1,0 +1,53 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "PAPER-PLANE-WRITE-INTEGRITY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-26",
+  "task_id": "PAPER_PLANE_WRITE_INTEGRITY_V1",
+  "reviewed_bindings_sha256": "aaa2daadfc3a1d05db843fbad4d38ede157d0fe06ae937196336bb64fbf2b469",
+  "reviewed_inventory_sha256": "b6b62b1b55a1dfde55ae8a6cb44734234276419247e4b33187d89afdde6f64c5",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=6bb71a12b77cadf9dcd714a5738c326bf97b4a9853bc447dc8a2efcd21d14b13",
+        "PASS_W1_CONDITIONAL_TRANSITION",
+        "PASS_W2_SCOPED_LINEAGE",
+        "PASS_W4_ORDER_BY_ROWID",
+        "PASS_W6_NO_SCHEMA_OR_WEAKENING"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_W1_STALE_STATE",
+        "PASS_W2_W3_ONE_TRANSACTION",
+        "PASS_W4_ORDER_BY_ROWID",
+        "PASS_W6_WRITE_SET_CLEAN"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_DOD_RACE_CRASH_ORDER",
+        "PASS_STOCHASTIC_500",
+        "PASS_ACCOUNTING_FIXTURE_PROJECTION"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE_TRADING",
+    "NO_MERGE",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}
