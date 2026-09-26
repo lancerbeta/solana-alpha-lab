@@ -236,6 +236,7 @@ json.dump(packet, sys.stdout)
         raise LiveCohortReleaseError("CAPTURE_EXPORT_FAILED")
     packet = json.loads(proc.stdout.decode("utf-8"))
     mirror = repo_root / "local/factory_mirror/observation_rdp"
+    mirror.mkdir(parents=True, exist_ok=True)
 
     def _transfer(manifest: dict, missing: list[str]) -> None:
         del manifest
@@ -394,7 +395,7 @@ def main(argv: list[str] | None = None) -> int:
         "unpack-next-live-cohort",
         help="Next mature unimported cohort to FORGE_CONTROL_READY. Does not run Forge.",
     )
-    unpack.add_argument("--observation-rdp", type=Path, required=True)
+    unpack.add_argument("--observation-rdp", type=Path, default=None)
     unpack.add_argument("--ops-store", type=Path, default=None)
     unpack.add_argument(
         "--resolution",
@@ -560,7 +561,7 @@ def main(argv: list[str] | None = None) -> int:
                     ObservationScheduleStore,
                 )
 
-                if args.closure_receipt is None:
+                if args.observation_rdp is None or args.closure_receipt is None:
                     raise LiveCohortReleaseError("COHORT_RESOLUTION_MISSING")
                 if args.resolution is not None:
                     resolution = json.loads(_path(args.resolution).read_text(encoding="utf-8"))

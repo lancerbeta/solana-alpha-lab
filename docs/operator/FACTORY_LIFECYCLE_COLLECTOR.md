@@ -738,9 +738,9 @@ Forge.
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py unpack-next-live-cohort --data-root local/factory_v1/data_plane
 ```
 
-Drop `--plan-only` only when the mirror already contains that receipt's
-dependency set and a local build is authorized. Do not point this ordinary
-path at a live VPS `build-live-source`.
+That command is the full local consume through `FORGE_CONTROL_READY`.
+It does not take `--plan-only`. Do not point it at a live VPS
+`build-live-source`.
 
 Historical expert commands remain for diagnosis. They are not the split-host
 route:

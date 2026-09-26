@@ -134,6 +134,22 @@ class VanillaOwnerPathTests(unittest.TestCase):
         self.assertNotIn("build_live_observation_source_from_rdp", owner)
         self.assertNotIn("seal_live_cohort", owner)
         self.assertNotIn("import_live_cohort", owner)
+        import os
+        from unittest.mock import patch
+
+        failed = __import__("subprocess").CompletedProcess(
+            args=[], returncode=1, stdout=b"", stderr=b""
+        )
+        with patch.dict(os.environ, {module.SOURCE_BUILD_WORKER_ENV: "1"}, clear=False):
+            with patch.object(module.subprocess, "run", return_value=failed):
+                code = module.main(
+                    [
+                        "unpack-next-live-cohort",
+                        "--data-root",
+                        "local/factory_v1/data_plane",
+                    ]
+                )
+        self.assertEqual(code, 2)
 
     def test_stale_mirror_transfer_makes_plan_bounded(self) -> None:
         from tests.test_bounded_cohort_materialization_v1 import (
