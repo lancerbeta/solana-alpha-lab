@@ -4,8 +4,8 @@
   "review_id": "FORGE-GROUNDED-DISCOVERY-REPAIR-REVIEW-001",
   "as_of": "2026-09-26",
   "task_id": "FORGE_GROUNDED_DISCOVERY_REPAIR_V1",
-  "reviewed_bindings_sha256": "2433655dcec02f1c075fba302b79cb7791452165bcd62e15367146840a83154e",
-  "reviewed_inventory_sha256": "9d4951714890002927e230ac90bf5785bde69bfc784ef8c7274a21826b3cb90f",
+  "reviewed_bindings_sha256": "30fa92639a5d6ebb3976fb74d3093308604033c19aaaf3ba933b25d4af599e1a",
+  "reviewed_inventory_sha256": "e9faf33b375b437d00493007331c2f3ee4ef94c3f860c96eefe9f9346fbaec34",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
