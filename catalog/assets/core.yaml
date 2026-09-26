@@ -33967,7 +33967,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_discovery_release.py', repository_path: src/solana_alpha_lab/factory/live_cohort_discovery_release.py}
-  integrity: {kind: sha256, sha256: 9eefbb66e5c731af855ffd5650c4199f20f77c819d43bfdaa7cb0db89fef3179}
+  integrity: {kind: sha256, sha256: aa7b942cf9f822602df7759df51eb92558e946b842b0f83987117a1899f674b7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001}

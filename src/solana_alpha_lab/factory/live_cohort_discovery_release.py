@@ -250,13 +250,26 @@ def _compact_utc(value: datetime) -> str:
     return value.astimezone(UTC).strftime("%Y%m%dT%H%M%SZ")
 
 
+def _rel_encoded_instant(value: datetime) -> datetime:
+    """UTC instant at the second precision stored in a REL-* cohort id.
+
+    Activation timestamps stay unchanged. Cohort identity bounds are the
+    instants that round-trip through ``cohort_window_bounds``.
+    """
+    return datetime.strptime(_compact_utc(value), "%Y%m%dT%H%M%SZ").replace(tzinfo=UTC)
+
+
 def campaign_cohort_windows(
     starts_at: datetime,
     stops_admitting_at: datetime,
 ) -> list[tuple[str, datetime, datetime]]:
-    """Half-open [S+k*7d, S+(k+1)*7d) windows until stops_admitting_at."""
-    start = starts_at.astimezone(UTC)
-    stop = stops_admitting_at.astimezone(UTC)
+    """Half-open [S+k*7d, S+(k+1)*7d) windows until stops_admitting_at.
+
+    Bounds use REL-* second precision so the generated id parses back to the
+    same instants. Subsecond activation fields are not rewritten.
+    """
+    start = _rel_encoded_instant(starts_at)
+    stop = _rel_encoded_instant(stops_admitting_at)
     _require(stop > start, "CAMPAIGN_WINDOW_INVALID")
     windows: list[tuple[str, datetime, datetime]] = []
     cursor = start
