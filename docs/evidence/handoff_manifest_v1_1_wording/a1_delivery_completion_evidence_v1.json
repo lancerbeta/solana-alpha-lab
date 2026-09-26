@@ -11,15 +11,15 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "8871dfb71e0beff5dc020dbfdb25c9078e5654136cca721e66bf2f1ddb087c02",
-    "catalog/assets/lifecycle.yaml": "4bf1a469f5860858a65ac2cecac0240dae96f1adc5d2fa02563e957fe731ffc3",
-    "catalog/catalog_manifest.yaml": "d04d55d9781657aaf2ee328b2f6241419339683f8de9d6f268875ac75ba185c3",
-    "catalog/generated/asset_edges.json": "7976d221e401616a44df32aa83af32dcb25c5839de4806bd14a61c9c82b1e1f5",
-    "docs/PROJECT_MAP.md": "8a6b73bf9743d1104e7637dfefee3063ad2d0872a0ad7d5bdbe78d3b237b5d57",
+    "catalog/assets/core.yaml": "26483646bbc352a32e7ba7bc9beedfdd254353ebf0844d0ca47d2ebe9675cc20",
+    "catalog/assets/lifecycle.yaml": "dbbf7ba4c7d86129b15b32ce00adeac926f7b92bdaf2257ac9724f29aae69fa9",
+    "catalog/catalog_manifest.yaml": "66601948c599b36099858775a1ec247314ccc96ff4f6254222e73d62dfbd56e8",
+    "catalog/generated/asset_edges.json": "292dd381ed0fe45fb45ea1a0df1fa7bb1959c97117eb4d011b8a9640cf51867f",
+    "docs/PROJECT_MAP.md": "b880f8b2f43f90dde4678799cc3f438665924034b7ed44da3115b7e488267a23",
     "docs/contracts/science_to_strategy_handoff_v1.md": "e0d063385564b41986eca07cb9a32e04a124f526d4f294e54797d639aa63c9ff",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "66029d56c8bb625bd573e8e17bdeabcce8d4e16977346b33f8492f5d0e0bf113",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "efc9e0d75cae43880caef31429e297116ea92b68c7b310f24531d8cd7d2a7505",
     "docs/reports/handoff_manifest_v1_1_wording/a1_owner_readout_v1.md": "387c8b1b34b27bb83787a162d653465c6241e1bca6b31e8cc4fd45835e73846e",
-    "docs/tasks/HANDOFF_MANIFEST_V1_1_WORDING_V1.md": "871dd3a8685d02f33f0cd4c2d8a0b9b91c06a8294cbdc193bdeef25918ba4705",
+    "docs/tasks/HANDOFF_MANIFEST_V1_1_WORDING_V1.md": "a9194368d545d7c7cbda4d70605685e4983b4aac24a873355f255edb2b38100f",
     "tests/test_science_to_strategy_handoff_v1.py": "c61812f14497fb03d8a03cd3acf0a113a2791ebee0bef92e41e375970fe5d8c7"
   },
   "active_stop_conditions": [],
@@ -32,14 +32,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/handoff_manifest_v1_1_wording/a1_delivery_factory_fit_v1.json",
-    "sha256": "1b9a581844eaf41c05358e48561ea1350c1511ca42fd86c7d6101e94f27349fe",
+    "sha256": "2e39614f7e44a4fbb444087a4dfff9097e3f5e10fd93125adac85a286c4f9698",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HANDOFF_MANIFEST_V1_1_WORDING",
     "independent_review": {
       "path": "docs/evidence/handoff_manifest_v1_1_wording/a1_delivery_independent_review_v1.json",
-      "sha256": "87cf0143900805d309a371d256a67b2988cd4f66486f9e5b3eb8d706d84e932c",
+      "sha256": "93f8b7c5b0651173cd2aaafc7387a87f9b1427c3156a6e930d606705f9f8ec50",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
