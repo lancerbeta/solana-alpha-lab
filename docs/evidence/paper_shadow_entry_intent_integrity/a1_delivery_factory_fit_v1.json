@@ -4,8 +4,8 @@
   "review_id": "PAPER-SHADOW-ENTRY-INTENT-INTEGRITY-FACTORY-FIT-001",
   "as_of": "2026-09-26",
   "task_id": "PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1",
-  "reviewed_bindings_sha256": "cc546649b9615f62ae602e9cec9fa0dfe9e4704377bce4725a77e41e3327bbba",
-  "reviewed_inventory_sha256": "e985a76ce0e2524a3ceea57e505d4127723201ffa3c9417d5e2f2402d5aa7bfb",
+  "reviewed_bindings_sha256": "8ff13ba0747cacf1a1c8ddf26f444d2bd82423aaf9aad9c6a96b6d80b8747186",
+  "reviewed_inventory_sha256": "c7bc355b263c6dca17dd1ef3b97264777f24522c487169e91ec243a92c2baab0",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

@@ -21,7 +21,7 @@
     "docs/contracts/trading_operations_workbench_v2.md": "c8faf6a735cbcadf51473f026a3a61ac0c63144ce874db43ba8e59da5cf7087e",
     "docs/contracts/trading_runtime_policy_v1.md": "d81fc10b24afc0f6e093c44d4117d05e655b61bd4d19a02db207bd3fe661b326",
     "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "7bb8dc52f57ac9a827193f28e7ea71c1b5ab6c3c934b2b2430e1573a4824e896",
-    "docs/reports/paper_shadow_entry_intent_integrity/a1_owner_readout_v1.md": "e2e72b3af2cb30c49e6126e683659ca69d968ff049a0b1bb2302264cee1b7d80",
+    "docs/reports/paper_shadow_entry_intent_integrity/a1_owner_readout_v1.md": "071f842fde73807723f4f8cde5ba03b7e8ec227926cb0e7d079ffc3df32dec66",
     "docs/tasks/PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1.md": "849231b16352df2af1561419bcb103bd7408d1accca51909618d271b9688f8c6",
     "src/solana_alpha_lab/factory/paper_plane.py": "3be6c95265675db9ddc8b0c0915c1a59a8199c372ae6756e278f1e584b804968",
     "src/solana_alpha_lab/factory/paper_shadow_commands.py": "8ffb3d10cffa9b181e8b32aa0d23906dd8a606cfbb48332d3e821fb2ed463b49",
@@ -39,14 +39,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/paper_shadow_entry_intent_integrity/a1_delivery_factory_fit_v1.json",
-    "sha256": "e71d10a0cb783005d5429fa3bcfbedb7fb40a7fb430884094f6cf0321220ae79",
+    "sha256": "f0817f973b78a0a0f3921aa340fa370c5ba6278637294eb5895d882f328cc33b",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_ENTRY_INTENT_INTEGRITY_VERTICAL_AND_DOMAIN",
     "independent_review": {
       "path": "docs/evidence/paper_shadow_entry_intent_integrity/a1_delivery_independent_review_v1.json",
-      "sha256": "27b7ae6a41d16bff8a569aced4dd60934db2505d62aae2085d8ad58b81bba512",
+      "sha256": "664df78f4496fa64f7ee04c9b32ee7a082fb95628095f8f99ff10ed8e03ae2f1",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
