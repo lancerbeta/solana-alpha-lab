@@ -177,6 +177,22 @@ class PrefreezeDraftRecoveryTests(unittest.TestCase):
                     1,
                 )
                 self.assertEqual(list_hfic_sessions(store), [])
+                from solana_alpha_lab.factory.hfic_representation_ladder import (
+                    evaluate_forge_run,
+                )
+
+                forge_run = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    owner_focus="AUTO",
+                    persist=False,
+                )
+                self.assertEqual(forge_run.get("next_action"), "RESUME_BASE")
+                self.assertIsNone(forge_run.get("owner_final"))
+                self.assertNotIn(
+                    "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
+                    list(forge_run.get("blocking_reason_codes") or []),
+                )
 
                 mutated = json.loads(json.dumps(draft))
                 mutated["candidates"][0]["claim"] += " mutated bytes"

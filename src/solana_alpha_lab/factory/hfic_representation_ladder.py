@@ -2972,12 +2972,28 @@ def evaluate_forge_run(
                 admission.get("reason_code") or "SCIENTIFIC_SLOT_ADMISSION_STOP"
             )
             # A generated draft with no lifecycle row is the pre-freeze resume
-            # path, including a capability-only repair. Do not report it as a
-            # missing readback and do not open a second trial.
-            if not (
+            # path, including a capability-only repair. Clearing the block
+            # without binding RESUME would leave START_BASE, which is a new
+            # trial. Bind resume explicitly.
+            if (
                 reason == "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING"
                 and resumable_orphan
             ):
+                resume_action = _resume_action(
+                    "BASE"
+                    if active_rep
+                    in {"CURRENT_REPRESENTATION_CONTROL_V1", "ORDINARY_BASE"}
+                    else active_rep
+                )
+                decision = {
+                    "next_action": resume_action,
+                    "owner_final": None,
+                    "reason_code": "GENERATED_DRAFT_READBACK",
+                    "session_id": str(admission.get("session_id") or "") or None,
+                }
+                next_action = resume_action
+                owner_final = None
+            else:
                 decision = {
                     "next_action": ACTION_OBSERVABILITY_BLOCKED,
                     "owner_final": ACTION_OBSERVABILITY_BLOCKED,
@@ -2996,7 +3012,22 @@ def evaluate_forge_run(
                 for row in resolved_stages
                 if isinstance(row, Mapping)
             }
-            if admitted_id and admitted_id not in observed_ids and not resumable_orphan:
+            if admitted_id and admitted_id not in observed_ids and resumable_orphan:
+                resume_action = _resume_action(
+                    "BASE"
+                    if active_rep
+                    in {"CURRENT_REPRESENTATION_CONTROL_V1", "ORDINARY_BASE"}
+                    else active_rep
+                )
+                decision = {
+                    "next_action": resume_action,
+                    "owner_final": None,
+                    "reason_code": "GENERATED_DRAFT_READBACK",
+                    "session_id": admitted_id,
+                }
+                next_action = resume_action
+                owner_final = None
+            elif admitted_id and admitted_id not in observed_ids:
                 # The reservation is authoritative for occupancy, but the
                 # lifecycle row is not safely bound/readable (for example an
                 # orphan V1 parent). Do not expose the reservation's internal
