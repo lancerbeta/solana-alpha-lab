@@ -720,13 +720,30 @@ Same-identity retry reuses that sealed tree (does not rewrite `sealed_at`).
 Override with `--release-root` only when the durable location must differ.
 On a Factory VPS shell, skip this same-host one-shot if Forge is local.
 
-Cross-plane (VPS Observation RDP, local Forge). Do not import a moving
-Observation RDP into Forge.
+Cross-plane ordinary path is fixed:
 
-On VPS, list mature campaign windows. Without local Forge `--data-root`,
-`imported` is unknown — pick the mature `cohort_id` that is not already in
-the local LIVE CORPUS. `build-live-source` now fail-closes on incomplete
-closure (same gates as publish). Then seal/verify:
+`VPS capture/freeze/export → LOCAL mirror/build/seal/import → FORGE_CONTROL_READY`
+
+The owner does not choose a C-number, cohort id, schedule SHA, activation id,
+file list, or build host. One command resolves the next mature unimported
+cohort whose admission window is still owned by its activation. A predecessor
+does not grow a synthetic window after rollover cutover. VPS exports a frozen
+closure receipt and the bounded dependency manifest. It does not run cohort
+materialization. Local work reuses mirror bytes, builds, seals, imports, and
+stops at `FORGE_CONTROL_READY`. The next owner action is
+`/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`. The command does not run
+Forge.
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py unpack-next-live-cohort --data-root local/factory_v1/data_plane
+```
+
+That command is the full local consume through `FORGE_CONTROL_READY`.
+It does not take `--plan-only`. Do not point it at a live VPS
+`build-live-source`.
+
+Historical expert commands remain for diagnosis. They are not the split-host
+route:
 
 ```
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py list-live-cohorts --observation-rdp /opt/solana-alpha-lab/local/factory_v1/observation_rdp --ops-store /opt/solana-alpha-lab/local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...>
@@ -736,11 +753,9 @@ uv run --locked --managed-python python -B scripts/discovery_evidence_release.py
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py build-live-source --plan-only --observation-rdp /opt/solana-alpha-lab/local/factory_v1/observation_rdp --ops-store /opt/solana-alpha-lab/local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --cohort-id <REL-...>
 ```
 
-Require `work_class=BOUNDED_COHORT_WINDOW` before the build.
-
-```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py build-live-source --observation-rdp /opt/solana-alpha-lab/local/factory_v1/observation_rdp --ops-store /opt/solana-alpha-lab/local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --cohort-id <REL-...>
-```
+Require `work_class=BOUNDED_COHORT_WINDOW` before any local build. A real
+`build-live-source` on the VPS is not the ordinary split-host route. Heavy
+materialization stays on the owner workstation.
 
 ```
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py seal-live-cohort --observation-rdp /opt/solana-alpha-lab/local/factory_v1/observation_rdp --cohort-id <REL-...> --release-root /opt/solana-alpha-lab/local/factory_v1/live_cohort_releases/<cohort_id>

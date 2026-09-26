@@ -213,7 +213,7 @@ def _production_control_preflight(
         search_key_sha256,
     )
 
-    def _enumerate_production(_root: Path):
+    def _enumerate_production(_root: Path, **_kwargs: object):
         # Fixture enumerate returns thin rows; stamp the same evidence_role /
         # feature fields real enumerate_rdp_datasets emits so the production
         # packet writer is exercised without replacing it.
@@ -1791,7 +1791,7 @@ class DisposableFreezeFinalizeE2ETests(unittest.TestCase):
                     json.dumps(payload, indent=2), encoding="utf-8"
                 )
 
-                def _enumerate_c3(_data_root: Path):
+                def _enumerate_c3(_data_root: Path, **_kwargs: object):
                     live = _enumerate_live(_data_root)[0]
                     extra = dict(live[0])
                     extra["dataset_manifest_id"] = "MID-C3"
@@ -2069,7 +2069,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             )
             lineage_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
-            def _enumerate_c3(_data_root: Path):
+            def _enumerate_c3(_data_root: Path, **_kwargs: object):
                 live = _enumerate_live(_data_root)[0]
                 extra = dict(live[0])
                 extra["dataset_manifest_id"] = "MID-C3"

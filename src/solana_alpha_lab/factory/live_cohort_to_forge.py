@@ -724,11 +724,15 @@ def forge_control_ready(
         repo_root=Path(repo_root),
         imported_cohort_id=imported_cohort_id,
         evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+        live_corpus_current_only=True,
     )
     if not input_receipt["forge_runnable"]:
         codes = list(input_receipt.get("blocking_reason_codes") or [])
         _require(False, str(codes[0] if codes else "CURRENT_CORPUS_MISSING"))
-    datasets, warnings = enumerate_rdp_datasets(Path(data_root))
+    datasets, warnings = enumerate_rdp_datasets(
+        Path(data_root),
+        live_corpus_current_only=True,
+    )
     bounded, trunc = select_forge_packet_datasets(
         datasets,
         evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
@@ -765,7 +769,11 @@ def forge_control_ready(
         _require(yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE, "LOW_YIELD")
     coverage = str(labels.get("discovery_coverage_class") or "")
     _require(coverage != "GAP_CONFIRMED", "COVERAGE_CONFIRMED_BROKEN")
-    material = evidence_epoch_material(repo_root=repo_root, data_root=data_root)
+    material = evidence_epoch_material(
+        repo_root=repo_root,
+        data_root=data_root,
+        live_corpus_current_only=True,
+    )
     store: ExistingResearchStoreReader | None
     try:
         store = ExistingResearchStoreReader(Path(data_root))

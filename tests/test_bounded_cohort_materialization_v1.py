@@ -38,7 +38,9 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
     _cohort_contributing_lineage,
     _cohort_members_into_sqlite,
     build_live_observation_source_from_rdp,
+    campaign_cohort_windows,
     cohort_source_dir,
+    cohort_window_bounds,
     latest_c1_observation_manifest_at,
 )
 from solana_alpha_lab.factory.live_cohort_source_bundle import (
@@ -227,6 +229,83 @@ def _publish_obs(
 
 
 class BoundedCohortMaterializationTests(unittest.TestCase):
+    def test_microsecond_activation_rel_round_trip_builds(self) -> None:
+        activation_start = datetime(2026, 9, 14, 17, 35, 10, 845525, tzinfo=UTC)
+        activation_stop = activation_start + timedelta(days=7)
+        windows = campaign_cohort_windows(activation_start, activation_stop)
+        self.assertEqual(
+            [item[0] for item in windows],
+            ["REL-20260914T173510Z-20260921T173510Z"],
+        )
+        cohort_id, bound_start, bound_end = windows[0]
+        self.assertEqual(cohort_window_bounds(cohort_id), (bound_start, bound_end))
+        schedule = _schedule()
+        schedule.pop("schedule_sha256", None)
+        activation = dict(schedule["activation"])
+        activation["starts_at"] = "2026-09-14T17:35:10.845525Z"
+        activation["stops_admitting_at"] = "2026-09-21T17:35:10.845525Z"
+        schedule["activation"] = activation
+        validated = validate_observation_schedule(schedule, root=ROOT)
+        self.assertEqual(
+            validated["activation"]["starts_at"], "2026-09-14T17:35:10.845525Z"
+        )
+        self.assertEqual(
+            validated["activation"]["stops_admitting_at"],
+            "2026-09-21T17:35:10.845525Z",
+        )
+        digest = str(validated["schedule_sha256"])
+        admit = datetime(2026, 9, 14, 18, 35, 10, tzinfo=UTC)
+        as_of = datetime(2026, 9, 22, 17, 35, 10, tzinfo=UTC)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "rdp"
+            root.mkdir()
+            persist_observation_schedule(
+                data_root=root,
+                schedule=validated,
+                now=admit,
+                producer_git_sha=PRODUCER,
+                activation_id=ACTIVATION_ID,
+            )
+            unit = write_snapshot_unit(
+                root,
+                utc_day="20260914",
+                dataset_manifest_id="cur",
+                rows=[_member("mint1", admit=admit, digest=digest)],
+            )
+            _append_event(
+                root,
+                record_id="MEM-MICRO",
+                kind=RecordKind.OBSERVATION_MEMBER_BATCH,
+                digest=digest,
+                payload={
+                    "schedule_sha256": digest,
+                    "dataset_manifest_id": "cur",
+                    "member_location": str(unit["publications"][0]["rel"]),
+                    "row_count": 1,
+                },
+                now=admit,
+                txn="RESEARCH-TXN-MEM-MICROSEC01",
+            )
+            receipt = synthetic_closed_receipt(
+                schedule_sha256=digest,
+                activation_id=ACTIVATION_ID,
+                cohort_id=cohort_id,
+                as_of=as_of,
+                members_total=1,
+            )
+            source = build_live_observation_source_from_rdp(
+                observation_rdp_root=root,
+                schedule_sha256=digest,
+                activation_id=ACTIVATION_ID,
+                cohort_id=cohort_id,
+                as_of=as_of,
+                closure_receipt=receipt,
+            )
+        self.assertEqual(source["cohort_id"], cohort_id)
+        self.assertEqual(source["member_count"], 1)
+        self.assertEqual(source["starts_at"], "2026-09-14T17:35:10.845525Z")
+        self.assertEqual(source["stops_admitting_at"], "2026-09-21T17:35:10.845525Z")
+
     def test_a_prefix_walk_applies_each_delta_at_most_once(self) -> None:
         digest = "a" * 64
         with tempfile.TemporaryDirectory() as tmp:
@@ -860,8 +939,21 @@ class BoundedCohortMaterializationTests(unittest.TestCase):
                     producer_git_sha=PRODUCER,
                     activation_id=ACTIVATION_ID,
                 )
+                sidecar_dir = root / "datasets" / "manifests" / "partitions"
+                sidecar_dir.mkdir(parents=True, exist_ok=True)
                 for index in range(history):
                     when = WINDOW_START - timedelta(days=history - index, hours=1)
+                    (sidecar_dir / f"partition-hist-{index:04d}.json").write_text(
+                        json.dumps(
+                            {
+                                "dataset_manifest_id": f"hist-{index}",
+                                "logical_location": f"datasets/parquet/hist-{index}/observations.parquet",
+                                "file_sha256": "ab" * 32,
+                                "partition_id": f"hist-{index}",
+                            }
+                        ),
+                        encoding="utf-8",
+                    )
                     _append_event(
                         root,
                         record_id=f"HIST-{index:04d}",
@@ -916,6 +1008,7 @@ class BoundedCohortMaterializationTests(unittest.TestCase):
                 self.assertFalse(plan["slow_fallback_required"])
                 self.assertEqual(plan["historical_independent_reconstruct_calls"], 0)
                 self.assertEqual(plan["global_manifest_markers_scanned"], 0)
+                self.assertEqual(int(plan["observation_partition_index_files_read"]), 0)
                 self.assertGreaterEqual(int(plan["research_event_partitions_skipped_by_time"]), 0)
                 return {
                     "headers": int(plan["research_manifest_headers_scanned"]),
@@ -930,9 +1023,14 @@ class BoundedCohortMaterializationTests(unittest.TestCase):
         c20 = _shape(20)
         c50 = _shape(50)
         c100 = _shape(100)
+        c200 = _shape(200)
         self.assertLessEqual(c100["payload"] / max(c3["payload"], 1), 1.5)
+        self.assertLessEqual(c200["payload"] / max(c3["payload"], 1), 1.5)
         self.assertLessEqual(c100["members"] / max(c3["members"], 1), 1.5)
+        self.assertEqual(c200["members"], c3["members"])
+        self.assertEqual(c20["members"], c3["members"])
         self.assertGreaterEqual(c100["headers"], c3["headers"])
+        self.assertGreaterEqual(c200["headers"], c100["headers"])
         self.assertGreaterEqual(c100["skipped"], c3["skipped"])
         self.assertEqual(c100["members"], c3["members"])
 

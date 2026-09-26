@@ -1624,6 +1624,7 @@ class ResearchStore:
                 if digest != schedule_sha256:
                     continue
                 records_out.append(record)
+        selected_manifests = tuple(selected.values())
         telemetry = ResearchStoreBoundTelemetry(
             research_manifest_headers_scanned=headers_scanned,
             research_event_partitions_opened=opened,
@@ -1634,6 +1635,13 @@ class ResearchStore:
             research_event_partitions_skipped_by_time=skipped_by_time,
             research_event_partitions_opened_unknown_bounds=unknown_bounds,
             research_event_lifecycle_partitions_total=lifecycle_total,
+            selected_parquet_locations=tuple(
+                str(item.logical_location) for item in selected_manifests
+            ),
+            selected_partition_manifest_rels=tuple(
+                f"research/manifests/partitions/{item.partition_manifest_id}.json"
+                for item in selected_manifests
+            ),
         )
         return tuple(records_out), telemetry
 
@@ -2120,6 +2128,8 @@ class ResearchStoreBoundTelemetry:
     research_event_partitions_skipped_by_time: int = 0
     research_event_partitions_opened_unknown_bounds: int = 0
     research_event_lifecycle_partitions_total: int = 0
+    selected_parquet_locations: tuple[str, ...] = ()
+    selected_partition_manifest_rels: tuple[str, ...] = ()
 
 
 _BOUNDED_LIFECYCLE_KINDS = frozenset(

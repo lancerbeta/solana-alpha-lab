@@ -251,7 +251,52 @@ def _cohorts_from_lineage(lineage: Mapping[str, Any]) -> list[dict[str, Any]]:
     return out
 
 
-def inspect_canonical_root(data_root: Path, dataset_manifest_id: str) -> dict[str, Any]:
+_IMPORT_PARQUET_BYTES = {"historical": 0, "new": 0}
+
+
+def reset_import_parquet_accounting() -> None:
+    _IMPORT_PARQUET_BYTES["historical"] = 0
+    _IMPORT_PARQUET_BYTES["new"] = 0
+
+
+def _parquet_size_path(data_root: Path, partition_id: str) -> Path:
+    return _manifests_dir(data_root) / "partitions" / f"{partition_id}.bytes"
+
+
+def _recorded_parquet_size(data_root: Path, partition_id: str) -> int | None:
+    path = _parquet_size_path(data_root, partition_id)
+    if not path.is_file() or path.is_symlink():
+        return None
+    try:
+        text = path.read_text(encoding="utf-8").strip()
+        size = int(text)
+    except (OSError, UnicodeDecodeError, ValueError):
+        return None
+    if size < 0:
+        return None
+    return size
+
+
+def _write_recorded_parquet_size(data_root: Path, partition_id: str, size: int) -> None:
+    path = _parquet_size_path(data_root, partition_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _publish_bytes(path, str(int(size)).encode("utf-8"))
+
+
+def import_parquet_accounting() -> dict[str, int]:
+    return dict(_IMPORT_PARQUET_BYTES)
+
+
+def _note_import_parquet_bytes(kind: str, nbytes: int) -> None:
+    _IMPORT_PARQUET_BYTES[kind] = int(_IMPORT_PARQUET_BYTES.get(kind) or 0) + int(nbytes)
+
+
+def inspect_canonical_root(
+    data_root: Path,
+    dataset_manifest_id: str,
+    *,
+    verify_parquet_bytes: bool = True,
+) -> dict[str, Any]:
     """Return whether a LIVE CORPUS dataset root is TASK-06-valid and published."""
 
     manifests = _manifests_dir(data_root)
@@ -317,9 +362,19 @@ def inspect_canonical_root(data_root: Path, dataset_manifest_id: str) -> dict[st
         if parquet_path.is_symlink() or not parquet_path.is_file():
             parquet_ok = False
             break
+        size = int(parquet_path.stat().st_size)
+        recorded = _recorded_parquet_size(data_root, part.partition_id)
+        if recorded is not None and recorded != size:
+            parquet_ok = False
+            break
+        if not verify_parquet_bytes and recorded == size:
+            continue
+        _note_import_parquet_bytes("historical", size)
         if sha256_file_streaming(parquet_path) != part.file_sha256:
             parquet_ok = False
             break
+        if recorded is None:
+            _write_recorded_parquet_size(data_root, part.partition_id, size)
     complete = artifacts_ok and labels_ok and published_ok and parquet_ok
     if not labels_ok:
         reason = "LABELS_MISSING"
@@ -512,10 +567,12 @@ def _install_parquet(src: Path, dest: Path, expected_sha: str) -> None:
     if dest.is_symlink():
         raise LiveCohortReleaseError("LIVE_CORPUS_PARQUET_SYMLINK")
     if dest.is_file():
+        _note_import_parquet_bytes("new", int(dest.stat().st_size))
         if sha256_file_streaming(dest) != expected_sha:
             raise LiveCohortReleaseError("CANONICAL_TARGET_CONFLICT")
         return
     shutil.copyfile(src, dest)
+    _note_import_parquet_bytes("new", int(dest.stat().st_size))
     if dest.is_symlink() or sha256_file_streaming(dest) != expected_sha:
         dest.unlink(missing_ok=True)
         raise LiveCohortReleaseError("TRANSPORT_HASH_MISMATCH")
@@ -574,6 +631,11 @@ def _commit_canonical_root(
             manifests / "partitions" / f"{part.partition_manifest_id}.json",
             canonical_manifest_bytes(part),
         )
+        parquet_path = root / part.logical_location
+        if parquet_path.is_file() and not parquet_path.is_symlink():
+            _write_recorded_parquet_size(
+                root, part.partition_id, int(parquet_path.stat().st_size)
+            )
     _publish_bytes(
         manifests / f"{dataset.dataset_manifest_id}.validation.json",
         receipt_bytes,
@@ -620,14 +682,24 @@ def _claims_for_cohort(
         expected_file = str(cohort[sha_key])
         parquet_path = Path(data_root) / rel
         _require(parquet_path.is_file() and not parquet_path.is_symlink(), "LIVE_CORPUS_PARQUET_MISSING")
-        disk_sha = sha256_file_streaming(parquet_path)
-        _require(disk_sha == expected_file, "CORPUS_PARQUET_SHA_MISMATCH")
         if prior_by_id is not None and part_id in prior_by_id:
             claim = prior_by_id[part_id]
             _require(claim.file_sha256 == expected_file, "CORPUS_PARQUET_SHA_MISMATCH")
             _require(claim.logical_location == rel, "CORPUS_PARTITION_LOCATION_MISMATCH")
+            size = int(parquet_path.stat().st_size)
+            recorded = _recorded_parquet_size(data_root, part_id)
+            if recorded is None:
+                _note_import_parquet_bytes("historical", size)
+                disk_sha = sha256_file_streaming(parquet_path)
+                _require(disk_sha == expected_file, "CORPUS_PARQUET_SHA_MISMATCH")
+                _write_recorded_parquet_size(data_root, part_id, size)
+            elif recorded != size:
+                raise LiveCohortReleaseError("CORPUS_PARQUET_SHA_MISMATCH")
             out.append(claim)
             continue
+        _note_import_parquet_bytes("new", int(parquet_path.stat().st_size))
+        disk_sha = sha256_file_streaming(parquet_path)
+        _require(disk_sha == expected_file, "CORPUS_PARQUET_SHA_MISMATCH")
         _require(allow_measure, "HISTORICAL_LOGICAL_RESCAN_FORBIDDEN")
         claim = _measure_parquet(
             parquet_path,
@@ -1053,6 +1125,7 @@ def import_live_cohort_canonical(
     import_time: datetime | None = None,
     fault_before_visibility: Callable[[], None] | None = None,
 ) -> dict[str, Any]:
+    reset_import_parquet_accounting()
     manifest = verify_live_cohort(release_root)
     imported_at = (import_time or datetime.now(tz=UTC)).astimezone(UTC)
     sealed_at = parse_live_corpus_utc(str(manifest["sealed_at"]))
@@ -1082,7 +1155,9 @@ def import_live_cohort_canonical(
             isinstance(current_mid, str) and current_mid,
             "CURRENT_CORPUS_MISSING",
         )
-        current_inspection = inspect_canonical_root(data_root, str(current_mid))
+        current_inspection = inspect_canonical_root(
+            data_root, str(current_mid), verify_parquet_bytes=False
+        )
         if current_inspection.get("reason") == "CORPUS_PARQUET_SHA_MISMATCH":
             raise LiveCohortReleaseError("CORPUS_PARQUET_SHA_MISMATCH")
         if not current_inspection["complete"]:
@@ -1316,4 +1391,6 @@ def import_live_cohort_canonical(
         "cumulative_observation_rows": obs_rows_sum,
         "logical_rows_measured_partitions": len(measured),
         "measured_logical_locations": measured,
+        "historical_parquet_bytes_hashed": import_parquet_accounting()["historical"],
+        "new_cohort_parquet_bytes_hashed": import_parquet_accounting()["new"],
     }
