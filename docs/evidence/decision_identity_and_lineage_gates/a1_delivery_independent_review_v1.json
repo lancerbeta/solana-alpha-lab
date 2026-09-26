@@ -7,22 +7,16 @@
   "reviewed_bindings_sha256": "44e24070f7e0852034158bccf21bd521e834b2c8d180e224165045df208bcd84",
   "reviewed_inventory_sha256": "a1bff7838b8591d25c1336546dd07301b3fe50abb137ad9d90a47e4e0d23690e",
   "required_roles": [
+    "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
-    "GOAL_DOD_CRITIC",
-    "ARCHITECTURE_CRITIC"
+    "GOAL_DOD_CRITIC"
   ],
   "reviews": [
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "CLOCK_REQUIRED_ON_ACCEPT",
-        "FP_SORT_KEYS_LIST_ORDER",
-        "LEGACY_NULL_SKIP_ENTER",
-        "SHADOW_TICK_SPEC_DRIFT_MATCH",
-        "AS_OF_NONE_FAILS_LOUD",
-        "AS_OF_EQ_DECISION_AT_VACUOUS",
-        "BOUNDARIES_ADDITIVE_OK"
+        "PASS_PAPER_PLANE_UNCHANGED_VS_1f66fd66"
       ]
     },
     {
@@ -31,15 +25,9 @@
       "findings": [
         "WRITE_SET_OK",
         "HFIC_ABSENT",
-        "G1_CLOCK_OK",
-        "G2_IDENTITY_OK",
-        "G3_SPEC_DRIFT_OK",
-        "G4_EXIT_VERSION_OK",
-        "G5_LINEAGE_OK",
-        "G6_ASOF_ONLY_OK",
+        "PAPER_PLANE_PINNED",
+        "CATALOG_RESTORE_OK",
         "EPOCH_EXPECT_NOT_WEAKENING",
-        "NO_PROD_ASOF_OMISSION",
-        "ZERO_SKIP_DELETE",
         "REVIEW_PLAN_OK"
       ]
     },
@@ -50,7 +38,8 @@
         "PASS_DOD_1_IDENTITY_CLASSES",
         "PASS_DOD_2_AUDIT_CODES_AND_REPLAY",
         "PASS_DOD_3_LINEAGE_AND_EXIT_STAGE",
-        "PASS_DOD_4_SPEC_DRIFT_AND_NULL_BACKFILL",
+        "PASS_DOD_4_SPEC_DRIFT",
+        "NULL_BACKFILL_UNFALSIFIED",
         "PASS_DOD_5_ASOF_ONLY_NO_WEAKENING"
       ]
     }
