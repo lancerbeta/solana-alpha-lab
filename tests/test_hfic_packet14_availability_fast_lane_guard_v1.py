@@ -89,7 +89,10 @@ def _spec_for(feat_ids: list[str]) -> dict:
 
 def _classify(frozen: dict, spec: dict) -> dict:
     return run_live_classifier(
-        {"experiment_spec": spec},
+        {
+            "experiment_spec": spec,
+            "hypothesis_definition_sha256": frozen["selected_definition_sha256"],
+        },
         frozen,
         repo_root=ROOT,
         data_root=ROOT,
@@ -415,7 +418,10 @@ class AvailabilityFastLaneGuardTests(unittest.TestCase):
             _expect_gate_denial(
                 self,
                 run_live_classifier(
-                    {"experiment_spec": spec},
+                    {
+                        "experiment_spec": spec,
+                        "hypothesis_definition_sha256": frozen["selected_definition_sha256"],
+                    },
                     frozen,
                     repo_root=ROOT,
                     data_root=ROOT,
