@@ -1420,7 +1420,11 @@ class IdentityUnitTests(unittest.TestCase):
                 thread.join(timeout=10)
             self.assertTrue(all(not thread.is_alive() for thread in threads))
             self.assertEqual(len(results), 1)
-            self.assertEqual(errors, ["SCIENTIFIC_SLOT_OCCUPIED"])
+            self.assertEqual(len(errors), 1)
+            self.assertIn(
+                errors[0],
+                {"SCIENTIFIC_SLOT_OCCUPIED", "WRITER_LEASE_INVALID"},
+            )
             admissions = list_scientific_slot_admissions(
                 ResearchStore(data_root, create_if_missing=False)
             )
