@@ -48,7 +48,7 @@
     "targeted": "PASS_LIVE_COHORT_VANILLA_OWNER_PATH",
     "independent_review": {
       "path": "docs/evidence/live_cohort_vanilla_owner_path/a1_delivery_independent_review_v1.json",
-      "sha256": "ebb74bd827d8beaf9f26bc9b100ea9f9e6c2d8fd6e37ed64f76aca73118a42e0",
+      "sha256": "4150c6a7356b59f7a94b7ac73acfce0e946d6638f1e754691547ea1368d31939",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
