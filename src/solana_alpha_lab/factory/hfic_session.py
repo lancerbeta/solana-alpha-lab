@@ -1217,6 +1217,8 @@ def _require_fresh_v12_runner_up_declaration(
         return
     if not frozen.get("selected_candidate_id"):
         return
+    if not frozen.get("runner_up_candidate_id"):
+        return
     declared_sha = frozen.get("runner_up_critic_input_packet_sha256")
     if not (isinstance(declared_sha, str) and len(declared_sha) == 64):
         raise HficSessionError("RUNNER_UP_PACKET_MISSING")
@@ -1656,7 +1658,9 @@ def freeze_draft(
         "selected_candidate": selected_block,
         "provisional_lane": _provisional_lane(selected_required_caps),
         "provisional_execution_unit": "NONE",
-        "strongest_rejected_alternative": rejected.candidate_id,
+        "strongest_rejected_alternative": (
+            "NONE" if rejected is None else rejected.candidate_id
+        ),
         "known_unknowns": critic_known_unknowns_with_closed_families(
             family_hard_close_terminals(closed_family_ledger)
         ),
@@ -1860,9 +1864,11 @@ def freeze_draft(
             packet_bytes.encode("utf-8")
         ).hexdigest(),
         "runner_up_critic_input_packet": runner_up_packet,
-        "runner_up_critic_input_packet_sha256": hashlib.sha256(
-            runner_up_packet_bytes.encode("utf-8")
-        ).hexdigest(),
+        "runner_up_critic_input_packet_sha256": (
+            None
+            if runner_up_packet is None
+            else hashlib.sha256(runner_up_packet_bytes.encode("utf-8")).hexdigest()
+        ),
         "store_inventory_digest": store_digest,
         "git_composite_sha256": git_composite,
         "research_memory_as_of": memory_as_of,

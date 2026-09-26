@@ -265,7 +265,7 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-inp
    Ambiguous role or an unresolved holdout stops before row values. Then:
 
 ```text
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <scope> --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
 ```
 
    Pass `--journal-scope` as the preflight `search_key_sha256`. Copy the

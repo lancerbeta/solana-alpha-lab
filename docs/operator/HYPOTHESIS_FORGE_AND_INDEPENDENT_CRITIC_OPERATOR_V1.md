@@ -408,7 +408,7 @@ Re-check joint state coverage without a scientific look:
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-coverage --format json
 ```
 
-Ordinary numeric recipe. The store argument is explicit. Do not point it at the live store in this repair. Role and holdout come from the binding file:
+Ordinary numeric recipe. The store argument is explicit. Do not point it at the live store in this repair. Role and holdout come from the binding file. `--journal-scope` is the preflight `search_key_sha256`. Copy the whole returned object onto the draft as `grounded_evidence`. Ordinary preflight already stamps the discovery contract; do not invent that field:
 
 ```text
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <scope> --format json

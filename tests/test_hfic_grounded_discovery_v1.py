@@ -611,11 +611,20 @@ class ProductionRowRecipeTests(unittest.TestCase):
         early_rows = [
             _obs("keep", "X300", PRICE, 5.0, at=DECISION_AT, cohort=c1),
             _obs("keep", "X300", LIQ, 100.0, at=DECISION_AT, cohort=c1),
-            _obs("keep", "X300", LIQ, 1.0, at="2026-09-03T00:20:00Z", cohort=c1),
+            _obs("keep", "X300", LIQ, 1.0, at="2026-09-03T00:20:00Z", cohort=c1, state="ABSENT"),
             _obs("keep", "Y1800", PRICE, 1.0, at=TARGET_AT, cohort=c1),
         ]
         kept = execute_discovery_from_rows(early, early_rows, _spec(), [_binding()[0]])["summary"]
         self.assertEqual(kept["base_x_n"], 1)
+        late_only = [_census("lateonly", c1)]
+        late_rows = [
+            _obs("lateonly", "X300", PRICE, 5.0, at="2026-09-03T00:20:00Z", cohort=c1),
+            _obs("lateonly", "X300", LIQ, 100.0, at="2026-09-03T00:20:00Z", cohort=c1),
+            _obs("lateonly", "Y1800", PRICE, 1.0, at=TARGET_AT, cohort=c1),
+        ]
+        erased = execute_discovery_from_rows(late_only, late_rows, _spec(), [_binding()[0]])["summary"]
+        self.assertEqual(erased["base_x_n"], 0)
+        self.assertEqual(erased["exclusion_reasons"].get("PIT_LIQUIDITY_MISSING"), 1)
         price = {
             "question_id": "PRICE_RULE",
             "population": "BASE_X",
