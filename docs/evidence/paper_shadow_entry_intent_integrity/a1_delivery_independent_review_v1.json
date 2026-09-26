@@ -4,8 +4,8 @@
   "review_id": "PAPER-SHADOW-ENTRY-INTENT-INTEGRITY-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-26",
   "task_id": "PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1",
-  "reviewed_bindings_sha256": "c6836ba7e98b98eb4b37d87cbdde770a338db478efd8998b82ac2c51b9e8fe79",
-  "reviewed_inventory_sha256": "ffe8b9b02c0dced472743a98a3f662c54b3797fb78eedaaa3d67bb4b4d09b92b",
+  "reviewed_bindings_sha256": "cc546649b9615f62ae602e9cec9fa0dfe9e4704377bce4725a77e41e3327bbba",
+  "reviewed_inventory_sha256": "e985a76ce0e2524a3ceea57e505d4127723201ffa3c9417d5e2f2402d5aa7bfb",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
