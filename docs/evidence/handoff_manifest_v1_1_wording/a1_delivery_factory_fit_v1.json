@@ -4,8 +4,8 @@
   "review_id": "HANDOFF-MANIFEST-V1-1-WORDING-FACTORY-FIT-001",
   "as_of": "2026-09-26",
   "task_id": "HANDOFF_MANIFEST_V1_1_WORDING_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "e818e345cb3c3a219b9d119fd24edde5c5037a14ab4e014cb859066c97482af7",
+  "reviewed_inventory_sha256": "a2deed262a9c220f68dd937794b1b8bc538255e1ab07d8654bfa77d644a35ca7",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
