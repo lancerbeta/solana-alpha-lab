@@ -172,6 +172,7 @@ def summarize_discovery_query(
     """Pooled, cohort, and calendar summaries. Never emits an alpha claim."""
 
     bound = validate_query_spec(spec)
+    overlap_known = overlap_members is not None
     overlap = set(overlap_members or [])
     groups: dict[str, list[Mapping[str, Any]]] = {
         "pooled": [],
@@ -277,13 +278,28 @@ def summarize_discovery_query(
         "engine_emits_alpha": False,
         "missing_is_not_zero": True,
         "missing": missing,
-        "pooled": _view("pooled", pooled_values, base_n, independent=overlap_n == 0),
+        "pooled": _view(
+            "pooled",
+            pooled_values,
+            base_n,
+            independent=overlap_known and overlap_n == 0,
+        ),
         "by_cohort": [
-            _view(key, values, cohort_denoms[key], independent=cohort_overlap[key] == 0)
+            _view(
+                key,
+                values,
+                cohort_denoms[key],
+                independent=overlap_known and cohort_overlap[key] == 0,
+            )
             for key, values in sorted(by_cohort.items())
         ],
         "by_calendar_block": [
-            _view(key, values, block_denoms[key], independent=block_overlap[key] == 0)
+            _view(
+                key,
+                values,
+                block_denoms[key],
+                independent=overlap_known and block_overlap[key] == 0,
+            )
             for key, values in sorted(by_block.items())
         ],
         "by_explanatory": [

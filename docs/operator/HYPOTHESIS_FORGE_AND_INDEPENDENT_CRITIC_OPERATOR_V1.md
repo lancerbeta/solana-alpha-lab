@@ -400,6 +400,11 @@ strictly after the decision points. Missing outcomes are not zeros. A scoped
 CONTROL negative does not hard-close a different raw question; an exact scope
 match still blocks a duplicate. Query budget is at most six main specifications
 and two adaptive refinements. Identical spec bytes are a retry, not a new look.
+Re-check joint state coverage without a scientific look:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-coverage --format json
+```
 
 ## A0. Authority и hard boundaries
 

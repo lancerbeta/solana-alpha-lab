@@ -129,6 +129,12 @@ When the caller supplied `--model-provenance-sha256` to `preflight`, repeat
 the exact same digest on `forge-run`; missing or changed model provenance
 blocks completed-result reuse as UNKNOWN.
 
+No-write state-only joint coverage. It does not select `typed_value` and does not reserve a scientific slot:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-coverage --format json
+```
+
 ## Representation mode boundary
 
 The normal slash remains one bounded run. A fresh ordinary focus reports

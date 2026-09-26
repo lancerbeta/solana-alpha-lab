@@ -16,6 +16,11 @@ diagnostics-only `structural_signature_v1_sha256` (not HFIC-CAND identity),
 and read-only `diagnostics --last N` (1..20).
 
 Canonical entrypoint: `scripts/hypothesis_forge.py`.
+No-write state-only coverage, never selecting `typed_value` and never reserving a slot:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-coverage --format json
+```
 Operator-executable prefix:
 `uv run --locked --managed-python python -B scripts/hypothesis_forge.py`.
 Required interpreter: CPython `3.13.14`. Do not invoke a bare workstation `python`.

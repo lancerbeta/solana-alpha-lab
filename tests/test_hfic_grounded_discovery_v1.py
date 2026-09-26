@@ -99,7 +99,8 @@ class GroundedDiscoveryTests(unittest.TestCase):
             _member("d", cohort="C2", block="B2", target=-1.0, flag=False),
             _member("noise", cohort="C1", block="B1", target=None, flag=True, in_base=False),
         ]
-        result = summarize_discovery_query(members, SPEC)
+        result = summarize_discovery_query(members, SPEC, overlap_members=[])
+        self.assertTrue(result["pooled"]["independent_replication"])
         self.assertFalse(result["engine_emits_alpha"])
         self.assertEqual(result["base_x_n"], 4)
         self.assertEqual(result["pooled"]["mean_synthetic_target"], 0.0)
@@ -123,6 +124,7 @@ class GroundedDiscoveryTests(unittest.TestCase):
             _member("gone", cohort="C1", block="B1", target=99.0, flag=False, state="ABSENT"),
         ]
         result = summarize_discovery_query(members, SPEC)
+        self.assertFalse(result["pooled"]["independent_replication"])
         self.assertEqual(result["pooled"]["mean_synthetic_target"], 0.0)
         self.assertEqual(result["pooled"]["target_observed_after_decision"], 2)
         self.assertEqual(result["missing"]["missing_typed"], 1)

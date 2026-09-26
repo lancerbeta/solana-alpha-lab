@@ -31,6 +31,12 @@ Market Prompt A, Critic, and experiments were not run.
 
 ## No-write live coverage
 
+Re-run without reserving a slot:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-coverage --format json
+```
+
 `scientific_writes=0`. `typed_value` was not selected.
 
 | Cohort | base_x-like | joint X300 price+liquidity | prefix through Y1800 inside base_x-like |
