@@ -259,7 +259,7 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-inp
      For `CONTROL_CORPUS_UNRESOLVABLE`: `OWNER NEXT=STOP_CORPUS_UNRESOLVABLE`.
      Same recovery fence.
    - `START_NEW_SESSION` → continue only when `forge-run` next is `START_BASE`.
-3. Only for ordinary `START_NEW_SESSION` (no `--control-current-representation`),
+3. Only for `START_NEW_SESSION` on the ordinary route (no `--control-current-representation`),
    before Prompt A, run the production recipe. Resolve role and holdout from
    the runtime binding. Do not substitute `EXPLORATORY_REUSE` or `holdout=false`.
    Ambiguous role or an unresolved holdout stops before row values. Then:
