@@ -38265,7 +38265,7 @@ records:
   as_of: '2026-09-26'
   truth_owner: HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1.md', repository_path: docs/tasks/HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1.md}
-  integrity: {kind: sha256, sha256: eb53d4949db183554b81f24f52431bb4701c7fe64f3a1601a5c4c0732f834eeb}
+  integrity: {kind: sha256, sha256: 0be39e63ceb4fac52ecae32b9d04f25133cc0987565c9eb70e608b38c968cb42}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}

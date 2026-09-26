@@ -49,6 +49,7 @@ managed_write_set:
   - docs/PROJECT_MAP.md
   - docs/OPERATOR_NAVIGATION.md
   - docs/FACTORY_SEMANTIC_MAP.md
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
 
 external_caps:
   network: false
