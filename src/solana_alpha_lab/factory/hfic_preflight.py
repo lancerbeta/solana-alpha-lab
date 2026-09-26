@@ -240,6 +240,7 @@ def evidence_epoch_material(
     data_root: Path | None = None,
     *,
     store: ResearchStore | None = None,
+    live_corpus_current_only: bool = False,
 ) -> dict[str, Any]:
     root = Path(repo_root)
     hashes = [
@@ -271,7 +272,10 @@ def evidence_epoch_material(
     dataset_fingerprints = [commissioning_dataset_fingerprint(root)]
     lifecycle_terminals = ["NO_GIT_FAST_LANE_PROVEN"]
     if data_root is not None:
-        enumerated, _warnings = enumerate_rdp_datasets(Path(data_root))
+        enumerated, _warnings = enumerate_rdp_datasets(
+            Path(data_root),
+            live_corpus_current_only=live_corpus_current_only,
+        )
         if enumerated:
             dataset_manifest_ids = [item["dataset_manifest_id"] for item in enumerated]
             dataset_fingerprints = [item["dataset_fingerprint"] for item in enumerated]
@@ -820,12 +824,50 @@ def _is_symlink_path(path: Path) -> bool:
     return is_link_path(path)
 
 
+_ENUMERATE_WORK = {
+    "datasets_partition_scanned": 0,
+    "parquet_bytes_hashed": 0,
+    "superseded_live_corpus_skipped": 0,
+}
+
+
+def reset_enumerate_work() -> None:
+    for key in _ENUMERATE_WORK:
+        _ENUMERATE_WORK[key] = 0
+
+
+def enumerate_work() -> dict[str, int]:
+    return dict(_ENUMERATE_WORK)
+
+
+def _current_live_corpus_manifest_id(data_root: Path) -> str | None:
+    path = Path(data_root) / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+    if not path.is_file() or path.is_symlink():
+        return None
+    try:
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    if not isinstance(loaded, dict):
+        return None
+    current = loaded.get("current_dataset_manifest_id")
+    if isinstance(current, str) and current:
+        return current
+    return None
+
+
 def enumerate_rdp_datasets(
     data_root: Path,
+    *,
+    live_corpus_current_only: bool = False,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     manifests_dir = Path(data_root) / "datasets" / "manifests"
     warnings: list[dict[str, Any]] = []
     entries: list[dict[str, Any]] = []
+    current_corpus_id = (
+        _current_live_corpus_manifest_id(data_root) if live_corpus_current_only else None
+    )
+    from solana_alpha_lab.factory.live_cohort_discovery_release import CORPUS_DATASET_ID
     if not manifests_dir.is_dir():
         return [], warnings
     for path in sorted(manifests_dir.glob("*.json")):
@@ -884,7 +926,15 @@ def enumerate_rdp_datasets(
                 )
                 continue
             labels = loaded_labels
+        if (
+            live_corpus_current_only
+            and manifest.dataset_id == CORPUS_DATASET_ID
+            and manifest.dataset_manifest_id != current_corpus_id
+        ):
+            _ENUMERATE_WORK["superseded_live_corpus_skipped"] += 1
+            continue
         partition_dir = manifests_dir / "partitions"
+        _ENUMERATE_WORK["datasets_partition_scanned"] += 1
         matching: list[Path] = []
         matching_manifests: list[PartitionManifest] = []
         if partition_dir.is_dir():
@@ -907,12 +957,14 @@ def enumerate_rdp_datasets(
                     matching.append(part_path)
                     matching_manifests.append(part)
                     parquet_path = Path(data_root) / part.logical_location
-                    if (
-                        not parquet_path.is_file()
-                        or _is_symlink_path(parquet_path)
-                        or hashlib.sha256(parquet_path.read_bytes()).hexdigest()
-                        != part.file_sha256
-                    ):
+                    parquet_ok = parquet_path.is_file() and not _is_symlink_path(parquet_path)
+                    if parquet_ok:
+                        _ENUMERATE_WORK["parquet_bytes_hashed"] += int(parquet_path.stat().st_size)
+                        parquet_ok = (
+                            hashlib.sha256(parquet_path.read_bytes()).hexdigest()
+                            == part.file_sha256
+                        )
+                    if not parquet_ok:
                         warnings.append(
                             {
                                 "code": "DATASET_PARTITION_CORRUPT",
@@ -1478,7 +1530,10 @@ def build_forge_context_packet(
     selection_caveat: Mapping[str, Any] | None = None,
 ) -> tuple[dict[str, Any], str]:
     packet_bound = forge_context_packet_max_bytes(evidence_surface_mode)
-    datasets, warnings = enumerate_rdp_datasets(Path(data_root))
+    datasets, warnings = enumerate_rdp_datasets(
+        Path(data_root),
+        live_corpus_current_only=True,
+    )
     ds_trunc: dict[str, Any] = {
         "truncated": False,
         "selection_policy": "current_version_per_dataset_id",

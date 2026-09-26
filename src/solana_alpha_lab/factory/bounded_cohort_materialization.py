@@ -336,6 +336,36 @@ def select_observation_batches(
     return selected
 
 
+def _completed_observation_binding(
+    root: Path,
+    payload: Mapping[str, Any],
+    manifest_id: str,
+) -> tuple[str, str] | None:
+    """Open the one completed publication receipt named by the batch identity."""
+
+    content = str(payload.get("dataset_fingerprint") or payload.get("content_sha256") or "")
+    if len(content) != 64 or any(char not in "0123456789abcdef" for char in content):
+        return None
+    from solana_alpha_lab.factory.observation_publication_jobs import completed_job_path
+
+    path = completed_job_path(root, content)
+    if not path.is_file() or path.is_symlink():
+        return None
+    try:
+        job = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    if not isinstance(job, Mapping):
+        return None
+    if str(job.get("dataset_manifest_id") or "") not in {"", manifest_id}:
+        return None
+    relative = str(job.get("parquet_rel") or "").replace("\\", "/")
+    file_sha = str(job.get("file_sha256") or "")
+    if not relative or len(file_sha) != 64:
+        return None
+    return relative, file_sha
+
+
 def sidecar_partitions_for_dataset(
     root: Path,
     manifest_id: str,
@@ -355,9 +385,12 @@ def load_observation_partition_index(
     partitions_dir = Path(root) / "datasets" / "manifests" / "partitions"
     if not partitions_dir.is_dir():
         return {}
+    from solana_alpha_lab.factory.live_cohort_source_bundle import note_counter
+
     for path in partitions_dir.iterdir():
         if not path.is_file() or path.is_symlink() or path.suffix != ".json":
             continue
+        note_counter("observation_partition_index_files_read", 1)
         try:
             document = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, UnicodeDecodeError, json.JSONDecodeError):
@@ -396,9 +429,20 @@ def resolve_observation_panel_location(
         raise BoundedMaterializationError(OBSERVATION_LINEAGE_INCOMPLETE)
     raw_partitions = list(document.get("partitions") or [])
     if not raw_partitions:
-        raw_partitions = sidecar_partitions_for_dataset(
-            root, manifest_id, index=partition_index
-        )
+        binding = _completed_observation_binding(root, payload, manifest_id)
+        if binding is not None:
+            location_rel, file_sha_bound = binding
+            raw_partitions = [
+                {
+                    "logical_location": location_rel,
+                    "file_sha256": file_sha_bound,
+                    "partition_id": "observation",
+                }
+            ]
+        elif partition_index is not None:
+            raw_partitions = sidecar_partitions_for_dataset(
+                root, manifest_id, index=partition_index
+            )
     partitions = [
         item
         for item in raw_partitions

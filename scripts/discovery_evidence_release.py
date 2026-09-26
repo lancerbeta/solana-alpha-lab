@@ -282,6 +282,27 @@ def main(argv: list[str] | None = None) -> int:
     listed.add_argument("--data-root", type=Path, default=None)
     listed.add_argument("--as-of", type=str, default=None)
 
+    unpack = sub.add_parser(
+        "unpack-next-live-cohort",
+        help="Next mature unimported cohort to FORGE_CONTROL_READY. Does not run Forge.",
+    )
+    unpack.add_argument("--observation-rdp", type=Path, required=True)
+    unpack.add_argument("--ops-store", type=Path, default=None)
+    unpack.add_argument(
+        "--resolution",
+        type=Path,
+        default=None,
+        help="Exported activation/rollover JSON. Use this instead of copying SQLite.",
+    )
+    unpack.add_argument("--data-root", type=Path, default=None)
+    unpack.add_argument("--repo-root", type=Path, default=None)
+    unpack.add_argument("--closure-receipt", type=Path, required=True)
+    unpack.add_argument("--mirror-rdp", type=Path, default=None)
+    unpack.add_argument("--source-rdp", type=Path, default=None)
+    unpack.add_argument("--as-of", type=str, default=None)
+    unpack.add_argument("--release-builder-git-sha", default=None)
+    unpack.add_argument("--plan-only", action="store_true")
+
     forge_ready = sub.add_parser(
         "forge-control-ready",
         help="Read-only Forge CONTROL readiness (does not run /hypothesis-forge)",
@@ -409,6 +430,39 @@ def main(argv: list[str] | None = None) -> int:
             )
             _print_import_success(result, data_root)
             return 0
+        elif args.command == "unpack-next-live-cohort":
+            from solana_alpha_lab.factory.live_cohort_vanilla_path import (
+                unpack_next_live_cohort,
+            )
+            from solana_alpha_lab.factory.observation_schedule_store import (
+                ObservationScheduleStore,
+            )
+
+            data_root = _resolved_data_root(args.data_root)
+            if args.resolution is not None:
+                resolution = json.loads(_path(args.resolution).read_text(encoding="utf-8"))
+                activations = list(resolution.get("activations") or [])
+                rollovers = list(resolution.get("rollovers") or [])
+            elif args.ops_store is not None:
+                store = ObservationScheduleStore(_path(args.ops_store))
+                activations = store.list_activations()
+                rollovers = store.list_rollovers()
+            else:
+                raise LiveCohortReleaseError("COHORT_RESOLUTION_MISSING")
+            receipt = json.loads(_path(args.closure_receipt).read_text(encoding="utf-8"))
+            result = unpack_next_live_cohort(
+                observation_rdp=_path(args.observation_rdp),
+                data_root=data_root,
+                repo_root=ROOT if args.repo_root is None else _path(args.repo_root),
+                activations=activations,
+                rollovers=rollovers,
+                closure_receipt=receipt,
+                as_of=_parse_utc(args.as_of) or datetime.now().astimezone(),
+                mirror_root=None if args.mirror_rdp is None else _path(args.mirror_rdp),
+                source_root=None if args.source_rdp is None else _path(args.source_rdp),
+                release_builder_git_sha=args.release_builder_git_sha,
+                plan_only=bool(args.plan_only),
+            )
         elif args.command == "list-live-cohorts":
             result = list_live_cohorts(
                 observation_rdp=_path(args.observation_rdp),
