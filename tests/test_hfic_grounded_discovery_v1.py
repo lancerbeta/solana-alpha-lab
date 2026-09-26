@@ -778,6 +778,31 @@ class OrdinaryOwnerPathTests(unittest.TestCase):
             workspace = Path(raw)
             data_root = workspace / "rdp"
             populate_real_c1_c2(data_root, workspace)
+            raw_preflight = subprocess.run(
+                [
+                    sys.executable,
+                    "-B",
+                    "scripts/hypothesis_forge.py",
+                    "--root",
+                    str(ROOT),
+                    "--data-root",
+                    str(data_root),
+                    "preflight",
+                    "--owner-focus",
+                    "ORDINARY-DISCOVERY-SYNTH",
+                    "--format",
+                    "json",
+                ],
+                cwd=ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(raw_preflight.returncode, 0, raw_preflight.stderr)
+            self.assertEqual(
+                json.loads(raw_preflight.stdout).get("discovery_contract_version"),
+                "FORGE_GROUNDED_DISCOVERY_V1",
+            )
             preflight = run_cli(
                 "preflight",
                 "--discovery-contract",

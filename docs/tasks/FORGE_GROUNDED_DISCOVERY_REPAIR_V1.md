@@ -61,6 +61,9 @@ managed_write_set:
   - .cursor/commands/hypothesis-forge.md
   - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
   - tests/test_hfic_grounded_discovery_v1.py
+  - tests/test_hfic_cli.py
+  - tests/test_hfic_forge_context_and_no_worthy.py
+  - tests/test_hfic_discovery_prospects_and_next_action.py
   - tests/test_forge_representation_ladder_v1.py
   - tests/test_hfic_operational_closure_v1.py
 

@@ -19,10 +19,10 @@ stays missing. Empty cohorts stay in the table with a zero usable count.
 An explanatory rule later than the decision points is rejected. Overlapping
 collection windows are not independent replication. Mint overlap that was
 not measured is not reported as independent. The result carries
-`engine_emits_alpha=false`. Ordinary discovery preflight with
-`--discovery-contract` carries `discovery_contract_version`. That saved
-contract requires computed `grounded_evidence` at freeze for zero, one,
-four, or six candidates.
+`engine_emits_alpha=false`. Ordinary non-CONTROL preflight carries
+`discovery_contract_version` whether or not `--discovery-contract` is
+passed. That saved contract requires computed `grounded_evidence` at
+freeze for zero, one, four, or six candidates.
 A historical receipt without the contract keeps the classic floor.
 `evidence_surface_mode` on the preflight receipt stays unset unless the run
 is explicit CONTROL. Zero candidates can freeze. One selected candidate

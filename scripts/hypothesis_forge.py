@@ -340,7 +340,6 @@ def cmd_preflight(
     explicit_data_root: Path | None,
     control_current_representation: bool = False,
     model_provenance_sha256: str | None = None,
-    discovery_contract: bool = False,
 ) -> int:
     _assert_no_path_leak(
         {
@@ -418,8 +417,7 @@ def cmd_preflight(
         **receipt,
     }
     if (
-        discovery_contract
-        and not control_current_representation
+        not control_current_representation
         and payload.get("evidence_surface_mode") != "CURRENT_REPRESENTATION_CONTROL_V1"
     ):
         from solana_alpha_lab.factory.hfic_grounded_discovery import (
@@ -1746,8 +1744,8 @@ def build_parser() -> argparse.ArgumentParser:
         "--discovery-contract",
         action="store_true",
         help=(
-            "Stamp FORGE_GROUNDED_DISCOVERY_V1. Freeze then requires "
-            "computed grounded evidence for every candidate count."
+            "Accepted on ordinary preflight. Non-CONTROL receipts always "
+            "carry FORGE_GROUNDED_DISCOVERY_V1; this flag does not toggle it."
         ),
     )
     preflight.add_argument(
@@ -2054,7 +2052,6 @@ def main(argv: list[str] | None = None) -> int:
                 model_provenance_sha256=getattr(
                     args, "model_provenance_sha256", None
                 ),
-                discovery_contract=bool(getattr(args, "discovery_contract", False)),
             )
         if args.command == "forge-input":
             return cmd_forge_input(

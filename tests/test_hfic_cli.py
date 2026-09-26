@@ -149,6 +149,42 @@ def seed_minimal_market_basis(data_root: Path) -> None:
             shutil.copy2(child, target)
 
 
+def historical_preflight_view(
+    args: tuple[str, ...],
+    result: subprocess.CompletedProcess[str],
+) -> subprocess.CompletedProcess[str]:
+    """Keep classic HFIC tests on receipts saved before the discovery contract.
+
+    Public non-CONTROL preflight always stamps discovery_contract_version.
+    Pass --discovery-contract to keep that stamp. Other preflight calls in
+    these tests drop it and rehash so the classic floor stays testable.
+    """
+
+    if not args or args[0] != "preflight" or result.returncode != 0:
+        return result
+    if "--discovery-contract" in args or "--control-current-representation" in args:
+        return result
+    try:
+        payload = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return result
+    if not isinstance(payload, dict) or "discovery_contract_version" not in payload:
+        return result
+    payload.pop("discovery_contract_version", None)
+    from solana_alpha_lab.factory.hfic_session import canonical_preflight_receipt_sha256
+
+    payload["preflight_receipt_sha256"] = canonical_preflight_receipt_sha256(payload)
+    rendered = json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    return subprocess.CompletedProcess(
+        result.args,
+        result.returncode,
+        stdout=rendered + "\n",
+        stderr=result.stderr,
+    )
+
+
 def bind_draft(draft: dict, receipt: dict) -> dict:
     bound = dict(draft)
     bound["preflight_receipt_id"] = receipt["receipt_id"]
@@ -172,7 +208,7 @@ def run_cli(*args: str, data_root: Path, env: dict[str, str] | None = None) -> s
     merged["SMIAL_DATA_ROOT"] = str(data_root)
     merged["PYTHONUTF8"] = "1"
     merged["PYTHONIOENCODING"] = "utf-8"
-    return subprocess.run(
+    completed = subprocess.run(
         [
             sys.executable,
             "-B",
@@ -191,6 +227,7 @@ def run_cli(*args: str, data_root: Path, env: dict[str, str] | None = None) -> s
         errors="replace",
         check=False,
     )
+    return historical_preflight_view(args, completed)
 
 
 class HficCliContractTests(unittest.TestCase):

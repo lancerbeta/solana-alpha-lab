@@ -275,8 +275,9 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
    `--cohort-partition COHORT CENSUS OBSERVATIONS` per cohort. Do not replace
    those hashes with the hash of a combined file. A stamped ordinary receipt
    requires that evidence object for 0, 1, 4, and 6 candidates.
-   Ordinary preflight with `--discovery-contract` carries
-   `discovery_contract_version`. Do not hand-write that field.
+   Ordinary preflight carries `discovery_contract_version` for every
+   non-CONTROL receipt. `--discovery-contract` is accepted and does not
+   decide the stamp. Do not hand-write that field.
    `evidence_surface_mode` stays unset unless the run is explicit CONTROL.
    Do not invent those fields.
    CONTROL does not run this command. This repair atom
