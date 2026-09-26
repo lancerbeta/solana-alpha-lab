@@ -246,7 +246,13 @@ class BoundedCohortMaterializationTests(unittest.TestCase):
         activation["stops_admitting_at"] = "2026-09-21T17:35:10.845525Z"
         schedule["activation"] = activation
         validated = validate_observation_schedule(schedule, root=ROOT)
-        self.assertEqual(validated["activation"]["starts_at"], "2026-09-14T17:35:10.845525Z")
+        self.assertEqual(
+            validated["activation"]["starts_at"], "2026-09-14T17:35:10.845525Z"
+        )
+        self.assertEqual(
+            validated["activation"]["stops_admitting_at"],
+            "2026-09-21T17:35:10.845525Z",
+        )
         digest = str(validated["schedule_sha256"])
         admit = datetime(2026, 9, 14, 18, 35, 10, tzinfo=UTC)
         as_of = datetime(2026, 9, 22, 17, 35, 10, tzinfo=UTC)
@@ -295,9 +301,10 @@ class BoundedCohortMaterializationTests(unittest.TestCase):
                 as_of=as_of,
                 closure_receipt=receipt,
             )
+        self.assertEqual(source["cohort_id"], cohort_id)
         self.assertEqual(source["member_count"], 1)
         self.assertEqual(source["starts_at"], "2026-09-14T17:35:10.845525Z")
-        self.assertNotEqual(str(source.get("materialization", {}).get("code", "")), "IDENTITY_CONFLICT")
+        self.assertEqual(source["stops_admitting_at"], "2026-09-21T17:35:10.845525Z")
 
     def test_a_prefix_walk_applies_each_delta_at_most_once(self) -> None:
         digest = "a" * 64
