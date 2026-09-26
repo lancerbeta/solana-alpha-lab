@@ -12,8 +12,9 @@
   "capability_radar_now": "USE_VANILLA_COHORT_OWNER_PATH",
   "implementation_bindings": {
     "catalog/assets/core.yaml": "474745d334da9f4110511b7ddb1c1318c03abdd5d9b51ee4895aad67fad00d61",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "5d1cc86d15e7a70938dd27fdfcc6bbc025bf653778bee3b735ca0c4eadfe1318",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "02493fc2bd23e6413ae449df1c7cb149ce180752737801ad14a54b507b864276",
-    "docs/tasks/LIVE_COHORT_VANILLA_OWNER_PATH_V1.md": "e6593abaf2086a157e57cdb4e7291208128b367e5fb6296c0487255a460dbcfe",
+    "docs/tasks/LIVE_COHORT_VANILLA_OWNER_PATH_V1.md": "59d69ba9caadc83c27c56f126c996d8d9ff0aafccdfb8508f741d0144c7904f6",
     "scripts/discovery_evidence_release.py": "e8f6d23604d470d796ae213e8618b3e54f59560718361ac693b1be7da6d9c60d",
     "src/solana_alpha_lab/factory/bounded_cohort_materialization.py": "e64a0ff6198efddb8b95eb6cc78aac18928c1e48df08c53c5c1be89603e11024",
     "src/solana_alpha_lab/factory/forge_input_receipt.py": "64b609bff4f672a004af1c9ac5164754f32c8f90977306fb44ac72c24fa6305e",
@@ -41,14 +42,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/live_cohort_vanilla_owner_path/a1_delivery_factory_fit_v1.json",
-    "sha256": "fed5e43de16dd40faf363e95683cc51c09616a45380f3146f355bbabf2f10d79",
+    "sha256": "0f3179335ce26b4441f272334b0eab39c906a55a375b4387fbc138c3f4aae46e",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LIVE_COHORT_VANILLA_OWNER_PATH",
     "independent_review": {
       "path": "docs/evidence/live_cohort_vanilla_owner_path/a1_delivery_independent_review_v1.json",
-      "sha256": "f143c22bd9d3fbe58804d800c320c5dcbf00608d703d2c3807e7e7ea61e34bf6",
+      "sha256": "76e9b8c611c6f109c09369d2e35d25e438dc27f092afe6ab77b0c20e0cdbabb3",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
