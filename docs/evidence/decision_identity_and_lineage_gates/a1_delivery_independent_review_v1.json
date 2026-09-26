@@ -4,8 +4,8 @@
   "review_id": "DECISION-IDENTITY-AND-LINEAGE-GATES-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-26",
   "task_id": "DECISION_IDENTITY_AND_LINEAGE_GATES_V1",
-  "reviewed_bindings_sha256": "44e24070f7e0852034158bccf21bd521e834b2c8d180e224165045df208bcd84",
-  "reviewed_inventory_sha256": "a1bff7838b8591d25c1336546dd07301b3fe50abb137ad9d90a47e4e0d23690e",
+  "reviewed_bindings_sha256": "2022fc00eed8390f724fcd2b8853fdb3df1a66dec7b2f0961a67cc7e840c1b07",
+  "reviewed_inventory_sha256": "5e0933d1c960b6ad298d9ba3bdce14b34457ec1ba2e30d0c26d38eac9348540c",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
