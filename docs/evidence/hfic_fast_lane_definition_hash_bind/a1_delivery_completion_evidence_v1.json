@@ -5,7 +5,7 @@
   "as_of": "2026-09-26",
   "task_id": "HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1",
   "state_change": "BARE_EXPERIMENT_SPEC_IS_HYPOTHESIS_DEFINITION_UNBOUND",
-  "base_main": "b6ab5f699ad2b2bee3286171ad2728e1bcee1638",
+  "base_main": "4213755922fec0142a69ba1b0df52268c026240b",
   "capability_radar_now": "NONE",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,

@@ -29606,7 +29606,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
-  integrity: {kind: sha256, sha256: cd6bc3c843f285b39d1973871e576158d7cd69edc0e1310adb2048c919b8e844}
+  integrity: {kind: sha256, sha256: 3be6c95265675db9ddc8b0c0915c1a59a8199c372ae6756e278f1e584b804968}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
@@ -34825,7 +34825,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_shadow_operations.py', repository_path: src/solana_alpha_lab/factory/paper_shadow_operations.py}
-  integrity: {kind: sha256, sha256: cd80e09c225f56d8ce7befbd2bba978e1a2d45a3a488560a21ffba86681c4ed2}
+  integrity: {kind: sha256, sha256: 9649fa8fe6103787ac25af8ad7379ef816d9f85dca1cfbfa0e2ff0d1e2569e82}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001}
@@ -34843,7 +34843,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_shadow_commands.py', repository_path: src/solana_alpha_lab/factory/paper_shadow_commands.py}
-  integrity: {kind: sha256, sha256: f99b44adb7304f27ec8a60548370711c6588c89197b41969f9fbfb297add0ef7}
+  integrity: {kind: sha256, sha256: 8ffb3d10cffa9b181e8b32aa0d23906dd8a606cfbb48332d3e821fb2ed463b49}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001}
@@ -34921,7 +34921,7 @@ records:
   as_of: '2026-09-26'
   truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/architecture/PAPER_SHADOW_EXECUTION_INTEGRITY_PRD_SSD_V1.md', repository_path: docs/architecture/PAPER_SHADOW_EXECUTION_INTEGRITY_PRD_SSD_V1.md}
-  integrity: {kind: sha256, sha256: 0c512cecb044c492864513f17d1309436539dfae7410cf163c30d63c085acb29}
+  integrity: {kind: sha256, sha256: c841af00127a1d1a7a3a85ec061bdb374370d04751ae5e2db1752183eb20f6fc}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001}
@@ -34938,7 +34938,7 @@ records:
   as_of: '2026-09-26'
   truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_paper_shadow_execution_integrity_vertical_v1.py', repository_path: tests/test_paper_shadow_execution_integrity_vertical_v1.py}
-  integrity: {kind: sha256, sha256: 0ab3db54cb64f2df8eea8896e03120c9f9032537d8eef6a7f07220cd921f789e}
+  integrity: {kind: sha256, sha256: 11538bbf3933e409fb2436045e20a76b9b4b6d685a1ae250c0fed756566c0179}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001}
@@ -34998,6 +34998,77 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [PAPER_PLANE, WRITE_INTEGRITY, FACTORY_FIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-PAPER-SHADOW-ENTRY-INTENT-INTEGRITY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for CANCELLED entry intents, stop dominance and admission-bounded fills.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1.md', repository_path: docs/tasks/PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1.md}
+  integrity: {kind: sha256, sha256: 849231b16352df2af1561419bcb103bd7408d1accca51909618d271b9688f8c6}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: DOC-PAPER-SHADOW-EXECUTION-INTEGRITY-PRD-SSD-001}
+  - {relation_type: contains, target_asset_id: TEST-PAPER-SHADOW-EXECUTION-INTEGRITY-VERTICAL-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-COMMANDS-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PAPER_SHADOW, ENTRY_INTENT, CANCELLED, STOP_DOMINANCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-PAPER-SHADOW-ENTRY-INTENT-INTEGRITY-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Completion evidence for CANCELLED entry intents and admission-bounded fills.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/paper_shadow_entry_intent_integrity/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/paper_shadow_entry_intent_integrity/a1_delivery_completion_evidence_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PAPER-SHADOW-ENTRY-INTENT-INTEGRITY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PAPER_SHADOW, ENTRY_INTENT, COMPLETION_EVIDENCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-PAPER-SHADOW-ENTRY-INTENT-INTEGRITY-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Independent review evidence for the entry-intent integrity atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/paper_shadow_entry_intent_integrity/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/paper_shadow_entry_intent_integrity/a1_delivery_independent_review_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PAPER-SHADOW-ENTRY-INTENT-INTEGRITY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PAPER_SHADOW, ENTRY_INTENT, INDEPENDENT_REVIEW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: EVIDENCE-PAPER-SHADOW-ENTRY-INTENT-INTEGRITY-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Factory-fit review for the entry-intent integrity atom.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-26'
+  truth_owner: PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/paper_shadow_entry_intent_integrity/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/paper_shadow_entry_intent_integrity/a1_delivery_factory_fit_v1.json}
+  integrity: {kind: none, note: 'Content integrity is owned by the live completion-review-fit hash chain; embedding its SHA here would create an indirect self-reference through the reviewed inventory.'}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PAPER-SHADOW-ENTRY-INTENT-INTEGRITY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PAPER_SHADOW, ENTRY_INTENT, FACTORY_FIT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 
 - asset_id: CTRL-OWNER-OPERATIONS-COCKPIT-001
@@ -36265,7 +36336,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: TRADING_OPERATIONS_WORKBENCH_V2
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/trading_operations_workbench_v2.md', repository_path: docs/contracts/trading_operations_workbench_v2.md}
-  integrity: {kind: sha256, sha256: 1e067f76995debadd2889432db1a465375d97738838f9e89f21d091710c676e2}
+  integrity: {kind: sha256, sha256: c8faf6a735cbcadf51473f026a3a61ac0c63144ce874db43ba8e59da5cf7087e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-OPERATIONS-WORKBENCH-001}
@@ -36285,7 +36356,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: TRADING_OPERATIONS_WORKBENCH_V2
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/trading_operations.py', repository_path: src/solana_alpha_lab/factory/trading_operations.py}
-  integrity: {kind: sha256, sha256: b7b14be6757c001c5bc9aaf7116487c192f8af4e544019e9f2a54b44434c6863}
+  integrity: {kind: sha256, sha256: 5bae6dcd4d944196e3e3703e0b4181a8de2fc3aec8478607411704d166d9d9ae}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-OPERATIONS-WORKBENCH-001}
@@ -36545,7 +36616,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: RISK_AND_ECONOMICS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/risk_and_economics_v1.md', repository_path: docs/contracts/risk_and_economics_v1.md}
-  integrity: {kind: sha256, sha256: 95e211c1693532caf9bb158fa8cbed8cd00d0e9ee123fcfbd2afa323ffc74301}
+  integrity: {kind: sha256, sha256: b637d2438d88595c9d2789d8fa54637aaafdb698a2159ee1fe8ad2e44dced109}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RISK-AND-ECONOMICS-001}
@@ -36903,7 +36974,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: OWNER_TRADING_OPERABILITY_FOUNDATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/trading_runtime_policy_v1.md', repository_path: docs/contracts/trading_runtime_policy_v1.md}
-  integrity: {kind: sha256, sha256: c29b84c7219bc7f01618e6589482be78299369b716764abfac80ed58d8af9c69}
+  integrity: {kind: sha256, sha256: d81fc10b24afc0f6e093c44d4117d05e655b61bd4d19a02db207bd3fe661b326}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-RUNTIME-POLICY-001}
@@ -38265,7 +38336,7 @@ records:
   as_of: '2026-09-26'
   truth_owner: HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1.md', repository_path: docs/tasks/HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1.md}
-  integrity: {kind: sha256, sha256: 0be39e63ceb4fac52ecae32b9d04f25133cc0987565c9eb70e608b38c968cb42}
+  integrity: {kind: sha256, sha256: 6893338a54b0a6e739c3efb5b0e25959bdf486721583d6a6ce09050b6464d61a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}

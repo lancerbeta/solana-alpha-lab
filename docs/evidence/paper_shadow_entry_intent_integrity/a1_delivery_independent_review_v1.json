@@ -1,0 +1,64 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "PAPER-SHADOW-ENTRY-INTENT-INTEGRITY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-26",
+  "task_id": "PAPER_SHADOW_ENTRY_INTENT_INTEGRITY_V1",
+  "reviewed_bindings_sha256": "8ff13ba0747cacf1a1c8ddf26f444d2bd82423aaf9aad9c6a96b6d80b8747186",
+  "reviewed_inventory_sha256": "c7bc355b263c6dca17dd1ef3b97264777f24522c487169e91ec243a92c2baab0",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=5859a13544eba2d2584c4e865e53c35de10b07bd2fa842669ea98b9f0106d345",
+        "PASS_HFIC_SESSION_ABSENT",
+        "PASS_E1_STOP_DOMINANCE",
+        "PASS_E2_NO_AUTOFILL",
+        "PASS_E4_ADMISSION_BINDING",
+        "PASS_E6_CANCELLED_NOT_OPEN_RISK"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_E1_THROUGH_E9",
+        "PASS_WRITE_SET",
+        "PASS_NO_TEST_WEAKENING"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_DOD_1_STOP_MATRIX_AND_J4",
+        "PASS_DOD_2_CANCELLED_EXCLUDED",
+        "PASS_DOD_3_FILL_BINDING",
+        "PASS_DOD_4_SINGLE_STATE_SETS",
+        "PASS_DOD_5_NO_WEAKENED_TESTS"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_CLOSE_STOP_SAY_CANCELLED",
+        "PASS_ATTEMPTING_SKIPPED_UNTIL_RECONCILE"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE_TRADING",
+    "NO_MERGE",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}

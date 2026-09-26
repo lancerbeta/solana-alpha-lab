@@ -33,6 +33,7 @@ EVENT_STAGE = {
     "SIGNAL_DECISION_ACCEPTED": "SIGNAL_DECISION",
     "PRE_TRADE_RISK_SNAPSHOT": "PRE_TRADE_RISK",
     "EXECUTION_INTENT_CREATED": "EXECUTION_INTENT",
+    "ENTRY_INTENT_CANCELLED": "EXECUTION_INTENT",
     "PAPER_SIMULATION_OBSERVED": "EXECUTION_OBSERVATION",
     "SHADOW_EXECUTABLE_OBSERVED": "EXECUTION_OBSERVATION",
     "POSITION_TRANSITION": "POSITION",
@@ -59,22 +60,22 @@ COMMAND_SPECS = (
     (
         "REQUEST_CLOSE_POSITION",
         "position_id",
-        "Position in OPEN|PARTIAL|UNKNOWN (EXIT_REQUIRED is idempotent)",
-        "state=EXIT_REQUIRED; fill_claimed=false",
+        "OPEN|PARTIAL|UNKNOWN close; pre-attempt cancels; EXIT_REQUIRED and CANCELLED are idempotent",
+        "EXIT_REQUIRED for a live position, or CANCELLED for a pre-attempt intent; fill_claimed=false",
         "CLOSE_POSITION_STATE_INVALID / SOURCE_NOT_PRESENT",
     ),
     (
         "REQUEST_CLOSE_ALL",
         "bot_instance_id + expected_open_position_set_sha256",
         "Rendered open-set hash equals live inventory hash",
-        "fanout close requests or hash mismatch with zero side effects",
+        "pre-attempt intents become CANCELLED; ATTEMPTING is skipped until reconcile; open positions request exit",
         "hash mismatch / CLOSE_ALL_SNAPSHOT_REQUIRED",
     ),
     (
         "STOP_BOT",
         "bot_instance_id",
         "Bot PRESENT",
-        "DRAINING while inventory remains; STOPPED only after drain-cleared",
+        "cancels pre-attempt intents; DRAINING while inventory remains; STOPPED when drain-cleared is RECONCILED or CANCELLED",
         "BOT_NOT_FOUND / SOURCE_NOT_PRESENT",
     ),
 )
@@ -256,6 +257,8 @@ def _build_traces(store: Any) -> list[dict[str, Any]]:
         if event_type == "RECONCILIATION" and payload.get("result") == "UNRESOLVED":
             bucket["blocker"] = "UNRESOLVED_POSITION"
             stage = None
+        if event_type == "ENTRY_INTENT_CANCELLED":
+            bucket["blocker"] = bucket.get("blocker") or "INTENT_CANCELLED"
         position_backed = {
             "EXECUTION_INTENT",
             "EXECUTION_OBSERVATION",

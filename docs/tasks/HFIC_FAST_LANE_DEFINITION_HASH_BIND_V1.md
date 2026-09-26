@@ -17,9 +17,9 @@ required_review_roles:
 expected_repository: lancerbeta/solana-alpha-lab
 
 git_binding:
-  expected_base: b6ab5f699ad2b2bee3286171ad2728e1bcee1638
+  expected_base: 4213755922fec0142a69ba1b0df52268c026240b
   expected_upstream: origin/main
-  expected_upstream_oid: b6ab5f699ad2b2bee3286171ad2728e1bcee1638
+  expected_upstream_oid: 4213755922fec0142a69ba1b0df52268c026240b
   expected_branch: cursor/hfic-fast-lane-definition-hash-bind-v1
   dirty_mode: ALLOW_REPORTED
 
@@ -95,7 +95,7 @@ context_requirements:
 # HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1
 
 SPEC_ROUTE=PRD_LITE. FACTORY_FIT=FULL_REVIEW. MODEL_EFFORT=`LUNA_MAX`.
-Route `DIRECT_CURSOR_DELIVERY`. Base `b6ab5f699ad2b2bee3286171ad2728e1bcee1638`.
+Route `DIRECT_CURSOR_DELIVERY`. Base `4213755922fec0142a69ba1b0df52268c026240b`.
 
 Confirmed defect: `run_live_classifier` copies `frozen.selected_definition_sha256`
 onto a bare ExperimentSpec and can return `FAST_LANE_READY` when only feature

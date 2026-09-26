@@ -165,6 +165,10 @@ capacity, CVaR/VaR, Kelly) are `NOT_DEFINED`, not unlimited/safe.
 Unresolved / EXIT_REQUIRED inventory remains Operations-owned. Entry
 headroom never means all risk is clear.
 
+`CANCELLED` is a terminal non-fill. It is not an `OPEN_RISK_STATES` member,
+not entry-admission risk, and not inventory. Its PnL status is
+`NOT_APPLICABLE`.
+
 ## 9. Exposure
 
 `ENTERED_NOTIONAL_EXPOSURE_USD` scoped by strategy_version and mode. Not
