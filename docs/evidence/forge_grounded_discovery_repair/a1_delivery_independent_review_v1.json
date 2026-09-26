@@ -17,29 +17,29 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "At HEAD 58bf8192, discovery-execute computes BASE_X from rows, records DISCOVERY_QUERY_LOOK, and freeze rejects a tampered result. Explanatory points after the decision are rejected. Empty ordinary receipts allow candidate_ids minItems 0 and a null runner. freeze_draft keeps a floor of 4 unless the draft is ordinary discovery. Non-empty unresolved runner refs still raise CROSS_REFERENCE_MISMATCH."
+        "At HEAD 69cbcd44, a missing rejected alternative is the token NONE, an empty runner id skips the runner packet, and a late-only liquidity cell stays out of base_x. Ordinary preflight stamps the discovery contract. Binding hashes, cohort, release, and explicit holdout false constrain the public CLI."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "The synthetic public path covers pooled versus conditional means, calendar blocks, empty strata, leakage, censored lateness, missing flags, prior rename versus richer CONTROL scope, and predictive identity without an actor. Market Prompt A, market Critic, and the live focus slot stay outside this atom."
+        "Stamped ordinary preflight plus discovery-execute freezes NO_WORTHY with the computed result refs. The late-only mint falsifies absolute-latest selection. Market Prompt A, market Critic, and the live focus slot stay outside this atom."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=8efecf24bfc89aa299918cbb410000785a00a6cca19d8f2b08170fbb9256ffe5",
-        "Production execute passes overlap_members null, so unmeasured mint overlap is not independent_replication true. PREDICTIVE identity stores an empty actor instead of inventing one. Empty ordinary NO_WORTHY persists no fabricated candidate id. CONTROL freeze still uses floor 4."
+        "packet_fingerprint_sha256=d5664536c1bb29007e0d5951d94a3494389e1784137438daffd7b2441a49a10d",
+        "Ordinary preflight stamps the contract. PIT keeps the latest row available by the deadline, so a late-only mint is not base_x. explanatory_condition separates priors. Journal scope must match the preflight search key."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Ordinary versus CONTROL, discovery-execute, discovery-coverage, predictive 0-6 without a forced actor, and the post-merge slash are on the skill, slash command, operator A0/A2/A4/A5/A13/A15, and the owner readout."
+        "Skill, slash command, operator A0, and the owner readout say journal-scope is the preflight search_key_sha256 and that the whole discovery-execute object is grounded_evidence."
       ]
     }
   ],
