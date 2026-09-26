@@ -3199,7 +3199,7 @@ def persist_scientific_slot_admission(
         except Exception as exc:
             # A competing writer may hold the lease briefly. Re-read after a
             # bounded retry so the loser reports the occupied slot instead of
-            # leaking an implementation-level WRITER_BUSY error.
+            # leaking an implementation-level WRITER_BUSY or WRITER_LEASE_INVALID error.
             observed = _existing_scientific_slot_admission(store, slot)
             if observed is not None:
                 if str(observed.get("session_id") or "") != session_id:
@@ -3210,7 +3210,7 @@ def persist_scientific_slot_admission(
                     )
                 return observed
             if (
-                getattr(exc, "code", None) == "WRITER_BUSY"
+                getattr(exc, "code", None) in {"WRITER_BUSY", "WRITER_LEASE_INVALID"}
                 and attempt < 3
             ):
                 time.sleep(0.05 * (attempt + 1))
