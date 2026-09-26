@@ -5094,6 +5094,27 @@ def build_classifier_receipt(
     }
 
 
+def _caller_hypothesis_definition_sha256(
+    critic_result: Mapping[str, Any],
+    submission: Mapping[str, Any],
+) -> str | None:
+    """Hash the caller actually passed. Never the frozen candidate hash."""
+
+    raw: list[object] = []
+    if "experiment_spec" in submission:
+        raw.append(submission.get("hypothesis_definition_sha256"))
+    raw.append(critic_result.get("hypothesis_definition_sha256"))
+    present = [item for item in raw if item is not None]
+    if not present:
+        return None
+    if any(not isinstance(item, str) or not item for item in present):
+        return None
+    unique = list(dict.fromkeys(str(item) for item in present))
+    if len(unique) != 1:
+        return None
+    return unique[0]
+
+
 def run_live_classifier(
     critic_result: Mapping[str, Any],
     frozen: Mapping[str, Any],
@@ -5114,18 +5135,10 @@ def run_live_classifier(
         "experiment_spec"
     )
     if isinstance(submission, Mapping) and "experiment_spec" not in submission:
-        if submission.get("schema") == "smial.experiment-spec":
-            submission = {
-                "experiment_spec": dict(submission),
-                "hypothesis_definition_sha256": frozen.get("selected_definition_sha256"),
-            }
-        else:
-            submission = {
-                "experiment_spec": dict(submission),
-                "hypothesis_definition_sha256": frozen.get("selected_definition_sha256"),
-            }
+        submission = {"experiment_spec": dict(submission)}
     if not isinstance(submission, Mapping) or "experiment_spec" not in submission:
         raise HficSessionError("EXPERIMENT_SPEC_REQUIRED")
+    caller_hash = _caller_hypothesis_definition_sha256(critic_result, submission)
     spec = submission["experiment_spec"]
     if not isinstance(spec, Mapping):
         raise HficSessionError("EXPERIMENT_SPEC_REQUIRED")
@@ -5152,6 +5165,9 @@ def run_live_classifier(
             raise HficSessionError(str(exc)) from exc
     else:
         selected = None
+    expected_hash = frozen.get("selected_definition_sha256")
+    if not isinstance(caller_hash, str) or caller_hash != expected_hash:
+        raise HficSessionError("HYPOTHESIS_DEFINITION_UNBOUND")
     as_of_raw = ""
     for candidate in (
         submission.get("classifier_evaluated_at") if isinstance(submission, Mapping) else None,
@@ -5165,7 +5181,7 @@ def run_live_classifier(
     else:
         as_of = datetime.now(UTC)
     packet = dict(submission)
-    packet.setdefault("hypothesis_definition_sha256", frozen.get("selected_definition_sha256"))
+    packet["hypothesis_definition_sha256"] = caller_hash
     from solana_alpha_lab.factory.scientific_eligibility_projection import (
         ScientificEligibilityError,
         try_project_scientific_eligibility_from_data_root,
@@ -5194,6 +5210,7 @@ def run_live_classifier(
         decision=decision,
         spec_sha256=spec_sha,
     )
+    receipt["hypothesis_version"] = validated.get("hypothesis_version")
     if selected is not None and _classifier_to_hfic_terminal(receipt) == "PASS_FAST_LANE_READY":
         from solana_alpha_lab.factory.hfic_control_integrity import (
             DENY_HFIC_AVAILABILITY_GATE,
@@ -5239,6 +5256,7 @@ def validate_live_classifier_receipt(
         "selected_candidate_id",
         "selected_definition_sha256",
         "experiment_spec_sha256",
+        "hypothesis_version",
         "lane",
         "lane_classifier_terminal",
         "classifier_route_terminal",

@@ -1,0 +1,55 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-FAST-LANE-DEFINITION-HASH-BIND-COMPLETION-001",
+  "as_of": "2026-09-26",
+  "task_id": "HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1",
+  "state_change": "BARE_EXPERIMENT_SPEC_IS_HYPOTHESIS_DEFINITION_UNBOUND",
+  "base_main": "b6ab5f699ad2b2bee3286171ad2728e1bcee1638",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "docs/tasks/HFIC_FAST_LANE_DEFINITION_HASH_BIND_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_fast_lane_definition_hash_bind/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_HFIC_FAST_LANE_DEFINITION_HASH_BIND_FOCUSED_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_fast_lane_definition_hash_bind/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_CASES_A_B_C",
+      "PASS_PACKET14_AND_CLASSIFICATION_REGRESSION"
+    ]
+  },
+  "non_claims": [
+    "NO_MERGE",
+    "NO_HFIC_CAND_EQUALS_HYP",
+    "NO_SPEC_PRODUCER",
+    "NO_HANDOFF_CONTRACT_EDIT"
+  ],
+  "side_effects": {
+    "network_calls": 0,
+    "local_writes": 0,
+    "external_actions": 0
+  }
+}

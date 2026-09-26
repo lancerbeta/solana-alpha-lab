@@ -292,7 +292,10 @@ class ExperimentSpecBindTests(unittest.TestCase):
             return_value="cd" * 32,
         ):
             receipt = run_live_classifier(
-                {"experiment_spec": {"schema": "smial.experiment-spec"}},
+                {
+                    "experiment_spec": {"schema": "smial.experiment-spec"},
+                    "hypothesis_definition_sha256": frozen["selected_definition_sha256"],
+                },
                 frozen,
                 repo_root=ROOT,
                 data_root=ROOT,
