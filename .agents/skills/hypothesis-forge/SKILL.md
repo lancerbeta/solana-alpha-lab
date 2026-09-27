@@ -285,6 +285,25 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <canonical-data-root> --store <canonical-data-root> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
 ```
 
+   Before persist/freeze, ordinary discovery may escalate inside the same
+   journal. Tiers `SIMPLE_SCREEN` and `COMPOUND_SCREEN` are internal labels,
+   not new terminals. Shared budget stays 6 main + 2 adaptive. AUTO reserves
+   3 main slots for compound until compound is used. A simple screen with no
+   freeze-worthy candidate escalates to compound before any
+   `NO_WORTHY_HYPOTHESIS` terminal. Do not call an unused compound tier
+   executed. `SKIPPED_BUDGET` and a model error are not `EXECUTED`.
+   Feature-only preview:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-preview --data-root <canonical-data-root> --spec <preview.json> --format json
+```
+
+   Preview has no target. A temporal query uses schema
+   `smial.hfic-temporal-query`. Relative results are
+   `PRICE_RELATIVE_PROXY`. Cost output is `ESTIMATED_NET_PROXY`, never
+   `NetReturn`. The frozen recipe's fixed-time consumer is
+   `CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001`.
+
    Pass `--journal-scope` as the preflight `search_key_sha256`. Copy the
    whole returned evidence object onto the draft as `grounded_evidence`.
    Do not copy only `result_refs` and do not hand-write the summary.

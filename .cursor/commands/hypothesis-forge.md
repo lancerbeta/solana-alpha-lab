@@ -31,6 +31,11 @@ interpreter. Required runtime is CPython 3.13.14 via that prefix.
 Read and follow `.agents/skills/hypothesis-forge/SKILL.md` and
 `docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md`.
 
+Ordinary discovery escalates from `SIMPLE_SCREEN` to `COMPOUND_SCREEN`
+before freeze when no candidate is worth freezing. The shared budget stays
+6 main + 2 adaptive. Do not mark a tier executed unless its saved looks say so.
+`PRICE_RELATIVE_PROXY` and `ESTIMATED_NET_PROXY` are not `NetReturn`.
+
 A5 identity: market epoch admits/resumes/budgets; capability epoch does not
 free AUTO/focus quota; START ≠ RESUME ≠ REUSED; incomplete market is BLOCKED
 (not a synthetic digest). Merge phrase and scientific market run stay separate

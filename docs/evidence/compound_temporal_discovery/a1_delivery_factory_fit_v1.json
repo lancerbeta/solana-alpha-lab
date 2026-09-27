@@ -1,0 +1,33 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "COMPOUND-TEMPORAL-DISCOVERY-FACTORY-FIT-001",
+  "as_of": "2026-09-27",
+  "task_id": "COMPOUND_TEMPORAL_DISCOVERY_V1",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_ORDINARY_FORGE_GAINS_COMPOUND_TEMPORAL_TIER",
+    "flexibility_and_history": "PASS_LEGACY_V1_AND_RENAME_RETRY_KEEP_BUDGET",
+    "context_efficiency": "PASS_EXISTING_FORGE_CLI_AND_STORE",
+    "research_truth": "PASS_RELATIVE_PROXY_AND_ASSUMPTION_COST_ARE_LABELED",
+    "owner_operability": "PASS_PREVIEW_AND_TIER_PROGRESS_FROM_STORED_LOOKS",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_MARKET_EXECUTION",
+    "monitoring_and_recovery": "PASS_RETRY_AND_HASH_MISMATCH",
+    "build_vs_buy": "PASS_NO_NEW_FORGE_OR_STORE",
+    "red_team": "PASS_HOLDOUT_AND_EXIT_CONFLICT_STOP_BEFORE_A_NUMBER",
+    "security": "PASS_NO_PROVIDER_NO_LIVE_WRITE"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "ONE_AUTHORIZED_RESEARCH_RUN"
+  },
+  "recovery": "Revert this change. Append-only discovery looks stay readable. A code rollback does not restore a consumed budget.",
+  "limits": [
+    "NO_MARKET_FORGE",
+    "NO_MARKET_CRITIC",
+    "NO_NET_RETURN",
+    "NO_ALPHA",
+    "MARKET_EXECUTION_NOT_RUN"
+  ]
+}

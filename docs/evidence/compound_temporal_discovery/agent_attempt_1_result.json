@@ -1,0 +1,28 @@
+{
+  "matched_n": 1,
+  "observed_target_n": 1,
+  "mean_target": 0.19999999999999996,
+  "target_kind": "PRICE_RELATIVE_PROXY",
+  "claim_level": "EXPLORATORY_PROXY",
+  "labeled_net_return": false,
+  "matched_feature_means": {
+    "liq_x300": 1000.0,
+    "peak_drawdown_at_y3600": -0.19999999999999996,
+    "prior_runup_x300_y1800": 1.0
+  },
+  "cost": {
+    "status": "ABSENT",
+    "source_status": null,
+    "scenarios": {},
+    "decision_sensitivity": "NOT_EVALUATED",
+    "labeled_net_return": false
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_INTRABAR_STOP",
+    "NO_CAUSAL_IDENTIFICATION"
+  ],
+  "spec_sha256": "bbe56ff3a053993ae042be1563ae8d829b908e4172d56d79fe80fb9dbad50f21",
+  "search_tier": "COMPOUND_SCREEN"
+}

@@ -1,0 +1,67 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "COMPOUND-TEMPORAL-DISCOVERY-REVIEW-001",
+  "as_of": "2026-09-27",
+  "task_id": "COMPOUND_TEMPORAL_DISCOVERY_V1",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Exit ties at the same availability go through _select_cell and do not become a number. Same-version resume is a retry. A different calculation version is CALCULATION_REVISION and does not reuse the old summary as RETRY_SAME_BYTES."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "The owner path records SIMPLE_SCREEN then COMPOUND_SCREEN in one journal. ESTIMATED_NET_PROXY is on the freeze critic packet and on CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001. PRICE_RELATIVE_PROXY stays distinct from NetReturn."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "What can pass a helper test and still distort a conclusion: assess_tier_progress will believe a caller-supplied list. The CLI readout tier_progress is taken from stored looks, so a compound tier is executed only when a look was saved. Exit conflict is not a raw return. Assumption cost is labeled and is not NetReturn."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "discovery-execute shows search_tier and tier_progress. An unused compound tier is not marked executed. Preview does not include a target. Proxies are not labeled NetReturn."
+      ]
+    }
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Exit revisions with the same availability were collapsed by row order.",
+      "resolved_by": "ALL_TIED_EXIT_ROWS_ENTER_SELECT_CELL"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Simple-to-compound escalation and ESTIMATED_NET_PROXY were helper-only.",
+      "resolved_by": "OWNER_PATH_SIMPLE_THEN_COMPOUND_WITH_COST"
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MERGE",
+    "NO_ALPHA",
+    "NO_MARKET_FORGE",
+    "NO_NET_RETURN"
+  ]
+}

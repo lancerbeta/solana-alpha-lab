@@ -1531,6 +1531,17 @@ Catalog/prior resolution
 
 ---
 
+## 5.1 Составной временной экран
+
+Внутри одного ordinary `/hypothesis-forge`, до persist/freeze, простой экран
+может перейти в составной. Это не новая сессия и не `NORMALIZED_TRAJECTORY_V1`.
+Общий бюджет: 6 main + 2 adaptive. AUTO оставляет 3 main для compound, пока
+compound не использован. Неназывайте непройденный tier выполненным.
+`PRICE_RELATIVE_PROXY` — относительная цена. `ESTIMATED_NET_PROXY` — модельная
+оценка. Ни один из них не является фактическим `NetReturn`.
+Preview: `discovery-preview`. Фиксированный offline falsifier:
+`CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001`.
+
 ## 6. Версионный чекпоинт
 
 При каждом использовании сохраняйте в research packet:

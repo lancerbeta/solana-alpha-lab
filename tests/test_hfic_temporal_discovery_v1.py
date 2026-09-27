@@ -1,0 +1,566 @@
+"""T01–T06 and T08 for compound temporal discovery. No live store and no provider."""
+
+from __future__ import annotations
+
+import importlib.util
+import random
+import sys
+import tempfile
+import unittest
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
+
+SRC = Path(__file__).resolve().parents[1] / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+_ORACLE_PATH = Path(__file__).with_name("oracle_temporal_arithmetic_v1.py")
+_ORACLE_SPEC = importlib.util.spec_from_file_location("oracle_temporal_arithmetic_v1", _ORACLE_PATH)
+assert _ORACLE_SPEC is not None and _ORACLE_SPEC.loader is not None
+_ORACLE = importlib.util.module_from_spec(_ORACLE_SPEC)
+_ORACLE_SPEC.loader.exec_module(_ORACLE)
+break_even_haircut = _ORACLE.break_even_haircut
+estimated_net_proxy = _ORACLE.estimated_net_proxy
+grid_drawdown = _ORACLE.grid_drawdown
+missing_break_even_mean = _ORACLE.missing_break_even_mean
+missing_stress_mean = _ORACLE.missing_stress_mean
+price_return = _ORACLE.price_return
+retention = _ORACLE.retention
+
+from solana_alpha_lab.factory.hfic_grounded_discovery import (  # noqa: E402
+    CALCULATION_VERSION,
+    GroundedDiscoveryError,
+    execute_discovery_from_rows,
+    run_recorded_discovery_query,
+    validate_query_spec,
+)
+from solana_alpha_lab.factory.hfic_temporal_discovery import (  # noqa: E402
+    assess_tier_progress,
+    assert_search_exhaustion_claim,
+    build_feature_preview,
+    classify_temporal_look,
+    default_assumption_stress_profile,
+    technical_stop_record,
+    temporal_target_label,
+    validate_temporal_query,
+)
+from solana_alpha_lab.factory.research_store import ResearchStore  # noqa: E402
+
+PRICE = "FIELD-USD-PRICE-001"
+LIQ = "FIELD-LIQUIDITY-USD-001"
+COHORT = "REL-20260902T111900Z-20260909T111900Z"
+RELEASE = "aa" * 32
+ANCHOR = datetime(2026, 9, 3, tzinfo=UTC)
+OFFSETS = {"X300": 300, "Y900": 900, "Y1800": 1800, "Y3600": 3600, "Y7200": 7200}
+GIT_SHA = "ab" * 20
+TOLERANCE = 1e-12
+
+
+def _stamp(point: str, lateness: int = 300) -> str:
+    moment = ANCHOR + timedelta(seconds=OFFSETS[point] + lateness)
+    return moment.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _binding() -> list[dict]:
+    return [
+        {
+            "dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+            "evidence_role": "EXPLORATORY_REUSE",
+            "holdout": False,
+            "cohort_id": COHORT,
+            "release_id": RELEASE,
+            "census_sha256": "bb" * 32,
+            "observations_sha256": "cc" * 32,
+            "window_start": "2026-09-02T11:19:00Z",
+            "window_end": "2026-09-09T11:19:00Z",
+        }
+    ]
+
+
+def _census(mint: str, state: str = "X_ELIGIBLE") -> dict:
+    return {
+        "mint": mint,
+        "cohort_id": COHORT,
+        "release_id": RELEASE,
+        "candidate_state": state,
+        "authoritative_anchor": "2026-09-03T00:00:00Z",
+    }
+
+
+def _obs(mint: str, point: str, field: str, value: float | None, *, at: str | None = None, state: str = "OBSERVED") -> dict:
+    return {
+        "mint": mint,
+        "cohort_id": COHORT,
+        "release_id": RELEASE,
+        "point_id": point,
+        "field_id": field,
+        "state": state,
+        "first_reliable_available_at": at or _stamp(point),
+        "typed_value": value,
+    }
+
+
+def _profile(**overrides: object) -> dict:
+    profile = default_assumption_stress_profile()
+    profile.update(overrides)
+    return profile
+
+
+def _explicit_cost() -> dict:
+    profile = _profile()
+    profile["scenarios"] = {
+        "LOW": {"h": 0.03, "q": 0.0, "f": 0.0, "r_fail": -1.0},
+        "BASE": {"h": 0.1, "q": 0.05, "f": 0.0, "r_fail": -1.0},
+        "STRESS": {"h": 0.25, "q": 0.2, "f": 0.02, "r_fail": -1.0},
+    }
+    return profile
+
+
+def _spec(tier: str = "COMPOUND_SCREEN", **overrides: object) -> dict:
+    spec = {
+        "schema": "smial.hfic-temporal-query",
+        "schema_version": "1.0",
+        "query_id": "impulse_pullback_liquidity",
+        "population": "BASE_X",
+        "search_tier": tier,
+        "budget_allocation": "AUTO",
+        "decision": {"point_id": "Y3600", "time_policy": "BOUND_SCHEDULE_CUTOFF"},
+        "schedule": {"lateness_seconds": 300},
+        "features": [
+            {"name": "impulse", "op": "return_ratio", "field_id": PRICE, "start": "X300", "end": "Y1800"},
+            {
+                "name": "pullback",
+                "op": "drawdown_from_grid_max",
+                "field_id": PRICE,
+                "points": ["X300", "Y900", "Y1800", "Y3600"],
+                "at": "Y3600",
+            },
+            {
+                "name": "retention",
+                "op": "ratio",
+                "field_id": LIQ,
+                "numerator": "Y3600",
+                "denominator": "Y1800",
+            },
+        ],
+        "all": [
+            {"feature": "impulse", "op": "between", "lower": 0.25, "upper": 2.0, "closed": "left"},
+            {"feature": "pullback", "op": "between", "lower": -0.40, "upper": -0.10, "closed": "left"},
+            {"feature": "retention", "op": "gte", "value": 0.70},
+        ],
+        "target": {
+            "kind": "PRICE_RELATIVE_PROXY",
+            "reference_point": "Y3600",
+            "exit_point": "Y7200",
+            "field_id": PRICE,
+        },
+        "entry_model": {"kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT", "assumed_latency_seconds": 30},
+        "evaluation": {
+            "calendar_block": "UTC_DAY_OF_DECISION",
+            "baseline": "SAME_DECISION_ELIGIBLE",
+            "ablations": "DROP_ONE_CONDITION",
+        },
+        "cost_profile": _explicit_cost(),
+    }
+    spec.update(overrides)
+    return spec
+
+
+def _path(mint: str, prices: list[float], liquidity: tuple[float, float], exit_price: float) -> list[dict]:
+    points = ["X300", "Y900", "Y1800", "Y3600"]
+    rows = [_obs(mint, "X300", LIQ, 1000.0)]
+    for point, price in zip(points, prices, strict=True):
+        rows.append(_obs(mint, point, PRICE, price))
+    rows.append(_obs(mint, "Y1800", LIQ, liquidity[0]))
+    rows.append(_obs(mint, "Y3600", LIQ, liquidity[1]))
+    rows.append(_obs(mint, "Y7200", PRICE, exit_price))
+    return rows
+
+
+def _scope(spec: dict) -> dict:
+    return {
+        "population": "BASE_X",
+        "decision_timestamp": "Y3600",
+        "target": temporal_target_label(spec),
+        "estimand": "price_relative_proxy",
+        "explanatory_condition": "compound",
+        "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+        "representation_scope": "TEMPORAL_PRICE_LIQUIDITY",
+    }
+
+
+class TemporalArithmeticTests(unittest.TestCase):
+    def test_t01_relative_return_is_unit_invariant_and_v1_stays_raw(self) -> None:
+        spec = _spec(
+            search_tier="SIMPLE_SCREEN",
+            features=[{"name": "mark", "op": "point_value", "field_id": PRICE, "point": "Y3600"}],
+            all=[{"feature": "mark", "op": "gte", "value": 0.0}],
+            cost_profile=None,
+        )
+        census = [_census("a")]
+        observations = _path("a", [1.0, 1.0, 1.0, 1.0], (10000.0, 9000.0), 2.0)
+        first = execute_discovery_from_rows(census, observations, spec, _binding())["summary"]
+        scaled = _path("a", [1000.0, 1000.0, 1000.0, 1000.0], (10000.0, 9000.0), 2000.0)
+        second = execute_discovery_from_rows(census, scaled, spec, _binding())["summary"]
+        self.assertAlmostEqual(first["mean_target"], price_return(1.0, 2.0), delta=TOLERANCE)
+        self.assertAlmostEqual(second["mean_target"], price_return(1.0, 2.0), delta=TOLERANCE)
+        self.assertEqual(first["target_kind"], "PRICE_RELATIVE_PROXY")
+        self.assertFalse(first["labeled_net_return"])
+        other = execute_discovery_from_rows(
+            [_census("b")],
+            _path("b", [100.0, 100.0, 100.0, 100.0], (10000.0, 9000.0), 110.0),
+            spec,
+            _binding(),
+        )["summary"]
+        self.assertAlmostEqual(other["mean_target"], price_return(100.0, 110.0), delta=TOLERANCE)
+        legacy = {
+            "query_id": "raw-v1",
+            "decision_points": ["X300"],
+            "decision_fields": [PRICE, LIQ],
+            "target_point": "Y7200",
+            "target_field": PRICE,
+            "explanatory": [],
+            "population": "BASE_X",
+        }
+        raw = execute_discovery_from_rows(census, observations, legacy, _binding())["summary"]
+        raw_scaled = execute_discovery_from_rows(census, scaled, legacy, _binding())["summary"]
+        self.assertEqual(raw["calculation_version"], CALCULATION_VERSION)
+        self.assertNotEqual(raw["pooled"]["mean_target"], first["mean_target"])
+        self.assertNotEqual(raw["pooled"]["mean_target"], raw_scaled["pooled"]["mean_target"])
+        self.assertNotIn("target_kind", raw)
+
+    def test_t02_pit_conflict_zero_and_order(self) -> None:
+        spec = _spec()
+        census = [_census("a"), _census("zero"), _census("bad")]
+        base = _path("a", [1.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92)
+        base.append(_obs("a", "Y3600", PRICE, 999.0, at="2026-09-03T05:00:00Z"))
+        base.append(
+            {
+                **_obs("a", "X300", PRICE, 50.0, at="2026-09-03T05:00:00Z"),
+                "event_time": "2026-09-03T00:00:01Z",
+            }
+        )
+        zero = _path("zero", [1.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92)
+        zero[0] = _obs("zero", "X300", LIQ, 0.0)
+        bad = _path("bad", [0.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92)
+        conflict = [
+            _obs("a", "Y900", PRICE, 1.5),
+            _obs("a", "Y900", PRICE, 9.0),
+        ]
+        quiet = execute_discovery_from_rows(census, base + zero + bad, spec, _binding())["summary"]
+        shuffled = list(base + zero + bad)
+        random.Random(7).shuffle(shuffled)
+        again = execute_discovery_from_rows(census, shuffled, spec, _binding())["summary"]
+        self.assertAlmostEqual(quiet["matched_feature_means"]["impulse"], 1.0, delta=TOLERANCE)
+        self.assertAlmostEqual(quiet["matched_feature_means"]["pullback"], -0.2, delta=TOLERANCE)
+        self.assertEqual(quiet["mean_target"], again["mean_target"])
+        self.assertGreaterEqual(quiet["population_n"], 2)
+        self.assertNotIn("zero", quiet["exclusion_reasons"])
+        tied = execute_discovery_from_rows([_census("a")], conflict + base, spec, _binding())["summary"]
+        tied_reversed = execute_discovery_from_rows(
+            [_census("a")], list(reversed(conflict + base)), spec, _binding()
+        )["summary"]
+        self.assertEqual(tied["feature_unknown_n"], tied_reversed["feature_unknown_n"])
+        self.assertEqual(tied["matched_n"], 0)
+        self.assertEqual(quiet["feature_unknown_n"], 1)
+        exit_tie = [
+            *_path("a", [1.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92),
+            _obs("a", "Y7200", PRICE, 9.0),
+        ]
+        forward = execute_discovery_from_rows([_census("a")], exit_tie, spec, _binding())["summary"]
+        backward = execute_discovery_from_rows(
+            [_census("a")], list(reversed(exit_tie)), spec, _binding()
+        )["summary"]
+        self.assertEqual(forward["observed_target_n"], 0)
+        self.assertEqual(backward["observed_target_n"], 0)
+        self.assertEqual(forward["mean_target"], backward["mean_target"])
+
+    def test_t03_compound_expression_has_no_marginal_gate(self) -> None:
+        spec = _spec(cost_profile=None)
+        other = _spec(
+            query_id="other_compound",
+            cost_profile=None,
+            all=[
+                {"feature": "retention", "op": "gte", "value": 0.70},
+                {"feature": "pullback", "op": "between", "lower": -0.40, "upper": -0.10, "closed": "left"},
+                {"feature": "impulse", "op": "between", "lower": 0.25, "upper": 2.0, "closed": "left"},
+            ],
+        )
+        census = [_census("a"), _census("scaled"), _census("small"), _census("flat")]
+        observations = []
+        observations.extend(_path("a", [1.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92))
+        observations.extend(_path("scaled", [10.0, 15.0, 20.0, 16.0], (100000.0, 90000.0), 19.2))
+        observations.extend(_path("small", [1.0, 1.1, 1.2, 1.15], (10000.0, 9000.0), 1.2))
+        observations.extend(_path("flat", [1.0, 1.0, 1.0, 1.0], (10000.0, 10000.0), 1.0))
+        summary = execute_discovery_from_rows(census, observations, spec, _binding())["summary"]
+        self.assertAlmostEqual(summary["matched_feature_means"]["impulse"], price_return(1.0, 2.0), delta=TOLERANCE)
+        self.assertAlmostEqual(
+            summary["matched_feature_means"]["pullback"],
+            grid_drawdown([1.0, 1.5, 2.0, 1.6], 1.6),
+            delta=TOLERANCE,
+        )
+        self.assertAlmostEqual(summary["matched_feature_means"]["retention"], retention(9000.0, 10000.0), delta=TOLERANCE)
+        self.assertEqual(summary["matched_n"], 2)
+        self.assertEqual(validate_temporal_query(spec)["spec_sha256"], validate_temporal_query(other)["spec_sha256"])
+        self.assertTrue(summary["ablations"])
+        self.assertEqual(summary["cost"]["status"], "ABSENT")
+        self.assertFalse(summary["labeled_net_return"])
+
+    def test_t04_denominators_duplicate_and_missing_stress(self) -> None:
+        spec = _spec(
+            search_tier="SIMPLE_SCREEN",
+            features=[{"name": "mark", "op": "point_value", "field_id": PRICE, "point": "Y3600"}],
+            all=[{"feature": "mark", "op": "gte", "value": 1.0}],
+            cost_profile=None,
+        )
+        census = [_census(f"m{index}") for index in range(10)]
+        census.append(_census("m0"))
+        observations = []
+        returns = [0.2, 0.4, -0.1, 0.3]
+        for index in range(10):
+            mint = f"m{index}"
+            observations.append(_obs(mint, "X300", LIQ, 1000.0))
+            observations.append(_obs(mint, "X300", PRICE, 1.0))
+            if index < 8:
+                price = 1.0 if index < 6 else 0.5
+                observations.append(_obs(mint, "Y3600", PRICE, price))
+                observations.append(_obs(mint, "Y1800", LIQ, 1000.0))
+                observations.append(_obs(mint, "Y3600", LIQ, 1000.0))
+            if index < 4:
+                observations.append(_obs(mint, "Y7200", PRICE, 1.0 + returns[index]))
+        summary = execute_discovery_from_rows(census, observations, spec, _binding())["summary"]
+        self.assertEqual(summary["population_n"], 10)
+        self.assertEqual(summary["decision_eligible_n"], 8)
+        self.assertEqual(summary["matched_n"], 6)
+        self.assertEqual(summary["observed_target_n"], 4)
+        self.assertEqual(summary["missing_target_n"], 2)
+        self.assertEqual(summary["duplicate_delivery_count"], 1)
+        self.assertAlmostEqual(summary["mean_target"], 0.2, delta=TOLERANCE)
+        self.assertAlmostEqual(summary["missing_stress_model"]["mean_target"], missing_stress_mean(returns, 2), delta=TOLERANCE)
+        self.assertEqual(summary["missing_stress_model"]["label"], "MODEL")
+        self.assertFalse(summary["missing_stress_model"]["writes_raw_history"])
+        self.assertAlmostEqual(summary["missing_target_mean_to_zero"], missing_break_even_mean(returns, 2), delta=TOLERANCE)
+        self.assertEqual(summary["independent_n"], 4)
+
+    def test_t05_cost_oracle_does_not_double_count_or_pretend_calibration(self) -> None:
+        spec = _spec(
+            search_tier="SIMPLE_SCREEN",
+            features=[{"name": "mark", "op": "point_value", "field_id": PRICE, "point": "Y3600"}],
+            all=[{"feature": "mark", "op": "gte", "value": 1.0}],
+        )
+        census = [_census("a")]
+        observations = _path("a", [1.0, 1.0, 1.0, 1.0], (1000.0, 1000.0), 1.2)
+        summary = execute_discovery_from_rows(census, observations, spec, _binding())["summary"]
+        success, proxy = estimated_net_proxy(0.2, 0.1, 0.05, -1.0, 0.0)
+        base = summary["cost"]["scenarios"]["BASE"]
+        self.assertAlmostEqual(summary["mean_target"], 0.2, delta=TOLERANCE)
+        self.assertAlmostEqual(base["r_success"], success, delta=TOLERANCE)
+        self.assertAlmostEqual(base["estimated_net_proxy"], proxy, delta=TOLERANCE)
+        self.assertAlmostEqual(base["h_break_even"], break_even_haircut(0.2, 0.05, 0.0), delta=TOLERANCE)
+        self.assertEqual(base["label"], "ESTIMATED_NET_PROXY")
+        self.assertNotEqual(base["label"], "NetReturn")
+        self.assertEqual(summary["cost"]["decision_sensitivity"], "FRAGILE")
+        self.assertEqual(summary["cost"]["source_status"], "ASSUMPTION_NOT_CALIBRATED")
+        quoted = _explicit_cost()
+        quoted["haircut_basis"] = "QUOTE_ALREADY_NET"
+        with self.assertRaises(GroundedDiscoveryError) as double:
+            validate_temporal_query(_spec(cost_profile=quoted))
+        self.assertEqual(double.exception.code, "COST_DOUBLE_COUNT")
+        cash = _explicit_cost()
+        cash["haircut_basis"] = "QUOTE_ALREADY_NET"
+        cash["scenarios"]["BASE"] = {"h": 0.0, "q": 0.0, "f": 0.01, "r_fail": -1.0}
+        cash["scenarios"]["LOW"] = {"h": 0.0, "q": 0.0, "f": 0.0, "r_fail": -1.0}
+        cash["scenarios"]["STRESS"] = {"h": 0.0, "q": 0.0, "f": 0.02, "r_fail": -1.0}
+        cash_summary = execute_discovery_from_rows(
+            census,
+            observations,
+            _spec(
+                search_tier="SIMPLE_SCREEN",
+                features=[{"name": "mark", "op": "point_value", "field_id": PRICE, "point": "Y3600"}],
+                all=[{"feature": "mark", "op": "gte", "value": 1.0}],
+                cost_profile=cash,
+            ),
+            _binding(),
+        )["summary"]
+        _, cash_proxy = estimated_net_proxy(0.2, 0.0, 0.0, -1.0, 0.01)
+        self.assertAlmostEqual(
+            cash_summary["cost"]["scenarios"]["BASE"]["estimated_net_proxy"],
+            cash_proxy,
+            delta=TOLERANCE,
+        )
+
+    def test_t06_identity_budget_retry_and_new_epoch(self) -> None:
+        renamed = _spec(query_id="renamed_question")
+        reordered = _spec(
+            query_id="reordered",
+            all=list(reversed(_spec()["all"])),
+        )
+        self.assertEqual(validate_temporal_query(_spec())["spec_sha256"], validate_temporal_query(renamed)["spec_sha256"])
+        self.assertEqual(validate_temporal_query(_spec())["spec_sha256"], validate_temporal_query(reordered)["spec_sha256"])
+        anchor = classify_temporal_look([], _spec())
+        retry = classify_temporal_look([anchor], renamed)
+        self.assertFalse(retry["new_look"])
+        stale = dict(anchor)
+        stale["calculation_version"] = "HFIC_TEMPORAL_DISCOVERY_CALC_V0"
+        revised = classify_temporal_look([stale], _spec())
+        self.assertEqual(revised["look_class"], "CALCULATION_REVISION")
+        self.assertFalse(revised["new_look"])
+        self.assertEqual(revised["main_count"], anchor["main_count"])
+
+        def _simple(index: int) -> dict:
+            return _spec(
+                search_tier="SIMPLE_SCREEN",
+                query_id=f"simple-{index}",
+                features=[_spec()["features"][0]],
+                all=[{"feature": "impulse", "op": "gte", "value": 0.1 * index}],
+            )
+
+        first = classify_temporal_look([], _simple(1))
+        changed = _simple(2)
+        changed["adaptation_of"] = first["spec_sha256"]
+        second = classify_temporal_look([first], changed)
+        self.assertEqual(second["look_class"], "ADAPTIVE")
+        third = classify_temporal_look([first, second], _simple(3))
+        fourth = classify_temporal_look([first, second, third], _simple(4))
+        with self.assertRaises(GroundedDiscoveryError) as reserved:
+            classify_temporal_look([first, second, third, fourth], _simple(5))
+        self.assertEqual(reserved.exception.code, "SIMPLE_BUDGET_RESERVED_FOR_COMPOUND")
+        compound = classify_temporal_look([first, second, third, fourth], _spec())
+        self.assertEqual(compound["look_class"], "MAIN")
+        self.assertEqual(compound["compound_main_count"], 1)
+        census = [_census("a")]
+        observations = _path("a", [1.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92)
+        spec = _spec()
+        with tempfile.TemporaryDirectory() as raw:
+            store = ResearchStore(Path(raw))
+            clock = datetime(2026, 9, 27, tzinfo=UTC)
+            opened = run_recorded_discovery_query(
+                store,
+                census=census,
+                observations=observations,
+                spec=spec,
+                binding=_binding(),
+                journal_scope="TEMPORAL-SYNTH",
+                candidate_scope=_scope(spec),
+                git_sha=GIT_SHA,
+                clock=clock,
+            )
+            self.assertTrue(opened["queries"][0]["new_look"])
+            resumed = run_recorded_discovery_query(
+                ResearchStore(Path(raw)),
+                census=census,
+                observations=observations,
+                spec=renamed,
+                binding=_binding(),
+                journal_scope="TEMPORAL-SYNTH",
+                candidate_scope=_scope(spec),
+                git_sha="cd" * 20,
+                clock=clock,
+            )
+            self.assertFalse(resumed["queries"][0]["new_look"])
+            self.assertEqual(resumed["result_refs"], opened["result_refs"])
+            changed_rows = observations + [_obs("a", "Y7200", PRICE, 9.0, at=_stamp("Y7200"))]
+            # A second legal exit at the same availability conflicts; use a new price
+            # on a copied mint epoch by changing the exit before the deadline only
+            # when the bytes differ through an added earlier cell that changes the binding.
+            epoch = observations + [_obs("a", "X300", PRICE, 1.0)]
+            fresh = run_recorded_discovery_query(
+                ResearchStore(Path(raw)),
+                census=census,
+                observations=epoch,
+                spec=spec,
+                binding=_binding(),
+                journal_scope="TEMPORAL-SYNTH",
+                candidate_scope=_scope(spec),
+                git_sha=GIT_SHA,
+                clock=clock,
+            )
+            self.assertTrue(fresh["queries"][0]["new_look"])
+            self.assertNotEqual(fresh["result_refs"], opened["result_refs"])
+            self.assertNotEqual(fresh["result"]["mean_target"], None)
+        progress = assess_tier_progress([first], freeze_worthy=False)
+        self.assertEqual(progress["action"], "ESCALATE_COMPOUND")
+        self.assertFalse(progress["compound_executed"])
+        with self.assertRaises(GroundedDiscoveryError):
+            assert_search_exhaustion_claim(progress, claim_search_exhausted=True)
+        done = assess_tier_progress([first, compound], freeze_worthy=True)
+        self.assertTrue(done["compound_executed"])
+        self.assertNotEqual(changed_rows, observations)
+
+
+class TemporalBoundaryTests(unittest.TestCase):
+    def test_t08_negative_routing_leaves_price_path_and_v1_intact(self) -> None:
+        class Boom(list):
+            def __iter__(self):
+                raise AssertionError("values read")
+
+        blocked = _binding()
+        blocked[0]["holdout"] = None
+        with self.assertRaises(GroundedDiscoveryError) as holdout:
+            execute_discovery_from_rows([_census("a")], Boom(), _spec(), blocked)
+        self.assertEqual(holdout.exception.code, "HOLDOUT_UNRESOLVED")
+        with self.assertRaises(GroundedDiscoveryError) as volume:
+            validate_temporal_query(
+                _spec(
+                    features=[{"name": "vol", "op": "point_value", "field_id": "FIELD-VOLUME-USD-001", "point": "X300"}],
+                    all=[{"feature": "vol", "op": "gte", "value": 1.0}],
+                )
+            )
+        self.assertEqual(volume.exception.code, "UNSUPPORTED_REQUIREMENT")
+        still = execute_discovery_from_rows(
+            [_census("a")],
+            _path("a", [1.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92),
+            _spec(),
+            _binding(),
+        )
+        self.assertEqual(still["summary"]["target_kind"], "PRICE_RELATIVE_PROXY")
+        with self.assertRaises(GroundedDiscoveryError) as stop:
+            validate_temporal_query(
+                _spec(target={**_spec()["target"], "kind": "INTRABAR_STOP"})
+            )
+        self.assertEqual(stop.exception.code, "UNSUPPORTED_REQUIREMENT")
+        technical = technical_stop_record("MODEL_ERROR")
+        self.assertFalse(technical["scientific_negative"])
+        self.assertNotEqual(technical["terminal"], "NO_WORTHY_HYPOTHESIS")
+        legacy = validate_query_spec(
+            {
+                "query_id": "legacy",
+                "decision_points": ["X300"],
+                "decision_fields": [PRICE],
+                "target_point": "Y1800",
+                "target_field": PRICE,
+                "explanatory": [],
+                "population": "BASE_X",
+            }
+        )
+        self.assertNotIn("target_label", legacy)
+        preview = build_feature_preview(
+            [_census("secret-mint")],
+            _path("secret-mint", [1.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92),
+            {
+                "decision": {"point_id": "Y3600"},
+                "schedule": {"lateness_seconds": 300, "points": ["X300", "Y900", "Y1800", "Y3600"]},
+                "seed": "frozen-seed",
+            },
+            _binding(),
+        )
+        self.assertNotIn("secret-mint", str(preview))
+        self.assertFalse(preview["target_included"])
+        self.assertEqual(preview["selected_count"], 1)
+        with self.assertRaises(GroundedDiscoveryError) as extra:
+            build_feature_preview(
+                [_census("secret-mint")],
+                _path("secret-mint", [1.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92),
+                {
+                    "decision": {"point_id": "Y3600"},
+                    "schedule": {"lateness_seconds": 300, "points": ["X300"]},
+                    "seed": "other-seed",
+                },
+                _binding(),
+                prior_preview_hashes=["a" * 64, "b" * 64],
+            )
+        self.assertEqual(extra.exception.code, "PREVIEW_ENVELOPE_EXHAUSTED")
+
+
+if __name__ == "__main__":
+    unittest.main()

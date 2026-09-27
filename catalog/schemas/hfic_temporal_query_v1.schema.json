@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/hfic_temporal_query_v1.schema.json",
+  "title": "HFIC temporal query",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema", "schema_version", "query_id", "population", "search_tier", "decision", "schedule", "features", "all", "target", "entry_model"],
+  "properties": {
+    "schema": {"const": "smial.hfic-temporal-query"},
+    "schema_version": {"const": "1.0"},
+    "population": {"const": "BASE_X"},
+    "search_tier": {"enum": ["SIMPLE_SCREEN", "COMPOUND_SCREEN"]},
+    "target": {
+      "type": "object",
+      "required": ["kind", "reference_point", "exit_point", "field_id"],
+      "properties": {
+        "kind": {"const": "PRICE_RELATIVE_PROXY"}
+      }
+    }
+  }
+}

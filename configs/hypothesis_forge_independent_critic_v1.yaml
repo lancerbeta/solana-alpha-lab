@@ -32,6 +32,19 @@ search_budget:
   auto_sessions_per_evidence_epoch: 1
   distinct_focus_sessions_per_evidence_epoch: 3
   same_search_key_replay: RETURN_EXISTING_SESSION
+temporal_discovery:
+  schema: smial.hfic-temporal-query
+  schema_version: '1.0'
+  tiers:
+    - SIMPLE_SCREEN
+    - COMPOUND_SCREEN
+  main_limit: 6
+  adaptive_limit: 2
+  auto_simple_main_cap_before_compound: 3
+  compound_reserved_main: 3
+  max_final_candidates: 6
+  escalation: PRE_FREEZE_WHEN_NO_WORTHY_CANDIDATE
+  terminal_enums_unchanged: true
 identity:
   canonical_content_hash: SHA256
   display_ordinal_is_identity: false

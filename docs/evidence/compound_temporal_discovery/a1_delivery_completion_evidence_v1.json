@@ -1,0 +1,66 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "COMPOUND-TEMPORAL-DISCOVERY-ACCEPTANCE-001",
+  "as_of": "2026-09-27",
+  "task_id": "COMPOUND_TEMPORAL_DISCOVERY_V1",
+  "state_change": "ORDINARY_DISCOVERY_CAN_ESCALATE_TO_COMPOUND_TEMPORAL_QUESTIONS",
+  "base_main": "424e28990478102dc18a259f5509f40ee31d54b1",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "1bfd6388846d085e5a2c9ce157331899764c5be2e3b6a6341be954208a5af825",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "f830d318b12d7a8105ee54d9a5538e3fd257a1851481c8b68370cfa01b06fa9b",
+    "scripts/hypothesis_forge.py": "af77d6b548d9a06a8b857c8acc740b3a6c12541dc6de77088b2dddd224a8627f",
+    "tests/test_hfic_temporal_discovery_v1.py": "e841efc3df3641ad0d2a17a94ceb5652b0c93c03a61a0fb5c295448d9ee042ca",
+    "tests/test_hfic_temporal_owner_path_v1.py": "f9e91ab8d6029933b72fbaba310c40eb436778b1bea4793cfab35d2b4d565ada"
+  },
+  "active_stop_conditions": [
+    "MARKET_FORGE",
+    "MARKET_CRITIC",
+    "PRODUCTION_RDP_EXPERIMENT",
+    "PROVIDER_API_RPC_WSS",
+    "MERGE_WITHOUT_OWNER_PHRASE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/compound_temporal_discovery/a1_delivery_factory_fit_v1.json",
+    "sha256": "550cc9fe41fc66d9951a0466ab50137fc9e1105f7d140870f1b29a1d5cba0b69",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_TEMPORAL_UNIT_AND_OWNER_PATH",
+    "independent_review": {
+      "path": "docs/evidence/compound_temporal_discovery/a1_delivery_independent_review_v1.json",
+      "sha256": "2c8c3fe85bed7020dfafb0eac7062bb0755d7859e797db2796c270f03d19b414",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TEMPORAL_UNIT_AND_OWNER_PATH",
+      "PASS_LEGACY_DISCOVERY_ROWS"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_MARKET_EXECUTION",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "market_execution": "NOT_RUN",
+    "live_store_writes": 0
+  }
+}
