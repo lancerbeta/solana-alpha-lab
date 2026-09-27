@@ -1685,6 +1685,72 @@ def _ordinary_discovery_requested(
     return machine_contract
 
 
+def _bind_selected_look(
+    grounded: Mapping[str, Any],
+    selected_card: Mapping[str, Any],
+    *,
+    store: Any,
+) -> dict[str, Any]:
+    """Keep a confirming look, detach a narrower idea, stop a contradiction.
+
+    The durable look owns its scope. A selected card that names a different
+    target or estimand is not a scientific record. A card that only adds an
+    axis the look left open is saved later as an idea, without that result.
+    """
+
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        card_claim_scope,
+        relate_look_scope,
+        stored_look_scope,
+    )
+
+    look_scope = stored_look_scope(store, grounded) if store is not None else None
+    if look_scope is None:
+        raw = grounded.get("candidate_scope")
+        look_scope = dict(raw) if isinstance(raw, Mapping) else {}
+    relation = relate_look_scope(look_scope, card_claim_scope(selected_card))
+    if relation == "LOOK_SCOPE_CONTRADICTION":
+        raise HficSessionError("LOOK_SCOPE_CONTRADICTION")
+    if relation == "LOOK_SCOPE_MATCH":
+        body = dict(grounded)
+        body["candidate_scope"] = dict(look_scope)
+        body["look_scope_relation"] = relation
+        body["look_confirms_selected"] = True
+        return body
+    kept = {
+        key: value
+        for key, value in grounded.items()
+        if key
+        not in {
+            "result",
+            "result_sha256",
+            "result_refs",
+            "queries",
+            "priors",
+            "prior_scope_relations",
+            "canonical_prior_comparison",
+            "candidate_scope",
+        }
+    }
+    kept["candidate_scope"] = card_claim_scope(selected_card)
+    kept["look_scope_relation"] = relation
+    kept["look_confirms_selected"] = False
+    kept["look_context_result_refs"] = list(grounded.get("result_refs") or [])
+    return kept
+
+
+def _foreign_look_blocks_scientific_terminal(
+    frozen: Mapping[str, Any],
+    critic_result: Mapping[str, Any],
+) -> bool:
+    view = _classifier_frozen_view(frozen, critic_result)
+    packet = view.get("critic_input_packet")
+    if not isinstance(packet, Mapping):
+        return False
+    evidence = packet.get("grounded_evidence")
+    return isinstance(evidence, Mapping) and evidence.get("look_confirms_selected") is False
+
+
 def _enforce_ordinary_grounded_evidence(
     draft: Mapping[str, Any],
     *,
@@ -2004,7 +2070,13 @@ def freeze_draft(
         except (PriorMemoryCapacityError, PriorMemoryUnidentifiedError) as exc:
             raise HficSessionError(exc.code) from exc
     grounded = draft.get("grounded_evidence")
-    if isinstance(grounded, Mapping):
+    if isinstance(grounded, Mapping) and _ordinary_discovery_requested(draft, preflight_receipt):
+        grounded = _bind_selected_look(
+            grounded,
+            selected_card if isinstance(selected_card, Mapping) else {},
+            store=store,
+        )
+    if isinstance(grounded, Mapping) and grounded.get("look_confirms_selected") is not False:
         from solana_alpha_lab.factory.hfic_grounded_discovery import (
             GroundedDiscoveryError,
             bind_prior_scope_evidence,
@@ -2019,6 +2091,8 @@ def freeze_draft(
             )
         except GroundedDiscoveryError as exc:
             raise HficSessionError(exc.code) from exc
+    elif isinstance(grounded, Mapping):
+        packet["grounded_evidence"] = grounded
     if repo_root is not None:
         _validate_json_schema(
             packet,
@@ -6933,6 +7007,15 @@ def finalize_session(
                 critic_result["next"] = "STOP"
             else:
                 raise HficSessionError("CLASSIFIER_TERMINAL_MISMATCH")
+    if _foreign_look_blocks_scientific_terminal(frozen, critic_result) and (
+        terminal in _FINAL_PASS_TERMINALS
+        or (terminal in _KILL_TERMINALS and terminal != "KILL_UNBOUND_EVIDENCE")
+    ):
+        terminal = "KILL_UNBOUND_EVIDENCE"
+        observed_terminal = terminal
+        critic_result = dict(critic_result)
+        critic_result["critic_terminal"] = terminal
+        critic_result["next"] = "STOP"
     if _runner_up_failover_eligible(frozen, existing, terminal):
         if claimed_terminal is not None:
             frozen = {**dict(frozen), "critic_claimed_terminal": claimed_terminal}

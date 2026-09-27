@@ -378,6 +378,10 @@ def compact_forge_prior_entry(
         value = full.get(key)
         if value not in (None, "", [], {}):
             out[key] = value
+    if out.get("memory_status") == MEMORY_TECHNICAL_STOP:
+        out["technical_stop_note"] = (
+            "Технический отказ не является отрицательным рыночным результатом."
+        )
     # actor_counterparty is retained only when mechanism/claim text is absent;
     # otherwise the causal role is already carried by the substantive field.
     mechanism = full.get("mechanism")

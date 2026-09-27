@@ -950,7 +950,16 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             _rebind_runner_up_grounded_evidence(packet, dict(scope))
         self.assertEqual(caught.exception.code, "EXACT_PRIOR_SCOPE_MATCH")
 
-    def _freeze_scoped_runner(self, workspace: Path, *, runner_matches_look: bool) -> dict:
+    def _freeze_scoped_runner(
+        self,
+        workspace: Path,
+        *,
+        runner_matches_look: bool,
+        selected_target: str = "target_A",
+        selected_estimand: str = "estimand_A",
+        scope_estimand: str | None = "estimand_A",
+        expect_freeze_error: str | None = None,
+    ) -> dict:
         from tests.test_hfic_cli import bind_draft, populate_real_c1_c2, run_cli
 
         data_root = workspace / "rdp"
@@ -979,8 +988,8 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             {
                 "label": "HFIC-V12-A-LOOK",
                 "display_ordinal": 1,
-                "estimand": "estimand_A",
-                "target": "target_A",
+                "estimand": selected_estimand,
+                "target": selected_target,
                 "explanatory_condition": "cond_A",
                 "representation_scope": "rep_A",
             }
@@ -1038,21 +1047,18 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             ),
             encoding="utf-8",
         )
-        scope_path.write_text(
-            json.dumps(
-                {
-                    "question_id": "RUNNER_LOOK_GUARD",
-                    "population": "BASE_X",
-                    "decision_timestamp": "X300",
-                    "target": "target_A",
-                    "estimand": "estimand_A",
-                    "explanatory_condition": "cond_A",
-                    "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
-                    "representation_scope": "rep_A",
-                }
-            ),
-            encoding="utf-8",
-        )
+        look_scope = {
+            "question_id": "RUNNER_LOOK_GUARD",
+            "population": "BASE_X",
+            "decision_timestamp": "X300",
+            "target": "target_A",
+            "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+        }
+        if scope_estimand is not None:
+            look_scope["estimand"] = scope_estimand
+            look_scope["explanatory_condition"] = "cond_A"
+            look_scope["representation_scope"] = "rep_A"
+        scope_path.write_text(json.dumps(look_scope), encoding="utf-8")
         journal = str(receipt["search_key_sha256"])
         completed = subprocess.run(
             [
@@ -1118,7 +1124,10 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             "json",
             data_root=data_root,
         )
-        self.assertEqual(frozen_run.returncode, 0, frozen_run.stderr)
+        self.assertEqual(frozen_run.returncode, 0, frozen_run.stderr) if expect_freeze_error is None else self.assertNotEqual(frozen_run.returncode, 0)
+        if expect_freeze_error is not None:
+            self.assertIn(expect_freeze_error, frozen_run.stderr)
+            return {"data_root": data_root, "frozen": None, "evidence": evidence}
         frozen = json.loads(frozen_run.stdout)
         return {"data_root": data_root, "frozen": frozen, "evidence": evidence}
 
@@ -1348,9 +1357,210 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                 )
             self.assertEqual(caught.exception.code, "EXACT_PRIOR_SCOPE_MATCH")
 
+    def test_retry_does_not_rename_look_and_contradiction_stops_freeze(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            session = self._freeze_scoped_runner(
+                workspace,
+                runner_matches_look=False,
+                selected_target="target_B",
+                selected_estimand="estimand_B",
+                expect_freeze_error="LOOK_SCOPE_CONTRADICTION",
+            )
+            evidence = session["evidence"]
+            self.assertEqual(evidence["candidate_scope"]["target"], "target_A")
+            scope_path = workspace / "scope.json"
+            scope_path.write_text(
+                json.dumps(
+                    {
+                        **evidence["candidate_scope"],
+                        "target": "target_RENAMED",
+                        "estimand": "estimand_RENAMED",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            renamed = subprocess.run(
+                [
+                    sys.executable,
+                    "-B",
+                    "scripts/hypothesis_forge.py",
+                    "--root",
+                    str(ROOT),
+                    "--data-root",
+                    str(session["data_root"]),
+                    "discovery-execute",
+                    "--store",
+                    str(session["data_root"]),
+                    "--spec",
+                    str(workspace / "spec.json"),
+                    "--candidate-scope",
+                    str(scope_path),
+                    "--journal-scope",
+                    str(evidence["journal_scope"]),
+                    "--format",
+                    "json",
+                ],
+                cwd=ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                env={**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"},
+            )
+            self.assertEqual(renamed.returncode, 0, renamed.stderr)
+            again = json.loads(renamed.stdout)
+            self.assertEqual(again["candidate_scope"]["target"], "target_A")
+            self.assertEqual(again["candidate_scope"]["estimand"], "estimand_A")
+            self.assertNotEqual(again["requested_candidate_scope"]["target"], "target_A")
+            self.assertEqual(again["look_scope_relation"], "LOOK_SCOPE_CONTRADICTION")
+            self.assertFalse(again["queries"][0]["new_look"])
+            hypothesis_ids = [
+                json.loads(record.payload_json).get("hypothesis_version_id")
+                for record in ResearchStore(session["data_root"]).iter_committed_records()
+                if getattr(record.record_kind, "value", record.record_kind) == "HYPOTHESIS_VERSION"
+            ]
+            self.assertEqual(
+                hypothesis_ids,
+                ["HYP-QUOTE-NATIVE-FRICTION-H900-V1"],
+            )
+
+    def test_narrower_idea_is_saved_without_scientific_pass_or_close(self) -> None:
+        from solana_alpha_lab.factory.hfic_prior_memory import build_prior_memory_snapshot
+        from solana_alpha_lab.factory.hfic_session import finalize_session
+        from tests.test_hfic_cli import critic_result_from_packet_only
+
+        with tempfile.TemporaryDirectory() as raw:
+            session = self._freeze_scoped_runner(
+                Path(raw),
+                runner_matches_look=False,
+                scope_estimand=None,
+                selected_target="target_A",
+                selected_estimand="estimand_narrow",
+            )
+            frozen = session["frozen"]
+            evidence = frozen["critic_input_packet"]["grounded_evidence"]
+            self.assertFalse(evidence.get("look_confirms_selected"))
+            self.assertEqual(evidence.get("look_scope_relation"), "LOOK_SCOPE_NARROWER")
+            self.assertNotIn("result", evidence)
+            self.assertNotIn("result_sha256", evidence)
+            versions = {}
+            for record in ResearchStore(session["data_root"]).iter_committed_records():
+                kind = getattr(record.record_kind, "value", record.record_kind)
+                if kind != "HYPOTHESIS_VERSION":
+                    continue
+                payload = json.loads(record.payload_json)
+                versions[payload["hypothesis_version_id"]] = payload
+            selected = versions[frozen["selected_candidate_id"]]
+            self.assertEqual(selected["estimand"], "estimand_narrow")
+            self.assertEqual(selected["target"], "target_A")
+            store = ResearchStore(session["data_root"])
+            done = finalize_session(
+                frozen,
+                critic_result_from_packet_only(
+                    frozen["critic_input_packet"], "KILL_MECHANISM"
+                ),
+                store=store,
+                repo_root=ROOT,
+                data_root=session["data_root"],
+            )
+            self.assertEqual(
+                done["decisions"][frozen["selected_candidate_id"]]["reason_code"],
+                "KILL_UNBOUND_EVIDENCE",
+            )
+            self.assertNotEqual(done.get("final_session_terminal"), "KILL_MECHANISM")
+            snapshot = build_prior_memory_snapshot(
+                store,
+                store_inventory_digest=store.diagnostics().committed_inventory_sha256,
+            )
+            capsule = next(
+                item
+                for item in snapshot["capsules"]
+                if item["hypothesis_version_id"] == frozen["selected_candidate_id"]
+            )
+            self.assertEqual(capsule["memory_status"], "TECHNICAL_STOP")
+            self.assertNotEqual(capsule["memory_status"], "HARD_CLOSE")
+            from solana_alpha_lab.factory.hfic_prior_memory import compact_forge_prior_entry
+
+            note = compact_forge_prior_entry(
+                frozen["selected_candidate_id"],
+                selected,
+                {"decision_kind": "REJECT", "reason_code": "KILL_UNBOUND_EVIDENCE"},
+            )
+            self.assertEqual(
+                note["technical_stop_note"],
+                "Технический отказ не является отрицательным рыночным результатом.",
+            )
+
+    def test_narrower_idea_cannot_take_scientific_pass(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import (
+            apply_classification,
+            finalize_session,
+        )
+        from tests.test_fast_lane_classifier import submission
+        from tests.test_hfic_cli import critic_result_from_packet_only
+        from tests.test_hfic_one_frozen_runner_up_failover_v1 import _with_selected_feats
+
+        with tempfile.TemporaryDirectory() as raw:
+            session = self._freeze_scoped_runner(
+                Path(raw),
+                runner_matches_look=False,
+                scope_estimand=None,
+                selected_target="target_A",
+                selected_estimand="estimand_narrow",
+            )
+            frozen = session["frozen"]
+            self.assertFalse(
+                frozen["critic_input_packet"]["grounded_evidence"].get("look_confirms_selected")
+            )
+            store = ResearchStore(session["data_root"])
+            waiting = finalize_session(
+                frozen,
+                critic_result_from_packet_only(
+                    frozen["critic_input_packet"], "PASS_TO_CLASSIFICATION"
+                ),
+                store=store,
+                repo_root=ROOT,
+                data_root=session["data_root"],
+            )
+            spec = _with_selected_feats(submission(), frozen["critic_input_packet"])
+            spec["experiment_spec"]["data_bindings"] = [
+                {
+                    "binding_id": "BINDING-DATASET-MISSING-001",
+                    "source_kind": "DATASET_MANIFEST",
+                    "stable_id": "DATASET-MANIFEST-MISSING-001",
+                    "expected_content_sha256_or_dataset_fingerprint": "a" * 64,
+                }
+            ]
+            spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+            done = apply_classification(
+                waiting,
+                spec,
+                store=store,
+                repo_root=ROOT,
+                data_root=session["data_root"],
+            )
+            self.assertEqual(
+                done["decisions"][frozen["selected_candidate_id"]]["reason_code"],
+                "KILL_UNBOUND_EVIDENCE",
+            )
+            self.assertNotIn(
+                done.get("final_session_terminal"),
+                {
+                    "PASS_FAST_LANE_READY",
+                    "PASS_DATA_OPTION_REQUIRED",
+                    "PASS_CHANGE_LANE_REQUIRED",
+                },
+            )
+
     def test_same_scope_runner_up_keeps_ordinary_classification(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             session = self._freeze_scoped_runner(Path(raw), runner_matches_look=True)
+            primary = session["frozen"]["critic_input_packet"]["grounded_evidence"]
+            self.assertTrue(primary.get("look_confirms_selected"))
+            self.assertEqual(primary["candidate_scope"]["target"], "target_A")
+            self.assertEqual(primary["result_refs"], session["evidence"]["result_refs"])
             runner_evidence = session["frozen"]["runner_up_critic_input_packet"][
                 "grounded_evidence"
             ]

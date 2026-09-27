@@ -702,6 +702,80 @@ def classify_query_look(
     }
 
 
+_LOOK_CLAIM_AXES = (
+    "target",
+    "estimand",
+    "explanatory_condition",
+    "representation_scope",
+)
+
+
+def _axis_text(value: object) -> str:
+    return value.strip() if isinstance(value, str) else ""
+
+
+def relate_look_scope(
+    look_scope: Mapping[str, Any] | None,
+    card_scope: Mapping[str, Any] | None,
+) -> str:
+    """How a candidate's claim axes sit on the scope bound to a computed look.
+
+    LOOK_SCOPE_MATCH: the result directly confirms this card.
+    LOOK_SCOPE_NARROWER: the card adds a claim axis the look left open.
+    LOOK_SCOPE_CONTRADICTION: both sides name the same axis differently.
+    LOOK_SCOPE_UNBOUND: the look has no stored claim scope.
+    """
+
+    look = look_scope if isinstance(look_scope, Mapping) else {}
+    card = card_scope if isinstance(card_scope, Mapping) else {}
+    if not any(_axis_text(look.get(key)) for key in _LOOK_CLAIM_AXES):
+        return "LOOK_SCOPE_UNBOUND"
+    shared = False
+    card_adds = False
+    for key in _LOOK_CLAIM_AXES:
+        look_value = _axis_text(look.get(key))
+        card_value = _axis_text(card.get(key))
+        if look_value and card_value and look_value != card_value:
+            return "LOOK_SCOPE_CONTRADICTION"
+        if look_value and card_value:
+            shared = True
+        elif card_value and not look_value:
+            card_adds = True
+    if not shared:
+        return "LOOK_SCOPE_UNBOUND"
+    if card_adds:
+        return "LOOK_SCOPE_NARROWER"
+    return "LOOK_SCOPE_MATCH"
+
+
+def stored_look_scope(store: Any, evidence: Mapping[str, Any]) -> dict[str, Any] | None:
+    """Scope bound to the durable look, not a later label on the evidence object."""
+
+    refs = evidence.get("result_refs")
+    journal = str(evidence.get("journal_scope") or "")
+    if not isinstance(refs, list) or not refs or not journal:
+        return None
+    looks = {str(item.get("record_id") or ""): item for item in list_discovery_looks(store, journal)}
+    last = looks.get(str(refs[-1]))
+    if not isinstance(last, Mapping):
+        return None
+    scope = last.get("candidate_scope")
+    if not isinstance(scope, Mapping):
+        return None
+    return {key: value for key, value in scope.items() if _axis_text(value)}
+
+
+def card_claim_scope(card: Mapping[str, Any] | None) -> dict[str, str]:
+    if not isinstance(card, Mapping):
+        return {}
+    kept: dict[str, str] = {}
+    for key in _LOOK_CLAIM_AXES:
+        value = _axis_text(card.get(key))
+        if value:
+            kept[key] = value
+    return kept
+
+
 def _scope_missing(scope: Mapping[str, Any], *, prefix: str) -> list[str]:
     missing = [
         f"{prefix}{key}"
@@ -1356,6 +1430,16 @@ def run_recorded_discovery_query(
             "main_count": look["main_count"],
             "adaptive_count": look["adaptive_count"],
         }
+        stored = existing.get("candidate_scope") if isinstance(existing, Mapping) else None
+        relation = relate_look_scope(
+            stored if isinstance(stored, Mapping) else {},
+            candidate_scope,
+        )
+        if isinstance(stored, Mapping) and relation != "LOOK_SCOPE_UNBOUND":
+            confirming = {key: value for key, value in stored.items() if _axis_text(value)}
+        else:
+            confirming = {}
+            relation = "LOOK_SCOPE_UNBOUND"
     else:
         record_id = f"HFIC-ART-DISCOVERY-{identity[:40].upper()}"
         budget = look
@@ -1373,7 +1457,10 @@ def run_recorded_discovery_query(
             look=look,
             git_sha=git_sha,
             clock=clock,
+            candidate_scope=candidate_scope,
         )
+        confirming = dict(candidate_scope)
+        relation = "LOOK_SCOPE_MATCH"
     evidence = {
         "contract_version": DISCOVERY_CONTRACT_VERSION,
         "calculation_version": CALCULATION_VERSION,
@@ -1397,10 +1484,13 @@ def run_recorded_discovery_query(
             "main_limit": MAX_MAIN_QUERY_SPECS,
             "adaptive_limit": MAX_ADAPTIVE_REFINEMENTS,
         },
-        "candidate_scope": dict(candidate_scope),
+        "candidate_scope": confirming,
+        "look_scope_relation": relation,
         "priors": [dict(item) for item in (priors or [])],
         "scientific_slot_reserved": False,
     }
+    if existing is not None:
+        evidence["requested_candidate_scope"] = dict(candidate_scope)
     return assert_computed_grounded_evidence(store, evidence)
 
 
@@ -1425,6 +1515,7 @@ def _append_discovery_look(
     look: Mapping[str, Any],
     git_sha: str,
     clock: datetime | None,
+    candidate_scope: Mapping[str, Any] | None = None,
 ) -> None:
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
@@ -1446,6 +1537,11 @@ def _append_discovery_look(
         "look_class": look.get("look_class"),
         "new_look": True,
         "scientific_slot_reserved": False,
+        "candidate_scope": {
+            key: value
+            for key, value in dict(candidate_scope or {}).items()
+            if _axis_text(value)
+        },
     }
     canonical = _canonical(body)
     payload = {
