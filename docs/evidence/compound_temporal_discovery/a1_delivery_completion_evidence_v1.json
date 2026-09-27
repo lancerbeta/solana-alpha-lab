@@ -16,25 +16,33 @@
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "cec4eab8a372e478167544addb87f8c0d4ef7a2b066cf97fbfd24f3b6bc69414",
     ".cursor/commands/hypothesis-forge.md": "841b0e34bd9db2b602a889d3ee1e2143eb8bcc0b59ecaf9ed615985f6d81147a",
-    "catalog/assets/core.yaml": "af693fc22957df98657d2ad918ae86a29c798d527b8edf9e32d97e3b9caa057d",
+    "catalog/assets/core.yaml": "0dd0a64142e4743cc45bfe8dea66c07ab55ab98ea85ebc37f70e5155eb18008e",
+    "catalog/assets/lifecycle.yaml": "f15c9abe397fb4316d3a886d0516ef368fbceda0594d1827c9fd1471ae41d151",
+    "catalog/catalog_manifest.yaml": "d94de30b8528c39a00cb607b2ae520dddae4b0def1360d028c220bbb9dbad051",
+    "catalog/generated/asset_edges.json": "5a3cf27f0e2ba216fb7addddefd48b1e709bbc00e62eb7c853cc1108fc2b5dff",
     "catalog/schemas/hfic_temporal_query_v1.schema.json": "dff61269698427edc8ec2143d564bb25f0be90d280758c3cecab1ebd65270e6b",
     "configs/experiment_capability_registry_v2.yaml": "49edf7b770d37db38edb89a49dcb66f73b6212d62642cda2faa14880456e4430",
     "configs/hypothesis_forge_independent_critic_v1.yaml": "e76ec851c88b9198a9ea04a58a7d68f77d93aaf0f8910c4600c8a9949ef47a06",
+    "docs/PROJECT_MAP.md": "1728b1fe06fb2acbe31a5c12f25891a268bca9fee543b8b22d5a174209e92fce",
     "docs/evidence/compound_temporal_discovery/agent_attempt_1_critic.json": "0c367747867c3fb2ca1ef2d53dcb3b1778ca9ee27d98528f897902f03e832ab8",
     "docs/evidence/compound_temporal_discovery/agent_attempt_1_query.json": "d28237021e20bd90698207e3962e733363c4bfc0ab4fa2b1b24a9a66f4870b80",
     "docs/evidence/compound_temporal_discovery/agent_attempt_1_result.json": "5e14fc368bc3efb90f2bf0fc6e8687c00d172a64e44088f615b8132c085436d1",
     "docs/evidence/compound_temporal_discovery/execution_evidence_v1.json": "dbcc4286a5bcae2aea0bbb9d95b841a2a876bbb8a493a724457e94e19e9a6c9a",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "e3b7c0521cff1ed584ca13ed3a96258bc4568e144c80a7758d2f3a3f54d6732a",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "fe6c555da5acc83def9433186b43582448be086d769db64ebdefa6d0fc883def",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "cf21a585b21de5a8dc88f39b0acf06515e98a0723306fea74464607e709da8d9",
     "docs/reports/compound_temporal_discovery/a1_owner_readout_v1.md": "3c0586701e310cb4631905db199fd1b49453bd0b62dc5425b55f9888d0fa192e",
-    "docs/tasks/COMPOUND_TEMPORAL_DISCOVERY_V1.md": "4955177f6d40d47b46cdfe4b0f9ed946e786d2916a6d3930cdb269b0741e11ff",
+    "docs/tasks/COMPOUND_TEMPORAL_DISCOVERY_V1.md": "4deb52380c69ddbaeccefaa97693e5912c71dbab3fea27e4f8e0f3337022d118",
     "scripts/hypothesis_forge.py": "af77d6b548d9a06a8b857c8acc740b3a6c12541dc6de77088b2dddd224a8627f",
-    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "f830d318b12d7a8105ee54d9a5538e3fd257a1851481c8b68370cfa01b06fa9b",
-    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "1bfd6388846d085e5a2c9ce157331899764c5be2e3b6a6341be954208a5af825",
-    "tests/oracle_temporal_arithmetic_v1.py": "f74d5e59ca1d70162b3356c85a92a05c90b98db12d83a9a39d26ae49b8150ac8",
+    "src/solana_alpha_lab/factory/capabilities.py": "6e88094c7bb9f9bbd13cd5316c8ac20001592eb1782fe1243b805fe949814e13",
+    "src/solana_alpha_lab/factory/document_runner.py": "b4528d97bb157fdc8f17e9686d4fe5f7c9be4d51b9aab7281c67e3b4ebba4eb3",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "ad621f4a0f5f0a00f8b303a967564c26d9ad591c20c89714f7ed5b76947723f7",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "8daab29782abefa659f450d2f0af147012deec80f8de8aa983d05a08515d2e82",
+    "src/solana_alpha_lab/factory/lane_classifier.py": "c310bc8e6aef354de17fb844f9bff0398e74e3589ee82bc299d95a6a055379f4",
+    "tests/oracle_temporal_arithmetic_v1.py": "127fca216acbb233dc681487129e1992eb75289023f540fa7d380bb48ee0837d",
     "tests/test_discovery_evidence_release_bridge.py": "b775d46d795ac08d1177462930ff6cbad383476af2d421e59ebdfe7764b5a532",
-    "tests/test_hfic_temporal_discovery_v1.py": "e841efc3df3641ad0d2a17a94ceb5652b0c93c03a61a0fb5c295448d9ee042ca",
-    "tests/test_hfic_temporal_owner_path_v1.py": "f9e91ab8d6029933b72fbaba310c40eb436778b1bea4793cfab35d2b4d565ada"
+    "tests/test_hfic_temporal_discovery_v1.py": "8c2e5d50edd6a5dd71939700157daf1458d0890a33e97d44756d21935ef49c0f",
+    "tests/test_hfic_temporal_owner_path_v1.py": "f9e91ab8d6029933b72fbaba310c40eb436778b1bea4793cfab35d2b4d565ada",
+    "tests/test_hfic_temporal_production_runner_v1.py": "6a1d13a7d48e25c7c0fd1e57990376a6368ce1b21f990aad676fc745f21630ab"
   },
   "active_stop_conditions": [
     "MARKET_FORGE",
@@ -52,14 +60,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/compound_temporal_discovery/a1_delivery_factory_fit_v1.json",
-    "sha256": "e397ee5ca6b42c6a1b5f7d4c34d17f685aba82b501af948cce50ad24c56b049e",
+    "sha256": "15ec15d104cf42b6442c4ebd112cb6339276f76edeabe5e40277be947ba887f1",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_TEMPORAL_UNIT_AND_OWNER_PATH",
     "independent_review": {
       "path": "docs/evidence/compound_temporal_discovery/a1_delivery_independent_review_v1.json",
-      "sha256": "9fe2fefada277ed92e6e2f0ff8c08d2bd5ec94e5cc4c13db983433b3ab9a5603",
+      "sha256": "458984ea53ac6d17314a1691baaea01241f1e8cec4d085ed1bbd641a2ec91aaa",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
