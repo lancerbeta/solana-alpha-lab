@@ -17,29 +17,29 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Stored KILL_UNBOUND_EVIDENCE stays the terminal and still blocks a false scientific pass. The next snapshot maps that reason to TECHNICAL_STOP for Prompt A and Critic, including previously recorded decisions. The same scope does not raise EXACT_PRIOR_SCOPE_MATCH. KILL_MECHANISM still blocks."
+        "A repeated spec returns the stored look scope. Freeze raises LOOK_SCOPE_CONTRADICTION before a scientific record. A narrower idea is saved with look_confirms_selected false, so PASS_TO_CLASSIFICATION and a scientific kill become KILL_UNBOUND_EVIDENCE. A matching scope keeps the confirming result, including a same-scope runner-up rebound from the original evidence."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "The unlinked runner-up path ends KILL_UNBOUND_EVIDENCE and the rebuilt snapshot and ranked prior are TECHNICAL_STOP, so the same scope is not an exact close. A recorded KILL_MECHANISM on that scope stays HARD_CLOSE and raises EXACT_PRIOR_SCOPE_MATCH."
+        "Contradiction stops freeze and does not add a hypothesis version. A narrower idea does not enter AWAITING_CLASSIFICATION and a KILL_MECHANISM on that foreign look becomes TECHNICAL_STOP. A matching scope keeps result refs and the ordinary classify path."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=94c12bb7298f78d81265cb480b7d1b9dd7d7d57c70108a8a89cbee4d22f421b4",
-        "KILL_UNBOUND_EVIDENCE projects to TECHNICAL_STOP and does not become HARD_CLOSE or EXACT_PRIOR_SCOPE_MATCH. The stored terminal is not rewritten. KILL_MECHANISM on the same scope still blocks."
+        "packet_fingerprint_sha256=451b8321f412ad285bd72add1f053b19bb299ce6f0d8fa6ba53f379720475b26",
+        "A look with claim axes is not renamed by a repeated spec. A contradictory selected card cannot freeze. A narrower idea cannot reach AWAITING_CLASSIFICATION or a scientific PASS or KILL on the foreign look."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Readout, operator list, and critic skill name TECHNICAL_STOP for a recorded KILL_UNBOUND_EVIDENCE and do not call it HARD_CLOSE. No new owner hand step."
+        "The readout separates contradiction, a narrower idea, and a matching scope. Prompt A and the Critic config say a technical refusal is not a negative market result. No new owner hand step."
       ]
     }
   ],
