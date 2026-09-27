@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -444,6 +445,38 @@ def _cohort_partitions(directory: Path, census: list, observations: list):
     return argv, cohorts, files
 
 
+def _discovery_execute_published(store: Path, spec: Path, scope: Path, journal: str, extra: list[str]):
+    return subprocess.run(
+        [
+            sys.executable,
+            "-B",
+            "scripts/hypothesis_forge.py",
+            "--root",
+            str(ROOT),
+            "--data-root",
+            str(store),
+            "discovery-execute",
+            "--store",
+            str(store),
+            *extra,
+            "--spec",
+            str(spec),
+            "--candidate-scope",
+            str(scope),
+            "--journal-scope",
+            journal,
+            "--format",
+            "json",
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+
+
 def _discovery_execute(store: Path, binding: Path, spec: Path, scope: Path, journal: str, extra: list[str]):
     return subprocess.run(
         [
@@ -798,6 +831,9 @@ class OrdinaryOwnerPathTests(unittest.TestCase):
                 check=False,
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
+                env={**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"},
             )
             self.assertEqual(raw_preflight.returncode, 0, raw_preflight.stderr)
             stamped = json.loads(raw_preflight.stdout)
@@ -946,44 +982,48 @@ class OrdinaryOwnerPathTests(unittest.TestCase):
                     )
                 self.assertEqual(str(missing.exception), "GROUNDED_EVIDENCE_REQUIRED")
 
-            census, observations = _rows()
-            argv, cohorts, files = _cohort_partitions(workspace, census, observations)
-            self.assertEqual(len({item["census_sha256"] for item in cohorts}), 2)
-            binding_path = workspace / "binding.json"
+            bound = run_cli(
+                "discovery-binding",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(bound.returncode, 0, bound.stderr)
+            published = json.loads(bound.stdout)
+            self.assertFalse(published["values_loaded"])
+            self.assertTrue(published["holdout_derived_from_discovery_contract"])
+            self.assertGreaterEqual(len(published["cohorts"]), 2)
             spec_path = workspace / "spec.json"
             scope_path = workspace / "scope.json"
-            binding_path.write_text(json.dumps({"cohorts": cohorts}), encoding="utf-8")
             spec_path.write_text(json.dumps(_spec()), encoding="utf-8")
             scope_path.write_text(json.dumps(_scope()), encoding="utf-8")
             journal = str(receipt["search_key_sha256"])
-            cohort_ids = list(files)
-            swapped = []
-            for cohort_id in cohort_ids:
-                other = cohort_ids[1] if cohort_id == cohort_ids[0] else cohort_ids[0]
-                swapped.extend(
-                    [
-                        "--cohort-partition",
-                        cohort_id,
-                        str(files[other][0]),
-                        str(files[cohort_id][1]),
-                    ]
-                )
-            blocked = _discovery_execute(
-                data_root, binding_path, spec_path, scope_path, journal, swapped
+            left, right = published["cohorts"][0], published["cohorts"][1]
+            swapped = [
+                "--cohort-partition",
+                left["cohort_id"],
+                str(data_root / right["census_rel"]),
+                str(data_root / left["observations_rel"]),
+            ]
+            blocked = _discovery_execute_published(
+                data_root, spec_path, scope_path, journal, swapped
             )
             self.assertNotEqual(blocked.returncode, 0, blocked.stdout)
             self.assertIn("BINDING_HASH_MISMATCH", blocked.stderr)
-            census_path = files[cohort_ids[0]][0]
+            census_path = data_root / left["census_rel"]
             original = census_path.read_bytes()
             census_path.write_bytes(original + b"\x00")
-            tampered = _discovery_execute(
-                data_root, binding_path, spec_path, scope_path, journal, argv
+            tampered = _discovery_execute_published(
+                data_root, spec_path, scope_path, journal, []
             )
             self.assertNotEqual(tampered.returncode, 0, tampered.stdout)
-            self.assertIn("BINDING_HASH_MISMATCH", tampered.stderr)
+            self.assertTrue(
+                "BINDING_HASH_MISMATCH" in tampered.stderr
+                or "DISCOVERY_ARTIFACT_MISSING" in tampered.stderr
+            )
             census_path.write_bytes(original)
-            completed = _discovery_execute(
-                data_root, binding_path, spec_path, scope_path, journal, argv
+            completed = _discovery_execute_published(
+                data_root, spec_path, scope_path, journal, []
             )
             self.assertEqual(completed.returncode, 0, completed.stderr)
             evidence = json.loads(completed.stdout)
@@ -1104,8 +1144,8 @@ class OrdinaryOwnerPathTests(unittest.TestCase):
             self.assertIn("owner_readout", shown_payload)
             self.assertEqual(shown_payload.get("session_id"), session_id)
             self.assertEqual(shown_payload.get("session_state"), "SYNTHESIS_COMPLETE")
-            restarted = _discovery_execute(
-                data_root, binding_path, spec_path, scope_path, journal, argv
+            restarted = _discovery_execute_published(
+                data_root, spec_path, scope_path, journal, []
             )
             self.assertEqual(restarted.returncode, 0, restarted.stderr)
             restarted_payload = json.loads(restarted.stdout)

@@ -751,8 +751,6 @@ def cmd_discovery_execute(
     if binding_doc is not None and not isinstance(binding_doc, dict):
         return emit_error("DISCOVERY_INPUT_INVALID")
     data_root = explicit_data_root
-    if data_root is None and binding_doc is None:
-        data_root = store_root
     try:
         loaded = load_admitted_partition_rows(
             data_root=data_root,

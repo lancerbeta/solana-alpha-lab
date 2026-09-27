@@ -339,6 +339,30 @@ def load_admitted_partition_rows(
     cohorts = binding_doc.get("cohorts")
     if not isinstance(cohorts, list):
         raise GroundedDiscoveryError("DISCOVERY_INPUT_INVALID")
+    if binding_doc is not None and data_root is not None:
+        lineage_path = Path(data_root) / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+        if lineage_path.is_file() and not lineage_path.is_symlink():
+            published = resolve_published_discovery_binding(data_root)
+            published_pairs = {
+                (
+                    str(item.get("cohort_id")),
+                    str(item.get("census_sha256")),
+                    str(item.get("observations_sha256")),
+                )
+                for item in published["cohorts"]
+            }
+            for item in cohorts:
+                if not isinstance(item, Mapping):
+                    raise GroundedDiscoveryError("DISCOVERY_BINDING_INCOMPLETE")
+                pair = (
+                    str(item.get("cohort_id")),
+                    str(item.get("census_sha256")),
+                    str(item.get("observations_sha256")),
+                )
+                if pair not in published_pairs:
+                    raise GroundedDiscoveryError("DISCOVERY_AUTHORITY_ABSENT")
+            binding_doc = published
+            cohorts = published["cohorts"]
     admit_discovery_binding(cohorts)
     by_cohort = {str(item.get("cohort_id")): item for item in cohorts if isinstance(item, Mapping)}
     supplied = list(partitions or [])
@@ -698,7 +722,7 @@ def _non_blocking_prior(prior: Mapping[str, Any]) -> bool:
         return True
     if reason in _NON_BLOCKING_REASONS or reason.startswith("PARK_"):
         return True
-    if reason.endswith("_STOP") or reason in {"OBSERVABILITY_BLOCKED", "INPUT_NOT_READY"}:
+    if reason in {"OBSERVABILITY_BLOCKED", "INPUT_NOT_READY", "HOLDOUT_UNRESOLVED"}:
         return True
     return False
 
@@ -711,6 +735,23 @@ def _valid_close(prior: Mapping[str, Any]) -> bool:
     if status == "HARD_CLOSE":
         return True
     return reason.startswith("KILL_") or reason.startswith("CLOSE_")
+
+
+def _near_close_unresolved(candidate: Mapping[str, Any], prior: Mapping[str, Any]) -> bool:
+    """A close with several matching axes and one gap is not a free pass."""
+
+    if not _valid_close(prior):
+        return False
+    present = [
+        key
+        for key in _CONTENT_AXES
+        if prior.get(key) not in (None, "")
+    ]
+    if len(present) < 3:
+        return False
+    return all(candidate.get(key) == prior.get(key) for key in present) and len(
+        present
+    ) < len(_CONTENT_AXES)
 
 
 def _merge_scope_priors(
@@ -763,6 +804,10 @@ def bind_prior_scope_evidence(
         relation = prior_scope_relation(candidate_scope, prior)
         if relation in _BLOCKING_RELATIONS:
             raise GroundedDiscoveryError("EXACT_PRIOR_SCOPE_MATCH")
+        if relation == "UNKNOWN_SCOPE_NEEDS_RESOLUTION" and _near_close_unresolved(
+            candidate_scope, prior
+        ):
+            raise GroundedDiscoveryError("UNKNOWN_PRIOR_SCOPE")
         if _non_blocking_prior(prior) and relation == "UNKNOWN_SCOPE_NEEDS_RESOLUTION":
             relation = "NON_BLOCKING_PRIOR"
         relations.append(

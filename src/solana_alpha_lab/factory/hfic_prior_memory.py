@@ -522,9 +522,6 @@ def _fill_scope_from_session(
     if not isinstance(slot, Mapping):
         return
     sources: list[Mapping[str, Any]] = []
-    scope = slot.get("discovery_candidate_scope")
-    if isinstance(scope, Mapping):
-        sources.append(scope)
     candidate_id = str(payload.get("hypothesis_version_id") or "")
     candidates = slot.get("candidates")
     if isinstance(candidates, Mapping) and isinstance(candidates.get(candidate_id), Mapping):
