@@ -33441,7 +33441,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_discovery_evidence_release_bridge.py', repository_path: tests/test_discovery_evidence_release_bridge.py}
-  integrity: {kind: sha256, sha256: 2f6d3044f3a043fcae5dc777689695d2fabdfafd81174fc281be7b72e678391f}
+  integrity: {kind: sha256, sha256: b775d46d795ac08d1177462930ff6cbad383476af2d421e59ebdfe7764b5a532}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001}

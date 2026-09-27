@@ -87,7 +87,12 @@ class DiscoveryEvidenceReleaseBridgeTests(unittest.TestCase):
         proof = assert_capability_registry_v2_superset(ROOT)
         self.assertEqual(
             proof["intentional_v2_additions"],
-            ["CAP-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001", "CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001", "CAP-OBSERVATION-SCHEDULE-COMPILE-BIND-001"],
+            [
+                "CAP-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001",
+                "CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001",
+                "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+                "CAP-OBSERVATION-SCHEDULE-COMPILE-BIND-001",
+            ],
         )
         self.assertEqual(
             proof["active_registry"],

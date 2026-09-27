@@ -46,6 +46,7 @@ managed_write_set:
   - tests/oracle_temporal_arithmetic_v1.py
   - tests/test_hfic_temporal_discovery_v1.py
   - tests/test_hfic_temporal_owner_path_v1.py
+  - tests/test_discovery_evidence_release_bridge.py
   - docs/evidence/compound_temporal_discovery/agent_attempt_1_query.json
   - docs/evidence/compound_temporal_discovery/agent_attempt_1_result.json
   - docs/evidence/compound_temporal_discovery/agent_attempt_1_critic.json
