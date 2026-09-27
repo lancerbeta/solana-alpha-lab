@@ -13,7 +13,22 @@
     "kind": "NO_CHANGE"
   },
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "3bb87edb38f0fd9a18160d324c4bcbad1f8fdaa551f9883b1b4ee1178bb68b0a",
+    ".cursor/commands/hypothesis-forge.md": "ad9a81428819a83836514e8020faf3416f28a6957766f86f98805670aed440bd",
+    "catalog/assets/core.yaml": "9966aa1a27d9ab40aa717b220656559a1f90bf48a5ddbafe439e56bd4ee65d3d",
+    "catalog/schemas/hypothesis_critic_input_v1.schema.json": "7bc5fee2b1103635421b917e46a72448c66dbed7ff8529156f19166d97d12c72",
+    "docs/evidence/forge_runtime_discovery_binding_repair/a1_live_binding_readback_v1.json": "08664fc90618e3073c931a13f5eae94a84ea8615b57a23b7a2e4b1ebba5b11b1",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "8be3cf45ba34d791979d37b38a5d4d948f94b0415174980cb1c75c7310ea3e9b",
+    "docs/reports/forge_runtime_discovery_binding_repair/a1_owner_readout_v1.md": "b1761607d03b9ff6aae1a7627d52d661890af6aa007a84d2bbe8fd48d1cf8aa0",
+    "docs/tasks/FORGE_RUNTIME_DISCOVERY_BINDING_REPAIR_V1.md": "551c3d7a2f2778d596b42b3bd7693aacd8bcb8765b503f37a7a7457ad8178c86",
+    "scripts/hypothesis_forge.py": "95aad2a5aaa7d3b2fa2a472afe52f2aa5214fc8a66ffe4debcbd3e55f8206faf",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "dbace633f25f70b57f817bd748afc88bd3ae60f5f5ebbc058880d35ad151e4d1",
+    "src/solana_alpha_lab/factory/hfic_prior_memory.py": "94b7b3283e5b68db78b334eca9da05c895c715eda9ba53e5c3cffcc7e4f04af0",
+    "src/solana_alpha_lab/factory/hfic_session.py": "2a5540072ef63abe49d94a31857f2d055781a79ad5dab05dbf9ed7b83e33cdc8",
+    "tests/test_forge_runtime_discovery_binding_v1.py": "d7f2ab886e82c9e1ce83e3fa16ac464eadb77e094e17da94ff1d05f50b5db426",
+    "tests/test_hfic_grounded_discovery_v1.py": "41344ab04959936f2da63a45fd9b49d60753d12f56a1842972efa94b9c436734"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -24,14 +39,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_runtime_discovery_binding_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "d519c2fbe4b9e0b887f08df5de032ddf490e4982908e74a0e9c4acc122502b2d",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PUBLISHED_BINDING_AND_OWNER_FINAL_TESTS",
     "independent_review": {
       "path": "docs/evidence/forge_runtime_discovery_binding_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "c32af10e598d00e8f2d7701500bb8697ea3ca2cad37b398c290003c31b71f7c2",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
