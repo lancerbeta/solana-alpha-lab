@@ -4,8 +4,8 @@
   "review_id": "FORGE-RUNTIME-DISCOVERY-BINDING-REPAIR-REVIEW-001",
   "as_of": "2026-09-27",
   "task_id": "FORGE_RUNTIME_DISCOVERY_BINDING_REPAIR_V1",
-  "reviewed_bindings_sha256": "b7d5ef7a06f2ba48a8cf4f17e15cca9ec9210c2d79b54927f30c9ffcbe104c0d",
-  "reviewed_inventory_sha256": "ffae64d0d91ada3e878aabfa138e9be03abbf580b4869d30259b5721d7beaec5",
+  "reviewed_bindings_sha256": "ba44797268eeb08267ebc21a108d402f3bfed5f12760b0bffc5820cb63ed0488",
+  "reviewed_inventory_sha256": "511a35c80660517aec1686be31b781fd4253d1c5ed4601c22c42689a8335430e",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
