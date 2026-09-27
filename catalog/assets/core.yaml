@@ -37829,7 +37829,7 @@ records:
   as_of: '2026-09-27'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: f85073f54721a6548086dd40efe604d6927ff3160022ba2428310310235a35d2}
+  integrity: {kind: sha256, sha256: d565a9268abac7eefd360931443d6fb270c03206c0a1e1b27c602b033201b485}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}

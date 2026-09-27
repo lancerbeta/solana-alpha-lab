@@ -713,39 +713,123 @@ class TemporalVerticalTests(unittest.TestCase):
                 manifest_binding["expected_content_sha256_or_dataset_fingerprint"],
                 passport["dataset_fingerprints"],
             )
-            foreign = _bind_experiment(compound_evidence["result"]["experiment_recipe"], data_root)
-            for item in foreign["data_bindings"]:
-                if item["source_kind"] == "DATASET_MANIFEST":
-                    item["stable_id"] = "dataset-" + "ab" * 32
-            foreign_decision = classify_lane(
-                {
-                    "experiment_spec": foreign,
-                    "hypothesis_definition_sha256": HYPOTHESIS_DEFINITION_SHA256,
-                },
-                root=ROOT,
-                data_root=data_root,
-                as_of=AS_OF,
+            publish_commissioning_dataset(data_root)
+            from solana_alpha_lab.factory.commissioning_fixture import (
+                COMMISSIONING_DATASET_MANIFEST_ID,
+                commissioning_dataset_fingerprint,
             )
-            foreign_runner = DocumentRunner(
-                root=ROOT,
-                store=OperationalStore(data_root / "ops" / "operational_state.sqlite"),
+            from solana_alpha_lab.factory.hfic_temporal_discovery import (
+                execute_fixed_time_proxy_capability,
             )
-            try:
-                foreign_result = foreign_runner.start_document(
-                    foreign,
-                    spec_sha256=experiment_spec_sha256(foreign),
-                    run_context=RunContext(
-                        data_root=data_root,
-                        hypothesis_definition_sha256=HYPOTHESIS_DEFINITION_SHA256,
-                        lane_decision=foreign_decision,
-                    ),
+
+            loader_calls = {"n": 0}
+
+            def _loader(*_args, **_kwargs):
+                loader_calls["n"] += 1
+                raise AssertionError("value loader")
+
+            def run_blocked(spec: dict):
+                loader_calls["n"] = 0
+                lane = classify_lane(
+                    {
+                        "experiment_spec": spec,
+                        "hypothesis_definition_sha256": HYPOTHESIS_DEFINITION_SHA256,
+                    },
+                    root=ROOT,
+                    data_root=data_root,
+                    as_of=AS_OF,
                 )
-            finally:
-                foreign_runner.store.close()
-            self.assertEqual(foreign_decision.terminal, "BLOCKED_DATA", foreign_decision.reason_codes)
-            self.assertIn("DATA_BINDING_UNAVAILABLE", foreign_decision.reason_codes)
-            self.assertEqual(foreign_result["status"], "BLOCKED_DATA")
-            self.assertNotEqual(foreign_result["status"], "COMPLETE")
+                with patch(
+                    "solana_alpha_lab.factory.hfic_grounded_discovery.load_admitted_partition_rows",
+                    side_effect=_loader,
+                ):
+                    runner = DocumentRunner(
+                        root=ROOT,
+                        store=OperationalStore(data_root / "ops" / "operational_state.sqlite"),
+                    )
+                    try:
+                        outcome = runner.start_document(
+                            spec,
+                            spec_sha256=experiment_spec_sha256(spec),
+                            run_context=RunContext(
+                                data_root=data_root,
+                                hypothesis_definition_sha256=HYPOTHESIS_DEFINITION_SHA256,
+                                lane_decision=lane,
+                            ),
+                        )
+                    finally:
+                        runner.store.close()
+                self.assertEqual(loader_calls["n"], 0)
+                self.assertNotEqual(outcome["status"], "COMPLETE")
+                return lane, outcome
+
+            commissioned = json.loads(json.dumps(experiment))
+            for item in commissioned["data_bindings"]:
+                if item["source_kind"] == "DATASET_MANIFEST":
+                    item["stable_id"] = COMMISSIONING_DATASET_MANIFEST_ID
+                    item["expected_content_sha256_or_dataset_fingerprint"] = (
+                        commissioning_dataset_fingerprint(ROOT)
+                    )
+            commissioned_lane, commissioned_result = run_blocked(commissioned)
+            self.assertEqual(commissioned_lane.terminal, "FAST_LANE_READY", commissioned_lane.reason_codes)
+            self.assertEqual(commissioned_result["status"], "FAILED_INFRA")
+            self.assertIn("MANIFEST_MISMATCH", commissioned_result["reason_codes"])
+            absent = json.loads(json.dumps(experiment))
+            absent["data_bindings"] = [
+                item for item in absent["data_bindings"] if item["source_kind"] != "DATASET_MANIFEST"
+            ]
+            absent_lane, absent_result = run_blocked(absent)
+            self.assertEqual(absent_lane.terminal, "FAST_LANE_READY", absent_lane.reason_codes)
+            self.assertIn("MANIFEST_MISMATCH", absent_result["reason_codes"])
+            undeclared = json.loads(json.dumps(experiment))
+            extra = dict(undeclared["parameters"]["temporal_recipe"]["frozen_input"][0])
+            extra["dataset_manifest_id"] = COMMISSIONING_DATASET_MANIFEST_ID
+            undeclared["parameters"]["temporal_recipe"]["frozen_input"].append(extra)
+            undeclared_lane, undeclared_result = run_blocked(undeclared)
+            self.assertEqual(undeclared_lane.terminal, "FAST_LANE_READY", undeclared_lane.reason_codes)
+            self.assertIn("MANIFEST_MISMATCH", undeclared_result["reason_codes"])
+            duplicate = json.loads(json.dumps(experiment))
+            duplicate["data_bindings"].append(
+                dict(next(item for item in duplicate["data_bindings"] if item["source_kind"] == "DATASET_MANIFEST"))
+            )
+            duplicate["data_bindings"][-1]["binding_id"] = "BINDING-TEMPORAL-CORPUS-DUP"
+            duplicate_lane, duplicate_result = run_blocked(duplicate)
+            self.assertNotEqual(duplicate_result["status"], "COMPLETE")
+            self.assertTrue(
+                "DATA_BINDING_DUPLICATE" in duplicate_lane.reason_codes
+                or "MANIFEST_MISMATCH" in duplicate_result["reason_codes"]
+            )
+            wrong = json.loads(json.dumps(experiment))
+            for item in wrong["data_bindings"]:
+                if item["source_kind"] == "DATASET_MANIFEST":
+                    item["expected_content_sha256_or_dataset_fingerprint"] = "ab" * 32
+            wrong_lane, wrong_result = run_blocked(wrong)
+            self.assertNotEqual(wrong_result["status"], "COMPLETE")
+            self.assertTrue(
+                "EVIDENCE_HASH_MISMATCH" in wrong_lane.reason_codes
+                or "MANIFEST_MISMATCH" in wrong_result["reason_codes"]
+            )
+            with patch(
+                "solana_alpha_lab.factory.hfic_grounded_discovery.load_admitted_partition_rows",
+                side_effect=_loader,
+            ):
+                loader_calls["n"] = 0
+                with self.assertRaises(GroundedDiscoveryError) as wrapped:
+                    execute_fixed_time_proxy_capability(
+                        {
+                            "experiment_recipe": compound_evidence["result"]["experiment_recipe"],
+                            "data_bindings": absent["data_bindings"],
+                            "availability_cutoff": experiment["availability_cutoff"],
+                        },
+                        root=ROOT,
+                        capture_hooks={"data_root": data_root},
+                    )
+            self.assertEqual(str(wrapped.exception), "MANIFEST_MISMATCH")
+            self.assertEqual(loader_calls["n"], 0)
+            self.assertEqual(
+                json.loads(artifact.read_text(encoding="utf-8"))["capability_result"]["summary"]["mean_target"],
+                saved_summary["mean_target"],
+            )
             early = _bind_experiment(compound_evidence["result"]["experiment_recipe"], data_root)
             early["availability_cutoff"] = "2020-01-01T00:00:00Z"
             early_decision = classify_lane(

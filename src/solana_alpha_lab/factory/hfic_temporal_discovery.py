@@ -1521,10 +1521,16 @@ def _require_manifest_and_cutoff(
     bindings = spec.get("data_bindings")
     if not isinstance(bindings, list):
         raise GroundedDiscoveryError("MANIFEST_MISMATCH")
+    manifest_ids: list[str] = []
+    seen_ids: set[str] = set()
     for item in frozen_input:
-        manifest_id = item.get("dataset_manifest_id")
+        manifest_id = item.get("dataset_manifest_id") if isinstance(item, Mapping) else None
         if not isinstance(manifest_id, str) or not manifest_id:
             raise GroundedDiscoveryError("MANIFEST_MISMATCH")
+        if manifest_id not in seen_ids:
+            seen_ids.add(manifest_id)
+            manifest_ids.append(manifest_id)
+    for manifest_id in manifest_ids:
         match = [
             binding
             for binding in bindings
@@ -1532,14 +1538,14 @@ def _require_manifest_and_cutoff(
             and binding.get("source_kind") == "DATASET_MANIFEST"
             and binding.get("stable_id") == manifest_id
         ]
-        manifest_path = data_root / "datasets" / "manifests" / f"{manifest_id}.json"
-        if len(match) > 1:
+        if len(match) != 1:
             raise GroundedDiscoveryError("MANIFEST_MISMATCH")
+        manifest_path = data_root / "datasets" / "manifests" / f"{manifest_id}.json"
         try:
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         except (OSError, UnicodeError, json.JSONDecodeError) as exc:
             raise GroundedDiscoveryError("MANIFEST_MISMATCH") from exc
-        if match and manifest.get("dataset_fingerprint") != match[0].get(
+        if manifest.get("dataset_fingerprint") != match[0].get(
             "expected_content_sha256_or_dataset_fingerprint"
         ):
             raise GroundedDiscoveryError("MANIFEST_MISMATCH")
@@ -1646,6 +1652,10 @@ def execute_fixed_time_proxy_capability(
         wrapped = spec
     elif isinstance(recipe, Mapping):
         wrapped = {"parameters": {"temporal_recipe": recipe}}
+        if isinstance(spec.get("data_bindings"), list):
+            wrapped["data_bindings"] = spec["data_bindings"]
+        if "availability_cutoff" in spec:
+            wrapped["availability_cutoff"] = spec["availability_cutoff"]
     else:
         raise GroundedDiscoveryError("EXPERIMENT_RECIPE_INVALID")
     computed = run_temporal_fixed_time_from_spec(
