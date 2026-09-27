@@ -4,8 +4,8 @@
   "review_id": "TEMPORAL-COHORT-EVIDENCE-CLOSURE-FACTORY-FIT-001",
   "as_of": "2026-09-28",
   "task_id": "TEMPORAL_COHORT_EVIDENCE_CLOSURE_V1",
-  "reviewed_bindings_sha256": "pending",
-  "reviewed_inventory_sha256": "pending",
+  "reviewed_bindings_sha256": "42eb5a94ea3591a68689e47991bcda1afb023eed19c03510caeb106e10cf9565",
+  "reviewed_inventory_sha256": "a4a79246f6e9239946001a0cf682a5cfb56bfda8535f7edba096db5588f934fb",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {

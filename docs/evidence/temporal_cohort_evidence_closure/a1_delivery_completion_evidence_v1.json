@@ -9,9 +9,20 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "42c378ff4a47e343d551a548f935293c030e8ceb825785a4b944b84063eef4b0",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "af693f1fb267ba00bd32d8e53eda5adef62a788bb561f19d9fd5560c0fcf9bf5",
+    "docs/reports/temporal_cohort_evidence_closure/a1_owner_readout_v1.md": "ed50ac96e545223c810ee7a935d8f463e81fcd070d084eda500d9dc68d4faff2",
+    "docs/tasks/TEMPORAL_COHORT_EVIDENCE_CLOSURE_V1.md": "ab1b9de28ffd7e35ebfbe32a2c896e936d5fe00897268bedc1b177ec3a7810be",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "843db3e7d12cf40a16c1e52474e5309b3f5973ba1f8f9871054fd69685041a49",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "b79f936e7db7a512c7a79af3b14d7f815acb6b2a11793ba8982670f25c609b9b",
+    "tests/test_hfic_temporal_discovery_v1.py": "b18f6f5a7a7fbaec154cac22eb1dc8ecf62c68edf18b5d4604e546c0374f1b63",
+    "tests/test_hfic_temporal_production_runner_v1.py": "c4ddfd0813e1817cbc44b66fa3887fc6116ff7b1699e6f96a60bdb11920edc94"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -22,20 +33,30 @@
   },
   "factory_fit": {
     "path": "docs/evidence/temporal_cohort_evidence_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "pending",
+    "sha256": "4282de741588cbd8dcb8d723b06aaca2a61f28cd5576d5561fe0dd934ed7a2bc",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_COHORT_SLICE_AND_VERTICAL",
     "independent_review": {
       "path": "docs/evidence/temporal_cohort_evidence_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "pending",
+      "sha256": "f2d4aad9eebdedf0c062c41bf608444edd3e3b56e152643ab4510ba60dc07e1c",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
-    "project_checks": ["PASS_COHORT_SLICE_AND_VERTICAL"]
+    "project_checks": [
+      "PASS_COHORT_SLICE_AND_VERTICAL"
+    ]
   },
-  "non_claims": ["NO_ALPHA", "NO_NET_RETURN", "NO_MARKET_EXECUTION", "NO_MERGE"],
-  "side_effects": {"market_execution": "NOT_RUN", "live_store_writes": 0}
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_MARKET_EXECUTION",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "market_execution": "NOT_RUN",
+    "live_store_writes": 0
+  }
 }
