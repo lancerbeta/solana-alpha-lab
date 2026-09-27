@@ -1539,6 +1539,14 @@ Catalog/prior resolution
 compound не использован. Неназывайте непройденный tier выполненным.
 `PRICE_RELATIVE_PROXY` — относительная цена. `ESTIMATED_NET_PROXY` — модельная
 оценка. Ни один из них не является фактическим `NetReturn`.
+Один temporal-вопрос пишет в тот же result три среза: `pooled`, `by_cohort`
+и `by_calendar_block`. Когортный срез описательный: общая decision может
+входить в несколько когорт, суммы N не обязаны совпасть с pooled, и когорты
+не являются независимой репликацией. Нет observed target — mean `null`, не 0.
+Пустая admitted cohort остаётся строкой с N=0. Writer temporal calculation —
+`HFIC_TEMPORAL_DISCOVERY_CALC_V2`. V1 читается как есть, без выдуманного среза;
+повтор того же science/input пишет V2 как `CALCULATION_REVISION`, без нового
+scientific look. Grounded `CALCULATION_VERSION` не меняется.
 Preview: `discovery-preview --store <data-root> --journal-scope <search-key>`.
 Оба флага вместе включают память preview. Коды `SCHEDULE_CONTEXT_UNBOUND`,
 `SCHEDULE_LATENESS_MISMATCH`, `PREVIEW_ENVELOPE_EXHAUSTED` и

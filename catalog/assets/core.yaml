@@ -34494,10 +34494,10 @@ records:
   purpose: Operator runbook for Hypothesis Forge and Independent Critic one-slash workflow.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-09-02'
+  as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 8825dd6f0200f33a37e613d59ff1a969810f714d95512932c0663b79f2a9aae2}
+  integrity: {kind: sha256, sha256: e96adfab3c84e4500f80d91cecb022c9285bd353d64a75a73f9a7b537287e564}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37826,10 +37826,10 @@ records:
   purpose: Pure temporal query, relative target and assumption-cost proxy used by ordinary Forge discovery.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-09-27'
+  as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: 3830c2a56e72aa1789720772233abc14f442107a66f274c973db2598a2fb7d5b}
+  integrity: {kind: sha256, sha256: 5e21f1f3a59c244a4760033520f507fe0183260a64133d0ddfcc2464101d405a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}

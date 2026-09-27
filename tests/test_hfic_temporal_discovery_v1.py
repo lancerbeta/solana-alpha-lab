@@ -35,11 +35,14 @@ from solana_alpha_lab.factory.hfic_grounded_discovery import (  # noqa: E402
     validate_query_spec,
 )
 from solana_alpha_lab.factory.hfic_temporal_discovery import (  # noqa: E402
+    TEMPORAL_CALCULATION_VERSION,
+    TEMPORAL_CALCULATION_VERSION_V1,
     assess_tier_progress,
     assert_search_exhaustion_claim,
     build_feature_preview,
     classify_temporal_look,
     default_assumption_stress_profile,
+    execute_temporal_discovery,
     technical_stop_record,
     temporal_target_label,
     validate_temporal_query,
@@ -668,6 +671,291 @@ class TemporalBoundaryTests(unittest.TestCase):
                 prior_preview_hashes=["a" * 64, "b" * 64],
             )
         self.assertEqual(extra.exception.code, "PREVIEW_ENVELOPE_EXHAUSTED")
+
+
+COHORT_B = "REL-20260909T111900Z-20260916T111900Z"
+COHORT_C = "REL-20260914T173510Z-20260921T173510Z"
+COHORT_EMPTY = "REL-20260921T173510Z-20260928T173510Z"
+RELEASE_B = "bb" * 32
+RELEASE_C = "cc" * 32
+RELEASE_EMPTY = "dd" * 32
+ANCHOR_LATER = datetime(2026, 9, 10, tzinfo=UTC)
+
+
+def _bind(cohort: str, release: str) -> dict:
+    row = dict(_binding()[0])
+    row["cohort_id"] = cohort
+    row["release_id"] = release
+    return row
+
+
+def _move(row: dict, cohort: str, release: str) -> dict:
+    copied = dict(row)
+    copied["cohort_id"] = cohort
+    copied["release_id"] = release
+    return copied
+
+
+def _at(anchor: datetime, point: str) -> str:
+    return (anchor + timedelta(seconds=OFFSETS[point] + 300)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _member_path(
+    mint: str,
+    cohort: str,
+    release: str,
+    anchor: datetime,
+    prices: list[float],
+    liquidity: tuple[float, float],
+    exit_price: float | None,
+) -> tuple[dict, list[dict]]:
+    census = _move(_census(mint), cohort, release)
+    census["authoritative_anchor"] = anchor.strftime("%Y-%m-%dT%H:%M:%SZ")
+    points = ["X300", "Y900", "Y1800", "Y3600"]
+    rows = [_move(_obs(mint, "X300", LIQ, 1000.0, at=_at(anchor, "X300")), cohort, release)]
+    for point, price in zip(points, prices, strict=True):
+        rows.append(_move(_obs(mint, point, PRICE, price, at=_at(anchor, point)), cohort, release))
+    rows.append(_move(_obs(mint, "Y1800", LIQ, liquidity[0], at=_at(anchor, "Y1800")), cohort, release))
+    rows.append(_move(_obs(mint, "Y3600", LIQ, liquidity[1], at=_at(anchor, "Y3600")), cohort, release))
+    if exit_price is not None:
+        rows.append(
+            _move(_obs(mint, "Y7200", PRICE, exit_price, at=_at(anchor, "Y7200")), cohort, release)
+        )
+    return census, rows
+
+
+def _simple() -> dict:
+    return _spec(
+        search_tier="SIMPLE_SCREEN",
+        query_id="cohort-slice",
+        features=[_spec()["features"][0]],
+        all=[{"feature": "impulse", "op": "gte", "value": 0.0}],
+        cost_profile=None,
+    )
+
+
+def _row(summary: dict, cohort: str) -> dict:
+    return next(item for item in summary["by_cohort"] if item["cohort_id"] == cohort)
+
+
+class TemporalCohortSliceTests(unittest.TestCase):
+    def test_s2_means_keep_missing_cohort_and_null_mean(self) -> None:
+        binding = [
+            _bind(COHORT, RELEASE),
+            _bind(COHORT_B, RELEASE_B),
+            _bind(COHORT_C, RELEASE_C),
+            _bind(COHORT_EMPTY, RELEASE_EMPTY),
+        ]
+        parts = [
+            _member_path("pos", COHORT, RELEASE, ANCHOR, [1.0, 1.2, 1.5, 1.2], (10000.0, 9000.0), 1.44),
+            _member_path("neg", COHORT_B, RELEASE_B, ANCHOR, [1.0, 1.0, 1.5, 2.0], (10000.0, 9000.0), 1.0),
+            _member_path("gap", COHORT_C, RELEASE_C, ANCHOR, [1.0, 1.2, 1.5, 1.2], (10000.0, 9000.0), None),
+        ]
+        census = [item[0] for item in parts]
+        observations = [row for item in parts for row in item[1]]
+        summary = execute_temporal_discovery(census, observations, _simple(), binding)["summary"]
+        self.assertAlmostEqual(summary["pooled"]["mean_target"], -0.15, places=9)
+        self.assertEqual(summary["observed_target_n"], 2)
+        self.assertEqual(summary["missing_target_n"], 1)
+        positive = _row(summary, COHORT)
+        negative = _row(summary, COHORT_B)
+        missing = _row(summary, COHORT_C)
+        empty = _row(summary, COHORT_EMPTY)
+        self.assertAlmostEqual(positive["mean_target"], price_return(1.2, 1.44), places=9)
+        self.assertAlmostEqual(negative["mean_target"], price_return(2.0, 1.0), places=9)
+        self.assertEqual(missing["matched_n"], 1)
+        self.assertEqual(missing["missing_target_n"], 1)
+        self.assertIsNone(missing["mean_target"])
+        self.assertEqual(empty["population_n"], 0)
+        self.assertIsNone(empty["mean_target"])
+        self.assertFalse(summary["cohort_independent_replication"])
+        self.assertTrue(all(item["independent_replication"] is False for item in summary["by_cohort"]))
+
+    def test_cohort_dates_and_shared_calendar_block_stay_distinct(self) -> None:
+        binding = [_bind(COHORT, RELEASE), _bind(COHORT_B, RELEASE_B)]
+        parts = [
+            _member_path("early", COHORT, RELEASE, ANCHOR, [1.0, 1.2, 1.5, 1.2], (10000.0, 9000.0), 1.44),
+            _member_path("late", COHORT, RELEASE, ANCHOR_LATER, [1.0, 1.2, 1.5, 1.2], (10000.0, 9000.0), 1.8),
+            _member_path("peer", COHORT_B, RELEASE_B, ANCHOR, [1.0, 1.0, 1.5, 2.0], (10000.0, 9000.0), 1.0),
+        ]
+        census = [item[0] for item in parts]
+        observations = [row for item in parts for row in item[1]]
+        summary = execute_temporal_discovery(census, observations, _simple(), binding)["summary"]
+        cohort = _row(summary, COHORT)
+        self.assertEqual(cohort["observed_target_n"], 2)
+        self.assertAlmostEqual(cohort["mean_target"], (price_return(1.2, 1.44) + price_return(1.2, 1.8)) / 2, places=9)
+        day = ANCHOR.date().isoformat()
+        block = next(item for item in summary["by_calendar_block"] if item["view"] == day)
+        self.assertEqual(block["observed_n"], 2)
+        self.assertNotAlmostEqual(block["mean_target"], cohort["mean_target"], places=9)
+
+    def test_condition_frequency_differs_by_cohort(self) -> None:
+        spec = _spec(
+            search_tier="SIMPLE_SCREEN",
+            query_id="frequency",
+            features=[_spec()["features"][0]],
+            all=[{"feature": "impulse", "op": "gte", "value": 0.4}],
+            cost_profile=None,
+        )
+        binding = [_bind(COHORT, RELEASE), _bind(COHORT_B, RELEASE_B)]
+        grid = [
+            ("a1", COHORT, RELEASE, [1.0, 1.2, 1.5, 1.2], 1.44),
+            ("a2", COHORT, RELEASE, [1.0, 1.0, 1.1, 1.05], 1.0),
+            ("b1", COHORT_B, RELEASE_B, [1.0, 1.2, 1.5, 1.2], 0.6),
+            ("b2", COHORT_B, RELEASE_B, [1.0, 1.0, 1.1, 1.0], 0.5),
+            ("b3", COHORT_B, RELEASE_B, [1.0, 1.0, 1.05, 1.0], 0.4),
+        ]
+        census = []
+        observations = []
+        for mint, cohort, release, prices, exit_price in grid:
+            member, rows = _member_path(mint, cohort, release, ANCHOR, prices, (10000.0, 9000.0), exit_price)
+            census.append(member)
+            observations.extend(rows)
+        summary = execute_temporal_discovery(census, observations, spec, binding)["summary"]
+        left = _row(summary, COHORT)
+        right = _row(summary, COHORT_B)
+        self.assertEqual(left["decision_eligible_n"], 2)
+        self.assertEqual(left["matched_n"], 1)
+        self.assertEqual(right["decision_eligible_n"], 3)
+        self.assertEqual(right["matched_n"], 1)
+        self.assertNotAlmostEqual(left["mean_target"], summary["pooled"]["mean_target"], places=9)
+        self.assertLess(summary["pooled"]["mean_target"], 0)
+
+    def test_overlap_duplicate_and_conflict_are_stable(self) -> None:
+        binding = [_bind(COHORT, RELEASE), _bind(COHORT_B, RELEASE_B)]
+        shared_a = _member_path("shared", COHORT, RELEASE, ANCHOR, [1.0, 1.2, 1.5, 1.2], (10000.0, 9000.0), 1.44)
+        shared_b = _member_path("shared", COHORT_B, RELEASE_B, ANCHOR, [1.0, 1.2, 1.5, 1.2], (10000.0, 9000.0), 1.44)
+        census = [shared_a[0], shared_b[0]]
+        observations = shared_a[1] + shared_b[1]
+        summary = execute_temporal_discovery(census, observations, _simple(), binding)["summary"]
+        self.assertEqual(summary["observed_target_n"], 1)
+        self.assertEqual(summary["duplicate_delivery_count"], 1)
+        self.assertEqual(_row(summary, COHORT)["observed_target_n"], 1)
+        self.assertEqual(_row(summary, COHORT_B)["observed_target_n"], 1)
+        self.assertEqual(_row(summary, COHORT)["shared_decision_n"], 1)
+        self.assertGreater(
+            _row(summary, COHORT)["observed_target_n"] + _row(summary, COHORT_B)["observed_target_n"],
+            summary["observed_target_n"],
+        )
+        twin = _member_path("shared", COHORT_B, RELEASE_B, ANCHOR, [1.0, 1.2, 1.5, 1.2], (10000.0, 9000.0), 9.0)
+        conflicted = execute_temporal_discovery(
+            [shared_a[0], twin[0]],
+            shared_a[1] + twin[1],
+            _simple(),
+            binding,
+        )["summary"]
+        self.assertEqual(conflicted["integrity_conflict_count"], 1)
+        self.assertEqual(conflicted["observed_target_n"], 0)
+        self.assertEqual(_row(conflicted, COHORT)["observed_target_n"], 0)
+        self.assertGreater(_row(conflicted, COHORT_B)["exclusion_reasons"].get("INTEGRITY_CONFLICT", 0), 0)
+        reversed_summary = execute_temporal_discovery(
+            list(reversed([shared_a[0], twin[0]])),
+            list(reversed(shared_a[1] + twin[1])),
+            _simple(),
+            binding,
+        )["summary"]
+        self.assertEqual(reversed_summary["observed_target_n"], conflicted["observed_target_n"])
+        self.assertEqual(
+            _row(reversed_summary, COHORT)["exclusion_reasons"],
+            _row(conflicted, COHORT)["exclusion_reasons"],
+        )
+
+    def test_v1_revision_replays_v2_without_evaluator_or_new_look(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            _append_discovery_look,
+            _look_identity,
+            data_binding_sha256,
+            result_sha256,
+        )
+
+        census = [_census("a")]
+        observations = _path("a", [1.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92)
+        spec = _spec(cost_profile=None)
+        computed = execute_temporal_discovery(census, observations, spec, _binding())
+        legacy = dict(computed["summary"])
+        legacy.pop("by_cohort", None)
+        legacy.pop("cohort_slices_are_descriptive", None)
+        legacy.pop("cohort_independent_replication", None)
+        legacy["calculation_version"] = TEMPORAL_CALCULATION_VERSION_V1
+        self.assertNotIn("by_cohort", legacy)
+        with tempfile.TemporaryDirectory() as raw:
+            store = ResearchStore(Path(raw))
+            clock = datetime(2026, 9, 27, tzinfo=UTC)
+            binding_sha = data_binding_sha256(computed["admitted"], census, observations)
+            identity = _look_identity(
+                legacy["spec_sha256"],
+                binding_sha,
+                "TEMPORAL-REV",
+                calculation_version=TEMPORAL_CALCULATION_VERSION_V1,
+            )
+            v1_id = f"HFIC-ART-DISCOVERY-{identity[:40].upper()}"
+            _append_discovery_look(
+                store,
+                record_id=v1_id,
+                journal_scope="TEMPORAL-REV",
+                spec=legacy["experiment_recipe"]["spec"],
+                spec_sha256=legacy["spec_sha256"],
+                binding_sha=binding_sha,
+                data_refs=list(computed["admitted"]["cohorts"]),
+                digest=result_sha256(legacy),
+                identity=identity,
+                summary=legacy,
+                look={
+                    "look_class": "MAIN",
+                    "new_look": True,
+                    "search_tier": legacy["search_tier"],
+                    "main_count": 1,
+                    "adaptive_count": 0,
+                    "simple_main_count": 0,
+                    "compound_main_count": 1,
+                },
+                git_sha=GIT_SHA,
+                clock=clock,
+                candidate_scope=_scope(spec),
+            )
+            v1_payload = next(
+                record.payload_json
+                for record in store.iter_committed_records()
+                if record.record_id == v1_id
+            )
+            revised = run_recorded_discovery_query(
+                ResearchStore(Path(raw)),
+                census=census,
+                observations=observations,
+                spec=spec,
+                binding=_binding(),
+                journal_scope="TEMPORAL-REV",
+                candidate_scope=_scope(spec),
+                git_sha=GIT_SHA,
+                clock=clock,
+            )
+            self.assertEqual(revised["calculation_version"], TEMPORAL_CALCULATION_VERSION)
+            self.assertFalse(revised["queries"][0]["new_look"])
+            self.assertEqual(revised["queries"][0]["look_class"], "CALCULATION_REVISION")
+            self.assertEqual(revised["budget"]["main_count"], 1)
+            self.assertNotEqual(revised["result_refs"], [v1_id])
+            self.assertIn("by_cohort", revised["result"])
+            self.assertEqual(
+                next(record.payload_json for record in ResearchStore(Path(raw)).iter_committed_records() if record.record_id == v1_id),
+                v1_payload,
+            )
+            with unittest.mock.patch(
+                "solana_alpha_lab.factory.hfic_temporal_discovery.execute_temporal_discovery",
+                side_effect=AssertionError("evaluator must not rerun"),
+            ):
+                replayed = run_recorded_discovery_query(
+                    ResearchStore(Path(raw)),
+                    census=census,
+                    observations=observations,
+                    spec=spec,
+                    binding=_binding(),
+                    journal_scope="TEMPORAL-REV",
+                    candidate_scope=_scope(spec),
+                    git_sha=GIT_SHA,
+                    clock=clock,
+                )
+            self.assertEqual(replayed["result_refs"], revised["result_refs"])
+            self.assertEqual(replayed["result_sha256"], revised["result_sha256"])
 
 
 if __name__ == "__main__":

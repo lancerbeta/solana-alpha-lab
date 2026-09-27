@@ -1494,9 +1494,14 @@ def assert_computed_grounded_evidence(
     expected = result_sha256(summary)
     if bound.get("result_sha256") != expected:
         raise GroundedDiscoveryError("GROUNDED_RESULT_MISMATCH")
-    from solana_alpha_lab.factory.hfic_temporal_discovery import TEMPORAL_CALCULATION_VERSION
+    from solana_alpha_lab.factory.hfic_temporal_discovery import (
+        TEMPORAL_CALCULATION_VERSIONS_READABLE,
+    )
 
-    if bound.get("calculation_version") not in {CALCULATION_VERSION, TEMPORAL_CALCULATION_VERSION}:
+    if bound.get("calculation_version") not in {
+        CALCULATION_VERSION,
+        *TEMPORAL_CALCULATION_VERSIONS_READABLE,
+    }:
         raise GroundedDiscoveryError("GROUNDED_RESULT_MISMATCH")
     journal_scope = str(bound.get("journal_scope") or "")
     if expected_journal_scope and journal_scope != expected_journal_scope:
@@ -1546,6 +1551,8 @@ def format_discovery_readout(evidence: Mapping[str, Any]) -> dict[str, Any]:
         "pooled_mean_target": (result.get("pooled") or {}).get("mean_target"),
         "by_cohort": result.get("by_cohort"),
         "by_calendar_block": result.get("by_calendar_block"),
+        "cohort_independent_replication": result.get("cohort_independent_replication"),
+        "cohort_slices_are_descriptive": result.get("cohort_slices_are_descriptive"),
         "by_explanatory": result.get("by_explanatory"),
         "exclusion_reasons": result.get("exclusion_reasons"),
         "calendar_overlap_is_not_independent_replication": result.get(
