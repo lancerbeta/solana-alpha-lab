@@ -398,6 +398,15 @@ class TemporalArithmeticTests(unittest.TestCase):
         )["summary"]
         self.assertEqual(kept["observed_target_n"], alone["observed_target_n"])
         self.assertAlmostEqual(kept["mean_target"], alone["mean_target"], delta=TOLERANCE)
+        doubled = execute_discovery_from_rows(
+            [outsider, _census("a"), {**_census("a"), "release_id": other_release}],
+            observations + identical,
+            spec,
+            binding,
+        )["summary"]
+        self.assertEqual(doubled["observed_target_n"], alone["observed_target_n"])
+        self.assertEqual(doubled["duplicate_delivery_count"], 1)
+        self.assertAlmostEqual(doubled["mean_target"], alone["mean_target"], delta=TOLERANCE)
 
     def test_t05_cost_oracle_does_not_double_count_or_pretend_calibration(self) -> None:
         spec = _spec(

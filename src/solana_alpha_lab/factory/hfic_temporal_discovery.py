@@ -864,7 +864,11 @@ def execute_temporal_discovery(
                         member["matched"] = False
                         member["target_is_observed"] = False
                 continue
-            existing = next(item for item in members if item.get("identity") == identity)
+            existing = next(
+                item
+                for item in members
+                if item.get("identity") == identity and item.get("exclusion") != "BINDING_COHORT_MISMATCH"
+            )
             if existing.get("in_base"):
                 continue
             members.remove(existing)
