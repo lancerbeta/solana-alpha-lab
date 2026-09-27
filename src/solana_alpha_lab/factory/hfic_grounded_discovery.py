@@ -1548,6 +1548,17 @@ def format_discovery_readout(evidence: Mapping[str, Any]) -> dict[str, Any]:
         "contract_version": DISCOVERY_CONTRACT_VERSION,
         "engine_emits_alpha": False,
         "result_refs": list(evidence.get("result_refs") or []),
+        "calculation_version": evidence.get("calculation_version") or result.get("calculation_version"),
+        "look_class": (
+            (evidence.get("queries") or [{}])[0].get("look_class")
+            if isinstance(evidence.get("queries"), list) and evidence.get("queries")
+            else None
+        ),
+        "new_look": (
+            (evidence.get("queries") or [{}])[0].get("new_look")
+            if isinstance(evidence.get("queries"), list) and evidence.get("queries")
+            else None
+        ),
         "pooled_mean_target": (result.get("pooled") or {}).get("mean_target"),
         "by_cohort": result.get("by_cohort"),
         "by_calendar_block": result.get("by_calendar_block"),

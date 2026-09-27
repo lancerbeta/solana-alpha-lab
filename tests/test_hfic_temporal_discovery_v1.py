@@ -31,6 +31,7 @@ from solana_alpha_lab.factory.hfic_grounded_discovery import (  # noqa: E402
     CALCULATION_VERSION,
     GroundedDiscoveryError,
     execute_discovery_from_rows,
+    format_discovery_readout,
     run_recorded_discovery_query,
     validate_query_spec,
 )
@@ -770,6 +771,18 @@ class TemporalCohortSliceTests(unittest.TestCase):
         self.assertIsNone(empty["mean_target"])
         self.assertFalse(summary["cohort_independent_replication"])
         self.assertTrue(all(item["independent_replication"] is False for item in summary["by_cohort"]))
+        readout = format_discovery_readout(
+            {
+                "result": summary,
+                "result_refs": ["HFIC-ART-DISCOVERY-TEST"],
+                "calculation_version": summary["calculation_version"],
+                "queries": [{"look_class": "MAIN", "new_look": True}],
+            }
+        )
+        self.assertIsNone(_row({"by_cohort": readout["by_cohort"]}, COHORT_C)["mean_target"])
+        self.assertEqual(readout["look_class"], "MAIN")
+        self.assertTrue(readout["new_look"])
+        self.assertEqual(readout["calculation_version"], TEMPORAL_CALCULATION_VERSION)
 
     def test_cohort_dates_and_shared_calendar_block_stay_distinct(self) -> None:
         binding = [_bind(COHORT, RELEASE), _bind(COHORT_B, RELEASE_B)]
@@ -846,6 +859,9 @@ class TemporalCohortSliceTests(unittest.TestCase):
         )["summary"]
         self.assertEqual(conflicted["integrity_conflict_count"], 1)
         self.assertEqual(conflicted["observed_target_n"], 0)
+        self.assertEqual(conflicted["population_n"], 0)
+        self.assertEqual(_row(conflicted, COHORT)["population_n"], 0)
+        self.assertEqual(_row(conflicted, COHORT_B)["population_n"], 0)
         self.assertEqual(_row(conflicted, COHORT)["observed_target_n"], 0)
         self.assertGreater(_row(conflicted, COHORT_B)["exclusion_reasons"].get("INTEGRITY_CONFLICT", 0), 0)
         reversed_summary = execute_temporal_discovery(
@@ -939,7 +955,9 @@ class TemporalCohortSliceTests(unittest.TestCase):
                 next(record.payload_json for record in ResearchStore(Path(raw)).iter_committed_records() if record.record_id == v1_id),
                 v1_payload,
             )
-            with unittest.mock.patch(
+            from unittest import mock
+
+            with mock.patch(
                 "solana_alpha_lab.factory.hfic_temporal_discovery.execute_temporal_discovery",
                 side_effect=AssertionError("evaluator must not rerun"),
             ):

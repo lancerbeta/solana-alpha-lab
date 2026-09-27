@@ -1112,8 +1112,12 @@ def execute_temporal_discovery(
                 for member in members:
                     if member.get("identity") == identity:
                         member["integrity_excluded"] = True
+                        member["in_base"] = False
+                        member["decision_eligible"] = False
+                        member["feature_unknown"] = False
                         member["matched"] = False
                         member["target_is_observed"] = False
+                        member["target"] = None
                 _exclude_shared_identity(cohort_membership, identity)
                 _note_cohort_membership(
                     cohort_membership,

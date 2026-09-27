@@ -1546,7 +1546,9 @@ compound не использован. Неназывайте непройден�
 Пустая admitted cohort остаётся строкой с N=0. Writer temporal calculation —
 `HFIC_TEMPORAL_DISCOVERY_CALC_V2`. V1 читается как есть, без выдуманного среза;
 повтор того же science/input пишет V2 как `CALCULATION_REVISION`, без нового
-scientific look. Grounded `CALCULATION_VERSION` не меняется.
+scientific look. В owner readout это поля `calculation_version`,
+`queries[].look_class=CALCULATION_REVISION` и `queries[].new_look=false`
+(тот же смысл на `format_discovery_readout`). Grounded `CALCULATION_VERSION` не меняется.
 Preview: `discovery-preview --store <data-root> --journal-scope <search-key>`.
 Оба флага вместе включают память preview. Коды `SCHEDULE_CONTEXT_UNBOUND`,
 `SCHEDULE_LATENESS_MISMATCH`, `PREVIEW_ENVELOPE_EXHAUSTED` и
