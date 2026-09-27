@@ -1254,27 +1254,66 @@ def _proven_runner_scope(
     return proven
 
 
+_COMPUTED_LOOK_KEYS = (
+    "result",
+    "result_sha256",
+    "result_refs",
+    "queries",
+    "priors",
+)
+
+
+def _executed_scope_matches(executed: Mapping[str, Any], proven: Mapping[str, str]) -> bool:
+    """True only when this card is the scope the discovery look was computed for."""
+
+    compared = False
+    for key in (
+        "population",
+        "decision_timestamp",
+        "target",
+        "estimand",
+        "explanatory_condition",
+        "evidence_surface_mode",
+        "representation_scope",
+    ):
+        value = executed.get(key)
+        if not isinstance(value, str) or not value.strip():
+            continue
+        compared = True
+        if proven.get(key) != value:
+            return False
+    return compared
+
+
 def _rebind_runner_up_grounded_evidence(
     packet: dict[str, Any],
     card: Mapping[str, Any],
 ) -> None:
-    """Drop the primary candidate scope unless this runner-up proves its own."""
+    """Keep discovery numbers only when they were computed for this candidate.
+
+    A copied primary packet otherwise drops the executed scope, its prior
+    relations, and the computed look. A complete runner-up scope is recorded
+    on its own and is not a relabel of the primary result.
+    """
 
     grounded = packet.get("grounded_evidence")
     if not isinstance(grounded, Mapping):
         return
+    executed = grounded.get("candidate_scope")
+    executed_scope = executed if isinstance(executed, Mapping) else {}
     proven = _proven_runner_scope(card, packet)
-    body = {
-        key: value
-        for key, value in grounded.items()
-        if key not in {"candidate_scope", "prior_scope_relations", "canonical_prior_comparison"}
-    }
+    same_look = _executed_scope_matches(executed_scope, proven)
+    drop = {"candidate_scope", "prior_scope_relations", "canonical_prior_comparison"}
+    if not same_look:
+        drop.update(_COMPUTED_LOOK_KEYS)
+    body = {key: value for key, value in grounded.items() if key not in drop}
     if all(proven.get(key) for key in _RUNNER_SCOPE_KEYS):
         scope = {key: proven[key] for key in _RUNNER_SCOPE_KEYS}
         if proven.get("representation_scope"):
             scope["representation_scope"] = proven["representation_scope"]
         body["candidate_scope"] = scope
-        body["priors"] = []
+        if not same_look:
+            body["priors"] = []
         from solana_alpha_lab.factory.hfic_grounded_discovery import (
             GroundedDiscoveryError,
             bind_prior_scope_evidence,

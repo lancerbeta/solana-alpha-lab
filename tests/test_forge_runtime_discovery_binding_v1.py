@@ -828,13 +828,51 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             self.assertEqual(rejected["estimand"], "estimand_C")
             self.assertNotIn("target", rejected)
             runner_packet = frozen["runner_up_critic_input_packet"]
-            runner_scope = runner_packet["grounded_evidence"]["candidate_scope"]
+            runner_evidence = runner_packet["grounded_evidence"]
+            runner_scope = runner_evidence["candidate_scope"]
             self.assertEqual(runner_scope["target"], "target_B")
             self.assertEqual(runner_scope["estimand"], "estimand_B")
             self.assertNotEqual(runner_scope["target"], "target_A")
-            primary_scope = frozen["critic_input_packet"]["grounded_evidence"]["candidate_scope"]
-            self.assertEqual(primary_scope["target"], "target_A")
-            self.assertIn("prior_scope_relations", runner_packet["grounded_evidence"])
+            primary_evidence = frozen["critic_input_packet"]["grounded_evidence"]
+            self.assertEqual(primary_evidence["candidate_scope"]["target"], "target_A")
+            self.assertIn("result", primary_evidence)
+            self.assertNotIn("result", runner_evidence)
+            self.assertNotIn("result_sha256", runner_evidence)
+            self.assertNotIn("result_refs", runner_evidence)
+            self.assertNotIn("queries", runner_evidence)
+            self.assertNotIn("target_A", json.dumps(runner_evidence))
+            self.assertIn("prior_scope_relations", runner_evidence)
+
+    def test_same_scope_runner_up_keeps_its_own_computed_look(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import (
+            _rebind_runner_up_grounded_evidence,
+        )
+
+        scope = {
+            "population": "BASE_X",
+            "decision_timestamp": "X300",
+            "target": "target_same",
+            "estimand": "estimand_same",
+            "explanatory_condition": "cond_same",
+            "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+            "representation_scope": "rep_same",
+        }
+        packet = {
+            "grounded_evidence": {
+                "candidate_scope": dict(scope),
+                "result": {"pooled": {"mean_target": 1}},
+                "result_sha256": "abc",
+                "result_refs": ["HFIC-ART-1"],
+                "queries": [{"query_id": "Q"}],
+                "priors": [],
+            },
+            "prior_memory": {"capsules": []},
+        }
+        _rebind_runner_up_grounded_evidence(packet, dict(scope))
+        evidence = packet["grounded_evidence"]
+        self.assertEqual(evidence["candidate_scope"]["target"], "target_same")
+        self.assertEqual(evidence["result_sha256"], "abc")
+        self.assertIn("result", evidence)
 
 
 if __name__ == "__main__":
