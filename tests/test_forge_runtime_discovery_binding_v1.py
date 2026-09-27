@@ -965,6 +965,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
         selected_estimand: str = "estimand_A",
         selected_population: str = "BASE_X",
         selected_decision: str = "X300",
+        decision_points: list[str] | None = None,
         scope_estimand: str | None = "estimand_A",
         expect_freeze_error: str | None = None,
     ) -> dict:
@@ -1004,9 +1005,12 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                 "representation_scope": "rep_A",
             }
         )
+        points = list(decision_points or ["X300"])
+        point_offset = {"X300": 300, "Y900": 900, "Y1800": 1800, "Y3600": 3600}
+        latest_decision = max(points, key=lambda item: point_offset[item])
         runner_scope = {
             "population": "BASE_X",
-            "decision_timestamp": "X300",
+            "decision_timestamp": latest_decision,
             "estimand": "estimand_A",
             "target": MEASURED_TARGET,
             "explanatory_condition": "cond_A",
@@ -1045,7 +1049,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                 {
                     "query_id": "RUNNER_LOOK_GUARD",
                     "population": "BASE_X",
-                    "decision_points": ["X300"],
+                    "decision_points": points,
                     "decision_fields": [
                         "FIELD-USD-PRICE-001",
                         "FIELD-LIQUIDITY-USD-001",
@@ -1060,7 +1064,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
         look_scope = {
             "question_id": "RUNNER_LOOK_GUARD",
             "population": "BASE_X",
-            "decision_timestamp": "X300",
+            "decision_timestamp": latest_decision,
             "target": scope_target,
             "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
         }
@@ -1825,6 +1829,25 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                 "GROUNDED_RESULT_UNBOUND",
                 diagnostics.get("availability_gate_reason_codes") or [],
             )
+            decision = done["decisions"][session["frozen"]["runner_up_candidate_id"]]
+            self.assertEqual(decision["reason_code"], "PASS_DATA_OPTION_REQUIRED")
+
+    def test_latest_decision_point_confirms_through_critic(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            session = self._freeze_scoped_runner(
+                Path(raw),
+                runner_matches_look=True,
+                decision_points=["X300", "Y900"],
+                selected_decision="Y900",
+            )
+            evidence = session["evidence"]["candidate_scope"]
+            self.assertEqual(evidence["decision_timestamp"], "Y900")
+            self.assertEqual(evidence["target"], MEASURED_TARGET)
+            primary = session["frozen"]["critic_input_packet"]["grounded_evidence"]
+            self.assertTrue(primary.get("look_confirms_selected"))
+            self.assertEqual(primary["candidate_scope"]["decision_timestamp"], "Y900")
+            done = self._classify_runner_after_primary_kill(session)
+            self.assertEqual(done["final_session_terminal"], "PASS_DATA_OPTION_REQUIRED")
             decision = done["decisions"][session["frozen"]["runner_up_candidate_id"]]
             self.assertEqual(decision["reason_code"], "PASS_DATA_OPTION_REQUIRED")
 
