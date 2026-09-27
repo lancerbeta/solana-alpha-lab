@@ -59,13 +59,7 @@
     "tests/test_hfic_temporal_owner_path_v1.py": "3bea7eab0ea5dab2049671d60a3160898bbacdcb3b8a2949ce0f184c02b55e94",
     "tests/test_hfic_temporal_production_runner_v1.py": "b2cf4f84ce686c5b413b8f3bb99958245e80f8536b7bd636a692c0de3a4e33cf"
   },
-  "active_stop_conditions": [
-    "MARKET_FORGE",
-    "MARKET_CRITIC",
-    "PRODUCTION_RDP_EXPERIMENT",
-    "PROVIDER_API_RPC_WSS",
-    "MERGE_WITHOUT_OWNER_PHRASE"
-  ],
+  "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
     "material_owner_decision": false,
