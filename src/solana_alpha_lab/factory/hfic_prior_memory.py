@@ -21,15 +21,18 @@ CONFIG_RELATIVE = "configs/hypothesis_forge_independent_critic_v1.yaml"
 MEMORY_HARD_CLOSE = "HARD_CLOSE"
 MEMORY_PARK = "PARK"
 MEMORY_NOT_SELECTED = "NOT_SELECTED_IN_SESSION"
+MEMORY_TECHNICAL_STOP = "TECHNICAL_STOP"
 MEMORY_AMBIGUOUS = "AMBIGUOUS"
 MEMORY_HISTORICAL = "HISTORICAL"
 MEMORY_STATUSES = (
     MEMORY_HARD_CLOSE,
     MEMORY_PARK,
     MEMORY_NOT_SELECTED,
+    MEMORY_TECHNICAL_STOP,
     MEMORY_AMBIGUOUS,
     MEMORY_HISTORICAL,
 )
+_TECHNICAL_KILL_REASONS = frozenset({"KILL_UNBOUND_EVIDENCE"})
 
 _CAPSULE_FIELDS = (
     "claim",
@@ -42,6 +45,13 @@ _CAPSULE_FIELDS = (
     "horizon_notional",
     "negative_control",
     "cheapest_falsifier",
+)
+_SCOPE_FIELDS = (
+    "target",
+    "estimand",
+    "explanatory_condition",
+    "evidence_surface_mode",
+    "representation_scope",
 )
 
 
@@ -109,6 +119,8 @@ def classify_memory_status(
     reason = str(reason_code or "")
     if reason == MEMORY_NOT_SELECTED:
         return MEMORY_NOT_SELECTED
+    if reason in _TECHNICAL_KILL_REASONS:
+        return MEMORY_TECHNICAL_STOP
     if reason.startswith("PARK_") or reason == "OWNER_PRIORITY_PARK" or kind == "PARK":
         return MEMORY_PARK
     if (
@@ -165,14 +177,15 @@ def build_prior_memory_snapshot(
     )
 
     decisions = latest_hypothesis_decisions(store)
+    session_scope = _session_scope_index(store)
     capsules_by_id: dict[str, dict[str, Any]] = {}
     for payload in iter_search_memory_hypothesis_payloads(store):
         hyp_id = str(payload.get("hypothesis_version_id") or "")
         if not hyp_id:
             raise PriorMemoryUnidentifiedError()
-        capsules_by_id[hyp_id] = _capsule_from_payload(
-            hyp_id, payload, decisions.get(hyp_id)
-        )
+        capsule = _capsule_from_payload(hyp_id, payload, decisions.get(hyp_id))
+        _fill_scope_from_session(capsule, payload, session_scope)
+        capsules_by_id[hyp_id] = capsule
     capsules = [capsules_by_id[item] for item in sorted(capsules_by_id)]
     eligible = len(capsules)
     if eligible > records_bound:
@@ -365,6 +378,10 @@ def compact_forge_prior_entry(
         value = full.get(key)
         if value not in (None, "", [], {}):
             out[key] = value
+    if out.get("memory_status") == MEMORY_TECHNICAL_STOP:
+        out["technical_stop_note"] = (
+            "Технический отказ не является отрицательным рыночным результатом."
+        )
     # actor_counterparty is retained only when mechanism/claim text is absent;
     # otherwise the causal role is already carried by the substantive field.
     mechanism = full.get("mechanism")
@@ -395,6 +412,10 @@ def compact_forge_prior_entry(
             value = full.get(key)
             if value not in (None, "", [], {}):
                 out[key] = value
+    for key in _SCOPE_FIELDS:
+        value = full.get(key)
+        if value not in (None, "", [], {}):
+            out[key] = value
     return out
 
 
@@ -449,6 +470,10 @@ def _capsule_from_payload(
         else:
             value = str(payload.get(field) or "")
         capsule[field] = value or None
+    for field in _SCOPE_FIELDS:
+        raw_scope = payload.get(field)
+        if isinstance(raw_scope, str) and raw_scope.strip():
+            capsule[field] = raw_scope
     legacy = payload.get("legacy_definition")
     if isinstance(legacy, Mapping) and legacy:
         compact_legacy = {
@@ -464,6 +489,95 @@ def _capsule_from_payload(
         if isinstance(park_status, str) and park_status.strip():
             capsule["park_status"] = park_status
     return capsule
+
+
+def _session_scope_index(store: Any) -> dict[str, dict[str, Any]]:
+    """Recover surface and discovery scope from immutable cycle records."""
+
+    index: dict[str, dict[str, Any]] = {}
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if kind != "RESEARCH_CYCLE":
+            continue
+        payload = _payload_mapping(record)
+        session_id = str(payload.get("session_id") or "")
+        if not session_id:
+            continue
+        slot = index.setdefault(session_id, {"candidates": {}})
+        mode = payload.get("evidence_surface_mode")
+        if isinstance(mode, str) and mode and not slot.get("evidence_surface_mode"):
+            slot["evidence_surface_mode"] = mode
+        scope = payload.get("discovery_candidate_scope")
+        if isinstance(scope, Mapping) and not slot.get("discovery_candidate_scope"):
+            slot["discovery_candidate_scope"] = dict(scope)
+        for cand in payload.get("grounded_candidates") or []:
+            if not isinstance(cand, Mapping):
+                continue
+            candidate_id = str(cand.get("candidate_id") or "")
+            if candidate_id:
+                slot["candidates"][candidate_id] = dict(cand)
+    return index
+
+
+def _fill_scope_from_session(
+    capsule: dict[str, Any],
+    payload: Mapping[str, Any],
+    session_scope: Mapping[str, Mapping[str, Any]],
+) -> None:
+    """Fill missing scope axes from records bound to this hypothesis.
+
+    A session-level discovery scope is not applied: it is not proof that
+    every hypothesis in the session shares one target or estimand.
+    ``evidence_surface_mode`` is session-level and may be shared.
+    Do not overwrite a field the hypothesis payload already has.
+    """
+
+    session_id = str(payload.get("session_id") or "")
+    slot = session_scope.get(session_id)
+    if not isinstance(slot, Mapping):
+        return
+    sources: list[Mapping[str, Any]] = []
+    candidate_id = str(
+        payload.get("hypothesis_version_id") or capsule.get("hypothesis_version_id") or ""
+    )
+    candidates = slot.get("candidates")
+    if isinstance(candidates, Mapping) and isinstance(candidates.get(candidate_id), Mapping):
+        sources.append(candidates[candidate_id])
+    if isinstance(slot.get("evidence_surface_mode"), str):
+        sources.append({"evidence_surface_mode": slot["evidence_surface_mode"]})
+    for source in sources:
+        for field in _SCOPE_FIELDS:
+            if capsule.get(field) not in (None, ""):
+                continue
+            value = source.get(field)
+            if isinstance(value, str) and value.strip():
+                capsule[field] = value
+
+
+def recover_scope_payload(
+    payload: Mapping[str, Any],
+    session_scope: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Return a payload copy whose missing scope axes come from immutable records.
+
+    Used by Prompt A ranked entries and by Critic capsules so both see the
+    same recovered fields. Axes with no candidate-bound source stay absent.
+    """
+
+    enriched = dict(payload)
+    scratch: dict[str, Any] = {
+        "hypothesis_version_id": str(enriched.get("hypothesis_version_id") or "")
+    }
+    for field in _SCOPE_FIELDS:
+        value = enriched.get(field)
+        if isinstance(value, str) and value.strip():
+            scratch[field] = value
+    _fill_scope_from_session(scratch, enriched, session_scope)
+    for field in _SCOPE_FIELDS:
+        if enriched.get(field) not in (None, "") or scratch.get(field) in (None, ""):
+            continue
+        enriched[field] = scratch[field]
+    return enriched
 
 
 def _finalize_snapshot(

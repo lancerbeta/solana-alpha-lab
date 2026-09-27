@@ -1,0 +1,35 @@
+{
+  "schema": "smial.forge-runtime-discovery-binding-readback",
+  "schema_version": "1.0",
+  "task_id": "FORGE_RUNTIME_DISCOVERY_BINDING_REPAIR_V1",
+  "as_of": "2026-09-27",
+  "inventory_unchanged": true,
+  "inventory_sha256": "06ffa3066b028d9e97680a9e75e0fa8bc7318bcad764b178711ba0b5d055109a",
+  "discovery_looks": 0,
+  "research_cycles": 26,
+  "binding": {
+    "authority_source": "PUBLISHED_DISCOVERY_LABELS_V1",
+    "holdout_derived_from_discovery_contract": true,
+    "protected_holdout_assignment": false,
+    "values_loaded": false,
+    "scientific_writes": 0,
+    "cohort_count": 3
+  },
+  "forge_run": {
+    "next_action": "START_BASE",
+    "owner_class": "FORGE_RUN_IN_PROGRESS",
+    "research_store_writes": 0,
+    "session_writes": 0
+  },
+  "coverage": {
+    "typed_value_selected": false,
+    "scientific_writes": 0,
+    "authority_source": "PUBLISHED_DISCOVERY_LABELS_V1",
+    "calendar_overlap_independent_replication": false
+  },
+  "non_claims": [
+    "NO_MARKET_PROMPT_A",
+    "NO_TYPED_MARKET_VALUES",
+    "NO_LIVE_SCIENTIFIC_SLOT"
+  ]
+}

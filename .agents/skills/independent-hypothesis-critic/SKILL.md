@@ -95,7 +95,9 @@ Hard boundaries — same as Forge:
    population, decision timestamp, X/Y/horizon, and falsifier/control/economic
    distinction. Lexical equality of identity fields is **not** required for
    duplicate suspicion. Capsule `memory_status` stays distinguishable
-   (`HARD_CLOSE`, `PARK`, `NOT_SELECTED_IN_SESSION`, `AMBIGUOUS`, `HISTORICAL`);
+   (`HARD_CLOSE`, `PARK`, `NOT_SELECTED_IN_SESSION`, `TECHNICAL_STOP`,
+   `AMBIGUOUS`, `HISTORICAL`); `TECHNICAL_STOP` is a recorded
+   `KILL_UNBOUND_EVIDENCE` and does not ban the same scope.
    visibility in prior memory is not automatic hard-close. Do not compensate a
    missing capsule with ResearchStore archaeology, RAG, embeddings, or a hidden
    synonym query. Historical `1.0` / `1.1` / `1.2` packets without

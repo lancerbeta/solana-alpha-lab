@@ -1,0 +1,79 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-RUNTIME-DISCOVERY-BINDING-REPAIR-REVIEW-001",
+  "as_of": "2026-09-27",
+  "task_id": "FORGE_RUNTIME_DISCOVERY_BINDING_REPAIR_V1",
+  "reviewed_bindings_sha256": "e97d69374987df132dd986f8d81b265c801f059f8015278a7e8312b52cc433d4",
+  "reviewed_inventory_sha256": "0057ddf9b8c900afc6e2228449dbdb14b1c7c4743d20c8f5e955f694b81959cb",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "The confirming decision is the latest point in the spec, and the confirming target is target_point:target_field. An earlier declared point is rejected before the query. A free-text target cannot take a scientific pass. A Y900 card on a spec whose latest point is Y900 keeps the ordinary classification path."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Declaring X300 on a spec that also uses Y900 writes nothing. A liquidity label repeated by the card does not become a scientific pass. A card at Y900 with the measured target reaches PASS_DATA_OPTION_REQUIRED through Critic."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=2a370b5304596dbdd875ecee7b30cf3f4b614d7085214aac1a98cd48d7ab8f8c",
+        "The confirming moment and target come from the validated spec. X300 is not stored when Y900 is the latest decision point. A free-text target stays unbound. The measured Y900 scope can still reach ordinary classification."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "The readout names the latest decision point and the measured target point and field. A match keeps the ordinary path. No new manual step and no market forge claim."
+      ]
+    }
+  ],
+  "remediation_history": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "A card-only decision moment could still LOOK_SCOPE_MATCH when the stored look lacked that axis.",
+      "observed_head": "94859ff8ccab11885282d4cd131e084057a2a736",
+      "resolved_by_head": "21d11f019401818fde9107a3cbc330fa456aa3ba"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "The positive Critic path used only a singleton X300 spec, so the latest point of a two-point look was not shown through classification.",
+      "observed_head": "09da8ca079a7561aac4e494f81404ffc17fad867",
+      "resolved_by_head": "e4ccdb827adad2914dfe75c77b634fd93618a4e5"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "The readout named a different decision moment and a separate scope contradiction, and did not name population as the same machine stop.",
+      "observed_head": "94859ff8ccab11885282d4cd131e084057a2a736",
+      "resolved_by_head": "21d11f019401818fde9107a3cbc330fa456aa3ba"
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MERGE",
+    "NO_ALPHA",
+    "NO_MARKET_FORGE"
+  ]
+}

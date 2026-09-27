@@ -135,10 +135,14 @@ No-write state-only joint coverage. It does not select `typed_value` and does no
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-coverage --format json
 ```
 
-Ordinary numeric recipe. `--store` is explicit and is not the live store unless the owner points it there. Role and holdout come from `--binding`. `--journal-scope` is the preflight `search_key_sha256`. Copy the whole JSON object onto the draft as `grounded_evidence`, not only `result_refs`. When cohort hashes differ, pass `--cohort-partition COHORT CENSUS OBSERVATIONS` once per cohort. Do not replace those hashes with a combined file. Ordinary non-CONTROL preflight always stamps the discovery contract; `--discovery-contract` does not toggle it. That receipt requires the evidence object for 0, 1, 4, and 6 candidates. One selected candidate is persisted without a runner-up. Do not hand-write the contract field. CONTROL does not use this command:
+Ordinary numeric recipe. `discovery-binding` does not load parquet values. Stop before row reads on `DISCOVERY_ROLE_UNKNOWN`, `DISCOVERY_ROLE_FORBIDDEN`, `DISCOVERY_ROLE_CONFLICT`, `DISCOVERY_AUTHORITY_ABSENT`, `HOLDOUT_PROTECTED`, `HOLDOUT_UNRESOLVED`, `DISCOVERY_IDENTITY_MISMATCH`, `BINDING_HASH_MISMATCH`, `DISCOVERY_ARTIFACT_MISSING`, or `DISCOVERY_SCOPE_UNSUPPORTED`. Do not hand-write role or `holdout`. On an authorized ordinary slash, `--data-root` and `--store` are the canonical data root. `--journal-scope` is the preflight `search_key_sha256`. Copy the whole JSON object onto the draft as `grounded_evidence`, not only `result_refs`. An exact repeated `--cohort-partition` is eliminated; a conflicting repeat stops. Ordinary non-CONTROL preflight always stamps the discovery contract; `--discovery-contract` does not toggle it. That receipt requires the evidence object for 0, 1, 4, and 6 candidates. One selected candidate is persisted without a runner-up. Do not hand-write the contract field. CONTROL does not use this command:
 
 ```text
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-binding --format json
+```
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <canonical-data-root> --store <canonical-data-root> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
 ```
 
 ## Representation mode boundary

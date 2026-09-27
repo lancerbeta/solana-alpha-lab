@@ -1,0 +1,76 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-RUNTIME-DISCOVERY-BINDING-REPAIR-ACCEPTANCE-001",
+  "as_of": "2026-09-27",
+  "task_id": "FORGE_RUNTIME_DISCOVERY_BINDING_REPAIR_V1",
+  "state_change": "PUBLISHED_DISCOVERY_BINDING_AND_SCOPED_MEMORY_REPAIR",
+  "base_main": "c7a081e92443dfd09977aad9f6c7446f79127405",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "3bb87edb38f0fd9a18160d324c4bcbad1f8fdaa551f9883b1b4ee1178bb68b0a",
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "b027dc9a699f74e8d3f83ae165089c4d84c2d170945012103f33eaef66194d2e",
+    ".cursor/commands/hypothesis-forge.md": "ad9a81428819a83836514e8020faf3416f28a6957766f86f98805670aed440bd",
+    "catalog/assets/core.yaml": "69822a61625b7839b8201d18a032550cd7ecbcfbbef3f771c513661666e396ed",
+    "catalog/schemas/hypothesis_critic_input_v1.schema.json": "d4a7951e5a9e20a5cc4bff9b91f70031ef6d7ef96f2410cfac8de6751205d9e3",
+    "configs/hypothesis_forge_independent_critic_v1.yaml": "fc499888a8d0aaeefc816bd0fc306ceb8e22b639ec3df4ca671e917a877741c1",
+    "docs/evidence/forge_runtime_discovery_binding_repair/a1_live_binding_readback_v1.json": "08664fc90618e3073c931a13f5eae94a84ea8615b57a23b7a2e4b1ebba5b11b1",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "7010f194710b284b01e568bc7b32208b68f9f7e2b550dd094f407e58a44b9c24",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "e61fa9c0d20df3126ce428341cc862b8cc3a8f4be66e3bd27ca4f04ae9d050ea",
+    "docs/reports/forge_runtime_discovery_binding_repair/a1_owner_readout_v1.md": "10bc6d5b8434731656b87ba0bb8c2d8ffdadab46fe8a9edeae9c1c0aeae40587",
+    "docs/tasks/FORGE_RUNTIME_DISCOVERY_BINDING_REPAIR_V1.md": "ea2c8477b2a5450ec4ad1d63957677988cbaaf8218ddf93c0f68cf503ed8c035",
+    "scripts/hypothesis_forge.py": "95aad2a5aaa7d3b2fa2a472afe52f2aa5214fc8a66ffe4debcbd3e55f8206faf",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "7ca61611d9e3210d345e362aae81415915fcbc34617863db81d4cd6cd11ca26f",
+    "src/solana_alpha_lab/factory/hfic_prior_memory.py": "010533ef475932fc6396298c315dacae2b07d33e961481c45859564074a5f99f",
+    "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py": "f6f17e75757b3733c7246b75d8da42bcf7587daeb7af66da9342ff985cd29fda",
+    "src/solana_alpha_lab/factory/hfic_session.py": "187ecea7dd0d413a2c17626f77b759f2cff6e6e6e38a16854c065bea17e0adf8",
+    "tests/test_forge_runtime_discovery_binding_v1.py": "9c97572925b3afafb4c6a7d87f16156b0822b734869b89d8ec7c7243bc8d51e1",
+    "tests/test_hfic_grounded_discovery_v1.py": "4dab424467d248b49b2318e18e070052cd566686ba6a113124b15f2b2b03aff2"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_runtime_discovery_binding_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "78c28fd3eb2d7bd947ee0bea1a4f7cf29d15b44d1c89a32e0dc37254d55e2db8",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_PUBLISHED_BINDING_AND_OWNER_FINAL_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/forge_runtime_discovery_binding_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "afa8d2fec11f3d5b936868e4090601200950b966bd0e96edb2f7d8e599cdc92d",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK"
+    ]
+  },
+  "non_claims": [
+    "NO_MARKET_PROMPT_A",
+    "NO_MARKET_CRITIC",
+    "NO_EXPERIMENT",
+    "NO_LIVE_RDP_WRITE",
+    "NO_AUTO_RELEASE",
+    "NO_ALPHA",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "git_mutation_count": 0,
+    "provider_calls": 0,
+    "cash_spend": 0
+  }
+}

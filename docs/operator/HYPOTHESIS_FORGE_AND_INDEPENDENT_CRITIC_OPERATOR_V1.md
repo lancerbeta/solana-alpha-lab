@@ -410,10 +410,14 @@ Re-check joint state coverage without a scientific look:
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-coverage --format json
 ```
 
-Ordinary numeric recipe. The store argument is explicit. Do not point it at the live store in this repair. Role and holdout come from the binding file. `--journal-scope` is the preflight `search_key_sha256`. Copy the whole returned object onto the draft as `grounded_evidence`. When cohort hashes differ, pass `--cohort-partition COHORT CENSUS OBSERVATIONS` once per cohort and do not replace those hashes with a combined file. Ordinary non-CONTROL preflight always stamps the discovery contract; `--discovery-contract` does not toggle it. That receipt requires the evidence object for 0, 1, 4, and 6 candidates. One selected candidate is persisted without a runner-up. Do not hand-write the contract field:
+Ordinary numeric recipe. `discovery-binding` does not load parquet values. It admits only when published labels match `REQUIRED_LABELS` and no protected holdout is assigned. Stop codes before row reads: `DISCOVERY_ROLE_UNKNOWN`, `DISCOVERY_ROLE_FORBIDDEN`, `DISCOVERY_ROLE_CONFLICT`, `DISCOVERY_AUTHORITY_ABSENT`, `HOLDOUT_PROTECTED`, `HOLDOUT_UNRESOLVED`, `DISCOVERY_IDENTITY_MISMATCH`, `BINDING_HASH_MISMATCH`, `DISCOVERY_ARTIFACT_MISSING`, `DISCOVERY_SCOPE_UNSUPPORTED`. Do not hand-write role or holdout. On an authorized ordinary slash, `--data-root` and `--store` are both the canonical data root, because freeze checks the look there. `--journal-scope` is the preflight `search_key_sha256`. Copy the whole returned object onto the draft as `grounded_evidence`. Each cohort keeps its own published partition. An exact repeated `--cohort-partition` is eliminated; a conflicting repeat stops. Ordinary non-CONTROL preflight always stamps the discovery contract; `--discovery-contract` does not toggle it. That receipt requires the evidence object for 0, 1, 4, and 6 candidates. One selected candidate is persisted without a runner-up. Do not hand-write the contract field:
 
 ```text
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-binding --format json
+```
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <canonical-data-root> --store <canonical-data-root> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
 ```
 
 ## A0. Authority и hard boundaries
@@ -1167,8 +1171,9 @@ decision after collection
 - Сравни selected candidate с каждой capsule по mechanism/state, actor/counterparty,
   population, decision timestamp, X/Y/horizon и falsifier/control/economic distinction.
 - Лексическое равенство identity-полей **не** требуется для duplicate suspicion.
-- `memory_status` (`HARD_CLOSE`, `PARK`, `NOT_SELECTED_IN_SESSION`, `AMBIGUOUS`,
-  `HISTORICAL`) остаётся различимым; видимость prior ≠ automatic hard-close.
+- `memory_status` (`HARD_CLOSE`, `PARK`, `NOT_SELECTED_IN_SESSION`,
+  `TECHNICAL_STOP`, `AMBIGUOUS`, `HISTORICAL`) остаётся различимым; видимость prior ≠ automatic hard-close.
+  `TECHNICAL_STOP` — записанный `KILL_UNBOUND_EVIDENCE`: terminal сохраняется, тот же scope не банит следующий поиск.
 - Найди ближайший prior mechanism и terminal.
 - Проверь equivalence under renaming и threshold changes.
 - Определи, наследует ли кандидат prior null/negative evidence.

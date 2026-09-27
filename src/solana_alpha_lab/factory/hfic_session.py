@@ -1042,6 +1042,95 @@ def _copy_evidence_surface_mode(
         target["evidence_surface_mode"] = mode
 
 
+def _discovery_candidate_scope(frozen: Mapping[str, Any] | None) -> dict[str, Any]:
+    if not isinstance(frozen, Mapping):
+        return {}
+    grounded = frozen.get("grounded_evidence")
+    if not isinstance(grounded, Mapping):
+        return {}
+    scope = grounded.get("candidate_scope")
+    if not isinstance(scope, Mapping):
+        return {}
+    kept: dict[str, Any] = {}
+    for key in (
+        "population",
+        "decision_timestamp",
+        "target",
+        "estimand",
+        "explanatory_condition",
+        "evidence_surface_mode",
+        "representation_scope",
+    ):
+        value = scope.get(key)
+        if isinstance(value, str) and value:
+            kept[key] = value
+    return kept
+
+
+def _hypothesis_scope_fields(
+    frozen: Mapping[str, Any] | None,
+    definition: Mapping[str, Any] | None,
+    card: Mapping[str, Any] | None = None,
+) -> dict[str, str]:
+    """Persist only scope axes proven on this candidate.
+
+    A session-wide ``grounded_evidence.candidate_scope`` is not copied onto
+    every hypothesis. ``evidence_surface_mode`` may come from the session
+    because it is not a per-candidate target or estimand.
+    """
+
+    out: dict[str, str] = {}
+    sources: list[Mapping[str, Any]] = []
+    if isinstance(card, Mapping):
+        sources.append(card)
+    if isinstance(definition, Mapping):
+        sources.append(definition)
+    for source in sources:
+        for key in (
+            "estimand",
+            "target",
+            "explanatory_condition",
+            "representation_scope",
+            "evidence_surface_mode",
+        ):
+            if key in out:
+                continue
+            value = source.get(key)
+            if isinstance(value, str) and value.strip():
+                out[key] = value
+    if "evidence_surface_mode" not in out and isinstance(frozen, Mapping):
+        mode = frozen.get("evidence_surface_mode")
+        if isinstance(mode, str) and mode.strip():
+            out["evidence_surface_mode"] = mode
+    return out
+
+
+def _cards_for_identities(
+    identities: Sequence[Any],
+    frozen: Mapping[str, Any] | None,
+    draft: Mapping[str, Any] | None,
+) -> list[Mapping[str, Any]]:
+    by_id: dict[str, Mapping[str, Any]] = {}
+    grounded = frozen.get("grounded_candidates") if isinstance(frozen, Mapping) else None
+    if isinstance(grounded, list):
+        for card in grounded:
+            if isinstance(card, Mapping) and card.get("candidate_id"):
+                by_id[str(card["candidate_id"])] = card
+    draft_cards: list[Mapping[str, Any]] = []
+    if isinstance(draft, Mapping) and isinstance(draft.get("candidates"), list):
+        draft_cards = [
+            card if isinstance(card, Mapping) else {}
+            for card in draft["candidates"]
+        ]
+    aligned: list[Mapping[str, Any]] = []
+    for index, identity in enumerate(identities):
+        card = by_id.get(str(getattr(identity, "candidate_id", "") or ""))
+        if card is None and index < len(draft_cards):
+            card = draft_cards[index]
+        aligned.append(card or {})
+    return aligned
+
+
 def _selected_candidate_block(
     identity: Any,
     card: Mapping[str, Any],
@@ -1121,7 +1210,128 @@ def _build_runner_up_critic_packet(
     required_caps = selected.pop("_required_capability_ids")
     packet["selected_candidate"] = selected
     packet["provisional_lane"] = _provisional_lane(required_caps)
+    _rebind_runner_up_grounded_evidence(packet, runner_up_card)
     return packet
+
+
+_RUNNER_SCOPE_KEYS = (
+    "population",
+    "decision_timestamp",
+    "target",
+    "estimand",
+    "explanatory_condition",
+    "evidence_surface_mode",
+)
+
+
+def _proven_runner_scope(
+    card: Mapping[str, Any],
+    packet: Mapping[str, Any],
+) -> dict[str, str]:
+    """Scope axes that belong to this runner-up card, not the primary candidate."""
+
+    proven: dict[str, str] = {}
+    for key in (
+        "population",
+        "decision_timestamp",
+        "target",
+        "estimand",
+        "explanatory_condition",
+        "representation_scope",
+        "evidence_surface_mode",
+    ):
+        value = card.get(key)
+        if isinstance(value, str) and value.strip():
+            proven[key] = value
+    if "evidence_surface_mode" not in proven:
+        grounded = packet.get("grounded_evidence")
+        scope = grounded.get("candidate_scope") if isinstance(grounded, Mapping) else None
+        mode = scope.get("evidence_surface_mode") if isinstance(scope, Mapping) else None
+        if not isinstance(mode, str) or not mode.strip():
+            mode = packet.get("evidence_surface_mode")
+        if isinstance(mode, str) and mode.strip():
+            proven["evidence_surface_mode"] = mode
+    return proven
+
+
+_COMPUTED_LOOK_KEYS = (
+    "result",
+    "result_sha256",
+    "result_refs",
+    "queries",
+    "priors",
+)
+
+
+def _executed_scope_matches(executed: Mapping[str, Any], proven: Mapping[str, str]) -> bool:
+    """True only when every labeled axis on both sides is the same look.
+
+    An axis present on only one side is a mismatch. A sparse executed scope
+    must not keep its result under a runner-up target or estimand it never had.
+    """
+
+    compared = False
+    for key in (
+        "population",
+        "decision_timestamp",
+        "target",
+        "estimand",
+        "explanatory_condition",
+        "evidence_surface_mode",
+        "representation_scope",
+    ):
+        raw_executed = executed.get(key)
+        raw_proven = proven.get(key)
+        executed_value = raw_executed.strip() if isinstance(raw_executed, str) else ""
+        proven_value = raw_proven.strip() if isinstance(raw_proven, str) else ""
+        if not executed_value and not proven_value:
+            continue
+        compared = True
+        if executed_value != proven_value:
+            return False
+    return compared
+
+
+def _rebind_runner_up_grounded_evidence(
+    packet: dict[str, Any],
+    card: Mapping[str, Any],
+) -> None:
+    """Keep discovery numbers only when they were computed for this candidate.
+
+    A copied primary packet otherwise drops the executed scope, its prior
+    relations, and the computed look. A complete runner-up scope is recorded
+    on its own and is not a relabel of the primary result.
+    """
+
+    grounded = packet.get("grounded_evidence")
+    if not isinstance(grounded, Mapping):
+        return
+    executed = grounded.get("candidate_scope")
+    executed_scope = executed if isinstance(executed, Mapping) else {}
+    proven = _proven_runner_scope(card, packet)
+    same_look = _executed_scope_matches(executed_scope, proven)
+    drop = {"candidate_scope", "prior_scope_relations", "canonical_prior_comparison"}
+    if not same_look:
+        drop.update(_COMPUTED_LOOK_KEYS)
+    body = {key: value for key, value in grounded.items() if key not in drop}
+    if all(proven.get(key) for key in _RUNNER_SCOPE_KEYS):
+        scope = {key: proven[key] for key in _RUNNER_SCOPE_KEYS}
+        if proven.get("representation_scope"):
+            scope["representation_scope"] = proven["representation_scope"]
+        body["candidate_scope"] = scope
+        if not same_look:
+            body["priors"] = []
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            GroundedDiscoveryError,
+            bind_prior_scope_evidence,
+        )
+
+        capsules = list((packet.get("prior_memory") or {}).get("capsules") or [])
+        try:
+            body = bind_prior_scope_evidence(body, canonical_priors=capsules)
+        except GroundedDiscoveryError as exc:
+            raise HficSessionError(exc.code) from exc
+    packet["grounded_evidence"] = body
 
 
 def _blank_optional(value: object) -> bool:
@@ -1264,6 +1474,45 @@ def _runner_up_failover_eligible(
     if not isinstance(packet, Mapping):
         return False
     return True
+
+
+def _computed_look_linked(evidence: Mapping[str, Any]) -> bool:
+    """True when this packet still carries the look it was computed for."""
+
+    refs = evidence.get("result_refs")
+    result = evidence.get("result")
+    digest = evidence.get("result_sha256")
+    if not isinstance(refs, list) or not refs:
+        return False
+    if not all(isinstance(item, str) and item.strip() for item in refs):
+        return False
+    if not isinstance(result, Mapping) or not isinstance(digest, str) or not digest.strip():
+        return False
+    from solana_alpha_lab.factory.hfic_grounded_discovery import result_sha256
+
+    return digest == result_sha256(result)
+
+
+def _runner_up_missing_own_computed_look(frozen: Mapping[str, Any]) -> bool:
+    """A runner-up discovery packet with no linked look must not pass as science.
+
+    Packets that never carried grounded evidence stay on the ordinary classifier
+    path. A same-scope runner-up that still has the computed result, its hash,
+    and result refs is linked and is not this case.
+    """
+
+    runner_id = frozen.get("runner_up_candidate_id")
+    if not isinstance(runner_id, str) or not runner_id:
+        return False
+    if frozen.get("selected_candidate_id") != runner_id:
+        return False
+    packet = frozen.get("critic_input_packet")
+    if not isinstance(packet, Mapping):
+        return False
+    evidence = packet.get("grounded_evidence")
+    if not isinstance(evidence, Mapping):
+        return False
+    return not _computed_look_linked(evidence)
 
 
 def _classifier_frozen_view(
@@ -1434,6 +1683,73 @@ def _ordinary_discovery_requested(
         or contract == DISCOVERY_CONTRACT_VERSION
     )
     return machine_contract
+
+
+def _bind_selected_look(
+    grounded: Mapping[str, Any],
+    selected_card: Mapping[str, Any],
+    *,
+    store: Any,
+    strict: bool = True,
+) -> dict[str, Any]:
+    """Keep a confirming look, detach a narrower idea, stop a contradiction.
+
+    The durable look owns its scope. A selected card that names a different
+    population or decision moment stops. A different or one-sided label is
+    not a scientific record and is saved later as an idea, without that result.
+    """
+
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        card_claim_scope,
+        relate_look_scope,
+        stored_look_scope,
+    )
+
+    look_scope = stored_look_scope(store, grounded) if store is not None else None
+    if look_scope is None:
+        raw = grounded.get("candidate_scope")
+        look_scope = dict(raw) if isinstance(raw, Mapping) else {}
+    relation = relate_look_scope(look_scope, card_claim_scope(selected_card))
+    if relation == "LOOK_SCOPE_CONTRADICTION" and strict:
+        raise HficSessionError("LOOK_SCOPE_CONTRADICTION")
+    if relation == "LOOK_SCOPE_MATCH":
+        body = dict(grounded)
+        body["candidate_scope"] = dict(look_scope)
+        body["look_scope_relation"] = relation
+        body["look_confirms_selected"] = True
+        return body
+    kept = {
+        key: value
+        for key, value in grounded.items()
+        if key
+        not in {
+            "result",
+            "result_sha256",
+            "result_refs",
+            "queries",
+            "priors",
+            "prior_scope_relations",
+            "canonical_prior_comparison",
+            "candidate_scope",
+        }
+    }
+    kept["candidate_scope"] = card_claim_scope(selected_card)
+    kept["look_scope_relation"] = relation
+    kept["look_confirms_selected"] = False
+    kept["look_context_result_refs"] = list(grounded.get("result_refs") or [])
+    return kept
+
+
+def _foreign_look_blocks_scientific_terminal(
+    frozen: Mapping[str, Any],
+    critic_result: Mapping[str, Any],
+) -> bool:
+    view = _classifier_frozen_view(frozen, critic_result)
+    packet = view.get("critic_input_packet")
+    if not isinstance(packet, Mapping):
+        return False
+    evidence = packet.get("grounded_evidence")
+    return isinstance(evidence, Mapping) and evidence.get("look_confirms_selected") is False
 
 
 def _enforce_ordinary_grounded_evidence(
@@ -1756,15 +2072,34 @@ def freeze_draft(
             raise HficSessionError(exc.code) from exc
     grounded = draft.get("grounded_evidence")
     if isinstance(grounded, Mapping):
+        from solana_alpha_lab.factory.hfic_grounded_discovery import stored_look_scope
+
+        look_scope = stored_look_scope(store, grounded) if store is not None else None
+        if look_scope or (
+            isinstance(grounded.get("result_refs"), list) and grounded.get("result_refs")
+        ):
+            grounded = _bind_selected_look(
+                grounded,
+                selected_card if isinstance(selected_card, Mapping) else {},
+                store=store,
+            )
+    if isinstance(grounded, Mapping) and grounded.get("look_confirms_selected") is not False:
         from solana_alpha_lab.factory.hfic_grounded_discovery import (
             GroundedDiscoveryError,
             bind_prior_scope_evidence,
         )
 
         try:
-            packet["grounded_evidence"] = bind_prior_scope_evidence(grounded)
+            packet["grounded_evidence"] = bind_prior_scope_evidence(
+                grounded,
+                canonical_priors=list(
+                    (packet.get("prior_memory") or {}).get("capsules") or []
+                ),
+            )
         except GroundedDiscoveryError as exc:
             raise HficSessionError(exc.code) from exc
+    elif isinstance(grounded, Mapping):
+        packet["grounded_evidence"] = grounded
     if repo_root is not None:
         _validate_json_schema(
             packet,
@@ -1794,6 +2129,42 @@ def freeze_draft(
             runner_up_card=runner_up_transport,
             packet_version=critic_packet_version,
         )
+        source_evidence = draft.get("grounded_evidence")
+        if isinstance(source_evidence, Mapping) and (
+            isinstance(source_evidence.get("result_refs"), list)
+            and source_evidence.get("result_refs")
+        ):
+            built_evidence = runner_up_packet.get("grounded_evidence")
+            rebound = _bind_selected_look(
+                source_evidence,
+                runner_up_card if isinstance(runner_up_card, Mapping) else {},
+                store=store,
+                strict=False,
+            )
+            if (
+                rebound.get("look_confirms_selected") is False
+                and isinstance(built_evidence, Mapping)
+            ):
+                if "prior_scope_relations" in built_evidence:
+                    rebound["prior_scope_relations"] = built_evidence["prior_scope_relations"]
+                if built_evidence.get("canonical_prior_comparison") is True:
+                    rebound["canonical_prior_comparison"] = True
+            if rebound.get("look_confirms_selected") is not False:
+                from solana_alpha_lab.factory.hfic_grounded_discovery import (
+                    GroundedDiscoveryError,
+                    bind_prior_scope_evidence,
+                )
+
+                try:
+                    rebound = bind_prior_scope_evidence(
+                        rebound,
+                        canonical_priors=list(
+                            (packet.get("prior_memory") or {}).get("capsules") or []
+                        ),
+                    )
+                except GroundedDiscoveryError as exc:
+                    raise HficSessionError(exc.code) from exc
+            runner_up_packet["grounded_evidence"] = rebound
         try:
             assert_packet_grounding_consistent(
                 runner_up_packet["selected_candidate"],
@@ -2613,6 +2984,11 @@ def persist_no_worthy_session(
                     if frozen.get("evidence_surface_mode")
                     else {}
                 ),
+                **(
+                    {"discovery_candidate_scope": _discovery_candidate_scope(frozen)}
+                    if _discovery_candidate_scope(frozen)
+                    else {}
+                ),
             },
         ),
         event(
@@ -2655,7 +3031,8 @@ def persist_no_worthy_session(
             },
         ),
     ]
-    for identity in identities:
+    cards = _cards_for_identities(identities, frozen, draft)
+    for identity, card in zip(identities, cards, strict=True):
         records.append(
             event(
                 record_id=f"HFIC-HYP-{identity.candidate_id}",
@@ -2680,6 +3057,7 @@ def persist_no_worthy_session(
                     "cheapest_falsifier": identity.definition["cheapest_falsifier"],
                     "definition_sha256": identity.full_sha256,
                     "role_in_session": "CONSIDERED_UNSELECTED",
+                    **_hypothesis_scope_fields(frozen, identity.definition, card),
                 },
             )
         )
@@ -4276,6 +4654,9 @@ def persist_frozen_session(
     _copy_evidence_surface_mode(cycle_payload, frozen)
     _stamp_split_identity(cycle_payload, frozen)
     _stamp_market_evidence_basis(cycle_payload, frozen)
+    discovered_scope = _discovery_candidate_scope(frozen)
+    if discovered_scope:
+        cycle_payload["discovery_candidate_scope"] = discovered_scope
     if isinstance(frozen.get("grounded_candidates"), list):
         cycle_payload["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -4304,7 +4685,8 @@ def persist_frozen_session(
             payload=cycle_payload,
         )
     ]
-    for identity in identities:
+    cards = _cards_for_identities(identities, frozen, draft)
+    for identity, card in zip(identities, cards, strict=True):
         records.append(
             event(
                 record_id=f"HFIC-HYP-{identity.candidate_id}",
@@ -4338,6 +4720,7 @@ def persist_frozen_session(
                             else "PORTFOLIO"
                         )
                     ),
+                    **_hypothesis_scope_fields(frozen, identity.definition, card),
                 },
             )
         )
@@ -5680,6 +6063,17 @@ def run_live_classifier(
         spec_sha256=spec_sha,
     )
     receipt["hypothesis_version"] = validated.get("hypothesis_version")
+    if (
+        _runner_up_missing_own_computed_look(frozen)
+        and _classifier_to_hfic_terminal(receipt) in _FINAL_PASS_TERMINALS
+    ):
+        receipt = {
+            **receipt,
+            "lane": "DENY",
+            "lane_classifier_terminal": "DENY_INTEGRITY_MISMATCH",
+            "reason_codes": ["GROUNDED_RESULT_UNBOUND"],
+            "classifier_route_terminal": str(decision.terminal),
+        }
     if selected is not None and _classifier_to_hfic_terminal(receipt) == "PASS_FAST_LANE_READY":
         from solana_alpha_lab.factory.hfic_control_integrity import (
             DENY_HFIC_AVAILABILITY_GATE,
@@ -6112,6 +6506,30 @@ def apply_revision(
     packet = dict(packet_in)
     packet["selected_candidate"] = rebuilt_selected
     packet["strongest_rejected_alternative"] = rejected_id
+    source_evidence = packet.get("grounded_evidence")
+    if isinstance(source_evidence, Mapping) and source_evidence.get("result_refs"):
+        rebound = _bind_selected_look(
+            source_evidence,
+            selected_card if isinstance(selected_card, Mapping) else {},
+            store=store,
+            strict=False,
+        )
+        if rebound.get("look_confirms_selected") is not False:
+            from solana_alpha_lab.factory.hfic_grounded_discovery import (
+                GroundedDiscoveryError,
+                bind_prior_scope_evidence,
+            )
+
+            try:
+                rebound = bind_prior_scope_evidence(
+                    rebound,
+                    canonical_priors=list(
+                        (packet.get("prior_memory") or {}).get("capsules") or []
+                    ),
+                )
+            except GroundedDiscoveryError as exc:
+                raise HficSessionError(exc.code) from exc
+        packet["grounded_evidence"] = rebound
     packet["research_memory_as_of"] = str(existing.get("research_memory_as_of") or "")
     packet["owner_focus"] = str(existing.get("owner_focus") or "AUTO")
     packet["truth_roots_used"] = _nonempty_str_list(
@@ -6254,6 +6672,9 @@ def apply_revision(
                     "definition_sha256": selected_identity.full_sha256,
                     "role_in_session": "SELECTED",
                     "supersedes_hypothesis_version_id": original_selected_id,
+                    **_hypothesis_scope_fields(
+                        frozen, selected_identity.definition, selected_card
+                    ),
                 },
                 transaction_id=transaction_id,
             )
@@ -6610,19 +7031,26 @@ def finalize_session(
             clock=clock,
         )
     if terminal == "PASS_TO_CLASSIFICATION":
-        fake = critic_result.get("classifier_receipt")
-        if fake:
-            raise HficSessionError("CLASSIFIER_RECEIPT_INVALID")
-        if existing is not None and existing.get("session_state") == "AWAITING_CLASSIFICATION":
-            return existing
-        return persist_intermediate_cycle(
-            store,
-            frozen,
-            critic_result,
-            repo_root=repo_root,
-            phase="AWAITING_CLASSIFICATION",
-            clock=clock,
-        )
+        if _foreign_look_blocks_scientific_terminal(frozen, critic_result):
+            terminal = "KILL_UNBOUND_EVIDENCE"
+            observed_terminal = terminal
+            critic_result = dict(critic_result)
+            critic_result["critic_terminal"] = terminal
+            critic_result["next"] = "STOP"
+        else:
+            fake = critic_result.get("classifier_receipt")
+            if fake:
+                raise HficSessionError("CLASSIFIER_RECEIPT_INVALID")
+            if existing is not None and existing.get("session_state") == "AWAITING_CLASSIFICATION":
+                return existing
+            return persist_intermediate_cycle(
+                store,
+                frozen,
+                critic_result,
+                repo_root=repo_root,
+                phase="AWAITING_CLASSIFICATION",
+                clock=clock,
+            )
     classifier_receipt = None
     claimed_terminal = None
     classifier_view = _classifier_frozen_view(frozen, critic_result)
@@ -6653,6 +7081,15 @@ def finalize_session(
                 critic_result["next"] = "STOP"
             else:
                 raise HficSessionError("CLASSIFIER_TERMINAL_MISMATCH")
+    if _foreign_look_blocks_scientific_terminal(frozen, critic_result) and (
+        terminal in _FINAL_PASS_TERMINALS
+        or (terminal in _KILL_TERMINALS and terminal != "KILL_UNBOUND_EVIDENCE")
+    ):
+        terminal = "KILL_UNBOUND_EVIDENCE"
+        observed_terminal = terminal
+        critic_result = dict(critic_result)
+        critic_result["critic_terminal"] = terminal
+        critic_result["next"] = "STOP"
     if _runner_up_failover_eligible(frozen, existing, terminal):
         if claimed_terminal is not None:
             frozen = {**dict(frozen), "critic_claimed_terminal": claimed_terminal}

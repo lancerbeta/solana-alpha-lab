@@ -224,6 +224,14 @@ def ranked_prior_entries_for_ids(
         # Same canonical DECISION_EVENT walker as Critic prior-memory.
         for hyp_id, decision in latest_hypothesis_decisions(store).items():
             resolved.setdefault(str(hyp_id), decision)
+    session_scope: dict[str, dict[str, Any]] = {}
+    if store is not None:
+        from solana_alpha_lab.factory.hfic_prior_memory import (
+            _session_scope_index,
+            recover_scope_payload,
+        )
+
+        session_scope = _session_scope_index(store)
     entries: list[dict[str, Any]] = []
     for hyp_id in ranked_ids:
         payload = by_id.get(str(hyp_id))
@@ -233,6 +241,8 @@ def ranked_prior_entries_for_ids(
         # deliberately omits Critic-only fields; re-checking the lean entry with
         # the Critic usefulness predicate would mislabel capacity/projection
         # outcomes as RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE.
+        if session_scope:
+            payload = recover_scope_payload(payload, session_scope)
         decision = resolved.get(str(hyp_id))
         entry = compact_forge_prior_entry(str(hyp_id), payload, decision)
         if str(entry.get("hypothesis_version_id") or "") != str(hyp_id):
