@@ -298,6 +298,7 @@
                   "HARD_CLOSE",
                   "PARK",
                   "NOT_SELECTED_IN_SESSION",
+                  "TECHNICAL_STOP",
                   "AMBIGUOUS",
                   "HISTORICAL"
                 ]

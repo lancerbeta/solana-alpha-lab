@@ -722,7 +722,14 @@ def _non_blocking_prior(prior: Mapping[str, Any]) -> bool:
         return True
     if reason in _NON_BLOCKING_REASONS or reason.startswith("PARK_"):
         return True
-    if reason in {"OBSERVABILITY_BLOCKED", "INPUT_NOT_READY", "HOLDOUT_UNRESOLVED"}:
+    if reason in {
+        "OBSERVABILITY_BLOCKED",
+        "INPUT_NOT_READY",
+        "HOLDOUT_UNRESOLVED",
+        "KILL_UNBOUND_EVIDENCE",
+    }:
+        return True
+    if status == "TECHNICAL_STOP":
         return True
     return False
 

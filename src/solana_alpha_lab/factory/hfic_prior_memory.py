@@ -21,15 +21,18 @@ CONFIG_RELATIVE = "configs/hypothesis_forge_independent_critic_v1.yaml"
 MEMORY_HARD_CLOSE = "HARD_CLOSE"
 MEMORY_PARK = "PARK"
 MEMORY_NOT_SELECTED = "NOT_SELECTED_IN_SESSION"
+MEMORY_TECHNICAL_STOP = "TECHNICAL_STOP"
 MEMORY_AMBIGUOUS = "AMBIGUOUS"
 MEMORY_HISTORICAL = "HISTORICAL"
 MEMORY_STATUSES = (
     MEMORY_HARD_CLOSE,
     MEMORY_PARK,
     MEMORY_NOT_SELECTED,
+    MEMORY_TECHNICAL_STOP,
     MEMORY_AMBIGUOUS,
     MEMORY_HISTORICAL,
 )
+_TECHNICAL_KILL_REASONS = frozenset({"KILL_UNBOUND_EVIDENCE"})
 
 _CAPSULE_FIELDS = (
     "claim",
@@ -116,6 +119,8 @@ def classify_memory_status(
     reason = str(reason_code or "")
     if reason == MEMORY_NOT_SELECTED:
         return MEMORY_NOT_SELECTED
+    if reason in _TECHNICAL_KILL_REASONS:
+        return MEMORY_TECHNICAL_STOP
     if reason.startswith("PARK_") or reason == "OWNER_PRIORITY_PARK" or kind == "PARK":
         return MEMORY_PARK
     if (

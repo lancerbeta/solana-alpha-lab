@@ -1197,9 +1197,156 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             decision = done["decisions"][session["frozen"]["runner_up_candidate_id"]]
             self.assertEqual(decision["reason_code"], "KILL_UNBOUND_EVIDENCE")
             self.assertEqual(decision["decision_kind"], "REJECT")
-            decision = done["decisions"][session["frozen"]["runner_up_candidate_id"]]
-            self.assertEqual(decision["reason_code"], "KILL_UNBOUND_EVIDENCE")
-            self.assertEqual(decision["decision_kind"], "REJECT")
+            self._assert_unbound_kill_does_not_close_memory(session, done)
+
+    def _assert_unbound_kill_does_not_close_memory(self, session: dict, done: dict) -> None:
+        from solana_alpha_lab.factory.hfic_memory_policy import (
+            iter_search_memory_hypothesis_payloads,
+        )
+        from solana_alpha_lab.factory.hfic_prior_memory import build_prior_memory_snapshot
+        from solana_alpha_lab.factory.hfic_reopened_prior_routing import (
+            ranked_prior_entries_for_ids,
+        )
+
+        store = ResearchStore(session["data_root"])
+        runner_id = session["frozen"]["runner_up_candidate_id"]
+        snapshot = build_prior_memory_snapshot(
+            store,
+            store_inventory_digest=store.diagnostics().committed_inventory_sha256,
+        )
+        capsule = next(
+            item
+            for item in snapshot["capsules"]
+            if item["hypothesis_version_id"] == runner_id
+        )
+        self.assertEqual(capsule["reason_code"], "KILL_UNBOUND_EVIDENCE")
+        self.assertEqual(capsule["memory_status"], "TECHNICAL_STOP")
+        self.assertNotEqual(capsule["memory_status"], "HARD_CLOSE")
+        payloads = list(iter_search_memory_hypothesis_payloads(store))
+        ranked = ranked_prior_entries_for_ids([runner_id], payloads, store=store)
+        self.assertEqual(ranked[0]["memory_status"], "TECHNICAL_STOP")
+        self.assertEqual(ranked[0]["reason_code"], "KILL_UNBOUND_EVIDENCE")
+        scope = {
+            key: capsule[key]
+            for key in (
+                "population",
+                "decision_timestamp",
+                "target",
+                "estimand",
+                "explanatory_condition",
+                "evidence_surface_mode",
+                "representation_scope",
+            )
+            if capsule.get(key)
+        }
+        scope.setdefault("evidence_surface_mode", "ORDINARY_GROUNDED_DISCOVERY_V1")
+        bound = bind_prior_scope_evidence(
+            {"candidate_scope": scope, "priors": []},
+            canonical_priors=snapshot["capsules"],
+        )
+        relation = next(
+            item["relation"]
+            for item in bound["prior_scope_relations"]
+            if item.get("hypothesis_version_id") == runner_id
+        )
+        self.assertIn(relation, {"NON_BLOCKING_PRIOR", "UNKNOWN_SCOPE_NEEDS_RESOLUTION"})
+        self.assertNotIn(relation, {"EXACT_SCOPE_MATCH", "EXACT_VALID_CLOSE"})
+        self.assertEqual(done["final_session_terminal"], "KILL_UNBOUND_EVIDENCE")
+
+    def test_recorded_unbound_kill_is_technical_and_mechanism_still_blocks(self) -> None:
+        unbound_id = "HFIC-CAND-RECORDED-UNBOUND"
+        mechanism_id = "HFIC-CAND-RECORDED-MECHANISM"
+        axes = {
+            "population": "BASE_X",
+            "decision_timestamp": "X300",
+            "target": "target_same",
+            "estimand": "estimand_same",
+            "explanatory_condition": "cond_same",
+            "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+            "representation_scope": "rep_same",
+        }
+        common = {
+            "session_id": "HFIC-SESS-RECORDED-KILL",
+            "hfic_protocol": "HFIC-V1.2",
+            "mechanism": "recorded close",
+            "actor_counterparty": "crowd",
+            "primary_x_family": "ACTIVITY_VOLUME",
+            "primary_y": "path",
+            "horizon_notional": "Y1800",
+            "negative_control": "shuffled",
+            "cheapest_falsifier": "falsifier",
+            **axes,
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            store.append(
+                [
+                    _event(
+                        RecordKind.HYPOTHESIS_VERSION,
+                        "HFIC-HYP-UNBOUND",
+                        {
+                            **common,
+                            "hypothesis_version_id": unbound_id,
+                            "claim": "recorded unbound kill",
+                        },
+                        hyp=unbound_id,
+                    ),
+                    _event(
+                        RecordKind.HYPOTHESIS_VERSION,
+                        "HFIC-HYP-MECHANISM",
+                        {
+                            **common,
+                            "hypothesis_version_id": mechanism_id,
+                            "claim": "recorded mechanism kill",
+                        },
+                        hyp=mechanism_id,
+                    ),
+                    _event(
+                        RecordKind.DECISION_EVENT,
+                        "HFIC-DEC-UNBOUND",
+                        {
+                            "hypothesis_version_id": unbound_id,
+                            "decision_kind": "REJECT",
+                            "reason_code": "KILL_UNBOUND_EVIDENCE",
+                        },
+                        hyp=unbound_id,
+                    ),
+                    _event(
+                        RecordKind.DECISION_EVENT,
+                        "HFIC-DEC-MECHANISM",
+                        {
+                            "hypothesis_version_id": mechanism_id,
+                            "decision_kind": "REJECT",
+                            "reason_code": "KILL_MECHANISM",
+                        },
+                        hyp=mechanism_id,
+                    ),
+                ],
+                transaction_id="RESEARCH-TXN-BINDING-001",
+            )
+            from solana_alpha_lab.factory.hfic_prior_memory import build_prior_memory_snapshot
+
+            snapshot = build_prior_memory_snapshot(
+                store,
+                store_inventory_digest="ab" * 32,
+            )
+            by_id = {item["hypothesis_version_id"]: item for item in snapshot["capsules"]}
+            self.assertEqual(by_id[unbound_id]["memory_status"], "TECHNICAL_STOP")
+            self.assertEqual(by_id[mechanism_id]["memory_status"], "HARD_CLOSE")
+            allowed = bind_prior_scope_evidence(
+                {"candidate_scope": dict(axes), "priors": []},
+                canonical_priors=[by_id[unbound_id]],
+            )
+            self.assertEqual(
+                allowed["prior_scope_relations"][0]["relation"],
+                "NON_BLOCKING_PRIOR",
+            )
+            with self.assertRaises(GroundedDiscoveryError) as caught:
+                bind_prior_scope_evidence(
+                    {"candidate_scope": dict(axes), "priors": []},
+                    canonical_priors=[by_id[mechanism_id]],
+                )
+            self.assertEqual(caught.exception.code, "EXACT_PRIOR_SCOPE_MATCH")
 
     def test_same_scope_runner_up_keeps_ordinary_classification(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
