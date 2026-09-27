@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -472,6 +474,367 @@ class PriorScopeTransportTests(unittest.TestCase):
                 bound["prior_scope_relations"][0]["relation"],
                 "SCOPED_CONTROL_DOES_NOT_BLOCK",
             )
+
+
+class LegacyRankedPriorRecoveryTests(unittest.TestCase):
+    def test_preflight_ranked_entry_matches_critic_capsule_without_prefilled_scope(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import prior_scope_relation
+        from solana_alpha_lab.factory.hfic_reopened_prior_routing import (
+            ranked_prior_entries_for_ids,
+        )
+        from tests.test_hfic_cli import seed_minimal_market_basis
+        from tests.test_hfic_forge_context_and_no_worthy import run_cli
+
+        legacy_id = "HFIC-CAND-LEGACY-SCOPE-RECOVERY"
+        sibling_id = "HFIC-CAND-LEGACY-SCOPE-SIBLING"
+        session_id = "HFIC-SESS-LEGACY-SCOPE"
+        focus = "LEGACY_SCOPE_RECOVERY_TOKEN"
+        legacy_body = {
+            "hypothesis_version_id": legacy_id,
+            "session_id": session_id,
+            "claim": f"{focus} ticket asymmetry",
+            "statement": f"{focus} ticket asymmetry",
+            "mechanism": "preparatory loop",
+            "actor_counterparty": "crowd",
+            "population": "BASE_X",
+            "decision_timestamp": "X300",
+            "primary_x_family": "ACTIVITY_VOLUME",
+            "primary_y": "path",
+            "horizon_notional": "Y1800",
+            "negative_control": "shuffled",
+            "cheapest_falsifier": "kill the loop",
+        }
+        sibling_body = {
+            **legacy_body,
+            "hypothesis_version_id": sibling_id,
+            "claim": f"{focus} sibling without card",
+            "statement": f"{focus} sibling without card",
+        }
+        self.assertNotIn("target", legacy_body)
+        self.assertNotIn("estimand", legacy_body)
+        with tempfile.TemporaryDirectory() as tmp:
+            data = Path(tmp) / "rdp"
+            seed_minimal_market_basis(data)
+            store = ResearchStore(data)
+            store.append(
+                [
+                    _event(RecordKind.HYPOTHESIS_VERSION, "HFIC-HYP-LEGACY", legacy_body, hyp=legacy_id),
+                    _event(RecordKind.HYPOTHESIS_VERSION, "HFIC-HYP-SIBLING", sibling_body, hyp=sibling_id),
+                    _event(
+                        RecordKind.RESEARCH_CYCLE,
+                        "HFIC-CYCLE-LEGACY",
+                        {
+                            "session_id": session_id,
+                            "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+                            "discovery_candidate_scope": {
+                                "target": "POISON_SHARED_TARGET",
+                                "estimand": "POISON_SHARED_ESTIMAND",
+                            },
+                            "grounded_candidates": [
+                                {
+                                    "candidate_id": legacy_id,
+                                    "estimand": "ticket_asymmetry",
+                                    "target": "Y1800_REPORTED_PRICE_PATH",
+                                    "explanatory_condition": "PRICE_GE_2",
+                                    "representation_scope": CURRENT_REPRESENTATION_CONTROL_V1,
+                                }
+                            ],
+                        },
+                    ),
+                    _event(
+                        RecordKind.DECISION_EVENT,
+                        "HFIC-DEC-LEGACY",
+                        {
+                            "hypothesis_version_id": legacy_id,
+                            "decision_kind": "REJECT",
+                            "reason_code": "KILL_PREPARATORY_LOOP",
+                        },
+                        hyp=legacy_id,
+                    ),
+                    _event(
+                        RecordKind.DECISION_EVENT,
+                        "HFIC-DEC-SIBLING",
+                        {
+                            "hypothesis_version_id": sibling_id,
+                            "decision_kind": "REJECT",
+                            "reason_code": "KILL_MECHANISM",
+                        },
+                        hyp=sibling_id,
+                    ),
+                ],
+                transaction_id="RESEARCH-TXN-BINDING-001",
+            )
+            preflight = run_cli(
+                "preflight",
+                "--owner-focus",
+                focus,
+                "--format",
+                "json",
+                data_root=data,
+            )
+            self.assertEqual(preflight.returncode, 0, preflight.stderr)
+            packet = json.loads(preflight.stdout)["forge_context_packet"]
+            ranked = {
+                item["hypothesis_version_id"]: item
+                for item in packet["ranked_prior_entries"]
+            }
+            self.assertIn(legacy_id, ranked)
+            self.assertIn(sibling_id, ranked)
+            prompt_a = ranked[legacy_id]
+            self.assertEqual(prompt_a["target"], "Y1800_REPORTED_PRICE_PATH")
+            self.assertEqual(prompt_a["estimand"], "ticket_asymmetry")
+            self.assertEqual(
+                prompt_a["evidence_surface_mode"],
+                CURRENT_REPRESENTATION_CONTROL_V1,
+            )
+            self.assertNotEqual(prompt_a.get("target"), "POISON_SHARED_TARGET")
+            sibling_entry = ranked[sibling_id]
+            self.assertNotIn("target", sibling_entry)
+            self.assertNotIn("estimand", sibling_entry)
+            self.assertNotEqual(sibling_entry.get("target"), "Y1800_REPORTED_PRICE_PATH")
+            snapshot = build_prior_memory_snapshot(
+                ResearchStore(data),
+                store_inventory_digest="cd" * 32,
+            )
+            capsules = {
+                item["hypothesis_version_id"]: item for item in snapshot["capsules"]
+            }
+            for field in (
+                "target",
+                "estimand",
+                "explanatory_condition",
+                "representation_scope",
+                "evidence_surface_mode",
+            ):
+                self.assertEqual(capsules[legacy_id].get(field), prompt_a.get(field))
+                self.assertEqual(capsules[sibling_id].get(field), sibling_entry.get(field))
+            direct = {
+                item["hypothesis_version_id"]: item
+                for item in ranked_prior_entries_for_ids(
+                    [legacy_id, sibling_id],
+                    [legacy_body, sibling_body],
+                    store=ResearchStore(data),
+                )
+            }
+            self.assertEqual(direct[legacy_id]["target"], prompt_a["target"])
+            self.assertNotIn("target", direct[sibling_id])
+            self.assertEqual(
+                prior_scope_relation(
+                    {
+                        "population": "BASE_X",
+                        "decision_timestamp": "X300",
+                        "target": "Y1800_REPORTED_PRICE_PATH",
+                        "estimand": "ticket_asymmetry",
+                        "explanatory_condition": "PRICE_GE_2",
+                        "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+                    },
+                    capsules[sibling_id],
+                ),
+                "UNKNOWN_SCOPE_NEEDS_RESOLUTION",
+            )
+
+
+class PerCandidateScopePersistenceTests(unittest.TestCase):
+    def test_runner_up_does_not_inherit_selected_scope(self) -> None:
+        from tests.test_hfic_cli import bind_draft, populate_real_c1_c2, run_cli
+
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            data_root = workspace / "rdp"
+            populate_real_c1_c2(data_root, workspace)
+            preflight = run_cli(
+                "preflight",
+                "--discovery-contract",
+                "--owner-focus",
+                "PER-CANDIDATE-SCOPE",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(preflight.returncode, 0, preflight.stderr)
+            receipt = json.loads(preflight.stdout)
+            source = json.loads(
+                (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            base = dict(source["candidates"][0])
+            card_a = dict(base)
+            card_b = dict(base)
+            card_c = dict(base)
+            card_a.update(
+                {
+                    "label": "HFIC-V12-A-SCOPE",
+                    "display_ordinal": 1,
+                    "estimand": "estimand_A",
+                    "target": "target_A",
+                    "explanatory_condition": "cond_A",
+                    "representation_scope": "rep_A",
+                }
+            )
+            card_b.update(
+                {
+                    "label": "HFIC-V12-B-SCOPE",
+                    "display_ordinal": 2,
+                    "claim": base["claim"] + " runner B",
+                    "estimand": "estimand_B",
+                    "target": "target_B",
+                    "explanatory_condition": "cond_B",
+                    "representation_scope": "rep_B",
+                }
+            )
+            card_c.update(
+                {
+                    "label": "HFIC-V12-C-SCOPE",
+                    "display_ordinal": 3,
+                    "claim": base["claim"] + " rejected C",
+                    "estimand": "estimand_C",
+                }
+            )
+            for key in ("target", "explanatory_condition", "representation_scope"):
+                card_c.pop(key, None)
+            bound = run_cli(
+                "discovery-binding",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(bound.returncode, 0, bound.stderr)
+            spec_path = workspace / "spec.json"
+            scope_path = workspace / "scope.json"
+            spec_path.write_text(
+                json.dumps(
+                    {
+                        "query_id": "PER_CANDIDATE_SCOPE",
+                        "population": "BASE_X",
+                        "decision_points": ["X300"],
+                        "decision_fields": [
+                            "FIELD-USD-PRICE-001",
+                            "FIELD-LIQUIDITY-USD-001",
+                        ],
+                        "target_point": "Y1800",
+                        "target_field": "FIELD-USD-PRICE-001",
+                        "explanatory": [],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            scope_path.write_text(
+                json.dumps(
+                    {
+                        "question_id": "PER_CANDIDATE_SCOPE",
+                        "population": "BASE_X",
+                        "decision_timestamp": "X300",
+                        "target": "target_A",
+                        "estimand": "estimand_A",
+                        "explanatory_condition": "cond_A",
+                        "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+                        "representation_scope": "rep_A",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            journal = str(receipt["search_key_sha256"])
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-B",
+                    "scripts/hypothesis_forge.py",
+                    "--root",
+                    str(ROOT),
+                    "--data-root",
+                    str(data_root),
+                    "discovery-execute",
+                    "--store",
+                    str(data_root),
+                    "--spec",
+                    str(spec_path),
+                    "--candidate-scope",
+                    str(scope_path),
+                    "--journal-scope",
+                    journal,
+                    "--format",
+                    "json",
+                ],
+                cwd=ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                env={**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"},
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            evidence = json.loads(completed.stdout)
+            self.assertEqual(evidence["candidate_scope"]["target"], "target_A")
+            preflight_after = run_cli(
+                "preflight",
+                "--discovery-contract",
+                "--owner-focus",
+                "PER-CANDIDATE-SCOPE",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(preflight_after.returncode, 0, preflight_after.stderr)
+            receipt = json.loads(preflight_after.stdout)
+            self.assertEqual(receipt.get("search_key_sha256"), evidence["journal_scope"])
+            draft = bind_draft(
+                {**source, "candidates": [card_a, card_b, card_c]},
+                receipt,
+            )
+            draft["selected_candidate_ref"] = card_a["label"]
+            draft["runner_up_candidate_ref"] = card_b["label"]
+            draft["strongest_rejected_alternative"] = card_c["label"]
+            draft["grounded_evidence"] = evidence
+            draft_path = workspace / "draft.json"
+            receipt_path = workspace / "preflight.json"
+            draft_path.write_text(json.dumps(draft), encoding="utf-8")
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            frozen_run = run_cli(
+                "freeze",
+                "--draft",
+                str(draft_path),
+                "--preflight-receipt",
+                str(receipt_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(frozen_run.returncode, 0, frozen_run.stderr)
+            frozen = json.loads(frozen_run.stdout)
+            versions = {}
+            for record in ResearchStore(data_root).iter_committed_records():
+                kind = getattr(record.record_kind, "value", record.record_kind)
+                if kind != "HYPOTHESIS_VERSION":
+                    continue
+                payload = json.loads(record.payload_json)
+                if payload.get("session_id") != frozen["session_id"]:
+                    continue
+                versions[payload["hypothesis_version_id"]] = payload
+            selected = versions[frozen["selected_candidate_id"]]
+            runner = versions[frozen["runner_up_candidate_id"]]
+            rejected_id = next(
+                item
+                for item in versions
+                if item not in {frozen["selected_candidate_id"], frozen["runner_up_candidate_id"]}
+            )
+            rejected = versions[rejected_id]
+            self.assertEqual(selected["target"], "target_A")
+            self.assertEqual(selected["estimand"], "estimand_A")
+            self.assertEqual(runner["target"], "target_B")
+            self.assertEqual(runner["estimand"], "estimand_B")
+            self.assertNotEqual(runner.get("target"), "target_A")
+            self.assertEqual(rejected["estimand"], "estimand_C")
+            self.assertNotIn("target", rejected)
+            runner_packet = frozen["runner_up_critic_input_packet"]
+            runner_scope = runner_packet["grounded_evidence"]["candidate_scope"]
+            self.assertEqual(runner_scope["target"], "target_B")
+            self.assertEqual(runner_scope["estimand"], "estimand_B")
+            self.assertNotEqual(runner_scope["target"], "target_A")
+            primary_scope = frozen["critic_input_packet"]["grounded_evidence"]["candidate_scope"]
+            self.assertEqual(primary_scope["target"], "target_A")
+            self.assertIn("prior_scope_relations", runner_packet["grounded_evidence"])
 
 
 if __name__ == "__main__":

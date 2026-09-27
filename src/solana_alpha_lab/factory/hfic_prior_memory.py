@@ -515,14 +515,22 @@ def _fill_scope_from_session(
     payload: Mapping[str, Any],
     session_scope: Mapping[str, Mapping[str, Any]],
 ) -> None:
-    """Fill missing scope axes. Do not overwrite a field the hypothesis already has."""
+    """Fill missing scope axes from records bound to this hypothesis.
+
+    A session-level discovery scope is not applied: it is not proof that
+    every hypothesis in the session shares one target or estimand.
+    ``evidence_surface_mode`` is session-level and may be shared.
+    Do not overwrite a field the hypothesis payload already has.
+    """
 
     session_id = str(payload.get("session_id") or "")
     slot = session_scope.get(session_id)
     if not isinstance(slot, Mapping):
         return
     sources: list[Mapping[str, Any]] = []
-    candidate_id = str(payload.get("hypothesis_version_id") or "")
+    candidate_id = str(
+        payload.get("hypothesis_version_id") or capsule.get("hypothesis_version_id") or ""
+    )
     candidates = slot.get("candidates")
     if isinstance(candidates, Mapping) and isinstance(candidates.get(candidate_id), Mapping):
         sources.append(candidates[candidate_id])
@@ -535,6 +543,32 @@ def _fill_scope_from_session(
             value = source.get(field)
             if isinstance(value, str) and value.strip():
                 capsule[field] = value
+
+
+def recover_scope_payload(
+    payload: Mapping[str, Any],
+    session_scope: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Return a payload copy whose missing scope axes come from immutable records.
+
+    Used by Prompt A ranked entries and by Critic capsules so both see the
+    same recovered fields. Axes with no candidate-bound source stay absent.
+    """
+
+    enriched = dict(payload)
+    scratch: dict[str, Any] = {
+        "hypothesis_version_id": str(enriched.get("hypothesis_version_id") or "")
+    }
+    for field in _SCOPE_FIELDS:
+        value = enriched.get(field)
+        if isinstance(value, str) and value.strip():
+            scratch[field] = value
+    _fill_scope_from_session(scratch, enriched, session_scope)
+    for field in _SCOPE_FIELDS:
+        if enriched.get(field) not in (None, "") or scratch.get(field) in (None, ""):
+            continue
+        enriched[field] = scratch[field]
+    return enriched
 
 
 def _finalize_snapshot(

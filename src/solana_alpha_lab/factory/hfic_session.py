@@ -1070,18 +1070,21 @@ def _discovery_candidate_scope(frozen: Mapping[str, Any] | None) -> dict[str, An
 def _hypothesis_scope_fields(
     frozen: Mapping[str, Any] | None,
     definition: Mapping[str, Any] | None,
+    card: Mapping[str, Any] | None = None,
 ) -> dict[str, str]:
-    """Forward-persist scope axes already present on the draft or session."""
+    """Persist only scope axes proven on this candidate.
+
+    A session-wide ``grounded_evidence.candidate_scope`` is not copied onto
+    every hypothesis. ``evidence_surface_mode`` may come from the session
+    because it is not a per-candidate target or estimand.
+    """
 
     out: dict[str, str] = {}
     sources: list[Mapping[str, Any]] = []
+    if isinstance(card, Mapping):
+        sources.append(card)
     if isinstance(definition, Mapping):
         sources.append(definition)
-    scope = _discovery_candidate_scope(frozen)
-    if scope:
-        sources.append(scope)
-    if isinstance(frozen, Mapping):
-        sources.append(frozen)
     for source in sources:
         for key in (
             "estimand",
@@ -1093,9 +1096,39 @@ def _hypothesis_scope_fields(
             if key in out:
                 continue
             value = source.get(key)
-            if isinstance(value, str) and value:
+            if isinstance(value, str) and value.strip():
                 out[key] = value
+    if "evidence_surface_mode" not in out and isinstance(frozen, Mapping):
+        mode = frozen.get("evidence_surface_mode")
+        if isinstance(mode, str) and mode.strip():
+            out["evidence_surface_mode"] = mode
     return out
+
+
+def _cards_for_identities(
+    identities: Sequence[Any],
+    frozen: Mapping[str, Any] | None,
+    draft: Mapping[str, Any] | None,
+) -> list[Mapping[str, Any]]:
+    by_id: dict[str, Mapping[str, Any]] = {}
+    grounded = frozen.get("grounded_candidates") if isinstance(frozen, Mapping) else None
+    if isinstance(grounded, list):
+        for card in grounded:
+            if isinstance(card, Mapping) and card.get("candidate_id"):
+                by_id[str(card["candidate_id"])] = card
+    draft_cards: list[Mapping[str, Any]] = []
+    if isinstance(draft, Mapping) and isinstance(draft.get("candidates"), list):
+        draft_cards = [
+            card if isinstance(card, Mapping) else {}
+            for card in draft["candidates"]
+        ]
+    aligned: list[Mapping[str, Any]] = []
+    for index, identity in enumerate(identities):
+        card = by_id.get(str(getattr(identity, "candidate_id", "") or ""))
+        if card is None and index < len(draft_cards):
+            card = draft_cards[index]
+        aligned.append(card or {})
+    return aligned
 
 
 def _selected_candidate_block(
@@ -1177,7 +1210,83 @@ def _build_runner_up_critic_packet(
     required_caps = selected.pop("_required_capability_ids")
     packet["selected_candidate"] = selected
     packet["provisional_lane"] = _provisional_lane(required_caps)
+    _rebind_runner_up_grounded_evidence(packet, runner_up_card)
     return packet
+
+
+_RUNNER_SCOPE_KEYS = (
+    "population",
+    "decision_timestamp",
+    "target",
+    "estimand",
+    "explanatory_condition",
+    "evidence_surface_mode",
+)
+
+
+def _proven_runner_scope(
+    card: Mapping[str, Any],
+    packet: Mapping[str, Any],
+) -> dict[str, str]:
+    """Scope axes that belong to this runner-up card, not the primary candidate."""
+
+    proven: dict[str, str] = {}
+    for key in (
+        "population",
+        "decision_timestamp",
+        "target",
+        "estimand",
+        "explanatory_condition",
+        "representation_scope",
+        "evidence_surface_mode",
+    ):
+        value = card.get(key)
+        if isinstance(value, str) and value.strip():
+            proven[key] = value
+    if "evidence_surface_mode" not in proven:
+        grounded = packet.get("grounded_evidence")
+        scope = grounded.get("candidate_scope") if isinstance(grounded, Mapping) else None
+        mode = scope.get("evidence_surface_mode") if isinstance(scope, Mapping) else None
+        if not isinstance(mode, str) or not mode.strip():
+            mode = packet.get("evidence_surface_mode")
+        if isinstance(mode, str) and mode.strip():
+            proven["evidence_surface_mode"] = mode
+    return proven
+
+
+def _rebind_runner_up_grounded_evidence(
+    packet: dict[str, Any],
+    card: Mapping[str, Any],
+) -> None:
+    """Drop the primary candidate scope unless this runner-up proves its own."""
+
+    grounded = packet.get("grounded_evidence")
+    if not isinstance(grounded, Mapping):
+        return
+    proven = _proven_runner_scope(card, packet)
+    body = {
+        key: value
+        for key, value in grounded.items()
+        if key not in {"candidate_scope", "prior_scope_relations", "canonical_prior_comparison"}
+    }
+    if all(proven.get(key) for key in _RUNNER_SCOPE_KEYS):
+        scope = {key: proven[key] for key in _RUNNER_SCOPE_KEYS}
+        if proven.get("representation_scope"):
+            scope["representation_scope"] = proven["representation_scope"]
+        body["candidate_scope"] = scope
+        body["priors"] = []
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            GroundedDiscoveryError,
+            bind_prior_scope_evidence,
+        )
+
+        capsules = list((packet.get("prior_memory") or {}).get("capsules") or [])
+        try:
+            body = bind_prior_scope_evidence(body, canonical_priors=capsules)
+        except GroundedDiscoveryError:
+            body.pop("prior_scope_relations", None)
+            body.pop("canonical_prior_comparison", None)
+    packet["grounded_evidence"] = body
 
 
 def _blank_optional(value: object) -> bool:
@@ -2721,7 +2830,8 @@ def persist_no_worthy_session(
             },
         ),
     ]
-    for identity in identities:
+    cards = _cards_for_identities(identities, frozen, draft)
+    for identity, card in zip(identities, cards, strict=True):
         records.append(
             event(
                 record_id=f"HFIC-HYP-{identity.candidate_id}",
@@ -2746,7 +2856,7 @@ def persist_no_worthy_session(
                     "cheapest_falsifier": identity.definition["cheapest_falsifier"],
                     "definition_sha256": identity.full_sha256,
                     "role_in_session": "CONSIDERED_UNSELECTED",
-                    **_hypothesis_scope_fields(frozen, identity.definition),
+                    **_hypothesis_scope_fields(frozen, identity.definition, card),
                 },
             )
         )
@@ -4374,7 +4484,8 @@ def persist_frozen_session(
             payload=cycle_payload,
         )
     ]
-    for identity in identities:
+    cards = _cards_for_identities(identities, frozen, draft)
+    for identity, card in zip(identities, cards, strict=True):
         records.append(
             event(
                 record_id=f"HFIC-HYP-{identity.candidate_id}",
@@ -4408,7 +4519,7 @@ def persist_frozen_session(
                             else "PORTFOLIO"
                         )
                     ),
-                    **_hypothesis_scope_fields(frozen, identity.definition),
+                    **_hypothesis_scope_fields(frozen, identity.definition, card),
                 },
             )
         )
@@ -6325,7 +6436,9 @@ def apply_revision(
                     "definition_sha256": selected_identity.full_sha256,
                     "role_in_session": "SELECTED",
                     "supersedes_hypothesis_version_id": original_selected_id,
-                    **_hypothesis_scope_fields(frozen, selected_identity.definition),
+                    **_hypothesis_scope_fields(
+                        frozen, selected_identity.definition, selected_card
+                    ),
                 },
                 transaction_id=transaction_id,
             )
