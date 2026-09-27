@@ -17,30 +17,56 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "A repeated spec returns the stored look scope. Freeze raises LOOK_SCOPE_CONTRADICTION before a scientific record. A narrower idea is saved with look_confirms_selected false, so PASS_TO_CLASSIFICATION and a scientific kill become KILL_UNBOUND_EVIDENCE. A matching scope keeps the confirming result, including a same-scope runner-up rebound from the original evidence."
+        "Population and decision moment come from the spec. A both-named mismatch stops selected freeze. A one-sided or semantic axis stays context and drops confirmation. Retry keeps the stored scope. REVISE_ONCE rebinds before the packet hash."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Contradiction stops freeze and does not add a hypothesis version. A narrower idea does not enter AWAITING_CLASSIFICATION and a KILL_MECHANISM on that foreign look becomes TECHNICAL_STOP. A matching scope keeps result refs and the ordinary classify path."
+        "Named tests cover a foreign decision moment, a foreign population, a spec population or decision the query did not compute, an omitted machine field filled from the spec, a card-only decision moment, a revision that drops confirmation, and a matching scope that keeps ordinary classification."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=451b8321f412ad285bd72add1f053b19bb299ce6f0d8fa6ba53f379720475b26",
-        "A look with claim axes is not renamed by a repeated spec. A contradictory selected card cannot freeze. A narrower idea cannot reach AWAITING_CLASSIFICATION or a scientific PASS or KILL on the foreign look."
+        "packet_fingerprint_sha256=5bc0032ed93d50e74bb9056d1d77305d13e607c853c139b97860aa26fb9d6ce1",
+        "The spec binds population and decision moment before the query. Both-named machine mismatch is a contradiction. A card-only or semantic axis cannot confirm the look. Revision rebinds before the packet hash. A full match keeps the ordinary path."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "The readout separates contradiction, a narrower idea, and a matching scope. Prompt A and the Critic config say a technical refusal is not a negative market result. No new owner hand step."
+        "The readout separates a different population or decision moment, a narrower idea without PASS, and a matching scope. No new owner step and no market forge claim."
       ]
+    }
+  ],
+  "remediation_history": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "A card-only decision moment could still LOOK_SCOPE_MATCH when the stored look lacked that axis.",
+      "observed_head": "94859ff8ccab11885282d4cd131e084057a2a736",
+      "resolved_by_head": "21d11f019401818fde9107a3cbc330fa456aa3ba"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Population mismatch at freeze and at look creation, and spec fill of an omitted decision moment, were not named tests.",
+      "observed_head": "94859ff8ccab11885282d4cd131e084057a2a736",
+      "resolved_by_head": "21d11f019401818fde9107a3cbc330fa456aa3ba"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "The readout named a different decision moment and a separate scope contradiction, and did not name population as the same machine stop.",
+      "observed_head": "94859ff8ccab11885282d4cd131e084057a2a736",
+      "resolved_by_head": "21d11f019401818fde9107a3cbc330fa456aa3ba"
     }
   ],
   "verdict": "PASS",
