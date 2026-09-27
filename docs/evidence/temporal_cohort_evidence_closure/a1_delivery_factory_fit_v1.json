@@ -4,8 +4,8 @@
   "review_id": "TEMPORAL-COHORT-EVIDENCE-CLOSURE-FACTORY-FIT-001",
   "as_of": "2026-09-28",
   "task_id": "TEMPORAL_COHORT_EVIDENCE_CLOSURE_V1",
-  "reviewed_bindings_sha256": "f5f4066b5b9eff36f85eabb807e01627ce11ac42bcdacbd099110e377f630d6c",
-  "reviewed_inventory_sha256": "2783cc17e7813f7b1e0cc0ecf332679d0a986e818ac444aa2d18e90d3039b5cf",
+  "reviewed_bindings_sha256": "00d07bb6539d5dab6b757f108209792bd31601db5edaed69496a8a8a7a63b946",
+  "reviewed_inventory_sha256": "6e4916d95db0bdc599e67bd5a978c9b899a18462c1af702fdf1236e5a6cf9c55",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
@@ -13,11 +13,11 @@
     "flexibility_and_history": "PASS_V1_BYTES_STAY_AND_V2_IS_NOT_A_NEW_LOOK",
     "context_efficiency": "PASS_EXISTING_JOURNAL_AND_READOUT",
     "research_truth": "PASS_NULL_MEAN_AND_DESCRIPTIVE_COHORTS",
-    "owner_operability": "PASS_READOUT_SHOWS_REVISION_AND_COHORT_ROWS",
+    "owner_operability": "PASS_READOUT_NAMES_INTEGRITY_CONFLICT",
     "execution_to_cashflow": "NOT_APPLICABLE_NO_MARKET_EXECUTION",
     "monitoring_and_recovery": "PASS_COMPLETED_REPLAY_SKIPS_EVALUATOR",
     "build_vs_buy": "PASS_NO_NEW_CAPABILITY_OR_CLI",
-    "red_team": "PASS_CONFLICT_CLEARS_POOLED_AND_COHORT_TOGETHER",
+    "red_team": "PASS_CONFLICT_STAYS_EXCLUDED_FOR_THE_PASS",
     "security": "PASS_NO_PROVIDER_NO_LIVE_WRITE"
   },
   "capability_radar": {
