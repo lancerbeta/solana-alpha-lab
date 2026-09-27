@@ -39,6 +39,7 @@ managed_write_set:
   - configs/experiment_capability_registry_v2.yaml
   - catalog/schemas/hfic_temporal_query_v1.schema.json
   - catalog/assets/core.yaml
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
   - .agents/skills/hypothesis-forge/SKILL.md
   - .cursor/commands/hypothesis-forge.md
   - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
