@@ -42,5 +42,13 @@
         "format_discovery_readout shows calculation_version, look_class and new_look. Operator section 5.1 names queries[].look_class=CALCULATION_REVISION and new_look=false."
       ]
     }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MERGE",
+    "NO_ALPHA",
+    "NO_MARKET_FORGE",
+    "NO_NET_RETURN"
   ]
 }

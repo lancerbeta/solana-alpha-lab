@@ -77,8 +77,7 @@ context_requirements:
     DELIVERY_EVIDENCE: []
     HISTORICAL_CONTEXT: []
   exact_role_paths:
-    LIFECYCLE:
-      - src/solana_alpha_lab/factory/hfic_temporal_discovery.py
+    LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS:
       - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
