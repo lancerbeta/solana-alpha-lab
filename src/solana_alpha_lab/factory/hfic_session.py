@@ -2134,12 +2134,21 @@ def freeze_draft(
             isinstance(source_evidence.get("result_refs"), list)
             and source_evidence.get("result_refs")
         ):
+            built_evidence = runner_up_packet.get("grounded_evidence")
             rebound = _bind_selected_look(
                 source_evidence,
                 runner_up_card if isinstance(runner_up_card, Mapping) else {},
                 store=store,
                 strict=False,
             )
+            if (
+                rebound.get("look_confirms_selected") is False
+                and isinstance(built_evidence, Mapping)
+            ):
+                if "prior_scope_relations" in built_evidence:
+                    rebound["prior_scope_relations"] = built_evidence["prior_scope_relations"]
+                if built_evidence.get("canonical_prior_comparison") is True:
+                    rebound["canonical_prior_comparison"] = True
             if rebound.get("look_confirms_selected") is not False:
                 from solana_alpha_lab.factory.hfic_grounded_discovery import (
                     GroundedDiscoveryError,

@@ -13,6 +13,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
+MEASURED_TARGET = "Y1800:FIELD-USD-PRICE-001"
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
@@ -666,8 +667,10 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                 {
                     "label": "HFIC-V12-A-SCOPE",
                     "display_ordinal": 1,
+                    "population": "BASE_X",
+                    "decision_timestamp": "X300",
                     "estimand": "estimand_A",
-                    "target": "target_A",
+                    "target": MEASURED_TARGET,
                     "explanatory_condition": "cond_A",
                     "representation_scope": "rep_A",
                 }
@@ -677,6 +680,8 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                     "label": "HFIC-V12-B-SCOPE",
                     "display_ordinal": 2,
                     "claim": base["claim"] + " runner B",
+                    "population": "BASE_X",
+                    "decision_timestamp": "X300",
                     "estimand": "estimand_B",
                     "target": "target_B",
                     "explanatory_condition": "cond_B",
@@ -766,7 +771,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             )
             self.assertEqual(completed.returncode, 0, completed.stderr)
             evidence = json.loads(completed.stdout)
-            self.assertEqual(evidence["candidate_scope"]["target"], "target_A")
+            self.assertEqual(evidence["candidate_scope"]["target"], MEASURED_TARGET)
             preflight_after = run_cli(
                 "preflight",
                 "--discovery-contract",
@@ -820,7 +825,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                 if item not in {frozen["selected_candidate_id"], frozen["runner_up_candidate_id"]}
             )
             rejected = versions[rejected_id]
-            self.assertEqual(selected["target"], "target_A")
+            self.assertEqual(selected["target"], MEASURED_TARGET)
             self.assertEqual(selected["estimand"], "estimand_A")
             self.assertEqual(runner["target"], "target_B")
             self.assertEqual(runner["estimand"], "estimand_B")
@@ -834,7 +839,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             self.assertEqual(runner_scope["estimand"], "estimand_B")
             self.assertNotEqual(runner_scope["target"], "target_A")
             primary_evidence = frozen["critic_input_packet"]["grounded_evidence"]
-            self.assertEqual(primary_evidence["candidate_scope"]["target"], "target_A")
+            self.assertEqual(primary_evidence["candidate_scope"]["target"], MEASURED_TARGET)
             self.assertIn("result", primary_evidence)
             self.assertNotIn("result", runner_evidence)
             self.assertNotIn("result_sha256", runner_evidence)
@@ -955,7 +960,8 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
         workspace: Path,
         *,
         runner_matches_look: bool,
-        selected_target: str = "target_A",
+        selected_target: str = MEASURED_TARGET,
+        scope_target: str = "target_A",
         selected_estimand: str = "estimand_A",
         selected_population: str = "BASE_X",
         selected_decision: str = "X300",
@@ -1002,7 +1008,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             "population": "BASE_X",
             "decision_timestamp": "X300",
             "estimand": "estimand_A",
-            "target": "target_A",
+            "target": MEASURED_TARGET,
             "explanatory_condition": "cond_A",
             "representation_scope": "rep_A",
             "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
@@ -1055,7 +1061,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             "question_id": "RUNNER_LOOK_GUARD",
             "population": "BASE_X",
             "decision_timestamp": "X300",
-            "target": "target_A",
+            "target": scope_target,
             "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
         }
         if scope_estimand is not None:
@@ -1365,7 +1371,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                 expect_freeze_error="LOOK_SCOPE_CONTRADICTION",
             )
             evidence = session["evidence"]
-            self.assertEqual(evidence["candidate_scope"]["target"], "target_A")
+            self.assertEqual(evidence["candidate_scope"]["target"], MEASURED_TARGET)
             scope_path = workspace / "scope.json"
             scope_path.write_text(
                 json.dumps(
@@ -1408,9 +1414,9 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             )
             self.assertEqual(renamed.returncode, 0, renamed.stderr)
             again = json.loads(renamed.stdout)
-            self.assertEqual(again["candidate_scope"]["target"], "target_A")
+            self.assertEqual(again["candidate_scope"]["target"], MEASURED_TARGET)
             self.assertEqual(again["candidate_scope"]["estimand"], "estimand_A")
-            self.assertNotEqual(again["requested_candidate_scope"]["target"], "target_A")
+            self.assertNotEqual(again["requested_candidate_scope"]["target"], MEASURED_TARGET)
             self.assertEqual(again["look_scope_relation"], "LOOK_SCOPE_NARROWER")
             self.assertFalse(again["queries"][0]["new_look"])
             hypothesis_ids = [
@@ -1637,7 +1643,94 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
         bound = scope_bound_to_spec(spec, {"target": "target_A", "estimand": "estimand_A"})
         self.assertEqual(bound["population"], "BASE_X")
         self.assertEqual(bound["decision_timestamp"], "X300")
-        self.assertEqual(bound["target"], "target_A")
+        self.assertEqual(bound["target"], MEASURED_TARGET)
+        later = {
+            **spec,
+            "query_id": "SPEC_LATER_DECISION",
+            "decision_points": ["X300", "Y900"],
+            "target_point": "Y1800",
+        }
+        filled = scope_bound_to_spec(later, {"target": "Y3600:FIELD-LIQUIDITY-USD-001"})
+        self.assertEqual(filled["decision_timestamp"], "Y900")
+        self.assertEqual(filled["target"], MEASURED_TARGET)
+        self.assertNotIn("Y3600", filled["target"])
+
+    def test_earlier_decision_point_cannot_label_a_later_look(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            GroundedDiscoveryError,
+            run_recorded_discovery_query,
+        )
+
+        spec = {
+            "query_id": "PIT_DECISION",
+            "population": "BASE_X",
+            "decision_points": ["X300", "Y900"],
+            "decision_fields": ["FIELD-USD-PRICE-001"],
+            "target_point": "Y1800",
+            "target_field": "FIELD-USD-PRICE-001",
+            "explanatory": [],
+        }
+        with tempfile.TemporaryDirectory() as raw:
+            store = ResearchStore(Path(raw))
+            with self.assertRaises(GroundedDiscoveryError) as caught:
+                run_recorded_discovery_query(
+                    store,
+                    census=[],
+                    observations=[],
+                    spec=spec,
+                    binding=[],
+                    journal_scope="journal",
+                    candidate_scope={
+                        "population": "BASE_X",
+                        "decision_timestamp": "X300",
+                        "target": MEASURED_TARGET,
+                    },
+                    git_sha="ab" * 20,
+                )
+            self.assertEqual(caught.exception.code, "LOOK_SPEC_SCOPE_MISMATCH")
+            self.assertEqual(list(store.iter_committed_records()), [])
+
+    def test_free_text_target_cannot_confirm_another_measurement(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import finalize_session
+        from tests.test_hfic_cli import critic_result_from_packet_only
+
+        lied = "Y3600:FIELD-LIQUIDITY-USD-001"
+        with tempfile.TemporaryDirectory() as raw:
+            session = self._freeze_scoped_runner(
+                Path(raw),
+                runner_matches_look=False,
+                scope_target=lied,
+                selected_target=lied,
+            )
+            self.assertEqual(session["evidence"]["candidate_scope"]["target"], MEASURED_TARGET)
+            self.assertEqual(session["evidence"]["candidate_scope"]["decision_timestamp"], "X300")
+            frozen = session["frozen"]
+            evidence = frozen["critic_input_packet"]["grounded_evidence"]
+            self.assertFalse(evidence.get("look_confirms_selected"))
+            self.assertEqual(evidence.get("look_scope_relation"), "LOOK_SCOPE_NARROWER")
+            self.assertNotIn("result", evidence)
+            done = finalize_session(
+                frozen,
+                critic_result_from_packet_only(
+                    frozen["critic_input_packet"], "PASS_TO_CLASSIFICATION"
+                ),
+                store=ResearchStore(session["data_root"]),
+                repo_root=ROOT,
+                data_root=session["data_root"],
+            )
+            self.assertNotEqual(done.get("session_state"), "AWAITING_CLASSIFICATION")
+            self.assertEqual(
+                done["decisions"][frozen["selected_candidate_id"]]["reason_code"],
+                "KILL_UNBOUND_EVIDENCE",
+            )
+            self.assertNotIn(
+                done.get("final_session_terminal"),
+                {
+                    "PASS_FAST_LANE_READY",
+                    "PASS_DATA_OPTION_REQUIRED",
+                    "PASS_CHANGE_LANE_REQUIRED",
+                },
+            )
 
     def test_card_only_machine_axis_is_not_confirmation(self) -> None:
         from solana_alpha_lab.factory.hfic_grounded_discovery import relate_look_scope
@@ -1709,7 +1802,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             self.assertTrue(primary.get("look_confirms_selected"))
             self.assertEqual(primary["candidate_scope"]["population"], "BASE_X")
             self.assertEqual(primary["candidate_scope"]["decision_timestamp"], "X300")
-            self.assertEqual(primary["candidate_scope"]["target"], "target_A")
+            self.assertEqual(primary["candidate_scope"]["target"], MEASURED_TARGET)
             self.assertEqual(primary["result_refs"], session["evidence"]["result_refs"])
             runner_evidence = session["frozen"]["runner_up_critic_input_packet"][
                 "grounded_evidence"

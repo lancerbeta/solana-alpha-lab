@@ -782,32 +782,54 @@ def stored_look_scope(store: Any, evidence: Mapping[str, Any]) -> dict[str, Any]
     return {key: value for key, value in scope.items() if _axis_text(value)}
 
 
+def _last_decision_point(points: Sequence[str]) -> str:
+    """The decision moment the numeric recipe actually uses.
+
+    Features may be read at earlier points. The decision deadline is the
+    latest point in the spec, so an earlier label is a different question.
+    """
+
+    return max((str(point) for point in points), key=_point_offset)
+
+
+def measured_target_label(spec: Mapping[str, Any]) -> str:
+    """Target identity the spec computed: ``target_point:target_field``."""
+
+    validated = validate_query_spec(spec)
+    return f"{validated['target_point']}:{validated['target_field']}"
+
+
 def scope_bound_to_spec(
     spec: Mapping[str, Any],
     candidate_scope: Mapping[str, Any] | None,
 ) -> dict[str, str]:
-    """Machine fields on a new look come from the spec, not from a free label.
+    """Confirming look fields come from the spec, not from a free label.
 
-    A declared population or decision moment that the spec did not compute is
-    not stored as the confirming scope.
+    Population is the spec population. The decision moment is the latest
+    decision point the recipe uses. The confirming target is
+    ``target_point:target_field``. A declared earlier decision point, or a
+    target string that does not name that pair, is not stored as confirmation.
     """
 
-    stored = spec if spec.get("decision_points") and spec.get("population") else validate_query_spec(spec)
+    validated = validate_query_spec(spec)
     declared = candidate_scope if isinstance(candidate_scope, Mapping) else {}
-    spec_population = _axis_text(stored.get("population"))
+    spec_population = _axis_text(validated.get("population"))
     declared_population = _axis_text(declared.get("population"))
     if declared_population and declared_population != spec_population:
         raise GroundedDiscoveryError("LOOK_SPEC_SCOPE_MISMATCH")
-    points = [str(item) for item in (stored.get("decision_points") or []) if str(item)]
+    points = [str(item) for item in validated["decision_points"]]
+    last_decision = _last_decision_point(points)
     declared_decision = _axis_text(declared.get("decision_timestamp"))
-    if declared_decision and declared_decision not in points:
+    if declared_decision and declared_decision != last_decision:
         raise GroundedDiscoveryError("LOOK_SPEC_SCOPE_MISMATCH")
-    bound = {key: value for key, value in declared.items() if _axis_text(value)}
+    bound = {
+        key: value
+        for key, value in declared.items()
+        if _axis_text(value) and key not in {"target", "population", "decision_timestamp"}
+    }
     bound["population"] = spec_population
-    if not declared_decision and len(points) == 1:
-        bound["decision_timestamp"] = points[0]
-    elif declared_decision:
-        bound["decision_timestamp"] = declared_decision
+    bound["decision_timestamp"] = last_decision
+    bound["target"] = measured_target_label(validated)
     return bound
 
 
