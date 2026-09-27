@@ -740,6 +740,24 @@ def _row(summary: dict, cohort: str) -> dict:
 
 
 class TemporalCohortSliceTests(unittest.TestCase):
+    def _conflict_fingerprint(self, summary: dict) -> dict:
+        return {
+            "observed_target_n": summary["observed_target_n"],
+            "mean_target": summary["mean_target"],
+            "population_n": summary["population_n"],
+            "integrity_conflict_count": summary["integrity_conflict_count"],
+            "duplicate_delivery_count": summary["duplicate_delivery_count"],
+            "cohorts": {
+                row["cohort_id"]: {
+                    "population_n": row["population_n"],
+                    "observed_target_n": row["observed_target_n"],
+                    "mean_target": row["mean_target"],
+                    "INTEGRITY_CONFLICT": row["exclusion_reasons"].get("INTEGRITY_CONFLICT", 0),
+                }
+                for row in summary["by_cohort"]
+            },
+        }
+
     def test_s2_means_keep_missing_cohort_and_null_mean(self) -> None:
         binding = [
             _bind(COHORT, RELEASE),
@@ -875,6 +893,90 @@ class TemporalCohortSliceTests(unittest.TestCase):
             _row(reversed_summary, COHORT)["exclusion_reasons"],
             _row(conflicted, COHORT)["exclusion_reasons"],
         )
+        orders = (("A", "A", "B"), ("A", "B", "A"), ("B", "A", "A"))
+        copies = {"A": shared_a, "B": twin}
+        fingerprints = [
+            self._conflict_fingerprint(
+                execute_temporal_discovery(
+                    [copies[label][0] for label in order],
+                    shared_a[1] + twin[1],
+                    _simple(),
+                    binding,
+                )["summary"]
+            )
+            for order in orders
+        ]
+        self.assertEqual(fingerprints[0]["observed_target_n"], 0)
+        self.assertIsNone(fingerprints[0]["mean_target"])
+        self.assertEqual(fingerprints[0]["population_n"], 0)
+        self.assertEqual(fingerprints[0]["integrity_conflict_count"], 1)
+        self.assertTrue(all(item == fingerprints[0] for item in fingerprints[1:]))
+        for cohort in (COHORT, COHORT_B):
+            self.assertGreater(fingerprints[0]["cohorts"][cohort]["INTEGRITY_CONFLICT"], 0)
+            self.assertEqual(fingerprints[0]["cohorts"][cohort]["population_n"], 0)
+            self.assertEqual(fingerprints[0]["cohorts"][cohort]["observed_target_n"], 0)
+            self.assertIsNone(fingerprints[0]["cohorts"][cohort]["mean_target"])
+        aligned = _member_path(
+            "shared", COHORT_C, RELEASE_C, ANCHOR, [1.0, 1.2, 1.5, 1.2], (10000.0, 9000.0), 1.44
+        )
+        trio = {"A": shared_a, "B": twin, "C": aligned}
+        trio_binding = binding + [_bind(COHORT_C, RELEASE_C)]
+        trio_rows = shared_a[1] + twin[1] + aligned[1]
+        trio_prints = []
+        labels = ("A", "B", "C")
+        for left in labels:
+            for middle in labels:
+                if middle == left:
+                    continue
+                for right in labels:
+                    if right in {left, middle}:
+                        continue
+                    trio_prints.append(
+                        self._conflict_fingerprint(
+                            execute_temporal_discovery(
+                                [trio[left][0], trio[middle][0], trio[right][0]],
+                                trio_rows,
+                                _simple(),
+                                trio_binding,
+                            )["summary"]
+                        )
+                    )
+        self.assertEqual(len(trio_prints), 6)
+        self.assertEqual(trio_prints[0]["observed_target_n"], 0)
+        self.assertIsNone(trio_prints[0]["mean_target"])
+        self.assertTrue(all(item == trio_prints[0] for item in trio_prints[1:]))
+        for cohort in (COHORT, COHORT_B, COHORT_C):
+            self.assertGreater(trio_prints[0]["cohorts"][cohort]["INTEGRITY_CONFLICT"], 0)
+            self.assertEqual(trio_prints[0]["cohorts"][cohort]["observed_target_n"], 0)
+        blocked = dict(shared_a[0])
+        blocked["candidate_state"] = "SCREENED_OUT"
+        replaced = execute_temporal_discovery(
+            [blocked, shared_a[0]],
+            shared_a[1],
+            _simple(),
+            [_bind(COHORT, RELEASE)],
+        )["summary"]
+        self.assertEqual(replaced["integrity_conflict_count"], 0)
+        self.assertEqual(replaced["observed_target_n"], 1)
+        self.assertAlmostEqual(replaced["mean_target"], price_return(1.2, 1.44), places=9)
+        self.assertEqual(_row(replaced, COHORT)["population_n"], 1)
+        kept = execute_temporal_discovery(
+            [shared_a[0], blocked],
+            shared_a[1],
+            _simple(),
+            [_bind(COHORT, RELEASE)],
+        )["summary"]
+        self.assertEqual(kept["observed_target_n"], 1)
+        self.assertAlmostEqual(kept["mean_target"], replaced["mean_target"], places=9)
+        unrestored = execute_temporal_discovery(
+            [blocked, twin[0], shared_a[0]],
+            shared_a[1] + twin[1],
+            _simple(),
+            binding,
+        )["summary"]
+        self.assertEqual(unrestored["observed_target_n"], 0)
+        self.assertIsNone(unrestored["mean_target"])
+        self.assertEqual(unrestored["population_n"], 0)
 
     def test_v1_revision_replays_v2_without_evaluator_or_new_look(self) -> None:
         from solana_alpha_lab.factory.hfic_grounded_discovery import (

@@ -725,13 +725,22 @@ def _note_cohort_membership(
     identity: tuple,
     member: Mapping[str, Any],
 ) -> None:
-    """One descriptive seat per cohort and decision. A later eligible copy may replace an ineligible seat."""
+    """One descriptive seat per cohort and decision.
+
+    A later eligible copy may replace a non-conflicting ineligible seat.
+    An integrity conflict stays excluded for the rest of the computation.
+    """
 
     bucket = slots.setdefault(cohort, {})
     view = _cohort_view(member)
     current = bucket.get(identity)
     if current is None:
         bucket[identity] = view
+        return
+    if view.get("integrity_excluded"):
+        bucket[identity] = view
+        return
+    if current.get("integrity_excluded"):
         return
     if not current.get("in_base") and view.get("in_base"):
         bucket[identity] = view
@@ -1067,6 +1076,7 @@ def execute_temporal_discovery(
     predicates = list(body["predicates"])
     seen: set[tuple[str, str]] = set()
     signatures: dict[tuple[str, str], tuple] = {}
+    conflicted: set[tuple[str, str]] = set()
     members: list[dict[str, Any]] = []
     cohort_membership: dict[str, dict[tuple, dict[str, Any]]] = {}
     duplicate_count = 0
@@ -1107,8 +1117,10 @@ def execute_temporal_discovery(
         signature = signature_index.get((mint, cohort, release), ())
         if identity in seen:
             duplicate_count += 1
-            if signatures.get(identity) != signature:
-                integrity_conflicts += 1
+            if identity in conflicted or signatures.get(identity) != signature:
+                if identity not in conflicted:
+                    integrity_conflicts += 1
+                    conflicted.add(identity)
                 for member in members:
                     if member.get("identity") == identity:
                         member["integrity_excluded"] = True
@@ -1140,6 +1152,25 @@ def execute_temporal_discovery(
                 for item in members
                 if item.get("identity") == identity and item.get("exclusion") != "BINDING_COHORT_MISMATCH"
             )
+            if existing.get("integrity_excluded"):
+                conflicted.add(identity)
+                _exclude_shared_identity(cohort_membership, identity)
+                _note_cohort_membership(
+                    cohort_membership,
+                    cohort,
+                    identity,
+                    {
+                        "integrity_excluded": True,
+                        "in_base": False,
+                        "decision_eligible": False,
+                        "matched": False,
+                        "target_is_observed": False,
+                        "feature_unknown": False,
+                        "exclusion": "INTEGRITY_CONFLICT",
+                        "target": None,
+                    },
+                )
+                continue
             if existing.get("in_base"):
                 _note_cohort_membership(cohort_membership, cohort, identity, existing)
                 continue
