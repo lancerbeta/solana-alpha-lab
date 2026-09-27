@@ -1690,6 +1690,7 @@ def _bind_selected_look(
     selected_card: Mapping[str, Any],
     *,
     store: Any,
+    strict: bool = True,
 ) -> dict[str, Any]:
     """Keep a confirming look, detach a narrower idea, stop a contradiction.
 
@@ -1709,7 +1710,7 @@ def _bind_selected_look(
         raw = grounded.get("candidate_scope")
         look_scope = dict(raw) if isinstance(raw, Mapping) else {}
     relation = relate_look_scope(look_scope, card_claim_scope(selected_card))
-    if relation == "LOOK_SCOPE_CONTRADICTION":
+    if relation == "LOOK_SCOPE_CONTRADICTION" and strict:
         raise HficSessionError("LOOK_SCOPE_CONTRADICTION")
     if relation == "LOOK_SCOPE_MATCH":
         body = dict(grounded)
@@ -2074,7 +2075,9 @@ def freeze_draft(
         from solana_alpha_lab.factory.hfic_grounded_discovery import stored_look_scope
 
         look_scope = stored_look_scope(store, grounded) if store is not None else None
-        if look_scope:
+        if look_scope or (
+            isinstance(grounded.get("result_refs"), list) and grounded.get("result_refs")
+        ):
             grounded = _bind_selected_look(
                 grounded,
                 selected_card if isinstance(selected_card, Mapping) else {},
@@ -2126,6 +2129,33 @@ def freeze_draft(
             runner_up_card=runner_up_transport,
             packet_version=critic_packet_version,
         )
+        source_evidence = draft.get("grounded_evidence")
+        if isinstance(source_evidence, Mapping) and (
+            isinstance(source_evidence.get("result_refs"), list)
+            and source_evidence.get("result_refs")
+        ):
+            rebound = _bind_selected_look(
+                source_evidence,
+                runner_up_card if isinstance(runner_up_card, Mapping) else {},
+                store=store,
+                strict=False,
+            )
+            if rebound.get("look_confirms_selected") is not False:
+                from solana_alpha_lab.factory.hfic_grounded_discovery import (
+                    GroundedDiscoveryError,
+                    bind_prior_scope_evidence,
+                )
+
+                try:
+                    rebound = bind_prior_scope_evidence(
+                        rebound,
+                        canonical_priors=list(
+                            (packet.get("prior_memory") or {}).get("capsules") or []
+                        ),
+                    )
+                except GroundedDiscoveryError as exc:
+                    raise HficSessionError(exc.code) from exc
+            runner_up_packet["grounded_evidence"] = rebound
         try:
             assert_packet_grounding_consistent(
                 runner_up_packet["selected_candidate"],
