@@ -719,6 +719,7 @@ class TemporalVerticalTests(unittest.TestCase):
                 commissioning_dataset_fingerprint,
             )
             from solana_alpha_lab.factory.hfic_temporal_discovery import (
+                _require_manifest_and_cutoff,
                 execute_fixed_time_proxy_capability,
             )
 
@@ -794,38 +795,42 @@ class TemporalVerticalTests(unittest.TestCase):
             )
             duplicate["data_bindings"][-1]["binding_id"] = "BINDING-TEMPORAL-CORPUS-DUP"
             duplicate_lane, duplicate_result = run_blocked(duplicate)
-            self.assertNotEqual(duplicate_result["status"], "COMPLETE")
-            self.assertTrue(
-                "DATA_BINDING_DUPLICATE" in duplicate_lane.reason_codes
-                or "MANIFEST_MISMATCH" in duplicate_result["reason_codes"]
-            )
+            self.assertEqual(duplicate_lane.terminal, "FAST_LANE_READY", duplicate_lane.reason_codes)
+            self.assertEqual(duplicate_result["status"], "FAILED_INFRA")
+            self.assertIn("MANIFEST_MISMATCH", duplicate_result["reason_codes"])
             wrong = json.loads(json.dumps(experiment))
             for item in wrong["data_bindings"]:
                 if item["source_kind"] == "DATASET_MANIFEST":
                     item["expected_content_sha256_or_dataset_fingerprint"] = "ab" * 32
             wrong_lane, wrong_result = run_blocked(wrong)
             self.assertNotEqual(wrong_result["status"], "COMPLETE")
-            self.assertTrue(
-                "EVIDENCE_HASH_MISMATCH" in wrong_lane.reason_codes
-                or "MANIFEST_MISMATCH" in wrong_result["reason_codes"]
-            )
+            self.assertIn("EVIDENCE_HASH_MISMATCH", wrong_lane.reason_codes)
+            shared = json.loads(json.dumps(experiment))
+            shared_frozen = shared["parameters"]["temporal_recipe"]["frozen_input"]
+            shared_frozen.append(dict(shared_frozen[0]))
+            _require_manifest_and_cutoff(shared, shared_frozen, data_root)
+            blank = json.loads(json.dumps(experiment))
+            for item in blank["data_bindings"]:
+                if item["source_kind"] == "DATASET_MANIFEST":
+                    item["expected_content_sha256_or_dataset_fingerprint"] = None
             with patch(
                 "solana_alpha_lab.factory.hfic_grounded_discovery.load_admitted_partition_rows",
                 side_effect=_loader,
             ):
-                loader_calls["n"] = 0
-                with self.assertRaises(GroundedDiscoveryError) as wrapped:
-                    execute_fixed_time_proxy_capability(
-                        {
-                            "experiment_recipe": compound_evidence["result"]["experiment_recipe"],
-                            "data_bindings": absent["data_bindings"],
-                            "availability_cutoff": experiment["availability_cutoff"],
-                        },
-                        root=ROOT,
-                        capture_hooks={"data_root": data_root},
-                    )
-            self.assertEqual(str(wrapped.exception), "MANIFEST_MISMATCH")
-            self.assertEqual(loader_calls["n"], 0)
+                for bindings in (absent["data_bindings"], wrong["data_bindings"], blank["data_bindings"]):
+                    loader_calls["n"] = 0
+                    with self.assertRaises(GroundedDiscoveryError) as wrapped:
+                        execute_fixed_time_proxy_capability(
+                            {
+                                "experiment_recipe": compound_evidence["result"]["experiment_recipe"],
+                                "data_bindings": bindings,
+                                "availability_cutoff": experiment["availability_cutoff"],
+                            },
+                            root=ROOT,
+                            capture_hooks={"data_root": data_root},
+                        )
+                    self.assertEqual(str(wrapped.exception), "MANIFEST_MISMATCH")
+                    self.assertEqual(loader_calls["n"], 0)
             self.assertEqual(
                 json.loads(artifact.read_text(encoding="utf-8"))["capability_result"]["summary"]["mean_target"],
                 saved_summary["mean_target"],

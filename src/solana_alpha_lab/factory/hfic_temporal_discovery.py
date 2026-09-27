@@ -1545,8 +1545,14 @@ def _require_manifest_and_cutoff(
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         except (OSError, UnicodeError, json.JSONDecodeError) as exc:
             raise GroundedDiscoveryError("MANIFEST_MISMATCH") from exc
-        if manifest.get("dataset_fingerprint") != match[0].get(
-            "expected_content_sha256_or_dataset_fingerprint"
+        expected = match[0].get("expected_content_sha256_or_dataset_fingerprint")
+        actual = manifest.get("dataset_fingerprint")
+        if (
+            not isinstance(expected, str)
+            or not expected
+            or not isinstance(actual, str)
+            or not actual
+            or actual != expected
         ):
             raise GroundedDiscoveryError("MANIFEST_MISMATCH")
         available = _parse_time(manifest.get("first_reliable_available_at"))
