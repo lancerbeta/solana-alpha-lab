@@ -747,6 +747,7 @@ class TemporalCohortSliceTests(unittest.TestCase):
             "population_n": summary["population_n"],
             "integrity_conflict_count": summary["integrity_conflict_count"],
             "duplicate_delivery_count": summary["duplicate_delivery_count"],
+            "INTEGRITY_CONFLICT": summary["exclusion_reasons"].get("INTEGRITY_CONFLICT", 0),
             "cohorts": {
                 row["cohort_id"]: {
                     "population_n": row["population_n"],
@@ -910,12 +911,29 @@ class TemporalCohortSliceTests(unittest.TestCase):
         self.assertIsNone(fingerprints[0]["mean_target"])
         self.assertEqual(fingerprints[0]["population_n"], 0)
         self.assertEqual(fingerprints[0]["integrity_conflict_count"], 1)
+        self.assertGreater(fingerprints[0]["INTEGRITY_CONFLICT"], 0)
         self.assertTrue(all(item == fingerprints[0] for item in fingerprints[1:]))
         for cohort in (COHORT, COHORT_B):
             self.assertGreater(fingerprints[0]["cohorts"][cohort]["INTEGRITY_CONFLICT"], 0)
             self.assertEqual(fingerprints[0]["cohorts"][cohort]["population_n"], 0)
             self.assertEqual(fingerprints[0]["cohorts"][cohort]["observed_target_n"], 0)
             self.assertIsNone(fingerprints[0]["cohorts"][cohort]["mean_target"])
+        visible = execute_temporal_discovery(
+            [shared_a[0], twin[0], shared_a[0]],
+            shared_a[1] + twin[1],
+            _simple(),
+            binding,
+        )
+        readout = format_discovery_readout(
+            {
+                "result": visible["summary"],
+                "result_refs": ["HFIC-ART-DISCOVERY-TEST"],
+                "calculation_version": visible["summary"]["calculation_version"],
+                "queries": [{"look_class": "MAIN", "new_look": True}],
+            }
+        )
+        self.assertGreater(readout["exclusion_reasons"].get("INTEGRITY_CONFLICT", 0), 0)
+        self.assertGreater(_row(readout, COHORT_B)["exclusion_reasons"].get("INTEGRITY_CONFLICT", 0), 0)
         aligned = _member_path(
             "shared", COHORT_C, RELEASE_C, ANCHOR, [1.0, 1.2, 1.5, 1.2], (10000.0, 9000.0), 1.44
         )
@@ -944,6 +962,7 @@ class TemporalCohortSliceTests(unittest.TestCase):
         self.assertEqual(len(trio_prints), 6)
         self.assertEqual(trio_prints[0]["observed_target_n"], 0)
         self.assertIsNone(trio_prints[0]["mean_target"])
+        self.assertGreater(trio_prints[0]["INTEGRITY_CONFLICT"], 0)
         self.assertTrue(all(item == trio_prints[0] for item in trio_prints[1:]))
         for cohort in (COHORT, COHORT_B, COHORT_C):
             self.assertGreater(trio_prints[0]["cohorts"][cohort]["INTEGRITY_CONFLICT"], 0)

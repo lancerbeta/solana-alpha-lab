@@ -1543,7 +1543,7 @@ compound не использован. Неназывайте непройден�
 и `by_calendar_block`. Когортный срез описательный: общая decision может
 входить в несколько когорт, суммы N не обязаны совпасть с pooled, и когорты
 не являются независимой репликацией. Нет observed target — mean `null`, не 0.
-Пустая admitted cohort остаётся строкой с N=0. Writer temporal calculation —
+Пустая admitted cohort остаётся строкой с N=0. `INTEGRITY_CONFLICT` — другая причина того же N=0 и mean `null`: decision исключена до конца расчёта и на pooled, и на каждой затронутой когорте, включая когорту поздней копии. Причина лежит в `exclusion_reasons` результата и в `by_cohort[].exclusion_reasons`, а не в пустой cohort и не в missing target. Writer temporal calculation —
 `HFIC_TEMPORAL_DISCOVERY_CALC_V2`. V1 читается как есть, без выдуманного среза;
 повтор того же science/input пишет V2 как `CALCULATION_REVISION`, без нового
 scientific look. В owner readout это поля `calculation_version`,

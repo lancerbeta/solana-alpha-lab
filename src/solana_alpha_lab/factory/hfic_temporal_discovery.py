@@ -1130,6 +1130,8 @@ def execute_temporal_discovery(
                         member["matched"] = False
                         member["target_is_observed"] = False
                         member["target"] = None
+                        if member.get("exclusion") != "BINDING_COHORT_MISMATCH":
+                            member["exclusion"] = "INTEGRITY_CONFLICT"
                 _exclude_shared_identity(cohort_membership, identity)
                 _note_cohort_membership(
                     cohort_membership,
