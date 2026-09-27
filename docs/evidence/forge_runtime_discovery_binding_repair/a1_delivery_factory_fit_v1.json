@@ -4,8 +4,8 @@
   "review_id": "FORGE-RUNTIME-DISCOVERY-BINDING-REPAIR-FACTORY-FIT-001",
   "as_of": "2026-09-27",
   "task_id": "FORGE_RUNTIME_DISCOVERY_BINDING_REPAIR_V1",
-  "reviewed_bindings_sha256": "8d3aabf8cc5dfefcf9dcfb5ec5707829d13de287a6f09fac01836282ff3bbd22",
-  "reviewed_inventory_sha256": "5ecf13b27eef8cbf66a304e6b66470398aa5e6b86f4b6900698ba87ee405356d",
+  "reviewed_bindings_sha256": "e97d69374987df132dd986f8d81b265c801f059f8015278a7e8312b52cc433d4",
+  "reviewed_inventory_sha256": "0057ddf9b8c900afc6e2228449dbdb14b1c7c4743d20c8f5e955f694b81959cb",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
