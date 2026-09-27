@@ -1476,6 +1476,45 @@ def _runner_up_failover_eligible(
     return True
 
 
+def _computed_look_linked(evidence: Mapping[str, Any]) -> bool:
+    """True when this packet still carries the look it was computed for."""
+
+    refs = evidence.get("result_refs")
+    result = evidence.get("result")
+    digest = evidence.get("result_sha256")
+    if not isinstance(refs, list) or not refs:
+        return False
+    if not all(isinstance(item, str) and item.strip() for item in refs):
+        return False
+    if not isinstance(result, Mapping) or not isinstance(digest, str) or not digest.strip():
+        return False
+    from solana_alpha_lab.factory.hfic_grounded_discovery import result_sha256
+
+    return digest == result_sha256(result)
+
+
+def _runner_up_missing_own_computed_look(frozen: Mapping[str, Any]) -> bool:
+    """A runner-up discovery packet with no linked look must not pass as science.
+
+    Packets that never carried grounded evidence stay on the ordinary classifier
+    path. A same-scope runner-up that still has the computed result, its hash,
+    and result refs is linked and is not this case.
+    """
+
+    runner_id = frozen.get("runner_up_candidate_id")
+    if not isinstance(runner_id, str) or not runner_id:
+        return False
+    if frozen.get("selected_candidate_id") != runner_id:
+        return False
+    packet = frozen.get("critic_input_packet")
+    if not isinstance(packet, Mapping):
+        return False
+    evidence = packet.get("grounded_evidence")
+    if not isinstance(evidence, Mapping):
+        return False
+    return not _computed_look_linked(evidence)
+
+
 def _classifier_frozen_view(
     frozen: Mapping[str, Any],
     critic_result: Mapping[str, Any],
@@ -5907,6 +5946,17 @@ def run_live_classifier(
         spec_sha256=spec_sha,
     )
     receipt["hypothesis_version"] = validated.get("hypothesis_version")
+    if (
+        _runner_up_missing_own_computed_look(frozen)
+        and _classifier_to_hfic_terminal(receipt) in _FINAL_PASS_TERMINALS
+    ):
+        receipt = {
+            **receipt,
+            "lane": "DENY",
+            "lane_classifier_terminal": "DENY_INTEGRITY_MISMATCH",
+            "reason_codes": ["GROUNDED_RESULT_UNBOUND"],
+            "classifier_route_terminal": str(decision.terminal),
+        }
     if selected is not None and _classifier_to_hfic_terminal(receipt) == "PASS_FAST_LANE_READY":
         from solana_alpha_lab.factory.hfic_control_integrity import (
             DENY_HFIC_AVAILABILITY_GATE,
