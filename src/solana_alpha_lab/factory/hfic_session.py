@@ -1264,7 +1264,11 @@ _COMPUTED_LOOK_KEYS = (
 
 
 def _executed_scope_matches(executed: Mapping[str, Any], proven: Mapping[str, str]) -> bool:
-    """True only when this card is the scope the discovery look was computed for."""
+    """True only when every labeled axis on both sides is the same look.
+
+    An axis present on only one side is a mismatch. A sparse executed scope
+    must not keep its result under a runner-up target or estimand it never had.
+    """
 
     compared = False
     for key in (
@@ -1276,11 +1280,14 @@ def _executed_scope_matches(executed: Mapping[str, Any], proven: Mapping[str, st
         "evidence_surface_mode",
         "representation_scope",
     ):
-        value = executed.get(key)
-        if not isinstance(value, str) or not value.strip():
+        raw_executed = executed.get(key)
+        raw_proven = proven.get(key)
+        executed_value = raw_executed.strip() if isinstance(raw_executed, str) else ""
+        proven_value = raw_proven.strip() if isinstance(raw_proven, str) else ""
+        if not executed_value and not proven_value:
             continue
         compared = True
-        if proven.get(key) != value:
+        if executed_value != proven_value:
             return False
     return compared
 

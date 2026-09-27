@@ -874,6 +874,44 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
         self.assertEqual(evidence["result_sha256"], "abc")
         self.assertIn("result", evidence)
 
+    def test_sparse_executed_scope_does_not_keep_primary_result(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import (
+            _rebind_runner_up_grounded_evidence,
+        )
+
+        packet = {
+            "grounded_evidence": {
+                "candidate_scope": {
+                    "population": "BASE_X",
+                    "decision_timestamp": "X300",
+                    "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+                },
+                "result": {"pooled": {"mean_target": 1}},
+                "result_sha256": "abc",
+                "result_refs": ["HFIC-ART-1"],
+                "queries": [{"query_id": "Q"}],
+                "priors": [],
+            },
+            "prior_memory": {"capsules": []},
+        }
+        _rebind_runner_up_grounded_evidence(
+            packet,
+            {
+                "population": "BASE_X",
+                "decision_timestamp": "X300",
+                "target": "target_B",
+                "estimand": "estimand_B",
+                "explanatory_condition": "cond_B",
+                "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+                "representation_scope": "rep_B",
+            },
+        )
+        evidence = packet["grounded_evidence"]
+        self.assertEqual(evidence["candidate_scope"]["target"], "target_B")
+        self.assertEqual(evidence["candidate_scope"]["estimand"], "estimand_B")
+        self.assertNotIn("result", evidence)
+        self.assertNotIn("result_sha256", evidence)
+
 
 if __name__ == "__main__":
     unittest.main()
