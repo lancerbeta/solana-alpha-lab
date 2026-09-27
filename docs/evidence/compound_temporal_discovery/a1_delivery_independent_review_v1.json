@@ -17,28 +17,28 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Exit ties at the same availability go through _select_cell and do not become a number. Same-version resume is a retry. A different calculation version is CALCULATION_REVISION and does not reuse the old summary as RETRY_SAME_BYTES."
+        "On 92bd16b3 a non-admitted census row does not reserve (mint, decision), and duplicate replacement skips BINDING_COHORT_MISMATCH so an outsider plus an identical second delivery is not double-counted. Frozen-input hash check, shared lateness gate, and intent-before-eval remain in place."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "The owner path records SIMPLE_SCREEN then COMPOUND_SCREEN in one journal. ESTIMATED_NET_PROXY is on the freeze critic packet and on CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001. PRICE_RELATIVE_PROXY stays distinct from NetReturn."
+        "The published vertical records simple then compound, freeze, classify_lane and DocumentRunner readback. An identical second delivery keeps the mean. offline_v1_1_spec is only the ExperimentSpec carrier for the frozen temporal recipe."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "What can pass a helper test and still distort a conclusion: assess_tier_progress will believe a caller-supplied list. The CLI readout tier_progress is taken from stored looks, so a compound tier is executed only when a look was saved. Exit conflict is not a raw return. Assumption cost is labeled and is not NetReturn."
+        "The ACCEPTED entrypoint and run_registered_fixed_time_proxy both load rows only from recipe.frozen_input under data_root. A direct row-injection call is not that replay. Explicit COMPOUND_INAPPLICABLE remains a researcher skip, not a silent exhaustion."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "discovery-execute shows search_tier and tier_progress. An unused compound tier is not marked executed. Preview does not include a target. Proxies are not labeled NetReturn."
+        "discovery-preview writes store memory only when --store and --journal-scope are both set. SCHEDULE_CONTEXT_UNBOUND, SCHEDULE_LATENESS_MISMATCH, PREVIEW_ENVELOPE_EXHAUSTED and FROZEN_INPUT_MISMATCH print TECHNICAL_STOP scientific_negative=false."
       ]
     }
   ],
