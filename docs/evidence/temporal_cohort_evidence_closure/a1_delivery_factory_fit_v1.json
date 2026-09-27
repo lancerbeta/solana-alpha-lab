@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "TEMPORAL-COHORT-EVIDENCE-CLOSURE-FACTORY-FIT-001",
+  "as_of": "2026-09-28",
+  "task_id": "TEMPORAL_COHORT_EVIDENCE_CLOSURE_V1",
+  "reviewed_bindings_sha256": "pending",
+  "reviewed_inventory_sha256": "pending",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_TEMPORAL_RESULT_KEEPS_COHORT_SLICE",
+    "flexibility_and_history": "PASS_V1_BYTES_STAY_AND_V2_IS_NOT_A_NEW_LOOK",
+    "context_efficiency": "PASS_EXISTING_JOURNAL_AND_READOUT",
+    "research_truth": "PASS_NULL_MEAN_AND_DESCRIPTIVE_COHORTS",
+    "owner_operability": "PASS_READOUT_SHOWS_REVISION_AND_COHORT_ROWS",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_MARKET_EXECUTION",
+    "monitoring_and_recovery": "PASS_COMPLETED_REPLAY_SKIPS_EVALUATOR",
+    "build_vs_buy": "PASS_NO_NEW_CAPABILITY_OR_CLI",
+    "red_team": "PASS_CONFLICT_CLEARS_POOLED_AND_COHORT_TOGETHER",
+    "security": "PASS_NO_PROVIDER_NO_LIVE_WRITE"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "ONE_AUTHORIZED_RESEARCH_RUN"
+  },
+  "recovery": "Revert this change. Stored V1 looks stay readable. A code rollback does not delete an appended V2 revision.",
+  "limits": [
+    "NO_MARKET_FORGE",
+    "NO_LIVE_MEMORY_CHANGE",
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "AGENT_BRANCH_INCOMPLETE_PREDICATE_EQ"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "TEMPORAL-COHORT-EVIDENCE-CLOSURE-REVIEW-001",
+  "as_of": "2026-09-28",
+  "task_id": "TEMPORAL_COHORT_EVIDENCE_CLOSURE_V1",
+  "reviewed_bindings_sha256": "pending",
+  "reviewed_inventory_sha256": "pending",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "On ac6f0353 integrity conflict clears in_base, eligibility and target on pooled members and cohort seats together. Readout adds calculation_version, look_class and new_look without dropping by_cohort."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Missing-target mean stays null on format_discovery_readout. Conflict population_n is 0 on pooled and both cohorts. DocumentRunner summary carries by_cohort. V1 remains readable without a fabricated slice."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=3ed25f5c4ff0df179b0df5577d93dffaa687758452faf6ad930114d5cf49b5ef",
+        "Pooled and cohort seats now clear the same membership flags on INTEGRITY_CONFLICT. V1 without by_cohort stays readable and is not rewritten."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "format_discovery_readout shows calculation_version, look_class and new_look. Operator section 5.1 names queries[].look_class=CALCULATION_REVISION and new_look=false."
+      ]
+    }
+  ]
+}

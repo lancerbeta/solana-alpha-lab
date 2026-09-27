@@ -1,0 +1,41 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "TEMPORAL-COHORT-EVIDENCE-CLOSURE-ACCEPTANCE-001",
+  "as_of": "2026-09-28",
+  "task_id": "TEMPORAL_COHORT_EVIDENCE_CLOSURE_V1",
+  "state_change": "TEMPORAL_RESULT_CARRIES_COHORT_SLICE",
+  "base_main": "662b3d654a995699b681be57addda358737556f0",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/temporal_cohort_evidence_closure/a1_delivery_factory_fit_v1.json",
+    "sha256": "pending",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_COHORT_SLICE_AND_VERTICAL",
+    "independent_review": {
+      "path": "docs/evidence/temporal_cohort_evidence_closure/a1_delivery_independent_review_v1.json",
+      "sha256": "pending",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": ["PASS_COHORT_SLICE_AND_VERTICAL"]
+  },
+  "non_claims": ["NO_ALPHA", "NO_NET_RETURN", "NO_MARKET_EXECUTION", "NO_MERGE"],
+  "side_effects": {"market_execution": "NOT_RUN", "live_store_writes": 0}
+}

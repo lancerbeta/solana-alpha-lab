@@ -83,7 +83,9 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
       - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
     DELIVERY_EVIDENCE:
-      - docs/tasks/TEMPORAL_COHORT_EVIDENCE_CLOSURE_V1.md
+      - docs/evidence/temporal_cohort_evidence_closure/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/temporal_cohort_evidence_closure/a1_delivery_independent_review_v1.json
+      - docs/evidence/temporal_cohort_evidence_closure/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
