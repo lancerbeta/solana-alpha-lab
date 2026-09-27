@@ -702,12 +702,17 @@ def classify_query_look(
     }
 
 
-_LOOK_CLAIM_AXES = (
+_MACHINE_LOOK_AXES = (
+    "population",
+    "decision_timestamp",
+)
+_SEMANTIC_LOOK_AXES = (
     "target",
     "estimand",
     "explanatory_condition",
     "representation_scope",
 )
+_LOOK_CLAIM_AXES = _MACHINE_LOOK_AXES + _SEMANTIC_LOOK_AXES
 
 
 def _axis_text(value: object) -> str:
@@ -730,22 +735,34 @@ def relate_look_scope(
     card = card_scope if isinstance(card_scope, Mapping) else {}
     if not any(_axis_text(look.get(key)) for key in _LOOK_CLAIM_AXES):
         return "LOOK_SCOPE_UNBOUND"
-    shared = False
-    card_adds = False
-    for key in _LOOK_CLAIM_AXES:
+    machine_shared = False
+    semantic_shared = False
+    semantic_context = False
+    for key in _MACHINE_LOOK_AXES:
         look_value = _axis_text(look.get(key))
         card_value = _axis_text(card.get(key))
         if look_value and card_value and look_value != card_value:
             return "LOOK_SCOPE_CONTRADICTION"
         if look_value and card_value:
-            shared = True
+            machine_shared = True
+        elif look_value and not card_value:
+            semantic_context = True
+    for key in _SEMANTIC_LOOK_AXES:
+        look_value = _axis_text(look.get(key))
+        card_value = _axis_text(card.get(key))
+        if look_value and card_value and look_value != card_value:
+            semantic_context = True
+        elif look_value and card_value:
+            semantic_shared = True
         elif card_value and not look_value:
-            card_adds = True
-    if not shared:
+            semantic_context = True
+    if semantic_context or not machine_shared:
+        if machine_shared or semantic_shared or semantic_context:
+            return "LOOK_SCOPE_NARROWER"
         return "LOOK_SCOPE_UNBOUND"
-    if card_adds:
-        return "LOOK_SCOPE_NARROWER"
-    return "LOOK_SCOPE_MATCH"
+    if semantic_shared or machine_shared:
+        return "LOOK_SCOPE_MATCH"
+    return "LOOK_SCOPE_UNBOUND"
 
 
 def stored_look_scope(store: Any, evidence: Mapping[str, Any]) -> dict[str, Any] | None:
@@ -763,6 +780,35 @@ def stored_look_scope(store: Any, evidence: Mapping[str, Any]) -> dict[str, Any]
     if not isinstance(scope, Mapping):
         return None
     return {key: value for key, value in scope.items() if _axis_text(value)}
+
+
+def scope_bound_to_spec(
+    spec: Mapping[str, Any],
+    candidate_scope: Mapping[str, Any] | None,
+) -> dict[str, str]:
+    """Machine fields on a new look come from the spec, not from a free label.
+
+    A declared population or decision moment that the spec did not compute is
+    not stored as the confirming scope.
+    """
+
+    stored = spec if spec.get("decision_points") and spec.get("population") else validate_query_spec(spec)
+    declared = candidate_scope if isinstance(candidate_scope, Mapping) else {}
+    spec_population = _axis_text(stored.get("population"))
+    declared_population = _axis_text(declared.get("population"))
+    if declared_population and declared_population != spec_population:
+        raise GroundedDiscoveryError("LOOK_SPEC_SCOPE_MISMATCH")
+    points = [str(item) for item in (stored.get("decision_points") or []) if str(item)]
+    declared_decision = _axis_text(declared.get("decision_timestamp"))
+    if declared_decision and declared_decision not in points:
+        raise GroundedDiscoveryError("LOOK_SPEC_SCOPE_MISMATCH")
+    bound = {key: value for key, value in declared.items() if _axis_text(value)}
+    bound["population"] = spec_population
+    if not declared_decision and len(points) == 1:
+        bound["decision_timestamp"] = points[0]
+    elif declared_decision:
+        bound["decision_timestamp"] = declared_decision
+    return bound
 
 
 def card_claim_scope(card: Mapping[str, Any] | None) -> dict[str, str]:
@@ -1395,6 +1441,7 @@ def run_recorded_discovery_query(
         raise GroundedDiscoveryError("JOURNAL_SCOPE_REQUIRED")
     if not isinstance(git_sha, str) or len(git_sha) != 40:
         raise GroundedDiscoveryError("GIT_SHA_REQUIRED")
+    bound_scope = scope_bound_to_spec(spec, candidate_scope)
     computed = execute_discovery_from_rows(census, observations, spec, binding)
     summary = computed["summary"]
     binding_sha = data_binding_sha256(computed["admitted"], census, observations)
@@ -1459,9 +1506,9 @@ def run_recorded_discovery_query(
             look=look,
             git_sha=git_sha,
             clock=clock,
-            candidate_scope=candidate_scope,
+            candidate_scope=bound_scope,
         )
-        confirming = dict(candidate_scope)
+        confirming = dict(bound_scope)
         relation = "LOOK_SCOPE_MATCH"
     evidence = {
         "contract_version": DISCOVERY_CONTRACT_VERSION,

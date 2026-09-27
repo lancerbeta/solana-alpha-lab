@@ -1044,6 +1044,16 @@ class OrdinaryOwnerPathTests(unittest.TestCase):
             self.assertEqual(source_receipt.get("action"), "START_NEW_SESSION")
             self.assertEqual(source_receipt.get("search_key_sha256"), evidence["journal_scope"])
             selected = dict(card)
+            selected.update(
+                {
+                    "population": "BASE_X",
+                    "decision_timestamp": "X300",
+                    "target": _scope()["target"],
+                    "estimand": _scope()["estimand"],
+                    "explanatory_condition": _scope()["explanatory_condition"],
+                    "representation_scope": _scope()["representation_scope"],
+                }
+            )
             draft = bind_draft({**source, "candidates": [selected]}, source_receipt)
             draft.pop("runner_up_candidate_ref", None)
             draft.pop("strongest_rejected_alternative", None)

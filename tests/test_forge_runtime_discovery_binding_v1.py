@@ -957,6 +957,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
         runner_matches_look: bool,
         selected_target: str = "target_A",
         selected_estimand: str = "estimand_A",
+        selected_decision: str = "X300",
         scope_estimand: str | None = "estimand_A",
         expect_freeze_error: str | None = None,
     ) -> dict:
@@ -988,6 +989,8 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             {
                 "label": "HFIC-V12-A-LOOK",
                 "display_ordinal": 1,
+                "population": "BASE_X",
+                "decision_timestamp": selected_decision,
                 "estimand": selected_estimand,
                 "target": selected_target,
                 "explanatory_condition": "cond_A",
@@ -1525,11 +1528,99 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                 },
             )
 
+    def test_foreign_decision_moment_does_not_match_the_look(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            session = self._freeze_scoped_runner(
+                Path(raw),
+                runner_matches_look=False,
+                selected_decision="X900",
+                expect_freeze_error="LOOK_SCOPE_CONTRADICTION",
+            )
+            self.assertIsNone(session["frozen"])
+            self.assertEqual(session["evidence"]["candidate_scope"]["decision_timestamp"], "X300")
+
+    def test_declared_scope_must_match_the_spec_decision(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            GroundedDiscoveryError,
+            run_recorded_discovery_query,
+        )
+
+        spec = {
+            "query_id": "SPEC_SCOPE",
+            "population": "BASE_X",
+            "decision_points": ["X300"],
+            "decision_fields": ["FIELD-USD-PRICE-001"],
+            "target_point": "Y1800",
+            "target_field": "FIELD-USD-PRICE-001",
+            "explanatory": [],
+        }
+        with tempfile.TemporaryDirectory() as raw:
+            store = ResearchStore(Path(raw))
+            with self.assertRaises(GroundedDiscoveryError) as caught:
+                run_recorded_discovery_query(
+                    store,
+                    census=[],
+                    observations=[],
+                    spec=spec,
+                    binding=[],
+                    journal_scope="journal",
+                    candidate_scope={
+                        "population": "BASE_X",
+                        "decision_timestamp": "X900",
+                        "target": "target_A",
+                        "estimand": "estimand_A",
+                    },
+                    git_sha="ab" * 20,
+                )
+            self.assertEqual(caught.exception.code, "LOOK_SPEC_SCOPE_MISMATCH")
+            self.assertEqual(list(store.iter_committed_records()), [])
+
+    def test_revision_rebinds_when_the_card_scope_changes(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import apply_revision, finalize_session
+        from tests.test_hfic_cli import critic_result_from_packet_only
+
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            session = self._freeze_scoped_runner(workspace, runner_matches_look=True)
+            frozen = session["frozen"]
+            self.assertTrue(
+                frozen["critic_input_packet"]["grounded_evidence"].get("look_confirms_selected")
+            )
+            store = ResearchStore(session["data_root"])
+            critic = critic_result_from_packet_only(
+                frozen["critic_input_packet"], "REVISE_ONCE"
+            )
+            critic["revision_receipt"] = {"scope": "target", "attempt": 1}
+            pending = finalize_session(
+                frozen,
+                critic,
+                store=store,
+                repo_root=ROOT,
+                data_root=session["data_root"],
+            )
+            self.assertEqual(pending["session_state"], "REVISION_REQUIRED")
+            draft = json.loads((workspace / "draft.json").read_text(encoding="utf-8"))
+            for card in draft["candidates"]:
+                if card["label"] == "HFIC-V12-A-LOOK":
+                    card["target"] = "target_REVISED"
+            revised = apply_revision(
+                pending,
+                draft,
+                store=store,
+                repo_root=ROOT,
+            )
+            evidence = revised["critic_input_packet"]["grounded_evidence"]
+            self.assertFalse(evidence.get("look_confirms_selected"))
+            self.assertNotIn("result", evidence)
+            self.assertNotIn("result_sha256", evidence)
+
     def test_same_scope_runner_up_keeps_ordinary_classification(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             session = self._freeze_scoped_runner(Path(raw), runner_matches_look=True)
             primary = session["frozen"]["critic_input_packet"]["grounded_evidence"]
             self.assertTrue(primary.get("look_confirms_selected"))
+            self.assertEqual(primary["candidate_scope"]["population"], "BASE_X")
+            self.assertEqual(primary["candidate_scope"]["decision_timestamp"], "X300")
             self.assertEqual(primary["candidate_scope"]["target"], "target_A")
             self.assertEqual(primary["result_refs"], session["evidence"]["result_refs"])
             runner_evidence = session["frozen"]["runner_up_critic_input_packet"][

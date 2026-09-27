@@ -6497,6 +6497,30 @@ def apply_revision(
     packet = dict(packet_in)
     packet["selected_candidate"] = rebuilt_selected
     packet["strongest_rejected_alternative"] = rejected_id
+    source_evidence = packet.get("grounded_evidence")
+    if isinstance(source_evidence, Mapping) and source_evidence.get("result_refs"):
+        rebound = _bind_selected_look(
+            source_evidence,
+            selected_card if isinstance(selected_card, Mapping) else {},
+            store=store,
+            strict=False,
+        )
+        if rebound.get("look_confirms_selected") is not False:
+            from solana_alpha_lab.factory.hfic_grounded_discovery import (
+                GroundedDiscoveryError,
+                bind_prior_scope_evidence,
+            )
+
+            try:
+                rebound = bind_prior_scope_evidence(
+                    rebound,
+                    canonical_priors=list(
+                        (packet.get("prior_memory") or {}).get("capsules") or []
+                    ),
+                )
+            except GroundedDiscoveryError as exc:
+                raise HficSessionError(exc.code) from exc
+        packet["grounded_evidence"] = rebound
     packet["research_memory_as_of"] = str(existing.get("research_memory_as_of") or "")
     packet["owner_focus"] = str(existing.get("owner_focus") or "AUTO")
     packet["truth_roots_used"] = _nonempty_str_list(
