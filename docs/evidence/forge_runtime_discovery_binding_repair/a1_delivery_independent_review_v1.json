@@ -4,8 +4,8 @@
   "review_id": "FORGE-RUNTIME-DISCOVERY-BINDING-REPAIR-REVIEW-001",
   "as_of": "2026-09-27",
   "task_id": "FORGE_RUNTIME_DISCOVERY_BINDING_REPAIR_V1",
-  "reviewed_bindings_sha256": "8d3aabf8cc5dfefcf9dcfb5ec5707829d13de287a6f09fac01836282ff3bbd22",
-  "reviewed_inventory_sha256": "5ecf13b27eef8cbf66a304e6b66470398aa5e6b86f4b6900698ba87ee405356d",
+  "reviewed_bindings_sha256": "5c72a4259787aa9c19f479a0b4e82b114d590a45f1786a81bd7c3fbf0785e58f",
+  "reviewed_inventory_sha256": "e68046056d77ba03d46aa4a4d623e08688eaf9b5c905354c9433e992c8c1895c",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -17,29 +17,29 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Population and decision moment come from the spec. A both-named mismatch stops selected freeze. A one-sided or semantic axis stays context and drops confirmation. Retry keeps the stored scope. REVISE_ONCE rebinds before the packet hash."
+        "The confirming decision is the latest point in the spec, and the confirming target is target_point:target_field. An earlier declared point is rejected before the query. A free-text target cannot take a scientific pass. A Y900 card on a spec whose latest point is Y900 keeps the ordinary classification path."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Named tests cover a foreign decision moment, a foreign population, a spec population or decision the query did not compute, an omitted machine field filled from the spec, a card-only decision moment, a revision that drops confirmation, and a matching scope that keeps ordinary classification."
+        "Declaring X300 on a spec that also uses Y900 writes nothing. A liquidity label repeated by the card does not become a scientific pass. A card at Y900 with the measured target reaches PASS_DATA_OPTION_REQUIRED through Critic."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=5bc0032ed93d50e74bb9056d1d77305d13e607c853c139b97860aa26fb9d6ce1",
-        "The spec binds population and decision moment before the query. Both-named machine mismatch is a contradiction. A card-only or semantic axis cannot confirm the look. Revision rebinds before the packet hash. A full match keeps the ordinary path."
+        "packet_fingerprint_sha256=2a370b5304596dbdd875ecee7b30cf3f4b614d7085214aac1a98cd48d7ab8f8c",
+        "The confirming moment and target come from the validated spec. X300 is not stored when Y900 is the latest decision point. A free-text target stays unbound. The measured Y900 scope can still reach ordinary classification."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "The readout separates a different population or decision moment, a narrower idea without PASS, and a matching scope. No new owner step and no market forge claim."
+        "The readout names the latest decision point and the measured target point and field. A match keeps the ordinary path. No new manual step and no market forge claim."
       ]
     }
   ],
@@ -56,9 +56,9 @@
       "role": "GOAL_DOD_CRITIC",
       "prior_verdict": "NOT_READY",
       "severity": "MAJOR",
-      "finding": "Population mismatch at freeze and at look creation, and spec fill of an omitted decision moment, were not named tests.",
-      "observed_head": "94859ff8ccab11885282d4cd131e084057a2a736",
-      "resolved_by_head": "21d11f019401818fde9107a3cbc330fa456aa3ba"
+      "finding": "The positive Critic path used only a singleton X300 spec, so the latest point of a two-point look was not shown through classification.",
+      "observed_head": "09da8ca079a7561aac4e494f81404ffc17fad867",
+      "resolved_by_head": "e4ccdb827adad2914dfe75c77b634fd93618a4e5"
     },
     {
       "role": "OWNER_UX_CRITIC",
