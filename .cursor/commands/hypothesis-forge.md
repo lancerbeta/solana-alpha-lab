@@ -150,6 +150,12 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <canonical-data-root> --store <canonical-data-root> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
 ```
 
+Feature preview writes store memory only when `--store` and `--journal-scope` are both set. A third distinct preview is `PREVIEW_ENVELOPE_EXHAUSTED`. `SCHEDULE_CONTEXT_UNBOUND`, `SCHEDULE_LATENESS_MISMATCH` and `FROZEN_INPUT_MISMATCH` are technical stops, not a scientific negative.
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-preview --data-root <canonical-data-root> --store <canonical-data-root> --journal-scope <preflight-search-key-sha256> --spec <preview.json> --format json
+```
+
 ## Representation mode boundary
 
 The normal slash remains one bounded run. A fresh ordinary focus reports

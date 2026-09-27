@@ -381,6 +381,28 @@ class TemporalVerticalTests(unittest.TestCase):
                 loaded["cohorts"],
             )["summary"]
             self.assertEqual(event_conflict["observed_target_n"], 0)
+            same_release = "dd" * 32
+            same_census = [dict(row) for row in loaded["census"]]
+            same_census.append({**same_census[0], "mint": "MintW0A", "release_id": same_release})
+            same_rows = [dict(row) for row in loaded["observations"]]
+            for row in list(loaded["observations"]):
+                if row.get("mint") != "MintW0A":
+                    continue
+                copied = dict(row)
+                copied["release_id"] = same_release
+                same_rows.append(copied)
+            same_binding = list(loaded["cohorts"]) + [
+                {**loaded["cohorts"][0], "release_id": same_release}
+            ]
+            identical = execute_discovery_from_rows(
+                same_census,
+                same_rows,
+                spec,
+                same_binding,
+            )["summary"]
+            self.assertGreaterEqual(identical["duplicate_delivery_count"], 1)
+            self.assertEqual(identical["integrity_conflict_count"], 0)
+            self.assertAlmostEqual(identical["mean_target"], 0.2, places=9)
             other_release = "ee" * 32
             twin_census = [dict(row) for row in loaded["census"]]
             twin_census.append({**twin_census[0], "mint": "MintW0A", "release_id": other_release})

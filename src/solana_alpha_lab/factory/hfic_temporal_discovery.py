@@ -836,24 +836,44 @@ def execute_temporal_discovery(
         decision_deadline = _deadline_for(anchor, decision_point, lateness)
         decision_key = decision_deadline.strftime("%Y-%m-%dT%H:%M:%SZ") if decision_deadline else str(anchor or "")
         identity = (mint, decision_key)
+        block = decision_deadline.date().isoformat() if decision_deadline is not None else "UNANCHORED"
+        if (cohort, release) not in admitted_pairs:
+            members.append(
+                {
+                    "identity": identity,
+                    "in_base": False,
+                    "decision_eligible": False,
+                    "feature_values": {},
+                    "feature_unknown": False,
+                    "matched": False,
+                    "target": None,
+                    "target_is_observed": False,
+                    "block": block,
+                    "exclusion": "BINDING_COHORT_MISMATCH",
+                }
+            )
+            continue
+        signature = _observation_signature(observations, mint, cohort, release)
         if identity in seen:
             duplicate_count += 1
-            if signatures.get(identity) != _observation_signature(observations, mint, cohort, release):
+            if signatures.get(identity) != signature:
                 integrity_conflicts += 1
                 for member in members:
                     if member.get("identity") == identity:
                         member["integrity_excluded"] = True
                         member["matched"] = False
                         member["target_is_observed"] = False
-            continue
+                continue
+            existing = next(item for item in members if item.get("identity") == identity)
+            if existing.get("in_base"):
+                continue
+            members.remove(existing)
+            seen.remove(identity)
         seen.add(identity)
-        signatures[identity] = _observation_signature(observations, mint, cohort, release)
-        block = decision_deadline.date().isoformat() if decision_deadline is not None else "UNANCHORED"
+        signatures[identity] = signature
         exclusion = None
         in_base = False
-        if (cohort, release) not in admitted_pairs:
-            exclusion = "BINDING_COHORT_MISMATCH"
-        elif str(row.get("candidate_state") or "") != "X_ELIGIBLE" or decision_deadline is None:
+        if str(row.get("candidate_state") or "") != "X_ELIGIBLE" or decision_deadline is None:
             exclusion = "NOT_X_ELIGIBLE"
         else:
             liquidity = _cell(
@@ -1406,44 +1426,26 @@ def execute_fixed_time_proxy_capability(
     authority_phrase: str | None = None,
     capture_hooks: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Registry entrypoint. Replays a frozen recipe with the same calculator."""
+    """Registry entrypoint. The frozen recipe files are the only rows."""
 
     del authority_phrase
     hooks = dict(capture_hooks or {})
-    recipe = spec.get("experiment_recipe") if isinstance(spec.get("experiment_recipe"), Mapping) else spec
-    if not isinstance(recipe, Mapping):
+    data_root = hooks.get("data_root")
+    if not isinstance(data_root, Path):
+        raise GroundedDiscoveryError("DATA_ROOT_REQUIRED")
+    recipe = spec.get("experiment_recipe") if isinstance(spec.get("experiment_recipe"), Mapping) else None
+    parameters = spec.get("parameters") if isinstance(spec.get("parameters"), Mapping) else None
+    if recipe is None and isinstance(parameters, Mapping):
+        wrapped = spec
+    elif isinstance(recipe, Mapping):
+        wrapped = {"parameters": {"temporal_recipe": recipe}}
+    else:
         raise GroundedDiscoveryError("EXPERIMENT_RECIPE_INVALID")
-    query = recipe.get("spec")
-    if not isinstance(query, Mapping):
-        raise GroundedDiscoveryError("EXPERIMENT_RECIPE_INVALID")
-    stored_identity = str(recipe.get("scientific_identity") or "")
-    body = query.get("scientific_body")
-    if not isinstance(body, Mapping):
-        raise GroundedDiscoveryError("EXPERIMENT_RECIPE_INVALID")
-    public = {
-        "schema": TEMPORAL_SCHEMA,
-        "schema_version": TEMPORAL_SCHEMA_VERSION,
-        "query_id": query.get("query_id") or "frozen-recipe",
-        "population": "BASE_X",
-        "search_tier": query.get("search_tier") or "COMPOUND_SCREEN",
-        "budget_allocation": query.get("budget_allocation") or "AUTO",
-        "decision": {"point_id": body["decision_point"], "time_policy": "BOUND_SCHEDULE_CUTOFF"},
-        "schedule": {"lateness_seconds": body["schedule_lateness_seconds"]},
-        "features": body["features"],
-        "all": body["predicates"],
-        "target": body["target"],
-        "entry_model": body["entry_model"],
-        "cost_profile": body.get("cost_profile"),
-        "evaluation": body.get("evaluation") or {},
-    }
-    computed = execute_temporal_discovery(
-        list(hooks.get("census") or []),
-        list(hooks.get("observations") or []),
-        public,
-        list(hooks.get("binding") or []),
+    computed = run_temporal_fixed_time_from_spec(
+        wrapped,
+        root=root,
+        capture_hooks={"data_root": data_root},
     )
-    if stored_identity and computed["summary"]["spec_sha256"] != stored_identity:
-        raise GroundedDiscoveryError("EXPERIMENT_RECIPE_IDENTITY_MISMATCH")
     computed["capability_id"] = TEMPORAL_CAPABILITY_ID
     computed["root_used"] = Path(root).name
     computed["labeled_net_return"] = False
@@ -1455,10 +1457,12 @@ def run_registered_fixed_time_proxy(
     root: Path,
     registry_path: Path,
     recipe: Mapping[str, Any],
-    census: Sequence[Mapping[str, Any]],
-    observations: Sequence[Mapping[str, Any]],
-    binding: Sequence[Mapping[str, Any]],
+    data_root: Path,
+    census: Sequence[Mapping[str, Any]] = (),
+    observations: Sequence[Mapping[str, Any]] = (),
+    binding: Sequence[Mapping[str, Any]] = (),
 ) -> dict[str, Any]:
+    del census, observations, binding
     document = yaml.safe_load(Path(registry_path).read_text(encoding="utf-8"))
     rows = document.get("capabilities") if isinstance(document, Mapping) else None
     if not isinstance(rows, list):
@@ -1479,5 +1483,5 @@ def run_registered_fixed_time_proxy(
     return handler(
         {"experiment_recipe": recipe},
         root=root,
-        capture_hooks={"census": census, "observations": observations, "binding": binding},
+        capture_hooks={"data_root": data_root},
     )

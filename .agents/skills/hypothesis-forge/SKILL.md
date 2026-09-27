@@ -295,10 +295,14 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
    Feature-only preview:
 
 ```text
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-preview --data-root <canonical-data-root> --spec <preview.json> --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-preview --data-root <canonical-data-root> --store <canonical-data-root> --journal-scope <preflight-search-key-sha256> --spec <preview.json> --format json
 ```
 
-   Preview has no target. A temporal query uses schema
+   Preview has no target. Pass `--store` and `--journal-scope` together; one flag
+   alone is `PREVIEW_STORE_SCOPE_REQUIRED`. A third distinct preview is
+   `PREVIEW_ENVELOPE_EXHAUSTED`. `SCHEDULE_CONTEXT_UNBOUND`,
+   `SCHEDULE_LATENESS_MISMATCH` and `FROZEN_INPUT_MISMATCH` are technical
+   stops (`scientific_negative=false`), not a scientific negative. A temporal query uses schema
    `smial.hfic-temporal-query`. Relative results are
    `PRICE_RELATIVE_PROXY`. Cost output is `ESTIMATED_NET_PROXY`, never
    `NetReturn`. The frozen recipe's fixed-time consumer is

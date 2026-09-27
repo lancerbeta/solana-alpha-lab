@@ -145,6 +145,8 @@ class TemporalOwnerPathTests(unittest.TestCase):
             census_path, observations_path, binding = _write_partition(workspace)
             binding[0]["census_sha256"] = _sha256_file(census_path)
             binding[0]["observations_sha256"] = _sha256_file(observations_path)
+            binding[0]["census_rel"] = census_path.name
+            binding[0]["observations_rel"] = observations_path.name
             binding_path = workspace / "cost-binding.json"
             binding_path.write_text(json.dumps({"cohorts": binding}), encoding="utf-8")
             simple = _spec(
@@ -350,9 +352,7 @@ class TemporalOwnerPathTests(unittest.TestCase):
                 root=ROOT,
                 registry_path=ROOT / "configs/experiment_capability_registry_v2.yaml",
                 recipe=evidence["result"]["experiment_recipe"],
-                census=[_census("cost-mint")],
-                observations=_path("cost-mint", [1.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92),
-                binding=binding,
+                data_root=workspace,
             )
             self.assertEqual(consumed["capability_id"], "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001")
             self.assertEqual(consumed["summary"]["spec_sha256"], evidence["result"]["spec_sha256"])

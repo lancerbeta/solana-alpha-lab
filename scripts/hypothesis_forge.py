@@ -131,8 +131,23 @@ def emit(payload: dict[str, Any], *, exit_code: int = 0) -> int:
     return exit_code
 
 
+_TECHNICAL_STOPS = frozenset(
+    {
+        "SCHEDULE_CONTEXT_UNBOUND",
+        "SCHEDULE_LATENESS_MISMATCH",
+        "FROZEN_INPUT_MISMATCH",
+        "FROZEN_INPUT_REQUIRED",
+        "PREVIEW_ENVELOPE_EXHAUSTED",
+        "PREVIEW_STORE_SCOPE_REQUIRED",
+        "DATA_ROOT_REQUIRED",
+    }
+)
+
+
 def emit_error(code: str, *, exit_code: int = 1) -> int:
     print(code, file=sys.stderr)
+    if code in _TECHNICAL_STOPS:
+        print("TECHNICAL_STOP scientific_negative=false", file=sys.stderr)
     return exit_code
 
 
@@ -807,7 +822,7 @@ def cmd_discovery_preview(
     store_root: Path | None = None,
     journal_scope: str | None = None,
 ) -> int:
-    """Feature-only preview. Does not write a store and does not read a target."""
+    """Feature-only preview. Store memory is written only when store and journal are both set."""
 
     from solana_alpha_lab.factory.hfic_grounded_discovery import (
         GroundedDiscoveryError,
@@ -834,6 +849,8 @@ def cmd_discovery_preview(
             census_path=census_path,
             observations_path=observations_path,
         )
+        if (store_root is None) != (not journal_scope):
+            return emit_error("PREVIEW_STORE_SCOPE_REQUIRED")
         remembered = list(prior_preview_hash or [])
         if store_root is not None and journal_scope:
             from solana_alpha_lab.factory.hfic_temporal_discovery import stored_preview_hashes
@@ -1924,7 +1941,7 @@ def build_parser() -> argparse.ArgumentParser:
     discovery_execute.add_argument("--journal-scope", required=True)
     discovery_preview = subparsers.add_parser(
         "discovery-preview",
-        help="Feature-only temporal preview. Does not write a store or read a target.",
+        help="Feature-only temporal preview. Writes store memory only when --store and --journal-scope are both set. Does not read a target.",
     )
     discovery_preview.add_argument("--spec", type=Path, required=True)
     discovery_preview.add_argument("--binding", type=Path)

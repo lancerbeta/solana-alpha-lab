@@ -1539,8 +1539,11 @@ Catalog/prior resolution
 compound не использован. Неназывайте непройденный tier выполненным.
 `PRICE_RELATIVE_PROXY` — относительная цена. `ESTIMATED_NET_PROXY` — модельная
 оценка. Ни один из них не является фактическим `NetReturn`.
-Preview: `discovery-preview`. Фиксированный offline falsifier:
-`CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001`.
+Preview: `discovery-preview --store <data-root> --journal-scope <search-key>`.
+Оба флага вместе включают память preview. Коды `SCHEDULE_CONTEXT_UNBOUND`,
+`SCHEDULE_LATENESS_MISMATCH`, `PREVIEW_ENVELOPE_EXHAUSTED` и
+`FROZEN_INPUT_MISMATCH` — технический stop, не научный негатив.
+Фиксированный offline falsifier: `CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001`.
 
 ## 6. Версионный чекпоинт
 
