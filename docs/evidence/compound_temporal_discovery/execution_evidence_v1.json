@@ -1,0 +1,19 @@
+{
+  "schema": "smial.compound-temporal-discovery-execution-evidence",
+  "task_id": "COMPOUND_TEMPORAL_DISCOVERY_V1",
+  "base": "424e28990478102dc18a259f5509f40ee31d54b1",
+  "dependency": "PR_347_MERGED",
+  "engineering_commands": [
+    "uv run --locked --managed-python python -B -m unittest tests.test_hfic_temporal_discovery_v1 tests.test_hfic_temporal_owner_path_v1 tests.test_hfic_grounded_discovery_v1.ProductionRowRecipeTests"
+  ],
+  "engineering_result": "PASS_15",
+  "agent_acceptance": {
+    "status": "COMPLETED_ONE_ATTEMPT",
+    "researcher_agent_id": "f9fcbd05-db0c-46e9-b919-6855b2aa78d1",
+    "critic_agent_id": "38740dc1-1bde-47a8-8edc-d3dc2d11fc30",
+    "query_valid": true,
+    "critic_terminal": "KILL",
+    "scripted_fixture": false
+  },
+  "market_execution": "NOT_RUN"
+}

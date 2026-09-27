@@ -131,8 +131,25 @@ def emit(payload: dict[str, Any], *, exit_code: int = 0) -> int:
     return exit_code
 
 
+_TECHNICAL_STOPS = frozenset(
+    {
+        "SCHEDULE_CONTEXT_UNBOUND",
+        "CANONICAL_X300_SCHEDULE_INCOMPATIBLE",
+        "SEARCH_EXHAUSTED_WITHOUT_COMPOUND",
+        "SCHEDULE_LATENESS_MISMATCH",
+        "FROZEN_INPUT_MISMATCH",
+        "FROZEN_INPUT_REQUIRED",
+        "PREVIEW_ENVELOPE_EXHAUSTED",
+        "PREVIEW_STORE_SCOPE_REQUIRED",
+        "DATA_ROOT_REQUIRED",
+    }
+)
+
+
 def emit_error(code: str, *, exit_code: int = 1) -> int:
     print(code, file=sys.stderr)
+    if code in _TECHNICAL_STOPS:
+        print("TECHNICAL_STOP scientific_negative=false", file=sys.stderr)
     return exit_code
 
 
@@ -792,6 +809,97 @@ def cmd_discovery_execute(
     if data_root is not None:
         _assert_no_path_leak(evidence, str(data_root))
     return emit(evidence)
+
+
+def cmd_discovery_preview(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    spec_path: Path,
+    binding_path: Path | None,
+    census_path: Path | None,
+    observations_path: Path | None,
+    cohort_partitions: list[tuple[str, Path, Path]] | None,
+    prior_preview_hash: list[str] | None,
+    store_root: Path | None = None,
+    journal_scope: str | None = None,
+) -> int:
+    """Feature-only preview. Store memory is written only when store and journal are both set."""
+
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        load_admitted_partition_rows,
+    )
+    from solana_alpha_lab.factory.hfic_temporal_discovery import build_feature_preview
+
+    try:
+        spec = json.loads(spec_path.read_text(encoding="utf-8"))
+        binding_doc = None
+        if binding_path is not None:
+            binding_doc = json.loads(binding_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return emit_error("DISCOVERY_INPUT_INVALID")
+    if not isinstance(spec, dict):
+        return emit_error("DISCOVERY_INPUT_INVALID")
+    if binding_doc is not None and not isinstance(binding_doc, dict):
+        return emit_error("DISCOVERY_INPUT_INVALID")
+    try:
+        loaded = load_admitted_partition_rows(
+            data_root=explicit_data_root,
+            binding_doc=binding_doc,
+            partitions=cohort_partitions,
+            census_path=census_path,
+            observations_path=observations_path,
+        )
+        if (store_root is None) != (not journal_scope):
+            return emit_error("PREVIEW_STORE_SCOPE_REQUIRED")
+        remembered = list(prior_preview_hash or [])
+        if store_root is not None and journal_scope:
+            from solana_alpha_lab.factory.hfic_temporal_discovery import stored_preview_hashes
+            from solana_alpha_lab.factory.research_store import ResearchStore
+
+            remembered = stored_preview_hashes(ResearchStore(store_root), journal_scope)
+        payload = build_feature_preview(
+            loaded["census"],
+            loaded["observations"],
+            spec,
+            loaded["cohorts"],
+            prior_preview_hashes=remembered,
+        )
+        if store_root is not None and journal_scope:
+            from solana_alpha_lab.factory.hfic_temporal_discovery import persist_feature_preview
+            from solana_alpha_lab.factory.research_store import ResearchStore
+
+            input_identity = hashlib.sha256(
+                json.dumps(
+                    [
+                        (
+                            str(item.get("cohort_id")),
+                            str(item.get("release_id")),
+                            str(item.get("observations_sha256")),
+                        )
+                        for item in loaded["cohorts"]
+                    ],
+                    sort_keys=True,
+                ).encode("utf-8")
+            ).hexdigest()
+            persist_feature_preview(
+                ResearchStore(store_root),
+                journal_scope=journal_scope,
+                preview=payload,
+                git_sha="0" * 40,
+                input_sha256=input_identity,
+            )
+    except GroundedDiscoveryError as exc:
+        return emit_error(exc.code)
+    except (OSError, ValueError):
+        return emit_error("DISCOVERY_ROWS_UNREADABLE")
+    payload["values_are_features_only"] = True
+    payload["scientific_writes"] = 0
+    _assert_no_path_leak(payload, str(repo_root))
+    if explicit_data_root is not None:
+        _assert_no_path_leak(payload, str(explicit_data_root))
+    return emit(payload)
 
 
 def cmd_discovery_coverage(repo_root: Path, explicit_data_root: Path | None) -> int:
@@ -1847,6 +1955,25 @@ def build_parser() -> argparse.ArgumentParser:
     discovery_execute.add_argument("--spec", type=Path, required=True)
     discovery_execute.add_argument("--candidate-scope", type=Path, required=True)
     discovery_execute.add_argument("--journal-scope", required=True)
+    discovery_preview = subparsers.add_parser(
+        "discovery-preview",
+        help="Feature-only temporal preview. Writes store memory only when --store and --journal-scope are both set. Does not read a target.",
+    )
+    discovery_preview.add_argument("--spec", type=Path, required=True)
+    discovery_preview.add_argument("--binding", type=Path)
+    discovery_preview.add_argument("--census", type=Path)
+    discovery_preview.add_argument("--observations", type=Path)
+    discovery_preview.add_argument(
+        "--cohort-partition",
+        action="append",
+        nargs=3,
+        metavar=("COHORT", "CENSUS", "OBSERVATIONS"),
+        default=None,
+    )
+    discovery_preview.add_argument("--prior-preview-hash", action="append", default=None)
+    discovery_preview.add_argument("--store", type=Path)
+    discovery_preview.add_argument("--journal-scope")
+    discovery_preview.add_argument("--format", choices=("json",), default="json")
     discovery_execute.add_argument("--format", choices=("json",), default="json")
 
     persist_draft = subparsers.add_parser(
@@ -2093,6 +2220,22 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_discovery_coverage(repo_root, args.data_root)
         if args.command == "discovery-binding":
             return cmd_discovery_binding(repo_root, args.data_root)
+        if args.command == "discovery-preview":
+            return cmd_discovery_preview(
+                repo_root,
+                explicit_data_root=args.data_root,
+                spec_path=args.spec,
+                binding_path=args.binding,
+                census_path=args.census,
+                observations_path=args.observations,
+                cohort_partitions=[
+                    (str(item[0]), Path(item[1]), Path(item[2]))
+                    for item in (args.cohort_partition or [])
+                ],
+                prior_preview_hash=args.prior_preview_hash,
+                store_root=args.store,
+                journal_scope=args.journal_scope,
+            )
         if args.command == "discovery-execute":
             return cmd_discovery_execute(
                 repo_root,

@@ -141,12 +141,26 @@
               "RESEARCH_ARTIFACT"
             ]
           },
-          "stable_id": {"$ref": "#/$defs/stable_id"},
+          "stable_id": {"type": "string"},
           "expected_content_sha256_or_dataset_fingerprint": {
             "type": "string",
             "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{15,255}$"
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {"source_kind": {"const": "DATASET_MANIFEST"}},
+              "required": ["source_kind"]
+            },
+            "then": {
+              "properties": {"stable_id": {"$ref": "#/$defs/dataset_manifest_id"}}
+            },
+            "else": {
+              "properties": {"stable_id": {"$ref": "#/$defs/stable_id"}}
+            }
+          }
+        ]
       }
     },
     "query_recipe_ids": {
@@ -172,6 +186,12 @@
     "stable_id": {
       "type": "string",
       "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+    },
+    "dataset_manifest_id": {
+      "anyOf": [
+        {"$ref": "#/$defs/stable_id"},
+        {"type": "string", "pattern": "^dataset-[0-9a-f]{64}$"}
+      ]
     },
     "capability_id": {
       "type": "string",

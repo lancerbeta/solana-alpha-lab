@@ -1,0 +1,29 @@
+{
+  "provenance": "ISOLATED_AGENT_ATTEMPT_2",
+  "agent_id": "e23d4400-9da9-468d-a498-88dab1015505",
+  "attempt": 2,
+  "scripted_fixture": false,
+  "query": {
+    "schema": "smial.hfic-temporal-query",
+    "schema_version": "1.0",
+    "query_id": "compound-second-leg-contained-fade-y3600",
+    "population": "BASE_X",
+    "search_tier": "COMPOUND_SCREEN",
+    "decision": {"point_id": "Y3600", "time_policy": "BOUND_SCHEDULE_CUTOFF"},
+    "schedule": {"lateness_seconds": 300},
+    "features": [
+      {"name": "second_leg_y900_y1800", "op": "return_ratio", "field_id": "FIELD-USD-PRICE-001", "start": "Y900", "end": "Y1800"},
+      {"name": "late_fade_y1800_y3600", "op": "return_ratio", "field_id": "FIELD-USD-PRICE-001", "start": "Y1800", "end": "Y3600"},
+      {"name": "liq_x300", "op": "point_value", "field_id": "FIELD-LIQUIDITY-USD-001", "point": "X300"}
+    ],
+    "all": [
+      {"feature": "second_leg_y900_y1800", "op": "gt", "value": 0.2},
+      {"feature": "late_fade_y1800_y3600", "op": "between", "lower": -0.5, "upper": 0.0, "closed": "left"},
+      {"feature": "liq_x300", "op": "gte", "value": 500.0}
+    ],
+    "target": {"kind": "PRICE_RELATIVE_PROXY", "reference_point": "Y3600", "exit_point": "Y7200", "field_id": "FIELD-USD-PRICE-001"},
+    "entry_model": {"kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT", "assumed_latency_seconds": 0}
+  },
+  "mechanism": "A second-leg expansion into Y1800 followed by a contained fade into Y3600, with X300 liquidity still above a floor, may mark unfinished post-impulse digestion rather than trend failure.",
+  "cheapest_falsifier": "Fixed-time PRICE_RELATIVE_PROXY versus the same decision-eligible baseline under ASSUMPTION_STRESS_ONLY; kill if the edge vanishes in BASE/STRESS or under drop-one ablation."
+}

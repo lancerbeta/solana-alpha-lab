@@ -327,6 +327,7 @@ class DocumentRunner(ExperimentRunner):
                     authority_phrase=authority_phrase,
                 )
             else:
+                hooks.setdefault("data_root", run_context.data_root)
                 capability_result = execute_capability(
                     spec,
                     root=self.root,

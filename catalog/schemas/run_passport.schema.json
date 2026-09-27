@@ -51,7 +51,7 @@
     "uv_lock_sha256": {"$ref": "#/$defs/sha256"},
     "dataset_manifest_ids": {
       "type": "array",
-      "items": {"$ref": "#/$defs/stable_id"}
+      "items": {"$ref": "#/$defs/dataset_manifest_id"}
     },
     "dataset_fingerprints": {
       "type": "array",
@@ -125,6 +125,12 @@
     "stable_id": {
       "type": "string",
       "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+    },
+    "dataset_manifest_id": {
+      "anyOf": [
+        {"$ref": "#/$defs/stable_id"},
+        {"type": "string", "pattern": "^dataset-[0-9a-f]{64}$"}
+      ]
     },
     "sha256": {
       "type": "string",

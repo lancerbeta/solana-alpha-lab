@@ -691,6 +691,31 @@ def compile_observation_schedule(
     )
 
 
+def run_temporal_fixed_time_proxy(
+    spec: Mapping[str, Any],
+    *,
+    root: Path,
+    authority_phrase: str | None = None,
+    capture_hooks: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Offline fixed-time proxy. Rows come from the data root, not caller hooks."""
+
+    del authority_phrase
+    from solana_alpha_lab.factory.hfic_temporal_discovery import (
+        run_temporal_fixed_time_from_spec,
+    )
+
+    try:
+        return run_temporal_fixed_time_from_spec(
+            spec,
+            root=root,
+            capture_hooks=capture_hooks,
+        )
+    except Exception as exc:
+        code = getattr(exc, "code", None) or str(exc)
+        raise CapabilityError(str(code)) from exc
+
+
 CAPABILITY_ROUTER: dict[str, Callable[..., dict[str, Any]]] = {
     CAP_OFFLINE_CANONICAL_RECEIPT_REPLAY: replay_canonical_receipts,
     CAP_JUPITER_FREE_KEY_QUOTE_NATIVE_BOUNDED_CAPTURE: capture_quote_native_free_key,
@@ -700,6 +725,7 @@ CAPABILITY_ROUTER: dict[str, Callable[..., dict[str, Any]]] = {
     CAP_OBSERVATION_SCHEDULE_COMPILE_BIND: compile_observation_schedule,
     CAP_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC: run_censoring_ignorability_diagnostic,
     CAP_HFIC_SELECTION_ROBUSTNESS_GATE: run_selection_robustness_gate,
+    "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001": run_temporal_fixed_time_proxy,
 }
 
 
@@ -736,6 +762,8 @@ def execute_capability(
     if capability_id == CAP_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC and budget != 0:
         raise CapabilityError("PROVIDER_BUDGET_NOT_ZERO")
     if capability_id == CAP_HFIC_SELECTION_ROBUSTNESS_GATE and budget != 0:
+        raise CapabilityError("PROVIDER_BUDGET_NOT_ZERO")
+    if capability_id == "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001" and budget != 0:
         raise CapabilityError("PROVIDER_BUDGET_NOT_ZERO")
     return handler(
         spec,

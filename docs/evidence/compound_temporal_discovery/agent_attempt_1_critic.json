@@ -1,0 +1,11 @@
+{
+  "provenance": "ISOLATED_CRITIC_ATTEMPT_1",
+  "agent_id": "38740dc1-1bde-47a8-8edc-d3dc2d11fc30",
+  "input": "frozen result packet only",
+  "critic_terminal": "KILL",
+  "claim_you_accept": "Only an EXPLORATORY_PROXY compound-screen observation with matched_n=1, PRICE_RELATIVE_PROXY target, labeled_net_return=false, and ABSENT cost.",
+  "one_sentence_reason": "N=1 PRICE_RELATIVE_PROXY with unevaluated cost is not a fill or NetReturn.",
+  "scripted_fixture": false,
+  "attempts_used": 1,
+  "schema_repairs": 0
+}

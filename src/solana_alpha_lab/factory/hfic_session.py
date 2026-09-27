@@ -2100,6 +2100,25 @@ def freeze_draft(
             raise HficSessionError(exc.code) from exc
     elif isinstance(grounded, Mapping):
         packet["grounded_evidence"] = grounded
+    handed = packet.get("grounded_evidence")
+    if isinstance(handed, Mapping) and store is not None:
+        result = handed.get("result") if isinstance(handed.get("result"), Mapping) else {}
+        if isinstance(result, Mapping) and result.get("schema") == "smial.hfic-temporal-query":
+            from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks
+
+            journal = str(handed.get("journal_scope") or "")
+            viewed = [
+                {
+                    "query_id": item.get("query_id") or (item.get("result") or {}).get("query_id"),
+                    "spec_sha256": item.get("spec_sha256"),
+                    "search_tier": item.get("search_tier"),
+                    "look_class": item.get("look_class"),
+                    "new_look": item.get("new_look"),
+                    "result_sha256": item.get("result_sha256"),
+                }
+                for item in list_discovery_looks(store, journal)
+            ]
+            packet["grounded_evidence"] = {**dict(handed), "viewed_queries": viewed}
     if repo_root is not None:
         _validate_json_schema(
             packet,
@@ -2332,6 +2351,37 @@ def freeze_draft(
     return result
 
 
+def _assert_temporal_search_closed(draft: Mapping[str, Any], store: Any) -> None:
+    """NO_WORTHY is a search closure. An optional flag is not the authority."""
+
+    evidence = draft.get("grounded_evidence")
+    if not isinstance(evidence, Mapping) or store is None:
+        return
+    result = evidence.get("result") if isinstance(evidence.get("result"), Mapping) else {}
+    if not isinstance(result, Mapping) or result.get("schema") != "smial.hfic-temporal-query":
+        return
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        list_discovery_looks,
+    )
+    from solana_alpha_lab.factory.hfic_temporal_discovery import (
+        assert_search_exhaustion_claim,
+        assess_tier_progress,
+    )
+
+    journal = str(evidence.get("journal_scope") or "")
+    decision = str(evidence.get("tier_decision") or "")
+    try:
+        progress = assess_tier_progress(
+            list_discovery_looks(store, journal),
+            freeze_worthy=decision == "WORTHY_SIMPLE",
+            compound_applicable=decision != "COMPOUND_INAPPLICABLE",
+        )
+        assert_search_exhaustion_claim(progress, claim_search_exhausted=True)
+    except GroundedDiscoveryError as exc:
+        raise HficSessionError(exc.code) from exc
+
+
 def _freeze_no_worthy(
     draft: Mapping[str, Any],
     *,
@@ -2348,6 +2398,7 @@ def _freeze_no_worthy(
     _assert_vision_integrity_for_surface(
         preflight_receipt, prompt_version=prompt_version
     )
+    _assert_temporal_search_closed(draft, store)
     empty_ordinary = not identities and _ordinary_discovery_requested(
         draft, preflight_receipt
     )

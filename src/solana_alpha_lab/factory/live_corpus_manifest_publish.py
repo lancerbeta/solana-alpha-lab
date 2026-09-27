@@ -1298,6 +1298,12 @@ def import_live_cohort_canonical(
         "obs_rel": obs_rel,
         "observation_row_count": int(manifest["observation_row_count"]),
         "observations_sha256": obs_sha,
+        **(
+            {"allowed_lateness_seconds": int(manifest["allowed_lateness_seconds"])}
+            if isinstance(manifest.get("allowed_lateness_seconds"), int)
+            and not isinstance(manifest.get("allowed_lateness_seconds"), bool)
+            else {}
+        ),
         "readiness_state": manifest.get("readiness_state"),
         "release_id": release_id,
         "sealed_at": _render_utc(sealed_at),

@@ -285,6 +285,30 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <canonical-data-root> --store <canonical-data-root> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
 ```
 
+   Before persist/freeze, ordinary discovery may escalate inside the same
+   journal. Tiers `SIMPLE_SCREEN` and `COMPOUND_SCREEN` are internal labels,
+   not new terminals. Shared budget stays 6 main + 2 adaptive. AUTO reserves
+   3 main slots for compound until compound is used. A simple screen with no
+   freeze-worthy candidate escalates to compound before any
+   `NO_WORTHY_HYPOTHESIS` terminal. Do not call an unused compound tier
+   executed. `SKIPPED_BUDGET` and a model error are not `EXECUTED`.
+   Feature-only preview:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-preview --data-root <canonical-data-root> --store <canonical-data-root> --journal-scope <preflight-search-key-sha256> --spec <preview.json> --format json
+```
+
+   Preview has no target. Pass `--store` and `--journal-scope` together; one flag
+   alone is `PREVIEW_STORE_SCOPE_REQUIRED`. A third distinct preview is
+   `PREVIEW_ENVELOPE_EXHAUSTED`. `SCHEDULE_CONTEXT_UNBOUND`,
+   `SCHEDULE_LATENESS_MISMATCH`,    `FROZEN_INPUT_MISMATCH`,
+   `SEARCH_EXHAUSTED_WITHOUT_COMPOUND`, and `CANONICAL_X300_SCHEDULE_INCOMPATIBLE` are technical
+   stops (`scientific_negative=false`), not a scientific negative. A temporal query uses schema
+   `smial.hfic-temporal-query`. Relative results are
+   `PRICE_RELATIVE_PROXY`. Cost output is `ESTIMATED_NET_PROXY`, never
+   `NetReturn`. The frozen recipe's fixed-time consumer is
+   `CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001`.
+
    Pass `--journal-scope` as the preflight `search_key_sha256`. Copy the
    whole returned evidence object onto the draft as `grounded_evidence`.
    Do not copy only `result_refs` and do not hand-write the summary.
@@ -336,7 +360,7 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
    `strongest_rejected_alternative`. After persist, run preflight again.
    Freeze consumes that restart receipt and the same draft bytes. The draft
    stays bound to the source preflight hash.
-5. If Prompt A returned `NO_WORTHY_HYPOTHESIS` (empty `selected_candidate_ref`):
+5. If Prompt A returned `NO_WORTHY_HYPOTHESIS`, omit `selected_candidate_ref`. Do not send `""` or null. `SEARCH_EXHAUSTED_WITHOUT_COMPOUND` means run compound before that closure:
    - query `uv run --locked --managed-python python -B scripts/hypothesis_forge.py prospects --trigger POST_NO_WORTHY_REVIEW --max-results 3 --format json`;
    - run **PROMPT C** (`HFIC-NEXT-V1.0`) from the operator pack using only the
      already-bound `FORGE_CONTEXT_PACKET`, no-worthy portfolio, terminal, and

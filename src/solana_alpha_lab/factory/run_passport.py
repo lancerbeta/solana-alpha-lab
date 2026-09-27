@@ -80,6 +80,14 @@ StableId = Annotated[
         pattern=r"^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$",
     ),
 ]
+DatasetManifestId = Annotated[
+    str,
+    Field(
+        min_length=3,
+        max_length=256,
+        pattern=r"^(?:dataset-[0-9a-f]{64}|[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+)$",
+    ),
+]
 
 
 class RunPassportError(ValueError):
@@ -265,6 +273,14 @@ def _stable_id(name: str, value: object) -> str:
     return value
 
 
+def _dataset_manifest_id(name: str, value: object) -> str:
+    from solana_alpha_lab.storage.manifests import is_dataset_manifest_id
+
+    if not is_dataset_manifest_id(value):
+        raise RunPassportError(f"{name.upper()}_INVALID")
+    return str(value)
+
+
 def _ordered_identifiers(
     name: str,
     value: object,
@@ -318,7 +334,7 @@ def _normalized_run_key_inputs(values: Mapping[str, Any]) -> dict[str, object]:
         "ordered_input_dataset_manifest_ids": _ordered_identifiers(
             "ordered_input_dataset_manifest_ids",
             values["ordered_input_dataset_manifest_ids"],
-            validator=_stable_id,
+            validator=_dataset_manifest_id,
         ),
         "ordered_input_dataset_fingerprints": _ordered_identifiers(
             "ordered_input_dataset_fingerprints",
@@ -370,7 +386,7 @@ class RunPassport(BaseModel):
     runner_git_sha: GitSha
     capability_closure_sha256: Hash64
     uv_lock_sha256: Hash64
-    dataset_manifest_ids: tuple[StableId, ...]
+    dataset_manifest_ids: tuple[DatasetManifestId, ...]
     dataset_fingerprints: tuple[Hash64, ...]
     query_recipe_ids: tuple[StableId, ...]
     query_recipe_sha256s: tuple[Hash64, ...]

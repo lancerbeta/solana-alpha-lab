@@ -33,6 +33,21 @@ _LOGICAL_LOCATION_RE = re.compile(
 _HASH64_RE = re.compile(r"[0-9a-f]{64}")
 _WINDOWS_DRIVE_RE = re.compile(r"[A-Za-z]:")
 _DATASET_MANIFEST_ID_RE = re.compile(r"dataset-[0-9a-f]{64}")
+_PUBLISHER_DATASET_MANIFEST_ID_RE = re.compile(r"^dataset-[0-9a-f]{64}$")
+_LEGACY_DATASET_MANIFEST_ID_RE = re.compile(r"^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$")
+
+
+def is_dataset_manifest_id(value: object) -> bool:
+    """Publisher ``dataset-<sha>`` or a previously allowed uppercase manifest id.
+
+    This does not widen StableId. Catalog assets, capabilities and binding ids
+    stay on the uppercase pattern.
+    """
+
+    return isinstance(value, str) and (
+        _PUBLISHER_DATASET_MANIFEST_ID_RE.fullmatch(value) is not None
+        or _LEGACY_DATASET_MANIFEST_ID_RE.fullmatch(value) is not None
+    )
 
 
 class ManifestContractError(ValueError):

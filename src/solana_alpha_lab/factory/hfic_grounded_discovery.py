@@ -74,9 +74,17 @@ def _point_offset(point_id: object) -> int:
     return POINT_OFFSET[point_id]
 
 
+def _is_temporal_query(spec: object) -> bool:
+    return isinstance(spec, Mapping) and spec.get("schema") == "smial.hfic-temporal-query"
+
+
 def validate_query_spec(spec: Mapping[str, Any]) -> dict[str, Any]:
     """Fail closed before any value read. Cohort id is not an explanatory feature."""
 
+    if _is_temporal_query(spec):
+        from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+
+        return validate_temporal_query(spec)
     if not isinstance(spec, Mapping):
         raise GroundedDiscoveryError("QUERY_SPEC_INVALID")
     decision_points = spec.get("decision_points")
@@ -196,6 +204,80 @@ def _explicit_holdout_or_raise(sources: Sequence[Mapping[str, Any]]) -> None:
             raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED")
 
 
+def schedule_projection_for_census(data_root: Path, census_path: Path) -> dict[str, Any]:
+    """Project point clocks from the verified schedule. Does not write parquet or run a look."""
+
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    from solana_alpha_lab.factory.hfic_temporal_discovery import project_schedule_points
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        CANONICAL_SCHEDULE_UNBOUND,
+        CANONICAL_X300_SCHEDULE_INCOMPATIBLE,
+        ScientificEligibilityError,
+        load_hashed_schedule_document,
+        verify_factory_x300_schedule,
+    )
+
+    try:
+        table = pq.read_table(census_path, columns=["source_schedule_sha256"])
+    except (OSError, pa.ArrowException):
+        return {"schedule_context_gap": CANONICAL_SCHEDULE_UNBOUND}
+    shas = {
+        str(value)
+        for value in table.column("source_schedule_sha256").to_pylist()
+        if isinstance(value, str) and value
+    }
+    if len(shas) != 1 or len(next(iter(shas))) != 64:
+        return {"schedule_context_gap": CANONICAL_SCHEDULE_UNBOUND}
+    wanted = next(iter(shas))
+    try:
+        document = load_hashed_schedule_document(data_root, wanted)
+    except ScientificEligibilityError:
+        return {"schedule_context_gap": CANONICAL_SCHEDULE_UNBOUND, "schedule_sha256": wanted}
+    try:
+        verify_factory_x300_schedule(document)
+    except ScientificEligibilityError:
+        return {
+            "schedule_context_gap": CANONICAL_X300_SCHEDULE_INCOMPATIBLE,
+            "schedule_sha256": wanted,
+            "schedule_hash_matches": True,
+        }
+    try:
+        projected = project_schedule_points(document)
+    except GroundedDiscoveryError:
+        return {
+            "schedule_context_gap": CANONICAL_SCHEDULE_UNBOUND,
+            "schedule_sha256": wanted,
+            "schedule_hash_matches": True,
+        }
+    return {
+        "schedule_sha256": wanted,
+        "schedule_hash_matches": True,
+        "schedule_x300_compatible": True,
+        **projected,
+    }
+
+
+def _attach_verified_schedule(root: Path, cohorts: list[dict[str, Any]]) -> None:
+    for cohort in cohorts:
+        census_rel = cohort.get("census_rel")
+        if not isinstance(census_rel, str):
+            cohort["schedule_context_gap"] = "CANONICAL_SCHEDULE_UNBOUND"
+            continue
+        projected = schedule_projection_for_census(root, root / census_rel)
+        declared = cohort.get("schedule_lateness_seconds")
+        point_lateness = projected.get("schedule_point_lateness")
+        if (
+            isinstance(declared, int)
+            and not isinstance(declared, bool)
+            and isinstance(point_lateness, Mapping)
+            and any(value != declared for value in point_lateness.values())
+        ):
+            projected["schedule_context_gap"] = "SCHEDULE_LATENESS_MISMATCH"
+        cohort.update(projected)
+
+
 def resolve_published_discovery_binding(data_root: Path) -> dict[str, Any]:
     """Build the admission binding from a canonical publication.
 
@@ -282,8 +364,15 @@ def resolve_published_discovery_binding(data_root: Path) -> dict[str, Any]:
                 "observations_sha256": observations_sha,
                 "census_rel": census_rel,
                 "observations_rel": obs_rel,
+                **(
+                    {"schedule_lateness_seconds": int(item["allowed_lateness_seconds"])}
+                    if isinstance(item.get("allowed_lateness_seconds"), int)
+                    and not isinstance(item.get("allowed_lateness_seconds"), bool)
+                    else {}
+                ),
             }
         )
+    _attach_verified_schedule(root, bound_cohorts)
     admitted = admit_discovery_binding(bound_cohorts)
     return {
         **admitted,
@@ -664,6 +753,10 @@ def classify_query_look(
 ) -> dict[str, Any]:
     """Cost budget. Same bytes are a retry. A changed question is a new variant."""
 
+    if _is_temporal_query(spec):
+        from solana_alpha_lab.factory.hfic_temporal_discovery import classify_temporal_look
+
+        return classify_temporal_look(previous, spec)
     bound = validate_query_spec(spec)
     digest = bound["spec_sha256"]
     mains = [
@@ -796,6 +889,8 @@ def measured_target_label(spec: Mapping[str, Any]) -> str:
     """Target identity the spec computed: ``target_point:target_field``."""
 
     validated = validate_query_spec(spec)
+    if validated.get("target_label"):
+        return str(validated["target_label"])
     return f"{validated['target_point']}:{validated['target_field']}"
 
 
@@ -829,7 +924,11 @@ def scope_bound_to_spec(
     }
     bound["population"] = spec_population
     bound["decision_timestamp"] = last_decision
-    bound["target"] = measured_target_label(validated)
+    bound["target"] = (
+        str(validated["target_label"])
+        if validated.get("target_label")
+        else measured_target_label(validated)
+    )
     return bound
 
 
@@ -1145,6 +1244,10 @@ def execute_discovery_from_rows(
     Eligibility does not look at the target. Traders are not required.
     """
 
+    if _is_temporal_query(spec):
+        from solana_alpha_lab.factory.hfic_temporal_discovery import execute_temporal_discovery
+
+        return execute_temporal_discovery(census, observations, spec, binding)
     bound_spec = validate_query_spec(spec)
     for item in binding:
         if "holdout" not in item:
@@ -1329,13 +1432,18 @@ def data_binding_sha256(
     return hashlib.sha256(_canonical(body).encode("utf-8")).hexdigest()
 
 
-def _look_identity(spec_sha: str, binding_sha: str, journal_scope: str) -> str:
+def _look_identity(
+    spec_sha: str,
+    binding_sha: str,
+    journal_scope: str,
+    calculation_version: str = CALCULATION_VERSION,
+) -> str:
     return hashlib.sha256(
         _canonical(
             {
                 "spec_sha256": spec_sha,
                 "data_binding_sha256": binding_sha,
-                "calculation_version": CALCULATION_VERSION,
+                "calculation_version": calculation_version,
                 "journal_scope": journal_scope,
             }
         ).encode("utf-8")
@@ -1386,7 +1494,9 @@ def assert_computed_grounded_evidence(
     expected = result_sha256(summary)
     if bound.get("result_sha256") != expected:
         raise GroundedDiscoveryError("GROUNDED_RESULT_MISMATCH")
-    if bound.get("calculation_version") != CALCULATION_VERSION:
+    from solana_alpha_lab.factory.hfic_temporal_discovery import TEMPORAL_CALCULATION_VERSION
+
+    if bound.get("calculation_version") not in {CALCULATION_VERSION, TEMPORAL_CALCULATION_VERSION}:
         raise GroundedDiscoveryError("GROUNDED_RESULT_MISMATCH")
     journal_scope = str(bound.get("journal_scope") or "")
     if expected_journal_scope and journal_scope != expected_journal_scope:
@@ -1419,6 +1529,7 @@ def no_worthy_scope_record(evidence: Mapping[str, Any]) -> dict[str, Any]:
         "budget": evidence.get("budget"),
         "candidate_scope": evidence.get("candidate_scope"),
         "result_sha256": evidence.get("result_sha256"),
+        "viewed_queries": list(evidence.get("viewed_queries") or []),
     }
 
 
@@ -1428,7 +1539,7 @@ def format_discovery_readout(evidence: Mapping[str, Any]) -> dict[str, Any]:
     result = evidence.get("result")
     if not isinstance(result, Mapping):
         raise GroundedDiscoveryError("GROUNDED_RESULT_UNBOUND")
-    return {
+    payload = {
         "contract_version": DISCOVERY_CONTRACT_VERSION,
         "engine_emits_alpha": False,
         "result_refs": list(evidence.get("result_refs") or []),
@@ -1442,6 +1553,89 @@ def format_discovery_readout(evidence: Mapping[str, Any]) -> dict[str, Any]:
         ),
         "non_claims": ["NO_ALPHA", "NO_CAUSAL_IDENTIFICATION", "NO_MARKET_FORGE"],
     }
+    if result.get("target_kind"):
+        payload["target_kind"] = result.get("target_kind")
+        payload["mean_target_units"] = result.get("mean_target_units")
+        payload["claim_level"] = result.get("claim_level")
+        payload["labeled_net_return"] = result.get("labeled_net_return")
+        payload["search_tier"] = result.get("search_tier")
+    return payload
+
+
+def _append_temporal_intent(
+    store: Any,
+    *,
+    journal_scope: str,
+    spec_sha256: str,
+    binding_sha: str,
+    search_tier: str,
+    git_sha: str,
+) -> None:
+    """Record the question before evaluation. A repeat of the same intent is not a new look."""
+
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if kind != "RESEARCH_ARTIFACT":
+            continue
+        try:
+            wrapper = json.loads(record.payload_json)
+            body = json.loads(str(wrapper.get("payload_canonical") or ""))
+        except (TypeError, json.JSONDecodeError):
+            continue
+        if (
+            isinstance(body, dict)
+            and body.get("artifact_kind") == "DISCOVERY_QUERY_INTENT"
+            and body.get("journal_scope") == journal_scope
+            and body.get("spec_sha256") == spec_sha256
+            and body.get("data_binding_sha256") == binding_sha
+        ):
+            return
+    from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
+
+    now = datetime.now(timezone.utc)
+    identity = hashlib.sha256(
+        _canonical(
+            {
+                "spec_sha256": spec_sha256,
+                "data_binding_sha256": binding_sha,
+                "journal_scope": journal_scope,
+                "artifact_kind": "DISCOVERY_QUERY_INTENT",
+            }
+        ).encode("utf-8")
+    ).hexdigest()
+    body = {
+        "artifact_kind": "DISCOVERY_QUERY_INTENT",
+        "journal_scope": journal_scope,
+        "spec_sha256": spec_sha256,
+        "data_binding_sha256": binding_sha,
+        "search_tier": search_tier,
+        "scientific_slot_reserved": False,
+    }
+    canonical = _canonical(body)
+    payload = {
+        "artifact_kind": "DISCOVERY_QUERY_INTENT",
+        "payload_canonical": canonical,
+        "payload_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
+    }
+    payload_json = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    event = ResearchEvent(
+        record_id=f"HFIC-ART-INTENT-{identity[:40].upper()}",
+        record_kind=RecordKind.RESEARCH_ARTIFACT,
+        entity_id=f"HFIC-ART-INTENT-{identity[:40].upper()}",
+        hypothesis_version_id=None,
+        run_id=None,
+        transaction_id=f"RESEARCH-TXN-INTENT-{identity[:24].upper()}",
+        effective_at=now,
+        first_reliable_available_at=now,
+        supersedes_record_id=None,
+        payload_json=payload_json,
+        payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+        schema_version="1.0",
+        producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+        producer_git_sha=git_sha,
+        created_at=now,
+    )
+    store.append([event], transaction_id=event.transaction_id)
 
 
 def run_recorded_discovery_query(
@@ -1464,11 +1658,59 @@ def run_recorded_discovery_query(
     if not isinstance(git_sha, str) or len(git_sha) != 40:
         raise GroundedDiscoveryError("GIT_SHA_REQUIRED")
     bound_scope = scope_bound_to_spec(spec, candidate_scope)
-    computed = execute_discovery_from_rows(census, observations, spec, binding)
+    replayed = None
+    if _is_temporal_query(spec):
+        from solana_alpha_lab.factory.hfic_temporal_discovery import (
+            TEMPORAL_CALCULATION_VERSION,
+            validate_temporal_query,
+        )
+
+        prevalidated = validate_temporal_query(spec)
+        admitted_meta = admit_discovery_binding(binding)
+        pre_binding_sha = data_binding_sha256(admitted_meta, census, observations)
+        replayed = next(
+            (
+                item
+                for item in list_discovery_looks(store, journal_scope)
+                if item.get("spec_sha256") == prevalidated["spec_sha256"]
+                and item.get("data_binding_sha256") == pre_binding_sha
+                and item.get("calculation_version") == TEMPORAL_CALCULATION_VERSION
+                and isinstance(item.get("result"), Mapping)
+            ),
+            None,
+        )
+    if replayed is None:
+        if _is_temporal_query(spec):
+            from solana_alpha_lab.factory.hfic_temporal_discovery import classify_temporal_look
+
+            classify_temporal_look(list_discovery_looks(store, journal_scope), spec)
+            _append_temporal_intent(
+                store,
+                journal_scope=journal_scope,
+                spec_sha256=prevalidated["spec_sha256"],
+                binding_sha=pre_binding_sha,
+                search_tier=str(prevalidated["search_tier"]),
+                git_sha=git_sha,
+            )
+        computed = execute_discovery_from_rows(census, observations, spec, binding)
+    else:
+        computed = {
+            "admitted": admit_discovery_binding(binding),
+            "summary": replayed["result"],
+            "members_projected": 0,
+            "replayed_without_evaluator": True,
+        }
     summary = computed["summary"]
+    calc_version = str(summary.get("calculation_version") or CALCULATION_VERSION)
+    temporal = summary.get("schema") == "smial.hfic-temporal-query"
     binding_sha = data_binding_sha256(computed["admitted"], census, observations)
     digest = result_sha256(summary)
-    identity = _look_identity(summary["spec_sha256"], binding_sha, journal_scope)
+    identity = _look_identity(
+        summary["spec_sha256"],
+        binding_sha,
+        journal_scope,
+        calculation_version=calc_version,
+    )
     previous = list_discovery_looks(store, journal_scope)
     existing = next(
         (
@@ -1476,10 +1718,13 @@ def run_recorded_discovery_query(
             for item in previous
             if item.get("spec_sha256") == summary["spec_sha256"]
             and item.get("data_binding_sha256") == binding_sha
-            and item.get("calculation_version") == CALCULATION_VERSION
+            and item.get("calculation_version") == calc_version
         ),
         None,
     )
+    if existing is not None and temporal and isinstance(existing.get("result"), Mapping):
+        summary = existing["result"]
+        digest = str(existing.get("result_sha256") or result_sha256(summary))
     budget_history = []
     for item in previous:
         if (
@@ -1496,8 +1741,11 @@ def run_recorded_discovery_query(
             "spec_sha256": summary["spec_sha256"],
             "new_look": False,
             "look_class": "RETRY_SAME_BYTES",
+            "search_tier": look.get("search_tier"),
             "main_count": look["main_count"],
             "adaptive_count": look["adaptive_count"],
+            "simple_main_count": look.get("simple_main_count"),
+            "compound_main_count": look.get("compound_main_count"),
         }
         stored = existing.get("candidate_scope") if isinstance(existing, Mapping) else None
         relation = relate_look_scope(
@@ -1534,7 +1782,7 @@ def run_recorded_discovery_query(
         relation = "LOOK_SCOPE_MATCH"
     evidence = {
         "contract_version": DISCOVERY_CONTRACT_VERSION,
-        "calculation_version": CALCULATION_VERSION,
+        "calculation_version": calc_version,
         "journal_scope": journal_scope,
         "data_binding_sha256": binding_sha,
         "result_sha256": digest,
@@ -1547,6 +1795,11 @@ def run_recorded_discovery_query(
                 "record_id": record_id,
                 "look_class": budget["look_class"],
                 "new_look": budget["new_look"],
+                **(
+                    {"search_tier": budget.get("search_tier") or summary.get("search_tier")}
+                    if summary.get("search_tier")
+                    else {}
+                ),
             }
         ],
         "budget": {
@@ -1560,12 +1813,26 @@ def run_recorded_discovery_query(
         "priors": [dict(item) for item in (priors or [])],
         "scientific_slot_reserved": False,
     }
+    if summary.get("search_tier"):
+        from solana_alpha_lab.factory.hfic_temporal_discovery import assess_tier_progress
+
+        evidence["budget"]["simple_main_count"] = budget.get("simple_main_count")
+        evidence["budget"]["compound_main_count"] = budget.get("compound_main_count")
+        evidence["budget"]["viewed_variants"] = list(summary.get("viewed_variants") or [])
+        evidence["tier_progress"] = assess_tier_progress(
+            list_discovery_looks(store, journal_scope),
+            freeze_worthy=False,
+        )
     if existing is not None:
         evidence["requested_candidate_scope"] = dict(candidate_scope)
     return assert_computed_grounded_evidence(store, evidence)
 
 
 def _stored_query_spec(spec: Mapping[str, Any]) -> dict[str, Any]:
+    if _is_temporal_query(spec):
+        from solana_alpha_lab.factory.hfic_temporal_discovery import canonical_temporal_spec
+
+        return canonical_temporal_spec(spec)
     stored = validate_query_spec(spec)
     stored["explanatory_rules"] = _jsonable(spec.get("explanatory_rules") or [])
     return stored
@@ -1597,7 +1864,7 @@ def _append_discovery_look(
         "schema": "smial.discovery-query-look",
         "schema_version": "1.0",
         "journal_scope": journal_scope,
-        "calculation_version": CALCULATION_VERSION,
+        "calculation_version": str(summary.get("calculation_version") or CALCULATION_VERSION),
         "query_id": summary.get("query_id"),
         "spec": dict(spec),
         "spec_sha256": spec_sha256,
@@ -1606,7 +1873,7 @@ def _append_discovery_look(
         "result_sha256": digest,
         "result": summary,
         "look_class": look.get("look_class"),
-        "new_look": True,
+        "new_look": bool(look.get("new_look", True)),
         "scientific_slot_reserved": False,
         "candidate_scope": {
             key: value
@@ -1614,6 +1881,12 @@ def _append_discovery_look(
             if _axis_text(value)
         },
     }
+    if summary.get("search_tier"):
+        body["search_tier"] = summary.get("search_tier")
+    if summary.get("target_kind"):
+        body["target_kind"] = summary.get("target_kind")
+    if summary.get("viewed_variants"):
+        body["viewed_variants"] = list(summary["viewed_variants"])
     canonical = _canonical(body)
     payload = {
         "research_artifact_id": record_id,

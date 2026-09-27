@@ -1,0 +1,27 @@
+{
+  "query": {
+    "schema": "smial.hfic-temporal-query",
+    "schema_version": "1.0",
+    "query_id": "compound-postpeak-partial-pullback-y3600",
+    "population": "BASE_X",
+    "search_tier": "COMPOUND_SCREEN",
+    "decision": {"point_id": "Y3600", "time_policy": "BOUND_SCHEDULE_CUTOFF"},
+    "schedule": {"lateness_seconds": 300},
+    "features": [
+      {"name": "prior_runup_x300_y1800", "op": "return_ratio", "field_id": "FIELD-USD-PRICE-001", "start": "X300", "end": "Y1800"},
+      {"name": "peak_drawdown_at_y3600", "op": "drawdown_from_grid_max", "field_id": "FIELD-USD-PRICE-001", "points": ["X300", "Y900", "Y1800", "Y3600"], "at": "Y3600"},
+      {"name": "liq_x300", "op": "point_value", "field_id": "FIELD-LIQUIDITY-USD-001", "point": "X300"}
+    ],
+    "all": [
+      {"feature": "prior_runup_x300_y1800", "op": "gt", "value": 0.5},
+      {"feature": "peak_drawdown_at_y3600", "op": "between", "lower": -0.45, "upper": -0.05, "closed": "left"},
+      {"feature": "liq_x300", "op": "gte", "value": 500.0}
+    ],
+    "target": {"kind": "PRICE_RELATIVE_PROXY", "reference_point": "Y3600", "exit_point": "Y7200", "field_id": "FIELD-USD-PRICE-001"},
+    "entry_model": {"kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT", "assumed_latency_seconds": 0}
+  },
+  "mechanism": "Early fixed-horizon price expansion that later partially retraces from the pre-decision grid max, while X300 liquidity remains above a floor, may mark unfinished post-peak inventory absorption still open at Y3600.",
+  "cheapest_falsifier": "Fixed-time proxy versus the same decision-eligible baseline; kill if the estimated proxy edge disappears under the stress profile or a drop-one ablation.",
+  "provenance": "ISOLATED_AGENT_ATTEMPT_1",
+  "agent_id": "f9fcbd05-db0c-46e9-b919-6855b2aa78d1"
+}

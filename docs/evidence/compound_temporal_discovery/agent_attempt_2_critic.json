@@ -1,0 +1,12 @@
+{
+  "provenance": "ISOLATED_CRITIC_ATTEMPT_2",
+  "agent_id": "4e1245c7-578c-4d13-aae1-ea5b52597f34",
+  "input": "computed result packet only",
+  "input_spec_sha256": "dbc1893bb452c5adf5a51028da3c33de9a9a4efafe76dd9278cf8d7bee8af660",
+  "critic_terminal": "INCONCLUSIVE",
+  "claim_you_accept": "One COMPOUND_SCREEN match under EXPLORATORY_PROXY with mean PRICE_RELATIVE_PROXY about 0.20 and the stated feature means; no edge, independence, or cost-adjusted claim.",
+  "one_sentence_reason": "matched_n=1 with independence UNKNOWN and cost ABSENT cannot confirm or falsify a compound temporal edge. The next test must raise observed_target_n on the same proxy and either resolve independence or run a cost decision-sensitivity screen.",
+  "scripted_fixture": false,
+  "attempts_used": 2,
+  "schema_repairs": 0
+}

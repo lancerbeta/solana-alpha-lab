@@ -1,0 +1,99 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "COMPOUND-TEMPORAL-DISCOVERY-ACCEPTANCE-001",
+  "as_of": "2026-09-27",
+  "task_id": "COMPOUND_TEMPORAL_DISCOVERY_V1",
+  "state_change": "ORDINARY_DISCOVERY_CAN_ESCALATE_TO_COMPOUND_TEMPORAL_QUESTIONS",
+  "base_main": "424e28990478102dc18a259f5509f40ee31d54b1",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "0fea3b3bf81b3e461a0d0679306f27483a86ba9c8f40696d0dbb1c22cf7e42f7",
+    ".cursor/commands/hypothesis-forge.md": "9712a3c7debd1dd6381a8d29f07dd07a540b3447caf2bd826ba198828c31fa32",
+    "catalog/assets/core.yaml": "0121fe8e7cc5c232dc7de0d061d9b82dc857e113511ae6b37c3ece95b31ef8d2",
+    "catalog/assets/lifecycle.yaml": "f15c9abe397fb4316d3a886d0516ef368fbceda0594d1827c9fd1471ae41d151",
+    "catalog/catalog_manifest.yaml": "d94de30b8528c39a00cb607b2ae520dddae4b0def1360d028c220bbb9dbad051",
+    "catalog/generated/asset_edges.json": "5a3cf27f0e2ba216fb7addddefd48b1e709bbc00e62eb7c853cc1108fc2b5dff",
+    "catalog/schemas/experiment_spec_v1_1.schema.json": "ef1b3e5d36c65d0b0ddb4c10ef6bee73b172be6b092b3f4f81c9b1dad137c278",
+    "catalog/schemas/experiment_spec_v1_2.schema.json": "7c3153f95236546451a717efe9890557c9175ae297f175516956320578fe1287",
+    "catalog/schemas/experiment_spec_v1_3.schema.json": "acea9c7813b591a83903d616d01f1a1b340c40e96161f65796b109888317a8ab",
+    "catalog/schemas/hfic_temporal_query_v1.schema.json": "dff61269698427edc8ec2143d564bb25f0be90d280758c3cecab1ebd65270e6b",
+    "catalog/schemas/run_passport.schema.json": "5ee436960c30263b3358de55c2653d8b80446d2df5eef0d1c9293e0c81dbdbec",
+    "configs/experiment_capability_registry_v2.yaml": "49edf7b770d37db38edb89a49dcb66f73b6212d62642cda2faa14880456e4430",
+    "configs/hypothesis_forge_independent_critic_v1.yaml": "e76ec851c88b9198a9ea04a58a7d68f77d93aaf0f8910c4600c8a9949ef47a06",
+    "docs/PROJECT_MAP.md": "1728b1fe06fb2acbe31a5c12f25891a268bca9fee543b8b22d5a174209e92fce",
+    "docs/evidence/compound_temporal_discovery/agent_attempt_1_critic.json": "0c367747867c3fb2ca1ef2d53dcb3b1778ca9ee27d98528f897902f03e832ab8",
+    "docs/evidence/compound_temporal_discovery/agent_attempt_1_query.json": "d28237021e20bd90698207e3962e733363c4bfc0ab4fa2b1b24a9a66f4870b80",
+    "docs/evidence/compound_temporal_discovery/agent_attempt_1_result.json": "5e14fc368bc3efb90f2bf0fc6e8687c00d172a64e44088f615b8132c085436d1",
+    "docs/evidence/compound_temporal_discovery/agent_attempt_2_critic.json": "adbfb3e1c6b91f8de6796e53941a9d4019723fdc4a91bfe7eeb6c52dfe9d8697",
+    "docs/evidence/compound_temporal_discovery/agent_attempt_2_query.json": "bac4c40db6202631ae964fcec2a2e8ef50d23eda46a5f5458486730704751d78",
+    "docs/evidence/compound_temporal_discovery/agent_attempt_2_result.json": "94f08d769c2b43e5b2748e49f4c8a2d560707bbfd24decdb4de809c1160ecadc",
+    "docs/evidence/compound_temporal_discovery/execution_evidence_v1.json": "dbcc4286a5bcae2aea0bbb9d95b841a2a876bbb8a493a724457e94e19e9a6c9a",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "bed927f041fa23e92dc5698909932f3a5c1f2195ce9e81e9a369701b8f625fc7",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "8825dd6f0200f33a37e613d59ff1a969810f714d95512932c0663b79f2a9aae2",
+    "docs/reports/compound_temporal_discovery/a1_owner_readout_v1.md": "3c0586701e310cb4631905db199fd1b49453bd0b62dc5425b55f9888d0fa192e",
+    "docs/tasks/COMPOUND_TEMPORAL_DISCOVERY_V1.md": "5c84a84040a4f527fe565ee12d2f1b4071e054f15041616195ad83b9db0a7d7d",
+    "scripts/hypothesis_forge.py": "01d78e977b69bcda32e7575fa2a9bc6955b2704a9e2fdc13988a969a913c30f5",
+    "src/solana_alpha_lab/factory/capabilities.py": "6e88094c7bb9f9bbd13cd5316c8ac20001592eb1782fe1243b805fe949814e13",
+    "src/solana_alpha_lab/factory/data_resolver.py": "60f6c9263503b22f0fd3554538dc86efc3e858216167f099fb9813204bac0df1",
+    "src/solana_alpha_lab/factory/document_runner.py": "b4528d97bb157fdc8f17e9686d4fe5f7c9be4d51b9aab7281c67e3b4ebba4eb3",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "af9d9a89f684d37c88b93ceffd221510fe360f1f8821a930e1d8a0abe3465296",
+    "src/solana_alpha_lab/factory/hfic_session.py": "47c016195f2808436fcca2018dfcaba512f3ddbd33176ee2fe75fbd4522eea23",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "3830c2a56e72aa1789720772233abc14f442107a66f274c973db2598a2fb7d5b",
+    "src/solana_alpha_lab/factory/lane_classifier.py": "c310bc8e6aef354de17fb844f9bff0398e74e3589ee82bc299d95a6a055379f4",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "b1411ad49f4bb0ee30674e66793619e963c243b0fbed09051ffc96cb4f8e129b",
+    "src/solana_alpha_lab/factory/live_corpus_manifest_publish.py": "b3dbe376aa303360a511c795f461ee572daebc32bbc9eadefaa3e95e364ba480",
+    "src/solana_alpha_lab/factory/run_passport.py": "50cdc6d938c0a28f01734140938c026a6203ab69b775940fd2dc2cf37070e5a5",
+    "src/solana_alpha_lab/factory/scientific_eligibility_projection.py": "d2623fb5dccd2ebc9066a6af7e792fbdce9e450b0f1959be7dd234a9f094d746",
+    "src/solana_alpha_lab/storage/manifests.py": "5203931b3d1cc7210740c623a83b645e28b1fd29e18423d15701caf7ea96c20a",
+    "tests/oracle_temporal_arithmetic_v1.py": "127fca216acbb233dc681487129e1992eb75289023f540fa7d380bb48ee0837d",
+    "tests/test_discovery_evidence_release_bridge.py": "b775d46d795ac08d1177462930ff6cbad383476af2d421e59ebdfe7764b5a532",
+    "tests/test_factory_ordinary_market_hypothesis.py": "01b8d921d55e24ca7afbeb04622448c930492e70b52630df28b5475b9a1ba290",
+    "tests/test_hfic_temporal_discovery_v1.py": "3d23b2403ed9662099f3ae199bdaa25eacc222eb7b2520441b4be4d9f47e4d1f",
+    "tests/test_hfic_temporal_owner_path_v1.py": "3bea7eab0ea5dab2049671d60a3160898bbacdcb3b8a2949ce0f184c02b55e94",
+    "tests/test_hfic_temporal_production_runner_v1.py": "b2cf4f84ce686c5b413b8f3bb99958245e80f8536b7bd636a692c0de3a4e33cf"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/compound_temporal_discovery/a1_delivery_factory_fit_v1.json",
+    "sha256": "387eb20f377641a6c042740bf0a8868e9512314ee20b49bff650c23d369ecd06",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_TEMPORAL_UNIT_AND_OWNER_PATH",
+    "independent_review": {
+      "path": "docs/evidence/compound_temporal_discovery/a1_delivery_independent_review_v1.json",
+      "sha256": "6f2681e080adc396e1351150e1c7c90c4cd5a542a371457c6fbdbc1e190171aa",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TEMPORAL_UNIT_AND_OWNER_PATH",
+      "PASS_LEGACY_DISCOVERY_ROWS"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_MARKET_EXECUTION",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "market_execution": "NOT_RUN",
+    "live_store_writes": 0
+  }
+}

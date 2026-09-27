@@ -83,6 +83,14 @@ def _stable_id(name: str, value: object) -> str:
     return value
 
 
+def _dataset_manifest_id(name: str, value: object) -> str:
+    from solana_alpha_lab.storage.manifests import is_dataset_manifest_id
+
+    if not is_dataset_manifest_id(value):
+        raise EvidenceResolutionError(f"{name.upper()}_INVALID")
+    return str(value)
+
+
 def _hash64(name: str, value: object) -> str:
     if not isinstance(value, str) or _HASH64_RE.fullmatch(value) is None:
         raise EvidenceResolutionError(f"{name.upper()}_INVALID")
@@ -359,11 +367,14 @@ def resolve_evidence_bindings(
         if not isinstance(binding, Mapping) or set(binding) != _BINDING_KEYS:
             raise EvidenceResolutionError("DATA_BINDING_INVALID")
         binding_id = _stable_id("binding_id", binding.get("binding_id"))
-        stable_id = _stable_id("stable_id", binding.get("stable_id"))
+        source_kind = binding.get("source_kind")
+        if source_kind == "DATASET_MANIFEST":
+            stable_id = _dataset_manifest_id("stable_id", binding.get("stable_id"))
+        else:
+            stable_id = _stable_id("stable_id", binding.get("stable_id"))
         if binding_id in seen_binding_ids:
             raise EvidenceResolutionError("DATA_BINDING_DUPLICATE")
         seen_binding_ids.add(binding_id)
-        source_kind = binding.get("source_kind")
         expected = _hash64(
             "expected_content_sha256_or_dataset_fingerprint",
             binding.get("expected_content_sha256_or_dataset_fingerprint"),

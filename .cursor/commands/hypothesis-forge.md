@@ -31,6 +31,11 @@ interpreter. Required runtime is CPython 3.13.14 via that prefix.
 Read and follow `.agents/skills/hypothesis-forge/SKILL.md` and
 `docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md`.
 
+Ordinary discovery escalates from `SIMPLE_SCREEN` to `COMPOUND_SCREEN`
+before freeze when no candidate is worth freezing. The shared budget stays
+6 main + 2 adaptive. Do not mark a tier executed unless its saved looks say so.
+`PRICE_RELATIVE_PROXY` and `ESTIMATED_NET_PROXY` are not `NetReturn`.
+
 A5 identity: market epoch admits/resumes/budgets; capability epoch does not
 free AUTO/focus quota; START ≠ RESUME ≠ REUSED; incomplete market is BLOCKED
 (not a synthetic digest). Merge phrase and scientific market run stay separate
@@ -143,6 +148,12 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
 
 ```text
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <canonical-data-root> --store <canonical-data-root> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
+```
+
+Feature preview writes store memory only when `--store` and `--journal-scope` are both set. A third distinct preview is `PREVIEW_ENVELOPE_EXHAUSTED`. `SCHEDULE_CONTEXT_UNBOUND`, `SCHEDULE_LATENESS_MISMATCH` and `FROZEN_INPUT_MISMATCH` are technical stops, not a scientific negative.
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-preview --data-root <canonical-data-root> --store <canonical-data-root> --journal-scope <preflight-search-key-sha256> --spec <preview.json> --format json
 ```
 
 ## Representation mode boundary
