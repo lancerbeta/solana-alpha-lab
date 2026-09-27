@@ -17,21 +17,21 @@
     ".agents/skills/hypothesis-forge/SKILL.md": "3bb87edb38f0fd9a18160d324c4bcbad1f8fdaa551f9883b1b4ee1178bb68b0a",
     ".agents/skills/independent-hypothesis-critic/SKILL.md": "b027dc9a699f74e8d3f83ae165089c4d84c2d170945012103f33eaef66194d2e",
     ".cursor/commands/hypothesis-forge.md": "ad9a81428819a83836514e8020faf3416f28a6957766f86f98805670aed440bd",
-    "catalog/assets/core.yaml": "b24f5453f4f2e1d9884e7540b4363260b6e0da84c56588a0c855d4162d0c898e",
+    "catalog/assets/core.yaml": "3be97342ad616090e5929ff4ea66394c46087423db5fdd048abf2ade7d9c8bf7",
     "catalog/schemas/hypothesis_critic_input_v1.schema.json": "d4a7951e5a9e20a5cc4bff9b91f70031ef6d7ef96f2410cfac8de6751205d9e3",
     "configs/hypothesis_forge_independent_critic_v1.yaml": "fc499888a8d0aaeefc816bd0fc306ceb8e22b639ec3df4ca671e917a877741c1",
     "docs/evidence/forge_runtime_discovery_binding_repair/a1_live_binding_readback_v1.json": "08664fc90618e3073c931a13f5eae94a84ea8615b57a23b7a2e4b1ebba5b11b1",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "cab9784493a45bbdeb8032da8af745981560b6a91cca9d7dc1adcee42c420440",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "0ec8e8ee632a4d38f90632f7ef61b8467e925c75772215e09620331ab4480804",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "e61fa9c0d20df3126ce428341cc862b8cc3a8f4be66e3bd27ca4f04ae9d050ea",
-    "docs/reports/forge_runtime_discovery_binding_repair/a1_owner_readout_v1.md": "7ebf93d6efd0d6bed8f40a1dee9b58f79e64e79c7abc66865db59caf5fd94fc7",
+    "docs/reports/forge_runtime_discovery_binding_repair/a1_owner_readout_v1.md": "8c18b0741eadf629ddb4c29bac42e5a8f25ff0b76ed3b895013d5b089063819d",
     "docs/tasks/FORGE_RUNTIME_DISCOVERY_BINDING_REPAIR_V1.md": "ea2c8477b2a5450ec4ad1d63957677988cbaaf8218ddf93c0f68cf503ed8c035",
     "scripts/hypothesis_forge.py": "95aad2a5aaa7d3b2fa2a472afe52f2aa5214fc8a66ffe4debcbd3e55f8206faf",
-    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "7a858f84a748661d8e1723bdfbff7a6a2215d31bc30054d48d868733647bf796",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "4a582cb9c6c6e21e136cdad14fc363786c88c0ad2b852613b1142a8526f6508f",
     "src/solana_alpha_lab/factory/hfic_prior_memory.py": "010533ef475932fc6396298c315dacae2b07d33e961481c45859564074a5f99f",
     "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py": "f6f17e75757b3733c7246b75d8da42bcf7587daeb7af66da9342ff985cd29fda",
-    "src/solana_alpha_lab/factory/hfic_session.py": "f8e45705a25f38213946d494290c6110c83c9a48966f1a0d283806add39a2357",
-    "tests/test_forge_runtime_discovery_binding_v1.py": "6b128c132367a13d20cbb517c1f9021c307bd71906406ba712d76026f8c181dc",
-    "tests/test_hfic_grounded_discovery_v1.py": "41344ab04959936f2da63a45fd9b49d60753d12f56a1842972efa94b9c436734"
+    "src/solana_alpha_lab/factory/hfic_session.py": "5b43e1f46c5820e375532e42f603d010602f5d8ad99f4205817c8a259bbe29ce",
+    "tests/test_forge_runtime_discovery_binding_v1.py": "a10115777e2587256a691069b5e4fc3cda0bc40fef2c4e1eb55666e1b52237f0",
+    "tests/test_hfic_grounded_discovery_v1.py": "4dab424467d248b49b2318e18e070052cd566686ba6a113124b15f2b2b03aff2"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -43,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_runtime_discovery_binding_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "e83db65433521ed53c04cf68fbc24b94d40811ffeaedab7d63c3b4a34bf85bc3",
+    "sha256": "75a9138fbbfb419d7f40ff9352b1f1aa5a3fad79cca0b6ba8bf23537d1c7b2ec",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PUBLISHED_BINDING_AND_OWNER_FINAL_TESTS",
     "independent_review": {
       "path": "docs/evidence/forge_runtime_discovery_binding_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "95fbed8810418035d58d2ee72c10004c764da05c3ca7f468aa6bdef95bda2f19",
+      "sha256": "40edba3da1f0f2fdcb525d5d18691f16716ac6e3c3bb82911ac92bbadacf86e1",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
