@@ -42,22 +42,6 @@
       ]
     }
   ],
-  "remediation_history": [
-    {
-      "role": "CODE_REVIEWER",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "finding": "Exit revisions with the same availability were collapsed by row order.",
-      "resolved_by": "ALL_TIED_EXIT_ROWS_ENTER_SELECT_CELL"
-    },
-    {
-      "role": "GOAL_DOD_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "MAJOR",
-      "finding": "Simple-to-compound escalation and ESTIMATED_NET_PROXY were helper-only.",
-      "resolved_by": "OWNER_PATH_SIMPLE_THEN_COMPOUND_WITH_COST"
-    }
-  ],
   "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
