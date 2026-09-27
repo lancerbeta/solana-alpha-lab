@@ -17,29 +17,29 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Classify rewrites a runner-up scientific pass to DENY_INTEGRITY_MISMATCH when the packet has no linked computed look. apply_classification persists KILL_UNBOUND_EVIDENCE with reason GROUNDED_RESULT_UNBOUND. A same-scope runner-up with linked result refs keeps the ordinary classify path. A direct finalize that claims PASS with this deny receipt still raises CLASSIFIER_TERMINAL_MISMATCH rather than recording a pass."
+        "Stored KILL_UNBOUND_EVIDENCE stays the terminal and still blocks a false scientific pass. The next snapshot maps that reason to TECHNICAL_STOP for Prompt A and Critic, including previously recorded decisions. The same scope does not raise EXACT_PRIOR_SCOPE_MATCH. KILL_MECHANISM still blocks."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "test_unlinked_runner_up_cannot_take_scientific_pass freezes A and B on different scopes, kills the primary, accepts PASS_TO_CLASSIFICATION, then classify ends KILL_UNBOUND_EVIDENCE with GROUNDED_RESULT_UNBOUND. test_same_scope_runner_up_keeps_ordinary_classification keeps the linked result refs from one discovery-execute and classify stays PASS_DATA_OPTION_REQUIRED."
+        "The unlinked runner-up path ends KILL_UNBOUND_EVIDENCE and the rebuilt snapshot and ranked prior are TECHNICAL_STOP, so the same scope is not an exact close. A recorded KILL_MECHANISM on that scope stays HARD_CLOSE and raises EXACT_PRIOR_SCOPE_MATCH."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=aa98427efc3eada04f13f7d4a707777a28dfed224285758dceee3e13feda7701",
-        "A runner-up without a linked computed look cannot exit classify as PASS_FAST_LANE_READY, PASS_DATA_OPTION_REQUIRED, or PASS_CHANGE_LANE_REQUIRED. The typed outcome is KILL_UNBOUND_EVIDENCE with GROUNDED_RESULT_UNBOUND. A same-scope runner-up with linked result refs stays on the ordinary classify path."
+        "packet_fingerprint_sha256=94c12bb7298f78d81265cb480b7d1b9dd7d7d57c70108a8a89cbee4d22f421b4",
+        "KILL_UNBOUND_EVIDENCE projects to TECHNICAL_STOP and does not become HARD_CLOSE or EXACT_PRIOR_SCOPE_MATCH. The stored terminal is not rewritten. KILL_MECHANISM on the same scope still blocks."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "The readout matches the guard: an unlinked runner-up cannot become a scientific pass, and classify returns KILL_UNBOUND_EVIDENCE with GROUNDED_RESULT_UNBOUND. A same-scope runner-up keeps the ordinary path. No new owner hand step."
+        "Readout, operator list, and critic skill name TECHNICAL_STOP for a recorded KILL_UNBOUND_EVIDENCE and do not call it HARD_CLOSE. No new owner hand step."
       ]
     }
   ],
