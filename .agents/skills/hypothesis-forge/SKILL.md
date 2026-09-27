@@ -301,7 +301,8 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
    Preview has no target. Pass `--store` and `--journal-scope` together; one flag
    alone is `PREVIEW_STORE_SCOPE_REQUIRED`. A third distinct preview is
    `PREVIEW_ENVELOPE_EXHAUSTED`. `SCHEDULE_CONTEXT_UNBOUND`,
-   `SCHEDULE_LATENESS_MISMATCH` and `FROZEN_INPUT_MISMATCH` are technical
+   `SCHEDULE_LATENESS_MISMATCH`, `FROZEN_INPUT_MISMATCH` and
+   `SEARCH_EXHAUSTED_WITHOUT_COMPOUND` are technical
    stops (`scientific_negative=false`), not a scientific negative. A temporal query uses schema
    `smial.hfic-temporal-query`. Relative results are
    `PRICE_RELATIVE_PROXY`. Cost output is `ESTIMATED_NET_PROXY`, never
