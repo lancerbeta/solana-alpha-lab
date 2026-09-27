@@ -1695,8 +1695,8 @@ def _bind_selected_look(
     """Keep a confirming look, detach a narrower idea, stop a contradiction.
 
     The durable look owns its scope. A selected card that names a different
-    target or estimand is not a scientific record. A card that only adds an
-    axis the look left open is saved later as an idea, without that result.
+    population or decision moment stops. A different or one-sided label is
+    not a scientific record and is saved later as an idea, without that result.
     """
 
     from solana_alpha_lab.factory.hfic_grounded_discovery import (

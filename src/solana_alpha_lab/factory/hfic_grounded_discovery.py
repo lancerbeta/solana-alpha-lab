@@ -725,9 +725,9 @@ def relate_look_scope(
 ) -> str:
     """How a candidate's claim axes sit on the scope bound to a computed look.
 
-    LOOK_SCOPE_MATCH: the result directly confirms this card.
-    LOOK_SCOPE_NARROWER: the card adds a claim axis the look left open.
-    LOOK_SCOPE_CONTRADICTION: both sides name the same axis differently.
+    LOOK_SCOPE_MATCH: every stored machine and semantic axis is on the card and equal.
+    LOOK_SCOPE_NARROWER: a semantic axis differs, or either side names an axis the other lacks.
+    LOOK_SCOPE_CONTRADICTION: both sides name population or decision_timestamp differently.
     LOOK_SCOPE_UNBOUND: the look has no stored claim scope.
     """
 
@@ -745,7 +745,7 @@ def relate_look_scope(
             return "LOOK_SCOPE_CONTRADICTION"
         if look_value and card_value:
             machine_shared = True
-        elif look_value and not card_value:
+        elif look_value or card_value:
             semantic_context = True
     for key in _SEMANTIC_LOOK_AXES:
         look_value = _axis_text(look.get(key))
@@ -754,7 +754,7 @@ def relate_look_scope(
             semantic_context = True
         elif look_value and card_value:
             semantic_shared = True
-        elif card_value and not look_value:
+        elif look_value or card_value:
             semantic_context = True
     if semantic_context or not machine_shared:
         if machine_shared or semantic_shared or semantic_context:

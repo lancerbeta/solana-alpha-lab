@@ -957,6 +957,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
         runner_matches_look: bool,
         selected_target: str = "target_A",
         selected_estimand: str = "estimand_A",
+        selected_population: str = "BASE_X",
         selected_decision: str = "X300",
         scope_estimand: str | None = "estimand_A",
         expect_freeze_error: str | None = None,
@@ -989,7 +990,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             {
                 "label": "HFIC-V12-A-LOOK",
                 "display_ordinal": 1,
-                "population": "BASE_X",
+                "population": selected_population,
                 "decision_timestamp": selected_decision,
                 "estimand": selected_estimand,
                 "target": selected_target,
@@ -1575,6 +1576,92 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                 )
             self.assertEqual(caught.exception.code, "LOOK_SPEC_SCOPE_MISMATCH")
             self.assertEqual(list(store.iter_committed_records()), [])
+
+    def test_foreign_population_does_not_match_the_look(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            session = self._freeze_scoped_runner(
+                Path(raw),
+                runner_matches_look=False,
+                selected_population="OTHER_POP",
+                expect_freeze_error="LOOK_SCOPE_CONTRADICTION",
+            )
+            self.assertIsNone(session["frozen"])
+            self.assertEqual(session["evidence"]["candidate_scope"]["population"], "BASE_X")
+
+    def test_declared_population_must_match_the_spec(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            GroundedDiscoveryError,
+            run_recorded_discovery_query,
+        )
+
+        spec = {
+            "query_id": "SPEC_POPULATION",
+            "population": "BASE_X",
+            "decision_points": ["X300"],
+            "decision_fields": ["FIELD-USD-PRICE-001"],
+            "target_point": "Y1800",
+            "target_field": "FIELD-USD-PRICE-001",
+            "explanatory": [],
+        }
+        with tempfile.TemporaryDirectory() as raw:
+            store = ResearchStore(Path(raw))
+            with self.assertRaises(GroundedDiscoveryError) as caught:
+                run_recorded_discovery_query(
+                    store,
+                    census=[],
+                    observations=[],
+                    spec=spec,
+                    binding=[],
+                    journal_scope="journal",
+                    candidate_scope={
+                        "population": "OTHER_POP",
+                        "decision_timestamp": "X300",
+                    },
+                    git_sha="ab" * 20,
+                )
+            self.assertEqual(caught.exception.code, "LOOK_SPEC_SCOPE_MISMATCH")
+            self.assertEqual(list(store.iter_committed_records()), [])
+
+    def test_spec_fills_omitted_machine_scope(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import scope_bound_to_spec
+
+        spec = {
+            "query_id": "SPEC_FILL",
+            "population": "BASE_X",
+            "decision_points": ["X300"],
+            "decision_fields": ["FIELD-USD-PRICE-001"],
+            "target_point": "Y1800",
+            "target_field": "FIELD-USD-PRICE-001",
+            "explanatory": [],
+        }
+        bound = scope_bound_to_spec(spec, {"target": "target_A", "estimand": "estimand_A"})
+        self.assertEqual(bound["population"], "BASE_X")
+        self.assertEqual(bound["decision_timestamp"], "X300")
+        self.assertEqual(bound["target"], "target_A")
+
+    def test_card_only_machine_axis_is_not_confirmation(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import relate_look_scope
+
+        relation = relate_look_scope(
+            {"population": "BASE_X", "target": "target_A", "estimand": "estimand_A"},
+            {
+                "population": "BASE_X",
+                "decision_timestamp": "X300",
+                "target": "target_A",
+                "estimand": "estimand_A",
+            },
+        )
+        self.assertEqual(relation, "LOOK_SCOPE_NARROWER")
+        omitted = relate_look_scope(
+            {
+                "population": "BASE_X",
+                "decision_timestamp": "X300",
+                "target": "target_A",
+                "estimand": "estimand_A",
+            },
+            {"population": "BASE_X", "decision_timestamp": "X300", "target": "target_A"},
+        )
+        self.assertEqual(omitted, "LOOK_SCOPE_NARROWER")
 
     def test_revision_rebinds_when_the_card_scope_changes(self) -> None:
         from solana_alpha_lab.factory.hfic_session import apply_revision, finalize_session
