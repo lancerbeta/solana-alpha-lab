@@ -1329,9 +1329,8 @@ def _rebind_runner_up_grounded_evidence(
         capsules = list((packet.get("prior_memory") or {}).get("capsules") or [])
         try:
             body = bind_prior_scope_evidence(body, canonical_priors=capsules)
-        except GroundedDiscoveryError:
-            body.pop("prior_scope_relations", None)
-            body.pop("canonical_prior_comparison", None)
+        except GroundedDiscoveryError as exc:
+            raise HficSessionError(exc.code) from exc
     packet["grounded_evidence"] = body
 
 

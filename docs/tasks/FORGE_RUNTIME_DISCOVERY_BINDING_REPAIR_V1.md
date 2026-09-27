@@ -39,6 +39,7 @@ managed_write_set:
   - docs/evidence/forge_runtime_discovery_binding_repair/a1_delivery_factory_fit_v1.json
   - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
   - src/solana_alpha_lab/factory/hfic_prior_memory.py
+  - src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py
   - src/solana_alpha_lab/factory/hfic_session.py
   - scripts/hypothesis_forge.py
   - catalog/schemas/hypothesis_critic_input_v1.schema.json

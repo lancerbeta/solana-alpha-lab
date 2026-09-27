@@ -912,6 +912,44 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
         self.assertNotIn("result", evidence)
         self.assertNotIn("result_sha256", evidence)
 
+    def test_runner_up_exact_close_still_blocks(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import (
+            HficSessionError,
+            _rebind_runner_up_grounded_evidence,
+        )
+
+        scope = {
+            "population": "BASE_X",
+            "decision_timestamp": "X300",
+            "target": "target_same",
+            "estimand": "estimand_same",
+            "explanatory_condition": "cond_same",
+            "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+            "representation_scope": "rep_same",
+        }
+        packet = {
+            "grounded_evidence": {
+                "candidate_scope": dict(scope),
+                "result": {"pooled": {"mean_target": 1}},
+                "result_sha256": "abc",
+                "priors": [],
+            },
+            "prior_memory": {
+                "capsules": [
+                    {
+                        **scope,
+                        "memory_status": "HARD_CLOSE",
+                        "reason_code": "KILL_TEST",
+                        "question_id": "Q-CLOSE",
+                        "hypothesis_version_id": "HV-CLOSE",
+                    }
+                ]
+            },
+        }
+        with self.assertRaises(HficSessionError) as caught:
+            _rebind_runner_up_grounded_evidence(packet, dict(scope))
+        self.assertEqual(caught.exception.code, "EXACT_PRIOR_SCOPE_MATCH")
+
 
 if __name__ == "__main__":
     unittest.main()
