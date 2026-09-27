@@ -314,6 +314,11 @@
               "horizon_notional": {"type": ["string", "null"]},
               "negative_control": {"type": ["string", "null"]},
               "cheapest_falsifier": {"type": ["string", "null"]},
+              "target": {"type": ["string", "null"]},
+              "estimand": {"type": ["string", "null"]},
+              "explanatory_condition": {"type": ["string", "null"]},
+              "evidence_surface_mode": {"type": ["string", "null"]},
+              "representation_scope": {"type": ["string", "null"]},
               "legacy_definition": {
                 "type": ["object", "null"],
                 "additionalProperties": true

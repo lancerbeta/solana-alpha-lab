@@ -260,28 +260,42 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-inp
      Same recovery fence.
    - `START_NEW_SESSION` → continue only when `forge-run` next is `START_BASE`.
 3. Only for `START_NEW_SESSION` on the ordinary route (no `--control-current-representation`),
-   before Prompt A, run the production recipe. Resolve role and holdout from
-   the runtime binding. Do not substitute `EXPLORATORY_REUSE` or `holdout=false`.
-   Ambiguous role or an unresolved holdout stops before row values. Then:
+   before Prompt A, resolve the published discovery binding. Do not hand-write
+   `EXPLORATORY_REUSE` or `holdout=false`. The resolver admits only when the
+   published labels match `REQUIRED_LABELS` and no protected holdout assignment
+   is present. A stop before row values uses the command's code:
+   `DISCOVERY_ROLE_UNKNOWN`, `DISCOVERY_ROLE_FORBIDDEN`,
+   `DISCOVERY_ROLE_CONFLICT`, `DISCOVERY_AUTHORITY_ABSENT`,
+   `HOLDOUT_PROTECTED`, `HOLDOUT_UNRESOLVED`, `DISCOVERY_IDENTITY_MISMATCH`,
+   `BINDING_HASH_MISMATCH`, `DISCOVERY_ARTIFACT_MISSING`, or
+   `DISCOVERY_SCOPE_UNSUPPORTED`.
 
 ```text
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --store <explicit-store> --census <census.parquet> --observations <observations.parquet> --binding <binding.json> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-binding --format json
+```
+
+   Then run the query. Omit `--binding`; pass `--data-root` for the published
+   corpus and `--store` for the explicit journal. Do not pass a combined file
+   when cohort hashes differ. An exact repeated `--cohort-partition` is
+   eliminated; a second path for the same cohort stops. Copy the whole returned
+   evidence object onto the draft as `grounded_evidence`.
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <published-corpus-root> --store <explicit-journal> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
 ```
 
    Pass `--journal-scope` as the preflight `search_key_sha256`. Copy the
    whole returned evidence object onto the draft as `grounded_evidence`.
    Do not copy only `result_refs` and do not hand-write the summary.
-   When the binding lists different census or observation hashes, pass one
-   `--cohort-partition COHORT CENSUS OBSERVATIONS` per cohort. Do not replace
-   those hashes with the hash of a combined file. A stamped ordinary receipt
-   requires that evidence object for 0, 1, 4, and 6 candidates.
+   A stamped ordinary receipt requires that evidence object for 0, 1, 4, and 6 candidates.
    Ordinary preflight carries `discovery_contract_version` for every
    non-CONTROL receipt. `--discovery-contract` is accepted and does not
    decide the stamp. Do not hand-write that field.
    `evidence_surface_mode` stays unset unless the run is explicit CONTROL.
    Do not invent those fields.
-   CONTROL does not run this command. This repair atom
-   does not point it at the live market corpus.
+   CONTROL does not run this command. `discovery-binding` does not load
+   values. On an authorized ordinary slash the journal store is the canonical
+   data root, because freeze checks the look there.
    Then run **PROMPT A** from the operator pack using
    `HFIC-V1.2` and only the bounded `FORGE_CONTEXT_PACKET` plus explicitly
    resolved evidence. In `CURRENT_REPRESENTATION_CONTROL_V1`, "explicitly

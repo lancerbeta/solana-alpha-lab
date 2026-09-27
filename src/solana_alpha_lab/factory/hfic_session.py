@@ -1042,6 +1042,62 @@ def _copy_evidence_surface_mode(
         target["evidence_surface_mode"] = mode
 
 
+def _discovery_candidate_scope(frozen: Mapping[str, Any] | None) -> dict[str, Any]:
+    if not isinstance(frozen, Mapping):
+        return {}
+    grounded = frozen.get("grounded_evidence")
+    if not isinstance(grounded, Mapping):
+        return {}
+    scope = grounded.get("candidate_scope")
+    if not isinstance(scope, Mapping):
+        return {}
+    kept: dict[str, Any] = {}
+    for key in (
+        "population",
+        "decision_timestamp",
+        "target",
+        "estimand",
+        "explanatory_condition",
+        "evidence_surface_mode",
+        "representation_scope",
+    ):
+        value = scope.get(key)
+        if isinstance(value, str) and value:
+            kept[key] = value
+    return kept
+
+
+def _hypothesis_scope_fields(
+    frozen: Mapping[str, Any] | None,
+    definition: Mapping[str, Any] | None,
+) -> dict[str, str]:
+    """Forward-persist scope axes already present on the draft or session."""
+
+    out: dict[str, str] = {}
+    sources: list[Mapping[str, Any]] = []
+    if isinstance(definition, Mapping):
+        sources.append(definition)
+    scope = _discovery_candidate_scope(frozen)
+    if scope:
+        sources.append(scope)
+    if isinstance(frozen, Mapping):
+        sources.append(frozen)
+    for source in sources:
+        for key in (
+            "estimand",
+            "target",
+            "explanatory_condition",
+            "representation_scope",
+            "evidence_surface_mode",
+        ):
+            if key in out:
+                continue
+            value = source.get(key)
+            if isinstance(value, str) and value:
+                out[key] = value
+    return out
+
+
 def _selected_candidate_block(
     identity: Any,
     card: Mapping[str, Any],
@@ -1762,7 +1818,12 @@ def freeze_draft(
         )
 
         try:
-            packet["grounded_evidence"] = bind_prior_scope_evidence(grounded)
+            packet["grounded_evidence"] = bind_prior_scope_evidence(
+                grounded,
+                canonical_priors=list(
+                    (packet.get("prior_memory") or {}).get("capsules") or []
+                ),
+            )
         except GroundedDiscoveryError as exc:
             raise HficSessionError(exc.code) from exc
     if repo_root is not None:
@@ -2613,6 +2674,11 @@ def persist_no_worthy_session(
                     if frozen.get("evidence_surface_mode")
                     else {}
                 ),
+                **(
+                    {"discovery_candidate_scope": _discovery_candidate_scope(frozen)}
+                    if _discovery_candidate_scope(frozen)
+                    else {}
+                ),
             },
         ),
         event(
@@ -2680,6 +2746,7 @@ def persist_no_worthy_session(
                     "cheapest_falsifier": identity.definition["cheapest_falsifier"],
                     "definition_sha256": identity.full_sha256,
                     "role_in_session": "CONSIDERED_UNSELECTED",
+                    **_hypothesis_scope_fields(frozen, identity.definition),
                 },
             )
         )
@@ -4276,6 +4343,9 @@ def persist_frozen_session(
     _copy_evidence_surface_mode(cycle_payload, frozen)
     _stamp_split_identity(cycle_payload, frozen)
     _stamp_market_evidence_basis(cycle_payload, frozen)
+    discovered_scope = _discovery_candidate_scope(frozen)
+    if discovered_scope:
+        cycle_payload["discovery_candidate_scope"] = discovered_scope
     if isinstance(frozen.get("grounded_candidates"), list):
         cycle_payload["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -4338,6 +4408,7 @@ def persist_frozen_session(
                             else "PORTFOLIO"
                         )
                     ),
+                    **_hypothesis_scope_fields(frozen, identity.definition),
                 },
             )
         )
@@ -6254,6 +6325,7 @@ def apply_revision(
                     "definition_sha256": selected_identity.full_sha256,
                     "role_in_session": "SELECTED",
                     "supersedes_hypothesis_version_id": original_selected_id,
+                    **_hypothesis_scope_fields(frozen, selected_identity.definition),
                 },
                 transaction_id=transaction_id,
             )

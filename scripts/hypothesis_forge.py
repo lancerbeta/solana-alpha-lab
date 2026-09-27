@@ -680,104 +680,105 @@ def cmd_forge_run(
     ))
 
 
+def cmd_discovery_binding(repo_root: Path, explicit_data_root: Path | None) -> int:
+    """No-write admission binding for the published discovery corpus."""
+
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        resolve_published_discovery_binding,
+    )
+
+    git_before = repository_git_snapshot(repo_root)
+    try:
+        data_root = _existing_data_root(repo_root, explicit_data_root)
+    except HficCliError as exc:
+        return emit_error(str(exc))
+    try:
+        payload = resolve_published_discovery_binding(data_root)
+    except GroundedDiscoveryError as exc:
+        return emit_error(exc.code)
+    git_after = repository_git_snapshot(repo_root)
+    if not git_before.unchanged(git_after):
+        return emit_error("GIT_MUTATION_DETECTED")
+    payload["scientific_writes"] = 0
+    payload["values_loaded"] = False
+    payload["authority"] = {
+        "git_mutation": 0,
+        "experiment_execution": 0,
+        "provider_api_rpc_wss_calls": 0,
+    }
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
 def cmd_discovery_execute(
     repo_root: Path,
     *,
     store_root: Path,
     census_path: Path | None,
     observations_path: Path | None,
-    binding_path: Path,
+    binding_path: Path | None,
     spec_path: Path,
     journal_scope: str,
     candidate_scope_path: Path,
     cohort_partitions: list[tuple[str, Path, Path]] | None = None,
+    explicit_data_root: Path | None = None,
 ) -> int:
     """Compute one ordinary discovery query into a caller-selected store.
 
     Does not default to the live ResearchStore and does not reserve a slot.
+    Omitting ``--binding`` resolves the published corpus at ``--data-root``.
     """
 
     from solana_alpha_lab.factory.hfic_grounded_discovery import (
         GroundedDiscoveryError,
-        admit_discovery_binding,
-        load_parquet_rows,
+        load_admitted_partition_rows,
         run_recorded_discovery_query,
     )
     from solana_alpha_lab.factory.research_store import ResearchStore
 
     git_before = repository_git_snapshot(repo_root)
     try:
-        binding_doc = json.loads(binding_path.read_text(encoding="utf-8"))
         spec = json.loads(spec_path.read_text(encoding="utf-8"))
         candidate_scope = json.loads(candidate_scope_path.read_text(encoding="utf-8"))
+        binding_doc = None
+        if binding_path is not None:
+            binding_doc = json.loads(binding_path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         return emit_error("DISCOVERY_INPUT_INVALID")
-    if not isinstance(binding_doc, dict) or not isinstance(spec, dict):
+    if not isinstance(spec, dict) or not isinstance(candidate_scope, dict):
         return emit_error("DISCOVERY_INPUT_INVALID")
-    cohorts = binding_doc.get("cohorts")
-    if not isinstance(cohorts, list) or not isinstance(candidate_scope, dict):
+    if binding_doc is not None and not isinstance(binding_doc, dict):
         return emit_error("DISCOVERY_INPUT_INVALID")
-    if any(not isinstance(item, dict) or "holdout" not in item for item in cohorts):
-        return emit_error("HOLDOUT_UNRESOLVED")
+    data_root = explicit_data_root
+    if data_root is None and binding_doc is None:
+        data_root = store_root
     try:
-        admit_discovery_binding(cohorts)
+        loaded = load_admitted_partition_rows(
+            data_root=data_root,
+            binding_doc=binding_doc,
+            partitions=cohort_partitions,
+            census_path=census_path,
+            observations_path=observations_path,
+        )
     except GroundedDiscoveryError as exc:
         return emit_error(exc.code)
-    by_cohort = {str(item.get("cohort_id")): item for item in cohorts}
-    partitions = list(cohort_partitions or [])
-    census: list[dict] = []
-    observations: list[dict] = []
-    try:
-        if partitions:
-            for cohort_id, census_file, obs_file in partitions:
-                binding_row = by_cohort.get(cohort_id)
-                if binding_row is None:
-                    return emit_error("BINDING_COHORT_MISMATCH")
-                census_sha = hashlib.sha256(Path(census_file).read_bytes()).hexdigest()
-                observations_sha = hashlib.sha256(Path(obs_file).read_bytes()).hexdigest()
-                if (
-                    binding_row.get("census_sha256") != census_sha
-                    or binding_row.get("observations_sha256") != observations_sha
-                ):
-                    return emit_error("BINDING_HASH_MISMATCH")
-                for row in load_parquet_rows(census_file):
-                    stamped = dict(row)
-                    stamped["cohort_id"] = cohort_id
-                    stamped["release_id"] = binding_row.get("release_id")
-                    census.append(stamped)
-                for row in load_parquet_rows(obs_file):
-                    stamped = dict(row)
-                    stamped["cohort_id"] = cohort_id
-                    stamped["release_id"] = binding_row.get("release_id")
-                    observations.append(stamped)
-        else:
-            if census_path is None or observations_path is None:
-                return emit_error("BINDING_PARTITION_REQUIRED")
-            distinct = {
-                (item.get("census_sha256"), item.get("observations_sha256"))
-                for item in cohorts
-            }
-            if len(distinct) != 1:
-                return emit_error("BINDING_PARTITION_REQUIRED")
-            census_sha = hashlib.sha256(census_path.read_bytes()).hexdigest()
-            observations_sha = hashlib.sha256(observations_path.read_bytes()).hexdigest()
-            if distinct != {(census_sha, observations_sha)}:
-                return emit_error("BINDING_HASH_MISMATCH")
-            census = load_parquet_rows(census_path)
-            observations = load_parquet_rows(observations_path)
     except (OSError, ValueError):
         return emit_error("DISCOVERY_ROWS_UNREADABLE")
     store = ResearchStore(store_root)
+    priors = []
+    if isinstance(binding_doc, dict):
+        priors = binding_doc.get("priors") or []
     try:
         evidence = run_recorded_discovery_query(
             store,
-            census=census,
-            observations=observations,
+            census=loaded["census"],
+            observations=loaded["observations"],
             spec=spec,
-            binding=cohorts,
+            binding=loaded["cohorts"],
             journal_scope=journal_scope,
             candidate_scope=candidate_scope,
-            priors=binding_doc.get("priors") or [],
+            priors=priors,
             git_sha=git_before.head_sha,
         )
     except GroundedDiscoveryError as exc:
@@ -787,7 +788,11 @@ def cmd_discovery_execute(
         return emit_error("GIT_MUTATION_FORBIDDEN")
     evidence["scientific_writes"] = 0
     evidence["live_store_selected"] = False
+    evidence["duplicate_partitions_eliminated"] = loaded["duplicate_partitions_eliminated"]
+    evidence["authority_source"] = (loaded["binding"] or {}).get("authority_source")
     _assert_no_path_leak(evidence, str(store_root), str(repo_root))
+    if data_root is not None:
+        _assert_no_path_leak(evidence, str(data_root))
     return emit(evidence)
 
 
@@ -1811,6 +1816,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="No-write state-only joint coverage. Never selects typed_value.",
     )
     discovery_coverage.add_argument("--format", choices=("json",), default="json")
+    discovery_binding = subparsers.add_parser(
+        "discovery-binding",
+        help=(
+            "No-write discovery admission binding from the published corpus. "
+            "Does not read parquet values."
+        ),
+    )
+    discovery_binding.add_argument("--format", choices=("json",), default="json")
     discovery_execute = subparsers.add_parser(
         "discovery-execute",
         help=(
@@ -1828,7 +1841,11 @@ def build_parser() -> argparse.ArgumentParser:
         metavar=("COHORT", "CENSUS", "OBSERVATIONS"),
         default=None,
     )
-    discovery_execute.add_argument("--binding", type=Path, required=True)
+    discovery_execute.add_argument(
+        "--binding",
+        type=Path,
+        help="Optional explicit binding. Omit to resolve the published corpus.",
+    )
     discovery_execute.add_argument("--spec", type=Path, required=True)
     discovery_execute.add_argument("--candidate-scope", type=Path, required=True)
     discovery_execute.add_argument("--journal-scope", required=True)
@@ -2076,6 +2093,8 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.command == "discovery-coverage":
             return cmd_discovery_coverage(repo_root, args.data_root)
+        if args.command == "discovery-binding":
+            return cmd_discovery_binding(repo_root, args.data_root)
         if args.command == "discovery-execute":
             return cmd_discovery_execute(
                 repo_root,
@@ -2090,6 +2109,7 @@ def main(argv: list[str] | None = None) -> int:
                     (str(item[0]), Path(item[1]), Path(item[2]))
                     for item in (args.cohort_partition or [])
                 ],
+                explicit_data_root=args.data_root,
             )
         if args.command == "persist-draft":
             return cmd_persist_draft(

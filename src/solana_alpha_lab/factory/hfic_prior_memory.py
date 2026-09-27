@@ -43,6 +43,13 @@ _CAPSULE_FIELDS = (
     "negative_control",
     "cheapest_falsifier",
 )
+_SCOPE_FIELDS = (
+    "target",
+    "estimand",
+    "explanatory_condition",
+    "evidence_surface_mode",
+    "representation_scope",
+)
 
 
 class PriorMemoryCapacityError(ValueError):
@@ -165,14 +172,15 @@ def build_prior_memory_snapshot(
     )
 
     decisions = latest_hypothesis_decisions(store)
+    session_scope = _session_scope_index(store)
     capsules_by_id: dict[str, dict[str, Any]] = {}
     for payload in iter_search_memory_hypothesis_payloads(store):
         hyp_id = str(payload.get("hypothesis_version_id") or "")
         if not hyp_id:
             raise PriorMemoryUnidentifiedError()
-        capsules_by_id[hyp_id] = _capsule_from_payload(
-            hyp_id, payload, decisions.get(hyp_id)
-        )
+        capsule = _capsule_from_payload(hyp_id, payload, decisions.get(hyp_id))
+        _fill_scope_from_session(capsule, payload, session_scope)
+        capsules_by_id[hyp_id] = capsule
     capsules = [capsules_by_id[item] for item in sorted(capsules_by_id)]
     eligible = len(capsules)
     if eligible > records_bound:
@@ -395,6 +403,10 @@ def compact_forge_prior_entry(
             value = full.get(key)
             if value not in (None, "", [], {}):
                 out[key] = value
+    for key in _SCOPE_FIELDS:
+        value = full.get(key)
+        if value not in (None, "", [], {}):
+            out[key] = value
     return out
 
 
@@ -449,6 +461,10 @@ def _capsule_from_payload(
         else:
             value = str(payload.get(field) or "")
         capsule[field] = value or None
+    for field in _SCOPE_FIELDS:
+        raw_scope = payload.get(field)
+        if isinstance(raw_scope, str) and raw_scope.strip():
+            capsule[field] = raw_scope
     legacy = payload.get("legacy_definition")
     if isinstance(legacy, Mapping) and legacy:
         compact_legacy = {
@@ -464,6 +480,64 @@ def _capsule_from_payload(
         if isinstance(park_status, str) and park_status.strip():
             capsule["park_status"] = park_status
     return capsule
+
+
+def _session_scope_index(store: Any) -> dict[str, dict[str, Any]]:
+    """Recover surface and discovery scope from immutable cycle records."""
+
+    index: dict[str, dict[str, Any]] = {}
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if kind != "RESEARCH_CYCLE":
+            continue
+        payload = _payload_mapping(record)
+        session_id = str(payload.get("session_id") or "")
+        if not session_id:
+            continue
+        slot = index.setdefault(session_id, {"candidates": {}})
+        mode = payload.get("evidence_surface_mode")
+        if isinstance(mode, str) and mode and not slot.get("evidence_surface_mode"):
+            slot["evidence_surface_mode"] = mode
+        scope = payload.get("discovery_candidate_scope")
+        if isinstance(scope, Mapping) and not slot.get("discovery_candidate_scope"):
+            slot["discovery_candidate_scope"] = dict(scope)
+        for cand in payload.get("grounded_candidates") or []:
+            if not isinstance(cand, Mapping):
+                continue
+            candidate_id = str(cand.get("candidate_id") or "")
+            if candidate_id:
+                slot["candidates"][candidate_id] = dict(cand)
+    return index
+
+
+def _fill_scope_from_session(
+    capsule: dict[str, Any],
+    payload: Mapping[str, Any],
+    session_scope: Mapping[str, Mapping[str, Any]],
+) -> None:
+    """Fill missing scope axes. Do not overwrite a field the hypothesis already has."""
+
+    session_id = str(payload.get("session_id") or "")
+    slot = session_scope.get(session_id)
+    if not isinstance(slot, Mapping):
+        return
+    sources: list[Mapping[str, Any]] = []
+    scope = slot.get("discovery_candidate_scope")
+    if isinstance(scope, Mapping):
+        sources.append(scope)
+    candidate_id = str(payload.get("hypothesis_version_id") or "")
+    candidates = slot.get("candidates")
+    if isinstance(candidates, Mapping) and isinstance(candidates.get(candidate_id), Mapping):
+        sources.append(candidates[candidate_id])
+    if isinstance(slot.get("evidence_surface_mode"), str):
+        sources.append({"evidence_surface_mode": slot["evidence_surface_mode"]})
+    for source in sources:
+        for field in _SCOPE_FIELDS:
+            if capsule.get(field) not in (None, ""):
+                continue
+            value = source.get(field)
+            if isinstance(value, str) and value.strip():
+                capsule[field] = value
 
 
 def _finalize_snapshot(

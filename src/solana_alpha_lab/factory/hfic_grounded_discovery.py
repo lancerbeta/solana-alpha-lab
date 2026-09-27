@@ -158,6 +158,257 @@ def admit_discovery_binding(cohorts: Sequence[Mapping[str, Any]]) -> dict[str, A
     }
 
 
+_AUTHORITY_SOURCE = "PUBLISHED_DISCOVERY_LABELS_V1"
+_NON_BLOCKING_MEMORY = frozenset({"PARK", "NOT_SELECTED_IN_SESSION"})
+_NON_BLOCKING_REASONS = frozenset(
+    {
+        "NOT_SELECTED_IN_SESSION",
+        "NO_WORTHY_HYPOTHESIS",
+        "OWNER_PRIORITY_PARK",
+    }
+)
+
+
+def _labels_authority_or_raise(labels: Mapping[str, Any]) -> None:
+    """Positive discovery contract. A role string alone does not derive holdout."""
+
+    from solana_alpha_lab.factory.live_cohort_discovery_release import REQUIRED_LABELS
+
+    if "evidence_role" not in labels or labels.get("evidence_role") in (None, ""):
+        raise GroundedDiscoveryError("DISCOVERY_ROLE_UNKNOWN")
+    if labels.get("evidence_role") != REQUIRED_LABELS["evidence_role"]:
+        raise GroundedDiscoveryError("DISCOVERY_ROLE_FORBIDDEN")
+    if labels.get("outcome_previously_consumed") is True:
+        raise GroundedDiscoveryError("DISCOVERY_ROLE_FORBIDDEN")
+    for key, expected in REQUIRED_LABELS.items():
+        if key not in labels or labels.get(key) != expected:
+            raise GroundedDiscoveryError("DISCOVERY_AUTHORITY_ABSENT")
+
+
+def _explicit_holdout_or_raise(sources: Sequence[Mapping[str, Any]]) -> None:
+    for source in sources:
+        if "holdout" not in source:
+            continue
+        value = source.get("holdout")
+        if value is True:
+            raise GroundedDiscoveryError("HOLDOUT_PROTECTED")
+        if value is not False:
+            raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED")
+
+
+def resolve_published_discovery_binding(data_root: Path) -> dict[str, Any]:
+    """Build the admission binding from a canonical publication.
+
+    Does not read parquet values. Hashes are streamed. ``holdout=false`` is
+    derived only after REQUIRED_LABELS match and no protected holdout
+    assignment is present on those labels or cohort records.
+    """
+
+    from solana_alpha_lab.factory.live_cohort_discovery_release import (
+        CORPUS_DATASET_ID,
+        LIVE_EVIDENCE_ROLE,
+        load_live_corpus_lineage,
+    )
+    from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
+
+    root = Path(data_root)
+    lineage = load_live_corpus_lineage(root)
+    if lineage.get("corpus_dataset_id") != CORPUS_DATASET_ID:
+        raise GroundedDiscoveryError("DISCOVERY_IDENTITY_MISMATCH")
+    manifest_id = lineage.get("current_dataset_manifest_id")
+    if not isinstance(manifest_id, str) or not manifest_id:
+        raise GroundedDiscoveryError("DISCOVERY_ARTIFACT_MISSING")
+    labels_path = root / "datasets" / "manifests" / f"{manifest_id}.labels.json"
+    if not labels_path.is_file() or labels_path.is_symlink():
+        raise GroundedDiscoveryError("DISCOVERY_ARTIFACT_MISSING")
+    try:
+        labels = json.loads(labels_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise GroundedDiscoveryError("DISCOVERY_ARTIFACT_MISSING") from exc
+    if not isinstance(labels, Mapping):
+        raise GroundedDiscoveryError("DISCOVERY_AUTHORITY_ABSENT")
+    _labels_authority_or_raise(labels)
+    raw_cohorts = [
+        item for item in (lineage.get("cohorts") or []) if isinstance(item, Mapping)
+    ]
+    if not raw_cohorts:
+        raise GroundedDiscoveryError("DISCOVERY_BINDING_EMPTY")
+    _explicit_holdout_or_raise([labels, *raw_cohorts])
+    label_lineage = labels.get("cohort_lineage")
+    if not isinstance(label_lineage, list):
+        raise GroundedDiscoveryError("DISCOVERY_SCOPE_UNSUPPORTED")
+    label_ids = {str(item) for item in label_lineage}
+    bound_cohorts: list[dict[str, Any]] = []
+    for item in sorted(raw_cohorts, key=lambda row: int(row.get("corpus_version") or 0)):
+        cohort_id = item.get("cohort_id")
+        release_id = item.get("release_id")
+        census_sha = item.get("census_sha256")
+        observations_sha = item.get("observations_sha256")
+        census_rel = item.get("census_rel")
+        obs_rel = item.get("obs_rel")
+        if not all(
+            isinstance(value, str) and value
+            for value in (
+                cohort_id,
+                release_id,
+                census_sha,
+                observations_sha,
+                census_rel,
+                obs_rel,
+            )
+        ):
+            raise GroundedDiscoveryError("DISCOVERY_IDENTITY_MISMATCH")
+        if str(cohort_id) not in label_ids:
+            raise GroundedDiscoveryError("DISCOVERY_SCOPE_UNSUPPORTED")
+        cohort_role = item.get("evidence_role")
+        if cohort_role not in (None, "") and cohort_role != LIVE_EVIDENCE_ROLE:
+            raise GroundedDiscoveryError("DISCOVERY_ROLE_CONFLICT")
+        for rel, expected in ((census_rel, census_sha), (obs_rel, observations_sha)):
+            path = root / str(rel)
+            if path.is_symlink() or not path.is_file():
+                raise GroundedDiscoveryError("DISCOVERY_ARTIFACT_MISSING")
+            if sha256_file_streaming(path) != expected:
+                raise GroundedDiscoveryError("BINDING_HASH_MISMATCH")
+        bound_cohorts.append(
+            {
+                "dataset_id": CORPUS_DATASET_ID,
+                "dataset_manifest_id": manifest_id,
+                "dataset_version": str(item.get("dataset_version") or labels.get("dataset_version") or ""),
+                "evidence_role": LIVE_EVIDENCE_ROLE,
+                "holdout": False,
+                "cohort_id": cohort_id,
+                "release_id": release_id,
+                "census_sha256": census_sha,
+                "observations_sha256": observations_sha,
+                "census_rel": census_rel,
+                "observations_rel": obs_rel,
+            }
+        )
+    admitted = admit_discovery_binding(bound_cohorts)
+    return {
+        **admitted,
+        "authority_source": _AUTHORITY_SOURCE,
+        "holdout_derived_from_discovery_contract": True,
+        "protected_holdout_assignment": False,
+        "dataset_manifest_id": manifest_id,
+        "dataset_version": str(labels.get("dataset_version") or ""),
+        "cohorts": bound_cohorts,
+    }
+
+
+def collapse_exact_partition_duplicates(
+    partitions: Sequence[tuple[str, Path, Path]],
+) -> tuple[list[tuple[str, Path, Path]], int]:
+    """Drop an exact repeated cohort path. A different path for the same cohort fails."""
+
+    seen: dict[str, tuple[str, str]] = {}
+    unique: list[tuple[str, Path, Path]] = []
+    eliminated = 0
+    for cohort_id, census_file, obs_file in partitions:
+        key = str(cohort_id)
+        signature = (str(Path(census_file)), str(Path(obs_file)))
+        previous = seen.get(key)
+        if previous is not None:
+            if previous == signature:
+                eliminated += 1
+                continue
+            raise GroundedDiscoveryError("DUPLICATE_COHORT_PARTITION")
+        seen[key] = signature
+        unique.append((key, Path(census_file), Path(obs_file)))
+    return unique, eliminated
+
+
+def load_admitted_partition_rows(
+    *,
+    data_root: Path | None,
+    binding_doc: Mapping[str, Any] | None,
+    partitions: Sequence[tuple[str, Path, Path]] | None,
+    census_path: Path | None,
+    observations_path: Path | None,
+) -> dict[str, Any]:
+    """Admit, then hash-check, then load. Authority failures do not call the loader."""
+
+    from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
+
+    if binding_doc is None:
+        if data_root is None:
+            raise GroundedDiscoveryError("DISCOVERY_AUTHORITY_ABSENT")
+        binding_doc = resolve_published_discovery_binding(data_root)
+    if not isinstance(binding_doc, Mapping):
+        raise GroundedDiscoveryError("DISCOVERY_INPUT_INVALID")
+    cohorts = binding_doc.get("cohorts")
+    if not isinstance(cohorts, list):
+        raise GroundedDiscoveryError("DISCOVERY_INPUT_INVALID")
+    admit_discovery_binding(cohorts)
+    by_cohort = {str(item.get("cohort_id")): item for item in cohorts if isinstance(item, Mapping)}
+    supplied = list(partitions or [])
+    if not supplied and data_root is not None:
+        for item in cohorts:
+            if not isinstance(item, Mapping):
+                continue
+            census_rel = item.get("census_rel")
+            obs_rel = item.get("observations_rel") or item.get("obs_rel")
+            if isinstance(census_rel, str) and isinstance(obs_rel, str):
+                supplied.append(
+                    (
+                        str(item.get("cohort_id")),
+                        Path(data_root) / census_rel,
+                        Path(data_root) / obs_rel,
+                    )
+                )
+    unique, eliminated = collapse_exact_partition_duplicates(supplied)
+    census: list[dict[str, Any]] = []
+    observations: list[dict[str, Any]] = []
+    if unique:
+        for cohort_id, census_file, obs_file in unique:
+            binding_row = by_cohort.get(cohort_id)
+            if binding_row is None:
+                raise GroundedDiscoveryError("BINDING_COHORT_MISMATCH")
+            census_sha = sha256_file_streaming(Path(census_file))
+            observations_sha = sha256_file_streaming(Path(obs_file))
+            if (
+                binding_row.get("census_sha256") != census_sha
+                or binding_row.get("observations_sha256") != observations_sha
+            ):
+                raise GroundedDiscoveryError("BINDING_HASH_MISMATCH")
+        for cohort_id, census_file, obs_file in unique:
+            binding_row = by_cohort[cohort_id]
+            for row in load_parquet_rows(census_file):
+                stamped = dict(row)
+                stamped["cohort_id"] = cohort_id
+                stamped["release_id"] = binding_row.get("release_id")
+                census.append(stamped)
+            for row in load_parquet_rows(obs_file):
+                stamped = dict(row)
+                stamped["cohort_id"] = cohort_id
+                stamped["release_id"] = binding_row.get("release_id")
+                observations.append(stamped)
+    else:
+        if census_path is None or observations_path is None:
+            raise GroundedDiscoveryError("BINDING_PARTITION_REQUIRED")
+        distinct = {
+            (item.get("census_sha256"), item.get("observations_sha256"))
+            for item in cohorts
+            if isinstance(item, Mapping)
+        }
+        if len(distinct) != 1:
+            raise GroundedDiscoveryError("BINDING_PARTITION_REQUIRED")
+        census_sha = sha256_file_streaming(census_path)
+        observations_sha = sha256_file_streaming(observations_path)
+        if distinct != {(census_sha, observations_sha)}:
+            raise GroundedDiscoveryError("BINDING_HASH_MISMATCH")
+        census = load_parquet_rows(census_path)
+        observations = load_parquet_rows(observations_path)
+    return {
+        "binding": dict(binding_doc),
+        "cohorts": cohorts,
+        "census": census,
+        "observations": observations,
+        "duplicate_partitions_eliminated": eliminated,
+        "values_loaded": True,
+    }
+
+
 def _parse_time(value: object) -> datetime | None:
     if isinstance(value, datetime):
         if value.tzinfo is None:
@@ -438,31 +689,82 @@ def _scope_missing(scope: Mapping[str, Any], *, prefix: str) -> list[str]:
     return missing
 
 
-def _valid_close(prior: Mapping[str, Any]) -> bool:
+def _non_blocking_prior(prior: Mapping[str, Any]) -> bool:
+    """PARK, not-selected, scoped no-worthy and technical stops do not ban a family."""
+
     status = str(prior.get("memory_status") or "")
     reason = str(prior.get("reason_code") or "")
-    if status in {"HARD_CLOSE", "PARK"}:
+    if status in _NON_BLOCKING_MEMORY:
         return True
-    return reason.startswith("KILL_") or reason.startswith("CLOSE_") or reason.startswith("PARK_")
+    if reason in _NON_BLOCKING_REASONS or reason.startswith("PARK_"):
+        return True
+    if reason.endswith("_STOP") or reason in {"OBSERVABILITY_BLOCKED", "INPUT_NOT_READY"}:
+        return True
+    return False
 
 
-def bind_prior_scope_evidence(evidence: Mapping[str, Any]) -> dict[str, Any]:
-    """Attach relations. Equivalent valid closes and unknown axes stop freeze."""
+def _valid_close(prior: Mapping[str, Any]) -> bool:
+    if _non_blocking_prior(prior):
+        return False
+    status = str(prior.get("memory_status") or "")
+    reason = str(prior.get("reason_code") or "")
+    if status == "HARD_CLOSE":
+        return True
+    return reason.startswith("KILL_") or reason.startswith("CLOSE_")
+
+
+def _merge_scope_priors(
+    caller: Sequence[Mapping[str, Any]],
+    canonical: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Canonical memory stays in the comparison. A caller list cannot erase it."""
+
+    by_id: dict[str, dict[str, Any]] = {}
+    order: list[str] = []
+    for item in list(canonical) + list(caller):
+        if not isinstance(item, Mapping):
+            continue
+        key = str(item.get("hypothesis_version_id") or item.get("question_id") or "")
+        if not key:
+            key = _canonical(item)
+        if key in by_id:
+            merged = dict(by_id[key])
+            for field, value in item.items():
+                if merged.get(field) in (None, "") and value not in (None, ""):
+                    merged[field] = value
+            by_id[key] = merged
+            continue
+        by_id[key] = dict(item)
+        order.append(key)
+    return [by_id[key] for key in order]
+
+
+def bind_prior_scope_evidence(
+    evidence: Mapping[str, Any],
+    canonical_priors: Sequence[Mapping[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Attach relations from caller priors plus canonical memory.
+
+    An incomplete candidate scope stops. An incomplete unrelated prior is
+    recorded as unresolved and does not ban the forge. A valid same-scope
+    close still stops. An empty caller list does not skip canonical memory.
+    """
 
     body = dict(evidence)
     candidate_scope = body.get("candidate_scope")
-    priors = body.get("priors")
-    if not isinstance(candidate_scope, Mapping) or not isinstance(priors, list):
+    caller = body.get("priors") if isinstance(body.get("priors"), list) else []
+    merged = _merge_scope_priors(caller, list(canonical_priors or []))
+    if not merged:
         return body
+    if not isinstance(candidate_scope, Mapping) or _scope_missing(candidate_scope, prefix=""):
+        raise GroundedDiscoveryError("UNKNOWN_PRIOR_SCOPE")
     relations = []
-    for prior in priors:
-        if not isinstance(prior, Mapping):
-            continue
+    for prior in merged:
         relation = prior_scope_relation(candidate_scope, prior)
         if relation in _BLOCKING_RELATIONS:
             raise GroundedDiscoveryError("EXACT_PRIOR_SCOPE_MATCH")
-        if relation == "UNKNOWN_SCOPE_NEEDS_RESOLUTION":
-            raise GroundedDiscoveryError("UNKNOWN_PRIOR_SCOPE")
+        if _non_blocking_prior(prior) and relation == "UNKNOWN_SCOPE_NEEDS_RESOLUTION":
+            relation = "NON_BLOCKING_PRIOR"
         relations.append(
             {
                 "question_id": prior.get("question_id"),
@@ -472,6 +774,7 @@ def bind_prior_scope_evidence(evidence: Mapping[str, Any]) -> dict[str, Any]:
             }
         )
     body["prior_scope_relations"] = relations
+    body["canonical_prior_comparison"] = True
     return body
 
 
@@ -502,6 +805,8 @@ def prior_scope_relation(
         and candidate_scope not in (None, "")
         and candidate_scope != prior_scope
     )
+    if content_same and _non_blocking_prior(prior):
+        return "NON_BLOCKING_PRIOR"
     if content_same and surface_same:
         if _valid_close(prior):
             return "EXACT_VALID_CLOSE"
@@ -1139,26 +1444,13 @@ def live_state_only_coverage(data_root: Path) -> dict[str, Any]:
     )
 
     lineage = load_live_corpus_lineage(Path(data_root))
+    binding = resolve_published_discovery_binding(Path(data_root))
     cohorts = [
         item
         for item in (lineage.get("cohorts") or [])
         if isinstance(item, Mapping)
     ]
     cohorts.sort(key=lambda item: int(item.get("corpus_version") or 0))
-    binding = admit_discovery_binding(
-        [
-            {
-                "dataset_id": LIVE_DATASET_ID,
-                "evidence_role": LIVE_EVIDENCE_ROLE,
-                "cohort_id": item.get("cohort_id"),
-                "release_id": item.get("release_id"),
-                "census_sha256": item.get("census_sha256"),
-                "observations_sha256": item.get("observations_sha256"),
-                "holdout": False,
-            }
-            for item in cohorts
-        ]
-    )
     reports = []
     connection = duckdb.connect(database=":memory:")
     try:

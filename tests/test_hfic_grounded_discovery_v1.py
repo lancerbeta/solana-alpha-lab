@@ -481,6 +481,7 @@ def _scope() -> dict:
         "decision_timestamp": "X300",
         "target": "Y1800:FIELD-USD-PRICE-001",
         "estimand": "price_liquidity_prefix",
+        "explanatory_condition": "NONE",
         "evidence_surface_mode": ORDINARY_GROUNDED_DISCOVERY_V1,
         "representation_scope": "PRICE_LIQUIDITY_PREFIX_THROUGH_Y1800",
     }
@@ -1102,6 +1103,7 @@ class OrdinaryOwnerPathTests(unittest.TestCase):
             shown_payload = json.loads(shown.stdout)
             self.assertIn("owner_readout", shown_payload)
             self.assertEqual(shown_payload.get("session_id"), session_id)
+            self.assertEqual(shown_payload.get("session_state"), "SYNTHESIS_COMPLETE")
             restarted = _discovery_execute(
                 data_root, binding_path, spec_path, scope_path, journal, argv
             )
