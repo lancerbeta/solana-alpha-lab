@@ -1360,6 +1360,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                 runner_matches_look=False,
                 selected_target="target_B",
                 selected_estimand="estimand_B",
+                selected_decision="X900",
                 expect_freeze_error="LOOK_SCOPE_CONTRADICTION",
             )
             evidence = session["evidence"]
@@ -1409,7 +1410,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             self.assertEqual(again["candidate_scope"]["target"], "target_A")
             self.assertEqual(again["candidate_scope"]["estimand"], "estimand_A")
             self.assertNotEqual(again["requested_candidate_scope"]["target"], "target_A")
-            self.assertEqual(again["look_scope_relation"], "LOOK_SCOPE_CONTRADICTION")
+            self.assertEqual(again["look_scope_relation"], "LOOK_SCOPE_NARROWER")
             self.assertFalse(again["queries"][0]["new_look"])
             hypothesis_ids = [
                 json.loads(record.payload_json).get("hypothesis_version_id")
