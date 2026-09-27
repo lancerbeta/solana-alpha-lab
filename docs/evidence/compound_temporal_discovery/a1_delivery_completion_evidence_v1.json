@@ -14,9 +14,24 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "1bfd6388846d085e5a2c9ce157331899764c5be2e3b6a6341be954208a5af825",
-    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "f830d318b12d7a8105ee54d9a5538e3fd257a1851481c8b68370cfa01b06fa9b",
+    ".agents/skills/hypothesis-forge/SKILL.md": "cec4eab8a372e478167544addb87f8c0d4ef7a2b066cf97fbfd24f3b6bc69414",
+    ".cursor/commands/hypothesis-forge.md": "841b0e34bd9db2b602a889d3ee1e2143eb8bcc0b59ecaf9ed615985f6d81147a",
+    "catalog/assets/core.yaml": "50476f7103ed06b1171f5207b0b9f41f837f4f8db3f973e67c753c465cbe6985",
+    "catalog/schemas/hfic_temporal_query_v1.schema.json": "dff61269698427edc8ec2143d564bb25f0be90d280758c3cecab1ebd65270e6b",
+    "configs/experiment_capability_registry_v2.yaml": "49edf7b770d37db38edb89a49dcb66f73b6212d62642cda2faa14880456e4430",
+    "configs/hypothesis_forge_independent_critic_v1.yaml": "e76ec851c88b9198a9ea04a58a7d68f77d93aaf0f8910c4600c8a9949ef47a06",
+    "docs/evidence/compound_temporal_discovery/agent_attempt_1_critic.json": "0c367747867c3fb2ca1ef2d53dcb3b1778ca9ee27d98528f897902f03e832ab8",
+    "docs/evidence/compound_temporal_discovery/agent_attempt_1_query.json": "d28237021e20bd90698207e3962e733363c4bfc0ab4fa2b1b24a9a66f4870b80",
+    "docs/evidence/compound_temporal_discovery/agent_attempt_1_result.json": "5e14fc368bc3efb90f2bf0fc6e8687c00d172a64e44088f615b8132c085436d1",
+    "docs/evidence/compound_temporal_discovery/execution_evidence_v1.json": "dbcc4286a5bcae2aea0bbb9d95b841a2a876bbb8a493a724457e94e19e9a6c9a",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "795a29bdbe6cc41456ea9865be35b3af78443341c614cb93f0a57a4b12dc2150",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "cf21a585b21de5a8dc88f39b0acf06515e98a0723306fea74464607e709da8d9",
+    "docs/reports/compound_temporal_discovery/a1_owner_readout_v1.md": "3c0586701e310cb4631905db199fd1b49453bd0b62dc5425b55f9888d0fa192e",
+    "docs/tasks/COMPOUND_TEMPORAL_DISCOVERY_V1.md": "b0f11383b55f05983b76466358dc1df944cd27b479db62569d8ad7b43a6db15d",
     "scripts/hypothesis_forge.py": "af77d6b548d9a06a8b857c8acc740b3a6c12541dc6de77088b2dddd224a8627f",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "f830d318b12d7a8105ee54d9a5538e3fd257a1851481c8b68370cfa01b06fa9b",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "1bfd6388846d085e5a2c9ce157331899764c5be2e3b6a6341be954208a5af825",
+    "tests/oracle_temporal_arithmetic_v1.py": "f74d5e59ca1d70162b3356c85a92a05c90b98db12d83a9a39d26ae49b8150ac8",
     "tests/test_hfic_temporal_discovery_v1.py": "e841efc3df3641ad0d2a17a94ceb5652b0c93c03a61a0fb5c295448d9ee042ca",
     "tests/test_hfic_temporal_owner_path_v1.py": "f9e91ab8d6029933b72fbaba310c40eb436778b1bea4793cfab35d2b4d565ada"
   },
@@ -36,14 +51,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/compound_temporal_discovery/a1_delivery_factory_fit_v1.json",
-    "sha256": "550cc9fe41fc66d9951a0466ab50137fc9e1105f7d140870f1b29a1d5cba0b69",
+    "sha256": "8e528d7542ef87ce60ff4cee8e7eb083b65e196bae3b1f3e12cfffbf56566f1c",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_TEMPORAL_UNIT_AND_OWNER_PATH",
     "independent_review": {
       "path": "docs/evidence/compound_temporal_discovery/a1_delivery_independent_review_v1.json",
-      "sha256": "2c8c3fe85bed7020dfafb0eac7062bb0755d7859e797db2796c270f03d19b414",
+      "sha256": "766171c2ea94adb92289f5d317ef875e17533f4858ca865969a08889d9e82a84",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
