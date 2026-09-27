@@ -61,7 +61,12 @@ from tests.test_live_cohort_discovery_release_series import (  # noqa: E402
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-DOCUMENT_LATENESS = 180
+DOCUMENT_LATENESS = int(
+    load_observation_schedule(
+        Path(__file__).resolve().parents[1],
+        "tests/fixtures/observation_schedule/x300_y900.yaml",
+    )["x_point"]["allowed_lateness_seconds"]
+)
 OFFSETS = {"X300": 300, "Y900": 900, "Y1800": 1800, "Y3600": 3600, "Y7200": 7200}
 GIT_SHA = "cd" * 20
 
@@ -77,9 +82,6 @@ def _schedule() -> dict:
         "starts_at": CAMPAIGN_STARTS.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "stops_admitting_at": CAMPAIGN_STOPS.strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
-    x_point = dict(document["x_point"])
-    x_point["allowed_lateness_seconds"] = DOCUMENT_LATENESS
-    document["x_point"] = x_point
     document["y_points"] = [
         {
             "point_id": point_id,
@@ -185,14 +187,65 @@ def _publish(data_root: Path, workspace: Path, week: int = 0, *, with_schedule: 
         )
 
 
+def _freeze_draft(receipt: dict, evidence: dict, *, select: bool, worthy: bool) -> dict:
+    source = json.loads(
+        (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(encoding="utf-8")
+    )
+    card = dict(source["candidates"][0])
+    card.update(
+        {
+            "population": "BASE_X",
+            "decision_timestamp": "Y3600",
+            "target": evidence["candidate_scope"]["target"]
+            if isinstance(evidence.get("candidate_scope"), dict)
+            else card.get("target"),
+            "estimand": "price_relative_proxy",
+            "explanatory_condition": "simple" if worthy or not select else "compound",
+            "representation_scope": "TEMPORAL_PRICE_LIQUIDITY",
+        }
+    )
+    body = dict(evidence)
+    body.pop("search_exhausted", None)
+    if worthy:
+        body["tier_decision"] = "WORTHY_SIMPLE"
+    if select:
+        draft = bind_draft({**source, "candidates": [card]}, receipt)
+        draft.pop("runner_up_candidate_ref", None)
+        draft.pop("strongest_rejected_alternative", None)
+        draft["selected_candidate_ref"] = card["label"]
+    else:
+        draft = bind_draft(source, receipt)
+        draft.pop("selected_candidate_ref", None)
+    draft["grounded_evidence"] = body
+    return draft
+
+
 def _bind_experiment(recipe: dict, data_root: Path) -> dict:
     experiment = offline_v1_1_spec()
     experiment["capability_id"] = "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
     experiment["capabilities"] = ["CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"]
     experiment["parameters"] = {"temporal_recipe": recipe}
-    experiment["data_bindings"] = [
+    kept = [
         item for item in experiment["data_bindings"] if item["source_kind"] != "DATASET_MANIFEST"
     ]
+    seen: set[str] = set()
+    for item in recipe["frozen_input"]:
+        manifest_id = str(item.get("dataset_manifest_id") or "")
+        if not manifest_id or manifest_id in seen:
+            continue
+        seen.add(manifest_id)
+        manifest = json.loads(
+            (data_root / "datasets" / "manifests" / f"{manifest_id}.json").read_text(encoding="utf-8")
+        )
+        kept.append(
+            {
+                "binding_id": f"BINDING-TEMPORAL-CORPUS-{len(seen):03d}",
+                "source_kind": "DATASET_MANIFEST",
+                "stable_id": manifest_id,
+                "expected_content_sha256_or_dataset_fingerprint": manifest["dataset_fingerprint"],
+            }
+        )
+    experiment["data_bindings"] = kept
     return experiment
 
 
@@ -651,12 +704,19 @@ class TemporalVerticalTests(unittest.TestCase):
             self.assertEqual(passport["as_of"], experiment["as_of"])
             self.assertEqual(passport["availability_cutoff"], experiment["availability_cutoff"])
             self.assertEqual(passport["result_artifact_id"], f"RESULT-ARTIFACT-{run_id.removeprefix('RUN-')}")
-            foreign_recipe = json.loads(
-                json.dumps(compound_evidence["result"]["experiment_recipe"])
+            manifest_binding = next(
+                item for item in experiment["data_bindings"] if item["source_kind"] == "DATASET_MANIFEST"
             )
-            for item in foreign_recipe["frozen_input"]:
-                item["dataset_manifest_id"] = "dataset-" + "ab" * 32
-            foreign = _bind_experiment(foreign_recipe, data_root)
+            self.assertTrue(manifest_binding["stable_id"].startswith("dataset-"))
+            self.assertIn(manifest_binding["stable_id"], passport["dataset_manifest_ids"])
+            self.assertIn(
+                manifest_binding["expected_content_sha256_or_dataset_fingerprint"],
+                passport["dataset_fingerprints"],
+            )
+            foreign = _bind_experiment(compound_evidence["result"]["experiment_recipe"], data_root)
+            for item in foreign["data_bindings"]:
+                if item["source_kind"] == "DATASET_MANIFEST":
+                    item["stable_id"] = "dataset-" + "ab" * 32
             foreign_decision = classify_lane(
                 {
                     "experiment_spec": foreign,
@@ -682,8 +742,10 @@ class TemporalVerticalTests(unittest.TestCase):
                 )
             finally:
                 foreign_runner.store.close()
-            self.assertEqual(foreign_result["status"], "FAILED_INFRA")
-            self.assertIn("MANIFEST_MISMATCH", foreign_result["reason_codes"])
+            self.assertEqual(foreign_decision.terminal, "BLOCKED_DATA", foreign_decision.reason_codes)
+            self.assertIn("DATA_BINDING_UNAVAILABLE", foreign_decision.reason_codes)
+            self.assertEqual(foreign_result["status"], "BLOCKED_DATA")
+            self.assertNotEqual(foreign_result["status"], "COMPLETE")
             early = _bind_experiment(compound_evidence["result"]["experiment_recipe"], data_root)
             early["availability_cutoff"] = "2020-01-01T00:00:00Z"
             early_decision = classify_lane(
@@ -711,11 +773,9 @@ class TemporalVerticalTests(unittest.TestCase):
                 )
             finally:
                 early_runner.store.close()
-            self.assertNotEqual(early_result["status"], "COMPLETE")
-            self.assertTrue(
-                "CUTOFF_REJECTED" in early_result["reason_codes"]
-                or early_result["status"] == "BLOCKED_DATA"
-            )
+            self.assertEqual(early_decision.terminal, "BLOCKED_DATA", early_decision.reason_codes)
+            self.assertIn("EVIDENCE_UNAVAILABLE_AT_CUTOFF", early_decision.reason_codes)
+            self.assertEqual(early_result["status"], "BLOCKED_DATA")
             cohort = binding["cohorts"][0]
             obs_path = data_root / cohort["observations_rel"]
             original = obs_path.read_bytes()
@@ -790,7 +850,220 @@ class TemporalVerticalTests(unittest.TestCase):
             )
 
 
+    def test_draft_v12_omits_selected_ref_and_rejects_empty(self) -> None:
+        import jsonschema
+
+        schema = json.loads(
+            (ROOT / "catalog/schemas/hypothesis_forge_draft_v1_2.schema.json").read_text(encoding="utf-8")
+        )
+        draft = json.loads(
+            (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(encoding="utf-8")
+        )
+        self.assertNotIn("selected_candidate_ref", schema["required"])
+        omitted = dict(draft)
+        omitted.pop("selected_candidate_ref")
+        jsonschema.validate(omitted, schema)
+        empty = dict(draft)
+        empty["selected_candidate_ref"] = ""
+        with self.assertRaises(jsonschema.ValidationError) as caught:
+            jsonschema.validate(empty, schema)
+        self.assertEqual(caught.exception.validator, "minLength")
+        self.assertEqual(list(caught.exception.absolute_path), ["selected_candidate_ref"])
+        self.assertEqual(
+            list(caught.exception.schema_path),
+            ["properties", "selected_candidate_ref", "minLength"],
+        )
+        null_draft = dict(draft)
+        null_draft["selected_candidate_ref"] = None
+        with self.assertRaises(jsonschema.ValidationError) as caught_null:
+            jsonschema.validate(null_draft, schema)
+        self.assertEqual(caught_null.exception.validator, "type")
+        self.assertEqual(list(caught_null.exception.absolute_path), ["selected_candidate_ref"])
+
+    def test_hash_match_does_not_accept_a_non_factory_x300_schedule(self) -> None:
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            schedule_projection_for_census,
+        )
+        from solana_alpha_lab.factory.observation_panel_publisher import (
+            persist_observation_schedule,
+        )
+        from tests.test_live_cohort_discovery_release_series import PRODUCER
+
+        schedule = _schedule()
+        schedule.pop("schedule_sha256", None)
+        x_point = dict(schedule["x_point"])
+        x_point["allowed_lateness_seconds"] = 180
+        schedule["x_point"] = x_point
+        validated = validate_observation_schedule(schedule, root=ROOT)
+        validated["schedule_sha256"] = schedule_sha256(validated)
+        with tempfile.TemporaryDirectory() as raw:
+            data_root = Path(raw) / "rdp"
+            data_root.mkdir()
+            census = data_root / "census.parquet"
+            pq.write_table(
+                pa.Table.from_pylist(
+                    [{"source_schedule_sha256": validated["schedule_sha256"]}]
+                ),
+                census,
+            )
+            persist_observation_schedule(
+                data_root=data_root,
+                schedule=validated,
+                now=CAMPAIGN_STARTS,
+                producer_git_sha=PRODUCER,
+                activation_id=ACTIVATION,
+            )
+            projected = schedule_projection_for_census(data_root, census)
+        self.assertTrue(projected["schedule_hash_matches"])
+        self.assertEqual(projected["schedule_context_gap"], "CANONICAL_X300_SCHEDULE_INCOMPATIBLE")
+        self.assertNotIn("schedule_point_lateness", projected)
+
+    def test_cli_freeze_pending_worthy_simple_and_no_worthy(self) -> None:
+        simple = _spec(
+            search_tier="SIMPLE_SCREEN",
+            query_id="freeze-simple",
+            features=[_spec()["features"][0]],
+            all=[{"feature": "impulse", "op": "gte", "value": 0.0}],
+            cost_profile=None,
+            schedule={"lateness_seconds": DOCUMENT_LATENESS},
+        )
+        compound = _spec(
+            cost_profile=None,
+            query_id="freeze-compound",
+            schedule={"lateness_seconds": DOCUMENT_LATENESS},
+        )
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            data_root = workspace / "rdp"
+            _publish(data_root, workspace)
+            simple_path = workspace / "simple.json"
+            compound_path = workspace / "compound.json"
+            scope_path = workspace / "scope.json"
+            simple_path.write_text(json.dumps(simple), encoding="utf-8")
+            compound_path.write_text(json.dumps(compound), encoding="utf-8")
+            scope_path.write_text(
+                json.dumps(
+                    {
+                        "population": "BASE_X",
+                        "decision_timestamp": "Y3600",
+                        "target": temporal_target_label(simple),
+                        "estimand": "price_relative_proxy",
+                        "explanatory_condition": "simple",
+                        "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+                        "representation_scope": "TEMPORAL_PRICE_LIQUIDITY",
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            def focus(name: str) -> dict:
+                completed = run_cli(
+                    "preflight",
+                    "--discovery-contract",
+                    "--owner-focus",
+                    name,
+                    "--format",
+                    "json",
+                    data_root=data_root,
+                )
+                self.assertEqual(completed.returncode, 0, completed.stderr)
+                return json.loads(completed.stdout)
+
+            def execute(path: Path, receipt: dict) -> dict:
+                completed = run_cli(
+                    "discovery-execute",
+                    "--store",
+                    str(data_root),
+                    "--spec",
+                    str(path),
+                    "--candidate-scope",
+                    str(scope_path),
+                    "--journal-scope",
+                    str(receipt["search_key_sha256"]),
+                    "--format",
+                    "json",
+                    data_root=data_root,
+                )
+                self.assertEqual(completed.returncode, 0, completed.stderr)
+                return json.loads(completed.stdout)
+
+            def freeze(name: str, evidence: dict, *, select: bool, worthy: bool) -> object:
+                resume = focus(name)
+                draft = _freeze_draft(resume, evidence, select=select, worthy=worthy)
+                draft_path = workspace / f"{name}-draft.json"
+                receipt_path = workspace / f"{name}-receipt.json"
+                draft_path.write_text(json.dumps(draft), encoding="utf-8")
+                receipt_path.write_text(json.dumps(resume), encoding="utf-8")
+                persisted = run_cli(
+                    "persist-draft",
+                    "--draft",
+                    str(draft_path),
+                    "--preflight-receipt",
+                    str(receipt_path),
+                    "--representation-id",
+                    "BASE",
+                    "--format",
+                    "json",
+                    data_root=data_root,
+                )
+                self.assertEqual(persisted.returncode, 0, persisted.stderr)
+                again = focus(name)
+                again_path = workspace / f"{name}-resume.json"
+                again_path.write_text(json.dumps(again), encoding="utf-8")
+                return run_cli(
+                    "freeze",
+                    "--draft",
+                    str(draft_path),
+                    "--preflight-receipt",
+                    str(again_path),
+                    "--format",
+                    "json",
+                    data_root=data_root,
+                )
+
+            pending_receipt = focus("ORDINARY-TEMPORAL-PENDING")
+            pending_evidence = execute(simple_path, pending_receipt)
+            pending_freeze = freeze(
+                "ORDINARY-TEMPORAL-PENDING",
+                pending_evidence,
+                select=False,
+                worthy=False,
+            )
+            self.assertNotEqual(pending_freeze.returncode, 0)
+            self.assertIn("SEARCH_EXHAUSTED_WITHOUT_COMPOUND", pending_freeze.stderr)
+            self.assertNotIn("NO_WORTHY_HYPOTHESIS", pending_freeze.stdout)
+            worthy_receipt = focus("ORDINARY-TEMPORAL-WORTHY")
+            worthy_evidence = execute(simple_path, worthy_receipt)
+            worthy_freeze = freeze(
+                "ORDINARY-TEMPORAL-WORTHY",
+                worthy_evidence,
+                select=True,
+                worthy=True,
+            )
+            self.assertEqual(worthy_freeze.returncode, 0, worthy_freeze.stderr)
+            worthy_body = json.loads(worthy_freeze.stdout)
+            self.assertNotEqual(worthy_body.get("critic_terminal"), "NO_WORTHY_HYPOTHESIS")
+            closed_receipt = focus("ORDINARY-TEMPORAL-CLOSED")
+            execute(simple_path, closed_receipt)
+            closed_evidence = execute(compound_path, closed_receipt)
+            closed_freeze = freeze(
+                "ORDINARY-TEMPORAL-CLOSED",
+                closed_evidence,
+                select=False,
+                worthy=False,
+            )
+            self.assertEqual(closed_freeze.returncode, 0, closed_freeze.stderr)
+            self.assertEqual(json.loads(closed_freeze.stdout).get("critic_terminal"), "NO_WORTHY_HYPOTHESIS")
+
     def test_three_current_cohorts_without_a_schedule_do_not_invent_lateness(self) -> None:
+        """Negative fixtures: three synthetic publications with no schedule document.
+
+        These are not the live market corpus. A missing document is
+        CANONICAL_SCHEDULE_UNBOUND, which is not corpus readiness.
+        """
         from solana_alpha_lab.factory.hfic_grounded_discovery import (
             schedule_projection_for_census,
         )

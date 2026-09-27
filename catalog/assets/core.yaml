@@ -428,7 +428,7 @@ records:
     repository_path: src/solana_alpha_lab/storage/manifests.py
   integrity:
     kind: sha256
-    sha256: 3cd9d52c3f8926e8696829d45a46870f42c3d7ba11d6fe2ded17655c54209238
+    sha256: 5203931b3d1cc7210740c623a83b645e28b1fd29e18423d15701caf7ea96c20a
   access: *t06_read_file
   relations:
   - relation_type: governed_by
@@ -31848,7 +31848,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/experiment_spec_v1_1.schema.json', repository_path: catalog/schemas/experiment_spec_v1_1.schema.json}
-  integrity: {kind: sha256, sha256: 7ba24a5109b539469bdfd0d1d74d88171cffaed03e5819fae3e3b9346d9e2ccd}
+  integrity: {kind: sha256, sha256: ef1b3e5d36c65d0b0ddb4c10ef6bee73b172be6b092b3f4f81c9b1dad137c278}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -31901,7 +31901,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/run_passport.schema.json', repository_path: catalog/schemas/run_passport.schema.json}
-  integrity: {kind: sha256, sha256: 761b0ff20c75aa0fa7617b5d1e2faa70d112f3fc2f7348db6448517d3e8053c6}
+  integrity: {kind: sha256, sha256: 5ee436960c30263b3358de55c2653d8b80446d2df5eef0d1c9293e0c81dbdbec}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -31991,7 +31991,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/data_resolver.py', repository_path: src/solana_alpha_lab/factory/data_resolver.py}
-  integrity: {kind: sha256, sha256: 22b551e65924113595f0170158e0a13dbb919c6358f17cf72c92087e6e113b19}
+  integrity: {kind: sha256, sha256: 60f6c9263503b22f0fd3554538dc86efc3e858216167f099fb9813204bac0df1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32027,7 +32027,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/run_passport.py', repository_path: src/solana_alpha_lab/factory/run_passport.py}
-  integrity: {kind: sha256, sha256: 10e1d32a2934ce8c2917632c0796fee6ba018c14d5e62f008e5888c58ae3fafc}
+  integrity: {kind: sha256, sha256: 50cdc6d938c0a28f01734140938c026a6203ab69b775940fd2dc2cf37070e5a5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32850,7 +32850,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/experiment_spec_v1_2.schema.json', repository_path: catalog/schemas/experiment_spec_v1_2.schema.json}
-  integrity: {kind: sha256, sha256: 41de53d9dac8bd9a5331e21a0a0ab3950adfc9fc6715632977eca75cc1a19fd9}
+  integrity: {kind: sha256, sha256: 7c3153f95236546451a717efe9890557c9175ae297f175516956320578fe1287}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -37954,7 +37954,7 @@ records:
   as_of: '2026-09-18'
   truth_owner: HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/experiment_spec_v1_3.schema.json', repository_path: catalog/schemas/experiment_spec_v1_3.schema.json}
-  integrity: {kind: sha256, sha256: 3270b93209d26e5bfa2afec9c567a0e42338fd466ccc7acebcab174f909cee88}
+  integrity: {kind: sha256, sha256: acea9c7813b591a83903d616d01f1a1b340c40e96161f65796b109888317a8ab}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001}

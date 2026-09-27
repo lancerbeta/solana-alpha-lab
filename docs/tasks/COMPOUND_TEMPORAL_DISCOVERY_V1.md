@@ -54,6 +54,13 @@ managed_write_set:
   - tests/test_hfic_temporal_production_runner_v1.py
   - tests/test_factory_ordinary_market_hypothesis.py
   - src/solana_alpha_lab/factory/scientific_eligibility_projection.py
+  - src/solana_alpha_lab/factory/data_resolver.py
+  - src/solana_alpha_lab/factory/run_passport.py
+  - src/solana_alpha_lab/storage/manifests.py
+  - catalog/schemas/experiment_spec_v1_1.schema.json
+  - catalog/schemas/experiment_spec_v1_2.schema.json
+  - catalog/schemas/experiment_spec_v1_3.schema.json
+  - catalog/schemas/run_passport.schema.json
   - src/solana_alpha_lab/factory/capabilities.py
   - src/solana_alpha_lab/factory/lane_classifier.py
   - src/solana_alpha_lab/factory/document_runner.py

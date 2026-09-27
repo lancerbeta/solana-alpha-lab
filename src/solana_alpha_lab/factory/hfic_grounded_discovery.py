@@ -213,8 +213,10 @@ def schedule_projection_for_census(data_root: Path, census_path: Path) -> dict[s
     from solana_alpha_lab.factory.hfic_temporal_discovery import project_schedule_points
     from solana_alpha_lab.factory.scientific_eligibility_projection import (
         CANONICAL_SCHEDULE_UNBOUND,
+        CANONICAL_X300_SCHEDULE_INCOMPATIBLE,
         ScientificEligibilityError,
         load_hashed_schedule_document,
+        verify_factory_x300_schedule,
     )
 
     try:
@@ -231,10 +233,30 @@ def schedule_projection_for_census(data_root: Path, census_path: Path) -> dict[s
     wanted = next(iter(shas))
     try:
         document = load_hashed_schedule_document(data_root, wanted)
-        projected = project_schedule_points(document)
-    except (ScientificEligibilityError, GroundedDiscoveryError):
+    except ScientificEligibilityError:
         return {"schedule_context_gap": CANONICAL_SCHEDULE_UNBOUND, "schedule_sha256": wanted}
-    return {"schedule_sha256": wanted, **projected}
+    try:
+        verify_factory_x300_schedule(document)
+    except ScientificEligibilityError:
+        return {
+            "schedule_context_gap": CANONICAL_X300_SCHEDULE_INCOMPATIBLE,
+            "schedule_sha256": wanted,
+            "schedule_hash_matches": True,
+        }
+    try:
+        projected = project_schedule_points(document)
+    except GroundedDiscoveryError:
+        return {
+            "schedule_context_gap": CANONICAL_SCHEDULE_UNBOUND,
+            "schedule_sha256": wanted,
+            "schedule_hash_matches": True,
+        }
+    return {
+        "schedule_sha256": wanted,
+        "schedule_hash_matches": True,
+        "schedule_x300_compatible": True,
+        **projected,
+    }
 
 
 def _attach_verified_schedule(root: Path, cohorts: list[dict[str, Any]]) -> None:
