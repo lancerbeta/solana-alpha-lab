@@ -17,7 +17,7 @@
     "catalog/assets/core.yaml": "42c378ff4a47e343d551a548f935293c030e8ceb825785a4b944b84063eef4b0",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "af693f1fb267ba00bd32d8e53eda5adef62a788bb561f19d9fd5560c0fcf9bf5",
     "docs/reports/temporal_cohort_evidence_closure/a1_owner_readout_v1.md": "ed50ac96e545223c810ee7a935d8f463e81fcd070d084eda500d9dc68d4faff2",
-    "docs/tasks/TEMPORAL_COHORT_EVIDENCE_CLOSURE_V1.md": "ab1b9de28ffd7e35ebfbe32a2c896e936d5fe00897268bedc1b177ec3a7810be",
+    "docs/tasks/TEMPORAL_COHORT_EVIDENCE_CLOSURE_V1.md": "b80838eee28ca8593c14e5a7eaca40eab3eb3b2d9c4b5f04ea1ab7223c0ee94b",
     "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "843db3e7d12cf40a16c1e52474e5309b3f5973ba1f8f9871054fd69685041a49",
     "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "b79f936e7db7a512c7a79af3b14d7f815acb6b2a11793ba8982670f25c609b9b",
     "tests/test_hfic_temporal_discovery_v1.py": "b18f6f5a7a7fbaec154cac22eb1dc8ecf62c68edf18b5d4604e546c0374f1b63",
@@ -33,14 +33,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/temporal_cohort_evidence_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "4282de741588cbd8dcb8d723b06aaca2a61f28cd5576d5561fe0dd934ed7a2bc",
+    "sha256": "03c739041272c2c3e02a545e795c798d826fbb28392bc3975ad5ff8ee2679979",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_COHORT_SLICE_AND_VERTICAL",
     "independent_review": {
       "path": "docs/evidence/temporal_cohort_evidence_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "f2d4aad9eebdedf0c062c41bf608444edd3e3b56e152643ab4510ba60dc07e1c",
+      "sha256": "51e92036c79ad6c5399752624d1bcc76a7aa52b0e4b9e863c45719d2ae20d01f",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
