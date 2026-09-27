@@ -122,10 +122,8 @@ class TemporalOwnerPathTests(unittest.TestCase):
                 "json",
                 data_root=data_root,
             )
-            self.assertEqual(preview_run.returncode, 0, preview_run.stderr)
-            preview_body = json.loads(preview_run.stdout)
-            self.assertFalse(preview_body["target_included"])
-            self.assertNotIn("target", preview_body)
+            self.assertNotEqual(preview_run.returncode, 0)
+            self.assertIn("SCHEDULE_CONTEXT_UNBOUND", preview_run.stderr)
             completed = run_cli(
                 "discovery-execute",
                 "--store",
@@ -140,30 +138,8 @@ class TemporalOwnerPathTests(unittest.TestCase):
                 "json",
                 data_root=data_root,
             )
-            self.assertEqual(completed.returncode, 0, completed.stderr)
-            evidence = json.loads(completed.stdout)
-            self.assertEqual(evidence["result"]["target_kind"], "PRICE_RELATIVE_PROXY")
-            self.assertFalse(evidence["result"]["labeled_net_return"])
-            self.assertEqual(evidence["queries"][0]["search_tier"], "COMPOUND_SCREEN")
-            self.assertTrue(evidence["queries"][0]["new_look"])
-            resumed = run_cli(
-                "discovery-execute",
-                "--store",
-                str(data_root),
-                "--spec",
-                str(spec_path),
-                "--candidate-scope",
-                str(scope_path),
-                "--journal-scope",
-                journal,
-                "--format",
-                "json",
-                data_root=data_root,
-            )
-            self.assertEqual(resumed.returncode, 0, resumed.stderr)
-            resumed_body = json.loads(resumed.stdout)
-            self.assertFalse(resumed_body["queries"][0]["new_look"])
-            self.assertEqual(resumed_body["result_refs"], evidence["result_refs"])
+            self.assertNotEqual(completed.returncode, 0)
+            self.assertIn("SCHEDULE_CONTEXT_UNBOUND", completed.stderr)
             empty_root = workspace / "unlined"
             empty_root.mkdir()
             census_path, observations_path, binding = _write_partition(workspace)

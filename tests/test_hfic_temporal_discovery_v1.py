@@ -71,6 +71,7 @@ def _binding() -> list[dict]:
             "release_id": RELEASE,
             "census_sha256": "bb" * 32,
             "observations_sha256": "cc" * 32,
+            "schedule_lateness_seconds": 300,
             "window_start": "2026-09-02T11:19:00Z",
             "window_end": "2026-09-09T11:19:00Z",
         }
@@ -88,6 +89,7 @@ def _census(mint: str, state: str = "X_ELIGIBLE") -> dict:
 
 
 def _obs(mint: str, point: str, field: str, value: float | None, *, at: str | None = None, state: str = "OBSERVED") -> dict:
+    available = at or _stamp(point)
     return {
         "mint": mint,
         "cohort_id": COHORT,
@@ -95,7 +97,8 @@ def _obs(mint: str, point: str, field: str, value: float | None, *, at: str | No
         "point_id": point,
         "field_id": field,
         "state": state,
-        "first_reliable_available_at": at or _stamp(point),
+        "first_reliable_available_at": available,
+        "event_time": available,
         "typed_value": value,
     }
 
@@ -173,7 +176,9 @@ def _path(mint: str, prices: list[float], liquidity: tuple[float, float], exit_p
         rows.append(_obs(mint, point, PRICE, price))
     rows.append(_obs(mint, "Y1800", LIQ, liquidity[0]))
     rows.append(_obs(mint, "Y3600", LIQ, liquidity[1]))
-    rows.append(_obs(mint, "Y7200", PRICE, exit_price))
+    exit_row = _obs(mint, "Y7200", PRICE, exit_price)
+    exit_row["event_time"] = exit_row["first_reliable_available_at"]
+    rows.append(exit_row)
     return rows
 
 
@@ -327,7 +332,9 @@ class TemporalArithmeticTests(unittest.TestCase):
                 observations.append(_obs(mint, "Y1800", LIQ, 1000.0))
                 observations.append(_obs(mint, "Y3600", LIQ, 1000.0))
             if index < 4:
-                observations.append(_obs(mint, "Y7200", PRICE, 1.0 + returns[index]))
+                exit_row = _obs(mint, "Y7200", PRICE, 1.0 + returns[index])
+                exit_row["event_time"] = exit_row["first_reliable_available_at"]
+                observations.append(exit_row)
         summary = execute_discovery_from_rows(census, observations, spec, _binding())["summary"]
         self.assertEqual(summary["population_n"], 10)
         self.assertEqual(summary["decision_eligible_n"], 8)
@@ -343,6 +350,45 @@ class TemporalArithmeticTests(unittest.TestCase):
         self.assertEqual(summary["unique_decision_n"], 10)
         self.assertEqual(summary["independence"], "UNKNOWN")
         self.assertIsNone(summary["independent_replication"])
+
+    def test_conflicting_copy_is_excluded_and_reorder_is_stable(self) -> None:
+        spec = _spec(
+            search_tier="SIMPLE_SCREEN",
+            features=[{"name": "mark", "op": "point_value", "field_id": PRICE, "point": "Y3600"}],
+            all=[{"feature": "mark", "op": "gte", "value": 0.0}],
+            cost_profile=None,
+        )
+        other_release = "dd" * 32
+        census = [_census("a"), {**_census("a"), "release_id": other_release}]
+        observations = _path("a", [1.0, 1.0, 1.0, 1.0], (1000.0, 1000.0), 1.2)
+        conflict = []
+        for row in observations:
+            copied = dict(row)
+            copied["release_id"] = other_release
+            if copied["point_id"] == "Y7200":
+                copied["typed_value"] = 9.0
+            conflict.append(copied)
+        binding = _binding() + [{**_binding()[0], "release_id": other_release}]
+        rows = observations + conflict
+        first = execute_discovery_from_rows(census, rows, spec, binding)["summary"]
+        self.assertEqual(first["integrity_conflict_count"], 1)
+        self.assertIsNone(first["mean_target"])
+        self.assertEqual(first["unique_decision_n"], 1)
+        second = execute_discovery_from_rows(
+            list(reversed(census)),
+            list(reversed(rows)),
+            spec,
+            binding,
+        )["summary"]
+        self.assertEqual(second["integrity_conflict_count"], first["integrity_conflict_count"])
+        self.assertEqual(second["mean_target"], first["mean_target"])
+        self.assertEqual(second["unique_decision_n"], first["unique_decision_n"])
+        identical = [dict(row) | {"release_id": other_release} for row in observations]
+        same = execute_discovery_from_rows(census, observations + identical, spec, binding)["summary"]
+        alone = execute_discovery_from_rows([_census("a")], observations, spec, _binding())["summary"]
+        self.assertEqual(same["integrity_conflict_count"], 0)
+        self.assertEqual(same["duplicate_delivery_count"], 1)
+        self.assertAlmostEqual(same["mean_target"], alone["mean_target"], delta=TOLERANCE)
 
     def test_t05_cost_oracle_does_not_double_count_or_pretend_calibration(self) -> None:
         spec = _spec(

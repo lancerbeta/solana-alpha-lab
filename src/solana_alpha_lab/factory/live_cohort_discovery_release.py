@@ -429,6 +429,7 @@ def _validate_source_payload(
         "observation_schedule_partition": payload.get("observation_schedule_partition"),
         "observation_schedule_sha256": payload.get("observation_schedule_sha256"),
         "schema_version": payload.get("schema_version"),
+        "allowed_lateness_seconds": payload.get("allowed_lateness_seconds"),
         "source_representation": payload.get("source_representation"),
         "source_dir": payload.get("source_dir"),
     }
@@ -2995,6 +2996,12 @@ def seal_live_cohort(
         "confirmatory_reuse_forbidden": True,
         "census_sha256": census_sha,
         "observations_sha256": obs_sha,
+        **(
+            {"allowed_lateness_seconds": int(source["allowed_lateness_seconds"])}
+            if isinstance(source.get("allowed_lateness_seconds"), int)
+            and not isinstance(source.get("allowed_lateness_seconds"), bool)
+            else {}
+        ),
         "census_row_count": census_rows,
         "observation_row_count": observation_rows,
         "feature_families": families,

@@ -55,6 +55,12 @@ managed_write_set:
   - src/solana_alpha_lab/factory/capabilities.py
   - src/solana_alpha_lab/factory/lane_classifier.py
   - src/solana_alpha_lab/factory/document_runner.py
+  - src/solana_alpha_lab/factory/hfic_session.py
+  - src/solana_alpha_lab/factory/live_cohort_discovery_release.py
+  - src/solana_alpha_lab/factory/live_corpus_manifest_publish.py
+  - docs/evidence/compound_temporal_discovery/agent_attempt_2_query.json
+  - docs/evidence/compound_temporal_discovery/agent_attempt_2_result.json
+  - docs/evidence/compound_temporal_discovery/agent_attempt_2_critic.json
   - docs/evidence/compound_temporal_discovery/agent_attempt_1_query.json
   - docs/evidence/compound_temporal_discovery/agent_attempt_1_result.json
   - docs/evidence/compound_temporal_discovery/agent_attempt_1_critic.json

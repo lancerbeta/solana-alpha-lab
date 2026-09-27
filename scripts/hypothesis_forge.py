@@ -804,6 +804,8 @@ def cmd_discovery_preview(
     observations_path: Path | None,
     cohort_partitions: list[tuple[str, Path, Path]] | None,
     prior_preview_hash: list[str] | None,
+    store_root: Path | None = None,
+    journal_scope: str | None = None,
 ) -> int:
     """Feature-only preview. Does not write a store and does not read a target."""
 
@@ -832,13 +834,29 @@ def cmd_discovery_preview(
             census_path=census_path,
             observations_path=observations_path,
         )
+        remembered = list(prior_preview_hash or [])
+        if store_root is not None and journal_scope:
+            from solana_alpha_lab.factory.hfic_temporal_discovery import stored_preview_hashes
+            from solana_alpha_lab.factory.research_store import ResearchStore
+
+            remembered = stored_preview_hashes(ResearchStore(store_root), journal_scope)
         payload = build_feature_preview(
             loaded["census"],
             loaded["observations"],
             spec,
             loaded["cohorts"],
-            prior_preview_hashes=prior_preview_hash or [],
+            prior_preview_hashes=remembered,
         )
+        if store_root is not None and journal_scope:
+            from solana_alpha_lab.factory.hfic_temporal_discovery import persist_feature_preview
+            from solana_alpha_lab.factory.research_store import ResearchStore
+
+            persist_feature_preview(
+                ResearchStore(store_root),
+                journal_scope=journal_scope,
+                preview=payload,
+                git_sha="0" * 40,
+            )
     except GroundedDiscoveryError as exc:
         return emit_error(exc.code)
     except (OSError, ValueError):
@@ -1920,6 +1938,8 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
     )
     discovery_preview.add_argument("--prior-preview-hash", action="append", default=None)
+    discovery_preview.add_argument("--store", type=Path)
+    discovery_preview.add_argument("--journal-scope")
     discovery_preview.add_argument("--format", choices=("json",), default="json")
     discovery_execute.add_argument("--format", choices=("json",), default="json")
 
@@ -2180,6 +2200,8 @@ def main(argv: list[str] | None = None) -> int:
                     for item in (args.cohort_partition or [])
                 ],
                 prior_preview_hash=args.prior_preview_hash,
+                store_root=args.store,
+                journal_scope=args.journal_scope,
             )
         if args.command == "discovery-execute":
             return cmd_discovery_execute(

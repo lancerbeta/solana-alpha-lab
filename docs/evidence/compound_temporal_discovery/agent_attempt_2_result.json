@@ -1,0 +1,29 @@
+{
+  "spec_sha256": "dbc1893bb452c5adf5a51028da3c33de9a9a4efafe76dd9278cf8d7bee8af660",
+  "search_tier": "COMPOUND_SCREEN",
+  "matched_n": 1,
+  "observed_target_n": 1,
+  "mean_target": 0.19999999999999996,
+  "target_kind": "PRICE_RELATIVE_PROXY",
+  "claim_level": "EXPLORATORY_PROXY",
+  "labeled_net_return": false,
+  "matched_feature_means": {
+    "late_fade_y1800_y3600": -0.19999999999999996,
+    "liq_x300": 1000.0,
+    "second_leg_y900_y1800": 0.33333333333333326
+  },
+  "independence": "UNKNOWN",
+  "cost": {
+    "status": "ABSENT",
+    "source_status": null,
+    "scenarios": {},
+    "decision_sensitivity": "NOT_EVALUATED",
+    "labeled_net_return": false
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_INTRABAR_STOP",
+    "NO_CAUSAL_IDENTIFICATION"
+  ]
+}

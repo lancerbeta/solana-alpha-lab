@@ -290,6 +290,12 @@ def resolve_published_discovery_binding(data_root: Path) -> dict[str, Any]:
                 "observations_sha256": observations_sha,
                 "census_rel": census_rel,
                 "observations_rel": obs_rel,
+                **(
+                    {"schedule_lateness_seconds": int(item["allowed_lateness_seconds"])}
+                    if isinstance(item.get("allowed_lateness_seconds"), int)
+                    and not isinstance(item.get("allowed_lateness_seconds"), bool)
+                    else {}
+                ),
             }
         )
     admitted = admit_discovery_binding(bound_cohorts)
@@ -1480,6 +1486,82 @@ def format_discovery_readout(evidence: Mapping[str, Any]) -> dict[str, Any]:
     return payload
 
 
+def _append_temporal_intent(
+    store: Any,
+    *,
+    journal_scope: str,
+    spec_sha256: str,
+    binding_sha: str,
+    search_tier: str,
+    git_sha: str,
+) -> None:
+    """Record the question before evaluation. A repeat of the same intent is not a new look."""
+
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if kind != "RESEARCH_ARTIFACT":
+            continue
+        try:
+            wrapper = json.loads(record.payload_json)
+            body = json.loads(str(wrapper.get("payload_canonical") or ""))
+        except (TypeError, json.JSONDecodeError):
+            continue
+        if (
+            isinstance(body, dict)
+            and body.get("artifact_kind") == "DISCOVERY_QUERY_INTENT"
+            and body.get("journal_scope") == journal_scope
+            and body.get("spec_sha256") == spec_sha256
+            and body.get("data_binding_sha256") == binding_sha
+        ):
+            return
+    from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
+
+    now = datetime.now(timezone.utc)
+    identity = hashlib.sha256(
+        _canonical(
+            {
+                "spec_sha256": spec_sha256,
+                "data_binding_sha256": binding_sha,
+                "journal_scope": journal_scope,
+                "artifact_kind": "DISCOVERY_QUERY_INTENT",
+            }
+        ).encode("utf-8")
+    ).hexdigest()
+    body = {
+        "artifact_kind": "DISCOVERY_QUERY_INTENT",
+        "journal_scope": journal_scope,
+        "spec_sha256": spec_sha256,
+        "data_binding_sha256": binding_sha,
+        "search_tier": search_tier,
+        "scientific_slot_reserved": False,
+    }
+    canonical = _canonical(body)
+    payload = {
+        "artifact_kind": "DISCOVERY_QUERY_INTENT",
+        "payload_canonical": canonical,
+        "payload_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
+    }
+    payload_json = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    event = ResearchEvent(
+        record_id=f"HFIC-ART-INTENT-{identity[:40].upper()}",
+        record_kind=RecordKind.RESEARCH_ARTIFACT,
+        entity_id=f"HFIC-ART-INTENT-{identity[:40].upper()}",
+        hypothesis_version_id=None,
+        run_id=None,
+        transaction_id=f"RESEARCH-TXN-INTENT-{identity[:24].upper()}",
+        effective_at=now,
+        first_reliable_available_at=now,
+        supersedes_record_id=None,
+        payload_json=payload_json,
+        payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+        schema_version="1.0",
+        producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+        producer_git_sha=git_sha,
+        created_at=now,
+    )
+    store.append([event], transaction_id=event.transaction_id)
+
+
 def run_recorded_discovery_query(
     store: Any,
     *,
@@ -1522,6 +1604,15 @@ def run_recorded_discovery_query(
             None,
         )
     if replayed is None:
+        if _is_temporal_query(spec):
+            _append_temporal_intent(
+                store,
+                journal_scope=journal_scope,
+                spec_sha256=prevalidated["spec_sha256"],
+                binding_sha=pre_binding_sha,
+                search_tier=str(prevalidated["search_tier"]),
+                git_sha=git_sha,
+            )
         computed = execute_discovery_from_rows(census, observations, spec, binding)
     else:
         computed = {

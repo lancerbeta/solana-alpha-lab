@@ -1781,6 +1781,26 @@ def _enforce_ordinary_grounded_evidence(
                 str(expected_scope) if isinstance(expected_scope, str) else None
             ),
         )
+        result = evidence.get("result") if isinstance(evidence.get("result"), Mapping) else {}
+        if isinstance(result, Mapping) and result.get("schema") == "smial.hfic-temporal-query":
+            from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks
+            from solana_alpha_lab.factory.hfic_temporal_discovery import (
+                assess_tier_progress,
+                assert_search_exhaustion_claim,
+            )
+
+            journal = str(evidence.get("journal_scope") or expected_scope or "")
+            looks = list_discovery_looks(store, journal)
+            decision = str(evidence.get("tier_decision") or "")
+            progress = assess_tier_progress(
+                looks,
+                freeze_worthy=decision == "WORTHY_SIMPLE",
+                compound_applicable=decision != "COMPOUND_INAPPLICABLE",
+            )
+            assert_search_exhaustion_claim(
+                progress,
+                claim_search_exhausted=evidence.get("search_exhausted") is True,
+            )
     except GroundedDiscoveryError as exc:
         raise HficSessionError(exc.code) from exc
 

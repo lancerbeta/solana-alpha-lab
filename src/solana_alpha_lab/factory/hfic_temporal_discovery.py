@@ -12,7 +12,7 @@ import json
 import math
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -549,6 +549,42 @@ def _feature_value(
     return float(at["value"]) / base - 1.0
 
 
+def _require_bound_schedule(binding: Sequence[Mapping[str, Any]], lateness: int) -> None:
+    """Preview and evaluation share one declared lateness. A missing field does not skip the check."""
+
+    for item in binding:
+        declared = item.get("schedule_lateness_seconds")
+        if isinstance(declared, bool) or not isinstance(declared, int):
+            raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
+        if declared != lateness:
+            raise GroundedDiscoveryError("SCHEDULE_LATENESS_MISMATCH")
+
+
+def _observation_signature(
+    observations: Sequence[Mapping[str, Any]],
+    mint: str,
+    cohort: str,
+    release: str,
+) -> tuple:
+    items = []
+    for row in observations:
+        if str(row.get("mint") or "") != mint:
+            continue
+        if str(row.get("cohort_id") or "") != cohort or str(row.get("release_id") or "") != release:
+            continue
+        items.append(
+            (
+                str(row.get("point_id") or ""),
+                str(row.get("field_id") or ""),
+                str(row.get("first_reliable_available_at") or ""),
+                str(row.get("event_time") or row.get("observed_at") or ""),
+                str(row.get("state") or ""),
+                str(row.get("typed_value")),
+            )
+        )
+    return tuple(sorted(items))
+
+
 def _mean(values: Sequence[float]) -> float | None:
     if not values:
         return None
@@ -758,15 +794,25 @@ def execute_temporal_discovery(
         if "evidence_role" not in item:
             raise GroundedDiscoveryError("DISCOVERY_ROLE_AMBIGUOUS")
     admitted = admit_discovery_binding(binding)
+    frozen_source = [
+        {
+            "dataset_id": item.get("dataset_id"),
+            "evidence_role": item.get("evidence_role"),
+            "holdout": item.get("holdout"),
+            "cohort_id": item.get("cohort_id"),
+            "release_id": item.get("release_id"),
+            "census_sha256": item.get("census_sha256"),
+            "observations_sha256": item.get("observations_sha256"),
+            "census_rel": item.get("census_rel"),
+            "observations_rel": item.get("observations_rel") or item.get("obs_rel"),
+            "schedule_lateness_seconds": item.get("schedule_lateness_seconds"),
+        }
+        for item in binding
+    ]
     bound = validate_temporal_query(spec)
     body = bound["scientific_body"]
     lateness = int(body["schedule_lateness_seconds"])
-    for item in binding:
-        declared = item.get("schedule_lateness_seconds")
-        if declared is None:
-            continue
-        if isinstance(declared, bool) or not isinstance(declared, int) or declared != lateness:
-            raise GroundedDiscoveryError("SCHEDULE_LATENESS_MISMATCH")
+    _require_bound_schedule(binding, lateness)
     decision_point = str(body["decision_point"])
     grouped = _grouped_cells(observations)
     admitted_pairs = {
@@ -776,6 +822,7 @@ def execute_temporal_discovery(
     features = list(body["features"])
     predicates = list(body["predicates"])
     seen: set[tuple[str, str]] = set()
+    signatures: dict[tuple[str, str], tuple] = {}
     members: list[dict[str, Any]] = []
     duplicate_count = 0
     integrity_conflicts = 0
@@ -791,8 +838,16 @@ def execute_temporal_discovery(
         identity = (mint, decision_key)
         if identity in seen:
             duplicate_count += 1
+            if signatures.get(identity) != _observation_signature(observations, mint, cohort, release):
+                integrity_conflicts += 1
+                for member in members:
+                    if member.get("identity") == identity:
+                        member["integrity_excluded"] = True
+                        member["matched"] = False
+                        member["target_is_observed"] = False
             continue
         seen.add(identity)
+        signatures[identity] = _observation_signature(observations, mint, cohort, release)
         block = decision_deadline.date().isoformat() if decision_deadline is not None else "UNANCHORED"
         exclusion = None
         in_base = False
@@ -857,21 +912,15 @@ def execute_temporal_discovery(
                 latest_exit = max(item[0] for item in legal)
                 tied_rows = [row for available, row in legal if available == latest_exit]
                 selected = _select_cell(tied_rows, latest_exit)
-                point_time = _deadline_for(anchor, exit_point, 0)
                 event_times = [
                     _parse_time(row.get("event_time")) or _parse_time(row.get("observed_at"))
                     for row in tied_rows
                 ]
-                observed_times = [item for item in event_times if item is not None]
-                observed_time = observed_times[0] if len(set(observed_times)) == 1 else None
-                if observed_time is None:
-                    observed_time = point_time
-                if (
-                    observed_time is None
-                    or entry_at is None
-                    or observed_time <= entry_at
-                    or selected.get("status") != "OBSERVED"
-                ):
+                if any(item is None for item in event_times):
+                    selected = {"status": "MISSING_EVENT_TIME"}
+                elif len(set(event_times)) != 1:
+                    selected = {"status": "EVENT_TIME_CONFLICT"}
+                elif entry_at is None or event_times[0] <= entry_at or selected.get("status") != "OBSERVED":
                     selected = {"status": "NOT_AFTER_ENTRY"}
                 reference = _cell(
                     grouped,
@@ -887,6 +936,7 @@ def execute_temporal_discovery(
                     target_observed = True
         members.append(
             {
+                "identity": identity,
                 "in_base": in_base,
                 "decision_eligible": decision_eligible,
                 "feature_values": feature_values,
@@ -900,7 +950,9 @@ def execute_temporal_discovery(
         )
     base_members = [item for item in members if item["in_base"]]
     decision_members = [item for item in base_members if item["decision_eligible"]]
-    matched_members = [item for item in decision_members if item["matched"]]
+    matched_members = [
+        item for item in decision_members if item["matched"] and not item.get("integrity_excluded")
+    ]
     observed = [item for item in matched_members if item["target_is_observed"] and item["target"] is not None]
     missing_target = [item for item in matched_members if not item["target_is_observed"]]
     observed_values = [float(item["target"]) for item in observed]
@@ -1044,6 +1096,7 @@ def execute_temporal_discovery(
             "cost_label": "ESTIMATED_NET_PROXY" if costs["status"] == "EVALUATED" else "ABSENT",
             "labeled_net_return": False,
             "spec": canonical_temporal_spec(spec),
+            "frozen_input": frozen_source,
         },
         "non_claims": [
             "NO_ALPHA",
@@ -1084,6 +1137,7 @@ def build_feature_preview(
     point_ids = [_point(item) for item in points]
     if any(POINT_OFFSET[item] > POINT_OFFSET[decision_point] for item in point_ids):
         raise GroundedDiscoveryError("FEATURE_AFTER_DECISION")
+    _require_bound_schedule(binding, lateness)
     seed = spec.get("seed")
     if not isinstance(seed, str) or not seed:
         raise GroundedDiscoveryError("PREVIEW_SEED_REQUIRED")
@@ -1172,6 +1226,78 @@ def build_feature_preview(
     return payload
 
 
+def stored_preview_hashes(store: Any, journal_scope: str) -> list[str]:
+    found: list[str] = []
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if kind != "RESEARCH_ARTIFACT":
+            continue
+        try:
+            wrapper = json.loads(record.payload_json)
+            body = json.loads(str(wrapper.get("payload_canonical") or ""))
+        except (TypeError, json.JSONDecodeError):
+            continue
+        if (
+            isinstance(body, dict)
+            and body.get("artifact_kind") == "DISCOVERY_FEATURE_PREVIEW"
+            and body.get("journal_scope") == journal_scope
+            and isinstance(body.get("preview_sha256"), str)
+        ):
+            found.append(str(body["preview_sha256"]))
+    return found
+
+
+def persist_feature_preview(
+    store: Any,
+    *,
+    journal_scope: str,
+    preview: Mapping[str, Any],
+    git_sha: str,
+) -> None:
+    """Remember a preview in the store. Caller hash lists are not the memory."""
+
+    digest = str(preview.get("preview_sha256") or "")
+    if digest in stored_preview_hashes(store, journal_scope):
+        return
+    from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
+
+    now = datetime.now(timezone.utc)
+    body = {
+        "artifact_kind": "DISCOVERY_FEATURE_PREVIEW",
+        "journal_scope": journal_scope,
+        "preview_sha256": digest,
+        "target_included": False,
+        "selected_count": preview.get("selected_count"),
+        "total_count": preview.get("total_count"),
+    }
+    canonical = _canonical(body)
+    payload = {
+        "artifact_kind": "DISCOVERY_FEATURE_PREVIEW",
+        "payload_canonical": canonical,
+        "payload_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
+    }
+    payload_json = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    record_id = f"HFIC-ART-PREVIEW-{digest[:40].upper()}"
+    event = ResearchEvent(
+        record_id=record_id,
+        record_kind=RecordKind.RESEARCH_ARTIFACT,
+        entity_id=record_id,
+        hypothesis_version_id=None,
+        run_id=None,
+        transaction_id=f"RESEARCH-TXN-PREVIEW-{digest[:24].upper()}",
+        effective_at=now,
+        first_reliable_available_at=now,
+        supersedes_record_id=None,
+        payload_json=payload_json,
+        payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+        schema_version="1.0",
+        producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+        producer_git_sha=git_sha,
+        created_at=now,
+    )
+    store.append([event], transaction_id=event.transaction_id)
+
+
 def _public_query_from_recipe(recipe: Mapping[str, Any]) -> dict[str, Any]:
     query = recipe.get("spec")
     if not isinstance(query, Mapping):
@@ -1219,46 +1345,40 @@ def run_temporal_fixed_time_from_spec(
     stored_identity = str(recipe.get("scientific_identity") or "")
     if stored_identity and pre["spec_sha256"] != stored_identity:
         raise GroundedDiscoveryError("EXPERIMENT_RECIPE_IDENTITY_MISMATCH")
+    frozen_input = recipe.get("frozen_input")
+    if not isinstance(frozen_input, list) or not frozen_input:
+        raise GroundedDiscoveryError("FROZEN_INPUT_REQUIRED")
     from solana_alpha_lab.factory.hfic_grounded_discovery import (
         load_admitted_partition_rows,
         result_sha256,
     )
+    from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
 
-    lineage = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
-    sealed = data_root / "datasets" / "temporal_fixed_time_proxy" / "binding.json"
-    if lineage.is_file():
-        loaded = load_admitted_partition_rows(
-            data_root=data_root,
-            binding_doc=None,
-            partitions=None,
-            census_path=None,
-            observations_path=None,
-        )
-    elif sealed.is_file():
-        binding_doc = json.loads(sealed.read_text(encoding="utf-8"))
-        cohorts = binding_doc.get("cohorts") if isinstance(binding_doc, Mapping) else None
-        if not isinstance(cohorts, list):
-            raise GroundedDiscoveryError("DISCOVERY_BINDING_INCOMPLETE")
-        partitions = []
-        for item in cohorts:
-            if not isinstance(item, Mapping):
-                raise GroundedDiscoveryError("DISCOVERY_BINDING_INCOMPLETE")
-            partitions.append(
-                (
-                    str(item.get("cohort_id")),
-                    data_root / str(item.get("census_rel")),
-                    data_root / str(item.get("observations_rel")),
-                )
-            )
-        loaded = load_admitted_partition_rows(
-            data_root=None,
-            binding_doc=binding_doc,
-            partitions=partitions,
-            census_path=None,
-            observations_path=None,
-        )
-    else:
-        raise GroundedDiscoveryError("DISCOVERY_BINDING_INCOMPLETE")
+    partitions = []
+    binding_cohorts = []
+    for item in frozen_input:
+        if not isinstance(item, Mapping):
+            raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH")
+        census_rel = item.get("census_rel")
+        obs_rel = item.get("observations_rel")
+        if not isinstance(census_rel, str) or not isinstance(obs_rel, str):
+            raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH")
+        census_path = data_root / census_rel
+        obs_path = data_root / obs_rel
+        if (
+            sha256_file_streaming(census_path) != item.get("census_sha256")
+            or sha256_file_streaming(obs_path) != item.get("observations_sha256")
+        ):
+            raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH")
+        partitions.append((str(item.get("cohort_id")), census_path, obs_path))
+        binding_cohorts.append(dict(item))
+    loaded = load_admitted_partition_rows(
+        data_root=None,
+        binding_doc={"cohorts": binding_cohorts},
+        partitions=partitions,
+        census_path=None,
+        observations_path=None,
+    )
     computed = execute_temporal_discovery(
         loaded["census"],
         loaded["observations"],
