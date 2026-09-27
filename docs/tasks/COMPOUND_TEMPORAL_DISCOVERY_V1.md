@@ -39,6 +39,10 @@ managed_write_set:
   - configs/experiment_capability_registry_v2.yaml
   - catalog/schemas/hfic_temporal_query_v1.schema.json
   - catalog/assets/core.yaml
+  - catalog/assets/lifecycle.yaml
+  - catalog/catalog_manifest.yaml
+  - catalog/generated/asset_edges.json
+  - docs/PROJECT_MAP.md
   - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
   - .agents/skills/hypothesis-forge/SKILL.md
   - .cursor/commands/hypothesis-forge.md
@@ -47,6 +51,10 @@ managed_write_set:
   - tests/test_hfic_temporal_discovery_v1.py
   - tests/test_hfic_temporal_owner_path_v1.py
   - tests/test_discovery_evidence_release_bridge.py
+  - tests/test_hfic_temporal_production_runner_v1.py
+  - src/solana_alpha_lab/factory/capabilities.py
+  - src/solana_alpha_lab/factory/lane_classifier.py
+  - src/solana_alpha_lab/factory/document_runner.py
   - docs/evidence/compound_temporal_discovery/agent_attempt_1_query.json
   - docs/evidence/compound_temporal_discovery/agent_attempt_1_result.json
   - docs/evidence/compound_temporal_discovery/agent_attempt_1_critic.json

@@ -1500,7 +1500,36 @@ def run_recorded_discovery_query(
     if not isinstance(git_sha, str) or len(git_sha) != 40:
         raise GroundedDiscoveryError("GIT_SHA_REQUIRED")
     bound_scope = scope_bound_to_spec(spec, candidate_scope)
-    computed = execute_discovery_from_rows(census, observations, spec, binding)
+    replayed = None
+    if _is_temporal_query(spec):
+        from solana_alpha_lab.factory.hfic_temporal_discovery import (
+            TEMPORAL_CALCULATION_VERSION,
+            validate_temporal_query,
+        )
+
+        prevalidated = validate_temporal_query(spec)
+        admitted_meta = admit_discovery_binding(binding)
+        pre_binding_sha = data_binding_sha256(admitted_meta, census, observations)
+        replayed = next(
+            (
+                item
+                for item in list_discovery_looks(store, journal_scope)
+                if item.get("spec_sha256") == prevalidated["spec_sha256"]
+                and item.get("data_binding_sha256") == pre_binding_sha
+                and item.get("calculation_version") == TEMPORAL_CALCULATION_VERSION
+                and isinstance(item.get("result"), Mapping)
+            ),
+            None,
+        )
+    if replayed is None:
+        computed = execute_discovery_from_rows(census, observations, spec, binding)
+    else:
+        computed = {
+            "admitted": admit_discovery_binding(binding),
+            "summary": replayed["result"],
+            "members_projected": 0,
+            "replayed_without_evaluator": True,
+        }
     summary = computed["summary"]
     calc_version = str(summary.get("calculation_version") or CALCULATION_VERSION)
     temporal = summary.get("schema") == "smial.hfic-temporal-query"

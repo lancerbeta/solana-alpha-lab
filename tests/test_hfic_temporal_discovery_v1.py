@@ -340,7 +340,9 @@ class TemporalArithmeticTests(unittest.TestCase):
         self.assertEqual(summary["missing_stress_model"]["label"], "MODEL")
         self.assertFalse(summary["missing_stress_model"]["writes_raw_history"])
         self.assertAlmostEqual(summary["missing_target_mean_to_zero"], missing_break_even_mean(returns, 2), delta=TOLERANCE)
-        self.assertEqual(summary["independent_n"], 4)
+        self.assertEqual(summary["unique_decision_n"], 10)
+        self.assertEqual(summary["independence"], "UNKNOWN")
+        self.assertIsNone(summary["independent_replication"])
 
     def test_t05_cost_oracle_does_not_double_count_or_pretend_calibration(self) -> None:
         spec = _spec(
@@ -486,6 +488,48 @@ class TemporalArithmeticTests(unittest.TestCase):
         done = assess_tier_progress([first, compound], freeze_worthy=True)
         self.assertTrue(done["compound_executed"])
         self.assertNotEqual(changed_rows, observations)
+
+
+class TemporalRepairTests(unittest.TestCase):
+    def test_p2_exit_event_before_entry_is_not_an_outcome(self) -> None:
+        spec = _spec(
+            search_tier="SIMPLE_SCREEN",
+            features=[{"name": "mark", "op": "point_value", "field_id": PRICE, "point": "Y3600"}],
+            all=[{"feature": "mark", "op": "gte", "value": 0.0}],
+            entry_model={"kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT", "assumed_latency_seconds": 3500},
+            cost_profile=None,
+        )
+        rows = _path("a", [1.0, 1.0, 1.0, 1.0], (1000.0, 1000.0), 2.0)
+        for row in rows:
+            if row["point_id"] == "Y7200":
+                row["event_time"] = "2026-09-03T02:00:00Z"
+                row["first_reliable_available_at"] = "2026-09-03T02:05:00Z"
+        summary = execute_discovery_from_rows([_census("a")], rows, spec, _binding())["summary"]
+        self.assertEqual(summary["observed_target_n"], 0)
+
+    def test_p2_lateness_mismatch_stops_before_values(self) -> None:
+        class Boom(list):
+            def __iter__(self):
+                raise AssertionError("values read")
+
+        binding = _binding()
+        binding[0]["schedule_lateness_seconds"] = 100
+        with self.assertRaises(GroundedDiscoveryError) as exc:
+            execute_discovery_from_rows([_census("a")], Boom(), _spec(), binding)
+        self.assertEqual(exc.exception.code, "SCHEDULE_LATENESS_MISMATCH")
+
+    def test_p3_generalized_break_even_and_overlap(self) -> None:
+        edge = break_even_haircut(1.0, 0.2, 0.0, -0.5)
+        self.assertAlmostEqual(edge, 0.4375, delta=TOLERANCE)
+        from solana_alpha_lab.factory.hfic_temporal_discovery import break_even_haircut as impl
+
+        produced = impl(1.0, q=0.2, f=0.0, r_fail=-0.5)
+        self.assertAlmostEqual(produced["h_break_even"], 0.4375, delta=TOLERANCE)
+        success, net_old = estimated_net_proxy(1.0, 0.375, 0.2, -0.5, 0.0)
+        del success
+        self.assertAlmostEqual(net_old, 0.10, delta=TOLERANCE)
+        _success, net_new = estimated_net_proxy(1.0, 0.4375, 0.2, -0.5, 0.0)
+        self.assertAlmostEqual(net_new, 0.0, delta=TOLERANCE)
 
 
 class TemporalBoundaryTests(unittest.TestCase):

@@ -11578,6 +11578,11 @@
       "target_asset_id": "CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001"
     },
     {
+      "source_asset_id": "MODULE-HFIC-TEMPORAL-DISCOVERY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001"
+    },
+    {
       "source_asset_id": "MODULE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001"

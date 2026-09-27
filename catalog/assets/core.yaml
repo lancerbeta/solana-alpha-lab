@@ -25648,7 +25648,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: bff643190dac24712086cd58c2ce5bd8731fc4927feaf837188156c0e6115cc9}
+  integrity: {kind: sha256, sha256: 6e88094c7bb9f9bbd13cd5316c8ac20001592eb1782fe1243b805fe949814e13}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25971,7 +25971,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: bff643190dac24712086cd58c2ce5bd8731fc4927feaf837188156c0e6115cc9}
+  integrity: {kind: sha256, sha256: 6e88094c7bb9f9bbd13cd5316c8ac20001592eb1782fe1243b805fe949814e13}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
@@ -31971,7 +31971,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lane_classifier.py', repository_path: src/solana_alpha_lab/factory/lane_classifier.py}
-  integrity: {kind: sha256, sha256: 3387f33e3a996135993e5680ce00d5259b076556352e45aeac77e808b4478d52}
+  integrity: {kind: sha256, sha256: c310bc8e6aef354de17fb844f9bff0398e74e3589ee82bc299d95a6a055379f4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -37819,6 +37819,25 @@ records:
   evidence: []
   search_terms: [HYPOTHESIS_FORGE, HFIC, SELECTION, SPEC, BLOCK_A]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-HFIC-TEMPORAL-DISCOVERY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Pure temporal query, relative target and assumption-cost proxy used by ordinary Forge discovery.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-27'
+  truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
+  integrity: {kind: sha256, sha256: 8daab29782abefa659f450d2f0af147012deec80f8de8aa983d05a08515d2e82}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, TEMPORAL, COMPOUND]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
 - asset_id: MODULE-HFIC-SELECTION-ROBUSTNESS-GATE-001
   record_version: '1.0'
   asset_type: script

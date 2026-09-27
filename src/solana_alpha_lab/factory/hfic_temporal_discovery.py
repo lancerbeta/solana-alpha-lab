@@ -392,11 +392,25 @@ def estimate_net_proxy(
     return {"r_success": success, "estimated_net_proxy": proxy}
 
 
-def break_even_haircut(r_mark: float, *, q: float, f: float) -> float | None:
+def break_even_haircut(
+    r_mark: float,
+    *,
+    q: float,
+    f: float,
+    r_fail: float = -1.0,
+) -> dict[str, Any]:
+    """Generalized haircut that zeros the proxy. Not clamped into [0, 1)."""
+
     denominator = (1.0 - q) * (1.0 + r_mark)
-    if denominator <= 0:
-        return None
-    return 1.0 - (1.0 + f) / denominator
+    if denominator == 0:
+        return {"applicable": False, "h_break_even": None, "reason": "ZERO_DENOMINATOR"}
+    value = 1.0 - ((1.0 - q) - q * r_fail + f) / denominator
+    return {
+        "applicable": True,
+        "h_break_even": value,
+        "inside_unit_interval": 0 <= value < 1,
+        "reason": "INSIDE_UNIT_INTERVAL" if 0 <= value < 1 else "OUTSIDE_UNIT_INTERVAL",
+    }
 
 
 def _deadline_for(anchor: object, point: str, lateness: int):
@@ -701,11 +715,18 @@ def _cost_views(r_mark: float | None, profile: Mapping[str, Any] | None) -> dict
             r_fail=float(row["r_fail"]),
             f=float(row["f"]),
         )
-        edge = break_even_haircut(r_mark, q=float(row["q"]), f=float(row["f"]))
+        edge = break_even_haircut(
+            r_mark,
+            q=float(row["q"]),
+            f=float(row["f"]),
+            r_fail=float(row["r_fail"]),
+        )
         scenarios[name] = {
             **estimated,
-            "h_break_even": edge,
-            "basis": "POPULATION_MEAN",
+            "h_break_even": edge.get("h_break_even"),
+            "h_break_even_applicable": edge.get("applicable"),
+            "h_break_even_inside_unit_interval": edge.get("inside_unit_interval"),
+            "basis": "OBSERVED_CASE_MEAN",
             "label": "ESTIMATED_NET_PROXY",
         }
         proxies.append(float(estimated["estimated_net_proxy"]))
@@ -740,6 +761,12 @@ def execute_temporal_discovery(
     bound = validate_temporal_query(spec)
     body = bound["scientific_body"]
     lateness = int(body["schedule_lateness_seconds"])
+    for item in binding:
+        declared = item.get("schedule_lateness_seconds")
+        if declared is None:
+            continue
+        if isinstance(declared, bool) or not isinstance(declared, int) or declared != lateness:
+            raise GroundedDiscoveryError("SCHEDULE_LATENESS_MISMATCH")
     decision_point = str(body["decision_point"])
     grouped = _grouped_cells(observations)
     admitted_pairs = {
@@ -748,9 +775,10 @@ def execute_temporal_discovery(
     cohort_ids = [str(item["cohort_id"]) for item in admitted["cohorts"]]
     features = list(body["features"])
     predicates = list(body["predicates"])
-    seen: set[tuple[str, str, str, str]] = set()
+    seen: set[tuple[str, str]] = set()
     members: list[dict[str, Any]] = []
     duplicate_count = 0
+    integrity_conflicts = 0
     for row in census:
         mint = str(row.get("mint") or "")
         if not mint:
@@ -758,13 +786,13 @@ def execute_temporal_discovery(
         cohort = str(row.get("cohort_id") or "")
         release = str(row.get("release_id") or "")
         anchor = row.get("authoritative_anchor")
-        anchor_text = str(anchor or "")
-        identity = (cohort, release, mint, anchor_text)
+        decision_deadline = _deadline_for(anchor, decision_point, lateness)
+        decision_key = decision_deadline.strftime("%Y-%m-%dT%H:%M:%SZ") if decision_deadline else str(anchor or "")
+        identity = (mint, decision_key)
         if identity in seen:
             duplicate_count += 1
             continue
         seen.add(identity)
-        decision_deadline = _deadline_for(anchor, decision_point, lateness)
         block = decision_deadline.date().isoformat() if decision_deadline is not None else "UNANCHORED"
         exclusion = None
         in_base = False
@@ -827,10 +855,24 @@ def execute_temporal_discovery(
                 legal.append((available, exit_row))
             if legal:
                 latest_exit = max(item[0] for item in legal)
-                selected = _select_cell(
-                    [row for available, row in legal if available == latest_exit],
-                    latest_exit,
-                )
+                tied_rows = [row for available, row in legal if available == latest_exit]
+                selected = _select_cell(tied_rows, latest_exit)
+                point_time = _deadline_for(anchor, exit_point, 0)
+                event_times = [
+                    _parse_time(row.get("event_time")) or _parse_time(row.get("observed_at"))
+                    for row in tied_rows
+                ]
+                observed_times = [item for item in event_times if item is not None]
+                observed_time = observed_times[0] if len(set(observed_times)) == 1 else None
+                if observed_time is None:
+                    observed_time = point_time
+                if (
+                    observed_time is None
+                    or entry_at is None
+                    or observed_time <= entry_at
+                    or selected.get("status") != "OBSERVED"
+                ):
+                    selected = {"status": "NOT_AFTER_ENTRY"}
                 reference = _cell(
                     grouped,
                     (cohort, release, mint, str(body["target"]["reference_point"]), PRICE),
@@ -932,7 +974,12 @@ def execute_temporal_discovery(
         "observed_target_n": len(observed),
         "missing_target_n": len(missing_target),
         "duplicate_delivery_count": duplicate_count,
-        "independent_n": len(observed),
+        "integrity_conflict_count": integrity_conflicts,
+        "unique_mint_n": len({mint for mint, _decision in seen}),
+        "unique_decision_n": len(seen),
+        "block_count": len({item["block"] for item in observed}),
+        "independence": "UNKNOWN",
+        "independent_replication": None,
         "later_target_observed_n": len(observed),
         "feature_admissible_n": len(decision_members),
         "mean_target": observed_mean,
@@ -981,7 +1028,7 @@ def execute_temporal_discovery(
             "target_observed_after_decision": len(observed),
             "mean_target": observed_mean,
             "mean_target_kind": "PRICE_RELATIVE_PROXY",
-            "independent_replication": duplicate_count == 0,
+            "independent_replication": None,
         },
         "exclusion_reasons": dict(sorted(
             (key, sum(1 for item in members if item["exclusion"] == key))
@@ -1123,6 +1170,113 @@ def build_feature_preview(
     if len(encoded) > PREVIEW_BYTE_LIMIT:
         raise GroundedDiscoveryError("PREVIEW_TOO_LARGE")
     return payload
+
+
+def _public_query_from_recipe(recipe: Mapping[str, Any]) -> dict[str, Any]:
+    query = recipe.get("spec")
+    if not isinstance(query, Mapping):
+        raise GroundedDiscoveryError("EXPERIMENT_RECIPE_INVALID")
+    body = query.get("scientific_body")
+    if not isinstance(body, Mapping):
+        raise GroundedDiscoveryError("EXPERIMENT_RECIPE_INVALID")
+    return {
+        "schema": TEMPORAL_SCHEMA,
+        "schema_version": TEMPORAL_SCHEMA_VERSION,
+        "query_id": query.get("query_id") or "frozen-recipe",
+        "population": "BASE_X",
+        "search_tier": query.get("search_tier") or "COMPOUND_SCREEN",
+        "budget_allocation": query.get("budget_allocation") or "AUTO",
+        "decision": {"point_id": body["decision_point"], "time_policy": "BOUND_SCHEDULE_CUTOFF"},
+        "schedule": {"lateness_seconds": body["schedule_lateness_seconds"]},
+        "features": body["features"],
+        "all": body["predicates"],
+        "target": body["target"],
+        "entry_model": body["entry_model"],
+        "cost_profile": body.get("cost_profile"),
+        "evaluation": body.get("evaluation") or {},
+    }
+
+
+def run_temporal_fixed_time_from_spec(
+    spec: Mapping[str, Any],
+    *,
+    root: Path,
+    capture_hooks: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Production adapter. Identity is checked before the evaluator runs."""
+
+    del root
+    hooks = dict(capture_hooks or {})
+    data_root = hooks.get("data_root")
+    if not isinstance(data_root, Path):
+        raise GroundedDiscoveryError("DATA_ROOT_REQUIRED")
+    parameters = spec.get("parameters") if isinstance(spec.get("parameters"), Mapping) else {}
+    recipe = parameters.get("temporal_recipe") if isinstance(parameters, Mapping) else None
+    if not isinstance(recipe, Mapping):
+        raise GroundedDiscoveryError("EXPERIMENT_RECIPE_INVALID")
+    public = _public_query_from_recipe(recipe)
+    pre = validate_temporal_query(public)
+    stored_identity = str(recipe.get("scientific_identity") or "")
+    if stored_identity and pre["spec_sha256"] != stored_identity:
+        raise GroundedDiscoveryError("EXPERIMENT_RECIPE_IDENTITY_MISMATCH")
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        load_admitted_partition_rows,
+        result_sha256,
+    )
+
+    lineage = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+    sealed = data_root / "datasets" / "temporal_fixed_time_proxy" / "binding.json"
+    if lineage.is_file():
+        loaded = load_admitted_partition_rows(
+            data_root=data_root,
+            binding_doc=None,
+            partitions=None,
+            census_path=None,
+            observations_path=None,
+        )
+    elif sealed.is_file():
+        binding_doc = json.loads(sealed.read_text(encoding="utf-8"))
+        cohorts = binding_doc.get("cohorts") if isinstance(binding_doc, Mapping) else None
+        if not isinstance(cohorts, list):
+            raise GroundedDiscoveryError("DISCOVERY_BINDING_INCOMPLETE")
+        partitions = []
+        for item in cohorts:
+            if not isinstance(item, Mapping):
+                raise GroundedDiscoveryError("DISCOVERY_BINDING_INCOMPLETE")
+            partitions.append(
+                (
+                    str(item.get("cohort_id")),
+                    data_root / str(item.get("census_rel")),
+                    data_root / str(item.get("observations_rel")),
+                )
+            )
+        loaded = load_admitted_partition_rows(
+            data_root=None,
+            binding_doc=binding_doc,
+            partitions=partitions,
+            census_path=None,
+            observations_path=None,
+        )
+    else:
+        raise GroundedDiscoveryError("DISCOVERY_BINDING_INCOMPLETE")
+    computed = execute_temporal_discovery(
+        loaded["census"],
+        loaded["observations"],
+        public,
+        loaded["cohorts"],
+    )
+    summary = computed["summary"]
+    return {
+        "status": "COMPLETE",
+        "terminal": "INCONCLUSIVE",
+        "claim_level": summary.get("claim_level"),
+        "provider_api_rpc_wss_calls": 0,
+        "labeled_net_return": False,
+        "target_kind": summary.get("target_kind"),
+        "spec_sha256": summary.get("spec_sha256"),
+        "result_sha256": result_sha256(summary),
+        "summary": summary,
+    }
 
 
 def execute_fixed_time_proxy_capability(

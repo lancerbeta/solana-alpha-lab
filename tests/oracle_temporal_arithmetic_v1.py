@@ -21,8 +21,8 @@ def estimated_net_proxy(r_mark: float, h: float, q: float, r_fail: float, f: flo
     return success, proxy
 
 
-def break_even_haircut(r_mark: float, q: float, f: float) -> float:
-    return 1.0 - (1.0 + f) / ((1.0 - q) * (1.0 + r_mark))
+def break_even_haircut(r_mark: float, q: float, f: float, r_fail: float = -1.0) -> float:
+    return 1.0 - ((1.0 - q) - q * r_fail + f) / ((1.0 - q) * (1.0 + r_mark))
 
 
 def missing_break_even_mean(observed: list[float], n_missing: int) -> float:

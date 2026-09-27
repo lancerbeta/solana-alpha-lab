@@ -370,6 +370,19 @@ def classify_lane(
             reason_codes=("EXPERIMENT_SPEC_INVALID",),
             next_action="CORRECT_EXPERIMENT_SPEC",
         )
+    if descriptor is None and not uses_observation_request:
+        try:
+            offline = _load_capabilities(
+                root, registry_relative=CAPABILITY_REGISTRY_V2_RELATIVE
+            ).get(capability_id)
+        except (OSError, ValueError, yaml.YAMLError, jsonschema.ValidationError):
+            offline = None
+        if (
+            isinstance(offline, Mapping)
+            and offline.get("effect_class") == "OFFLINE_READ_ONLY"
+            and int(offline.get("max_provider_calls") or 0) == 0
+        ):
+            descriptor = offline
     if descriptor is None:
         return _change_lane("CAPABILITY_NOT_REGISTERED")
     if descriptor["status"] != "ACCEPTED":
