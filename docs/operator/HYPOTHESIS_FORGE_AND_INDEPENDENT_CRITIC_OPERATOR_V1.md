@@ -1171,8 +1171,9 @@ decision after collection
 - Сравни selected candidate с каждой capsule по mechanism/state, actor/counterparty,
   population, decision timestamp, X/Y/horizon и falsifier/control/economic distinction.
 - Лексическое равенство identity-полей **не** требуется для duplicate suspicion.
-- `memory_status` (`HARD_CLOSE`, `PARK`, `NOT_SELECTED_IN_SESSION`, `AMBIGUOUS`,
-  `HISTORICAL`) остаётся различимым; видимость prior ≠ automatic hard-close.
+- `memory_status` (`HARD_CLOSE`, `PARK`, `NOT_SELECTED_IN_SESSION`,
+  `TECHNICAL_STOP`, `AMBIGUOUS`, `HISTORICAL`) остаётся различимым; видимость prior ≠ automatic hard-close.
+  `TECHNICAL_STOP` — записанный `KILL_UNBOUND_EVIDENCE`: terminal сохраняется, тот же scope не банит следующий поиск.
 - Найди ближайший prior mechanism и terminal.
 - Проверь equivalence under renaming и threshold changes.
 - Определи, наследует ли кандидат prior null/negative evidence.
