@@ -5,7 +5,7 @@ Ordinary discovery admission now comes from the published labels contract.
 on an already published discovery corpus is derived only when `REQUIRED_LABELS`
 match and no protected holdout assignment is present.
 
-Memory outcome: `SCOPED_MEMORY_REPAIR`. Recoverable scope from immutable cycle records reaches both Prompt A `ranked_prior_entries` and Critic capsules. A shared discovery scope is not written onto every hypothesis. A runner-up packet keeps only scope proven on that candidate. When that scope is not the scope the discovery look was computed for, the packet does not keep the primary result, result hash, or prior relations. A valid same-scope close still blocks. `PARK`, `NOT_SELECTED` and `NO_WORTHY` do not ban a family.
+Memory outcome: `SCOPED_MEMORY_REPAIR`. Recoverable scope from immutable cycle records reaches both Prompt A `ranked_prior_entries` and Critic capsules. A shared discovery scope is not written onto every hypothesis. A runner-up packet keeps only scope proven on that candidate. When that scope is not the scope the discovery look was computed for, the packet drops the primary result and result hash, drops the primary prior relations, and records prior relations only for the runner-up's own complete scope. A valid same-scope close still blocks. `PARK`, `NOT_SELECTED`, `NO_WORTHY` and technical stops (`OBSERVABILITY_BLOCKED`, `INPUT_NOT_READY`, `HOLDOUT_UNRESOLVED`) do not ban a family.
 
 Live readback after the change: binding admitted for the three published
 cohorts, `values_loaded=false`, store inventory unchanged, discovery looks 0,
