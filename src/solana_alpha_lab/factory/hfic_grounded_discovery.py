@@ -1435,7 +1435,9 @@ def run_recorded_discovery_query(
             stored if isinstance(stored, Mapping) else {},
             candidate_scope,
         )
-        if isinstance(stored, Mapping) and relation != "LOOK_SCOPE_UNBOUND":
+        if isinstance(stored, Mapping) and any(
+            _axis_text(stored.get(key)) for key in _LOOK_CLAIM_AXES
+        ):
             confirming = {key: value for key, value in stored.items() if _axis_text(value)}
         else:
             confirming = {}

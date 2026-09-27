@@ -123,7 +123,10 @@ MODEL_EFFORT: `SOL_XHIGH`.
 - **DECISION_DELTA:** `holdout=false` is derived only when published labels
   match `REQUIRED_LABELS` and no protected holdout assignment is present.
   Unknown, forbidden, conflicting, or hash-mismatched publications stop
-  before the value loader. Canonical prior memory is compared even when the
+  before the value loader. A discovery look keeps the scope it was computed
+  under; a repeated spec cannot rename that result. An explicit scope
+  contradiction stops before a scientific record. A narrower idea is saved
+  without a PASS or a scientific close on the foreign look. Canonical prior memory is compared even when the
   caller prior list is empty. PARK, NOT_SELECTED, NO_WORTHY and technical
   stops do not ban a family. A valid same-scope close still blocks.
 - **UNCERTAINTY_REMOVED:** the live corpus binding is admissible without

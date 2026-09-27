@@ -2070,12 +2070,16 @@ def freeze_draft(
         except (PriorMemoryCapacityError, PriorMemoryUnidentifiedError) as exc:
             raise HficSessionError(exc.code) from exc
     grounded = draft.get("grounded_evidence")
-    if isinstance(grounded, Mapping) and _ordinary_discovery_requested(draft, preflight_receipt):
-        grounded = _bind_selected_look(
-            grounded,
-            selected_card if isinstance(selected_card, Mapping) else {},
-            store=store,
-        )
+    if isinstance(grounded, Mapping):
+        from solana_alpha_lab.factory.hfic_grounded_discovery import stored_look_scope
+
+        look_scope = stored_look_scope(store, grounded) if store is not None else None
+        if look_scope:
+            grounded = _bind_selected_look(
+                grounded,
+                selected_card if isinstance(selected_card, Mapping) else {},
+                store=store,
+            )
     if isinstance(grounded, Mapping) and grounded.get("look_confirms_selected") is not False:
         from solana_alpha_lab.factory.hfic_grounded_discovery import (
             GroundedDiscoveryError,
@@ -6964,19 +6968,26 @@ def finalize_session(
             clock=clock,
         )
     if terminal == "PASS_TO_CLASSIFICATION":
-        fake = critic_result.get("classifier_receipt")
-        if fake:
-            raise HficSessionError("CLASSIFIER_RECEIPT_INVALID")
-        if existing is not None and existing.get("session_state") == "AWAITING_CLASSIFICATION":
-            return existing
-        return persist_intermediate_cycle(
-            store,
-            frozen,
-            critic_result,
-            repo_root=repo_root,
-            phase="AWAITING_CLASSIFICATION",
-            clock=clock,
-        )
+        if _foreign_look_blocks_scientific_terminal(frozen, critic_result):
+            terminal = "KILL_UNBOUND_EVIDENCE"
+            observed_terminal = terminal
+            critic_result = dict(critic_result)
+            critic_result["critic_terminal"] = terminal
+            critic_result["next"] = "STOP"
+        else:
+            fake = critic_result.get("classifier_receipt")
+            if fake:
+                raise HficSessionError("CLASSIFIER_RECEIPT_INVALID")
+            if existing is not None and existing.get("session_state") == "AWAITING_CLASSIFICATION":
+                return existing
+            return persist_intermediate_cycle(
+                store,
+                frozen,
+                critic_result,
+                repo_root=repo_root,
+                phase="AWAITING_CLASSIFICATION",
+                clock=clock,
+            )
     classifier_receipt = None
     claimed_terminal = None
     classifier_view = _classifier_frozen_view(frozen, critic_result)

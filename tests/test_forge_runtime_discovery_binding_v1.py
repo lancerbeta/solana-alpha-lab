@@ -1494,13 +1494,8 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             )
 
     def test_narrower_idea_cannot_take_scientific_pass(self) -> None:
-        from solana_alpha_lab.factory.hfic_session import (
-            apply_classification,
-            finalize_session,
-        )
-        from tests.test_fast_lane_classifier import submission
+        from solana_alpha_lab.factory.hfic_session import finalize_session
         from tests.test_hfic_cli import critic_result_from_packet_only
-        from tests.test_hfic_one_frozen_runner_up_failover_v1 import _with_selected_feats
 
         with tempfile.TemporaryDirectory() as raw:
             session = self._freeze_scoped_runner(
@@ -1515,7 +1510,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                 frozen["critic_input_packet"]["grounded_evidence"].get("look_confirms_selected")
             )
             store = ResearchStore(session["data_root"])
-            waiting = finalize_session(
+            done = finalize_session(
                 frozen,
                 critic_result_from_packet_only(
                     frozen["critic_input_packet"], "PASS_TO_CLASSIFICATION"
@@ -1524,23 +1519,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                 repo_root=ROOT,
                 data_root=session["data_root"],
             )
-            spec = _with_selected_feats(submission(), frozen["critic_input_packet"])
-            spec["experiment_spec"]["data_bindings"] = [
-                {
-                    "binding_id": "BINDING-DATASET-MISSING-001",
-                    "source_kind": "DATASET_MANIFEST",
-                    "stable_id": "DATASET-MANIFEST-MISSING-001",
-                    "expected_content_sha256_or_dataset_fingerprint": "a" * 64,
-                }
-            ]
-            spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
-            done = apply_classification(
-                waiting,
-                spec,
-                store=store,
-                repo_root=ROOT,
-                data_root=session["data_root"],
-            )
+            self.assertNotEqual(done.get("session_state"), "AWAITING_CLASSIFICATION")
             self.assertEqual(
                 done["decisions"][frozen["selected_candidate_id"]]["reason_code"],
                 "KILL_UNBOUND_EVIDENCE",
