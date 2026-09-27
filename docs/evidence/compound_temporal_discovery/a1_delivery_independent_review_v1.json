@@ -17,32 +17,32 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "On 92bd16b3 a non-admitted census row does not reserve (mint, decision), and duplicate replacement skips BINDING_COHORT_MISMATCH so an outsider plus an identical second delivery is not double-counted. Frozen-input hash check, shared lateness gate, and intent-before-eval remain in place."
+        "On 822d4e37 schedule lateness is projected from the verified document, the signature index is one pass, preview identity includes the journal, and budget classification runs before the evaluator. The capabilities.py pin moved only for the additive temporal router; the other five factory-core pins stayed."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "The published vertical records simple then compound, freeze, classify_lane and DocumentRunner readback. An identical second delivery keeps the mean. offline_v1_1_spec is only the ExperimentSpec carrier for the frozen temporal recipe."
+        "The published vertical reaches classify_lane and DocumentRunner, and a missing schedule is CANONICAL_SCHEDULE_UNBOUND without a write. NO_WORTHY coverage is proven on the closure function, not yet on a schema-valid freeze with an empty selected candidate."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "The ACCEPTED entrypoint and run_registered_fixed_time_proxy both load rows only from recipe.frozen_input under data_root. A direct row-injection call is not that replay. Explicit COMPOUND_INAPPLICABLE remains a researcher skip, not a silent exhaustion."
+        "load_hashed_schedule_document does not invent lateness. resolve_canonical_release_schedule still verifies factory X300. A missing schedule is CANONICAL_SCHEDULE_UNBOUND."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "discovery-preview writes store memory only when --store and --journal-scope are both set. SCHEDULE_CONTEXT_UNBOUND, SCHEDULE_LATENESS_MISMATCH, PREVIEW_ENVELOPE_EXHAUSTED and FROZEN_INPUT_MISMATCH print TECHNICAL_STOP scientific_negative=false."
+        "SEARCH_EXHAUSTED_WITHOUT_COMPOUND is now in the technical-stop banner. A schema-valid freeze of NO_WORTHY without a selected candidate was not shown, so the owner path for that closure is not fully operable."
       ]
     }
   ],
-  "verdict": "PASS",
+  "verdict": "NOT_READY",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "NO_MERGE",
