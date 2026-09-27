@@ -742,16 +742,16 @@ def _near_close_unresolved(candidate: Mapping[str, Any], prior: Mapping[str, Any
 
     if not _valid_close(prior):
         return False
-    present = [
-        key
-        for key in _CONTENT_AXES
-        if prior.get(key) not in (None, "")
+    content_present = [
+        key for key in _CONTENT_AXES if prior.get(key) not in (None, "")
     ]
-    if len(present) < 3:
+    if not content_present:
         return False
-    return all(candidate.get(key) == prior.get(key) for key in present) and len(
-        present
-    ) < len(_CONTENT_AXES)
+    if not all(candidate.get(key) == prior.get(key) for key in content_present):
+        return False
+    if len(content_present) < len(_CONTENT_AXES):
+        return len(content_present) >= 3
+    return prior.get("evidence_surface_mode") in (None, "")
 
 
 def _merge_scope_priors(

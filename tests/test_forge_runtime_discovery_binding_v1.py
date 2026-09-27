@@ -368,6 +368,13 @@ class PriorScopeTransportTests(unittest.TestCase):
                 canonical_priors=[prior],
             )
         self.assertEqual(exact.exception.code, "EXACT_PRIOR_SCOPE_MATCH")
+        missing_surface = {key: value for key, value in prior.items() if key != "evidence_surface_mode"}
+        with self.assertRaises(GroundedDiscoveryError) as unresolved_surface:
+            bind_prior_scope_evidence(
+                {"candidate_scope": same, "priors": []},
+                canonical_priors=[missing_surface],
+            )
+        self.assertEqual(unresolved_surface.exception.code, "UNKNOWN_PRIOR_SCOPE")
         parked = {**prior, "memory_status": "PARK", "reason_code": "OWNER_PRIORITY_PARK"}
         parked_bound = bind_prior_scope_evidence(
             {"candidate_scope": same, "priors": []},

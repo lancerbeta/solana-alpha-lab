@@ -417,7 +417,7 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
 ```
 
 ```text
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <published-corpus-root> --store <explicit-journal> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <canonical-data-root> --store <canonical-data-root> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
 ```
 
 ## A0. Authority и hard boundaries

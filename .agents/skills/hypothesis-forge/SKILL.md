@@ -274,14 +274,15 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-inp
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-binding --format json
 ```
 
-   Then run the query. Omit `--binding`; pass `--data-root` for the published
-   corpus and `--store` for the explicit journal. Do not pass a combined file
-   when cohort hashes differ. An exact repeated `--cohort-partition` is
-   eliminated; a second path for the same cohort stops. Copy the whole returned
-   evidence object onto the draft as `grounded_evidence`.
+   Then run the query. Omit `--binding`. On an authorized ordinary slash,
+   pass the canonical data root as both `--data-root` and `--store`, because
+   freeze checks the look in that store. Do not pass a combined file when
+   cohort hashes differ. An exact repeated `--cohort-partition` is eliminated;
+   a second path for the same cohort stops. Copy the whole returned evidence
+   object onto the draft as `grounded_evidence`.
 
 ```text
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <published-corpus-root> --store <explicit-journal> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <canonical-data-root> --store <canonical-data-root> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
 ```
 
    Pass `--journal-scope` as the preflight `search_key_sha256`. Copy the
@@ -294,8 +295,8 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
    `evidence_surface_mode` stays unset unless the run is explicit CONTROL.
    Do not invent those fields.
    CONTROL does not run this command. `discovery-binding` does not load
-   values. On an authorized ordinary slash the journal store is the canonical
-   data root, because freeze checks the look there.
+   values. On an authorized ordinary slash, `--data-root` and `--store` are
+   both the canonical data root.
    Then run **PROMPT A** from the operator pack using
    `HFIC-V1.2` and only the bounded `FORGE_CONTEXT_PACKET` plus explicitly
    resolved evidence. In `CURRENT_REPRESENTATION_CONTROL_V1`, "explicitly
