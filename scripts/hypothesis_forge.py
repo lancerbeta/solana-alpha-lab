@@ -134,6 +134,7 @@ def emit(payload: dict[str, Any], *, exit_code: int = 0) -> int:
 _TECHNICAL_STOPS = frozenset(
     {
         "SCHEDULE_CONTEXT_UNBOUND",
+        "CANONICAL_X300_SCHEDULE_INCOMPATIBLE",
         "SEARCH_EXHAUSTED_WITHOUT_COMPOUND",
         "SCHEDULE_LATENESS_MISMATCH",
         "FROZEN_INPUT_MISMATCH",
