@@ -15,9 +15,10 @@
   "capability_radar_now": "NONE",
   "implementation_bindings": {
     "catalog/assets/core.yaml": "42c378ff4a47e343d551a548f935293c030e8ceb825785a4b944b84063eef4b0",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "7b583a8964392e3df77922dcdbc0fcb5deb0db042899899e21b561c842847bfa",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "af693f1fb267ba00bd32d8e53eda5adef62a788bb561f19d9fd5560c0fcf9bf5",
     "docs/reports/temporal_cohort_evidence_closure/a1_owner_readout_v1.md": "ed50ac96e545223c810ee7a935d8f463e81fcd070d084eda500d9dc68d4faff2",
-    "docs/tasks/TEMPORAL_COHORT_EVIDENCE_CLOSURE_V1.md": "b80838eee28ca8593c14e5a7eaca40eab3eb3b2d9c4b5f04ea1ab7223c0ee94b",
+    "docs/tasks/TEMPORAL_COHORT_EVIDENCE_CLOSURE_V1.md": "f38cc0f761076916f12b000ad962638e3c5007f8012a8756c93f8e667984cd37",
     "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "843db3e7d12cf40a16c1e52474e5309b3f5973ba1f8f9871054fd69685041a49",
     "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "b79f936e7db7a512c7a79af3b14d7f815acb6b2a11793ba8982670f25c609b9b",
     "tests/test_hfic_temporal_discovery_v1.py": "b18f6f5a7a7fbaec154cac22eb1dc8ecf62c68edf18b5d4604e546c0374f1b63",
@@ -33,14 +34,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/temporal_cohort_evidence_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "03c739041272c2c3e02a545e795c798d826fbb28392bc3975ad5ff8ee2679979",
+    "sha256": "ec18847dd949e78de8d45316f8df066971d20e48fbad67119e11ebdfe3acc358",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_COHORT_SLICE_AND_VERTICAL",
     "independent_review": {
       "path": "docs/evidence/temporal_cohort_evidence_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "51e92036c79ad6c5399752624d1bcc76a7aa52b0e4b9e863c45719d2ae20d01f",
+      "sha256": "353e1af4e92305fc034957835a58438c533a029d9473651d8294c0a02ddc8d6d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
