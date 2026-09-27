@@ -17,29 +17,29 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Legacy HYPOTHESIS_VERSION records without scope fields recover the same candidate-bound axes into ranked_prior_entries and Critic capsules. Shared discovery_candidate_scope is not applied. A runner-up packet keeps that candidate's scope, drops a mismatched discovery result including a sparse executed scope, and still raises EXACT_PRIOR_SCOPE_MATCH on a same-scope HARD_CLOSE."
+        "Classify rewrites a runner-up scientific pass to DENY_INTEGRITY_MISMATCH when the packet has no linked computed look. apply_classification persists KILL_UNBOUND_EVIDENCE with reason GROUNDED_RESULT_UNBOUND. A same-scope runner-up with linked result refs keeps the ordinary classify path. A direct finalize that claims PASS with this deny receipt still raises CLASSIFIER_TERMINAL_MISMATCH rather than recording a pass."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "LegacyRankedPriorRecoveryTests starts from a payload without target or estimand and checks real preflight ranked_prior_entries against Critic capsules. PerCandidateScopePersistenceTests keeps selected A and runner-up B scopes distinct, drops A's result on mismatch and on a sparse executed scope, and raises on an exact runner-up close."
+        "test_unlinked_runner_up_cannot_take_scientific_pass freezes A and B on different scopes, kills the primary, accepts PASS_TO_CLASSIFICATION, then classify ends KILL_UNBOUND_EVIDENCE with GROUNDED_RESULT_UNBOUND. test_same_scope_runner_up_keeps_ordinary_classification keeps the linked result refs from one discovery-execute and classify stays PASS_DATA_OPTION_REQUIRED."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=7bf146a3049335aaa49d84e514892d9c1cfad41940a1ec6d76fcfd7b5065f6ce",
-        "Shared discovery scope is not stamped onto every hypothesis. Runner-up scope comes from that candidate's card. A mismatched or sparse executed look does not keep the primary discovery result. A same-scope close still raises."
+        "packet_fingerprint_sha256=aa98427efc3eada04f13f7d4a707777a28dfed224285758dceee3e13feda7701",
+        "A runner-up without a linked computed look cannot exit classify as PASS_FAST_LANE_READY, PASS_DATA_OPTION_REQUIRED, or PASS_CHANGE_LANE_REQUIRED. The typed outcome is KILL_UNBOUND_EVIDENCE with GROUNDED_RESULT_UNBOUND. A same-scope runner-up with linked result refs stays on the ordinary classify path."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "The readout matches the repair: recoverable scope reaches Prompt A and Critic, a mismatched runner-up drops the primary result and records its own prior relations, and technical stops do not ban a family. No new owner hand step."
+        "The readout matches the guard: an unlinked runner-up cannot become a scientific pass, and classify returns KILL_UNBOUND_EVIDENCE with GROUNDED_RESULT_UNBOUND. A same-scope runner-up keeps the ordinary path. No new owner hand step."
       ]
     }
   ],
