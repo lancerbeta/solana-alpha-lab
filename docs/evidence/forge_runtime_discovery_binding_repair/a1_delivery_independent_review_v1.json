@@ -17,29 +17,29 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Published-root discovery-execute reconciles an explicit binding to published cohort hashes before load. Session recovery no longer copies discovery_candidate_scope onto every hypothesis. A full-content HARD_CLOSE missing evidence_surface_mode raises UNKNOWN_PRIOR_SCOPE; PriorScopeTransportTests covers that path."
+        "Legacy HYPOTHESIS_VERSION records without scope fields recover the same candidate-bound axes into ranked_prior_entries and Critic capsules. Shared discovery_candidate_scope is not applied. A runner-up packet keeps that candidate's scope, drops a mismatched discovery result including a sparse executed scope, and still raises EXACT_PRIOR_SCOPE_MATCH on a same-scope HARD_CLOSE."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "OrdinaryOwnerPathTests seals and imports a corpus, runs discovery-binding with values_loaded false, runs discovery-execute without --binding, then persist-draft, freeze, fixture critic, finalize, and show-session SYNTHESIS_COMPLETE. Protected, unknown-role, and hash failures are asserted before load_parquet_rows."
+        "LegacyRankedPriorRecoveryTests starts from a payload without target or estimand and checks real preflight ranked_prior_entries against Critic capsules. PerCandidateScopePersistenceTests keeps selected A and runner-up B scopes distinct, drops A's result on mismatch and on a sparse executed scope, and raises on an exact runner-up close."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=6996a49efdbb50067743e6515c378aa55b635937e8b677f979c3941283444a83",
-        "holdout=false is derived only after REQUIRED_LABELS match and no protected holdout. A contradictory binding on a published root is replaced by the published pairs or rejected. Near-complete valid closes do not become a free pass. Scope recovery is per candidate_id, not a broadcast of one session scope."
+        "packet_fingerprint_sha256=7bf146a3049335aaa49d84e514892d9c1cfad41940a1ec6d76fcfd7b5065f6ce",
+        "Shared discovery scope is not stamped onto every hypothesis. Runner-up scope comes from that candidate's card. A mismatched or sparse executed look does not keep the primary discovery result. A same-scope close still raises."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Skill, slash command, and operator recipe name discovery-binding, state that it does not load parquet values, list the pre-loader stop codes, and set both --data-root and --store to the canonical data root. A cold agent does not hand-write holdout=false."
+        "The readout matches the repair: recoverable scope reaches Prompt A and Critic, a mismatched runner-up drops the primary result and records its own prior relations, and technical stops do not ban a family. No new owner hand step."
       ]
     }
   ],
