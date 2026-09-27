@@ -4,8 +4,8 @@
   "review_id": "COMPOUND-TEMPORAL-DISCOVERY-FACTORY-FIT-001",
   "as_of": "2026-09-27",
   "task_id": "COMPOUND_TEMPORAL_DISCOVERY_V1",
-  "reviewed_bindings_sha256": "23eebd3c60195aa2aec7225c727a6085daf3cb0a98aa25838195f8037297a50e",
-  "reviewed_inventory_sha256": "64015328058bcfcc975a604a7d6eaba62e149628293a26f84e52d8bcce413c3c",
+  "reviewed_bindings_sha256": "059737ee26a45339ec7565a23dabc675e73846ad085cdcbb609e85209e7974ff",
+  "reviewed_inventory_sha256": "9b03f5d89db354ab87c2445aa467b2e975386e8c66b87b310440d1ae177f3c98",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
