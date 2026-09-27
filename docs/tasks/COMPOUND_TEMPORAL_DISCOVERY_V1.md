@@ -52,6 +52,8 @@ managed_write_set:
   - tests/test_hfic_temporal_owner_path_v1.py
   - tests/test_discovery_evidence_release_bridge.py
   - tests/test_hfic_temporal_production_runner_v1.py
+  - tests/test_factory_ordinary_market_hypothesis.py
+  - src/solana_alpha_lab/factory/scientific_eligibility_projection.py
   - src/solana_alpha_lab/factory/capabilities.py
   - src/solana_alpha_lab/factory/lane_classifier.py
   - src/solana_alpha_lab/factory/document_runner.py

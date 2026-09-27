@@ -34,6 +34,12 @@ from solana_alpha_lab.factory.hfic_temporal_discovery import (  # noqa: E402
     temporal_target_label,
 )
 from solana_alpha_lab.factory.lane_classifier import classify_lane  # noqa: E402
+from solana_alpha_lab.factory.observation_schedule import (  # noqa: E402
+    load_observation_schedule,
+    schedule_sha256,
+    validate_observation_schedule,
+)
+from solana_alpha_lab.factory.run_passport import experiment_spec_sha256  # noqa: E402
 from solana_alpha_lab.factory.live_cohort_discovery_release import (  # noqa: E402
     cohort_id_for_admission,
     import_live_cohort,
@@ -47,6 +53,7 @@ from tests.test_fast_lane_runner import offline_v1_1_spec, publish_commissioning
 from tests.test_hfic_cli import bind_draft, run_cli  # noqa: E402
 from tests.test_hfic_temporal_discovery_v1 import _spec  # noqa: E402
 from tests.test_live_cohort_discovery_release_series import (  # noqa: E402
+    ACTIVATION,
     CAMPAIGN_STARTS,
     CAMPAIGN_STOPS,
     _obs,
@@ -54,13 +61,44 @@ from tests.test_live_cohort_discovery_release_series import (  # noqa: E402
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-LATENESS = 300
+DOCUMENT_LATENESS = 180
 OFFSETS = {"X300": 300, "Y900": 900, "Y1800": 1800, "Y3600": 3600, "Y7200": 7200}
 GIT_SHA = "cd" * 20
 
 
+def _schedule() -> dict:
+    document = load_observation_schedule(
+        ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+    )
+    document = dict(document)
+    document.pop("schedule_sha256", None)
+    document["activation"] = {
+        **dict(document.get("activation") or {}),
+        "starts_at": CAMPAIGN_STARTS.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "stops_admitting_at": CAMPAIGN_STOPS.strftime("%Y-%m-%dT%H:%M:%SZ"),
+    }
+    x_point = dict(document["x_point"])
+    x_point["allowed_lateness_seconds"] = DOCUMENT_LATENESS
+    document["x_point"] = x_point
+    document["y_points"] = [
+        {
+            "point_id": point_id,
+            "due_offset_seconds": offset,
+            "allowed_lateness_seconds": DOCUMENT_LATENESS,
+            "bundle_ids": ["BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-001"],
+        }
+        for point_id, offset in OFFSETS.items()
+        if point_id != "X300"
+    ]
+    validated = validate_observation_schedule(document, root=ROOT)
+    validated["schedule_sha256"] = schedule_sha256(validated)
+    return validated
+
+
 def _moment(anchor, point: str) -> str:
-    return (anchor + timedelta(seconds=OFFSETS[point] + LATENESS)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return (anchor + timedelta(seconds=OFFSETS[point] + DOCUMENT_LATENESS)).strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
 
 
 def _timed(mint: str, point: str, field: str, value: str, anchor) -> dict:
@@ -77,7 +115,7 @@ def _timed(mint: str, point: str, field: str, value: str, anchor) -> dict:
     return row
 
 
-def _publish(data_root: Path, workspace: Path, week: int = 0) -> None:
+def _publish(data_root: Path, workspace: Path, week: int = 0, *, with_schedule: bool = True) -> None:
     data_root.mkdir(parents=True, exist_ok=True)
     admission = CAMPAIGN_STARTS + timedelta(days=7 * week)
     as_of = admission + timedelta(days=10)
@@ -88,7 +126,9 @@ def _publish(data_root: Path, workspace: Path, week: int = 0) -> None:
     )
     assert cohort_id is not None
     snapshot = _snapshot_for_week(week)
-    snapshot["allowed_lateness_seconds"] = LATENESS
+    schedule = _schedule() if with_schedule else None
+    if schedule is not None:
+        snapshot["schedule_sha256"] = schedule["schedule_sha256"]
     if week == 0:
         prices = {"X300": "1.0", "Y900": "1.2", "Y1800": "1.5", "Y3600": "1.2"}
         for member in snapshot["members"]:
@@ -130,26 +170,53 @@ def _publish(data_root: Path, workspace: Path, week: int = 0) -> None:
         import_time=as_of + timedelta(hours=1),
     )
     assert imported["status"] == "IMPORTED"
+    if schedule is not None and week == 0:
+        from solana_alpha_lab.factory.observation_panel_publisher import (
+            persist_observation_schedule,
+        )
+        from tests.test_live_cohort_discovery_release_series import PRODUCER
+
+        persist_observation_schedule(
+            data_root=data_root,
+            schedule=schedule,
+            now=as_of,
+            producer_git_sha=PRODUCER,
+            activation_id=ACTIVATION,
+        )
+
+
+def _bind_experiment(recipe: dict, data_root: Path) -> dict:
+    experiment = offline_v1_1_spec()
+    experiment["capability_id"] = "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+    experiment["capabilities"] = ["CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"]
+    experiment["parameters"] = {"temporal_recipe": recipe}
+    experiment["data_bindings"] = [
+        item for item in experiment["data_bindings"] if item["source_kind"] != "DATASET_MANIFEST"
+    ]
+    return experiment
 
 
 class TemporalVerticalTests(unittest.TestCase):
     def test_published_journal_reaches_document_runner_readback(self) -> None:
-        spec = _spec(cost_profile=None)
+        spec = _spec(cost_profile=None, schedule={"lateness_seconds": DOCUMENT_LATENESS})
         simple = _spec(
             search_tier="SIMPLE_SCREEN",
             query_id="vertical-simple",
             features=[_spec()["features"][0]],
             all=[{"feature": "impulse", "op": "gte", "value": 0.0}],
             cost_profile=None,
+            schedule={"lateness_seconds": DOCUMENT_LATENESS},
         )
         with tempfile.TemporaryDirectory() as raw:
             workspace = Path(raw)
             data_root = workspace / "rdp"
             _publish(data_root, workspace)
-            publish_commissioning_dataset(data_root)
             binding = resolve_published_discovery_binding(data_root)
             self.assertTrue(binding["holdout_derived_from_discovery_contract"])
-            self.assertEqual(binding["cohorts"][0]["schedule_lateness_seconds"], LATENESS)
+            point_lateness = binding["cohorts"][0]["schedule_point_lateness"]
+            self.assertTrue(point_lateness)
+            self.assertTrue(all(value == DOCUMENT_LATENESS for value in point_lateness.values()))
+            self.assertNotIn("allowed_lateness_seconds", binding["cohorts"][0])
             preflight = run_cli(
                 "preflight",
                 "--discovery-contract",
@@ -175,7 +242,7 @@ class TemporalVerticalTests(unittest.TestCase):
                         {
                             "decision": {"point_id": "Y3600"},
                             "schedule": {
-                                "lateness_seconds": LATENESS,
+                                "lateness_seconds": DOCUMENT_LATENESS,
                                 "points": ["X300", "Y900", "Y1800", "Y3600"],
                             },
                             "seed": seed,
@@ -247,6 +314,18 @@ class TemporalVerticalTests(unittest.TestCase):
             simple_evidence = execute(simple_path)
             self.assertEqual(simple_evidence["queries"][0]["search_tier"], "SIMPLE_SCREEN")
             self.assertAlmostEqual(simple_evidence["result"]["mean_target"], 0.2, places=9)
+            self.assertEqual(simple_evidence["result"]["observation_index_passes"], 1)
+            from solana_alpha_lab.factory.hfic_session import (
+                HficSessionError,
+                _assert_temporal_search_closed,
+            )
+
+            with self.assertRaises(HficSessionError) as pending:
+                _assert_temporal_search_closed(
+                    {"grounded_evidence": simple_evidence},
+                    ResearchStore(data_root),
+                )
+            self.assertEqual(str(pending.exception), "SEARCH_EXHAUSTED_WITHOUT_COMPOUND")
             compound_evidence = execute(compound_path)
             self.assertEqual(compound_evidence["queries"][0]["search_tier"], "COMPOUND_SCREEN")
             self.assertTrue(compound_evidence["tier_progress"]["compound_executed"])
@@ -257,7 +336,10 @@ class TemporalVerticalTests(unittest.TestCase):
                 frozen_input[0]["observations_sha256"],
                 binding["cohorts"][0]["observations_sha256"],
             )
-            self.assertEqual(frozen_input[0]["schedule_lateness_seconds"], LATENESS)
+            self.assertEqual(
+                frozen_input[0]["schedule_point_lateness"]["Y3600"],
+                DOCUMENT_LATENESS,
+            )
             store = ResearchStore(data_root)
             intents = []
             for record in store.iter_committed_records():
@@ -302,6 +384,7 @@ class TemporalVerticalTests(unittest.TestCase):
                 features=[{"name": "mark", "op": "point_value", "field_id": PRICE, "point": "Y3600"}],
                 all=[{"feature": "mark", "op": "gte", "value": 0.0}],
                 cost_profile=None,
+                schedule={"lateness_seconds": DOCUMENT_LATENESS},
             )
             with patch(
                 "solana_alpha_lab.factory.hfic_grounded_discovery.execute_discovery_from_rows",
@@ -499,6 +582,7 @@ class TemporalVerticalTests(unittest.TestCase):
             self.assertEqual(handed["result_refs"], compound_evidence["result_refs"])
             self.assertEqual(handed["result"]["spec_sha256"], compound_evidence["result"]["spec_sha256"])
             self.assertTrue(handed["tier_progress"]["compound_executed"])
+            self.assertGreaterEqual(len(handed["viewed_queries"]), 2)
             progress = assess_tier_progress(list_discovery_looks(store, journal), freeze_worthy=True)
             self.assertTrue(progress["search_exhausted_allowed"])
             with self.assertRaises(GroundedDiscoveryError):
@@ -506,12 +590,11 @@ class TemporalVerticalTests(unittest.TestCase):
                     assess_tier_progress([], freeze_worthy=False),
                     claim_search_exhausted=True,
                 )
-            experiment = offline_v1_1_spec()
-            experiment["capability_id"] = "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
-            experiment["capabilities"] = ["CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"]
-            experiment["parameters"] = {
-                "temporal_recipe": compound_evidence["result"]["experiment_recipe"]
-            }
+            experiment = _bind_experiment(
+                compound_evidence["result"]["experiment_recipe"],
+                data_root,
+            )
+            spec_hash = experiment_spec_sha256(experiment)
             decision = classify_lane(
                 {
                     "experiment_spec": experiment,
@@ -526,7 +609,7 @@ class TemporalVerticalTests(unittest.TestCase):
             try:
                 result = DocumentRunner(root=ROOT, store=ops).start_document(
                     experiment,
-                    spec_sha256="cd" * 32,
+                    spec_sha256=spec_hash,
                     run_context=RunContext(
                         data_root=data_root,
                         hypothesis_definition_sha256=HYPOTHESIS_DEFINITION_SHA256,
@@ -564,10 +647,72 @@ class TemporalVerticalTests(unittest.TestCase):
             self.assertIsNotNone(passport)
             assert passport is not None
             self.assertEqual(passport["run_key_sha256"], decision.run_key_sha256)
-            self.assertEqual(passport["experiment_spec_sha256"], "cd" * 32)
+            self.assertEqual(passport["experiment_spec_sha256"], spec_hash)
             self.assertEqual(passport["as_of"], experiment["as_of"])
             self.assertEqual(passport["availability_cutoff"], experiment["availability_cutoff"])
             self.assertEqual(passport["result_artifact_id"], f"RESULT-ARTIFACT-{run_id.removeprefix('RUN-')}")
+            foreign_recipe = json.loads(
+                json.dumps(compound_evidence["result"]["experiment_recipe"])
+            )
+            for item in foreign_recipe["frozen_input"]:
+                item["dataset_manifest_id"] = "dataset-" + "ab" * 32
+            foreign = _bind_experiment(foreign_recipe, data_root)
+            foreign_decision = classify_lane(
+                {
+                    "experiment_spec": foreign,
+                    "hypothesis_definition_sha256": HYPOTHESIS_DEFINITION_SHA256,
+                },
+                root=ROOT,
+                data_root=data_root,
+                as_of=AS_OF,
+            )
+            foreign_runner = DocumentRunner(
+                root=ROOT,
+                store=OperationalStore(data_root / "ops" / "operational_state.sqlite"),
+            )
+            try:
+                foreign_result = foreign_runner.start_document(
+                    foreign,
+                    spec_sha256=experiment_spec_sha256(foreign),
+                    run_context=RunContext(
+                        data_root=data_root,
+                        hypothesis_definition_sha256=HYPOTHESIS_DEFINITION_SHA256,
+                        lane_decision=foreign_decision,
+                    ),
+                )
+            finally:
+                foreign_runner.store.close()
+            self.assertEqual(foreign_result["status"], "FAILED_INFRA")
+            self.assertIn("MANIFEST_MISMATCH", foreign_result["reason_codes"])
+            early = _bind_experiment(compound_evidence["result"]["experiment_recipe"], data_root)
+            early["availability_cutoff"] = "2020-01-01T00:00:00Z"
+            early_decision = classify_lane(
+                {
+                    "experiment_spec": early,
+                    "hypothesis_definition_sha256": HYPOTHESIS_DEFINITION_SHA256,
+                },
+                root=ROOT,
+                data_root=data_root,
+                as_of=AS_OF,
+            )
+            early_runner = DocumentRunner(
+                root=ROOT,
+                store=OperationalStore(data_root / "ops" / "operational_state.sqlite"),
+            )
+            try:
+                early_result = early_runner.start_document(
+                    early,
+                    spec_sha256=experiment_spec_sha256(early),
+                    run_context=RunContext(
+                        data_root=data_root,
+                        hypothesis_definition_sha256=HYPOTHESIS_DEFINITION_SHA256,
+                        lane_decision=early_decision,
+                    ),
+                )
+            finally:
+                early_runner.store.close()
+            self.assertEqual(early_result["status"], "FAILED_INFRA")
+            self.assertIn("CUTOFF_REJECTED", early_result["reason_codes"])
             cohort = binding["cohorts"][0]
             obs_path = data_root / cohort["observations_rel"]
             original = obs_path.read_bytes()
@@ -608,12 +753,8 @@ class TemporalVerticalTests(unittest.TestCase):
             }
             self.assertIn(frozen_input[0]["observations_sha256"], fresh_hashes)
             self.assertGreater(len(fresh_hashes), 1)
-            new_experiment = offline_v1_1_spec()
-            new_experiment["capability_id"] = "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
-            new_experiment["capabilities"] = ["CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"]
-            new_experiment["parameters"] = {
-                "temporal_recipe": fresh["result"]["experiment_recipe"]
-            }
+            new_experiment = _bind_experiment(fresh["result"]["experiment_recipe"], data_root)
+            new_spec_hash = experiment_spec_sha256(new_experiment)
             new_decision = classify_lane(
                 {
                     "experiment_spec": new_experiment,
@@ -629,7 +770,7 @@ class TemporalVerticalTests(unittest.TestCase):
             try:
                 again = DocumentRunner(root=ROOT, store=ops_again).start_document(
                     new_experiment,
-                    spec_sha256="cf" * 32,
+                    spec_sha256=new_spec_hash,
                     run_context=RunContext(
                         data_root=data_root,
                         hypothesis_definition_sha256=HYPOTHESIS_DEFINITION_SHA256,
@@ -644,6 +785,29 @@ class TemporalVerticalTests(unittest.TestCase):
                 json.loads(artifact.read_text(encoding="utf-8"))["capability_result"]["summary"]["mean_target"],
                 saved_summary["mean_target"],
             )
+
+
+    def test_three_current_cohorts_without_a_schedule_do_not_invent_lateness(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            schedule_projection_for_census,
+        )
+
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            data_root = workspace / "rdp"
+            for week in range(3):
+                _publish(data_root, workspace, week=week, with_schedule=False)
+            binding = resolve_published_discovery_binding(data_root)
+            self.assertEqual(len(binding["cohorts"]), 3)
+            for cohort in binding["cohorts"]:
+                observations = data_root / cohort["observations_rel"]
+                before = observations.read_bytes()
+                projected = schedule_projection_for_census(
+                    data_root, data_root / cohort["census_rel"]
+                )
+                self.assertEqual(projected["schedule_context_gap"], "CANONICAL_SCHEDULE_UNBOUND")
+                self.assertEqual(observations.read_bytes(), before)
+                self.assertNotIn("schedule_point_lateness", projected)
 
 
 if __name__ == "__main__":

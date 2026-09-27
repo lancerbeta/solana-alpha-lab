@@ -346,24 +346,11 @@ def bind_lineage_canonical_release(data_root: Path, *, repo_root: Path) -> Any:
     return bind_canonical_censoring_inputs(Path(data_root), pins)
 
 
-def resolve_canonical_release_schedule(
-    data_root: Path,
-    census_rows: Sequence[Mapping[str, Any]],
-) -> dict[str, Any]:
-    """Load the release-bound schedule document. Never trust ExperimentSpec."""
+def load_hashed_schedule_document(data_root: Path, wanted: str) -> dict[str, Any]:
+    """Read one schedule document by its semantic hash. Does not apply a default lateness."""
 
-    digests: list[str] = []
-    seen: set[str] = set()
-    for row in census_rows:
-        if not isinstance(row, Mapping):
-            continue
-        digest = str(row.get("source_schedule_sha256") or row.get("schedule_sha256") or "")
-        if len(digest) == 64 and digest not in seen:
-            seen.add(digest)
-            digests.append(digest)
-    if len(digests) != 1:
+    if len(wanted) != 64:
         raise ScientificEligibilityError(CANONICAL_SCHEDULE_UNBOUND)
-    wanted = digests[0]
     from solana_alpha_lab.factory.observation_schedule import (
         schedule_sha256 as hash_schedule,
     )
@@ -407,6 +394,27 @@ def resolve_canonical_release_schedule(
     document = documents[0]
     if hash_schedule(document) != wanted:
         raise ScientificEligibilityError(CANONICAL_X300_SCHEDULE_INCOMPATIBLE)
+    return document
+
+
+def resolve_canonical_release_schedule(
+    data_root: Path,
+    census_rows: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Load the release-bound schedule document. Never trust ExperimentSpec."""
+
+    digests: list[str] = []
+    seen: set[str] = set()
+    for row in census_rows:
+        if not isinstance(row, Mapping):
+            continue
+        digest = str(row.get("source_schedule_sha256") or row.get("schedule_sha256") or "")
+        if len(digest) == 64 and digest not in seen:
+            seen.add(digest)
+            digests.append(digest)
+    if len(digests) != 1:
+        raise ScientificEligibilityError(CANONICAL_SCHEDULE_UNBOUND)
+    document = load_hashed_schedule_document(data_root, digests[0])
     verify_factory_x300_schedule(document)
     return document
 

@@ -868,11 +868,25 @@ def cmd_discovery_preview(
             from solana_alpha_lab.factory.hfic_temporal_discovery import persist_feature_preview
             from solana_alpha_lab.factory.research_store import ResearchStore
 
+            input_identity = hashlib.sha256(
+                json.dumps(
+                    [
+                        (
+                            str(item.get("cohort_id")),
+                            str(item.get("release_id")),
+                            str(item.get("observations_sha256")),
+                        )
+                        for item in loaded["cohorts"]
+                    ],
+                    sort_keys=True,
+                ).encode("utf-8")
+            ).hexdigest()
             persist_feature_preview(
                 ResearchStore(store_root),
                 journal_scope=journal_scope,
                 preview=payload,
                 git_sha="0" * 40,
+                input_sha256=input_identity,
             )
     except GroundedDiscoveryError as exc:
         return emit_error(exc.code)

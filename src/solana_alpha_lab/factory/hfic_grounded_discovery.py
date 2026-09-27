@@ -204,6 +204,58 @@ def _explicit_holdout_or_raise(sources: Sequence[Mapping[str, Any]]) -> None:
             raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED")
 
 
+def schedule_projection_for_census(data_root: Path, census_path: Path) -> dict[str, Any]:
+    """Project point clocks from the verified schedule. Does not write parquet or run a look."""
+
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    from solana_alpha_lab.factory.hfic_temporal_discovery import project_schedule_points
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        CANONICAL_SCHEDULE_UNBOUND,
+        ScientificEligibilityError,
+        load_hashed_schedule_document,
+    )
+
+    try:
+        table = pq.read_table(census_path, columns=["source_schedule_sha256"])
+    except (OSError, pa.ArrowException):
+        return {"schedule_context_gap": CANONICAL_SCHEDULE_UNBOUND}
+    shas = {
+        str(value)
+        for value in table.column("source_schedule_sha256").to_pylist()
+        if isinstance(value, str) and value
+    }
+    if len(shas) != 1 or len(next(iter(shas))) != 64:
+        return {"schedule_context_gap": CANONICAL_SCHEDULE_UNBOUND}
+    wanted = next(iter(shas))
+    try:
+        document = load_hashed_schedule_document(data_root, wanted)
+        projected = project_schedule_points(document)
+    except (ScientificEligibilityError, GroundedDiscoveryError):
+        return {"schedule_context_gap": CANONICAL_SCHEDULE_UNBOUND, "schedule_sha256": wanted}
+    return {"schedule_sha256": wanted, **projected}
+
+
+def _attach_verified_schedule(root: Path, cohorts: list[dict[str, Any]]) -> None:
+    for cohort in cohorts:
+        census_rel = cohort.get("census_rel")
+        if not isinstance(census_rel, str):
+            cohort["schedule_context_gap"] = "CANONICAL_SCHEDULE_UNBOUND"
+            continue
+        projected = schedule_projection_for_census(root, root / census_rel)
+        declared = cohort.get("schedule_lateness_seconds")
+        point_lateness = projected.get("schedule_point_lateness")
+        if (
+            isinstance(declared, int)
+            and not isinstance(declared, bool)
+            and isinstance(point_lateness, Mapping)
+            and any(value != declared for value in point_lateness.values())
+        ):
+            projected["schedule_context_gap"] = "SCHEDULE_LATENESS_MISMATCH"
+        cohort.update(projected)
+
+
 def resolve_published_discovery_binding(data_root: Path) -> dict[str, Any]:
     """Build the admission binding from a canonical publication.
 
@@ -298,6 +350,7 @@ def resolve_published_discovery_binding(data_root: Path) -> dict[str, Any]:
                 ),
             }
         )
+    _attach_verified_schedule(root, bound_cohorts)
     admitted = admit_discovery_binding(bound_cohorts)
     return {
         **admitted,
@@ -1454,6 +1507,7 @@ def no_worthy_scope_record(evidence: Mapping[str, Any]) -> dict[str, Any]:
         "budget": evidence.get("budget"),
         "candidate_scope": evidence.get("candidate_scope"),
         "result_sha256": evidence.get("result_sha256"),
+        "viewed_queries": list(evidence.get("viewed_queries") or []),
     }
 
 
@@ -1605,6 +1659,9 @@ def run_recorded_discovery_query(
         )
     if replayed is None:
         if _is_temporal_query(spec):
+            from solana_alpha_lab.factory.hfic_temporal_discovery import classify_temporal_look
+
+            classify_temporal_look(list_discovery_looks(store, journal_scope), spec)
             _append_temporal_intent(
                 store,
                 journal_scope=journal_scope,

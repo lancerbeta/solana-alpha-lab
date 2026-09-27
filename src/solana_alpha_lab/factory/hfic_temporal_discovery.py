@@ -413,11 +413,12 @@ def break_even_haircut(
     }
 
 
-def _deadline_for(anchor: object, point: str, lateness: int):
+def _deadline_for(anchor: object, point: str, lateness: int, *, due_offset: int | None = None):
     parsed = _parse_time(anchor)
     if parsed is None:
         return None
-    return parsed + timedelta(seconds=POINT_OFFSET[point] + lateness)
+    offset = POINT_OFFSET[point] if due_offset is None else due_offset
+    return parsed + timedelta(seconds=offset + lateness)
 
 
 def _select_cell(rows: Sequence[Mapping[str, Any]], deadline: object) -> dict[str, Any]:
@@ -484,9 +485,15 @@ def _feature_value(
     feature: Mapping[str, Any],
     lateness: int,
     decision_deadline: object,
+    due_offset_for: Any = None,
 ) -> float | None:
+    def offset(point: str) -> int | None:
+        if due_offset_for is None:
+            return None
+        return int(due_offset_for(point))
+
     def read(point: str, field: str) -> dict[str, Any]:
-        point_deadline = _deadline_for(anchor, point, lateness)
+        point_deadline = _deadline_for(anchor, point, lateness, due_offset=offset(point))
         if point_deadline is None or decision_deadline is None or point_deadline > decision_deadline:
             return {"status": "ABSENT"}
         return _cell(grouped, (cohort, release, mint, point, field), point_deadline)
@@ -496,15 +503,15 @@ def _feature_value(
         cell = read(str(feature["point"]), str(feature["field_id"]))
         return cell.get("value") if cell.get("status") == "OBSERVED" else None
     if op == "utc_hour":
-        moment = _deadline_for(anchor, str(feature["point"]), 0)
+        moment = _deadline_for(anchor, str(feature["point"]), 0, due_offset=offset(str(feature["point"])))
         if moment is None or decision_deadline is None or moment > decision_deadline:
             return None
         if read(str(feature["point"]), PRICE).get("status") != "OBSERVED":
             return None
         return float(moment.hour)
     if op == "elapsed_seconds":
-        start = _deadline_for(anchor, str(feature["start"]), 0)
-        end = _deadline_for(anchor, str(feature["end"]), 0)
+        start = _deadline_for(anchor, str(feature["start"]), 0, due_offset=offset(str(feature["start"])))
+        end = _deadline_for(anchor, str(feature["end"]), 0, due_offset=offset(str(feature["end"])))
         if start is None or end is None:
             return None
         if read(str(feature["start"]), PRICE).get("status") != "OBSERVED":
@@ -549,15 +556,124 @@ def _feature_value(
     return float(at["value"]) / base - 1.0
 
 
-def _require_bound_schedule(binding: Sequence[Mapping[str, Any]], lateness: int) -> None:
-    """Preview and evaluation share one declared lateness. A missing field does not skip the check."""
+def project_schedule_points(document: Mapping[str, Any]) -> dict[str, dict[str, int]]:
+    """Read due offset and lateness from the schedule points themselves."""
+
+    points: list[Mapping[str, Any]] = []
+    x_point = document.get("x_point")
+    if isinstance(x_point, Mapping):
+        points.append(x_point)
+    for item in document.get("y_points") or []:
+        if isinstance(item, Mapping):
+            points.append(item)
+    lateness: dict[str, int] = {}
+    due: dict[str, int] = {}
+    for point in points:
+        point_id = str(point.get("point_id") or "")
+        late = point.get("allowed_lateness_seconds")
+        offset = point.get("due_offset_seconds")
+        if (
+            not point_id
+            or isinstance(late, bool)
+            or not isinstance(late, int)
+            or isinstance(offset, bool)
+            or not isinstance(offset, int)
+        ):
+            raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
+        lateness[point_id] = late
+        due[point_id] = offset
+    if not lateness:
+        raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
+    return {
+        "schedule_point_lateness": lateness,
+        "schedule_point_due_offset_seconds": due,
+    }
+
+
+def _query_points(body: Mapping[str, Any]) -> list[str]:
+    points = [
+        str(body["decision_point"]),
+        "X300",
+        str(body["target"]["reference_point"]),
+        str(body["target"]["exit_point"]),
+    ]
+    for feature in body["features"]:
+        if not isinstance(feature, Mapping):
+            continue
+        for key in ("point", "start", "end", "at", "numerator", "denominator"):
+            if feature.get(key):
+                points.append(str(feature[key]))
+        for point in feature.get("points") or []:
+            points.append(str(point))
+    ordered: list[str] = []
+    for point in points:
+        if point not in ordered:
+            ordered.append(point)
+    return ordered
+
+
+def _clock(item: Mapping[str, Any], point: str, query_lateness: int) -> tuple[int, int]:
+    """Document point clocks win. A missing document does not fall back to a default."""
+
+    gap = item.get("schedule_context_gap")
+    if gap == "CANONICAL_SCHEDULE_UNBOUND":
+        raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
+    if isinstance(gap, str) and gap:
+        raise GroundedDiscoveryError(gap)
+    lateness_map = item.get("schedule_point_lateness")
+    due_map = item.get("schedule_point_due_offset_seconds")
+    if isinstance(lateness_map, Mapping) and isinstance(due_map, Mapping) and lateness_map:
+        late = lateness_map.get(point)
+        due = due_map.get(point)
+        if (
+            isinstance(late, bool)
+            or not isinstance(late, int)
+            or isinstance(due, bool)
+            or not isinstance(due, int)
+        ):
+            raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
+        if late != query_lateness:
+            raise GroundedDiscoveryError("SCHEDULE_LATENESS_MISMATCH")
+        return due, late
+    declared = item.get("schedule_lateness_seconds")
+    if isinstance(declared, bool) or not isinstance(declared, int):
+        raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
+    if declared != query_lateness:
+        raise GroundedDiscoveryError("SCHEDULE_LATENESS_MISMATCH")
+    if point not in POINT_OFFSET:
+        raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
+    return POINT_OFFSET[point], declared
+
+
+def _require_bound_schedule(binding: Sequence[Mapping[str, Any]], body: Mapping[str, Any], lateness: int) -> None:
+    """Preview and evaluation share the verified point clocks. A missing field does not skip the check."""
 
     for item in binding:
-        declared = item.get("schedule_lateness_seconds")
-        if isinstance(declared, bool) or not isinstance(declared, int):
-            raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
-        if declared != lateness:
-            raise GroundedDiscoveryError("SCHEDULE_LATENESS_MISMATCH")
+        for point in _query_points(body):
+            _clock(item, point, lateness)
+
+
+def _signature_index(observations: Sequence[Mapping[str, Any]]) -> dict[tuple[str, str, str], tuple]:
+    """One pass over observations. Later census rows reuse this index."""
+
+    buckets: dict[tuple[str, str, str], list[tuple]] = defaultdict(list)
+    for row in observations:
+        key = (
+            str(row.get("mint") or ""),
+            str(row.get("cohort_id") or ""),
+            str(row.get("release_id") or ""),
+        )
+        buckets[key].append(
+            (
+                str(row.get("point_id") or ""),
+                str(row.get("field_id") or ""),
+                str(row.get("first_reliable_available_at") or ""),
+                str(row.get("event_time") or row.get("observed_at") or ""),
+                str(row.get("state") or ""),
+                str(row.get("typed_value")),
+            )
+        )
+    return {key: tuple(sorted(items)) for key, items in buckets.items()}
 
 
 def _observation_signature(
@@ -805,15 +921,30 @@ def execute_temporal_discovery(
             "observations_sha256": item.get("observations_sha256"),
             "census_rel": item.get("census_rel"),
             "observations_rel": item.get("observations_rel") or item.get("obs_rel"),
+            "dataset_manifest_id": item.get("dataset_manifest_id"),
+            "schedule_sha256": item.get("schedule_sha256"),
             "schedule_lateness_seconds": item.get("schedule_lateness_seconds"),
+            "schedule_point_lateness": item.get("schedule_point_lateness"),
+            "schedule_point_due_offset_seconds": item.get("schedule_point_due_offset_seconds"),
         }
         for item in binding
     ]
     bound = validate_temporal_query(spec)
     body = bound["scientific_body"]
     lateness = int(body["schedule_lateness_seconds"])
-    _require_bound_schedule(binding, lateness)
+    _require_bound_schedule(binding, body, lateness)
     decision_point = str(body["decision_point"])
+    binding_by = {
+        (str(item.get("cohort_id")), str(item.get("release_id"))): item for item in binding
+    }
+
+    def _due_late(cohort_id: str, release_id: str, point: str) -> tuple[int, int]:
+        item = binding_by.get((cohort_id, release_id))
+        if item is None:
+            raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
+        return _clock(item, point, lateness)
+
+    signature_index = _signature_index(observations)
     grouped = _grouped_cells(observations)
     admitted_pairs = {
         (str(item["cohort_id"]), str(item["release_id"])) for item in admitted["cohorts"]
@@ -833,7 +964,13 @@ def execute_temporal_discovery(
         cohort = str(row.get("cohort_id") or "")
         release = str(row.get("release_id") or "")
         anchor = row.get("authoritative_anchor")
-        decision_deadline = _deadline_for(anchor, decision_point, lateness)
+        if (cohort, release) in admitted_pairs:
+            decision_due, decision_late = _due_late(cohort, release, decision_point)
+            decision_deadline = _deadline_for(
+                anchor, decision_point, decision_late, due_offset=decision_due
+            )
+        else:
+            decision_deadline = _deadline_for(anchor, decision_point, lateness)
         decision_key = decision_deadline.strftime("%Y-%m-%dT%H:%M:%SZ") if decision_deadline else str(anchor or "")
         identity = (mint, decision_key)
         block = decision_deadline.date().isoformat() if decision_deadline is not None else "UNANCHORED"
@@ -853,7 +990,7 @@ def execute_temporal_discovery(
                 }
             )
             continue
-        signature = _observation_signature(observations, mint, cohort, release)
+        signature = signature_index.get((mint, cohort, release), ())
         if identity in seen:
             duplicate_count += 1
             if signatures.get(identity) != signature:
@@ -883,7 +1020,12 @@ def execute_temporal_discovery(
             liquidity = _cell(
                 grouped,
                 (cohort, release, mint, "X300", LIQUIDITY),
-                _deadline_for(anchor, "X300", lateness),
+                _deadline_for(
+                    anchor,
+                    "X300",
+                    _due_late(cohort, release, "X300")[1],
+                    due_offset=_due_late(cohort, release, "X300")[0],
+                ),
             )
             if liquidity.get("status") != "OBSERVED":
                 exclusion = "PIT_LIQUIDITY_MISSING"
@@ -909,6 +1051,9 @@ def execute_temporal_discovery(
                         feature=feature,
                         lateness=lateness,
                         decision_deadline=decision_deadline,
+                        due_offset_for=lambda point, cohort=cohort, release=release: _due_late(
+                            cohort, release, point
+                        )[0],
                     )
         hits = [
             _predicate_holds(feature_values.get(str(item["feature"])), item) for item in predicates
@@ -922,7 +1067,8 @@ def execute_temporal_discovery(
                 seconds=int(body["entry_model"]["assumed_latency_seconds"])
             )
             exit_point = str(body["target"]["exit_point"])
-            exit_deadline = _deadline_for(anchor, exit_point, lateness)
+            exit_due, exit_late = _due_late(cohort, release, exit_point)
+            exit_deadline = _deadline_for(anchor, exit_point, exit_late, due_offset=exit_due)
             exit_rows = grouped.get((cohort, release, mint, exit_point, PRICE), ())
             legal = []
             for exit_row in exit_rows:
@@ -1051,6 +1197,7 @@ def execute_temporal_discovery(
         "missing_target_n": len(missing_target),
         "duplicate_delivery_count": duplicate_count,
         "integrity_conflict_count": integrity_conflicts,
+        "observation_index_passes": 1,
         "unique_mint_n": len({mint for mint, _decision in seen}),
         "unique_decision_n": len(seen),
         "block_count": len({item["block"] for item in observed}),
@@ -1161,7 +1308,9 @@ def build_feature_preview(
     point_ids = [_point(item) for item in points]
     if any(POINT_OFFSET[item] > POINT_OFFSET[decision_point] for item in point_ids):
         raise GroundedDiscoveryError("FEATURE_AFTER_DECISION")
-    _require_bound_schedule(binding, lateness)
+    for item in binding:
+        for point in ["X300", *point_ids]:
+            _clock(item, point, lateness)
     seed = spec.get("seed")
     if not isinstance(seed, str) or not seed:
         raise GroundedDiscoveryError("PREVIEW_SEED_REQUIRED")
@@ -1178,6 +1327,14 @@ def build_feature_preview(
     if identity not in prior and len(set(prior)) >= MAX_PREVIEW_SPECS:
         raise GroundedDiscoveryError("PREVIEW_ENVELOPE_EXHAUSTED")
     grouped = _grouped_cells(observations)
+    preview_binding = {
+        (str(item.get("cohort_id")), str(item.get("release_id"))): item for item in binding
+    }
+
+    def preview_deadline(anchor: object, cohort_id: str, release_id: str, point: str):
+        due, late = _clock(preview_binding[(cohort_id, release_id)], point, lateness)
+        return _deadline_for(anchor, point, late, due_offset=due)
+
     admitted_pairs = {(str(item["cohort_id"]), str(item["release_id"])) for item in admitted["cohorts"]}
     examples: list[dict[str, Any]] = []
     total = 0
@@ -1193,7 +1350,7 @@ def build_feature_preview(
         liquidity = _cell(
             grouped,
             (cohort, release, mint, "X300", LIQUIDITY),
-            _deadline_for(anchor, "X300", lateness),
+            preview_deadline(anchor, cohort, release, "X300"),
         )
         if liquidity.get("status") != "OBSERVED":
             continue
@@ -1204,7 +1361,7 @@ def build_feature_preview(
             cell = _cell(
                 grouped,
                 (cohort, release, mint, point, PRICE),
-                _deadline_for(anchor, point, lateness),
+                preview_deadline(anchor, cohort, release, point),
             )
             if cell.get("status") == "OBSERVED":
                 prices[point] = float(cell["value"])
@@ -1277,12 +1434,16 @@ def persist_feature_preview(
     journal_scope: str,
     preview: Mapping[str, Any],
     git_sha: str,
+    input_sha256: str = "",
 ) -> None:
-    """Remember a preview in the store. Caller hash lists are not the memory."""
+    """Remember a preview in the store. Identity includes the journal and the input."""
 
     digest = str(preview.get("preview_sha256") or "")
     if digest in stored_preview_hashes(store, journal_scope):
         return
+    identity = hashlib.sha256(
+        f"{journal_scope}:{digest}:{input_sha256}".encode("utf-8")
+    ).hexdigest()
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
     now = datetime.now(timezone.utc)
@@ -1301,14 +1462,14 @@ def persist_feature_preview(
         "payload_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
     }
     payload_json = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-    record_id = f"HFIC-ART-PREVIEW-{digest[:40].upper()}"
+    record_id = f"HFIC-ART-PREVIEW-{identity[:40].upper()}"
     event = ResearchEvent(
         record_id=record_id,
         record_kind=RecordKind.RESEARCH_ARTIFACT,
         entity_id=record_id,
         hypothesis_version_id=None,
         run_id=None,
-        transaction_id=f"RESEARCH-TXN-PREVIEW-{digest[:24].upper()}",
+        transaction_id=f"RESEARCH-TXN-PREVIEW-{identity[:24].upper()}",
         effective_at=now,
         first_reliable_available_at=now,
         supersedes_record_id=None,
@@ -1347,6 +1508,46 @@ def _public_query_from_recipe(recipe: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _require_manifest_and_cutoff(
+    spec: Mapping[str, Any],
+    frozen_input: Sequence[Mapping[str, Any]],
+    data_root: Path,
+) -> None:
+    """A foreign manifest or an early cutoff stops before observation values are read."""
+
+    cutoff = _parse_time(spec.get("availability_cutoff"))
+    if cutoff is None:
+        raise GroundedDiscoveryError("CUTOFF_REJECTED")
+    bindings = spec.get("data_bindings")
+    if not isinstance(bindings, list):
+        raise GroundedDiscoveryError("MANIFEST_MISMATCH")
+    for item in frozen_input:
+        manifest_id = item.get("dataset_manifest_id")
+        if not isinstance(manifest_id, str) or not manifest_id:
+            raise GroundedDiscoveryError("MANIFEST_MISMATCH")
+        match = [
+            binding
+            for binding in bindings
+            if isinstance(binding, Mapping)
+            and binding.get("source_kind") == "DATASET_MANIFEST"
+            and binding.get("stable_id") == manifest_id
+        ]
+        manifest_path = data_root / "datasets" / "manifests" / f"{manifest_id}.json"
+        if len(match) > 1:
+            raise GroundedDiscoveryError("MANIFEST_MISMATCH")
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            raise GroundedDiscoveryError("MANIFEST_MISMATCH") from exc
+        if match and manifest.get("dataset_fingerprint") != match[0].get(
+            "expected_content_sha256_or_dataset_fingerprint"
+        ):
+            raise GroundedDiscoveryError("MANIFEST_MISMATCH")
+        available = _parse_time(manifest.get("first_reliable_available_at"))
+        if available is None or cutoff < available:
+            raise GroundedDiscoveryError("CUTOFF_REJECTED")
+
+
 def run_temporal_fixed_time_from_spec(
     spec: Mapping[str, Any],
     *,
@@ -1378,6 +1579,8 @@ def run_temporal_fixed_time_from_spec(
     )
     from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
 
+    if "data_bindings" in spec or "availability_cutoff" in spec:
+        _require_manifest_and_cutoff(spec, frozen_input, data_root)
     partitions = []
     binding_cohorts = []
     for item in frozen_input:
