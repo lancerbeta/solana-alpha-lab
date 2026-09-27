@@ -15,20 +15,21 @@
   "capability_radar_now": "NONE",
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "3bb87edb38f0fd9a18160d324c4bcbad1f8fdaa551f9883b1b4ee1178bb68b0a",
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "b027dc9a699f74e8d3f83ae165089c4d84c2d170945012103f33eaef66194d2e",
     ".cursor/commands/hypothesis-forge.md": "ad9a81428819a83836514e8020faf3416f28a6957766f86f98805670aed440bd",
-    "catalog/assets/core.yaml": "7cf677165067feb67d7b5c4b81e06adc7f8af42024da37977d720532dbe7918b",
-    "catalog/schemas/hypothesis_critic_input_v1.schema.json": "7bc5fee2b1103635421b917e46a72448c66dbed7ff8529156f19166d97d12c72",
+    "catalog/assets/core.yaml": "227bf511f223759c8785f946cca8101b85c2137f33bc62a044e5bc070865eab0",
+    "catalog/schemas/hypothesis_critic_input_v1.schema.json": "d4a7951e5a9e20a5cc4bff9b91f70031ef6d7ef96f2410cfac8de6751205d9e3",
     "docs/evidence/forge_runtime_discovery_binding_repair/a1_live_binding_readback_v1.json": "08664fc90618e3073c931a13f5eae94a84ea8615b57a23b7a2e4b1ebba5b11b1",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "6bea0a252ed95a2f3a582fdfde0e690644086c33c7515b8baaca271a38894343",
-    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "8be3cf45ba34d791979d37b38a5d4d948f94b0415174980cb1c75c7310ea3e9b",
-    "docs/reports/forge_runtime_discovery_binding_repair/a1_owner_readout_v1.md": "20d6a4dff8b20cef0d2df36ec5428615746184a92d4aae7cbe63501201aabe61",
-    "docs/tasks/FORGE_RUNTIME_DISCOVERY_BINDING_REPAIR_V1.md": "774d6f237359d96281a68d4d7771ff4a6b6c1a8aeca7af009dfab36afdca2dc5",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "ceaa4ad0d693bdcd4e6bf3e3c011c53b964abd784ebe2f52ade74ef2ea334afe",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "e61fa9c0d20df3126ce428341cc862b8cc3a8f4be66e3bd27ca4f04ae9d050ea",
+    "docs/reports/forge_runtime_discovery_binding_repair/a1_owner_readout_v1.md": "450c918487c82ab5b9677bfa5f6d2b5b80a85e3389484a4ec6a50164f3fee628",
+    "docs/tasks/FORGE_RUNTIME_DISCOVERY_BINDING_REPAIR_V1.md": "3bd68557ef54156f79137a61516c18c47904466c37a181b58f2408fa66339596",
     "scripts/hypothesis_forge.py": "95aad2a5aaa7d3b2fa2a472afe52f2aa5214fc8a66ffe4debcbd3e55f8206faf",
-    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "dbace633f25f70b57f817bd748afc88bd3ae60f5f5ebbc058880d35ad151e4d1",
-    "src/solana_alpha_lab/factory/hfic_prior_memory.py": "f3d63bde584c5e168ae7b48a508749fba85e6b39aa99a855ef730c2bfa2f2c31",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "22edd868e3dd49a774768f8d6aa2f615e6e1d1f2fd803dc3b62d4e76a4627876",
+    "src/solana_alpha_lab/factory/hfic_prior_memory.py": "e02df2c9fc519ea36b5560469a2ee82fb1393cb58727276194ca08913244a469",
     "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py": "f6f17e75757b3733c7246b75d8da42bcf7587daeb7af66da9342ff985cd29fda",
     "src/solana_alpha_lab/factory/hfic_session.py": "8497a3d1e3b3551faeb9c5ab3b4d8b5cf8da831b5b817067ea10057870d7d117",
-    "tests/test_forge_runtime_discovery_binding_v1.py": "845f8c3f27de4dd6bb10f55b44d83ce75fd792fb6e08f7ed587bd2791db65140",
+    "tests/test_forge_runtime_discovery_binding_v1.py": "c21a6e5cc81f3bd55531e7adb8381c9f6fe123c5c47d30720efcd873c653a174",
     "tests/test_hfic_grounded_discovery_v1.py": "41344ab04959936f2da63a45fd9b49d60753d12f56a1842972efa94b9c436734"
   },
   "active_stop_conditions": [],
@@ -41,14 +42,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_runtime_discovery_binding_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "a53a1ff5289dd0ea2f1f1c1196a18bee7b664de3093f21fa70f69693c4831d00",
+    "sha256": "b6e874a3dac90cefa2e55c2f4ee0f1c16b9af5e65e3c7c149586be2273c29b90",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PUBLISHED_BINDING_AND_OWNER_FINAL_TESTS",
     "independent_review": {
       "path": "docs/evidence/forge_runtime_discovery_binding_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "ac01ac5194174a47f1240c93016936dbd021636ee08f78d0260dbc717af98001",
+      "sha256": "12e37e44514a1e3be60e0a0273dc1f2910118277f179703b2f1dea0b563cd4b0",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
