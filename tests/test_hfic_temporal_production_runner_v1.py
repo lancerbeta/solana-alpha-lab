@@ -578,26 +578,46 @@ class TemporalVerticalTests(unittest.TestCase):
             _publish(data_root, workspace, week=1)
             rebound = resolve_published_discovery_binding(data_root)
             self.assertEqual(len(rebound["cohorts"]), 2)
-            self.assertNotEqual(
-                rebound["cohorts"][1]["observations_sha256"],
-                frozen_input[0]["observations_sha256"],
+            fresh = execute(compound_path)
+            self.assertNotEqual(fresh["data_binding_sha256"], compound_evidence["data_binding_sha256"])
+            fresh_hashes = {
+                item["observations_sha256"]
+                for item in fresh["result"]["experiment_recipe"]["frozen_input"]
+            }
+            self.assertIn(frozen_input[0]["observations_sha256"], fresh_hashes)
+            self.assertGreater(len(fresh_hashes), 1)
+            new_experiment = offline_v1_1_spec()
+            new_experiment["capability_id"] = "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+            new_experiment["capabilities"] = ["CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"]
+            new_experiment["parameters"] = {
+                "temporal_recipe": fresh["result"]["experiment_recipe"]
+            }
+            new_decision = classify_lane(
+                {
+                    "experiment_spec": new_experiment,
+                    "hypothesis_definition_sha256": HYPOTHESIS_DEFINITION_SHA256,
+                },
+                root=ROOT,
+                data_root=data_root,
+                as_of=AS_OF,
             )
+            self.assertEqual(new_decision.terminal, "FAST_LANE_READY", new_decision.reason_codes)
+            self.assertNotEqual(new_decision.run_key_sha256, decision.run_key_sha256)
             ops_again = OperationalStore(data_root / "ops" / "operational_state.sqlite")
             try:
                 again = DocumentRunner(root=ROOT, store=ops_again).start_document(
-                    experiment,
-                    spec_sha256="cd" * 32,
+                    new_experiment,
+                    spec_sha256="cf" * 32,
                     run_context=RunContext(
                         data_root=data_root,
                         hypothesis_definition_sha256=HYPOTHESIS_DEFINITION_SHA256,
-                        lane_decision=decision,
+                        lane_decision=new_decision,
                     ),
                 )
             finally:
                 ops_again.close()
             self.assertEqual(again["status"], "COMPLETE", again)
-            fresh = execute(compound_path)
-            self.assertNotEqual(fresh["data_binding_sha256"], compound_evidence["data_binding_sha256"])
+            self.assertNotEqual(again["run_id_or_null"], run_id)
             self.assertEqual(
                 json.loads(artifact.read_text(encoding="utf-8"))["capability_result"]["summary"]["mean_target"],
                 saved_summary["mean_target"],
