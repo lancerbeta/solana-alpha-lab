@@ -16,19 +16,19 @@
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "3bb87edb38f0fd9a18160d324c4bcbad1f8fdaa551f9883b1b4ee1178bb68b0a",
     ".cursor/commands/hypothesis-forge.md": "ad9a81428819a83836514e8020faf3416f28a6957766f86f98805670aed440bd",
-    "catalog/assets/core.yaml": "88fb740fe611bfcedad756c213862bafb428a4064c38020f8b6ae1f60762ecd3",
+    "catalog/assets/core.yaml": "7cf677165067feb67d7b5c4b81e06adc7f8af42024da37977d720532dbe7918b",
     "catalog/schemas/hypothesis_critic_input_v1.schema.json": "7bc5fee2b1103635421b917e46a72448c66dbed7ff8529156f19166d97d12c72",
     "docs/evidence/forge_runtime_discovery_binding_repair/a1_live_binding_readback_v1.json": "08664fc90618e3073c931a13f5eae94a84ea8615b57a23b7a2e4b1ebba5b11b1",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "a18e921493e47090e5d12bc3e8d51945cc3fcfe227c1b5ed67f1f843c4747149",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "6bea0a252ed95a2f3a582fdfde0e690644086c33c7515b8baaca271a38894343",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "8be3cf45ba34d791979d37b38a5d4d948f94b0415174980cb1c75c7310ea3e9b",
-    "docs/reports/forge_runtime_discovery_binding_repair/a1_owner_readout_v1.md": "e15fc8b3541801b2932ee389debe773babf9973a413285488bcda4f88c8bd933",
+    "docs/reports/forge_runtime_discovery_binding_repair/a1_owner_readout_v1.md": "20d6a4dff8b20cef0d2df36ec5428615746184a92d4aae7cbe63501201aabe61",
     "docs/tasks/FORGE_RUNTIME_DISCOVERY_BINDING_REPAIR_V1.md": "774d6f237359d96281a68d4d7771ff4a6b6c1a8aeca7af009dfab36afdca2dc5",
     "scripts/hypothesis_forge.py": "95aad2a5aaa7d3b2fa2a472afe52f2aa5214fc8a66ffe4debcbd3e55f8206faf",
     "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "dbace633f25f70b57f817bd748afc88bd3ae60f5f5ebbc058880d35ad151e4d1",
     "src/solana_alpha_lab/factory/hfic_prior_memory.py": "f3d63bde584c5e168ae7b48a508749fba85e6b39aa99a855ef730c2bfa2f2c31",
     "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py": "f6f17e75757b3733c7246b75d8da42bcf7587daeb7af66da9342ff985cd29fda",
-    "src/solana_alpha_lab/factory/hfic_session.py": "4b26c8357b3744cabb413a1ccfa9a67914543c35c5065d43f6cf6d2e063882e2",
-    "tests/test_forge_runtime_discovery_binding_v1.py": "ad437def1c37379716551c5e41793aaf992044ad2125213981d93f891fe5dc68",
+    "src/solana_alpha_lab/factory/hfic_session.py": "8497a3d1e3b3551faeb9c5ab3b4d8b5cf8da831b5b817067ea10057870d7d117",
+    "tests/test_forge_runtime_discovery_binding_v1.py": "845f8c3f27de4dd6bb10f55b44d83ce75fd792fb6e08f7ed587bd2791db65140",
     "tests/test_hfic_grounded_discovery_v1.py": "41344ab04959936f2da63a45fd9b49d60753d12f56a1842972efa94b9c436734"
   },
   "active_stop_conditions": [],
@@ -41,14 +41,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_runtime_discovery_binding_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "91db0f281bc077236cc0a1376a8a9da896956a4f38cab1a3e4287d6be7745a00",
+    "sha256": "a53a1ff5289dd0ea2f1f1c1196a18bee7b664de3093f21fa70f69693c4831d00",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PUBLISHED_BINDING_AND_OWNER_FINAL_TESTS",
     "independent_review": {
       "path": "docs/evidence/forge_runtime_discovery_binding_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "f14aed2f66dbfc6ce7502ac45557808c9eaf0ac75e335bb521827f519d1e9450",
+      "sha256": "ac01ac5194174a47f1240c93016936dbd021636ee08f78d0260dbc717af98001",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
