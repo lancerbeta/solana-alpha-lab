@@ -17,28 +17,29 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "On 1cacf267 StableId is unchanged. Publisher dataset-<sha> is accepted only as a dataset manifest id. A hashed schedule that fails Factory X300 is CANONICAL_X300_SCHEDULE_INCOMPATIBLE and is a technical stop."
+        "On 7a18de77 each unique frozen manifest requires one DATASET_MANIFEST binding. A blank or unequal fingerprint is MANIFEST_MISMATCH before the value loader. The recipe-only helper that omits both data_bindings and availability_cutoff still skips the check."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "The published temporal manifest id passes schema, resolver, classifier, DocumentRunner and the saved passport. CLI freeze distinguishes pending compound, worthy simple, and NO_WORTHY with the selected ref omitted."
+        "The published corpus stays COMPLETE and the passport carries the manifest id and fingerprint that were used. Commissioning substitution, a missing binding, an undeclared manifest, a duplicate, a wrong fingerprint, and a null fingerprint stop before the value loader without COMPLETE."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Hash match does not grant Factory X300. Publisher dataset-<sha> is a scoped manifest id and does not widen StableId."
+        "packet_fingerprint_sha256=56ec2b69bbfd8dc21363d92179a19d04a434eb6bece365a5f3db018e1bbf3d81",
+        "FAST_LANE_READY does not grant frozen-manifest identity. FAILED_INFRA remains a technical stop with scientific_terminal INVALID. None==None is not a fingerprint match."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "The skill says to omit selected_candidate_ref and not send an empty string or null. Pending compound, worthy simple, and completed no-candidate search are distinct on the freeze command."
+        "A binding failure is FAILED_INFRA or a classifier deny with an explicit reason code. It is not a COMPLETE scientific result. No new owner command was added."
       ]
     }
   ],
