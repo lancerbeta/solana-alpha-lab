@@ -17,32 +17,32 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "On 822d4e37 schedule lateness is projected from the verified document, the signature index is one pass, preview identity includes the journal, and budget classification runs before the evaluator. The capabilities.py pin moved only for the additive temporal router; the other five factory-core pins stayed."
+        "On 1cacf267 StableId is unchanged. Publisher dataset-<sha> is accepted only as a dataset manifest id. A hashed schedule that fails Factory X300 is CANONICAL_X300_SCHEDULE_INCOMPATIBLE and is a technical stop."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "The published vertical reaches classify_lane and DocumentRunner, and a missing schedule is CANONICAL_SCHEDULE_UNBOUND without a write. NO_WORTHY coverage is proven on the closure function, not yet on a schema-valid freeze with an empty selected candidate."
+        "The published temporal manifest id passes schema, resolver, classifier, DocumentRunner and the saved passport. CLI freeze distinguishes pending compound, worthy simple, and NO_WORTHY with the selected ref omitted."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "load_hashed_schedule_document does not invent lateness. resolve_canonical_release_schedule still verifies factory X300. A missing schedule is CANONICAL_SCHEDULE_UNBOUND."
+        "Hash match does not grant Factory X300. Publisher dataset-<sha> is a scoped manifest id and does not widen StableId."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "SEARCH_EXHAUSTED_WITHOUT_COMPOUND is now in the technical-stop banner. A schema-valid freeze of NO_WORTHY without a selected candidate was not shown, so the owner path for that closure is not fully operable."
+        "The skill says to omit selected_candidate_ref and not send an empty string or null. Pending compound, worthy simple, and completed no-candidate search are distinct on the freeze command."
       ]
     }
   ],
-  "verdict": "NOT_READY",
+  "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "NO_MERGE",
