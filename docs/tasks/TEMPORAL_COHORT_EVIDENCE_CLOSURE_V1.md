@@ -37,6 +37,7 @@ managed_write_set:
   - tests/test_hfic_temporal_production_runner_v1.py
   - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
   - catalog/assets/core.yaml
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
   - docs/reports/temporal_cohort_evidence_closure/a1_owner_readout_v1.md
   - docs/evidence/temporal_cohort_evidence_closure/a1_delivery_completion_evidence_v1.json
   - docs/evidence/temporal_cohort_evidence_closure/a1_delivery_independent_review_v1.json
