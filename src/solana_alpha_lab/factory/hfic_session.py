@@ -560,7 +560,18 @@ def _effective_at_key(value: object) -> str:
 
 
 def _cycle_better(candidate: Mapping[str, Any], current: Mapping[str, Any]) -> bool:
-    """Match projection: phase_rank ASC, hfic_cycle_seq DESC, effective_at DESC, record_id ASC."""
+    """Match projection: phase_rank ASC, hfic_cycle_seq DESC, effective_at DESC, record_id ASC.
+
+    Repair-continuation cycles outrank older completes by sequence so a new
+    terminal written under an authorized disposition becomes the active bundle.
+    """
+    cand_repair = bool(candidate.get("repair_continuation_disposition_sha256"))
+    cur_repair = bool(current.get("repair_continuation_disposition_sha256"))
+    if cand_repair or cur_repair:
+        cand_seq = int(candidate.get("hfic_cycle_seq") or 0)
+        cur_seq = int(current.get("hfic_cycle_seq") or 0)
+        if cand_seq != cur_seq:
+            return cand_seq > cur_seq
     cand_rank = phase_rank(candidate.get("phase") or candidate.get("session_state"))
     cur_rank = phase_rank(current.get("phase") or current.get("session_state"))
     if cand_rank != cur_rank:
@@ -2814,23 +2825,42 @@ def persist_no_worthy_session(
 
     session_id = str(frozen["session_id"])
     existing = load_session_bundle(store, session_id)
+    repair_admission = None
     if existing is not None:
-        action = existing.get("next_action")
-        if isinstance(action, Mapping):
-            return dict(action)
-        receipt = existing.get("session_receipt")
-        referenced = isinstance(receipt, Mapping) and receipt.get(
-            "next_action_artifact_sha256"
+        try:
+            repair_admission = _assert_scientific_admission(
+                store,
+                frozen,
+                repo_root=repo_root,
+                representation_registry=representation_registry,
+            )
+        except HficSessionError:
+            repair_admission = None
+        from solana_alpha_lab.factory.hfic_repair_continuation import (
+            ACTION_RESUME_REPAIR_CONTINUATION,
         )
-        if referenced:
-            raise HficSessionError("HFIC_NEXT_ACTION_ARTIFACT_MISSING")
-        return {"action_type": str(existing.get("next") or "STOP")}
-    _assert_scientific_admission(
-        store,
-        frozen,
-        repo_root=repo_root,
-        representation_registry=representation_registry,
-    )
+
+        if (
+            not isinstance(repair_admission, Mapping)
+            or repair_admission.get("action") != ACTION_RESUME_REPAIR_CONTINUATION
+        ):
+            action = existing.get("next_action")
+            if isinstance(action, Mapping):
+                return dict(action)
+            receipt = existing.get("session_receipt")
+            referenced = isinstance(receipt, Mapping) and receipt.get(
+                "next_action_artifact_sha256"
+            )
+            if referenced:
+                raise HficSessionError("HFIC_NEXT_ACTION_ARTIFACT_MISSING")
+            return {"action_type": str(existing.get("next") or "STOP")}
+    if repair_admission is None:
+        repair_admission = _assert_scientific_admission(
+            store,
+            frozen,
+            repo_root=repo_root,
+            representation_registry=representation_registry,
+        )
     # Admission is the first lifecycle boundary: legacy combined-only input
     # must receive SCIENTIFIC_ADMISSION_REQUIRED before any current-protocol
     # provenance diagnosis.  Once the split slot is admissible, recheck the
@@ -2920,6 +2950,15 @@ def persist_no_worthy_session(
     action_bytes = _canonical_bytes(action)
     action_sha = hashlib.sha256(action_bytes).hexdigest()
     prompt_version = str(frozen.get("prompt_version") or PROMPT_VERSION)
+    repair_disposition = None
+    if isinstance(repair_admission, Mapping):
+        repair_disposition = repair_admission.get(
+            "repair_continuation_disposition_sha256"
+        )
+    cycle_seq = _next_cycle_seq(existing)
+    cycle_suffix = "NO-WORTHY"
+    if isinstance(repair_disposition, str) and repair_disposition:
+        cycle_suffix = f"REPAIR-{repair_disposition[:12].upper()}"
     receipt = {
         "session_id": session_id,
         "session_state": "SYNTHESIS_COMPLETE",
@@ -2937,7 +2976,7 @@ def persist_no_worthy_session(
         "critic_launched": False,
         "critic_terminal": "NO_WORTHY_HYPOTHESIS",
         "lane_classifier_terminal": None,
-        "decision_event_ids": [f"HFIC-DEC-{session_id}-NO-WORTHY"],
+        "decision_event_ids": [f"HFIC-DEC-{session_id}-{cycle_suffix}"],
         "next": action["action_type"],
         "next_action_artifact_sha256": action_sha,
         "next_action_type": action["action_type"],
@@ -2992,11 +3031,11 @@ def persist_no_worthy_session(
     receipt_sha = hashlib.sha256(receipt_bytes).hexdigest()
     records = [
         event(
-            record_id=f"HFIC-CYCLE-{session_id}-NO-WORTHY",
+            record_id=f"HFIC-CYCLE-{session_id}-{cycle_suffix}",
             kind=RecordKind.RESEARCH_CYCLE,
             entity_id=session_id,
             payload={
-                "research_cycle_id": f"{session_id}-NO-WORTHY",
+                "research_cycle_id": f"{session_id}-{cycle_suffix}",
                 "session_id": session_id,
                 "phase": "SYNTHESIS_COMPLETE",
                 "hfic_protocol": prompt_version,
@@ -3023,6 +3062,17 @@ def persist_no_worthy_session(
                 "git_composite_sha256": frozen.get("git_composite_sha256"),
                 "research_memory_as_of": frozen.get("research_memory_as_of"),
                 "revision_count": 0,
+                "hfic_cycle_seq": cycle_seq,
+                **(
+                    {
+                        "repair_continuation_disposition_sha256": repair_disposition,
+                        "parent_cycle_seq": int(existing.get("hfic_cycle_seq") or 0)
+                        if isinstance(existing, Mapping)
+                        else 0,
+                    }
+                    if isinstance(repair_disposition, str) and repair_disposition
+                    else {}
+                ),
                 **_execution_identity_fields(frozen),
                 **_split_identity_fields(frozen),
                 **(
@@ -3056,11 +3106,11 @@ def persist_no_worthy_session(
             },
         ),
         event(
-            record_id=f"HFIC-ART-SESSION-RECEIPT-{session_id}",
+            record_id=f"HFIC-ART-SESSION-RECEIPT-{session_id}-{cycle_suffix}",
             kind=RecordKind.RESEARCH_ARTIFACT,
-            entity_id=f"HFIC-ART-SESSION-RECEIPT-{session_id}",
+            entity_id=f"HFIC-ART-SESSION-RECEIPT-{session_id}-{cycle_suffix}",
             payload={
-                "research_artifact_id": f"HFIC-ART-SESSION-RECEIPT-{session_id}",
+                "research_artifact_id": f"HFIC-ART-SESSION-RECEIPT-{session_id}-{cycle_suffix}",
                 "session_id": session_id,
                 "hfic_protocol": prompt_version,
                 "artifact_kind": "SESSION_RECEIPT",
@@ -3069,11 +3119,11 @@ def persist_no_worthy_session(
             },
         ),
         event(
-            record_id=f"HFIC-DEC-{session_id}-NO-WORTHY",
+            record_id=f"HFIC-DEC-{session_id}-{cycle_suffix}",
             kind=RecordKind.DECISION_EVENT,
-            entity_id=f"HFIC-DEC-{session_id}-NO-WORTHY",
+            entity_id=f"HFIC-DEC-{session_id}-{cycle_suffix}",
             payload={
-                "decision_event_id": f"HFIC-DEC-{session_id}-NO-WORTHY",
+                "decision_event_id": f"HFIC-DEC-{session_id}-{cycle_suffix}",
                 "session_id": session_id,
                 "hfic_protocol": prompt_version,
                 "decision_kind": "REJECT",
@@ -3529,6 +3579,10 @@ def _assert_scientific_admission(
     from solana_alpha_lab.factory.hfic_evidence_identity import (
         resolve_scientific_admission,
     )
+    from solana_alpha_lab.factory.hfic_repair_continuation import (
+        ACTION_RESUME_REPAIR_CONTINUATION,
+        list_repair_continuation_dispositions,
+    )
 
     visible_cohort_ids = binding.get("visible_cohort_ids")
     if not isinstance(visible_cohort_ids, list):
@@ -3576,6 +3630,7 @@ def _assert_scientific_admission(
             )
             if isinstance(fields.get(key) or binding.get(key), str)
         },
+        repair_continuations=list_repair_continuation_dispositions(store),
     )
     action = str(admission.get("action") or "")
     if action == "STOP" and str(admission.get("reason_code") or "") == (
@@ -3664,6 +3719,7 @@ def _assert_scientific_admission(
     if admitted_id == session_id and action in {
         "RESUME_EXISTING_SESSION",
         "RETURN_EXISTING_SESSION",
+        ACTION_RESUME_REPAIR_CONTINUATION,
     }:
         return admission
     raise HficSessionError(
@@ -4606,16 +4662,35 @@ def persist_frozen_session(
 
     session_id = str(frozen["session_id"])
     existing = load_session_bundle(store, session_id)
+    repair_admission = None
     if existing is not None:
-        return
+        try:
+            repair_admission = _assert_scientific_admission(
+                store,
+                frozen,
+                repo_root=repo_root,
+                representation_registry=representation_registry,
+            )
+        except HficSessionError:
+            repair_admission = None
+        from solana_alpha_lab.factory.hfic_repair_continuation import (
+            ACTION_RESUME_REPAIR_CONTINUATION,
+        )
+
+        if (
+            not isinstance(repair_admission, Mapping)
+            or repair_admission.get("action") != ACTION_RESUME_REPAIR_CONTINUATION
+        ):
+            return
     if stage_time is not None:
         _stage_datetime(lambda: stage_time)
-    _assert_scientific_admission(
-        store,
-        frozen,
-        repo_root=repo_root,
-        representation_registry=representation_registry,
-    )
+    if repair_admission is None:
+        repair_admission = _assert_scientific_admission(
+            store,
+            frozen,
+            repo_root=repo_root,
+            representation_registry=representation_registry,
+        )
     persist_scientific_slot_admission(
         store,
         frozen,
@@ -4699,9 +4774,21 @@ def persist_frozen_session(
                 "git_composite_sha256": frozen.get("git_composite_sha256"),
                 "research_memory_as_of": frozen.get("research_memory_as_of"),
                 "revision_count": int(frozen.get("revision_count") or 0),
-                "hfic_cycle_seq": 1,
+                "hfic_cycle_seq": _next_cycle_seq(existing),
                 **_execution_identity_fields(frozen),
             }
+    if (
+        isinstance(repair_admission, Mapping)
+        and isinstance(
+            repair_admission.get("repair_continuation_disposition_sha256"), str
+        )
+        and repair_admission.get("repair_continuation_disposition_sha256")
+    ):
+        cycle_payload["repair_continuation_disposition_sha256"] = repair_admission[
+            "repair_continuation_disposition_sha256"
+        ]
+        if isinstance(existing, Mapping):
+            cycle_payload["parent_cycle_seq"] = int(existing.get("hfic_cycle_seq") or 0)
     _copy_evidence_surface_mode(cycle_payload, frozen)
     _stamp_split_identity(cycle_payload, frozen)
     _stamp_market_evidence_basis(cycle_payload, frozen)
@@ -4728,9 +4815,13 @@ def persist_frozen_session(
         cycle_payload["recovery_execution_binding_sha256"] = frozen.get(
             "recovery_execution_binding_sha256"
         )
+    freeze_suffix = "FROZEN"
+    repair_disp = cycle_payload.get("repair_continuation_disposition_sha256")
+    if isinstance(repair_disp, str) and repair_disp:
+        freeze_suffix = f"REPAIR-FROZEN-{repair_disp[:12].upper()}"
     records = [
         event(
-            record_id=f"HFIC-CYCLE-{session_id}-FROZEN",
+            record_id=f"HFIC-CYCLE-{session_id}-{freeze_suffix}",
             kind=RecordKind.RESEARCH_CYCLE,
             entity_id=session_id,
             payload=cycle_payload,

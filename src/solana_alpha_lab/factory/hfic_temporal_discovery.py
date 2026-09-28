@@ -458,6 +458,75 @@ def _deadline_for(anchor: object, point: str, lateness: int, *, due_offset: int 
     return parsed + timedelta(seconds=offset + lateness)
 
 
+_REGISTERED_PRIMITIVE_IDS: frozenset[str] | None = None
+
+
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parents[3]
+
+
+def _registered_primitive_ids() -> frozenset[str]:
+    global _REGISTERED_PRIMITIVE_IDS
+    if _REGISTERED_PRIMITIVE_IDS is not None:
+        return _REGISTERED_PRIMITIVE_IDS
+    from solana_alpha_lab.factory.observation_primitive_registry import (
+        load_observation_primitive_registry,
+    )
+
+    registry = load_observation_primitive_registry(_repo_root())
+    _REGISTERED_PRIMITIVE_IDS = frozenset(registry.primitives)
+    return _REGISTERED_PRIMITIVE_IDS
+
+
+def _is_hex64(value: object) -> bool:
+    text = str(value or "")
+    return len(text) == 64 and all(ch in "0123456789abcdef" for ch in text)
+
+
+def _snapshot_lineage_reason(
+    row: Mapping[str, Any],
+    *,
+    query_policy: str,
+    point_due_at: object | None = None,
+    outer_deadline: object | None = None,
+) -> str | None:
+    """Return exclusion code when snapshot lineage/policy/acquisition fails."""
+
+    row_policy = row.get("observation_clock_policy")
+    if row_policy not in (None, "", query_policy):
+        return "SNAPSHOT_POLICY_MISMATCH"
+    primitive_id = str(row.get("primitive_id") or "")
+    occurrence = str(row.get("call_occurrence_id") or "")
+    request_digest = str(row.get("request_sha256") or "")
+    if (
+        not primitive_id
+        or primitive_id not in _registered_primitive_ids()
+        or not _is_hex64(occurrence)
+        or not _is_hex64(request_digest)
+    ):
+        return "SNAPSHOT_OCCURRENCE_UNBOUND"
+    request = _parse_time(row.get("request_started_at"))
+    response = _parse_time(row.get("response_received_at"))
+    available = _parse_time(row.get("first_reliable_available_at"))
+    if request is None or response is None or available is None:
+        return "MISSING_ACQUISITION_CLOCK"
+    if not (request <= response <= available):
+        return "CLOCK_ORDER_INVALID"
+    if point_due_at is not None and request < point_due_at:
+        return "ACQUISITION_BEFORE_POINT_DUE"
+    if outer_deadline is not None and available > outer_deadline:
+        return "AVAILABILITY_AFTER_DEADLINE"
+    # Availability claimed inside the outer window must not hide request/response
+    # that only arrive after that window (contradictory acquisition clocks).
+    if (
+        outer_deadline is not None
+        and available <= outer_deadline
+        and (request > outer_deadline or response > outer_deadline)
+    ):
+        return "ACQUISITION_AFTER_CUTOFF"
+    return None
+
+
 def _select_cell(rows: Sequence[Mapping[str, Any]], deadline: object) -> dict[str, Any]:
     if deadline is None:
         return {"status": "ABSENT"}
@@ -495,15 +564,59 @@ def _select_cell(rows: Sequence[Mapping[str, Any]], deadline: object) -> dict[st
         "primitive_id": winner.get("primitive_id"),
         "call_occurrence_id": winner.get("call_occurrence_id"),
         "request_sha256": winner.get("request_sha256"),
+        "observation_clock_policy": winner.get("observation_clock_policy"),
     }
+
+
+def _select_snapshot_cell(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    query_policy: str,
+    point_due_at: object | None,
+    deadline: object,
+) -> dict[str, Any]:
+    """Availability-bound cell read with snapshot lineage/acquisition checks."""
+
+    if deadline is None:
+        return {"status": "ABSENT"}
+    legal: list[tuple[object, Mapping[str, Any]]] = []
+    for row in rows:
+        reason = _snapshot_lineage_reason(
+            row,
+            query_policy=query_policy,
+            point_due_at=point_due_at,
+            outer_deadline=deadline,
+        )
+        if reason is not None:
+            continue
+        available = _parse_time(row.get("first_reliable_available_at"))
+        if available is None or available > deadline:
+            continue
+        if str(row.get("state") or "") != "OBSERVED":
+            continue
+        legal.append((available, row))
+    if not legal:
+        return {"status": "ABSENT"}
+    return _select_cell([row for _, row in legal], deadline)
 
 
 def _cell(
     grouped: Mapping[tuple[str, str, str, str, str], Sequence[Mapping[str, Any]]],
     key: tuple[str, str, str, str, str],
     deadline: object,
+    *,
+    snapshot_policy: str | None = None,
+    point_due_at: object | None = None,
 ) -> dict[str, Any]:
-    return _select_cell(tuple(grouped.get(key, ())), deadline)
+    rows = tuple(grouped.get(key, ()))
+    if snapshot_policy:
+        return _select_snapshot_cell(
+            rows,
+            query_policy=snapshot_policy,
+            point_due_at=point_due_at,
+            deadline=deadline,
+        )
+    return _select_cell(rows, deadline)
 
 
 def _predicate_holds(value: float | None, predicate: Mapping[str, Any]) -> bool | None:
@@ -533,6 +646,7 @@ def _feature_value(
     decision_deadline: object,
     due_offset_for: Any = None,
     lateness_for: Any = None,
+    snapshot_policy: str | None = None,
 ) -> float | None:
     def offset(point: str) -> int | None:
         if due_offset_for is None:
@@ -545,12 +659,22 @@ def _feature_value(
         return int(lateness_for(point))
 
     def read(point: str, field: str) -> dict[str, Any]:
+        due = offset(point)
         point_deadline = _deadline_for(
-            anchor, point, point_lateness(point), due_offset=offset(point)
+            anchor, point, point_lateness(point), due_offset=due
         )
         if point_deadline is None or decision_deadline is None or point_deadline > decision_deadline:
             return {"status": "ABSENT"}
-        return _cell(grouped, (cohort, release, mint, point, field), point_deadline)
+        point_due_at = _due_moment(anchor, int(due)) if due is not None else None
+        cutoff = point_deadline if snapshot_policy else point_deadline
+        # Snapshot features keep their own point deadline and acquisition lineage.
+        return _cell(
+            grouped,
+            (cohort, release, mint, point, field),
+            cutoff,
+            snapshot_policy=snapshot_policy,
+            point_due_at=point_due_at if snapshot_policy else None,
+        )
 
     op = str(feature["op"])
     if op == "point_value":
@@ -724,6 +848,7 @@ def _select_snapshot_exit(
     entry_at: object,
     exit_due_at: object,
     exit_deadline: object,
+    query_policy: str = OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
 ) -> tuple[dict[str, Any], str | None]:
     """Select a provider-reported snapshot exit under acquisition clocks.
 
@@ -739,15 +864,14 @@ def _select_snapshot_exit(
     legal: list[tuple[object, Mapping[str, Any]]] = []
     seen_reasons: list[str] = []
     for exit_row in exit_rows:
-        primitive_id = str(exit_row.get("primitive_id") or "")
-        occurrence = str(exit_row.get("call_occurrence_id") or "")
-        request_digest = str(exit_row.get("request_sha256") or "")
-        if (
-            not primitive_id.startswith("PRIM-")
-            or not occurrence
-            or not request_digest
-        ):
-            seen_reasons.append("SNAPSHOT_OCCURRENCE_UNBOUND")
+        lineage = _snapshot_lineage_reason(
+            exit_row,
+            query_policy=query_policy,
+            point_due_at=exit_due_at,
+            outer_deadline=exit_deadline,
+        )
+        if lineage is not None:
+            seen_reasons.append(lineage)
             continue
         request = _parse_time(exit_row.get("request_started_at"))
         response = _parse_time(exit_row.get("response_received_at"))
@@ -768,15 +892,6 @@ def _select_snapshot_exit(
         if request is None or response is None or available is None:
             seen_reasons.append("MISSING_ACQUISITION_CLOCK")
             continue
-        if request < exit_due_at:
-            seen_reasons.append("ACQUISITION_BEFORE_POINT_DUE")
-            continue
-        if not (exit_due_at <= request <= response <= available):
-            seen_reasons.append("CLOCK_ORDER_INVALID")
-            continue
-        if exit_deadline is not None and available > exit_deadline:
-            seen_reasons.append("AVAILABILITY_AFTER_DEADLINE")
-            continue
         if request <= entry_at:
             seen_reasons.append("REQUEST_NOT_AFTER_ENTRY")
             continue
@@ -790,10 +905,12 @@ def _select_snapshot_exit(
         preferred = (
             "REQUEST_NOT_AFTER_ENTRY",
             "ACQUISITION_BEFORE_POINT_DUE",
+            "ACQUISITION_AFTER_CUTOFF",
             "AVAILABILITY_AFTER_DEADLINE",
             "CLOCK_ORDER_INVALID",
             "SOURCE_PRICE_EVENT_STALE",
             "SOURCE_PRICE_EVENT_MALFORMED",
+            "SNAPSHOT_POLICY_MISMATCH",
             "SNAPSHOT_OCCURRENCE_UNBOUND",
             "MISSING_ACQUISITION_CLOCK",
             "EXIT_NOT_OBSERVED",
@@ -1391,18 +1508,29 @@ def execute_temporal_discovery(
         signatures[identity] = signature
         exclusion = None
         in_base = False
+        clock_policy = str(
+            body.get("observation_clock_policy") or OBSERVATION_CLOCK_EVENT_TIME_V1
+        )
+        snapshot_policy = (
+            clock_policy
+            if clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
+            else None
+        )
         if str(row.get("candidate_state") or "") != "X_ELIGIBLE" or decision_deadline is None:
             exclusion = "NOT_X_ELIGIBLE"
         else:
+            x300_due, x300_late = _due_late(cohort, release, "X300")
             liquidity = _cell(
                 grouped,
                 (cohort, release, mint, "X300", LIQUIDITY),
                 _deadline_for(
                     anchor,
                     "X300",
-                    _due_late(cohort, release, "X300")[1],
-                    due_offset=_due_late(cohort, release, "X300")[0],
+                    x300_late,
+                    due_offset=x300_due,
                 ),
+                snapshot_policy=snapshot_policy,
+                point_due_at=_due_moment(anchor, x300_due) if snapshot_policy else None,
             )
             if liquidity.get("status") != "OBSERVED":
                 exclusion = "PIT_LIQUIDITY_MISSING"
@@ -1411,10 +1539,13 @@ def execute_temporal_discovery(
         feature_values: dict[str, float | None] = {}
         decision_eligible = False
         if in_base:
+            decision_due, _decision_late = _due_late(cohort, release, decision_point)
             decision_price = _cell(
                 grouped,
                 (cohort, release, mint, decision_point, PRICE),
                 decision_deadline,
+                snapshot_policy=snapshot_policy,
+                point_due_at=_due_moment(anchor, decision_due) if snapshot_policy else None,
             )
             decision_eligible = decision_price.get("status") == "OBSERVED"
             if decision_eligible:
@@ -1434,6 +1565,7 @@ def execute_temporal_discovery(
                         lateness_for=lambda point, cohort=cohort, release=release: _due_late(
                             cohort, release, point
                         )[1],
+                        snapshot_policy=snapshot_policy,
                     )
         hits = [
             _predicate_holds(feature_values.get(str(item["feature"])), item) for item in predicates
@@ -1444,9 +1576,6 @@ def execute_temporal_discovery(
         target_observed = False
         target_exclusion = None
         selected_source_event = "UNKNOWN"
-        clock_policy = str(
-            body.get("observation_clock_policy") or OBSERVATION_CLOCK_EVENT_TIME_V1
-        )
         if in_base and decision_deadline is not None:
             entry_at = decision_deadline + timedelta(
                 seconds=int(body["entry_model"]["assumed_latency_seconds"])
@@ -1462,6 +1591,7 @@ def execute_temporal_discovery(
                     entry_at=entry_at,
                     exit_due_at=exit_due_at,
                     exit_deadline=exit_deadline,
+                    query_policy=clock_policy,
                 )
             else:
                 selected, target_exclusion = _select_event_time_exit(
@@ -1492,6 +1622,8 @@ def execute_temporal_discovery(
                 grouped,
                 (cohort, release, mint, reference_point, PRICE),
                 ref_cutoff,
+                snapshot_policy=snapshot_policy,
+                point_due_at=_due_moment(anchor, reference_due) if snapshot_policy else None,
             )
             if (
                 selected.get("status") == "OBSERVED"

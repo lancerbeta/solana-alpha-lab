@@ -230,11 +230,16 @@ def plan_repair_continuation(
         parent_session.get("terminal_receipt_sha256")
         or parent_session.get("session_receipt_sha256")
     )
-    if (
-        isinstance(parent_receipt, str)
-        and parent_receipt
-        and parent_receipt != body["terminal_receipt_sha256"]
-    ):
+    if not isinstance(parent_receipt, str) or not parent_receipt:
+        return _owner_plan(
+            status="NOT_APPLICABLE",
+            reason_code="PARENT_TERMINAL_RECEIPT_MISSING",
+            writes=False,
+            disposition=body,
+            owner_status="BLOCKED",
+            next_step="PROVIDE_TERMINAL_RECEIPT_FROM_SHOW_SESSION",
+        )
+    if parent_receipt != body["terminal_receipt_sha256"]:
         return _owner_plan(
             status="NOT_APPLICABLE",
             reason_code="TERMINAL_RECEIPT_MISMATCH",
@@ -243,6 +248,50 @@ def plan_repair_continuation(
             owner_status="BLOCKED",
             next_step="ALIGN_DRAFT_TERMINAL_RECEIPT",
         )
+    parent_run = (
+        parent_session.get("run_id")
+        or parent_session.get("forge_run_id")
+        or parent_session.get("parent_run_id")
+    )
+    if isinstance(parent_run, str) and parent_run and parent_run != body["parent_run_id"]:
+        return _owner_plan(
+            status="NOT_APPLICABLE",
+            reason_code="PARENT_RUN_MISMATCH",
+            writes=False,
+            disposition=body,
+            owner_status="BLOCKED",
+            next_step="ALIGN_DRAFT_PARENT_RUN_ID",
+        )
+    if store is not None and (
+        not isinstance(parent_run, str) or not parent_run
+    ):
+        looked = _lookup_forge_run_for_parent(
+            store,
+            session_id=session_id,
+            scientific_slot_sha256=str(body["scientific_slot_sha256"]),
+        )
+        observed_run = (
+            str(looked.get("run_id") or "") if isinstance(looked, Mapping) else ""
+        )
+        if observed_run and observed_run != body["parent_run_id"]:
+            return _owner_plan(
+                status="NOT_APPLICABLE",
+                reason_code="PARENT_RUN_MISMATCH",
+                writes=False,
+                disposition=body,
+                owner_status="BLOCKED",
+                next_step="ALIGN_DRAFT_PARENT_RUN_ID",
+            )
+        spent_probe = spent_looks_from_journal(store, body["journal_scope"])
+        if int(spent_probe["look_count"]) > 0 and not observed_run:
+            return _owner_plan(
+                status="NOT_APPLICABLE",
+                reason_code="PARENT_RUN_UNPROVEN",
+                writes=False,
+                disposition=body,
+                owner_status="BLOCKED",
+                next_step="BIND_PARENT_RUN_FROM_STORE",
+            )
     parent_scope = (
         parent_session.get("journal_scope") or parent_session.get("search_key_sha256")
     )
@@ -258,6 +307,32 @@ def plan_repair_continuation(
             disposition=body,
             owner_status="BLOCKED",
             next_step="ALIGN_DRAFT_JOURNAL_SCOPE",
+        )
+    # Closed/applied dispositions are durable history: recognize them before
+    # journal spent alignment, which may have grown during the continuation.
+    for item in existing_dispositions:
+        if not isinstance(item, Mapping):
+            continue
+        if item.get("disposition_sha256") != body["disposition_sha256"]:
+            continue
+        if item.get("status") == "CLOSED":
+            return _owner_plan(
+                status="NOT_APPLICABLE",
+                reason_code="DISPOSITION_ALREADY_CLOSED",
+                writes=False,
+                disposition=dict(item),
+                owner_status="BLOCKED",
+                next_step="STOP_CONTINUATION_ALREADY_CONSUMED",
+            )
+        return _owner_plan(
+            status="ALREADY_APPLIED",
+            reason_code="IDEMPOTENT_REPLAY",
+            writes=False,
+            disposition=dict(item),
+            owner_status="DONE",
+            next_step="ORDINARY_TEMPORAL_QUERY_WITHIN_REMAINING_BUDGET",
+            remaining_main_looks=max(0, 6 - int(body["spent_main_looks"])),
+            remaining_adaptive_looks=max(0, 2 - int(body["spent_adaptive_looks"])),
         )
     # Resolve spent looks from durable journal when store has looks.
     # Caller draft counts are assertions against the journal, not authority.
@@ -333,26 +408,6 @@ def plan_repair_continuation(
     for item in existing_dispositions:
         if not isinstance(item, Mapping):
             continue
-        if item.get("disposition_sha256") == body["disposition_sha256"]:
-            if item.get("status") == "CLOSED":
-                return _owner_plan(
-                    status="NOT_APPLICABLE",
-                    reason_code="DISPOSITION_ALREADY_CLOSED",
-                    writes=False,
-                    disposition=dict(item),
-                    owner_status="BLOCKED",
-                    next_step="STOP_CONTINUATION_ALREADY_CONSUMED",
-                )
-            return _owner_plan(
-                status="ALREADY_APPLIED",
-                reason_code="IDEMPOTENT_REPLAY",
-                writes=False,
-                disposition=dict(item),
-                owner_status="DONE",
-                next_step="ORDINARY_TEMPORAL_QUERY_WITHIN_REMAINING_BUDGET",
-                remaining_main_looks=max(0, 6 - int(body["spent_main_looks"])),
-                remaining_adaptive_looks=max(0, 2 - int(body["spent_adaptive_looks"])),
-            )
         if (
             item.get("parent_session_id") == body["parent_session_id"]
             and item.get("status") == "AUTHORIZED"
@@ -504,6 +559,7 @@ def spent_looks_from_journal(store: Any, journal_scope: str) -> dict[str, Any]:
     """Count spent discovery looks for one journal scope. No writes."""
 
     from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks
+    from solana_alpha_lab.factory.hfic_temporal_discovery import stored_preview_hashes
 
     looks = list_discovery_looks(store, journal_scope)
     main = 0
@@ -525,12 +581,15 @@ def spent_looks_from_journal(store: Any, journal_scope: str) -> dict[str, Any]:
             adaptive += 1
         elif look_class == "PREVIEW":
             preview += 1
+    # Feature previews are separate DISCOVERY_FEATURE_PREVIEW artifacts.
+    feature_previews = stored_preview_hashes(store, journal_scope)
+    preview = max(preview, len(feature_previews))
     return {
         "spent_main_looks": main,
         "spent_adaptive_looks": adaptive,
         "spent_preview_looks": preview,
         "allowed_look_ids": look_ids,
-        "look_count": len(looks),
+        "look_count": len(looks) + len(feature_previews),
     }
 
 
@@ -750,7 +809,39 @@ def apply_repair_continuation(
         producer_git_sha=git_sha,
         created_at=moment,
     )
-    store.append([event], transaction_id=event.transaction_id)
+
+    def _recheck_under_lease() -> None:
+        latest = list_repair_continuation_dispositions(store)
+        for item in latest:
+            if not isinstance(item, Mapping):
+                continue
+            if item.get("disposition_sha256") == identity:
+                if item.get("status") == "AUTHORIZED":
+                    return
+                raise RepairContinuationError("DISPOSITION_ALREADY_CLOSED")
+            if (
+                item.get("status") == "AUTHORIZED"
+                and item.get("scientific_slot_sha256") == body["scientific_slot_sha256"]
+                and item.get("parent_session_id") == body["parent_session_id"]
+                and item.get("disposition_sha256") != identity
+            ):
+                raise RepairContinuationError("COMPETING_DISPOSITION_APPLIED")
+        replan = plan_repair_continuation(
+            draft,
+            parent_session=parent_session,
+            existing_dispositions=latest,
+            store=store,
+        )
+        if replan["status"] != "READY":
+            raise RepairContinuationError(
+                str(replan.get("reason_code") or "NOT_READY_UNDER_LEASE")
+            )
+
+    store.append(
+        [event],
+        transaction_id=event.transaction_id,
+        before_commit=_recheck_under_lease,
+    )
     applied_plan = {
         **plan,
         "status": "APPLIED",

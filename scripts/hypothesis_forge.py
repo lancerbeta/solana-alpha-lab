@@ -1762,12 +1762,24 @@ def cmd_repair_continuation_plan(
                         "final_session_terminal",
                         "selected_candidate_id",
                         "scientific_slot_sha256",
+                        "session_receipt_sha256",
+                        "terminal_receipt_sha256",
+                        "journal_scope",
+                        "search_key_sha256",
+                        "run_id",
+                        "forge_run_id",
                         "spent_main_looks",
                         "spent_adaptive_looks",
                         "spent_preview_looks",
                     )
                     if shown.get(key) is not None
                 }}
+                if not parent.get("terminal_receipt_sha256"):
+                    parent["terminal_receipt_sha256"] = parent.get(
+                        "session_receipt_sha256"
+                    )
+                if not parent.get("journal_scope"):
+                    parent["journal_scope"] = parent.get("search_key_sha256")
             except HficSessionError:
                 pass
     existing = list_repair_continuation_dispositions(store)
@@ -1840,6 +1852,12 @@ def cmd_repair_continuation_apply(
                             "final_session_terminal",
                             "selected_candidate_id",
                             "scientific_slot_sha256",
+                            "session_receipt_sha256",
+                            "terminal_receipt_sha256",
+                            "journal_scope",
+                            "search_key_sha256",
+                            "run_id",
+                            "forge_run_id",
                             "spent_main_looks",
                             "spent_adaptive_looks",
                             "spent_preview_looks",
@@ -1847,6 +1865,12 @@ def cmd_repair_continuation_apply(
                         if shown.get(key) is not None
                     },
                 }
+                if not parent.get("terminal_receipt_sha256"):
+                    parent["terminal_receipt_sha256"] = parent.get(
+                        "session_receipt_sha256"
+                    )
+                if not parent.get("journal_scope"):
+                    parent["journal_scope"] = parent.get("search_key_sha256")
             except HficSessionError:
                 pass
     snapshot = repository_git_snapshot(repo_root)

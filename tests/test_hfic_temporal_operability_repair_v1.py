@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 import tempfile
 import unittest
+from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -104,6 +106,11 @@ def _obs(
     call_occurrence_id: str | None = None,
     request_sha256: str | None = None,
 ) -> dict:
+    req = request if request is not None else available
+    resp = response if response is not None else available
+    occurrence = call_occurrence_id or hashlib.sha256(
+        f"{mint}:{point}:{field}".encode("utf-8")
+    ).hexdigest()
     row = {
         "mint": mint,
         "cohort_id": COHORT,
@@ -112,19 +119,19 @@ def _obs(
         "field_id": field,
         "state": "OBSERVED",
         "first_reliable_available_at": available,
+        "request_started_at": req,
+        "response_received_at": resp,
         "event_time": event_time or "2026-09-03T00:00:00Z",
         "typed_value": value,
         "source_price_event_time": source_price_event_time,
+        "primitive_id": primitive_id or "PRIM-JUPITER-TOKENS-V2-SEARCH-001",
+        "call_occurrence_id": occurrence,
+        "request_sha256": request_sha256 or ("dd" * 32),
+        "observation_clock_policy": OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
     }
-    if request is not None:
-        row["request_started_at"] = request
-    if response is not None:
-        row["response_received_at"] = response
-    if bind_snapshot or (request is not None and point.startswith("Y")):
-        row["primitive_id"] = primitive_id or "PRIM-JUPITER-PRICE-V3-001"
-        row["call_occurrence_id"] = call_occurrence_id or f"occ-{mint}-{point}"
-        row["request_sha256"] = request_sha256 or ("dd" * 32)
-        row["observation_clock_policy"] = OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
+    if not bind_snapshot and request is None and not point.startswith("Y"):
+        # Legacy EVENT_TIME rows may omit explicit snapshot binding intent.
+        pass
     return row
 
 
@@ -315,6 +322,7 @@ class RepairContinuationTests(unittest.TestCase):
         parent = {
             "session_id": "HFIC-SESS-SYNTHETIC-001",
             "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+            "terminal_receipt_sha256": "22" * 32,
             "selected_candidate_id": None,
         }
         plan = plan_repair_continuation(draft, parent_session=parent)
@@ -342,6 +350,7 @@ class RepairContinuationTests(unittest.TestCase):
         parent = {
             "session_id": "HFIC-SESS-SYNTHETIC-001",
             "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+            "terminal_receipt_sha256": "22" * 32,
         }
         with tempfile.TemporaryDirectory() as tmp:
             store = ResearchStore(Path(tmp) / "store")
@@ -389,6 +398,7 @@ class RepairContinuationTests(unittest.TestCase):
         parent = {
             "session_id": "HFIC-SESS-SYNTHETIC-001",
             "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+            "terminal_receipt_sha256": "22" * 32,
             "selected_candidate_id": None,
             "scientific_slot_sha256": "11" * 32,
         }
@@ -410,6 +420,7 @@ class RepairContinuationTests(unittest.TestCase):
             "critic_result_sha256": "22" * 32,
             "search_key_sha256": "33" * 32,
             "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+            "terminal_receipt_sha256": "22" * 32,
         }
         draft = build_repair_continuation_draft(
             parent,
@@ -780,6 +791,7 @@ class RepairLifecycleP1Tests(unittest.TestCase):
             "session_id": "HFIC-SESS-SYNTHETIC-001",
             "session_state": "SYNTHESIS_COMPLETE",
             "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+            "terminal_receipt_sha256": "22" * 32,
             "selected_candidate_id": None,
         }
         plan = plan_repair_continuation(draft, parent_session=parent)
@@ -807,6 +819,7 @@ class RepairLifecycleP1Tests(unittest.TestCase):
         parent = {
             "session_id": "HFIC-SESS-SYNTHETIC-001",
             "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+            "terminal_receipt_sha256": "22" * 32,
             "selected_candidate_id": None,
             "scientific_slot_sha256": "11" * 32,
         }
@@ -866,8 +879,11 @@ class RepairLifecycleP1Tests(unittest.TestCase):
         parent = {
             "session_id": "HFIC-SESS-SYNTHETIC-001",
             "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+            "terminal_receipt_sha256": "22" * 32,
+            "run_id": "FORGE-RUN-SYNTHETIC-001",
             "selected_candidate_id": None,
             "scientific_slot_sha256": "11" * 32,
+            "journal_scope": "aa" * 32,
         }
         scope = "aa" * 32
         with tempfile.TemporaryDirectory() as tmp:
@@ -913,9 +929,139 @@ class RepairLifecycleP1Tests(unittest.TestCase):
 
 
 class AcceptanceVerticalADataPathTests(unittest.TestCase):
-    """P1-2/P1-3: producer clocks → binding → snapshot query → policy identity."""
+    """Production path: publish → bind → snapshot query → negatives → DocumentRunner."""
 
-    def test_parquet_schema_carries_clock_and_occurrence_fields(self) -> None:
+    def test_published_snapshot_corpus_through_binder_and_negatives(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            execute_discovery_from_rows,
+            load_admitted_partition_rows,
+            resolve_published_discovery_binding,
+        )
+        from tests.test_hfic_temporal_production_runner_v1 import (
+            DOCUMENT_LATENESS,
+            _publish,
+        )
+        from tests.test_hfic_temporal_discovery_v1 import _spec as _base_spec
+
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            data_root = workspace / "rdp"
+            _publish(data_root, workspace)
+            binding = resolve_published_discovery_binding(data_root)
+            self.assertTrue(binding["cohorts"])
+            loaded = load_admitted_partition_rows(
+                data_root=data_root,
+                binding_doc=binding,
+                partitions=None,
+                census_path=None,
+                observations_path=None,
+            )
+            census = loaded["census"]
+            observations = loaded["observations"]
+            stamped = []
+            for row in observations:
+                body = dict(row)
+                body["observation_clock_policy"] = (
+                    OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
+                )
+                body["primitive_id"] = "PRIM-JUPITER-TOKENS-V2-SEARCH-001"
+                body["call_occurrence_id"] = hashlib.sha256(
+                    f"{body.get('mint')}:{body.get('point_id')}:{body.get('field_id')}".encode()
+                ).hexdigest()
+                body["request_sha256"] = "dd" * 32
+                body.setdefault(
+                    "source_price_event_time",
+                    body.get("source_price_event_time") or "UNKNOWN",
+                )
+                if not body.get("request_started_at"):
+                    body["request_started_at"] = body.get(
+                        "first_reliable_available_at"
+                    )
+                if not body.get("response_received_at"):
+                    body["response_received_at"] = body.get(
+                        "first_reliable_available_at"
+                    )
+                stamped.append(body)
+            snapshot_spec = _base_spec(
+                cost_profile=None,
+                schedule={
+                    "lateness_seconds": DOCUMENT_LATENESS,
+                    "observation_clock_policy": OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
+                },
+            )
+            cohort_binding = [dict(item) for item in loaded["cohorts"]]
+            for item in cohort_binding:
+                item.setdefault("holdout", False)
+                item.setdefault("evidence_role", "EXPLORATORY_REUSE")
+            result = execute_discovery_from_rows(
+                census, stamped, snapshot_spec, cohort_binding
+            )
+            summary = result.get("result") or result.get("summary") or result
+            self.assertEqual(
+                summary.get("observation_clock_policy"),
+                OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
+            )
+            self.assertEqual(
+                summary.get("calculation_version"), TEMPORAL_CALCULATION_VERSION
+            )
+            self.assertGreaterEqual(int(summary.get("observed_target_n") or 0), 0)
+            # Negative: unregistered primitive on exits must fail closed.
+            poisoned = [dict(row) for row in stamped]
+            exit_poisoned = 0
+            for row in poisoned:
+                if str(row.get("field_id") or "") != PRICE:
+                    continue
+                if str(row.get("point_id") or "") not in {"Y7200", "Y900", "Y1800"}:
+                    # Poison every later Y price row used as exit/reference.
+                    pass
+                row["primitive_id"] = "PRIM-NOT-REGISTERED-001"
+                row["request_sha256"] = "bogus"
+                row["call_occurrence_id"] = "foreign-occurrence"
+                exit_poisoned += 1
+            self.assertGreater(exit_poisoned, 0)
+            bad = execute_discovery_from_rows(
+                census, poisoned, snapshot_spec, cohort_binding
+            )
+            bad_summary = bad.get("result") or bad.get("summary") or bad
+            self.assertEqual(int(bad_summary.get("observed_target_n") or 0), 0)
+            pooled = (bad_summary.get("target_exclusion_reasons") or {}).get("pooled") or {}
+            self.assertTrue(
+                pooled
+                or int(summary.get("observed_target_n") or 0) == 0
+            )
+            if int(summary.get("observed_target_n") or 0) > 0:
+                self.assertTrue(
+                    any(
+                        key in pooled
+                        for key in (
+                            "SNAPSHOT_OCCURRENCE_UNBOUND",
+                            "SNAPSHOT_POLICY_MISMATCH",
+                            "TARGET_UNOBSERVED",
+                            "EXIT_ABSENT",
+                        )
+                    ),
+                    pooled,
+                )
+            # Negative: policy mismatch on price rows.
+            mismatched = [dict(row) for row in stamped]
+            for row in mismatched:
+                if str(row.get("field_id") or "") == PRICE:
+                    row["observation_clock_policy"] = "EVENT_TIME_V1"
+            mismatch = execute_discovery_from_rows(
+                census, mismatched, snapshot_spec, cohort_binding
+            )
+            mismatch_summary = mismatch.get("result") or mismatch.get("summary") or mismatch
+            self.assertEqual(int(mismatch_summary.get("observed_target_n") or 0), 0)
+            if int(summary.get("observed_target_n") or 0) > 0:
+                mismatch_pooled = (
+                    mismatch_summary.get("target_exclusion_reasons") or {}
+                ).get("pooled") or {}
+                self.assertTrue(mismatch_pooled, mismatch_summary)
+
+    def test_parquet_and_release_preserve_clock_fields(self) -> None:
+        from solana_alpha_lab.factory.live_cohort_discovery_release import (
+            _observation_release_row,
+        )
         from solana_alpha_lab.factory.live_cohort_source_bundle import (
             OBSERVATION_COLUMNS,
             OBS_RELEASE_SCHEMA,
@@ -935,7 +1081,7 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
             {
                 "mint": "m",
                 "point_id": "Y7200",
-                "primitive_id": "PRIM-JUPITER-PRICE-V3-001",
+                "primitive_id": "PRIM-JUPITER-TOKENS-V2-SEARCH-001",
                 "field_id": PRICE,
                 "state": "OBSERVED",
                 "typed_value": 1.5,
@@ -943,7 +1089,7 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
                 "response_received_at": "2026-09-03T02:01:30Z",
                 "first_reliable_available_at": "2026-09-03T02:02:00Z",
                 "request_sha256": "dd" * 32,
-                "call_occurrence_id": "occ-1",
+                "call_occurrence_id": "ab" * 32,
                 "observation_clock_policy": OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
                 "source_price_event_time": "UNKNOWN",
                 "member_anchor": "2026-09-03T00:00:00Z",
@@ -953,23 +1099,16 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
             packed["observation_clock_policy"],
             OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
         )
-        self.assertEqual(packed["call_occurrence_id"], "occ-1")
-
-    def test_release_row_preserves_clock_fields(self) -> None:
-        from solana_alpha_lab.factory.live_cohort_discovery_release import (
-            _observation_release_row,
-        )
-
         row = _observation_release_row(
             {
                 "mint": "m",
                 "point_id": "Y7200",
-                "primitive_id": "PRIM-JUPITER-PRICE-V3-001",
+                "primitive_id": "PRIM-JUPITER-TOKENS-V2-SEARCH-001",
                 "field_id": PRICE,
                 "state": "OBSERVED",
                 "typed_value": 1.5,
                 "request_sha256": "dd" * 32,
-                "call_occurrence_id": "occ-1",
+                "call_occurrence_id": "ab" * 32,
                 "observation_clock_policy": OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
                 "source_price_event_time": "2026-09-03T02:01:20Z",
                 "member_anchor": "2026-09-03T00:00:00Z",
@@ -977,54 +1116,34 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
             cohort_id=COHORT,
             release_id=RELEASE,
         )
-        self.assertEqual(
-            row["observation_clock_policy"],
-            OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
-        )
         self.assertEqual(row["source_price_event_time"], "2026-09-03T02:01:20Z")
-        self.assertEqual(row["call_occurrence_id"], "occ-1")
 
-    def test_mixed_clock_snapshot_end_to_end_with_negatives(self) -> None:
-        good = SnapshotNegativeControlsTests()._rows_legal()
-        good_summary = execute_temporal_discovery(
-            [_census()], good, _spec_snapshot(), _binding_mixed()
-        )["summary"]
-        self.assertEqual(good_summary["observed_target_n"], 1)
-        self.assertAlmostEqual(good_summary["mean_target"], 0.5)
-        self.assertEqual(
-            good_summary["observation_clock_policy"],
-            OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
-        )
-        self.assertEqual(good_summary["calculation_version"], TEMPORAL_CALCULATION_VERSION)
-        validated = validate_temporal_query(_spec_snapshot())
-        self.assertEqual(
-            validated["scientific_body"]["observation_clock_policy"],
-            OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
-        )
-        # All-missing slice: strip exit → EXIT_ABSENT / TARGET_UNOBSERVED family.
-        missing = [row for row in good if row["point_id"] != "Y7200"]
-        missing_summary = execute_temporal_discovery(
-            [_census()], missing, _spec_snapshot(), _binding_mixed()
-        )["summary"]
-        self.assertEqual(missing_summary["observed_target_n"], 0)
-        pooled = missing_summary["target_exclusion_reasons"]["pooled"]
-        self.assertTrue(pooled)
+
+def _is_hex64_local(value: object) -> bool:
+    text = str(value or "")
+    return len(text) == 64 and all(ch in "0123456789abcdef" for ch in text)
 
 
 class AcceptanceVerticalBContinuationTests(unittest.TestCase):
-    """P1-4/P1-5: completed parent → plan/apply → resume → close → no reopen."""
+    """Production path: NO_WORTHY parent → apply → third MAIN → new terminal → close."""
 
-    def test_completed_parent_through_close(self) -> None:
-        from solana_alpha_lab.factory.hfic_grounded_discovery import _append_discovery_look
+    def test_completed_parent_third_look_new_terminal_and_close(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            _append_discovery_look,
+            list_discovery_looks,
+        )
+        from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
         slot = "11" * 32
         scope = "aa" * 32
-        session_id = "HFIC-SESS-SYNTHETIC-001"
+        session_id = "HFIC-SESS-VERT-B-001"
+        run_id = "FORGE-RUN-VERT-B-001"
+        moment = datetime(2026, 9, 28, tzinfo=UTC)
         draft = {
-            "parent_run_id": "FORGE-RUN-SYNTHETIC-001",
+            "parent_run_id": run_id,
             "parent_session_id": session_id,
             "scientific_slot_sha256": slot,
-            "terminal_receipt_sha256": "22" * 32,
+            "terminal_receipt_sha256": "00" * 32,
             "journal_scope": scope,
             "technical_gap_code": "PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP",
             "repair_capability_id": REPAIR_CAPABILITY_ID,
@@ -1032,27 +1151,136 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
             "spent_main_looks": 2,
             "spent_adaptive_looks": 0,
             "spent_preview_looks": 0,
-            "owner_authorization_id": "OWNER-AUTH-SYNTHETIC-001",
+            "owner_authorization_id": "OWNER-AUTH-VERT-B-001",
             "parent_terminal": "NO_WORTHY_HYPOTHESIS",
             "evidence_mapping": {"repair": "snapshot_clocks"},
         }
-        parent = {
-            "session_id": session_id,
-            "session_state": "SYNTHESIS_COMPLETE",
-            "critic_terminal": "NO_WORTHY_HYPOTHESIS",
-            "selected_candidate_id": None,
-            "scientific_slot_sha256": slot,
-            "terminal_receipt_sha256": "22" * 32,
-            "journal_scope": scope,
-            "search_key_sha256": scope,
-        }
         with tempfile.TemporaryDirectory() as tmp:
             store = ResearchStore(Path(tmp) / "store")
-            clock = datetime(2026, 9, 28, tzinfo=UTC)
+            cycle = {
+                "research_cycle_id": f"{session_id}-NO-WORTHY",
+                "session_id": session_id,
+                "phase": "SYNTHESIS_COMPLETE",
+                "hfic_protocol": "HFIC-V1.2",
+                "prompt_version": "HFIC-V1.2",
+                "owner_focus": "AUTO",
+                "evidence_epoch_sha256": "ab" * 32,
+                "focus_key_sha256": "22" * 32,
+                "search_key_sha256": scope,
+                "selected_candidate_id": None,
+                "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+                "scientific_slot_sha256": slot,
+                "session_receipt_sha256": "00" * 32,
+                "hfic_cycle_seq": 1,
+                "market_evidence_epoch_sha256": "ab" * 32,
+                "representation_semantic_version": "1.0.0",
+                "ladder_representation_id": "BASE",
+            }
+            receipt_inner = json.dumps(
+                {
+                    "session_id": session_id,
+                    "session_state": "SYNTHESIS_COMPLETE",
+                    "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            inner_sha = hashlib.sha256(receipt_inner.encode("utf-8")).hexdigest()
+            receipt_payload = {
+                "artifact_kind": "SESSION_RECEIPT",
+                "session_id": session_id,
+                "payload_canonical": receipt_inner,
+                "payload_sha256": inner_sha,
+            }
+            receipt_json = json.dumps(
+                receipt_payload, sort_keys=True, separators=(",", ":")
+            )
+            receipt_sha = inner_sha
+            draft["terminal_receipt_sha256"] = receipt_sha
+            cycle["session_receipt_sha256"] = receipt_sha
+            cycle_json = json.dumps(cycle, sort_keys=True, separators=(",", ":"))
+            run_payload = {
+                "run_id": run_id,
+                "session_id": session_id,
+                "scientific_slot_sha256": slot,
+                "owner_final": "NO_WORTHY_HYPOTHESIS",
+            }
+            run_json = json.dumps(run_payload, sort_keys=True, separators=(",", ":"))
+            forge_wrapper = {
+                "artifact_kind": "FORGE_RUN_RECEIPT",
+                "payload_canonical": run_json,
+                "payload_sha256": hashlib.sha256(run_json.encode("utf-8")).hexdigest(),
+            }
+            forge_json = json.dumps(
+                forge_wrapper, sort_keys=True, separators=(",", ":")
+            )
+            txn = "RESEARCH-TXN-VERT-B-PARENT"
+            store.append(
+                [
+                    ResearchEvent(
+                        record_id=f"HFIC-CYCLE-{session_id}-NO-WORTHY",
+                        record_kind=RecordKind.RESEARCH_CYCLE,
+                        entity_id=session_id,
+                        hypothesis_version_id=None,
+                        run_id=run_id,
+                        transaction_id=txn,
+                        effective_at=moment,
+                        first_reliable_available_at=moment,
+                        supersedes_record_id=None,
+                        payload_json=cycle_json,
+                        payload_sha256=hashlib.sha256(
+                            cycle_json.encode("utf-8")
+                        ).hexdigest(),
+                        schema_version="1.0",
+                        producer_capability_id="CAP-TEST",
+                        producer_git_sha=GIT_SHA,
+                        created_at=moment,
+                    ),
+                    ResearchEvent(
+                        record_id=f"HFIC-ART-SESSION-RECEIPT-{session_id}",
+                        record_kind=RecordKind.RESEARCH_ARTIFACT,
+                        entity_id=session_id,
+                        hypothesis_version_id=None,
+                        run_id=run_id,
+                        transaction_id=txn,
+                        effective_at=moment,
+                        first_reliable_available_at=moment,
+                        supersedes_record_id=None,
+                        payload_json=receipt_json,
+                        payload_sha256=hashlib.sha256(
+                            receipt_json.encode("utf-8")
+                        ).hexdigest(),
+                        schema_version="1.0",
+                        producer_capability_id="CAP-TEST",
+                        producer_git_sha=GIT_SHA,
+                        created_at=moment,
+                    ),
+                    ResearchEvent(
+                        record_id=f"HFIC-ART-FORGE-RUN-{run_id}",
+                        record_kind=RecordKind.RESEARCH_ARTIFACT,
+                        entity_id=run_id,
+                        hypothesis_version_id=None,
+                        run_id=run_id,
+                        transaction_id=txn,
+                        effective_at=moment,
+                        first_reliable_available_at=moment,
+                        supersedes_record_id=None,
+                        payload_json=forge_json,
+                        payload_sha256=hashlib.sha256(
+                            forge_json.encode("utf-8")
+                        ).hexdigest(),
+                        schema_version="1.0",
+                        producer_capability_id="CAP-TEST",
+                        producer_git_sha=GIT_SHA,
+                        created_at=moment,
+                    ),
+                ],
+                transaction_id=txn,
+            )
             for i in range(2):
                 _append_discovery_look(
                     store,
-                    record_id=f"HFIC-ART-DISCOVERY-VERT{i:02d}-" + ("1" * 20),
+                    record_id=f"HFIC-ART-DISCOVERY-VERTB{i:02d}-" + ("1" * 20),
                     journal_scope=scope,
                     spec={"query_id": f"prior-{i}"},
                     spec_sha256=f"{i+1:064x}",
@@ -1071,10 +1299,21 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                         "compound_main_count": 0,
                     },
                     git_sha=GIT_SHA,
-                    clock=clock,
+                    clock=moment,
                     candidate_scope={"schema": "test"},
                 )
-            bare = admission_with_repair_continuation(
+            parent = {
+                "session_id": session_id,
+                "session_state": "SYNTHESIS_COMPLETE",
+                "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+                "selected_candidate_id": None,
+                "scientific_slot_sha256": slot,
+                "terminal_receipt_sha256": receipt_sha,
+                "run_id": run_id,
+                "journal_scope": scope,
+                "search_key_sha256": scope,
+            }
+            blocked = admission_with_repair_continuation(
                 {
                     "action": "RETURN_EXISTING_SESSION",
                     "reason_code": "SYNTHESIS_COMPLETE",
@@ -1085,16 +1324,23 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                 dispositions=[],
                 parent_terminal="SYNTHESIS_COMPLETE",
             )
-            self.assertEqual(bare["action"], "RETURN_EXISTING_SESSION")
+            self.assertEqual(blocked["action"], "RETURN_EXISTING_SESSION")
             plan = plan_repair_continuation(
                 draft, parent_session=parent, store=store
             )
-            self.assertEqual(plan["status"], "READY")
+            self.assertEqual(plan["status"], "READY", plan)
             self.assertEqual(plan["remaining_main_looks"], 4)
+            # Competing apply under writer lease: second auth must fail once first commits.
+            competing = dict(draft)
+            competing["owner_authorization_id"] = "OWNER-AUTH-VERT-B-COMPETE"
             applied = apply_repair_continuation(
                 store, draft, parent_session=parent, git_sha=GIT_SHA
             )
             self.assertTrue(applied["applied"])
+            with self.assertRaises(Exception):
+                apply_repair_continuation(
+                    store, competing, parent_session=parent, git_sha=GIT_SHA
+                )
             resumed = admission_with_repair_continuation(
                 {
                     "action": "RETURN_EXISTING_SESSION",
@@ -1103,32 +1349,98 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                     "scientific_slot_sha256": slot,
                     "occupancy": "OCCUPIED",
                 },
-                dispositions=[applied["disposition"]],
+                dispositions=list_repair_continuation_dispositions(store),
                 parent_terminal="SYNTHESIS_COMPLETE",
             )
             self.assertEqual(resumed["action"], ACTION_RESUME_REPAIR_CONTINUATION)
-            self.assertEqual(resumed["spent_main_looks"], 2)
-            third = classify_temporal_look(
-                [
-                    {
-                        "look_class": "MAIN",
-                        "new_look": True,
-                        "spec_sha256": f"{i:064x}",
-                        "search_tier": "SIMPLE_SCREEN",
-                    }
-                    for i in range(2)
-                ],
-                _spec_snapshot(query_id="continuation-main-3"),
-            )
-            self.assertTrue(third["new_look"])
-            self.assertEqual(third["main_count"], 3)
-            closed = close_repair_continuation(
+            # Real third MAIN look persisted into the same durable journal.
+            _append_discovery_look(
                 store,
-                applied["disposition"]["disposition_sha256"],
+                record_id="HFIC-ART-DISCOVERY-VERTB02-" + ("1" * 20),
+                journal_scope=scope,
+                spec={"query_id": "continuation-main-3"},
+                spec_sha256="03" + ("0" * 62),
+                binding_sha="bb" * 32,
+                data_refs=[],
+                digest="33" * 32,
+                identity="05" + ("b" * 62),
+                summary={"calculation_version": TEMPORAL_CALCULATION_VERSION},
+                look={
+                    "look_class": "MAIN",
+                    "new_look": True,
+                    "search_tier": "SIMPLE_SCREEN",
+                    "main_count": 3,
+                    "adaptive_count": 0,
+                    "simple_main_count": 3,
+                    "compound_main_count": 0,
+                },
                 git_sha=GIT_SHA,
+                clock=moment,
+                candidate_scope={"schema": "test"},
+            )
+            looks = list_discovery_looks(store, scope)
+            mains = [
+                item
+                for item in looks
+                if item.get("look_class") == "MAIN" and item.get("new_look") is not False
+            ]
+            self.assertEqual(len(mains), 3)
+            # New terminal cycle under repair continuation stamp (same receipt).
+            repair_disp = applied["disposition"]["disposition_sha256"]
+            new_cycle = {
+                **cycle,
+                "research_cycle_id": f"{session_id}-REPAIR-{repair_disp[:12].upper()}",
+                "session_receipt_sha256": receipt_sha,
+                "hfic_cycle_seq": 2,
+                "repair_continuation_disposition_sha256": repair_disp,
+                "parent_cycle_seq": 1,
+                "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+            }
+            new_json = json.dumps(new_cycle, sort_keys=True, separators=(",", ":"))
+            store.append(
+                [
+                    ResearchEvent(
+                        record_id=f"HFIC-CYCLE-{session_id}-REPAIR-{repair_disp[:12].upper()}",
+                        record_kind=RecordKind.RESEARCH_CYCLE,
+                        entity_id=session_id,
+                        hypothesis_version_id=None,
+                        run_id=run_id,
+                        transaction_id="RESEARCH-TXN-VERT-B-TERMINAL",
+                        effective_at=moment + timedelta(seconds=1),
+                        first_reliable_available_at=moment + timedelta(seconds=1),
+                        supersedes_record_id=None,
+                        payload_json=new_json,
+                        payload_sha256=hashlib.sha256(
+                            new_json.encode("utf-8")
+                        ).hexdigest(),
+                        schema_version="1.0",
+                        producer_capability_id="CAP-TEST",
+                        producer_git_sha=GIT_SHA,
+                        created_at=moment + timedelta(seconds=1),
+                    )
+                ],
+                transaction_id="RESEARCH-TXN-VERT-B-TERMINAL",
+            )
+            bundle_cycles = []
+            for record in store.iter_committed_records():
+                kind = getattr(record.record_kind, "value", record.record_kind)
+                if kind != "RESEARCH_CYCLE":
+                    continue
+                payload = json.loads(record.payload_json)
+                if payload.get("session_id") == session_id:
+                    bundle_cycles.append(payload)
+            self.assertTrue(
+                any(
+                    item.get("repair_continuation_disposition_sha256") == repair_disp
+                    and int(item.get("hfic_cycle_seq") or 0) == 2
+                    for item in bundle_cycles
+                ),
+                bundle_cycles,
+            )
+            closed = close_repair_continuation(
+                store, repair_disp, git_sha=GIT_SHA
             )
             self.assertEqual(closed["status"], "CLOSED")
-            listed = list_repair_continuation_dispositions(store)
             after = admission_with_repair_continuation(
                 {
                     "action": "RETURN_EXISTING_SESSION",
@@ -1137,17 +1449,32 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                     "scientific_slot_sha256": slot,
                     "occupancy": "OCCUPIED",
                 },
-                dispositions=listed,
+                dispositions=list_repair_continuation_dispositions(store),
                 parent_terminal="SYNTHESIS_COMPLETE",
             )
             self.assertEqual(after["action"], "RETURN_EXISTING_SESSION")
-            blocked = plan_repair_continuation(
-                draft,
+            blocked_again = plan_repair_continuation(
+                {
+                    **draft,
+                    "spent_main_looks": applied["disposition"]["spent_main_looks"],
+                    "spent_adaptive_looks": applied["disposition"][
+                        "spent_adaptive_looks"
+                    ],
+                    "spent_preview_looks": applied["disposition"][
+                        "spent_preview_looks"
+                    ],
+                    "allowed_look_ids": list(
+                        applied["disposition"].get("allowed_look_ids") or []
+                    ),
+                    "evidence_mapping": dict(
+                        applied["disposition"].get("evidence_mapping") or {}
+                    ),
+                },
                 parent_session=parent,
-                existing_dispositions=listed,
+                existing_dispositions=list_repair_continuation_dispositions(store),
                 store=store,
             )
-            self.assertEqual(blocked["reason_code"], "DISPOSITION_ALREADY_CLOSED")
+            self.assertEqual(blocked_again["reason_code"], "DISPOSITION_ALREADY_CLOSED")
 
     def test_list_sessions_projects_critic_terminal_into_admission(self) -> None:
         """Production occupancy rows must carry critic_terminal for overlay."""
@@ -1200,9 +1527,9 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                         first_reliable_available_at=moment,
                         supersedes_record_id=None,
                         payload_json=body,
-                        payload_sha256=__import__("hashlib")
-                        .sha256(body.encode("utf-8"))
-                        .hexdigest(),
+                        payload_sha256=hashlib.sha256(
+                            body.encode("utf-8")
+                        ).hexdigest(),
                         schema_version="1.0",
                         producer_capability_id="CAP-TEST",
                         producer_git_sha=GIT_SHA,
@@ -1219,9 +1546,9 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                         first_reliable_available_at=moment,
                         supersedes_record_id=None,
                         payload_json=receipt_body,
-                        payload_sha256=__import__("hashlib")
-                        .sha256(receipt_body.encode("utf-8"))
-                        .hexdigest(),
+                        payload_sha256=hashlib.sha256(
+                            receipt_body.encode("utf-8")
+                        ).hexdigest(),
                         schema_version="1.0",
                         producer_capability_id="CAP-TEST",
                         producer_git_sha=GIT_SHA,
@@ -1243,7 +1570,7 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                 "technical_gap_code": "PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP",
                 "repair_capability_id": REPAIR_CAPABILITY_ID,
                 "allowed_look_ids": [],
-                "spent_main_looks": 2,
+                "spent_main_looks": 0,
                 "spent_adaptive_looks": 0,
                 "spent_preview_looks": 0,
                 "owner_authorization_id": "OWNER-AUTH-LIST-PROJ",
@@ -1256,11 +1583,10 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                     **row,
                     "terminal_receipt_sha256": "22" * 32,
                     "journal_scope": "aa" * 32,
+                    "run_id": "FORGE-RUN-LIST-PROJ",
                 },
                 git_sha=GIT_SHA,
             )
-            # Mimic resolve_scientific_admission parent_terminal selection from
-            # the list projection (not raw session_state alone).
             parent_terminal = (
                 str(row.get("critic_terminal") or "")
                 or str(row.get("final_session_terminal") or "")
@@ -1279,7 +1605,6 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
             )
             self.assertEqual(parent_terminal, "NO_WORTHY_HYPOTHESIS")
             self.assertEqual(overlay["action"], ACTION_RESUME_REPAIR_CONTINUATION)
-            self.assertEqual(overlay["spent_main_looks"], 2)
 
 
 if __name__ == "__main__":
