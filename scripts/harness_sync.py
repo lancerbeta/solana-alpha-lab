@@ -200,6 +200,42 @@ def _registry_payload(
     return _worktree_bytes(relative, root)
 
 
+LOCAL_GIT_PATH_KIND = "git_path"
+EXTERNAL_OR_LOGICAL_LOCATION_KINDS = frozenset({"external_bundle", "logical_only"})
+SHA256_LOCATION_LOCAL = "local_git_path"
+SHA256_LOCATION_EXTERNAL = "external_or_logical"
+
+
+def _sha256_location_class(record: dict[str, Any]) -> str | None:
+    """Classify a Catalog record for incremental SHA handling.
+
+    Returns:
+      - ``local_git_path`` for ``integrity.kind=sha256`` + ``location.kind=git_path``
+        (derived local pin; ``repository_path`` required)
+      - ``external_or_logical`` for ``sha256`` + ``external_bundle|logical_only``
+        (primary external/logical SHA; no local rehash)
+      - ``None`` when the record is not a sha256 integrity asset
+
+    Unknown location kinds, missing/non-dict location, or ``git_path`` without a
+    non-empty ``repository_path`` raise ``INCREMENTAL_SCOPE_UNPROVEN``.
+    """
+    integrity = record.get("integrity")
+    if not isinstance(integrity, dict) or integrity.get("kind") != "sha256":
+        return None
+    location = record.get("location")
+    if not isinstance(location, dict):
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+    kind = location.get("kind")
+    if kind == LOCAL_GIT_PATH_KIND:
+        path = location.get("repository_path")
+        if not isinstance(path, str) or not path.strip():
+            raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+        return SHA256_LOCATION_LOCAL
+    if kind in EXTERNAL_OR_LOGICAL_LOCATION_KINDS:
+        return SHA256_LOCATION_EXTERNAL
+    raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+
+
 def collect_asset_records(
     *, live_source: str = "worktree"
 ) -> dict[str, dict[str, Any]]:
@@ -217,21 +253,31 @@ def collect_asset_records(
         for record in document.get("records", []) or []:
             if not isinstance(record, dict):
                 continue
-            integrity = record.get("integrity") or {}
-            location = record.get("location") or {}
-            if integrity.get("kind") != "sha256":
-                continue
-            if location.get("kind") != "git_path":
+            try:
+                location_class = _sha256_location_class(record)
+            except HarnessSyncError as exc:
+                if str(exc) != "INCREMENTAL_SCOPE_UNPROVEN":
+                    raise
+                integrity = record.get("integrity") or {}
+                location = record.get("location") or {}
+                if (
+                    isinstance(integrity, dict)
+                    and integrity.get("kind") == "sha256"
+                    and isinstance(location, dict)
+                    and location.get("kind") == LOCAL_GIT_PATH_KIND
+                ):
+                    asset_id = record.get("asset_id") or "UNKNOWN"
+                    raise HarnessSyncError(f"ASSET_PATH_MISSING:{asset_id}") from None
+                # Unknown / corrupt non-local sha256 location: fail closed here so
+                # collectors cannot soft-skip into a later full-fallback walk.
+                raise
+            if location_class != SHA256_LOCATION_LOCAL:
                 continue
             asset_id = record["asset_id"]
-            relative = location.get("repository_path")
-            _require(
-                isinstance(relative, str) and bool(relative),
-                f"ASSET_PATH_MISSING:{asset_id}",
-            )
+            relative = record["location"]["repository_path"]
             out[asset_id] = {
                 "registry": registry_relative,
-                "repository_path": relative.replace("\\", "/"),
+                "repository_path": str(relative).replace("\\", "/"),
             }
     return out
 
@@ -688,13 +734,20 @@ def _semantic_registry_projection(payload: bytes) -> bytes:
             raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
         copy = dict(record)
         integrity = copy.get("integrity")
-        if isinstance(integrity, dict) and integrity.get("kind") == "sha256":
+        location_class = _sha256_location_class(record)
+        if (
+            location_class == SHA256_LOCATION_LOCAL
+            and isinstance(integrity, dict)
+            and integrity.get("kind") == "sha256"
+        ):
+            # Derived local pin: strip sha256 so pin-only churn is non-semantic.
             stripped = {
                 key: value
                 for key, value in integrity.items()
                 if key not in DERIVED_REGISTRY_FIELDS
             }
             copy["integrity"] = stripped
+        # external_or_logical keeps integrity.sha256 as a primary semantic field.
         records.append(copy)
     return json.dumps(
         {"header": header, "records": records},
@@ -723,6 +776,11 @@ def _worktree_bytes(relative: str, root: Path) -> bytes | None:
 
 
 def _registry_sha256_pins(payload: bytes) -> dict[str, str]:
+    """Derived local sha256 pins only (``sha256`` + ``git_path``).
+
+    External/logical primary SHAs are excluded: they are not rewritten by local
+    rehash and are compared via semantic projection instead.
+    """
     document = yaml.safe_load(payload.decode("utf-8"))
     if not isinstance(document, dict):
         raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
@@ -730,10 +788,13 @@ def _registry_sha256_pins(payload: bytes) -> dict[str, str]:
     for record in document.get("records") or []:
         if not isinstance(record, dict):
             raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
-        integrity = record.get("integrity")
-        if not isinstance(integrity, dict) or integrity.get("kind") != "sha256":
+        location_class = _sha256_location_class(record)
+        if location_class is None:
             continue
-        sha = integrity.get("sha256")
+        if location_class != SHA256_LOCATION_LOCAL:
+            continue
+        integrity = record.get("integrity")
+        sha = integrity.get("sha256") if isinstance(integrity, dict) else None
         asset_id = record.get("asset_id")
         if not isinstance(asset_id, str) or not isinstance(sha, str):
             raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
@@ -742,6 +803,12 @@ def _registry_sha256_pins(payload: bytes) -> dict[str, str]:
 
 
 def _registry_path_index(payload: bytes) -> dict[str, str]:
+    """Map asset_id -> repository_path for locally hashable sha256 git_path rows.
+
+    Correct ``external_bundle`` / ``logical_only`` sha256 rows without a local
+    path are skipped. Corrupt ``git_path``, unknown location kinds, and
+    ambiguous structures raise ``INCREMENTAL_SCOPE_UNPROVEN``.
+    """
     document = yaml.safe_load(payload.decode("utf-8"))
     if not isinstance(document, dict):
         raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
@@ -749,15 +816,16 @@ def _registry_path_index(payload: bytes) -> dict[str, str]:
     for record in document.get("records") or []:
         if not isinstance(record, dict):
             raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
-        integrity = record.get("integrity")
-        if not isinstance(integrity, dict) or integrity.get("kind") != "sha256":
+        location_class = _sha256_location_class(record)
+        if location_class is None:
+            continue
+        if location_class != SHA256_LOCATION_LOCAL:
             continue
         asset_id = record.get("asset_id")
-        location = record.get("location")
-        path = location.get("repository_path") if isinstance(location, dict) else None
-        if not isinstance(asset_id, str) or not isinstance(path, str):
+        path = record["location"]["repository_path"]
+        if not isinstance(asset_id, str):
             raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
-        index[asset_id] = path.replace("\\", "/")
+        index[asset_id] = str(path).replace("\\", "/")
     return index
 
 

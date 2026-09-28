@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LAIS-LOCATION-AWARE-INCREMENTAL-SYNC-COMPLETION-001",
+  "as_of": "2026-09-28",
+  "task_id": "DELIVERY_HARNESS_LOCATION_AWARE_INCREMENTAL_SYNC_V1",
+  "state_change": "LOCATION_AWARE_INCREMENTAL_HASH_SCOPE",
+  "base_main": "86b24cb1abe5867becc1ead16efb3754044550df",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/evidence/control/a1_location_aware_incremental_sync_benchmark_v1.json": "8433057dfff9ce0da1ece4523847786c62b7cb9bcc049f279c2f40790f9f9e3c",
+    "docs/reports/control/a1_location_aware_incremental_sync_owner_readout_v1.md": "d618ae814564dda83dcdad739cd977a965e0622b50c278989bb395369932ccbd",
+    "docs/tasks/DELIVERY_HARNESS_LOCATION_AWARE_INCREMENTAL_SYNC_V1.md": "a8e249837842d6113c7f4dfda3db80ef5d178ec3139124dda90cb831178b66e8",
+    "scripts/harness_sync.py": "ed33bddce154d13d5af56a95147e610d7b94747e9d66ca1cdd778d17c6a5e144",
+    "tests/test_harness_sync.py": "14cf984d3e042949f6b0b62249460525c1961292d7a0cd38501cf86e25d00711"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/control/a1_location_aware_incremental_sync_factory_fit_v1.json",
+    "sha256": "3f08b35bc6c6c461c183821aa76bf16371bc6fa06a8f749cc8362164c1de3dfb",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_LOCATION_AWARE_HARNESS_SYNC_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/control/a1_location_aware_incremental_sync_review_v1.json",
+      "sha256": "ea6a14d3a3a106615cdc5a2aa31dfd822f2476c75ff78009083e49f199fd1594",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_LOCATION_AWARE_HARNESS_SYNC_TESTS",
+      "PASS_LOCATION_AWARE_INCREMENTAL_CLI_FIXTURE",
+      "PASS_REPRESENTATIVE_BASE_REF_BENCHMARK"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_ALPHA_CLAIM",
+    "NO_UNSCOPED_CHECK_ACCELERATION"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}
