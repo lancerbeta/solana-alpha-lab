@@ -1,12 +1,13 @@
 # FORGE_TEMPORAL_OPERABILITY_REPAIR_V1 owner readout
 
-Head: 99f985abf7623caabb8e950a90d744722d1d6889
+Head: ddcd42df589fec82338edccd17a28ece60bcccde
 
 ## Closed this increment
 
 - P1-2: snapshot lineage/policy/acquisition on production publish→bind→journal→DocumentRunner path; hard SNAPSHOT_OCCURRENCE_UNBOUND and SNAPSHOT_POLICY_MISMATCH negatives.
 - P1-4: ordinary continuation reaches new terminal via persist_no_worthy under RESUME_REPAIR_CONTINUATION.
 - P1-5: receipt/run authority, writer-lease IDEMPOTENT_REPLAY, preview spent ledger, competing disposition recovery with sha.
+- Preflight: task21 owner_pulse core.yaml shadow-pin re-pinned to HEAD; path in managed_write_set.
 
 ## Vertical receipts (local disposable)
 

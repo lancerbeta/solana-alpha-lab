@@ -17,28 +17,28 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "AcceptanceVertical A/B exercise publish/run_recorded/DocumentRunner and persist_no_worthy repair re-entry; ALREADY_APPLIED-by-auth and unique repair txn/next-action ids hold on 99f985ab."
+        "Tip ddcd42df: P1-2/4/5 and AcceptanceVertical A/B hold; write set clean; tip after 99f985ab is evidence+shadow-pin only. Residual LOW: spent_looks_from_journal vs classify_temporal_look new_look predicate drift if rows omit new_look."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Vertical A closes P1-2 with hard SNAPSHOT_OCCURRENCE_UNBOUND/SNAPSHOT_POLICY_MISMATCH; Vertical B closes P1-4/5 with preview spend, competing apply, idempotent replay, _assert_scientific_admission, and repair terminal."
+        "DoD falsifiably met at ddcd42df: Vertical A publish→bind→run_recorded→DocumentRunner plus SNAPSHOT_OCCURRENCE_UNBOUND/SNAPSHOT_POLICY_MISMATCH; Vertical B preview→apply→replay→competing→third MAIN→CLOSED."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Lease same-digest AUTHORIZED raises IDEMPOTENT_REPLAY mapped to ALREADY_APPLIED; snapshot rows require explicit policy equality; single ResearchStore and CLOSED-before-spent hold."
+        "Exit path enforces snapshot policy equality; ALREADY_APPLIED-by-auth, lease IDEMPOTENT_REPLAY, competing disposition sha, single ResearchStore hold. Residual: cell-path ABSENT can collapse lineage failures; EVENT_TIME_V1 still unpolicy-gated."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Apply COMPETING_* emits competitor disposition_sha256 and competing_disposition_sha256; runbook documents CLOSE_COMPETING_DISPOSITION_THEN_STOP."
+        "Apply COMPETING_* emits competing_disposition_sha256; runbook CLOSE_COMPETING_DISPOSITION_THEN_STOP operable. Residual: plan CONFLICT nests competitor sha under disposition only; close after competitor shares STOP_CONTINUATION_CONSUMED."
       ]
     }
   ],
