@@ -8092,6 +8092,10 @@ def load_session_bundle(
         "runner_up_critic_terminal": cycle.get("runner_up_critic_terminal")
         or (session_receipt or {}).get("runner_up_critic_terminal"),
         "hfic_cycle_seq": int(cycle.get("hfic_cycle_seq") or 0),
+        "repair_continuation_disposition_sha256": cycle.get(
+            "repair_continuation_disposition_sha256"
+        ),
+        "parent_cycle_seq": cycle.get("parent_cycle_seq"),
         "critic_result": critic_result,
         "critic_result_sha256": critic_result_sha,
         "runner_up_critic_result": runner_up_result,

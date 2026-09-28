@@ -1570,6 +1570,288 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
             )
             self.assertEqual(blocked_again["reason_code"], "DISPOSITION_ALREADY_CLOSED")
 
+    def test_selected_repair_with_new_execution_binding_finalize_and_replay(self) -> None:
+        """Historical parent → repair → selected freeze/finalize under new capability."""
+
+        import hashlib
+        import json as _json
+
+        from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+        from solana_alpha_lab.factory.hfic_clock import FrozenClock
+        from solana_alpha_lab.factory.hfic_identity import (
+            assign_portfolio_ids,
+            normalize_text,
+        )
+        from solana_alpha_lab.factory.hfic_preflight import persist_forge_context_packet
+        from solana_alpha_lab.factory.hfic_repair_continuation import (
+            spent_looks_from_journal,
+        )
+        from solana_alpha_lab.factory.hfic_session import (
+            _assert_scientific_admission,
+            finalize_session,
+            freeze_draft,
+            list_hfic_sessions,
+            load_session_bundle,
+            persist_frozen_session,
+            persist_no_worthy_session,
+            show_session,
+        )
+        from solana_alpha_lab.factory.hfic_temporal_discovery import (
+            persist_feature_preview,
+        )
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            list_discovery_looks,
+            run_recorded_discovery_query,
+        )
+        from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
+        from tests.test_hfic_session import finalize_kill_complete, _critic_result, valid_draft
+
+        git = repository_git_snapshot(ROOT)
+        draft = _json.loads(
+            (ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        focus = hashlib.sha256(normalize_text("AUTO").encode("utf-8")).hexdigest()
+        started = datetime(2026, 8, 27, 12, 0, 0, tzinfo=UTC)
+        started_text = "2026-08-27T12:00:00Z"
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ResearchStore(data_root)
+            packet = {
+                "schema": "smial.forge-context-packet",
+                "owner_focus": "AUTO",
+                "evidence_epoch_sha256": "11" * 32,
+                "market_evidence_epoch_sha256": "11" * 32,
+            }
+            ctx = persist_forge_context_packet(
+                data_root,
+                packet,
+                store=store,
+                repo_root=ROOT,
+                clock=FrozenClock(started),
+            )
+            receipt = {
+                "receipt_id": "HFIC-PREFLIGHT-FIXTURE-SEL-001",
+                "evidence_epoch_sha256": "11" * 32,
+                "market_evidence_epoch_sha256": "11" * 32,
+                "focus_key_sha256": focus,
+                "search_key_sha256": "33" * 32,
+                "owner_focus": "AUTO",
+                "session_started_at": started_text,
+                "live_git_head": git.head_sha.lower(),
+                "git_composite_sha256": git.composite_sha256,
+                "forge_context_packet_sha256": ctx,
+                "store_inventory_digest": "ee" * 32,
+            }
+            frozen = freeze_draft(draft, preflight_receipt=receipt)
+            persist_no_worthy_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+                preflight_receipt=receipt,
+            )
+            shown = show_session(store, str(frozen["session_id"]), repo_root=ROOT)
+            journal = str(shown["search_key_sha256"])
+            rows = SnapshotTargetTests()._rows_legal()
+            census = [_census()]
+            binding = _binding_mixed()
+            for spec in (
+                _spec_snapshot(query_id="sel-prior-1"),
+                _spec_snapshot(
+                    query_id="sel-prior-2",
+                    all=[{"feature": "mark", "op": "gte", "value": 0.1}],
+                ),
+            ):
+                run_recorded_discovery_query(
+                    store,
+                    census=census,
+                    observations=rows,
+                    spec=spec,
+                    binding=binding,
+                    journal_scope=journal,
+                    candidate_scope={"schema": "test", "target": spec["target"]},
+                    git_sha=git.head_sha,
+                )
+            persist_feature_preview(
+                store,
+                journal_scope=journal,
+                preview={"preview_sha256": "cd" * 32},
+                git_sha=git.head_sha,
+            )
+            spent = spent_looks_from_journal(store, journal)
+            run_id = "FORGE-RUN-VERT-B-SEL-001"
+            run_payload = {
+                "run_id": run_id,
+                "session_id": shown["session_id"],
+                "scientific_slot_sha256": shown["scientific_slot_sha256"],
+                "owner_final": "NO_WORTHY_HYPOTHESIS",
+            }
+            run_json = _json.dumps(run_payload, sort_keys=True, separators=(",", ":"))
+            wrapper = {
+                "artifact_kind": "FORGE_RUN_RECEIPT",
+                "payload_canonical": run_json,
+                "payload_sha256": hashlib.sha256(run_json.encode("utf-8")).hexdigest(),
+            }
+            wrapper_json = _json.dumps(wrapper, sort_keys=True, separators=(",", ":"))
+            store.append(
+                [
+                    ResearchEvent(
+                        record_id=f"HFIC-ART-FORGE-RUN-{run_id}",
+                        record_kind=RecordKind.RESEARCH_ARTIFACT,
+                        entity_id=run_id,
+                        hypothesis_version_id=None,
+                        run_id=run_id,
+                        transaction_id="RESEARCH-TXN-FORGE-RUN-SEL",
+                        effective_at=started,
+                        first_reliable_available_at=started,
+                        supersedes_record_id=None,
+                        payload_json=wrapper_json,
+                        payload_sha256=hashlib.sha256(
+                            wrapper_json.encode("utf-8")
+                        ).hexdigest(),
+                        schema_version="1.0",
+                        producer_capability_id="CAP-TEST",
+                        producer_git_sha=git.head_sha,
+                        created_at=started,
+                    )
+                ],
+                transaction_id="RESEARCH-TXN-FORGE-RUN-SEL",
+            )
+            parent = {
+                "session_id": shown["session_id"],
+                "session_state": shown["session_state"],
+                "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+                "selected_candidate_id": None,
+                "scientific_slot_sha256": shown["scientific_slot_sha256"],
+                "terminal_receipt_sha256": shown["session_receipt_sha256"],
+                "run_id": run_id,
+                "journal_scope": journal,
+                "search_key_sha256": journal,
+            }
+            draft_r = {
+                "parent_run_id": run_id,
+                "parent_session_id": parent["session_id"],
+                "scientific_slot_sha256": parent["scientific_slot_sha256"],
+                "terminal_receipt_sha256": parent["terminal_receipt_sha256"],
+                "journal_scope": journal,
+                "technical_gap_code": "PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP",
+                "repair_capability_id": REPAIR_CAPABILITY_ID,
+                "allowed_look_ids": [],
+                "spent_main_looks": spent["spent_main_looks"],
+                "spent_adaptive_looks": spent["spent_adaptive_looks"],
+                "spent_preview_looks": spent["spent_preview_looks"],
+                "owner_authorization_id": "OWNER-AUTH-VERT-B-SEL-001",
+                "parent_terminal": "NO_WORTHY_HYPOTHESIS",
+                "evidence_mapping": {"repair": "selected_continuation"},
+            }
+            applied = apply_repair_continuation(
+                store, draft_r, parent_session=parent, git_sha=git.head_sha
+            )
+            self.assertTrue(applied["applied"])
+            third = _spec_snapshot(
+                query_id="sel-cont-3",
+                all=[{"feature": "mark", "op": "gte", "value": 0.2}],
+            )
+            run_recorded_discovery_query(
+                store,
+                census=census,
+                observations=rows,
+                spec=third,
+                binding=binding,
+                journal_scope=journal,
+                candidate_scope={"schema": "test", "target": third["target"]},
+                git_sha=git.head_sha,
+            )
+            self.assertEqual(
+                len(
+                    [
+                        item
+                        for item in list_discovery_looks(store, journal)
+                        if item.get("look_class") == "MAIN"
+                        and item.get("new_look") is not False
+                    ]
+                ),
+                3,
+            )
+            selected_source = valid_draft()
+            selected_source["selected_candidate_ref"] = selected_source["candidates"][0][
+                "label"
+            ]
+            selected_source["runner_up_candidate_ref"] = selected_source["candidates"][1][
+                "label"
+            ]
+            selected_source["strongest_rejected_alternative"] = selected_source[
+                "candidates"
+            ][2]["label"]
+            new_capability = "ab" * 32
+            repair_receipt = {
+                **receipt,
+                "capability_epoch_sha256": new_capability,
+            }
+            selected_frozen = freeze_draft(
+                selected_source, preflight_receipt=repair_receipt, repo_root=ROOT
+            )
+            self.assertEqual(selected_frozen["session_id"], shown["session_id"])
+            selected_frozen["capability_epoch_sha256"] = new_capability
+            admission = _assert_scientific_admission(
+                store, {**selected_frozen, **repair_receipt}, repo_root=ROOT
+            )
+            self.assertEqual(admission["action"], ACTION_RESUME_REPAIR_CONTINUATION)
+            persist_frozen_session(
+                store,
+                {**selected_frozen, **repair_receipt},
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(selected_source["candidates"]),
+                draft=selected_source,
+            )
+            bundle = load_session_bundle(store, shown["session_id"])
+            self.assertEqual(bundle["session_state"], "FROZEN_AWAITING_CRITIC")
+            self.assertEqual(
+                bundle.get("repair_continuation_disposition_sha256"),
+                applied["disposition"]["disposition_sha256"],
+            )
+            listed = [
+                item
+                for item in list_hfic_sessions(store)
+                if item["session_id"] == shown["session_id"]
+            ][0]
+            self.assertEqual(
+                listed.get("repair_continuation_disposition_sha256"),
+                applied["disposition"]["disposition_sha256"],
+            )
+            critic = _critic_result(selected_frozen, "KILL_PREPARATORY_LOOP")
+            done = finalize_kill_complete(
+                {**selected_frozen, **repair_receipt},
+                critic,
+                store,
+                repo_root=ROOT,
+            )
+            self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
+            self.assertEqual(done["critic_terminal"], "KILL_PREPARATORY_LOOP")
+            shown_after = show_session(store, shown["session_id"], repo_root=ROOT)
+            self.assertEqual(shown_after["critic_terminal"], "KILL_PREPARATORY_LOOP")
+            self.assertNotEqual(shown_after["critic_terminal"], "NO_WORTHY_HYPOTHESIS")
+            # Restart against the completed terminal stays sticky; no second
+            # active execution and no return to the parent NO_WORTHY DONE.
+            sticky = load_session_bundle(store, shown["session_id"])
+            self.assertEqual(sticky["session_state"], "SYNTHESIS_COMPLETE")
+            self.assertEqual(sticky["critic_terminal"], "KILL_PREPARATORY_LOOP")
+            mains_after = [
+                item
+                for item in list_discovery_looks(store, journal)
+                if item.get("look_class") == "MAIN" and item.get("new_look") is not False
+            ]
+            self.assertEqual(len(mains_after), 3)
+            closed = close_repair_continuation(
+                store,
+                applied["disposition"]["disposition_sha256"],
+                git_sha=git.head_sha,
+            )
+            self.assertEqual(closed["status"], "CLOSED")
 
     def test_list_sessions_projects_critic_terminal_into_admission(self) -> None:
         """Production occupancy rows must carry critic_terminal for overlay."""
