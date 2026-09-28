@@ -2881,6 +2881,13 @@ def persist_no_worthy_session(
         else bound_session_started_at(preflight_receipt)
     )
     transaction_id = f"RESEARCH-TXN-{session_id.replace('HFIC-SESS-', 'HFICNW-')}"
+    if isinstance(repair_admission, Mapping):
+        repair_tx = repair_admission.get("repair_continuation_disposition_sha256")
+        if isinstance(repair_tx, str) and repair_tx:
+            transaction_id = (
+                f"RESEARCH-TXN-{session_id.replace('HFIC-SESS-', 'HFICNW-')}"
+                f"-REPAIR-{repair_tx[:12].upper()}"
+            )
     producer = "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"
 
     def event(
@@ -2940,21 +2947,22 @@ def persist_no_worthy_session(
         repo_root=Path(repo_root),
         created_at=created_at,
     )
-    persist_scientific_slot_admission(
-        store,
-        frozen,
-        repo_root=repo_root,
-        stage_time=stage_time,
-        representation_registry=representation_registry,
-    )
-    action_bytes = _canonical_bytes(action)
-    action_sha = hashlib.sha256(action_bytes).hexdigest()
-    prompt_version = str(frozen.get("prompt_version") or PROMPT_VERSION)
     repair_disposition = None
     if isinstance(repair_admission, Mapping):
         repair_disposition = repair_admission.get(
             "repair_continuation_disposition_sha256"
         )
+    if not (isinstance(repair_disposition, str) and repair_disposition):
+        persist_scientific_slot_admission(
+            store,
+            frozen,
+            repo_root=repo_root,
+            stage_time=stage_time,
+            representation_registry=representation_registry,
+        )
+    action_bytes = _canonical_bytes(action)
+    action_sha = hashlib.sha256(action_bytes).hexdigest()
+    prompt_version = str(frozen.get("prompt_version") or PROMPT_VERSION)
     cycle_seq = _next_cycle_seq(existing)
     cycle_suffix = "NO-WORTHY"
     if isinstance(repair_disposition, str) and repair_disposition:
@@ -3093,11 +3101,23 @@ def persist_no_worthy_session(
             },
         ),
         event(
-            record_id=f"HFIC-ART-NEXT-ACTION-{session_id}-{action_sha[:12]}",
+            record_id=(
+                f"HFIC-ART-NEXT-ACTION-{session_id}-{cycle_suffix}-{action_sha[:12]}"
+                if isinstance(repair_disposition, str) and repair_disposition
+                else f"HFIC-ART-NEXT-ACTION-{session_id}-{action_sha[:12]}"
+            ),
             kind=RecordKind.RESEARCH_ARTIFACT,
-            entity_id=f"HFIC-ART-NEXT-ACTION-{session_id}-{action_sha[:12]}",
+            entity_id=(
+                f"HFIC-ART-NEXT-ACTION-{session_id}-{cycle_suffix}-{action_sha[:12]}"
+                if isinstance(repair_disposition, str) and repair_disposition
+                else f"HFIC-ART-NEXT-ACTION-{session_id}-{action_sha[:12]}"
+            ),
             payload={
-                "research_artifact_id": f"HFIC-ART-NEXT-ACTION-{session_id}-{action_sha[:12]}",
+                "research_artifact_id": (
+                    f"HFIC-ART-NEXT-ACTION-{session_id}-{cycle_suffix}-{action_sha[:12]}"
+                    if isinstance(repair_disposition, str) and repair_disposition
+                    else f"HFIC-ART-NEXT-ACTION-{session_id}-{action_sha[:12]}"
+                ),
                 "session_id": session_id,
                 "hfic_protocol": prompt_version,
                 "artifact_kind": "NEXT_EPISTEMIC_ACTION",
@@ -3132,46 +3152,50 @@ def persist_no_worthy_session(
             },
         ),
     ]
-    cards = _cards_for_identities(identities, frozen, draft)
-    for identity, card in zip(identities, cards, strict=True):
-        records.append(
-            event(
-                record_id=f"HFIC-HYP-{identity.candidate_id}",
-                kind=RecordKind.HYPOTHESIS_VERSION,
-                entity_id=identity.candidate_id,
-                hypothesis_version_id=identity.candidate_id,
-                payload={
-                    "hypothesis_version_id": identity.candidate_id,
-                    "session_id": session_id,
-                    "hfic_protocol": prompt_version,
-                    "statement": identity.definition["claim"],
-                    "claim": identity.definition["claim"],
-                    "mechanism": identity.definition["mechanism"],
-                    "actor_counterparty": identity.definition["actor_counterparty"],
-                    "population": identity.definition["population"],
-                    "decision_timestamp": identity.definition["decision_timestamp"],
-                    "primary_x_family": identity.definition["primary_x_family"],
-                    "primary_y": identity.definition["primary_y"],
-                    "horizon_notional": identity.definition["horizon_notional"],
-                    "negative_control": identity.definition["negative_control"],
-                    "falsifier": identity.definition["cheapest_falsifier"],
-                    "cheapest_falsifier": identity.definition["cheapest_falsifier"],
-                    "definition_sha256": identity.full_sha256,
-                    "role_in_session": "CONSIDERED_UNSELECTED",
-                    **_hypothesis_scope_fields(frozen, identity.definition, card),
-                },
+    # Repair re-entry must not rewrite durable parent hypothesis cards / drafts.
+    # Those record_ids are already committed; only the new cycle/receipt/decision
+    # (and a fresh next-action) belong to the repair terminal write set.
+    if not (isinstance(repair_disposition, str) and repair_disposition):
+        cards = _cards_for_identities(identities, frozen, draft)
+        for identity, card in zip(identities, cards, strict=True):
+            records.append(
+                event(
+                    record_id=f"HFIC-HYP-{identity.candidate_id}",
+                    kind=RecordKind.HYPOTHESIS_VERSION,
+                    entity_id=identity.candidate_id,
+                    hypothesis_version_id=identity.candidate_id,
+                    payload={
+                        "hypothesis_version_id": identity.candidate_id,
+                        "session_id": session_id,
+                        "hfic_protocol": prompt_version,
+                        "statement": identity.definition["claim"],
+                        "claim": identity.definition["claim"],
+                        "mechanism": identity.definition["mechanism"],
+                        "actor_counterparty": identity.definition["actor_counterparty"],
+                        "population": identity.definition["population"],
+                        "decision_timestamp": identity.definition["decision_timestamp"],
+                        "primary_x_family": identity.definition["primary_x_family"],
+                        "primary_y": identity.definition["primary_y"],
+                        "horizon_notional": identity.definition["horizon_notional"],
+                        "negative_control": identity.definition["negative_control"],
+                        "falsifier": identity.definition["cheapest_falsifier"],
+                        "cheapest_falsifier": identity.definition["cheapest_falsifier"],
+                        "definition_sha256": identity.full_sha256,
+                        "role_in_session": "CONSIDERED_UNSELECTED",
+                        **_hypothesis_scope_fields(frozen, identity.definition, card),
+                    },
+                )
             )
-        )
-    if draft is not None:
-        draft_bytes = json.dumps(
-            draft,
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
-            allow_nan=False,
-        )
-        records.append(
-            event(
+        if draft is not None:
+            draft_bytes = json.dumps(
+                draft,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+                allow_nan=False,
+            )
+            records.append(
+                event(
                 record_id=f"HFIC-ART-FORGE-DRAFT-{session_id}",
                 kind=RecordKind.RESEARCH_ARTIFACT,
                 entity_id=f"HFIC-ART-FORGE-DRAFT-{session_id}",

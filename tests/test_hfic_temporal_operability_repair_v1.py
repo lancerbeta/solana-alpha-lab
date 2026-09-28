@@ -929,19 +929,34 @@ class RepairLifecycleP1Tests(unittest.TestCase):
 
 
 class AcceptanceVerticalADataPathTests(unittest.TestCase):
-    """Production path: publish → bind → snapshot query → negatives → DocumentRunner."""
+    """Production path: publish → bind → snapshot query → journal → DocumentRunner."""
 
     def test_published_snapshot_corpus_through_binder_and_negatives(self) -> None:
+        import hashlib
+        from datetime import datetime, timedelta
+
+        from solana_alpha_lab.factory.document_runner import (
+            DocumentRunner,
+            RunContext,
+            repository_git_snapshot,
+        )
         from solana_alpha_lab.factory.hfic_grounded_discovery import (
             execute_discovery_from_rows,
+            list_discovery_looks,
             load_admitted_partition_rows,
             resolve_published_discovery_binding,
+            run_recorded_discovery_query,
         )
+        from solana_alpha_lab.factory.lane_classifier import classify_lane
+        from solana_alpha_lab.factory.operational_store import OperationalStore
+        from solana_alpha_lab.factory.run_passport import experiment_spec_sha256
+        from tests.test_fast_lane_classifier import AS_OF, HYPOTHESIS_DEFINITION_SHA256
+        from tests.test_hfic_temporal_discovery_v1 import _spec as _base_spec
         from tests.test_hfic_temporal_production_runner_v1 import (
             DOCUMENT_LATENESS,
+            _bind_experiment,
             _publish,
         )
-        from tests.test_hfic_temporal_discovery_v1 import _spec as _base_spec
 
         with tempfile.TemporaryDirectory() as raw:
             workspace = Path(raw)
@@ -956,10 +971,8 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
                 census_path=None,
                 observations_path=None,
             )
-            census = loaded["census"]
-            observations = loaded["observations"]
             stamped = []
-            for row in observations:
+            for row in loaded["observations"]:
                 body = dict(row)
                 body["observation_clock_policy"] = (
                     OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
@@ -973,17 +986,29 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
                     "source_price_event_time",
                     body.get("source_price_event_time") or "UNKNOWN",
                 )
-                if not body.get("request_started_at"):
-                    body["request_started_at"] = body.get(
-                        "first_reliable_available_at"
+                point = str(body.get("point_id"))
+                offs = {
+                    "X300": 300,
+                    "Y900": 900,
+                    "Y1800": 1800,
+                    "Y3600": 3600,
+                    "Y7200": 7200,
+                }.get(point, 0)
+                anchor = datetime.fromisoformat(
+                    str(loaded["census"][0]["authoritative_anchor"]).replace(
+                        "Z", "+00:00"
                     )
-                if not body.get("response_received_at"):
-                    body["response_received_at"] = body.get(
-                        "first_reliable_available_at"
-                    )
+                )
+                available = (
+                    anchor + timedelta(seconds=offs + DOCUMENT_LATENESS)
+                ).strftime("%Y-%m-%dT%H:%M:%SZ")
+                body["request_started_at"] = available
+                body["response_received_at"] = available
+                body["first_reliable_available_at"] = available
                 stamped.append(body)
             snapshot_spec = _base_spec(
                 cost_profile=None,
+                query_id="vert-a-snapshot",
                 schedule={
                     "lateness_seconds": DOCUMENT_LATENESS,
                     "observation_clock_policy": OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
@@ -993,10 +1018,21 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
             for item in cohort_binding:
                 item.setdefault("holdout", False)
                 item.setdefault("evidence_role", "EXPLORATORY_REUSE")
-            result = execute_discovery_from_rows(
-                census, stamped, snapshot_spec, cohort_binding
+                item["schedule_lateness_seconds"] = DOCUMENT_LATENESS
+            store = ResearchStore(data_root)
+            journal = "aa" * 32
+            git = repository_git_snapshot(ROOT)
+            evidence = run_recorded_discovery_query(
+                store,
+                census=loaded["census"],
+                observations=stamped,
+                spec=snapshot_spec,
+                binding=cohort_binding,
+                journal_scope=journal,
+                candidate_scope={"schema": "test", "target": snapshot_spec["target"]},
+                git_sha=git.head_sha,
             )
-            summary = result.get("result") or result.get("summary") or result
+            summary = evidence["result"]
             self.assertEqual(
                 summary.get("observation_clock_policy"),
                 OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
@@ -1004,59 +1040,64 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
             self.assertEqual(
                 summary.get("calculation_version"), TEMPORAL_CALCULATION_VERSION
             )
-            self.assertGreaterEqual(int(summary.get("observed_target_n") or 0), 0)
-            # Negative: unregistered primitive on exits must fail closed.
-            poisoned = [dict(row) for row in stamped]
-            exit_poisoned = 0
-            for row in poisoned:
-                if str(row.get("field_id") or "") != PRICE:
-                    continue
-                if str(row.get("point_id") or "") not in {"Y7200", "Y900", "Y1800"}:
-                    # Poison every later Y price row used as exit/reference.
-                    pass
-                row["primitive_id"] = "PRIM-NOT-REGISTERED-001"
-                row["request_sha256"] = "bogus"
-                row["call_occurrence_id"] = "foreign-occurrence"
-                exit_poisoned += 1
-            self.assertGreater(exit_poisoned, 0)
-            bad = execute_discovery_from_rows(
-                census, poisoned, snapshot_spec, cohort_binding
-            )
-            bad_summary = bad.get("result") or bad.get("summary") or bad
-            self.assertEqual(int(bad_summary.get("observed_target_n") or 0), 0)
-            pooled = (bad_summary.get("target_exclusion_reasons") or {}).get("pooled") or {}
+            self.assertEqual(int(summary.get("observed_target_n") or 0), 1)
             self.assertTrue(
-                pooled
-                or int(summary.get("observed_target_n") or 0) == 0
-            )
-            if int(summary.get("observed_target_n") or 0) > 0:
-                self.assertTrue(
-                    any(
-                        key in pooled
-                        for key in (
-                            "SNAPSHOT_OCCURRENCE_UNBOUND",
-                            "SNAPSHOT_POLICY_MISMATCH",
-                            "TARGET_UNOBSERVED",
-                            "EXIT_ABSENT",
-                        )
-                    ),
-                    pooled,
+                any(
+                    item.get("look_class") == "MAIN"
+                    and item.get("new_look") is not False
+                    for item in list_discovery_looks(store, journal)
                 )
-            # Negative: policy mismatch on price rows.
+            )
+            experiment = _bind_experiment(summary["experiment_recipe"], data_root)
+            decision = classify_lane(
+                {
+                    "experiment_spec": experiment,
+                    "hypothesis_definition_sha256": HYPOTHESIS_DEFINITION_SHA256,
+                },
+                root=ROOT,
+                data_root=data_root,
+                as_of=AS_OF,
+            )
+            self.assertEqual(decision.terminal, "FAST_LANE_READY", decision.reason_codes)
+            ops = OperationalStore(data_root / "ops" / "operational_state.sqlite")
+            try:
+                result = DocumentRunner(root=ROOT, store=ops).start_document(
+                    experiment,
+                    spec_sha256=experiment_spec_sha256(experiment),
+                    run_context=RunContext(
+                        data_root=data_root,
+                        hypothesis_definition_sha256=HYPOTHESIS_DEFINITION_SHA256,
+                        lane_decision=decision,
+                    ),
+                )
+            finally:
+                ops.close()
+            self.assertEqual(result["status"], "COMPLETE", result)
+            self.assertEqual(result["provider_calls_actual"], 0)
+            poisoned = [dict(row) for row in stamped]
+            for row in poisoned:
+                if row.get("point_id") == "Y7200" and row.get("field_id") == PRICE:
+                    row["primitive_id"] = "PRIM-NOT-REGISTERED-001"
+                    row["request_sha256"] = "bogus"
+                    row["call_occurrence_id"] = "foreign-occurrence"
+            bad = execute_discovery_from_rows(
+                loaded["census"], poisoned, snapshot_spec, cohort_binding
+            )["summary"]
+            self.assertEqual(int(bad.get("observed_target_n") or 0), 0)
+            pooled = (bad.get("target_exclusion_reasons") or {}).get("pooled") or {}
+            self.assertIn("SNAPSHOT_OCCURRENCE_UNBOUND", pooled)
             mismatched = [dict(row) for row in stamped]
             for row in mismatched:
-                if str(row.get("field_id") or "") == PRICE:
+                if row.get("point_id") == "Y7200" and row.get("field_id") == PRICE:
                     row["observation_clock_policy"] = "EVENT_TIME_V1"
             mismatch = execute_discovery_from_rows(
-                census, mismatched, snapshot_spec, cohort_binding
-            )
-            mismatch_summary = mismatch.get("result") or mismatch.get("summary") or mismatch
-            self.assertEqual(int(mismatch_summary.get("observed_target_n") or 0), 0)
-            if int(summary.get("observed_target_n") or 0) > 0:
-                mismatch_pooled = (
-                    mismatch_summary.get("target_exclusion_reasons") or {}
-                ).get("pooled") or {}
-                self.assertTrue(mismatch_pooled, mismatch_summary)
+                loaded["census"], mismatched, snapshot_spec, cohort_binding
+            )["summary"]
+            self.assertEqual(int(mismatch.get("observed_target_n") or 0), 0)
+            mismatch_pooled = (
+                mismatch.get("target_exclusion_reasons") or {}
+            ).get("pooled") or {}
+            self.assertIn("SNAPSHOT_POLICY_MISMATCH", mismatch_pooled)
 
     def test_parquet_and_release_preserve_clock_fields(self) -> None:
         from solana_alpha_lab.factory.live_cohort_discovery_release import (
@@ -1128,334 +1169,280 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
     """Production path: NO_WORTHY parent → apply → third MAIN → new terminal → close."""
 
     def test_completed_parent_third_look_new_terminal_and_close(self) -> None:
+        import hashlib
+        import json as _json
+
+        from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+        from solana_alpha_lab.factory.hfic_clock import FrozenClock
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            resolve_scientific_admission,
+        )
         from solana_alpha_lab.factory.hfic_grounded_discovery import (
-            _append_discovery_look,
             list_discovery_looks,
+            run_recorded_discovery_query,
+        )
+        from solana_alpha_lab.factory.hfic_identity import (
+            assign_portfolio_ids,
+            normalize_text,
+        )
+        from solana_alpha_lab.factory.hfic_preflight import persist_forge_context_packet
+        from solana_alpha_lab.factory.hfic_repair_continuation import (
+            RepairContinuationError,
+            spent_looks_from_journal,
+        )
+        from solana_alpha_lab.factory.hfic_session import (
+            _assert_scientific_admission,
+            freeze_draft,
+            list_hfic_sessions,
+            persist_no_worthy_session,
+            show_session,
+        )
+        from solana_alpha_lab.factory.hfic_temporal_discovery import (
+            persist_feature_preview,
         )
         from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
-        slot = "11" * 32
-        scope = "aa" * 32
-        session_id = "HFIC-SESS-VERT-B-001"
-        run_id = "FORGE-RUN-VERT-B-001"
-        moment = datetime(2026, 9, 28, tzinfo=UTC)
-        draft = {
-            "parent_run_id": run_id,
-            "parent_session_id": session_id,
-            "scientific_slot_sha256": slot,
-            "terminal_receipt_sha256": "00" * 32,
-            "journal_scope": scope,
-            "technical_gap_code": "PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP",
-            "repair_capability_id": REPAIR_CAPABILITY_ID,
-            "allowed_look_ids": [],
-            "spent_main_looks": 2,
-            "spent_adaptive_looks": 0,
-            "spent_preview_looks": 0,
-            "owner_authorization_id": "OWNER-AUTH-VERT-B-001",
-            "parent_terminal": "NO_WORTHY_HYPOTHESIS",
-            "evidence_mapping": {"repair": "snapshot_clocks"},
-        }
+        git = repository_git_snapshot(ROOT)
+        draft = _json.loads(
+            (ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        focus = hashlib.sha256(normalize_text("AUTO").encode("utf-8")).hexdigest()
+        started = datetime(2026, 8, 27, 12, 0, 0, tzinfo=UTC)
+        started_text = "2026-08-27T12:00:00Z"
         with tempfile.TemporaryDirectory() as tmp:
-            store = ResearchStore(Path(tmp) / "store")
-            cycle = {
-                "research_cycle_id": f"{session_id}-NO-WORTHY",
-                "session_id": session_id,
-                "phase": "SYNTHESIS_COMPLETE",
-                "hfic_protocol": "HFIC-V1.2",
-                "prompt_version": "HFIC-V1.2",
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ResearchStore(data_root)
+            packet = {
+                "schema": "smial.forge-context-packet",
                 "owner_focus": "AUTO",
-                "evidence_epoch_sha256": "ab" * 32,
-                "focus_key_sha256": "22" * 32,
-                "search_key_sha256": scope,
-                "selected_candidate_id": None,
-                "critic_terminal": "NO_WORTHY_HYPOTHESIS",
-                "scientific_slot_sha256": slot,
-                "session_receipt_sha256": "00" * 32,
-                "hfic_cycle_seq": 1,
-                "market_evidence_epoch_sha256": "ab" * 32,
-                "representation_semantic_version": "1.0.0",
-                "ladder_representation_id": "BASE",
+                "evidence_epoch_sha256": "11" * 32,
+                "market_evidence_epoch_sha256": "11" * 32,
             }
-            receipt_inner = json.dumps(
-                {
-                    "session_id": session_id,
-                    "session_state": "SYNTHESIS_COMPLETE",
-                    "critic_terminal": "NO_WORTHY_HYPOTHESIS",
-                },
-                sort_keys=True,
-                separators=(",", ":"),
+            ctx = persist_forge_context_packet(
+                data_root,
+                packet,
+                store=store,
+                repo_root=ROOT,
+                clock=FrozenClock(started),
             )
-            inner_sha = hashlib.sha256(receipt_inner.encode("utf-8")).hexdigest()
-            receipt_payload = {
-                "artifact_kind": "SESSION_RECEIPT",
-                "session_id": session_id,
-                "payload_canonical": receipt_inner,
-                "payload_sha256": inner_sha,
+            receipt = {
+                "receipt_id": "HFIC-PREFLIGHT-FIXTURE-001",
+                "evidence_epoch_sha256": "11" * 32,
+                "market_evidence_epoch_sha256": "11" * 32,
+                "focus_key_sha256": focus,
+                "search_key_sha256": "33" * 32,
+                "owner_focus": "AUTO",
+                "session_started_at": started_text,
+                "live_git_head": git.head_sha.lower(),
+                "git_composite_sha256": git.composite_sha256,
+                "forge_context_packet_sha256": ctx,
+                "store_inventory_digest": "ee" * 32,
             }
-            receipt_json = json.dumps(
-                receipt_payload, sort_keys=True, separators=(",", ":")
+            frozen = freeze_draft(draft, preflight_receipt=receipt)
+            persist_no_worthy_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+                preflight_receipt=receipt,
             )
-            receipt_sha = inner_sha
-            draft["terminal_receipt_sha256"] = receipt_sha
-            cycle["session_receipt_sha256"] = receipt_sha
-            cycle_json = json.dumps(cycle, sort_keys=True, separators=(",", ":"))
+            shown = show_session(store, str(frozen["session_id"]), repo_root=ROOT)
+            self.assertEqual(shown.get("session_state"), "SYNTHESIS_COMPLETE")
+            self.assertEqual(shown.get("critic_terminal"), "NO_WORTHY_HYPOTHESIS")
+            journal = str(shown["search_key_sha256"])
+            rows = SnapshotTargetTests()._rows_legal()
+            census = [_census()]
+            binding = _binding_mixed()
+            for spec in (
+                _spec_snapshot(
+                    query_id="prior-1",
+                    all=[{"feature": "mark", "op": "gte", "value": 0.0}],
+                ),
+                _spec_snapshot(
+                    query_id="prior-2",
+                    all=[{"feature": "mark", "op": "gte", "value": 0.1}],
+                ),
+            ):
+                run_recorded_discovery_query(
+                    store,
+                    census=census,
+                    observations=rows,
+                    spec=spec,
+                    binding=binding,
+                    journal_scope=journal,
+                    candidate_scope={"schema": "test", "target": spec["target"]},
+                    git_sha=git.head_sha,
+                )
+            persist_feature_preview(
+                store,
+                journal_scope=journal,
+                preview={"preview_sha256": "ab" * 32},
+                git_sha=git.head_sha,
+            )
+            spent = spent_looks_from_journal(store, journal)
+            self.assertEqual(spent["spent_main_looks"], 2)
+            self.assertEqual(spent["spent_preview_looks"], 1)
+            run_id = "FORGE-RUN-VERT-B-001"
             run_payload = {
                 "run_id": run_id,
-                "session_id": session_id,
-                "scientific_slot_sha256": slot,
+                "session_id": shown["session_id"],
+                "scientific_slot_sha256": shown["scientific_slot_sha256"],
                 "owner_final": "NO_WORTHY_HYPOTHESIS",
             }
-            run_json = json.dumps(run_payload, sort_keys=True, separators=(",", ":"))
-            forge_wrapper = {
+            run_json = _json.dumps(run_payload, sort_keys=True, separators=(",", ":"))
+            wrapper = {
                 "artifact_kind": "FORGE_RUN_RECEIPT",
                 "payload_canonical": run_json,
                 "payload_sha256": hashlib.sha256(run_json.encode("utf-8")).hexdigest(),
             }
-            forge_json = json.dumps(
-                forge_wrapper, sort_keys=True, separators=(",", ":")
-            )
-            txn = "RESEARCH-TXN-VERT-B-PARENT"
+            wrapper_json = _json.dumps(wrapper, sort_keys=True, separators=(",", ":"))
             store.append(
                 [
-                    ResearchEvent(
-                        record_id=f"HFIC-CYCLE-{session_id}-NO-WORTHY",
-                        record_kind=RecordKind.RESEARCH_CYCLE,
-                        entity_id=session_id,
-                        hypothesis_version_id=None,
-                        run_id=run_id,
-                        transaction_id=txn,
-                        effective_at=moment,
-                        first_reliable_available_at=moment,
-                        supersedes_record_id=None,
-                        payload_json=cycle_json,
-                        payload_sha256=hashlib.sha256(
-                            cycle_json.encode("utf-8")
-                        ).hexdigest(),
-                        schema_version="1.0",
-                        producer_capability_id="CAP-TEST",
-                        producer_git_sha=GIT_SHA,
-                        created_at=moment,
-                    ),
-                    ResearchEvent(
-                        record_id=f"HFIC-ART-SESSION-RECEIPT-{session_id}",
-                        record_kind=RecordKind.RESEARCH_ARTIFACT,
-                        entity_id=session_id,
-                        hypothesis_version_id=None,
-                        run_id=run_id,
-                        transaction_id=txn,
-                        effective_at=moment,
-                        first_reliable_available_at=moment,
-                        supersedes_record_id=None,
-                        payload_json=receipt_json,
-                        payload_sha256=hashlib.sha256(
-                            receipt_json.encode("utf-8")
-                        ).hexdigest(),
-                        schema_version="1.0",
-                        producer_capability_id="CAP-TEST",
-                        producer_git_sha=GIT_SHA,
-                        created_at=moment,
-                    ),
                     ResearchEvent(
                         record_id=f"HFIC-ART-FORGE-RUN-{run_id}",
                         record_kind=RecordKind.RESEARCH_ARTIFACT,
                         entity_id=run_id,
                         hypothesis_version_id=None,
                         run_id=run_id,
-                        transaction_id=txn,
-                        effective_at=moment,
-                        first_reliable_available_at=moment,
+                        transaction_id="RESEARCH-TXN-FORGE-RUN",
+                        effective_at=started,
+                        first_reliable_available_at=started,
                         supersedes_record_id=None,
-                        payload_json=forge_json,
+                        payload_json=wrapper_json,
                         payload_sha256=hashlib.sha256(
-                            forge_json.encode("utf-8")
+                            wrapper_json.encode("utf-8")
                         ).hexdigest(),
                         schema_version="1.0",
                         producer_capability_id="CAP-TEST",
-                        producer_git_sha=GIT_SHA,
-                        created_at=moment,
-                    ),
+                        producer_git_sha=git.head_sha,
+                        created_at=started,
+                    )
                 ],
-                transaction_id=txn,
+                transaction_id="RESEARCH-TXN-FORGE-RUN",
             )
-            for i in range(2):
-                _append_discovery_look(
-                    store,
-                    record_id=f"HFIC-ART-DISCOVERY-VERTB{i:02d}-" + ("1" * 20),
-                    journal_scope=scope,
-                    spec={"query_id": f"prior-{i}"},
-                    spec_sha256=f"{i+1:064x}",
-                    binding_sha="bb" * 32,
-                    data_refs=[],
-                    digest=f"{i+30:064x}",
-                    identity=f"{i+3:02x}" + ("b" * 62),
-                    summary={"calculation_version": TEMPORAL_CALCULATION_VERSION},
-                    look={
-                        "look_class": "MAIN",
-                        "new_look": True,
-                        "search_tier": "SIMPLE_SCREEN",
-                        "main_count": i + 1,
-                        "adaptive_count": 0,
-                        "simple_main_count": i + 1,
-                        "compound_main_count": 0,
-                    },
-                    git_sha=GIT_SHA,
-                    clock=moment,
-                    candidate_scope={"schema": "test"},
-                )
             parent = {
-                "session_id": session_id,
-                "session_state": "SYNTHESIS_COMPLETE",
+                "session_id": shown["session_id"],
+                "session_state": shown["session_state"],
                 "critic_terminal": "NO_WORTHY_HYPOTHESIS",
                 "selected_candidate_id": None,
-                "scientific_slot_sha256": slot,
-                "terminal_receipt_sha256": receipt_sha,
+                "scientific_slot_sha256": shown["scientific_slot_sha256"],
+                "terminal_receipt_sha256": shown["session_receipt_sha256"],
                 "run_id": run_id,
-                "journal_scope": scope,
-                "search_key_sha256": scope,
+                "journal_scope": journal,
+                "search_key_sha256": journal,
             }
-            blocked = admission_with_repair_continuation(
-                {
-                    "action": "RETURN_EXISTING_SESSION",
-                    "reason_code": "SYNTHESIS_COMPLETE",
-                    "session_id": session_id,
-                    "scientific_slot_sha256": slot,
-                    "occupancy": "OCCUPIED",
-                },
-                dispositions=[],
-                parent_terminal="SYNTHESIS_COMPLETE",
+            draft_r = {
+                "parent_run_id": run_id,
+                "parent_session_id": parent["session_id"],
+                "scientific_slot_sha256": parent["scientific_slot_sha256"],
+                "terminal_receipt_sha256": parent["terminal_receipt_sha256"],
+                "journal_scope": journal,
+                "technical_gap_code": "PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP",
+                "repair_capability_id": REPAIR_CAPABILITY_ID,
+                "allowed_look_ids": [],
+                "spent_main_looks": spent["spent_main_looks"],
+                "spent_adaptive_looks": spent["spent_adaptive_looks"],
+                "spent_preview_looks": spent["spent_preview_looks"],
+                "owner_authorization_id": "OWNER-AUTH-VERT-B-001",
+                "parent_terminal": "NO_WORTHY_HYPOTHESIS",
+                "evidence_mapping": {"repair": "snapshot_clocks"},
+            }
+            blocked = resolve_scientific_admission(
+                list_hfic_sessions(store),
+                reservations=[],
+                market_evidence_epoch="11" * 32,
+                representation_id="BASE",
+                representation_semantic_version="HFIC-V1.2",
+                owner_focus="AUTO",
+                repair_continuations=[],
             )
             self.assertEqual(blocked["action"], "RETURN_EXISTING_SESSION")
             plan = plan_repair_continuation(
-                draft, parent_session=parent, store=store
+                draft_r, parent_session=parent, store=store
             )
             self.assertEqual(plan["status"], "READY", plan)
             self.assertEqual(plan["remaining_main_looks"], 4)
-            # Competing apply under writer lease: second auth must fail once first commits.
-            competing = dict(draft)
-            competing["owner_authorization_id"] = "OWNER-AUTH-VERT-B-COMPETE"
             applied = apply_repair_continuation(
-                store, draft, parent_session=parent, git_sha=GIT_SHA
+                store, draft_r, parent_session=parent, git_sha=git.head_sha
             )
             self.assertTrue(applied["applied"])
-            with self.assertRaises(Exception):
+            self.assertEqual(applied["disposition"]["spent_preview_looks"], 1)
+            replay = apply_repair_continuation(
+                store, draft_r, parent_session=parent, git_sha=git.head_sha
+            )
+            self.assertEqual(replay.get("status"), "ALREADY_APPLIED")
+            self.assertTrue(replay.get("idempotent"))
+            competing = dict(draft_r)
+            competing["owner_authorization_id"] = "OWNER-AUTH-VERT-B-COMPETE"
+            with self.assertRaises(RepairContinuationError) as raised:
                 apply_repair_continuation(
-                    store, competing, parent_session=parent, git_sha=GIT_SHA
+                    store, competing, parent_session=parent, git_sha=git.head_sha
                 )
-            resumed = admission_with_repair_continuation(
-                {
-                    "action": "RETURN_EXISTING_SESSION",
-                    "reason_code": "SYNTHESIS_COMPLETE",
-                    "session_id": session_id,
-                    "scientific_slot_sha256": slot,
-                    "occupancy": "OCCUPIED",
-                },
-                dispositions=list_repair_continuation_dispositions(store),
-                parent_terminal="SYNTHESIS_COMPLETE",
+            self.assertIn(
+                str(raised.exception),
+                {"COMPETING_ACTIVE_DISPOSITION", "COMPETING_DISPOSITION_APPLIED"},
+            )
+            resumed = _assert_scientific_admission(
+                store, {**frozen, **receipt}, repo_root=ROOT
             )
             self.assertEqual(resumed["action"], ACTION_RESUME_REPAIR_CONTINUATION)
-            # Real third MAIN look persisted into the same durable journal.
-            _append_discovery_look(
-                store,
-                record_id="HFIC-ART-DISCOVERY-VERTB02-" + ("1" * 20),
-                journal_scope=scope,
-                spec={"query_id": "continuation-main-3"},
-                spec_sha256="03" + ("0" * 62),
-                binding_sha="bb" * 32,
-                data_refs=[],
-                digest="33" * 32,
-                identity="05" + ("b" * 62),
-                summary={"calculation_version": TEMPORAL_CALCULATION_VERSION},
-                look={
-                    "look_class": "MAIN",
-                    "new_look": True,
-                    "search_tier": "SIMPLE_SCREEN",
-                    "main_count": 3,
-                    "adaptive_count": 0,
-                    "simple_main_count": 3,
-                    "compound_main_count": 0,
-                },
-                git_sha=GIT_SHA,
-                clock=moment,
-                candidate_scope={"schema": "test"},
+            third = _spec_snapshot(
+                query_id="cont-3",
+                all=[{"feature": "mark", "op": "gte", "value": 0.2}],
             )
-            looks = list_discovery_looks(store, scope)
+            run_recorded_discovery_query(
+                store,
+                census=census,
+                observations=rows,
+                spec=third,
+                binding=binding,
+                journal_scope=journal,
+                candidate_scope={"schema": "test", "target": third["target"]},
+                git_sha=git.head_sha,
+            )
             mains = [
                 item
-                for item in looks
+                for item in list_discovery_looks(store, journal)
                 if item.get("look_class") == "MAIN" and item.get("new_look") is not False
             ]
             self.assertEqual(len(mains), 3)
-            # New terminal cycle under repair continuation stamp (same receipt).
-            repair_disp = applied["disposition"]["disposition_sha256"]
-            new_cycle = {
-                **cycle,
-                "research_cycle_id": f"{session_id}-REPAIR-{repair_disp[:12].upper()}",
-                "session_receipt_sha256": receipt_sha,
-                "hfic_cycle_seq": 2,
-                "repair_continuation_disposition_sha256": repair_disp,
-                "parent_cycle_seq": 1,
-                "critic_terminal": "NO_WORTHY_HYPOTHESIS",
-            }
-            new_json = json.dumps(new_cycle, sort_keys=True, separators=(",", ":"))
-            store.append(
-                [
-                    ResearchEvent(
-                        record_id=f"HFIC-CYCLE-{session_id}-REPAIR-{repair_disp[:12].upper()}",
-                        record_kind=RecordKind.RESEARCH_CYCLE,
-                        entity_id=session_id,
-                        hypothesis_version_id=None,
-                        run_id=run_id,
-                        transaction_id="RESEARCH-TXN-VERT-B-TERMINAL",
-                        effective_at=moment + timedelta(seconds=1),
-                        first_reliable_available_at=moment + timedelta(seconds=1),
-                        supersedes_record_id=None,
-                        payload_json=new_json,
-                        payload_sha256=hashlib.sha256(
-                            new_json.encode("utf-8")
-                        ).hexdigest(),
-                        schema_version="1.0",
-                        producer_capability_id="CAP-TEST",
-                        producer_git_sha=GIT_SHA,
-                        created_at=moment + timedelta(seconds=1),
-                    )
-                ],
-                transaction_id="RESEARCH-TXN-VERT-B-TERMINAL",
+            persist_no_worthy_session(
+                store,
+                {**frozen, **receipt},
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+                preflight_receipt=receipt,
             )
-            bundle_cycles = []
+            repair_disp = applied["disposition"]["disposition_sha256"]
+            cycles = []
             for record in store.iter_committed_records():
                 kind = getattr(record.record_kind, "value", record.record_kind)
                 if kind != "RESEARCH_CYCLE":
                     continue
-                payload = json.loads(record.payload_json)
-                if payload.get("session_id") == session_id:
-                    bundle_cycles.append(payload)
+                payload = _json.loads(record.payload_json)
+                if payload.get("session_id") == shown["session_id"]:
+                    cycles.append(payload)
             self.assertTrue(
                 any(
                     item.get("repair_continuation_disposition_sha256") == repair_disp
-                    and int(item.get("hfic_cycle_seq") or 0) == 2
-                    for item in bundle_cycles
+                    for item in cycles
                 ),
-                bundle_cycles,
+                cycles,
             )
-            closed = close_repair_continuation(
-                store, repair_disp, git_sha=GIT_SHA
-            )
+            closed = close_repair_continuation(store, repair_disp, git_sha=git.head_sha)
             self.assertEqual(closed["status"], "CLOSED")
-            after = admission_with_repair_continuation(
-                {
-                    "action": "RETURN_EXISTING_SESSION",
-                    "reason_code": "SYNTHESIS_COMPLETE",
-                    "session_id": session_id,
-                    "scientific_slot_sha256": slot,
-                    "occupancy": "OCCUPIED",
-                },
-                dispositions=list_repair_continuation_dispositions(store),
-                parent_terminal="SYNTHESIS_COMPLETE",
+            after = _assert_scientific_admission(
+                store, {**frozen, **receipt}, repo_root=ROOT
             )
             self.assertEqual(after["action"], "RETURN_EXISTING_SESSION")
             blocked_again = plan_repair_continuation(
                 {
-                    **draft,
+                    **draft_r,
                     "spent_main_looks": applied["disposition"]["spent_main_looks"],
                     "spent_adaptive_looks": applied["disposition"][
                         "spent_adaptive_looks"
@@ -1475,6 +1462,7 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                 store=store,
             )
             self.assertEqual(blocked_again["reason_code"], "DISPOSITION_ALREADY_CLOSED")
+
 
     def test_list_sessions_projects_critic_terminal_into_admission(self) -> None:
         """Production occupancy rows must carry critic_terminal for overlay."""

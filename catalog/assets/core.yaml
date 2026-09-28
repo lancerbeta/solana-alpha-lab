@@ -32287,7 +32287,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 1491d88ee0601adf8939e03581fc4ddfb9593a940edd956d2dc090279ca9de96}
+  integrity: {kind: sha256, sha256: 6581be26d691f432b342831a1070d502316890237971b298af0aed50c47d7405}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32309,7 +32309,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 5bc66a65c4e12d8e9414ef81c97edf80905468fbdabccb24a21a03f839c72012}
+  integrity: {kind: sha256, sha256: f2fcc967d8dba3fcb176917ba68513b250cf0fa61c121a2ce93c3f6cd1158c12}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37847,7 +37847,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: FORGE_TEMPORAL_OPERABILITY_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_repair_continuation.py', repository_path: src/solana_alpha_lab/factory/hfic_repair_continuation.py}
-  integrity: {kind: sha256, sha256: 99c0b340dac0823ffcffb507c427654dddafee9f855cf669022f071008551508}
+  integrity: {kind: sha256, sha256: 3da8ea9ba899f27f3e3a8f7b4f75a4721f15c5a06b094ac9dc33152d658dcecc}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-TEMPORAL-DISCOVERY-001}

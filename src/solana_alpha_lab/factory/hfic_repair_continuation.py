@@ -308,12 +308,19 @@ def plan_repair_continuation(
             owner_status="BLOCKED",
             next_step="ALIGN_DRAFT_JOURNAL_SCOPE",
         )
-    # Closed/applied dispositions are durable history: recognize them before
-    # journal spent alignment, which may have grown during the continuation.
+    # Same owner authorization is durable history. Match by authorization
+    # identity (not only disposition_sha256): journal spent / allowed_look_ids
+    # enrichment must not turn an idempotent replay into a second READY write.
     for item in existing_dispositions:
         if not isinstance(item, Mapping):
             continue
-        if item.get("disposition_sha256") != body["disposition_sha256"]:
+        same_auth = (
+            item.get("owner_authorization_id") == body["owner_authorization_id"]
+            and item.get("parent_session_id") == body["parent_session_id"]
+            and item.get("scientific_slot_sha256") == body["scientific_slot_sha256"]
+        )
+        same_digest = item.get("disposition_sha256") == body["disposition_sha256"]
+        if not same_auth and not same_digest:
             continue
         if item.get("status") == "CLOSED":
             return _owner_plan(
@@ -331,8 +338,13 @@ def plan_repair_continuation(
             disposition=dict(item),
             owner_status="DONE",
             next_step="ORDINARY_TEMPORAL_QUERY_WITHIN_REMAINING_BUDGET",
-            remaining_main_looks=max(0, 6 - int(body["spent_main_looks"])),
-            remaining_adaptive_looks=max(0, 2 - int(body["spent_adaptive_looks"])),
+            remaining_main_looks=max(
+                0, 6 - int(item.get("spent_main_looks") or body["spent_main_looks"])
+            ),
+            remaining_adaptive_looks=max(
+                0,
+                2 - int(item.get("spent_adaptive_looks") or body["spent_adaptive_looks"]),
+            ),
         )
     # Resolve spent looks from durable journal when store has looks.
     # Caller draft counts are assertions against the journal, not authority.
@@ -360,6 +372,33 @@ def plan_repair_continuation(
             if spent["allowed_look_ids"]:
                 body["allowed_look_ids"] = list(spent["allowed_look_ids"])
             body["disposition_sha256"] = disposition_identity(body)
+            # Re-check after enrichment: sha may now equal a stored disposition.
+            for item in existing_dispositions:
+                if not isinstance(item, Mapping):
+                    continue
+                if item.get("disposition_sha256") != body["disposition_sha256"]:
+                    continue
+                if item.get("status") == "CLOSED":
+                    return _owner_plan(
+                        status="NOT_APPLICABLE",
+                        reason_code="DISPOSITION_ALREADY_CLOSED",
+                        writes=False,
+                        disposition=dict(item),
+                        owner_status="BLOCKED",
+                        next_step="STOP_CONTINUATION_ALREADY_CONSUMED",
+                    )
+                return _owner_plan(
+                    status="ALREADY_APPLIED",
+                    reason_code="IDEMPOTENT_REPLAY",
+                    writes=False,
+                    disposition=dict(item),
+                    owner_status="DONE",
+                    next_step="ORDINARY_TEMPORAL_QUERY_WITHIN_REMAINING_BUDGET",
+                    remaining_main_looks=max(0, 6 - int(body["spent_main_looks"])),
+                    remaining_adaptive_looks=max(
+                        0, 2 - int(body["spent_adaptive_looks"])
+                    ),
+                )
         else:
             for key in (
                 "spent_main_looks",
