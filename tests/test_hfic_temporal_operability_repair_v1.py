@@ -1721,6 +1721,28 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                 ],
                 transaction_id="RESEARCH-TXN-FORGE-RUN-SEL",
             )
+            # Immutable parent snapshot: repair continues from sealed store bytes
+            # with 86b24-stable (non-REPAIR) artifact ids — not a live tip rewrite.
+            import shutil
+
+            parent_snapshot = Path(tmp) / "parent_snapshot_86b24_shape"
+            shutil.copytree(data_root, parent_snapshot)
+            store = ResearchStore(parent_snapshot)
+            data_root = parent_snapshot
+            shown = show_session(store, str(frozen["session_id"]), repo_root=ROOT)
+            self.assertEqual(shown.get("critic_terminal"), "NO_WORTHY_HYPOTHESIS")
+            parent_ids = {
+                str(getattr(record, "record_id", "") or "")
+                for record in store.iter_committed_records()
+            }
+            self.assertIn(f"HFIC-ART-FORGE-DRAFT-{shown['session_id']}", parent_ids)
+            self.assertIn(
+                f"HFIC-ART-SESSION-RECEIPT-{shown['session_id']}-NO-WORTHY",
+                parent_ids,
+            )
+            self.assertFalse(any("REPAIR-" in rid for rid in parent_ids))
+            journal = str(shown["search_key_sha256"])
+            spent = spent_looks_from_journal(store, journal)
             parent = {
                 "session_id": shown["session_id"],
                 "session_state": shown["session_state"],
@@ -1869,8 +1891,13 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                 shown_after.get("repair_continuation_disposition_sha256"),
                 applied["disposition"]["disposition_sha256"],
             )
-            # forge-run --no-write discovers terminals from list_hfic_sessions;
-            # assert occupancy + sticky show carry the new kill, not parent NO_WORTHY.
+            # forge-run --no-write readback must see the new terminal, not parent NO_WORTHY.
+            from unittest.mock import patch
+
+            from solana_alpha_lab.factory.hfic_representation_ladder import (
+                evaluate_forge_run,
+            )
+
             listed_after = [
                 item
                 for item in list_hfic_sessions(store)
@@ -1880,6 +1907,57 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                 listed_after.get("critic_terminal"), "KILL_PREPARATORY_LOOP"
             )
             self.assertEqual(listed_after.get("session_state"), "SYNTHESIS_COMPLETE")
+            forge_input = {
+                "schema": "smial.forge-input-receipt",
+                "owner_class": "SEARCH",
+                "market_evidence_epoch_sha256": "11" * 32,
+                "capability_epoch_sha256": "ab" * 32,
+                "active_evidence_set": {"visible_cohort_ids": []},
+            }
+            with patch(
+                "solana_alpha_lab.factory.hfic_representation_ladder.build_forge_input_receipt",
+                return_value=forge_input,
+            ):
+                forge_readback = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    persist=False,
+                    preferred_control_session_id=str(shown["session_id"]),
+                    stages=[
+                        {
+                            "representation_id": "BASE",
+                            "session_id": shown["session_id"],
+                            "legacy_epoch_sha256": "11" * 32,
+                            "effective_terminal": listed_after.get("critic_terminal"),
+                            "session_state": listed_after.get("session_state"),
+                            "execution_status": "EXECUTED",
+                            "stage_ref_sha256": str(
+                                listed_after.get("session_receipt_sha256")
+                                or shown_after.get("session_receipt_sha256")
+                                or "aa" * 32
+                            ),
+                            "used_cohort_ids": [],
+                        }
+                    ],
+                )
+            self.assertEqual(
+                forge_readback["stages"][0]["effective_terminal"],
+                "KILL_PREPARATORY_LOOP",
+            )
+            self.assertNotEqual(
+                forge_readback["stages"][0]["effective_terminal"],
+                "NO_WORTHY_HYPOTHESIS",
+            )
+            self.assertEqual(forge_readback["writes"]["research_store"], 0)
+            self.assertEqual(forge_readback["writes"]["forge_run"], 0)
+            # Disposable store lacks live cohort lineage; owner_final may be
+            # OBSERVABILITY_BLOCKED. The repair contract is the BASE stage
+            # terminal + zero writes, not a live market class.
+            self.assertIsNotNone(forge_readback.get("owner_final"))
+            self.assertNotEqual(
+                forge_readback["stages"][0].get("effective_terminal"),
+                "NO_WORTHY_HYPOTHESIS",
+            )
             listed_replay = [
                 item
                 for item in list_hfic_sessions(store)
