@@ -1157,6 +1157,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 store=store,
                 now=NOW,
                 deploy_git_sha=GIT,
+                observation_rdp=data_root,
             )
             snapshot = build_collector_snapshot(
                 packet,
@@ -1192,6 +1193,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 store=store,
                 now=NOW,
                 deploy_git_sha=GIT,
+                observation_rdp=data_root,
                 emit=False,
                 persist=True,
                 unit_status={
@@ -1230,6 +1232,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 store=store,
                 now=NOW + timedelta(minutes=15),
                 deploy_git_sha=GIT,
+                observation_rdp=data_root,
                 emit=False,
                 persist=True,
                 unit_status={
@@ -1282,6 +1285,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 activation=store.get_activation(
                     registered["schedule_sha256"], "ACT-WARN"
                 ),
+                data_root=data_root,
             )
             self.assertEqual(continuity["campaign_successor_state"], "AUTHORIZED")
             self.assertTrue(continuity["campaign_successor_required"])
@@ -1290,6 +1294,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 store=store,
                 now=NOW + timedelta(minutes=30),
                 deploy_git_sha=GIT,
+                observation_rdp=data_root,
                 emit=False,
                 persist=True,
                 unit_status={
@@ -1456,7 +1461,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 self.assertIn("reconcile", continuity["campaign_successor_owner_action"])
             store.close()
 
-    def test_authorized_successor_after_gap_does_not_clear_warning(self) -> None:
+    def test_authorized_window_starting_after_cutover_is_not_rollover_ready(self) -> None:
         current = _with_window(
             load_observation_schedule(
                 ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
@@ -1491,8 +1496,26 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                     current_registered["schedule_sha256"], "ACT-CURRENT"
                 ),
             )
-            self.assertEqual(continuity["campaign_successor_state"], "AUTHORIZED")
+            self.assertEqual(
+                continuity["campaign_successor_state"], "WINDOW_MISSES_CUTOVER"
+            )
             self.assertTrue(continuity["campaign_successor_required"])
+            self.assertIn(
+                "window covers", continuity["campaign_successor_owner_action"]
+            )
+            self.assertNotIn(
+                "commit and prove", continuity["campaign_successor_owner_action"]
+            )
+            alert = classify_incidents(
+                {
+                    "health_classes": ["CAMPAIGN_SUCCESSOR_REQUIRED"],
+                    "activation_id": "ACT-CURRENT",
+                    "campaign_continuity_activation_id": "ACT-CURRENT",
+                    **continuity,
+                }
+            )["CAMPAIGN_SUCCESSOR_REQUIRED"]
+            self.assertIn("does not cover the cutover boundary", alert)
+            self.assertIn("do not commit a rollover to this window", alert)
             store.close()
 
     def test_valid_rollover_clears_warning(self) -> None:
@@ -1624,6 +1647,172 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             self.assertIn("NON_ADMITTING", alert)
             self.assertNotIn("expires soon", alert)
             store.close()
+
+    def test_unproven_active_successor_does_not_hide_draining_gap_in_watch(self) -> None:
+        predecessor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-01T00:05:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-UNPROVEN-ACTIVE-PREDECESSOR-001",
+        )
+        successor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+            ),
+            starts_at="2026-09-01T00:05:00Z",
+            stops_admitting_at="2026-09-02T00:05:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-UNPROVEN-ACTIVE-SUCCESSOR-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            data_root = root / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(root / "ops.sqlite")
+            predecessor_started = datetime(2026, 9, 1, 0, 0, tzinfo=UTC)
+            predecessor_registered, _ = _activate_campaign(
+                store,
+                data_root,
+                predecessor,
+                activation_id="ACT-PREDECESSOR",
+                now=predecessor_started,
+            )
+            drain_expired_admission(
+                data_root=data_root,
+                store=store,
+                schedule_sha256=predecessor_registered["schedule_sha256"],
+                activation_id="ACT-PREDECESSOR",
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            successor_registered = register_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                document=successor,
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            # Model a mutable SQLite ACTIVE claim with no immutable transition
+            # event. The collector must not let it replace the expired anchor.
+            store.upsert_activation(
+                {
+                    "schedule_sha256": successor_registered["schedule_sha256"],
+                    "activation_id": "ACT-UNPROVEN-SUCCESSOR",
+                    "schedule_key": successor["schedule_key"],
+                    "state": "ACTIVE",
+                    "starts_at": successor["activation"]["starts_at"],
+                    "stops_admitting_at": successor["activation"][
+                        "stops_admitting_at"
+                    ],
+                    "payload": {},
+                },
+                clock=NOW,
+            )
+
+            packet = build_collector_operational_packet(
+                root=root,
+                store=store,
+                now=NOW,
+                deploy_git_sha=GIT,
+                observation_rdp=data_root,
+                remote_config={},
+                environ={},
+            )
+            result = evaluate_operability(
+                root=root,
+                store=store,
+                now=NOW,
+                deploy_git_sha=GIT,
+                observation_rdp=data_root,
+                remote_config={},
+                environ={},
+                emit=False,
+                persist=False,
+                unit_status={
+                    "factory-observation-schedule.timer": "active",
+                    "factory-remote-backup.timer": "active",
+                    "factory-collector-owner-pulse.timer": "active",
+                    "factory-hot90-closed-day-archive.timer": "active",
+                    "factory-operability-watch.timer": "active",
+                    "factory-v1-workbench.service": "active",
+                },
+            )
+            details = "\n".join(result["preview_messages"])
+            snapshot = build_collector_snapshot(
+                packet, observed_at=packet["observed_at"]
+            )
+            store.close()
+            self.assertIn("CAMPAIGN_SUCCESSOR_REQUIRED", result["present"])
+            self.assertEqual(packet["activation_id"], "ACT-UNPROVEN-SUCCESSOR")
+            self.assertEqual(packet["activation_state"], "UNKNOWN")
+            self.assertEqual(
+                packet["campaign_successor_state"], "GAP"
+            )
+            self.assertEqual(
+                packet["campaign_continuity_activation_id"],
+                "ACT-PREDECESSOR",
+            )
+            self.assertEqual(
+                snapshot["packet"]["campaign_continuity_activation_id"],
+                "ACT-PREDECESSOR",
+            )
+            self.assertIn("successor_state=GAP", details)
+            self.assertIn("continuity_activation=ACT-PREDECESSOR", details)
+
+    def test_unproven_active_without_draining_predecessor_stays_unknown(self) -> None:
+        document = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-03T00:00:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-UNPROVEN-ACTIVE-ONLY-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            data_root = root / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(root / "ops.sqlite")
+            registered = register_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                document=document,
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            store.upsert_activation(
+                {
+                    "schedule_sha256": registered["schedule_sha256"],
+                    "activation_id": "ACT-UNPROVEN-ONLY",
+                    "schedule_key": document["schedule_key"],
+                    "state": "ACTIVE",
+                    "starts_at": document["activation"]["starts_at"],
+                    "stops_admitting_at": document["activation"][
+                        "stops_admitting_at"
+                    ],
+                    "payload": {},
+                },
+                clock=NOW,
+            )
+            packet = build_collector_operational_packet(
+                root=root,
+                store=store,
+                now=NOW,
+                deploy_git_sha=GIT,
+                observation_rdp=data_root,
+                remote_config={},
+                environ={},
+            )
+            alert = classify_incidents(packet)["CAMPAIGN_SUCCESSOR_REQUIRED"]
+            store.close()
+            self.assertEqual(packet["activation_state"], "UNKNOWN")
+            self.assertEqual(packet["campaign_successor_state"], "UNKNOWN")
+            self.assertTrue(packet["campaign_successor_required"])
+            self.assertIn("UNKNOWN/BLOCKED", alert)
+            self.assertIn("reconcile current activation transition proof", alert)
 
     def test_source_data_stale_unchanged(self) -> None:
         packet = {

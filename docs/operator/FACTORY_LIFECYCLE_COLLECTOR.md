@@ -315,6 +315,9 @@ continuity is clear only after the rollover is committed and both linked
 append-only transition events are proven. A same-family successor that is
 already `ACTIVE` clears the warning only with live bound authority, a
 boundary-covering window, and valid immutable lifecycle transition proof.
+Any registration whose window starts after the boundary is reported as
+`WINDOW_MISSES_CUTOVER`; its `REGISTERED` or `AUTHORIZED` state does not make
+the late window usable.
 
 After the predecessor window ends, a `DRAINING` predecessor without that proof
 remains `GAP`. The watch keeps `CAMPAIGN_SUCCESSOR_REQUIRED` present; it does
@@ -334,13 +337,18 @@ When Telegram fires `CAMPAIGN_SUCCESSOR_REQUIRED`:
 1. Read `SUCCESSOR_STATE` / `STOPS_ADMITTING_AT` / `TIME_REMAINING_SECONDS`.
 2. If `SUCCESSOR_STATE=AUTHORIZED`, commit and prove the in-window rollover;
    authorization by itself does not close the attention. If the state is
-   `HISTORICAL_OUT_OF_WINDOW`, prepare a new same-family successor. If the
-   state is `GAP`, follow the `NON_ADMITTING` forward-recovery procedure above.
+   `WINDOW_MISSES_CUTOVER`, do not roll over that document: prepare and
+   authorize a new same-family successor whose half-open window covers
+   `STOPS_ADMITTING_AT`. If the state is `HISTORICAL_OUT_OF_WINDOW`, prepare a
+   new same-family successor. If the state is `GAP`, follow the
+   `NON_ADMITTING` forward-recovery procedure above.
 3. The attention clears only after `ROLLOVER_READY` or a proven `ACTIVE`
    successor. The Telegram card remains
    `FACTORY / ATTENTION — ACTION` with `MESSAGE_TYPE=ATTENTION` and
    `ATTENTION=CAMPAIGN_SUCCESSOR_REQUIRED`, not `SOURCE_DATA_STALE`.
-   Age `> period*3` remains the sole `SOURCE_DATA_STALE` rule.
+   An unproven `ACTIVE` row does not displace an expired `DRAINING` continuity
+   anchor; its alert names that anchor separately from the reported current
+   activation. Age `> period*3` remains the sole `SOURCE_DATA_STALE` rule.
 
 ### Current-state read model
 

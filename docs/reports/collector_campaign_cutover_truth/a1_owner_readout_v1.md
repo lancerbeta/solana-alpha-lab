@@ -8,12 +8,14 @@
 - Историческая регистрация той же семьи, чьё окно завершилось к границе predecessor, получает HISTORICAL_OUT_OF_WINDOW и не выглядит продолжением.
 - AUTHORIZED без связанного rollover и двух проверенных append-only transition events оставляет owner attention активным.
 - После истечения окна DRAINING без доказанного successor остаётся GAP; оператору указана только существующая forward-only процедура NON_ADMITTING, без задних дат.
+- Неподтверждённый ACTIVE не вытесняет DRAINING predecessor: alert привязывает GAP к отдельному continuity activation; без доказанного predecessor continuity остаётся UNKNOWN с owner attention.
+- Зарегистрированное окно, начинающееся после cutover, помечается WINDOW_MISSES_CUTOVER и не получает невыполнимую инструкцию rollover.
 - CLI захватывает единый UTC now после чтения runtime-конфига и до открытия SQLite; кандидаты проецируются через project_activation_as_of.
 - Alert, operator runbook и Catalog описывают те же правила.
 
 ## Проверка
 
-Девять целевых unittest сценариев прошли. В тестах provider/credential вызовы не выполнялись; CLI replay заглушает физические зависимости и проверяет границу времени. Это доказывает локальную проекцию и lifecycle-поведение, но не live cutover.
+74 целевых unittest теста прошли. В тестах provider/credential вызовы не выполнялись; CLI replay заглушает физические зависимости и проверяет границу времени. Это доказывает локальную проекцию и lifecycle-поведение, но не live cutover.
 
 ## Product Horizon
 

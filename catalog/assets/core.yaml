@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: bb89857dc7637022483ee23854897f8b5752f7a9b703ed73d416a4edd9e9e253}
+  integrity: {kind: sha256, sha256: 523afa3a2563d9a9e26416a01528b8907a210025a1aa65b92ae4e2ca7b924135}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -34247,7 +34247,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: 3c42abc85f66bbef344c4a1fb907d6f77ed018bfb703d21ad6eb1628c61fa87e}
+  integrity: {kind: sha256, sha256: 4cb29cbcc853e3cf6608f829451b017906b16cad085168bc8957381fae42dfab}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -38581,18 +38581,18 @@ records:
   - {relation_type: validated_by, target_asset_id: TEST-OBSERVATION-SCHEDULE-CUTOVER-TICK-001}
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
-  search_terms: [CAMPAIGN, CONTINUITY, CUTOVER, GAP, AUTHORITY, TICK]
+  search_terms: [CAMPAIGN, CONTINUITY, CUTOVER, WINDOW_MISSES_CUTOVER, UNPROVEN_ACTIVE, GAP, AUTHORITY, TICK]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: TEST-COLLECTOR-CAMPAIGN-CONTINUITY-001
   record_version: '1.0'
   asset_type: script
-  purpose: Zero-provider proofs for historical registrations, authority without rollover, and persistent expired-window alerts.
+  purpose: Zero-provider proofs for historical registrations, successor windows that miss cutover, authority without rollover, unproven ACTIVE claims, and persistent expired-window alerts.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-28'
   truth_owner: COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_collector_campaign_continuity_repair_v1.py', repository_path: tests/test_collector_campaign_continuity_repair_v1.py}
-  integrity: {kind: sha256, sha256: 9e7fcfc760acde98582260afde0ac606facfe5b7a9900bd5b2ea2808f92d1d7e}
+  integrity: {kind: sha256, sha256: 8e0a93ebcb3231bece174f5e710783c899d33f8323418dbc0dd0581edd3dc08a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-CAMPAIGN-CUTOVER-TRUTH-001}
@@ -38600,7 +38600,7 @@ records:
   - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-LIFECYCLE-001}
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
-  search_terms: [CAMPAIGN_CONTINUITY, HISTORICAL_OUT_OF_WINDOW, GAP, TESTS]
+  search_terms: [CAMPAIGN_CONTINUITY, HISTORICAL_OUT_OF_WINDOW, WINDOW_MISSES_CUTOVER, UNPROVEN_ACTIVE, GAP, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: TEST-OBSERVATION-SCHEDULE-CUTOVER-TICK-001
   record_version: '1.0'

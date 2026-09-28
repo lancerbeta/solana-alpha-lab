@@ -40,6 +40,8 @@ COLLECTOR_SNAPSHOT_PACKET_FIELDS = (
     "provider_observations",
     "restore_marker_unresolved",
     "stops_admitting_at",
+    "campaign_continuity_activation_id",
+    "campaign_continuity_schedule_sha256",
     "campaign_time_remaining_seconds",
     "campaign_successor_state",
     "campaign_successor_schedule_sha256",
@@ -241,6 +243,20 @@ def classify_incidents(
                 f"stops_admitting_at={packet.get('stops_admitting_at')} "
                 f"time_remaining_seconds={remaining} "
                 f"successor_state={successor_state} "
+                f"continuity_activation={packet.get('campaign_continuity_activation_id')} "
+                f"owner_action={packet.get('campaign_successor_owner_action')})."
+            )
+        elif successor_state == "WINDOW_MISSES_CUTOVER":
+            found["CAMPAIGN_SUCCESSOR_REQUIRED"] = (
+                "Campaign admission expires soon; the registered same-family "
+                "window does not cover the cutover boundary. Prepare a new "
+                "boundary-covering successor; do not commit a rollover to this "
+                "window "
+                f"(activation={packet.get('activation_id')} "
+                f"stops_admitting_at={packet.get('stops_admitting_at')} "
+                f"time_remaining_seconds={remaining} "
+                f"successor_state={successor_state} "
+                f"continuity_activation={packet.get('campaign_continuity_activation_id')} "
                 f"owner_action={packet.get('campaign_successor_owner_action')})."
             )
         elif successor_state == "UNKNOWN" or remaining in (None, "UNKNOWN"):
@@ -248,6 +264,7 @@ def classify_incidents(
                 "Campaign successor continuity is UNKNOWN/BLOCKED; do not claim "
                 "an expiry time "
                 f"(activation={packet.get('activation_id')} "
+                f"continuity_activation={packet.get('campaign_continuity_activation_id')} "
                 f"owner_action={packet.get('campaign_successor_owner_action')})."
             )
         else:
@@ -257,6 +274,7 @@ def classify_incidents(
                 f"stops_admitting_at={packet.get('stops_admitting_at')} "
                 f"time_remaining_seconds={remaining} "
                 f"successor_state={successor_state} "
+                f"continuity_activation={packet.get('campaign_continuity_activation_id')} "
                 f"owner_action={packet.get('campaign_successor_owner_action')})."
             )
     units = unit_status or {}
