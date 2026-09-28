@@ -1543,9 +1543,26 @@ compound не использован. Неназывайте непройден�
 и `by_calendar_block`. Когортный срез описательный: общая decision может
 входить в несколько когорт, суммы N не обязаны совпасть с pooled, и когорты
 не являются независимой репликацией. Нет observed target — mean `null`, не 0.
-Пустая admitted cohort остаётся строкой с N=0. `INTEGRITY_CONFLICT` — другая причина того же N=0 и mean `null`: decision исключена до конца расчёта и на pooled, и на каждой затронутой когорте, включая когорту поздней копии. Причина лежит в `exclusion_reasons` результата и в `by_cohort[].exclusion_reasons`, а не в пустой cohort и не в missing target. Writer temporal calculation —
-`HFIC_TEMPORAL_DISCOVERY_CALC_V2`. V1 читается как есть, без выдуманного среза;
-повтор того же science/input пишет V2 как `CALCULATION_REVISION`, без нового
+Пустая admitted cohort остаётся строкой с N=0. `INTEGRITY_CONFLICT` — другая причина того же N=0 и mean `null`: decision исключена до конца расчёта и на pooled, и на каждой затронутой когорте, включая когорту поздней копии. Причина лежит в `exclusion_reasons` результата и в `by_cohort[].exclusion_reasons`, а не в пустой cohort и не в missing target.
+Bound schedule может задавать per-point `(due_offset, allowed_lateness)`;
+query scalar остаётся X300 envelope. `schedule.observation_clock_policy:
+PROVIDER_REPORTED_SNAPSHOT_V1` считает exit по request/response/availability,
+не по member anchor как market-event. Причины missing target —
+`target_exclusion_reasons` (pooled + by_cohort). После completed NO_WORTHY без selected candidate узкий owner-authorized repair
+continuation наследует потраченный look ledger. Owner path
+(`--data-root` — parent flag перед subcommand):
+`hypothesis_forge.py --data-root <store> repair-continuation-draft --parent-session-id <id> --owner-authorization-id <auth> --technical-gap-code <gap> --output <draft.json>`
+(spent looks и run/receipt берутся из show-session + store; см. field map в runbook)
+→ `repair-continuation-plan --draft <json>` (без записи) →
+отдельно `repair-continuation-apply --draft <json> --confirm-append-only` →
+ordinary temporal query в остатке бюджета → после нового terminal
+`repair-continuation-close --disposition-sha256 <from-apply> --confirm-append-only`
+(иначе AUTHORIZED снова откроет slot).
+Терминалы draft/plan/apply/close и glossary причин —
+`docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md`.
+Writer temporal calculation —
+`HFIC_TEMPORAL_DISCOVERY_CALC_V3`. V1/V2 читаются как есть, без выдуманного среза;
+повтор того же science/input пишет V3 как `CALCULATION_REVISION`, без нового
 scientific look. В owner readout это поля `calculation_version`,
 `queries[].look_class=CALCULATION_REVISION` и `queries[].new_look=false`
 (тот же смысл на `format_discovery_readout`). Grounded `CALCULATION_VERSION` не меняется.

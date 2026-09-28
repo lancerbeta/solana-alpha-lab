@@ -268,11 +268,17 @@ def _attach_verified_schedule(root: Path, cohorts: list[dict[str, Any]]) -> None
         projected = schedule_projection_for_census(root, root / census_rel)
         declared = cohort.get("schedule_lateness_seconds")
         point_lateness = projected.get("schedule_point_lateness")
+        # Query scalar is the X300 envelope only. Mixed non-X300 point maps
+        # are legal and must not trip SCHEDULE_LATENESS_MISMATCH here.
+        x300_late = (
+            point_lateness.get("X300") if isinstance(point_lateness, Mapping) else None
+        )
         if (
             isinstance(declared, int)
             and not isinstance(declared, bool)
-            and isinstance(point_lateness, Mapping)
-            and any(value != declared for value in point_lateness.values())
+            and isinstance(x300_late, int)
+            and not isinstance(x300_late, bool)
+            and x300_late != declared
         ):
             projected["schedule_context_gap"] = "SCHEDULE_LATENESS_MISMATCH"
         cohort.update(projected)
@@ -1577,6 +1583,18 @@ def format_discovery_readout(evidence: Mapping[str, Any]) -> dict[str, Any]:
         payload["claim_level"] = result.get("claim_level")
         payload["labeled_net_return"] = result.get("labeled_net_return")
         payload["search_tier"] = result.get("search_tier")
+    if result.get("observation_clock_policy"):
+        payload["observation_clock_policy"] = result.get("observation_clock_policy")
+    if result.get("target_exclusion_reasons") is not None:
+        payload["target_exclusion_reasons"] = result.get("target_exclusion_reasons")
+    if result.get("source_price_event_time") is not None:
+        payload["source_price_event_time"] = result.get("source_price_event_time")
+    if result.get("technical_stop") is not None:
+        payload["technical_stop"] = result.get("technical_stop")
+    if result.get("technical_failure") is not None:
+        payload["technical_failure"] = result.get("technical_failure")
+    if result.get("scientific_negative") is not None:
+        payload["scientific_negative"] = result.get("scientific_negative")
     return payload
 
 

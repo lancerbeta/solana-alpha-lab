@@ -168,6 +168,9 @@
     "idempotency_policy": {"const": "EXACT_REQUEST_HASH"},
     "data_zone": {"const": "DATA_ROOT_ONLY"},
     "raw_retention_class": {"enum": ["RAW_BOUNDED", "CANONICAL_IMMUTABLE"]},
-    "redaction_profile": {"const": "NO_SECRETS_NO_CREDENTIAL_HEADERS"}
+    "redaction_profile": {"const": "NO_SECRETS_NO_CREDENTIAL_HEADERS"},
+    "observation_clock_policy": {
+      "enum": ["EVENT_TIME_V1", "PROVIDER_REPORTED_SNAPSHOT_V1"]
+    }
   }
 }

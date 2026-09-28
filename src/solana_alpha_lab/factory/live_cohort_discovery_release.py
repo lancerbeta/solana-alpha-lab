@@ -819,6 +819,9 @@ def _explode_observation_rows(
         "call_occurrence_id": row.get("call_occurrence_id"),
         "http_status": row.get("http_status"),
         "http_class": row.get("http_class"),
+        "observation_clock_policy": row.get("observation_clock_policy"),
+        "source_price_event_time": row.get("source_price_event_time"),
+        "member_anchor": row.get("member_anchor"),
     }
     field_values = row.get("field_values")
     out: list[dict[str, Any]] = []
@@ -2790,6 +2793,9 @@ def _observation_release_row(
         "call_occurrence_id": obs.get("call_occurrence_id"),
         "http_status": http_status,
         "http_class": obs.get("http_class"),
+        "observation_clock_policy": obs.get("observation_clock_policy"),
+        "source_price_event_time": obs.get("source_price_event_time"),
+        "member_anchor": obs.get("member_anchor"),
         "evidence_role": LIVE_EVIDENCE_ROLE,
         "confirmatory_reuse_forbidden": True,
     }

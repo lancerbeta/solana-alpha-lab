@@ -33,11 +33,41 @@ from solana_alpha_lab.factory.hfic_grounded_discovery import (
 TEMPORAL_SCHEMA = "smial.hfic-temporal-query"
 TEMPORAL_SCHEMA_VERSION = "1.0"
 TEMPORAL_CALCULATION_VERSION_V1 = "HFIC_TEMPORAL_DISCOVERY_CALC_V1"
-TEMPORAL_CALCULATION_VERSION = "HFIC_TEMPORAL_DISCOVERY_CALC_V2"
+TEMPORAL_CALCULATION_VERSION_V2 = "HFIC_TEMPORAL_DISCOVERY_CALC_V2"
+TEMPORAL_CALCULATION_VERSION = "HFIC_TEMPORAL_DISCOVERY_CALC_V3"
 TEMPORAL_CALCULATION_VERSIONS_READABLE = frozenset(
-    {TEMPORAL_CALCULATION_VERSION_V1, TEMPORAL_CALCULATION_VERSION}
+    {
+        TEMPORAL_CALCULATION_VERSION_V1,
+        TEMPORAL_CALCULATION_VERSION_V2,
+        TEMPORAL_CALCULATION_VERSION,
+    }
 )
 TEMPORAL_CAPABILITY_ID = "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+OBSERVATION_CLOCK_EVENT_TIME_V1 = "EVENT_TIME_V1"
+OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1 = "PROVIDER_REPORTED_SNAPSHOT_V1"
+OBSERVATION_CLOCK_POLICIES = frozenset(
+    {
+        OBSERVATION_CLOCK_EVENT_TIME_V1,
+        OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
+    }
+)
+# Versioned read-path interpretation: legacy rows may omit the explicit policy
+# column when sealed transport/occurrence lineage already proves snapshot
+# semantics under a PROVIDER_REPORTED_SNAPSHOT_V1 query. Never invent clocks
+# or hashes; insufficient lineage is SNAPSHOT_LINEAGE_UNINTERPRETABLE.
+SNAPSHOT_ROW_INTERPRETATION_V1 = "SNAPSHOT_ROW_INTERPRETATION_V1"
+SNAPSHOT_LINEAGE_BLOCKERS = frozenset(
+    {
+        "SNAPSHOT_POLICY_MISMATCH",
+        "SNAPSHOT_OCCURRENCE_UNBOUND",
+        "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+        "MISSING_ACQUISITION_CLOCK",
+        "CLOCK_ORDER_INVALID",
+        "ACQUISITION_BEFORE_POINT_DUE",
+        "AVAILABILITY_AFTER_DEADLINE",
+        "ACQUISITION_AFTER_CUTOFF",
+    }
+)
 PREVIEW_BYTE_LIMIT = 64 * 1024
 PREVIEW_EXAMPLE_LIMIT = 24
 MAX_PREVIEW_SPECS = 2
@@ -259,6 +289,11 @@ def scientific_body(spec: Mapping[str, Any]) -> dict[str, Any]:
     lateness = schedule.get("lateness_seconds")
     if isinstance(lateness, bool) or not isinstance(lateness, int) or lateness < 0:
         raise GroundedDiscoveryError("SCHEDULE_INVALID")
+    clock_policy = schedule.get("observation_clock_policy")
+    if clock_policy in (None, ""):
+        clock_policy = OBSERVATION_CLOCK_EVENT_TIME_V1
+    if clock_policy not in OBSERVATION_CLOCK_POLICIES:
+        raise GroundedDiscoveryError("OBSERVATION_CLOCK_POLICY_INVALID")
     features_in = spec.get("features")
     predicates_in = spec.get("all")
     if not isinstance(features_in, list) or not features_in or len(features_in) > MAX_FEATURES:
@@ -311,6 +346,7 @@ def scientific_body(spec: Mapping[str, Any]) -> dict[str, Any]:
         "population": "BASE_X",
         "decision_point": decision_point,
         "schedule_lateness_seconds": lateness,
+        "observation_clock_policy": str(clock_policy),
         "features": sorted(features, key=lambda item: str(item["name"])),
         "predicates": sorted(predicates, key=_canonical),
         "target": {
@@ -338,8 +374,22 @@ def scientific_body(spec: Mapping[str, Any]) -> dict[str, Any]:
 
 def validate_temporal_query(spec: Mapping[str, Any]) -> dict[str, Any]:
     body = scientific_body(spec)
-    identity = {key: body[key] for key in body if key not in {"query_id", "search_tier", "budget_allocation", "adaptation_of"}}
+    identity = {
+        key: body[key]
+        for key in body
+        if key not in {"query_id", "search_tier", "budget_allocation", "adaptation_of"}
+    }
+    # Default EVENT_TIME_V1 is omitted from identity so prior frozen digests
+    # remain stable; any non-default policy enters scientific identity.
+    if identity.get("observation_clock_policy") == OBSERVATION_CLOCK_EVENT_TIME_V1:
+        identity = {
+            key: value
+            for key, value in identity.items()
+            if key != "observation_clock_policy"
+        }
     digest = _sha256(identity)
+    runtime_body = dict(identity)
+    runtime_body["observation_clock_policy"] = body["observation_clock_policy"]
     return {
         "query_id": body["query_id"],
         "decision_points": [body["decision_point"]],
@@ -350,13 +400,13 @@ def validate_temporal_query(spec: Mapping[str, Any]) -> dict[str, Any]:
         "population": "BASE_X",
         "spec_sha256": digest,
         "target_label": (
-            f"PRICE_RELATIVE_PROXY:{identity['target']['reference_point']}:"
-            f"{identity['target']['exit_point']}:{identity['target']['field_id']}"
+            f"PRICE_RELATIVE_PROXY:{runtime_body['target']['reference_point']}:"
+            f"{runtime_body['target']['exit_point']}:{runtime_body['target']['field_id']}"
         ),
         "search_tier": body["search_tier"],
         "budget_allocation": body["budget_allocation"],
         "adaptation_of": body["adaptation_of"],
-        "scientific_body": identity,
+        "scientific_body": runtime_body,
         "display": body,
     }
 
@@ -425,6 +475,160 @@ def _deadline_for(anchor: object, point: str, lateness: int, *, due_offset: int 
     return parsed + timedelta(seconds=offset + lateness)
 
 
+_REGISTERED_PRIMITIVE_IDS: frozenset[str] | None = None
+
+
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parents[3]
+
+
+def _registered_primitive_ids() -> frozenset[str]:
+    global _REGISTERED_PRIMITIVE_IDS
+    if _REGISTERED_PRIMITIVE_IDS is not None:
+        return _REGISTERED_PRIMITIVE_IDS
+    from solana_alpha_lab.factory.observation_primitive_registry import (
+        load_observation_primitive_registry,
+    )
+
+    registry = load_observation_primitive_registry(_repo_root())
+    _REGISTERED_PRIMITIVE_IDS = frozenset(registry.primitives)
+    return _REGISTERED_PRIMITIVE_IDS
+
+
+def _is_hex64(value: object) -> bool:
+    text = str(value or "")
+    return len(text) == 64 and all(ch in "0123456789abcdef" for ch in text)
+
+
+def stamp_provider_reported_snapshot_transport(
+    observations: Sequence[Mapping[str, Any]],
+    *,
+    primitive_id: str = "PRIM-JUPITER-TOKENS-V2-SEARCH-001",
+    include_explicit_policy: bool = True,
+    request_sha256: str | None = None,
+) -> list[dict[str, Any]]:
+    """Stamp fake-transport snapshot lineage onto producer rows before publish.
+
+    New-format corpora set ``observation_clock_policy`` explicitly. Legacy-format
+    fixtures may omit the policy column while retaining occurrence/request and
+    acquisition clocks so ``SNAPSHOT_ROW_INTERPRETATION_V1`` can derive policy.
+    Never invent clocks when availability is already absent.
+    """
+
+    stamped: list[dict[str, Any]] = []
+    default_request = request_sha256 if _is_hex64(request_sha256) else "dd" * 32
+    for row in observations:
+        body = dict(row)
+        available = body.get("first_reliable_available_at") or body.get("event_time")
+        if available not in (None, ""):
+            # Producer fake-transport clocks are coherent: request=response=available.
+            # Do not preserve pre-stamp request anchors that predate point due.
+            body["request_started_at"] = available
+            body["response_received_at"] = available
+            body["first_reliable_available_at"] = available
+        body["primitive_id"] = primitive_id or body.get("primitive_id") or (
+            "PRIM-JUPITER-TOKENS-V2-SEARCH-001"
+        )
+        body["call_occurrence_id"] = hashlib.sha256(
+            f"{body.get('mint')}:{body.get('point_id')}:{body.get('field_id')}:"
+            f"{body.get('first_reliable_available_at')}".encode("utf-8")
+        ).hexdigest()
+        body["request_sha256"] = default_request
+        body.setdefault("source_price_event_time", body.get("source_price_event_time") or "UNKNOWN")
+        if include_explicit_policy:
+            body["observation_clock_policy"] = (
+                OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
+            )
+        else:
+            body.pop("observation_clock_policy", None)
+        stamped.append(body)
+    return stamped
+
+
+def _legacy_snapshot_lineage_complete(row: Mapping[str, Any]) -> bool:
+    """True when retained transport/occurrence links can prove snapshot semantics."""
+
+    primitive_id = str(row.get("primitive_id") or "")
+    return bool(
+        primitive_id
+        and primitive_id in _registered_primitive_ids()
+        and _is_hex64(row.get("call_occurrence_id"))
+        and _is_hex64(row.get("request_sha256"))
+        and _parse_time(row.get("request_started_at")) is not None
+        and _parse_time(row.get("response_received_at")) is not None
+        and _parse_time(row.get("first_reliable_available_at")) is not None
+    )
+
+
+def _effective_snapshot_row_policy(
+    row: Mapping[str, Any], *, query_policy: str
+) -> str | None:
+    """Resolve row clock policy for snapshot admission.
+
+    Explicit policy wins. Absent policy under a snapshot query may inherit the
+    query policy only when ``SNAPSHOT_ROW_INTERPRETATION_V1`` lineage is
+    complete. Otherwise return None (caller emits UNINTERPRETABLE).
+    """
+
+    explicit = row.get("observation_clock_policy")
+    if explicit not in (None, ""):
+        return str(explicit)
+    if (
+        query_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
+        and _legacy_snapshot_lineage_complete(row)
+    ):
+        return query_policy
+    return None
+
+
+def _snapshot_lineage_reason(
+    row: Mapping[str, Any],
+    *,
+    query_policy: str,
+    point_due_at: object | None = None,
+    outer_deadline: object | None = None,
+) -> str | None:
+    """Return exclusion code when snapshot lineage/policy/acquisition fails."""
+
+    row_policy = _effective_snapshot_row_policy(row, query_policy=query_policy)
+    if row_policy is None:
+        if row.get("observation_clock_policy") in (None, ""):
+            return "SNAPSHOT_LINEAGE_UNINTERPRETABLE"
+        return "SNAPSHOT_POLICY_MISMATCH"
+    if row_policy != query_policy:
+        return "SNAPSHOT_POLICY_MISMATCH"
+    primitive_id = str(row.get("primitive_id") or "")
+    occurrence = str(row.get("call_occurrence_id") or "")
+    request_digest = str(row.get("request_sha256") or "")
+    if (
+        not primitive_id
+        or primitive_id not in _registered_primitive_ids()
+        or not _is_hex64(occurrence)
+        or not _is_hex64(request_digest)
+    ):
+        return "SNAPSHOT_OCCURRENCE_UNBOUND"
+    request = _parse_time(row.get("request_started_at"))
+    response = _parse_time(row.get("response_received_at"))
+    available = _parse_time(row.get("first_reliable_available_at"))
+    if request is None or response is None or available is None:
+        return "MISSING_ACQUISITION_CLOCK"
+    if not (request <= response <= available):
+        return "CLOCK_ORDER_INVALID"
+    if point_due_at is not None and request < point_due_at:
+        return "ACQUISITION_BEFORE_POINT_DUE"
+    if outer_deadline is not None and available > outer_deadline:
+        return "AVAILABILITY_AFTER_DEADLINE"
+    # Availability claimed inside the outer window must not hide request/response
+    # that only arrive after that window (contradictory acquisition clocks).
+    if (
+        outer_deadline is not None
+        and available <= outer_deadline
+        and (request > outer_deadline or response > outer_deadline)
+    ):
+        return "ACQUISITION_AFTER_CUTOFF"
+    return None
+
+
 def _select_cell(rows: Sequence[Mapping[str, Any]], deadline: object) -> dict[str, Any]:
     if deadline is None:
         return {"status": "ABSENT"}
@@ -453,15 +657,82 @@ def _select_cell(rows: Sequence[Mapping[str, Any]], deadline: object) -> dict[st
     kind, number = parsed[0]
     if kind != "NUM" or number is None:
         return {"status": "MISSING", "available_at": latest}
-    return {"status": "OBSERVED", "value": number, "available_at": latest}
+    winner = tied[0]
+    return {
+        "status": "OBSERVED",
+        "value": number,
+        "available_at": latest,
+        "source_price_event_time": winner.get("source_price_event_time") or "UNKNOWN",
+        "primitive_id": winner.get("primitive_id"),
+        "call_occurrence_id": winner.get("call_occurrence_id"),
+        "request_sha256": winner.get("request_sha256"),
+        "observation_clock_policy": winner.get("observation_clock_policy"),
+    }
+
+
+def _select_snapshot_cell(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    query_policy: str,
+    point_due_at: object | None,
+    deadline: object,
+) -> dict[str, Any]:
+    """Availability-bound cell read with snapshot lineage/acquisition checks."""
+
+    if deadline is None:
+        return {"status": "ABSENT"}
+    legal: list[tuple[object, Mapping[str, Any]]] = []
+    seen_reasons: list[str] = []
+    for row in rows:
+        reason = _snapshot_lineage_reason(
+            row,
+            query_policy=query_policy,
+            point_due_at=point_due_at,
+            outer_deadline=deadline,
+        )
+        if reason is not None:
+            seen_reasons.append(reason)
+            continue
+        available = _parse_time(row.get("first_reliable_available_at"))
+        if available is None or available > deadline:
+            continue
+        if str(row.get("state") or "") != "OBSERVED":
+            continue
+        legal.append((available, row))
+    if not legal:
+        for code in (
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+            "SNAPSHOT_POLICY_MISMATCH",
+            "SNAPSHOT_OCCURRENCE_UNBOUND",
+            "MISSING_ACQUISITION_CLOCK",
+            "CLOCK_ORDER_INVALID",
+            "ACQUISITION_BEFORE_POINT_DUE",
+            "AVAILABILITY_AFTER_DEADLINE",
+            "ACQUISITION_AFTER_CUTOFF",
+        ):
+            if code in seen_reasons:
+                return {"status": code}
+        return {"status": "ABSENT"}
+    return _select_cell([row for _, row in legal], deadline)
 
 
 def _cell(
     grouped: Mapping[tuple[str, str, str, str, str], Sequence[Mapping[str, Any]]],
     key: tuple[str, str, str, str, str],
     deadline: object,
+    *,
+    snapshot_policy: str | None = None,
+    point_due_at: object | None = None,
 ) -> dict[str, Any]:
-    return _select_cell(tuple(grouped.get(key, ())), deadline)
+    rows = tuple(grouped.get(key, ()))
+    if snapshot_policy:
+        return _select_snapshot_cell(
+            rows,
+            query_policy=snapshot_policy,
+            point_due_at=point_due_at,
+            deadline=deadline,
+        )
+    return _select_cell(rows, deadline)
 
 
 def _predicate_holds(value: float | None, predicate: Mapping[str, Any]) -> bool | None:
@@ -479,6 +750,121 @@ def _predicate_holds(value: float | None, predicate: Mapping[str, Any]) -> bool 
     return float(predicate["lower"]) <= value < float(predicate["upper"])
 
 
+def _feature_value_with_lineage(
+    grouped: Mapping[Any, Sequence[Mapping[str, Any]]],
+    *,
+    cohort: str,
+    release: str,
+    mint: str,
+    anchor: object,
+    feature: Mapping[str, Any],
+    lateness: int,
+    decision_deadline: object,
+    due_offset_for: Any = None,
+    lateness_for: Any = None,
+    snapshot_policy: str | None = None,
+) -> tuple[float | None, str | None]:
+    """Return (value, lineage_blocker). Lineage blockers stay visible for fitness."""
+
+    lineage: str | None = None
+
+    def offset(point: str) -> int | None:
+        if due_offset_for is None:
+            return None
+        return int(due_offset_for(point))
+
+    def point_lateness(point: str) -> int:
+        if lateness_for is None:
+            return lateness
+        return int(lateness_for(point))
+
+    def read(point: str, field: str) -> dict[str, Any]:
+        nonlocal lineage
+        due = offset(point)
+        point_deadline = _deadline_for(
+            anchor, point, point_lateness(point), due_offset=due
+        )
+        if point_deadline is None or decision_deadline is None or point_deadline > decision_deadline:
+            return {"status": "ABSENT"}
+        point_due_at = _due_moment(anchor, int(due)) if due is not None else None
+        cell = _cell(
+            grouped,
+            (cohort, release, mint, point, field),
+            point_deadline,
+            snapshot_policy=snapshot_policy,
+            point_due_at=point_due_at if snapshot_policy else None,
+        )
+        status = str(cell.get("status") or "")
+        if lineage is None and status in SNAPSHOT_LINEAGE_BLOCKERS:
+            lineage = status
+        return cell
+
+    op = str(feature["op"])
+    if op == "point_value":
+        cell = read(str(feature["point"]), str(feature["field_id"]))
+        if cell.get("status") != "OBSERVED":
+            return None, lineage
+        return float(cell["value"]), lineage
+    if op == "utc_hour":
+        moment = _deadline_for(
+            anchor, str(feature["point"]), 0, due_offset=offset(str(feature["point"]))
+        )
+        if moment is None or decision_deadline is None or moment > decision_deadline:
+            return None, lineage
+        if read(str(feature["point"]), PRICE).get("status") != "OBSERVED":
+            return None, lineage
+        return float(moment.hour), lineage
+    if op == "elapsed_seconds":
+        start = _deadline_for(
+            anchor, str(feature["start"]), 0, due_offset=offset(str(feature["start"]))
+        )
+        end = _deadline_for(
+            anchor, str(feature["end"]), 0, due_offset=offset(str(feature["end"]))
+        )
+        if start is None or end is None:
+            return None, lineage
+        if read(str(feature["start"]), PRICE).get("status") != "OBSERVED":
+            return None, lineage
+        if read(str(feature["end"]), PRICE).get("status") != "OBSERVED":
+            return None, lineage
+        return float((end - start).total_seconds()), lineage
+    if op == "return_ratio":
+        start = read(str(feature["start"]), str(feature["field_id"]))
+        end = read(str(feature["end"]), str(feature["field_id"]))
+        if start.get("status") != "OBSERVED" or end.get("status") != "OBSERVED":
+            return None, lineage
+        denominator = float(start["value"])
+        if denominator <= 0:
+            return None, lineage
+        return float(end["value"]) / denominator - 1.0, lineage
+    if op == "ratio":
+        numerator = read(str(feature["numerator"]), str(feature["field_id"]))
+        denominator_cell = read(str(feature["denominator"]), str(feature["field_id"]))
+        if numerator.get("status") != "OBSERVED" or denominator_cell.get("status") != "OBSERVED":
+            return None, lineage
+        denominator = float(denominator_cell["value"])
+        if denominator <= 0:
+            return None, lineage
+        return float(numerator["value"]) / denominator, lineage
+    points = [str(item) for item in feature.get("points") or []]
+    values: list[float] = []
+    for point in points:
+        cell = read(point, str(feature["field_id"]))
+        if cell.get("status") != "OBSERVED":
+            return None, lineage
+        values.append(float(cell["value"]))
+    at = read(str(feature["at"]), str(feature["field_id"]))
+    if at.get("status") != "OBSERVED":
+        return None, lineage
+    if op == "drawdown_from_grid_max":
+        base = max(values)
+    else:
+        base = min(values)
+    if base <= 0:
+        return None, lineage
+    return float(at["value"]) / base - 1.0, lineage
+
+
 def _feature_value(
     grouped: Mapping[Any, Sequence[Mapping[str, Any]]],
     *,
@@ -490,74 +876,23 @@ def _feature_value(
     lateness: int,
     decision_deadline: object,
     due_offset_for: Any = None,
+    lateness_for: Any = None,
+    snapshot_policy: str | None = None,
 ) -> float | None:
-    def offset(point: str) -> int | None:
-        if due_offset_for is None:
-            return None
-        return int(due_offset_for(point))
-
-    def read(point: str, field: str) -> dict[str, Any]:
-        point_deadline = _deadline_for(anchor, point, lateness, due_offset=offset(point))
-        if point_deadline is None or decision_deadline is None or point_deadline > decision_deadline:
-            return {"status": "ABSENT"}
-        return _cell(grouped, (cohort, release, mint, point, field), point_deadline)
-
-    op = str(feature["op"])
-    if op == "point_value":
-        cell = read(str(feature["point"]), str(feature["field_id"]))
-        return cell.get("value") if cell.get("status") == "OBSERVED" else None
-    if op == "utc_hour":
-        moment = _deadline_for(anchor, str(feature["point"]), 0, due_offset=offset(str(feature["point"])))
-        if moment is None or decision_deadline is None or moment > decision_deadline:
-            return None
-        if read(str(feature["point"]), PRICE).get("status") != "OBSERVED":
-            return None
-        return float(moment.hour)
-    if op == "elapsed_seconds":
-        start = _deadline_for(anchor, str(feature["start"]), 0, due_offset=offset(str(feature["start"])))
-        end = _deadline_for(anchor, str(feature["end"]), 0, due_offset=offset(str(feature["end"])))
-        if start is None or end is None:
-            return None
-        if read(str(feature["start"]), PRICE).get("status") != "OBSERVED":
-            return None
-        if read(str(feature["end"]), PRICE).get("status") != "OBSERVED":
-            return None
-        return float((end - start).total_seconds())
-    if op == "return_ratio":
-        start = read(str(feature["start"]), str(feature["field_id"]))
-        end = read(str(feature["end"]), str(feature["field_id"]))
-        if start.get("status") != "OBSERVED" or end.get("status") != "OBSERVED":
-            return None
-        denominator = float(start["value"])
-        if denominator <= 0:
-            return None
-        return float(end["value"]) / denominator - 1.0
-    if op == "ratio":
-        numerator = read(str(feature["numerator"]), str(feature["field_id"]))
-        denominator_cell = read(str(feature["denominator"]), str(feature["field_id"]))
-        if numerator.get("status") != "OBSERVED" or denominator_cell.get("status") != "OBSERVED":
-            return None
-        denominator = float(denominator_cell["value"])
-        if denominator <= 0:
-            return None
-        return float(numerator["value"]) / denominator
-    points = [str(item) for item in feature.get("points") or []]
-    values: list[float] = []
-    for point in points:
-        cell = read(point, str(feature["field_id"]))
-        if cell.get("status") != "OBSERVED":
-            return None
-        values.append(float(cell["value"]))
-    at = read(str(feature["at"]), str(feature["field_id"]))
-    if at.get("status") != "OBSERVED":
-        return None
-    if op == "drawdown_from_grid_max":
-        base = max(values)
-    else:
-        base = min(values)
-    if base <= 0:
-        return None
-    return float(at["value"]) / base - 1.0
+    value, _lineage = _feature_value_with_lineage(
+        grouped,
+        cohort=cohort,
+        release=release,
+        mint=mint,
+        anchor=anchor,
+        feature=feature,
+        lateness=lateness,
+        decision_deadline=decision_deadline,
+        due_offset_for=due_offset_for,
+        lateness_for=lateness_for,
+        snapshot_policy=snapshot_policy,
+    )
+    return value
 
 
 def project_schedule_points(document: Mapping[str, Any]) -> dict[str, dict[str, int]]:
@@ -617,7 +952,12 @@ def _query_points(body: Mapping[str, Any]) -> list[str]:
 
 
 def _clock(item: Mapping[str, Any], point: str, query_lateness: int) -> tuple[int, int]:
-    """Document point clocks win. A missing document does not fall back to a default."""
+    """Document point clocks win. A missing document does not fall back to a default.
+
+    When the bound schedule carries per-point maps, each point uses its own
+    ``(due_offset, allowed_lateness)``. The query scalar is a legacy uniform
+    contract and is not forced onto mixed point maps.
+    """
 
     gap = item.get("schedule_context_gap")
     if gap == "CANONICAL_SCHEDULE_UNBOUND":
@@ -636,7 +976,8 @@ def _clock(item: Mapping[str, Any], point: str, query_lateness: int) -> tuple[in
             or not isinstance(due, int)
         ):
             raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
-        if late != query_lateness:
+        # Query scalar remains the X300 envelope. Other points may differ.
+        if point == "X300" and late != query_lateness:
             raise GroundedDiscoveryError("SCHEDULE_LATENESS_MISMATCH")
         return due, late
     declared = item.get("schedule_lateness_seconds")
@@ -647,6 +988,134 @@ def _clock(item: Mapping[str, Any], point: str, query_lateness: int) -> tuple[in
     if point not in POINT_OFFSET:
         raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
     return POINT_OFFSET[point], declared
+
+
+def _due_moment(anchor: object, due_offset: int):
+    parsed = _parse_time(anchor)
+    if parsed is None:
+        return None
+    return parsed + timedelta(seconds=int(due_offset))
+
+
+def _select_snapshot_exit(
+    exit_rows: Sequence[Mapping[str, Any]],
+    *,
+    entry_at: object,
+    exit_due_at: object,
+    exit_deadline: object,
+    query_policy: str = OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
+) -> tuple[dict[str, Any], str | None]:
+    """Select a provider-reported snapshot exit under acquisition clocks.
+
+    Member anchor is not a market-event timestamp. Request must start after
+    entry and not before the point due; clocks keep
+    ``due ≤ request ≤ response ≤ availability ≤ deadline``.
+    Occurrence must bind a registered primitive id plus request/occurrence
+    hashes. Known source events that are malformed or stale fail closed.
+    """
+
+    if entry_at is None or exit_due_at is None:
+        return {"status": "MISSING_ACQUISITION_CLOCK"}, "MISSING_ACQUISITION_CLOCK"
+    legal: list[tuple[object, Mapping[str, Any]]] = []
+    seen_reasons: list[str] = []
+    for exit_row in exit_rows:
+        lineage = _snapshot_lineage_reason(
+            exit_row,
+            query_policy=query_policy,
+            point_due_at=exit_due_at,
+            outer_deadline=exit_deadline,
+        )
+        if lineage is not None:
+            seen_reasons.append(lineage)
+            continue
+        request = _parse_time(exit_row.get("request_started_at"))
+        response = _parse_time(exit_row.get("response_received_at"))
+        available = _parse_time(exit_row.get("first_reliable_available_at"))
+        source_event = exit_row.get("source_price_event_time")
+        if source_event not in (None, "", "UNKNOWN"):
+            source_parsed = _parse_time(source_event)
+            if source_parsed is None:
+                seen_reasons.append("SOURCE_PRICE_EVENT_MALFORMED")
+                continue
+            if (
+                exit_deadline is None
+                or source_parsed > exit_deadline
+                or (entry_at is not None and source_parsed <= entry_at)
+            ):
+                seen_reasons.append("SOURCE_PRICE_EVENT_STALE")
+                continue
+        if request is None or response is None or available is None:
+            seen_reasons.append("MISSING_ACQUISITION_CLOCK")
+            continue
+        if request <= entry_at:
+            seen_reasons.append("REQUEST_NOT_AFTER_ENTRY")
+            continue
+        if str(exit_row.get("state") or "") != "OBSERVED":
+            seen_reasons.append("EXIT_NOT_OBSERVED")
+            continue
+        legal.append((available, exit_row))
+    if not legal:
+        if not seen_reasons:
+            return {"status": "ABSENT"}, "EXIT_ABSENT"
+        preferred = (
+            "REQUEST_NOT_AFTER_ENTRY",
+            "ACQUISITION_BEFORE_POINT_DUE",
+            "ACQUISITION_AFTER_CUTOFF",
+            "AVAILABILITY_AFTER_DEADLINE",
+            "CLOCK_ORDER_INVALID",
+            "SOURCE_PRICE_EVENT_STALE",
+            "SOURCE_PRICE_EVENT_MALFORMED",
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+            "SNAPSHOT_POLICY_MISMATCH",
+            "SNAPSHOT_OCCURRENCE_UNBOUND",
+            "MISSING_ACQUISITION_CLOCK",
+            "EXIT_NOT_OBSERVED",
+            "EXIT_ABSENT",
+        )
+        for code in preferred:
+            if code in seen_reasons:
+                return {"status": code}, code
+        return {"status": seen_reasons[0]}, seen_reasons[0]
+    latest_exit = max(item[0] for item in legal)
+    tied_rows = [row for available, row in legal if available == latest_exit]
+    selected = _select_cell(tied_rows, latest_exit)
+    if selected.get("status") != "OBSERVED":
+        return selected, "EXIT_NOT_OBSERVED"
+    return selected, None
+
+
+def _select_event_time_exit(
+    exit_rows: Sequence[Mapping[str, Any]],
+    *,
+    entry_at: object,
+    exit_deadline: object,
+) -> tuple[dict[str, Any], str | None]:
+    """Legacy event-time exit: known event must fall after entry within deadline."""
+
+    legal = []
+    for exit_row in exit_rows:
+        available = _parse_time(exit_row.get("first_reliable_available_at"))
+        if available is None or available <= entry_at:
+            continue
+        if exit_deadline is not None and available > exit_deadline:
+            continue
+        legal.append((available, exit_row))
+    if not legal:
+        return {"status": "ABSENT"}, "EXIT_ABSENT"
+    latest_exit = max(item[0] for item in legal)
+    tied_rows = [row for available, row in legal if available == latest_exit]
+    selected = _select_cell(tied_rows, latest_exit)
+    event_times = [
+        _parse_time(row.get("event_time")) or _parse_time(row.get("observed_at"))
+        for row in tied_rows
+    ]
+    if any(item is None for item in event_times):
+        return {"status": "MISSING_EVENT_TIME"}, "MISSING_EVENT_TIME"
+    if len(set(event_times)) != 1:
+        return {"status": "EVENT_TIME_CONFLICT"}, "EVENT_TIME_CONFLICT"
+    if entry_at is None or event_times[0] <= entry_at or selected.get("status") != "OBSERVED":
+        return {"status": "NOT_AFTER_ENTRY"}, "EVENT_NOT_AFTER_ENTRY"
+    return selected, None
 
 
 def _require_bound_schedule(binding: Sequence[Mapping[str, Any]], body: Mapping[str, Any], lateness: int) -> None:
@@ -672,6 +1141,9 @@ def _signature_index(observations: Sequence[Mapping[str, Any]]) -> dict[tuple[st
                 str(row.get("point_id") or ""),
                 str(row.get("field_id") or ""),
                 str(row.get("first_reliable_available_at") or ""),
+                str(row.get("request_started_at") or ""),
+                str(row.get("response_received_at") or ""),
+                str(row.get("source_price_event_time") or ""),
                 str(row.get("event_time") or row.get("observed_at") or ""),
                 str(row.get("state") or ""),
                 str(row.get("typed_value")),
@@ -697,6 +1169,9 @@ def _observation_signature(
                 str(row.get("point_id") or ""),
                 str(row.get("field_id") or ""),
                 str(row.get("first_reliable_available_at") or ""),
+                str(row.get("request_started_at") or ""),
+                str(row.get("response_received_at") or ""),
+                str(row.get("source_price_event_time") or ""),
                 str(row.get("event_time") or row.get("observed_at") or ""),
                 str(row.get("state") or ""),
                 str(row.get("typed_value")),
@@ -713,6 +1188,7 @@ def _cohort_view(member: Mapping[str, Any]) -> dict[str, Any]:
         "matched": bool(member.get("matched")) and not excluded,
         "target_is_observed": bool(member.get("target_is_observed")) and not excluded,
         "target": None if excluded else member.get("target"),
+        "target_exclusion": None if excluded else member.get("target_exclusion"),
         "feature_unknown": bool(member.get("feature_unknown")) and not excluded,
         "exclusion": member.get("exclusion"),
         "integrity_excluded": excluded,
@@ -798,6 +1274,11 @@ def _cohort_rows(
             for identity, view in bucket.items()
             if not view.get("integrity_excluded") and len(owners.get(identity, ())) > 1
         )
+        target_exclusions: dict[str, int] = defaultdict(int)
+        for item in matched:
+            reason = item.get("target_exclusion")
+            if isinstance(reason, str) and reason and not item.get("target_is_observed"):
+                target_exclusions[reason] += 1
         rows.append(
             {
                 "view": cohort_id,
@@ -815,6 +1296,7 @@ def _cohort_rows(
                 "mean_target": _mean(observed),
                 "mean_target_kind": "PRICE_RELATIVE_PROXY",
                 "exclusion_reasons": dict(sorted(exclusions.items())),
+                "target_exclusion_reasons": dict(sorted(target_exclusions.items())),
                 "independent_replication": False,
                 "shared_decision_n": shared,
                 "membership": "DESCRIPTIVE_NOT_INDEPENDENT",
@@ -903,6 +1385,138 @@ def classify_temporal_look(
     }
 
 
+def technical_stop_record(code: str) -> dict[str, Any]:
+    return {
+        "terminal": "TECHNICAL_STOP",
+        "reason_code": code,
+        "scientific_negative": False,
+        "technical_failure": True,
+        "raw_corpus_negative": False,
+    }
+
+
+def snapshot_input_technical_stop(summary: Mapping[str, Any]) -> dict[str, Any] | None:
+    """Recoverable metadata/data stop when snapshot input is wholly uninterpretable.
+
+    Predicate fitness and matched-outcome fitness are separate:
+
+    - Required cells for forming population / evaluating predicates (X300,
+      decision, features) decide whether the eligible scope is interpretable.
+    - Outcome cells (reference/exit) decide fitness only for the matched scope.
+      Unmatched exit/reference lineage must not convert a valid zero-match into
+      a technical stop.
+
+    Partial lineage misses stay as exclusions. Interpretable zero-match
+    (population formed; predicates evaluated false) is not a technical stop.
+    Excluded census members (e.g. NOT_X_ELIGIBLE) do not decide fitness of the
+    eligible scientific scope.
+    """
+
+    if int(summary.get("observed_target_n") or 0) > 0:
+        return None
+    membership = {
+        str(code): int(count or 0)
+        for code, count in dict(summary.get("exclusion_reasons") or {}).items()
+        if int(count or 0) > 0
+    }
+    target_pooled = {
+        str(code): int(count or 0)
+        for code, count in dict(
+            (summary.get("target_exclusion_reasons") or {}).get("pooled") or {}
+        ).items()
+        if int(count or 0) > 0
+    }
+    lineage_membership = {
+        code: count
+        for code, count in membership.items()
+        if code in SNAPSHOT_LINEAGE_BLOCKERS
+    }
+    lineage_targets = {
+        code: count
+        for code, count in target_pooled.items()
+        if code in SNAPSHOT_LINEAGE_BLOCKERS
+    }
+    other_targets = {
+        code: count
+        for code, count in target_pooled.items()
+        if code not in SNAPSHOT_LINEAGE_BLOCKERS
+    }
+    population_n = int(summary.get("population_n") or 0)
+    decision_eligible_n = int(summary.get("decision_eligible_n") or 0)
+    matched_n = int(summary.get("matched_n") or 0)
+    feature_unknown_n = int(summary.get("feature_unknown_n") or 0)
+    if population_n == 0:
+        # Predicate fitness: no base population. Lineage among census attempts
+        # is a technical stop; companion scientific membership (e.g. PIT) must
+        # not cancel it — same principle as eligible feature-unknown.
+        if lineage_membership:
+            primary = sorted(lineage_membership)[0]
+            return technical_stop_record(primary)
+        return None
+    # Predicate fitness: base population formed but no decision-eligible path.
+    # Lineage on the decision path is authoritative; companion non-eligible
+    # scientific membership must not cancel this stop.
+    if decision_eligible_n == 0:
+        if lineage_membership:
+            primary = sorted(lineage_membership)[0]
+            return technical_stop_record(primary)
+        return None
+    # Predicate fitness: every decision-eligible member has uninterpretable
+    # required feature cells (feature_unknown), so predicates cannot be judged.
+    # Companion non-eligible membership codes must not cancel this stop — only
+    # the eligible feature-unknown bag decides predicate interpretability.
+    if (
+        matched_n == 0
+        and feature_unknown_n >= decision_eligible_n
+        and lineage_membership
+    ):
+        primary = sorted(lineage_membership)[0]
+        return technical_stop_record(primary)
+    # Valid zero-match / partial cohort: predicates were interpretable enough
+    # to leave unmatched members. Do not consult unmatched outcome lineage.
+    if matched_n == 0:
+        return None
+    # Matched-outcome fitness: matched scope exists but every missing target is
+    # a lineage blocker (no scientific TARGET_UNOBSERVED / REFERENCE_NOT_AVAILABLE).
+    if lineage_targets and not other_targets:
+        primary = sorted(lineage_targets)[0]
+        return technical_stop_record(primary)
+    return None
+
+
+def look_counts_toward_scientific_search(item: Mapping[str, Any]) -> bool:
+    """Technical/metadata-only looks must not authorize SEARCH_EXHAUSTED."""
+
+    if item.get("new_look") is not True:
+        return False
+    result = item.get("result")
+    if not isinstance(result, Mapping) or not result:
+        # Opaque or empty look payloads must not credit scientific search.
+        return False
+    if result.get("technical_failure") is True:
+        return False
+    stop = result.get("technical_stop")
+    if isinstance(stop, Mapping) and stop.get("technical_failure") is True:
+        return False
+    if snapshot_input_technical_stop(result) is not None:
+        return False
+    # A stamped discovery summary carries at least one fitness/denominator field.
+    # Do not treat a lone technical_stop key as fitness proof — malformed
+    # {"technical_stop": null} must not credit scientific search.
+    if not any(
+        key in result
+        for key in (
+            "population_n",
+            "observed_target_n",
+            "decision_eligible_n",
+            "exclusion_reasons",
+            "calculation_version",
+        )
+    ):
+        return False
+    return True
+
+
 def assess_tier_progress(
     looks: Sequence[Mapping[str, Any]],
     *,
@@ -914,16 +1528,34 @@ def assess_tier_progress(
     simple = [
         item
         for item in looks
-        if item.get("new_look") is True and item.get("search_tier") == "SIMPLE_SCREEN"
+        if look_counts_toward_scientific_search(item)
+        and item.get("search_tier") == "SIMPLE_SCREEN"
     ]
     compound = [
         item
         for item in looks
-        if item.get("new_look") is True and item.get("search_tier") == "COMPOUND_SCREEN"
+        if look_counts_toward_scientific_search(item)
+        and item.get("search_tier") == "COMPOUND_SCREEN"
+    ]
+    technical_attempts = [
+        item
+        for item in looks
+        if item.get("new_look") is True
+        and not look_counts_toward_scientific_search(item)
     ]
     if not compound_applicable:
-        status = "SKIPPED_INAPPLICABLE"
-        action = "READY_TO_FREEZE"
+        # Compound N/A may close search only after scientific simple evidence.
+        # Technical/metadata-only looks must not authorize SEARCH_EXHAUSTED via
+        # the SKIPPED_INAPPLICABLE shortcut.
+        if simple:
+            status = "SKIPPED_INAPPLICABLE"
+            action = "READY_TO_FREEZE"
+        elif technical_attempts:
+            status = "TECHNICAL_BLOCKED"
+            action = "STOP_TECHNICAL_INPUT"
+        else:
+            status = "SKIPPED_INAPPLICABLE"
+            action = "READY_TO_FREEZE"
     elif compound:
         status = "EXECUTED"
         action = "READY_TO_FREEZE"
@@ -931,11 +1563,17 @@ def assess_tier_progress(
         status = "SKIPPED_WITH_WORTHY_SIMPLE"
         action = "READY_TO_FREEZE"
     elif not simple and not compound:
-        status = "NOT_STARTED"
-        action = "RUN_SIMPLE_OR_COMPOUND"
+        if technical_attempts:
+            status = "TECHNICAL_BLOCKED"
+            action = "STOP_TECHNICAL_INPUT"
+        else:
+            status = "NOT_STARTED"
+            action = "RUN_SIMPLE_OR_COMPOUND"
     else:
         mains = [
-            item for item in looks if item.get("look_class") == "MAIN" and item.get("new_look") is True
+            item
+            for item in looks
+            if item.get("look_class") == "MAIN" and item.get("new_look") is True
         ]
         if len(mains) >= MAX_MAIN_QUERY_SPECS:
             status = "SKIPPED_BUDGET"
@@ -957,16 +1595,6 @@ def assess_tier_progress(
 def assert_search_exhaustion_claim(progress: Mapping[str, Any], *, claim_search_exhausted: bool) -> None:
     if claim_search_exhausted and progress.get("search_exhausted_allowed") is not True:
         raise GroundedDiscoveryError("SEARCH_EXHAUSTED_WITHOUT_COMPOUND")
-
-
-def technical_stop_record(code: str) -> dict[str, Any]:
-    return {
-        "terminal": "TECHNICAL_STOP",
-        "reason_code": code,
-        "scientific_negative": False,
-        "technical_failure": True,
-        "raw_corpus_negative": False,
-    }
 
 
 def _cost_views(r_mark: float | None, profile: Mapping[str, Any] | None) -> dict[str, Any]:
@@ -1182,35 +1810,58 @@ def execute_temporal_discovery(
         signatures[identity] = signature
         exclusion = None
         in_base = False
+        clock_policy = str(
+            body.get("observation_clock_policy") or OBSERVATION_CLOCK_EVENT_TIME_V1
+        )
+        snapshot_policy = (
+            clock_policy
+            if clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
+            else None
+        )
         if str(row.get("candidate_state") or "") != "X_ELIGIBLE" or decision_deadline is None:
             exclusion = "NOT_X_ELIGIBLE"
         else:
+            x300_due, x300_late = _due_late(cohort, release, "X300")
             liquidity = _cell(
                 grouped,
                 (cohort, release, mint, "X300", LIQUIDITY),
                 _deadline_for(
                     anchor,
                     "X300",
-                    _due_late(cohort, release, "X300")[1],
-                    due_offset=_due_late(cohort, release, "X300")[0],
+                    x300_late,
+                    due_offset=x300_due,
                 ),
+                snapshot_policy=snapshot_policy,
+                point_due_at=_due_moment(anchor, x300_due) if snapshot_policy else None,
             )
             if liquidity.get("status") != "OBSERVED":
-                exclusion = "PIT_LIQUIDITY_MISSING"
+                status = str(liquidity.get("status") or "")
+                if status in SNAPSHOT_LINEAGE_BLOCKERS:
+                    exclusion = status
+                else:
+                    exclusion = "PIT_LIQUIDITY_MISSING"
             else:
                 in_base = True
         feature_values: dict[str, float | None] = {}
         decision_eligible = False
         if in_base:
+            decision_due, _decision_late = _due_late(cohort, release, decision_point)
             decision_price = _cell(
                 grouped,
                 (cohort, release, mint, decision_point, PRICE),
                 decision_deadline,
+                snapshot_policy=snapshot_policy,
+                point_due_at=_due_moment(anchor, decision_due) if snapshot_policy else None,
             )
-            decision_eligible = decision_price.get("status") == "OBSERVED"
+            decision_status = str(decision_price.get("status") or "")
+            decision_eligible = decision_status == "OBSERVED"
+            if not decision_eligible and decision_status in SNAPSHOT_LINEAGE_BLOCKERS:
+                # Preserve lineage fitness reasons on the eligible attempt; do
+                # not let them collapse to an empty exclusion bag.
+                exclusion = decision_status
             if decision_eligible:
                 for feature in features:
-                    feature_values[str(feature["name"])] = _feature_value(
+                    value, feature_lineage = _feature_value_with_lineage(
                         grouped,
                         cohort=cohort,
                         release=release,
@@ -1222,7 +1873,17 @@ def execute_temporal_discovery(
                         due_offset_for=lambda point, cohort=cohort, release=release: _due_late(
                             cohort, release, point
                         )[0],
+                        lateness_for=lambda point, cohort=cohort, release=release: _due_late(
+                            cohort, release, point
+                        )[1],
+                        snapshot_policy=snapshot_policy,
                     )
+                    feature_values[str(feature["name"])] = value
+                    if (
+                        feature_lineage in SNAPSHOT_LINEAGE_BLOCKERS
+                        and exclusion not in SNAPSHOT_LINEAGE_BLOCKERS
+                    ):
+                        exclusion = feature_lineage
         hits = [
             _predicate_holds(feature_values.get(str(item["feature"])), item) for item in predicates
         ] if decision_eligible else []
@@ -1230,6 +1891,8 @@ def execute_temporal_discovery(
         matched = decision_eligible and not feature_unknown and all(hit is True for hit in hits)
         target_value = None
         target_observed = False
+        target_exclusion = None
+        selected_source_event = "UNKNOWN"
         if in_base and decision_deadline is not None:
             entry_at = decision_deadline + timedelta(
                 seconds=int(body["entry_model"]["assumed_latency_seconds"])
@@ -1238,40 +1901,77 @@ def execute_temporal_discovery(
             exit_due, exit_late = _due_late(cohort, release, exit_point)
             exit_deadline = _deadline_for(anchor, exit_point, exit_late, due_offset=exit_due)
             exit_rows = grouped.get((cohort, release, mint, exit_point, PRICE), ())
-            legal = []
-            for exit_row in exit_rows:
-                available = _parse_time(exit_row.get("first_reliable_available_at"))
-                if available is None or available <= entry_at:
-                    continue
-                if exit_deadline is not None and available > exit_deadline:
-                    continue
-                legal.append((available, exit_row))
-            if legal:
-                latest_exit = max(item[0] for item in legal)
-                tied_rows = [row for available, row in legal if available == latest_exit]
-                selected = _select_cell(tied_rows, latest_exit)
-                event_times = [
-                    _parse_time(row.get("event_time")) or _parse_time(row.get("observed_at"))
-                    for row in tied_rows
-                ]
-                if any(item is None for item in event_times):
-                    selected = {"status": "MISSING_EVENT_TIME"}
-                elif len(set(event_times)) != 1:
-                    selected = {"status": "EVENT_TIME_CONFLICT"}
-                elif entry_at is None or event_times[0] <= entry_at or selected.get("status") != "OBSERVED":
-                    selected = {"status": "NOT_AFTER_ENTRY"}
-                reference = _cell(
-                    grouped,
-                    (cohort, release, mint, str(body["target"]["reference_point"]), PRICE),
-                    decision_deadline,
+            if clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1:
+                exit_due_at = _due_moment(anchor, exit_due)
+                selected, target_exclusion = _select_snapshot_exit(
+                    exit_rows,
+                    entry_at=entry_at,
+                    exit_due_at=exit_due_at,
+                    exit_deadline=exit_deadline,
+                    query_policy=clock_policy,
                 )
-                if (
-                    selected.get("status") == "OBSERVED"
-                    and reference.get("status") == "OBSERVED"
-                    and float(reference["value"]) > 0
-                ):
-                    target_value = float(selected["value"]) / float(reference["value"]) - 1.0
-                    target_observed = True
+            else:
+                selected, target_exclusion = _select_event_time_exit(
+                    exit_rows,
+                    entry_at=entry_at,
+                    exit_deadline=exit_deadline,
+                )
+            reference_point = str(body["target"]["reference_point"])
+            reference_due, reference_late = _due_late(cohort, release, reference_point)
+            reference_deadline = _deadline_for(
+                anchor, reference_point, reference_late, due_offset=reference_due
+            )
+            # Snapshot policy: reference must also meet its own point deadline.
+            # EVENT_TIME keeps decision_deadline-only cutoff for V1/V2 replay parity.
+            use_strict_reference = (
+                clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
+            )
+            if (
+                use_strict_reference
+                and reference_deadline is not None
+                and decision_deadline is not None
+                and reference_deadline < decision_deadline
+            ):
+                ref_cutoff = reference_deadline
+            else:
+                ref_cutoff = decision_deadline
+            reference = _cell(
+                grouped,
+                (cohort, release, mint, reference_point, PRICE),
+                ref_cutoff,
+                snapshot_policy=snapshot_policy,
+                point_due_at=_due_moment(anchor, reference_due) if snapshot_policy else None,
+            )
+            if (
+                selected.get("status") == "OBSERVED"
+                and reference.get("status") == "OBSERVED"
+                and float(reference["value"]) > 0
+            ):
+                target_value = float(selected["value"]) / float(reference["value"]) - 1.0
+                target_observed = True
+                target_exclusion = None
+                source_event = selected.get("source_price_event_time")
+                if source_event not in (None, ""):
+                    selected_source_event = str(source_event)
+            elif selected.get("status") == "OBSERVED" and reference.get("status") != "OBSERVED":
+                ref_status = str(reference.get("status") or "")
+                if ref_status in SNAPSHOT_LINEAGE_BLOCKERS:
+                    target_exclusion = ref_status
+                else:
+                    target_exclusion = "REFERENCE_NOT_AVAILABLE"
+            elif matched and target_exclusion is None:
+                target_exclusion = "TARGET_UNOBSERVED"
+        # Outcome fitness is scoped to matched members only. Publishing exit /
+        # reference lineage for unmatched members would let a false predicate
+        # zero-match collapse into a technical stop.
+        publish_target_exclusion = None
+        if (
+            matched
+            and not target_observed
+            and isinstance(target_exclusion, str)
+            and target_exclusion
+        ):
+            publish_target_exclusion = target_exclusion
         members.append(
             {
                 "identity": identity,
@@ -1282,6 +1982,8 @@ def execute_temporal_discovery(
                 "matched": matched,
                 "target": target_value,
                 "target_is_observed": target_observed,
+                "target_exclusion": publish_target_exclusion,
+                "source_price_event_time": selected_source_event,
                 "block": block,
                 "exclusion": exclusion,
             }
@@ -1296,6 +1998,12 @@ def execute_temporal_discovery(
     missing_target = [item for item in matched_members if not item["target_is_observed"]]
     observed_values = [float(item["target"]) for item in observed]
     observed_mean = _mean(observed_values)
+    known_source_events = [
+        str(item.get("source_price_event_time"))
+        for item in observed
+        if item.get("source_price_event_time") not in (None, "", "UNKNOWN")
+    ]
+    summary_source_event = known_source_events[0] if known_source_events else "UNKNOWN"
     stress_values = observed_values + [-1.0 for _ in missing_target]
     ablations = []
     if body["evaluation"]["ablations"] == "DROP_ONE_CONDITION":
@@ -1341,6 +2049,16 @@ def execute_temporal_discovery(
     missing_mean_to_zero = None
     if missing_target and observed_values:
         missing_mean_to_zero = -sum(observed_values) / len(missing_target)
+    clock_policy = str(body.get("observation_clock_policy") or OBSERVATION_CLOCK_EVENT_TIME_V1)
+    target_exclusion_pooled: dict[str, int] = defaultdict(int)
+    for item in members:
+        reason = item.get("target_exclusion")
+        if isinstance(reason, str) and reason:
+            target_exclusion_pooled[reason] += 1
+    by_cohort_rows = _cohort_rows(
+        cohort_membership,
+        list(dict.fromkeys(cohort_ids)),
+    )
     summary = {
         "contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
         "calculation_version": TEMPORAL_CALCULATION_VERSION,
@@ -1349,6 +2067,7 @@ def execute_temporal_discovery(
         "spec_sha256": bound["spec_sha256"],
         "population": "BASE_X",
         "search_tier": bound["search_tier"],
+        "observation_clock_policy": clock_policy,
         "target_kind": "PRICE_RELATIVE_PROXY",
         "mean_target_kind": "PRICE_RELATIVE_PROXY",
         "mean_target_units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
@@ -1357,6 +2076,7 @@ def execute_temporal_discovery(
         "engine_emits_alpha": False,
         "eligibility_uses_target": False,
         "missing_is_not_zero": True,
+        "source_price_event_time": summary_source_event,
         "population_n": len(base_members),
         "base_x_n": len(base_members),
         "decision_eligible_n": len(decision_members),
@@ -1410,10 +2130,7 @@ def execute_temporal_discovery(
             }
             for key, values in sorted(by_block.items())
         ],
-        "by_cohort": _cohort_rows(
-            cohort_membership,
-            list(dict.fromkeys(cohort_ids)),
-        ),
+        "by_cohort": by_cohort_rows,
         "cohort_slices_are_descriptive": True,
         "cohort_independent_replication": False,
         "cost": costs,
@@ -1432,12 +2149,20 @@ def execute_temporal_discovery(
             (key, sum(1 for item in members if item["exclusion"] == key))
             for key in {item["exclusion"] for item in members if item["exclusion"]}
         )),
+        "target_exclusion_reasons": {
+            "pooled": dict(sorted(target_exclusion_pooled.items())),
+            "by_cohort": {
+                str(row["cohort_id"]): dict(row.get("target_exclusion_reasons") or {})
+                for row in by_cohort_rows
+            },
+        },
         "required_cohorts": cohort_ids,
         "experiment_recipe": {
             "capability_id": TEMPORAL_CAPABILITY_ID,
             "schema": TEMPORAL_SCHEMA,
             "schema_version": TEMPORAL_SCHEMA_VERSION,
             "scientific_identity": bound["spec_sha256"],
+            "observation_clock_policy": clock_policy,
             "target_kind": "PRICE_RELATIVE_PROXY",
             "cost_label": "ESTIMATED_NET_PROXY" if costs["status"] == "EVALUATED" else "ABSENT",
             "labeled_net_return": False,
@@ -1449,8 +2174,20 @@ def execute_temporal_discovery(
             "NO_NET_RETURN",
             "NO_INTRABAR_STOP",
             "NO_CAUSAL_IDENTIFICATION",
+            *(
+                ["NO_SOURCE_PRICE_EVENT_TIME"]
+                if summary_source_event in (None, "", "UNKNOWN")
+                else []
+            ),
         ],
     }
+    stop = snapshot_input_technical_stop(summary)
+    if stop is not None:
+        summary["technical_stop"] = stop
+        summary["technical_failure"] = True
+        summary["terminal"] = stop["terminal"]
+        summary["reason_code"] = stop["reason_code"]
+        summary["scientific_negative"] = False
     return {
         "admitted": admitted,
         "summary": summary,
@@ -1665,6 +2402,18 @@ def _public_query_from_recipe(recipe: Mapping[str, Any]) -> dict[str, Any]:
     body = query.get("scientific_body")
     if not isinstance(body, Mapping):
         raise GroundedDiscoveryError("EXPERIMENT_RECIPE_INVALID")
+    schedule: dict[str, Any] = {"lateness_seconds": body["schedule_lateness_seconds"]}
+    # Preserve non-default clock policy so recipe replay keeps snapshot
+    # semantics and scientific identity. EVENT_TIME_V1 stays omitted.
+    clock_policy = body.get("observation_clock_policy")
+    if not clock_policy:
+        clock_policy = recipe.get("observation_clock_policy")
+    if (
+        isinstance(clock_policy, str)
+        and clock_policy
+        and clock_policy != OBSERVATION_CLOCK_EVENT_TIME_V1
+    ):
+        schedule["observation_clock_policy"] = clock_policy
     return {
         "schema": TEMPORAL_SCHEMA,
         "schema_version": TEMPORAL_SCHEMA_VERSION,
@@ -1673,7 +2422,7 @@ def _public_query_from_recipe(recipe: Mapping[str, Any]) -> dict[str, Any]:
         "search_tier": query.get("search_tier") or "COMPOUND_SCREEN",
         "budget_allocation": query.get("budget_allocation") or "AUTO",
         "decision": {"point_id": body["decision_point"], "time_policy": "BOUND_SCHEDULE_CUTOFF"},
-        "schedule": {"lateness_seconds": body["schedule_lateness_seconds"]},
+        "schedule": schedule,
         "features": body["features"],
         "all": body["predicates"],
         "target": body["target"],

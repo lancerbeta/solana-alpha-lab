@@ -1,0 +1,54 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-TEMPORAL-OPERABILITY-REPAIR-REVIEW-001",
+  "as_of": "2026-09-28",
+  "task_id": "FORGE_TEMPORAL_OPERABILITY_REPAIR_V1",
+  "reviewed_bindings_sha256": "5e1f2ca7c593f9d53d7fb4d2663a5ea74b1d6d7443978bff26a54e114604bc9b",
+  "reviewed_inventory_sha256": "100b4172fe0ae1b8dcd8b4f342f83e5cee1b4833a43628def29a5f9a5cbb590a",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "G11 ordinary completed + OBSERVABILITY_BLOCKED returns non-writing _readback_existing_run; durable owner_final preserved. Predicate vs matched-outcome fitness and disposition-bound close hold. Companion PIT no longer cancels population/decision lineage stops."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DoD end-behavior falsified: feature/decision/X300 lineage blocks freeze/exhaustion; false-predicate+unmatched exit stays scientific; apply→immediate close refuses with delta=0 AUTHORIZED; G11 ordinary blocked overlay writes=0; matrix + Vertical B + runner-up PASS covered."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "P1 closed: population/decision lineage stops on lineage_membership alone (companion PIT cannot cancel), aligned with feature-unknown. Matched-only target publish HOLD; close disposition+receipt-delta HOLD; G11 ordinary/repair-marked readback HOLD."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "REPAIR_EXECUTION_NOT_COMPLETE maps to COMPLETE_DISPOSITION_BOUND_REPAIR_EXECUTION_THEN_CLOSE; close readiness requires disposition stamp + receipt new vs parent; G11 overlay surfaces OBSERVABILITY_BLOCKED without rewriting durable SEARCH_EXHAUSTED."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MERGE",
+    "NO_ALPHA",
+    "NO_MARKET_FORGE",
+    "NO_NET_RETURN",
+    "NO_LIVE_APPLY"
+  ]
+}

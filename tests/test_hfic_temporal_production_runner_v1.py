@@ -117,7 +117,14 @@ def _timed(mint: str, point: str, field: str, value: str, anchor) -> dict:
     return row
 
 
-def _publish(data_root: Path, workspace: Path, week: int = 0, *, with_schedule: bool = True) -> None:
+def _publish(
+    data_root: Path,
+    workspace: Path,
+    week: int = 0,
+    *,
+    with_schedule: bool = True,
+    snapshot_transport: str | None = None,
+) -> None:
     data_root.mkdir(parents=True, exist_ok=True)
     admission = CAMPAIGN_STARTS + timedelta(days=7 * week)
     as_of = admission + timedelta(days=10)
@@ -155,6 +162,15 @@ def _publish(data_root: Path, workspace: Path, week: int = 0, *, with_schedule: 
                 _timed("MintW0A", "Y1800", LIQUIDITY, "10000", admission),
                 _timed("MintW0A", "Y3600", LIQUIDITY, "9000", admission),
             ]
+        )
+    if snapshot_transport in {"new", "legacy"}:
+        from solana_alpha_lab.factory.hfic_temporal_discovery import (
+            stamp_provider_reported_snapshot_transport,
+        )
+
+        snapshot["observations"] = stamp_provider_reported_snapshot_transport(
+            snapshot["observations"],
+            include_explicit_policy=(snapshot_transport == "new"),
         )
     observation_root = workspace / f"observation-rdp-{week}"
     release_root = workspace / f"release-{week}"

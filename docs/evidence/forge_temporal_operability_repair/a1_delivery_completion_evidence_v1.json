@@ -1,0 +1,87 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-TEMPORAL-OPERABILITY-REPAIR-ACCEPTANCE-001",
+  "as_of": "2026-09-28",
+  "task_id": "FORGE_TEMPORAL_OPERABILITY_REPAIR_V1",
+  "state_change": "INPUT_FITNESS_PREDICATE_VS_MATCHED_OUTCOME_DISPOSITION_BOUND_CLOSE_AND_G11_NON_WRITING_BLOCK",
+  "base_main": "cc137231e17029875046823caa0f8db636ed6240",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "f43682aee6122aa6418b4ebac26338775b68e2dc41a39a015c03ff01433ed9ee",
+    "catalog/assets/lifecycle.yaml": "a5560ac251aa3c13461a25816de76ea0c2786aac19c668363cf8b0284c46c4a8",
+    "catalog/catalog_manifest.yaml": "10b53b7b43081ec80faacc642757ebebd600fcb0d5d8773faedcf94c8a67cf0d",
+    "catalog/generated/asset_edges.json": "02b274c7f3619d66b5b969ed31b4c1b0aafbdc79086355717fa73e8dfa8d789e",
+    "catalog/schemas/observation_primitive_descriptor_v1.schema.json": "47adf110bfadd5d356dcc863f52f59574b02b6ccc3bb81578f3233906b4d3de4",
+    "configs/observation_primitive_registry_v1.yaml": "8529e43e8b29631b0b47d78d9d0b66e7c1d9b7e8f5be2d3e2d9384a74790e032",
+    "docs/PROJECT_MAP.md": "7d236107f751bcd47f0e82ba35d2ccd7223cad79bf86558889e6bf18b9b632fc",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "d475bf51c3bce98b4550dedf76a21ca341bf49c0067e28be7d3908f322db4eb0",
+    "docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md": "4c93641315e96111798c6c4289c7d09a91eae733a2e061df76c0618a7668174c",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "7ad08632f44fc5925e4f0b4fadc90f07b76912f90bd4b63d912c88d65a2abcf8",
+    "docs/reports/forge_temporal_operability_repair/a1_owner_readout_v1.md": "77e1c10e35bf7843ba054b5462a498eb41d50d64f5adfbf7931c8eca936ac7dd",
+    "docs/tasks/FORGE_TEMPORAL_OPERABILITY_REPAIR_V1.md": "d4cdeaa8d680b8930acae62cdf2722dbb1ba0336beba691e130d78702646a70f",
+    "scripts/hypothesis_forge.py": "0cd414b4f0227ca1a7cf6adc29033d008b0d312a1015c0602b981b135172edd1",
+    "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "09ff278db0d40ab9a37b6c40f69fe7b1a829aff66ee4a4f0cd98a01f6b891170",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "d899f0c476eedbddecc69766eef4e2f99ba9ca8e5d55f90b2ddcb3640925e639",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "2daed4c74be430d3659a52381114db27263402764a2ada57cc9fc64f3d6b2626",
+    "src/solana_alpha_lab/factory/hfic_repair_continuation.py": "e2add077c63cfc2cbc5a34ad93ba9ff52c71cb5e6806cd1fff01f5b5e84f5c0b",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "c1186871872f95e40848ec62e9e8c8e3405ad7316d35de228060865fe3a7c3e7",
+    "src/solana_alpha_lab/factory/hfic_session.py": "0174f784b73067d63ccc0d28a2a2f4b46dd9c785403c3bb3af4daf94c4aa359c",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "d13f75c49ede36f0ae8a9d5c4e999e52d77d18921bedd7cf9376a804fb67fe9b",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "ab26da78d00bb13fbc42ff8e911bc5004e8e106baec10392fb010c02c1197707",
+    "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "6c9b418190226ada55702a1569480a05232d1190115447ef8a66ebf2f5488ca9",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "b2f589a12a132c56c57623f1920d4574e6ab2b8e4f1694a254c5e7c2dd2c8c5d",
+    "tests/test_hfic_temporal_discovery_v1.py": "cec91bf5e82bd78e3469284f2c6e990d75102adc8dea16e512e5816bd7ffbc78",
+    "tests/test_hfic_temporal_operability_repair_v1.py": "52647ea8d1723f9b0cf559426d2c335da966e889e9993b2b1401fd408ee4f30f",
+    "tests/test_hfic_temporal_production_runner_v1.py": "93286a2f086d15f0c4ee442d323ac8e05cbe9a8d599319d0d7a0933e5a032e4b"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "602799fa15e1ee07213b3cb33248e5493a1dc7d4eccda2053c792d3f86e8acf9",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_INPUT_FITNESS_DISPOSITION_BOUND_CLOSE_AND_G11_MATRIX",
+    "independent_review": {
+      "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "bc09598d134338507be888f7dfcc7533629fa3096b6af909efa4b8e17400fad8",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_PREDICATE_VS_MATCHED_OUTCOME_FITNESS",
+      "PASS_COMPANION_PIT_DOES_NOT_CANCEL_LINEAGE_STOP",
+      "PASS_DISPOSITION_BOUND_CLOSE",
+      "PASS_G11_ORDINARY_BLOCKED_NON_WRITING_READBACK",
+      "PASS_OUTCOME_MATRIX",
+      "PASS_OWNER_DATA_AND_CONTINUATION_SCENARIOS",
+      "PASS_PRODUCTION_VERTICALS_A_AND_B"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_MARKET_EXECUTION",
+    "NO_MERGE",
+    "NO_LIVE_APPLY"
+  ],
+  "side_effects": {
+    "market_execution": "NOT_RUN",
+    "live_store_writes": 0
+  }
+}
