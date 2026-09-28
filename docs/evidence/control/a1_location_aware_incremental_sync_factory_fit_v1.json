@@ -4,8 +4,8 @@
   "review_id": "LAIS-LOCATION-AWARE-INCREMENTAL-SYNC-FACTORY-FIT-001",
   "as_of": "2026-09-28",
   "task_id": "DELIVERY_HARNESS_LOCATION_AWARE_INCREMENTAL_SYNC_V1",
-  "reviewed_bindings_sha256": "PENDING",
-  "reviewed_inventory_sha256": "PENDING",
+  "reviewed_bindings_sha256": "d8c5af9a684d3074ef0be5da88bfb8ebef4bf968b7ea134ff2ede16173fbef36",
+  "reviewed_inventory_sha256": "769ab7a3e04fbdb7d5eaf448670799beda5f7a05f868ccd7ca1c18e61ab5d232",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

@@ -10,7 +10,13 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "docs/evidence/control/a1_location_aware_incremental_sync_benchmark_v1.json": "8433057dfff9ce0da1ece4523847786c62b7cb9bcc049f279c2f40790f9f9e3c",
+    "docs/reports/control/a1_location_aware_incremental_sync_owner_readout_v1.md": "4a1b8fa627416ecb872ada7b572cc4f31a79bfba74202255a56cfc4e77aee3e5",
+    "docs/tasks/DELIVERY_HARNESS_LOCATION_AWARE_INCREMENTAL_SYNC_V1.md": "a8e249837842d6113c7f4dfda3db80ef5d178ec3139124dda90cb831178b66e8",
+    "scripts/harness_sync.py": "ca41719dbdd34be5acc5680daf229c54c302b2136bc6f71f42610c7f556236ae",
+    "tests/test_harness_sync.py": "84576830e981c2c54be84e13385fb41e0ddc7d1ffc6387ea2d4151f12a3735a1"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +27,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_location_aware_incremental_sync_factory_fit_v1.json",
-    "sha256": "PENDING",
+    "sha256": "11d74fe4f8a05d1aac550393e3efcfc02d2405d8e98b47bf31042684bf1d7b21",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LOCATION_AWARE_HARNESS_SYNC_TESTS",
     "independent_review": {
       "path": "docs/evidence/control/a1_location_aware_incremental_sync_review_v1.json",
-      "sha256": "PENDING",
+      "sha256": "01dce5ead20524890de5b89b5edf36b354f1700cc0670115818e67a2b7606425",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
