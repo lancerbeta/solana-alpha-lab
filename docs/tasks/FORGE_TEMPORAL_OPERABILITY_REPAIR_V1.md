@@ -37,9 +37,12 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hfic_evidence_identity.py
   - src/solana_alpha_lab/factory/hfic_representation_ladder.py
   - src/solana_alpha_lab/factory/hfic_session.py
+  - src/solana_alpha_lab/factory/hfic_preflight.py
   - src/solana_alpha_lab/factory/hfic_repair_continuation.py
   - src/solana_alpha_lab/factory/observation_scheduler.py
+  - src/solana_alpha_lab/factory/live_cohort_discovery_release.py
   - configs/observation_primitive_registry_v1.yaml
+  - catalog/schemas/observation_primitive_descriptor_v1.schema.json
   - tests/test_hfic_temporal_discovery_v1.py
   - tests/test_hfic_temporal_operability_repair_v1.py
   - tests/test_hfic_repair_continuation_v1.py
