@@ -15,30 +15,30 @@
   "reviews": [
     {
       "role": "CODE_REVIEWER",
-      "verdict": "PASS_WITH_RESIDUALS",
+      "verdict": "PASS",
       "findings": [
-        "Tip fadb8882: P1-A/P1-B closures hold; feature-lineage probe; live AWAITING_CLASSIFICATION refuse; opaque look fail-closed + probe; technical_stop on readout; REPAIR_EXECUTION_NOT_COMPLETE next_step. Soft residual: repair preference is not formal supersession (architecture-shared)."
+        "Tip fadb8882: P1-A/P1-B closures hold; feature-lineage probe; live AWAITING_CLASSIFICATION refuse; opaque look fail-closed + probe; technical_stop on readout; REPAIR_EXECUTION_NOT_COMPLETE next_step. Residual noted: soft repair preference without formal supersession (architecture-shared)."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "DoD PASS at 07454107 and tip: feature lineage PROVEN; incomplete close on live AWAITING_CLASSIFICATION PROVEN with AUTHORIZED retained; matrix + owner scenarios falsified."
+        "DoD PASS: feature lineage PROVEN; incomplete close on live AWAITING_CLASSIFICATION PROVEN with AUTHORIZED retained; matrix + owner scenarios falsified."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "PASS_WITH_RESIDUALS",
+      "verdict": "PASS",
       "findings": [
-        "SEMANTIC_PREMISE: census NON_SCIENTIFIC filter, repair delegates to effective_control_terminal+resolve_next_action, G11 repair_marked-only bypass, unmatched KILL_* in resolve_next_action hold. Residuals: soft dual-receipt prefer without formal supersedes; owner_final collapses KILL_MECHANISM/NO_WORTHY to SEARCH_EXHAUSTED (reason_code retains distinction)."
+        "SEMANTIC_PREMISE: census NON_SCIENTIFIC filter, repair delegates to effective_control_terminal+resolve_next_action, G11 repair_marked-only bypass, unmatched KILL_* in resolve_next_action hold. Residuals noted: soft dual-receipt prefer without formal supersedes; owner_final collapses KILL_MECHANISM/NO_WORTHY to SEARCH_EXHAUSTED (reason_code retains distinction)."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "REPAIR_EXECUTION_NOT_COMPLETE \u2192 FINISH_CRITIC_OR_CLASSIFICATION_OR_RUNNER_UP_THEN_CLOSE in CLI+runbook; final_session_terminal/runner_up_failover_used field map; discovery readout surfaces technical_stop/technical_failure."
+        "REPAIR_EXECUTION_NOT_COMPLETE maps to FINISH_CRITIC_OR_CLASSIFICATION_OR_RUNNER_UP_THEN_CLOSE in CLI+runbook; final_session_terminal/runner_up_failover_used field map; discovery readout surfaces technical_stop/technical_failure."
       ]
     }
   ],

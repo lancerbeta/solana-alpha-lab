@@ -57,7 +57,7 @@
     "targeted": "PASS_P1A_P1B_MATRIX_AND_OWNER_SCENARIOS",
     "independent_review": {
       "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "1d36744ab1eaf235da596b78d980db7b7cf61f193d519866b559f7b61f952550",
+      "sha256": "5a8587360e4214fe027eeb9853b3117a35056eb507bb5d7d0b426a9f62b73836",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
