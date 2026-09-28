@@ -1917,47 +1917,36 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
             with patch(
                 "solana_alpha_lab.factory.hfic_representation_ladder.build_forge_input_receipt",
                 return_value=forge_input,
+            ), patch(
+                # Disposable store has no cohort lineage; allow same-market
+                # discovery so forge-run can bind the preferred session from
+                # sealed store bytes (not an injected stages echo).
+                "solana_alpha_lab.factory.hfic_representation_ladder._session_applicable_to_current_market",
+                return_value=True,
             ):
                 forge_readback = evaluate_forge_run(
                     ROOT,
                     data_root,
                     persist=False,
                     preferred_control_session_id=str(shown["session_id"]),
-                    stages=[
-                        {
-                            "representation_id": "BASE",
-                            "session_id": shown["session_id"],
-                            "legacy_epoch_sha256": "11" * 32,
-                            "effective_terminal": listed_after.get("critic_terminal"),
-                            "session_state": listed_after.get("session_state"),
-                            "execution_status": "EXECUTED",
-                            "stage_ref_sha256": str(
-                                listed_after.get("session_receipt_sha256")
-                                or shown_after.get("session_receipt_sha256")
-                                or "aa" * 32
-                            ),
-                            "used_cohort_ids": [],
-                        }
-                    ],
                 )
+            discovered = [
+                stage
+                for stage in list(forge_readback.get("stages") or [])
+                if stage.get("session_id") == shown["session_id"]
+            ]
+            self.assertTrue(discovered, forge_readback.get("stages"))
             self.assertEqual(
-                forge_readback["stages"][0]["effective_terminal"],
+                discovered[0].get("effective_terminal"),
                 "KILL_PREPARATORY_LOOP",
             )
             self.assertNotEqual(
-                forge_readback["stages"][0]["effective_terminal"],
+                discovered[0].get("effective_terminal"),
                 "NO_WORTHY_HYPOTHESIS",
             )
             self.assertEqual(forge_readback["writes"]["research_store"], 0)
             self.assertEqual(forge_readback["writes"]["forge_run"], 0)
-            # Disposable store lacks live cohort lineage; owner_final may be
-            # OBSERVABILITY_BLOCKED. The repair contract is the BASE stage
-            # terminal + zero writes, not a live market class.
             self.assertIsNotNone(forge_readback.get("owner_final"))
-            self.assertNotEqual(
-                forge_readback["stages"][0].get("effective_terminal"),
-                "NO_WORTHY_HYPOTHESIS",
-            )
             listed_replay = [
                 item
                 for item in list_hfic_sessions(store)
