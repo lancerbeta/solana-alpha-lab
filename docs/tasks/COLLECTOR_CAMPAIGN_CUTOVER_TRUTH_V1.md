@@ -43,6 +43,7 @@ managed_write_set:
   - docs/evidence/collector_campaign_cutover_truth/a1_delivery_completion_evidence_v1.json
   - docs/evidence/collector_campaign_cutover_truth/a1_delivery_independent_review_v1.json
   - docs/evidence/collector_campaign_cutover_truth/a1_delivery_factory_fit_v1.json
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
   - docs/reports/collector_campaign_cutover_truth/a1_owner_readout_v1.md
 external_caps:
   network: true
