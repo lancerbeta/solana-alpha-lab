@@ -1,0 +1,50 @@
+{
+  "schema": "smial.harness-sync-benchmark-receipt",
+  "schema_version": "1.0",
+  "receipt_id": "LAIS-LOCATION-AWARE-INCREMENTAL-SYNC-BENCHMARK-001",
+  "as_of": "2026-09-28",
+  "task_id": "DELIVERY_HARNESS_LOCATION_AWARE_INCREMENTAL_SYNC_V1",
+  "base_ref": "86b24cb1abe5867becc1ead16efb3754044550df",
+  "command": "scripts/harness_sync.py --apply --base-ref <expected_base>",
+  "representative_change": "RECORD_ADD_OR_MOVE: one new local sha256+git_path Catalog record plus file, against live Catalog that already contains correct sha256 external_bundle|logical_only rows without repository_path",
+  "historical_comparison": {
+    "elapsed_minutes": 20.3,
+    "fallback": "INCREMENTAL_SCOPE_UNPROVEN",
+    "registered_sha_assets_approx": 1712,
+    "desired_sha_calls_per_file_approx": 3,
+    "note": "Historical measurement; conditions not bit-identical to this run"
+  },
+  "measured": {
+    "HARNESS_SYNC_PLAN": "class=RECORD_ADD_OR_MOVE hashed=4 nav=1 fallback=none base_ref=86b24cb1abe5867becc1ead16efb3754044550df",
+    "mode": "incremental",
+    "full_fallback": false,
+    "fallback_reason": null,
+    "impact_class": "RECORD_ADD_OR_MOVE",
+    "hashed_unique_paths": 4,
+    "desired_sha_calls": 9,
+    "elapsed_ms": 48607,
+    "elapsed_ms_wall": 48782,
+    "registered_sha_assets_total": 1713,
+    "spy_unique_paths": [
+      "catalog/generated/asset_edges.json",
+      "docs/OPERATOR_NAVIGATION.md",
+      "docs/PROJECT_MAP.md",
+      "docs/lais_benchmark_probe.txt"
+    ]
+  },
+  "speedup_vs_historical_20_3_min": {
+    "historical_ms_approx": 1218000,
+    "measured_ms": 48607,
+    "ratio_approx": 25.1,
+    "meets_5x_floor": true
+  },
+  "condition_deltas_vs_historical": [
+    "This run used post-fix location-aware classifier on the same main tip Catalog population shape",
+    "Historical run fell back to full rehash; this run stayed incremental with HASH_SCOPE of 4 unique paths",
+    "Unscoped --check was not measured and is not claimed faster"
+  ],
+  "non_claims": [
+    "NO_CI_WALL_CLOCK_ASSERTION",
+    "NO_UNSCOPED_CHECK_ACCELERATION"
+  ]
+}

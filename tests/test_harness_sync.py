@@ -1172,5 +1172,383 @@ class HashScopeThroughputTests(unittest.TestCase):
         self.assertNotIn("HASH-SCOPE-000", payload["impact_plan"]["direct_sha_assets"])
 
 
+def _append_external_sha_record(
+    worktree: Path,
+    asset_id: str,
+    *,
+    location_kind: str,
+    digest: str,
+    logical_uri: str,
+) -> None:
+    core = worktree / "catalog/assets/core.yaml"
+    core.write_text(
+        core.read_text(encoding="utf-8")
+        + (
+            f"- asset_id: {asset_id}\n"
+            "  record_version: '1.0'\n"
+            "  asset_type: evidence\n"
+            "  purpose: external-or-logical sha fixture\n"
+            "  status: IMPLEMENTED_UNVERIFIED\n"
+            "  origin: EXTERNAL\n"
+            "  as_of: '2026-09-28'\n"
+            "  truth_owner: TASK-99\n"
+            "  location:\n"
+            f"    kind: {location_kind}\n"
+            f"    logical_uri: {logical_uri}\n"
+            "  integrity:\n"
+            "    kind: sha256\n"
+            f"    sha256: {digest}\n"
+            "  access:\n"
+            "    mode: read_only\n"
+            "    method: external_reference\n"
+            "    network_required: false\n"
+            "    secrets_required: false\n"
+            "  relations: []\n"
+            "  consumers: [TASK-99]\n"
+            "  evidence: []\n"
+            "  classification:\n"
+            "    contains_secrets: false\n"
+            "    contains_raw_data: false\n"
+            "    sensitivity: INTERNAL_NON_SECRET\n"
+        ),
+        encoding="utf-8",
+    )
+
+
+class LocationAwareIncrementalSyncTests(unittest.TestCase):
+    """CLI proof that external/logical sha256 rows do not force full rehash."""
+
+    LOCAL_COUNT = 200
+    EXTERNAL_COUNT = 10
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.worktree = Path(self._tmp.name) / "repo"
+        self.addCleanup(self._tmp.cleanup)
+        SyncGoldenTests._build_fixture(self)
+        first = _run(
+            [sys.executable, "-B", "scripts/harness_sync.py", "--apply"],
+            cwd=self.worktree,
+        )
+        self.assertEqual(first.returncode, 0, first.stderr or first.stdout)
+        _commit_all(self.worktree, "synced fixture")
+        seed = _run(["git", "rev-parse", "HEAD"], cwd=self.worktree).stdout.strip()
+        for index in range(self.LOCAL_COUNT):
+            relative = f"docs/loc_aware_{index:03d}.txt"
+            path = self.worktree / relative
+            path.write_bytes(f"loc-member-{index}\n".encode("utf-8"))
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            _append_sha_record(
+                self.worktree, f"LOC-AWARE-{index:03d}", relative, digest
+            )
+        for index in range(self.EXTERNAL_COUNT):
+            kind = "external_bundle" if index % 2 == 0 else "logical_only"
+            digest = hashlib.sha256(f"external-{index}".encode("utf-8")).hexdigest()
+            _append_external_sha_record(
+                self.worktree,
+                f"LOC-EXT-{index:03d}",
+                location_kind=kind,
+                digest=digest,
+                logical_uri=f"fixture://external/{index}",
+            )
+        filler = _run(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--apply",
+                "--base-ref",
+                seed,
+            ],
+            cwd=self.worktree,
+        )
+        self.assertEqual(filler.returncode, 0, filler.stderr or filler.stdout)
+        payload = json.loads(filler.stdout)
+        self.assertEqual(payload["mode"], "incremental", filler.stderr)
+        self.assertFalse(payload.get("full_fallback"), filler.stderr)
+        _commit_all(self.worktree, "location-aware baseline")
+        self.base = _run(["git", "rev-parse", "HEAD"], cwd=self.worktree).stdout.strip()
+
+    def test_mixed_delta_stays_incremental_and_narrow(self) -> None:
+        # 1) change one local file
+        local_path = "docs/loc_aware_000.txt"
+        (self.worktree / local_path).write_bytes(b"loc-member-0-changed\n")
+        # 2) add one local sha record
+        new_relative = "docs/loc_aware_new.txt"
+        (self.worktree / new_relative).write_bytes(b"brand-new-local\n")
+        new_digest = hashlib.sha256(
+            (self.worktree / new_relative).read_bytes()
+        ).hexdigest()
+        _append_sha_record(
+            self.worktree, "LOC-AWARE-NEW", new_relative, "aa" * 32
+        )
+        # 3) change one external SHA (must remain semantic; not hashed)
+        core = self.worktree / "catalog/assets/core.yaml"
+        text = core.read_text(encoding="utf-8")
+        old_ext = hashlib.sha256(b"external-0").hexdigest()
+        new_ext = hashlib.sha256(b"external-0-changed").hexdigest()
+        self.assertIn(old_ext, text)
+        core.write_text(text.replace(old_ext, new_ext, 1), encoding="utf-8")
+
+        spy = self.worktree / "sha256.spy"
+        result = _run_with_spy(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--apply",
+                "--base-ref",
+                self.base,
+            ],
+            cwd=self.worktree,
+            spy=spy,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["mode"], "incremental")
+        self.assertFalse(payload["full_fallback"])
+        self.assertIsNone(payload["impact_plan"].get("fallback_reason"))
+        plan_line = next(
+            line
+            for line in result.stderr.splitlines()
+            if line.startswith("HARNESS_SYNC_PLAN:")
+        )
+        self.assertIn("fallback=none", plan_line)
+
+        expected = {local_path, new_relative}
+        expected.update(_cataloged_nav_paths(self.worktree))
+        unique = _unique_spy_paths(spy)
+        self.assertEqual(unique, expected)
+        self.assertNotIn("docs/loc_aware_001.txt", unique)
+        for index in range(self.EXTERNAL_COUNT):
+            self.assertNotIn(f"fixture://external/{index}", "\n".join(unique))
+
+        self.assertEqual(payload["hashed_unique_paths"], len(unique))
+        self.assertGreaterEqual(payload["desired_sha_calls"], len(unique))
+        self.assertEqual(len(unique), payload["hashed_unique_paths"])
+        plan_ids = set(payload["impact_plan"]["direct_sha_assets"])
+        self.assertIn("LOC-AWARE-000", plan_ids)
+        self.assertIn("LOC-AWARE-NEW", plan_ids)
+        self.assertNotIn("LOC-AWARE-001", plan_ids)
+        self.assertNotIn("LOC-EXT-000", plan_ids)
+        core_text = core.read_text(encoding="utf-8")
+        self.assertIn(new_digest, core_text)
+        self.assertIn(new_ext, core_text)
+        self.assertNotIn(old_ext, core_text)
+
+        # Repeat apply must be NOOP for impacted closure.
+        spy2 = self.worktree / "sha256.spy2"
+        second = _run_with_spy(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--apply",
+                "--base-ref",
+                self.base,
+            ],
+            cwd=self.worktree,
+            spy=spy2,
+        )
+        self.assertEqual(second.returncode, 0, second.stderr or second.stdout)
+        second_payload = json.loads(second.stdout)
+        self.assertEqual(second_payload["mode"], "incremental")
+        self.assertFalse(second_payload["full_fallback"])
+        self.assertEqual(
+            second_payload["idempotency"], "PASS_IMPACTED_CLOSURE_NOOP"
+        )
+
+        # Staged check: stale local pin, index vs HEAD, narrow, no full fallback.
+        stale_relative = "docs/loc_aware_002.txt"
+        stale_digest = "bb" * 32
+        core_now = core.read_text(encoding="utf-8")
+        live_digest = hashlib.sha256(
+            (self.worktree / stale_relative).read_bytes()
+        ).hexdigest()
+        self.assertIn(live_digest, core_now)
+        core.write_text(
+            core_now.replace(live_digest, stale_digest, 1), encoding="utf-8"
+        )
+        _run(["git", "add", "catalog/assets/core.yaml"], cwd=self.worktree)
+        # restore worktree registry to HEAD so check must use index
+        head_core = subprocess.run(
+            ["git", "show", "HEAD:catalog/assets/core.yaml"],
+            cwd=str(self.worktree),
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(head_core.returncode, 0)
+        core.write_bytes(head_core.stdout)
+        spy3 = self.worktree / "sha256.spy3"
+        checked = _run_with_spy(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--check",
+                "--paths-from-staging",
+            ],
+            cwd=self.worktree,
+            spy=spy3,
+        )
+        self.assertEqual(checked.returncode, 1, checked.stderr)
+        self.assertIn("sha256_mismatch:LOC-AWARE-002", checked.stderr)
+        self.assertNotIn("INCREMENTAL_SCOPE_UNPROVEN", checked.stderr)
+        self.assertIn("fallback=none", checked.stderr)
+        check_unique = _unique_spy_paths(spy3)
+        self.assertIn(stale_relative, check_unique)
+        self.assertNotIn("docs/loc_aware_001.txt", check_unique)
+        self.assertLessEqual(len(check_unique), 8)
+
+    def test_fail_closed_corrupt_unknown_and_kind_flip(self) -> None:
+        from harness_sync import (
+            HarnessSyncError,
+            _registry_path_index,
+            _semantic_registry_projection,
+            build_impact_plan,
+        )
+
+        # Missing path on git_path
+        bad_git = (
+            "records:\n"
+            "- asset_id: BAD-GIT\n"
+            "  location:\n"
+            "    kind: git_path\n"
+            "  integrity:\n"
+            "    kind: sha256\n"
+            f"    sha256: {'a' * 64}\n"
+        ).encode("utf-8")
+        with self.assertRaisesRegex(HarnessSyncError, "INCREMENTAL_SCOPE_UNPROVEN"):
+            _registry_path_index(bad_git)
+
+        # Unknown location kind
+        unknown = (
+            "records:\n"
+            "- asset_id: BAD-KIND\n"
+            "  location:\n"
+            "    kind: mystery_blob\n"
+            "  integrity:\n"
+            "    kind: sha256\n"
+            f"    sha256: {'b' * 64}\n"
+        ).encode("utf-8")
+        with self.assertRaisesRegex(HarnessSyncError, "INCREMENTAL_SCOPE_UNPROVEN"):
+            _registry_path_index(unknown)
+
+        # git_path -> external is semantic (not a silent noop)
+        relative = "docs/loc_aware_003.txt"
+        digest = hashlib.sha256((self.worktree / relative).read_bytes()).hexdigest()
+        core = self.worktree / "catalog/assets/core.yaml"
+        text = core.read_text(encoding="utf-8")
+        needle = (
+            f"  location:\n"
+            f"    kind: git_path\n"
+            f"    logical_uri: repo://{relative}\n"
+            f"    repository_path: {relative}\n"
+            f"  integrity:\n"
+            f"    kind: sha256\n"
+            f"    sha256: {digest}\n"
+        )
+        replacement = (
+            "  location:\n"
+            "    kind: logical_only\n"
+            f"    logical_uri: fixture://flipped/{relative}\n"
+            "  integrity:\n"
+            "    kind: sha256\n"
+            f"    sha256: {digest}\n"
+        )
+        self.assertIn(needle, text)
+        core.write_text(text.replace(needle, replacement, 1), encoding="utf-8")
+        plan = build_impact_plan(self.base, root=self.worktree)
+        self.assertEqual(plan["mode"], "INCREMENTAL")
+        self.assertTrue(plan["navigation_required"])
+        self.assertTrue(
+            any(reason.startswith("REGISTRY_SEMANTIC:") for reason in plan["navigation_reason"])
+        )
+        self.assertIsNone(plan.get("fallback_reason"))
+
+        # external -> git_path also semantic and hashes the new local target
+        text2 = core.read_text(encoding="utf-8")
+        ext_digest = hashlib.sha256(b"external-1").hexdigest()
+        ext_block = (
+            "  location:\n"
+            "    kind: logical_only\n"
+            "    logical_uri: fixture://external/1\n"
+            "  integrity:\n"
+            "    kind: sha256\n"
+            f"    sha256: {ext_digest}\n"
+        )
+        new_rel = "docs/loc_from_external.txt"
+        (self.worktree / new_rel).write_bytes(b"was-external\n")
+        new_digest = hashlib.sha256(
+            (self.worktree / new_rel).read_bytes()
+        ).hexdigest()
+        flipped_to_git = (
+            "  location:\n"
+            "    kind: git_path\n"
+            f"    logical_uri: repo://{new_rel}\n"
+            f"    repository_path: {new_rel}\n"
+            "  integrity:\n"
+            "    kind: sha256\n"
+            f"    sha256: {new_digest}\n"
+        )
+        self.assertIn(ext_block, text2)
+        core.write_text(text2.replace(ext_block, flipped_to_git, 1), encoding="utf-8")
+        # Reset prior flip for cleaner apply? Keep both flips; prove apply stays incremental.
+        spy = self.worktree / "kindflip.spy"
+        result = _run_with_spy(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--apply",
+                "--base-ref",
+                self.base,
+            ],
+            cwd=self.worktree,
+            spy=spy,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["mode"], "incremental")
+        self.assertFalse(payload["full_fallback"])
+        unique = _unique_spy_paths(spy)
+        self.assertIn(new_rel, unique)
+        self.assertNotIn("docs/loc_aware_001.txt", unique)
+
+        # Small-fixture oracle: local pins / nav / checkpoint match full apply.
+        derived = [
+            "catalog/assets/core.yaml",
+            "catalog/catalog_manifest.yaml",
+            "docs/PROJECT_MAP.md",
+            "catalog/generated/asset_edges.json",
+            "docs/OPERATOR_NAVIGATION.md",
+        ]
+        after_inc = {
+            relative: (self.worktree / relative).read_bytes()
+            for relative in derived
+            if (self.worktree / relative).is_file()
+        }
+        _run(["git", "checkout", "--", "."], cwd=self.worktree)
+        # re-apply the same edits after checkout wipe
+        core.write_text(
+            (self.worktree / "catalog/assets/core.yaml").read_text(encoding="utf-8")
+            .replace(needle, replacement, 1)
+            .replace(ext_block, flipped_to_git, 1),
+            encoding="utf-8",
+        )
+        (self.worktree / new_rel).write_bytes(b"was-external\n")
+        full = _run(
+            [sys.executable, "-B", "scripts/harness_sync.py", "--apply", "--full"],
+            cwd=self.worktree,
+        )
+        self.assertEqual(full.returncode, 0, full.stderr or full.stdout)
+        for relative, expected_bytes in after_inc.items():
+            self.assertEqual(
+                expected_bytes,
+                (self.worktree / relative).read_bytes(),
+                relative,
+            )
+
+
 if __name__ == "__main__":
     unittest.main()
