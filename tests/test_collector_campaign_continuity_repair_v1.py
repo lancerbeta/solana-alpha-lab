@@ -1794,6 +1794,85 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             self.assertIn("successor_state=GAP", details)
             self.assertIn("continuity_activation=ACT-PREDECESSOR", details)
 
+    def test_registered_versus_none_owner_actions_are_distinct(self) -> None:
+        current = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-01T12:00:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-REGISTERED-VS-NONE-CURRENT-001",
+        )
+        registered_successor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+            ),
+            starts_at="2026-09-01T12:00:00Z",
+            stops_admitting_at="2026-09-02T12:00:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-REGISTERED-VS-NONE-SUCCESSOR-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            current_registered, _ = _activate_campaign(
+                store,
+                data_root,
+                current,
+                activation_id="ACT-CURRENT",
+            )
+            none_continuity = assess_campaign_successor_continuity(
+                store,
+                now=NOW,
+                activation=store.get_activation(
+                    current_registered["schedule_sha256"], "ACT-CURRENT"
+                ),
+                data_root=data_root,
+            )
+            self.assertEqual(none_continuity["campaign_successor_state"], "NONE")
+            self.assertTrue(none_continuity["campaign_successor_required"])
+            self.assertIn(
+                "register and authorize",
+                none_continuity["campaign_successor_owner_action"],
+            )
+            self.assertNotIn(
+                "already-registered",
+                none_continuity["campaign_successor_owner_action"],
+            )
+            register_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                document=registered_successor,
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            registered_continuity = assess_campaign_successor_continuity(
+                store,
+                now=NOW,
+                activation=store.get_activation(
+                    current_registered["schedule_sha256"], "ACT-CURRENT"
+                ),
+                data_root=data_root,
+            )
+            self.assertEqual(
+                registered_continuity["campaign_successor_state"], "REGISTERED"
+            )
+            self.assertTrue(registered_continuity["campaign_successor_required"])
+            self.assertIn(
+                "already-registered",
+                registered_continuity["campaign_successor_owner_action"],
+            )
+            self.assertIn(
+                "REGISTERED alone is insufficient",
+                registered_continuity["campaign_successor_owner_action"],
+            )
+            self.assertNotEqual(
+                none_continuity["campaign_successor_owner_action"],
+                registered_continuity["campaign_successor_owner_action"],
+            )
+            store.close()
+
     def test_unproven_draining_predecessor_stays_unknown(self) -> None:
         predecessor = _with_window(
             load_observation_schedule(

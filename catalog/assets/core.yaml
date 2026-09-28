@@ -38592,7 +38592,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_collector_campaign_continuity_repair_v1.py', repository_path: tests/test_collector_campaign_continuity_repair_v1.py}
-  integrity: {kind: sha256, sha256: bc6f79a58ad92fbe7a212b0e02f01f02607b62f2f8ff210756b7a708d6735e24}
+  integrity: {kind: sha256, sha256: fa3de39024e899222b15ce52d89488f5885e57dbcbffe2aff82b13fda22b2900}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-CAMPAIGN-CUTOVER-TRUTH-001}
