@@ -5,7 +5,7 @@ Head: pending-bind
 ## Closed this increment (P1-A / P1-B)
 
 - P1-A: `SNAPSHOT_ROW_INTERPRETATION_V1` admits legacy rows without explicit policy when occurrence/request/acquisition lineage is complete; insufficient lineage surfaces `SNAPSHOT_LINEAGE_UNINTERPRETABLE` instead of a false empty population. New and legacy published bytes share one journal→DocumentRunner scientific payload (observed/mean/spec/policy/exclusions).
-- P1-B: authorized selected repair skips slot re-reservation, uses disposition-scoped artifact ids, projects repair marker into list/bundle, allows capability/execution lineage under repair, and reaches selected freeze→critic→finalize with sticky replay. NO_WORTHY repair path retained.
+- P1-B: authorized selected repair skips slot re-reservation, uses disposition-scoped artifact ids, projects repair marker into list/bundle, allows capability/execution lineage under repair, and reaches selected freeze→critic→finalize with sticky replay. NO_WORTHY repair path retained. `SYNTHESIS_COMPLETE` ≠ disposition CLOSED — owner still runs `repair-continuation-close`.
 
 ## Vertical receipts (local disposable)
 

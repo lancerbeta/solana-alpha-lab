@@ -45,6 +45,8 @@ deadline. Do not invent `source_price_event_time`; default is `UNKNOWN`.
 | `SOURCE_PRICE_EVENT_STALE` | Proven source event outside deadline or not after entry | Keep fail-closed |
 | `SOURCE_PRICE_EVENT_MALFORMED` | Non-empty source event unparsable | Fail closed; not UNKNOWN |
 | `SNAPSHOT_OCCURRENCE_UNBOUND` | Exit lacks PRIM-* / request / occurrence | Bind occurrence lineage |
+| `SNAPSHOT_LINEAGE_UNINTERPRETABLE` | Policy column absent and retained transport/occurrence/acquisition lineage incomplete | Metadata/data blocker — do not invent clocks; not a false empty population or family kill |
+| `SNAPSHOT_POLICY_MISMATCH` | Row policy disagrees with query policy | Align query/corpus clock policy |
 | `EVENT_NOT_AFTER_ENTRY` | Legacy EVENT_TIME path; often anchor | Prefer snapshot policy |
 | `REFERENCE_NOT_AVAILABLE` | Reference missing by cutoff | Check reference point clocks |
 | `EXIT_ABSENT` / `EXIT_NOT_OBSERVED` | No usable exit row | Data / schedule gap |
@@ -68,6 +70,8 @@ modeled negative return and not an automatic family ban.
 | `spent_*_looks` | discovery journal under `journal_scope` (MAIN/ADAPTIVE/PREVIEW) |
 | `owner_authorization_id` | owner-supplied authority token |
 | `technical_gap_code` | owner-supplied gap id (e.g. `PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP`) |
+| `repair_continuation_disposition_sha256` | stamped on `show-session` / list after authorized repair freeze or NO_WORTHY repair terminal — use for `repair-continuation-close` if apply JSON was lost |
+| `critic_terminal` | current cycle terminal (`NO_WORTHY_HYPOTHESIS`, `KILL_*`, …). After selected repair this flips away from the parent terminal while AUTHORIZED disposition may still need close |
 
 ### 1) Build draft (no-write)
 
@@ -100,15 +104,20 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-ro
 
 ### 4) After a new terminal — close the disposition (append-only)
 
-Save `disposition_sha256` from apply/plan readout. After the ordinary
-continuation run reaches a new terminal:
+Save `disposition_sha256` from apply/plan readout (or recover
+`repair_continuation_disposition_sha256` from `show-session` after a repair
+freeze/terminal). After the ordinary continuation reaches a **new** terminal
+— either NO_WORTHY or selected→critic→finalize — close is still required:
 
 ```
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <store> repair-continuation-close --disposition-sha256 <64-hex> --confirm-append-only
 ```
 
-Close is required so AUTHORIZED cannot reopen the slot. Idempotent replay
-returns `ALREADY_CLOSED` / `owner_status=DONE`.
+`show-session` `session_state=SYNTHESIS_COMPLETE` with a new `critic_terminal`
+(≠ parent `NO_WORTHY`) means the research cycle finished; it does **not** mean
+the AUTHORIZED disposition is consumed. Until close, AUTHORIZED can still
+overlay admission. Close is required so AUTHORIZED cannot reopen the slot;
+idempotent close replay returns `ALREADY_CLOSED` / `owner_status=DONE`.
 
 ### Plan/apply/draft/close owner terminals
 
