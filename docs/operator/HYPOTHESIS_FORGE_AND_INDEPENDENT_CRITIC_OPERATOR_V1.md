@@ -1549,8 +1549,10 @@ query scalar остаётся X300 envelope. `schedule.observation_clock_policy:
 PROVIDER_REPORTED_SNAPSHOT_V1` считает exit по request/response/availability,
 не по member anchor как market-event. Причины missing target —
 `target_exclusion_reasons` (pooled + by_cohort). После completed NO_WORTHY без selected candidate узкий owner-authorized repair
-continuation наследует потраченный look ledger. Owner path:
-`hypothesis_forge.py repair-continuation-plan --draft <json>` (без записи) →
+continuation наследует потраченный look ledger. Owner path
+(`--data-root` — parent flag перед subcommand):
+`hypothesis_forge.py --data-root <store> repair-continuation-draft ...`
+→ `repair-continuation-plan --draft <json>` (без записи) →
 отдельно `repair-continuation-apply --draft <json> --confirm-append-only`.
 Терминалы plan/apply и glossary причин —
 `docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md`.

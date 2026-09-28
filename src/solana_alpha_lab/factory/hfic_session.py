@@ -8123,6 +8123,8 @@ def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[
         "session_id": bundle["session_id"],
         "session_state": bundle["session_state"],
         "evidence_epoch_sha256": bundle.get("evidence_epoch_sha256") or "0" * 64,
+        "market_evidence_epoch_sha256": bundle.get("market_evidence_epoch_sha256"),
+        "scientific_slot_sha256": bundle.get("scientific_slot_sha256"),
         "focus_key_sha256": bundle.get("focus_key_sha256") or "0" * 64,
         "search_key_sha256": bundle.get("search_key_sha256") or "0" * 64,
         "memory_eligibility_sha256": bundle.get("memory_eligibility_sha256"),

@@ -730,7 +730,9 @@ def _select_snapshot_exit(
         if source_event not in (None, "", "UNKNOWN"):
             source_parsed = _parse_time(source_event)
             if source_parsed is not None and (
-                exit_deadline is None or source_parsed > exit_deadline
+                exit_deadline is None
+                or source_parsed > exit_deadline
+                or (entry_at is not None and source_parsed <= entry_at)
             ):
                 seen_reasons.append("SOURCE_PRICE_EVENT_STALE")
                 continue
@@ -836,6 +838,9 @@ def _signature_index(observations: Sequence[Mapping[str, Any]]) -> dict[tuple[st
                 str(row.get("point_id") or ""),
                 str(row.get("field_id") or ""),
                 str(row.get("first_reliable_available_at") or ""),
+                str(row.get("request_started_at") or ""),
+                str(row.get("response_received_at") or ""),
+                str(row.get("source_price_event_time") or ""),
                 str(row.get("event_time") or row.get("observed_at") or ""),
                 str(row.get("state") or ""),
                 str(row.get("typed_value")),
@@ -861,6 +866,9 @@ def _observation_signature(
                 str(row.get("point_id") or ""),
                 str(row.get("field_id") or ""),
                 str(row.get("first_reliable_available_at") or ""),
+                str(row.get("request_started_at") or ""),
+                str(row.get("response_received_at") or ""),
+                str(row.get("source_price_event_time") or ""),
                 str(row.get("event_time") or row.get("observed_at") or ""),
                 str(row.get("state") or ""),
                 str(row.get("typed_value")),
@@ -1873,6 +1881,18 @@ def _public_query_from_recipe(recipe: Mapping[str, Any]) -> dict[str, Any]:
     body = query.get("scientific_body")
     if not isinstance(body, Mapping):
         raise GroundedDiscoveryError("EXPERIMENT_RECIPE_INVALID")
+    schedule: dict[str, Any] = {"lateness_seconds": body["schedule_lateness_seconds"]}
+    # Preserve non-default clock policy so recipe replay keeps snapshot
+    # semantics and scientific identity. EVENT_TIME_V1 stays omitted.
+    clock_policy = body.get("observation_clock_policy")
+    if not clock_policy:
+        clock_policy = recipe.get("observation_clock_policy")
+    if (
+        isinstance(clock_policy, str)
+        and clock_policy
+        and clock_policy != OBSERVATION_CLOCK_EVENT_TIME_V1
+    ):
+        schedule["observation_clock_policy"] = clock_policy
     return {
         "schema": TEMPORAL_SCHEMA,
         "schema_version": TEMPORAL_SCHEMA_VERSION,
@@ -1881,7 +1901,7 @@ def _public_query_from_recipe(recipe: Mapping[str, Any]) -> dict[str, Any]:
         "search_tier": query.get("search_tier") or "COMPOUND_SCREEN",
         "budget_allocation": query.get("budget_allocation") or "AUTO",
         "decision": {"point_id": body["decision_point"], "time_policy": "BOUND_SCHEDULE_CUTOFF"},
-        "schedule": {"lateness_seconds": body["schedule_lateness_seconds"]},
+        "schedule": schedule,
         "features": body["features"],
         "all": body["predicates"],
         "target": body["target"],

@@ -65,6 +65,9 @@ def disposition_identity(body: Mapping[str, Any]) -> str:
             "technical_gap_code": body.get("technical_gap_code"),
             "repair_capability_id": body.get("repair_capability_id"),
             "allowed_look_ids": list(body.get("allowed_look_ids") or []),
+            "spent_main_looks": body.get("spent_main_looks"),
+            "spent_adaptive_looks": body.get("spent_adaptive_looks"),
+            "spent_preview_looks": body.get("spent_preview_looks"),
             "owner_authorization_id": body.get("owner_authorization_id"),
         }
     )
@@ -176,23 +179,52 @@ def plan_repair_continuation(
         )
     terminal = str(
         parent_session.get("critic_terminal")
+        or parent_session.get("final_session_terminal")
+        or parent_session.get("owner_final")
         or parent_session.get("session_state")
         or parent_session.get("phase")
         or ""
     )
-    if terminal not in {"NO_WORTHY_HYPOTHESIS", "COMPLETED", "SEARCH_CLOSED", ""}:
-        if terminal and "NO_WORTHY" not in terminal and terminal not in {
-            "DONE",
-            "OWNER_FINAL",
-            "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
-        }:
+    # Strict eligibility: parent must be a completed NO_WORTHY close.
+    # Broad COMPLETED/DONE alone is not enough — that would reopen chosen work.
+    if terminal != "NO_WORTHY_HYPOTHESIS" and "NO_WORTHY" not in terminal:
+        return _owner_plan(
+            status="NOT_APPLICABLE",
+            reason_code="PARENT_NOT_COMPLETED_NO_WORTHY",
+            writes=False,
+            disposition=body,
+            owner_status="BLOCKED",
+            next_step="STOP_SCIENTIFIC_CLOSE_STANDS",
+        )
+    parent_slot = parent_session.get("scientific_slot_sha256")
+    if (
+        isinstance(parent_slot, str)
+        and parent_slot
+        and parent_slot != body["scientific_slot_sha256"]
+    ):
+        return _owner_plan(
+            status="NOT_APPLICABLE",
+            reason_code="PARENT_SLOT_MISMATCH",
+            writes=False,
+            disposition=body,
+            owner_status="BLOCKED",
+            next_step="ALIGN_DRAFT_SCIENTIFIC_SLOT",
+        )
+    # Prefer store-declared spent counts when the parent already recorded them.
+    for key in ("spent_main_looks", "spent_adaptive_looks", "spent_preview_looks"):
+        observed = parent_session.get(key)
+        if (
+            isinstance(observed, int)
+            and not isinstance(observed, bool)
+            and int(observed) != int(body[key])
+        ):
             return _owner_plan(
                 status="NOT_APPLICABLE",
-                reason_code="PARENT_NOT_COMPLETED_NO_WORTHY",
+                reason_code="SPENT_BUDGET_MISMATCH",
                 writes=False,
                 disposition=body,
                 owner_status="BLOCKED",
-                next_step="STOP_SCIENTIFIC_CLOSE_STANDS",
+                next_step="ALIGN_DRAFT_SPENT_LOOKS_TO_PARENT",
             )
     if parent_session.get("selected_candidate_id") not in (None, ""):
         return _owner_plan(
@@ -321,6 +353,92 @@ def explain_target_exclusion(code: str) -> str:
     )
 
 
+def build_repair_continuation_draft(
+    parent_session: Mapping[str, Any],
+    *,
+    owner_authorization_id: str,
+    technical_gap_code: str,
+    parent_run_id: str | None = None,
+    terminal_receipt_sha256: str | None = None,
+    journal_scope: str | None = None,
+    spent_main_looks: int | None = None,
+    spent_adaptive_looks: int | None = None,
+    spent_preview_looks: int | None = None,
+    allowed_look_ids: Sequence[str] | None = None,
+    example_exclusion_code: str | None = None,
+) -> dict[str, Any]:
+    """Build a disposition draft from show-session fields. No store writes."""
+
+    session_id = _require_text(
+        parent_session.get("session_id"), "PARENT_SESSION_REQUIRED"
+    )
+    slot = parent_session.get("scientific_slot_sha256")
+    if not isinstance(slot, str) or _HEX64.fullmatch(slot) is None:
+        raise RepairContinuationError("SCIENTIFIC_SLOT_REQUIRED")
+    run_id = parent_run_id or parent_session.get("run_id") or parent_session.get(
+        "forge_run_id"
+    )
+    if not isinstance(run_id, str) or not run_id.strip():
+        raise RepairContinuationError("PARENT_RUN_REQUIRED")
+    receipt = terminal_receipt_sha256 or parent_session.get(
+        "terminal_receipt_sha256"
+    ) or parent_session.get("session_receipt_sha256") or parent_session.get(
+        "critic_result_sha256"
+    )
+    if not isinstance(receipt, str) or _HEX64.fullmatch(receipt) is None:
+        raise RepairContinuationError("TERMINAL_RECEIPT_REQUIRED")
+    scope = journal_scope or parent_session.get("journal_scope") or parent_session.get(
+        "search_key_sha256"
+    )
+    if not isinstance(scope, str) or not scope.strip():
+        raise RepairContinuationError("JOURNAL_SCOPE_REQUIRED")
+    main = (
+        spent_main_looks
+        if spent_main_looks is not None
+        else parent_session.get("spent_main_looks")
+    )
+    adaptive = (
+        spent_adaptive_looks
+        if spent_adaptive_looks is not None
+        else parent_session.get("spent_adaptive_looks")
+    )
+    preview = (
+        spent_preview_looks
+        if spent_preview_looks is not None
+        else parent_session.get("spent_preview_looks")
+    )
+    for label, value in (
+        ("spent_main_looks", main),
+        ("spent_adaptive_looks", adaptive),
+        ("spent_preview_looks", preview),
+    ):
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise RepairContinuationError("SPENT_BUDGET_INVALID")
+    looks = list(allowed_look_ids or parent_session.get("allowed_look_ids") or [])
+    draft = {
+        "schema": DISPOSITION_SCHEMA,
+        "schema_version": DISPOSITION_SCHEMA_VERSION,
+        "parent_run_id": str(run_id).strip(),
+        "parent_session_id": session_id,
+        "scientific_slot_sha256": slot,
+        "terminal_receipt_sha256": receipt,
+        "journal_scope": str(scope).strip(),
+        "technical_gap_code": _require_text(technical_gap_code, "TECHNICAL_GAP_REQUIRED"),
+        "repair_capability_id": REPAIR_CAPABILITY_ID,
+        "allowed_look_ids": [str(item) for item in looks if isinstance(item, str) and item],
+        "spent_main_looks": int(main),
+        "spent_adaptive_looks": int(adaptive),
+        "spent_preview_looks": int(preview),
+        "owner_authorization_id": _require_text(
+            owner_authorization_id, "OWNER_AUTHORIZATION_REQUIRED"
+        ),
+        "parent_terminal": "NO_WORTHY_HYPOTHESIS",
+    }
+    if example_exclusion_code:
+        draft["example_exclusion_code"] = str(example_exclusion_code)
+    return draft
+
+
 def list_repair_continuation_dispositions(store: Any) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for record in store.iter_committed_records():
@@ -388,14 +506,23 @@ def apply_repair_continuation(
         created_at=moment,
     )
     store.append([event], transaction_id=event.transaction_id)
-    return {
+    applied_plan = {
         **plan,
         "status": "APPLIED",
         "applied": True,
         "idempotent": False,
         "record_id": event.record_id,
         "writes": True,
+        "owner_status": "DONE",
+        "next_step": "ORDINARY_TEMPORAL_QUERY_WITHIN_REMAINING_BUDGET",
     }
+    applied_plan["owner_readout"] = {
+        "status": "DONE",
+        "reason_code": REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION,
+        "next": applied_plan["next_step"],
+        "writes": True,
+    }
+    return applied_plan
 
 
 def active_repair_continuation_for_slot(
@@ -443,15 +570,9 @@ def admission_with_repair_continuation(
     )
     if disposition is None:
         return result
-    if parent_terminal and "NO_WORTHY" not in str(parent_terminal):
-        if parent_terminal not in {
-            "DONE",
-            "COMPLETED",
-            "SEARCH_CLOSED",
-            "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
-            "OWNER_FINAL",
-        }:
-            return result
+    # Overlay only when the occupied parent is a NO_WORTHY close.
+    if parent_terminal is not None and "NO_WORTHY" not in str(parent_terminal):
+        return result
     result["action"] = ACTION_RESUME_REPAIR_CONTINUATION
     result["reason_code"] = REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION
     result["occupancy"] = "REPAIR_CONTINUATION"

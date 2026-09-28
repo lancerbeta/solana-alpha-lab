@@ -268,11 +268,17 @@ def _attach_verified_schedule(root: Path, cohorts: list[dict[str, Any]]) -> None
         projected = schedule_projection_for_census(root, root / census_rel)
         declared = cohort.get("schedule_lateness_seconds")
         point_lateness = projected.get("schedule_point_lateness")
+        # Query scalar is the X300 envelope only. Mixed non-X300 point maps
+        # are legal and must not trip SCHEDULE_LATENESS_MISMATCH here.
+        x300_late = (
+            point_lateness.get("X300") if isinstance(point_lateness, Mapping) else None
+        )
         if (
             isinstance(declared, int)
             and not isinstance(declared, bool)
-            and isinstance(point_lateness, Mapping)
-            and any(value != declared for value in point_lateness.values())
+            and isinstance(x300_late, int)
+            and not isinstance(x300_late, bool)
+            and x300_late != declared
         ):
             projected["schedule_context_gap"] = "SCHEDULE_LATENESS_MISMATCH"
         cohort.update(projected)

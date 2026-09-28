@@ -20,11 +20,13 @@ from solana_alpha_lab.factory.hfic_repair_continuation import (  # noqa: E402
     REPAIR_CAPABILITY_ID,
     admission_with_repair_continuation,
     apply_repair_continuation,
+    build_repair_continuation_draft,
     plan_repair_continuation,
 )
 from solana_alpha_lab.factory.hfic_temporal_discovery import (  # noqa: E402
     OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
     _clock,
+    _public_query_from_recipe,
     classify_temporal_look,
     execute_temporal_discovery,
     validate_temporal_query,
@@ -363,6 +365,133 @@ class RepairContinuationTests(unittest.TestCase):
         with self.assertRaises(GroundedDiscoveryError) as exc:
             classify_temporal_look(exhausted_prev, _spec_snapshot(query_id="other"))
         self.assertEqual(exc.exception.code, "QUERY_MAIN_BUDGET_EXHAUSTED")
+
+    def test_apply_owner_readout_is_done_not_ready(self) -> None:
+        draft = self._draft()
+        parent = {
+            "session_id": "HFIC-SESS-SYNTHETIC-001",
+            "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+            "selected_candidate_id": None,
+            "scientific_slot_sha256": "11" * 32,
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp) / "store")
+            applied = apply_repair_continuation(
+                store, draft, parent_session=parent, git_sha=GIT_SHA
+            )
+            self.assertEqual(applied["status"], "APPLIED")
+            self.assertEqual(applied["owner_status"], "DONE")
+            self.assertEqual(applied["owner_readout"]["status"], "DONE")
+            self.assertTrue(applied["owner_readout"]["writes"])
+
+    def test_draft_builder_requires_no_worthy_fields(self) -> None:
+        parent = {
+            "session_id": "HFIC-SESS-SYNTHETIC-001",
+            "scientific_slot_sha256": "11" * 32,
+            "run_id": "FORGE-RUN-SYNTHETIC",
+            "critic_result_sha256": "22" * 32,
+            "search_key_sha256": "33" * 32,
+            "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+        }
+        draft = build_repair_continuation_draft(
+            parent,
+            owner_authorization_id="OWNER-AUTH-SYNTHETIC-001",
+            technical_gap_code="PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP",
+            spent_main_looks=2,
+            spent_adaptive_looks=0,
+            spent_preview_looks=0,
+        )
+        self.assertEqual(draft["parent_terminal"], "NO_WORTHY_HYPOTHESIS")
+        self.assertEqual(draft["spent_main_looks"], 2)
+        plan = plan_repair_continuation(draft, parent_session=parent)
+        self.assertEqual(plan["status"], "READY")
+
+    def test_completed_without_no_worthy_is_blocked(self) -> None:
+        draft = self._draft()
+        parent = {
+            "session_id": "HFIC-SESS-SYNTHETIC-001",
+            "critic_terminal": "WORTHY_CANDIDATE",
+            "selected_candidate_id": None,
+        }
+        plan = plan_repair_continuation(draft, parent_session=parent)
+        self.assertEqual(plan["status"], "NOT_APPLICABLE")
+        self.assertEqual(plan["reason_code"], "PARENT_NOT_COMPLETED_NO_WORTHY")
+
+    def test_recipe_replay_preserves_snapshot_policy(self) -> None:
+        validated = validate_temporal_query(_spec_snapshot())
+        body = validated["scientific_body"]
+        recipe = {
+            "capability_id": "CAP-HFIC-TEMPORAL-DISCOVERY-001",
+            "observation_clock_policy": OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
+            "spec": {
+                "query_id": validated["query_id"],
+                "search_tier": validated["search_tier"],
+                "budget_allocation": validated["budget_allocation"],
+                "scientific_body": body,
+            },
+        }
+        public = _public_query_from_recipe(recipe)
+        self.assertEqual(
+            public["schedule"]["observation_clock_policy"],
+            OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
+        )
+
+
+class BinderMixedLatenessTests(unittest.TestCase):
+    def test_attach_verified_schedule_allows_mixed_non_x300(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            _attach_verified_schedule,
+        )
+        from unittest.mock import patch
+
+        cohorts = [
+            {
+                "census_rel": "datasets/fake/census.parquet",
+                "schedule_lateness_seconds": 300,
+            }
+        ]
+        projected = {
+            "schedule_point_lateness": {"X300": 300, "Y3600": 120, "Y7200": 240},
+            "schedule_point_due_offset_seconds": {
+                "X300": 300,
+                "Y3600": 3600,
+                "Y7200": 7200,
+            },
+        }
+        with patch(
+            "solana_alpha_lab.factory.hfic_grounded_discovery.schedule_projection_for_census",
+            return_value=projected,
+        ):
+            _attach_verified_schedule(Path("."), cohorts)
+        self.assertNotEqual(
+            cohorts[0].get("schedule_context_gap"), "SCHEDULE_LATENESS_MISMATCH"
+        )
+        self.assertEqual(cohorts[0]["schedule_point_lateness"]["Y3600"], 120)
+
+    def test_attach_verified_schedule_rejects_x300_drift(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            _attach_verified_schedule,
+        )
+        from unittest.mock import patch
+
+        cohorts = [
+            {
+                "census_rel": "datasets/fake/census.parquet",
+                "schedule_lateness_seconds": 300,
+            }
+        ]
+        projected = {
+            "schedule_point_lateness": {"X300": 120, "Y3600": 120},
+            "schedule_point_due_offset_seconds": {"X300": 300, "Y3600": 3600},
+        }
+        with patch(
+            "solana_alpha_lab.factory.hfic_grounded_discovery.schedule_projection_for_census",
+            return_value=projected,
+        ):
+            _attach_verified_schedule(Path("."), cohorts)
+        self.assertEqual(
+            cohorts[0].get("schedule_context_gap"), "SCHEDULE_LATENESS_MISMATCH"
+        )
 
 
 if __name__ == "__main__":

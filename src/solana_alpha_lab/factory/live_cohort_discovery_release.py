@@ -819,6 +819,9 @@ def _explode_observation_rows(
         "call_occurrence_id": row.get("call_occurrence_id"),
         "http_status": row.get("http_status"),
         "http_class": row.get("http_class"),
+        "observation_clock_policy": row.get("observation_clock_policy"),
+        "source_price_event_time": row.get("source_price_event_time"),
+        "member_anchor": row.get("member_anchor"),
     }
     field_values = row.get("field_values")
     out: list[dict[str, Any]] = []
