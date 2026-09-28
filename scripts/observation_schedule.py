@@ -625,16 +625,18 @@ def main(
                 pending_future = []
                 for row in activation_rows:
                     projected = project_activation_as_of(row, now)
-                    if projected.get("future_transition_pending") is True:
+                    projected_state = str(projected.get("state") or "")
+                    if (
+                        projected.get("future_transition_pending") is True
+                        and projected_state not in {"ACTIVE", "DRAINING"}
+                    ):
                         pending_future.append(
                             {
                                 "schedule_sha256": str(
                                     row.get("schedule_sha256") or ""
                                 ),
                                 "activation_id": str(row.get("activation_id") or ""),
-                                "projected_state": str(
-                                    projected.get("state") or ""
-                                ),
+                                "projected_state": projected_state,
                             }
                         )
                 if pending_future:
@@ -687,7 +689,31 @@ def main(
                         },
                         2,
                     )
-                activation_state = str(activation["state"])
+                projected = project_activation_as_of(activation, now)
+                projected_state = str(projected.get("state") or "")
+                if (
+                    projected.get("future_transition_pending") is True
+                    and projected_state not in {"ACTIVE", "DRAINING"}
+                ):
+                    return _emit(
+                        {
+                            "terminal": "TICK_REFUSED_FUTURE_TRANSITION_PENDING",
+                            "schedule_sha256": digest,
+                            "activation_id": activation_id,
+                            "provider_calls": 0,
+                            "credential_reads": 0,
+                            "next_action": "WAIT_OR_INSPECT_SCHEDULED_CUTOVER",
+                            "pending_activations": [
+                                {
+                                    "schedule_sha256": digest,
+                                    "activation_id": activation_id,
+                                    "projected_state": projected_state,
+                                }
+                            ],
+                        },
+                        2,
+                    )
+                activation_state = projected_state or str(activation["state"])
                 if activation_state == "PAUSED_OPERATOR":
                     return _emit(
                         {
@@ -748,12 +774,12 @@ def main(
                     ):
                         return _emit(
                             {
-                                "terminal": "TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE",
+                                "terminal": "TICK_REFUSED_FUTURE_TRANSITION_PENDING",
                                 "schedule_sha256": digest,
                                 "activation_id": activation_id,
                                 "provider_calls": 0,
                                 "credential_reads": 0,
-                                "next_action": "RECONCILE_ACTIVE_TRANSITION_PROOF",
+                                "next_action": "WAIT_OR_INSPECT_SCHEDULED_CUTOVER",
                             },
                             2,
                         )

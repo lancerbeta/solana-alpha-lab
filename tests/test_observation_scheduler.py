@@ -2714,6 +2714,95 @@ class ObservationSchedulerTests(unittest.TestCase):
                 payload["next_action"], "REGISTER_AUTHORIZE_ACTIVATE"
             )
 
+    def test_cli_tick_explicit_override_future_active_waits_for_cutover(self) -> None:
+        cutover = NOW + timedelta(hours=1)
+        cutover_raw = render_utc(cutover)
+        successor = {
+            "schedule_sha256": "b" * 64,
+            "activation_id": "ACT-SUC",
+            "state": "ACTIVE",
+            "starts_at": cutover_raw,
+            "stops_admitting_at": render_utc(cutover + timedelta(days=7)),
+            "authority_receipt_sha256": "2" * 64,
+            "payload": json.dumps(
+                {
+                    "prior_state": "REGISTERED",
+                    "new_state": "ACTIVE",
+                    "transition_effective_at": cutover_raw,
+                }
+            ),
+        }
+
+        class _Store:
+            def restore_marker_unresolved(self) -> bool:
+                return False
+
+            def list_activations(self) -> list[dict]:
+                return [successor]
+
+            def get_registered_schedule(self, digest: str) -> dict:
+                return {
+                    "document": {
+                        "schedule_sha256": digest,
+                        "activation": {
+                            "starts_at": cutover_raw,
+                            "stops_admitting_at": render_utc(
+                                cutover + timedelta(days=7)
+                            ),
+                        },
+                    }
+                }
+
+            def get_activation(self, digest: str, activation_id: str) -> dict:
+                assert digest == successor["schedule_sha256"]
+                assert activation_id == successor["activation_id"]
+                return successor
+
+            def close(self) -> None:
+                pass
+
+        with tempfile.TemporaryDirectory() as tmp:
+            config = {"producer_git_sha": GIT_SHA}
+            output = StringIO()
+            with (
+                patch(
+                    "scripts.observation_schedule.load_runtime_config",
+                    return_value=config,
+                ),
+                patch(
+                    "scripts.observation_schedule.resolve_clock",
+                    return_value=NOW,
+                ),
+                patch(
+                    "scripts.observation_schedule._bind_runtime",
+                    return_value=(config, Path(tmp), _Store()),
+                ),
+                patch("scripts.observation_schedule.git_sha", return_value=GIT_SHA),
+                redirect_stdout(output),
+            ):
+                code = cli_main(
+                    [
+                        "tick",
+                        "--once",
+                        "--schedule-sha256",
+                        successor["schedule_sha256"],
+                        "--activation-id",
+                        successor["activation_id"],
+                    ]
+                )
+            payload = json.loads(output.getvalue())
+            self.assertEqual(code, 2)
+            self.assertEqual(
+                payload["terminal"], "TICK_REFUSED_FUTURE_TRANSITION_PENDING"
+            )
+            self.assertEqual(
+                payload["next_action"], "WAIT_OR_INSPECT_SCHEDULED_CUTOVER"
+            )
+            self.assertNotEqual(
+                payload["terminal"],
+                "TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE",
+            )
+
 
     def test_cli_tick_keeps_entry_clock_when_processing_crosses_cutover(self) -> None:
         cutover = NOW + timedelta(seconds=2)
