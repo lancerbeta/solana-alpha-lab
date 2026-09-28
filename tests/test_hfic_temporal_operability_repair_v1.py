@@ -931,9 +931,8 @@ class RepairLifecycleP1Tests(unittest.TestCase):
 class AcceptanceVerticalADataPathTests(unittest.TestCase):
     """Production path: publish → bind → snapshot query → journal → DocumentRunner."""
 
-    def test_published_snapshot_corpus_through_binder_and_negatives(self) -> None:
+    def _run_snapshot_vertical(self, *, snapshot_transport: str) -> dict:
         import hashlib
-        from datetime import datetime, timedelta
 
         from solana_alpha_lab.factory.document_runner import (
             DocumentRunner,
@@ -958,10 +957,10 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
             _publish,
         )
 
-        with tempfile.TemporaryDirectory() as raw:
-            workspace = Path(raw)
+        workspace = Path(tempfile.mkdtemp())
+        try:
             data_root = workspace / "rdp"
-            _publish(data_root, workspace)
+            _publish(data_root, workspace, snapshot_transport=snapshot_transport)
             binding = resolve_published_discovery_binding(data_root)
             self.assertTrue(binding["cohorts"])
             loaded = load_admitted_partition_rows(
@@ -971,44 +970,25 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
                 census_path=None,
                 observations_path=None,
             )
-            stamped = []
-            for row in loaded["observations"]:
-                body = dict(row)
-                body["observation_clock_policy"] = (
-                    OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
-                )
-                body["primitive_id"] = "PRIM-JUPITER-TOKENS-V2-SEARCH-001"
-                body["call_occurrence_id"] = hashlib.sha256(
-                    f"{body.get('mint')}:{body.get('point_id')}:{body.get('field_id')}".encode()
-                ).hexdigest()
-                body["request_sha256"] = "dd" * 32
-                body.setdefault(
-                    "source_price_event_time",
-                    body.get("source_price_event_time") or "UNKNOWN",
-                )
-                point = str(body.get("point_id"))
-                offs = {
-                    "X300": 300,
-                    "Y900": 900,
-                    "Y1800": 1800,
-                    "Y3600": 3600,
-                    "Y7200": 7200,
-                }.get(point, 0)
-                anchor = datetime.fromisoformat(
-                    str(loaded["census"][0]["authoritative_anchor"]).replace(
-                        "Z", "+00:00"
+            # No post-load rewrite: journal and DocumentRunner share published bytes.
+            if snapshot_transport == "new":
+                self.assertTrue(
+                    any(
+                        row.get("observation_clock_policy")
+                        == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
+                        for row in loaded["observations"]
                     )
                 )
-                available = (
-                    anchor + timedelta(seconds=offs + DOCUMENT_LATENESS)
-                ).strftime("%Y-%m-%dT%H:%M:%SZ")
-                body["request_started_at"] = available
-                body["response_received_at"] = available
-                body["first_reliable_available_at"] = available
-                stamped.append(body)
+            else:
+                self.assertTrue(
+                    all(
+                        row.get("observation_clock_policy") in (None, "")
+                        for row in loaded["observations"]
+                    )
+                )
             snapshot_spec = _base_spec(
                 cost_profile=None,
-                query_id="vert-a-snapshot",
+                query_id=f"vert-a-{snapshot_transport}",
                 schedule={
                     "lateness_seconds": DOCUMENT_LATENESS,
                     "observation_clock_policy": OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
@@ -1025,7 +1005,7 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
             evidence = run_recorded_discovery_query(
                 store,
                 census=loaded["census"],
-                observations=stamped,
+                observations=loaded["observations"],
                 spec=snapshot_spec,
                 binding=cohort_binding,
                 journal_scope=journal,
@@ -1041,6 +1021,7 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
                 summary.get("calculation_version"), TEMPORAL_CALCULATION_VERSION
             )
             self.assertEqual(int(summary.get("observed_target_n") or 0), 1)
+            self.assertIsNotNone(summary.get("mean_target"))
             self.assertTrue(
                 any(
                     item.get("look_class") == "MAIN"
@@ -1074,7 +1055,143 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
                 ops.close()
             self.assertEqual(result["status"], "COMPLETE", result)
             self.assertEqual(result["provider_calls_actual"], 0)
-            poisoned = [dict(row) for row in stamped]
+            import json as _json
+
+            run_id = str(result["run_id_or_null"])
+            artifact = (
+                data_root
+                / "research"
+                / "artifacts"
+                / "results"
+                / f"RESULT-ARTIFACT-{run_id.removeprefix('RUN-')}.json"
+            )
+            saved = _json.loads(artifact.read_text(encoding="utf-8"))
+            consumer = saved["capability_result"]["summary"]
+            self.assertEqual(
+                consumer.get("observation_clock_policy"),
+                summary.get("observation_clock_policy"),
+            )
+            self.assertEqual(
+                int(consumer.get("observed_target_n") or 0),
+                int(summary.get("observed_target_n") or 0),
+            )
+            self.assertAlmostEqual(
+                float(consumer.get("mean_target")),
+                float(summary.get("mean_target")),
+                places=9,
+            )
+            self.assertEqual(
+                consumer.get("calculation_version"),
+                summary.get("calculation_version"),
+            )
+            self.assertEqual(
+                consumer.get("spec_sha256"),
+                summary.get("spec_sha256"),
+            )
+            journal_pooled = (summary.get("target_exclusion_reasons") or {}).get(
+                "pooled"
+            ) or {}
+            consumer_pooled = (consumer.get("target_exclusion_reasons") or {}).get(
+                "pooled"
+            ) or {}
+            self.assertEqual(consumer_pooled, journal_pooled)
+            return {
+                "summary": summary,
+                "consumer": consumer,
+                "loaded": loaded,
+                "snapshot_spec": snapshot_spec,
+                "cohort_binding": cohort_binding,
+            }
+        finally:
+            import shutil
+
+            shutil.rmtree(workspace, ignore_errors=True)
+
+    def test_new_and_legacy_published_bytes_match_journal_and_consumer(self) -> None:
+        new_path = self._run_snapshot_vertical(snapshot_transport="new")
+        legacy_path = self._run_snapshot_vertical(snapshot_transport="legacy")
+        self.assertEqual(
+            new_path["summary"]["observed_target_n"],
+            legacy_path["summary"]["observed_target_n"],
+        )
+        self.assertEqual(
+            new_path["summary"]["mean_target"],
+            legacy_path["summary"]["mean_target"],
+        )
+
+    def test_insufficient_legacy_lineage_is_metadata_blocker(self) -> None:
+        rows = SnapshotNegativeControlsTests()._rows_legal()
+        stripped = []
+        for row in rows:
+            body = dict(row)
+            body.pop("observation_clock_policy", None)
+            body.pop("call_occurrence_id", None)
+            body.pop("request_sha256", None)
+            body.pop("primitive_id", None)
+            stripped.append(body)
+        bad = execute_temporal_discovery(
+            [_census()], stripped, _spec_snapshot(query_id="vert-a-insufficient"), _binding_mixed()
+        )["summary"]
+        self.assertEqual(int(bad.get("observed_target_n") or 0), 0)
+        pooled = (bad.get("target_exclusion_reasons") or {}).get("pooled") or {}
+        membership = (bad.get("membership_exclusion_reasons") or {}).get("pooled") or {}
+        text = json.dumps(bad, sort_keys=True, default=str)
+        self.assertTrue(
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE" in pooled
+            or "SNAPSHOT_OCCURRENCE_UNBOUND" in pooled
+            or "SNAPSHOT_LINEAGE_UNINTERPRETABLE" in membership
+            or "SNAPSHOT_OCCURRENCE_UNBOUND" in membership
+            or "SNAPSHOT_LINEAGE_UNINTERPRETABLE" in text
+            or "SNAPSHOT_OCCURRENCE_UNBOUND" in text,
+            bad,
+        )
+
+    def test_published_snapshot_negatives_and_schema(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            execute_discovery_from_rows,
+            load_admitted_partition_rows,
+            resolve_published_discovery_binding,
+        )
+        from solana_alpha_lab.factory.live_cohort_discovery_release import (
+            _observation_release_row,
+        )
+        from solana_alpha_lab.factory.live_cohort_source_bundle import (
+            OBSERVATION_COLUMNS,
+            OBS_RELEASE_SCHEMA,
+            row_for_observation_parquet,
+        )
+        from tests.test_hfic_temporal_discovery_v1 import _spec as _base_spec
+        from tests.test_hfic_temporal_production_runner_v1 import (
+            DOCUMENT_LATENESS,
+            _publish,
+        )
+
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            data_root = workspace / "rdp"
+            _publish(data_root, workspace, snapshot_transport="new")
+            binding = resolve_published_discovery_binding(data_root)
+            loaded = load_admitted_partition_rows(
+                data_root=data_root,
+                binding_doc=binding,
+                partitions=None,
+                census_path=None,
+                observations_path=None,
+            )
+            snapshot_spec = _base_spec(
+                cost_profile=None,
+                query_id="vert-a-neg",
+                schedule={
+                    "lateness_seconds": DOCUMENT_LATENESS,
+                    "observation_clock_policy": OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
+                },
+            )
+            cohort_binding = [dict(item) for item in loaded["cohorts"]]
+            for item in cohort_binding:
+                item.setdefault("holdout", False)
+                item.setdefault("evidence_role", "EXPLORATORY_REUSE")
+                item["schedule_lateness_seconds"] = DOCUMENT_LATENESS
+            poisoned = [dict(row) for row in loaded["observations"]]
             for row in poisoned:
                 if row.get("point_id") == "Y7200" and row.get("field_id") == PRICE:
                     row["primitive_id"] = "PRIM-NOT-REGISTERED-001"
@@ -1086,7 +1203,7 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
             self.assertEqual(int(bad.get("observed_target_n") or 0), 0)
             pooled = (bad.get("target_exclusion_reasons") or {}).get("pooled") or {}
             self.assertIn("SNAPSHOT_OCCURRENCE_UNBOUND", pooled)
-            mismatched = [dict(row) for row in stamped]
+            mismatched = [dict(row) for row in loaded["observations"]]
             for row in mismatched:
                 if row.get("point_id") == "Y7200" and row.get("field_id") == PRICE:
                     row["observation_clock_policy"] = "EVENT_TIME_V1"
@@ -1098,16 +1215,6 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
                 mismatch.get("target_exclusion_reasons") or {}
             ).get("pooled") or {}
             self.assertIn("SNAPSHOT_POLICY_MISMATCH", mismatch_pooled)
-
-    def test_parquet_and_release_preserve_clock_fields(self) -> None:
-        from solana_alpha_lab.factory.live_cohort_discovery_release import (
-            _observation_release_row,
-        )
-        from solana_alpha_lab.factory.live_cohort_source_bundle import (
-            OBSERVATION_COLUMNS,
-            OBS_RELEASE_SCHEMA,
-            row_for_observation_parquet,
-        )
 
         for name in (
             "observation_clock_policy",
@@ -1166,7 +1273,7 @@ def _is_hex64_local(value: object) -> bool:
 
 
 class AcceptanceVerticalBContinuationTests(unittest.TestCase):
-    """Production path: NO_WORTHY parent → apply → third MAIN → new terminal → close."""
+    """Production path: historical parent → repair → selected or NO_WORTHY → replay."""
 
     def test_completed_parent_third_look_new_terminal_and_close(self) -> None:
         import hashlib
