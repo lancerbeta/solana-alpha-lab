@@ -1543,7 +1543,16 @@ compound не использован. Неназывайте непройден�
 и `by_calendar_block`. Когортный срез описательный: общая decision может
 входить в несколько когорт, суммы N не обязаны совпасть с pooled, и когорты
 не являются независимой репликацией. Нет observed target — mean `null`, не 0.
-Пустая admitted cohort остаётся строкой с N=0. `INTEGRITY_CONFLICT` — другая причина того же N=0 и mean `null`: decision исключена до конца расчёта и на pooled, и на каждой затронутой когорте, включая когорту поздней копии. Причина лежит в `exclusion_reasons` результата и в `by_cohort[].exclusion_reasons`, а не в пустой cohort и не в missing target. Writer temporal calculation —
+Пустая admitted cohort остаётся строкой с N=0. `INTEGRITY_CONFLICT` — другая причина того же N=0 и mean `null`: decision исключена до конца расчёта и на pooled, и на каждой затронутой когорте, включая когорту поздней копии. Причина лежит в `exclusion_reasons` результата и в `by_cohort[].exclusion_reasons`, а не в пустой cohort и не в missing target.
+Bound schedule может задавать per-point `(due_offset, allowed_lateness)`;
+query scalar остаётся X300 envelope. `schedule.observation_clock_policy:
+PROVIDER_REPORTED_SNAPSHOT_V1` считает exit по request/response/availability,
+не по member anchor как market-event. Причины missing target —
+`target_exclusion_reasons` (pooled + by_cohort). После completed NO_WORTHY
+без selected candidate узкий owner-authorized repair continuation наследует
+потраченный look ledger; plan без записи, apply отдельно
+(`docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md`).
+Writer temporal calculation —
 `HFIC_TEMPORAL_DISCOVERY_CALC_V2`. V1 читается как есть, без выдуманного среза;
 повтор того же science/input пишет V2 как `CALCULATION_REVISION`, без нового
 scientific look. В owner readout это поля `calculation_version`,

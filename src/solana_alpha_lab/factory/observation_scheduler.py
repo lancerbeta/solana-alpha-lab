@@ -2675,6 +2675,18 @@ def _observation_row(
         ),
         "provisional_due": provisional,
         "authoritative_anchor": anchor,
+        "member_anchor": anchor,
+        "observation_clock_policy": (
+            payload.get("observation_clock_policy")
+            if payload.get("observation_clock_policy")
+            else (
+                "PROVIDER_REPORTED_SNAPSHOT_V1"
+                if str(claim.get("primitive_id") or "")
+                == "PRIM-JUPITER-TOKENS-V2-SEARCH-001"
+                else None
+            )
+        ),
+        "source_price_event_time": payload.get("source_price_event_time") or "UNKNOWN",
         "missing_reason": missing_reason,
         "field_values": values,
     }

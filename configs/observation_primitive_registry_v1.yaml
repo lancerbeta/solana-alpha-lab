@@ -290,6 +290,7 @@ primitives:
     version: '1.0'
     status: ACCEPTED
     kind: BATCH_SNAPSHOT
+    observation_clock_policy: PROVIDER_REPORTED_SNAPSHOT_V1
     provider_route_ids:
       - JUPITER-SOLANA-TOKENS-V2-SEARCH-FREE-API-KEY-001
     access_class: LOCAL_ENV_CREDENTIAL

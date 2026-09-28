@@ -888,6 +888,7 @@ def resolve_scientific_admission(
     repo_root: Path | None = None,
     auto_sessions_per_market: int = 1,
     max_distinct_focuses: int = 3,
+    repair_continuations: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Resolve one shared market-slot admission decision.
 
@@ -1144,13 +1145,24 @@ def resolve_scientific_admission(
                     break
         if context_matches:
             action = "RESUME_EXISTING_SESSION" if state in pending else "RETURN_EXISTING_SESSION"
-            return {
+            result = {
                 "action": action,
                 "reason_code": state or "SCIENTIFIC_SLOT_OCCUPIED",
                 "session_id": session_id,
                 "scientific_slot_sha256": target_slot,
                 "occupancy": "OCCUPIED",
             }
+            if repair_continuations and action == "RETURN_EXISTING_SESSION":
+                from solana_alpha_lab.factory.hfic_repair_continuation import (
+                    admission_with_repair_continuation,
+                )
+
+                result = admission_with_repair_continuation(
+                    result,
+                    dispositions=repair_continuations,
+                    parent_terminal=state,
+                )
+            return result
         return {
             "action": "STOP",
             "reason_code": "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",

@@ -2784,6 +2784,12 @@ def evaluate_forge_run(
         resolve_scientific_admission,
         scientific_slot_sha256,
     )
+    from solana_alpha_lab.factory.hfic_repair_continuation import (
+        ACTION_RESUME_REPAIR_CONTINUATION,
+        REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION,
+        active_repair_continuation_for_slot,
+        list_repair_continuation_dispositions,
+    )
 
     market_epoch = input_receipt.get("market_evidence_epoch_sha256")
     if not isinstance(market_epoch, str) or len(market_epoch) != 64:
@@ -2968,6 +2974,7 @@ def evaluate_forge_run(
             execution_context=admission_execution_context or None,
             memory_eligibility_sha256=current_memory_eligibility,
             repo_root=Path(repo_root),
+            repair_continuations=list_repair_continuation_dispositions(store),
         )
         from solana_alpha_lab.factory.hfic_session import (
             orphan_prefreeze_draft_resumable,
@@ -3033,6 +3040,7 @@ def evaluate_forge_run(
         elif admission.get("action") in {
             "RESUME_EXISTING_SESSION",
             "RETURN_EXISTING_SESSION",
+            ACTION_RESUME_REPAIR_CONTINUATION,
         }:
             admitted_id = str(admission.get("session_id") or "")
             observed_ids = {
@@ -3040,7 +3048,28 @@ def evaluate_forge_run(
                 for row in resolved_stages
                 if isinstance(row, Mapping)
             }
-            if admitted_id and admitted_id not in observed_ids and resumable_orphan:
+            if admission.get("action") == ACTION_RESUME_REPAIR_CONTINUATION:
+                resume_action = _resume_action(
+                    "BASE"
+                    if active_rep
+                    in {"CURRENT_REPRESENTATION_CONTROL_V1", "ORDINARY_BASE"}
+                    else active_rep
+                )
+                decision = {
+                    "next_action": resume_action,
+                    "owner_final": None,
+                    "reason_code": REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION,
+                    "session_id": admitted_id or None,
+                    "repair_continuation_disposition_sha256": admission.get(
+                        "repair_continuation_disposition_sha256"
+                    ),
+                    "spent_main_looks": admission.get("spent_main_looks"),
+                    "spent_adaptive_looks": admission.get("spent_adaptive_looks"),
+                }
+                next_action = resume_action
+                owner_final = None
+                existing_owner_final = False
+            elif admitted_id and admitted_id not in observed_ids and resumable_orphan:
                 resume_action = _resume_action(
                     "BASE"
                     if active_rep
@@ -3090,18 +3119,33 @@ def evaluate_forge_run(
         # Admission verifies the caller's known execution context, while this
         # second check verifies the persisted artifact's own binding before it
         # can be replayed as a completed owner result.
-        replay_provenance = _completed_readback_provenance_status(
-            existing,
-            active_row=active_row,
+        # An authorized repair continuation deliberately lifts the completed
+        # readback so the remaining look ledger can continue on the same slot.
+        repair_active = active_repair_continuation_for_slot(
+            list_repair_continuation_dispositions(store),
             scientific_slot_sha256=scientific_slot,
         )
-        if replay_provenance == EXEC_PROVENANCE_CONFLICT:
-            return _readback_existing_run(
+        if repair_active is None:
+            replay_provenance = _completed_readback_provenance_status(
                 existing,
-                block_reason="SCIENTIFIC_IDENTITY_CONFLICT",
-                provenance_status=replay_provenance,
+                active_row=active_row,
+                scientific_slot_sha256=scientific_slot,
             )
-        return _readback_existing_run(existing, provenance_status=replay_provenance)
+            if replay_provenance == EXEC_PROVENANCE_CONFLICT:
+                return _readback_existing_run(
+                    existing,
+                    block_reason="SCIENTIFIC_IDENTITY_CONFLICT",
+                    provenance_status=replay_provenance,
+                )
+            return _readback_existing_run(existing, provenance_status=replay_provenance)
+        existing_owner_final = False
+        owner_final = None
+        decision = dict(decision)
+        decision["owner_final"] = None
+        decision["reason_code"] = REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION
+        decision["repair_continuation_disposition_sha256"] = repair_active.get(
+            "disposition_sha256"
+        )
     cap_epoch = input_receipt.get("capability_epoch_sha256")
     exec_binding = None
     exec_provenance_status = EXEC_PROVENANCE_NOT_APPLICABLE

@@ -1577,6 +1577,12 @@ def format_discovery_readout(evidence: Mapping[str, Any]) -> dict[str, Any]:
         payload["claim_level"] = result.get("claim_level")
         payload["labeled_net_return"] = result.get("labeled_net_return")
         payload["search_tier"] = result.get("search_tier")
+    if result.get("observation_clock_policy"):
+        payload["observation_clock_policy"] = result.get("observation_clock_policy")
+    if result.get("target_exclusion_reasons") is not None:
+        payload["target_exclusion_reasons"] = result.get("target_exclusion_reasons")
+    if result.get("source_price_event_time") is not None:
+        payload["source_price_event_time"] = result.get("source_price_event_time")
     return payload
 
 

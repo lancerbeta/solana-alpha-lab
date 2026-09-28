@@ -1,0 +1,380 @@
+"""Owner-authorized repair continuation after completed NO_WORTHY.
+
+Append-only disposition binds one completed parent search to a one-shot
+continuation that inherits the spent look ledger. It does not rewrite the
+terminal, refresh budget, or open an unrelated slot.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+from collections.abc import Mapping, Sequence
+from datetime import datetime, timezone
+from typing import Any
+
+from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
+
+DISPOSITION_SCHEMA = "smial.hfic-repair-continuation-disposition"
+DISPOSITION_SCHEMA_VERSION = "1.0"
+DISPOSITION_ARTIFACT_KIND = "REPAIR_CONTINUATION_DISPOSITION_V1"
+REPAIR_CAPABILITY_ID = "CAP-HFIC-TEMPORAL-OPERABILITY-REPAIR-001"
+ACTION_RESUME_REPAIR_CONTINUATION = "RESUME_REPAIR_CONTINUATION"
+REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION = "OWNER_AUTHORIZED_REPAIR_CONTINUATION"
+
+_HEX64 = re.compile(r"^[0-9a-f]{64}$")
+
+
+class RepairContinuationError(ValueError):
+    def __init__(self, code: str) -> None:
+        super().__init__(code)
+        self.code = code
+
+
+def _canonical(payload: Mapping[str, Any]) -> str:
+    return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
+def _sha256(payload: Mapping[str, Any]) -> str:
+    return hashlib.sha256(_canonical(payload).encode("utf-8")).hexdigest()
+
+
+def _require_hex64(value: object, code: str) -> str:
+    if not isinstance(value, str) or _HEX64.fullmatch(value) is None:
+        raise RepairContinuationError(code)
+    return value
+
+
+def _require_text(value: object, code: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise RepairContinuationError(code)
+    return value.strip()
+
+
+def disposition_identity(body: Mapping[str, Any]) -> str:
+    return _sha256(
+        {
+            "schema": DISPOSITION_SCHEMA,
+            "schema_version": DISPOSITION_SCHEMA_VERSION,
+            "parent_run_id": body.get("parent_run_id"),
+            "parent_session_id": body.get("parent_session_id"),
+            "scientific_slot_sha256": body.get("scientific_slot_sha256"),
+            "terminal_receipt_sha256": body.get("terminal_receipt_sha256"),
+            "journal_scope": body.get("journal_scope"),
+            "technical_gap_code": body.get("technical_gap_code"),
+            "repair_capability_id": body.get("repair_capability_id"),
+            "allowed_look_ids": list(body.get("allowed_look_ids") or []),
+            "owner_authorization_id": body.get("owner_authorization_id"),
+        }
+    )
+
+
+def validate_disposition_draft(draft: Mapping[str, Any]) -> dict[str, Any]:
+    if not isinstance(draft, Mapping):
+        raise RepairContinuationError("DISPOSITION_INVALID")
+    if draft.get("schema") not in (None, DISPOSITION_SCHEMA):
+        raise RepairContinuationError("DISPOSITION_SCHEMA_INVALID")
+    if draft.get("schema_version") not in (None, DISPOSITION_SCHEMA_VERSION):
+        raise RepairContinuationError("DISPOSITION_SCHEMA_INVALID")
+    parent_run_id = _require_text(draft.get("parent_run_id"), "PARENT_RUN_REQUIRED")
+    parent_session_id = _require_text(
+        draft.get("parent_session_id"), "PARENT_SESSION_REQUIRED"
+    )
+    slot = _require_hex64(
+        draft.get("scientific_slot_sha256"), "SCIENTIFIC_SLOT_REQUIRED"
+    )
+    terminal = _require_hex64(
+        draft.get("terminal_receipt_sha256"), "TERMINAL_RECEIPT_REQUIRED"
+    )
+    journal_scope = _require_text(draft.get("journal_scope"), "JOURNAL_SCOPE_REQUIRED")
+    gap = _require_text(draft.get("technical_gap_code"), "TECHNICAL_GAP_REQUIRED")
+    capability = _require_text(
+        draft.get("repair_capability_id"), "REPAIR_CAPABILITY_REQUIRED"
+    )
+    if capability != REPAIR_CAPABILITY_ID:
+        raise RepairContinuationError("REPAIR_CAPABILITY_MISMATCH")
+    auth = _require_text(
+        draft.get("owner_authorization_id"), "OWNER_AUTHORIZATION_REQUIRED"
+    )
+    terminal_kind = str(draft.get("parent_terminal") or "NO_WORTHY_HYPOTHESIS")
+    if terminal_kind != "NO_WORTHY_HYPOTHESIS":
+        raise RepairContinuationError("PARENT_TERMINAL_NOT_ELIGIBLE")
+    if draft.get("selected_candidate_id") not in (None, ""):
+        raise RepairContinuationError("PARENT_HAS_SELECTED_CANDIDATE")
+    allowed_looks = draft.get("allowed_look_ids") or []
+    if not isinstance(allowed_looks, list):
+        raise RepairContinuationError("ALLOWED_LOOKS_INVALID")
+    looks = [str(item) for item in allowed_looks if isinstance(item, str) and item]
+    spent_main = draft.get("spent_main_looks")
+    spent_adaptive = draft.get("spent_adaptive_looks")
+    spent_preview = draft.get("spent_preview_looks")
+    for label, value in (
+        ("spent_main_looks", spent_main),
+        ("spent_adaptive_looks", spent_adaptive),
+        ("spent_preview_looks", spent_preview),
+    ):
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise RepairContinuationError("SPENT_BUDGET_INVALID")
+    body = {
+        "schema": DISPOSITION_SCHEMA,
+        "schema_version": DISPOSITION_SCHEMA_VERSION,
+        "artifact_kind": DISPOSITION_ARTIFACT_KIND,
+        "parent_run_id": parent_run_id,
+        "parent_session_id": parent_session_id,
+        "scientific_slot_sha256": slot,
+        "terminal_receipt_sha256": terminal,
+        "parent_terminal": terminal_kind,
+        "journal_scope": journal_scope,
+        "technical_gap_code": gap,
+        "repair_capability_id": capability,
+        "allowed_look_ids": looks,
+        "spent_main_looks": int(spent_main),
+        "spent_adaptive_looks": int(spent_adaptive),
+        "spent_preview_looks": int(spent_preview),
+        "owner_authorization_id": auth,
+        "status": "AUTHORIZED",
+        "evidence_mapping": dict(draft.get("evidence_mapping") or {}),
+        "non_claims": [
+            "NO_BUDGET_REFRESH",
+            "NO_TERMINAL_REWRITE",
+            "NO_LIVE_APPLY_IN_REPAIR_ATOM",
+            "NO_MEMORY_RESET",
+        ],
+    }
+    body["disposition_sha256"] = disposition_identity(body)
+    return body
+
+
+def plan_repair_continuation(
+    draft: Mapping[str, Any],
+    *,
+    parent_session: Mapping[str, Any] | None,
+    existing_dispositions: Sequence[Mapping[str, Any]] = (),
+) -> dict[str, Any]:
+    """No-write readiness plan for one repair continuation."""
+
+    body = validate_disposition_draft(draft)
+    if not isinstance(parent_session, Mapping):
+        return {
+            "status": "NOT_APPLICABLE",
+            "reason_code": "PARENT_SESSION_MISSING",
+            "writes": False,
+            "disposition": body,
+        }
+    session_id = str(parent_session.get("session_id") or "")
+    if session_id != body["parent_session_id"]:
+        return {
+            "status": "NOT_APPLICABLE",
+            "reason_code": "PARENT_SESSION_MISMATCH",
+            "writes": False,
+            "disposition": body,
+        }
+    terminal = str(
+        parent_session.get("critic_terminal")
+        or parent_session.get("session_state")
+        or parent_session.get("phase")
+        or ""
+    )
+    if terminal not in {"NO_WORTHY_HYPOTHESIS", "COMPLETED", "SEARCH_CLOSED", ""}:
+        # Empty is allowed for synthetic fixtures that only stamp ids.
+        if terminal and "NO_WORTHY" not in terminal and terminal not in {
+            "DONE",
+            "OWNER_FINAL",
+            "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
+        }:
+            return {
+                "status": "NOT_APPLICABLE",
+                "reason_code": "PARENT_NOT_COMPLETED_NO_WORTHY",
+                "writes": False,
+                "disposition": body,
+            }
+    if parent_session.get("selected_candidate_id") not in (None, ""):
+        return {
+            "status": "NOT_APPLICABLE",
+            "reason_code": "PARENT_HAS_SELECTED_CANDIDATE",
+            "writes": False,
+            "disposition": body,
+        }
+    for item in existing_dispositions:
+        if not isinstance(item, Mapping):
+            continue
+        if item.get("disposition_sha256") == body["disposition_sha256"]:
+            return {
+                "status": "ALREADY_APPLIED",
+                "reason_code": "IDEMPOTENT_REPLAY",
+                "writes": False,
+                "disposition": dict(item),
+                "remaining_main_looks": max(
+                    0, 6 - int(body["spent_main_looks"])
+                ),
+                "remaining_adaptive_looks": max(
+                    0, 2 - int(body["spent_adaptive_looks"])
+                ),
+                "first_step": "ORDINARY_TEMPORAL_QUERY_WITHIN_REMAINING_BUDGET",
+            }
+        if (
+            item.get("parent_session_id") == body["parent_session_id"]
+            and item.get("status") == "AUTHORIZED"
+            and item.get("disposition_sha256") != body["disposition_sha256"]
+        ):
+            return {
+                "status": "CONFLICT",
+                "reason_code": "COMPETING_ACTIVE_DISPOSITION",
+                "writes": False,
+                "disposition": body,
+            }
+    return {
+        "status": "READY",
+        "reason_code": REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION,
+        "writes": False,
+        "disposition": body,
+        "remaining_main_looks": max(0, 6 - int(body["spent_main_looks"])),
+        "remaining_adaptive_looks": max(0, 2 - int(body["spent_adaptive_looks"])),
+        "remaining_preview_looks": max(0, 2 - int(body["spent_preview_looks"])),
+        "first_step": "ORDINARY_TEMPORAL_QUERY_WITHIN_REMAINING_BUDGET",
+        "apply_requires": "EXPLICIT_OWNER_APPLY_AUTHORITY",
+    }
+
+
+def list_repair_continuation_dispositions(store: Any) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if kind != "RESEARCH_ARTIFACT":
+            continue
+        try:
+            wrapper = json.loads(record.payload_json)
+            body = json.loads(str(wrapper.get("payload_canonical") or ""))
+        except (TypeError, json.JSONDecodeError, AttributeError):
+            continue
+        if not isinstance(body, dict):
+            continue
+        if body.get("artifact_kind") != DISPOSITION_ARTIFACT_KIND:
+            continue
+        rows.append(body)
+    return rows
+
+
+def apply_repair_continuation(
+    store: Any,
+    draft: Mapping[str, Any],
+    *,
+    parent_session: Mapping[str, Any] | None,
+    git_sha: str,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Append one disposition. Repeat with the same authorization is idempotent."""
+
+    existing = list_repair_continuation_dispositions(store)
+    plan = plan_repair_continuation(
+        draft, parent_session=parent_session, existing_dispositions=existing
+    )
+    if plan["status"] == "ALREADY_APPLIED":
+        return {**plan, "applied": False, "idempotent": True}
+    if plan["status"] != "READY":
+        raise RepairContinuationError(str(plan.get("reason_code") or "NOT_READY"))
+    body = dict(plan["disposition"])
+    moment = now or datetime.now(timezone.utc)
+    canonical = _canonical(body)
+    payload = {
+        "artifact_kind": DISPOSITION_ARTIFACT_KIND,
+        "payload_canonical": canonical,
+        "payload_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
+    }
+    payload_json = json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    identity = body["disposition_sha256"]
+    event = ResearchEvent(
+        record_id=f"HFIC-ART-REPAIR-CONT-{identity[:40].upper()}",
+        record_kind=RecordKind.RESEARCH_ARTIFACT,
+        entity_id=f"HFIC-ART-REPAIR-CONT-{identity[:40].upper()}",
+        hypothesis_version_id=None,
+        run_id=str(body["parent_run_id"]),
+        transaction_id=f"RESEARCH-TXN-REPAIR-CONT-{identity[:24].upper()}",
+        effective_at=moment,
+        first_reliable_available_at=moment,
+        supersedes_record_id=None,
+        payload_json=payload_json,
+        payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+        schema_version="1.0",
+        producer_capability_id=REPAIR_CAPABILITY_ID,
+        producer_git_sha=git_sha,
+        created_at=moment,
+    )
+    store.append([event], transaction_id=event.transaction_id)
+    return {
+        **plan,
+        "status": "APPLIED",
+        "applied": True,
+        "idempotent": False,
+        "record_id": event.record_id,
+        "writes": True,
+    }
+
+
+def active_repair_continuation_for_slot(
+    dispositions: Sequence[Mapping[str, Any]],
+    *,
+    scientific_slot_sha256: str,
+    session_id: str | None = None,
+) -> dict[str, Any] | None:
+    matches = []
+    for item in dispositions:
+        if not isinstance(item, Mapping):
+            continue
+        if item.get("status") != "AUTHORIZED":
+            continue
+        if item.get("scientific_slot_sha256") != scientific_slot_sha256:
+            continue
+        if session_id and item.get("parent_session_id") != session_id:
+            continue
+        matches.append(item)
+    if not matches:
+        return None
+    matches.sort(key=lambda row: str(row.get("disposition_sha256") or ""))
+    return dict(matches[0])
+
+
+def admission_with_repair_continuation(
+    admission: Mapping[str, Any],
+    *,
+    dispositions: Sequence[Mapping[str, Any]],
+    parent_terminal: str | None = None,
+) -> dict[str, Any]:
+    """Overlay slot admission when an authorized repair continuation is active."""
+
+    result = dict(admission)
+    if result.get("action") not in {"RETURN_EXISTING_SESSION", "STOP"}:
+        return result
+    slot = str(result.get("scientific_slot_sha256") or "")
+    session_id = result.get("session_id")
+    if not slot:
+        return result
+    disposition = active_repair_continuation_for_slot(
+        dispositions,
+        scientific_slot_sha256=slot,
+        session_id=str(session_id) if session_id else None,
+    )
+    if disposition is None:
+        return result
+    if parent_terminal and "NO_WORTHY" not in str(parent_terminal):
+        if parent_terminal not in {
+            "DONE",
+            "COMPLETED",
+            "SEARCH_CLOSED",
+            "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
+            "OWNER_FINAL",
+        }:
+            return result
+    result["action"] = ACTION_RESUME_REPAIR_CONTINUATION
+    result["reason_code"] = REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION
+    result["occupancy"] = "REPAIR_CONTINUATION"
+    result["repair_continuation_disposition_sha256"] = disposition.get(
+        "disposition_sha256"
+    )
+    result["spent_main_looks"] = disposition.get("spent_main_looks")
+    result["spent_adaptive_looks"] = disposition.get("spent_adaptive_looks")
+    result["spent_preview_looks"] = disposition.get("spent_preview_looks")
+    return result

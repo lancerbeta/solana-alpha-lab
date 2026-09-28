@@ -38,6 +38,14 @@ TEMPORAL_CALCULATION_VERSIONS_READABLE = frozenset(
     {TEMPORAL_CALCULATION_VERSION_V1, TEMPORAL_CALCULATION_VERSION}
 )
 TEMPORAL_CAPABILITY_ID = "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+OBSERVATION_CLOCK_EVENT_TIME_V1 = "EVENT_TIME_V1"
+OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1 = "PROVIDER_REPORTED_SNAPSHOT_V1"
+OBSERVATION_CLOCK_POLICIES = frozenset(
+    {
+        OBSERVATION_CLOCK_EVENT_TIME_V1,
+        OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
+    }
+)
 PREVIEW_BYTE_LIMIT = 64 * 1024
 PREVIEW_EXAMPLE_LIMIT = 24
 MAX_PREVIEW_SPECS = 2
@@ -259,6 +267,11 @@ def scientific_body(spec: Mapping[str, Any]) -> dict[str, Any]:
     lateness = schedule.get("lateness_seconds")
     if isinstance(lateness, bool) or not isinstance(lateness, int) or lateness < 0:
         raise GroundedDiscoveryError("SCHEDULE_INVALID")
+    clock_policy = schedule.get("observation_clock_policy")
+    if clock_policy in (None, ""):
+        clock_policy = OBSERVATION_CLOCK_EVENT_TIME_V1
+    if clock_policy not in OBSERVATION_CLOCK_POLICIES:
+        raise GroundedDiscoveryError("OBSERVATION_CLOCK_POLICY_INVALID")
     features_in = spec.get("features")
     predicates_in = spec.get("all")
     if not isinstance(features_in, list) or not features_in or len(features_in) > MAX_FEATURES:
@@ -311,6 +324,7 @@ def scientific_body(spec: Mapping[str, Any]) -> dict[str, Any]:
         "population": "BASE_X",
         "decision_point": decision_point,
         "schedule_lateness_seconds": lateness,
+        "observation_clock_policy": str(clock_policy),
         "features": sorted(features, key=lambda item: str(item["name"])),
         "predicates": sorted(predicates, key=_canonical),
         "target": {
@@ -338,8 +352,22 @@ def scientific_body(spec: Mapping[str, Any]) -> dict[str, Any]:
 
 def validate_temporal_query(spec: Mapping[str, Any]) -> dict[str, Any]:
     body = scientific_body(spec)
-    identity = {key: body[key] for key in body if key not in {"query_id", "search_tier", "budget_allocation", "adaptation_of"}}
+    identity = {
+        key: body[key]
+        for key in body
+        if key not in {"query_id", "search_tier", "budget_allocation", "adaptation_of"}
+    }
+    # Default EVENT_TIME_V1 is omitted from identity so prior frozen digests
+    # remain stable; any non-default policy enters scientific identity.
+    if identity.get("observation_clock_policy") == OBSERVATION_CLOCK_EVENT_TIME_V1:
+        identity = {
+            key: value
+            for key, value in identity.items()
+            if key != "observation_clock_policy"
+        }
     digest = _sha256(identity)
+    runtime_body = dict(identity)
+    runtime_body["observation_clock_policy"] = body["observation_clock_policy"]
     return {
         "query_id": body["query_id"],
         "decision_points": [body["decision_point"]],
@@ -350,13 +378,13 @@ def validate_temporal_query(spec: Mapping[str, Any]) -> dict[str, Any]:
         "population": "BASE_X",
         "spec_sha256": digest,
         "target_label": (
-            f"PRICE_RELATIVE_PROXY:{identity['target']['reference_point']}:"
-            f"{identity['target']['exit_point']}:{identity['target']['field_id']}"
+            f"PRICE_RELATIVE_PROXY:{runtime_body['target']['reference_point']}:"
+            f"{runtime_body['target']['exit_point']}:{runtime_body['target']['field_id']}"
         ),
         "search_tier": body["search_tier"],
         "budget_allocation": body["budget_allocation"],
         "adaptation_of": body["adaptation_of"],
-        "scientific_body": identity,
+        "scientific_body": runtime_body,
         "display": body,
     }
 
@@ -490,14 +518,22 @@ def _feature_value(
     lateness: int,
     decision_deadline: object,
     due_offset_for: Any = None,
+    lateness_for: Any = None,
 ) -> float | None:
     def offset(point: str) -> int | None:
         if due_offset_for is None:
             return None
         return int(due_offset_for(point))
 
+    def point_lateness(point: str) -> int:
+        if lateness_for is None:
+            return lateness
+        return int(lateness_for(point))
+
     def read(point: str, field: str) -> dict[str, Any]:
-        point_deadline = _deadline_for(anchor, point, lateness, due_offset=offset(point))
+        point_deadline = _deadline_for(
+            anchor, point, point_lateness(point), due_offset=offset(point)
+        )
         if point_deadline is None or decision_deadline is None or point_deadline > decision_deadline:
             return {"status": "ABSENT"}
         return _cell(grouped, (cohort, release, mint, point, field), point_deadline)
@@ -507,15 +543,21 @@ def _feature_value(
         cell = read(str(feature["point"]), str(feature["field_id"]))
         return cell.get("value") if cell.get("status") == "OBSERVED" else None
     if op == "utc_hour":
-        moment = _deadline_for(anchor, str(feature["point"]), 0, due_offset=offset(str(feature["point"])))
+        moment = _deadline_for(
+            anchor, str(feature["point"]), 0, due_offset=offset(str(feature["point"]))
+        )
         if moment is None or decision_deadline is None or moment > decision_deadline:
             return None
         if read(str(feature["point"]), PRICE).get("status") != "OBSERVED":
             return None
         return float(moment.hour)
     if op == "elapsed_seconds":
-        start = _deadline_for(anchor, str(feature["start"]), 0, due_offset=offset(str(feature["start"])))
-        end = _deadline_for(anchor, str(feature["end"]), 0, due_offset=offset(str(feature["end"])))
+        start = _deadline_for(
+            anchor, str(feature["start"]), 0, due_offset=offset(str(feature["start"]))
+        )
+        end = _deadline_for(
+            anchor, str(feature["end"]), 0, due_offset=offset(str(feature["end"]))
+        )
         if start is None or end is None:
             return None
         if read(str(feature["start"]), PRICE).get("status") != "OBSERVED":
@@ -617,7 +659,12 @@ def _query_points(body: Mapping[str, Any]) -> list[str]:
 
 
 def _clock(item: Mapping[str, Any], point: str, query_lateness: int) -> tuple[int, int]:
-    """Document point clocks win. A missing document does not fall back to a default."""
+    """Document point clocks win. A missing document does not fall back to a default.
+
+    When the bound schedule carries per-point maps, each point uses its own
+    ``(due_offset, allowed_lateness)``. The query scalar is a legacy uniform
+    contract and is not forced onto mixed point maps.
+    """
 
     gap = item.get("schedule_context_gap")
     if gap == "CANONICAL_SCHEDULE_UNBOUND":
@@ -636,7 +683,8 @@ def _clock(item: Mapping[str, Any], point: str, query_lateness: int) -> tuple[in
             or not isinstance(due, int)
         ):
             raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
-        if late != query_lateness:
+        # Query scalar remains the X300 envelope. Other points may differ.
+        if point == "X300" and late != query_lateness:
             raise GroundedDiscoveryError("SCHEDULE_LATENESS_MISMATCH")
         return due, late
     declared = item.get("schedule_lateness_seconds")
@@ -647,6 +695,122 @@ def _clock(item: Mapping[str, Any], point: str, query_lateness: int) -> tuple[in
     if point not in POINT_OFFSET:
         raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
     return POINT_OFFSET[point], declared
+
+
+def _due_moment(anchor: object, due_offset: int):
+    parsed = _parse_time(anchor)
+    if parsed is None:
+        return None
+    return parsed + timedelta(seconds=int(due_offset))
+
+
+def _select_snapshot_exit(
+    exit_rows: Sequence[Mapping[str, Any]],
+    *,
+    entry_at: object,
+    exit_due_at: object,
+    exit_deadline: object,
+) -> tuple[dict[str, Any], str | None]:
+    """Select a provider-reported snapshot exit under acquisition clocks.
+
+    Member anchor is not a market-event timestamp. Request must start after
+    entry and not before the point due; clocks keep
+    ``due ≤ request ≤ response ≤ availability ≤ deadline``.
+    """
+
+    if entry_at is None or exit_due_at is None:
+        return {"status": "MISSING_ACQUISITION_CLOCK"}, "MISSING_ACQUISITION_CLOCK"
+    legal: list[tuple[object, Mapping[str, Any]]] = []
+    seen_reasons: list[str] = []
+    for exit_row in exit_rows:
+        request = _parse_time(exit_row.get("request_started_at"))
+        response = _parse_time(exit_row.get("response_received_at"))
+        available = _parse_time(exit_row.get("first_reliable_available_at"))
+        source_event = exit_row.get("source_price_event_time")
+        if source_event not in (None, "", "UNKNOWN"):
+            source_parsed = _parse_time(source_event)
+            if source_parsed is not None and (
+                exit_deadline is None or source_parsed > exit_deadline
+            ):
+                seen_reasons.append("SOURCE_PRICE_EVENT_STALE")
+                continue
+        if request is None or response is None or available is None:
+            seen_reasons.append("MISSING_ACQUISITION_CLOCK")
+            continue
+        if request < exit_due_at:
+            seen_reasons.append("ACQUISITION_BEFORE_POINT_DUE")
+            continue
+        if not (exit_due_at <= request <= response <= available):
+            seen_reasons.append("CLOCK_ORDER_INVALID")
+            continue
+        if exit_deadline is not None and available > exit_deadline:
+            seen_reasons.append("AVAILABILITY_AFTER_DEADLINE")
+            continue
+        if request <= entry_at:
+            seen_reasons.append("REQUEST_NOT_AFTER_ENTRY")
+            continue
+        if str(exit_row.get("state") or "") != "OBSERVED":
+            seen_reasons.append("EXIT_NOT_OBSERVED")
+            continue
+        legal.append((available, exit_row))
+    if not legal:
+        if not seen_reasons:
+            return {"status": "ABSENT"}, "EXIT_ABSENT"
+        # Prefer the most specific observed gap for owner readout.
+        preferred = (
+            "REQUEST_NOT_AFTER_ENTRY",
+            "ACQUISITION_BEFORE_POINT_DUE",
+            "AVAILABILITY_AFTER_DEADLINE",
+            "CLOCK_ORDER_INVALID",
+            "SOURCE_PRICE_EVENT_STALE",
+            "MISSING_ACQUISITION_CLOCK",
+            "EXIT_NOT_OBSERVED",
+            "EXIT_ABSENT",
+        )
+        for code in preferred:
+            if code in seen_reasons:
+                return {"status": code}, code
+        return {"status": seen_reasons[0]}, seen_reasons[0]
+    latest_exit = max(item[0] for item in legal)
+    tied_rows = [row for available, row in legal if available == latest_exit]
+    selected = _select_cell(tied_rows, latest_exit)
+    if selected.get("status") != "OBSERVED":
+        return selected, "EXIT_NOT_OBSERVED"
+    return selected, None
+
+
+def _select_event_time_exit(
+    exit_rows: Sequence[Mapping[str, Any]],
+    *,
+    entry_at: object,
+    exit_deadline: object,
+) -> tuple[dict[str, Any], str | None]:
+    """Legacy event-time exit: known event must fall after entry within deadline."""
+
+    legal = []
+    for exit_row in exit_rows:
+        available = _parse_time(exit_row.get("first_reliable_available_at"))
+        if available is None or available <= entry_at:
+            continue
+        if exit_deadline is not None and available > exit_deadline:
+            continue
+        legal.append((available, exit_row))
+    if not legal:
+        return {"status": "ABSENT"}, "EXIT_ABSENT"
+    latest_exit = max(item[0] for item in legal)
+    tied_rows = [row for available, row in legal if available == latest_exit]
+    selected = _select_cell(tied_rows, latest_exit)
+    event_times = [
+        _parse_time(row.get("event_time")) or _parse_time(row.get("observed_at"))
+        for row in tied_rows
+    ]
+    if any(item is None for item in event_times):
+        return {"status": "MISSING_EVENT_TIME"}, "MISSING_EVENT_TIME"
+    if len(set(event_times)) != 1:
+        return {"status": "EVENT_TIME_CONFLICT"}, "EVENT_TIME_CONFLICT"
+    if entry_at is None or event_times[0] <= entry_at or selected.get("status") != "OBSERVED":
+        return {"status": "NOT_AFTER_ENTRY"}, "EVENT_NOT_AFTER_ENTRY"
+    return selected, None
 
 
 def _require_bound_schedule(binding: Sequence[Mapping[str, Any]], body: Mapping[str, Any], lateness: int) -> None:
@@ -713,6 +877,7 @@ def _cohort_view(member: Mapping[str, Any]) -> dict[str, Any]:
         "matched": bool(member.get("matched")) and not excluded,
         "target_is_observed": bool(member.get("target_is_observed")) and not excluded,
         "target": None if excluded else member.get("target"),
+        "target_exclusion": None if excluded else member.get("target_exclusion"),
         "feature_unknown": bool(member.get("feature_unknown")) and not excluded,
         "exclusion": member.get("exclusion"),
         "integrity_excluded": excluded,
@@ -798,6 +963,11 @@ def _cohort_rows(
             for identity, view in bucket.items()
             if not view.get("integrity_excluded") and len(owners.get(identity, ())) > 1
         )
+        target_exclusions: dict[str, int] = defaultdict(int)
+        for item in matched:
+            reason = item.get("target_exclusion")
+            if isinstance(reason, str) and reason and not item.get("target_is_observed"):
+                target_exclusions[reason] += 1
         rows.append(
             {
                 "view": cohort_id,
@@ -815,6 +985,7 @@ def _cohort_rows(
                 "mean_target": _mean(observed),
                 "mean_target_kind": "PRICE_RELATIVE_PROXY",
                 "exclusion_reasons": dict(sorted(exclusions.items())),
+                "target_exclusion_reasons": dict(sorted(target_exclusions.items())),
                 "independent_replication": False,
                 "shared_decision_n": shared,
                 "membership": "DESCRIPTIVE_NOT_INDEPENDENT",
@@ -1222,6 +1393,9 @@ def execute_temporal_discovery(
                         due_offset_for=lambda point, cohort=cohort, release=release: _due_late(
                             cohort, release, point
                         )[0],
+                        lateness_for=lambda point, cohort=cohort, release=release: _due_late(
+                            cohort, release, point
+                        )[1],
                     )
         hits = [
             _predicate_holds(feature_values.get(str(item["feature"])), item) for item in predicates
@@ -1230,6 +1404,10 @@ def execute_temporal_discovery(
         matched = decision_eligible and not feature_unknown and all(hit is True for hit in hits)
         target_value = None
         target_observed = False
+        target_exclusion = None
+        clock_policy = str(
+            body.get("observation_clock_policy") or OBSERVATION_CLOCK_EVENT_TIME_V1
+        )
         if in_base and decision_deadline is not None:
             entry_at = decision_deadline + timedelta(
                 seconds=int(body["entry_model"]["assumed_latency_seconds"])
@@ -1238,40 +1416,51 @@ def execute_temporal_discovery(
             exit_due, exit_late = _due_late(cohort, release, exit_point)
             exit_deadline = _deadline_for(anchor, exit_point, exit_late, due_offset=exit_due)
             exit_rows = grouped.get((cohort, release, mint, exit_point, PRICE), ())
-            legal = []
-            for exit_row in exit_rows:
-                available = _parse_time(exit_row.get("first_reliable_available_at"))
-                if available is None or available <= entry_at:
-                    continue
-                if exit_deadline is not None and available > exit_deadline:
-                    continue
-                legal.append((available, exit_row))
-            if legal:
-                latest_exit = max(item[0] for item in legal)
-                tied_rows = [row for available, row in legal if available == latest_exit]
-                selected = _select_cell(tied_rows, latest_exit)
-                event_times = [
-                    _parse_time(row.get("event_time")) or _parse_time(row.get("observed_at"))
-                    for row in tied_rows
-                ]
-                if any(item is None for item in event_times):
-                    selected = {"status": "MISSING_EVENT_TIME"}
-                elif len(set(event_times)) != 1:
-                    selected = {"status": "EVENT_TIME_CONFLICT"}
-                elif entry_at is None or event_times[0] <= entry_at or selected.get("status") != "OBSERVED":
-                    selected = {"status": "NOT_AFTER_ENTRY"}
-                reference = _cell(
-                    grouped,
-                    (cohort, release, mint, str(body["target"]["reference_point"]), PRICE),
-                    decision_deadline,
+            if clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1:
+                exit_due_at = _due_moment(anchor, exit_due)
+                selected, target_exclusion = _select_snapshot_exit(
+                    exit_rows,
+                    entry_at=entry_at,
+                    exit_due_at=exit_due_at,
+                    exit_deadline=exit_deadline,
                 )
-                if (
-                    selected.get("status") == "OBSERVED"
-                    and reference.get("status") == "OBSERVED"
-                    and float(reference["value"]) > 0
-                ):
-                    target_value = float(selected["value"]) / float(reference["value"]) - 1.0
-                    target_observed = True
+            else:
+                selected, target_exclusion = _select_event_time_exit(
+                    exit_rows,
+                    entry_at=entry_at,
+                    exit_deadline=exit_deadline,
+                )
+            reference_point = str(body["target"]["reference_point"])
+            reference_due, reference_late = _due_late(cohort, release, reference_point)
+            reference_deadline = _deadline_for(
+                anchor, reference_point, reference_late, due_offset=reference_due
+            )
+            # Reference must be available by both decision cutoff and own point deadline.
+            if (
+                reference_deadline is not None
+                and decision_deadline is not None
+                and reference_deadline < decision_deadline
+            ):
+                ref_cutoff = reference_deadline
+            else:
+                ref_cutoff = decision_deadline
+            reference = _cell(
+                grouped,
+                (cohort, release, mint, reference_point, PRICE),
+                ref_cutoff,
+            )
+            if (
+                selected.get("status") == "OBSERVED"
+                and reference.get("status") == "OBSERVED"
+                and float(reference["value"]) > 0
+            ):
+                target_value = float(selected["value"]) / float(reference["value"]) - 1.0
+                target_observed = True
+                target_exclusion = None
+            elif selected.get("status") == "OBSERVED" and reference.get("status") != "OBSERVED":
+                target_exclusion = "REFERENCE_NOT_AVAILABLE"
+            elif matched and target_exclusion is None:
+                target_exclusion = "TARGET_UNOBSERVED"
         members.append(
             {
                 "identity": identity,
@@ -1282,6 +1471,7 @@ def execute_temporal_discovery(
                 "matched": matched,
                 "target": target_value,
                 "target_is_observed": target_observed,
+                "target_exclusion": target_exclusion if matched and not target_observed else None,
                 "block": block,
                 "exclusion": exclusion,
             }
@@ -1341,6 +1531,16 @@ def execute_temporal_discovery(
     missing_mean_to_zero = None
     if missing_target and observed_values:
         missing_mean_to_zero = -sum(observed_values) / len(missing_target)
+    clock_policy = str(body.get("observation_clock_policy") or OBSERVATION_CLOCK_EVENT_TIME_V1)
+    target_exclusion_pooled: dict[str, int] = defaultdict(int)
+    for item in missing_target:
+        reason = item.get("target_exclusion")
+        if isinstance(reason, str) and reason:
+            target_exclusion_pooled[reason] += 1
+    by_cohort_rows = _cohort_rows(
+        cohort_membership,
+        list(dict.fromkeys(cohort_ids)),
+    )
     summary = {
         "contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
         "calculation_version": TEMPORAL_CALCULATION_VERSION,
@@ -1349,6 +1549,7 @@ def execute_temporal_discovery(
         "spec_sha256": bound["spec_sha256"],
         "population": "BASE_X",
         "search_tier": bound["search_tier"],
+        "observation_clock_policy": clock_policy,
         "target_kind": "PRICE_RELATIVE_PROXY",
         "mean_target_kind": "PRICE_RELATIVE_PROXY",
         "mean_target_units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
@@ -1357,6 +1558,7 @@ def execute_temporal_discovery(
         "engine_emits_alpha": False,
         "eligibility_uses_target": False,
         "missing_is_not_zero": True,
+        "source_price_event_time": "UNKNOWN",
         "population_n": len(base_members),
         "base_x_n": len(base_members),
         "decision_eligible_n": len(decision_members),
@@ -1410,10 +1612,7 @@ def execute_temporal_discovery(
             }
             for key, values in sorted(by_block.items())
         ],
-        "by_cohort": _cohort_rows(
-            cohort_membership,
-            list(dict.fromkeys(cohort_ids)),
-        ),
+        "by_cohort": by_cohort_rows,
         "cohort_slices_are_descriptive": True,
         "cohort_independent_replication": False,
         "cost": costs,
@@ -1432,12 +1631,20 @@ def execute_temporal_discovery(
             (key, sum(1 for item in members if item["exclusion"] == key))
             for key in {item["exclusion"] for item in members if item["exclusion"]}
         )),
+        "target_exclusion_reasons": {
+            "pooled": dict(sorted(target_exclusion_pooled.items())),
+            "by_cohort": {
+                str(row["cohort_id"]): dict(row.get("target_exclusion_reasons") or {})
+                for row in by_cohort_rows
+            },
+        },
         "required_cohorts": cohort_ids,
         "experiment_recipe": {
             "capability_id": TEMPORAL_CAPABILITY_ID,
             "schema": TEMPORAL_SCHEMA,
             "schema_version": TEMPORAL_SCHEMA_VERSION,
             "scientific_identity": bound["spec_sha256"],
+            "observation_clock_policy": clock_policy,
             "target_kind": "PRICE_RELATIVE_PROXY",
             "cost_label": "ESTIMATED_NET_PROXY" if costs["status"] == "EVALUATED" else "ABSENT",
             "labeled_net_return": False,
@@ -1449,6 +1656,7 @@ def execute_temporal_discovery(
             "NO_NET_RETURN",
             "NO_INTRABAR_STOP",
             "NO_CAUSAL_IDENTIFICATION",
+            "NO_SOURCE_PRICE_EVENT_TIME",
         ],
     }
     return {
