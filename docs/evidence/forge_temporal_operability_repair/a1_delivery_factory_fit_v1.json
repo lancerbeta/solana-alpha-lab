@@ -4,8 +4,8 @@
   "review_id": "FORGE-TEMPORAL-OPERABILITY-REPAIR-FACTORY-FIT-001",
   "as_of": "2026-09-28",
   "task_id": "FORGE_TEMPORAL_OPERABILITY_REPAIR_V1",
-  "reviewed_bindings_sha256": "2702c1f7b914fc1cd8772018ebec35a0ec110996c34f1a01abfbd8a4cd24ce78",
-  "reviewed_inventory_sha256": "9f84878a2d21ddae15608d83a41143fabe5bd45554c38d801546e5175a217d52",
+  "reviewed_bindings_sha256": "e5341d50e6db86e234e55e8a1d8afce389026bb15eaa549b3c0204484eca1192",
+  "reviewed_inventory_sha256": "c63a025a888bea285ec035f6ead49e7baa55afec520d73c716154fda2064f2cc",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
