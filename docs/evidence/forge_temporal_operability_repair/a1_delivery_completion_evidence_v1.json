@@ -50,14 +50,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "eb97e814f2ce484f9cee8b9c6e48de07b4e86d601d2b49085424d28283eda60d",
+    "sha256": "24289a48beb44b9d5aef4f63ca0253e835c294a4614e94a4d304bea4cf60d4ba",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_INPUT_FITNESS_AND_DISPOSITION_BOUND_CLOSE_MATRIX",
     "independent_review": {
       "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "cafc698fd6ea0ca09fd2fc95a7cff890e4d9557c6879d234b051af5d41061251",
+      "sha256": "e02659c6f8794d44d76ad50ba5a6c4a5d27da77654dca327253d47a69c4d6c03",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
