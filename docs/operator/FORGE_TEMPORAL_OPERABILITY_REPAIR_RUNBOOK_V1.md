@@ -59,13 +59,19 @@ looks do **not** authorize scientific `SEARCH_EXHAUSTED` / `READY_TO_FREEZE`
 (including the compound-inapplicable shortcut). Owner recovery: fix metadata /
 occurrence lineage, then re-query — do not treat the stop as family kill.
 Census rows that never enter the eligible population (e.g. `NOT_X_ELIGIBLE`)
-must not cancel that technical stop. Lineage blockers on decision / feature /
-reference stay visible in exclusion and target pools.
+must not cancel that technical stop. Predicate fitness (X300 / decision /
+required features) and matched-outcome fitness (reference / exit) are separate:
+feature lineage that leaves every eligible member `feature_unknown` is a
+technical stop; exit/reference lineage on **unmatched** members must not turn a
+valid false-predicate zero-match into `TECHNICAL_STOP`. Matched-scope outcome
+lineage remains visible in `target_exclusion_reasons` and can still stop.
 
 Repair `close` takes the owner-final from `effective_control_terminal` +
 `resolve_next_action` (final session terminal wins over primary critic). Close
-before a completed repair execution (awaiting critic / classification /
-runner-up) fails with `REPAIR_EXECUTION_NOT_COMPLETE` and writes nothing.
+requires a completed cycle **bound to this disposition** and new vs the parent
+receipt. Apply → immediate close on parent `NO_WORTHY` / foreign marker /
+awaiting critic / classification / runner-up fails with
+`REPAIR_EXECUTION_NOT_COMPLETE` and writes nothing (`AUTHORIZED` retained).
 
 ## Repair continuation — owner commands
 
@@ -89,10 +95,15 @@ runner-up) fails with `REPAIR_EXECUTION_NOT_COMPLETE` and writes nothing.
 | `runner_up_failover_used` | true when the surviving candidate is the runner-up; survivor id is `final_survivor_candidate_id` on the session receipt |
 
 Close readiness: `session_state=SYNTHESIS_COMPLETE` **and** a non-empty
-`final_session_terminal` (PASS/CASE_A/KILL/NO_WORTHY…). Pending
-`AWAITING_CLASSIFICATION` / `RUNNER_UP_AWAITING_CRITIC` / revision pause must
-**not** be closed — CLI returns `REPAIR_EXECUTION_NOT_COMPLETE` with
-`FINISH_CRITIC_OR_CLASSIFICATION_OR_RUNNER_UP_THEN_CLOSE`.
+`final_session_terminal` (PASS/CASE_A/KILL/NO_WORTHY…) **and**
+`repair_continuation_disposition_sha256` equal to the AUTHORIZED disposition
+**and** `session_receipt_sha256` different from the disposition's parent
+`terminal_receipt_sha256`. Apply alone (parent DONE still visible) must not
+close. Pending `AWAITING_CLASSIFICATION` / `RUNNER_UP_AWAITING_CRITIC` /
+revision pause must not close either — CLI returns
+`REPAIR_EXECUTION_NOT_COMPLETE` with
+`COMPLETE_DISPOSITION_BOUND_REPAIR_EXECUTION_THEN_CLOSE` (disposition stays
+`AUTHORIZED`; do not rerun apply).
 
 ### 1) Build draft (no-write)
 
@@ -180,7 +191,7 @@ Draft/apply failures also print JSON on stdout with `owner_status=BLOCKED`
 | `SPENT_BUDGET_INVALID` | `PASS_SPENT_LOOKS_OR_ENSURE_DISCOVERY_JOURNAL` |
 | `SPENT_BUDGET_MISMATCH` | `ALIGN_DRAFT_SPENT_LOOKS_TO_JOURNAL` (or `…_TO_PARENT` from plan JSON when store has no looks) |
 | `DISPOSITION_ALREADY_CLOSED` | `STOP_CONTINUATION_ALREADY_CONSUMED` |
-| `REPAIR_EXECUTION_NOT_COMPLETE` | `FINISH_CRITIC_OR_CLASSIFICATION_OR_RUNNER_UP_THEN_CLOSE` — disposition stays AUTHORIZED; do not rerun apply |
+| `REPAIR_EXECUTION_NOT_COMPLETE` | `COMPLETE_DISPOSITION_BOUND_REPAIR_EXECUTION_THEN_CLOSE` — finish pending critic/classification/runner-up **or** run a new repair freeze/finalize bound to this disposition (apply alone / parent DONE is not enough); disposition stays AUTHORIZED; do not rerun apply |
 | `COMPETING_ACTIVE_DISPOSITION` / `COMPETING_DISPOSITION_APPLIED` | `CLOSE_COMPETING_DISPOSITION_THEN_STOP` — plan or apply-blocked JSON `disposition.disposition_sha256` (and `owner_readout.competing_disposition_sha256` on apply) is the competitor to `repair-continuation-close` |
 | `REPAIR_CONTINUATION_CONFIRM_REQUIRED` | `ADD_CONFIRM_APPEND_ONLY_WITH_OWNER_AUTHORITY` |
 

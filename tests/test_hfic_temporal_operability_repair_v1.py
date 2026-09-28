@@ -2680,10 +2680,10 @@ class FinishOutcomeMatrixTests(unittest.TestCase):
         )
         self.assertFalse(progress["search_exhausted_allowed"])
 
-    def test_reference_lineage_absence_visible_on_target_exclusions(self) -> None:
-        # Decision observed; reference Y3600 stripped of lineage (same cell as
-        # decision in this fixture) — use exit-only strip + separate reference
-        # via a second mint path is heavy; strip Y3600 and keep X300/Y7200.
+    def test_reference_lineage_absence_blocks_via_predicate_fitness(self) -> None:
+        # Decision cell is also the reference point in this fixture: stripping
+        # Y3600 lineage fails decision eligibility (predicate path), not matched
+        # outcome publishing.
         legal = SnapshotNegativeControlsTests()._rows_legal()
         rows = []
         for row in legal:
@@ -2700,9 +2700,120 @@ class FinishOutcomeMatrixTests(unittest.TestCase):
         summary = execute_temporal_discovery(
             [_census()], rows, _spec_snapshot(query_id="mx-ref"), _binding_mixed()
         )["summary"]
+        self.assertEqual(int(summary.get("decision_eligible_n") or 0), 0)
+        self.assertEqual(int(summary.get("matched_n") or 0), 0)
+        self.assertIn(
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+            summary.get("exclusion_reasons") or {},
+        )
+        self.assertEqual(
+            (summary.get("technical_stop") or {}).get("reason_code"),
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+        )
+        # Unmatched outcome lineage is not published into target exclusions.
+        pooled = (summary.get("target_exclusion_reasons") or {}).get("pooled") or {}
+        self.assertNotIn("SNAPSHOT_LINEAGE_UNINTERPRETABLE", pooled)
+
+    def test_exit_lineage_on_matched_scope_is_technical_stop(self) -> None:
+        legal = SnapshotNegativeControlsTests()._rows_legal()
+        rows = []
+        for row in legal:
+            body = dict(row)
+            if body["point_id"] == "Y7200":
+                for key in (
+                    "observation_clock_policy",
+                    "call_occurrence_id",
+                    "request_sha256",
+                    "primitive_id",
+                ):
+                    body.pop(key, None)
+            rows.append(body)
+        summary = execute_temporal_discovery(
+            [_census()], rows, _spec_snapshot(query_id="mx-exit-matched"), _binding_mixed()
+        )["summary"]
+        self.assertEqual(int(summary.get("matched_n") or 0), 1)
         pooled = (summary.get("target_exclusion_reasons") or {}).get("pooled") or {}
         self.assertIn("SNAPSHOT_LINEAGE_UNINTERPRETABLE", pooled)
-        self.assertIsNotNone(summary.get("technical_stop"))
+        self.assertEqual(
+            (summary.get("technical_stop") or {}).get("reason_code"),
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+        )
+
+    def test_false_predicate_with_unmatched_exit_lineage_stays_scientific(self) -> None:
+        from solana_alpha_lab.factory.hfic_temporal_discovery import assess_tier_progress
+
+        legal = SnapshotNegativeControlsTests()._rows_legal()
+        rows = []
+        for row in legal:
+            body = dict(row)
+            if body["point_id"] == "Y7200":
+                for key in (
+                    "observation_clock_policy",
+                    "call_occurrence_id",
+                    "request_sha256",
+                    "primitive_id",
+                ):
+                    body.pop(key, None)
+            rows.append(body)
+        summary = execute_temporal_discovery(
+            [_census()],
+            rows,
+            _spec_snapshot(
+                query_id="mx-false-exit",
+                all=[{"feature": "mark", "op": "gte", "value": 9.0}],
+            ),
+            _binding_mixed(),
+        )["summary"]
+        self.assertEqual(int(summary.get("matched_n") or 0), 0)
+        self.assertIsNone(summary.get("technical_stop"))
+        pooled = (summary.get("target_exclusion_reasons") or {}).get("pooled") or {}
+        self.assertEqual(pooled, {})
+        looks = [
+            {
+                "new_look": True,
+                "search_tier": "SIMPLE_SCREEN",
+                "look_class": "MAIN",
+                "result": summary,
+            },
+            {
+                "new_look": True,
+                "search_tier": "COMPOUND_SCREEN",
+                "look_class": "MAIN",
+                "result": summary,
+            },
+        ]
+        progress = assess_tier_progress(
+            looks, freeze_worthy=False, compound_applicable=True
+        )
+        self.assertNotEqual(progress.get("action"), "STOP_TECHNICAL_INPUT")
+        self.assertTrue(progress.get("search_exhausted_allowed"))
+
+    def test_x300_lineage_absence_blocks_population(self) -> None:
+        legal = SnapshotNegativeControlsTests()._rows_legal()
+        rows = []
+        for row in legal:
+            body = dict(row)
+            if body["point_id"] == "X300":
+                for key in (
+                    "observation_clock_policy",
+                    "call_occurrence_id",
+                    "request_sha256",
+                    "primitive_id",
+                ):
+                    body.pop(key, None)
+            rows.append(body)
+        summary = execute_temporal_discovery(
+            [_census()], rows, _spec_snapshot(query_id="mx-x300"), _binding_mixed()
+        )["summary"]
+        self.assertEqual(int(summary.get("population_n") or 0), 0)
+        self.assertEqual(
+            (summary.get("technical_stop") or {}).get("reason_code"),
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+        )
+        self.assertIn(
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+            summary.get("exclusion_reasons") or {},
+        )
 
     def test_valid_zero_match_remains_scientific(self) -> None:
         from solana_alpha_lab.factory.hfic_temporal_discovery import assess_tier_progress
@@ -2785,7 +2896,9 @@ class FinishOutcomeMatrixTests(unittest.TestCase):
         self.assertEqual(no_worthy, ("NO_WORTHY_HYPOTHESIS", ACTION_SEARCH_EXHAUSTED))
 
     def test_feature_lineage_absence_preserves_reason(self) -> None:
-        """Decision observed; feature cell lineage missing → visible exclusion."""
+        """Decision observed; feature cell lineage missing → technical stop."""
+
+        from solana_alpha_lab.factory.hfic_temporal_discovery import assess_tier_progress
 
         legal = SnapshotNegativeControlsTests()._rows_legal()
         # Feature-only Y1800 row with stripped lineage; X300/Y3600/Y7200 stay legal.
@@ -2837,6 +2950,58 @@ class FinishOutcomeMatrixTests(unittest.TestCase):
         self.assertGreaterEqual(int(summary.get("population_n") or 0), 1)
         self.assertGreaterEqual(int(summary.get("decision_eligible_n") or 0), 1)
         self.assertEqual(int(summary.get("matched_n") or 0), 0)
+        self.assertEqual(int(summary.get("feature_unknown_n") or 0), 1)
+        self.assertEqual(
+            (summary.get("technical_stop") or {}).get("reason_code"),
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+        )
+        looks = [
+            {
+                "new_look": True,
+                "search_tier": "SIMPLE_SCREEN",
+                "look_class": "MAIN",
+                "result": summary,
+            },
+            {
+                "new_look": True,
+                "search_tier": "COMPOUND_SCREEN",
+                "look_class": "MAIN",
+                "result": summary,
+            },
+        ]
+        progress = assess_tier_progress(
+            looks, freeze_worthy=False, compound_applicable=True
+        )
+        self.assertEqual(progress.get("action"), "STOP_TECHNICAL_INPUT")
+        self.assertFalse(progress.get("search_exhausted_allowed"))
+        # Adding NOT_X_ELIGIBLE census rows must not cancel the eligible stop.
+        mixed = execute_temporal_discovery(
+            [_census(), {**_census("mint-b"), "candidate_state": "NOT_ELIGIBLE"}],
+            rows,
+            spec,
+            binding,
+        )["summary"]
+        self.assertEqual(
+            (mixed.get("technical_stop") or {}).get("reason_code"),
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+        )
+        self.assertIn("NOT_X_ELIGIBLE", mixed.get("exclusion_reasons") or {})
+        self.assertEqual(int(mixed.get("decision_eligible_n") or 0), 1)
+        # Companion non-eligible scientific exclusions must not cancel the
+        # eligible feature-unknown technical stop either.
+        companion = dict(summary)
+        companion["exclusion_reasons"] = {
+            **dict(summary.get("exclusion_reasons") or {}),
+            "PIT_LIQUIDITY_MISSING": 1,
+        }
+        from solana_alpha_lab.factory.hfic_temporal_discovery import (
+            snapshot_input_technical_stop,
+        )
+
+        self.assertEqual(
+            (snapshot_input_technical_stop(companion) or {}).get("reason_code"),
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+        )
 
     def test_repair_completion_refuses_incomplete_states(self) -> None:
         from solana_alpha_lab.factory.hfic_repair_continuation import (
@@ -2996,6 +3161,181 @@ class FinishOutcomeMatrixTests(unittest.TestCase):
                 "AUTHORIZED",
             )
             self.assertEqual(len(before), len(after))
+
+    def test_apply_immediate_close_refuses_parent_done_absorption(self) -> None:
+        """AUTHORIZED alone must not rename parent NO_WORTHY into repair completion."""
+
+        import hashlib
+        import json as _json
+
+        from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+        from solana_alpha_lab.factory.hfic_clock import FrozenClock
+        from solana_alpha_lab.factory.hfic_identity import (
+            assign_portfolio_ids,
+            normalize_text,
+        )
+        from solana_alpha_lab.factory.hfic_preflight import persist_forge_context_packet
+        from solana_alpha_lab.factory.hfic_repair_continuation import (
+            RepairContinuationError,
+        )
+        from solana_alpha_lab.factory.hfic_session import (
+            freeze_draft,
+            persist_no_worthy_session,
+            show_session,
+        )
+        from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
+        from solana_alpha_lab.factory.run_passport import (
+            canonical_json_bytes,
+            canonical_sha256,
+        )
+
+        git = repository_git_snapshot(ROOT)
+        draft = _json.loads(
+            (ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        focus = hashlib.sha256(normalize_text("AUTO").encode("utf-8")).hexdigest()
+        started = datetime(2026, 8, 27, 12, 0, 0, tzinfo=UTC)
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ResearchStore(data_root)
+            market = "11" * 32
+            ctx = persist_forge_context_packet(
+                data_root,
+                {
+                    "schema": "smial.forge-context-packet",
+                    "owner_focus": "AUTO",
+                    "evidence_epoch_sha256": market,
+                    "market_evidence_epoch_sha256": market,
+                },
+                store=store,
+                repo_root=ROOT,
+                clock=FrozenClock(started),
+            )
+            receipt = {
+                "receipt_id": "HFIC-PREFLIGHT-ABSORB-001",
+                "evidence_epoch_sha256": market,
+                "market_evidence_epoch_sha256": market,
+                "focus_key_sha256": focus,
+                "search_key_sha256": "33" * 32,
+                "owner_focus": "AUTO",
+                "session_started_at": "2026-08-27T12:00:00Z",
+                "live_git_head": git.head_sha.lower(),
+                "git_composite_sha256": git.composite_sha256,
+                "forge_context_packet_sha256": ctx,
+                "store_inventory_digest": "ee" * 32,
+            }
+            frozen = freeze_draft(draft, preflight_receipt=receipt)
+            persist_no_worthy_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+                preflight_receipt=receipt,
+            )
+            shown = show_session(store, str(frozen["session_id"]), repo_root=ROOT)
+            self.assertEqual(shown.get("critic_terminal"), "NO_WORTHY_HYPOTHESIS")
+            self.assertIsNone(shown.get("repair_continuation_disposition_sha256"))
+            parent_run = {
+                "schema": "smial.forge-run-receipt",
+                "schema_version": "1.0",
+                "run_id": "FORGE-RUN-ABSORB-PARENT",
+                "run_identity_sha256": "ab" * 32,
+                "owner_focus": "AUTO",
+                "owner_class": "SEARCH",
+                "next_action": "RETURN_EXISTING",
+                "owner_final": "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
+                "session_id": shown["session_id"],
+                "scientific_slot_sha256": shown["scientific_slot_sha256"],
+                "market_evidence_epoch_sha256": market,
+                "stages": [],
+                "writes": {"research_store": 0},
+            }
+            parent_run["receipt_sha256"] = canonical_sha256(parent_run)
+            body = canonical_json_bytes(parent_run).decode("utf-8")
+            artifact = {
+                "research_artifact_id": "HFIC-ART-FORGE-RUN-ABSORB",
+                "hfic_protocol": "HFIC-V1.2",
+                "artifact_kind": "FORGE_RUN_RECEIPT",
+                "payload_canonical": body,
+                "payload_sha256": parent_run["receipt_sha256"],
+            }
+            payload_json = json.dumps(
+                artifact, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+            )
+            store.append(
+                [
+                    ResearchEvent(
+                        record_id="HFIC-ART-FORGE-RUN-ABSORB",
+                        record_kind=RecordKind.RESEARCH_ARTIFACT,
+                        entity_id="HFIC-ART-FORGE-RUN-ABSORB",
+                        hypothesis_version_id=None,
+                        run_id=parent_run["run_id"],
+                        transaction_id="RESEARCH-TXN-ABSORB-PARENT",
+                        effective_at=started,
+                        first_reliable_available_at=started,
+                        supersedes_record_id=None,
+                        payload_json=payload_json,
+                        payload_sha256=hashlib.sha256(
+                            payload_json.encode("utf-8")
+                        ).hexdigest(),
+                        schema_version="1.0",
+                        producer_capability_id=REPAIR_CAPABILITY_ID,
+                        producer_git_sha=git.head_sha,
+                        created_at=started,
+                    )
+                ],
+                transaction_id="RESEARCH-TXN-ABSORB-PARENT",
+            )
+            repair_draft = {
+                "parent_run_id": parent_run["run_id"],
+                "parent_session_id": shown["session_id"],
+                "scientific_slot_sha256": shown["scientific_slot_sha256"],
+                "terminal_receipt_sha256": shown["session_receipt_sha256"],
+                "journal_scope": "aa" * 32,
+                "technical_gap_code": "PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP",
+                "repair_capability_id": REPAIR_CAPABILITY_ID,
+                "allowed_look_ids": [],
+                "spent_main_looks": 2,
+                "spent_adaptive_looks": 0,
+                "spent_preview_looks": 0,
+                "owner_authorization_id": "OWNER-AUTH-ABSORB",
+                "parent_terminal": "NO_WORTHY_HYPOTHESIS",
+            }
+            parent = {
+                "session_id": shown["session_id"],
+                "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+                "terminal_receipt_sha256": shown["session_receipt_sha256"],
+                "selected_candidate_id": None,
+                "scientific_slot_sha256": shown["scientific_slot_sha256"],
+                "run_id": parent_run["run_id"],
+            }
+            applied = apply_repair_continuation(
+                store, repair_draft, parent_session=parent, git_sha=git.head_sha
+            )
+            before_n = len(list(store.iter_committed_records()))
+            with self.assertRaises(RepairContinuationError) as raised:
+                close_repair_continuation(
+                    store,
+                    applied["disposition"]["disposition_sha256"],
+                    git_sha=git.head_sha,
+                )
+            self.assertEqual(raised.exception.code, "REPAIR_EXECUTION_NOT_COMPLETE")
+            after_n = len(list(store.iter_committed_records()))
+            self.assertEqual(after_n - before_n, 0)
+            listed = list_repair_continuation_dispositions(store)
+            self.assertEqual(
+                next(
+                    item
+                    for item in listed
+                    if item.get("disposition_sha256")
+                    == applied["disposition"]["disposition_sha256"]
+                ).get("status"),
+                "AUTHORIZED",
+            )
 
 
 class OwnerDataScenarioTechnicalAndScientificTests(unittest.TestCase):
@@ -3230,6 +3570,11 @@ class OwnerContinuationRunnerUpPassTests(unittest.TestCase):
             applied = apply_repair_continuation(
                 store, repair_draft, parent_session=parent, git_sha=git.head_sha
             )
+            repair_disp = applied["disposition"]["disposition_sha256"]
+            frozen = {
+                **frozen,
+                "repair_continuation_disposition_sha256": repair_disp,
+            }
             pending = finalize_session(
                 frozen,
                 critic_result_from_packet_only(
@@ -3242,12 +3587,15 @@ class OwnerContinuationRunnerUpPassTests(unittest.TestCase):
             with self.assertRaises(RepairContinuationError) as raised:
                 close_repair_continuation(
                     store,
-                    applied["disposition"]["disposition_sha256"],
+                    repair_disp,
                     git_sha=git.head_sha,
                 )
             self.assertEqual(raised.exception.code, "REPAIR_EXECUTION_NOT_COMPLETE")
             waiting = finalize_session(
-                pending,
+                {
+                    **pending,
+                    "repair_continuation_disposition_sha256": repair_disp,
+                },
                 critic_result_from_packet_only(
                     pending["critic_input_packet"], "PASS_TO_CLASSIFICATION"
                 ),
@@ -3261,7 +3609,10 @@ class OwnerContinuationRunnerUpPassTests(unittest.TestCase):
             )
             packet["hypothesis_definition_sha256"] = frozen["runner_up_definition_sha256"]
             done = apply_classification(
-                waiting,
+                {
+                    **waiting,
+                    "repair_continuation_disposition_sha256": repair_disp,
+                },
                 packet,
                 store=store,
                 repo_root=ROOT,
@@ -3270,6 +3621,10 @@ class OwnerContinuationRunnerUpPassTests(unittest.TestCase):
             self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
             bundle = load_session_bundle(store, frozen["session_id"])
             assert bundle is not None
+            self.assertEqual(
+                bundle.get("repair_continuation_disposition_sha256"),
+                repair_disp,
+            )
             self.assertEqual(bundle.get("critic_terminal"), "KILL_DATA_INFEASIBLE")
             self.assertEqual(
                 effective_control_terminal(bundle),
@@ -3288,7 +3643,7 @@ class OwnerContinuationRunnerUpPassTests(unittest.TestCase):
             self.assertNotEqual(survivor, frozen["selected_candidate_id"])
             closed = close_repair_continuation(
                 store,
-                applied["disposition"]["disposition_sha256"],
+                repair_disp,
                 git_sha=git.head_sha,
             )
             self.assertEqual(closed["status"], "CLOSED")
@@ -3297,7 +3652,7 @@ class OwnerContinuationRunnerUpPassTests(unittest.TestCase):
                 disposition={
                     **applied["disposition"],
                     "status": "CLOSED",
-                    "disposition_sha256": applied["disposition"]["disposition_sha256"],
+                    "disposition_sha256": repair_disp,
                 },
                 git_sha=git.head_sha,
                 now=now,

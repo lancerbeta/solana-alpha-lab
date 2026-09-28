@@ -640,6 +640,44 @@ def _repair_completion_from_session(
     return terminal, owner_final
 
 
+def _disposition_bound_repair_completion(
+    bundle: Mapping[str, Any],
+    disposition: Mapping[str, Any],
+) -> tuple[str, str] | None:
+    """Require a completed cycle bound to this disposition and new vs parent.
+
+    Parent DONE without a repair marker, a foreign disposition marker, or a
+    still-pending repair cycle must not authorize close. Uses existing session
+    identities (disposition stamp + terminal receipt) — no new permission surface.
+    """
+
+    completion = _repair_completion_from_session(bundle)
+    if completion is None:
+        return None
+    expected = disposition.get("disposition_sha256")
+    if not (isinstance(expected, str) and expected):
+        return None
+    bound = bundle.get("repair_continuation_disposition_sha256")
+    if bound != expected:
+        return None
+    parent_receipt = disposition.get("terminal_receipt_sha256")
+    session_receipt = bundle.get("session_receipt_sha256") or bundle.get(
+        "terminal_receipt_sha256"
+    )
+    if not (
+        isinstance(parent_receipt, str)
+        and parent_receipt
+        and isinstance(session_receipt, str)
+        and session_receipt
+    ):
+        # Fail closed: missing either identity cannot prove a new execution.
+        return None
+    if session_receipt == parent_receipt:
+        # Same receipt as the authorized parent — no new repair execution yet.
+        return None
+    return completion
+
+
 def _persist_repair_completion_forge_run(
     store: Any,
     *,
@@ -709,7 +747,7 @@ def _persist_repair_completion_forge_run(
         == disposition.get("disposition_sha256")
     ):
         return dict(existing_repair)
-    completion = _repair_completion_from_session(bundle)
+    completion = _disposition_bound_repair_completion(bundle, disposition)
     if completion is None:
         return None
     terminal, owner_final = completion
@@ -1294,13 +1332,17 @@ def close_repair_continuation(
     if target.get("status") != "AUTHORIZED":
         raise RepairContinuationError("DISPOSITION_NOT_AUTHORIZED")
     # Refuse close until this disposition's repair session has a canonical
-    # owner-final terminal. Parent DONE / critic-only / intermediate states
-    # are not a completion of the authorized continuation.
+    # owner-final terminal bound to the disposition and new relative to the
+    # parent receipt. Parent DONE / foreign marker / critic-only / intermediate
+    # states are not a completion of the authorized continuation.
     from solana_alpha_lab.factory.hfic_session import load_session_bundle
 
     session_id = str(target.get("parent_session_id") or "")
     bundle = load_session_bundle(store, session_id, read_mode=True) if session_id else None
-    if not isinstance(bundle, Mapping) or _repair_completion_from_session(bundle) is None:
+    if (
+        not isinstance(bundle, Mapping)
+        or _disposition_bound_repair_completion(bundle, target) is None
+    ):
         raise RepairContinuationError("REPAIR_EXECUTION_NOT_COMPLETE")
     closed = dict(target)
     closed["status"] = "CLOSED"

@@ -7738,9 +7738,15 @@ def finalize_session(
     repair_disp = None
     if isinstance(existing, Mapping):
         repair_disp = existing.get("repair_continuation_disposition_sha256")
+    if not (isinstance(repair_disp, str) and repair_disp) and isinstance(
+        frozen, Mapping
+    ):
+        repair_disp = frozen.get("repair_continuation_disposition_sha256")
     if isinstance(repair_disp, str) and repair_disp:
         complete_cycle["repair_continuation_disposition_sha256"] = repair_disp
-        complete_cycle["parent_cycle_seq"] = int(existing.get("hfic_cycle_seq") or 0)
+        complete_cycle["parent_cycle_seq"] = int(
+            (existing or {}).get("hfic_cycle_seq") or 0
+        )
     complete_suffix = "COMPLETE"
     receipt_artifact_id = f"HFIC-ART-SESSION-RECEIPT-{session_id}"
     if isinstance(repair_disp, str) and repair_disp:

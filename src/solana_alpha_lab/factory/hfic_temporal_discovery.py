@@ -1405,8 +1405,16 @@ def technical_stop_record(code: str) -> dict[str, Any]:
 def snapshot_input_technical_stop(summary: Mapping[str, Any]) -> dict[str, Any] | None:
     """Recoverable metadata/data stop when snapshot input is wholly uninterpretable.
 
+    Predicate fitness and matched-outcome fitness are separate:
+
+    - Required cells for forming population / evaluating predicates (X300,
+      decision, features) decide whether the eligible scope is interpretable.
+    - Outcome cells (reference/exit) decide fitness only for the matched scope.
+      Unmatched exit/reference lineage must not convert a valid zero-match into
+      a technical stop.
+
     Partial lineage misses stay as exclusions. Interpretable zero-match
-    (population formed; scientific target gaps) is not a technical stop.
+    (population formed; predicates evaluated false) is not a technical stop.
     Excluded census members (e.g. NOT_X_ELIGIBLE) do not decide fitness of the
     eligible scientific scope.
     """
@@ -1448,25 +1456,38 @@ def snapshot_input_technical_stop(summary: Mapping[str, Any]) -> dict[str, Any] 
     }
     population_n = int(summary.get("population_n") or 0)
     decision_eligible_n = int(summary.get("decision_eligible_n") or 0)
+    matched_n = int(summary.get("matched_n") or 0)
+    feature_unknown_n = int(summary.get("feature_unknown_n") or 0)
     if population_n == 0:
         if lineage_membership and not other_membership:
             primary = sorted(lineage_membership)[0]
             return technical_stop_record(primary)
         return None
-    # Base population formed but no decision-eligible scientific path: every
-    # fitness failure among eligible attempts is lineage/metadata, not a
-    # scientific empty match.
+    # Predicate fitness: base population formed but no decision-eligible path.
+    # Every fitness failure among eligible attempts is lineage/metadata.
+    if decision_eligible_n == 0:
+        if lineage_membership and not other_membership:
+            primary = sorted(lineage_membership)[0]
+            return technical_stop_record(primary)
+        return None
+    # Predicate fitness: every decision-eligible member has uninterpretable
+    # required feature cells (feature_unknown), so predicates cannot be judged.
+    # Companion non-eligible membership codes must not cancel this stop — only
+    # the eligible feature-unknown bag decides predicate interpretability.
     if (
-        decision_eligible_n == 0
+        matched_n == 0
+        and feature_unknown_n >= decision_eligible_n
         and lineage_membership
-        and not other_membership
-        and not other_targets
     ):
         primary = sorted(lineage_membership)[0]
         return technical_stop_record(primary)
-    # Population formed but every missing target is a lineage blocker and no
-    # scientific target gap is named — treat as uninterpretable input scope.
-    if lineage_targets and not other_targets and not other_membership:
+    # Valid zero-match / partial cohort: predicates were interpretable enough
+    # to leave unmatched members. Do not consult unmatched outcome lineage.
+    if matched_n == 0:
+        return None
+    # Matched-outcome fitness: matched scope exists but every missing target is
+    # a lineage blocker (no scientific TARGET_UNOBSERVED / REFERENCE_NOT_AVAILABLE).
+    if lineage_targets and not other_targets:
         primary = sorted(lineage_targets)[0]
         return technical_stop_record(primary)
     return None
@@ -1949,12 +1970,17 @@ def execute_temporal_discovery(
                     target_exclusion = "REFERENCE_NOT_AVAILABLE"
             elif matched and target_exclusion is None:
                 target_exclusion = "TARGET_UNOBSERVED"
-        # Keep lineage target reasons visible even when the member never matched
-        # predicates (decision/feature path already failed fitness).
+        # Outcome fitness is scoped to matched members only. Publishing exit /
+        # reference lineage for unmatched members would let a false predicate
+        # zero-match collapse into a technical stop.
         publish_target_exclusion = None
-        if not target_observed and isinstance(target_exclusion, str) and target_exclusion:
-            if matched or target_exclusion in SNAPSHOT_LINEAGE_BLOCKERS:
-                publish_target_exclusion = target_exclusion
+        if (
+            matched
+            and not target_observed
+            and isinstance(target_exclusion, str)
+            and target_exclusion
+        ):
+            publish_target_exclusion = target_exclusion
         members.append(
             {
                 "identity": identity,

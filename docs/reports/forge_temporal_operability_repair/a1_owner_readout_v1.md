@@ -1,34 +1,38 @@
 # FORGE_TEMPORAL_OPERABILITY_REPAIR_V1 owner readout
 
-Finish atom: P1-A input fitness scope + P1-B canonical repair terminal.
-Base main: `86b24cb1abe5867becc1ead16efb3754044550df`. Reviewed prior tip: `8ce2edea`.
+Finish atom: predicate vs matched-outcome input fitness + disposition-bound close.
+Base main: `86b24cb1abe5867becc1ead16efb3754044550df`. Prior verified tip: `12ce9bce`.
 
 ## Closed this increment
 
-- **P1-A:** Eligible scientific fitness ignores non-scientific census exclusions (`NOT_X_ELIGIBLE`). Lineage blockers on decision/feature/reference stay visible in exclusion/target pools. Wholly unfit required scope stamps `technical_stop` and denies scientific exhaustion; valid zero-match stays scientific.
-- **P1-B:** Repair close uses `effective_control_terminal` + `resolve_next_action` (no local critic-first table). Incomplete critic/revision/classification/runner-up states refuse close (`REPAIR_EXECUTION_NOT_COMPLETE`). Primary KILL + runner-up PASS keeps `OWNER_CANDIDATE` and the survivor candidate id on the repair receipt.
-- G11 preserved: ordinary completed receipts still honor `OBSERVABILITY_BLOCKED`; only repair-marked completions bypass for occupied-slot post-close readback.
+- **INPUT FITNESS:** Required predicate-path cells (X300 / decision / features) and matched-scope outcomes (reference / exit) are assessed separately. Feature lineage with `feature_unknown` on every eligible member stamps `technical_stop` and blocks `READY_TO_FREEZE`. Unmatched exit/reference lineage no longer converts a valid false-predicate zero-match into `TECHNICAL_STOP`. `NOT_X_ELIGIBLE` still does not cancel an eligible-scope stop; pooled/by_cohort N and reasons stay aligned.
+- **COMPLETION BINDING:** `close_repair_continuation` requires a completed cycle stamped with this disposition and a session receipt new vs the bound parent. Apply → immediate close on parent `NO_WORTHY` refuses with `REPAIR_EXECUTION_NOT_COMPLETE`, records delta=0, `AUTHORIZED` retained. Parent DONE, foreign marker, and pending states refuse without write.
+- Prior P1-A/P1-B and G11 remain closed (census scope, canonical terminal, OBSERVABILITY bypass only for repair-marked completions).
 
-## Outcome matrix (PROVEN)
+## Outcome matrix (test-falsified; tip PROVEN deferred to exact-head CI + reviews)
 
 | Boundary | Status | Evidence |
 |---|---|---|
-| Census NOT_X_ELIGIBLE does not cancel technical stop | PROVEN | `FinishOutcomeMatrixTests.test_census_not_x_eligible_*` |
-| Decision/feature/reference lineage reason preserved | PROVEN | `test_decision_lineage_*`, `test_feature_lineage_*`, `test_reference_lineage_*` |
-| Valid zero-match remains scientific | PROVEN | `FinishOutcomeMatrixTests.test_valid_zero_match_*` |
-| Canonical terminals: PASS / CASE_C / scientific KILL / NO_WORTHY | PROVEN | `FinishOutcomeMatrixTests.test_repair_completion_prefers_*` |
-| Incomplete close refused (incl. live AWAITING_CLASSIFICATION) | PROVEN | `FinishOutcomeMatrixTests.test_repair_completion_refuses_*` |
-| Both candidates: runner-up PASS after primary KILL | PROVEN | `OwnerContinuationRunnerUpPassTests` |
-| Parent/authority + post-close readback | PROVEN | `MetadataStopAndPostCloseReadbackTests` + Vertical B |
+| X300 / decision / feature lineage → technical stop | FALSIFIED | `test_x300_*`, `test_decision_lineage_*`, `test_feature_lineage_*` |
+| Reference lineage via decision cell → predicate fitness stop | FALSIFIED | `test_reference_lineage_absence_blocks_via_predicate_fitness` |
+| Exit lineage on matched scope → technical stop | FALSIFIED | `test_exit_lineage_on_matched_scope_is_technical_stop` |
+| False predicate + unmatched exit lineage stays scientific | FALSIFIED | `test_false_predicate_with_unmatched_exit_lineage_stays_scientific` |
+| NOT_X_ELIGIBLE does not cancel eligible feature stop | FALSIFIED | `test_feature_lineage_absence_preserves_reason` (mixed census) |
+| Valid zero-match remains scientific | FALSIFIED | `test_valid_zero_match_*` |
+| Apply → immediate close refuses parent absorption | FALSIFIED | `test_apply_immediate_close_refuses_parent_done_absorption` |
+| Incomplete / pending close refused | FALSIFIED | `test_repair_completion_refuses_*` |
+| Bound execution → NO_WORTHY / selected / runner-up → close → readback | FALSIFIED | Vertical B + MetadataStop + OwnerContinuationRunnerUpPass |
+| Primary KILL → runner-up PASS keeps OWNER_CANDIDATE + survivor | FALSIFIED | `OwnerContinuationRunnerUpPassTests` |
+| Crash recovery between terminal/receipt/CLOSED | FALSIFIED | MetadataStop post-close replay path |
 
 ## Owner production scenarios
 
-- **Data:** journal path with technical stop + NOT_X_ELIGIBLE census; scientific positive vs zero-match distinct (`OwnerDataScenarioTechnicalAndScientificTests`). Vertical A published parity still required after tip commit/hash rebind.
-- **Continuation:** authorized disposition → primary `KILL_DATA_INFEASIBLE` → runner-up classify `PASS_FAST_LANE_READY` → close → repair receipt `OWNER_CANDIDATE` with survivor = runner-up id.
+- **Data:** journal path with technical stop + NOT_X_ELIGIBLE census; scientific positive vs zero-match distinct (`OwnerDataScenarioTechnicalAndScientificTests`). Vertical A published parity after tip commit/hash rebind.
+- **Continuation:** authorized disposition → new bound execution → close; apply-without-execution cannot close; runner-up PASS keeps `OWNER_CANDIDATE` with survivor = runner-up id.
 
 ## Still closed from prior increments
 
-Mixed clocks; journal/DocumentRunner parity; selected repair lifecycle; post-close preference of repair-marked receipt; metadata technical stop vs SEARCH_EXHAUSTED.
+Mixed clocks; journal/DocumentRunner parity; selected repair lifecycle; post-close preference of repair-marked receipt; metadata technical stop vs SEARCH_EXHAUSTED; opaque looks do not credit scientific search.
 
 ## Metadata-only live cohort note
 
