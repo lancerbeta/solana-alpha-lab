@@ -13,9 +13,9 @@ required_review_roles:
   - OWNER_UX_CRITIC
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: cc137231e17029875046823caa0f8db636ed6240
+  expected_base: 043bbb7ee4caf992c3db23bac9b8c23142d8f741
   expected_upstream: origin/main
-  expected_upstream_oid: cc137231e17029875046823caa0f8db636ed6240
+  expected_upstream_oid: 043bbb7ee4caf992c3db23bac9b8c23142d8f741
   expected_branch: codex/collector-campaign-cutover-truth-v1
   dirty_mode: ALLOW_REPORTED
 objective: >-

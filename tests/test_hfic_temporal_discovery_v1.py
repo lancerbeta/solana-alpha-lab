@@ -548,12 +548,22 @@ class TemporalArithmeticTests(unittest.TestCase):
             self.assertTrue(fresh["queries"][0]["new_look"])
             self.assertNotEqual(fresh["result_refs"], opened["result_refs"])
             self.assertNotEqual(fresh["result"]["mean_target"], None)
-        progress = assess_tier_progress([first], freeze_worthy=False)
+        # Tier progress consumes discovery look results (classification metadata
+        # alone is not scientific evidence — see look_counts_toward_scientific_search).
+        scientific_result = {
+            "population_n": 1,
+            "observed_target_n": 1,
+            "decision_eligible_n": 1,
+            "calculation_version": TEMPORAL_CALCULATION_VERSION,
+        }
+        first_look = {**first, "result": scientific_result}
+        compound_look = {**compound, "result": scientific_result}
+        progress = assess_tier_progress([first_look], freeze_worthy=False)
         self.assertEqual(progress["action"], "ESCALATE_COMPOUND")
         self.assertFalse(progress["compound_executed"])
         with self.assertRaises(GroundedDiscoveryError):
             assert_search_exhaustion_claim(progress, claim_search_exhausted=True)
-        done = assess_tier_progress([first, compound], freeze_worthy=True)
+        done = assess_tier_progress([first_look, compound_look], freeze_worthy=True)
         self.assertTrue(done["compound_executed"])
         self.assertNotEqual(changed_rows, observations)
 

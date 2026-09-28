@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-TEMPORAL-OPERABILITY-REPAIR-FACTORY-FIT-001",
+  "as_of": "2026-09-28",
+  "task_id": "FORGE_TEMPORAL_OPERABILITY_REPAIR_V1",
+  "reviewed_bindings_sha256": "5e1f2ca7c593f9d53d7fb4d2663a5ea74b1d6d7443978bff26a54e114604bc9b",
+  "reviewed_inventory_sha256": "100b4172fe0ae1b8dcd8b4f342f83e5cee1b4833a43628def29a5f9a5cbb590a",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_ORDINARY_FORGE_SNAPSHOT_AND_REPAIR_CONTINUATION",
+    "flexibility_and_history": "PASS_LEGACY_LINEAGE_AND_CLOSED_DISPOSITIONS_STAND",
+    "context_efficiency": "PASS_EXISTING_FORGE_CLI_AND_RESEARCH_STORE",
+    "research_truth": "PASS_PREDICATE_VS_MATCHED_OUTCOME_FITNESS_COMPANION_PIT_AND_DISPOSITION_BOUND_CLOSE",
+    "owner_operability": "PASS_BOUND_EXECUTION_CLOSE_READINESS_G11_NON_WRITING_BLOCK_AND_NEXT_STEP",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_MARKET_EXECUTION",
+    "monitoring_and_recovery": "PASS_IDEMPOTENT_CLOSE_REPAIR_RECEIPT_PREFERENCE_AND_G11_OVERLAY",
+    "build_vs_buy": "PASS_NO_SECOND_RUNTIME",
+    "red_team": "PASS_SOURCE_POLICY_AND_AUTHORITY_NEGATIVES",
+    "security": "PASS_NO_PROVIDER_NO_LIVE_WRITE"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "POST_MERGE_LIVE_PARENT_PLAN_ONLY"
+  },
+  "recovery": "Revert this change. Append-only dispositions and looks stay readable. A code rollback does not restore a consumed budget.",
+  "limits": [
+    "NO_MARKET_FORGE",
+    "NO_LIVE_APPLY",
+    "NO_NET_RETURN",
+    "NO_ALPHA",
+    "MARKET_EXECUTION_NOT_RUN",
+    "NO_MERGE"
+  ]
+}

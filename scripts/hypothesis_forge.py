@@ -93,6 +93,14 @@ from solana_alpha_lab.factory.hfic_memory_policy import (  # noqa: E402
     memory_policy_status,
     preview_memory_policy,
 )
+from solana_alpha_lab.factory.hfic_repair_continuation import (  # noqa: E402
+    RepairContinuationError,
+    apply_repair_continuation,
+    close_repair_continuation,
+    explain_target_exclusion,
+    list_repair_continuation_dispositions,
+    plan_repair_continuation,
+)
 from solana_alpha_lab.factory.hfic_reopened_prior_routing import (  # noqa: E402
     DEFECTIVE_CONTROL_SESSION_ID,
     ReopenedPriorRoutingError,
@@ -151,6 +159,66 @@ def emit_error(code: str, *, exit_code: int = 1) -> int:
     if code in _TECHNICAL_STOPS:
         print("TECHNICAL_STOP scientific_negative=false", file=sys.stderr)
     return exit_code
+
+
+_REPAIR_OWNER_NEXT = {
+    "PARENT_SESSION_MISSING": "PROVIDE_PARENT_SESSION_ID_FROM_SHOW_SESSION",
+    "PARENT_SESSION_REQUIRED": "SHOW_SESSION_THEN_REPAIR_CONTINUATION_DRAFT",
+    "PARENT_SESSION_MISMATCH": "ALIGN_DRAFT_PARENT_SESSION_ID",
+    "PARENT_RUN_REQUIRED": "PROVIDE_PARENT_RUN_ID_OR_ENSURE_FORGE_RUN_RECEIPT",
+    "PARENT_RUN_MISMATCH": "ALIGN_DRAFT_PARENT_RUN_ID",
+    "PARENT_RUN_UNPROVEN": "BIND_PARENT_RUN_FROM_STORE",
+    "PARENT_TERMINAL_RECEIPT_MISSING": "PROVIDE_TERMINAL_RECEIPT_FROM_SHOW_SESSION",
+    "PARENT_TERMINAL_NOT_ELIGIBLE": "STOP_SCIENTIFIC_CLOSE_STANDS",
+    "PARENT_HAS_SELECTED_CANDIDATE": "STOP_SELECTED_CANDIDATE_NOT_REPAIRABLE_HERE",
+    "PARENT_NOT_COMPLETED_NO_WORTHY": "STOP_SCIENTIFIC_CLOSE_STANDS",
+    "TERMINAL_RECEIPT_REQUIRED": "ENSURE_SESSION_RECEIPT_SHA256_ON_SHOW_SESSION",
+    "TERMINAL_RECEIPT_MISMATCH": "ALIGN_DRAFT_TERMINAL_RECEIPT",
+    "JOURNAL_SCOPE_REQUIRED": "ENSURE_SEARCH_KEY_SHA256_ON_SHOW_SESSION",
+    "JOURNAL_SCOPE_MISMATCH": "ALIGN_DRAFT_JOURNAL_SCOPE",
+    "SCIENTIFIC_SLOT_REQUIRED": "ENSURE_SCIENTIFIC_SLOT_ON_SHOW_SESSION",
+    "PARENT_SLOT_MISMATCH": "ALIGN_DRAFT_SCIENTIFIC_SLOT",
+    "SPENT_BUDGET_INVALID": "PASS_SPENT_LOOKS_OR_ENSURE_DISCOVERY_JOURNAL",
+    "SPENT_BUDGET_MISMATCH": "ALIGN_DRAFT_SPENT_LOOKS_TO_JOURNAL",
+    "DISPOSITION_ALREADY_CLOSED": "STOP_CONTINUATION_ALREADY_CONSUMED",
+    "DISPOSITION_NOT_FOUND": "STOP_CONTINUATION_UNKNOWN_DISPOSITION",
+    "DISPOSITION_NOT_AUTHORIZED": "STOP_CONTINUATION_NOT_AUTHORIZED",
+    "DISPOSITION_INVALID": "FIX_DRAFT_JSON_OR_RERUN_DRAFT_BUILDER",
+    "DISPOSITION_SCHEMA_INVALID": "FIX_DRAFT_JSON_OR_RERUN_DRAFT_BUILDER",
+    "ALLOWED_LOOKS_INVALID": "FIX_DRAFT_JSON_OR_RERUN_DRAFT_BUILDER",
+    "COMPETING_ACTIVE_DISPOSITION": "CLOSE_COMPETING_DISPOSITION_THEN_STOP",
+    "COMPETING_DISPOSITION_APPLIED": "CLOSE_COMPETING_DISPOSITION_THEN_STOP",
+    "REPAIR_CONTINUATION_CONFIRM_REQUIRED": "ADD_CONFIRM_APPEND_ONLY_WITH_OWNER_AUTHORITY",
+    "REPAIR_CONTINUATION_DRAFT_INVALID": "FIX_DRAFT_JSON_OR_RERUN_DRAFT_BUILDER",
+    "REPAIR_CONTINUATION_GIT_SHA_UNRESOLVED": "RESOLVE_REPO_GIT_SHA_THEN_RERUN",
+    "REPAIR_CONTINUATION_DISPOSITION_SHA_INVALID": "PASS_DISPOSITION_SHA256_FROM_APPLY",
+    "OWNER_AUTHORIZATION_REQUIRED": "PASS_OWNER_AUTHORIZATION_ID",
+    "TECHNICAL_GAP_REQUIRED": "PASS_TECHNICAL_GAP_CODE",
+    "REPAIR_CAPABILITY_REQUIRED": "USE_CAP_HFIC_TEMPORAL_OPERABILITY_REPAIR_001",
+    "REPAIR_CAPABILITY_MISMATCH": "USE_CAP_HFIC_TEMPORAL_OPERABILITY_REPAIR_001",
+    "REPAIR_EXECUTION_NOT_COMPLETE": "COMPLETE_DISPOSITION_BOUND_REPAIR_EXECUTION_THEN_CLOSE",
+    "REPAIR_FORGE_RUN_PERSIST_FAILED": "INSPECT_PARENT_FORGE_RUN_THEN_RETRY_CLOSE",
+}
+
+
+def emit_repair_blocked(code: str, *, exit_code: int = 2) -> int:
+    """Owner-readable JSON for repair-continuation failures (stdout)."""
+
+    next_step = _REPAIR_OWNER_NEXT.get(str(code), "INSPECT_REASON_CODE_THEN_RERUN")
+    payload = {
+        "status": "NOT_APPLICABLE",
+        "reason_code": str(code),
+        "writes": False,
+        "owner_status": "BLOCKED",
+        "next_step": next_step,
+        "owner_readout": {
+            "status": "BLOCKED",
+            "reason_code": str(code),
+            "next": next_step,
+            "writes": False,
+        },
+    }
+    return emit(payload, exit_code=exit_code)
 
 
 def _assert_no_path_leak(payload: dict[str, Any], *forbidden: str) -> None:
@@ -1606,6 +1674,339 @@ def cmd_prior(
     return emit(payload)
 
 
+def cmd_repair_continuation_draft(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    parent_session_id: str,
+    owner_authorization_id: str,
+    technical_gap_code: str,
+    spent_main_looks: int | None,
+    spent_adaptive_looks: int | None,
+    spent_preview_looks: int | None,
+    parent_run_id: str | None,
+    terminal_receipt_sha256: str | None,
+    journal_scope: str | None,
+    output_path: Path | None,
+) -> int:
+    """No-write draft builder from show-session + store enrichment."""
+
+    from solana_alpha_lab.factory.hfic_repair_continuation import (
+        build_repair_continuation_draft,
+        enrich_parent_for_repair_draft,
+    )
+
+    data_root = _store_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    try:
+        parent = show_session(store, parent_session_id, repo_root=repo_root)
+    except HficSessionError as exc:
+        raise RepairContinuationError("PARENT_SESSION_MISSING") from exc
+    parent = enrich_parent_for_repair_draft(store, parent)
+    draft = build_repair_continuation_draft(
+        parent,
+        owner_authorization_id=owner_authorization_id,
+        technical_gap_code=technical_gap_code,
+        parent_run_id=parent_run_id,
+        terminal_receipt_sha256=terminal_receipt_sha256,
+        journal_scope=journal_scope,
+        spent_main_looks=spent_main_looks,
+        spent_adaptive_looks=spent_adaptive_looks,
+        spent_preview_looks=spent_preview_looks,
+    )
+    if output_path is not None:
+        output_path.write_text(
+            json.dumps(draft, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+    payload = {
+        "command": "repair-continuation-draft",
+        "writes": False,
+        "owner_status": "READY",
+        "next_step": "REPAIR_CONTINUATION_PLAN_WITH_DRAFT",
+        "draft": draft,
+        "draft_path": str(output_path.name) if output_path is not None else None,
+        "spent_looks_source": parent.get("spent_looks_source") or "EXPLICIT_FLAGS",
+        "remaining_main_looks": max(0, 6 - int(draft["spent_main_looks"])),
+        "remaining_adaptive_looks": max(0, 2 - int(draft["spent_adaptive_looks"])),
+        "remaining_preview_looks": max(0, 2 - int(draft["spent_preview_looks"])),
+        "owner_readout": {
+            "status": "READY",
+            "next": "REPAIR_CONTINUATION_PLAN_WITH_DRAFT",
+            "writes": False,
+            "spent_main_looks": draft["spent_main_looks"],
+            "remaining_main_looks": max(0, 6 - int(draft["spent_main_looks"])),
+        },
+    }
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_repair_continuation_plan(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    draft_path: Path,
+    parent_session_id: str | None,
+) -> int:
+    """No-write owner plan for one repair continuation disposition draft."""
+
+    data_root = _store_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    try:
+        draft = json.loads(draft_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HficCliError("REPAIR_CONTINUATION_DRAFT_INVALID") from exc
+    if not isinstance(draft, dict):
+        raise HficCliError("REPAIR_CONTINUATION_DRAFT_INVALID")
+    session_id = str(parent_session_id or draft.get("parent_session_id") or "")
+    parent = None
+    if session_id:
+        parent = next(
+            (
+                item
+                for item in list_hfic_sessions(store)
+                if str(item.get("session_id") or "") == session_id
+            ),
+            None,
+        )
+        if parent is None:
+            try:
+                parent = show_session(store, session_id, repo_root=repo_root)
+            except HficSessionError:
+                parent = {"session_id": session_id}
+        else:
+            # Enrich list projection with critic/selected fields from show-session.
+            try:
+                shown = show_session(store, session_id, repo_root=repo_root)
+                parent = {**parent, **{
+                    key: shown.get(key)
+                    for key in (
+                        "critic_terminal",
+                        "final_session_terminal",
+                        "selected_candidate_id",
+                        "scientific_slot_sha256",
+                        "session_receipt_sha256",
+                        "terminal_receipt_sha256",
+                        "journal_scope",
+                        "search_key_sha256",
+                        "run_id",
+                        "forge_run_id",
+                        "spent_main_looks",
+                        "spent_adaptive_looks",
+                        "spent_preview_looks",
+                    )
+                    if shown.get(key) is not None
+                }}
+                if not parent.get("terminal_receipt_sha256"):
+                    parent["terminal_receipt_sha256"] = parent.get(
+                        "session_receipt_sha256"
+                    )
+                if not parent.get("journal_scope"):
+                    parent["journal_scope"] = parent.get("search_key_sha256")
+            except HficSessionError:
+                pass
+    existing = list_repair_continuation_dispositions(store)
+    plan = plan_repair_continuation(
+        draft,
+        parent_session=parent,
+        existing_dispositions=existing,
+        store=store,
+    )
+    reasons = draft.get("technical_gap_code")
+    payload = {
+        **plan,
+        "command": "repair-continuation-plan",
+        "writes": False,
+        "technical_gap_code": reasons,
+        "exclusion_glossary_hint": explain_target_exclusion(
+            str(draft.get("example_exclusion_code") or "REQUEST_NOT_AFTER_ENTRY")
+        ),
+    }
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    exit_code = 0 if plan.get("owner_status") in {"READY", "DONE"} else 2
+    return emit(payload, exit_code=exit_code)
+
+
+def cmd_repair_continuation_apply(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    draft_path: Path,
+    parent_session_id: str | None,
+    confirm_append_only: bool,
+) -> int:
+    """Append-only repair continuation. Requires --confirm-append-only."""
+
+    if not confirm_append_only:
+        raise HficCliError("REPAIR_CONTINUATION_CONFIRM_REQUIRED")
+    data_root = _store_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    try:
+        draft = json.loads(draft_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HficCliError("REPAIR_CONTINUATION_DRAFT_INVALID") from exc
+    if not isinstance(draft, dict):
+        raise HficCliError("REPAIR_CONTINUATION_DRAFT_INVALID")
+    session_id = str(parent_session_id or draft.get("parent_session_id") or "")
+    parent = None
+    if session_id:
+        parent = next(
+            (
+                item
+                for item in list_hfic_sessions(store)
+                if str(item.get("session_id") or "") == session_id
+            ),
+            None,
+        )
+        if parent is None:
+            try:
+                parent = show_session(store, session_id, repo_root=repo_root)
+            except HficSessionError:
+                parent = {"session_id": session_id}
+        else:
+            try:
+                shown = show_session(store, session_id, repo_root=repo_root)
+                parent = {
+                    **parent,
+                    **{
+                        key: shown.get(key)
+                        for key in (
+                            "critic_terminal",
+                            "final_session_terminal",
+                            "selected_candidate_id",
+                            "scientific_slot_sha256",
+                            "session_receipt_sha256",
+                            "terminal_receipt_sha256",
+                            "journal_scope",
+                            "search_key_sha256",
+                            "run_id",
+                            "forge_run_id",
+                            "spent_main_looks",
+                            "spent_adaptive_looks",
+                            "spent_preview_looks",
+                        )
+                        if shown.get(key) is not None
+                    },
+                }
+                if not parent.get("terminal_receipt_sha256"):
+                    parent["terminal_receipt_sha256"] = parent.get(
+                        "session_receipt_sha256"
+                    )
+                if not parent.get("journal_scope"):
+                    parent["journal_scope"] = parent.get("search_key_sha256")
+            except HficSessionError:
+                pass
+    snapshot = repository_git_snapshot(repo_root)
+    git_sha = str(snapshot.head_sha or "").lower()
+    if len(git_sha) != 40:
+        raise HficCliError("REPAIR_CONTINUATION_GIT_SHA_UNRESOLVED")
+    try:
+        result = apply_repair_continuation(
+            store,
+            draft,
+            parent_session=parent,
+            git_sha=git_sha,
+        )
+    except RepairContinuationError as exc:
+        code = str(exc)
+        if code in {
+            "COMPETING_ACTIVE_DISPOSITION",
+            "COMPETING_DISPOSITION_APPLIED",
+        }:
+            conflict = plan_repair_continuation(
+                draft,
+                parent_session=parent,
+                existing_dispositions=list_repair_continuation_dispositions(store),
+                store=store,
+            )
+            payload = {
+                **conflict,
+                "command": "repair-continuation-apply",
+                "owner_status": "BLOCKED",
+                "reason_code": code,
+                "next_step": conflict.get("next_step")
+                or _REPAIR_OWNER_NEXT.get(code, "CLOSE_COMPETING_DISPOSITION_THEN_STOP"),
+            }
+            payload["owner_readout"] = {
+                "status": "BLOCKED",
+                "reason_code": code,
+                "next": payload["next_step"],
+                "writes": False,
+                "competing_disposition_sha256": (
+                    (conflict.get("disposition") or {}).get("disposition_sha256")
+                    if isinstance(conflict.get("disposition"), dict)
+                    else None
+                ),
+            }
+            _assert_no_path_leak(payload, str(data_root), str(repo_root))
+            return emit(payload, exit_code=2)
+        return emit_repair_blocked(code)
+    payload = {
+        **result,
+        "command": "repair-continuation-apply",
+        "owner_status": (
+            "DONE"
+            if result.get("status") in {"APPLIED", "ALREADY_APPLIED"}
+            else result.get("owner_status") or "BLOCKED"
+        ),
+        "next_step": result.get("next_step")
+        or "ORDINARY_TEMPORAL_QUERY_WITHIN_REMAINING_BUDGET",
+    }
+    if payload["owner_status"] == "DONE":
+        payload["owner_readout"] = {
+            "status": "DONE",
+            "reason_code": result.get("reason_code"),
+            "next": payload["next_step"],
+            "writes": bool(result.get("writes")),
+        }
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_repair_continuation_close(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    disposition_sha256: str,
+    reason_code: str,
+    confirm_append_only: bool,
+) -> int:
+    """Append-only CLOSE after a new terminal. Requires --confirm-append-only."""
+
+    if not confirm_append_only:
+        raise HficCliError("REPAIR_CONTINUATION_CONFIRM_REQUIRED")
+    digest = str(disposition_sha256 or "").strip().lower()
+    if len(digest) != 64 or any(ch not in "0123456789abcdef" for ch in digest):
+        raise HficCliError("REPAIR_CONTINUATION_DISPOSITION_SHA_INVALID")
+    data_root = _store_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    snapshot = repository_git_snapshot(repo_root)
+    git_sha = str(snapshot.head_sha or "").lower()
+    if len(git_sha) != 40:
+        raise HficCliError("REPAIR_CONTINUATION_GIT_SHA_UNRESOLVED")
+    result = close_repair_continuation(
+        store,
+        digest,
+        git_sha=git_sha,
+        reason_code=str(reason_code or "CONTINUATION_TERMINAL_REACHED"),
+    )
+    payload = {
+        **result,
+        "command": "repair-continuation-close",
+        "owner_status": "DONE",
+        "next_step": "STOP_CONTINUATION_CONSUMED",
+        "owner_readout": {
+            "status": "DONE",
+            "reason_code": result.get("reason_code"),
+            "next": "STOP_CONTINUATION_CONSUMED",
+            "writes": bool(result.get("writes")),
+        },
+    }
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
 def cmd_prove_runtime(
     repo_root: Path,
     session_id: str,
@@ -2175,6 +2576,89 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="required; appends non-HFIC HYPOTHESIS_VERSION only; never rewrites historical RDP bytes",
     )
+    repair_draft = subparsers.add_parser(
+        "repair-continuation-draft",
+        help="no-write draft builder from show-session; spent looks default from journal",
+    )
+    repair_draft.add_argument("--parent-session-id", required=True)
+    repair_draft.add_argument("--owner-authorization-id", required=True)
+    repair_draft.add_argument("--technical-gap-code", required=True)
+    repair_draft.add_argument(
+        "--spent-main-looks",
+        type=int,
+        default=None,
+        help="optional override; default = discovery journal MAIN count for search_key",
+    )
+    repair_draft.add_argument(
+        "--spent-adaptive-looks",
+        type=int,
+        default=None,
+        help="optional override; default = discovery journal ADAPTIVE count",
+    )
+    repair_draft.add_argument(
+        "--spent-preview-looks",
+        type=int,
+        default=None,
+        help="optional override; default = discovery journal PREVIEW count",
+    )
+    repair_draft.add_argument("--parent-run-id", default=None)
+    repair_draft.add_argument("--terminal-receipt-sha256", default=None)
+    repair_draft.add_argument("--journal-scope", default=None)
+    repair_draft.add_argument(
+        "--output",
+        type=Path,
+        default=None,
+        help="optional path to write draft JSON",
+    )
+    repair_draft.add_argument("--format", choices=("json",), default="json")
+    repair_plan = subparsers.add_parser(
+        "repair-continuation-plan",
+        help="no-write owner plan for repair continuation after completed NO_WORTHY",
+    )
+    repair_plan.add_argument(
+        "--draft",
+        type=Path,
+        required=True,
+        help="JSON disposition draft (parent run/session/slot/terminal/gap/authorization)",
+    )
+    repair_plan.add_argument(
+        "--parent-session-id",
+        default=None,
+        help="optional override; defaults to draft.parent_session_id",
+    )
+    repair_plan.add_argument("--format", choices=("json",), default="json")
+    repair_apply = subparsers.add_parser(
+        "repair-continuation-apply",
+        help="append-only repair continuation; requires --confirm-append-only; separate from plan",
+    )
+    repair_apply.add_argument("--draft", type=Path, required=True)
+    repair_apply.add_argument("--parent-session-id", default=None)
+    repair_apply.add_argument(
+        "--confirm-append-only",
+        action="store_true",
+        help="required; appends disposition only; does not refresh budget or rewrite NO_WORTHY",
+    )
+    repair_apply.add_argument("--format", choices=("json",), default="json")
+    repair_close = subparsers.add_parser(
+        "repair-continuation-close",
+        help="append-only CLOSE after a new terminal; requires --confirm-append-only",
+    )
+    repair_close.add_argument(
+        "--disposition-sha256",
+        required=True,
+        help="exact disposition_sha256 from apply / plan readout",
+    )
+    repair_close.add_argument(
+        "--reason-code",
+        default="CONTINUATION_TERMINAL_REACHED",
+        help="close reason; default CONTINUATION_TERMINAL_REACHED",
+    )
+    repair_close.add_argument(
+        "--confirm-append-only",
+        action="store_true",
+        help="required; appends CLOSED disposition; does not rewrite history",
+    )
+    repair_close.add_argument("--format", choices=("json",), default="json")
     return parser
 
 
@@ -2393,9 +2877,64 @@ def main(argv: list[str] | None = None) -> int:
                 explicit_data_root=args.data_root,
                 confirm_append_only=bool(args.confirm_append_only),
             )
+        if args.command == "repair-continuation-draft":
+            return cmd_repair_continuation_draft(
+                repo_root,
+                explicit_data_root=args.data_root,
+                parent_session_id=args.parent_session_id,
+                owner_authorization_id=args.owner_authorization_id,
+                technical_gap_code=args.technical_gap_code,
+                spent_main_looks=getattr(args, "spent_main_looks", None),
+                spent_adaptive_looks=getattr(args, "spent_adaptive_looks", None),
+                spent_preview_looks=getattr(args, "spent_preview_looks", None),
+                parent_run_id=getattr(args, "parent_run_id", None),
+                terminal_receipt_sha256=getattr(args, "terminal_receipt_sha256", None),
+                journal_scope=getattr(args, "journal_scope", None),
+                output_path=getattr(args, "output", None),
+            )
+        if args.command == "repair-continuation-plan":
+            return cmd_repair_continuation_plan(
+                repo_root,
+                explicit_data_root=args.data_root,
+                draft_path=args.draft,
+                parent_session_id=getattr(args, "parent_session_id", None),
+            )
+        if args.command == "repair-continuation-apply":
+            return cmd_repair_continuation_apply(
+                repo_root,
+                explicit_data_root=args.data_root,
+                draft_path=args.draft,
+                parent_session_id=getattr(args, "parent_session_id", None),
+                confirm_append_only=bool(args.confirm_append_only),
+            )
+        if args.command == "repair-continuation-close":
+            return cmd_repair_continuation_close(
+                repo_root,
+                explicit_data_root=args.data_root,
+                disposition_sha256=str(getattr(args, "disposition_sha256", "") or ""),
+                reason_code=str(
+                    getattr(args, "reason_code", None) or "CONTINUATION_TERMINAL_REACHED"
+                ),
+                confirm_append_only=bool(args.confirm_append_only),
+            )
         raise HficCliError(f"HFIC_COMMAND_NOT_READY:{args.command}")
-    except (HficCliError, HficSessionError, HficPreflightError, HficProspectError, HficSuppressionError, HficMemoryPolicyError, ReopenedPriorRoutingError, DataRootError, ResearchStoreError) as exc:
-        return emit_error(str(exc))
+    except RepairContinuationError as exc:
+        return emit_repair_blocked(str(exc))
+    except (
+        HficCliError,
+        HficSessionError,
+        HficPreflightError,
+        HficProspectError,
+        HficSuppressionError,
+        HficMemoryPolicyError,
+        ReopenedPriorRoutingError,
+        DataRootError,
+        ResearchStoreError,
+    ) as exc:
+        code = str(exc)
+        if str(getattr(args, "command", "") or "").startswith("repair-continuation"):
+            return emit_repair_blocked(code)
+        return emit_error(code)
     except (OSError, ValueError, json.JSONDecodeError):
         return emit_error("HFIC_PROTOCOL_INVALID")
 

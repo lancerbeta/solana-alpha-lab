@@ -888,6 +888,7 @@ def resolve_scientific_admission(
     repo_root: Path | None = None,
     auto_sessions_per_market: int = 1,
     max_distinct_focuses: int = 3,
+    repair_continuations: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Resolve one shared market-slot admission decision.
 
@@ -1144,13 +1145,63 @@ def resolve_scientific_admission(
                     break
         if context_matches:
             action = "RESUME_EXISTING_SESSION" if state in pending else "RETURN_EXISTING_SESSION"
-            return {
+            result = {
                 "action": action,
                 "reason_code": state or "SCIENTIFIC_SLOT_OCCUPIED",
                 "session_id": session_id,
                 "scientific_slot_sha256": target_slot,
                 "occupancy": "OCCUPIED",
             }
+            if repair_continuations and action == "RETURN_EXISTING_SESSION":
+                from solana_alpha_lab.factory.hfic_repair_continuation import (
+                    admission_with_repair_continuation,
+                )
+
+                parent_terminal = (
+                    str(chosen.get("critic_terminal") or "")
+                    or str(chosen.get("final_session_terminal") or "")
+                    or state
+                )
+                result = admission_with_repair_continuation(
+                    result,
+                    dispositions=repair_continuations,
+                    parent_terminal=parent_terminal,
+                )
+            return result
+        # Addressable repair: authorized disposition may resume even when the
+        # caller capability/execution binding drifted after the scientific close.
+        if repair_continuations and state not in pending:
+            from solana_alpha_lab.factory.hfic_repair_continuation import (
+                ACTION_RESUME_REPAIR_CONTINUATION,
+                active_repair_continuation_for_slot,
+                admission_with_repair_continuation,
+            )
+
+            disposition = active_repair_continuation_for_slot(
+                repair_continuations,
+                scientific_slot_sha256=target_slot,
+                session_id=session_id,
+            )
+            if disposition is not None:
+                parent_terminal = (
+                    str(chosen.get("critic_terminal") or "")
+                    or str(chosen.get("final_session_terminal") or "")
+                    or state
+                )
+                candidate = {
+                    "action": "RETURN_EXISTING_SESSION",
+                    "reason_code": state or "SCIENTIFIC_SLOT_OCCUPIED",
+                    "session_id": session_id,
+                    "scientific_slot_sha256": target_slot,
+                    "occupancy": "OCCUPIED",
+                }
+                overlaid = admission_with_repair_continuation(
+                    candidate,
+                    dispositions=repair_continuations,
+                    parent_terminal=parent_terminal,
+                )
+                if overlaid.get("action") == ACTION_RESUME_REPAIR_CONTINUATION:
+                    return overlaid
         return {
             "action": "STOP",
             "reason_code": "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",

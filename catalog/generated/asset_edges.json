@@ -11543,6 +11543,16 @@
       "target_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-EXECUTION-CLOSURE-001"
     },
     {
+      "source_asset_id": "MODULE-HFIC-REPAIR-CONTINUATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-EVIDENCE-IDENTITY-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-REPAIR-CONTINUATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-TEMPORAL-DISCOVERY-001"
+    },
+    {
       "source_asset_id": "MODULE-HFIC-REPRESENTATION-LADDER-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001"

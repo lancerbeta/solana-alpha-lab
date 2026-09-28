@@ -439,6 +439,7 @@ _ADMITTED_SESSION_READBACK_ACTIONS = frozenset(
         "RESUME_FINALIZE",
         "RESUME_REVISE",
         "RESUME_CLASSIFY",
+        "RESUME_REPAIR_CONTINUATION",
     }
 )
 
@@ -521,6 +522,7 @@ def decide_preflight_action(
     current_visible_cohort_ids: Sequence[str] | None = None,
     execution_context: Mapping[str, Any] | None = None,
     repo_root: Path | None = None,
+    repair_continuations: Sequence[Mapping[str, Any]] | None = None,
 ) -> tuple[str, str | None]:
     from solana_alpha_lab.factory.hfic_control_integrity import (
         session_evidence_surface_mode,
@@ -558,6 +560,7 @@ def decide_preflight_action(
             repo_root=repo_root,
             auto_sessions_per_market=AUTO_SESSIONS_PER_EPOCH,
             max_distinct_focuses=MAX_DISTINCT_FOCUSES_PER_EPOCH,
+            repair_continuations=repair_continuations,
         )
         if admission.get("action") == "STOP":
             if (
@@ -622,6 +625,11 @@ def decide_preflight_action(
             return ("STOP", str(admission.get("reason_code") or "SEARCH_BUDGET_EXHAUSTED"))
         if admission.get("action") == "START_NEW_SESSION":
             return ("START_NEW_SESSION", None)
+        if admission.get("action") == "RESUME_REPAIR_CONTINUATION":
+            return (
+                "RESUME_REPAIR_CONTINUATION",
+                str(admission.get("session_id") or "") or None,
+            )
         admitted_id = str(admission.get("session_id") or "")
         chosen = next(
             (
@@ -2699,6 +2707,11 @@ def run_preflight(
     )
 
     reservations = list_scientific_slot_admissions(store)
+    from solana_alpha_lab.factory.hfic_repair_continuation import (
+        list_repair_continuation_dispositions,
+    )
+
+    repair_continuations = list_repair_continuation_dispositions(store)
     visible_cohort_ids = (
         forge_input.get("active_evidence_set", {}).get("visible_cohort_ids")
         if isinstance(forge_input.get("active_evidence_set"), Mapping)
@@ -2740,6 +2753,7 @@ def run_preflight(
         current_visible_cohort_ids=visible_cohort_ids,
         execution_context=execution_context or None,
         repo_root=Path(repo_root),
+        repair_continuations=repair_continuations,
     )
     if (
         not market_admission_ready

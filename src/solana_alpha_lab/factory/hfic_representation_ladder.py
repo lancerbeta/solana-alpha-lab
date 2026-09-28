@@ -497,6 +497,14 @@ def resolve_next_action(
         | {RUNNER_UP_REVISION_REQUIRED, "KILL_UNBOUND_EVIDENCE"}
     )
     if base_terminal not in known_base:
+        # Completed process/technical KILL not listed in CASE_C still stops
+        # non-scientifically. Do not launder it into OBSERVABILITY_BLOCKED.
+        if base_terminal.startswith("KILL_"):
+            return {
+                "next_action": ACTION_NON_SCIENTIFIC_STOP,
+                "owner_final": ACTION_NON_SCIENTIFIC_STOP,
+                "reason_code": base_terminal,
+            }
         return {
             "next_action": ACTION_OBSERVABILITY_BLOCKED,
             "owner_final": ACTION_OBSERVABILITY_BLOCKED,
@@ -2126,6 +2134,7 @@ def _lookup_run_artifact(
 ) -> dict[str, Any] | None:
     latest: dict[str, Any] | None = None
     completed: dict[str, Any] | None = None
+    repair_completed: dict[str, Any] | None = None
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
         if kind != RecordKind.RESEARCH_ARTIFACT.value:
@@ -2137,11 +2146,60 @@ def _lookup_run_artifact(
         if not isinstance(raw, str):
             continue
         body = json.loads(raw)
-        if isinstance(body, dict) and body.get("run_identity_sha256") == identity:
-            latest = body
-            if body.get("owner_final"):
-                completed = body
-    return completed or latest
+        if not (isinstance(body, dict) and body.get("run_identity_sha256") == identity):
+            continue
+        latest = body
+        if not body.get("owner_final"):
+            continue
+        # Authorized repair completion supersedes the historical exhausted
+        # parent receipt for the same run identity without rewriting it.
+        if isinstance(body.get("repair_continuation_disposition_sha256"), str) and body.get(
+            "repair_continuation_disposition_sha256"
+        ):
+            repair_completed = body
+        else:
+            completed = body
+    return repair_completed or completed or latest
+
+
+def _lookup_run_artifact_for_session(
+    store: ResearchStore, session_id: str
+) -> dict[str, Any] | None:
+    """Latest FORGE_RUN_RECEIPT bound to a session; repair completion preferred.
+
+    Current ladder frozen-set identity can diverge from a historical parent
+    receipt's run_identity while the session lineage is still the owner
+    answer. Prefer the repair-marked completion over SEARCH_EXHAUSTED.
+    """
+
+    if not session_id:
+        return None
+    latest: dict[str, Any] | None = None
+    completed: dict[str, Any] | None = None
+    repair_completed: dict[str, Any] | None = None
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if kind != RecordKind.RESEARCH_ARTIFACT.value:
+            continue
+        payload = json.loads(record.payload_json)
+        if payload.get("artifact_kind") != FORGE_RUN_ARTIFACT_KIND:
+            continue
+        raw = payload.get("payload_canonical")
+        if not isinstance(raw, str):
+            continue
+        body = json.loads(raw)
+        if not (isinstance(body, dict) and str(body.get("session_id") or "") == session_id):
+            continue
+        latest = body
+        if not body.get("owner_final"):
+            continue
+        if isinstance(body.get("repair_continuation_disposition_sha256"), str) and body.get(
+            "repair_continuation_disposition_sha256"
+        ):
+            repair_completed = body
+        else:
+            completed = body
+    return repair_completed or completed or latest
 
 
 def _persist_run_receipt(
@@ -2784,6 +2842,12 @@ def evaluate_forge_run(
         resolve_scientific_admission,
         scientific_slot_sha256,
     )
+    from solana_alpha_lab.factory.hfic_repair_continuation import (
+        ACTION_RESUME_REPAIR_CONTINUATION,
+        REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION,
+        active_repair_continuation_for_slot,
+        list_repair_continuation_dispositions,
+    )
 
     market_epoch = input_receipt.get("market_evidence_epoch_sha256")
     if not isinstance(market_epoch, str) or len(market_epoch) != 64:
@@ -2826,6 +2890,30 @@ def evaluate_forge_run(
                 existing = None
             if existing is not None:
                 run_identity = str(existing.get("run_identity_sha256") or legacy_identity)
+        if existing is None:
+            # Historical parent/repair receipts may keep the parent
+            # run_identity (e.g. BASE-only) while the live ladder freezes a
+            # wider ACTIVE set. Session lineage still owns the current
+            # owner result after repair close.
+            session_for_lookup = (
+                str(preferred_control_session_id)
+                if preferred_control_session_id
+                else (str(control_session_id) if control_session_id else "")
+            )
+            if not session_for_lookup:
+                for row in resolved_stages:
+                    if not isinstance(row, Mapping):
+                        continue
+                    sid = str(row.get("session_id") or "")
+                    if sid:
+                        session_for_lookup = sid
+                        break
+            if session_for_lookup:
+                existing = _lookup_run_artifact_for_session(store, session_for_lookup)
+                if existing is not None:
+                    bound_identity = existing.get("run_identity_sha256")
+                    if isinstance(bound_identity, str) and len(bound_identity) == 64:
+                        run_identity = bound_identity
     except ResearchStoreError:
         existing = None
     existing_owner_final = bool(
@@ -2968,6 +3056,7 @@ def evaluate_forge_run(
             execution_context=admission_execution_context or None,
             memory_eligibility_sha256=current_memory_eligibility,
             repo_root=Path(repo_root),
+            repair_continuations=list_repair_continuation_dispositions(store),
         )
         from solana_alpha_lab.factory.hfic_session import (
             orphan_prefreeze_draft_resumable,
@@ -3033,6 +3122,7 @@ def evaluate_forge_run(
         elif admission.get("action") in {
             "RESUME_EXISTING_SESSION",
             "RETURN_EXISTING_SESSION",
+            ACTION_RESUME_REPAIR_CONTINUATION,
         }:
             admitted_id = str(admission.get("session_id") or "")
             observed_ids = {
@@ -3040,7 +3130,28 @@ def evaluate_forge_run(
                 for row in resolved_stages
                 if isinstance(row, Mapping)
             }
-            if admitted_id and admitted_id not in observed_ids and resumable_orphan:
+            if admission.get("action") == ACTION_RESUME_REPAIR_CONTINUATION:
+                resume_action = _resume_action(
+                    "BASE"
+                    if active_rep
+                    in {"CURRENT_REPRESENTATION_CONTROL_V1", "ORDINARY_BASE"}
+                    else active_rep
+                )
+                decision = {
+                    "next_action": resume_action,
+                    "owner_final": None,
+                    "reason_code": REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION,
+                    "session_id": admitted_id or None,
+                    "repair_continuation_disposition_sha256": admission.get(
+                        "repair_continuation_disposition_sha256"
+                    ),
+                    "spent_main_looks": admission.get("spent_main_looks"),
+                    "spent_adaptive_looks": admission.get("spent_adaptive_looks"),
+                }
+                next_action = resume_action
+                owner_final = None
+                existing_owner_final = False
+            elif admitted_id and admitted_id not in observed_ids and resumable_orphan:
                 resume_action = _resume_action(
                     "BASE"
                     if active_rep
@@ -3085,23 +3196,69 @@ def evaluate_forge_run(
         ),
         None,
     )
-    if existing_owner_final and next_action != ACTION_OBSERVABILITY_BLOCKED:
+    if existing_owner_final:
         # A completed run is a durable readback, not a new forge-run write.
-        # Admission verifies the caller's known execution context, while this
-        # second check verifies the persisted artifact's own binding before it
-        # can be replayed as a completed owner result.
-        replay_provenance = _completed_readback_provenance_status(
-            existing,
-            active_row=active_row,
-            scientific_slot_sha256=scientific_slot,
-        )
-        if replay_provenance == EXEC_PROVENANCE_CONFLICT:
+        # Ordinary completed receipts still respect OBSERVABILITY_BLOCKED from
+        # execution-binding / model-context gates (G11). A repair-marked
+        # completion after close may surface under admission STOP for the
+        # occupied slot; that must not hide the repair owner_final. Provenance
+        # still fail-closes contradictory bindings.
+        # An authorized repair continuation deliberately lifts the completed
+        # readback so the remaining look ledger can continue on the same slot.
+        # Gate matches apply/overlay: AUTHORIZED + NO_WORTHY parent + session bind.
+        repair_marked = isinstance(
+            existing.get("repair_continuation_disposition_sha256"), str
+        ) and bool(existing.get("repair_continuation_disposition_sha256"))
+        if next_action == ACTION_OBSERVABILITY_BLOCKED and not repair_marked:
+            # Ordinary completed receipt: surface the admission/observability
+            # block as a non-writing overlay. Never fall through into a new
+            # forge-run rebuild that could persist over the durable terminal.
+            replay_provenance = _completed_readback_provenance_status(
+                existing,
+                active_row=active_row,
+                scientific_slot_sha256=scientific_slot,
+            )
+            if replay_provenance == EXEC_PROVENANCE_CONFLICT:
+                return _readback_existing_run(
+                    existing,
+                    block_reason="SCIENTIFIC_IDENTITY_CONFLICT",
+                    provenance_status=replay_provenance,
+                )
             return _readback_existing_run(
                 existing,
-                block_reason="SCIENTIFIC_IDENTITY_CONFLICT",
+                block_reason=str(
+                    decision.get("reason_code") or ACTION_OBSERVABILITY_BLOCKED
+                ),
                 provenance_status=replay_provenance,
             )
-        return _readback_existing_run(existing, provenance_status=replay_provenance)
+        repair_active = active_repair_continuation_for_slot(
+            list_repair_continuation_dispositions(store),
+            scientific_slot_sha256=scientific_slot,
+            session_id=str(decision.get("session_id") or "") or None,
+        )
+        if repair_active is None or (
+            str(repair_active.get("parent_terminal") or "") != "NO_WORTHY_HYPOTHESIS"
+        ):
+            replay_provenance = _completed_readback_provenance_status(
+                existing,
+                active_row=active_row,
+                scientific_slot_sha256=scientific_slot,
+            )
+            if replay_provenance == EXEC_PROVENANCE_CONFLICT:
+                return _readback_existing_run(
+                    existing,
+                    block_reason="SCIENTIFIC_IDENTITY_CONFLICT",
+                    provenance_status=replay_provenance,
+                )
+            return _readback_existing_run(existing, provenance_status=replay_provenance)
+        existing_owner_final = False
+        owner_final = None
+        decision = dict(decision)
+        decision["owner_final"] = None
+        decision["reason_code"] = REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION
+        decision["repair_continuation_disposition_sha256"] = repair_active.get(
+            "disposition_sha256"
+        )
     cap_epoch = input_receipt.get("capability_epoch_sha256")
     exec_binding = None
     exec_provenance_status = EXEC_PROVENANCE_NOT_APPLICABLE

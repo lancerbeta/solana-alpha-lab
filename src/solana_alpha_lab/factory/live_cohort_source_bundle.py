@@ -510,6 +510,9 @@ OBSERVATION_COLUMNS = (
     "call_occurrence_id",
     "http_status",
     "http_class",
+    "observation_clock_policy",
+    "source_price_event_time",
+    "member_anchor",
 )
 OBSERVATION_SCHEMA = pa.schema(
     [
@@ -531,6 +534,9 @@ OBSERVATION_SCHEMA = pa.schema(
         pa.field("call_occurrence_id", pa.string()),
         pa.field("http_status", pa.string()),
         pa.field("http_class", pa.string()),
+        pa.field("observation_clock_policy", pa.string()),
+        pa.field("source_price_event_time", pa.string()),
+        pa.field("member_anchor", pa.string()),
     ]
 )
 
@@ -631,6 +637,9 @@ OBS_RELEASE_SCHEMA = pa.schema(
         pa.field("call_occurrence_id", pa.string()),
         pa.field("http_status", pa.int64()),
         pa.field("http_class", pa.string()),
+        pa.field("observation_clock_policy", pa.string()),
+        pa.field("source_price_event_time", pa.string()),
+        pa.field("member_anchor", pa.string()),
         pa.field("evidence_role", pa.string()),
         pa.field("confirmatory_reuse_forbidden", pa.bool_()),
     ]
