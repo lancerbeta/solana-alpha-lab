@@ -1554,12 +1554,15 @@ continuation наследует потраченный look ledger. Owner path
 `hypothesis_forge.py --data-root <store> repair-continuation-draft --parent-session-id <id> --owner-authorization-id <auth> --technical-gap-code <gap> --output <draft.json>`
 (spent looks и run/receipt берутся из show-session + store; см. field map в runbook)
 → `repair-continuation-plan --draft <json>` (без записи) →
-отдельно `repair-continuation-apply --draft <json> --confirm-append-only`.
-Терминалы plan/apply и glossary причин —
+отдельно `repair-continuation-apply --draft <json> --confirm-append-only` →
+ordinary temporal query в остатке бюджета → после нового terminal
+`repair-continuation-close --disposition-sha256 <from-apply> --confirm-append-only`
+(иначе AUTHORIZED снова откроет slot).
+Терминалы draft/plan/apply/close и glossary причин —
 `docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md`.
 Writer temporal calculation —
-`HFIC_TEMPORAL_DISCOVERY_CALC_V2`. V1 читается как есть, без выдуманного среза;
-повтор того же science/input пишет V2 как `CALCULATION_REVISION`, без нового
+`HFIC_TEMPORAL_DISCOVERY_CALC_V3`. V1/V2 читаются как есть, без выдуманного среза;
+повтор того же science/input пишет V3 как `CALCULATION_REVISION`, без нового
 scientific look. В owner readout это поля `calculation_version`,
 `queries[].look_class=CALCULATION_REVISION` и `queries[].new_look=false`
 (тот же смысл на `format_discovery_readout`). Grounded `CALCULATION_VERSION` не меняется.

@@ -2495,7 +2495,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     repair_draft = subparsers.add_parser(
         "repair-continuation-draft",
-        help="no-write draft builder from show-session + explicit spent looks",
+        help="no-write draft builder from show-session; spent looks default from journal",
     )
     repair_draft.add_argument("--parent-session-id", required=True)
     repair_draft.add_argument("--owner-authorization-id", required=True)
