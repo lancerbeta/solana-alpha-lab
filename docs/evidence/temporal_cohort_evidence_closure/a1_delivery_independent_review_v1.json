@@ -1,0 +1,54 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "TEMPORAL-COHORT-EVIDENCE-CLOSURE-REVIEW-001",
+  "as_of": "2026-09-28",
+  "task_id": "TEMPORAL_COHORT_EVIDENCE_CLOSURE_V1",
+  "reviewed_bindings_sha256": "00d07bb6539d5dab6b757f108209792bd31601db5edaed69496a8a8a7a63b946",
+  "reviewed_inventory_sha256": "6e4916d95db0bdc599e67bd5a978c9b899a18462c1af702fdf1236e5a6cf9c55",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "On 126c7659 a conflicted identity stays excluded for the whole pass. A later same-signature copy cannot restore pooled or cohort membership. Non-conflicting ineligible seats can still be replaced. Pooled exclusion_reasons records INTEGRITY_CONFLICT."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Permutations of [A,A,B] and of three cohorts where two signatures match keep observed_target_n at 0 and mean null. The owner readout shows INTEGRITY_CONFLICT, distinct from an empty cohort. DocumentRunner still carries by_cohort. V1 remains readable."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=399e5985e37e298c16e8861462e5d6645d57e6057e6d06891a2f8218ffd4b6d4",
+        "INTEGRITY_CONFLICT persists through later copies, including a new cohort. Exclusion stays visible on the result and on by_cohort. V1 without by_cohort stays readable and is not rewritten."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Section 5.1 names INTEGRITY_CONFLICT as N=0 and mean null on pooled and every touched cohort, distinct from an empty cohort and from a missing target. format_discovery_readout copies exclusion_reasons and by_cohort."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MERGE",
+    "NO_ALPHA",
+    "NO_MARKET_FORGE",
+    "NO_NET_RETURN"
+  ]
+}

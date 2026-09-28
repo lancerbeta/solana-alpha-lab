@@ -1,0 +1,63 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "TEMPORAL-COHORT-EVIDENCE-CLOSURE-ACCEPTANCE-001",
+  "as_of": "2026-09-28",
+  "task_id": "TEMPORAL_COHORT_EVIDENCE_CLOSURE_V1",
+  "state_change": "TEMPORAL_RESULT_CARRIES_COHORT_SLICE",
+  "base_main": "662b3d654a995699b681be57addda358737556f0",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "cf75a0f5ac975412bbb0ad13ba11b6c7bfec9d438afc1cff8984baa4ede5d356",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "16867830cae183013baec180baab5c4a76c2affee882c7708ea4a41340afb2a5",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "72c6b66a27ff7122e4c7fcf2f35d416c2fcbfdf246ef6fa63093c02790b3e8d7",
+    "docs/reports/temporal_cohort_evidence_closure/a1_owner_readout_v1.md": "9430cfd0fa6c15f76f959b9493dd57744e21b6eebd6913ca46a3e6e805767333",
+    "docs/tasks/TEMPORAL_COHORT_EVIDENCE_CLOSURE_V1.md": "f38cc0f761076916f12b000ad962638e3c5007f8012a8756c93f8e667984cd37",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "843db3e7d12cf40a16c1e52474e5309b3f5973ba1f8f9871054fd69685041a49",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "8eed99649140230439cd59567123e2eb3e39588ba878fa0d09d1377d39163318",
+    "tests/test_hfic_temporal_discovery_v1.py": "ba396895f2f2a626c1261fac2c5c37e6ea5aa021dfb60fc6df83aae2251ab1d6",
+    "tests/test_hfic_temporal_production_runner_v1.py": "c4ddfd0813e1817cbc44b66fa3887fc6116ff7b1699e6f96a60bdb11920edc94"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/temporal_cohort_evidence_closure/a1_delivery_factory_fit_v1.json",
+    "sha256": "8c1e2c54001ec484e3f4b709a5d8c0e732d7a44b6a8a92c7e434badee8273202",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_COHORT_SLICE_AND_VERTICAL",
+    "independent_review": {
+      "path": "docs/evidence/temporal_cohort_evidence_closure/a1_delivery_independent_review_v1.json",
+      "sha256": "07160fd2d0ce42a20ddb5b0a7309e31ec331430be5d93bcd96a99fda974dc07c",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_COHORT_SLICE_AND_VERTICAL"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_MARKET_EXECUTION",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "market_execution": "NOT_RUN",
+    "live_store_writes": 0
+  }
+}

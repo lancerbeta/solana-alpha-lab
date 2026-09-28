@@ -32,7 +32,11 @@ from solana_alpha_lab.factory.hfic_grounded_discovery import (
 
 TEMPORAL_SCHEMA = "smial.hfic-temporal-query"
 TEMPORAL_SCHEMA_VERSION = "1.0"
-TEMPORAL_CALCULATION_VERSION = "HFIC_TEMPORAL_DISCOVERY_CALC_V1"
+TEMPORAL_CALCULATION_VERSION_V1 = "HFIC_TEMPORAL_DISCOVERY_CALC_V1"
+TEMPORAL_CALCULATION_VERSION = "HFIC_TEMPORAL_DISCOVERY_CALC_V2"
+TEMPORAL_CALCULATION_VERSIONS_READABLE = frozenset(
+    {TEMPORAL_CALCULATION_VERSION_V1, TEMPORAL_CALCULATION_VERSION}
+)
 TEMPORAL_CAPABILITY_ID = "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
 PREVIEW_BYTE_LIMIT = 64 * 1024
 PREVIEW_EXAMPLE_LIMIT = 24
@@ -701,6 +705,124 @@ def _observation_signature(
     return tuple(sorted(items))
 
 
+def _cohort_view(member: Mapping[str, Any]) -> dict[str, Any]:
+    excluded = bool(member.get("integrity_excluded"))
+    return {
+        "in_base": bool(member.get("in_base")) and not excluded,
+        "decision_eligible": bool(member.get("decision_eligible")) and not excluded,
+        "matched": bool(member.get("matched")) and not excluded,
+        "target_is_observed": bool(member.get("target_is_observed")) and not excluded,
+        "target": None if excluded else member.get("target"),
+        "feature_unknown": bool(member.get("feature_unknown")) and not excluded,
+        "exclusion": member.get("exclusion"),
+        "integrity_excluded": excluded,
+    }
+
+
+def _note_cohort_membership(
+    slots: dict[str, dict[tuple, dict[str, Any]]],
+    cohort: str,
+    identity: tuple,
+    member: Mapping[str, Any],
+) -> None:
+    """One descriptive seat per cohort and decision.
+
+    A later eligible copy may replace a non-conflicting ineligible seat.
+    An integrity conflict stays excluded for the rest of the computation.
+    """
+
+    bucket = slots.setdefault(cohort, {})
+    view = _cohort_view(member)
+    current = bucket.get(identity)
+    if current is None:
+        bucket[identity] = view
+        return
+    if view.get("integrity_excluded"):
+        bucket[identity] = view
+        return
+    if current.get("integrity_excluded"):
+        return
+    if not current.get("in_base") and view.get("in_base"):
+        bucket[identity] = view
+
+
+def _exclude_shared_identity(
+    slots: dict[str, dict[tuple, dict[str, Any]]],
+    identity: tuple,
+) -> None:
+    for bucket in slots.values():
+        view = bucket.get(identity)
+        if view is None:
+            continue
+        view["integrity_excluded"] = True
+        view["in_base"] = False
+        view["decision_eligible"] = False
+        view["matched"] = False
+        view["target_is_observed"] = False
+        view["feature_unknown"] = False
+        view["target"] = None
+
+
+def _cohort_rows(
+    slots: dict[str, dict[tuple, dict[str, Any]]],
+    admitted_ids: Sequence[str],
+) -> list[dict[str, Any]]:
+    owners: dict[tuple, set[str]] = defaultdict(set)
+    for cohort_id, bucket in slots.items():
+        for identity, view in bucket.items():
+            if view.get("integrity_excluded"):
+                continue
+            owners[identity].add(cohort_id)
+    rows = []
+    for cohort_id in admitted_ids:
+        bucket = slots.get(cohort_id, {})
+        views = list(bucket.values())
+        active = [item for item in views if not item.get("integrity_excluded")]
+        observed = [
+            float(item["target"])
+            for item in active
+            if item.get("target_is_observed") and item.get("target") is not None
+        ]
+        matched = [item for item in active if item.get("matched")]
+        missing = [item for item in matched if not item.get("target_is_observed")]
+        exclusions: dict[str, int] = defaultdict(int)
+        for item in views:
+            if item.get("integrity_excluded"):
+                exclusions["INTEGRITY_CONFLICT"] += 1
+                continue
+            reason = item.get("exclusion")
+            if isinstance(reason, str) and reason:
+                exclusions[reason] += 1
+        shared = sum(
+            1
+            for identity, view in bucket.items()
+            if not view.get("integrity_excluded") and len(owners.get(identity, ())) > 1
+        )
+        rows.append(
+            {
+                "view": cohort_id,
+                "cohort_id": cohort_id,
+                "population_n": sum(1 for item in active if item.get("in_base")),
+                "base_x_n": sum(1 for item in active if item.get("in_base")),
+                "decision_eligible_n": sum(1 for item in active if item.get("decision_eligible")),
+                "matched_n": len(matched),
+                "observed_target_n": len(observed),
+                "missing_target_n": len(missing),
+                "feature_unknown_n": sum(1 for item in active if item.get("feature_unknown")),
+                "denominator_base_x": sum(1 for item in active if item.get("in_base")),
+                "feature_admissible": sum(1 for item in active if item.get("decision_eligible")),
+                "target_observed_after_decision": len(observed),
+                "mean_target": _mean(observed),
+                "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                "exclusion_reasons": dict(sorted(exclusions.items())),
+                "independent_replication": False,
+                "shared_decision_n": shared,
+                "membership": "DESCRIPTIVE_NOT_INDEPENDENT",
+            }
+        )
+    return rows
+
+
 def _mean(values: Sequence[float]) -> float | None:
     if not values:
         return None
@@ -954,7 +1076,9 @@ def execute_temporal_discovery(
     predicates = list(body["predicates"])
     seen: set[tuple[str, str]] = set()
     signatures: dict[tuple[str, str], tuple] = {}
+    conflicted: set[tuple[str, str]] = set()
     members: list[dict[str, Any]] = []
+    cohort_membership: dict[str, dict[tuple, dict[str, Any]]] = {}
     duplicate_count = 0
     integrity_conflicts = 0
     for row in census:
@@ -993,20 +1117,64 @@ def execute_temporal_discovery(
         signature = signature_index.get((mint, cohort, release), ())
         if identity in seen:
             duplicate_count += 1
-            if signatures.get(identity) != signature:
-                integrity_conflicts += 1
+            if identity in conflicted or signatures.get(identity) != signature:
+                if identity not in conflicted:
+                    integrity_conflicts += 1
+                    conflicted.add(identity)
                 for member in members:
                     if member.get("identity") == identity:
                         member["integrity_excluded"] = True
+                        member["in_base"] = False
+                        member["decision_eligible"] = False
+                        member["feature_unknown"] = False
                         member["matched"] = False
                         member["target_is_observed"] = False
+                        member["target"] = None
+                        if member.get("exclusion") != "BINDING_COHORT_MISMATCH":
+                            member["exclusion"] = "INTEGRITY_CONFLICT"
+                _exclude_shared_identity(cohort_membership, identity)
+                _note_cohort_membership(
+                    cohort_membership,
+                    cohort,
+                    identity,
+                    {
+                        "integrity_excluded": True,
+                        "in_base": False,
+                        "decision_eligible": False,
+                        "matched": False,
+                        "target_is_observed": False,
+                        "feature_unknown": False,
+                        "exclusion": "INTEGRITY_CONFLICT",
+                        "target": None,
+                    },
+                )
                 continue
             existing = next(
                 item
                 for item in members
                 if item.get("identity") == identity and item.get("exclusion") != "BINDING_COHORT_MISMATCH"
             )
+            if existing.get("integrity_excluded"):
+                conflicted.add(identity)
+                _exclude_shared_identity(cohort_membership, identity)
+                _note_cohort_membership(
+                    cohort_membership,
+                    cohort,
+                    identity,
+                    {
+                        "integrity_excluded": True,
+                        "in_base": False,
+                        "decision_eligible": False,
+                        "matched": False,
+                        "target_is_observed": False,
+                        "feature_unknown": False,
+                        "exclusion": "INTEGRITY_CONFLICT",
+                        "target": None,
+                    },
+                )
+                continue
             if existing.get("in_base"):
+                _note_cohort_membership(cohort_membership, cohort, identity, existing)
                 continue
             members.remove(existing)
             seen.remove(identity)
@@ -1118,6 +1286,7 @@ def execute_temporal_discovery(
                 "exclusion": exclusion,
             }
         )
+        _note_cohort_membership(cohort_membership, cohort, identity, members[-1])
     base_members = [item for item in members if item["in_base"]]
     decision_members = [item for item in base_members if item["decision_eligible"]]
     matched_members = [
@@ -1241,6 +1410,12 @@ def execute_temporal_discovery(
             }
             for key, values in sorted(by_block.items())
         ],
+        "by_cohort": _cohort_rows(
+            cohort_membership,
+            list(dict.fromkeys(cohort_ids)),
+        ),
+        "cohort_slices_are_descriptive": True,
+        "cohort_independent_replication": False,
         "cost": costs,
         "viewed_variants": viewed,
         "main_question_count_includes_variants": False,

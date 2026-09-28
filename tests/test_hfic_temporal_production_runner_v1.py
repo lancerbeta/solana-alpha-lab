@@ -634,6 +634,11 @@ class TemporalVerticalTests(unittest.TestCase):
             handed = frozen["critic_input_packet"]["grounded_evidence"]
             self.assertEqual(handed["result_refs"], compound_evidence["result_refs"])
             self.assertEqual(handed["result"]["spec_sha256"], compound_evidence["result"]["spec_sha256"])
+            self.assertEqual(
+                handed["result"]["by_cohort"],
+                compound_evidence["result"]["by_cohort"],
+            )
+            self.assertAlmostEqual(handed["result"]["by_cohort"][0]["mean_target"], 0.2, places=9)
             self.assertTrue(handed["tier_progress"]["compound_executed"])
             self.assertGreaterEqual(len(handed["viewed_queries"]), 2)
             progress = assess_tier_progress(list_discovery_looks(store, journal), freeze_worthy=True)
@@ -685,6 +690,11 @@ class TemporalVerticalTests(unittest.TestCase):
             saved_summary = saved["capability_result"]["summary"]
             self.assertEqual(saved_summary["spec_sha256"], compound_evidence["result"]["spec_sha256"])
             self.assertAlmostEqual(saved_summary["mean_target"], 0.2, places=9)
+            self.assertEqual(
+                saved_summary["by_cohort"][0]["cohort_id"],
+                compound_evidence["result"]["by_cohort"][0]["cohort_id"],
+            )
+            self.assertAlmostEqual(saved_summary["by_cohort"][0]["mean_target"], 0.2, places=9)
             self.assertEqual(
                 saved_summary["experiment_recipe"]["frozen_input"][0]["observations_sha256"],
                 frozen_input[0]["observations_sha256"],
