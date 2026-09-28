@@ -5011,6 +5011,10 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                     "execution_binding_sha256"
                 ),
                 "model_provenance_sha256": payload.get("model_provenance_sha256"),
+                "critic_terminal": payload.get("critic_terminal"),
+                "final_session_terminal": payload.get("final_session_terminal"),
+                "selected_candidate_id": payload.get("selected_candidate_id"),
+                "run_id": payload.get("run_id") or payload.get("forge_run_id"),
             }
         cycle_row["_identity_fields_present"] = {
             key

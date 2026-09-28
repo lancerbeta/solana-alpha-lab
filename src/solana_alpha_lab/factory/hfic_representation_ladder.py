@@ -3121,11 +3121,15 @@ def evaluate_forge_run(
         # can be replayed as a completed owner result.
         # An authorized repair continuation deliberately lifts the completed
         # readback so the remaining look ledger can continue on the same slot.
+        # Gate matches apply/overlay: AUTHORIZED + NO_WORTHY parent + session bind.
         repair_active = active_repair_continuation_for_slot(
             list_repair_continuation_dispositions(store),
             scientific_slot_sha256=scientific_slot,
+            session_id=str(decision.get("session_id") or "") or None,
         )
-        if repair_active is None:
+        if repair_active is None or (
+            str(repair_active.get("parent_terminal") or "") != "NO_WORTHY_HYPOTHESIS"
+        ):
             replay_provenance = _completed_readback_provenance_status(
                 existing,
                 active_row=active_row,

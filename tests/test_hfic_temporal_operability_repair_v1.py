@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
 import unittest
@@ -1127,6 +1128,138 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                 store=store,
             )
             self.assertEqual(blocked["reason_code"], "DISPOSITION_ALREADY_CLOSED")
+
+    def test_list_sessions_projects_critic_terminal_into_admission(self) -> None:
+        """Production occupancy rows must carry critic_terminal for overlay."""
+
+        from datetime import timezone
+
+        from solana_alpha_lab.factory.hfic_session import list_hfic_sessions
+        from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
+
+        session_id = "HFIC-SESS-LIST-PROJ-001"
+        moment = datetime(2026, 9, 28, tzinfo=timezone.utc)
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp) / "store")
+            cycle_payload = {
+                "research_cycle_id": f"{session_id}-NO-WORTHY",
+                "session_id": session_id,
+                "phase": "SYNTHESIS_COMPLETE",
+                "hfic_protocol": "HFIC-V1.2",
+                "prompt_version": "HFIC-V1.2",
+                "owner_focus": "AUTO",
+                "evidence_epoch_sha256": "ab" * 32,
+                "focus_key_sha256": "22" * 32,
+                "search_key_sha256": "aa" * 32,
+                "selected_candidate_id": None,
+                "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+                "scientific_slot_sha256": "11" * 32,
+            }
+            body = json.dumps(cycle_payload, sort_keys=True, separators=(",", ":"))
+            receipt_body = json.dumps(
+                {
+                    "artifact_kind": "SESSION_RECEIPT",
+                    "session_id": session_id,
+                    "session_state": "SYNTHESIS_COMPLETE",
+                    "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            txn = f"RESEARCH-TXN-LIST-PROJ-{session_id[-8:].upper()}"
+            store.append(
+                [
+                    ResearchEvent(
+                        record_id=f"HFIC-CYCLE-{session_id}-NO-WORTHY",
+                        record_kind=RecordKind.RESEARCH_CYCLE,
+                        entity_id=session_id,
+                        hypothesis_version_id=None,
+                        run_id=None,
+                        transaction_id=txn,
+                        effective_at=moment,
+                        first_reliable_available_at=moment,
+                        supersedes_record_id=None,
+                        payload_json=body,
+                        payload_sha256=__import__("hashlib")
+                        .sha256(body.encode("utf-8"))
+                        .hexdigest(),
+                        schema_version="1.0",
+                        producer_capability_id="CAP-TEST",
+                        producer_git_sha=GIT_SHA,
+                        created_at=moment,
+                    ),
+                    ResearchEvent(
+                        record_id=f"HFIC-ART-RECEIPT-{session_id}",
+                        record_kind=RecordKind.RESEARCH_ARTIFACT,
+                        entity_id=session_id,
+                        hypothesis_version_id=None,
+                        run_id=None,
+                        transaction_id=txn,
+                        effective_at=moment,
+                        first_reliable_available_at=moment,
+                        supersedes_record_id=None,
+                        payload_json=receipt_body,
+                        payload_sha256=__import__("hashlib")
+                        .sha256(receipt_body.encode("utf-8"))
+                        .hexdigest(),
+                        schema_version="1.0",
+                        producer_capability_id="CAP-TEST",
+                        producer_git_sha=GIT_SHA,
+                        created_at=moment,
+                    ),
+                ],
+                transaction_id=txn,
+            )
+            listed = list_hfic_sessions(store)
+            row = next(item for item in listed if item["session_id"] == session_id)
+            self.assertEqual(row["session_state"], "SYNTHESIS_COMPLETE")
+            self.assertEqual(row["critic_terminal"], "NO_WORTHY_HYPOTHESIS")
+            draft = {
+                "parent_run_id": "FORGE-RUN-LIST-PROJ",
+                "parent_session_id": session_id,
+                "scientific_slot_sha256": "11" * 32,
+                "terminal_receipt_sha256": "22" * 32,
+                "journal_scope": "aa" * 32,
+                "technical_gap_code": "PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP",
+                "repair_capability_id": REPAIR_CAPABILITY_ID,
+                "allowed_look_ids": [],
+                "spent_main_looks": 2,
+                "spent_adaptive_looks": 0,
+                "spent_preview_looks": 0,
+                "owner_authorization_id": "OWNER-AUTH-LIST-PROJ",
+                "parent_terminal": "NO_WORTHY_HYPOTHESIS",
+            }
+            applied = apply_repair_continuation(
+                store,
+                draft,
+                parent_session={
+                    **row,
+                    "terminal_receipt_sha256": "22" * 32,
+                    "journal_scope": "aa" * 32,
+                },
+                git_sha=GIT_SHA,
+            )
+            # Mimic resolve_scientific_admission parent_terminal selection from
+            # the list projection (not raw session_state alone).
+            parent_terminal = (
+                str(row.get("critic_terminal") or "")
+                or str(row.get("final_session_terminal") or "")
+                or str(row.get("session_state") or "")
+            )
+            overlay = admission_with_repair_continuation(
+                {
+                    "action": "RETURN_EXISTING_SESSION",
+                    "reason_code": row["session_state"],
+                    "session_id": session_id,
+                    "scientific_slot_sha256": "11" * 32,
+                    "occupancy": "OCCUPIED",
+                },
+                dispositions=[applied["disposition"]],
+                parent_terminal=parent_terminal,
+            )
+            self.assertEqual(parent_terminal, "NO_WORTHY_HYPOTHESIS")
+            self.assertEqual(overlay["action"], ACTION_RESUME_REPAIR_CONTINUATION)
+            self.assertEqual(overlay["spent_main_looks"], 2)
 
 
 if __name__ == "__main__":
