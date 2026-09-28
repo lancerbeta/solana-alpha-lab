@@ -1,8 +1,8 @@
 ---
 task_id: COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1
-task_version: "1.0"
+task_version: "1.1"
 status: IN_PROGRESS
-as_of: "2026-09-28"
+as_of: "2026-09-29"
 owner: GOAL_OWNER
 allowed_routes:
   - DIRECT_CODEX_DELIVERY
@@ -13,9 +13,9 @@ required_review_roles:
   - OWNER_UX_CRITIC
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 86b24cb1abe5867becc1ead16efb3754044550df
+  expected_base: cc137231e17029875046823caa0f8db636ed6240
   expected_upstream: origin/main
-  expected_upstream_oid: 86b24cb1abe5867becc1ead16efb3754044550df
+  expected_upstream_oid: cc137231e17029875046823caa0f8db636ed6240
   expected_branch: codex/collector-campaign-cutover-truth-v1
   dirty_mode: ALLOW_REPORTED
 objective: >-
@@ -44,15 +44,18 @@ managed_write_set:
   - docs/evidence/collector_campaign_cutover_truth/a1_delivery_factory_fit_v1.json
   - docs/reports/collector_campaign_cutover_truth/a1_owner_readout_v1.md
 external_caps:
-  network: false
-  credentials: false
-  external_system: false
+  network: true
+  credentials: true
+  external_system: true
   signing_or_financial_action: false
   cash_spend: false
   deployment: false
 stop_conditions:
   - LIVE_VPS_DEPLOY_OR_MUTATION_REQUIRED
-  - PROVIDER_API_RPC_WSS_OR_CREDENTIAL_REQUIRED
+  - PROVIDER_API_RPC_WSS_OR_NON_GITHUB_CREDENTIAL_REQUIRED
+  - GITHUB_CLI_TOKEN_PLAINTEXT_STORAGE_REQUIRED
+  - GITHUB_REPOSITORY_TARGET_MISMATCH
+  - SSH_KEY_CREATION_OR_UPLOAD_REQUIRED
   - LIVE_ACTIVATION_REGISTRATION_OR_AUTHORIZATION_REQUIRED
   - SQLITE_SCHEMA_RETENTION_OR_CAMPAIGN_LIMIT_CHANGE_REQUIRED
   - APPEND_ONLY_LIFECYCLE_HISTORY_REWRITE_REQUIRED
@@ -86,7 +89,10 @@ context_requirements:
       - src/solana_alpha_lab/factory/collector_read_model.py
       - src/solana_alpha_lab/factory/collector_operational_packet.py
       - scripts/observation_schedule.py
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/collector_campaign_cutover_truth/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/collector_campaign_cutover_truth/a1_delivery_independent_review_v1.json
+      - docs/evidence/collector_campaign_cutover_truth/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
@@ -99,8 +105,9 @@ PRD_LITE — exact bounded task contract based on the owner-supplied PRD + SSD.
 ## ENTRY VERDICT
 
 START_AS_WRITTEN. The fresh default-branch base is
-86b24cb1abe5867becc1ead16efb3754044550df; the named contract did not exist
-on main, so this file establishes it without editing prior contracts.
+cc137231e17029875046823caa0f8db636ed6240 after merging origin/main (PR #351
+location-aware incremental sync). The named contract did not exist on main, so
+this file establishes it without editing prior contracts.
 
 ## DECISION_DELTA
 
@@ -149,10 +156,23 @@ implementation and tests.
 
 ## NON-GOALS
 
-No live VPS work, provider calls, credential reads, activation/authority
-operations, SQLite schema, retention, campaign-limit or scientific-parameter
-changes; no append-only history rewrite; no call_ledger optimization or live
-commissioning; no replacement of previous task contracts.
+No live VPS work, provider calls, campaign/provider credential reads,
+activation/authority operations, SQLite schema, retention, campaign-limit or
+scientific-parameter changes; no append-only history rewrite; no call_ledger
+optimization or live commissioning; no replacement of previous task contracts.
+GitHub CLI fallback is bounded by AUTHORIZED_GITHUB_DELIVERY_FALLBACK and does
+not authorize use of credentials or GitHub access outside this repository task.
+
+## AUTHORIZED_GITHUB_DELIVERY_FALLBACK
+
+Owner authorization on 2026-09-29 permits one GitHub CLI web-device login only
+if the Codex GitHub connector is not callable in this task context. Use HTTPS
+for routine delivery on lancerbeta/solana-alpha-lab: publish this task branch,
+open/update its task PR, and read back exact-head CI and merge-readiness. Do not
+create or upload SSH keys, expose or print the stored token, or use this access
+for another repository, issue, provider, VPS, campaign, activation, or authority
+operation. If the CLI cannot store the credential in the Windows secure
+credential store, stop before remote delivery.
 
 ## STOP
 

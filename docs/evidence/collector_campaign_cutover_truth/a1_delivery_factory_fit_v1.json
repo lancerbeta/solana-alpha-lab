@@ -1,0 +1,39 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "COLLECTOR-CAMPAIGN-CUTOVER-TRUTH-FACTORY-FIT-001",
+  "as_of": "2026-09-29",
+  "task_id": "COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "security": "PASS",
+    "red_team": "PASS"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1"
+  },
+  "recovery": "REVERT",
+  "limits": [
+    "NO_CANONICAL_DONE",
+    "NO_ALPHA",
+    "NO_LIVE_VPS_OR_CUTOVER_EVIDENCE",
+    "NO_PROVIDER_CALLS_OR_CREDENTIAL_READS",
+    "NO_ACTIVATION_OR_AUTHORITY_OPERATIONS",
+    "NO_SQLITE_SCHEMA_RETENTION_OR_CAMPAIGN_LIMIT_CHANGES",
+    "NO_APPEND_ONLY_HISTORY_REWRITE",
+    "NO_CALL_LEDGER_OPTIMIZATION",
+    "NO_PHYSICAL_DISPATCH_CROSSING_TEST"
+  ]
+}
