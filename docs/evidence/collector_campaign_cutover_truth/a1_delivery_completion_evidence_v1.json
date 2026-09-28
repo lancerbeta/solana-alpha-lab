@@ -10,7 +10,22 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "a942d0e7ab412ccc120ae60f3a74b3ef8c8119eeaf889c6cc1aaea08cf3abbd6",
+    "catalog/assets/lifecycle.yaml": "360784ceee34aeb05141449eb55d1ad172ef435bfc827474b45ee8b54d384b64",
+    "catalog/catalog_manifest.yaml": "d89d6920527e3d8bb0c84caa591a0c3a5eec47a8cf16813a01c4f18ad4d67e99",
+    "catalog/generated/asset_edges.json": "06fc2dad390f0ce8fcd5d4addef50e59987b5a749710b7504cb1eea9e53c9826",
+    "docs/PROJECT_MAP.md": "a85c168661ac1702536b7ac04ec87f7fd7175e9e8467d4fd2056611b7578166d",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "5117ac80cc7640238959e86bfc86d8bfc2fed1f5a672210db789fdb50b0d90d7",
+    "docs/reports/collector_campaign_cutover_truth/a1_owner_readout_v1.md": "f2cdf656764efa49b7976f6c7aa03d3680384d8e2c2c832bc0b49d498b5b66c9",
+    "docs/tasks/COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1.md": "75266edfb805bdd88e5fe1f31c414149a90bdd93271e61c8ee295c0d261caa7e",
+    "scripts/observation_schedule.py": "65a35554546fca9249f85cabd2e9822fc3245d923547682c8c8b613f1d003c85",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "b735c056bcd8e418b83abfd93a12a928cfdce858e7319d189aab4992eee78186",
+    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "481e601ca5fdf73a0bac7ca16c6f9076d1ff83ee1061fdc47c716afab49d7cce",
+    "src/solana_alpha_lab/factory/operability_watch.py": "3b1aed717b0a119bac511fd28d802cafa45e4ceaf5fb1de6761c1809abb6de11",
+    "tests/test_collector_campaign_continuity_repair_v1.py": "fa3de39024e899222b15ce52d89488f5885e57dbcbffe2aff82b13fda22b2900",
+    "tests/test_observation_scheduler.py": "e76b78313e7f12cb9c042f24f5184db1b804d8b91ab46ebe9e59781c1dcf98d0"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/collector_campaign_cutover_truth/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "4a05c8486baefec5f05faf623483e68edae5b8b6eae726f7eec6cf8795fd2a46",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_78_TARGETED_UNITTESTS_AND_CATALOG_CONTEXT_CHECKS",
     "independent_review": {
       "path": "docs/evidence/collector_campaign_cutover_truth/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "f047ccd5b6914b9c7db057240867e269c2109adeca28c7b73f0dc882da8ff89a",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
