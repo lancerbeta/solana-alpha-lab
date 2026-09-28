@@ -17,6 +17,7 @@ from typing import Any, Mapping
 from solana_alpha_lab.factory.collector_read_model import (
     build_collector_read_model,
     activation_rows_with_family_keys,
+    project_activation_as_of,
     select_current_activation,
 )
 from solana_alpha_lab.factory.due_pressure import backlog_risk_from_due_pressure
@@ -32,6 +33,7 @@ from solana_alpha_lab.factory.observation_publication_jobs import (
 )
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
 from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+    activation_transition_research_event_proven,
     cohort_family_key,
     rollover_research_event_proven,
 )
@@ -121,7 +123,8 @@ def assess_campaign_successor_continuity(
     }
     if activation is None:
         return empty
-    if str(activation.get("state") or "") != "ACTIVE":
+    activation_state = str(activation.get("state") or "")
+    if activation_state not in {"ACTIVE", "DRAINING"}:
         return {
             **empty,
             "stops_admitting_at": str(activation.get("stops_admitting_at") or UNKNOWN),
@@ -156,7 +159,7 @@ def assess_campaign_successor_continuity(
     activation_id = str(activation.get("activation_id") or "")
     registered = store.get_registered_schedule(schedule_sha) if schedule_sha else None
     if registered is None:
-        required = within_warning_band
+        required = within_warning_band or time_to_stop <= timedelta(0)
         return {
             "campaign_successor_state": "UNKNOWN",
             "stops_admitting_at": stops_raw,
@@ -305,6 +308,9 @@ def assess_campaign_successor_continuity(
                     require_bound_receipt=True,
                 )
                 and _window_covers(other_reg["document"], current_stops)
+                and activation_transition_research_event_proven(
+                    data_root, other, now=now
+                )
             ):
                 has_active_peer = True
                 continuity_proven = True
@@ -316,37 +322,84 @@ def assess_campaign_successor_continuity(
 
     if successor_state != "ROLLOVER_READY" and not continuity_proven:
         best = "NONE"
+        best_rank = -1
         for other_sha in store.list_registered_schedule_digests():
             if other_sha == schedule_sha:
                 continue
             other_reg = store.get_registered_schedule(other_sha)
             if other_reg is None or cohort_family_key(other_reg["document"]) != family:
                 continue
-            if _authority_is_live(other_sha):
-                best = "AUTHORIZED"
-                if _window_covers(other_reg["document"], current_stops):
-                    continuity_proven = True
-                    successor_schedule_sha256 = other_sha
-                    break
-            elif best == "NONE":
-                best = "REGISTERED"
+            try:
+                other_starts = parse_utc(
+                    str(other_reg["document"]["activation"]["starts_at"])
+                )
+                other_stops = parse_utc(
+                    str(other_reg["document"]["activation"]["stops_admitting_at"])
+                )
+            except (KeyError, TypeError, ValueError):
+                continue
+            if other_stops <= current_stops:
+                candidate_state = "HISTORICAL_OUT_OF_WINDOW"
+                candidate_rank = 0
+            elif other_starts > current_stops:
+                candidate_state = "WINDOW_MISSES_CUTOVER"
+                candidate_rank = 1
+            elif _authority_is_live(other_sha):
+                candidate_state = "AUTHORIZED"
+                candidate_rank = 3
+            else:
+                candidate_state = "REGISTERED"
+                candidate_rank = 2
+            if candidate_rank > best_rank:
+                best = candidate_state
+                best_rank = candidate_rank
                 successor_schedule_sha256 = other_sha
         if successor_state != "ROLLOVER_READY":
             successor_state = best
     elif has_active_peer:
         successor_state = "ACTIVE"
     prepared = continuity_proven or has_active_peer
-    required = within_warning_band and not prepared
-    if required and successor_state == "AUTHORIZED":
+    boundary_reached = time_to_stop <= timedelta(0)
+    required = (within_warning_band or boundary_reached) and not prepared
+    if required and boundary_reached:
+        successor_state = "GAP"
         owner_action = (
-            "prepare a new same-family successor whose authorized window covers "
-            "the current stops_admitting_at; this AUTHORIZED window is not continuous"
+            "admission gap: use the existing NON_ADMITTING forward-recovery "
+            "procedure, then late-activate a same-family successor; do not backdate"
+        )
+    elif required and successor_state == "AUTHORIZED":
+        owner_action = (
+            "commit and prove the same-family rollover at stops_admitting_at; "
+            "AUTHORIZED alone does not establish continuity"
+        )
+    elif required and successor_state == "WINDOW_MISSES_CUTOVER":
+        owner_action = (
+            "the registered same-family window starts after stops_admitting_at; "
+            "do not roll it over. Prepare and authorize a new same-family "
+            "successor whose window covers stops_admitting_at; if the boundary "
+            "passes first, use NON_ADMITTING forward recovery without backdating"
+        )
+    elif required and successor_state == "REGISTERED":
+        owner_action = (
+            "authorize the already-registered same-family successor whose "
+            "window covers stops_admitting_at, then commit and prove its "
+            "rollover; REGISTERED alone is insufficient"
+        )
+    elif required and successor_state == "HISTORICAL_OUT_OF_WINDOW":
+        owner_action = (
+            "prepare and authorize a new same-family successor whose window "
+            "covers stops_admitting_at; the historical registration is "
+            "out-of-window and is not a continuity candidate"
+        )
+    elif required and successor_state == "NONE":
+        owner_action = (
+            "register and authorize a same-family successor whose window covers "
+            "stops_admitting_at, then commit and prove its rollover"
         )
     elif required:
         owner_action = (
-            "register+authorize a same-family successor whose window covers "
-            "the current stops_admitting_at (REGISTERED alone insufficient); "
-            "in-window use rollover, post-window late activate after NON_ADMITTING"
+            "prepare and authorize a same-family successor whose window covers "
+            "stops_admitting_at, then commit and prove its rollover"
         )
     else:
         owner_action = UNKNOWN
@@ -1022,30 +1075,108 @@ def build_collector_operational_packet(
         period_seconds=period_seconds,
         empirical_overlap_seconds=empirical_overlap_seconds,
     )
-    continuity_activation = None
+    continuity_data_root = (
+        Path(observation_rdp)
+        if observation_rdp is not None
+        else root / "local/factory_v1/observation_rdp"
+    )
+    continuity_rows = activation_rows_with_family_keys(store, store.list_activations())
+    continuity_family_key: str | None = None
+    explicit_continuity_scope = False
     if schedule_sha256 and activation_id:
         requested = store.get_activation(schedule_sha256, activation_id)
         if requested is not None:
-            continuity_activation = select_current_activation(
-                activation_rows_with_family_keys(store, [requested]),
-                now=clock,
-                explicit_scope=True,
+            requested_rows = activation_rows_with_family_keys(store, [requested])
+            requested_family = str(
+                requested_rows[0].get("cohort_family_key") or ""
             )
-    if continuity_activation is None:
-        continuity_activation = select_current_activation(
-            activation_rows_with_family_keys(store, store.list_activations()),
-            now=clock,
+            explicit_continuity_scope = True
+            if requested_family:
+                continuity_family_key = requested_family
+                continuity_rows = [
+                    row
+                    for row in continuity_rows
+                    if str(row.get("cohort_family_key") or "")
+                    == continuity_family_key
+                ]
+            else:
+                continuity_rows = requested_rows
+    continuity_activation = select_current_activation(
+        continuity_rows,
+        now=clock,
+        family_key=continuity_family_key,
+        explicit_scope=explicit_continuity_scope,
+    )
+    continuity_proof_unavailable = False
+    if (
+        continuity_activation is not None
+        and str(continuity_activation.get("state") or "") == "ACTIVE"
+        and not activation_transition_research_event_proven(
+            continuity_data_root, continuity_activation, now=clock
         )
+    ):
+        unproven_active = continuity_activation
+        continuity_proof_unavailable = True
+        selected_family = str(
+            continuity_activation.get("cohort_family_key") or ""
+        )
+        draining_rows = [
+            row
+            for row in continuity_rows
+            if selected_family
+            and str(row.get("cohort_family_key") or "") == selected_family
+            and str(project_activation_as_of(row, clock).get("state") or "")
+            == "DRAINING"
+        ]
+        draining_predecessor = select_current_activation(
+            draining_rows,
+            now=clock,
+            family_key=selected_family or None,
+            explicit_scope=True,
+        )
+        if draining_predecessor is not None and activation_transition_research_event_proven(
+            continuity_data_root, draining_predecessor, now=clock
+        ):
+            continuity_activation = draining_predecessor
+            continuity_proof_unavailable = False
+        else:
+            # Unproven DRAINING cannot authorize GAP; keep UNKNOWN/BLOCKED.
+            continuity_activation = (
+                draining_predecessor
+                if draining_predecessor is not None
+                else unproven_active
+            )
+            continuity_proof_unavailable = True
     continuity = assess_campaign_successor_continuity(
         store,
         now=clock,
         activation=continuity_activation,
-        data_root=(
-            Path(observation_rdp)
-            if observation_rdp is not None
-            else root / "local/factory_v1/observation_rdp"
-        ),
+        data_root=continuity_data_root,
     )
+    if (
+        not continuity_proof_unavailable
+        and continuity_data_root is not None
+        and continuity_activation is not None
+        and str(continuity_activation.get("state") or "") in {"ACTIVE", "DRAINING"}
+        and not activation_transition_research_event_proven(
+            continuity_data_root, continuity_activation, now=clock
+        )
+    ):
+        continuity_proof_unavailable = True
+    if continuity_proof_unavailable:
+        continuity.update(
+            {
+                "campaign_successor_state": "UNKNOWN",
+                "campaign_successor_required": True,
+                "campaign_successor_owner_action": (
+                    "run read-only status using CONTINUITY_SCHEDULE_SHA256 and "
+                    "CONTINUITY_ACTIVATION_ID; verify last_transition_event_id "
+                    "resolves to a committed matching OBSERVATION_SCHEDULE_STATE. "
+                    "Missing or mismatched proof remains UNKNOWN: open a recovery "
+                    "atom and do not rewrite lifecycle history"
+                ),
+            }
+        )
 
     loaded = dict(remote_config) if remote_config is not None else None
     try:
@@ -1222,10 +1353,6 @@ def build_collector_operational_packet(
     reported_activation_state = base.get("activation_state") or UNKNOWN
     if reported_activation_state == "ACTIVE" and digest and act_id:
         try:
-            from solana_alpha_lab.factory.observation_schedule_lifecycle import (
-                activation_transition_research_event_proven,
-            )
-
             proof_row = store.get_activation(digest, act_id)
             proven = proof_row is not None and activation_transition_research_event_proven(
                 rdp, proof_row, now=clock
@@ -1249,6 +1376,12 @@ def build_collector_operational_packet(
         "campaign_id": campaign_id or UNKNOWN,
         "cohort_id": release.get("cohort_id") or UNKNOWN,
         "stops_admitting_at": continuity.get("stops_admitting_at") or UNKNOWN,
+        "campaign_continuity_activation_id": str(
+            (continuity_activation or {}).get("activation_id") or UNKNOWN
+        ),
+        "campaign_continuity_schedule_sha256": str(
+            (continuity_activation or {}).get("schedule_sha256") or UNKNOWN
+        ),
         "campaign_time_remaining_seconds": continuity.get(
             "campaign_time_remaining_seconds"
         ),

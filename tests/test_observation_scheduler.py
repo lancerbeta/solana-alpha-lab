@@ -4,14 +4,21 @@ import json
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from datetime import UTC, datetime, timedelta
+from io import StringIO
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from solana_alpha_lab.factory.collector_read_model import (  # noqa: E402
+    project_activation_as_of,
+)
 from solana_alpha_lab.factory.observation_schedule import (  # noqa: E402
     canonical_sha256,
     load_observation_schedule,
@@ -26,7 +33,10 @@ from solana_alpha_lab.factory.observation_scheduler import (  # noqa: E402
     apply_recovery_gap,
     tick_once,
 )
-from scripts.observation_schedule import main as cli_main  # noqa: E402
+from scripts.observation_schedule import (  # noqa: E402
+    _tick_candidates_as_of,
+    main as cli_main,
+)
 
 
 GIT_SHA = "c" * 40
@@ -2577,6 +2587,366 @@ class ObservationSchedulerTests(unittest.TestCase):
                 self.assertIsNotNone(payload.get("first_seen_at"))
             finally:
                 store.close()
+
+
+    def test_tick_candidates_use_one_as_of_clock_across_future_cutover(self) -> None:
+        cutover = NOW + timedelta(seconds=2)
+        cutover_raw = render_utc(cutover)
+        predecessor = {
+            "schedule_sha256": "a" * 64,
+            "activation_id": "ACT-PRE",
+            "state": "DRAINING",
+            "payload": json.dumps(
+                {
+                    "prior_state": "ACTIVE",
+                    "new_state": "DRAINING",
+                    "transition_effective_at": cutover_raw,
+                }
+            ),
+        }
+        successor = {
+            "schedule_sha256": "b" * 64,
+            "activation_id": "ACT-SUC",
+            "state": "ACTIVE",
+            "payload": json.dumps(
+                {
+                    "prior_state": "REGISTERED",
+                    "new_state": "ACTIVE",
+                    "transition_effective_at": cutover_raw,
+                }
+            ),
+        }
+        rows = [predecessor, successor]
+
+        # The tick starts two seconds before the boundary and finishes after it.
+        # Its candidate snapshot must keep using the captured entry instant.
+        captured_now = cutover - timedelta(seconds=2)
+        candidates_at_start = _tick_candidates_as_of(rows, captured_now)
+        self.assertEqual(
+            candidates_at_start,
+            [("a" * 64, "ACT-PRE")],
+        )
+        completion_time = cutover + timedelta(seconds=3)
+        self.assertGreater(completion_time, cutover)
+        self.assertEqual(
+            _tick_candidates_as_of(rows, captured_now),
+            candidates_at_start,
+        )
+
+        # A tick started at or after the boundary sees the successor as the
+        # sole accepting activation; the predecessor remains selectable only
+        # for draining due work.
+        candidates_after = _tick_candidates_as_of(rows, cutover)
+        self.assertEqual(
+            set(candidates_after),
+            {("a" * 64, "ACT-PRE"), ("b" * 64, "ACT-SUC")},
+        )
+        projected_after = [
+            project_activation_as_of(row, cutover) for row in rows
+        ]
+        self.assertEqual(
+            [
+                row["activation_id"]
+                for row in projected_after
+                if row["state"] == "ACTIVE"
+            ],
+            ["ACT-SUC"],
+        )
+
+    def test_cli_tick_refuses_future_only_without_reregister_action(self) -> None:
+        cutover = NOW + timedelta(hours=1)
+        cutover_raw = render_utc(cutover)
+        successor = {
+            "schedule_sha256": "b" * 64,
+            "activation_id": "ACT-SUC",
+            "state": "ACTIVE",
+            "starts_at": cutover_raw,
+            "stops_admitting_at": render_utc(cutover + timedelta(days=7)),
+            "authority_receipt_sha256": "2" * 64,
+            "payload": json.dumps(
+                {
+                    "prior_state": "REGISTERED",
+                    "new_state": "ACTIVE",
+                    "transition_effective_at": cutover_raw,
+                }
+            ),
+        }
+
+        class _Store:
+            def restore_marker_unresolved(self) -> bool:
+                return False
+
+            def list_activations(self) -> list[dict]:
+                return [successor]
+
+            def close(self) -> None:
+                pass
+
+        with tempfile.TemporaryDirectory() as tmp:
+            config = {"producer_git_sha": GIT_SHA}
+            output = StringIO()
+            with (
+                patch(
+                    "scripts.observation_schedule.load_runtime_config",
+                    return_value=config,
+                ),
+                patch(
+                    "scripts.observation_schedule.resolve_clock",
+                    return_value=NOW,
+                ),
+                patch(
+                    "scripts.observation_schedule._bind_runtime",
+                    return_value=(config, Path(tmp), _Store()),
+                ),
+                patch("scripts.observation_schedule.git_sha", return_value=GIT_SHA),
+                redirect_stdout(output),
+            ):
+                code = cli_main(["tick", "--once"])
+            payload = json.loads(output.getvalue())
+            self.assertEqual(code, 2)
+            self.assertEqual(
+                payload["terminal"], "TICK_REFUSED_FUTURE_TRANSITION_PENDING"
+            )
+            self.assertEqual(
+                payload["next_action"], "WAIT_OR_INSPECT_SCHEDULED_CUTOVER"
+            )
+            self.assertNotEqual(
+                payload["next_action"], "REGISTER_AUTHORIZE_ACTIVATE"
+            )
+
+    def test_cli_tick_explicit_override_future_active_waits_for_cutover(self) -> None:
+        cutover = NOW + timedelta(hours=1)
+        cutover_raw = render_utc(cutover)
+        successor = {
+            "schedule_sha256": "b" * 64,
+            "activation_id": "ACT-SUC",
+            "state": "ACTIVE",
+            "starts_at": cutover_raw,
+            "stops_admitting_at": render_utc(cutover + timedelta(days=7)),
+            "authority_receipt_sha256": "2" * 64,
+            "payload": json.dumps(
+                {
+                    "prior_state": "REGISTERED",
+                    "new_state": "ACTIVE",
+                    "transition_effective_at": cutover_raw,
+                }
+            ),
+        }
+
+        class _Store:
+            def restore_marker_unresolved(self) -> bool:
+                return False
+
+            def list_activations(self) -> list[dict]:
+                return [successor]
+
+            def get_registered_schedule(self, digest: str) -> dict:
+                return {
+                    "document": {
+                        "schedule_sha256": digest,
+                        "activation": {
+                            "starts_at": cutover_raw,
+                            "stops_admitting_at": render_utc(
+                                cutover + timedelta(days=7)
+                            ),
+                        },
+                    }
+                }
+
+            def get_activation(self, digest: str, activation_id: str) -> dict:
+                assert digest == successor["schedule_sha256"]
+                assert activation_id == successor["activation_id"]
+                return successor
+
+            def close(self) -> None:
+                pass
+
+        with tempfile.TemporaryDirectory() as tmp:
+            config = {"producer_git_sha": GIT_SHA}
+            output = StringIO()
+            with (
+                patch(
+                    "scripts.observation_schedule.load_runtime_config",
+                    return_value=config,
+                ),
+                patch(
+                    "scripts.observation_schedule.resolve_clock",
+                    return_value=NOW,
+                ),
+                patch(
+                    "scripts.observation_schedule._bind_runtime",
+                    return_value=(config, Path(tmp), _Store()),
+                ),
+                patch("scripts.observation_schedule.git_sha", return_value=GIT_SHA),
+                redirect_stdout(output),
+            ):
+                code = cli_main(
+                    [
+                        "tick",
+                        "--once",
+                        "--schedule-sha256",
+                        successor["schedule_sha256"],
+                        "--activation-id",
+                        successor["activation_id"],
+                    ]
+                )
+            payload = json.loads(output.getvalue())
+            self.assertEqual(code, 2)
+            self.assertEqual(
+                payload["terminal"], "TICK_REFUSED_FUTURE_TRANSITION_PENDING"
+            )
+            self.assertEqual(
+                payload["next_action"], "WAIT_OR_INSPECT_SCHEDULED_CUTOVER"
+            )
+            self.assertNotEqual(
+                payload["terminal"],
+                "TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE",
+            )
+
+
+    def test_cli_tick_keeps_entry_clock_when_processing_crosses_cutover(self) -> None:
+        cutover = NOW + timedelta(seconds=2)
+        cutover_raw = render_utc(cutover)
+        predecessor = {
+            "schedule_sha256": "a" * 64,
+            "activation_id": "ACT-PRE",
+            "state": "DRAINING",
+            "starts_at": render_utc(NOW - timedelta(hours=1)),
+            "stops_admitting_at": render_utc(cutover + timedelta(hours=1)),
+            "authority_receipt_sha256": "1" * 64,
+            "payload": json.dumps(
+                {
+                    "prior_state": "ACTIVE",
+                    "new_state": "DRAINING",
+                    "transition_effective_at": cutover_raw,
+                }
+            ),
+        }
+        successor = {
+            "schedule_sha256": "b" * 64,
+            "activation_id": "ACT-SUC",
+            "state": "ACTIVE",
+            "starts_at": cutover_raw,
+            "stops_admitting_at": render_utc(cutover + timedelta(days=7)),
+            "authority_receipt_sha256": "2" * 64,
+            "payload": json.dumps(
+                {
+                    "prior_state": "REGISTERED",
+                    "new_state": "ACTIVE",
+                    "transition_effective_at": cutover_raw,
+                }
+            ),
+        }
+
+        class _Store:
+            def __init__(self) -> None:
+                self.rows = [predecessor, successor]
+                self.completion_time = NOW
+
+            def restore_marker_unresolved(self) -> bool:
+                return False
+
+            def list_activations(self) -> list[dict]:
+                self.completion_time = cutover + timedelta(seconds=3)
+                return self.rows
+
+            def get_registered_schedule(self, digest: str) -> dict:
+                return {
+                    "document": {
+                        "schedule_sha256": digest,
+                        "activation": {
+                            "starts_at": render_utc(NOW - timedelta(hours=1)),
+                            "stops_admitting_at": render_utc(cutover + timedelta(days=7)),
+                        },
+                    }
+                }
+
+            def get_activation(self, digest: str, activation_id: str) -> dict:
+                return next(
+                    row
+                    for row in self.rows
+                    if row["schedule_sha256"] == digest
+                    and row["activation_id"] == activation_id
+                )
+
+            def close(self) -> None:
+                pass
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = _Store()
+            config = {"producer_git_sha": GIT_SHA}
+            tick_calls: list[dict] = []
+            proof_times: list[datetime] = []
+
+            def _tick_once(**kwargs) -> dict:
+                tick_calls.append(kwargs)
+                return {
+                    "terminal": "TICK_COMPLETE",
+                    "provider_calls": 0,
+                    "credential_reads": 0,
+                }
+
+            def _proof(_data_root, _activation, *, now: datetime) -> bool:
+                proof_times.append(now)
+                return True
+
+            def _run(captured_now: datetime) -> tuple[int, dict]:
+                output = StringIO()
+                with (
+                    patch("scripts.observation_schedule.load_runtime_config", return_value=config),
+                    patch("scripts.observation_schedule.resolve_clock", return_value=captured_now),
+                    patch(
+                        "scripts.observation_schedule._bind_runtime",
+                        return_value=(config, Path(tmp), store),
+                    ),
+                    patch("scripts.observation_schedule.git_sha", return_value=GIT_SHA),
+                    patch(
+                        "scripts.observation_schedule.activation_transition_research_event_proven",
+                        side_effect=_proof,
+                    ),
+                    patch("scripts.observation_schedule._require_live_authority", return_value={}),
+                    patch(
+                        "scripts.observation_schedule.materialize_tick_physical_dependencies",
+                        return_value=SimpleNamespace(
+                            opener=None, credential_loader=None, pacing_clock=None
+                        ),
+                    ),
+                    patch(
+                        "scripts.observation_schedule.resolve_provider_call_wall_seconds",
+                        return_value=5,
+                    ),
+                    patch("scripts.observation_schedule.tick_once", side_effect=_tick_once),
+                    redirect_stdout(output),
+                ):
+                    code = cli_main(["tick", "--once"])
+                return code, json.loads(output.getvalue())
+
+            pre_code, pre_output = _run(cutover - timedelta(seconds=2))
+            self.assertGreater(store.completion_time, cutover)
+            self.assertEqual(pre_code, 0)
+            self.assertEqual(pre_output["terminal"], "TICK_COMPLETE")
+            self.assertEqual(
+                [call["activation_id"] for call in tick_calls],
+                ["ACT-PRE"],
+            )
+            self.assertEqual(tick_calls[0]["now"], cutover - timedelta(seconds=2))
+            self.assertEqual(proof_times, [cutover - timedelta(seconds=2)])
+
+            tick_calls.clear()
+            proof_times.clear()
+            post_code, post_output = _run(cutover)
+            self.assertEqual(post_code, 0)
+            self.assertEqual(post_output["terminal"], "TICK_COMPLETE")
+            self.assertEqual(
+                {call["activation_id"] for call in tick_calls},
+                {"ACT-PRE", "ACT-SUC"},
+            )
+            self.assertTrue(all(call["now"] == cutover for call in tick_calls))
+            projected = [project_activation_as_of(row, cutover) for row in store.rows]
+            self.assertEqual(
+                [row["activation_id"] for row in projected if row["state"] == "ACTIVE"],
+                ["ACT-SUC"],
+            )
 
 
 if __name__ == "__main__":

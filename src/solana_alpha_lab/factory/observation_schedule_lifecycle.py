@@ -1369,12 +1369,12 @@ def activation_transition_research_event_proven(
     *,
     now: datetime,
 ) -> bool:
-    """Prove that an ACTIVE projection matches its committed transition.
+    """Prove that an ACTIVE or DRAINING projection matches its committed transition.
 
     SQLite is a mutable operational projection. It may label a transition
-    ACTIVE before the effective time, or without the ResearchStore event that
-    establishes when that lifecycle change became available. Neither case is
-    proof that the activation is currently ACTIVE.
+    ACTIVE/DRAINING before the effective time, or without the ResearchStore
+    event that establishes when that lifecycle change became available.
+    Neither case is proof that the activation currently holds that state.
     """
 
     if data_root is None:
@@ -1406,6 +1406,8 @@ def activation_transition_research_event_proven(
             return _prior_active_transition_research_event_proven(
                 data_root, row, now=now
             )
+    if str(row.get("state") or "") == "DRAINING" and new_state == "DRAINING":
+        return _draining_transition_evidence(data_root, row, now=now) is not None
     if (
         str(row.get("state") or "") != "ACTIVE"
         or new_state != "ACTIVE"
