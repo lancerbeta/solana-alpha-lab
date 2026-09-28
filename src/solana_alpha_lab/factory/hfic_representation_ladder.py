@@ -2126,6 +2126,7 @@ def _lookup_run_artifact(
 ) -> dict[str, Any] | None:
     latest: dict[str, Any] | None = None
     completed: dict[str, Any] | None = None
+    repair_completed: dict[str, Any] | None = None
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
         if kind != RecordKind.RESEARCH_ARTIFACT.value:
@@ -2137,11 +2138,60 @@ def _lookup_run_artifact(
         if not isinstance(raw, str):
             continue
         body = json.loads(raw)
-        if isinstance(body, dict) and body.get("run_identity_sha256") == identity:
-            latest = body
-            if body.get("owner_final"):
-                completed = body
-    return completed or latest
+        if not (isinstance(body, dict) and body.get("run_identity_sha256") == identity):
+            continue
+        latest = body
+        if not body.get("owner_final"):
+            continue
+        # Authorized repair completion supersedes the historical exhausted
+        # parent receipt for the same run identity without rewriting it.
+        if isinstance(body.get("repair_continuation_disposition_sha256"), str) and body.get(
+            "repair_continuation_disposition_sha256"
+        ):
+            repair_completed = body
+        else:
+            completed = body
+    return repair_completed or completed or latest
+
+
+def _lookup_run_artifact_for_session(
+    store: ResearchStore, session_id: str
+) -> dict[str, Any] | None:
+    """Latest FORGE_RUN_RECEIPT bound to a session; repair completion preferred.
+
+    Current ladder frozen-set identity can diverge from a historical parent
+    receipt's run_identity while the session lineage is still the owner
+    answer. Prefer the repair-marked completion over SEARCH_EXHAUSTED.
+    """
+
+    if not session_id:
+        return None
+    latest: dict[str, Any] | None = None
+    completed: dict[str, Any] | None = None
+    repair_completed: dict[str, Any] | None = None
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if kind != RecordKind.RESEARCH_ARTIFACT.value:
+            continue
+        payload = json.loads(record.payload_json)
+        if payload.get("artifact_kind") != FORGE_RUN_ARTIFACT_KIND:
+            continue
+        raw = payload.get("payload_canonical")
+        if not isinstance(raw, str):
+            continue
+        body = json.loads(raw)
+        if not (isinstance(body, dict) and str(body.get("session_id") or "") == session_id):
+            continue
+        latest = body
+        if not body.get("owner_final"):
+            continue
+        if isinstance(body.get("repair_continuation_disposition_sha256"), str) and body.get(
+            "repair_continuation_disposition_sha256"
+        ):
+            repair_completed = body
+        else:
+            completed = body
+    return repair_completed or completed or latest
 
 
 def _persist_run_receipt(
@@ -2832,6 +2882,30 @@ def evaluate_forge_run(
                 existing = None
             if existing is not None:
                 run_identity = str(existing.get("run_identity_sha256") or legacy_identity)
+        if existing is None:
+            # Historical parent/repair receipts may keep the parent
+            # run_identity (e.g. BASE-only) while the live ladder freezes a
+            # wider ACTIVE set. Session lineage still owns the current
+            # owner result after repair close.
+            session_for_lookup = (
+                str(preferred_control_session_id)
+                if preferred_control_session_id
+                else (str(control_session_id) if control_session_id else "")
+            )
+            if not session_for_lookup:
+                for row in resolved_stages:
+                    if not isinstance(row, Mapping):
+                        continue
+                    sid = str(row.get("session_id") or "")
+                    if sid:
+                        session_for_lookup = sid
+                        break
+            if session_for_lookup:
+                existing = _lookup_run_artifact_for_session(store, session_for_lookup)
+                if existing is not None:
+                    bound_identity = existing.get("run_identity_sha256")
+                    if isinstance(bound_identity, str) and len(bound_identity) == 64:
+                        run_identity = bound_identity
     except ResearchStoreError:
         existing = None
     existing_owner_final = bool(
@@ -3114,11 +3188,12 @@ def evaluate_forge_run(
         ),
         None,
     )
-    if existing_owner_final and next_action != ACTION_OBSERVABILITY_BLOCKED:
+    if existing_owner_final:
         # A completed run is a durable readback, not a new forge-run write.
-        # Admission verifies the caller's known execution context, while this
-        # second check verifies the persisted artifact's own binding before it
-        # can be replayed as a completed owner result.
+        # Admission STOP / OBSERVABILITY_BLOCKED governs starting new scientific
+        # work; it must not hide an already-persisted owner_final — including a
+        # repair completion that supersedes historical SEARCH_EXHAUSTED after
+        # close. Provenance still fail-closes contradictory bindings.
         # An authorized repair continuation deliberately lifts the completed
         # readback so the remaining look ledger can continue on the same slot.
         # Gate matches apply/overlay: AUTHORIZED + NO_WORTHY parent + session bind.

@@ -37829,7 +37829,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: df48bbabcfc831867a2f942582784e48aab70a784059cee1d503e5c62706b5f9}
+  integrity: {kind: sha256, sha256: 04ea6e89dc86b4975e32f40c413953706653ce6bbaa7e35912ed5536ceebe893}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}
@@ -37847,7 +37847,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: FORGE_TEMPORAL_OPERABILITY_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_repair_continuation.py', repository_path: src/solana_alpha_lab/factory/hfic_repair_continuation.py}
-  integrity: {kind: sha256, sha256: 10fe6b6a648f22da3469e8c997b6a248a2f585153d2d6aaf688dbf70b860fec2}
+  integrity: {kind: sha256, sha256: 7196dde30980b664ef200dc958a81072b0d818882fae59fd25a164ce876c29ec}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-TEMPORAL-DISCOVERY-001}
@@ -38306,7 +38306,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_REPRESENTATION_LADDER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_ladder.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_ladder.py}
-  integrity: {kind: sha256, sha256: c79ea8661091f36927d6c512cb4d07f6eb67343e54e0c970d71839ac46f1d880}
+  integrity: {kind: sha256, sha256: 1b9f18d08472466588ada8c2c4afc5a4d57d750fbd1bd50c1abf396451757ace}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}

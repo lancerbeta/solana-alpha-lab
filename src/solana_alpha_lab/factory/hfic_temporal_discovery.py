@@ -1346,6 +1346,89 @@ def classify_temporal_look(
     }
 
 
+def technical_stop_record(code: str) -> dict[str, Any]:
+    return {
+        "terminal": "TECHNICAL_STOP",
+        "reason_code": code,
+        "scientific_negative": False,
+        "technical_failure": True,
+        "raw_corpus_negative": False,
+    }
+
+
+def snapshot_input_technical_stop(summary: Mapping[str, Any]) -> dict[str, Any] | None:
+    """Recoverable metadata/data stop when snapshot input is wholly uninterpretable.
+
+    Partial lineage misses stay as exclusions. Interpretable zero-match
+    (population formed; scientific target gaps) is not a technical stop.
+    """
+
+    if int(summary.get("observed_target_n") or 0) > 0:
+        return None
+    membership = {
+        str(code): int(count or 0)
+        for code, count in dict(summary.get("exclusion_reasons") or {}).items()
+        if int(count or 0) > 0
+    }
+    target_pooled = {
+        str(code): int(count or 0)
+        for code, count in dict(
+            (summary.get("target_exclusion_reasons") or {}).get("pooled") or {}
+        ).items()
+        if int(count or 0) > 0
+    }
+    lineage_membership = {
+        code: count
+        for code, count in membership.items()
+        if code in SNAPSHOT_LINEAGE_BLOCKERS
+    }
+    lineage_targets = {
+        code: count
+        for code, count in target_pooled.items()
+        if code in SNAPSHOT_LINEAGE_BLOCKERS
+    }
+    other_membership = {
+        code: count
+        for code, count in membership.items()
+        if code not in SNAPSHOT_LINEAGE_BLOCKERS
+    }
+    other_targets = {
+        code: count
+        for code, count in target_pooled.items()
+        if code not in SNAPSHOT_LINEAGE_BLOCKERS
+    }
+    population_n = int(summary.get("population_n") or 0)
+    if population_n == 0:
+        if lineage_membership and not other_membership:
+            primary = sorted(lineage_membership)[0]
+            return technical_stop_record(primary)
+        return None
+    # Population formed but every missing target is a lineage blocker and no
+    # scientific target gap is named — treat as uninterpretable input scope.
+    if lineage_targets and not other_targets and not other_membership:
+        primary = sorted(lineage_targets)[0]
+        return technical_stop_record(primary)
+    return None
+
+
+def look_counts_toward_scientific_search(item: Mapping[str, Any]) -> bool:
+    """Technical/metadata-only looks must not authorize SEARCH_EXHAUSTED."""
+
+    if item.get("new_look") is not True:
+        return False
+    result = item.get("result") if isinstance(item.get("result"), Mapping) else {}
+    if not isinstance(result, Mapping):
+        return True
+    if result.get("technical_failure") is True:
+        return False
+    stop = result.get("technical_stop")
+    if isinstance(stop, Mapping) and stop.get("technical_failure") is True:
+        return False
+    if snapshot_input_technical_stop(result) is not None:
+        return False
+    return True
+
+
 def assess_tier_progress(
     looks: Sequence[Mapping[str, Any]],
     *,
@@ -1357,12 +1440,14 @@ def assess_tier_progress(
     simple = [
         item
         for item in looks
-        if item.get("new_look") is True and item.get("search_tier") == "SIMPLE_SCREEN"
+        if look_counts_toward_scientific_search(item)
+        and item.get("search_tier") == "SIMPLE_SCREEN"
     ]
     compound = [
         item
         for item in looks
-        if item.get("new_look") is True and item.get("search_tier") == "COMPOUND_SCREEN"
+        if look_counts_toward_scientific_search(item)
+        and item.get("search_tier") == "COMPOUND_SCREEN"
     ]
     if not compound_applicable:
         status = "SKIPPED_INAPPLICABLE"
@@ -1378,7 +1463,9 @@ def assess_tier_progress(
         action = "RUN_SIMPLE_OR_COMPOUND"
     else:
         mains = [
-            item for item in looks if item.get("look_class") == "MAIN" and item.get("new_look") is True
+            item
+            for item in looks
+            if item.get("look_class") == "MAIN" and item.get("new_look") is True
         ]
         if len(mains) >= MAX_MAIN_QUERY_SPECS:
             status = "SKIPPED_BUDGET"
@@ -1400,16 +1487,6 @@ def assess_tier_progress(
 def assert_search_exhaustion_claim(progress: Mapping[str, Any], *, claim_search_exhausted: bool) -> None:
     if claim_search_exhausted and progress.get("search_exhausted_allowed") is not True:
         raise GroundedDiscoveryError("SEARCH_EXHAUSTED_WITHOUT_COMPOUND")
-
-
-def technical_stop_record(code: str) -> dict[str, Any]:
-    return {
-        "terminal": "TECHNICAL_STOP",
-        "reason_code": code,
-        "scientific_negative": False,
-        "technical_failure": True,
-        "raw_corpus_negative": False,
-    }
 
 
 def _cost_views(r_mark: float | None, profile: Mapping[str, Any] | None) -> dict[str, Any]:
@@ -1970,6 +2047,13 @@ def execute_temporal_discovery(
             ),
         ],
     }
+    stop = snapshot_input_technical_stop(summary)
+    if stop is not None:
+        summary["technical_stop"] = stop
+        summary["technical_failure"] = True
+        summary["terminal"] = stop["terminal"]
+        summary["reason_code"] = stop["reason_code"]
+        summary["scientific_negative"] = False
     return {
         "admitted": admitted,
         "summary": summary,

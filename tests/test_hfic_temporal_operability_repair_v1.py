@@ -2133,5 +2133,423 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
             self.assertEqual(overlay["action"], ACTION_RESUME_REPAIR_CONTINUATION)
 
 
+class MetadataStopAndPostCloseReadbackTests(unittest.TestCase):
+    """P1 residual: metadata technical stop; post-close owner result lineage."""
+
+    def test_wholly_uninterpretable_input_blocks_scientific_exhaustion(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import GroundedDiscoveryError
+        from solana_alpha_lab.factory.hfic_temporal_discovery import (
+            assert_search_exhaustion_claim,
+            assess_tier_progress,
+            execute_temporal_discovery,
+        )
+
+        rows = SnapshotNegativeControlsTests()._rows_legal()
+        stripped = []
+        for row in rows:
+            body = dict(row)
+            for key in (
+                "observation_clock_policy",
+                "call_occurrence_id",
+                "request_sha256",
+                "primitive_id",
+            ):
+                body.pop(key, None)
+            stripped.append(body)
+        summary = execute_temporal_discovery(
+            [_census()],
+            stripped,
+            _spec_snapshot(query_id="p11-tech-stop", search_tier="COMPOUND_SCREEN"),
+            _binding_mixed(),
+        )["summary"]
+        self.assertTrue(summary.get("technical_failure"))
+        self.assertEqual(
+            (summary.get("technical_stop") or {}).get("reason_code"),
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+        )
+        looks = [
+            {
+                "new_look": True,
+                "search_tier": "SIMPLE_SCREEN",
+                "look_class": "MAIN",
+                "result": summary,
+            },
+            {
+                "new_look": True,
+                "search_tier": "COMPOUND_SCREEN",
+                "look_class": "MAIN",
+                "result": summary,
+            },
+        ]
+        progress = assess_tier_progress(looks, freeze_worthy=False)
+        self.assertFalse(progress.get("search_exhausted_allowed"))
+        self.assertNotEqual(progress.get("action"), "READY_TO_FREEZE")
+        with self.assertRaises(GroundedDiscoveryError) as raised:
+            assert_search_exhaustion_claim(progress, claim_search_exhausted=True)
+        self.assertEqual(str(raised.exception), "SEARCH_EXHAUSTED_WITHOUT_COMPOUND")
+        # Interpretable positive path is unchanged.
+        legal = SnapshotTargetTests()._rows_legal()
+        ok = execute_temporal_discovery(
+            [_census()], legal, _spec_snapshot(query_id="p11-ok"), _binding_mixed()
+        )["summary"]
+        self.assertGreaterEqual(int(ok.get("observed_target_n") or 0), 1)
+        self.assertIsNone(ok.get("technical_stop"))
+
+    def test_post_close_forge_run_prefers_repair_terminal_over_parent(self) -> None:
+        """Historical SEARCH_EXHAUSTED receipt must not overshadow repair KILL after close."""
+
+        import hashlib
+        import json as _json
+        import shutil
+        from unittest.mock import patch
+
+        from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+        from solana_alpha_lab.factory.hfic_clock import FrozenClock
+        from solana_alpha_lab.factory.hfic_evidence_identity import forge_run_identity_sha256
+        from solana_alpha_lab.factory.hfic_identity import (
+            assign_portfolio_ids,
+            normalize_text,
+        )
+        from solana_alpha_lab.factory.hfic_preflight import persist_forge_context_packet
+        from solana_alpha_lab.factory.hfic_repair_continuation import (
+            close_repair_continuation,
+            spent_looks_from_journal,
+        )
+        from solana_alpha_lab.factory.hfic_representation_ladder import (
+            ACTION_NON_SCIENTIFIC_STOP,
+            ACTION_SEARCH_EXHAUSTED,
+            _lookup_run_artifact,
+            evaluate_forge_run,
+        )
+        from solana_alpha_lab.factory.hfic_session import (
+            _assert_scientific_admission,
+            freeze_draft,
+            list_hfic_sessions,
+            persist_frozen_session,
+            persist_no_worthy_session,
+            show_session,
+        )
+        from solana_alpha_lab.factory.hfic_temporal_discovery import (
+            persist_feature_preview,
+        )
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            list_discovery_looks,
+            run_recorded_discovery_query,
+        )
+        from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
+        from tests.test_hfic_session import finalize_kill_complete, _critic_result, valid_draft
+
+        git = repository_git_snapshot(ROOT)
+        draft = _json.loads(
+            (ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        focus = hashlib.sha256(normalize_text("AUTO").encode("utf-8")).hexdigest()
+        started = datetime(2026, 8, 27, 12, 0, 0, tzinfo=UTC)
+        started_text = "2026-08-27T12:00:00Z"
+        market = "11" * 32
+        run_identity = forge_run_identity_sha256(
+            market_evidence_epoch_sha256=market,
+            frozen_representation_ids=["BASE"],
+            owner_focus="AUTO",
+            frozen_representation_versions=["BASE@HFIC-V1.2"],
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ResearchStore(data_root)
+            packet = {
+                "schema": "smial.forge-context-packet",
+                "owner_focus": "AUTO",
+                "evidence_epoch_sha256": market,
+                "market_evidence_epoch_sha256": market,
+            }
+            ctx = persist_forge_context_packet(
+                data_root,
+                packet,
+                store=store,
+                repo_root=ROOT,
+                clock=FrozenClock(started),
+            )
+            receipt = {
+                "receipt_id": "HFIC-PREFLIGHT-P12-001",
+                "evidence_epoch_sha256": market,
+                "market_evidence_epoch_sha256": market,
+                "focus_key_sha256": focus,
+                "search_key_sha256": "33" * 32,
+                "owner_focus": "AUTO",
+                "session_started_at": started_text,
+                "live_git_head": git.head_sha.lower(),
+                "git_composite_sha256": git.composite_sha256,
+                "forge_context_packet_sha256": ctx,
+                "store_inventory_digest": "ee" * 32,
+            }
+            frozen = freeze_draft(draft, preflight_receipt=receipt)
+            persist_no_worthy_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+                preflight_receipt=receipt,
+            )
+            shown = show_session(store, str(frozen["session_id"]), repo_root=ROOT)
+            journal = str(shown["search_key_sha256"])
+            rows = SnapshotTargetTests()._rows_legal()
+            census = [_census()]
+            binding = _binding_mixed()
+            for spec in (
+                _spec_snapshot(query_id="p12-prior-1"),
+                _spec_snapshot(
+                    query_id="p12-prior-2",
+                    all=[{"feature": "mark", "op": "gte", "value": 0.1}],
+                ),
+            ):
+                run_recorded_discovery_query(
+                    store,
+                    census=census,
+                    observations=rows,
+                    spec=spec,
+                    binding=binding,
+                    journal_scope=journal,
+                    candidate_scope={"schema": "test", "target": spec["target"]},
+                    git_sha=git.head_sha,
+                )
+            persist_feature_preview(
+                store,
+                journal_scope=journal,
+                preview={"preview_sha256": "cd" * 32},
+                git_sha=git.head_sha,
+            )
+            spent = spent_looks_from_journal(store, journal)
+            run_id = "FORGE-RUN-P12-PARENT"
+            run_payload = {
+                "schema": "smial.forge-run-receipt",
+                "schema_version": "1.0",
+                "run_id": run_id,
+                "run_identity_sha256": run_identity,
+                "session_id": shown["session_id"],
+                "scientific_slot_sha256": shown["scientific_slot_sha256"],
+                "owner_focus": "AUTO",
+                "owner_final": ACTION_SEARCH_EXHAUSTED,
+                "next_action": "RETURN_EXISTING",
+                "market_evidence_epoch_sha256": market,
+                "capability_epoch_sha256": "aa" * 32,
+                "stages": [
+                    {
+                        "representation_id": "BASE",
+                        "session_id": shown["session_id"],
+                        "effective_terminal": "NO_WORTHY_HYPOTHESIS",
+                        "execution_status": "EXECUTED",
+                        "capability_epoch_sha256": "aa" * 32,
+                    }
+                ],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "visible_cohort_ids": [],
+                "used_cohort_ids": [],
+                "frozen_representation_ids": ["BASE"],
+                "frozen_representation_versions": ["BASE@HFIC-V1.2"],
+            }
+            run_json = _json.dumps(run_payload, sort_keys=True, separators=(",", ":"))
+            wrapper = {
+                "artifact_kind": "FORGE_RUN_RECEIPT",
+                "payload_canonical": run_json,
+                "payload_sha256": hashlib.sha256(run_json.encode("utf-8")).hexdigest(),
+            }
+            wrapper_json = _json.dumps(wrapper, sort_keys=True, separators=(",", ":"))
+            store.append(
+                [
+                    ResearchEvent(
+                        record_id=f"HFIC-ART-FORGE-RUN-{run_id}",
+                        record_kind=RecordKind.RESEARCH_ARTIFACT,
+                        entity_id=run_id,
+                        hypothesis_version_id=None,
+                        run_id=run_id,
+                        transaction_id="RESEARCH-TXN-FORGE-RUN-P12",
+                        effective_at=started,
+                        first_reliable_available_at=started,
+                        supersedes_record_id=None,
+                        payload_json=wrapper_json,
+                        payload_sha256=hashlib.sha256(
+                            wrapper_json.encode("utf-8")
+                        ).hexdigest(),
+                        schema_version="1.0",
+                        producer_capability_id="CAP-TEST",
+                        producer_git_sha=git.head_sha,
+                        created_at=started,
+                    )
+                ],
+                transaction_id="RESEARCH-TXN-FORGE-RUN-P12",
+            )
+            found = _lookup_run_artifact(store, run_identity)
+            self.assertIsNotNone(found)
+            self.assertEqual(found.get("owner_final"), ACTION_SEARCH_EXHAUSTED)
+            parent_snapshot = Path(tmp) / "parent_snap"
+            shutil.copytree(data_root, parent_snapshot)
+            store = ResearchStore(parent_snapshot)
+            data_root = parent_snapshot
+            shown = show_session(store, str(frozen["session_id"]), repo_root=ROOT)
+            journal = str(shown["search_key_sha256"])
+            spent = spent_looks_from_journal(store, journal)
+            parent = {
+                "session_id": shown["session_id"],
+                "session_state": shown["session_state"],
+                "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+                "selected_candidate_id": None,
+                "scientific_slot_sha256": shown["scientific_slot_sha256"],
+                "terminal_receipt_sha256": shown["session_receipt_sha256"],
+                "run_id": run_id,
+                "journal_scope": journal,
+                "search_key_sha256": journal,
+            }
+            draft_r = {
+                "parent_run_id": run_id,
+                "parent_session_id": parent["session_id"],
+                "scientific_slot_sha256": parent["scientific_slot_sha256"],
+                "terminal_receipt_sha256": parent["terminal_receipt_sha256"],
+                "journal_scope": journal,
+                "technical_gap_code": "PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP",
+                "repair_capability_id": REPAIR_CAPABILITY_ID,
+                "allowed_look_ids": [],
+                "spent_main_looks": spent["spent_main_looks"],
+                "spent_adaptive_looks": spent["spent_adaptive_looks"],
+                "spent_preview_looks": spent["spent_preview_looks"],
+                "owner_authorization_id": "OWNER-AUTH-P12-001",
+                "parent_terminal": "NO_WORTHY_HYPOTHESIS",
+                "evidence_mapping": {"repair": "post_close_readback"},
+            }
+            applied = apply_repair_continuation(
+                store, draft_r, parent_session=parent, git_sha=git.head_sha
+            )
+            third = _spec_snapshot(
+                query_id="p12-cont-3",
+                all=[{"feature": "mark", "op": "gte", "value": 0.2}],
+            )
+            run_recorded_discovery_query(
+                store,
+                census=census,
+                observations=rows,
+                spec=third,
+                binding=binding,
+                journal_scope=journal,
+                candidate_scope={"schema": "test", "target": third["target"]},
+                git_sha=git.head_sha,
+            )
+            self.assertEqual(
+                len(
+                    [
+                        item
+                        for item in list_discovery_looks(store, journal)
+                        if item.get("look_class") == "MAIN"
+                        and item.get("new_look") is not False
+                    ]
+                ),
+                3,
+            )
+            selected_source = valid_draft()
+            selected_source["selected_candidate_ref"] = selected_source["candidates"][0][
+                "label"
+            ]
+            selected_source["runner_up_candidate_ref"] = selected_source["candidates"][1][
+                "label"
+            ]
+            selected_source["strongest_rejected_alternative"] = selected_source[
+                "candidates"
+            ][2]["label"]
+            new_capability = "ab" * 32
+            repair_receipt = {
+                **receipt,
+                "capability_epoch_sha256": new_capability,
+            }
+            selected_frozen = freeze_draft(
+                selected_source, preflight_receipt=repair_receipt, repo_root=ROOT
+            )
+            selected_frozen["capability_epoch_sha256"] = new_capability
+            admission = _assert_scientific_admission(
+                store, {**selected_frozen, **repair_receipt}, repo_root=ROOT
+            )
+            self.assertEqual(admission["action"], ACTION_RESUME_REPAIR_CONTINUATION)
+            persist_frozen_session(
+                store,
+                {**selected_frozen, **repair_receipt},
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(selected_source["candidates"]),
+                draft=selected_source,
+            )
+            critic = _critic_result(selected_frozen, "KILL_PREPARATORY_LOOP")
+            done = finalize_kill_complete(
+                {**selected_frozen, **repair_receipt},
+                critic,
+                store,
+                repo_root=ROOT,
+            )
+            self.assertEqual(done["critic_terminal"], "KILL_PREPARATORY_LOOP")
+            closed = close_repair_continuation(
+                store,
+                applied["disposition"]["disposition_sha256"],
+                git_sha=git.head_sha,
+            )
+            self.assertEqual(closed["status"], "CLOSED")
+            self.assertIsNotNone(closed.get("forge_run_receipt_sha256"))
+            after = _lookup_run_artifact(store, run_identity)
+            self.assertIsNotNone(after)
+            self.assertEqual(
+                after.get("repair_continuation_disposition_sha256"),
+                applied["disposition"]["disposition_sha256"],
+            )
+            self.assertEqual(after.get("owner_final"), ACTION_NON_SCIENTIFIC_STOP)
+            self.assertNotEqual(after.get("owner_final"), ACTION_SEARCH_EXHAUSTED)
+            forge_input = {
+                "schema": "smial.forge-input-receipt",
+                "owner_class": "SEARCH",
+                "market_evidence_epoch_sha256": market,
+                "capability_epoch_sha256": new_capability,
+                "active_evidence_set": {"visible_cohort_ids": []},
+            }
+            with patch(
+                "solana_alpha_lab.factory.hfic_representation_ladder.build_forge_input_receipt",
+                return_value=forge_input,
+            ), patch(
+                "solana_alpha_lab.factory.hfic_representation_ladder._session_applicable_to_current_market",
+                return_value=True,
+            ):
+                readback = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    persist=False,
+                    preferred_control_session_id=str(shown["session_id"]),
+                )
+            self.assertEqual(readback.get("owner_final"), ACTION_NON_SCIENTIFIC_STOP)
+            self.assertNotEqual(readback.get("owner_final"), ACTION_SEARCH_EXHAUSTED)
+            self.assertNotEqual(
+                readback.get("blocking_reason_codes"),
+                ["SCIENTIFIC_IDENTITY_CONFLICT"],
+            )
+            stages = list(readback.get("stages") or [])
+            matched = [
+                row
+                for row in stages
+                if row.get("session_id") == shown["session_id"]
+                or row.get("effective_terminal") == "KILL_PREPARATORY_LOOP"
+            ]
+            self.assertTrue(matched, stages)
+            self.assertEqual(readback["writes"]["research_store"], 0)
+            # Restart / reopen store: repair terminal still current.
+            reopened = ResearchStore(data_root)
+            again = _lookup_run_artifact(reopened, run_identity)
+            self.assertEqual(
+                again.get("repair_continuation_disposition_sha256"),
+                applied["disposition"]["disposition_sha256"],
+            )
+            self.assertEqual(again.get("owner_final"), ACTION_NON_SCIENTIFIC_STOP)
+            replay = close_repair_continuation(
+                reopened,
+                applied["disposition"]["disposition_sha256"],
+                git_sha=git.head_sha,
+            )
+            self.assertEqual(replay["status"], "ALREADY_CLOSED")
+
+
 if __name__ == "__main__":
     unittest.main()

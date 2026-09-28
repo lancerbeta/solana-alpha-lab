@@ -573,6 +573,7 @@ def _lookup_forge_run_for_parent(
 
     latest: dict[str, Any] | None = None
     completed: dict[str, Any] | None = None
+    repair_completed: dict[str, Any] | None = None
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
         if kind != "RESEARCH_ARTIFACT":
@@ -595,9 +596,193 @@ def _lookup_forge_run_for_parent(
         if not (match_session or match_slot):
             continue
         latest = body
-        if body.get("owner_final"):
+        if not body.get("owner_final"):
+            continue
+        if isinstance(body.get("repair_continuation_disposition_sha256"), str) and body.get(
+            "repair_continuation_disposition_sha256"
+        ):
+            repair_completed = body
+        else:
             completed = body
-    return completed or latest
+    return repair_completed or completed or latest
+
+
+def _persist_repair_completion_forge_run(
+    store: Any,
+    *,
+    disposition: Mapping[str, Any],
+    git_sha: str,
+    now: datetime,
+) -> dict[str, Any] | None:
+    """Append durable FORGE_RUN_RECEIPT for the repair terminal without rewriting parent."""
+
+    from solana_alpha_lab.factory.hfic_session import list_hfic_sessions, load_session_bundle
+    from solana_alpha_lab.factory.hfic_representation_ladder import (
+        ACTION_NON_SCIENTIFIC_STOP,
+        ACTION_SEARCH_EXHAUSTED,
+        FORGE_RUN_ARTIFACT_KIND,
+    )
+    from solana_alpha_lab.factory.run_passport import canonical_json_bytes, canonical_sha256
+
+    session_id = str(disposition.get("parent_session_id") or "")
+    if not session_id:
+        return None
+    bundle = load_session_bundle(store, session_id, read_mode=True)
+    if not isinstance(bundle, Mapping):
+        return None
+    parent_run = _lookup_forge_run_for_parent(
+        store,
+        session_id=session_id,
+        scientific_slot_sha256=(
+            str(disposition.get("scientific_slot_sha256"))
+            if isinstance(disposition.get("scientific_slot_sha256"), str)
+            else None
+        ),
+    )
+    # Prefer the historical parent receipt (without repair marker) as identity source.
+    parent_identity = None
+    parent_run_id = str(disposition.get("parent_run_id") or "")
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if kind != "RESEARCH_ARTIFACT":
+            continue
+        try:
+            wrapper = json.loads(record.payload_json)
+            body = json.loads(str(wrapper.get("payload_canonical") or ""))
+        except (TypeError, json.JSONDecodeError, AttributeError):
+            continue
+        if wrapper.get("artifact_kind") != "FORGE_RUN_RECEIPT" or not isinstance(body, dict):
+            continue
+        if body.get("repair_continuation_disposition_sha256"):
+            continue
+        if parent_run_id and str(body.get("run_id") or "") == parent_run_id:
+            parent_identity = body
+            break
+        if body.get("session_id") == session_id and body.get("run_identity_sha256"):
+            parent_identity = body
+    if parent_identity is None:
+        parent_identity = parent_run
+    if not isinstance(parent_identity, Mapping):
+        return None
+    run_identity = parent_identity.get("run_identity_sha256")
+    if not (isinstance(run_identity, str) and _HEX64.match(run_identity)):
+        return None
+    # Idempotent: already have a repair receipt for this disposition.
+    existing_repair = _lookup_forge_run_for_parent(
+        store,
+        session_id=session_id,
+        scientific_slot_sha256=str(disposition.get("scientific_slot_sha256") or "")
+        or None,
+    )
+    if (
+        isinstance(existing_repair, Mapping)
+        and existing_repair.get("repair_continuation_disposition_sha256")
+        == disposition.get("disposition_sha256")
+    ):
+        return dict(existing_repair)
+    terminal = str(
+        bundle.get("critic_terminal")
+        or bundle.get("final_session_terminal")
+        or ""
+    )
+    if terminal == "NO_WORTHY_HYPOTHESIS":
+        owner_final = ACTION_SEARCH_EXHAUSTED
+    elif terminal:
+        owner_final = ACTION_NON_SCIENTIFIC_STOP
+    else:
+        return None
+    listed = next(
+        (
+            item
+            for item in list_hfic_sessions(store)
+            if item.get("session_id") == session_id
+        ),
+        None,
+    )
+    stage = {
+        "representation_id": "BASE",
+        "representation_semantic_version": bundle.get("representation_semantic_version")
+        or "HFIC-V1.2",
+        "session_id": session_id,
+        "session_state": bundle.get("session_state"),
+        "effective_terminal": terminal,
+        "critic_terminal": terminal,
+        "execution_status": "EXECUTED",
+        "scientific_slot_sha256": disposition.get("scientific_slot_sha256")
+        or bundle.get("scientific_slot_sha256"),
+        "capability_epoch_sha256": bundle.get("capability_epoch_sha256")
+        or (listed or {}).get("capability_epoch_sha256"),
+        "market_evidence_epoch_sha256": bundle.get("market_evidence_epoch_sha256")
+        or parent_identity.get("market_evidence_epoch_sha256"),
+        "execution_binding_sha256": bundle.get("execution_binding_sha256"),
+        "used_cohort_ids": list(parent_identity.get("used_cohort_ids") or []),
+        "stage_ref_sha256": bundle.get("session_receipt_sha256"),
+    }
+    run_id = f"FORGE-RUN-REPAIR-{str(disposition.get('disposition_sha256') or '')[:16].upper()}"
+    unsigned = {
+        "schema": parent_identity.get("schema") or "smial.forge-run-receipt",
+        "schema_version": parent_identity.get("schema_version") or "1.0",
+        "run_id": run_id,
+        "run_identity_sha256": run_identity,
+        "owner_focus": parent_identity.get("owner_focus") or "AUTO",
+        "owner_class": parent_identity.get("owner_class"),
+        "next_action": "RETURN_EXISTING",
+        "owner_final": owner_final,
+        "session_id": session_id,
+        "scientific_slot_sha256": disposition.get("scientific_slot_sha256")
+        or parent_identity.get("scientific_slot_sha256"),
+        "market_evidence_epoch_sha256": parent_identity.get("market_evidence_epoch_sha256"),
+        "capability_epoch_sha256": stage.get("capability_epoch_sha256")
+        or parent_identity.get("capability_epoch_sha256"),
+        "execution_binding_sha256": stage.get("execution_binding_sha256"),
+        "stages": [stage],
+        "repair_continuation_disposition_sha256": disposition.get("disposition_sha256"),
+        "parent_run_id": parent_run_id or parent_identity.get("run_id"),
+        "writes": {"research_store": 1, "forge_run": 1, "session": 0},
+        "visible_cohort_ids": list(parent_identity.get("visible_cohort_ids") or []),
+        "used_cohort_ids": list(parent_identity.get("used_cohort_ids") or []),
+        "frozen_representation_ids": list(
+            parent_identity.get("frozen_representation_ids") or ["BASE"]
+        ),
+        "frozen_representation_versions": list(
+            parent_identity.get("frozen_representation_versions") or []
+        ),
+    }
+    unsigned["receipt_sha256"] = canonical_sha256(
+        {key: value for key, value in unsigned.items() if key != "owner_readout"}
+    )
+    body = canonical_json_bytes(unsigned).decode("utf-8")
+    digest = unsigned["receipt_sha256"]
+    artifact = {
+        "research_artifact_id": f"HFIC-ART-FORGE-RUN-{digest[:16].upper()}",
+        "hfic_protocol": "HFIC-V1.2",
+        "artifact_kind": FORGE_RUN_ARTIFACT_KIND,
+        "payload_canonical": body,
+        "payload_sha256": digest,
+    }
+    payload_json = json.dumps(
+        artifact, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
+    )
+    transaction_id = f"RESEARCH-TXN-FORGERUN-REPAIR-{digest[:12].upper()}"
+    event = ResearchEvent(
+        record_id=f"HFIC-ART-FORGE-RUN-{digest[:16].upper()}",
+        record_kind=RecordKind.RESEARCH_ARTIFACT,
+        entity_id=f"HFIC-ART-FORGE-RUN-{digest[:16].upper()}",
+        hypothesis_version_id=None,
+        run_id=run_id,
+        transaction_id=transaction_id,
+        effective_at=now,
+        first_reliable_available_at=now,
+        supersedes_record_id=None,
+        payload_json=payload_json,
+        payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+        schema_version="1.0",
+        producer_capability_id=REPAIR_CAPABILITY_ID,
+        producer_git_sha=git_sha,
+        created_at=now,
+    )
+    store.append([event], transaction_id=transaction_id)
+    return unsigned
 
 
 def spent_looks_from_journal(store: Any, journal_scope: str) -> dict[str, Any]:
@@ -1029,6 +1214,14 @@ def close_repair_continuation(
     if target is None:
         raise RepairContinuationError("DISPOSITION_NOT_FOUND")
     if target.get("status") == "CLOSED":
+        # Crash recovery: CLOSED without a repair forge-run still needs the
+        # durable owner result linked to this disposition.
+        repair_run = _persist_repair_completion_forge_run(
+            store,
+            disposition=target,
+            git_sha=git_sha,
+            now=now or datetime.now(timezone.utc),
+        )
         return {
             "status": "ALREADY_CLOSED",
             "applied": False,
@@ -1037,6 +1230,9 @@ def close_repair_continuation(
             "writes": False,
             "owner_status": "DONE",
             "reason_code": reason_code,
+            "forge_run_receipt_sha256": (
+                repair_run.get("receipt_sha256") if isinstance(repair_run, Mapping) else None
+            ),
         }
     if target.get("status") != "AUTHORIZED":
         raise RepairContinuationError("DISPOSITION_NOT_AUTHORIZED")
@@ -1044,6 +1240,12 @@ def close_repair_continuation(
     closed["status"] = "CLOSED"
     closed["closed_reason_code"] = reason_code
     moment = now or datetime.now(timezone.utc)
+    repair_run = _persist_repair_completion_forge_run(
+        store,
+        disposition={**closed, "disposition_sha256": disposition_sha256},
+        git_sha=git_sha,
+        now=moment,
+    )
     canonical = _canonical(closed)
     payload = {
         "artifact_kind": DISPOSITION_ARTIFACT_KIND,
@@ -1081,4 +1283,7 @@ def close_repair_continuation(
         "owner_status": "DONE",
         "reason_code": reason_code,
         "record_id": event.record_id,
+        "forge_run_receipt_sha256": (
+            repair_run.get("receipt_sha256") if isinstance(repair_run, Mapping) else None
+        ),
     }
