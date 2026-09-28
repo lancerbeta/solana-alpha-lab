@@ -38590,7 +38590,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1.md', repository_path: docs/tasks/COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1.md}
-  integrity: {kind: sha256, sha256: d305532d50b1ad973ec34ab65c549eacf61ed6a4a348d2d99e13f390e772d42e}
+  integrity: {kind: sha256, sha256: 4088dcfdd75cde17b83baa866e10a995b40d24e38ceb525ae996b823bbfdbd57}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-COLLECTOR-OPERATIONAL-PACKET-001}
