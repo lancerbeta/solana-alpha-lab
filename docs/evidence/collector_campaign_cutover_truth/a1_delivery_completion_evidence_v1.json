@@ -25,7 +25,7 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_74_TARGETED_UNITTESTS_AND_CATALOG_CONTEXT_CHECKS",
+    "targeted": "PASS_78_TARGETED_UNITTESTS_AND_CATALOG_CONTEXT_CHECKS",
     "independent_review": {
       "path": "docs/evidence/collector_campaign_cutover_truth/a1_delivery_independent_review_v1.json",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -37,7 +37,7 @@
       "PASS_DELIVERY_HARNESS_CHECK",
       "PASS_CATALOG_VALIDATION",
       "PASS_SEMANTIC_PREMISE_VALIDATION",
-      "PASS_74_TARGETED_UNITTESTS"
+      "PASS_78_TARGETED_UNITTESTS"
     ]
   },
   "non_claims": [

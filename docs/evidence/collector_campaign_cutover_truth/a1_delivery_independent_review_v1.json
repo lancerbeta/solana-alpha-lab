@@ -15,34 +15,40 @@
   "reviews": [
     {
       "role": "CODE_REVIEWER",
-      "verdict": "PENDING",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_ISOLATED_REVIEW"
+        "PASS_NO_P0_P1_FINDINGS",
+        "REVIEWED_DIFF_SHA256_d90cfabf9ce640966efe91c4fa1bf01fb08b9baded804387e64c9494e1f32a87"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "PENDING",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_ISOLATED_REVIEW"
+        "PASS_ACCEPTANCE_AND_DOD_NO_P0_P1_GAPS",
+        "REVIEWED_DIFF_SHA256_d90cfabf9ce640966efe91c4fa1bf01fb08b9baded804387e64c9494e1f32a87"
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "PENDING",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_ISOLATED_REVIEW"
+        "PASS_NO_P0_P1_VIOLATION_PROVEN",
+        "packet_fingerprint_sha256=24a5b64d1ad7c4e09a716ef736af2f2371445407156f7defc44cdc73a2e7e156",
+        "PHYSICAL_DISPATCH_CROSSING_CUTOVER_NOT_TESTED"
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "PENDING",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_ISOLATED_REVIEW"
+        "PASS_NO_BLOCKING_OWNER_OPERABILITY_GAP",
+        "SMOKE_DOCUMENTS_NO_LIVE_AND_FUTURE_TRANSITION_PENDING",
+        "REGISTERED_VERSUS_NONE_OWNER_ACTIONS_DISTINCT"
       ]
     }
   ],
-  "verdict": "PENDING",
+  "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "NO_SINGLE_AGENT_REVIEW_FALLBACK",
