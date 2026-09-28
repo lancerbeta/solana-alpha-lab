@@ -1489,6 +1489,8 @@ def look_counts_toward_scientific_search(item: Mapping[str, Any]) -> bool:
     if snapshot_input_technical_stop(result) is not None:
         return False
     # A stamped discovery summary carries at least one fitness/denominator field.
+    # Do not treat a lone technical_stop key as fitness proof — malformed
+    # {"technical_stop": null} must not credit scientific search.
     if not any(
         key in result
         for key in (
@@ -1497,7 +1499,6 @@ def look_counts_toward_scientific_search(item: Mapping[str, Any]) -> bool:
             "decision_eligible_n",
             "exclusion_reasons",
             "calculation_version",
-            "technical_stop",
         )
     ):
         return False

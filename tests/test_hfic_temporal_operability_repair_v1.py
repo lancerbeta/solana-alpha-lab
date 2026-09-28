@@ -2559,7 +2559,37 @@ class FinishOutcomeMatrixTests(unittest.TestCase):
             out.append(body)
         return out
 
-    def test_census_not_x_eligible_does_not_cancel_technical_stop(self) -> None:
+    def test_opaque_look_payloads_do_not_credit_scientific_search(self) -> None:
+        from solana_alpha_lab.factory.hfic_temporal_discovery import (
+            look_counts_toward_scientific_search,
+        )
+
+        self.assertFalse(look_counts_toward_scientific_search({"new_look": True}))
+        self.assertFalse(
+            look_counts_toward_scientific_search({"new_look": True, "result": {}})
+        )
+        self.assertFalse(
+            look_counts_toward_scientific_search(
+                {"new_look": True, "result": {"technical_stop": None}}
+            )
+        )
+        self.assertFalse(
+            look_counts_toward_scientific_search(
+                {"new_look": True, "result": "not-a-mapping"}
+            )
+        )
+        self.assertTrue(
+            look_counts_toward_scientific_search(
+                {
+                    "new_look": True,
+                    "result": {
+                        "population_n": 1,
+                        "observed_target_n": 0,
+                        "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V3",
+                    },
+                }
+            )
+        )
         from solana_alpha_lab.factory.hfic_temporal_discovery import assess_tier_progress
 
         legal = SnapshotNegativeControlsTests()._rows_legal()
