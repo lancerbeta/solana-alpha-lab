@@ -9,9 +9,35 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "51f0f41647a46d53b7d70d88f405429cca6a9ad38acc208f1ee218409354b21b",
+    "catalog/assets/lifecycle.yaml": "a5560ac251aa3c13461a25816de76ea0c2786aac19c668363cf8b0284c46c4a8",
+    "catalog/catalog_manifest.yaml": "10b53b7b43081ec80faacc642757ebebd600fcb0d5d8773faedcf94c8a67cf0d",
+    "catalog/generated/asset_edges.json": "02b274c7f3619d66b5b969ed31b4c1b0aafbdc79086355717fa73e8dfa8d789e",
+    "catalog/schemas/observation_primitive_descriptor_v1.schema.json": "47adf110bfadd5d356dcc863f52f59574b02b6ccc3bb81578f3233906b4d3de4",
+    "configs/observation_primitive_registry_v1.yaml": "8529e43e8b29631b0b47d78d9d0b66e7c1d9b7e8f5be2d3e2d9384a74790e032",
+    "docs/PROJECT_MAP.md": "7d236107f751bcd47f0e82ba35d2ccd7223cad79bf86558889e6bf18b9b632fc",
+    "docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md": "c52f6622f22c34343973e1f916196d761f90a8da12d6315a82162c33586cdbb4",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "7ad08632f44fc5925e4f0b4fadc90f07b76912f90bd4b63d912c88d65a2abcf8",
+    "docs/reports/forge_temporal_operability_repair/a1_owner_readout_v1.md": "59b690152c87d3c98e69c5af35d743015e29a4109eab49dc7971073d3a049be5",
+    "docs/tasks/FORGE_TEMPORAL_OPERABILITY_REPAIR_V1.md": "e929db44065509f5b60cb5b04d359f97746db3e5ba94ca5fe5dd2c71169eab1c",
+    "scripts/hypothesis_forge.py": "37e45daf93e93224c111429b708b4974b303d78b9ad2d008ee9040a454a98bab",
+    "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "09ff278db0d40ab9a37b6c40f69fe7b1a829aff66ee4a4f0cd98a01f6b891170",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "314abf3bf8431f1ec8ba019f42deaa2a956e0095ce5ff880fe7ad3d3c5decf82",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "2daed4c74be430d3659a52381114db27263402764a2ada57cc9fc64f3d6b2626",
+    "src/solana_alpha_lab/factory/hfic_repair_continuation.py": "10fe6b6a648f22da3469e8c997b6a248a2f585153d2d6aaf688dbf70b860fec2",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "c79ea8661091f36927d6c512cb4d07f6eb67343e54e0c970d71839ac46f1d880",
+    "src/solana_alpha_lab/factory/hfic_session.py": "f2fcc967d8dba3fcb176917ba68513b250cf0fa61c121a2ce93c3f6cd1158c12",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "73ea9e209dcdad45cdd80ac04519c9a45ad3303a35f09c0e958f17875938e5dd",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "ab26da78d00bb13fbc42ff8e911bc5004e8e106baec10392fb010c02c1197707",
+    "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "6c9b418190226ada55702a1569480a05232d1190115447ef8a66ebf2f5488ca9",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "b2f589a12a132c56c57623f1920d4574e6ab2b8e4f1694a254c5e7c2dd2c8c5d",
+    "tests/test_hfic_temporal_operability_repair_v1.py": "6b3643a2770a80b738590842c4a6355059bab06c43042f40e7e21f1b8bc3bb88"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -22,20 +48,31 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "a079228b5ae01e532927c38834a3b52785c8bc57700fb27f70ae8196e52b0f86",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PRODUCTION_VERTICALS_A_AND_B",
     "independent_review": {
       "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "d1b6907955dac7c55029a37b21d408f22dc01f508b0bbccb62cfeaeb516416d0",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
-    "project_checks": ["PASS_PRODUCTION_VERTICALS_A_AND_B"]
+    "project_checks": [
+      "PASS_PRODUCTION_VERTICALS_A_AND_B"
+    ]
   },
-  "non_claims": ["NO_ALPHA", "NO_NET_RETURN", "NO_MARKET_EXECUTION", "NO_MERGE", "NO_LIVE_APPLY"],
-  "side_effects": {"market_execution": "NOT_RUN", "live_store_writes": 0}
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_MARKET_EXECUTION",
+    "NO_MERGE",
+    "NO_LIVE_APPLY"
+  ],
+  "side_effects": {
+    "market_execution": "NOT_RUN",
+    "live_store_writes": 0
+  }
 }

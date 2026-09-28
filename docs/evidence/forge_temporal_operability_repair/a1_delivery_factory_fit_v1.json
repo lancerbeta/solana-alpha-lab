@@ -4,8 +4,8 @@
   "review_id": "FORGE-TEMPORAL-OPERABILITY-REPAIR-FACTORY-FIT-001",
   "as_of": "2026-09-28",
   "task_id": "FORGE_TEMPORAL_OPERABILITY_REPAIR_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "9a286d2b28e5b686d1f813094813bd0c76ad33ebbbf78cca51d39ab76234caa3",
+  "reviewed_inventory_sha256": "12877a26c13ca2a7b9141ca63015bc2402a1d07fbf20af99fabb7d1057710fff",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
@@ -20,7 +20,17 @@
     "red_team": "PASS_SOURCE_POLICY_AND_AUTHORITY_NEGATIVES",
     "security": "PASS_NO_PROVIDER_NO_LIVE_WRITE"
   },
-  "capability_radar": {"now": "NONE", "watch": "POST_MERGE_LIVE_PARENT_PLAN_ONLY"},
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "POST_MERGE_LIVE_PARENT_PLAN_ONLY"
+  },
   "recovery": "Revert this change. Append-only dispositions and looks stay readable. A code rollback does not restore a consumed budget.",
-  "limits": ["NO_MARKET_FORGE", "NO_LIVE_APPLY", "NO_NET_RETURN", "NO_ALPHA", "MARKET_EXECUTION_NOT_RUN", "NO_MERGE"]
+  "limits": [
+    "NO_MARKET_FORGE",
+    "NO_LIVE_APPLY",
+    "NO_NET_RETURN",
+    "NO_ALPHA",
+    "MARKET_EXECUTION_NOT_RUN",
+    "NO_MERGE"
+  ]
 }
