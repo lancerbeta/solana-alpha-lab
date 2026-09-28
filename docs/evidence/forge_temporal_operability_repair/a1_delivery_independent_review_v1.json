@@ -4,8 +4,8 @@
   "review_id": "FORGE-TEMPORAL-OPERABILITY-REPAIR-REVIEW-001",
   "as_of": "2026-09-28",
   "task_id": "FORGE_TEMPORAL_OPERABILITY_REPAIR_V1",
-  "reviewed_bindings_sha256": "b48ac271f2e30ca162b568a4e1a32aece86f04732e87b2c21b238ad4c06698d9",
-  "reviewed_inventory_sha256": "f213bcf3959a4fc5ed5426c66cdcfb28667d6d6584feef08383b632fcdf08c1d",
+  "reviewed_bindings_sha256": "9922c109acca1282416d6b0ccbe276a67505b71937e81107562a1adb2689cc11",
+  "reviewed_inventory_sha256": "99112a24ae683c79d55ddf77aec7190c5910df990d55b84b06a2f7e6bb2ebfc6",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -17,28 +17,28 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Tip ddcd42df: P1-2/4/5 and AcceptanceVertical A/B hold; write set clean; tip after 99f985ab is evidence+shadow-pin only. Residual LOW: spent_looks_from_journal vs classify_temporal_look new_look predicate drift if rows omit new_look."
+        "Tip 75c9534: P1-A/P1-B product logic sound — show_session projects repair disposition; RU/intermediate stamp disposition; disposition-scoped RU cycle ids; Vertical B covers immutable parent snapshot, forge-run discovery without stages echo, sticky query replay. Residual LOW: RU research_cycle_id not disposition-scoped; parent_cycle_seq rewrites to immediate predecessor."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "DoD falsifiably met at ddcd42df: Vertical A publish→bind→run_recorded→DocumentRunner plus SNAPSHOT_OCCURRENCE_UNBOUND/SNAPSHOT_POLICY_MISMATCH; Vertical B preview→apply→replay→competing→third MAIN→CLOSED."
+        "DoD1 PASS Vertical A journal==DocumentRunner + SNAPSHOT_LINEAGE_UNINTERPRETABLE. DoD2 PASS: immutable parent copytree, selected freeze→critic→finalize, evaluate_forge_run without stages discovers KILL≠NO_WORTHY writes=0, sticky RETRY_SAME_BYTES. DoD3 UNKNOWN live cohort note holds."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Exit path enforces snapshot policy equality; ALREADY_APPLIED-by-auth, lease IDEMPOTENT_REPLAY, competing disposition sha, single ResearchStore hold. Residual: cell-path ABSENT can collapse lineage failures; EVENT_TIME_V1 still unpolicy-gated."
+        "STANDARD profile. Disposition continuity append-only through intermediate/awaiting; show_session projection not authority; identity/unauthorized drift fail-closed. Residual: frozen fallback can stamp disposition without re-admission if existing lacks it; awaiting payload research_cycle_id stays unscoped."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Apply COMPETING_* emits competing_disposition_sha256; runbook CLOSE_COMPETING_DISPOSITION_THEN_STOP operable. Residual: plan CONFLICT nests competitor sha under disposition only; close after competitor shares STOP_CONTINUATION_CONSUMED."
+        "show-session recovers repair_continuation_disposition_sha256; runbook glossary SNAPSHOT_LINEAGE_UNINTERPRETABLE + §4 SYNTHESIS_COMPLETE≠CLOSED; close path operable. Residual: readout Head bound at evidence tip."
       ]
     }
   ],
