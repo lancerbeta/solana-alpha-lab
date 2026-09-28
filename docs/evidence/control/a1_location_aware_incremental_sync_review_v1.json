@@ -1,0 +1,58 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "LAIS-LOCATION-AWARE-INCREMENTAL-SYNC-REVIEW-001",
+  "as_of": "2026-09-28",
+  "task_id": "DELIVERY_HARNESS_LOCATION_AWARE_INCREMENTAL_SYNC_V1",
+  "reviewed_bindings_sha256": "86888a19ad5c8b803183693028a6200039dda11c248b7f93672f5815d4f0ba37",
+  "reviewed_inventory_sha256": "52570411a9a3fbc42fba12fe62b46ca435ee0c63ad4accedd85b62a4c627fe1f",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "collect_asset_records re-raises INCREMENTAL_SCOPE_UNPROVEN for unknown/corrupt non-local sha256 location; no soft-continue.",
+        "ASSET_PATH_MISSING:<asset_id> preserved for sha256+git_path without repository_path.",
+        "Valid external_bundle|logical_only still class-skip via SHA256_LOCATION_EXTERNAL, not hashed.",
+        "CollectFailClosedLocationTests: apply/check exit 2 before hash; empty spy; external-alone stays incremental."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Closes FALSE_NOOP_ON_CORRUPT_LOCATION: corrupt rows cannot soft-skip into green full-fallback apply/check.",
+        "CLI falsifier proves early UNPROVEN, staged check fail, ASSET_PATH_MISSING, valid external incremental.",
+        "HASH_SCOPE / external-SHA semantics / Catalog schema / explicit full recovery policy unchanged for clean rows."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "EXTERNAL_SHA_NOT_LOCAL_VERIFIED: external/logical never enter collect HASH_SCOPE, path-index, derived pins, or desired_sha256.",
+        "Fail-closed at collect precedes plan emit, desired_sha256, and FULL_FALLBACK walk.",
+        "No second hash store; unscoped --check remains full backstop when locations classify cleanly."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "P0 narrative drift closed: owner readout states corrupt/unknown fail closed at collect; full oracle does not skip bad rows.",
+        "Exit 2 + HARNESS_SYNC_ERROR is owner-visible STOP before long hash walk.",
+        "ASSET_PATH_MISSING:<id> remains actionable for missing git_path; opaque UNPROVEN without id is non-P0 residual."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}
