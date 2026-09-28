@@ -21,6 +21,7 @@ from solana_alpha_lab.factory.hfic_repair_continuation import (  # noqa: E402
     admission_with_repair_continuation,
     apply_repair_continuation,
     build_repair_continuation_draft,
+    enrich_parent_for_repair_draft,
     plan_repair_continuation,
 )
 from solana_alpha_lab.factory.hfic_temporal_discovery import (  # noqa: E402
@@ -405,6 +406,32 @@ class RepairContinuationTests(unittest.TestCase):
         self.assertEqual(draft["spent_main_looks"], 2)
         plan = plan_repair_continuation(draft, parent_session=parent)
         self.assertEqual(plan["status"], "READY")
+
+    def test_enrich_parent_fills_receipt_and_spent_from_show_fields(self) -> None:
+        parent = {
+            "session_id": "HFIC-SESS-SYNTHETIC-001",
+            "scientific_slot_sha256": "11" * 32,
+            "session_receipt_sha256": "22" * 32,
+            "terminal_receipt_sha256": "22" * 32,
+            "search_key_sha256": "33" * 32,
+            "journal_scope": "33" * 32,
+            "run_id": "FORGE-RUN-SYNTHETIC",
+            "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+            "spent_main_looks": 3,
+            "spent_adaptive_looks": 1,
+            "spent_preview_looks": 0,
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp) / "store")
+            enriched = enrich_parent_for_repair_draft(store, parent)
+            draft = build_repair_continuation_draft(
+                enriched,
+                owner_authorization_id="OWNER-AUTH-SYNTHETIC-001",
+                technical_gap_code="PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP",
+            )
+        self.assertEqual(draft["terminal_receipt_sha256"], "22" * 32)
+        self.assertEqual(draft["spent_main_looks"], 3)
+        self.assertEqual(draft["parent_run_id"], "FORGE-RUN-SYNTHETIC")
 
     def test_completed_without_no_worthy_is_blocked(self) -> None:
         draft = self._draft()

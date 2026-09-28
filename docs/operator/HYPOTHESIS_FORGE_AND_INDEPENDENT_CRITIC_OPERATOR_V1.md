@@ -1551,7 +1551,8 @@ PROVIDER_REPORTED_SNAPSHOT_V1` считает exit по request/response/availab
 `target_exclusion_reasons` (pooled + by_cohort). После completed NO_WORTHY без selected candidate узкий owner-authorized repair
 continuation наследует потраченный look ledger. Owner path
 (`--data-root` — parent flag перед subcommand):
-`hypothesis_forge.py --data-root <store> repair-continuation-draft ...`
+`hypothesis_forge.py --data-root <store> repair-continuation-draft --parent-session-id <id> --owner-authorization-id <auth> --technical-gap-code <gap> --output <draft.json>`
+(spent looks и run/receipt берутся из show-session + store; см. field map в runbook)
 → `repair-continuation-plan --draft <json>` (без записи) →
 отдельно `repair-continuation-apply --draft <json> --confirm-append-only`.
 Терминалы plan/apply и glossary причин —

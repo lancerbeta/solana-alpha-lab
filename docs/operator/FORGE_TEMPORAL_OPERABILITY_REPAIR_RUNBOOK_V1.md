@@ -54,14 +54,28 @@ modeled negative return and not an automatic family ban.
 
 `--data-root` is a **parent** flag. Put it before the subcommand.
 
+### Field map from `show-session` (no guessing)
+
+| Draft field | Source on `show-session` / store |
+|---|---|
+| `parent_session_id` | `session_id` |
+| `scientific_slot_sha256` | `scientific_slot_sha256` |
+| `terminal_receipt_sha256` | `terminal_receipt_sha256` (= `session_receipt_sha256`) |
+| `journal_scope` | `journal_scope` (= `search_key_sha256`) |
+| `parent_run_id` | resolved from store `FORGE_RUN_RECEIPT` for session/slot |
+| `spent_*_looks` | discovery journal under `journal_scope` (MAIN/ADAPTIVE/PREVIEW) |
+| `owner_authorization_id` | owner-supplied authority token |
+| `technical_gap_code` | owner-supplied gap id (e.g. `PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP`) |
+
 ### 1) Build draft (no-write)
 
 ```
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <store> repair-continuation-draft --parent-session-id <HFIC-SESS-...> --owner-authorization-id <OWNER-AUTH-...> --technical-gap-code <GAP> --spent-main-looks <N> --spent-adaptive-looks <A> --spent-preview-looks <P> --output <draft.json>
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <store> repair-continuation-draft --parent-session-id <HFIC-SESS-...> --owner-authorization-id <OWNER-AUTH-...> --technical-gap-code <GAP> --output <draft.json>
 ```
 
-Optional overrides when show-session lacks them: `--parent-run-id`,
-`--terminal-receipt-sha256`, `--journal-scope`.
+Spent looks default from the discovery journal. Optional overrides:
+`--spent-main-looks`, `--spent-adaptive-looks`, `--spent-preview-looks`,
+`--parent-run-id`, `--terminal-receipt-sha256`, `--journal-scope`.
 
 Draft JSON fields (exact): `parent_run_id`, `parent_session_id`,
 `scientific_slot_sha256`, `terminal_receipt_sha256`, `journal_scope`,
@@ -82,16 +96,26 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-ro
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <store> repair-continuation-apply --draft <draft.json> --confirm-append-only
 ```
 
-### Plan/apply owner terminals
+### Plan/apply/draft owner terminals
 
 | Machine `status` | `owner_status` | Meaning | `next_step` |
 |---|---|---|---|
-| `READY` | `READY` | Disposition valid; not written | `APPLY_WITH_EXPLICIT_CONFIRM_APPEND_ONLY` |
+| `READY` | `READY` | Disposition/draft valid; not written | plan → `APPLY_WITH_EXPLICIT_CONFIRM_APPEND_ONLY`; draft → `REPAIR_CONTINUATION_PLAN_WITH_DRAFT` |
 | `ALREADY_APPLIED` | `DONE` | Idempotent replay | `ORDINARY_TEMPORAL_QUERY_WITHIN_REMAINING_BUDGET` |
 | `APPLIED` | `DONE` | Disposition appended | ordinary query in remainder |
-| `NOT_APPLICABLE` | `BLOCKED` | Wrong parent / selected candidate / missing session / slot / spent mismatch | see `reason_code` |
+| `NOT_APPLICABLE` | `BLOCKED` | Wrong parent / missing field / selected candidate / slot / spent mismatch | see `reason_code` + `owner_readout.next` |
 | `CONFLICT` | `BLOCKED` | Competing active disposition | resolve or stop |
-| missing `--confirm-append-only` | `BLOCKED` | Apply refused | add confirm flag only with authority |
+
+Draft/apply failures also print JSON on stdout with `owner_status=BLOCKED`
+(not stderr-only codes). Common draft codes:
+
+| `reason_code` | `next_step` |
+|---|---|
+| `PARENT_SESSION_MISSING` | `SHOW_SESSION_THEN_REPAIR_CONTINUATION_DRAFT` |
+| `PARENT_RUN_REQUIRED` | `PROVIDE_PARENT_RUN_ID_OR_ENSURE_FORGE_RUN_RECEIPT` |
+| `TERMINAL_RECEIPT_REQUIRED` | `ENSURE_SESSION_RECEIPT_SHA256_ON_SHOW_SESSION` |
+| `SPENT_BUDGET_INVALID` | `PASS_SPENT_LOOKS_OR_ENSURE_DISCOVERY_JOURNAL` |
+| `REPAIR_CONTINUATION_CONFIRM_REQUIRED` | `ADD_CONFIRM_APPEND_ONLY_WITH_OWNER_AUTHORITY` |
 
 Ordinary temporal discovery after a READY/DONE continuation uses the same
 `/hypothesis-forge` discovery path and inherited look counts. Do not open a

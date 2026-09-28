@@ -353,6 +353,123 @@ def explain_target_exclusion(code: str) -> str:
     )
 
 
+def _lookup_forge_run_for_parent(
+    store: Any,
+    *,
+    session_id: str,
+    scientific_slot_sha256: str | None,
+) -> dict[str, Any] | None:
+    """Latest FORGE_RUN_RECEIPT matching session or scientific slot."""
+
+    latest: dict[str, Any] | None = None
+    completed: dict[str, Any] | None = None
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if kind != "RESEARCH_ARTIFACT":
+            continue
+        try:
+            wrapper = json.loads(record.payload_json)
+            body = json.loads(str(wrapper.get("payload_canonical") or ""))
+        except (TypeError, json.JSONDecodeError, AttributeError):
+            continue
+        if not isinstance(body, dict):
+            continue
+        if wrapper.get("artifact_kind") != "FORGE_RUN_RECEIPT":
+            continue
+        match_session = str(body.get("session_id") or "") == session_id
+        match_slot = (
+            isinstance(scientific_slot_sha256, str)
+            and scientific_slot_sha256
+            and body.get("scientific_slot_sha256") == scientific_slot_sha256
+        )
+        if not (match_session or match_slot):
+            continue
+        latest = body
+        if body.get("owner_final"):
+            completed = body
+    return completed or latest
+
+
+def spent_looks_from_journal(store: Any, journal_scope: str) -> dict[str, Any]:
+    """Count spent discovery looks for one journal scope. No writes."""
+
+    from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks
+
+    looks = list_discovery_looks(store, journal_scope)
+    main = 0
+    adaptive = 0
+    preview = 0
+    look_ids: list[str] = []
+    for item in looks:
+        if not isinstance(item, Mapping):
+            continue
+        if item.get("new_look") is False:
+            continue
+        look_class = str(item.get("look_class") or "")
+        record_id = str(item.get("record_id") or item.get("spec_sha256") or "")
+        if record_id:
+            look_ids.append(record_id)
+        if look_class == "MAIN":
+            main += 1
+        elif look_class == "ADAPTIVE":
+            adaptive += 1
+        elif look_class == "PREVIEW":
+            preview += 1
+    return {
+        "spent_main_looks": main,
+        "spent_adaptive_looks": adaptive,
+        "spent_preview_looks": preview,
+        "allowed_look_ids": look_ids,
+        "look_count": len(looks),
+    }
+
+
+def enrich_parent_for_repair_draft(
+    store: Any,
+    parent_session: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Fill run_id / terminal receipt / spent looks from store when absent."""
+
+    parent = dict(parent_session)
+    session_id = str(parent.get("session_id") or "")
+    slot = parent.get("scientific_slot_sha256")
+    if not parent.get("run_id") and not parent.get("forge_run_id"):
+        receipt = _lookup_forge_run_for_parent(
+            store,
+            session_id=session_id,
+            scientific_slot_sha256=str(slot) if isinstance(slot, str) else None,
+        )
+        if isinstance(receipt, Mapping):
+            if receipt.get("run_id"):
+                parent["run_id"] = receipt.get("run_id")
+                parent["forge_run_id"] = receipt.get("run_id")
+            if (
+                not parent.get("scientific_slot_sha256")
+                and isinstance(receipt.get("scientific_slot_sha256"), str)
+            ):
+                parent["scientific_slot_sha256"] = receipt.get("scientific_slot_sha256")
+    if not parent.get("terminal_receipt_sha256"):
+        parent["terminal_receipt_sha256"] = parent.get("session_receipt_sha256")
+    scope = (
+        parent.get("journal_scope")
+        or parent.get("search_key_sha256")
+    )
+    if isinstance(scope, str) and scope.strip():
+        parent.setdefault("journal_scope", scope.strip())
+        spent = spent_looks_from_journal(store, scope.strip())
+        for key in (
+            "spent_main_looks",
+            "spent_adaptive_looks",
+            "spent_preview_looks",
+        ):
+            if parent.get(key) is None:
+                parent[key] = spent[key]
+        if not parent.get("allowed_look_ids"):
+            parent["allowed_look_ids"] = list(spent["allowed_look_ids"])
+        parent["spent_looks_source"] = "DISCOVERY_JOURNAL"
+    return parent
+
+
 def build_repair_continuation_draft(
     parent_session: Mapping[str, Any],
     *,

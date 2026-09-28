@@ -160,6 +160,42 @@ def emit_error(code: str, *, exit_code: int = 1) -> int:
     return exit_code
 
 
+_REPAIR_OWNER_NEXT = {
+    "PARENT_SESSION_MISSING": "SHOW_SESSION_THEN_REPAIR_CONTINUATION_DRAFT",
+    "PARENT_SESSION_REQUIRED": "SHOW_SESSION_THEN_REPAIR_CONTINUATION_DRAFT",
+    "PARENT_RUN_REQUIRED": "PROVIDE_PARENT_RUN_ID_OR_ENSURE_FORGE_RUN_RECEIPT",
+    "TERMINAL_RECEIPT_REQUIRED": "ENSURE_SESSION_RECEIPT_SHA256_ON_SHOW_SESSION",
+    "JOURNAL_SCOPE_REQUIRED": "ENSURE_SEARCH_KEY_SHA256_ON_SHOW_SESSION",
+    "SCIENTIFIC_SLOT_REQUIRED": "ENSURE_SCIENTIFIC_SLOT_ON_SHOW_SESSION",
+    "SPENT_BUDGET_INVALID": "PASS_SPENT_LOOKS_OR_ENSURE_DISCOVERY_JOURNAL",
+    "REPAIR_CONTINUATION_CONFIRM_REQUIRED": "ADD_CONFIRM_APPEND_ONLY_WITH_OWNER_AUTHORITY",
+    "REPAIR_CONTINUATION_DRAFT_INVALID": "FIX_DRAFT_JSON_OR_RERUN_DRAFT_BUILDER",
+    "OWNER_AUTHORIZATION_REQUIRED": "PASS_OWNER_AUTHORIZATION_ID",
+    "TECHNICAL_GAP_REQUIRED": "PASS_TECHNICAL_GAP_CODE",
+    "REPAIR_CAPABILITY_MISMATCH": "USE_CAP_HFIC_TEMPORAL_OPERABILITY_REPAIR_001",
+}
+
+
+def emit_repair_blocked(code: str, *, exit_code: int = 2) -> int:
+    """Owner-readable JSON for repair-continuation failures (stdout)."""
+
+    next_step = _REPAIR_OWNER_NEXT.get(str(code), "INSPECT_REASON_CODE_THEN_RERUN")
+    payload = {
+        "status": "NOT_APPLICABLE",
+        "reason_code": str(code),
+        "writes": False,
+        "owner_status": "BLOCKED",
+        "next_step": next_step,
+        "owner_readout": {
+            "status": "BLOCKED",
+            "reason_code": str(code),
+            "next": next_step,
+            "writes": False,
+        },
+    }
+    return emit(payload, exit_code=exit_code)
+
+
 def _assert_no_path_leak(payload: dict[str, Any], *forbidden: str) -> None:
     needles = ("SMIAL_DATA_ROOT", *(item for item in forbidden if item))
 
@@ -1620,18 +1656,19 @@ def cmd_repair_continuation_draft(
     parent_session_id: str,
     owner_authorization_id: str,
     technical_gap_code: str,
-    spent_main_looks: int,
-    spent_adaptive_looks: int,
-    spent_preview_looks: int,
+    spent_main_looks: int | None,
+    spent_adaptive_looks: int | None,
+    spent_preview_looks: int | None,
     parent_run_id: str | None,
     terminal_receipt_sha256: str | None,
     journal_scope: str | None,
     output_path: Path | None,
 ) -> int:
-    """No-write draft builder from show-session + explicit spent looks."""
+    """No-write draft builder from show-session + store enrichment."""
 
     from solana_alpha_lab.factory.hfic_repair_continuation import (
         build_repair_continuation_draft,
+        enrich_parent_for_repair_draft,
     )
 
     data_root = _store_root(repo_root, explicit_data_root)
@@ -1639,7 +1676,8 @@ def cmd_repair_continuation_draft(
     try:
         parent = show_session(store, parent_session_id, repo_root=repo_root)
     except HficSessionError as exc:
-        raise HficCliError("PARENT_SESSION_MISSING") from exc
+        raise RepairContinuationError("PARENT_SESSION_MISSING") from exc
+    parent = enrich_parent_for_repair_draft(store, parent)
     draft = build_repair_continuation_draft(
         parent,
         owner_authorization_id=owner_authorization_id,
@@ -1662,11 +1700,17 @@ def cmd_repair_continuation_draft(
         "owner_status": "READY",
         "next_step": "REPAIR_CONTINUATION_PLAN_WITH_DRAFT",
         "draft": draft,
-        "draft_path": str(output_path) if output_path is not None else None,
+        "draft_path": str(output_path.name) if output_path is not None else None,
+        "spent_looks_source": parent.get("spent_looks_source") or "EXPLICIT_FLAGS",
+        "remaining_main_looks": max(0, 6 - int(draft["spent_main_looks"])),
+        "remaining_adaptive_looks": max(0, 2 - int(draft["spent_adaptive_looks"])),
+        "remaining_preview_looks": max(0, 2 - int(draft["spent_preview_looks"])),
         "owner_readout": {
             "status": "READY",
             "next": "REPAIR_CONTINUATION_PLAN_WITH_DRAFT",
             "writes": False,
+            "spent_main_looks": draft["spent_main_looks"],
+            "remaining_main_looks": max(0, 6 - int(draft["spent_main_looks"])),
         },
     }
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
@@ -2409,9 +2453,24 @@ def build_parser() -> argparse.ArgumentParser:
     repair_draft.add_argument("--parent-session-id", required=True)
     repair_draft.add_argument("--owner-authorization-id", required=True)
     repair_draft.add_argument("--technical-gap-code", required=True)
-    repair_draft.add_argument("--spent-main-looks", type=int, required=True)
-    repair_draft.add_argument("--spent-adaptive-looks", type=int, default=0)
-    repair_draft.add_argument("--spent-preview-looks", type=int, default=0)
+    repair_draft.add_argument(
+        "--spent-main-looks",
+        type=int,
+        default=None,
+        help="optional override; default = discovery journal MAIN count for search_key",
+    )
+    repair_draft.add_argument(
+        "--spent-adaptive-looks",
+        type=int,
+        default=None,
+        help="optional override; default = discovery journal ADAPTIVE count",
+    )
+    repair_draft.add_argument(
+        "--spent-preview-looks",
+        type=int,
+        default=None,
+        help="optional override; default = discovery journal PREVIEW count",
+    )
     repair_draft.add_argument("--parent-run-id", default=None)
     repair_draft.add_argument("--terminal-receipt-sha256", default=None)
     repair_draft.add_argument("--journal-scope", default=None)
@@ -2675,9 +2734,9 @@ def main(argv: list[str] | None = None) -> int:
                 parent_session_id=args.parent_session_id,
                 owner_authorization_id=args.owner_authorization_id,
                 technical_gap_code=args.technical_gap_code,
-                spent_main_looks=int(args.spent_main_looks),
-                spent_adaptive_looks=int(args.spent_adaptive_looks),
-                spent_preview_looks=int(args.spent_preview_looks),
+                spent_main_looks=getattr(args, "spent_main_looks", None),
+                spent_adaptive_looks=getattr(args, "spent_adaptive_looks", None),
+                spent_preview_looks=getattr(args, "spent_preview_looks", None),
                 parent_run_id=getattr(args, "parent_run_id", None),
                 terminal_receipt_sha256=getattr(args, "terminal_receipt_sha256", None),
                 journal_scope=getattr(args, "journal_scope", None),
@@ -2699,6 +2758,8 @@ def main(argv: list[str] | None = None) -> int:
                 confirm_append_only=bool(args.confirm_append_only),
             )
         raise HficCliError(f"HFIC_COMMAND_NOT_READY:{args.command}")
+    except RepairContinuationError as exc:
+        return emit_repair_blocked(str(exc))
     except (
         HficCliError,
         HficSessionError,
@@ -2707,11 +2768,13 @@ def main(argv: list[str] | None = None) -> int:
         HficSuppressionError,
         HficMemoryPolicyError,
         ReopenedPriorRoutingError,
-        RepairContinuationError,
         DataRootError,
         ResearchStoreError,
     ) as exc:
-        return emit_error(str(exc))
+        code = str(exc)
+        if str(getattr(args, "command", "") or "").startswith("repair-continuation"):
+            return emit_repair_blocked(code)
+        return emit_error(code)
     except (OSError, ValueError, json.JSONDecodeError):
         return emit_error("HFIC_PROTOCOL_INVALID")
 
