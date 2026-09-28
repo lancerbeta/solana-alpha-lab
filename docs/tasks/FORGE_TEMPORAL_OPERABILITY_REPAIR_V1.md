@@ -19,7 +19,7 @@ expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
   expected_base: 86b24cb1abe5867becc1ead16efb3754044550df
   expected_upstream: origin/main
-  expected_upstream_oid: 86b24cb1abe5867becc1ead16efb3754044550df
+  expected_upstream_oid: cc137231e17029875046823caa0f8db636ed6240
   expected_branch: cursor/forge-temporal-operability-repair-v1
   dirty_mode: FORBIDDEN
 
