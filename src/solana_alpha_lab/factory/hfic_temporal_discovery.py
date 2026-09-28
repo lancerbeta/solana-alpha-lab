@@ -493,7 +493,7 @@ def _snapshot_lineage_reason(
     """Return exclusion code when snapshot lineage/policy/acquisition fails."""
 
     row_policy = row.get("observation_clock_policy")
-    if row_policy not in (None, "", query_policy):
+    if row_policy != query_policy:
         return "SNAPSHOT_POLICY_MISMATCH"
     primitive_id = str(row.get("primitive_id") or "")
     occurrence = str(row.get("call_occurrence_id") or "")

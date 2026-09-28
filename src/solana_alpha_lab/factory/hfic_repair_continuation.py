@@ -452,13 +452,19 @@ def plan_repair_continuation(
             and item.get("status") == "AUTHORIZED"
             and item.get("disposition_sha256") != body["disposition_sha256"]
         ):
+            competing = dict(item)
+            competing_sha = str(competing.get("disposition_sha256") or "")
             return _owner_plan(
                 status="CONFLICT",
                 reason_code="COMPETING_ACTIVE_DISPOSITION",
                 writes=False,
-                disposition=body,
+                disposition=competing,
                 owner_status="BLOCKED",
-                next_step="RESOLVE_COMPETING_DISPOSITION_OR_STOP",
+                next_step=(
+                    "CLOSE_COMPETING_DISPOSITION_THEN_STOP"
+                    if competing_sha
+                    else "RESOLVE_COMPETING_DISPOSITION_OR_STOP"
+                ),
             )
     return _owner_plan(
         status="READY",
@@ -856,7 +862,8 @@ def apply_repair_continuation(
                 continue
             if item.get("disposition_sha256") == identity:
                 if item.get("status") == "AUTHORIZED":
-                    return
+                    # Another writer already committed this authorization.
+                    raise RepairContinuationError("IDEMPOTENT_REPLAY")
                 raise RepairContinuationError("DISPOSITION_ALREADY_CLOSED")
             if (
                 item.get("status") == "AUTHORIZED"
@@ -871,16 +878,47 @@ def apply_repair_continuation(
             existing_dispositions=latest,
             store=store,
         )
+        if replan["status"] == "ALREADY_APPLIED":
+            raise RepairContinuationError("IDEMPOTENT_REPLAY")
+        if replan["status"] == "CONFLICT":
+            raise RepairContinuationError(
+                str(replan.get("reason_code") or "COMPETING_ACTIVE_DISPOSITION")
+            )
         if replan["status"] != "READY":
             raise RepairContinuationError(
                 str(replan.get("reason_code") or "NOT_READY_UNDER_LEASE")
             )
 
-    store.append(
-        [event],
-        transaction_id=event.transaction_id,
-        before_commit=_recheck_under_lease,
-    )
+    try:
+        store.append(
+            [event],
+            transaction_id=event.transaction_id,
+            before_commit=_recheck_under_lease,
+        )
+    except RepairContinuationError as exc:
+        if str(exc) == "IDEMPOTENT_REPLAY":
+            latest = list_repair_continuation_dispositions(store)
+            matched = next(
+                (
+                    item
+                    for item in latest
+                    if isinstance(item, Mapping)
+                    and item.get("disposition_sha256") == identity
+                ),
+                body,
+            )
+            return {
+                **plan,
+                "status": "ALREADY_APPLIED",
+                "reason_code": "IDEMPOTENT_REPLAY",
+                "applied": False,
+                "idempotent": True,
+                "writes": False,
+                "owner_status": "DONE",
+                "next_step": "ORDINARY_TEMPORAL_QUERY_WITHIN_REMAINING_BUDGET",
+                "disposition": dict(matched) if isinstance(matched, Mapping) else body,
+            }
+        raise
     applied_plan = {
         **plan,
         "status": "APPLIED",

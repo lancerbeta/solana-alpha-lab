@@ -119,17 +119,22 @@ returns `ALREADY_CLOSED` / `owner_status=DONE`.
 | `APPLIED` | `DONE` | Disposition appended | ordinary query in remainder |
 | `CLOSED` / `ALREADY_CLOSED` | `DONE` | Disposition consumed after new terminal | `STOP_CONTINUATION_CONSUMED` |
 | `NOT_APPLICABLE` | `BLOCKED` | Wrong parent / missing field / selected candidate / slot / spent mismatch | see `reason_code` + `owner_readout.next` |
-| `CONFLICT` | `BLOCKED` | Competing active disposition | resolve or stop |
+| `CONFLICT` | `BLOCKED` | Competing active disposition | `CLOSE_COMPETING_DISPOSITION_THEN_STOP` using competitor `disposition_sha256` from plan JSON |
 
 Draft/apply failures also print JSON on stdout with `owner_status=BLOCKED`
 (not stderr-only codes). Common draft codes:
 
 | `reason_code` | `next_step` |
 |---|---|
-| `PARENT_SESSION_MISSING` | `SHOW_SESSION_THEN_REPAIR_CONTINUATION_DRAFT` |
+| `PARENT_SESSION_MISSING` | `PROVIDE_PARENT_SESSION_ID_FROM_SHOW_SESSION` |
 | `PARENT_RUN_REQUIRED` | `PROVIDE_PARENT_RUN_ID_OR_ENSURE_FORGE_RUN_RECEIPT` |
+| `PARENT_RUN_MISMATCH` / `PARENT_RUN_UNPROVEN` | `ALIGN_DRAFT_PARENT_RUN_ID` / `BIND_PARENT_RUN_FROM_STORE` (omit CLI run id and re-draft from store) |
+| `PARENT_TERMINAL_RECEIPT_MISSING` | `PROVIDE_TERMINAL_RECEIPT_FROM_SHOW_SESSION` |
 | `TERMINAL_RECEIPT_REQUIRED` | `ENSURE_SESSION_RECEIPT_SHA256_ON_SHOW_SESSION` |
 | `SPENT_BUDGET_INVALID` | `PASS_SPENT_LOOKS_OR_ENSURE_DISCOVERY_JOURNAL` |
+| `SPENT_BUDGET_MISMATCH` | `ALIGN_DRAFT_SPENT_LOOKS_TO_JOURNAL` (or `…_TO_PARENT` from plan JSON when store has no looks) |
+| `DISPOSITION_ALREADY_CLOSED` | `STOP_CONTINUATION_ALREADY_CONSUMED` |
+| `COMPETING_ACTIVE_DISPOSITION` / `COMPETING_DISPOSITION_APPLIED` | `CLOSE_COMPETING_DISPOSITION_THEN_STOP` — plan or apply-blocked JSON `disposition.disposition_sha256` (and `owner_readout.competing_disposition_sha256` on apply) is the competitor to `repair-continuation-close` |
 | `REPAIR_CONTINUATION_CONFIRM_REQUIRED` | `ADD_CONFIRM_APPEND_ONLY_WITH_OWNER_AUTHORITY` |
 
 Ordinary temporal discovery after a READY/DONE continuation uses the same

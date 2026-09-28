@@ -162,13 +162,16 @@ def emit_error(code: str, *, exit_code: int = 1) -> int:
 
 
 _REPAIR_OWNER_NEXT = {
-    "PARENT_SESSION_MISSING": "SHOW_SESSION_THEN_REPAIR_CONTINUATION_DRAFT",
+    "PARENT_SESSION_MISSING": "PROVIDE_PARENT_SESSION_ID_FROM_SHOW_SESSION",
     "PARENT_SESSION_REQUIRED": "SHOW_SESSION_THEN_REPAIR_CONTINUATION_DRAFT",
     "PARENT_SESSION_MISMATCH": "ALIGN_DRAFT_PARENT_SESSION_ID",
     "PARENT_RUN_REQUIRED": "PROVIDE_PARENT_RUN_ID_OR_ENSURE_FORGE_RUN_RECEIPT",
     "PARENT_RUN_MISMATCH": "ALIGN_DRAFT_PARENT_RUN_ID",
     "PARENT_RUN_UNPROVEN": "BIND_PARENT_RUN_FROM_STORE",
     "PARENT_TERMINAL_RECEIPT_MISSING": "PROVIDE_TERMINAL_RECEIPT_FROM_SHOW_SESSION",
+    "PARENT_TERMINAL_NOT_ELIGIBLE": "STOP_SCIENTIFIC_CLOSE_STANDS",
+    "PARENT_HAS_SELECTED_CANDIDATE": "STOP_SELECTED_CANDIDATE_NOT_REPAIRABLE_HERE",
+    "PARENT_NOT_COMPLETED_NO_WORTHY": "STOP_SCIENTIFIC_CLOSE_STANDS",
     "TERMINAL_RECEIPT_REQUIRED": "ENSURE_SESSION_RECEIPT_SHA256_ON_SHOW_SESSION",
     "TERMINAL_RECEIPT_MISMATCH": "ALIGN_DRAFT_TERMINAL_RECEIPT",
     "JOURNAL_SCOPE_REQUIRED": "ENSURE_SEARCH_KEY_SHA256_ON_SHOW_SESSION",
@@ -177,17 +180,21 @@ _REPAIR_OWNER_NEXT = {
     "PARENT_SLOT_MISMATCH": "ALIGN_DRAFT_SCIENTIFIC_SLOT",
     "SPENT_BUDGET_INVALID": "PASS_SPENT_LOOKS_OR_ENSURE_DISCOVERY_JOURNAL",
     "SPENT_BUDGET_MISMATCH": "ALIGN_DRAFT_SPENT_LOOKS_TO_JOURNAL",
-    "PARENT_NOT_COMPLETED_NO_WORTHY": "STOP_SCIENTIFIC_CLOSE_STANDS",
     "DISPOSITION_ALREADY_CLOSED": "STOP_CONTINUATION_ALREADY_CONSUMED",
     "DISPOSITION_NOT_FOUND": "STOP_CONTINUATION_UNKNOWN_DISPOSITION",
-    "COMPETING_ACTIVE_DISPOSITION": "RESOLVE_COMPETING_DISPOSITION_OR_STOP",
-    "COMPETING_DISPOSITION_APPLIED": "RESOLVE_COMPETING_DISPOSITION_OR_STOP",
+    "DISPOSITION_NOT_AUTHORIZED": "STOP_CONTINUATION_NOT_AUTHORIZED",
+    "DISPOSITION_INVALID": "FIX_DRAFT_JSON_OR_RERUN_DRAFT_BUILDER",
+    "DISPOSITION_SCHEMA_INVALID": "FIX_DRAFT_JSON_OR_RERUN_DRAFT_BUILDER",
+    "ALLOWED_LOOKS_INVALID": "FIX_DRAFT_JSON_OR_RERUN_DRAFT_BUILDER",
+    "COMPETING_ACTIVE_DISPOSITION": "CLOSE_COMPETING_DISPOSITION_THEN_STOP",
+    "COMPETING_DISPOSITION_APPLIED": "CLOSE_COMPETING_DISPOSITION_THEN_STOP",
     "REPAIR_CONTINUATION_CONFIRM_REQUIRED": "ADD_CONFIRM_APPEND_ONLY_WITH_OWNER_AUTHORITY",
     "REPAIR_CONTINUATION_DRAFT_INVALID": "FIX_DRAFT_JSON_OR_RERUN_DRAFT_BUILDER",
     "REPAIR_CONTINUATION_GIT_SHA_UNRESOLVED": "RESOLVE_REPO_GIT_SHA_THEN_RERUN",
     "REPAIR_CONTINUATION_DISPOSITION_SHA_INVALID": "PASS_DISPOSITION_SHA256_FROM_APPLY",
     "OWNER_AUTHORIZATION_REQUIRED": "PASS_OWNER_AUTHORIZATION_ID",
     "TECHNICAL_GAP_REQUIRED": "PASS_TECHNICAL_GAP_CODE",
+    "REPAIR_CAPABILITY_REQUIRED": "USE_CAP_HFIC_TEMPORAL_OPERABILITY_REPAIR_001",
     "REPAIR_CAPABILITY_MISMATCH": "USE_CAP_HFIC_TEMPORAL_OPERABILITY_REPAIR_001",
 }
 
@@ -1892,12 +1899,47 @@ def cmd_repair_continuation_apply(
     git_sha = str(snapshot.head_sha or "").lower()
     if len(git_sha) != 40:
         raise HficCliError("REPAIR_CONTINUATION_GIT_SHA_UNRESOLVED")
-    result = apply_repair_continuation(
-        store,
-        draft,
-        parent_session=parent,
-        git_sha=git_sha,
-    )
+    try:
+        result = apply_repair_continuation(
+            store,
+            draft,
+            parent_session=parent,
+            git_sha=git_sha,
+        )
+    except RepairContinuationError as exc:
+        code = str(exc)
+        if code in {
+            "COMPETING_ACTIVE_DISPOSITION",
+            "COMPETING_DISPOSITION_APPLIED",
+        }:
+            conflict = plan_repair_continuation(
+                draft,
+                parent_session=parent,
+                existing_dispositions=list_repair_continuation_dispositions(store),
+                store=store,
+            )
+            payload = {
+                **conflict,
+                "command": "repair-continuation-apply",
+                "owner_status": "BLOCKED",
+                "reason_code": code,
+                "next_step": conflict.get("next_step")
+                or _REPAIR_OWNER_NEXT.get(code, "CLOSE_COMPETING_DISPOSITION_THEN_STOP"),
+            }
+            payload["owner_readout"] = {
+                "status": "BLOCKED",
+                "reason_code": code,
+                "next": payload["next_step"],
+                "writes": False,
+                "competing_disposition_sha256": (
+                    (conflict.get("disposition") or {}).get("disposition_sha256")
+                    if isinstance(conflict.get("disposition"), dict)
+                    else None
+                ),
+            }
+            _assert_no_path_leak(payload, str(data_root), str(repo_root))
+            return emit(payload, exit_code=2)
+        return emit_repair_blocked(code)
     payload = {
         **result,
         "command": "repair-continuation-apply",
