@@ -1135,8 +1135,11 @@ def build_collector_operational_packet(
                 "campaign_successor_state": "UNKNOWN",
                 "campaign_successor_required": True,
                 "campaign_successor_owner_action": (
-                    "reconcile current activation transition proof before "
-                    "claiming campaign continuity"
+                    "run read-only status using CONTINUITY_SCHEDULE_SHA256 and "
+                    "CONTINUITY_ACTIVATION_ID; verify last_transition_event_id "
+                    "resolves to a committed matching OBSERVATION_SCHEDULE_STATE. "
+                    "Missing or mismatched proof remains UNKNOWN: open a recovery "
+                    "atom and do not rewrite lifecycle history"
                 ),
             }
         )

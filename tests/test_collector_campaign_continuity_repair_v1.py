@@ -54,6 +54,7 @@ from solana_alpha_lab.factory.operability_watch import (
     build_collector_snapshot,
     classify_incidents,
     evaluate_operability,
+    render_incident_message,
 )
 from solana_alpha_lab.factory.system_operability import _next_action_for
 from solana_alpha_lab.factory.observation_schedule import canonical_sha256
@@ -1170,6 +1171,8 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 "campaign_successor_state",
                 "campaign_successor_schedule_sha256",
                 "campaign_successor_activation_id",
+                "campaign_continuity_schedule_sha256",
+                "campaign_continuity_activation_id",
                 "campaign_successor_required",
                 "campaign_successor_owner_action",
             ):
@@ -1223,6 +1226,8 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             self.assertIn(
                 "ATTENTION=CAMPAIGN_SUCCESSOR_REQUIRED", attention_preview
             )
+            self.assertIn("CONTINUITY_SCHEDULE_SHA256=", attention_preview)
+            self.assertIn("CONTINUITY_ACTIVATION_ID=", attention_preview)
             self.assertNotIn(
                 "INCIDENT=CAMPAIGN_SUCCESSOR_REQUIRED", attention_preview
             )
@@ -1365,19 +1370,39 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             store.close()
 
     def test_unknown_successor_warning_does_not_claim_expiry_time(self) -> None:
-        found = classify_incidents(
-            {
-                "health_classes": ["CAMPAIGN_SUCCESSOR_REQUIRED"],
-                "activation_id": "ACT-UNKNOWN",
-                "campaign_successor_state": "UNKNOWN",
-                "campaign_time_remaining_seconds": "UNKNOWN",
-                "campaign_successor_owner_action": (
-                    "RECONCILE_CAMPAIGN_SUCCESSOR_STATE"
-                ),
-            }
-        )
+        packet = {
+            "health_classes": ["CAMPAIGN_SUCCESSOR_REQUIRED"],
+            "activation_id": "ACT-UNKNOWN",
+            "stops_admitting_at": "2026-09-01T00:00:00Z",
+            "campaign_successor_state": "UNKNOWN",
+            "campaign_time_remaining_seconds": -3600,
+            "campaign_continuity_schedule_sha256": "sha-current",
+            "campaign_continuity_activation_id": "ACT-CURRENT",
+            "campaign_successor_owner_action": "RECONCILE_CAMPAIGN_SUCCESSOR_STATE",
+        }
+        found = classify_incidents(packet)
         self.assertIn("UNKNOWN/BLOCKED", found["CAMPAIGN_SUCCESSOR_REQUIRED"])
         self.assertNotIn("expires soon", found["CAMPAIGN_SUCCESSOR_REQUIRED"])
+        self.assertNotIn("ADMISSION GAP", found["CAMPAIGN_SUCCESSOR_REQUIRED"])
+        self.assertIn("read-only status", found["CAMPAIGN_SUCCESSOR_REQUIRED"])
+        self.assertIn(
+            "committed OBSERVATION_SCHEDULE_STATE",
+            found["CAMPAIGN_SUCCESSOR_REQUIRED"],
+        )
+        card = render_incident_message(
+            kind="ATTENTION",
+            code="CAMPAIGN_SUCCESSOR_REQUIRED",
+            detail=found["CAMPAIGN_SUCCESSOR_REQUIRED"],
+            packet=packet,
+            first_seen_at="2026-09-01T00:10:00Z",
+        )
+        self.assertIn("STOPS_ADMITTING_AT=UNKNOWN", card)
+        self.assertIn("TIME_REMAINING_SECONDS=UNKNOWN", card)
+        self.assertIn(
+            "UNVERIFIED_SCHEDULE_STOPS_ADMITTING_AT=2026-09-01T00:00:00Z",
+            card,
+        )
+        self.assertIn("UNVERIFIED_SCHEDULE_TIME_REMAINING_SECONDS=-3600", card)
         self.assertEqual(
             _next_action_for("CAMPAIGN_SUCCESSOR_REQUIRED"),
             "REPAIR_CAMPAIGN_SUCCESSOR_CONTINUITY",
@@ -1812,7 +1837,11 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             self.assertEqual(packet["campaign_successor_state"], "UNKNOWN")
             self.assertTrue(packet["campaign_successor_required"])
             self.assertIn("UNKNOWN/BLOCKED", alert)
-            self.assertIn("reconcile current activation transition proof", alert)
+            self.assertIn("CONTINUITY_SCHEDULE_SHA256", alert)
+            self.assertIn("CONTINUITY_ACTIVATION_ID", alert)
+            self.assertIn("last_transition_event_id", alert)
+            self.assertIn("OBSERVATION_SCHEDULE_STATE", alert)
+            self.assertIn("recovery atom", alert)
 
     def test_source_data_stale_unchanged(self) -> None:
         packet = {

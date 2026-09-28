@@ -193,6 +193,21 @@ is `DOCTOR_OK` with `current_activation_state=DRAINING` and
 While the predecessor is still admission-capable (`ACTIVE`, or `DRAINING`
 without proven closed admission), a second same-family activation requires an
 exact `rollover` cutover binding. In-window rollover semantics are unchanged.
+After the owner has authorized the exact same-family successor, run the
+rollover once before the boundary. Copy the predecessor identities, successor
+schedule SHA, and boundary from the alert. If
+`SUCCESSOR_ACTIVATION_ID=UNKNOWN`, choose a unique owner-selected activation ID
+following the existing activation ID convention; otherwise use the exact ID
+shown. The command writes the operational rollover and lifecycle events:
+
+```text
+uv run --locked --managed-python python -B scripts/observation_schedule.py rollover --predecessor-schedule-sha256 <CONTINUITY_SCHEDULE_SHA256> --predecessor-activation-id <CONTINUITY_ACTIVATION_ID> --successor-schedule-sha256 <SUCCESSOR_SCHEDULE_SHA256> --successor-activation-id <OWNER_SELECTED_SUCCESSOR_ACTIVATION_ID> --cutover-at <STOPS_ADMITTING_AT> --runtime-config configs/observation_schedule_runtime_v1.yaml
+```
+
+Accept only `ROLLOVER_COMMITTED` or an idempotent `ROLLOVER_REPLAY`, then
+verify the bound status rows and immutable events below. For any other result,
+inspect its `terminal` and `next_action` before retrying. Never move the
+cutover into the past.
 
 If `rollover` returns
 `ROLLOVER_IMMUTABLE_PROOF_UNAVAILABLE` with
@@ -349,6 +364,38 @@ When Telegram fires `CAMPAIGN_SUCCESSOR_REQUIRED`:
    An unproven `ACTIVE` row does not displace an expired `DRAINING` continuity
    anchor; its alert names that anchor separately from the reported current
    activation. Age `> period*3` remains the sole `SOURCE_DATA_STALE` rule.
+
+For `SUCCESSOR_STATE=UNKNOWN` or `UNKNOWN/BLOCKED`, do not infer an expiry or
+claim continuity. Use the two `CONTINUITY_*` identity fields from the alert
+with the read-only status command:
+
+```text
+uv run --locked --managed-python python -B scripts/observation_schedule.py status --schedule-sha256 <CONTINUITY_SCHEDULE_SHA256> --activation-id <CONTINUITY_ACTIVATION_ID> --runtime-config configs/observation_schedule_runtime_v1.yaml
+```
+
+Take `activations[0].transition_event_id` from that JSON and inspect its
+committed ResearchStore record with this read-only query:
+
+`<DATA_ROOT>` means the `data_root` value in
+`configs/observation_schedule_runtime_v1.yaml` (currently
+`local/factory_v1/observation_rdp`). Run the command from the repository root
+and substitute the configured value; do not use `ops_store_relative`, which
+points to the separate operational SQLite store. In the alert,
+`STOPS_ADMITTING_AT` and `TIME_REMAINING_SECONDS` remain `UNKNOWN`; the
+`UNVERIFIED_SCHEDULE_*` fields are diagnostic schedule values, not proof of an
+elapsed admission window or completed cutover.
+
+```text
+uv run --locked --managed-python python -B -c "import json; from pathlib import Path; from solana_alpha_lab.factory.research_store import ResearchStore; s=ResearchStore(Path('<DATA_ROOT>'), create_if_missing=False); selector=('<CONTINUITY_SCHEDULE_SHA256>','<CONTINUITY_ACTIVATION_ID>','<TRANSITION_EVENT_ID>'); print(json.dumps([{'record_id':r.record_id,'record_kind':str(r.record_kind),'entity_id':r.entity_id,'run_id':r.run_id,'effective_at':r.effective_at.isoformat(),'payload':json.loads(r.payload_json)} for r in s.iter_committed_records() if (str(r.entity_id),str(r.run_id or ''),r.record_id)==selector], sort_keys=True))"
+```
+
+The status row must match both identifiers, and exactly one committed
+`OBSERVATION_SCHEDULE_STATE` record must match its state and transition event.
+If status is absent, the event is missing/malformed, or the identities/state do
+not match, keep `UNKNOWN/BLOCKED` and open a separate recovery atom; do not
+rewrite SQLite lifecycle projections or append-only history. A valid current
+transition record alone does not prove a campaign cutover: wait for the watch
+to recompute and clear only on its normal proven-continuity condition.
 
 ### Current-state read model
 

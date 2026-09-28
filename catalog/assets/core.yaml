@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: 523afa3a2563d9a9e26416a01528b8907a210025a1aa65b92ae4e2ca7b924135}
+  integrity: {kind: sha256, sha256: e6ef485784cc6ca4446395f3f62e2d5566ec2aa4250c98a8fe693ab0490888b5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -34247,7 +34247,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: 4cb29cbcc853e3cf6608f829451b017906b16cad085168bc8957381fae42dfab}
+  integrity: {kind: sha256, sha256: 36dcc5c088c8733095901424e484dfc7bda0b3679f0adaf2c8e3b33ece64eb3f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -38592,7 +38592,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_collector_campaign_continuity_repair_v1.py', repository_path: tests/test_collector_campaign_continuity_repair_v1.py}
-  integrity: {kind: sha256, sha256: 8e0a93ebcb3231bece174f5e710783c899d33f8323418dbc0dd0581edd3dc08a}
+  integrity: {kind: sha256, sha256: e445f8bf475e96893f5a9fb3bbc7025943029770913354174a405c28dc997810}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-CAMPAIGN-CUTOVER-TRUTH-001}

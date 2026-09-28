@@ -232,9 +232,19 @@ def classify_incidents(
     if "CAMPAIGN_SUCCESSOR_REQUIRED" in classes:
         remaining = packet.get("campaign_time_remaining_seconds")
         successor_state = str(packet.get("campaign_successor_state") or "UNKNOWN")
-        if successor_state == "GAP" or (
-            isinstance(remaining, (int, float)) and remaining < 0
-        ):
+        if successor_state == "UNKNOWN" or remaining in (None, "UNKNOWN"):
+            found["CAMPAIGN_SUCCESSOR_REQUIRED"] = (
+                "Campaign successor continuity is UNKNOWN/BLOCKED; do not claim "
+                "an expiry time. Run read-only status with the continuity SHA "
+                "and activation ID from this card; verify the transition event "
+                "against committed OBSERVATION_SCHEDULE_STATE evidence. Missing "
+                "or mismatched proof stays UNKNOWN and requires a recovery atom "
+                f"(activation={packet.get('activation_id')} "
+                f"continuity_activation={packet.get('campaign_continuity_activation_id')} "
+                f"continuity_schedule={packet.get('campaign_continuity_schedule_sha256')} "
+                f"owner_action={packet.get('campaign_successor_owner_action')})."
+            )
+        elif successor_state == "GAP":
             found["CAMPAIGN_SUCCESSOR_REQUIRED"] = (
                 "Campaign admission GAP; the predecessor window ended without "
                 "proven continuity. Continue only through the existing "
@@ -256,14 +266,6 @@ def classify_incidents(
                 f"stops_admitting_at={packet.get('stops_admitting_at')} "
                 f"time_remaining_seconds={remaining} "
                 f"successor_state={successor_state} "
-                f"continuity_activation={packet.get('campaign_continuity_activation_id')} "
-                f"owner_action={packet.get('campaign_successor_owner_action')})."
-            )
-        elif successor_state == "UNKNOWN" or remaining in (None, "UNKNOWN"):
-            found["CAMPAIGN_SUCCESSOR_REQUIRED"] = (
-                "Campaign successor continuity is UNKNOWN/BLOCKED; do not claim "
-                "an expiry time "
-                f"(activation={packet.get('activation_id')} "
                 f"continuity_activation={packet.get('campaign_continuity_activation_id')} "
                 f"owner_action={packet.get('campaign_successor_owner_action')})."
             )
@@ -351,17 +353,37 @@ def render_incident_message(
         f"FIRST_SEEN_AT={first_seen_at}",
     ]
     if code == "CAMPAIGN_SUCCESSOR_REQUIRED":
+        continuity_unknown = (
+            str(packet.get("campaign_successor_state") or "UNKNOWN") == "UNKNOWN"
+            or packet.get("campaign_time_remaining_seconds") in (None, "UNKNOWN")
+        )
         lines.extend(
             [
                 f"ACTIVATION_ID={packet.get('activation_id')}",
-                f"STOPS_ADMITTING_AT={packet.get('stops_admitting_at')}",
-                f"TIME_REMAINING_SECONDS={packet.get('campaign_time_remaining_seconds')}",
+                f"CONTINUITY_SCHEDULE_SHA256={packet.get('campaign_continuity_schedule_sha256')}",
+                f"CONTINUITY_ACTIVATION_ID={packet.get('campaign_continuity_activation_id')}",
                 f"SUCCESSOR_STATE={packet.get('campaign_successor_state')}",
                 f"SUCCESSOR_SCHEDULE_SHA256={packet.get('campaign_successor_schedule_sha256')}",
                 f"SUCCESSOR_ACTIVATION_ID={packet.get('campaign_successor_activation_id')}",
                 f"CAMPAIGN_OWNER_ACTION={packet.get('campaign_successor_owner_action')}",
             ]
         )
+        if continuity_unknown:
+            lines.extend(
+                [
+                    "STOPS_ADMITTING_AT=UNKNOWN",
+                    "TIME_REMAINING_SECONDS=UNKNOWN",
+                    f"UNVERIFIED_SCHEDULE_STOPS_ADMITTING_AT={packet.get('stops_admitting_at')}",
+                    f"UNVERIFIED_SCHEDULE_TIME_REMAINING_SECONDS={packet.get('campaign_time_remaining_seconds')}",
+                ]
+            )
+        else:
+            lines.extend(
+                [
+                    f"STOPS_ADMITTING_AT={packet.get('stops_admitting_at')}",
+                    f"TIME_REMAINING_SECONDS={packet.get('campaign_time_remaining_seconds')}",
+                ]
+            )
     if recovered_at:
         lines.append(f"RECOVERED_AT={recovered_at}")
     lines.extend(["```", ""])
