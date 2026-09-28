@@ -168,11 +168,24 @@ Discovery release seal/verify/import (local RDP; zero network):
 /usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py tick --once --runtime-config configs/observation_schedule_runtime_v1.yaml
 ```
 
-Expected without live activation:
+Expected when no live `ACTIVE`/`DRAINING` projection exists at the captured UTC
+`now`:
 
 ```json
-{"terminal":"TICK_REFUSED_NO_LIVE_DEFAULT","provider_calls":0,"credential_reads":0}
+{"terminal":"TICK_REFUSED_NO_LIVE_DEFAULT","provider_calls":0,"credential_reads":0,"next_action":"REGISTER_AUTHORIZE_ACTIVATE"}
 ```
+
+If activations exist but every row still has a future non-live transition at
+that captured `now` (for example `REGISTERED` → `ACTIVE` after cutover), expect
+instead:
+
+```json
+{"terminal":"TICK_REFUSED_FUTURE_TRANSITION_PENDING","provider_calls":0,"credential_reads":0,"next_action":"WAIT_OR_INSPECT_SCHEDULED_CUTOVER"}
+```
+
+Treat `WAIT_OR_INSPECT_SCHEDULED_CUTOVER` as wait/inspect — not as a cue to
+re-register or re-authorize. Explicit `--schedule-sha256` / `--activation-id`
+overrides use the same as-of rule.
 
 Not expected on a healthy exact-SHA root after producer-SHA repair:
 
