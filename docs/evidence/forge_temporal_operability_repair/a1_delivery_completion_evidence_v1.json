@@ -6,7 +6,6 @@
   "task_id": "FORGE_TEMPORAL_OPERABILITY_REPAIR_V1",
   "state_change": "P1A_INPUT_FITNESS_SCOPE_AND_P1B_CANONICAL_REPAIR_TERMINAL",
   "base_main": "86b24cb1abe5867becc1ead16efb3754044550df",
-  "reviewed_head": "fadb8882c764456849a9c20e663ed796ef697bfd",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
@@ -51,14 +50,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "008230d7fd9c03fc0d7ac15183163cbc07c2b3e0ed5cac57200a2f436a7058e1",
+    "sha256": "86ecdd6226ebffca34390c4c4bf3adbf0a454de6f9f9fb131f4144cebc9132ee",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_P1A_P1B_MATRIX_AND_OWNER_SCENARIOS",
     "independent_review": {
       "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "4ea19cecb8ada43a9a9b23eeb439fcc3d5a5df3294ba4a4314412f27ed26d3e9",
+      "sha256": "1d36744ab1eaf235da596b78d980db7b7cf61f193d519866b559f7b61f952550",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
