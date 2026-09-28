@@ -46,6 +46,7 @@ managed_write_set:
   - catalog/schemas/observation_primitive_descriptor_v1.schema.json
   - tests/test_hfic_temporal_discovery_v1.py
   - tests/test_hfic_temporal_operability_repair_v1.py
+  - tests/test_hfic_temporal_production_runner_v1.py
   - tests/test_hfic_repair_continuation_v1.py
   - scripts/hypothesis_forge.py
   - docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md

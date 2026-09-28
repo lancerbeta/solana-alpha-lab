@@ -4715,13 +4715,21 @@ def persist_frozen_session(
             repo_root=repo_root,
             representation_registry=representation_registry,
         )
-    persist_scientific_slot_admission(
-        store,
-        frozen,
-        repo_root=repo_root,
-        stage_time=stage_time,
-        representation_registry=representation_registry,
-    )
+    repair_disposition = None
+    if isinstance(repair_admission, Mapping):
+        repair_disposition = repair_admission.get(
+            "repair_continuation_disposition_sha256"
+        )
+    # Authorized repair keeps the parent slot reservation; a new capability /
+    # execution binding must not rewrite or collide with the reserved digest.
+    if not (isinstance(repair_disposition, str) and repair_disposition):
+        persist_scientific_slot_admission(
+            store,
+            frozen,
+            repo_root=repo_root,
+            stage_time=stage_time,
+            representation_registry=representation_registry,
+        )
     git = repository_git_snapshot(Path(repo_root))
     now = (
         _stage_datetime(lambda: stage_time)
@@ -4729,6 +4737,11 @@ def persist_frozen_session(
         else bound_session_started_at(frozen)
     )
     transaction_id = f"RESEARCH-TXN-{session_id.replace('HFIC-SESS-', 'HFIC-')}"
+    if isinstance(repair_disposition, str) and repair_disposition:
+        transaction_id = (
+            f"RESEARCH-TXN-{session_id.replace('HFIC-SESS-', 'HFIC-')}"
+            f"-REPAIR-{repair_disposition[:12].upper()}"
+        )
     producer = "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"
 
     def event(
@@ -4851,11 +4864,18 @@ def persist_frozen_session(
             payload=cycle_payload,
         )
     ]
+    # Repair re-entry must not rewrite durable parent hypothesis cards. New
+    # selected cards use disposition-scoped record ids for append-only replay.
     cards = _cards_for_identities(identities, frozen, draft)
     for identity, card in zip(identities, cards, strict=True):
+        hyp_id = (
+            f"HFIC-HYP-{identity.candidate_id}-REPAIR-{repair_disp[:12].upper()}"
+            if isinstance(repair_disp, str) and repair_disp
+            else f"HFIC-HYP-{identity.candidate_id}"
+        )
         records.append(
             event(
-                record_id=f"HFIC-HYP-{identity.candidate_id}",
+                record_id=hyp_id,
                 kind=RecordKind.HYPOTHESIS_VERSION,
                 entity_id=identity.candidate_id,
                 hypothesis_version_id=identity.candidate_id,
@@ -4897,13 +4917,18 @@ def persist_frozen_session(
         separators=(",", ":"),
         allow_nan=False,
     )
+    critic_input_id = (
+        f"HFIC-ART-CRITIC-INPUT-{session_id}-{freeze_suffix}"
+        if isinstance(repair_disp, str) and repair_disp
+        else f"HFIC-ART-CRITIC-INPUT-{session_id}"
+    )
     records.append(
         event(
-            record_id=f"HFIC-ART-CRITIC-INPUT-{session_id}",
+            record_id=critic_input_id,
             kind=RecordKind.RESEARCH_ARTIFACT,
-            entity_id=f"HFIC-ART-CRITIC-INPUT-{session_id}",
+            entity_id=critic_input_id,
             payload={
-                "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}",
+                "research_artifact_id": critic_input_id,
                 "session_id": session_id,
                 "hfic_protocol": prompt_version,
                 "artifact_kind": "CRITIC_INPUT_PACKET",
@@ -4923,13 +4948,18 @@ def persist_frozen_session(
             separators=(",", ":"),
             allow_nan=False,
         )
+        runner_up_id = (
+            f"HFIC-ART-CRITIC-INPUT-{session_id}-RUNNER-UP-{freeze_suffix}"
+            if isinstance(repair_disp, str) and repair_disp
+            else f"HFIC-ART-CRITIC-INPUT-{session_id}-RUNNER-UP"
+        )
         records.append(
             event(
-                record_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-RUNNER-UP",
+                record_id=runner_up_id,
                 kind=RecordKind.RESEARCH_ARTIFACT,
-                entity_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-RUNNER-UP",
+                entity_id=runner_up_id,
                 payload={
-                    "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}-RUNNER-UP",
+                    "research_artifact_id": runner_up_id,
                     "session_id": session_id,
                     "hfic_protocol": prompt_version,
                     "artifact_kind": "CRITIC_INPUT_PACKET",
@@ -4948,13 +4978,18 @@ def persist_frozen_session(
             separators=(",", ":"),
             allow_nan=False,
         )
+        draft_id = (
+            f"HFIC-ART-FORGE-DRAFT-{session_id}-{freeze_suffix}"
+            if isinstance(repair_disp, str) and repair_disp
+            else f"HFIC-ART-FORGE-DRAFT-{session_id}"
+        )
         records.append(
             event(
-                record_id=f"HFIC-ART-FORGE-DRAFT-{session_id}",
+                record_id=draft_id,
                 kind=RecordKind.RESEARCH_ARTIFACT,
-                entity_id=f"HFIC-ART-FORGE-DRAFT-{session_id}",
+                entity_id=draft_id,
                 payload={
-                    "research_artifact_id": f"HFIC-ART-FORGE-DRAFT-{session_id}",
+                    "research_artifact_id": draft_id,
                     "session_id": session_id,
                     "hfic_protocol": prompt_version,
                     "artifact_kind": "FORGE_DRAFT",
@@ -5130,6 +5165,10 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                 "final_session_terminal": payload.get("final_session_terminal"),
                 "selected_candidate_id": payload.get("selected_candidate_id"),
                 "run_id": payload.get("run_id") or payload.get("forge_run_id"),
+                "repair_continuation_disposition_sha256": payload.get(
+                    "repair_continuation_disposition_sha256"
+                ),
+                "parent_cycle_seq": payload.get("parent_cycle_seq"),
             }
         cycle_row["_identity_fields_present"] = {
             key
@@ -5184,6 +5223,13 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
         head_present = set(head.pop("_identity_fields_present", set()))
         ordered = sorted(rows, key=lambda item: int(item.get("hfic_cycle_seq") or 0))
         conflicts: set[str] = set()
+        head_is_repair = bool(head.get("repair_continuation_disposition_sha256"))
+        repair_mutable = {
+            "capability_epoch_sha256",
+            "execution_binding_sha256",
+            "model_provenance_sha256",
+            "representation_payload_sha256",
+        }
         for row in ordered:
             fields = {
                 **_split_identity_fields(row),
@@ -5199,6 +5245,11 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                 current = head.get(key)
                 if key in head_present:
                     if current not in (None, "") and current != value:
+                        # Authorized repair may carry a new capability/execution
+                        # binding while keeping the scientific slot; parent
+                        # values must not trip CONFLICT against the repair head.
+                        if head_is_repair and key in repair_mutable:
+                            continue
                         conflicts.add(key)
                     elif current in (None, ""):
                         # A durable explicit UNKNOWN is not reconstructable
@@ -7284,7 +7335,15 @@ def finalize_session(
     session_id = str(frozen["session_id"])
     stage_time = _stage_datetime(clock)
     created_at = render_canonical_utc(stage_time)
+    repair_disp_for_txn = None
+    if isinstance(existing, Mapping):
+        repair_disp_for_txn = existing.get("repair_continuation_disposition_sha256")
     transaction_id = f"RESEARCH-TXN-HFICFIN-{session_id[-16:]}"
+    if isinstance(repair_disp_for_txn, str) and repair_disp_for_txn:
+        transaction_id = (
+            f"RESEARCH-TXN-HFICFIN-{session_id[-16:]}-REPAIR-"
+            f"{repair_disp_for_txn[:12].upper()}"
+        )
     event = _make_event_factory(
         repo_root,
         git_before,
@@ -7647,14 +7706,27 @@ def finalize_session(
     _copy_evidence_surface_mode(complete_cycle, frozen)
     _stamp_split_identity(complete_cycle, frozen, existing, receipt)
     _stamp_market_evidence_basis(complete_cycle, frozen, existing, receipt)
+    repair_disp = None
+    if isinstance(existing, Mapping):
+        repair_disp = existing.get("repair_continuation_disposition_sha256")
+    if isinstance(repair_disp, str) and repair_disp:
+        complete_cycle["repair_continuation_disposition_sha256"] = repair_disp
+        complete_cycle["parent_cycle_seq"] = int(existing.get("hfic_cycle_seq") or 0)
+    complete_suffix = "COMPLETE"
+    receipt_artifact_id = f"HFIC-ART-SESSION-RECEIPT-{session_id}"
+    if isinstance(repair_disp, str) and repair_disp:
+        complete_suffix = f"REPAIR-COMPLETE-{repair_disp[:12].upper()}"
+        receipt_artifact_id = (
+            f"HFIC-ART-SESSION-RECEIPT-{session_id}-{complete_suffix}"
+        )
     records.extend(
         [
             event(
-                record_id=f"HFIC-ART-SESSION-RECEIPT-{session_id}",
+                record_id=receipt_artifact_id,
                 kind=RecordKind.RESEARCH_ARTIFACT,
-                entity_id=f"HFIC-ART-SESSION-RECEIPT-{session_id}",
+                entity_id=receipt_artifact_id,
                 payload={
-                    "research_artifact_id": f"HFIC-ART-SESSION-RECEIPT-{session_id}",
+                    "research_artifact_id": receipt_artifact_id,
                     "session_id": session_id,
                     "hfic_protocol": prompt_version,
                     "artifact_kind": "SESSION_RECEIPT",
@@ -7664,7 +7736,7 @@ def finalize_session(
                 transaction_id=transaction_id,
             ),
             event(
-                record_id=f"HFIC-CYCLE-{session_id}-COMPLETE",
+                record_id=f"HFIC-CYCLE-{session_id}-{complete_suffix}",
                 kind=RecordKind.RESEARCH_CYCLE,
                 entity_id=session_id,
                 payload=complete_cycle,
@@ -7817,7 +7889,22 @@ def load_session_bundle(
                 continue
             if value not in observed:
                 observed.append(value)
+        repair_authorized = any(
+            isinstance(row.get("repair_continuation_disposition_sha256"), str)
+            and row.get("repair_continuation_disposition_sha256")
+            for row in cycles
+        )
+        repair_mutable = {
+            "capability_epoch_sha256",
+            "execution_binding_sha256",
+            "model_provenance_sha256",
+            "representation_payload_sha256",
+        }
         if len(observed) > 1 or (explicit_unknown and observed):
+            if repair_authorized and key in repair_mutable:
+                head_value = cycle.get(key) if isinstance(cycle, Mapping) else None
+                if head_value not in (None, ""):
+                    return head_value
             if read_mode and key in _READ_IDENTITY_FIELDS:
                 identity_conflict_fields.append(key)
                 return None

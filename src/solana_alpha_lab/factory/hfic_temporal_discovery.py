@@ -51,6 +51,23 @@ OBSERVATION_CLOCK_POLICIES = frozenset(
         OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
     }
 )
+# Versioned read-path interpretation: legacy rows may omit the explicit policy
+# column when sealed transport/occurrence lineage already proves snapshot
+# semantics under a PROVIDER_REPORTED_SNAPSHOT_V1 query. Never invent clocks
+# or hashes; insufficient lineage is SNAPSHOT_LINEAGE_UNINTERPRETABLE.
+SNAPSHOT_ROW_INTERPRETATION_V1 = "SNAPSHOT_ROW_INTERPRETATION_V1"
+SNAPSHOT_LINEAGE_BLOCKERS = frozenset(
+    {
+        "SNAPSHOT_POLICY_MISMATCH",
+        "SNAPSHOT_OCCURRENCE_UNBOUND",
+        "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+        "MISSING_ACQUISITION_CLOCK",
+        "CLOCK_ORDER_INVALID",
+        "ACQUISITION_BEFORE_POINT_DUE",
+        "AVAILABILITY_AFTER_DEADLINE",
+        "ACQUISITION_AFTER_CUTOFF",
+    }
+)
 PREVIEW_BYTE_LIMIT = 64 * 1024
 PREVIEW_EXAMPLE_LIMIT = 24
 MAX_PREVIEW_SPECS = 2
@@ -483,6 +500,87 @@ def _is_hex64(value: object) -> bool:
     return len(text) == 64 and all(ch in "0123456789abcdef" for ch in text)
 
 
+def stamp_provider_reported_snapshot_transport(
+    observations: Sequence[Mapping[str, Any]],
+    *,
+    primitive_id: str = "PRIM-JUPITER-TOKENS-V2-SEARCH-001",
+    include_explicit_policy: bool = True,
+    request_sha256: str | None = None,
+) -> list[dict[str, Any]]:
+    """Stamp fake-transport snapshot lineage onto producer rows before publish.
+
+    New-format corpora set ``observation_clock_policy`` explicitly. Legacy-format
+    fixtures may omit the policy column while retaining occurrence/request and
+    acquisition clocks so ``SNAPSHOT_ROW_INTERPRETATION_V1`` can derive policy.
+    Never invent clocks when availability is already absent.
+    """
+
+    stamped: list[dict[str, Any]] = []
+    default_request = request_sha256 if _is_hex64(request_sha256) else "dd" * 32
+    for row in observations:
+        body = dict(row)
+        available = body.get("first_reliable_available_at") or body.get("event_time")
+        if available not in (None, ""):
+            # Producer fake-transport clocks are coherent: request=response=available.
+            # Do not preserve pre-stamp request anchors that predate point due.
+            body["request_started_at"] = available
+            body["response_received_at"] = available
+            body["first_reliable_available_at"] = available
+        body["primitive_id"] = primitive_id or body.get("primitive_id") or (
+            "PRIM-JUPITER-TOKENS-V2-SEARCH-001"
+        )
+        body["call_occurrence_id"] = hashlib.sha256(
+            f"{body.get('mint')}:{body.get('point_id')}:{body.get('field_id')}:"
+            f"{body.get('first_reliable_available_at')}".encode("utf-8")
+        ).hexdigest()
+        body["request_sha256"] = default_request
+        body.setdefault("source_price_event_time", body.get("source_price_event_time") or "UNKNOWN")
+        if include_explicit_policy:
+            body["observation_clock_policy"] = (
+                OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
+            )
+        else:
+            body.pop("observation_clock_policy", None)
+        stamped.append(body)
+    return stamped
+
+
+def _legacy_snapshot_lineage_complete(row: Mapping[str, Any]) -> bool:
+    """True when retained transport/occurrence links can prove snapshot semantics."""
+
+    primitive_id = str(row.get("primitive_id") or "")
+    return bool(
+        primitive_id
+        and primitive_id in _registered_primitive_ids()
+        and _is_hex64(row.get("call_occurrence_id"))
+        and _is_hex64(row.get("request_sha256"))
+        and _parse_time(row.get("request_started_at")) is not None
+        and _parse_time(row.get("response_received_at")) is not None
+        and _parse_time(row.get("first_reliable_available_at")) is not None
+    )
+
+
+def _effective_snapshot_row_policy(
+    row: Mapping[str, Any], *, query_policy: str
+) -> str | None:
+    """Resolve row clock policy for snapshot admission.
+
+    Explicit policy wins. Absent policy under a snapshot query may inherit the
+    query policy only when ``SNAPSHOT_ROW_INTERPRETATION_V1`` lineage is
+    complete. Otherwise return None (caller emits UNINTERPRETABLE).
+    """
+
+    explicit = row.get("observation_clock_policy")
+    if explicit not in (None, ""):
+        return str(explicit)
+    if (
+        query_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
+        and _legacy_snapshot_lineage_complete(row)
+    ):
+        return query_policy
+    return None
+
+
 def _snapshot_lineage_reason(
     row: Mapping[str, Any],
     *,
@@ -492,7 +590,11 @@ def _snapshot_lineage_reason(
 ) -> str | None:
     """Return exclusion code when snapshot lineage/policy/acquisition fails."""
 
-    row_policy = row.get("observation_clock_policy")
+    row_policy = _effective_snapshot_row_policy(row, query_policy=query_policy)
+    if row_policy is None:
+        if row.get("observation_clock_policy") in (None, ""):
+            return "SNAPSHOT_LINEAGE_UNINTERPRETABLE"
+        return "SNAPSHOT_POLICY_MISMATCH"
     if row_policy != query_policy:
         return "SNAPSHOT_POLICY_MISMATCH"
     primitive_id = str(row.get("primitive_id") or "")
@@ -580,6 +682,7 @@ def _select_snapshot_cell(
     if deadline is None:
         return {"status": "ABSENT"}
     legal: list[tuple[object, Mapping[str, Any]]] = []
+    seen_reasons: list[str] = []
     for row in rows:
         reason = _snapshot_lineage_reason(
             row,
@@ -588,6 +691,7 @@ def _select_snapshot_cell(
             outer_deadline=deadline,
         )
         if reason is not None:
+            seen_reasons.append(reason)
             continue
         available = _parse_time(row.get("first_reliable_available_at"))
         if available is None or available > deadline:
@@ -596,6 +700,18 @@ def _select_snapshot_cell(
             continue
         legal.append((available, row))
     if not legal:
+        for code in (
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+            "SNAPSHOT_POLICY_MISMATCH",
+            "SNAPSHOT_OCCURRENCE_UNBOUND",
+            "MISSING_ACQUISITION_CLOCK",
+            "CLOCK_ORDER_INVALID",
+            "ACQUISITION_BEFORE_POINT_DUE",
+            "AVAILABILITY_AFTER_DEADLINE",
+            "ACQUISITION_AFTER_CUTOFF",
+        ):
+            if code in seen_reasons:
+                return {"status": code}
         return {"status": "ABSENT"}
     return _select_cell([row for _, row in legal], deadline)
 
@@ -910,6 +1026,7 @@ def _select_snapshot_exit(
             "CLOCK_ORDER_INVALID",
             "SOURCE_PRICE_EVENT_STALE",
             "SOURCE_PRICE_EVENT_MALFORMED",
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
             "SNAPSHOT_POLICY_MISMATCH",
             "SNAPSHOT_OCCURRENCE_UNBOUND",
             "MISSING_ACQUISITION_CLOCK",
@@ -1533,7 +1650,11 @@ def execute_temporal_discovery(
                 point_due_at=_due_moment(anchor, x300_due) if snapshot_policy else None,
             )
             if liquidity.get("status") != "OBSERVED":
-                exclusion = "PIT_LIQUIDITY_MISSING"
+                status = str(liquidity.get("status") or "")
+                if status in SNAPSHOT_LINEAGE_BLOCKERS:
+                    exclusion = status
+                else:
+                    exclusion = "PIT_LIQUIDITY_MISSING"
             else:
                 in_base = True
         feature_values: dict[str, float | None] = {}
