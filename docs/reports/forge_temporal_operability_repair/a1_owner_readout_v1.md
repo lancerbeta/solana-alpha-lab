@@ -5,13 +5,13 @@ Head: pending-bind
 ## Closed this increment (P1-A / P1-B)
 
 - P1-A: `SNAPSHOT_ROW_INTERPRETATION_V1` admits legacy rows without explicit policy when occurrence/request/acquisition lineage is complete; insufficient lineage surfaces `SNAPSHOT_LINEAGE_UNINTERPRETABLE` instead of a false empty population. New and legacy published bytes share one journal→DocumentRunner scientific payload (observed/mean/spec/policy/exclusions).
-- P1-B: authorized selected repair skips slot re-reservation, uses disposition-scoped artifact ids, projects repair marker into list/bundle, allows capability/execution lineage under repair, and reaches selected freeze→critic→finalize with sticky replay. NO_WORTHY repair path retained. `SYNTHESIS_COMPLETE` ≠ disposition CLOSED — owner still runs `repair-continuation-close`.
+- P1-B: authorized selected repair skips slot re-reservation, uses disposition-scoped artifact ids, projects repair marker into list/bundle/`show-session`, preserves marker through runner-up→finalize, allows capability/execution lineage under repair, and reaches selected freeze→critic→finalize with sticky list/show + query replay. NO_WORTHY repair path retained. `SYNTHESIS_COMPLETE` ≠ disposition CLOSED — owner still runs `repair-continuation-close` (digest recoverable from `show-session`).
 
 ## Vertical receipts (local disposable)
 
 - Vertical A new+legacy: observed_target_n=1, mean≈0.2, DocumentRunner COMPLETE, provider_calls_actual=0, journal==consumer scientific fields.
 - Vertical B NO_WORTHY: 2 MAIN + preview → apply → third MAIN → new terminal → close.
-- Vertical B selected: historical parent → repair → new capability freeze → KILL terminal ≠ parent NO_WORTHY → sticky replay; mains stay 3.
+- Vertical B selected: historical parent (legacy draft/receipt ids) → repair → new capability freeze → KILL terminal ≠ parent NO_WORTHY → sticky list/show + RETRY_SAME_BYTES query replay; mains stay 3; close via show-session digest.
 
 ## Metadata-only live cohort note
 

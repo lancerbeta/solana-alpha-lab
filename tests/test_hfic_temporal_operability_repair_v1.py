@@ -1823,6 +1823,36 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                 listed.get("repair_continuation_disposition_sha256"),
                 applied["disposition"]["disposition_sha256"],
             )
+            shown_frozen = show_session(store, shown["session_id"], repo_root=ROOT)
+            self.assertEqual(
+                shown_frozen.get("repair_continuation_disposition_sha256"),
+                applied["disposition"]["disposition_sha256"],
+            )
+            # Parent artifacts must keep pre-repair (86b24-stable) identities;
+            # repair freeze appends disposition-scoped ids alongside them.
+            parent_draft_id = f"HFIC-ART-FORGE-DRAFT-{shown['session_id']}"
+            parent_receipt_id = (
+                f"HFIC-ART-SESSION-RECEIPT-{shown['session_id']}-NO-WORTHY"
+            )
+            committed_ids = {
+                str(getattr(record, "record_id", "") or "")
+                for record in store.iter_committed_records()
+            }
+            self.assertIn(parent_draft_id, committed_ids)
+            self.assertIn(parent_receipt_id, committed_ids)
+            self.assertTrue(
+                any(
+                    "REPAIR-" in rid
+                    and (
+                        rid.startswith(f"HFIC-ART-FORGE-DRAFT-{shown['session_id']}-")
+                        or rid.startswith(
+                            f"HFIC-ART-SESSION-RECEIPT-{shown['session_id']}-"
+                        )
+                    )
+                    for rid in committed_ids
+                ),
+                committed_ids,
+            )
             critic = _critic_result(selected_frozen, "KILL_PREPARATORY_LOOP")
             done = finalize_kill_complete(
                 {**selected_frozen, **repair_receipt},
@@ -1835,6 +1865,58 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
             shown_after = show_session(store, shown["session_id"], repo_root=ROOT)
             self.assertEqual(shown_after["critic_terminal"], "KILL_PREPARATORY_LOOP")
             self.assertNotEqual(shown_after["critic_terminal"], "NO_WORTHY_HYPOTHESIS")
+            self.assertEqual(
+                shown_after.get("repair_continuation_disposition_sha256"),
+                applied["disposition"]["disposition_sha256"],
+            )
+            # forge-run --no-write discovers terminals from list_hfic_sessions;
+            # assert occupancy + sticky show carry the new kill, not parent NO_WORTHY.
+            listed_after = [
+                item
+                for item in list_hfic_sessions(store)
+                if item["session_id"] == shown["session_id"]
+            ][0]
+            self.assertEqual(
+                listed_after.get("critic_terminal"), "KILL_PREPARATORY_LOOP"
+            )
+            self.assertEqual(listed_after.get("session_state"), "SYNTHESIS_COMPLETE")
+            listed_replay = [
+                item
+                for item in list_hfic_sessions(store)
+                if item["session_id"] == shown["session_id"]
+            ][0]
+            self.assertEqual(
+                listed_replay.get("critic_terminal"),
+                listed_after.get("critic_terminal"),
+            )
+            self.assertEqual(
+                listed_replay.get("repair_continuation_disposition_sha256"),
+                applied["disposition"]["disposition_sha256"],
+            )
+            # Sticky query replay: same third look bytes → no evaluator, no new MAIN.
+            replay_third = run_recorded_discovery_query(
+                store,
+                census=census,
+                observations=rows,
+                spec=third,
+                binding=binding,
+                journal_scope=journal,
+                candidate_scope={"schema": "test", "target": third["target"]},
+                git_sha=git.head_sha,
+            )
+            self.assertEqual(replay_third["queries"][0]["new_look"], False)
+            self.assertEqual(replay_third["queries"][0]["look_class"], "RETRY_SAME_BYTES")
+            self.assertEqual(
+                len(
+                    [
+                        item
+                        for item in list_discovery_looks(store, journal)
+                        if item.get("look_class") == "MAIN"
+                        and item.get("new_look") is not False
+                    ]
+                ),
+                3,
+            )
             # Restart against the completed terminal stays sticky; no second
             # active execution and no return to the parent NO_WORTHY DONE.
             sticky = load_session_bundle(store, shown["session_id"])
@@ -1848,7 +1930,7 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
             self.assertEqual(len(mains_after), 3)
             closed = close_repair_continuation(
                 store,
-                applied["disposition"]["disposition_sha256"],
+                shown_after["repair_continuation_disposition_sha256"],
                 git_sha=git.head_sha,
             )
             self.assertEqual(closed["status"], "CLOSED")

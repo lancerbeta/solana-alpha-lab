@@ -6440,6 +6440,18 @@ def persist_intermediate_cycle(
     _copy_evidence_surface_mode(intermediate_cycle, frozen)
     _stamp_split_identity(intermediate_cycle, source, frozen)
     _stamp_market_evidence_basis(intermediate_cycle, source, frozen)
+    repair_disp = None
+    if isinstance(existing, Mapping):
+        repair_disp = existing.get("repair_continuation_disposition_sha256")
+    if not (isinstance(repair_disp, str) and repair_disp) and isinstance(
+        frozen, Mapping
+    ):
+        repair_disp = frozen.get("repair_continuation_disposition_sha256")
+    if isinstance(repair_disp, str) and repair_disp:
+        intermediate_cycle["repair_continuation_disposition_sha256"] = repair_disp
+        intermediate_cycle["parent_cycle_seq"] = int(
+            (existing or {}).get("hfic_cycle_seq") or 0
+        )
     if isinstance(frozen.get("grounded_candidates"), list):
         intermediate_cycle["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -7059,15 +7071,32 @@ def persist_primary_kill_awaiting_runner_up(
     _copy_evidence_surface_mode(pending_cycle, frozen)
     _stamp_split_identity(pending_cycle, existing, frozen)
     _stamp_market_evidence_basis(pending_cycle, existing, frozen)
+    repair_disp = None
+    if isinstance(existing, Mapping):
+        repair_disp = existing.get("repair_continuation_disposition_sha256")
+    if not (isinstance(repair_disp, str) and repair_disp) and isinstance(
+        frozen, Mapping
+    ):
+        repair_disp = frozen.get("repair_continuation_disposition_sha256")
+    if isinstance(repair_disp, str) and repair_disp:
+        pending_cycle["repair_continuation_disposition_sha256"] = repair_disp
+        pending_cycle["parent_cycle_seq"] = int(
+            (existing or {}).get("hfic_cycle_seq") or 0
+        )
     if isinstance(frozen.get("grounded_candidates"), list):
         pending_cycle["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
         pending_cycle["closed_or_suppressed_collision_count"] = frozen[
             "closed_or_suppressed_collision_count"
         ]
+    runner_up_cycle_id = f"HFIC-CYCLE-{session_id}-RUNNER-UP-AWAITING"
+    if isinstance(repair_disp, str) and repair_disp:
+        runner_up_cycle_id = (
+            f"HFIC-CYCLE-{session_id}-REPAIR-RU-{repair_disp[:12].upper()}"
+        )
     records = [
         event(
-            record_id=f"HFIC-CYCLE-{session_id}-RUNNER-UP-AWAITING",
+            record_id=runner_up_cycle_id,
             kind=RecordKind.RESEARCH_CYCLE,
             entity_id=session_id,
             payload=pending_cycle,
@@ -8369,6 +8398,9 @@ def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[
         if isinstance(bundle.get("classifier_receipt"), Mapping)
         else [],
         "critic_claimed_terminal": bundle.get("critic_claimed_terminal"),
+        "repair_continuation_disposition_sha256": bundle.get(
+            "repair_continuation_disposition_sha256"
+        ),
         "owner_readout": _classification_owner_readout(bundle),
         "decision_event_ids": bundle.get("decision_event_ids") or [],
         "next": bundle.get("next") or "STOP",
