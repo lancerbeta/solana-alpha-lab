@@ -48,7 +48,7 @@ LIQ = "FIELD-LIQUIDITY-USD-001"
 COHORT = "REL-20260902T111900Z-20260909T111900Z"
 RELEASE = "aa" * 32
 ANCHOR = datetime(2026, 9, 3, tzinfo=UTC)
-OFFSETS = {"X300": 300, "Y3600": 3600, "Y7200": 7200}
+OFFSETS = {"X300": 300, "Y1800": 1800, "Y3600": 3600, "Y7200": 7200}
 GIT_SHA = "ab" * 20
 
 
@@ -2754,6 +2754,60 @@ class FinishOutcomeMatrixTests(unittest.TestCase):
         )
         self.assertEqual(no_worthy, ("NO_WORTHY_HYPOTHESIS", ACTION_SEARCH_EXHAUSTED))
 
+    def test_feature_lineage_absence_preserves_reason(self) -> None:
+        """Decision observed; feature cell lineage missing → visible exclusion."""
+
+        legal = SnapshotNegativeControlsTests()._rows_legal()
+        # Feature-only Y1800 row with stripped lineage; X300/Y3600/Y7200 stay legal.
+        y1800 = _obs(
+            "mint-a",
+            "Y1800",
+            PRICE,
+            1.0,
+            available=_stamp("Y1800", lateness=120) if "Y1800" in OFFSETS else (
+                ANCHOR + timedelta(seconds=1800 + 120)
+            ).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        )
+        for key in (
+            "observation_clock_policy",
+            "call_occurrence_id",
+            "request_sha256",
+            "primitive_id",
+        ):
+            y1800.pop(key, None)
+        rows = list(legal) + [y1800]
+        binding = _binding_mixed()
+        binding[0] = dict(binding[0])
+        binding[0]["schedule_point_lateness"] = {
+            **dict(binding[0]["schedule_point_lateness"]),
+            "Y1800": 120,
+        }
+        binding[0]["schedule_point_due_offset_seconds"] = {
+            **dict(binding[0]["schedule_point_due_offset_seconds"]),
+            "Y1800": 1800,
+        }
+        spec = _spec_snapshot(
+            query_id="mx-feat",
+            features=[
+                {"name": "mark", "op": "point_value", "field_id": PRICE, "point": "Y3600"},
+                {"name": "mid", "op": "point_value", "field_id": PRICE, "point": "Y1800"},
+            ],
+            all=[
+                {"feature": "mark", "op": "gte", "value": 0.0},
+                {"feature": "mid", "op": "gte", "value": 0.0},
+            ],
+        )
+        summary = execute_temporal_discovery(
+            [_census()], rows, spec, binding
+        )["summary"]
+        self.assertIn(
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+            summary.get("exclusion_reasons") or {},
+        )
+        self.assertGreaterEqual(int(summary.get("population_n") or 0), 1)
+        self.assertGreaterEqual(int(summary.get("decision_eligible_n") or 0), 1)
+        self.assertEqual(int(summary.get("matched_n") or 0), 0)
+
     def test_repair_completion_refuses_incomplete_states(self) -> None:
         from solana_alpha_lab.factory.hfic_repair_continuation import (
             RepairContinuationError,
@@ -2761,6 +2815,19 @@ class FinishOutcomeMatrixTests(unittest.TestCase):
             apply_repair_continuation,
             close_repair_continuation,
         )
+        from solana_alpha_lab.factory.hfic_session import (
+            finalize_session,
+            freeze_draft,
+        )
+        from tests import test_hfic_session as session_tests
+        from tests.test_hfic_cli import critic_result_from_packet_only
+        from tests.test_hfic_session import valid_draft
+        from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+        from solana_alpha_lab.factory.run_passport import (
+            canonical_json_bytes,
+            canonical_sha256,
+        )
+        from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
         self.assertIsNone(
             _repair_completion_from_session(
@@ -2781,40 +2848,124 @@ class FinishOutcomeMatrixTests(unittest.TestCase):
                 }
             )
         )
-        draft = {
-            "parent_run_id": "FORGE-RUN-INCOMPLETE",
-            "parent_session_id": "HFIC-SESS-INCOMPLETE",
-            "scientific_slot_sha256": "11" * 32,
-            "terminal_receipt_sha256": "22" * 32,
-            "journal_scope": "aa" * 32,
-            "technical_gap_code": "PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP",
-            "repair_capability_id": REPAIR_CAPABILITY_ID,
-            "allowed_look_ids": [],
-            "spent_main_looks": 2,
-            "spent_adaptive_looks": 0,
-            "spent_preview_looks": 0,
-            "owner_authorization_id": "OWNER-AUTH-INCOMPLETE",
-            "parent_terminal": "NO_WORTHY_HYPOTHESIS",
-        }
-        parent = {
-            "session_id": "HFIC-SESS-INCOMPLETE",
-            "critic_terminal": "NO_WORTHY_HYPOTHESIS",
-            "terminal_receipt_sha256": "22" * 32,
-            "selected_candidate_id": None,
-            "scientific_slot_sha256": "11" * 32,
-        }
+        # Integration: real session parked at AWAITING_CLASSIFICATION must
+        # refuse close without writing CLOSED.
+        session_tests._CACHED_GIT = None
+        git = repository_git_snapshot(ROOT)
         with tempfile.TemporaryDirectory() as tmp:
             store = ResearchStore(Path(tmp))
-            applied = apply_repair_continuation(
-                store, draft, parent_session=parent, git_sha=GIT_SHA
+            frozen = freeze_draft(
+                valid_draft(),
+                preflight_receipt=session_tests._preflight_receipt(),
+                repo_root=ROOT,
             )
+            parent_run = {
+                "schema": "smial.forge-run-receipt",
+                "schema_version": "1.0",
+                "run_id": "FORGE-RUN-INCOMPLETE-CLOSE",
+                "run_identity_sha256": "cd" * 32,
+                "owner_focus": "AUTO",
+                "owner_class": "SEARCH",
+                "next_action": "RETURN_EXISTING",
+                "owner_final": "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
+                "session_id": frozen["session_id"],
+                "scientific_slot_sha256": frozen.get("scientific_slot_sha256")
+                or ("11" * 32),
+                "market_evidence_epoch_sha256": "11" * 32,
+                "stages": [],
+                "writes": {"research_store": 0},
+            }
+            parent_run["receipt_sha256"] = canonical_sha256(parent_run)
+            body = canonical_json_bytes(parent_run).decode("utf-8")
+            artifact = {
+                "research_artifact_id": "HFIC-ART-FORGE-RUN-INCOMP",
+                "hfic_protocol": "HFIC-V1.2",
+                "artifact_kind": "FORGE_RUN_RECEIPT",
+                "payload_canonical": body,
+                "payload_sha256": parent_run["receipt_sha256"],
+            }
+            payload_json = json.dumps(
+                artifact, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+            )
+            now = datetime(2026, 8, 27, 12, 0, 0, tzinfo=UTC)
+            store.append(
+                [
+                    ResearchEvent(
+                        record_id="HFIC-ART-FORGE-RUN-INCOMP",
+                        record_kind=RecordKind.RESEARCH_ARTIFACT,
+                        entity_id="HFIC-ART-FORGE-RUN-INCOMP",
+                        hypothesis_version_id=None,
+                        run_id=parent_run["run_id"],
+                        transaction_id="RESEARCH-TXN-INCOMP",
+                        effective_at=now,
+                        first_reliable_available_at=now,
+                        supersedes_record_id=None,
+                        payload_json=payload_json,
+                        payload_sha256=hashlib.sha256(
+                            payload_json.encode("utf-8")
+                        ).hexdigest(),
+                        schema_version="1.0",
+                        producer_capability_id=REPAIR_CAPABILITY_ID,
+                        producer_git_sha=git.head_sha,
+                        created_at=now,
+                    )
+                ],
+                transaction_id="RESEARCH-TXN-INCOMP",
+            )
+            draft = {
+                "parent_run_id": parent_run["run_id"],
+                "parent_session_id": frozen["session_id"],
+                "scientific_slot_sha256": parent_run["scientific_slot_sha256"],
+                "terminal_receipt_sha256": "22" * 32,
+                "journal_scope": "aa" * 32,
+                "technical_gap_code": "PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP",
+                "repair_capability_id": REPAIR_CAPABILITY_ID,
+                "allowed_look_ids": [],
+                "spent_main_looks": 2,
+                "spent_adaptive_looks": 0,
+                "spent_preview_looks": 0,
+                "owner_authorization_id": "OWNER-AUTH-INCOMPLETE-LIVE",
+                "parent_terminal": "NO_WORTHY_HYPOTHESIS",
+            }
+            parent = {
+                "session_id": frozen["session_id"],
+                "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+                "terminal_receipt_sha256": "22" * 32,
+                "selected_candidate_id": None,
+                "scientific_slot_sha256": parent_run["scientific_slot_sha256"],
+                "run_id": parent_run["run_id"],
+            }
+            applied = apply_repair_continuation(
+                store, draft, parent_session=parent, git_sha=git.head_sha
+            )
+            waiting = finalize_session(
+                frozen,
+                critic_result_from_packet_only(
+                    frozen["critic_input_packet"], "PASS_TO_CLASSIFICATION"
+                ),
+                store=store,
+                repo_root=ROOT,
+            )
+            self.assertEqual(waiting["session_state"], "AWAITING_CLASSIFICATION")
+            before = list_repair_continuation_dispositions(store)
             with self.assertRaises(RepairContinuationError) as raised:
                 close_repair_continuation(
                     store,
                     applied["disposition"]["disposition_sha256"],
-                    git_sha=GIT_SHA,
+                    git_sha=git.head_sha,
                 )
             self.assertEqual(raised.exception.code, "REPAIR_EXECUTION_NOT_COMPLETE")
+            after = list_repair_continuation_dispositions(store)
+            self.assertEqual(
+                next(
+                    item
+                    for item in after
+                    if item.get("disposition_sha256")
+                    == applied["disposition"]["disposition_sha256"]
+                ).get("status"),
+                "AUTHORIZED",
+            )
+            self.assertEqual(len(before), len(after))
 
 
 class OwnerDataScenarioTechnicalAndScientificTests(unittest.TestCase):
@@ -2873,10 +3024,9 @@ class OwnerDataScenarioTechnicalAndScientificTests(unittest.TestCase):
             self.assertTrue(looks)
             readout = format_discovery_readout(evidence)
             text = json.dumps(readout, ensure_ascii=False).upper()
-            self.assertTrue(
-                "TECHNICAL" in text or summary.get("technical_failure") is True,
-                readout,
-            )
+            self.assertIn("TECHNICAL", text)
+            self.assertTrue(readout.get("technical_failure") is True)
+            self.assertIsNotNone(readout.get("technical_stop"))
             progress = assess_tier_progress(
                 [
                     {

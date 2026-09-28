@@ -14,10 +14,10 @@ Base main: `86b24cb1abe5867becc1ead16efb3754044550df`. Reviewed prior tip: `8ce2
 | Boundary | Status | Evidence |
 |---|---|---|
 | Census NOT_X_ELIGIBLE does not cancel technical stop | PROVEN | `FinishOutcomeMatrixTests.test_census_not_x_eligible_*` |
-| Decision/reference lineage reason preserved; no scientific exhaust | PROVEN | `FinishOutcomeMatrixTests.test_decision_lineage_*`, `test_reference_lineage_*` |
+| Decision/feature/reference lineage reason preserved | PROVEN | `test_decision_lineage_*`, `test_feature_lineage_*`, `test_reference_lineage_*` |
 | Valid zero-match remains scientific | PROVEN | `FinishOutcomeMatrixTests.test_valid_zero_match_*` |
 | Canonical terminals: PASS / CASE_C / scientific KILL / NO_WORTHY | PROVEN | `FinishOutcomeMatrixTests.test_repair_completion_prefers_*` |
-| Incomplete close refused | PROVEN | `FinishOutcomeMatrixTests.test_repair_completion_refuses_*` |
+| Incomplete close refused (incl. live AWAITING_CLASSIFICATION) | PROVEN | `FinishOutcomeMatrixTests.test_repair_completion_refuses_*` |
 | Both candidates: runner-up PASS after primary KILL | PROVEN | `OwnerContinuationRunnerUpPassTests` |
 | Parent/authority + post-close readback | PROVEN | `MetadataStopAndPostCloseReadbackTests` + Vertical B |
 

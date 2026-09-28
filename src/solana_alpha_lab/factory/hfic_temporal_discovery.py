@@ -1477,15 +1477,29 @@ def look_counts_toward_scientific_search(item: Mapping[str, Any]) -> bool:
 
     if item.get("new_look") is not True:
         return False
-    result = item.get("result") if isinstance(item.get("result"), Mapping) else {}
-    if not isinstance(result, Mapping):
-        return True
+    result = item.get("result")
+    if not isinstance(result, Mapping) or not result:
+        # Opaque or empty look payloads must not credit scientific search.
+        return False
     if result.get("technical_failure") is True:
         return False
     stop = result.get("technical_stop")
     if isinstance(stop, Mapping) and stop.get("technical_failure") is True:
         return False
     if snapshot_input_technical_stop(result) is not None:
+        return False
+    # A stamped discovery summary carries at least one fitness/denominator field.
+    if not any(
+        key in result
+        for key in (
+            "population_n",
+            "observed_target_n",
+            "decision_eligible_n",
+            "exclusion_reasons",
+            "calculation_version",
+            "technical_stop",
+        )
+    ):
         return False
     return True
 

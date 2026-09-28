@@ -84,7 +84,15 @@ runner-up) fails with `REPAIR_EXECUTION_NOT_COMPLETE` and writes nothing.
 | `owner_authorization_id` | owner-supplied authority token |
 | `technical_gap_code` | owner-supplied gap id (e.g. `PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP`) |
 | `repair_continuation_disposition_sha256` | stamped on `show-session` / list after authorized repair freeze or NO_WORTHY repair terminal — use for `repair-continuation-close` if apply JSON was lost |
-| `critic_terminal` | current cycle terminal (`NO_WORTHY_HYPOTHESIS`, `KILL_*`, …). After selected repair this flips away from the parent terminal while AUTHORIZED disposition may still need close |
+| `critic_terminal` | primary-cycle critic verdict (`NO_WORTHY_HYPOTHESIS`, `KILL_*`, …). After runner-up failover this may still show the primary KILL while the **owner-final** terminal is elsewhere — do not steer close/readback on this alone |
+| `final_session_terminal` | canonical session terminal after F3/failover (`effective_control_terminal`). Prefer this over `critic_terminal` for close readiness and expected `forge-run` owner_final |
+| `runner_up_failover_used` | true when the surviving candidate is the runner-up; survivor id is `final_survivor_candidate_id` on the session receipt |
+
+Close readiness: `session_state=SYNTHESIS_COMPLETE` **and** a non-empty
+`final_session_terminal` (PASS/CASE_A/KILL/NO_WORTHY…). Pending
+`AWAITING_CLASSIFICATION` / `RUNNER_UP_AWAITING_CRITIC` / revision pause must
+**not** be closed — CLI returns `REPAIR_EXECUTION_NOT_COMPLETE` with
+`FINISH_CRITIC_OR_CLASSIFICATION_OR_RUNNER_UP_THEN_CLOSE`.
 
 ### 1) Build draft (no-write)
 
@@ -126,11 +134,15 @@ freeze/terminal). After the ordinary continuation reaches a **new** terminal
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <store> repair-continuation-close --disposition-sha256 <64-hex> --confirm-append-only
 ```
 
-`show-session` `session_state=SYNTHESIS_COMPLETE` with a new `critic_terminal`
-(≠ parent `NO_WORTHY`) means the research cycle finished; it does **not** mean
-the AUTHORIZED disposition is consumed. Until close, AUTHORIZED can still
-overlay admission. Close is required so AUTHORIZED cannot reopen the slot;
-idempotent close replay returns `ALREADY_CLOSED` / `owner_status=DONE`.
+`show-session` `session_state=SYNTHESIS_COMPLETE` with a completed
+`final_session_terminal` (≠ parent `NO_WORTHY` when repair produced a new
+cycle) means the research cycle finished; it does **not** mean the AUTHORIZED
+disposition is consumed. Trust `final_session_terminal` /
+`effective_control_terminal` for the owner-final cue — after runner-up failover,
+`critic_terminal` may still name the primary KILL while the survivor PASS is on
+`final_session_terminal`. Until close, AUTHORIZED can still overlay admission.
+Close is required so AUTHORIZED cannot reopen the slot; idempotent close replay
+returns `ALREADY_CLOSED` / `owner_status=DONE`.
 
 Close also appends a repair-marked `FORGE_RUN_RECEIPT` (same parent
 `run_identity_sha256`, `repair_continuation_disposition_sha256` set) without
@@ -168,6 +180,7 @@ Draft/apply failures also print JSON on stdout with `owner_status=BLOCKED`
 | `SPENT_BUDGET_INVALID` | `PASS_SPENT_LOOKS_OR_ENSURE_DISCOVERY_JOURNAL` |
 | `SPENT_BUDGET_MISMATCH` | `ALIGN_DRAFT_SPENT_LOOKS_TO_JOURNAL` (or `…_TO_PARENT` from plan JSON when store has no looks) |
 | `DISPOSITION_ALREADY_CLOSED` | `STOP_CONTINUATION_ALREADY_CONSUMED` |
+| `REPAIR_EXECUTION_NOT_COMPLETE` | `FINISH_CRITIC_OR_CLASSIFICATION_OR_RUNNER_UP_THEN_CLOSE` — disposition stays AUTHORIZED; do not rerun apply |
 | `COMPETING_ACTIVE_DISPOSITION` / `COMPETING_DISPOSITION_APPLIED` | `CLOSE_COMPETING_DISPOSITION_THEN_STOP` — plan or apply-blocked JSON `disposition.disposition_sha256` (and `owner_readout.competing_disposition_sha256` on apply) is the competitor to `repair-continuation-close` |
 | `REPAIR_CONTINUATION_CONFIRM_REQUIRED` | `ADD_CONFIRM_APPEND_ONLY_WITH_OWNER_AUTHORITY` |
 

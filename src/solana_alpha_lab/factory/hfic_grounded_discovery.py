@@ -1589,6 +1589,12 @@ def format_discovery_readout(evidence: Mapping[str, Any]) -> dict[str, Any]:
         payload["target_exclusion_reasons"] = result.get("target_exclusion_reasons")
     if result.get("source_price_event_time") is not None:
         payload["source_price_event_time"] = result.get("source_price_event_time")
+    if result.get("technical_stop") is not None:
+        payload["technical_stop"] = result.get("technical_stop")
+    if result.get("technical_failure") is not None:
+        payload["technical_failure"] = result.get("technical_failure")
+    if result.get("scientific_negative") is not None:
+        payload["scientific_negative"] = result.get("scientific_negative")
     return payload
 
 

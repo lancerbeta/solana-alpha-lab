@@ -32287,7 +32287,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 37e45daf93e93224c111429b708b4974b303d78b9ad2d008ee9040a454a98bab}
+  integrity: {kind: sha256, sha256: 3948d95adaeb00a92d0f92f85f869eed8a5bac7673508fa5078a82e69ab7a157}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37829,7 +37829,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: 1c638cea47b4d13e4cfc1b9e1924f057d231055a041488ad7b412e0171605d35}
+  integrity: {kind: sha256, sha256: 32c4471b0a88e5bc6c2c5f7dad18f3db638f9de357c4e766fb9e573e2d5be1ca}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}
