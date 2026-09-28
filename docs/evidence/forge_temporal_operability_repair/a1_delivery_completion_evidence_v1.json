@@ -50,14 +50,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "86ecdd6226ebffca34390c4c4bf3adbf0a454de6f9f9fb131f4144cebc9132ee",
+    "sha256": "22e5e2beca7e4ce30bdad89d6fe11a5045b5268af8f7453da2be3093509ce92a",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_P1A_P1B_MATRIX_AND_OWNER_SCENARIOS",
     "independent_review": {
       "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "5a8587360e4214fe027eeb9853b3117a35056eb507bb5d7d0b426a9f62b73836",
+      "sha256": "b6179819ef20c9523130cd8403cef74ddb019cfa0bb355d1abfd1b49ed5e65c2",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
