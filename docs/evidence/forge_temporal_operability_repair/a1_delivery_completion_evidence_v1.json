@@ -25,7 +25,7 @@
     "docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md": "4c93641315e96111798c6c4289c7d09a91eae733a2e061df76c0618a7668174c",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "7ad08632f44fc5925e4f0b4fadc90f07b76912f90bd4b63d912c88d65a2abcf8",
     "docs/reports/forge_temporal_operability_repair/a1_owner_readout_v1.md": "0930b97f8a58b7eb7fef9140e5841cfc94f517277b4d1cc118e65d1957efca65",
-    "docs/tasks/FORGE_TEMPORAL_OPERABILITY_REPAIR_V1.md": "42da16f35c962f5d3bd8da4600a44a96e1f40ad1f73de31dcd4f9cb30da76e67",
+    "docs/tasks/FORGE_TEMPORAL_OPERABILITY_REPAIR_V1.md": "becfc19b7ddc5a537332bc1a810459f3e58977470b27a0bef65b44b53d5534f1",
     "scripts/hypothesis_forge.py": "0cd414b4f0227ca1a7cf6adc29033d008b0d312a1015c0602b981b135172edd1",
     "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "09ff278db0d40ab9a37b6c40f69fe7b1a829aff66ee4a4f0cd98a01f6b891170",
     "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "d899f0c476eedbddecc69766eef4e2f99ba9ca8e5d55f90b2ddcb3640925e639",
@@ -51,14 +51,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "2a45a30584bd63683b15e911c97d0448c490bd35db3a150abdb0152d85992447",
+    "sha256": "ca8f02c9d904b7ca56fdbf23cf4ccb8528e34e3df9e08d959ed4b11857f8c222",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_INPUT_FITNESS_DISPOSITION_BOUND_CLOSE_AND_G11_MATRIX",
     "independent_review": {
       "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "5e001badde1500a900f417257a43707a71f30490068adba778db6084f9095698",
+      "sha256": "46efc6d937c5be4a05346aaf6d619a5ffb3c20920cd01153d46089c80d7e9167",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
