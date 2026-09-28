@@ -1550,5 +1550,194 @@ class LocationAwareIncrementalSyncTests(unittest.TestCase):
             )
 
 
+class CollectFailClosedLocationTests(unittest.TestCase):
+    """Compact CLI proof: unknown location fails closed in collect_asset_records."""
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.worktree = Path(self._tmp.name) / "repo"
+        self.addCleanup(self._tmp.cleanup)
+        SyncGoldenTests._build_fixture(self)
+        first = _run(
+            [sys.executable, "-B", "scripts/harness_sync.py", "--apply"],
+            cwd=self.worktree,
+        )
+        self.assertEqual(first.returncode, 0, first.stderr or first.stdout)
+        _commit_all(self.worktree, "synced fixture")
+        seed = _run(["git", "rev-parse", "HEAD"], cwd=self.worktree).stdout.strip()
+        digest = hashlib.sha256(b"external-ok").hexdigest()
+        _append_external_sha_record(
+            self.worktree,
+            "LOC-EXT-OK",
+            location_kind="external_bundle",
+            digest=digest,
+            logical_uri="fixture://external/ok",
+        )
+        filled = _run(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--apply",
+                "--base-ref",
+                seed,
+            ],
+            cwd=self.worktree,
+        )
+        self.assertEqual(filled.returncode, 0, filled.stderr or filled.stdout)
+        payload = json.loads(filled.stdout)
+        self.assertEqual(payload["mode"], "incremental")
+        self.assertFalse(payload.get("full_fallback"))
+        _commit_all(self.worktree, "external baseline")
+        self.base = _run(["git", "rev-parse", "HEAD"], cwd=self.worktree).stdout.strip()
+        self.ext_digest = digest
+
+    def _append_unknown_sha_record(self) -> None:
+        _append_external_sha_record(
+            self.worktree,
+            "LOC-EXT-BAD-KIND",
+            location_kind="mystery_blob",
+            digest=hashlib.sha256(b"bad-kind").hexdigest(),
+            logical_uri="fixture://external/bad",
+        )
+
+    def test_unknown_location_apply_fails_before_hash(self) -> None:
+        self._append_unknown_sha_record()
+        before = {
+            relative: (self.worktree / relative).read_bytes()
+            for relative in (
+                "catalog/assets/core.yaml",
+                "catalog/catalog_manifest.yaml",
+            )
+            if (self.worktree / relative).is_file()
+        }
+        spy = self.worktree / "sha256.spy"
+        result = _run_with_spy(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--apply",
+                "--base-ref",
+                self.base,
+            ],
+            cwd=self.worktree,
+            spy=spy,
+        )
+        self.assertEqual(result.returncode, 2, result.stderr or result.stdout)
+        self.assertIn("HARNESS_SYNC_ERROR: INCREMENTAL_SCOPE_UNPROVEN", result.stderr)
+        self.assertNotIn("HARNESS_SYNC_PLAN:", result.stderr)
+        self.assertEqual(_unique_spy_paths(spy), set())
+        self.assertFalse(result.stdout.strip().startswith("{"))
+        for relative, payload in before.items():
+            self.assertEqual(payload, (self.worktree / relative).read_bytes(), relative)
+
+    def test_unknown_location_staged_check_fails(self) -> None:
+        self._append_unknown_sha_record()
+        _run(["git", "add", "catalog/assets/core.yaml"], cwd=self.worktree)
+        spy = self.worktree / "sha256.spy"
+        checked = _run_with_spy(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--check",
+                "--paths-from-staging",
+            ],
+            cwd=self.worktree,
+            spy=spy,
+        )
+        self.assertEqual(checked.returncode, 2, checked.stderr)
+        self.assertIn("HARNESS_SYNC_ERROR: INCREMENTAL_SCOPE_UNPROVEN", checked.stderr)
+        self.assertNotIn("PASS", checked.stdout)
+        self.assertEqual(_unique_spy_paths(spy), set())
+
+    def test_git_path_missing_path_is_asset_path_missing(self) -> None:
+        core = self.worktree / "catalog/assets/core.yaml"
+        core.write_text(
+            core.read_text(encoding="utf-8")
+            + (
+                "- asset_id: LOC-GIT-MISSING-PATH\n"
+                "  record_version: '1.0'\n"
+                "  asset_type: evidence\n"
+                "  purpose: missing repository_path\n"
+                "  status: IMPLEMENTED_UNVERIFIED\n"
+                "  origin: REPOSITORY\n"
+                "  as_of: '2026-09-28'\n"
+                "  truth_owner: TASK-99\n"
+                "  location:\n"
+                "    kind: git_path\n"
+                "    logical_uri: repo://docs/missing.txt\n"
+                "  integrity:\n"
+                "    kind: sha256\n"
+                f"    sha256: {'ab' * 32}\n"
+                "  access:\n"
+                "    mode: read_only\n"
+                "    method: file\n"
+                "    network_required: false\n"
+                "    secrets_required: false\n"
+                "  relations: []\n"
+                "  consumers: [TASK-99]\n"
+                "  evidence: []\n"
+                "  classification:\n"
+                "    contains_secrets: false\n"
+                "    contains_raw_data: false\n"
+                "    sensitivity: INTERNAL_NON_SECRET\n"
+            ),
+            encoding="utf-8",
+        )
+        result = _run(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--apply",
+                "--base-ref",
+                self.base,
+            ],
+            cwd=self.worktree,
+        )
+        self.assertEqual(result.returncode, 2, result.stderr or result.stdout)
+        self.assertIn(
+            "HARNESS_SYNC_ERROR: ASSET_PATH_MISSING:LOC-GIT-MISSING-PATH",
+            result.stderr,
+        )
+
+    def test_valid_external_alone_stays_incremental(self) -> None:
+        self._append_unknown_sha_record()
+        core = self.worktree / "catalog/assets/core.yaml"
+        text = core.read_text(encoding="utf-8")
+        # Drop only the corrupt unknown-kind record; keep LOC-EXT-OK.
+        start = text.index("- asset_id: LOC-EXT-BAD-KIND\n")
+        end = text.find("\n- asset_id:", start + 1)
+        if end < 0:
+            end = len(text)
+        core.write_text(text[:start] + text[end:].lstrip("\n"), encoding="utf-8")
+        # Touch an unrelated registered source so plan is non-empty but narrow.
+        target = self.worktree / "docs/generated_target.txt"
+        target.write_bytes(target.read_bytes() + b"x")
+        spy = self.worktree / "sha256.spy"
+        result = _run_with_spy(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--apply",
+                "--base-ref",
+                self.base,
+            ],
+            cwd=self.worktree,
+            spy=spy,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["mode"], "incremental")
+        self.assertFalse(payload["full_fallback"])
+        self.assertIsNone(payload["impact_plan"].get("fallback_reason"))
+        self.assertIn("fallback=none", result.stderr)
+        self.assertIn(self.ext_digest, core.read_text(encoding="utf-8"))
+        self.assertNotIn("LOC-EXT-BAD-KIND", core.read_text(encoding="utf-8"))
+
+
 if __name__ == "__main__":
     unittest.main()

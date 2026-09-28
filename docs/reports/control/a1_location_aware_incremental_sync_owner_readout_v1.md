@@ -10,6 +10,6 @@
 
 4. **Time.** Measured `elapsed_ms=48607` (~49s) vs historical ~20.3 min full fallback under similar Catalog size (~1712 SHA assets). Approx **25×**; floor 5× met. Not a CI wall-clock assert.
 
-5. **Full backstop.** Bare `--apply` / `--apply --full` and unscoped `--check` unchanged. This atom does **not** accelerate all of CI.
+5. **Full backstop.** Bare `--apply` / `--apply --full` and unscoped `--check` still walk the full local HASH_SCOPE when Catalog locations classify cleanly. Corrupt/unknown `location.kind` on a `sha256` row now fails closed at collect (`INCREMENTAL_SCOPE_UNPROVEN` / `ASSET_PATH_MISSING`) before hash or full recovery — fix the primary Catalog record first; do not expect full oracle to skip it.
 
-6. **Residual risk.** Future unknown `location.kind` values still force full fallback (intentional). Semantic external-SHA edits still require navigation. Stale historical timing conditions differ; trust the spy/plan counters over folklore.
+6. **Residual risk.** Unknown `location.kind` fails closed early (intentional). Semantic external-SHA edits still require navigation. Stale historical timing conditions differ; trust the spy/plan counters over folklore.

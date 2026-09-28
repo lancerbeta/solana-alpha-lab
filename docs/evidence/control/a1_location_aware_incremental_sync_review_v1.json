@@ -4,8 +4,8 @@
   "review_id": "LAIS-LOCATION-AWARE-INCREMENTAL-SYNC-REVIEW-001",
   "as_of": "2026-09-28",
   "task_id": "DELIVERY_HARNESS_LOCATION_AWARE_INCREMENTAL_SYNC_V1",
-  "reviewed_bindings_sha256": "d8c5af9a684d3074ef0be5da88bfb8ebef4bf968b7ea134ff2ede16173fbef36",
-  "reviewed_inventory_sha256": "769ab7a3e04fbdb7d5eaf448670799beda5f7a05f868ccd7ca1c18e61ab5d232",
+  "reviewed_bindings_sha256": "PENDING",
+  "reviewed_inventory_sha256": "PENDING",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -17,37 +17,37 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "_sha256_location_class splits git_path vs external_bundle|logical_only; unknown/empty git_path raise INCREMENTAL_SCOPE_UNPROVEN.",
-        "Path index + derived pins skip external/logical; semantic projection strips SHA only for local pins.",
-        "collect_asset_records uses the shared classifier for HASH_SCOPE; fixtures prove incremental narrow spy, NOOP, staged stale-pin catch.",
-        "Kind flips stay semantic without false full fallback from valid external rows."
+        "collect_asset_records re-raises INCREMENTAL_SCOPE_UNPROVEN for unknown/corrupt non-local sha256 location; no soft-continue.",
+        "ASSET_PATH_MISSING:<asset_id> preserved for sha256+git_path without repository_path.",
+        "Valid external_bundle|logical_only still class-skip via SHA256_LOCATION_EXTERNAL, not hashed.",
+        "CollectFailClosedLocationTests: apply/check exit 2 before hash; empty spy; external-alone stays incremental."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Shared classifier drives path index, pins, semantic projection, and HASH_SCOPE via collect_asset_records.",
-        "Cheapest falsifier encoded end-to-end in LocationAwareIncrementalSyncTests.",
-        "Benchmark receipt: incremental, fallback=none, hashed_unique_paths=4, ~25x vs historical 20.3m; non-claims exclude unscoped check acceleration."
+        "Closes FALSE_NOOP_ON_CORRUPT_LOCATION: corrupt rows cannot soft-skip into green full-fallback apply/check.",
+        "CLI falsifier proves early UNPROVEN, staged check fail, ASSET_PATH_MISSING, valid external incremental.",
+        "HASH_SCOPE / external-SHA semantics / Catalog schema / explicit full recovery policy unchanged for clean rows."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "EXTERNAL_SHA_NOT_LOCAL_VERIFIED: external/logical sha256 never enters collect/path-index/derived-pin/desired_sha256; SHA kept in semantic projection.",
-        "Corrupt/unknown location fail closed via INCREMENTAL_SCOPE_UNPROVEN on scope proof paths.",
-        "No second hash store/cache/threads; unscoped --check remains FULL_FALLBACK/UNSCOPED_CHECK backstop."
+        "EXTERNAL_SHA_NOT_LOCAL_VERIFIED: external/logical never enter collect HASH_SCOPE, path-index, derived pins, or desired_sha256.",
+        "Fail-closed at collect precedes plan emit, desired_sha256, and FULL_FALLBACK walk.",
+        "No second hash store; unscoped --check remains full backstop when locations classify cleanly."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "HARNESS_SYNC_PLAN stderr exposes class/hashed/nav/fallback/base_ref for owner diagnosis.",
-        "--apply --base-ref vs --full stay distinct; staged --check --paths-from-staging shares HASH_SCOPE with repair hint.",
-        "Owner readout and benchmark explicitly deny accelerating all CI / unscoped --check."
+        "P0 narrative drift closed: owner readout states corrupt/unknown fail closed at collect; full oracle does not skip bad rows.",
+        "Exit 2 + HARNESS_SYNC_ERROR is owner-visible STOP before long hash walk.",
+        "ASSET_PATH_MISSING:<id> remains actionable for missing git_path; opaque UNPROVEN without id is non-P0 residual."
       ]
     }
   ],

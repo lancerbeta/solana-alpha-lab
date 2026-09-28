@@ -268,9 +268,9 @@ def collect_asset_records(
                 ):
                     asset_id = record.get("asset_id") or "UNKNOWN"
                     raise HarnessSyncError(f"ASSET_PATH_MISSING:{asset_id}") from None
-                # Unknown/corrupt non-local kinds are not locally hashable targets;
-                # incremental planners fail closed via path-index/semantic helpers.
-                continue
+                # Unknown / corrupt non-local sha256 location: fail closed here so
+                # collectors cannot soft-skip into a later full-fallback walk.
+                raise
             if location_class != SHA256_LOCATION_LOCAL:
                 continue
             asset_id = record["asset_id"]
