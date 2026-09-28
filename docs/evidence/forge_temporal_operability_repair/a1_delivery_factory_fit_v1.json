@@ -1,0 +1,26 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-TEMPORAL-OPERABILITY-REPAIR-FACTORY-FIT-001",
+  "as_of": "2026-09-28",
+  "task_id": "FORGE_TEMPORAL_OPERABILITY_REPAIR_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_ORDINARY_FORGE_SNAPSHOT_AND_REPAIR_CONTINUATION",
+    "flexibility_and_history": "PASS_LEGACY_EVENT_TIME_AND_CLOSED_DISPOSITIONS_STAND",
+    "context_efficiency": "PASS_EXISTING_FORGE_CLI_AND_RESEARCH_STORE",
+    "research_truth": "PASS_SNAPSHOT_LINEAGE_AND_EXCLUSION_REASONS",
+    "owner_operability": "PASS_PLAN_APPLY_CLOSE_WITH_COMPETING_RECOVERY",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_MARKET_EXECUTION",
+    "monitoring_and_recovery": "PASS_IDEMPOTENT_REPLAY_AND_LEASE",
+    "build_vs_buy": "PASS_NO_SECOND_RUNTIME",
+    "red_team": "PASS_SOURCE_POLICY_AND_AUTHORITY_NEGATIVES",
+    "security": "PASS_NO_PROVIDER_NO_LIVE_WRITE"
+  },
+  "capability_radar": {"now": "NONE", "watch": "POST_MERGE_LIVE_PARENT_PLAN_ONLY"},
+  "recovery": "Revert this change. Append-only dispositions and looks stay readable. A code rollback does not restore a consumed budget.",
+  "limits": ["NO_MARKET_FORGE", "NO_LIVE_APPLY", "NO_NET_RETURN", "NO_ALPHA", "MARKET_EXECUTION_NOT_RUN", "NO_MERGE"]
+}

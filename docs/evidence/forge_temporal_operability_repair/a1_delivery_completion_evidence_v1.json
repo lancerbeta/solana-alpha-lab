@@ -1,0 +1,41 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-TEMPORAL-OPERABILITY-REPAIR-ACCEPTANCE-001",
+  "as_of": "2026-09-28",
+  "task_id": "FORGE_TEMPORAL_OPERABILITY_REPAIR_V1",
+  "state_change": "SNAPSHOT_PATH_AND_REPAIR_CONTINUATION_OPERABLE",
+  "base_main": "86b24cb1abe5867becc1ead16efb3754044550df",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_PRODUCTION_VERTICALS_A_AND_B",
+    "independent_review": {
+      "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": ["PASS_PRODUCTION_VERTICALS_A_AND_B"]
+  },
+  "non_claims": ["NO_ALPHA", "NO_NET_RETURN", "NO_MARKET_EXECUTION", "NO_MERGE", "NO_LIVE_APPLY"],
+  "side_effects": {"market_execution": "NOT_RUN", "live_store_writes": 0}
+}

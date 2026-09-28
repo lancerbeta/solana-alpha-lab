@@ -1,0 +1,18 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-TEMPORAL-OPERABILITY-REPAIR-REVIEW-001",
+  "as_of": "2026-09-28",
+  "task_id": "FORGE_TEMPORAL_OPERABILITY_REPAIR_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": ["ARCHITECTURE_CRITIC", "CODE_REVIEWER", "GOAL_DOD_CRITIC", "OWNER_UX_CRITIC"],
+  "reviews": [
+    {"role": "CODE_REVIEWER", "verdict": "PASS", "findings": ["AcceptanceVertical A/B exercise publish/run_recorded/DocumentRunner and persist_no_worthy repair re-entry; ALREADY_APPLIED-by-auth and unique repair txn/next-action ids hold on 99f985ab."]},
+    {"role": "GOAL_DOD_CRITIC", "verdict": "PASS", "findings": ["Vertical A closes P1-2 with hard SNAPSHOT_OCCURRENCE_UNBOUND/SNAPSHOT_POLICY_MISMATCH; Vertical B closes P1-4/5 with preview spend, competing apply, idempotent replay, _assert_scientific_admission, and repair terminal."]},
+    {"role": "ARCHITECTURE_CRITIC", "verdict": "PASS", "findings": ["Lease same-digest AUTHORIZED raises IDEMPOTENT_REPLAY mapped to ALREADY_APPLIED; snapshot rows require explicit policy equality; single ResearchStore and CLOSED-before-spent hold."]},
+    {"role": "OWNER_UX_CRITIC", "verdict": "PASS", "findings": ["Apply COMPETING_* emits competitor disposition_sha256 and competing_disposition_sha256; runbook documents CLOSE_COMPETING_DISPOSITION_THEN_STOP."]}
+  ],
+  "verdict": "PASS",
+  "non_claims": ["NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY", "NO_MERGE", "NO_ALPHA", "NO_MARKET_FORGE", "NO_NET_RETURN", "NO_LIVE_APPLY"]
+}
