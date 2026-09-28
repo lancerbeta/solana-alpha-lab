@@ -1,7 +1,7 @@
 # FORGE_TEMPORAL_OPERABILITY_REPAIR_V1 owner readout
 
 Finish atom: predicate vs matched-outcome input fitness + disposition-bound close.
-Base main: `86b24cb1abe5867becc1ead16efb3754044550df`. Prior verified tip: `12ce9bce`.
+Base main: `cc137231e17029875046823caa0f8db636ed6240` (retargeted after #351; prior frozen base `86b24cb1`). Prior verified tip: `12ce9bce`.
 
 ## Closed this increment
 
