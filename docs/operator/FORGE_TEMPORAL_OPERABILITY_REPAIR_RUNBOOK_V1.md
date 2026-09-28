@@ -52,7 +52,12 @@ deadline. Do not invent `source_price_event_time`; default is `UNKNOWN`.
 | `EXIT_ABSENT` / `EXIT_NOT_OBSERVED` | No usable exit row | Data / schedule gap |
 
 Empty observed target with these reasons is a **technical or data gap**, not a
-modeled negative return and not an automatic family ban.
+modeled negative return and not an automatic family ban. When the whole required
+input scope is lineage-uninterpretable, discovery stamps `technical_stop` /
+`technical_failure=true` (reason e.g. `SNAPSHOT_LINEAGE_UNINTERPRETABLE`). Those
+looks do **not** authorize scientific `SEARCH_EXHAUSTED` / `READY_TO_FREEZE`
+(including the compound-inapplicable shortcut). Owner recovery: fix metadata /
+occurrence lineage, then re-query — do not treat the stop as family kill.
 
 ## Repair continuation — owner commands
 
@@ -118,6 +123,18 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-ro
 the AUTHORIZED disposition is consumed. Until close, AUTHORIZED can still
 overlay admission. Close is required so AUTHORIZED cannot reopen the slot;
 idempotent close replay returns `ALREADY_CLOSED` / `owner_status=DONE`.
+
+Close also appends a repair-marked `FORGE_RUN_RECEIPT` (same parent
+`run_identity_sha256`, `repair_continuation_disposition_sha256` set) without
+rewriting the historical exhausted parent receipt. After close (and after store
+reopen), ordinary `forge-run --no-write` must show the **repair** terminal —
+e.g. `KILL_*` → `NON_SCIENTIFIC_STOP`, PASS/CASE_A → `OWNER_CANDIDATE`, repair
+`NO_WORTHY` → `SEARCH_EXHAUSTED_CURRENT_EVIDENCE` — not the parent
+`SEARCH_EXHAUSTED` and not `SCIENTIFIC_IDENTITY_CONFLICT`. Close JSON carries
+`forge_run_receipt_sha256` when persist succeeds. `ALREADY_CLOSED` crash
+recovery may still append a missing repair receipt; trust
+`forge_run_receipt_sha256` / subsequent `--no-write` readback, and `writes=true`
+when that recovery actually wrote.
 
 ### Plan/apply/draft/close owner terminals
 

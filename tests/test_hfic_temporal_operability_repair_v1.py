@@ -2187,6 +2187,16 @@ class MetadataStopAndPostCloseReadbackTests(unittest.TestCase):
         with self.assertRaises(GroundedDiscoveryError) as raised:
             assert_search_exhaustion_claim(progress, claim_search_exhausted=True)
         self.assertEqual(str(raised.exception), "SEARCH_EXHAUSTED_WITHOUT_COMPOUND")
+        # Compound-inapplicable shortcut must not launder technical looks into
+        # SEARCH_EXHAUSTED / READY_TO_FREEZE either.
+        inapplicable = assess_tier_progress(
+            looks, freeze_worthy=False, compound_applicable=False
+        )
+        self.assertFalse(inapplicable.get("search_exhausted_allowed"))
+        self.assertNotEqual(inapplicable.get("action"), "READY_TO_FREEZE")
+        self.assertEqual(inapplicable.get("compound_status"), "TECHNICAL_BLOCKED")
+        with self.assertRaises(GroundedDiscoveryError):
+            assert_search_exhaustion_claim(inapplicable, claim_search_exhausted=True)
         # Interpretable positive path is unchanged.
         legal = SnapshotTargetTests()._rows_legal()
         ok = execute_temporal_discovery(

@@ -1449,9 +1449,25 @@ def assess_tier_progress(
         if look_counts_toward_scientific_search(item)
         and item.get("search_tier") == "COMPOUND_SCREEN"
     ]
+    technical_attempts = [
+        item
+        for item in looks
+        if item.get("new_look") is True
+        and not look_counts_toward_scientific_search(item)
+    ]
     if not compound_applicable:
-        status = "SKIPPED_INAPPLICABLE"
-        action = "READY_TO_FREEZE"
+        # Compound N/A may close search only after scientific simple evidence.
+        # Technical/metadata-only looks must not authorize SEARCH_EXHAUSTED via
+        # the SKIPPED_INAPPLICABLE shortcut.
+        if simple:
+            status = "SKIPPED_INAPPLICABLE"
+            action = "READY_TO_FREEZE"
+        elif technical_attempts:
+            status = "TECHNICAL_BLOCKED"
+            action = "STOP_TECHNICAL_INPUT"
+        else:
+            status = "SKIPPED_INAPPLICABLE"
+            action = "READY_TO_FREEZE"
     elif compound:
         status = "EXECUTED"
         action = "READY_TO_FREEZE"
@@ -1459,8 +1475,12 @@ def assess_tier_progress(
         status = "SKIPPED_WITH_WORTHY_SIMPLE"
         action = "READY_TO_FREEZE"
     elif not simple and not compound:
-        status = "NOT_STARTED"
-        action = "RUN_SIMPLE_OR_COMPOUND"
+        if technical_attempts:
+            status = "TECHNICAL_BLOCKED"
+            action = "STOP_TECHNICAL_INPUT"
+        else:
+            status = "NOT_STARTED"
+            action = "RUN_SIMPLE_OR_COMPOUND"
     else:
         mains = [
             item

@@ -617,10 +617,16 @@ def _persist_repair_completion_forge_run(
     """Append durable FORGE_RUN_RECEIPT for the repair terminal without rewriting parent."""
 
     from solana_alpha_lab.factory.hfic_session import list_hfic_sessions, load_session_bundle
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CASE_A_TERMINALS,
+        CASE_C_KILL_TERMINALS,
+    )
     from solana_alpha_lab.factory.hfic_representation_ladder import (
         ACTION_NON_SCIENTIFIC_STOP,
+        ACTION_OWNER_CANDIDATE,
         ACTION_SEARCH_EXHAUSTED,
         FORGE_RUN_ARTIFACT_KIND,
+        PASS_TERMINALS,
     )
     from solana_alpha_lab.factory.run_passport import canonical_json_bytes, canonical_sha256
 
@@ -687,6 +693,10 @@ def _persist_repair_completion_forge_run(
     )
     if terminal == "NO_WORTHY_HYPOTHESIS":
         owner_final = ACTION_SEARCH_EXHAUSTED
+    elif terminal in PASS_TERMINALS or terminal in CASE_A_TERMINALS:
+        owner_final = ACTION_OWNER_CANDIDATE
+    elif terminal in CASE_C_KILL_TERMINALS or terminal.startswith("KILL_"):
+        owner_final = ACTION_NON_SCIENTIFIC_STOP
     elif terminal:
         owner_final = ACTION_NON_SCIENTIFIC_STOP
     else:
@@ -1216,18 +1226,33 @@ def close_repair_continuation(
     if target.get("status") == "CLOSED":
         # Crash recovery: CLOSED without a repair forge-run still needs the
         # durable owner result linked to this disposition.
+        prior = _lookup_forge_run_for_parent(
+            store,
+            session_id=str(target.get("parent_session_id") or ""),
+            scientific_slot_sha256=(
+                str(target.get("scientific_slot_sha256"))
+                if isinstance(target.get("scientific_slot_sha256"), str)
+                else None
+            ),
+        )
+        already_linked = (
+            isinstance(prior, Mapping)
+            and prior.get("repair_continuation_disposition_sha256")
+            == disposition_sha256
+        )
         repair_run = _persist_repair_completion_forge_run(
             store,
             disposition=target,
             git_sha=git_sha,
             now=now or datetime.now(timezone.utc),
         )
+        wrote = isinstance(repair_run, Mapping) and not already_linked
         return {
             "status": "ALREADY_CLOSED",
             "applied": False,
             "idempotent": True,
             "disposition": target,
-            "writes": False,
+            "writes": wrote,
             "owner_status": "DONE",
             "reason_code": reason_code,
             "forge_run_receipt_sha256": (
@@ -1246,6 +1271,24 @@ def close_repair_continuation(
         git_sha=git_sha,
         now=moment,
     )
+    if repair_run is None:
+        # Fail closed only when a parent FORGE_RUN_RECEIPT identity exists to
+        # supersede; older parents without a durable forge-run still close.
+        parent_probe = _lookup_forge_run_for_parent(
+            store,
+            session_id=str(closed.get("parent_session_id") or ""),
+            scientific_slot_sha256=(
+                str(closed.get("scientific_slot_sha256"))
+                if isinstance(closed.get("scientific_slot_sha256"), str)
+                else None
+            ),
+        )
+        if (
+            isinstance(parent_probe, Mapping)
+            and isinstance(parent_probe.get("run_identity_sha256"), str)
+            and _HEX64.match(str(parent_probe.get("run_identity_sha256")))
+        ):
+            raise RepairContinuationError("REPAIR_FORGE_RUN_PERSIST_FAILED")
     canonical = _canonical(closed)
     payload = {
         "artifact_kind": DISPOSITION_ARTIFACT_KIND,
