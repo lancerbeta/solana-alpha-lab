@@ -4,8 +4,8 @@
   "review_id": "COLLECTOR-CAMPAIGN-CUTOVER-TRUTH-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-29",
   "task_id": "COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1",
-  "reviewed_bindings_sha256": "5c38267a862f1e3d85640356aea8125c66b60520df3036412ff126e4707f1b01",
-  "reviewed_inventory_sha256": "e41951593e9535ab41193d4a40e6ceac3218bfd726f823d47e19230b5a04a712",
+  "reviewed_bindings_sha256": "0fcc69fb78eeff99a7d32575a76f7ad7c3e974df6783cf9df3e63bfca1bf19b3",
+  "reviewed_inventory_sha256": "ffac1f7d75b29cabe88ca028d581755f6bb14fd297434107f7626862183ab9a6",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -18,9 +18,8 @@
       "verdict": "PASS",
       "findings": [
         "PASS_NO_P0_P1_FINDINGS",
-        "REVIEWED_DIFF_SHA256_fb1d7018f9a4d11535ca3d80554a223f851a514a449ad7dc4e5a757a67427a70",
         "MODEL_grok-4.7-high",
-        "INVENTORY_DELTA_OWNER_READOUT_TEST_COUNT_74_TO_78_ONLY"
+        "PASS_PRODUCT_UNCHANGED_CONTEXT_ROLE_AND_PIN_META_ONLY"
       ]
     },
     {
@@ -29,7 +28,7 @@
       "findings": [
         "PASS_PRODUCT_ACCEPTANCE_ACTUALLY_SATISFIED",
         "MODEL_grok-4.7-high",
-        "READOUT_TEST_COUNT_HYGIENE_FIXED_78",
+        "CONTEXT_RECEIPT_NOW_BINDS_DELIVERY_EVIDENCE",
         "EVIDENCE_REBIND_REQUIRED_AND_APPLIED_AFTER_REVIEW"
       ]
     },
@@ -39,8 +38,7 @@
       "findings": [
         "PASS_NO_P0_P1_VIOLATION_PROVEN",
         "MODEL_grok-4.7-high",
-        "PHYSICAL_DISPATCH_CROSSING_CUTOVER_NOT_TESTED",
-        "PACKET_SCHEDULE_FIELDS_UNDER_UNKNOWN_RESIDUAL_NON_BLOCKING"
+        "PHYSICAL_DISPATCH_CROSSING_CUTOVER_NOT_TESTED"
       ]
     },
     {
@@ -49,7 +47,6 @@
       "findings": [
         "PASS_NO_BLOCKING_OWNER_OPERABILITY_GAP",
         "MODEL_grok-4.7-high",
-        "SMOKE_DOCUMENTS_NO_LIVE_AND_FUTURE_TRANSITION_PENDING",
         "REGISTERED_VERSUS_NONE_OWNER_ACTIONS_DISTINCT"
       ]
     }

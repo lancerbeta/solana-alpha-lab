@@ -11,15 +11,15 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "75ebc803d079b97dc448292f37969694e56051b0508a334f32e2a053848e65e6",
+    "catalog/assets/core.yaml": "522c29c9d9b7671b47dbe420c2344b4cda372dffcaad320e11f5d67f335118bf",
     "catalog/assets/lifecycle.yaml": "2e6230f533d44cb5fd1b94aecb4243ea954107c94ae2c07fab1ee7f978aa4659",
     "catalog/catalog_manifest.yaml": "00ac73ab96212985c71a14381cd79d5854d462283ca8d90befd483fdf1a712b5",
     "catalog/generated/asset_edges.json": "3185b5504f9648da7152a28b2144fdc845e5f99ec832ab084a88f112785f032f",
     "docs/PROJECT_MAP.md": "a19293bad386266b0d6e212cb6e2ff56ca9f07ea7ccd1e451d3b939d2eabe55c",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "f13221433898aea231d0d66500d872cc5b4f445229460c1b4d6449d0dabcf652",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "5e515038ecfa389c62636be68754a5599389db3df8be571cf86be048b8c14eeb",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "5117ac80cc7640238959e86bfc86d8bfc2fed1f5a672210db789fdb50b0d90d7",
     "docs/reports/collector_campaign_cutover_truth/a1_owner_readout_v1.md": "b60721fb64b8e5e7374bbf7b7db63f8ce4fbfbfa1f4d304801bf9c89ff119680",
-    "docs/tasks/COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1.md": "d305532d50b1ad973ec34ab65c549eacf61ed6a4a348d2d99e13f390e772d42e",
+    "docs/tasks/COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1.md": "4088dcfdd75cde17b83baa866e10a995b40d24e38ceb525ae996b823bbfdbd57",
     "scripts/observation_schedule.py": "65a35554546fca9249f85cabd2e9822fc3245d923547682c8c8b613f1d003c85",
     "src/solana_alpha_lab/factory/collector_operational_packet.py": "b735c056bcd8e418b83abfd93a12a928cfdce858e7319d189aab4992eee78186",
     "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "481e601ca5fdf73a0bac7ca16c6f9076d1ff83ee1061fdc47c716afab49d7cce",
@@ -37,14 +37,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/collector_campaign_cutover_truth/a1_delivery_factory_fit_v1.json",
-    "sha256": "c990bdbdbd3bc416830f686e9f2983e935eb12422c68e5dcd882a6ce0f84a56c",
+    "sha256": "4c9dc405fe80e99a4b56a23a8d75806714e37a4e09fc0448ced623af4db4769c",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_78_TARGETED_UNITTESTS_AND_CATALOG_CONTEXT_CHECKS",
     "independent_review": {
       "path": "docs/evidence/collector_campaign_cutover_truth/a1_delivery_independent_review_v1.json",
-      "sha256": "6251d47d39340129e193ac94d81e6bbead2ffc592952379c101ff0439dff6a5c",
+      "sha256": "166715aa082a44b725abe5734663834f990f4509c167cbe3ef713d2a2abdff15",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
