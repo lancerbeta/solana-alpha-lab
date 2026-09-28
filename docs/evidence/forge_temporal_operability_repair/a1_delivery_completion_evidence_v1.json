@@ -14,15 +14,15 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "0e72434e03626f40443c24c78dcc699cb67fd01b8d21255ffaccaf688231470c",
+    "catalog/assets/core.yaml": "a76e01c806ac8ba26d31a98efe36fb02b84c9191bd83929502fd5ecc6f497056",
     "catalog/assets/lifecycle.yaml": "a5560ac251aa3c13461a25816de76ea0c2786aac19c668363cf8b0284c46c4a8",
     "catalog/catalog_manifest.yaml": "10b53b7b43081ec80faacc642757ebebd600fcb0d5d8773faedcf94c8a67cf0d",
     "catalog/generated/asset_edges.json": "02b274c7f3619d66b5b969ed31b4c1b0aafbdc79086355717fa73e8dfa8d789e",
     "catalog/schemas/observation_primitive_descriptor_v1.schema.json": "47adf110bfadd5d356dcc863f52f59574b02b6ccc3bb81578f3233906b4d3de4",
     "configs/observation_primitive_registry_v1.yaml": "8529e43e8b29631b0b47d78d9d0b66e7c1d9b7e8f5be2d3e2d9384a74790e032",
     "docs/PROJECT_MAP.md": "7d236107f751bcd47f0e82ba35d2ccd7223cad79bf86558889e6bf18b9b632fc",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "6c83c43984791f1546b33a057ea49a1f643c8c236d11cd1479cb0ef5f528ab65",
-    "docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md": "2de97445f1fa255af236c4ca568f9d98d433ca4f610619d9e82994e39ec8e69b",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "0bb87bc25ea4aacc5af31ea535af866d1aa49969174b0f08712e9ec2a44d5290",
+    "docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md": "a307c8b713200c8cc81797406dc3575e9e9fc9321e1aa83c79990bf0803c3ce5",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "7ad08632f44fc5925e4f0b4fadc90f07b76912f90bd4b63d912c88d65a2abcf8",
     "docs/reports/forge_temporal_operability_repair/a1_owner_readout_v1.md": "a7add22ef61bf1ed54e201e26be0e2527495970d1511c7b68b5ebd206bffe053",
     "docs/tasks/FORGE_TEMPORAL_OPERABILITY_REPAIR_V1.md": "42da16f35c962f5d3bd8da4600a44a96e1f40ad1f73de31dcd4f9cb30da76e67",
@@ -30,14 +30,14 @@
     "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "09ff278db0d40ab9a37b6c40f69fe7b1a829aff66ee4a4f0cd98a01f6b891170",
     "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "314abf3bf8431f1ec8ba019f42deaa2a956e0095ce5ff880fe7ad3d3c5decf82",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "2daed4c74be430d3659a52381114db27263402764a2ada57cc9fc64f3d6b2626",
-    "src/solana_alpha_lab/factory/hfic_repair_continuation.py": "7196dde30980b664ef200dc958a81072b0d818882fae59fd25a164ce876c29ec",
+    "src/solana_alpha_lab/factory/hfic_repair_continuation.py": "b1355ecf4029e4ad834f09173a901dab712612c9194f416c18ffc83718d8089f",
     "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "1b9f18d08472466588ada8c2c4afc5a4d57d750fbd1bd50c1abf396451757ace",
     "src/solana_alpha_lab/factory/hfic_session.py": "38b4ce32db1f45d1839c113147db518be2ca2e6b8da303868ea96bfcec0df4a0",
-    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "04ea6e89dc86b4975e32f40c413953706653ce6bbaa7e35912ed5536ceebe893",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "aae5415b18296fa3335364e91ef44b516626d172f3c83d2f3d49f0abc9e40fd6",
     "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "ab26da78d00bb13fbc42ff8e911bc5004e8e106baec10392fb010c02c1197707",
     "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "6c9b418190226ada55702a1569480a05232d1190115447ef8a66ebf2f5488ca9",
     "src/solana_alpha_lab/factory/observation_scheduler.py": "b2f589a12a132c56c57623f1920d4574e6ab2b8e4f1694a254c5e7c2dd2c8c5d",
-    "tests/test_hfic_temporal_operability_repair_v1.py": "144eda56e1b04ae3f0a6114a5a2b1c1b60b76bf5f0dd4f2f170c04184876e374",
+    "tests/test_hfic_temporal_operability_repair_v1.py": "1e80652c879aabf0da08d663930dac8556373009431163452170bf7e91721938",
     "tests/test_hfic_temporal_production_runner_v1.py": "93286a2f086d15f0c4ee442d323ac8e05cbe9a8d599319d0d7a0933e5a032e4b"
   },
   "active_stop_conditions": [],
@@ -50,14 +50,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "bcd5116d8e264c5736fd8e74101b1b276278596982090d14d75dc10e17203ef2",
+    "sha256": "7402e65e05cf995cba8a3efc1d1314615ae0d318c7ab1ab6c6a0bf45fad972cb",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_METADATA_STOP_AND_POST_CLOSE_READBACK",
     "independent_review": {
       "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "0b90d4acf738055b1f437f775705d522d0ded100ea20d150754a6623ab07d31c",
+      "sha256": "77d5e81a393e85d8d259da21a4c650598c9951d1c9df11b348f5d6c1fdfc7a9e",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

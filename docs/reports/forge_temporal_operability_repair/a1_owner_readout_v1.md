@@ -1,11 +1,11 @@
 # FORGE_TEMPORAL_OPERABILITY_REPAIR_V1 owner readout
 
-Head: d4249da6146f5c949c80ea89dbb00ebfc55ca2dc
+Head: 94e6b8a9762a796721bf48a32b3e30cfec6b8dc2
 
 ## Closed this increment (residual P1-1 / P1-2)
 
-- P1-1: wholly uninterpretable required snapshot lineage stamps recoverable `technical_stop` / `SNAPSHOT_LINEAGE_UNINTERPRETABLE` and is excluded from looks that authorize scientific `SEARCH_EXHAUSTED` / `READY_TO_FREEZE`. Partial exclusions and valid zero-match remain scientific. Positive journal↔DocumentRunner path unchanged.
-- P1-2: `repair-continuation-close` appends a repair-marked `FORGE_RUN_RECEIPT` (parent bytes untouched). Ordinary `forge-run --no-write` after close and after store reopen returns the repair terminal (`NON_SCIENTIFIC_STOP` / KILL), not parent `SEARCH_EXHAUSTED` or `SCIENTIFIC_IDENTITY_CONFLICT`. `ALREADY_CLOSED` close replay stays idempotent.
+- P1-1: wholly uninterpretable required snapshot lineage stamps recoverable `technical_stop` / `SNAPSHOT_LINEAGE_UNINTERPRETABLE` and is excluded from looks that authorize scientific `SEARCH_EXHAUSTED` / `READY_TO_FREEZE`, including the compound-inapplicable shortcut (`TECHNICAL_BLOCKED`). Partial exclusions and valid zero-match remain scientific. Positive journal↔DocumentRunner path unchanged.
+- P1-2: `repair-continuation-close` appends a repair-marked `FORGE_RUN_RECEIPT` (parent bytes untouched). Ordinary `forge-run --no-write` after close and after store reopen returns the repair terminal (`NON_SCIENTIFIC_STOP` / KILL, or `OWNER_CANDIDATE` for PASS/CASE_A), not parent `SEARCH_EXHAUSTED` or `SCIENTIFIC_IDENTITY_CONFLICT`. `ALREADY_CLOSED` crash recovery reports `writes=true` when it persists a missing repair receipt.
 
 ## Still closed from prior increments (do not reopen)
 

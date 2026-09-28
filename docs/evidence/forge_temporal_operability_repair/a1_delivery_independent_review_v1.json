@@ -4,8 +4,8 @@
   "review_id": "FORGE-TEMPORAL-OPERABILITY-REPAIR-REVIEW-001",
   "as_of": "2026-09-28",
   "task_id": "FORGE_TEMPORAL_OPERABILITY_REPAIR_V1",
-  "reviewed_bindings_sha256": "076fd9489be49dd4aa8d746a435fad91bb89a8863daf8945d8dac241b147cd3b",
-  "reviewed_inventory_sha256": "77610d2c5badfb1cd58a67b9591845188fcba91742d7e8f1e75fa4c9686bb406",
+  "reviewed_bindings_sha256": "2702c1f7b914fc1cd8772018ebec35a0ec110996c34f1a01abfbd8a4cd24ce78",
+  "reviewed_inventory_sha256": "9f84878a2d21ddae15608d83a41143fabe5bd45554c38d801546e5175a217d52",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -17,14 +17,14 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Tip d4249da6: P1-1 technical_stop + look_counts_toward_scientific_search keep lineage-blocked looks out of SEARCH_EXHAUSTED; P1-2 repair-marked FORGE_RUN_RECEIPT preferred on close with session fallback and completed readback despite admission OBSERVABILITY_BLOCKED; MetadataStopAndPostCloseReadbackTests cover both. Residuals: ALREADY_CLOSED write telemetry; soft-fail persist; SNAPSHOT_LINEAGE_BLOCKERS broader than UNINTERPRETABLE alone."
+        "Tip 94e6b8a9: P1-1 technical_stop + look_counts_toward_scientific_search keep lineage-blocked looks out of SEARCH_EXHAUSTED; compound_applicable=False with only technical looks is TECHNICAL_BLOCKED (not SKIPPED_INAPPLICABLE exhaust). P1-2 repair-marked FORGE_RUN_RECEIPT preferred; PASS/CASE_A→OWNER_CANDIDATE; ALREADY_CLOSED writes=true on crash-recovery persist; MetadataStopAndPostCloseReadbackTests cover both."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "DoD P1-1 PASS: wholly uninterpretable lineage stamps TECHNICAL_STOP; assess denies search_exhausted_allowed/READY_TO_FREEZE; assert_search_exhaustion_claim raises SEARCH_EXHAUSTED_WITHOUT_COMPOUND; positive path technical_stop is None. DoD P1-2 PASS: after close+reopen evaluate_forge_run owner_final=NON_SCIENTIFIC_STOP with repair disposition, not parent SEARCH_EXHAUSTED or SCIENTIFIC_IDENTITY_CONFLICT."
+        "DoD P1-1 PASS: wholly uninterpretable lineage stamps TECHNICAL_STOP; assess denies search_exhausted_allowed/READY_TO_FREEZE for compound-applicable and compound-inapplicable technical-only paths; assert_search_exhaustion_claim raises SEARCH_EXHAUSTED_WITHOUT_COMPOUND; positive path technical_stop is None. DoD P1-2 PASS: after close+reopen evaluate_forge_run owner_final=NON_SCIENTIFIC_STOP with repair disposition, not parent SEARCH_EXHAUSTED or SCIENTIFIC_IDENTITY_CONFLICT."
       ]
     },
     {
@@ -39,7 +39,7 @@
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Metadata technical stop distinguished from scientific exhaustion; post-close forge-run prefers repair KILL/NON_SCIENTIFIC_STOP; ALREADY_CLOSED recoverable. Residuals: TECHNICAL vs NON_SCIENTIFIC naming; ALREADY_CLOSED writes:false vs possible forge-run persist; runbook omits explicit technical_stop next-step."
+        "Metadata technical stop distinguished from scientific exhaustion (incl. compound-inapplicable); post-close forge-run prefers repair terminal; ALREADY_CLOSED writes honest on recovery persist; runbook documents technical_stop fields and post-close forge-run contract."
       ]
     }
   ],
