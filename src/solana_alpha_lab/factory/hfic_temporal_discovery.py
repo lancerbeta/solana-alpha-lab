@@ -68,6 +68,13 @@ SNAPSHOT_LINEAGE_BLOCKERS = frozenset(
         "ACQUISITION_AFTER_CUTOFF",
     }
 )
+# Census membership codes that never describe scientific input fitness of the
+# eligible population. They must not cancel a lineage technical stop.
+NON_SCIENTIFIC_CENSUS_EXCLUSIONS = frozenset(
+    {
+        "NOT_X_ELIGIBLE",
+    }
+)
 PREVIEW_BYTE_LIMIT = 64 * 1024
 PREVIEW_EXAMPLE_LIMIT = 24
 MAX_PREVIEW_SPECS = 2
@@ -750,6 +757,121 @@ def _predicate_holds(value: float | None, predicate: Mapping[str, Any]) -> bool 
     return float(predicate["lower"]) <= value < float(predicate["upper"])
 
 
+def _feature_value_with_lineage(
+    grouped: Mapping[Any, Sequence[Mapping[str, Any]]],
+    *,
+    cohort: str,
+    release: str,
+    mint: str,
+    anchor: object,
+    feature: Mapping[str, Any],
+    lateness: int,
+    decision_deadline: object,
+    due_offset_for: Any = None,
+    lateness_for: Any = None,
+    snapshot_policy: str | None = None,
+) -> tuple[float | None, str | None]:
+    """Return (value, lineage_blocker). Lineage blockers stay visible for fitness."""
+
+    lineage: str | None = None
+
+    def offset(point: str) -> int | None:
+        if due_offset_for is None:
+            return None
+        return int(due_offset_for(point))
+
+    def point_lateness(point: str) -> int:
+        if lateness_for is None:
+            return lateness
+        return int(lateness_for(point))
+
+    def read(point: str, field: str) -> dict[str, Any]:
+        nonlocal lineage
+        due = offset(point)
+        point_deadline = _deadline_for(
+            anchor, point, point_lateness(point), due_offset=due
+        )
+        if point_deadline is None or decision_deadline is None or point_deadline > decision_deadline:
+            return {"status": "ABSENT"}
+        point_due_at = _due_moment(anchor, int(due)) if due is not None else None
+        cell = _cell(
+            grouped,
+            (cohort, release, mint, point, field),
+            point_deadline,
+            snapshot_policy=snapshot_policy,
+            point_due_at=point_due_at if snapshot_policy else None,
+        )
+        status = str(cell.get("status") or "")
+        if lineage is None and status in SNAPSHOT_LINEAGE_BLOCKERS:
+            lineage = status
+        return cell
+
+    op = str(feature["op"])
+    if op == "point_value":
+        cell = read(str(feature["point"]), str(feature["field_id"]))
+        if cell.get("status") != "OBSERVED":
+            return None, lineage
+        return float(cell["value"]), lineage
+    if op == "utc_hour":
+        moment = _deadline_for(
+            anchor, str(feature["point"]), 0, due_offset=offset(str(feature["point"]))
+        )
+        if moment is None or decision_deadline is None or moment > decision_deadline:
+            return None, lineage
+        if read(str(feature["point"]), PRICE).get("status") != "OBSERVED":
+            return None, lineage
+        return float(moment.hour), lineage
+    if op == "elapsed_seconds":
+        start = _deadline_for(
+            anchor, str(feature["start"]), 0, due_offset=offset(str(feature["start"]))
+        )
+        end = _deadline_for(
+            anchor, str(feature["end"]), 0, due_offset=offset(str(feature["end"]))
+        )
+        if start is None or end is None:
+            return None, lineage
+        if read(str(feature["start"]), PRICE).get("status") != "OBSERVED":
+            return None, lineage
+        if read(str(feature["end"]), PRICE).get("status") != "OBSERVED":
+            return None, lineage
+        return float((end - start).total_seconds()), lineage
+    if op == "return_ratio":
+        start = read(str(feature["start"]), str(feature["field_id"]))
+        end = read(str(feature["end"]), str(feature["field_id"]))
+        if start.get("status") != "OBSERVED" or end.get("status") != "OBSERVED":
+            return None, lineage
+        denominator = float(start["value"])
+        if denominator <= 0:
+            return None, lineage
+        return float(end["value"]) / denominator - 1.0, lineage
+    if op == "ratio":
+        numerator = read(str(feature["numerator"]), str(feature["field_id"]))
+        denominator_cell = read(str(feature["denominator"]), str(feature["field_id"]))
+        if numerator.get("status") != "OBSERVED" or denominator_cell.get("status") != "OBSERVED":
+            return None, lineage
+        denominator = float(denominator_cell["value"])
+        if denominator <= 0:
+            return None, lineage
+        return float(numerator["value"]) / denominator, lineage
+    points = [str(item) for item in feature.get("points") or []]
+    values: list[float] = []
+    for point in points:
+        cell = read(point, str(feature["field_id"]))
+        if cell.get("status") != "OBSERVED":
+            return None, lineage
+        values.append(float(cell["value"]))
+    at = read(str(feature["at"]), str(feature["field_id"]))
+    if at.get("status") != "OBSERVED":
+        return None, lineage
+    if op == "drawdown_from_grid_max":
+        base = max(values)
+    else:
+        base = min(values)
+    if base <= 0:
+        return None, lineage
+    return float(at["value"]) / base - 1.0, lineage
+
+
 def _feature_value(
     grouped: Mapping[Any, Sequence[Mapping[str, Any]]],
     *,
@@ -764,96 +886,20 @@ def _feature_value(
     lateness_for: Any = None,
     snapshot_policy: str | None = None,
 ) -> float | None:
-    def offset(point: str) -> int | None:
-        if due_offset_for is None:
-            return None
-        return int(due_offset_for(point))
-
-    def point_lateness(point: str) -> int:
-        if lateness_for is None:
-            return lateness
-        return int(lateness_for(point))
-
-    def read(point: str, field: str) -> dict[str, Any]:
-        due = offset(point)
-        point_deadline = _deadline_for(
-            anchor, point, point_lateness(point), due_offset=due
-        )
-        if point_deadline is None or decision_deadline is None or point_deadline > decision_deadline:
-            return {"status": "ABSENT"}
-        point_due_at = _due_moment(anchor, int(due)) if due is not None else None
-        cutoff = point_deadline if snapshot_policy else point_deadline
-        # Snapshot features keep their own point deadline and acquisition lineage.
-        return _cell(
-            grouped,
-            (cohort, release, mint, point, field),
-            cutoff,
-            snapshot_policy=snapshot_policy,
-            point_due_at=point_due_at if snapshot_policy else None,
-        )
-
-    op = str(feature["op"])
-    if op == "point_value":
-        cell = read(str(feature["point"]), str(feature["field_id"]))
-        return cell.get("value") if cell.get("status") == "OBSERVED" else None
-    if op == "utc_hour":
-        moment = _deadline_for(
-            anchor, str(feature["point"]), 0, due_offset=offset(str(feature["point"]))
-        )
-        if moment is None or decision_deadline is None or moment > decision_deadline:
-            return None
-        if read(str(feature["point"]), PRICE).get("status") != "OBSERVED":
-            return None
-        return float(moment.hour)
-    if op == "elapsed_seconds":
-        start = _deadline_for(
-            anchor, str(feature["start"]), 0, due_offset=offset(str(feature["start"]))
-        )
-        end = _deadline_for(
-            anchor, str(feature["end"]), 0, due_offset=offset(str(feature["end"]))
-        )
-        if start is None or end is None:
-            return None
-        if read(str(feature["start"]), PRICE).get("status") != "OBSERVED":
-            return None
-        if read(str(feature["end"]), PRICE).get("status") != "OBSERVED":
-            return None
-        return float((end - start).total_seconds())
-    if op == "return_ratio":
-        start = read(str(feature["start"]), str(feature["field_id"]))
-        end = read(str(feature["end"]), str(feature["field_id"]))
-        if start.get("status") != "OBSERVED" or end.get("status") != "OBSERVED":
-            return None
-        denominator = float(start["value"])
-        if denominator <= 0:
-            return None
-        return float(end["value"]) / denominator - 1.0
-    if op == "ratio":
-        numerator = read(str(feature["numerator"]), str(feature["field_id"]))
-        denominator_cell = read(str(feature["denominator"]), str(feature["field_id"]))
-        if numerator.get("status") != "OBSERVED" or denominator_cell.get("status") != "OBSERVED":
-            return None
-        denominator = float(denominator_cell["value"])
-        if denominator <= 0:
-            return None
-        return float(numerator["value"]) / denominator
-    points = [str(item) for item in feature.get("points") or []]
-    values: list[float] = []
-    for point in points:
-        cell = read(point, str(feature["field_id"]))
-        if cell.get("status") != "OBSERVED":
-            return None
-        values.append(float(cell["value"]))
-    at = read(str(feature["at"]), str(feature["field_id"]))
-    if at.get("status") != "OBSERVED":
-        return None
-    if op == "drawdown_from_grid_max":
-        base = max(values)
-    else:
-        base = min(values)
-    if base <= 0:
-        return None
-    return float(at["value"]) / base - 1.0
+    value, _lineage = _feature_value_with_lineage(
+        grouped,
+        cohort=cohort,
+        release=release,
+        mint=mint,
+        anchor=anchor,
+        feature=feature,
+        lateness=lateness,
+        decision_deadline=decision_deadline,
+        due_offset_for=due_offset_for,
+        lateness_for=lateness_for,
+        snapshot_policy=snapshot_policy,
+    )
+    return value
 
 
 def project_schedule_points(document: Mapping[str, Any]) -> dict[str, dict[str, int]]:
@@ -1361,6 +1407,8 @@ def snapshot_input_technical_stop(summary: Mapping[str, Any]) -> dict[str, Any] 
 
     Partial lineage misses stay as exclusions. Interpretable zero-match
     (population formed; scientific target gaps) is not a technical stop.
+    Excluded census members (e.g. NOT_X_ELIGIBLE) do not decide fitness of the
+    eligible scientific scope.
     """
 
     if int(summary.get("observed_target_n") or 0) > 0:
@@ -1391,6 +1439,7 @@ def snapshot_input_technical_stop(summary: Mapping[str, Any]) -> dict[str, Any] 
         code: count
         for code, count in membership.items()
         if code not in SNAPSHOT_LINEAGE_BLOCKERS
+        and code not in NON_SCIENTIFIC_CENSUS_EXCLUSIONS
     }
     other_targets = {
         code: count
@@ -1398,11 +1447,23 @@ def snapshot_input_technical_stop(summary: Mapping[str, Any]) -> dict[str, Any] 
         if code not in SNAPSHOT_LINEAGE_BLOCKERS
     }
     population_n = int(summary.get("population_n") or 0)
+    decision_eligible_n = int(summary.get("decision_eligible_n") or 0)
     if population_n == 0:
         if lineage_membership and not other_membership:
             primary = sorted(lineage_membership)[0]
             return technical_stop_record(primary)
         return None
+    # Base population formed but no decision-eligible scientific path: every
+    # fitness failure among eligible attempts is lineage/metadata, not a
+    # scientific empty match.
+    if (
+        decision_eligible_n == 0
+        and lineage_membership
+        and not other_membership
+        and not other_targets
+    ):
+        primary = sorted(lineage_membership)[0]
+        return technical_stop_record(primary)
     # Population formed but every missing target is a lineage blocker and no
     # scientific target gap is named — treat as uninterpretable input scope.
     if lineage_targets and not other_targets and not other_membership:
@@ -1765,10 +1826,15 @@ def execute_temporal_discovery(
                 snapshot_policy=snapshot_policy,
                 point_due_at=_due_moment(anchor, decision_due) if snapshot_policy else None,
             )
-            decision_eligible = decision_price.get("status") == "OBSERVED"
+            decision_status = str(decision_price.get("status") or "")
+            decision_eligible = decision_status == "OBSERVED"
+            if not decision_eligible and decision_status in SNAPSHOT_LINEAGE_BLOCKERS:
+                # Preserve lineage fitness reasons on the eligible attempt; do
+                # not let them collapse to an empty exclusion bag.
+                exclusion = decision_status
             if decision_eligible:
                 for feature in features:
-                    feature_values[str(feature["name"])] = _feature_value(
+                    value, feature_lineage = _feature_value_with_lineage(
                         grouped,
                         cohort=cohort,
                         release=release,
@@ -1785,6 +1851,12 @@ def execute_temporal_discovery(
                         )[1],
                         snapshot_policy=snapshot_policy,
                     )
+                    feature_values[str(feature["name"])] = value
+                    if (
+                        feature_lineage in SNAPSHOT_LINEAGE_BLOCKERS
+                        and exclusion not in SNAPSHOT_LINEAGE_BLOCKERS
+                    ):
+                        exclusion = feature_lineage
         hits = [
             _predicate_holds(feature_values.get(str(item["feature"])), item) for item in predicates
         ] if decision_eligible else []
@@ -1855,9 +1927,19 @@ def execute_temporal_discovery(
                 if source_event not in (None, ""):
                     selected_source_event = str(source_event)
             elif selected.get("status") == "OBSERVED" and reference.get("status") != "OBSERVED":
-                target_exclusion = "REFERENCE_NOT_AVAILABLE"
+                ref_status = str(reference.get("status") or "")
+                if ref_status in SNAPSHOT_LINEAGE_BLOCKERS:
+                    target_exclusion = ref_status
+                else:
+                    target_exclusion = "REFERENCE_NOT_AVAILABLE"
             elif matched and target_exclusion is None:
                 target_exclusion = "TARGET_UNOBSERVED"
+        # Keep lineage target reasons visible even when the member never matched
+        # predicates (decision/feature path already failed fitness).
+        publish_target_exclusion = None
+        if not target_observed and isinstance(target_exclusion, str) and target_exclusion:
+            if matched or target_exclusion in SNAPSHOT_LINEAGE_BLOCKERS:
+                publish_target_exclusion = target_exclusion
         members.append(
             {
                 "identity": identity,
@@ -1868,7 +1950,7 @@ def execute_temporal_discovery(
                 "matched": matched,
                 "target": target_value,
                 "target_is_observed": target_observed,
-                "target_exclusion": target_exclusion if matched and not target_observed else None,
+                "target_exclusion": publish_target_exclusion,
                 "source_price_event_time": selected_source_event,
                 "block": block,
                 "exclusion": exclusion,
@@ -1937,7 +2019,7 @@ def execute_temporal_discovery(
         missing_mean_to_zero = -sum(observed_values) / len(missing_target)
     clock_policy = str(body.get("observation_clock_policy") or OBSERVATION_CLOCK_EVENT_TIME_V1)
     target_exclusion_pooled: dict[str, int] = defaultdict(int)
-    for item in missing_target:
+    for item in members:
         reason = item.get("target_exclusion")
         if isinstance(reason, str) and reason:
             target_exclusion_pooled[reason] += 1

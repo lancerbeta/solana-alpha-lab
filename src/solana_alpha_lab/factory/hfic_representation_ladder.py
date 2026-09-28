@@ -497,6 +497,14 @@ def resolve_next_action(
         | {RUNNER_UP_REVISION_REQUIRED, "KILL_UNBOUND_EVIDENCE"}
     )
     if base_terminal not in known_base:
+        # Completed process/technical KILL not listed in CASE_C still stops
+        # non-scientifically. Do not launder it into OBSERVABILITY_BLOCKED.
+        if base_terminal.startswith("KILL_"):
+            return {
+                "next_action": ACTION_NON_SCIENTIFIC_STOP,
+                "owner_final": ACTION_NON_SCIENTIFIC_STOP,
+                "reason_code": base_terminal,
+            }
         return {
             "next_action": ACTION_OBSERVABILITY_BLOCKED,
             "owner_final": ACTION_OBSERVABILITY_BLOCKED,
@@ -3190,41 +3198,48 @@ def evaluate_forge_run(
     )
     if existing_owner_final:
         # A completed run is a durable readback, not a new forge-run write.
-        # Admission STOP / OBSERVABILITY_BLOCKED governs starting new scientific
-        # work; it must not hide an already-persisted owner_final — including a
-        # repair completion that supersedes historical SEARCH_EXHAUSTED after
-        # close. Provenance still fail-closes contradictory bindings.
+        # Ordinary completed receipts still respect OBSERVABILITY_BLOCKED from
+        # execution-binding / model-context gates (G11). A repair-marked
+        # completion after close may surface under admission STOP for the
+        # occupied slot; that must not hide the repair owner_final. Provenance
+        # still fail-closes contradictory bindings.
         # An authorized repair continuation deliberately lifts the completed
         # readback so the remaining look ledger can continue on the same slot.
         # Gate matches apply/overlay: AUTHORIZED + NO_WORTHY parent + session bind.
-        repair_active = active_repair_continuation_for_slot(
-            list_repair_continuation_dispositions(store),
-            scientific_slot_sha256=scientific_slot,
-            session_id=str(decision.get("session_id") or "") or None,
-        )
-        if repair_active is None or (
-            str(repair_active.get("parent_terminal") or "") != "NO_WORTHY_HYPOTHESIS"
-        ):
-            replay_provenance = _completed_readback_provenance_status(
-                existing,
-                active_row=active_row,
+        repair_marked = isinstance(
+            existing.get("repair_continuation_disposition_sha256"), str
+        ) and bool(existing.get("repair_continuation_disposition_sha256"))
+        if next_action == ACTION_OBSERVABILITY_BLOCKED and not repair_marked:
+            pass
+        else:
+            repair_active = active_repair_continuation_for_slot(
+                list_repair_continuation_dispositions(store),
                 scientific_slot_sha256=scientific_slot,
+                session_id=str(decision.get("session_id") or "") or None,
             )
-            if replay_provenance == EXEC_PROVENANCE_CONFLICT:
-                return _readback_existing_run(
+            if repair_active is None or (
+                str(repair_active.get("parent_terminal") or "") != "NO_WORTHY_HYPOTHESIS"
+            ):
+                replay_provenance = _completed_readback_provenance_status(
                     existing,
-                    block_reason="SCIENTIFIC_IDENTITY_CONFLICT",
-                    provenance_status=replay_provenance,
+                    active_row=active_row,
+                    scientific_slot_sha256=scientific_slot,
                 )
-            return _readback_existing_run(existing, provenance_status=replay_provenance)
-        existing_owner_final = False
-        owner_final = None
-        decision = dict(decision)
-        decision["owner_final"] = None
-        decision["reason_code"] = REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION
-        decision["repair_continuation_disposition_sha256"] = repair_active.get(
-            "disposition_sha256"
-        )
+                if replay_provenance == EXEC_PROVENANCE_CONFLICT:
+                    return _readback_existing_run(
+                        existing,
+                        block_reason="SCIENTIFIC_IDENTITY_CONFLICT",
+                        provenance_status=replay_provenance,
+                    )
+                return _readback_existing_run(existing, provenance_status=replay_provenance)
+            existing_owner_final = False
+            owner_final = None
+            decision = dict(decision)
+            decision["owner_final"] = None
+            decision["reason_code"] = REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION
+            decision["repair_continuation_disposition_sha256"] = repair_active.get(
+                "disposition_sha256"
+            )
     cap_epoch = input_receipt.get("capability_epoch_sha256")
     exec_binding = None
     exec_provenance_status = EXEC_PROVENANCE_NOT_APPLICABLE

@@ -607,6 +607,39 @@ def _lookup_forge_run_for_parent(
     return repair_completed or completed or latest
 
 
+def _repair_completion_from_session(
+    bundle: Mapping[str, Any],
+) -> tuple[str, str] | None:
+    """Map a completed repair session to (effective_terminal, owner_final).
+
+    Uses canonical ``effective_control_terminal`` + ``resolve_next_action``.
+    Incomplete critic/revision/classification/runner-up states return None.
+    """
+
+    from solana_alpha_lab.factory.hfic_control_integrity import effective_control_terminal
+    from solana_alpha_lab.factory.hfic_representation_ladder import resolve_next_action
+
+    terminal = effective_control_terminal(bundle)
+    if not terminal:
+        return None
+    state = str(bundle.get("session_state") or "")
+    decision = resolve_next_action(
+        [
+            {
+                "representation_id": "BASE",
+                "execution_status": "EXECUTED",
+                "effective_terminal": terminal,
+                "session_state": state,
+                "runner_up_candidate_id": bundle.get("runner_up_candidate_id"),
+            }
+        ]
+    )
+    owner_final = decision.get("owner_final")
+    if not isinstance(owner_final, str) or not owner_final:
+        return None
+    return terminal, owner_final
+
+
 def _persist_repair_completion_forge_run(
     store: Any,
     *,
@@ -617,17 +650,7 @@ def _persist_repair_completion_forge_run(
     """Append durable FORGE_RUN_RECEIPT for the repair terminal without rewriting parent."""
 
     from solana_alpha_lab.factory.hfic_session import list_hfic_sessions, load_session_bundle
-    from solana_alpha_lab.factory.hfic_control_integrity import (
-        CASE_A_TERMINALS,
-        CASE_C_KILL_TERMINALS,
-    )
-    from solana_alpha_lab.factory.hfic_representation_ladder import (
-        ACTION_NON_SCIENTIFIC_STOP,
-        ACTION_OWNER_CANDIDATE,
-        ACTION_SEARCH_EXHAUSTED,
-        FORGE_RUN_ARTIFACT_KIND,
-        PASS_TERMINALS,
-    )
+    from solana_alpha_lab.factory.hfic_representation_ladder import FORGE_RUN_ARTIFACT_KIND
     from solana_alpha_lab.factory.run_passport import canonical_json_bytes, canonical_sha256
 
     session_id = str(disposition.get("parent_session_id") or "")
@@ -686,21 +709,10 @@ def _persist_repair_completion_forge_run(
         == disposition.get("disposition_sha256")
     ):
         return dict(existing_repair)
-    terminal = str(
-        bundle.get("critic_terminal")
-        or bundle.get("final_session_terminal")
-        or ""
-    )
-    if terminal == "NO_WORTHY_HYPOTHESIS":
-        owner_final = ACTION_SEARCH_EXHAUSTED
-    elif terminal in PASS_TERMINALS or terminal in CASE_A_TERMINALS:
-        owner_final = ACTION_OWNER_CANDIDATE
-    elif terminal in CASE_C_KILL_TERMINALS or terminal.startswith("KILL_"):
-        owner_final = ACTION_NON_SCIENTIFIC_STOP
-    elif terminal:
-        owner_final = ACTION_NON_SCIENTIFIC_STOP
-    else:
+    completion = _repair_completion_from_session(bundle)
+    if completion is None:
         return None
+    terminal, owner_final = completion
     listed = next(
         (
             item
@@ -716,7 +728,8 @@ def _persist_repair_completion_forge_run(
         "session_id": session_id,
         "session_state": bundle.get("session_state"),
         "effective_terminal": terminal,
-        "critic_terminal": terminal,
+        "critic_terminal": bundle.get("critic_terminal"),
+        "final_session_terminal": bundle.get("final_session_terminal"),
         "execution_status": "EXECUTED",
         "scientific_slot_sha256": disposition.get("scientific_slot_sha256")
         or bundle.get("scientific_slot_sha256"),
@@ -727,6 +740,25 @@ def _persist_repair_completion_forge_run(
         "execution_binding_sha256": bundle.get("execution_binding_sha256"),
         "used_cohort_ids": list(parent_identity.get("used_cohort_ids") or []),
         "stage_ref_sha256": bundle.get("session_receipt_sha256"),
+        "selected_candidate_id": (
+            bundle.get("final_survivor_candidate_id")
+            or (
+                (bundle.get("session_receipt") or {}).get("final_survivor_candidate_id")
+                if isinstance(bundle.get("session_receipt"), Mapping)
+                else None
+            )
+            or (
+                bundle.get("runner_up_candidate_id")
+                if bundle.get("runner_up_failover_used")
+                or (
+                    isinstance(bundle.get("session_receipt"), Mapping)
+                    and (bundle.get("session_receipt") or {}).get("runner_up_failover_used")
+                )
+                else None
+            )
+            or bundle.get("selected_candidate_id")
+            or bundle.get("runner_up_candidate_id")
+        ),
     }
     run_id = f"FORGE-RUN-REPAIR-{str(disposition.get('disposition_sha256') or '')[:16].upper()}"
     unsigned = {
@@ -1261,6 +1293,15 @@ def close_repair_continuation(
         }
     if target.get("status") != "AUTHORIZED":
         raise RepairContinuationError("DISPOSITION_NOT_AUTHORIZED")
+    # Refuse close until this disposition's repair session has a canonical
+    # owner-final terminal. Parent DONE / critic-only / intermediate states
+    # are not a completion of the authorized continuation.
+    from solana_alpha_lab.factory.hfic_session import load_session_bundle
+
+    session_id = str(target.get("parent_session_id") or "")
+    bundle = load_session_bundle(store, session_id, read_mode=True) if session_id else None
+    if not isinstance(bundle, Mapping) or _repair_completion_from_session(bundle) is None:
+        raise RepairContinuationError("REPAIR_EXECUTION_NOT_COMPLETE")
     closed = dict(target)
     closed["status"] = "CLOSED"
     closed["closed_reason_code"] = reason_code

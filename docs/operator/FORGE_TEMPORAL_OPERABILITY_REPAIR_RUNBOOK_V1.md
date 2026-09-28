@@ -58,6 +58,14 @@ input scope is lineage-uninterpretable, discovery stamps `technical_stop` /
 looks do **not** authorize scientific `SEARCH_EXHAUSTED` / `READY_TO_FREEZE`
 (including the compound-inapplicable shortcut). Owner recovery: fix metadata /
 occurrence lineage, then re-query — do not treat the stop as family kill.
+Census rows that never enter the eligible population (e.g. `NOT_X_ELIGIBLE`)
+must not cancel that technical stop. Lineage blockers on decision / feature /
+reference stay visible in exclusion and target pools.
+
+Repair `close` takes the owner-final from `effective_control_terminal` +
+`resolve_next_action` (final session terminal wins over primary critic). Close
+before a completed repair execution (awaiting critic / classification /
+runner-up) fails with `REPAIR_EXECUTION_NOT_COMPLETE` and writes nothing.
 
 ## Repair continuation — owner commands
 

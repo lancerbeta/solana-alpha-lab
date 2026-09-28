@@ -1,31 +1,49 @@
 # FORGE_TEMPORAL_OPERABILITY_REPAIR_V1 owner readout
 
-Head: 94e6b8a9762a796721bf48a32b3e30cfec6b8dc2
+Finish atom: P1-A input fitness scope + P1-B canonical repair terminal.
+Base main: `86b24cb1abe5867becc1ead16efb3754044550df`. Reviewed prior tip: `8ce2edea`.
 
-## Closed this increment (residual P1-1 / P1-2)
+## Closed this increment
 
-- P1-1: wholly uninterpretable required snapshot lineage stamps recoverable `technical_stop` / `SNAPSHOT_LINEAGE_UNINTERPRETABLE` and is excluded from looks that authorize scientific `SEARCH_EXHAUSTED` / `READY_TO_FREEZE`, including the compound-inapplicable shortcut (`TECHNICAL_BLOCKED`). Partial exclusions and valid zero-match remain scientific. Positive journal↔DocumentRunner path unchanged.
-- P1-2: `repair-continuation-close` appends a repair-marked `FORGE_RUN_RECEIPT` (parent bytes untouched). Ordinary `forge-run --no-write` after close and after store reopen returns the repair terminal (`NON_SCIENTIFIC_STOP` / KILL, or `OWNER_CANDIDATE` for PASS/CASE_A), not parent `SEARCH_EXHAUSTED` or `SCIENTIFIC_IDENTITY_CONFLICT`. `ALREADY_CLOSED` crash recovery reports `writes=true` when it persists a missing repair receipt.
+- **P1-A:** Eligible scientific fitness ignores non-scientific census exclusions (`NOT_X_ELIGIBLE`). Lineage blockers on decision/feature/reference stay visible in exclusion/target pools. Wholly unfit required scope stamps `technical_stop` and denies scientific exhaustion; valid zero-match stays scientific.
+- **P1-B:** Repair close uses `effective_control_terminal` + `resolve_next_action` (no local critic-first table). Incomplete critic/revision/classification/runner-up states refuse close (`REPAIR_EXECUTION_NOT_COMPLETE`). Primary KILL + runner-up PASS keeps `OWNER_CANDIDATE` and the survivor candidate id on the repair receipt.
+- G11 preserved: ordinary completed receipts still honor `OBSERVABILITY_BLOCKED`; only repair-marked completions bypass for occupied-slot post-close readback.
 
-## Still closed from prior increments (do not reopen)
+## Outcome matrix (PROVEN)
 
-- Journal/DocumentRunner published-byte parity; legacy lineage admit; selected repair lifecycle through finalize; show-session disposition projection.
+| Boundary | Status | Evidence |
+|---|---|---|
+| Census NOT_X_ELIGIBLE does not cancel technical stop | PROVEN | `FinishOutcomeMatrixTests.test_census_not_x_eligible_*` |
+| Decision/reference lineage reason preserved; no scientific exhaust | PROVEN | `FinishOutcomeMatrixTests.test_decision_lineage_*`, `test_reference_lineage_*` |
+| Valid zero-match remains scientific | PROVEN | `FinishOutcomeMatrixTests.test_valid_zero_match_*` |
+| Canonical terminals: PASS / CASE_C / scientific KILL / NO_WORTHY | PROVEN | `FinishOutcomeMatrixTests.test_repair_completion_prefers_*` |
+| Incomplete close refused | PROVEN | `FinishOutcomeMatrixTests.test_repair_completion_refuses_*` |
+| Both candidates: runner-up PASS after primary KILL | PROVEN | `OwnerContinuationRunnerUpPassTests` |
+| Parent/authority + post-close readback | PROVEN | `MetadataStopAndPostCloseReadbackTests` + Vertical B |
 
-## Vertical receipts (local disposable)
+## Owner production scenarios
 
-- MetadataStop + Vertical A/B acceptance at tip: PASS (8 tests).
-- P1-1: uninterpretable input → technical stop; exhaustion claim denied.
-- P1-2: historical SEARCH_EXHAUSTED seed → selected repair KILL → close → evaluate_forge_run prefers repair terminal; reopen + ALREADY_CLOSED.
+- **Data:** journal path with technical stop + NOT_X_ELIGIBLE census; scientific positive vs zero-match distinct (`OwnerDataScenarioTechnicalAndScientificTests`). Vertical A published parity still required after tip commit/hash rebind.
+- **Continuation:** authorized disposition → primary `KILL_DATA_INFEASIBLE` → runner-up classify `PASS_FAST_LANE_READY` → close → repair receipt `OWNER_CANDIDATE` with survivor = runner-up id.
+
+## Still closed from prior increments
+
+Mixed clocks; journal/DocumentRunner parity; selected repair lifecycle; post-close preference of repair-marked receipt; metadata technical stop vs SEARCH_EXHAUSTED.
 
 ## Metadata-only live cohort note
 
-Current cohort bindings/schema are not re-run against live S3 in this atom. Live corpus without occurrence/request remains UNKNOWN until a separate metadata read.
+Live S3 metadata read not re-run in this atom. Disposition remains UNKNOWN for occurrence/request readiness until a separate metadata-only read. Historical live parent for future apply (re-check runtime before use):
+
+- run `FORGE-RUN-1CEB81C6C91AC1A8`
+- session `HFIC-SESS-222A589D8A2731D8`
+- focus `COHORT_STRATIFIED_LIFECYCLE_PATHS`
 
 ## Unexecuted post-merge plan
 
-1. Metadata-only live readiness read of current parent inventory (no apply).
-2. Owner-authorized repair-continuation-plan for the live parent only after separate authority.
-3. No merge in this atom.
+1. No-write readiness/plan for the exact live parent.
+2. Separate owner permission for live apply.
+3. One ordinary continuation in the remaining budget; current terminal/replay.
+4. If metadata blocker: fix input constraint first — no scientific close, no arbitrary rerun.
 
 ## Non-claims
 
