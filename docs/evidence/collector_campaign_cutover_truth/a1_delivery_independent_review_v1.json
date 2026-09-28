@@ -4,8 +4,8 @@
   "review_id": "COLLECTOR-CAMPAIGN-CUTOVER-TRUTH-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-29",
   "task_id": "COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1",
-  "reviewed_bindings_sha256": "f250b42a168f6043fa70956cf7dd1144eafccfbe1201d1b16db07cba174601f4",
-  "reviewed_inventory_sha256": "93bacc6c2afb2050b598bf2e5690f8081f6edb35f58045d68bd337f84811bbc8",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -18,15 +18,16 @@
       "verdict": "PASS",
       "findings": [
         "PASS_NO_P0_P1_FINDINGS",
-        "REVIEWED_DIFF_SHA256_d90cfabf9ce640966efe91c4fa1bf01fb08b9baded804387e64c9494e1f32a87"
+        "REVIEWED_DIFF_SHA256_dc00f66af133649ec4010f35cca70d14d0e2780914e26f3fadde03bdc80d89b0"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PASS_ACCEPTANCE_AND_DOD_NO_P0_P1_GAPS",
-        "REVIEWED_DIFF_SHA256_d90cfabf9ce640966efe91c4fa1bf01fb08b9baded804387e64c9494e1f32a87"
+        "PASS_PRODUCT_ACCEPTANCE_UNCHANGED_META_PIN_ONLY",
+        "REVIEWED_DIFF_SHA256_dc00f66af133649ec4010f35cca70d14d0e2780914e26f3fadde03bdc80d89b0",
+        "EVIDENCE_REBIND_REQUIRED_AND_APPLIED_AFTER_REVIEW"
       ]
     },
     {
@@ -34,7 +35,7 @@
       "verdict": "PASS",
       "findings": [
         "PASS_NO_P0_P1_VIOLATION_PROVEN",
-        "packet_fingerprint_sha256=24a5b64d1ad7c4e09a716ef736af2f2371445407156f7defc44cdc73a2e7e156",
+        "packet_fingerprint_sha256=22f1ed430f29b56426fddf4a9cdd0806d60af3a32c204a117103cf2dc59b7019",
         "PHYSICAL_DISPATCH_CROSSING_CUTOVER_NOT_TESTED"
       ]
     },
