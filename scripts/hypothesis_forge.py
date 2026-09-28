@@ -96,6 +96,7 @@ from solana_alpha_lab.factory.hfic_memory_policy import (  # noqa: E402
 from solana_alpha_lab.factory.hfic_repair_continuation import (  # noqa: E402
     RepairContinuationError,
     apply_repair_continuation,
+    close_repair_continuation,
     explain_target_exclusion,
     list_repair_continuation_dispositions,
     plan_repair_continuation,
@@ -1880,6 +1881,49 @@ def cmd_repair_continuation_apply(
     return emit(payload)
 
 
+def cmd_repair_continuation_close(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    disposition_sha256: str,
+    reason_code: str,
+    confirm_append_only: bool,
+) -> int:
+    """Append-only CLOSE after a new terminal. Requires --confirm-append-only."""
+
+    if not confirm_append_only:
+        raise HficCliError("REPAIR_CONTINUATION_CONFIRM_REQUIRED")
+    digest = str(disposition_sha256 or "").strip().lower()
+    if len(digest) != 64 or any(ch not in "0123456789abcdef" for ch in digest):
+        raise HficCliError("REPAIR_CONTINUATION_DISPOSITION_SHA_INVALID")
+    data_root = _store_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    snapshot = repository_git_snapshot(repo_root)
+    git_sha = str(snapshot.head_sha or "").lower()
+    if len(git_sha) != 40:
+        raise HficCliError("REPAIR_CONTINUATION_GIT_SHA_UNRESOLVED")
+    result = close_repair_continuation(
+        store,
+        digest,
+        git_sha=git_sha,
+        reason_code=str(reason_code or "CONTINUATION_TERMINAL_REACHED"),
+    )
+    payload = {
+        **result,
+        "command": "repair-continuation-close",
+        "owner_status": "DONE",
+        "next_step": "STOP_CONTINUATION_CONSUMED",
+        "owner_readout": {
+            "status": "DONE",
+            "reason_code": result.get("reason_code"),
+            "next": "STOP_CONTINUATION_CONSUMED",
+            "writes": bool(result.get("writes")),
+        },
+    }
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
 def cmd_prove_runtime(
     repo_root: Path,
     session_id: str,
@@ -2512,6 +2556,26 @@ def build_parser() -> argparse.ArgumentParser:
         help="required; appends disposition only; does not refresh budget or rewrite NO_WORTHY",
     )
     repair_apply.add_argument("--format", choices=("json",), default="json")
+    repair_close = subparsers.add_parser(
+        "repair-continuation-close",
+        help="append-only CLOSE after a new terminal; requires --confirm-append-only",
+    )
+    repair_close.add_argument(
+        "--disposition-sha256",
+        required=True,
+        help="exact disposition_sha256 from apply / plan readout",
+    )
+    repair_close.add_argument(
+        "--reason-code",
+        default="CONTINUATION_TERMINAL_REACHED",
+        help="close reason; default CONTINUATION_TERMINAL_REACHED",
+    )
+    repair_close.add_argument(
+        "--confirm-append-only",
+        action="store_true",
+        help="required; appends CLOSED disposition; does not rewrite history",
+    )
+    repair_close.add_argument("--format", choices=("json",), default="json")
     return parser
 
 
@@ -2758,6 +2822,16 @@ def main(argv: list[str] | None = None) -> int:
                 explicit_data_root=args.data_root,
                 draft_path=args.draft,
                 parent_session_id=getattr(args, "parent_session_id", None),
+                confirm_append_only=bool(args.confirm_append_only),
+            )
+        if args.command == "repair-continuation-close":
+            return cmd_repair_continuation_close(
+                repo_root,
+                explicit_data_root=args.data_root,
+                disposition_sha256=str(getattr(args, "disposition_sha256", "") or ""),
+                reason_code=str(
+                    getattr(args, "reason_code", None) or "CONTINUATION_TERMINAL_REACHED"
+                ),
                 confirm_append_only=bool(args.confirm_append_only),
             )
         raise HficCliError(f"HFIC_COMMAND_NOT_READY:{args.command}")

@@ -98,13 +98,26 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-ro
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <store> repair-continuation-apply --draft <draft.json> --confirm-append-only
 ```
 
-### Plan/apply/draft owner terminals
+### 4) After a new terminal — close the disposition (append-only)
+
+Save `disposition_sha256` from apply/plan readout. After the ordinary
+continuation run reaches a new terminal:
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <store> repair-continuation-close --disposition-sha256 <64-hex> --confirm-append-only
+```
+
+Close is required so AUTHORIZED cannot reopen the slot. Idempotent replay
+returns `ALREADY_CLOSED` / `owner_status=DONE`.
+
+### Plan/apply/draft/close owner terminals
 
 | Machine `status` | `owner_status` | Meaning | `next_step` |
 |---|---|---|---|
 | `READY` | `READY` | Disposition/draft valid; not written | plan → `APPLY_WITH_EXPLICIT_CONFIRM_APPEND_ONLY`; draft → `REPAIR_CONTINUATION_PLAN_WITH_DRAFT` |
 | `ALREADY_APPLIED` | `DONE` | Idempotent replay | `ORDINARY_TEMPORAL_QUERY_WITHIN_REMAINING_BUDGET` |
 | `APPLIED` | `DONE` | Disposition appended | ordinary query in remainder |
+| `CLOSED` / `ALREADY_CLOSED` | `DONE` | Disposition consumed after new terminal | `STOP_CONTINUATION_CONSUMED` |
 | `NOT_APPLICABLE` | `BLOCKED` | Wrong parent / missing field / selected candidate / slot / spent mismatch | see `reason_code` + `owner_readout.next` |
 | `CONFLICT` | `BLOCKED` | Competing active disposition | resolve or stop |
 
@@ -141,4 +154,6 @@ new session to refresh quota.
    only proves the mechanism).
 3. One ordinary temporal query inside the inherited remainder, with
    `PROVIDER_REPORTED_SNAPSHOT_V1` and mixed point clocks as needed.
-4. Readback. Do not promise a worthy candidate.
+4. After the new terminal: `repair-continuation-close --disposition-sha256
+   <from-apply> --confirm-append-only`.
+5. Readback. Do not promise a worthy candidate.

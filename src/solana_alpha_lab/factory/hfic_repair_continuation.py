@@ -183,26 +183,26 @@ def plan_repair_continuation(
             next_step="ALIGN_DRAFT_PARENT_SESSION_ID",
         )
     critic = str(parent_session.get("critic_terminal") or "")
-    state = str(
-        parent_session.get("session_state")
-        or parent_session.get("phase")
-        or parent_session.get("final_session_terminal")
+    final_terminal = str(
+        parent_session.get("final_session_terminal")
         or parent_session.get("owner_final")
         or ""
     )
-    # Strict eligibility: completed NO_WORTHY. SYNTHESIS_COMPLETE alone is
-    # only accepted when critic_terminal is NO_WORTHY (or disposition binds it).
-    eligible = (
-        critic == "NO_WORTHY_HYPOTHESIS"
-        or "NO_WORTHY" in critic
-        or (
-            state == "SYNTHESIS_COMPLETE"
-            and body.get("parent_terminal") == "NO_WORTHY_HYPOTHESIS"
-            and critic in {"", "NO_WORTHY_HYPOTHESIS"}
-        )
+    state = str(
+        parent_session.get("session_state")
+        or parent_session.get("phase")
+        or ""
     )
-    if not eligible and state == "SYNTHESIS_COMPLETE" and critic == "NO_WORTHY_HYPOTHESIS":
-        eligible = True
+    # Durable NO_WORTHY only — draft parent_terminal is not authority.
+    durable_no_worthy = (
+        critic == "NO_WORTHY_HYPOTHESIS"
+        or final_terminal == "NO_WORTHY_HYPOTHESIS"
+    )
+    eligible = durable_no_worthy and (
+        state in {"", "SYNTHESIS_COMPLETE", "SEARCH_EXHAUSTED_CURRENT_EVIDENCE"}
+        or "NO_WORTHY" in state
+        or critic == "NO_WORTHY_HYPOTHESIS"
+    )
     if not eligible:
         return _owner_plan(
             status="NOT_APPLICABLE",
@@ -667,7 +667,8 @@ def build_repair_continuation_draft(
 
 
 def list_repair_continuation_dispositions(store: Any) -> list[dict[str, Any]]:
-    # Prefer later CLOSED over earlier AUTHORIZED for the same digest.
+    # CLOSED always dominates AUTHORIZED for the same digest, regardless of
+    # ResearchStore iteration order (close artifact may appear before CONT).
     by_digest: dict[str, dict[str, Any]] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
@@ -688,7 +689,14 @@ def list_repair_continuation_dispositions(store: Any) -> list[dict[str, Any]]:
         digest = str(body.get("disposition_sha256") or "")
         if not digest:
             continue
-        by_digest[digest] = body
+        prior = by_digest.get(digest)
+        if prior is not None and prior.get("status") == "CLOSED":
+            continue
+        if body.get("status") == "CLOSED" or prior is None:
+            by_digest[digest] = body
+            continue
+        if prior.get("status") != "CLOSED":
+            by_digest[digest] = body
     return list(by_digest.values())
 
 
@@ -810,12 +818,18 @@ def admission_with_repair_continuation(
     terminal = str(parent_terminal or "")
     # Overlay when parent is NO_WORTHY, or SYNTHESIS_COMPLETE bound by a
     # NO_WORTHY disposition (completed search without selected candidate).
-    if terminal and "NO_WORTHY" not in terminal:
+    if not terminal:
+        return result
+    if "NO_WORTHY" not in terminal:
         if terminal == "SYNTHESIS_COMPLETE":
             if disposition.get("parent_terminal") != "NO_WORTHY_HYPOTHESIS":
                 return result
         elif terminal not in {"SEARCH_EXHAUSTED_CURRENT_EVIDENCE"}:
             return result
+        else:
+            # SEARCH_EXHAUSTED alone is not NO_WORTHY; disposition must bind it.
+            if disposition.get("parent_terminal") != "NO_WORTHY_HYPOTHESIS":
+                return result
     result["action"] = ACTION_RESUME_REPAIR_CONTINUATION
     result["reason_code"] = REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION
     result["occupancy"] = "REPAIR_CONTINUATION"

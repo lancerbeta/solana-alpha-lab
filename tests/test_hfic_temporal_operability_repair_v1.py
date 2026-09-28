@@ -25,6 +25,7 @@ from solana_alpha_lab.factory.hfic_repair_continuation import (  # noqa: E402
     close_repair_continuation,
     disposition_identity,
     enrich_parent_for_repair_draft,
+    list_repair_continuation_dispositions,
     plan_repair_continuation,
     validate_disposition_draft,
 )
@@ -819,10 +820,17 @@ class RepairLifecycleP1Tests(unittest.TestCase):
                 store, digest, git_sha=GIT_SHA, reason_code="CONTINUATION_TERMINAL_REACHED"
             )
             self.assertEqual(closed["status"], "CLOSED")
+            # Store round-trip: CLOSED must dominate AUTHORIZED regardless of
+            # ResearchStore iteration order.
+            listed = list_repair_continuation_dispositions(store)
+            listed_one = next(
+                item for item in listed if item.get("disposition_sha256") == digest
+            )
+            self.assertEqual(listed_one.get("status"), "CLOSED")
             replay = plan_repair_continuation(
                 draft,
                 parent_session=parent,
-                existing_dispositions=[closed["disposition"]],
+                existing_dispositions=listed,
                 store=store,
             )
             self.assertEqual(replay["status"], "NOT_APPLICABLE")
@@ -835,10 +843,21 @@ class RepairLifecycleP1Tests(unittest.TestCase):
                     "scientific_slot_sha256": "11" * 32,
                     "occupancy": "OCCUPIED",
                 },
-                dispositions=[closed["disposition"]],
+                dispositions=listed,
                 parent_terminal="SYNTHESIS_COMPLETE",
             )
             self.assertNotEqual(overlay["action"], ACTION_RESUME_REPAIR_CONTINUATION)
+
+    def test_empty_critic_synthesis_complete_is_blocked(self) -> None:
+        draft = self._draft()
+        parent = {
+            "session_id": "HFIC-SESS-SYNTHETIC-001",
+            "session_state": "SYNTHESIS_COMPLETE",
+            "selected_candidate_id": None,
+        }
+        plan = plan_repair_continuation(draft, parent_session=parent)
+        self.assertEqual(plan["status"], "NOT_APPLICABLE")
+        self.assertEqual(plan["reason_code"], "PARENT_NOT_COMPLETED_NO_WORTHY")
 
     def test_journal_spent_rejects_caller_zero(self) -> None:
         from solana_alpha_lab.factory.hfic_grounded_discovery import _append_discovery_look
@@ -1109,6 +1128,7 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                 git_sha=GIT_SHA,
             )
             self.assertEqual(closed["status"], "CLOSED")
+            listed = list_repair_continuation_dispositions(store)
             after = admission_with_repair_continuation(
                 {
                     "action": "RETURN_EXISTING_SESSION",
@@ -1117,14 +1137,14 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                     "scientific_slot_sha256": slot,
                     "occupancy": "OCCUPIED",
                 },
-                dispositions=[closed["disposition"]],
+                dispositions=listed,
                 parent_terminal="SYNTHESIS_COMPLETE",
             )
             self.assertEqual(after["action"], "RETURN_EXISTING_SESSION")
             blocked = plan_repair_continuation(
                 draft,
                 parent_session=parent,
-                existing_dispositions=[closed["disposition"]],
+                existing_dispositions=listed,
                 store=store,
             )
             self.assertEqual(blocked["reason_code"], "DISPOSITION_ALREADY_CLOSED")

@@ -1710,7 +1710,11 @@ def execute_temporal_discovery(
             "NO_NET_RETURN",
             "NO_INTRABAR_STOP",
             "NO_CAUSAL_IDENTIFICATION",
-            "NO_SOURCE_PRICE_EVENT_TIME",
+            *(
+                ["NO_SOURCE_PRICE_EVENT_TIME"]
+                if summary_source_event in (None, "", "UNKNOWN")
+                else []
+            ),
         ],
     }
     return {

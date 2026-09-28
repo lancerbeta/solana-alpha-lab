@@ -1172,6 +1172,7 @@ def resolve_scientific_admission(
         # caller capability/execution binding drifted after the scientific close.
         if repair_continuations and state not in pending:
             from solana_alpha_lab.factory.hfic_repair_continuation import (
+                ACTION_RESUME_REPAIR_CONTINUATION,
                 active_repair_continuation_for_slot,
                 admission_with_repair_continuation,
             )
@@ -1187,18 +1188,20 @@ def resolve_scientific_admission(
                     or str(chosen.get("final_session_terminal") or "")
                     or state
                 )
-                result = {
+                candidate = {
                     "action": "RETURN_EXISTING_SESSION",
                     "reason_code": state or "SCIENTIFIC_SLOT_OCCUPIED",
                     "session_id": session_id,
                     "scientific_slot_sha256": target_slot,
                     "occupancy": "OCCUPIED",
                 }
-                return admission_with_repair_continuation(
-                    result,
+                overlaid = admission_with_repair_continuation(
+                    candidate,
                     dispositions=repair_continuations,
                     parent_terminal=parent_terminal,
                 )
+                if overlaid.get("action") == ACTION_RESUME_REPAIR_CONTINUATION:
+                    return overlaid
         return {
             "action": "STOP",
             "reason_code": "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
