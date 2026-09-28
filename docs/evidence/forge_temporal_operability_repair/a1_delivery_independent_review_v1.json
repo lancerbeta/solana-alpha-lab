@@ -4,8 +4,8 @@
   "review_id": "FORGE-TEMPORAL-OPERABILITY-REPAIR-REVIEW-001",
   "as_of": "2026-09-28",
   "task_id": "FORGE_TEMPORAL_OPERABILITY_REPAIR_V1",
-  "reviewed_bindings_sha256": "9922c109acca1282416d6b0ccbe276a67505b71937e81107562a1adb2689cc11",
-  "reviewed_inventory_sha256": "99112a24ae683c79d55ddf77aec7190c5910df990d55b84b06a2f7e6bb2ebfc6",
+  "reviewed_bindings_sha256": "93365edf3f3a6d0c90f7f36409b390d2c5232d9e3f65d8a4078a516aa852face",
+  "reviewed_inventory_sha256": "2c3fe74cd3ee2b207a78e3d3e17ee99f58e88822e95313380272b3778747db6a",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
