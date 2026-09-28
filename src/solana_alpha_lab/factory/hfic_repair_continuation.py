@@ -53,6 +53,9 @@ def _require_text(value: object, code: str) -> str:
 
 
 def disposition_identity(body: Mapping[str, Any]) -> str:
+    mapping = body.get("evidence_mapping") or {}
+    if not isinstance(mapping, Mapping):
+        mapping = {}
     return _sha256(
         {
             "schema": DISPOSITION_SCHEMA,
@@ -69,6 +72,7 @@ def disposition_identity(body: Mapping[str, Any]) -> str:
             "spent_adaptive_looks": body.get("spent_adaptive_looks"),
             "spent_preview_looks": body.get("spent_preview_looks"),
             "owner_authorization_id": body.get("owner_authorization_id"),
+            "evidence_mapping": dict(sorted((str(k), mapping[k]) for k in mapping)),
         }
     )
 
@@ -154,6 +158,7 @@ def plan_repair_continuation(
     *,
     parent_session: Mapping[str, Any] | None,
     existing_dispositions: Sequence[Mapping[str, Any]] = (),
+    store: Any | None = None,
 ) -> dict[str, Any]:
     """No-write readiness plan for one repair continuation."""
 
@@ -177,17 +182,28 @@ def plan_repair_continuation(
             owner_status="BLOCKED",
             next_step="ALIGN_DRAFT_PARENT_SESSION_ID",
         )
-    terminal = str(
-        parent_session.get("critic_terminal")
+    critic = str(parent_session.get("critic_terminal") or "")
+    state = str(
+        parent_session.get("session_state")
+        or parent_session.get("phase")
         or parent_session.get("final_session_terminal")
         or parent_session.get("owner_final")
-        or parent_session.get("session_state")
-        or parent_session.get("phase")
         or ""
     )
-    # Strict eligibility: parent must be a completed NO_WORTHY close.
-    # Broad COMPLETED/DONE alone is not enough — that would reopen chosen work.
-    if terminal != "NO_WORTHY_HYPOTHESIS" and "NO_WORTHY" not in terminal:
+    # Strict eligibility: completed NO_WORTHY. SYNTHESIS_COMPLETE alone is
+    # only accepted when critic_terminal is NO_WORTHY (or disposition binds it).
+    eligible = (
+        critic == "NO_WORTHY_HYPOTHESIS"
+        or "NO_WORTHY" in critic
+        or (
+            state == "SYNTHESIS_COMPLETE"
+            and body.get("parent_terminal") == "NO_WORTHY_HYPOTHESIS"
+            and critic in {"", "NO_WORTHY_HYPOTHESIS"}
+        )
+    )
+    if not eligible and state == "SYNTHESIS_COMPLETE" and critic == "NO_WORTHY_HYPOTHESIS":
+        eligible = True
+    if not eligible:
         return _owner_plan(
             status="NOT_APPLICABLE",
             reason_code="PARENT_NOT_COMPLETED_NO_WORTHY",
@@ -210,22 +226,101 @@ def plan_repair_continuation(
             owner_status="BLOCKED",
             next_step="ALIGN_DRAFT_SCIENTIFIC_SLOT",
         )
-    # Prefer store-declared spent counts when the parent already recorded them.
-    for key in ("spent_main_looks", "spent_adaptive_looks", "spent_preview_looks"):
-        observed = parent_session.get(key)
-        if (
-            isinstance(observed, int)
-            and not isinstance(observed, bool)
-            and int(observed) != int(body[key])
-        ):
-            return _owner_plan(
-                status="NOT_APPLICABLE",
-                reason_code="SPENT_BUDGET_MISMATCH",
-                writes=False,
-                disposition=body,
-                owner_status="BLOCKED",
-                next_step="ALIGN_DRAFT_SPENT_LOOKS_TO_PARENT",
-            )
+    parent_receipt = (
+        parent_session.get("terminal_receipt_sha256")
+        or parent_session.get("session_receipt_sha256")
+    )
+    if (
+        isinstance(parent_receipt, str)
+        and parent_receipt
+        and parent_receipt != body["terminal_receipt_sha256"]
+    ):
+        return _owner_plan(
+            status="NOT_APPLICABLE",
+            reason_code="TERMINAL_RECEIPT_MISMATCH",
+            writes=False,
+            disposition=body,
+            owner_status="BLOCKED",
+            next_step="ALIGN_DRAFT_TERMINAL_RECEIPT",
+        )
+    parent_scope = (
+        parent_session.get("journal_scope") or parent_session.get("search_key_sha256")
+    )
+    if (
+        isinstance(parent_scope, str)
+        and parent_scope
+        and parent_scope != body["journal_scope"]
+    ):
+        return _owner_plan(
+            status="NOT_APPLICABLE",
+            reason_code="JOURNAL_SCOPE_MISMATCH",
+            writes=False,
+            disposition=body,
+            owner_status="BLOCKED",
+            next_step="ALIGN_DRAFT_JOURNAL_SCOPE",
+        )
+    # Resolve spent looks from durable journal when store has looks.
+    # Caller draft counts are assertions against the journal, not authority.
+    if store is not None:
+        spent = spent_looks_from_journal(store, body["journal_scope"])
+        if int(spent["look_count"]) > 0:
+            for key in (
+                "spent_main_looks",
+                "spent_adaptive_looks",
+                "spent_preview_looks",
+            ):
+                if int(body[key]) != int(spent[key]):
+                    return _owner_plan(
+                        status="NOT_APPLICABLE",
+                        reason_code="SPENT_BUDGET_MISMATCH",
+                        writes=False,
+                        disposition=body,
+                        owner_status="BLOCKED",
+                        next_step="ALIGN_DRAFT_SPENT_LOOKS_TO_JOURNAL",
+                    )
+            body = dict(body)
+            body["spent_main_looks"] = int(spent["spent_main_looks"])
+            body["spent_adaptive_looks"] = int(spent["spent_adaptive_looks"])
+            body["spent_preview_looks"] = int(spent["spent_preview_looks"])
+            if spent["allowed_look_ids"]:
+                body["allowed_look_ids"] = list(spent["allowed_look_ids"])
+            body["disposition_sha256"] = disposition_identity(body)
+        else:
+            for key in (
+                "spent_main_looks",
+                "spent_adaptive_looks",
+                "spent_preview_looks",
+            ):
+                observed = parent_session.get(key)
+                if (
+                    isinstance(observed, int)
+                    and not isinstance(observed, bool)
+                    and int(observed) != int(body[key])
+                ):
+                    return _owner_plan(
+                        status="NOT_APPLICABLE",
+                        reason_code="SPENT_BUDGET_MISMATCH",
+                        writes=False,
+                        disposition=body,
+                        owner_status="BLOCKED",
+                        next_step="ALIGN_DRAFT_SPENT_LOOKS_TO_PARENT",
+                    )
+    else:
+        for key in ("spent_main_looks", "spent_adaptive_looks", "spent_preview_looks"):
+            observed = parent_session.get(key)
+            if (
+                isinstance(observed, int)
+                and not isinstance(observed, bool)
+                and int(observed) != int(body[key])
+            ):
+                return _owner_plan(
+                    status="NOT_APPLICABLE",
+                    reason_code="SPENT_BUDGET_MISMATCH",
+                    writes=False,
+                    disposition=body,
+                    owner_status="BLOCKED",
+                    next_step="ALIGN_DRAFT_SPENT_LOOKS_TO_PARENT",
+                )
     if parent_session.get("selected_candidate_id") not in (None, ""):
         return _owner_plan(
             status="NOT_APPLICABLE",
@@ -239,6 +334,15 @@ def plan_repair_continuation(
         if not isinstance(item, Mapping):
             continue
         if item.get("disposition_sha256") == body["disposition_sha256"]:
+            if item.get("status") == "CLOSED":
+                return _owner_plan(
+                    status="NOT_APPLICABLE",
+                    reason_code="DISPOSITION_ALREADY_CLOSED",
+                    writes=False,
+                    disposition=dict(item),
+                    owner_status="BLOCKED",
+                    next_step="STOP_CONTINUATION_ALREADY_CONSUMED",
+                )
             return _owner_plan(
                 status="ALREADY_APPLIED",
                 reason_code="IDEMPOTENT_REPLAY",
@@ -334,6 +438,12 @@ TARGET_EXCLUSION_OWNER_GLOSSARY = {
     ),
     "SOURCE_PRICE_EVENT_STALE": (
         "A proven source price event is outside the exit deadline; not hidden by HTTP timing."
+    ),
+    "SOURCE_PRICE_EVENT_MALFORMED": (
+        "A non-empty source price event could not be parsed; fail closed, not UNKNOWN."
+    ),
+    "SNAPSHOT_OCCURRENCE_UNBOUND": (
+        "Snapshot exit lacks a registered PRIM-* primitive plus request/occurrence binding."
     ),
     "EVENT_NOT_AFTER_ENTRY": (
         "Legacy EVENT_TIME_V1: event_time was not after entry (often member anchor)."
@@ -557,7 +667,8 @@ def build_repair_continuation_draft(
 
 
 def list_repair_continuation_dispositions(store: Any) -> list[dict[str, Any]]:
-    rows: list[dict[str, Any]] = []
+    # Prefer later CLOSED over earlier AUTHORIZED for the same digest.
+    by_digest: dict[str, dict[str, Any]] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
         if kind != "RESEARCH_ARTIFACT":
@@ -569,10 +680,16 @@ def list_repair_continuation_dispositions(store: Any) -> list[dict[str, Any]]:
             continue
         if not isinstance(body, dict):
             continue
-        if body.get("artifact_kind") != DISPOSITION_ARTIFACT_KIND:
+        wrapper_kind = wrapper.get("artifact_kind")
+        if wrapper_kind != DISPOSITION_ARTIFACT_KIND and body.get(
+            "schema"
+        ) != DISPOSITION_SCHEMA:
             continue
-        rows.append(body)
-    return rows
+        digest = str(body.get("disposition_sha256") or "")
+        if not digest:
+            continue
+        by_digest[digest] = body
+    return list(by_digest.values())
 
 
 def apply_repair_continuation(
@@ -587,7 +704,10 @@ def apply_repair_continuation(
 
     existing = list_repair_continuation_dispositions(store)
     plan = plan_repair_continuation(
-        draft, parent_session=parent_session, existing_dispositions=existing
+        draft,
+        parent_session=parent_session,
+        existing_dispositions=existing,
+        store=store,
     )
     if plan["status"] == "ALREADY_APPLIED":
         return {**plan, "applied": False, "idempotent": True}
@@ -687,9 +807,15 @@ def admission_with_repair_continuation(
     )
     if disposition is None:
         return result
-    # Overlay only when the occupied parent is a NO_WORTHY close.
-    if parent_terminal is not None and "NO_WORTHY" not in str(parent_terminal):
-        return result
+    terminal = str(parent_terminal or "")
+    # Overlay when parent is NO_WORTHY, or SYNTHESIS_COMPLETE bound by a
+    # NO_WORTHY disposition (completed search without selected candidate).
+    if terminal and "NO_WORTHY" not in terminal:
+        if terminal == "SYNTHESIS_COMPLETE":
+            if disposition.get("parent_terminal") != "NO_WORTHY_HYPOTHESIS":
+                return result
+        elif terminal not in {"SEARCH_EXHAUSTED_CURRENT_EVIDENCE"}:
+            return result
     result["action"] = ACTION_RESUME_REPAIR_CONTINUATION
     result["reason_code"] = REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION
     result["occupancy"] = "REPAIR_CONTINUATION"
@@ -700,3 +826,77 @@ def admission_with_repair_continuation(
     result["spent_adaptive_looks"] = disposition.get("spent_adaptive_looks")
     result["spent_preview_looks"] = disposition.get("spent_preview_looks")
     return result
+
+
+def close_repair_continuation(
+    store: Any,
+    disposition_sha256: str,
+    *,
+    git_sha: str,
+    reason_code: str = "CONTINUATION_TERMINAL_REACHED",
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Append-only CLOSE of an AUTHORIZED disposition after a new terminal."""
+
+    existing = list_repair_continuation_dispositions(store)
+    target = None
+    for item in existing:
+        if item.get("disposition_sha256") == disposition_sha256:
+            target = dict(item)
+            break
+    if target is None:
+        raise RepairContinuationError("DISPOSITION_NOT_FOUND")
+    if target.get("status") == "CLOSED":
+        return {
+            "status": "ALREADY_CLOSED",
+            "applied": False,
+            "idempotent": True,
+            "disposition": target,
+            "writes": False,
+            "owner_status": "DONE",
+            "reason_code": reason_code,
+        }
+    if target.get("status") != "AUTHORIZED":
+        raise RepairContinuationError("DISPOSITION_NOT_AUTHORIZED")
+    closed = dict(target)
+    closed["status"] = "CLOSED"
+    closed["closed_reason_code"] = reason_code
+    moment = now or datetime.now(timezone.utc)
+    canonical = _canonical(closed)
+    payload = {
+        "artifact_kind": DISPOSITION_ARTIFACT_KIND,
+        "payload_canonical": canonical,
+        "payload_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
+    }
+    payload_json = json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    identity = str(disposition_sha256)
+    event = ResearchEvent(
+        record_id=f"HFIC-ART-REPAIR-CLOSE-{identity[:36].upper()}",
+        record_kind=RecordKind.RESEARCH_ARTIFACT,
+        entity_id=f"HFIC-ART-REPAIR-CLOSE-{identity[:36].upper()}",
+        hypothesis_version_id=None,
+        run_id=str(closed.get("parent_run_id") or ""),
+        transaction_id=f"RESEARCH-TXN-REPAIR-CLOSE-{identity[:24].upper()}",
+        effective_at=moment,
+        first_reliable_available_at=moment,
+        supersedes_record_id=None,
+        payload_json=payload_json,
+        payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+        schema_version="1.0",
+        producer_capability_id=REPAIR_CAPABILITY_ID,
+        producer_git_sha=git_sha,
+        created_at=moment,
+    )
+    store.append([event], transaction_id=event.transaction_id)
+    return {
+        "status": "CLOSED",
+        "applied": True,
+        "idempotent": False,
+        "disposition": closed,
+        "writes": True,
+        "owner_status": "DONE",
+        "reason_code": reason_code,
+        "record_id": event.record_id,
+    }

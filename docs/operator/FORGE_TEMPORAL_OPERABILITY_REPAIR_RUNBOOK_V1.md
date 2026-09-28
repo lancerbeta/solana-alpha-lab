@@ -43,6 +43,8 @@ deadline. Do not invent `source_price_event_time`; default is `UNKNOWN`.
 | `CLOCK_ORDER_INVALID` | Order due≤request≤response≤availability broken | Inspect occurrence timing |
 | `MISSING_ACQUISITION_CLOCK` | Missing request/response/availability | UNKNOWN; not family kill |
 | `SOURCE_PRICE_EVENT_STALE` | Proven source event outside deadline or not after entry | Keep fail-closed |
+| `SOURCE_PRICE_EVENT_MALFORMED` | Non-empty source event unparsable | Fail closed; not UNKNOWN |
+| `SNAPSHOT_OCCURRENCE_UNBOUND` | Exit lacks PRIM-* / request / occurrence | Bind occurrence lineage |
 | `EVENT_NOT_AFTER_ENTRY` | Legacy EVENT_TIME path; often anchor | Prefer snapshot policy |
 | `REFERENCE_NOT_AVAILABLE` | Reference missing by cutoff | Check reference point clocks |
 | `EXIT_ABSENT` / `EXIT_NOT_OBSERVED` | No usable exit row | Data / schedule gap |

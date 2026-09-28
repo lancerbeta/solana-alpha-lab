@@ -8208,6 +8208,20 @@ def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[
         ),
         "candidates_retrievable": len(bundle.get("candidates") or []) >= 4,
     }
+    journal = str(payload.get("journal_scope") or "")
+    if re.fullmatch(r"[0-9a-f]{64}", journal) is not None:
+        try:
+            from solana_alpha_lab.factory.hfic_repair_continuation import (
+                spent_looks_from_journal,
+            )
+
+            spent = spent_looks_from_journal(store, journal)
+            payload["spent_main_looks"] = int(spent["spent_main_looks"])
+            payload["spent_adaptive_looks"] = int(spent["spent_adaptive_looks"])
+            payload["spent_preview_looks"] = int(spent["spent_preview_looks"])
+            payload["spent_look_ids"] = list(spent["allowed_look_ids"])
+        except Exception:
+            pass
     if provenance_status != "VALID":
         payload["original_exact_time_status"] = "UNKNOWN"
         payload["chronological_use_forbidden"] = True

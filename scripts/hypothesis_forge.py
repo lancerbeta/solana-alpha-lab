@@ -1771,7 +1771,10 @@ def cmd_repair_continuation_plan(
                 pass
     existing = list_repair_continuation_dispositions(store)
     plan = plan_repair_continuation(
-        draft, parent_session=parent, existing_dispositions=existing
+        draft,
+        parent_session=parent,
+        existing_dispositions=existing,
+        store=store,
     )
     reasons = draft.get("technical_gap_code")
     payload = {

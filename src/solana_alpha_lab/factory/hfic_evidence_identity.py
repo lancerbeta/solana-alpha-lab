@@ -1157,12 +1157,48 @@ def resolve_scientific_admission(
                     admission_with_repair_continuation,
                 )
 
+                parent_terminal = (
+                    str(chosen.get("critic_terminal") or "")
+                    or str(chosen.get("final_session_terminal") or "")
+                    or state
+                )
                 result = admission_with_repair_continuation(
                     result,
                     dispositions=repair_continuations,
-                    parent_terminal=state,
+                    parent_terminal=parent_terminal,
                 )
             return result
+        # Addressable repair: authorized disposition may resume even when the
+        # caller capability/execution binding drifted after the scientific close.
+        if repair_continuations and state not in pending:
+            from solana_alpha_lab.factory.hfic_repair_continuation import (
+                active_repair_continuation_for_slot,
+                admission_with_repair_continuation,
+            )
+
+            disposition = active_repair_continuation_for_slot(
+                repair_continuations,
+                scientific_slot_sha256=target_slot,
+                session_id=session_id,
+            )
+            if disposition is not None:
+                parent_terminal = (
+                    str(chosen.get("critic_terminal") or "")
+                    or str(chosen.get("final_session_terminal") or "")
+                    or state
+                )
+                result = {
+                    "action": "RETURN_EXISTING_SESSION",
+                    "reason_code": state or "SCIENTIFIC_SLOT_OCCUPIED",
+                    "session_id": session_id,
+                    "scientific_slot_sha256": target_slot,
+                    "occupancy": "OCCUPIED",
+                }
+                return admission_with_repair_continuation(
+                    result,
+                    dispositions=repair_continuations,
+                    parent_terminal=parent_terminal,
+                )
         return {
             "action": "STOP",
             "reason_code": "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",

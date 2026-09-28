@@ -33,9 +33,14 @@ from solana_alpha_lab.factory.hfic_grounded_discovery import (
 TEMPORAL_SCHEMA = "smial.hfic-temporal-query"
 TEMPORAL_SCHEMA_VERSION = "1.0"
 TEMPORAL_CALCULATION_VERSION_V1 = "HFIC_TEMPORAL_DISCOVERY_CALC_V1"
-TEMPORAL_CALCULATION_VERSION = "HFIC_TEMPORAL_DISCOVERY_CALC_V2"
+TEMPORAL_CALCULATION_VERSION_V2 = "HFIC_TEMPORAL_DISCOVERY_CALC_V2"
+TEMPORAL_CALCULATION_VERSION = "HFIC_TEMPORAL_DISCOVERY_CALC_V3"
 TEMPORAL_CALCULATION_VERSIONS_READABLE = frozenset(
-    {TEMPORAL_CALCULATION_VERSION_V1, TEMPORAL_CALCULATION_VERSION}
+    {
+        TEMPORAL_CALCULATION_VERSION_V1,
+        TEMPORAL_CALCULATION_VERSION_V2,
+        TEMPORAL_CALCULATION_VERSION,
+    }
 )
 TEMPORAL_CAPABILITY_ID = "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
 OBSERVATION_CLOCK_EVENT_TIME_V1 = "EVENT_TIME_V1"
@@ -481,7 +486,16 @@ def _select_cell(rows: Sequence[Mapping[str, Any]], deadline: object) -> dict[st
     kind, number = parsed[0]
     if kind != "NUM" or number is None:
         return {"status": "MISSING", "available_at": latest}
-    return {"status": "OBSERVED", "value": number, "available_at": latest}
+    winner = tied[0]
+    return {
+        "status": "OBSERVED",
+        "value": number,
+        "available_at": latest,
+        "source_price_event_time": winner.get("source_price_event_time") or "UNKNOWN",
+        "primitive_id": winner.get("primitive_id"),
+        "call_occurrence_id": winner.get("call_occurrence_id"),
+        "request_sha256": winner.get("request_sha256"),
+    }
 
 
 def _cell(
@@ -716,6 +730,8 @@ def _select_snapshot_exit(
     Member anchor is not a market-event timestamp. Request must start after
     entry and not before the point due; clocks keep
     ``due ≤ request ≤ response ≤ availability ≤ deadline``.
+    Occurrence must bind a registered primitive id plus request/occurrence
+    hashes. Known source events that are malformed or stale fail closed.
     """
 
     if entry_at is None or exit_due_at is None:
@@ -723,13 +739,26 @@ def _select_snapshot_exit(
     legal: list[tuple[object, Mapping[str, Any]]] = []
     seen_reasons: list[str] = []
     for exit_row in exit_rows:
+        primitive_id = str(exit_row.get("primitive_id") or "")
+        occurrence = str(exit_row.get("call_occurrence_id") or "")
+        request_digest = str(exit_row.get("request_sha256") or "")
+        if (
+            not primitive_id.startswith("PRIM-")
+            or not occurrence
+            or not request_digest
+        ):
+            seen_reasons.append("SNAPSHOT_OCCURRENCE_UNBOUND")
+            continue
         request = _parse_time(exit_row.get("request_started_at"))
         response = _parse_time(exit_row.get("response_received_at"))
         available = _parse_time(exit_row.get("first_reliable_available_at"))
         source_event = exit_row.get("source_price_event_time")
         if source_event not in (None, "", "UNKNOWN"):
             source_parsed = _parse_time(source_event)
-            if source_parsed is not None and (
+            if source_parsed is None:
+                seen_reasons.append("SOURCE_PRICE_EVENT_MALFORMED")
+                continue
+            if (
                 exit_deadline is None
                 or source_parsed > exit_deadline
                 or (entry_at is not None and source_parsed <= entry_at)
@@ -758,13 +787,14 @@ def _select_snapshot_exit(
     if not legal:
         if not seen_reasons:
             return {"status": "ABSENT"}, "EXIT_ABSENT"
-        # Prefer the most specific observed gap for owner readout.
         preferred = (
             "REQUEST_NOT_AFTER_ENTRY",
             "ACQUISITION_BEFORE_POINT_DUE",
             "AVAILABILITY_AFTER_DEADLINE",
             "CLOCK_ORDER_INVALID",
             "SOURCE_PRICE_EVENT_STALE",
+            "SOURCE_PRICE_EVENT_MALFORMED",
+            "SNAPSHOT_OCCURRENCE_UNBOUND",
             "MISSING_ACQUISITION_CLOCK",
             "EXIT_NOT_OBSERVED",
             "EXIT_ABSENT",
@@ -1413,6 +1443,7 @@ def execute_temporal_discovery(
         target_value = None
         target_observed = False
         target_exclusion = None
+        selected_source_event = "UNKNOWN"
         clock_policy = str(
             body.get("observation_clock_policy") or OBSERVATION_CLOCK_EVENT_TIME_V1
         )
@@ -1443,9 +1474,14 @@ def execute_temporal_discovery(
             reference_deadline = _deadline_for(
                 anchor, reference_point, reference_late, due_offset=reference_due
             )
-            # Reference must be available by both decision cutoff and own point deadline.
+            # Snapshot policy: reference must also meet its own point deadline.
+            # EVENT_TIME keeps decision_deadline-only cutoff for V1/V2 replay parity.
+            use_strict_reference = (
+                clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
+            )
             if (
-                reference_deadline is not None
+                use_strict_reference
+                and reference_deadline is not None
                 and decision_deadline is not None
                 and reference_deadline < decision_deadline
             ):
@@ -1465,6 +1501,9 @@ def execute_temporal_discovery(
                 target_value = float(selected["value"]) / float(reference["value"]) - 1.0
                 target_observed = True
                 target_exclusion = None
+                source_event = selected.get("source_price_event_time")
+                if source_event not in (None, ""):
+                    selected_source_event = str(source_event)
             elif selected.get("status") == "OBSERVED" and reference.get("status") != "OBSERVED":
                 target_exclusion = "REFERENCE_NOT_AVAILABLE"
             elif matched and target_exclusion is None:
@@ -1480,6 +1519,7 @@ def execute_temporal_discovery(
                 "target": target_value,
                 "target_is_observed": target_observed,
                 "target_exclusion": target_exclusion if matched and not target_observed else None,
+                "source_price_event_time": selected_source_event,
                 "block": block,
                 "exclusion": exclusion,
             }
@@ -1494,6 +1534,12 @@ def execute_temporal_discovery(
     missing_target = [item for item in matched_members if not item["target_is_observed"]]
     observed_values = [float(item["target"]) for item in observed]
     observed_mean = _mean(observed_values)
+    known_source_events = [
+        str(item.get("source_price_event_time"))
+        for item in observed
+        if item.get("source_price_event_time") not in (None, "", "UNKNOWN")
+    ]
+    summary_source_event = known_source_events[0] if known_source_events else "UNKNOWN"
     stress_values = observed_values + [-1.0 for _ in missing_target]
     ablations = []
     if body["evaluation"]["ablations"] == "DROP_ONE_CONDITION":
@@ -1566,7 +1612,7 @@ def execute_temporal_discovery(
         "engine_emits_alpha": False,
         "eligibility_uses_target": False,
         "missing_is_not_zero": True,
-        "source_price_event_time": "UNKNOWN",
+        "source_price_event_time": summary_source_event,
         "population_n": len(base_members),
         "base_x_n": len(base_members),
         "decision_eligible_n": len(decision_members),
