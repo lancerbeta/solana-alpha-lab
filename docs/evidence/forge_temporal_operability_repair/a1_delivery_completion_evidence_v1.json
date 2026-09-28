@@ -21,10 +21,11 @@
     "catalog/schemas/observation_primitive_descriptor_v1.schema.json": "47adf110bfadd5d356dcc863f52f59574b02b6ccc3bb81578f3233906b4d3de4",
     "configs/observation_primitive_registry_v1.yaml": "8529e43e8b29631b0b47d78d9d0b66e7c1d9b7e8f5be2d3e2d9384a74790e032",
     "docs/PROJECT_MAP.md": "7d236107f751bcd47f0e82ba35d2ccd7223cad79bf86558889e6bf18b9b632fc",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "5f04b7b4155a7a52fdb36dedd88e7bf8044a68066bb494c890e93ce757511ac7",
     "docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md": "c52f6622f22c34343973e1f916196d761f90a8da12d6315a82162c33586cdbb4",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "7ad08632f44fc5925e4f0b4fadc90f07b76912f90bd4b63d912c88d65a2abcf8",
-    "docs/reports/forge_temporal_operability_repair/a1_owner_readout_v1.md": "59b690152c87d3c98e69c5af35d743015e29a4109eab49dc7971073d3a049be5",
-    "docs/tasks/FORGE_TEMPORAL_OPERABILITY_REPAIR_V1.md": "e929db44065509f5b60cb5b04d359f97746db3e5ba94ca5fe5dd2c71169eab1c",
+    "docs/reports/forge_temporal_operability_repair/a1_owner_readout_v1.md": "4146835b4460c89db566f7a2ee09ab1c5aa762b3d23eadf34e55bac1af8d01b3",
+    "docs/tasks/FORGE_TEMPORAL_OPERABILITY_REPAIR_V1.md": "41a5dc4ec22a78ff372687f6c4b68db88e4455cb52cf864d90579f0d268ef8c4",
     "scripts/hypothesis_forge.py": "37e45daf93e93224c111429b708b4974b303d78b9ad2d008ee9040a454a98bab",
     "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "09ff278db0d40ab9a37b6c40f69fe7b1a829aff66ee4a4f0cd98a01f6b891170",
     "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "314abf3bf8431f1ec8ba019f42deaa2a956e0095ce5ff880fe7ad3d3c5decf82",
@@ -48,14 +49,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "a079228b5ae01e532927c38834a3b52785c8bc57700fb27f70ae8196e52b0f86",
+    "sha256": "407a1a6e548f8149596a67e5f357f1cf9149b9af534457470b7f7d8c3e8c6a58",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PRODUCTION_VERTICALS_A_AND_B",
     "independent_review": {
       "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "d1b6907955dac7c55029a37b21d408f22dc01f508b0bbccb62cfeaeb516416d0",
+      "sha256": "c627b3eeca893bd8fdf7c19188f5e04b8c18e8e1c7d47e4c4054efb6d14de514",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
