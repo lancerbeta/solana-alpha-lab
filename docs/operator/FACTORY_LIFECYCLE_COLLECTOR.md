@@ -345,25 +345,37 @@ The CLI tick captures one trusted UTC `now` when the command starts and
 projects stored lifecycle rows as of that time. A tick begun before cutover
 keeps the predecessor admission view even if processing finishes after the
 boundary; the next tick started at or after the boundary uses the successor
-view. Existing authority and append-only transition checks still apply.
+view. Existing authority and append-only transition checks still apply. When
+every stored activation only has a future transition pending at that captured
+`now`, the tick refuses with `TICK_REFUSED_FUTURE_TRANSITION_PENDING` and
+`WAIT_OR_INSPECT_SCHEDULED_CUTOVER` — not `REGISTER_AUTHORIZE_ACTIVATE`.
 
 When Telegram fires `CAMPAIGN_SUCCESSOR_REQUIRED`:
 
 1. Read `SUCCESSOR_STATE` / `STOPS_ADMITTING_AT` / `TIME_REMAINING_SECONDS`.
-2. If `SUCCESSOR_STATE=AUTHORIZED`, commit and prove the in-window rollover;
-   authorization by itself does not close the attention. If the state is
-   `WINDOW_MISSES_CUTOVER`, do not roll over that document: prepare and
-   authorize a new same-family successor whose half-open window covers
-   `STOPS_ADMITTING_AT`. If the state is `HISTORICAL_OUT_OF_WINDOW`, prepare a
-   new same-family successor. If the state is `GAP`, follow the
-   `NON_ADMITTING` forward-recovery procedure above.
+2. Branch on `SUCCESSOR_STATE`:
+   - `AUTHORIZED`: commit and prove the in-window rollover; authorization alone
+     does not close the attention.
+   - `REGISTERED`: authorize that already-registered same-family successor whose
+     window covers `STOPS_ADMITTING_AT`, then commit and prove rollover. Do not
+     re-register it.
+   - `NONE`: register and authorize a same-family successor whose half-open
+     window covers `STOPS_ADMITTING_AT`, then commit and prove rollover.
+   - `WINDOW_MISSES_CUTOVER`: do not roll over that document; prepare and
+     authorize a new same-family successor whose window covers
+     `STOPS_ADMITTING_AT`.
+   - `HISTORICAL_OUT_OF_WINDOW`: prepare a new same-family successor; the
+     historical registration is not a continuity candidate.
+   - `GAP`: follow the `NON_ADMITTING` forward-recovery procedure above.
 3. The attention clears only after `ROLLOVER_READY` or a proven `ACTIVE`
    successor. The Telegram card remains
    `FACTORY / ATTENTION — ACTION` with `MESSAGE_TYPE=ATTENTION` and
    `ATTENTION=CAMPAIGN_SUCCESSOR_REQUIRED`, not `SOURCE_DATA_STALE`.
    An unproven `ACTIVE` row does not displace an expired `DRAINING` continuity
    anchor; its alert names that anchor separately from the reported current
-   activation. Age `> period*3` remains the sole `SOURCE_DATA_STALE` rule.
+   activation. An unproven `DRAINING` row cannot authorize `GAP` — keep
+   `UNKNOWN/BLOCKED` until the DRAINING transition is proven in ResearchStore.
+   Age `> period*3` remains the sole `SOURCE_DATA_STALE` rule.
 
 For `SUCCESSOR_STATE=UNKNOWN` or `UNKNOWN/BLOCKED`, do not infer an expiry or
 claim continuity. Use the two `CONTINUITY_*` identity fields from the alert

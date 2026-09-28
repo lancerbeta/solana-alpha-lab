@@ -379,11 +379,27 @@ def assess_campaign_successor_continuity(
             "successor whose window covers stops_admitting_at; if the boundary "
             "passes first, use NON_ADMITTING forward recovery without backdating"
         )
-    elif required:
+    elif required and successor_state == "REGISTERED":
+        owner_action = (
+            "authorize the already-registered same-family successor whose "
+            "window covers stops_admitting_at, then commit and prove its "
+            "rollover; REGISTERED alone is insufficient"
+        )
+    elif required and successor_state == "HISTORICAL_OUT_OF_WINDOW":
+        owner_action = (
+            "prepare and authorize a new same-family successor whose window "
+            "covers stops_admitting_at; the historical registration is "
+            "out-of-window and is not a continuity candidate"
+        )
+    elif required and successor_state == "NONE":
         owner_action = (
             "register and authorize a same-family successor whose window covers "
-            "stops_admitting_at, then commit and prove its rollover; REGISTERED "
-            "alone is insufficient"
+            "stops_admitting_at, then commit and prove its rollover"
+        )
+    elif required:
+        owner_action = (
+            "prepare and authorize a same-family successor whose window covers "
+            "stops_admitting_at, then commit and prove its rollover"
         )
     else:
         owner_action = UNKNOWN
@@ -1118,17 +1134,35 @@ def build_collector_operational_packet(
             family_key=selected_family or None,
             explicit_scope=True,
         )
-        if draining_predecessor is not None:
+        if draining_predecessor is not None and activation_transition_research_event_proven(
+            continuity_data_root, draining_predecessor, now=clock
+        ):
             continuity_activation = draining_predecessor
             continuity_proof_unavailable = False
         else:
-            continuity_activation = unproven_active
+            # Unproven DRAINING cannot authorize GAP; keep UNKNOWN/BLOCKED.
+            continuity_activation = (
+                draining_predecessor
+                if draining_predecessor is not None
+                else unproven_active
+            )
+            continuity_proof_unavailable = True
     continuity = assess_campaign_successor_continuity(
         store,
         now=clock,
         activation=continuity_activation,
         data_root=continuity_data_root,
     )
+    if (
+        not continuity_proof_unavailable
+        and continuity_data_root is not None
+        and continuity_activation is not None
+        and str(continuity_activation.get("state") or "") in {"ACTIVE", "DRAINING"}
+        and not activation_transition_research_event_proven(
+            continuity_data_root, continuity_activation, now=clock
+        )
+    ):
+        continuity_proof_unavailable = True
     if continuity_proof_unavailable:
         continuity.update(
             {

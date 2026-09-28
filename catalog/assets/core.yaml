@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: e6ef485784cc6ca4446395f3f62e2d5566ec2aa4250c98a8fe693ab0490888b5}
+  integrity: {kind: sha256, sha256: b93358c1463444c66087a4c232e603e9530e56c51d4f3960fddf956ddb1e5800}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -33076,7 +33076,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_lifecycle.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_lifecycle.py}
-  integrity: {kind: sha256, sha256: 9a4d63794654dbd941dc26dee48a9b9daa488d072d45a7681d9a30b56e422d27}
+  integrity: {kind: sha256, sha256: 481e601ca5fdf73a0bac7ca16c6f9076d1ff83ee1061fdc47c716afab49d7cce}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33128,7 +33128,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/observation_schedule.py', repository_path: scripts/observation_schedule.py}
-  integrity: {kind: sha256, sha256: 61bd5fa9bc4ba125e7f6b4c7628b6c1d03cfe7487f01527c71a5e5ec8938d1a2}
+  integrity: {kind: sha256, sha256: 33f4ca99aeeeefe75599e66febc05169879f5fc279da2203c474e5b38f90f681}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-COMPILER-001}
@@ -34247,7 +34247,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: 36dcc5c088c8733095901424e484dfc7bda0b3679f0adaf2c8e3b33ece64eb3f}
+  integrity: {kind: sha256, sha256: b735c056bcd8e418b83abfd93a12a928cfdce858e7319d189aab4992eee78186}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -38571,7 +38571,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1.md', repository_path: docs/tasks/COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1.md}
-  integrity: {kind: sha256, sha256: b11d087be624b6bed1b60c370603a0b0c4eb11a259868f1472e9582de3155bd8}
+  integrity: {kind: sha256, sha256: 75266edfb805bdd88e5fe1f31c414149a90bdd93271e61c8ee295c0d261caa7e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-COLLECTOR-OPERATIONAL-PACKET-001}
@@ -38592,7 +38592,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_collector_campaign_continuity_repair_v1.py', repository_path: tests/test_collector_campaign_continuity_repair_v1.py}
-  integrity: {kind: sha256, sha256: e445f8bf475e96893f5a9fb3bbc7025943029770913354174a405c28dc997810}
+  integrity: {kind: sha256, sha256: bc6f79a58ad92fbe7a212b0e02f01f02607b62f2f8ff210756b7a708d6735e24}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-CAMPAIGN-CUTOVER-TRUTH-001}
@@ -38611,7 +38611,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_observation_scheduler.py', repository_path: tests/test_observation_scheduler.py}
-  integrity: {kind: sha256, sha256: 03f1485851d3aa97d004ade80977bad4a9f7264ace0466320a700b9bff66ea90}
+  integrity: {kind: sha256, sha256: 97dc095d1ca720a5f952b05910fc0da1a9aba46d0acce7ef78cbdee0ee6a854d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-CAMPAIGN-CUTOVER-TRUTH-001}

@@ -1646,6 +1646,14 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 current,
                 activation_id="ACT-EXPIRED",
             )
+            drain_expired_admission(
+                data_root=data_root,
+                store=store,
+                schedule_sha256=current_registered["schedule_sha256"],
+                activation_id="ACT-EXPIRED",
+                now=datetime(2026, 9, 1, 12, 10, tzinfo=UTC),
+                producer_git_sha=GIT,
+            )
             activation = store.get_activation(
                 current_registered["schedule_sha256"], "ACT-EXPIRED"
             )
@@ -1653,7 +1661,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             continuity = assess_campaign_successor_continuity(
                 store,
                 now=datetime(2026, 9, 1, 12, 10, tzinfo=UTC),
-                activation={**activation, "state": "DRAINING"},
+                activation=activation,
                 data_root=data_root,
             )
             self.assertEqual(continuity["campaign_successor_state"], "GAP")
@@ -1785,6 +1793,92 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             )
             self.assertIn("successor_state=GAP", details)
             self.assertIn("continuity_activation=ACT-PREDECESSOR", details)
+
+    def test_unproven_draining_predecessor_stays_unknown(self) -> None:
+        predecessor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-01T00:05:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-UNPROVEN-DRAINING-PREDECESSOR-001",
+        )
+        successor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+            ),
+            starts_at="2026-09-01T00:05:00Z",
+            stops_admitting_at="2026-09-02T00:05:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-UNPROVEN-DRAINING-SUCCESSOR-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            data_root = root / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(root / "ops.sqlite")
+            predecessor_registered = register_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                document=predecessor,
+                now=datetime(2026, 9, 1, 0, 0, tzinfo=UTC),
+                producer_git_sha=GIT,
+            )
+            # Mutable DRAINING claim without immutable transition proof.
+            store.upsert_activation(
+                {
+                    "schedule_sha256": predecessor_registered["schedule_sha256"],
+                    "activation_id": "ACT-UNPROVEN-DRAIN",
+                    "schedule_key": predecessor["schedule_key"],
+                    "state": "DRAINING",
+                    "starts_at": predecessor["activation"]["starts_at"],
+                    "stops_admitting_at": predecessor["activation"][
+                        "stops_admitting_at"
+                    ],
+                    "payload": {
+                        "prior_state": "ACTIVE",
+                        "new_state": "DRAINING",
+                        "admission_window_closed": True,
+                    },
+                },
+                clock=NOW,
+            )
+            successor_registered = register_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                document=successor,
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            store.upsert_activation(
+                {
+                    "schedule_sha256": successor_registered["schedule_sha256"],
+                    "activation_id": "ACT-UNPROVEN-SUCCESSOR",
+                    "schedule_key": successor["schedule_key"],
+                    "state": "ACTIVE",
+                    "starts_at": successor["activation"]["starts_at"],
+                    "stops_admitting_at": successor["activation"][
+                        "stops_admitting_at"
+                    ],
+                    "payload": {},
+                },
+                clock=NOW,
+            )
+            packet = build_collector_operational_packet(
+                root=root,
+                store=store,
+                now=NOW,
+                deploy_git_sha=GIT,
+                observation_rdp=data_root,
+                remote_config={},
+                environ={},
+            )
+            store.close()
+            self.assertEqual(packet["campaign_successor_state"], "UNKNOWN")
+            self.assertTrue(packet["campaign_successor_required"])
+            self.assertIn("UNKNOWN", packet["campaign_successor_owner_action"].upper())
+            self.assertNotEqual(packet["campaign_successor_state"], "GAP")
 
     def test_unproven_active_without_draining_predecessor_stays_unknown(self) -> None:
         document = _with_window(

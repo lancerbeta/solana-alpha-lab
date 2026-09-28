@@ -606,6 +606,7 @@ def main(
                 )
             requested_digest = args.schedule_sha256
             requested_activation = args.activation_id
+            activation_rows = store.list_activations()
             if requested_digest and requested_activation:
                 candidates = [
                     (str(requested_digest), str(requested_activation))
@@ -619,10 +620,40 @@ def main(
                     2,
                 )
             else:
-                candidates = _tick_candidates_as_of(
-                    store.list_activations(), now
-                )
+                candidates = _tick_candidates_as_of(activation_rows, now)
             if not candidates:
+                pending_future = []
+                for row in activation_rows:
+                    projected = project_activation_as_of(row, now)
+                    if projected.get("future_transition_pending") is True:
+                        pending_future.append(
+                            {
+                                "schedule_sha256": str(
+                                    row.get("schedule_sha256") or ""
+                                ),
+                                "activation_id": str(row.get("activation_id") or ""),
+                                "projected_state": str(
+                                    projected.get("state") or ""
+                                ),
+                            }
+                        )
+                if pending_future:
+                    return _emit(
+                        {
+                            "terminal": "TICK_REFUSED_FUTURE_TRANSITION_PENDING",
+                            "provider_calls": 0,
+                            "credential_reads": 0,
+                            "next_action": "WAIT_OR_INSPECT_SCHEDULED_CUTOVER",
+                            "pending_activations": sorted(
+                                pending_future,
+                                key=lambda item: (
+                                    item["schedule_sha256"],
+                                    item["activation_id"],
+                                ),
+                            ),
+                        },
+                        2,
+                    )
                 return _emit(
                     {
                         "terminal": "TICK_REFUSED_NO_LIVE_DEFAULT",

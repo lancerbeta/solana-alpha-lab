@@ -29,6 +29,7 @@ managed_write_set:
   - docs/tasks/COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1.md
   - src/solana_alpha_lab/factory/collector_operational_packet.py
   - src/solana_alpha_lab/factory/operability_watch.py
+  - src/solana_alpha_lab/factory/observation_schedule_lifecycle.py
   - scripts/observation_schedule.py
   - tests/test_collector_campaign_continuity_repair_v1.py
   - tests/test_observation_scheduler.py
