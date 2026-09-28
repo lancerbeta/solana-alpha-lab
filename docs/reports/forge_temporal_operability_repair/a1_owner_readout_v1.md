@@ -1,21 +1,25 @@
 # FORGE_TEMPORAL_OPERABILITY_REPAIR_V1 owner readout
 
-Head: 75c9534bf4d090ce41c04c48b1da28b1c6326545
+Head: d4249da6146f5c949c80ea89dbb00ebfc55ca2dc
 
-## Closed this increment (P1-A / P1-B)
+## Closed this increment (residual P1-1 / P1-2)
 
-- P1-A: `SNAPSHOT_ROW_INTERPRETATION_V1` admits legacy rows without explicit policy when occurrence/request/acquisition lineage is complete; insufficient lineage surfaces `SNAPSHOT_LINEAGE_UNINTERPRETABLE` instead of a false empty population. New and legacy published bytes share one journal→DocumentRunner scientific payload (observed/mean/spec/policy/exclusions).
-- P1-B: authorized selected repair skips slot re-reservation, uses disposition-scoped artifact ids, projects repair marker into list/bundle/`show-session`, preserves marker through runner-up→finalize, allows capability/execution lineage under repair, and reaches selected freeze→critic→finalize with sticky list/show + query replay + `evaluate_forge_run` discovery of the new kill terminal. NO_WORTHY repair path retained. `SYNTHESIS_COMPLETE` ≠ disposition CLOSED — owner still runs `repair-continuation-close` (digest recoverable from `show-session`).
+- P1-1: wholly uninterpretable required snapshot lineage stamps recoverable `technical_stop` / `SNAPSHOT_LINEAGE_UNINTERPRETABLE` and is excluded from looks that authorize scientific `SEARCH_EXHAUSTED` / `READY_TO_FREEZE`. Partial exclusions and valid zero-match remain scientific. Positive journal↔DocumentRunner path unchanged.
+- P1-2: `repair-continuation-close` appends a repair-marked `FORGE_RUN_RECEIPT` (parent bytes untouched). Ordinary `forge-run --no-write` after close and after store reopen returns the repair terminal (`NON_SCIENTIFIC_STOP` / KILL), not parent `SEARCH_EXHAUSTED` or `SCIENTIFIC_IDENTITY_CONFLICT`. `ALREADY_CLOSED` close replay stays idempotent.
+
+## Still closed from prior increments (do not reopen)
+
+- Journal/DocumentRunner published-byte parity; legacy lineage admit; selected repair lifecycle through finalize; show-session disposition projection.
 
 ## Vertical receipts (local disposable)
 
-- Vertical A new+legacy: observed_target_n=1, mean≈0.2, DocumentRunner COMPLETE, provider_calls_actual=0, journal==consumer scientific fields.
-- Vertical B NO_WORTHY: 2 MAIN + preview → apply → third MAIN → new terminal → close.
-- Vertical B selected: immutable parent snapshot (86b24-stable draft/receipt ids, no REPAIR-) → repair → new capability freeze → KILL terminal ≠ parent NO_WORTHY → forge-run discovery + sticky list/show + RETRY_SAME_BYTES query replay; mains stay 3; close via show-session digest.
+- MetadataStop + Vertical A/B acceptance at tip: PASS (8 tests).
+- P1-1: uninterpretable input → technical stop; exhaustion claim denied.
+- P1-2: historical SEARCH_EXHAUSTED seed → selected repair KILL → close → evaluate_forge_run prefers repair terminal; reopen + ALREADY_CLOSED.
 
 ## Metadata-only live cohort note
 
-Current cohort bindings/schema are not re-run against live S3 in this atom. Compatibility for sealed partitions with complete transport lineage is proven on fixtures; live corpus without occurrence/request remains UNKNOWN until a separate metadata read.
+Current cohort bindings/schema are not re-run against live S3 in this atom. Live corpus without occurrence/request remains UNKNOWN until a separate metadata read.
 
 ## Unexecuted post-merge plan
 

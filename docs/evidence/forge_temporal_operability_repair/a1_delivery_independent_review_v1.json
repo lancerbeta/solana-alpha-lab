@@ -4,8 +4,8 @@
   "review_id": "FORGE-TEMPORAL-OPERABILITY-REPAIR-REVIEW-001",
   "as_of": "2026-09-28",
   "task_id": "FORGE_TEMPORAL_OPERABILITY_REPAIR_V1",
-  "reviewed_bindings_sha256": "93365edf3f3a6d0c90f7f36409b390d2c5232d9e3f65d8a4078a516aa852face",
-  "reviewed_inventory_sha256": "2c3fe74cd3ee2b207a78e3d3e17ee99f58e88822e95313380272b3778747db6a",
+  "reviewed_bindings_sha256": "3521ce75db3786fbc2c824101db4ffbb7db31a033f1e6e2a388204640736b787",
+  "reviewed_inventory_sha256": "9c438d4e6de7fc75c9b3522ae7baa66c967afb789cb99272f5a42856ea8982ba",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -17,28 +17,29 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Tip 75c9534: P1-A/P1-B product logic sound — show_session projects repair disposition; RU/intermediate stamp disposition; disposition-scoped RU cycle ids; Vertical B covers immutable parent snapshot, forge-run discovery without stages echo, sticky query replay. Residual LOW: RU research_cycle_id not disposition-scoped; parent_cycle_seq rewrites to immediate predecessor."
+        "Tip d4249da6: P1-1 technical_stop + look_counts_toward_scientific_search keep lineage-blocked looks out of SEARCH_EXHAUSTED; P1-2 repair-marked FORGE_RUN_RECEIPT preferred on close with session fallback and completed readback despite admission OBSERVABILITY_BLOCKED; MetadataStopAndPostCloseReadbackTests cover both. Residuals: ALREADY_CLOSED write telemetry; soft-fail persist; SNAPSHOT_LINEAGE_BLOCKERS broader than UNINTERPRETABLE alone."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "DoD1 PASS Vertical A journal==DocumentRunner + SNAPSHOT_LINEAGE_UNINTERPRETABLE. DoD2 PASS: immutable parent copytree, selected freeze→critic→finalize, evaluate_forge_run without stages discovers KILL≠NO_WORTHY writes=0, sticky RETRY_SAME_BYTES. DoD3 UNKNOWN live cohort note holds."
+        "DoD P1-1 PASS: wholly uninterpretable lineage stamps TECHNICAL_STOP; assess denies search_exhausted_allowed/READY_TO_FREEZE; assert_search_exhaustion_claim raises SEARCH_EXHAUSTED_WITHOUT_COMPOUND; positive path technical_stop is None. DoD P1-2 PASS: after close+reopen evaluate_forge_run owner_final=NON_SCIENTIFIC_STOP with repair disposition, not parent SEARCH_EXHAUSTED or SCIENTIFIC_IDENTITY_CONFLICT."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "STANDARD profile. Disposition continuity append-only through intermediate/awaiting; show_session projection not authority; identity/unauthorized drift fail-closed. Residual: frozen fallback can stamp disposition without re-admission if existing lacks it; awaiting payload research_cycle_id stays unscoped."
+        "packet_fingerprint_sha256=66d43a34456be3e2dc1c146322e902753665b330ef0126c32eebb83949e8b3f6",
+        "SEMANTIC_PREMISE. Append-only repair receipt; identity fail-closed retained. Residuals: opaque historical looks without technical fields can still credit exhaustion; repair-marker soft preference + session rebind without formal supersession; completed readback under OBSERVABILITY_BLOCKED widens all owner_final; KILL mapped to NON_SCIENTIFIC_STOP."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "show-session recovers repair_continuation_disposition_sha256; runbook glossary SNAPSHOT_LINEAGE_UNINTERPRETABLE + §4 SYNTHESIS_COMPLETE≠CLOSED; close path operable. Residual: readout Head bound at evidence tip."
+        "Metadata technical stop distinguished from scientific exhaustion; post-close forge-run prefers repair KILL/NON_SCIENTIFIC_STOP; ALREADY_CLOSED recoverable. Residuals: TECHNICAL vs NON_SCIENTIFIC naming; ALREADY_CLOSED writes:false vs possible forge-run persist; runbook omits explicit technical_stop next-step."
       ]
     }
   ],
