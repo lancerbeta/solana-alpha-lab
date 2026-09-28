@@ -32,6 +32,7 @@ from solana_alpha_lab.factory.observation_publication_jobs import (
 )
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
 from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+    activation_transition_research_event_proven,
     cohort_family_key,
     rollover_research_event_proven,
 )
@@ -121,7 +122,8 @@ def assess_campaign_successor_continuity(
     }
     if activation is None:
         return empty
-    if str(activation.get("state") or "") != "ACTIVE":
+    activation_state = str(activation.get("state") or "")
+    if activation_state not in {"ACTIVE", "DRAINING"}:
         return {
             **empty,
             "stops_admitting_at": str(activation.get("stops_admitting_at") or UNKNOWN),
@@ -156,7 +158,7 @@ def assess_campaign_successor_continuity(
     activation_id = str(activation.get("activation_id") or "")
     registered = store.get_registered_schedule(schedule_sha) if schedule_sha else None
     if registered is None:
-        required = within_warning_band
+        required = within_warning_band or time_to_stop <= timedelta(0)
         return {
             "campaign_successor_state": "UNKNOWN",
             "stops_admitting_at": stops_raw,
@@ -305,6 +307,9 @@ def assess_campaign_successor_continuity(
                     require_bound_receipt=True,
                 )
                 and _window_covers(other_reg["document"], current_stops)
+                and activation_transition_research_event_proven(
+                    data_root, other, now=now
+                )
             ):
                 has_active_peer = True
                 continuity_proven = True
@@ -316,37 +321,55 @@ def assess_campaign_successor_continuity(
 
     if successor_state != "ROLLOVER_READY" and not continuity_proven:
         best = "NONE"
+        best_rank = -1
         for other_sha in store.list_registered_schedule_digests():
             if other_sha == schedule_sha:
                 continue
             other_reg = store.get_registered_schedule(other_sha)
             if other_reg is None or cohort_family_key(other_reg["document"]) != family:
                 continue
-            if _authority_is_live(other_sha):
-                best = "AUTHORIZED"
-                if _window_covers(other_reg["document"], current_stops):
-                    continuity_proven = True
-                    successor_schedule_sha256 = other_sha
-                    break
-            elif best == "NONE":
-                best = "REGISTERED"
+            try:
+                other_stops = parse_utc(
+                    str(other_reg["document"]["activation"]["stops_admitting_at"])
+                )
+            except (KeyError, TypeError, ValueError):
+                continue
+            if other_stops <= current_stops:
+                candidate_state = "HISTORICAL_OUT_OF_WINDOW"
+                candidate_rank = 0
+            elif _authority_is_live(other_sha):
+                candidate_state = "AUTHORIZED"
+                candidate_rank = 2
+            else:
+                candidate_state = "REGISTERED"
+                candidate_rank = 1
+            if candidate_rank > best_rank:
+                best = candidate_state
+                best_rank = candidate_rank
                 successor_schedule_sha256 = other_sha
         if successor_state != "ROLLOVER_READY":
             successor_state = best
     elif has_active_peer:
         successor_state = "ACTIVE"
     prepared = continuity_proven or has_active_peer
-    required = within_warning_band and not prepared
-    if required and successor_state == "AUTHORIZED":
+    boundary_reached = time_to_stop <= timedelta(0)
+    required = (within_warning_band or boundary_reached) and not prepared
+    if required and boundary_reached:
+        successor_state = "GAP"
         owner_action = (
-            "prepare a new same-family successor whose authorized window covers "
-            "the current stops_admitting_at; this AUTHORIZED window is not continuous"
+            "admission gap: use the existing NON_ADMITTING forward-recovery "
+            "procedure, then late-activate a same-family successor; do not backdate"
+        )
+    elif required and successor_state == "AUTHORIZED":
+        owner_action = (
+            "commit and prove the same-family rollover at stops_admitting_at; "
+            "AUTHORIZED alone does not establish continuity"
         )
     elif required:
         owner_action = (
-            "register+authorize a same-family successor whose window covers "
-            "the current stops_admitting_at (REGISTERED alone insufficient); "
-            "in-window use rollover, post-window late activate after NON_ADMITTING"
+            "register and authorize a same-family successor whose window covers "
+            "stops_admitting_at, then commit and prove its rollover; REGISTERED "
+            "alone is insufficient"
         )
     else:
         owner_action = UNKNOWN

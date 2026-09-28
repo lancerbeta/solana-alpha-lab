@@ -1031,7 +1031,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             )
             self.assertFalse(outside["campaign_successor_required"])
             self.assertTrue(exact["campaign_successor_required"])
-            self.assertFalse(after_expiry["campaign_successor_required"])
+            self.assertTrue(after_expiry["campaign_successor_required"])
             store.close()
 
     def test_lifecycle_denials_have_owner_next_actions(self) -> None:
@@ -1284,12 +1284,60 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 ),
             )
             self.assertEqual(continuity["campaign_successor_state"], "AUTHORIZED")
-            self.assertFalse(continuity["campaign_successor_required"])
-            recovered = evaluate_operability(
+            self.assertTrue(continuity["campaign_successor_required"])
+            authorized_only = evaluate_operability(
                 root=root,
                 store=store,
                 now=NOW + timedelta(minutes=30),
                 deploy_git_sha=GIT,
+                emit=False,
+                persist=True,
+                unit_status={
+                    "factory-observation-schedule.timer": "active",
+                    "factory-remote-backup.timer": "active",
+                    "factory-collector-owner-pulse.timer": "active",
+                    "factory-hot90-closed-day-archive.timer": "active",
+                    "factory-operability-watch.timer": "active",
+                    "factory-v1-workbench.service": "active",
+                },
+            )
+            self.assertIn("CAMPAIGN_SUCCESSOR_REQUIRED", authorized_only["present"])
+            self.assertFalse(
+                any(
+                    msg.get("kind") == "RECOVERED"
+                    and msg.get("code") == "CAMPAIGN_SUCCESSOR_REQUIRED"
+                    for msg in authorized_only["messages"]
+                )
+            )
+
+            rollover_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                predecessor_schedule_sha256=registered["schedule_sha256"],
+                predecessor_activation_id="ACT-WARN",
+                successor_schedule_sha256=succ["schedule_sha256"],
+                successor_activation_id="ACT-SUCCESSOR",
+                cutover_at=document["activation"]["stops_admitting_at"],
+                now=NOW + timedelta(minutes=30),
+                producer_git_sha=GIT,
+            )
+            continuity = assess_campaign_successor_continuity(
+                store,
+                now=NOW + timedelta(minutes=31),
+                activation=store.get_activation(
+                    registered["schedule_sha256"], "ACT-WARN"
+                ),
+                data_root=data_root,
+            )
+            self.assertEqual(continuity["campaign_successor_state"], "ROLLOVER_READY")
+            self.assertFalse(continuity["campaign_successor_required"])
+            recovered = evaluate_operability(
+                root=root,
+                store=store,
+                now=NOW + timedelta(minutes=45),
+                deploy_git_sha=GIT,
+                observation_rdp=data_root,
                 emit=False,
                 persist=True,
                 unit_status={
@@ -1365,7 +1413,9 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                     current_registered["schedule_sha256"], "ACT-CURRENT"
                 ),
             )
-            self.assertEqual(continuity["campaign_successor_state"], "REGISTERED")
+            self.assertEqual(
+                continuity["campaign_successor_state"], "HISTORICAL_OUT_OF_WINDOW"
+            )
             self.assertTrue(continuity["campaign_successor_required"])
             store.close()
 
@@ -1458,10 +1508,11 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             load_observation_schedule(
                 ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
             ),
-            starts_at="2026-09-01T00:00:00Z",
+            starts_at="2026-09-01T12:00:00Z",
             stops_admitting_at="2026-09-02T12:00:00Z",
             schedule_key="OBS-EARLY-PUMPFUN-CONTINUITY-ROLLOVER-001",
         )
+        cutover_at = current["activation"]["stops_admitting_at"]
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
@@ -1480,7 +1531,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 predecessor_activation_id="ACT-CURRENT",
                 successor_schedule_sha256=successor_registered["schedule_sha256"],
                 successor_activation_id="ACT-SUCCESSOR",
-                cutover_at=render_utc(NOW),
+                cutover_at=cutover_at,
                 authority_receipt_sha256=successor_authority["receipt_sha256"],
                 clock=NOW,
             )
@@ -1492,12 +1543,10 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 ),
                 data_root=data_root,
             )
-            # The SQLite rollover row is only a prepared projection until the
-            # immutable predecessor transition is committed.  The authorized
-            # boundary-covering successor still clears the warning, but must
-            # not be mislabeled ROLLOVER_READY before that event exists.
+            # Authorization and a prepared SQLite rollover do not prove
+            # continuity until both linked immutable transitions exist.
             self.assertEqual(continuity["campaign_successor_state"], "AUTHORIZED")
-            self.assertFalse(continuity["campaign_successor_required"])
+            self.assertTrue(continuity["campaign_successor_required"])
             rollover_schedule(
                 root=ROOT,
                 data_root=data_root,
@@ -1506,10 +1555,20 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 predecessor_activation_id="ACT-CURRENT",
                 successor_schedule_sha256=successor_registered["schedule_sha256"],
                 successor_activation_id="ACT-SUCCESSOR",
-                cutover_at=render_utc(NOW),
+                cutover_at=cutover_at,
                 now=NOW,
                 producer_git_sha=GIT,
             )
+            continuity = assess_campaign_successor_continuity(
+                store,
+                now=NOW,
+                activation=store.get_activation(
+                    current_registered["schedule_sha256"], "ACT-CURRENT"
+                ),
+                data_root=data_root,
+            )
+            self.assertEqual(continuity["campaign_successor_state"], "ROLLOVER_READY")
+            self.assertFalse(continuity["campaign_successor_required"])
             predecessor_row = store.get_activation(
                 current_registered["schedule_sha256"], "ACT-CURRENT"
             )
@@ -1518,6 +1577,52 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 data_root, predecessor_row, now=NOW
             )
             self.assertEqual(proof["late_recovery_proof"], "NOT_REQUIRED")
+            store.close()
+
+    def test_expired_draining_predecessor_remains_actionable_gap(self) -> None:
+        current = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-01T12:00:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-CONTINUITY-EXPIRED-CURRENT-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            current_registered, _ = _activate_campaign(
+                store,
+                data_root,
+                current,
+                activation_id="ACT-EXPIRED",
+            )
+            activation = store.get_activation(
+                current_registered["schedule_sha256"], "ACT-EXPIRED"
+            )
+            assert activation is not None
+            continuity = assess_campaign_successor_continuity(
+                store,
+                now=datetime(2026, 9, 1, 12, 10, tzinfo=UTC),
+                activation={**activation, "state": "DRAINING"},
+                data_root=data_root,
+            )
+            self.assertEqual(continuity["campaign_successor_state"], "GAP")
+            self.assertTrue(continuity["campaign_successor_required"])
+            self.assertIn(
+                "NON_ADMITTING", continuity["campaign_successor_owner_action"]
+            )
+            alert = classify_incidents(
+                {
+                    "health_classes": ["CAMPAIGN_SUCCESSOR_REQUIRED"],
+                    "activation_id": "ACT-EXPIRED",
+                    **continuity,
+                }
+            )["CAMPAIGN_SUCCESSOR_REQUIRED"]
+            self.assertIn("ADMISSION GAP", alert.upper())
+            self.assertIn("NON_ADMITTING", alert)
+            self.assertNotIn("expires soon", alert)
             store.close()
 
     def test_source_data_stale_unchanged(self) -> None:

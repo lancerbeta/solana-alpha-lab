@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import sys
+from datetime import datetime
 from pathlib import Path, PurePosixPath, PureWindowsPath
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,6 +15,9 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from solana_alpha_lab.factory.collector_read_model import (  # noqa: E402
+    project_activation_as_of,
+)
 from solana_alpha_lab.factory.observation_schedule import (  # noqa: E402
     ObservationScheduleError,
     load_observation_schedule,
@@ -98,9 +102,27 @@ def _emit(payload: dict, code: int) -> int:
     return code
 
 
-def _bind_runtime(args: argparse.Namespace) -> tuple[dict, Path, ObservationScheduleStore]:
-    relative = getattr(args, "runtime_config", None) or DEFAULT_RUNTIME_RELATIVE
-    config = load_runtime_config(ROOT, relative)
+def _tick_candidates_as_of(
+    rows: list[dict], now: datetime
+) -> list[tuple[str, str]]:
+    """Select live tick rows using the command entrypoint's captured clock."""
+
+    candidates = []
+    for row in rows:
+        projected = project_activation_as_of(row, now)
+        if str(projected.get("state") or "") in {"ACTIVE", "DRAINING"}:
+            candidates.append(
+                (str(row["schedule_sha256"]), str(row["activation_id"]))
+            )
+    return sorted(candidates)
+
+
+def _bind_runtime(
+    args: argparse.Namespace, *, config: dict | None = None
+) -> tuple[dict, Path, ObservationScheduleStore]:
+    if config is None:
+        relative = getattr(args, "runtime_config", None) or DEFAULT_RUNTIME_RELATIVE
+        config = load_runtime_config(ROOT, relative)
     explicit = getattr(args, "data_root", None)
     if explicit:
         resolved = Path(explicit)
@@ -183,11 +205,13 @@ def main(
                 },
                 0 if result.schedule_sha256 else 2,
             )
-        config, data_root, store = _bind_runtime(args)
+        relative = getattr(args, "runtime_config", None) or DEFAULT_RUNTIME_RELATIVE
+        runtime_config = load_runtime_config(ROOT, relative)
         if physical_overrides is not None:
             now = physical_overrides.now
         else:
-            now = resolve_clock(config)
+            now = resolve_clock(runtime_config)
+        config, data_root, store = _bind_runtime(args, config=runtime_config)
         producer = git_sha(ROOT, config.get("producer_git_sha"))
         if args.command == "register":
             if not args.schedule:
@@ -595,13 +619,8 @@ def main(
                     2,
                 )
             else:
-                candidates = sorted(
-                    (
-                        str(row["schedule_sha256"]),
-                        str(row["activation_id"]),
-                    )
-                    for row in store.list_activations()
-                    if str(row["state"]) in {"ACTIVE", "DRAINING"}
+                candidates = _tick_candidates_as_of(
+                    store.list_activations(), now
                 )
             if not candidates:
                 return _emit(

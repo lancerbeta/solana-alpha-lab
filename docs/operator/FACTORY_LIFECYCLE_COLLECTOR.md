@@ -301,26 +301,46 @@ predecessor is NON_ADMITTING. Re-run doctor: expect
 `current_activation_state=ACTIVE` for the successor and `live_activation=true`.
 Predecessor remains `DRAINING` until dues complete.
 
-### Pre-expiry owner attention
+### Continuity proof and owner attention
 
-When the current same-family campaign is `ACTIVE` and
-`stops_admitting_at - now <= 24h` with no prepared successor
-whose authorized window can cover the current admission boundary
-(`AUTHORIZED` / `ROLLOVER_READY`; **REGISTERED alone is not enough**),
-operability watch emits one deduped `CAMPAIGN_SUCCESSOR_REQUIRED` attention
-(not `SOURCE_DATA_STALE`). An historical or post-gap authorized schedule does
-not clear the attention. Age `> period*3` remains the sole
-`SOURCE_DATA_STALE` rule.
+The existing owner warning begins within 24 hours of the predecessor's
+`stops_admitting_at`. Its boundary is half-open:
+`starts_at <= cutover_at < stops_admitting_at`.
+
+`REGISTERED` and `AUTHORIZED` are preparation states. Neither proves a
+cutover, even when the successor window covers the predecessor boundary.
+Registrations whose windows end at or before that boundary are reported as
+`HISTORICAL_OUT_OF_WINDOW`; they are not usable successors. In-window
+continuity is clear only after the rollover is committed and both linked
+append-only transition events are proven. A same-family successor that is
+already `ACTIVE` clears the warning only with live bound authority, a
+boundary-covering window, and valid immutable lifecycle transition proof.
+
+After the predecessor window ends, a `DRAINING` predecessor without that proof
+remains `GAP`. The watch keeps `CAMPAIGN_SUCCESSOR_REQUIRED` present; it does
+not report `RECOVERED` merely because the predecessor is draining. Continue
+only through the existing `NON_ADMITTING` forward-recovery procedure above.
+The gap clears only after a new same-family `ACTIVE` successor is proven. Do
+not backdate a window or rewrite lifecycle events.
+
+The CLI tick captures one trusted UTC `now` when the command starts and
+projects stored lifecycle rows as of that time. A tick begun before cutover
+keeps the predecessor admission view even if processing finishes after the
+boundary; the next tick started at or after the boundary uses the successor
+view. Existing authority and append-only transition checks still apply.
 
 When Telegram fires `CAMPAIGN_SUCCESSOR_REQUIRED`:
 
 1. Read `SUCCESSOR_STATE` / `STOPS_ADMITTING_AT` / `TIME_REMAINING_SECONDS`.
-2. Register the successor schedule if missing, then **authorize** it before
-   expiry (or commit in-window `rollover` while admission is still open).
-3. Attention clears once a continuity-valid state is `AUTHORIZED` or
-   `ROLLOVER_READY`; the Telegram card is `FACTORY / ATTENTION — ACTION` with
-   `MESSAGE_TYPE=ATTENTION` and `ATTENTION=CAMPAIGN_SUCCESSOR_REQUIRED`, rather
-   than an incident.
+2. If `SUCCESSOR_STATE=AUTHORIZED`, commit and prove the in-window rollover;
+   authorization by itself does not close the attention. If the state is
+   `HISTORICAL_OUT_OF_WINDOW`, prepare a new same-family successor. If the
+   state is `GAP`, follow the `NON_ADMITTING` forward-recovery procedure above.
+3. The attention clears only after `ROLLOVER_READY` or a proven `ACTIVE`
+   successor. The Telegram card remains
+   `FACTORY / ATTENTION — ACTION` with `MESSAGE_TYPE=ATTENTION` and
+   `ATTENTION=CAMPAIGN_SUCCESSOR_REQUIRED`, not `SOURCE_DATA_STALE`.
+   Age `> period*3` remains the sole `SOURCE_DATA_STALE` rule.
 
 ### Current-state read model
 

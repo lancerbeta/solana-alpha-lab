@@ -230,7 +230,20 @@ def classify_incidents(
     if "CAMPAIGN_SUCCESSOR_REQUIRED" in classes:
         remaining = packet.get("campaign_time_remaining_seconds")
         successor_state = str(packet.get("campaign_successor_state") or "UNKNOWN")
-        if successor_state == "UNKNOWN" or remaining in (None, "UNKNOWN"):
+        if successor_state == "GAP" or (
+            isinstance(remaining, (int, float)) and remaining < 0
+        ):
+            found["CAMPAIGN_SUCCESSOR_REQUIRED"] = (
+                "Campaign admission GAP; the predecessor window ended without "
+                "proven continuity. Continue only through the existing "
+                "NON_ADMITTING forward-recovery procedure; do not backdate "
+                f"(activation={packet.get('activation_id')} "
+                f"stops_admitting_at={packet.get('stops_admitting_at')} "
+                f"time_remaining_seconds={remaining} "
+                f"successor_state={successor_state} "
+                f"owner_action={packet.get('campaign_successor_owner_action')})."
+            )
+        elif successor_state == "UNKNOWN" or remaining in (None, "UNKNOWN"):
             found["CAMPAIGN_SUCCESSOR_REQUIRED"] = (
                 "Campaign successor continuity is UNKNOWN/BLOCKED; do not claim "
                 "an expiry time "
@@ -239,7 +252,7 @@ def classify_incidents(
             )
         else:
             found["CAMPAIGN_SUCCESSOR_REQUIRED"] = (
-                "Campaign admission expires soon without a prepared successor "
+                "Campaign admission expires soon without a proven successor "
                 f"(activation={packet.get('activation_id')} "
                 f"stops_admitting_at={packet.get('stops_admitting_at')} "
                 f"time_remaining_seconds={remaining} "
