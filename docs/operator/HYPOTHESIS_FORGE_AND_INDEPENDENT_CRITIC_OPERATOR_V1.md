@@ -1548,10 +1548,12 @@ Bound schedule может задавать per-point `(due_offset, allowed_laten
 query scalar остаётся X300 envelope. `schedule.observation_clock_policy:
 PROVIDER_REPORTED_SNAPSHOT_V1` считает exit по request/response/availability,
 не по member anchor как market-event. Причины missing target —
-`target_exclusion_reasons` (pooled + by_cohort). После completed NO_WORTHY
-без selected candidate узкий owner-authorized repair continuation наследует
-потраченный look ledger; plan без записи, apply отдельно
-(`docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md`).
+`target_exclusion_reasons` (pooled + by_cohort). После completed NO_WORTHY без selected candidate узкий owner-authorized repair
+continuation наследует потраченный look ledger. Owner path:
+`hypothesis_forge.py repair-continuation-plan --draft <json>` (без записи) →
+отдельно `repair-continuation-apply --draft <json> --confirm-append-only`.
+Терминалы plan/apply и glossary причин —
+`docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md`.
 Writer temporal calculation —
 `HFIC_TEMPORAL_DISCOVERY_CALC_V2`. V1 читается как есть, без выдуманного среза;
 повтор того же science/input пишет V2 как `CALCULATION_REVISION`, без нового

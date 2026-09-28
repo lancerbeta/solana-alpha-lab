@@ -300,7 +300,11 @@ class RepairContinuationTests(unittest.TestCase):
         plan = plan_repair_continuation(draft, parent_session=parent)
         self.assertEqual(plan["status"], "READY")
         self.assertFalse(plan["writes"])
+        self.assertEqual(plan["owner_status"], "READY")
         self.assertEqual(plan["remaining_main_looks"], 4)
+        self.assertEqual(
+            plan["next_step"], "APPLY_WITH_EXPLICIT_CONFIRM_APPEND_ONLY"
+        )
         with tempfile.TemporaryDirectory() as tmp:
             store = ResearchStore(Path(tmp) / "store")
             first = apply_repair_continuation(

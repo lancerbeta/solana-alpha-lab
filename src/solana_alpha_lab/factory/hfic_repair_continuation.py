@@ -156,20 +156,24 @@ def plan_repair_continuation(
 
     body = validate_disposition_draft(draft)
     if not isinstance(parent_session, Mapping):
-        return {
-            "status": "NOT_APPLICABLE",
-            "reason_code": "PARENT_SESSION_MISSING",
-            "writes": False,
-            "disposition": body,
-        }
+        return _owner_plan(
+            status="NOT_APPLICABLE",
+            reason_code="PARENT_SESSION_MISSING",
+            writes=False,
+            disposition=body,
+            owner_status="BLOCKED",
+            next_step="PROVIDE_PARENT_SESSION_ID_FROM_SHOW_SESSION",
+        )
     session_id = str(parent_session.get("session_id") or "")
     if session_id != body["parent_session_id"]:
-        return {
-            "status": "NOT_APPLICABLE",
-            "reason_code": "PARENT_SESSION_MISMATCH",
-            "writes": False,
-            "disposition": body,
-        }
+        return _owner_plan(
+            status="NOT_APPLICABLE",
+            reason_code="PARENT_SESSION_MISMATCH",
+            writes=False,
+            disposition=body,
+            owner_status="BLOCKED",
+            next_step="ALIGN_DRAFT_PARENT_SESSION_ID",
+        )
     terminal = str(
         parent_session.get("critic_terminal")
         or parent_session.get("session_state")
@@ -177,64 +181,144 @@ def plan_repair_continuation(
         or ""
     )
     if terminal not in {"NO_WORTHY_HYPOTHESIS", "COMPLETED", "SEARCH_CLOSED", ""}:
-        # Empty is allowed for synthetic fixtures that only stamp ids.
         if terminal and "NO_WORTHY" not in terminal and terminal not in {
             "DONE",
             "OWNER_FINAL",
             "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
         }:
-            return {
-                "status": "NOT_APPLICABLE",
-                "reason_code": "PARENT_NOT_COMPLETED_NO_WORTHY",
-                "writes": False,
-                "disposition": body,
-            }
+            return _owner_plan(
+                status="NOT_APPLICABLE",
+                reason_code="PARENT_NOT_COMPLETED_NO_WORTHY",
+                writes=False,
+                disposition=body,
+                owner_status="BLOCKED",
+                next_step="STOP_SCIENTIFIC_CLOSE_STANDS",
+            )
     if parent_session.get("selected_candidate_id") not in (None, ""):
-        return {
-            "status": "NOT_APPLICABLE",
-            "reason_code": "PARENT_HAS_SELECTED_CANDIDATE",
-            "writes": False,
-            "disposition": body,
-        }
+        return _owner_plan(
+            status="NOT_APPLICABLE",
+            reason_code="PARENT_HAS_SELECTED_CANDIDATE",
+            writes=False,
+            disposition=body,
+            owner_status="BLOCKED",
+            next_step="STOP_SELECTED_CANDIDATE_NOT_REPAIRABLE_HERE",
+        )
     for item in existing_dispositions:
         if not isinstance(item, Mapping):
             continue
         if item.get("disposition_sha256") == body["disposition_sha256"]:
-            return {
-                "status": "ALREADY_APPLIED",
-                "reason_code": "IDEMPOTENT_REPLAY",
-                "writes": False,
-                "disposition": dict(item),
-                "remaining_main_looks": max(
-                    0, 6 - int(body["spent_main_looks"])
-                ),
-                "remaining_adaptive_looks": max(
-                    0, 2 - int(body["spent_adaptive_looks"])
-                ),
-                "first_step": "ORDINARY_TEMPORAL_QUERY_WITHIN_REMAINING_BUDGET",
-            }
+            return _owner_plan(
+                status="ALREADY_APPLIED",
+                reason_code="IDEMPOTENT_REPLAY",
+                writes=False,
+                disposition=dict(item),
+                owner_status="DONE",
+                next_step="ORDINARY_TEMPORAL_QUERY_WITHIN_REMAINING_BUDGET",
+                remaining_main_looks=max(0, 6 - int(body["spent_main_looks"])),
+                remaining_adaptive_looks=max(0, 2 - int(body["spent_adaptive_looks"])),
+            )
         if (
             item.get("parent_session_id") == body["parent_session_id"]
             and item.get("status") == "AUTHORIZED"
             and item.get("disposition_sha256") != body["disposition_sha256"]
         ):
-            return {
-                "status": "CONFLICT",
-                "reason_code": "COMPETING_ACTIVE_DISPOSITION",
-                "writes": False,
-                "disposition": body,
-            }
-    return {
-        "status": "READY",
-        "reason_code": REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION,
-        "writes": False,
-        "disposition": body,
-        "remaining_main_looks": max(0, 6 - int(body["spent_main_looks"])),
-        "remaining_adaptive_looks": max(0, 2 - int(body["spent_adaptive_looks"])),
-        "remaining_preview_looks": max(0, 2 - int(body["spent_preview_looks"])),
-        "first_step": "ORDINARY_TEMPORAL_QUERY_WITHIN_REMAINING_BUDGET",
-        "apply_requires": "EXPLICIT_OWNER_APPLY_AUTHORITY",
+            return _owner_plan(
+                status="CONFLICT",
+                reason_code="COMPETING_ACTIVE_DISPOSITION",
+                writes=False,
+                disposition=body,
+                owner_status="BLOCKED",
+                next_step="RESOLVE_COMPETING_DISPOSITION_OR_STOP",
+            )
+    return _owner_plan(
+        status="READY",
+        reason_code=REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION,
+        writes=False,
+        disposition=body,
+        owner_status="READY",
+        next_step="APPLY_WITH_EXPLICIT_CONFIRM_APPEND_ONLY",
+        remaining_main_looks=max(0, 6 - int(body["spent_main_looks"])),
+        remaining_adaptive_looks=max(0, 2 - int(body["spent_adaptive_looks"])),
+        remaining_preview_looks=max(0, 2 - int(body["spent_preview_looks"])),
+        apply_requires="EXPLICIT_OWNER_APPLY_AUTHORITY",
+    )
+
+
+def _owner_plan(
+    *,
+    status: str,
+    reason_code: str,
+    writes: bool,
+    disposition: Mapping[str, Any],
+    owner_status: str,
+    next_step: str,
+    remaining_main_looks: int | None = None,
+    remaining_adaptive_looks: int | None = None,
+    remaining_preview_looks: int | None = None,
+    apply_requires: str | None = None,
+) -> dict[str, Any]:
+    """Machine plan plus owner-facing DONE/BLOCKED/READY/NEXT fields."""
+
+    payload: dict[str, Any] = {
+        "status": status,
+        "reason_code": reason_code,
+        "writes": writes,
+        "disposition": dict(disposition),
+        "owner_status": owner_status,
+        "next_step": next_step,
+        "owner_readout": {
+            "status": owner_status,
+            "reason_code": reason_code,
+            "next": next_step,
+            "writes": writes,
+        },
     }
+    if remaining_main_looks is not None:
+        payload["remaining_main_looks"] = remaining_main_looks
+    if remaining_adaptive_looks is not None:
+        payload["remaining_adaptive_looks"] = remaining_adaptive_looks
+    if remaining_preview_looks is not None:
+        payload["remaining_preview_looks"] = remaining_preview_looks
+    if apply_requires is not None:
+        payload["apply_requires"] = apply_requires
+    return payload
+
+
+TARGET_EXCLUSION_OWNER_GLOSSARY = {
+    "REQUEST_NOT_AFTER_ENTRY": (
+        "Exit snapshot request did not start after entry (decision cutoff + assumed latency)."
+    ),
+    "ACQUISITION_BEFORE_POINT_DUE": (
+        "Snapshot request started before the exit point due; early scrape cannot stand in for a later Y."
+    ),
+    "AVAILABILITY_AFTER_DEADLINE": (
+        "First reliable availability arrived after the exit point deadline."
+    ),
+    "CLOCK_ORDER_INVALID": (
+        "Required order due ≤ request ≤ response ≤ availability was broken."
+    ),
+    "MISSING_ACQUISITION_CLOCK": (
+        "Request, response or availability clock missing; treat as UNKNOWN, not a negative return."
+    ),
+    "SOURCE_PRICE_EVENT_STALE": (
+        "A proven source price event is outside the exit deadline; not hidden by HTTP timing."
+    ),
+    "EVENT_NOT_AFTER_ENTRY": (
+        "Legacy EVENT_TIME_V1: event_time was not after entry (often member anchor)."
+    ),
+    "REFERENCE_NOT_AVAILABLE": (
+        "Reference snapshot was not available by decision cutoff and its own point deadline."
+    ),
+    "EXIT_ABSENT": "No exit observation rows for the target point.",
+    "EXIT_NOT_OBSERVED": "Exit row present but not OBSERVED.",
+    "TARGET_UNOBSERVED": "Matched member without an observed target for another reason.",
+}
+
+
+def explain_target_exclusion(code: str) -> str:
+    return TARGET_EXCLUSION_OWNER_GLOSSARY.get(
+        str(code), "Unknown target exclusion; inspect result.target_exclusion_reasons."
+    )
 
 
 def list_repair_continuation_dispositions(store: Any) -> list[dict[str, Any]]:

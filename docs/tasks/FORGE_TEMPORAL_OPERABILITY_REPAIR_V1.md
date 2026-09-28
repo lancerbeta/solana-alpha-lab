@@ -43,9 +43,14 @@ managed_write_set:
   - tests/test_hfic_temporal_discovery_v1.py
   - tests/test_hfic_temporal_operability_repair_v1.py
   - tests/test_hfic_repair_continuation_v1.py
-  - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
+  - scripts/hypothesis_forge.py
   - docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md
+  - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
   - catalog/assets/core.yaml
+  - catalog/assets/lifecycle.yaml
+  - catalog/catalog_manifest.yaml
+  - catalog/generated/asset_edges.json
+  - docs/PROJECT_MAP.md
   - docs/evidence/forge_temporal_operability_repair/a1_delivery_completion_evidence_v1.json
   - docs/evidence/forge_temporal_operability_repair/a1_delivery_independent_review_v1.json
   - docs/evidence/forge_temporal_operability_repair/a1_delivery_factory_fit_v1.json
