@@ -37829,7 +37829,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: ab35f7063d5b98d9d7f5ca0da820c1665aa41f6617922f3fe666ed6c8a876f4c}
+  integrity: {kind: sha256, sha256: d13f75c49ede36f0ae8a9d5c4e999e52d77d18921bedd7cf9376a804fb67fe9b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}
@@ -38306,7 +38306,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_REPRESENTATION_LADDER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_ladder.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_ladder.py}
-  integrity: {kind: sha256, sha256: ec2d81bd8d01f152fb8bf6528d9986a57c737002f23e6f1867b6f2e64e69a8ea}
+  integrity: {kind: sha256, sha256: c1186871872f95e40848ec62e9e8c8e3405ad7316d35de228060865fe3a7c3e7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}

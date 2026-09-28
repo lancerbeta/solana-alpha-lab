@@ -4,8 +4,8 @@
   "review_id": "FORGE-TEMPORAL-OPERABILITY-REPAIR-REVIEW-001",
   "as_of": "2026-09-28",
   "task_id": "FORGE_TEMPORAL_OPERABILITY_REPAIR_V1",
-  "reviewed_bindings_sha256": "efb31623ce0ef39074c9fdf417ba94395aa708f8c9b0d2403469589d552cc003",
-  "reviewed_inventory_sha256": "6e22e21cb786e3fea7c6824acef05fb21b28c99be178cd90e916e68ca6bd3fee",
+  "reviewed_bindings_sha256": "PENDING_REBIND",
+  "reviewed_inventory_sha256": "PENDING_REBIND",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -17,28 +17,28 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "P1 closed: feature-unknown predicate stop no longer cancelled by companion other_membership (e.g. PIT_LIQUIDITY_MISSING). Completion binding holds (stamp + receipt delta). Matched-only target exclusion publish holds."
+        "G11 ordinary completed + OBSERVABILITY_BLOCKED returns non-writing _readback_existing_run; durable owner_final preserved. Predicate vs matched-outcome fitness and disposition-bound close hold. Companion PIT no longer cancels population/decision lineage stops."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "DoD end-behavior falsified: feature lineage blocks READY_TO_FREEZE; false-predicate+unmatched exit stays scientific; apply→immediate close refuses with delta=0 AUTHORIZED; matrix + Vertical B + runner-up PASS covered."
+        "DoD end-behavior falsified: feature/decision/X300 lineage blocks freeze/exhaustion; false-predicate+unmatched exit stays scientific; apply→immediate close refuses with delta=0 AUTHORIZED; G11 ordinary blocked overlay writes=0; matrix + Vertical B + runner-up PASS covered."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Predicate vs matched-outcome scopes HOLD; publish matched-only HOLD; close uses existing disposition+receipt identities. P1 closed: missing either receipt identity fails closed. Tip without these bytes must not ship."
+        "P1 closed: population/decision lineage stops on lineage_membership alone (companion PIT cannot cancel), aligned with feature-unknown. Matched-only target publish HOLD; close disposition+receipt-delta HOLD; G11 ordinary/repair-marked readback HOLD."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "P1 closed: REPAIR_EXECUTION_NOT_COMPLETE maps to COMPLETE_DISPOSITION_BOUND_REPAIR_EXECUTION_THEN_CLOSE; close readiness requires disposition stamp + receipt new vs parent; runbook distinguishes apply-alone from pending critic."
+        "REPAIR_EXECUTION_NOT_COMPLETE maps to COMPLETE_DISPOSITION_BOUND_REPAIR_EXECUTION_THEN_CLOSE; close readiness requires disposition stamp + receipt new vs parent; G11 overlay surfaces OBSERVABILITY_BLOCKED without rewriting durable SEARCH_EXHAUSTED."
       ]
     }
   ],

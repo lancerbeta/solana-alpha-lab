@@ -4,7 +4,7 @@
   "acceptance_id": "FORGE-TEMPORAL-OPERABILITY-REPAIR-ACCEPTANCE-001",
   "as_of": "2026-09-28",
   "task_id": "FORGE_TEMPORAL_OPERABILITY_REPAIR_V1",
-  "state_change": "INPUT_FITNESS_PREDICATE_VS_MATCHED_OUTCOME_AND_DISPOSITION_BOUND_CLOSE",
+  "state_change": "INPUT_FITNESS_PREDICATE_VS_MATCHED_OUTCOME_DISPOSITION_BOUND_CLOSE_AND_G11_NON_WRITING_BLOCK",
   "base_main": "86b24cb1abe5867becc1ead16efb3754044550df",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
@@ -55,7 +55,7 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_INPUT_FITNESS_AND_DISPOSITION_BOUND_CLOSE_MATRIX",
+    "targeted": "PASS_INPUT_FITNESS_DISPOSITION_BOUND_CLOSE_AND_G11_MATRIX",
     "independent_review": {
       "path": "docs/evidence/forge_temporal_operability_repair/a1_delivery_independent_review_v1.json",
       "sha256": "c0978e2a60f6f1813918c69d3f408d8d0e7c46502ed9eeab56ea911df1ddc804",
@@ -65,7 +65,9 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": [
       "PASS_PREDICATE_VS_MATCHED_OUTCOME_FITNESS",
+      "PASS_COMPANION_PIT_DOES_NOT_CANCEL_LINEAGE_STOP",
       "PASS_DISPOSITION_BOUND_CLOSE",
+      "PASS_G11_ORDINARY_BLOCKED_NON_WRITING_READBACK",
       "PASS_OUTCOME_MATRIX",
       "PASS_OWNER_DATA_AND_CONTINUATION_SCENARIOS",
       "PASS_PRODUCTION_VERTICALS_A_AND_B"

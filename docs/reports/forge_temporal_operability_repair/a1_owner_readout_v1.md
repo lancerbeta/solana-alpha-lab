@@ -5,9 +5,9 @@ Base main: `86b24cb1abe5867becc1ead16efb3754044550df`. Prior verified tip: `12ce
 
 ## Closed this increment
 
-- **INPUT FITNESS:** Required predicate-path cells (X300 / decision / features) and matched-scope outcomes (reference / exit) are assessed separately. Feature lineage with `feature_unknown` on every eligible member stamps `technical_stop` and blocks `READY_TO_FREEZE`. Unmatched exit/reference lineage no longer converts a valid false-predicate zero-match into `TECHNICAL_STOP`. `NOT_X_ELIGIBLE` still does not cancel an eligible-scope stop; pooled/by_cohort N and reasons stay aligned.
+- **INPUT FITNESS:** Required predicate-path cells (X300 / decision / features) and matched-scope outcomes (reference / exit) are assessed separately. Feature lineage with `feature_unknown` on every eligible member stamps `technical_stop` and blocks `READY_TO_FREEZE`. Population/decision lineage stops are not cancelled by companion scientific membership (e.g. `PIT_LIQUIDITY_MISSING`). Unmatched exit/reference lineage no longer converts a valid false-predicate zero-match into `TECHNICAL_STOP`. `NOT_X_ELIGIBLE` still does not cancel an eligible-scope stop; pooled/by_cohort N and reasons stay aligned.
 - **COMPLETION BINDING:** `close_repair_continuation` requires a completed cycle stamped with this disposition and a session receipt new vs the bound parent. Apply → immediate close on parent `NO_WORTHY` refuses with `REPAIR_EXECUTION_NOT_COMPLETE`, records delta=0, `AUTHORIZED` retained. Parent DONE, foreign marker, and pending states refuse without write.
-- Prior P1-A/P1-B and G11 remain closed (census scope, canonical terminal, OBSERVABILITY bypass only for repair-marked completions).
+- Prior P1-A/P1-B and G11 remain closed (census scope, canonical terminal, OBSERVABILITY bypass only for repair-marked completions; ordinary completed + admission STOP is a non-writing blocked overlay — never persists over the durable terminal).
 
 ## Outcome matrix (test-falsified; tip PROVEN deferred to exact-head CI + reviews)
 
@@ -22,6 +22,7 @@ Base main: `86b24cb1abe5867becc1ead16efb3754044550df`. Prior verified tip: `12ce
 | Apply → immediate close refuses parent absorption | FALSIFIED | `test_apply_immediate_close_refuses_parent_done_absorption` |
 | Incomplete / pending close refused | FALSIFIED | `test_repair_completion_refuses_*` |
 | Bound execution → NO_WORTHY / selected / runner-up → close → readback | FALSIFIED | Vertical B + MetadataStop + OwnerContinuationRunnerUpPass |
+| Ordinary completed + OBSERVABILITY_BLOCKED is non-writing overlay | FALSIFIED | `test_ordinary_completed_observability_block_is_non_writing_readback` |
 | Primary KILL → runner-up PASS keeps OWNER_CANDIDATE + survivor | FALSIFIED | `OwnerContinuationRunnerUpPassTests` |
 | Crash recovery between terminal/receipt/CLOSED | FALSIFIED | MetadataStop post-close replay path |
 

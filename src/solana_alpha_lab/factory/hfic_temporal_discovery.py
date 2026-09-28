@@ -68,13 +68,6 @@ SNAPSHOT_LINEAGE_BLOCKERS = frozenset(
         "ACQUISITION_AFTER_CUTOFF",
     }
 )
-# Census membership codes that never describe scientific input fitness of the
-# eligible population. They must not cancel a lineage technical stop.
-NON_SCIENTIFIC_CENSUS_EXCLUSIONS = frozenset(
-    {
-        "NOT_X_ELIGIBLE",
-    }
-)
 PREVIEW_BYTE_LIMIT = 64 * 1024
 PREVIEW_EXAMPLE_LIMIT = 24
 MAX_PREVIEW_SPECS = 2
@@ -1443,12 +1436,6 @@ def snapshot_input_technical_stop(summary: Mapping[str, Any]) -> dict[str, Any] 
         for code, count in target_pooled.items()
         if code in SNAPSHOT_LINEAGE_BLOCKERS
     }
-    other_membership = {
-        code: count
-        for code, count in membership.items()
-        if code not in SNAPSHOT_LINEAGE_BLOCKERS
-        and code not in NON_SCIENTIFIC_CENSUS_EXCLUSIONS
-    }
     other_targets = {
         code: count
         for code, count in target_pooled.items()
@@ -1459,14 +1446,18 @@ def snapshot_input_technical_stop(summary: Mapping[str, Any]) -> dict[str, Any] 
     matched_n = int(summary.get("matched_n") or 0)
     feature_unknown_n = int(summary.get("feature_unknown_n") or 0)
     if population_n == 0:
-        if lineage_membership and not other_membership:
+        # Predicate fitness: no base population. Lineage among census attempts
+        # is a technical stop; companion scientific membership (e.g. PIT) must
+        # not cancel it — same principle as eligible feature-unknown.
+        if lineage_membership:
             primary = sorted(lineage_membership)[0]
             return technical_stop_record(primary)
         return None
     # Predicate fitness: base population formed but no decision-eligible path.
-    # Every fitness failure among eligible attempts is lineage/metadata.
+    # Lineage on the decision path is authoritative; companion non-eligible
+    # scientific membership must not cancel this stop.
     if decision_eligible_n == 0:
-        if lineage_membership and not other_membership:
+        if lineage_membership:
             primary = sorted(lineage_membership)[0]
             return technical_stop_record(primary)
         return None

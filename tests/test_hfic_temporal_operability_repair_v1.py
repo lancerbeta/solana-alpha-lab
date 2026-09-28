@@ -2541,6 +2541,190 @@ class MetadataStopAndPostCloseReadbackTests(unittest.TestCase):
             )
             self.assertEqual(replay["status"], "ALREADY_CLOSED")
 
+    def test_ordinary_completed_observability_block_is_non_writing_readback(self) -> None:
+        """G11: ordinary completed + admission STOP must not persist over durable terminal."""
+
+        import hashlib
+        import json as _json
+        from unittest.mock import patch
+
+        from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+        from solana_alpha_lab.factory.hfic_clock import FrozenClock
+        from solana_alpha_lab.factory.hfic_evidence_identity import forge_run_identity_sha256
+        from solana_alpha_lab.factory.hfic_identity import (
+            assign_portfolio_ids,
+            normalize_text,
+        )
+        from solana_alpha_lab.factory.hfic_preflight import persist_forge_context_packet
+        from solana_alpha_lab.factory.hfic_representation_ladder import (
+            ACTION_OBSERVABILITY_BLOCKED,
+            ACTION_SEARCH_EXHAUSTED,
+            _lookup_run_artifact,
+            evaluate_forge_run,
+        )
+        from solana_alpha_lab.factory.hfic_session import (
+            freeze_draft,
+            persist_no_worthy_session,
+            show_session,
+        )
+        from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
+        from tests.test_hfic_session import valid_draft
+
+        git = repository_git_snapshot(ROOT)
+        draft = _json.loads(
+            (ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        focus = hashlib.sha256(normalize_text("AUTO").encode("utf-8")).hexdigest()
+        started = datetime(2026, 8, 27, 12, 0, 0, tzinfo=UTC)
+        started_text = "2026-08-27T12:00:00Z"
+        market = "11" * 32
+        run_identity = forge_run_identity_sha256(
+            market_evidence_epoch_sha256=market,
+            frozen_representation_ids=["BASE"],
+            owner_focus="AUTO",
+            frozen_representation_versions=["BASE@HFIC-V1.2"],
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ResearchStore(data_root)
+            packet = {
+                "schema": "smial.forge-context-packet",
+                "owner_focus": "AUTO",
+                "evidence_epoch_sha256": market,
+                "market_evidence_epoch_sha256": market,
+            }
+            ctx = persist_forge_context_packet(
+                data_root,
+                packet,
+                store=store,
+                repo_root=ROOT,
+                clock=FrozenClock(started),
+            )
+            receipt = {
+                "receipt_id": "HFIC-PREFLIGHT-G11-001",
+                "evidence_epoch_sha256": market,
+                "market_evidence_epoch_sha256": market,
+                "focus_key_sha256": focus,
+                "search_key_sha256": "33" * 32,
+                "owner_focus": "AUTO",
+                "session_started_at": started_text,
+                "live_git_head": git.head_sha.lower(),
+                "git_composite_sha256": git.composite_sha256,
+                "forge_context_packet_sha256": ctx,
+                "store_inventory_digest": "ee" * 32,
+            }
+            frozen = freeze_draft(draft, preflight_receipt=receipt)
+            persist_no_worthy_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+                preflight_receipt=receipt,
+            )
+            shown = show_session(store, str(frozen["session_id"]), repo_root=ROOT)
+            run_id = "FORGE-RUN-G11-ORDINARY"
+            run_payload = {
+                "schema": "smial.forge-run-receipt",
+                "schema_version": "1.0",
+                "run_id": run_id,
+                "run_identity_sha256": run_identity,
+                "session_id": shown["session_id"],
+                "scientific_slot_sha256": shown["scientific_slot_sha256"],
+                "owner_focus": "AUTO",
+                "owner_final": ACTION_SEARCH_EXHAUSTED,
+                "next_action": "RETURN_EXISTING",
+                "market_evidence_epoch_sha256": market,
+                "capability_epoch_sha256": "aa" * 32,
+                "stages": [
+                    {
+                        "representation_id": "BASE",
+                        "session_id": shown["session_id"],
+                        "effective_terminal": "NO_WORTHY_HYPOTHESIS",
+                        "execution_status": "EXECUTED",
+                        "capability_epoch_sha256": "aa" * 32,
+                    }
+                ],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "visible_cohort_ids": [],
+                "used_cohort_ids": [],
+                "frozen_representation_ids": ["BASE"],
+                "frozen_representation_versions": ["BASE@HFIC-V1.2"],
+            }
+            run_json = _json.dumps(run_payload, sort_keys=True, separators=(",", ":"))
+            wrapper = {
+                "artifact_kind": "FORGE_RUN_RECEIPT",
+                "payload_canonical": run_json,
+                "payload_sha256": hashlib.sha256(run_json.encode("utf-8")).hexdigest(),
+            }
+            wrapper_json = _json.dumps(wrapper, sort_keys=True, separators=(",", ":"))
+            store.append(
+                [
+                    ResearchEvent(
+                        record_id=f"HFIC-ART-FORGE-RUN-{run_id}",
+                        record_kind=RecordKind.RESEARCH_ARTIFACT,
+                        entity_id=run_id,
+                        hypothesis_version_id=None,
+                        run_id=run_id,
+                        transaction_id="RESEARCH-TXN-FORGE-RUN-G11",
+                        effective_at=started,
+                        first_reliable_available_at=started,
+                        supersedes_record_id=None,
+                        payload_json=wrapper_json,
+                        payload_sha256=hashlib.sha256(
+                            wrapper_json.encode("utf-8")
+                        ).hexdigest(),
+                        schema_version="1.0",
+                        producer_capability_id="CAP-TEST",
+                        producer_git_sha=git.head_sha,
+                        created_at=started,
+                    )
+                ],
+                transaction_id="RESEARCH-TXN-FORGE-RUN-G11",
+            )
+            before = _lookup_run_artifact(store, run_identity)
+            self.assertEqual(before.get("owner_final"), ACTION_SEARCH_EXHAUSTED)
+            self.assertIsNone(before.get("repair_continuation_disposition_sha256"))
+            records_before = len(list(store.iter_committed_records()))
+            forge_input = {
+                "schema": "smial.forge-input-receipt",
+                "owner_class": "SEARCH",
+                "market_evidence_epoch_sha256": market,
+                "capability_epoch_sha256": "aa" * 32,
+                "active_evidence_set": {"visible_cohort_ids": []},
+            }
+            with patch(
+                "solana_alpha_lab.factory.hfic_representation_ladder.build_forge_input_receipt",
+                return_value=forge_input,
+            ), patch(
+                "solana_alpha_lab.factory.hfic_representation_ladder._session_applicable_to_current_market",
+                return_value=True,
+            ), patch(
+                "solana_alpha_lab.factory.hfic_evidence_identity.resolve_scientific_admission",
+                return_value={
+                    "action": "STOP",
+                    "reason_code": "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
+                    "session_id": shown["session_id"],
+                },
+            ):
+                blocked = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    persist=True,
+                    preferred_control_session_id=str(shown["session_id"]),
+                )
+            self.assertEqual(blocked["next_action"], ACTION_OBSERVABILITY_BLOCKED)
+            self.assertEqual(blocked["owner_final"], ACTION_OBSERVABILITY_BLOCKED)
+            self.assertEqual(blocked["writes"]["forge_run"], 0)
+            self.assertEqual(blocked["writes"]["research_store"], 0)
+            self.assertEqual(len(list(store.iter_committed_records())), records_before)
+            durable = _lookup_run_artifact(store, run_identity)
+            self.assertEqual(durable.get("owner_final"), ACTION_SEARCH_EXHAUSTED)
+            self.assertIsNone(durable.get("repair_continuation_disposition_sha256"))
+
 
 class FinishOutcomeMatrixTests(unittest.TestCase):
     """PR350 finish matrix: input fitness scope + repair canonical terminal."""
@@ -2679,6 +2863,41 @@ class FinishOutcomeMatrixTests(unittest.TestCase):
             looks, freeze_worthy=False, compound_applicable=True
         )
         self.assertFalse(progress["search_exhausted_allowed"])
+        # Companion scientific membership (PIT) must not cancel decision-path
+        # lineage stop — same principle as eligible feature-unknown.
+        companion = dict(summary)
+        companion["exclusion_reasons"] = {
+            **dict(summary.get("exclusion_reasons") or {}),
+            "PIT_LIQUIDITY_MISSING": 1,
+        }
+        from solana_alpha_lab.factory.hfic_temporal_discovery import (
+            snapshot_input_technical_stop,
+        )
+
+        self.assertEqual(
+            (snapshot_input_technical_stop(companion) or {}).get("reason_code"),
+            "SNAPSHOT_LINEAGE_UNINTERPRETABLE",
+        )
+        companion_progress = assess_tier_progress(
+            [
+                {
+                    "new_look": True,
+                    "search_tier": "SIMPLE_SCREEN",
+                    "look_class": "MAIN",
+                    "result": companion,
+                },
+                {
+                    "new_look": True,
+                    "search_tier": "COMPOUND_SCREEN",
+                    "look_class": "MAIN",
+                    "result": companion,
+                },
+            ],
+            freeze_worthy=False,
+            compound_applicable=True,
+        )
+        self.assertEqual(companion_progress.get("action"), "STOP_TECHNICAL_INPUT")
+        self.assertFalse(companion_progress.get("search_exhausted_allowed"))
 
     def test_reference_lineage_absence_blocks_via_predicate_fitness(self) -> None:
         # Decision cell is also the reference point in this fixture: stripping
