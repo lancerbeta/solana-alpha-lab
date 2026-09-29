@@ -480,6 +480,7 @@ class OrdinaryOperationTests(unittest.TestCase):
                     operation_sha256=operation["operation_sha256"],
                     spec={**spec, "query_id": "renamed-only"},
                     journal_scope=JOURNAL,
+                    verified_market=MARKET,
                 )
             self.assertEqual(getattr(raised.exception, "code", ""), "ORDINARY_OPERATION_SPEC_MISMATCH")
 
@@ -499,6 +500,7 @@ class OrdinaryOperationTests(unittest.TestCase):
                     operation_sha256=operation["operation_sha256"],
                     spec=spec,
                     journal_scope=JOURNAL,
+                    verified_market=MARKET,
                 )
             self.assertEqual(getattr(raised.exception, "code", ""), "OWNER_CAP_EXHAUSTED")
             self.assertEqual(_mains(store), [])
@@ -1017,6 +1019,7 @@ class OrdinaryOperationTests(unittest.TestCase):
                 operation_sha256=operation["operation_sha256"],
                 spec=spec,
                 journal_scope=JOURNAL,
+                verified_market=MARKET,
             )
             self.assertEqual(first["disposition"], "RESERVED")
             second = gate_before_values(
@@ -1024,6 +1027,7 @@ class OrdinaryOperationTests(unittest.TestCase):
                 operation_sha256=operation["operation_sha256"],
                 spec=spec,
                 journal_scope=JOURNAL,
+                verified_market=MARKET,
             )
             self.assertEqual(second["disposition"], "RESUME")
             self.assertFalse(second["writes"])
@@ -1043,12 +1047,14 @@ class OrdinaryOperationTests(unittest.TestCase):
                 operation_sha256=operation["operation_sha256"],
                 spec=_simple_spec(),
                 journal_scope=JOURNAL,
+                verified_market=MARKET,
             )
             second = gate_before_values(
                 ResearchStore(store, create_if_missing=False),
                 operation_sha256=operation["operation_sha256"],
                 spec=other,
                 journal_scope=JOURNAL,
+                verified_market=MARKET,
             )
             self.assertEqual(first["disposition"], "RESERVED")
             self.assertEqual(second["disposition"], "RESERVED")
@@ -1061,6 +1067,7 @@ class OrdinaryOperationTests(unittest.TestCase):
                     operation_sha256=operation["operation_sha256"],
                     spec=third,
                     journal_scope=JOURNAL,
+                    verified_market=MARKET,
                 )
             self.assertEqual(getattr(raised.exception, "code", ""), "OWNER_CAP_EXHAUSTED")
 
@@ -1082,6 +1089,7 @@ class OrdinaryOperationTests(unittest.TestCase):
                 operation_sha256=recorded["operation_sha256"],
                 spec=spec,
                 journal_scope=other_journal,
+                verified_market=MARKET,
             )
             home = _operation(_simple_spec(), completion="LIMITED_RESULT", cap_main=1)
             home["owner_cap"] = {"main": None, "adaptive": None, "preview": None}

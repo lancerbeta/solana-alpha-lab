@@ -32103,7 +32103,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_research_store.py', repository_path: tests/test_research_store.py}
-  integrity: {kind: sha256, sha256: 3cc3bc346d799189d4d99e242f434bb363341a549e98c384bff587f159343983}
+  integrity: {kind: sha256, sha256: c1ff25a7b22f3419a0aa76ff622d4cb471083e26c5d753c69d3fe26e0d9a5585}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32288,7 +32288,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: ee7c030b575be5ffd3cb3963c54b0d20830de2021dcdeae958b033b898e2cb9b}
+  integrity: {kind: sha256, sha256: 7ade44944dfbb3112c4595a05997875518da9bc47094359162d8b47ecc69ff5c}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}

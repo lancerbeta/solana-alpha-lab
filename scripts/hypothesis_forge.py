@@ -1183,7 +1183,9 @@ def cmd_discovery_preview(
         from solana_alpha_lab.factory.hfic_ordinary_operation import (
             OrdinaryOperationError,
             authorize_temporal_attempt,
+            get_operation,
             list_operations,
+            owner_allowance,
             record_operation,
         )
         from solana_alpha_lab.factory.research_store import ResearchStore
@@ -1194,34 +1196,6 @@ def cmd_discovery_preview(
                 exit_code=2,
             )
         preview_store = ResearchStore(store_root, create_if_missing=False)
-        epochs: list[str] = []
-        if explicit_data_root is not None:
-            try:
-                found, _basis = compute_market_epoch_for_data_root(repo_root, explicit_data_root)
-                epochs.append(found)
-            except EvidenceIdentityError:
-                if _published_file_hash_mismatch(explicit_data_root):
-                    return emit_error("BINDING_HASH_MISMATCH")
-                return emit(
-                    {
-                        "reason_code": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
-                        "values_loaded": False,
-                        "writes": False,
-                        "scientific_negative": False,
-                    },
-                    exit_code=2,
-                )
-        if not epochs:
-            return emit(
-                {
-                    "reason_code": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
-                    "values_loaded": False,
-                    "writes": False,
-                    "scientific_negative": False,
-                },
-                exit_code=2,
-            )
-        epoch = epochs[0]
         try:
             if operation_path is not None:
                 request = json.loads(operation_path.read_text(encoding="utf-8"))
@@ -1229,11 +1203,51 @@ def cmd_discovery_preview(
                 operation = record_operation(preview_store, request)
                 preview_service_writes = int(len(list_operations(preview_store)) > before_records)
                 operation_sha256 = str(operation.get("operation_sha256") or "")
-            elif not operation_sha256:
+            else:
+                operation = get_operation(preview_store, str(operation_sha256))
+            if str(operation.get("journal_scope") or "") != journal_scope:
+                raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_MISMATCH")
+            explicit_preview = (operation.get("owner_cap") or {}).get("preview")
+            if explicit_preview is not None:
+                from solana_alpha_lab.factory.hfic_temporal_discovery import stored_preview_hashes
+
+                used_previews = len(stored_preview_hashes(preview_store, journal_scope))
+                if used_previews >= explicit_preview or owner_allowance(
+                    preview_store, operation, "preview"
+                ) < 1:
+                    raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
+            elif owner_allowance(preview_store, operation, "preview") < 1:
+                raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
+            epochs: list[str] = []
+            if explicit_data_root is not None:
+                try:
+                    found, _basis = compute_market_epoch_for_data_root(
+                        repo_root, explicit_data_root
+                    )
+                    epochs.append(found)
+                except EvidenceIdentityError:
+                    if _published_file_hash_mismatch(explicit_data_root):
+                        return emit_error("BINDING_HASH_MISMATCH")
+                    return emit(
+                        {
+                            "reason_code": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+                            "values_loaded": False,
+                            "writes": bool(preview_service_writes),
+                            "scientific_negative": False,
+                        },
+                        exit_code=2,
+                    )
+            if not epochs:
                 return emit(
-                    {"reason_code": "ORDINARY_OPERATION_REQUIRED", "values_loaded": False, "writes": False},
+                    {
+                        "reason_code": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+                        "values_loaded": False,
+                        "writes": bool(preview_service_writes),
+                        "scientific_negative": False,
+                    },
                     exit_code=2,
                 )
+            epoch = epochs[0]
             binding_cohorts: list[dict[str, Any]] = []
             if binding_doc is not None and isinstance(binding_doc, dict):
                 binding_cohorts = list(binding_doc.get("cohorts") or [])
@@ -1244,7 +1258,8 @@ def cmd_discovery_preview(
 
                 try:
                     binding_cohorts = list(
-                        resolve_published_discovery_binding(explicit_data_root).get("cohorts") or []
+                        resolve_published_discovery_binding(explicit_data_root).get("cohorts")
+                        or []
                     )
                 except Exception:
                     binding_cohorts = []

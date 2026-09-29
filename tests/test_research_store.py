@@ -406,6 +406,8 @@ class WriterLeaseStaleRecoveryTests(unittest.TestCase):
                 pid=1,
                 raw=b"{not-json",
             )
+            # Durable corruption is older than the create→write publish window.
+            os.utime(path, (1_600_000_000, 1_600_000_000))
             original = path.read_bytes()
             with self.assertRaisesRegex(ResearchStoreError, "WRITER_LEASE_INVALID"):
                 with ResearchStore(root).writer_lease():
