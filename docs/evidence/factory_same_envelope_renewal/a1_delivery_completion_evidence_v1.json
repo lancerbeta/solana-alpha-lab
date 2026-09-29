@@ -1,0 +1,63 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-SAME-ENVELOPE-RENEWAL-LOCAL-CANDIDATE-001",
+  "as_of": "2026-09-29",
+  "task_id": "FACTORY_SAME_ENVELOPE_RENEWAL_V1",
+  "state_change": "IMPLEMENTED_LOCAL_CANDIDATE_NOT_MERGED",
+  "base_main": "06924bc6878dbd2116acfbb4fb8aed21a10ee045",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "ec9b66b61ff225b246020e3888f76c876caad217fd93badd390aacd5f8d1e4ef",
+    "configs/factory_remote_ops/factory-same-envelope-renewal.service": "13b634688e644cc057bc9b5d4d6f0586a630cb051f10987e41b259a73483157b",
+    "configs/factory_remote_ops/factory-same-envelope-renewal.timer": "c967c85e97997526503af3ec62d47732dce70b45687883652e26c513b6288ce7",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "404793a8fc0d872d8ce8c21723dde79911177dd5e6672431732f756eb5432cab",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "c9bff8ffcd1ff81b6521552bcd5f50c8fe0e7b660979054ace2d032566d59065",
+    "docs/tasks/FACTORY_SAME_ENVELOPE_RENEWAL_V1.md": "aff02133fcbd92c8ed167d9009fd424fdf97eb075e1156b3570446d92b565781",
+    "scripts/renew_same_observation_envelope.py": "a902e1a566265a2da7f510827a924c8d50269d8264196ed5143ff13e19c521b6",
+    "src/solana_alpha_lab/factory/same_envelope_renewal.py": "d80321d1125a3e18df565bb72af894b34d479d99dc1e1300cd79d860b31bfe02",
+    "tests/test_same_envelope_renewal.py": "459cc1298eb711e54b4372d95433dd179b9747aced756bf0fddd9f165a339ae3"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_same_envelope_renewal/a1_delivery_factory_fit_v1.json",
+    "sha256": "6f99538b9d9106500586b8076e3d90f754ea83985d318629ca93a605c715a4ca",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_5_SAME_ENVELOPE_RENEWAL_UNITTESTS",
+    "independent_review": {
+      "path": "docs/evidence/factory_same_envelope_renewal/a1_delivery_independent_review_v1.json",
+      "sha256": "4633f498e71ade6a4719a9c6b132bffe0f162793b6ad5085f2a879e33d064b38",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_5_SAME_ENVELOPE_RENEWAL_UNITTESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_MERGE",
+    "NO_LIVE_VPS_DEPLOY",
+    "NO_TIMER_ENABLE",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0
+  }
+}

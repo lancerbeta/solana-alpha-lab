@@ -390,6 +390,14 @@ When Telegram fires `CAMPAIGN_SUCCESSOR_REQUIRED`:
    `UNKNOWN/BLOCKED` until the DRAINING transition is proven in ResearchStore.
    Age `> period*3` remains the sole `SOURCE_DATA_STALE` rule.
 
+A daily oneshot `factory-same-envelope-renewal.timer` (06:40 UTC) may
+register, authorize, and roll over the next window only when the document is
+the same envelope shifted forward by its own duration and the boundary is
+inside 72 hours. It does not call `activate`. Success is silent. A refusal
+leaves `CAMPAIGN_SUCCESSOR_REQUIRED` as the owner signal. The timer is not
+installed by a code deploy; enable it beside the owner-pulse timer after the
+exact SHA is on the host.
+
 For `SUCCESSOR_STATE=UNKNOWN` or `UNKNOWN/BLOCKED`, do not infer an expiry or
 claim continuity. Use the two `CONTINUITY_*` identity fields from the alert
 with the read-only status command:

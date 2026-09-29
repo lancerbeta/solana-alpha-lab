@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily same-envelope observation renewal at 06:40 UTC
+
+[Timer]
+OnCalendar=*-*-* 06:40:00 UTC
+Persistent=true
+Unit=factory-same-envelope-renewal.service
+
+[Install]
+WantedBy=timers.target
