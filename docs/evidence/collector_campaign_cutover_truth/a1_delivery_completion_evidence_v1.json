@@ -1,0 +1,75 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "COLLECTOR-CAMPAIGN-CUTOVER-TRUTH-LOCAL-CANDIDATE-001",
+  "as_of": "2026-09-29",
+  "task_id": "COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1",
+  "state_change": "IMPLEMENTED_LOCAL_CANDIDATE_NOT_MERGED",
+  "base_main": "043bbb7ee4caf992c3db23bac9b8c23142d8f741",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "522c29c9d9b7671b47dbe420c2344b4cda372dffcaad320e11f5d67f335118bf",
+    "catalog/assets/lifecycle.yaml": "2e6230f533d44cb5fd1b94aecb4243ea954107c94ae2c07fab1ee7f978aa4659",
+    "catalog/catalog_manifest.yaml": "00ac73ab96212985c71a14381cd79d5854d462283ca8d90befd483fdf1a712b5",
+    "catalog/generated/asset_edges.json": "3185b5504f9648da7152a28b2144fdc845e5f99ec832ab084a88f112785f032f",
+    "docs/PROJECT_MAP.md": "a19293bad386266b0d6e212cb6e2ff56ca9f07ea7ccd1e451d3b939d2eabe55c",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "5e515038ecfa389c62636be68754a5599389db3df8be571cf86be048b8c14eeb",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "5117ac80cc7640238959e86bfc86d8bfc2fed1f5a672210db789fdb50b0d90d7",
+    "docs/reports/collector_campaign_cutover_truth/a1_owner_readout_v1.md": "b60721fb64b8e5e7374bbf7b7db63f8ce4fbfbfa1f4d304801bf9c89ff119680",
+    "docs/tasks/COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1.md": "4088dcfdd75cde17b83baa866e10a995b40d24e38ceb525ae996b823bbfdbd57",
+    "scripts/observation_schedule.py": "65a35554546fca9249f85cabd2e9822fc3245d923547682c8c8b613f1d003c85",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "b735c056bcd8e418b83abfd93a12a928cfdce858e7319d189aab4992eee78186",
+    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "481e601ca5fdf73a0bac7ca16c6f9076d1ff83ee1061fdc47c716afab49d7cce",
+    "src/solana_alpha_lab/factory/operability_watch.py": "3b1aed717b0a119bac511fd28d802cafa45e4ceaf5fb1de6761c1809abb6de11",
+    "tests/test_collector_campaign_continuity_repair_v1.py": "fa3de39024e899222b15ce52d89488f5885e57dbcbffe2aff82b13fda22b2900",
+    "tests/test_observation_scheduler.py": "e76b78313e7f12cb9c042f24f5184db1b804d8b91ab46ebe9e59781c1dcf98d0"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/collector_campaign_cutover_truth/a1_delivery_factory_fit_v1.json",
+    "sha256": "4c9dc405fe80e99a4b56a23a8d75806714e37a4e09fc0448ced623af4db4769c",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_78_TARGETED_UNITTESTS_AND_CATALOG_CONTEXT_CHECKS",
+    "independent_review": {
+      "path": "docs/evidence/collector_campaign_cutover_truth/a1_delivery_independent_review_v1.json",
+      "sha256": "166715aa082a44b725abe5734663834f990f4509c167cbe3ef713d2a2abdff15",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_CATALOG_VALIDATION",
+      "PASS_SEMANTIC_PREMISE_VALIDATION",
+      "PASS_78_TARGETED_UNITTESTS"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_MERGE",
+    "NO_LIVE_VPS_DEPLOY",
+    "NO_PROVIDER_CALLS",
+    "NO_CREDENTIAL_READS",
+    "NO_LIVE_CUTOVER",
+    "NO_PHYSICAL_DISPATCH_CROSSING_PROOF",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0
+  }
+}

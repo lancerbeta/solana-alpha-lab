@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import sys
+from datetime import datetime
 from pathlib import Path, PurePosixPath, PureWindowsPath
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,6 +15,9 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from solana_alpha_lab.factory.collector_read_model import (  # noqa: E402
+    project_activation_as_of,
+)
 from solana_alpha_lab.factory.observation_schedule import (  # noqa: E402
     ObservationScheduleError,
     load_observation_schedule,
@@ -98,9 +102,27 @@ def _emit(payload: dict, code: int) -> int:
     return code
 
 
-def _bind_runtime(args: argparse.Namespace) -> tuple[dict, Path, ObservationScheduleStore]:
-    relative = getattr(args, "runtime_config", None) or DEFAULT_RUNTIME_RELATIVE
-    config = load_runtime_config(ROOT, relative)
+def _tick_candidates_as_of(
+    rows: list[dict], now: datetime
+) -> list[tuple[str, str]]:
+    """Select live tick rows using the command entrypoint's captured clock."""
+
+    candidates = []
+    for row in rows:
+        projected = project_activation_as_of(row, now)
+        if str(projected.get("state") or "") in {"ACTIVE", "DRAINING"}:
+            candidates.append(
+                (str(row["schedule_sha256"]), str(row["activation_id"]))
+            )
+    return sorted(candidates)
+
+
+def _bind_runtime(
+    args: argparse.Namespace, *, config: dict | None = None
+) -> tuple[dict, Path, ObservationScheduleStore]:
+    if config is None:
+        relative = getattr(args, "runtime_config", None) or DEFAULT_RUNTIME_RELATIVE
+        config = load_runtime_config(ROOT, relative)
     explicit = getattr(args, "data_root", None)
     if explicit:
         resolved = Path(explicit)
@@ -183,11 +205,13 @@ def main(
                 },
                 0 if result.schedule_sha256 else 2,
             )
-        config, data_root, store = _bind_runtime(args)
+        relative = getattr(args, "runtime_config", None) or DEFAULT_RUNTIME_RELATIVE
+        runtime_config = load_runtime_config(ROOT, relative)
         if physical_overrides is not None:
             now = physical_overrides.now
         else:
-            now = resolve_clock(config)
+            now = resolve_clock(runtime_config)
+        config, data_root, store = _bind_runtime(args, config=runtime_config)
         producer = git_sha(ROOT, config.get("producer_git_sha"))
         if args.command == "register":
             if not args.schedule:
@@ -582,6 +606,7 @@ def main(
                 )
             requested_digest = args.schedule_sha256
             requested_activation = args.activation_id
+            activation_rows = store.list_activations()
             if requested_digest and requested_activation:
                 candidates = [
                     (str(requested_digest), str(requested_activation))
@@ -595,15 +620,42 @@ def main(
                     2,
                 )
             else:
-                candidates = sorted(
-                    (
-                        str(row["schedule_sha256"]),
-                        str(row["activation_id"]),
-                    )
-                    for row in store.list_activations()
-                    if str(row["state"]) in {"ACTIVE", "DRAINING"}
-                )
+                candidates = _tick_candidates_as_of(activation_rows, now)
             if not candidates:
+                pending_future = []
+                for row in activation_rows:
+                    projected = project_activation_as_of(row, now)
+                    projected_state = str(projected.get("state") or "")
+                    if (
+                        projected.get("future_transition_pending") is True
+                        and projected_state not in {"ACTIVE", "DRAINING"}
+                    ):
+                        pending_future.append(
+                            {
+                                "schedule_sha256": str(
+                                    row.get("schedule_sha256") or ""
+                                ),
+                                "activation_id": str(row.get("activation_id") or ""),
+                                "projected_state": projected_state,
+                            }
+                        )
+                if pending_future:
+                    return _emit(
+                        {
+                            "terminal": "TICK_REFUSED_FUTURE_TRANSITION_PENDING",
+                            "provider_calls": 0,
+                            "credential_reads": 0,
+                            "next_action": "WAIT_OR_INSPECT_SCHEDULED_CUTOVER",
+                            "pending_activations": sorted(
+                                pending_future,
+                                key=lambda item: (
+                                    item["schedule_sha256"],
+                                    item["activation_id"],
+                                ),
+                            ),
+                        },
+                        2,
+                    )
                 return _emit(
                     {
                         "terminal": "TICK_REFUSED_NO_LIVE_DEFAULT",
@@ -637,7 +689,31 @@ def main(
                         },
                         2,
                     )
-                activation_state = str(activation["state"])
+                projected = project_activation_as_of(activation, now)
+                projected_state = str(projected.get("state") or "")
+                if (
+                    projected.get("future_transition_pending") is True
+                    and projected_state not in {"ACTIVE", "DRAINING"}
+                ):
+                    return _emit(
+                        {
+                            "terminal": "TICK_REFUSED_FUTURE_TRANSITION_PENDING",
+                            "schedule_sha256": digest,
+                            "activation_id": activation_id,
+                            "provider_calls": 0,
+                            "credential_reads": 0,
+                            "next_action": "WAIT_OR_INSPECT_SCHEDULED_CUTOVER",
+                            "pending_activations": [
+                                {
+                                    "schedule_sha256": digest,
+                                    "activation_id": activation_id,
+                                    "projected_state": projected_state,
+                                }
+                            ],
+                        },
+                        2,
+                    )
+                activation_state = projected_state or str(activation["state"])
                 if activation_state == "PAUSED_OPERATOR":
                     return _emit(
                         {
@@ -698,12 +774,12 @@ def main(
                     ):
                         return _emit(
                             {
-                                "terminal": "TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE",
+                                "terminal": "TICK_REFUSED_FUTURE_TRANSITION_PENDING",
                                 "schedule_sha256": digest,
                                 "activation_id": activation_id,
                                 "provider_calls": 0,
                                 "credential_reads": 0,
-                                "next_action": "RECONCILE_ACTIVE_TRANSITION_PROOF",
+                                "next_action": "WAIT_OR_INSPECT_SCHEDULED_CUTOVER",
                             },
                             2,
                         )

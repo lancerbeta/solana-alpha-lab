@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "COLLECTOR-CAMPAIGN-CUTOVER-TRUTH-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-29",
+  "task_id": "COLLECTOR_CAMPAIGN_CUTOVER_TRUTH_V1",
+  "reviewed_bindings_sha256": "0fcc69fb78eeff99a7d32575a76f7ad7c3e974df6783cf9df3e63bfca1bf19b3",
+  "reviewed_inventory_sha256": "ffac1f7d75b29cabe88ca028d581755f6bb14fd297434107f7626862183ab9a6",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_NO_P0_P1_FINDINGS",
+        "MODEL_grok-4.7-high",
+        "PASS_PRODUCT_UNCHANGED_CONTEXT_ROLE_AND_PIN_META_ONLY"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_PRODUCT_ACCEPTANCE_ACTUALLY_SATISFIED",
+        "MODEL_grok-4.7-high",
+        "CONTEXT_RECEIPT_NOW_BINDS_DELIVERY_EVIDENCE",
+        "EVIDENCE_REBIND_REQUIRED_AND_APPLIED_AFTER_REVIEW"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_NO_P0_P1_VIOLATION_PROVEN",
+        "MODEL_grok-4.7-high",
+        "PHYSICAL_DISPATCH_CROSSING_CUTOVER_NOT_TESTED"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_NO_BLOCKING_OWNER_OPERABILITY_GAP",
+        "MODEL_grok-4.7-high",
+        "REGISTERED_VERSUS_NONE_OWNER_ACTIONS_DISTINCT"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_LIVE_CUTOVER_OR_PHYSICAL_DISPATCH_PROOF"
+  ]
+}

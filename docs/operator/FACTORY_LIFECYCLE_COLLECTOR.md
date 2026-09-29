@@ -168,11 +168,24 @@ Discovery release seal/verify/import (local RDP; zero network):
 /usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py tick --once --runtime-config configs/observation_schedule_runtime_v1.yaml
 ```
 
-Expected without live activation:
+Expected when no live `ACTIVE`/`DRAINING` projection exists at the captured UTC
+`now`:
 
 ```json
-{"terminal":"TICK_REFUSED_NO_LIVE_DEFAULT","provider_calls":0,"credential_reads":0}
+{"terminal":"TICK_REFUSED_NO_LIVE_DEFAULT","provider_calls":0,"credential_reads":0,"next_action":"REGISTER_AUTHORIZE_ACTIVATE"}
 ```
+
+If activations exist but every row still has a future non-live transition at
+that captured `now` (for example `REGISTERED` → `ACTIVE` after cutover), expect
+instead:
+
+```json
+{"terminal":"TICK_REFUSED_FUTURE_TRANSITION_PENDING","provider_calls":0,"credential_reads":0,"next_action":"WAIT_OR_INSPECT_SCHEDULED_CUTOVER"}
+```
+
+Treat `WAIT_OR_INSPECT_SCHEDULED_CUTOVER` as wait/inspect — not as a cue to
+re-register or re-authorize. Explicit `--schedule-sha256` / `--activation-id`
+overrides use the same as-of rule.
 
 Not expected on a healthy exact-SHA root after producer-SHA repair:
 
@@ -193,6 +206,21 @@ is `DOCTOR_OK` with `current_activation_state=DRAINING` and
 While the predecessor is still admission-capable (`ACTIVE`, or `DRAINING`
 without proven closed admission), a second same-family activation requires an
 exact `rollover` cutover binding. In-window rollover semantics are unchanged.
+After the owner has authorized the exact same-family successor, run the
+rollover once before the boundary. Copy the predecessor identities, successor
+schedule SHA, and boundary from the alert. If
+`SUCCESSOR_ACTIVATION_ID=UNKNOWN`, choose a unique owner-selected activation ID
+following the existing activation ID convention; otherwise use the exact ID
+shown. The command writes the operational rollover and lifecycle events:
+
+```text
+uv run --locked --managed-python python -B scripts/observation_schedule.py rollover --predecessor-schedule-sha256 <CONTINUITY_SCHEDULE_SHA256> --predecessor-activation-id <CONTINUITY_ACTIVATION_ID> --successor-schedule-sha256 <SUCCESSOR_SCHEDULE_SHA256> --successor-activation-id <OWNER_SELECTED_SUCCESSOR_ACTIVATION_ID> --cutover-at <STOPS_ADMITTING_AT> --runtime-config configs/observation_schedule_runtime_v1.yaml
+```
+
+Accept only `ROLLOVER_COMMITTED` or an idempotent `ROLLOVER_REPLAY`, then
+verify the bound status rows and immutable events below. For any other result,
+inspect its `terminal` and `next_action` before retrying. Never move the
+cutover into the past.
 
 If `rollover` returns
 `ROLLOVER_IMMUTABLE_PROOF_UNAVAILABLE` with
@@ -301,26 +329,98 @@ predecessor is NON_ADMITTING. Re-run doctor: expect
 `current_activation_state=ACTIVE` for the successor and `live_activation=true`.
 Predecessor remains `DRAINING` until dues complete.
 
-### Pre-expiry owner attention
+### Continuity proof and owner attention
 
-When the current same-family campaign is `ACTIVE` and
-`stops_admitting_at - now <= 24h` with no prepared successor
-whose authorized window can cover the current admission boundary
-(`AUTHORIZED` / `ROLLOVER_READY`; **REGISTERED alone is not enough**),
-operability watch emits one deduped `CAMPAIGN_SUCCESSOR_REQUIRED` attention
-(not `SOURCE_DATA_STALE`). An historical or post-gap authorized schedule does
-not clear the attention. Age `> period*3` remains the sole
-`SOURCE_DATA_STALE` rule.
+The existing owner warning begins within 24 hours of the predecessor's
+`stops_admitting_at`. Its boundary is half-open:
+`starts_at <= cutover_at < stops_admitting_at`.
+
+`REGISTERED` and `AUTHORIZED` are preparation states. Neither proves a
+cutover, even when the successor window covers the predecessor boundary.
+Registrations whose windows end at or before that boundary are reported as
+`HISTORICAL_OUT_OF_WINDOW`; they are not usable successors. In-window
+continuity is clear only after the rollover is committed and both linked
+append-only transition events are proven. A same-family successor that is
+already `ACTIVE` clears the warning only with live bound authority, a
+boundary-covering window, and valid immutable lifecycle transition proof.
+Any registration whose window starts after the boundary is reported as
+`WINDOW_MISSES_CUTOVER`; its `REGISTERED` or `AUTHORIZED` state does not make
+the late window usable.
+
+After the predecessor window ends, a `DRAINING` predecessor without that proof
+remains `GAP`. The watch keeps `CAMPAIGN_SUCCESSOR_REQUIRED` present; it does
+not report `RECOVERED` merely because the predecessor is draining. Continue
+only through the existing `NON_ADMITTING` forward-recovery procedure above.
+The gap clears only after a new same-family `ACTIVE` successor is proven. Do
+not backdate a window or rewrite lifecycle events.
+
+The CLI tick captures one trusted UTC `now` when the command starts and
+projects stored lifecycle rows as of that time. A tick begun before cutover
+keeps the predecessor admission view even if processing finishes after the
+boundary; the next tick started at or after the boundary uses the successor
+view. Existing authority and append-only transition checks still apply. When
+every stored activation only has a future transition pending at that captured
+`now`, the tick refuses with `TICK_REFUSED_FUTURE_TRANSITION_PENDING` and
+`WAIT_OR_INSPECT_SCHEDULED_CUTOVER` — not `REGISTER_AUTHORIZE_ACTIVATE`.
 
 When Telegram fires `CAMPAIGN_SUCCESSOR_REQUIRED`:
 
 1. Read `SUCCESSOR_STATE` / `STOPS_ADMITTING_AT` / `TIME_REMAINING_SECONDS`.
-2. Register the successor schedule if missing, then **authorize** it before
-   expiry (or commit in-window `rollover` while admission is still open).
-3. Attention clears once a continuity-valid state is `AUTHORIZED` or
-   `ROLLOVER_READY`; the Telegram card is `FACTORY / ATTENTION — ACTION` with
-   `MESSAGE_TYPE=ATTENTION` and `ATTENTION=CAMPAIGN_SUCCESSOR_REQUIRED`, rather
-   than an incident.
+2. Branch on `SUCCESSOR_STATE`:
+   - `AUTHORIZED`: commit and prove the in-window rollover; authorization alone
+     does not close the attention.
+   - `REGISTERED`: authorize that already-registered same-family successor whose
+     window covers `STOPS_ADMITTING_AT`, then commit and prove rollover. Do not
+     re-register it.
+   - `NONE`: register and authorize a same-family successor whose half-open
+     window covers `STOPS_ADMITTING_AT`, then commit and prove rollover.
+   - `WINDOW_MISSES_CUTOVER`: do not roll over that document; prepare and
+     authorize a new same-family successor whose window covers
+     `STOPS_ADMITTING_AT`.
+   - `HISTORICAL_OUT_OF_WINDOW`: prepare a new same-family successor; the
+     historical registration is not a continuity candidate.
+   - `GAP`: follow the `NON_ADMITTING` forward-recovery procedure above.
+3. The attention clears only after `ROLLOVER_READY` or a proven `ACTIVE`
+   successor. The Telegram card remains
+   `FACTORY / ATTENTION — ACTION` with `MESSAGE_TYPE=ATTENTION` and
+   `ATTENTION=CAMPAIGN_SUCCESSOR_REQUIRED`, not `SOURCE_DATA_STALE`.
+   An unproven `ACTIVE` row does not displace an expired `DRAINING` continuity
+   anchor; its alert names that anchor separately from the reported current
+   activation. An unproven `DRAINING` row cannot authorize `GAP` — keep
+   `UNKNOWN/BLOCKED` until the DRAINING transition is proven in ResearchStore.
+   Age `> period*3` remains the sole `SOURCE_DATA_STALE` rule.
+
+For `SUCCESSOR_STATE=UNKNOWN` or `UNKNOWN/BLOCKED`, do not infer an expiry or
+claim continuity. Use the two `CONTINUITY_*` identity fields from the alert
+with the read-only status command:
+
+```text
+uv run --locked --managed-python python -B scripts/observation_schedule.py status --schedule-sha256 <CONTINUITY_SCHEDULE_SHA256> --activation-id <CONTINUITY_ACTIVATION_ID> --runtime-config configs/observation_schedule_runtime_v1.yaml
+```
+
+Take `activations[0].transition_event_id` from that JSON and inspect its
+committed ResearchStore record with this read-only query:
+
+`<DATA_ROOT>` means the `data_root` value in
+`configs/observation_schedule_runtime_v1.yaml` (currently
+`local/factory_v1/observation_rdp`). Run the command from the repository root
+and substitute the configured value; do not use `ops_store_relative`, which
+points to the separate operational SQLite store. In the alert,
+`STOPS_ADMITTING_AT` and `TIME_REMAINING_SECONDS` remain `UNKNOWN`; the
+`UNVERIFIED_SCHEDULE_*` fields are diagnostic schedule values, not proof of an
+elapsed admission window or completed cutover.
+
+```text
+uv run --locked --managed-python python -B -c "import json; from pathlib import Path; from solana_alpha_lab.factory.research_store import ResearchStore; s=ResearchStore(Path('<DATA_ROOT>'), create_if_missing=False); selector=('<CONTINUITY_SCHEDULE_SHA256>','<CONTINUITY_ACTIVATION_ID>','<TRANSITION_EVENT_ID>'); print(json.dumps([{'record_id':r.record_id,'record_kind':str(r.record_kind),'entity_id':r.entity_id,'run_id':r.run_id,'effective_at':r.effective_at.isoformat(),'payload':json.loads(r.payload_json)} for r in s.iter_committed_records() if (str(r.entity_id),str(r.run_id or ''),r.record_id)==selector], sort_keys=True))"
+```
+
+The status row must match both identifiers, and exactly one committed
+`OBSERVATION_SCHEDULE_STATE` record must match its state and transition event.
+If status is absent, the event is missing/malformed, or the identities/state do
+not match, keep `UNKNOWN/BLOCKED` and open a separate recovery atom; do not
+rewrite SQLite lifecycle projections or append-only history. A valid current
+transition record alone does not prove a campaign cutover: wait for the watch
+to recompute and clear only on its normal proven-continuity condition.
 
 ### Current-state read model
 
