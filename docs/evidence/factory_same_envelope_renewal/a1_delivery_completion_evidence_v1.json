@@ -16,7 +16,7 @@
     "configs/factory_remote_ops/factory-same-envelope-renewal.timer": "c967c85e97997526503af3ec62d47732dce70b45687883652e26c513b6288ce7",
     "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "404793a8fc0d872d8ce8c21723dde79911177dd5e6672431732f756eb5432cab",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "c9bff8ffcd1ff81b6521552bcd5f50c8fe0e7b660979054ace2d032566d59065",
-    "docs/tasks/FACTORY_SAME_ENVELOPE_RENEWAL_V1.md": "3876df41360de150f9db133ac8f032b612b7113c8182fed159f4d0e868799d90",
+    "docs/tasks/FACTORY_SAME_ENVELOPE_RENEWAL_V1.md": "aff02133fcbd92c8ed167d9009fd424fdf97eb075e1156b3570446d92b565781",
     "scripts/renew_same_observation_envelope.py": "a902e1a566265a2da7f510827a924c8d50269d8264196ed5143ff13e19c521b6",
     "src/solana_alpha_lab/factory/same_envelope_renewal.py": "d80321d1125a3e18df565bb72af894b34d479d99dc1e1300cd79d860b31bfe02",
     "tests/test_same_envelope_renewal.py": "459cc1298eb711e54b4372d95433dd179b9747aced756bf0fddd9f165a339ae3"
@@ -31,14 +31,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_same_envelope_renewal/a1_delivery_factory_fit_v1.json",
-    "sha256": "f97f58940c6b9ba3e78100690196f8f32a4d02924fc03882e23bcdb1a870d4c0",
+    "sha256": "6f99538b9d9106500586b8076e3d90f754ea83985d318629ca93a605c715a4ca",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_5_SAME_ENVELOPE_RENEWAL_UNITTESTS",
     "independent_review": {
       "path": "docs/evidence/factory_same_envelope_renewal/a1_delivery_independent_review_v1.json",
-      "sha256": "8c0160c3af437e3180610ddadfefa21c2e05d8f16817d8f3fad0720a70ad696b",
+      "sha256": "4633f498e71ade6a4719a9c6b132bffe0f162793b6ad5085f2a879e33d064b38",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
