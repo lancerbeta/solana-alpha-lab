@@ -39,7 +39,10 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
   - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
   - scripts/hypothesis_forge.py
+  - src/solana_alpha_lab/factory/hfic_representation_ladder.py
   - tests/test_hfic_ordinary_operation_v1.py
+  - tests/test_hfic_ordinary_operation_acceptance_v1.py
+  - docs/evidence/forge_ordinary_operation_contract/operator_trials_4_to_8_v1.json
   - tests/test_hfic_grounded_discovery_v1.py
   - tests/test_hfic_temporal_owner_path_v1.py
   - tests/test_hfic_temporal_production_runner_v1.py
@@ -83,7 +86,6 @@ context_requirements:
       - docs/evidence/forge_ordinary_operation_contract/a1_delivery_completion_evidence_v1.json
       - docs/evidence/forge_ordinary_operation_contract/a1_delivery_independent_review_v1.json
       - docs/evidence/forge_ordinary_operation_contract/a1_delivery_factory_fit_v1.json
-      - docs/evidence/forge_ordinary_operation_contract/operator_trials_4_to_8_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
