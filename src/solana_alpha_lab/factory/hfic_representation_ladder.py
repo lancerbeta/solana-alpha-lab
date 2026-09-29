@@ -2202,6 +2202,24 @@ def _lookup_run_artifact_for_session(
     return repair_completed or completed or latest
 
 
+def _input_has_current_surface(input_receipt: Mapping[str, Any]) -> bool:
+    """True when forge input already names a current corpus surface.
+
+    Matches preflight: a manifest id, a non-empty visible cohort list, live
+    corpus, or a packet that still contains live corpus. An empty cohort list
+    is not a surface.
+    """
+
+    active = input_receipt.get("active_evidence_set")
+    packet = input_receipt.get("packet")
+    named = isinstance(active, Mapping) and bool(
+        active.get("current_dataset_manifest_id") or active.get("visible_cohort_ids")
+    )
+    live = bool(input_receipt.get("live_corpus"))
+    in_packet = isinstance(packet, Mapping) and bool(packet.get("live_corpus_in_packet"))
+    return named or live or in_packet
+
+
 def _unique_completed_repair_receipt(
     store: ResearchStore, owner_focus: str
 ) -> dict[str, Any] | None:
@@ -2913,7 +2931,9 @@ def evaluate_forge_run(
                 market_epoch = None
         if not isinstance(market_epoch, str) or len(market_epoch) != 64:
             sealed = _unique_completed_repair_receipt(store, owner_focus)
-            if sealed is not None:
+            # Same gate as preflight: a present incomplete surface is not
+            # answered by a sealed repair from another market context.
+            if sealed is not None and not _input_has_current_surface(input_receipt):
                 return _readback_existing_run(sealed)
             raise LadderError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
     frozen_representation_versions = [
