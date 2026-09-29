@@ -17,14 +17,14 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Legacy close refuses DONE without a readable repair result whose run_identity is the pinned binding. Ordinary preflight and forge-run use production CLI without patching applicability or receipt lookup. Sealed readback requires one focus match and no current evidence surface. Write set includes hfic_preflight.py and hfic_representation_ladder.py."
+        "A repair receipt is an ordinary forge-run answer only after the disposition is CLOSED. Crash between the result append and CLOSED stays AUTHORIZED: preflight resumes, forge-run does not return the sealed owner_final. Retry close then readback adds no look."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Ordinary disposable verticals walk draft, plan, apply, production preflight, continuation, close, reopen, and forge-run --no-write for NO_WORTHY and runner-up PASS. MAIN 2 to 3, replay delta 0, historical bytes unchanged. No invented historical receipt."
+        "On a current C1/C2 corpus, production preflight is passed into the continuation. NO_WORTHY readback is SEARCH_EXHAUSTED. Primary KILL then runner-up PASS readback is OWNER_CANDIDATE. MAIN 2 to 3, replay delta 0, historical bytes unchanged."
       ]
     },
     {

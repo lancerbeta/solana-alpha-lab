@@ -34,6 +34,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hfic_repair_continuation.py
   - src/solana_alpha_lab/factory/hfic_preflight.py
   - src/solana_alpha_lab/factory/hfic_representation_ladder.py
+  - src/solana_alpha_lab/factory/hfic_session.py
   - scripts/hypothesis_forge.py
   - catalog/assets/core.yaml
   - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json

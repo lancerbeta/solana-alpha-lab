@@ -2223,16 +2223,28 @@ def _input_has_current_surface(input_receipt: Mapping[str, Any]) -> bool:
 def _unique_completed_repair_receipt(
     store: ResearchStore, owner_focus: str
 ) -> dict[str, Any] | None:
-    """One completed repair-marked receipt for this focus, or none.
+    """One CLOSED repair-marked receipt for this focus, or none.
 
     Ordinary forge-run can miss the pinned binding when the current corpus
-    cannot hash a market epoch. A single sealed repair result is still the
-    owner answer. Several matches are not guessed.
+    cannot hash a market epoch. A single sealed repair result is the owner
+    answer only after the disposition itself is CLOSED. A receipt written
+    before that append is not a finished continuation. Several matches are
+    not guessed.
     """
 
+    from solana_alpha_lab.factory.hfic_repair_continuation import (
+        list_repair_continuation_dispositions,
+    )
     from solana_alpha_lab.factory.hfic_session import focus_key_sha256
 
     expected = focus_key_sha256(owner_focus if str(owner_focus).strip() else "AUTO")
+    # CLOSED dominates AUTHORIZED. A result receipt written before that
+    # append is not a finished continuation.
+    closed_markers = {
+        str(item.get("disposition_sha256") or "")
+        for item in list_repair_continuation_dispositions(store)
+        if str(item.get("status") or "") == "CLOSED"
+    }
     hits: dict[str, dict[str, Any]] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
@@ -2249,6 +2261,8 @@ def _unique_completed_repair_receipt(
             continue
         marker = body.get("repair_continuation_disposition_sha256")
         if not isinstance(marker, str) or len(marker) != 64:
+            continue
+        if marker not in closed_markers:
             continue
         if body.get("owner_final") not in {
             ACTION_OWNER_CANDIDATE,
@@ -2993,6 +3007,25 @@ def evaluate_forge_run(
                         run_identity = bound_identity
     except ResearchStoreError:
         existing = None
+    if existing is None:
+        sealed = _unique_completed_repair_receipt(store, owner_focus)
+        if isinstance(sealed, dict):
+            expected_slot = scientific_slot_sha256(
+                market_evidence_epoch_sha256=str(market_epoch),
+                representation_id="BASE",
+                representation_semantic_version=representation_semantic_version(
+                    registry_doc, "BASE"
+                ),
+                owner_focus=owner_focus,
+            )
+            if (
+                sealed.get("market_evidence_epoch_sha256") == str(market_epoch)
+                and sealed.get("scientific_slot_sha256") == expected_slot
+            ):
+                existing = sealed
+                bound_identity = sealed.get("run_identity_sha256")
+                if isinstance(bound_identity, str) and len(bound_identity) == 64:
+                    run_identity = bound_identity
     existing_owner_final = bool(
         existing is not None
         and existing.get("owner_final")

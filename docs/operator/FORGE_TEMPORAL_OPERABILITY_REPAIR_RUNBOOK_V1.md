@@ -173,7 +173,9 @@ e.g. `KILL_*` → `NON_SCIENTIFIC_STOP`, PASS/CASE_A → `OWNER_CANDIDATE`, repa
 `SEARCH_EXHAUSTED` and not `SCIENTIFIC_IDENTITY_CONFLICT`. That readback
 still holds when the current corpus cannot hash a market epoch and there is
 no current evidence surface, if exactly one completed repair receipt matches
-the focus. A present incomplete surface, or several receipts, stays blocked.
+the focus, and only after that disposition is `CLOSED`. A result receipt
+written before the `CLOSED` append is not the finished continuation.
+A present incomplete surface, or several receipts, stays blocked.
 Close JSON carries
 `forge_run_receipt_sha256` when persist succeeds. `ALREADY_CLOSED` crash
 recovery may still append a missing repair receipt; trust
