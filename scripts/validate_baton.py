@@ -611,7 +611,7 @@ def validate_cursor_and_templates() -> None:
         "agents": (
             agents,
             (
-                "Cursor and Codex are equal direct delivery agents",
+                "Every elected direct agent is an equal delivery agent",
                 "Git is the working project-memory owner",
                 "OWNER_ATTENTION_GATE_V2",
                 "exact owner phrase",

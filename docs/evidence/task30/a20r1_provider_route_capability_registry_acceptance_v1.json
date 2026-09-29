@@ -57,7 +57,7 @@
     },
     "agents_policy": {
       "path": "AGENTS.md",
-      "sha256": "a4dfeeae4db041cd2a0d27229946176f59f4e5a227ac3240bdfec108513db002"
+      "sha256": "eaa6bdd038ef7f265fbbb7d2daeb2e84a34455e330be35c7f9366a283e99dc0c"
     },
     "context_map": {
       "path": "delivery-harness/context-map.yaml",

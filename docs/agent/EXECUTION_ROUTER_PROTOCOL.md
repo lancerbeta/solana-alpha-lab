@@ -100,7 +100,7 @@ Routine bounded local/GitHub delivery continues without micro-approval. Stop
 for the material/external/user-only/destructive/safety gates in
 `OWNER_ATTENTION_GATE_V2`.
 
-Both direct routes stop for exactly:
+All active direct routes stop for exactly:
 
 `PR #<number>, head <40 lowercase hex> проверен; ready + merge разрешаю.`
 

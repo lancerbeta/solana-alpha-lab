@@ -735,7 +735,7 @@ records:
     repository_path: AGENTS.md
   integrity:
     kind: sha256
-    sha256: a4dfeeae4db041cd2a0d27229946176f59f4e5a227ac3240bdfec108513db002
+    sha256: eaa6bdd038ef7f265fbbb7d2daeb2e84a34455e330be35c7f9366a283e99dc0c
   access:
     mode: read_only
     method: file
@@ -4156,7 +4156,7 @@ records:
     repository_path: docs/agent/EXECUTION_ROUTER_PROTOCOL.md
   integrity:
     kind: sha256
-    sha256: 2640eac4700a4b0370ccf9271221b6e81eb5b60010be27ce4735026941e7a324
+    sha256: e83932f9c3ac3a322ddfade14a6c297013d67b6877f121c430e8be76915acd4c
   access:
     mode: read_only
     method: file
@@ -4249,7 +4249,7 @@ records:
     repository_path: .cursor/rules/00-authority.mdc
   integrity:
     kind: sha256
-    sha256: 77480f9b94aea01aec46e88e0b8de905106348da3d31d690918537125d3f575f
+    sha256: f958cb46b47f0090eeac246fb2c22b9f2a0a1bd7cb4a829765ddbbcd0181e497
   access:
     mode: read_only
     method: file
@@ -4794,7 +4794,7 @@ records:
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: 8caa6401cb3fb1c0c1337306d2a76691ea3b63bea70dc9846dbc333f4e839ec1
+    sha256: f8c59f75a956cfb2304ab435257e442a01e212362b4fb953e1cb0ecb24880e6a
   access:
     mode: read_only
     method: file
@@ -13620,7 +13620,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 1e0ae680d1099ef532f6fc2e582cf5fa711f066498b2a2801beb2654510edbb6}
+  integrity: {kind: sha256, sha256: a46a4aaed88ffd59b657a69f522572c69e32e615719cdd9558d23aef537bc93a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
