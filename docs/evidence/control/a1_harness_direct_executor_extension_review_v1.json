@@ -20,7 +20,8 @@
         "PASS on f4e6fc7ed99414522f539efec1bc475dbbdc0882. Claude and OTHER share Cursor/Codex grants. Unknown spellings stay ACTOR_INVALID. load_base_bound_policy returns the frozen base. Exact policy path is required; control/** does not admit a transition. LIVE_PR_HEAD cannot carry the policy change. DESIGN_ONLY stays read-only. Dormant baton stays FORBIDDEN.",
         "MINOR: format_executor_provenance is not enforced inside preflight_push; provenance is not a grant.",
         "MINOR: simulated journey uses FakeRunner where base bytes equal the candidate. The real git fixture is the self-authorization proof.",
-        "Follow-up commit only re-pins SEPARATE sha256 values for owner_attention_gate.py, AGENTS.md and catalog/assets/core.yaml in three historical evidence files so preflight shadow-pin drift is clear."
+        "Follow-up commit only re-pins SEPARATE sha256 values for owner_attention_gate.py, AGENTS.md and catalog/assets/core.yaml in three historical evidence files so preflight shadow-pin drift is clear.",
+        "Main CI repair: the legacy policy fixture is git show a372f81376a7d77fe2500201739a46a736f2d986:control/owner_attention_gate_v2.yaml, not live origin/main."
       ]
     },
     {

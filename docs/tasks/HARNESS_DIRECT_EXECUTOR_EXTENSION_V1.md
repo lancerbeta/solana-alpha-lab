@@ -8,10 +8,10 @@ allowed_routes:
 - DIRECT_CURSOR_DELIVERY
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: a372f81376a7d77fe2500201739a46a736f2d986
+  expected_base: cfbab906f8592b1b4c2725a6cb57edf9685607fc
   expected_upstream: origin/main
-  expected_upstream_oid: a372f81376a7d77fe2500201739a46a736f2d986
-  expected_branch: cursor/harness-direct-executor-extension-v1
+  expected_upstream_oid: cfbab906f8592b1b4c2725a6cb57edf9685607fc
+  expected_branch: cursor/harness-executor-legacy-policy-pin
   dirty_mode: FORBIDDEN
 objective: Add Claude Code and an explicitly named OTHER coding client to the existing Git-native Delivery Harness with the same grants and denials as Cursor and Codex, without letting the candidate policy authorize its own merge.
 managed_write_set:
