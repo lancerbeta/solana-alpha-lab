@@ -1560,6 +1560,10 @@ ordinary temporal query в остатке бюджета → после ново
 (иначе AUTHORIZED снова откроет slot).
 Терминалы draft/plan/apply/close и glossary причин —
 `docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md`.
+Если у completed `NO_WORTHY` нет агрегатного `FORGE_RUN_RECEIPT`, draft
+без `--parent-run-id` строит `legacy_parent_binding` (`ESTABLISHED_NOW`).
+Это не исторический run и не разрешение apply. Повреждённый или частичный
+aggregate блокирует fallback.
 Writer temporal calculation —
 `HFIC_TEMPORAL_DISCOVERY_CALC_V3`. V1/V2 читаются как есть, без выдуманного среза;
 повтор того же science/input пишет V3 как `CALCULATION_REVISION`, без нового

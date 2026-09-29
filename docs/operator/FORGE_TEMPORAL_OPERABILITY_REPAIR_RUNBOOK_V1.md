@@ -185,7 +185,13 @@ Draft/apply failures also print JSON on stdout with `owner_status=BLOCKED`
 |---|---|
 | `PARENT_SESSION_MISSING` | `PROVIDE_PARENT_SESSION_ID_FROM_SHOW_SESSION` |
 | `PARENT_RUN_REQUIRED` | `PROVIDE_PARENT_RUN_ID_OR_ENSURE_FORGE_RUN_RECEIPT` |
-| `PARENT_RUN_MISMATCH` / `PARENT_RUN_UNPROVEN` | `ALIGN_DRAFT_PARENT_RUN_ID` / `BIND_PARENT_RUN_FROM_STORE` (omit CLI run id and re-draft from store) |
+| `PARENT_RUN_MISMATCH` / `PARENT_RUN_UNPROVEN` | `ALIGN_DRAFT_PARENT_RUN_ID` / `OMIT_CALLER_RUN_ID_AND_USE_DERIVED_BINDING` — a caller `--parent-run-id` is not proof; omit it and re-draft |
+| `PARENT_RECEIPT_CONFLICT` | `INSPECT_CONTRADICTING_FORGE_RUN_RECEIPT` — a partial or damaged aggregate blocks fallback |
+| `PARENT_BINDING_MISMATCH` | `ALIGN_DRAFT_LEGACY_PARENT_BINDING` |
+| `CORPUS_BINDING_UNPROVEN` / `CORPUS_BINDING_CONFLICT` | `RESTORE_JOURNAL_CORPUS_BINDING` / `RESOLVE_JOURNAL_CORPUS_BINDING` |
+| `REPRESENTATION_SCOPE_UNPROVEN` / `SLOT_IDENTITY_UNPROVEN` / `FOCUS_IDENTITY_UNPROVEN` / `MARKET_IDENTITY_UNPROVEN` | restore the durable admission/session hashes; do not guess provenance |
+| `SPENT_BUDGET_EXHAUSTED` | `STOP_LOOK_BUDGET_EXHAUSTED` |
+| `REPAIR_RESULT_UNREADABLE` | `RETRY_CLOSE_UNTIL_REPAIR_RESULT_IS_READABLE` — close did not consume the authorization |
 | `PARENT_TERMINAL_RECEIPT_MISSING` | `PROVIDE_TERMINAL_RECEIPT_FROM_SHOW_SESSION` |
 | `TERMINAL_RECEIPT_REQUIRED` | `ENSURE_SESSION_RECEIPT_SHA256_ON_SHOW_SESSION` |
 | `SPENT_BUDGET_INVALID` | `PASS_SPENT_LOOKS_OR_ENSURE_DISCOVERY_JOURNAL` |
@@ -198,6 +204,27 @@ Draft/apply failures also print JSON on stdout with `owner_status=BLOCKED`
 Ordinary temporal discovery after a READY/DONE continuation uses the same
 `/hypothesis-forge` discovery path and inherited look counts. Do not open a
 new session to refresh quota.
+
+## Legacy parent without an aggregate receipt
+
+A completed `NO_WORTHY` session can lack a stored `FORGE_RUN_RECEIPT`. Draft
+then derives `evidence_mapping.legacy_parent_binding` with
+`provenance=ESTABLISHED_NOW` and `aggregate_receipt=ABSENT`. `parent_run_id`
+is `LEGACY-PARENT-` plus the binding digest prefix. That id is not a
+historical `FORGE-RUN-*` and is not accepted from `--parent-run-id` unless it
+equals the derivation.
+
+The binding uses the session receipt, journal scope, slot, market epoch,
+journal corpus hash, and the single representation on the slot admission.
+It does not mark the current ACTIVE ladder as already executed and does not
+fill missing model or execution provenance. A contradicting or only partially
+matching aggregate receipt is `PARENT_RECEIPT_CONFLICT`; fallback does not
+override it.
+
+Plan, apply, and close use that same check. Close writes a repair result
+receipt whose `run_identity_sha256` is the pinned binding digest, reads it
+back, then appends `CLOSED`. `CLOSED`/`DONE` without that readable result is
+refused and the authorization stays open. Retry is idempotent.
 
 ## Compatibility
 
