@@ -4,8 +4,8 @@
   "review_id": "FORGE-LEGACY-PARENT-CONTINUATION-COMPAT-REVIEW-001",
   "as_of": "2026-09-29",
   "task_id": "FORGE_LEGACY_PARENT_CONTINUATION_COMPAT_V1",
-  "reviewed_bindings_sha256": "1e6c8890fa9833c32a9dd8fdfcd312621d913a36925d4c9c30f2c4e3fd154744",
-  "reviewed_inventory_sha256": "199a29e65f2cecf01634379de80b05687cd2f42b03c83c4c89fa650b7cba77af",
+  "reviewed_bindings_sha256": "010fe7883ab0ef01d8021b835c73d9bd96c7e0380f9b4d08f48601a19c59d19e",
+  "reviewed_inventory_sha256": "3516100013ec9f0df949e4381f27f566855711d54684c78c3a865416efd26e7e",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
