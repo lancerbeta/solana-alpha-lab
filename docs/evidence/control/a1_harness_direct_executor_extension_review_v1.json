@@ -4,8 +4,8 @@
   "review_id": "a1_harness_direct_executor_extension_v1",
   "as_of": "2026-09-29",
   "task_id": "HARNESS_DIRECT_EXECUTOR_EXTENSION_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "c37e531a2464658892d1b9671a9b7e3fa5844737c82c555178b3afe4628145fe",
+  "reviewed_inventory_sha256": "1c3a832022e720f8999049b06b4399a49f1aa5e78cd1347a4adae4450f470abc",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

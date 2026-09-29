@@ -8,7 +8,31 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/delivery-harness/SKILL.md": "73b29e65e3964bf7d4515af9269d1728eaa44ec1a64effad13fb41e87d98bda6",
+    ".cursor/commands/delivery-start.md": "89624e3b2f17f46b2dc55bbc2fccc498cb4750df8de18b5bb3ce83feb686002d",
+    ".cursor/rules/00-authority.mdc": "77480f9b94aea01aec46e88e0b8de905106348da3d31d690918537125d3f575f",
+    "AGENTS.md": "a4dfeeae4db041cd2a0d27229946176f59f4e5a227ac3240bdfec108513db002",
+    "CLAUDE.md": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
+    "catalog/assets/core.yaml": "9de0d719b81ec50c72e22fcf2c3d7c2c890092c87d069c5a369eebbb2426cb80",
+    "catalog/schemas/delivery_harness.schema.json": "b16b5930a23a8270cf34e68d89b46267e6a38df1b1793a3dd92ced343a5290e9",
+    "catalog/schemas/delivery_harness_context_receipt.schema.json": "0ffb927a503559ad4bcb8a6a32b4960bdb5a2e92104c1d2b10cbfa11e633a1ef",
+    "catalog/schemas/delivery_harness_task_contract.schema.json": "f00b15366c4d3d0807ad47022bc209f068eea851d791f8ecfd7ffa2ff41e6bd0",
+    "catalog/schemas/owner_attention_gate_v2.schema.json": "4ec86b80e7f0dae2597840acd6a192bff3b31bc0718e2a74e6dd0fc88f87f431",
+    "control/owner_attention_gate_v2.yaml": "06b5279eb4c0555de7c3cf8e2c30aaa6f37cdaad847f03b511f8fef8c1ad2b90",
+    "delivery-harness/harness.yaml": "11930b776e578ab1c0dcd5545b203a7b57b32d0e3f71edcd46ad243d50684da3",
+    "delivery-harness/templates/portable-bundle-manifest.json": "99d0fe18c4eddd681267e016386cbe11a1eb510bc8e9dcc83df9b029efb73a81",
+    "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "d303b6977ab44b864e6509572b4774fba7cd531d20c54f53c2890d60e8ec4885",
+    "docs/agent/EXECUTION_ROUTER_PROTOCOL.md": "2640eac4700a4b0370ccf9271221b6e81eb5b60010be27ce4735026941e7a324",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "10b0e0419d847c2ddd39d55bd889e0e38239bf48d03449171fe88b7e13c4b4e0",
+    "docs/tasks/HARNESS_DIRECT_EXECUTOR_EXTENSION_V1.md": "4891917cc8337b2ef45c3fc8cbc05d607f67b1607666f2c8b348d440d3c58162",
+    "scripts/delivery_harness.py": "f1f54144c3fe004450d71fcf1e307febe86c4ccb37ec3b1c122bed401027fdf9",
+    "scripts/owner_attention_gate.py": "ca0a70b6e561d9bc855f6103fea6ab5f75b35bc699cce4567a3838eb6e8465e2",
+    "scripts/validate_baton.py": "8caa6401cb3fb1c0c1337306d2a76691ea3b63bea70dc9846dbc333f4e839ec1",
+    "tests/test_delivery_harness_authority.py": "f6ffcffa114a0256022794a4f1fb87bd0dabeb52c454c33b43061d040db4f9dc",
+    "tests/test_delivery_harness_contract.py": "3f931095fa2ba302b013f339babf40adb11660df0b84f83c1538db08378ea94c",
+    "tests/test_delivery_harness_executor_extension.py": "fddde75f93b77587688cbf052a0d8d68d61cb2d54a28596c676fa47e16276790"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -19,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_harness_direct_executor_extension_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "a66e039c8324147c788a548f65a1f6a948a660e3110a971cd8a5dee8ae1aed37",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_tests_test_delivery_harness_executor_extension",
     "independent_review": {
       "path": "docs/evidence/control/a1_harness_direct_executor_extension_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "2541af39ac833c1e74909539abd1a9000b589c7ce6525b28c872c5a935a2e5ec",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
