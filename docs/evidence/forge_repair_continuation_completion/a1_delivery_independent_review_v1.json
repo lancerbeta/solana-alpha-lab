@@ -1,0 +1,53 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-REPAIR-CONTINUATION-COMPLETION-REVIEW-001",
+  "as_of": "2026-09-29",
+  "task_id": "FORGE_REPAIR_CONTINUATION_COMPLETION_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Exact-match retry checks grounded_result_sha256 and blocks a selected draft from inheriting a stamped no-worthy terminal. The first repair freeze, including a selected candidate, still proceeds when that hash is absent. Drifted and matching-capability mismatches raise GROUNDED_RESULT_MISMATCH."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "After CLOSED, resolve_scientific_admission under a drifted capability epoch returns RETURN_EXISTING_SESSION and REPAIR_CLOSED_READBACK, not START_NEW_SESSION or RESUME_REPAIR_CONTINUATION."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Capability drift does not admit a different market epoch or a foreign session/slot. CLOSED readback does not reopen the grant. A different grounded result is refused."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "The runbook tells the operator to repeat freeze and read the stored terminal. It does not ask for hand-edited hashes. After CLOSED, preflight is RETURN_EXISTING_SESSION and forge-run reads the repair receipt."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MERGE",
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_NEW_SCIENTIFIC_LOOK"
+  ]
+}

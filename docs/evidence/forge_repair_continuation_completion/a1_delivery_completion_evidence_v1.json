@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-REPAIR-CONTINUATION-COMPLETION-ACCEPTANCE-001",
+  "as_of": "2026-09-29",
+  "task_id": "FORGE_REPAIR_CONTINUATION_COMPLETION_V1",
+  "state_change": "AUTHORIZED_REPAIR_FREEZE_SURVIVES_MISSING_PARENT_CAPABILITY_EPOCH",
+  "base_main": "c3c177efb79df4b4b6b52ab257abe1b3f9f6c40a",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_repair_continuation_completion/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_LEGACY_PARENT_MODULE_AND_ISOLATED_COPY_FREEZE",
+    "independent_review": {
+      "path": "docs/evidence/forge_repair_continuation_completion/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_CAPABILITY_DRIFT_LOOKUP",
+      "PASS_RETRY_GROUNDED_RESULT_MISMATCH",
+      "PASS_SELECTED_CANNOT_INHERIT_NO_WORTHY",
+      "PASS_CLOSED_ADMISSION_READBACK",
+      "PASS_LEGACY_PARENT_MODULE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_NEW_SCIENTIFIC_LOOK",
+    "NO_LIVE_COMPLETION",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "market_execution": "NOT_RUN",
+    "live_store_writes": 0
+  }
+}
