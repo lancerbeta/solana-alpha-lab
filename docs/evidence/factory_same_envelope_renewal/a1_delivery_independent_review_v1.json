@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-SAME-ENVELOPE-RENEWAL-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-29",
+  "task_id": "FACTORY_SAME_ENVELOPE_RENEWAL_V1",
+  "reviewed_bindings_sha256": "7a17ccef0cd970068b7e4887ca93f6b6a8643129cc31728e95f6677714b96e14",
+  "reviewed_inventory_sha256": "d070a870391bdc99a7096ed49e055becfdf1b9477d2eb07ca995a1d6a9406e6f",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_NO_P0_P1_FINDINGS",
+        "ROLLOVER_AT_BOUNDARY_NOT_ACTIVATE",
+        "HISTORICAL_DRAINING_NOT_COUNTED",
+        "PHRASE_NOT_PRINTED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_PRODUCT_ACCEPTANCE_ACTUALLY_SATISFIED",
+        "UNCHANGED_WEEK_DOES_NOT_NEED_OWNER_PHRASE",
+        "TIMER_ENABLE_IS_LATER_OPERATE_STEP"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_NO_P0_P1_VIOLATION_PROVEN",
+        "FUTURE_EFFECTIVE_SUCCESSOR_STAYS_UNKNOWN_UNTIL_CUTOVER",
+        "PURE_SHIFT_GATES_AUTO_AUTHORIZE",
+        "PAST_BOUNDARY_NOT_BACKDATED"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_NO_BLOCKING_OWNER_OPERABILITY_GAP",
+        "SUCCESS_SILENT_REFUSAL_USES_EXISTING_ALERT"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_LIVE_DEPLOY",
+    "NO_TIMER_ENABLE"
+  ]
+}
