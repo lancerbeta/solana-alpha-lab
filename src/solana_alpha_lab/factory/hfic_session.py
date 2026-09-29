@@ -5737,10 +5737,44 @@ def _bind_store_freeze_preflight(
     existing = _lookup_existing_freeze_session(
         store, preflight_receipt, draft
     )
-    if existing is not None and existing.get("repair_continuation_disposition_sha256"):
-        # Stored repair terminal. Do not rebuild a second cycle or let a
-        # caller-shaped JSON pretend to be a new freeze.
-        return preflight_receipt, existing, None
+    if (
+        existing is not None
+        and isinstance(existing.get("repair_continuation_disposition_sha256"), str)
+        and existing.get("repair_continuation_disposition_sha256")
+        and not _is_ladder_challenger_preflight(preflight_receipt)
+    ):
+        # AUTHORIZED retry and CLOSED readback both return the stored terminal.
+        # Neither may skip preflight integrity, draft/context binding, or the
+        # caller's current-market check. Store digest lags the first freeze
+        # write, so it is not the currency proof. A failed check writes nothing.
+        # CLOSED is not a new execution: the grant stays closed.
+        disposition = _repair_disposition_for_session(store, existing)
+        if disposition is None or str(disposition.get("status") or "") not in {
+            "AUTHORIZED",
+            "CLOSED",
+        }:
+            raise HficSessionError(
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
+            )
+        bound = bind_preflight_receipt(
+            preflight_receipt,
+            draft,
+            store=store,
+            repo_root=repo_root,
+            require_current_store_digest=False,
+            require_current_market_identity=verify_current_market_identity,
+        )
+        if bound["research_memory_as_of"] != memory_as_of:
+            raise HficSessionError("RESEARCH_MEMORY_AS_OF_MISMATCH")
+        _validate_draft_forge_context_binding(draft, preflight_receipt, bound)
+        readback = dict(existing)
+        if verify_current_market_identity:
+            readback["current_market_identity"] = "VERIFIED"
+        else:
+            # Historical bytes are not a current-market confirmation.
+            readback["current_market_identity"] = "NOT_VERIFIED"
+        readback["repair_readback_status"] = str(disposition.get("status"))
+        return preflight_receipt, readback, None
     if existing is not None and _is_ladder_challenger_preflight(preflight_receipt):
         return preflight_receipt, existing, None
     if _is_ladder_challenger_preflight(preflight_receipt):
