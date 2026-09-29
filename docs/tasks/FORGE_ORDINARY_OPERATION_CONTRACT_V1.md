@@ -81,6 +81,8 @@ context_requirements:
       - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
     DELIVERY_EVIDENCE:
       - docs/evidence/forge_ordinary_operation_contract/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/forge_ordinary_operation_contract/a1_delivery_independent_review_v1.json
+      - docs/evidence/forge_ordinary_operation_contract/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
