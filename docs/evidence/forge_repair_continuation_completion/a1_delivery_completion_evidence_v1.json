@@ -14,7 +14,12 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "352c7c0d15a65ca7c2ce82fc46de99af0c47cd805af9c5a1b43be0240c8b1020",
+    "docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md": "297f88b873b2d6e4ee34aa7addb34e717b353ddcb6b3db454f0ef56da3ddb9c2",
+    "docs/tasks/FORGE_REPAIR_CONTINUATION_COMPLETION_V1.md": "a29fa3b44d1e46e77242fd56d6dd910d12849650aeedac4539b4364541984693",
+    "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "006863f69db6eece96104c01fd75ddde3a5a28af470cba8d57a2bb8572f629b4",
+    "src/solana_alpha_lab/factory/hfic_session.py": "61bef43de2f444ff41deac02b4c0b360fad5da6a92f4f10697b49dd517ead1cc",
+    "tests/test_hfic_legacy_parent_continuation_compat_v1.py": "fd281a32aea51e9dae62b2c4a1d0b706874795ac6640da277250978d56d675bd"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -26,14 +31,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_repair_continuation_completion/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "d03a2abf398181c2a38e58f93e1f47da344063b49852fa6c7ff84e1ce4964d45",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LEGACY_PARENT_MODULE_AND_ISOLATED_COPY_FREEZE",
     "independent_review": {
       "path": "docs/evidence/forge_repair_continuation_completion/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "9e94738f8156a7fc245ec3b97348c5bbdd3461b4a636dfe26ded5451bf403dbb",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
