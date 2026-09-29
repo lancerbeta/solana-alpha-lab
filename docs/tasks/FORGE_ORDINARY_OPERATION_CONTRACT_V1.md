@@ -120,11 +120,16 @@ STOP: >-
   Do not run the prepared 15m-4h question.
 
 NEXT: >-
-  C-E passed on the publication builder. Operator trials 4-8 are recorded.
-  Trial 7 persisted a draft and wrote no new MAIN; freeze refused a stale
-  preflight receipt. Do not start another trial: the 8-trial budget is spent.
-  After exact-head CI, run merge-readiness. Do not execute the prepared
-  liquidity-retention launch. Do not reopen CLOSED #355.
+  Operator trials 4-8 stay recorded. Trial 7 stays MISSING_INPUT.
+  Replacement acceptance 9 is not PASS. Session
+  HFIC-SESS-0E1065476AE7A9D6 is FROZEN_AWAITING_CRITIC. An independent
+  Critic returned KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED, but finalize
+  refused GIT_COMPOSITE_CHANGED, so the verdict is not in the store.
+  Do not start a second replacement. Do not regenerate trial 7.
+  After a tree that matches the frozen git composite, finalize that
+  same session only. Then exact-head CI and merge-readiness.
+  Do not execute the prepared liquidity-retention launch.
+  Do not reopen CLOSED #355.
 
 Published-corpus acceptance on `_publish` (one data root per scenario):
 
