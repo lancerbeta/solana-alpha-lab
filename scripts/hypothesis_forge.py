@@ -889,9 +889,9 @@ def cmd_discovery_execute(
             {"reason_code": "ORDINARY_OPERATION_REQUIRED", "values_loaded": False, "writes": False},
             exit_code=2,
         )
-    op_store = ResearchStore(store_root, create_if_missing=False)
     gate: dict[str, object] = {"disposition": "EXECUTE"}
-    if temporal_query or operation_path is not None or operation_sha256:
+    if temporal_query:
+        op_store = ResearchStore(store_root)
         try:
             if operation_path is not None:
                 request = json.loads(operation_path.read_text(encoding="utf-8"))
