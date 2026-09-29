@@ -13,7 +13,20 @@
     "kind": "NO_CHANGE"
   },
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "bf08cae582b75f5de4c0197142e62cbc79bafccc8e185ef3bbe4f47a5431bc3a",
+    "catalog/assets/core.yaml": "38047cd6cdd6723e92817b1048ddce16e34f2aab19c3317d3b11c108fdae8a57",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "5ed29e9da0ffea4b4b1bc340d4c13cc5988412c2eb4748605fe6b9fdd2569c96",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "a11bc28c3dd9ab8de1e2a2a9c71e4569858825140f7dd687918e086848fb67ec",
+    "docs/tasks/FORGE_ORDINARY_OPERATION_CONTRACT_V1.md": "d5b098472e54dfa571479437b4383584a0f3b679d5a0ca71ab6fe83261f37eae",
+    "scripts/hypothesis_forge.py": "151e24ed0edf2b19b189acbf8fd8005c3890c4ff02e1fe20e6b5a4df1f5c05d2",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "12e4a6074ae551723d0df8c22e58da3a394826ca5b53d76dce8cc3b17356fe7b",
+    "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "42de8ecbf21d42919cfe588238eb85acb72d63e1516ce58bb0ab793dacabce1b",
+    "tests/test_hfic_grounded_discovery_v1.py": "f82226d6680726f2e429da54c297b50a2c41067d8873c612443739756abcb880",
+    "tests/test_hfic_ordinary_operation_v1.py": "dc28292f23cab325b6b7793c2a85f0813f9031df792df38d1b86a575f7b27359",
+    "tests/test_hfic_temporal_owner_path_v1.py": "df4e3ec793a1009200dcaa3a6fef7486ed522606dcd15015edb701a0f663d720",
+    "tests/test_hfic_temporal_production_runner_v1.py": "8bf181ea81d824c665e7cb934c633b194f939bfad24aa7d2e3773cc464c37556"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -24,14 +37,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_ordinary_operation_contract/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "0b1c956b47767cdb6c574883f779f315c235e349010cadec127ce2191c19f064",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_ORDINARY_OPERATION_V1_V2_V3_AND_CAP_GUARDS",
     "independent_review": {
       "path": "docs/evidence/forge_ordinary_operation_contract/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "0fe2c6b3267ae0560819bb150ba93d4e84256daba58e4b51960f67d5f267f7ad",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
