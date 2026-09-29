@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-LEGACY-PARENT-CONTINUATION-COMPAT-ACCEPTANCE-001",
+  "as_of": "2026-09-29",
+  "task_id": "FORGE_LEGACY_PARENT_CONTINUATION_COMPAT_V1",
+  "state_change": "LEGACY_PARENT_BINDING_ESTABLISHED_NOW_AND_CLOSE_REQUIRES_READABLE_RESULT",
+  "base_main": "043bbb7ee4caf992c3db23bac9b8c23142d8f741",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_legacy_parent_continuation_compat/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_LEGACY_PARENT_VERTICALS_AND_REPAIR_REGRESSION",
+    "independent_review": {
+      "path": "docs/evidence/forge_legacy_parent_continuation_compat/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_NO_WRITE_DRAFT_PLAN",
+      "PASS_APPLY_WITHOUT_PARENT_RECEIPT",
+      "PASS_EARLY_CLOSE_REFUSED",
+      "PASS_NO_WORTHY_CLOSE_AND_FORGE_RUN_NO_WRITE",
+      "PASS_RUNNER_UP_SURVIVOR",
+      "PASS_CLOSE_RETRY_WITHOUT_NEW_LOOK",
+      "PASS_FOREIGN_BINDING_CONFLICT_AND_EXHAUSTED_BUDGET",
+      "PASS_MAIN_2_TO_3_REPLAY_DELTA_0"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_MARKET_EXECUTION",
+    "NO_MERGE",
+    "NO_LIVE_APPLY",
+    "NO_INVENTED_HISTORICAL_FORGE_RUN_RECEIPT"
+  ],
+  "side_effects": {
+    "market_execution": "NOT_RUN",
+    "live_store_writes": 0
+  }
+}
