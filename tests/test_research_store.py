@@ -412,6 +412,17 @@ class WriterLeaseStaleRecoveryTests(unittest.TestCase):
                     pass
             self.assertEqual(path.read_bytes(), original)
 
+    def test_t5b_empty_lock_publish_window_is_writer_busy(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = root / "locks" / "research-writer.lock"
+            path.parent.mkdir(parents=True)
+            path.write_bytes(b"")
+            with self.assertRaisesRegex(ResearchStoreError, "WRITER_BUSY"):
+                with ResearchStore(root).writer_lease():
+                    pass
+            self.assertEqual(path.read_bytes(), b"")
+
     def test_t6_pid_unknown_fails_closed(self) -> None:
         now = datetime(2026, 8, 31, 12, 0, tzinfo=UTC)
         research_store_module._lease_clock = lambda: now

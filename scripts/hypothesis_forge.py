@@ -1172,12 +1172,17 @@ def cmd_discovery_preview(
             },
             exit_code=2,
         )
+    preview_service_writes = 0
+    preview_store = None
     if store_root is not None and journal_scope:
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            EvidenceIdentityError,
+            compute_market_epoch_for_data_root,
+        )
         from solana_alpha_lab.factory.hfic_ordinary_operation import (
             OrdinaryOperationError,
-            get_operation,
+            authorize_temporal_attempt,
             list_operations,
-            owner_allowance,
             record_operation,
         )
         from solana_alpha_lab.factory.research_store import ResearchStore
@@ -1188,24 +1193,69 @@ def cmd_discovery_preview(
                 exit_code=2,
             )
         preview_store = ResearchStore(store_root, create_if_missing=False)
-        preview_service_writes = 0
+        epochs: list[str] = []
+        if explicit_data_root is not None:
+            try:
+                found, _basis = compute_market_epoch_for_data_root(repo_root, explicit_data_root)
+                epochs.append(found)
+            except EvidenceIdentityError:
+                if _published_file_hash_mismatch(explicit_data_root):
+                    return emit_error("BINDING_HASH_MISMATCH")
+                return emit(
+                    {
+                        "reason_code": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+                        "values_loaded": False,
+                        "writes": False,
+                        "scientific_negative": False,
+                    },
+                    exit_code=2,
+                )
+        if not epochs:
+            return emit(
+                {
+                    "reason_code": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                },
+                exit_code=2,
+            )
+        epoch = epochs[0]
         try:
             if operation_path is not None:
                 request = json.loads(operation_path.read_text(encoding="utf-8"))
                 before_records = len(list_operations(preview_store))
                 operation = record_operation(preview_store, request)
                 preview_service_writes = int(len(list_operations(preview_store)) > before_records)
-            else:
-                operation = get_operation(preview_store, str(operation_sha256))
-            if str(operation.get("journal_scope") or "") != journal_scope:
-                raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_MISMATCH")
-            explicit_preview = (operation.get("owner_cap") or {}).get("preview")
-            if explicit_preview is not None:
-                from solana_alpha_lab.factory.hfic_temporal_discovery import stored_preview_hashes
+                operation_sha256 = str(operation.get("operation_sha256") or "")
+            elif not operation_sha256:
+                return emit(
+                    {"reason_code": "ORDINARY_OPERATION_REQUIRED", "values_loaded": False, "writes": False},
+                    exit_code=2,
+                )
+            binding_cohorts: list[dict[str, Any]] = []
+            if binding_doc is not None and isinstance(binding_doc, dict):
+                binding_cohorts = list(binding_doc.get("cohorts") or [])
+            elif explicit_data_root is not None:
+                from solana_alpha_lab.factory.hfic_grounded_discovery import (
+                    resolve_published_discovery_binding,
+                )
 
-                used_previews = len(stored_preview_hashes(preview_store, journal_scope))
-                if used_previews >= explicit_preview or owner_allowance(preview_store, operation, "preview") < 1:
-                    raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
+                try:
+                    binding_cohorts = list(
+                        resolve_published_discovery_binding(explicit_data_root).get("cohorts") or []
+                    )
+                except Exception:
+                    binding_cohorts = []
+            authorize_temporal_attempt(
+                preview_store,
+                operation_sha256=str(operation_sha256),
+                spec=spec,
+                journal_scope=journal_scope,
+                binding_cohorts=binding_cohorts,
+                verified_market=epoch,
+                look_kind="preview",
+            )
         except OrdinaryOperationError as exc:
             return emit(
                 {

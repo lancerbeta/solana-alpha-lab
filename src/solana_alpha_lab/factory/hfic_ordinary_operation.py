@@ -357,6 +357,89 @@ def _closed_slot(admission: Mapping[str, Any], sessions: Sequence[Mapping[str, A
     return False
 
 
+def _assert_journal_is_canonical(operation: Mapping[str, Any], journal_scope: str) -> None:
+    """Caller agreement is not enough when both sides name a foreign journal."""
+
+    from solana_alpha_lab.factory.hfic_session import search_key_sha256
+
+    market = str(operation.get("market_evidence_epoch_sha256") or "")
+    focus = str(operation.get("owner_focus") or "")
+    if len(market) != 64 or not focus:
+        raise OrdinaryOperationError("ORDINARY_OPERATION_BINDING_INCOMPLETE")
+    candidates = {
+        search_key_sha256(market, focus, "HFIC-V1.2"),
+        search_key_sha256(market, focus, "HFIC-V1.2", None, "ORDINARY_GROUNDED_DISCOVERY_V1"),
+        search_key_sha256(
+            market, focus, "HFIC-V1.2", None, "CURRENT_REPRESENTATION_CONTROL_V1"
+        ),
+        search_key_sha256(market, focus, "HFIC-V1.1"),
+        search_key_sha256(market, focus, "HFIC-V1.1", None, "ORDINARY_GROUNDED_DISCOVERY_V1"),
+    }
+    if journal_scope not in candidates and journal_scope != operation.get("journal_scope"):
+        raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_MISMATCH")
+    if journal_scope not in candidates:
+        raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_NOT_CANONICAL")
+
+
+def authorize_temporal_attempt(
+    store: Any,
+    *,
+    operation_sha256: str,
+    spec: Mapping[str, Any],
+    journal_scope: str,
+    binding_cohorts: Sequence[Mapping[str, Any]] | None = None,
+    verified_market: str | None = None,
+    look_kind: str = "main",
+) -> dict[str, Any]:
+    """One admission contract for CLI execute/preview and recorded-query."""
+
+    if look_kind == "preview":
+        operation = get_operation(store, operation_sha256)
+        if str(operation.get("journal_scope") or "") != journal_scope:
+            raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_MISMATCH")
+        if isinstance(verified_market, str) and verified_market != operation.get(
+            "market_evidence_epoch_sha256"
+        ):
+            raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
+        _assert_journal_is_canonical(operation, journal_scope)
+        fingerprint = binding_fingerprint(binding_cohorts)
+        stamped = operation.get("corpus_fingerprint")
+        if fingerprint and stamped and fingerprint != stamped:
+            raise OrdinaryOperationError("ORDINARY_OPERATION_BINDING_MISMATCH")
+        if fingerprint and not stamped:
+            updated = dict(operation)
+            updated["corpus_fingerprint"] = fingerprint
+            _append(store, kind=OPERATION_KIND, body=updated, record_prefix="HFIC-ART-OP")
+            operation = get_operation(store, operation_sha256)
+        admission = _admit(store, operation)
+        if admission.get("action") == "STOP":
+            raise OrdinaryOperationError(
+                str(admission.get("reason_code") or "SCIENTIFIC_ADMISSION_STOP")
+            )
+        from solana_alpha_lab.factory.hfic_session import list_hfic_sessions
+
+        if _closed_slot(admission, list_hfic_sessions(store)):
+            raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")
+        if owner_allowance(store, operation, "preview") < 1:
+            raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
+        return {
+            "disposition": "EXECUTE",
+            "values_loaded": False,
+            "writes": False,
+            "operation": operation,
+            "admission": admission,
+            "look_class": "PREVIEW",
+        }
+    return gate_before_values(
+        store,
+        operation_sha256=operation_sha256,
+        spec=spec,
+        journal_scope=journal_scope,
+        binding_cohorts=binding_cohorts,
+        verified_market=verified_market,
+    )
+
+
 def gate_before_values(
     store: Any,
     *,
@@ -373,6 +456,7 @@ def gate_before_values(
         raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_MISMATCH")
     if isinstance(verified_market, str) and verified_market != operation.get("market_evidence_epoch_sha256"):
         raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
+    _assert_journal_is_canonical(operation, journal_scope)
     from solana_alpha_lab.factory.hfic_temporal_discovery import (
         classify_temporal_look,
         validate_temporal_query,
@@ -542,7 +626,14 @@ def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look
         except OrdinaryOperationError:
             raise
         except ResearchStoreError as exc:
-            if exc.code != "WRITER_BUSY" or attempt == 7:
+            if exc.code != "WRITER_BUSY":
+                raise
+            if any(item.get("spec_sha256") == spec_sha256 for item in _reservations(store, digest)):
+                return
+            current = get_operation(store, digest)
+            if owner_allowance(store, current, look_class) < 1:
+                raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
+            if attempt >= 39:
                 raise
             time.sleep(0.05)
         except Exception as exc:

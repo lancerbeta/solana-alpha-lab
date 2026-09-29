@@ -489,6 +489,16 @@ def _attempt_stale_writer_lease_recovery(root: Path, lock_path: Path) -> None:
         raise ResearchStoreError("WRITER_LEASE_INVALID") from exc
     lease = _parse_writer_lease_bytes(raw)
     if lease is None:
+        # Empty or truncated bytes are the create→write publish window of a live
+        # owner, not durable corruption. Do not reclaim that path.
+        if not raw:
+            raise ResearchStoreError("WRITER_BUSY")
+        try:
+            age = _current_lease_time().timestamp() - lock_path.stat().st_mtime
+        except OSError as exc:
+            raise ResearchStoreError("WRITER_LEASE_INVALID") from exc
+        if age < 5.0:
+            raise ResearchStoreError("WRITER_BUSY")
         raise ResearchStoreError("WRITER_LEASE_INVALID")
     now = _current_lease_time()
     if lease.expiry >= now:
@@ -1162,10 +1172,15 @@ class ResearchStore:
         ).encode("utf-8")
 
         def _acquire() -> None:
-            with lock_path.open("xb") as handle:
-                handle.write(lease_bytes)
-                handle.flush()
-                os.fsync(handle.fileno())
+            flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+            if hasattr(os, "O_BINARY"):
+                flags |= os.O_BINARY
+            fd = os.open(lock_path, flags, 0o644)
+            try:
+                os.write(fd, lease_bytes)
+                os.fsync(fd)
+            finally:
+                os.close(fd)
 
         try:
             _acquire()
