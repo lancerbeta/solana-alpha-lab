@@ -22,6 +22,13 @@ DISPOSITION_ARTIFACT_KIND = "REPAIR_CONTINUATION_DISPOSITION_V1"
 REPAIR_CAPABILITY_ID = "CAP-HFIC-TEMPORAL-OPERABILITY-REPAIR-001"
 ACTION_RESUME_REPAIR_CONTINUATION = "RESUME_REPAIR_CONTINUATION"
 REASON_OWNER_AUTHORIZED_REPAIR_CONTINUATION = "OWNER_AUTHORIZED_REPAIR_CONTINUATION"
+LEGACY_PARENT_BINDING_SCHEMA = "smial.hfic-legacy-parent-binding"
+LEGACY_PARENT_BINDING_VERSION = "1.0"
+LEGACY_PARENT_BINDING_KEY = "legacy_parent_binding"
+LEGACY_PARENT_PROVENANCE = "ESTABLISHED_NOW"
+LEGACY_PARENT_AGGREGATE = "ABSENT"
+LEGACY_PARENT_RUN_PREFIX = "LEGACY-PARENT-"
+MAIN_LOOK_BUDGET = 6
 
 _HEX64 = re.compile(r"^[0-9a-f]{64}$")
 
@@ -50,6 +57,390 @@ def _require_text(value: object, code: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise RepairContinuationError(code)
     return value.strip()
+
+
+def _legacy_binding_from_mapping(mapping: object) -> dict[str, Any] | None:
+    if not isinstance(mapping, Mapping):
+        return None
+    raw = mapping.get(LEGACY_PARENT_BINDING_KEY)
+    if not isinstance(raw, Mapping):
+        return None
+    return dict(raw)
+
+
+def _pinned_legacy_binding(disposition: Mapping[str, Any]) -> dict[str, Any] | None:
+    pinned = _legacy_binding_from_mapping(disposition.get("evidence_mapping"))
+    if pinned is None:
+        return None
+    if (
+        pinned.get("schema") != LEGACY_PARENT_BINDING_SCHEMA
+        or pinned.get("schema_version") != LEGACY_PARENT_BINDING_VERSION
+        or pinned.get("provenance") != LEGACY_PARENT_PROVENANCE
+        or pinned.get("aggregate_receipt") != LEGACY_PARENT_AGGREGATE
+        or _HEX64.fullmatch(str(pinned.get("binding_sha256") or "")) is None
+    ):
+        raise RepairContinuationError("PARENT_BINDING_MISMATCH")
+    source = pinned.get("source")
+    if not isinstance(source, Mapping):
+        raise RepairContinuationError("PARENT_BINDING_MISMATCH")
+    return pinned
+
+
+def _iter_forge_run_bodies(store: Any) -> list[dict[str, Any]]:
+    found: list[dict[str, Any]] = []
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if kind != "RESEARCH_ARTIFACT":
+            continue
+        try:
+            wrapper = json.loads(record.payload_json)
+            body = json.loads(str(wrapper.get("payload_canonical") or ""))
+        except (TypeError, json.JSONDecodeError, AttributeError):
+            continue
+        if not isinstance(body, dict):
+            continue
+        if wrapper.get("artifact_kind") != "FORGE_RUN_RECEIPT":
+            continue
+        found.append(body)
+    return found
+
+
+def _classify_parent_aggregates(
+    store: Any,
+    *,
+    session_id: str,
+    scientific_slot_sha256: str,
+) -> tuple[str, dict[str, Any] | None]:
+    """Exact session+slot aggregate, a contradicting aggregate, or absence.
+
+    A repair result receipt is not a parent aggregate. Slot-only or
+    session-only matches are contradictions, not a fallback.
+    """
+
+    exact: list[dict[str, Any]] = []
+    conflicts: list[dict[str, Any]] = []
+    for body in _iter_forge_run_bodies(store):
+        if body.get("repair_continuation_disposition_sha256"):
+            continue
+        session = body.get("session_id")
+        slot = body.get("scientific_slot_sha256")
+        session_present = isinstance(session, str) and bool(session.strip())
+        slot_present = isinstance(slot, str) and _HEX64.fullmatch(slot) is not None
+        session_match = session_present and session == session_id
+        slot_match = slot_present and slot == scientific_slot_sha256
+        if session_match and slot_match:
+            run_id = body.get("run_id")
+            identity = body.get("run_identity_sha256")
+            if not isinstance(run_id, str) or not run_id.strip():
+                conflicts.append(body)
+                continue
+            if identity not in (None, "") and (
+                not isinstance(identity, str) or _HEX64.fullmatch(identity) is None
+            ):
+                conflicts.append(body)
+                continue
+            exact.append(body)
+            continue
+        if session_match or slot_match:
+            conflicts.append(body)
+    if conflicts:
+        return "CONFLICT", conflicts[0]
+    if not exact:
+        return "ABSENT", None
+    run_ids = {str(item.get("run_id") or "") for item in exact}
+    if len(run_ids) != 1:
+        return "CONFLICT", exact[0]
+    chosen = next(
+        (item for item in exact if item.get("owner_final")),
+        exact[-1],
+    )
+    return "EXACT", chosen
+
+
+def _journal_corpus_binding(store: Any, journal_scope: str) -> dict[str, Any]:
+    from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks
+
+    bindings: set[str] = set()
+    cohorts: set[str] = set()
+    for item in list_discovery_looks(store, journal_scope):
+        if not isinstance(item, Mapping) or item.get("new_look") is False:
+            continue
+        digest = item.get("data_binding_sha256")
+        if isinstance(digest, str) and _HEX64.fullmatch(digest) is not None:
+            bindings.add(digest)
+        refs = item.get("data_refs")
+        if isinstance(refs, list):
+            for ref in refs:
+                if isinstance(ref, Mapping) and isinstance(ref.get("cohort_id"), str):
+                    cohort = str(ref["cohort_id"]).strip()
+                    if cohort:
+                        cohorts.add(cohort)
+    if len(bindings) != 1 or not cohorts:
+        raise RepairContinuationError(
+            "CORPUS_BINDING_CONFLICT" if len(bindings) > 1 else "CORPUS_BINDING_UNPROVEN"
+        )
+    return {
+        "data_binding_sha256": next(iter(bindings)),
+        "cohort_ids": sorted(cohorts),
+    }
+
+
+def _admission_for_parent(
+    store: Any,
+    *,
+    session_id: str,
+    scientific_slot_sha256: str,
+) -> dict[str, Any]:
+    from solana_alpha_lab.factory.hfic_session import list_scientific_slot_admissions
+
+    matches = [
+        dict(row)
+        for row in list_scientific_slot_admissions(store)
+        if isinstance(row, Mapping)
+        and row.get("session_id") == session_id
+        and row.get("scientific_slot_sha256") == scientific_slot_sha256
+        and row.get("identity_binding_status") != "CONFLICT"
+    ]
+    if len(matches) != 1:
+        raise RepairContinuationError("REPRESENTATION_SCOPE_UNPROVEN")
+    return matches[0]
+
+
+def derive_legacy_parent_binding(
+    store: Any,
+    parent_session: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Bind a completed parent that has no aggregate FORGE_RUN_RECEIPT.
+
+    The binding is established now from durable hashes. It is not a
+    historical run receipt and does not reconstruct model or execution
+    provenance. Only the representation recorded on the slot admission is
+    treated as executed.
+    """
+
+    from solana_alpha_lab.factory.hfic_evidence_identity import scientific_slot_sha256
+    from solana_alpha_lab.factory.hfic_identity import normalize_text
+    from solana_alpha_lab.factory.hfic_session import load_session_bundle
+    from solana_alpha_lab.factory.run_passport import canonical_sha256
+
+    session_id = _require_text(
+        parent_session.get("session_id"), "PARENT_SESSION_REQUIRED"
+    )
+    bundle = load_session_bundle(store, session_id, read_mode=True)
+    if not isinstance(bundle, Mapping):
+        raise RepairContinuationError("PARENT_SESSION_MISSING")
+    slot = bundle.get("scientific_slot_sha256")
+    if not isinstance(slot, str) or _HEX64.fullmatch(slot) is None:
+        raise RepairContinuationError("SCIENTIFIC_SLOT_REQUIRED")
+    terminal = bundle.get("session_receipt_sha256")
+    if not isinstance(terminal, str) or _HEX64.fullmatch(terminal) is None:
+        raise RepairContinuationError("TERMINAL_RECEIPT_REQUIRED")
+    journal = str(bundle.get("search_key_sha256") or "")
+    if _HEX64.fullmatch(journal) is None:
+        raise RepairContinuationError("JOURNAL_SCOPE_REQUIRED")
+    market = bundle.get("market_evidence_epoch_sha256")
+    if not isinstance(market, str) or _HEX64.fullmatch(market) is None:
+        raise RepairContinuationError("MARKET_IDENTITY_UNPROVEN")
+    claimed_slot = parent_session.get("scientific_slot_sha256")
+    claimed_terminal = (
+        parent_session.get("terminal_receipt_sha256")
+        or parent_session.get("session_receipt_sha256")
+    )
+    claimed_journal = parent_session.get("journal_scope") or parent_session.get(
+        "search_key_sha256"
+    )
+    if isinstance(claimed_slot, str) and claimed_slot and claimed_slot != slot:
+        raise RepairContinuationError("PARENT_SLOT_MISMATCH")
+    if (
+        isinstance(claimed_terminal, str)
+        and claimed_terminal
+        and claimed_terminal != terminal
+    ):
+        raise RepairContinuationError("TERMINAL_RECEIPT_MISMATCH")
+    if isinstance(claimed_journal, str) and claimed_journal and claimed_journal != journal:
+        raise RepairContinuationError("JOURNAL_SCOPE_MISMATCH")
+    kind, aggregate = _classify_parent_aggregates(
+        store, session_id=session_id, scientific_slot_sha256=slot
+    )
+    if kind == "CONFLICT":
+        raise RepairContinuationError("PARENT_RECEIPT_CONFLICT")
+    if kind == "EXACT":
+        raise RepairContinuationError("PARENT_AGGREGATE_PRESENT")
+    admission = _admission_for_parent(
+        store, session_id=session_id, scientific_slot_sha256=slot
+    )
+    focus = admission.get("owner_focus")
+    if not isinstance(focus, str) or not focus.strip():
+        raise RepairContinuationError("FOCUS_IDENTITY_UNPROVEN")
+    focus = focus.strip()
+    focus_key = hashlib.sha256(normalize_text(focus).encode("utf-8")).hexdigest()
+    admitted_focus = admission.get("focus_key_sha256")
+    if isinstance(admitted_focus, str) and admitted_focus and admitted_focus != focus_key:
+        raise RepairContinuationError("FOCUS_IDENTITY_UNPROVEN")
+    admitted_market = admission.get("market_evidence_epoch_sha256")
+    if admitted_market != market:
+        raise RepairContinuationError("MARKET_IDENTITY_UNPROVEN")
+    representation = admission.get("ladder_representation_id")
+    version = admission.get("representation_semantic_version")
+    if not isinstance(representation, str) or not representation.strip():
+        raise RepairContinuationError("REPRESENTATION_SCOPE_UNPROVEN")
+    if not isinstance(version, str) or not version.strip():
+        raise RepairContinuationError("REPRESENTATION_SCOPE_UNPROVEN")
+    representation = representation.strip()
+    version = version.strip()
+    bundle_representation = bundle.get("ladder_representation_id")
+    if (
+        isinstance(bundle_representation, str)
+        and bundle_representation
+        and bundle_representation != representation
+    ):
+        raise RepairContinuationError("REPRESENTATION_SCOPE_UNPROVEN")
+    expected_slot = scientific_slot_sha256(
+        market_evidence_epoch_sha256=market,
+        representation_id=representation,
+        representation_semantic_version=version,
+        owner_focus=focus,
+    )
+    if expected_slot != slot:
+        raise RepairContinuationError("SLOT_IDENTITY_UNPROVEN")
+    corpus = _journal_corpus_binding(store, journal)
+    source = {
+        "aggregate_receipt": LEGACY_PARENT_AGGREGATE,
+        "cohort_ids": list(corpus["cohort_ids"]),
+        "data_binding_sha256": corpus["data_binding_sha256"],
+        "executed_representation_ids": [representation],
+        "execution_binding_status": "NOT_RECOVERED",
+        "focus_key_sha256": focus_key,
+        "journal_scope": journal,
+        "market_evidence_epoch_sha256": market,
+        "model_provenance_status": "NOT_RECOVERED",
+        "owner_focus": focus,
+        "parent_session_id": session_id,
+        "provenance": LEGACY_PARENT_PROVENANCE,
+        "representation_id": representation,
+        "representation_semantic_version": version,
+        "scientific_slot_sha256": slot,
+        "terminal_receipt_sha256": terminal,
+    }
+    binding_sha = canonical_sha256(
+        {
+            "identity_version": "HFIC_LEGACY_PARENT_BINDING_V1",
+            "source": source,
+        }
+    )
+    public_run_id = f"{LEGACY_PARENT_RUN_PREFIX}{binding_sha[:16].upper()}"
+    binding = {
+        "aggregate_receipt": LEGACY_PARENT_AGGREGATE,
+        "binding_sha256": binding_sha,
+        "provenance": LEGACY_PARENT_PROVENANCE,
+        "schema": LEGACY_PARENT_BINDING_SCHEMA,
+        "schema_version": LEGACY_PARENT_BINDING_VERSION,
+        "source": source,
+    }
+    return {
+        "mode": "LEGACY_PARENT_BINDING",
+        "parent_run_id": public_run_id,
+        "binding": binding,
+        "evidence_mapping": {LEGACY_PARENT_BINDING_KEY: binding},
+    }
+
+
+def _proof_next_step(code: str) -> str:
+    return {
+        "PARENT_RECEIPT_CONFLICT": "INSPECT_CONTRADICTING_FORGE_RUN_RECEIPT",
+        "PARENT_RUN_UNPROVEN": "OMIT_CALLER_RUN_ID_AND_USE_DERIVED_BINDING",
+        "PARENT_RUN_MISMATCH": "ALIGN_DRAFT_PARENT_RUN_ID",
+        "PARENT_BINDING_MISMATCH": "ALIGN_DRAFT_LEGACY_PARENT_BINDING",
+        "PARENT_AGGREGATE_PRESENT": "USE_STORED_FORGE_RUN_RECEIPT",
+        "CORPUS_BINDING_UNPROVEN": "RESTORE_JOURNAL_CORPUS_BINDING",
+        "CORPUS_BINDING_CONFLICT": "RESOLVE_JOURNAL_CORPUS_BINDING",
+        "REPRESENTATION_SCOPE_UNPROVEN": "RESTORE_SLOT_ADMISSION_REPRESENTATION",
+        "SLOT_IDENTITY_UNPROVEN": "RESTORE_SLOT_ADMISSION_IDENTITY",
+        "FOCUS_IDENTITY_UNPROVEN": "RESTORE_SLOT_ADMISSION_FOCUS",
+        "MARKET_IDENTITY_UNPROVEN": "RESTORE_MARKET_EPOCH_BINDING",
+        "SPENT_BUDGET_EXHAUSTED": "STOP_LOOK_BUDGET_EXHAUSTED",
+    }.get(code, "INSPECT_REASON_CODE_THEN_RERUN")
+
+
+def resolve_repair_parent_proof(
+    store: Any,
+    parent_session: Mapping[str, Any],
+    *,
+    claimed_run_id: str | None = None,
+) -> dict[str, Any]:
+    """One parent contract for draft, plan, apply and completion."""
+
+    session_id = _require_text(
+        parent_session.get("session_id"), "PARENT_SESSION_REQUIRED"
+    )
+    slot = parent_session.get("scientific_slot_sha256")
+    if not isinstance(slot, str) or _HEX64.fullmatch(slot) is None:
+        from solana_alpha_lab.factory.hfic_session import load_session_bundle
+
+        bundle = load_session_bundle(store, session_id, read_mode=True)
+        slot = bundle.get("scientific_slot_sha256") if isinstance(bundle, Mapping) else None
+    if not isinstance(slot, str) or _HEX64.fullmatch(slot) is None:
+        raise RepairContinuationError("SCIENTIFIC_SLOT_REQUIRED")
+    kind, aggregate = _classify_parent_aggregates(
+        store, session_id=session_id, scientific_slot_sha256=slot
+    )
+    if kind == "CONFLICT":
+        raise RepairContinuationError("PARENT_RECEIPT_CONFLICT")
+    if kind == "EXACT" and isinstance(aggregate, Mapping):
+        proven_run_id = str(aggregate.get("run_id") or "")
+        if claimed_run_id and claimed_run_id != proven_run_id:
+            raise RepairContinuationError("PARENT_RUN_MISMATCH")
+        return {
+            "mode": "AGGREGATE_RECEIPT",
+            "parent_run_id": proven_run_id,
+            "binding": None,
+            "evidence_mapping": {},
+            "receipt": dict(aggregate),
+        }
+    derived = derive_legacy_parent_binding(store, parent_session)
+    if claimed_run_id and claimed_run_id != derived["parent_run_id"]:
+        raise RepairContinuationError("PARENT_RUN_UNPROVEN")
+    return derived
+
+
+def read_repair_result_receipt(
+    store: Any,
+    disposition: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """Read the repair result bound to this disposition, session and slot.
+
+    A foreign receipt that matches only the slot or only the session is not
+    this result. Legacy completions also require the pinned binding digest.
+    """
+
+    disposition_sha = str(disposition.get("disposition_sha256") or "")
+    session_id = str(disposition.get("parent_session_id") or "")
+    slot = str(disposition.get("scientific_slot_sha256") or "")
+    if not disposition_sha or not session_id or _HEX64.fullmatch(slot) is None:
+        return None
+    pinned = None
+    if _legacy_binding_from_mapping(disposition.get("evidence_mapping")) is not None:
+        pinned = _pinned_legacy_binding(disposition)
+    want_identity = (
+        str(pinned.get("binding_sha256") or "") if isinstance(pinned, Mapping) else ""
+    )
+    found: list[dict[str, Any]] = []
+    for body in _iter_forge_run_bodies(store):
+        if str(body.get("repair_continuation_disposition_sha256") or "") != disposition_sha:
+            continue
+        if str(body.get("session_id") or "") != session_id:
+            continue
+        if str(body.get("scientific_slot_sha256") or "") != slot:
+            continue
+        if want_identity and str(body.get("run_identity_sha256") or "") != want_identity:
+            continue
+        found.append(body)
+    if not found:
+        return None
+    digests = {str(item.get("receipt_sha256") or "") for item in found}
+    if len(digests) != 1 or not next(iter(digests)):
+        raise RepairContinuationError("PARENT_RECEIPT_CONFLICT")
+    return dict(found[-1])
 
 
 def disposition_identity(body: Mapping[str, Any]) -> str:
@@ -248,32 +639,38 @@ def plan_repair_continuation(
             owner_status="BLOCKED",
             next_step="ALIGN_DRAFT_TERMINAL_RECEIPT",
         )
-    parent_run = (
-        parent_session.get("run_id")
-        or parent_session.get("forge_run_id")
-        or parent_session.get("parent_run_id")
-    )
-    if isinstance(parent_run, str) and parent_run and parent_run != body["parent_run_id"]:
-        return _owner_plan(
-            status="NOT_APPLICABLE",
-            reason_code="PARENT_RUN_MISMATCH",
-            writes=False,
-            disposition=body,
-            owner_status="BLOCKED",
-            next_step="ALIGN_DRAFT_PARENT_RUN_ID",
-        )
-    if store is not None and (
-        not isinstance(parent_run, str) or not parent_run
-    ):
-        looked = _lookup_forge_run_for_parent(
+    durable_parent = False
+    if store is not None:
+        from solana_alpha_lab.factory.hfic_session import load_session_bundle
+
+        stored_bundle = load_session_bundle(store, session_id, read_mode=True)
+        aggregate_kind, _aggregate = _classify_parent_aggregates(
             store,
             session_id=session_id,
             scientific_slot_sha256=str(body["scientific_slot_sha256"]),
         )
-        observed_run = (
-            str(looked.get("run_id") or "") if isinstance(looked, Mapping) else ""
+        durable_parent = aggregate_kind != "ABSENT" or (
+            isinstance(stored_bundle, Mapping)
+            and _HEX64.fullmatch(str(stored_bundle.get("session_receipt_sha256") or ""))
+            is not None
         )
-        if observed_run and observed_run != body["parent_run_id"]:
+    if store is not None and durable_parent:
+        try:
+            proof = resolve_repair_parent_proof(
+                store,
+                parent_session,
+                claimed_run_id=str(body["parent_run_id"]),
+            )
+        except RepairContinuationError as exc:
+            return _owner_plan(
+                status="NOT_APPLICABLE",
+                reason_code=str(exc),
+                writes=False,
+                disposition=body,
+                owner_status="BLOCKED",
+                next_step=_proof_next_step(str(exc)),
+            )
+        if proof["parent_run_id"] != body["parent_run_id"]:
             return _owner_plan(
                 status="NOT_APPLICABLE",
                 reason_code="PARENT_RUN_MISMATCH",
@@ -282,15 +679,40 @@ def plan_repair_continuation(
                 owner_status="BLOCKED",
                 next_step="ALIGN_DRAFT_PARENT_RUN_ID",
             )
-        spent_probe = spent_looks_from_journal(store, body["journal_scope"])
-        if int(spent_probe["look_count"]) > 0 and not observed_run:
+        if proof["mode"] == "LEGACY_PARENT_BINDING":
+            pinned = _legacy_binding_from_mapping(body.get("evidence_mapping"))
+            if pinned != proof.get("binding"):
+                return _owner_plan(
+                    status="NOT_APPLICABLE",
+                    reason_code="PARENT_BINDING_MISMATCH",
+                    writes=False,
+                    disposition=body,
+                    owner_status="BLOCKED",
+                    next_step="ALIGN_DRAFT_LEGACY_PARENT_BINDING",
+                )
+        elif _legacy_binding_from_mapping(body.get("evidence_mapping")) is not None:
             return _owner_plan(
                 status="NOT_APPLICABLE",
-                reason_code="PARENT_RUN_UNPROVEN",
+                reason_code="PARENT_RECEIPT_CONFLICT",
                 writes=False,
                 disposition=body,
                 owner_status="BLOCKED",
-                next_step="BIND_PARENT_RUN_FROM_STORE",
+                next_step="DROP_LEGACY_BINDING_WHEN_AGGREGATE_RECEIPT_EXISTS",
+            )
+    else:
+        parent_run = (
+            parent_session.get("run_id")
+            or parent_session.get("forge_run_id")
+            or parent_session.get("parent_run_id")
+        )
+        if isinstance(parent_run, str) and parent_run and parent_run != body["parent_run_id"]:
+            return _owner_plan(
+                status="NOT_APPLICABLE",
+                reason_code="PARENT_RUN_MISMATCH",
+                writes=False,
+                disposition=body,
+                owner_status="BLOCKED",
+                next_step="ALIGN_DRAFT_PARENT_RUN_ID",
             )
     parent_scope = (
         parent_session.get("journal_scope") or parent_session.get("search_key_sha256")
@@ -435,6 +857,15 @@ def plan_repair_continuation(
                     owner_status="BLOCKED",
                     next_step="ALIGN_DRAFT_SPENT_LOOKS_TO_PARENT",
                 )
+    if int(body["spent_main_looks"]) >= MAIN_LOOK_BUDGET:
+        return _owner_plan(
+            status="NOT_APPLICABLE",
+            reason_code="SPENT_BUDGET_EXHAUSTED",
+            writes=False,
+            disposition=body,
+            owner_status="BLOCKED",
+            next_step="STOP_LOOK_BUDGET_EXHAUSTED",
+        )
     if parent_session.get("selected_candidate_id") not in (None, ""):
         return _owner_plan(
             status="NOT_APPLICABLE",
@@ -697,50 +1128,68 @@ def _persist_repair_completion_forge_run(
     bundle = load_session_bundle(store, session_id, read_mode=True)
     if not isinstance(bundle, Mapping):
         return None
-    parent_run = _lookup_forge_run_for_parent(
-        store,
-        session_id=session_id,
-        scientific_slot_sha256=(
-            str(disposition.get("scientific_slot_sha256"))
-            if isinstance(disposition.get("scientific_slot_sha256"), str)
-            else None
-        ),
-    )
-    # Prefer the historical parent receipt (without repair marker) as identity source.
-    parent_identity = None
+    pinned = None
+    if _legacy_binding_from_mapping(disposition.get("evidence_mapping")) is not None:
+        pinned = _pinned_legacy_binding(disposition)
     parent_run_id = str(disposition.get("parent_run_id") or "")
-    for record in store.iter_committed_records():
-        kind = getattr(record.record_kind, "value", record.record_kind)
-        if kind != "RESEARCH_ARTIFACT":
-            continue
-        try:
-            wrapper = json.loads(record.payload_json)
-            body = json.loads(str(wrapper.get("payload_canonical") or ""))
-        except (TypeError, json.JSONDecodeError, AttributeError):
-            continue
-        if wrapper.get("artifact_kind") != "FORGE_RUN_RECEIPT" or not isinstance(body, dict):
-            continue
-        if body.get("repair_continuation_disposition_sha256"):
-            continue
-        if parent_run_id and str(body.get("run_id") or "") == parent_run_id:
-            parent_identity = body
-            break
-        if body.get("session_id") == session_id and body.get("run_identity_sha256"):
-            parent_identity = body
-    if parent_identity is None:
-        parent_identity = parent_run
-    if not isinstance(parent_identity, Mapping):
-        return None
-    run_identity = parent_identity.get("run_identity_sha256")
+    if pinned is not None:
+        source = pinned.get("source")
+        if not isinstance(source, Mapping):
+            raise RepairContinuationError("PARENT_BINDING_MISMATCH")
+        representation = str(source.get("representation_id") or "")
+        version = str(source.get("representation_semantic_version") or "")
+        parent_identity = {
+            "schema": "smial.forge-run-receipt",
+            "schema_version": "1.0",
+            "owner_focus": source.get("owner_focus"),
+            "owner_class": "OWNER_FINAL",
+            "market_evidence_epoch_sha256": source.get("market_evidence_epoch_sha256"),
+            "frozen_representation_ids": list(
+                source.get("executed_representation_ids") or []
+            ),
+            "frozen_representation_versions": [f"{representation}@{version}"],
+            "visible_cohort_ids": list(source.get("cohort_ids") or []),
+            "used_cohort_ids": list(source.get("cohort_ids") or []),
+            "legacy_parent_binding_sha256": pinned.get("binding_sha256"),
+            "parent_binding_provenance": LEGACY_PARENT_PROVENANCE,
+        }
+        run_identity = str(pinned.get("binding_sha256") or "")
+    else:
+        parent_run = _lookup_forge_run_for_parent(
+            store,
+            session_id=session_id,
+            scientific_slot_sha256=(
+                str(disposition.get("scientific_slot_sha256"))
+                if isinstance(disposition.get("scientific_slot_sha256"), str)
+                else None
+            ),
+        )
+        parent_identity = None
+        for body in _iter_forge_run_bodies(store):
+            if body.get("repair_continuation_disposition_sha256"):
+                continue
+            if (
+                parent_run_id
+                and str(body.get("run_id") or "") == parent_run_id
+                and str(body.get("session_id") or "") == session_id
+                and str(body.get("scientific_slot_sha256") or "")
+                == str(disposition.get("scientific_slot_sha256") or "")
+            ):
+                parent_identity = body
+                break
+        if parent_identity is None and isinstance(parent_run, Mapping):
+            if (
+                str(parent_run.get("session_id") or "") == session_id
+                and str(parent_run.get("scientific_slot_sha256") or "")
+                == str(disposition.get("scientific_slot_sha256") or "")
+            ):
+                parent_identity = parent_run
+        if not isinstance(parent_identity, Mapping):
+            return None
+        run_identity = parent_identity.get("run_identity_sha256")
     if not (isinstance(run_identity, str) and _HEX64.match(run_identity)):
         return None
-    # Idempotent: already have a repair receipt for this disposition.
-    existing_repair = _lookup_forge_run_for_parent(
-        store,
-        session_id=session_id,
-        scientific_slot_sha256=str(disposition.get("scientific_slot_sha256") or "")
-        or None,
-    )
+    existing_repair = read_repair_result_receipt(store, disposition)
     if (
         isinstance(existing_repair, Mapping)
         and existing_repair.get("repair_continuation_disposition_sha256")
@@ -760,8 +1209,19 @@ def _persist_repair_completion_forge_run(
         None,
     )
     stage = {
-        "representation_id": "BASE",
-        "representation_semantic_version": bundle.get("representation_semantic_version")
+        "representation_id": (
+            str(parent_identity.get("frozen_representation_ids")[0])
+            if isinstance(parent_identity.get("frozen_representation_ids"), list)
+            and parent_identity.get("frozen_representation_ids")
+            else "BASE"
+        ),
+        "representation_semantic_version": (
+            (pinned or {}).get("source", {}).get("representation_semantic_version")
+            if isinstance(pinned, Mapping)
+            and isinstance((pinned or {}).get("source"), Mapping)
+            else None
+        )
+        or bundle.get("representation_semantic_version")
         or "HFIC-V1.2",
         "session_id": session_id,
         "session_state": bundle.get("session_state"),
@@ -862,6 +1322,13 @@ def _persist_repair_completion_forge_run(
         created_at=now,
     )
     store.append([event], transaction_id=transaction_id)
+    if pinned is not None:
+        observed = read_repair_result_receipt(store, disposition)
+        if not isinstance(observed, Mapping):
+            raise RepairContinuationError("REPAIR_RESULT_UNREADABLE")
+        if observed.get("receipt_sha256") != digest:
+            raise RepairContinuationError("REPAIR_RESULT_UNREADABLE")
+        return observed
     return unsigned
 
 
@@ -962,6 +1429,7 @@ def build_repair_continuation_draft(
     spent_preview_looks: int | None = None,
     allowed_look_ids: Sequence[str] | None = None,
     example_exclusion_code: str | None = None,
+    evidence_mapping: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build a disposition draft from show-session fields. No store writes."""
 
@@ -1011,6 +1479,7 @@ def build_repair_continuation_draft(
         if isinstance(value, bool) or not isinstance(value, int) or value < 0:
             raise RepairContinuationError("SPENT_BUDGET_INVALID")
     looks = list(allowed_look_ids or parent_session.get("allowed_look_ids") or [])
+    mapping = dict(evidence_mapping or parent_session.get("evidence_mapping") or {})
     draft = {
         "schema": DISPOSITION_SCHEMA,
         "schema_version": DISPOSITION_SCHEMA_VERSION,
@@ -1029,6 +1498,7 @@ def build_repair_continuation_draft(
             owner_authorization_id, "OWNER_AUTHORIZATION_REQUIRED"
         ),
         "parent_terminal": "NO_WORTHY_HYPOTHESIS",
+        "evidence_mapping": mapping,
     }
     if example_exclusion_code:
         draft["example_exclusion_code"] = str(example_exclusion_code)
@@ -1317,6 +1787,12 @@ def close_repair_continuation(
             now=now or datetime.now(timezone.utc),
         )
         wrote = isinstance(repair_run, Mapping) and not already_linked
+        if _legacy_binding_from_mapping(target.get("evidence_mapping")) is not None:
+            readable = read_repair_result_receipt(store, target)
+            if not isinstance(readable, Mapping):
+                raise RepairContinuationError("REPAIR_RESULT_UNREADABLE")
+            repair_run = readable
+            wrote = not already_linked
         return {
             "status": "ALREADY_CLOSED",
             "applied": False,
@@ -1354,9 +1830,14 @@ def close_repair_continuation(
         git_sha=git_sha,
         now=moment,
     )
-    if repair_run is None:
-        # Fail closed only when a parent FORGE_RUN_RECEIPT identity exists to
-        # supersede; older parents without a durable forge-run still close.
+    if _legacy_binding_from_mapping(closed.get("evidence_mapping")) is not None:
+        if not isinstance(repair_run, Mapping) or not read_repair_result_receipt(
+            store, {**closed, "disposition_sha256": disposition_sha256}
+        ):
+            raise RepairContinuationError("REPAIR_RESULT_UNREADABLE")
+    elif repair_run is None:
+        # Receipt-backed parents with a run identity must leave a readable
+        # repair result. Older fixtures without that identity still close.
         parent_probe = _lookup_forge_run_for_parent(
             store,
             session_id=str(closed.get("parent_session_id") or ""),

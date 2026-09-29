@@ -85,7 +85,7 @@ awaiting critic / classification / runner-up fails with
 | `scientific_slot_sha256` | `scientific_slot_sha256` |
 | `terminal_receipt_sha256` | `terminal_receipt_sha256` (= `session_receipt_sha256`) |
 | `journal_scope` | `journal_scope` (= `search_key_sha256`) |
-| `parent_run_id` | resolved from store `FORGE_RUN_RECEIPT` for session/slot |
+| `parent_run_id` | exact aggregate `FORGE_RUN_RECEIPT` `run_id` when session and slot both match; if that aggregate is absent, draft derives `LEGACY-PARENT-` + binding prefix (`provenance=ESTABLISHED_NOW`). Do not pass a guessed `--parent-run-id` |
 | `spent_*_looks` | discovery journal under `journal_scope` (MAIN/ADAPTIVE/PREVIEW) |
 | `owner_authorization_id` | owner-supplied authority token |
 | `technical_gap_code` | owner-supplied gap id (e.g. `PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP`) |
@@ -111,16 +111,25 @@ revision pause must not close either — CLI returns
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <store> repair-continuation-draft --parent-session-id <HFIC-SESS-...> --owner-authorization-id <OWNER-AUTH-...> --technical-gap-code <GAP> --output <draft.json>
 ```
 
-Spent looks default from the discovery journal. Optional overrides:
+Spent looks default from the discovery journal. Omit `--parent-run-id`
+unless it is the exact stored aggregate `run_id`. Optional alignment flags:
 `--spent-main-looks`, `--spent-adaptive-looks`, `--spent-preview-looks`,
-`--parent-run-id`, `--terminal-receipt-sha256`, `--journal-scope`.
+`--terminal-receipt-sha256`, `--journal-scope`.
 
-Draft JSON fields (exact): `parent_run_id`, `parent_session_id`,
+Draft JSON fields: `parent_run_id`, `parent_session_id`,
 `scientific_slot_sha256`, `terminal_receipt_sha256`, `journal_scope`,
 `technical_gap_code`, `repair_capability_id`
 (`CAP-HFIC-TEMPORAL-OPERABILITY-REPAIR-001`), `allowed_look_ids`,
 `spent_main_looks`, `spent_adaptive_looks`, `spent_preview_looks`,
-`owner_authorization_id`, `parent_terminal=NO_WORTHY_HYPOTHESIS`.
+`owner_authorization_id`, `parent_terminal=NO_WORTHY_HYPOTHESIS`,
+and `evidence_mapping.legacy_parent_binding` when the aggregate receipt is
+absent (`provenance=ESTABLISHED_NOW`). CLI also prints `parent_proof_mode`.
+`READY` on the draft is not apply authority. After apply, production
+preflight of the same focus returns `RESUME_REPAIR_CONTINUATION` for that
+single `AUTHORIZED` parent when the current corpus cannot form a market
+epoch and there is no current evidence surface. It does not start a new
+session. Several matches, or a current surface that is still not an
+admissible market, stay `STOP` / `MARKET_EVIDENCE_BASIS_INCOMPLETE`.
 
 ### 2) No-write plan
 
@@ -161,7 +170,13 @@ rewriting the historical exhausted parent receipt. After close (and after store
 reopen), ordinary `forge-run --no-write` must show the **repair** terminal —
 e.g. `KILL_*` → `NON_SCIENTIFIC_STOP`, PASS/CASE_A → `OWNER_CANDIDATE`, repair
 `NO_WORTHY` → `SEARCH_EXHAUSTED_CURRENT_EVIDENCE` — not the parent
-`SEARCH_EXHAUSTED` and not `SCIENTIFIC_IDENTITY_CONFLICT`. Close JSON carries
+`SEARCH_EXHAUSTED` and not `SCIENTIFIC_IDENTITY_CONFLICT`. That readback
+still holds when the current corpus cannot hash a market epoch and there is
+no current evidence surface, if exactly one completed repair receipt matches
+the focus, and only after that disposition is `CLOSED`. A result receipt
+written before the `CLOSED` append is not the finished continuation.
+A present incomplete surface, or several receipts, stays blocked.
+Close JSON carries
 `forge_run_receipt_sha256` when persist succeeds. `ALREADY_CLOSED` crash
 recovery may still append a missing repair receipt; trust
 `forge_run_receipt_sha256` / subsequent `--no-write` readback, and `writes=true`
@@ -185,7 +200,13 @@ Draft/apply failures also print JSON on stdout with `owner_status=BLOCKED`
 |---|---|
 | `PARENT_SESSION_MISSING` | `PROVIDE_PARENT_SESSION_ID_FROM_SHOW_SESSION` |
 | `PARENT_RUN_REQUIRED` | `PROVIDE_PARENT_RUN_ID_OR_ENSURE_FORGE_RUN_RECEIPT` |
-| `PARENT_RUN_MISMATCH` / `PARENT_RUN_UNPROVEN` | `ALIGN_DRAFT_PARENT_RUN_ID` / `BIND_PARENT_RUN_FROM_STORE` (omit CLI run id and re-draft from store) |
+| `PARENT_RUN_MISMATCH` / `PARENT_RUN_UNPROVEN` | `ALIGN_DRAFT_PARENT_RUN_ID` / `OMIT_CALLER_RUN_ID_AND_USE_DERIVED_BINDING` — a caller `--parent-run-id` is not proof; omit it and re-draft |
+| `PARENT_RECEIPT_CONFLICT` | `INSPECT_CONTRADICTING_FORGE_RUN_RECEIPT` — a partial or damaged aggregate blocks fallback |
+| `PARENT_BINDING_MISMATCH` | `ALIGN_DRAFT_LEGACY_PARENT_BINDING` |
+| `CORPUS_BINDING_UNPROVEN` / `CORPUS_BINDING_CONFLICT` | `RESTORE_JOURNAL_CORPUS_BINDING` / `RESOLVE_JOURNAL_CORPUS_BINDING` |
+| `REPRESENTATION_SCOPE_UNPROVEN` / `SLOT_IDENTITY_UNPROVEN` / `FOCUS_IDENTITY_UNPROVEN` / `MARKET_IDENTITY_UNPROVEN` | restore the durable admission/session hashes; do not guess provenance |
+| `SPENT_BUDGET_EXHAUSTED` | `STOP_LOOK_BUDGET_EXHAUSTED` |
+| `REPAIR_RESULT_UNREADABLE` | close-path, not a draft failure: `RETRY_CLOSE_UNTIL_REPAIR_RESULT_IS_READABLE` — authorization stays open |
 | `PARENT_TERMINAL_RECEIPT_MISSING` | `PROVIDE_TERMINAL_RECEIPT_FROM_SHOW_SESSION` |
 | `TERMINAL_RECEIPT_REQUIRED` | `ENSURE_SESSION_RECEIPT_SHA256_ON_SHOW_SESSION` |
 | `SPENT_BUDGET_INVALID` | `PASS_SPENT_LOOKS_OR_ENSURE_DISCOVERY_JOURNAL` |
@@ -198,6 +219,27 @@ Draft/apply failures also print JSON on stdout with `owner_status=BLOCKED`
 Ordinary temporal discovery after a READY/DONE continuation uses the same
 `/hypothesis-forge` discovery path and inherited look counts. Do not open a
 new session to refresh quota.
+
+## Legacy parent without an aggregate receipt
+
+A completed `NO_WORTHY` session can lack a stored `FORGE_RUN_RECEIPT`. Draft
+then derives `evidence_mapping.legacy_parent_binding` with
+`provenance=ESTABLISHED_NOW` and `aggregate_receipt=ABSENT`. `parent_run_id`
+is `LEGACY-PARENT-` plus the binding digest prefix. That id is not a
+historical `FORGE-RUN-*` and is not accepted from `--parent-run-id` unless it
+equals the derivation.
+
+The binding uses the session receipt, journal scope, slot, market epoch,
+journal corpus hash, and the single representation on the slot admission.
+It does not mark the current ACTIVE ladder as already executed and does not
+fill missing model or execution provenance. A contradicting or only partially
+matching aggregate receipt is `PARENT_RECEIPT_CONFLICT`; fallback does not
+override it.
+
+Plan, apply, and close use that same check. Close writes a repair result
+receipt whose `run_identity_sha256` is the pinned binding digest, reads it
+back, then appends `CLOSED`. `CLOSED`/`DONE` without that readable result is
+refused and the authorization stays open. Retry is idempotent.
 
 ## Compatibility
 

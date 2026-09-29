@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-LEGACY-PARENT-CONTINUATION-COMPAT-FACTORY-FIT-001",
+  "as_of": "2026-09-29",
+  "task_id": "FORGE_LEGACY_PARENT_CONTINUATION_COMPAT_V1",
+  "reviewed_bindings_sha256": "1f9d3ac19a053e5d41491a00ac6e261ab0ed845db061cafa0c96629ec4946af6",
+  "reviewed_inventory_sha256": "b26a509dcd4f7d1bac7923770a8828fb7ea8199b1e84b57e0508b2ec028cb0b0",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_LEGACY_PARENT_CONTINUATION_WITHOUT_INVENTED_RECEIPT",
+    "flexibility_and_history": "PASS_OLD_DISPOSITIONS_AND_PARTIAL_AGGREGATES_FAIL_CLOSED",
+    "context_efficiency": "PASS_EXISTING_REPAIR_DISPOSITION_AND_FORGE_CLI",
+    "research_truth": "PASS_ESTABLISHED_NOW_BINDING_NOT_HISTORICAL_RUN",
+    "owner_operability": "PASS_READY_IS_NOT_APPLY_AND_CLOSE_REQUIRES_READABLE_RESULT",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_MARKET_EXECUTION",
+    "monitoring_and_recovery": "PASS_IDEMPOTENT_CLOSE_RETRY_WITHOUT_NEW_LOOK",
+    "build_vs_buy": "PASS_NO_SECOND_RUNTIME",
+    "red_team": "PASS_CALLER_RUN_ID_AND_PARTIAL_RECEIPT_NEGATIVES",
+    "security": "PASS_NO_PROVIDER_NO_LIVE_WRITE"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "POST_MERGE_OWNER_APPLY_OF_SAVED_PLAN"
+  },
+  "recovery": "Revert this change. Existing dispositions and historical session bytes stay readable. A code rollback does not consume the live authorization because apply was not run.",
+  "limits": [
+    "NO_MARKET_FORGE",
+    "NO_LIVE_APPLY",
+    "NO_NET_RETURN",
+    "NO_ALPHA",
+    "NO_INVENTED_HISTORICAL_FORGE_RUN_RECEIPT",
+    "NO_MERGE"
+  ]
+}

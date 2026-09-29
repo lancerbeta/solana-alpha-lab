@@ -167,7 +167,18 @@ _REPAIR_OWNER_NEXT = {
     "PARENT_SESSION_MISMATCH": "ALIGN_DRAFT_PARENT_SESSION_ID",
     "PARENT_RUN_REQUIRED": "PROVIDE_PARENT_RUN_ID_OR_ENSURE_FORGE_RUN_RECEIPT",
     "PARENT_RUN_MISMATCH": "ALIGN_DRAFT_PARENT_RUN_ID",
-    "PARENT_RUN_UNPROVEN": "BIND_PARENT_RUN_FROM_STORE",
+    "PARENT_RUN_UNPROVEN": "OMIT_CALLER_RUN_ID_AND_USE_DERIVED_BINDING",
+    "PARENT_RECEIPT_CONFLICT": "INSPECT_CONTRADICTING_FORGE_RUN_RECEIPT",
+    "PARENT_BINDING_MISMATCH": "ALIGN_DRAFT_LEGACY_PARENT_BINDING",
+    "PARENT_AGGREGATE_PRESENT": "USE_STORED_FORGE_RUN_RECEIPT",
+    "CORPUS_BINDING_UNPROVEN": "RESTORE_JOURNAL_CORPUS_BINDING",
+    "CORPUS_BINDING_CONFLICT": "RESOLVE_JOURNAL_CORPUS_BINDING",
+    "REPRESENTATION_SCOPE_UNPROVEN": "RESTORE_SLOT_ADMISSION_REPRESENTATION",
+    "SLOT_IDENTITY_UNPROVEN": "RESTORE_SLOT_ADMISSION_IDENTITY",
+    "FOCUS_IDENTITY_UNPROVEN": "RESTORE_SLOT_ADMISSION_FOCUS",
+    "MARKET_IDENTITY_UNPROVEN": "RESTORE_MARKET_EPOCH_BINDING",
+    "SPENT_BUDGET_EXHAUSTED": "STOP_LOOK_BUDGET_EXHAUSTED",
+    "REPAIR_RESULT_UNREADABLE": "RETRY_CLOSE_UNTIL_REPAIR_RESULT_IS_READABLE",
     "PARENT_TERMINAL_RECEIPT_MISSING": "PROVIDE_TERMINAL_RECEIPT_FROM_SHOW_SESSION",
     "PARENT_TERMINAL_NOT_ELIGIBLE": "STOP_SCIENTIFIC_CLOSE_STANDS",
     "PARENT_HAS_SELECTED_CANDIDATE": "STOP_SELECTED_CANDIDATE_NOT_REPAIRABLE_HERE",
@@ -1694,6 +1705,7 @@ def cmd_repair_continuation_draft(
     from solana_alpha_lab.factory.hfic_repair_continuation import (
         build_repair_continuation_draft,
         enrich_parent_for_repair_draft,
+        resolve_repair_parent_proof,
     )
 
     data_root = _store_root(repo_root, explicit_data_root)
@@ -1703,16 +1715,23 @@ def cmd_repair_continuation_draft(
     except HficSessionError as exc:
         raise RepairContinuationError("PARENT_SESSION_MISSING") from exc
     parent = enrich_parent_for_repair_draft(store, parent)
+    proof = resolve_repair_parent_proof(
+        store,
+        parent,
+        claimed_run_id=parent_run_id,
+    )
+    mapping = dict(proof.get("evidence_mapping") or {})
     draft = build_repair_continuation_draft(
         parent,
         owner_authorization_id=owner_authorization_id,
         technical_gap_code=technical_gap_code,
-        parent_run_id=parent_run_id,
+        parent_run_id=str(proof["parent_run_id"]),
         terminal_receipt_sha256=terminal_receipt_sha256,
         journal_scope=journal_scope,
         spent_main_looks=spent_main_looks,
         spent_adaptive_looks=spent_adaptive_looks,
         spent_preview_looks=spent_preview_looks,
+        evidence_mapping=mapping or None,
     )
     if output_path is not None:
         output_path.write_text(
@@ -1722,6 +1741,7 @@ def cmd_repair_continuation_draft(
     payload = {
         "command": "repair-continuation-draft",
         "writes": False,
+        "parent_proof_mode": proof.get("mode"),
         "owner_status": "READY",
         "next_step": "REPAIR_CONTINUATION_PLAN_WITH_DRAFT",
         "draft": draft,

@@ -2202,6 +2202,90 @@ def _lookup_run_artifact_for_session(
     return repair_completed or completed or latest
 
 
+def _input_has_current_surface(input_receipt: Mapping[str, Any]) -> bool:
+    """True when forge input already names a current corpus surface.
+
+    Matches preflight: a manifest id, a non-empty visible cohort list, live
+    corpus, or a packet that still contains live corpus. An empty cohort list
+    is not a surface.
+    """
+
+    active = input_receipt.get("active_evidence_set")
+    packet = input_receipt.get("packet")
+    named = isinstance(active, Mapping) and bool(
+        active.get("current_dataset_manifest_id") or active.get("visible_cohort_ids")
+    )
+    live = bool(input_receipt.get("live_corpus"))
+    in_packet = isinstance(packet, Mapping) and bool(packet.get("live_corpus_in_packet"))
+    return named or live or in_packet
+
+
+def _unique_completed_repair_receipt(
+    store: ResearchStore, owner_focus: str
+) -> dict[str, Any] | None:
+    """One CLOSED repair-marked receipt for this focus, or none.
+
+    Ordinary forge-run can miss the pinned binding when the current corpus
+    cannot hash a market epoch. A single sealed repair result is the owner
+    answer only after the disposition itself is CLOSED. A receipt written
+    before that append is not a finished continuation. Several matches are
+    not guessed.
+    """
+
+    from solana_alpha_lab.factory.hfic_repair_continuation import (
+        list_repair_continuation_dispositions,
+    )
+    from solana_alpha_lab.factory.hfic_session import focus_key_sha256
+
+    expected = focus_key_sha256(owner_focus if str(owner_focus).strip() else "AUTO")
+    # CLOSED dominates AUTHORIZED. A result receipt written before that
+    # append is not a finished continuation.
+    closed_markers = {
+        str(item.get("disposition_sha256") or "")
+        for item in list_repair_continuation_dispositions(store)
+        if str(item.get("status") or "") == "CLOSED"
+    }
+    hits: dict[str, dict[str, Any]] = {}
+    for record in store.iter_committed_records():
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if kind != RecordKind.RESEARCH_ARTIFACT.value:
+            continue
+        payload = json.loads(record.payload_json)
+        if payload.get("artifact_kind") != FORGE_RUN_ARTIFACT_KIND:
+            continue
+        raw = payload.get("payload_canonical")
+        if not isinstance(raw, str):
+            continue
+        body = json.loads(raw)
+        if not isinstance(body, dict):
+            continue
+        marker = body.get("repair_continuation_disposition_sha256")
+        if not isinstance(marker, str) or len(marker) != 64:
+            continue
+        if marker not in closed_markers:
+            continue
+        if body.get("owner_final") not in {
+            ACTION_OWNER_CANDIDATE,
+            ACTION_SEARCH_EXHAUSTED,
+            ACTION_NON_SCIENTIFIC_STOP,
+        }:
+            continue
+        identity = body.get("run_identity_sha256")
+        if not isinstance(identity, str) or len(identity) != 64:
+            continue
+        if focus_key_sha256(str(body.get("owner_focus") or "")) != expected:
+            continue
+        previous = hits.get(marker)
+        if previous is not None and previous.get("receipt_sha256") != body.get(
+            "receipt_sha256"
+        ):
+            return None
+        hits[marker] = body
+    if len(hits) != 1:
+        return None
+    return next(iter(hits.values()))
+
+
 def _persist_run_receipt(
     store: ResearchStore,
     receipt: Mapping[str, Any],
@@ -2856,8 +2940,15 @@ def evaluate_forge_run(
             try:
                 market_epoch = _hash_market_basis(basis)
             except EvidenceIdentityError as exc:
-                raise LadderError(str(exc)) from exc
+                if str(exc) != "MARKET_EVIDENCE_BASIS_INCOMPLETE":
+                    raise LadderError(str(exc)) from exc
+                market_epoch = None
         if not isinstance(market_epoch, str) or len(market_epoch) != 64:
+            sealed = _unique_completed_repair_receipt(store, owner_focus)
+            # Same gate as preflight: a present incomplete surface is not
+            # answered by a sealed repair from another market context.
+            if sealed is not None and not _input_has_current_surface(input_receipt):
+                return _readback_existing_run(sealed)
             raise LadderError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
     frozen_representation_versions = [
         f"{item}@{representation_semantic_version(registry_doc, item)}"
@@ -2916,6 +3007,25 @@ def evaluate_forge_run(
                         run_identity = bound_identity
     except ResearchStoreError:
         existing = None
+    if existing is None:
+        sealed = _unique_completed_repair_receipt(store, owner_focus)
+        if isinstance(sealed, dict):
+            expected_slot = scientific_slot_sha256(
+                market_evidence_epoch_sha256=str(market_epoch),
+                representation_id="BASE",
+                representation_semantic_version=representation_semantic_version(
+                    registry_doc, "BASE"
+                ),
+                owner_focus=owner_focus,
+            )
+            if (
+                sealed.get("market_evidence_epoch_sha256") == str(market_epoch)
+                and sealed.get("scientific_slot_sha256") == expected_slot
+            ):
+                existing = sealed
+                bound_identity = sealed.get("run_identity_sha256")
+                if isinstance(bound_identity, str) and len(bound_identity) == 64:
+                    run_identity = bound_identity
     existing_owner_final = bool(
         existing is not None
         and existing.get("owner_final")

@@ -705,7 +705,11 @@ def bind_preflight_receipt(
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
 
     action = receipt.get("action")
-    if action not in {"START_NEW_SESSION", "RESUME_EXISTING_SESSION"}:
+    if action not in {
+        "START_NEW_SESSION",
+        "RESUME_EXISTING_SESSION",
+        "RESUME_REPAIR_CONTINUATION",
+    }:
         raise HficSessionError("PREFLIGHT_ACTION_INVALID")
     if receipt.get("prompt_version") != PROMPT_VERSION:
         raise HficSessionError("PREFLIGHT_PROMPT_VERSION_INVALID")
@@ -716,6 +720,9 @@ def bind_preflight_receipt(
             raise HficSessionError("PREFLIGHT_ACTION_INVALID")
         if receipt.get("generated_draft_sha256") != draft_sha:
             raise HficSessionError("GENERATED_DRAFT_CONFLICT")
+    elif action == "RESUME_REPAIR_CONTINUATION":
+        if not str(receipt.get("session_id") or ""):
+            raise HficSessionError("PREFLIGHT_ACTION_INVALID")
     observed_hash = receipt.get("preflight_receipt_sha256")
     expected_hash = canonical_preflight_receipt_sha256(receipt)
     if observed_hash != expected_hash:
@@ -2346,7 +2353,12 @@ def freeze_draft(
             ladder_representation_id=slot_rep,
             control_session_id=slot_parent,
         )
-        if existing is not None:
+        if existing is not None and (
+            not isinstance(preflight_receipt, Mapping)
+            or preflight_receipt.get("action") != "RESUME_REPAIR_CONTINUATION"
+        ):
+            # A completed parent is the readback for an ordinary re-freeze.
+            # An authorized repair preflight is a new terminal on that session.
             return existing
         persist_frozen_session(
             store,
