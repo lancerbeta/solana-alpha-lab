@@ -28,6 +28,6 @@
   "limits": [
     "Claude, Kimi and GLM clients were not launched",
     "Portable seed still has the legacy two-direct-route shape",
-    "New route grants apply only after this policy is on the default branch"
+    "Legacy policy fixture is the frozen base a372f81376a7d77fe2500201739a46a736f2d986, not live origin/main"
   ]
 }

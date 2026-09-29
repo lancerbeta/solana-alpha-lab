@@ -72,7 +72,8 @@
     "NO_SELF_AUTHORIZATION",
     "NO_PRODUCT_ACCEPTANCE",
     "NO_ALPHA",
-    "NO_REAL_MONEY"
+    "NO_REAL_MONEY",
+    "LEGACY_FIXTURE_IS_FROZEN_BASE"
   ],
   "side_effects": {
     "repository_commits": true,
