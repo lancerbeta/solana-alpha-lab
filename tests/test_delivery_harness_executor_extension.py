@@ -149,9 +149,15 @@ class ExecutorExtensionTests(unittest.TestCase):
         cls.harness = load_module(HARNESS_SCRIPT, "executor_extension_harness")
         cls.policy = json.loads(POLICY_PATH.read_text(encoding="utf-8"))
         cls.schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+        # Frozen pre-acceptance base. Live origin/main contains the new
+        # routes after this policy lands, so it is not a legacy fixture.
         cls.old_policy = json.loads(
             subprocess.run(
-                ["git", "show", "origin/main:control/owner_attention_gate_v2.yaml"],
+                [
+                    "git",
+                    "show",
+                    "a372f81376a7d77fe2500201739a46a736f2d986:control/owner_attention_gate_v2.yaml",
+                ],
                 cwd=ROOT,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
