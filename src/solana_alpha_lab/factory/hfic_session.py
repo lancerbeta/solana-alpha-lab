@@ -2873,6 +2873,29 @@ def persist_no_worthy_session(
             repo_root=repo_root,
             representation_registry=representation_registry,
         )
+    if (
+        isinstance(existing, Mapping)
+        and isinstance(repair_admission, Mapping)
+        and repair_admission.get("action") == "RESUME_REPAIR_CONTINUATION"
+    ):
+        from solana_alpha_lab.factory.hfic_repair_continuation import (
+            _disposition_bound_repair_completion,
+        )
+
+        disp = str(repair_admission.get("repair_continuation_disposition_sha256") or "")
+        target = _repair_disposition_for_session(store, existing)
+        if (
+            target is not None
+            and target.get("disposition_sha256") == disp
+            and _disposition_bound_repair_completion(existing, target) is not None
+        ):
+            # Same transaction and record ids must not be appended again with
+            # a higher cycle sequence. The stored repair terminal is the retry.
+            _assert_repair_retry_evidence(existing, draft)
+            stored_action = existing.get("next_action")
+            if isinstance(stored_action, Mapping):
+                return dict(stored_action)
+            return {"action_type": str(existing.get("next") or "STOP")}
     # Admission is the first lifecycle boundary: legacy combined-only input
     # must receive SCIENTIFIC_ADMISSION_REQUIRED before any current-protocol
     # provenance diagnosis.  Once the split slot is admissible, recheck the
@@ -3089,6 +3112,22 @@ def persist_no_worthy_session(
                         "parent_cycle_seq": int(existing.get("hfic_cycle_seq") or 0)
                         if isinstance(existing, Mapping)
                         else 0,
+                        **(
+                            {
+                                "grounded_result_sha256": (
+                                    draft.get("grounded_evidence") or {}
+                                ).get("result_sha256"),
+                                "grounded_result_refs": list(
+                                    (draft.get("grounded_evidence") or {}).get(
+                                        "result_refs"
+                                    )
+                                    or []
+                                ),
+                            }
+                            if isinstance(draft, Mapping)
+                            and isinstance(draft.get("grounded_evidence"), Mapping)
+                            else {}
+                        ),
                     }
                     if isinstance(repair_disposition, str) and repair_disposition
                     else {}
@@ -5180,6 +5219,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                 "repair_continuation_disposition_sha256": payload.get(
                     "repair_continuation_disposition_sha256"
                 ),
+                "session_receipt_sha256": payload.get("session_receipt_sha256"),
                 "parent_cycle_seq": payload.get("parent_cycle_seq"),
             }
         cycle_row["_identity_fields_present"] = {
@@ -5387,8 +5427,77 @@ def _is_ladder_challenger_preflight(preflight: Mapping[str, Any] | None) -> bool
     return representation in _LADDER_REPRESENTATION_IDS and bool(parent)
 
 
+def _repair_disposition_for_session(
+    store: Any,
+    session: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """One store disposition for this session and slot. Several matches are not guessed."""
+
+    from solana_alpha_lab.factory.hfic_repair_continuation import (
+        list_repair_continuation_dispositions,
+    )
+
+    session_id = str(session.get("session_id") or "")
+    slot = session.get("scientific_slot_sha256")
+    if not session_id:
+        return None
+    matches = []
+    for item in list_repair_continuation_dispositions(store):
+        if not isinstance(item, Mapping):
+            continue
+        if str(item.get("parent_session_id") or "") != session_id:
+            continue
+        if isinstance(slot, str) and item.get("scientific_slot_sha256") != slot:
+            continue
+        if item.get("status") not in {"AUTHORIZED", "CLOSED"}:
+            continue
+        matches.append(dict(item))
+    if len(matches) != 1:
+        return None
+    return matches[0]
+
+
+def _selected_draft_cannot_inherit_repair(
+    bundle: Mapping[str, Any],
+    draft: Mapping[str, Any] | None,
+) -> bool:
+    """A selected draft does not inherit a no-worthy repair terminal."""
+
+    if not isinstance(draft, Mapping):
+        return False
+    if not str(draft.get("selected_candidate_ref") or "").strip():
+        return False
+    return not str(bundle.get("selected_candidate_id") or "").strip()
+
+
+def _assert_repair_retry_evidence(
+    bundle: Mapping[str, Any],
+    draft: Mapping[str, Any] | None,
+) -> None:
+    """A repeated repair freeze must name the stored result, not a different look."""
+
+    if not isinstance(draft, Mapping):
+        return
+    evidence = draft.get("grounded_evidence")
+    stored_sha = bundle.get("grounded_result_sha256")
+    stored_refs = bundle.get("grounded_result_refs")
+    if not isinstance(evidence, Mapping):
+        if isinstance(stored_sha, str) and stored_sha:
+            raise HficSessionError("GROUNDED_RESULT_MISMATCH")
+        return
+    observed_sha = evidence.get("result_sha256")
+    if not isinstance(stored_sha, str) or stored_sha != observed_sha:
+        raise HficSessionError("GROUNDED_RESULT_MISMATCH")
+    if isinstance(stored_refs, list) and list(evidence.get("result_refs") or []) != list(
+        stored_refs
+    ):
+        raise HficSessionError("GROUNDED_RESULT_MISMATCH")
+
+
 def _lookup_existing_freeze_session(
-    store: Any, preflight_receipt: Mapping[str, Any]
+    store: Any,
+    preflight_receipt: Mapping[str, Any],
+    draft: Mapping[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     epoch_hint = str(preflight_receipt.get("evidence_epoch_sha256") or "")
     focus_hint = str(preflight_receipt.get("focus_key_sha256") or "")
@@ -5426,12 +5535,21 @@ def _lookup_existing_freeze_session(
         **lookup_args,
         execution_context=execution_context or None,
     )
-    if existing is not None or not execution_context:
+    if existing is not None:
+        # A stamped repair result must match this draft. The parent cycle has
+        # no grounded hash, so the first repair freeze — including a selected
+        # candidate — still proceeds.
+        if isinstance(existing.get("grounded_result_sha256"), str) and existing.get(
+            "grounded_result_sha256"
+        ):
+            if _selected_draft_cannot_inherit_repair(existing, draft):
+                raise HficSessionError(
+                    "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
+                )
+            _assert_repair_retry_evidence(existing, draft)
         return existing
-    # The slot identity is occupied but the stored execution context is not
-    # compatible with this freeze input.  Re-run the lookup without the
-    # current binding only to distinguish that typed STOP from an available
-    # slot; never let the caller create a second lifecycle row in its place.
+    # Occupied historical rows stay occupied even when the caller has no
+    # execution stamp. Returning None here used to look like a free slot.
     historical = find_session_by_epoch_focus(
         store,
         epoch_hint,
@@ -5444,7 +5562,32 @@ def _lookup_existing_freeze_session(
             "ignore_evidence_surface_mode": True,
         },
     )
-    if historical is not None:
+    if historical is None:
+        return None
+    # Capability/model drift against a legacy parent is not a second session.
+    # Only a store disposition for this session and slot may continue, and an
+    # already bound repair terminal is that saved result — not the parent
+    # NO_WORTHY that predates the grant. A selected draft does not inherit a
+    # no-worthy grant. Market identity is unchanged here: the historical row
+    # was found on the same evidence epoch.
+    disposition = _repair_disposition_for_session(store, historical)
+    if disposition is None:
+        raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING")
+    from solana_alpha_lab.factory.hfic_repair_continuation import (
+        _disposition_bound_repair_completion,
+    )
+
+    bundle = load_session_bundle(store, str(historical.get("session_id") or ""))
+    if not isinstance(bundle, Mapping):
+        raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING")
+    if _disposition_bound_repair_completion(bundle, disposition) is not None:
+        if _selected_draft_cannot_inherit_repair(bundle, draft):
+            raise HficSessionError(
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
+            )
+        _assert_repair_retry_evidence(bundle, draft)
+        return bundle
+    if str(disposition.get("status") or "") != "AUTHORIZED":
         raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING")
     return None
 
@@ -5591,7 +5734,47 @@ def _bind_store_freeze_preflight(
             require_current_market_identity=True,
         )
 
-    existing = _lookup_existing_freeze_session(store, preflight_receipt)
+    existing = _lookup_existing_freeze_session(
+        store, preflight_receipt, draft
+    )
+    if (
+        existing is not None
+        and isinstance(existing.get("repair_continuation_disposition_sha256"), str)
+        and existing.get("repair_continuation_disposition_sha256")
+        and not _is_ladder_challenger_preflight(preflight_receipt)
+    ):
+        # AUTHORIZED retry and CLOSED readback both return the stored terminal.
+        # Neither may skip preflight integrity, draft/context binding, or the
+        # caller's current-market check. Store digest lags the first freeze
+        # write, so it is not the currency proof. A failed check writes nothing.
+        # CLOSED is not a new execution: the grant stays closed.
+        disposition = _repair_disposition_for_session(store, existing)
+        if disposition is None or str(disposition.get("status") or "") not in {
+            "AUTHORIZED",
+            "CLOSED",
+        }:
+            raise HficSessionError(
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
+            )
+        bound = bind_preflight_receipt(
+            preflight_receipt,
+            draft,
+            store=store,
+            repo_root=repo_root,
+            require_current_store_digest=False,
+            require_current_market_identity=verify_current_market_identity,
+        )
+        if bound["research_memory_as_of"] != memory_as_of:
+            raise HficSessionError("RESEARCH_MEMORY_AS_OF_MISMATCH")
+        _validate_draft_forge_context_binding(draft, preflight_receipt, bound)
+        readback = dict(existing)
+        if verify_current_market_identity:
+            readback["current_market_identity"] = "VERIFIED"
+        else:
+            # Historical bytes are not a current-market confirmation.
+            readback["current_market_identity"] = "NOT_VERIFIED"
+        readback["repair_readback_status"] = str(disposition.get("status"))
+        return preflight_receipt, readback, None
     if existing is not None and _is_ladder_challenger_preflight(preflight_receipt):
         return preflight_receipt, existing, None
     if _is_ladder_challenger_preflight(preflight_receipt):
@@ -8142,6 +8325,10 @@ def load_session_bundle(
         "repair_continuation_disposition_sha256": cycle.get(
             "repair_continuation_disposition_sha256"
         ),
+        "grounded_result_sha256": cycle.get("grounded_result_sha256"),
+        "grounded_result_refs": list(cycle.get("grounded_result_refs") or [])
+        if isinstance(cycle.get("grounded_result_refs"), list)
+        else None,
         "parent_cycle_seq": cycle.get("parent_cycle_seq"),
         "critic_result": critic_result,
         "critic_result_sha256": critic_result_sha,
@@ -8419,6 +8606,8 @@ def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[
         "repair_continuation_disposition_sha256": bundle.get(
             "repair_continuation_disposition_sha256"
         ),
+        "grounded_result_sha256": bundle.get("grounded_result_sha256"),
+        "grounded_result_refs": bundle.get("grounded_result_refs"),
         "owner_readout": _classification_owner_readout(bundle),
         "decision_event_ids": bundle.get("decision_event_ids") or [],
         "next": bundle.get("next") or "STOP",

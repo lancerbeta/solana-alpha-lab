@@ -250,6 +250,23 @@ refused and the authorization stays open. Retry is idempotent.
 - Unknown disposition / policy must stop explainably; it must not silently
   return the old DONE as a free new search.
 
+A legacy parent may have no `capability_epoch_sha256`. That execution drift
+does not by itself block `freeze` when the store has exactly one `AUTHORIZED`
+disposition for the same session and scientific slot and the market epoch is
+unchanged. `preflight.action=RESUME_REPAIR_CONTINUATION` is not the authority;
+the disposition record is. A selected-candidate draft does not inherit that
+grant. After the repair terminal is stored, repeating `freeze` returns that
+terminal and writes nothing only after the preflight still binds the draft
+and, on a production freeze, the current market epoch still matches.
+`current_market_identity=NOT_VERIFIED` means that check was not requested;
+it is not a current-market confirmation. A no-write replay includes
+`repair_readback_status` of `AUTHORIZED` or `CLOSED`; the first freeze does
+not. That field is not a new scientific result. A different `grounded_evidence.result_sha256`
+or `result_refs` is `GROUNDED_RESULT_MISMATCH`. The parent `NO_WORTHY`
+receipt is not that terminal. After `CLOSED`, ordinary preflight is
+`RETURN_EXISTING_SESSION` for that session, and `forge-run --no-write` reads
+the repair receipt rather than opening another trial.
+
 ## Live parent (post-merge, separate authority)
 
 1. No-write `repair-continuation-draft` then `repair-continuation-plan` against

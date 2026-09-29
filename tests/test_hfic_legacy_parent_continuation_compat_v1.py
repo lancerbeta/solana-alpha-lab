@@ -34,6 +34,8 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (
     evaluate_forge_run,
 )
 from solana_alpha_lab.factory.hfic_session import (
+    HficSessionError,
+    _lookup_existing_freeze_session,
     apply_classification,
     finalize_session,
     freeze_draft,
@@ -604,6 +606,216 @@ class LegacyParentContinuationCompatTests(TestCase):
             self.assertEqual(len(_mains(store, opened["journal"])), before_looks)
             self.assertEqual(_forge_run_count(store), 1)
 
+    def test_capability_drift_freeze_is_store_disposition_not_parent_terminal(self) -> None:
+        import tempfile
+
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            _closed_repair_readback,
+        )
+        from solana_alpha_lab.factory.hfic_repair_continuation import (
+            list_repair_continuation_dispositions,
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            opened = self._open_parent(data_root)
+            store = opened["store"]
+            drifted = {
+                **opened["receipt"],
+                "capability_epoch_sha256": "ab" * 32,
+                "action": "RESUME_REPAIR_CONTINUATION",
+            }
+            with self.assertRaises(HficSessionError) as blocked:
+                _lookup_existing_freeze_session(store, drifted, draft={"candidates": []})
+            self.assertEqual(
+                blocked.exception.code,
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            )
+            drafted = self._draft_via_cli(data_root, opened["shown"]["session_id"])
+            applied = self._cli_json(
+                CLI.cmd_repair_continuation_apply,
+                repo_root=ROOT,
+                explicit_data_root=data_root,
+                draft_path=drafted["_path"],
+                parent_session_id=None,
+                confirm_append_only=True,
+            )
+            self.assertEqual(applied["status"], "APPLIED", applied)
+            # First selected freeze is the repair execution, not a second slot.
+            self.assertIsNone(
+                _lookup_existing_freeze_session(
+                    store,
+                    drifted,
+                    draft={"selected_candidate_ref": "HFIC-V12-C1"},
+                )
+            )
+            self.assertIsNone(
+                _lookup_existing_freeze_session(
+                    store, drifted, draft={"candidates": []}
+                )
+            )
+            with self.assertRaises(HficSessionError) as freeze_blocked:
+                freeze_draft(
+                    opened["draft"],
+                    preflight_receipt=drifted,
+                    store=store,
+                    repo_root=ROOT,
+                    verify_current_market_identity=True,
+                )
+            self.assertNotEqual(
+                freeze_blocked.exception.code,
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            )
+            evidence = {
+                "result_sha256": "cd" * 32,
+                "result_refs": ["HFIC-ART-DISCOVERY-BOUND"],
+            }
+            repair_draft = {**opened["draft"], "grounded_evidence": evidence}
+            before = _payloads(store)
+            persist_no_worthy_session(
+                store,
+                {**opened["frozen"], **opened["receipt"]},
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(opened["draft"]["candidates"]),
+                draft=repair_draft,
+                preflight_receipt=opened["receipt"],
+            )
+            shown = show_session(store, opened["shown"]["session_id"], repo_root=ROOT)
+            self.assertEqual(
+                shown["repair_continuation_disposition_sha256"],
+                applied["disposition"]["disposition_sha256"],
+            )
+            self.assertNotEqual(
+                shown["session_receipt_sha256"],
+                opened["shown"]["session_receipt_sha256"],
+            )
+            self.assertEqual(shown["grounded_result_sha256"], evidence["result_sha256"])
+            self.assertEqual(shown["grounded_result_refs"], evidence["result_refs"])
+            written = _payloads(store)
+            self.assertNotEqual(written, before)
+            persist_no_worthy_session(
+                store,
+                {**opened["frozen"], **opened["receipt"]},
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(opened["draft"]["candidates"]),
+                draft=repair_draft,
+                preflight_receipt=opened["receipt"],
+            )
+            self.assertEqual(_payloads(store), written)
+            replay = _lookup_existing_freeze_session(
+                store, drifted, draft={"grounded_evidence": evidence}
+            )
+            self.assertEqual(
+                replay["repair_continuation_disposition_sha256"],
+                applied["disposition"]["disposition_sha256"],
+            )
+            with self.assertRaises(HficSessionError) as selected_after:
+                _lookup_existing_freeze_session(
+                    store,
+                    drifted,
+                    draft={
+                        "selected_candidate_ref": "HFIC-V12-C1",
+                        "grounded_evidence": evidence,
+                    },
+                )
+            self.assertEqual(
+                selected_after.exception.code,
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            )
+            with self.assertRaises(HficSessionError) as changed:
+                _lookup_existing_freeze_session(
+                    store,
+                    drifted,
+                    draft={
+                        "grounded_evidence": {
+                            "result_sha256": "ef" * 32,
+                            "result_refs": evidence["result_refs"],
+                        }
+                    },
+                )
+            self.assertEqual(changed.exception.code, "GROUNDED_RESULT_MISMATCH")
+            matched = {
+                key: value
+                for key, value in drifted.items()
+                if key != "capability_epoch_sha256"
+            }
+            with self.assertRaises(HficSessionError) as matched_changed:
+                _lookup_existing_freeze_session(
+                    store,
+                    matched,
+                    draft={
+                        "grounded_evidence": {
+                            "result_sha256": "ef" * 32,
+                            "result_refs": evidence["result_refs"],
+                        }
+                    },
+                )
+            self.assertEqual(
+                matched_changed.exception.code, "GROUNDED_RESULT_MISMATCH"
+            )
+            self.assertEqual(_payloads(store), written)
+            from solana_alpha_lab.factory.hfic_repair_continuation import (
+                close_repair_continuation,
+            )
+
+            closed = close_repair_continuation(
+                store,
+                applied["disposition"]["disposition_sha256"],
+                git_sha=opened["git"].head_sha,
+            )
+            self.assertEqual(closed["status"], "CLOSED")
+            again = close_repair_continuation(
+                store,
+                applied["disposition"]["disposition_sha256"],
+                git_sha=opened["git"].head_sha,
+            )
+            self.assertEqual(again["status"], "ALREADY_CLOSED")
+            self.assertFalse(again["writes"])
+            listed = [
+                item
+                for item in list_repair_continuation_dispositions(store)
+                if item.get("disposition_sha256")
+                == applied["disposition"]["disposition_sha256"]
+            ]
+            readback = _closed_repair_readback(
+                listed,
+                shown,
+                scientific_slot_sha256=shown["scientific_slot_sha256"],
+            )
+            self.assertEqual(
+                readback["disposition_sha256"],
+                applied["disposition"]["disposition_sha256"],
+            )
+            from solana_alpha_lab.factory.hfic_evidence_identity import (
+                resolve_scientific_admission,
+            )
+            from solana_alpha_lab.factory.hfic_session import (
+                list_hfic_sessions,
+                list_scientific_slot_admissions,
+            )
+
+            closed_shown = show_session(
+                store, opened["shown"]["session_id"], repo_root=ROOT
+            )
+            admission = resolve_scientific_admission(
+                list_hfic_sessions(store),
+                market_evidence_epoch=str(
+                    closed_shown["market_evidence_epoch_sha256"]
+                ),
+                representation_id="BASE",
+                representation_semantic_version="HFIC-V1.2",
+                owner_focus="AUTO",
+                reservations=list_scientific_slot_admissions(store),
+                execution_context={"capability_epoch_sha256": "ab" * 32},
+                repair_continuations=list_repair_continuation_dispositions(store),
+            )
+            self.assertEqual(admission["action"], "RETURN_EXISTING_SESSION")
+            self.assertEqual(admission["session_id"], closed_shown["session_id"])
+            self.assertEqual(admission["occupancy"], "REPAIR_CLOSED_READBACK")
+            self.assertNotEqual(admission["action"], "START_NEW_SESSION")
+            self.assertNotEqual(admission["action"], "RESUME_REPAIR_CONTINUATION")
+
     def test_foreign_binding_conflict_and_exhausted_budget_are_refused(self) -> None:
         import tempfile
 
@@ -753,7 +965,9 @@ class LegacyParentContinuationCompatTests(TestCase):
             model_provenance_sha256=None,
         )
 
-    def _open_parent_on_current_corpus(self, data_root: Path) -> dict:
+    def _open_parent_on_current_corpus(
+        self, data_root: Path, *, omit_capability_epoch: bool = False
+    ) -> dict:
         from tests.test_hfic_cli import seed_minimal_market_basis
 
         seed_minimal_market_basis(data_root)
@@ -782,6 +996,8 @@ class LegacyParentContinuationCompatTests(TestCase):
             "capability_epoch_sha256": current.get("capability_epoch_sha256"),
             "prompt_version": current.get("prompt_version"),
         }
+        if omit_capability_epoch:
+            receipt.pop("capability_epoch_sha256", None)
         draft = json.loads(
             (ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1.json").read_text(
                 encoding="utf-8"
@@ -813,20 +1029,23 @@ class LegacyParentContinuationCompatTests(TestCase):
             run_recorded_discovery_query,
         )
 
+        discovery_evidence = []
         for index in range(2):
             spec = _spec_snapshot(
                 query_id=f"legacy-corpus-{index}",
                 all=[{"feature": "mark", "op": "gte", "value": index / 10}],
             )
-            run_recorded_discovery_query(
-                store,
-                census=census,
-                observations=rows,
-                spec=spec,
-                binding=binding,
-                journal_scope=journal,
-                candidate_scope={"schema": "test", "target": spec["target"]},
-                git_sha=git.head_sha,
+            discovery_evidence.append(
+                run_recorded_discovery_query(
+                    store,
+                    census=census,
+                    observations=rows,
+                    spec=spec,
+                    binding=binding,
+                    journal_scope=journal,
+                    candidate_scope={"schema": "test", "target": spec["target"]},
+                    git_sha=git.head_sha,
+                )
             )
         self.assertEqual(len(_mains(store, journal)), 2)
         self.assertEqual(_forge_run_count(store), 0)
@@ -841,6 +1060,7 @@ class LegacyParentContinuationCompatTests(TestCase):
             "rows": rows,
             "census": census,
             "binding": binding,
+            "discovery_evidence": discovery_evidence,
         }
 
     def _continue_from_preflight(
@@ -941,6 +1161,288 @@ class LegacyParentContinuationCompatTests(TestCase):
             control_current_representation=False,
         )
         return readback
+
+    def _freeze_cli(self, data_root: Path, draft_path: Path, preflight_path: Path) -> dict:
+        try:
+            return self._cli_json(
+                CLI.cmd_freeze,
+                repo_root=ROOT,
+                draft_path=draft_path,
+                preflight_path=preflight_path,
+                explicit_data_root=data_root,
+                next_action_path=None,
+            )
+        except HficSessionError as exc:
+            return {"reason_code": exc.code, "writes": False, "_exit": 2}
+
+    def _repair_draft(self, preflight: dict, evidence: dict, path: Path) -> dict:
+        from tests.test_hfic_cli import bind_draft
+
+        receipt = self._preflight_body(preflight)
+        draft = bind_draft(
+            {
+                "packet_schema": "smial.hypothesis-forge-draft",
+                "packet_version": "1.2",
+                "generator_prompt_version": "HFIC-V1.2",
+                "owner_focus": receipt.get("owner_focus") or "AUTO",
+                "authority": {
+                    "git_mutation": 0,
+                    "experiment_execution": 0,
+                    "provider_api_rpc_wss_calls": 0,
+                },
+                "candidates": [],
+                "pareto_factors": ["grounding"],
+                "non_claims": ["NO_ALPHA", "NO_WORTHY_HYPOTHESIS"],
+                "grounded_evidence": evidence,
+            },
+            receipt,
+        )
+        path.write_text(json.dumps(draft), encoding="utf-8")
+        return draft
+
+    def test_cli_capability_drift_freeze_close_and_readback(self) -> None:
+        import tempfile
+
+        from solana_alpha_lab.factory.hfic_repair_continuation import (
+            close_repair_continuation,
+            list_repair_continuation_dispositions,
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            opened = self._open_parent_on_current_corpus(
+                data_root, omit_capability_epoch=True
+            )
+            self.assertIsNone(opened["shown"].get("capability_epoch_sha256"))
+            self.assertEqual(_forge_run_count(opened["store"]), 0)
+            self.assertEqual(len(opened["discovery_evidence"]), 2)
+            compound_spec = _spec_snapshot(
+                query_id="legacy-compound",
+                search_tier="COMPOUND_SCREEN",
+                all=[{"feature": "mark", "op": "gte", "value": 0.5}],
+            )
+            evidence = self._spend_one_main(
+                opened, query_id="legacy-compound", spec=compound_spec
+            )
+            prepared = self._apply_ordinary_repair(data_root, opened)
+            self.assertNotEqual(
+                prepared["preflight"].get("capability_epoch_sha256"),
+                opened["shown"].get("capability_epoch_sha256"),
+            )
+            other = opened["discovery_evidence"][0]
+            self.assertNotEqual(evidence["result_sha256"], other["result_sha256"])
+            preflight_path = data_root.parent / "repair-preflight.json"
+            preflight_path.write_text(
+                json.dumps(self._preflight_body(prepared["preflight"])),
+                encoding="utf-8",
+            )
+            draft_path = data_root.parent / "repair-draft.json"
+            self._repair_draft(prepared["preflight"], evidence, draft_path)
+            before_mains = len(_mains(opened["store"], opened["journal"]))
+            frozen = self._freeze_cli(data_root, draft_path, preflight_path)
+            self.assertEqual(frozen.get("_exit"), 0, frozen)
+            shown = show_session(
+                opened["store"], opened["shown"]["session_id"], repo_root=ROOT
+            )
+            self.assertEqual(
+                shown["repair_continuation_disposition_sha256"],
+                prepared["applied"]["disposition"]["disposition_sha256"],
+            )
+            self.assertNotEqual(
+                shown["session_receipt_sha256"],
+                opened["shown"]["session_receipt_sha256"],
+            )
+            self.assertEqual(shown["grounded_result_sha256"], evidence["result_sha256"])
+            self.assertEqual(shown["session_id"], opened["shown"]["session_id"])
+            self.assertEqual(
+                shown["scientific_slot_sha256"],
+                opened["shown"]["scientific_slot_sha256"],
+            )
+            self.assertEqual(shown["search_key_sha256"], opened["journal"])
+            self.assertEqual(len(_mains(opened["store"], opened["journal"])), before_mains)
+            written = _payloads(opened["store"])
+            replay = self._freeze_cli(data_root, draft_path, preflight_path)
+            self.assertEqual(replay.get("_exit"), 0, replay)
+            self.assertEqual(replay.get("current_market_identity"), "VERIFIED")
+            self.assertEqual(replay.get("repair_readback_status"), "AUTHORIZED")
+            self.assertEqual(
+                replay.get("session_receipt_sha256"), shown["session_receipt_sha256"]
+            )
+            self.assertEqual(_payloads(opened["store"]), written)
+            historical = freeze_draft(
+                json.loads(draft_path.read_text(encoding="utf-8")),
+                preflight_receipt=self._preflight_body(prepared["preflight"]),
+                store=ResearchStore(data_root, create_if_missing=False),
+                repo_root=ROOT,
+                verify_current_market_identity=False,
+            )
+            self.assertEqual(historical.get("current_market_identity"), "NOT_VERIFIED")
+            self.assertEqual(_payloads(opened["store"]), written)
+            corrupt_path = data_root.parent / "corrupt-preflight.json"
+            corrupt = self._preflight_body(prepared["preflight"])
+            corrupt["preflight_receipt_sha256"] = "00" * 32
+            corrupt_path.write_text(json.dumps(corrupt), encoding="utf-8")
+            refused = self._freeze_cli(data_root, draft_path, corrupt_path)
+            self.assertEqual(refused.get("_exit"), 2, refused)
+            self.assertEqual(
+                refused.get("reason_code"), "PREFLIGHT_RECEIPT_HASH_MISMATCH"
+            )
+            self.assertEqual(_payloads(opened["store"]), written)
+            lineage = (
+                data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+            )
+            original_lineage = lineage.read_bytes()
+            changed_lineage = json.loads(original_lineage)
+            cohorts = changed_lineage.get("cohorts") or []
+            self.assertTrue(cohorts)
+            source_key = (
+                "source_sha256"
+                if cohorts[0].get("source_sha256")
+                else "content_sha256"
+            )
+            digest = str(cohorts[0][source_key])
+            cohorts[0][source_key] = ("0" if digest[0] != "0" else "1") + digest[1:]
+            lineage.write_text(json.dumps(changed_lineage), encoding="utf-8")
+            try:
+                drifted_market = self._freeze_cli(data_root, draft_path, preflight_path)
+            finally:
+                lineage.write_bytes(original_lineage)
+            self.assertEqual(drifted_market.get("_exit"), 2, drifted_market)
+            self.assertIn(
+                drifted_market.get("reason_code"),
+                {"MARKET_IDENTITY_DRIFT", "MARKET_EVIDENCE_BASIS_INCOMPLETE"},
+            )
+            self.assertEqual(_payloads(opened["store"]), written)
+            fresh = self._production_preflight(data_root)
+            self.assertEqual(fresh.get("_exit"), 0, fresh)
+            self.assertEqual(fresh.get("action"), "RESUME_REPAIR_CONTINUATION")
+            self.assertEqual(fresh.get("session_id"), opened["shown"]["session_id"])
+            self.assertEqual(
+                fresh.get("market_evidence_epoch_sha256"),
+                opened["shown"]["market_evidence_epoch_sha256"],
+            )
+            fresh_draft = data_root.parent / "fresh-draft.json"
+            fresh_preflight = data_root.parent / "fresh-preflight.json"
+            fresh_preflight.write_text(
+                json.dumps(self._preflight_body(fresh)), encoding="utf-8"
+            )
+            self._repair_draft(fresh, evidence, fresh_draft)
+            before_reread = _payloads(ResearchStore(data_root, create_if_missing=False))
+            reread = self._freeze_cli(data_root, fresh_draft, fresh_preflight)
+            self.assertEqual(reread.get("_exit"), 0, reread)
+            self.assertEqual(reread.get("repair_readback_status"), "AUTHORIZED")
+            again = show_session(
+                ResearchStore(data_root, create_if_missing=False),
+                opened["shown"]["session_id"],
+                repo_root=ROOT,
+            )
+            self.assertEqual(
+                again["session_receipt_sha256"], shown["session_receipt_sha256"]
+            )
+            self.assertEqual(again["scientific_slot_sha256"], shown["scientific_slot_sha256"])
+            self.assertEqual(again["search_key_sha256"], opened["journal"])
+            self.assertEqual(len(_mains(opened["store"], opened["journal"])), before_mains)
+            self.assertEqual(
+                _payloads(ResearchStore(data_root, create_if_missing=False)),
+                before_reread,
+            )
+            other_draft = data_root.parent / "other-draft.json"
+            self._repair_draft(prepared["preflight"], other, other_draft)
+            mismatched = self._freeze_cli(data_root, other_draft, preflight_path)
+            self.assertEqual(mismatched.get("_exit"), 2, mismatched)
+            self.assertEqual(mismatched.get("reason_code"), "GROUNDED_RESULT_MISMATCH")
+            self.assertEqual(
+                show_session(
+                    ResearchStore(data_root, create_if_missing=False),
+                    opened["shown"]["session_id"],
+                    repo_root=ROOT,
+                )["session_receipt_sha256"],
+                shown["session_receipt_sha256"],
+            )
+            store = ResearchStore(data_root, create_if_missing=False)
+            original_append = store.append
+            calls = {"n": 0}
+
+            def flaky(records, *args, **kwargs):
+                calls["n"] += 1
+                if calls["n"] == 2:
+                    raise RepairContinuationError("INJECTED_CLOSE_FAILURE")
+                return original_append(records, *args, **kwargs)
+
+            store.append = flaky  # type: ignore[method-assign]
+            with self.assertRaises(RepairContinuationError) as raised:
+                close_repair_continuation(
+                    store,
+                    prepared["applied"]["disposition"]["disposition_sha256"],
+                    git_sha=opened["git"].head_sha,
+                )
+            self.assertEqual(raised.exception.code, "INJECTED_CLOSE_FAILURE")
+            store.append = original_append  # type: ignore[method-assign]
+            disposition_sha = prepared["applied"]["disposition"]["disposition_sha256"]
+            open_rows = [
+                item
+                for item in list_repair_continuation_dispositions(store)
+                if item.get("disposition_sha256") == disposition_sha
+            ]
+            self.assertEqual([item.get("status") for item in open_rows], ["AUTHORIZED"])
+            self.assertEqual(
+                _forge_run_count(ResearchStore(data_root, create_if_missing=False)),
+                1,
+            )
+            interrupted = self._production_preflight(data_root)
+            self.assertEqual(interrupted.get("action"), "RESUME_REPAIR_CONTINUATION")
+            self.assertEqual(
+                interrupted.get("session_id"), opened["shown"]["session_id"]
+            )
+            resumed = close_repair_continuation(
+                ResearchStore(data_root, create_if_missing=False),
+                disposition_sha,
+                git_sha=opened["git"].head_sha,
+            )
+            self.assertEqual(resumed["status"], "CLOSED")
+            idle = close_repair_continuation(
+                ResearchStore(data_root, create_if_missing=False),
+                disposition_sha,
+                git_sha=opened["git"].head_sha,
+            )
+            self.assertEqual(idle["status"], "ALREADY_CLOSED")
+            self.assertFalse(idle["writes"])
+            closed_payloads = _payloads(
+                ResearchStore(data_root, create_if_missing=False)
+            )
+            closed_replay = self._freeze_cli(data_root, draft_path, preflight_path)
+            self.assertEqual(closed_replay.get("_exit"), 0, closed_replay)
+            self.assertEqual(closed_replay.get("repair_readback_status"), "CLOSED")
+            self.assertEqual(closed_replay.get("current_market_identity"), "VERIFIED")
+            self.assertEqual(
+                closed_replay.get("session_receipt_sha256"),
+                shown["session_receipt_sha256"],
+            )
+            self.assertEqual(
+                _payloads(ResearchStore(data_root, create_if_missing=False)),
+                closed_payloads,
+            )
+            blocked = self._freeze_cli(data_root, other_draft, preflight_path)
+            self.assertEqual(blocked.get("_exit"), 2, blocked)
+            self.assertEqual(blocked.get("reason_code"), "GROUNDED_RESULT_MISMATCH")
+            self.assertEqual(len(_mains(opened["store"], opened["journal"])), before_mains)
+            readback_preflight = self._production_preflight(data_root)
+            self.assertEqual(
+                readback_preflight.get("action"), "RETURN_EXISTING_SESSION"
+            )
+            self.assertEqual(
+                readback_preflight.get("session_id"), opened["shown"]["session_id"]
+            )
+            self.assertNotEqual(readback_preflight.get("action"), "START_NEW_SESSION")
+            self.assertNotEqual(
+                readback_preflight.get("action"), "RESUME_REPAIR_CONTINUATION"
+            )
+            readback = self._reopen_forge_run(data_root)
+            self.assertEqual(readback.get("_exit"), 0, readback)
+            self.assertEqual(readback.get("next_action"), ACTION_RETURN_EXISTING)
+            self.assertEqual(readback.get("owner_final"), ACTION_SEARCH_EXHAUSTED)
+            self.assertEqual(readback.get("session_id"), opened["shown"]["session_id"])
+            self.assertNotEqual(readback.get("next_action"), "START_BASE")
 
     def test_ordinary_no_worthy_readback_after_reopen(self) -> None:
         import tempfile

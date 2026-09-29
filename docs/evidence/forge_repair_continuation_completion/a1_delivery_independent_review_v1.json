@@ -1,0 +1,53 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-REPAIR-CONTINUATION-COMPLETION-REVIEW-001",
+  "as_of": "2026-09-29",
+  "task_id": "FORGE_REPAIR_CONTINUATION_COMPLETION_V1",
+  "reviewed_bindings_sha256": "ff1dc8616c2ec215791faf54b752c686870f7a55892a80855fabdaca92b8839b",
+  "reviewed_inventory_sha256": "69392bbd53ad1105d4db1a8e6faca6b071fd0784e4a774ed5f13175b0be422f1",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "A stored BASE repair readback runs bind_preflight_receipt, memory as-of, and draft/context binding before returning the terminal. Production freeze also checks the current market epoch. A failed check writes nothing. AUTHORIZED retry and CLOSED readback do not skip that path. The first freeze, before a repair stamp, still writes. GROUNDED_RESULT_MISMATCH still blocks a different result."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "The CLI scenario locks a legacy parent without a capability epoch or FORGE_RUN_RECEIPT through production preflight, CLI freeze, zero-write replay, AUTHORIZED reopen as RESUME_REPAIR_CONTINUATION, a close interrupt that keeps one completion receipt, resume to CLOSED, and ordinary post-close readback. Corrupt preflight, market drift, and a different grounded result are refused without new looks."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=f9e8ec5108e977682b6d1b5f130e7f6e80ba09b530b2d1107c767c6984c6f589. Stored AUTHORIZED and CLOSED readback bind the draft and, on a production freeze, the current market epoch. NOT_VERIFIED is not a current-market confirmation. CLOSED is not a new grant. Call-stamped identity fields are not durable PIT truth."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "A no-write replay carries repair_readback_status AUTHORIZED or CLOSED. The first freeze does not. NOT_VERIFIED means the market check was not requested. After CLOSED, ordinary preflight is RETURN_EXISTING_SESSION. The runbook does not ask for hand-edited hashes."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MERGE",
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_NEW_SCIENTIFIC_LOOK"
+  ]
+}
