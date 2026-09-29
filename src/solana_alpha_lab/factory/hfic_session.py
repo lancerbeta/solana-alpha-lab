@@ -4271,10 +4271,12 @@ def prefreeze_generated_draft_recovery(
         return False
     if reservation.get("focus_key_sha256") != generated_draft.get("focus_key_sha256"):
         return False
-    if normalize_text(str(reservation.get("owner_focus") or "AUTO")) != normalize_text(
-        str(generated_draft.get("owner_focus") or "AUTO")
-    ):
-        return False
+    draft_focus = generated_draft.get("owner_focus")
+    if isinstance(draft_focus, str) and draft_focus.strip():
+        if normalize_text(str(reservation.get("owner_focus") or "AUTO")) != normalize_text(
+            draft_focus
+        ):
+            return False
     surface = evidence_surface_mode
     if not assert_evidence_surface:
         surface = (
@@ -4560,6 +4562,7 @@ def persist_generated_draft(
     payload = {
         "research_artifact_id": f"HFIC-ART-FORGE-DRAFT-GENERATED-{draft_sha[:16].upper()}",
         "session_id": session_id,
+        "owner_focus": str(receipt.get("owner_focus") or "AUTO"),
         "hfic_protocol": str(receipt.get("prompt_version") or PROMPT_VERSION),
         "artifact_kind": "FORGE_DRAFT",
         "draft_lifecycle": "GENERATED_BEFORE_FREEZE",

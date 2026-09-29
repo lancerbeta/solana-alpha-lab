@@ -32288,7 +32288,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 7ade44944dfbb3112c4595a05997875518da9bc47094359162d8b47ecc69ff5c}
+  integrity: {kind: sha256, sha256: 5b3efc163d810197924d6bcf0a2be979d5aeeb3de07ef9a40a71f2215daafb7b}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32310,7 +32310,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 08b0965b7fbab354e0596c3c5a6fc45b28ad6874af81da9fb8bcba97932cc7b3}
+  integrity: {kind: sha256, sha256: 2d387c7bbee06537acf424207a9dd94adb2bb8fc5383c193f0e4a451bfda2dd2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37833,7 +37833,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: d13f75c49ede36f0ae8a9d5c4e999e52d77d18921bedd7cf9376a804fb67fe9b}
+  integrity: {kind: sha256, sha256: 4b4cccc97b40ddb5fc748e7f59e9897691b819c34f6161c733abccde05c2f767}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}

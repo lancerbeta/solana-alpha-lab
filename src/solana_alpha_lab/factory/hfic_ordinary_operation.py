@@ -230,6 +230,47 @@ def binding_fingerprint(cohorts: Sequence[Mapping[str, Any]] | None) -> str | No
     return _sha({"cohorts": rows})
 
 
+def _feature_previews(store: Any, journal: str) -> list[dict[str, Any]]:
+    return [
+        item
+        for item in _iter_kind(store, "DISCOVERY_FEATURE_PREVIEW")
+        if item.get("journal_scope") == journal
+    ]
+
+
+def _assert_preflight_journal(
+    store: Any,
+    operation: Mapping[str, Any],
+    journal_scope: str,
+    *,
+    repo_root: Any,
+    data_root: Any,
+) -> None:
+    """Journal must be the preflight search key for this market and focus."""
+
+    from pathlib import Path
+
+    from solana_alpha_lab.factory.hfic_evidence_identity import compute_split_identity
+    from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
+    from solana_alpha_lab.factory.hfic_session import PROMPT_VERSION, search_key_sha256
+
+    split = compute_split_identity(Path(repo_root), Path(data_root), store=store)
+    epoch = str(split.get("market_evidence_epoch_sha256") or "")
+    if epoch != str(operation.get("market_evidence_epoch_sha256") or ""):
+        raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
+    policy = effective_policy(store)
+    memory = str(policy.get("memory_eligibility_sha256") or "")
+    expected = search_key_sha256(
+        epoch,
+        str(operation.get("owner_focus") or ""),
+        PROMPT_VERSION,
+        memory or None,
+        None,
+    )
+    if journal_scope != expected:
+        raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_NOT_CANONICAL")
+
+
 def _protocol_remaining(
     store: Any,
     looks: Sequence[Mapping[str, Any]],
@@ -238,8 +279,24 @@ def _protocol_remaining(
     journal: str,
 ) -> int:
     if kind == "preview":
-        used = sum(1 for item in looks if item.get("look_class") == "PREVIEW" and item.get("new_look") is True)
-        return max(0, MAX_PREVIEW_SPECS - used)
+        used = {
+            str(item.get("preview_sha256") or "")
+            for item in _feature_previews(store, journal)
+            if item.get("preview_sha256")
+        }
+        landed_specs = {
+            str(item.get("spec_sha256") or "")
+            for item in _feature_previews(store, journal)
+            if item.get("spec_sha256")
+        }
+        pending = {
+            str(item.get("spec_sha256") or "")
+            for item in _iter_kind(store, RESERVATION_KIND)
+            if item.get("journal_scope") == journal
+            and item.get("look_class") == "PREVIEW"
+            and str(item.get("spec_sha256") or "") not in landed_specs
+        }
+        return max(0, MAX_PREVIEW_SPECS - len(used) - len(pending))
     completed = {
         str(item.get("spec_sha256") or "")
         for item in looks
@@ -275,6 +332,26 @@ def _spent_by_operation(store: Any, operation: Mapping[str, Any], kind: str) -> 
         if item.get("operation_sha256") == digest and item.get("new_look") is True
     ]
     look_class = {"main": "MAIN", "adaptive": "ADAPTIVE", "preview": "PREVIEW"}[kind]
+    if kind == "preview":
+        done = {
+            str(item.get("preview_sha256") or item.get("spec_sha256") or "")
+            for item in _feature_previews(store, journal)
+            if item.get("operation_sha256") == digest
+        }
+        done.discard("")
+        pending = {
+            str(item.get("spec_sha256") or "")
+            for item in _reservations(store, digest)
+            if item.get("look_class") == "PREVIEW"
+            and str(item.get("spec_sha256") or "")
+            not in {
+                str(item.get("spec_sha256") or "")
+                for item in _feature_previews(store, journal)
+                if item.get("operation_sha256") == digest
+            }
+        }
+        pending.discard("")
+        return len(done) + len(pending)
     done = {str(item.get("spec_sha256") or "") for item in looks if item.get("look_class") == look_class}
     pending = {
         str(item.get("spec_sha256") or "")
@@ -366,6 +443,8 @@ def authorize_temporal_attempt(
     binding_cohorts: Sequence[Mapping[str, Any]] | None = None,
     verified_market: str | None = None,
     look_kind: str = "main",
+    repo_root: Any = None,
+    data_root: Any = None,
 ) -> dict[str, Any]:
     """One admission contract for CLI execute/preview and recorded-query."""
 
@@ -377,6 +456,27 @@ def authorize_temporal_attempt(
             raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_UNVERIFIED")
         if verified_market != operation.get("market_evidence_epoch_sha256"):
             raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
+        if repo_root is not None and data_root is not None:
+            _assert_preflight_journal(
+                store, operation, journal_scope, repo_root=repo_root, data_root=data_root
+            )
+        spec_sha = hashlib.sha256(_canonical(dict(spec)).encode("utf-8")).hexdigest()
+        owned = [
+            item
+            for item in _feature_previews(store, journal_scope)
+            if item.get("operation_sha256") == operation.get("operation_sha256")
+            and item.get("spec_sha256") == spec_sha
+        ]
+        if owned:
+            return {
+                "disposition": "REPLAY",
+                "values_loaded": False,
+                "writes": False,
+                "operation": operation,
+                "look_class": "PREVIEW",
+                "preview_sha256": owned[-1].get("preview_sha256"),
+                "replayed_without_loader": True,
+            }
         fingerprint = binding_fingerprint(binding_cohorts)
         stamped = operation.get("corpus_fingerprint")
         if fingerprint and stamped and fingerprint != stamped:
@@ -392,6 +492,7 @@ def authorize_temporal_attempt(
             raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")
         if owner_allowance(store, operation, "preview") < 1:
             raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
+        _reserve(store, operation, spec_sha256=spec_sha, look_class="preview")
         if fingerprint and not stamped:
             updated = dict(operation)
             updated["corpus_fingerprint"] = fingerprint
@@ -412,6 +513,8 @@ def authorize_temporal_attempt(
         journal_scope=journal_scope,
         binding_cohorts=binding_cohorts,
         verified_market=verified_market,
+        repo_root=repo_root,
+        data_root=data_root,
     )
 
 
@@ -423,6 +526,8 @@ def gate_before_values(
     journal_scope: str,
     binding_cohorts: Sequence[Mapping[str, Any]] | None = None,
     verified_market: str | None = None,
+    repo_root: Any = None,
+    data_root: Any = None,
 ) -> dict[str, Any]:
     """Metadata, admission and cap. Does not load outcome rows."""
 
@@ -433,6 +538,10 @@ def gate_before_values(
         raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_UNVERIFIED")
     if verified_market != operation.get("market_evidence_epoch_sha256"):
         raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
+    if repo_root is not None and data_root is not None:
+        _assert_preflight_journal(
+            store, operation, journal_scope, repo_root=repo_root, data_root=data_root
+        )
     from solana_alpha_lab.factory.hfic_temporal_discovery import (
         classify_temporal_look,
         validate_temporal_query,
@@ -544,7 +653,7 @@ def gate_before_values(
 
 def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look_class: str = "main") -> None:
     digest = str(operation.get("operation_sha256") or "")
-    stored_class = "ADAPTIVE" if look_class == "adaptive" else "MAIN"
+    stored_class = {"adaptive": "ADAPTIVE", "preview": "PREVIEW"}.get(look_class, "MAIN")
     for item in _reservations(store, digest):
         if item.get("spec_sha256") == spec_sha256:
             return
@@ -739,6 +848,10 @@ def merge_ordinary_readout(payload: dict[str, Any], projection: Mapping[str, Any
         proj["search_open"] = False
     elif final in terminals:
         proj["next_action"] = "READ_SAVED_RESULT"
+        proj["next_needs_new_authority"] = False
+        proj["search_open"] = False
+    elif str(payload.get("next_action") or "").startswith("RESUME_"):
+        proj["next_action"] = str(payload.get("next_action"))
         proj["next_needs_new_authority"] = False
         proj["search_open"] = False
     elif proj.get("candidate_ready") and proj.get("owner_main_remaining") == 0:

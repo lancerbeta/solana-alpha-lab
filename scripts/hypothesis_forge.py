@@ -1034,6 +1034,8 @@ def cmd_discovery_execute(
                 journal_scope=journal_scope,
                 binding_cohorts=cohorts,
                 verified_market=epoch,
+                repo_root=repo_root,
+                data_root=explicit_data_root or store_root,
             )
         except OrdinaryOperationError as exc:
             return emit(
@@ -1207,16 +1209,19 @@ def cmd_discovery_preview(
                 operation = get_operation(preview_store, str(operation_sha256))
             if str(operation.get("journal_scope") or "") != journal_scope:
                 raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_MISMATCH")
-            explicit_preview = (operation.get("owner_cap") or {}).get("preview")
-            if explicit_preview is not None:
-                from solana_alpha_lab.factory.hfic_temporal_discovery import stored_preview_hashes
+            from solana_alpha_lab.factory.hfic_ordinary_operation import (
+                _canonical as _op_canonical,
+                _feature_previews,
+                owner_allowance,
+            )
 
-                used_previews = len(stored_preview_hashes(preview_store, journal_scope))
-                if used_previews >= explicit_preview or owner_allowance(
-                    preview_store, operation, "preview"
-                ) < 1:
-                    raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
-            elif owner_allowance(preview_store, operation, "preview") < 1:
+            preview_spec_sha = hashlib.sha256(_op_canonical(dict(spec)).encode("utf-8")).hexdigest()
+            already_owned = any(
+                item.get("operation_sha256") == operation.get("operation_sha256")
+                and item.get("spec_sha256") == preview_spec_sha
+                for item in _feature_previews(preview_store, journal_scope)
+            )
+            if not already_owned and owner_allowance(preview_store, operation, "preview") < 1:
                 raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
             epochs: list[str] = []
             if explicit_data_root is not None:
@@ -1263,7 +1268,7 @@ def cmd_discovery_preview(
                     )
                 except Exception:
                     binding_cohorts = []
-            authorize_temporal_attempt(
+            preview_gate = authorize_temporal_attempt(
                 preview_store,
                 operation_sha256=str(operation_sha256),
                 spec=spec,
@@ -1271,7 +1276,20 @@ def cmd_discovery_preview(
                 binding_cohorts=binding_cohorts,
                 verified_market=epoch,
                 look_kind="preview",
+                repo_root=repo_root,
+                data_root=explicit_data_root or store_root,
             )
+            if isinstance(preview_gate, dict) and preview_gate.get("disposition") == "REPLAY":
+                return emit(
+                    {
+                        "disposition": "REPLAY",
+                        "preview_sha256": preview_gate.get("preview_sha256"),
+                        "replayed_without_loader": True,
+                        "values_loaded": False,
+                        "writes": bool(preview_service_writes),
+                        "scientific_negative": False,
+                    }
+                )
         except OrdinaryOperationError as exc:
             return emit(
                 {
@@ -1322,12 +1340,17 @@ def cmd_discovery_preview(
                     sort_keys=True,
                 ).encode("utf-8")
             ).hexdigest()
+            from solana_alpha_lab.factory.hfic_ordinary_operation import _canonical as _op_canonical
+
+            persisted_spec = hashlib.sha256(_op_canonical(dict(spec)).encode("utf-8")).hexdigest()
             persist_feature_preview(
                 ResearchStore(store_root),
                 journal_scope=journal_scope,
                 preview=payload,
                 git_sha="0" * 40,
                 input_sha256=input_identity,
+                operation_sha256=str(operation_sha256) if operation_sha256 else None,
+                spec_sha256=persisted_spec or None,
             )
     except GroundedDiscoveryError as exc:
         return emit_error(exc.code)

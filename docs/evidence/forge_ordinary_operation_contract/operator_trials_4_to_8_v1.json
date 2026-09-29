@@ -342,7 +342,7 @@
           "operator_trial_scratch_present": false,
           "trial7_data_present": false
         },
-        "note": "Original store bytes are absent from this worktree. Do not recreate under the same identities. Resume recovery only when the named paths are restored."
+        "note": "Checked operator_trial_scratch/trial7/data in the delivery worktree and the main checkout. Both absent. Do not recreate under the same identities. Mechanical saved-candidate continuation is test_c, which is not this trial."
       }
     },
     {

@@ -2347,6 +2347,8 @@ def persist_feature_preview(
     preview: Mapping[str, Any],
     git_sha: str,
     input_sha256: str = "",
+    operation_sha256: str | None = None,
+    spec_sha256: str | None = None,
 ) -> None:
     """Remember a preview in the store. Identity includes the journal and the input."""
 
@@ -2367,6 +2369,10 @@ def persist_feature_preview(
         "selected_count": preview.get("selected_count"),
         "total_count": preview.get("total_count"),
     }
+    if operation_sha256:
+        body["operation_sha256"] = operation_sha256
+    if spec_sha256:
+        body["spec_sha256"] = spec_sha256
     canonical = _canonical(body)
     payload = {
         "artifact_kind": "DISCOVERY_FEATURE_PREVIEW",

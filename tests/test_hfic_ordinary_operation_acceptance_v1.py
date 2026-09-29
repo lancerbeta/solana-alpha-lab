@@ -220,9 +220,13 @@ class OrdinaryAcceptanceTests(unittest.TestCase):
                 "json",
                 data_root=data_root,
             )
-            self.assertIn(cold.returncode, {0, 2}, cold.stderr + cold.stdout)
+            self.assertEqual(cold.returncode, 0, cold.stderr + cold.stdout)
             cold_body = json.loads(cold.stdout)
-            self.assertNotEqual(cold_body.get("next_action"), "AUTHORIZE_ADDITIONAL_LOOKS", cold_body)
+            self.assertEqual(cold_body.get("next_action"), "RESUME_BASE", cold_body)
+            self.assertNotIn(
+                "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
+                cold_body.get("blocking_reason_codes") or [],
+            )
             cold_op = cold_body.get("ordinary_operation") or {}
             self.assertEqual(cold_op.get("result_refs"), evidence["result_refs"])
             self.assertEqual(cold_op.get("status"), "PAUSED_CAP")
@@ -1004,3 +1008,157 @@ class OrdinaryAcceptanceTests(unittest.TestCase):
                 self.assertEqual(caught.exception.code, "ORDINARY_OPERATION_MARKET_MISMATCH")
                 evaluator.assert_not_called()
             self.assertEqual(len(_mains(data_root, journal)), 1)
+
+    def test_preview_spend_follows_feature_preview_and_preflight_journal(self) -> None:
+        focus = "PUBLISHED_ORDINARY_PREVIEW_SPEND"
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            data_root, receipt = _publish_focus(workspace, focus)
+            journal = str(receipt["search_key_sha256"])
+            market = str(receipt["market_evidence_epoch_sha256"])
+            from tests.test_hfic_temporal_production_runner_v1 import DOCUMENT_LATENESS
+
+            simple = {
+                "decision": {"point_id": "Y3600"},
+                "schedule": {
+                    "lateness_seconds": DOCUMENT_LATENESS,
+                    "points": ["X300", "Y900", "Y1800", "Y3600"],
+                },
+                "seed": "preview-spend",
+            }
+            other = {**simple, "seed": "preview-other"}
+            scope_path = workspace / "scope.json"
+            scope_path.write_text(
+                json.dumps(
+                    {
+                        "population": "BASE_X",
+                        "decision_timestamp": "Y3600",
+                        "target": "PRICE_RELATIVE_PROXY:Y3600:Y7200:FIELD-USD-PRICE-001",
+                        "estimand": "price_relative_proxy",
+                        "explanatory_condition": "mark",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            op_path = workspace / "preview-op.json"
+            op_path.write_text(
+                json.dumps(
+                    _operation(
+                        _simple("preview-op-identity"),
+                        focus=focus,
+                        journal=journal,
+                        market=market,
+                        text="one preview",
+                        cap={"main": 0, "adaptive": 0, "preview": 1},
+                    )
+                ),
+                encoding="utf-8",
+            )
+
+            def preview(spec: dict, name: str) -> object:
+                path = workspace / f"{name}.json"
+                path.write_text(json.dumps(spec), encoding="utf-8")
+                return run_cli(
+                    "discovery-preview",
+                    "--spec",
+                    str(path),
+                    "--store",
+                    str(data_root),
+                    "--journal-scope",
+                    journal,
+                    "--operation",
+                    str(op_path),
+                    "--format",
+                    "json",
+                    data_root=data_root,
+                )
+
+            before = _inventory(data_root)
+            first = preview(simple, "first")
+            self.assertEqual(first.returncode, 0, first.stderr + first.stdout)
+            self.assertTrue(json.loads(first.stdout).get("preview_sha256"))
+            after_first = _inventory(data_root)
+            self.assertNotEqual(after_first, before)
+            replay = preview(simple, "replay")
+            self.assertEqual(replay.returncode, 0, replay.stderr + replay.stdout)
+            self.assertTrue(json.loads(replay.stdout).get("replayed_without_loader"))
+            self.assertEqual(_inventory(data_root), after_first)
+            second = preview(other, "second")
+            self.assertNotEqual(second.returncode, 0)
+            self.assertIn("OWNER_CAP_EXHAUSTED", second.stdout + second.stderr)
+            self.assertEqual(_inventory(data_root), after_first)
+            foreign = workspace / "foreign-journal.json"
+            foreign.write_text(
+                json.dumps(
+                    _operation(
+                        _simple("journal-op"),
+                        focus=focus,
+                        journal="cd" * 32,
+                        market=market,
+                        text="same wrong journal both sides",
+                        cap={"main": 0, "adaptive": 0, "preview": 1},
+                    )
+                ),
+                encoding="utf-8",
+            )
+            wrong = {**other, "seed": "wrong-journal"}
+            wrong_path = workspace / "wrong.json"
+            wrong_path.write_text(json.dumps(wrong), encoding="utf-8")
+            mains_before = len(_mains(data_root, journal))
+            refused = run_cli(
+                "discovery-preview",
+                "--spec",
+                str(wrong_path),
+                "--store",
+                str(data_root),
+                "--journal-scope",
+                "cd" * 32,
+                "--operation",
+                str(foreign),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertIn(
+                "ORDINARY_OPERATION_JOURNAL_NOT_CANONICAL",
+                refused.stdout + refused.stderr,
+            )
+            self.assertEqual(len(_mains(data_root, journal)), mains_before)
+            self.assertFalse(json.loads(refused.stdout).get("values_loaded"))
+            other_root = workspace / "other-corpus"
+            _publish(other_root, workspace / "other-pub")
+            fresh_cap = workspace / "fresh-cap.json"
+            fresh_cap.write_text(
+                json.dumps(
+                    _operation(
+                        _simple("fresh-corpus-cap"),
+                        focus=focus,
+                        journal=journal,
+                        market=market,
+                        text="grant for corpus A only",
+                        cap={"main": 0, "adaptive": 0, "preview": 1},
+                    )
+                ),
+                encoding="utf-8",
+            )
+            foreign_spec = workspace / "foreign-corpus.json"
+            foreign_spec.write_text(json.dumps({**other, "seed": "corpus-b"}), encoding="utf-8")
+            foreign_corpus = run_cli(
+                "discovery-preview",
+                "--spec",
+                str(foreign_spec),
+                "--store",
+                str(data_root),
+                "--journal-scope",
+                journal,
+                "--operation",
+                str(fresh_cap),
+                "--format",
+                "json",
+                data_root=other_root,
+            )
+            self.assertIn(
+                "ORDINARY_OPERATION_MARKET_MISMATCH",
+                foreign_corpus.stdout + foreign_corpus.stderr,
+            )
+            self.assertFalse(json.loads(foreign_corpus.stdout).get("values_loaded"))

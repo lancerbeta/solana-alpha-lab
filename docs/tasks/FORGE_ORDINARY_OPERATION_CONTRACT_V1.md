@@ -38,6 +38,8 @@ managed_write_set:
   - docs/evidence/forge_ordinary_operation_contract/a1_delivery_factory_fit_v1.json
   - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
   - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
+  - src/solana_alpha_lab/factory/hfic_session.py
+  - src/solana_alpha_lab/factory/hfic_temporal_discovery.py
   - src/solana_alpha_lab/factory/research_store.py
   - scripts/hypothesis_forge.py
   - src/solana_alpha_lab/factory/hfic_representation_ladder.py
