@@ -734,15 +734,15 @@ def cmd_forge_run(
         from solana_alpha_lab.factory.research_store import ResearchStore
 
         if resolved.status == "PRESENT" and resolved.root is not None:
-            projection = project_ordinary_operation(
-                ResearchStore(resolved.root, create_if_missing=False),
-                owner_focus=owner_focus if owner_focus.strip() else "AUTO",
-            )
+            try:
+                projection = project_ordinary_operation(
+                    ResearchStore(resolved.root, create_if_missing=False),
+                    owner_focus=owner_focus if owner_focus.strip() else "AUTO",
+                )
+            except Exception:
+                projection = None
             if projection is not None:
                 payload["ordinary_operation"] = projection
-                if projection.get("status") == "PAUSED_CAP":
-                    payload["next_action"] = "AUTHORIZE_ADDITIONAL_LOOKS"
-                    payload["owner_final"] = "OPERATION_PAUSED_SEARCH_OPEN"
         payload["owner_readout"] = format_forge_run_owner_readout(payload)
         return _emit_run(payload, exit_code=2)
     payload = {**receipt, "no_write": not persist, "selection_reason": resolved.selection_reason}
@@ -783,17 +783,16 @@ def cmd_forge_run(
             store=store,
             execution_context=execution_context,
         )
-    from solana_alpha_lab.factory.hfic_ordinary_operation import project_ordinary_operation
+    from solana_alpha_lab.factory.hfic_ordinary_operation import (
+        merge_ordinary_readout,
+        project_ordinary_operation,
+    )
 
     projection = project_ordinary_operation(
         store,
         owner_focus=owner_focus if owner_focus.strip() else "AUTO",
     )
-    if projection is not None and payload.get("owner_final") != "SEARCH_EXHAUSTED_CURRENT_EVIDENCE":
-        payload["ordinary_operation"] = projection
-        if projection.get("status") == "PAUSED_CAP":
-            payload["next_action"] = "AUTHORIZE_ADDITIONAL_LOOKS"
-            payload["owner_final"] = "OPERATION_PAUSED_SEARCH_OPEN"
+    payload = merge_ordinary_readout(payload, projection)
     _assert_no_path_leak(payload, str(resolved.root), str(repo_root))
     return _emit_run(payload, exit_code=(
         0 if payload.get("owner_class") not in {"INPUT_NOT_READY", "OBSERVABILITY_BLOCKED"} else 2
@@ -877,36 +876,84 @@ def cmd_discovery_execute(
         note_look_landed,
         record_operation,
     )
+    from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
     from solana_alpha_lab.factory.research_store import ResearchStore
 
-    if operation_path is None and not operation_sha256:
+    try:
+        validate_temporal_query(spec)
+        temporal_query = True
+    except Exception:
+        temporal_query = False
+    if temporal_query and operation_path is None and not operation_sha256:
         return emit(
             {"reason_code": "ORDINARY_OPERATION_REQUIRED", "values_loaded": False, "writes": False},
             exit_code=2,
         )
     op_store = ResearchStore(store_root, create_if_missing=False)
-    try:
-        if operation_path is not None:
-            request = json.loads(operation_path.read_text(encoding="utf-8"))
-            if not isinstance(request, dict):
-                raise OrdinaryOperationError("ORDINARY_OPERATION_REQUEST_REQUIRED")
-            operation = record_operation(op_store, request)
-            operation_sha256 = str(operation.get("operation_sha256") or "")
-        gate = gate_before_values(
-            op_store,
-            operation_sha256=str(operation_sha256),
-            spec=spec,
-            journal_scope=journal_scope,
-        )
-    except OrdinaryOperationError as exc:
-        return emit(
-            {"reason_code": exc.code, "values_loaded": False, "writes": False, "scientific_negative": False},
-            exit_code=2,
-        )
+    gate: dict[str, object] = {"disposition": "EXECUTE"}
+    if temporal_query or operation_path is not None or operation_sha256:
+        try:
+            if operation_path is not None:
+                request = json.loads(operation_path.read_text(encoding="utf-8"))
+                if not isinstance(request, dict):
+                    raise OrdinaryOperationError("ORDINARY_OPERATION_REQUEST_REQUIRED")
+                operation = record_operation(op_store, request)
+                operation_sha256 = str(operation.get("operation_sha256") or "")
+            gate = gate_before_values(
+                op_store,
+                operation_sha256=str(operation_sha256),
+                spec=spec,
+                journal_scope=journal_scope,
+            )
+        except OrdinaryOperationError as exc:
+            return emit(
+                {
+                    "reason_code": exc.code,
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                },
+                exit_code=2,
+            )
     if gate.get("disposition") == "REPLAY":
         evidence = dict(gate.get("evidence") or {})
+        try:
+            loaded = load_admitted_partition_rows(
+                data_root=explicit_data_root,
+                binding_doc=binding_doc,
+                partitions=cohort_partitions,
+                census_path=census_path,
+                observations_path=observations_path,
+            )
+            from solana_alpha_lab.factory.hfic_grounded_discovery import (
+                admit_discovery_binding,
+                data_binding_sha256,
+            )
+
+            actual_binding = data_binding_sha256(
+                admit_discovery_binding(loaded["cohorts"]),
+                loaded["census"],
+                loaded["observations"],
+            )
+        except GroundedDiscoveryError as exc:
+            return emit_error(exc.code)
+        except (OSError, ValueError):
+            return emit_error("DISCOVERY_ROWS_UNREADABLE")
+        if actual_binding != evidence.get("data_binding_sha256"):
+            return emit(
+                {
+                    "reason_code": "ORDINARY_OPERATION_BINDING_MISMATCH",
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                    "new_look": False,
+                },
+                exit_code=2,
+            )
         evidence["values_loaded"] = False
-        evidence["ordinary_operation"] = gate.get("operation", {}).get("operation_sha256")
+        evidence["ordinary_operation"] = (gate.get("operation") or {}).get("status")
+        evidence["operation_sha256"] = (gate.get("operation") or {}).get("operation_sha256")
+        _assert_no_path_leak(evidence, str(store_root), str(repo_root))
         return emit(evidence)
     data_root = explicit_data_root
     try:
@@ -968,6 +1015,8 @@ def cmd_discovery_preview(
     prior_preview_hash: list[str] | None,
     store_root: Path | None = None,
     journal_scope: str | None = None,
+    operation_path: Path | None = None,
+    operation_sha256: str | None = None,
 ) -> int:
     """Feature-only preview. Store memory is written only when store and journal are both set."""
 
@@ -988,6 +1037,41 @@ def cmd_discovery_preview(
         return emit_error("DISCOVERY_INPUT_INVALID")
     if binding_doc is not None and not isinstance(binding_doc, dict):
         return emit_error("DISCOVERY_INPUT_INVALID")
+    if store_root is not None and journal_scope:
+        from solana_alpha_lab.factory.hfic_ordinary_operation import (
+            OrdinaryOperationError,
+            get_operation,
+            owner_allowance,
+            record_operation,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        if operation_path is None and not operation_sha256:
+            return emit(
+                {"reason_code": "ORDINARY_OPERATION_REQUIRED", "values_loaded": False, "writes": False},
+                exit_code=2,
+            )
+        preview_store = ResearchStore(store_root, create_if_missing=False)
+        try:
+            if operation_path is not None:
+                request = json.loads(operation_path.read_text(encoding="utf-8"))
+                operation = record_operation(preview_store, request)
+            else:
+                operation = get_operation(preview_store, str(operation_sha256))
+            if str(operation.get("journal_scope") or "") != journal_scope:
+                raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_MISMATCH")
+            explicit_preview = (operation.get("owner_cap") or {}).get("preview")
+            if explicit_preview is not None:
+                from solana_alpha_lab.factory.hfic_temporal_discovery import stored_preview_hashes
+
+                used_previews = len(stored_preview_hashes(preview_store, journal_scope))
+                if used_previews >= explicit_preview or owner_allowance(preview_store, operation, "preview") < 1:
+                    raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
+        except OrdinaryOperationError as exc:
+            return emit(
+                {"reason_code": exc.code, "values_loaded": False, "writes": False, "scientific_negative": False},
+                exit_code=2,
+            )
     try:
         loaded = load_admitted_partition_rows(
             data_root=explicit_data_root,
@@ -2809,6 +2893,8 @@ def main(argv: list[str] | None = None) -> int:
                 prior_preview_hash=args.prior_preview_hash,
                 store_root=args.store,
                 journal_scope=args.journal_scope,
+                operation_path=args.operation,
+                operation_sha256=args.operation_sha256,
             )
         if args.command == "discovery-execute":
             return cmd_discovery_execute(

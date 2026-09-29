@@ -1549,10 +1549,11 @@ query scalar остаётся X300 envelope. `schedule.observation_clock_policy:
 PROVIDER_REPORTED_SNAPSHOT_V1` считает exit по request/response/availability,
 не по member anchor как market-event. Причины missing target —
 `target_exclusion_reasons` (pooled + by_cohort). Обычная пауза одного вопроса — не repair и не `NO_WORTHY` всего поиска.
-`discovery-execute` требует `ORDINARY_OPERATION_V1`: явный текст запроса,
+Temporal `discovery-execute` требует `ORDINARY_OPERATION_V1`: явный текст запроса,
 journal, полный spec и owner cap. Cap не задан — действует остаток protocol
-в этом journal, не молчаливый cap=1. После cap=0 `forge-run --no-write`
-показывает `AUTHORIZE_ADDITIONAL_LOOKS`, тот же journal и сохранённый result.
+в этом journal, не молчаливый cap=1. После cap=0 `ordinary_operation.next_action` — `AUTHORIZE_ADDITIONAL_LOOKS`,
+journal и сохранённый result те же. Верхний `next_action` прогона при этом
+не подменяется: блокировка и уже замороженный научный итог остаются своими.
 Новое разрешение — новая operation-запись на том же journal. Закрытый repair
 slot так не открывается. Expert repair остаётся в runbook ниже.
 

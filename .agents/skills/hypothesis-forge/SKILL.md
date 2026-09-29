@@ -20,12 +20,16 @@ and read-only `diagnostics --last N` (1..20).
 A short owner request is an `ORDINARY_OPERATION_V1` row in the ResearchStore,
 not a new journal and not a repair continuation. Read state with ordinary
 `forge-run --no-write` for that focus. `PAUSED_CAP` means the question was
-saved, the owner cap is spent, and the scientific search stays open: the next
-action is a new explicit authorization on the same journal. Do not emit
-`NO_WORTHY` or `WAIT_FOR_NEW_EVIDENCE` for that pause. A `STOPPED` operation
+saved and the owner cap is spent. Its next step is
+`ordinary_operation.next_action`, not a replacement of the run's
+`next_action`. A blocked readback and a frozen scientific terminal keep
+their own `next_action`. Do not emit `NO_WORTHY` or `WAIT_FOR_NEW_EVIDENCE`
+for that pause. A `STOPPED` operation
 or a real `CLOSED` repair slot is not reopened by a restart.
-`discovery-execute` and stored preview require that operation; omitting it
-does not bypass the cap. Coverage without values stays `discovery-coverage`.
+A temporal `discovery-execute` and a stored preview require that operation;
+omitting it does not bypass the cap. A null owner cap is the protocol
+remainder, not a silent cap of one. Coverage without values stays
+`discovery-coverage`.
 
 Canonical entrypoint: `scripts/hypothesis_forge.py`.
 No-write state-only coverage, never selecting `typed_value` and never reserving a slot:

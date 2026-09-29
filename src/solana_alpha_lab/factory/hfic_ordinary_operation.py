@@ -56,6 +56,8 @@ def _iter_kind(store: Any, kind: str) -> list[dict[str, Any]]:
         body = _load_body(record)
         if isinstance(body, dict) and body.get("artifact_kind") == kind:
             body["record_id"] = str(getattr(record, "record_id", "") or "")
+            recorded = getattr(record, "created_at", None)
+            body["_recorded_at"] = recorded.isoformat() if hasattr(recorded, "isoformat") else ""
             found.append(body)
     return found
 
@@ -64,11 +66,17 @@ def list_operations(store: Any) -> list[dict[str, Any]]:
     return _iter_kind(store, OPERATION_KIND)
 
 
+def _latest_recorded(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    return dict(max(rows, key=lambda item: str(item.get("_recorded_at") or "")))
+
+
 def get_operation(store: Any, operation_sha256: str) -> dict[str, Any]:
     found = [item for item in list_operations(store) if item.get("operation_sha256") == operation_sha256]
     if not found:
         raise OrdinaryOperationError("ORDINARY_OPERATION_NOT_FOUND")
-    return found[-1]
+    latest = _latest_recorded(found)
+    latest.pop("_recorded_at", None)
+    return latest
 
 
 def _cap_field(value: object) -> int | None:
@@ -341,6 +349,7 @@ def gate_before_values(
             item
             for item in looks
             if item.get("spec_sha256") == validated["spec_sha256"]
+            and item.get("operation_sha256") == operation_sha256
             and isinstance(item.get("result"), Mapping)
         ),
         None,
@@ -358,6 +367,7 @@ def gate_before_values(
                 "result": stored.get("result"),
                 "journal_scope": journal_scope,
                 "spec_sha256": validated["spec_sha256"],
+                "data_binding_sha256": stored.get("data_binding_sha256"),
                 "new_look": False,
             },
         }
@@ -459,8 +469,8 @@ def project_ordinary_operation(store: Any, *, owner_focus: str) -> dict[str, Any
     rows = [item for item in list_operations(store) if item.get("owner_focus") == owner_focus]
     if not rows:
         return None
-    rows.sort(key=lambda item: str(item.get("operation_sha256") or ""))
-    current = rows[-1]
+    current = _latest_recorded(rows)
+    current.pop("_recorded_at", None)
     journal = str(current.get("journal_scope") or "")
     looks = _looks(store, journal)
     from solana_alpha_lab.factory.hfic_temporal_discovery import assess_tier_progress, validate_temporal_query
@@ -509,7 +519,7 @@ def project_ordinary_operation(store: Any, *, owner_focus: str) -> dict[str, Any
         "completed": {
             "look": latest is not None,
             "operation": current.get("status") in {"PAUSED_CAP", "STOPPED"},
-            "scientific_search": progress.get("search_exhausted_allowed") is True,
+            "scientific_search": False,
         },
         "result_refs": [latest.get("record_id")] if latest else [],
         "result_sha256": latest.get("result_sha256") if latest else None,
@@ -523,5 +533,13 @@ def project_ordinary_operation(store: Any, *, owner_focus: str) -> dict[str, Any
         "next_action": next_action,
         "next_needs_new_values": next_needs_values,
         "next_needs_new_authority": next_needs_authority,
-        "search_open": progress.get("search_exhausted_allowed") is not True and current.get("status") != "STOPPED",
+        "search_open": current.get("status") != "STOPPED",
     }
+
+
+def merge_ordinary_readout(payload: dict[str, Any], projection: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Attach the pause beside the run. Do not replace its next action."""
+
+    if projection is not None:
+        payload["ordinary_operation"] = dict(projection)
+    return payload

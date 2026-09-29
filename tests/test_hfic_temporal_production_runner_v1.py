@@ -320,6 +320,24 @@ class TemporalVerticalTests(unittest.TestCase):
                     encoding="utf-8",
                 )
 
+            market = str(receipt["market_evidence_epoch_sha256"])
+            operation_path = workspace / "ordinary-operation.json"
+            operation_path.write_text(
+                json.dumps(
+                    {
+                        "owner_request_text": "protocol vertical temporal",
+                        "owner_focus": "ORDINARY-TEMPORAL-VERTICAL",
+                        "journal_scope": journal,
+                        "market_evidence_epoch_sha256": market,
+                        "spec": spec,
+                        "question_text": "vertical",
+                        "owner_cap": {"main": None, "adaptive": None, "preview": None},
+                        "requested_completion": "LIMITED_RESULT",
+                    }
+                ),
+                encoding="utf-8",
+            )
+
             def preview(path: Path) -> object:
                 return run_cli(
                     "discovery-preview",
@@ -329,6 +347,8 @@ class TemporalVerticalTests(unittest.TestCase):
                     str(data_root),
                     "--journal-scope",
                     journal,
+                    "--operation",
+                    str(operation_path),
                     "--prior-preview-hash",
                     "",
                     "--format",
@@ -363,6 +383,24 @@ class TemporalVerticalTests(unittest.TestCase):
             scope_path.write_text(json.dumps(scope), encoding="utf-8")
 
             def execute(path: Path) -> dict:
+                spec_body = json.loads(path.read_text(encoding="utf-8"))
+                execute._n = int(getattr(execute, "_n", 0)) + 1
+                op = path.with_suffix(".operation.json")
+                op.write_text(
+                    json.dumps(
+                        {
+                            "owner_request_text": f"protocol vertical {spec_body.get('query_id')} {execute._n}",
+                            "owner_focus": "ORDINARY-TEMPORAL-VERTICAL",
+                            "journal_scope": journal,
+                            "market_evidence_epoch_sha256": market,
+                            "spec": spec_body,
+                            "question_text": str(spec_body.get("query_id")),
+                            "owner_cap": {"main": None, "adaptive": None, "preview": None},
+                            "requested_completion": "LIMITED_RESULT",
+                        }
+                    ),
+                    encoding="utf-8",
+                )
                 completed = run_cli(
                     "discovery-execute",
                     "--store",
@@ -373,6 +411,8 @@ class TemporalVerticalTests(unittest.TestCase):
                     str(scope_path),
                     "--journal-scope",
                     journal,
+                    "--operation",
+                    str(op),
                     "--format",
                     "json",
                     data_root=data_root,
@@ -489,6 +529,22 @@ class TemporalVerticalTests(unittest.TestCase):
             mismatched["schedule"] = {"lateness_seconds": 0}
             mismatch_path = workspace / "mismatch.json"
             mismatch_path.write_text(json.dumps(mismatched), encoding="utf-8")
+            mismatch_op = workspace / "mismatch.operation.json"
+            mismatch_op.write_text(
+                json.dumps(
+                    {
+                        "owner_request_text": "protocol lateness mismatch",
+                        "owner_focus": "ORDINARY-TEMPORAL-VERTICAL",
+                        "journal_scope": journal,
+                        "market_evidence_epoch_sha256": market,
+                        "spec": mismatched,
+                        "question_text": "lateness-mismatch",
+                        "owner_cap": {"main": None, "adaptive": None, "preview": None},
+                        "requested_completion": "LIMITED_RESULT",
+                    }
+                ),
+                encoding="utf-8",
+            )
             looks_before_mismatch = len(list_discovery_looks(store, journal))
             mismatch_run = run_cli(
                 "discovery-execute",
@@ -500,6 +556,8 @@ class TemporalVerticalTests(unittest.TestCase):
                 str(scope_path),
                 "--journal-scope",
                 journal,
+                "--operation",
+                str(mismatch_op),
                 "--format",
                 "json",
                 data_root=data_root,
@@ -1088,6 +1146,23 @@ class TemporalVerticalTests(unittest.TestCase):
                 return json.loads(completed.stdout)
 
             def execute(path: Path, receipt: dict) -> dict:
+                spec_body = json.loads(path.read_text(encoding="utf-8"))
+                op = path.with_suffix(".operation.json")
+                op.write_text(
+                    json.dumps(
+                        {
+                            "owner_request_text": f"protocol focus {spec_body.get('query_id')}",
+                            "owner_focus": str(receipt.get("owner_focus") or "AUTO"),
+                            "journal_scope": str(receipt["search_key_sha256"]),
+                            "market_evidence_epoch_sha256": str(receipt["market_evidence_epoch_sha256"]),
+                            "spec": spec_body,
+                            "question_text": str(spec_body.get("query_id")),
+                            "owner_cap": {"main": None, "adaptive": None, "preview": None},
+                            "requested_completion": "LIMITED_RESULT",
+                        }
+                    ),
+                    encoding="utf-8",
+                )
                 completed = run_cli(
                     "discovery-execute",
                     "--store",
@@ -1098,6 +1173,8 @@ class TemporalVerticalTests(unittest.TestCase):
                     str(scope_path),
                     "--journal-scope",
                     str(receipt["search_key_sha256"]),
+                    "--operation",
+                    str(op),
                     "--format",
                     "json",
                     data_root=data_root,

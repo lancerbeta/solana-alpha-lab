@@ -41,6 +41,8 @@ managed_write_set:
   - scripts/hypothesis_forge.py
   - tests/test_hfic_ordinary_operation_v1.py
   - tests/test_hfic_grounded_discovery_v1.py
+  - tests/test_hfic_temporal_owner_path_v1.py
+  - tests/test_hfic_temporal_production_runner_v1.py
   - catalog/assets/core.yaml
   - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
 
@@ -94,8 +96,10 @@ UNCERTAINTY_REMOVED: >-
   before values are loaded.
 
 CAPABILITY_OR_EVIDENCE: >-
-  ORDINARY_OPERATION_V1 plus reservation, forge-run projection, and the
-  synthetic CLI pause/continuation test.
+  ORDINARY_OPERATION_V1. V1 records simple then compound, then a production
+  freeze and a new-process forge-run. V2 freezes a saved candidate after the
+  owner cap is spent, without another look. V3 reads a closed repair that has
+  no operation row. A blocked slot readback is not rewritten into another look.
 
 STOP: >-
   Stop at exact-head merge-readiness. Do not merge before the owner phrase.
@@ -104,6 +108,16 @@ STOP: >-
 NEXT: >-
   After merge and a separate owner authorization, one live question on a new
   focus. This atom does not start it.
+
+Coverage on synthetic stores through the production CLI:
+
+| Slice | Result |
+|---|---|
+| V1 | SIMPLE then compound, production freeze `NO_WORTHY_HYPOTHESIS`, new-process forge-run. MAIN 0→1→2. |
+| V2 | Positive SIMPLE, exhausted cap, revised spec refused, persist-draft, freeze, scripted critic, finalize. MAIN stays 1. |
+| V3 | Closed repair readback with no operation artifact. |
+| Guards | Cap 0 before values, preview cap 0, same-operation replay, changed binding refused, blocked run keeps its next_action. |
+| Model | One empty-store trial on `gpt-5.6-sol-xhigh` stopped `MARKET_EVIDENCE_BASIS_INCOMPLETE` with no MAIN. Two later trials reported model `UNKNOWN`. |
 
 Ordinary operation contract. Historical scientific contracts stay in place.
 The closed repair `4a01bbb755f2097dd99285e619f3699bcb2e7879957d2bfa9bc254dbc64da0f1`

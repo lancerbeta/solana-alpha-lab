@@ -1,0 +1,55 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-ORDINARY-OPERATION-CONTRACT-REVIEW-001",
+  "as_of": "2026-09-29",
+  "task_id": "FORGE_ORDINARY_OPERATION_CONTRACT_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Current operation and its latest status are chosen by record created_at, not by partition-hash iteration. A later operation whose sha sorts first still wins. LadderError readback does not rewrite next_action. A changed corpus binding on the same operation is ORDINARY_OPERATION_BINDING_MISMATCH with no new look."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "V1 reaches a production freeze CLI and a new-process readback after compound. V2 freezes a persisted candidate after the cap is spent and keeps one MAIN. V3 delegates to the existing closed-repair production readback, which has no operation artifact."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=2d2e6d79bbb980e921de1efa0fd8f62a2210711d096a0c00df3b919cf1f7e948 SEMANTIC_PREMISE PASS. merge_ordinary_readout attaches the pause and does not replace a frozen owner_final or a blocked next_action. completed.scientific_search stays false. P2 notes were not patched."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "The pause next step is ordinary_operation.next_action. A blocked forge-run and a frozen scientific terminal keep their own next_action. One request records ORDINARY_OPERATION_V1. A pause is not NO_WORTHY and not a repair continuation."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MERGE",
+    "NO_ALPHA",
+    "NO_MARKET_FORGE",
+    "NO_NET_RETURN",
+    "NO_LIVE_LOOK",
+    "MODEL_TRIAL_2_AND_3_PROVENANCE_UNKNOWN"
+  ]
+}

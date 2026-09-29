@@ -23,6 +23,8 @@ if str(SRC) not in sys.path:
 from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks  # noqa: E402
 from solana_alpha_lab.factory.hfic_ordinary_operation import (  # noqa: E402
     gate_before_values,
+    get_operation,
+    merge_ordinary_readout,
     project_ordinary_operation,
     record_operation,
 )
@@ -308,8 +310,19 @@ class OrdinaryOperationTests(unittest.TestCase):
             self.assertEqual(operation.get("status"), "PAUSED_CAP", readback)
             self.assertEqual(operation.get("journal_scope"), JOURNAL)
             self.assertEqual(operation.get("owner_main_remaining"), 0)
-            self.assertEqual(readback.get("next_action"), "AUTHORIZE_ADDITIONAL_LOOKS", readback)
+            self.assertEqual(operation.get("next_action"), "AUTHORIZE_ADDITIONAL_LOOKS", readback)
+            self.assertNotEqual(readback.get("next_action"), "AUTHORIZE_ADDITIONAL_LOOKS", readback)
+            self.assertEqual(readback.get("owner_class"), "INPUT_NOT_READY", readback)
             self.assertNotEqual(readback.get("owner_final"), "SEARCH_EXHAUSTED_CURRENT_EVIDENCE")
+            frozen = {
+                "next_action": "RETURN_EXISTING_RUN",
+                "owner_final": "NO_WORTHY_HYPOTHESIS",
+                "owner_class": "OWNER_FINAL",
+            }
+            merged = merge_ordinary_readout(frozen, {"status": "PAUSED_CAP", "next_action": "AUTHORIZE_ADDITIONAL_LOOKS"})
+            self.assertEqual(merged["owner_final"], "NO_WORTHY_HYPOTHESIS")
+            self.assertEqual(merged["next_action"], "RETURN_EXISTING_RUN")
+            self.assertEqual(merged["ordinary_operation"]["status"], "PAUSED_CAP")
             other = _compound_spec()
             other_path = root / "compound.json"
             other_path.write_text(json.dumps(other), encoding="utf-8")
@@ -386,3 +399,533 @@ class OrdinaryOperationTests(unittest.TestCase):
                     journal_scope=JOURNAL,
                 )
             self.assertEqual(getattr(raised.exception, "code", ""), "ORDINARY_OPERATION_SPEC_MISMATCH")
+
+    def test_zero_owner_cap_refuses_while_protocol_budget_remains(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            store = root / "store"
+            ResearchStore(store)
+            spec = _simple_spec()
+            operation = record_operation(
+                ResearchStore(store),
+                _operation(spec, completion="LIMITED_RESULT", cap_main=0),
+            )
+            with self.assertRaises(Exception) as raised:
+                gate_before_values(
+                    ResearchStore(store, create_if_missing=False),
+                    operation_sha256=operation["operation_sha256"],
+                    spec=spec,
+                    journal_scope=JOURNAL,
+                )
+            self.assertEqual(getattr(raised.exception, "code", ""), "OWNER_CAP_EXHAUSTED")
+            self.assertEqual(_mains(store), [])
+
+    def test_preview_cap_zero_refuses_before_values(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            store = root / "store"
+            ResearchStore(store)
+            spec = _simple_spec()
+            request = _operation(spec, completion="LIMITED_RESULT", cap_main=1)
+            request["owner_cap"]["preview"] = 0
+            op_path = root / "op.json"
+            spec_path = root / "spec.json"
+            op_path.write_text(json.dumps(request), encoding="utf-8")
+            spec_path.write_text(json.dumps({"decision": {"point_id": "Y3600"}}), encoding="utf-8")
+            refused = _cli(
+                store,
+                "discovery-preview",
+                "--spec",
+                str(spec_path),
+                "--store",
+                str(store),
+                "--journal-scope",
+                JOURNAL,
+                "--operation",
+                str(op_path),
+                "--format",
+                "json",
+            )
+            self.assertEqual(refused.get("reason_code"), "OWNER_CAP_EXHAUSTED", refused)
+            self.assertFalse(refused.get("values_loaded"))
+
+    def test_compound_then_real_freeze_is_the_scientific_terminal(self) -> None:
+        from tests.test_hfic_cli import bind_draft, seed_minimal_market_basis
+
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            data_root = root / "rdp"
+            seed_minimal_market_basis(data_root)
+            focus = "V1_ORDINARY_SEARCH_TERMINAL"
+            preflight = _cli(
+                data_root,
+                "--data-root",
+                str(data_root),
+                "preflight",
+                "--owner-focus",
+                focus,
+                "--format",
+                "json",
+            )
+            self.assertEqual(preflight.get("_exit"), 0, preflight)
+            journal = str(preflight["search_key_sha256"])
+            market = str(preflight["market_evidence_epoch_sha256"])
+            census, observations, binding = _write_partition(root)
+            simple = _simple_spec()
+            compound = _compound_spec()
+            simple_path = root / "simple.json"
+            compound_path = root / "compound.json"
+            scope_path = root / "scope.json"
+            simple_op = root / "simple.op.json"
+            compound_op = root / "compound.op.json"
+            simple_path.write_text(json.dumps(simple), encoding="utf-8")
+            compound_path.write_text(json.dumps(compound), encoding="utf-8")
+            scope_path.write_text(
+                json.dumps(
+                    {
+                        "population": "BASE_X",
+                        "decision_timestamp": "Y3600",
+                        "target": "PRICE_RELATIVE_PROXY:Y3600:Y7200:FIELD-USD-PRICE-001",
+                        "estimand": "price_relative_proxy",
+                        "explanatory_condition": "retention",
+                        "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            simple_request = _operation(simple, completion="LIMITED_RESULT", cap_main=1)
+            simple_request["owner_focus"] = focus
+            simple_request["journal_scope"] = journal
+            simple_request["market_evidence_epoch_sha256"] = market
+            simple_op.write_text(json.dumps(simple_request), encoding="utf-8")
+            first = _cli(
+                data_root,
+                "discovery-execute",
+                "--store",
+                str(data_root),
+                "--census",
+                str(census),
+                "--observations",
+                str(observations),
+                "--binding",
+                str(binding),
+                "--spec",
+                str(simple_path),
+                "--candidate-scope",
+                str(scope_path),
+                "--journal-scope",
+                journal,
+                "--operation",
+                str(simple_op),
+                "--format",
+                "json",
+            )
+            self.assertEqual(first.get("_exit"), 0, first)
+            self.assertEqual(first.get("ordinary_operation"), "PAUSED_CAP", first)
+            parent = record_operation(
+                ResearchStore(data_root, create_if_missing=False), simple_request
+            )["operation_sha256"]
+            follow = _operation(compound, completion="SCIENTIFIC_TERMINAL", cap_main=1, parent=parent)
+            follow["owner_focus"] = focus
+            follow["journal_scope"] = journal
+            follow["market_evidence_epoch_sha256"] = market
+            compound_op.write_text(json.dumps(follow), encoding="utf-8")
+            second = _cli(
+                data_root,
+                "discovery-execute",
+                "--store",
+                str(data_root),
+                "--census",
+                str(census),
+                "--observations",
+                str(observations),
+                "--binding",
+                str(binding),
+                "--spec",
+                str(compound_path),
+                "--candidate-scope",
+                str(scope_path),
+                "--journal-scope",
+                journal,
+                "--operation",
+                str(compound_op),
+                "--format",
+                "json",
+            )
+            self.assertEqual(second.get("_exit"), 0, second)
+            self.assertEqual(
+                len(list_discovery_looks(ResearchStore(data_root, create_if_missing=False), journal)),
+                2,
+            )
+            fresh = _cli(
+                data_root,
+                "--data-root",
+                str(data_root),
+                "preflight",
+                "--owner-focus",
+                focus,
+                "--format",
+                "json",
+            )
+            self.assertEqual(fresh.get("_exit"), 0, fresh)
+            source = json.loads(
+                (ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1_2.json").read_text(encoding="utf-8")
+            )
+            source["grounded_evidence"] = second
+            source["owner_focus"] = focus
+            receipt = {key: value for key, value in fresh.items() if not str(key).startswith("_")}
+            draft = bind_draft(source, receipt)
+            draft_path = root / "draft.json"
+            receipt_path = root / "preflight.json"
+            draft_path.write_text(json.dumps(draft), encoding="utf-8")
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            frozen = _cli(
+                data_root,
+                "--data-root",
+                str(data_root),
+                "freeze",
+                "--draft",
+                str(draft_path),
+                "--preflight-receipt",
+                str(receipt_path),
+                "--format",
+                "json",
+            )
+            self.assertEqual(frozen.get("_exit"), 0, frozen)
+            self.assertEqual(frozen.get("critic_terminal"), "NO_WORTHY_HYPOTHESIS", frozen)
+            readback = _cli(
+                data_root,
+                "--data-root",
+                str(data_root),
+                "forge-run",
+                "--owner-focus",
+                focus,
+                "--no-write",
+                "--format",
+                "json",
+            )
+            self.assertEqual(readback.get("_exit"), 0, readback)
+            self.assertIn(
+                readback.get("owner_final"),
+                {"SEARCH_EXHAUSTED_CURRENT_EVIDENCE", "NO_WORTHY_HYPOTHESIS"},
+            )
+            self.assertEqual(
+                len(
+                    [
+                        item
+                        for item in list_discovery_looks(
+                            ResearchStore(data_root, create_if_missing=False), journal
+                        )
+                        if item.get("look_class") == "MAIN" and item.get("new_look") is True
+                    ]
+                ),
+                2,
+            )
+
+    def test_cap_zero_still_freezes_a_saved_candidate(self) -> None:
+        from tests.test_hfic_cli import bind_draft, seed_minimal_market_basis
+
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            data_root = root / "rdp"
+            seed_minimal_market_basis(data_root)
+            focus = "V2_CAP_ZERO_CANDIDATE"
+            preflight = _cli(
+                data_root,
+                "--data-root",
+                str(data_root),
+                "preflight",
+                "--owner-focus",
+                focus,
+                "--format",
+                "json",
+            )
+            self.assertEqual(preflight.get("_exit"), 0, preflight)
+            journal = str(preflight["search_key_sha256"])
+            market = str(preflight["market_evidence_epoch_sha256"])
+            census, observations = _rows()
+            for row in observations:
+                if row.get("point_id") == "Y7200":
+                    row["typed_value"] = 3.0
+            census_path = root / "census.parquet"
+            obs_path = root / "observations.parquet"
+            pq.write_table(pa.Table.from_pylist(census), census_path)
+            pq.write_table(pa.Table.from_pylist(observations), obs_path)
+            binding = {
+                "cohorts": [
+                    {
+                        "dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+                        "evidence_role": "EXPLORATORY_REUSE",
+                        "holdout": False,
+                        "cohort_id": COHORT,
+                        "release_id": RELEASE,
+                        "census_sha256": hashlib.sha256(census_path.read_bytes()).hexdigest(),
+                        "observations_sha256": hashlib.sha256(obs_path.read_bytes()).hexdigest(),
+                        "schedule_lateness_seconds": 300,
+                    }
+                ]
+            }
+            binding_path = root / "binding.json"
+            binding_path.write_text(json.dumps(binding), encoding="utf-8")
+            spec = _simple_spec()
+            spec["query_id"] = "simple_positive_window"
+            spec_path = root / "spec.json"
+            scope_path = root / "scope.json"
+            op_path = root / "op.json"
+            spec_path.write_text(json.dumps(spec), encoding="utf-8")
+            scope_path.write_text(
+                json.dumps(
+                    {
+                        "population": "BASE_X",
+                        "decision_timestamp": "Y3600",
+                        "target": "PRICE_RELATIVE_PROXY:Y3600:Y7200:FIELD-USD-PRICE-001",
+                        "estimand": "price_relative_proxy",
+                        "explanatory_condition": "retention",
+                        "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            request = _operation(spec, completion="LIMITED_RESULT", cap_main=1)
+            request["owner_focus"] = focus
+            request["journal_scope"] = journal
+            request["market_evidence_epoch_sha256"] = market
+            op_path.write_text(json.dumps(request), encoding="utf-8")
+            evidence = _cli(
+                data_root,
+                "discovery-execute",
+                "--store",
+                str(data_root),
+                "--census",
+                str(census_path),
+                "--observations",
+                str(obs_path),
+                "--binding",
+                str(binding_path),
+                "--spec",
+                str(spec_path),
+                "--candidate-scope",
+                str(scope_path),
+                "--journal-scope",
+                journal,
+                "--operation",
+                str(op_path),
+                "--format",
+                "json",
+            )
+            self.assertEqual(evidence.get("_exit"), 0, evidence)
+            self.assertGreater(float(evidence["result"]["mean_target"]), 0.0)
+            self.assertEqual(evidence.get("ordinary_operation"), "PAUSED_CAP")
+            changed = dict(spec)
+            changed["query_id"] = "simple_positive_revised"
+            changed_path = root / "revised.json"
+            changed_path.write_text(json.dumps(changed), encoding="utf-8")
+            revised = _cli(
+                data_root,
+                "discovery-execute",
+                "--store",
+                str(data_root),
+                "--census",
+                str(census_path),
+                "--observations",
+                str(obs_path),
+                "--binding",
+                str(binding_path),
+                "--spec",
+                str(changed_path),
+                "--candidate-scope",
+                str(scope_path),
+                "--journal-scope",
+                journal,
+                "--operation",
+                str(op_path),
+                "--format",
+                "json",
+            )
+            self.assertEqual(revised.get("reason_code"), "ORDINARY_OPERATION_SPEC_MISMATCH", revised)
+            self.assertFalse(revised.get("values_loaded"))
+            fresh = _cli(
+                data_root,
+                "--data-root",
+                str(data_root),
+                "preflight",
+                "--owner-focus",
+                focus,
+                "--format",
+                "json",
+            )
+            self.assertEqual(fresh.get("_exit"), 0, fresh)
+            receipt = {key: value for key, value in fresh.items() if not str(key).startswith("_")}
+            source = json.loads(
+                (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(encoding="utf-8")
+            )
+            card = dict(source["candidates"][0])
+            card.update(
+                {
+                    "population": "BASE_X",
+                    "decision_timestamp": "Y3600",
+                    "target": "PRICE_RELATIVE_PROXY:Y3600:Y7200:FIELD-USD-PRICE-001",
+                    "estimand": "price_relative_proxy",
+                    "explanatory_condition": "retention",
+                }
+            )
+            draft = bind_draft({**source, "candidates": [card]}, receipt)
+            draft.pop("runner_up_candidate_ref", None)
+            draft.pop("strongest_rejected_alternative", None)
+            draft["selected_candidate_ref"] = card["label"]
+            draft["grounded_evidence"] = evidence
+            draft["owner_focus"] = focus
+            draft_path = root / "draft.json"
+            receipt_path = root / "preflight.json"
+            draft_path.write_text(json.dumps(draft), encoding="utf-8")
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            persisted = _cli(
+                data_root,
+                "--data-root",
+                str(data_root),
+                "persist-draft",
+                "--draft",
+                str(draft_path),
+                "--preflight-receipt",
+                str(receipt_path),
+                "--representation-id",
+                "BASE",
+                "--format",
+                "json",
+            )
+            self.assertEqual(persisted.get("_exit"), 0, persisted)
+            resume = _cli(
+                data_root,
+                "--data-root",
+                str(data_root),
+                "preflight",
+                "--owner-focus",
+                focus,
+                "--format",
+                "json",
+            )
+            self.assertEqual(resume.get("_exit"), 0, resume)
+            resume_receipt = {key: value for key, value in resume.items() if not str(key).startswith("_")}
+            resume_path = root / "resume.json"
+            resume_path.write_text(json.dumps(resume_receipt), encoding="utf-8")
+            frozen = _cli(
+                data_root,
+                "--data-root",
+                str(data_root),
+                "freeze",
+                "--draft",
+                str(draft_path),
+                "--preflight-receipt",
+                str(resume_path),
+                "--format",
+                "json",
+            )
+            self.assertEqual(frozen.get("_exit"), 0, frozen)
+            self.assertTrue(frozen.get("critic_input_packet"), frozen)
+            critic = {
+                "schema": "smial.hypothesis-critic-result",
+                "schema_version": "1.1",
+                "session_id": frozen["session_id"],
+                "critic_input_packet_sha256": frozen["critic_input_packet_sha256"],
+                "selected_candidate_id": frozen["selected_candidate_id"],
+                "selected_definition_sha256": frozen["selected_definition_sha256"],
+                "critic_prompt_version": "HFIC-V1.1",
+                "isolated_context_attestation": "NEW_CONTEXT_REQUIRED",
+                "critic_terminal": "KILL_PREPARATORY_LOOP",
+                "next": "STOP",
+                "authority": {
+                    "git_mutation": 0,
+                    "experiment_execution": 0,
+                    "provider_api_rpc_wss_calls": 0,
+                },
+                "non_claims": ["NO_ALPHA", "FIXTURE_CRITIC"],
+            }
+            critic_path = root / "critic.json"
+            critic_path.write_text(json.dumps(critic), encoding="utf-8")
+            finalized = _cli(
+                data_root,
+                "--data-root",
+                str(data_root),
+                "finalize",
+                "--session-id",
+                str(frozen["session_id"]),
+                "--critic-result",
+                str(critic_path),
+                "--format",
+                "json",
+            )
+            self.assertEqual(finalized.get("_exit"), 0, finalized)
+            shown = _cli(
+                data_root,
+                "--data-root",
+                str(data_root),
+                "show-session",
+                "--session-id",
+                str(frozen["session_id"]),
+                "--format",
+                "json",
+            )
+            self.assertEqual(shown.get("_exit"), 0, shown)
+            self.assertEqual(shown.get("session_id"), frozen["session_id"])
+            readback = _cli(
+                data_root,
+                "--data-root",
+                str(data_root),
+                "forge-run",
+                "--owner-focus",
+                focus,
+                "--no-write",
+                "--format",
+                "json",
+            )
+            self.assertEqual(readback.get("writes", {}).get("research_store"), 0)
+            self.assertEqual(
+                (readback.get("ordinary_operation") or {}).get("owner_main_remaining"),
+                0,
+            )
+            self.assertEqual(
+                len(
+                    [
+                        item
+                        for item in list_discovery_looks(
+                            ResearchStore(data_root, create_if_missing=False), journal
+                        )
+                        if item.get("look_class") == "MAIN" and item.get("new_look") is True
+                    ]
+                ),
+                1,
+            )
+
+    def test_later_operation_wins_even_when_its_hash_sorts_first(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            store = Path(raw) / "store"
+            ResearchStore(store)
+            first = record_operation(
+                ResearchStore(store),
+                _operation(_simple_spec(), completion="LIMITED_RESULT", cap_main=1),
+            )
+            later = None
+            for index in range(40):
+                spec = _simple_spec()
+                spec["query_id"] = f"later_{index}"
+                row = record_operation(
+                    ResearchStore(store),
+                    _operation(spec, completion="LIMITED_RESULT", cap_main=1),
+                )
+                if row["operation_sha256"] < first["operation_sha256"]:
+                    later = row
+                    break
+            self.assertIsNotNone(later)
+            seen = project_ordinary_operation(ResearchStore(store, create_if_missing=False), owner_focus=FOCUS)
+            self.assertEqual(seen["operation_sha256"], later["operation_sha256"])
+            self.assertEqual(get_operation(ResearchStore(store, create_if_missing=False), first["operation_sha256"])["status"], "OPEN")
+
+    def test_closed_repair_without_operation_artifact_still_reads(self) -> None:
+        from tests.test_hfic_legacy_parent_continuation_compat_v1 import (
+            LegacyParentContinuationCompatTests,
+        )
+
+        legacy = LegacyParentContinuationCompatTests(
+            "test_cli_capability_drift_freeze_close_and_readback"
+        )
+        legacy.test_cli_capability_drift_freeze_close_and_readback()

@@ -32288,7 +32288,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 891619baebfd82c117aaa55fb5e5099afa050773bb309329510d004bc338b019}
+  integrity: {kind: sha256, sha256: 151e24ed0edf2b19b189acbf8fd8005c3890c4ff02e1fe20e6b5a4df1f5c05d2}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34501,7 +34501,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 679ca0927cf446ad21ebb95303a320e2fa70fac50b381834d0f74436b6b3b6bc}
+  integrity: {kind: sha256, sha256: a11bc28c3dd9ab8de1e2a2a9c71e4569858825140f7dd687918e086848fb67ec}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34519,7 +34519,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: 671ed7af4d2d5b0aec0ec0291f2923f9d8e55ed9b5b7ea913753a21b1074c4e7}
+  integrity: {kind: sha256, sha256: bf08cae582b75f5de4c0197142e62cbc79bafccc8e185ef3bbe4f47a5431bc3a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
