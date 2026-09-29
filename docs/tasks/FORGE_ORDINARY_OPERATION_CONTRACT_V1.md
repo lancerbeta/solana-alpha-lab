@@ -54,6 +54,7 @@ managed_write_set:
   - tests/test_hfic_temporal_production_runner_v1.py
   - tests/test_hfic_temporal_discovery_v1.py
   - tests/test_hfic_temporal_operability_repair_v1.py
+  - tests/test_hfic_legacy_parent_continuation_compat_v1.py
   - .cursor/commands/hypothesis-forge.md
   - catalog/assets/core.yaml
   - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
@@ -129,8 +130,10 @@ NEXT: >-
   Isolated Critic terminal KILL_UNBOUND_EVIDENCE, session
   SYNTHESIS_COMPLETE, ordinary entry RETURN_EXISTING_SESSION.
   acceptance_code_head is c907e76ce96bb774030f88aa1b93a1f315a503a5.
-  After merging main 93d8d855 the Forge runtime bytes in the compare
-  scope still match that head, so the acceptance still applies.
+  Merging main 93d8d855 did not change Forge runtime. A later
+  ordinary-path fix did: exact REPLAY and pending RESUME now precede
+  ORDINARY_OPERATION_SLOT_CLOSED. Acceptance 10 was not rerun and does
+  not cover that runtime delta.
   No second replacement.
   Do not regenerate trial 7. Do not weaken the git fence.
   After merge, use Forge. Do not open another ordinary-path audit.

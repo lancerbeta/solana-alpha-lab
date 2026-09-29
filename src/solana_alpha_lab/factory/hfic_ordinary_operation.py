@@ -567,8 +567,6 @@ def gate_before_values(
     admission = _admit(store, operation)
     if admission.get("action") == "STOP":
         raise OrdinaryOperationError(str(admission.get("reason_code") or "SCIENTIFIC_ADMISSION_STOP"))
-    if _closed_slot(admission, list_hfic_sessions(store)):
-        raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")
     stored = next(
         (
             item
@@ -623,6 +621,8 @@ def gate_before_values(
             "spec_sha256": validated["spec_sha256"],
             "look_class": pending[0].get("look_class"),
         }
+    if _closed_slot(admission, list_hfic_sessions(store)):
+        raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")
     try:
         classified = classify_temporal_look(looks, spec)
     except Exception as exc:

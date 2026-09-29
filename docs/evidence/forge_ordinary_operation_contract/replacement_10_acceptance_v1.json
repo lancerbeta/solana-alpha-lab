@@ -41,7 +41,8 @@
   "git_composite_unchanged": true,
   "git_composite_drift_during_active_chain": 0,
   "merged_main": "93d8d8552f09b4e08bc2b62d1bf81e14fe07e10c",
-  "runtime_bytes_equivalent_to_acceptance_code_head": true,
+  "runtime_bytes_equivalent_to_acceptance_code_head": false,
+  "runtime_delta_after_acceptance": "gate_before_values returns exact stored REPLAY and pending RESUME before ORDINARY_OPERATION_SLOT_CLOSED. A new spec on a closed NO_WORTHY slot still refuses. Acceptance 10 was not rerun.",
   "runtime_compare_scope": [
     ".agents/skills/hypothesis-forge/SKILL.md",
     ".cursor/commands/hypothesis-forge.md",
