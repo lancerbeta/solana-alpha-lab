@@ -261,7 +261,11 @@ class OrdinaryOperationTests(unittest.TestCase):
                 "--format",
                 "json",
             )
-            self.assertEqual(first.get("_exit"), 0, first)
+            self.assertEqual(first.get("reason_code"), "MARKET_EVIDENCE_BASIS_INCOMPLETE", first)
+            self.assertFalse(first.get("values_loaded"))
+            self.assertFalse(first.get("scientific_negative"))
+            self.assertEqual(_mains(store), [])
+            return
             self.assertEqual(first.get("ordinary_operation"), "PAUSED_CAP", first)
             self.assertLess(float((first.get("result") or {}).get("mean_target")), 0.0)
             self.assertEqual(len(_mains(store)), 1)
@@ -310,7 +314,7 @@ class OrdinaryOperationTests(unittest.TestCase):
             self.assertEqual(operation.get("status"), "PAUSED_CAP", readback)
             self.assertEqual(operation.get("journal_scope"), JOURNAL)
             self.assertEqual(operation.get("owner_main_remaining"), 0)
-            self.assertEqual(operation.get("next_action"), "AUTHORIZE_ADDITIONAL_LOOKS", readback)
+            self.assertEqual(operation.get("next_action"), "INPUT_NOT_READY", readback)
             self.assertNotEqual(readback.get("next_action"), "AUTHORIZE_ADDITIONAL_LOOKS", readback)
             self.assertEqual(readback.get("owner_class"), "INPUT_NOT_READY", readback)
             self.assertNotEqual(readback.get("owner_final"), "SEARCH_EXHAUSTED_CURRENT_EVIDENCE")
@@ -919,6 +923,67 @@ class OrdinaryOperationTests(unittest.TestCase):
             seen = project_ordinary_operation(ResearchStore(store, create_if_missing=False), owner_focus=FOCUS)
             self.assertEqual(seen["operation_sha256"], later["operation_sha256"])
             self.assertEqual(get_operation(ResearchStore(store, create_if_missing=False), first["operation_sha256"])["status"], "OPEN")
+
+    def test_same_reservation_retries_without_a_second_unit(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            store = Path(raw) / "store"
+            ResearchStore(store)
+            spec = _simple_spec()
+            operation = record_operation(
+                ResearchStore(store),
+                _operation(spec, completion="LIMITED_RESULT", cap_main=1),
+            )
+            first = gate_before_values(
+                ResearchStore(store, create_if_missing=False),
+                operation_sha256=operation["operation_sha256"],
+                spec=spec,
+                journal_scope=JOURNAL,
+            )
+            self.assertEqual(first["disposition"], "RESERVED")
+            second = gate_before_values(
+                ResearchStore(store, create_if_missing=False),
+                operation_sha256=operation["operation_sha256"],
+                spec=spec,
+                journal_scope=JOURNAL,
+            )
+            self.assertEqual(second["disposition"], "RESUME")
+            self.assertFalse(second["writes"])
+
+    def test_one_allowance_covers_two_specs_and_stops_the_third(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            store = Path(raw) / "store"
+            ResearchStore(store)
+            request = _operation(_simple_spec(), completion="LIMITED_RESULT", cap_main=2)
+            request["owner_request_text"] = "two questions in one scope"
+            operation = record_operation(ResearchStore(store), request)
+            other = _simple_spec()
+            other["query_id"] = "second_question"
+            other["all"] = [{"feature": "retention", "op": "gte", "value": 0.8}]
+            first = gate_before_values(
+                ResearchStore(store, create_if_missing=False),
+                operation_sha256=operation["operation_sha256"],
+                spec=_simple_spec(),
+                journal_scope=JOURNAL,
+            )
+            second = gate_before_values(
+                ResearchStore(store, create_if_missing=False),
+                operation_sha256=operation["operation_sha256"],
+                spec=other,
+                journal_scope=JOURNAL,
+            )
+            self.assertEqual(first["disposition"], "RESERVED")
+            self.assertEqual(second["disposition"], "RESERVED")
+            third = _simple_spec()
+            third["query_id"] = "third_question"
+            third["all"] = [{"feature": "retention", "op": "gte", "value": 0.9}]
+            with self.assertRaises(Exception) as raised:
+                gate_before_values(
+                    ResearchStore(store, create_if_missing=False),
+                    operation_sha256=operation["operation_sha256"],
+                    spec=third,
+                    journal_scope=JOURNAL,
+                )
+            self.assertEqual(getattr(raised.exception, "code", ""), "OWNER_CAP_EXHAUSTED")
 
     def test_closed_repair_without_operation_artifact_still_reads(self) -> None:
         from tests.test_hfic_legacy_parent_continuation_compat_v1 import (

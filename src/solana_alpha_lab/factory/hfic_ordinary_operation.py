@@ -94,8 +94,6 @@ def record_operation(store: Any, request: Mapping[str, Any]) -> dict[str, Any]:
     if not isinstance(text, str) or not text.strip():
         raise OrdinaryOperationError("ORDINARY_OPERATION_REQUEST_REQUIRED")
     spec = request.get("spec")
-    if not isinstance(spec, Mapping):
-        raise OrdinaryOperationError("ORDINARY_OPERATION_SPEC_REQUIRED")
     journal = str(request.get("journal_scope") or "").strip()
     focus = str(request.get("owner_focus") or "").strip()
     market = str(request.get("market_evidence_epoch_sha256") or "").strip()
@@ -110,13 +108,18 @@ def record_operation(store: Any, request: Mapping[str, Any]) -> dict[str, Any]:
         "adaptive": _cap_field(cap_in.get("adaptive")),
         "preview": _cap_field(cap_in.get("preview")),
     }
-    from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+    exact = cap["main"] == 1
+    validated = None
+    if exact and not isinstance(spec, Mapping):
+        raise OrdinaryOperationError("ORDINARY_OPERATION_SPEC_REQUIRED")
+    if isinstance(spec, Mapping):
+        from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
 
-    try:
-        validated = validate_temporal_query(spec)
-    except Exception as exc:
-        code = getattr(exc, "code", None) or "QUERY_SPEC_INVALID"
-        raise OrdinaryOperationError(str(code)) from exc
+        try:
+            validated = validate_temporal_query(spec)
+        except Exception as exc:
+            code = getattr(exc, "code", None) or "QUERY_SPEC_INVALID"
+            raise OrdinaryOperationError(str(code)) from exc
     parent = request.get("parent_operation_sha256")
     if parent is not None and (not isinstance(parent, str) or len(parent) != 64):
         raise OrdinaryOperationError("ORDINARY_OPERATION_PARENT_INVALID")
@@ -143,8 +146,6 @@ def record_operation(store: Any, request: Mapping[str, Any]) -> dict[str, Any]:
         "journal_scope": journal,
         "market_evidence_epoch_sha256": market,
         "scientific_slot_sha256": slot,
-        "spec_canonical": _canonical(dict(spec)),
-        "spec_sha256": validated["spec_sha256"],
         "question_text": str(request.get("question_text") or text.strip()),
         "owner_cap": cap,
         "requested_completion": completion,
@@ -156,6 +157,8 @@ def record_operation(store: Any, request: Mapping[str, Any]) -> dict[str, Any]:
             return existing
     stored = {
         **identity_body,
+        "spec_sha256": None if not exact or validated is None else validated["spec_sha256"],
+        "spec_canonical": None if not exact or not isinstance(spec, Mapping) else _canonical(dict(spec)),
         "operation_sha256": digest,
         "status": "OPEN",
         "schema": "smial.hfic-ordinary-operation",
@@ -202,15 +205,49 @@ def _looks(store: Any, journal: str) -> list[dict[str, Any]]:
     return list_discovery_looks(store, journal)
 
 
-def _protocol_remaining(looks: Sequence[Mapping[str, Any]], kind: str) -> int:
+def binding_fingerprint(cohorts: Sequence[Mapping[str, Any]] | None) -> str | None:
+    """Hash declared cohort metadata. Does not read parquet values."""
+
+    if not cohorts:
+        return None
+    rows = []
+    for item in cohorts:
+        if not isinstance(item, Mapping):
+            continue
+        rows.append(
+            {
+                "cohort_id": item.get("cohort_id"),
+                "census_sha256": item.get("census_sha256"),
+                "observations_sha256": item.get("observations_sha256"),
+                "dataset_id": item.get("dataset_id"),
+                "evidence_role": item.get("evidence_role"),
+                "holdout": item.get("holdout"),
+            }
+        )
+    if not rows or not any(row.get("census_sha256") for row in rows):
+        return None
+    return _sha({"cohorts": rows})
+
+
+def _protocol_remaining(store: Any, looks: Sequence[Mapping[str, Any]], kind: str) -> int:
     if kind == "preview":
         used = sum(1 for item in looks if item.get("look_class") == "PREVIEW" and item.get("new_look") is True)
         return max(0, MAX_PREVIEW_SPECS - used)
-    if kind == "adaptive":
-        used = sum(1 for item in looks if item.get("look_class") == "ADAPTIVE" and item.get("new_look") is True)
-        return max(0, MAX_ADAPTIVE_REFINEMENTS - used)
-    used = sum(1 for item in looks if item.get("look_class") == "MAIN" and item.get("new_look") is True)
-    return max(0, MAX_MAIN_QUERY_SPECS - used)
+    completed = {
+        str(item.get("spec_sha256") or "")
+        for item in looks
+        if item.get("look_class") == ("ADAPTIVE" if kind == "adaptive" else "MAIN")
+        and item.get("new_look") is True
+        and isinstance(item.get("result"), Mapping)
+    }
+    in_flight = {
+        str(item.get("spec_sha256") or "")
+        for item in _iter_kind(store, RESERVATION_KIND)
+        if item.get("look_class") == ("ADAPTIVE" if kind == "adaptive" else "MAIN")
+        and str(item.get("spec_sha256") or "") not in completed
+    }
+    limit = MAX_ADAPTIVE_REFINEMENTS if kind == "adaptive" else MAX_MAIN_QUERY_SPECS
+    return max(0, limit - len(completed) - len(in_flight))
 
 
 def _reservations(store: Any, operation_sha256: str) -> list[dict[str, Any]]:
@@ -243,7 +280,7 @@ def owner_allowance(store: Any, operation: Mapping[str, Any], kind: str) -> int:
     """Explicit cap wins when it is smaller than the protocol remainder."""
 
     looks = _looks(store, str(operation.get("journal_scope") or ""))
-    protocol = _protocol_remaining(looks, kind)
+    protocol = _protocol_remaining(store, looks, kind)
     explicit = (operation.get("owner_cap") or {}).get(kind)
     if explicit is None:
         return protocol
@@ -316,25 +353,39 @@ def gate_before_values(
     operation_sha256: str,
     spec: Mapping[str, Any],
     journal_scope: str,
+    binding_cohorts: Sequence[Mapping[str, Any]] | None = None,
+    verified_market: str | None = None,
 ) -> dict[str, Any]:
     """Metadata, admission and cap. Does not load outcome rows."""
 
     operation = get_operation(store, operation_sha256)
-    if operation.get("status") == "STOPPED":
-        raise OrdinaryOperationError("ORDINARY_OPERATION_STOPPED")
     if str(operation.get("journal_scope") or "") != journal_scope:
         raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_MISMATCH")
-    from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+    if isinstance(verified_market, str) and verified_market != operation.get("market_evidence_epoch_sha256"):
+        raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
+    from solana_alpha_lab.factory.hfic_temporal_discovery import (
+        classify_temporal_look,
+        validate_temporal_query,
+    )
 
     try:
         validated = validate_temporal_query(spec)
     except Exception as exc:
         code = getattr(exc, "code", None) or "QUERY_SPEC_INVALID"
         raise OrdinaryOperationError(str(code)) from exc
-    if validated["spec_sha256"] != operation.get("spec_sha256"):
+    if operation.get("spec_sha256") and validated["spec_sha256"] != operation.get("spec_sha256"):
         raise OrdinaryOperationError("ORDINARY_OPERATION_SPEC_MISMATCH")
-    if _canonical(dict(spec)) != operation.get("spec_canonical"):
+    if operation.get("spec_canonical") and _canonical(dict(spec)) != operation.get("spec_canonical"):
         raise OrdinaryOperationError("ORDINARY_OPERATION_SPEC_MISMATCH")
+    fingerprint = binding_fingerprint(binding_cohorts)
+    stamped = operation.get("corpus_fingerprint")
+    if fingerprint and stamped and fingerprint != stamped:
+        raise OrdinaryOperationError("ORDINARY_OPERATION_BINDING_MISMATCH")
+    if fingerprint and not stamped:
+        updated = dict(operation)
+        updated["corpus_fingerprint"] = fingerprint
+        _append(store, kind=OPERATION_KIND, body=updated, record_prefix="HFIC-ART-OP")
+        operation = get_operation(store, operation_sha256)
     looks = _looks(store, journal_scope)
     _search_terminal_conflict(operation, looks, spec)
     from solana_alpha_lab.factory.hfic_session import list_hfic_sessions
@@ -355,9 +406,13 @@ def gate_before_values(
         None,
     )
     if stored is not None:
+        stored_refs = stored.get("data_refs") if isinstance(stored.get("data_refs"), list) else []
+        if fingerprint and binding_fingerprint(stored_refs) not in {None, fingerprint}:
+            raise OrdinaryOperationError("ORDINARY_OPERATION_BINDING_MISMATCH")
         return {
             "disposition": "REPLAY",
             "values_loaded": False,
+            "writes": False,
             "operation": operation,
             "admission": admission,
             "evidence": {
@@ -369,22 +424,51 @@ def gate_before_values(
                 "spec_sha256": validated["spec_sha256"],
                 "data_binding_sha256": stored.get("data_binding_sha256"),
                 "new_look": False,
+                "writes": False,
+                "values_loaded": False,
             },
         }
-    if owner_allowance(store, operation, "main") < 1:
+    pending = [
+        item
+        for item in _reservations(store, operation_sha256)
+        if item.get("spec_sha256") == validated["spec_sha256"]
+    ]
+    if pending:
+        return {
+            "disposition": "RESUME",
+            "values_loaded": False,
+            "writes": False,
+            "operation": operation,
+            "admission": admission,
+            "spec_sha256": validated["spec_sha256"],
+            "look_class": pending[0].get("look_class"),
+        }
+    try:
+        classified = classify_temporal_look(looks, spec)
+    except Exception as exc:
+        code = getattr(exc, "code", None) or "QUERY_SPEC_INVALID"
+        raise OrdinaryOperationError(str(code)) from exc
+    look_class = str(classified.get("look_class") or "MAIN")
+    if look_class not in {"MAIN", "ADAPTIVE"}:
+        look_class = "ADAPTIVE" if validated.get("adaptation_of") else "MAIN"
+    kind = "adaptive" if look_class == "ADAPTIVE" else "main"
+    if owner_allowance(store, operation, kind) < 1:
         raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
-    _reserve(store, operation, spec_sha256=validated["spec_sha256"])
+    _reserve(store, operation, spec_sha256=validated["spec_sha256"], look_class=kind)
     return {
         "disposition": "RESERVED",
         "values_loaded": False,
+        "writes": True,
         "operation": get_operation(store, operation_sha256),
         "admission": admission,
         "spec_sha256": validated["spec_sha256"],
+        "look_class": "ADAPTIVE" if kind == "adaptive" else "MAIN",
     }
 
 
-def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str) -> None:
+def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look_class: str = "main") -> None:
     digest = str(operation.get("operation_sha256") or "")
+    stored_class = "ADAPTIVE" if look_class == "adaptive" else "MAIN"
     for item in _reservations(store, digest):
         if item.get("spec_sha256") == spec_sha256:
             return
@@ -393,14 +477,16 @@ def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str) -> N
         "operation_sha256": digest,
         "journal_scope": operation.get("journal_scope"),
         "spec_sha256": spec_sha256,
-        "look_class": "MAIN",
+        "look_class": stored_class,
         "schema": "smial.hfic-ordinary-look-reservation",
         "schema_version": "1.0",
     }
 
     def _check() -> None:
         current = get_operation(store, digest)
-        if owner_allowance(store, current, "main") < 1:
+        if any(item.get("spec_sha256") == spec_sha256 for item in _reservations(store, digest)):
+            return
+        if owner_allowance(store, current, look_class) < 1:
             raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
 
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
@@ -446,14 +532,8 @@ def note_look_landed(store: Any, operation_sha256: str) -> dict[str, Any]:
     """Cap limits new looks. Landing a saved look may pause or stop the operation."""
 
     operation = get_operation(store, operation_sha256)
-    looks = _looks(store, str(operation.get("journal_scope") or ""))
-    from solana_alpha_lab.factory.hfic_temporal_discovery import assess_tier_progress
-
-    progress = assess_tier_progress(looks, freeze_worthy=False, compound_applicable=True)
     status = operation.get("status")
-    if operation.get("requested_completion") == SCIENTIFIC_TERMINAL and progress.get("search_exhausted_allowed") is True:
-        status = "STOPPED"
-    elif owner_allowance(store, operation, "main") < 1 and operation.get("requested_completion") == LIMITED_RESULT:
+    if owner_allowance(store, operation, "main") < 1 and operation.get("requested_completion") == LIMITED_RESULT:
         status = "PAUSED_CAP"
     if status == operation.get("status"):
         return operation
@@ -463,10 +543,17 @@ def note_look_landed(store: Any, operation_sha256: str) -> dict[str, Any]:
     return updated
 
 
-def project_ordinary_operation(store: Any, *, owner_focus: str) -> dict[str, Any] | None:
+def project_ordinary_operation(
+    store: Any,
+    *,
+    owner_focus: str,
+    market_evidence_epoch_sha256: str | None = None,
+) -> dict[str, Any] | None:
     """Derived readout. Not a second persisted DONE."""
 
     rows = [item for item in list_operations(store) if item.get("owner_focus") == owner_focus]
+    if isinstance(market_evidence_epoch_sha256, str) and len(market_evidence_epoch_sha256) == 64:
+        rows = [item for item in rows if item.get("market_evidence_epoch_sha256") == market_evidence_epoch_sha256]
     if not rows:
         return None
     current = _latest_recorded(rows)
@@ -524,7 +611,7 @@ def project_ordinary_operation(store: Any, *, owner_focus: str) -> dict[str, Any
         "result_refs": [latest.get("record_id")] if latest else [],
         "result_sha256": latest.get("result_sha256") if latest else None,
         "claim_boundary": "PRICE_RELATIVE_PROXY is not net return; cohorts are not independent replications",
-        "protocol_main_remaining": _protocol_remaining(looks, "main"),
+        "protocol_main_remaining": _protocol_remaining(store, looks, "main"),
         "protocol_main_used": sum(1 for item in looks if item.get("look_class") == "MAIN" and item.get("new_look") is True),
         "owner_main_remaining": owner_allowance(store, current, "main"),
         "reserved_main": len(_reservations(store, str(current.get("operation_sha256") or ""))),
@@ -534,12 +621,42 @@ def project_ordinary_operation(store: Any, *, owner_focus: str) -> dict[str, Any
         "next_needs_new_values": next_needs_values,
         "next_needs_new_authority": next_needs_authority,
         "search_open": current.get("status") != "STOPPED",
+        "candidate_ready": any(
+            item.get("owner_focus") == owner_focus for item in _iter_kind(store, "FORGE_DRAFT")
+        ),
     }
 
 
 def merge_ordinary_readout(payload: dict[str, Any], projection: Mapping[str, Any] | None) -> dict[str, Any]:
-    """Attach the pause beside the run. Do not replace its next action."""
+    """One operator next. A blocker or a scientific terminal is not a second menu."""
 
-    if projection is not None:
-        payload["ordinary_operation"] = dict(projection)
+    if projection is None:
+        return payload
+    proj = dict(projection)
+    blocked = payload.get("owner_class") in {"INPUT_NOT_READY", "OBSERVABILITY_BLOCKED"}
+    final = str(payload.get("owner_final") or "")
+    terminals = {
+        "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
+        "NO_WORTHY_HYPOTHESIS",
+        "OWNER_CANDIDATE",
+        "RETURN_EXISTING_RUN",
+        "NON_SCIENTIFIC_STOP",
+    }
+    if blocked:
+        proj["next_action"] = str(payload.get("next_action") or "INPUT_NOT_READY")
+        proj["next_needs_new_authority"] = False
+        proj["search_open"] = False
+    elif final in terminals:
+        proj["next_action"] = "READ_SAVED_RESULT"
+        proj["next_needs_new_authority"] = False
+        proj["search_open"] = False
+    elif proj.get("candidate_ready") and proj.get("owner_main_remaining") == 0:
+        proj["next_action"] = "FORMAT_SAVED_CANDIDATE"
+        proj["next_needs_new_authority"] = False
+        payload["next_action"] = "FORMAT_SAVED_CANDIDATE"
+        payload["owner_final"] = "CANDIDATE_READY_CAP_EXHAUSTED"
+    elif proj.get("status") == "PAUSED_CAP" and proj.get("owner_main_remaining") == 0:
+        payload["next_action"] = "AUTHORIZE_ADDITIONAL_LOOKS"
+        payload["owner_final"] = "OPERATION_PAUSED_SEARCH_OPEN"
+    payload["ordinary_operation"] = proj
     return payload

@@ -884,6 +884,16 @@ def cmd_discovery_execute(
         temporal_query = True
     except Exception:
         temporal_query = False
+    if spec.get("schema") == "smial.hfic-temporal-query" and not temporal_query:
+        return emit(
+            {
+                "reason_code": "QUERY_SPEC_INVALID",
+                "values_loaded": False,
+                "writes": False,
+                "scientific_negative": False,
+            },
+            exit_code=2,
+        )
     if temporal_query and operation_path is None and not operation_sha256:
         return emit(
             {"reason_code": "ORDINARY_OPERATION_REQUIRED", "values_loaded": False, "writes": False},
@@ -899,11 +909,25 @@ def cmd_discovery_execute(
                     raise OrdinaryOperationError("ORDINARY_OPERATION_REQUEST_REQUIRED")
                 operation = record_operation(op_store, request)
                 operation_sha256 = str(operation.get("operation_sha256") or "")
+            cohorts = []
+            if isinstance(binding_doc, dict):
+                cohorts = list(binding_doc.get("cohorts") or [])
+            elif explicit_data_root is not None:
+                from solana_alpha_lab.factory.hfic_grounded_discovery import (
+                    resolve_published_discovery_binding,
+                )
+
+                try:
+                    published = resolve_published_discovery_binding(explicit_data_root)
+                    cohorts = list(published.get("cohorts") or [])
+                except Exception:
+                    cohorts = []
             gate = gate_before_values(
                 op_store,
                 operation_sha256=str(operation_sha256),
                 spec=spec,
                 journal_scope=journal_scope,
+                binding_cohorts=cohorts,
             )
         except OrdinaryOperationError as exc:
             return emit(
@@ -917,44 +941,44 @@ def cmd_discovery_execute(
             )
     if gate.get("disposition") == "REPLAY":
         evidence = dict(gate.get("evidence") or {})
-        try:
-            loaded = load_admitted_partition_rows(
-                data_root=explicit_data_root,
-                binding_doc=binding_doc,
-                partitions=cohort_partitions,
-                census_path=census_path,
-                observations_path=observations_path,
-            )
-            from solana_alpha_lab.factory.hfic_grounded_discovery import (
-                admit_discovery_binding,
-                data_binding_sha256,
-            )
-
-            actual_binding = data_binding_sha256(
-                admit_discovery_binding(loaded["cohorts"]),
-                loaded["census"],
-                loaded["observations"],
-            )
-        except GroundedDiscoveryError as exc:
-            return emit_error(exc.code)
-        except (OSError, ValueError):
-            return emit_error("DISCOVERY_ROWS_UNREADABLE")
-        if actual_binding != evidence.get("data_binding_sha256"):
-            return emit(
-                {
-                    "reason_code": "ORDINARY_OPERATION_BINDING_MISMATCH",
-                    "values_loaded": False,
-                    "writes": False,
-                    "scientific_negative": False,
-                    "new_look": False,
-                },
-                exit_code=2,
-            )
         evidence["values_loaded"] = False
-        evidence["ordinary_operation"] = (gate.get("operation") or {}).get("status")
+        evidence["writes"] = False
+        evidence["scientific_negative"] = False
+        if operation_sha256:
+            evidence["ordinary_operation"] = note_look_landed(op_store, str(operation_sha256)).get("status")
         evidence["operation_sha256"] = (gate.get("operation") or {}).get("operation_sha256")
         _assert_no_path_leak(evidence, str(store_root), str(repo_root))
         return emit(evidence)
+    if temporal_query and gate.get("disposition") in {"RESERVED", "RESUME"}:
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            EvidenceIdentityError,
+            compute_market_epoch_for_data_root,
+        )
+
+        corpus_root = explicit_data_root or store_root
+        try:
+            epoch, _basis = compute_market_epoch_for_data_root(repo_root, corpus_root)
+        except EvidenceIdentityError as exc:
+            return emit(
+                {
+                    "reason_code": str(exc),
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                },
+                exit_code=2,
+            )
+        claimed = str((gate.get("operation") or {}).get("market_evidence_epoch_sha256") or "")
+        if claimed != epoch:
+            return emit(
+                {
+                    "reason_code": "ORDINARY_OPERATION_MARKET_MISMATCH",
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                },
+                exit_code=2,
+            )
     data_root = explicit_data_root
     try:
         loaded = load_admitted_partition_rows(

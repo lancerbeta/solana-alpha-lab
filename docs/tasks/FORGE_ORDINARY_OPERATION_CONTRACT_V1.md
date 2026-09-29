@@ -98,10 +98,12 @@ UNCERTAINTY_REMOVED: >-
   before values are loaded.
 
 CAPABILITY_OR_EVIDENCE: >-
-  ORDINARY_OPERATION_V1. V1 records simple then compound, then a production
-  freeze and a new-process forge-run. V2 freezes a saved candidate after the
-  owner cap is spent, without another look. V3 reads a closed repair that has
-  no operation row. A blocked slot readback is not rewritten into another look.
+  One ordinary owner request binds the admitted journal and corpus. Looks
+  inside that allowance do not each need a new owner request. A saved
+  candidate can still be frozen when the new-look cap is spent. A blocked
+  readback is not advertised as a pause, and a scientific terminal is not
+  replaced by the operation status. Acceptance scenarios A-F in the tests
+  named below are the DoD, not the short coverage table.
 
 STOP: >-
   Stop at exact-head merge-readiness. Do not merge before the owner phrase.

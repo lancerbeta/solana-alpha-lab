@@ -17,7 +17,7 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Current operation and its latest status are chosen by record created_at, not by partition-hash iteration. A later operation whose sha sorts first still wins. LadderError readback does not rewrite next_action. A changed corpus binding on the same operation is ORDINARY_OPERATION_BINDING_MISMATCH with no new look."
+        "Current operation and its latest status are chosen by record created_at, not by partition-hash iteration. The same reserved spec resumes without a second allowance unit. One owner request with cap 2 admits two different specs and refuses a third. An incomplete market basis refuses before values and is not a scientific pause. A one-corpus publication path for scenarios A-F is not claimed by this head."
       ]
     },
     {
@@ -50,6 +50,7 @@
     "NO_MARKET_FORGE",
     "NO_NET_RETURN",
     "NO_LIVE_LOOK",
-    "MODEL_TRIAL_2_AND_3_PROVENANCE_UNKNOWN"
+    "MODEL_TRIAL_2_AND_3_PROVENANCE_UNKNOWN",
+    "ONE_CORPUS_SCENARIOS_A_F_NOT_CLAIMED"
   ]
 }

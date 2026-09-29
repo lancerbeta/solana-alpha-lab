@@ -64,7 +64,8 @@
     "NO_MARKET_EXECUTION",
     "NO_MERGE",
     "NO_LIVE_LOOK",
-    "MODEL_TRIAL_2_AND_3_PROVENANCE_UNKNOWN"
+    "MODEL_TRIAL_2_AND_3_PROVENANCE_UNKNOWN",
+    "ONE_CORPUS_SCENARIOS_A_F_NOT_CLAIMED"
   ],
   "side_effects": {
     "market_execution": "NOT_RUN",
