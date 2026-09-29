@@ -54,6 +54,7 @@ context_requirements:
     - DOC-FACTORY-LIFECYCLE-COLLECTOR-001
   l2_roles:
     - LIFECYCLE
+    - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
   exact_role_asset_ids:
