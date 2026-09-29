@@ -17,28 +17,28 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Legacy close refuses DONE without a readable repair result whose run_identity is the pinned binding. Caller FORGE-RUN ids are PARENT_RUN_UNPROVEN. Slot-only aggregates are PARENT_RECEIPT_CONFLICT."
+        "Legacy close refuses DONE without a readable repair result whose run_identity is the pinned binding. Ordinary preflight and forge-run use production CLI without patching applicability or receipt lookup. Sealed readback requires one focus match and no current evidence surface. Write set includes hfic_preflight.py and hfic_representation_ladder.py."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Disposable verticals cover no-write draft/plan, apply, early close refusal, NO_WORTHY close plus forge-run persist=false, runner-up survivor, crash retry without a new look, foreign/binding/budget rejects, historical bytes unchanged, MAIN 2 to 3, replay delta 0. No invented historical receipt."
+        "Ordinary disposable verticals walk draft, plan, apply, production preflight, continuation, close, reopen, and forge-run --no-write for NO_WORTHY and runner-up PASS. MAIN 2 to 3, replay delta 0, historical bytes unchanged. No invented historical receipt."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=8ffc59bb76ca928ed20a34ebda80324b4b58ee3a1f0fcdc969d65813fedc992e SEMANTIC_PREMISE PASS. ESTABLISHED_NOW binding is not a historical run. NOT_RECOVERED stays unknown. Repair-result receipt must not be read as a historical parent aggregate."
+        "packet_fingerprint_sha256=09f1d768d05ec2b49a10f9e47c3371bfb08d0d81adcf4d43460c8eba2009b566 SEMANTIC_PREMISE PASS. Sealed forge-run readback requires no current evidence surface. ESTABLISHED_NOW is not a historical run. NOT_RECOVERED stays unknown."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Field map, draft fields, and the draft recipe now show LEGACY-PARENT/ESTABLISHED_NOW, omit guessed --parent-run-id, and state READY is not apply authority. PARENT_RECEIPT_CONFLICT, PARENT_RUN_UNPROVEN, and REPAIR_RESULT_UNREADABLE have owner next steps."
+        "Runbook distinguishes RESUME_REPAIR_CONTINUATION from STOP MARKET_EVIDENCE_BASIS_INCOMPLETE, and sealed forge-run readback from a present incomplete surface. READY is not apply authority. LEGACY-PARENT is not a historical FORGE-RUN."
       ]
     }
   ],
