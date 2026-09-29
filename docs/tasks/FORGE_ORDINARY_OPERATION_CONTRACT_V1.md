@@ -83,6 +83,7 @@ context_requirements:
       - docs/evidence/forge_ordinary_operation_contract/a1_delivery_completion_evidence_v1.json
       - docs/evidence/forge_ordinary_operation_contract/a1_delivery_independent_review_v1.json
       - docs/evidence/forge_ordinary_operation_contract/a1_delivery_factory_fit_v1.json
+      - docs/evidence/forge_ordinary_operation_contract/operator_trials_4_to_8_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
