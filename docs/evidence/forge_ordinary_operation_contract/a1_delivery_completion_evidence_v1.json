@@ -15,11 +15,11 @@
   "capability_radar_now": "NONE",
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "bf08cae582b75f5de4c0197142e62cbc79bafccc8e185ef3bbe4f47a5431bc3a",
-    "catalog/assets/core.yaml": "38047cd6cdd6723e92817b1048ddce16e34f2aab19c3317d3b11c108fdae8a57",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "5ed29e9da0ffea4b4b1bc340d4c13cc5988412c2eb4748605fe6b9fdd2569c96",
+    "catalog/assets/core.yaml": "518a6b0f23970c70c11a2340b93d0bbf1d4f91f888028e8d8700b5974027c649",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "3f62ce3684271560e2f0a9609d3b6a7de101c1faa642169de2d36a0c8f251fa7",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "a11bc28c3dd9ab8de1e2a2a9c71e4569858825140f7dd687918e086848fb67ec",
     "docs/tasks/FORGE_ORDINARY_OPERATION_CONTRACT_V1.md": "d5b098472e54dfa571479437b4383584a0f3b679d5a0ca71ab6fe83261f37eae",
-    "scripts/hypothesis_forge.py": "151e24ed0edf2b19b189acbf8fd8005c3890c4ff02e1fe20e6b5a4df1f5c05d2",
+    "scripts/hypothesis_forge.py": "db71c12e04bd36c5b4daab180ad46f318ff995528ed4c93527280d7074b552b9",
     "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "12e4a6074ae551723d0df8c22e58da3a394826ca5b53d76dce8cc3b17356fe7b",
     "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "42de8ecbf21d42919cfe588238eb85acb72d63e1516ce58bb0ab793dacabce1b",
     "tests/test_hfic_grounded_discovery_v1.py": "f82226d6680726f2e429da54c297b50a2c41067d8873c612443739756abcb880",
@@ -37,14 +37,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_ordinary_operation_contract/a1_delivery_factory_fit_v1.json",
-    "sha256": "0b1c956b47767cdb6c574883f779f315c235e349010cadec127ce2191c19f064",
+    "sha256": "3459e98d1459761c4618296ba030d8592d59f7c3859d7ab0289fb077a87b99ef",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_ORDINARY_OPERATION_V1_V2_V3_AND_CAP_GUARDS",
     "independent_review": {
       "path": "docs/evidence/forge_ordinary_operation_contract/a1_delivery_independent_review_v1.json",
-      "sha256": "0fe2c6b3267ae0560819bb150ba93d4e84256daba58e4b51960f67d5f267f7ad",
+      "sha256": "34f2d7c1a4f62118658543d8f4ffc31ccfb64dd19d8267a7d2c56a85656190ae",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
