@@ -58,6 +58,39 @@ ANCHOR = datetime(2026, 9, 3, tzinfo=UTC)
 OFFSETS = {"X300": 300, "Y900": 900, "Y1800": 1800, "Y3600": 3600, "Y7200": 7200}
 GIT_SHA = "ab" * 20
 TOLERANCE = 1e-12
+SYNTH_JOURNAL = "11" * 32
+REV_JOURNAL = "33" * 32
+SYNTH_MARKET = "ab" * 32
+
+
+def _ordinary_gate(store, journal: str) -> dict[str, str]:
+    from solana_alpha_lab.factory.hfic_ordinary_operation import list_operations, record_operation
+
+    found = [
+        item
+        for item in list_operations(store)
+        if item.get("journal_scope") == journal and item.get("market_evidence_epoch_sha256") == SYNTH_MARKET
+    ]
+    if found:
+        return {
+            "operation_sha256": str(found[-1]["operation_sha256"]),
+            "verified_market": SYNTH_MARKET,
+        }
+    recorded = record_operation(
+        store,
+        {
+            "owner_request_text": "synthetic recorded-query gate",
+            "owner_focus": "SYNTHETIC_RECORDED_GATE",
+            "journal_scope": journal,
+            "market_evidence_epoch_sha256": SYNTH_MARKET,
+            "owner_cap": {"main": None, "adaptive": None, "preview": None},
+            "requested_completion": "LIMITED_RESULT",
+        },
+    )
+    return {
+        "operation_sha256": str(recorded["operation_sha256"]),
+        "verified_market": SYNTH_MARKET,
+    }
 
 
 def _stamp(point: str, lateness: int = 300) -> str:
@@ -510,10 +543,11 @@ class TemporalArithmeticTests(unittest.TestCase):
                 observations=observations,
                 spec=spec,
                 binding=_binding(),
-                journal_scope="TEMPORAL-SYNTH",
+                journal_scope=SYNTH_JOURNAL,
                 candidate_scope=_scope(spec),
                 git_sha=GIT_SHA,
                 clock=clock,
+                **_ordinary_gate(store, SYNTH_JOURNAL),
             )
             self.assertTrue(opened["queries"][0]["new_look"])
             resumed = run_recorded_discovery_query(
@@ -522,10 +556,11 @@ class TemporalArithmeticTests(unittest.TestCase):
                 observations=observations,
                 spec=renamed,
                 binding=_binding(),
-                journal_scope="TEMPORAL-SYNTH",
+                journal_scope=SYNTH_JOURNAL,
                 candidate_scope=_scope(spec),
                 git_sha="cd" * 20,
                 clock=clock,
+                **_ordinary_gate(ResearchStore(Path(raw)), SYNTH_JOURNAL),
             )
             self.assertFalse(resumed["queries"][0]["new_look"])
             self.assertEqual(resumed["result_refs"], opened["result_refs"])
@@ -540,10 +575,11 @@ class TemporalArithmeticTests(unittest.TestCase):
                 observations=epoch,
                 spec=spec,
                 binding=_binding(),
-                journal_scope="TEMPORAL-SYNTH",
+                journal_scope=SYNTH_JOURNAL,
                 candidate_scope=_scope(spec),
                 git_sha=GIT_SHA,
                 clock=clock,
+                **_ordinary_gate(ResearchStore(Path(raw)), SYNTH_JOURNAL),
             )
             self.assertTrue(fresh["queries"][0]["new_look"])
             self.assertNotEqual(fresh["result_refs"], opened["result_refs"])
@@ -1039,7 +1075,7 @@ class TemporalCohortSliceTests(unittest.TestCase):
             _append_discovery_look(
                 store,
                 record_id=v1_id,
-                journal_scope="TEMPORAL-REV",
+                journal_scope=REV_JOURNAL,
                 spec=legacy["experiment_recipe"]["spec"],
                 spec_sha256=legacy["spec_sha256"],
                 binding_sha=binding_sha,
@@ -1071,10 +1107,11 @@ class TemporalCohortSliceTests(unittest.TestCase):
                 observations=observations,
                 spec=spec,
                 binding=_binding(),
-                journal_scope="TEMPORAL-REV",
+                journal_scope=REV_JOURNAL,
                 candidate_scope=_scope(spec),
                 git_sha=GIT_SHA,
                 clock=clock,
+                **_ordinary_gate(ResearchStore(Path(raw)), REV_JOURNAL),
             )
             self.assertEqual(revised["calculation_version"], TEMPORAL_CALCULATION_VERSION)
             self.assertFalse(revised["queries"][0]["new_look"])
@@ -1098,10 +1135,11 @@ class TemporalCohortSliceTests(unittest.TestCase):
                     observations=observations,
                     spec=spec,
                     binding=_binding(),
-                    journal_scope="TEMPORAL-REV",
+                    journal_scope=REV_JOURNAL,
                     candidate_scope=_scope(spec),
                     git_sha=GIT_SHA,
                     clock=clock,
+                    **_ordinary_gate(ResearchStore(Path(raw)), REV_JOURNAL),
                 )
             self.assertEqual(replayed["result_refs"], revised["result_refs"])
             self.assertEqual(replayed["result_sha256"], revised["result_sha256"])

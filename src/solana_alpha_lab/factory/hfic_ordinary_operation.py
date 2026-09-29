@@ -381,11 +381,6 @@ def authorize_temporal_attempt(
         stamped = operation.get("corpus_fingerprint")
         if fingerprint and stamped and fingerprint != stamped:
             raise OrdinaryOperationError("ORDINARY_OPERATION_BINDING_MISMATCH")
-        if fingerprint and not stamped:
-            updated = dict(operation)
-            updated["corpus_fingerprint"] = fingerprint
-            _append(store, kind=OPERATION_KIND, body=updated, record_prefix="HFIC-ART-OP")
-            operation = get_operation(store, operation_sha256)
         admission = _admit(store, operation)
         if admission.get("action") == "STOP":
             raise OrdinaryOperationError(
@@ -397,6 +392,11 @@ def authorize_temporal_attempt(
             raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")
         if owner_allowance(store, operation, "preview") < 1:
             raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
+        if fingerprint and not stamped:
+            updated = dict(operation)
+            updated["corpus_fingerprint"] = fingerprint
+            _append(store, kind=OPERATION_KIND, body=updated, record_prefix="HFIC-ART-OP")
+            operation = get_operation(store, operation_sha256)
         return {
             "disposition": "EXECUTE",
             "values_loaded": False,

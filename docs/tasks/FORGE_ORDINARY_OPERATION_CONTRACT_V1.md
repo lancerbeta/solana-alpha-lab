@@ -48,6 +48,9 @@ managed_write_set:
   - tests/test_hfic_grounded_discovery_v1.py
   - tests/test_hfic_temporal_owner_path_v1.py
   - tests/test_hfic_temporal_production_runner_v1.py
+  - tests/test_hfic_temporal_discovery_v1.py
+  - tests/test_hfic_temporal_operability_repair_v1.py
+  - .cursor/commands/hypothesis-forge.md
   - catalog/assets/core.yaml
   - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
 

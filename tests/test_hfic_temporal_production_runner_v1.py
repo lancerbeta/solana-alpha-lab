@@ -469,6 +469,13 @@ class TemporalVerticalTests(unittest.TestCase):
                 if body.get("artifact_kind") == "DISCOVERY_QUERY_INTENT":
                     intents.append(body["spec_sha256"])
             self.assertIn(compound_evidence["result"]["spec_sha256"], intents)
+            from solana_alpha_lab.factory.hfic_ordinary_operation import list_operations
+
+            vertical_operation = next(
+                item["operation_sha256"]
+                for item in list_operations(store)
+                if item.get("journal_scope") == journal
+            )
             loaded = load_admitted_partition_rows(
                 data_root=data_root,
                 binding_doc=None,
@@ -489,6 +496,8 @@ class TemporalVerticalTests(unittest.TestCase):
                     journal_scope=journal,
                     candidate_scope=scope,
                     git_sha=GIT_SHA,
+                    operation_sha256=vertical_operation,
+                    verified_market=market,
                 )
             self.assertFalse(replay["queries"][0]["new_look"])
             self.assertEqual(replay["result_sha256"], compound_evidence["result_sha256"])
@@ -515,6 +524,8 @@ class TemporalVerticalTests(unittest.TestCase):
                         journal_scope=journal,
                         candidate_scope=scope,
                         git_sha=GIT_SHA,
+                        operation_sha256=vertical_operation,
+                        verified_market=market,
                     )
             self.assertEqual(len(list_discovery_looks(store, journal)), looks_before_interrupt)
             resumed = run_recorded_discovery_query(
@@ -526,6 +537,8 @@ class TemporalVerticalTests(unittest.TestCase):
                 journal_scope=journal,
                 candidate_scope=scope,
                 git_sha=GIT_SHA,
+                operation_sha256=vertical_operation,
+                verified_market=market,
             )
             self.assertTrue(resumed["queries"][0]["new_look"])
             self.assertEqual(resumed["result"]["query_id"], "vertical-interrupt")
