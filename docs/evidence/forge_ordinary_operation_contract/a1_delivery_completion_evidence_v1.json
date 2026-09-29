@@ -5,7 +5,7 @@
   "as_of": "2026-09-30",
   "task_id": "FORGE_ORDINARY_OPERATION_CONTRACT_V1",
   "state_change": "ORDINARY_REQUEST_BINDS_ONE_JOURNAL_BEFORE_A_TEMPORAL_LOOK",
-  "base_main": "cfbab906f8592b1b4c2725a6cb57edf9685607fc",
+  "base_main": "93d8d8552f09b4e08bc2b62d1bf81e14fe07e10c",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
@@ -72,7 +72,8 @@
     "MODEL_TRIALS_4_TO_8_OBSERVED_MODEL_UNKNOWN",
     "OPERATOR_TRIAL_7_FREEZE_REFUSED_STALE_PREFLIGHT_RECEIPT",
     "REPLACEMENT_9_BLOCKED_GIT_COMPOSITE_CHANGED",
-    "REPLACEMENT_10_OPERATIONAL_PASS_KILL_UNBOUND_EVIDENCE"
+    "REPLACEMENT_10_OPERATIONAL_PASS_KILL_UNBOUND_EVIDENCE",
+    "KILL_UNBOUND_EVIDENCE_IS_NOT_SCIENTIFIC_PASS"
   ],
   "side_effects": {
     "market_execution": "NOT_RUN",

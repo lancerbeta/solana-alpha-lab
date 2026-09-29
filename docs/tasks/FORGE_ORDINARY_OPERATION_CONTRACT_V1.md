@@ -17,9 +17,9 @@ required_review_roles:
 expected_repository: lancerbeta/solana-alpha-lab
 
 git_binding:
-  expected_base: cfbab906f8592b1b4c2725a6cb57edf9685607fc
+  expected_base: 93d8d8552f09b4e08bc2b62d1bf81e14fe07e10c
   expected_upstream: origin/main
-  expected_upstream_oid: cfbab906f8592b1b4c2725a6cb57edf9685607fc
+  expected_upstream_oid: 93d8d8552f09b4e08bc2b62d1bf81e14fe07e10c
   expected_branch: cursor/forge-ordinary-operation-contract-v1
   dirty_mode: FORBIDDEN
 
@@ -125,10 +125,13 @@ NEXT: >-
   Operator trials 4-8 stay recorded. Trial 7 stays MISSING_INPUT.
   Replacement 9 stays BLOCKED_GIT_COMPOSITE_CHANGED and is not rewritten.
   Session HFIC-SESS-0E1065476AE7A9D6 stays FROZEN_AWAITING_CRITIC.
-  Replacement 10 is the operational model acceptance: isolated Critic
-  KILL_UNBOUND_EVIDENCE, session SYNTHESIS_COMPLETE, ordinary entry
-  RETURN_EXISTING_SESSION. acceptance_code_head is
-  c907e76ce96bb774030f88aa1b93a1f315a503a5. No second replacement.
+  Replacement 10 is OPERATIONAL_PASS, not a scientific PASS.
+  Isolated Critic terminal KILL_UNBOUND_EVIDENCE, session
+  SYNTHESIS_COMPLETE, ordinary entry RETURN_EXISTING_SESSION.
+  acceptance_code_head is c907e76ce96bb774030f88aa1b93a1f315a503a5.
+  After merging main 93d8d855 the Forge runtime bytes in the compare
+  scope still match that head, so the acceptance still applies.
+  No second replacement.
   Do not regenerate trial 7. Do not weaken the git fence.
   After merge, use Forge. Do not open another ordinary-path audit.
   Do not execute the prepared liquidity-retention launch.
