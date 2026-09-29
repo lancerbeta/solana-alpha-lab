@@ -21,7 +21,10 @@ or `NEITHER`, do not start this workflow.
 Read `AGENTS.md`, `delivery-harness/harness.yaml` and the elected profile. Run
 the deterministic check. Require one exact task contract; never discover work
 by recency. Generate L0/L1 context, preserve explicit gaps and keep the route
-fixed. Git is working project memory. Cloud artifacts are
+fixed. The executing client selects one direct route (`CURSOR`, `CODEX`,
+`CLAUDE_CODE`, or explicit `OTHER`); authority for this PR is the frozen base
+policy, not the candidate file. Claude Code starts from root `CLAUDE.md`
+(`@AGENTS.md`). Another client reads `AGENTS.md` and this skill by path. Git is working project memory. Cloud artifacts are
 `OWNER_MANAGED_OPTIONAL_EXPORT`; never request a bundle replacement or smoke.
 
 ## Entry and outcome

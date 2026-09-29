@@ -76,7 +76,12 @@ def passing_merge_request(
         "context_receipt_sha256": "a" * 64,
         "context_route": (
             route
-            if route in {"DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY"}
+            if route in {
+                "DIRECT_CODEX_DELIVERY",
+                "DIRECT_CURSOR_DELIVERY",
+                "DIRECT_CLAUDE_CODE_DELIVERY",
+                "DIRECT_OTHER_DELIVERY",
+            }
             else "DIRECT_CURSOR_DELIVERY"
         ),
     }
@@ -87,7 +92,12 @@ def passing_merge_request(
         "context_receipt_sha256": "a" * 64,
         "context_route": (
             route
-            if route in {"DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY"}
+            if route in {
+                "DIRECT_CODEX_DELIVERY",
+                "DIRECT_CURSOR_DELIVERY",
+                "DIRECT_CLAUDE_CODE_DELIVERY",
+                "DIRECT_OTHER_DELIVERY",
+            }
             else "DIRECT_CURSOR_DELIVERY"
         ),
         "exact_pr_head_bound": True,
@@ -120,6 +130,8 @@ class DeliveryHarnessAuthorityTests(unittest.TestCase):
         for route, actor in (
             ("DIRECT_CODEX_DELIVERY", "CODEX"),
             ("DIRECT_CURSOR_DELIVERY", "CURSOR"),
+            ("DIRECT_CLAUDE_CODE_DELIVERY", "CLAUDE_CODE"),
+            ("DIRECT_OTHER_DELIVERY", "OTHER"),
         ):
             with self.subTest(route=route):
                 result = self.evaluate(base_request(route=route, actor=actor))
@@ -130,6 +142,8 @@ class DeliveryHarnessAuthorityTests(unittest.TestCase):
         for route, actor in (
             ("DIRECT_CODEX_DELIVERY", "CODEX"),
             ("DIRECT_CURSOR_DELIVERY", "CURSOR"),
+            ("DIRECT_CLAUDE_CODE_DELIVERY", "CLAUDE_CODE"),
+            ("DIRECT_OTHER_DELIVERY", "OTHER"),
         ):
             for trigger in base_request()["triggers"]:
                 with self.subTest(route=route, trigger=trigger):
@@ -144,6 +158,8 @@ class DeliveryHarnessAuthorityTests(unittest.TestCase):
         for route, actor in (
             ("DIRECT_CODEX_DELIVERY", "CODEX"),
             ("DIRECT_CURSOR_DELIVERY", "CURSOR"),
+            ("DIRECT_CLAUDE_CODE_DELIVERY", "CLAUDE_CODE"),
+            ("DIRECT_OTHER_DELIVERY", "OTHER"),
         ):
             with self.subTest(route=route):
                 request = passing_merge_request(route=route, actor=actor)
@@ -156,6 +172,8 @@ class DeliveryHarnessAuthorityTests(unittest.TestCase):
         for route, actor in (
             ("DIRECT_CODEX_DELIVERY", "CODEX"),
             ("DIRECT_CURSOR_DELIVERY", "CURSOR"),
+            ("DIRECT_CLAUDE_CODE_DELIVERY", "CLAUDE_CODE"),
+            ("DIRECT_OTHER_DELIVERY", "OTHER"),
         ):
             with self.subTest(route=route):
                 result = self.evaluate(passing_merge_request(route=route, actor=actor))

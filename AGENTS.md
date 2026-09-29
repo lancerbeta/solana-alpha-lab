@@ -1,7 +1,7 @@
 # AGENTS.md — Delivery Harness front door
 
-This repository uses `DELIVERY_HARNESS_V1`. Cursor and Codex are equal direct
-delivery agents over one Git-native control core. Read this file first, then:
+This repository uses `DELIVERY_HARNESS_V1`. Every elected direct agent is an
+equal delivery agent over one Git-native control core. Read this file first, then:
 
 1. `delivery-harness/harness.yaml` — active routes, budgets and hard exclusions;
 2. `delivery-harness/project-profile.yaml` — repository bindings;
@@ -41,10 +41,15 @@ cloud chat voluntarily outside this harness.
 
 ## ACTIVE_ROUTES_AND_STATUS
 
-Active routes are exactly `DIRECT_CODEX_DELIVERY`, `DIRECT_CURSOR_DELIVERY` and
-`DESIGN_ONLY`. `LEGACY_GITHUB_BATON_DORMANT` is historical, inactive and cannot
+Active routes are exactly `DIRECT_CODEX_DELIVERY`, `DIRECT_CURSOR_DELIVERY`,
+`DIRECT_CLAUDE_CODE_DELIVERY`, `DIRECT_OTHER_DELIVERY` and `DESIGN_ONLY`.
+The executing client selects the route: Cursor Agent → `CURSOR`, Codex →
+`CODEX`, Claude Code → `CLAUDE_CODE`, another explicitly named coding client →
+`OTHER`. `OTHER` is not a wildcard. Model changes inside one client do not
+create a route. `LEGACY_GITHUB_BATON_DORMANT` is historical, inactive and cannot
 select work or grant authority. A route is fixed for the delivery receipt; a
-change requires an explicit replan and new receipt.
+change requires an explicit replan and new receipt. Effective grants come from
+the frozen base policy, not from the candidate file.
 
 The owner owns product meaning, hypotheses, estimand, priority, budget, material
 risk and external authority. The elected direct agent owns bounded task
@@ -54,8 +59,8 @@ semantic acceptance, canonical `DONE`, alpha, strategy promotion or cashflow.
 
 ## AUTONOMY_AND_OWNER_ATTENTION
 
-Inside an exact bounded objective and stricter task write set, both direct
-agents proceed autonomously through read-only inspection, local writes,
+Inside an exact bounded objective and stricter task write set, every elected
+direct agent proceeds autonomously through read-only inspection, local writes,
 refactor needed for DoD, tests, Catalog/generated propagation, ordinary
 commits, fetch/read-back, non-force task-branch push, PR/review and CI work.
 Do not pause for routine microsteps.
@@ -67,7 +72,7 @@ change, real money/wallet/signer/transaction, unresolved truth/safety conflict,
 or a stricter task stop. Failed machine evidence is `DENY`; reassurance cannot
 override it.
 
-Both direct agents stop once after exact-head CI **and**
+Every elected direct agent stops once after exact-head CI **and**
 `scripts/owner_attention_gate.py --merge-readiness` reports
 `ready_for_owner_phrase: true` for the exact owner phrase bound to the
 current PR and unchanged 40-hex head; the readiness response carries

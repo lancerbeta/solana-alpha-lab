@@ -7,8 +7,10 @@ alwaysApply: true
 # Direct delivery authority
 
 - Read `AGENTS.md`, `delivery-harness/harness.yaml` and the elected project
-  profile. Use only `DIRECT_CURSOR_DELIVERY`, `DIRECT_CODEX_DELIVERY` or
-  `DESIGN_ONLY`; historical transport artifacts grant no active authority.
+  profile. Use only `DIRECT_CURSOR_DELIVERY`, `DIRECT_CODEX_DELIVERY`,
+  `DIRECT_CLAUDE_CODE_DELIVERY`, `DIRECT_OTHER_DELIVERY` or `DESIGN_ONLY`;
+  historical transport artifacts grant no active authority. `OTHER` is an
+  explicit client, not a wildcard.
 - Mutate, deliver and merge only from an exact task contract. Do not infer the
   current/next task from recency, branch names, Issues, PRs, commits, tests or
   chat history. Orientation may inspect Git truth without a new contract and
@@ -18,9 +20,9 @@ alwaysApply: true
   task contract. Do not ask for micro-approvals.
 - Evaluate `OWNER_ATTENTION_GATE_V2` for material/external/user-only/destructive
   boundaries and merge. Failed machine checks are `DENY`.
-- Cursor and Codex have the same guarded merge right: only after exact-head CI
-  and the exact owner phrase for the unchanged PR/head. The owner never clicks
-  GitHub Merge; the elected direct agent merges.
+- Every elected direct agent has the same guarded merge right: only after
+  exact-head CI and the exact owner phrase for the unchanged PR/head. The
+  owner never clicks GitHub Merge; the elected direct agent merges.
 - Git is working project memory. Cloud bundle/Project Instruction is
   `OWNER_MANAGED_OPTIONAL_EXPORT`; never request replacement or smoke.
 - Tests, PR, CI or merge do not by themselves establish semantic acceptance,
