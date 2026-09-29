@@ -4,8 +4,8 @@
   "review_id": "FORGE-ORDINARY-OPERATION-CONTRACT-REVIEW-001",
   "as_of": "2026-09-30",
   "task_id": "FORGE_ORDINARY_OPERATION_CONTRACT_V1",
-  "reviewed_bindings_sha256": "1a096c6600d2e6c401d311d49c49215ef1dc8a808a8c560a12103b0c1880352c",
-  "reviewed_inventory_sha256": "e08326468d453d7384a3cdabaf8724251402a6bc49f068acdbd741355218358f",
+  "reviewed_bindings_sha256": "1238cd6969fe7f3873773d31e0d8684535a066453a8c9531a66f58d7894ef5bf",
+  "reviewed_inventory_sha256": "c72b28f88904a7eac494dc22a279e0c056da12770253d4a53222c817c50e8abd",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
