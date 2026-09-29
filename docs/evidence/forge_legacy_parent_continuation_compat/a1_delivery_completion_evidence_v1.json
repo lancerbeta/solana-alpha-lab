@@ -13,7 +13,16 @@
     "kind": "NO_CHANGE"
   },
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "1458ad7813008cc3795ffaf5b2f98f9629eaedbd8aac67db4a1abb5b510caf5c",
+    "docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md": "963db0e7925e91eb369b1456362acd9931f4398e545d2eca2a8173ef1be3b3e2",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "fe6a976e136dcd5c54bdd8781711399650fec89a7aa8cc36c6a599e48e3a7367",
+    "docs/reports/forge_legacy_parent_continuation_compat/a1_owner_readout_v1.md": "f4fcbc3c47f3b21faab23577a53c3d21fb07706324b211a04e7643236e105f86",
+    "docs/tasks/FORGE_LEGACY_PARENT_CONTINUATION_COMPAT_V1.md": "771e3aabeb511d6554a87b80d518c2a64b422ea7571a94ed1d50f5a797e69aa7",
+    "scripts/hypothesis_forge.py": "fa7c3e7dddcf280b4d4be16bff6246588fe5bc305405cbd8639833da3c6ca401",
+    "src/solana_alpha_lab/factory/hfic_repair_continuation.py": "07689dce003faf4c9a4a7e97a8f01cafc691213dc2d673793ba9c47ad7243e2d",
+    "tests/test_hfic_legacy_parent_continuation_compat_v1.py": "2f6c6e2938681be35abca1cef8e127c6942836ed49d3735b607afef6cb492a3a"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -24,14 +33,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_legacy_parent_continuation_compat/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "2d7a7fad98ad88eceac3a767f04778d58f5505da018817a47c104c688d3b714f",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LEGACY_PARENT_VERTICALS_AND_REPAIR_REGRESSION",
     "independent_review": {
       "path": "docs/evidence/forge_legacy_parent_continuation_compat/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "e95e9ab6cfbdcae0b70b87819fc4aeeeb19a22c0685435880dbd35f657dc436e",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
