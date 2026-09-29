@@ -82,12 +82,12 @@
     {
       "path": "AGENTS.md",
       "bytes": 9376,
-      "sha256": "fc8e8c1dfe992b9e508e2885f0ecc75b4e7207a8664c56ec72bd4969b2c4026a"
+      "sha256": "a4dfeeae4db041cd2a0d27229946176f59f4e5a227ac3240bdfec108513db002"
     },
     {
       "path": "catalog/assets/core.yaml",
       "bytes": 1982148,
-      "sha256": "dfbef8852486d40d255db472c90cc4218016cd2a9a65f627e569e02711cce85a"
+      "sha256": "5eefd2f57d72e16b8d9ddea79d532e4ca65ddc4e1cc47d00e08f7a7be0029b69"
     }
   ],
   "deterministic_acceptance": {

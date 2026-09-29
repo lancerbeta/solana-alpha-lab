@@ -38,6 +38,9 @@ managed_write_set:
 - delivery-harness/templates/portable-bundle-manifest.json
 - catalog/assets/core.yaml
 - docs/evidence/control/delivery_harness_acceptance_v1.json
+- docs/evidence/control/owner_attention_gate_acceptance_v1.json
+- docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
+- docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
 - docs/evidence/control/a1_harness_direct_executor_extension_completion_v1.json
 - docs/evidence/control/a1_harness_direct_executor_extension_review_v1.json
 - docs/evidence/control/a1_harness_direct_executor_extension_factory_fit_v1.json
