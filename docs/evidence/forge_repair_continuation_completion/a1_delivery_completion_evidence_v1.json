@@ -15,8 +15,9 @@
   "capability_radar_now": "NONE",
   "implementation_bindings": {
     "catalog/assets/core.yaml": "352c7c0d15a65ca7c2ce82fc46de99af0c47cd805af9c5a1b43be0240c8b1020",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "047b74ea52a3b25d95fba42c733881f3d04881ff1b40ca06b28bd5a67e880e50",
     "docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md": "297f88b873b2d6e4ee34aa7addb34e717b353ddcb6b3db454f0ef56da3ddb9c2",
-    "docs/tasks/FORGE_REPAIR_CONTINUATION_COMPLETION_V1.md": "a29fa3b44d1e46e77242fd56d6dd910d12849650aeedac4539b4364541984693",
+    "docs/tasks/FORGE_REPAIR_CONTINUATION_COMPLETION_V1.md": "9672c11afde23b62800e83fc18ae01d88ce7d7d0f852c61750b181ce3ac41b0a",
     "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "006863f69db6eece96104c01fd75ddde3a5a28af470cba8d57a2bb8572f629b4",
     "src/solana_alpha_lab/factory/hfic_session.py": "61bef43de2f444ff41deac02b4c0b360fad5da6a92f4f10697b49dd517ead1cc",
     "tests/test_hfic_legacy_parent_continuation_compat_v1.py": "fd281a32aea51e9dae62b2c4a1d0b706874795ac6640da277250978d56d675bd"
@@ -31,14 +32,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_repair_continuation_completion/a1_delivery_factory_fit_v1.json",
-    "sha256": "d03a2abf398181c2a38e58f93e1f47da344063b49852fa6c7ff84e1ce4964d45",
+    "sha256": "1c646987fd4585aaa0acdc78cb1a2542881170f9c5158b1d858aab1adba314a5",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LEGACY_PARENT_MODULE_AND_ISOLATED_COPY_FREEZE",
     "independent_review": {
       "path": "docs/evidence/forge_repair_continuation_completion/a1_delivery_independent_review_v1.json",
-      "sha256": "9e94738f8156a7fc245ec3b97348c5bbdd3461b4a636dfe26ded5451bf403dbb",
+      "sha256": "2bc1c799ac5b08bdf42b73c4fd03f826b5e8ab1bd1aa8e4073e09416e25618e1",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
