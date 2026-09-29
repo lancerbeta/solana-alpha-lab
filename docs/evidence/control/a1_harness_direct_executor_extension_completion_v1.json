@@ -11,10 +11,10 @@
   "implementation_bindings": {
     ".agents/skills/delivery-harness/SKILL.md": "73b29e65e3964bf7d4515af9269d1728eaa44ec1a64effad13fb41e87d98bda6",
     ".cursor/commands/delivery-start.md": "89624e3b2f17f46b2dc55bbc2fccc498cb4750df8de18b5bb3ce83feb686002d",
-    ".cursor/rules/00-authority.mdc": "77480f9b94aea01aec46e88e0b8de905106348da3d31d690918537125d3f575f",
-    "AGENTS.md": "a4dfeeae4db041cd2a0d27229946176f59f4e5a227ac3240bdfec108513db002",
+    ".cursor/rules/00-authority.mdc": "f958cb46b47f0090eeac246fb2c22b9f2a0a1bd7cb4a829765ddbbcd0181e497",
+    "AGENTS.md": "eaa6bdd038ef7f265fbbb7d2daeb2e84a34455e330be35c7f9366a283e99dc0c",
     "CLAUDE.md": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
-    "catalog/assets/core.yaml": "5eefd2f57d72e16b8d9ddea79d532e4ca65ddc4e1cc47d00e08f7a7be0029b69",
+    "catalog/assets/core.yaml": "befb26843bc0acd4d727c6a02cd64b2ac339de18b4685c1b294e1f1562d442ac",
     "catalog/schemas/delivery_harness.schema.json": "b16b5930a23a8270cf34e68d89b46267e6a38df1b1793a3dd92ced343a5290e9",
     "catalog/schemas/delivery_harness_context_receipt.schema.json": "0ffb927a503559ad4bcb8a6a32b4960bdb5a2e92104c1d2b10cbfa11e633a1ef",
     "catalog/schemas/delivery_harness_task_contract.schema.json": "f00b15366c4d3d0807ad47022bc209f068eea851d791f8ecfd7ffa2ff41e6bd0",
@@ -23,15 +23,15 @@
     "delivery-harness/harness.yaml": "11930b776e578ab1c0dcd5545b203a7b57b32d0e3f71edcd46ad243d50684da3",
     "delivery-harness/templates/portable-bundle-manifest.json": "99d0fe18c4eddd681267e016386cbe11a1eb510bc8e9dcc83df9b029efb73a81",
     "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "d303b6977ab44b864e6509572b4774fba7cd531d20c54f53c2890d60e8ec4885",
-    "docs/agent/EXECUTION_ROUTER_PROTOCOL.md": "2640eac4700a4b0370ccf9271221b6e81eb5b60010be27ce4735026941e7a324",
-    "docs/evidence/control/delivery_harness_acceptance_v1.json": "10b0e0419d847c2ddd39d55bd889e0e38239bf48d03449171fe88b7e13c4b4e0",
+    "docs/agent/EXECUTION_ROUTER_PROTOCOL.md": "e83932f9c3ac3a322ddfade14a6c297013d67b6877f121c430e8be76915acd4c",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "982e79092b9c0fe10f131498b055a9c0be939b452d2fa45396e3b673afff7081",
     "docs/evidence/control/owner_attention_gate_acceptance_v1.json": "9c45cf1253e41d7369af72f3030770ac02cfb79b2c42a46506e20e3a404fcbd4",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "89cd8393811f2a4fb89d9d826c9e5f13212ba1bbc84608f4b24a18b6d46e9c89",
-    "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "1e0ae680d1099ef532f6fc2e582cf5fa711f066498b2a2801beb2654510edbb6",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "6c36e50834955337be1d69ce296735abdc435c30213530b6cdb4ec4bfac9dec5",
+    "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "a46a4aaed88ffd59b657a69f522572c69e32e615719cdd9558d23aef537bc93a",
     "docs/tasks/HARNESS_DIRECT_EXECUTOR_EXTENSION_V1.md": "7e10e2a1c45023499d3d52b9603afee0cb491f417d0dd37f4fb93a78e08f50d3",
     "scripts/delivery_harness.py": "f1f54144c3fe004450d71fcf1e307febe86c4ccb37ec3b1c122bed401027fdf9",
     "scripts/owner_attention_gate.py": "ca0a70b6e561d9bc855f6103fea6ab5f75b35bc699cce4567a3838eb6e8465e2",
-    "scripts/validate_baton.py": "8caa6401cb3fb1c0c1337306d2a76691ea3b63bea70dc9846dbc333f4e839ec1",
+    "scripts/validate_baton.py": "f8c59f75a956cfb2304ab435257e442a01e212362b4fb953e1cb0ecb24880e6a",
     "tests/test_delivery_harness_authority.py": "f6ffcffa114a0256022794a4f1fb87bd0dabeb52c454c33b43061d040db4f9dc",
     "tests/test_delivery_harness_contract.py": "3f931095fa2ba302b013f339babf40adb11660df0b84f83c1538db08378ea94c",
     "tests/test_delivery_harness_executor_extension.py": "fddde75f93b77587688cbf052a0d8d68d61cb2d54a28596c676fa47e16276790"
@@ -46,14 +46,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_harness_direct_executor_extension_factory_fit_v1.json",
-    "sha256": "745a9cdb39715c66fd1dafa23ca8d7e864bf2b0cc37fa239d5091d7a12d6fd2f",
+    "sha256": "1a0e4dd84387329ce1e613b41a11164dfc6f11a298458ed633a65da7ca951d18",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_tests_test_delivery_harness_executor_extension",
     "independent_review": {
       "path": "docs/evidence/control/a1_harness_direct_executor_extension_review_v1.json",
-      "sha256": "be8fdf4a2a1c533a76e4321e84ae9197c474dd8dc537d6dd97cdd21d6f61b826",
+      "sha256": "597c7dad9766a7b51421bac0cbbbd296ecdd4126ce838a617d25310d3214541d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
