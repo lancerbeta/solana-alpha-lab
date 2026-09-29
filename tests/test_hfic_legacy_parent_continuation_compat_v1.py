@@ -1315,6 +1315,8 @@ class LegacyParentContinuationCompatTests(TestCase):
             self.assertEqual(_payloads(opened["store"]), written)
             fresh = self._production_preflight(data_root)
             self.assertEqual(fresh.get("_exit"), 0, fresh)
+            self.assertEqual(fresh.get("action"), "RESUME_REPAIR_CONTINUATION")
+            self.assertEqual(fresh.get("session_id"), opened["shown"]["session_id"])
             self.assertEqual(
                 fresh.get("market_evidence_epoch_sha256"),
                 opened["shown"]["market_evidence_epoch_sha256"],
@@ -1325,6 +1327,7 @@ class LegacyParentContinuationCompatTests(TestCase):
                 json.dumps(self._preflight_body(fresh)), encoding="utf-8"
             )
             self._repair_draft(fresh, evidence, fresh_draft)
+            before_reread = _payloads(ResearchStore(data_root, create_if_missing=False))
             reread = self._freeze_cli(data_root, fresh_draft, fresh_preflight)
             self.assertEqual(reread.get("_exit"), 0, reread)
             self.assertEqual(reread.get("repair_readback_status"), "AUTHORIZED")
@@ -1339,6 +1342,10 @@ class LegacyParentContinuationCompatTests(TestCase):
             self.assertEqual(again["scientific_slot_sha256"], shown["scientific_slot_sha256"])
             self.assertEqual(again["search_key_sha256"], opened["journal"])
             self.assertEqual(len(_mains(opened["store"], opened["journal"])), before_mains)
+            self.assertEqual(
+                _payloads(ResearchStore(data_root, create_if_missing=False)),
+                before_reread,
+            )
             other_draft = data_root.parent / "other-draft.json"
             self._repair_draft(prepared["preflight"], other, other_draft)
             mismatched = self._freeze_cli(data_root, other_draft, preflight_path)
@@ -1378,6 +1385,15 @@ class LegacyParentContinuationCompatTests(TestCase):
                 if item.get("disposition_sha256") == disposition_sha
             ]
             self.assertEqual([item.get("status") for item in open_rows], ["AUTHORIZED"])
+            self.assertEqual(
+                _forge_run_count(ResearchStore(data_root, create_if_missing=False)),
+                1,
+            )
+            interrupted = self._production_preflight(data_root)
+            self.assertEqual(interrupted.get("action"), "RESUME_REPAIR_CONTINUATION")
+            self.assertEqual(
+                interrupted.get("session_id"), opened["shown"]["session_id"]
+            )
             resumed = close_repair_continuation(
                 ResearchStore(data_root, create_if_missing=False),
                 disposition_sha,

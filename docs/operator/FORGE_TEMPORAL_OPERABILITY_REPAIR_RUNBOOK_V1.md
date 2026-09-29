@@ -259,7 +259,9 @@ grant. After the repair terminal is stored, repeating `freeze` returns that
 terminal and writes nothing only after the preflight still binds the draft
 and, on a production freeze, the current market epoch still matches.
 `current_market_identity=NOT_VERIFIED` means that check was not requested;
-it is not a current-market confirmation. A different `grounded_evidence.result_sha256`
+it is not a current-market confirmation. A no-write replay includes
+`repair_readback_status` of `AUTHORIZED` or `CLOSED`; the first freeze does
+not. That field is not a new scientific result. A different `grounded_evidence.result_sha256`
 or `result_refs` is `GROUNDED_RESULT_MISMATCH`. The parent `NO_WORTHY`
 receipt is not that terminal. After `CLOSED`, ordinary preflight is
 `RETURN_EXISTING_SESSION` for that session, and `forge-run --no-write` reads
