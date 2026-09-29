@@ -27,6 +27,10 @@ managed_write_set:
   - docs/tasks/FACTORY_SAME_ENVELOPE_RENEWAL_V1.md
   - docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md
   - catalog/assets/core.yaml
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
+  - docs/evidence/factory_same_envelope_renewal/a1_delivery_completion_evidence_v1.json
+  - docs/evidence/factory_same_envelope_renewal/a1_delivery_independent_review_v1.json
+  - docs/evidence/factory_same_envelope_renewal/a1_delivery_factory_fit_v1.json
   - src/solana_alpha_lab/factory/same_envelope_renewal.py
   - scripts/renew_same_observation_envelope.py
   - tests/test_same_envelope_renewal.py
@@ -66,7 +70,10 @@ context_requirements:
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS:
       - src/solana_alpha_lab/factory/observation_schedule_lifecycle.py
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/factory_same_envelope_renewal/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/factory_same_envelope_renewal/a1_delivery_independent_review_v1.json
+      - docs/evidence/factory_same_envelope_renewal/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-SAME-ENVELOPE-RENEWAL-FACTORY-FIT-001",
+  "as_of": "2026-09-29",
+  "task_id": "FACTORY_SAME_ENVELOPE_RENEWAL_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "security": "PASS",
+    "red_team": "PASS"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1"
+  },
+  "recovery": "REVERT",
+  "limits": [
+    "NO_CANONICAL_DONE",
+    "NO_ALPHA",
+    "NO_LIVE_DEPLOY",
+    "NO_TIMER_ENABLE",
+    "NO_CALL_LEDGER_CHANGE",
+    "NO_CAMPAIGN_WINDOW_LENGTH_CHANGE"
+  ]
+}
