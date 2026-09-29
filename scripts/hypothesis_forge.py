@@ -873,6 +873,7 @@ def cmd_discovery_execute(
     from solana_alpha_lab.factory.hfic_ordinary_operation import (
         OrdinaryOperationError,
         gate_before_values,
+        get_operation,
         note_look_landed,
         record_operation,
     )
@@ -901,14 +902,62 @@ def cmd_discovery_execute(
         )
     gate: dict[str, object] = {"disposition": "EXECUTE"}
     if temporal_query:
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            EvidenceIdentityError,
+            compute_market_epoch_for_data_root,
+        )
+
+        corpus_root = explicit_data_root or store_root
+        try:
+            epoch, _basis = compute_market_epoch_for_data_root(repo_root, corpus_root)
+        except EvidenceIdentityError as exc:
+            return emit(
+                {
+                    "reason_code": str(exc),
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                },
+                exit_code=2,
+            )
+        claimed_market = ""
+        if operation_path is not None:
+            try:
+                preview_request = json.loads(operation_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+                return emit_error("DISCOVERY_INPUT_INVALID")
+            if isinstance(preview_request, dict):
+                claimed_market = str(preview_request.get("market_evidence_epoch_sha256") or "")
+        if claimed_market and claimed_market != epoch:
+            return emit(
+                {
+                    "reason_code": "ORDINARY_OPERATION_MARKET_MISMATCH",
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                },
+                exit_code=2,
+            )
         op_store = ResearchStore(store_root)
         try:
             if operation_path is not None:
-                request = json.loads(operation_path.read_text(encoding="utf-8"))
+                request = preview_request
                 if not isinstance(request, dict):
                     raise OrdinaryOperationError("ORDINARY_OPERATION_REQUEST_REQUIRED")
                 operation = record_operation(op_store, request)
                 operation_sha256 = str(operation.get("operation_sha256") or "")
+            elif claimed_market == "":
+                existing = get_operation(op_store, str(operation_sha256))
+                if str(existing.get("market_evidence_epoch_sha256") or "") != epoch:
+                    return emit(
+                        {
+                            "reason_code": "ORDINARY_OPERATION_MARKET_MISMATCH",
+                            "values_loaded": False,
+                            "writes": False,
+                            "scientific_negative": False,
+                        },
+                        exit_code=2,
+                    )
             cohorts = []
             if isinstance(binding_doc, dict):
                 cohorts = list(binding_doc.get("cohorts") or [])
@@ -928,13 +977,14 @@ def cmd_discovery_execute(
                 spec=spec,
                 journal_scope=journal_scope,
                 binding_cohorts=cohorts,
+                verified_market=epoch,
             )
         except OrdinaryOperationError as exc:
             return emit(
                 {
                     "reason_code": exc.code,
                     "values_loaded": False,
-                    "writes": False,
+                    "writes": gate.get("disposition") == "RESERVED",
                     "scientific_negative": False,
                 },
                 exit_code=2,
@@ -949,36 +999,6 @@ def cmd_discovery_execute(
         evidence["operation_sha256"] = (gate.get("operation") or {}).get("operation_sha256")
         _assert_no_path_leak(evidence, str(store_root), str(repo_root))
         return emit(evidence)
-    if temporal_query and gate.get("disposition") in {"RESERVED", "RESUME"}:
-        from solana_alpha_lab.factory.hfic_evidence_identity import (
-            EvidenceIdentityError,
-            compute_market_epoch_for_data_root,
-        )
-
-        corpus_root = explicit_data_root or store_root
-        try:
-            epoch, _basis = compute_market_epoch_for_data_root(repo_root, corpus_root)
-        except EvidenceIdentityError as exc:
-            return emit(
-                {
-                    "reason_code": str(exc),
-                    "values_loaded": False,
-                    "writes": False,
-                    "scientific_negative": False,
-                },
-                exit_code=2,
-            )
-        claimed = str((gate.get("operation") or {}).get("market_evidence_epoch_sha256") or "")
-        if claimed != epoch:
-            return emit(
-                {
-                    "reason_code": "ORDINARY_OPERATION_MARKET_MISMATCH",
-                    "values_loaded": False,
-                    "writes": False,
-                    "scientific_negative": False,
-                },
-                exit_code=2,
-            )
     data_root = explicit_data_root
     try:
         loaded = load_admitted_partition_rows(

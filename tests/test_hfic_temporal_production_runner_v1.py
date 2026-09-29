@@ -124,6 +124,7 @@ def _publish(
     *,
     with_schedule: bool = True,
     snapshot_transport: str | None = None,
+    exit_price: str = "1.44",
 ) -> None:
     data_root.mkdir(parents=True, exist_ok=True)
     admission = CAMPAIGN_STARTS + timedelta(days=7 * week)
@@ -151,7 +152,7 @@ def _publish(
                 obs["first_reliable_available_at"] = stamp
             if obs["mint"] == "MintW0A" and obs["point_id"] == "Y7200":
                 stamp = _moment(admission, "Y7200")
-                obs["typed_value"] = "1.44"
+                obs["typed_value"] = exit_price
                 obs["state"] = "OBSERVED"
                 obs["missing_reason"] = None
                 obs["event_time"] = stamp

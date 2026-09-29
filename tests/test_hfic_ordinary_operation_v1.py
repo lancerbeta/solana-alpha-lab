@@ -25,6 +25,7 @@ from solana_alpha_lab.factory.hfic_ordinary_operation import (  # noqa: E402
     gate_before_values,
     get_operation,
     merge_ordinary_readout,
+    owner_allowance,
     project_ordinary_operation,
     record_operation,
 )
@@ -984,6 +985,437 @@ class OrdinaryOperationTests(unittest.TestCase):
                     journal_scope=JOURNAL,
                 )
             self.assertEqual(getattr(raised.exception, "code", ""), "OWNER_CAP_EXHAUSTED")
+
+    def test_foreign_journal_reservations_do_not_spend_this_journal(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            store = Path(raw) / "store"
+            ResearchStore(store)
+            other_journal = "ab" * 32
+            foreign = _operation(_simple_spec(), completion="LIMITED_RESULT", cap_main=1)
+            foreign["journal_scope"] = other_journal
+            foreign["owner_request_text"] = "foreign journal one look"
+            foreign["owner_focus"] = "FOREIGN-JOURNAL"
+            foreign["owner_cap"] = {"main": None, "adaptive": None, "preview": None}
+            recorded = record_operation(ResearchStore(store), foreign)
+            spec = _simple_spec()
+            spec["all"] = [{"feature": "retention", "op": "gte", "value": 0.2}]
+            gate_before_values(
+                ResearchStore(store, create_if_missing=False),
+                operation_sha256=recorded["operation_sha256"],
+                spec=spec,
+                journal_scope=other_journal,
+            )
+            home = _operation(_simple_spec(), completion="LIMITED_RESULT", cap_main=1)
+            home["owner_cap"] = {"main": None, "adaptive": None, "preview": None}
+            home["owner_request_text"] = "home journal untouched"
+            recorded_home = record_operation(ResearchStore(store), home)
+            self.assertEqual(
+                owner_allowance(ResearchStore(store, create_if_missing=False), recorded_home, "main"),
+                6,
+            )
+
+    def test_published_negative_simple_pauses_on_one_corpus(self) -> None:
+        from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_target_label
+        from tests.test_hfic_cli import run_cli
+        from tests.test_hfic_temporal_discovery_v1 import _spec as temporal_spec
+        from tests.test_hfic_temporal_production_runner_v1 import DOCUMENT_LATENESS, _publish
+
+        focus = "PUBLISHED_ORDINARY_PAUSE"
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            data_root = workspace / "rdp"
+            _publish(data_root, workspace, exit_price="0.60")
+            preflight = run_cli(
+                "preflight",
+                "--discovery-contract",
+                "--owner-focus",
+                focus,
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(preflight.returncode, 0, preflight.stderr)
+            receipt = json.loads(preflight.stdout)
+            journal = str(receipt["search_key_sha256"])
+            market = str(receipt["market_evidence_epoch_sha256"])
+            simple = temporal_spec(
+                "SIMPLE_SCREEN",
+                query_id="published-negative-simple",
+                features=[{"name": "mark", "op": "point_value", "field_id": PRICE, "point": "Y3600"}],
+                all=[{"feature": "mark", "op": "gte", "value": 0.0}],
+                cost_profile=None,
+                schedule={"lateness_seconds": DOCUMENT_LATENESS},
+            )
+            spec_path = workspace / "spec.json"
+            scope_path = workspace / "scope.json"
+            op_path = workspace / "op.json"
+            spec_path.write_text(json.dumps(simple), encoding="utf-8")
+            scope_path.write_text(
+                json.dumps(
+                    {
+                        "population": "BASE_X",
+                        "decision_timestamp": "Y3600",
+                        "target": temporal_target_label(simple),
+                        "estimand": "price_relative_proxy",
+                        "explanatory_condition": "mark",
+                        "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            op_path.write_text(
+                json.dumps(
+                    {
+                        "owner_request_text": "one negative simple on this published corpus",
+                        "owner_focus": focus,
+                        "journal_scope": journal,
+                        "market_evidence_epoch_sha256": market,
+                        "spec": simple,
+                        "question_text": "published negative simple",
+                        "owner_cap": {"main": 1, "adaptive": 0, "preview": 0},
+                        "requested_completion": "LIMITED_RESULT",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            completed = run_cli(
+                "discovery-execute",
+                "--store",
+                str(data_root),
+                "--spec",
+                str(spec_path),
+                "--candidate-scope",
+                str(scope_path),
+                "--journal-scope",
+                journal,
+                "--operation",
+                str(op_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr + completed.stdout)
+            evidence = json.loads(completed.stdout)
+            self.assertLess(float(evidence["result"]["mean_target"]), 0.0)
+            self.assertTrue(evidence["queries"][0]["new_look"])
+            self.assertEqual(evidence.get("ordinary_operation"), "PAUSED_CAP")
+            readback = run_cli(
+                "forge-run",
+                "--owner-focus",
+                focus,
+                "--no-write",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(readback.returncode, 0, readback.stderr + readback.stdout)
+            shown = json.loads(readback.stdout)
+            self.assertNotEqual(shown.get("owner_class"), "INPUT_NOT_READY")
+            self.assertEqual(shown.get("next_action"), "AUTHORIZE_ADDITIONAL_LOOKS")
+            self.assertEqual(shown.get("owner_final"), "OPERATION_PAUSED_SEARCH_OPEN")
+            operation = shown.get("ordinary_operation") or {}
+            self.assertEqual(operation.get("status"), "PAUSED_CAP")
+            self.assertEqual(operation.get("journal_scope"), journal)
+            self.assertEqual(operation.get("result_refs"), evidence["result_refs"])
+            self.assertEqual(
+                len(
+                    [
+                        item
+                        for item in list_discovery_looks(
+                            ResearchStore(data_root, create_if_missing=False), journal
+                        )
+                        if item.get("look_class") == "MAIN" and item.get("new_look") is True
+                    ]
+                ),
+                1,
+            )
+            replay = run_cli(
+                "discovery-execute",
+                "--store",
+                str(data_root),
+                "--spec",
+                str(spec_path),
+                "--candidate-scope",
+                str(scope_path),
+                "--journal-scope",
+                journal,
+                "--operation",
+                str(op_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(replay.returncode, 0, replay.stderr + replay.stdout)
+            replayed = json.loads(replay.stdout)
+            self.assertFalse(replayed["queries"][0]["new_look"])
+            self.assertEqual(replayed["result_refs"], evidence["result_refs"])
+            changed = dict(simple)
+            changed["all"] = [{"feature": "mark", "op": "gte", "value": 5.0}]
+            changed_path = workspace / "changed.json"
+            changed_path.write_text(json.dumps(changed), encoding="utf-8")
+            refused = run_cli(
+                "discovery-execute",
+                "--store",
+                str(data_root),
+                "--spec",
+                str(changed_path),
+                "--candidate-scope",
+                str(scope_path),
+                "--journal-scope",
+                journal,
+                "--operation",
+                str(op_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertNotEqual(refused.returncode, 0)
+            self.assertIn("ORDINARY_OPERATION_SPEC_MISMATCH", refused.stdout + refused.stderr)
+            parent = record_operation(
+                ResearchStore(data_root, create_if_missing=False),
+                json.loads(op_path.read_text(encoding="utf-8")),
+            )["operation_sha256"]
+            compound = dict(simple)
+            compound["query_id"] = "published-compound"
+            compound["search_tier"] = "COMPOUND_SCREEN"
+            compound["features"] = [
+                simple["features"][0],
+                {
+                    "name": "retention",
+                    "op": "ratio",
+                    "field_id": LIQ,
+                    "numerator": "Y3600",
+                    "denominator": "Y1800",
+                },
+            ]
+            compound["all"] = [
+                {"feature": "mark", "op": "gte", "value": 0.0},
+                {"feature": "retention", "op": "gte", "value": 0.5},
+            ]
+            compound_path = workspace / "compound.json"
+            compound_op = workspace / "compound.op.json"
+            compound_scope = workspace / "compound-scope.json"
+            compound_path.write_text(json.dumps(compound), encoding="utf-8")
+            compound_scope.write_text(
+                json.dumps(
+                    {
+                        "population": "BASE_X",
+                        "decision_timestamp": "Y3600",
+                        "target": temporal_target_label(compound),
+                        "estimand": "price_relative_proxy",
+                        "explanatory_condition": "compound",
+                        "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            compound_op.write_text(
+                json.dumps(
+                    {
+                        "owner_request_text": "explicit compound on the same open journal",
+                        "owner_focus": focus,
+                        "journal_scope": journal,
+                        "market_evidence_epoch_sha256": market,
+                        "spec": compound,
+                        "question_text": "published compound",
+                        "owner_cap": {"main": 1, "adaptive": 0, "preview": 0},
+                        "requested_completion": "LIMITED_RESULT",
+                        "parent_operation_sha256": parent,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            second = run_cli(
+                "discovery-execute",
+                "--store",
+                str(data_root),
+                "--spec",
+                str(compound_path),
+                "--candidate-scope",
+                str(compound_scope),
+                "--journal-scope",
+                journal,
+                "--operation",
+                str(compound_op),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(second.returncode, 0, second.stderr + second.stdout)
+            self.assertTrue(json.loads(second.stdout)["queries"][0]["new_look"])
+            self.assertEqual(
+                len(
+                    [
+                        item
+                        for item in list_discovery_looks(
+                            ResearchStore(data_root, create_if_missing=False), journal
+                        )
+                        if item.get("look_class") == "MAIN" and item.get("new_look") is True
+                    ]
+                ),
+                2,
+            )
+            from tests.test_hfic_cli import bind_draft
+
+            fresh = run_cli(
+                "preflight",
+                "--discovery-contract",
+                "--owner-focus",
+                focus,
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(fresh.returncode, 0, fresh.stderr)
+            fresh_receipt = json.loads(fresh.stdout)
+            source = json.loads(
+                (ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1_2.json").read_text(encoding="utf-8")
+            )
+            source["grounded_evidence"] = json.loads(second.stdout)
+            source["owner_focus"] = focus
+            draft = bind_draft(source, fresh_receipt)
+            draft_path = workspace / "draft.json"
+            receipt_path = workspace / "receipt.json"
+            draft_path.write_text(json.dumps(draft), encoding="utf-8")
+            receipt_path.write_text(json.dumps(fresh_receipt), encoding="utf-8")
+            frozen = run_cli(
+                "freeze",
+                "--draft",
+                str(draft_path),
+                "--preflight-receipt",
+                str(receipt_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(frozen.returncode, 0, frozen.stderr + frozen.stdout)
+            self.assertEqual(json.loads(frozen.stdout).get("critic_terminal"), "NO_WORTHY_HYPOTHESIS")
+            terminal = run_cli(
+                "forge-run",
+                "--owner-focus",
+                focus,
+                "--no-write",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(terminal.returncode, 0, terminal.stderr + terminal.stdout)
+            finished = json.loads(terminal.stdout)
+            self.assertIn(
+                finished.get("owner_final"),
+                {"SEARCH_EXHAUSTED_CURRENT_EVIDENCE", "NO_WORTHY_HYPOTHESIS"},
+            )
+            self.assertNotEqual(finished.get("next_action"), "AUTHORIZE_ADDITIONAL_LOOKS")
+
+    def test_published_cap_two_runs_two_questions_without_a_second_grant(self) -> None:
+        from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_target_label
+        from tests.test_hfic_cli import run_cli
+        from tests.test_hfic_temporal_discovery_v1 import _spec as temporal_spec
+        from tests.test_hfic_temporal_production_runner_v1 import DOCUMENT_LATENESS, _publish
+
+        focus = "PUBLISHED_TWO_QUESTIONS"
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            data_root = workspace / "rdp"
+            _publish(data_root, workspace, exit_price="0.60")
+            preflight = run_cli(
+                "preflight",
+                "--discovery-contract",
+                "--owner-focus",
+                focus,
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(preflight.returncode, 0, preflight.stderr)
+            receipt = json.loads(preflight.stdout)
+            journal = str(receipt["search_key_sha256"])
+            market = str(receipt["market_evidence_epoch_sha256"])
+            first_spec = temporal_spec(
+                "SIMPLE_SCREEN",
+                query_id="published-q1",
+                features=[{"name": "mark", "op": "point_value", "field_id": PRICE, "point": "Y3600"}],
+                all=[{"feature": "mark", "op": "gte", "value": 0.0}],
+                cost_profile=None,
+                schedule={"lateness_seconds": DOCUMENT_LATENESS},
+            )
+            second_spec = dict(first_spec)
+            second_spec["query_id"] = "published-q2"
+            second_spec["all"] = [{"feature": "mark", "op": "gte", "value": 0.1}]
+            third_spec = dict(first_spec)
+            third_spec["query_id"] = "published-q3"
+            third_spec["all"] = [{"feature": "mark", "op": "gte", "value": 0.2}]
+            op_path = workspace / "op.json"
+            op_path.write_text(
+                json.dumps(
+                    {
+                        "owner_request_text": "two questions inside one published allowance",
+                        "owner_focus": focus,
+                        "journal_scope": journal,
+                        "market_evidence_epoch_sha256": market,
+                        "question_text": "two published questions",
+                        "owner_cap": {"main": 2, "adaptive": 0, "preview": 0},
+                        "requested_completion": "LIMITED_RESULT",
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            def execute(spec: dict, name: str):
+                path = workspace / f"{name}.json"
+                path.write_text(json.dumps(spec), encoding="utf-8")
+                scope = workspace / f"{name}-scope.json"
+                scope.write_text(
+                    json.dumps(
+                        {
+                            "population": "BASE_X",
+                            "decision_timestamp": "Y3600",
+                            "target": temporal_target_label(spec),
+                            "estimand": "price_relative_proxy",
+                            "explanatory_condition": name,
+                            "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+                return run_cli(
+                    "discovery-execute",
+                    "--store",
+                    str(data_root),
+                    "--spec",
+                    str(path),
+                    "--candidate-scope",
+                    str(scope),
+                    "--journal-scope",
+                    journal,
+                    "--operation",
+                    str(op_path),
+                    "--format",
+                    "json",
+                    data_root=data_root,
+                )
+
+            first = execute(first_spec, "q1")
+            second = execute(second_spec, "q2")
+            self.assertEqual(first.returncode, 0, first.stderr + first.stdout)
+            self.assertEqual(second.returncode, 0, second.stderr + second.stdout)
+            self.assertTrue(json.loads(first.stdout)["queries"][0]["new_look"])
+            self.assertTrue(json.loads(second.stdout)["queries"][0]["new_look"])
+            third = execute(third_spec, "q3")
+            self.assertNotEqual(third.returncode, 0)
+            self.assertIn("OWNER_CAP_EXHAUSTED", third.stdout + third.stderr)
+            self.assertEqual(
+                len(
+                    [
+                        item
+                        for item in list_discovery_looks(
+                            ResearchStore(data_root, create_if_missing=False), journal
+                        )
+                        if item.get("look_class") == "MAIN" and item.get("new_look") is True
+                    ]
+                ),
+                2,
+            )
 
     def test_closed_repair_without_operation_artifact_still_reads(self) -> None:
         from tests.test_hfic_legacy_parent_continuation_compat_v1 import (

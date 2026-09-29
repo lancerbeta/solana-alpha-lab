@@ -229,7 +229,13 @@ def binding_fingerprint(cohorts: Sequence[Mapping[str, Any]] | None) -> str | No
     return _sha({"cohorts": rows})
 
 
-def _protocol_remaining(store: Any, looks: Sequence[Mapping[str, Any]], kind: str) -> int:
+def _protocol_remaining(
+    store: Any,
+    looks: Sequence[Mapping[str, Any]],
+    kind: str,
+    *,
+    journal: str,
+) -> int:
     if kind == "preview":
         used = sum(1 for item in looks if item.get("look_class") == "PREVIEW" and item.get("new_look") is True)
         return max(0, MAX_PREVIEW_SPECS - used)
@@ -243,7 +249,8 @@ def _protocol_remaining(store: Any, looks: Sequence[Mapping[str, Any]], kind: st
     in_flight = {
         str(item.get("spec_sha256") or "")
         for item in _iter_kind(store, RESERVATION_KIND)
-        if item.get("look_class") == ("ADAPTIVE" if kind == "adaptive" else "MAIN")
+        if item.get("journal_scope") == journal
+        and item.get("look_class") == ("ADAPTIVE" if kind == "adaptive" else "MAIN")
         and str(item.get("spec_sha256") or "") not in completed
     }
     limit = MAX_ADAPTIVE_REFINEMENTS if kind == "adaptive" else MAX_MAIN_QUERY_SPECS
@@ -280,7 +287,9 @@ def owner_allowance(store: Any, operation: Mapping[str, Any], kind: str) -> int:
     """Explicit cap wins when it is smaller than the protocol remainder."""
 
     looks = _looks(store, str(operation.get("journal_scope") or ""))
-    protocol = _protocol_remaining(store, looks, kind)
+    protocol = _protocol_remaining(
+        store, looks, kind, journal=str(operation.get("journal_scope") or "")
+    )
     explicit = (operation.get("owner_cap") or {}).get(kind)
     if explicit is None:
         return protocol
@@ -406,9 +415,6 @@ def gate_before_values(
         None,
     )
     if stored is not None:
-        stored_refs = stored.get("data_refs") if isinstance(stored.get("data_refs"), list) else []
-        if fingerprint and binding_fingerprint(stored_refs) not in {None, fingerprint}:
-            raise OrdinaryOperationError("ORDINARY_OPERATION_BINDING_MISMATCH")
         return {
             "disposition": "REPLAY",
             "values_loaded": False,
@@ -426,6 +432,15 @@ def gate_before_values(
                 "new_look": False,
                 "writes": False,
                 "values_loaded": False,
+                "queries": [
+                    {
+                        "query_id": (stored.get("result") or {}).get("query_id"),
+                        "spec_sha256": validated["spec_sha256"],
+                        "record_id": stored.get("record_id"),
+                        "look_class": "RETRY_SAME_BYTES",
+                        "new_look": False,
+                    }
+                ],
             },
         }
     pending = [
@@ -611,7 +626,7 @@ def project_ordinary_operation(
         "result_refs": [latest.get("record_id")] if latest else [],
         "result_sha256": latest.get("result_sha256") if latest else None,
         "claim_boundary": "PRICE_RELATIVE_PROXY is not net return; cohorts are not independent replications",
-        "protocol_main_remaining": _protocol_remaining(store, looks, "main"),
+        "protocol_main_remaining": _protocol_remaining(store, looks, "main", journal=journal),
         "protocol_main_used": sum(1 for item in looks if item.get("look_class") == "MAIN" and item.get("new_look") is True),
         "owner_main_remaining": owner_allowance(store, current, "main"),
         "reserved_main": len(_reservations(store, str(current.get("operation_sha256") or ""))),

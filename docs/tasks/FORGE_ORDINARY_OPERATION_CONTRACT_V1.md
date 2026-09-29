@@ -110,18 +110,22 @@ STOP: >-
   Do not run the prepared 15m-4h question.
 
 NEXT: >-
-  After merge and a separate owner authorization, one live question on a new
-  focus. This atom does not start it.
+  Continue on this PR. Published scenarios A and B pass. Still required on
+  that same publication builder: C candidate classification at cap 0, D
+  fault and race, E foreign binding and direct-entry negatives, F keep the
+  existing closed-repair readback. Then model trials within the remaining
+  budget, reviews, exact-head CI, and merge-readiness. Do not treat a local
+  PASS as the whole DoD while C-F are open.
 
-Coverage on synthetic stores through the production CLI:
+Published-corpus acceptance on `_publish` (one data root per scenario):
 
-| Slice | Result |
+| Scenario | Result |
 |---|---|
-| V1 | SIMPLE then compound, production freeze `NO_WORTHY_HYPOTHESIS`, new-process forge-run. MAIN 0→1→2. |
-| V2 | Positive SIMPLE, exhausted cap, revised spec refused, persist-draft, freeze, scripted critic, finalize. MAIN stays 1. |
-| V3 | Closed repair readback with no operation artifact. |
-| Guards | Cap 0 before values, preview cap 0, same-operation replay, changed binding refused, blocked run keeps its next_action. |
-| Model | One empty-store trial on `gpt-5.6-sol-xhigh` stopped `MARKET_EVIDENCE_BASIS_INCOMPLETE` with no MAIN. Two later trials reported model `UNKNOWN`. |
+| A | PASS. Negative SIMPLE, cap 1, pause, cold `forge-run` `AUTHORIZE_ADDITIONAL_LOOKS`, exact replay, spec change refused, new grant, compound, freeze `NO_WORTHY_HYPOTHESIS`, terminal readback. MAIN 0→1→1→2. |
+| B | PASS. One request, cap 2, two CLI calculations, third `OWNER_CAP_EXHAUSTED`. |
+| C-E | NOT_RUN on this publication builder. |
+| F | Existing closed-repair regression still invoked; not re-proven against a new publication. |
+| Journal isolation | PASS. A foreign journal reservation does not reduce this journal's protocol remainder. |
 
 Ordinary operation contract. Historical scientific contracts stay in place.
 The closed repair `4a01bbb755f2097dd99285e619f3699bcb2e7879957d2bfa9bc254dbc64da0f1`

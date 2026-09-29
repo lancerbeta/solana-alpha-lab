@@ -17,7 +17,7 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Current operation and its latest status are chosen by record created_at, not by partition-hash iteration. The same reserved spec resumes without a second allowance unit. One owner request with cap 2 admits two different specs and refuses a third. An incomplete market basis refuses before values and is not a scientific pause. A one-corpus publication path for scenarios A-F is not claimed by this head."
+        "Published scenario A pauses a negative SIMPLE and freezes after compound on one _publish corpus. Scenario B runs two questions under one cap-2 request. Protocol remainder ignores another journal's reservations. Scenarios C-E are not run on that builder yet, so this PASS is not the whole DoD."
       ]
     },
     {
@@ -51,6 +51,6 @@
     "NO_NET_RETURN",
     "NO_LIVE_LOOK",
     "MODEL_TRIAL_2_AND_3_PROVENANCE_UNKNOWN",
-    "ONE_CORPUS_SCENARIOS_A_F_NOT_CLAIMED"
+    "ONE_CORPUS_SCENARIOS_C_E_NOT_RUN"
   ]
 }
