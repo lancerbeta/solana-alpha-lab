@@ -16,7 +16,19 @@ fixed for the candidate fingerprint and context receipt.
 |---|---|---|---|
 | `DIRECT_CODEX_DELIVERY` | Codex | bounded repository delivery | exact owner PR/head approval plus machine gate |
 | `DIRECT_CURSOR_DELIVERY` | Cursor | bounded repository delivery | exact owner PR/head approval plus machine gate |
-| `DESIGN_ONLY` | either | read-only design/review with no delivery mutation | forbidden |
+| `DIRECT_CLAUDE_CODE_DELIVERY` | Claude Code | bounded repository delivery | exact owner PR/head approval plus machine gate |
+| `DIRECT_OTHER_DELIVERY` | named other client | bounded repository delivery | exact owner PR/head approval plus machine gate |
+| `DESIGN_ONLY` | read-only actors | read-only design/review with no delivery mutation | forbidden |
+
+The executing client picks the route. Cursor Agent is `DIRECT_CURSOR_DELIVERY`
+even when the model is not Cursor's. Codex, including its extension inside
+Cursor, is `DIRECT_CODEX_DELIVERY`. Claude Code, including its extension inside
+Cursor, is `DIRECT_CLAUDE_CODE_DELIVERY`. Another coding client passes
+`DIRECT_OTHER_DELIVERY` and actor `OTHER` explicitly, plus a non-secret client
+name in the start checkpoint. `kimi`, `glm` and typos are not rewritten to
+`OTHER`. A model change inside the same client does not create a route. Two
+clients do not write one worktree. Grants for the current PR come from the
+frozen expected-base policy.
 
 `LEGACY_GITHUB_BATON_DORMANT` is historical and inactive. It cannot select a
 task, receive a new atom, grant execution authority or merge. Historical bytes

@@ -44,6 +44,7 @@ ARCHITECTURE_FLOOR_PREFIXES = (
     "control/",
     "delivery-harness/",
     "AGENTS.md",
+    "CLAUDE.md",
     ".cursor/rules/",
     ".cursor/agents/",
     ".agents/skills/delivery-harness/",
@@ -78,27 +79,238 @@ OPTIONAL_COMPLETION_EVIDENCE_KEYS = {
 }
 SINGLE_AGENT_REVIEW_FALLBACK = "SINGLE_AGENT_REVIEW_FALLBACK"
 
-# Human CLI boundary accepts case variants of existing actors only; internal
-# receipts stay uppercase and unknown actors remain invalid (no fuzzy aliases).
-CLI_ACTOR_ALIASES = {
+# Syntactic closed sets. Membership is not a grant. Grants are read from the
+# selected policy's route_authority and never invented from an enum name.
+KNOWN_ACTORS = frozenset({"GPT", "CODEX", "CURSOR", "CLAUDE_CODE", "OTHER"})
+LEGACY_REQUIRED_POLICY_ROUTES = frozenset(
+    {
+        "DIRECT_CODEX_DELIVERY",
+        "DIRECT_CURSOR_DELIVERY",
+        "DESIGN_ONLY",
+        "LEGACY_GITHUB_BATON_DORMANT",
+    }
+)
+OPTIONAL_DIRECT_ROUTES = frozenset(
+    {
+        "DIRECT_CLAUDE_CODE_DELIVERY",
+        "DIRECT_OTHER_DELIVERY",
+    }
+)
+KNOWN_DIRECT_ROUTES = frozenset(
+    {
+        "DIRECT_CODEX_DELIVERY",
+        "DIRECT_CURSOR_DELIVERY",
+        "DIRECT_CLAUDE_CODE_DELIVERY",
+        "DIRECT_OTHER_DELIVERY",
+    }
+)
+KNOWN_CONTEXT_ROUTES = KNOWN_DIRECT_ROUTES | frozenset({"DESIGN_ONLY"})
+KNOWN_REQUEST_ROUTES = KNOWN_CONTEXT_ROUTES | frozenset(
+    {"LEGACY_GITHUB_BATON_DORMANT"}
+)
+POLICY_RELATIVE = "control/owner_attention_gate_v2.yaml"
+DIRECT_MERGE_GRANT = "EXACT_OWNER_APPROVAL_AND_MACHINE_GATE"
+KNOWN_AUTONOMOUS_ACTION_CLASSES = frozenset(
+    {"READ_ONLY", "ROUTINE_ENGINEERING", "GITHUB_TRANSPORT"}
+)
+# Casefold of documented tokens only. "claude", "kimi", "glm" and typos do
+# not become CLAUDE_CODE or OTHER. GPT stays off this map: the historical
+# CLI boundary rejects the bare token "gpt".
+CLI_ACTOR_CASEFOLD = {
     "cursor": "CURSOR",
-    "Cursor": "CURSOR",
-    "CURSOR": "CURSOR",
     "codex": "CODEX",
-    "Codex": "CODEX",
-    "CODEX": "CODEX",
+    "claude_code": "CLAUDE_CODE",
+    "other": "OTHER",
 }
+DIRECT_ROUTE_ACTOR = {
+    "DIRECT_CODEX_DELIVERY": "CODEX",
+    "DIRECT_CURSOR_DELIVERY": "CURSOR",
+    "DIRECT_CLAUDE_CODE_DELIVERY": "CLAUDE_CODE",
+    "DIRECT_OTHER_DELIVERY": "OTHER",
+}
+ACTIVE_ROUTE_ORDER = (
+    "DIRECT_CODEX_DELIVERY",
+    "DIRECT_CURSOR_DELIVERY",
+    "DIRECT_CLAUDE_CODE_DELIVERY",
+    "DIRECT_OTHER_DELIVERY",
+    "DESIGN_ONLY",
+)
+DESIGN_ONLY_ACTORS = frozenset({"GPT", "CODEX", "CURSOR", "CLAUDE_CODE", "OTHER"})
 
 
 def normalize_cli_actor(value: str) -> str:
-    if not isinstance(value, str):
+    if not isinstance(value, str) or value == "":
         raise ValueError("ACTOR_INVALID")
-    canonical = CLI_ACTOR_ALIASES.get(value)
+    canonical = CLI_ACTOR_CASEFOLD.get(value.lower())
     if canonical is None:
         raise ValueError(
-            "ACTOR_INVALID: expected one of cursor|Cursor|CURSOR|codex|Codex|CODEX"
+            "ACTOR_INVALID: expected a documented case variant of "
+            "CURSOR, CODEX, CLAUDE_CODE or OTHER"
         )
     return canonical
+
+
+def _route_policy_shape_ok(body: Any) -> bool:
+    if not isinstance(body, dict) or set(body) != {
+        "allowed_actors",
+        "autonomous_action_classes",
+        "ordinary_merge",
+    }:
+        return False
+    actors = body["allowed_actors"]
+    actions = body["autonomous_action_classes"]
+    merge = body["ordinary_merge"]
+    return bool(
+        isinstance(actors, list)
+        and actors
+        and len(set(actors)) == len(actors)
+        and all(isinstance(item, str) and item in KNOWN_ACTORS for item in actors)
+        and isinstance(actions, list)
+        and actions
+        and len(set(actions)) == len(actions)
+        and all(item in KNOWN_AUTONOMOUS_ACTION_CLASSES for item in actions)
+        and merge in {DIRECT_MERGE_GRANT, "FORBIDDEN"}
+    )
+
+
+def admit_transport_actor(
+    policy: dict[str, Any], route: str, actor: str | None
+) -> str:
+    """Admit a transport actor from the selected policy only.
+
+    A missing actor is filled only when that route lists exactly one allowed
+    actor. Unknown spellings are not rewritten to OTHER.
+    """
+
+    routes = policy.get("route_authority")
+    if not isinstance(routes, dict) or not isinstance(routes.get(route), dict):
+        raise ValueError("UNKNOWN_ROUTE")
+    body = routes[route]
+    if body.get("ordinary_merge") != DIRECT_MERGE_GRANT:
+        raise ValueError("ROUTE_MERGE_FORBIDDEN")
+    actions = body.get("autonomous_action_classes")
+    if not isinstance(actions, list) or "GITHUB_TRANSPORT" not in actions:
+        raise ValueError("ACTION_CLASS_NOT_AUTONOMOUS_FOR_ROUTE")
+    allowed = body.get("allowed_actors")
+    if not isinstance(allowed, list) or not all(
+        isinstance(item, str) for item in allowed
+    ):
+        raise ValueError("ACTOR_NOT_ALLOWED_FOR_ROUTE")
+    if actor is None:
+        if len(allowed) != 1:
+            raise ValueError("ACTOR_NOT_UNIQUE_FOR_ROUTE")
+        return allowed[0]
+    canonical = normalize_cli_actor(actor)
+    if canonical not in allowed:
+        raise ValueError("ACTOR_NOT_ALLOWED_FOR_ROUTE")
+    return canonical
+
+
+LEGACY_ACTIVE_ROUTE_ORDER = (
+    "DIRECT_CODEX_DELIVERY",
+    "DIRECT_CURSOR_DELIVERY",
+    "DESIGN_ONLY",
+)
+LEGACY_DESIGN_ONLY_ACTORS = frozenset({"GPT", "CODEX", "CURSOR"})
+
+
+def _direct_route_parity(
+    routes: dict[str, Any],
+    harness_routes: dict[str, Any],
+    route: str,
+    actor: str,
+) -> bool:
+    body = routes.get(route)
+    spec = harness_routes.get(route)
+    return bool(
+        _route_policy_shape_ok(body)
+        and isinstance(spec, dict)
+        and body["allowed_actors"] == [actor]
+        and body["autonomous_action_classes"]
+        == ["READ_ONLY", "ROUTINE_ENGINEERING", "GITHUB_TRANSPORT"]
+        and body["ordinary_merge"] == DIRECT_MERGE_GRANT
+        and spec.get("active") is True
+        and spec.get("actor") == actor
+        and spec.get("merge") == DIRECT_MERGE_GRANT
+    )
+
+
+def active_configuration_problems(
+    harness: dict[str, Any], policy: dict[str, Any]
+) -> list[str]:
+    """Live harness/policy parity. This does not grant the candidate rights.
+
+    A legacy two-direct-route document stays valid. The extended document must
+    carry both new pairs. A mix is divergence. Neither shape grants rights by
+    itself; admission still reads the frozen base policy.
+    """
+
+    problems: list[str] = []
+    routes = policy.get("route_authority") if isinstance(policy, dict) else None
+    harness_routes = harness.get("routes") if isinstance(harness, dict) else None
+    active = harness.get("active_routes") if isinstance(harness, dict) else None
+    if not isinstance(routes, dict) or not isinstance(harness_routes, dict):
+        return ["ACTIVE_ROUTE_AUTHORITY_DIVERGENCE"]
+    legacy = active == list(LEGACY_ACTIVE_ROUTE_ORDER)
+    extended = active == list(ACTIVE_ROUTE_ORDER)
+    if not legacy and not extended:
+        problems.append("ACTIVE_ROUTE_AUTHORITY_DIVERGENCE")
+    expected_policy_routes = set(LEGACY_REQUIRED_POLICY_ROUTES)
+    if extended:
+        expected_policy_routes |= set(OPTIONAL_DIRECT_ROUTES)
+    if set(routes) != expected_policy_routes or set(harness_routes) != set(routes):
+        problems.append("ACTIVE_ROUTE_AUTHORITY_DIVERGENCE")
+    checked_direct = (
+        DIRECT_ROUTE_ACTOR.items()
+        if extended
+        else (
+            ("DIRECT_CODEX_DELIVERY", "CODEX"),
+            ("DIRECT_CURSOR_DELIVERY", "CURSOR"),
+        )
+    )
+    for route, actor in checked_direct:
+        if not _direct_route_parity(routes, harness_routes, route, actor):
+            problems.append("ACTIVE_ROUTE_AUTHORITY_DIVERGENCE")
+    design_actors = DESIGN_ONLY_ACTORS if extended else LEGACY_DESIGN_ONLY_ACTORS
+    design = routes.get("DESIGN_ONLY")
+    design_spec = harness_routes.get("DESIGN_ONLY")
+    if (
+        not _route_policy_shape_ok(design)
+        or set(design["allowed_actors"]) != design_actors
+        or design["autonomous_action_classes"] != ["READ_ONLY"]
+        or design["ordinary_merge"] != "FORBIDDEN"
+        or not isinstance(design_spec, dict)
+        or design_spec.get("active") is not True
+        or design_spec.get("actor") != "ANY"
+        or design_spec.get("merge") != "FORBIDDEN"
+    ):
+        problems.append("ACTIVE_ROUTE_AUTHORITY_DIVERGENCE")
+    dormant = routes.get("LEGACY_GITHUB_BATON_DORMANT")
+    dormant_spec = harness_routes.get("LEGACY_GITHUB_BATON_DORMANT")
+    if (
+        not _route_policy_shape_ok(dormant)
+        or dormant["allowed_actors"] != ["CURSOR"]
+        or dormant["ordinary_merge"] != "FORBIDDEN"
+        or dormant["autonomous_action_classes"] != ["READ_ONLY"]
+        or not isinstance(dormant_spec, dict)
+        or dormant_spec.get("active") is not False
+        or dormant_spec.get("merge") != "FORBIDDEN"
+        or "LEGACY_GITHUB_BATON_DORMANT" in (active or [])
+    ):
+        problems.append("ACTIVE_ROUTE_AUTHORITY_DIVERGENCE")
+    return sorted(set(problems))
+
+
+def policy_path_explicitly_listed(managed: list[str]) -> bool:
+    """Exact policy path only. A prefix such as ``control/**`` does not qualify."""
+
+    normalized: list[str] = []
+    for item in managed:
+        try:
+            normalized.append(safe_repo_path(item, allow_prefix=True))
+        except ValueError:
+            return False
+    return POLICY_RELATIVE in normalized
 
 
 pr_group = r"([1-9][0-9]*)"
@@ -902,29 +1114,128 @@ def render_validation_command(command: dict[str, Any], expected_base: str) -> li
     return rendered
 
 
-def load_base_bound_policy(
+def read_frozen_base_policy(
     root: Path, *, expected_base: str, runner=run_read
 ) -> dict[str, Any]:
+    """Load authority from the frozen expected base. Never from the candidate."""
+
     try:
-        candidate = decode_json_mapping(
-            (root.resolve() / "control" / "owner_attention_gate_v2.yaml").read_bytes(),
-            "OWNER_POLICY_BASE_BINDING_INVALID",
-        )
-        base = decode_json_mapping(
+        return decode_json_mapping(
             runner(
-                [
-                    "git", "show",
-                    f"{expected_base}:control/owner_attention_gate_v2.yaml",
-                ],
+                ["git", "show", f"{expected_base}:{POLICY_RELATIVE}"],
                 root,
             ),
             "OWNER_POLICY_BASE_BINDING_INVALID",
         )
     except (OSError, ValueError):
         raise ValueError("OWNER_POLICY_BASE_BINDING_INVALID") from None
-    if canonical_json_bytes(candidate) != canonical_json_bytes(base):
-        raise ValueError("OWNER_POLICY_BASE_BINDING_INVALID")
-    return candidate
+
+
+def _scoped_policy_transition_admitted(
+    root: Path,
+    *,
+    expected_base: str,
+    context_receipt: dict[str, Any] | None,
+    runner,
+    candidate_bytes: bytes,
+) -> bool:
+    """True only for a task-scoped, committed policy edit.
+
+    The candidate is acknowledged as reviewed work product. It is not the
+    authority for this delivery. ``control/**`` does not list the policy path.
+    LIVE_PR_HEAD cannot carry a policy transition.
+    """
+
+    if not isinstance(context_receipt, dict) or is_live_pr_head(context_receipt):
+        return False
+    try:
+        verify_context_receipt(root, context_receipt)
+    except ValueError:
+        return False
+    task = context_receipt.get("task")
+    if not isinstance(task, dict):
+        return False
+    try:
+        observed_head = runner(["git", "rev-parse", "HEAD"], root).decode(
+            "ascii", errors="strict"
+        ).strip()
+        committed = runner(["git", "show", f"HEAD:{POLICY_RELATIVE}"], root)
+    except (UnicodeDecodeError, ValueError):
+        return False
+    repository = context_receipt.get("repository")
+    if not isinstance(repository, dict) or repository.get("head") != observed_head:
+        return False
+    if committed != candidate_bytes:
+        return False
+    relative = task.get("path")
+    if not isinstance(relative, str):
+        return False
+    try:
+        task_path = (root.resolve() / safe_repo_path(relative)).resolve()
+        task_bytes = task_path.read_bytes()
+    except (OSError, ValueError):
+        return False
+    if task.get("sha256") != sha256_bytes(task_bytes):
+        return False
+    try:
+        module = load_delivery_harness_runtime(root)
+        parser = getattr(module, "parse_task_contract", None)
+        if not callable(parser):
+            return False
+        metadata = parser(root, relative, task.get("task_id"))
+    except (OSError, ValueError):
+        return False
+    if not isinstance(metadata, dict):
+        return False
+    binding = metadata.get("git_binding")
+    managed_value = metadata.get("managed_write_set")
+    if not isinstance(binding, dict) or binding.get("expected_base") != expected_base:
+        return False
+    if not isinstance(managed_value, list) or not all(
+        isinstance(item, str) for item in managed_value
+    ):
+        return False
+    return policy_path_explicitly_listed(managed_value)
+
+
+def load_base_bound_policy(
+    root: Path,
+    *,
+    expected_base: str,
+    runner=run_read,
+    context_receipt: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Return the frozen-base policy.
+
+    Unchanged bytes keep the previous behavior. A differing candidate is
+    tolerated only for a scoped task receipt whose managed write set lists
+    the exact policy path and whose committed bytes match the worktree. The
+    returned object is always the base policy, so the candidate cannot weaken
+    checks, change the phrase, or appoint its own actor for this PR.
+    """
+
+    policy_path = root.resolve() / POLICY_RELATIVE
+    try:
+        candidate_bytes = policy_path.read_bytes()
+        candidate = decode_json_mapping(
+            candidate_bytes, "OWNER_POLICY_BASE_BINDING_INVALID"
+        )
+        base = read_frozen_base_policy(
+            root, expected_base=expected_base, runner=runner
+        )
+    except (OSError, ValueError):
+        raise ValueError("OWNER_POLICY_BASE_BINDING_INVALID") from None
+    if canonical_json_bytes(candidate) == canonical_json_bytes(base):
+        return base
+    if _scoped_policy_transition_admitted(
+        root,
+        expected_base=expected_base,
+        context_receipt=context_receipt,
+        runner=runner,
+        candidate_bytes=candidate_bytes,
+    ):
+        return base
+    raise ValueError("OWNER_POLICY_BASE_BINDING_INVALID")
 
 
 def candidate_identity_unchanged(
@@ -1300,9 +1611,7 @@ def verify_context_receipt(root: Path, receipt: dict[str, Any]) -> None:
         receipt.get("schema") == "smial.delivery-context-receipt"
         and receipt.get("schema_version") == "1.0"
         and receipt.get("harness_id") == "DELIVERY_HARNESS_V1"
-        and receipt.get("route") in {
-            "DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY", "DESIGN_ONLY"
-        }
+        and receipt.get("route") in KNOWN_CONTEXT_ROUTES
         and receipt.get("cloud_bundle_mode") == "OWNER_MANAGED_OPTIONAL_EXPORT"
         and isinstance(receipt.get("repository"), dict)
         and isinstance(receipt.get("selected"), list)
@@ -1907,7 +2216,10 @@ def build_grounded_merge_request(
     ) != expected_upstream_oid:
         raise ValueError("FROZEN_BASE_MISMATCH")
     policy = load_base_bound_policy(
-        root, expected_base=expected_base, runner=runner
+        root,
+        expected_base=expected_base,
+        runner=runner,
+        context_receipt=context_receipt,
     )
     pr = decode_json_mapping(runner(["gh", "pr", "view", str(pr_number), "--repo", repository, "--json", "number,headRefOid,headRefName,baseRefName,mergeable,reviewDecision,state,isDraft"], root), "PR_READBACK_INVALID")
     check_policy = policy["github_checks"]
@@ -2029,7 +2341,7 @@ def build_grounded_merge_request(
     review_state_pass = pr.get("reviewDecision") != "CHANGES_REQUESTED"
     machine = {
         "pr_number": pr_number, "observed_head_sha": str(pr.get("headRefOid", "")), "observed_tree_sha": local_tree,
-        "context_receipt_sha256": receipt_hash if isinstance(receipt_hash, str) else "0" * 64, "context_route": receipt_route if receipt_route in {"DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY"} else route,
+        "context_receipt_sha256": receipt_hash if isinstance(receipt_hash, str) else "0" * 64, "context_route": receipt_route if receipt_route in KNOWN_DIRECT_ROUTES else route,
         "exact_pr_head_bound": exact_head, "context_receipt_bound": context_bound,
         "required_tests_pass": delivery_checks["required_tests_pass"],
         "ci_exact_head_pass": exact_head and ci_pass,
@@ -2056,7 +2368,7 @@ def build_grounded_merge_request(
             "pr_number": approval_pr,
             "head_sha": approval_head,
             "context_receipt_sha256": receipt_hash if isinstance(receipt_hash, str) else "0" * 64,
-            "context_route": receipt_route if receipt_route in {"DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY"} else route,
+            "context_route": receipt_route if receipt_route in KNOWN_DIRECT_ROUTES else route,
         },
         "merge_checks": machine,
     }
@@ -2196,7 +2508,10 @@ def build_post_merge_receipt(
     parent_oids = lineage[1:]
     try:
         policy = load_base_bound_policy(
-            root, expected_base=expected_base, runner=runner
+            root,
+            expected_base=expected_base,
+            runner=runner,
+            context_receipt=verified_context,
         )
     except ValueError:
         raise ValueError("POST_MERGE_READBACK_FAILED") from None
@@ -2320,7 +2635,10 @@ def evaluate_merge_readiness(
         root, context_receipt, repository=repository, runner=runner
     )
     policy = load_base_bound_policy(
-        root, expected_base=expected_base, runner=runner
+        root,
+        expected_base=expected_base,
+        runner=runner,
+        context_receipt=context_receipt,
     )
     result = evaluate(request, policy)
     reasons = list(result.get("reasons") or [])
@@ -2403,7 +2721,10 @@ def execute_guarded_merge(
         root, verified_context, repository=repository, runner=runner
     )
     policy = load_base_bound_policy(
-        root, expected_base=expected_base, runner=runner
+        root,
+        expected_base=expected_base,
+        runner=runner,
+        context_receipt=verified_context,
     )
     observed_head = request["merge_checks"]["observed_head_sha"]
     observed_tree = request["merge_checks"]["observed_tree_sha"]
@@ -2429,7 +2750,10 @@ def execute_guarded_merge(
             "merge_submitted": False,
         }
     rebound_policy = load_base_bound_policy(
-        root, expected_base=expected_base, runner=runner
+        root,
+        expected_base=expected_base,
+        runner=runner,
+        context_receipt=verified_context,
     )
     if canonical_json_bytes(rebound_policy) != canonical_json_bytes(policy) or not (
         candidate_identity_unchanged(
@@ -2651,11 +2975,9 @@ def _policy_v2_is_closed(policy: dict[str, Any]) -> bool:
         and isinstance(checks.get("required_jobs"), list)
         and checks["required_jobs"]
         and isinstance(routes, dict)
-        and set(routes)
-        == {
-            "DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY", "DESIGN_ONLY",
-            "LEGACY_GITHUB_BATON_DORMANT",
-        }
+        and LEGACY_REQUIRED_POLICY_ROUTES <= set(routes)
+        and set(routes) <= (LEGACY_REQUIRED_POLICY_ROUTES | OPTIONAL_DIRECT_ROUTES)
+        and all(_route_policy_shape_ok(body) for body in routes.values())
         and isinstance(policy.get("merge_preconditions"), list)
     )
 
@@ -2675,12 +2997,8 @@ def _request_v2_is_closed(request: dict[str, Any]) -> bool:
         and re.fullmatch(
             r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", request["repository"]
         )
-        and request.get("route")
-        in {
-            "DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY", "DESIGN_ONLY",
-            "LEGACY_GITHUB_BATON_DORMANT",
-        }
-        and request.get("actor") in {"GPT", "CODEX", "CURSOR"}
+        and request.get("route") in KNOWN_REQUEST_ROUTES
+        and request.get("actor") in KNOWN_ACTORS
         and request.get("action_class")
         in {"READ_ONLY", "ROUTINE_ENGINEERING", "GITHUB_TRANSPORT", "MERGE_PULL_REQUEST"}
     ):
@@ -2706,8 +3024,7 @@ def _request_v2_is_closed(request: dict[str, Any]) -> bool:
         and re.fullmatch(r"[0-9a-f]{40}", approval["head_sha"])
         and isinstance(approval.get("context_receipt_sha256"), str)
         and re.fullmatch(r"[0-9a-f]{64}", approval["context_receipt_sha256"])
-        and approval.get("context_route")
-        in {"DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY"}
+        and approval.get("context_route") in KNOWN_DIRECT_ROUTES
     ):
         return False
     checks = request.get("merge_checks")
@@ -2731,8 +3048,7 @@ def _request_v2_is_closed(request: dict[str, Any]) -> bool:
         and re.fullmatch(r"[0-9a-f]{40}", checks["observed_tree_sha"])
         and isinstance(checks.get("context_receipt_sha256"), str)
         and re.fullmatch(r"[0-9a-f]{64}", checks["context_receipt_sha256"])
-        and checks.get("context_route")
-        in {"DIRECT_CODEX_DELIVERY", "DIRECT_CURSOR_DELIVERY"}
+        and checks.get("context_route") in KNOWN_DIRECT_ROUTES
     ):
         return False
     return _request_v2_has_exact_types(request)

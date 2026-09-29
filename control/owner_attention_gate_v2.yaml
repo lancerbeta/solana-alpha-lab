@@ -12,7 +12,9 @@
   "route_authority": {
     "DIRECT_CODEX_DELIVERY": {"allowed_actors": ["CODEX"], "autonomous_action_classes": ["READ_ONLY", "ROUTINE_ENGINEERING", "GITHUB_TRANSPORT"], "ordinary_merge": "EXACT_OWNER_APPROVAL_AND_MACHINE_GATE"},
     "DIRECT_CURSOR_DELIVERY": {"allowed_actors": ["CURSOR"], "autonomous_action_classes": ["READ_ONLY", "ROUTINE_ENGINEERING", "GITHUB_TRANSPORT"], "ordinary_merge": "EXACT_OWNER_APPROVAL_AND_MACHINE_GATE"},
-    "DESIGN_ONLY": {"allowed_actors": ["GPT", "CODEX", "CURSOR"], "autonomous_action_classes": ["READ_ONLY"], "ordinary_merge": "FORBIDDEN"},
+    "DIRECT_CLAUDE_CODE_DELIVERY": {"allowed_actors": ["CLAUDE_CODE"], "autonomous_action_classes": ["READ_ONLY", "ROUTINE_ENGINEERING", "GITHUB_TRANSPORT"], "ordinary_merge": "EXACT_OWNER_APPROVAL_AND_MACHINE_GATE"},
+    "DIRECT_OTHER_DELIVERY": {"allowed_actors": ["OTHER"], "autonomous_action_classes": ["READ_ONLY", "ROUTINE_ENGINEERING", "GITHUB_TRANSPORT"], "ordinary_merge": "EXACT_OWNER_APPROVAL_AND_MACHINE_GATE"},
+    "DESIGN_ONLY": {"allowed_actors": ["GPT", "CODEX", "CURSOR", "CLAUDE_CODE", "OTHER"], "autonomous_action_classes": ["READ_ONLY"], "ordinary_merge": "FORBIDDEN"},
     "LEGACY_GITHUB_BATON_DORMANT": {"allowed_actors": ["CURSOR"], "autonomous_action_classes": ["READ_ONLY"], "ordinary_merge": "FORBIDDEN"}
   },
   "merge_approval": {"exact_phrase_pattern": "^PR #([1-9][0-9]*), head ([0-9a-f]{40}) проверен; ready \\+ merge разрешаю\\.$", "bind_repository": true, "bind_pr_number": true, "bind_head_sha": true},

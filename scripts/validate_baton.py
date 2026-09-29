@@ -654,6 +654,8 @@ def validate_cursor_and_templates() -> None:
             (
                 "DIRECT_CODEX_DELIVERY",
                 "DIRECT_CURSOR_DELIVERY",
+                "DIRECT_CLAUDE_CODE_DELIVERY",
+                "DIRECT_OTHER_DELIVERY",
                 "LEGACY_GITHUB_BATON_DORMANT",
                 "OWNER_ATTENTION_GATE_V2",
             ),
@@ -776,6 +778,22 @@ def validate_owner_attention_gate() -> None:
         routes.get("DIRECT_CURSOR_DELIVERY", {}).get("ordinary_merge")
         == "EXACT_OWNER_APPROVAL_AND_MACHINE_GATE",
     )
+    for route, actor in (
+        ("DIRECT_CLAUDE_CODE_DELIVERY", "CLAUDE_CODE"),
+        ("DIRECT_OTHER_DELIVERY", "OTHER"),
+    ):
+        body = routes.get(route, {})
+        assert_check(
+            f"owner_attention_{route}_guarded_merge",
+            body.get("ordinary_merge") == "EXACT_OWNER_APPROVAL_AND_MACHINE_GATE"
+            and body.get("allowed_actors") == [actor],
+        )
+    assert_check(
+        "owner_attention_design_only_reads_new_actors",
+        set(routes.get("DESIGN_ONLY", {}).get("allowed_actors", []))
+        == {"GPT", "CODEX", "CURSOR", "CLAUDE_CODE", "OTHER"}
+        and routes.get("DESIGN_ONLY", {}).get("ordinary_merge") == "FORBIDDEN",
+    )
     assert_check(
         "owner_attention_dormant_baton_merge_forbidden",
         routes.get("LEGACY_GITHUB_BATON_DORMANT", {}).get("ordinary_merge")
@@ -840,6 +858,9 @@ def validate_protocol_links() -> None:
     router = (ROOT / "docs/agent/EXECUTION_ROUTER_PROTOCOL.md").read_text(encoding="utf-8")
     assert_check("router_direct_codex", "DIRECT_CODEX_DELIVERY" in router)
     assert_check("router_direct_cursor", "DIRECT_CURSOR_DELIVERY" in router)
+    assert_check("router_direct_claude_code", "DIRECT_CLAUDE_CODE_DELIVERY" in router)
+    assert_check("router_direct_other", "DIRECT_OTHER_DELIVERY" in router)
+    assert_check("agents_claude_shim", (ROOT / "CLAUDE.md").read_text(encoding="utf-8").strip() == "@AGENTS.md")
     assert_check("router_baton_dormant", "LEGACY_GITHUB_BATON_DORMANT" in router)
     authority = (ROOT / ".cursor/rules/00-authority.mdc").read_text(encoding="utf-8")
     assert_check("authority_direct_merge", "same guarded merge right" in authority)

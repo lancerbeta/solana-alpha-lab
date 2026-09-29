@@ -41,10 +41,15 @@ cloud chat voluntarily outside this harness.
 
 ## ACTIVE_ROUTES_AND_STATUS
 
-Active routes are exactly `DIRECT_CODEX_DELIVERY`, `DIRECT_CURSOR_DELIVERY` and
-`DESIGN_ONLY`. `LEGACY_GITHUB_BATON_DORMANT` is historical, inactive and cannot
+Active routes are exactly `DIRECT_CODEX_DELIVERY`, `DIRECT_CURSOR_DELIVERY`,
+`DIRECT_CLAUDE_CODE_DELIVERY`, `DIRECT_OTHER_DELIVERY` and `DESIGN_ONLY`.
+The executing client selects the route: Cursor Agent → `CURSOR`, Codex →
+`CODEX`, Claude Code → `CLAUDE_CODE`, another explicitly named coding client →
+`OTHER`. `OTHER` is not a wildcard. Model changes inside one client do not
+create a route. `LEGACY_GITHUB_BATON_DORMANT` is historical, inactive and cannot
 select work or grant authority. A route is fixed for the delivery receipt; a
-change requires an explicit replan and new receipt.
+change requires an explicit replan and new receipt. Effective grants come from
+the frozen base policy, not from the candidate file.
 
 The owner owns product meaning, hypotheses, estimand, priority, budget, material
 risk and external authority. The elected direct agent owns bounded task

@@ -219,6 +219,38 @@ def _load_harness_sync_module() -> ModuleType:
 _HARNESS_SYNC_MODULE_CACHE: ModuleType | None = None
 
 
+def format_executor_provenance(
+    *,
+    coding_client: str,
+    model: str | None,
+    route: str,
+    actor: str,
+) -> dict[str, str]:
+    """Declared client/model for a start checkpoint or owner readout.
+
+    This is provenance, not a grant and not a receipt field. OTHER requires
+    an explicit non-secret client name. A missing model is UNKNOWN.
+    """
+
+    if not isinstance(coding_client, str) or not coding_client.strip():
+        raise ValueError("EXECUTOR_CLIENT_UNDECLARED")
+    client = coding_client.strip()
+    if route == "DIRECT_OTHER_DELIVERY" and client.upper() in {"OTHER", "ANY", "UNKNOWN"}:
+        raise ValueError("EXECUTOR_CLIENT_UNDECLARED")
+    if not isinstance(route, str) or not isinstance(actor, str) or not actor:
+        raise ValueError("EXECUTOR_CLIENT_UNDECLARED")
+    declared_model = "UNKNOWN"
+    if isinstance(model, str) and model.strip():
+        declared_model = model.strip()
+    return {
+        "coding_client": client,
+        "model": declared_model,
+        "route": route,
+        "actor": actor,
+        "grant": "NONE",
+    }
+
+
 def preflight_push(
     root: Path,
     *,
@@ -249,17 +281,10 @@ def preflight_push(
     checks: dict[str, bool] = {}
     reasons: list[str] = []
 
-    # Actor casing is normalized at the human CLI boundary only when supplied.
+    # Casefold is syntactic. Route admission below uses the frozen base policy.
     canonical_actor: str | None = None
     if actor is not None:
-        aliases = {"cursor": "CURSOR", "codex": "CODEX"}
-        lowered = actor.lower() if isinstance(actor, str) else None
-        if lowered in aliases:
-            canonical_actor = aliases[lowered]
-        else:
-            raise ValueError(
-                "ACTOR_INVALID: expected one of cursor|Cursor|CURSOR|codex|Codex|CODEX"
-            )
+        canonical_actor = _load_gate_module().normalize_cli_actor(actor)
 
     identity = git_identity(root)
     checks["worktree_clean"] = identity["dirty"] is False
@@ -316,6 +341,19 @@ def preflight_push(
         checks["candidate_non_empty"] = bool(changed)
         if not changed:
             reasons.append("CANDIDATE_EMPTY_DIFF")
+        try:
+            base_policy = json.loads(
+                git_read(
+                    root, "show", f"{expected_base}:control/owner_attention_gate_v2.yaml"
+                )
+            )
+        except (json.JSONDecodeError, ValueError):
+            raise ValueError("OWNER_POLICY_BASE_BINDING_INVALID") from None
+        if not isinstance(base_policy, dict):
+            raise ValueError("OWNER_POLICY_BASE_BINDING_INVALID")
+        canonical_actor = _load_gate_module().admit_transport_actor(
+            base_policy, route, actor
+        )
         managed = metadata["managed_write_set"]
         outside = [path for path in changed if not path_in_managed_write_set(path, managed)]
         checks["write_set_pass"] = not outside
@@ -1609,6 +1647,8 @@ def cursor_rule_frontmatter(path: Path) -> dict[str, Any]:
 def check_harness(root: Path) -> dict[str, Any]:
     errors: list[str] = []
     profile: dict[str, Any] | None = None
+    harness_document: dict[str, Any] | None = None
+    policy_document: dict[str, Any] | None = None
     delivery_gate_ready = False
     documents = (
         (HARNESS_PATH, "catalog/schemas/delivery_harness.schema.json"),
@@ -1625,6 +1665,10 @@ def check_harness(root: Path) -> dict[str, Any]:
             loaded = load_closed_document(root / document, root / schema)
             if document == PROFILE_PATH:
                 profile = loaded
+            elif document == HARNESS_PATH:
+                harness_document = loaded
+            elif document == "control/owner_attention_gate_v2.yaml":
+                policy_document = loaded
             elif document == CONTEXT_MAP_PATH:
                 validate_context_role_set(loaded)
         except (OSError, ValueError, JSONSCHEMA_VALIDATION_ERROR):
@@ -1642,6 +1686,12 @@ def check_harness(root: Path) -> dict[str, Any]:
         except ValueError:
             errors.append("REPOSITORY_IDENTITY_DIVERGENCE")
         errors.extend(factory_v1_readiness_contract_errors(root, profile))
+    if harness_document is not None and policy_document is not None:
+        errors.extend(
+            _load_gate_module().active_configuration_problems(
+                harness_document, policy_document
+            )
+        )
     active_baton_paths = [
         ".cursor/rules/50-github-baton.mdc",
         ".cursor/commands/baton-preflight.md",
@@ -1656,6 +1706,12 @@ def check_harness(root: Path) -> dict[str, Any]:
         ".cursor/commands/delivery-review.md",
         ".cursor/commands/delivery-finish.md",
     ]
+    claude_route_active = bool(
+        isinstance(harness_document, dict)
+        and "DIRECT_CLAUDE_CODE_DELIVERY" in (harness_document.get("active_routes") or [])
+    )
+    if claude_route_active:
+        required_active_paths.append("CLAUDE.md")
     if any(not (root / path).is_file() for path in required_active_paths):
         errors.append("ACTIVE_ADAPTER_MISSING")
     if profile is not None and profile.get("mode") == "BOUND_PROJECT":
@@ -2110,11 +2166,17 @@ def parse_args() -> argparse.Namespace:
     preflight.add_argument(
         "--route",
         required=True,
-        help="Active route: DIRECT_CODEX_DELIVERY | DIRECT_CURSOR_DELIVERY | DESIGN_ONLY",
+        help=(
+            "Active route: DIRECT_CODEX_DELIVERY | DIRECT_CURSOR_DELIVERY | "
+            "DIRECT_CLAUDE_CODE_DELIVERY | DIRECT_OTHER_DELIVERY | DESIGN_ONLY"
+        ),
     )
     preflight.add_argument(
         "--actor",
-        help="Acting agent: cursor | Cursor | CURSOR | codex | Codex | CODEX",
+        help=(
+            "Acting agent case variant: cursor, codex, claude_code, other. "
+            "OTHER is not a catch-all; pass route and actor explicitly."
+        ),
     )
     preflight.add_argument("--format", choices=("json",), default="json")
     init = sub.add_parser("init")

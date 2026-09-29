@@ -236,6 +236,35 @@ never prompts for Project Sources/Project Instruction replacement or smoke and
 never uses cloud activation as an execution or DONE gate. Historical release
 bytes remain audit-only.
 
+## Direct client entry
+
+The executing client chooses the route. Cursor Agent uses
+`DIRECT_CURSOR_DELIVERY` / `CURSOR`. Codex uses `DIRECT_CODEX_DELIVERY` /
+`CODEX`. Claude Code uses `DIRECT_CLAUDE_CODE_DELIVERY` / `CLAUDE_CODE` and
+reads root `CLAUDE.md`, whose only instruction line is `@AGENTS.md`. Another
+coding client uses `DIRECT_OTHER_DELIVERY` / `OTHER` and names itself in the
+start checkpoint (`coding_client`, `model` or `UNKNOWN`). That declaration is
+not a grant. Unknown names are not rewritten to `OTHER`. Skills are read by
+exact path when a client does not auto-load `.agents/skills`.
+
+Starter prompt for a future client, one exact task, no standing task picker:
+
+```text
+Client: <coding client name>
+Route: DIRECT_OTHER_DELIVERY
+Actor: OTHER
+Model: UNKNOWN
+Task: docs/tasks/<TASK>.md
+Read AGENTS.md, then .agents/skills/delivery-harness/SKILL.md.
+Run scripts/delivery_harness.py check, then context with this route and the exact task.
+Execute only that task. Stop at the exact owner merge phrase.
+```
+
+Claude Code uses the same steps with route `DIRECT_CLAUDE_CODE_DELIVERY` and
+actor `CLAUDE_CODE`. Cursor and Codex keep their existing routes. A route
+change mid-atom needs a saved checkpoint and an explicit replan. The current
+PR is authorized only by the frozen expected-base policy.
+
 ## External boundary
 
 This protocol grants no provider/API/RPC/WSS, credential, dependency adoption,
