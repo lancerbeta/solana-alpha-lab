@@ -41,6 +41,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hfic_evidence_identity.py
   - tests/test_hfic_legacy_parent_continuation_compat_v1.py
   - catalog/assets/core.yaml
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
 
 external_caps:
   network: false
