@@ -34,6 +34,8 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (
     evaluate_forge_run,
 )
 from solana_alpha_lab.factory.hfic_session import (
+    HficSessionError,
+    _lookup_existing_freeze_session,
     apply_classification,
     finalize_session,
     freeze_draft,
@@ -603,6 +605,216 @@ class LegacyParentContinuationCompatTests(TestCase):
             self.assertEqual(readback.get("owner_final"), ACTION_SEARCH_EXHAUSTED)
             self.assertEqual(len(_mains(store, opened["journal"])), before_looks)
             self.assertEqual(_forge_run_count(store), 1)
+
+    def test_capability_drift_freeze_is_store_disposition_not_parent_terminal(self) -> None:
+        import tempfile
+
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            _closed_repair_readback,
+        )
+        from solana_alpha_lab.factory.hfic_repair_continuation import (
+            list_repair_continuation_dispositions,
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            opened = self._open_parent(data_root)
+            store = opened["store"]
+            drifted = {
+                **opened["receipt"],
+                "capability_epoch_sha256": "ab" * 32,
+                "action": "RESUME_REPAIR_CONTINUATION",
+            }
+            with self.assertRaises(HficSessionError) as blocked:
+                _lookup_existing_freeze_session(store, drifted, draft={"candidates": []})
+            self.assertEqual(
+                blocked.exception.code,
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            )
+            drafted = self._draft_via_cli(data_root, opened["shown"]["session_id"])
+            applied = self._cli_json(
+                CLI.cmd_repair_continuation_apply,
+                repo_root=ROOT,
+                explicit_data_root=data_root,
+                draft_path=drafted["_path"],
+                parent_session_id=None,
+                confirm_append_only=True,
+            )
+            self.assertEqual(applied["status"], "APPLIED", applied)
+            # First selected freeze is the repair execution, not a second slot.
+            self.assertIsNone(
+                _lookup_existing_freeze_session(
+                    store,
+                    drifted,
+                    draft={"selected_candidate_ref": "HFIC-V12-C1"},
+                )
+            )
+            self.assertIsNone(
+                _lookup_existing_freeze_session(
+                    store, drifted, draft={"candidates": []}
+                )
+            )
+            with self.assertRaises(HficSessionError) as freeze_blocked:
+                freeze_draft(
+                    opened["draft"],
+                    preflight_receipt=drifted,
+                    store=store,
+                    repo_root=ROOT,
+                    verify_current_market_identity=True,
+                )
+            self.assertNotEqual(
+                freeze_blocked.exception.code,
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            )
+            evidence = {
+                "result_sha256": "cd" * 32,
+                "result_refs": ["HFIC-ART-DISCOVERY-BOUND"],
+            }
+            repair_draft = {**opened["draft"], "grounded_evidence": evidence}
+            before = _payloads(store)
+            persist_no_worthy_session(
+                store,
+                {**opened["frozen"], **opened["receipt"]},
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(opened["draft"]["candidates"]),
+                draft=repair_draft,
+                preflight_receipt=opened["receipt"],
+            )
+            shown = show_session(store, opened["shown"]["session_id"], repo_root=ROOT)
+            self.assertEqual(
+                shown["repair_continuation_disposition_sha256"],
+                applied["disposition"]["disposition_sha256"],
+            )
+            self.assertNotEqual(
+                shown["session_receipt_sha256"],
+                opened["shown"]["session_receipt_sha256"],
+            )
+            self.assertEqual(shown["grounded_result_sha256"], evidence["result_sha256"])
+            self.assertEqual(shown["grounded_result_refs"], evidence["result_refs"])
+            written = _payloads(store)
+            self.assertNotEqual(written, before)
+            persist_no_worthy_session(
+                store,
+                {**opened["frozen"], **opened["receipt"]},
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(opened["draft"]["candidates"]),
+                draft=repair_draft,
+                preflight_receipt=opened["receipt"],
+            )
+            self.assertEqual(_payloads(store), written)
+            replay = _lookup_existing_freeze_session(
+                store, drifted, draft={"grounded_evidence": evidence}
+            )
+            self.assertEqual(
+                replay["repair_continuation_disposition_sha256"],
+                applied["disposition"]["disposition_sha256"],
+            )
+            with self.assertRaises(HficSessionError) as selected_after:
+                _lookup_existing_freeze_session(
+                    store,
+                    drifted,
+                    draft={
+                        "selected_candidate_ref": "HFIC-V12-C1",
+                        "grounded_evidence": evidence,
+                    },
+                )
+            self.assertEqual(
+                selected_after.exception.code,
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            )
+            with self.assertRaises(HficSessionError) as changed:
+                _lookup_existing_freeze_session(
+                    store,
+                    drifted,
+                    draft={
+                        "grounded_evidence": {
+                            "result_sha256": "ef" * 32,
+                            "result_refs": evidence["result_refs"],
+                        }
+                    },
+                )
+            self.assertEqual(changed.exception.code, "GROUNDED_RESULT_MISMATCH")
+            matched = {
+                key: value
+                for key, value in drifted.items()
+                if key != "capability_epoch_sha256"
+            }
+            with self.assertRaises(HficSessionError) as matched_changed:
+                _lookup_existing_freeze_session(
+                    store,
+                    matched,
+                    draft={
+                        "grounded_evidence": {
+                            "result_sha256": "ef" * 32,
+                            "result_refs": evidence["result_refs"],
+                        }
+                    },
+                )
+            self.assertEqual(
+                matched_changed.exception.code, "GROUNDED_RESULT_MISMATCH"
+            )
+            self.assertEqual(_payloads(store), written)
+            from solana_alpha_lab.factory.hfic_repair_continuation import (
+                close_repair_continuation,
+            )
+
+            closed = close_repair_continuation(
+                store,
+                applied["disposition"]["disposition_sha256"],
+                git_sha=opened["git"].head_sha,
+            )
+            self.assertEqual(closed["status"], "CLOSED")
+            again = close_repair_continuation(
+                store,
+                applied["disposition"]["disposition_sha256"],
+                git_sha=opened["git"].head_sha,
+            )
+            self.assertEqual(again["status"], "ALREADY_CLOSED")
+            self.assertFalse(again["writes"])
+            listed = [
+                item
+                for item in list_repair_continuation_dispositions(store)
+                if item.get("disposition_sha256")
+                == applied["disposition"]["disposition_sha256"]
+            ]
+            readback = _closed_repair_readback(
+                listed,
+                shown,
+                scientific_slot_sha256=shown["scientific_slot_sha256"],
+            )
+            self.assertEqual(
+                readback["disposition_sha256"],
+                applied["disposition"]["disposition_sha256"],
+            )
+            from solana_alpha_lab.factory.hfic_evidence_identity import (
+                resolve_scientific_admission,
+            )
+            from solana_alpha_lab.factory.hfic_session import (
+                list_hfic_sessions,
+                list_scientific_slot_admissions,
+            )
+
+            closed_shown = show_session(
+                store, opened["shown"]["session_id"], repo_root=ROOT
+            )
+            admission = resolve_scientific_admission(
+                list_hfic_sessions(store),
+                market_evidence_epoch=str(
+                    closed_shown["market_evidence_epoch_sha256"]
+                ),
+                representation_id="BASE",
+                representation_semantic_version="HFIC-V1.2",
+                owner_focus="AUTO",
+                reservations=list_scientific_slot_admissions(store),
+                execution_context={"capability_epoch_sha256": "ab" * 32},
+                repair_continuations=list_repair_continuation_dispositions(store),
+            )
+            self.assertEqual(admission["action"], "RETURN_EXISTING_SESSION")
+            self.assertEqual(admission["session_id"], closed_shown["session_id"])
+            self.assertEqual(admission["occupancy"], "REPAIR_CLOSED_READBACK")
+            self.assertNotEqual(admission["action"], "START_NEW_SESSION")
+            self.assertNotEqual(admission["action"], "RESUME_REPAIR_CONTINUATION")
 
     def test_foreign_binding_conflict_and_exhausted_budget_are_refused(self) -> None:
         import tempfile

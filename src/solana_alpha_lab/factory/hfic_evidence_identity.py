@@ -872,6 +872,45 @@ def session_slot_matches_execution_context(
     return True
 
 
+def _closed_repair_readback(
+    dispositions: Sequence[Mapping[str, Any]] | None,
+    session: Mapping[str, Any],
+    *,
+    scientific_slot_sha256: str,
+) -> Mapping[str, Any] | None:
+    """CLOSED disposition whose session terminal is already bound to it.
+
+    Parent receipt equality is not a completion. Several matches are not guessed.
+    """
+
+    session_id = str(session.get("session_id") or "")
+    stamp = session.get("repair_continuation_disposition_sha256")
+    receipt = session.get("session_receipt_sha256")
+    if not session_id or not isinstance(stamp, str) or not stamp:
+        return None
+    if not isinstance(receipt, str) or len(receipt) != 64:
+        return None
+    matches: list[Mapping[str, Any]] = []
+    for item in dispositions or []:
+        if not isinstance(item, Mapping):
+            continue
+        if item.get("status") != "CLOSED":
+            continue
+        if str(item.get("parent_session_id") or "") != session_id:
+            continue
+        if item.get("scientific_slot_sha256") != scientific_slot_sha256:
+            continue
+        if item.get("disposition_sha256") != stamp:
+            continue
+        parent_receipt = item.get("terminal_receipt_sha256")
+        if receipt == parent_receipt:
+            continue
+        matches.append(item)
+    if len(matches) != 1:
+        return None
+    return matches[0]
+
+
 def resolve_scientific_admission(
     sessions: Sequence[Mapping[str, Any]],
     *,
@@ -1202,6 +1241,22 @@ def resolve_scientific_admission(
                 )
                 if overlaid.get("action") == ACTION_RESUME_REPAIR_CONTINUATION:
                     return overlaid
+            closed = _closed_repair_readback(
+                repair_continuations,
+                chosen,
+                scientific_slot_sha256=target_slot,
+            )
+            if closed is not None:
+                return {
+                    "action": "RETURN_EXISTING_SESSION",
+                    "reason_code": state or "REPAIR_CONTINUATION_CLOSED",
+                    "session_id": session_id,
+                    "scientific_slot_sha256": target_slot,
+                    "occupancy": "REPAIR_CLOSED_READBACK",
+                    "repair_continuation_disposition_sha256": closed.get(
+                        "disposition_sha256"
+                    ),
+                }
         return {
             "action": "STOP",
             "reason_code": "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
