@@ -12,7 +12,7 @@
     "mission": "PASS_DISPOSITION_BOUND_NO_WORTHY_AFTER_CAPABILITY_DRIFT",
     "flexibility_and_history": "PASS_PARENT_RECEIPT_AND_LOOKS_UNCHANGED",
     "context_efficiency": "PASS_EXISTING_FREEZE_CLOSE_AND_FORGE_RUN",
-    "research_truth": "PASS_CHANGED_RESULT_HASH_IS_NOT_A_RETRY",
+    "research_truth": "PASS_READBACK_STILL_CHECKS_MARKET_AND_RESULT",
     "owner_operability": "PASS_CLOSED_READBACK_IS_NOT_A_NEW_TRIAL",
     "execution_to_cashflow": "NOT_APPLICABLE_NO_MARKET_EXECUTION",
     "monitoring_and_recovery": "PASS_CLOSE_RETRY_WRITES_NOTHING",

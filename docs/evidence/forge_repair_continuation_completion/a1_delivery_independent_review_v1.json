@@ -17,28 +17,28 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Exact-match retry checks grounded_result_sha256 and blocks a selected draft from inheriting a stamped no-worthy terminal. The first repair freeze, including a selected candidate, still proceeds when that hash is absent. Drifted and matching-capability mismatches raise GROUNDED_RESULT_MISMATCH."
+        "A stored BASE repair readback runs bind_preflight_receipt, memory as-of, and draft/context binding before returning the terminal. Production freeze also checks the current market epoch. A failed check writes nothing. AUTHORIZED retry and CLOSED readback do not skip that path. The first freeze, before a repair stamp, still writes. GROUNDED_RESULT_MISMATCH still blocks a different result."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "After CLOSED, resolve_scientific_admission under a drifted capability epoch returns RETURN_EXISTING_SESSION and REPAIR_CLOSED_READBACK, not START_NEW_SESSION or RESUME_REPAIR_CONTINUATION."
+        "The CLI scenario locks a legacy parent without a capability epoch or FORGE_RUN_RECEIPT through production preflight, CLI freeze, zero-write replay, AUTHORIZED reopen as RESUME_REPAIR_CONTINUATION, a close interrupt that keeps one completion receipt, resume to CLOSED, and ordinary post-close readback. Corrupt preflight, market drift, and a different grounded result are refused without new looks."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Capability drift does not admit a different market epoch or a foreign session/slot. CLOSED readback does not reopen the grant. A different grounded result is refused."
+        "packet_fingerprint_sha256=f9e8ec5108e977682b6d1b5f130e7f6e80ba09b530b2d1107c767c6984c6f589. Stored AUTHORIZED and CLOSED readback bind the draft and, on a production freeze, the current market epoch. NOT_VERIFIED is not a current-market confirmation. CLOSED is not a new grant. Call-stamped identity fields are not durable PIT truth."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "The runbook tells the operator to repeat freeze and read the stored terminal. It does not ask for hand-edited hashes. After CLOSED, preflight is RETURN_EXISTING_SESSION and forge-run reads the repair receipt."
+        "A no-write replay carries repair_readback_status AUTHORIZED or CLOSED. The first freeze does not. NOT_VERIFIED means the market check was not requested. After CLOSED, ordinary preflight is RETURN_EXISTING_SESSION. The runbook does not ask for hand-edited hashes."
       ]
     }
   ],

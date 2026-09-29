@@ -36,7 +36,7 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_LEGACY_PARENT_MODULE_AND_ISOLATED_COPY_FREEZE",
+    "targeted": "PASS_LEGACY_PARENT_MODULE_CLI_FREEZE_READBACK",
     "independent_review": {
       "path": "docs/evidence/forge_repair_continuation_completion/a1_delivery_independent_review_v1.json",
       "sha256": "2bc1c799ac5b08bdf42b73c4fd03f826b5e8ab1bd1aa8e4073e09416e25618e1",
@@ -49,6 +49,7 @@
       "PASS_RETRY_GROUNDED_RESULT_MISMATCH",
       "PASS_SELECTED_CANNOT_INHERIT_NO_WORTHY",
       "PASS_CLOSED_ADMISSION_READBACK",
+      "PASS_CLI_FREEZE_VALIDATES_BEFORE_READBACK",
       "PASS_LEGACY_PARENT_MODULE"
     ]
   },
