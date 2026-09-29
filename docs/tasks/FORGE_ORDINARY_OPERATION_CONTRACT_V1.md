@@ -17,9 +17,9 @@ required_review_roles:
 expected_repository: lancerbeta/solana-alpha-lab
 
 git_binding:
-  expected_base: a372f81376a7d77fe2500201739a46a736f2d986
+  expected_base: cfbab906f8592b1b4c2725a6cb57edf9685607fc
   expected_upstream: origin/main
-  expected_upstream_oid: a372f81376a7d77fe2500201739a46a736f2d986
+  expected_upstream_oid: cfbab906f8592b1b4c2725a6cb57edf9685607fc
   expected_branch: cursor/forge-ordinary-operation-contract-v1
   dirty_mode: FORBIDDEN
 
@@ -38,6 +38,7 @@ managed_write_set:
   - docs/evidence/forge_ordinary_operation_contract/a1_delivery_factory_fit_v1.json
   - docs/evidence/forge_ordinary_operation_contract/operator_trials_4_to_8_v1.json
   - docs/evidence/forge_ordinary_operation_contract/replacement_acceptance_v1.json
+  - docs/evidence/forge_ordinary_operation_contract/replacement_10_acceptance_v1.json
   - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
   - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
   - src/solana_alpha_lab/factory/hfic_session.py
@@ -122,13 +123,14 @@ STOP: >-
 
 NEXT: >-
   Operator trials 4-8 stay recorded. Trial 7 stays MISSING_INPUT.
-  Replacement acceptance 9 is not PASS. Session
-  HFIC-SESS-0E1065476AE7A9D6 is FROZEN_AWAITING_CRITIC. An independent
-  Critic returned KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED, but finalize
-  refused GIT_COMPOSITE_CHANGED, so the verdict is not in the store.
-  Do not start a second replacement. Do not regenerate trial 7.
-  After a tree that matches the frozen git composite, finalize that
-  same session only. Then exact-head CI and merge-readiness.
+  Replacement 9 stays BLOCKED_GIT_COMPOSITE_CHANGED and is not rewritten.
+  Session HFIC-SESS-0E1065476AE7A9D6 stays FROZEN_AWAITING_CRITIC.
+  Replacement 10 is the operational model acceptance: isolated Critic
+  KILL_UNBOUND_EVIDENCE, session SYNTHESIS_COMPLETE, ordinary entry
+  RETURN_EXISTING_SESSION. acceptance_code_head is
+  c907e76ce96bb774030f88aa1b93a1f315a503a5. No second replacement.
+  Do not regenerate trial 7. Do not weaken the git fence.
+  After merge, use Forge. Do not open another ordinary-path audit.
   Do not execute the prepared liquidity-retention launch.
   Do not reopen CLOSED #355.
 
