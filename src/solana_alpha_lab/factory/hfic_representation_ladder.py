@@ -1121,6 +1121,8 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         status = "NEXT — START BASE (new scientific look on this market)"
     elif next_action == ACTION_START_V1:
         status = "NEXT — continue V1 envelope; do not treat WAIT as done"
+    elif owner_final == "OPERATION_PAUSED_SEARCH_OPEN" or next_action == "AUTHORIZE_ADDITIONAL_LOOKS":
+        status = "NEXT — saved result stays; authorize another look on this journal, or stop"
     elif owner_final:
         status = "DONE — bounded-run owner-final; do not continue"
         if provenance_unknown:

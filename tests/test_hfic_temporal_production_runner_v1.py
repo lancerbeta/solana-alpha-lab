@@ -387,13 +387,18 @@ class TemporalVerticalTests(unittest.TestCase):
                 spec_body = json.loads(path.read_text(encoding="utf-8"))
                 execute._n = int(getattr(execute, "_n", 0)) + 1
                 op = path.with_suffix(".operation.json")
+                from solana_alpha_lab.factory.hfic_evidence_identity import (
+                    compute_market_epoch_for_data_root,
+                )
+
+                current_market, _basis = compute_market_epoch_for_data_root(ROOT, data_root)
                 op.write_text(
                     json.dumps(
                         {
                             "owner_request_text": f"protocol vertical {spec_body.get('query_id')} {execute._n}",
                             "owner_focus": "ORDINARY-TEMPORAL-VERTICAL",
                             "journal_scope": journal,
-                            "market_evidence_epoch_sha256": market,
+                            "market_evidence_epoch_sha256": current_market,
                             "spec": spec_body,
                             "question_text": str(spec_body.get("query_id")),
                             "owner_cap": {"main": None, "adaptive": None, "preview": None},

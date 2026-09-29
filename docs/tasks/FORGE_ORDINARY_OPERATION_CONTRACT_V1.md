@@ -110,12 +110,11 @@ STOP: >-
   Do not run the prepared 15m-4h question.
 
 NEXT: >-
-  Continue on this PR. Published scenarios A and B pass. Still required on
-  that same publication builder: C candidate classification at cap 0, D
-  fault and race, E foreign binding and direct-entry negatives, F keep the
-  existing closed-repair readback. Then model trials within the remaining
-  budget, reviews, exact-head CI, and merge-readiness. Do not treat a local
-  PASS as the whole DoD while C-F are open.
+  C-E passed on the publication builder. Operator trials 4-8 are recorded.
+  Trial 7 persisted a draft and wrote no new MAIN; freeze refused a stale
+  preflight receipt. Do not start another trial: the 8-trial budget is spent.
+  After exact-head CI, run merge-readiness. Do not execute the prepared
+  liquidity-retention launch. Do not reopen CLOSED #355.
 
 Published-corpus acceptance on `_publish` (one data root per scenario):
 
@@ -123,8 +122,10 @@ Published-corpus acceptance on `_publish` (one data root per scenario):
 |---|---|
 | A | PASS. Negative SIMPLE, cap 1, pause, cold `forge-run` `AUTHORIZE_ADDITIONAL_LOOKS`, exact replay, spec change refused, new grant, compound, freeze `NO_WORTHY_HYPOTHESIS`, terminal readback. MAIN 0→1→1→2. |
 | B | PASS. One request, cap 2, two CLI calculations, third `OWNER_CAP_EXHAUSTED`. |
-| C-E | NOT_RUN on this publication builder. |
-| F | Existing closed-repair regression still invoked; not re-proven against a new publication. |
+| C | PASS. Scripted critic `PASS_TO_CLASSIFICATION` (`SCRIPTED_CRITIC_MECHANICAL`), then standard classification `PASS_FAST_LANE_READY` / `FAST_LANE_READY`. MAIN stays 1. |
+| D | PASS. Reply-lost, transition-lost, and reserve-only resume do not recompute a committed look. Last allowance unit: one `RESERVED`, one `OWNER_CAP_EXHAUSTED`. |
+| E | PASS. Foreign market, journal, and corpus refuse before values. Missing operation refuses. MAIN, ADAPTIVE, and PREVIEW caps refuse before values. Zero-match, feature-unknown, and invalid spec stay distinct. |
+| F | PASS. Existing closed-repair readback, no new operation. |
 | Journal isolation | PASS. A foreign journal reservation does not reduce this journal's protocol remainder. |
 
 Ordinary operation contract. Historical scientific contracts stay in place.

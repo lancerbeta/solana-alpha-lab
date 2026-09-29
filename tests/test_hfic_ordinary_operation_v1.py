@@ -180,23 +180,29 @@ def _mains(store: Path) -> list[dict]:
 
 class OrdinaryOperationTests(unittest.TestCase):
     def test_search_terminal_conflict_refuses_before_values(self) -> None:
+        from tests.test_hfic_cli import run_cli
+        from tests.test_hfic_temporal_discovery_v1 import _spec as temporal_spec
+        from tests.test_hfic_temporal_production_runner_v1 import DOCUMENT_LATENESS, _publish
+
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
-            store = root / "store"
-            ResearchStore(store)
-            spec = _simple_spec()
-            request = _operation(spec, completion="SCIENTIFIC_TERMINAL", cap_main=1)
-            op_path = root / "op.json"
+            empty = root / "empty"
+            ResearchStore(empty)
             spec_path = root / "spec.json"
             scope_path = root / "scope.json"
-            op_path.write_text(json.dumps(request), encoding="utf-8")
+            op_path = root / "op.json"
+            spec = _simple_spec()
             spec_path.write_text(json.dumps(spec), encoding="utf-8")
             scope_path.write_text("{}", encoding="utf-8")
-            refused = _cli(
-                store,
+            op_path.write_text(
+                json.dumps(_operation(spec, completion="SCIENTIFIC_TERMINAL", cap_main=1)),
+                encoding="utf-8",
+            )
+            incomplete = _cli(
+                empty,
                 "discovery-execute",
                 "--store",
-                str(store),
+                str(empty),
                 "--spec",
                 str(spec_path),
                 "--candidate-scope",
@@ -208,9 +214,81 @@ class OrdinaryOperationTests(unittest.TestCase):
                 "--format",
                 "json",
             )
-            self.assertEqual(refused.get("reason_code"), "OPERATION_SEARCH_TERMINAL_CONFLICT", refused)
-            self.assertFalse(refused.get("values_loaded"))
-            self.assertEqual(_mains(store), [])
+            self.assertEqual(incomplete.get("reason_code"), "MARKET_EVIDENCE_BASIS_INCOMPLETE", incomplete)
+            self.assertFalse(incomplete.get("values_loaded"))
+            self.assertEqual(_mains(empty), [])
+            workspace = root / "published"
+            data_root = workspace / "rdp"
+            _publish(data_root, workspace)
+            preflight = run_cli(
+                "preflight",
+                "--discovery-contract",
+                "--owner-focus",
+                "PUBLISHED_TERMINAL_CONFLICT",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(preflight.returncode, 0, preflight.stderr)
+            receipt = json.loads(preflight.stdout)
+            simple = temporal_spec(
+                "SIMPLE_SCREEN",
+                query_id="terminal-conflict-simple",
+                features=[{"name": "mark", "op": "point_value", "field_id": PRICE, "point": "Y3600"}],
+                all=[{"feature": "mark", "op": "gte", "value": 0.0}],
+                cost_profile=None,
+                schedule={"lateness_seconds": DOCUMENT_LATENESS},
+            )
+            spec_path = workspace / "spec.json"
+            scope_path = workspace / "scope.json"
+            op_path = workspace / "op.json"
+            spec_path.write_text(json.dumps(simple), encoding="utf-8")
+            scope_path.write_text("{}", encoding="utf-8")
+            op_path.write_text(
+                json.dumps(
+                    {
+                        "owner_request_text": "scientific terminal from one simple",
+                        "owner_focus": "PUBLISHED_TERMINAL_CONFLICT",
+                        "journal_scope": receipt["search_key_sha256"],
+                        "market_evidence_epoch_sha256": receipt["market_evidence_epoch_sha256"],
+                        "spec": simple,
+                        "question_text": "terminal conflict",
+                        "owner_cap": {"main": 1, "adaptive": 0, "preview": 0},
+                        "requested_completion": "SCIENTIFIC_TERMINAL",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            refused = run_cli(
+                "discovery-execute",
+                "--store",
+                str(data_root),
+                "--spec",
+                str(spec_path),
+                "--candidate-scope",
+                str(scope_path),
+                "--journal-scope",
+                str(receipt["search_key_sha256"]),
+                "--operation",
+                str(op_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            payload = json.loads(refused.stdout or "{}")
+            self.assertEqual(payload.get("reason_code"), "OPERATION_SEARCH_TERMINAL_CONFLICT", refused.stderr + refused.stdout)
+            self.assertFalse(payload.get("values_loaded"))
+            self.assertEqual(
+                [
+                    item
+                    for item in list_discovery_looks(
+                        ResearchStore(data_root, create_if_missing=False),
+                        str(receipt["search_key_sha256"]),
+                    )
+                    if item.get("new_look") is True
+                ],
+                [],
+            )
 
     def test_simple_cap_pauses_and_continuation_keeps_the_journal(self) -> None:
         with tempfile.TemporaryDirectory() as raw:

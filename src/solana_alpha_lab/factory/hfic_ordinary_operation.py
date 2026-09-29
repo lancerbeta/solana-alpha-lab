@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import time
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timezone
 from typing import Any
@@ -532,15 +533,23 @@ def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look
         producer_git_sha="0" * 40,
         created_at=now,
     )
-    try:
-        store.append([event], transaction_id=event.transaction_id, before_commit=_check)
-    except OrdinaryOperationError:
-        raise
-    except Exception as exc:
-        code = getattr(exc, "code", None)
-        if code == "OWNER_CAP_EXHAUSTED":
-            raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED") from exc
-        raise
+    from solana_alpha_lab.factory.research_store import ResearchStoreError
+
+    for attempt in range(40):
+        try:
+            store.append([event], transaction_id=event.transaction_id, before_commit=_check)
+            return
+        except OrdinaryOperationError:
+            raise
+        except ResearchStoreError as exc:
+            if exc.code != "WRITER_BUSY" or attempt == 7:
+                raise
+            time.sleep(0.05)
+        except Exception as exc:
+            code = getattr(exc, "code", None)
+            if code == "OWNER_CAP_EXHAUSTED":
+                raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED") from exc
+            raise
 
 
 def note_look_landed(store: Any, operation_sha256: str) -> dict[str, Any]:

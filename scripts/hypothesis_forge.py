@@ -161,6 +161,21 @@ def emit_error(code: str, *, exit_code: int = 1) -> int:
     return exit_code
 
 
+def _published_file_hash_mismatch(root: Path) -> bool:
+    """True when published cohort bytes disagree with their declared hashes."""
+
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        resolve_published_discovery_binding,
+    )
+
+    try:
+        resolve_published_discovery_binding(root)
+    except GroundedDiscoveryError as exc:
+        return str(exc) == "BINDING_HASH_MISMATCH"
+    return False
+
+
 _REPAIR_OWNER_NEXT = {
     "PARENT_SESSION_MISSING": "PROVIDE_PARENT_SESSION_ID_FROM_SHOW_SESSION",
     "PARENT_SESSION_REQUIRED": "SHOW_SESSION_THEN_REPAIR_CONTINUATION_DRAFT",
@@ -874,6 +889,7 @@ def cmd_discovery_execute(
         OrdinaryOperationError,
         gate_before_values,
         get_operation,
+        list_operations,
         note_look_landed,
         record_operation,
     )
@@ -907,20 +923,55 @@ def cmd_discovery_execute(
             compute_market_epoch_for_data_root,
         )
 
-        corpus_root = explicit_data_root or store_root
-        try:
-            epoch, _basis = compute_market_epoch_for_data_root(repo_root, corpus_root)
-        except EvidenceIdentityError as exc:
+        values_follow_data_root = explicit_data_root is not None and census_path is None and observations_path is None and not cohort_partitions
+        corpus_candidates = []
+        for root in (store_root, explicit_data_root):
+            if root is None or root in corpus_candidates:
+                continue
+            corpus_candidates.append(root)
+        epochs: list[str] = []
+        for root in corpus_candidates:
+            try:
+                found, _basis = compute_market_epoch_for_data_root(repo_root, root)
+            except EvidenceIdentityError:
+                if _published_file_hash_mismatch(root):
+                    return emit_error("BINDING_HASH_MISMATCH")
+                if values_follow_data_root and root == explicit_data_root:
+                    return emit(
+                        {
+                            "reason_code": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+                            "values_loaded": False,
+                            "writes": False,
+                            "scientific_negative": False,
+                        },
+                        exit_code=2,
+                    )
+                continue
+            if found not in epochs:
+                epochs.append(found)
+        if not epochs:
             return emit(
                 {
-                    "reason_code": str(exc),
+                    "reason_code": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
                     "values_loaded": False,
                     "writes": False,
                     "scientific_negative": False,
                 },
                 exit_code=2,
             )
+        if len(epochs) > 1:
+            return emit(
+                {
+                    "reason_code": "ORDINARY_OPERATION_MARKET_MISMATCH",
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                },
+                exit_code=2,
+            )
+        epoch = epochs[0]
         claimed_market = ""
+        service_writes = 0
         if operation_path is not None:
             try:
                 preview_request = json.loads(operation_path.read_text(encoding="utf-8"))
@@ -929,6 +980,9 @@ def cmd_discovery_execute(
             if isinstance(preview_request, dict):
                 claimed_market = str(preview_request.get("market_evidence_epoch_sha256") or "")
         if claimed_market and claimed_market != epoch:
+            for root in corpus_candidates:
+                if _published_file_hash_mismatch(root):
+                    return emit_error("BINDING_HASH_MISMATCH")
             return emit(
                 {
                     "reason_code": "ORDINARY_OPERATION_MARKET_MISMATCH",
@@ -944,7 +998,9 @@ def cmd_discovery_execute(
                 request = preview_request
                 if not isinstance(request, dict):
                     raise OrdinaryOperationError("ORDINARY_OPERATION_REQUEST_REQUIRED")
+                before_records = len(list_operations(op_store))
                 operation = record_operation(op_store, request)
+                service_writes = int(len(list_operations(op_store)) > before_records)
                 operation_sha256 = str(operation.get("operation_sha256") or "")
             elif claimed_market == "":
                 existing = get_operation(op_store, str(operation_sha256))
@@ -984,7 +1040,7 @@ def cmd_discovery_execute(
                 {
                     "reason_code": exc.code,
                     "values_loaded": False,
-                    "writes": gate.get("disposition") == "RESERVED",
+                    "writes": bool(service_writes) or gate.get("disposition") == "RESERVED",
                     "scientific_negative": False,
                 },
                 exit_code=2,
@@ -1035,6 +1091,10 @@ def cmd_discovery_execute(
     if git_before.head_sha != git_after.head_sha:
         return emit_error("GIT_MUTATION_FORBIDDEN")
     evidence["scientific_writes"] = 0
+    if temporal_query:
+        query_rows = evidence.get("queries") if isinstance(evidence.get("queries"), list) else []
+        first_query = query_rows[0] if query_rows and isinstance(query_rows[0], dict) else {}
+        evidence["writes"] = bool(service_writes) or bool(first_query.get("new_look"))
     evidence["live_store_selected"] = False
     evidence["duplicate_partitions_eliminated"] = loaded["duplicate_partitions_eliminated"]
     evidence["authority_source"] = (loaded["binding"] or {}).get("authority_source")
@@ -1081,10 +1141,42 @@ def cmd_discovery_preview(
         return emit_error("DISCOVERY_INPUT_INVALID")
     if binding_doc is not None and not isinstance(binding_doc, dict):
         return emit_error("DISCOVERY_INPUT_INVALID")
+    from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+
+    try:
+        validate_temporal_query(spec)
+        temporal_preview = True
+    except Exception:
+        temporal_preview = False
+    if spec.get("schema") == "smial.hfic-temporal-query" and not temporal_preview:
+        return emit(
+            {
+                "reason_code": "QUERY_SPEC_INVALID",
+                "values_loaded": False,
+                "writes": False,
+                "scientific_negative": False,
+            },
+            exit_code=2,
+        )
+    if temporal_preview and (
+        store_root is None
+        or not journal_scope
+        or (operation_path is None and not operation_sha256)
+    ):
+        return emit(
+            {
+                "reason_code": "ORDINARY_OPERATION_REQUIRED",
+                "values_loaded": False,
+                "writes": False,
+                "scientific_negative": False,
+            },
+            exit_code=2,
+        )
     if store_root is not None and journal_scope:
         from solana_alpha_lab.factory.hfic_ordinary_operation import (
             OrdinaryOperationError,
             get_operation,
+            list_operations,
             owner_allowance,
             record_operation,
         )
@@ -1096,10 +1188,13 @@ def cmd_discovery_preview(
                 exit_code=2,
             )
         preview_store = ResearchStore(store_root, create_if_missing=False)
+        preview_service_writes = 0
         try:
             if operation_path is not None:
                 request = json.loads(operation_path.read_text(encoding="utf-8"))
+                before_records = len(list_operations(preview_store))
                 operation = record_operation(preview_store, request)
+                preview_service_writes = int(len(list_operations(preview_store)) > before_records)
             else:
                 operation = get_operation(preview_store, str(operation_sha256))
             if str(operation.get("journal_scope") or "") != journal_scope:
@@ -1113,7 +1208,12 @@ def cmd_discovery_preview(
                     raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
         except OrdinaryOperationError as exc:
             return emit(
-                {"reason_code": exc.code, "values_loaded": False, "writes": False, "scientific_negative": False},
+                {
+                    "reason_code": exc.code,
+                    "values_loaded": False,
+                    "writes": bool(preview_service_writes),
+                    "scientific_negative": False,
+                },
                 exit_code=2,
             )
     try:
