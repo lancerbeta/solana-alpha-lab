@@ -1,0 +1,55 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "a1_harness_direct_executor_extension_v1",
+  "as_of": "2026-09-29",
+  "task_id": "HARNESS_DIRECT_EXECUTOR_EXTENSION_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS on f4e6fc7ed99414522f539efec1bc475dbbdc0882. Claude and OTHER share Cursor/Codex grants. Unknown spellings stay ACTOR_INVALID. load_base_bound_policy returns the frozen base. Exact policy path is required; control/** does not admit a transition. LIVE_PR_HEAD cannot carry the policy change. DESIGN_ONLY stays read-only. Dormant baton stays FORBIDDEN.",
+        "MINOR: format_executor_provenance is not enforced inside preflight_push; provenance is not a grant.",
+        "MINOR: simulated journey uses FakeRunner where base bytes equal the candidate. The real git fixture is the self-authorization proof."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DoD is falsifiable. Four pairs share allows and denials. Legacy policy still validates. Base policy blocks self-enablement. Starter prompt stops at the owner phrase. No client install and no launch claim."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=193600ee4fb1b1f886e9dc50fba7c0e80dd521223ad4476d13fa079852b30e86",
+        "SEMANTIC_PREMISE PASS. Candidate policy cannot authorize this PR: load_base_bound_policy returns frozen base. OTHER is not a catch-all. Legacy documents stay readable. Portable seed does not claim the new routes.",
+        "Tests can pass while FakeRunner collapses base to candidate. That simulation must not be read as this PR granting the new routes. Live git show of the base policy does not."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CLAUDE.md is the single line @AGENTS.md. The starter names client, route, actor and an exact task. OTHER is not a catch-all. No new manual stage, sandbox disable, or paid tool.",
+        "MINOR: AGENTS.md still opens by naming Cursor and Codex before the route table. The route table and delivery-start already name Claude Code and OTHER."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "ACTUAL_CLIENT_LAUNCH_NOT_RUN"
+  ]
+}
