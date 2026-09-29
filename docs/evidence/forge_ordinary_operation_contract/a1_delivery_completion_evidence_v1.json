@@ -15,17 +15,20 @@
   "capability_radar_now": "NONE",
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "bf08cae582b75f5de4c0197142e62cbc79bafccc8e185ef3bbe4f47a5431bc3a",
-    "catalog/assets/core.yaml": "10609c90b37c2b99f946d8a340c10c13daedc3b7bb86768b6866d67c1020f6c0",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "f9fd20258e9f5723d453aad06619f2f8521e56c8b3b1e9766f7d87b70f1762d8",
+    "catalog/assets/core.yaml": "d990a292a16c728e07c31bd161e00189cfd03b6e5d864fceddc0548af27d196b",
+    "docs/evidence/forge_ordinary_operation_contract/operator_trials_4_to_8_v1.json": "4ee534ee2174056b0ffd7de2cf0a6bfb0132e4e0b2d6010d3562e0e6b5f50c26",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "396b5804c52ed7d60c46dca06d28fb1cd256d9b0a9cf1d23dad1a8c4818cf298",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "a11bc28c3dd9ab8de1e2a2a9c71e4569858825140f7dd687918e086848fb67ec",
-    "docs/tasks/FORGE_ORDINARY_OPERATION_CONTRACT_V1.md": "58b08babd962e37383c9fd045e37380e903bbb9ce751f07575072df893e5aa0f",
-    "scripts/hypothesis_forge.py": "fc0b5f13b4b9afe0d567ae4ea99bf102d6b6eb06ae920e05fc13a2ac5ddacacb",
+    "docs/tasks/FORGE_ORDINARY_OPERATION_CONTRACT_V1.md": "209ba5facfbb38c7c215f506f5b8d5176bfb2364cf91bedd94e989c3f8187dc8",
+    "scripts/hypothesis_forge.py": "29f9baba91cd1376ea8326db28c889ab6e222ae308a2c1ce6caa7159f5726370",
     "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "12e4a6074ae551723d0df8c22e58da3a394826ca5b53d76dce8cc3b17356fe7b",
-    "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "42f75eabd6d4f84bcc620cb3cdd9aff896b0f8b3881fa31e0be1b926ec77372d",
+    "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "b9ff28b4bcc8b51c80b400da2822c760fbfa05648763b997c47f4ebf50bb080d",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "1ceb9b73bc9ba47664c6eafd87b47d51d7cbe77dea4d17425ade8ace0527e7c5",
     "tests/test_hfic_grounded_discovery_v1.py": "f82226d6680726f2e429da54c297b50a2c41067d8873c612443739756abcb880",
-    "tests/test_hfic_ordinary_operation_v1.py": "834d33f52371cb0e13fbd6b6dd18267f373d2310aba3ff0b96b2de73c77f1830",
+    "tests/test_hfic_ordinary_operation_acceptance_v1.py": "c13e499f9858080093009feef603f436fe155f04b472cff7f8e8c307f2baa011",
+    "tests/test_hfic_ordinary_operation_v1.py": "9fa6bf8d38b712abdaa1e2dd323e8e829461e2a6ff122346d9f5d6e04474cf5b",
     "tests/test_hfic_temporal_owner_path_v1.py": "df4e3ec793a1009200dcaa3a6fef7486ed522606dcd15015edb701a0f663d720",
-    "tests/test_hfic_temporal_production_runner_v1.py": "d6898c4da803bcc3f7f41ddc63dfc18585c24e8cec8b6f170fd62b3e288ced21"
+    "tests/test_hfic_temporal_production_runner_v1.py": "fc455204ace02229fb664ccc2996ac81be04e35facc91933705df4ceb36bd5de"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -37,14 +40,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_ordinary_operation_contract/a1_delivery_factory_fit_v1.json",
-    "sha256": "ec5f597ee9e19e07b9b76673fabae79f5564c4e437627997b6a3769d8a88ff86",
+    "sha256": "31fbc8a5fad1536d1caf21816856758f26b5f88f2569c3329a4dc6b227c25361",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_ORDINARY_OPERATION_V1_V2_V3_AND_CAP_GUARDS",
     "independent_review": {
       "path": "docs/evidence/forge_ordinary_operation_contract/a1_delivery_independent_review_v1.json",
-      "sha256": "20f628c92b25e46fd379cb5cd275ff1fb7c5b57fd0448a7a6fe25cdad4ad4f7a",
+      "sha256": "77e9aaa690cd56f7738acc102d34bdd641fa01db307723e8e808fb905c926555",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
@@ -64,9 +67,9 @@
     "NO_MARKET_EXECUTION",
     "NO_MERGE",
     "NO_LIVE_LOOK",
-  "MODEL_TRIAL_2_AND_3_PROVENANCE_UNKNOWN",
-  "MODEL_TRIALS_4_TO_8_OBSERVED_MODEL_UNKNOWN",
-  "OPERATOR_TRIAL_7_FREEZE_REFUSED_STALE_PREFLIGHT_RECEIPT"
+    "MODEL_TRIAL_2_AND_3_PROVENANCE_UNKNOWN",
+    "MODEL_TRIALS_4_TO_8_OBSERVED_MODEL_UNKNOWN",
+    "OPERATOR_TRIAL_7_FREEZE_REFUSED_STALE_PREFLIGHT_RECEIPT"
   ],
   "side_effects": {
     "market_execution": "NOT_RUN",
