@@ -17,9 +17,9 @@ required_review_roles:
 expected_repository: lancerbeta/solana-alpha-lab
 
 git_binding:
-  expected_base: 043bbb7ee4caf992c3db23bac9b8c23142d8f741
+  expected_base: 06924bc6878dbd2116acfbb4fb8aed21a10ee045
   expected_upstream: origin/main
-  expected_upstream_oid: 043bbb7ee4caf992c3db23bac9b8c23142d8f741
+  expected_upstream_oid: 06924bc6878dbd2116acfbb4fb8aed21a10ee045
   expected_branch: cursor/forge-legacy-parent-continuation-compat-v1
   dirty_mode: FORBIDDEN
 
