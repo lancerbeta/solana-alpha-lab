@@ -124,7 +124,12 @@ Draft JSON fields: `parent_run_id`, `parent_session_id`,
 `owner_authorization_id`, `parent_terminal=NO_WORTHY_HYPOTHESIS`,
 and `evidence_mapping.legacy_parent_binding` when the aggregate receipt is
 absent (`provenance=ESTABLISHED_NOW`). CLI also prints `parent_proof_mode`.
-`READY` on the draft is not apply authority.
+`READY` on the draft is not apply authority. After apply, production
+preflight of the same focus returns `RESUME_REPAIR_CONTINUATION` for that
+single `AUTHORIZED` parent when the current corpus cannot form a market
+epoch and there is no current evidence surface. It does not start a new
+session. Several matches, or a current surface that is still not an
+admissible market, stay `STOP` / `MARKET_EVIDENCE_BASIS_INCOMPLETE`.
 
 ### 2) No-write plan
 
@@ -165,7 +170,10 @@ rewriting the historical exhausted parent receipt. After close (and after store
 reopen), ordinary `forge-run --no-write` must show the **repair** terminal —
 e.g. `KILL_*` → `NON_SCIENTIFIC_STOP`, PASS/CASE_A → `OWNER_CANDIDATE`, repair
 `NO_WORTHY` → `SEARCH_EXHAUSTED_CURRENT_EVIDENCE` — not the parent
-`SEARCH_EXHAUSTED` and not `SCIENTIFIC_IDENTITY_CONFLICT`. Close JSON carries
+`SEARCH_EXHAUSTED` and not `SCIENTIFIC_IDENTITY_CONFLICT`. That readback
+still holds when the current corpus cannot hash a market epoch, if exactly
+one completed repair receipt matches the focus. Several receipts are not
+chosen. Close JSON carries
 `forge_run_receipt_sha256` when persist succeeds. `ALREADY_CLOSED` crash
 recovery may still append a missing repair receipt; trust
 `forge_run_receipt_sha256` / subsequent `--no-write` readback, and `writes=true`

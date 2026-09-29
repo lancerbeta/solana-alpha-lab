@@ -691,3 +691,217 @@ class LegacyParentContinuationCompatTests(TestCase):
                 {"JOURNAL_SCOPE_MISMATCH", "PARENT_BINDING_MISMATCH"},
             )
             self.assertEqual(_forge_run_count(opened["store"]), 0)
+
+    def _apply_ordinary_repair(self, data_root: Path, opened: dict) -> dict:
+        drafted = self._draft_via_cli(data_root, opened["shown"]["session_id"])
+        self.assertEqual(drafted["_exit"], 0, drafted)
+        planned = self._cli_json(
+            CLI.cmd_repair_continuation_plan,
+            repo_root=ROOT,
+            explicit_data_root=data_root,
+            draft_path=drafted["_path"],
+            parent_session_id=None,
+        )
+        self.assertEqual(planned["status"], "READY", planned)
+        self.assertFalse(planned["writes"])
+        applied = self._cli_json(
+            CLI.cmd_repair_continuation_apply,
+            repo_root=ROOT,
+            explicit_data_root=data_root,
+            draft_path=drafted["_path"],
+            parent_session_id=None,
+            confirm_append_only=True,
+        )
+        self.assertEqual(applied["status"], "APPLIED", applied)
+        preflight = self._cli_json(
+            CLI.cmd_preflight,
+            repo_root=ROOT,
+            owner_focus="AUTO",
+            auto_commission=True,
+            explicit_data_root=data_root,
+            control_current_representation=False,
+            model_provenance_sha256=None,
+        )
+        self.assertEqual(preflight.get("_exit"), 0, preflight)
+        self.assertEqual(preflight.get("action"), "RESUME_REPAIR_CONTINUATION")
+        self.assertEqual(preflight.get("session_id"), opened["shown"]["session_id"])
+        return {"drafted": drafted, "applied": applied, "preflight": preflight}
+
+    def _spend_one_main(self, opened: dict, *, query_id: str) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            run_recorded_discovery_query,
+        )
+
+        spec = _spec_snapshot(
+            query_id=query_id,
+            all=[{"feature": "mark", "op": "gte", "value": 0.2}],
+        )
+        run_recorded_discovery_query(
+            opened["store"],
+            census=opened["census"],
+            observations=opened["rows"],
+            spec=spec,
+            binding=opened["binding"],
+            journal_scope=opened["journal"],
+            candidate_scope={"schema": "test", "target": spec["target"]},
+            git_sha=opened["git"].head_sha,
+        )
+
+    def _reopen_forge_run(self, data_root: Path) -> dict:
+        ResearchStore(data_root, create_if_missing=False)
+        readback = self._cli_json(
+            CLI.cmd_forge_run,
+            repo_root=ROOT,
+            explicit_data_root=data_root,
+            owner_focus="AUTO",
+            persist=False,
+            saved_draft_sha256=None,
+            model_provenance_sha256=None,
+            control_current_representation=False,
+        )
+        return readback
+
+    def test_ordinary_no_worthy_readback_after_reopen(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            opened = self._open_parent(data_root)
+            historical = _payloads(opened["store"])
+            self.assertEqual(len(_mains(opened["store"], opened["journal"])), 2)
+            self.assertEqual(_forge_run_count(opened["store"]), 0)
+            prepared = self._apply_ordinary_repair(data_root, opened)
+            binding = prepared["drafted"]["draft"]["evidence_mapping"][
+                "legacy_parent_binding"
+            ]
+            self.assertEqual(binding["source"]["model_provenance_status"], "NOT_RECOVERED")
+            self.assertEqual(
+                binding["source"]["execution_binding_status"], "NOT_RECOVERED"
+            )
+            self._spend_one_main(opened, query_id="legacy-ordinary-3")
+            self.assertEqual(len(_mains(opened["store"], opened["journal"])), 3)
+            persist_no_worthy_session(
+                opened["store"],
+                {**opened["frozen"], **opened["receipt"]},
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(opened["draft"]["candidates"]),
+                draft=opened["draft"],
+                preflight_receipt=opened["receipt"],
+            )
+            closed = self._cli_json(
+                CLI.cmd_repair_continuation_close,
+                repo_root=ROOT,
+                explicit_data_root=data_root,
+                disposition_sha256=prepared["applied"]["disposition"]["disposition_sha256"],
+                reason_code="CONTINUATION_TERMINAL_REACHED",
+                confirm_append_only=True,
+            )
+            self.assertEqual(closed["status"], "CLOSED", closed)
+            readback = self._reopen_forge_run(data_root)
+            self.assertEqual(readback.get("_exit"), 0, readback)
+            self.assertEqual(readback.get("owner_final"), ACTION_SEARCH_EXHAUSTED)
+            self.assertEqual(readback.get("run_identity_sha256"), binding["binding_sha256"])
+            self.assertEqual(readback.get("frozen_representation_ids"), ["BASE"])
+            self.assertTrue(readback.get("repair_continuation_disposition_sha256"))
+            self.assertEqual(
+                readback.get("writes"),
+                {"research_store": 0, "forge_run": 0, "session": 0},
+            )
+            self._spend_one_main(opened, query_id="legacy-ordinary-3")
+            self.assertEqual(len(_mains(opened["store"], opened["journal"])), 3)
+            for record_id, digest in historical.items():
+                self.assertEqual(_payloads(opened["store"]).get(record_id), digest, record_id)
+
+    def test_ordinary_runner_up_readback_after_reopen(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            opened = self._open_parent(data_root)
+            historical = _payloads(opened["store"])
+            prepared = self._apply_ordinary_repair(data_root, opened)
+            binding = prepared["drafted"]["draft"]["evidence_mapping"][
+                "legacy_parent_binding"
+            ]
+            self._spend_one_main(opened, query_id="legacy-ordinary-runner")
+            self.assertEqual(len(_mains(opened["store"], opened["journal"])), 3)
+            repair_disp = prepared["applied"]["disposition"]["disposition_sha256"]
+            from tests import test_hfic_session as session_tests
+
+            source = _happy_with_pit_runner_up()
+            selected_receipt = dict(session_tests._preflight_receipt())
+            selected_receipt["market_evidence_epoch_sha256"] = "11" * 32
+            selected_receipt["evidence_epoch_sha256"] = "11" * 32
+            selected_receipt["search_key_sha256"] = opened["journal"]
+            selected = freeze_draft(
+                source,
+                preflight_receipt=selected_receipt,
+                repo_root=ROOT,
+            )
+            selected["session_id"] = opened["shown"]["session_id"]
+            selected["repair_continuation_disposition_sha256"] = repair_disp
+            persist_frozen_session(
+                opened["store"],
+                selected,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(source["candidates"]),
+                draft=source,
+            )
+            pending = finalize_session(
+                selected,
+                critic_result_from_packet_only(
+                    selected["critic_input_packet"], "KILL_DATA_INFEASIBLE"
+                ),
+                store=opened["store"],
+                repo_root=ROOT,
+            )
+            self.assertEqual(pending["session_state"], "RUNNER_UP_AWAITING_CRITIC")
+            waiting = finalize_session(
+                {**pending, "repair_continuation_disposition_sha256": repair_disp},
+                critic_result_from_packet_only(
+                    pending["critic_input_packet"], "PASS_TO_CLASSIFICATION"
+                ),
+                store=opened["store"],
+                repo_root=ROOT,
+            )
+            packet = _with_selected_feats(
+                submission(),
+                selected["runner_up_critic_input_packet"],
+            )
+            packet["hypothesis_definition_sha256"] = selected["runner_up_definition_sha256"]
+            done = apply_classification(
+                {**waiting, "repair_continuation_disposition_sha256": repair_disp},
+                packet,
+                store=opened["store"],
+                repo_root=ROOT,
+                data_root=data_root,
+            )
+            self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
+            closed = self._cli_json(
+                CLI.cmd_repair_continuation_close,
+                repo_root=ROOT,
+                explicit_data_root=data_root,
+                disposition_sha256=repair_disp,
+                reason_code="CONTINUATION_TERMINAL_REACHED",
+                confirm_append_only=True,
+            )
+            self.assertEqual(closed["status"], "CLOSED", closed)
+            readback = self._reopen_forge_run(data_root)
+            self.assertEqual(readback.get("_exit"), 0, readback)
+            self.assertEqual(readback.get("owner_final"), ACTION_OWNER_CANDIDATE)
+            self.assertEqual(readback.get("run_identity_sha256"), binding["binding_sha256"])
+            stage = (readback.get("stages") or [{}])[0]
+            self.assertEqual(
+                stage.get("selected_candidate_id"),
+                selected["runner_up_candidate_id"],
+            )
+            self.assertEqual(
+                readback.get("writes"),
+                {"research_store": 0, "forge_run": 0, "session": 0},
+            )
+            self._spend_one_main(opened, query_id="legacy-ordinary-runner")
+            self.assertEqual(len(_mains(opened["store"], opened["journal"])), 3)
+            for record_id, digest in historical.items():
+                self.assertEqual(_payloads(opened["store"]).get(record_id), digest, record_id)

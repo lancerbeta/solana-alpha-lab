@@ -484,6 +484,60 @@ def _exact_admitted_session_readback(
     return True
 
 
+def _unique_authorized_repair_session(
+    sessions: Sequence[Mapping[str, Any]],
+    repair_continuations: Sequence[Mapping[str, Any]] | None,
+    *,
+    owner_focus: str,
+) -> Mapping[str, Any] | None:
+    """One AUTHORIZED repair whose sealed session already matches this focus.
+
+    Current corpus may be unable to form a market epoch. That must not hide
+    a durable parent whose slot, market, search key and focus key are already
+    stored. Zero or several matches stay unresolved.
+    """
+
+    from solana_alpha_lab.factory.hfic_session import focus_key_sha256
+
+    expected = focus_key_sha256(owner_focus)
+    hits: list[Mapping[str, Any]] = []
+    seen: set[str] = set()
+    for disposition in repair_continuations or []:
+        if str(disposition.get("status") or "") != "AUTHORIZED":
+            continue
+        session_id = str(disposition.get("parent_session_id") or "")
+        if not session_id or session_id in seen:
+            continue
+        chosen = next(
+            (
+                item
+                for item in sessions
+                if str(item.get("session_id") or "") == session_id
+            ),
+            None,
+        )
+        if chosen is None:
+            continue
+        if str(chosen.get("focus_key_sha256") or "") != expected:
+            continue
+        slot = chosen.get("scientific_slot_sha256")
+        search = chosen.get("search_key_sha256")
+        focus_key = chosen.get("focus_key_sha256")
+        market = chosen.get("market_evidence_epoch_sha256")
+        if not all(
+            isinstance(value, str) and len(value) == 64
+            for value in (slot, search, focus_key, market)
+        ):
+            continue
+        if str(disposition.get("scientific_slot_sha256") or "") != slot:
+            continue
+        seen.add(session_id)
+        hits.append(chosen)
+    if len(hits) != 1:
+        return None
+    return hits[0]
+
+
 def query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
     """Public read-model entry used by A5 consumers.
 
@@ -2755,6 +2809,28 @@ def run_preflight(
         repo_root=Path(repo_root),
         repair_continuations=repair_continuations,
     )
+    if (
+        not market_admission_ready
+        and not has_current_surface
+        and not _exact_admitted_session_readback(
+            sessions,
+            action=action,
+            session_id=bound_session,
+            search_key=search_key,
+            focus_key=focus_key,
+            has_current_surface=has_current_surface,
+        )
+    ):
+        sealed = _unique_authorized_repair_session(
+            sessions,
+            repair_continuations,
+            owner_focus=focus,
+        )
+        if sealed is not None:
+            action = "RESUME_REPAIR_CONTINUATION"
+            bound_session = str(sealed.get("session_id") or "") or None
+            search_key = str(sealed.get("search_key_sha256") or "")
+            focus_key = str(sealed.get("focus_key_sha256") or "")
     if (
         not market_admission_ready
         and not _exact_admitted_session_readback(
