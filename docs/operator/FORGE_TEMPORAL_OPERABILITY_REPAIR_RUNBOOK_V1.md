@@ -85,7 +85,7 @@ awaiting critic / classification / runner-up fails with
 | `scientific_slot_sha256` | `scientific_slot_sha256` |
 | `terminal_receipt_sha256` | `terminal_receipt_sha256` (= `session_receipt_sha256`) |
 | `journal_scope` | `journal_scope` (= `search_key_sha256`) |
-| `parent_run_id` | resolved from store `FORGE_RUN_RECEIPT` for session/slot |
+| `parent_run_id` | exact aggregate `FORGE_RUN_RECEIPT` `run_id` when session and slot both match; if that aggregate is absent, draft derives `LEGACY-PARENT-` + binding prefix (`provenance=ESTABLISHED_NOW`). Do not pass a guessed `--parent-run-id` |
 | `spent_*_looks` | discovery journal under `journal_scope` (MAIN/ADAPTIVE/PREVIEW) |
 | `owner_authorization_id` | owner-supplied authority token |
 | `technical_gap_code` | owner-supplied gap id (e.g. `PROVIDER_REPORTED_SNAPSHOT_CLOCK_GAP`) |
@@ -111,16 +111,20 @@ revision pause must not close either — CLI returns
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <store> repair-continuation-draft --parent-session-id <HFIC-SESS-...> --owner-authorization-id <OWNER-AUTH-...> --technical-gap-code <GAP> --output <draft.json>
 ```
 
-Spent looks default from the discovery journal. Optional overrides:
+Spent looks default from the discovery journal. Omit `--parent-run-id`
+unless it is the exact stored aggregate `run_id`. Optional alignment flags:
 `--spent-main-looks`, `--spent-adaptive-looks`, `--spent-preview-looks`,
-`--parent-run-id`, `--terminal-receipt-sha256`, `--journal-scope`.
+`--terminal-receipt-sha256`, `--journal-scope`.
 
-Draft JSON fields (exact): `parent_run_id`, `parent_session_id`,
+Draft JSON fields: `parent_run_id`, `parent_session_id`,
 `scientific_slot_sha256`, `terminal_receipt_sha256`, `journal_scope`,
 `technical_gap_code`, `repair_capability_id`
 (`CAP-HFIC-TEMPORAL-OPERABILITY-REPAIR-001`), `allowed_look_ids`,
 `spent_main_looks`, `spent_adaptive_looks`, `spent_preview_looks`,
-`owner_authorization_id`, `parent_terminal=NO_WORTHY_HYPOTHESIS`.
+`owner_authorization_id`, `parent_terminal=NO_WORTHY_HYPOTHESIS`,
+and `evidence_mapping.legacy_parent_binding` when the aggregate receipt is
+absent (`provenance=ESTABLISHED_NOW`). CLI also prints `parent_proof_mode`.
+`READY` on the draft is not apply authority.
 
 ### 2) No-write plan
 
@@ -191,7 +195,7 @@ Draft/apply failures also print JSON on stdout with `owner_status=BLOCKED`
 | `CORPUS_BINDING_UNPROVEN` / `CORPUS_BINDING_CONFLICT` | `RESTORE_JOURNAL_CORPUS_BINDING` / `RESOLVE_JOURNAL_CORPUS_BINDING` |
 | `REPRESENTATION_SCOPE_UNPROVEN` / `SLOT_IDENTITY_UNPROVEN` / `FOCUS_IDENTITY_UNPROVEN` / `MARKET_IDENTITY_UNPROVEN` | restore the durable admission/session hashes; do not guess provenance |
 | `SPENT_BUDGET_EXHAUSTED` | `STOP_LOOK_BUDGET_EXHAUSTED` |
-| `REPAIR_RESULT_UNREADABLE` | `RETRY_CLOSE_UNTIL_REPAIR_RESULT_IS_READABLE` — close did not consume the authorization |
+| `REPAIR_RESULT_UNREADABLE` | close-path, not a draft failure: `RETRY_CLOSE_UNTIL_REPAIR_RESULT_IS_READABLE` — authorization stays open |
 | `PARENT_TERMINAL_RECEIPT_MISSING` | `PROVIDE_TERMINAL_RECEIPT_FROM_SHOW_SESSION` |
 | `TERMINAL_RECEIPT_REQUIRED` | `ENSURE_SESSION_RECEIPT_SHA256_ON_SHOW_SESSION` |
 | `SPENT_BUDGET_INVALID` | `PASS_SPENT_LOOKS_OR_ENSURE_DISCOVERY_JOURNAL` |
