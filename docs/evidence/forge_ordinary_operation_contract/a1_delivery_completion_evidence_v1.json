@@ -15,15 +15,15 @@
   "capability_radar_now": "NONE",
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "bf08cae582b75f5de4c0197142e62cbc79bafccc8e185ef3bbe4f47a5431bc3a",
-    "catalog/assets/core.yaml": "518a6b0f23970c70c11a2340b93d0bbf1d4f91f888028e8d8700b5974027c649",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "3f62ce3684271560e2f0a9609d3b6a7de101c1faa642169de2d36a0c8f251fa7",
+    "catalog/assets/core.yaml": "b330f7c1b47a016b36f98331feddfcdce4fafd97a3ac1a2f73ff27faba87101d",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "32b2f7d3f6a60d09ab92211d1555a5ceef0d993524d457ac61266319333635ac",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "a11bc28c3dd9ab8de1e2a2a9c71e4569858825140f7dd687918e086848fb67ec",
-    "docs/tasks/FORGE_ORDINARY_OPERATION_CONTRACT_V1.md": "d5b098472e54dfa571479437b4383584a0f3b679d5a0ca71ab6fe83261f37eae",
-    "scripts/hypothesis_forge.py": "db71c12e04bd36c5b4daab180ad46f318ff995528ed4c93527280d7074b552b9",
+    "docs/tasks/FORGE_ORDINARY_OPERATION_CONTRACT_V1.md": "52d89a4f9d4e98264b49f44a4e3e9111584e71aec61a6ddbd4367913a1040627",
+    "scripts/hypothesis_forge.py": "a16e3c551ff12c53b80de316ab5837e7ede612816edb4235cba52706314eb668",
     "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "12e4a6074ae551723d0df8c22e58da3a394826ca5b53d76dce8cc3b17356fe7b",
-    "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "42de8ecbf21d42919cfe588238eb85acb72d63e1516ce58bb0ab793dacabce1b",
+    "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "356cb7795346ed119ced46ea706db32ab8969fe322cffdae9e388b2f701016fb",
     "tests/test_hfic_grounded_discovery_v1.py": "f82226d6680726f2e429da54c297b50a2c41067d8873c612443739756abcb880",
-    "tests/test_hfic_ordinary_operation_v1.py": "dc28292f23cab325b6b7793c2a85f0813f9031df792df38d1b86a575f7b27359",
+    "tests/test_hfic_ordinary_operation_v1.py": "1e3482e5d2b3308d54dc924cddf2f00e288f97e3b787d671fad01196a51d053a",
     "tests/test_hfic_temporal_owner_path_v1.py": "df4e3ec793a1009200dcaa3a6fef7486ed522606dcd15015edb701a0f663d720",
     "tests/test_hfic_temporal_production_runner_v1.py": "8bf181ea81d824c665e7cb934c633b194f939bfad24aa7d2e3773cc464c37556"
   },
@@ -37,14 +37,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_ordinary_operation_contract/a1_delivery_factory_fit_v1.json",
-    "sha256": "3459e98d1459761c4618296ba030d8592d59f7c3859d7ab0289fb077a87b99ef",
+    "sha256": "ec3c5bd6df61d0e0e61534d6939400dad1935a7853d310ed0bfa46490bddc621",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_ORDINARY_OPERATION_V1_V2_V3_AND_CAP_GUARDS",
     "independent_review": {
       "path": "docs/evidence/forge_ordinary_operation_contract/a1_delivery_independent_review_v1.json",
-      "sha256": "34f2d7c1a4f62118658543d8f4ffc31ccfb64dd19d8267a7d2c56a85656190ae",
+      "sha256": "72557736ae1cd884132cd9d389cc2da5d72731324096bc21a01b5a508f1f740c",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
