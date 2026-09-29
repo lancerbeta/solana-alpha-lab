@@ -1084,6 +1084,7 @@ def cmd_discovery_execute(
             priors=priors,
             git_sha=git_before.head_sha,
             operation_sha256=str(operation_sha256) if operation_sha256 else None,
+            verified_market=epoch if temporal_query else None,
         )
     except GroundedDiscoveryError as exc:
         return emit_error(exc.code)

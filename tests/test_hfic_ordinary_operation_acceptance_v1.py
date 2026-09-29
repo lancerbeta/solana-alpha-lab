@@ -210,6 +210,31 @@ class OrdinaryAcceptanceTests(unittest.TestCase):
                 data_root=data_root,
             )
             self.assertEqual(persisted.returncode, 0, persisted.stderr + persisted.stdout)
+            persisted_body = json.loads(persisted.stdout)
+            cold = run_cli(
+                "forge-run",
+                "--owner-focus",
+                focus,
+                "--no-write",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertIn(cold.returncode, {0, 2}, cold.stderr + cold.stdout)
+            cold_body = json.loads(cold.stdout)
+            self.assertNotEqual(cold_body.get("next_action"), "AUTHORIZE_ADDITIONAL_LOOKS", cold_body)
+            cold_op = cold_body.get("ordinary_operation") or {}
+            self.assertEqual(cold_op.get("result_refs"), evidence["result_refs"])
+            self.assertEqual(cold_op.get("status"), "PAUSED_CAP")
+            draft_sha = str(persisted_body.get("payload_sha256") or "")
+            self.assertTrue(draft_sha)
+            stage_drafts = {
+                str(item.get("draft_sha256") or "")
+                for item in (cold_body.get("stages") or [])
+                if isinstance(item, dict)
+            }
+            if stage_drafts:
+                self.assertIn(draft_sha, stage_drafts, cold_body)
             open_work = run_cli(
                 "preflight",
                 "--discovery-contract",
@@ -789,3 +814,193 @@ class OrdinaryAcceptanceTests(unittest.TestCase):
             self.assertIn("OWNER_CAP_EXHAUSTED", main_zero.stdout + main_zero.stderr)
             self.assertFalse(json.loads(main_zero.stdout).get("values_loaded"))
             self.assertEqual(len(_mains(data_root, journal)), mains_before_zero_cap)
+
+    def test_recorded_query_requires_operation_and_independent_market(self) -> None:
+        from unittest import mock
+
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            GroundedDiscoveryError,
+            load_admitted_partition_rows,
+            run_recorded_discovery_query,
+        )
+        from solana_alpha_lab.factory.hfic_ordinary_operation import record_operation
+
+        focus = "PUBLISHED_ORDINARY_RECORDED"
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            data_root, receipt = _publish_focus(workspace, focus)
+            journal = str(receipt["search_key_sha256"])
+            market = str(receipt["market_evidence_epoch_sha256"])
+            simple = _simple("recorded-gate")
+            scope = {
+                "population": "BASE_X",
+                "decision_timestamp": "Y3600",
+                "target": temporal_target_label(simple),
+                "estimand": "price_relative_proxy",
+                "explanatory_condition": "mark",
+                "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+            }
+            loaded = load_admitted_partition_rows(
+                data_root=data_root,
+                binding_doc=None,
+                partitions=None,
+                census_path=None,
+                observations_path=None,
+            )
+            store = ResearchStore(data_root, create_if_missing=False)
+            before = _inventory(data_root)
+            git_sha = "a" * 40
+            for missing in (None, ""):
+                with mock.patch(
+                    "solana_alpha_lab.factory.hfic_grounded_discovery.execute_discovery_from_rows"
+                ) as evaluator:
+                    with self.assertRaises(GroundedDiscoveryError) as caught:
+                        run_recorded_discovery_query(
+                            store,
+                            census=loaded["census"],
+                            observations=loaded["observations"],
+                            spec=simple,
+                            binding=loaded["cohorts"],
+                            journal_scope=journal,
+                            candidate_scope=scope,
+                            git_sha=git_sha,
+                            operation_sha256=missing,
+                            verified_market=market,
+                        )
+                    self.assertEqual(caught.exception.code, "ORDINARY_OPERATION_REQUIRED")
+                    evaluator.assert_not_called()
+            self.assertEqual(_inventory(data_root), before)
+            self.assertEqual(_mains(data_root, journal), [])
+            with mock.patch(
+                "solana_alpha_lab.factory.hfic_grounded_discovery.execute_discovery_from_rows"
+            ) as evaluator:
+                with self.assertRaises(GroundedDiscoveryError) as caught:
+                    run_recorded_discovery_query(
+                        store,
+                        census=loaded["census"],
+                        observations=loaded["observations"],
+                        spec=simple,
+                        binding=loaded["cohorts"],
+                        journal_scope=journal,
+                        candidate_scope=scope,
+                        git_sha=git_sha,
+                        operation_sha256="ab" * 32,
+                        verified_market=market,
+                    )
+                self.assertEqual(caught.exception.code, "ORDINARY_OPERATION_NOT_FOUND")
+                evaluator.assert_not_called()
+            with mock.patch(
+                "solana_alpha_lab.factory.hfic_grounded_discovery.execute_discovery_from_rows"
+            ) as evaluator:
+                with self.assertRaises(GroundedDiscoveryError) as caught:
+                    run_recorded_discovery_query(
+                        store,
+                        census=loaded["census"],
+                        observations=loaded["observations"],
+                        spec=simple,
+                        binding=loaded["cohorts"],
+                        journal_scope=journal,
+                        candidate_scope=scope,
+                        git_sha=git_sha,
+                        operation_sha256="cd" * 32,
+                        verified_market=None,
+                    )
+                self.assertEqual(caught.exception.code, "ORDINARY_OPERATION_MARKET_UNVERIFIED")
+                evaluator.assert_not_called()
+            self.assertEqual(_inventory(data_root), before)
+            zero = record_operation(
+                store,
+                _operation(
+                    simple,
+                    focus=focus,
+                    journal=journal,
+                    market=market,
+                    text="cap zero recorded",
+                    cap={"main": 0, "adaptive": 0, "preview": 0},
+                ),
+            )
+            after_op = _inventory(data_root)
+            with mock.patch(
+                "solana_alpha_lab.factory.hfic_grounded_discovery.execute_discovery_from_rows"
+            ) as evaluator:
+                with self.assertRaises(GroundedDiscoveryError) as caught:
+                    run_recorded_discovery_query(
+                        store,
+                        census=loaded["census"],
+                        observations=loaded["observations"],
+                        spec=simple,
+                        binding=loaded["cohorts"],
+                        journal_scope=journal,
+                        candidate_scope=scope,
+                        git_sha=git_sha,
+                        operation_sha256=str(zero["operation_sha256"]),
+                        verified_market=market,
+                    )
+                self.assertEqual(caught.exception.code, "OWNER_CAP_EXHAUSTED")
+                evaluator.assert_not_called()
+            self.assertEqual(_inventory(data_root), after_op)
+            self.assertEqual(_mains(data_root, journal), [])
+            allowed = record_operation(
+                store,
+                _operation(
+                    simple,
+                    focus=focus,
+                    journal=journal,
+                    market=market,
+                    text="one recorded look",
+                    cap={"main": 1, "adaptive": 0, "preview": 0},
+                ),
+            )
+            first = run_recorded_discovery_query(
+                store,
+                census=loaded["census"],
+                observations=loaded["observations"],
+                spec=simple,
+                binding=loaded["cohorts"],
+                journal_scope=journal,
+                candidate_scope=scope,
+                git_sha=git_sha,
+                operation_sha256=str(allowed["operation_sha256"]),
+                verified_market=market,
+            )
+            self.assertTrue(first["queries"][0]["new_look"])
+            self.assertEqual(len(_mains(data_root, journal)), 1)
+            with mock.patch(
+                "solana_alpha_lab.factory.hfic_grounded_discovery.execute_discovery_from_rows"
+            ) as evaluator:
+                second = run_recorded_discovery_query(
+                    store,
+                    census=loaded["census"],
+                    observations=loaded["observations"],
+                    spec=simple,
+                    binding=loaded["cohorts"],
+                    journal_scope=journal,
+                    candidate_scope=scope,
+                    git_sha=git_sha,
+                    operation_sha256=str(allowed["operation_sha256"]),
+                    verified_market=market,
+                )
+                evaluator.assert_not_called()
+            self.assertFalse(second["queries"][0]["new_look"])
+            self.assertEqual(second["result_refs"], first["result_refs"])
+            self.assertEqual(len(_mains(data_root, journal)), 1)
+            foreign_market = "ef" * 32
+            with mock.patch(
+                "solana_alpha_lab.factory.hfic_grounded_discovery.execute_discovery_from_rows"
+            ) as evaluator:
+                with self.assertRaises(GroundedDiscoveryError) as caught:
+                    run_recorded_discovery_query(
+                        store,
+                        census=loaded["census"],
+                        observations=loaded["observations"],
+                        spec=simple,
+                        binding=loaded["cohorts"],
+                        journal_scope=journal,
+                        candidate_scope=scope,
+                        git_sha=git_sha,
+                        operation_sha256=str(allowed["operation_sha256"]),
+                        verified_market=foreign_market,
+                    )
+                self.assertEqual(caught.exception.code, "ORDINARY_OPERATION_MARKET_MISMATCH")
+                evaluator.assert_not_called()
+            self.assertEqual(len(_mains(data_root, journal)), 1)

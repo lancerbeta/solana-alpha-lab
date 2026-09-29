@@ -357,30 +357,6 @@ def _closed_slot(admission: Mapping[str, Any], sessions: Sequence[Mapping[str, A
     return False
 
 
-def _assert_journal_is_canonical(operation: Mapping[str, Any], journal_scope: str) -> None:
-    """Caller agreement is not enough when both sides name a foreign journal."""
-
-    from solana_alpha_lab.factory.hfic_session import search_key_sha256
-
-    market = str(operation.get("market_evidence_epoch_sha256") or "")
-    focus = str(operation.get("owner_focus") or "")
-    if len(market) != 64 or not focus:
-        raise OrdinaryOperationError("ORDINARY_OPERATION_BINDING_INCOMPLETE")
-    candidates = {
-        search_key_sha256(market, focus, "HFIC-V1.2"),
-        search_key_sha256(market, focus, "HFIC-V1.2", None, "ORDINARY_GROUNDED_DISCOVERY_V1"),
-        search_key_sha256(
-            market, focus, "HFIC-V1.2", None, "CURRENT_REPRESENTATION_CONTROL_V1"
-        ),
-        search_key_sha256(market, focus, "HFIC-V1.1"),
-        search_key_sha256(market, focus, "HFIC-V1.1", None, "ORDINARY_GROUNDED_DISCOVERY_V1"),
-    }
-    if journal_scope not in candidates and journal_scope != operation.get("journal_scope"):
-        raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_MISMATCH")
-    if journal_scope not in candidates:
-        raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_NOT_CANONICAL")
-
-
 def authorize_temporal_attempt(
     store: Any,
     *,
@@ -397,11 +373,10 @@ def authorize_temporal_attempt(
         operation = get_operation(store, operation_sha256)
         if str(operation.get("journal_scope") or "") != journal_scope:
             raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_MISMATCH")
-        if isinstance(verified_market, str) and verified_market != operation.get(
-            "market_evidence_epoch_sha256"
-        ):
+        if not isinstance(verified_market, str) or len(verified_market) != 64:
+            raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_UNVERIFIED")
+        if verified_market != operation.get("market_evidence_epoch_sha256"):
             raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
-        _assert_journal_is_canonical(operation, journal_scope)
         fingerprint = binding_fingerprint(binding_cohorts)
         stamped = operation.get("corpus_fingerprint")
         if fingerprint and stamped and fingerprint != stamped:
@@ -454,9 +429,10 @@ def gate_before_values(
     operation = get_operation(store, operation_sha256)
     if str(operation.get("journal_scope") or "") != journal_scope:
         raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_MISMATCH")
-    if isinstance(verified_market, str) and verified_market != operation.get("market_evidence_epoch_sha256"):
+    if not isinstance(verified_market, str) or len(verified_market) != 64:
+        raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_UNVERIFIED")
+    if verified_market != operation.get("market_evidence_epoch_sha256"):
         raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
-    _assert_journal_is_canonical(operation, journal_scope)
     from solana_alpha_lab.factory.hfic_temporal_discovery import (
         classify_temporal_look,
         validate_temporal_query,
@@ -475,11 +451,6 @@ def gate_before_values(
     stamped = operation.get("corpus_fingerprint")
     if fingerprint and stamped and fingerprint != stamped:
         raise OrdinaryOperationError("ORDINARY_OPERATION_BINDING_MISMATCH")
-    if fingerprint and not stamped:
-        updated = dict(operation)
-        updated["corpus_fingerprint"] = fingerprint
-        _append(store, kind=OPERATION_KIND, body=updated, record_prefix="HFIC-ART-OP")
-        operation = get_operation(store, operation_sha256)
     looks = _looks(store, journal_scope)
     _search_terminal_conflict(operation, looks, spec)
     from solana_alpha_lab.factory.hfic_session import list_hfic_sessions
@@ -554,6 +525,11 @@ def gate_before_values(
     kind = "adaptive" if look_class == "ADAPTIVE" else "main"
     if owner_allowance(store, operation, kind) < 1:
         raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
+    if fingerprint and not stamped:
+        updated = dict(operation)
+        updated["corpus_fingerprint"] = fingerprint
+        _append(store, kind=OPERATION_KIND, body=updated, record_prefix="HFIC-ART-OP")
+        operation = get_operation(store, operation_sha256)
     _reserve(store, operation, spec_sha256=validated["spec_sha256"], look_class=kind)
     return {
         "disposition": "RESERVED",

@@ -1687,6 +1687,7 @@ def run_recorded_discovery_query(
     git_sha: str,
     clock: datetime | None = None,
     operation_sha256: str | None = None,
+    verified_market: str | None = None,
 ) -> dict[str, Any]:
     """Public production entry: compute, persist or resume, return evidence refs."""
 
@@ -1695,18 +1696,18 @@ def run_recorded_discovery_query(
     if not isinstance(git_sha, str) or len(git_sha) != 40:
         raise GroundedDiscoveryError("GIT_SHA_REQUIRED")
     bound_scope = scope_bound_to_spec(spec, candidate_scope)
-    if _is_temporal_query(spec) and isinstance(operation_sha256, str) and operation_sha256:
+    if _is_temporal_query(spec):
+        if not isinstance(operation_sha256, str) or not operation_sha256.strip():
+            raise GroundedDiscoveryError("ORDINARY_OPERATION_REQUIRED")
+        if not isinstance(verified_market, str) or len(verified_market) != 64:
+            raise GroundedDiscoveryError("ORDINARY_OPERATION_MARKET_UNVERIFIED")
         from solana_alpha_lab.factory.hfic_ordinary_operation import (
             OrdinaryOperationError,
             gate_before_values,
-            get_operation,
         )
 
-        operation = get_operation(store, operation_sha256)
-        market = str(operation.get("market_evidence_epoch_sha256") or "")
-        verified_market = market if len(market) == 64 else None
         try:
-            gate = gate_before_values(
+            gate_before_values(
                 store,
                 operation_sha256=operation_sha256,
                 spec=spec,
@@ -1716,11 +1717,6 @@ def run_recorded_discovery_query(
             )
         except OrdinaryOperationError as exc:
             raise GroundedDiscoveryError(str(exc.code)) from exc
-        if gate.get("disposition") == "REPLAY":
-            evidence = dict(gate.get("evidence") or {})
-            evidence.setdefault("journal_scope", journal_scope)
-            evidence["operation_sha256"] = operation_sha256
-            return assert_computed_grounded_evidence(store, evidence)
     replayed = None
     if _is_temporal_query(spec):
         from solana_alpha_lab.factory.hfic_temporal_discovery import (

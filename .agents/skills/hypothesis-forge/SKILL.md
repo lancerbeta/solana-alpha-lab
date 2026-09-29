@@ -292,13 +292,17 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
 
    Then run the query. Omit `--binding`. On an authorized ordinary slash,
    pass the canonical data root as both `--data-root` and `--store`, because
-   freeze checks the look in that store. Do not pass a combined file when
-   cohort hashes differ. An exact repeated `--cohort-partition` is eliminated;
-   a second path for the same cohort stops. Copy the whole returned evidence
-   object onto the draft as `grounded_evidence`.
+   freeze checks the look in that store. Pass `--operation` with the explicit
+   owner request for this journal; temporal looks refuse missing/empty/foreign
+   operations before values. Do not pass a combined file when cohort hashes
+   differ. An exact repeated `--cohort-partition` is eliminated; a second path
+   for the same cohort stops. Copy the whole returned evidence object onto the
+   draft as `grounded_evidence`. After `persist-draft`, re-run
+   `preflight --discovery-contract` and freeze against that fresh receipt so a
+   saved candidate can continue without a new MAIN.
 
 ```text
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <canonical-data-root> --store <canonical-data-root> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <canonical-data-root> --store <canonical-data-root> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --operation <ordinary-operation.json> --format json
 ```
 
    Before persist/freeze, ordinary discovery may escalate inside the same

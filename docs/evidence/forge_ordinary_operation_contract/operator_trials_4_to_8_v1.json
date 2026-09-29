@@ -323,7 +323,27 @@
         "PREFLIGHT_RECEIPT_HASH_MISMATCH_FROM_TEXT_CAPTURE",
         "PREFLIGHT_STORE_DIGEST_MISMATCH",
         "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING"
-      ]
+      ],
+      "recovery_segment": {
+        "status": "MISSING_INPUT",
+        "required_existing_paths": [
+          "operator_trial_scratch/trial7/data",
+          "operator_trial_scratch/trial7/draft.json",
+          "operator_trial_scratch/trial7/operation.json",
+          "operator_trial_scratch/trial7/preflight_utf8.json"
+        ],
+        "required_identities": {
+          "focus": "trial7 saved candidate cap zero",
+          "session_id": "HFIC-SESS-A3F4EA73459752DC",
+          "draft_sha256": "61115212f3589c1c139539eda177cd985e4749431a300f3d1ea5843e7a0752c3",
+          "look_record_id": "HFIC-ART-DISCOVERY-358EFD8486365E9A85BD0F04F6438063B3E692C2"
+        },
+        "observed_at_recovery": {
+          "operator_trial_scratch_present": false,
+          "trial7_data_present": false
+        },
+        "note": "Original store bytes are absent from this worktree. Do not recreate under the same identities. Resume recovery only when the named paths are restored."
+      }
     },
     {
       "trial_index": 8,
