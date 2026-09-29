@@ -1686,6 +1686,7 @@ def run_recorded_discovery_query(
     priors: Sequence[Mapping[str, Any]] | None = None,
     git_sha: str,
     clock: datetime | None = None,
+    operation_sha256: str | None = None,
 ) -> dict[str, Any]:
     """Public production entry: compute, persist or resume, return evidence refs."""
 
@@ -1813,6 +1814,7 @@ def run_recorded_discovery_query(
             git_sha=git_sha,
             clock=clock,
             candidate_scope=bound_scope,
+            operation_sha256=operation_sha256,
         )
         confirming = dict(bound_scope)
         relation = "LOOK_SCOPE_MATCH"
@@ -1890,6 +1892,7 @@ def _append_discovery_look(
     git_sha: str,
     clock: datetime | None,
     candidate_scope: Mapping[str, Any] | None = None,
+    operation_sha256: str | None = None,
 ) -> None:
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
@@ -1917,6 +1920,8 @@ def _append_discovery_look(
             if _axis_text(value)
         },
     }
+    if isinstance(operation_sha256, str) and operation_sha256:
+        body["operation_sha256"] = operation_sha256
     if summary.get("search_tier"):
         body["search_tier"] = summary.get("search_tier")
     if summary.get("target_kind"):

@@ -445,7 +445,24 @@ def _cohort_partitions(directory: Path, census: list, observations: list):
     return argv, cohorts, files
 
 
+def _operation_file(store: Path, spec: Path, journal: str) -> Path:
+    payload = {
+        "owner_request_text": f"protocol ordinary execute {journal}",
+        "owner_focus": "ORDINARY-DISCOVERY-TEST",
+        "journal_scope": journal,
+        "market_evidence_epoch_sha256": "ab" * 32,
+        "spec": json.loads(spec.read_text(encoding="utf-8")),
+        "question_text": "protocol ordinary execute",
+        "owner_cap": {"main": None, "adaptive": None, "preview": None},
+        "requested_completion": "LIMITED_RESULT",
+    }
+    path = store.parent / f"operation-{journal[:8]}.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
 def _discovery_execute_published(store: Path, spec: Path, scope: Path, journal: str, extra: list[str]):
+    operation = _operation_file(store, spec, journal)
     return subprocess.run(
         [
             sys.executable,
@@ -465,6 +482,8 @@ def _discovery_execute_published(store: Path, spec: Path, scope: Path, journal: 
             str(scope),
             "--journal-scope",
             journal,
+            "--operation",
+            str(operation),
             "--format",
             "json",
         ],
@@ -478,6 +497,7 @@ def _discovery_execute_published(store: Path, spec: Path, scope: Path, journal: 
 
 
 def _discovery_execute(store: Path, binding: Path, spec: Path, scope: Path, journal: str, extra: list[str]):
+    operation = _operation_file(store, spec, journal)
     return subprocess.run(
         [
             sys.executable,
@@ -497,6 +517,8 @@ def _discovery_execute(store: Path, binding: Path, spec: Path, scope: Path, jour
             str(scope),
             "--journal-scope",
             journal,
+            "--operation",
+            str(operation),
             "--format",
             "json",
         ],

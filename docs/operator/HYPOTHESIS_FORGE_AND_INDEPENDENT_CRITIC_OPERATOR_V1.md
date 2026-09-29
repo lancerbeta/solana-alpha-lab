@@ -1548,7 +1548,15 @@ Bound schedule может задавать per-point `(due_offset, allowed_laten
 query scalar остаётся X300 envelope. `schedule.observation_clock_policy:
 PROVIDER_REPORTED_SNAPSHOT_V1` считает exit по request/response/availability,
 не по member anchor как market-event. Причины missing target —
-`target_exclusion_reasons` (pooled + by_cohort). После completed NO_WORTHY без selected candidate узкий owner-authorized repair
+`target_exclusion_reasons` (pooled + by_cohort). Обычная пауза одного вопроса — не repair и не `NO_WORTHY` всего поиска.
+`discovery-execute` требует `ORDINARY_OPERATION_V1`: явный текст запроса,
+journal, полный spec и owner cap. Cap не задан — действует остаток protocol
+в этом journal, не молчаливый cap=1. После cap=0 `forge-run --no-write`
+показывает `AUTHORIZE_ADDITIONAL_LOOKS`, тот же journal и сохранённый result.
+Новое разрешение — новая operation-запись на том же journal. Закрытый repair
+slot так не открывается. Expert repair остаётся в runbook ниже.
+
+После completed NO_WORTHY без selected candidate узкий owner-authorized repair
 continuation наследует потраченный look ledger. Owner path
 (`--data-root` — parent flag перед subcommand):
 `hypothesis_forge.py --data-root <store> repair-continuation-draft --parent-session-id <id> --owner-authorization-id <auth> --technical-gap-code <gap> --output <draft.json>`

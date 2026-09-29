@@ -730,6 +730,19 @@ def cmd_forge_run(
         )
     except LadderError as exc:
         payload = _ladder_error_payload(str(exc))
+        from solana_alpha_lab.factory.hfic_ordinary_operation import project_ordinary_operation
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        if resolved.status == "PRESENT" and resolved.root is not None:
+            projection = project_ordinary_operation(
+                ResearchStore(resolved.root, create_if_missing=False),
+                owner_focus=owner_focus if owner_focus.strip() else "AUTO",
+            )
+            if projection is not None:
+                payload["ordinary_operation"] = projection
+                if projection.get("status") == "PAUSED_CAP":
+                    payload["next_action"] = "AUTHORIZE_ADDITIONAL_LOOKS"
+                    payload["owner_final"] = "OPERATION_PAUSED_SEARCH_OPEN"
         payload["owner_readout"] = format_forge_run_owner_readout(payload)
         return _emit_run(payload, exit_code=2)
     payload = {**receipt, "no_write": not persist, "selection_reason": resolved.selection_reason}
@@ -770,6 +783,17 @@ def cmd_forge_run(
             store=store,
             execution_context=execution_context,
         )
+    from solana_alpha_lab.factory.hfic_ordinary_operation import project_ordinary_operation
+
+    projection = project_ordinary_operation(
+        store,
+        owner_focus=owner_focus if owner_focus.strip() else "AUTO",
+    )
+    if projection is not None and payload.get("owner_final") != "SEARCH_EXHAUSTED_CURRENT_EVIDENCE":
+        payload["ordinary_operation"] = projection
+        if projection.get("status") == "PAUSED_CAP":
+            payload["next_action"] = "AUTHORIZE_ADDITIONAL_LOOKS"
+            payload["owner_final"] = "OPERATION_PAUSED_SEARCH_OPEN"
     _assert_no_path_leak(payload, str(resolved.root), str(repo_root))
     return _emit_run(payload, exit_code=(
         0 if payload.get("owner_class") not in {"INPUT_NOT_READY", "OBSERVABILITY_BLOCKED"} else 2
@@ -819,6 +843,8 @@ def cmd_discovery_execute(
     candidate_scope_path: Path,
     cohort_partitions: list[tuple[str, Path, Path]] | None = None,
     explicit_data_root: Path | None = None,
+    operation_path: Path | None = None,
+    operation_sha256: str | None = None,
 ) -> int:
     """Compute one ordinary discovery query into a caller-selected store.
 
@@ -831,7 +857,6 @@ def cmd_discovery_execute(
         load_admitted_partition_rows,
         run_recorded_discovery_query,
     )
-    from solana_alpha_lab.factory.research_store import ResearchStore
 
     git_before = repository_git_snapshot(repo_root)
     try:
@@ -846,6 +871,43 @@ def cmd_discovery_execute(
         return emit_error("DISCOVERY_INPUT_INVALID")
     if binding_doc is not None and not isinstance(binding_doc, dict):
         return emit_error("DISCOVERY_INPUT_INVALID")
+    from solana_alpha_lab.factory.hfic_ordinary_operation import (
+        OrdinaryOperationError,
+        gate_before_values,
+        note_look_landed,
+        record_operation,
+    )
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    if operation_path is None and not operation_sha256:
+        return emit(
+            {"reason_code": "ORDINARY_OPERATION_REQUIRED", "values_loaded": False, "writes": False},
+            exit_code=2,
+        )
+    op_store = ResearchStore(store_root, create_if_missing=False)
+    try:
+        if operation_path is not None:
+            request = json.loads(operation_path.read_text(encoding="utf-8"))
+            if not isinstance(request, dict):
+                raise OrdinaryOperationError("ORDINARY_OPERATION_REQUEST_REQUIRED")
+            operation = record_operation(op_store, request)
+            operation_sha256 = str(operation.get("operation_sha256") or "")
+        gate = gate_before_values(
+            op_store,
+            operation_sha256=str(operation_sha256),
+            spec=spec,
+            journal_scope=journal_scope,
+        )
+    except OrdinaryOperationError as exc:
+        return emit(
+            {"reason_code": exc.code, "values_loaded": False, "writes": False, "scientific_negative": False},
+            exit_code=2,
+        )
+    if gate.get("disposition") == "REPLAY":
+        evidence = dict(gate.get("evidence") or {})
+        evidence["values_loaded"] = False
+        evidence["ordinary_operation"] = gate.get("operation", {}).get("operation_sha256")
+        return emit(evidence)
     data_root = explicit_data_root
     try:
         loaded = load_admitted_partition_rows(
@@ -874,6 +936,7 @@ def cmd_discovery_execute(
             candidate_scope=candidate_scope,
             priors=priors,
             git_sha=git_before.head_sha,
+            operation_sha256=str(operation_sha256) if operation_sha256 else None,
         )
     except GroundedDiscoveryError as exc:
         return emit_error(exc.code)
@@ -884,6 +947,9 @@ def cmd_discovery_execute(
     evidence["live_store_selected"] = False
     evidence["duplicate_partitions_eliminated"] = loaded["duplicate_partitions_eliminated"]
     evidence["authority_source"] = (loaded["binding"] or {}).get("authority_source")
+    evidence["values_loaded"] = True
+    if operation_sha256:
+        evidence["ordinary_operation"] = note_look_landed(op_store, str(operation_sha256)).get("status")
     _assert_no_path_leak(evidence, str(store_root), str(repo_root))
     if data_root is not None:
         _assert_no_path_leak(evidence, str(data_root))
@@ -2376,6 +2442,8 @@ def build_parser() -> argparse.ArgumentParser:
     discovery_execute.add_argument("--spec", type=Path, required=True)
     discovery_execute.add_argument("--candidate-scope", type=Path, required=True)
     discovery_execute.add_argument("--journal-scope", required=True)
+    discovery_execute.add_argument("--operation", type=Path, default=None)
+    discovery_execute.add_argument("--operation-sha256", default=None)
     discovery_preview = subparsers.add_parser(
         "discovery-preview",
         help="Feature-only temporal preview. Writes store memory only when --store and --journal-scope are both set. Does not read a target.",
@@ -2394,6 +2462,8 @@ def build_parser() -> argparse.ArgumentParser:
     discovery_preview.add_argument("--prior-preview-hash", action="append", default=None)
     discovery_preview.add_argument("--store", type=Path)
     discovery_preview.add_argument("--journal-scope")
+    discovery_preview.add_argument("--operation", type=Path, default=None)
+    discovery_preview.add_argument("--operation-sha256", default=None)
     discovery_preview.add_argument("--format", choices=("json",), default="json")
     discovery_execute.add_argument("--format", choices=("json",), default="json")
 
@@ -2755,6 +2825,8 @@ def main(argv: list[str] | None = None) -> int:
                     for item in (args.cohort_partition or [])
                 ],
                 explicit_data_root=args.data_root,
+                operation_path=args.operation,
+                operation_sha256=args.operation_sha256,
             )
         if args.command == "persist-draft":
             return cmd_persist_draft(

@@ -15,6 +15,18 @@ V1.2 adds deterministic feature grounding, typed unresolved requirements,
 diagnostics-only `structural_signature_v1_sha256` (not HFIC-CAND identity),
 and read-only `diagnostics --last N` (1..20).
 
+## Ordinary operation
+
+A short owner request is an `ORDINARY_OPERATION_V1` row in the ResearchStore,
+not a new journal and not a repair continuation. Read state with ordinary
+`forge-run --no-write` for that focus. `PAUSED_CAP` means the question was
+saved, the owner cap is spent, and the scientific search stays open: the next
+action is a new explicit authorization on the same journal. Do not emit
+`NO_WORTHY` or `WAIT_FOR_NEW_EVIDENCE` for that pause. A `STOPPED` operation
+or a real `CLOSED` repair slot is not reopened by a restart.
+`discovery-execute` and stored preview require that operation; omitting it
+does not bypass the cap. Coverage without values stays `discovery-coverage`.
+
 Canonical entrypoint: `scripts/hypothesis_forge.py`.
 No-write state-only coverage, never selecting `typed_value` and never reserving a slot:
 
