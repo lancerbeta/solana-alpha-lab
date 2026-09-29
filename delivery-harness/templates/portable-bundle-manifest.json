@@ -51,7 +51,7 @@
     {
       "source": "catalog/schemas/delivery_harness_context_receipt.schema.json",
       "destination": "catalog/schemas/delivery_harness_context_receipt.schema.json",
-      "sha256": "08524ddc202d47ef1654a193538305e29b6007c7f2cc02df692dfaa535a4bcb7"
+      "sha256": "0ffb927a503559ad4bcb8a6a32b4960bdb5a2e92104c1d2b10cbfa11e633a1ef"
     },
     {
       "source": "catalog/schemas/delivery_harness_capability_radar.schema.json",
@@ -61,7 +61,7 @@
     {
       "source": "catalog/schemas/delivery_harness_task_contract.schema.json",
       "destination": "catalog/schemas/delivery_harness_task_contract.schema.json",
-      "sha256": "a23e5233f8c3193495b3aa9a7719793408a6355d870d9ff9692612ebfab1a87f"
+      "sha256": "f00b15366c4d3d0807ad47022bc209f068eea851d791f8ecfd7ffa2ff41e6bd0"
     },
     {
       "source": "catalog/schemas/delivery_harness_completion_evidence.schema.json",
@@ -76,7 +76,7 @@
     {
       "source": "catalog/schemas/owner_attention_gate_v2.schema.json",
       "destination": "catalog/schemas/owner_attention_gate_v2.schema.json",
-      "sha256": "dd25d1e30b1e248f984506b0d594a20deb91fcc952ca55c43fb749bc16516425"
+      "sha256": "4ec86b80e7f0dae2597840acd6a192bff3b31bc0718e2a74e6dd0fc88f87f431"
     },
     {
       "source": "delivery-harness/templates/portable-core/control/owner_attention_gate_v2.yaml",
@@ -91,7 +91,7 @@
     {
       "source": "scripts/owner_attention_gate.py",
       "destination": "scripts/owner_attention_gate.py",
-      "sha256": "e5976193d7bb9ee7adb2063fb38955cf2f0a38bea28539854d571950cb74e1fe"
+      "sha256": "ca0a70b6e561d9bc855f6103fea6ab5f75b35bc699cce4567a3838eb6e8465e2"
     },
     {
       "source": "delivery-harness/templates/portable-core/AGENTS.md.tmpl",
