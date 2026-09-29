@@ -14,13 +14,13 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "352c7c0d15a65ca7c2ce82fc46de99af0c47cd805af9c5a1b43be0240c8b1020",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "047b74ea52a3b25d95fba42c733881f3d04881ff1b40ca06b28bd5a67e880e50",
-    "docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md": "297f88b873b2d6e4ee34aa7addb34e717b353ddcb6b3db454f0ef56da3ddb9c2",
+    "catalog/assets/core.yaml": "dfbef8852486d40d255db472c90cc4218016cd2a9a65f627e569e02711cce85a",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "26dc033244da164f3f6a761b6a75b32850d9836da5d9c8761c4f9564f1cf36a0",
+    "docs/operator/FORGE_TEMPORAL_OPERABILITY_REPAIR_RUNBOOK_V1.md": "d2f704b20d5b739ea6a98025eddabdfb11efb4f145b4528ff1589ec1f0bf9112",
     "docs/tasks/FORGE_REPAIR_CONTINUATION_COMPLETION_V1.md": "9672c11afde23b62800e83fc18ae01d88ce7d7d0f852c61750b181ce3ac41b0a",
     "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "006863f69db6eece96104c01fd75ddde3a5a28af470cba8d57a2bb8572f629b4",
-    "src/solana_alpha_lab/factory/hfic_session.py": "61bef43de2f444ff41deac02b4c0b360fad5da6a92f4f10697b49dd517ead1cc",
-    "tests/test_hfic_legacy_parent_continuation_compat_v1.py": "fd281a32aea51e9dae62b2c4a1d0b706874795ac6640da277250978d56d675bd"
+    "src/solana_alpha_lab/factory/hfic_session.py": "08b0965b7fbab354e0596c3c5a6fc45b28ad6874af81da9fb8bcba97932cc7b3",
+    "tests/test_hfic_legacy_parent_continuation_compat_v1.py": "6dcc0af246d94b71a4102eca6e193e799d9fb050efc2eae05cd8b92dbc1a8cb6"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -32,14 +32,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_repair_continuation_completion/a1_delivery_factory_fit_v1.json",
-    "sha256": "1c646987fd4585aaa0acdc78cb1a2542881170f9c5158b1d858aab1adba314a5",
+    "sha256": "2697dec2a73168e577315ccf2e681f5db6969ab4d53390d677341c557a292756",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LEGACY_PARENT_MODULE_CLI_FREEZE_READBACK",
     "independent_review": {
       "path": "docs/evidence/forge_repair_continuation_completion/a1_delivery_independent_review_v1.json",
-      "sha256": "2bc1c799ac5b08bdf42b73c4fd03f826b5e8ab1bd1aa8e4073e09416e25618e1",
+      "sha256": "d2cb89ef777ebc0c1ccc59637887e0857a2229c29024939d65725a2b349d7368",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

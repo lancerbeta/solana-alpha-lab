@@ -4,8 +4,8 @@
   "review_id": "FORGE-REPAIR-CONTINUATION-COMPLETION-FACTORY-FIT-001",
   "as_of": "2026-09-29",
   "task_id": "FORGE_REPAIR_CONTINUATION_COMPLETION_V1",
-  "reviewed_bindings_sha256": "23ecc25666e1892ac7dd9a6f48ea3801bc3a20dbc79f391f05708f5783ddb9f9",
-  "reviewed_inventory_sha256": "6c9ca2998d8beb2ee582417198d6b38efb46b8b66c78b8a2985297bc757dbaa7",
+  "reviewed_bindings_sha256": "ff1dc8616c2ec215791faf54b752c686870f7a55892a80855fabdaca92b8839b",
+  "reviewed_inventory_sha256": "69392bbd53ad1105d4db1a8e6faca6b071fd0784e4a774ed5f13175b0be422f1",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
