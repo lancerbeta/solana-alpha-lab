@@ -7,7 +7,7 @@ import hashlib
 import json
 import re
 import time
-from collections.abc import Mapping, Sequence
+from collections.abc import Collection, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -6268,6 +6268,52 @@ def _verify_runner_up_result_bind(
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
 
 
+def candidate_reference_gaps(
+    *,
+    claimed_ids: Sequence[Any],
+    durable_ids: Collection[str],
+    selected_candidate_id: Any = None,
+    runner_up_candidate_id: Any = None,
+) -> list[str]:
+    """Candidate references this session claims that do not durably resolve.
+
+    Answers "are the candidate artifacts this exact session claims to own
+    resolvable and internally consistent?", never "did it produce at least N
+    candidates?". Portfolio size is not a reference property: a legitimate
+    zero- or one-candidate session has no gaps. An absent selection or
+    runner-up is valid; a named one that does not resolve is a gap.
+    """
+
+    known = {str(item) for item in durable_ids if str(item)}
+    gaps: list[str] = []
+    for item in claimed_ids or ():
+        candidate_id = str(item or "")
+        if candidate_id and candidate_id not in known:
+            gaps.append(f"CANDIDATE:{candidate_id}")
+    for role, value in (
+        ("SELECTED", selected_candidate_id),
+        ("RUNNER_UP", runner_up_candidate_id),
+    ):
+        candidate_id = str(value or "")
+        if candidate_id and candidate_id not in known:
+            gaps.append(f"{role}:{candidate_id}")
+    return gaps
+
+
+def _bundle_candidate_reference_gaps(bundle: Mapping[str, Any]) -> list[str]:
+    durable = [
+        str(card.get("hypothesis_version_id") or "")
+        for card in (bundle.get("candidates") or [])
+        if isinstance(card, Mapping)
+    ]
+    return candidate_reference_gaps(
+        claimed_ids=list(bundle.get("candidate_ids") or []),
+        durable_ids=durable,
+        selected_candidate_id=bundle.get("selected_candidate_id"),
+        runner_up_candidate_id=bundle.get("runner_up_candidate_id"),
+    )
+
+
 def _verify_store_reference_resolution(
     store: Any,
     bundle: Mapping[str, Any],
@@ -6287,10 +6333,15 @@ def _verify_store_reference_resolution(
         elif kind == "DECISION_EVENT":
             decision_id = str(payload.get("decision_event_id") or record.entity_id)
             known_decisions.add(decision_id)
-    if len(known_hypothesis) >= len(candidate_ids):
-        for candidate_id in candidate_ids:
-            if candidate_id not in known_hypothesis:
-                raise HficSessionError("CANDIDATE_REFERENCE_UNRESOLVED")
+    # A missing durable candidate is exactly what this check is for, so the
+    # count of what was found never decides whether the claim is verified.
+    if candidate_reference_gaps(
+        claimed_ids=candidate_ids,
+        durable_ids=known_hypothesis,
+        selected_candidate_id=bundle.get("selected_candidate_id"),
+        runner_up_candidate_id=bundle.get("runner_up_candidate_id"),
+    ):
+        raise HficSessionError("CANDIDATE_REFERENCE_UNRESOLVED")
     for decision_id in bundle.get("decision_event_ids") or []:
         if str(decision_id) not in known_decisions:
             raise HficSessionError("DECISION_REFERENCE_UNRESOLVED")
@@ -8658,7 +8709,7 @@ def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[
                 )
             )
         ),
-        "candidates_retrievable": len(bundle.get("candidates") or []) >= 4,
+        "candidates_retrievable": not _bundle_candidate_reference_gaps(bundle),
     }
     journal = str(payload.get("journal_scope") or "")
     if re.fullmatch(r"[0-9a-f]{64}", journal) is not None:

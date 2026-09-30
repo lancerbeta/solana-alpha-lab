@@ -1,0 +1,74 @@
+{
+  "project_sources_disposition": {"kind": "NO_CHANGE"},
+  "schema": "smial.forge-trust-smoke-delta",
+  "schema_version": "1.0",
+  "task_id": "FORGE_CANDIDATE_COLD_LIFECYCLE_REPAIR_V1",
+  "status": "PASS",
+  "source_smoke": "FORGE_TRUST_SMOKE_V0 2026-09-30-v0",
+  "base": "860c98abd7f67105a32160de82813fbce3c61c7a",
+  "scope": "DELTA_ONLY_E1_E2_RELEVANT_F_G_AND_CLOSED_PAIR",
+  "live_store": {"mutated": false, "read": false},
+  "reproduced_before_patch_on_saved_smoke_stores": {
+    "P1_ORDINARY_KILL_COLD_READBACK": {
+      "store": "smoke e1_kill/rdp (byte copy)",
+      "session_id": "HFIC-SESS-161E807102CAA309",
+      "show_session": "SYNTHESIS_COMPLETE / KILL_MECHANISM",
+      "cold_forge_run_exit": 2,
+      "blocking_reason_codes": ["SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING"],
+      "projected_stage": {"reason_code": "SAVED_DRAFT_PRESENT", "session_state": "FROZEN_AWAITING_CRITIC"}
+    },
+    "P1_SINGLE_CANDIDATE_RUNTIME_PROOF": {
+      "store": "smoke g_saved_work/rdp (byte copy)",
+      "session_id": "HFIC-SESS-FF22C67EF8150F18",
+      "prove_runtime_exit": 1,
+      "reason": "SESSION_ARTIFACT_MISSING"
+    }
+  },
+  "after_patch": {
+    "P1_SINGLE_CANDIDATE_RUNTIME_PROOF": {
+      "store": "smoke g_saved_work/rdp (byte copy)",
+      "session_id": "HFIC-SESS-FF22C67EF8150F18",
+      "prove_runtime_exit": 0,
+      "proof_status": "PROVEN",
+      "candidates_retrievable": true,
+      "artifacts_retrievable": true,
+      "provider_calls_actual": 0,
+      "git_composite_unchanged": true,
+      "note": "prove-runtime does not pass through capability-epoch admission, so the frozen smoke store proves the fix directly"
+    },
+    "P1_ORDINARY_KILL_COLD_READBACK": {
+      "demonstrated_on": "EQUIVALENT_IN_CONTEXT_VERTICAL",
+      "regression": "tests.test_hfic_candidate_cold_lifecycle_v1.ColdLifecycleVerticalTests.test_a1_one_candidate_kill_is_found_cold",
+      "base_probe": {
+        "exit": 2,
+        "blocking_reason_codes": ["SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING"],
+        "projected_stage": {"reason_code": "SAVED_DRAFT_PRESENT", "session_state": "FROZEN_AWAITING_CRITIC"},
+        "note": "same vertical run against pristine 860c98ab in a detached worktree"
+      },
+      "branch_result": {"exit": 0, "stale_saved_draft_stage": false, "completed_session_selected": true},
+      "why_not_the_frozen_smoke_store": "the saved smoke store is bound to the pre-patch capability epoch; hfic_session.py and hfic_representation_ladder.py are part of the capability protocol surface, so any repair to them shifts that epoch and ordinary admission then answers SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING. Verified: the same store reads back as OWNER_CANDIDATE from a pristine 860c98ab worktree and as DIFFERENT_EXECUTION_BINDING from the patched branch, for the PASS store too. Pre-existing designed admission behavior, not introduced here."
+    }
+  },
+  "closed_pair": {
+    "scenario": "durable CLOSED slot, one unmocked CLI pair",
+    "regression": "tests.test_hfic_candidate_cold_lifecycle_v1.DurableClosedPairTests.test_closed_slot_replays_the_same_spec_and_refuses_a_distinct_one",
+    "exact_replay": {"exit": 0, "values_loaded": false, "writes": false, "same_result_refs": true},
+    "distinct_new_spec": {"exit": 2, "reason_code": "ORDINARY_OPERATION_SLOT_CLOSED", "values_loaded": false},
+    "previous_status": "NOT_PROVEN",
+    "new_status": "PASS"
+  },
+  "environment_clarification": {
+    "finding": "PREFLIGHT_RECEIPT_HASH_MISMATCH on two ordinary-operation tests was a console-encoding artifact, not a product defect",
+    "evidence": "the same two tests pass under PYTHONUTF8=1 at this head and failed only under a cp1251 console",
+    "affects": "the local-failure non-claim recorded in FORGE_TEMPORAL_RESULT_COHERENCE_REPAIR_V1 completion evidence"
+  },
+  "non_claims": [
+    "NO_LIVE_STORE_MUTATION",
+    "NO_NEW_SCIENTIFIC_LOOK",
+    "NO_PROVIDER_OR_DATA_CALL",
+    "SCRIPTED_CRITIC_MECHANICAL_IS_NOT_SCIENTIFIC_PASS",
+    "SYNTHETIC_CANDIDATE_ROUTING_IS_NOT_CANDIDATE_QUALITY",
+    "OFFLINE_SYNTHETIC_DOCUMENT_RUNNER_IS_ROUTING_VALIDATION_ONLY",
+    "NO_BROAD_SMOKE_RERUN"
+  ]
+}
