@@ -1,4 +1,7 @@
 {
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
   "schema": "smial.forge-copy-based-revision-acceptance",
   "schema_version": "1.0",
   "task_id": "FORGE_TEMPORAL_RESULT_COHERENCE_REPAIR_V1",
