@@ -703,6 +703,7 @@ def cmd_forge_run(
         return emit(payload, exit_code=exit_code)
 
     from solana_alpha_lab.factory.hfic_scientific_disposition import (
+        current_search_key,
         format_context_lines,
         safe_disposition_context,
     )
@@ -710,18 +711,21 @@ def cmd_forge_run(
 
     def _attach_scientific_context(payload: dict[str, Any], store: Any) -> dict[str, Any]:
         # Derived overlay: added after receipt_sha256, never part of a canonical receipt.
-        operation = payload.get("ordinary_operation")
+        # The current journal is the search key preflight would use now, not the
+        # journal of the most recently recorded operation.
+        focus = str(payload.get("owner_focus") or owner_focus or "AUTO")
         market = payload.get("market_evidence_epoch_sha256")
+        market = market if isinstance(market, str) and len(market) == 64 else None
+        try:
+            journal = current_search_key(store, market=market, owner_focus=focus)
+        except Exception:
+            journal = None
         payload["scientific_disposition_context"] = {
             **safe_disposition_context(
                 store,
-                owner_focus=str(payload.get("owner_focus") or owner_focus or "AUTO"),
-                current_market=market if isinstance(market, str) and len(market) == 64 else None,
-                journal_scope=(
-                    str(operation.get("journal_scope") or "") or None
-                    if isinstance(operation, Mapping)
-                    else None
-                ),
+                owner_focus=focus,
+                current_market=market,
+                journal_scope=journal,
                 forbidden_texts=(str(repo_root), str(resolved.root)),
             ),
             "receipt_hash_domain": "EXCLUDED_DERIVED_OVERLAY",
@@ -915,6 +919,7 @@ def cmd_disposition_record(
     from solana_alpha_lab.factory.hfic_scientific_disposition import (
         MODE_NEW,
         DispositionError,
+        current_search_key,
         preview_disposition,
         record_disposition,
     )
@@ -933,11 +938,20 @@ def cmd_disposition_record(
             },
             exit_code=2,
         )
+    subject = packet.get("subject") if isinstance(packet.get("subject"), dict) else {}
+    try:
+        journal = current_search_key(store, market=market, owner_focus=str(subject.get("owner_focus") or ""))
+    except Exception:
+        journal = None
     try:
         if preview:
-            payload = preview_disposition(store, packet, current_market=market, repo_root=repo_root)
+            payload = preview_disposition(
+                store, packet, current_market=market, current_journal=journal, repo_root=repo_root
+            )
         else:
-            payload = record_disposition(store, packet, current_market=market, repo_root=repo_root)
+            payload = record_disposition(
+                store, packet, current_market=market, current_journal=journal, repo_root=repo_root
+            )
     except DispositionError as exc:
         payload = {
             "refusal_code": exc.code,
@@ -946,6 +960,11 @@ def cmd_disposition_record(
             "writes": {"research_store": 0},
             "authority_granted": False,
         }
+        if exc.code in {"DISPOSITION_SUBJECT_HAS_HEAD", "DISPOSITION_STALE_PARENT"}:
+            payload["hint"] = (
+                "to correct the current head, resubmit with supersedes={record_id, disposition_sha256} "
+                "taken from detail (<record_id>:<disposition_sha256>)"
+            )
         _assert_no_path_leak(payload, str(data_root), str(repo_root))
         return emit(payload, exit_code=2)
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
@@ -969,9 +988,18 @@ def cmd_disposition_show(
         disposition_detail,
     )
 
+    if journal_scope is not None and not re.fullmatch(r"[0-9a-f]{64}", journal_scope):
+        return emit({"refusal_code": "DISPOSITION_JOURNAL_SCOPE_INVALID", "writes": {"research_store": 0}}, exit_code=2)
     data_root = _existing_data_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root, create_if_missing=False)
     market = _current_market(repo_root, data_root, store)
+    if journal_scope is None:
+        from solana_alpha_lab.factory.hfic_scientific_disposition import current_search_key
+
+        try:
+            journal_scope = current_search_key(store, market=market, owner_focus=owner_focus)
+        except Exception:
+            journal_scope = None
     try:
         payload = disposition_detail(
             store,
@@ -990,7 +1018,13 @@ def cmd_disposition_show(
     if market is None:
         payload["market_note"] = "market UNVERIFIED: no assessment is shown as current"
     payload["writes"] = {"research_store": 0}
-    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    try:
+        _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    except HficCliError:
+        return emit(
+            {"refusal_code": "DISPOSITION_DETAIL_PATH_LEAK", "writes": {"research_store": 0}},
+            exit_code=2,
+        )
     return emit(payload)
 
 

@@ -39,8 +39,10 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py dispositi
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py disposition-record --input <packet.json> --format json
 ```
 
-Use the global `--data-root <store>` when the store is not the default. A
-write changes the store inventory: take a fresh preflight afterwards, because
+Use the global `--data-root <store>` when the store is not the default. The
+current journal is computed the way preflight computes its search key (market
++ focus + prompt version + memory eligibility); `--journal-scope` only
+overrides it and must be 64 lowercase hex. A write changes the store inventory: take a fresh preflight afterwards, because
 a preflight receipt taken before the write no longer matches the store digest.
 
 ## Packet shapes
@@ -98,19 +100,24 @@ Withdrawal (no current advice afterwards; history kept):
 Historical import: `provenance.mode = "HISTORICAL_IMPORT"`, `source_sha256` of the source
 artifact (required; the writer records it and does **not** compare it with source bytes — that
 check is the operator's), `source_encoding`, `assessed_at` when verifiable. A bounded search
-import must declare the frontier it covered:
-`"journal_frontier": {"attempts": [{"attempt_ref", "evidence_ref", "result_sha256", "calculation_version"}]}`.
-Each attempt must resolve to a saved result. An import is not current because it was
-imported: if the store moved on, it reads `REVIEW_REQUIRED`.
+import must declare, **inside `basis`**, the frontier the historical author covered:
+`"basis": {..., "journal_frontier": {"attempts": [{"attempt_ref", "evidence_ref", "result_sha256", "calculation_version"}]}}`.
+`evidence_ref` is the saved result the author read; `attempt_ref` is the revision root of that
+result (the attempt's first look; equal to `evidence_ref` unless a calculation revision exists).
+Current values for every journal of the focus are in `disposition-show` → `journal_frontiers`;
+keep only the attempts the author actually covered. Each attempt must resolve exactly, otherwise
+`DISPOSITION_FRONTIER_UNRESOLVED`. `--preview` shows `would_be_applicability` before any write.
+An import is not current because it was imported: if the store moved on, it reads
+`REVIEW_REQUIRED`.
 
 ## Applicability (computed on read, never stored)
 
 | Status | Meaning | What to do |
 |---|---|---|
-| `CURRENT_FOR_BOUND_BASIS` | bound result/frontier unchanged, verified market, current journal | advice active (still only advice) |
-| `REVIEW_REQUIRED` | result revised, new attempt in the journal (`FRONTIER_CHANGED`), journal rotated (`JOURNAL_CHANGED`) or market unverified (`MARKET_UNVERIFIED`) | re-assess with a successor, or leave as history |
+| `CURRENT_FOR_BOUND_BASIS` | bound result unchanged on a verified market; for a search scope also the unchanged frontier of the verified current journal | advice active (still only advice) |
+| `REVIEW_REQUIRED` | result revised (`BASIS_RESULT_REVISED`), new attempt in the journal (`FRONTIER_CHANGED`), journal rotated (`JOURNAL_CHANGED`), current journal unknown (`JOURNAL_UNVERIFIED`, search scopes) or market unknown (`MARKET_UNVERIFIED`) | re-assess with a successor, or leave as history |
 | `HISTORICAL` | another market, or the bound result is not science-ready | history only |
-| `WITHDRAWN` | explicit withdrawal is the head | none; a new assessment may supersede it |
+| `WITHDRAWN` | explicit withdrawal is the head; the question is not listed again as `NOT_RECORDED` | none; a new assessment supersedes the withdrawal |
 | `CONFLICT` | more than one head (restored fork); never latest-wins | **STOP** for this subject; writes are refused; owner resolution |
 | `UNREADABLE` | a record of this subject is corrupt/unsupported, or its bound result is missing | **STOP** for this subject; writes are refused; owner resolution |
 | `NOT_RECORDED` | a saved calculation in this focus's journal with no assessment | write one with `disposition-record` |
@@ -121,6 +128,12 @@ decision outside this capability. Other subjects, numerical results,
 candidate paths and `next_action` are unaffected. An unscoped corrupt record
 is only counted. A reader failure or a host path found in stored text yields
 `scientific_disposition_context.status=UNAVAILABLE` with a typed reason.
+
+A journal rotation (memory policy or prompt version) degrades search-scope
+advice, whose basis is the journal frontier; it does not degrade a question
+assessment, whose basis is one saved result that has not changed.
+A record whose stored text carries a host path is read as `UNREADABLE`
+(`HOST_PATH_IN_STORED_TEXT`) and its text is never displayed.
 
 `NO_WORTHY_SIMPLE_NEXT` speaks for the considered SIMPLE scope only. A
 COMPOUND scope is another subject and stays untested unless named. Literal
@@ -138,5 +151,8 @@ overlay outside `receipt_sha256` and prints it as `scientific_context
 (at most 4 KiB, inside the unchanged 64 KiB Forge packet budget) to new
 `forge_context_packet` bytes only when the focus has assessment history,
 separate from `ranked_prior_candidate_ids`; under byte pressure it shrinks to
-counts and the detail query before any other section. Omitted entries are
-counted with the exact `disposition-show` query.
+counts and the detail query before any other section, and if the packet is
+still over budget it is dropped entirely (the truncation receipt records
+`disposition_subjects_omitted`). Omitted entries are counted with the exact
+`disposition-show` query. In the readout, advisory steps are labelled
+`advice_next:` so they are never read as the machine `next_action`.

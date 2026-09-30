@@ -971,10 +971,20 @@ class ReviewRegressionTests(_Base):
         self.assertEqual(by_ref[s1["record_id"]]["reasons"], ["JOURNAL_CHANGED"])
         # A question stays about its own bound result.
         self.assertEqual(by_ref[q1["record_id"]]["status"], disp.STATUS_CURRENT)
-        # Blocked forge-run without a market never shows advice as current.
-        with mock.patch.object(disp, "_View", wraps=disp._View):
-            capsule = disp.safe_disposition_context(store, owner_focus=FOCUS, current_market=None)
+        # The consumer wrapper without a market (the blocked forge-run path) shows no active advice.
+        capsule = disp.safe_disposition_context(store, owner_focus=FOCUS, current_market=None)
         self.assertFalse(any(item.get("recommendation_active") for item in capsule["entries"]))
+        # An unknown current journal never reads search advice as current; questions keep their basis.
+        no_journal = disp.disposition_context(store, owner_focus=FOCUS, current_market=ctx["market"])
+        by_ref = {item["ref"]: item for item in no_journal["entries"]}
+        self.assertEqual(by_ref[s1["record_id"]]["reasons"], ["JOURNAL_UNVERIFIED"])
+        self.assertEqual(by_ref[q1["record_id"]]["status"], disp.STATUS_CURRENT)
+        self.assertIn("current journal UNVERIFIED", "\n".join(disp.format_context_lines(no_journal)))
+        # The CLI computes the current journal like preflight; a bad override is refused.
+        self.assertEqual(disp.current_search_key(store, market=ctx["market"], owner_focus=FOCUS), ctx["journal"])
+        completed = run_cli("disposition-show", "--owner-focus", FOCUS, "--journal-scope", "nothex", "--format", "json", data_root=ctx["root"])
+        self.assertEqual(completed.returncode, 2)
+        self.assertEqual(json.loads(completed.stdout)["refusal_code"], "DISPOSITION_JOURNAL_SCOPE_INVALID")
 
     def test_host_paths_are_refused_and_never_break_readback(self) -> None:
         ctx = _ctx(self.workspace())
@@ -986,6 +996,10 @@ class ReviewRegressionTests(_Base):
             f"snapshot at {ctx['root']}",
             "SMIAL_DATA_ROOT snapshot",
             "notes at https://example.org/readout",
+            "see //server/share/x",
+            "ratio a\\b\\c",
+            "C:foo\\bar",
+            "noise \\sigma est",
         ):
             with self.subTest(text=text):
                 packet = question_packet(ctx, ctx["q1"])
@@ -994,7 +1008,10 @@ class ReviewRegressionTests(_Base):
                     disp.record_disposition(store, packet, current_market=ctx["market"])
                 self.assertEqual(caught.exception.code, "DISPOSITION_ABSOLUTE_PATH_FORBIDDEN")
         allowed = question_packet(ctx, ctx["q1"])
-        allowed["judgement"]["caveats"] = ["PASS/FAIL wording and the /hypothesis-forge slash kept literal"]
+        allowed["judgement"]["caveats"] = [
+            "PASS/FAIL wording and the /hypothesis-forge slash kept literal",
+            "input file: x.csv; units: /s/ rate",
+        ]
         self.assertEqual(disp.record_disposition(store, allowed, current_market=ctx["market"])["disposition"], "CREATED")
         # FAULT INJECTION: restored history that carries the real data-root path.
         leaky = disp.normalize_packet(question_packet(ctx, ctx["q2"]))
@@ -1002,13 +1019,43 @@ class ReviewRegressionTests(_Base):
         leaky["basis"]["operation_sha256"] = None
         leaky["basis"]["data_binding_sha256"] = ctx["q2"]["data_binding_sha256"]
         _inject_body(ctx["root"], leaky)
+        # FAIL-CLOSED on a second shape the writer would refuse, the CLI guard's UNC form.
+        unc = disp.normalize_packet(question_packet(ctx, ctx["q2"], text="another restored question"))
+        unc["subject"]["question_spec_sha256"] = "34" * 32
+        unc["subject_key"] = disp.subject_key(unc["subject"])
+        unc["judgement"]["caveats"] = ["see //server/share/x"]
+        unc["basis"]["operation_sha256"] = None
+        unc["basis"]["data_binding_sha256"] = ctx["q2"]["data_binding_sha256"]
+        _inject_body(ctx["root"], unc)
         run = _forge_run(ctx["root"])
         self.assertEqual(run["_exit"], 0, run["_stderr"][-400:])
-        self.assertEqual(run["scientific_disposition_context"]["status"], "UNAVAILABLE")
-        self.assertEqual(run["scientific_disposition_context"]["reason_code"], "DISPOSITION_CONTEXT_PATH_LEAK")
+        overlay = run["scientific_disposition_context"]
+        self.assertNotEqual(overlay.get("status"), "UNAVAILABLE")
+        unreadable = [item for item in overlay["entries"] if item["status"] == disp.STATUS_UNREADABLE]
+        self.assertEqual(len(unreadable), 2)
+        self.assertTrue(all(item["reasons"][0].startswith("HOST_PATH_IN_STORED_TEXT") for item in unreadable))
+        self.assertNotIn(str(ctx["root"]), json.dumps(run))
+        self.assertNotIn("//server", json.dumps(run))
         self.assertIn("ordinary_operation", run)
         packet = _preflight(ctx["root"])["forge_context_packet"]
-        self.assertEqual(packet["scientific_disposition_context"]["status"], "UNAVAILABLE")
+        self.assertNotIn("//server", json.dumps(packet))
+        shown = _show(ctx["root"])
+        self.assertNotIn("//server", json.dumps(shown))
+        # A caller-supplied forbidden text is also caught inside the boundary.
+        guarded = disp.safe_disposition_context(
+            store, owner_focus=FOCUS, current_market=ctx["market"], forbidden_texts=("WINDOW_SURVIVAL",)
+        )
+        self.assertEqual(guarded["reason_code"], "DISPOSITION_CONTEXT_PATH_LEAK")
+
+    def test_writer_guard_is_a_superset_of_the_cli_guard(self) -> None:
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location("hfic_forge_cli_guard", ROOT_DIR / "scripts" / "hypothesis_forge.py")
+        forge = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(forge)
+        self.assertEqual(forge._WINDOWS_PHYSICAL_PATH_RE.pattern, disp.CLI_PHYSICAL_PATH_RE.pattern)
+        self.assertEqual(forge._WINDOWS_PHYSICAL_PATH_RE.flags, disp.CLI_PHYSICAL_PATH_RE.flags)
 
     def test_capsule_shrinks_first_under_packet_budget(self) -> None:
         import contextlib
@@ -1051,6 +1098,15 @@ class ReviewRegressionTests(_Base):
         self.assertEqual(squeezed["semantic_capability_entries"], baseline["semantic_capability_entries"])
         self.assertEqual(squeezed["feature_grounding_entries"], baseline["feature_grounding_entries"])
         self.assertFalse(squeezed["truncation_receipt"].get("feature_grounding_truncated"))
+        # Inside the window the reduced capsule cannot fit either: advice goes first, entirely.
+        reduced_bytes = len(canonical_json_bytes(disp.compact_counts_only(capsule)))
+        tight = full - len(canonical_json_bytes(capsule)) + reduced_bytes // 2
+        with mock.patch.object(hfic_preflight, "forge_context_packet_max_bytes", return_value=tight):
+            dropped = preflight()
+        self.assertNotIn("scientific_disposition_context", dropped)
+        self.assertEqual(dropped["truncation_receipt"]["disposition_subjects_omitted"], capsule["total_subjects"])
+        self.assertEqual(dropped["semantic_capability_entries"], baseline["semantic_capability_entries"])
+        self.assertEqual(dropped["feature_grounding_entries"], baseline["feature_grounding_entries"])
 
     def test_packets_without_assessment_history_keep_their_shape(self) -> None:
         ctx = _ctx(self.workspace())
@@ -1089,9 +1145,12 @@ class ReviewRegressionTests(_Base):
             current_market=ctx["market"],
         )
         final = disp.disposition_context(store, owner_focus=FOCUS, current_market=ctx["market"])
-        self.assertEqual(sorted(item["result_ref"] for item in final["not_recorded"]), expected)
+        # The withdrawn question is shown once, as WITHDRAWN with how to re-assess.
+        self.assertEqual([item["result_ref"] for item in final["not_recorded"]], [ctx["q2"]["record_id"]])
+        self.assertEqual(final["status_counts"], {disp.STATUS_NOT_RECORDED: 1, disp.STATUS_WITHDRAWN: 1})
         lines = "\n".join(disp.format_context_lines(final))
         self.assertIn("withdrawn because: wrong question text", lines)
+        self.assertIn("advice_next: none required; a new assessment uses disposition-record with supersedes=", lines)
 
     def test_historical_import_paths(self) -> None:
         ctx = _ctx(self.workspace())
@@ -1131,15 +1190,26 @@ class ReviewRegressionTests(_Base):
             "attempts": [{"attempt_ref": ctx["q1"]["record_id"], "evidence_ref": ctx["q1"]["record_id"],
                           "result_sha256": ctx["q1"]["result_sha256"], "calculation_version": ctx["q1"]["calculation_version"]}]
         }
+        wrong_root = json.loads(json.dumps(older))
+        wrong_root["basis"]["journal_frontier"]["attempts"][0]["attempt_ref"] = "attempt-7605"
+        with self.assertRaises(disp.DispositionError) as caught:
+            disp.record_disposition(store, wrong_root, current_market=ctx["market"])
+        self.assertEqual(caught.exception.code, "DISPOSITION_FRONTIER_UNRESOLVED")
+        frontiers = _show(ctx["root"])["journal_frontiers"][ctx["journal"]]["attempts"]
+        self.assertIn(older["basis"]["journal_frontier"]["attempts"][0], frontiers)
         preview_code, preview = _cli_record(ctx["root"], older, "--preview")
         self.assertEqual(preview_code, 0, preview)
         self.assertTrue(preview["would_append"])
+        self.assertEqual(preview["would_be_applicability"], {"status": disp.STATUS_REVIEW, "reasons": ["FRONTIER_CHANGED", "NEW_ATTEMPTS:1"]})
         self.assertEqual(preview["writes"], {"research_store": 0})
         code, written = _cli_record(ctx["root"], older)
         self.assertEqual(code, 0, written)
         self.assertEqual(written["record_id"], preview["record_id"])
         entry = next(
-            item for item in disp.disposition_context(store, owner_focus=FOCUS, current_market=ctx["market"])["entries"]
+            item
+            for item in disp.disposition_context(
+                store, owner_focus=FOCUS, current_market=ctx["market"], journal_scope=ctx["journal"]
+            )["entries"]
             if item["ref"] == written["record_id"]
         )
         self.assertEqual(entry["status"], disp.STATUS_REVIEW)

@@ -2082,6 +2082,16 @@ def build_forge_context_packet(
             packet["scientific_disposition_context"]
         )
         encoded = canonical_json_bytes(packet)
+        if len(encoded) > packet_bound:
+            # Still over: drop the advice entirely before any other section and
+            # record only how many subjects were omitted.
+            dropped = packet.pop("scientific_disposition_context")
+            packet["truncation_receipt"] = {
+                **packet["truncation_receipt"],
+                "truncated": True,
+                "disposition_subjects_omitted": int(dropped.get("total_subjects") or 0),
+            }
+            encoded = canonical_json_bytes(packet)
     if len(encoded) > packet_bound:
         # Semantic navigation is lower priority than datasets / closed families / priors.
         packet["semantic_capability_entries"] = []

@@ -89,18 +89,53 @@ _PACKET_KEYS = frozenset(
     {"schema", "schema_version", "entry", "subject", "basis", "judgement", "withdrawal", "provenance", "supersedes"}
 )
 _HEX64 = re.compile(r"^[0-9a-f]{64}$")
-# Host-path shapes anywhere in stored text: a rooted POSIX path of two or more
-# segments after a boundary, a drive letter, a UNC prefix, a well-known home or
-# mount segment, or the data-root variable name. Stored advice must stay portable.
-_HOST_PATH = re.compile(
-    r"(?:^|[\s\"'(=,;<>\[\]{}])/[A-Za-z0-9._~+-]+/"
-    r"|(?<![A-Za-z0-9+.-])[A-Za-z]:[\\/]"
-    r"|\\\\"
-    r"|[\\/](?:Users|home|root|mnt|srv|tmp|var|opt|private)[\\/]"
-    r"|SMIAL_DATA_ROOT"
-    # The ResearchStore itself refuses URI forms; refuse them here with a typed code.
-    r"|://|(?:^|\s)file:"
+# Exact copy of the forge CLI physical-path guard (_WINDOWS_PHYSICAL_PATH_RE in
+# scripts/hypothesis_forge.py); a test keeps the two identical. Stored advice
+# must never trip the guard that protects every Forge readout.
+CLI_PHYSICAL_PATH_RE = re.compile(
+    r"""
+    (?:
+        (?<![A-Za-z0-9+.-])[A-Za-z]:(?:(?!//)[\\/]|[^\s\\/:]+\\)
+        | (?<!:)//[^/\\\s]+[\\/][^\\\s]+
+        | \\\\[^\\/]+[\\/][^\\/]+
+        | (?<!\\)\\[^\\/\s]+\\[^\\/\s]+
+    )
+    """,
+    re.VERBOSE,
 )
+# Further host-path shapes refused in stored text: any backslash, a rooted POSIX
+# path of two or more named segments, a well-known home/mount segment, URI
+# forms the ResearchStore itself refuses, and the data-root variable name.
+_HOST_PATH = re.compile(
+    r"\\"
+    r"|(?:^|[\s\"'(=,;<>\[\]{}])/[A-Za-z0-9._~+-]+/[A-Za-z0-9._~+-]"
+    r"|[/](?:Users|home|root|mnt|srv|tmp|var|opt|private)/"
+    r"|//"
+    r"|\bfile:/"
+    r"|SMIAL_DATA_ROOT"
+)
+
+
+def host_path_in(value: str) -> bool:
+    return bool(CLI_PHYSICAL_PATH_RE.search(value) or _HOST_PATH.search(value))
+
+
+def _string_leaves(value: Any) -> list[tuple[str, str]]:
+    found: list[tuple[str, str]] = []
+
+    def walk(item: Any, where: str) -> None:
+        if isinstance(item, str):
+            found.append((where, item))
+        elif isinstance(item, Mapping):
+            for key, child in item.items():
+                found.append((f"{where}.{key}:key", str(key)))
+                walk(child, f"{where}.{key}" if where else str(key))
+        elif isinstance(item, (list, tuple)):
+            for index, child in enumerate(item):
+                walk(child, f"{where}[{index}]")
+
+    walk(value, "")
+    return found
 
 
 class DispositionError(ValueError):
@@ -202,17 +237,9 @@ def _require_hex(value: Any, code: str) -> str:
 
 
 def _reject_absolute_paths(value: Any) -> None:
-    if isinstance(value, str):
-        if _HOST_PATH.search(value):
-            raise DispositionError("DISPOSITION_ABSOLUTE_PATH_FORBIDDEN")
-        return
-    if isinstance(value, Mapping):
-        for item in value.values():
-            _reject_absolute_paths(item)
-        return
-    if isinstance(value, (list, tuple)):
-        for item in value:
-            _reject_absolute_paths(item)
+    for where, text in _string_leaves(value):
+        if host_path_in(text):
+            raise DispositionError("DISPOSITION_ABSOLUTE_PATH_FORBIDDEN", detail=where.replace(":key", ""))
 
 
 def normalize_packet(packet: Mapping[str, Any]) -> dict[str, Any]:
@@ -303,7 +330,9 @@ def normalize_packet(packet: Mapping[str, Any]) -> dict[str, Any]:
             )
         if verdict == NO_WORTHY_SIMPLE_NEXT and (subject.get("search_scope") or {}).get("search_tier") != "SIMPLE_SCREEN":
             # A SIMPLE no-worthy-next never speaks for another tier.
-            raise DispositionError("DISPOSITION_SCOPE_TIER_MISMATCH")
+            raise DispositionError(
+                "DISPOSITION_SCOPE_TIER_MISMATCH", detail="NO_WORTHY_SIMPLE_NEXT requires search_tier=SIMPLE_SCREEN"
+            )
         body["judgement"] = judgement
         if packet.get("withdrawal") is not None:
             raise DispositionError("DISPOSITION_ENTRY_INVALID")
@@ -379,13 +408,15 @@ def _parse_disposition(record_id: str, body: Mapping[str, Any]) -> dict[str, Any
     subject = body.get("subject") if isinstance(body.get("subject"), Mapping) else {}
 
     def _bad(reason: str) -> dict[str, Any]:
+        focus = subject.get("owner_focus")
+        market = subject.get("market_evidence_epoch_sha256")
         return {
             "record_id": record_id,
             "readable": False,
             "reason": reason,
             "subject_key": scoped_key if scoped_key and _HEX64.fullmatch(scoped_key) else None,
-            "owner_focus": subject.get("owner_focus") if isinstance(subject.get("owner_focus"), str) else None,
-            "market": subject.get("market_evidence_epoch_sha256"),
+            "owner_focus": focus if isinstance(focus, str) and not host_path_in(focus) else None,
+            "market": market if isinstance(market, str) and _HEX64.fullmatch(market) else None,
         }
 
     if "__wrapper__" in body:
@@ -403,6 +434,9 @@ def _parse_disposition(record_id: str, body: Mapping[str, Any]) -> dict[str, Any
         return _bad("RECORD_ID_MISMATCH")
     if subject_key(clean["subject"]) != clean.get("subject_key"):
         return _bad("SUBJECT_KEY_MISMATCH")
+    if any(host_path_in(text) for _where, text in _string_leaves(clean)):
+        # Restored/foreign history carrying a host path: localized, never displayed.
+        return _bad("HOST_PATH_IN_STORED_TEXT")
     return {"record_id": record_id, "readable": True, "body": clean}
 
 
@@ -450,6 +484,18 @@ class _View:
             if key:
                 grouped.setdefault(str(key), []).append(item)
         return grouped
+
+
+def current_search_key(store: Any, *, market: str | None, owner_focus: str) -> str | None:
+    """The ordinary journal preflight would use now for this market and focus."""
+
+    if not market or not _HEX64.fullmatch(market) or owner_focus in {"", "AUTO"}:
+        return None
+    from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
+    from solana_alpha_lab.factory.hfic_session import PROMPT_VERSION, search_key_sha256
+
+    memory = str(effective_policy(store).get("memory_eligibility_sha256") or "")
+    return search_key_sha256(market, owner_focus, PROMPT_VERSION, memory or None, None)
 
 
 def journal_frontier(looks: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
@@ -592,15 +638,22 @@ def _validate_basis(view: _View, body: dict[str, Any], *, current_market: str | 
             basis["journal_frontier"] = current
         else:
             if not isinstance(declared, Mapping) or not isinstance(declared.get("attempts"), list):
-                raise DispositionError("DISPOSITION_IMPORT_FRONTIER_REQUIRED")
+                raise DispositionError(
+                    "DISPOSITION_IMPORT_FRONTIER_REQUIRED",
+                    detail="basis.journal_frontier.attempts; current values: disposition-show journal_frontiers",
+                )
             attempts = [dict(item) for item in declared["attempts"]]
+            from solana_alpha_lab.factory.hfic_temporal_discovery import look_revision_root
+
             for item in attempts:
                 look = view.find_look(journal, str(item.get("evidence_ref") or ""))
                 if (
                     look is None
                     or look.get("result_sha256") != item.get("result_sha256")
                     or look.get("calculation_version") != item.get("calculation_version")
+                    or look_revision_root(look) != item.get("attempt_ref")
                 ):
+                    # attempt_ref is the revision root of evidence_ref (the attempt's first look).
                     raise DispositionError("DISPOSITION_FRONTIER_UNRESOLVED", detail=str(item.get("evidence_ref")))
             basis["journal_frontier"] = {
                 "attempts": sorted(attempts, key=lambda row: str(row.get("attempt_ref"))),
@@ -660,6 +713,9 @@ def _applicability(
             return STATUS_UNREADABLE, [f"BASIS_RESULT_HASH_MISMATCH:{ref.get('result_ref')}"]
     if current_market and subject["market_evidence_epoch_sha256"] != current_market:
         return STATUS_HISTORICAL, ["MARKET_CHANGED"]
+    if not current_market:
+        # UNKNOWN market is never read as a current basis.
+        return STATUS_REVIEW, ["MARKET_UNVERIFIED"]
     if subject["subject_kind"] == QUESTION:
         ref = body["basis"]["result_refs"][0]
         look = view.find_look(journal, str(ref["result_ref"]))
@@ -669,7 +725,10 @@ def _applicability(
         if not _science_ready(look):
             return STATUS_HISTORICAL, [f"BASIS_NOT_SCIENCE_READY:{ref['result_ref']}"]
     else:
-        if current_journal and current_journal != journal:
+        if not current_journal:
+            # UNKNOWN current journal is never read as the judged one.
+            return STATUS_REVIEW, ["JOURNAL_UNVERIFIED"]
+        if current_journal != journal:
             # Same market, rotated search key (memory policy or prompt version):
             # the judged frontier is no longer the journal new attempts land in.
             return STATUS_REVIEW, ["JOURNAL_CHANGED"]
@@ -685,9 +744,6 @@ def _applicability(
             if new_attempts:
                 reasons.append(f"NEW_ATTEMPTS:{new_attempts}")
             return STATUS_REVIEW, reasons
-    if not current_market:
-        # UNKNOWN market is never read as a current basis.
-        return STATUS_REVIEW, ["MARKET_UNVERIFIED"]
     return STATUS_CURRENT, reasons
 
 
@@ -813,14 +869,14 @@ def resolve_focus(
         for entry in entries
         if entry.get("subject") and entry.get("scope_match") in in_scope
     }
-    # A question counts as assessed only in its own journal, in scope and not withdrawn.
+    # A question counts as having a subject only in its own journal and in scope.
+    # A withdrawn subject is shown as WITHDRAWN (with how to re-assess), not twice.
     assessed = {
         (str(entry["subject"]["journal_scope"]), str(entry["subject"].get("question_spec_sha256")))
         for entry in entries
         if entry.get("subject")
         and entry["subject"].get("subject_kind") == QUESTION
         and entry.get("scope_match") in in_scope
-        and entry.get("status") != STATUS_WITHDRAWN
     }
     not_recorded: list[dict[str, Any]] = []
     for journal in sorted(item for item in journals if item):
@@ -853,9 +909,21 @@ def resolve_focus(
             str(item.get("subject_key")),
         )
     )
+    assessed_tiers = sorted(
+        {
+            str((entry["subject"].get("search_scope") or {}).get("search_tier"))
+            for entry in entries
+            if entry.get("subject")
+            and entry["subject"].get("subject_kind") == BOUNDED_SEARCH
+            and entry.get("scope_match") in in_scope
+            and entry.get("status") not in {STATUS_WITHDRAWN}
+        }
+    )
     return {
         "owner_focus": owner_focus,
         "current_market_evidence_epoch_sha256": current_market,
+        "current_journal_scope": journal_scope,
+        "assessed_search_tiers": assessed_tiers,
         "journals": sorted(item for item in journals if item),
         "entries": entries,
         "not_recorded": not_recorded,
@@ -867,6 +935,7 @@ def _compact_entry(entry: Mapping[str, Any]) -> dict[str, Any]:
     subject = entry.get("subject") or {}
     compact: dict[str, Any] = {
         "ref": entry.get("head_ref"),
+        "ref_sha256": entry.get("head_disposition_sha256"),
         "subject_key": entry.get("subject_key"),
         "kind": subject.get("subject_kind"),
         "status": entry.get("status"),
@@ -949,6 +1018,8 @@ def disposition_context(
         "owner_focus": owner_focus,
         "focus_resolved": owner_focus not in {"", "AUTO"},
         "market_verified": bool(current_market),
+        "journal_verified": bool(journal_scope),
+        "assessed_search_tiers": resolved["assessed_search_tiers"],
         "advisory_only": True,
         "authority_granted": False,
         "machine_next_action_owner": "ORDINARY_RESOLVER",
@@ -1042,6 +1113,9 @@ def disposition_detail(
         "advisory_only": True,
         "authority_granted": False,
         "journals": resolved["journals"],
+        "current_journal_scope": journal_scope,
+        # Current frontier per journal: the values a bounded-search import declares.
+        "journal_frontiers": {journal: journal_frontier(view.looks(journal)) for journal in resolved["journals"]},
         "total_subjects": len(entries),
         "offset": offset,
         "limit": limit,
@@ -1137,11 +1211,16 @@ def _event(body: Mapping[str, Any], *, now: datetime) -> Any:
 
 
 def _result(
-    store: Any, body: Mapping[str, Any], disposition: str, *, current_market: str | None = None
+    store: Any,
+    body: Mapping[str, Any],
+    disposition: str,
+    *,
+    current_market: str | None = None,
+    current_journal: str | None = None,
 ) -> dict[str, Any]:
     view = _View(store)
     items = view.by_subject().get(str(body["subject_key"]), [])
-    resolved = resolve_subject(view, items, current_market=current_market)
+    resolved = resolve_subject(view, items, current_market=current_market, current_journal=current_journal)
     return {
         "schema": "smial.hfic-scientific-disposition-write",
         "schema_version": "1.0",
@@ -1181,6 +1260,7 @@ def preview_disposition(
     packet: Mapping[str, Any],
     *,
     current_market: str | None = None,
+    current_journal: str | None = None,
     repo_root: Path | None = None,
 ) -> dict[str, Any]:
     """Exact append plan without appending: record, lineage link and expected deltas."""
@@ -1192,11 +1272,20 @@ def preview_disposition(
         try:
             _check_lineage(store, body)
         except DispositionError as exc:
-            lineage_refusal = {"code": exc.code, "head_refs": exc.head_refs}
+            lineage_refusal = {"code": exc.code, "head_refs": exc.head_refs, "detail": exc.detail}
         except _AlreadyCommitted:
             existing = _existing(store, str(body["disposition_sha256"]))
+    would_be: dict[str, Any] = {"status": None, "reasons": []}
+    if body["entry"] == ASSESSMENT:
+        status, reasons = _applicability(
+            _View(store), body, current_market=current_market, current_journal=current_journal
+        )
+        would_be = {"status": status, "reasons": reasons}
+    elif body["entry"] == WITHDRAWAL:
+        would_be = {"status": STATUS_WITHDRAWN, "reasons": ["EXPLICIT_WITHDRAWAL"]}
     return {
         "schema": "smial.hfic-scientific-disposition-preview",
+        "would_be_applicability": would_be,
         "schema_version": "1.0",
         "would_append": existing is None and lineage_refusal is None,
         "replay_existing": existing is not None,
@@ -1222,6 +1311,7 @@ def record_disposition(
     repo_root: Path | None = None,
     now: datetime | None = None,
     before_append: Callable[[], None] | None = None,
+    current_journal: str | None = None,
 ) -> dict[str, Any]:
     """Append one assessment or withdrawal. An exact repeat returns the saved record.
 
@@ -1235,7 +1325,7 @@ def record_disposition(
     body = prepare_disposition(store, packet, current_market=current_market, repo_root=repo_root, now=moment)
     saved = _existing(store, str(body["disposition_sha256"]))
     if saved is not None:
-        return _result(store, saved, "REPLAY_EXISTING", current_market=current_market)
+        return _result(store, saved, "REPLAY_EXISTING", current_market=current_market, current_journal=current_journal)
     event = _event(body, now=moment)
 
     def _check() -> None:
@@ -1246,7 +1336,7 @@ def record_disposition(
     for attempt in range(40):
         try:
             store.append([event], transaction_id=event.transaction_id, before_commit=_check)
-            return _result(store, body, "CREATED", current_market=current_market)
+            return _result(store, body, "CREATED", current_market=current_market, current_journal=current_journal)
         except _AlreadyCommitted:
             break
         except ResearchStoreError as exc:
@@ -1258,7 +1348,7 @@ def record_disposition(
     saved = _existing(store, str(body["disposition_sha256"]))
     if saved is None:
         raise DispositionError("DISPOSITION_WRITE_NOT_VISIBLE")
-    return _result(store, saved, "REPLAY_EXISTING", current_market=current_market)
+    return _result(store, saved, "REPLAY_EXISTING", current_market=current_market, current_journal=current_journal)
 
 
 # ---------------------------------------------------------------------------
@@ -1275,7 +1365,8 @@ def format_context_lines(capsule: Mapping[str, Any] | None) -> list[str]:
         return [
             "scientific_context: UNAVAILABLE "
             f"({capsule.get('reason_code') or 'UNKNOWN'}) — recorded assessments could not be read; "
-            "numerical results and next_action are unaffected"
+            "numerical results and next_action are unaffected",
+            f"  detail: {capsule.get('detail_query')}",
         ]
     lines = ["scientific_context (advisory; not next_action, not authority):"]
     if capsule.get("focus_resolved") is False:
@@ -1285,14 +1376,19 @@ def format_context_lines(capsule: Mapping[str, Any] | None) -> list[str]:
         )
     if not capsule.get("market_verified"):
         lines.append("  market UNVERIFIED — no assessment is shown as current")
+    elif not capsule.get("journal_verified"):
+        lines.append("  current journal UNVERIFIED — no search-scope assessment is shown as current")
     entries = capsule.get("entries") or []
-    if not entries and not capsule.get("not_recorded") and capsule.get("focus_resolved") is not False:
+    if (
+        not capsule.get("total_subjects")
+        and not capsule.get("not_recorded")
+        and not capsule.get("not_recorded_omitted")
+        and capsule.get("focus_resolved") is not False
+    ):
         lines.append("  none recorded for this focus")
-    named_tiers = set()
     for entry in entries:
         scope = entry.get("scope") or {}
         if entry.get("kind") == BOUNDED_SEARCH:
-            named_tiers.add(str(scope.get("search_tier")))
             scope_text = f"tier={scope.get('search_tier')}"
         else:
             question = entry.get("question") or f"spec {str(scope.get('question_spec_sha256') or '')[:12]}"
@@ -1313,11 +1409,23 @@ def format_context_lines(capsule: Mapping[str, Any] | None) -> list[str]:
         if entry.get("withdrawal_reason"):
             lines.append(f"    withdrawn because: {entry['withdrawal_reason']}")
         status = entry.get("status")
+        supersede = f"supersedes={{record_id: {entry.get('ref')}, disposition_sha256: {entry.get('ref_sha256')}}}"
         if status in {STATUS_REVIEW, STATUS_HISTORICAL}:
-            lines.append("    next: re-assess on the current basis with disposition-record (successor), or leave as history")
-        elif status in {STATUS_CONFLICT, STATUS_UNREADABLE}:
             lines.append(
-                "    next: STOP for this subject — owner resolution needed; writes to it are refused "
+                f"    advice_next: re-assess on the current basis with disposition-record and {supersede}, "
+                "or leave as history"
+            )
+        elif status == STATUS_WITHDRAWN:
+            lines.append(f"    advice_next: none required; a new assessment uses disposition-record with {supersede}")
+        elif status == STATUS_CONFLICT:
+            lines.append("    heads: " + ", ".join(str(item) for item in entry.get("heads") or []))
+            lines.append(
+                "    advice_next: STOP for this subject — owner resolution needed; writes to it are refused "
+                "(see docs/contracts/hfic_scientific_disposition_continuity_v1.md)"
+            )
+        elif status == STATUS_UNREADABLE:
+            lines.append(
+                "    advice_next: STOP for this subject — owner resolution needed; writes to it are refused "
                 "(see docs/contracts/hfic_scientific_disposition_continuity_v1.md)"
             )
     for item in capsule.get("not_recorded") or []:
@@ -1335,7 +1443,7 @@ def format_context_lines(capsule: Mapping[str, Any] | None) -> list[str]:
             f"  unreadable records without a subject: {capsule['unreadable_unscoped_records']} (counted, not shown)"
         )
     lines.append(f"  detail: {capsule.get('detail_query')}")
-    untested = sorted({"SIMPLE_SCREEN", "COMPOUND_SCREEN"} - named_tiers)
+    untested = sorted({"SIMPLE_SCREEN", "COMPOUND_SCREEN"} - set(capsule.get("assessed_search_tiers") or []))
     lines.append(
         "  note: advice does not open, close or budget a look"
         + (f"; search tiers without a recorded assessment: {', '.join(untested)}" if untested else "")
@@ -1344,8 +1452,12 @@ def format_context_lines(capsule: Mapping[str, Any] | None) -> list[str]:
 
 
 def _leaks(capsule: Mapping[str, Any], forbidden_texts: Sequence[str]) -> bool:
-    text = _canonical(capsule)
-    return bool(_HOST_PATH.search(text)) or any(item and item in text for item in forbidden_texts)
+    # Raw string leaves, as the CLI guard walks them; never the JSON-escaped text.
+    needles = [item for item in forbidden_texts if item]
+    return any(
+        host_path_in(text) or any(needle in text for needle in needles)
+        for _where, text in _string_leaves(capsule)
+    )
 
 
 def safe_disposition_context(
