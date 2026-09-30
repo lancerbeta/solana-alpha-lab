@@ -1,0 +1,71 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-ACCEPTANCE-001",
+  "as_of": "2026-09-30",
+  "task_id": "FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1",
+  "state_change": "AUTHORED_ORDINARY_ASSESSMENTS_ARE_DURABLE_PORTABLE_STORE_ARTIFACTS_WITH_DERIVED_APPLICABILITY",
+  "base_main": "5f597efd4869297f149ce8718870e7cbfd81bf52",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_scientific_disposition_continuity/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_DISPOSITION_CONTINUITY_25_TESTS_AND_PROTECTED_NEIGHBOUR_SUITES",
+    "independent_review": {
+      "path": "docs/evidence/forge_scientific_disposition_continuity/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_V1_NORMAL_WRITER_COLD_FORGE_RUN_AND_PRE_VALUES_CAPSULE",
+      "PASS_V2_NO_SPEND_SEARCH_ASSESSMENT_WITHOUT_FAKE_OBJECTS",
+      "PASS_V3_REVISION_NEW_LOOK_MARKET_TIER_JOURNAL_DRIFT_DEGRADE",
+      "PASS_V3_SUCCESSOR_WITHDRAWAL_STALE_PARENT_FORK_CONFLICT",
+      "PASS_V3_CORRUPT_RELEVANT_UNRELATED_AND_HOST_PATH_RECORDS_LOCALIZED",
+      "PASS_V4_RELOCATED_ROOT_FRESH_PROCESS_SAME_SEMANTICS",
+      "PASS_V4_RETRY_LOST_RESPONSE_CRASH_CONCURRENT_WRITES",
+      "PASS_V4_BOUNDED_CAPSULE_OMITTED_COUNTS_AND_PACKET_PRIORITY",
+      "PASS_HISTORICAL_IMPORT_PREVIEW_AND_FRONTIER_CHECKS",
+      "PASS_SEMANTIC_NAVIGATION_OWNER_PHRASINGS_TO_READ_COMMAND",
+      "PASS_PROTECTED_NEIGHBOURS_ORDINARY_TEMPORAL_CANDIDATE_NEXT_ACTION_IDENTITY",
+      "NOT_PASS_FRESH_CONTEXT_ACCEPTANCE_NAVIGATION_GAP_FIXED_NOT_RERUN"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_MARKET_EXECUTION",
+    "NO_MERGE",
+    "NO_LIVE_STORE_MUTATION",
+    "NO_NEW_SCIENTIFIC_LOOK",
+    "NO_PROVIDER_OR_DATA_CALL",
+    "HISTORICAL_IMPORT_NOT_RUN_PRE_MERGE",
+    "WRITER_VERIFIES_REFS_NOT_SCIENTIFIC_TRUTH",
+    "SYNTHETIC_FIXTURE_VALUES_ARE_NOT_MARKET_ORACLES",
+    "FRESH_CONTEXT_ACCEPTANCE_NOT_PASS_INDEPENDENT_VERIFICATION_PENDING"
+  ],
+  "side_effects": {
+    "market_execution": "NOT_RUN",
+    "live_store_writes": 0
+  }
+}

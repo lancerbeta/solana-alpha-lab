@@ -1,0 +1,44 @@
+{
+  "schema": "smial.forge-fresh-context-acceptance",
+  "schema_version": "1.0",
+  "task_id": "FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1",
+  "as_of": "2026-09-30",
+  "attempt_count": 1,
+  "attempted_head": "f6be22473bf1bcfda5668609cdeecd1fcf0af728",
+  "launch": "ISOLATED_SUBAGENT_NEW_CONTEXT_SAME_CLIENT",
+  "model_diversity": "UNPROVEN",
+  "inputs_given": [
+    "AGENTS.md entry",
+    "branch and exact head",
+    "disposable portable store locator",
+    "owner focus",
+    "owner question"
+  ],
+  "inputs_withheld": [
+    "PRD",
+    "expected verdicts",
+    "assessment ids",
+    "sidecar paths",
+    "solution trace",
+    "next-step commands"
+  ],
+  "question": "Что уже заключили по этой работе, что осталось непроверенным и что разрешено делать дальше?",
+  "established": {
+    "question_assessments_scoped": true,
+    "no_worthy_simple_next_limited_to_simple_scope": true,
+    "advice_not_owner_authority_and_grants_no_spend": true,
+    "compound_and_other_scopes_untested": true,
+    "exact_refs_without_sidecar": true,
+    "technical_journal_state_separate": "STATED_FROM_CONTRACT_FORGE_RUN_NOT_EXECUTED"
+  },
+  "trace_summary": [
+    "AGENTS.md -> docs/FACTORY_SEMANTIC_MAP.md -> catalog_cli search-routes (English paraphrase missed SEM-PRIOR-WORK) -> resolve-route SEM-PRIOR-WORK",
+    "disposition-show located by grep over docs/configs/catalog/.agents, not by Catalog navigation",
+    "disposition-show --owner-focus <focus> --format json on the relocated store: 3 CURRENT subjects, writes 0, values_loaded false"
+  ],
+  "result": "NOT_PASS_NAVIGATION_GAP",
+  "defect": "Owner paraphrase did not resolve to SEM-PRIOR-WORK and the read command was reached by grep",
+  "defect_fixed_in_atom": "SEM-PRIOR-WORK owner questions and terms extended; navigation test walks search-routes -> resolve-route -> related-assets -> contract -> disposition-show for seven phrasings including this one",
+  "rerun": "NOT_RUN_BY_DESIGN_ONE_BOUNDED_ATTEMPT",
+  "independent_verification": "OWNER_PROMPT_IN_HANDBACK"
+}
