@@ -4,8 +4,8 @@
   "review_id": "FORGE-ORDINARY-OPERATION-CONTRACT-FACTORY-FIT-001",
   "as_of": "2026-09-30",
   "task_id": "FORGE_ORDINARY_OPERATION_CONTRACT_V1",
-  "reviewed_bindings_sha256": "1238cd6969fe7f3873773d31e0d8684535a066453a8c9531a66f58d7894ef5bf",
-  "reviewed_inventory_sha256": "c72b28f88904a7eac494dc22a279e0c056da12770253d4a53222c817c50e8abd",
+  "reviewed_bindings_sha256": "d05ac36417182fc5a311151782e1f69297c7d9acf3d84f9c9f1660239cb79b96",
+  "reviewed_inventory_sha256": "d06c35c8a2eba0fcac257103dad8699dfb4f85a183ab826aa2b1fc7a579836cc",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
