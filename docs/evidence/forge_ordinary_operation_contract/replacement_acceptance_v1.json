@@ -1,4 +1,5 @@
 {
+  "project_sources_disposition": {"kind": "NO_CHANGE"},
   "schema": "smial.replacement-acceptance",
   "schema_version": "1.0",
   "status": "BLOCKED_GIT_COMPOSITE_CHANGED",

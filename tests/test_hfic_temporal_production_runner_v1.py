@@ -364,7 +364,9 @@ class TemporalVerticalTests(unittest.TestCase):
             self.assertEqual(second.returncode, 0, second.stderr)
             third = preview(third_preview)
             self.assertNotEqual(third.returncode, 0)
-            self.assertIn("PREVIEW_ENVELOPE_EXHAUSTED", third.stderr)
+            third_body = json.loads(third.stdout)
+            self.assertEqual(third_body.get("reason_code"), "OWNER_CAP_EXHAUSTED")
+            self.assertFalse(third_body.get("values_loaded"))
             scope = {
                 "population": "BASE_X",
                 "decision_timestamp": "Y3600",
@@ -387,17 +389,25 @@ class TemporalVerticalTests(unittest.TestCase):
                 spec_body = json.loads(path.read_text(encoding="utf-8"))
                 execute._n = int(getattr(execute, "_n", 0)) + 1
                 op = path.with_suffix(".operation.json")
-                from solana_alpha_lab.factory.hfic_evidence_identity import (
-                    compute_market_epoch_for_data_root,
+                fresh_preflight = run_cli(
+                    "preflight",
+                    "--discovery-contract",
+                    "--owner-focus",
+                    "ORDINARY-TEMPORAL-VERTICAL",
+                    "--format",
+                    "json",
+                    data_root=data_root,
                 )
-
-                current_market, _basis = compute_market_epoch_for_data_root(ROOT, data_root)
+                self.assertEqual(fresh_preflight.returncode, 0, fresh_preflight.stderr)
+                fresh_receipt = json.loads(fresh_preflight.stdout)
+                current_journal = str(fresh_receipt["search_key_sha256"])
+                current_market = str(fresh_receipt["market_evidence_epoch_sha256"])
                 op.write_text(
                     json.dumps(
                         {
                             "owner_request_text": f"protocol vertical {spec_body.get('query_id')} {execute._n}",
                             "owner_focus": "ORDINARY-TEMPORAL-VERTICAL",
-                            "journal_scope": journal,
+                            "journal_scope": current_journal,
                             "market_evidence_epoch_sha256": current_market,
                             "spec": spec_body,
                             "question_text": str(spec_body.get("query_id")),
@@ -416,7 +426,7 @@ class TemporalVerticalTests(unittest.TestCase):
                     "--candidate-scope",
                     str(scope_path),
                     "--journal-scope",
-                    journal,
+                    current_journal,
                     "--operation",
                     str(op),
                     "--format",

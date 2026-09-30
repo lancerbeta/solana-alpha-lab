@@ -1035,7 +1035,7 @@ def cmd_discovery_execute(
                 binding_cohorts=cohorts,
                 verified_market=epoch,
                 repo_root=repo_root,
-                data_root=explicit_data_root or store_root,
+                data_root=store_root or explicit_data_root,
             )
         except OrdinaryOperationError as exc:
             return emit(
@@ -1277,7 +1277,7 @@ def cmd_discovery_preview(
                 verified_market=epoch,
                 look_kind="preview",
                 repo_root=repo_root,
-                data_root=explicit_data_root or store_root,
+                data_root=store_root or explicit_data_root,
             )
             if isinstance(preview_gate, dict) and preview_gate.get("disposition") == "REPLAY":
                 return emit(
