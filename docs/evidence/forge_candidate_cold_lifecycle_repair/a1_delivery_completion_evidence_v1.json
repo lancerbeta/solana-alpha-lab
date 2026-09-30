@@ -1,0 +1,74 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-CANDIDATE-COLD-LIFECYCLE-REPAIR-ACCEPTANCE-001",
+  "as_of": "2026-09-30",
+  "task_id": "FORGE_CANDIDATE_COLD_LIFECYCLE_REPAIR_V1",
+  "state_change": "A_COMPLETED_CANDIDATE_LIFECYCLE_IS_FOUND_COLD_AND_PROVED_BY_REFERENCE_NOT_BY_COUNT",
+  "base_main": "860c98abd7f67105a32160de82813fbce3c61c7a",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_candidate_cold_lifecycle_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_CANDIDATE_COLD_LIFECYCLE_AND_RELATED_SUITES",
+    "independent_review": {
+      "path": "docs/evidence/forge_candidate_cold_lifecycle_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_A1_ONE_CANDIDATE_KILL_FOUND_COLD_AND_PROVEN",
+      "PASS_A2_ONE_CANDIDATE_PASS_COLD_OWNER_CANDIDATE_AND_PROVEN",
+      "PASS_A3_ZERO_CANDIDATE_SHAPE_IS_NOT_MISSING_ARTIFACTS",
+      "PASS_A4_FOUR_CANDIDATE_PORTFOLIO_STILL_PROVES",
+      "PASS_A5_LISTED_SELECTED_RUNNER_UP_AND_VANISHED_CARD_FAIL_CLOSED",
+      "PASS_A6_IDENTITIES_STABLE_ACROSS_A_FRESH_PROCESS",
+      "PASS_A7_NO_LOOK_CANDIDATE_PROVIDER_OR_GIT_DELTA_ON_REPLAY_OR_PROOF",
+      "PASS_CARDLESS_STORE_IS_READABLE_BUT_UNPROVABLE",
+      "PASS_DURABLE_CLOSED_REPLAY_AND_DISTINCT_SPEC_REFUSAL",
+      "PASS_FRESH_OPERATOR_READ_BOTH_SAVED_SESSIONS_WITH_ZERO_ROUTE_HINTS"
+    ],
+    "serial_clean_run": "203 tests across 7 modules at the delivery head; one failure, tests.test_forge_representation_ladder_v1.RealNoWriteVerticalTests.test_canonical_control_auto_advance_does_not_write, which fails identically at base 860c98ab and is pre-existing"
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_MARKET_EXECUTION",
+    "NO_MERGE",
+    "NO_LIVE_STORE_MUTATION",
+    "NO_NEW_SCIENTIFIC_LOOK",
+    "NO_PROVIDER_OR_DATA_CALL",
+    "SCRIPTED_CRITIC_MECHANICAL_IS_NOT_SCIENTIFIC_PASS",
+    "OFFLINE_SYNTHETIC_DOCUMENT_RUNNER_IS_ROUTING_VALIDATION_ONLY",
+    "CANDIDATES_RETRIEVABLE_IS_NOT_A_PORTFOLIO_COMPLETENESS_PROOF",
+    "SCOPED_TO_KILL_MECHANISM_OTHER_KILL_TERMINALS_STILL_READ_BLOCKED",
+    "PREPARED_SMOKE_STORES_BECOME_EPOCH_STALE_AT_THE_MERGE_HEAD",
+    "FRESH_OPERATOR_CHECK_IS_A_NARRATIVE_REPORT_WITH_UNKNOWN_MODEL",
+    "PRE_EXISTING_AUTO_ADVANCE_FAILURE_NOT_ADDRESSED",
+    "SIDECAR_SCIENTIFIC_DISPOSITION_CONTINUITY_REMAINS_WATCH"
+  ],
+  "side_effects": {
+    "market_execution": "NOT_RUN",
+    "live_store_writes": 0
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-CANDIDATE-COLD-LIFECYCLE-REPAIR-REVIEW-001",
+  "as_of": "2026-09-30",
+  "task_id": "FORGE_CANDIDATE_COLD_LIFECYCLE_REPAIR_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Round 1 on 7de1195c: FAIL on two P0s. Making the store reference check unconditional hard-raised inside load_session_bundle for completed sessions whose store holds no HYPOTHESIS_VERSION card, and a genuine replay conflict was masked as CANDIDATE_REFERENCE_UNRESOLVED instead of SESSION_CONFLICT. Round 2 on 658c63a0: PASS, both closed, verified end-to-end on a cardless store: loads, shows candidates_retrievable false, prove_runtime refuses SESSION_ARTIFACT_MISSING. 68 and 56 tests OK serially. Open P2: partial card loss still raises at load rather than reporting false, a chosen shape mirroring the decision-reference check; the two gates derive the durable id set differently, skewed toward the stricter proof gate; candidate_ids falls back to durable ids for cycles with no recorded claim."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Round 1 on 7de1195c: FAIL on the same P0 plus a P1 that the interim fix fail-opened the headline one-candidate case, a P1 that A1 never ran prove-runtime, and a P1 that fresh-agent G was unrecorded. Round 2 on 658c63a0: PASS, all closed and verified independently, including prove-runtime on fresh copies of both smoke stores (g_saved_work PROVEN / PASS_FAST_LANE_READY, e1_kill PROVEN / KILL_MECHANISM). Open P2: the fresh-operator block is narrative with no archived receipts and UNKNOWN model, A4's four-candidate fixture is synthesized from the V1.2 draft, and the candidate_ids fallback leaves the listed-id check vacuous for cycles with no claim."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=0e04438215369a92a0613521dc8f39267ae0587b047e069dc28db8520b0fbf46 SEMANTIC_PREMISE. Round 1 (packet e5fe5bae) FAIL: deleting the count gate rejected a whole listing-only family. Round 2 PASS on all four owner questions: one predicate owns both gates and the count gate is replaced by an existence gate, strictly stronger than the old one; probed 1-of-4 card loss raising at load and 4-of-4 loss loading but unprovable. PASS conditioned on recording the residual limit in the bundle helper docstring, which is now recorded. Open WATCH: PROBE_PERMIT_TERMINALS remains a separate hand-maintained pair, and whether one killed mechanism should read as SEARCH_EXHAUSTED_CURRENT_EVIDENCE is an owner semantic question left to the existing resolver."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS in both rounds. The completed KILL reads as DONE with owner-final SEARCH_EXHAUSTED_CURRENT_EVIDENCE, no stale draft, no resume line and no rerun invitation, distinct from PASS, from a technical block and from a pause; prove-runtime reports PROVEN with candidates_retrievable true and zero provider calls. Open P2, recorded not fixed: no owner_note_ru arm for a completed scientific negative, and the pre-patch arm that did fire was actively wrong, so shipping with none is not a regression; blocked_by prints the terminal for both KILL and PASS; prove-runtime owner_readout names none of the proven facts; a session whose cards all vanished projects normally with no tell though the proof gate refuses."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "MODEL_DIVERSITY_UNPROVEN",
+    "NO_MERGE",
+    "NO_LIVE_STORE_MUTATION",
+    "NO_NEW_SCIENTIFIC_LOOK",
+    "SCRIPTED_CRITIC_MECHANICAL_IS_NOT_SCIENTIFIC_PASS"
+  ]
+}
