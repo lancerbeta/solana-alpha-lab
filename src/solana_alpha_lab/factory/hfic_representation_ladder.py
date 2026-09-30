@@ -2610,10 +2610,10 @@ def _discover_ladder_stages(
                 terminal in PASS_TERMINALS or terminal in CASE_A_TERMINALS
             ):
                 ordinary_pass.append(row)
-            elif isinstance(terminal, str) and terminal in {
-                "NO_WORTHY_HYPOTHESIS",
-                "KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED",
-            }:
+            elif isinstance(terminal, str) and terminal in KNOWN_SCIENTIFIC_NEGATIVES:
+                # One authoritative scientific-negative family owns this, so a
+                # completed KILL_MECHANISM is discoverable like NO_WORTHY and
+                # KILL_DUPLICATE instead of falling back to a stale draft.
                 ordinary_trigger.append(row)
         ordinary_pick = ordinary_pending or ordinary_pass or ordinary_trigger
         if ordinary_pick:

@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-CANDIDATE-COLD-LIFECYCLE-REPAIR-FACTORY-FIT-001",
+  "as_of": "2026-09-30",
+  "task_id": "FORGE_CANDIDATE_COLD_LIFECYCLE_REPAIR_V1",
+  "reviewed_bindings_sha256": "6fddf5aa5a9bb1f26f154cbffce8151a20f02ab161273fe575375a67ae424ae8",
+  "reviewed_inventory_sha256": "714f74b9767c04a0c9df3a1f16220661c6f9c62cf576e69a425138b1c6a87928",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_COMPLETED_CANDIDATE_LIFECYCLE_IS_READ_COLD_AND_PROVED_BY_REFERENCE",
+    "flexibility_and_history": "PASS_LISTING_ONLY_AND_HISTORICAL_PORTFOLIOS_STAY_LOADABLE",
+    "context_efficiency": "PASS_ONE_TERMINAL_FAMILY_AND_ONE_REFERENCE_OWNER_NO_NEW_REGISTRY",
+    "research_truth": "PASS_A_LOST_CARD_CANNOT_BE_PROVED_AND_A_KILL_IS_NOT_A_TECHNICAL_BLOCK",
+    "owner_operability": "PASS_COMPLETED_KILL_READS_AS_OWNER_FINAL_WITHOUT_A_STALE_DRAFT",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_MARKET_EXECUTION",
+    "monitoring_and_recovery": "PASS_READABLE_BUT_UNPROVABLE_IS_AN_EXPLICIT_STATE",
+    "build_vs_buy": "PASS_REUSES_KNOWN_SCIENTIFIC_NEGATIVES_AND_THE_EXISTING_REFERENCE_CHECK",
+    "red_team": "PASS_VANISHED_LISTED_SELECTED_AND_RUNNER_UP_REFERENCES_FAIL_CLOSED",
+    "security": "PASS_NO_PROVIDER_NO_LIVE_STORE_WRITE"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "OWNER_SEMANTICS_OF_KILL_MECHANISM_AS_SEARCH_EXHAUSTION"
+  },
+  "recovery": "Revert this change. No records are written or migrated by it; completed sessions written under either shape stay readable, and a revert only restores the retired count rule.",
+  "limits": [
+    "NO_LIVE_STORE_MUTATION",
+    "NO_NEW_SCIENTIFIC_LOOK",
+    "NO_PROVIDER_OR_DATA_CALL",
+    "SCRIPTED_CRITIC_MECHANICAL_IS_NOT_SCIENTIFIC_PASS",
+    "OFFLINE_SYNTHETIC_DOCUMENT_RUNNER_IS_ROUTING_VALIDATION_ONLY",
+    "CANDIDATES_RETRIEVABLE_IS_NOT_A_PORTFOLIO_COMPLETENESS_PROOF",
+    "SCOPED_TO_KILL_MECHANISM_OTHER_KILL_TERMINALS_STILL_READ_BLOCKED"
+  ]
+}
