@@ -545,6 +545,24 @@ class TierProgressFitnessTests(unittest.TestCase):
         self.assertFalse(open_search["compound_executed"])
         self.assertFalse(open_search["search_exhausted_allowed"])
 
+    def test_one_coherent_sibling_does_not_hide_an_unfit_look(self) -> None:
+        parts = [
+            _member_rows("m", COHORT, RELEASE, mark=MATCH, exit_price=1.2),
+            _member_rows("u", COHORT, RELEASE, mark=MISS, exit_price=3.0),
+        ]
+        census, observations = _rows(parts)
+        with old_writer():
+            old = execute_temporal_discovery(census, observations, _query(), [_bind(COHORT, RELEASE)])["summary"]
+        new = execute_temporal_discovery(census, observations, _query(), [_bind(COHORT, RELEASE)])["summary"]
+        wrong = self._look("L-OLD", old)
+        good_simple = self._look("L-SIMPLE", new)
+        good_compound = self._look("L-COMPOUND", new, search_tier="COMPOUND_SCREEN")
+        for looks, applicable in (([wrong, good_compound], True), ([wrong, good_simple], False)):
+            progress = assess_tier_progress(looks, freeze_worthy=False, compound_applicable=applicable)
+            self.assertEqual(progress["action"], "CORRECT_CALCULATION_REVISION")
+            self.assertFalse(progress["search_exhausted_allowed"])
+            self.assertTrue(progress["evidence_revision_required"])
+
 
 # --- published corpus through the production publisher and binder ---------------------------
 
@@ -1268,6 +1286,16 @@ class RevisionGateTests(unittest.TestCase):
             self.assertEqual(revised["queries"][0]["look_class"], "CALCULATION_REVISION")
             self.assertEqual(revised["budget"]["main_count"], 1)
             self.assertEqual(len(_reservations(ResearchStore(Path(raw)), op_sha)), 1)
+            # A repeat of the same correction reads the saved revision, no evaluator, no duplicate.
+            with mock.patch.object(temporal, "execute_temporal_discovery", side_effect=AssertionError("rerun")):
+                again = run_recorded_discovery_query(ResearchStore(Path(raw)), correction=correction, **kwargs)
+            self.assertEqual(again["result_refs"], revised["result_refs"])
+            self.assertEqual(again["revision_of"]["record_id"], correction["source_result_ref"])
+            self.assertEqual(len(list_discovery_looks(ResearchStore(Path(raw)), kwargs["journal_scope"])), 2)
+            wrong = {**correction, "source_result_sha256": "0" * 64}
+            with self.assertRaises(Exception) as garbage:
+                gate_before_values(ResearchStore(Path(raw)), correction=wrong, **gate_args)
+            self.assertEqual(getattr(garbage.exception, "code", None), "CALCULATION_REVISION_SOURCE_HASH_MISMATCH")
 
     def test_changed_clock_is_not_a_free_revision(self) -> None:
         parts = [

@@ -1581,6 +1581,8 @@ def temporal_result_coherence(summary: Mapping[str, Any]) -> dict[str, Any]:
             )
     return {
         "status": "INCOHERENT" if issues else "COHERENT",
+        # COHERENT means no stored view contradicts another; absent fields are not checked.
+        "basis": "STORED_FIELDS_ONLY",
         "issues": issues,
         "repair_action": "CALCULATION_REVISION" if issues else None,
     }
@@ -1860,10 +1862,9 @@ def assess_tier_progress(
     ]
     simple_ready = [item for item in simple if look_evidence_is_science_ready(item, looks)]
     compound_ready = [item for item in compound if look_evidence_is_science_ready(item, looks)]
-    revision_required = bool(
-        (simple and not simple_ready and not compound_ready)
-        or (compound and not compound_ready)
-    )
+    # Any spent look on unfit evidence is an unknown; one coherent sibling
+    # does not let the search close over it.
+    revision_required = len(simple_ready) < len(simple) or len(compound_ready) < len(compound)
     if revision_required:
         # A wrong saved summary justifies neither a terminal nor escalation.
         status = "TECHNICAL_BLOCKED"

@@ -1132,11 +1132,14 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
                 if isinstance(item, Mapping)
             }
         )
+        shown = ", ".join(fields[:4]) or "fields unknown"
+        if len(fields) > 4:
+            shown += f", +{len(fields) - 4} more"
         status = (
             f"NEXT — saved result {saved.get('result_ref') or 'UNKNOWN'} is internally inconsistent"
-            f" ({', '.join(fields[:4]) or 'fields unknown'}); run discovery-execute with"
-            " --correct-result-ref/--correct-result-sha256 for that result; no new look,"
-            " not a scientific result"
+            f" ({shown}); run discovery-execute with --correct-result-ref"
+            f" {saved.get('result_ref') or 'UNKNOWN'} --correct-result-sha256"
+            f" {saved.get('result_sha256') or 'UNKNOWN'}; no new look, not a scientific result"
         )
     elif owner_final == "OPERATION_PAUSED_SEARCH_OPEN" or next_action == "AUTHORIZE_ADDITIONAL_LOOKS":
         status = "NEXT — saved result stays; authorize another look on this journal, or stop"

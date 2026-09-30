@@ -1784,6 +1784,9 @@ def run_recorded_discovery_query(
             )
             if source_look.get("data_binding_sha256") != pre_binding_sha:
                 raise GroundedDiscoveryError("CALCULATION_REVISION_INPUT_MISMATCH")
+            if replayed is not None:
+                # Already applied: the verified request reads the saved revision.
+                source_look = None
         elif replayed is None:
             # Ordinary readback of a saved older version: exact bytes, no evaluator.
             historical = [

@@ -630,12 +630,19 @@ def gate_before_values(
     )
 
     stored = _operation_result(looks, operation_sha256, validated["spec_sha256"])
-    if (
-        stored is not None
-        and correction is not None
-        and stored.get("calculation_version") != TEMPORAL_CALCULATION_VERSION
-    ):
-        stored = None
+    if stored is not None and correction is not None:
+        # A correction request is checked even when its revision already exists.
+        try:
+            verify_calculation_revision_source(
+                looks,
+                correction=correction,
+                spec=spec,
+                operation_sha256=operation_sha256,
+            )
+        except GroundedDiscoveryError as exc:
+            raise OrdinaryOperationError(exc.code) from exc
+        if stored.get("calculation_version") != TEMPORAL_CALCULATION_VERSION:
+            stored = None
     if stored is not None:
         evidence: dict[str, Any] = {
             "replayed_without_evaluator": True,

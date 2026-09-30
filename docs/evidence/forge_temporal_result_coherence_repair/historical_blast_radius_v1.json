@@ -147,7 +147,7 @@
     "not_applicable_to_current_decision": [
       "V2 results HFIC-ART-DISCOVERY-…F46D3061FAEB and …45421E9FA536 pass the stored-field check.",
       "…B2741B49BD88 (V3, compound, journal 222a589d) has no session or frozen reference.",
-      "The current question uses only …A7EEA4A5CFCE; its pooled, calendar and baseline views were already right."
+      "The current question uses only …A7EEA4A5CFCE; this fix leaves its pooled, calendar and baseline views unchanged. That does not prove them right in every other respect."
     ],
     "owner_decision_required": [
       "Whether closed session HFIC-SESS-222A589D8A2731D8 (NO_WORTHY, repair 4a01bbb7…, #355) needs a separate review of its cohort evidence. It was not reopened and not recomputed here.",

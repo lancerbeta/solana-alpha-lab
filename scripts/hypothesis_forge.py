@@ -1146,6 +1146,7 @@ def cmd_discovery_execute(
     if isinstance(binding_doc, dict):
         priors = binding_doc.get("priors") or []
     counts_before = _look_counts(store, journal_scope) if temporal_query else None
+    inventory_before = store.diagnostics().committed_inventory_sha256 if temporal_query else None
     try:
         evidence = run_recorded_discovery_query(
             store,
@@ -1176,11 +1177,15 @@ def cmd_discovery_execute(
                 str(operation_sha256 or ""),
                 _validate(spec)["spec_sha256"],
             )
-            stop = _saved_result_stop(
-                exc.code,
-                result_readout(saved) if saved is not None else None,
-                values_loaded=True,
-            )
+            readout = result_readout(saved) if saved is not None else None
+            if readout is not None and readout.get("result_coherence") == "COHERENT":
+                # The stop is about this computation, not the saved result.
+                readout = None
+            stop = _saved_result_stop(exc.code, readout, values_loaded=True)
+            if exc.code == "TEMPORAL_RESULT_INCOHERENT" and readout is None:
+                stop.pop("repair_action", None)
+                stop.pop("next_action", None)
+            stop["writes"] = store.diagnostics().committed_inventory_sha256 != inventory_before
             _assert_no_path_leak(stop, str(store_root), str(repo_root))
             return emit(stop, exit_code=2)
         return emit_error(exc.code)
