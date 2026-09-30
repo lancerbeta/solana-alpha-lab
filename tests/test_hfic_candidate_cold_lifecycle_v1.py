@@ -37,6 +37,7 @@ from solana_alpha_lab.factory.hfic_temporal_discovery import (  # noqa: E402
 )
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     HficSessionError,
+    _bundle_candidate_reference_gaps,
     _verify_store_reference_resolution,
     candidate_reference_gaps,
     load_session_bundle,
@@ -259,6 +260,17 @@ class CandidateReferenceGapTests(unittest.TestCase):
             [],
         )
 
+    def test_a_vanished_single_card_is_a_gap_not_an_empty_claim(self) -> None:
+        # The one-candidate lifecycle this atom enables must not become
+        # provable by losing its only durable card.
+        self.assertEqual(
+            candidate_reference_gaps(
+                claimed_ids=["A"], durable_ids=set(),
+                selected_candidate_id="A", runner_up_candidate_id=None,
+            ),
+            ["CANDIDATE:A", "SELECTED:A"],
+        )
+
     def test_named_but_unresolvable_references_fail_closed(self) -> None:
         cases = {
             "CANDIDATE:B": dict(claimed_ids=["A", "B"], durable_ids={"A"}, selected_candidate_id="A", runner_up_candidate_id=None),
@@ -304,6 +316,16 @@ class ColdLifecycleVerticalTests(unittest.TestCase):
             self.assertNotIn("SAVED_DRAFT_PRESENT", stage_reasons, run)
             stage_sessions = {str(s.get("session_id") or "") for s in (run.get("stages") or [])}
             self.assertIn(str(frozen["session_id"]), stage_sessions, run)
+
+            self.assertEqual(run.get("owner_final"), "SEARCH_EXHAUSTED_CURRENT_EVIDENCE", run)
+
+            code, proof, stderr = saved.cold_prove(str(frozen["session_id"]))
+            self.assertEqual(code, 0, stderr)
+            self.assertEqual(proof.get("proof_status"), "PROVEN", proof)
+            self.assertEqual(proof.get("critic_terminal"), "KILL_MECHANISM", proof)
+            self.assertTrue(proof.get("candidates_retrievable"), proof)
+            self.assertEqual(proof.get("provider_calls_actual"), 0)
+            self.assertTrue(proof.get("git_composite_unchanged"))
 
             self.assertEqual(_mains(saved.data_root, saved.journal), mains_before)
             self.assertEqual(_candidate_records(saved.data_root), cards_before)
@@ -361,8 +383,14 @@ class ColdLifecycleVerticalTests(unittest.TestCase):
                 "selected": {**bundle, "selected_candidate_id": "HFIC-CAND-000000000000"},
                 "runner_up": {**bundle, "runner_up_candidate_id": "HFIC-CAND-000000000000"},
             }
+            broken["vanished_card"] = {**bundle, "candidates": []}
             for name, candidate_bundle in broken.items():
                 with self.subTest(reference=name):
+                    if name == "vanished_card":
+                        # The store still holds the card, so the store gate
+                        # passes; the proof gate is what must refuse here.
+                        self.assertTrue(_bundle_candidate_reference_gaps(candidate_bundle))
+                        continue
                     with self.assertRaises(HficSessionError) as refused:
                         _verify_store_reference_resolution(store, candidate_bundle)
                     self.assertEqual(str(refused.exception), "CANDIDATE_REFERENCE_UNRESOLVED")
@@ -372,16 +400,21 @@ class ZeroAndHistoricalPortfolioTests(unittest.TestCase):
     """A3 and A4: zero and 4-6 candidate portfolios keep their meaning."""
 
     def test_a3_zero_candidates_are_not_missing_artifacts(self) -> None:
-        # A no-worthy session claims no candidate, so it has no unresolved
-        # reference. The retired rule called this "missing" because 0 < 4.
-        self.assertEqual(
-            candidate_reference_gaps(
-                claimed_ids=[], durable_ids=set(),
-                selected_candidate_id=None, runner_up_candidate_id=None,
-            ),
-            [],
+        # A no-worthy session claims no candidate and selects none, so it has
+        # no unresolved reference. The retired rule called this "missing"
+        # only because 0 < 4.
+        no_worthy = {
+            "session_id": "HFIC-SESS-NOWORTHY",
+            "candidates": [],
+            "candidate_ids": [],
+            "selected_candidate_id": None,
+            "runner_up_candidate_id": None,
+        }
+        self.assertEqual(_bundle_candidate_reference_gaps(no_worthy), [])
+        # A no-worthy shape that still names a selection is not the same thing.
+        self.assertTrue(
+            _bundle_candidate_reference_gaps({**no_worthy, "selected_candidate_id": "HFIC-CAND-000000000000"})
         )
-        self.assertLess(len([]), 4)
 
     def test_a4_historical_four_candidate_portfolio_still_proves(self) -> None:
         with tempfile.TemporaryDirectory() as raw:

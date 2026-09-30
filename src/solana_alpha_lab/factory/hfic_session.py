@@ -6333,9 +6333,14 @@ def _verify_store_reference_resolution(
         elif kind == "DECISION_EVENT":
             decision_id = str(payload.get("decision_event_id") or record.entity_id)
             known_decisions.add(decision_id)
-    # A missing durable candidate is exactly what this check is for, so the
-    # count of what was found never decides whether the claim is verified.
-    if candidate_reference_gaps(
+    # Loading a bundle stays possible for a store that never persisted this
+    # session's cards, which is how legacy and control-surface sessions were
+    # written; refusing to load them would hide a readable lifecycle. Once
+    # the store carries any card, an incomplete claim fails closed, so the
+    # count of what was found never excuses a missing reference. Whether
+    # those artifacts are good enough to prove is the proof gate's question,
+    # and `candidates_retrievable` answers it without this tolerance.
+    if known_hypothesis and candidate_reference_gaps(
         claimed_ids=candidate_ids,
         durable_ids=known_hypothesis,
         selected_candidate_id=bundle.get("selected_candidate_id"),
