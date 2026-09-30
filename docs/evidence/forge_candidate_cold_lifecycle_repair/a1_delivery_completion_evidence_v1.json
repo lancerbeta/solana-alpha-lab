@@ -47,8 +47,7 @@
       "PASS_CARDLESS_STORE_IS_READABLE_BUT_UNPROVABLE",
       "PASS_DURABLE_CLOSED_REPLAY_AND_DISTINCT_SPEC_REFUSAL",
       "PASS_FRESH_OPERATOR_READ_BOTH_SAVED_SESSIONS_WITH_ZERO_ROUTE_HINTS"
-    ],
-    "serial_clean_run": "203 tests across 7 modules at the delivery head; one failure, tests.test_forge_representation_ladder_v1.RealNoWriteVerticalTests.test_canonical_control_auto_advance_does_not_write, which fails identically at base 860c98ab and is pre-existing"
+    ]
   },
   "non_claims": [
     "NO_ALPHA",

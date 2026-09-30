@@ -219,5 +219,6 @@
     "CODE_REVIEWER: the two gates derive the durable id set slightly differently; the skew favours the stricter proof gate.",
     "ARCHITECTURE: PROBE_PERMIT_TERMINALS remains a separate hand-maintained pair; unifying it would grant V1 probe permission.",
     "ARCHITECTURE: ordinary KILL_MECHANISM resolves to SEARCH_EXHAUSTED_CURRENT_EVIDENCE through the existing resolver; whether one killed mechanism should read as search exhaustion is an owner semantic question."
-  ]
+  ],
+  "serial_clean_run": "203 tests across 7 modules at the delivery head; one failure, tests.test_forge_representation_ladder_v1.RealNoWriteVerticalTests.test_canonical_control_auto_advance_does_not_write, which fails identically at base 860c98ab and is pre-existing"
 }
