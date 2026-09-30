@@ -17,7 +17,7 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Head f6e5acd0263653237b056068c990545b7f86844c. Exact stored REPLAY and pending RESUME precede ORDINARY_OPERATION_SLOT_CLOSED. A new spec on a closed NO_WORTHY slot still refuses. Isolated V1 and V2 freeze tests passed. WATCH items were not patched."
+        "Head f6e5acd0263653237b056068c990545b7f86844c keeps exact REPLAY and pending RESUME before ORDINARY_OPERATION_SLOT_CLOSED. Commit b65ec7cde0d55b5d07fc1bee1c6b91eef04dc1ec checks the journal on the store corpus, refreshes the vertical journal after republish, expects OWNER_CAP_EXHAUSTED for the third preview, and records NO_CHANGE source disposition. Stale completion bindings are rebound with this evidence commit. WATCH items were not patched."
       ]
     },
     {
