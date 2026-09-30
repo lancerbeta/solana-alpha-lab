@@ -18,6 +18,7 @@ from solana_alpha_lab.factory.hfic_grounded_discovery import (
     MAX_ADAPTIVE_REFINEMENTS,
     MAX_MAIN_QUERY_SPECS,
     POINT_OFFSET,
+    GroundedDiscoveryError,
     _canonical,
     list_discovery_looks,
 )
@@ -204,6 +205,56 @@ def _append(store: Any, *, kind: str, body: Mapping[str, Any], record_prefix: st
 
 def _looks(store: Any, journal: str) -> list[dict[str, Any]]:
     return list_discovery_looks(store, journal)
+
+
+def _operation_result(
+    looks: Sequence[Mapping[str, Any]],
+    operation_sha256: str,
+    spec_sha256: str | None = None,
+) -> Mapping[str, Any] | None:
+    """The result this operation reads: a current-version look, else the newest saved one.
+
+    The earliest stored row must not shadow a later calculation revision.
+    """
+
+    from solana_alpha_lab.factory.hfic_temporal_discovery import TEMPORAL_CALCULATION_VERSION
+
+    owned = [
+        item
+        for item in looks
+        if item.get("operation_sha256") == operation_sha256
+        and isinstance(item.get("result"), Mapping)
+        and (spec_sha256 is None or item.get("spec_sha256") == spec_sha256)
+    ]
+    current = [item for item in owned if item.get("calculation_version") == TEMPORAL_CALCULATION_VERSION]
+    if current:
+        return current[-1]
+    return owned[-1] if owned else None
+
+
+def result_readout(look: Mapping[str, Any]) -> dict[str, Any]:
+    """Version, lineage and coherence of one saved result. Reads no values."""
+
+    from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_result_coherence
+
+    result = look.get("result") if isinstance(look.get("result"), Mapping) else {}
+    coherence = temporal_result_coherence(result)
+    body: dict[str, Any] = {
+        "result_ref": look.get("record_id"),
+        "result_sha256": look.get("result_sha256"),
+        "calculation_version": look.get("calculation_version"),
+        "look_class": look.get("look_class"),
+        "new_look": look.get("new_look"),
+        "result_coherence": coherence["status"],
+        "science_ready": coherence["status"] == "COHERENT" and result.get("technical_failure") is not True,
+    }
+    if isinstance(look.get("revision_of"), Mapping):
+        body["revision_of"] = dict(look["revision_of"])
+    if coherence["status"] != "COHERENT":
+        body["incoherent_fields"] = coherence["issues"]
+        body["repair_action"] = coherence["repair_action"]
+        body["next_action"] = "CORRECT_CALCULATION_REVISION"
+    return body
 
 
 def binding_fingerprint(cohorts: Sequence[Mapping[str, Any]] | None) -> str | None:
@@ -528,8 +579,14 @@ def gate_before_values(
     verified_market: str | None = None,
     repo_root: Any = None,
     data_root: Any = None,
+    correction: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Metadata, admission and cap. Does not load outcome rows."""
+    """Metadata, admission and cap. Does not load outcome rows.
+
+    An explicit ``correction`` of this operation's saved result is a
+    CALCULATION_REVISION: no cap check and no reservation. The same spec
+    without it reads the saved result as it is.
+    """
 
     operation = get_operation(store, operation_sha256)
     if str(operation.get("journal_scope") or "") != journal_scope:
@@ -567,44 +624,77 @@ def gate_before_values(
     admission = _admit(store, operation)
     if admission.get("action") == "STOP":
         raise OrdinaryOperationError(str(admission.get("reason_code") or "SCIENTIFIC_ADMISSION_STOP"))
-    stored = next(
-        (
-            item
-            for item in looks
-            if item.get("spec_sha256") == validated["spec_sha256"]
-            and item.get("operation_sha256") == operation_sha256
-            and isinstance(item.get("result"), Mapping)
-        ),
-        None,
+    from solana_alpha_lab.factory.hfic_temporal_discovery import (
+        TEMPORAL_CALCULATION_VERSION,
+        verify_calculation_revision_source,
     )
+
+    stored = _operation_result(looks, operation_sha256, validated["spec_sha256"])
+    if (
+        stored is not None
+        and correction is not None
+        and stored.get("calculation_version") != TEMPORAL_CALCULATION_VERSION
+    ):
+        stored = None
     if stored is not None:
+        evidence: dict[str, Any] = {
+            "replayed_without_evaluator": True,
+            "calculation_version": stored.get("calculation_version"),
+            "result_sha256": stored.get("result_sha256"),
+            "result_refs": [stored.get("record_id")],
+            "result": stored.get("result"),
+            "journal_scope": journal_scope,
+            "spec_sha256": validated["spec_sha256"],
+            "data_binding_sha256": stored.get("data_binding_sha256"),
+            "new_look": False,
+            "writes": False,
+            "values_loaded": False,
+            "queries": [
+                {
+                    "query_id": (stored.get("result") or {}).get("query_id"),
+                    "spec_sha256": validated["spec_sha256"],
+                    "record_id": stored.get("record_id"),
+                    "look_class": "RETRY_SAME_BYTES",
+                    "new_look": False,
+                }
+            ],
+        }
+        if isinstance(stored.get("revision_of"), Mapping):
+            evidence["revision_of"] = dict(stored["revision_of"])
+        if correction is not None:
+            evidence["correction_already_applied"] = True
         return {
             "disposition": "REPLAY",
             "values_loaded": False,
             "writes": False,
             "operation": operation,
             "admission": admission,
-            "evidence": {
-                "replayed_without_evaluator": True,
-                "result_sha256": stored.get("result_sha256"),
-                "result_refs": [stored.get("record_id")],
-                "result": stored.get("result"),
-                "journal_scope": journal_scope,
-                "spec_sha256": validated["spec_sha256"],
-                "data_binding_sha256": stored.get("data_binding_sha256"),
-                "new_look": False,
-                "writes": False,
-                "values_loaded": False,
-                "queries": [
-                    {
-                        "query_id": (stored.get("result") or {}).get("query_id"),
-                        "spec_sha256": validated["spec_sha256"],
-                        "record_id": stored.get("record_id"),
-                        "look_class": "RETRY_SAME_BYTES",
-                        "new_look": False,
-                    }
-                ],
-            },
+            "result_readout": result_readout(stored),
+            "evidence": evidence,
+        }
+    if correction is not None:
+        try:
+            source = verify_calculation_revision_source(
+                looks,
+                correction=correction,
+                spec=spec,
+                operation_sha256=operation_sha256,
+            )
+        except GroundedDiscoveryError as exc:
+            raise OrdinaryOperationError(exc.code) from exc
+        if _closed_slot(admission, list_hfic_sessions(store)):
+            raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")
+        return {
+            "disposition": "CORRECTION",
+            "values_loaded": False,
+            "writes": False,
+            "operation": operation,
+            "admission": admission,
+            "spec_sha256": validated["spec_sha256"],
+            "look_class": "CALCULATION_REVISION",
+            "source_result_ref": source.get("record_id"),
+            "source_result_sha256": source.get("result_sha256"),
+            "source_calculation_version": source.get("calculation_version"),
         }
     pending = [
         item
@@ -629,6 +719,9 @@ def gate_before_values(
         code = getattr(exc, "code", None) or "QUERY_SPEC_INVALID"
         raise OrdinaryOperationError(str(code)) from exc
     look_class = str(classified.get("look_class") or "MAIN")
+    if look_class == "CALCULATION_REVISION":
+        # Never convert a revision into a spendable MAIN.
+        raise OrdinaryOperationError("CALCULATION_REVISION_REQUIRES_EXPLICIT_CORRECTION")
     if look_class not in {"MAIN", "ADAPTIVE"}:
         look_class = "ADAPTIVE" if validated.get("adaptation_of") else "MAIN"
     kind = "adaptive" if look_class == "ADAPTIVE" else "main"
@@ -773,16 +866,14 @@ def project_ordinary_operation(
     hold = None
     if reference in POINT_OFFSET and exit_point in POINT_OFFSET:
         hold = POINT_OFFSET[exit_point] - POINT_OFFSET[reference]
-    latest = next(
-        (
-            item
-            for item in reversed(looks)
-            if item.get("operation_sha256") == current.get("operation_sha256")
-            and isinstance(item.get("result"), Mapping)
-        ),
-        None,
-    )
-    if current.get("status") == "PAUSED_CAP":
+    latest = _operation_result(looks, str(current.get("operation_sha256") or ""))
+    readout = result_readout(latest) if latest is not None else None
+    if readout is not None and readout.get("result_coherence") != "COHERENT":
+        # A technical mismatch is repaired by a calculation revision, not by more looks.
+        next_action = "CORRECT_CALCULATION_REVISION"
+        next_needs_values = True
+        next_needs_authority = False
+    elif current.get("status") == "PAUSED_CAP":
         next_action = "AUTHORIZE_ADDITIONAL_LOOKS"
         next_needs_values = True
         next_needs_authority = True
@@ -810,6 +901,7 @@ def project_ordinary_operation(
         },
         "result_refs": [latest.get("record_id")] if latest else [],
         "result_sha256": latest.get("result_sha256") if latest else None,
+        "result": readout,
         "claim_boundary": "PRICE_RELATIVE_PROXY is not net return; cohorts are not independent replications",
         "protocol_main_remaining": _protocol_remaining(store, looks, "main", journal=journal),
         "protocol_main_used": sum(1 for item in looks if item.get("look_class") == "MAIN" and item.get("new_look") is True),
@@ -854,6 +946,9 @@ def merge_ordinary_readout(payload: dict[str, Any], projection: Mapping[str, Any
         proj["next_action"] = str(payload.get("next_action"))
         proj["next_needs_new_authority"] = False
         proj["search_open"] = False
+    elif proj.get("next_action") == "CORRECT_CALCULATION_REVISION":
+        payload["next_action"] = "CORRECT_CALCULATION_REVISION"
+        payload["owner_final"] = "SAVED_RESULT_NEEDS_CALCULATION_REVISION"
     elif proj.get("candidate_ready") and proj.get("owner_main_remaining") == 0:
         proj["next_action"] = "FORMAT_SAVED_CANDIDATE"
         proj["next_needs_new_authority"] = False

@@ -1512,7 +1512,8 @@ def assert_computed_grounded_evidence(
     journal_scope = str(bound.get("journal_scope") or "")
     if expected_journal_scope and journal_scope != expected_journal_scope:
         raise GroundedDiscoveryError("JOURNAL_SCOPE_MISMATCH")
-    looks = {item.get("record_id"): item for item in list_discovery_looks(store, journal_scope)}
+    journal_looks = list_discovery_looks(store, journal_scope)
+    looks = {item.get("record_id"): item for item in journal_looks}
     last = looks.get(str(refs[-1]))
     if not isinstance(last, Mapping):
         raise GroundedDiscoveryError("GROUNDED_RESULT_UNBOUND")
@@ -1523,6 +1524,17 @@ def assert_computed_grounded_evidence(
     for ref in refs:
         if str(ref) not in looks:
             raise GroundedDiscoveryError("GROUNDED_RESULT_UNBOUND")
+    if summary.get("schema") == "smial.hfic-temporal-query":
+        from solana_alpha_lab.factory.hfic_temporal_discovery import (
+            current_look_evidence,
+            require_coherent_temporal_result,
+        )
+
+        # Matching hashes prove the bytes, not that the views agree.
+        require_coherent_temporal_result(summary)
+        current = current_look_evidence(last, journal_looks)
+        if str(current.get("record_id") or "") != str(last.get("record_id") or ""):
+            raise GroundedDiscoveryError("GROUNDED_RESULT_SUPERSEDED")
     return bound
 
 
@@ -1595,6 +1607,17 @@ def format_discovery_readout(evidence: Mapping[str, Any]) -> dict[str, Any]:
         payload["technical_failure"] = result.get("technical_failure")
     if result.get("scientific_negative") is not None:
         payload["scientific_negative"] = result.get("scientific_negative")
+    if result.get("schema") == "smial.hfic-temporal-query":
+        from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_result_coherence
+
+        coherence = temporal_result_coherence(result)
+        payload["result_coherence"] = coherence["status"]
+        if coherence["status"] != "COHERENT":
+            payload["incoherent_fields"] = coherence["issues"]
+            payload["repair_action"] = coherence["repair_action"]
+            payload["science_ready"] = False
+    if isinstance(evidence.get("revision_of"), Mapping):
+        payload["revision_of"] = dict(evidence["revision_of"])
     return payload
 
 
@@ -1688,8 +1711,14 @@ def run_recorded_discovery_query(
     clock: datetime | None = None,
     operation_sha256: str | None = None,
     verified_market: str | None = None,
+    correction: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Public production entry: compute, persist or resume, return evidence refs."""
+    """Public production entry: compute, persist or resume, return evidence refs.
+
+    A saved older-version result is read as it is, without the evaluator.
+    Only an explicit ``correction`` bound to that source ref and hash writes
+    a CALCULATION_REVISION, on the same spec and frozen input.
+    """
 
     if not isinstance(journal_scope, str) or not journal_scope.strip():
         raise GroundedDiscoveryError("JOURNAL_SCOPE_REQUIRED")
@@ -1714,30 +1743,55 @@ def run_recorded_discovery_query(
                 journal_scope=journal_scope,
                 binding_cohorts=list(binding),
                 verified_market=verified_market,
+                correction=correction,
             )
         except OrdinaryOperationError as exc:
             raise GroundedDiscoveryError(str(exc.code)) from exc
+    elif correction is not None:
+        raise GroundedDiscoveryError("CALCULATION_REVISION_UNSUPPORTED")
     replayed = None
+    source_look: Mapping[str, Any] | None = None
     if _is_temporal_query(spec):
         from solana_alpha_lab.factory.hfic_temporal_discovery import (
             TEMPORAL_CALCULATION_VERSION,
+            TEMPORAL_CALCULATION_VERSIONS_READABLE,
             validate_temporal_query,
+            verify_calculation_revision_source,
         )
 
         prevalidated = validate_temporal_query(spec)
         admitted_meta = admit_discovery_binding(binding)
         pre_binding_sha = data_binding_sha256(admitted_meta, census, observations)
+        journal_looks = list_discovery_looks(store, journal_scope)
+        same_question = [
+            item
+            for item in journal_looks
+            if item.get("spec_sha256") == prevalidated["spec_sha256"]
+            and item.get("data_binding_sha256") == pre_binding_sha
+            and isinstance(item.get("result"), Mapping)
+        ]
         replayed = next(
-            (
-                item
-                for item in list_discovery_looks(store, journal_scope)
-                if item.get("spec_sha256") == prevalidated["spec_sha256"]
-                and item.get("data_binding_sha256") == pre_binding_sha
-                and item.get("calculation_version") == TEMPORAL_CALCULATION_VERSION
-                and isinstance(item.get("result"), Mapping)
-            ),
+            (item for item in same_question if item.get("calculation_version") == TEMPORAL_CALCULATION_VERSION),
             None,
         )
+        if correction is not None:
+            source_look = verify_calculation_revision_source(
+                journal_looks,
+                correction=correction,
+                spec=spec,
+                binding=list(binding),
+                operation_sha256=operation_sha256,
+            )
+            if source_look.get("data_binding_sha256") != pre_binding_sha:
+                raise GroundedDiscoveryError("CALCULATION_REVISION_INPUT_MISMATCH")
+        elif replayed is None:
+            # Ordinary readback of a saved older version: exact bytes, no evaluator.
+            historical = [
+                item
+                for item in same_question
+                if item.get("calculation_version") in TEMPORAL_CALCULATION_VERSIONS_READABLE
+            ]
+            replayed = historical[-1] if historical else None
     if replayed is None:
         if _is_temporal_query(spec):
             from solana_alpha_lab.factory.hfic_temporal_discovery import classify_temporal_look
@@ -1752,6 +1806,15 @@ def run_recorded_discovery_query(
                 git_sha=git_sha,
             )
         computed = execute_discovery_from_rows(census, observations, spec, binding)
+        if source_look is not None:
+            recipe = computed["summary"].get("experiment_recipe") or {}
+            stored_recipe = source_look["result"].get("experiment_recipe") or {}
+            if (
+                recipe.get("spec") != stored_recipe.get("spec")
+                or recipe.get("frozen_input") != stored_recipe.get("frozen_input")
+                or recipe.get("scientific_identity") != stored_recipe.get("scientific_identity")
+            ):
+                raise GroundedDiscoveryError("CALCULATION_REVISION_INPUT_MISMATCH")
     else:
         computed = {
             "admitted": admit_discovery_binding(binding),
@@ -1794,6 +1857,23 @@ def run_recorded_discovery_query(
         else:
             budget_history.append(item)
     look = classify_query_look(budget_history, spec)
+    revision_of: dict[str, Any] | None = None
+    if source_look is not None:
+        from solana_alpha_lab.factory.hfic_temporal_discovery import (
+            calculation_revision_reason,
+            look_revision_root,
+        )
+
+        if look.get("new_look") is not False or look.get("look_class") != "CALCULATION_REVISION":
+            raise GroundedDiscoveryError("CALCULATION_REVISION_NOT_A_REVISION")
+        revision_of = {
+            "record_id": str(source_look.get("record_id") or ""),
+            "root_record_id": look_revision_root(source_look),
+            "result_sha256": source_look.get("result_sha256"),
+            "calculation_version": source_look.get("calculation_version"),
+            "data_binding_sha256": source_look.get("data_binding_sha256"),
+            "reason": calculation_revision_reason(source_look["result"]),
+        }
     if existing is not None:
         record_id = str(existing.get("record_id") or "")
         budget = {
@@ -1821,6 +1901,13 @@ def run_recorded_discovery_query(
     else:
         record_id = f"HFIC-ART-DISCOVERY-{identity[:40].upper()}"
         budget = look
+        if source_look is not None:
+            # A revision answers the saved question; its claim scope is the source's.
+            bound_scope = {
+                key: value
+                for key, value in dict(source_look.get("candidate_scope") or {}).items()
+                if _axis_text(value)
+            }
         _append_discovery_look(
             store,
             record_id=record_id,
@@ -1837,9 +1924,14 @@ def run_recorded_discovery_query(
             clock=clock,
             candidate_scope=bound_scope,
             operation_sha256=operation_sha256,
+            revision_of=revision_of,
         )
         confirming = dict(bound_scope)
-        relation = "LOOK_SCOPE_MATCH"
+        relation = (
+            "LOOK_SCOPE_MATCH"
+            if source_look is None
+            else relate_look_scope(bound_scope, candidate_scope)
+        )
     evidence = {
         "contract_version": DISCOVERY_CONTRACT_VERSION,
         "calculation_version": calc_version,
@@ -1883,6 +1975,9 @@ def run_recorded_discovery_query(
             list_discovery_looks(store, journal_scope),
             freeze_worthy=False,
         )
+    lineage = existing.get("revision_of") if existing is not None else revision_of
+    if isinstance(lineage, Mapping):
+        evidence["revision_of"] = dict(lineage)
     if existing is not None:
         evidence["requested_candidate_scope"] = dict(candidate_scope)
     return assert_computed_grounded_evidence(store, evidence)
@@ -1915,6 +2010,7 @@ def _append_discovery_look(
     clock: datetime | None,
     candidate_scope: Mapping[str, Any] | None = None,
     operation_sha256: str | None = None,
+    revision_of: Mapping[str, Any] | None = None,
 ) -> None:
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
@@ -1944,6 +2040,8 @@ def _append_discovery_look(
     }
     if isinstance(operation_sha256, str) and operation_sha256:
         body["operation_sha256"] = operation_sha256
+    if isinstance(revision_of, Mapping):
+        body["revision_of"] = dict(revision_of)
     if summary.get("search_tier"):
         body["search_tier"] = summary.get("search_tier")
     if summary.get("target_kind"):

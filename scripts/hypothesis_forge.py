@@ -150,8 +150,50 @@ _TECHNICAL_STOPS = frozenset(
         "PREVIEW_ENVELOPE_EXHAUSTED",
         "PREVIEW_STORE_SCOPE_REQUIRED",
         "DATA_ROOT_REQUIRED",
+        "TEMPORAL_RESULT_INCOHERENT",
+        "CALCULATION_REVISION_INPUT_MISMATCH",
     }
 )
+
+
+def _look_counts(store: Any, journal_scope: str) -> dict[str, int]:
+    from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks
+
+    looks = list_discovery_looks(store, journal_scope)
+    return {
+        "records": len(looks),
+        "main": sum(1 for item in looks if item.get("look_class") == "MAIN" and item.get("new_look") is True),
+        "adaptive": sum(
+            1 for item in looks if item.get("look_class") == "ADAPTIVE" and item.get("new_look") is True
+        ),
+    }
+
+
+def _saved_result_stop(
+    code: str,
+    readout: Mapping[str, Any] | None,
+    *,
+    values_loaded: bool,
+) -> dict[str, Any]:
+    """Technical stop on a saved result. Names the ref, fields and repair; not more looks."""
+
+    body: dict[str, Any] = {
+        "reason_code": code,
+        "terminal": "TECHNICAL_STOP",
+        "technical_failure": True,
+        "scientific_negative": False,
+        "values_loaded": values_loaded,
+        "writes": False,
+    }
+    if isinstance(readout, Mapping):
+        body["result_refs"] = [readout.get("result_ref")]
+        body["result_sha256"] = readout.get("result_sha256")
+        body["calculation_version"] = readout.get("calculation_version")
+        body["incoherent_fields"] = list(readout.get("incoherent_fields") or [])
+    if code == "TEMPORAL_RESULT_INCOHERENT":
+        body["repair_action"] = "CALCULATION_REVISION"
+        body["next_action"] = "CORRECT_CALCULATION_REVISION"
+    return body
 
 
 def emit_error(code: str, *, exit_code: int = 1) -> int:
@@ -859,15 +901,20 @@ def cmd_discovery_execute(
     explicit_data_root: Path | None = None,
     operation_path: Path | None = None,
     operation_sha256: str | None = None,
+    correct_result_ref: str | None = None,
+    correct_result_sha256: str | None = None,
 ) -> int:
     """Compute one ordinary discovery query into a caller-selected store.
 
     Does not default to the live ResearchStore and does not reserve a slot.
     Omitting ``--binding`` resolves the published corpus at ``--data-root``.
+    ``--correct-result-ref`` with ``--correct-result-sha256`` writes one
+    CALCULATION_REVISION of that saved result; it spends no look.
     """
 
     from solana_alpha_lab.factory.hfic_grounded_discovery import (
         GroundedDiscoveryError,
+        list_discovery_looks,
         load_admitted_partition_rows,
         run_recorded_discovery_query,
     )
@@ -916,6 +963,22 @@ def cmd_discovery_execute(
             {"reason_code": "ORDINARY_OPERATION_REQUIRED", "values_loaded": False, "writes": False},
             exit_code=2,
         )
+    correction: dict[str, str] | None = None
+    if correct_result_ref or correct_result_sha256:
+        if not (correct_result_ref and correct_result_sha256):
+            return emit(
+                {"reason_code": "CALCULATION_REVISION_SOURCE_REQUIRED", "values_loaded": False, "writes": False},
+                exit_code=2,
+            )
+        if not temporal_query:
+            return emit(
+                {"reason_code": "CALCULATION_REVISION_UNSUPPORTED", "values_loaded": False, "writes": False},
+                exit_code=2,
+            )
+        correction = {
+            "source_result_ref": str(correct_result_ref),
+            "source_result_sha256": str(correct_result_sha256),
+        }
     gate: dict[str, object] = {"disposition": "EXECUTE"}
     if temporal_query:
         from solana_alpha_lab.factory.hfic_evidence_identity import (
@@ -1036,6 +1099,7 @@ def cmd_discovery_execute(
                 verified_market=epoch,
                 repo_root=repo_root,
                 data_root=store_root or explicit_data_root,
+                correction=correction,
             )
         except OrdinaryOperationError as exc:
             return emit(
@@ -1048,6 +1112,13 @@ def cmd_discovery_execute(
                 exit_code=2,
             )
     if gate.get("disposition") == "REPLAY":
+        readout = gate.get("result_readout") if isinstance(gate.get("result_readout"), dict) else None
+        if readout is not None and readout.get("result_coherence") != "COHERENT":
+            # Matching hashes do not make an inconsistent summary evidence.
+            stop = _saved_result_stop("TEMPORAL_RESULT_INCOHERENT", readout, values_loaded=False)
+            stop["operation_sha256"] = (gate.get("operation") or {}).get("operation_sha256")
+            _assert_no_path_leak(stop, str(store_root), str(repo_root))
+            return emit(stop, exit_code=2)
         evidence = dict(gate.get("evidence") or {})
         evidence["values_loaded"] = False
         evidence["writes"] = False
@@ -1074,6 +1145,7 @@ def cmd_discovery_execute(
     priors = []
     if isinstance(binding_doc, dict):
         priors = binding_doc.get("priors") or []
+    counts_before = _look_counts(store, journal_scope) if temporal_query else None
     try:
         evidence = run_recorded_discovery_query(
             store,
@@ -1087,8 +1159,30 @@ def cmd_discovery_execute(
             git_sha=git_before.head_sha,
             operation_sha256=str(operation_sha256) if operation_sha256 else None,
             verified_market=epoch if temporal_query else None,
+            correction=correction,
         )
     except GroundedDiscoveryError as exc:
+        if temporal_query and (
+            exc.code == "TEMPORAL_RESULT_INCOHERENT" or exc.code.startswith("CALCULATION_REVISION_")
+        ):
+            from solana_alpha_lab.factory.hfic_ordinary_operation import (
+                _operation_result,
+                result_readout,
+            )
+            from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query as _validate
+
+            saved = _operation_result(
+                list_discovery_looks(store, journal_scope),
+                str(operation_sha256 or ""),
+                _validate(spec)["spec_sha256"],
+            )
+            stop = _saved_result_stop(
+                exc.code,
+                result_readout(saved) if saved is not None else None,
+                values_loaded=True,
+            )
+            _assert_no_path_leak(stop, str(store_root), str(repo_root))
+            return emit(stop, exit_code=2)
         return emit_error(exc.code)
     git_after = repository_git_snapshot(repo_root)
     if git_before.head_sha != git_after.head_sha:
@@ -1097,7 +1191,14 @@ def cmd_discovery_execute(
     if temporal_query:
         query_rows = evidence.get("queries") if isinstance(evidence.get("queries"), list) else []
         first_query = query_rows[0] if query_rows and isinstance(query_rows[0], dict) else {}
-        evidence["writes"] = bool(service_writes) or bool(first_query.get("new_look"))
+        counts_after = _look_counts(store, journal_scope)
+        record_delta = counts_after["records"] - int((counts_before or {}).get("records") or 0)
+        evidence["writes"] = bool(service_writes) or bool(first_query.get("new_look")) or record_delta > 0
+        evidence["record_delta"] = {"discovery_look_records": record_delta}
+        evidence["scientific_look_delta"] = {
+            "main": counts_after["main"] - int((counts_before or {}).get("main") or 0),
+            "adaptive": counts_after["adaptive"] - int((counts_before or {}).get("adaptive") or 0),
+        }
     evidence["live_store_selected"] = False
     evidence["duplicate_partitions_eliminated"] = loaded["duplicate_partitions_eliminated"]
     evidence["authority_source"] = (loaded["binding"] or {}).get("authority_source")
@@ -2761,6 +2862,16 @@ def build_parser() -> argparse.ArgumentParser:
     discovery_execute.add_argument("--journal-scope", required=True)
     discovery_execute.add_argument("--operation", type=Path, default=None)
     discovery_execute.add_argument("--operation-sha256", default=None)
+    discovery_execute.add_argument(
+        "--correct-result-ref",
+        default=None,
+        help="Saved result to revise. Same spec and frozen input; no new look.",
+    )
+    discovery_execute.add_argument(
+        "--correct-result-sha256",
+        default=None,
+        help="Exact result_sha256 of --correct-result-ref.",
+    )
     discovery_preview = subparsers.add_parser(
         "discovery-preview",
         help="Feature-only temporal preview. Writes store memory only when --store and --journal-scope are both set. Does not read a target.",
@@ -3146,6 +3257,8 @@ def main(argv: list[str] | None = None) -> int:
                 explicit_data_root=args.data_root,
                 operation_path=args.operation,
                 operation_sha256=args.operation_sha256,
+                correct_result_ref=args.correct_result_ref,
+                correct_result_sha256=args.correct_result_sha256,
             )
         if args.command == "persist-draft":
             return cmd_persist_draft(

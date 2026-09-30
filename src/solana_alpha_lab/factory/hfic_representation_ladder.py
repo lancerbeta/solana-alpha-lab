@@ -1121,6 +1121,23 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         status = "NEXT — START BASE (new scientific look on this market)"
     elif next_action == ACTION_START_V1:
         status = "NEXT — continue V1 envelope; do not treat WAIT as done"
+    elif next_action == "CORRECT_CALCULATION_REVISION":
+        operation = receipt.get("ordinary_operation")
+        saved = operation.get("result") if isinstance(operation, Mapping) else None
+        saved = saved if isinstance(saved, Mapping) else {}
+        fields = sorted(
+            {
+                f"{item.get('view')}.{item.get('field')}"
+                for item in (saved.get("incoherent_fields") or [])
+                if isinstance(item, Mapping)
+            }
+        )
+        status = (
+            f"NEXT — saved result {saved.get('result_ref') or 'UNKNOWN'} is internally inconsistent"
+            f" ({', '.join(fields[:4]) or 'fields unknown'}); run discovery-execute with"
+            " --correct-result-ref/--correct-result-sha256 for that result; no new look,"
+            " not a scientific result"
+        )
     elif owner_final == "OPERATION_PAUSED_SEARCH_OPEN" or next_action == "AUTHORIZE_ADDITIONAL_LOOKS":
         status = "NEXT — saved result stays; authorize another look on this journal, or stop"
     elif owner_final:

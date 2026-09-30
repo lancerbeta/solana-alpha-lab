@@ -44,6 +44,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hfic_temporal_discovery.py
   - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
   - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
+  - src/solana_alpha_lab/factory/hfic_representation_ladder.py
   - scripts/hypothesis_forge.py
   - tests/test_hfic_temporal_result_coherence_v1.py
   - tests/test_hfic_temporal_discovery_v1.py
