@@ -108,9 +108,13 @@ CLI_PHYSICAL_PATH_RE = re.compile(
 # forms the ResearchStore itself refuses, and the data-root variable name.
 _HOST_PATH = re.compile(
     r"\\"
-    r"|(?:^|[\s\"'(=,;<>\[\]{}])/[A-Za-z0-9._~+-]+/[A-Za-z0-9._~+-]"
+    r"|(?:^|[^\w/])/[^\s/\\]+/[^\s/\\]"
     r"|[/](?:Users|home|root|mnt|srv|tmp|var|opt|private)/"
     r"|//"
+    r"|[A-Za-z]:/(?!/)"
+    r"|(?:^|\W)~/"
+    r"|\$\{?HOME"
+    r"|(?:^|[/\s])\.\.(?:/|$)"
     r"|\bfile:/"
     r"|SMIAL_DATA_ROOT"
 )
@@ -127,9 +131,11 @@ def _string_leaves(value: Any) -> list[tuple[str, str]]:
         if isinstance(item, str):
             found.append((where, item))
         elif isinstance(item, Mapping):
-            for key, child in item.items():
-                found.append((f"{where}.{key}:key", str(key)))
-                walk(child, f"{where}.{key}" if where else str(key))
+            for index, (key, child) in enumerate(item.items()):
+                # Positions name a key only when the key itself is safe to echo.
+                label = f"<key {index}>" if host_path_in(str(key)) else str(key)
+                found.append((f"{where}.{label}:key" if where else f"{label}:key", str(key)))
+                walk(child, f"{where}.{label}" if where else label)
         elif isinstance(item, (list, tuple)):
             for index, child in enumerate(item):
                 walk(child, f"{where}[{index}]")
@@ -239,7 +245,8 @@ def _require_hex(value: Any, code: str) -> str:
 def _reject_absolute_paths(value: Any) -> None:
     for where, text in _string_leaves(value):
         if host_path_in(text):
-            raise DispositionError("DISPOSITION_ABSOLUTE_PATH_FORBIDDEN", detail=where.replace(":key", ""))
+            position = where.replace(":key", " (key)") if where.endswith(":key") else where
+            raise DispositionError("DISPOSITION_ABSOLUTE_PATH_FORBIDDEN", detail=position)
 
 
 def normalize_packet(packet: Mapping[str, Any]) -> dict[str, Any]:
@@ -247,9 +254,10 @@ def normalize_packet(packet: Mapping[str, Any]) -> dict[str, Any]:
 
     if not isinstance(packet, Mapping):
         raise DispositionError("DISPOSITION_PACKET_INVALID")
+    _reject_absolute_paths(packet)
     unknown = set(packet) - _PACKET_KEYS
     if unknown:
-        raise DispositionError("DISPOSITION_PACKET_UNKNOWN_FIELD", detail=",".join(sorted(unknown)))
+        raise DispositionError("DISPOSITION_PACKET_UNKNOWN_FIELD", detail=",".join(sorted(str(key) for key in unknown)))
     if packet.get("schema", BODY_SCHEMA) != BODY_SCHEMA:
         raise DispositionError("DISPOSITION_SCHEMA_UNSUPPORTED")
     if str(packet.get("schema_version", SCHEMA_VERSION)) not in SUPPORTED_SCHEMA_VERSIONS:
@@ -271,7 +279,10 @@ def normalize_packet(packet: Mapping[str, Any]) -> dict[str, Any]:
         raise DispositionError("DISPOSITION_SUBJECT_FOCUS_REQUIRED")
     if kind == BOUNDED_SEARCH and isinstance(subject.get("search_scope"), Mapping):
         scope = dict(subject["search_scope"])
-        scope["constraints"] = sorted(str(item) for item in scope.get("constraints") or [])
+        constraints = scope.get("constraints") or []
+        if not isinstance(constraints, list) or not all(isinstance(item, str) for item in constraints):
+            raise DispositionError("DISPOSITION_PACKET_INVALID", detail="subject.search_scope.constraints must be strings")
+        scope["constraints"] = sorted(constraints)
         subject["search_scope"] = scope
     basis_in = packet.get("basis") if isinstance(packet.get("basis"), Mapping) else {}
     basis = dict(basis_in)
@@ -370,6 +381,8 @@ def _finalize(body: dict[str, Any], *, recorded_at: datetime, repo_root: Path | 
     errors = _schema_errors(body)
     if errors:
         raise DispositionError("DISPOSITION_SCHEMA_INVALID", detail=";".join(errors[:6]))
+    # The stored body, not only the submission, must be readable by the reader.
+    _reject_absolute_paths(_identity(body))
     if len(_canonical(body).encode("utf-8")) > MAX_BODY_BYTES:
         raise DispositionError("DISPOSITION_BODY_TOO_LARGE")
     return body
@@ -1276,7 +1289,9 @@ def preview_disposition(
         except _AlreadyCommitted:
             existing = _existing(store, str(body["disposition_sha256"]))
     would_be: dict[str, Any] = {"status": None, "reasons": []}
-    if body["entry"] == ASSESSMENT:
+    if lineage_refusal is not None:
+        would_be = {"status": None, "reasons": ["NOT_WRITTEN_LINEAGE_REFUSAL"]}
+    elif body["entry"] == ASSESSMENT:
         status, reasons = _applicability(
             _View(store), body, current_market=current_market, current_journal=current_journal
         )
@@ -1416,7 +1431,10 @@ def format_context_lines(capsule: Mapping[str, Any] | None) -> list[str]:
                 "or leave as history"
             )
         elif status == STATUS_WITHDRAWN:
-            lines.append(f"    advice_next: none required; a new assessment uses disposition-record with {supersede}")
+            lines.append(
+                f"    advice_next: no current assessment; re-assess with disposition-record and {supersede} "
+                "(newer results for this question are not tracked while withdrawn)"
+            )
         elif status == STATUS_CONFLICT:
             lines.append("    heads: " + ", ".join(str(item) for item in entry.get("heads") or []))
             lines.append(

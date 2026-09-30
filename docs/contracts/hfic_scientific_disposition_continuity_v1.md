@@ -49,8 +49,9 @@ a preflight receipt taken before the write no longer matches the store digest.
 
 A packet is the submission, not the stored body: do not resubmit a stored or
 previewed `body`. Unknown top-level keys are refused. Text fields must not
-contain host paths (`/home/…`, `C:\…`, UNC, `SMIAL_DATA_ROOT`); cite repo-
-relative files or plain labels instead.
+contain host paths or path-like shapes (rooted paths, `C:\…` or `C:/…`, UNC `//…`, any
+backslash, `~/`, `$HOME`, `..` segments, URIs, `SMIAL_DATA_ROOT`); cite repo-relative files or
+plain labels instead. The refusal `detail` names the offending field position.
 
 | subject_kind | allowed verdict | allowed recommendation |
 |---|---|---|
@@ -77,11 +78,13 @@ Question assessment (values from `forge-run` `ordinary_operation`, from the
 ```
 
 Bounded search assessment (no operation, spec, session or candidate needed):
-the same `subject` without `question_spec_sha256`, plus
-`"search_scope": {"search_tier": "SIMPLE_SCREEN", "population": "<fixed or UNKNOWN_NOT_FIXED>",
-"window": "<fixed or UNKNOWN_NOT_FIXED>", "constraints": ["<real constraint>"]}`; `basis` adds
-`"considered_proposals": [{"label", "representation", "disposition_reason"}]` and a compact
-`"synthesis_basis"`. The writer records the journal frontier itself.
+`subject` has `"subject_kind": "BOUNDED_SEARCH_ASSESSMENT"`, no `question_spec_sha256`, and
+**inside `subject`** `"search_scope": {"search_tier": "SIMPLE_SCREEN", "population": "<fixed or
+UNKNOWN_NOT_FIXED>", "window": "<fixed or UNKNOWN_NOT_FIXED>", "constraints": ["<real constraint>"]}`
+(constraints are plain strings). `basis` adds `"considered_proposals": [{"label", "representation",
+"disposition_reason"}]` and `"synthesis_basis"`: one plain-text paragraph (at most 2400
+characters) saying what was considered and why no next question was worthy. For a NEW
+assessment the writer records the journal frontier itself.
 
 Successor (corrects the current head): the full new packet plus
 `"supersedes": {"record_id": "HFIC-ART-DISP-<40HEX>", "disposition_sha256": "<64hex>"}` of the
@@ -126,8 +129,9 @@ CONFLICT and UNREADABLE are not repaired by another append; resolving them
 (for example restoring the missing result or choosing a head) is an owner
 decision outside this capability. Other subjects, numerical results,
 candidate paths and `next_action` are unaffected. An unscoped corrupt record
-is only counted. A reader failure or a host path found in stored text yields
-`scientific_disposition_context.status=UNAVAILABLE` with a typed reason.
+is only counted. A reader failure, or a capsule containing the data-root or
+repository path, yields `scientific_disposition_context.status=UNAVAILABLE`
+with a typed reason.
 
 A journal rotation (memory policy or prompt version) degrades search-scope
 advice, whose basis is the journal frontier; it does not degrade a question

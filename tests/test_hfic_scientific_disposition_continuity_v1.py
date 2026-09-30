@@ -1000,6 +1000,13 @@ class ReviewRegressionTests(_Base):
             "ratio a\\b\\c",
             "C:foo\\bar",
             "noise \\sigma est",
+            "copied from `/data/lab/store`",
+            "path:/srv2/lab/x",
+            "/данные/лаб/хранилище",
+            "~/lab/data",
+            "$HOME/lab",
+            "fromD:/lab/x",
+            "docs/../notes/x.md",
         ):
             with self.subTest(text=text):
                 packet = question_packet(ctx, ctx["q1"])
@@ -1013,6 +1020,18 @@ class ReviewRegressionTests(_Base):
             "input file: x.csv; units: /s/ rate",
         ]
         self.assertEqual(disp.record_disposition(store, allowed, current_market=ctx["market"])["disposition"], "CREATED")
+        # A non-string constraint would be stringified after the check: refused, never stored.
+        nested = search_packet(ctx, [ctx["q1"], ctx["q2"]], constraints=[["a\nb\nc"]])
+        with self.assertRaises(disp.DispositionError) as caught:
+            disp.record_disposition(store, nested, current_market=ctx["market"], current_journal=ctx["journal"])
+        self.assertEqual(caught.exception.code, "DISPOSITION_PACKET_INVALID")
+        # The refusal names the position, never the offending key text.
+        keyed = question_packet(ctx, ctx["q1"])
+        keyed["provenance"]["C:\\x"] = 1
+        with self.assertRaises(disp.DispositionError) as caught:
+            disp.record_disposition(store, keyed, current_market=ctx["market"])
+        self.assertEqual(caught.exception.code, "DISPOSITION_ABSOLUTE_PATH_FORBIDDEN")
+        self.assertNotIn("C:", str(caught.exception.detail))
         # FAULT INJECTION: restored history that carries the real data-root path.
         leaky = disp.normalize_packet(question_packet(ctx, ctx["q2"]))
         leaky["judgement"]["caveats"] = [f"restored from a host copy at {ctx['root']}"]
@@ -1150,7 +1169,7 @@ class ReviewRegressionTests(_Base):
         self.assertEqual(final["status_counts"], {disp.STATUS_NOT_RECORDED: 1, disp.STATUS_WITHDRAWN: 1})
         lines = "\n".join(disp.format_context_lines(final))
         self.assertIn("withdrawn because: wrong question text", lines)
-        self.assertIn("advice_next: none required; a new assessment uses disposition-record with supersedes=", lines)
+        self.assertIn("advice_next: no current assessment; re-assess with disposition-record and supersedes=", lines)
 
     def test_historical_import_paths(self) -> None:
         ctx = _ctx(self.workspace())
@@ -1242,6 +1261,19 @@ class ReviewRegressionTests(_Base):
             disp.record_disposition(store, follow, current_market=ctx["market"])
         self.assertEqual(caught.exception.code, "DISPOSITION_SUBJECT_UNREADABLE")
         self.assertIn("STOP for this subject", "\n".join(disp.format_context_lines(capsule)))
+
+    def test_untested_tier_hint_uses_full_in_scope_data(self) -> None:
+        ctx, *_ = self._recorded()
+        store = ResearchStore(ctx["root"], create_if_missing=False)
+        capsule = disp.disposition_context(
+            store, owner_focus=FOCUS, current_market=ctx["market"], journal_scope=ctx["journal"], max_bytes=900
+        )
+        self.assertEqual(capsule["entries"], [])
+        self.assertEqual(capsule["assessed_search_tiers"], ["SIMPLE_SCREEN"])
+        note = [line for line in disp.format_context_lines(capsule) if "search tiers without" in line][0]
+        self.assertIn("COMPOUND_SCREEN", note)
+        self.assertNotIn("SIMPLE_SCREEN", note)
+        self.assertNotIn("none recorded", "\n".join(disp.format_context_lines(capsule)))
 
     def test_auto_focus_is_labelled_not_empty(self) -> None:
         lines = disp.format_context_lines(

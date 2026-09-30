@@ -2031,7 +2031,13 @@ def build_forge_context_packet(
         store,
         owner_focus=owner_focus,
         current_market=evidence_epoch if len(str(evidence_epoch or "")) == 64 else None,
-        journal_scope=search_key if len(str(search_key or "")) == 64 else None,
+        # A CONTROL-surface search key is not the ordinary journal: unverified.
+        journal_scope=(
+            search_key
+            if len(str(search_key or "")) == 64
+            and evidence_surface_mode != "CURRENT_REPRESENTATION_CONTROL_V1"
+            else None
+        ),
         forbidden_texts=(str(data_root), str(repo_root)),
     )
     if disposition_capsule.get("status") == "UNAVAILABLE" or disposition_capsule.get("total_subjects"):
@@ -2090,6 +2096,9 @@ def build_forge_context_packet(
                 **packet["truncation_receipt"],
                 "truncated": True,
                 "disposition_subjects_omitted": int(dropped.get("total_subjects") or 0),
+                "disposition_not_recorded_omitted": int(
+                    len(dropped.get("not_recorded") or []) + int(dropped.get("not_recorded_omitted") or 0)
+                ),
             }
             encoded = canonical_json_bytes(packet)
     if len(encoded) > packet_bound:

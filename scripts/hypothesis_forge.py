@@ -717,7 +717,12 @@ def cmd_forge_run(
         market = payload.get("market_evidence_epoch_sha256")
         market = market if isinstance(market, str) and len(market) == 64 else None
         try:
-            journal = current_search_key(store, market=market, owner_focus=focus)
+            # A CONTROL-surface run is not the ordinary journal: leave it unverified.
+            journal = (
+                None
+                if control_current_representation
+                else current_search_key(store, market=market, owner_focus=focus)
+            )
         except Exception:
             journal = None
         payload["scientific_disposition_context"] = {
@@ -967,6 +972,14 @@ def cmd_disposition_record(
             )
         _assert_no_path_leak(payload, str(data_root), str(repo_root))
         return emit(payload, exit_code=2)
+    if isinstance(payload.get("lineage_refusal"), dict) and payload["lineage_refusal"].get("code") in {
+        "DISPOSITION_SUBJECT_HAS_HEAD",
+        "DISPOSITION_STALE_PARENT",
+    }:
+        payload["lineage_refusal"]["hint"] = (
+            "to correct the current head, resubmit with supersedes={record_id, disposition_sha256} "
+            "taken from detail (<record_id>:<disposition_sha256>)"
+        )
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     return emit(payload)
 
@@ -993,6 +1006,7 @@ def cmd_disposition_show(
     data_root = _existing_data_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root, create_if_missing=False)
     market = _current_market(repo_root, data_root, store)
+    journal_source = "OVERRIDE" if journal_scope is not None else "COMPUTED"
     if journal_scope is None:
         from solana_alpha_lab.factory.hfic_scientific_disposition import current_search_key
 
@@ -1000,6 +1014,8 @@ def cmd_disposition_show(
             journal_scope = current_search_key(store, market=market, owner_focus=owner_focus)
         except Exception:
             journal_scope = None
+        if journal_scope is None:
+            journal_source = "UNVERIFIED"
     try:
         payload = disposition_detail(
             store,
@@ -1014,6 +1030,7 @@ def cmd_disposition_show(
     except DispositionError as exc:
         return emit({"refusal_code": exc.code, "writes": {"research_store": 0}}, exit_code=2)
     payload["market_verified"] = market is not None
+    payload["journal_scope_source"] = journal_source
     payload["values_loaded"] = False
     if market is None:
         payload["market_note"] = "market UNVERIFIED: no assessment is shown as current"
