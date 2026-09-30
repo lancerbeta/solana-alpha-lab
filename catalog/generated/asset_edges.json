@@ -3378,6 +3378,21 @@
       "target_asset_id": "TEST-FORGE-REPRESENTATION-LADDER-001"
     },
     {
+      "source_asset_id": "CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001"
+    },
+    {
+      "source_asset_id": "CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "ARCH-INTENT-006"
+    },
+    {
+      "source_asset_id": "CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001"
+    },
+    {
       "source_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001",
       "relation": "depends_on",
       "target_asset_id": "ARCH-INTENT-005"
@@ -5891,6 +5906,21 @@
       "source_asset_id": "DOC-HFIC-SCIENTIFIC-DISCOVERY-RESEARCH-001",
       "relation": "governed_by",
       "target_asset_id": "ARCH-INTENT-006"
+    },
+    {
+      "source_asset_id": "DOC-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-SCIENTIFIC-DISPOSITION-001"
+    },
+    {
+      "source_asset_id": "DOC-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-HFIC-SCIENTIFIC-DISPOSITION-V1-001"
+    },
+    {
+      "source_asset_id": "DOC-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001"
     },
     {
       "source_asset_id": "DOC-HYPOTHESIS-FORGE-OPERATOR-001",
@@ -11268,6 +11298,21 @@
       "target_asset_id": "CTRL-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-HFIC-SCIENTIFIC-DISPOSITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-HFIC-SCIENTIFIC-DISPOSITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-HFIC-SCIENTIFIC-DISPOSITION-V1-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-HFIC-SCIENTIFIC-DISPOSITION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
@@ -14508,6 +14553,11 @@
       "target_asset_id": "CTRL-HFIC-DISCOVERY-PROSPECT-MEMORY-AND-NEXT-ACTION-001"
     },
     {
+      "source_asset_id": "SCHEMA-HFIC-SCIENTIFIC-DISPOSITION-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001"
+    },
+    {
       "source_asset_id": "SCHEMA-HYPOTHESIS-CRITIC-RESULT-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
@@ -16996,6 +17046,21 @@
       "source_asset_id": "TEST-HFIC-REPRESENTATION-PROBE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-SCIENTIFIC-DISPOSITION-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001"
     },
     {
       "source_asset_id": "TEST-HFIC-SELECTION-ROBUSTNESS-GATE-001",

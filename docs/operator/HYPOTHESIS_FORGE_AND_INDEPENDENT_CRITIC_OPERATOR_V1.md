@@ -45,6 +45,14 @@ new capability/collector/provider/infrastructure path, compare against those
 entries and accepted `capability_entries`; reuse when sufficient, name the exact
 gap when missing, and do not invent infrastructure under uncertainty.
 
+When present, `scientific_disposition_context` in the same packet (≤4096 bytes,
+`advisory_only=true`, `authority_granted=false`) lists recorded authored
+assessments for this focus: exact question assessments and bounded search
+assessments with their applicability status. It is prior context, not a
+suppression capsule and not `ranked_prior_candidate_ids`; omitted entries are
+counted with an exact `disposition-show` query. New assessments are written
+with `disposition-record` (`docs/contracts/hfic_scientific_disposition_continuity_v1.md`).
+
 **Canonical operator prefix:** `uv run --locked --managed-python python -B scripts/hypothesis_forge.py`.
 Required interpreter is CPython `3.13.14` from `.python-version` /
 `pyproject.toml` `exact_python_pin`. A non-matching interpreter must return
@@ -1006,6 +1014,13 @@ decision after collection
     `prior_memory`. Не создавай HFIC-V1.3 / HFIC-V1.4 Prompt A.
 
 Не добавляй roadmap из множества задач. Runners-up остаются watchlist, а не backlog tasks.
+
+`scientific_disposition_context`, если есть, — записанные ранее оценки:
+`CURRENT_FOR_BOUND_BASIS` относится только к названному вопросу или
+SIMPLE/COMPOUND scope и не запрещает другой scope; `REVIEW_REQUIRED`,
+`HISTORICAL`, `WITHDRAWN`, `CONFLICT`, `UNREADABLE` не являются действующим
+выводом. Не повторяй вопрос с действующей оценкой без нового основания и не
+выдавай совет за authority, бюджет или family close.
 
 ## A14. Формат FORGE_DRAFT
 

@@ -1509,7 +1509,7 @@ records:
     repository_path: README.md
   integrity:
     kind: sha256
-    sha256: 625cd06e83b181bc6462ccf4d7fd03fad221d0516770b09774bc1c1e4f3343ee
+    sha256: d1a722625fc9dec6aafa6bff57574f1e142c30089f0ad49f36dbfd998e6b47e4
   access:
     mode: read_only
     method: file
@@ -17787,7 +17787,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-34A
   location: {kind: git_path, logical_uri: 'repo://docs/OPERATOR_NAVIGATION.md', repository_path: docs/OPERATOR_NAVIGATION.md}
-  integrity: {kind: sha256, sha256: a896bed012b0d9b98531215292e4e69ee4dea9351fbecaa526c2472c06278a26}
+  integrity: {kind: sha256, sha256: e441b21ea2d64178c7829f13faab2d04172281b51979a215941bff472cf9b7c8}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: SCRIPT-T34A-CONTEXT-001}
@@ -32288,7 +32288,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 7932d67d58fe95cef774055c1607ce80deacc0b4ba59f3c4015923b342829e11}
+  integrity: {kind: sha256, sha256: ec4adb38513ad765d85200fb68f4031a036c4453b403b0ac88840db82a54c4f6}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32676,6 +32676,99 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [HFIC, PROSPECT, NEXT_ACTION, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: 'Exact delivery contract for durable authored ordinary Forge assessments and their cold, portable read path.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-30'
+  truth_owner: FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1.md', repository_path: docs/tasks/FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1.md}
+  integrity: {kind: sha256, sha256: 57c389065a8c9672965892f685d22884a5a8d186876c593a302eccf29ff38f48}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: ARCH-INTENT-006}
+  - {relation_type: depends_on, target_asset_id: DOC-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001}
+  - {relation_type: validated_by, target_asset_id: TEST-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HFIC, DISPOSITION, ASSESSMENT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: 'Contract for ORDINARY_SCIENTIFIC_DISPOSITION_V1: what was concluded about a saved question or bounded search scope, on which basis, and whether it still applies. Advice, not authority.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-30'
+  truth_owner: FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/hfic_scientific_disposition_continuity_v1.md', repository_path: docs/contracts/hfic_scientific_disposition_continuity_v1.md}
+  integrity: {kind: sha256, sha256: 375d057b8b84000e64682769b6cd0af20ef3f052f717f87551f74d79d6e48f00}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-SCIENTIFIC-DISPOSITION-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-HFIC-SCIENTIFIC-DISPOSITION-V1-001}
+  consumers: [FACTORY-001, GOAL-OWNER, SKILL-HYPOTHESIS-FORGE-001]
+  evidence: []
+  search_terms: [HFIC, DISPOSITION, ASSESSMENT, PRIOR_CONCLUSION, NO_WORTHY_SIMPLE_NEXT, disposition-show]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-FACTORY-V1-HFIC-SCIENTIFIC-DISPOSITION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: 'Writer, lineage check and single applicability resolver for authored ordinary Forge assessments; feeds forge-run readback and the pre-values context packet.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-30'
+  truth_owner: FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_scientific_disposition.py', repository_path: src/solana_alpha_lab/factory/hfic_scientific_disposition.py}
+  integrity: {kind: sha256, sha256: df8f324685ea33b9bca85204752e5c16d99089837f855f8df20212e648c8184f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RESEARCH-STORE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-HFIC-SCIENTIFIC-DISPOSITION-V1-001}
+  consumers: [FACTORY-001, SCRIPT-HYPOTHESIS-FORGE-001]
+  evidence: []
+  search_terms: [HFIC, DISPOSITION, APPLICABILITY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-HFIC-SCIENTIFIC-DISPOSITION-V1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: 'JSON Schema for one ORDINARY_SCIENTIFIC_DISPOSITION_V1 body (QUESTION or BOUNDED_SEARCH_ASSESSMENT, assessment or withdrawal).'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-30'
+  truth_owner: FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/hfic_scientific_disposition_v1.schema.json', repository_path: catalog/schemas/hfic_scientific_disposition_v1.schema.json}
+  integrity: {kind: sha256, sha256: b10d4672a29370b3b8c1d2cf972143608c8e5f2740408dd77eb2b937f9a67df7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HFIC, DISPOSITION, SCHEMA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: 'Portable disposable-store acceptance V1-V4: normal writer, no-spend search assessment, drift/lineage, relocation, retry/crash/concurrency and bounded context.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-30'
+  truth_owner: FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_scientific_disposition_continuity_v1.py', repository_path: tests/test_hfic_scientific_disposition_continuity_v1.py}
+  integrity: {kind: sha256, sha256: b6fdb46bbf5f1cae81cb7544caab4efbfda4cc17302985aa51af27992344ce5c}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-SCIENTIFIC-DISPOSITION-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-HYPOTHESIS-FORGE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HFIC, DISPOSITION, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: CTRL-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001
   record_version: '1.0'
@@ -34448,7 +34541,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: b410db626d3e60906807d29e3b945f9ef3396506c11741f4ba6a745e0972f1c3}
+  integrity: {kind: sha256, sha256: 848b9657c497f6c652190b6ef062fe3246a1b3314f58d514096499b55db64937}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34501,7 +34594,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: ff12bbba4c6358cb04ca5d71c9a2fba7105c1dcd4f29350c66990ffe3283db0c}
+  integrity: {kind: sha256, sha256: 9095d26e5939420de56f336be357a6867e97e208abe5d8436405f08ece11a748}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34519,7 +34612,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: 21f630d54d84090bcec13571102e0bc9657439d957832fd344226a856fbea7e5}
+  integrity: {kind: sha256, sha256: 2264cd3171bb0b951c68483c4ac4227b1280a3362b9cb780e46e5f2f0df0bd84}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34555,7 +34648,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/FACTORY_SEMANTIC_MAP.md', repository_path: docs/FACTORY_SEMANTIC_MAP.md}
-  integrity: {kind: sha256, sha256: 302b2a57761a8b46310ec6fca1a0c2781956f7643a524555328630ce68f08c5d}
+  integrity: {kind: sha256, sha256: bda85690d0f24ec0877a08edcb9a5ee856cbf0914c3ad1031ef188b48acbf93c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -38390,7 +38483,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_evidence_identity.py', repository_path: src/solana_alpha_lab/factory/hfic_evidence_identity.py}
-  integrity: {kind: sha256, sha256: 006863f69db6eece96104c01fd75ddde3a5a28af470cba8d57a2bb8572f629b4}
+  integrity: {kind: sha256, sha256: 189145e8ab49de52f2719333d8ddf96e9e4b7354562e64d5c23e488163c0d018}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
@@ -38409,7 +38502,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_preflight.py', repository_path: src/solana_alpha_lab/factory/hfic_preflight.py}
-  integrity: {kind: sha256, sha256: 9a9b503f98282479ddc93f2bfbde3c5e4953c3d62055441b2f38988071236857}
+  integrity: {kind: sha256, sha256: b5598cc9ec4638ddf9d2c5980a5e31efde4762641b083b77ca947805668fe3b3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}

@@ -57,6 +57,8 @@ _CAPABILITY_PROTOCOL_FILES = (
     "src/solana_alpha_lab/factory/research_store.py",
     "src/solana_alpha_lab/factory/live_cohort_to_forge.py",
     "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py",
+    "src/solana_alpha_lab/factory/hfic_scientific_disposition.py",
+    "catalog/schemas/hfic_scientific_disposition_v1.schema.json",
 )
 
 _OPERATOR_PACK = (

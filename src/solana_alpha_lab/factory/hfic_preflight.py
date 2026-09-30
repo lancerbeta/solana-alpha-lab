@@ -2018,6 +2018,27 @@ def build_forge_context_packet(
             ),
         },
     }
+    from solana_alpha_lab.factory.hfic_scientific_disposition import (
+        safe_disposition_context,
+    )
+
+    # Authored scientific assessments: advisory capsule, separate from ranked
+    # priors and hard-close capsules. Added only when something is recorded or
+    # unassessed, so packets without assessment history keep their bytes.
+    disposition_capsule = safe_disposition_context(
+        store,
+        owner_focus=owner_focus,
+        current_market=evidence_epoch if len(str(evidence_epoch or "")) == 64 else None,
+        journal_scope=search_key if len(str(search_key or "")) == 64 else None,
+    )
+    if (
+        disposition_capsule.get("status") == "UNAVAILABLE"
+        or disposition_capsule.get("total_subjects")
+        or disposition_capsule.get("unreadable_unscoped_records")
+        or disposition_capsule.get("not_recorded")
+        or disposition_capsule.get("not_recorded_omitted")
+    ):
+        packet["scientific_disposition_context"] = disposition_capsule
     if selection_caveat is not None:
         packet["selection_robustness_caveat"] = {
             "router_decision": str(selection_caveat.get("router_decision") or ""),

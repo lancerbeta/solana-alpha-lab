@@ -158,6 +158,10 @@ Feature preview writes store memory only when `--store` and `--journal-scope` ar
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-preview --data-root <canonical-data-root> --store <canonical-data-root> --journal-scope <preflight-search-key-sha256> --spec <preview.json> --format json
 ```
 
+`scientific_context` in the readout is recorded advice, not `next_action`.
+Write a new assessment with `disposition-record`; see the skill's Ordinary
+operation section and `docs/contracts/hfic_scientific_disposition_continuity_v1.md`.
+
 ## Representation mode boundary
 
 The normal slash remains one bounded run. A fresh ordinary focus reports

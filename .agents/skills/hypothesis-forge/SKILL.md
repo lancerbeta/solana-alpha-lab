@@ -37,6 +37,15 @@ looks. Revise that exact result with `discovery-execute ... --correct-result-ref
 one `CALCULATION_REVISION` with `new_look=false` and spends no MAIN. Then read
 the saved question again.
 
+After reading a saved result or finishing a bounded pre-values synthesis,
+record the authored assessment with `disposition-record --input <packet>`
+(normal path, not a backfill). An unwritten assessment stays `NOT_RECORDED`;
+do not invent a non-candidate, session or `NO_WORTHY`. `forge-run --no-write`
+shows `scientific_context` as advice beside, never instead of, the machine
+`next_action`; it opens, closes and budgets nothing. Contract, packet shape and
+statuses: `docs/contracts/hfic_scientific_disposition_continuity_v1.md`;
+detail: `disposition-show --owner-focus <FOCUS>`.
+
 Canonical entrypoint: `scripts/hypothesis_forge.py`.
 No-write state-only coverage, never selecting `typed_value` and never reserving a slot:
 
