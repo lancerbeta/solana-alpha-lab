@@ -94,8 +94,9 @@ context_requirements:
       - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
       - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
     DELIVERY_EVIDENCE:
-      - docs/evidence/forge_temporal_result_coherence_repair/copy_based_revision_acceptance_v1.json
-      - docs/evidence/forge_temporal_result_coherence_repair/historical_blast_radius_v1.json
+      - docs/evidence/forge_temporal_result_coherence_repair/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/forge_temporal_result_coherence_repair/a1_delivery_independent_review_v1.json
+      - docs/evidence/forge_temporal_result_coherence_repair/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
