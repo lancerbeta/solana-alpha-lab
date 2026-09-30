@@ -1,0 +1,55 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-TEMPORAL-RESULT-COHERENCE-REPAIR-REVIEW-001",
+  "as_of": "2026-09-30",
+  "task_id": "FORGE_TEMPORAL_RESULT_COHERENCE_REPAIR_V1",
+  "reviewed_bindings_sha256": "5e330d930f4f5e1951c6f2780bd358c4d9fcd67aa31a766a40e44e9db3baea1a",
+  "reviewed_inventory_sha256": "2228ab6d63b36009ac9cbe81380b3a26ac8eb1fe3a2f3f9c1f02ca2ef21c4590",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Round 1 on e732c97c: PASS with P2 on API correction idempotency, unchecked ref/hash for an applied correction and CLI stop writes. All closed on b5d68d5f. Re-review PASS: 95 temporal tests OK; ordinary/acceptance/grounded 37 run with the two known local PREFLIGHT_RECEIPT_HASH_MISMATCH failures that also fail on base 6b11fb78. WATCH: changed-binding refusal untested; an existing terminal owner_final keeps precedence."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Sections 1-6 demonstrated by code, tests and evidence on b5d68d5f (39 tests OK). P2 blast-radius overclaim fixed. Open P2: LIMITED_RESULT not asserted by name, raw-value change under the same binding metadata not exercised, between-revision-and-read fault covered only through reply-lost and new-process steps. WATCH: no test of an old frozen DocumentRunner V3 artifact."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=faa20d556fcf83ee53e2071bfa0afea329118a76b481932a692f397ecaf592f2 SEMANTIC_PREMISE PASS. Round 1 (packet 4377339d) FAIL P1: one coherent look let a tier close over an incoherent sibling. Fixed: any unfit spent look blocks the terminal; mixed-look test added. P2: basis STORED_FIELDS_ONLY not yet copied into result_readout and format_discovery_readout. WATCH: a future calculation-version bump allows cap-free re-evaluation of coherent old looks under enforced spec/input/clock identity; overlap has only a sum>=pooled cross-view check."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Inconsistent saved result reads as a technical stop, not a pause, terminal or DONE. Status line now carries the exact ref and hash. P2: raw ordinary_operation still shows PAUSED_CAP fields while revision is needed; next_action and owner_final override. WATCH: correction output has no next_action; a computation-side incoherence stop has no next step."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "MODEL_DIVERSITY_UNPROVEN",
+    "NO_MERGE",
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_LIVE_LOOK",
+    "SCRIPTED_CRITIC_MECHANICAL_IS_NOT_SCIENTIFIC_PASS"
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "schema": "smial.forge-temporal-result-blast-radius",
+  "schema_version": "1.0",
+  "task_id": "FORGE_TEMPORAL_RESULT_COHERENCE_REPAIR_V1",
+  "scope": "CANONICAL_LIVE_ROOT_READ_THROUGH_BYTE_IDENTICAL_COPY",
+  "method": "STORED_SUMMARY_COHERENCE_CHECK_AND_REFERENCE_SCAN; NO_RAW_RECALCULATION",
+  "records_scanned": 302,
+  "temporal_looks": 5,
+  "results": [
+    {
+      "result_ref": "HFIC-ART-DISCOVERY-2CB0802123BE5F4C6C78C2027280F46D3061FAEB",
+      "journal_scope": "222a589d8a2731d821bc0e858029749ad1ada669d3d59515ce5e8c623c15d5ed",
+      "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V2",
+      "look_class": "MAIN",
+      "new_look": true,
+      "search_tier": "COMPOUND_SCREEN",
+      "query_id": "HFIC-COHORT-EARLY-PRICE-LIQUIDITY-PATH-V1",
+      "result_sha256": "e3e60ba3ec1eea971653ff7301b05ad2d7950c1cc6b675722e3762c30d334b39",
+      "coherence": "COHERENT",
+      "incoherent_fields": [],
+      "referenced_by": [
+        {
+          "record_id": "HFIC-ART-FORGE-DRAFT-GENERATED-F925809980E8EA2C",
+          "kind": "FORGE_DRAFT"
+        },
+        {
+          "record_id": "HFIC-ART-FORGE-DRAFT-HFIC-SESS-222A589D8A2731D8",
+          "kind": "FORGE_DRAFT"
+        },
+        {
+          "record_id": "HFIC-ART-REPAIR-CLOSE-4A01BBB755F2097DD99285E619F3699BCB2E",
+          "kind": "REPAIR_CONTINUATION_DISPOSITION_V1"
+        },
+        {
+          "record_id": "HFIC-ART-REPAIR-CONT-4A01BBB755F2097DD99285E619F3699BCB2E7879",
+          "kind": "REPAIR_CONTINUATION_DISPOSITION_V1"
+        }
+      ]
+    },
+    {
+      "result_ref": "HFIC-ART-DISCOVERY-366F0B1580EFA263C50DAE11697C4C01BC1CAA35",
+      "journal_scope": "222a589d8a2731d821bc0e858029749ad1ada669d3d59515ce5e8c623c15d5ed",
+      "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V3",
+      "look_class": "MAIN",
+      "new_look": true,
+      "search_tier": "COMPOUND_SCREEN",
+      "query_id": "HFIC-COHORT-EARLY-DIP-LIQUIDITY-HOLD-V1",
+      "result_sha256": "e2fcccefdd6348d7847aab2d627d0ad11e931d1a3cd0579753776867516cb529",
+      "coherence": "INCOHERENT",
+      "incoherent_fields": [
+        "by_cohort.observed_target_n_sum",
+        "by_cohort:REL-20260902T111900Z-20260909T111900Z.observed_target_n+missing_target_n",
+        "by_cohort:REL-20260909T111900Z-20260916T111900Z.observed_target_n+missing_target_n",
+        "by_cohort:REL-20260914T173510Z-20260921T173510Z.observed_target_n+missing_target_n"
+      ],
+      "referenced_by": [
+        {
+          "record_id": "HFIC-CYCLE-HFIC-SESS-222A589D8A2731D8-REPAIR-4A01BBB755F2",
+          "kind": "RESEARCH_CYCLE"
+        }
+      ]
+    },
+    {
+      "result_ref": "HFIC-ART-DISCOVERY-56BEAD6F516806D152E9F91559F6A7EEA4A5CFCE",
+      "journal_scope": "58d69e4384549b48a09616ba2e1fb6d947a9dd8d5197e2bb3678c2049fe6cba1",
+      "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V3",
+      "look_class": "MAIN",
+      "new_look": true,
+      "search_tier": "SIMPLE_SCREEN",
+      "query_id": "window_liquidity_survival_y900_y14400_v1",
+      "result_sha256": "fa3effb7e78d3693e02aa8f9070fcd503f164cfe73f950cb3e899292915949c5",
+      "coherence": "INCOHERENT",
+      "incoherent_fields": [
+        "by_cohort.observed_target_n_sum",
+        "by_cohort:REL-20260902T111900Z-20260909T111900Z.observed_target_n+missing_target_n",
+        "by_cohort:REL-20260909T111900Z-20260916T111900Z.observed_target_n+missing_target_n",
+        "by_cohort:REL-20260914T173510Z-20260921T173510Z.observed_target_n+missing_target_n"
+      ],
+      "referenced_by": []
+    },
+    {
+      "result_ref": "HFIC-ART-DISCOVERY-79BB617A9B75EAC557D75CE2B11045421E9FA536",
+      "journal_scope": "222a589d8a2731d821bc0e858029749ad1ada669d3d59515ce5e8c623c15d5ed",
+      "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V2",
+      "look_class": "MAIN",
+      "new_look": true,
+      "search_tier": "SIMPLE_SCREEN",
+      "query_id": "HFIC-COHORT-LIFECYCLE-POSITIVE-MIDPATH-V1",
+      "result_sha256": "a38a3f983ff7ed160a215f6364359bebdae994b5083d9c5167b4801fc3c12dfc",
+      "coherence": "COHERENT",
+      "incoherent_fields": [],
+      "referenced_by": [
+        {
+          "record_id": "HFIC-ART-REPAIR-CLOSE-4A01BBB755F2097DD99285E619F3699BCB2E",
+          "kind": "REPAIR_CONTINUATION_DISPOSITION_V1"
+        },
+        {
+          "record_id": "HFIC-ART-REPAIR-CONT-4A01BBB755F2097DD99285E619F3699BCB2E7879",
+          "kind": "REPAIR_CONTINUATION_DISPOSITION_V1"
+        }
+      ]
+    },
+    {
+      "result_ref": "HFIC-ART-DISCOVERY-9E10ACDA0DDAECFAA9AB18068D77B2741B49BD88",
+      "journal_scope": "222a589d8a2731d821bc0e858029749ad1ada669d3d59515ce5e8c623c15d5ed",
+      "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V3",
+      "look_class": "MAIN",
+      "new_look": true,
+      "search_tier": "COMPOUND_SCREEN",
+      "query_id": "HFIC-COHORT-EARLY-PRICE-LIQUIDITY-PATH-V1",
+      "result_sha256": "fe59f95e13164530d70d58cb30b315b83f1e270d5f463704e063b22be756c7ea",
+      "coherence": "INCOHERENT",
+      "incoherent_fields": [
+        "by_cohort.observed_target_n_sum",
+        "by_cohort:REL-20260902T111900Z-20260909T111900Z.observed_target_n",
+        "by_cohort:REL-20260902T111900Z-20260909T111900Z.observed_target_n+missing_target_n",
+        "by_cohort:REL-20260909T111900Z-20260916T111900Z.observed_target_n",
+        "by_cohort:REL-20260909T111900Z-20260916T111900Z.observed_target_n+missing_target_n",
+        "by_cohort:REL-20260914T173510Z-20260921T173510Z.observed_target_n",
+        "by_cohort:REL-20260914T173510Z-20260921T173510Z.observed_target_n+missing_target_n"
+      ],
+      "referenced_by": []
+    }
+  ],
+  "affected_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V3",
+  "summary": {
+    "explicitly_incoherent": [
+      "HFIC-ART-DISCOVERY-366F0B1580EFA263C50DAE11697C4C01BC1CAA35",
+      "HFIC-ART-DISCOVERY-56BEAD6F516806D152E9F91559F6A7EEA4A5CFCE",
+      "HFIC-ART-DISCOVERY-9E10ACDA0DDAECFAA9AB18068D77B2741B49BD88"
+    ],
+    "coherent_on_stored_fields": [
+      "HFIC-ART-DISCOVERY-2CB0802123BE5F4C6C78C2027280F46D3061FAEB",
+      "HFIC-ART-DISCOVERY-79BB617A9B75EAC557D75CE2B11045421E9FA536"
+    ],
+    "potentially_affected_consumers": [
+      {
+        "record_id": "HFIC-CYCLE-HFIC-SESS-222A589D8A2731D8-REPAIR-4A01BBB755F2",
+        "kind": "RESEARCH_CYCLE",
+        "session_id": "HFIC-SESS-222A589D8A2731D8",
+        "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+        "uses_result": "HFIC-ART-DISCOVERY-366F0B1580EFA263C50DAE11697C4C01BC1CAA35",
+        "wrong_views": "by_cohort observed_target_n and mean_target included unmatched decisions",
+        "correct_views": "pooled, by_calendar_block, baseline, matched_n, missing_target_n"
+      }
+    ],
+    "not_applicable_to_current_decision": [
+      "V2 results HFIC-ART-DISCOVERY-…F46D3061FAEB and …45421E9FA536 pass the stored-field check.",
+      "…B2741B49BD88 (V3, compound, journal 222a589d) has no session or frozen reference.",
+      "The current question uses only …A7EEA4A5CFCE; this fix leaves its pooled, calendar and baseline views unchanged. That does not prove them right in every other respect."
+    ],
+    "owner_decision_required": [
+      "Whether closed session HFIC-SESS-222A589D8A2731D8 (NO_WORTHY, repair 4a01bbb7…, #355) needs a separate review of its cohort evidence. It was not reopened and not recomputed here.",
+      "Whether to revise the two unreferenced-or-closed V3 compound results. Not done here; no authority."
+    ]
+  },
+  "non_claims": [
+    "A PASSING STORED-FIELD CHECK DOES NOT PROVE AN OLD RESULT RIGHT IN EVERY OTHER RESPECT",
+    "NO_RAW_RECALCULATION",
+    "NO_CLOSED_DECISION_REOPENED",
+    "OTHER_LOCAL_STORES_NOT_SCANNED"
+  ]
+}

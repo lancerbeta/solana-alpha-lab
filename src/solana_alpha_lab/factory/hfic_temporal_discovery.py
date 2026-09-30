@@ -34,14 +34,19 @@ TEMPORAL_SCHEMA = "smial.hfic-temporal-query"
 TEMPORAL_SCHEMA_VERSION = "1.0"
 TEMPORAL_CALCULATION_VERSION_V1 = "HFIC_TEMPORAL_DISCOVERY_CALC_V1"
 TEMPORAL_CALCULATION_VERSION_V2 = "HFIC_TEMPORAL_DISCOVERY_CALC_V2"
-TEMPORAL_CALCULATION_VERSION = "HFIC_TEMPORAL_DISCOVERY_CALC_V3"
+TEMPORAL_CALCULATION_VERSION_V3 = "HFIC_TEMPORAL_DISCOVERY_CALC_V3"
+# V4: by_cohort reads the same matched sample as pooled and calendar.
+TEMPORAL_CALCULATION_VERSION = "HFIC_TEMPORAL_DISCOVERY_CALC_V4"
 TEMPORAL_CALCULATION_VERSIONS_READABLE = frozenset(
     {
         TEMPORAL_CALCULATION_VERSION_V1,
         TEMPORAL_CALCULATION_VERSION_V2,
+        TEMPORAL_CALCULATION_VERSION_V3,
         TEMPORAL_CALCULATION_VERSION,
     }
 )
+COHORT_CONDITIONAL_SAMPLE_CORRECTION = "COHORT_CONDITIONAL_SAMPLE_V4"
+RESULT_COHERENCE_TOLERANCE = 1e-9
 TEMPORAL_CAPABILITY_ID = "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
 OBSERVATION_CLOCK_EVENT_TIME_V1 = "EVENT_TIME_V1"
 OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1 = "PROVIDER_REPORTED_SNAPSHOT_V1"
@@ -1239,6 +1244,30 @@ def _exclude_shared_identity(
         view["target"] = None
 
 
+def _conditional_sample(
+    members: Sequence[Mapping[str, Any]],
+) -> tuple[list[Mapping[str, Any]], list[Mapping[str, Any]], list[Mapping[str, Any]]]:
+    """The one conditional sample behind pooled, calendar and cohort views.
+
+    Matched members without an integrity exclusion. Observed and missing
+    split that set, so observed + missing is always matched. Unmatched
+    members never enter a conditional view, whatever their target.
+    """
+
+    matched = [
+        item for item in members if item.get("matched") and not item.get("integrity_excluded")
+    ]
+    observed = [
+        item for item in matched if item.get("target_is_observed") and item.get("target") is not None
+    ]
+    missing = [
+        item
+        for item in matched
+        if not (item.get("target_is_observed") and item.get("target") is not None)
+    ]
+    return matched, observed, missing
+
+
 def _cohort_rows(
     slots: dict[str, dict[tuple, dict[str, Any]]],
     admitted_ids: Sequence[str],
@@ -1254,13 +1283,8 @@ def _cohort_rows(
         bucket = slots.get(cohort_id, {})
         views = list(bucket.values())
         active = [item for item in views if not item.get("integrity_excluded")]
-        observed = [
-            float(item["target"])
-            for item in active
-            if item.get("target_is_observed") and item.get("target") is not None
-        ]
-        matched = [item for item in active if item.get("matched")]
-        missing = [item for item in matched if not item.get("target_is_observed")]
+        matched, observed_members, missing = _conditional_sample(active)
+        observed = [float(item["target"]) for item in observed_members]
         exclusions: dict[str, int] = defaultdict(int)
         for item in views:
             if item.get("integrity_excluded"):
@@ -1382,6 +1406,253 @@ def classify_temporal_look(
         "adaptive_count": len(adaptive) + int(look_class == "ADAPTIVE"),
         "simple_main_count": len(simple_mains) + int(look_class == "MAIN" and tier == "SIMPLE_SCREEN"),
         "compound_main_count": len(compound_mains) + int(look_class == "MAIN" and tier == "COMPOUND_SCREEN"),
+    }
+
+
+def _int_or_none(value: object) -> int | None:
+    if isinstance(value, bool) or not isinstance(value, int):
+        return None
+    return value
+
+
+def _means_differ(left: object, right: object) -> bool:
+    if left is None or right is None:
+        return (left is None) != (right is None)
+    a = _finite_number(left)
+    b = _finite_number(right)
+    if a is None or b is None:
+        return True
+    return abs(a - b) > RESULT_COHERENCE_TOLERANCE * max(1.0, abs(a), abs(b))
+
+
+def _view_issues(
+    view: str,
+    row: Mapping[str, Any],
+    *,
+    observed_key: str,
+    matched_key: str | None,
+    missing_key: str | None,
+    aliases: Sequence[str] = (),
+) -> list[dict[str, Any]]:
+    issues: list[dict[str, Any]] = []
+    observed = _int_or_none(row.get(observed_key))
+    if observed is None:
+        return issues
+    matched = _int_or_none(row.get(matched_key)) if matched_key else None
+    missing = _int_or_none(row.get(missing_key)) if missing_key else None
+    if matched is not None and missing is not None and observed + missing != matched:
+        issues.append(
+            {
+                "view": view,
+                "field": f"{observed_key}+{missing_key}",
+                "expected": matched,
+                "actual": observed + missing,
+            }
+        )
+    for alias in aliases:
+        if alias in row and _int_or_none(row.get(alias)) != observed:
+            issues.append({"view": view, "field": alias, "expected": observed, "actual": row.get(alias)})
+    if observed == 0 and row.get("mean_target") is not None:
+        issues.append({"view": view, "field": "mean_target", "expected": None, "actual": row.get("mean_target")})
+    if observed > 0 and "mean_target" in row and row.get("mean_target") is None:
+        issues.append({"view": view, "field": "mean_target", "expected": "NUMBER", "actual": None})
+    return issues
+
+
+def temporal_result_coherence(summary: Mapping[str, Any]) -> dict[str, Any]:
+    """Do the stored conditional views read one matched, observed sample?
+
+    Checks only fields the summary carries, so an older compact summary is
+    read as it is. Passing does not prove the old calculation right in every
+    other respect.
+    """
+
+    issues: list[dict[str, Any]] = []
+    pooled_observed = _int_or_none(summary.get("observed_target_n"))
+    pooled_mean = summary.get("mean_target")
+    issues.extend(
+        _view_issues(
+            "summary",
+            summary,
+            observed_key="observed_target_n",
+            matched_key="matched_n",
+            missing_key="missing_target_n",
+            aliases=("later_target_observed_n",),
+        )
+    )
+    pooled = summary.get("pooled")
+    if isinstance(pooled, Mapping) and pooled_observed is not None:
+        if (
+            "target_observed_after_decision" in pooled
+            and _int_or_none(pooled.get("target_observed_after_decision")) != pooled_observed
+        ):
+            issues.append(
+                {
+                    "view": "pooled",
+                    "field": "target_observed_after_decision",
+                    "expected": pooled_observed,
+                    "actual": pooled.get("target_observed_after_decision"),
+                }
+            )
+        if "mean_target" in pooled and _means_differ(pooled.get("mean_target"), pooled_mean):
+            issues.append(
+                {"view": "pooled", "field": "mean_target", "expected": pooled_mean, "actual": pooled.get("mean_target")}
+            )
+    blocks = summary.get("by_calendar_block")
+    if isinstance(blocks, list) and pooled_observed is not None:
+        total = 0
+        weighted = 0.0
+        for block in blocks:
+            if not isinstance(block, Mapping):
+                continue
+            label = f"by_calendar_block:{block.get('view')}"
+            issues.extend(_view_issues(label, block, observed_key="observed_n", matched_key=None, missing_key=None))
+            count = _int_or_none(block.get("observed_n")) or 0
+            total += count
+            mean = _finite_number(block.get("mean_target"))
+            if count and mean is not None:
+                weighted += mean * count
+        if total != pooled_observed:
+            issues.append(
+                {"view": "by_calendar_block", "field": "observed_n_sum", "expected": pooled_observed, "actual": total}
+            )
+        elif total and _means_differ(weighted / total, pooled_mean):
+            issues.append(
+                {
+                    "view": "by_calendar_block",
+                    "field": "weighted_mean_target",
+                    "expected": pooled_mean,
+                    "actual": weighted / total,
+                }
+            )
+    cohorts = summary.get("by_cohort")
+    if isinstance(cohorts, list) and pooled_observed is not None:
+        rows = [row for row in cohorts if isinstance(row, Mapping)]
+        disjoint = all((_int_or_none(row.get("shared_decision_n")) or 0) == 0 for row in rows)
+        sums = {"observed_target_n": 0, "matched_n": 0, "missing_target_n": 0}
+        weighted = 0.0
+        for row in rows:
+            label = f"by_cohort:{row.get('cohort_id')}"
+            issues.extend(
+                _view_issues(
+                    label,
+                    row,
+                    observed_key="observed_target_n",
+                    matched_key="matched_n",
+                    missing_key="missing_target_n",
+                    aliases=("target_observed_after_decision",),
+                )
+            )
+            observed = _int_or_none(row.get("observed_target_n")) or 0
+            if observed > pooled_observed:
+                issues.append(
+                    {"view": label, "field": "observed_target_n", "expected": f"<={pooled_observed}", "actual": observed}
+                )
+            for key in sums:
+                sums[key] += _int_or_none(row.get(key)) or 0
+            mean = _finite_number(row.get("mean_target"))
+            if observed and mean is not None:
+                weighted += mean * observed
+        if rows and disjoint:
+            for key, total in sums.items():
+                expected = _int_or_none(summary.get(key))
+                if expected is not None and total != expected:
+                    issues.append({"view": "by_cohort", "field": f"{key}_sum", "expected": expected, "actual": total})
+            if sums["observed_target_n"] == pooled_observed and pooled_observed and _means_differ(
+                weighted / pooled_observed, pooled_mean
+            ):
+                issues.append(
+                    {
+                        "view": "by_cohort",
+                        "field": "weighted_mean_target",
+                        "expected": pooled_mean,
+                        "actual": weighted / pooled_observed,
+                    }
+                )
+        elif rows and sums["observed_target_n"] < pooled_observed:
+            # With overlap each unique decision sits in at least one cohort.
+            issues.append(
+                {
+                    "view": "by_cohort",
+                    "field": "observed_target_n_sum",
+                    "expected": f">={pooled_observed}",
+                    "actual": sums["observed_target_n"],
+                }
+            )
+    return {
+        "status": "INCOHERENT" if issues else "COHERENT",
+        # COHERENT means no stored view contradicts another; absent fields are not checked.
+        "basis": "STORED_FIELDS_ONLY",
+        "issues": issues,
+        "repair_action": "CALCULATION_REVISION" if issues else None,
+    }
+
+
+def require_coherent_temporal_result(summary: Mapping[str, Any]) -> None:
+    if temporal_result_coherence(summary)["status"] != "COHERENT":
+        raise GroundedDiscoveryError("TEMPORAL_RESULT_INCOHERENT")
+
+
+def verify_calculation_revision_source(
+    looks: Sequence[Mapping[str, Any]],
+    *,
+    correction: Mapping[str, Any],
+    spec: Mapping[str, Any],
+    binding: Sequence[Mapping[str, Any]] | None = None,
+    operation_sha256: str | None = None,
+) -> Mapping[str, Any]:
+    """Bind one explicit correction to one saved look of the same question.
+
+    A caller flag alone is not a revision. The source must be this journal's
+    look with the given ref and hash, the same spec and operation, an older
+    readable calculation version, and, when the binding is known, the same
+    frozen input and per-point clocks.
+    """
+
+    ref = str(correction.get("source_result_ref") or "")
+    digest = str(correction.get("source_result_sha256") or "")
+    if not ref or not _is_hex64(digest):
+        raise GroundedDiscoveryError("CALCULATION_REVISION_SOURCE_REQUIRED")
+    source = next((item for item in looks if str(item.get("record_id") or "") == ref), None)
+    if source is None or not isinstance(source.get("result"), Mapping):
+        raise GroundedDiscoveryError("CALCULATION_REVISION_SOURCE_NOT_FOUND")
+    if source.get("result_sha256") != digest or _sha256(source["result"]) != digest:
+        raise GroundedDiscoveryError("CALCULATION_REVISION_SOURCE_HASH_MISMATCH")
+    bound = validate_temporal_query(spec)
+    if source.get("spec_sha256") != bound["spec_sha256"]:
+        raise GroundedDiscoveryError("CALCULATION_REVISION_SPEC_MISMATCH")
+    owner = source.get("operation_sha256")
+    if operation_sha256 and owner and owner != operation_sha256:
+        raise GroundedDiscoveryError("CALCULATION_REVISION_OPERATION_MISMATCH")
+    version = source.get("calculation_version")
+    if version == TEMPORAL_CALCULATION_VERSION:
+        raise GroundedDiscoveryError("CALCULATION_REVISION_NOT_REQUIRED")
+    if version not in TEMPORAL_CALCULATION_VERSIONS_READABLE:
+        raise GroundedDiscoveryError("CALCULATION_REVISION_SOURCE_UNREADABLE")
+    recipe = source["result"].get("experiment_recipe")
+    if not isinstance(recipe, Mapping) or not isinstance(recipe.get("frozen_input"), list):
+        raise GroundedDiscoveryError("CALCULATION_REVISION_SOURCE_UNVERIFIABLE")
+    if recipe.get("spec") != canonical_temporal_spec(spec):
+        raise GroundedDiscoveryError("CALCULATION_REVISION_SPEC_MISMATCH")
+    if binding is not None and list(recipe["frozen_input"]) != temporal_frozen_input(binding):
+        raise GroundedDiscoveryError("CALCULATION_REVISION_INPUT_MISMATCH")
+    return source
+
+
+def calculation_revision_reason(source_result: Mapping[str, Any]) -> dict[str, Any]:
+    """Why a revision was written: the exact incoherent fields, or a version change."""
+
+    coherence = temporal_result_coherence(source_result)
+    if coherence["status"] == "INCOHERENT":
+        return {
+            "code": COHORT_CONDITIONAL_SAMPLE_CORRECTION,
+            "source_coherence": "INCOHERENT",
+            "source_issue_fields": sorted({f"{item['view']}.{item['field']}" for item in coherence["issues"]}),
+        }
+    return {
+        "code": "CALCULATION_VERSION_SUPERSEDED",
+        "source_coherence": "COHERENT",
+        "source_issue_fields": [],
     }
 
 
@@ -1517,13 +1788,59 @@ def look_counts_toward_scientific_search(item: Mapping[str, Any]) -> bool:
     return True
 
 
+def look_revision_root(item: Mapping[str, Any]) -> str:
+    """The attempt a look belongs to: its own record, or the one it revises."""
+
+    lineage = item.get("revision_of")
+    if isinstance(lineage, Mapping):
+        root = str(lineage.get("root_record_id") or lineage.get("record_id") or "")
+        if root:
+            return root
+    return str(item.get("record_id") or "")
+
+
+def current_look_evidence(
+    look: Mapping[str, Any],
+    looks: Sequence[Mapping[str, Any]],
+) -> Mapping[str, Any]:
+    """Newest evidence for one attempt: a current-version revision, else the look."""
+
+    root = look_revision_root(look)
+    if not root:
+        return look
+    family = [
+        item
+        for item in looks
+        if look_revision_root(item) == root and isinstance(item.get("result"), Mapping)
+    ]
+    current = [item for item in family if item.get("calculation_version") == TEMPORAL_CALCULATION_VERSION]
+    if current:
+        return current[-1]
+    revisions = [item for item in family if isinstance(item.get("revision_of"), Mapping)]
+    return revisions[-1] if revisions else look
+
+
+def look_evidence_is_science_ready(
+    look: Mapping[str, Any],
+    looks: Sequence[Mapping[str, Any]],
+) -> bool:
+    """Spend and fitness differ. A spent look is ready only on coherent evidence."""
+
+    result = current_look_evidence(look, looks).get("result")
+    return isinstance(result, Mapping) and temporal_result_coherence(result)["status"] == "COHERENT"
+
+
 def assess_tier_progress(
     looks: Sequence[Mapping[str, Any]],
     *,
     freeze_worthy: bool,
     compound_applicable: bool = True,
 ) -> dict[str, Any]:
-    """Pre-freeze tier state. A skipped compound tier is not an executed search."""
+    """Pre-freeze tier state. A skipped compound tier is not an executed search.
+
+    A spent look stays spent. Its evidence authorizes a tier terminal only
+    when the look, or its calculation revision, is coherent.
+    """
 
     simple = [
         item
@@ -1543,7 +1860,16 @@ def assess_tier_progress(
         if item.get("new_look") is True
         and not look_counts_toward_scientific_search(item)
     ]
-    if not compound_applicable:
+    simple_ready = [item for item in simple if look_evidence_is_science_ready(item, looks)]
+    compound_ready = [item for item in compound if look_evidence_is_science_ready(item, looks)]
+    # Any spent look on unfit evidence is an unknown; one coherent sibling
+    # does not let the search close over it.
+    revision_required = len(simple_ready) < len(simple) or len(compound_ready) < len(compound)
+    if revision_required:
+        # A wrong saved summary justifies neither a terminal nor escalation.
+        status = "TECHNICAL_BLOCKED"
+        action = "CORRECT_CALCULATION_REVISION"
+    elif not compound_applicable:
         # Compound N/A may close search only after scientific simple evidence.
         # Technical/metadata-only looks must not authorize SEARCH_EXHAUSTED via
         # the SKIPPED_INAPPLICABLE shortcut.
@@ -1587,6 +1913,7 @@ def assess_tier_progress(
         "compound_status": status,
         "compound_executed": status == "EXECUTED",
         "simple_executed": bool(simple),
+        "evidence_revision_required": revision_required,
         "search_exhausted_allowed": exhausted_allowed,
         "freeze_worthy": freeze_worthy,
     }
@@ -1646,21 +1973,10 @@ def _cost_views(r_mark: float | None, profile: Mapping[str, Any] | None) -> dict
     }
 
 
-def execute_temporal_discovery(
-    census: Sequence[Mapping[str, Any]],
-    observations: Sequence[Mapping[str, Any]],
-    spec: Mapping[str, Any],
-    binding: Sequence[Mapping[str, Any]],
-) -> dict[str, Any]:
-    """Compute one temporal query. Binding is admitted before any value read."""
+def temporal_frozen_input(binding: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Recipe input identity: files, releases and per-point clocks. No values."""
 
-    for item in binding:
-        if "holdout" not in item:
-            raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED")
-        if "evidence_role" not in item:
-            raise GroundedDiscoveryError("DISCOVERY_ROLE_AMBIGUOUS")
-    admitted = admit_discovery_binding(binding)
-    frozen_source = [
+    return [
         {
             "dataset_id": item.get("dataset_id"),
             "evidence_role": item.get("evidence_role"),
@@ -1679,6 +1995,23 @@ def execute_temporal_discovery(
         }
         for item in binding
     ]
+
+
+def execute_temporal_discovery(
+    census: Sequence[Mapping[str, Any]],
+    observations: Sequence[Mapping[str, Any]],
+    spec: Mapping[str, Any],
+    binding: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Compute one temporal query. Binding is admitted before any value read."""
+
+    for item in binding:
+        if "holdout" not in item:
+            raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED")
+        if "evidence_role" not in item:
+            raise GroundedDiscoveryError("DISCOVERY_ROLE_AMBIGUOUS")
+    admitted = admit_discovery_binding(binding)
+    frozen_source = temporal_frozen_input(binding)
     bound = validate_temporal_query(spec)
     body = bound["scientific_body"]
     lateness = int(body["schedule_lateness_seconds"])
@@ -1991,11 +2324,7 @@ def execute_temporal_discovery(
         _note_cohort_membership(cohort_membership, cohort, identity, members[-1])
     base_members = [item for item in members if item["in_base"]]
     decision_members = [item for item in base_members if item["decision_eligible"]]
-    matched_members = [
-        item for item in decision_members if item["matched"] and not item.get("integrity_excluded")
-    ]
-    observed = [item for item in matched_members if item["target_is_observed"] and item["target"] is not None]
-    missing_target = [item for item in matched_members if not item["target_is_observed"]]
+    matched_members, observed, missing_target = _conditional_sample(decision_members)
     observed_values = [float(item["target"]) for item in observed]
     observed_mean = _mean(observed_values)
     known_source_events = [
@@ -2188,6 +2517,7 @@ def execute_temporal_discovery(
         summary["terminal"] = stop["terminal"]
         summary["reason_code"] = stop["reason_code"]
         summary["scientific_negative"] = False
+    require_coherent_temporal_result(summary)
     return {
         "admitted": admitted,
         "summary": summary,

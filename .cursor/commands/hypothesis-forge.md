@@ -150,6 +150,8 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <canonical-data-root> --store <canonical-data-root> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --operation <ordinary-operation.json> --format json
 ```
 
+`TEMPORAL_RESULT_INCOHERENT` / `next_action=CORRECT_CALCULATION_REVISION` is a technical stop on a saved result, not a request for more looks. Revise that exact result on the same spec and input by adding `--correct-result-ref <ref> --correct-result-sha256 <hash>` to the same command. This writes one `CALCULATION_REVISION` with `new_look=false`. A repeat answers `correction_already_applied`.
+
 Feature preview writes store memory only when `--store` and `--journal-scope` are both set. A third distinct preview is `PREVIEW_ENVELOPE_EXHAUSTED`. `SCHEDULE_CONTEXT_UNBOUND`, `SCHEDULE_LATENESS_MISMATCH` and `FROZEN_INPUT_MISMATCH` are technical stops, not a scientific negative.
 
 ```text

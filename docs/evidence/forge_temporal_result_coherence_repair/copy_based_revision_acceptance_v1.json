@@ -1,0 +1,209 @@
+{
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.forge-copy-based-revision-acceptance",
+  "schema_version": "1.0",
+  "task_id": "FORGE_TEMPORAL_RESULT_COHERENCE_REPAIR_V1",
+  "status": "PASS",
+  "store_location": "ISOLATED_BYTE_COPY_OUTSIDE_REPOSITORY",
+  "live_store_writes": 0,
+  "live_store_manifest": {
+    "files": 308,
+    "unchanged_before_and_after_copy_run": true
+  },
+  "copy_identical_to_live_before_run": true,
+  "process_model": "EACH_STEP_A_NEW_CLI_PROCESS",
+  "code_head_at_run": "12b1f912",
+  "source": {
+    "focus": "WINDOW_LIQUIDITY_SURVIVAL_15M_TO_4H",
+    "journal_scope": "58d69e4384549b48a09616ba2e1fb6d947a9dd8d5197e2bb3678c2049fe6cba1",
+    "operation_sha256": "338eb5ff374b5efcf6720d12cf88fe7d4d9257601b055dd118422ab82b52ad37",
+    "spec_sha256": "cc7e450b353d2c864804dc48d2511b53f942a019496604b202d04a4ffd245d5a",
+    "market_evidence_epoch_sha256": "ae771cf5c1e7692c007b442c0048e7547005dc09125eeb9eb75e24406e429749",
+    "data_binding_sha256": "4d827372d0f7aacb9e3ff0ee09fd44bb6796bce069e144f0c0d1c0e6c9aef567",
+    "result_ref": "HFIC-ART-DISCOVERY-56BEAD6F516806D152E9F91559F6A7EEA4A5CFCE",
+    "result_sha256": "fa3effb7e78d3693e02aa8f9070fcd503f164cfe73f950cb3e899292915949c5",
+    "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V3",
+    "base_code_reproduces_source_bytes": true
+  },
+  "before_revision": {
+    "forge_run_next_action": "CORRECT_CALCULATION_REVISION",
+    "forge_run_owner_final": "SAVED_RESULT_NEEDS_CALCULATION_REVISION",
+    "ordinary_operation_status": "PAUSED_CAP",
+    "compound_status": "TECHNICAL_BLOCKED",
+    "ordinary_execute": {
+      "exit": 2,
+      "reason_code": "TEMPORAL_RESULT_INCOHERENT",
+      "values_loaded": false,
+      "writes": false,
+      "incoherent_fields": [
+        "by_cohort.observed_target_n_sum",
+        "by_cohort:REL-20260902T111900Z-20260909T111900Z.observed_target_n+missing_target_n",
+        "by_cohort:REL-20260909T111900Z-20260916T111900Z.observed_target_n+missing_target_n",
+        "by_cohort:REL-20260914T173510Z-20260921T173510Z.observed_target_n+missing_target_n"
+      ]
+    }
+  },
+  "revision": {
+    "exit": 0,
+    "result_ref": "HFIC-ART-DISCOVERY-BD41C662D377C9D2CD77B2AF6BAD497CCDA70D87",
+    "result_sha256": "d0229c58fd60f0c97690e23567acc7dc7cd62805adab83a352bd87ce953c67c4",
+    "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V4",
+    "look_class": "CALCULATION_REVISION",
+    "new_look": false,
+    "revision_of": {
+      "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V3",
+      "data_binding_sha256": "4d827372d0f7aacb9e3ff0ee09fd44bb6796bce069e144f0c0d1c0e6c9aef567",
+      "reason": {
+        "code": "COHORT_CONDITIONAL_SAMPLE_V4",
+        "source_coherence": "INCOHERENT",
+        "source_issue_fields": [
+          "by_cohort.observed_target_n_sum",
+          "by_cohort:REL-20260902T111900Z-20260909T111900Z.observed_target_n+missing_target_n",
+          "by_cohort:REL-20260909T111900Z-20260916T111900Z.observed_target_n+missing_target_n",
+          "by_cohort:REL-20260914T173510Z-20260921T173510Z.observed_target_n+missing_target_n"
+        ]
+      },
+      "record_id": "HFIC-ART-DISCOVERY-56BEAD6F516806D152E9F91559F6A7EEA4A5CFCE",
+      "result_sha256": "fa3effb7e78d3693e02aa8f9070fcd503f164cfe73f950cb3e899292915949c5",
+      "root_record_id": "HFIC-ART-DISCOVERY-56BEAD6F516806D152E9F91559F6A7EEA4A5CFCE"
+    },
+    "record_delta": {
+      "discovery_look_records": 1
+    },
+    "scientific_look_delta": {
+      "adaptive": 0,
+      "main": 0
+    },
+    "same_spec_binding_operation_scope": true,
+    "changed_result_keys": [
+      "by_cohort",
+      "calculation_version"
+    ],
+    "independent_rerun_matches_revision_bytes": true
+  },
+  "cohorts_before": [
+    {
+      "cohort_id": "REL-20260902T111900Z-20260909T111900Z",
+      "matched_n": 283,
+      "missing_target_n": 74,
+      "observed_target_n": 266,
+      "mean_target": -0.019688486701616822,
+      "shared_decision_n": 0
+    },
+    {
+      "cohort_id": "REL-20260909T111900Z-20260916T111900Z",
+      "matched_n": 128,
+      "missing_target_n": 2,
+      "observed_target_n": 158,
+      "mean_target": -0.01169616802858147,
+      "shared_decision_n": 0
+    },
+    {
+      "cohort_id": "REL-20260914T173510Z-20260921T173510Z",
+      "matched_n": 284,
+      "missing_target_n": 0,
+      "observed_target_n": 375,
+      "mean_target": -0.02584510727629554,
+      "shared_decision_n": 0
+    }
+  ],
+  "cohorts_after": [
+    {
+      "cohort_id": "REL-20260902T111900Z-20260909T111900Z",
+      "matched_n": 283,
+      "missing_target_n": 74,
+      "observed_target_n": 209,
+      "mean_target": -0.007680012290675766,
+      "shared_decision_n": 0
+    },
+    {
+      "cohort_id": "REL-20260909T111900Z-20260916T111900Z",
+      "matched_n": 128,
+      "missing_target_n": 2,
+      "observed_target_n": 126,
+      "mean_target": -0.003152031405455175,
+      "shared_decision_n": 0
+    },
+    {
+      "cohort_id": "REL-20260914T173510Z-20260921T173510Z",
+      "matched_n": 284,
+      "missing_target_n": 0,
+      "observed_target_n": 284,
+      "mean_target": -0.023574255628523905,
+      "shared_decision_n": 0
+    }
+  ],
+  "pooled_unchanged": {
+    "matched_n": 695,
+    "observed_target_n": 619,
+    "missing_target_n": 76,
+    "mean_target": -0.014050673868076536,
+    "median_target": 0.0
+  },
+  "baseline_unchanged": {
+    "mean_target": -0.020997555994689332,
+    "mean_target_kind": "PRICE_RELATIVE_PROXY",
+    "observed_n": 799,
+    "view": "BASELINE_DECISION_ELIGIBLE"
+  },
+  "repeat_correction": {
+    "exit": 0,
+    "correction_already_applied": true,
+    "writes": false,
+    "values_loaded": false,
+    "result_refs": [
+      "HFIC-ART-DISCOVERY-BD41C662D377C9D2CD77B2AF6BAD497CCDA70D87"
+    ]
+  },
+  "ordinary_replay_after": {
+    "exit": 0,
+    "result_refs": [
+      "HFIC-ART-DISCOVERY-BD41C662D377C9D2CD77B2AF6BAD497CCDA70D87"
+    ],
+    "values_loaded": false,
+    "writes": false
+  },
+  "cold_readback": {
+    "next_action": "AUTHORIZE_ADDITIONAL_LOOKS",
+    "owner_final": "OPERATION_PAUSED_SEARCH_OPEN",
+    "status": "PAUSED_CAP",
+    "result_refs": [
+      "HFIC-ART-DISCOVERY-BD41C662D377C9D2CD77B2AF6BAD497CCDA70D87"
+    ],
+    "result_calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V4",
+    "result_coherence": "COHERENT",
+    "protocol_main_used": 1,
+    "owner_main_remaining": 0,
+    "compound_status": "NOT_STARTED",
+    "search_open": true
+  },
+  "counts": {
+    "main_before": 1,
+    "main_after": 1,
+    "adaptive": 0,
+    "preview": 0,
+    "reservations_before": 1,
+    "reservations_after": 1,
+    "operation_rows_before": 3,
+    "operation_rows_after": 3
+  },
+  "non_claims": [
+    "COPY_ONLY_NOT_LIVE",
+    "NO_SCIENTIFIC_EVALUATION_IN_THIS_RUN",
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_NEW_LOOK"
+  ],
+  "reruns": [
+    {
+      "code_head": "22f81eef",
+      "outcome": "SAME_REVISION_REF_AND_BYTES"
+    },
+    {
+      "code_head": "12b1f912",
+      "outcome": "SAME_REVISION_REF_AND_BYTES"
+    }
+  ]
+}
