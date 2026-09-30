@@ -11,7 +11,7 @@
   },
   "copy_identical_to_live_before_run": true,
   "process_model": "EACH_STEP_A_NEW_CLI_PROCESS",
-  "code_head_at_run": "22f81eef",
+  "code_head_at_run": "12b1f912",
   "source": {
     "focus": "WINDOW_LIQUIDITY_SURVIVAL_15M_TO_4H",
     "journal_scope": "58d69e4384549b48a09616ba2e1fb6d947a9dd8d5197e2bb3678c2049fe6cba1",
@@ -192,5 +192,15 @@
     "NO_ALPHA",
     "NO_NET_RETURN",
     "NO_NEW_LOOK"
+  ],
+  "reruns": [
+    {
+      "code_head": "22f81eef",
+      "outcome": "SAME_REVISION_REF_AND_BYTES"
+    },
+    {
+      "code_head": "12b1f912",
+      "outcome": "SAME_REVISION_REF_AND_BYTES"
+    }
   ]
 }
