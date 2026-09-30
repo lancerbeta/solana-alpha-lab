@@ -11299,7 +11299,7 @@
     },
     {
       "source_asset_id": "MODULE-FACTORY-V1-HFIC-SCIENTIFIC-DISPOSITION-001",
-      "relation": "depends_on",
+      "relation": "consumes",
       "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
     },
     {
@@ -16361,6 +16361,11 @@
       "source_asset_id": "SKILL-HYPOTHESIS-FORGE-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001"
+    },
+    {
+      "source_asset_id": "SKILL-HYPOTHESIS-FORGE-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001"
     },
     {
       "source_asset_id": "SKILL-HYPOTHESIS-FORGE-001",

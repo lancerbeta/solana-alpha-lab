@@ -44,10 +44,30 @@ class DispositionNavigationTests(unittest.TestCase):
         self.assertEqual(resolved.returncode, 0, resolved.stderr)
         route = json.loads(resolved.stdout)
         self.assertFalse(route["authority_granted"])
-        bindings = {item["binding_id"]: item for item in route["root_bindings"]}
-        doc = bindings["ACTIVE-SCIENTIFIC-DISPOSITION-CONTINUITY"]
-        self.assertEqual(doc["target_asset_id"], "DOC-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001")
-        text = (ROOT / doc["path"]).read_text(encoding="utf-8")
+        roots = {item["asset_id"] for item in route["root_assets"]}
+        self.assertIn("MODULE-FACTORY-V1-RESEARCH-STORE-001", roots)
+        # Existing root -> consumers of the store -> the disposition owner.
+        consumers = _run(
+            str(CATALOG_CLI), "related-assets", "MODULE-FACTORY-V1-RESEARCH-STORE-001",
+            "--direction", "in", "--relation", "consumes", "--json",
+        )
+        self.assertEqual(consumers.returncode, 0, consumers.stderr)
+        module_ids = {item["asset_id"] for item in json.loads(consumers.stdout)["results"]}
+        self.assertIn("MODULE-FACTORY-V1-HFIC-SCIENTIFIC-DISPOSITION-001", module_ids)
+        owners = _run(
+            str(CATALOG_CLI), "related-assets", "MODULE-FACTORY-V1-HFIC-SCIENTIFIC-DISPOSITION-001",
+            "--direction", "in", "--json",
+        )
+        self.assertEqual(owners.returncode, 0, owners.stderr)
+        docs = {item["asset_id"]: item for item in json.loads(owners.stdout)["results"]}
+        doc = docs["DOC-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001"]
+        # The Forge route reaches the same contract through its skill root.
+        skill = _run(str(CATALOG_CLI), "related-assets", "SKILL-HYPOTHESIS-FORGE-001", "--direction", "out", "--json")
+        self.assertIn(
+            "DOC-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001",
+            {item["asset_id"] for item in json.loads(skill.stdout)["results"]},
+        )
+        text = (ROOT / doc["path_repository"]).read_text(encoding="utf-8")
         self.assertIn("scripts/hypothesis_forge.py disposition-show --owner-focus", text)
         self.assertIn("scripts/hypothesis_forge.py disposition-record --input", text)
         helped = _run(str(FORGE_CLI), "disposition-show", "--help")
@@ -73,6 +93,9 @@ class DispositionNavigationTests(unittest.TestCase):
             ],
         )
         self.assertEqual(len(prior["root_asset_ids"]), 3)
+        self.assertEqual(prior["root_binding_ids"], [])
+        self.assertEqual(prior["related_route_ids"], ["SEM-EXPERIMENT-CAPABILITIES", "SEM-LIVE-EVIDENCE-TO-FORGE"])
+        self.assertLessEqual(len(prior["search_terms"]), 16)
         self.assertEqual(len(config["routes"]), 13)
 
 

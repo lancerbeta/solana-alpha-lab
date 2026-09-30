@@ -17787,7 +17787,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-34A
   location: {kind: git_path, logical_uri: 'repo://docs/OPERATOR_NAVIGATION.md', repository_path: docs/OPERATOR_NAVIGATION.md}
-  integrity: {kind: sha256, sha256: e441b21ea2d64178c7829f13faab2d04172281b51979a215941bff472cf9b7c8}
+  integrity: {kind: sha256, sha256: a896bed012b0d9b98531215292e4e69ee4dea9351fbecaa526c2472c06278a26}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: SCRIPT-T34A-CONTEXT-001}
@@ -32728,7 +32728,7 @@ records:
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001}
-  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RESEARCH-STORE-001}
+  - {relation_type: consumes, target_asset_id: MODULE-FACTORY-V1-RESEARCH-STORE-001}
   - {relation_type: depends_on, target_asset_id: SCHEMA-HFIC-SCIENTIFIC-DISPOSITION-V1-001}
   consumers: [FACTORY-001, SCRIPT-HYPOTHESIS-FORGE-001]
   evidence: []
@@ -34541,7 +34541,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: 848b9657c497f6c652190b6ef062fe3246a1b3314f58d514096499b55db64937}
+  integrity: {kind: sha256, sha256: 5fdab649370e4f7c6d830a95d2ee70278058544cb6bfc5c0b5948f052364d99c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34617,6 +34617,7 @@ records:
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
   - {relation_type: depends_on, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}
+  - {relation_type: depends_on, target_asset_id: DOC-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001}
   consumers: [DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
   evidence: []
   search_terms: [HYPOTHESIS_FORGE, SKILL]
@@ -34648,7 +34649,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/FACTORY_SEMANTIC_MAP.md', repository_path: docs/FACTORY_SEMANTIC_MAP.md}
-  integrity: {kind: sha256, sha256: bda85690d0f24ec0877a08edcb9a5ee856cbf0914c3ad1031ef188b48acbf93c}
+  integrity: {kind: sha256, sha256: 302b2a57761a8b46310ec6fca1a0c2781956f7643a524555328630ce68f08c5d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}

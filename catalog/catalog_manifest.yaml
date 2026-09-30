@@ -51,14 +51,6 @@ canonical_bindings:
     - SCRIPT-HYPOTHESIS-FORGE-001
     - DOC-HYPOTHESIS-FORGE-OPERATOR-001
     - MODULE-HFIC-REPRESENTATION-LADDER-001
-  ACTIVE-SCIENTIFIC-DISPOSITION-CONTINUITY:
-    target_asset_id: DOC-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001
-    expected_asset_type: control_document
-    semantics: CURRENT_AT_COMMIT
-    rationale: Current contract for authored ordinary Forge assessments and their applicability read path
-    current_use_evidence_asset_ids:
-    - MODULE-FACTORY-V1-HFIC-SCIENTIFIC-DISPOSITION-001
-    - TEST-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001
   ACTIVE-EXPERIMENT-CAPABILITY-REGISTRY:
     target_asset_id: CONFIG-EXPERIMENT-CAPABILITY-REGISTRY-V2-001
     expected_asset_type: configuration
