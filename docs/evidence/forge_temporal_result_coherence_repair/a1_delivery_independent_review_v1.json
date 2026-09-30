@@ -4,8 +4,8 @@
   "review_id": "FORGE-TEMPORAL-RESULT-COHERENCE-REPAIR-REVIEW-001",
   "as_of": "2026-09-30",
   "task_id": "FORGE_TEMPORAL_RESULT_COHERENCE_REPAIR_V1",
-  "reviewed_bindings_sha256": "152fa40920082d51d50b41b946111e0fbfef73e0c9369eed37972c621b3c9f8f",
-  "reviewed_inventory_sha256": "480f8083b9155d2f8b0a3bcee0dc7e8d53afec4cdeb99c76fab21cf04adf3ef1",
+  "reviewed_bindings_sha256": "5e330d930f4f5e1951c6f2780bd358c4d9fcd67aa31a766a40e44e9db3baea1a",
+  "reviewed_inventory_sha256": "2228ab6d63b36009ac9cbe81380b3a26ac8eb1fe3a2f3f9c1f02ca2ef21c4590",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
