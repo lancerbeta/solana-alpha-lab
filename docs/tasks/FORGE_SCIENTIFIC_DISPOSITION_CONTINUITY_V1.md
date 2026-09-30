@@ -55,6 +55,7 @@ managed_write_set:
   - configs/factory_semantic_operability_v1.yaml
   - catalog/catalog_manifest.yaml
   - catalog/assets/core.yaml
+  - catalog/assets/lifecycle.yaml
   - catalog/generated/**
   - docs/FACTORY_SEMANTIC_MAP.md
   - docs/OPERATOR_NAVIGATION.md

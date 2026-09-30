@@ -50,6 +50,7 @@ from tests.test_hfic_ordinary_operation_acceptance_v1 import (  # noqa: E402
 )
 
 FOCUS = "WINDOW_SURVIVAL_SYNTHETIC_FOCUS"
+ROOT_DIR = Path(__file__).resolve().parents[1]
 
 
 # ---------------------------------------------------------------------------
@@ -620,6 +621,8 @@ class V3DriftAndLineageTests(_Base):
             disp.record_disposition(store, revised, current_market=ctx["market"])
         self.assertEqual(dup.exception.code, "DISPOSITION_SUBJECT_HAS_HEAD")
         self.assertEqual(dup.exception.head_refs, [q1["record_id"]])
+        # The refusal names the head hash a successor must cite.
+        self.assertEqual(dup.exception.detail, f"{q1['record_id']}:{q1['disposition_sha256']}")
         successor = question_packet(ctx, ctx["q1"])
         successor["judgement"]["verdict"] = "INSUFFICIENT_EVIDENCE"
         successor["judgement"]["recommendation"] = "REVIEW_BOUNDED_SCOPE"
@@ -700,7 +703,8 @@ class V3DriftAndLineageTests(_Base):
         with mock.patch.object(disp, "resolve_focus", side_effect=RuntimeError("boom")):
             capsule = disp.safe_disposition_context(store, owner_focus=FOCUS, current_market=ctx["market"])
         self.assertEqual(capsule["status"], "UNAVAILABLE")
-        self.assertEqual(capsule["reason_code"], "RuntimeError")
+        self.assertEqual(capsule["reason_code"], "DISPOSITION_CONTEXT_READ_FAILED")
+        self.assertEqual(capsule["error_class"], "RuntimeError")
         self.assertIn("UNAVAILABLE", disp.format_context_lines(capsule)[0])
 
 
@@ -922,13 +926,260 @@ class V4OperabilityTests(_Base):
             side_effect=AssertionError("detail must not evaluate outcomes"),
         ):
             while offset is not None:
-                page = _show(ctx["root"], "--offset", str(offset), "--limit", "10")
+                page = disp.disposition_detail(
+                    store, owner_focus=FOCUS, current_market=ctx["market"], offset=offset, limit=10
+                )
                 seen |= {item["head_ref"] for item in page["entries"]}
                 offset = page["next_offset"]
         self.assertEqual(len(seen), total)
+        # The same pages through the CLI in a fresh process.
+        cli_page = _show(ctx["root"], "--offset", "20", "--limit", "10")
+        self.assertEqual(cli_page["total_subjects"], total)
+        self.assertEqual(len(cli_page["entries"]), total - 20)
         packet = _preflight(ctx["root"])["forge_context_packet"]
         self.assertLessEqual(len(json.dumps(packet["scientific_disposition_context"], sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()), disp.COMPACT_CONTEXT_MAX_BYTES)
         self.assertEqual(packet["truncation_receipt"]["max_packet_bytes"], FORGE_OPERATIONAL_PACKET_MAX_BYTES)
+
+
+# ---------------------------------------------------------------------------
+# Review round 1 regressions (architecture, code, goal/DoD, owner-UX findings)
+# ---------------------------------------------------------------------------
+
+
+class ReviewRegressionTests(_Base):
+    def _recorded(self) -> tuple[dict, dict, dict, dict]:
+        ctx = _ctx(self.workspace())
+        store = ResearchStore(ctx["root"], create_if_missing=False)
+        q1 = disp.record_disposition(store, question_packet(ctx, ctx["q1"]), current_market=ctx["market"])
+        q2 = disp.record_disposition(store, question_packet(ctx, ctx["q2"]), current_market=ctx["market"])
+        s1 = disp.record_disposition(store, search_packet(ctx, [ctx["q1"], ctx["q2"]]), current_market=ctx["market"])
+        return ctx, q1, q2, s1
+
+    def test_unknown_market_and_rotated_journal_are_never_current(self) -> None:
+        ctx, q1, _q2, s1 = self._recorded()
+        store = ResearchStore(ctx["root"], create_if_missing=False)
+        unknown = disp.disposition_context(store, owner_focus=FOCUS, current_market=None)
+        self.assertEqual({item["status"] for item in unknown["entries"]}, {disp.STATUS_REVIEW})
+        self.assertTrue(all(item["reasons"] == ["MARKET_UNVERIFIED"] for item in unknown["entries"]))
+        self.assertFalse(any(item["recommendation_active"] for item in unknown["entries"]))
+        self.assertIn("market UNVERIFIED", "\n".join(disp.format_context_lines(unknown)))
+        rotated = disp.disposition_context(
+            store, owner_focus=FOCUS, current_market=ctx["market"], journal_scope="9" * 64
+        )
+        by_ref = {item["ref"]: item for item in rotated["entries"]}
+        self.assertEqual(by_ref[s1["record_id"]]["status"], disp.STATUS_REVIEW)
+        self.assertEqual(by_ref[s1["record_id"]]["reasons"], ["JOURNAL_CHANGED"])
+        # A question stays about its own bound result.
+        self.assertEqual(by_ref[q1["record_id"]]["status"], disp.STATUS_CURRENT)
+        # Blocked forge-run without a market never shows advice as current.
+        with mock.patch.object(disp, "_View", wraps=disp._View):
+            capsule = disp.safe_disposition_context(store, owner_focus=FOCUS, current_market=None)
+        self.assertFalse(any(item.get("recommendation_active") for item in capsule["entries"]))
+
+    def test_host_paths_are_refused_and_never_break_readback(self) -> None:
+        ctx = _ctx(self.workspace())
+        store = ResearchStore(ctx["root"], create_if_missing=False)
+        for text in (
+            "copied from /srv/lab/data",
+            "see E:\\lab\\data",
+            "window from /mnt/research/store",
+            f"snapshot at {ctx['root']}",
+            "SMIAL_DATA_ROOT snapshot",
+            "notes at https://example.org/readout",
+        ):
+            with self.subTest(text=text):
+                packet = question_packet(ctx, ctx["q1"])
+                packet["judgement"]["caveats"] = [text]
+                with self.assertRaises(disp.DispositionError) as caught:
+                    disp.record_disposition(store, packet, current_market=ctx["market"])
+                self.assertEqual(caught.exception.code, "DISPOSITION_ABSOLUTE_PATH_FORBIDDEN")
+        allowed = question_packet(ctx, ctx["q1"])
+        allowed["judgement"]["caveats"] = ["PASS/FAIL wording and the /hypothesis-forge slash kept literal"]
+        self.assertEqual(disp.record_disposition(store, allowed, current_market=ctx["market"])["disposition"], "CREATED")
+        # FAULT INJECTION: restored history that carries the real data-root path.
+        leaky = disp.normalize_packet(question_packet(ctx, ctx["q2"]))
+        leaky["judgement"]["caveats"] = [f"restored from a host copy at {ctx['root']}"]
+        leaky["basis"]["operation_sha256"] = None
+        leaky["basis"]["data_binding_sha256"] = ctx["q2"]["data_binding_sha256"]
+        _inject_body(ctx["root"], leaky)
+        run = _forge_run(ctx["root"])
+        self.assertEqual(run["_exit"], 0, run["_stderr"][-400:])
+        self.assertEqual(run["scientific_disposition_context"]["status"], "UNAVAILABLE")
+        self.assertEqual(run["scientific_disposition_context"]["reason_code"], "DISPOSITION_CONTEXT_PATH_LEAK")
+        self.assertIn("ordinary_operation", run)
+        packet = _preflight(ctx["root"])["forge_context_packet"]
+        self.assertEqual(packet["scientific_disposition_context"]["status"], "UNAVAILABLE")
+
+    def test_capsule_shrinks_first_under_packet_budget(self) -> None:
+        import contextlib
+        import io
+        import importlib.util
+
+        from solana_alpha_lab.factory import hfic_preflight
+        from solana_alpha_lab.factory.hfic_preflight import canonical_json_bytes
+
+        ctx, *_ = self._recorded()
+        spec = importlib.util.spec_from_file_location("hfic_forge_cli_budget", ROOT_DIR / "scripts" / "hypothesis_forge.py")
+        forge = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(forge)
+
+        def preflight() -> dict:
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                code = forge.main(
+                    ["--root", str(ROOT_DIR), "--data-root", str(ctx["root"]), "preflight", "--discovery-contract",
+                     "--owner-focus", FOCUS, "--format", "json"]
+                )
+            self.assertEqual(code, 0, out.getvalue()[-400:])
+            return json.loads(out.getvalue())["forge_context_packet"]
+
+        baseline = preflight()
+        capsule = baseline["scientific_disposition_context"]
+        full = len(canonical_json_bytes(baseline))
+        saved = len(canonical_json_bytes(capsule)) - len(canonical_json_bytes(disp.compact_counts_only(capsule)))
+        self.assertGreater(saved, 600)
+        bound = full - saved + 300
+        with mock.patch.object(hfic_preflight, "forge_context_packet_max_bytes", return_value=bound):
+            squeezed = preflight()
+        reduced = squeezed["scientific_disposition_context"]
+        self.assertTrue(reduced["reduced_for_packet_budget"])
+        self.assertEqual(reduced["entries"], [])
+        self.assertEqual(reduced["omitted"], capsule["total_subjects"])
+        self.assertIn("disposition-show", reduced["detail_query"])
+        # Scientific and navigation sections are untouched.
+        self.assertEqual(squeezed["semantic_capability_entries"], baseline["semantic_capability_entries"])
+        self.assertEqual(squeezed["feature_grounding_entries"], baseline["feature_grounding_entries"])
+        self.assertFalse(squeezed["truncation_receipt"].get("feature_grounding_truncated"))
+
+    def test_packets_without_assessment_history_keep_their_shape(self) -> None:
+        ctx = _ctx(self.workspace())
+        packet = _preflight(ctx["root"])["forge_context_packet"]
+        self.assertNotIn("scientific_disposition_context", packet)
+
+    def test_not_recorded_is_scoped_and_matches_the_detail_query(self) -> None:
+        ctx = _ctx(self.workspace())
+        root = ctx["root"]
+        run = _forge_run(root)
+        shown = _show(root)
+        expected = sorted([ctx["q1"]["record_id"], ctx["q2"]["record_id"]])
+        self.assertEqual(sorted(item["result_ref"] for item in run["scientific_disposition_context"]["not_recorded"]), expected)
+        self.assertEqual(sorted(item["result_ref"] for item in shown["not_recorded"]), expected)
+        row = next(item for item in shown["not_recorded"] if item["result_ref"] == ctx["q2"]["record_id"])
+        # Everything the writer needs is in the row.
+        self.assertEqual(row["result_sha256"], ctx["q2"]["result_sha256"])
+        self.assertEqual(row["calculation_version"], ctx["q2"]["calculation_version"])
+        self.assertEqual(row["question_spec_sha256"], ctx["q2"]["spec_sha256"])
+        self.assertEqual(row["market_evidence_epoch_sha256"], ctx["market"])
+        self.assertIn(f"sha256={ctx['q2']['result_sha256']}", run["_stderr"])
+        store = ResearchStore(root, create_if_missing=False)
+        first = disp.record_disposition(store, question_packet(ctx, ctx["q1"]), current_market=ctx["market"])
+        after = disp.disposition_context(store, owner_focus=FOCUS, current_market=ctx["market"])
+        self.assertEqual([item["result_ref"] for item in after["not_recorded"]], [ctx["q2"]["record_id"]])
+        # A withdrawn assessment no longer covers its question.
+        disp.record_disposition(
+            store,
+            {
+                "entry": "WITHDRAWAL",
+                "subject": question_packet(ctx, ctx["q1"])["subject"],
+                "withdrawal": {"reason": "wrong question text"},
+                "supersedes": {"record_id": first["record_id"], "disposition_sha256": first["disposition_sha256"]},
+                "provenance": {"author_role": "OPERATOR", "source_episode": "SYNTHETIC-WITHDRAWAL", "source_refs": []},
+            },
+            current_market=ctx["market"],
+        )
+        final = disp.disposition_context(store, owner_focus=FOCUS, current_market=ctx["market"])
+        self.assertEqual(sorted(item["result_ref"] for item in final["not_recorded"]), expected)
+        lines = "\n".join(disp.format_context_lines(final))
+        self.assertIn("withdrawn because: wrong question text", lines)
+
+    def test_historical_import_paths(self) -> None:
+        ctx = _ctx(self.workspace())
+        store = ResearchStore(ctx["root"], create_if_missing=False)
+        source_sha = hashlib.sha256(b"synthetic historical readout").hexdigest()
+
+        def imported(packet: dict) -> dict:
+            packet["provenance"].update(
+                {"mode": "HISTORICAL_IMPORT", "source_sha256": source_sha, "source_encoding": "utf-8", "assessed_at": "UNKNOWN"}
+            )
+            return packet
+
+        question = imported(question_packet(ctx, ctx["q1"]))
+        code, written = _cli_record(ctx["root"], question)
+        self.assertEqual(code, 0, written)
+        self.assertEqual(written["readback"]["status"], disp.STATUS_CURRENT)
+        missing_sha = question_packet(ctx, ctx["q2"])
+        missing_sha["provenance"]["mode"] = "HISTORICAL_IMPORT"
+        with self.assertRaises(disp.DispositionError) as caught:
+            disp.record_disposition(store, missing_sha, current_market=ctx["market"])
+        self.assertEqual(caught.exception.code, "DISPOSITION_IMPORT_SOURCE_SHA_REQUIRED")
+        no_frontier = imported(search_packet(ctx, [ctx["q1"], ctx["q2"]]))
+        with self.assertRaises(disp.DispositionError) as caught:
+            disp.record_disposition(store, no_frontier, current_market=ctx["market"])
+        self.assertEqual(caught.exception.code, "DISPOSITION_IMPORT_FRONTIER_REQUIRED")
+        unresolved = imported(search_packet(ctx, [ctx["q1"]]))
+        unresolved["basis"]["journal_frontier"] = {
+            "attempts": [{"attempt_ref": "X", "evidence_ref": "HFIC-ART-DISCOVERY-" + "C" * 40,
+                          "result_sha256": "0" * 64, "calculation_version": "V4"}]
+        }
+        with self.assertRaises(disp.DispositionError) as caught:
+            disp.record_disposition(store, unresolved, current_market=ctx["market"])
+        self.assertEqual(caught.exception.code, "DISPOSITION_FRONTIER_UNRESOLVED")
+        # The historical author saw only q1: importing that frontier reads REVIEW_REQUIRED, not current.
+        older = imported(search_packet(ctx, [ctx["q1"]]))
+        older["basis"]["journal_frontier"] = {
+            "attempts": [{"attempt_ref": ctx["q1"]["record_id"], "evidence_ref": ctx["q1"]["record_id"],
+                          "result_sha256": ctx["q1"]["result_sha256"], "calculation_version": ctx["q1"]["calculation_version"]}]
+        }
+        preview_code, preview = _cli_record(ctx["root"], older, "--preview")
+        self.assertEqual(preview_code, 0, preview)
+        self.assertTrue(preview["would_append"])
+        self.assertEqual(preview["writes"], {"research_store": 0})
+        code, written = _cli_record(ctx["root"], older)
+        self.assertEqual(code, 0, written)
+        self.assertEqual(written["record_id"], preview["record_id"])
+        entry = next(
+            item for item in disp.disposition_context(store, owner_focus=FOCUS, current_market=ctx["market"])["entries"]
+            if item["ref"] == written["record_id"]
+        )
+        self.assertEqual(entry["status"], disp.STATUS_REVIEW)
+        self.assertEqual(entry["reasons"], ["FRONTIER_CHANGED", "NEW_ATTEMPTS:1"])
+        body = _show(ctx["root"], "--record-id", written["record_id"])["records"][0]["body"]
+        self.assertEqual(body["provenance"]["mode"], "HISTORICAL_IMPORT")
+        self.assertEqual(body["provenance"]["source_sha256"], source_sha)
+
+    def test_localized_hash_mismatch_blocks_writes_to_that_subject_only(self) -> None:
+        ctx, q1, q2, _s1 = self._recorded()
+        store = ResearchStore(ctx["root"], create_if_missing=False)
+        body = json.loads(json.dumps(disp._View(store).by_subject()[q1["subject_key"]][0]["body"]))
+        body["judgement"]["rationale"] = "tampered after hashing"
+        body["supersedes"] = {"record_id": q1["record_id"], "disposition_sha256": q1["disposition_sha256"]}
+        # FAULT INJECTION: keep the stale disposition_sha256 so the body no longer matches its hash.
+        canonical = disp._canonical(body)
+        wrapper = {"artifact_kind": disp.ARTIFACT_KIND, "payload_canonical": canonical,
+                   "payload_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest()}
+        _inject(ctx["root"], record_id="HFIC-ART-DISP-" + "E" * 40, payload_json=json.dumps(wrapper))
+        capsule = disp.disposition_context(store, owner_focus=FOCUS, current_market=ctx["market"])
+        by_key = {item["subject_key"]: item for item in capsule["entries"]}
+        self.assertEqual(by_key[q1["subject_key"]]["status"], disp.STATUS_UNREADABLE)
+        self.assertEqual(by_key[q1["subject_key"]]["owner_action"], "STOP_OWNER_RESOLUTION")
+        self.assertTrue(any(reason.startswith("DISPOSITION_HASH_MISMATCH") for reason in by_key[q1["subject_key"]]["reasons"]))
+        self.assertEqual(by_key[q2["subject_key"]]["status"], disp.STATUS_CURRENT)
+        follow = question_packet(ctx, ctx["q1"])
+        follow["supersedes"] = {"record_id": q1["record_id"], "disposition_sha256": q1["disposition_sha256"]}
+        follow["judgement"]["rationale"] = "successor on a damaged subject"
+        with self.assertRaises(disp.DispositionError) as caught:
+            disp.record_disposition(store, follow, current_market=ctx["market"])
+        self.assertEqual(caught.exception.code, "DISPOSITION_SUBJECT_UNREADABLE")
+        self.assertIn("STOP for this subject", "\n".join(disp.format_context_lines(capsule)))
+
+    def test_auto_focus_is_labelled_not_empty(self) -> None:
+        lines = disp.format_context_lines(
+            {"owner_focus": "AUTO", "focus_resolved": False, "market_verified": True, "entries": [],
+             "not_recorded": [], "detail_query": "q"}
+        )
+        self.assertIn("not a named focus", "\n".join(lines))
+        self.assertNotIn("none recorded", "\n".join(lines))
 
 
 if __name__ == "__main__":

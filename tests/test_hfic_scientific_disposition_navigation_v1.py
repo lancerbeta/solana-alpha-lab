@@ -35,6 +35,10 @@ class DispositionNavigationTests(unittest.TestCase):
             "Что уже заключили по этой работе, почему остановились?",
             "What did we already conclude about this question or search scope?",
             "прошлый вывод по вопросу",
+            "what was concluded, what remains untested, what is authorized next",
+            "что мы решили по этому вопросу",
+            "почему мы бросили этот поиск",
+            "is the old assessment still valid",
         ):
             with self.subTest(question=question):
                 found = _run(str(CATALOG_CLI), "search-routes", "--text", question, "--limit", "3", "--json")

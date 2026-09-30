@@ -19,74 +19,124 @@ no sidecar file, host path or chat history.
 
 It is authored advice. It is not owner authority, not a candidate PASS/KILL,
 not a search-wide `NO_WORTHY_HYPOTHESIS`, not a family close and not alpha. It
-never reserves a look, spends budget, changes admission, market identity or
-the scientific slot. Record ids start with `HFIC-`, so the existing endogenous
-classification keeps them out of the market evidence epoch.
-
-## Two subject forms
-
-| subject_kind | Binds | Typical verdict |
-|---|---|---|
-| `QUESTION` | market, focus, journal, `question_spec_sha256`, exactly one saved result (ref, hash, calculation version, input binding, operation) | `LIMITED_NON_CANDIDATE_FOR_THIS_QUESTION`, `INSUFFICIENT_EVIDENCE` |
-| `BOUNDED_SEARCH_ASSESSMENT` | market, focus, journal, declared scope (tier, population, window, constraints), considered proposals, compact synthesis basis, journal frontier | `NO_WORTHY_SIMPLE_NEXT` (SIMPLE tier only), `INSUFFICIENT_EVIDENCE` |
-
-`NO_WORTHY_SIMPLE_NEXT` speaks for the considered SIMPLE scope only. A COMPOUND
-scope is another subject and stays untested unless named. Literal source
-wording (for example an operator's `PARK_FAMILY`) is kept for provenance; it
-does not become a lifecycle state. A bounded search assessment needs no
-operation, spec, session or candidate; `values_loaded=false` and
-`saved_results_read=true` are recorded separately; `scientific_look_delta` is
-always 0.
-
-## Applicability (computed on read, never stored)
-
-| Status | Meaning |
-|---|---|
-| `CURRENT_FOR_BOUND_BASIS` | bound result/frontier unchanged on this market; advice active |
-| `REVIEW_REQUIRED` | a calculation revision superseded the bound result, or a new attempt changed the journal frontier |
-| `HISTORICAL` | another market, or the bound result is not science-ready |
-| `WITHDRAWN` | explicit withdrawal is the lineage head; history kept |
-| `CONFLICT` | more than one lineage head (restored fork); never latest-wins |
-| `UNREADABLE` | a record of this subject is corrupt/unsupported or its basis ref is missing |
-| `NOT_RECORDED` | a saved calculation with no authored assessment |
-
-Unrelated receipts, logs, operations and the assessment's own append do not
-change the frontier. A corrupt record is localized to its subject; an
-unscoped corrupt record is only counted. Reader failure yields
-`scientific_disposition_context.status=UNAVAILABLE`; numerical results,
-candidate paths and `next_action` are unaffected.
-
-## Lineage
-
-Append-only. A successor names `supersedes={record_id, disposition_sha256}`
-of the current head; the check runs inside the store writer lease. A new
-root when a head exists is `DISPOSITION_SUBJECT_HAS_HEAD`; a stale parent is
-`DISPOSITION_STALE_PARENT` with the actual head ref. A withdrawal is a
-successor with a reason and no basis. An exact repeat returns the saved record
-and its original ingestion metadata. Rollback is a successor or withdrawal,
-never delete or overwrite.
+never reserves a look, spends budget, changes admission, market identity, the
+search/journal key or the scientific slot. Record ids start with `HFIC-`, so
+the existing endogenous classification keeps them out of the market evidence
+epoch. `author_role`, `model` and `effort` are declared by the submitter, not
+verified identity; `author_role: OWNER` is not an owner decision.
 
 ## Commands
 
-Write (normal path for every new assessment; `--preview` never writes):
+All three are safe to run without authority. `forge-run --no-write` is a
+read-only readback despite its name; it never starts a run.
 
 ```text
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py disposition-record --input <packet.json> [--preview] --format json
+# read (exact detail, paging; reads no outcome rows)
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py disposition-show --owner-focus <FOCUS> [--journal-scope <sha>] [--subject-key <sha>] [--record-id <ref>] [--offset N] --format json
+# preview a write (validates, shows the exact append plan, never writes)
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py disposition-record --input <packet.json> --preview --format json
+# write (normal path for every new assessment)
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py disposition-record --input <packet.json> --format json
 ```
 
-Read (exact detail, paging, no outcome rows):
+Use the global `--data-root <store>` when the store is not the default. A
+write changes the store inventory: take a fresh preflight afterwards, because
+a preflight receipt taken before the write no longer matches the store digest.
 
-```text
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py disposition-show --owner-focus <FOCUS> [--subject-key <sha>] [--record-id <ref>] [--offset N] --format json
+## Packet shapes
+
+A packet is the submission, not the stored body: do not resubmit a stored or
+previewed `body`. Unknown top-level keys are refused. Text fields must not
+contain host paths (`/home/…`, `C:\…`, UNC, `SMIAL_DATA_ROOT`); cite repo-
+relative files or plain labels instead.
+
+| subject_kind | allowed verdict | allowed recommendation |
+|---|---|---|
+| `QUESTION` | `LIMITED_NON_CANDIDATE_FOR_THIS_QUESTION`, `INSUFFICIENT_EVIDENCE` | `STOP_THIS_QUESTION`, `REVIEW_BOUNDED_SCOPE` |
+| `BOUNDED_SEARCH_ASSESSMENT` | `NO_WORTHY_SIMPLE_NEXT` (tier `SIMPLE_SCREEN` only) | `PAUSE_CONSIDERED_SIMPLE_SCOPE`, `REVIEW_BOUNDED_SCOPE` |
+| `BOUNDED_SEARCH_ASSESSMENT` | `INSUFFICIENT_EVIDENCE` | `REVIEW_BOUNDED_SCOPE` |
+
+Question assessment (values from `forge-run` `ordinary_operation`, from the
+`NOT_RECORDED` line, or from `disposition-show` `not_recorded[]`):
+
+```json
+{
+  "subject": {"subject_kind": "QUESTION", "market_evidence_epoch_sha256": "<64hex>",
+              "owner_focus": "<FOCUS>", "journal_scope": "<64hex>",
+              "question_spec_sha256": "<64hex>", "question_text": "<short text>"},
+  "basis": {"result_refs": [{"result_ref": "HFIC-ART-DISCOVERY-<40HEX>",
+                             "result_sha256": "<64hex>", "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V4"}],
+            "saved_results_read": true, "values_loaded": false, "scientific_look_delta": 0},
+  "judgement": {"verdict": "LIMITED_NON_CANDIDATE_FOR_THIS_QUESTION", "recommendation": "STOP_THIS_QUESTION",
+                "source_wording": "<literal wording>", "rationale": "<why>", "caveats": ["<material caveat>"]},
+  "provenance": {"author_role": "MODEL", "model": "UNKNOWN", "effort": "UNKNOWN",
+                 "source_episode": "<episode label>", "source_refs": ["<label or repo-relative ref>"]}
+}
 ```
 
-Ordinary consumers read the same resolver: `forge-run --no-write` carries
-`scientific_disposition_context` as a derived overlay outside
-`receipt_sha256`; preflight adds the same capsule (at most 4 KiB, inside the
-unchanged 64 KiB Forge packet budget) to new `forge_context_packet` bytes,
-separate from `ranked_prior_candidate_ids`. Omitted entries are counted with
-the exact `disposition-show` query.
+Bounded search assessment (no operation, spec, session or candidate needed):
+the same `subject` without `question_spec_sha256`, plus
+`"search_scope": {"search_tier": "SIMPLE_SCREEN", "population": "<fixed or UNKNOWN_NOT_FIXED>",
+"window": "<fixed or UNKNOWN_NOT_FIXED>", "constraints": ["<real constraint>"]}`; `basis` adds
+`"considered_proposals": [{"label", "representation", "disposition_reason"}]` and a compact
+`"synthesis_basis"`. The writer records the journal frontier itself.
 
-`provenance.mode=HISTORICAL_IMPORT` keeps a historical basis: the packet must
-declare the journal frontier it covered. It is not current merely because it
-was imported; source hashes verify bytes and grant nothing.
+Successor (corrects the current head): the full new packet plus
+`"supersedes": {"record_id": "HFIC-ART-DISP-<40HEX>", "disposition_sha256": "<64hex>"}` of the
+current head (both are in `disposition-show` `head_ref` / `head_disposition_sha256`, and in the
+`detail` of a `DISPOSITION_SUBJECT_HAS_HEAD` / `DISPOSITION_STALE_PARENT` refusal).
+
+Withdrawal (no current advice afterwards; history kept):
+
+```json
+{"entry": "WITHDRAWAL", "subject": {"<same subject as the head>": "..."},
+ "withdrawal": {"reason": "<why the assessment was wrong>"},
+ "supersedes": {"record_id": "<head ref>", "disposition_sha256": "<head sha>"},
+ "provenance": {"author_role": "OPERATOR", "source_episode": "<label>", "source_refs": []}}
+```
+
+Historical import: `provenance.mode = "HISTORICAL_IMPORT"`, `source_sha256` of the source
+artifact (required; the writer records it and does **not** compare it with source bytes — that
+check is the operator's), `source_encoding`, `assessed_at` when verifiable. A bounded search
+import must declare the frontier it covered:
+`"journal_frontier": {"attempts": [{"attempt_ref", "evidence_ref", "result_sha256", "calculation_version"}]}`.
+Each attempt must resolve to a saved result. An import is not current because it was
+imported: if the store moved on, it reads `REVIEW_REQUIRED`.
+
+## Applicability (computed on read, never stored)
+
+| Status | Meaning | What to do |
+|---|---|---|
+| `CURRENT_FOR_BOUND_BASIS` | bound result/frontier unchanged, verified market, current journal | advice active (still only advice) |
+| `REVIEW_REQUIRED` | result revised, new attempt in the journal (`FRONTIER_CHANGED`), journal rotated (`JOURNAL_CHANGED`) or market unverified (`MARKET_UNVERIFIED`) | re-assess with a successor, or leave as history |
+| `HISTORICAL` | another market, or the bound result is not science-ready | history only |
+| `WITHDRAWN` | explicit withdrawal is the head | none; a new assessment may supersede it |
+| `CONFLICT` | more than one head (restored fork); never latest-wins | **STOP** for this subject; writes are refused; owner resolution |
+| `UNREADABLE` | a record of this subject is corrupt/unsupported, or its bound result is missing | **STOP** for this subject; writes are refused; owner resolution |
+| `NOT_RECORDED` | a saved calculation in this focus's journal with no assessment | write one with `disposition-record` |
+
+CONFLICT and UNREADABLE are not repaired by another append; resolving them
+(for example restoring the missing result or choosing a head) is an owner
+decision outside this capability. Other subjects, numerical results,
+candidate paths and `next_action` are unaffected. An unscoped corrupt record
+is only counted. A reader failure or a host path found in stored text yields
+`scientific_disposition_context.status=UNAVAILABLE` with a typed reason.
+
+`NO_WORTHY_SIMPLE_NEXT` speaks for the considered SIMPLE scope only. A
+COMPOUND scope is another subject and stays untested unless named. Literal
+source wording (for example an operator's `PARK_FAMILY`) is kept for
+provenance; it never becomes a lifecycle state. Unrelated receipts, logs,
+operations and the assessment's own append do not change the frontier; the
+frontier counts every saved attempt in the journal and does not judge
+predicate relevance.
+
+## Consumers
+
+`forge-run --no-write` carries `scientific_disposition_context` as a derived
+overlay outside `receipt_sha256` and prints it as `scientific_context
+(advisory; not next_action, not authority)`. Preflight adds the same capsule
+(at most 4 KiB, inside the unchanged 64 KiB Forge packet budget) to new
+`forge_context_packet` bytes only when the focus has assessment history,
+separate from `ranked_prior_candidate_ids`; under byte pressure it shrinks to
+counts and the detail query before any other section. Omitted entries are
+counted with the exact `disposition-show` query.

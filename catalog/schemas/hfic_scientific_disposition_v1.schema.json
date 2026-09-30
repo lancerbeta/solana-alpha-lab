@@ -20,85 +20,223 @@
     "ingestion"
   ],
   "properties": {
-    "schema": {"const": "smial.hfic-scientific-disposition"},
-    "schema_version": {"const": "1.0"},
-    "artifact_kind": {"const": "ORDINARY_SCIENTIFIC_DISPOSITION_V1"},
-    "entry": {"enum": ["ASSESSMENT", "WITHDRAWAL"]},
-    "subject": {"$ref": "#/$defs/subject"},
-    "subject_key": {"$ref": "#/$defs/sha256"},
-    "basis": {"$ref": "#/$defs/basis"},
-    "judgement": {"$ref": "#/$defs/judgement"},
+    "schema": {
+      "const": "smial.hfic-scientific-disposition"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "artifact_kind": {
+      "const": "ORDINARY_SCIENTIFIC_DISPOSITION_V1"
+    },
+    "entry": {
+      "enum": [
+        "ASSESSMENT",
+        "WITHDRAWAL"
+      ]
+    },
+    "subject": {
+      "$ref": "#/$defs/subject"
+    },
+    "subject_key": {
+      "$ref": "#/$defs/sha256"
+    },
+    "basis": {
+      "$ref": "#/$defs/basis"
+    },
+    "judgement": {
+      "$ref": "#/$defs/judgement"
+    },
     "withdrawal": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["reason"],
-      "properties": {"reason": {"type": "string", "minLength": 1, "maxLength": 1000}}
+      "required": [
+        "reason"
+      ],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      }
     },
-    "provenance": {"$ref": "#/$defs/provenance"},
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
     "supersedes": {
       "oneOf": [
-        {"type": "null"},
+        {
+          "type": "null"
+        },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["record_id", "disposition_sha256"],
+          "required": [
+            "record_id",
+            "disposition_sha256"
+          ],
           "properties": {
-            "record_id": {"type": "string", "pattern": "^HFIC-ART-DISP-[0-9A-F]{40}$"},
-            "disposition_sha256": {"$ref": "#/$defs/sha256"}
+            "record_id": {
+              "type": "string",
+              "pattern": "^HFIC-ART-DISP-[0-9A-F]{40}$"
+            },
+            "disposition_sha256": {
+              "$ref": "#/$defs/sha256"
+            }
           }
         }
       ]
     },
-    "claim_boundary": {"type": "string", "minLength": 1, "maxLength": 600},
-    "disposition_sha256": {"$ref": "#/$defs/sha256"},
+    "claim_boundary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 600
+    },
+    "disposition_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
     "ingestion": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["recorded_at", "writer_module_sha256", "writer_git_sha", "writer"],
+      "required": [
+        "recorded_at",
+        "writer_module_sha256",
+        "writer_git_sha",
+        "writer"
+      ],
       "properties": {
-        "recorded_at": {"type": "string", "minLength": 20, "maxLength": 40},
-        "writer_module_sha256": {"$ref": "#/$defs/sha256"},
-        "writer_git_sha": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^[0-9a-f]{40}$"}]},
-        "writer": {"const": "hypothesis_forge.disposition-record"}
+        "recorded_at": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 40
+        },
+        "writer_module_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "writer_git_sha": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            }
+          ]
+        },
+        "writer": {
+          "const": "hypothesis_forge.disposition-record"
+        }
       }
     }
   },
   "allOf": [
     {
-      "if": {"properties": {"entry": {"const": "ASSESSMENT"}}},
-      "then": {"required": ["judgement"], "not": {"required": ["withdrawal"]}}
+      "if": {
+        "properties": {
+          "entry": {
+            "const": "ASSESSMENT"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "judgement"
+        ],
+        "not": {
+          "required": [
+            "withdrawal"
+          ]
+        }
+      }
     },
     {
-      "if": {"properties": {"entry": {"const": "WITHDRAWAL"}}},
+      "if": {
+        "properties": {
+          "entry": {
+            "const": "WITHDRAWAL"
+          }
+        }
+      },
       "then": {
-        "required": ["withdrawal"],
-        "not": {"required": ["judgement"]},
-        "properties": {"supersedes": {"type": "object"}}
+        "required": [
+          "withdrawal"
+        ],
+        "not": {
+          "required": [
+            "judgement"
+          ]
+        },
+        "properties": {
+          "supersedes": {
+            "type": "object"
+          }
+        }
       }
     }
   ],
   "$defs": {
-    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "short_text": {"type": "string", "minLength": 1, "maxLength": 400},
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "short_text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 400
+    },
     "result_ref": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["result_ref", "result_sha256", "calculation_version"],
+      "required": [
+        "result_ref",
+        "result_sha256",
+        "calculation_version"
+      ],
       "properties": {
-        "result_ref": {"type": "string", "pattern": "^HFIC-ART-DISCOVERY-[0-9A-F]{16,64}$"},
-        "result_sha256": {"$ref": "#/$defs/sha256"},
-        "calculation_version": {"type": "string", "minLength": 1, "maxLength": 80}
+        "result_ref": {
+          "type": "string",
+          "pattern": "^HFIC-ART-DISCOVERY-[0-9A-F]{16,64}$"
+        },
+        "result_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "calculation_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        }
       }
     },
     "frontier_attempt": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["attempt_ref", "evidence_ref", "result_sha256", "calculation_version"],
+      "required": [
+        "attempt_ref",
+        "evidence_ref",
+        "result_sha256",
+        "calculation_version"
+      ],
       "properties": {
-        "attempt_ref": {"type": "string", "minLength": 1, "maxLength": 128},
-        "evidence_ref": {"type": "string", "minLength": 1, "maxLength": 128},
-        "result_sha256": {"$ref": "#/$defs/sha256"},
-        "calculation_version": {"type": "string", "minLength": 1, "maxLength": 80}
+        "attempt_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "evidence_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "calculation_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        }
       }
     },
     "subject": {
@@ -111,57 +249,172 @@
         "journal_scope"
       ],
       "properties": {
-        "subject_kind": {"enum": ["QUESTION", "BOUNDED_SEARCH_ASSESSMENT"]},
-        "market_evidence_epoch_sha256": {"$ref": "#/$defs/sha256"},
-        "owner_focus": {"type": "string", "minLength": 1, "maxLength": 128},
-        "journal_scope": {"$ref": "#/$defs/sha256"},
-        "question_spec_sha256": {"$ref": "#/$defs/sha256"},
-        "question_text": {"type": "string", "minLength": 1, "maxLength": 600},
+        "subject_kind": {
+          "enum": [
+            "QUESTION",
+            "BOUNDED_SEARCH_ASSESSMENT"
+          ]
+        },
+        "market_evidence_epoch_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "owner_focus": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "journal_scope": {
+          "$ref": "#/$defs/sha256"
+        },
+        "question_spec_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "question_text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        },
         "search_scope": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["search_tier", "population", "window", "constraints"],
+          "required": [
+            "search_tier",
+            "population",
+            "window",
+            "constraints"
+          ],
           "properties": {
-            "search_tier": {"enum": ["SIMPLE_SCREEN", "COMPOUND_SCREEN"]},
-            "population": {"type": "string", "minLength": 1, "maxLength": 200},
-            "window": {"type": "string", "minLength": 1, "maxLength": 200},
+            "search_tier": {
+              "enum": [
+                "SIMPLE_SCREEN",
+                "COMPOUND_SCREEN"
+              ]
+            },
+            "population": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "window": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
             "constraints": {
               "type": "array",
               "maxItems": 12,
-              "items": {"$ref": "#/$defs/short_text"}
+              "items": {
+                "$ref": "#/$defs/short_text"
+              }
             }
           }
         }
       },
       "allOf": [
         {
-          "if": {"properties": {"subject_kind": {"const": "QUESTION"}}},
-          "then": {"required": ["question_spec_sha256"], "not": {"required": ["search_scope"]}}
+          "if": {
+            "properties": {
+              "subject_kind": {
+                "const": "QUESTION"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "question_spec_sha256"
+            ],
+            "not": {
+              "required": [
+                "search_scope"
+              ]
+            }
+          }
         },
         {
-          "if": {"properties": {"subject_kind": {"const": "BOUNDED_SEARCH_ASSESSMENT"}}},
-          "then": {"required": ["search_scope"], "not": {"required": ["question_spec_sha256"]}}
+          "if": {
+            "properties": {
+              "subject_kind": {
+                "const": "BOUNDED_SEARCH_ASSESSMENT"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "search_scope"
+            ],
+            "not": {
+              "required": [
+                "question_spec_sha256"
+              ]
+            }
+          }
         }
       ]
     },
     "basis": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["result_refs", "saved_results_read", "values_loaded", "scientific_look_delta"],
+      "required": [
+        "result_refs",
+        "saved_results_read",
+        "values_loaded",
+        "scientific_look_delta"
+      ],
       "properties": {
-        "result_refs": {"type": "array", "maxItems": 24, "items": {"$ref": "#/$defs/result_ref"}},
-        "operation_sha256": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
-        "data_binding_sha256": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
-        "saved_results_read": {"type": "boolean"},
-        "values_loaded": {"type": "boolean"},
-        "scientific_look_delta": {"const": 0},
+        "result_refs": {
+          "type": "array",
+          "maxItems": 24,
+          "items": {
+            "$ref": "#/$defs/result_ref"
+          }
+        },
+        "operation_sha256": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/sha256"
+            }
+          ]
+        },
+        "data_binding_sha256": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/sha256"
+            }
+          ]
+        },
+        "saved_results_read": {
+          "type": "boolean"
+        },
+        "values_loaded": {
+          "type": "boolean"
+        },
+        "scientific_look_delta": {
+          "const": 0
+        },
         "journal_frontier": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["attempts", "frontier_sha256"],
+          "required": [
+            "attempts",
+            "frontier_sha256"
+          ],
           "properties": {
-            "attempts": {"type": "array", "maxItems": 48, "items": {"$ref": "#/$defs/frontier_attempt"}},
-            "frontier_sha256": {"$ref": "#/$defs/sha256"}
+            "attempts": {
+              "type": "array",
+              "maxItems": 48,
+              "items": {
+                "$ref": "#/$defs/frontier_attempt"
+              }
+            },
+            "frontier_sha256": {
+              "$ref": "#/$defs/sha256"
+            }
           }
         },
         "considered_proposals": {
@@ -170,21 +423,47 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["label", "representation", "disposition_reason"],
+            "required": [
+              "label",
+              "representation",
+              "disposition_reason"
+            ],
             "properties": {
-              "label": {"type": "string", "minLength": 1, "maxLength": 160},
-              "representation": {"type": "string", "minLength": 1, "maxLength": 160},
-              "disposition_reason": {"type": "string", "minLength": 1, "maxLength": 400}
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "representation": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "disposition_reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 400
+              }
             }
           }
         },
-        "synthesis_basis": {"type": "string", "minLength": 1, "maxLength": 2400}
+        "synthesis_basis": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2400
+        }
       }
     },
     "judgement": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["verdict", "recommendation", "source_wording", "rationale", "caveats"],
+      "required": [
+        "verdict",
+        "recommendation",
+        "source_wording",
+        "rationale",
+        "caveats"
+      ],
       "properties": {
         "verdict": {
           "enum": [
@@ -200,26 +479,122 @@
             "PAUSE_CONSIDERED_SIMPLE_SCOPE"
           ]
         },
-        "source_wording": {"type": "string", "minLength": 1, "maxLength": 400},
-        "rationale": {"type": "string", "minLength": 1, "maxLength": 2400},
-        "caveats": {"type": "array", "maxItems": 8, "items": {"$ref": "#/$defs/short_text"}}
+        "source_wording": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2400
+        },
+        "caveats": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/short_text"
+          }
+        }
       }
     },
     "provenance": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["mode", "author_role", "model", "effort", "source_episode", "source_refs", "source_sha256", "source_encoding", "assessed_at"],
+      "required": [
+        "mode",
+        "author_role",
+        "model",
+        "effort",
+        "source_episode",
+        "source_refs",
+        "source_sha256",
+        "source_encoding",
+        "assessed_at"
+      ],
       "properties": {
-        "mode": {"enum": ["NEW", "HISTORICAL_IMPORT"]},
-        "author_role": {"enum": ["OPERATOR", "MODEL", "OWNER"]},
-        "model": {"type": "string", "minLength": 1, "maxLength": 120},
-        "effort": {"type": "string", "minLength": 1, "maxLength": 60},
-        "source_episode": {"type": "string", "minLength": 1, "maxLength": 200},
-        "source_refs": {"type": "array", "maxItems": 12, "items": {"$ref": "#/$defs/short_text"}},
-        "source_sha256": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
-        "source_encoding": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 1, "maxLength": 40}]},
-        "assessed_at": {"type": "string", "minLength": 1, "maxLength": 40}
-      }
+        "mode": {
+          "enum": [
+            "NEW",
+            "HISTORICAL_IMPORT"
+          ]
+        },
+        "author_role": {
+          "enum": [
+            "OPERATOR",
+            "MODEL",
+            "OWNER"
+          ]
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "effort": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "source_episode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "source_refs": {
+          "type": "array",
+          "maxItems": 12,
+          "items": {
+            "$ref": "#/$defs/short_text"
+          }
+        },
+        "source_sha256": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/sha256"
+            }
+          ]
+        },
+        "source_encoding": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 40
+            }
+          ]
+        },
+        "assessed_at": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "HISTORICAL_IMPORT"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source_sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          }
+        }
+      ],
+      "description": "author_role, model and effort are declared by the submitter, not verified identity; source_sha256 is recorded, not checked against source bytes by the writer."
     }
   }
 }

@@ -1019,8 +1019,10 @@ decision after collection
 `CURRENT_FOR_BOUND_BASIS` относится только к названному вопросу или
 SIMPLE/COMPOUND scope и не запрещает другой scope; `REVIEW_REQUIRED`,
 `HISTORICAL`, `WITHDRAWN`, `CONFLICT`, `UNREADABLE` не являются действующим
-выводом. Не повторяй вопрос с действующей оценкой без нового основания и не
-выдавай совет за authority, бюджет или family close.
+выводом. Это совет, не запрет: повтор вопроса с действующей оценкой допустим,
+если назвать новое основание; совет не является authority, бюджетом или
+family close. `MARKET_UNVERIFIED` и `JOURNAL_CHANGED` означают, что основание
+не подтверждено для текущего входа.
 
 ## A14. Формат FORGE_DRAFT
 

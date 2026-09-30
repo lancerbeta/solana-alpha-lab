@@ -722,6 +722,7 @@ def cmd_forge_run(
                     if isinstance(operation, Mapping)
                     else None
                 ),
+                forbidden_texts=(str(repo_root), str(resolved.root)),
             ),
             "receipt_hash_domain": "EXCLUDED_DERIVED_OVERLAY",
         }
@@ -960,6 +961,7 @@ def cmd_disposition_show(
     record_id: str | None = None,
     offset: int = 0,
     limit: int = 20,
+    journal_scope: str | None = None,
 ) -> int:
     """Exact-ref detail of recorded assessments. Reads no outcome rows."""
     from solana_alpha_lab.factory.hfic_scientific_disposition import (
@@ -979,11 +981,14 @@ def cmd_disposition_show(
             record_id=record_id,
             offset=max(0, offset),
             limit=max(1, min(limit, 100)),
+            journal_scope=journal_scope,
         )
     except DispositionError as exc:
         return emit({"refusal_code": exc.code, "writes": {"research_store": 0}}, exit_code=2)
     payload["market_verified"] = market is not None
     payload["values_loaded"] = False
+    if market is None:
+        payload["market_note"] = "market UNVERIFIED: no assessment is shown as current"
     payload["writes"] = {"research_store": 0}
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     return emit(payload)
@@ -2967,7 +2972,15 @@ def build_parser() -> argparse.ArgumentParser:
             "Advice only: no look, budget, admission or session."
         ),
     )
-    disposition_record.add_argument("--input", type=Path, required=True)
+    disposition_record.add_argument(
+        "--input",
+        type=Path,
+        required=True,
+        help=(
+            "Packet JSON (subject, basis, judgement|withdrawal, provenance, supersedes); "
+            "shapes and examples: docs/contracts/hfic_scientific_disposition_continuity_v1.md"
+        ),
+    )
     disposition_record.add_argument(
         "--preview",
         action="store_true",
@@ -2983,6 +2996,11 @@ def build_parser() -> argparse.ArgumentParser:
     disposition_show.add_argument("--record-id", default=None)
     disposition_show.add_argument("--offset", type=int, default=0)
     disposition_show.add_argument("--limit", type=int, default=20)
+    disposition_show.add_argument(
+        "--journal-scope",
+        default=None,
+        help="Current journal (preflight search_key_sha256); rotated journals degrade search advice",
+    )
     disposition_show.add_argument("--format", choices=("json",), default="json")
     discovery_coverage = subparsers.add_parser(
         "discovery-coverage",
@@ -3396,6 +3414,7 @@ def main(argv: list[str] | None = None) -> int:
                 record_id=args.record_id,
                 offset=args.offset,
                 limit=args.limit,
+                journal_scope=args.journal_scope,
             )
         if args.command == "discovery-coverage":
             return cmd_discovery_coverage(repo_root, args.data_root)

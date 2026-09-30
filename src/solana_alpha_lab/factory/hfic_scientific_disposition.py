@@ -89,7 +89,18 @@ _PACKET_KEYS = frozenset(
     {"schema", "schema_version", "entry", "subject", "basis", "judgement", "withdrawal", "provenance", "supersedes"}
 )
 _HEX64 = re.compile(r"^[0-9a-f]{64}$")
-_ABSOLUTE_PATH = re.compile(r"(^/)|(^[A-Za-z]:[\\/])|(\\\\)|([\\/](Users|home|root)[\\/])")
+# Host-path shapes anywhere in stored text: a rooted POSIX path of two or more
+# segments after a boundary, a drive letter, a UNC prefix, a well-known home or
+# mount segment, or the data-root variable name. Stored advice must stay portable.
+_HOST_PATH = re.compile(
+    r"(?:^|[\s\"'(=,;<>\[\]{}])/[A-Za-z0-9._~+-]+/"
+    r"|(?<![A-Za-z0-9+.-])[A-Za-z]:[\\/]"
+    r"|\\\\"
+    r"|[\\/](?:Users|home|root|mnt|srv|tmp|var|opt|private)[\\/]"
+    r"|SMIAL_DATA_ROOT"
+    # The ResearchStore itself refuses URI forms; refuse them here with a typed code.
+    r"|://|(?:^|\s)file:"
+)
 
 
 class DispositionError(ValueError):
@@ -192,7 +203,7 @@ def _require_hex(value: Any, code: str) -> str:
 
 def _reject_absolute_paths(value: Any) -> None:
     if isinstance(value, str):
-        if _ABSOLUTE_PATH.search(value):
+        if _HOST_PATH.search(value):
             raise DispositionError("DISPOSITION_ABSOLUTE_PATH_FORBIDDEN")
         return
     if isinstance(value, Mapping):
@@ -256,6 +267,11 @@ def normalize_packet(packet: Mapping[str, Any]) -> dict[str, Any]:
     extra = set(provenance_in) - set(provenance)
     if extra:
         raise DispositionError("DISPOSITION_PACKET_UNKNOWN_FIELD", detail=",".join(sorted(extra)))
+    if provenance["mode"] == MODE_IMPORT and not (
+        isinstance(provenance["source_sha256"], str) and _HEX64.fullmatch(provenance["source_sha256"])
+    ):
+        # The writer records the hash; comparing it to the real source bytes is operator work.
+        raise DispositionError("DISPOSITION_IMPORT_SOURCE_SHA_REQUIRED")
     body: dict[str, Any] = {
         "schema": BODY_SCHEMA,
         "schema_version": SCHEMA_VERSION,
@@ -277,9 +293,14 @@ def normalize_packet(packet: Mapping[str, Any]) -> dict[str, Any]:
         allowed = _ALLOWED_JUDGEMENTS[str(kind)]
         verdict = judgement.get("verdict")
         if verdict not in allowed:
-            raise DispositionError("DISPOSITION_VERDICT_NOT_ALLOWED_FOR_SUBJECT")
+            raise DispositionError(
+                "DISPOSITION_VERDICT_NOT_ALLOWED_FOR_SUBJECT", detail="allowed=" + ",".join(sorted(allowed))
+            )
         if judgement.get("recommendation") not in allowed[str(verdict)]:
-            raise DispositionError("DISPOSITION_RECOMMENDATION_NOT_ALLOWED")
+            raise DispositionError(
+                "DISPOSITION_RECOMMENDATION_NOT_ALLOWED",
+                detail="allowed=" + ",".join(sorted(allowed[str(verdict)])),
+            )
         if verdict == NO_WORTHY_SIMPLE_NEXT and (subject.get("search_scope") or {}).get("search_tier") != "SIMPLE_SCREEN":
             # A SIMPLE no-worthy-next never speaks for another tier.
             raise DispositionError("DISPOSITION_SCOPE_TIER_MISMATCH")
@@ -624,6 +645,7 @@ def _applicability(
     body: Mapping[str, Any],
     *,
     current_market: str | None,
+    current_journal: str | None = None,
 ) -> tuple[str, list[str]]:
     subject = body["subject"]
     journal = str(subject["journal_scope"])
@@ -647,6 +669,10 @@ def _applicability(
         if not _science_ready(look):
             return STATUS_HISTORICAL, [f"BASIS_NOT_SCIENCE_READY:{ref['result_ref']}"]
     else:
+        if current_journal and current_journal != journal:
+            # Same market, rotated search key (memory policy or prompt version):
+            # the judged frontier is no longer the journal new attempts land in.
+            return STATUS_REVIEW, ["JOURNAL_CHANGED"]
         recorded = (body["basis"].get("journal_frontier") or {}).get("frontier_sha256")
         current = journal_frontier(view.looks(journal))
         if current["frontier_sha256"] != recorded:
@@ -660,11 +686,18 @@ def _applicability(
                 reasons.append(f"NEW_ATTEMPTS:{new_attempts}")
             return STATUS_REVIEW, reasons
     if not current_market:
-        reasons.append("MARKET_NOT_VERIFIED_BY_CALLER")
+        # UNKNOWN market is never read as a current basis.
+        return STATUS_REVIEW, ["MARKET_UNVERIFIED"]
     return STATUS_CURRENT, reasons
 
 
-def resolve_subject(view: _View, items: Sequence[Mapping[str, Any]], *, current_market: str | None) -> dict[str, Any]:
+def resolve_subject(
+    view: _View,
+    items: Sequence[Mapping[str, Any]],
+    *,
+    current_market: str | None,
+    current_journal: str | None = None,
+) -> dict[str, Any]:
     lineage = _lineage(items)
     readable = lineage["readable"]
     any_body = readable[0]["body"] if readable else None
@@ -680,10 +713,14 @@ def resolve_subject(view: _View, items: Sequence[Mapping[str, Any]], *, current_
     if lineage["unreadable"] or lineage["broken"]:
         reasons = [f"{item['reason']}:{item['record_id']}" for item in lineage["unreadable"]]
         reasons += [f"PREDECESSOR_UNRESOLVED:{ref}" for ref in lineage["broken"]]
-        entry.update({"status": STATUS_UNREADABLE, "reasons": reasons, "head_ref": None})
+        entry.update(
+            {"status": STATUS_UNREADABLE, "reasons": reasons, "head_ref": None, "recommendation_active": False}
+        )
         return entry
     if len(lineage["heads"]) != 1:
-        entry.update({"status": STATUS_CONFLICT, "reasons": ["LINEAGE_FORK"], "head_ref": None})
+        entry.update(
+            {"status": STATUS_CONFLICT, "reasons": ["LINEAGE_FORK"], "head_ref": None, "recommendation_active": False}
+        )
         return entry
     head = lineage["by_id"][lineage["heads"][0]]["body"]
     entry["head_ref"] = lineage["heads"][0]
@@ -691,9 +728,16 @@ def resolve_subject(view: _View, items: Sequence[Mapping[str, Any]], *, current_
     entry["provenance_mode"] = head["provenance"]["mode"]
     entry["history_refs"] = sorted(item["record_id"] for item in readable if item["record_id"] != entry["head_ref"])
     if head["entry"] == WITHDRAWAL:
-        entry.update({"status": STATUS_WITHDRAWN, "reasons": ["EXPLICIT_WITHDRAWAL"], "recommendation_active": False})
+        entry.update(
+            {
+                "status": STATUS_WITHDRAWN,
+                "reasons": ["EXPLICIT_WITHDRAWAL"],
+                "recommendation_active": False,
+                "withdrawal_reason": head["withdrawal"]["reason"],
+            }
+        )
         return entry
-    status, reasons = _applicability(view, head, current_market=current_market)
+    status, reasons = _applicability(view, head, current_market=current_market, current_journal=current_journal)
     entry.update(
         {
             "status": status,
@@ -740,7 +784,7 @@ def resolve_focus(
         )
         if focus != owner_focus:
             continue
-        entry = resolve_subject(view, items, current_market=current_market)
+        entry = resolve_subject(view, items, current_market=current_market, current_journal=journal_scope)
         entry["scope_match"] = _scope_match(entry.get("subject"), current_market)
         if entry["scope_match"] == "RELATED_OTHER_MARKET" and entry["status"] not in {
             STATUS_CONFLICT,
@@ -754,16 +798,29 @@ def resolve_focus(
     for item in view.dispositions:
         if not item["readable"] and not item.get("subject_key"):
             unscoped += 1
+    in_scope = {"EXACT", "FOCUS_ONLY_MARKET_UNVERIFIED"}
+    # Journals this focus actually works in: ordinary operations on the current
+    # market (or any market when unverified) plus recorded in-scope subjects.
     journals = {journal_scope} if journal_scope else set()
+    journals |= {
+        str(operation.get("journal_scope") or "")
+        for operation in view.operations.values()
+        if operation.get("owner_focus") == owner_focus
+        and (not current_market or operation.get("market_evidence_epoch_sha256") == current_market)
+    }
     journals |= {
         str(entry["subject"]["journal_scope"])
         for entry in entries
-        if entry.get("subject") and entry.get("scope_match") in {"EXACT", "FOCUS_ONLY_MARKET_UNVERIFIED"}
+        if entry.get("subject") and entry.get("scope_match") in in_scope
     }
-    assessed_specs = {
-        str(entry["subject"].get("question_spec_sha256"))
+    # A question counts as assessed only in its own journal, in scope and not withdrawn.
+    assessed = {
+        (str(entry["subject"]["journal_scope"]), str(entry["subject"].get("question_spec_sha256")))
         for entry in entries
-        if entry.get("subject") and entry["subject"].get("subject_kind") == QUESTION
+        if entry.get("subject")
+        and entry["subject"].get("subject_kind") == QUESTION
+        and entry.get("scope_match") in in_scope
+        and entry.get("status") != STATUS_WITHDRAWN
     }
     not_recorded: list[dict[str, Any]] = []
     for journal in sorted(item for item in journals if item):
@@ -771,18 +828,23 @@ def resolve_focus(
         for attempt in frontier["attempts"]:
             look = view.find_look(journal, attempt["evidence_ref"]) or {}
             spec = str(look.get("spec_sha256") or "")
-            if spec and spec not in assessed_specs:
+            if spec and (journal, spec) not in assessed:
+                operation = view.operations.get(str(look.get("operation_sha256") or "")) or {}
                 not_recorded.append(
                     {
                         "status": STATUS_NOT_RECORDED,
                         "subject_kind": QUESTION,
+                        "market_evidence_epoch_sha256": operation.get("market_evidence_epoch_sha256"),
                         "journal_scope": journal,
                         "question_spec_sha256": spec,
+                        "question_text": operation.get("question_text"),
                         "result_ref": attempt["evidence_ref"],
+                        "result_sha256": attempt["result_sha256"],
+                        "calculation_version": attempt["calculation_version"],
                         "note": "calculation saved; no authored assessment recorded",
                     }
                 )
-                assessed_specs.add(spec)
+                assessed.add((journal, spec))
     entries.sort(
         key=lambda item: (
             0 if item.get("scope_match") in {"EXACT", "FOCUS_ONLY_MARKET_UNVERIFIED"} else 1,
@@ -794,6 +856,7 @@ def resolve_focus(
     return {
         "owner_focus": owner_focus,
         "current_market_evidence_epoch_sha256": current_market,
+        "journals": sorted(item for item in journals if item),
         "entries": entries,
         "not_recorded": not_recorded,
         "unreadable_unscoped_records": unscoped,
@@ -814,6 +877,8 @@ def _compact_entry(entry: Mapping[str, Any]) -> dict[str, Any]:
         compact["scope"] = {"search_tier": scope.get("search_tier"), "population": scope.get("population"), "window": scope.get("window")}
     elif subject.get("subject_kind") == QUESTION:
         compact["scope"] = {"question_spec_sha256": subject.get("question_spec_sha256")}
+        if subject.get("question_text"):
+            compact["question"] = str(subject["question_text"])[:80]
     for key in ("verdict", "recommendation", "recommendation_active"):
         if key in entry:
             compact[key] = entry[key]
@@ -824,18 +889,30 @@ def _compact_entry(entry: Mapping[str, Any]) -> dict[str, Any]:
         compact["caveats"] = caveats
     if entry.get("reasons"):
         compact["reasons"] = [str(item)[:96] for item in entry["reasons"]][:3]
+    if entry.get("withdrawal_reason"):
+        compact["withdrawal_reason"] = str(entry["withdrawal_reason"])[:120]
     if entry.get("status") == STATUS_CONFLICT:
         compact["heads"] = list(entry.get("lineage_heads") or [])[:4]
+    if entry.get("status") in {STATUS_CONFLICT, STATUS_UNREADABLE}:
+        compact["owner_action"] = "STOP_OWNER_RESOLUTION"
     return compact
 
 
-def detail_query(owner_focus: str, *, subject_key_value: str | None = None, offset: int | None = None) -> str:
+def detail_query(
+    owner_focus: str,
+    *,
+    subject_key_value: str | None = None,
+    offset: int | None = None,
+    journal_scope: str | None = None,
+) -> str:
     import shlex
 
     command = (
         "uv run --locked --managed-python python -B scripts/hypothesis_forge.py disposition-show "
         f"--owner-focus {shlex.quote(owner_focus)} --format json"
     )
+    if journal_scope:
+        command += f" --journal-scope {journal_scope}"
     if subject_key_value:
         command += f" --subject-key {subject_key_value}"
     if offset:
@@ -870,6 +947,7 @@ def disposition_context(
         "schema": CONTEXT_SCHEMA,
         "schema_version": "1.0",
         "owner_focus": owner_focus,
+        "focus_resolved": owner_focus not in {"", "AUTO"},
         "market_verified": bool(current_market),
         "advisory_only": True,
         "authority_granted": False,
@@ -882,7 +960,7 @@ def disposition_context(
         "not_recorded": [],
         "shown": 0,
         "omitted": 0,
-        "detail_query": detail_query(owner_focus),
+        "detail_query": detail_query(owner_focus, journal_scope=journal_scope),
     }
 
     def _size() -> int:
@@ -898,7 +976,14 @@ def disposition_context(
             capsule["omitted"] = len(entries) - capsule["shown"]
             break
     for item in resolved["not_recorded"]:
-        capsule["not_recorded"].append({"result_ref": item["result_ref"], "question_spec_sha256": item["question_spec_sha256"]})
+        capsule["not_recorded"].append(
+            {
+                "result_ref": item["result_ref"],
+                "result_sha256": item["result_sha256"],
+                "calculation_version": item["calculation_version"],
+                "question_spec_sha256": item["question_spec_sha256"],
+            }
+        )
         if _size() > max_bytes:
             capsule["not_recorded"].pop()
             break
@@ -922,6 +1007,7 @@ def disposition_detail(
     record_id: str | None = None,
     offset: int = 0,
     limit: int = 20,
+    journal_scope: str | None = None,
 ) -> dict[str, Any]:
     """Exact-ref detail: full bodies and lineage. Reads no market outcome rows."""
 
@@ -937,7 +1023,9 @@ def disposition_detail(
         owner_focus = (
             found["body"]["subject"]["owner_focus"] if found["readable"] else str(found.get("owner_focus") or owner_focus)
         )
-    resolved = resolve_focus(store, owner_focus=owner_focus, current_market=current_market, view=view)
+    resolved = resolve_focus(
+        store, owner_focus=owner_focus, current_market=current_market, journal_scope=journal_scope, view=view
+    )
     entries = resolved["entries"]
     if subject_key_value:
         entries = [item for item in entries if item.get("subject_key") == subject_key_value]
@@ -953,6 +1041,7 @@ def disposition_detail(
         "owner_focus": owner_focus,
         "advisory_only": True,
         "authority_granted": False,
+        "journals": resolved["journals"],
         "total_subjects": len(entries),
         "offset": offset,
         "limit": limit,
@@ -975,22 +1064,33 @@ def _check_lineage(store: Any, body: Mapping[str, Any]) -> None:
         raise _AlreadyCommitted()
     items = view.by_subject().get(str(body["subject_key"]), [])
     lineage = _lineage(items)
+
+    def _refuse(code: str) -> DispositionError:
+        # Name the actual head(s) with the hash a successor must cite.
+        heads = [
+            f"{ref}:{lineage['by_id'][ref]['body']['disposition_sha256']}"
+            for ref in lineage["heads"]
+            if ref in lineage["by_id"]
+        ]
+        return DispositionError(code, head_refs=lineage["heads"], detail=";".join(heads) or None)
+
     if lineage["unreadable"] or lineage["broken"]:
-        raise DispositionError("DISPOSITION_SUBJECT_UNREADABLE", head_refs=lineage["heads"])
+        # Restored/corrupt history is not repaired by another append: owner resolution.
+        raise _refuse("DISPOSITION_SUBJECT_UNREADABLE")
     link = body.get("supersedes")
     if link is None:
         if lineage["heads"]:
-            raise DispositionError("DISPOSITION_SUBJECT_HAS_HEAD", head_refs=lineage["heads"])
+            raise _refuse("DISPOSITION_SUBJECT_HAS_HEAD")
         return
     parent = lineage["by_id"].get(str(link.get("record_id")))
     if parent is None or parent["body"]["disposition_sha256"] != link.get("disposition_sha256"):
-        raise DispositionError("DISPOSITION_PREDECESSOR_NOT_FOUND", head_refs=lineage["heads"])
+        raise _refuse("DISPOSITION_PREDECESSOR_NOT_FOUND")
     if len(lineage["heads"]) > 1:
-        raise DispositionError("DISPOSITION_SUBJECT_CONFLICT", head_refs=lineage["heads"])
+        raise _refuse("DISPOSITION_SUBJECT_CONFLICT")
     if lineage["heads"] != [parent["record_id"]]:
-        raise DispositionError("DISPOSITION_STALE_PARENT", head_refs=lineage["heads"])
+        raise _refuse("DISPOSITION_STALE_PARENT")
     if body["entry"] == WITHDRAWAL and parent["body"]["entry"] == WITHDRAWAL:
-        raise DispositionError("DISPOSITION_ALREADY_WITHDRAWN", head_refs=lineage["heads"])
+        raise _refuse("DISPOSITION_ALREADY_WITHDRAWN")
 
 
 def _existing(store: Any, disposition_sha256: str) -> dict[str, Any] | None:
@@ -1174,19 +1274,29 @@ def format_context_lines(capsule: Mapping[str, Any] | None) -> list[str]:
     if capsule.get("status") == "UNAVAILABLE":
         return [
             "scientific_context: UNAVAILABLE "
-            f"({capsule.get('reason_code') or 'UNKNOWN'}) — numerical results and next_action are unaffected"
+            f"({capsule.get('reason_code') or 'UNKNOWN'}) — recorded assessments could not be read; "
+            "numerical results and next_action are unaffected"
         ]
     lines = ["scientific_context (advisory; not next_action, not authority):"]
+    if capsule.get("focus_resolved") is False:
+        lines.append(
+            f"  focus {capsule.get('owner_focus') or 'AUTO'} is not a named focus; "
+            "assessments are recorded per focus — pass --owner-focus <FOCUS> to see them"
+        )
+    if not capsule.get("market_verified"):
+        lines.append("  market UNVERIFIED — no assessment is shown as current")
     entries = capsule.get("entries") or []
-    if not entries and not capsule.get("not_recorded"):
+    if not entries and not capsule.get("not_recorded") and capsule.get("focus_resolved") is not False:
         lines.append("  none recorded for this focus")
+    named_tiers = set()
     for entry in entries:
         scope = entry.get("scope") or {}
-        scope_text = (
-            f"tier={scope.get('search_tier')}"
-            if entry.get("kind") == BOUNDED_SEARCH
-            else f"spec={str(scope.get('question_spec_sha256') or '')[:12]}"
-        )
+        if entry.get("kind") == BOUNDED_SEARCH:
+            named_tiers.add(str(scope.get("search_tier")))
+            scope_text = f"tier={scope.get('search_tier')}"
+        else:
+            question = entry.get("question") or f"spec {str(scope.get('question_spec_sha256') or '')[:12]}"
+            scope_text = f'question="{question}" result={",".join(entry.get("result_refs") or []) or "NONE"}'
         lines.append(
             "  {status} {kind} {scope} verdict={verdict} advice={advice}{active} ref={ref}".format(
                 status=entry.get("status"),
@@ -1200,17 +1310,42 @@ def format_context_lines(capsule: Mapping[str, Any] | None) -> list[str]:
         )
         if entry.get("reasons"):
             lines.append("    reasons: " + ", ".join(str(item) for item in entry["reasons"]))
+        if entry.get("withdrawal_reason"):
+            lines.append(f"    withdrawn because: {entry['withdrawal_reason']}")
+        status = entry.get("status")
+        if status in {STATUS_REVIEW, STATUS_HISTORICAL}:
+            lines.append("    next: re-assess on the current basis with disposition-record (successor), or leave as history")
+        elif status in {STATUS_CONFLICT, STATUS_UNREADABLE}:
+            lines.append(
+                "    next: STOP for this subject — owner resolution needed; writes to it are refused "
+                "(see docs/contracts/hfic_scientific_disposition_continuity_v1.md)"
+            )
     for item in capsule.get("not_recorded") or []:
-        lines.append(f"  NOT_RECORDED QUESTION result={item.get('result_ref')} — calculation saved, assessment missing")
+        lines.append(
+            f"  NOT_RECORDED QUESTION result={item.get('result_ref')} sha256={item.get('result_sha256')} "
+            f"calc={item.get('calculation_version')} — calculation saved, assessment missing; "
+            "write it with disposition-record"
+        )
     if capsule.get("omitted") or capsule.get("not_recorded_omitted"):
         lines.append(
             f"  omitted: {capsule.get('omitted', 0)} subjects, {capsule.get('not_recorded_omitted', 0)} unassessed results"
         )
+    if capsule.get("unreadable_unscoped_records"):
+        lines.append(
+            f"  unreadable records without a subject: {capsule['unreadable_unscoped_records']} (counted, not shown)"
+        )
     lines.append(f"  detail: {capsule.get('detail_query')}")
+    untested = sorted({"SIMPLE_SCREEN", "COMPOUND_SCREEN"} - named_tiers)
     lines.append(
-        "  note: advice does not open, close or budget a look; COMPOUND and other scopes stay untested unless named"
+        "  note: advice does not open, close or budget a look"
+        + (f"; search tiers without a recorded assessment: {', '.join(untested)}" if untested else "")
     )
     return lines
+
+
+def _leaks(capsule: Mapping[str, Any], forbidden_texts: Sequence[str]) -> bool:
+    text = _canonical(capsule)
+    return bool(_HOST_PATH.search(text)) or any(item and item in text for item in forbidden_texts)
 
 
 def safe_disposition_context(
@@ -1219,19 +1354,56 @@ def safe_disposition_context(
     owner_focus: str,
     current_market: str | None,
     journal_scope: str | None = None,
+    forbidden_texts: Sequence[str] = (),
+    max_bytes: int = COMPACT_CONTEXT_MAX_BYTES,
 ) -> dict[str, Any]:
-    """Consumer wrapper: a disposition read failure never blocks Forge input or readback."""
+    """Consumer wrapper: a disposition read failure never blocks Forge input or readback.
 
-    try:
-        return disposition_context(
-            store, owner_focus=owner_focus, current_market=current_market, journal_scope=journal_scope
-        )
-    except Exception as exc:  # noqa: BLE001 - isolation boundary, typed code only
-        return {
+    The capsule is also checked for host paths here, inside the boundary, so
+    stored advice text can never trip the caller's physical-path leak guard.
+    """
+
+    def _unavailable(code: str, detail: str | None = None) -> dict[str, Any]:
+        body = {
             "schema": CONTEXT_SCHEMA,
             "schema_version": "1.0",
             "status": "UNAVAILABLE",
-            "reason_code": getattr(exc, "code", None) or type(exc).__name__,
+            "reason_code": code,
+            "owner_focus": owner_focus,
             "advisory_only": True,
             "authority_granted": False,
+            "detail_query": detail_query(owner_focus, journal_scope=journal_scope),
         }
+        if detail:
+            body["error_class"] = detail
+        return body
+
+    try:
+        capsule = disposition_context(
+            store,
+            owner_focus=owner_focus,
+            current_market=current_market,
+            journal_scope=journal_scope,
+            max_bytes=max_bytes,
+        )
+    except Exception as exc:  # noqa: BLE001 - isolation boundary, typed code only
+        code = getattr(exc, "code", None)
+        return _unavailable(str(code) if code else "DISPOSITION_CONTEXT_READ_FAILED", None if code else type(exc).__name__)
+    if _leaks(capsule, forbidden_texts):
+        return _unavailable("DISPOSITION_CONTEXT_PATH_LEAK")
+    return capsule
+
+
+def compact_counts_only(capsule: Mapping[str, Any]) -> dict[str, Any]:
+    """Smallest honest capsule: counts and the detail query, no entries."""
+
+    reduced = {key: value for key, value in capsule.items() if key not in {"entries", "not_recorded"}}
+    reduced["entries"] = []
+    reduced["not_recorded"] = []
+    reduced["shown"] = 0
+    reduced["omitted"] = int(capsule.get("total_subjects") or 0)
+    reduced["not_recorded_omitted"] = int(
+        len(capsule.get("not_recorded") or []) + int(capsule.get("not_recorded_omitted") or 0)
+    )
+    reduced["reduced_for_packet_budget"] = True
+    return reduced
