@@ -4,8 +4,8 @@
   "review_id": "FORGE-TEMPORAL-RESULT-COHERENCE-REPAIR-FACTORY-FIT-001",
   "as_of": "2026-09-30",
   "task_id": "FORGE_TEMPORAL_RESULT_COHERENCE_REPAIR_V1",
-  "reviewed_bindings_sha256": "a85cb0c41b27a6e3358e5bb3982f6f42d43fa01c34775c0f013933d542cb9b5a",
-  "reviewed_inventory_sha256": "cec4a5bb8d76d74ac5f82cca6cf30394732c205813756dd038f4f2bb585144bc",
+  "reviewed_bindings_sha256": "152fa40920082d51d50b41b946111e0fbfef73e0c9369eed37972c621b3c9f8f",
+  "reviewed_inventory_sha256": "480f8083b9155d2f8b0a3bcee0dc7e8d53afec4cdeb99c76fab21cf04adf3ef1",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {

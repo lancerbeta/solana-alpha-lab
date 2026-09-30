@@ -19,6 +19,7 @@
     "catalog/assets/core.yaml": "ceb09187045b485751fd25d5d0848ea4b362a758e8ab7e019ae3583995cf2ee7",
     "docs/evidence/forge_temporal_result_coherence_repair/copy_based_revision_acceptance_v1.json": "16da1a0c17dcf24e7fd1c20b3edef5f6bfbc5cf6a6089bef0bbc854653fce55f",
     "docs/evidence/forge_temporal_result_coherence_repair/historical_blast_radius_v1.json": "1708555dc2f95a1e6ab445e344a34e6877fad58058f825c7cfe9561f067f997b",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "222e7d058726e0e62c18b65ad2aa7fe3a00655263b96635e4300eac532407c9c",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "ff12bbba4c6358cb04ca5d71c9a2fba7105c1dcd4f29350c66990ffe3283db0c",
     "docs/tasks/FORGE_TEMPORAL_RESULT_COHERENCE_REPAIR_V1.md": "4edd90bbb16317f083c124dd18ab65f508f3006e84fbacf21ab883521e9c9e63",
     "scripts/hypothesis_forge.py": "7932d67d58fe95cef774055c1607ce80deacc0b4ba59f3c4015923b342829e11",
@@ -39,14 +40,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_temporal_result_coherence_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "81431cffc8edc0da0b57ac2355c896776e2b66566a46a5e9f8cab0311bc766b0",
+    "sha256": "c8e4c744f92de30a07d32385d7d9aa0c9d96384d1065b6dcc26ca66e3284e8f0",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_TEMPORAL_COHERENCE_REVISION_AND_RELATED_SUITES",
     "independent_review": {
       "path": "docs/evidence/forge_temporal_result_coherence_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "85b4c5a5f0e368cd2d468a2a95e093934bc2cd933f44fb4dc198a6147545dd74",
+      "sha256": "682df533cd0e4dac8d59bc736fd1b5bc8b7b99d02a6e6cb97f0d993f9fd80b53",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
