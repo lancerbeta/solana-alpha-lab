@@ -66,6 +66,7 @@ context_requirements:
   catalog_asset_ids: []
   l2_roles:
     - ARCHITECTURE_DECISIONS
+    - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
   exact_role_asset_ids:
@@ -80,7 +81,10 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
       - src/solana_alpha_lab/factory/hfic_session.py
       - src/solana_alpha_lab/factory/hfic_representation_ladder.py
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/forge_candidate_cold_lifecycle_repair/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/forge_candidate_cold_lifecycle_repair/a1_delivery_independent_review_v1.json
+      - docs/evidence/forge_candidate_cold_lifecycle_repair/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
