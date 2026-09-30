@@ -1,0 +1,67 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-TEMPORAL-RESULT-COHERENCE-REPAIR-ACCEPTANCE-001",
+  "as_of": "2026-09-30",
+  "task_id": "FORGE_TEMPORAL_RESULT_COHERENCE_REPAIR_V1",
+  "state_change": "CONDITIONAL_TEMPORAL_VIEWS_SHARE_ONE_SAMPLE_AND_WRONG_SAVED_RESULTS_ARE_REVISED_EXPLICITLY",
+  "base_main": "6b11fb786ae92e3bad1e6d783e03ed2635348a26",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_temporal_result_coherence_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_TEMPORAL_COHERENCE_REVISION_AND_RELATED_SUITES",
+    "independent_review": {
+      "path": "docs/evidence/forge_temporal_result_coherence_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_MINIMAL_RED_AND_THREE_PAIRED_COUNTEREXAMPLES",
+      "PASS_ORACLE_INVARIANTS_DISJOINT_OVERLAP_CONFLICT",
+      "PASS_PUBLISHED_CORPUS_TWO_CAMPAIGN_OVERLAP_ORACLE",
+      "PASS_PERSISTED_VERTICAL_OLD_WRITER_TO_REVISION_AT_CAP_ZERO",
+      "PASS_FAULTS_CRASH_BEFORE_APPEND_REPLY_LOST_NEW_PROCESS",
+      "PASS_CANDIDATE_BRANCH_FREEZE_SCRIPTED_CRITIC_CLASSIFY_COLD_READBACK",
+      "PASS_DOCUMENT_RUNNER_REPRODUCES_REVISION_BYTES",
+      "PASS_COPY_BASED_REAL_QUESTION_REVISION_MAIN_STAYS_1",
+      "PASS_BOUNDED_BLAST_RADIUS_READ_ONLY"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_MARKET_EXECUTION",
+    "NO_MERGE",
+    "NO_LIVE_LOOK",
+    "NO_LIVE_STORE_WRITE_BEFORE_MERGE",
+    "SCRIPTED_CRITIC_MECHANICAL_IS_NOT_SCIENTIFIC_PASS",
+    "STORED_FIELD_COHERENCE_DOES_NOT_PROVE_OLD_RESULTS_RIGHT",
+    "CLOSED_SESSION_222A589D_NOT_REOPENED",
+    "LOCAL_PREFLIGHT_RECEIPT_HASH_MISMATCH_TWO_TESTS_ALSO_ON_BASE"
+  ],
+  "side_effects": {
+    "market_execution": "NOT_RUN",
+    "live_store_writes": 0
+  }
+}

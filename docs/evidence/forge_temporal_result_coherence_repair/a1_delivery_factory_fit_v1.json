@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-TEMPORAL-RESULT-COHERENCE-REPAIR-FACTORY-FIT-001",
+  "as_of": "2026-09-30",
+  "task_id": "FORGE_TEMPORAL_RESULT_COHERENCE_REPAIR_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_SAVED_QUESTION_READS_CORRECT_COHORT_EVIDENCE_WITHOUT_A_SECOND_MAIN",
+    "flexibility_and_history": "PASS_V1_V2_V3_BYTES_READ_AS_IS_REVISION_IS_APPEND_ONLY",
+    "context_efficiency": "PASS_EXISTING_JOURNAL_LINEAGE_NO_RESULT_REGISTRY",
+    "research_truth": "PASS_INCOHERENT_SUMMARY_IS_A_TECHNICAL_STOP_NOT_EVIDENCE",
+    "owner_operability": "PASS_ONE_EXPLICIT_CORRECTION_COMMAND_WITH_REF_AND_HASH",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_MARKET_EXECUTION",
+    "monitoring_and_recovery": "PASS_CRASH_BEFORE_APPEND_AND_REPLY_LOST_REPLAY_WITHOUT_EVALUATOR",
+    "build_vs_buy": "PASS_NO_NEW_RUNTIME_REUSES_CALCULATION_REVISION",
+    "red_team": "PASS_CHANGED_SPEC_INPUT_CLOCK_AND_BARE_FLAG_REFUSED",
+    "security": "PASS_NO_PROVIDER_NO_LIVE_WRITE_BEFORE_MERGE"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "OWNER_DECISION_ON_CLOSED_SESSION_222A589D_COHORT_EVIDENCE"
+  },
+  "recovery": "Revert this change. V4 revisions stay readable as append-only rows; V3 looks were never rewritten. A rollback spends no look because the revision is not a new look.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_LIVE_LOOK",
+    "NO_MERGE",
+    "COPY_BASED_REVISION_ONLY_BEFORE_MERGE",
+    "SCRIPTED_CRITIC_MECHANICAL_IS_NOT_SCIENTIFIC_PASS",
+    "BLAST_RADIUS_STORED_FIELD_CHECK_ONLY"
+  ]
+}
