@@ -15,6 +15,22 @@ V1.2 adds deterministic feature grounding, typed unresolved requirements,
 diagnostics-only `structural_signature_v1_sha256` (not HFIC-CAND identity),
 and read-only `diagnostics --last N` (1..20).
 
+## Ordinary operation
+
+A short owner request is an `ORDINARY_OPERATION_V1` row in the ResearchStore,
+not a new journal and not a repair continuation. Read state with ordinary
+`forge-run --no-write` for that focus. `PAUSED_CAP` means the question was
+saved and the owner cap is spent. Its next step is
+`ordinary_operation.next_action`, not a replacement of the run's
+`next_action`. A blocked readback and a frozen scientific terminal keep
+their own `next_action`. Do not emit `NO_WORTHY` or `WAIT_FOR_NEW_EVIDENCE`
+for that pause. A `STOPPED` operation
+or a real `CLOSED` repair slot is not reopened by a restart.
+A temporal `discovery-execute` and a stored preview require that operation;
+omitting it does not bypass the cap. A null owner cap is the protocol
+remainder, not a silent cap of one. Coverage without values stays
+`discovery-coverage`.
+
 Canonical entrypoint: `scripts/hypothesis_forge.py`.
 No-write state-only coverage, never selecting `typed_value` and never reserving a slot:
 
@@ -276,13 +292,17 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
 
    Then run the query. Omit `--binding`. On an authorized ordinary slash,
    pass the canonical data root as both `--data-root` and `--store`, because
-   freeze checks the look in that store. Do not pass a combined file when
-   cohort hashes differ. An exact repeated `--cohort-partition` is eliminated;
-   a second path for the same cohort stops. Copy the whole returned evidence
-   object onto the draft as `grounded_evidence`.
+   freeze checks the look in that store. Pass `--operation` with the explicit
+   owner request for this journal; temporal looks refuse missing/empty/foreign
+   operations before values. Do not pass a combined file when cohort hashes
+   differ. An exact repeated `--cohort-partition` is eliminated; a second path
+   for the same cohort stops. Copy the whole returned evidence object onto the
+   draft as `grounded_evidence`. After `persist-draft`, re-run
+   `preflight --discovery-contract` and freeze against that fresh receipt so a
+   saved candidate can continue without a new MAIN.
 
 ```text
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <canonical-data-root> --store <canonical-data-root> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <canonical-data-root> --store <canonical-data-root> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --operation <ordinary-operation.json> --format json
 ```
 
    Before persist/freeze, ordinary discovery may escalate inside the same

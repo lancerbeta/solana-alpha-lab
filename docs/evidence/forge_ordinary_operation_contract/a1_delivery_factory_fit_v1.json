@@ -1,0 +1,41 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-ORDINARY-OPERATION-CONTRACT-FACTORY-FIT-001",
+  "as_of": "2026-09-30",
+  "task_id": "FORGE_ORDINARY_OPERATION_CONTRACT_V1",
+  "reviewed_bindings_sha256": "d05ac36417182fc5a311151782e1f69297c7d9acf3d84f9c9f1660239cb79b96",
+  "reviewed_inventory_sha256": "d06c35c8a2eba0fcac257103dad8699dfb4f85a183ab826aa2b1fc7a579836cc",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_ORDINARY_REQUEST_BINDS_ONE_JOURNAL_BEFORE_A_LOOK",
+    "flexibility_and_history": "PASS_CLOSED_REPAIR_STILL_READS_WITHOUT_AN_OPERATION_ROW",
+    "context_efficiency": "PASS_EXISTING_FORGE_CLI_AND_JOURNAL",
+    "research_truth": "PASS_PAUSE_IS_NOT_A_SCIENTIFIC_TERMINAL",
+    "owner_operability": "PASS_ONE_SLASH_RECORDS_THE_OPERATION",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_MARKET_EXECUTION",
+    "monitoring_and_recovery": "PASS_REPLAY_AND_CAP_REFUSAL_BEFORE_A_NEW_LOOK",
+    "build_vs_buy": "PASS_NO_SECOND_RUNTIME",
+    "red_team": "PASS_BINDING_MISMATCH_AND_BLOCKED_READBACK_KEEP_THEIR_NEXT",
+    "security": "PASS_NO_PROVIDER_NO_LIVE_WRITE"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "POST_MERGE_OWNER_LIVE_QUESTION"
+  },
+  "recovery": "Revert this change. Existing journals and closed repair rows stay readable. A code rollback does not spend a live look because this atom did not execute one.",
+  "limits": [
+    "NO_MARKET_FORGE",
+    "NO_LIVE_LOOK",
+    "NO_NET_RETURN",
+    "NO_ALPHA",
+    "NO_MERGE",
+    "MODEL_TRIAL_2_AND_3_PROVENANCE_UNKNOWN",
+    "MODEL_TRIALS_4_TO_8_OBSERVED_MODEL_UNKNOWN",
+    "OPERATOR_TRIAL_7_FREEZE_REFUSED_STALE_PREFLIGHT_RECEIPT",
+    "REPLACEMENT_9_BLOCKED_GIT_COMPOSITE_CHANGED",
+    "REPLACEMENT_10_OPERATIONAL_PASS_KILL_UNBOUND_EVIDENCE",
+    "KILL_UNBOUND_EVIDENCE_IS_NOT_SCIENTIFIC_PASS"
+  ]
+}

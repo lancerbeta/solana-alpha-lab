@@ -1,0 +1,58 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-ORDINARY-OPERATION-CONTRACT-REVIEW-001",
+  "as_of": "2026-09-30",
+  "task_id": "FORGE_ORDINARY_OPERATION_CONTRACT_V1",
+  "reviewed_bindings_sha256": "d05ac36417182fc5a311151782e1f69297c7d9acf3d84f9c9f1660239cb79b96",
+  "reviewed_inventory_sha256": "d06c35c8a2eba0fcac257103dad8699dfb4f85a183ab826aa2b1fc7a579836cc",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Head f6e5acd0263653237b056068c990545b7f86844c keeps exact REPLAY and pending RESUME before ORDINARY_OPERATION_SLOT_CLOSED. Commit b65ec7cde0d55b5d07fc1bee1c6b91eef04dc1ec checks the journal on the store corpus, refreshes the vertical journal after republish, expects OWNER_CAP_EXHAUSTED for the third preview, and records NO_CHANGE source disposition. Stale completion bindings are rebound with this evidence commit. WATCH items were not patched."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Scenario F reads the closed repair. Replay and resume pass. Isolated re-run of test_compound_then_real_freeze_is_the_scientific_terminal and test_cap_zero_still_freezes_a_saved_candidate on f6e5acd0 returned OK. The reported PREFLIGHT_RECEIPT_HASH_MISMATCH was not reproduced. Replacement 10 is OPERATIONAL_PASS with KILL_UNBOUND_EVIDENCE, not a scientific PASS, and was not rerun after the replay-order delta."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=35dc5d257a612b2b4a4ccb9ae63e125388393d1e6835073a3f873103566051fc SEMANTIC_PREMISE PASS. REPLAY and RESUME stand before ORDINARY_OPERATION_SLOT_CLOSED. A new spec after NO_WORTHY stays blocked. Acceptance 10 stays historical. P2 notes were not patched."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "A closed NO_WORTHY slot still replays the stored look and resumes a pending reservation. A new spec stays refused. KILL_UNBOUND_EVIDENCE reads as RETURN_EXISTING_SESSION and is not a scientific PASS. The missing ordinary-operation JSON example is P2/WATCH."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MERGE",
+    "NO_ALPHA",
+    "NO_MARKET_FORGE",
+    "NO_NET_RETURN",
+    "NO_LIVE_LOOK",
+    "MODEL_TRIAL_2_AND_3_PROVENANCE_UNKNOWN",
+    "MODEL_TRIALS_4_TO_8_OBSERVED_MODEL_UNKNOWN",
+    "OPERATOR_TRIAL_7_FREEZE_REFUSED_STALE_PREFLIGHT_RECEIPT",
+    "KILL_UNBOUND_EVIDENCE_IS_NOT_SCIENTIFIC_PASS"
+  ]
+}

@@ -161,6 +161,21 @@ def emit_error(code: str, *, exit_code: int = 1) -> int:
     return exit_code
 
 
+def _published_file_hash_mismatch(root: Path) -> bool:
+    """True when published cohort bytes disagree with their declared hashes."""
+
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        resolve_published_discovery_binding,
+    )
+
+    try:
+        resolve_published_discovery_binding(root)
+    except GroundedDiscoveryError as exc:
+        return str(exc) == "BINDING_HASH_MISMATCH"
+    return False
+
+
 _REPAIR_OWNER_NEXT = {
     "PARENT_SESSION_MISSING": "PROVIDE_PARENT_SESSION_ID_FROM_SHOW_SESSION",
     "PARENT_SESSION_REQUIRED": "SHOW_SESSION_THEN_REPAIR_CONTINUATION_DRAFT",
@@ -730,6 +745,19 @@ def cmd_forge_run(
         )
     except LadderError as exc:
         payload = _ladder_error_payload(str(exc))
+        from solana_alpha_lab.factory.hfic_ordinary_operation import project_ordinary_operation
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        if resolved.status == "PRESENT" and resolved.root is not None:
+            try:
+                projection = project_ordinary_operation(
+                    ResearchStore(resolved.root, create_if_missing=False),
+                    owner_focus=owner_focus if owner_focus.strip() else "AUTO",
+                )
+            except Exception:
+                projection = None
+            if projection is not None:
+                payload["ordinary_operation"] = projection
         payload["owner_readout"] = format_forge_run_owner_readout(payload)
         return _emit_run(payload, exit_code=2)
     payload = {**receipt, "no_write": not persist, "selection_reason": resolved.selection_reason}
@@ -770,6 +798,16 @@ def cmd_forge_run(
             store=store,
             execution_context=execution_context,
         )
+    from solana_alpha_lab.factory.hfic_ordinary_operation import (
+        merge_ordinary_readout,
+        project_ordinary_operation,
+    )
+
+    projection = project_ordinary_operation(
+        store,
+        owner_focus=owner_focus if owner_focus.strip() else "AUTO",
+    )
+    payload = merge_ordinary_readout(payload, projection)
     _assert_no_path_leak(payload, str(resolved.root), str(repo_root))
     return _emit_run(payload, exit_code=(
         0 if payload.get("owner_class") not in {"INPUT_NOT_READY", "OBSERVABILITY_BLOCKED"} else 2
@@ -819,6 +857,8 @@ def cmd_discovery_execute(
     candidate_scope_path: Path,
     cohort_partitions: list[tuple[str, Path, Path]] | None = None,
     explicit_data_root: Path | None = None,
+    operation_path: Path | None = None,
+    operation_sha256: str | None = None,
 ) -> int:
     """Compute one ordinary discovery query into a caller-selected store.
 
@@ -831,7 +871,6 @@ def cmd_discovery_execute(
         load_admitted_partition_rows,
         run_recorded_discovery_query,
     )
-    from solana_alpha_lab.factory.research_store import ResearchStore
 
     git_before = repository_git_snapshot(repo_root)
     try:
@@ -846,6 +885,178 @@ def cmd_discovery_execute(
         return emit_error("DISCOVERY_INPUT_INVALID")
     if binding_doc is not None and not isinstance(binding_doc, dict):
         return emit_error("DISCOVERY_INPUT_INVALID")
+    from solana_alpha_lab.factory.hfic_ordinary_operation import (
+        OrdinaryOperationError,
+        gate_before_values,
+        get_operation,
+        list_operations,
+        note_look_landed,
+        record_operation,
+    )
+    from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    try:
+        validate_temporal_query(spec)
+        temporal_query = True
+    except Exception:
+        temporal_query = False
+    if spec.get("schema") == "smial.hfic-temporal-query" and not temporal_query:
+        return emit(
+            {
+                "reason_code": "QUERY_SPEC_INVALID",
+                "values_loaded": False,
+                "writes": False,
+                "scientific_negative": False,
+            },
+            exit_code=2,
+        )
+    if temporal_query and operation_path is None and not operation_sha256:
+        return emit(
+            {"reason_code": "ORDINARY_OPERATION_REQUIRED", "values_loaded": False, "writes": False},
+            exit_code=2,
+        )
+    gate: dict[str, object] = {"disposition": "EXECUTE"}
+    if temporal_query:
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            EvidenceIdentityError,
+            compute_market_epoch_for_data_root,
+        )
+
+        values_follow_data_root = explicit_data_root is not None and census_path is None and observations_path is None and not cohort_partitions
+        corpus_candidates = []
+        for root in (store_root, explicit_data_root):
+            if root is None or root in corpus_candidates:
+                continue
+            corpus_candidates.append(root)
+        epochs: list[str] = []
+        for root in corpus_candidates:
+            try:
+                found, _basis = compute_market_epoch_for_data_root(repo_root, root)
+            except EvidenceIdentityError:
+                if _published_file_hash_mismatch(root):
+                    return emit_error("BINDING_HASH_MISMATCH")
+                if values_follow_data_root and root == explicit_data_root:
+                    return emit(
+                        {
+                            "reason_code": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+                            "values_loaded": False,
+                            "writes": False,
+                            "scientific_negative": False,
+                        },
+                        exit_code=2,
+                    )
+                continue
+            if found not in epochs:
+                epochs.append(found)
+        if not epochs:
+            return emit(
+                {
+                    "reason_code": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                },
+                exit_code=2,
+            )
+        if len(epochs) > 1:
+            return emit(
+                {
+                    "reason_code": "ORDINARY_OPERATION_MARKET_MISMATCH",
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                },
+                exit_code=2,
+            )
+        epoch = epochs[0]
+        claimed_market = ""
+        service_writes = 0
+        if operation_path is not None:
+            try:
+                preview_request = json.loads(operation_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+                return emit_error("DISCOVERY_INPUT_INVALID")
+            if isinstance(preview_request, dict):
+                claimed_market = str(preview_request.get("market_evidence_epoch_sha256") or "")
+        if claimed_market and claimed_market != epoch:
+            for root in corpus_candidates:
+                if _published_file_hash_mismatch(root):
+                    return emit_error("BINDING_HASH_MISMATCH")
+            return emit(
+                {
+                    "reason_code": "ORDINARY_OPERATION_MARKET_MISMATCH",
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                },
+                exit_code=2,
+            )
+        op_store = ResearchStore(store_root)
+        try:
+            if operation_path is not None:
+                request = preview_request
+                if not isinstance(request, dict):
+                    raise OrdinaryOperationError("ORDINARY_OPERATION_REQUEST_REQUIRED")
+                before_records = len(list_operations(op_store))
+                operation = record_operation(op_store, request)
+                service_writes = int(len(list_operations(op_store)) > before_records)
+                operation_sha256 = str(operation.get("operation_sha256") or "")
+            elif claimed_market == "":
+                existing = get_operation(op_store, str(operation_sha256))
+                if str(existing.get("market_evidence_epoch_sha256") or "") != epoch:
+                    return emit(
+                        {
+                            "reason_code": "ORDINARY_OPERATION_MARKET_MISMATCH",
+                            "values_loaded": False,
+                            "writes": False,
+                            "scientific_negative": False,
+                        },
+                        exit_code=2,
+                    )
+            cohorts = []
+            if isinstance(binding_doc, dict):
+                cohorts = list(binding_doc.get("cohorts") or [])
+            elif explicit_data_root is not None:
+                from solana_alpha_lab.factory.hfic_grounded_discovery import (
+                    resolve_published_discovery_binding,
+                )
+
+                try:
+                    published = resolve_published_discovery_binding(explicit_data_root)
+                    cohorts = list(published.get("cohorts") or [])
+                except Exception:
+                    cohorts = []
+            gate = gate_before_values(
+                op_store,
+                operation_sha256=str(operation_sha256),
+                spec=spec,
+                journal_scope=journal_scope,
+                binding_cohorts=cohorts,
+                verified_market=epoch,
+                repo_root=repo_root,
+                data_root=store_root or explicit_data_root,
+            )
+        except OrdinaryOperationError as exc:
+            return emit(
+                {
+                    "reason_code": exc.code,
+                    "values_loaded": False,
+                    "writes": bool(service_writes) or gate.get("disposition") == "RESERVED",
+                    "scientific_negative": False,
+                },
+                exit_code=2,
+            )
+    if gate.get("disposition") == "REPLAY":
+        evidence = dict(gate.get("evidence") or {})
+        evidence["values_loaded"] = False
+        evidence["writes"] = False
+        evidence["scientific_negative"] = False
+        if operation_sha256:
+            evidence["ordinary_operation"] = note_look_landed(op_store, str(operation_sha256)).get("status")
+        evidence["operation_sha256"] = (gate.get("operation") or {}).get("operation_sha256")
+        _assert_no_path_leak(evidence, str(store_root), str(repo_root))
+        return emit(evidence)
     data_root = explicit_data_root
     try:
         loaded = load_admitted_partition_rows(
@@ -874,6 +1085,8 @@ def cmd_discovery_execute(
             candidate_scope=candidate_scope,
             priors=priors,
             git_sha=git_before.head_sha,
+            operation_sha256=str(operation_sha256) if operation_sha256 else None,
+            verified_market=epoch if temporal_query else None,
         )
     except GroundedDiscoveryError as exc:
         return emit_error(exc.code)
@@ -881,9 +1094,16 @@ def cmd_discovery_execute(
     if git_before.head_sha != git_after.head_sha:
         return emit_error("GIT_MUTATION_FORBIDDEN")
     evidence["scientific_writes"] = 0
+    if temporal_query:
+        query_rows = evidence.get("queries") if isinstance(evidence.get("queries"), list) else []
+        first_query = query_rows[0] if query_rows and isinstance(query_rows[0], dict) else {}
+        evidence["writes"] = bool(service_writes) or bool(first_query.get("new_look"))
     evidence["live_store_selected"] = False
     evidence["duplicate_partitions_eliminated"] = loaded["duplicate_partitions_eliminated"]
     evidence["authority_source"] = (loaded["binding"] or {}).get("authority_source")
+    evidence["values_loaded"] = True
+    if operation_sha256:
+        evidence["ordinary_operation"] = note_look_landed(op_store, str(operation_sha256)).get("status")
     _assert_no_path_leak(evidence, str(store_root), str(repo_root))
     if data_root is not None:
         _assert_no_path_leak(evidence, str(data_root))
@@ -902,6 +1122,8 @@ def cmd_discovery_preview(
     prior_preview_hash: list[str] | None,
     store_root: Path | None = None,
     journal_scope: str | None = None,
+    operation_path: Path | None = None,
+    operation_sha256: str | None = None,
 ) -> int:
     """Feature-only preview. Store memory is written only when store and journal are both set."""
 
@@ -922,6 +1144,162 @@ def cmd_discovery_preview(
         return emit_error("DISCOVERY_INPUT_INVALID")
     if binding_doc is not None and not isinstance(binding_doc, dict):
         return emit_error("DISCOVERY_INPUT_INVALID")
+    from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+
+    try:
+        validate_temporal_query(spec)
+        temporal_preview = True
+    except Exception:
+        temporal_preview = False
+    if spec.get("schema") == "smial.hfic-temporal-query" and not temporal_preview:
+        return emit(
+            {
+                "reason_code": "QUERY_SPEC_INVALID",
+                "values_loaded": False,
+                "writes": False,
+                "scientific_negative": False,
+            },
+            exit_code=2,
+        )
+    if temporal_preview and (
+        store_root is None
+        or not journal_scope
+        or (operation_path is None and not operation_sha256)
+    ):
+        return emit(
+            {
+                "reason_code": "ORDINARY_OPERATION_REQUIRED",
+                "values_loaded": False,
+                "writes": False,
+                "scientific_negative": False,
+            },
+            exit_code=2,
+        )
+    preview_service_writes = 0
+    preview_store = None
+    if store_root is not None and journal_scope:
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            EvidenceIdentityError,
+            compute_market_epoch_for_data_root,
+        )
+        from solana_alpha_lab.factory.hfic_ordinary_operation import (
+            OrdinaryOperationError,
+            authorize_temporal_attempt,
+            get_operation,
+            list_operations,
+            owner_allowance,
+            record_operation,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        if operation_path is None and not operation_sha256:
+            return emit(
+                {"reason_code": "ORDINARY_OPERATION_REQUIRED", "values_loaded": False, "writes": False},
+                exit_code=2,
+            )
+        preview_store = ResearchStore(store_root, create_if_missing=False)
+        try:
+            if operation_path is not None:
+                request = json.loads(operation_path.read_text(encoding="utf-8"))
+                before_records = len(list_operations(preview_store))
+                operation = record_operation(preview_store, request)
+                preview_service_writes = int(len(list_operations(preview_store)) > before_records)
+                operation_sha256 = str(operation.get("operation_sha256") or "")
+            else:
+                operation = get_operation(preview_store, str(operation_sha256))
+            if str(operation.get("journal_scope") or "") != journal_scope:
+                raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_MISMATCH")
+            from solana_alpha_lab.factory.hfic_ordinary_operation import (
+                _canonical as _op_canonical,
+                _feature_previews,
+                owner_allowance,
+            )
+
+            preview_spec_sha = hashlib.sha256(_op_canonical(dict(spec)).encode("utf-8")).hexdigest()
+            already_owned = any(
+                item.get("operation_sha256") == operation.get("operation_sha256")
+                and item.get("spec_sha256") == preview_spec_sha
+                for item in _feature_previews(preview_store, journal_scope)
+            )
+            if not already_owned and owner_allowance(preview_store, operation, "preview") < 1:
+                raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
+            epochs: list[str] = []
+            if explicit_data_root is not None:
+                try:
+                    found, _basis = compute_market_epoch_for_data_root(
+                        repo_root, explicit_data_root
+                    )
+                    epochs.append(found)
+                except EvidenceIdentityError:
+                    if _published_file_hash_mismatch(explicit_data_root):
+                        return emit_error("BINDING_HASH_MISMATCH")
+                    return emit(
+                        {
+                            "reason_code": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+                            "values_loaded": False,
+                            "writes": bool(preview_service_writes),
+                            "scientific_negative": False,
+                        },
+                        exit_code=2,
+                    )
+            if not epochs:
+                return emit(
+                    {
+                        "reason_code": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+                        "values_loaded": False,
+                        "writes": bool(preview_service_writes),
+                        "scientific_negative": False,
+                    },
+                    exit_code=2,
+                )
+            epoch = epochs[0]
+            binding_cohorts: list[dict[str, Any]] = []
+            if binding_doc is not None and isinstance(binding_doc, dict):
+                binding_cohorts = list(binding_doc.get("cohorts") or [])
+            elif explicit_data_root is not None:
+                from solana_alpha_lab.factory.hfic_grounded_discovery import (
+                    resolve_published_discovery_binding,
+                )
+
+                try:
+                    binding_cohorts = list(
+                        resolve_published_discovery_binding(explicit_data_root).get("cohorts")
+                        or []
+                    )
+                except Exception:
+                    binding_cohorts = []
+            preview_gate = authorize_temporal_attempt(
+                preview_store,
+                operation_sha256=str(operation_sha256),
+                spec=spec,
+                journal_scope=journal_scope,
+                binding_cohorts=binding_cohorts,
+                verified_market=epoch,
+                look_kind="preview",
+                repo_root=repo_root,
+                data_root=store_root or explicit_data_root,
+            )
+            if isinstance(preview_gate, dict) and preview_gate.get("disposition") == "REPLAY":
+                return emit(
+                    {
+                        "disposition": "REPLAY",
+                        "preview_sha256": preview_gate.get("preview_sha256"),
+                        "replayed_without_loader": True,
+                        "values_loaded": False,
+                        "writes": bool(preview_service_writes),
+                        "scientific_negative": False,
+                    }
+                )
+        except OrdinaryOperationError as exc:
+            return emit(
+                {
+                    "reason_code": exc.code,
+                    "values_loaded": False,
+                    "writes": bool(preview_service_writes),
+                    "scientific_negative": False,
+                },
+                exit_code=2,
+            )
     try:
         loaded = load_admitted_partition_rows(
             data_root=explicit_data_root,
@@ -962,12 +1340,17 @@ def cmd_discovery_preview(
                     sort_keys=True,
                 ).encode("utf-8")
             ).hexdigest()
+            from solana_alpha_lab.factory.hfic_ordinary_operation import _canonical as _op_canonical
+
+            persisted_spec = hashlib.sha256(_op_canonical(dict(spec)).encode("utf-8")).hexdigest()
             persist_feature_preview(
                 ResearchStore(store_root),
                 journal_scope=journal_scope,
                 preview=payload,
                 git_sha="0" * 40,
                 input_sha256=input_identity,
+                operation_sha256=str(operation_sha256) if operation_sha256 else None,
+                spec_sha256=persisted_spec or None,
             )
     except GroundedDiscoveryError as exc:
         return emit_error(exc.code)
@@ -2376,6 +2759,8 @@ def build_parser() -> argparse.ArgumentParser:
     discovery_execute.add_argument("--spec", type=Path, required=True)
     discovery_execute.add_argument("--candidate-scope", type=Path, required=True)
     discovery_execute.add_argument("--journal-scope", required=True)
+    discovery_execute.add_argument("--operation", type=Path, default=None)
+    discovery_execute.add_argument("--operation-sha256", default=None)
     discovery_preview = subparsers.add_parser(
         "discovery-preview",
         help="Feature-only temporal preview. Writes store memory only when --store and --journal-scope are both set. Does not read a target.",
@@ -2394,6 +2779,8 @@ def build_parser() -> argparse.ArgumentParser:
     discovery_preview.add_argument("--prior-preview-hash", action="append", default=None)
     discovery_preview.add_argument("--store", type=Path)
     discovery_preview.add_argument("--journal-scope")
+    discovery_preview.add_argument("--operation", type=Path, default=None)
+    discovery_preview.add_argument("--operation-sha256", default=None)
     discovery_preview.add_argument("--format", choices=("json",), default="json")
     discovery_execute.add_argument("--format", choices=("json",), default="json")
 
@@ -2739,6 +3126,8 @@ def main(argv: list[str] | None = None) -> int:
                 prior_preview_hash=args.prior_preview_hash,
                 store_root=args.store,
                 journal_scope=args.journal_scope,
+                operation_path=args.operation,
+                operation_sha256=args.operation_sha256,
             )
         if args.command == "discovery-execute":
             return cmd_discovery_execute(
@@ -2755,6 +3144,8 @@ def main(argv: list[str] | None = None) -> int:
                     for item in (args.cohort_partition or [])
                 ],
                 explicit_data_root=args.data_root,
+                operation_path=args.operation,
+                operation_sha256=args.operation_sha256,
             )
         if args.command == "persist-draft":
             return cmd_persist_draft(

@@ -1686,6 +1686,8 @@ def run_recorded_discovery_query(
     priors: Sequence[Mapping[str, Any]] | None = None,
     git_sha: str,
     clock: datetime | None = None,
+    operation_sha256: str | None = None,
+    verified_market: str | None = None,
 ) -> dict[str, Any]:
     """Public production entry: compute, persist or resume, return evidence refs."""
 
@@ -1694,6 +1696,27 @@ def run_recorded_discovery_query(
     if not isinstance(git_sha, str) or len(git_sha) != 40:
         raise GroundedDiscoveryError("GIT_SHA_REQUIRED")
     bound_scope = scope_bound_to_spec(spec, candidate_scope)
+    if _is_temporal_query(spec):
+        if not isinstance(operation_sha256, str) or not operation_sha256.strip():
+            raise GroundedDiscoveryError("ORDINARY_OPERATION_REQUIRED")
+        if not isinstance(verified_market, str) or len(verified_market) != 64:
+            raise GroundedDiscoveryError("ORDINARY_OPERATION_MARKET_UNVERIFIED")
+        from solana_alpha_lab.factory.hfic_ordinary_operation import (
+            OrdinaryOperationError,
+            gate_before_values,
+        )
+
+        try:
+            gate_before_values(
+                store,
+                operation_sha256=operation_sha256,
+                spec=spec,
+                journal_scope=journal_scope,
+                binding_cohorts=list(binding),
+                verified_market=verified_market,
+            )
+        except OrdinaryOperationError as exc:
+            raise GroundedDiscoveryError(str(exc.code)) from exc
     replayed = None
     if _is_temporal_query(spec):
         from solana_alpha_lab.factory.hfic_temporal_discovery import (
@@ -1813,6 +1836,7 @@ def run_recorded_discovery_query(
             git_sha=git_sha,
             clock=clock,
             candidate_scope=bound_scope,
+            operation_sha256=operation_sha256,
         )
         confirming = dict(bound_scope)
         relation = "LOOK_SCOPE_MATCH"
@@ -1890,6 +1914,7 @@ def _append_discovery_look(
     git_sha: str,
     clock: datetime | None,
     candidate_scope: Mapping[str, Any] | None = None,
+    operation_sha256: str | None = None,
 ) -> None:
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
@@ -1917,6 +1942,8 @@ def _append_discovery_look(
             if _axis_text(value)
         },
     }
+    if isinstance(operation_sha256, str) and operation_sha256:
+        body["operation_sha256"] = operation_sha256
     if summary.get("search_tier"):
         body["search_tier"] = summary.get("search_tier")
     if summary.get("target_kind"):

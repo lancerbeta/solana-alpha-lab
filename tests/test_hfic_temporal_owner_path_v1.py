@@ -48,6 +48,26 @@ def _write_partition(directory: Path) -> tuple[Path, Path, list[dict]]:
     return census_path, observations_path, _binding()
 
 
+def _operation(directory: Path, spec: dict, journal: str, market: str, name: str) -> Path:
+    path = directory / f"{name}.operation.json"
+    path.write_text(
+        json.dumps(
+            {
+                "owner_request_text": f"protocol owner path {name}",
+                "owner_focus": "ORDINARY-TEMPORAL-SYNTH",
+                "journal_scope": journal,
+                "market_evidence_epoch_sha256": market,
+                "spec": spec,
+                "question_text": name,
+                "owner_cap": {"main": None, "adaptive": None, "preview": None},
+                "requested_completion": "LIMITED_RESULT",
+            }
+        ),
+        encoding="utf-8",
+    )
+    return path
+
+
 def _cli(*args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [
@@ -114,6 +134,8 @@ class TemporalOwnerPathTests(unittest.TestCase):
             scope_path.write_text(json.dumps(scope), encoding="utf-8")
             preview_path.write_text(json.dumps(preview), encoding="utf-8")
             journal = str(receipt["search_key_sha256"])
+            market = str(receipt["market_evidence_epoch_sha256"])
+            published_op = _operation(workspace, spec, journal, market, "published")
             preview_run = run_cli(
                 "discovery-preview",
                 "--spec",
@@ -134,6 +156,8 @@ class TemporalOwnerPathTests(unittest.TestCase):
                 str(scope_path),
                 "--journal-scope",
                 journal,
+                "--operation",
+                str(published_op),
                 "--format",
                 "json",
                 data_root=data_root,
@@ -188,6 +212,8 @@ class TemporalOwnerPathTests(unittest.TestCase):
                 str(simple_scope_path),
                 "--journal-scope",
                 journal,
+                "--operation",
+                str(_operation(workspace, simple, journal, market, "simple")),
                 "--format",
                 "json",
             )
@@ -212,6 +238,8 @@ class TemporalOwnerPathTests(unittest.TestCase):
                 str(compound_scope_path),
                 "--journal-scope",
                 journal,
+                "--operation",
+                str(_operation(workspace, compound, journal, market, "compound")),
                 "--format",
                 "json",
             )
@@ -374,6 +402,8 @@ class TemporalOwnerPathTests(unittest.TestCase):
                 str(scope_path),
                 "--journal-scope",
                 journal,
+                "--operation",
+                str(published_op),
                 "--format",
                 "json",
                 data_root=data_root,

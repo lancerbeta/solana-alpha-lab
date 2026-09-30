@@ -410,14 +410,14 @@ Re-check joint state coverage without a scientific look:
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-coverage --format json
 ```
 
-Ordinary numeric recipe. `discovery-binding` does not load parquet values. It admits only when published labels match `REQUIRED_LABELS` and no protected holdout is assigned. Stop codes before row reads: `DISCOVERY_ROLE_UNKNOWN`, `DISCOVERY_ROLE_FORBIDDEN`, `DISCOVERY_ROLE_CONFLICT`, `DISCOVERY_AUTHORITY_ABSENT`, `HOLDOUT_PROTECTED`, `HOLDOUT_UNRESOLVED`, `DISCOVERY_IDENTITY_MISMATCH`, `BINDING_HASH_MISMATCH`, `DISCOVERY_ARTIFACT_MISSING`, `DISCOVERY_SCOPE_UNSUPPORTED`. Do not hand-write role or holdout. On an authorized ordinary slash, `--data-root` and `--store` are both the canonical data root, because freeze checks the look there. `--journal-scope` is the preflight `search_key_sha256`. Copy the whole returned object onto the draft as `grounded_evidence`. Each cohort keeps its own published partition. An exact repeated `--cohort-partition` is eliminated; a conflicting repeat stops. Ordinary non-CONTROL preflight always stamps the discovery contract; `--discovery-contract` does not toggle it. That receipt requires the evidence object for 0, 1, 4, and 6 candidates. One selected candidate is persisted without a runner-up. Do not hand-write the contract field:
+Ordinary numeric recipe. `discovery-binding` does not load parquet values. It admits only when published labels match `REQUIRED_LABELS` and no protected holdout is assigned. Stop codes before row reads: `DISCOVERY_ROLE_UNKNOWN`, `DISCOVERY_ROLE_FORBIDDEN`, `DISCOVERY_ROLE_CONFLICT`, `DISCOVERY_AUTHORITY_ABSENT`, `HOLDOUT_PROTECTED`, `HOLDOUT_UNRESOLVED`, `DISCOVERY_IDENTITY_MISMATCH`, `BINDING_HASH_MISMATCH`, `DISCOVERY_ARTIFACT_MISSING`, `DISCOVERY_SCOPE_UNSUPPORTED`. Do not hand-write role or holdout. On an authorized ordinary slash, `--data-root` and `--store` are both the canonical data root, because freeze checks the look there. `--journal-scope` is the preflight `search_key_sha256`. Temporal execute/preview also require `--operation` (or `--operation-sha256`) naming an explicit owner request; omitting it does not spend a look. Copy the whole returned object onto the draft as `grounded_evidence`. Each cohort keeps its own published partition. An exact repeated `--cohort-partition` is eliminated; a conflicting repeat stops. Ordinary non-CONTROL preflight always stamps the discovery contract; `--discovery-contract` does not toggle it. That receipt requires the evidence object for 0, 1, 4, and 6 candidates. One selected candidate is persisted without a runner-up. After persist, take a fresh `--discovery-contract` preflight before freeze so the receipt digest matches the store. Do not hand-write the contract field:
 
 ```text
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-binding --format json
 ```
 
 ```text
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <canonical-data-root> --store <canonical-data-root> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-execute --data-root <canonical-data-root> --store <canonical-data-root> --spec <spec.json> --candidate-scope <scope.json> --journal-scope <preflight-search-key-sha256> --operation <ordinary-operation.json> --format json
 ```
 
 ## A0. Authority и hard boundaries
@@ -1548,7 +1548,16 @@ Bound schedule может задавать per-point `(due_offset, allowed_laten
 query scalar остаётся X300 envelope. `schedule.observation_clock_policy:
 PROVIDER_REPORTED_SNAPSHOT_V1` считает exit по request/response/availability,
 не по member anchor как market-event. Причины missing target —
-`target_exclusion_reasons` (pooled + by_cohort). После completed NO_WORTHY без selected candidate узкий owner-authorized repair
+`target_exclusion_reasons` (pooled + by_cohort). Обычная пауза одного вопроса — не repair и не `NO_WORTHY` всего поиска.
+Temporal `discovery-execute` требует `ORDINARY_OPERATION_V1`: явный текст запроса,
+journal, полный spec и owner cap. Cap не задан — действует остаток protocol
+в этом journal, не молчаливый cap=1. После cap=0 `ordinary_operation.next_action` — `AUTHORIZE_ADDITIONAL_LOOKS`,
+journal и сохранённый result те же. Верхний `next_action` прогона при этом
+не подменяется: блокировка и уже замороженный научный итог остаются своими.
+Новое разрешение — новая operation-запись на том же journal. Закрытый repair
+slot так не открывается. Expert repair остаётся в runbook ниже.
+
+После completed NO_WORTHY без selected candidate узкий owner-authorized repair
 continuation наследует потраченный look ledger. Owner path
 (`--data-root` — parent flag перед subcommand):
 `hypothesis_forge.py --data-root <store> repair-continuation-draft --parent-session-id <id> --owner-authorization-id <auth> --technical-gap-code <gap> --output <draft.json>`

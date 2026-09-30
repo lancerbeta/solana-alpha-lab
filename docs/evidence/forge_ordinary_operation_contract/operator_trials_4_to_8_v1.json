@@ -1,0 +1,428 @@
+{
+  "schema": "smial.operator-trials",
+  "schema_version": "1.0",
+  "trial_set": "FORGE_ORDINARY_OPERATION_CONTRACT_OPERATOR_TRIALS_4_TO_8_V1",
+  "as_of": "2026-09-29",
+  "command_prefix": "uv run --locked --managed-python python -B",
+  "path_sanitization": {
+    "absolute_paths_recorded": false,
+    "worktree_relative_scratch_root": "operator_trial_scratch",
+    "note": "Commands below replace the absolute worktree prefix with relative paths."
+  },
+  "constraints_receipt": {
+    "product_source_edited": false,
+    "live_research_store_read_or_written": false,
+    "local_factory_v1_read_or_written": false,
+    "ssh_used": false,
+    "git_commit_push_or_merge": false,
+    "prices_changed_after_publication": false
+  },
+  "setup_observations": [
+    {
+      "stage": "initial_publication_probe",
+      "exit_code": 1,
+      "error": "DATA_ROOT_MUST_BE_ABSOLUTE",
+      "main_looks_written": 0
+    },
+    {
+      "stage": "initial_query_contract_probe",
+      "exit_code": 2,
+      "reason_code": "QUERY_SPEC_INVALID",
+      "values_loaded": false,
+      "writes": false,
+      "main_looks_written": 0
+    },
+    {
+      "stage": "zero_cap_query_contract_probe",
+      "exit_code": 2,
+      "reason_code": "OWNER_CAP_EXHAUSTED",
+      "values_loaded": false,
+      "writes": true,
+      "main_looks_written": 0
+    }
+  ],
+  "trials": [
+    {
+      "trial_index": 4,
+      "scenario": "limited_question",
+      "human_intervention": false,
+      "model_observed": "UNKNOWN",
+      "second_process_used": false,
+      "publication": {
+        "helper": "tests.test_hfic_temporal_production_runner_v1._publish",
+        "exit_price": "0.60",
+        "data_root": "operator_trial_scratch/trial4_actual/data"
+      },
+      "commands": [
+        {
+          "command": "uv run --locked --managed-python python -B -c \"from tests.test_hfic_temporal_production_runner_v1 import _publish; _publish(<trial4-data-root>, <trial4-publication-workspace>, exit_price='0.60')\"",
+          "exit_code": 0
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial4_actual/data preflight --owner-focus \"trial4 limited exit-price question\" --format json",
+          "exit_code": 0
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial4_actual/data discovery-execute --store operator_trial_scratch/trial4_actual/data --spec operator_trial_scratch/valid_probe_spec.json --candidate-scope operator_trial_scratch/candidate_scope.json --journal-scope 7d6c789300e2931621762afdc49d4f69b758c4ebab5f76855207483757a81174 --operation operator_trial_scratch/trial4_operation.json --format json",
+          "exit_code": 0
+        }
+      ],
+      "observed_cli_fields": {
+        "preflight": {
+          "action": "START_NEW_SESSION",
+          "receipt_id": "HFIC-PREFLIGHT-7D6C789300E29316",
+          "search_key_sha256": "7d6c789300e2931621762afdc49d4f69b758c4ebab5f76855207483757a81174"
+        },
+        "discovery_execute": {
+          "reason_code": null,
+          "next_action": null,
+          "owner_final": null,
+          "ordinary_operation_status": "PAUSED_CAP",
+          "new_look": true,
+          "look_class": "MAIN",
+          "result_refs": [
+            "HFIC-ART-DISCOVERY-30B4E695828D437B48188A8D045222ABC41E94D3"
+          ],
+          "result_sha256": "f35478384a631eb731b7b3eb33bf5d29ade60d8f176763aafefbc0c0c290a08f",
+          "values_loaded": true,
+          "fields_not_printed": [
+            "reason_code",
+            "next_action",
+            "owner_final"
+          ]
+        }
+      },
+      "main_look_count": {
+        "before": 0,
+        "after": 1
+      },
+      "outcome": "One MAIN look returned a LIMITED_RESULT operation pause; no second look was added.",
+      "errors": []
+    },
+    {
+      "trial_index": 5,
+      "scenario": "cold_resume",
+      "human_intervention": false,
+      "model_observed": "UNKNOWN",
+      "second_process_used": true,
+      "publication": {
+        "reused_trial_index": 4,
+        "data_root": "operator_trial_scratch/trial4_actual/data"
+      },
+      "commands": [
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial4_actual/data forge-run --no-write --owner-focus \"trial4 limited exit-price question\" --format json",
+          "exit_code": 0
+        }
+      ],
+      "observed_cli_fields": {
+        "forge_run": {
+          "reason_code": "ORDINARY_DISCOVERY_READY",
+          "reason_code_path": "stages[0].reason_code",
+          "next_action": "AUTHORIZE_ADDITIONAL_LOOKS",
+          "owner_final": "OPERATION_PAUSED_SEARCH_OPEN",
+          "ordinary_operation_status": "PAUSED_CAP",
+          "new_look": null,
+          "new_look_field_printed": false,
+          "result_refs": [
+            "HFIC-ART-DISCOVERY-30B4E695828D437B48188A8D045222ABC41E94D3"
+          ],
+          "owner_main_remaining": 0,
+          "protocol_main_used": 1,
+          "writes": {
+            "forge_run": 0,
+            "research_store": 0,
+            "session": 0
+          }
+        }
+      },
+      "main_look_count": {
+        "before": 1,
+        "after": 1
+      },
+      "outcome": "A cold no-write process returned the saved PAUSED_CAP state and existing result ref without recomputation.",
+      "errors": []
+    },
+    {
+      "trial_index": 6,
+      "scenario": "several_questions_inside_one_allowance",
+      "human_intervention": false,
+      "model_observed": "UNKNOWN",
+      "second_process_used": true,
+      "publication": {
+        "helper": "tests.test_hfic_temporal_production_runner_v1._publish",
+        "exit_price": "0.60",
+        "data_root": "operator_trial_scratch/trial6/data"
+      },
+      "commands": [
+        {
+          "command": "uv run --locked --managed-python python -B -c \"from tests.test_hfic_temporal_production_runner_v1 import _publish; _publish(<trial6-data-root>, <trial6-publication-workspace>, exit_price='0.60')\"",
+          "exit_code": 0
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial6/data preflight --owner-focus \"trial6 several questions one allowance\" --format json",
+          "exit_code": 0
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial6/data discovery-execute --store operator_trial_scratch/trial6/data --spec operator_trial_scratch/valid_probe_spec.json --candidate-scope operator_trial_scratch/candidate_scope.json --journal-scope 1ddaccf2a10e987ebc2609e69e3921fe4170554da169a5c340306244a5c58c80 --operation operator_trial_scratch/trial6_operation.json --format json",
+          "exit_code": 0
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial6/data discovery-execute --store operator_trial_scratch/trial6/data --spec operator_trial_scratch/trial6_q2.json --candidate-scope operator_trial_scratch/trial6_scope_q2.json --journal-scope 1ddaccf2a10e987ebc2609e69e3921fe4170554da169a5c340306244a5c58c80 --operation operator_trial_scratch/trial6_operation.json --format json",
+          "exit_code": 0
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial6/data discovery-execute --store operator_trial_scratch/trial6/data --spec operator_trial_scratch/trial6_q3.json --candidate-scope operator_trial_scratch/trial6_scope_q3.json --journal-scope 1ddaccf2a10e987ebc2609e69e3921fe4170554da169a5c340306244a5c58c80 --operation operator_trial_scratch/trial6_operation.json --format json",
+          "exit_code": 2
+        }
+      ],
+      "observed_cli_fields": {
+        "first_call": {
+          "reason_code": null,
+          "next_action": null,
+          "owner_final": null,
+          "ordinary_operation_status": "OPEN",
+          "new_look": true,
+          "result_refs": [
+            "HFIC-ART-DISCOVERY-6252F354BD482C38BFCE72DB2E5B933BAFCCB2B9"
+          ],
+          "main_count": 1
+        },
+        "second_call": {
+          "reason_code": null,
+          "next_action": null,
+          "owner_final": null,
+          "ordinary_operation_status": "PAUSED_CAP",
+          "new_look": true,
+          "result_refs": [
+            "HFIC-ART-DISCOVERY-4F21E14C3DEE5F8B0E7106179B31D071E38A58C5"
+          ],
+          "main_count": 2
+        },
+        "third_call": {
+          "reason_code": "OWNER_CAP_EXHAUSTED",
+          "next_action": null,
+          "owner_final": null,
+          "ordinary_operation_status": null,
+          "new_look": null,
+          "result_refs": [],
+          "scientific_negative": false,
+          "values_loaded": false,
+          "writes": false
+        }
+      },
+      "main_look_count": {
+        "before": 0,
+        "after": 2
+      },
+      "outcome": "Two different predicate values consumed the one operation's two MAIN allowances; the third call was refused without values or writes.",
+      "errors": [
+        "EXPECTED_REFUSAL:OWNER_CAP_EXHAUSTED"
+      ]
+    },
+    {
+      "trial_index": 7,
+      "scenario": "saved_candidate_at_cap_zero",
+      "human_intervention": false,
+      "model_observed": "UNKNOWN",
+      "second_process_used": true,
+      "scripted_critic": false,
+      "publication": {
+        "helper": "tests.test_hfic_temporal_production_runner_v1._publish",
+        "exit_price": "0.60",
+        "data_root": "operator_trial_scratch/trial7/data"
+      },
+      "commands": [
+        {
+          "command": "uv run --locked --managed-python python -B -c \"from tests.test_hfic_temporal_production_runner_v1 import _publish; _publish(<trial7-data-root>, <trial7-publication-workspace>, exit_price='0.60')\"",
+          "exit_code": 0
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial7/data preflight --owner-focus \"trial7 saved candidate cap zero\" --format json",
+          "exit_code": 0
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial7/data discovery-execute --store operator_trial_scratch/trial7/data --spec operator_trial_scratch/valid_probe_spec.json --candidate-scope operator_trial_scratch/candidate_scope.json --journal-scope a3f4ea73459752dcefa08df286385f181300e598227b11656f727c2390c12a91 --operation operator_trial_scratch/trial7/operation.json --format json",
+          "exit_code": 0
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial7/data persist-draft --draft operator_trial_scratch/trial7/draft.json --preflight-receipt operator_trial_scratch/trial7/preflight.json --format json",
+          "exit_code": 1
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial7/data preflight --owner-focus \"trial7 saved candidate cap zero\" --format json",
+          "exit_code": 0,
+          "note": "Raw stdout bytes were transcoded from the Windows console encoding to UTF-8 without changing JSON text semantics."
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial7/data persist-draft --draft operator_trial_scratch/trial7/draft.json --preflight-receipt operator_trial_scratch/trial7/preflight_utf8.json --format json",
+          "exit_code": 0
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial7/data freeze --draft operator_trial_scratch/trial7/draft.json --preflight-receipt operator_trial_scratch/trial7/preflight_utf8.json --format json",
+          "exit_code": 1
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial7/data forge-run --no-write --owner-focus \"trial7 saved candidate cap zero\" --saved-draft-sha256 61115212f3589c1c139539eda177cd985e4749431a300f3d1ea5843e7a0752c3 --format json",
+          "exit_code": 2
+        }
+      ],
+      "observed_cli_fields": {
+        "discovery_execute": {
+          "reason_code": null,
+          "next_action": null,
+          "owner_final": null,
+          "ordinary_operation_status": "PAUSED_CAP",
+          "new_look": true,
+          "result_refs": [
+            "HFIC-ART-DISCOVERY-358EFD8486365E9A85BD0F04F6438063B3E692C2"
+          ],
+          "main_count": 1
+        },
+        "persist_draft": {
+          "artifact_kind": "FORGE_DRAFT",
+          "payload_sha256": "61115212f3589c1c139539eda177cd985e4749431a300f3d1ea5843e7a0752c3",
+          "research_artifact_id": "HFIC-ART-FORGE-DRAFT-GENERATED-61115212F3589C1C",
+          "session_id": "HFIC-SESS-A3F4EA73459752DC",
+          "result_refs": [
+            "HFIC-ART-DISCOVERY-358EFD8486365E9A85BD0F04F6438063B3E692C2"
+          ]
+        },
+        "freeze": {
+          "error": "PREFLIGHT_STORE_DIGEST_MISMATCH"
+        },
+        "saved_draft_forge_run": {
+          "reason_code": "ORDINARY_DISCOVERY_READY",
+          "reason_code_path": "stages[0].reason_code",
+          "next_action": "OBSERVABILITY_BLOCKED",
+          "owner_final": "OBSERVABILITY_BLOCKED",
+          "ordinary_operation_status": "PAUSED_CAP",
+          "new_look": null,
+          "new_look_field_printed": false,
+          "result_refs": [
+            "HFIC-ART-DISCOVERY-358EFD8486365E9A85BD0F04F6438063B3E692C2"
+          ],
+          "owner_main_remaining": 0,
+          "protocol_main_used": 1,
+          "blocking_reason_codes": [
+            "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING"
+          ],
+          "writes": {
+            "forge_run": 0,
+            "research_store": 0,
+            "session": 0
+          }
+        }
+      },
+      "main_look_count": {
+        "before": 0,
+        "after": 1
+      },
+      "outcome": "The draft persisted after one MAIN and the later cap-zero process wrote no new look, but direct freeze failed on store digest drift and saved-draft readback ended OBSERVABILITY_BLOCKED because no lifecycle row was readable.",
+      "errors": [
+        "PREFLIGHT_RECEIPT_HASH_MISMATCH_FROM_TEXT_CAPTURE",
+        "PREFLIGHT_STORE_DIGEST_MISMATCH",
+        "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING"
+      ],
+      "recovery_segment": {
+        "status": "MISSING_INPUT",
+        "required_existing_paths": [
+          "operator_trial_scratch/trial7/data",
+          "operator_trial_scratch/trial7/draft.json",
+          "operator_trial_scratch/trial7/operation.json",
+          "operator_trial_scratch/trial7/preflight_utf8.json"
+        ],
+        "required_identities": {
+          "focus": "trial7 saved candidate cap zero",
+          "session_id": "HFIC-SESS-A3F4EA73459752DC",
+          "draft_sha256": "61115212f3589c1c139539eda177cd985e4749431a300f3d1ea5843e7a0752c3",
+          "look_record_id": "HFIC-ART-DISCOVERY-358EFD8486365E9A85BD0F04F6438063B3E692C2"
+        },
+        "observed_at_recovery": {
+          "operator_trial_scratch_present": false,
+          "trial7_data_present": false
+        },
+        "note": "Checked operator_trial_scratch/trial7/data in the delivery worktree and the main checkout. Both absent. Do not recreate under the same identities. Mechanical saved-candidate continuation is test_c, which is not this trial."
+      }
+    },
+    {
+      "trial_index": 8,
+      "scenario": "technical_refusal",
+      "human_intervention": false,
+      "model_observed": "UNKNOWN",
+      "second_process_used": true,
+      "publication": {
+        "helper": "tests.test_hfic_temporal_production_runner_v1._publish",
+        "exit_price": "0.60",
+        "data_root": "operator_trial_scratch/trial8/data"
+      },
+      "commands": [
+        {
+          "command": "uv run --locked --managed-python python -B -c \"from tests.test_hfic_temporal_production_runner_v1 import _publish; _publish(<trial8-data-root>, <trial8-publication-workspace>, exit_price='0.60')\"",
+          "exit_code": 0
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial8/data preflight --owner-focus \"trial8 technical refusal\" --format json",
+          "exit_code": 0
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial8/data discovery-execute --store operator_trial_scratch/trial8/data --spec operator_trial_scratch/trial8_invalid.json --candidate-scope operator_trial_scratch/candidate_scope.json --journal-scope 62df7e32719f33cf2e85d10a3e454b72a4a849788f3ab905385305acc41ae576 --operation operator_trial_scratch/trial8_operation.json --format json",
+          "exit_code": 1
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial8/data discovery-execute --store operator_trial_scratch/trial8/data --spec operator_trial_scratch/valid_probe_spec.json --candidate-scope operator_trial_scratch/candidate_scope.json --journal-scope 62df7e32719f33cf2e85d10a3e454b72a4a849788f3ab905385305acc41ae576 --format json",
+          "exit_code": 2
+        },
+        {
+          "command": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root operator_trial_scratch/trial8/data forge-run --no-write --owner-focus \"trial8 technical refusal\" --format json",
+          "exit_code": 0
+        }
+      ],
+      "observed_cli_fields": {
+        "invalid_spec": {
+          "error": "DECISION_POINTS_REQUIRED",
+          "reason_code": null,
+          "json_printed": false,
+          "next_action": null,
+          "owner_final": null,
+          "ordinary_operation_status": null,
+          "new_look": null,
+          "result_refs": []
+        },
+        "valid_spec_without_operation": {
+          "reason_code": "ORDINARY_OPERATION_REQUIRED",
+          "next_action": null,
+          "owner_final": null,
+          "ordinary_operation_status": null,
+          "new_look": null,
+          "result_refs": [],
+          "values_loaded": false,
+          "writes": false
+        },
+        "forge_run_confirmation": {
+          "reason_code": "ORDINARY_DISCOVERY_READY",
+          "reason_code_path": "stages[0].reason_code",
+          "next_action": "START_BASE",
+          "owner_final": null,
+          "ordinary_operation_status": null,
+          "new_look": null,
+          "result_refs": [],
+          "writes": {
+            "forge_run": 0,
+            "research_store": 0,
+            "session": 0
+          }
+        }
+      },
+      "main_look_count": {
+        "before": 0,
+        "after": 0
+      },
+      "outcome": "The malformed temporal spec failed validation, the valid operationless spec was refused before values, and no MAIN result ref was written.",
+      "errors": [
+        "EXPECTED_REFUSAL:DECISION_POINTS_REQUIRED",
+        "EXPECTED_REFUSAL:ORDINARY_OPERATION_REQUIRED"
+      ]
+    }
+  ]
+}

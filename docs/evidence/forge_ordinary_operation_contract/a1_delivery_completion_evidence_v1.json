@@ -1,0 +1,92 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-ORDINARY-OPERATION-CONTRACT-ACCEPTANCE-001",
+  "as_of": "2026-09-30",
+  "task_id": "FORGE_ORDINARY_OPERATION_CONTRACT_V1",
+  "state_change": "ORDINARY_REQUEST_BINDS_ONE_JOURNAL_BEFORE_A_TEMPORAL_LOOK",
+  "base_main": "93d8d8552f09b4e08bc2b62d1bf81e14fe07e10c",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "641305ed790437659629779ebe38785a8c8d867336d46f182b312b301bd3e9cd",
+    ".cursor/commands/hypothesis-forge.md": "4bad9a5bc7a161543d33ba18a51e08286ef96886f6088ff7d5a5e90662b95c46",
+    "catalog/assets/core.yaml": "bf13aeecad45d06229544053faa129f90f88c25de1d137a80042d3d75bbf51f8",
+    "docs/evidence/forge_ordinary_operation_contract/operator_trials_4_to_8_v1.json": "a2e1acaa0645994de2480901a5fa05d20877f325b3a50d3032aaaa8403433139",
+    "docs/evidence/forge_ordinary_operation_contract/replacement_10_acceptance_v1.json": "321790d78a0a2cc353043dcb255021b9b485c9d9d7444d8b13e2d4d8529646af",
+    "docs/evidence/forge_ordinary_operation_contract/replacement_acceptance_v1.json": "1cfc72216ebcff0e8985b0f1e7e2ef062b69226ac67f9647396cbb02add7f384",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "62cdc018cb4b902ff3446be7bcd49afd31810cc96ea33c0b6fae6551bb62a282",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "70f7c4329753bce9b9367eeeea87c113abe3df4e1c2610b4c69f10656e26de15",
+    "docs/tasks/FORGE_ORDINARY_OPERATION_CONTRACT_V1.md": "29456bf9677c9545dbe7045da1a4c158bebe3857f047b6f2c17b99390b7a7384",
+    "scripts/hypothesis_forge.py": "affe2986309c52ee67963797edf796f6dab31b97d6e26e244c0ec1e74adc2430",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "412a3b6b6a4e9d665a81c80694aba346c110e77ea9d696f2e68fb23e25ec7f7a",
+    "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "2b38ee40f2cdea85883f92829773e42736e192e0ec95ea90aa76a69883cb0460",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "1ceb9b73bc9ba47664c6eafd87b47d51d7cbe77dea4d17425ade8ace0527e7c5",
+    "src/solana_alpha_lab/factory/hfic_session.py": "2d387c7bbee06537acf424207a9dd94adb2bb8fc5383c193f0e4a451bfda2dd2",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "4b4cccc97b40ddb5fc748e7f59e9897691b819c34f6161c733abccde05c2f767",
+    "src/solana_alpha_lab/factory/research_store.py": "04841c2f66776404aa5538d9638f866c89bca7523a78b0d82f9275c11738eb8a",
+    "tests/test_hfic_grounded_discovery_v1.py": "f82226d6680726f2e429da54c297b50a2c41067d8873c612443739756abcb880",
+    "tests/test_hfic_legacy_parent_continuation_compat_v1.py": "bea671cae340bd936e7ac5d9d249443648a6d3f562a164142f0b88463d813071",
+    "tests/test_hfic_ordinary_operation_acceptance_v1.py": "e8febbf1c8eb48364b79a0dfb27e73e29986f0a98533d1dcad1c039339ca1ce8",
+    "tests/test_hfic_ordinary_operation_v1.py": "1b8fc22f87b27e3aad994dc8678c453b57b5d8052c214f2d0fcbcc117170e91e",
+    "tests/test_hfic_temporal_discovery_v1.py": "f6d65fb69ebeb3de692c483c0e4fc82c51261d9f72e55aba59fd628ba5b5a829",
+    "tests/test_hfic_temporal_operability_repair_v1.py": "b2fd29e71ef317d76ff84cee00652c7476d68874d8961b83c1a3807f2cfae78a",
+    "tests/test_hfic_temporal_owner_path_v1.py": "df4e3ec793a1009200dcaa3a6fef7486ed522606dcd15015edb701a0f663d720",
+    "tests/test_hfic_temporal_production_runner_v1.py": "a0d1a4464811de6052ad06af728abb37c9b618690c232cb0dcc04942ef4d7a2f",
+    "tests/test_research_store.py": "c1ff25a7b22f3419a0aa76ff622d4cb471083e26c5d753c69d3fe26e0d9a5585"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_ordinary_operation_contract/a1_delivery_factory_fit_v1.json",
+    "sha256": "9ed05e9241f01126924d543711ba6ccbc036a96b4f0869e264816404c07d78a3",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_ORDINARY_OPERATION_V1_V2_V3_AND_CAP_GUARDS",
+    "independent_review": {
+      "path": "docs/evidence/forge_ordinary_operation_contract/a1_delivery_independent_review_v1.json",
+      "sha256": "21c92fb6cd5777ce2b021aeb2264d4ae2288747cf045dba6012985321c671ae9",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_V1_FREEZE_AFTER_COMPOUND",
+      "PASS_V2_FREEZE_AT_EXHAUSTED_CAP",
+      "PASS_V3_CLOSED_REPAIR_WITHOUT_OPERATION",
+      "PASS_CAP_ZERO_AND_PREVIEW_CAP_BEFORE_VALUES",
+      "PASS_BINDING_MISMATCH_WITHOUT_NEW_LOOK",
+      "PASS_BLOCKED_READBACK_KEEPS_NEXT_ACTION",
+      "PASS_REPLACEMENT_10_ISOLATED_CRITIC_KILL_READBACK"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_MARKET_EXECUTION",
+    "NO_MERGE",
+    "NO_LIVE_LOOK",
+    "MODEL_TRIAL_2_AND_3_PROVENANCE_UNKNOWN",
+    "MODEL_TRIALS_4_TO_8_OBSERVED_MODEL_UNKNOWN",
+    "OPERATOR_TRIAL_7_FREEZE_REFUSED_STALE_PREFLIGHT_RECEIPT",
+    "REPLACEMENT_9_BLOCKED_GIT_COMPOSITE_CHANGED",
+    "REPLACEMENT_10_OPERATIONAL_PASS_KILL_UNBOUND_EVIDENCE",
+    "KILL_UNBOUND_EVIDENCE_IS_NOT_SCIENTIFIC_PASS"
+  ],
+  "side_effects": {
+    "market_execution": "NOT_RUN",
+    "live_store_writes": 0
+  }
+}

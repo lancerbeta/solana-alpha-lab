@@ -50,6 +50,39 @@ RELEASE = "aa" * 32
 ANCHOR = datetime(2026, 9, 3, tzinfo=UTC)
 OFFSETS = {"X300": 300, "Y1800": 1800, "Y3600": 3600, "Y7200": 7200}
 GIT_SHA = "ab" * 20
+SYNTH_MARKET = "ab" * 32
+
+
+def _ordinary_gate(store, journal: str) -> dict[str, str]:
+    from solana_alpha_lab.factory.hfic_ordinary_operation import list_operations, record_operation
+
+    journal_key = journal
+    found = [
+        item
+        for item in list_operations(store)
+        if item.get("journal_scope") == journal_key
+        and item.get("market_evidence_epoch_sha256") == SYNTH_MARKET
+    ]
+    if found:
+        return {
+            "operation_sha256": str(found[-1]["operation_sha256"]),
+            "verified_market": SYNTH_MARKET,
+        }
+    recorded = record_operation(
+        store,
+        {
+            "owner_request_text": "synthetic recorded-query gate",
+            "owner_focus": "SYNTHETIC_RECORDED_GATE",
+            "journal_scope": journal_key,
+            "market_evidence_epoch_sha256": SYNTH_MARKET,
+            "owner_cap": {"main": None, "adaptive": None, "preview": None},
+            "requested_completion": "LIMITED_RESULT",
+        },
+    )
+    return {
+        "operation_sha256": str(recorded["operation_sha256"]),
+        "verified_market": SYNTH_MARKET,
+    }
 
 
 def _stamp(point: str, *, lateness: int = 0, extra: int = 0) -> str:
@@ -992,7 +1025,9 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
                 journal_scope=journal,
                 candidate_scope={"schema": "test", "target": snapshot_spec["target"]},
                 git_sha=git.head_sha,
-            )
+
+                **_ordinary_gate(store, journal),
+                )
             summary = evidence["result"]
             self.assertEqual(
                 summary.get("observation_clock_policy"),
@@ -1364,7 +1399,9 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                     journal_scope=journal,
                     candidate_scope={"schema": "test", "target": spec["target"]},
                     git_sha=git.head_sha,
-                )
+
+                    **_ordinary_gate(store, journal),
+                    )
             persist_feature_preview(
                 store,
                 journal_scope=journal,
@@ -1491,7 +1528,9 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                 journal_scope=journal,
                 candidate_scope={"schema": "test", "target": third["target"]},
                 git_sha=git.head_sha,
-            )
+
+                **_ordinary_gate(store, journal),
+                )
             mains = [
                 item
                 for item in list_discovery_looks(store, journal)
@@ -1656,7 +1695,9 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                     journal_scope=journal,
                     candidate_scope={"schema": "test", "target": spec["target"]},
                     git_sha=git.head_sha,
-                )
+
+                    **_ordinary_gate(store, journal),
+                    )
             persist_feature_preview(
                 store,
                 journal_scope=journal,
@@ -1768,7 +1809,9 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                 journal_scope=journal,
                 candidate_scope={"schema": "test", "target": third["target"]},
                 git_sha=git.head_sha,
-            )
+
+                **_ordinary_gate(store, journal),
+                )
             self.assertEqual(
                 len(
                     [
@@ -1951,7 +1994,9 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                 journal_scope=journal,
                 candidate_scope={"schema": "test", "target": third["target"]},
                 git_sha=git.head_sha,
-            )
+
+                **_ordinary_gate(store, journal),
+                )
             self.assertEqual(replay_third["queries"][0]["new_look"], False)
             self.assertEqual(replay_third["queries"][0]["look_class"], "RETRY_SAME_BYTES")
             self.assertEqual(
@@ -2306,7 +2351,9 @@ class MetadataStopAndPostCloseReadbackTests(unittest.TestCase):
                     journal_scope=journal,
                     candidate_scope={"schema": "test", "target": spec["target"]},
                     git_sha=git.head_sha,
-                )
+
+                    **_ordinary_gate(store, journal),
+                    )
             persist_feature_preview(
                 store,
                 journal_scope=journal,
@@ -2426,7 +2473,9 @@ class MetadataStopAndPostCloseReadbackTests(unittest.TestCase):
                 journal_scope=journal,
                 candidate_scope={"schema": "test", "target": third["target"]},
                 git_sha=git.head_sha,
-            )
+
+                **_ordinary_gate(store, journal),
+                )
             self.assertEqual(
                 len(
                     [
@@ -3602,7 +3651,9 @@ class OwnerDataScenarioTechnicalAndScientificTests(unittest.TestCase):
                     "target": _spec_snapshot()["target"],
                 },
                 git_sha=git.head_sha,
-            )
+
+                **_ordinary_gate(store, journal),
+                )
             summary = evidence["result"]
             self.assertTrue(summary.get("technical_failure"))
             self.assertEqual(

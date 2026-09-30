@@ -92,6 +92,36 @@ def _mains(store: ResearchStore, journal: str) -> list[dict]:
 
 
 class LegacyParentContinuationCompatTests(TestCase):
+    def _recorded_gate(self, store, journal: str, market: str, focus: str) -> dict[str, str]:
+        from solana_alpha_lab.factory.hfic_ordinary_operation import (
+            list_operations,
+            record_operation,
+        )
+
+        focus = focus or "AUTO"
+        found = [
+            item
+            for item in list_operations(store)
+            if item.get("journal_scope") == journal
+            and item.get("market_evidence_epoch_sha256") == market
+            and item.get("owner_focus") == focus
+        ]
+        recorded = found[-1] if found else record_operation(
+            store,
+            {
+                "owner_request_text": "legacy recorded-query gate",
+                "owner_focus": focus,
+                "journal_scope": journal,
+                "market_evidence_epoch_sha256": market,
+                "owner_cap": {"main": None, "adaptive": None, "preview": None},
+                "requested_completion": "LIMITED_RESULT",
+            },
+        )
+        return {
+            "operation_sha256": str(recorded["operation_sha256"]),
+            "verified_market": market,
+        }
+
     def _open_parent(self, data_root: Path, *, queries: int = 2) -> dict:
         git = repository_git_snapshot(ROOT)
         draft = json.loads(
@@ -128,17 +158,7 @@ class LegacyParentContinuationCompatTests(TestCase):
             "forge_context_packet_sha256": ctx,
             "store_inventory_digest": "ee" * 32,
         }
-        frozen = freeze_draft(draft, preflight_receipt=receipt)
-        persist_no_worthy_session(
-            store,
-            frozen,
-            repo_root=ROOT,
-            identities=assign_portfolio_ids(draft["candidates"]),
-            draft=draft,
-            preflight_receipt=receipt,
-        )
-        shown = show_session(store, str(frozen["session_id"]), repo_root=ROOT)
-        journal = str(shown["search_key_sha256"])
+        journal = "33" * 32
         from solana_alpha_lab.factory.hfic_grounded_discovery import (
             run_recorded_discovery_query,
         )
@@ -146,6 +166,7 @@ class LegacyParentContinuationCompatTests(TestCase):
         rows = SnapshotTargetTests()._rows_legal()
         census = [_census()]
         binding = _binding_mixed()
+        gate = self._recorded_gate(store, journal, "11" * 32, "AUTO")
         for index in range(queries):
             spec = _spec_snapshot(
                 query_id=f"legacy-prior-{index}",
@@ -160,7 +181,19 @@ class LegacyParentContinuationCompatTests(TestCase):
                 journal_scope=journal,
                 candidate_scope={"schema": "test", "target": spec["target"]},
                 git_sha=git.head_sha,
+                **gate,
             )
+        frozen = freeze_draft(draft, preflight_receipt=receipt)
+        persist_no_worthy_session(
+            store,
+            frozen,
+            repo_root=ROOT,
+            identities=assign_portfolio_ids(draft["candidates"]),
+            draft=draft,
+            preflight_receipt=receipt,
+        )
+        shown = show_session(store, str(frozen["session_id"]), repo_root=ROOT)
+        self.assertEqual(str(shown["search_key_sha256"]), journal)
         self.assertEqual(_forge_run_count(store), 0)
         return {
             "store": store,
@@ -170,6 +203,8 @@ class LegacyParentContinuationCompatTests(TestCase):
             "receipt": receipt,
             "shown": shown,
             "journal": journal,
+            "market": "11" * 32,
+            "focus": "AUTO",
             "rows": rows,
             "census": census,
             "binding": binding,
@@ -316,6 +351,9 @@ class LegacyParentContinuationCompatTests(TestCase):
                 journal_scope=opened["journal"],
                 candidate_scope={"schema": "test", "target": third["target"]},
                 git_sha=opened["git"].head_sha,
+                **self._recorded_gate(
+                    store, opened["journal"], opened["market"], opened["focus"]
+                ),
             )
             self.assertEqual(len(_mains(store, opened["journal"])), 3)
             persist_no_worthy_session(
@@ -371,6 +409,9 @@ class LegacyParentContinuationCompatTests(TestCase):
                 journal_scope=opened["journal"],
                 candidate_scope={"schema": "test", "target": third["target"]},
                 git_sha=opened["git"].head_sha,
+                **self._recorded_gate(
+                    store, opened["journal"], opened["market"], opened["focus"]
+                ),
             )
             self.assertEqual(len(_mains(store, opened["journal"])), 3)
             self.assertEqual(spent_looks_from_journal(store, opened["journal"])["spent_main_looks"], 3)
@@ -966,7 +1007,11 @@ class LegacyParentContinuationCompatTests(TestCase):
         )
 
     def _open_parent_on_current_corpus(
-        self, data_root: Path, *, omit_capability_epoch: bool = False
+        self,
+        data_root: Path,
+        *,
+        omit_capability_epoch: bool = False,
+        extra_specs: list[dict] | None = None,
     ) -> dict:
         from tests.test_hfic_cli import seed_minimal_market_basis
 
@@ -1004,23 +1049,9 @@ class LegacyParentContinuationCompatTests(TestCase):
             )
         )
         store = ResearchStore(data_root)
-        frozen = freeze_draft(draft, preflight_receipt=receipt, repo_root=ROOT)
-        persist_no_worthy_session(
-            store,
-            frozen,
-            repo_root=ROOT,
-            identities=assign_portfolio_ids(draft["candidates"]),
-            draft=draft,
-            preflight_receipt=receipt,
-        )
-        self.assertEqual(_forge_run_count(store), 0)
-        shown = show_session(store, str(frozen["session_id"]), repo_root=ROOT)
-        journal = str(shown["search_key_sha256"])
-        self.assertEqual(journal, current["search_key_sha256"])
-        self.assertEqual(
-            shown.get("market_evidence_epoch_sha256"),
-            current.get("market_evidence_epoch_sha256"),
-        )
+        journal = str(current["search_key_sha256"])
+        market = str(current.get("market_evidence_epoch_sha256") or "")
+        focus = str(current.get("owner_focus") or "AUTO")
         git = repository_git_snapshot(ROOT)
         rows = SnapshotTargetTests()._rows_legal()
         census = [_census()]
@@ -1030,11 +1061,16 @@ class LegacyParentContinuationCompatTests(TestCase):
         )
 
         discovery_evidence = []
-        for index in range(2):
-            spec = _spec_snapshot(
+        gate = self._recorded_gate(store, journal, market, focus)
+        setup_specs = [
+            _spec_snapshot(
                 query_id=f"legacy-corpus-{index}",
                 all=[{"feature": "mark", "op": "gte", "value": index / 10}],
             )
+            for index in range(2)
+        ]
+        setup_specs.extend(extra_specs or [])
+        for spec in setup_specs:
             discovery_evidence.append(
                 run_recorded_discovery_query(
                     store,
@@ -1045,9 +1081,25 @@ class LegacyParentContinuationCompatTests(TestCase):
                     journal_scope=journal,
                     candidate_scope={"schema": "test", "target": spec["target"]},
                     git_sha=git.head_sha,
+                    **gate,
                 )
             )
-        self.assertEqual(len(_mains(store, journal)), 2)
+        frozen = freeze_draft(draft, preflight_receipt=receipt, repo_root=ROOT)
+        persist_no_worthy_session(
+            store,
+            frozen,
+            repo_root=ROOT,
+            identities=assign_portfolio_ids(draft["candidates"]),
+            draft=draft,
+            preflight_receipt=receipt,
+        )
+        shown = show_session(store, str(frozen["session_id"]), repo_root=ROOT)
+        self.assertEqual(str(shown["search_key_sha256"]), journal)
+        self.assertEqual(
+            shown.get("market_evidence_epoch_sha256"),
+            current.get("market_evidence_epoch_sha256"),
+        )
+        self.assertEqual(len(_mains(store, journal)), len(setup_specs))
         self.assertEqual(_forge_run_count(store), 0)
         return {
             "store": store,
@@ -1057,6 +1109,8 @@ class LegacyParentContinuationCompatTests(TestCase):
             "receipt": receipt,
             "shown": shown,
             "journal": journal,
+            "market": market,
+            "focus": focus,
             "rows": rows,
             "census": census,
             "binding": binding,
@@ -1146,6 +1200,9 @@ class LegacyParentContinuationCompatTests(TestCase):
             candidate_scope=candidate_scope
             or {"schema": "test", "target": spec["target"]},
             git_sha=opened["git"].head_sha,
+            **self._recorded_gate(
+                opened["store"], opened["journal"], opened["market"], opened["focus"]
+            ),
         )
 
     def _reopen_forge_run(self, data_root: Path) -> dict:
@@ -1210,20 +1267,20 @@ class LegacyParentContinuationCompatTests(TestCase):
 
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
-            opened = self._open_parent_on_current_corpus(
-                data_root, omit_capability_epoch=True
-            )
-            self.assertIsNone(opened["shown"].get("capability_epoch_sha256"))
-            self.assertEqual(_forge_run_count(opened["store"]), 0)
-            self.assertEqual(len(opened["discovery_evidence"]), 2)
             compound_spec = _spec_snapshot(
                 query_id="legacy-compound",
                 search_tier="COMPOUND_SCREEN",
                 all=[{"feature": "mark", "op": "gte", "value": 0.5}],
             )
-            evidence = self._spend_one_main(
-                opened, query_id="legacy-compound", spec=compound_spec
+            opened = self._open_parent_on_current_corpus(
+                data_root,
+                omit_capability_epoch=True,
+                extra_specs=[compound_spec],
             )
+            self.assertIsNone(opened["shown"].get("capability_epoch_sha256"))
+            self.assertEqual(_forge_run_count(opened["store"]), 0)
+            self.assertEqual(len(opened["discovery_evidence"]), 3)
+            evidence = opened["discovery_evidence"][-1]
             prepared = self._apply_ordinary_repair(data_root, opened)
             self.assertNotEqual(
                 prepared["preflight"].get("capability_epoch_sha256"),
