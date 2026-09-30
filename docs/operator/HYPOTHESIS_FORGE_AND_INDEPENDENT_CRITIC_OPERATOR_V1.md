@@ -1543,6 +1543,11 @@ compound не использован. Неназывайте непройден�
 и `by_calendar_block`. Когортный срез описательный: общая decision может
 входить в несколько когорт, суммы N не обязаны совпасть с pooled, и когорты
 не являются независимой репликацией. Нет observed target — mean `null`, не 0.
+Все три условных среза читают одну выборку: matched участники без integrity
+exclusion; observed + missing = matched. Unmatched target входит только в
+`baseline` (`SAME_DECISION_ELIGIBLE`). Совпавший hash не делает несогласованный
+result evidence: `TEMPORAL_RESULT_INCOHERENT` — технический stop с ref, полями и
+`repair_action=CALCULATION_REVISION`, а не повод авторизовать новые looks.
 Пустая admitted cohort остаётся строкой с N=0. `INTEGRITY_CONFLICT` — другая причина того же N=0 и mean `null`: decision исключена до конца расчёта и на pooled, и на каждой затронутой когорте, включая когорту поздней копии. Причина лежит в `exclusion_reasons` результата и в `by_cohort[].exclusion_reasons`, а не в пустой cohort и не в missing target.
 Bound schedule может задавать per-point `(due_offset, allowed_lateness)`;
 query scalar остаётся X300 envelope. `schedule.observation_clock_policy:
@@ -1574,11 +1579,20 @@ ordinary temporal query в остатке бюджета → после ново
 Это не исторический run и не разрешение apply. Повреждённый или частичный
 aggregate блокирует fallback.
 Writer temporal calculation —
-`HFIC_TEMPORAL_DISCOVERY_CALC_V3`. V1/V2 читаются как есть, без выдуманного среза;
-повтор того же science/input пишет V3 как `CALCULATION_REVISION`, без нового
-scientific look. В owner readout это поля `calculation_version`,
-`queries[].look_class=CALCULATION_REVISION` и `queries[].new_look=false`
-(тот же смысл на `format_discovery_readout`). Grounded `CALCULATION_VERSION` не меняется.
+`HFIC_TEMPORAL_DISCOVERY_CALC_V4` (V4: `by_cohort` на той же matched-выборке, что
+pooled и calendar). V1/V2/V3 читаются как есть, без evaluator и без выдуманного
+среза. Обычный повтор того же вопроса возвращает сохранённый result; старую
+версию он не пересчитывает. Исправление — только явное:
+`discovery-execute ... --correct-result-ref <ref> --correct-result-sha256 <hash>`.
+Оно сверяет ref, hash, spec, operation и frozen input с per-point clocks и пишет
+одну append-only `CALCULATION_REVISION` (`new_look=false`, `revision_of` с
+причиной). Cap и reservation оно не трогает, MAIN не растёт. Изменённый spec или
+input — отказ с точным mismatch, не бесплатная ревизия. Закрытый slot закрытым
+и остаётся. После ревизии replay, projection, freeze и consumer читают её;
+freeze по старому ref даёт `GROUNDED_RESULT_SUPERSEDED`. Повтор correction
+отвечает `correction_already_applied` без записи. Спент SIMPLE остаётся
+спентом, но несогласованный summary не даёт scientific terminal
+(`CORRECT_CALCULATION_REVISION`). Grounded `CALCULATION_VERSION` не меняется.
 Preview: `discovery-preview --store <data-root> --journal-scope <search-key>`.
 Оба флага вместе включают память preview. Коды `SCHEDULE_CONTEXT_UNBOUND`,
 `SCHEDULE_LATENESS_MISMATCH`, `PREVIEW_ENVELOPE_EXHAUSTED` и

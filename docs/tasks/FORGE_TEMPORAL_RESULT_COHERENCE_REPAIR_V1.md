@@ -77,6 +77,7 @@ context_requirements:
   catalog_asset_ids: []
   l2_roles:
     - ARCHITECTURE_DECISIONS
+    - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
   exact_role_asset_ids:
@@ -92,7 +93,9 @@ context_requirements:
       - src/solana_alpha_lab/factory/hfic_temporal_discovery.py
       - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
       - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/forge_temporal_result_coherence_repair/copy_based_revision_acceptance_v1.json
+      - docs/evidence/forge_temporal_result_coherence_repair/historical_blast_radius_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

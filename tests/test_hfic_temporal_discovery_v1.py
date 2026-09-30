@@ -1101,6 +1101,21 @@ class TemporalCohortSliceTests(unittest.TestCase):
                 for record in store.iter_committed_records()
                 if record.record_id == v1_id
             )
+            # An ordinary request never turns a revision into a spendable look.
+            with self.assertRaises(GroundedDiscoveryError) as silent:
+                run_recorded_discovery_query(
+                    ResearchStore(Path(raw)),
+                    census=census,
+                    observations=observations,
+                    spec=spec,
+                    binding=_binding(),
+                    journal_scope=REV_JOURNAL,
+                    candidate_scope=_scope(spec),
+                    git_sha=GIT_SHA,
+                    clock=clock,
+                    **_ordinary_gate(ResearchStore(Path(raw)), REV_JOURNAL),
+                )
+            self.assertEqual(silent.exception.code, "CALCULATION_REVISION_REQUIRES_EXPLICIT_CORRECTION")
             revised = run_recorded_discovery_query(
                 ResearchStore(Path(raw)),
                 census=census,
@@ -1111,8 +1126,11 @@ class TemporalCohortSliceTests(unittest.TestCase):
                 candidate_scope=_scope(spec),
                 git_sha=GIT_SHA,
                 clock=clock,
+                correction={"source_result_ref": v1_id, "source_result_sha256": result_sha256(legacy)},
                 **_ordinary_gate(ResearchStore(Path(raw)), REV_JOURNAL),
             )
+            self.assertEqual(revised["revision_of"]["record_id"], v1_id)
+            self.assertEqual(revised["revision_of"]["reason"]["code"], "CALCULATION_VERSION_SUPERSEDED")
             self.assertEqual(revised["calculation_version"], TEMPORAL_CALCULATION_VERSION)
             self.assertFalse(revised["queries"][0]["new_look"])
             self.assertEqual(revised["queries"][0]["look_class"], "CALCULATION_REVISION")

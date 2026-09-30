@@ -30,6 +30,12 @@ A temporal `discovery-execute` and a stored preview require that operation;
 omitting it does not bypass the cap. A null owner cap is the protocol
 remainder, not a silent cap of one. Coverage without values stays
 `discovery-coverage`.
+`next_action=CORRECT_CALCULATION_REVISION` means the saved temporal result is
+internally inconsistent. It is a technical stop, not a request for more
+looks. Revise that exact result with `discovery-execute ... --correct-result-ref
+<ref> --correct-result-sha256 <hash>` on the same spec and input. This writes
+one `CALCULATION_REVISION` with `new_look=false` and spends no MAIN. Then read
+the saved question again.
 
 Canonical entrypoint: `scripts/hypothesis_forge.py`.
 No-write state-only coverage, never selecting `typed_value` and never reserving a slot:
