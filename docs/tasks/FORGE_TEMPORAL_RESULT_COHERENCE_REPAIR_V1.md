@@ -92,10 +92,7 @@ context_requirements:
       - src/solana_alpha_lab/factory/hfic_temporal_discovery.py
       - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
       - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
-    DELIVERY_EVIDENCE:
-      - docs/evidence/forge_temporal_result_coherence_repair/a1_delivery_completion_evidence_v1.json
-      - docs/evidence/forge_temporal_result_coherence_repair/a1_delivery_independent_review_v1.json
-      - docs/evidence/forge_temporal_result_coherence_repair/a1_delivery_factory_fit_v1.json
+    DELIVERY_EVIDENCE: []
     HISTORICAL_CONTEXT: []
 ---
 
