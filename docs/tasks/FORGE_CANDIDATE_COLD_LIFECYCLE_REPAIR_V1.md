@@ -30,8 +30,8 @@ objective: >-
   KILL_MECHANISM is selected like NO_WORTHY and KILL_DUPLICATE instead of
   falling back to a stale frozen draft. One authoritative candidate
   reference-completeness owner replaces the retired len(candidates) >= 4
-  rule, so a valid one-candidate session proves and an incomplete one still
-  fails closed.
+  rule, so a valid one-candidate session with durable cards proves and one
+  whose named references do not resolve still fails closed.
 
 managed_write_set:
   - docs/tasks/FORGE_CANDIDATE_COLD_LIFECYCLE_REPAIR_V1.md
@@ -96,14 +96,17 @@ DECISION_DELTA: >-
 UNCERTAINTY_REMOVED: >-
   Whether a committed one-candidate KILL_MECHANISM lifecycle is discoverable
   cold without regenerating work, and whether a legitimate 0..6 candidate
-  portfolio can be proved while a broken candidate reference still fails
-  closed.
+  portfolio whose cards are durable can be proved while a broken candidate
+  reference still fails closed. A card-less listing portfolio stays readable
+  but is not provable.
 
 CAPABILITY_OR_EVIDENCE: >-
   One terminal family for ordinary completed-session selection. One
   candidate_reference_gaps owner used by both the shown payload and the
-  store reference check, which no longer skips verification when fewer
-  durable cards were found than claimed. Verticals for one-candidate KILL
+  store reference check, which no longer skips verification merely because
+  fewer cards were found than claimed, once the store carries any card for
+  that session. Loading stays possible for a store that never persisted
+  cards; the proof gate keeps no such tolerance. Verticals for one-candidate KILL
   and PASS, a historical four-candidate portfolio, broken-reference
   negatives, and one unmocked durable CLOSED replay/new-spec CLI pair.
 

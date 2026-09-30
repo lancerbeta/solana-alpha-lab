@@ -38,6 +38,7 @@ from solana_alpha_lab.factory.hfic_temporal_discovery import (  # noqa: E402
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     HficSessionError,
     _bundle_candidate_reference_gaps,
+    freeze_draft,
     _verify_store_reference_resolution,
     candidate_reference_gaps,
     load_session_bundle,
@@ -394,6 +395,55 @@ class ColdLifecycleVerticalTests(unittest.TestCase):
                     with self.assertRaises(HficSessionError) as refused:
                         _verify_store_reference_resolution(store, candidate_bundle)
                     self.assertEqual(str(refused.exception), "CANDIDATE_REFERENCE_UNRESOLVED")
+
+
+class CardlessStoreIsReadableButUnprovableTests(unittest.TestCase):
+    """The one behaviour this delta newly permits, driven through production entries."""
+
+    def test_a_store_without_candidate_cards_loads_shows_false_and_refuses_to_prove(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import prove_runtime, show_session
+        from tests.test_forge_representation_ladder_v1 import (
+            _control_preflight,
+            _write_lineage,
+            finalize_kill_complete,
+            valid_draft,
+        )
+        from tests.test_hfic_session import critic_result_from_packet_only
+
+        with tempfile.TemporaryDirectory() as raw:
+            data_root = Path(raw)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            frozen = freeze_draft(
+                valid_draft(),
+                preflight_receipt=_control_preflight(data_root, store),
+                repo_root=ROOT,
+            )
+            done = finalize_kill_complete(
+                frozen,
+                critic_result_from_packet_only(frozen["critic_input_packet"], "KILL_MECHANISM"),
+                store,
+                repo_root=ROOT,
+            )
+            self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
+            session_id = str(frozen["session_id"])
+
+            # This route records the claim but persists no candidate card.
+            bundle = load_session_bundle(store, session_id)
+            assert bundle is not None
+            self.assertEqual(bundle.get("candidates"), [])
+            self.assertTrue(bundle.get("candidate_ids"))
+            self.assertTrue(bundle.get("selected_candidate_id"))
+
+            # Readable: the store gate tolerates a store that never persisted cards.
+            shown = show_session(store, session_id, repo_root=ROOT)
+            self.assertEqual(shown["session_state"], "SYNTHESIS_COMPLETE")
+            self.assertFalse(shown["candidates_retrievable"], shown)
+
+            # Not provable: the proof gate keeps no such tolerance.
+            with self.assertRaises(HficSessionError) as refused:
+                prove_runtime(store, session_id, repo_root=ROOT)
+            self.assertEqual(str(refused.exception), "SESSION_ARTIFACT_MISSING")
 
 
 class ZeroAndHistoricalPortfolioTests(unittest.TestCase):

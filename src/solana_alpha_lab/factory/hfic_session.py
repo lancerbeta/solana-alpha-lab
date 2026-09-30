@@ -6301,6 +6301,15 @@ def candidate_reference_gaps(
 
 
 def _bundle_candidate_reference_gaps(bundle: Mapping[str, Any]) -> list[str]:
+    """Gaps in what this bundle claims, with no tolerance for a lost card.
+
+    This is not a completeness proof of the portfolio. ``candidate_ids``
+    falls back to the durable ids when a cycle never recorded its own claim,
+    so for those cycles the listed-id check is vacuous and only a named
+    selection or runner-up still fails closed. Closing that needs claim-list
+    provenance the current schema does not carry.
+    """
+
     durable = [
         str(card.get("hypothesis_version_id") or "")
         for card in (bundle.get("candidates") or [])

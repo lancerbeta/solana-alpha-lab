@@ -65,7 +65,17 @@
         "stale_saved_draft_stage": false,
         "completed_session_selected": true
       },
-      "why_not_the_frozen_smoke_store": "the saved smoke stores are bound to the pre-patch capability epoch; hfic_session.py and hfic_representation_ladder.py are part of _CAPABILITY_PROTOCOL_FILES, so any repair to them shifts that epoch and ordinary admission then answers SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING. Verified on both smoke stores: from a pristine 860c98ab worktree g_saved_work/rdp reads back OWNER_CANDIDATE and e1_kill/rdp reproduces the original SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING; from the patched branch both answer DIFFERENT_EXECUTION_BINDING, so the block is not KILL-specific. On the branch e1_kill still projects the stale SAVED_DRAFT_PRESENT / FROZEN_AWAITING_CRITIC stage: only the reason code changed. Pre-existing designed admission behavior, not introduced here."
+      "why_not_the_frozen_smoke_store": "the saved smoke stores are bound to the pre-patch capability epoch; hfic_session.py and hfic_representation_ladder.py are part of _CAPABILITY_PROTOCOL_FILES, so any repair to them shifts that epoch and ordinary admission then answers SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING. Verified on both smoke stores: from a pristine 860c98ab worktree g_saved_work/rdp reads back OWNER_CANDIDATE and e1_kill/rdp reproduces the original SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING; from the patched branch both answer DIFFERENT_EXECUTION_BINDING, so the block is not KILL-specific. On the branch e1_kill still projects the stale SAVED_DRAFT_PRESENT / FROZEN_AWAITING_CRITIC stage: only the reason code changed. Pre-existing designed admission behavior, not introduced here.",
+      "prove_runtime_on_saved_store": {
+        "store": "smoke e1_kill/rdp (fresh copy)",
+        "exit": 0,
+        "proof_status": "PROVEN",
+        "critic_terminal": "KILL_MECHANISM",
+        "candidates_retrievable": true,
+        "provider_calls_actual": 0,
+        "verified_by": "GOAL_DOD_CRITIC independently at 658c63a0",
+        "note": "prove-runtime does not pass through capability-epoch admission, so the original P1-A store proves at the merge head even though its ordinary readback is epoch-stale"
+      }
     }
   },
   "closed_pair": {
@@ -139,7 +149,10 @@
       "show-session returns next_action_status LEGACY_NOT_RECORDED with next_action null, so no typed next epistemic action"
     ],
     "disposition": "PASS for the two repaired defects; both ambiguities are pre-existing legibility items about provenance and next-action recording, recorded as WATCH and left out of scope",
-    "model_and_effort": "UNKNOWN"
+    "model_and_effort": "UNKNOWN",
+    "captured_at_head": "7de1195c",
+    "reproducibility_note": "the two prepared stores are epoch-stale at the merge head: hfic_session.py and hfic_representation_ladder.py are in _CAPABILITY_PROTOCOL_FILES, so later commits shift the capability epoch and the same two commands then answer SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING. That is admission behavior, not a regression. The reproducible path at any head is the vertical regression tests.test_hfic_candidate_cold_lifecycle_v1.",
+    "receipts": "narrative operator report only; raw transcripts were not archived in the repository"
   },
   "review_findings_closed_in_this_atom": {
     "P0_BUNDLE_LOAD_FAIL_CLOSED": {
@@ -194,6 +207,17 @@
     "PROBE_PERMIT_TERMINALS in hfic_control_integrity.py remains a separate hand-maintained pair; unifying it would grant V1 probe permission and is out of scope",
     "KNOWN_SCIENTIFIC_NEGATIVES holds three terminals, so other KILL_* terminals still read back blocked; the claim here is scoped to KILL_MECHANISM",
     "ordinary KILL_MECHANISM resolves to owner_final SEARCH_EXHAUSTED_CURRENT_EVIDENCE through the existing resolver; whether one killed mechanism should read as search exhaustion is an owner semantic question recorded as WATCH, not changed here",
-    "candidate_ids falls back to the durable ids when a cycle never recorded a claim, which makes the listed-id check vacuous for those cycles; pre-existing fallback, not introduced here"
+    "candidate_ids falls back to the durable ids when a cycle never recorded a claim, which makes the listed-id check vacuous for those cycles; pre-existing fallback, not introduced here",
+    "the fresh-operator check is a narrative report; its raw receipts are not archived in the repository and the model and effort are UNKNOWN"
+  ],
+  "review_findings_recorded_not_fixed": [
+    "OWNER_UX: no owner_note_ru arm for a completed scientific negative; the DONE branch never carried one, so adding it decides new Russian copy for every PASS DONE. Pre-patch the arm that fired was actively wrong for a scientific negative, so shipping with none is not a regression.",
+    "OWNER_UX: blocked_by prints the terminal for both KILL and PASS, so it is a mis-named field (pre-existing).",
+    "OWNER_UX: prove-runtime owner_readout names none of the proven facts and prints a Python None.",
+    "OWNER_UX: a completed session whose cards all vanished loads and projects normally; the readout carries no tell, though the proof gate refuses.",
+    "CODE_REVIEWER: partial card loss still raises at load rather than reporting candidates_retrievable false; this mirrors the decision-reference check and is a chosen shape.",
+    "CODE_REVIEWER: the two gates derive the durable id set slightly differently; the skew favours the stricter proof gate.",
+    "ARCHITECTURE: PROBE_PERMIT_TERMINALS remains a separate hand-maintained pair; unifying it would grant V1 probe permission.",
+    "ARCHITECTURE: ordinary KILL_MECHANISM resolves to SEARCH_EXHAUSTED_CURRENT_EVIDENCE through the existing resolver; whether one killed mechanism should read as search exhaustion is an owner semantic question."
   ]
 }
