@@ -13,7 +13,14 @@
     "kind": "NO_CHANGE"
   },
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "911da6a3d75a0fe69374d3580cdad09be79f99de0be8daf747431d48f887c1a9",
+    "docs/evidence/forge_candidate_cold_lifecycle_repair/trust_smoke_delta_v1.json": "2027777c36fcb7646c400df5a025251a6beaf7eb962137c73072f66c69f7dbd9",
+    "docs/tasks/FORGE_CANDIDATE_COLD_LIFECYCLE_REPAIR_V1.md": "8bb4a279d206b9eb68a339c63a73c066033b944040d99659ff3a4ca8f8de3a53",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "dcaba3f94e34017791749f8674906df1d8dc87362a1a2e4f14af10176ccc038f",
+    "src/solana_alpha_lab/factory/hfic_session.py": "d0e36c061c48925af90b19c3786cdca35e0846a15b3801036122a6f6f71c77a0",
+    "tests/test_hfic_candidate_cold_lifecycle_v1.py": "d02b85c636782855f9b0952c510ba6b53220c7449f71eb8359d98960da252350"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -24,14 +31,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_candidate_cold_lifecycle_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "08614742449f24c32a5bc0215e3875312acefd58639bd24dd483bc39603a7356",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_CANDIDATE_COLD_LIFECYCLE_AND_RELATED_SUITES",
     "independent_review": {
       "path": "docs/evidence/forge_candidate_cold_lifecycle_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "ff49936dabd76835c912e2fa53293ceec93ca21215b526911a2d3c32938b2260",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
