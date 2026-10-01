@@ -14,26 +14,26 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    ".agents/skills/hypothesis-forge/SKILL.md": "2264cd3171bb0b951c68483c4ac4227b1280a3362b9cb780e46e5f2f0df0bd84",
-    ".cursor/commands/hypothesis-forge.md": "0db546297d0b480f46b28fba95614896e2e0b96dd85b58083c25050607597304",
-    "catalog/assets/core.yaml": "1a5112799eb7907bd01e537d606ddfc8c267ba8f32e9f24c4f6f477083cdda91",
+    ".agents/skills/hypothesis-forge/SKILL.md": "2cb356b958bc0826662c0b3bc1aef6e366581f741e6a0c50e34325c4a1af5d19",
+    ".cursor/commands/hypothesis-forge.md": "db075bae2589725c490b56db4467a57aa725cb1778dd62ec813590fe16b3e127",
+    "catalog/assets/core.yaml": "700f3b5a54e6ede90f02c37041df67ecc29598d102f1c133813c3f85a4e5923a",
     "catalog/assets/lifecycle.yaml": "762b82ae0ee0d08733ab478b546b3917f614a3fc614ea5ddebd383b183fc7249",
     "catalog/catalog_manifest.yaml": "40ab0313aa4addc97d7b313513503b775731a03ecd7d82a803a15f2164271714",
     "catalog/generated/asset_edges.json": "a813c19c2d95d3291fc70bed526a7aec7b54d4af2afeafcbb19f518ed4154a19",
     "catalog/schemas/hfic_scientific_disposition_v1.schema.json": "7542edd34c67cf4130acaf3519b168698e1a980bbf4f5da7cb9231da0e6b6aca",
     "configs/factory_semantic_operability_v1.yaml": "ebc98670c0185c505ba7750031f9fafdae2ca79adc53135236983153ac29cccb",
     "docs/PROJECT_MAP.md": "61750e2076004272bb68448db12d82c18c0c46189bbd6480a3d0f48a2fe26880",
-    "docs/contracts/hfic_scientific_disposition_continuity_v1.md": "cd45ce2c8aa0029982ce12405659ea4736461fb808f017c10773b7fb09964631",
-    "docs/evidence/forge_scientific_disposition_continuity/fresh_context_acceptance_v1.json": "3025ad781f73e06754b592afa0cdce1596ded51a83f4b3c4d2ec4baf7b20147a",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "98eae72f437b1d32bba8c9decedf88c50340887fec5831e4a4de8fd5e561f1ff",
-    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "c14ee0c5e4bb995bd7019a97a797784c6df7411032d6126305aed6584922afd6",
-    "docs/tasks/FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1.md": "8ab996e3742e5bc9914a5734ee4324ac62d0fb84726ae79f7e1a4d70ab59022f",
-    "scripts/hypothesis_forge.py": "52dc14da867cd9896a3a46df9b546f3be7f320537a75731ed5591d3c7ac1a4b1",
+    "docs/contracts/hfic_scientific_disposition_continuity_v1.md": "8809262f43b984ab94b36641fd54c7cbcf9ee0b891a728c6bb6d543f7c219d8f",
+    "docs/evidence/forge_scientific_disposition_continuity/fresh_context_acceptance_v1.json": "846e8178902345d58d8cb38e7d519fb189cbd258a7ade05791a70abd556e459b",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "27c1835fdcc48c02b47bc258884e8ad3a482647daf7cfc2e8a8e136e2100c49a",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "f04e383b5d14147236b9d5390e062119441785fc13229be1de921521dfed6455",
+    "docs/tasks/FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1.md": "baaa9c2f3e724c677328fd4e70bbac41456f64c366c7d3092f764226c3e84e66",
+    "scripts/hypothesis_forge.py": "71bd04772906ef834a125f70e3c5a664db2475c58b03b1e55b8847ab82e49e3f",
     "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "189145e8ab49de52f2719333d8ddf96e9e4b7354562e64d5c23e488163c0d018",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "afbc74857a27df8fd850417440a34414273c7492e848a9c04b2daf0b9e8c4149",
     "src/solana_alpha_lab/factory/hfic_scientific_disposition.py": "d2b980f20cb7e703d4d61033ca4481d58de39d8ed149b16b5b64d013859aac75",
     "tests/test_hfic_scientific_disposition_continuity_v1.py": "10a90b0cd7703042d02b2f846a24ff1ec94867cb4d12bf4041bf82ca087f0b4a",
-    "tests/test_hfic_scientific_disposition_navigation_v1.py": "f79e7784abf2715bce119d1ecbd59973f25216fbf6d77808a0e8e9d4938d84f7"
+    "tests/test_hfic_scientific_disposition_navigation_v1.py": "6e2b40ee272bec36259ddc6a35c0199dd00938a1d3683cb7af22051ca73cd5b6"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -45,14 +45,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_scientific_disposition_continuity/a1_delivery_factory_fit_v1.json",
-    "sha256": "82534eb2dc20febc9685a1e60f580072f96e29e76a11c20ce2a40418de1cd3c3",
+    "sha256": "131d78fba44126883cdd96555facf9e03e151e8c73e30eef67495c6e4fa930da",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_DISPOSITION_CONTINUITY_25_TESTS_AND_PROTECTED_NEIGHBOUR_SUITES",
     "independent_review": {
       "path": "docs/evidence/forge_scientific_disposition_continuity/a1_delivery_independent_review_v1.json",
-      "sha256": "893da57b61b4de3e07218d53db3f78aa2ef07fe465136da9428847a575074232",
+      "sha256": "5afeb2582f1e7f71ea25a6c08dee817785ef39129a3d25ae2d9d8fc2998534cc",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
