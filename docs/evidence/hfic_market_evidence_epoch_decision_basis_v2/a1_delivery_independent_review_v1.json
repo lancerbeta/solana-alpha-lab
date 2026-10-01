@@ -15,38 +15,87 @@
   "reviews": [
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING_FINAL_INVENTORY_REVIEW"
+        "packet_fingerprint_sha256=70aa9d16b454c8ffc075d50b985209cf3869437e9551704ba949d58b6667bc86",
+        "PASS: publication-only wrappers are excluded from scientific hash and cannot reset proven occupancy; current canonical integrity remains mandatory.",
+        "PASS: malformed manifest aliases, incomplete LIVE required labels and invalid current inputs produce typed STOP rather than new market.",
+        "PASS: validated V1 membership counts occupied quota/slots; ambiguous V1 continuity blocks; explicit NULL reservation is never restored.",
+        "PASS: verified new synthetic cohort/source/content/PIT creates a new market; separate owner look authority remains required.",
+        "Tests can still pass for incorrect source availability timestamps or overlapping cohorts. Identity/integrity does not prove source PIT quality, statistical independence or alpha; input retains NOT_EVALUATED PIT semantics.",
+        "PACKET_INFORMATION_PATH isolated; model diversity UNPROVEN; no real store/C4/scientific operation."
       ]
     },
     {
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING_FINAL_INVENTORY_REVIEW"
+        "PASS exact frozen inventory and direct production consumers; no blocking code findings.",
+        "Canonical filename/parsed ID binding closes alias bypass; missing mandatory LIVE fields fail closed using existing REQUIRED_LABELS; explicit NULL reservation remains UNKNOWN.",
+        "Generic optional reuse flag matches actual bool-default; proven V1 scope retains budgets and same-slot occupancy.",
+        "Four-role required review plan is adequate; no heavy rerun or real data access."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING_FINAL_INVENTORY_REVIEW"
+        "PASS scoped outcome and all DoD/non-claims; metadata/schema invariance, new scientific evidence and integrity STOP covered.",
+        "Scoped C1-C3 receipt compares every budget field except algorithm identity hash and unchanged scoped inventory: AUTO=1 focus=3 remaining=0.",
+        "Focused validation: 29 V2/budget, 54 owner-gold, 2 ordinary PASS; preflight 18 PASS plus one existing skip, no new skip.",
+        "No scientific acceptance or merge claim; ambiguous V1 continuity remains blocked."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING_FINAL_INVENTORY_REVIEW"
+        "PASS corrected exact operator path: forge-run --no-write reads saved artifacts; preflight JSON search_budget carries counters.",
+        "--no-auto-commission sets persist=False and disables commissioning/context persistence; no new session/look.",
+        "MARKET_EPOCH_CONTINUITY_UNRESOLVED gives actionable proof/read-only recovery and forbids history rewrite, quarantine/reset or new session.",
+        "No stronger owner claim, scientific acceptance or merge readiness inferred."
       ]
     }
   ],
-  "verdict": "PENDING",
+  "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "MODEL_DIVERSITY_UNPROVEN",
     "NO_SCIENTIFIC_PASS",
     "NO_MERGE"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Canonical root alias bypass and explicit NULL reservation restoration closed.",
+      "observed_head": "987c591fcbc415ae97aa8bb8a69d84fece308d49",
+      "resolved_by_head": "22e2767df2689047fdd0a6c21a408a6ae3ecc360"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Missing LIVE decision labels/fence could falsely create fresh scientific budget; now typed STOP.",
+      "observed_head": "987c591fcbc415ae97aa8bb8a69d84fece308d49",
+      "resolved_by_head": "22e2767df2689047fdd0a6c21a408a6ae3ecc360"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Saved-artifact versus counter readback and continuity recovery clarified.",
+      "observed_head": "987c591fcbc415ae97aa8bb8a69d84fece308d49",
+      "resolved_by_head": "22e2767df2689047fdd0a6c21a408a6ae3ecc360"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Operator JSON field corrected from search_budget_usage to search_budget.",
+      "observed_head": "b7f8bfdbd213a3a3862464dd5f1916d97a6a149b",
+      "resolved_by_head": "22e2767df2689047fdd0a6c21a408a6ae3ecc360"
+    }
   ]
 }
