@@ -116,27 +116,30 @@
   "comparison_semantics": "Compare every budget field except evidence_epoch_sha256, whose algorithm changes from V1 to V2. Scientific occupancy and representation slot readback remain identical.",
   "candidate_test_validation": {
     "v2_and_budget_tests": {
-      "count": 25,
-      "verdict": "PASS"
+      "count": 29,
+      "verdict": "PASS_FINAL_CORRECTED_CANDIDATE"
     },
     "owner_gold": {
       "count": 54,
-      "verdict": "PASS_SPLIT_RUN",
-      "full_run_passed": 52,
-      "sandbox_clone_errors": 2,
-      "focused_clone_rerun_passed": 2
+      "verdict": "PASS_FULL_RUN_FINAL_CORRECTED_CANDIDATE"
     },
     "ordinary_consumer_tests": {
       "count": 2,
-      "verdict": "PASS_FINAL_CANDIDATE",
-      "seconds": 73.09
+      "verdict": "PASS_FINAL_CORRECTED_CANDIDATE"
+    },
+    "preflight_tests": {
+      "count": 19,
+      "verdict": "PASS_WITH_ONE_EXISTING_SKIP",
+      "passed": 18,
+      "existing_skipped": 1
     },
     "git_diff_check": "PASS",
     "factory_static": "PASS"
   },
   "limitations": [
     "Read-only proof is scoped to dataset metadata, current canonical corpus parquet and committed ResearchStore inventory; not every byte in the data plane.",
-    "Full owner-gold invocation had two environment errors while creating scratch Git clones. Those exact two tests passed outside sandbox with short isolated scratch paths; this is split-run coverage.",
-    "No scientific run, no C4 access, no acceptance or merge authority."
-  ]
+    "One existing non-critical preflight skip remains; no new skip introduced.",
+    "No scientific run, no real C4 access, no acceptance or merge authority."
+  ],
+  "post_review_corrected_code_readback": "Same saved C1-C3 epoch and every budget field confirmed; no real mutation."
 }

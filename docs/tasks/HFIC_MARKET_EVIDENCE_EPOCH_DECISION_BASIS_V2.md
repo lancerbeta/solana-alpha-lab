@@ -32,6 +32,7 @@ managed_write_set:
   - tests/test_hfic_market_evidence_epoch_decision_basis_v2.py
   - tests/test_forge_evidence_identity_and_owner_gold_v1.py
   - tests/test_hfic_search_budget_epoch_guard_v1.py
+  - tests/test_hfic_preflight.py
   - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
   - docs/reports/hfic_market_evidence_epoch_decision_basis_v2/a1_owner_readout_v1.md
   - docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_readonly_budget_v1.json

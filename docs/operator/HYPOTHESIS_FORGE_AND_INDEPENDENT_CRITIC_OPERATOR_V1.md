@@ -149,7 +149,7 @@ counts. Quotas remain AUTO=1 / distinct-focus=3.
 Read-only owner path:
 
 1. Run the existing `forge-run --no-write` with the exact data/store roots
-   already resolved by the operator entry. It returns saved results and budget;
+   already resolved by the operator entry. It returns saved results and identity;
    this readback does not create a session or scientific look.
 2. `MARKET_EVIDENCE_BASIS_INCOMPLETE` means current input integrity cannot be
    established. Restore valid datasets/lineage/receipts only in a separately
@@ -162,6 +162,13 @@ Read-only owner path:
 4. A genuinely new verified cohort or decision-bearing content/PIT/eligibility
    change creates new market evidence. It still requires ordinary scientific
    admission and separate owner look authority.
+
+AUTO/focus counters are the `search_budget_usage` in existing preflight JSON,
+not fields of `forge-run --no-write`. With an already resolved current root,
+`preflight --no-auto-commission --owner-focus AUTO --format json` computes this
+readback without persisting or commissioning; it does not create a session/look.
+If continuity is unresolved, its budget status is UNRESOLVED rather than zero.
+Do not omit `--no-auto-commission` for this read-only path.
 
 This delivery performs no LIVE repair or C4 import. See
 `docs/reports/hfic_market_evidence_epoch_decision_basis_v2/a1_owner_readout_v1.md`

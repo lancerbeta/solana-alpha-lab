@@ -447,6 +447,13 @@ def _preflight_owner_readout(body: Mapping[str, Any]) -> str:
             "market/representation/focus readback; не регенерируйте и не "
             "сбрасывайте budget"
         )
+    elif terminal == "MARKET_EPOCH_CONTINUITY_UNRESOLVED":
+        next_line = (
+            "next: PROVE_MARKET_CONTINUITY - compare the saved frozen basis with "
+            "verified current cohort/release/content bindings; keep budget blocked. "
+            "See the Market basis V2 operator section; no new session, memory "
+            "reset, quarantine or receipt rewrite"
+        )
     elif owner_class == "OBSERVABILITY_BLOCKED":
         next_line = (
             "next: STOP_TYPED_PREFLIGHT_BLOCK — не повторяйте вход, "

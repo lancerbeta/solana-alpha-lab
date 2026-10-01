@@ -27,7 +27,7 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_25_V2_BUDGET_54_GOLD_SPLIT_RUN_2_ORDINARY_CONSUMER_TESTS",
+    "targeted": "PASS_29_V2_BUDGET_54_GOLD_2_ORDINARY_19_PREFLIGHT_ONE_EXISTING_SKIP",
     "independent_review": {
       "path": "docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_delivery_independent_review_v1.json",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -37,11 +37,13 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": [
       "PASS_DELIVERY_HARNESS_CHECK",
-      "PASS_V2_BUDGET_25",
-      "PASS_OWNER_GOLD_54_SPLIT_RUN",
+      "PASS_V2_BUDGET_29",
+      "PASS_OWNER_GOLD_54",
       "PASS_ORDINARY_FINAL_2",
+      "PASS_PREFLIGHT_19_ONE_EXISTING_SKIP",
       "PASS_FACTORY_STATIC",
-      "PASS_C1_C3_READONLY_BUDGET_INVENTORY"
+      "PASS_C1_C3_READONLY_BUDGET_INVENTORY",
+      "PASS_ALIAS_LIVE_LABELS_NULL_RESERVATION_AND_CONTINUITY_UX_REGRESSIONS"
     ]
   },
   "non_claims": [

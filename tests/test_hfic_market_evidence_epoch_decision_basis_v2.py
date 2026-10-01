@@ -91,7 +91,7 @@ class ScientificMarketV2Tests(unittest.TestCase):
 
     def test_incomplete_scientific_projection_is_not_a_new_market(self):
         _, basis = self.current()
-        for mutation in ("dataset_identity", "partition_sha", "partition_bounds", "derived", "wrapper"):
+        for mutation in ("dataset_identity", "partition_sha", "partition_bounds", "derived", "live_fence", "wrapper"):
             with self.subTest(mutation=mutation):
                 broken = copy.deepcopy(basis)
                 projection = broken["scientific_projection"]
@@ -104,6 +104,8 @@ class ScientificMarketV2Tests(unittest.TestCase):
                     del dataset["partitions"][0]["min_available_to_strategy_at"]
                 elif mutation == "derived":
                     del dataset["derived"]["feature_usable"]
+                elif mutation == "live_fence":
+                    dataset["admissibility"]["confirmatory_reuse_forbidden"] = None
                 else:
                     projection["published_at"] = "2099-01-01T00:00:00Z"
                 with self.assertRaisesRegex(EvidenceIdentityError, "MARKET_EVIDENCE_BASIS_INCOMPLETE"):
@@ -113,9 +115,81 @@ class ScientificMarketV2Tests(unittest.TestCase):
         epoch, _ = self.current()
         path = self.labels_path()
         labels = json.loads(path.read_bytes())
-        labels["confirmatory_reuse_forbidden"] = not bool(labels.get("confirmatory_reuse_forbidden"))
+        labels["yield_eligible"] += 1
         path.write_text(json.dumps(labels), encoding="utf-8")
         self.assertNotEqual(epoch, self.current()[0])
+
+    def test_incomplete_live_labels_stop_instead_of_granting_budget(self):
+        from solana_alpha_lab.factory.hfic_evidence_identity import build_market_evidence_basis
+        from solana_alpha_lab.factory.hfic_preflight import enumerate_rdp_datasets
+        epoch, basis = self.current()
+        dataset = enumerate_rdp_datasets(self.data)[0]
+        current_row = next(row for row in dataset if row["dataset_manifest_id"] == basis["current_dataset_manifest_id"])
+        broken_row = copy.deepcopy(current_row)
+        del broken_row["labels"]["confirmatory_reuse_forbidden"]
+        with self.assertRaisesRegex(EvidenceIdentityError, "MARKET_EVIDENCE_BASIS_INCOMPLETE"):
+            build_market_evidence_basis(datasets=[broken_row], visible_cohort_ids=basis["visible_cohort_ids"], lineage_bindings=basis["lineage_bindings"], current_dataset_manifest_id=basis["current_dataset_manifest_id"], corpus_version=basis["corpus_version"])
+        path = self.labels_path()
+        original = path.read_bytes()
+        for mutation in ("missing_file", "confirmatory_reuse_forbidden", "yield_eligible", "yield_missing", "feature_families", "dataset_terminal", "corpus_version", "is_current_corpus_version", "null_counter", "bool_counter", "removed_profile"):
+            with self.subTest(mutation=mutation):
+                path.write_bytes(original)
+                labels = json.loads(original)
+                if mutation == "missing_file":
+                    path.unlink()
+                else:
+                    if mutation == "null_counter":
+                        labels["yield_eligible"] = None
+                    elif mutation == "bool_counter":
+                        labels["yield_eligible"] = False
+                    elif mutation == "removed_profile":
+                        for key in ("evidence_role", "logical_dataset_id", "confirmatory_reuse_forbidden"):
+                            del labels[key]
+                    else:
+                        del labels[mutation]
+                    path.write_text(json.dumps(labels), encoding="utf-8")
+                with self.assertRaisesRegex(EvidenceIdentityError, "MARKET_EVIDENCE_BASIS_INCOMPLETE"):
+                    self.current()
+        path.write_bytes(original)
+        self.assertEqual(epoch, self.current()[0])
+
+    def test_reservation_explicit_null_basis_is_not_restored(self):
+        from solana_alpha_lab.factory.hfic_evidence_identity import _reservation_with_market_basis
+        epoch, basis = self.current()
+        session = self.session(epoch, basis)
+        reservation = {**session, "market_evidence_basis": None}
+        self.assertIs(_reservation_with_market_basis(reservation, [session]), reservation)
+        self.assertIsNone(reservation["market_evidence_basis"])
+        self.import_week(3)
+        new_epoch, new_basis = self.current()
+        with self.assertRaisesRegex(EvidenceIdentityError, "MARKET_EPOCH_CONTINUITY_UNRESOLVED"):
+            epoch_search_budget_usage([session], reservations=[reservation], evidence_epoch=new_epoch, market_evidence_basis=new_basis)
+
+    def test_continuity_stop_explains_owner_recovery(self):
+        from solana_alpha_lab.factory.hfic_representation_ladder import format_forge_run_owner_readout
+        body = {"no_write": True, "next_action": "OBSERVABILITY_BLOCKED", "owner_class": "OBSERVABILITY_BLOCKED", "blocking_reason_codes": ["MARKET_EPOCH_CONTINUITY_UNRESOLVED"]}
+        readout = format_forge_run_owner_readout(body)
+        self.assertIn("PROVE_MARKET_CONTINUITY", readout)
+        self.assertIn("keep budget blocked", readout)
+        self.assertIn("do not create a session", readout)
+        self.assertIn("docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md", readout)
+
+    def test_generic_optional_reuse_flag_uses_effective_consumer_default(self):
+        from solana_alpha_lab.factory.hfic_evidence_identity import build_market_evidence_basis
+        from solana_alpha_lab.factory.hfic_preflight import enumerate_rdp_datasets
+        _, current = self.current()
+        row = copy.deepcopy(next(item for item in enumerate_rdp_datasets(self.data)[0] if item["dataset_manifest_id"] == current["current_dataset_manifest_id"]))
+        row["dataset_id"] = "DATASET-GENERIC"
+        row["evidence_role"] = "GENERIC_DISCOVERY"
+        row["labels"] = {"logical_dataset_id": "DATASET-GENERIC", "confirmatory_reuse_forbidden": False}
+        kwargs = {"visible_cohort_ids": current["visible_cohort_ids"], "lineage_bindings": current["lineage_bindings"], "current_dataset_manifest_id": current["current_dataset_manifest_id"], "corpus_version": current["corpus_version"]}
+        before = build_market_evidence_basis(datasets=[row], **kwargs)
+        del row["labels"]["confirmatory_reuse_forbidden"]
+        after = build_market_evidence_basis(datasets=[row], **kwargs)
+        epoch = market_evidence_epoch_sha256(before)
+        self.assertEqual(epoch, market_evidence_epoch_sha256(after))
+        session = self.session(epoch, before)
+        self.assertEqual(epoch_search_budget_usage([session], evidence_epoch=epoch, market_evidence_basis=before), epoch_search_budget_usage([session], evidence_epoch=epoch, market_evidence_basis=after))
 
     def test_new_synthetic_cohort_changes_epoch(self):
         epoch, basis = self.current()
@@ -192,7 +266,8 @@ class ScientificMarketV2Tests(unittest.TestCase):
         self.assertEqual(len(basis["datasets"]), 2)
         stable_path = manifests / "MID-EXTRA.json"
         root_path.rename(stable_path)
-        self.assertEqual(len(self.current()[1]["datasets"]), 2)
+        with self.assertRaisesRegex(EvidenceIdentityError, "MARKET_EVIDENCE_BASIS_INCOMPLETE"):
+            self.current()
         stable_path.write_bytes(b"{corrupted")
         with self.assertRaisesRegex(EvidenceIdentityError, "MARKET_EVIDENCE_BASIS_INCOMPLETE"):
             self.current()

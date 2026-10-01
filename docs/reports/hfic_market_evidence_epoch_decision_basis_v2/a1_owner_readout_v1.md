@@ -30,14 +30,27 @@ V1 epoch: `ae771cf5c1e7692c007b442c0048e7547005dc09125eeb9eb75e24406e429749`.
 V2 epoch: `e722f33420194c1e28e9ba39ddb6bb0c129064f812530588cd4777b0376e1a8e`.
 Это смена версии хеша, а не новый scientific market.
 
-Validation: 25 V2/budget tests PASS; 54 owner-gold tests covered (52 PASS
-в основном запуске, два scratch-Git clone environment errors закрыты
-точечным успешным rerun вне sandbox); два финальных ordinary consumer tests
-PASS. Это не один чистый запуск всех 54 тестов. Exact-head CI и owner merge
-gate проверяются отдельно; локальные tests не означают delivery DONE.
+Validation на исправленном кандидате: 29 V2/budget tests PASS; полный
+owner-gold 54 PASS; два ordinary consumer tests PASS; direct preflight 19
+tests — 18 PASS и один существующий non-critical skip. Новых skips нет.
+Exact-head CI и owner merge gate проверяются отдельно; локальные tests не
+означают delivery DONE.
+
+Независимые critics выявили и потребовали закрыть alias-профиль manifest,
+missing LIVE labels/fence и восстановление явного NULL reservation.
+Теперь parsed manifest ID обязан совпадать с именем файла; canonical
+integrity нельзя обойти stable filename. Используется existing LIVE
+REQUIRED_LABELS contract; missing обязательные labels/counters/families
+дают STOP, а штатные optional NULL сохраняются. Явный NULL reservation
+не восстанавливается из lifecycle. Optional generic reuse flag совпадает
+с фактическим bool-default потребителя, без искусственного нового рынка.
+Owner output объясняет continuity STOP и указывает на runbook.
 
 Operator readback: существующий `forge-run --no-write` показывает saved
-artifacts и budget без новой попытки. При incomplete basis сначала
+artifacts и identity без новой попытки. AUTO/focus counters доступны в
+`search_budget_usage` через `preflight --no-auto-commission --owner-focus AUTO
+--format json` на уже разрешённом current root, без persistence/commissioning.
+При unresolved continuity budget=UNRESOLVED, не zero. При incomplete basis сначала
 восстановить валидный current input в отдельно разрешённом atom; при
 unresolved continuity сверить frozen basis и current verified composition,
 не стирать историю и не сбрасывать квоты. Exact operator path:

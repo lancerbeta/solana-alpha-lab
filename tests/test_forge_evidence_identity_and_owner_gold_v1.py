@@ -83,6 +83,7 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
 )
 from solana_alpha_lab.factory.live_cohort_discovery_release import (  # noqa: E402
     import_live_cohort,
+    REQUIRED_LABELS,
 )
 from solana_alpha_lab.factory.research_store import ResearchStore  # noqa: E402
 from solana_alpha_lab.factory.fast_lane_snapshot import (  # noqa: E402
@@ -497,6 +498,7 @@ class IdentityUnitTests(unittest.TestCase):
             "dataset_manifest_id": "MID-CURRENT",
             "dataset_fingerprint": "aa" * 32,
             "dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+            "labels": {**REQUIRED_LABELS, "corpus_version": 1, "is_current_corpus_version": True, "yield_eligible": 1, "yield_missing": 0, "feature_families": [], "dataset_terminal": "SAMPLE_VALID"},
             "a3_scientific_partition_projection": [{"partition_id": "PART-1", "content_sha256": "ab" * 32, "row_count": 1, "min_event_time": None, "max_event_time": None, "min_available_to_strategy_at": None, "max_available_to_strategy_at": None}],
         }
         basis_a = build_market_evidence_basis(
@@ -574,6 +576,10 @@ class IdentityUnitTests(unittest.TestCase):
             "a3_scientific_partition_projection": [{"partition_id": "PART-1", "content_sha256": "ab" * 32, "row_count": 1, "min_event_time": None, "max_event_time": None, "min_available_to_strategy_at": None, "max_available_to_strategy_at": None}],
             "a3_pit_availability_validation_sha256": "11" * 32,
             "labels": {
+                **REQUIRED_LABELS,
+                "yield_missing": 0,
+                "feature_families": [],
+                "dataset_terminal": "SAMPLE_VALID",
                 "logical_dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
                 "corpus_version": 2,
                 "is_current_corpus_version": True,

@@ -32288,7 +32288,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 3d148ec9c7674e7b0df39cf345f5670fab0f28bfc27308498970e4ac1f5bda31}
+  integrity: {kind: sha256, sha256: a7c124b348e19b878e4f08099310e4b11327ce79cc84069d38b8f648f2a4d2c7}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32450,7 +32450,7 @@ records:
   as_of: '2026-08-29'
   truth_owner: HFIC_ACTIVE_RDP_COMPATIBILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_preflight.py', repository_path: tests/test_hfic_preflight.py}
-  integrity: {kind: sha256, sha256: d9b615474d5d1824041a9e303747e3749ccd95a96ab31e8ddd4f63a0326db6fd}
+  integrity: {kind: sha256, sha256: 1d28cf5c6d242d919dcdfface8d272c815587d1ab6a4032fccd91c2e9cbcd2c5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-ACTIVE-RDP-COMPATIBILITY-CLOSURE-001}
@@ -34594,7 +34594,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: a1b0ba0f7f35f75a4292a6d106854ed1208c7c67f794f936f0fe67f8350e42be}
+  integrity: {kind: sha256, sha256: 32019bb585db155cf3c3362dbb677bad6e2c243e848ebf8e936e0d7d54072360}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -38404,7 +38404,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_REPRESENTATION_LADDER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_ladder.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_ladder.py}
-  integrity: {kind: sha256, sha256: 34f17ced3b777671cc96a8c0b8a74e9d409f84d8a032d34be9410c0fee775d06}
+  integrity: {kind: sha256, sha256: ef60963e324e4fbb0ecbdde68b36505cb68def2124cf57b201c1221931acefc5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}
@@ -38484,7 +38484,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_evidence_identity.py', repository_path: src/solana_alpha_lab/factory/hfic_evidence_identity.py}
-  integrity: {kind: sha256, sha256: 6d0e7beafb96fbe45be281a174ea01f8ec24d8da23faee3a536fad25d55d19ec}
+  integrity: {kind: sha256, sha256: b7a2d75b872a2f1ad0f30da502896055e0dc1d050e1456c55380626c3a38a93f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
@@ -38503,7 +38503,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_preflight.py', repository_path: src/solana_alpha_lab/factory/hfic_preflight.py}
-  integrity: {kind: sha256, sha256: d4a84e739c8ce002e41b798da78880ea9f741546b2c96d66ea5c355c751003ed}
+  integrity: {kind: sha256, sha256: 9bdf2fdb71bac5aa0039f51650e2969ef5d1e9d9df4200ab7b1a2f27bd52ed84}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
@@ -38522,7 +38522,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_forge_evidence_identity_and_owner_gold_v1.py', repository_path: tests/test_forge_evidence_identity_and_owner_gold_v1.py}
-  integrity: {kind: sha256, sha256: a54f360fb5cad7228048fc5398f27077931917a7dd98d7954a338fe5b1b694f2}
+  integrity: {kind: sha256, sha256: d46ee172d5ef5eccc455d9fc5e770fa06da225c2816813b902d88b0a5ca6e2ae}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
@@ -38749,7 +38749,7 @@ records:
     repository_path: docs/tasks/HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2.md
   integrity:
     kind: sha256
-    sha256: e3e00e69ad044caf4f9f956a472cae5623fc1fd43c92cdd1470ee0af76dfaa33
+    sha256: bc0fc0b7000516c15085d4d68060f9cd97f8e882b0772685446ff2b13dc93c9d
   access:
     mode: read_only
     method: file
@@ -38791,7 +38791,7 @@ records:
     repository_path: tests/test_hfic_market_evidence_epoch_decision_basis_v2.py
   integrity:
     kind: sha256
-    sha256: 05f6a1d63150d7adc8dc0c35357b36d4734d205f30c54659806f57d6800b0c02
+    sha256: 1cee11bd370828ba777bbddf74fd5279ecdfe33d2099f2947c5453269ed425da
   access:
     mode: read_only
     method: file
@@ -38831,7 +38831,7 @@ records:
     repository_path: docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_readonly_budget_v1.json
   integrity:
     kind: sha256
-    sha256: f27dd323ba2782ee1a53ad5085c68e104aac1ccab1e0b62c8fd70a69ead3e4c1
+    sha256: 400b99cf07bbbd9155ddb1033e0420cf19d146a023f2800e2d7bf0d158953c01
   access:
     mode: read_only
     method: file
@@ -38868,7 +38868,7 @@ records:
     repository_path: docs/reports/hfic_market_evidence_epoch_decision_basis_v2/a1_owner_readout_v1.md
   integrity:
     kind: sha256
-    sha256: 98ec645e93ca97bd19522b69579b66db5bbc7730070ebdb7253d44b78c499c4c
+    sha256: 127a445e2369f09e8bfe46d399021bc71d83e4632c71b5db8baf6e917ed45369
   access:
     mode: read_only
     method: file

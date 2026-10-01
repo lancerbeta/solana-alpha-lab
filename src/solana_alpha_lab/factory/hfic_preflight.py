@@ -1065,6 +1065,10 @@ def enumerate_rdp_datasets(
                 }
             )
             continue
+        if path.stem != manifest.dataset_manifest_id:
+            warnings.append({"code": "DATASET_MANIFEST_ID_MISMATCH", "dataset_manifest_id": path.stem})
+            continue
+        canonical = bool(re.fullmatch(r"dataset-[0-9a-f]{64}", manifest.dataset_manifest_id))
         labels_path = manifests_dir / f"{manifest.dataset_manifest_id}.labels.json"
         labels: dict[str, Any] | None = None
         if labels_path.exists() or labels_path.is_symlink():
@@ -1113,6 +1117,14 @@ def enumerate_rdp_datasets(
                 }
             )
             _ENUMERATE_WORK["superseded_corpus_metadata_only"] += 1
+            continue
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            EvidenceIdentityError, require_live_scientific_labels,
+        )
+        try:
+            require_live_scientific_labels(manifest.dataset_id, labels)
+        except EvidenceIdentityError:
+            warnings.append({"code": "DATASET_SCIENTIFIC_LABELS_INCOMPLETE", "dataset_manifest_id": manifest.dataset_manifest_id})
             continue
         partition_dir = manifests_dir / "partitions"
         named_ids = _receipt_partition_manifest_ids(

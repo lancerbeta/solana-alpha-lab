@@ -459,6 +459,36 @@ _PUBLICATION_BASIS_KEYS = (
 )
 
 
+def require_live_scientific_labels(dataset_id: Any, labels: Any) -> None:
+    """Apply the existing LIVE import contract before deriving scientific fields."""
+    from solana_alpha_lab.factory.live_cohort_discovery_release import (
+        CORPUS_DATASET_ID, LIVE_EVIDENCE_ROLE, REQUIRED_LABELS,
+    )
+    is_live = dataset_id == CORPUS_DATASET_ID or (
+        isinstance(labels, Mapping) and labels.get("evidence_role") == LIVE_EVIDENCE_ROLE
+    )
+    if not is_live:
+        return
+    if not isinstance(labels, Mapping) or any(
+        key not in labels or type(labels[key]) is not type(value) or labels[key] != value
+        for key, value in REQUIRED_LABELS.items()
+    ):
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+    if any(
+        type(labels.get(key)) is not int or labels[key] < 0
+        for key in ("yield_eligible", "yield_missing")
+    ) or not isinstance(labels.get("dataset_terminal"), str) or not labels["dataset_terminal"]:
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+    families = labels.get("feature_families")
+    if not isinstance(families, list) or any(not isinstance(item, str) or not item for item in families):
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+    if dataset_id == CORPUS_DATASET_ID and (
+        type(labels.get("corpus_version")) is not int or labels["corpus_version"] < 1
+        or type(labels.get("is_current_corpus_version")) is not bool
+    ):
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+
+
 def build_market_evidence_basis(**kwargs: Any) -> dict[str, Any]:
     """V2 scientific projection with unchanged, separately verified V1 provenance.
 
@@ -472,6 +502,8 @@ def build_market_evidence_basis(**kwargs: Any) -> dict[str, Any]:
         if not isinstance(item, Mapping):
             continue
         labels = item.get("labels")
+        if "a3_pit_availability_validation_sha256" in item:
+            require_live_scientific_labels(item.get("dataset_id"), labels)
         labels = labels if isinstance(labels, Mapping) else {}
         partitions = item.get("a3_scientific_partition_projection")
         if "a3_pit_availability_validation_sha256" in item and not partitions:
@@ -480,7 +512,12 @@ def build_market_evidence_basis(**kwargs: Any) -> dict[str, Any]:
             "dataset_id": item.get("dataset_id"),
             "logical_dataset_id": labels.get("logical_dataset_id") or item.get("dataset_id"),
             "derived": {key: item.get(key) for key in _DECISION_FIELDS},
-            "admissibility": {key: labels.get(key) for key in _DECISION_LABEL_FIELDS},
+            "admissibility": {
+                **{key: labels.get(key) for key in _DECISION_LABEL_FIELDS},
+                # A3 consumes this optional generic flag through bool(...).
+                # LIVE required-True evidence is validated before this step.
+                "confirmatory_reuse_forbidden": bool(labels.get("confirmatory_reuse_forbidden")),
+            },
             "partitions": partitions,
         })
     scientific_datasets.sort(key=lambda row: (str(row["logical_dataset_id"]), str(row["dataset_id"])))
@@ -549,6 +586,15 @@ def _validate_scientific_datasets(
             and "a3_pit_availability_validation_sha256" in item
             for item in publication
         )
+        from solana_alpha_lab.factory.live_cohort_discovery_release import (
+            CORPUS_DATASET_ID, LIVE_EVIDENCE_ROLE,
+        )
+        if requires_parts and (
+            row["dataset_id"] == CORPUS_DATASET_ID
+            or row["logical_dataset_id"] == CORPUS_DATASET_ID
+            or row["derived"]["evidence_role"] == LIVE_EVIDENCE_ROLE
+        ) and row["admissibility"]["confirmatory_reuse_forbidden"] is not True:
+            raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
         if parts is None and not requires_parts:
             continue
         if not isinstance(parts, list) or not parts:
@@ -1730,7 +1776,7 @@ def _reservation_with_market_basis(
     reservation: Mapping[str, Any], sessions: Sequence[Mapping[str, Any]],
 ) -> Mapping[str, Any]:
     """Read-only proof from the same durable lifecycle; never rewrite reservation."""
-    if not isinstance(reservation, Mapping) or reservation.get("market_evidence_basis") is not None:
+    if not isinstance(reservation, Mapping) or "market_evidence_basis" in reservation:
         return reservation
     slot = session_scientific_slot_sha256(reservation)
     if slot is None:

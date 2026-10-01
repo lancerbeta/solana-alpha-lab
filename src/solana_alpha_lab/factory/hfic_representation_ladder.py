@@ -1385,6 +1385,14 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "next: RESTORE_CAPABILITY_SURFACE — restore the protocol/semantic "
             "capability surface, then retry; do not reset market budget"
         )
+    elif "MARKET_EPOCH_CONTINUITY_UNRESOLVED" in blocking:
+        lines.append(
+            "next: PROVE_MARKET_CONTINUITY - compare the saved frozen basis with "
+            "verified current cohort/release/content bindings; keep budget blocked. "
+            "See the Market basis V2 section in "
+            "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md; "
+            "do not create a session, reset memory, quarantine or rewrite receipts"
+        )
     elif "CONTROL_SURFACE_REQUIRED" in blocking:
         if receipt.get("no_write") is True:
             lines.append(
