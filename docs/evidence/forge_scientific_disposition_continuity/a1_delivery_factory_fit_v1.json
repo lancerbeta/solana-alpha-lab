@@ -4,8 +4,8 @@
   "review_id": "FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-FACTORY-FIT-001",
   "as_of": "2026-09-30",
   "task_id": "FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1",
-  "reviewed_bindings_sha256": "5a82de2d2efeb8a1bbc1c127f696659eba97d871304bf66bde7324cd8e94a22a",
-  "reviewed_inventory_sha256": "82ade23189174c54f1d7fe2f5de2d232c46d9e3adac99c63eeb431095daeef4b",
+  "reviewed_bindings_sha256": "51afee62f7f810482af50e9f0fbb6386de3f66492b45a86024e93da38e04e3c6",
+  "reviewed_inventory_sha256": "998e328f6357ad3c4aefe35438ab0b6923e75449a5159d8813fcfbcfc4dbbbea",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {

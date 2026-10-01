@@ -25,7 +25,7 @@
     "docs/PROJECT_MAP.md": "61750e2076004272bb68448db12d82c18c0c46189bbd6480a3d0f48a2fe26880",
     "docs/contracts/hfic_scientific_disposition_continuity_v1.md": "cd45ce2c8aa0029982ce12405659ea4736461fb808f017c10773b7fb09964631",
     "docs/evidence/forge_scientific_disposition_continuity/fresh_context_acceptance_v1.json": "3025ad781f73e06754b592afa0cdce1596ded51a83f4b3c4d2ec4baf7b20147a",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "36dd00a912d2171fa9117f2ed412923fa11f91d55efaa03987f4a539dd8b78d0",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "98eae72f437b1d32bba8c9decedf88c50340887fec5831e4a4de8fd5e561f1ff",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "c14ee0c5e4bb995bd7019a97a797784c6df7411032d6126305aed6584922afd6",
     "docs/tasks/FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1.md": "8ab996e3742e5bc9914a5734ee4324ac62d0fb84726ae79f7e1a4d70ab59022f",
     "scripts/hypothesis_forge.py": "52dc14da867cd9896a3a46df9b546f3be7f320537a75731ed5591d3c7ac1a4b1",
@@ -45,14 +45,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_scientific_disposition_continuity/a1_delivery_factory_fit_v1.json",
-    "sha256": "9d60f36a567174a68733a0609f68a5c410326320ef7679ad9d31d55355795312",
+    "sha256": "82534eb2dc20febc9685a1e60f580072f96e29e76a11c20ce2a40418de1cd3c3",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_DISPOSITION_CONTINUITY_25_TESTS_AND_PROTECTED_NEIGHBOUR_SUITES",
     "independent_review": {
       "path": "docs/evidence/forge_scientific_disposition_continuity/a1_delivery_independent_review_v1.json",
-      "sha256": "352ceb57171a96969d9b353da3982a00d6b0e82e2eb09e0ab8264cf9a61d21f6",
+      "sha256": "893da57b61b4de3e07218d53db3f78aa2ef07fe465136da9428847a575074232",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
