@@ -89,6 +89,11 @@ routes:
       - Find prior negative hypothesis work
       - Is there an existing HFIC or Fast Lane session?
       - найти прошлую негативную работу по гипотезам
+      - What did we already conclude about this question or search scope?
+      - What was concluded, what remains untested, and what is authorized next?
+      - Is the old assessment still valid?
+      - что уже заключили и почему остановились
+      - что мы решили по этому вопросу и почему бросили этот поиск
     search_terms:
       - prior work
       - negative results
@@ -100,6 +105,11 @@ routes:
       - prior trials
       - historical calibration
       - FORGE_INPUT_RECEIPT
+      - прошлый вывод
+      - заключили
+      - остановились
+      - disposition
+      - concluded
     consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, DIRECT-CURSOR-DELIVERY]
     root_binding_ids: []
     root_asset_ids:

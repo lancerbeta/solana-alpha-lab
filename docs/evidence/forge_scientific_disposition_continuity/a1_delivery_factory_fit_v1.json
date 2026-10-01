@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-FACTORY-FIT-001",
+  "as_of": "2026-09-30",
+  "task_id": "FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1",
+  "reviewed_bindings_sha256": "a0eea875b4fded4c5b9acd4eb3bf48d55461361bae0ce8be8c8315db59f0ad11",
+  "reviewed_inventory_sha256": "32f2404d89326b1a57418767768743fe0a7f6864fe866496b3c5ccb3396e5656",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_PRIOR_SCIENTIFIC_CONCLUSIONS_ARE_READ_COLD_FROM_THE_STORE_WITHOUT_A_SIDECAR",
+    "flexibility_and_history": "PASS_APPEND_ONLY_LINEAGE_SUCCESSOR_WITHDRAWAL_AND_HISTORICAL_IMPORT",
+    "context_efficiency": "PASS_ONE_ARTIFACT_ONE_RESOLVER_CAPSULE_UNDER_4KIB_DROPPED_FIRST_UNDER_PRESSURE",
+    "research_truth": "PASS_STALE_UNKNOWN_OR_ROTATED_BASIS_NEVER_READS_CURRENT",
+    "owner_operability": "PASS_ADVICE_LABELLED_APART_FROM_MACHINE_NEXT_ACTION_WITH_PACKET_EXAMPLES",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_MARKET_EXECUTION",
+    "monitoring_and_recovery": "PASS_CORRUPT_OR_FORKED_SUBJECTS_ARE_LOCALIZED_STOPS",
+    "build_vs_buy": "PASS_REUSES_RESEARCH_STORE_TRANSACTION_LEASE_AND_LOOK_REVISION_LINEAGE",
+    "red_team": "PASS_FOUR_ISOLATED_ROUNDS_HOST_PATH_FUZZ_AND_CONCURRENT_SUCCESSORS",
+    "security": "PASS_NO_PROVIDER_NO_LIVE_STORE_NO_HOST_PATH_PERSISTED"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "LEGACY_OR_NON_ADMITTED_MARKET_EPOCH_IN_CAPSULE"
+  },
+  "recovery": "Revert this change. Stored disposition records are append-only artifacts under HFIC- ids that older code ignores; they stay readable by this code and never need deletion. Wrong advice is corrected by an explicit successor or withdrawal.",
+  "limits": [
+    "NO_LIVE_STORE_MUTATION",
+    "NO_NEW_SCIENTIFIC_LOOK",
+    "NO_PROVIDER_OR_DATA_CALL",
+    "HISTORICAL_IMPORT_NOT_RUN_PRE_MERGE",
+    "WRITER_VERIFIES_REFS_NOT_SCIENTIFIC_TRUTH",
+    "SYNTHETIC_FIXTURE_VALUES_ARE_NOT_MARKET_ORACLES"
+  ]
+}

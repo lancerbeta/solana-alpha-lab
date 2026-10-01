@@ -2018,6 +2018,30 @@ def build_forge_context_packet(
             ),
         },
     }
+    from solana_alpha_lab.factory.hfic_scientific_disposition import (
+        compact_counts_only,
+        safe_disposition_context,
+    )
+
+    # Authored scientific assessments: advisory capsule, separate from ranked
+    # priors and hard-close capsules. Present only when this focus has recorded
+    # assessment history (or its read failed), so packets without that history
+    # keep their bytes. Under byte pressure it shrinks first (below).
+    disposition_capsule = safe_disposition_context(
+        store,
+        owner_focus=owner_focus,
+        current_market=evidence_epoch if len(str(evidence_epoch or "")) == 64 else None,
+        # A CONTROL-surface search key is not the ordinary journal: unverified.
+        journal_scope=(
+            search_key
+            if len(str(search_key or "")) == 64
+            and evidence_surface_mode != "CURRENT_REPRESENTATION_CONTROL_V1"
+            else None
+        ),
+        forbidden_texts=(str(data_root), str(repo_root)),
+    )
+    if disposition_capsule.get("status") == "UNAVAILABLE" or disposition_capsule.get("total_subjects"):
+        packet["scientific_disposition_context"] = disposition_capsule
     if selection_caveat is not None:
         packet["selection_robustness_caveat"] = {
             "router_decision": str(selection_caveat.get("router_decision") or ""),
@@ -2055,6 +2079,28 @@ def build_forge_context_packet(
         all_grounding_entries
     )
     encoded = canonical_json_bytes(packet)
+    if len(encoded) > packet_bound and isinstance(
+        packet.get("scientific_disposition_context"), Mapping
+    ):
+        # Advice is the lowest priority: reduce it to counts + detail query
+        # before any scientific or navigation section is touched.
+        packet["scientific_disposition_context"] = compact_counts_only(
+            packet["scientific_disposition_context"]
+        )
+        encoded = canonical_json_bytes(packet)
+        if len(encoded) > packet_bound:
+            # Still over: drop the advice entirely before any other section and
+            # record only how many subjects were omitted.
+            dropped = packet.pop("scientific_disposition_context")
+            packet["truncation_receipt"] = {
+                **packet["truncation_receipt"],
+                "truncated": True,
+                "disposition_subjects_omitted": int(dropped.get("total_subjects") or 0),
+                "disposition_not_recorded_omitted": int(
+                    len(dropped.get("not_recorded") or []) + int(dropped.get("not_recorded_omitted") or 0)
+                ),
+            }
+            encoded = canonical_json_bytes(packet)
     if len(encoded) > packet_bound:
         # Semantic navigation is lower priority than datasets / closed families / priors.
         packet["semantic_capability_entries"] = []

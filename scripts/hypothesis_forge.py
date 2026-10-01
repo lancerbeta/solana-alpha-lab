@@ -691,13 +691,51 @@ def cmd_forge_run(
             payload["owner_readout"] = format_forge_run_owner_readout(payload)
         if history and "history:" not in str(payload.get("owner_readout") or ""):
             payload["owner_readout"] = str(payload.get("owner_readout") or "").rstrip() + "\n" + history
+        context_lines = format_context_lines(payload.get("scientific_disposition_context"))
+        if context_lines and "scientific_context" not in str(payload.get("owner_readout") or ""):
+            payload["owner_readout"] = (
+                str(payload.get("owner_readout") or "").rstrip() + "\n" + "\n".join(context_lines)
+            )
         _assert_no_path_leak(payload, str(repo_root))
         readout = payload.get("owner_readout")
         if isinstance(readout, str) and readout.strip():
             print(readout, file=sys.stderr)
         return emit(payload, exit_code=exit_code)
 
+    from solana_alpha_lab.factory.hfic_scientific_disposition import (
+        current_search_key,
+        format_context_lines,
+        safe_disposition_context,
+    )
     from solana_alpha_lab.factory.run_passport import canonical_sha256
+
+    def _attach_scientific_context(payload: dict[str, Any], store: Any) -> dict[str, Any]:
+        # Derived overlay: added after receipt_sha256, never part of a canonical receipt.
+        # The current journal is the search key preflight would use now, not the
+        # journal of the most recently recorded operation.
+        focus = str(payload.get("owner_focus") or owner_focus or "AUTO")
+        market = payload.get("market_evidence_epoch_sha256")
+        market = market if isinstance(market, str) and len(market) == 64 else None
+        try:
+            # A CONTROL-surface run is not the ordinary journal: leave it unverified.
+            journal = (
+                None
+                if control_current_representation
+                else current_search_key(store, market=market, owner_focus=focus)
+            )
+        except Exception:
+            journal = None
+        payload["scientific_disposition_context"] = {
+            **safe_disposition_context(
+                store,
+                owner_focus=focus,
+                current_market=market,
+                journal_scope=journal,
+                forbidden_texts=(str(repo_root), str(resolved.root)),
+            ),
+            "receipt_hash_domain": "EXCLUDED_DERIVED_OVERLAY",
+        }
+        return payload
 
     def _blocked_run_payload(code: str, owner_class: str) -> dict[str, Any]:
         run_identity = canonical_sha256(
@@ -800,6 +838,12 @@ def cmd_forge_run(
                 projection = None
             if projection is not None:
                 payload["ordinary_operation"] = projection
+            try:
+                payload = _attach_scientific_context(
+                    payload, ResearchStore(resolved.root, create_if_missing=False)
+                )
+            except Exception:
+                pass
         payload["owner_readout"] = format_forge_run_owner_readout(payload)
         return _emit_run(payload, exit_code=2)
     payload = {**receipt, "no_write": not persist, "selection_reason": resolved.selection_reason}
@@ -850,10 +894,155 @@ def cmd_forge_run(
         owner_focus=owner_focus if owner_focus.strip() else "AUTO",
     )
     payload = merge_ordinary_readout(payload, projection)
+    payload = _attach_scientific_context(payload, store)
     _assert_no_path_leak(payload, str(resolved.root), str(repo_root))
     return _emit_run(payload, exit_code=(
         0 if payload.get("owner_class") not in {"INPUT_NOT_READY", "OBSERVABILITY_BLOCKED"} else 2
     ))
+
+
+def _current_market(repo_root: Path, data_root: Path, store: Any) -> str | None:
+    from solana_alpha_lab.factory.hfic_evidence_identity import compute_split_identity
+
+    try:
+        market = compute_split_identity(repo_root, data_root, store=store).get(
+            "market_evidence_epoch_sha256"
+        )
+    except Exception:
+        return None
+    return market if isinstance(market, str) and len(market) == 64 else None
+
+
+def cmd_disposition_record(
+    repo_root: Path,
+    explicit_data_root: Path | None,
+    *,
+    input_path: Path,
+    preview: bool = False,
+) -> int:
+    """Record one authored scientific assessment or withdrawal. Never spends a look."""
+    from solana_alpha_lab.factory.hfic_scientific_disposition import (
+        MODE_NEW,
+        DispositionError,
+        current_search_key,
+        preview_disposition,
+        record_disposition,
+    )
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    packet = _load_json_file(input_path)
+    mode = (packet.get("provenance") or {}).get("mode", MODE_NEW) if isinstance(packet, dict) else MODE_NEW
+    market = _current_market(repo_root, data_root, store)
+    if mode == MODE_NEW and market is None:
+        return emit(
+            {
+                "refusal_code": "DISPOSITION_MARKET_UNVERIFIED",
+                "writes": {"research_store": 0},
+                "authority_granted": False,
+            },
+            exit_code=2,
+        )
+    subject = packet.get("subject") if isinstance(packet.get("subject"), dict) else {}
+    try:
+        journal = current_search_key(store, market=market, owner_focus=str(subject.get("owner_focus") or ""))
+    except Exception:
+        journal = None
+    try:
+        if preview:
+            payload = preview_disposition(
+                store, packet, current_market=market, current_journal=journal, repo_root=repo_root
+            )
+        else:
+            payload = record_disposition(
+                store, packet, current_market=market, current_journal=journal, repo_root=repo_root
+            )
+    except DispositionError as exc:
+        payload = {
+            "refusal_code": exc.code,
+            "head_refs": exc.head_refs,
+            "detail": exc.detail,
+            "writes": {"research_store": 0},
+            "authority_granted": False,
+        }
+        if exc.code in {"DISPOSITION_SUBJECT_HAS_HEAD", "DISPOSITION_STALE_PARENT"}:
+            payload["hint"] = (
+                "to correct the current head, resubmit with supersedes={record_id, disposition_sha256} "
+                "taken from detail (<record_id>:<disposition_sha256>)"
+            )
+        _assert_no_path_leak(payload, str(data_root), str(repo_root))
+        return emit(payload, exit_code=2)
+    if isinstance(payload.get("lineage_refusal"), dict) and payload["lineage_refusal"].get("code") in {
+        "DISPOSITION_SUBJECT_HAS_HEAD",
+        "DISPOSITION_STALE_PARENT",
+    }:
+        payload["lineage_refusal"]["hint"] = (
+            "to correct the current head, resubmit with supersedes={record_id, disposition_sha256} "
+            "taken from detail (<record_id>:<disposition_sha256>)"
+        )
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_disposition_show(
+    repo_root: Path,
+    explicit_data_root: Path | None,
+    *,
+    owner_focus: str,
+    subject_key: str | None = None,
+    record_id: str | None = None,
+    offset: int = 0,
+    limit: int = 20,
+    journal_scope: str | None = None,
+) -> int:
+    """Exact-ref detail of recorded assessments. Reads no outcome rows."""
+    from solana_alpha_lab.factory.hfic_scientific_disposition import (
+        DispositionError,
+        disposition_detail,
+    )
+
+    if journal_scope is not None and not re.fullmatch(r"[0-9a-f]{64}", journal_scope):
+        return emit({"refusal_code": "DISPOSITION_JOURNAL_SCOPE_INVALID", "writes": {"research_store": 0}}, exit_code=2)
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    market = _current_market(repo_root, data_root, store)
+    journal_source = "OVERRIDE" if journal_scope is not None else "COMPUTED"
+    if journal_scope is None:
+        from solana_alpha_lab.factory.hfic_scientific_disposition import current_search_key
+
+        try:
+            journal_scope = current_search_key(store, market=market, owner_focus=owner_focus)
+        except Exception:
+            journal_scope = None
+        if journal_scope is None:
+            journal_source = "UNVERIFIED"
+    try:
+        payload = disposition_detail(
+            store,
+            owner_focus=owner_focus,
+            current_market=market,
+            subject_key_value=subject_key,
+            record_id=record_id,
+            offset=max(0, offset),
+            limit=max(1, min(limit, 100)),
+            journal_scope=journal_scope,
+        )
+    except DispositionError as exc:
+        return emit({"refusal_code": exc.code, "writes": {"research_store": 0}}, exit_code=2)
+    payload["market_verified"] = market is not None
+    payload["journal_scope_source"] = journal_source
+    payload["values_loaded"] = False
+    if market is None:
+        payload["market_note"] = "market UNVERIFIED: no assessment is shown as current"
+    payload["writes"] = {"research_store": 0}
+    try:
+        _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    except HficCliError:
+        return emit(
+            {"refusal_code": "DISPOSITION_DETAIL_PATH_LEAK", "writes": {"research_store": 0}},
+            exit_code=2,
+        )
+    return emit(payload)
 
 
 def cmd_discovery_binding(repo_root: Path, explicit_data_root: Path | None) -> int:
@@ -2827,6 +3016,44 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Explicit CURRENT_REPRESENTATION_CONTROL_V1. Ordinary forge-run does not imply it.",
     )
+    disposition_record = subparsers.add_parser(
+        "disposition-record",
+        help=(
+            "Record one authored scientific assessment/withdrawal (ORDINARY_SCIENTIFIC_DISPOSITION_V1). "
+            "Without --preview it appends to the ResearchStore: run it only inside an authorized scope "
+            "(see the contract). Advice only: no look, budget, admission or session."
+        ),
+    )
+    disposition_record.add_argument(
+        "--input",
+        type=Path,
+        required=True,
+        help=(
+            "Packet JSON (subject, basis, judgement|withdrawal, provenance, supersedes); "
+            "shapes and examples: docs/contracts/hfic_scientific_disposition_continuity_v1.md"
+        ),
+    )
+    disposition_record.add_argument(
+        "--preview",
+        action="store_true",
+        help="Validate and show the exact append plan; never writes",
+    )
+    disposition_record.add_argument("--format", choices=("json",), default="json")
+    disposition_show = subparsers.add_parser(
+        "disposition-show",
+        help="Read recorded scientific assessments with applicability and lineage; no outcome rows",
+    )
+    disposition_show.add_argument("--owner-focus", required=True)
+    disposition_show.add_argument("--subject-key", default=None)
+    disposition_show.add_argument("--record-id", default=None)
+    disposition_show.add_argument("--offset", type=int, default=0)
+    disposition_show.add_argument("--limit", type=int, default=20)
+    disposition_show.add_argument(
+        "--journal-scope",
+        default=None,
+        help="Current journal (preflight search_key_sha256); rotated journals degrade search advice",
+    )
+    disposition_show.add_argument("--format", choices=("json",), default="json")
     discovery_coverage = subparsers.add_parser(
         "discovery-coverage",
         help="No-write state-only joint coverage. Never selects typed_value.",
@@ -3222,6 +3449,24 @@ def main(argv: list[str] | None = None) -> int:
                 control_current_representation=bool(
                     getattr(args, "control_current_representation", False)
                 ),
+            )
+        if args.command == "disposition-record":
+            return cmd_disposition_record(
+                repo_root,
+                args.data_root,
+                input_path=args.input,
+                preview=bool(args.preview),
+            )
+        if args.command == "disposition-show":
+            return cmd_disposition_show(
+                repo_root,
+                args.data_root,
+                owner_focus=args.owner_focus,
+                subject_key=args.subject_key,
+                record_id=args.record_id,
+                offset=args.offset,
+                limit=args.limit,
+                journal_scope=args.journal_scope,
             )
         if args.command == "discovery-coverage":
             return cmd_discovery_coverage(repo_root, args.data_root)

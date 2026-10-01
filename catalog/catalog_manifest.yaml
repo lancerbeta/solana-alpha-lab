@@ -4,9 +4,9 @@ catalog_version: 0.130.0
 as_of: '2026-09-07'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1862
+  assets: 1867
   asset_registries: 4
-  schemas: 97
+  schemas: 98
   queries: 19
   lifecycle_registries: 9
   lifecycle_records: 84
@@ -237,6 +237,7 @@ root_resolver:
   - catalog/schemas/hfic_scientific_discovery_prospects_v1.schema.json
   - catalog/schemas/hfic_next_epistemic_action_draft_v1.schema.json
   - catalog/schemas/hfic_next_epistemic_action_v1.schema.json
+  - catalog/schemas/hfic_scientific_disposition_v1.schema.json
   commands:
     validate:
     - uv
