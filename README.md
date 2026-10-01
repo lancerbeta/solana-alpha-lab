@@ -22,13 +22,6 @@ route `SEM-REMOTE-OPS-RECOVERY`, then the operator entrypoint
 and procedure only — not current disk, archive day, HOT90 stage, or Telegram
 state.
 
-For what was already concluded about ordinary Forge work (a saved question or
-a bounded search scope) and whether that advice still applies, start at
-semantic route `SEM-PRIOR-WORK`; the read entry is `scripts/hypothesis_forge.py
-disposition-show --owner-focus <FOCUS>` and the contract is
-`docs/contracts/hfic_scientific_disposition_continuity_v1.md`. Assessments are
-advice, not authority.
-
 For an exact delivery atom: `AGENTS.md` / Delivery Harness.
 
 For exhaustive asset archaeology: Catalog commands, with `docs/PROJECT_MAP.md`

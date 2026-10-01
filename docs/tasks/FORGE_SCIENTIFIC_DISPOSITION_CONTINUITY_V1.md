@@ -51,7 +51,6 @@ managed_write_set:
   - .agents/skills/hypothesis-forge/SKILL.md
   - .cursor/commands/hypothesis-forge.md
   - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
-  - README.md
   - configs/factory_semantic_operability_v1.yaml
   - catalog/catalog_manifest.yaml
   - catalog/assets/core.yaml

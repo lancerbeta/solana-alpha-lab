@@ -1509,7 +1509,7 @@ records:
     repository_path: README.md
   integrity:
     kind: sha256
-    sha256: d1a722625fc9dec6aafa6bff57574f1e142c30089f0ad49f36dbfd998e6b47e4
+    sha256: 625cd06e83b181bc6462ccf4d7fd03fad221d0516770b09774bc1c1e4f3343ee
   access:
     mode: read_only
     method: file
@@ -32686,7 +32686,7 @@ records:
   as_of: '2026-09-30'
   truth_owner: FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1.md', repository_path: docs/tasks/FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1.md}
-  integrity: {kind: sha256, sha256: 4e00e943282b54bf3ee2239864762cf8092cab6a3c3fc4acdeb6691b9512aafc}
+  integrity: {kind: sha256, sha256: 8ab996e3742e5bc9914a5734ee4324ac62d0fb84726ae79f7e1a4d70ab59022f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ARCH-INTENT-006}
