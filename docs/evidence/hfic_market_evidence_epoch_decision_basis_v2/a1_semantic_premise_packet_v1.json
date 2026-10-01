@@ -1,8 +1,8 @@
 {
   "candidate": {
     "base": "68b986e12e5752d36b3cc2e14d85a855fa90b09f",
-    "diff_sha256": "c5f69b145cd123415baca0dbb4647e0a5aebc2192b36bc2c16a9fe5eba94531e",
-    "head": "22e2767df2689047fdd0a6c21a408a6ae3ecc360"
+    "diff_sha256": "f834ec3f2850e495dc8cd338ee8ac0dbf41399c48b929c0a31e396009db85b83",
+    "head": "d243e74eae67b89f50fc8041e8c14cef424f34ae"
   },
   "evidence": [
     {
@@ -52,7 +52,7 @@
     "NO_MERGE",
     "AMBIGUOUS_V1_WRAPPER_CONTINUITY_NOT_PROVEN"
   ],
-  "packet_fingerprint_sha256": "70aa9d16b454c8ffc075d50b985209cf3869437e9551704ba949d58b6667bc86",
+  "packet_fingerprint_sha256": "ad63e91ca151faa551ec8a66ee15d7665699dcbdd424bd32c4db82b0fedc08f0",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
@@ -108,7 +108,7 @@
     }
   ],
   "task": {
-    "task_contract_sha256": "bc0fc0b7000516c15085d4d68060f9cd97f8e882b0772685446ff2b13dc93c9d",
+    "task_contract_sha256": "5242d19aca75d9e15425f6b94b42172672c2afc809557f865e235719509c0a5e",
     "task_id": "HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2"
   }
 }

@@ -17,7 +17,7 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=70aa9d16b454c8ffc075d50b985209cf3869437e9551704ba949d58b6667bc86",
+        "packet_fingerprint_sha256=ad63e91ca151faa551ec8a66ee15d7665699dcbdd424bd32c4db82b0fedc08f0",
         "PASS: publication-only wrappers are excluded from scientific hash and cannot reset proven occupancy; current canonical integrity remains mandatory.",
         "PASS: malformed manifest aliases, incomplete LIVE required labels and invalid current inputs produce typed STOP rather than new market.",
         "PASS: validated V1 membership counts occupied quota/slots; ambiguous V1 continuity blocks; explicit NULL reservation is never restored.",
@@ -71,7 +71,7 @@
       "severity": "MAJOR",
       "finding": "Canonical root alias bypass and explicit NULL reservation restoration closed.",
       "observed_head": "987c591fcbc415ae97aa8bb8a69d84fece308d49",
-      "resolved_by_head": "22e2767df2689047fdd0a6c21a408a6ae3ecc360"
+      "resolved_by_head": "d243e74eae67b89f50fc8041e8c14cef424f34ae"
     },
     {
       "role": "ARCHITECTURE_CRITIC",
@@ -79,7 +79,7 @@
       "severity": "MAJOR",
       "finding": "Missing LIVE decision labels/fence could falsely create fresh scientific budget; now typed STOP.",
       "observed_head": "987c591fcbc415ae97aa8bb8a69d84fece308d49",
-      "resolved_by_head": "22e2767df2689047fdd0a6c21a408a6ae3ecc360"
+      "resolved_by_head": "d243e74eae67b89f50fc8041e8c14cef424f34ae"
     },
     {
       "role": "OWNER_UX_CRITIC",
@@ -87,7 +87,7 @@
       "severity": "MINOR",
       "finding": "Saved-artifact versus counter readback and continuity recovery clarified.",
       "observed_head": "987c591fcbc415ae97aa8bb8a69d84fece308d49",
-      "resolved_by_head": "22e2767df2689047fdd0a6c21a408a6ae3ecc360"
+      "resolved_by_head": "d243e74eae67b89f50fc8041e8c14cef424f34ae"
     },
     {
       "role": "OWNER_UX_CRITIC",
@@ -95,7 +95,7 @@
       "severity": "MINOR",
       "finding": "Operator JSON field corrected from search_budget_usage to search_budget.",
       "observed_head": "b7f8bfdbd213a3a3862464dd5f1916d97a6a149b",
-      "resolved_by_head": "22e2767df2689047fdd0a6c21a408a6ae3ecc360"
+      "resolved_by_head": "d243e74eae67b89f50fc8041e8c14cef424f34ae"
     }
   ]
 }
