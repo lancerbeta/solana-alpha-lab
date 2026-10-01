@@ -38749,7 +38749,7 @@ records:
     repository_path: docs/tasks/HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2.md
   integrity:
     kind: sha256
-    sha256: bc0fc0b7000516c15085d4d68060f9cd97f8e882b0772685446ff2b13dc93c9d
+    sha256: 5242d19aca75d9e15425f6b94b42172672c2afc809557f865e235719509c0a5e
   access:
     mode: read_only
     method: file

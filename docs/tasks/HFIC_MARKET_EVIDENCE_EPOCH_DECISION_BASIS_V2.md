@@ -66,7 +66,7 @@ stop_conditions:
   - MERGE_WITHOUT_EXACT_OWNER_PHRASE
 context_requirements:
   catalog_asset_ids: [MODULE-HFIC-EVIDENCE-IDENTITY-001, MODULE-HFIC-PREFLIGHT-ADMISSION-001, MODULE-FORGE-INPUT-RECEIPT-001]
-  l2_roles: [ARCHITECTURE_DECISIONS]
+  l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
@@ -77,7 +77,10 @@ context_requirements:
       - src/solana_alpha_lab/factory/hfic_evidence_identity.py
       - src/solana_alpha_lab/factory/hfic_preflight.py
       - src/solana_alpha_lab/factory/forge_input_receipt.py
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_delivery_independent_review_v1.json
+      - docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
