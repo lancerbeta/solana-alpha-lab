@@ -38,7 +38,7 @@
   ],
   "result": "NOT_PASS_NAVIGATION_GAP",
   "defect": "Owner paraphrase did not resolve to SEM-PRIOR-WORK and the read command was reached by grep",
-  "defect_fixed_in_atom": "SEM-PRIOR-WORK owner questions and terms extended; navigation test walks search-routes -> resolve-route -> related-assets -> contract -> disposition-show for seven phrasings including this one",
+  "defect_fixed_in_atom": "SEM-PRIOR-WORK owner questions and terms extended; navigation test walks search-routes -> resolve-route -> related-assets -> contract -> disposition-show for eight phrasings including this exact question",
   "rerun": "NOT_RUN_BY_DESIGN_ONE_BOUNDED_ATTEMPT",
   "independent_verification": "OWNER_PROMPT_IN_HANDBACK",
   "project_sources_disposition": {
