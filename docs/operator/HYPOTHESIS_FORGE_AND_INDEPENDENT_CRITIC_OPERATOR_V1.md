@@ -163,7 +163,7 @@ Read-only owner path:
    change creates new market evidence. It still requires ordinary scientific
    admission and separate owner look authority.
 
-AUTO/focus counters are the `search_budget_usage` in existing preflight JSON,
+AUTO/focus counters are the `search_budget` in existing preflight JSON,
 not fields of `forge-run --no-write`. With an already resolved current root,
 `preflight --no-auto-commission --owner-focus AUTO --format json` computes this
 readback without persisting or commissioning; it does not create a session/look.

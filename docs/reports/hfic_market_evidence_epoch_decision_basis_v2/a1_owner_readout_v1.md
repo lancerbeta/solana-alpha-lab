@@ -48,7 +48,7 @@ Owner output объясняет continuity STOP и указывает на runbo
 
 Operator readback: существующий `forge-run --no-write` показывает saved
 artifacts и identity без новой попытки. AUTO/focus counters доступны в
-`search_budget_usage` через `preflight --no-auto-commission --owner-focus AUTO
+`search_budget` через `preflight --no-auto-commission --owner-focus AUTO
 --format json` на уже разрешённом current root, без persistence/commissioning.
 При unresolved continuity budget=UNRESOLVED, не zero. При incomplete basis сначала
 восстановить валидный current input в отдельно разрешённом atom; при

@@ -87,7 +87,7 @@
     {
       "path": "catalog/assets/core.yaml",
       "bytes": 1993786,
-      "sha256": "2943f0725f25b6c1d6132abb3372d68122ddcd42ef7079d5a20edb68867f8d43"
+      "sha256": "8673713ec8e3064d1c46070a238620d6283356b476407b2d2825ee5d19015529"
     }
   ],
   "deterministic_acceptance": {

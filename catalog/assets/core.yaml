@@ -34594,7 +34594,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 32019bb585db155cf3c3362dbb677bad6e2c243e848ebf8e936e0d7d54072360}
+  integrity: {kind: sha256, sha256: 6d782b10f7199fe14cf1a0a616be26e58aab990be34801dd8ce2ffbece22a0f8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -38868,7 +38868,7 @@ records:
     repository_path: docs/reports/hfic_market_evidence_epoch_decision_basis_v2/a1_owner_readout_v1.md
   integrity:
     kind: sha256
-    sha256: 127a445e2369f09e8bfe46d399021bc71d83e4632c71b5db8baf6e917ed45369
+    sha256: ebba1bd570e98be176ce7e227284acb51a9990c201757da77487409875561ecc
   access:
     mode: read_only
     method: file
