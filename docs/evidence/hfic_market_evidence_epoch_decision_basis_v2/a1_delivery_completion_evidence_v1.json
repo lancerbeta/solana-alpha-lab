@@ -1,0 +1,67 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-MARKET-BASIS-V2-COMPLETION-001",
+  "as_of": "2026-10-02",
+  "task_id": "HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2",
+  "state_change": "V2_SCIENTIFIC_MARKET_IDENTITY_PROVEN_V1_BUDGET_CONTINUITY",
+  "base_main": "68b986e12e5752d36b3cc2e14d85a855fa90b09f",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "docs/tasks/HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_25_V2_BUDGET_54_GOLD_SPLIT_RUN_2_ORDINARY_CONSUMER_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_V2_BUDGET_25",
+      "PASS_OWNER_GOLD_54_SPLIT_RUN",
+      "PASS_ORDINARY_FINAL_2",
+      "PASS_FACTORY_STATIC",
+      "PASS_C1_C3_READONLY_BUDGET_INVENTORY"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_SCIENTIFIC_FORGE",
+    "NO_C4_ACCESS_OR_IMPORT",
+    "NO_REAL_DATA_MUTATION",
+    "NO_HISTORICAL_REWRITE",
+    "NO_QUOTA_EXPANSION",
+    "NO_PROVIDER_DEPLOY",
+    "NO_LIVE_REPAIR",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "repository_local_writes": true,
+    "real_data_plane_mutated": false,
+    "c4_imported": false,
+    "scientific_forge_run": false,
+    "historical_rewrite": false,
+    "provider_calls": 0,
+    "deploy": false
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-MARKET-BASIS-V2-FACTORY-FIT-001",
+  "as_of": "2026-10-02",
+  "task_id": "HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_DECISION_BEARING_MARKET_IDENTITY_NOT_ALPHA",
+    "flexibility_and_history": "PASS_PROVEN_V1_CONTINUITY_APPEND_ONLY_UNRESOLVED_STOP",
+    "context_efficiency": "PASS_SHARED_IDENTITY_OWNER_NO_NEW_FRAMEWORK",
+    "research_truth": "PASS_METADATA_INVARIANCE_VALIDATED_A3_PARTITION_PIT_AND_BUDGET_PROOF",
+    "owner_operability": "PASS_EXISTING_NO_WRITE_READBACK_AND_TYPED_RECOVERY_GLOSS",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_SCIENTIFIC_RUN_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_GIT_REVERT_NEVER_REWRITE_RESEARCH_HISTORY",
+    "build_vs_buy": "PASS_WRAP_EXISTING_A3_MANIFEST_VALIDATION_AND_ADMISSION",
+    "security": "PASS_NO_PROVIDER_CREDENTIALS_DEPLOY_OR_REAL_MUTATION",
+    "red_team": "PASS_INVALID_ENUMERATION_EXPLICIT_NULL_AND_AMBIGUOUS_V1_STOP_NO_FREE_SLOT"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "SEPARATELY_AUTHORIZED_LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2"
+  },
+  "recovery": "Ordinary Git revert. Never rewrite historical receipts or mutate LIVE inventory.",
+  "limits": [
+    "AMBIGUOUS_V1_REPUBLISH_CONTINUITY_BLOCKED",
+    "NO_ALPHA",
+    "NO_SCIENTIFIC_FORGE",
+    "NO_REAL_C4_ACCESS",
+    "NO_REAL_DATA_MUTATION",
+    "NO_QUOTA_EXPANSION",
+    "NO_MERGE"
+  ]
+}

@@ -860,6 +860,7 @@ def forge_control_ready(
         sessions,
         search_key=search_key,
         evidence_epoch=market_epoch,
+        market_evidence_basis=input_receipt.get("market_evidence_basis"),
         focus_key=focus_key,
         owner_focus=focus,
         memory_eligibility_sha256=memory_eligibility,

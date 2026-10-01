@@ -1,0 +1,52 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-MARKET-BASIS-V2-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-10-02",
+  "task_id": "HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_FINAL_INVENTORY_REVIEW"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_FINAL_INVENTORY_REVIEW"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_FINAL_INVENTORY_REVIEW"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_FINAL_INVENTORY_REVIEW"
+      ]
+    }
+  ],
+  "verdict": "PENDING",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "MODEL_DIVERSITY_UNPROVEN",
+    "NO_SCIENTIFIC_PASS",
+    "NO_MERGE"
+  ]
+}

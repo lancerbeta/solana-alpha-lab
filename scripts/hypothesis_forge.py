@@ -134,7 +134,8 @@ class HficCliError(Exception):
 
 
 def emit(payload: dict[str, Any], *, exit_code: int = 0) -> int:
-    rendered = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    # ASCII JSON transport preserves Unicode receipt values on Windows pipes.
+    rendered = json.dumps(payload, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
     print(rendered)
     return exit_code
 
@@ -1350,6 +1351,8 @@ def cmd_discovery_execute(
             operation_sha256=str(operation_sha256) if operation_sha256 else None,
             verified_market=epoch if temporal_query else None,
             correction=correction,
+            repo_root=repo_root,
+            data_root=explicit_data_root or store_root,
         )
     except GroundedDiscoveryError as exc:
         if temporal_query and (

@@ -138,6 +138,35 @@ Docs-only / Git-only capability drift must not reset an occupied market slot.
 Legacy combined `evidence_epoch_sha256` without a market stamp is historical
 or unresolved — never silent current reuse.
 
+**Market basis V2: publication is not a new scientific market.**
+`MARKET_EVIDENCE_BASIS_V2` hashes verified composition, immutable source/content,
+partition event/strategy availability and effective A3 scientific fields.
+Publication IDs/fingerprints/schema/clocks/full-label digest remain verified
+provenance; changing those alone does not free AUTO/focus capacity. The epoch
+algorithm version changes the displayed digest; proven V1 occupancy still
+counts. Quotas remain AUTO=1 / distinct-focus=3.
+
+Read-only owner path:
+
+1. Run the existing `forge-run --no-write` with the exact data/store roots
+   already resolved by the operator entry. It returns saved results and budget;
+   this readback does not create a session or scientific look.
+2. `MARKET_EVIDENCE_BASIS_INCOMPLETE` means current input integrity cannot be
+   established. Restore valid datasets/lineage/receipts only in a separately
+   authorized repair; do not invent a hash or treat the failure as a new market.
+3. `MARKET_EPOCH_CONTINUITY_UNRESOLVED` means historical V1 membership in the
+   current scientific market cannot be proven. Compare the saved frozen basis
+   with verified current cohort/release/content bindings. Keep the spent
+   budget blocked until proof is available; no receipt rewrite, quarantine,
+   memory reset or new session is authorized by this error.
+4. A genuinely new verified cohort or decision-bearing content/PIT/eligibility
+   change creates new market evidence. It still requires ordinary scientific
+   admission and separate owner look authority.
+
+This delivery performs no LIVE repair or C4 import. See
+`docs/reports/hfic_market_evidence_epoch_decision_basis_v2/a1_owner_readout_v1.md`
+and its scoped C1-C3 read-only proof; passing tests is not merge or science.
+
 Status:
 
 ```

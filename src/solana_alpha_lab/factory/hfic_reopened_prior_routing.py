@@ -491,6 +491,7 @@ def preview_control_reconsideration(
         sessions,
         search_key=planned_search_key,
         evidence_epoch=current_market_epoch,
+        market_evidence_basis=_market_basis,
         focus_key=focus_key_sha256(owner_focus),
         owner_focus=owner_focus,
         memory_eligibility_sha256=new_eligibility,

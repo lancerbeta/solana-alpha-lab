@@ -426,7 +426,7 @@ def owner_allowance(store: Any, operation: Mapping[str, Any], kind: str) -> int:
     return max(0, min(int(explicit) - spent, protocol))
 
 
-def _admit(store: Any, operation: Mapping[str, Any]) -> dict[str, Any]:
+def _admit(store: Any, operation: Mapping[str, Any], *, repo_root: Any = None, data_root: Any = None) -> dict[str, Any]:
     from solana_alpha_lab.factory.hfic_evidence_identity import resolve_scientific_admission
     from solana_alpha_lab.factory.hfic_preflight import (
         AUTO_SESSIONS_PER_EPOCH,
@@ -438,9 +438,23 @@ def _admit(store: Any, operation: Mapping[str, Any]) -> dict[str, Any]:
     from solana_alpha_lab.factory.hfic_session import list_hfic_sessions
 
     sessions = list_hfic_sessions(store)
+    market_basis = None
+    if repo_root is not None and data_root is not None:
+        from pathlib import Path
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            EvidenceIdentityError, compute_market_epoch_for_data_root,
+        )
+
+        try:
+            _epoch, market_basis = compute_market_epoch_for_data_root(Path(repo_root), Path(data_root))
+        except EvidenceIdentityError as exc:
+            raise OrdinaryOperationError(exc.code) from exc
+        if _epoch != operation.get("market_evidence_epoch_sha256"):
+            raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
     return resolve_scientific_admission(
         sessions,
         market_evidence_epoch=str(operation.get("market_evidence_epoch_sha256") or ""),
+        market_evidence_basis=market_basis,
         representation_id="BASE",
         representation_semantic_version="HFIC-V1.2",
         owner_focus=str(operation.get("owner_focus") or ""),
@@ -532,7 +546,7 @@ def authorize_temporal_attempt(
         stamped = operation.get("corpus_fingerprint")
         if fingerprint and stamped and fingerprint != stamped:
             raise OrdinaryOperationError("ORDINARY_OPERATION_BINDING_MISMATCH")
-        admission = _admit(store, operation)
+        admission = _admit(store, operation, repo_root=repo_root, data_root=data_root)
         if admission.get("action") == "STOP":
             raise OrdinaryOperationError(
                 str(admission.get("reason_code") or "SCIENTIFIC_ADMISSION_STOP")
@@ -621,7 +635,7 @@ def gate_before_values(
     _search_terminal_conflict(operation, looks, spec)
     from solana_alpha_lab.factory.hfic_session import list_hfic_sessions
 
-    admission = _admit(store, operation)
+    admission = _admit(store, operation, repo_root=repo_root, data_root=data_root)
     if admission.get("action") == "STOP":
         raise OrdinaryOperationError(str(admission.get("reason_code") or "SCIENTIFIC_ADMISSION_STOP"))
     from solana_alpha_lab.factory.hfic_temporal_discovery import (

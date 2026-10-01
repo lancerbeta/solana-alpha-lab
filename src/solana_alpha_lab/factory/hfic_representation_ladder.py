@@ -3180,6 +3180,7 @@ def evaluate_forge_run(
             list_hfic_sessions(store),
             reservations=list_scientific_slot_admissions(store),
             market_evidence_epoch=str(market_epoch),
+            market_evidence_basis=input_receipt.get("market_evidence_basis"),
             representation_id=active_rep,
             representation_semantic_version=active_version,
             owner_focus=owner_focus,

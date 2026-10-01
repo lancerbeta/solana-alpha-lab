@@ -32288,7 +32288,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 71bd04772906ef834a125f70e3c5a664db2475c58b03b1e55b8847ab82e49e3f}
+  integrity: {kind: sha256, sha256: 3d148ec9c7674e7b0df39cf345f5670fab0f28bfc27308498970e4ac1f5bda31}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32310,7 +32310,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: d0e36c061c48925af90b19c3786cdca35e0846a15b3801036122a6f6f71c77a0}
+  integrity: {kind: sha256, sha256: 04a118ad8f34a3266e56236b2ba6e512557c4c7f09e02d397af54d00f1b7fe68}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34194,7 +34194,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_to_forge.py', repository_path: src/solana_alpha_lab/factory/live_cohort_to_forge.py}
-  integrity: {kind: sha256, sha256: dcc49de97a93c4c0723e879730fbb8d0ab444304099318b52623feb18e45af03}
+  integrity: {kind: sha256, sha256: f2d654850a990e8c5f1dee5aadb2268331d4e53b45426fbe78cb97726c8c6525}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34594,7 +34594,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: f04e383b5d14147236b9d5390e062119441785fc13229be1de921521dfed6455}
+  integrity: {kind: sha256, sha256: a1b0ba0f7f35f75a4292a6d106854ed1208c7c67f794f936f0fe67f8350e42be}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37686,7 +37686,7 @@ records:
   as_of: '2026-09-15'
   truth_owner: HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py', repository_path: src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py}
-  integrity: {kind: sha256, sha256: f6f17e75757b3733c7246b75d8da42bcf7587daeb7af66da9342ff985cd29fda}
+  integrity: {kind: sha256, sha256: 713671b0e91c34a9a0d9a23ffa6b033c31d4cd4c202cba5039de5ea4a6bd040c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001}
@@ -38310,7 +38310,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_INPUT_TRUTH_AND_VISIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/forge_input_receipt.py', repository_path: src/solana_alpha_lab/factory/forge_input_receipt.py}
-  integrity: {kind: sha256, sha256: 64b609bff4f672a004af1c9ac5164754f32c8f90977306fb44ac72c24fa6305e}
+  integrity: {kind: sha256, sha256: aecf7cde033cc58022ff472706f7f324f631ec1e41a886c1b50341e9f217477b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001}
@@ -38404,7 +38404,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_REPRESENTATION_LADDER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_ladder.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_ladder.py}
-  integrity: {kind: sha256, sha256: dcaba3f94e34017791749f8674906df1d8dc87362a1a2e4f14af10176ccc038f}
+  integrity: {kind: sha256, sha256: 34f17ced3b777671cc96a8c0b8a74e9d409f84d8a032d34be9410c0fee775d06}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}
@@ -38484,7 +38484,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_evidence_identity.py', repository_path: src/solana_alpha_lab/factory/hfic_evidence_identity.py}
-  integrity: {kind: sha256, sha256: 189145e8ab49de52f2719333d8ddf96e9e4b7354562e64d5c23e488163c0d018}
+  integrity: {kind: sha256, sha256: 6d0e7beafb96fbe45be281a174ea01f8ec24d8da23faee3a536fad25d55d19ec}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
@@ -38503,7 +38503,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_preflight.py', repository_path: src/solana_alpha_lab/factory/hfic_preflight.py}
-  integrity: {kind: sha256, sha256: afbc74857a27df8fd850417440a34414273c7492e848a9c04b2daf0b9e8c4149}
+  integrity: {kind: sha256, sha256: d4a84e739c8ce002e41b798da78880ea9f741546b2c96d66ea5c355c751003ed}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
@@ -38522,7 +38522,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_forge_evidence_identity_and_owner_gold_v1.py', repository_path: tests/test_forge_evidence_identity_and_owner_gold_v1.py}
-  integrity: {kind: sha256, sha256: 40600c4e4cb97a399819ba73b224a81b56cfbaa5cb81063f310c0fec87a9ee69}
+  integrity: {kind: sha256, sha256: a54f360fb5cad7228048fc5398f27077931917a7dd98d7954a338fe5b1b694f2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
@@ -38734,3 +38734,162 @@ records:
   evidence: []
   search_terms: [OBSERVATION_SCHEDULE, FUTURE_CUTOVER, AS_OF, TICK, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-HFIC-MARKET-EVIDENCE-EPOCH-DECISION-BASIS-V2-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Bounded scientific market V2 identity and proven V1 budget continuity contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-02'
+  truth_owner: HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2
+  location:
+    kind: git_path
+    logical_uri: repo://docs/tasks/HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2.md
+    repository_path: docs/tasks/HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2.md
+  integrity:
+    kind: sha256
+    sha256: e3e00e69ad044caf4f9f956a472cae5623fc1fd43c92cdd1470ee0af76dfaa33
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: depends_on
+    target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001
+  - relation_type: contains
+    target_asset_id: MODULE-HFIC-EVIDENCE-IDENTITY-001
+  - relation_type: validated_by
+    target_asset_id: TEST-HFIC-MARKET-EVIDENCE-EPOCH-DECISION-BASIS-V2-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  evidence: []
+  search_terms:
+  - HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2
+  - MARKET_EVIDENCE_BASIS_V2
+  - metadata-only
+  - budget continuity
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-HFIC-MARKET-EVIDENCE-EPOCH-DECISION-BASIS-V2-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Production-shaped metadata invariance, integrity, scientific change and
+    V1 continuity tests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-02'
+  truth_owner: HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_hfic_market_evidence_epoch_decision_basis_v2.py
+    repository_path: tests/test_hfic_market_evidence_epoch_decision_basis_v2.py
+  integrity:
+    kind: sha256
+    sha256: 05f6a1d63150d7adc8dc0c35357b36d4734d205f30c54659806f57d6800b0c02
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-HFIC-MARKET-EVIDENCE-EPOCH-DECISION-BASIS-V2-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-HFIC-EVIDENCE-IDENTITY-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  evidence: []
+  search_terms:
+  - HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2
+  - MARKET_EVIDENCE_BASIS_V2
+  - metadata-only
+  - budget continuity
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-HFIC-MARKET-BASIS-V2-READONLY-BUDGET-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Scoped current C1-C3 read-only inventory and unchanged scientific budget
+    proof.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-02'
+  truth_owner: HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_readonly_budget_v1.json
+    repository_path: docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_readonly_budget_v1.json
+  integrity:
+    kind: sha256
+    sha256: f27dd323ba2782ee1a53ad5085c68e104aac1ccab1e0b62c8fd70a69ead3e4c1
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-HFIC-MARKET-EVIDENCE-EPOCH-DECISION-BASIS-V2-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  evidence: []
+  search_terms:
+  - HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2
+  - MARKET_EVIDENCE_BASIS_V2
+  - metadata-only
+  - budget continuity
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: REPORT-HFIC-MARKET-BASIS-V2-OWNER-READOUT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Owner outcome, limits, validation and next separate LIVE repair boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-02'
+  truth_owner: HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2
+  location:
+    kind: git_path
+    logical_uri: repo://docs/reports/hfic_market_evidence_epoch_decision_basis_v2/a1_owner_readout_v1.md
+    repository_path: docs/reports/hfic_market_evidence_epoch_decision_basis_v2/a1_owner_readout_v1.md
+  integrity:
+    kind: sha256
+    sha256: 98ec645e93ca97bd19522b69579b66db5bbc7730070ebdb7253d44b78c499c4c
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-HFIC-MARKET-EVIDENCE-EPOCH-DECISION-BASIS-V2-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-HFIC-MARKET-BASIS-V2-READONLY-BUDGET-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  evidence: []
+  search_terms:
+  - HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2
+  - MARKET_EVIDENCE_BASIS_V2
+  - metadata-only
+  - budget continuity
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
