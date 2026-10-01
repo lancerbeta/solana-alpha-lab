@@ -32686,7 +32686,7 @@ records:
   as_of: '2026-09-30'
   truth_owner: FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1.md', repository_path: docs/tasks/FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1.md}
-  integrity: {kind: sha256, sha256: 8ab996e3742e5bc9914a5734ee4324ac62d0fb84726ae79f7e1a4d70ab59022f}
+  integrity: {kind: sha256, sha256: 95a1e933c8a4e8b2befa78421c866399264b563b35894c1f1702e6d49a07d998}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ARCH-INTENT-006}
@@ -32705,7 +32705,7 @@ records:
   as_of: '2026-09-30'
   truth_owner: FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/hfic_scientific_disposition_continuity_v1.md', repository_path: docs/contracts/hfic_scientific_disposition_continuity_v1.md}
-  integrity: {kind: sha256, sha256: cd45ce2c8aa0029982ce12405659ea4736461fb808f017c10773b7fb09964631}
+  integrity: {kind: sha256, sha256: 71a4e03ff24de58f3c45b0bb4b185e0eab7ba5056c7b4a3b3b013199d64d807d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001}
@@ -34594,7 +34594,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: c14ee0c5e4bb995bd7019a97a797784c6df7411032d6126305aed6584922afd6}
+  integrity: {kind: sha256, sha256: f04e383b5d14147236b9d5390e062119441785fc13229be1de921521dfed6455}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34612,7 +34612,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: 2264cd3171bb0b951c68483c4ac4227b1280a3362b9cb780e46e5f2f0df0bd84}
+  integrity: {kind: sha256, sha256: 2cb356b958bc0826662c0b3bc1aef6e366581f741e6a0c50e34325c4a1af5d19}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}

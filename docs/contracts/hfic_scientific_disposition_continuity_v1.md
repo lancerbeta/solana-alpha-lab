@@ -25,10 +25,29 @@ the existing endogenous classification keeps them out of the market evidence
 epoch. `author_role`, `model` and `effort` are declared by the submitter, not
 verified identity; `author_role: OWNER` is not an owner decision.
 
-## Commands
+## Commands and authority
 
-All three are safe to run without authority. `forge-run --no-write` is a
-read-only readback despite its name; it never starts a run.
+The assessment artifact itself grants no authority. What a command may do is
+decided by the scope it runs in:
+
+| Command | Effect | Authority needed |
+|---|---|---|
+| `disposition-show` | read-only | none; grants no mutation authority |
+| `disposition-record --preview` | read-only validation and exact append plan | none; grants no mutation authority |
+| `disposition-record` (no `--preview`) | **appends to the ResearchStore** | an already-authorized bounded scope (below) |
+
+- Inside an explicitly invoked `/hypothesis-forge`, one assessment produced by
+  that authorized bounded run may be appended as part of the existing
+  `ZERO_MID_CYCLE_OWNER_INTERVENTION` scope: no extra owner prompt. This does
+  not widen scientific look, provider, data or experiment authority.
+- A standalone write outside such a run requires an explicit mutation/OPERATE
+  scope from the owner.
+- Every `HISTORICAL_IMPORT`, including the planned post-merge import of the
+  three real historical assessments, is outside the slash cycle and requires a
+  separate explicit OPERATE authorization.
+
+`forge-run --no-write` is a read-only readback despite its name; it never
+starts a run.
 
 ```text
 # read (exact detail, paging; reads no outcome rows)
@@ -111,7 +130,8 @@ Current values for every journal of the focus are in `disposition-show` → `jou
 keep only the attempts the author actually covered. Each attempt must resolve exactly, otherwise
 `DISPOSITION_FRONTIER_UNRESOLVED`. `--preview` shows `would_be_applicability` before any write.
 An import is not current because it was imported: if the store moved on, it reads
-`REVIEW_REQUIRED`.
+`REVIEW_REQUIRED`. A historical import is never part of a `/hypothesis-forge` run; it
+needs its own explicit OPERATE authorization.
 
 ## Applicability (computed on read, never stored)
 

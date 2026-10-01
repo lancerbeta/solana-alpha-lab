@@ -144,6 +144,27 @@ NEXT: >-
   using disposition-record --preview then append with HISTORICAL_IMPORT
   provenance and exact source SHA checks.
 
+AUTHORITY_SEMANTICS: the assessment artifact grants no authority.
+`disposition-show` and `disposition-record --preview` are read-only. A
+non-preview `disposition-record` appends to the ResearchStore and is allowed
+without an extra mid-cycle owner prompt only for the one assessment produced
+by an explicitly invoked `/hypothesis-forge` run (existing
+ZERO_MID_CYCLE_OWNER_INTERVENTION scope, no wider look/provider/experiment
+authority); a standalone write needs an explicit mutation/OPERATE scope; every
+HISTORICAL_IMPORT, including the planned import of the three real historical
+assessments, is outside the slash cycle and needs a separate explicit OPERATE
+authorization.
+
+README semantic impact = NONE: the existing generic bootstrap is sufficient
+after the semantic-route update; a feature-specific README entry would
+duplicate navigation. (Preserving the historical harness acceptance pin on
+README.md is a constraint, not the primary reason.)
+
+FRESH_CONTEXT_ACCEPTANCE: the one bounded attempt was NOT_PASS_NAVIGATION_GAP;
+the defect was fixed in this atom and the deterministic navigation regression
+covers that exact owner phrasing; fresh-agent behaviour after the fix remains
+NOT_PROVEN. Deterministic V1-V4 are the primary proof.
+
 POST_MERGE_ADOPTION_TARGETS (verification targets only, not pre-merge inputs):
 journal 58d69e4384549b48a09616ba2e1fb6d947a9dd8d5197e2bb3678c2049fe6cba1;
 market ae771cf5c1e7692c007b442c0048e7547005dc09125eeb9eb75e24406e429749;

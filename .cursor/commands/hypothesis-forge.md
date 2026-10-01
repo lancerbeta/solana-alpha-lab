@@ -159,8 +159,9 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
 ```
 
 `scientific_context` in the readout is recorded advice, not `next_action`.
-Write a new assessment with `disposition-record`; see the skill's Ordinary
-operation section and `docs/contracts/hfic_scientific_disposition_continuity_v1.md`.
+This run's own assessment is written with `disposition-record`; standalone writes
+and historical imports need separate authority (skill Authority section and
+`docs/contracts/hfic_scientific_disposition_continuity_v1.md`).
 
 ## Representation mode boundary
 

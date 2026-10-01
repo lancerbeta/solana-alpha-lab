@@ -37,9 +37,10 @@ looks. Revise that exact result with `discovery-execute ... --correct-result-ref
 one `CALCULATION_REVISION` with `new_look=false` and spends no MAIN. Then read
 the saved question again.
 
-After reading a saved result or finishing a bounded pre-values synthesis,
-record the authored assessment with `disposition-record --input <packet>`
-(normal path, not a backfill). An unwritten assessment stays `NOT_RECORDED`;
+After reading a saved result or finishing a bounded pre-values synthesis
+inside this authorized run, record its authored assessment with
+`disposition-record --input <packet>` (normal path, not a backfill; see
+Authority for when a write is allowed). An unwritten assessment stays `NOT_RECORDED`;
 do not invent a non-candidate, session or `NO_WORTHY`. `forge-run --no-write`
 shows `scientific_context` as advice beside, never instead of, the machine
 `next_action`; it opens, closes and budgets nothing. Contract, packet shape and
@@ -81,9 +82,17 @@ commissioning on the same canonical data root if genuinely required;
 process-owned OS temp files; append-only RDP writes for context artifact,
 session/cycle, all candidate versions, frozen Critic packet, Critic result,
 revision receipt, classifier receipt, decisions, session receipt, next
-epistemic action and terminal; automatic isolated Critic handoff; network-free
-deterministic lane classification; finalize; replay/resume/`prove-runtime`;
-cleanup of process-owned temp files.
+epistemic action and terminal; one authored assessment produced by this run
+via `disposition-record` (preview and read are always allowed); automatic
+isolated Critic handoff; network-free deterministic lane classification;
+finalize; replay/resume/`prove-runtime`; cleanup of process-owned temp files.
+
+Scientific dispositions: the assessment record itself grants no authority and
+never widens look, provider, data or experiment scope. `disposition-show` and
+`disposition-record --preview` are read-only. A non-preview
+`disposition-record` outside an explicitly invoked run needs an explicit
+mutation/OPERATE scope. Any `HISTORICAL_IMPORT` is outside the slash cycle and
+needs a separate explicit OPERATE authorization.
 
 In `CURRENT_REPRESENTATION_CONTROL_V1`, Prompt A RDP access is limited to the
 coarse `FORGE_CONTEXT_PACKET` and labels/fingerprints already in that packet —

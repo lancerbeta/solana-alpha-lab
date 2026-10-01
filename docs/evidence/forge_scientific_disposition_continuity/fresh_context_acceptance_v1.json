@@ -43,5 +43,7 @@
   "independent_verification": "OWNER_PROMPT_IN_HANDBACK",
   "project_sources_disposition": {
     "kind": "NO_CHANGE"
-  }
+  },
+  "deterministic_regression": "tests/test_hfic_scientific_disposition_navigation_v1.py::test_owner_phrasings_reach_the_read_command covers the exact owner phrasing",
+  "fresh_agent_behavior_after_fix": "NOT_PROVEN"
 }

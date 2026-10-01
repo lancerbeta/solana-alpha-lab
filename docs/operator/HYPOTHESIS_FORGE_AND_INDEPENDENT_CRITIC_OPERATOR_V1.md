@@ -50,8 +50,12 @@ When present, `scientific_disposition_context` in the same packet (≤4096 bytes
 assessments for this focus: exact question assessments and bounded search
 assessments with their applicability status. It is prior context, not a
 suppression capsule and not `ranked_prior_candidate_ids`; omitted entries are
-counted with an exact `disposition-show` query. New assessments are written
-with `disposition-record` (`docs/contracts/hfic_scientific_disposition_continuity_v1.md`).
+counted with an exact `disposition-show` query. Inside an explicitly invoked
+`/hypothesis-forge`, the one assessment produced by that run is appended with
+`disposition-record` without an extra owner prompt; `disposition-show` and
+`--preview` are read-only. A standalone write needs an explicit mutation/OPERATE
+scope, and any `HISTORICAL_IMPORT` needs a separate OPERATE authorization
+(`docs/contracts/hfic_scientific_disposition_continuity_v1.md`).
 
 **Canonical operator prefix:** `uv run --locked --managed-python python -B scripts/hypothesis_forge.py`.
 Required interpreter is CPython `3.13.14` from `.python-version` /
