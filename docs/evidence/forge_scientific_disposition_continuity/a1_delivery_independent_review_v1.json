@@ -4,8 +4,8 @@
   "review_id": "FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-REVIEW-001",
   "as_of": "2026-09-30",
   "task_id": "FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1",
-  "reviewed_bindings_sha256": "76214311161fe3b803b649474b0b22e9e226da30e18818e46264a04c567ac00a",
-  "reviewed_inventory_sha256": "77607d7ee68af677ddb8f14b74590fe52906a28303aabd049ba2c1cceb5503ce",
+  "reviewed_bindings_sha256": "5a82de2d2efeb8a1bbc1c127f696659eba97d871304bf66bde7324cd8e94a22a",
+  "reviewed_inventory_sha256": "82ade23189174c54f1d7fe2f5de2d232c46d9e3adac99c63eeb431095daeef4b",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

@@ -16,8 +16,7 @@
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "2264cd3171bb0b951c68483c4ac4227b1280a3362b9cb780e46e5f2f0df0bd84",
     ".cursor/commands/hypothesis-forge.md": "0db546297d0b480f46b28fba95614896e2e0b96dd85b58083c25050607597304",
-    "README.md": "d1a722625fc9dec6aafa6bff57574f1e142c30089f0ad49f36dbfd998e6b47e4",
-    "catalog/assets/core.yaml": "6fecb9f24b45aa69bc829409604474bd72fc1334827b0bcef1816155c4d073a6",
+    "catalog/assets/core.yaml": "1a5112799eb7907bd01e537d606ddfc8c267ba8f32e9f24c4f6f477083cdda91",
     "catalog/assets/lifecycle.yaml": "762b82ae0ee0d08733ab478b546b3917f614a3fc614ea5ddebd383b183fc7249",
     "catalog/catalog_manifest.yaml": "40ab0313aa4addc97d7b313513503b775731a03ecd7d82a803a15f2164271714",
     "catalog/generated/asset_edges.json": "a813c19c2d95d3291fc70bed526a7aec7b54d4af2afeafcbb19f518ed4154a19",
@@ -25,10 +24,10 @@
     "configs/factory_semantic_operability_v1.yaml": "ebc98670c0185c505ba7750031f9fafdae2ca79adc53135236983153ac29cccb",
     "docs/PROJECT_MAP.md": "61750e2076004272bb68448db12d82c18c0c46189bbd6480a3d0f48a2fe26880",
     "docs/contracts/hfic_scientific_disposition_continuity_v1.md": "cd45ce2c8aa0029982ce12405659ea4736461fb808f017c10773b7fb09964631",
-    "docs/evidence/forge_scientific_disposition_continuity/fresh_context_acceptance_v1.json": "d30f23e32a95c785ee626cf183632e3ca50cbd4547bd594deaaf7aca49e6a82a",
+    "docs/evidence/forge_scientific_disposition_continuity/fresh_context_acceptance_v1.json": "3025ad781f73e06754b592afa0cdce1596ded51a83f4b3c4d2ec4baf7b20147a",
     "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "36dd00a912d2171fa9117f2ed412923fa11f91d55efaa03987f4a539dd8b78d0",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "c14ee0c5e4bb995bd7019a97a797784c6df7411032d6126305aed6584922afd6",
-    "docs/tasks/FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1.md": "4e00e943282b54bf3ee2239864762cf8092cab6a3c3fc4acdeb6691b9512aafc",
+    "docs/tasks/FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1.md": "8ab996e3742e5bc9914a5734ee4324ac62d0fb84726ae79f7e1a4d70ab59022f",
     "scripts/hypothesis_forge.py": "52dc14da867cd9896a3a46df9b546f3be7f320537a75731ed5591d3c7ac1a4b1",
     "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "189145e8ab49de52f2719333d8ddf96e9e4b7354562e64d5c23e488163c0d018",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "afbc74857a27df8fd850417440a34414273c7492e848a9c04b2daf0b9e8c4149",
@@ -46,14 +45,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_scientific_disposition_continuity/a1_delivery_factory_fit_v1.json",
-    "sha256": "331b7b84683ce9fd4c007d17f6f9554e4adbc65a9a1402c546ee1c0d23994347",
+    "sha256": "9d60f36a567174a68733a0609f68a5c410326320ef7679ad9d31d55355795312",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_DISPOSITION_CONTINUITY_25_TESTS_AND_PROTECTED_NEIGHBOUR_SUITES",
     "independent_review": {
       "path": "docs/evidence/forge_scientific_disposition_continuity/a1_delivery_independent_review_v1.json",
-      "sha256": "98f67c83c57f8ce923cbc0634f2177ec2c660a5d9043b3c86b7e75a30d5ffb0c",
+      "sha256": "352ceb57171a96969d9b353da3982a00d6b0e82e2eb09e0ab8264cf9a61d21f6",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
