@@ -32,6 +32,7 @@ def _run(*args: str) -> subprocess.CompletedProcess[str]:
 class DispositionNavigationTests(unittest.TestCase):
     def test_owner_phrasings_reach_the_read_command(self) -> None:
         for question in (
+            "Что уже заключили по этой работе, что осталось непроверенным и что разрешено делать дальше?",
             "Что уже заключили по этой работе, почему остановились?",
             "What did we already conclude about this question or search scope?",
             "прошлый вывод по вопросу",

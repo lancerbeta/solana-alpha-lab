@@ -129,7 +129,7 @@ UNCERTAINTY_REMOVED: >-
 CAPABILITY_OR_EVIDENCE: >-
   Module, schema, disposition-record/disposition-show, forge-run overlay,
   preflight capsule, capability-surface registration, Catalog/semantic
-  navigation, skill/operator/README entries, deterministic V1-V4 tests on
+  navigation, skill/operator entries (README impact NONE), deterministic V1-V4 tests on
   production-built portable stores, protected-neighbour regressions and an
   isolated fresh-context acceptance attempt.
 

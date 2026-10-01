@@ -54,7 +54,7 @@ starts a run.
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py disposition-show --owner-focus <FOCUS> [--journal-scope <sha>] [--subject-key <sha>] [--record-id <ref>] [--offset N] --format json
 # preview a write (validates, shows the exact append plan, never writes)
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py disposition-record --input <packet.json> --preview --format json
-# write (normal path for every new assessment)
+# write (appends to the store; only inside an authorized scope, see the table above)
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py disposition-record --input <packet.json> --format json
 ```
 
@@ -143,7 +143,7 @@ needs its own explicit OPERATE authorization.
 | `WITHDRAWN` | explicit withdrawal is the head; the question is not listed again as `NOT_RECORDED` | none; a new assessment supersedes the withdrawal |
 | `CONFLICT` | more than one head (restored fork); never latest-wins | **STOP** for this subject; writes are refused; owner resolution |
 | `UNREADABLE` | a record of this subject is corrupt/unsupported, or its bound result is missing | **STOP** for this subject; writes are refused; owner resolution |
-| `NOT_RECORDED` | a saved calculation in this focus's journal with no assessment | write one with `disposition-record` |
+| `NOT_RECORDED` | a saved calculation in this focus's journal with no assessment | write one with `disposition-record` (within an authorized scope; see Commands and authority) |
 
 CONFLICT and UNREADABLE are not repaired by another append; resolving them
 (for example restoring the missing result or choosing a head) is an owner

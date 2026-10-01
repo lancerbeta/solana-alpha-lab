@@ -3020,7 +3020,8 @@ def build_parser() -> argparse.ArgumentParser:
         "disposition-record",
         help=(
             "Record one authored scientific assessment/withdrawal (ORDINARY_SCIENTIFIC_DISPOSITION_V1). "
-            "Advice only: no look, budget, admission or session."
+            "Without --preview it appends to the ResearchStore: run it only inside an authorized scope "
+            "(see the contract). Advice only: no look, budget, admission or session."
         ),
     )
     disposition_record.add_argument(
