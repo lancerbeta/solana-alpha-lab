@@ -1,7 +1,7 @@
 """LIVE CORPUS local logical-row identity for census/observations parquet.
 
-Bound to CENSUS_RELEASE_SCHEMA and OBS_RELEASE_SCHEMA only. Not a generic
-identity framework. Streaming / bounded-memory.
+Current release writer and frozen stored-partition projections are distinct.
+Only CENSUS-20, OBS-21 and OBS-24 are supported. Streaming / bounded-memory.
 """
 
 from __future__ import annotations
@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 import pyarrow as pa
+import pyarrow.parquet as pq
 
 from solana_alpha_lab.factory.live_cohort_source_bundle import (
     BATCH_SIZE,
@@ -34,6 +35,42 @@ VALIDATION_RECEIPT_SCHEMA_VERSION = "1.0"
 CANONICAL_METADATA_SUFFIX = ".canonical-v1"
 KIND_CENSUS = "CENSUS"
 KIND_OBS = "OBS"
+
+# Frozen layouts, not a projection of a future writer schema. In particular,
+# ABSENT legacy clock columns and explicit current NULL columns hash differently.
+CENSUS20_SCHEMA = pa.schema([(name, pa.string()) for name in (
+    "release_id", "cohort_id", "source_schedule_sha256", "activation_id",
+    "producer_git_sha", "mint", "discovery_first_reliable_available_at",
+    "authoritative_anchor", "candidate_state", "membership_state",
+    "denominator_state", "sampling_policy", "sampling_seed",
+    "inclusion_probability", "selected_or_excluded", "exclusion_reason",
+    "discovery_coverage_class", "source_request_sha256", "source_response_sha256",
+    "evidence_role",
+)])
+OBS21_SCHEMA = pa.schema([
+    ("release_id", pa.string()), ("cohort_id", pa.string()), ("mint", pa.string()),
+    ("point_id", pa.string()), ("primitive_id", pa.string()), ("field_id", pa.string()),
+    ("value_kind", pa.string()), ("typed_value", pa.string()), ("state", pa.string()),
+    ("missing_reason", pa.string()), ("event_time", pa.string()),
+    ("request_started_at", pa.string()), ("response_received_at", pa.string()),
+    ("first_reliable_available_at", pa.string()), ("request_sha256", pa.string()),
+    ("response_sha256", pa.string()), ("call_occurrence_id", pa.string()),
+    ("http_status", pa.int64()), ("http_class", pa.string()),
+    ("evidence_role", pa.string()), ("confirmatory_reuse_forbidden", pa.bool_()),
+])
+OBS24_SCHEMA = pa.schema([
+    ("release_id", pa.string()), ("cohort_id", pa.string()), ("mint", pa.string()),
+    ("point_id", pa.string()), ("primitive_id", pa.string()), ("field_id", pa.string()),
+    ("value_kind", pa.string()), ("typed_value", pa.string()), ("state", pa.string()),
+    ("missing_reason", pa.string()), ("event_time", pa.string()),
+    ("request_started_at", pa.string()), ("response_received_at", pa.string()),
+    ("first_reliable_available_at", pa.string()), ("request_sha256", pa.string()),
+    ("response_sha256", pa.string()), ("call_occurrence_id", pa.string()),
+    ("http_status", pa.int64()), ("http_class", pa.string()),
+    ("observation_clock_policy", pa.string()), ("source_price_event_time", pa.string()),
+    ("member_anchor", pa.string()), ("evidence_role", pa.string()),
+    ("confirmatory_reuse_forbidden", pa.bool_()),
+])
 
 
 class LiveCorpusLogicalRowError(ValueError):
@@ -75,7 +112,22 @@ def live_corpus_schema_projection() -> dict[str, Any]:
         "observations": schema_field_projection(OBS_RELEASE_SCHEMA),
         "profile": SCHEMA_PROFILE,
         "schema_id": "SCHEMA-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+        "stored_partition_projections": {
+            "CENSUS-20": schema_field_projection(CENSUS20_SCHEMA),
+            "OBS-21": schema_field_projection(OBS21_SCHEMA),
+            "OBS-24": schema_field_projection(OBS24_SCHEMA),
+        },
     }
+
+
+def select_stored_partition_projection(kind: str, physical_schema: pa.Schema) -> pa.Schema:
+    """Exact fields/types/nullability; never guess a layout from row values."""
+    _require(kind in {KIND_CENSUS, KIND_OBS}, "LIVE_CORPUS_PARTITION_KIND_INVALID")
+    supported = (CENSUS20_SCHEMA,) if kind == KIND_CENSUS else (OBS21_SCHEMA, OBS24_SCHEMA)
+    for frozen in supported:
+        if physical_schema.equals(frozen, check_metadata=False):
+            return frozen
+    raise LiveCorpusLogicalRowError("LIVE_CORPUS_PARTITION_SCHEMA_UNSUPPORTED")
 
 
 def live_corpus_schema_sha256() -> str:
@@ -240,11 +292,12 @@ def measure_live_corpus_parquet(
     kind: str,
     partition_id: str,
     logical_location: str,
+    stored_claims: LiveCorpusPartitionClaims | None = None,
 ) -> LiveCorpusPartitionClaims:
     _require(kind in {KIND_CENSUS, KIND_OBS}, "LIVE_CORPUS_PARTITION_KIND_INVALID")
     parquet_path = Path(path)
     _require(parquet_path.is_file() and not parquet_path.is_symlink(), "LIVE_CORPUS_PARQUET_MISSING")
-    schema = CENSUS_RELEASE_SCHEMA if kind == KIND_CENSUS else OBS_RELEASE_SCHEMA
+    schema = select_stored_partition_projection(kind, pq.ParquetFile(parquet_path).schema_arrow)
     file_sha256 = sha256_file_streaming(parquet_path)
     digest = hashlib.sha256()
     digest.update(b"[")
@@ -297,7 +350,7 @@ def measure_live_corpus_parquet(
         min_event, max_event = None, None
     if not available_representable:
         min_available, max_available = None, None
-    return LiveCorpusPartitionClaims(
+    claims = LiveCorpusPartitionClaims(
         kind=kind,
         partition_id=partition_id,
         logical_location=logical_location,
@@ -309,6 +362,10 @@ def measure_live_corpus_parquet(
         min_available_to_strategy_at=min_available,
         max_available_to_strategy_at=max_available,
     )
+    if stored_claims is not None:
+        _require(claims.file_sha256 == stored_claims.file_sha256, "CORPUS_PARQUET_SHA_MISMATCH")
+        _require(claims == stored_claims, "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
+    return claims
 
 
 def write_parquet_and_confirm_logical_hash(

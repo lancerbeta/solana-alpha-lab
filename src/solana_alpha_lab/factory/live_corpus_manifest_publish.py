@@ -528,6 +528,7 @@ def _measure_parquet(
     partition_id: str,
     logical_location: str,
     measured: list[str],
+    stored_claims: LiveCorpusPartitionClaims | None = None,
 ) -> LiveCorpusPartitionClaims:
     try:
         claims = measure_live_corpus_parquet(
@@ -535,6 +536,7 @@ def _measure_parquet(
             kind=kind,
             partition_id=partition_id,
             logical_location=logical_location,
+            stored_claims=stored_claims,
         )
     except LiveCorpusLogicalRowError as exc:
         raise _wrap_logical(exc) from exc
@@ -1040,6 +1042,8 @@ def repair_live_corpus_manifests(
     claims: list[LiveCorpusPartitionClaims] = []
     # Repair always measures parquet and logical rows; never fills a cache in
     # the old root. Lineage is an immutable scientific composition binding.
+    saved_claims = ({part.partition_id: claims_from_partition(part) for part in old["partitions"]}
+                    if is_canonical else {})
     for item in cohorts:
         cohort_claims = []
         for kind, rel_key, sha_key, count_key, suffix in (
@@ -1055,7 +1059,8 @@ def repair_live_corpus_manifests(
             _require(sha256_file_streaming(path) == item[sha_key], "CORPUS_PARQUET_SHA_MISMATCH")
             claim = _measure_parquet(path, kind=kind,
                 partition_id=f"PARTITION-LIVE-COHORT-{item['cohort_id']}{suffix}",
-                logical_location=rel, measured=measured)
+                logical_location=rel, measured=measured,
+                stored_claims=saved_claims.get(f"PARTITION-LIVE-COHORT-{item['cohort_id']}{suffix}"))
             _require(claim.row_count == int(item[count_key]), "LIVE_CORPUS_ROW_COUNT_MISMATCH")
             cohort_claims.append(claim)
         _require(sha256_files_concat_streaming([root / str(item["census_rel"]), root / str(item["obs_rel"])])
