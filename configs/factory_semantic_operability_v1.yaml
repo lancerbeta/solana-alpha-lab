@@ -229,6 +229,9 @@ routes:
       - collector stale monitoring
       - SOURCE_DATA_STALE
       - source poll
+      - campaign successor
+      - collector writes data
+      - запись collector
     consumers: [GOAL-OWNER, FACTORY-001]
     root_binding_ids: [ACTIVE-LIFECYCLE-COLLECTOR]
     root_asset_ids: [CONFIG-OBSERVATION-SCHEDULE-RUNTIME-V1-001]

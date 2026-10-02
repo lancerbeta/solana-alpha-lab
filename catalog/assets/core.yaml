@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: ad172e732f461278d8875e42ddda20845f535c1860bcb90e7af1b73f07ba33cc}
+  integrity: {kind: sha256, sha256: 68813931879d4444ee5168f360dc6356aba2198886ebe17c82be1b65c74c0074}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -33956,7 +33956,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_read_model.py', repository_path: src/solana_alpha_lab/factory/collector_read_model.py}
-  integrity: {kind: sha256, sha256: 06562fe74d2bf4be2f4e828dfaa2bb2465c39a3940e250da05e37e62265e978d}
+  integrity: {kind: sha256, sha256: c7149673595fa05bea727707bf51ad6d3bc45a8523e5df57020a7acd4d4cc0d2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001}
@@ -34340,7 +34340,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: b735c056bcd8e418b83abfd93a12a928cfdce858e7319d189aab4992eee78186}
+  integrity: {kind: sha256, sha256: a908a8f3fd894818b7ae11f673161d9b302304e7f2c4f143514022b75b794282}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -34361,7 +34361,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_owner_pulse.py', repository_path: src/solana_alpha_lab/factory/collector_owner_pulse.py}
-  integrity: {kind: sha256, sha256: 8a689388574232aec59ece9ed2ff4fa44548c5c7059f9ef7d833c255b0f3e97d}
+  integrity: {kind: sha256, sha256: 830aaf66c8eec479580bc1d17ab93ab4f069992beff948f5f61e4e437f470aea}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -34541,7 +34541,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: ebc98670c0185c505ba7750031f9fafdae2ca79adc53135236983153ac29cccb}
+  integrity: {kind: sha256, sha256: 5c273dccb867b31e345743e6d93e06799b5a25fa386d565c17745f9e9d4c8fc5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34667,7 +34667,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/semantic_route_gold_queries_v1.yaml', repository_path: catalog/fixtures/semantic_route_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: 2931c424779d6b979109860df6bdc521d0f02e2703937d7210a4c111f386838c}
+  integrity: {kind: sha256, sha256: 6787cc13eb2ae164c252501dba8a25bd13e290d644f29d66616fe67798676713}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -36443,7 +36443,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_UNATTENDED_OPERABILITY.md', repository_path: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md}
-  integrity: {kind: sha256, sha256: 1ff4b16f6c0f712a33150e93fc9481d8ad0205fa063db01536bab32c9865d407}
+  integrity: {kind: sha256, sha256: 29f55fe1153b779056d9d9cd2259b43f5b5b70b23fe6971f7cb5ba9860ccad3c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
@@ -36463,7 +36463,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_unattended_operability_closure_v1.py', repository_path: tests/test_factory_unattended_operability_closure_v1.py}
-  integrity: {kind: sha256, sha256: 2045c46a5bc569087a996bd327bc3549ca5d4b790a0f32e75b58abc30822a2c9}
+  integrity: {kind: sha256, sha256: d2d86238f12b106e1791408ffaccb3c6e45aafe829b8c3e70ca6e7e24f8d3240}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001}
@@ -39242,6 +39242,194 @@ records:
   - OBS-24
   - frozen projection
   - mixed corpus
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CTRL-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Owner-named offline bounded call diagnostics contract; no live deployment authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-02'
+  truth_owner: FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/tasks/FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1.md
+    repository_path: docs/tasks/FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1.md
+  integrity:
+    kind: sha256
+    sha256: 3ecdfbccbe28b9f119c01ac63695ef103d317d292d62992a72b2ed44cbb46949
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations: []
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1
+  - bounded call diagnostics
+  - watch OOM
+  - MemoryPeak
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Scope/time/provider edge truth, vertical fake delivery, snapshot heartbeat and full-packet memory scaling proofs.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-02'
+  truth_owner: FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_factory_operability_bounded_call_diagnostics_v1.py
+    repository_path: tests/test_factory_operability_bounded_call_diagnostics_v1.py
+  integrity:
+    kind: sha256
+    sha256: d74c06b99e68fef6a643a5cf7e3de2cd04fac22799867b6b74f72c0df9bd262c
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-COLLECTOR-READ-MODEL-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1
+  - bounded call diagnostics
+  - watch OOM
+  - MemoryPeak
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCRIPT-FACTORY-OPERABILITY-RESOURCE-PROFILE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Reproducible local synthetic fixture and fresh-process full-consumer resource measurement; no live store.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-02'
+  truth_owner: FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1
+  location:
+    kind: git_path
+    logical_uri: repo://tests/operability_bounded_call_profile.py
+    repository_path: tests/operability_bounded_call_profile.py
+  integrity:
+    kind: sha256
+    sha256: 22cc892bb476df62151b278e751f8d85d57d2759a3776291a4ef8cc6840e80b5
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-COLLECTOR-READ-MODEL-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1
+  - bounded call diagnostics
+  - watch OOM
+  - MemoryPeak
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-FACTORY-OPERABILITY-BOUNDED-CALL-RESOURCES-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Offline BEFORE/AFTER, doubled history and 2 GiB fixture resource evidence; no live MemoryPeak proof.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-02'
+  truth_owner: FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/factory_operability_bounded_call_diagnostics/a1_resource_profile_v1.json
+    repository_path: docs/evidence/factory_operability_bounded_call_diagnostics/a1_resource_profile_v1.json
+  integrity:
+    kind: sha256
+    sha256: bf5c75992c5994425e5e4d4b2fccb381a5d0fffa793b64dea3ce217e026c6dc1
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001
+  - relation_type: depends_on
+    target_asset_id: SCRIPT-FACTORY-OPERABILITY-RESOURCE-PROFILE-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1
+  - bounded call diagnostics
+  - watch OOM
+  - MemoryPeak
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: REPORT-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Owner resource readout, UNKNOWNs and separately gated commissioning/rollback boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-02'
+  truth_owner: FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/reports/factory_operability_bounded_call_diagnostics/a1_owner_readout_v1.md
+    repository_path: docs/reports/factory_operability_bounded_call_diagnostics/a1_owner_readout_v1.md
+  integrity:
+    kind: sha256
+    sha256: d455c25da6a984578887756ce72ed2a332708dff20520a70775b00c4a0b968c7
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-FACTORY-OPERABILITY-BOUNDED-CALL-RESOURCES-001
+  - relation_type: depends_on
+    target_asset_id: DOC-FACTORY-UNATTENDED-OPERABILITY-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1
+  - bounded call diagnostics
+  - watch OOM
+  - MemoryPeak
   classification:
     contains_secrets: false
     contains_raw_data: false

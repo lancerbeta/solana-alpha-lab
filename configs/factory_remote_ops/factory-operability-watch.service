@@ -6,6 +6,8 @@ After=network-online.target
 
 [Service]
 Type=oneshot
+MemoryMax=768M
+TimeoutStartSec=180s
 WorkingDirectory=/opt/solana-alpha-lab
 EnvironmentFile=-/etc/solana-alpha-lab/secrets.env
 ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/factory_operability_watch.py --mode emit

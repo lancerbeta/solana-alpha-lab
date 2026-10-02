@@ -52,7 +52,7 @@ def main(argv: list[str] | None = None) -> int:
 
     runtime = load_runtime_config(ROOT, args.runtime_config)
     ops_rel = str(runtime["ops_store_relative"])
-    store = ObservationScheduleStore((ROOT / ops_rel).resolve())
+    store = ObservationScheduleStore((ROOT / ops_rel).resolve(), readonly=True, immutable=False)
     now = parse_utc(args.now) if args.now else datetime.now().astimezone()
     remote = load_config_v1_1(ROOT)
     producer_git_sha = git_sha(ROOT, runtime.get("producer_git_sha"))

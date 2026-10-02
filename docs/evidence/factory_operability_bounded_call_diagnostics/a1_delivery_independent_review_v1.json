@@ -1,0 +1,166 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-OPERABILITY-BOUNDED-CALL-REVIEW-001",
+  "as_of": "2026-10-02",
+  "task_id": "FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1",
+  "reviewed_bindings_sha256": "9cdb63d4cc8babde5029af8fc0f94b8fb99d5642cc066a1458182b46eab2a256",
+  "reviewed_inventory_sha256": "95a6ebb2e2e05cf5c9dc7a733ded1ab1a1b4b5d1913bdb4ded2a6b207f5a917f",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READ_ONLY: frozen candidate, diff and all 29 committed bindings verified; clean worktree and unchanged head.",
+        "Prior P2 closed: both documented recovery JSON locators execute against actual probe output; exact scope and missing locator UNKNOWN/BLOCKED are explicit.",
+        "Four executable runbook command tests independently PASS; payload access and mutation denied, SQLite/WAL bytes preserved.",
+        "Production, profiles and caps unchanged by operator correction; Catalog/TASK21 pin propagation is mechanical only."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READ_ONLY: exact bounded DoD, frozen diff, packet diff hash and all 29 bindings verified.",
+        "18 regression tests independently repeated PASS, including actual probe, both recovery consumers and unchanged SQLite/WAL.",
+        "Prior recovery gap closed: scope is returned and verified; missing locator stays UNKNOWN/BLOCKED; raw ID is not immutable/as-of proof.",
+        "Production, resource profiles, caps and prior bounded DoD preserved; no authority expansion or live UNKNOWN closure."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READ_ONLY; SEMANTIC_PREMISE PASS; frozen contract/diff and all 29 bindings verified; 23 implementation bindings unchanged.",
+        "packet_fingerprint_sha256=cd56d22bd115a3cfc75ad032aff02971aa00bf985b664c8bf00db32a29c66867",
+        "Prior P2 closed: exact scoped raw activation locator now binds both recovery consumers, with absent/null/empty/UNKNOWN/mismatch stopping as UNKNOWN/BLOCKED.",
+        "Synthetic resource PASS does not prove live envelope; retained canary requires numeric peak/clocks and ordinary cycles/delivery proof remain separate.",
+        "Watch env-selected and pulse default backup sinks may differ; correspondence to accepted envelope needs separately gated readback.",
+        "Operational counters, lifecycle pointers and heartbeat freshness do not prove source success, continuity, scientific publication, PIT validity or Telegram delivery.",
+        "Without DuckDB, immutable RDP/Parquet, sealed lineage and committed ResearchStore remain research truth; SQLite is operational projection. No new cross-task private imports.",
+        "Linear timestamp scan, single-row native JSON and filesystem/live resource costs remain limits; PACKET_INFORMATION_PATH, PROCESS_OBLIGATION, MODEL_DIVERSITY_UNPROVEN."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READ_ONLY: frozen candidate, exact bindings/inventory/packet verified; no new operator gaps.",
+        "Prior P2 closed: both recovery consumers use actual JSON path, explicit predecessor/successor/continuity argument pairs, exact scope and missing/mismatched locator stop.",
+        "No generic status pre-deploy/read-only probe; installed disabled timers visible; effective environment and each real CLI backup sink preserved without secret output.",
+        "Retained numeric MemoryPeak and clocks are required; UNKNOWN stops rollout; resource, two watch cycles, actual delivery and exact-SHA rollback remain distinct."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_MERGE_AUTHORITY",
+    "MODEL_DIVERSITY_UNPROVEN",
+    "NO_LIVE_COMMISSIONING_PROOF"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Invalid later HTTP_OK projection could clear a known provider failure.",
+      "observed_head": "86d3e7e4a744e55d3f155266331370f8ba885eb8",
+      "resolved_by_head": "b85bf7e4d7db67e9d14cc8a141ffad860285b9cb"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Malformed bounded snapshot could raise RecursionError/OverflowError instead of typed NO_PING.",
+      "observed_head": "86d3e7e4a744e55d3f155266331370f8ba885eb8",
+      "resolved_by_head": "b85bf7e4d7db67e9d14cc8a141ffad860285b9cb"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Invalid later success violated preservation of known failure.",
+      "observed_head": "86d3e7e4a744e55d3f155266331370f8ba885eb8",
+      "resolved_by_head": "b85bf7e4d7db67e9d14cc8a141ffad860285b9cb"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "UTC timestamp overflow violated invalid snapshot NO_PING DoD.",
+      "observed_head": "86d3e7e4a744e55d3f155266331370f8ba885eb8",
+      "resolved_by_head": "b85bf7e4d7db67e9d14cc8a141ffad860285b9cb"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Invalid success projection disproved conservative recovery semantics.",
+      "observed_head": "86d3e7e4a744e55d3f155266331370f8ba885eb8",
+      "resolved_by_head": "b85bf7e4d7db67e9d14cc8a141ffad860285b9cb"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "UNKNOWN reused confirmed coverage degradation incident meaning and dedupe key.",
+      "observed_head": "86d3e7e4a744e55d3f155266331370f8ba885eb8",
+      "resolved_by_head": "b85bf7e4d7db67e9d14cc8a141ffad860285b9cb"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "One-minute diagnosis lacked a bounded read-only freshness command.",
+      "observed_head": "86d3e7e4a744e55d3f155266331370f8ba885eb8",
+      "resolved_by_head": "b85bf7e4d7db67e9d14cc8a141ffad860285b9cb"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Commissioning commands did not prove two cycles and actual Telegram delivery.",
+      "observed_head": "86d3e7e4a744e55d3f155266331370f8ba885eb8",
+      "resolved_by_head": "b85bf7e4d7db67e9d14cc8a141ffad860285b9cb"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Review priority P2: recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
+      "observed_head": "2d61c454a03aa7f282dc4b07c4046def4166587c",
+      "resolved_by_head": "730d3e7b62b3b845991caee794ae66e04ae9e4f1"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Review priority P2: recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
+      "observed_head": "2d61c454a03aa7f282dc4b07c4046def4166587c",
+      "resolved_by_head": "730d3e7b62b3b845991caee794ae66e04ae9e4f1"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Review priority P2: recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
+      "observed_head": "2d61c454a03aa7f282dc4b07c4046def4166587c",
+      "resolved_by_head": "730d3e7b62b3b845991caee794ae66e04ae9e4f1"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Review priority P2: recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
+      "observed_head": "2d61c454a03aa7f282dc4b07c4046def4166587c",
+      "resolved_by_head": "730d3e7b62b3b845991caee794ae66e04ae9e4f1"
+    }
+  ]
+}

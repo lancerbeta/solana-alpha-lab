@@ -49,6 +49,8 @@ def _owner_action_code(packet: Mapping[str, Any]) -> str:
         return "DISK_RUNWAY_HARD50"
     if "PROVIDER_AUTH_FAILED" in classes:
         return "SUSTAINED_PROVIDER_FAILURE"
+    if "PROVIDER_STATE_UNKNOWN" in classes:
+        return "CALL_DIAGNOSTICS_UNKNOWN"
     if "IMMUTABLE_ARCHIVE_STALE" in classes:
         return "IMMUTABLE_ARCHIVE_STALE"
     if "BACKUP_DEGRADED" in classes:
@@ -68,6 +70,7 @@ def _owner_action(packet: Mapping[str, Any]) -> str:
         "IMMUTABLE_ARCHIVE_HASH_MISMATCH": "Fail closed: do not overwrite remote archive; inspect Drive object vs local SHA.",
         "DISK_RUNWAY_HARD50": "Free disk or scale storage before scientific evidence is at risk; do not auto-delete RDP.",
         "SUSTAINED_PROVIDER_FAILURE": "Inspect Jupiter credential placement (JUPITER_FREE_API_KEY); do not rotate blindly.",
+        "CALL_DIAGNOSTICS_UNKNOWN": "Диагностика calls неизвестна: проверьте scope и timestamps; восстановление провайдера не доказано.",
         "IMMUTABLE_ARCHIVE_STALE": "Closed-day Drive archive is behind RPO; later timer catch-up should converge.",
         "MUTABLE_BACKUP_STALE": "Mutable backup freshness degraded; do not treat generic offhost CURRENT as archive proof.",
         "SOURCE_DATA_STALE": "Confirm observation timer is enabled and last source-poll advances.",

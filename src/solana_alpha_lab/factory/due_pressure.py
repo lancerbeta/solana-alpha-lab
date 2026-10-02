@@ -32,7 +32,7 @@ def build_due_pressure_projection(
     oldest_overdue_age_seconds = 0
     minimum_deadline_slack_seconds: int | None = None
 
-    rows = store.due_in_states(
+    rows = store.iter_due_in_states(
         (
             "PENDING",
             "DUE",
@@ -41,6 +41,8 @@ def build_due_pressure_projection(
             "IN_FLIGHT_CALL_INDETERMINATE",
             "BLOCKED_BUDGET",
         ),
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
         due_at_max=now + timedelta(days=365),
     )
     for row in rows:

@@ -338,3 +338,15 @@ queries:
 - query_id: SGQ-TOKEN-TRAJECTORY-RU
   query: траектория токена
   required_top_route: SEM-HYPOTHESIS-FORGE
+- query_id: SGQ-OPERABILITY-VPS-OOM
+  query: VPS OOM
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-OPERABILITY-TELEGRAM-WATCH
+  query: Telegram watch
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-COLLECTOR-CAMPAIGN-SUCCESSOR
+  query: campaign successor
+  required_top_route: SEM-LIVE-COLLECTION
+- query_id: SGQ-COLLECTOR-WRITES-DATA
+  query: collector writes data
+  required_top_route: SEM-LIVE-COLLECTION

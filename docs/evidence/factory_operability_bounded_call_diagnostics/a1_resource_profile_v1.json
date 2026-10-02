@@ -1,0 +1,476 @@
+{
+  "schema": "smial.factory-operability-bounded-call-resource-profile",
+  "schema_version": "1.0",
+  "as_of": "2026-10-02",
+  "task_id": "FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1",
+  "base_main": "5263abdd327455f239767c0c31855909f90435b7",
+  "platform": "Windows; CPython 3.13.14; process OS PeakWorkingSetSize",
+  "fixture_builder": "tests/operability_bounded_call_profile.py",
+  "fixtures": [
+    {
+      "id": "one",
+      "old_call_rows": 2048,
+      "recent_call_rows": 128,
+      "old_payload_bytes_per_row": 65725,
+      "sqlite_bytes": 215031808
+    },
+    {
+      "id": "two",
+      "old_call_rows": 4096,
+      "recent_call_rows": 128,
+      "old_payload_bytes_per_row": 65725,
+      "sqlite_bytes": 350363648
+    },
+    {
+      "id": "stress",
+      "old_call_rows": 32768,
+      "recent_call_rows": 128,
+      "old_payload_bytes_per_row": 65725,
+      "sqlite_bytes": 2244997120
+    }
+  ],
+  "common_fixture": {
+    "candidate_rows": 6000,
+    "due_rows": 12000,
+    "rdp_files": 2500,
+    "rdp_bytes": 2560000,
+    "candidate_and_due_payload_bytes": 2059,
+    "recent_response_payload_bytes": 1024
+  },
+  "before": [
+    {
+      "consumer": "read_model",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 2176,
+        "call_payloads_decoded": 2176
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 346021888,
+      "result": {
+        "observations_24h": 128
+      },
+      "store_read_stats": {
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 2,
+        "due_in_states_rows": 0,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 0,
+        "list_candidates_calls": 1,
+        "list_candidates_rows": 6000
+      },
+      "wall_seconds": 0.914837
+    },
+    {
+      "consumer": "packet",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 2176,
+        "call_payloads_decoded": 2176
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 346275840,
+      "result": {
+        "observations_24h": 128,
+        "verdict": "ACTION_REQUIRED"
+      },
+      "store_read_stats": {
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 3,
+        "due_in_states_rows": 12000,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 0,
+        "list_candidates_calls": 1,
+        "list_candidates_rows": 6000
+      },
+      "wall_seconds": 1.225257
+    },
+    {
+      "consumer": "watch",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 2176,
+        "call_payloads_decoded": 2176
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 345890816,
+      "result": {
+        "message_chars": 1932,
+        "verdict": "ACTION_REQUIRED"
+      },
+      "store_read_stats": {
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 3,
+        "due_in_states_rows": 12000,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 0,
+        "list_candidates_calls": 1,
+        "list_candidates_rows": 6000
+      },
+      "wall_seconds": 1.168546
+    },
+    {
+      "consumer": "pulse",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 2176,
+        "call_payloads_decoded": 2176
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 346505216,
+      "result": {
+        "message_chars": 585,
+        "observations_24h": 128
+      },
+      "store_read_stats": {
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 3,
+        "due_in_states_rows": 12000,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 0,
+        "list_candidates_calls": 1,
+        "list_candidates_rows": 6000
+      },
+      "wall_seconds": 1.171276
+    }
+  ],
+  "after": [
+    {
+      "consumer": "read_model",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 0,
+        "call_payloads_decoded": 0
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 75702272,
+      "result": {
+        "observations_24h": 128
+      },
+      "store_read_stats": {
+        "call_diagnostics_rows_returned": 128,
+        "call_ledger_timestamp_rows_examined": 2176,
+        "call_payloads_decoded": 0,
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 0,
+        "due_in_states_rows": 0,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 25,
+        "list_candidates_calls": 0,
+        "list_candidates_rows": 0
+      },
+      "wall_seconds": 0.126987,
+      "fixture": "one"
+    },
+    {
+      "consumer": "packet",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 0,
+        "call_payloads_decoded": 0
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 77922304,
+      "result": {
+        "observations_24h": 128,
+        "verdict": "ACTION_REQUIRED"
+      },
+      "store_read_stats": {
+        "call_diagnostics_rows_returned": 128,
+        "call_ledger_timestamp_rows_examined": 2176,
+        "call_payloads_decoded": 0,
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 0,
+        "due_in_states_rows": 0,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 25,
+        "list_candidates_calls": 0,
+        "list_candidates_rows": 0
+      },
+      "wall_seconds": 0.466384,
+      "fixture": "one"
+    },
+    {
+      "consumer": "watch",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 0,
+        "call_payloads_decoded": 0
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 77488128,
+      "result": {
+        "message_chars": 1932,
+        "verdict": "ACTION_REQUIRED"
+      },
+      "store_read_stats": {
+        "call_diagnostics_rows_returned": 128,
+        "call_ledger_timestamp_rows_examined": 2176,
+        "call_payloads_decoded": 0,
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 0,
+        "due_in_states_rows": 0,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 25,
+        "list_candidates_calls": 0,
+        "list_candidates_rows": 0
+      },
+      "wall_seconds": 0.435682,
+      "fixture": "one"
+    },
+    {
+      "consumer": "pulse",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 0,
+        "call_payloads_decoded": 0
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 77778944,
+      "result": {
+        "message_chars": 585,
+        "observations_24h": 128
+      },
+      "store_read_stats": {
+        "call_diagnostics_rows_returned": 128,
+        "call_ledger_timestamp_rows_examined": 2176,
+        "call_payloads_decoded": 0,
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 0,
+        "due_in_states_rows": 0,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 25,
+        "list_candidates_calls": 0,
+        "list_candidates_rows": 0
+      },
+      "wall_seconds": 0.442741,
+      "fixture": "one"
+    },
+    {
+      "consumer": "read_model",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 0,
+        "call_payloads_decoded": 0
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 75456512,
+      "result": {
+        "observations_24h": 128
+      },
+      "store_read_stats": {
+        "call_diagnostics_rows_returned": 128,
+        "call_ledger_timestamp_rows_examined": 4224,
+        "call_payloads_decoded": 0,
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 0,
+        "due_in_states_rows": 0,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 25,
+        "list_candidates_calls": 0,
+        "list_candidates_rows": 0
+      },
+      "wall_seconds": 0.214416,
+      "fixture": "two"
+    },
+    {
+      "consumer": "packet",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 0,
+        "call_payloads_decoded": 0
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 77275136,
+      "result": {
+        "observations_24h": 128,
+        "verdict": "ACTION_REQUIRED"
+      },
+      "store_read_stats": {
+        "call_diagnostics_rows_returned": 128,
+        "call_ledger_timestamp_rows_examined": 4224,
+        "call_payloads_decoded": 0,
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 0,
+        "due_in_states_rows": 0,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 25,
+        "list_candidates_calls": 0,
+        "list_candidates_rows": 0
+      },
+      "wall_seconds": 0.539646,
+      "fixture": "two"
+    },
+    {
+      "consumer": "watch",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 0,
+        "call_payloads_decoded": 0
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 77021184,
+      "result": {
+        "message_chars": 1932,
+        "verdict": "ACTION_REQUIRED"
+      },
+      "store_read_stats": {
+        "call_diagnostics_rows_returned": 128,
+        "call_ledger_timestamp_rows_examined": 4224,
+        "call_payloads_decoded": 0,
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 0,
+        "due_in_states_rows": 0,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 25,
+        "list_candidates_calls": 0,
+        "list_candidates_rows": 0
+      },
+      "wall_seconds": 0.547145,
+      "fixture": "two"
+    },
+    {
+      "consumer": "pulse",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 0,
+        "call_payloads_decoded": 0
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 77598720,
+      "result": {
+        "message_chars": 585,
+        "observations_24h": 128
+      },
+      "store_read_stats": {
+        "call_diagnostics_rows_returned": 128,
+        "call_ledger_timestamp_rows_examined": 4224,
+        "call_payloads_decoded": 0,
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 0,
+        "due_in_states_rows": 0,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 25,
+        "list_candidates_calls": 0,
+        "list_candidates_rows": 0
+      },
+      "wall_seconds": 0.519291,
+      "fixture": "two"
+    }
+  ],
+  "stress": [
+    {
+      "consumer": "read_model",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 0,
+        "call_payloads_decoded": 0
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 75321344,
+      "result": {
+        "observations_24h": 128
+      },
+      "store_read_stats": {
+        "call_diagnostics_rows_returned": 128,
+        "call_ledger_timestamp_rows_examined": 32896,
+        "call_payloads_decoded": 0,
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 0,
+        "due_in_states_rows": 0,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 25,
+        "list_candidates_calls": 0,
+        "list_candidates_rows": 0
+      },
+      "wall_seconds": 1.433704,
+      "fixture": "stress"
+    },
+    {
+      "consumer": "packet",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 0,
+        "call_payloads_decoded": 0
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 77561856,
+      "result": {
+        "observations_24h": 128,
+        "verdict": "ACTION_REQUIRED"
+      },
+      "store_read_stats": {
+        "call_diagnostics_rows_returned": 128,
+        "call_ledger_timestamp_rows_examined": 32896,
+        "call_payloads_decoded": 0,
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 0,
+        "due_in_states_rows": 0,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 25,
+        "list_candidates_calls": 0,
+        "list_candidates_rows": 0
+      },
+      "wall_seconds": 1.752294,
+      "fixture": "stress"
+    },
+    {
+      "consumer": "watch",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 0,
+        "call_payloads_decoded": 0
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 77385728,
+      "result": {
+        "message_chars": 1933,
+        "verdict": "ACTION_REQUIRED"
+      },
+      "store_read_stats": {
+        "call_diagnostics_rows_returned": 128,
+        "call_ledger_timestamp_rows_examined": 32896,
+        "call_payloads_decoded": 0,
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 0,
+        "due_in_states_rows": 0,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 25,
+        "list_candidates_calls": 0,
+        "list_candidates_rows": 0
+      },
+      "wall_seconds": 1.716884,
+      "fixture": "stress"
+    },
+    {
+      "consumer": "pulse",
+      "legacy_call_read": {
+        "call_ledger_rows_returned": 0,
+        "call_payloads_decoded": 0
+      },
+      "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
+      "peak_rss_bytes": 76976128,
+      "result": {
+        "message_chars": 587,
+        "observations_24h": 128
+      },
+      "store_read_stats": {
+        "call_diagnostics_rows_returned": 128,
+        "call_ledger_timestamp_rows_examined": 32896,
+        "call_payloads_decoded": 0,
+        "count_due_in_states_calls": 0,
+        "due_in_states_calls": 0,
+        "due_in_states_rows": 0,
+        "get_candidate_calls": 0,
+        "iter_candidates_pages": 25,
+        "list_candidates_calls": 0,
+        "list_candidates_rows": 0
+      },
+      "wall_seconds": 1.703089,
+      "fixture": "stress"
+    }
+  ],
+  "interpretation": {
+    "ledger_python_payloads_decoded_before": 2176,
+    "ledger_python_payloads_decoded_after": 0,
+    "ledger_projected_rows_after": 128,
+    "old_timestamps_scanned": true,
+    "index_migration": false,
+    "watch_and_pulse_fixture_resource_thresholds_pass": true,
+    "host_commissioning": "UNKNOWN_EXTERNAL_READBACK_REQUIRED",
+    "fixture_provider_health": "ACTION_REQUIRED_FROM_SYNTHETIC_MISSING_DURABILITY_AND_LIFECYCLE_PROOFS_NOT_A_RESOURCE_FAILURE"
+  },
+  "non_claims": [
+    "NO_LIVE_MEMORYPEAK_PROOF",
+    "NO_LIVE_TELEGRAM_SEND",
+    "NO_LIVE_DATABASE_READ_OR_MUTATION",
+    "NO_PROVIDER_CALLS",
+    "NO_DEPLOY",
+    "NO_CLAIM_OF_LIVE_FIXTURE_EQUIVALENCE"
+  ]
+}

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping as MappingLike
+from collections.abc import Iterable, Mapping as MappingLike
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -439,7 +439,7 @@ def _attempt_kind(http_class: object) -> str:
 
 
 def derive_current_provider_state(
-    calls: list[dict[str, Any]],
+    calls: Iterable[dict[str, Any]],
     *,
     now: datetime,
 ) -> dict[str, bool]:
@@ -460,6 +460,10 @@ def derive_current_provider_state(
     malformed_kinds: dict[str, set[str]] = {}
 
     for call in calls:
+        if not call.get("diagnostics_payload_valid", True):
+            # An invalid projection proves neither scope nor classification.
+            # It cannot replace an admitted failure or manufacture recovery.
+            continue
         payload = call.get("payload") or {}
         if isinstance(payload, str):
             continue
@@ -573,51 +577,61 @@ def build_collector_read_model(
     last_source_poll_attempt_at = None
     last_source_poll_success_at = None
     last_search_success_at = None
-    current_state_calls: list[dict[str, Any]] = []
+    diagnostics_unknown = False
+    source_time_unknown = False
+    search_time_unknown = False
 
-    for call in store.list_calls():
-        payload = call.get("payload") or {}
-        if isinstance(payload, str):
-            continue
-        if isinstance(payload, dict) and (digest or act_id):
+    def diagnostic_calls() -> Iterable[dict[str, Any]]:
+        nonlocal observations_24h, typed_missing_24h, diagnostics_unknown
+        nonlocal source_time_unknown, search_time_unknown
+        nonlocal last_source_poll_attempt_at, last_source_poll_success_at, last_search_success_at
+        for call in store.iter_operability_calls(window_start=window_start):
+            payload = call["payload"]
             call_digest = str(payload.get("schedule_sha256") or "")
             call_activation = str(payload.get("activation_id") or "")
             if call_digest and digest and call_digest != digest:
                 continue
             if call_activation and act_id and call_activation != act_id:
                 continue
-        updated = _safe_parse(call.get("updated_at") or call.get("created_at"))
-        if updated is None:
-            current_state_calls.append(call)
-            continue
-        if updated < window_start:
-            continue
-        current_state_calls.append(call)
-        primitive = str(call.get("primitive_id") or "")
-        http_class = payload.get("http_class")
-        bucket = _http_bucket(http_class)
-        if bucket:
-            http_counts[bucket] += 1
-        status = str(payload.get("status") or "")
-        if status == "OBSERVED":
-            observations_24h += 1
-        if status == "MISSING_TYPED" or payload.get("missing_reason"):
-            if str(payload.get("missing_reason") or "") not in {
-                "",
-                "None",
-                "ENTITY_ABSENT_FROM_RESPONSE",
-            }:
-                typed_missing_24h += 1
-            elif status == "MISSING_TYPED":
-                typed_missing_24h += 1
-        if primitive == DISCOVERY:
-            last_source_poll_attempt_at = render_utc(updated)
-            if http_class == HTTP_CLASS_OK or status == "OBSERVED":
-                last_source_poll_success_at = render_utc(updated)
-        if primitive == SEARCH and (
-            http_class == HTTP_CLASS_OK or status == "OBSERVED"
-        ):
-            last_search_success_at = render_utc(updated)
+            primitive = str(call.get("primitive_id") or "")
+            updated = _safe_parse(call.get("updated_at") or call.get("created_at"))
+            if not call.get("diagnostics_payload_valid") or updated is None or updated > now:
+                diagnostics_unknown = True
+                source_time_unknown |= primitive == DISCOVERY
+                search_time_unknown |= primitive == SEARCH
+                yield call  # Known failure remains conservative; never a recovery.
+                continue
+            http_class = payload.get("http_class")
+            bucket = _http_bucket(http_class)
+            if bucket:
+                http_counts[bucket] += 1
+            status = str(payload.get("status") or "")
+            if status == "OBSERVED":
+                observations_24h += 1
+            if status == "MISSING_TYPED" or payload.get("missing_reason"):
+                if str(payload.get("missing_reason") or "") not in {"", "None", "ENTITY_ABSENT_FROM_RESPONSE"} or status == "MISSING_TYPED":
+                    typed_missing_24h += 1
+            # Compare parsed times; fractional UTC strings need not sort by time.
+            if primitive == DISCOVERY:
+                if last_source_poll_attempt_at is None or updated > parse_utc(last_source_poll_attempt_at):
+                    last_source_poll_attempt_at = render_utc(updated)
+                if http_class == HTTP_CLASS_OK or status == "OBSERVED":
+                    if last_source_poll_success_at is None or updated > parse_utc(last_source_poll_success_at):
+                        last_source_poll_success_at = render_utc(updated)
+            if primitive == SEARCH and (http_class == HTTP_CLASS_OK or status == "OBSERVED"):
+                if last_search_success_at is None or updated > parse_utc(last_search_success_at):
+                    last_search_success_at = render_utc(updated)
+            yield call
+
+    current_provider = derive_current_provider_state(diagnostic_calls(), now=now)
+    if diagnostics_unknown:
+        http_counts = {key: None for key in http_counts}
+        observations_24h = typed_missing_24h = None
+        current_provider = {key: True if value is True else None for key, value in current_provider.items()}
+    if source_time_unknown:
+        last_source_poll_attempt_at = last_source_poll_success_at = None
+    if search_time_unknown:
+        last_search_success_at = None
 
     last_tick_at = None
     selected_payload = dict((selected or {}).get("payload") or {})
@@ -625,8 +639,9 @@ def build_collector_read_model(
     if isinstance(tick_raw, str) and tick_raw:
         last_tick_at = tick_raw
 
-    for row in store.due_in_states(
-        ("CENSORED_LATE",), due_at_max=now + timedelta(days=365)
+    for row in store.iter_due_in_states(
+        ("CENSORED_LATE",), schedule_sha256=digest or None, activation_id=act_id or None,
+        due_at_max=now + timedelta(days=365)
     ):
         if digest and str(row.get("schedule_sha256")) != digest:
             continue
@@ -645,7 +660,6 @@ def build_collector_read_model(
         period_seconds=period_seconds,
         empirical_overlap_seconds=empirical_overlap_seconds,
     )
-    current_provider = derive_current_provider_state(current_state_calls, now=now)
 
     health_flags: list[str] = []
     if store.restore_marker_unresolved():
@@ -670,7 +684,7 @@ def build_collector_read_model(
     candidates_24h = 0
     members_24h = 0
     if digest and act_id:
-        for cand in store.list_candidates(schedule_sha256=digest, activation_id=act_id):
+        for cand in store.iter_candidates(schedule_sha256=digest, activation_id=act_id):
             created = _safe_parse(cand.get("created_at") or cand.get("updated_at"))
             if created is None or created < window_start:
                 continue
@@ -691,6 +705,7 @@ def build_collector_read_model(
         "activation_selection_status": selection_status,
         "last_tick_at": last_tick_at,
         "last_source_poll_attempt_at": last_source_poll_attempt_at,
+        "call_diagnostics_status": "UNKNOWN" if diagnostics_unknown else "EXACT",
         "last_source_poll_success_at": last_source_poll_success_at,
         "source_poll_age": source_poll_age,
         "discovery_coverage_class": coverage,

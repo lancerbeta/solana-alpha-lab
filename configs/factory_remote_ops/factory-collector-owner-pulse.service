@@ -6,6 +6,8 @@ Documentation=docs/operator/FACTORY_UNATTENDED_OPERABILITY.md
 
 [Service]
 Type=oneshot
+MemoryMax=768M
+TimeoutStartSec=180s
 WorkingDirectory=/opt/solana-alpha-lab
 EnvironmentFile=-/etc/solana-alpha-lab/secrets.env
 ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/collector_owner_pulse.py --mode emit --record-storage-history

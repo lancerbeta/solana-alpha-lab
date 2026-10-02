@@ -58,7 +58,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--skip-systemd", action="store_true")
     args = parser.parse_args(argv)
     runtime = load_runtime_config(ROOT, args.runtime_config)
-    store = ObservationScheduleStore((ROOT / str(runtime["ops_store_relative"])).resolve())
+    store = ObservationScheduleStore(
+        (ROOT / str(runtime["ops_store_relative"])).resolve(), readonly=True, immutable=False
+    )
     now = parse_utc(args.now) if args.now else datetime.now().astimezone()
     result = evaluate_operability(
         root=ROOT,
