@@ -17,11 +17,12 @@ from solana_alpha_lab.factory.collector_read_model import build_collector_read_m
 from solana_alpha_lab.factory.collector_operational_packet import build_collector_operational_packet
 from solana_alpha_lab.factory.collector_owner_pulse import run_daily_owner_pulse
 from solana_alpha_lab.factory.operability_watch import (
-    SNAPSHOT_RELATIVE, build_collector_snapshot, evaluate_operability,
+    SNAPSHOT_RELATIVE, build_collector_snapshot, classify_incidents, evaluate_operability,
 )
 from solana_alpha_lab.factory.external_heartbeat import HEARTBEAT_ENV, run_external_heartbeat
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
 from solana_alpha_lab.factory.observation_schedule import render_utc
+from solana_alpha_lab.factory.observation_primitives import HTTP_CLASS_401, HTTP_CLASS_403
 
 NOW = datetime(2026, 10, 2, 12, tzinfo=UTC)
 DIGEST = "a" * 64
@@ -60,11 +61,11 @@ class BoundedCallTests(unittest.TestCase):
         return build_collector_read_model(self.store, now=NOW, schedule_sha256=DIGEST, activation_id="A")
 
     def test_window_scope_counters_and_strict_same_primitive_recovery(self):
-        self.call(NOW - timedelta(days=2), http="HTTP_403", huge="x" * 100_000)
+        self.call(NOW - timedelta(days=2), http=HTTP_CLASS_403, huge="x" * 100_000)
         self.call(NOW - timedelta(hours=24), http="TIMEOUT")
         self.call(NOW - timedelta(minutes=3), primitive=SEARCH)
         self.call(NOW - timedelta(minutes=2), state="STARTED", http=None, status="")
-        self.call(NOW - timedelta(minutes=1), activation_id="OTHER", http="HTTP_401")
+        self.call(NOW - timedelta(minutes=1), activation_id="OTHER", http=HTTP_CLASS_401)
         model = self.read()
         self.assertEqual(model["TIMEOUT_24h"], 1)
         self.assertEqual(model["HTTP_403_24h"], 0)
@@ -110,6 +111,27 @@ class BoundedCallTests(unittest.TestCase):
         self.assertEqual(model["call_diagnostics_status"], "UNKNOWN")
         self.assertIsNone(model["observations_24h"])
         self.assertIsNone(model["provider_current_failed"])
+
+    def test_invalid_later_success_cannot_clear_known_failure(self):
+        for invalid in ({"status": []}, {"missing_reason": {}}, {"activation_id": {}}):
+            with self.subTest(invalid=invalid):
+                self.store._conn.execute("DELETE FROM call_ledger")
+                self.call(NOW - timedelta(seconds=1), http=HTTP_CLASS_403)
+                self.call(NOW, **invalid)
+                model = self.read()
+                self.assertEqual(model["call_diagnostics_status"], "UNKNOWN")
+                self.assertTrue(model["provider_current_auth_failed"])
+                packet = build_collector_operational_packet(
+                    root=self.root, store=self.store, now=NOW, remote_config={}, environ={})
+                self.assertIn("PROVIDER_AUTH_FAILED", packet["health_classes"])
+
+    def test_unknown_diagnostics_has_separate_incident_meaning(self):
+        incidents = classify_incidents({"health_classes": ["PROVIDER_STATE_UNKNOWN"]})
+        self.assertIn("CALL_DIAGNOSTICS_UNKNOWN", incidents)
+        self.assertNotIn("MATERIAL_COVERAGE_DEGRADATION", incidents)
+        both = classify_incidents({"health_classes": ["PROVIDER_STATE_UNKNOWN", "DISCOVERY_GAP"]})
+        self.assertIn("CALL_DIAGNOSTICS_UNKNOWN", both)
+        self.assertEqual(both["MATERIAL_COVERAGE_DEGRADATION"], "Discovery gap confirmed.")
 
     def test_fractional_source_clock_and_missing_reason_parity(self):
         self.call(NOW, status="MISSING_TYPED", missing_reason="ENTITY_ABSENT_FROM_RESPONSE")
@@ -183,6 +205,25 @@ class BoundedCallTests(unittest.TestCase):
 
 
 class HeartbeatTests(unittest.TestCase):
+    def test_bounded_parser_failures_are_typed_no_ping(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / SNAPSHOT_RELATIVE
+            path.parent.mkdir(parents=True)
+            bodies = ["[" * 10_000 + "]" * 10_000, '{"n":' + "1" * 10_000 + "}"]
+            for stamp in ("0001-01-01T00:00:00+23:59", "9999-12-31T23:59:59-23:59"):
+                bodies.append(json.dumps(build_collector_snapshot({}, observed_at=stamp)))
+            for body in bodies:
+                with self.subTest(prefix=body[:48]):
+                    self.assertLess(len(body.encode()), 65536)
+                    path.write_text(body)
+                    result = run_external_heartbeat(root=root, now=NOW,
+                        environ={HEARTBEAT_ENV: "https://fixture.invalid/ping"},
+                        transport=lambda _url: self.fail("invalid snapshot must not send"))
+                    self.assertEqual(result["terminal"], "NO_PING")
+                    self.assertEqual(result["reason"], "WATCH_SNAPSHOT_INVALID")
+                    self.assertEqual(result["network_calls"], 0)
+
     def test_only_fresh_valid_bounded_snapshot_pings(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

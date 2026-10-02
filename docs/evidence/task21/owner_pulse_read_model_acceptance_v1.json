@@ -171,9 +171,9 @@
       "sha256": "eaa6bdd038ef7f265fbbb7d2daeb2e84a34455e330be35c7f9366a283e99dc0c"
     },
     {
-      "bytes": 2001617,
+      "bytes": 2007964,
       "path": "catalog/assets/core.yaml",
-      "sha256": "febbc29e589c055ef72d63233a248ac9d8ac0c528261144037b9fe15ec555b67"
+      "sha256": "52ea9271c95089553a034ca62cb27598b5aa949d6ed06068e28daa8858fe6707"
     }
   ],
   "reconciliation_patch": {

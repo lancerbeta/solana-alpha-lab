@@ -132,14 +132,13 @@
   ],
   "after": [
     {
-      "fixture": "one",
       "consumer": "read_model",
       "legacy_call_read": {
         "call_ledger_rows_returned": 0,
         "call_payloads_decoded": 0
       },
       "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
-      "peak_rss_bytes": 75788288,
+      "peak_rss_bytes": 75702272,
       "result": {
         "observations_24h": 128
       },
@@ -155,17 +154,17 @@
         "list_candidates_calls": 0,
         "list_candidates_rows": 0
       },
-      "wall_seconds": 0.136541
+      "wall_seconds": 0.126987,
+      "fixture": "one"
     },
     {
-      "fixture": "one",
       "consumer": "packet",
       "legacy_call_read": {
         "call_ledger_rows_returned": 0,
         "call_payloads_decoded": 0
       },
       "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
-      "peak_rss_bytes": 77463552,
+      "peak_rss_bytes": 77922304,
       "result": {
         "observations_24h": 128,
         "verdict": "ACTION_REQUIRED"
@@ -182,17 +181,17 @@
         "list_candidates_calls": 0,
         "list_candidates_rows": 0
       },
-      "wall_seconds": 0.457204
+      "wall_seconds": 0.466384,
+      "fixture": "one"
     },
     {
-      "fixture": "one",
       "consumer": "watch",
       "legacy_call_read": {
         "call_ledger_rows_returned": 0,
         "call_payloads_decoded": 0
       },
       "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
-      "peak_rss_bytes": 78082048,
+      "peak_rss_bytes": 77488128,
       "result": {
         "message_chars": 1932,
         "verdict": "ACTION_REQUIRED"
@@ -209,17 +208,17 @@
         "list_candidates_calls": 0,
         "list_candidates_rows": 0
       },
-      "wall_seconds": 0.433041
+      "wall_seconds": 0.435682,
+      "fixture": "one"
     },
     {
-      "fixture": "one",
       "consumer": "pulse",
       "legacy_call_read": {
         "call_ledger_rows_returned": 0,
         "call_payloads_decoded": 0
       },
       "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
-      "peak_rss_bytes": 77594624,
+      "peak_rss_bytes": 77778944,
       "result": {
         "message_chars": 585,
         "observations_24h": 128
@@ -236,17 +235,17 @@
         "list_candidates_calls": 0,
         "list_candidates_rows": 0
       },
-      "wall_seconds": 0.429701
+      "wall_seconds": 0.442741,
+      "fixture": "one"
     },
     {
-      "fixture": "two",
       "consumer": "read_model",
       "legacy_call_read": {
         "call_ledger_rows_returned": 0,
         "call_payloads_decoded": 0
       },
       "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
-      "peak_rss_bytes": 75796480,
+      "peak_rss_bytes": 75456512,
       "result": {
         "observations_24h": 128
       },
@@ -262,17 +261,17 @@
         "list_candidates_calls": 0,
         "list_candidates_rows": 0
       },
-      "wall_seconds": 0.230304
+      "wall_seconds": 0.214416,
+      "fixture": "two"
     },
     {
-      "fixture": "two",
       "consumer": "packet",
       "legacy_call_read": {
         "call_ledger_rows_returned": 0,
         "call_payloads_decoded": 0
       },
       "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
-      "peak_rss_bytes": 77357056,
+      "peak_rss_bytes": 77275136,
       "result": {
         "observations_24h": 128,
         "verdict": "ACTION_REQUIRED"
@@ -289,17 +288,17 @@
         "list_candidates_calls": 0,
         "list_candidates_rows": 0
       },
-      "wall_seconds": 0.530451
+      "wall_seconds": 0.539646,
+      "fixture": "two"
     },
     {
-      "fixture": "two",
       "consumer": "watch",
       "legacy_call_read": {
         "call_ledger_rows_returned": 0,
         "call_payloads_decoded": 0
       },
       "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
-      "peak_rss_bytes": 77602816,
+      "peak_rss_bytes": 77021184,
       "result": {
         "message_chars": 1932,
         "verdict": "ACTION_REQUIRED"
@@ -316,17 +315,17 @@
         "list_candidates_calls": 0,
         "list_candidates_rows": 0
       },
-      "wall_seconds": 0.513694
+      "wall_seconds": 0.547145,
+      "fixture": "two"
     },
     {
-      "fixture": "two",
       "consumer": "pulse",
       "legacy_call_read": {
         "call_ledger_rows_returned": 0,
         "call_payloads_decoded": 0
       },
       "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
-      "peak_rss_bytes": 77406208,
+      "peak_rss_bytes": 77598720,
       "result": {
         "message_chars": 585,
         "observations_24h": 128
@@ -343,7 +342,8 @@
         "list_candidates_calls": 0,
         "list_candidates_rows": 0
       },
-      "wall_seconds": 0.527506
+      "wall_seconds": 0.519291,
+      "fixture": "two"
     }
   ],
   "stress": [
@@ -354,7 +354,7 @@
         "call_payloads_decoded": 0
       },
       "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
-      "peak_rss_bytes": 75517952,
+      "peak_rss_bytes": 75321344,
       "result": {
         "observations_24h": 128
       },
@@ -370,7 +370,8 @@
         "list_candidates_calls": 0,
         "list_candidates_rows": 0
       },
-      "wall_seconds": 1.388845
+      "wall_seconds": 1.433704,
+      "fixture": "stress"
     },
     {
       "consumer": "packet",
@@ -379,7 +380,7 @@
         "call_payloads_decoded": 0
       },
       "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
-      "peak_rss_bytes": 77721600,
+      "peak_rss_bytes": 77561856,
       "result": {
         "observations_24h": 128,
         "verdict": "ACTION_REQUIRED"
@@ -396,7 +397,8 @@
         "list_candidates_calls": 0,
         "list_candidates_rows": 0
       },
-      "wall_seconds": 1.706473
+      "wall_seconds": 1.752294,
+      "fixture": "stress"
     },
     {
       "consumer": "watch",
@@ -405,7 +407,7 @@
         "call_payloads_decoded": 0
       },
       "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
-      "peak_rss_bytes": 77860864,
+      "peak_rss_bytes": 77385728,
       "result": {
         "message_chars": 1933,
         "verdict": "ACTION_REQUIRED"
@@ -422,7 +424,8 @@
         "list_candidates_calls": 0,
         "list_candidates_rows": 0
       },
-      "wall_seconds": 1.684705
+      "wall_seconds": 1.716884,
+      "fixture": "stress"
     },
     {
       "consumer": "pulse",
@@ -431,7 +434,7 @@
         "call_payloads_decoded": 0
       },
       "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network",
-      "peak_rss_bytes": 77737984,
+      "peak_rss_bytes": 76976128,
       "result": {
         "message_chars": 587,
         "observations_24h": 128
@@ -448,7 +451,8 @@
         "list_candidates_calls": 0,
         "list_candidates_rows": 0
       },
-      "wall_seconds": 1.703483
+      "wall_seconds": 1.703089,
+      "fixture": "stress"
     }
   ],
   "interpretation": {

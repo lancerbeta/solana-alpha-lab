@@ -55,6 +55,7 @@ managed_write_set:
   - docs/evidence/factory_operability_bounded_call_diagnostics/a1_delivery_completion_evidence_v1.json
   - docs/evidence/factory_operability_bounded_call_diagnostics/a1_delivery_independent_review_v1.json
   - docs/evidence/factory_operability_bounded_call_diagnostics/a1_delivery_factory_fit_v1.json
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
   - docs/reports/factory_operability_bounded_call_diagnostics/a1_owner_readout_v1.md
 required_review_roles:
   - CODE_REVIEWER
@@ -121,7 +122,10 @@ git/gh, uv, SQLite, Catalog, snapshots and fake transports suffice.
 
 `START_WITH_PATCH`: executing client selects CODEX; the requested branch is
 preserved. Include the direct due-pressure helper for bounded read-model
-iteration. All provider/live/external exclusions remain frozen.
+iteration. Preflight found a SEPARATE Catalog shadow pin in the named TASK-21
+evidence: include that exact file solely for mechanical SHA/bytes re-binding
+to the changed Catalog blob. Historical acceptance and scientific fields remain
+frozen. All provider/live/external exclusions remain frozen.
 
 ## Task Outcome Brief
 

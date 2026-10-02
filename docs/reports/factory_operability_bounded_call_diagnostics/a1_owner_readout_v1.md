@@ -15,10 +15,10 @@ Fixture `one`: 2,048 старых calls по 65,725 bytes payload, 128 неда�
 
 | Потребитель | BEFORE wall, s | AFTER wall, s | BEFORE peak, MiB | AFTER peak, MiB |
 |---|---:|---:|---:|---:|
-| Read model | 0.915 | 0.137 | 330.0 | 72.3 |
-| Полный packet | 1.225 | 0.457 | 330.2 | 73.9 |
-| Watch dry-run | 1.169 | 0.433 | 329.9 | 74.5 |
-| Pulse dry-run | 1.171 | 0.430 | 330.5 | 74.0 |
+| Read model | 0.915 | 0.127 | 330.0 | 72.2 |
+| Полный packet | 1.225 | 0.466 | 330.2 | 74.3 |
+| Watch dry-run | 1.169 | 0.436 | 329.9 | 73.9 |
+| Pulse dry-run | 1.171 | 0.443 | 330.5 | 74.2 |
 
 BEFORE каждый потребитель возвращал/декодировал 2,176 полных call payload.
 AFTER сканирует 2,176 timestamps и возвращает только 128 scalar call projections;
@@ -26,13 +26,13 @@ AFTER сканирует 2,176 timestamps и возвращает только 1
 bounded iterators; это не заявление о нуле всех JSON decodes в packet.
 
 При удвоении старой истории (4,096 old calls; SQLite 350,363,648 bytes),
-не меняя recent window, peak полного packet/watch/pulse: 73.8 / 74.0 / 73.8 MiB.
+не меняя recent window, peak полного packet/watch/pulse: 73.7 / 73.5 / 74.0 MiB.
 Рост памяти не пропорционален историческим payload. Scale regression проверяет
 также отдельный полный packet с 1,024 → 2,048 old calls.
 
 Стресс AFTER: SQLite 2,244,997,120 bytes (2.09 GiB); 32,768 old calls,
-те же 128 recent, candidates/due/RDP. Watch: 74.3 MiB / 1.685s;
-pulse: 74.1 MiB / 1.703s; полный packet: 74.1 MiB / 1.706s.
+те же 128 recent, candidates/due/RDP. Watch: 73.8 MiB / 1.717s;
+pulse: 73.4 MiB / 1.703s; полный packet: 74.0 MiB / 1.752s.
 Локальные пороги <512 MiB и <120s выполнены. Это синтетические данные;
 эквивалентность текущей VPS-базе и live MemoryPeak не проверялись.
 
@@ -52,6 +52,8 @@ BEFORE выполнен до изменения production modules на базе
   recovery; равные timestamps не являются более поздним успехом. Poll clocks
   выбираются по времени, включая microseconds. Invalid/future/invalid payload дают
   `UNKNOWN`/null counts; известный unresolved failure остаётся True.
+  Invalid projection не доказывает ни failure, ни recovery. UNKNOWN получает
+  отдельный incident `CALL_DIAGNOSTICS_UNKNOWN`, не смысл confirmed discovery gap.
 - Обе service templates: MemoryMax=768M, TimeoutStartSec=180s. Watch cadence 15m.
   CLI открывают operational SQLite read-only, с WAL visibility; missing store не
   создаётся. Старый source_snapshot/RDP repair и signal calibration сохранены.
@@ -59,7 +61,7 @@ BEFORE выполнен до изменения production modules на базе
   Configured path не импортирует operational packet/store. Fresh snapshot не
   подтверждает Telegram. Fake transports проверяют success/failure/retry/dedupe/
   recovery; никакой реальной отправки в этом атоме.
-- 117 focused tests PASS, включая старые два repair suites, полные вертикальные
+- 120 focused tests PASS, включая старые два repair suites, полные вертикальные
   consumers, executable pulse CLI и новый memory-scale regression. Independent
   verdicts и exact bindings — в canonical delivery evidence; до их PASS кандидат
   не готов к merge. Exact-head CI/merge-readiness проверяются отдельно перед фразой.
@@ -84,6 +86,9 @@ Collector runbook остаётся существующим root binding/operato
 дублирование в root assets превысило 16 KiB budget и поэтому исключено.
 README уже ведёт к правильному recovery route; менять его не требуется.
 Generated FACTORY_SEMANTIC_MAP / OPERATOR_NAVIGATION / PROJECT_MAP руками не редактируются.
+Preflight обнаружил SEPARATE Catalog pin в TASK-21 owner-pulse evidence:
+обновлены только SHA/bytes этой ссылки и exact managed scope; историческая
+приёмка и scientific fields не изменены.
 
 ## UNKNOWN и операционная граница
 

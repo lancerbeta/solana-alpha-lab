@@ -460,6 +460,10 @@ def derive_current_provider_state(
     malformed_kinds: dict[str, set[str]] = {}
 
     for call in calls:
+        if not call.get("diagnostics_payload_valid", True):
+            # An invalid projection proves neither scope nor classification.
+            # It cannot replace an admitted failure or manufacture recovery.
+            continue
         payload = call.get("payload") or {}
         if isinstance(payload, str):
             continue

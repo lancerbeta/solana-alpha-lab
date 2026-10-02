@@ -33956,7 +33956,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_read_model.py', repository_path: src/solana_alpha_lab/factory/collector_read_model.py}
-  integrity: {kind: sha256, sha256: 93cc448783282b3ed46106946241e62319c7afbe80fda34ca732fb825159be15}
+  integrity: {kind: sha256, sha256: c7149673595fa05bea727707bf51ad6d3bc45a8523e5df57020a7acd4d4cc0d2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001}
@@ -36443,7 +36443,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_UNATTENDED_OPERABILITY.md', repository_path: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md}
-  integrity: {kind: sha256, sha256: 40ab5ef57e741956ae31efcc0f90587467daa4237c02ce756421bc0e3b554b2d}
+  integrity: {kind: sha256, sha256: 1f651879d093c21688479f7ba4a569b66ed88518ac2aa0008d05d9267754667c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
@@ -39137,7 +39137,7 @@ records:
     repository_path: docs/tasks/FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1.md
   integrity:
     kind: sha256
-    sha256: 6f1047a62694f3c62984cfcc08fc8f26a0ba2b07c928afdf4ef47c125f4dd925
+    sha256: 89bbb6f9862106975c9fa4bb3d5ee74703b47e87fedcf60f746c847dc29b3d70
   access:
     mode: read_only
     method: file
@@ -39171,7 +39171,7 @@ records:
     repository_path: tests/test_factory_operability_bounded_call_diagnostics_v1.py
   integrity:
     kind: sha256
-    sha256: 9dca1f00f3a916cfffb34bc824d4600411c96c3655856f63b504aea01d7815e7
+    sha256: 16089947cc3cbf900cad3a6789e5f3858da396e2f8b09e111f966bb26c0bd32d
   access:
     mode: read_only
     method: file
@@ -39247,7 +39247,7 @@ records:
     repository_path: docs/evidence/factory_operability_bounded_call_diagnostics/a1_resource_profile_v1.json
   integrity:
     kind: sha256
-    sha256: 74700a8079fda262364bec6902c01f84bea19689980aeaf09978967d06a96ba7
+    sha256: bf5c75992c5994425e5e4d4b2fccb381a5d0fffa793b64dea3ce217e026c6dc1
   access:
     mode: read_only
     method: file
@@ -39285,7 +39285,7 @@ records:
     repository_path: docs/reports/factory_operability_bounded_call_diagnostics/a1_owner_readout_v1.md
   integrity:
     kind: sha256
-    sha256: 5464f5cd18890f270861ebe0a3985ffd95154942feba9979dd71fd3ff07287de
+    sha256: aec81e53583ce271c4ee3667124cf11065bb284561750f0294aebcbe17b1b104
   access:
     mode: read_only
     method: file

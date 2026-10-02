@@ -25,11 +25,33 @@ stat -c 'snapshot bytes=%s modified=%y' local/factory_v1/operability_collector_s
 df -h /opt/solana-alpha-lab
 ```
 
-Проверьте snapshot `observed_at`, schema, размер <=65536 байт и freshness
-по текущему clock. Дополните проверку узким `observation_schedule.py status`
+Snapshot можно проверить этой bounded read-only командой из того же каталога:
+
+```sh
+PYTHONPATH=src uv run --locked --managed-python python -B - <<'PY'
+import json
+from datetime import UTC, datetime
+from pathlib import Path
+from solana_alpha_lab.factory.operability_watch import (
+    SNAPSHOT_RELATIVE, evaluate_collector_snapshot_freshness, load_collector_snapshot_file,
+)
+status, snapshot = load_collector_snapshot_file(Path(SNAPSHOT_RELATIVE))
+age = None
+if snapshot is not None:
+    status, age = evaluate_collector_snapshot_freshness(snapshot['observed_at'], now=datetime.now(UTC))
+print(json.dumps({'snapshot_state': status, 'age_seconds': age,
+                  'observed_at': snapshot['observed_at'] if snapshot else None}))
+PY
+```
+
+Результат — `FRESH`, `STALE`, `MISSING` или `INVALID` и возраст. Команда читает
+не более 65536 байт, не открывает collector store и не отправляет ping/Telegram.
+Дополните проверку узким `observation_schedule.py status`
 из collector runbook. Не читайте весь ledger и не запускайте старый полный
 packet на хосте после OOM. `PROVIDER_STATE_UNKNOWN` означает непроверяемую
 диагностику: проверьте scope и clocks, не объявляйте провайдера здоровым.
+Watch выдаёт отдельный `CALL_DIAGNOSTICS_UNKNOWN` после 1800s; прежний
+`MATERIAL_COVERAGE_DEGRADATION` означает только подтверждённый `DISCOVERY_GAP`.
 Heartbeat с настроенным URL и свежим snapshot — реальный HTTPS-запрос;
 не используйте его как read-only probe.
 
@@ -243,9 +265,24 @@ Git fixture evidence не заменяет host проверку. По read-only
    delivery/retry с отдельно разрешённой проверкой. Collector/renewal продолжаются:
 
 ```sh
+COMMISSIONING_START=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 sudo systemctl enable --now factory-operability-watch.timer
-systemctl show factory-operability-watch.service --property=Result,ExecMainStatus,MemoryPeak
+systemctl show factory-operability-watch.service --property=InvocationID,ExecMainStartTimestamp,ExecMainExitTimestamp,Result,ExecMainStatus,MemoryPeak
+journalctl --unit=factory-operability-watch.service --since "$COMMISSIONING_START" --output=short-iso --no-pager
 ```
+
+После каждого из двух обычных 15-минутных запусков сохраните этот readback и
+результат snapshot probe выше. Нужны два разных InvocationID/start times и
+два завершения после deploy, exit=0, peak <512 MiB, wall <120s, продвижение
+snapshot `observed_at`. Текущая строка `Result=success` доказывает только
+последний процесс. Проверьте JSON каждого запуска в journal:
+`pending_count > 0` или transport error — `BLOCKED`, даже при exit=0.
+`pending_count=0` без созданного сообщения не доказывает отправку Telegram.
+Incident/recovery считается проверенным только по соответствующим
+`MESSAGE_TYPE`/incident key и реально полученным карточкам с теми же clocks.
+Если incident/recovery не было, этот пункт остаётся `UNKNOWN` до отдельно
+разрешённой контрольной проверки; не создавайте сбой collector/provider ради неё.
+Сохраняйте минимальную датированную выжимку, не публикуйте секреты из journal.
 
 5. Отдельно выполните bounded pulse dry-run:
 
@@ -257,10 +294,18 @@ sudo systemd-run --unit=factory-pulse-commissioning --service-type=oneshot --wai
 и daily delivery. Два отчётных timer не включаются одним шагом:
 
 ```sh
+PULSE_START=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 sudo systemctl enable --now factory-collector-owner-pulse.timer
 sudo systemctl start factory-collector-owner-pulse.service
-systemctl show factory-collector-owner-pulse.service --property=Result,ExecMainStatus,MemoryPeak
+systemctl show factory-collector-owner-pulse.service --property=InvocationID,ExecMainStartTimestamp,ExecMainExitTimestamp,Result,ExecMainStatus,MemoryPeak
+journalctl --unit=factory-collector-owner-pulse.service --since "$PULSE_START" --output=short-iso --no-pager
 ```
+
+В journal нужен `# delivery delivered=True deduped=False` и полученная daily
+карточка за тот же UTC day. `delivered=False deduped=True` принимается только
+со ссылкой на ранее доказанную доставку этого day; один dedupe не доказывает
+её. `delivered=False deduped=False`, отсутствие delivery footer, pending или
+failure — `BLOCKED`. Snapshot и exit=0 delivery footer не заменяют.
 
 6. Внешний получатель, URL и Telegram-маршрут требуют отдельного решения
    владельца. До подключения и теста пропущенного heartbeat — `NOT_CONFIGURED`.

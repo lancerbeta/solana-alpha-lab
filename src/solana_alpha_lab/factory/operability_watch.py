@@ -82,6 +82,7 @@ INCIDENT_GRACE_SECONDS = {
     "DISK_RUNWAY_HARD50": 0,
     "SUSTAINED_PROVIDER_FAILURE": 1800,
     "MATERIAL_COVERAGE_DEGRADATION": 1800,
+    "CALL_DIAGNOSTICS_UNKNOWN": 1800,
     "REQUIRED_TIMER_FAILED": 900,
     "WORKBENCH_SERVICE_DOWN": 0,
     "ALERTING_UNAVAILABLE": 0,
@@ -120,11 +121,11 @@ def _parse_snapshot_observed_at(value: str) -> datetime | None:
         return None
     try:
         parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
-    except ValueError:
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=UTC)
+        return parsed.astimezone(UTC)
+    except (ValueError, OverflowError):
         return None
-    if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=UTC)
-    return parsed.astimezone(UTC)
 
 
 def validate_collector_snapshot(raw: Any) -> dict[str, Any] | None:
@@ -195,7 +196,7 @@ def load_collector_snapshot_file(path: Path) -> tuple[str, dict[str, Any] | None
         return "INVALID", None
     try:
         payload = json.loads(blob.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError):
+    except (UnicodeDecodeError, ValueError, RecursionError):
         return "INVALID", None
     if not isinstance(payload, dict):
         return "INVALID", None
@@ -240,7 +241,7 @@ def classify_incidents(
     if "DISCOVERY_GAP" in classes:
         found["MATERIAL_COVERAGE_DEGRADATION"] = "Discovery gap confirmed."
     if "PROVIDER_STATE_UNKNOWN" in classes:
-        found["MATERIAL_COVERAGE_DEGRADATION"] = (
+        found["CALL_DIAGNOSTICS_UNKNOWN"] = (
             "Call diagnostics UNKNOWN; inspect scope/timestamps. Provider recovery is not proven."
         )
     if "CAMPAIGN_SUCCESSOR_REQUIRED" in classes:
