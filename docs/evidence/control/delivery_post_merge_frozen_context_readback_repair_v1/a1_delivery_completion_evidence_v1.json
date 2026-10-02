@@ -11,17 +11,20 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "59c96746f87ce3b727a0f89a7b73e717d6dc6390a13aa90325253e9c76633694",
+    "catalog/assets/core.yaml": "789579dca0577be88c8c7879a1ecfeac03cc2575168ed3f367ef2bfe1c09d55b",
     "catalog/assets/lifecycle.yaml": "f5b69b58c501b2405ca8be8a4db04ee8bfd0dc1e9b7039fca7b763443ccc79ef",
     "catalog/catalog_manifest.yaml": "95ba619a01966497a7812562e67703b5a49fd29c81ab4dcdaae97946fc2bf6f0",
     "catalog/generated/asset_edges.json": "e05f91d16a834d5fceec98cc0f6033a8c20c2d615f453ba02a6be76aa2f41060",
+    "delivery-harness/templates/portable-bundle-manifest.json": "4e6a58ff7f5b44cc8caea35e20cb3c50be7a4b727adcb2f6e256a6e967c81a8d",
     "docs/PROJECT_MAP.md": "4b03e83b3c10371ae57468b3fe229001b6290983c69892e9a49a550c7e9546c9",
     "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "e65405cd2dd10bc070f4986730db6bb9cc3e18b4f872cd806065b5eccef36f9a",
-    "docs/evidence/control/delivery_post_merge_frozen_context_readback_repair_v1/a1_targeted_validation_v1.json": "ae9d96157964a462792bf2a48c14ec6ed7b1e8c1d7851088d71feef927dc1b91",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "75a8e3da33bf8e5393cefc7110eead89aa8159baa5097e6d7512ee71221be1e0",
+    "docs/evidence/control/delivery_post_merge_frozen_context_readback_repair_v1/a1_targeted_validation_v1.json": "71f6707a8caaf8cefbdec5654ff03eaffa4234173620e4cf05492d7ada5a636a",
     "docs/evidence/control/owner_attention_gate_acceptance_v1.json": "c2c7cceae00ea241bc8ceca8b706257faaf7b12d21c9ec269571aa3901232658",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "ff92ba36e9edb1faa49e6d61d79b8bd2144e7e484d9877ad88e70fc88c05cad0",
-    "docs/tasks/DELIVERY_POST_MERGE_FROZEN_CONTEXT_READBACK_REPAIR_V1.md": "26c3a27d6cc14f6eabbab2e6892ace6dad4ec7acac5152ddea4598679d248285",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "55f5ee6b07d3bd5541fb571490d400520d8088795aa854f6fd78ed032e59ebde",
+    "docs/tasks/DELIVERY_POST_MERGE_FROZEN_CONTEXT_READBACK_REPAIR_V1.md": "d0ca47ab397f064d2a7fb0d15ac17704391c582df3eb5401d7210748d9dbcd56",
     "scripts/owner_attention_gate.py": "91a2ef21e4340cf5c8a404faa72fd61a878c81fb724a96b05873fc8ae07ebfc9",
+    "tests/test_delivery_harness_executor_extension.py": "1d8ce9771098ec20a47bf151e480bc95f1b8f1867a9c178474704e1d579e2d9f",
     "tests/test_delivery_harness_merge_guard.py": "28744d03e23c3e3e9ec5544e4439cae4648dfd43e402265d960b1867d0c1c4b9",
     "tests/test_delivery_post_merge_frozen_context_v1.py": "81fc125cc25ea70548e319103e153e494c18cb7e9005ca21c77a27a22fead68b"
   },
@@ -35,14 +38,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/delivery_post_merge_frozen_context_readback_repair_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "d7f0d19efb6cef752db00c54c8eb3b735f04d4063fc4e3c81471de448e79f309",
+    "sha256": "5a9dd57964341e3a8034292e075cf587cd63ddecfd8911935adf8960fc21af0d",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_51_REAL_GIT_DAG_MERGE_GUARD_AND_ISOLATION_TESTS",
     "independent_review": {
       "path": "docs/evidence/control/delivery_post_merge_frozen_context_readback_repair_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "3b32432448c6407d77dafbf0a4ea313404ddeecf866a6c8675cda4fb13f65a76",
+      "sha256": "e0bdf87f8aaaf75aa749a2073ea4ec23fded8f3d18e6748a7804abe982d6ff82",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
