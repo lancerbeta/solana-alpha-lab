@@ -11,7 +11,18 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
-    "scripts/owner_attention_gate.py": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "16543333266a75dcf504770463c6579f089507d7a728b917091c3e757c24633f",
+    "catalog/assets/lifecycle.yaml": "f5b69b58c501b2405ca8be8a4db04ee8bfd0dc1e9b7039fca7b763443ccc79ef",
+    "catalog/catalog_manifest.yaml": "95ba619a01966497a7812562e67703b5a49fd29c81ab4dcdaae97946fc2bf6f0",
+    "catalog/generated/asset_edges.json": "e05f91d16a834d5fceec98cc0f6033a8c20c2d615f453ba02a6be76aa2f41060",
+    "docs/PROJECT_MAP.md": "4b03e83b3c10371ae57468b3fe229001b6290983c69892e9a49a550c7e9546c9",
+    "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "e65405cd2dd10bc070f4986730db6bb9cc3e18b4f872cd806065b5eccef36f9a",
+    "docs/evidence/control/delivery_post_merge_frozen_context_readback_repair_v1/a1_targeted_validation_v1.json": "687948b70da79cd1f2d3a3c2b63b05c4cfc9e7f147b17aaefe1674470604848d",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "df6ef0d63b6a87254618e325f062327a4c84ac1063ae0173613127fe0a76b5a5",
+    "docs/tasks/DELIVERY_POST_MERGE_FROZEN_CONTEXT_READBACK_REPAIR_V1.md": "dc140b7fa77142b668970a1d42c81847f81b10a357850d8d4e0352598e78f725",
+    "scripts/owner_attention_gate.py": "91a2ef21e4340cf5c8a404faa72fd61a878c81fb724a96b05873fc8ae07ebfc9",
+    "tests/test_delivery_harness_merge_guard.py": "28744d03e23c3e3e9ec5544e4439cae4648dfd43e402265d960b1867d0c1c4b9",
+    "tests/test_delivery_post_merge_frozen_context_v1.py": "81fc125cc25ea70548e319103e153e494c18cb7e9005ca21c77a27a22fead68b"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +34,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/delivery_post_merge_frozen_context_readback_repair_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "50602e6d19c0ea16a7ce05efc749d3ab19798454ec8fac9beea4eaa97425f928",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_51_REAL_GIT_DAG_MERGE_GUARD_AND_ISOLATION_TESTS",
     "independent_review": {
       "path": "docs/evidence/control/delivery_post_merge_frozen_context_readback_repair_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "3d5e2f67942bd4d6c8ee23ed4081751685f052f2b096e0244f1f0e87c87017b3",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
