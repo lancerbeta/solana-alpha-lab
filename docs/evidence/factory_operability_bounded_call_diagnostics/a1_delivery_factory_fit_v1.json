@@ -16,10 +16,10 @@
     "mission": "PASS resource-safe operability preserves collection instead of building monitoring infrastructure",
     "flexibility_and_history": "PASS no scientific/history rewrite, retention or index migration",
     "context_efficiency": "PASS one exact task and offline fixture profiles",
-    "research_truth": "PASS campaign and same-primitive recovery preserved; invalid/future diagnostics UNKNOWN",
-    "owner_operability": "PASS three independent states, cheap checks, staged commissioning and exact rollback",
+    "research_truth": "PASS campaign and same-primitive recovery preserved; invalid/future diagnostics UNKNOWN; raw scoped lifecycle pointer is not immutable/as-of proof",
+    "owner_operability": "PASS scoped mode=ro probes, exact recovery locators, disabled-unit visibility, environment/backup-sink correspondence and retained numeric MemoryPeak; UNKNOWN stops rollout",
     "execution_to_cashflow": "PASS indirect collection safety, no alpha or cashflow claim",
-    "monitoring_and_recovery": "PASS watch/pulse caps and fresh-snapshot conditional heartbeat; no Telegram proof inferred from snapshot",
+    "monitoring_and_recovery": "PASS watch/pulse caps, actual-CLI canaries, fresh-snapshot conditional heartbeat and separate cycles/delivery proof; pulse default sink mismatch requires gated readback",
     "build_vs_buy": "PASS existing SQL, stores, iterators, dedupe and Delivery Harness; no dependency or service",
     "security": "PASS zero provider/credential/network/live actions except authorized GitHub delivery transport",
     "red_team": "PASS full-packet and twofold history tests; host result remains UNKNOWN"
@@ -29,7 +29,9 @@
     "NO_LIVE_TELEGRAM_PROOF",
     "LINEAR_LEDGER_TIMESTAMP_SCAN",
     "NO_DEPLOY",
-    "EXTERNAL_RECEIVER_NOT_CONFIGURED"
+    "EXTERNAL_RECEIVER_NOT_CONFIGURED",
+    "PULSE_DEFAULT_SINK_ENVELOPE_CORRESPONDENCE_UNKNOWN",
+    "LIVE_ENVIRONMENT_AND_NUMERIC_MEMORYPEAK_REQUIRED"
   ],
   "recovery": "REVERT_GIT; SEPARATE_OWNER_GATED_EXACT_SHA_ROLLBACK_WITH_REPORT_TIMERS_OFF"
 }

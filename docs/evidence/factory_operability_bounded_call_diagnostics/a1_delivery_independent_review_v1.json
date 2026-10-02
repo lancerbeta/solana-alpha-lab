@@ -17,42 +17,44 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "ISOLATED_READ_ONLY: exact final candidate and 29 committed bindings verified; unchanged product bytes retain tested recovery/parser corrections.",
-        "20 final combined integration tests PASS; three incoming and five task Catalog assets preserved, 1885 assets, generator check PASS.",
-        "Final context correction selects exactly three canonical DELIVERY_EVIDENCE files as RESOLVED; 26 other bindings and product bytes remain unchanged.",
-        "TASK21 changes only Catalog SHA/bytes; no live resource or delivery claim."
+        "ISOLATED_READ_ONLY: frozen candidate, diff and all 29 committed bindings verified; clean worktree and unchanged head.",
+        "Prior P2 closed: both documented recovery JSON locators execute against actual probe output; exact scope and missing locator UNKNOWN/BLOCKED are explicit.",
+        "Four executable runbook command tests independently PASS; payload access and mutation denied, SQLite/WAL bytes preserved.",
+        "Production, profiles and caps unchanged by operator correction; Catalog/TASK21 pin propagation is mechanical only."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "ISOLATED_READ_ONLY: full bounded DoD and 29 bindings verified against final base/head; 20 integration and 15 semantic tests independently repeated PASS.",
-        "Four historical BEFORE and 12 unchanged AFTER/scale profiles demonstrate the synthetic envelope only; baseline remains bound to its measured historical commit.",
-        "Runbooks preserve current main text and separate resource, snapshot, Telegram and commissioning proofs; no authority expansion.",
-        "Final L2 DELIVERY_EVIDENCE selection closes the grounding gap without changing DoD, review roles, external caps or owner authority."
+        "ISOLATED_READ_ONLY: exact bounded DoD, frozen diff, packet diff hash and all 29 bindings verified.",
+        "18 regression tests independently repeated PASS, including actual probe, both recovery consumers and unchanged SQLite/WAL.",
+        "Prior recovery gap closed: scope is returned and verified; missing locator stays UNKNOWN/BLOCKED; raw ID is not immutable/as-of proof.",
+        "Production, resource profiles, caps and prior bounded DoD preserved; no authority expansion or live UNKNOWN closure."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "ISOLATED_READ_ONLY; SEMANTIC_PREMISE PASS; final diff, contract, evidence and all 29 bindings verified.",
-        "packet_fingerprint_sha256=b139fc85a7e83143a4f7c2a624958b692de594beddc91716c0430c80d18b8999",
-        "Final context correction selects the existing three evidence files; exact-base/head, hashes, committed blobs, role-set and inventory gates remain enforced.",
-        "Invalid projections cannot prove recovery; UNKNOWN stays null and has its own incident; prior provider/source incidents cannot clear on UNKNOWN.",
-        "Truth remains operational SQLite separately from immutable RDP/Parquet, manifests, sealed lineage and committed lifecycle evidence. Freshness is not scientific publication or PIT availability.",
-        "Linear timestamp scan, single-row native JSON, filesystem and live resource costs remain commissioning limits; PACKET_INFORMATION_PATH only, MODEL_DIVERSITY_UNPROVEN."
+        "ISOLATED_READ_ONLY; SEMANTIC_PREMISE PASS; frozen contract/diff and all 29 bindings verified; 23 implementation bindings unchanged.",
+        "packet_fingerprint_sha256=cd56d22bd115a3cfc75ad032aff02971aa00bf985b664c8bf00db32a29c66867",
+        "Prior P2 closed: exact scoped raw activation locator now binds both recovery consumers, with absent/null/empty/UNKNOWN/mismatch stopping as UNKNOWN/BLOCKED.",
+        "Synthetic resource PASS does not prove live envelope; retained canary requires numeric peak/clocks and ordinary cycles/delivery proof remain separate.",
+        "Watch env-selected and pulse default backup sinks may differ; correspondence to accepted envelope needs separately gated readback.",
+        "Operational counters, lifecycle pointers and heartbeat freshness do not prove source success, continuity, scientific publication, PIT validity or Telegram delivery.",
+        "Without DuckDB, immutable RDP/Parquet, sealed lineage and committed ResearchStore remain research truth; SQLite is operational projection. No new cross-task private imports.",
+        "Linear timestamp scan, single-row native JSON and filesystem/live resource costs remain limits; PACKET_INFORMATION_PATH, PROCESS_OBLIGATION, MODEL_DIVERSITY_UNPROVEN."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "ISOLATED_READ_ONLY: final candidate and bindings verified; prior operator gaps closed without authority regression.",
-        "Bounded read-only freshness probe, two distinct watch cycles, journal/delivery evidence, pending failure BLOCKED and dedupe provenance are explicit.",
-        "Exact-SHA commissioning/rollback preserves collector, renewal and runtime/scientific bytes; live commissioning not established.",
-        "Final context and mechanical Catalog/TASK21 corrections leave operator surfaces and authority unchanged."
+        "ISOLATED_READ_ONLY: frozen candidate, exact bindings/inventory/packet verified; no new operator gaps.",
+        "Prior P2 closed: both recovery consumers use actual JSON path, explicit predecessor/successor/continuity argument pairs, exact scope and missing/mismatched locator stop.",
+        "No generic status pre-deploy/read-only probe; installed disabled timers visible; effective environment and each real CLI backup sink preserved without secret output.",
+        "Retained numeric MemoryPeak and clocks are required; UNKNOWN stops rollout; resource, two watch cycles, actual delivery and exact-SHA rollback remain distinct."
       ]
     }
   ],
@@ -127,6 +129,38 @@
       "finding": "Commissioning commands did not prove two cycles and actual Telegram delivery.",
       "observed_head": "86d3e7e4a744e55d3f155266331370f8ba885eb8",
       "resolved_by_head": "b85bf7e4d7db67e9d14cc8a141ffad860285b9cb"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "P2",
+      "finding": "Recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
+      "observed_head": "2d61c454a03aa7f282dc4b07c4046def4166587c",
+      "resolved_by_head": "730d3e7b62b3b845991caee794ae66e04ae9e4f1"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "P2",
+      "finding": "Recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
+      "observed_head": "2d61c454a03aa7f282dc4b07c4046def4166587c",
+      "resolved_by_head": "730d3e7b62b3b845991caee794ae66e04ae9e4f1"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "P2",
+      "finding": "Recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
+      "observed_head": "2d61c454a03aa7f282dc4b07c4046def4166587c",
+      "resolved_by_head": "730d3e7b62b3b845991caee794ae66e04ae9e4f1"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "P2",
+      "finding": "Recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
+      "observed_head": "2d61c454a03aa7f282dc4b07c4046def4166587c",
+      "resolved_by_head": "730d3e7b62b3b845991caee794ae66e04ae9e4f1"
     }
   ]
 }
