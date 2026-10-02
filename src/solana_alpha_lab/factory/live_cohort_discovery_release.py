@@ -3280,7 +3280,10 @@ def select_current_datasets_for_forge(
             logical = labels.get("logical_dataset_id")
         if not isinstance(logical, str) or not logical:
             logical = dataset_id or str(item.get("dataset_manifest_id") or "")
-        if logical == CORPUS_DATASET_ID and dataset_id != CORPUS_DATASET_ID:
+        if dataset_id == CORPUS_DATASET_ID:
+            # A non-current label cannot create a second LIVE authority group.
+            logical = CORPUS_DATASET_ID
+        elif logical == CORPUS_DATASET_ID:
             logical = dataset_id or str(item.get("dataset_manifest_id") or "")
         by_logical.setdefault(logical, []).append(dict(item))
 

@@ -963,6 +963,9 @@ Read `result.dataset_manifest_id_before` / `dataset_manifest_id`,
 `IDEMPOTENT_REPAIR` selects the same identity and may finish derived label
 cleanup. `REBUILT_PARTIAL` completes compatible unpublished candidate artifacts;
 conflicting immutable candidate bytes are never overwritten.
+Complete reuse and repaired-root idempotence also check exact target-derived
+generation and receipt bytes. A valid TASK-06 manifest carrying a different
+repair contract still returns `CANONICAL_TARGET_CONFLICT`; do not overwrite it.
 
 On an interrupted preparation, read lineage and rerun the same command. On
 `CANONICAL_TARGET_CONFLICT`, `CANDIDATE_VERIFICATION_FAILED`,

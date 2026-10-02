@@ -75,8 +75,12 @@ CI failure compared equal partitions in different orders: exact model comparison
 now uses canonical partition-id order, retaining every integrity check and
 original composition/receipt order. Both original temporal oracle/saved-result
 verticals PASS on unchanged source. Total: 146 focused tests, one skipped.
-After the independent receipt-contract finding, all 61 repair/import/scientific
-verticals PASS again, including the new imported-root same-schema regression.
+After independent review findings, all 63 repair/import/scientific verticals
+PASS again. They include imported-root same-schema receipt drift, corrupted
+non-current logical grouping without poisoning old current/epoch/receipt, and
+valid TASK-06 roots whose generation or receipt bytes violate their repair target.
+Complete reuse/current idempotence now compare exact builder-derived dataset
+and receipt using the saved target clock; conflicts STOP without writes.
 Semantic search readback via existing catalog_cli search-assets: all four owner
 questions return the intended owner as the sole result (rank 1):
 "how does live RDP get into Forge" -> MODULE-LIVE-COHORT-TO-FORGE-001;

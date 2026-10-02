@@ -136,6 +136,11 @@ receipt/dataset construction, followed by successful C and then B, must reuse
 the same B identity and immutable bytes without manual deletion or restore.
 Imported canonical roots also compare the saved receipt schema/version/profile
 before same-schema idempotence; receipt-contract drift alone requires repair.
+Complete candidate reuse and repaired-root idempotence reconstruct exact dataset
+and receipt bytes with the target's frozen clock; TASK-06 validity alone cannot
+admit a different generation or receipt contract under that target identity.
+Current LIVE grouping uses canonical dataset_id, so non-current derived labels
+cannot split the lineage authority into another logical group.
 
 Capture old lineage and current root without writes. Reconstruct logical rows
 and verify immutable parquet/release composition before preparing replacement.

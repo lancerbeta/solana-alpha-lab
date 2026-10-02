@@ -664,6 +664,31 @@ def _build_dataset(
     return dataset
 
 
+def _verify_repair_target(
+    data_root: Path, dataset: DatasetManifest,
+    claims: Sequence[LiveCorpusPartitionClaims], composition: Sequence[Mapping[str, Any]],
+) -> None:
+    """Verify exact LIVE repair bytes against this target's frozen clock."""
+    parts = _build_partitions(dataset_version=dataset.dataset_version, claims=claims,
+                              published_at=dataset.created_at)
+    fingerprint = compute_dataset_fingerprint(dataset_id=CORPUS_DATASET_ID,
+        dataset_version=dataset.dataset_version, schema_id=CORPUS_SCHEMA_ID,
+        schema_sha256=dataset.schema_sha256, partitions=parts)
+    _, receipt_bytes, receipt_sha = _build_receipt(
+        dataset_version=dataset.dataset_version, schema_sha256=dataset.schema_sha256,
+        partitions=parts, composition=composition, dataset_fingerprint=fingerprint,
+        generation_reason=REPAIR_GENERATION_REASON, published_at=dataset.created_at,
+        superseded_dataset_manifest_id=None)
+    expected = _build_dataset(dataset_version=dataset.dataset_version,
+        schema_sha256=dataset.schema_sha256, partitions=parts,
+        validation_receipt_sha256=receipt_sha, published_at=dataset.created_at,
+        generation_task_id=CANONICAL_GENERATION_TASK_REPAIR,
+        generation_run_id=f"repair-{dataset.dataset_manifest_id[8:]}")
+    _require(dataset == expected, "CANONICAL_TARGET_CONFLICT")
+    _require((_manifests_dir(data_root) / f"{dataset.dataset_manifest_id}.validation.json").read_bytes()
+             == receipt_bytes, "CANONICAL_TARGET_CONFLICT")
+
+
 def _install_parquet(src: Path, dest: Path, expected_sha: str) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     if dest.is_symlink():
@@ -1052,9 +1077,13 @@ def repair_live_corpus_manifests(
             "schema_sha256": schema,
             "logical_row_profile": LOGICAL_ROW_PROFILE,
         }.items()))
+    composition = [{key: item[key] for key in ("cohort_id", "content_sha256", "release_id")}
+                   for item in cohorts]
     if (is_canonical and current.schema_sha256 == schema
             and ((not has_metadata_revision and imported_contract_current)
                  or current.dataset_version == repaired_version)):
+        if has_metadata_revision:
+            _verify_repair_target(root, current, claims, composition)
         _reconcile_current_labels(data_root=root, dataset_manifest_id=current_mid,
             labels=labels, lineage_out=lineage,
             previous_current_mid=latest.get("superseded_dataset_manifest_id"))
@@ -1079,8 +1108,6 @@ def repair_live_corpus_manifests(
     candidate_labels = {key: value for key, value in labels.items()
                         if key != "superseded_dataset_manifest_id"}
     candidate_labels["dataset_version"] = repaired_version
-    composition = [{key: item[key] for key in ("cohort_id", "content_sha256", "release_id")}
-                   for item in cohorts]
     candidate_path = _manifests_dir(root) / f"{repaired_mid}.json"
     candidate_marker = _manifests_dir(root) / f"{repaired_mid}.published"
     disposition = "BUILT"
@@ -1094,6 +1121,7 @@ def repair_live_corpus_manifests(
         dataset = already["dataset"]
         _require(dataset.dataset_version == repaired_version and dataset.schema_sha256 == schema,
                  "CANONICAL_TARGET_CONFLICT")
+        _verify_repair_target(root, dataset, claims, composition)
         _require({part.partition_id: claims_from_partition(part) for part in already["partitions"]}
                  == {claim.partition_id: claim for claim in claims}, "CANONICAL_TARGET_CONFLICT")
         stored_labels = json.loads((_manifests_dir(root) / f"{repaired_mid}.labels.json").read_bytes())

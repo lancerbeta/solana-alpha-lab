@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: f0acdfe3c2daf85caccdc18979a34eedc68906322e6ac88b4299bd4ae0d75be7}
+  integrity: {kind: sha256, sha256: 94f70ccea5bf772d547e7f6939548b39d3d913f0ada10e3c78a63e9c8090a57e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -34063,7 +34063,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_discovery_release.py', repository_path: src/solana_alpha_lab/factory/live_cohort_discovery_release.py}
-  integrity: {kind: sha256, sha256: a3c29d07ee8e055fc5a7345e75e59b61e9226e33410ed4ff231d9c067c87ea1b}
+  integrity: {kind: sha256, sha256: ffb8b7d10014ba327553dcd8d6d04ae88f8e6edbc9684e09273c4efd28e5fde0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001}
@@ -34138,7 +34138,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_corpus_manifest_publish.py', repository_path: src/solana_alpha_lab/factory/live_corpus_manifest_publish.py}
-  integrity: {kind: sha256, sha256: 0a0be808f13cc4315fff851b772f8b39dc7ef4c69aef6c9e6f1ad008ac380464}
+  integrity: {kind: sha256, sha256: 96f4e19d35f3d6d6332ed09b0633525a76acb06c3b2d8df213cbf0a3aaf4473e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001}
@@ -39021,7 +39021,7 @@ records:
     repository_path: docs/tasks/LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2.md
   integrity:
     kind: sha256
-    sha256: 0eee662b3bbbce34c0d9821114d7b3591437d60aa0ec56d19772511c4d962492
+    sha256: 47aea96e99f59d0b1289c4c5f60c4167cdbd94c667d4b622abf6807eeb71110b
   access:
     mode: read_only
     method: file
@@ -39060,7 +39060,7 @@ records:
     repository_path: tests/test_live_corpus_schema_drift_atomic_repair_v2.py
   integrity:
     kind: sha256
-    sha256: 25c89f261c12c8e6463e8e39036f58faffa1753334dcd6d9933a8e94eee40fa4
+    sha256: bad0891cf2ecc61076cf098fc151fdd983091958e72ec0e4cfd4894d5f1822c5
   access:
     mode: read_only
     method: file
@@ -39099,7 +39099,7 @@ records:
     repository_path: docs/reports/live_corpus_schema_drift_atomic_repair_v2/owner_readout.md
   integrity:
     kind: sha256
-    sha256: d412d2a82ef0ef848286b681e7ce5ecac69e34fe8fb8cb1103aae9b2b6984718
+    sha256: 6025c8afb62d42ee4481d91791c1c1b8c6858319bef67ad85f310245ce40a4e1
   access:
     mode: read_only
     method: file

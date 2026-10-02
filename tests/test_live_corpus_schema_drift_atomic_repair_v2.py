@@ -440,6 +440,45 @@ class LiveCorpusAtomicRepairTests(unittest.TestCase):
         self.assertEqual(self.repair()["dataset_manifest_id"], first["dataset_manifest_id"])
         self.assertEqual(compute_market_epoch_for_data_root(ROOT, self.data)[0], self.epoch)
 
+    def test_repaired_target_rejects_valid_but_wrong_generation_or_receipt_contract(self):
+        from solana_alpha_lab.storage.manifests import canonical_manifest_bytes
+        import hashlib
+        import shutil
+        first = self.repair()
+        schema_c = {**logical.live_corpus_schema_projection(), "metadata_contract": "scratch-C"}
+        for location in ("CURRENT", "HISTORICAL_REUSE"):
+            for mutation in ("GENERATION", "RECEIPT"):
+                with self.subTest(location=location, mutation=mutation), tempfile.TemporaryDirectory() as tmp:
+                    data = Path(tmp) / "rdp"
+                    shutil.copytree(self.data, data)
+                    if location == "HISTORICAL_REUSE":
+                        with patch.object(logical, "live_corpus_schema_projection", return_value=schema_c):
+                            repair_live_corpus_manifests(data_root=data)
+                    inspection = publish.inspect_canonical_root(data, first["dataset_manifest_id"])
+                    dataset = inspection["dataset"]
+                    receipt_path = data / f"datasets/manifests/{dataset.dataset_manifest_id}.validation.json"
+                    receipt_bytes = receipt_path.read_bytes()
+                    run_id = dataset.generation_run_id
+                    if mutation == "GENERATION":
+                        run_id = "SCRATCH-INVALID-TARGET-DERIVATION"
+                    else:
+                        receipt = json.loads(receipt_bytes)
+                        receipt["schema_version"] = "SCRATCH-INVALID-TARGET-CONTRACT"
+                        receipt_bytes = publish._canonical_receipt_bytes(receipt)
+                        receipt_path.write_bytes(receipt_bytes)
+                    wrong = publish._build_dataset(dataset_version=dataset.dataset_version,
+                        schema_sha256=dataset.schema_sha256, partitions=inspection["partitions"],
+                        validation_receipt_sha256=hashlib.sha256(receipt_bytes).hexdigest(),
+                        published_at=dataset.created_at, generation_task_id=dataset.generation_task_id,
+                        generation_run_id=run_id)
+                    (data / f"datasets/manifests/{dataset.dataset_manifest_id}.json").write_bytes(canonical_manifest_bytes(wrong))
+                    self.assertTrue(publish.inspect_canonical_root(data, dataset.dataset_manifest_id)["complete"])
+                    before = inventory(data)
+                    with self.assertRaisesRegex(Exception, "CANONICAL_TARGET_CONFLICT"):
+                        repair_live_corpus_manifests(data_root=data)
+                    self.assertEqual(inventory(data), before)
+                    self.assertEqual(compute_market_epoch_for_data_root(ROOT, data)[0], self.epoch)
+
     def test_composition_content_changes_metadata_identity(self):
         old = publish._load_dataset_manifest(self.data, self.old)
         cohorts = load_live_corpus_lineage(self.data)["cohorts"]
@@ -471,6 +510,21 @@ class LiveCorpusAtomicRepairTests(unittest.TestCase):
         self.assertEqual(json.loads(result.stdout)["code"], "PUBLICATION_CLOCK_CORRUPT")
         self.assertNotIn("Traceback", result.stderr)
         self.assert_old_visible()
+
+    def test_wrong_noncurrent_logical_group_cannot_poison_current_market(self):
+        def tamper():
+            candidate = next(p for p in self.data.glob("datasets/manifests/*.labels.json")
+                             if p.name not in {Path(path).name for path in self.before})
+            payload = json.loads(candidate.read_bytes())
+            payload["logical_dataset_id"] = "SCRATCH-DIFFERENT-GROUP"
+            candidate.write_text(json.dumps(payload), encoding="utf-8")
+        with self.assertRaisesRegex(Exception, "CANDIDATE_VERIFICATION_FAILED"):
+            self.repair(fault_before_visibility=tamper)
+        self.assert_old_visible()
+        rows, warnings = enumerate_rdp_datasets(self.data)
+        self.assertEqual(warnings, [])
+        self.assertEqual([row["dataset_manifest_id"] for row in select_current_datasets_for_forge(rows)], [self.old])
+        self.assertEqual(build_forge_input_receipt(self.data, repo_root=ROOT)["active_evidence_set"]["current_dataset_manifest_id"], self.old)
 
     def test_corrupt_uncommitted_labels_cannot_poison_current_market(self):
         def tamper():
