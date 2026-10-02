@@ -1,8 +1,8 @@
 {
   "candidate": {
     "base": "b24ec87f5308377fe7d5543f5db690d9fe8c2532",
-    "diff_sha256": "c6e4c5d76efbfd228cd76540d9c0323f3f95131ffd23a512e39109ec21540bee",
-    "head": "1c7190a3cefcda6283f083a82966202ce80474a1"
+    "diff_sha256": "74ea674a0e054aeba2f4e4e2d3d5c599060b09f6cc330c40d1c44ffc4d4e1f99",
+    "head": "fd508f1a7e31714eea65a3b540bf6d786297f748"
   },
   "evidence": [
     {
@@ -67,7 +67,7 @@
     "NO_MULTIWRITER_OR_POWER_LOSS_DURABILITY_GUARANTEE",
     "Snapshot is staged implementation at actual existing HEAD; packet and three delivery-chain evidence files are excluded to avoid self-binding. Final content inventory is reviewed separately."
   ],
-  "packet_fingerprint_sha256": "c92e4727bee26797687172b10f4a4ede2f0039e8c7d37f4938047aa1456ec25d",
+  "packet_fingerprint_sha256": "74c89ae82d1907899c612873b3d369948fe24fea6b784e432d75501100725f26",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
