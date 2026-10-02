@@ -1,0 +1,68 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1-COMPLETION",
+  "as_of": "2026-10-02",
+  "task_id": "LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1",
+  "state_change": "FROZEN_STORED_PROJECTION_COMPATIBILITY_PRESERVES_HISTORICAL_LOGICAL_IDENTITY",
+  "base_main": "5263abdd327455f239767c0c31855909f90435b7",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/live_corpus_stored_projection_compatibility_v1/factory_fit.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_55_FOCUSED_CASES_WITH_TWO_GIT_SENSITIVE_CASES_REPEATED_ON_CLEAN_HEAD",
+    "independent_review": {
+      "path": "docs/evidence/live_corpus_stored_projection_compatibility_v1/independent_review.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_PHYSICAL_OBS21_RED_TO_GREEN",
+      "PASS_OLD_CURRENT_MIXED_COLD_TEMPORAL_VERTICAL",
+      "PASS_REAL_SIX_SAVED_CLAIMS_READONLY_INVENTORY",
+      "PASS_EPOCH_FULL_BUDGET_HISTORY_INVARIANCE",
+      "PASS_APPEND_MEASURES_ONLY_NEW_TWO_PARTITIONS",
+      "PASS_EXISTING_V2_CRASH_RETRY_SUITE",
+      "PASS_TYPED_INTEGRITY_NEGATIVES",
+      "PASS_FACTORY_STATIC",
+      "PASS_GENERATED_NAVIGATION_SYNC",
+      "PASS_SEMANTIC_PREMISE_VALIDATE_LAUNCH"
+    ]
+  },
+  "non_claims": [
+    "NO_REAL_REPAIR_OR_IMPORT",
+    "NO_REAL_C4_OR_NEXT_COHORT_ACCESS",
+    "NO_REAL_FORGE_OR_SCIENTIFIC_WRITE",
+    "NO_HISTORICAL_PARQUET_OR_SEALED_RELEASE_REWRITE",
+    "NO_ESTIMAND_PIT_BUDGET_PUBLICATION_HARNESS_REDESIGN",
+    "NO_ALPHA_OR_LIVE_OPERATION_SUCCESS_CLAIM",
+    "NO_PROVIDER_DEPLOY",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "repository_local_writes": true,
+    "real_data_plane_mutated": false,
+    "real_c4_accessed": false,
+    "c4_imported": false,
+    "forge_run": false,
+    "provider_calls": 0,
+    "deployment": false
+  }
+}

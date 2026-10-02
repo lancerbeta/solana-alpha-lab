@@ -65,7 +65,10 @@ context_requirements:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/live_corpus_stored_projection_compatibility_v1/completion.json
+      - docs/evidence/live_corpus_stored_projection_compatibility_v1/independent_review.json
+      - docs/evidence/live_corpus_stored_projection_compatibility_v1/factory_fit.json
     HISTORICAL_CONTEXT: []
 ---
 
