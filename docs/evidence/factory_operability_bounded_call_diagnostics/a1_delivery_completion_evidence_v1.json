@@ -11,7 +11,7 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "6f073164528e8a4f258f90b47ef57a461e240bf0978e53b6fd8bbb8121bae0dd",
+    "catalog/assets/core.yaml": "f8d6ed630e77a22008208491e07a2b7b0aae4446b4d4e824fecacd99e4548143",
     "catalog/assets/lifecycle.yaml": "c60b6b212bcf03526d029da8bc116b30751323173dff7b1ea8922f4e40c15db6",
     "catalog/catalog_manifest.yaml": "c8c6d7c7f2f205d2d0af1453a7f13b26c17fec39f62dca80672b1ab1b6404757",
     "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "6787cc13eb2ae164c252501dba8a25bd13e290d644f29d66616fe67798676713",
@@ -21,11 +21,11 @@
     "configs/factory_semantic_operability_v1.yaml": "5c273dccb867b31e345743e6d93e06799b5a25fa386d565c17745f9e9d4c8fc5",
     "docs/PROJECT_MAP.md": "12e82714f528f584df6c343e49f0104d5cc026ecb69e15c48cdd3d7db106f2cc",
     "docs/evidence/factory_operability_bounded_call_diagnostics/a1_resource_profile_v1.json": "bf5c75992c5994425e5e4d4b2fccb381a5d0fffa793b64dea3ce217e026c6dc1",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "2acbb0cc6c53446bcdc9b7ea7e5c268e21e80963a2925b5be8ebb4f97df9360e",
-    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "86ff47fca6365f8f4e6ef2d7cec9904e7374e6260138769426644aeb912b3cb4",
-    "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "1f651879d093c21688479f7ba4a569b66ed88518ac2aa0008d05d9267754667c",
-    "docs/reports/factory_operability_bounded_call_diagnostics/a1_owner_readout_v1.md": "aec81e53583ce271c4ee3667124cf11065bb284561750f0294aebcbe17b1b104",
-    "docs/tasks/FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1.md": "62aafded2ed0514c2c4a2efac6b38ba9d2c8119d84cf0c1d410095087055a30a",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "4549f4d274156f86f2d73ced3a38097f6c7e678994f1e0410b565bc474a2e00d",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "68813931879d4444ee5168f360dc6356aba2198886ebe17c82be1b65c74c0074",
+    "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "29f55fe1153b779056d9d9cd2259b43f5b5b70b23fe6971f7cb5ba9860ccad3c",
+    "docs/reports/factory_operability_bounded_call_diagnostics/a1_owner_readout_v1.md": "d455c25da6a984578887756ce72ed2a332708dff20520a70775b00c4a0b968c7",
+    "docs/tasks/FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1.md": "3ecdfbccbe28b9f119c01ac63695ef103d317d292d62992a72b2ed44cbb46949",
     "scripts/collector_owner_pulse.py": "004032ba9beaabb728eaecb6fde8165d203226bbe495275c81bee593bb587446",
     "scripts/factory_external_heartbeat.py": "a33e223f82f0674c86863843b09741fffee366d385ef2fc83ab4f1dfd386be27",
     "scripts/factory_operability_watch.py": "92ba763cabcba7840510a0d7467805a2ba0e4b73d1e6eab34c684bcd16701efd",
@@ -38,7 +38,7 @@
     "src/solana_alpha_lab/factory/operability_watch.py": "d07855907c88d1ef8a9291e4dd98c6dd3ca54be2c90a93cd10257e81b7c66a76",
     "tests/operability_bounded_call_profile.py": "22cc892bb476df62151b278e751f8d85d57d2759a3776291a4ef8cc6840e80b5",
     "tests/test_collector_owner_pulse_cli_git_sha_repair.py": "d878127b325d836291aceab3758e0e3f9d954f560c2d3de3851ff5a825772dd7",
-    "tests/test_factory_operability_bounded_call_diagnostics_v1.py": "16089947cc3cbf900cad3a6789e5f3858da396e2f8b09e111f966bb26c0bd32d",
+    "tests/test_factory_operability_bounded_call_diagnostics_v1.py": "d74c06b99e68fef6a643a5cf7e3de2cd04fac22799867b6b74f72c0df9bd262c",
     "tests/test_factory_unattended_operability_closure_v1.py": "d2d86238f12b106e1791408ffaccb3c6e45aafe829b8c3e70ca6e7e24f8d3240"
   },
   "active_stop_conditions": [],
@@ -51,14 +51,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_operability_bounded_call_diagnostics/a1_delivery_factory_fit_v1.json",
-    "sha256": "a98e626dce55fceba3dc2fa8e3d493b30795364114cd2d7af160e664f990fa0f",
+    "sha256": "e34ba0857d6d2a9ef7f69be7f40ff3eff410d7bdd29c2c4ca2c3b26bf70c41aa",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_124_FOCUSED_AND_15_SEMANTIC_TESTS_AND_16_UNCHANGED_RESOURCE_PROFILES",
     "independent_review": {
       "path": "docs/evidence/factory_operability_bounded_call_diagnostics/a1_delivery_independent_review_v1.json",
-      "sha256": "0bc8b3f892751a4e5339b9db72245f1333a97ac5300b1c5da6bb5ba287c5a0aa",
+      "sha256": "8c530f1efbffe0417e95738141b970006a7d74c9087fa539f3481f636940c99b",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
