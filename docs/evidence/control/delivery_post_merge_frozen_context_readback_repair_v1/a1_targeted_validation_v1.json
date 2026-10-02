@@ -57,5 +57,9 @@
     "scripts/owner_attention_gate.py": "91a2ef21e4340cf5c8a404faa72fd61a878c81fb724a96b05873fc8ae07ebfc9",
     "tests/test_delivery_post_merge_frozen_context_v1.py": "81fc125cc25ea70548e319103e153e494c18cb7e9005ca21c77a27a22fead68b",
     "tests/test_delivery_harness_merge_guard.py": "28744d03e23c3e3e9ec5544e4439cae4648dfd43e402265d960b1867d0c1c4b9"
+  },
+  "preflight_remediation": {
+    "reason": "SHADOW_PIN_DRIFT:docs/evidence/control/owner_attention_gate_acceptance_v1.json->scripts/owner_attention_gate.py",
+    "change": "SEPARATE_EVALUATOR_SHA_REPIN_ONLY_VERDICTS_AND_HISTORY_PRESERVED"
   }
 }

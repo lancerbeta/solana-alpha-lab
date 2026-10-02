@@ -30,6 +30,7 @@ managed_write_set:
   - catalog/generated/asset_edges.json
   - docs/PROJECT_MAP.md
   - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
+  - docs/evidence/control/owner_attention_gate_acceptance_v1.json
 external_caps:
   network: false
   credentials: false
@@ -141,3 +142,6 @@ historical receipt. This confirmed active-delivery blocker permits the narrow
 control-plane freeze exception.
 
 Rollback: ordinary Git revert of this atom; preserve all historical receipts.
+Preflight found a SEPARATE current-byte evaluator pin in the existing
+owner-attention acceptance evidence. Its evaluator SHA is repinned only;
+historical verdict, base, tests, limits and semantic acceptance remain intact.

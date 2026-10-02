@@ -16381,7 +16381,7 @@ records:
   as_of: '2026-08-08'
   truth_owner: CTRL-OWNER-ATTENTION-GATE
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/control/owner_attention_gate_acceptance_v1.json', repository_path: docs/evidence/control/owner_attention_gate_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 9c45cf1253e41d7369af72f3030770ac02cfb79b2c42a46506e20e3a404fcbd4}
+  integrity: {kind: sha256, sha256: c2c7cceae00ea241bc8ceca8b706257faaf7b12d21c9ec269571aa3901232658}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: POLICY-OWNER-ATTENTION-GATE-001}
@@ -38909,7 +38909,7 @@ records:
     repository_path: docs/tasks/DELIVERY_POST_MERGE_FROZEN_CONTEXT_READBACK_REPAIR_V1.md
   integrity:
     kind: sha256
-    sha256: dc140b7fa77142b668970a1d42c81847f81b10a357850d8d4e0352598e78f725
+    sha256: 26c3a27d6cc14f6eabbab2e6892ace6dad4ec7acac5152ddea4598679d248285
   access:
     mode: read_only
     method: file
@@ -38983,7 +38983,7 @@ records:
     repository_path: docs/evidence/control/delivery_post_merge_frozen_context_readback_repair_v1/a1_targeted_validation_v1.json
   integrity:
     kind: sha256
-    sha256: 687948b70da79cd1f2d3a3c2b63b05c4cfc9e7f147b17aaefe1674470604848d
+    sha256: ae9d96157964a462792bf2a48c14ec6ed7b1e8c1d7851088d71feef927dc1b91
   access:
     mode: read_only
     method: file
