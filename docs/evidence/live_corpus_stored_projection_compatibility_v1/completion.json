@@ -1,0 +1,84 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1-COMPLETION",
+  "as_of": "2026-10-02",
+  "task_id": "LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1",
+  "state_change": "FROZEN_STORED_PROJECTION_COMPATIBILITY_PRESERVES_HISTORICAL_LOGICAL_IDENTITY",
+  "base_main": "5263abdd327455f239767c0c31855909f90435b7",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "86657e1f70f54bc1798eb7f9801e62b11522e09239355729cf24bfebda95b83b",
+    "catalog/assets/lifecycle.yaml": "e872b9240eeb8b5ec0180389b25f16c9007ca05b44dbcd684ffcde592d895e31",
+    "catalog/catalog_manifest.yaml": "ca452a9d75b392bfe881ef82c0d5a1bb2e24b277c213cc8cc0c038b3e24ffd03",
+    "catalog/generated/asset_edges.json": "032df920b03f15748b4f9d36d09e466b057e21123732cc7ebd47af64dc49e9e9",
+    "docs/PROJECT_MAP.md": "80868ae101887a9baf2ea704cf84eb8e313da39b8ef2de5c73f18b2a8f28f2b5",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "9fa9d096e0f09653767eee92c5c4dbb645e47c63db10e7e3218fcebe47591efb",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "ad172e732f461278d8875e42ddda20845f535c1860bcb90e7af1b73f07ba33cc",
+    "docs/reports/live_corpus_stored_projection_compatibility_v1/owner_readout.md": "4401d5e6c8327f4ff902f77f816b75b9ada621b923edd3f7b08422e5c8f0603b",
+    "docs/reports/live_corpus_stored_projection_compatibility_v1/semantic_premise_packet.json": "9fcf9e891a961bcd53df94f542fbf51b52547768424fdc47cb59d97e231a7d54",
+    "docs/tasks/LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1.md": "bf79a2b39bb57382df0585fefdda74ae236fc9d378c0bce7bd26261c4b37fc66",
+    "src/solana_alpha_lab/factory/live_corpus_logical_rows.py": "0acf2380d8e27919f20a9d1c19c8a9cec22e05321f5f5e19c2f4731fb83585ec",
+    "src/solana_alpha_lab/factory/live_corpus_manifest_publish.py": "882676156cfada2c6674353ef1c5f28cd70e7f3b743397e2c72ea4617ba68abe",
+    "tests/test_live_corpus_stored_projection_compatibility_v1.py": "92a7bad05b4b46dff1f12d7e4f82b162ea2d8ecfdcdd3d8dd77f87f3eacdbc10"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/live_corpus_stored_projection_compatibility_v1/factory_fit.json",
+    "sha256": "88bc24006ecc4cdceb76cefcd852d7d738548a73766baaf3f1e8671f174a7479",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_55_FOCUSED_CASES_WITH_TWO_GIT_SENSITIVE_CASES_REPEATED_ON_CLEAN_HEAD",
+    "independent_review": {
+      "path": "docs/evidence/live_corpus_stored_projection_compatibility_v1/independent_review.json",
+      "sha256": "cbaea3b036726823d97d094fae43cf62fbe4fe036c1486a3f6f2b6998697e174",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_PHYSICAL_OBS21_RED_TO_GREEN",
+      "PASS_OLD_CURRENT_MIXED_COLD_TEMPORAL_VERTICAL",
+      "PASS_REAL_SIX_SAVED_CLAIMS_READONLY_INVENTORY",
+      "PASS_EPOCH_FULL_BUDGET_HISTORY_INVARIANCE",
+      "PASS_APPEND_MEASURES_ONLY_NEW_TWO_PARTITIONS",
+      "PASS_EXISTING_V2_CRASH_RETRY_SUITE",
+      "PASS_TYPED_INTEGRITY_NEGATIVES",
+      "PASS_FACTORY_STATIC",
+      "PASS_GENERATED_NAVIGATION_SYNC",
+      "PASS_SEMANTIC_PREMISE_VALIDATE_LAUNCH",
+      "PASS_FOUR_INDEPENDENT_EXACT_CONTENT_REVIEWS",
+      "PASS_EXACT_COMMITTED_CATALOG_SHADOW_PIN_PROPAGATION"
+    ]
+  },
+  "non_claims": [
+    "NO_REAL_REPAIR_OR_IMPORT",
+    "NO_REAL_C4_OR_NEXT_COHORT_ACCESS",
+    "NO_REAL_FORGE_OR_SCIENTIFIC_WRITE",
+    "NO_HISTORICAL_PARQUET_OR_SEALED_RELEASE_REWRITE",
+    "NO_ESTIMAND_PIT_BUDGET_PUBLICATION_HARNESS_REDESIGN",
+    "NO_ALPHA_OR_LIVE_OPERATION_SUCCESS_CLAIM",
+    "NO_PROVIDER_DEPLOY",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "repository_local_writes": true,
+    "real_data_plane_mutated": false,
+    "real_c4_accessed": false,
+    "c4_imported": false,
+    "forge_run": false,
+    "provider_calls": 0,
+    "deployment": false
+  }
+}

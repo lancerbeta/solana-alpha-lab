@@ -1,0 +1,129 @@
+{
+  "candidate": {
+    "base": "5263abdd327455f239767c0c31855909f90435b7",
+    "diff_sha256": "f13ee9567c2fd45e66de6326417d9846ab6dee942ebd4379cd07ece81104db49",
+    "head": "047b92dd19935f0c9cf9670cb46404b1de25efee"
+  },
+  "evidence": [
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/live_corpus_logical_rows.py",
+      "sha256_or_fingerprint": "0acf2380d8e27919f20a9d1c19c8a9cec22e05321f5f5e19c2f4731fb83585ec"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/live_corpus_manifest_publish.py",
+      "sha256_or_fingerprint": "882676156cfada2c6674353ef1c5f28cd70e7f3b743397e2c72ea4617ba68abe"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_grounded_discovery.py",
+      "sha256_or_fingerprint": "4f9334606ee7296568ea8683f14336a041a77fd5c3df77ce65b249e78a0180af"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
+      "sha256_or_fingerprint": "2a25fe4be5680c8e8a8cfc2d70e7856b300bfa47bf7c4ab69622e672b9da14c0"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_evidence_identity.py",
+      "sha256_or_fingerprint": "2de64471450a880674330303ed9434fcc62aa90c733d51719675a31def79c770"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/live_cohort_discovery_release.py",
+      "sha256_or_fingerprint": "ffb8b7d10014ba327553dcd8d6d04ae88f8e6edbc9684e09273c4efd28e5fde0"
+    },
+    {
+      "logical_ref": "repo://tests/test_live_corpus_stored_projection_compatibility_v1.py",
+      "sha256_or_fingerprint": "92a7bad05b4b46dff1f12d7e4f82b162ea2d8ecfdcdd3d8dd77f87f3eacdbc10"
+    },
+    {
+      "logical_ref": "repo://tests/test_live_corpus_schema_drift_atomic_repair_v2.py",
+      "sha256_or_fingerprint": "bad0891cf2ecc61076cf098fc151fdd983091958e72ec0e4cfd4894d5f1822c5"
+    },
+    {
+      "logical_ref": "repo://tests/test_live_corpus_manifest_contract_repair_v1.py",
+      "sha256_or_fingerprint": "673fedf13fa2094b5c5d17cb87b564277d4949e98ac3710b5b793ef58d037aab"
+    },
+    {
+      "logical_ref": "repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md",
+      "sha256_or_fingerprint": "ad172e732f461278d8875e42ddda20845f535c1860bcb90e7af1b73f07ba33cc"
+    },
+    {
+      "logical_ref": "repo://docs/reports/live_corpus_stored_projection_compatibility_v1/owner_readout.md",
+      "sha256_or_fingerprint": "4401d5e6c8327f4ff902f77f816b75b9ada621b923edd3f7b08422e5c8f0603b"
+    }
+  ],
+  "independence": {
+    "claim_scope": "PACKET_INFORMATION_PATH",
+    "context_isolated": true,
+    "implementation_transcript_seen": false,
+    "launch_isolation": "PROCESS_OBLIGATION",
+    "model_diversity": "UNPROVEN",
+    "model_diversity_identity": null,
+    "packet_bound": true,
+    "readonly": true
+  },
+  "non_claims": [
+    "NO_REAL_REPAIR_OR_IMPORT",
+    "NO_REAL_C4_OR_NEXT_COHORT_ACCESS",
+    "NO_REAL_FORGE_OR_RESEARCHSTORE_WRITE",
+    "NO_HISTORICAL_DATA_REWRITE_OR_CLOCK_INFERENCE",
+    "NO_ESTIMAND_PIT_BUDGET_PUBLICATION_HARNESS_REDESIGN",
+    "NO_PROVIDER_DEPLOY_OR_MERGE",
+    "Packet freezes committed implementation at source head; packet and three delivery-chain files are later bound by the final independent inventory. MODEL_DIVERSITY_UNPROVEN."
+  ],
+  "packet_fingerprint_sha256": "7b126f2e25aa7e9a2d25d69bd8e5f15578d7325c2ad5278d83d6bbf37ff69d33",
+  "questions": [
+    "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
+    "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
+    "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL",
+    "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE",
+    "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY",
+    "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING",
+    "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER",
+    "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE",
+    "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM",
+    "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS"
+  ],
+  "review": {
+    "architecture_owner": "ARCHITECTURE_CRITIC",
+    "profile": "SEMANTIC_PREMISE",
+    "risk_dimensions": [
+      "EVIDENCE_ADMISSIBILITY",
+      "PIT_OR_AVAILABILITY_SEMANTICS",
+      "RESEARCH_TRUTH_OWNERSHIP",
+      "UNKNOWN_VS_NEGATIVE_EVIDENCE",
+      "DURABLE_SCIENCE_SCHEMA"
+    ]
+  },
+  "schema": "smial.semantic-premise-review-packet",
+  "schema_version": "1.0",
+  "semantic_claims": [
+    {
+      "claim": "Exact frozen physical CENSUS-20, OBS-21 and OBS-24 layouts select their original logical hash projection; absent legacy keys remain absent and explicit current null keys remain present.",
+      "claim_id": "FROZEN_PROJECTION",
+      "scope": "Existing LIVE logical-row owner only; exact field order, types and nullability, no row/date/cohort guesses."
+    },
+    {
+      "claim": "Canonical repair reconstructs against the verified saved claims and stops before publication on file/content/count/PIT mismatch or unsupported layout.",
+      "claim_id": "CLAIM_INTEGRITY",
+      "scope": "Existing serialized V2 repair, unchanged final equality and visibility transition."
+    },
+    {
+      "claim": "The descriptor honestly declares stored mixed projections separately from the writer. Production scratch seal/verify/import and cold temporal reader accept OBS-21 plus OBS-24 without backfill.",
+      "claim_id": "MIXED_CORPUS",
+      "scope": "One bounded scratch v3 repair, v4 import/read, idempotent repair, v5 ordinary append; observed/missing target and PIT deadline checks."
+    },
+    {
+      "claim": "Metadata repair preserves saved scientific claims, corpus version, V2 epoch, complete occupied AUTO/focus budget and history. Ordinary append reuses historical claims and measures only new partitions.",
+      "claim_id": "SCIENTIFIC_INVARIANCE",
+      "scope": "Production-shaped scratch tests; no real repair/import or scientific look outcome claim."
+    },
+    {
+      "claim": "The patched measurement reproduced all six saved real C1-C3 claims without changing the bounded file/mtime/sidecar inventory.",
+      "claim_id": "REAL_COMPATIBILITY",
+      "scope": "Owner-authorized read-only six current partitions, external local evidence; not a real repaired publication or broader runtime assertion."
+    }
+  ],
+  "task": {
+    "task_contract_sha256": "bf79a2b39bb57382df0585fefdda74ae236fc9d378c0bce7bd26261c4b37fc66",
+    "task_id": "LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1"
+  }
+}

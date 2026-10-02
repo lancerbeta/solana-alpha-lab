@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: 94f70ccea5bf772d547e7f6939548b39d3d913f0ada10e3c78a63e9c8090a57e}
+  integrity: {kind: sha256, sha256: ad172e732f461278d8875e42ddda20845f535c1860bcb90e7af1b73f07ba33cc}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -34114,20 +34114,20 @@ records:
 - asset_id: MODULE-LIVE-CORPUS-LOGICAL-ROWS-001
   record_version: '1.0'
   asset_type: script
-  purpose: Local census/observations canonical logical-row profile and LIVE CORPUS schema hash for TASK-06 content_sha256.
+  purpose: Frozen CENSUS-20/OBS-21/OBS-24 stored hash projections, strict physical layout and saved claims; current writer and mixed LIVE descriptor are separate.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-17'
-  truth_owner: LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1
+  truth_owner: LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_corpus_logical_rows.py', repository_path: src/solana_alpha_lab/factory/live_corpus_logical_rows.py}
-  integrity: {kind: sha256, sha256: 2ba111553e1eb8ffff6899c0eae3d90eb5aa8438bb6f02359c87c96a08d7353a}
+  integrity: {kind: sha256, sha256: 0acf2380d8e27919f20a9d1c19c8a9cec22e05321f5f5e19c2f4731fb83585ec}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
-  - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001}
+  - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-STORED-PROJECTION-COMPATIBILITY-V1-001}
   - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-SOURCE-BUNDLE-001}
   consumers: [FACTORY-001]
   evidence: []
-  search_terms: [LIVE_CORPUS, LOGICAL_ROWS, CONTENT_SHA256]
+  search_terms: [LIVE_CORPUS, LOGICAL_ROWS, CONTENT_SHA256, OBS-21, OBS-24, frozen projection, mixed corpus, stored schema compatibility]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001
   record_version: '1.0'
@@ -34138,7 +34138,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_corpus_manifest_publish.py', repository_path: src/solana_alpha_lab/factory/live_corpus_manifest_publish.py}
-  integrity: {kind: sha256, sha256: 96f4e19d35f3d6d6332ed09b0633525a76acb06c3b2d8df213cbf0a3aaf4473e}
+  integrity: {kind: sha256, sha256: 882676156cfada2c6674353ef1c5f28cd70e7f3b743397e2c72ea4617ba68abe}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001}
@@ -39119,6 +39119,129 @@ records:
   - schema drift
   - atomic repair
   - lineage current root
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: CTRL-LIVE-CORPUS-STORED-PROJECTION-COMPATIBILITY-V1-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Bounded physical historical/current/mixed LIVE projection compatibility
+    and delivery contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-02'
+  truth_owner: LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/tasks/LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1.md
+    repository_path: docs/tasks/LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1.md
+  integrity:
+    kind: sha256
+    sha256: bf79a2b39bb57382df0585fefdda74ae236fc9d378c0bce7bd26261c4b37fc66
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: PROTOCOL-DELIVERY-HARNESS-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-LIVE-CORPUS-LOGICAL-ROWS-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1
+  - OBS-21
+  - OBS-24
+  - frozen projection
+  - mixed corpus
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: TEST-LIVE-CORPUS-STORED-PROJECTION-COMPATIBILITY-V1-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Pinned physical OBS-21, explicit OBS-24 nulls, mixed v3 repair/v4 cold
+    temporal read/v5 append and fail-closed bindings.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-02'
+  truth_owner: LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_live_corpus_stored_projection_compatibility_v1.py
+    repository_path: tests/test_live_corpus_stored_projection_compatibility_v1.py
+  integrity:
+    kind: sha256
+    sha256: 92a7bad05b4b46dff1f12d7e4f82b162ea2d8ecfdcdd3d8dd77f87f3eacdbc10
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIVE-CORPUS-STORED-PROJECTION-COMPATIBILITY-V1-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-LIVE-CORPUS-LOGICAL-ROWS-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1
+  - OBS-21
+  - OBS-24
+  - frozen projection
+  - mixed corpus
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: REPORT-LIVE-CORPUS-STORED-PROJECTION-COMPATIBILITY-V1-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Projection compatibility evidence and limitations; detailed real read-only
+    machine truth remains outside tracked Git.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-02'
+  truth_owner: LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/reports/live_corpus_stored_projection_compatibility_v1/owner_readout.md
+    repository_path: docs/reports/live_corpus_stored_projection_compatibility_v1/owner_readout.md
+  integrity:
+    kind: sha256
+    sha256: 4401d5e6c8327f4ff902f77f816b75b9ada621b923edd3f7b08422e5c8f0603b
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIVE-CORPUS-STORED-PROJECTION-COMPATIBILITY-V1-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-LIVE-CORPUS-LOGICAL-ROWS-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1
+  - OBS-21
+  - OBS-24
+  - frozen projection
+  - mixed corpus
   classification:
     contains_secrets: false
     contains_raw_data: false

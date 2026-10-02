@@ -3973,6 +3973,16 @@
       "target_asset_id": "PROTOCOL-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "CTRL-LIVE-CORPUS-STORED-PROJECTION-COMPATIBILITY-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-CORPUS-LOGICAL-ROWS-001"
+    },
+    {
+      "source_asset_id": "CTRL-LIVE-CORPUS-STORED-PROJECTION-COMPATIBILITY-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "PROTOCOL-DELIVERY-HARNESS-001"
+    },
+    {
       "source_asset_id": "CTRL-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-FACTORY-LIFECYCLE-COLLECTOR-001"
@@ -11775,7 +11785,7 @@
     {
       "source_asset_id": "MODULE-LIVE-CORPUS-LOGICAL-ROWS-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001"
+      "target_asset_id": "CTRL-LIVE-CORPUS-STORED-PROJECTION-COMPATIBILITY-V1-001"
     },
     {
       "source_asset_id": "MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001",
@@ -14171,6 +14181,16 @@
       "source_asset_id": "REPORT-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001"
+    },
+    {
+      "source_asset_id": "REPORT-LIVE-CORPUS-STORED-PROJECTION-COMPATIBILITY-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-CORPUS-LOGICAL-ROWS-001"
+    },
+    {
+      "source_asset_id": "REPORT-LIVE-CORPUS-STORED-PROJECTION-COMPATIBILITY-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIVE-CORPUS-STORED-PROJECTION-COMPATIBILITY-V1-001"
     },
     {
       "source_asset_id": "REPORT-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-OWNER-READOUT-001",
@@ -17331,6 +17351,16 @@
       "source_asset_id": "TEST-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001"
+    },
+    {
+      "source_asset_id": "TEST-LIVE-CORPUS-STORED-PROJECTION-COMPATIBILITY-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-CORPUS-LOGICAL-ROWS-001"
+    },
+    {
+      "source_asset_id": "TEST-LIVE-CORPUS-STORED-PROJECTION-COMPATIBILITY-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIVE-CORPUS-STORED-PROJECTION-COMPATIBILITY-V1-001"
     },
     {
       "source_asset_id": "TEST-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001",
