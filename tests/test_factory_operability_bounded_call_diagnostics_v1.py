@@ -3,12 +3,17 @@
 from __future__ import annotations
 
 import json
+import io
+import re
+import sqlite3
 import subprocess
 import sys
 import tempfile
 import unittest
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from contextlib import redirect_stdout
+from types import SimpleNamespace
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -59,6 +64,106 @@ class BoundedCallTests(unittest.TestCase):
 
     def read(self):
         return build_collector_read_model(self.store, now=NOW, schedule_sha256=DIGEST, activation_id="A")
+
+    def runbook_code(self, marker):
+        runbook = (ROOT / 'docs/operator/FACTORY_UNATTENDED_OPERABILITY.md').read_text(encoding='utf-8')
+        return next(code for code in re.findall(r"<<'PY'\n(.*?)\nPY", runbook, re.S) if marker in code)
+
+    def execute_runbook_code(self, code, arguments):
+        output = io.StringIO()
+        exit_code = 0
+        with patch.object(sys, 'argv', ['runbook-probe', *arguments]), redirect_stdout(output):
+            try:
+                exec(compile(code, 'operator-runbook-probe', 'exec'), {})
+            except SystemExit as error:
+                exit_code = error.code
+        return exit_code, json.loads(output.getvalue())
+
+    def test_predeploy_sql_probe_never_reads_payload_and_preserves_sqlite(self):
+        for index in range(40):
+            self.call(NOW - timedelta(days=2), huge='x' * 20000)
+        database = Path(self.store.path)
+        files = [database, Path(str(database) + '-wal')]
+        before = {str(path): path.read_bytes() for path in files if path.exists()}
+        connect = sqlite3.connect
+
+        def checked_connect(database_uri, **kwargs):
+            self.assertTrue(database_uri.endswith('?mode=ro'))
+            self.assertTrue(kwargs['uri'])
+            connection = connect(database_uri, **kwargs)
+            def authorizer(action, table, column, *_):
+                if action == sqlite3.SQLITE_READ and column in {'payload_json', 'document_json'}:
+                    return sqlite3.SQLITE_DENY
+                if action in {sqlite3.SQLITE_INSERT, sqlite3.SQLITE_UPDATE, sqlite3.SQLITE_DELETE,
+                              sqlite3.SQLITE_CREATE_TABLE, sqlite3.SQLITE_CREATE_INDEX}:
+                    return sqlite3.SQLITE_DENY
+                return sqlite3.SQLITE_OK
+            connection.set_authorizer(authorizer)
+            return connection
+
+        with patch('pathlib.Path.resolve', return_value=database), patch('sqlite3.connect', side_effect=checked_connect):
+            code, result = self.execute_runbook_code(self.runbook_code('activation_and_authority_raw'), [DIGEST, 'A'])
+        self.assertEqual(code, 0)
+        self.assertEqual(result['probe_state'], 'RAW_READBACK')
+        self.assertEqual(len(result['activation_and_authority_raw']), 1)
+        self.assertEqual(len(result['call_tail_raw']), 32)
+        self.assertEqual(result['source_http_success'], 'UNKNOWN')
+        self.assertEqual(result['scientific_publication'], 'UNKNOWN')
+        self.assertEqual(before, {str(path): path.read_bytes() for path in files if path.exists()})
+
+    def test_canary_environment_guard_rejects_drift_and_missing_properties_without_values(self):
+        fields = {'LoadState': 'loaded', 'WorkingDirectory': '/opt/solana-alpha-lab',
+                  'EnvironmentFiles': '/etc/solana-alpha-lab/secrets.env (ignore_errors=yes)',
+                  'NoNewPrivileges': 'yes', 'Slice': 'system.slice',
+                  **{name: '' for name in ('Environment', 'PassEnvironment', 'UnsetEnvironment',
+                                           'DropInPaths', 'User', 'Group', 'RootDirectory', 'RootImage')}}
+        cases = [(fields, 'MATCH')]
+        for missing in fields:
+            cases.append(({key: value for key, value in fields.items() if key != missing}, 'UNKNOWN'))
+        cases += [(dict(fields, Environment='FAKE_REVIEW_SENTINEL'), 'UNKNOWN'),
+                  (dict(fields, DropInPaths='/run/systemd/system/example.conf'), 'UNKNOWN'),
+                  (dict(fields, EnvironmentFiles='/different/env'), 'UNKNOWN')]
+        code = self.runbook_code('report_environment_state')
+        for values, expected in cases:
+            with self.subTest(expected=expected, keys=sorted(values)):
+                completed = SimpleNamespace(returncode=0, stdout='\n'.join(f'{key}={value}' for key, value in values.items()))
+                with patch('subprocess.run', return_value=completed), patch('os.stat', return_value=SimpleNamespace(st_mode=0o100600)), patch('os.access', return_value=True):
+                    exit_code, result = self.execute_runbook_code(code, ['factory-operability-watch.service'])
+                self.assertEqual(exit_code, 0 if expected == 'MATCH' else 2)
+                self.assertEqual(result, {'report_environment_state': expected})
+                self.assertNotIn('FAKE_REVIEW_SENTINEL', json.dumps(result))
+
+    def test_canary_readback_requires_peak_clocks_and_exact_success(self):
+        fields = {'ActiveState': 'active', 'SubState': 'exited', 'Result': 'success',
+                  'ExecMainStatus': '0', 'MemoryPeak': str(75 * 1024**2),
+                  'ExecMainStartTimestampMonotonic': '1000000', 'ExecMainExitTimestampMonotonic': '2700000'}
+        cases = [(fields, 'PASS')]
+        for key in fields:
+            cases.append(({name: value for name, value in fields.items() if name != key}, 'UNKNOWN'))
+        cases += [(dict(fields, MemoryPeak=value), 'UNKNOWN') for value in ('', '0', 'infinity', str(2**64 - 1))]
+        cases += [(dict(fields, MemoryPeak=str(512 * 1024**2)), 'BLOCKED'),
+                  (dict(fields, ExecMainExitTimestampMonotonic='121000000'), 'BLOCKED'),
+                  (dict(fields, ExecMainExitTimestampMonotonic='1000000'), 'UNKNOWN'),
+                  (dict(fields, Result='oom-kill', MemoryPeak=''), 'BLOCKED'),
+                  (dict(fields, ExecMainStatus='1'), 'BLOCKED')]
+        code = self.runbook_code('resource_state')
+        for values, expected in cases:
+            with self.subTest(values=values):
+                completed = SimpleNamespace(returncode=0, stdout='\n'.join(f'{key}={value}' for key, value in values.items()))
+                with patch('subprocess.run', return_value=completed):
+                    exit_code, result = self.execute_runbook_code(code, ['factory-watch-canary-example.service'])
+                self.assertEqual(exit_code, 0 if expected == 'PASS' else 2)
+                self.assertEqual(result['resource_state'], expected)
+
+    def test_canary_readback_unavailable_is_typed_unknown(self):
+        code = self.runbook_code('resource_state')
+        for error in (FileNotFoundError('FAKE_REVIEW_SENTINEL'),
+                      subprocess.TimeoutExpired('systemctl', 5, stderr='FAKE_REVIEW_SENTINEL')):
+            with self.subTest(error=type(error).__name__), patch('subprocess.run', side_effect=error):
+                exit_code, result = self.execute_runbook_code(code, ['factory-watch-canary-example.service'])
+            self.assertEqual(exit_code, 2)
+            self.assertEqual(result['resource_state'], 'UNKNOWN')
+            self.assertNotIn('FAKE_REVIEW_SENTINEL', json.dumps(result))
 
     def test_window_scope_counters_and_strict_same_primitive_recovery(self):
         self.call(NOW - timedelta(days=2), http=HTTP_CLASS_403, huge="x" * 100_000)

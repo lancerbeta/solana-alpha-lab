@@ -19,7 +19,9 @@ Snapshot доказывает выполнение watch, но не достав
 date -u
 cat .factory_deploy_sha
 systemctl show factory-operability-watch.service factory-collector-owner-pulse.service --property=Result,ExecMainStatus,MemoryPeak,MemoryMax,TimeoutStartUSec
-systemctl list-timers factory-operability-watch.timer factory-collector-owner-pulse.timer factory-observation-schedule.timer factory-same-envelope-renewal.timer --no-pager
+systemctl list-unit-files factory-operability-watch.timer factory-collector-owner-pulse.timer factory-observation-schedule.timer factory-same-envelope-renewal.timer --no-pager
+systemctl show factory-operability-watch.timer factory-collector-owner-pulse.timer factory-observation-schedule.timer factory-same-envelope-renewal.timer --property=Id,LoadState,UnitFileState,ActiveState,SubState,LastTriggerUSec,NextElapseUSecRealtime
+systemctl list-timers --all factory-operability-watch.timer factory-collector-owner-pulse.timer factory-observation-schedule.timer factory-same-envelope-renewal.timer --no-pager
 journalctl -k --since '24 hours ago' --grep='oom-kill|Out of memory|Killed process' --no-pager -n 20
 stat -c 'snapshot bytes=%s modified=%y' local/factory_v1/operability_collector_snapshot.json
 df -h /opt/solana-alpha-lab
@@ -46,14 +48,110 @@ PY
 
 Результат — `FRESH`, `STALE`, `MISSING` или `INVALID` и возраст. Команда читает
 не более 65536 байт, не открывает collector store и не отправляет ping/Telegram.
-Дополните проверку узким `observation_schedule.py status`
-из collector runbook. Не читайте весь ledger и не запускайте старый полный
+Отключённые installed timers видны в `list-unit-files` и в явном `show`;
+`list-timers --all` дополняет их расписанием загруженных units. Пустой список
+срабатываний не означает, что unit отсутствует.
+
+До deploy используйте SQLite probe ниже. `observation_schedule.py status`
+не входит ни в pre-deploy, ни в read-only проверку: predecessor может пройти
+весь call ledger, а CLI открывает store с возможностью schema/write операций.
+После deploy этот CLI также не является доказанным read-only probe; данный
+runbook его не запускает. Не читайте весь ledger и не запускайте старый полный
 packet на хосте после OOM. `PROVIDER_STATE_UNKNOWN` означает непроверяемую
 диагностику: проверьте scope и clocks, не объявляйте провайдера здоровым.
 Watch выдаёт отдельный `CALL_DIAGNOSTICS_UNKNOWN` после 1800s; прежний
 `MATERIAL_COVERAGE_DEGRADATION` означает только подтверждённый `DISCOVERY_GAP`.
 Heartbeat с настроенным URL и свежим snapshot — реальный HTTPS-запрос;
 не используйте его как read-only probe.
+
+
+## Узкий pre-deploy SQLite readback
+
+Задайте точные `<SCHEDULE_SHA256>` и `<ACTIVATION_ID>` из уже принятого
+campaign envelope; не выбирайте latest activation. Путь ниже соответствует
+`ops_store_relative` в runtime config: при другом effective path остановитесь
+и подставьте подтверждённый путь, не создавайте новую базу.
+
+```sh
+/usr/bin/uv run --locked --managed-python python -B - '<SCHEDULE_SHA256>' '<ACTIVATION_ID>' <<'PY'
+import json
+import sqlite3
+import sys
+import time
+from datetime import UTC, datetime
+from pathlib import Path
+
+scope = (sys.argv[1], sys.argv[2])
+database = Path('local/factory_v1/observation_schedule_state.sqlite').resolve()
+if not database.is_file():
+    print(json.dumps({'probe_state': 'UNKNOWN', 'reason': 'STORE_MISSING'}))
+    raise SystemExit(2)
+deadline = time.monotonic() + 5
+try:
+    connection = sqlite3.connect(database.as_uri() + '?mode=ro', uri=True, timeout=2)
+except sqlite3.Error:
+    print(json.dumps({'probe_state': 'UNKNOWN', 'reason': 'STORE_OPEN_FAILED'}))
+    raise SystemExit(2)
+connection.row_factory = sqlite3.Row
+connection.execute('PRAGMA query_only=ON')
+connection.execute('PRAGMA cache_size=-2048')
+connection.set_progress_handler(lambda: int(time.monotonic() > deadline), 1000)
+queries = {
+    'activation_and_authority_raw': ("""SELECT a.state, a.starts_at, a.stops_admitting_at, a.updated_at,
+        a.transition_sequence, a.last_transition_event_id,
+        a.authority_receipt_sha256, r.expires_at AS authority_expires_at
+        FROM schedule_activations AS a
+        LEFT JOIN authority_receipts AS r
+          ON r.receipt_sha256 = a.authority_receipt_sha256
+        WHERE a.schedule_sha256=? AND a.activation_id=? LIMIT 1""", scope),
+    'today_accounting_raw': ("""SELECT provider_calls, canonical_bytes, last_provider_call_at, updated_at
+        FROM accounting_counters
+        WHERE schedule_sha256=? AND activation_id=? AND utc_day=? LIMIT 1""", (*scope, datetime.now(UTC).date().isoformat())),
+    'lifetime_raw': ("""SELECT provider_calls, canonical_bytes, updated_at FROM lifetime_counters
+        WHERE schedule_sha256=? AND activation_id=? LIMIT 1""", scope),
+    'due_states_raw': ("""SELECT state, count(*) AS rows, min(due_at) AS first_due_at
+        FROM due_observations WHERE schedule_sha256=? AND activation_id=?
+        GROUP BY state LIMIT 16""", scope),
+    'call_tail_raw': ("""SELECT rowid, primitive_id, state, created_at, updated_at
+        FROM call_ledger ORDER BY rowid DESC LIMIT 32""", ()),
+    'publication_tail_raw': ("""SELECT rowid, batch_content_sha256, created_at
+        FROM publication_batches ORDER BY rowid DESC LIMIT 8""", ()),
+    'restore_marker_raw': ("""SELECT resolved FROM restore_markers WHERE marker_id='UNRESOLVED' LIMIT 1""", ()),
+}
+try:
+    result = {name: [dict(row) for row in connection.execute(sql, parameters)]
+              for name, (sql, parameters) in queries.items()}
+    found = bool(result['activation_and_authority_raw'])
+    print(json.dumps({'probe_state': 'RAW_READBACK' if found else 'UNKNOWN',
+                      'source_http_success': 'UNKNOWN', 'scientific_publication': 'UNKNOWN',
+                      **result}, sort_keys=True))
+    if not found:
+        raise SystemExit(2)
+except sqlite3.Error:
+    print(json.dumps({'probe_state': 'UNKNOWN', 'reason': 'SQL_READ_FAILED_OR_BUDGET'}))
+    raise SystemExit(2)
+finally:
+    connection.close()
+PY
+```
+
+Запросы не выбирают `payload_json`, не вызывают Factory store/CLI и не меняют
+schema/SQLite. Primary keys ограничивают activation, authority и counters;
+существующий `(schedule_sha256, activation_id, state, due_at, deadline_at)`
+index обслуживает due aggregate. Call/publication tails ограничены 32/8
+строками в порядке insertion `rowid`, без сортировки всей истории.
+5s SQL budget и 2s lock timeout завершают неуспешное чтение как `UNKNOWN`.
+
+Повторите readback через один collector interval: advancement counters и
+source-primitive timestamps в tail — свидетельства оперативной активности.
+Tail не гарантирует присутствия выбранной campaign, не упорядочен по UTC и
+не доказывает `HTTP_OK`; accounting clock не равен source success.
+Raw activation state не заменяет as-of transition/authority/rollover proof.
+`canonical_bytes` и publication ledger не доказывают доступность научного RDP:
+для неё нужен точный сохранённый publication receipt/manifest и scientific
+lineage. Если нужного source/RDP/continuity доказательства нет, оставьте
+соответствующий пункт `UNKNOWN` и остановите rollout; не расширяйте этот
+probe до полного ledger, recursive RDP scan или writable `status`.
 
 Если два отчётных timer временно отключены, collector и same-envelope renewal
 продолжают свои циклы; incident/recovery и ежедневной Telegram-карточки нет.
@@ -155,6 +253,11 @@ Parser footer fields: `MESSAGE_TYPE`, `STATE`, `INCIDENT`, `COLLECTOR_STATE`,
 
 ## WHAT IS SAFE TO READ?
 
+До deploy после OOM используйте только bounded snapshot/SQLite/systemd probes
+выше. Тяжёлые watch/pulse dry-run ниже допустимы после deploy только в canary
+с проверенным окружением и caps. Generic status/doctor не заменяет pre-deploy
+probe: read-only эффект и ресурсный предел должны быть доказаны отдельно.
+
 - `scripts/hot90_activation.py show` — no mutation.
 - `scripts/collector_owner_pulse.py --mode dry-run` — zero network, zero
   Telegram credential VALUE reads.
@@ -245,20 +348,135 @@ sudo install -m 0644 configs/factory_remote_ops/factory-collector-owner-pulse.ti
 sudo systemctl daemon-reload
 ```
 
-3. Watch dry-run под лимитом; `oneshot` делает TimeoutStartSec ограничением
-   всей команды. Сохраните terminal, wall и memory accounting из вывода `--wait`:
+3. Memory canary запускается **после deploy** и до включения report timers.
+   Он должен получить effective окружение реальных watch/pulse, включая
+   `FACTORY_BACKUP_SINK`: без env file packet может измерить другой sink и
+   дать ложный resource PASS. Не используйте bare `sudo uv`, `source`, `env`,
+   `systemctl cat` или вывод `Environment`: они не являются безопасным
+   доказательством совпадения и могут раскрыть значения секретов.
+
+Для canonical templates ниже проверьте effective settings **обеих** units:
 
 ```sh
-sudo systemd-run --unit=factory-watch-commissioning --service-type=oneshot --wait --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab /usr/bin/uv run --locked --managed-python python -B scripts/factory_operability_watch.py --mode dry-run --skip-systemd
+check_report_environment() {
+    sudo /usr/bin/uv run --locked --managed-python python -B - "$1" <<'PY'
+import json
+import os
+import stat
+import subprocess
+import sys
+
+expected = {'LoadState': 'loaded', 'WorkingDirectory': '/opt/solana-alpha-lab',
+            'EnvironmentFiles': '/etc/solana-alpha-lab/secrets.env (ignore_errors=yes)',
+            'NoNewPrivileges': 'yes', 'Slice': 'system.slice',
+            **{name: '' for name in ('Environment', 'PassEnvironment', 'UnsetEnvironment',
+                                     'DropInPaths', 'User', 'Group', 'RootDirectory', 'RootImage')}}
+state = 'UNKNOWN'
+try:
+    read = subprocess.run(['systemctl', 'show', sys.argv[1],
+                           '--property=' + ','.join(expected)],
+                          capture_output=True, text=True, timeout=5, check=False)
+    values = dict(line.split('=', 1) for line in read.stdout.splitlines() if '=' in line)
+    env_file = '/etc/solana-alpha-lab/secrets.env'
+    if (read.returncode == 0 and expected.keys() <= values.keys()
+            and all(values[name] == wanted for name, wanted in expected.items())
+            and stat.S_IMODE(os.stat(env_file).st_mode) == 0o600
+            and os.access(env_file, os.R_OK)):
+        state = 'MATCH'
+except (OSError, subprocess.SubprocessError):
+    pass
+print(json.dumps({'report_environment_state': state}))
+raise SystemExit(0 if state == 'MATCH' else 2)
+PY
+}
+check_report_environment factory-operability-watch.service && check_report_environment factory-collector-owner-pulse.service
+sudo stat -c 'env_file_metadata=%d:%i:%s:%Y mode=%a' /etc/solana-alpha-lab/secrets.env
 ```
 
-[`systemd-run --wait`](https://raw.githubusercontent.com/systemd/systemd/main/man/systemd-run.xml)
-выводит runtime/exit и доступные accounting data; успешно завершённая transient
-unit может сразу исчезнуть. Не считывайте её отсутствующий MemoryPeak как ноль.
-Если host не отдаёт peak, результат `UNKNOWN` и timer не включать до отдельного
-профиля под теми же лимитами. Требуется peak <512 MiB, wall <120s и exit=0.
-Git fixture evidence не заменяет host проверку. По read-only dry-run preview
-также проверьте snapshot/incident semantics; dry-run snapshot не записывает.
+Проверка сравнивает inline environment в памяти только с пустой строкой;
+значения не выводятся, не сохраняются и не передаются в argv. Env file читает
+только service manager. При nonzero/неизвестном property, другом env file,
+drop-in или effective User/Group окружение = `UNKNOWN`: остановитесь и
+разберите конкретное отличие в отдельном OPERATE scope. Не копируйте
+секреты в команду. Не меняйте env file между canary и обычными запусками;
+повторите проверку метаданных перед enablement. Обе команды ниже используют
+тот же manager, root identity, working directory и env file и повторяют
+соответствующий production CLI. Это доказывает совпадение canary с конкретной
+unit; одинаковый env file не доказывает общий физический sink двух consumers.
+Watch передаёт окружение в packet и использует `FACTORY_BACKUP_SINK`.
+Существующий pulse CLI не передаёт окружение в packet: dry-run и emit читают
+git-side default sink. Canary сохраняет этот фактический путь; не объявляйте
+его проверкой env-selected sink. Если принятый production backup envelope
+требует другой sink, соответствие pulse = `UNKNOWN`, rollout остановить до
+отдельной коррекции этого consumer. Dry-run не читает Telegram credential VALUE,
+не отправляет сообщения и не записывает snapshot/incident/storage history.
+Следующие canary команды разрешены только после двух `MATCH` и сохранённых
+метаданных env file; любая ошибка этой проверки останавливает rollout.
+
+```sh
+WATCH_CANARY="factory-watch-canary-$(date -u +%Y%m%dT%H%M%SZ)"
+sudo systemd-run --unit="$WATCH_CANARY" --service-type=oneshot --remain-after-exit --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab --property=EnvironmentFile=-/etc/solana-alpha-lab/secrets.env --property=NoNewPrivileges=yes /usr/bin/uv run --locked --managed-python python -B scripts/factory_operability_watch.py --mode dry-run
+```
+
+`Type=oneshot` завершает start job после команды. `--remain-after-exit`
+сохраняет завершённую unit для readback: не добавляйте несовместимый `--wait`,
+`--pipe` или `--collect`, не останавливайте unit до получения measurement.
+Эти свойства описаны в [systemd-run](https://raw.githubusercontent.com/systemd/systemd/main/man/systemd-run.xml)
+и [systemd.service](https://raw.githubusercontent.com/systemd/systemd/main/man/systemd.service.xml).
+Уникальное имя исключает reuse старого пика. Получите результат функцией ниже:
+
+```sh
+canary_readback() {
+    /usr/bin/uv run --locked --managed-python python -B - "$1" <<'PY'
+import json
+import subprocess
+import sys
+
+properties = ('ActiveState', 'SubState', 'Result', 'ExecMainStatus', 'MemoryPeak',
+              'ExecMainStartTimestampMonotonic', 'ExecMainExitTimestampMonotonic')
+try:
+    read = subprocess.run(['systemctl', 'show', sys.argv[1],
+                           '--property=' + ','.join(properties)],
+                          capture_output=True, text=True, timeout=5, check=False)
+except (OSError, subprocess.SubprocessError):
+    print(json.dumps({'resource_state': 'UNKNOWN', 'memory_peak_bytes': None, 'wall_seconds': None}))
+    raise SystemExit(2)
+values = dict(line.split('=', 1) for line in read.stdout.splitlines() if '=' in line)
+state = 'UNKNOWN'
+peak = wall = None
+if read.returncode == 0:
+    if values.get('Result') not in (None, '', 'success') or values.get('ExecMainStatus') not in (None, '', '0'):
+        state = 'BLOCKED'
+    elif values.get('Result') == 'success' and values.get('ExecMainStatus') == '0':
+        try:
+            peak = int(values['MemoryPeak'])
+            started = int(values['ExecMainStartTimestampMonotonic'])
+            ended = int(values['ExecMainExitTimestampMonotonic'])
+            if 0 < peak < 2**64 - 1 and 0 < started < ended:
+                wall = (ended - started) / 1_000_000
+                if values.get('ActiveState') == 'active' and values.get('SubState') == 'exited':
+                    state = 'PASS' if peak < 512 * 1024**2 and wall < 120 else 'BLOCKED'
+        except (KeyError, ValueError):
+            pass
+print(json.dumps({'resource_state': state, 'memory_peak_bytes': peak, 'wall_seconds': wall}))
+raise SystemExit(0 if state == 'PASS' else 2)
+PY
+}
+canary_readback "$WATCH_CANARY.service"
+```
+
+`MemoryPeak` — cgroup peak всех дочерних процессов; это не sampling RSS одного
+Python PID. Positive numeric peak, monotonic duration, успешное завершение и
+пороги <512 MiB / <120s обязательны. Неподдерживаемый/пустой/infinity/нулевой
+пик, пропавшая unit или отсутствующий clock → `UNKNOWN`, rollout остановить.
+OOM/timeout/nonzero exit или превышение порога → `BLOCKED`.
+Сохраните только этот минимальный resource readback; journal preview отдельно
+проверяет snapshot/incident semantics, но не доказывает Telegram delivery.
+Только после readback остановите **canary**, сохранив обычные report timers off:
+
+```sh
+sudo systemctl stop "$WATCH_CANARY.service"
+```
 
 4. Только после PASS включите watch. Подтвердите два последовательных цикла,
    свежий валидный snapshot, MemoryPeak/время, incident/recovery и Telegram
@@ -284,10 +502,15 @@ Incident/recovery считается проверенным только по с
 разрешённой контрольной проверки; не создавайте сбой collector/provider ради неё.
 Сохраняйте минимальную датированную выжимку, не публикуйте секреты из journal.
 
-5. Отдельно выполните bounded pulse dry-run:
+5. Отдельный pulse canary использует ту же проверку окружения/метаданных,
+   тот же backup sink и функцию `canary_readback`; не подставляйте другой sink:
 
 ```sh
-sudo systemd-run --unit=factory-pulse-commissioning --service-type=oneshot --wait --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab /usr/bin/uv run --locked --managed-python python -B scripts/collector_owner_pulse.py --mode dry-run
+check_report_environment factory-collector-owner-pulse.service
+PULSE_CANARY="factory-pulse-canary-$(date -u +%Y%m%dT%H%M%SZ)"
+sudo systemd-run --unit="$PULSE_CANARY" --service-type=oneshot --remain-after-exit --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab --property=EnvironmentFile=-/etc/solana-alpha-lab/secrets.env --property=NoNewPrivileges=yes /usr/bin/uv run --locked --managed-python python -B scripts/collector_owner_pulse.py --mode dry-run --record-storage-history
+canary_readback "$PULSE_CANARY.service"
+sudo systemctl stop "$PULSE_CANARY.service"
 ```
 
 При тех же PASS-критериях включите pulse и подтвердите его реальный запуск

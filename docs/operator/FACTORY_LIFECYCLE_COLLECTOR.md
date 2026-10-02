@@ -1,5 +1,14 @@
 # Factory lifecycle collector — operator runbook
 
+Pre-deploy/read-only readback uses the exact scoped SQLite `mode=ro` queries
+in `FACTORY_UNATTENDED_OPERABILITY.md`, section «Узкий pre-deploy SQLite readback».
+The generic ObservationSchedule status CLI is not a read-only probe: its store
+binding can initialize/write schema and the predecessor read model can scan/decode
+the complete call ledger. Do not run it before or after this repair as a cheap
+host probe. Scalar operational rows do not establish source HTTP success,
+as-of authority/rollover or scientific RDP publication; missing proof stays UNKNOWN.
+
+
 Канон для ObservationSchedule / Tokens V2 lifecycle collector на Factory VPS.
 Читать **вместе с** `FACTORY_REMOTE_HOST.md` (host locator). Этот файл — протокол
 collector; host locator не дублировать.
@@ -115,11 +124,11 @@ sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_
 ```
 
 ```
-/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py status --runtime-config configs/observation_schedule_runtime_v1.yaml
+# Read-only SQLite probe: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md, section Узкий pre-deploy SQLite readback; use the exact schedule/activation IDs named here.
 ```
 
 ```
-/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py doctor --runtime-config configs/observation_schedule_runtime_v1.yaml
+# Generic doctor shares the writable CLI binding; use the scoped mode=ro probe above for read-only/pre-deploy checks.
 ```
 
 ```
@@ -250,8 +259,8 @@ recovery check below. Read both operational `last_transition_event_id` values
 for the predecessor and successor with the existing read-only `status` command:
 
 ```text
-uv run --locked --managed-python python -B scripts/observation_schedule.py status --schedule-sha256 <PREDECESSOR_SCHEDULE_SHA256> --activation-id <PREDECESSOR_ACTIVATION_ID> --runtime-config configs/observation_schedule_runtime_v1.yaml
-uv run --locked --managed-python python -B scripts/observation_schedule.py status --schedule-sha256 <SUCCESSOR_SCHEDULE_SHA256> --activation-id <SUCCESSOR_ACTIVATION_ID> --runtime-config configs/observation_schedule_runtime_v1.yaml
+# Read-only SQLite probe: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md, section Узкий pre-deploy SQLite readback; use the exact schedule/activation IDs named here.
+# Read-only SQLite probe: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md, section Узкий pre-deploy SQLite readback; use the exact schedule/activation IDs named here.
 ```
 
 Take `activations[0].transition_event_id` from each JSON result; `UNKNOWN`
@@ -423,7 +432,7 @@ claim continuity. Use the two `CONTINUITY_*` identity fields from the alert
 with the read-only status command:
 
 ```text
-uv run --locked --managed-python python -B scripts/observation_schedule.py status --schedule-sha256 <CONTINUITY_SCHEDULE_SHA256> --activation-id <CONTINUITY_ACTIVATION_ID> --runtime-config configs/observation_schedule_runtime_v1.yaml
+# Read-only SQLite probe: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md, section Узкий pre-deploy SQLite readback; use the exact schedule/activation IDs named here.
 ```
 
 Take `activations[0].transition_event_id` from that JSON and inspect its
@@ -556,7 +565,7 @@ Do **not** trust chat “current status”. Machine-resolve:
 | Question | Command / receipt |
 |---|---|
 | Deployed SHA | `cat /opt/solana-alpha-lab/.factory_deploy_sha` |
-| Activation | `observation_schedule.py status` / doctor collector fields |
+| Activation | exact scoped `mode=ro` SQLite probe / separately gated doctor fields |
 | Collector health | `observation_schedule.py doctor` + `factory_remote_doctor.py` |
 | Campaign envelope | `collector_campaign_preflight.py` (zero-network) |
 | Coverage class | doctor / collector read model `discovery_coverage_class` |
@@ -592,7 +601,7 @@ cat /opt/solana-alpha-lab/.factory_deploy_sha
 ```
 
 ```
-/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py status --runtime-config configs/observation_schedule_runtime_v1.yaml
+# Read-only SQLite probe: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md, section Узкий pre-deploy SQLite readback; use the exact schedule/activation IDs named here.
 ```
 
 ```

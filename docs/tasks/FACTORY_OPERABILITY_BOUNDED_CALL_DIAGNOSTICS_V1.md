@@ -158,6 +158,11 @@ frozen. All provider/live/external exclusions remain frozen.
    local fixtures. These results never prove live MemoryPeak.
 3. Preserve the previous source-snapshot/RDP memory repair and provider recovery
    calibration. Do not change retention, science or collector/provider behavior.
+   Pre-deploy operator checks must use narrow SQLite mode=ro scalar queries,
+   without the generic writable status CLI. Show installed disabled timers.
+   Memory canaries must share real unit environment/backup sink and retain
+   reproducible numeric MemoryPeak; absent peak/environment proof stops rollout
+   as UNKNOWN. No VPS execution or merge is authorized by this correction.
    Add no index without copy-side build/time/space/lock evidence; any migration
    belongs in a separate gated deployment step.
 4. Both oneshot service templates gain `MemoryMax=768M`, `TimeoutStartSec=180s`;

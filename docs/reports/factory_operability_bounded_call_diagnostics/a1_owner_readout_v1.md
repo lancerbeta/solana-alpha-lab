@@ -61,7 +61,7 @@ BEFORE выполнен до изменения production modules на базе
   Configured path не импортирует operational packet/store. Fresh snapshot не
   подтверждает Telegram. Fake transports проверяют success/failure/retry/dedupe/
   recovery; никакой реальной отправки в этом атоме.
-- 120 focused tests PASS, включая старые два repair suites, полные вертикальные
+- 124 focused + 15 semantic tests PASS, включая старые два repair suites, полные вертикальные
   consumers, executable pulse CLI и новый memory-scale regression. Independent
   verdicts и exact bindings — в canonical delivery evidence; до их PASS кандидат
   не готов к merge. Exact-head CI/merge-readiness проверяются отдельно перед фразой.
@@ -108,6 +108,16 @@ Git отчёта. Если continuity не доказана — exact blocker в
 Автоматизация не создавалась, будущий readback ещё не выполнен.
 
 ## Deploy / rollback после отдельного разрешения
+
+Pre-deploy probe теперь использует только scoped primary-key / bounded rowid
+SQLite queries с mode=ro и без payload_json; generic status не вызывается.
+Timer readback показывает installed disabled units. Canary повторяет effective
+unit environment и backup sink, сохраняет unit через remain-after-exit и
+проверяет численный MemoryPeak/monotonic clocks; missing peak остаётся UNKNOWN.
+Canary повторяет фактический sink соответствующего CLI: watch использует
+env-selected sink, существующий pulse packet — git-side default. Совпадение
+pulse с принятым backup envelope требует отдельного readback; mismatch
+останавливает rollout. Production code этой операторской правкой не менялся.
 
 Точные команды и stop criteria: `docs/operator/FACTORY_UNATTENDED_OPERABILITY.md`,
 раздел Commissioning. Сначала dated pre-readback (SHA/backup/archive/disk/
