@@ -1,8 +1,8 @@
 {
   "candidate": {
     "base": "5263abdd327455f239767c0c31855909f90435b7",
-    "diff_sha256": "2e82e843f92dee82f3c1e6cb55e0afa622b3afd207244f0cb88d25bafb2602d4",
-    "head": "c4b9e61646fe5dce1024e70d05af423b22fdc9ce"
+    "diff_sha256": "9b7d14b1ee12b443f98b9ca17ba0cf3a5ac83a162496c0fc7a6f8b4be2a5e953",
+    "head": "26684f280cabfa3b6012da97d58be4cf8bc534b8"
   },
   "evidence": [
     {
@@ -69,7 +69,7 @@
     "NO_PROVIDER_DEPLOY_OR_MERGE",
     "Packet freezes committed implementation at source head; packet and three delivery-chain files are later bound by the final independent inventory. MODEL_DIVERSITY_UNPROVEN."
   ],
-  "packet_fingerprint_sha256": "8106e122a210e4ca0e4327a58d2bd396572e6cab79ec659790380e7ecd1e6b12",
+  "packet_fingerprint_sha256": "fdee7e31ad9a3481bfe5f0d1c5ec11d99831c86a2bd35e22770ac40bab3d8db1",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
@@ -123,7 +123,7 @@
     }
   ],
   "task": {
-    "task_contract_sha256": "1c749bfd929766984853eabced84977f7f28b2f46c537f6d23285181eda1873f",
+    "task_contract_sha256": "feace6b40441bc39bdff3feeb39164312cecc9d3da24e132a1ad16b42bf67711",
     "task_id": "LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1"
   }
 }
