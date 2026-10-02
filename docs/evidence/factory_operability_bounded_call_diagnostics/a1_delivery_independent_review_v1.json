@@ -133,32 +133,32 @@
     {
       "role": "CODE_REVIEWER",
       "prior_verdict": "NOT_READY",
-      "severity": "P2",
-      "finding": "Recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
+      "severity": "MAJOR",
+      "finding": "Review priority P2: recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
       "observed_head": "2d61c454a03aa7f282dc4b07c4046def4166587c",
       "resolved_by_head": "730d3e7b62b3b845991caee794ae66e04ae9e4f1"
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "prior_verdict": "NOT_READY",
-      "severity": "P2",
-      "finding": "Recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
+      "severity": "MAJOR",
+      "finding": "Review priority P2: recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
       "observed_head": "2d61c454a03aa7f282dc4b07c4046def4166587c",
       "resolved_by_head": "730d3e7b62b3b845991caee794ae66e04ae9e4f1"
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "prior_verdict": "NOT_READY",
-      "severity": "P2",
-      "finding": "Recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
+      "severity": "MAJOR",
+      "finding": "Review priority P2: recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
       "observed_head": "2d61c454a03aa7f282dc4b07c4046def4166587c",
       "resolved_by_head": "730d3e7b62b3b845991caee794ae66e04ae9e4f1"
     },
     {
       "role": "OWNER_UX_CRITIC",
       "prior_verdict": "NOT_READY",
-      "severity": "P2",
-      "finding": "Recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
+      "severity": "MAJOR",
+      "finding": "Review priority P2: recovery consumer expected old activations[0].transition_event_id after replacement with scoped raw SQLite probe.",
       "observed_head": "2d61c454a03aa7f282dc4b07c4046def4166587c",
       "resolved_by_head": "730d3e7b62b3b845991caee794ae66e04ae9e4f1"
     }
