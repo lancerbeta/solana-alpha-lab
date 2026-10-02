@@ -16,9 +16,10 @@
     "catalog/catalog_manifest.yaml": "ca452a9d75b392bfe881ef82c0d5a1bb2e24b277c213cc8cc0c038b3e24ffd03",
     "catalog/generated/asset_edges.json": "032df920b03f15748b4f9d36d09e466b057e21123732cc7ebd47af64dc49e9e9",
     "docs/PROJECT_MAP.md": "80868ae101887a9baf2ea704cf84eb8e313da39b8ef2de5c73f18b2a8f28f2b5",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "1fb6708a62a9902d44e19346fb346067b48cdf4dc9ae4e9fe817491a4807f7df",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "ad172e732f461278d8875e42ddda20845f535c1860bcb90e7af1b73f07ba33cc",
     "docs/reports/live_corpus_stored_projection_compatibility_v1/owner_readout.md": "4401d5e6c8327f4ff902f77f816b75b9ada621b923edd3f7b08422e5c8f0603b",
-    "docs/reports/live_corpus_stored_projection_compatibility_v1/semantic_premise_packet.json": "eb857e9c059b80a1e6f3e9bfa7b9f21ad17c3c5eee3615d631c6d6689b3f9e58",
+    "docs/reports/live_corpus_stored_projection_compatibility_v1/semantic_premise_packet.json": "c3e380729ebd2533597b728d8a071c6f60f08086aed96b546857cddf73027e89",
     "docs/tasks/LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1.md": "feace6b40441bc39bdff3feeb39164312cecc9d3da24e132a1ad16b42bf67711",
     "src/solana_alpha_lab/factory/live_corpus_logical_rows.py": "0acf2380d8e27919f20a9d1c19c8a9cec22e05321f5f5e19c2f4731fb83585ec",
     "src/solana_alpha_lab/factory/live_corpus_manifest_publish.py": "882676156cfada2c6674353ef1c5f28cd70e7f3b743397e2c72ea4617ba68abe",
@@ -34,14 +35,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/live_corpus_stored_projection_compatibility_v1/factory_fit.json",
-    "sha256": "5ef730fe5c94f46594abe846d63d2c23ba20b42678b3b8b2c655e23513c2af64",
+    "sha256": "bab003877bdeb52a0863169580f35e89c60b3735bff77e499eb93006028b3fd6",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_55_FOCUSED_CASES_WITH_TWO_GIT_SENSITIVE_CASES_REPEATED_ON_CLEAN_HEAD",
     "independent_review": {
       "path": "docs/evidence/live_corpus_stored_projection_compatibility_v1/independent_review.json",
-      "sha256": "5860f75f6370ce6cdc02c4ce14a0f9d9b2a6df1ab782b98d7252e2462614c866",
+      "sha256": "154861452cf17024448e7ad700e7a5ab85b51003dc3983e2ecf3e6b37c3e2123",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
