@@ -19802,7 +19802,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/templates/portable-bundle-manifest.json', repository_path: delivery-harness/templates/portable-bundle-manifest.json}
-  integrity: {kind: sha256, sha256: 99d0fe18c4eddd681267e016386cbe11a1eb510bc8e9dcc83df9b029efb73a81}
+  integrity: {kind: sha256, sha256: 4e6a58ff7f5b44cc8caea35e20cb3c50be7a4b727adcb2f6e256a6e967c81a8d}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -38909,7 +38909,7 @@ records:
     repository_path: docs/tasks/DELIVERY_POST_MERGE_FROZEN_CONTEXT_READBACK_REPAIR_V1.md
   integrity:
     kind: sha256
-    sha256: cac978e205b6092ea5815ab647204f538bf79608f40b0cd262e62b5180e0911b
+    sha256: d0ca47ab397f064d2a7fb0d15ac17704391c582df3eb5401d7210748d9dbcd56
   access:
     mode: read_only
     method: file
@@ -38983,7 +38983,7 @@ records:
     repository_path: docs/evidence/control/delivery_post_merge_frozen_context_readback_repair_v1/a1_targeted_validation_v1.json
   integrity:
     kind: sha256
-    sha256: ad9a7f60714778d2495e7486acd003199d100d6b95d02f5f94799ad589f915e7
+    sha256: 71f6707a8caaf8cefbdec5654ff03eaffa4234173620e4cf05492d7ada5a636a
   access:
     mode: read_only
     method: file

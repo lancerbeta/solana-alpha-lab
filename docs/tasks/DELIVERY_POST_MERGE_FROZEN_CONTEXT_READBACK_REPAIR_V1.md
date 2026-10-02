@@ -19,6 +19,7 @@ objective: >-
   strict pre-merge freshness, scope and merge authority checks.
 managed_write_set:
   - scripts/owner_attention_gate.py
+  - delivery-harness/templates/portable-bundle-manifest.json
   - tests/test_delivery_harness_merge_guard.py
   - tests/test_delivery_harness_executor_extension.py
   - tests/test_delivery_post_merge_frozen_context_v1.py

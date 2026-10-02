@@ -88,5 +88,17 @@
       "scripts/owner_attention_gate.py",
       "tests/test_delivery_harness_merge_guard.py"
     ]
+  },
+  "ci_portable_pin_remediation": {
+    "failed_run_id": 36978287766,
+    "reason": "PORTABLE_TEMPLATE_HASH_MISMATCH",
+    "change": "SINGLE_CANONICAL_GATE_SOURCE_SHA_REPIN_AND_CORRESPONDING_HARNESS_ACCEPTANCE_MANIFEST_PIN_ONLY",
+    "production_code_changed": false,
+    "direct_consumer_command": "python -B -m unittest tests.test_delivery_harness_bootstrap tests.test_delivery_harness_contract -q",
+    "direct_consumer_tests_run": 36,
+    "direct_consumer_duration_seconds": 16.054,
+    "direct_consumer_result": "PASS",
+    "runtime": "PYTHONUTF8=1",
+    "windows_runtime_diagnostic": "STDLIB_SUBPROCESS_CP1251_UNICODEENCODEERROR_CONFIRMED_UTF8_INHERITANCE_RESOLVED_WITHOUT_CODE_CHANGE"
   }
 }
