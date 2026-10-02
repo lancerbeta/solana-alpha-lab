@@ -1,0 +1,64 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "DELIVERY-POST-MERGE-FROZEN-CONTEXT-COMPLETION-001",
+  "as_of": "2026-10-02",
+  "task_id": "DELIVERY_POST_MERGE_FROZEN_CONTEXT_READBACK_REPAIR_V1",
+  "state_change": "FROZEN_TASK_DELIVERY_CONTEXT_SEPARATED_FROM_IMMEDIATE_POST_MERGE_REALITY",
+  "base_main": "92e0143d2e8cacf39b9b74cad49b2d3c00f70055",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "scripts/owner_attention_gate.py": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/control/delivery_post_merge_frozen_context_readback_repair_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_51_REAL_GIT_DAG_MERGE_GUARD_AND_ISOLATION_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/control/delivery_post_merge_frozen_context_readback_repair_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_RED_GREEN_REAL_GIT_DAG",
+      "PASS_51_FOCUSED_TESTS",
+      "PASS_REVIEW_ISOLATION_REGRESSIONS"
+    ]
+  },
+  "non_claims": [
+    "NO_PRODUCT_SCIENCE_CHANGE",
+    "NO_REAL_DATA_PLANE_MUTATION",
+    "NO_C4",
+    "NO_FORGE",
+    "NO_PROVIDER_DEPLOY",
+    "NO_HISTORICAL_CLOSURE",
+    "NO_PREMERGE_AUTHORITY_CHANGE",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "repository_local_writes": true,
+    "real_data_plane_mutated": false,
+    "c4_accessed": false,
+    "forge_run": false,
+    "source_repository_refs_config_changed_by_frozen_proof": false,
+    "provider_calls": 0,
+    "deployment": false
+  }
+}
