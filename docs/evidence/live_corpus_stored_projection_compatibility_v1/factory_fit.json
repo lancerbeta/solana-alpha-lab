@@ -4,8 +4,8 @@
   "review_id": "LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1-FIT",
   "as_of": "2026-10-02",
   "task_id": "LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1",
-  "reviewed_bindings_sha256": "64b559360b0c03b69edae1fe89fb3cefa9ab5b359dac2b57496364f0a95d62a8",
-  "reviewed_inventory_sha256": "4c35922a7c463a1681627c01aa59394460729dfb6470e72798d6e760e72dd491",
+  "reviewed_bindings_sha256": "72b43829614b2d34abc9376c617f4da1492f136324ff1b758fc71fdf8e2bcb7e",
+  "reviewed_inventory_sha256": "cd3bdc7ca5216a6810872a2576c3223a6745b4a36a436ddbe28ffe20f14a952a",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

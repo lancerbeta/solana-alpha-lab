@@ -11,16 +11,16 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "5992c7f4e75221a6f5e9f23e6080df12f3508a1a3c406b3f115265f643d76312",
+    "catalog/assets/core.yaml": "86657e1f70f54bc1798eb7f9801e62b11522e09239355729cf24bfebda95b83b",
     "catalog/assets/lifecycle.yaml": "e872b9240eeb8b5ec0180389b25f16c9007ca05b44dbcd684ffcde592d895e31",
     "catalog/catalog_manifest.yaml": "ca452a9d75b392bfe881ef82c0d5a1bb2e24b277c213cc8cc0c038b3e24ffd03",
     "catalog/generated/asset_edges.json": "032df920b03f15748b4f9d36d09e466b057e21123732cc7ebd47af64dc49e9e9",
     "docs/PROJECT_MAP.md": "80868ae101887a9baf2ea704cf84eb8e313da39b8ef2de5c73f18b2a8f28f2b5",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "1fb6708a62a9902d44e19346fb346067b48cdf4dc9ae4e9fe817491a4807f7df",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "9fa9d096e0f09653767eee92c5c4dbb645e47c63db10e7e3218fcebe47591efb",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "ad172e732f461278d8875e42ddda20845f535c1860bcb90e7af1b73f07ba33cc",
     "docs/reports/live_corpus_stored_projection_compatibility_v1/owner_readout.md": "4401d5e6c8327f4ff902f77f816b75b9ada621b923edd3f7b08422e5c8f0603b",
-    "docs/reports/live_corpus_stored_projection_compatibility_v1/semantic_premise_packet.json": "c3e380729ebd2533597b728d8a071c6f60f08086aed96b546857cddf73027e89",
-    "docs/tasks/LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1.md": "feace6b40441bc39bdff3feeb39164312cecc9d3da24e132a1ad16b42bf67711",
+    "docs/reports/live_corpus_stored_projection_compatibility_v1/semantic_premise_packet.json": "9fcf9e891a961bcd53df94f542fbf51b52547768424fdc47cb59d97e231a7d54",
+    "docs/tasks/LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1.md": "bf79a2b39bb57382df0585fefdda74ae236fc9d378c0bce7bd26261c4b37fc66",
     "src/solana_alpha_lab/factory/live_corpus_logical_rows.py": "0acf2380d8e27919f20a9d1c19c8a9cec22e05321f5f5e19c2f4731fb83585ec",
     "src/solana_alpha_lab/factory/live_corpus_manifest_publish.py": "882676156cfada2c6674353ef1c5f28cd70e7f3b743397e2c72ea4617ba68abe",
     "tests/test_live_corpus_stored_projection_compatibility_v1.py": "92a7bad05b4b46dff1f12d7e4f82b162ea2d8ecfdcdd3d8dd77f87f3eacdbc10"
@@ -35,14 +35,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/live_corpus_stored_projection_compatibility_v1/factory_fit.json",
-    "sha256": "bab003877bdeb52a0863169580f35e89c60b3735bff77e499eb93006028b3fd6",
+    "sha256": "88bc24006ecc4cdceb76cefcd852d7d738548a73766baaf3f1e8671f174a7479",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_55_FOCUSED_CASES_WITH_TWO_GIT_SENSITIVE_CASES_REPEATED_ON_CLEAN_HEAD",
     "independent_review": {
       "path": "docs/evidence/live_corpus_stored_projection_compatibility_v1/independent_review.json",
-      "sha256": "154861452cf17024448e7ad700e7a5ab85b51003dc3983e2ecf3e6b37c3e2123",
+      "sha256": "cbaea3b036726823d97d094fae43cf62fbe4fe036c1486a3f6f2b6998697e174",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
