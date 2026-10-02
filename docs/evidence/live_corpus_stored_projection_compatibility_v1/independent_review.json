@@ -17,40 +17,44 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "PASS_ISOLATED_FINAL_CONTENT_NO_OPEN_P0_P1_P2; independently reproduced canonical 12-file Git blob inventory and exact frozen diff.",
+        "PASS_ISOLATED_FINAL_CONTENT_NO_OPEN_P0_P1_P2; independently reproduced canonical 13-file Git blob inventory and exact frozen diff.",
         "Six independent new scratch tests PASS; base/head OBS-24 null and non-null clock claims remain identical. Exact fields/types/nullability and full saved-claim admission remain fail-closed.",
-        "Review-plan scope PASS for all four frozen roles; no measured refactor trigger. External six-claim proof reviewed as bounded compatibility evidence only."
+        "Review-plan scope PASS for all four frozen roles; no measured refactor trigger. External six-claim proof reviewed as bounded compatibility evidence only.",
+        "PASS_FINAL_DELTA_AT_b338e249c67c8ce9676b473f2a11280dda95dd63: independently attested all 13 bindings; only required Catalog protected-input hash/size re-pin and packet refreeze changed. No new P0/P1/P2; behavior tests not repeated because source bytes unchanged."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PASS_ISOLATED_FINAL_CONTENT_DOD_NO_OPEN_P0_P1_P2; independently reproduced canonical 12-file inventory, worktree/blob and frozen diff.",
+        "PASS_ISOLATED_FINAL_CONTENT_DOD_NO_OPEN_P0_P1_P2; independently reproduced canonical 13-file inventory, worktree/blob and frozen diff.",
         "Independent base RED/patched GREEN reproduced pinned physical OBS-21 hash without file/mtime mutation; 53 focused old/new/memory/temporal scratch cases PASS.",
         "Connected mixed v3 repair/v4 cold read/v5 append and occupied AUTO/full focus/history invariance verified. Widening only PIT cutoff admitted late price and changed matched counts, proving the temporal falsifier is substantive.",
-        "Two Git-sensitive CLI cases have author-observed clean-head PASS and remain covered by exact-head CI; no separate saved raw author log. Real evidence checked from external local receipt without new runtime reads."
+        "Two Git-sensitive CLI cases have author-observed clean-head PASS and remain covered by exact-head CI; no separate saved raw author log. Real evidence checked from external local receipt without new runtime reads.",
+        "PASS_FINAL_DELTA_AT_b338e249c67c8ce9676b473f2a11280dda95dd63: independently attested all 13 bindings; only required Catalog protected-input hash/size re-pin and packet refreeze changed. No new P0/P1/P2; behavior tests not repeated because source bytes unchanged."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=fdee7e31ad9a3481bfe5f0d1c5ec11d99831c86a2bd35e22770ac40bab3d8db1",
-        "PASS_SEMANTIC_PREMISE_ISOLATED_PACKET_DIFF_NO_OPEN_P0_P1_P2; packet refs/fingerprint/diff and 12-file canonical inventory independently match. MODEL_DIVERSITY_UNPROVEN.",
+        "packet_fingerprint_sha256=f7f92ca4fb09e567a307c0ae871220e47cf97bb6ec8d997ce3bf9cbdd5f025bf",
+        "PASS_SEMANTIC_PREMISE_ISOLATED_PACKET_DIFF_NO_OPEN_P0_P1_P2; packet refs/fingerprint/diff and 13-file canonical inventory independently match. MODEL_DIVERSITY_UNPROVEN.",
         "ABSENT differs from NULL; exact frozen projection and saved complete claims preserve old meaning. Mixed descriptor and unchanged actual temporal reader do not grant new lifecycle/scientific authority.",
         "A changed downstream query clock policy or deadline could change PIT outcomes at unchanged hashes; evidence is bounded to the frozen tested temporal scenario, not all future policies.",
         "Before lineage switch only separate candidate artifacts can remain; old current root/labels stay visible. Post-switch derived cleanup may fail after NEW is authoritative. Existing V2 recovery, concurrency and power-loss limits are unchanged.",
-        "External six-partition read-only receipt was checked against reviewed source hashes; no real repair/import/C4 result claimed."
+        "External six-partition read-only receipt was checked against reviewed source hashes; no real repair/import/C4 result claimed.",
+        "PASS_FINAL_DELTA_AT_b338e249c67c8ce9676b473f2a11280dda95dd63: independently attested all 13 bindings; only required Catalog protected-input hash/size re-pin and packet refreeze changed. No new P0/P1/P2; behavior tests not repeated because source bytes unchanged."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PASS_ISOLATED_FINAL_CONTENT_NO_OPEN_P0_P1_P2; independently matched 12-file canonical inventory and frozen diff; semantic route file unchanged.",
+        "PASS_ISOLATED_FINAL_CONTENT_NO_OPEN_P0_P1_P2; independently matched 13-file canonical inventory and frozen diff; semantic route file unchanged.",
         "Existing operator command/retry flow is retained. Added contract distinguishes absent clocks, explicit NULL, unsupported physical layout and integrity STOP; guessing/cast/drop/rewrite are prohibited.",
-        "Existing unreadable next-action alias predates this patch; runbook explains content/PIT integrity STOP. Detailed machine evidence stays outside Git; real OPERATE requires separate authority after merge/readback."
+        "Existing unreadable next-action alias predates this patch; runbook explains content/PIT integrity STOP. Detailed machine evidence stays outside Git; real OPERATE requires separate authority after merge/readback.",
+        "PASS_FINAL_DELTA_AT_b338e249c67c8ce9676b473f2a11280dda95dd63: independently attested all 13 bindings; only required Catalog protected-input hash/size re-pin and packet refreeze changed. No new P0/P1/P2; behavior tests not repeated because source bytes unchanged."
       ]
     }
   ],
