@@ -20,6 +20,7 @@ objective: >-
 managed_write_set:
   - scripts/owner_attention_gate.py
   - tests/test_delivery_harness_merge_guard.py
+  - tests/test_delivery_harness_executor_extension.py
   - tests/test_delivery_post_merge_frozen_context_v1.py
   - docs/agent/DELIVERY_HARNESS_PROTOCOL.md
   - docs/tasks/DELIVERY_POST_MERGE_FROZEN_CONTEXT_READBACK_REPAIR_V1.md
@@ -31,6 +32,7 @@ managed_write_set:
   - docs/PROJECT_MAP.md
   - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
   - docs/evidence/control/owner_attention_gate_acceptance_v1.json
+  - docs/evidence/control/delivery_harness_acceptance_v1.json
 external_caps:
   network: false
   credentials: false

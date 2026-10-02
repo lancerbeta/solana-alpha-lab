@@ -56,10 +56,37 @@
   "implementation_sha256": {
     "scripts/owner_attention_gate.py": "91a2ef21e4340cf5c8a404faa72fd61a878c81fb724a96b05873fc8ae07ebfc9",
     "tests/test_delivery_post_merge_frozen_context_v1.py": "81fc125cc25ea70548e319103e153e494c18cb7e9005ca21c77a27a22fead68b",
-    "tests/test_delivery_harness_merge_guard.py": "28744d03e23c3e3e9ec5544e4439cae4648dfd43e402265d960b1867d0c1c4b9"
+    "tests/test_delivery_harness_merge_guard.py": "28744d03e23c3e3e9ec5544e4439cae4648dfd43e402265d960b1867d0c1c4b9",
+    "tests/test_delivery_harness_executor_extension.py": "1d8ce9771098ec20a47bf151e480bc95f1b8f1867a9c178474704e1d579e2d9f"
   },
   "preflight_remediation": {
     "reason": "SHADOW_PIN_DRIFT:docs/evidence/control/owner_attention_gate_acceptance_v1.json->scripts/owner_attention_gate.py",
     "change": "SEPARATE_EVALUATOR_SHA_REPIN_ONLY_VERDICTS_AND_HISTORY_PRESERVED"
+  },
+  "ci_fixture_remediation": {
+    "failed_head": "486e7fa797f4ac0e0b60c8f770c1d56c21ec011d",
+    "failed_run_id": 36978287766,
+    "reason": "SYNTHETIC_OID_RUNNER_MISSING_EXPLICIT_FROZEN_FIXTURE_VERIFIER",
+    "red_local": "EXECUTOR_EXTENSION_JOURNEY_TWO_ROUTE_SUBTESTS_ASSERTION_ERROR",
+    "fix": "EXPLICIT_EXISTING_FIXTURE_VERIFIER_FOR_SYNTHETIC_OID_POST_MERGE_CALL_ONLY",
+    "production_verifier_changed": false,
+    "direct_consumer_command": "python -B -m unittest tests.test_delivery_harness_executor_extension -q",
+    "direct_consumer_tests_run": 6,
+    "direct_consumer_duration_seconds": 1.66,
+    "direct_consumer_result": "PASS"
+  },
+  "ci_protocol_pin_remediation": {
+    "failed_run_id": 36978287766,
+    "reason": "CURRENT_BYTE_PROTOCOL_SHA_PIN_DRIFT",
+    "change": "PROTOCOL_IMPLEMENTATION_SHA_REPIN_ONLY_HISTORICAL_VERDICT_AND_SCOPE_PRESERVED",
+    "direct_consumer_command": "python -B -m unittest tests.test_delivery_harness_contract -q",
+    "direct_consumer_tests_run": 9,
+    "direct_consumer_duration_seconds": 2.053,
+    "direct_consumer_result": "PASS",
+    "repinned_paths": [
+      "docs/agent/DELIVERY_HARNESS_PROTOCOL.md",
+      "scripts/owner_attention_gate.py",
+      "tests/test_delivery_harness_merge_guard.py"
+    ]
   }
 }
