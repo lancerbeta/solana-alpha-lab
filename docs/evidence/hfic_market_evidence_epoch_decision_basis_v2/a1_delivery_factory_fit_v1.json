@@ -4,8 +4,8 @@
   "review_id": "HFIC-MARKET-BASIS-V2-FACTORY-FIT-001",
   "as_of": "2026-10-02",
   "task_id": "HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2",
-  "reviewed_bindings_sha256": "7ae4a0664ae92917153a8333e1d4aa70fc34fcc742d27b5b0ad226c32a9f26c8",
-  "reviewed_inventory_sha256": "fe04ecbe8fbadd2114e8cd42b097ef6f332913803cc505ada0c74d4898a95453",
+  "reviewed_bindings_sha256": "2bd7fffb62925a3d051c2b61972384aae94a1d7edcf1bf17d1b6473a4935a20e",
+  "reviewed_inventory_sha256": "59a7c0fa7894ad07bf5040b8024271141dd8f9cb61baeecc958540bc45b37f17",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
