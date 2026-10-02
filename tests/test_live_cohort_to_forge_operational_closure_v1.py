@@ -381,143 +381,61 @@ HARD_CLOSE_HV = "HFIC-CAND-HARDCLOSE001"
 PARK_HV = "HFIC-CAND-PARK000000001"
 NOT_SELECTED_HV = "HFIC-CAND-NOTSEL0000001"
 QUARANTINED_HV = "HFIC-CAND-QBLOCKED00001"
-STUB_CORPUS_MANIFEST = "DATASET-MANIFEST-LIVE-CORPUS-STUB-001"
 
 
 def _write_stub_live_corpus(data_root: Path, *, cohort_id: str) -> None:
-    from solana_alpha_lab.contracts.schema_v1 import DatasetManifest, PartitionManifest
+    """Small prior fixture with the production canonical publication contract."""
     from solana_alpha_lab.factory.commissioning_fixture import _deterministic_parquet_bytes
-    from solana_alpha_lab.storage.manifests import canonical_manifest_bytes
-    from solana_alpha_lab.factory.live_cohort_discovery_release import REQUIRED_LABELS
+    from solana_alpha_lab.factory import live_corpus_manifest_publish as publish
+    from solana_alpha_lab.storage.manifests import (
+        build_partition_manifest, compute_dataset_fingerprint, compute_dataset_manifest_id,
+    )
 
     created = datetime(2026, 1, 1, tzinfo=UTC)
     parquet_bytes = _deterministic_parquet_bytes()
     file_sha = hashlib.sha256(parquet_bytes).hexdigest()
-    logical = "datasets/partitions/date=2026-01-01/PARTITION-LIVE-CORPUS-STUB-001.parquet"
+    logical = f"datasets/partitions/date=2026-01-01/PARTITION-LIVE-COHORT-{cohort_id}-OBS.parquet"
     parquet_path = data_root / logical
     parquet_path.parent.mkdir(parents=True, exist_ok=True)
     parquet_path.write_bytes(parquet_bytes)
-    fingerprint = hashlib.sha256(CORPUS_DATASET_ID.encode()).hexdigest()
-    dataset = DatasetManifest(
-        dataset_manifest_id=STUB_CORPUS_MANIFEST,
-        dataset_id=CORPUS_DATASET_ID,
-        dataset_version="1.0",
-        schema_id="SCHEMA-LIVE-CORPUS-STUB-001",
-        schema_sha256="ab" * 32,
-        dataset_fingerprint=fingerprint,
-        generation_task_id="HFIC_FORGE_CONTROL_READY_NEGATIVE_PRIOR_REPAIR_V1",
-        generation_run_id="RUN-LIVE-CORPUS-STUB-001",
-        validation_receipt_sha256="ef" * 32,
-        first_reliable_available_at=created,
-        created_at=created,
-        content_sha256=file_sha,
-    )
-    partition = PartitionManifest(
-        partition_manifest_id="PARTITION-MANIFEST-LIVE-CORPUS-STUB-001",
-        dataset_manifest_id=STUB_CORPUS_MANIFEST,
-        partition_id="PARTITION-LIVE-CORPUS-STUB-001",
-        logical_location=logical,
-        file_sha256=file_sha,
-        content_sha256=file_sha,
-        row_count=3,
-        min_event_time=created,
-        max_event_time=created,
-        min_available_to_strategy_at=created,
-        max_available_to_strategy_at=created,
-        first_reliable_available_at=created,
-        created_at=created,
-    )
-    manifests = data_root / "datasets" / "manifests"
-    partitions = manifests / "partitions"
-    manifests.mkdir(parents=True, exist_ok=True)
-    partitions.mkdir(parents=True, exist_ok=True)
-    (manifests / f"{STUB_CORPUS_MANIFEST}.json").write_bytes(canonical_manifest_bytes(dataset))
-    (partitions / f"{partition.partition_manifest_id}.json").write_bytes(
-        canonical_manifest_bytes(partition)
-    )
-    (manifests / f"{STUB_CORPUS_MANIFEST}.labels.json").write_text(
-        json.dumps(
-            {
-                **REQUIRED_LABELS,
-                "logical_dataset_id": CORPUS_DATASET_ID,
-                "evidence_role": "EXPLORATORY_REUSE",
-                "yield_eligible": 20,
-                "yield_missing": 0,
-                "feature_families": [],
-                "dataset_terminal": "SAMPLE_VALID",
-                "corpus_version": 1,
-                "is_current_corpus_version": True,
-                "base_x_population_n": 20,
-                "discovery_coverage_class": "DISCOVERY_COVERAGE_UNKNOWN",
-            },
-            sort_keys=True,
-        ),
-        encoding="utf-8",
-    )
-    # Linux glob dataset-*.published is case-sensitive. The uppercase stub
-    # manifest name is not that layout marker, so a lineage row that already
-    # carries dataset_manifest_id is dropped and visible cohorts no longer
-    # match lineage bindings.
-    (manifests / f"dataset-{file_sha}.published").write_text(
-        json.dumps(
-            {
-                "dataset_manifest_id": STUB_CORPUS_MANIFEST,
-                "dataset_fingerprint": fingerprint,
-            },
-            sort_keys=True,
-        ),
-        encoding="utf-8",
-    )
-    (manifests / f"{STUB_CORPUS_MANIFEST}.published").write_text(
-        json.dumps(
-            {
-                "dataset_manifest_id": STUB_CORPUS_MANIFEST,
-                "dataset_fingerprint": fingerprint,
-            },
-            sort_keys=True,
-        ),
-        encoding="utf-8",
-    )
-    release_id = hashlib.sha256(
-        f"live-corpus-stub-release:{cohort_id}".encode("utf-8")
-    ).hexdigest()
-    (manifests / f"{STUB_CORPUS_MANIFEST}.validation.json").write_text(
-        json.dumps(
-            {
-                "corpus_composition": [
-                    {
-                        "cohort_id": cohort_id,
-                        "release_id": release_id,
-                        "content_sha256": file_sha,
-                    }
-                ]
-            },
-            sort_keys=True,
-        ),
-        encoding="utf-8",
-    )
-    lineage_path = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
-    lineage_path.parent.mkdir(parents=True, exist_ok=True)
-    lineage_path.write_text(
-        json.dumps(
-            {
-                "corpus_dataset_id": CORPUS_DATASET_ID,
-                "current_corpus_version": 1,
-                "current_dataset_manifest_id": STUB_CORPUS_MANIFEST,
-                "cohorts": [
-                    {
-                        "cohort_id": cohort_id,
-                        "release_id": release_id,
-                        "source_sha256": file_sha,
-                        "dataset_manifest_id": STUB_CORPUS_MANIFEST,
-                        "yield_eligible": 20,
-                    }
-                ],
-            },
-            sort_keys=True,
-        ),
-        encoding="utf-8",
-    )
+    version = publish.canonical_dataset_version(f"prior-corpus-{cohort_id}")
+    mid = compute_dataset_manifest_id(CORPUS_DATASET_ID, version)
+    release_id = hashlib.sha256(f"live-corpus-stub-release:{cohort_id}".encode("utf-8")).hexdigest()
+    part = build_partition_manifest(dataset_id=CORPUS_DATASET_ID, dataset_version=version,
+        partition_id=f"PARTITION-LIVE-COHORT-{cohort_id}-OBS", logical_location=logical,
+        file_sha256=file_sha, content_sha256=file_sha, row_count=3,
+        min_event_time=created, max_event_time=created,
+        min_available_to_strategy_at=created, max_available_to_strategy_at=created,
+        first_reliable_available_at=created, created_at=created)
+    schema = publish.live_corpus_schema_sha256()
+    _, receipt, receipt_sha = publish._build_receipt(dataset_version=version,
+        schema_sha256=schema, partitions=[part],
+        composition=[{"cohort_id": cohort_id, "release_id": release_id, "content_sha256": file_sha}],
+        dataset_fingerprint=compute_dataset_fingerprint(dataset_id=CORPUS_DATASET_ID,
+            dataset_version=version, schema_id=publish.CORPUS_SCHEMA_ID, schema_sha256=schema, partitions=[part]),
+        generation_reason="COHORT_IMPORT", published_at=created, superseded_dataset_manifest_id=None)
+    dataset = publish._build_dataset(dataset_version=version, schema_sha256=schema,
+        partitions=[part], validation_receipt_sha256=receipt_sha, published_at=created,
+        generation_task_id=publish.CANONICAL_GENERATION_TASK_IMPORT, generation_run_id=f"import-{mid[-16:]}")
+    labels = {**publish.REQUIRED_LABELS, "logical_dataset_id": CORPUS_DATASET_ID,
+        "evidence_role": "EXPLORATORY_REUSE", "yield_eligible": 20, "yield_missing": 0,
+        "feature_families": [], "dataset_terminal": "SAMPLE_VALID", "corpus_version": 1,
+        "is_current_corpus_version": True, "base_x_population_n": 20,
+        "discovery_coverage_class": "DISCOVERY_COVERAGE_UNKNOWN"}
+    publish._freeze_publication_clock(data_root=data_root, dataset_manifest_id=mid, proposed=created)
+    publish._publish_metadata(data_root, data_root / f"datasets/manifests/{mid}.labels.json",
+        publish._canonical_receipt_bytes(labels))
+    publish._commit_canonical_root(data_root=data_root, dataset=dataset, partitions=[part],
+        receipt_bytes=receipt, published={"commit_point": publish.COMMIT_POINT_KIND,
+            "cohort_id": cohort_id, "release_id": release_id, "corpus_version": 1,
+            "cumulative_cohort_count": 1, "dataset_manifest_id": mid,
+            "dataset_fingerprint": dataset.dataset_fingerprint,
+            "metadata_clock_at": publish._stamp_utc(created), "published_at": publish._stamp_utc(created)})
+    assert publish.inspect_canonical_root(data_root, mid)["complete"]
+    publish.write_live_corpus_lineage(data_root, {"corpus_dataset_id": CORPUS_DATASET_ID,
+        "current_corpus_version": 1, "current_dataset_manifest_id": mid,
+        "cohorts": [{"cohort_id": cohort_id, "release_id": release_id, "source_sha256": file_sha,
+            "dataset_manifest_id": mid, "yield_eligible": 20}]})
 
 
 def _decision_event(hyp_id: str, kind: str, reason: str, transaction_id: str):

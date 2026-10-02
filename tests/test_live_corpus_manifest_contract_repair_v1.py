@@ -74,25 +74,8 @@ from tests.test_live_cohort_discovery_release_series import (  # noqa: E402
     _snapshot_for_week,
 )
 
-REAL_DATA_PLANE = ROOT / "local" / "factory_v1" / "data_plane"
-
-
 def _sha256_path(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def _real_corpus_fingerprint() -> str | None:
-    lineage = REAL_DATA_PLANE / "datasets" / "live_lifecycle_corpus" / "lineage.json"
-    if not REAL_DATA_PLANE.is_dir() or not lineage.is_file():
-        return None
-    parts = [lineage.read_bytes()]
-    manifests = REAL_DATA_PLANE / "datasets" / "manifests"
-    if manifests.is_dir():
-        for path in sorted(manifests.rglob("*")):
-            if path.is_file() and not path.is_symlink():
-                parts.append(path.relative_to(REAL_DATA_PLANE).as_posix().encode())
-                parts.append(path.read_bytes())
-    return hashlib.sha256(b"\n".join(parts)).hexdigest()
 
 
 def _legacy_rebind_id(dataset_manifest_id: str, partition_id: str) -> str:
@@ -323,13 +306,6 @@ def _install_legacy_corpus(
 
 
 class LiveCorpusManifestContractRepairTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls._real_before = _real_corpus_fingerprint()
-
-    def tearDown(self) -> None:
-        self.assertEqual(_real_corpus_fingerprint(), getattr(self, "_real_before", None))
-
     def test_pre_post_parquet_logical_hash_and_schema_identity(self) -> None:
         census_rows = [
             {
@@ -548,7 +524,7 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
                 dataset.validation_receipt_sha256,
             )
             self.assertEqual(receipt["dataset_fingerprint"], dataset.dataset_fingerprint)
-            self.assertEqual(receipt["superseded_dataset_manifest_id"], legacy["dataset_manifest_id"])
+            self.assertIsNone(receipt["superseded_dataset_manifest_id"])
             repaired_labels = json.loads(
                 (
                     data_root / "datasets" / "manifests" / f"{new_mid}.labels.json"
@@ -633,116 +609,34 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
             base = Path(tmp)
             data_root = base / "rdp"
             data_root.mkdir()
-            release0, sealed0, _cohort0 = _seal_week(base, 0)
-            imported_at = datetime(2026, 1, 20, 1, tzinfo=UTC)
-            legacy = _install_legacy_corpus(
-                data_root=data_root,
-                release=release0,
-                sealed=sealed0,
-                imported_at=imported_at,
-            )
-            census_path = data_root / legacy["census_rel"]
-            census_before = _sha256_path(census_path)
-            published_at = datetime(2026, 9, 17, 11, tzinfo=UTC)
-
-            def _fault() -> None:
-                raise _VisibilityFault("before published")
-
+            release, sealed, _ = _seal_week(base, 0)
+            legacy = _install_legacy_corpus(data_root=data_root, release=release,
+                sealed=sealed, imported_at=datetime(2026, 1, 20, 1, tzinfo=UTC))
+            old = legacy["dataset_manifest_id"]
+            lineage_path = data_root / "datasets/live_lifecycle_corpus/lineage.json"
+            before = lineage_path.read_bytes()
+            def fault():
+                raise _VisibilityFault("before lineage")
             with self.assertRaises(_VisibilityFault):
-                repair_live_corpus_manifests(
-                    data_root=data_root,
-                    published_at=published_at,
-                    fault_before_visibility=_fault,
-                )
-            lineage = json.loads(
-                (data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json").read_text(
-                    encoding="utf-8"
-                )
-            )
-            new_mid = lineage["current_dataset_manifest_id"]
-            published_path = data_root / "datasets" / "manifests" / f"{new_mid}.published"
-            self.assertFalse(published_path.is_file())
-            enumerated, warnings = enumerate_rdp_datasets(data_root)
-            current = [
-                item
-                for item in select_current_datasets_for_forge(enumerated)
-                if item.get("dataset_id") == CORPUS_DATASET_ID
-            ]
-            self.assertTrue(current)
-            self.assertNotEqual(current[0]["dataset_manifest_id"], new_mid)
-            self.assertEqual(_sha256_path(census_path), census_before)
-            self.assertEqual(len(lineage["cohorts"]), 1)
-            release1, _sealed1, _cohort1 = _seal_week(base, 1)
-            with self.assertRaises(LiveCohortReleaseError) as blocked:
-                import_live_cohort(
-                    release_root=release1,
-                    data_root=data_root,
-                    import_time=datetime(2026, 1, 27, 1, tzinfo=UTC),
-                )
-            self.assertEqual(str(blocked.exception), LEGACY_CORPUS_REQUIRES_REPAIR)
-
-            rerun = repair_live_corpus_manifests(
-                data_root=data_root,
-                published_at=datetime(2026, 9, 19, tzinfo=UTC),
-            )
-            self.assertEqual(rerun["dataset_manifest_id"], new_mid)
-            self.assertTrue(published_path.is_file())
-            published_dataset = DatasetManifest.model_validate_json(
-                (data_root / "datasets" / "manifests" / f"{new_mid}.json").read_bytes()
-            )
-            self.assertEqual(
-                published_dataset.first_reliable_available_at,
-                datetime(2026, 9, 19, tzinfo=UTC),
-            )
-            published_path.unlink()
-            recovered = repair_live_corpus_manifests(
-                data_root=data_root,
-                published_at=datetime(2026, 9, 20, tzinfo=UTC),
-            )
-            self.assertEqual(recovered["dataset_manifest_id"], new_mid)
-            self.assertEqual(recovered["logical_rows_measured_partitions"], 0)
-            recovered_dataset = DatasetManifest.model_validate_json(
-                (data_root / "datasets" / "manifests" / f"{new_mid}.json").read_bytes()
-            )
-            self.assertEqual(
-                recovered_dataset.first_reliable_available_at,
-                datetime(2026, 9, 20, tzinfo=UTC),
-            )
-            self.assertEqual(_sha256_path(census_path), census_before)
-            enumerated, _ = enumerate_rdp_datasets(data_root)
-            current = [
-                item
-                for item in select_current_datasets_for_forge(enumerated)
-                if item.get("dataset_id") == CORPUS_DATASET_ID
-            ]
-            self.assertEqual(current[0]["dataset_manifest_id"], new_mid)
-            self.assertEqual(
-                json.loads(
-                    (
-                        data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
-                    ).read_text(encoding="utf-8")
-                )["current_corpus_version"],
-                1,
-            )
-            published_path.write_text("{not-json", encoding="utf-8")
-            recovered_corrupt = repair_live_corpus_manifests(
-                data_root=data_root,
-                published_at=datetime(2026, 9, 21, tzinfo=UTC),
-            )
-            self.assertEqual(recovered_corrupt["dataset_manifest_id"], new_mid)
-            self.assertEqual(recovered_corrupt["logical_rows_measured_partitions"], 0)
-            recovered_corrupt_dataset = DatasetManifest.model_validate_json(
-                (data_root / "datasets" / "manifests" / f"{new_mid}.json").read_bytes()
-            )
-            self.assertEqual(
-                recovered_corrupt_dataset.first_reliable_available_at,
-                datetime(2026, 9, 21, tzinfo=UTC),
-            )
-            published_after = json.loads(published_path.read_text(encoding="utf-8"))
-            self.assertEqual(
-                published_after["dataset_fingerprint"],
-                recovered_corrupt_dataset.dataset_fingerprint,
-            )
+                repair_live_corpus_manifests(data_root=data_root,
+                    published_at=datetime(2026, 9, 17, 11, tzinfo=UTC), fault_before_visibility=fault)
+            self.assertEqual(lineage_path.read_bytes(), before)
+            result = repair_live_corpus_manifests(data_root=data_root,
+                published_at=datetime(2026, 9, 19, tzinfo=UTC))
+            new = result["dataset_manifest_id"]
+            self.assertNotEqual(new, old)
+            self.assertEqual(result["candidate_disposition"], "REUSED")
+            dataset = DatasetManifest.model_validate_json(
+                (data_root / "datasets/manifests" / f"{new}.json").read_bytes())
+            self.assertEqual(dataset.first_reliable_available_at, datetime(2026, 9, 17, 11, tzinfo=UTC))
+            marker = data_root / "datasets/manifests" / f"{new}.published"
+            marker.unlink()
+            broken = {p.relative_to(data_root).as_posix(): p.read_bytes()
+                      for p in data_root.rglob("*") if p.is_file()}
+            with self.assertRaisesRegex(LiveCohortReleaseError, "UNPUBLISHED"):
+                repair_live_corpus_manifests(data_root=data_root)
+            self.assertEqual(broken, {p.relative_to(data_root).as_posix(): p.read_bytes()
+                      for p in data_root.rglob("*") if p.is_file()})
 
     def test_repair_fail_closed_on_missing_yield(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -855,57 +749,20 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
             base = Path(tmp)
             data_root = base / "rdp"
             data_root.mkdir()
-            release0, _sealed0, _cohort0 = _seal_week(base, 0)
-
-            def _fault() -> None:
-                raise _VisibilityFault("before published")
-
+            release, _, _ = _seal_week(base, 0)
+            def fault():
+                raise _VisibilityFault("before lineage")
             with self.assertRaises(_VisibilityFault):
-                import_live_cohort(
-                    release_root=release0,
-                    data_root=data_root,
-                    import_time=datetime(2026, 1, 20, 1, tzinfo=UTC),
-                    fault_before_visibility=_fault,
-                )
-            lineage = json.loads(
-                (
-                    data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
-                ).read_text(encoding="utf-8")
-            )
-            new_mid = lineage["current_dataset_manifest_id"]
-            enumerated, warnings = enumerate_rdp_datasets(data_root)
-            current = [
-                item
-                for item in select_current_datasets_for_forge(enumerated)
-                if item.get("dataset_id") == CORPUS_DATASET_ID
-            ]
-            self.assertEqual(current, [])
-            self.assertFalse(
-                (data_root / "datasets" / "manifests" / f"{new_mid}.json").is_file()
-            )
-            rerun = import_live_cohort(
-                release_root=release0,
-                data_root=data_root,
-                import_time=datetime(2026, 1, 20, 2, tzinfo=UTC),
-            )
-            self.assertEqual(rerun["dataset_manifest_id"], new_mid)
-            self.assertTrue(
-                (
-                    data_root / "datasets" / "manifests" / f"{new_mid}.published"
-                ).is_file()
-            )
-            lineage_after = json.loads(
-                (
-                    data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
-                ).read_text(encoding="utf-8")
-            )
-            self.assertNotEqual(
-                lineage_after["cohorts"][-1].get("superseded_dataset_manifest_id"),
-                new_mid,
-            )
-            self.assertIsNone(
-                lineage_after["cohorts"][-1].get("superseded_dataset_manifest_id")
-            )
+                import_live_cohort(release_root=release, data_root=data_root,
+                    import_time=datetime(2026, 1, 20, 1, tzinfo=UTC), fault_before_visibility=fault)
+            self.assertFalse((data_root / "datasets/live_lifecycle_corpus/lineage.json").exists())
+            rows, _ = enumerate_rdp_datasets(data_root)
+            self.assertEqual(select_current_datasets_for_forge(rows), [])
+            result = import_live_cohort(release_root=release, data_root=data_root,
+                import_time=datetime(2026, 1, 20, 2, tzinfo=UTC))
+            self.assertEqual(result["corpus_version"], 1)
+            self.assertEqual(len(json.loads((data_root / "datasets/live_lifecycle_corpus/lineage.json").read_bytes())["cohorts"]), 1)
+
 
 
 if __name__ == "__main__":

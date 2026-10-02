@@ -1,0 +1,126 @@
+{
+  "candidate": {
+    "base": "b24ec87f5308377fe7d5543f5db690d9fe8c2532",
+    "diff_sha256": "ec6f3f3c5ef749a0ed411682a4d8ab88f1bf0074f74fd0ceaad9c8825e867303",
+    "head": "0322db7f7c4ebb1183749dcbeea7f24ed07065e3"
+  },
+  "evidence": [
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/live_corpus_manifest_publish.py",
+      "sha256_or_fingerprint": "96f4e19d35f3d6d6332ed09b0633525a76acb06c3b2d8df213cbf0a3aaf4473e"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_preflight.py",
+      "sha256_or_fingerprint": "73d063c68845ec32a6fb7a47c5ad5f4ea14b0c003d64decd1078fe923b0b6d1d"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/live_cohort_discovery_release.py",
+      "sha256_or_fingerprint": "ffb8b7d10014ba327553dcd8d6d04ae88f8e6edbc9684e09273c4efd28e5fde0"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_evidence_identity.py",
+      "sha256_or_fingerprint": "2de64471450a880674330303ed9434fcc62aa90c733d51719675a31def79c770"
+    },
+    {
+      "logical_ref": "repo://tests/test_live_corpus_schema_drift_atomic_repair_v2.py",
+      "sha256_or_fingerprint": "bad0891cf2ecc61076cf098fc151fdd983091958e72ec0e4cfd4894d5f1822c5"
+    },
+    {
+      "logical_ref": "repo://tests/test_hfic_market_evidence_epoch_decision_basis_v2.py",
+      "sha256_or_fingerprint": "1fe1f98be7a09cb2fe05a7a3340975e60b45a836a642e3143823adf21e1e858e"
+    },
+    {
+      "logical_ref": "repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md",
+      "sha256_or_fingerprint": "94f70ccea5bf772d547e7f6939548b39d3d913f0ada10e3c78a63e9c8090a57e"
+    },
+    {
+      "logical_ref": "repo://docs/reports/live_corpus_schema_drift_atomic_repair_v2/owner_readout.md",
+      "sha256_or_fingerprint": "6025c8afb62d42ee4481d91791c1c1b8c6858319bef67ad85f310245ce40a4e1"
+    },
+    {
+      "logical_ref": "repo://tests/test_live_cohort_to_forge_operational_closure_v1.py",
+      "sha256_or_fingerprint": "4877ec661bc9c86edfdd81333a574d8abd60155ae16cb754f5578769e8b4dd2c"
+    },
+    {
+      "logical_ref": "repo://tests/test_hfic_censoring_ignorability_diagnostic_v1.py",
+      "sha256_or_fingerprint": "e58de6f5d02a7d39adaa909a1d759e850fa54f42bd78b13357eefc7f68cb2105"
+    }
+  ],
+  "independence": {
+    "claim_scope": "PACKET_INFORMATION_PATH",
+    "context_isolated": true,
+    "implementation_transcript_seen": false,
+    "launch_isolation": "PROCESS_OBLIGATION",
+    "model_diversity": "UNPROVEN",
+    "model_diversity_identity": null,
+    "packet_bound": true,
+    "readonly": true
+  },
+  "non_claims": [
+    "NO_REAL_DATA_PLANE_ACCESS",
+    "NO_REAL_C4_ACCESS_OR_IMPORT",
+    "NO_FORGE_RUN",
+    "NO_PROVIDER_OR_DEPLOY",
+    "NO_RESEARCHSTORE_MUTATION",
+    "NO_SCIENTIFIC_LOOK",
+    "NO_MARKET_V2_REDESIGN",
+    "NO_MULTIWRITER_OR_POWER_LOSS_DURABILITY_GUARANTEE",
+    "Snapshot is staged implementation at actual existing HEAD; packet and three delivery-chain evidence files are excluded to avoid self-binding. Final content inventory is reviewed separately."
+  ],
+  "packet_fingerprint_sha256": "e5899c52920915543a9dc43bc68d05220c4a682f436a89d4020e67fe67f3b1c3",
+  "questions": [
+    "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
+    "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
+    "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL",
+    "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE",
+    "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY",
+    "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING",
+    "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER",
+    "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE",
+    "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM",
+    "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS"
+  ],
+  "review": {
+    "architecture_owner": "ARCHITECTURE_CRITIC",
+    "profile": "SEMANTIC_PREMISE",
+    "risk_dimensions": [
+      "EVIDENCE_ADMISSIBILITY",
+      "RESEARCH_TRUTH_OWNERSHIP",
+      "PIT_OR_AVAILABILITY_SEMANTICS",
+      "EXECUTION_TRUTH_SEMANTICS"
+    ]
+  },
+  "schema": "smial.semantic-premise-review-packet",
+  "schema_version": "1.0",
+  "semantic_claims": [
+    {
+      "claim": "Lineage current_dataset_manifest_id solely owns current LIVE visibility; derived label flags cannot override it.",
+      "claim_id": "CURRENT_OWNER",
+      "scope": "LIVE corpus only; non-LIVE selection unchanged."
+    },
+    {
+      "claim": "Unchanged composition and bounded LIVE metadata contract produce the same target MID and predecessor-independent immutable candidate bytes, including partial B then C then B; the target-frozen publication clock is reused.",
+      "claim_id": "IDENTITY",
+      "scope": "LIVE dataset_version only, unchanged TASK-06 builders/corpus_version; transition predecessor stays in lineage/readback."
+    },
+    {
+      "claim": "Pre-switch failure leaves existing current root/lineage/labels/market unchanged; complete candidate verification precedes one lineage replacement. Post-switch readers use NEW even if labels stale.",
+      "claim_id": "ATOMICITY",
+      "scope": "Serialized repair/import operations, ordinary process interruption, isolated production-shaped fixtures."
+    },
+    {
+      "claim": "Metadata repair preserves V2 scientific epoch, AUTO/distinct-focus occupancy and history; next synthetic composition import changes v3 to v4 normally.",
+      "claim_id": "SCIENCE",
+      "scope": "Scratch regression evidence; no claim of actual live repair/import or alpha."
+    },
+    {
+      "claim": "Existing repair CLI retries compatible preparation and returns typed integrity stops without rewriting parquet/releases.",
+      "claim_id": "OPERABILITY",
+      "scope": "Existing commands/runbook, no service/framework/new scientific authority."
+    }
+  ],
+  "task": {
+    "task_contract_sha256": "47aea96e99f59d0b1289c4c5f60c4167cdbd94c667d4b622abf6807eeb71110b",
+    "task_id": "LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2"
+  }
+}

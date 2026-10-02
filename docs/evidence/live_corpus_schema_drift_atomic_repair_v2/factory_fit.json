@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2-FIT",
+  "as_of": "2026-10-02",
+  "task_id": "LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2",
+  "reviewed_bindings_sha256": "dfd36a2a13f6f6afb5fd3a629051482134ec2d914b08f9ff7b3bb7e40ee801b9",
+  "reviewed_inventory_sha256": "ec5e06a7fdeebf6f84e6c8fecf54785ba8d606cc14a69512b5ac18dd51142ddc",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_EXISTING_LIVE_EVIDENCE_REPAIR_IMPORT_CURRENT_CONSUMER_LOOP",
+    "flexibility_and_history": "PASS_PREDECESSOR_INDEPENDENT_TARGET_BYTES_PARTIAL_SCHEMA_CYCLE_AND_IMMUTABLE_ROOT_REUSE",
+    "context_efficiency": "PASS_EXACT_ROUTE_TASK_OWNER_PATHS_FROZEN_ISOLATED_CRITICS",
+    "research_truth": "PASS_V2_EPOCH_BUDGET_HISTORY_INVARIANCE_NO_SCIENTIFIC_AUTHORITY",
+    "owner_operability": "PASS_EXISTING_CLI_TYPED_TERMINALS_RETRY_RUNBOOK_FOUR_SEMANTIC_QUERIES",
+    "execution_to_cashflow": "NOT_APPLICABLE_METADATA_CAPABILITY_NO_TRADE_OR_ALPHA_CLAIM",
+    "monitoring_and_recovery": "PASS_SINGLE_LINEAGE_VISIBILITY_COMPATIBLE_RETRY_STALE_LABEL_CLEANUP",
+    "build_vs_buy": "PASS_REUSE_TASK06_BUILDERS_EXISTING_LINEAGE_AND_CLI_NO_GENERIC_FRAMEWORK",
+    "security": "PASS_SAFE_CONTAINED_PATHS_NO_SYMLINK_FOLLOW_NO_REAL_DATA_C4_PROVIDER_CREDENTIAL_CHANGES",
+    "red_team": "PASS_LATE_INTERRUPTS_WRONG_CANONICAL_GENERATION_RECEIPT_GROUPING_AND_CURRENT_CONSUMER_FALSIFIERS"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Separate owner-authorized real metadata repair and verified C4 import after merge."
+  },
+  "recovery": "Same repair command for compatible preparation or stale derived labels; typed integrity STOP; ordinary Git revert preserves runtime history.",
+  "limits": [
+    "SERIALIZED_REPAIR_IMPORT_OPERATIONS",
+    "NO_POWER_LOSS_DURABILITY_CLAIM",
+    "NO_RUNTIME_SUCCESS_CLAIM",
+    "NO_REAL_DATA_C4_FORGE",
+    "NO_MERGE"
+  ]
+}

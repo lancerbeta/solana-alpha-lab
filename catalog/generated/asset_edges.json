@@ -3963,6 +3963,16 @@
       "target_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001"
     },
     {
+      "source_asset_id": "CTRL-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001"
+    },
+    {
+      "source_asset_id": "CTRL-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001",
+      "relation": "governed_by",
+      "target_asset_id": "PROTOCOL-DELIVERY-HARNESS-001"
+    },
+    {
       "source_asset_id": "CTRL-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-FACTORY-LIFECYCLE-COLLECTOR-001"
@@ -11780,7 +11790,7 @@
     {
       "source_asset_id": "MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001"
+      "target_asset_id": "CTRL-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001"
     },
     {
       "source_asset_id": "MODULE-M1-CALIBRATION-REPORT-001",
@@ -14151,6 +14161,16 @@
       "source_asset_id": "REPORT-IN-SCOPE-POPULATION-FIT-RECONCILIATION-OWNER-READOUT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "REPORT-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001"
+    },
+    {
+      "source_asset_id": "REPORT-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001"
     },
     {
       "source_asset_id": "REPORT-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-OWNER-READOUT-001",
@@ -17301,6 +17321,16 @@
       "source_asset_id": "TEST-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001"
+    },
+    {
+      "source_asset_id": "TEST-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001"
+    },
+    {
+      "source_asset_id": "TEST-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001"
     },
     {
       "source_asset_id": "TEST-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001",

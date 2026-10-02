@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: c9bff8ffcd1ff81b6521552bcd5f50c8fe0e7b660979054ace2d032566d59065}
+  integrity: {kind: sha256, sha256: 94f70ccea5bf772d547e7f6939548b39d3d913f0ada10e3c78a63e9c8090a57e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -33499,7 +33499,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/discovery_evidence_release.py', repository_path: scripts/discovery_evidence_release.py}
-  integrity: {kind: sha256, sha256: e8f6d23604d470d796ae213e8618b3e54f59560718361ac693b1be7da6d9c60d}
+  integrity: {kind: sha256, sha256: fb0c9410e135cb98cac94d8390d57e70259c15c10f154dce523da98f2ec3fd11}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001}
@@ -34063,7 +34063,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_discovery_release.py', repository_path: src/solana_alpha_lab/factory/live_cohort_discovery_release.py}
-  integrity: {kind: sha256, sha256: ab26da78d00bb13fbc42ff8e911bc5004e8e106baec10392fb010c02c1197707}
+  integrity: {kind: sha256, sha256: ffb8b7d10014ba327553dcd8d6d04ae88f8e6edbc9684e09273c4efd28e5fde0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001}
@@ -34072,7 +34072,7 @@ records:
   - {relation_type: depends_on, target_asset_id: MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001}
   consumers: [FACTORY-001]
   evidence: []
-  search_terms: [LIVE_COHORT, CORPUS, EXPLORATORY_REUSE]
+  search_terms: [LIVE_COHORT, CORPUS, EXPLORATORY_REUSE, where did my imported cohort land]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: TEST-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001
   record_version: '1.0'
@@ -34132,21 +34132,21 @@ records:
 - asset_id: MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001
   record_version: '1.0'
   asset_type: script
-  purpose: TASK-06 builder-owned LIVE CORPUS DatasetManifest publication, metadata repair, and fail-closed commit-point sequence.
+  purpose: TASK-06 LIVE corpus schema-drift metadata repair; lineage.json owns current LIVE corpus, candidate verification precedes the sole visibility commit, labels are derived.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-17'
-  truth_owner: LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1
+  truth_owner: LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_corpus_manifest_publish.py', repository_path: src/solana_alpha_lab/factory/live_corpus_manifest_publish.py}
-  integrity: {kind: sha256, sha256: b3dbe376aa303360a511c795f461ee572daebc32bbc9eadefaa3e95e364ba480}
+  integrity: {kind: sha256, sha256: 96f4e19d35f3d6d6332ed09b0633525a76acb06c3b2d8df213cbf0a3aaf4473e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
-  - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001}
+  - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001}
   - {relation_type: depends_on, target_asset_id: MODULE-LIVE-CORPUS-LOGICAL-ROWS-001}
   - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
   consumers: [FACTORY-001]
   evidence: []
-  search_terms: [LIVE_CORPUS, PARTITION_MANIFEST, DATASET_MANIFEST, REPAIR]
+  search_terms: [LIVE_CORPUS, PARTITION_MANIFEST, DATASET_MANIFEST, REPAIR, how do I repair LIVE corpus metadata, what owns current LIVE corpus]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: TEST-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001
   record_version: '1.0'
@@ -34157,7 +34157,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_corpus_manifest_contract_repair_v1.py', repository_path: tests/test_live_corpus_manifest_contract_repair_v1.py}
-  integrity: {kind: sha256, sha256: 8c77dba8cbae80bf4760064211c4da02c8dbf6f94a0041f94568dc15a8499baf}
+  integrity: {kind: sha256, sha256: 673fedf13fa2094b5c5d17cb87b564277d4949e98ac3710b5b793ef58d037aab}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001}
@@ -34201,7 +34201,7 @@ records:
   - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
   consumers: [FACTORY-001]
   evidence: []
-  search_terms: [PUBLISH_LIVE_COHORT, FORGE_CONTROL_READY, CLOSURE_RECEIPT]
+  search_terms: [PUBLISH_LIVE_COHORT, FORGE_CONTROL_READY, CLOSURE_RECEIPT, how does live RDP get into Forge]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: TEST-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001
   record_version: '1.0'
@@ -34212,7 +34212,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_cohort_to_forge_operational_closure_v1.py', repository_path: tests/test_live_cohort_to_forge_operational_closure_v1.py}
-  integrity: {kind: sha256, sha256: 2ee5470fd79d7afe451e8fee7ed147d708884ac74a86dd62231e086fe60cb2de}
+  integrity: {kind: sha256, sha256: 4877ec661bc9c86edfdd81333a574d8abd60155ae16cb754f5578769e8b4dd2c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37800,7 +37800,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_censoring_ignorability_diagnostic_v1.py', repository_path: tests/test_hfic_censoring_ignorability_diagnostic_v1.py}
-  integrity: {kind: sha256, sha256: 26b388ba371ae6449faddc04a56fbec4c13bd9afe136109e591133472571f9a1}
+  integrity: {kind: sha256, sha256: e58de6f5d02a7d39adaa909a1d759e850fa54f42bd78b13357eefc7f68cb2105}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001}
@@ -38503,7 +38503,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_preflight.py', repository_path: src/solana_alpha_lab/factory/hfic_preflight.py}
-  integrity: {kind: sha256, sha256: 9bdf2fdb71bac5aa0039f51650e2969ef5d1e9d9df4200ab7b1a2f27bd52ed84}
+  integrity: {kind: sha256, sha256: 73d063c68845ec32a6fb7a47c5ad5f4ea14b0c003d64decd1078fe923b0b6d1d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
@@ -38791,7 +38791,7 @@ records:
     repository_path: tests/test_hfic_market_evidence_epoch_decision_basis_v2.py
   integrity:
     kind: sha256
-    sha256: f0d4e038ed341fb149b4bc6ab0a1d0fdf67e56b138ad3a2ed85111097f9b09ff
+    sha256: 1fe1f98be7a09cb2fe05a7a3340975e60b45a836a642e3143823adf21e1e858e
   access:
     mode: read_only
     method: file
@@ -39002,6 +39002,123 @@ records:
   - DELIVERY_POST_MERGE_FROZEN_CONTEXT_READBACK_REPAIR_V1
   - frozen context
   - post-merge readback
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CTRL-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Bounded LIVE corpus deterministic schema-drift identity, lineage visibility
+    commit, safe retry and scratch-only delivery contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-02'
+  truth_owner: LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2
+  location:
+    kind: git_path
+    logical_uri: repo://docs/tasks/LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2.md
+    repository_path: docs/tasks/LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2.md
+  integrity:
+    kind: sha256
+    sha256: 47aea96e99f59d0b1289c4c5f60c4167cdbd94c667d4b622abf6807eeb71110b
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: PROTOCOL-DELIVERY-HARNESS-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2
+  - schema drift
+  - atomic repair
+  - lineage current root
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Real scratch v3 schema-drift, failure atomicity, stale-label consumers,
+    V2 budget invariance and synthetic v4 import verticals.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-02'
+  truth_owner: LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_live_corpus_schema_drift_atomic_repair_v2.py
+    repository_path: tests/test_live_corpus_schema_drift_atomic_repair_v2.py
+  integrity:
+    kind: sha256
+    sha256: bad0891cf2ecc61076cf098fc151fdd983091958e72ec0e4cfd4894d5f1822c5
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2
+  - schema drift
+  - atomic repair
+  - lineage current root
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: REPORT-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Fixture-only repair implementation evidence and operator retry/stop readout;
+    no real repair or C4 claim.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-02'
+  truth_owner: LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2
+  location:
+    kind: git_path
+    logical_uri: repo://docs/reports/live_corpus_schema_drift_atomic_repair_v2/owner_readout.md
+    repository_path: docs/reports/live_corpus_schema_drift_atomic_repair_v2/owner_readout.md
+  integrity:
+    kind: sha256
+    sha256: 6025c8afb62d42ee4481d91791c1c1b8c6858319bef67ad85f310245ce40a4e1
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2
+  - schema drift
+  - atomic repair
+  - lineage current root
   classification:
     contains_secrets: false
     contains_raw_data: false
