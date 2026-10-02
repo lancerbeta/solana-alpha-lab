@@ -969,6 +969,20 @@ Only a later verified cohort import changes composition/version. Repair writes
 replacement metadata with current=false, verifies it, then atomically replaces
 lineage. Before that switch the old current root and labels remain unchanged.
 Parquet and sealed releases are never rewritten.
+Stored partition hashing is owned by `live_corpus_logical_rows.py`, separately
+from the current release writer. It matches exact frozen field names, Arrow
+types and nullable semantics for CENSUS-20, historical OBS-21 and current
+OBS-24. The LIVE schema descriptor admits their mixed corpus; repair preserves
+saved content/file hashes, rows and PIT claims. Missing historical clock policy,
+source price event time and anchor are not backfilled. Explicit null columns in
+OBS-24 remain part of that layout and its hash.
+`LIVE_CORPUS_PARTITION_SCHEMA_UNSUPPORTED` means an unsupported physical
+contract, not proven corruption. File hash drift or a mismatch with verified
+saved content/PIT claims remains an integrity STOP before publication. Do not
+cast/drop columns, rewrite parquet, or try layouts until a hash matches.
+Every writer schema change must include physical old/new/mixed regression in
+the same PR. Ordinary append reuses historical claims and measures only the
+new cohort; no intervening repair or historical logical rescan is required.
 The bounded metadata contract includes schema, logical row profile, receipt
 schema/version, publication/clock policy and static required labels. Candidate
 generation identity derives from its target, never the previous current root.

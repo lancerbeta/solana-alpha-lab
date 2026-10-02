@@ -8,9 +8,9 @@ allowed_routes:
   - DIRECT_CODEX_DELIVERY
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 5263abdd327455f239767c0c31855909f90435b7
+  expected_base: da1b39947343f9fc6a52ebca217e9b2359f567b3
   expected_upstream: origin/main
-  expected_upstream_oid: 5263abdd327455f239767c0c31855909f90435b7
+  expected_upstream_oid: da1b39947343f9fc6a52ebca217e9b2359f567b3
   expected_branch: cursor/factory-operability-bounded-call-diagnostics-v1
   dirty_mode: ALLOW_REPORTED
 objective: >-

@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1-FIT",
+  "as_of": "2026-10-02",
+  "task_id": "LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1",
+  "reviewed_bindings_sha256": "72b43829614b2d34abc9376c617f4da1492f136324ff1b758fc71fdf8e2bcb7e",
+  "reviewed_inventory_sha256": "cd3bdc7ca5216a6810872a2576c3223a6745b4a36a436ddbe28ffe20f14a952a",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_EXISTING_LIVE_STORED_LOGICAL_HASH_REPAIR_IMPORT_READER_LOOP",
+    "flexibility_and_history": "PASS_FROZEN_OLD_CURRENT_AND_MIXED_LAYOUTS_NO_HISTORICAL_REWRITE",
+    "context_efficiency": "PASS_EXACT_ROUTE_TASK_NAMED_OWNERS_FROZEN_PACKET",
+    "research_truth": "PASS_ABSENT_NULL_PIT_CLAIMS_EPOCH_BUDGET_AND_HISTORY_PRESERVED",
+    "owner_operability": "PASS_EXISTING_COMMANDS_TYPED_STOP_AND_OPERATOR_CONTRACT",
+    "execution_to_cashflow": "NOT_APPLICABLE_COMPATIBILITY_CAPABILITY_NO_ALPHA_OR_TRADE_CLAIM",
+    "monitoring_and_recovery": "PASS_REUSE_V2_CRASH_RETRY_IMMUTABLE_TARGET_SUITE",
+    "build_vs_buy": "PASS_EXISTING_ARROW_CANONICALIZATION_V2_IDENTITY_NO_FRAMEWORK",
+    "security": "PASS_NO_REAL_DATA_WRITE_C4_PROVIDER_CREDENTIAL_CHANGES",
+    "red_team": "PASS_INDEPENDENT_PINNED_OBS21_UNKNOWN_LAYOUT_ALTERED_BYTES_CONTENT_PIT_FALSIFIERS"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Separate owner-authorized real metadata repair and verified C4 import after merge."
+  },
+  "recovery": "Ordinary Git revert; preserve historical roots. Existing V2 typed integrity STOP and compatible retry semantics remain.",
+  "limits": [
+    "THREE_EXACT_SUPPORTED_PHYSICAL_LAYOUTS",
+    "SERIALIZED_REPAIR_IMPORT_OPERATIONS",
+    "NO_POWER_LOSS_DURABILITY_CLAIM",
+    "REAL_COMPATIBILITY_READ_ONLY_SIX_PARTITIONS",
+    "NO_REAL_REPAIR_IMPORT_C4_FORGE",
+    "NO_MERGE"
+  ]
+}
