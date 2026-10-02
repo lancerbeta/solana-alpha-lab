@@ -54,7 +54,7 @@
     "independent_review": {
       "path": "docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_delivery_independent_review_v1.json",
       "sha256": "5374287e9bce19cd4b28764bdb261fc9c6d4bf3f1c7411d5a0d913bce00995f2",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",

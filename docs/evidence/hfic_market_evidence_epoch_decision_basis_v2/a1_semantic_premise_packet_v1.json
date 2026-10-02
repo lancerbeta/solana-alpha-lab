@@ -1,8 +1,8 @@
 {
   "candidate": {
     "base": "68b986e12e5752d36b3cc2e14d85a855fa90b09f",
-    "diff_sha256": "f06e6a4f23f754150a065333449849f102e61ead04061aa2cf4a4548d5bed603",
-    "head": "73830e5301b88452ccd48ff2b7be8797620c9fef"
+    "diff_sha256": "c7eeba08b03901984992fbb6a4cdb2e97a360177111eb55e443201aa43d18599",
+    "head": "277843ae0daaa808f4aaa0935b70eef51005c84c"
   },
   "evidence": [
     {
@@ -52,7 +52,7 @@
     "NO_MERGE",
     "AMBIGUOUS_V1_WRAPPER_CONTINUITY_NOT_PROVEN"
   ],
-  "packet_fingerprint_sha256": "4f7d2a5f3477492351aca24c3067962e49b02237c7167680bc254cd909da5560",
+  "packet_fingerprint_sha256": "3d6dd0418f1ea7f55e1cf7b8a73106f907bb744e3b0812b2aedc4d1608fc5f17",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
