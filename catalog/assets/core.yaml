@@ -39260,7 +39260,7 @@ records:
     repository_path: docs/tasks/FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1.md
   integrity:
     kind: sha256
-    sha256: 4ccf1dd53ff1d31237707b7b8fcc081d5bc4cdae7f3dd6b51ccb2c9333fbadbb
+    sha256: 62aafded2ed0514c2c4a2efac6b38ba9d2c8119d84cf0c1d410095087055a30a
   access:
     mode: read_only
     method: file
