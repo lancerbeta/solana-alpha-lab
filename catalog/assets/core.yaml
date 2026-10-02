@@ -39139,7 +39139,7 @@ records:
     repository_path: docs/tasks/LIVE_CORPUS_STORED_PROJECTION_COMPATIBILITY_V1.md
   integrity:
     kind: sha256
-    sha256: feace6b40441bc39bdff3feeb39164312cecc9d3da24e132a1ad16b42bf67711
+    sha256: bf79a2b39bb57382df0585fefdda74ae236fc9d378c0bce7bd26261c4b37fc66
   access:
     mode: read_only
     method: file

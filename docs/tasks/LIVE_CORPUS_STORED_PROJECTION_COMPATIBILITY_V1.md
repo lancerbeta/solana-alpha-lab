@@ -52,7 +52,7 @@ stop_conditions:
   - OWNER_MERGE_PHRASE_REQUIRED
 context_requirements:
   catalog_asset_ids: [MODULE-LIVE-CORPUS-LOGICAL-ROWS-001, MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001]
-  l2_roles: []
+  l2_roles: [DELIVERY_EVIDENCE]
   l3_roles: []
   roadmap_path: null
   exact_role_asset_ids:
