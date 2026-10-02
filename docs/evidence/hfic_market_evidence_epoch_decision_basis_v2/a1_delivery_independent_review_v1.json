@@ -1,0 +1,124 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-MARKET-BASIS-V2-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-10-02",
+  "task_id": "HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2",
+  "reviewed_bindings_sha256": "2bd7fffb62925a3d051c2b61972384aae94a1d7edcf1bf17d1b6473a4935a20e",
+  "reviewed_inventory_sha256": "59a7c0fa7894ad07bf5040b8024271141dd8f9cb61baeecc958540bc45b37f17",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=3d6dd0418f1ea7f55e1cf7b8a73106f907bb744e3b0812b2aedc4d1608fc5f17",
+        "PASS: publication-only wrappers are excluded from scientific hash and cannot reset proven occupancy; current canonical integrity remains mandatory.",
+        "PASS: malformed manifest aliases, incomplete LIVE required labels and invalid current inputs produce typed STOP rather than new market.",
+        "PASS: validated V1 membership counts occupied quota/slots; ambiguous V1 continuity blocks; explicit NULL reservation is never restored.",
+        "PASS: conflicting lifecycle raw stamps cannot prove a different market after V1 wrapper republish; shared matching blocks both admission and budget on unproven cycle scope.",
+        "PASS: verified new synthetic cohort/source/content/PIT creates a new market; separate owner look authority remains required.",
+        "Tests can still pass for incorrect source availability timestamps or overlapping cohorts. Identity/integrity does not prove source PIT quality, statistical independence or alpha; input retains NOT_EVALUATED PIT semantics.",
+        "Future A3 decision-bearing fields or changed schema interpretation must extend the shared scientific projection together with a regression; the current finite field list does not attest all future consumer semantics.",
+        "PACKET_INFORMATION_PATH isolated; model diversity UNPROVEN; no real store/C4/scientific operation."
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS exact frozen inventory and direct production consumers; no blocking code findings.",
+        "Canonical filename/parsed ID binding closes alias bypass; missing mandatory LIVE fields fail closed using existing REQUIRED_LABELS; explicit NULL reservation remains UNKNOWN.",
+        "Generic optional reuse flag matches actual bool-default; proven V1 scope retains budgets and same-slot occupancy.",
+        "Prior P1 conflicting V1/V2 lifecycle bypass is corrected with a production-reader RED/GREEN regression; existing corrupt-reservation typed conflict remains unchanged.",
+        "Temporal CLI retains its validated market/store root through both ordinary gates, separately from explicit row inputs.",
+        "Four-role required review plan is adequate; no heavy rerun or real data access."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS scoped outcome and all DoD/non-claims; metadata/schema invariance, new scientific evidence and integrity STOP covered.",
+        "Scoped C1-C3 receipt compares every budget field except algorithm identity hash and unchanged scoped inventory: AUTO=1 focus=3 remaining=0.",
+        "Final focused validation: 30 V2/budget plus 29 identity/direct consumers PASS; preflight 18 PASS plus one existing skip. Full 54 owner-gold PASS is explicitly prior phase; final full suite belongs to exact-head CI.",
+        "Fresh C1-C3 readback confirms V1 unchanged, zero lifecycle conflicts and every budget field preserved. Superseded V2 draft hash is explained by the prior None-to-False effective consumer correction and exactly reproduced offline.",
+        "Old failed CI and two local legacy LIVE smoke failures are disclosed; no replacement current CI PASS is asserted by content review.",
+        "No scientific acceptance or merge claim; ambiguous V1 continuity remains blocked."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS corrected exact operator path: forge-run --no-write reads saved artifacts; preflight JSON search_budget carries counters.",
+        "--no-auto-commission sets persist=False and disables commissioning/context persistence; no new session/look.",
+        "MARKET_EPOCH_CONTINUITY_UNRESOLVED gives actionable proof/read-only recovery and forbids history rewrite, quarantine/reset or new session.",
+        "No stronger owner claim, scientific acceptance or merge readiness inferred.",
+        "PASS corrected top validation summary consistently separates final focused 30+29, preflight 18 plus existing skip, prior-phase full 54 and pending exact-head CI."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "MODEL_DIVERSITY_UNPROVEN",
+    "NO_SCIENTIFIC_PASS",
+    "NO_MERGE"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Canonical root alias bypass and explicit NULL reservation restoration closed.",
+      "observed_head": "987c591fcbc415ae97aa8bb8a69d84fece308d49",
+      "resolved_by_head": "277843ae0daaa808f4aaa0935b70eef51005c84c"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Missing LIVE decision labels/fence could falsely create fresh scientific budget; now typed STOP.",
+      "observed_head": "987c591fcbc415ae97aa8bb8a69d84fece308d49",
+      "resolved_by_head": "277843ae0daaa808f4aaa0935b70eef51005c84c"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Saved-artifact versus counter readback and continuity recovery clarified.",
+      "observed_head": "987c591fcbc415ae97aa8bb8a69d84fece308d49",
+      "resolved_by_head": "277843ae0daaa808f4aaa0935b70eef51005c84c"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Operator JSON field corrected from search_budget_usage to search_budget.",
+      "observed_head": "b7f8bfdbd213a3a3862464dd5f1916d97a6a149b",
+      "resolved_by_head": "277843ae0daaa808f4aaa0935b70eef51005c84c"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Conflicting V1/V2 lifecycle could falsely free a slot after wrapper republish; shared matching now stops both quota readback and admission unless cycle scope is recognized.",
+      "observed_head": "a8deb9a7cb5dd05614b8556d563c7d2384228cc4",
+      "resolved_by_head": "277843ae0daaa808f4aaa0935b70eef51005c84c"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Top validation summary now distinguishes final focused 30+29 checks from prior-phase full 54 owner-gold and pending exact-head CI.",
+      "observed_head": "73830e5301b88452ccd48ff2b7be8797620c9fef",
+      "resolved_by_head": "277843ae0daaa808f4aaa0935b70eef51005c84c"
+    }
+  ]
+}

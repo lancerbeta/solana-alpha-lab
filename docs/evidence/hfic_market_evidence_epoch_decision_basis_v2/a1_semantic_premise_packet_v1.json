@@ -1,0 +1,114 @@
+{
+  "candidate": {
+    "base": "68b986e12e5752d36b3cc2e14d85a855fa90b09f",
+    "diff_sha256": "c7eeba08b03901984992fbb6a4cdb2e97a360177111eb55e443201aa43d18599",
+    "head": "277843ae0daaa808f4aaa0935b70eef51005c84c"
+  },
+  "evidence": [
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_evidence_identity.py",
+      "sha256_or_fingerprint": "2de64471450a880674330303ed9434fcc62aa90c733d51719675a31def79c770"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_preflight.py",
+      "sha256_or_fingerprint": "9bdf2fdb71bac5aa0039f51650e2969ef5d1e9d9df4200ab7b1a2f27bd52ed84"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_session.py",
+      "sha256_or_fingerprint": "04a118ad8f34a3266e56236b2ba6e512557c4c7f09e02d397af54d00f1b7fe68"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/forge_input_receipt.py",
+      "sha256_or_fingerprint": "aecf7cde033cc58022ff472706f7f324f631ec1e41a886c1b50341e9f217477b"
+    },
+    {
+      "logical_ref": "repo://tests/test_hfic_market_evidence_epoch_decision_basis_v2.py",
+      "sha256_or_fingerprint": "f0d4e038ed341fb149b4bc6ab0a1d0fdf67e56b138ad3a2ed85111097f9b09ff"
+    },
+    {
+      "logical_ref": "repo://docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_readonly_budget_v1.json",
+      "sha256_or_fingerprint": "4a364fc78817c67e5fcd2a4c86b5faab93e2ec3ab9a5f8019f77e77f23a2d350"
+    }
+  ],
+  "independence": {
+    "claim_scope": "PACKET_INFORMATION_PATH",
+    "context_isolated": true,
+    "implementation_transcript_seen": false,
+    "launch_isolation": "PROCESS_OBLIGATION",
+    "model_diversity": "UNPROVEN",
+    "model_diversity_identity": null,
+    "packet_bound": true,
+    "readonly": true
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_SCIENTIFIC_FORGE",
+    "NO_REAL_DATA_MUTATION",
+    "NO_REAL_C4_ACCESS",
+    "NO_QUOTA_EXPANSION",
+    "NO_HISTORICAL_REWRITE",
+    "NO_LIVE_REPAIR",
+    "NO_PROVIDER_DEPLOY",
+    "NO_MERGE",
+    "AMBIGUOUS_V1_WRAPPER_CONTINUITY_NOT_PROVEN"
+  ],
+  "packet_fingerprint_sha256": "3d6dd0418f1ea7f55e1cf7b8a73106f907bb744e3b0812b2aedc4d1608fc5f17",
+  "questions": [
+    "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
+    "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
+    "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL",
+    "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE",
+    "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY",
+    "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING",
+    "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER",
+    "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE",
+    "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM",
+    "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS"
+  ],
+  "review": {
+    "architecture_owner": "ARCHITECTURE_CRITIC",
+    "profile": "SEMANTIC_PREMISE",
+    "risk_dimensions": [
+      "SCIENTIFIC_ESTIMAND",
+      "FALSIFIER_OR_ENDPOINT",
+      "EVIDENCE_ADMISSIBILITY",
+      "PIT_OR_AVAILABILITY_SEMANTICS",
+      "RESEARCH_TRUTH_OWNERSHIP",
+      "HYPOTHESIS_OR_FAMILY_CLOSURE",
+      "PROMOTION_OR_SUPPRESSION_AUTHORITY",
+      "UNKNOWN_VS_NEGATIVE_EVIDENCE",
+      "EXECUTION_TRUTH_SEMANTICS",
+      "DURABLE_SCIENCE_SCHEMA",
+      "OWNER_AUTHORITY_SEMANTICS",
+      "HARNESS_PREMISE_OR_MERGE_AUTHORITY"
+    ]
+  },
+  "schema": "smial.semantic-premise-review-packet",
+  "schema_version": "1.0",
+  "semantic_claims": [
+    {
+      "claim": "For verified identical decision-bearing evidence, publication labels/clocks and equivalent metadata schema-root republish do not change V2 scientific epoch or budget occupancy. Integrity provenance remains verified.",
+      "claim_id": "METADATA_INVARIANCE",
+      "scope": "Current production A3 input and shared HFIC admission/budget consumers; synthetic regression and scoped real C1-C3 proof."
+    },
+    {
+      "claim": "Invalid current root, canonical receipt, partition/parquet or lineage enumeration cannot become a fresh scientific market; admission stops on incomplete evidence.",
+      "claim_id": "FAIL_CLOSED",
+      "scope": "Current verified A3 enumeration and V2 epoch owner, no repair implementation."
+    },
+    {
+      "claim": "Proven V1 membership remains occupied in V2 without rewriting history; ambiguous frozen V1 continuity stops and cannot grant a trial.",
+      "claim_id": "V1_CONTINUITY",
+      "scope": "Current exact validated V1 alias, verified frozen bases, lifecycle/reservation readback and budgets AUTO=1 / distinct-focus=3."
+    },
+    {
+      "claim": "Genuinely new verified cohort or decision-bearing content/source/PIT/eligibility changes yield a new scientific epoch or typed integrity STOP; synthetic new cohort permits fresh market budget.",
+      "claim_id": "NEW_MARKET",
+      "scope": "Production-shaped isolated fixture tests only; no real C4 access or import."
+    }
+  ],
+  "task": {
+    "task_contract_sha256": "16e6996a2da443731625b3dec04fbea7e0dc9d5633c9e4f9ec2fd892c33736bd",
+    "task_id": "HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2"
+  }
+}

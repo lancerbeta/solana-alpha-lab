@@ -1712,6 +1712,8 @@ def run_recorded_discovery_query(
     operation_sha256: str | None = None,
     verified_market: str | None = None,
     correction: Mapping[str, Any] | None = None,
+    repo_root: Path | None = None,
+    data_root: Path | None = None,
 ) -> dict[str, Any]:
     """Public production entry: compute, persist or resume, return evidence refs.
 
@@ -1744,6 +1746,8 @@ def run_recorded_discovery_query(
                 binding_cohorts=list(binding),
                 verified_market=verified_market,
                 correction=correction,
+                repo_root=repo_root,
+                data_root=data_root,
             )
         except OrdinaryOperationError as exc:
             raise GroundedDiscoveryError(str(exc.code)) from exc

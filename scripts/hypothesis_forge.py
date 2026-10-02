@@ -134,7 +134,8 @@ class HficCliError(Exception):
 
 
 def emit(payload: dict[str, Any], *, exit_code: int = 0) -> int:
-    rendered = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    # ASCII JSON transport preserves Unicode receipt values on Windows pipes.
+    rendered = json.dumps(payload, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
     print(rendered)
     return exit_code
 
@@ -445,6 +446,13 @@ def _preflight_owner_readout(body: Mapping[str, Any]) -> str:
             "next: RESOLVE_IDENTITY_CONFLICT — восстановите согласованный "
             "market/representation/focus readback; не регенерируйте и не "
             "сбрасывайте budget"
+        )
+    elif terminal == "MARKET_EPOCH_CONTINUITY_UNRESOLVED":
+        next_line = (
+            "next: PROVE_MARKET_CONTINUITY - compare the saved frozen basis with "
+            "verified current cohort/release/content bindings; keep budget blocked. "
+            "See the Market basis V2 operator section; no new session, memory "
+            "reset, quarantine or receipt rewrite"
         )
     elif owner_class == "OBSERVABILITY_BLOCKED":
         next_line = (
@@ -1169,6 +1177,7 @@ def cmd_discovery_execute(
             "source_result_sha256": str(correct_result_sha256),
         }
     gate: dict[str, object] = {"disposition": "EXECUTE"}
+    market_root: Path | None = None
     if temporal_query:
         from solana_alpha_lab.factory.hfic_evidence_identity import (
             EvidenceIdentityError,
@@ -1201,6 +1210,8 @@ def cmd_discovery_execute(
                 continue
             if found not in epochs:
                 epochs.append(found)
+            if market_root is None:
+                market_root = root
         if not epochs:
             return emit(
                 {
@@ -1287,7 +1298,7 @@ def cmd_discovery_execute(
                 binding_cohorts=cohorts,
                 verified_market=epoch,
                 repo_root=repo_root,
-                data_root=store_root or explicit_data_root,
+                data_root=market_root,
                 correction=correction,
             )
         except OrdinaryOperationError as exc:
@@ -1350,6 +1361,8 @@ def cmd_discovery_execute(
             operation_sha256=str(operation_sha256) if operation_sha256 else None,
             verified_market=epoch if temporal_query else None,
             correction=correction,
+            repo_root=repo_root,
+            data_root=market_root if temporal_query else explicit_data_root or store_root,
         )
     except GroundedDiscoveryError as exc:
         if temporal_query and (

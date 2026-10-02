@@ -214,11 +214,17 @@ def select_forge_packet_datasets(
 
     del evidence_surface_mode
     current = select_current_datasets_for_forge(enumerated)
+    def scientific_order(item: Mapping[str, Any]) -> tuple[str, str]:
+        labels = item.get("labels") if isinstance(item.get("labels"), Mapping) else {}
+        return (str(labels.get("logical_dataset_id") or item.get("dataset_id") or ""), str(item.get("dataset_id") or ""))
+
+    # Wrapper IDs must not reshuffle the bounded evidence packet on republish.
+    current.sort(key=scientific_order)
     corpus = [item for item in current if is_live_corpus_dataset(item)]
     others = [item for item in current if not is_live_corpus_dataset(item)]
     slots = max(0, max_datasets - len(corpus))
     selected = corpus + others[:slots]
-    selected.sort(key=lambda item: str(item.get("dataset_manifest_id") or ""))
+    selected.sort(key=scientific_order)
     return selected, {
         "truncated": len(current) > len(selected),
         "max_datasets": max_datasets,
@@ -577,6 +583,7 @@ def decide_preflight_action(
     execution_context: Mapping[str, Any] | None = None,
     repo_root: Path | None = None,
     repair_continuations: Sequence[Mapping[str, Any]] | None = None,
+    market_evidence_basis: Mapping[str, Any] | None = None,
 ) -> tuple[str, str | None]:
     from solana_alpha_lab.factory.hfic_control_integrity import (
         session_evidence_surface_mode,
@@ -615,6 +622,7 @@ def decide_preflight_action(
             auto_sessions_per_market=AUTO_SESSIONS_PER_EPOCH,
             max_distinct_focuses=MAX_DISTINCT_FOCUSES_PER_EPOCH,
             repair_continuations=repair_continuations,
+            market_evidence_basis=market_evidence_basis,
         )
         if admission.get("action") == "STOP":
             if (
@@ -739,7 +747,7 @@ def decide_preflight_action(
     # Search-budget accounting is per market evidence epoch (A5). Capability /
     # Git / memory_eligibility must not reset AUTO or distinct-focus counters.
     same_epoch_for_budget = list(
-        sessions_for_market_budget(sessions, market_evidence_epoch=evidence_epoch)
+        sessions_for_market_budget(sessions, market_evidence_epoch=evidence_epoch, market_evidence_basis=market_evidence_basis)
     )
     if _is_auto_focus(owner_focus):
         auto_count = int(
@@ -767,20 +775,26 @@ def epoch_search_budget_usage(
     *,
     evidence_epoch: str,
     reservations: Sequence[Mapping[str, Any]] | None = None,
+    market_evidence_basis: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Market-epoch-scoped AUTO / distinct-focus usage (A5; not capability/Git)."""
     from solana_alpha_lab.factory.hfic_evidence_identity import (
         representation_identity_from_session,
         session_scientific_slot_sha256,
         sessions_for_market_budget,
+        _reservation_with_market_basis,
     )
 
     observed_sessions: list[Mapping[str, Any]] = [
-        *(sessions or []), *(reservations or [])
+        *(sessions or []), *(
+            _reservation_with_market_basis(item, sessions or [])
+            for item in (reservations or [])
+        )
     ]
     same_epoch = list(
         sessions_for_market_budget(
-            observed_sessions, market_evidence_epoch=evidence_epoch
+            observed_sessions, market_evidence_epoch=evidence_epoch,
+            market_evidence_basis=market_evidence_basis,
         )
     )
     deduped_epoch: list[Mapping[str, Any]] = []
@@ -1027,7 +1041,7 @@ def enumerate_rdp_datasets(
     if not manifests_dir.is_dir():
         return [], warnings
     for path in sorted(manifests_dir.glob("*.json")):
-        if path.name.endswith(".labels.json") or path.name.endswith(".decision.json"):
+        if path.name.endswith((".labels.json", ".decision.json", ".validation.json", ".publication-clock.json")):
             continue
         canonical = bool(re.fullmatch(r"dataset-[0-9a-f]{64}\.json", path.name))
         stable = bool(re.fullmatch(r"[A-Z][A-Z0-9]+(?:-[A-Z0-9]+)*\.json", path.name))
@@ -1044,14 +1058,17 @@ def enumerate_rdp_datasets(
         try:
             manifest = DatasetManifest.model_validate_json(path.read_bytes())
         except (OSError, UnicodeDecodeError, json.JSONDecodeError, Exception):
-            if canonical:
-                warnings.append(
-                    {
-                        "code": "DATASET_MANIFEST_CORRUPT",
-                        "dataset_manifest_id": path.stem,
-                    }
-                )
+            warnings.append(
+                {
+                    "code": "DATASET_MANIFEST_CORRUPT",
+                    "dataset_manifest_id": path.stem,
+                }
+            )
             continue
+        if path.stem != manifest.dataset_manifest_id:
+            warnings.append({"code": "DATASET_MANIFEST_ID_MISMATCH", "dataset_manifest_id": path.stem})
+            continue
+        canonical = bool(re.fullmatch(r"dataset-[0-9a-f]{64}", manifest.dataset_manifest_id))
         labels_path = manifests_dir / f"{manifest.dataset_manifest_id}.labels.json"
         labels: dict[str, Any] | None = None
         if labels_path.exists() or labels_path.is_symlink():
@@ -1100,6 +1117,14 @@ def enumerate_rdp_datasets(
                 }
             )
             _ENUMERATE_WORK["superseded_corpus_metadata_only"] += 1
+            continue
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            EvidenceIdentityError, require_live_scientific_labels,
+        )
+        try:
+            require_live_scientific_labels(manifest.dataset_id, labels)
+        except EvidenceIdentityError:
+            warnings.append({"code": "DATASET_SCIENTIFIC_LABELS_INCOMPLETE", "dataset_manifest_id": manifest.dataset_manifest_id})
             continue
         partition_dir = manifests_dir / "partitions"
         named_ids = _receipt_partition_manifest_ids(
@@ -1178,6 +1203,22 @@ def enumerate_rdp_datasets(
                     }
                 )
             continue
+        from solana_alpha_lab.storage.manifests import verify_dataset_manifest
+
+        try:
+            # Stable imported legacy IDs retain their predecessor integrity
+            # profile. TASK-06 content-addressed roots must verify canonically.
+            if canonical:
+                verify_dataset_manifest(manifest, partitions=matching_manifests)
+            receipt_path = manifests_dir / f"{manifest.dataset_manifest_id}.validation.json"
+            if canonical and (
+                receipt_path.is_symlink()
+                or hashlib.sha256(receipt_path.read_bytes()).hexdigest() != manifest.validation_receipt_sha256
+            ):
+                raise ValueError("DATASET_VALIDATION_RECEIPT_MISMATCH")
+        except Exception:
+            warnings.append({"code": "DATASET_MANIFEST_INTEGRITY_INVALID", "dataset_manifest_id": manifest.dataset_manifest_id})
+            continue
         a3_pit_availability_validation_sha256 = canonical_sha256(
             {
                 "identity_version": (
@@ -1255,6 +1296,21 @@ def enumerate_rdp_datasets(
                 "a3_pit_availability_validation_sha256": (
                     a3_pit_availability_validation_sha256
                 ),
+                # Scientific partition meaning excludes publication IDs,
+                # schema hashes, logical storage locations and creation clocks.
+                # The complete A3 manifest digest above still binds integrity.
+                "a3_scientific_partition_projection": [
+                    {
+                        "partition_id": part.partition_id,
+                        "content_sha256": part.content_sha256,
+                        "row_count": part.row_count,
+                        "min_event_time": part.model_dump(mode="json")["min_event_time"],
+                        "max_event_time": part.model_dump(mode="json")["max_event_time"],
+                        "min_available_to_strategy_at": part.model_dump(mode="json")["min_available_to_strategy_at"],
+                        "max_available_to_strategy_at": part.model_dump(mode="json")["max_available_to_strategy_at"],
+                    }
+                    for part in sorted(matching_manifests, key=lambda part: part.partition_id)
+                ],
                 "evidence_role": evidence_role,
                 "labels": labels,
                 "yield_eligible": yield_eligible,
@@ -2854,6 +2910,7 @@ def run_preflight(
         execution_context=execution_context or None,
         repo_root=Path(repo_root),
         repair_continuations=repair_continuations,
+        market_evidence_basis=forge_input.get("market_evidence_basis") if market_admission_ready else None,
     )
     if (
         not market_admission_ready
@@ -2941,9 +2998,16 @@ def run_preflight(
                 capability_epoch = saved_capability
             if isinstance(saved_evidence, str) and len(saved_evidence) == 64:
                 epoch = saved_evidence
-    search_budget = epoch_search_budget_usage(
-        sessions, evidence_epoch=epoch, reservations=reservations
-    )
+    try:
+        search_budget = epoch_search_budget_usage(
+            sessions, evidence_epoch=epoch, reservations=reservations,
+            market_evidence_basis=forge_input.get("market_evidence_basis") if market_admission_ready else None,
+        )
+    except ValueError as exc:
+        if str(exc) != "MARKET_EPOCH_CONTINUITY_UNRESOLVED":
+            raise
+        action, bound_session = "STOP", "MARKET_EPOCH_CONTINUITY_UNRESOLVED"
+        search_budget = {"status": "UNRESOLVED", "reason_code": str(exc)}
     live_git_head = "0" * 40
     git_composite = None
     if isinstance(git_snapshot, Mapping):

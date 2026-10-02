@@ -78,6 +78,13 @@ def _live_dataset(mid: str = "MID-CURRENT") -> dict[str, object]:
             "yield_eligible": 40,
         },
         "yield_eligible": 40,
+        # The same effective consumer fields must bind freeze and readback.
+        "evidence_role": "UNSPECIFIED",
+        "feature_families": [],
+        "feature_hint": None,
+        "feature_usable": True,
+        "yield_missing": 0,
+        "dataset_terminal": None,
         "dataset_fingerprint": "ab" * 32,
     }
 

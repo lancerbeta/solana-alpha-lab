@@ -16,7 +16,8 @@ from typing import Any
 
 from solana_alpha_lab.factory.run_passport import canonical_sha256
 
-MARKET_BASIS_VERSION = "MARKET_EVIDENCE_BASIS_V1"
+MARKET_BASIS_VERSION = "MARKET_EVIDENCE_BASIS_V2"
+LEGACY_MARKET_BASIS_VERSION = "MARKET_EVIDENCE_BASIS_V1"
 CAPABILITY_BASIS_VERSION = "CAPABILITY_EPOCH_BASIS_V1"
 SCIENTIFIC_SLOT_VERSION = "SCIENTIFIC_SLOT_V1"
 EXECUTION_BINDING_VERSION = "EXECUTION_BINDING_V1"
@@ -324,7 +325,7 @@ def _current_receipt_binds_historical_release(
     )
 
 
-def build_market_evidence_basis(
+def _build_v1_market_evidence_basis(
     *,
     datasets: Sequence[Mapping[str, Any]] | None = None,
     visible_cohort_ids: Sequence[str] | None = None,
@@ -425,7 +426,7 @@ def build_market_evidence_basis(
     bindings.sort(key=lambda row: row["cohort_id"])
 
     basis = {
-        "basis_version": MARKET_BASIS_VERSION,
+        "basis_version": LEGACY_MARKET_BASIS_VERSION,
         "current_dataset_manifest_id": current_dataset_manifest_id,
         "corpus_version": corpus_version,
         "visible_cohort_ids": cohorts,
@@ -443,14 +444,189 @@ def build_market_evidence_basis(
     return basis
 
 
+_DECISION_FIELDS = (
+    "evidence_role", "yield_eligible", "base_x_population_n", "yield_missing",
+    "feature_usable", "dataset_terminal", "feature_hint", "feature_families",
+)
+_DECISION_LABEL_FIELDS = (
+    "confirmatory_reuse_forbidden", "accepted_hypothesis_id",
+    "discovery_coverage_class",
+)
+_PUBLICATION_BASIS_KEYS = (
+    "basis_version", "current_dataset_manifest_id", "corpus_version",
+    "visible_cohort_ids", "datasets", "lineage_bindings",
+    "invalid_dataset_rows", "invalid_lineage_binding_rows",
+)
+
+
+def require_live_scientific_labels(dataset_id: Any, labels: Any) -> None:
+    """Apply the existing LIVE import contract before deriving scientific fields."""
+    from solana_alpha_lab.factory.live_cohort_discovery_release import (
+        CORPUS_DATASET_ID, LIVE_EVIDENCE_ROLE, REQUIRED_LABELS,
+    )
+    is_live = dataset_id == CORPUS_DATASET_ID or (
+        isinstance(labels, Mapping) and labels.get("evidence_role") == LIVE_EVIDENCE_ROLE
+    )
+    if not is_live:
+        return
+    if not isinstance(labels, Mapping) or any(
+        key not in labels or type(labels[key]) is not type(value) or labels[key] != value
+        for key, value in REQUIRED_LABELS.items()
+    ):
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+    if any(
+        type(labels.get(key)) is not int or labels[key] < 0
+        for key in ("yield_eligible", "yield_missing")
+    ) or not isinstance(labels.get("dataset_terminal"), str) or not labels["dataset_terminal"]:
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+    families = labels.get("feature_families")
+    if not isinstance(families, list) or any(not isinstance(item, str) or not item for item in families):
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+    if dataset_id == CORPUS_DATASET_ID and (
+        type(labels.get("corpus_version")) is not int or labels["corpus_version"] < 1
+        or type(labels.get("is_current_corpus_version")) is not bool
+    ):
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+
+
+def build_market_evidence_basis(**kwargs: Any) -> dict[str, Any]:
+    """V2 scientific projection with unchanged, separately verified V1 provenance.
+
+    A3 owns integrity and effective eligibility. Publication identities remain
+    available for auditing/continuity; only verified market/PIT meaning hashes.
+    """
+    basis = _build_v1_market_evidence_basis(**kwargs)
+    basis["basis_version"] = MARKET_BASIS_VERSION
+    scientific_datasets = []
+    for item in kwargs.get("datasets") or ():
+        if not isinstance(item, Mapping):
+            continue
+        labels = item.get("labels")
+        if "a3_pit_availability_validation_sha256" in item:
+            require_live_scientific_labels(item.get("dataset_id"), labels)
+        labels = labels if isinstance(labels, Mapping) else {}
+        partitions = item.get("a3_scientific_partition_projection")
+        if "a3_pit_availability_validation_sha256" in item and not partitions:
+            basis["invalid_dataset_rows"] = basis.get("invalid_dataset_rows", 0) + 1
+        scientific_datasets.append({
+            "dataset_id": item.get("dataset_id"),
+            "logical_dataset_id": labels.get("logical_dataset_id") or item.get("dataset_id"),
+            "derived": {key: item.get(key) for key in _DECISION_FIELDS},
+            "admissibility": {
+                **{key: labels.get(key) for key in _DECISION_LABEL_FIELDS},
+                # A3 consumes this optional generic flag through bool(...).
+                # LIVE required-True evidence is validated before this step.
+                "confirmatory_reuse_forbidden": bool(labels.get("confirmatory_reuse_forbidden")),
+            },
+            "partitions": partitions,
+        })
+    scientific_datasets.sort(key=lambda row: (str(row["logical_dataset_id"]), str(row["dataset_id"])))
+    basis["scientific_projection"] = {
+        "basis_version": MARKET_BASIS_VERSION,
+        "visible_cohort_ids": basis["visible_cohort_ids"],
+        "lineage_bindings": basis["lineage_bindings"],
+        "datasets": scientific_datasets,
+    }
+    return basis
+
+
+def _v1_publication_basis(basis: Mapping[str, Any]) -> dict[str, Any]:
+    result = {key: basis[key] for key in _PUBLICATION_BASIS_KEYS if key in basis}
+    result["basis_version"] = LEGACY_MARKET_BASIS_VERSION
+    return result
+
+
 def market_evidence_epoch_sha256(basis: Mapping[str, Any]) -> str:
+    """Integrity failure is incomplete input, never a fresh scientific market."""
+    if not isinstance(basis, Mapping):
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+    if basis.get("basis_version") == LEGACY_MARKET_BASIS_VERSION:
+        return _validated_v1_epoch(basis)
+    if basis.get("basis_version") != MARKET_BASIS_VERSION:
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+    _validated_v1_epoch(_v1_publication_basis(basis))
+    projection = basis.get("scientific_projection")
+    if (
+        not isinstance(projection, Mapping)
+        or projection.get("basis_version") != MARKET_BASIS_VERSION
+        or projection.get("visible_cohort_ids") != basis.get("visible_cohort_ids")
+        or projection.get("lineage_bindings") != basis.get("lineage_bindings")
+        or set(projection) != {"basis_version", "visible_cohort_ids", "lineage_bindings", "datasets"}
+        or not isinstance(projection.get("datasets"), list)
+        or len(projection["datasets"]) != len(basis["datasets"])
+    ):
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+    _validate_scientific_datasets(projection["datasets"], basis["datasets"])
+    return canonical_sha256(dict(projection))
+
+
+def _validate_scientific_datasets(
+    scientific: Sequence[Mapping[str, Any]], publication: Sequence[Mapping[str, Any]],
+) -> None:
+    """Reject incomplete or unbound science before computing an admission key."""
+    expected_ids = sorted(str(row["dataset_id"]) for row in publication)
+    observed_ids = []
+    for row in scientific:
+        if (
+            not isinstance(row, Mapping)
+            or set(row) != {"dataset_id", "logical_dataset_id", "derived", "admissibility", "partitions"}
+            or not isinstance(row.get("dataset_id"), str)
+            or not isinstance(row.get("logical_dataset_id"), str)
+            or not row["logical_dataset_id"]
+            or not isinstance(row.get("derived"), Mapping)
+            or set(row["derived"]) != set(_DECISION_FIELDS)
+            or not isinstance(row.get("admissibility"), Mapping)
+            or set(row["admissibility"]) != set(_DECISION_LABEL_FIELDS)
+        ):
+            raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        observed_ids.append(row["dataset_id"])
+        parts = row["partitions"]
+        requires_parts = any(
+            item["dataset_id"] == row["dataset_id"]
+            and "a3_pit_availability_validation_sha256" in item
+            for item in publication
+        )
+        from solana_alpha_lab.factory.live_cohort_discovery_release import (
+            CORPUS_DATASET_ID, LIVE_EVIDENCE_ROLE,
+        )
+        if requires_parts and (
+            row["dataset_id"] == CORPUS_DATASET_ID
+            or row["logical_dataset_id"] == CORPUS_DATASET_ID
+            or row["derived"]["evidence_role"] == LIVE_EVIDENCE_ROLE
+        ) and row["admissibility"]["confirmatory_reuse_forbidden"] is not True:
+            raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        if parts is None and not requires_parts:
+            continue
+        if not isinstance(parts, list) or not parts:
+            raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        seen = set()
+        for part in parts:
+            if (
+                not isinstance(part, Mapping)
+                or set(part) != {"partition_id", "content_sha256", "row_count", "min_event_time", "max_event_time", "min_available_to_strategy_at", "max_available_to_strategy_at"}
+                or not isinstance(part.get("partition_id"), str)
+                or not part["partition_id"]
+                or part["partition_id"] in seen
+                or not isinstance(part.get("content_sha256"), str)
+                or re.fullmatch(r"[0-9a-f]{64}", part["content_sha256"]) is None
+                or not isinstance(part.get("row_count"), int)
+                or isinstance(part["row_count"], bool)
+                or part["row_count"] < 0
+            ):
+                raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+            seen.add(part["partition_id"])
+    if sorted(observed_ids) != expected_ids:
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+
+
+def _validated_v1_epoch(basis: Mapping[str, Any]) -> str:
     if not isinstance(basis, Mapping):
         raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
 
     # A market epoch is an admission identity, not a checksum over whatever
     # labels happened to be available.  The current manifest, visible release
     # lineage and dataset fingerprints must form one complete A3 readback.
-    if basis.get("basis_version") != MARKET_BASIS_VERSION:
+    if basis.get("basis_version") != LEGACY_MARKET_BASIS_VERSION:
         raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
     current_mid = str(basis.get("current_dataset_manifest_id") or "").strip()
     visible = {
@@ -930,6 +1106,7 @@ def resolve_scientific_admission(
     auto_sessions_per_market: int = 1,
     max_distinct_focuses: int = 3,
     repair_continuations: Sequence[Mapping[str, Any]] | None = None,
+    market_evidence_basis: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Resolve one shared market-slot admission decision.
 
@@ -977,6 +1154,13 @@ def resolve_scientific_admission(
         representation_semantic_version=version,
         owner_focus=owner_focus,
     )
+    if market_evidence_basis is not None:
+        try:
+            if market_evidence_epoch_sha256(market_evidence_basis) != market_evidence_epoch:
+                raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        except EvidenceIdentityError as exc:
+            return {"action": "STOP", "reason_code": exc.code, "session_id": None,
+                    "scientific_slot_sha256": target_slot, "occupancy": "UNRESOLVED_BINDING"}
     if isinstance(execution_context, Mapping):
         for key in (
             "capability_epoch_sha256",
@@ -998,8 +1182,24 @@ def resolve_scientific_admission(
                 }
     observed_rows: list[Mapping[str, Any]] = []
     seen_rows: set[tuple[str, str]] = set()
-    all_rows = [*(sessions or []), *(reservations or [])]
+    all_rows = [*(sessions or []), *(
+        _reservation_with_market_basis(item, sessions or [])
+        for item in (reservations or [])
+    )]
+    try:
+        # Resolve all stamped history before any mismatched-epoch filtering.
+        # Unknown migration scope must never disappear as an available slot.
+        sessions_for_market_budget(
+            all_rows, market_evidence_epoch=market_evidence_epoch,
+            market_evidence_basis=market_evidence_basis,
+        )
+    except EvidenceIdentityError as exc:
+        return {"action": "STOP", "reason_code": exc.code, "session_id": None,
+                "scientific_slot_sha256": target_slot, "occupancy": "UNRESOLVED_BINDING"}
     invalid_rows = []
+    current_market_epochs = {market_evidence_epoch}
+    if isinstance(market_evidence_basis, Mapping) and market_evidence_basis.get("basis_version") == MARKET_BASIS_VERSION:
+        current_market_epochs.add(_validated_v1_epoch(_v1_publication_basis(market_evidence_basis)))
     for item in all_rows:
         if not isinstance(item, Mapping) or not _session_identity_is_invalid(item):
             continue
@@ -1015,7 +1215,7 @@ def resolve_scientific_admission(
             if (
                 item.get("identity_conflict_market_scope_complete") is True
                 and known_markets
-                and market_evidence_epoch not in known_markets
+                and not current_market_epochs.intersection(known_markets)
             ):
                 # A conflicting lifecycle history is scoped only when every
                 # A5-bearing cycle has a known market identity.  Latest-cycle
@@ -1024,7 +1224,7 @@ def resolve_scientific_admission(
         elif (
             isinstance(observed_market, str)
             and re.fullmatch(r"[0-9a-f]{64}", observed_market) is not None
-            and observed_market != market_evidence_epoch
+            and not session_matches_market_epoch(item, market_evidence_epoch, market_evidence_basis=market_evidence_basis)
         ):
             # Legacy conflict rows without per-cycle market provenance can be
             # scoped only by their single durable, internally consistent hash.
@@ -1051,7 +1251,7 @@ def resolve_scientific_admission(
         item
         for item in all_rows
         if isinstance(item, Mapping)
-        and session_matches_market_epoch(item, market_evidence_epoch)
+        and session_matches_market_epoch(item, market_evidence_epoch, market_evidence_basis=market_evidence_basis)
         and session_scientific_slot_sha256(item) is None
     ]
     if market_occupancy_unresolved:
@@ -1067,7 +1267,7 @@ def resolve_scientific_admission(
     for item in all_rows:
         if not isinstance(item, Mapping):
             continue
-        if session_matches_market_epoch(item, market_evidence_epoch):
+        if session_matches_market_epoch(item, market_evidence_epoch, market_evidence_basis=market_evidence_basis):
             continue
         if not str(item.get("evidence_epoch_sha256") or ""):
             continue
@@ -1103,12 +1303,13 @@ def resolve_scientific_admission(
         sessions_for_market_budget(
             observed_rows,
             market_evidence_epoch=market_evidence_epoch,
+            market_evidence_basis=market_evidence_basis,
         )
     )
     same_slot = [
         item
         for item in market_rows
-        if session_scientific_slot_sha256(item) == target_slot
+        if _slot_for_current_market(item, market_evidence_epoch) == target_slot
     ]
     same_slot.sort(
         key=lambda item: (
@@ -1126,7 +1327,8 @@ def resolve_scientific_admission(
             for item in (sessions or [])
             if isinstance(item, Mapping)
             and str(item.get("session_id") or "")
-            and session_scientific_slot_sha256(item) == target_slot
+            and session_matches_market_epoch(item, market_evidence_epoch, market_evidence_basis=market_evidence_basis)
+            and _slot_for_current_market(item, market_evidence_epoch) == target_slot
         }
         # A reservation is durable occupancy, but it is not a resumable
         # lifecycle row.  Do not turn an orphan reservation into a fresh
@@ -1374,6 +1576,7 @@ def compute_market_epoch_for_data_root(
         )
 
         enumerated, _warnings = enumerate_rdp_datasets(Path(data_root))
+        require_complete_market_enumeration(_warnings)
         verified_dataset_manifest_ids = {
             str(item.get("dataset_manifest_id") or "")
             for item in enumerated
@@ -1423,6 +1626,12 @@ def compute_market_epoch_for_data_root(
 def compute_capability_epoch_for_repo(repo_root: Path) -> tuple[str, dict[str, Any]]:
     basis = build_capability_epoch_basis(Path(repo_root))
     return capability_epoch_sha256(basis), basis
+
+
+def require_complete_market_enumeration(warnings: Sequence[Mapping[str, Any]]) -> None:
+    """Dropped invalid data is not evidence of a changed scientific population."""
+    if warnings:
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
 
 
 def compute_split_identity(
@@ -1550,18 +1759,55 @@ def classify_legacy_session_disposition(
     }
 
 
+def _slot_for_current_market(session: Mapping[str, Any], epoch: str) -> str | None:
+    """Ephemeral slot mapping, only after scientific market equivalence proof."""
+    if session_scientific_slot_sha256(session) is None:
+        return None
+    representation, version = representation_identity_from_session(session)
+    return scientific_slot_sha256(
+        market_evidence_epoch_sha256=epoch,
+        representation_id=str(representation),
+        representation_semantic_version=str(version),
+        owner_focus=str(session.get("owner_focus") or ""),
+    )
+
+
+def _reservation_with_market_basis(
+    reservation: Mapping[str, Any], sessions: Sequence[Mapping[str, Any]],
+) -> Mapping[str, Any]:
+    """Read-only proof from the same durable lifecycle; never rewrite reservation."""
+    if not isinstance(reservation, Mapping) or "market_evidence_basis" in reservation:
+        return reservation
+    slot = session_scientific_slot_sha256(reservation)
+    if slot is None:
+        return reservation
+    candidates = [
+        row.get("market_evidence_basis") for row in sessions
+        if row.get("session_id") == reservation.get("session_id")
+        and not _session_identity_is_invalid(row)
+        and session_scientific_slot_sha256(row) == slot
+        and isinstance(row.get("market_evidence_basis"), Mapping)
+    ]
+    if not candidates or any(item != candidates[0] for item in candidates[1:]):
+        return reservation
+    return {**reservation, "market_evidence_basis": candidates[0]}
+
+
 def sessions_for_market_budget(
     sessions: Sequence[Mapping[str, Any]],
     *,
     market_evidence_epoch: str,
     representation_id: str | None = None,
     representation_semantic_version: str | None = None,
+    market_evidence_basis: Mapping[str, Any] | None = None,
 ) -> list[Mapping[str, Any]]:
     """Sessions that consume scientific budget for the current market epoch."""
 
+    if market_evidence_basis is not None and market_evidence_epoch_sha256(market_evidence_basis) != market_evidence_epoch:
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
     matched: list[Mapping[str, Any]] = []
     for item in sessions:
-        if not session_matches_market_epoch(item, market_evidence_epoch):
+        if not session_matches_market_epoch(item, market_evidence_epoch, market_evidence_basis=market_evidence_basis):
             continue
         if representation_id is not None:
             observed = representation_identity_from_session(item)
@@ -1579,7 +1825,8 @@ def sessions_for_market_budget(
 
 
 def session_matches_market_epoch(
-    session: Mapping[str, Any], market_evidence_epoch: str
+    session: Mapping[str, Any], market_evidence_epoch: str,
+    *, market_evidence_basis: Mapping[str, Any] | None = None,
 ) -> bool:
     """True when session occupies budget for this market epoch.
 
@@ -1590,11 +1837,61 @@ def session_matches_market_epoch(
 
     stamped = session.get("market_evidence_epoch_sha256")
     if (
+        market_evidence_basis is not None
+        and market_evidence_basis.get("basis_version") == MARKET_BASIS_VERSION
+        and _session_identity_is_invalid(session)
+        and "identity_conflict_market_epochs" in session
+    ):
+        if market_evidence_epoch_sha256(market_evidence_basis) != market_evidence_epoch:
+            raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        recognized = {
+            market_evidence_epoch,
+            _validated_v1_epoch(_v1_publication_basis(market_evidence_basis)),
+        }
+        conflict_markets = session.get("identity_conflict_market_epochs")
+        if not (
+            session.get("identity_conflict_market_scope_complete") is True
+            and isinstance(conflict_markets, list)
+            and conflict_markets
+            and all(isinstance(value, str) and value in recognized for value in conflict_markets)
+        ):
+            # The reader retains raw stamps of every conflicting cycle, but
+            # only the latest frozen basis. A nonmatching old V1 stamp after
+            # republish cannot prove that all earlier scientific scopes differ.
+            # Apply the same STOP to quota readback and slot admission.
+            raise EvidenceIdentityError("MARKET_EPOCH_CONTINUITY_UNRESOLVED")
+    if (
         isinstance(stamped, str)
         and re.fullmatch(r"[0-9a-f]{64}", stamped) is not None
         and re.fullmatch(r"[0-9a-f]{64}", market_evidence_epoch) is not None
     ):
-        return stamped == market_evidence_epoch
+        if market_evidence_basis is not None:
+            if market_evidence_epoch_sha256(market_evidence_basis) != market_evidence_epoch:
+                raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        if stamped == market_evidence_epoch:
+            return True
+        if market_evidence_basis is None:
+            if isinstance(session.get("market_evidence_basis"), Mapping):
+                raise EvidenceIdentityError("MARKET_EPOCH_CONTINUITY_UNRESOLVED")
+            return False
+        if market_evidence_basis.get("basis_version") != MARKET_BASIS_VERSION:
+            return False
+        # Exact current validated V1 bytes prove unchanged scientific scope.
+        # This is an ephemeral compatibility proof, never a historical rewrite.
+        if stamped == _validated_v1_epoch(_v1_publication_basis(market_evidence_basis)):
+            return True
+        frozen = session.get("market_evidence_basis")
+        if isinstance(frozen, Mapping):
+            if market_evidence_epoch_sha256(frozen) != stamped:
+                raise EvidenceIdentityError("MARKET_EPOCH_CONTINUITY_UNRESOLVED")
+            if frozen.get("basis_version") == MARKET_BASIS_VERSION:
+                return frozen.get("scientific_projection") == market_evidence_basis.get("scientific_projection")
+            if frozen.get("basis_version") == LEGACY_MARKET_BASIS_VERSION:
+                # Verified immutable scope differences prove a genuinely
+                # different market. Publication/digest differences do not.
+                if any(frozen.get(key) != market_evidence_basis.get(key) for key in ("visible_cohort_ids", "lineage_bindings")):
+                    return False
+        raise EvidenceIdentityError("MARKET_EPOCH_CONTINUITY_UNRESOLVED")
     return False
 
 

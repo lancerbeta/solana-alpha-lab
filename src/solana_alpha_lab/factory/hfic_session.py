@@ -3676,6 +3676,7 @@ def _assert_scientific_admission(
         list_hfic_sessions(store),
         reservations=list_scientific_slot_admissions(store),
         market_evidence_epoch=market,
+        market_evidence_basis=_market_evidence_basis_from_sources(binding),
         representation_id=str(fields.get("ladder_representation_id") or "BASE"),
         representation_semantic_version=version,
         owner_focus=str(binding.get("owner_focus") or "AUTO"),
@@ -5201,6 +5202,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                 "market_evidence_epoch_sha256": payload.get(
                     "market_evidence_epoch_sha256"
                 ),
+                "market_evidence_basis": payload.get("market_evidence_basis"),
                 "capability_epoch_sha256": payload.get("capability_epoch_sha256"),
                 "ladder_representation_id": payload.get("ladder_representation_id"),
                 "control_session_id": payload.get("control_session_id"),
@@ -5230,6 +5232,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
             for key in (
                 "evidence_epoch_sha256",
                 "market_evidence_epoch_sha256",
+                "market_evidence_basis",
                 "capability_epoch_sha256",
                 "ladder_representation_id",
                 "control_session_id",
@@ -5262,6 +5265,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
         by_session_cycles.setdefault(str(candidate["session_id"]), []).append(candidate)
     identity_fields = (
         "market_evidence_epoch_sha256",
+        "market_evidence_basis",
         "capability_epoch_sha256",
         "ladder_representation_id",
         "control_session_id",

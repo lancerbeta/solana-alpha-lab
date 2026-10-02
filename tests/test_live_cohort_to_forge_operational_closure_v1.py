@@ -388,6 +388,7 @@ def _write_stub_live_corpus(data_root: Path, *, cohort_id: str) -> None:
     from solana_alpha_lab.contracts.schema_v1 import DatasetManifest, PartitionManifest
     from solana_alpha_lab.factory.commissioning_fixture import _deterministic_parquet_bytes
     from solana_alpha_lab.storage.manifests import canonical_manifest_bytes
+    from solana_alpha_lab.factory.live_cohort_discovery_release import REQUIRED_LABELS
 
     created = datetime(2026, 1, 1, tzinfo=UTC)
     parquet_bytes = _deterministic_parquet_bytes()
@@ -437,9 +438,15 @@ def _write_stub_live_corpus(data_root: Path, *, cohort_id: str) -> None:
     (manifests / f"{STUB_CORPUS_MANIFEST}.labels.json").write_text(
         json.dumps(
             {
+                **REQUIRED_LABELS,
                 "logical_dataset_id": CORPUS_DATASET_ID,
                 "evidence_role": "EXPLORATORY_REUSE",
                 "yield_eligible": 20,
+                "yield_missing": 0,
+                "feature_families": [],
+                "dataset_terminal": "SAMPLE_VALID",
+                "corpus_version": 1,
+                "is_current_corpus_version": True,
                 "base_x_population_n": 20,
                 "discovery_coverage_class": "DISCOVERY_COVERAGE_UNKNOWN",
             },
@@ -532,6 +539,33 @@ def _decision_event(hyp_id: str, kind: str, reason: str, transaction_id: str):
     )
 
 
+def _historical_session_records(session_id: str, hyp_ids: list[str]):
+    """Priors from a verified earlier synthetic cohort, not a fake hash."""
+    from solana_alpha_lab.factory.hfic_evidence_identity import compute_split_identity
+    from tests.test_hfic_operational_memory_quarantine_v1 import _session_records
+
+    with tempfile.TemporaryDirectory() as tmp:
+        prior_root = Path(tmp)
+        _commission(prior_root)
+        _write_stub_live_corpus(prior_root, cohort_id=COHORT1)
+        split = compute_split_identity(ROOT, prior_root)
+    records = _session_records(session_id, hyp_ids)
+    result = []
+    for record in records:
+        if getattr(record.record_kind, "value", record.record_kind) != "RESEARCH_CYCLE":
+            result.append(record)
+            continue
+        payload = json.loads(record.payload_json)
+        payload["market_evidence_epoch_sha256"] = split["market_evidence_epoch_sha256"]
+        payload["market_evidence_basis"] = split["market_evidence_basis"]
+        payload_json = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+        result.append(record.model_copy(update={
+            "payload_json": payload_json,
+            "payload_sha256": hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+        }))
+    return result
+
+
 def _seed_eligible_and_quarantined_priors(data_root: Path) -> None:
     from solana_alpha_lab.factory.hfic_memory_policy import (
         REASON_OWNER_CALIBRATION_RESET,
@@ -539,11 +573,11 @@ def _seed_eligible_and_quarantined_priors(data_root: Path) -> None:
         preview_memory_policy,
     )
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchStore
-    from tests.test_hfic_operational_memory_quarantine_v1 import _event, _session_records
+    from tests.test_hfic_operational_memory_quarantine_v1 import _event
 
     store = ResearchStore(data_root, create_if_missing=False)
     txn = f"RESEARCH-TXN-{ELIGIBLE_SESSION}"
-    eligible_records = _session_records(
+    eligible_records = _historical_session_records(
         ELIGIBLE_SESSION,
         [HARD_CLOSE_HV, PARK_HV, NOT_SELECTED_HV],
     )
@@ -613,7 +647,7 @@ def _seed_eligible_and_quarantined_priors(data_root: Path) -> None:
     )
     store.append(rewritten, transaction_id=txn)
     store.append(
-        _session_records(QUARANTINED_SESSION, [QUARANTINED_HV]),
+        _historical_session_records(QUARANTINED_SESSION, [QUARANTINED_HV]),
         transaction_id=f"RESEARCH-TXN-{QUARANTINED_SESSION}",
     )
     preview = preview_memory_policy(
@@ -638,12 +672,10 @@ def _quarantine_clean_room(data_root: Path) -> None:
         preview_memory_policy,
     )
     from solana_alpha_lab.factory.research_store import ResearchStore
-    from tests.test_hfic_operational_memory_quarantine_v1 import _session_records
-
     store = ResearchStore(data_root)
     session_id = "HFIC-SESS-CLEANROOMAAAAAA"
     store.append(
-        _session_records(session_id, ["HFIC-CAND-CLEANROOM0"]),
+        _historical_session_records(session_id, ["HFIC-CAND-CLEANROOM0"]),
         transaction_id=f"RESEARCH-TXN-{session_id}",
     )
     preview = preview_memory_policy(
@@ -719,7 +751,7 @@ def _write_filler_datasets(data_root: Path, count: int = 8) -> None:
             json.dumps(
                 {
                     "logical_dataset_id": dataset_id,
-                    "evidence_role": "EXPLORATORY_REUSE",
+                    "evidence_role": "UNSPECIFIED",
                 },
                 sort_keys=True,
             ),

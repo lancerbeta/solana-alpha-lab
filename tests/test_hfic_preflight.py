@@ -233,10 +233,12 @@ class ObservationScheduleInventoryRepairTests(unittest.TestCase):
             self.assertEqual(entries, [])
             codes = [item["code"] for item in warnings]
             self.assertIn("DATASET_MANIFEST_CORRUPT", codes)
-            self.assertEqual(codes.count("DATASET_MANIFEST_CORRUPT"), 1)
-            self.assertEqual(
+            # Corrupt stable roots are unknown evidence, not sidecars or an
+            # absent dataset that may silently free scientific capacity.
+            self.assertEqual(codes.count("DATASET_MANIFEST_CORRUPT"), 2)
+            self.assertCountEqual(
                 [item["dataset_manifest_id"] for item in warnings if item["code"] == "DATASET_MANIFEST_CORRUPT"],
-                [canonical.stem],
+                [canonical.stem, stable.stem],
             )
 
 

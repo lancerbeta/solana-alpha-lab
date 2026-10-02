@@ -439,6 +439,17 @@ class VanillaOwnerPathTests(unittest.TestCase):
                         "dataset_version": current_manifest.dataset_version,
                         "dataset_fingerprint": current_manifest.dataset_fingerprint,
                         "a3_pit_availability_validation_sha256": marker,
+                        "a3_scientific_partition_projection": [
+                            {
+                                key: part.model_dump(mode="json")[key]
+                                for key in (
+                                    "partition_id", "content_sha256", "row_count",
+                                    "min_event_time", "max_event_time",
+                                    "min_available_to_strategy_at", "max_available_to_strategy_at",
+                                )
+                            }
+                            for part in sorted(named_parts, key=lambda part: part.partition_id)
+                        ],
                         "evidence_role": str((labels or {}).get("evidence_role") or "UNSPECIFIED"),
                         "labels": labels,
                         "yield_eligible": yield_eligible,

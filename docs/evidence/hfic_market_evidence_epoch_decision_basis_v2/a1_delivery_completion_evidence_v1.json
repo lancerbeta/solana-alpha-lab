@@ -1,0 +1,103 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-MARKET-BASIS-V2-COMPLETION-001",
+  "as_of": "2026-10-02",
+  "task_id": "HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2",
+  "state_change": "V2_SCIENTIFIC_MARKET_IDENTITY_PROVEN_V1_BUDGET_CONTINUITY",
+  "base_main": "68b986e12e5752d36b3cc2e14d85a855fa90b09f",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "b62fc4e15fbf2e97179aad81de996bce59697f16f4b469c3250ca2aecd6afe8f",
+    "catalog/assets/lifecycle.yaml": "152b9e9979adee61a395abb42e3dcdf6d8b2ceed603bd65a3e3e6e8811efb2dc",
+    "catalog/catalog_manifest.yaml": "0562a847d6a213c579d7cd79dc6457382d36bd9a63f42fa4398935bf20737ea4",
+    "catalog/generated/asset_edges.json": "9393669bc009aa3160c686fd6f00e7eda7fc8608f5e8f044fe0b53bf703cdf7c",
+    "docs/PROJECT_MAP.md": "0adcde5ef2e8a587ebf5ec009cf1e4e13d545e027a0bad5e90a251dd70dbfa3b",
+    "docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_readonly_budget_v1.json": "4a364fc78817c67e5fcd2a4c86b5faab93e2ec3ab9a5f8019f77e77f23a2d350",
+    "docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_semantic_premise_packet_v1.json": "27a001974855ca1da2cbed566d0d9655a4da16c6f6a58ebc440d6563e1814aaa",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "05774094a6550e05ef4f71ec00d717bca3e96b44e0e7a558a6d83156603627e9",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "6d782b10f7199fe14cf1a0a616be26e58aab990be34801dd8ce2ffbece22a0f8",
+    "docs/reports/hfic_market_evidence_epoch_decision_basis_v2/a1_owner_readout_v1.md": "60e8b7ae9e6fda50f69001c5ff379effb3c92387a0e9551aa8d8066acf539ea5",
+    "docs/tasks/HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2.md": "16e6996a2da443731625b3dec04fbea7e0dc9d5633c9e4f9ec2fd892c33736bd",
+    "scripts/hypothesis_forge.py": "22e83da8dd88988100b30733e60cd85af06b72c60d738507f191311bb618eff2",
+    "src/solana_alpha_lab/factory/forge_input_receipt.py": "aecf7cde033cc58022ff472706f7f324f631ec1e41a886c1b50341e9f217477b",
+    "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "2de64471450a880674330303ed9434fcc62aa90c733d51719675a31def79c770",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "4f9334606ee7296568ea8683f14336a041a77fd5c3df77ce65b249e78a0180af",
+    "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "7f3882aae3d5991091a62597aed594def3ca2251a05748c8df60c03852262d07",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "9bdf2fdb71bac5aa0039f51650e2969ef5d1e9d9df4200ab7b1a2f27bd52ed84",
+    "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py": "713671b0e91c34a9a0d9a23ffa6b033c31d4cd4c202cba5039de5ea4a6bd040c",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "ef60963e324e4fbb0ecbdde68b36505cb68def2124cf57b201c1221931acefc5",
+    "src/solana_alpha_lab/factory/hfic_session.py": "04a118ad8f34a3266e56236b2ba6e512557c4c7f09e02d397af54d00f1b7fe68",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "f2d654850a990e8c5f1dee5aadb2268331d4e53b45426fbe78cb97726c8c6525",
+    "tests/test_forge_evidence_identity_and_owner_gold_v1.py": "d46ee172d5ef5eccc455d9fc5e770fa06da225c2816813b902d88b0a5ca6e2ae",
+    "tests/test_forge_input_truth_and_visibility_v1.py": "786caacc6b9b756c899d3807aeb766c04cc1629bcdc0604329a3eb2a4123f50e",
+    "tests/test_forge_representation_ladder_v1.py": "d42c563c40397140f9b45f376afe0161a245898f09fb62c11ef55d5a7db6e7b7",
+    "tests/test_hfic_censoring_ignorability_diagnostic_v1.py": "26b388ba371ae6449faddc04a56fbec4c13bd9afe136109e591133472571f9a1",
+    "tests/test_hfic_market_evidence_epoch_decision_basis_v2.py": "f0d4e038ed341fb149b4bc6ab0a1d0fdf67e56b138ad3a2ed85111097f9b09ff",
+    "tests/test_hfic_preflight.py": "1d28cf5c6d242d919dcdfface8d272c815587d1ab6a4032fccd91c2e9cbcd2c5",
+    "tests/test_hfic_temporal_result_coherence_v1.py": "efaeb161c20e4b949dd1170caf0a7a699cff50f468115d9bac860f34587a432d",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "2ee5470fd79d7afe451e8fee7ed147d708884ac74a86dd62231e086fe60cb2de",
+    "tests/test_live_cohort_vanilla_owner_path_v1.py": "b7a32b0547dd4538696de1515bf1491f815ad93c42441a28bf2c449e23e7254b"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_delivery_factory_fit_v1.json",
+    "sha256": "b8eaacd88e88424be5a88ebf4e162d6825e91c6f14ae7a2b63b995a1e1731b24",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_V2_BUDGET_30_IDENTITY_DIRECT_29_GOLD_54_PRIOR_PHASE_PREFLIGHT_18_PLUS_1_EXISTING_SKIP_CI_FAILURE_CASES",
+    "independent_review": {
+      "path": "docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_delivery_independent_review_v1.json",
+      "sha256": "51a95cafc0effa52b6ce0c0268bc8d288179d1722959207629650c3bb2afa94b",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_V2_BUDGET_29",
+      "PASS_OWNER_GOLD_54",
+      "PASS_ORDINARY_FINAL_2",
+      "PASS_PREFLIGHT_19_ONE_EXISTING_SKIP",
+      "PASS_FACTORY_STATIC",
+      "PASS_C1_C3_READONLY_BUDGET_INVENTORY",
+      "PASS_ALIAS_LIVE_LABELS_NULL_RESERVATION_AND_CONTINUITY_UX_REGRESSIONS",
+      "PASS_CI_TEMPORAL_CLI_DUAL_ROOT",
+      "PASS_CLOSURE_2_SELECTION_1_LADDER_27_VANILLA_REVISION_2",
+      "PASS_CENSORING_54_AND_SYNTHETIC_FORGE_INPUT_11",
+      "PASS_CONFLICT_LIFECYCLE_REPUBLISH_RED_GREEN_AND_BUDGET_STOP",
+      "PASS_CURRENT_C1_C3_RECHECK_V1_UNCHANGED_ALL_BUDGET_FIELDS_PRESERVED"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_SCIENTIFIC_FORGE",
+    "NO_C4_ACCESS_OR_IMPORT",
+    "NO_REAL_DATA_MUTATION",
+    "NO_HISTORICAL_REWRITE",
+    "NO_QUOTA_EXPANSION",
+    "NO_PROVIDER_DEPLOY",
+    "NO_LIVE_REPAIR",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "repository_local_writes": true,
+    "real_data_plane_mutated": false,
+    "c4_imported": false,
+    "scientific_forge_run": false,
+    "historical_rewrite": false,
+    "provider_calls": 0,
+    "deploy": false
+  }
+}

@@ -399,6 +399,7 @@ def build_forge_input_receipt(
         compute_capability_epoch_for_repo,
         lineage_cohort_bindings,
         market_evidence_epoch_sha256 as _hash_market_basis,
+        require_complete_market_enumeration,
     )
 
     market_basis = build_market_evidence_basis(
@@ -421,6 +422,7 @@ def build_forge_input_receipt(
     market_epoch: str | None = None
     if lineage_ok and readback is not None:
         try:
+            require_complete_market_enumeration(_warnings)
             market_epoch = _hash_market_basis(market_basis)
         except EvidenceIdentityError:
             if "MARKET_EVIDENCE_BASIS_INCOMPLETE" not in blocking:
