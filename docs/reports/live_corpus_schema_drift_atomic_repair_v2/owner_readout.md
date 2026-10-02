@@ -55,6 +55,10 @@ actual transition predecessor. The LIVE-local identity explicitly binds schema,
 logical profile, receipt schema/version, commit/clock contract, generation
 constants and static required labels. Receipt-version-only drift gets a new
 metadata identity and remains idempotent without creating a scientific epoch.
+That drift is detected on an imported canonical root as well as on an already
+repaired root: same schema is not sufficient to skip receipt-contract repair.
+The new imported-root regression reproduced IDEMPOTENT_REPAIR incorrectly before
+the fix and now proves REPAIRED, unchanged science and idempotent retry.
 Missing canonical current clock/publication blocks consumers; damaged non-current
 dataset/labels/partitions do not poison old current market or rows.
 
@@ -71,6 +75,8 @@ CI failure compared equal partitions in different orders: exact model comparison
 now uses canonical partition-id order, retaining every integrity check and
 original composition/receipt order. Both original temporal oracle/saved-result
 verticals PASS on unchanged source. Total: 146 focused tests, one skipped.
+After the independent receipt-contract finding, all 61 repair/import/scientific
+verticals PASS again, including the new imported-root same-schema regression.
 Semantic search readback via existing catalog_cli search-assets: all four owner
 questions return the intended owner as the sole result (rank 1):
 "how does live RDP get into Forge" -> MODULE-LIVE-COHORT-TO-FORGE-001;

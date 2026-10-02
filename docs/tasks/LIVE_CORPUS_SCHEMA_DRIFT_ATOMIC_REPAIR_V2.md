@@ -134,6 +134,8 @@ candidate labels and receipt do not contain the transition predecessor. Lineage
 and result readback retain that transition truth. A partial B interrupted after
 receipt/dataset construction, followed by successful C and then B, must reuse
 the same B identity and immutable bytes without manual deletion or restore.
+Imported canonical roots also compare the saved receipt schema/version/profile
+before same-schema idempotence; receipt-contract drift alone requires repair.
 
 Capture old lineage and current root without writes. Reconstruct logical rows
 and verify immutable parquet/release composition before preparing replacement.

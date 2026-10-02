@@ -417,6 +417,19 @@ class LiveCorpusAtomicRepairTests(unittest.TestCase):
                     market_evidence_basis=after_basis), usage)
                 self.assertEqual(history, history_before)
 
+    def test_imported_canonical_root_detects_receipt_contract_drift_at_same_schema(self):
+        schema_a = {**logical.live_corpus_schema_projection(), "metadata_contract": "scratch-A"}
+        with patch.object(logical, "live_corpus_schema_projection", return_value=schema_a):
+            with patch.object(publish, "VALIDATION_RECEIPT_SCHEMA_VERSION", "scratch-new-version"):
+                result = self.repair()
+                self.assertEqual(result["status"], "REPAIRED")
+                self.assertNotEqual(result["dataset_manifest_id"], self.old)
+                self.assertEqual(result["corpus_version"], 3)
+                self.assertTrue(publish.inspect_canonical_root(self.data, result["dataset_manifest_id"])["complete"])
+                self.assertEqual(self.repair()["status"], "IDEMPOTENT_REPAIR")
+        self.assertEqual(compute_market_epoch_for_data_root(ROOT, self.data)[0], self.epoch)
+        self.assert_immutable_data()
+
     def test_bounded_metadata_contract_change_gets_new_identity_without_new_science(self):
         first = self.repair()
         with patch.object(publish, "VALIDATION_RECEIPT_SCHEMA_VERSION", "scratch-version-B"):

@@ -34138,7 +34138,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_corpus_manifest_publish.py', repository_path: src/solana_alpha_lab/factory/live_corpus_manifest_publish.py}
-  integrity: {kind: sha256, sha256: 04768cecea68c2a3a650dfb5fd20dba5da3cee12ab9eafd76f2b3599e5eb074e}
+  integrity: {kind: sha256, sha256: 0a0be808f13cc4315fff851b772f8b39dc7ef4c69aef6c9e6f1ad008ac380464}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001}
@@ -39021,7 +39021,7 @@ records:
     repository_path: docs/tasks/LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2.md
   integrity:
     kind: sha256
-    sha256: 12cc54a7f78561fc8819339aba245f206882f5f0778dff330823739694aac36e
+    sha256: 0eee662b3bbbce34c0d9821114d7b3591437d60aa0ec56d19772511c4d962492
   access:
     mode: read_only
     method: file
@@ -39060,7 +39060,7 @@ records:
     repository_path: tests/test_live_corpus_schema_drift_atomic_repair_v2.py
   integrity:
     kind: sha256
-    sha256: f6ca5efe389a33d88987a1b1cd399a88d276d390d8254d7ac9115c8252f65a59
+    sha256: 25c89f261c12c8e6463e8e39036f58faffa1753334dcd6d9933a8e94eee40fa4
   access:
     mode: read_only
     method: file
@@ -39099,7 +39099,7 @@ records:
     repository_path: docs/reports/live_corpus_schema_drift_atomic_repair_v2/owner_readout.md
   integrity:
     kind: sha256
-    sha256: 2798e13040f986e808211f5ebc8f73666763d86c73aa7e2558395b1fc31099f1
+    sha256: d412d2a82ef0ef848286b681e7ce5ecac69e34fe8fb8cb1103aae9b2b6984718
   access:
     mode: read_only
     method: file

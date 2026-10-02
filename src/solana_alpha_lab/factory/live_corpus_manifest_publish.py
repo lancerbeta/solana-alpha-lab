@@ -1044,8 +1044,17 @@ def repair_live_corpus_manifests(
     repaired_version = repair_dataset_version(current.dataset_version, schema, cohorts)
     has_metadata_revision = bool(re.search(r"\.metadata-[0-9a-f]{64}$",
                                           current.dataset_version.removesuffix(CANONICAL_METADATA_SUFFIX)))
+    imported_contract_current = (is_canonical and current.schema_id == CORPUS_SCHEMA_ID
+        and all(old_receipt.get(key) == value for key, value in {
+            "schema": VALIDATION_RECEIPT_SCHEMA,
+            "schema_version": VALIDATION_RECEIPT_SCHEMA_VERSION,
+            "schema_id": CORPUS_SCHEMA_ID,
+            "schema_sha256": schema,
+            "logical_row_profile": LOGICAL_ROW_PROFILE,
+        }.items()))
     if (is_canonical and current.schema_sha256 == schema
-            and (not has_metadata_revision or current.dataset_version == repaired_version)):
+            and ((not has_metadata_revision and imported_contract_current)
+                 or current.dataset_version == repaired_version)):
         _reconcile_current_labels(data_root=root, dataset_manifest_id=current_mid,
             labels=labels, lineage_out=lineage,
             previous_current_mid=latest.get("superseded_dataset_manifest_id"))

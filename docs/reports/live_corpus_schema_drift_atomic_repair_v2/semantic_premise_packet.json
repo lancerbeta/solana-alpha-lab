@@ -1,13 +1,13 @@
 {
   "candidate": {
     "base": "b24ec87f5308377fe7d5543f5db690d9fe8c2532",
-    "diff_sha256": "0c27d002e80098db6e0f56e8420cbbe190f488efe6884fca16b268b8bce3149c",
-    "head": "e31edadc945a0cc6ea760921b501d352aafded0e"
+    "diff_sha256": "c6e4c5d76efbfd228cd76540d9c0323f3f95131ffd23a512e39109ec21540bee",
+    "head": "1c7190a3cefcda6283f083a82966202ce80474a1"
   },
   "evidence": [
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/live_corpus_manifest_publish.py",
-      "sha256_or_fingerprint": "04768cecea68c2a3a650dfb5fd20dba5da3cee12ab9eafd76f2b3599e5eb074e"
+      "sha256_or_fingerprint": "0a0be808f13cc4315fff851b772f8b39dc7ef4c69aef6c9e6f1ad008ac380464"
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_preflight.py",
@@ -23,7 +23,7 @@
     },
     {
       "logical_ref": "repo://tests/test_live_corpus_schema_drift_atomic_repair_v2.py",
-      "sha256_or_fingerprint": "f6ca5efe389a33d88987a1b1cd399a88d276d390d8254d7ac9115c8252f65a59"
+      "sha256_or_fingerprint": "25c89f261c12c8e6463e8e39036f58faffa1753334dcd6d9933a8e94eee40fa4"
     },
     {
       "logical_ref": "repo://tests/test_hfic_market_evidence_epoch_decision_basis_v2.py",
@@ -35,7 +35,7 @@
     },
     {
       "logical_ref": "repo://docs/reports/live_corpus_schema_drift_atomic_repair_v2/owner_readout.md",
-      "sha256_or_fingerprint": "2798e13040f986e808211f5ebc8f73666763d86c73aa7e2558395b1fc31099f1"
+      "sha256_or_fingerprint": "d412d2a82ef0ef848286b681e7ce5ecac69e34fe8fb8cb1103aae9b2b6984718"
     },
     {
       "logical_ref": "repo://tests/test_live_cohort_to_forge_operational_closure_v1.py",
@@ -67,7 +67,7 @@
     "NO_MULTIWRITER_OR_POWER_LOSS_DURABILITY_GUARANTEE",
     "Snapshot is staged implementation at actual existing HEAD; packet and three delivery-chain evidence files are excluded to avoid self-binding. Final content inventory is reviewed separately."
   ],
-  "packet_fingerprint_sha256": "28c61e94cc9a69495ea2746f033744366c4edd3db977b51522f5756f696eb3bd",
+  "packet_fingerprint_sha256": "c92e4727bee26797687172b10f4a4ede2f0039e8c7d37f4938047aa1456ec25d",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
@@ -120,7 +120,7 @@
     }
   ],
   "task": {
-    "task_contract_sha256": "12cc54a7f78561fc8819339aba245f206882f5f0778dff330823739694aac36e",
+    "task_contract_sha256": "0eee662b3bbbce34c0d9821114d7b3591437d60aa0ec56d19772511c4d962492",
     "task_id": "LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2"
   }
 }
