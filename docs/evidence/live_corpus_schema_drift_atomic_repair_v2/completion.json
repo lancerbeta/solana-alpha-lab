@@ -43,24 +43,21 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_57_PRODUCTION_SHAPED_REPAIR_IMPORT_SCIENTIFIC_CONSUMER_TESTS",
+    "targeted": "PASS_146_FOCUSED_TESTS_ONE_SKIPPED",
     "independent_review": {
       "path": "docs/evidence/live_corpus_schema_drift_atomic_repair_v2/independent_review.json",
       "sha256": "6c1c099842860d61de1e3c5a5ebac29ea14ccd809f85c95da2fd8a090f7d51e0",
-      "verdict": "PASS"
+      "verdict": "NOT_READY"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": [
-      "PASS_RED_GREEN_INCIDENT",
+      "PASS_PARTIAL_SCHEMA_CYCLE_RECEIPT_AND_DATASET_BOUNDARIES",
       "PASS_METADATA_EPOCH_AND_OCCUPANCY_INVARIANCE",
-      "PASS_57_FOCUSED_TESTS",
+      "PASS_146_FOCUSED_TESTS_ONE_SKIPPED",
+      "PASS_ALL_FIVE_PRIOR_CI_FAILURE_CASES",
       "PASS_FOUR_SEMANTIC_SEARCH_QUESTIONS",
-      "PASS_GENERATED_NAVIGATION_SYNC",
-      "PASS_DELIVERY_HARNESS_CHECK",
-      "PASS_PRECOMMIT_SECRET_DERIVED_CONTRACT_CHECKS",
-      "PASS_FOUR_INDEPENDENT_FINAL_INVENTORY_REVIEWS",
-      "PASS_SEMANTIC_PREMISE_VALIDATE_LAUNCH"
+      "FRESH_INDEPENDENT_REVIEW_AND_BINDING_PENDING"
     ]
   },
   "non_claims": [

@@ -924,7 +924,7 @@ JSON `next` is `REPAIR_LIVE_CORPUS_METADATA_FIRST`. Run repair, then paste the
 **exact same** `import-live` command that just failed (same `--release-root`).
 Do not treat repair itself as the import. An interrupted candidate preparation
 can be retried with the same repair command. A missing/corrupt `.published`
-on the **current** root is a typed STOP; do not regenerate current history.
+on the **canonical current** root is a typed STOP; do not regenerate current history.
 
 ```
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py repair-live-corpus-manifests
@@ -942,13 +942,19 @@ still select the new verified root. Rerun the same repair command to reconcile
 labels; no manual pointer or label editing is needed.
 
 Schema drift gives unchanged composition a deterministic LIVE metadata revision
-in `dataset_version` (`.metadata-<composition-and-schema-sha256>.canonical-v1`), using
+in `dataset_version` (`.metadata-<composition-and-contract-sha256>.canonical-v1`), using
 the existing TASK-06 identity builders. It never increments `corpus_version`
 and preserves `MARKET_EVIDENCE_BASIS_V2` epoch and consumed AUTO/focus slots.
 Only a later verified cohort import changes composition/version. Repair writes
 replacement metadata with current=false, verifies it, then atomically replaces
 lineage. Before that switch the old current root and labels remain unchanged.
 Parquet and sealed releases are never rewritten.
+The bounded metadata contract includes schema, logical row profile, receipt
+schema/version, publication/clock policy and static required labels. Candidate
+generation identity derives from its target, never the previous current root.
+The transition predecessor lives in lineage/result readback. If B preparation
+was interrupted and C subsequently became current, returning to B completes
+the same compatible candidate automatically, including late receipt/root faults.
 
 Read `result.dataset_manifest_id_before` / `dataset_manifest_id`,
 `corpus_version_before` / `corpus_version`, `candidate_disposition`

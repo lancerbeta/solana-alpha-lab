@@ -216,6 +216,17 @@ class LiveCorpusAtomicRepairTests(unittest.TestCase):
         self.assertEqual(compute_market_epoch_for_data_root(ROOT, self.data)[0], self.epoch)
         self.assertEqual(self.repair()["status"], "IDEMPOTENT_REPAIR")
 
+    def test_nonlexicographic_claim_order_import_keeps_exact_partition_integrity(self):
+        self.repair()
+        original = publish._claims_for_cohort
+        def reverse_claims(**kwargs):
+            return list(reversed(original(**kwargs)))
+        with patch.object(publish, "_claims_for_cohort", side_effect=reverse_claims):
+            result = self.import_week(3)
+        self.assertEqual(result["corpus_version"], 4)
+        self.assertTrue(publish.inspect_canonical_root(self.data, result["dataset_manifest_id"])["complete"])
+        self.assert_immutable_data()
+
     def test_synthetic_next_import_after_repair_is_real_v4_once_each(self):
         repaired = self.repair()
         result = self.import_week(3)
@@ -339,6 +350,82 @@ class LiveCorpusAtomicRepairTests(unittest.TestCase):
         with self.assertRaisesRegex(Exception, "CANDIDATE_VERIFICATION_FAILED"):
             self.repair(fault_before_visibility=tamper)
         self.assert_old_visible()
+
+    def test_partial_schema_cycle_converges_with_identical_target_bytes_and_budget(self):
+        from solana_alpha_lab.storage.manifests import compute_dataset_manifest_id
+        from solana_alpha_lab.factory.hfic_session import focus_key_sha256
+        from solana_alpha_lab.factory.hfic_evidence_identity import scientific_slot_sha256
+        session = market_fixture.ScientificMarketV2Tests.session(self.epoch, self.basis)
+        focus = {**copy.deepcopy(session), "session_id": "SCRATCH_CONSUMED_FOCUS", "owner_focus": "EARLY_LIQUIDITY"}
+        focus["focus_key_sha256"] = focus_key_sha256(focus["owner_focus"])
+        focus["scientific_slot_sha256"] = scientific_slot_sha256(
+            market_evidence_epoch_sha256=self.epoch, representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2", owner_focus=focus["owner_focus"])
+        history = [session, focus]
+        history_before = copy.deepcopy(history)
+        usage = epoch_search_budget_usage(history, evidence_epoch=self.epoch, market_evidence_basis=self.basis)
+        schema_c = {**logical.live_corpus_schema_projection(), "metadata_contract": "scratch-C"}
+        for boundary in (".validation.json", "DATASET_ROOT"):
+            with self.subTest(boundary=boundary), tempfile.TemporaryDirectory() as tmp:
+                import shutil
+                data = Path(tmp) / "rdp"
+                shutil.copytree(self.data, data)
+                current = publish._load_dataset_manifest(data, self.old)
+                version_b = publish.repair_dataset_version(current.dataset_version,
+                    logical.live_corpus_schema_sha256(), load_live_corpus_lineage(data)["cohorts"])
+                target_b = compute_dataset_manifest_id(publish.CORPUS_DATASET_ID, version_b)
+                original = publish._publish_metadata
+                def interrupt(root, path, payload):
+                    original(root, path, payload)
+                    if path.name == (f"{target_b}.json" if boundary == "DATASET_ROOT" else f"{target_b}{boundary}"):
+                        raise RuntimeError("scratch late B interruption")
+                with patch.object(publish, "_publish_metadata", side_effect=interrupt):
+                    with self.assertRaisesRegex(RuntimeError, "late B"):
+                        repair_live_corpus_manifests(data_root=data)
+                partial = inventory(data)
+                immutable_b = {path: content for path, content in partial.items()
+                    if path not in self.before and not path.endswith(".labels.json")}
+                self.assertTrue(any(path.endswith(".validation.json") for path in immutable_b))
+                for path, content in self.before.items():
+                    self.assertEqual(partial[path], content, path)
+                self.assertEqual(compute_market_epoch_for_data_root(ROOT, data)[0], self.epoch)
+                with patch.object(logical, "live_corpus_schema_projection", return_value=schema_c):
+                    middle = repair_live_corpus_manifests(data_root=data)
+                self.assertNotEqual(middle["dataset_manifest_id"], target_b)
+                final = repair_live_corpus_manifests(data_root=data)
+                self.assertEqual(final["dataset_manifest_id"], target_b)
+                self.assertEqual(final["candidate_disposition"], "REBUILT_PARTIAL")
+                self.assertEqual(final["superseded_dataset_manifest_id"], middle["dataset_manifest_id"])
+                self.assertEqual(final["corpus_version"], 3)
+                for path, content in immutable_b.items():
+                    self.assertEqual((data / path).read_bytes(), content, path)
+                inspection = publish.inspect_canonical_root(data, target_b)
+                self.assertTrue(inspection["complete"])
+                self.assertEqual(inspection["dataset"].generation_run_id, f"repair-{target_b[8:]}")
+                receipt = json.loads((data / f"datasets/manifests/{target_b}.validation.json").read_bytes())
+                self.assertIsNone(receipt["superseded_dataset_manifest_id"])
+                labels = json.loads((data / f"datasets/manifests/{target_b}.labels.json").read_bytes())
+                self.assertNotIn("superseded_dataset_manifest_id", labels)
+                stable = inventory(data)
+                repeated = repair_live_corpus_manifests(data_root=data)
+                self.assertEqual(repeated["status"], "IDEMPOTENT_REPAIR")
+                self.assertEqual(repeated["superseded_dataset_manifest_id"], middle["dataset_manifest_id"])
+                self.assertEqual(inventory(data), stable)
+                after_epoch, after_basis = compute_market_epoch_for_data_root(ROOT, data)
+                self.assertEqual(after_epoch, self.epoch)
+                self.assertEqual(epoch_search_budget_usage(history, evidence_epoch=after_epoch,
+                    market_evidence_basis=after_basis), usage)
+                self.assertEqual(history, history_before)
+
+    def test_bounded_metadata_contract_change_gets_new_identity_without_new_science(self):
+        first = self.repair()
+        with patch.object(publish, "VALIDATION_RECEIPT_SCHEMA_VERSION", "scratch-version-B"):
+            second = self.repair()
+            self.assertNotEqual(second["dataset_manifest_id"], first["dataset_manifest_id"])
+            self.assertEqual(self.repair()["status"], "IDEMPOTENT_REPAIR")
+            self.assertTrue(publish.inspect_canonical_root(self.data, second["dataset_manifest_id"])["complete"])
+        self.assertEqual(self.repair()["dataset_manifest_id"], first["dataset_manifest_id"])
+        self.assertEqual(compute_market_epoch_for_data_root(ROOT, self.data)[0], self.epoch)
 
     def test_composition_content_changes_metadata_identity(self):
         old = publish._load_dataset_manifest(self.data, self.old)

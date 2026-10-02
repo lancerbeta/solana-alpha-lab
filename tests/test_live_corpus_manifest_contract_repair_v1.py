@@ -524,7 +524,7 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
                 dataset.validation_receipt_sha256,
             )
             self.assertEqual(receipt["dataset_fingerprint"], dataset.dataset_fingerprint)
-            self.assertEqual(receipt["superseded_dataset_manifest_id"], legacy["dataset_manifest_id"])
+            self.assertIsNone(receipt["superseded_dataset_manifest_id"])
             repaired_labels = json.loads(
                 (
                     data_root / "datasets" / "manifests" / f"{new_mid}.labels.json"

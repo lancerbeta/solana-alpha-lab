@@ -7,7 +7,7 @@
   "reviewed_bindings_sha256": "19afc583d222e3a0a8f84fccb35ccec706f20a8cf651f63d08634235b67dab4b",
   "reviewed_inventory_sha256": "0ca11344b063f05e769d5282740a991b4b05743ed4766ae0b3a5e799e75cd8fb",
   "mode": "FULL_REVIEW",
-  "verdict": "PASS",
+  "verdict": "NOT_READY",
   "dimensions": {
     "mission": "PASS_EXISTING_LIVE_EVIDENCE_REPAIR_IMPORT_CURRENT_CONSUMER_LOOP",
     "flexibility_and_history": "PASS_DETERMINISTIC_METADATA_REVISIONS_IMMUTABLE_ROOT_REUSE_NO_CORPUS_VERSION_BUMP",

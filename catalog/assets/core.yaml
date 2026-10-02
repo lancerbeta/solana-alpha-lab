@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: f02d3618eb9a2a8300e6aa9f154fa33bb2c378ceaa9d9837ff686db9cd6de913}
+  integrity: {kind: sha256, sha256: f0acdfe3c2daf85caccdc18979a34eedc68906322e6ac88b4299bd4ae0d75be7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -34138,7 +34138,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_corpus_manifest_publish.py', repository_path: src/solana_alpha_lab/factory/live_corpus_manifest_publish.py}
-  integrity: {kind: sha256, sha256: eee652db9e91b3a626caac6963ecf021d4664928e2a717daffa80a94cf259bb9}
+  integrity: {kind: sha256, sha256: 04768cecea68c2a3a650dfb5fd20dba5da3cee12ab9eafd76f2b3599e5eb074e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-SCHEMA-DRIFT-ATOMIC-REPAIR-V2-001}
@@ -34157,7 +34157,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_corpus_manifest_contract_repair_v1.py', repository_path: tests/test_live_corpus_manifest_contract_repair_v1.py}
-  integrity: {kind: sha256, sha256: 72d531f0bc5cd159d1d66cbb0c9f8e713e4031d2b061ba162317970fd8220125}
+  integrity: {kind: sha256, sha256: 673fedf13fa2094b5c5d17cb87b564277d4949e98ac3710b5b793ef58d037aab}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001}
@@ -34212,7 +34212,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_cohort_to_forge_operational_closure_v1.py', repository_path: tests/test_live_cohort_to_forge_operational_closure_v1.py}
-  integrity: {kind: sha256, sha256: 2ee5470fd79d7afe451e8fee7ed147d708884ac74a86dd62231e086fe60cb2de}
+  integrity: {kind: sha256, sha256: 4877ec661bc9c86edfdd81333a574d8abd60155ae16cb754f5578769e8b4dd2c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37800,7 +37800,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_censoring_ignorability_diagnostic_v1.py', repository_path: tests/test_hfic_censoring_ignorability_diagnostic_v1.py}
-  integrity: {kind: sha256, sha256: 26b388ba371ae6449faddc04a56fbec4c13bd9afe136109e591133472571f9a1}
+  integrity: {kind: sha256, sha256: e58de6f5d02a7d39adaa909a1d759e850fa54f42bd78b13357eefc7f68cb2105}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001}
@@ -39021,7 +39021,7 @@ records:
     repository_path: docs/tasks/LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2.md
   integrity:
     kind: sha256
-    sha256: 209af219478d883ddbfead96e566a17b486aaf19b2e3af7ecfd4d3248d5e5b70
+    sha256: 12cc54a7f78561fc8819339aba245f206882f5f0778dff330823739694aac36e
   access:
     mode: read_only
     method: file
@@ -39060,7 +39060,7 @@ records:
     repository_path: tests/test_live_corpus_schema_drift_atomic_repair_v2.py
   integrity:
     kind: sha256
-    sha256: 042082f8a4e029dc834370862d6b8640a7e137c572a8879b425e4ad9b7ea6186
+    sha256: f6ca5efe389a33d88987a1b1cd399a88d276d390d8254d7ac9115c8252f65a59
   access:
     mode: read_only
     method: file
@@ -39099,7 +39099,7 @@ records:
     repository_path: docs/reports/live_corpus_schema_drift_atomic_repair_v2/owner_readout.md
   integrity:
     kind: sha256
-    sha256: c8e6b819adb97435b417e1ab2b756c50e5228aaf5bbe63a6957b39b4dd56e0a7
+    sha256: 2798e13040f986e808211f5ebc8f73666763d86c73aa7e2558395b1fc31099f1
   access:
     mode: read_only
     method: file

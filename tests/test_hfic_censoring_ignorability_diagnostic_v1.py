@@ -319,6 +319,9 @@ def _publish_dataset(
     cohort_id: str,
     release_id: str = FROZEN_RELEASE,
 ) -> str:
+    from solana_alpha_lab.factory import live_corpus_manifest_publish as publish
+    if dataset_id == FROZEN_DATASET:
+        dataset_version = publish.canonical_dataset_version(dataset_version)
     created = datetime(2026, 9, 13, 11, 57, 49, tzinfo=UTC)
     manifest_id = compute_dataset_manifest_id(dataset_id, dataset_version)
     census_part = build_partition_manifest(
@@ -370,6 +373,18 @@ def _publish_dataset(
         sort_keys=True,
         separators=(",", ":"),
     ).encode("utf-8")
+    if dataset_id == FROZEN_DATASET:
+        from solana_alpha_lab.storage.manifests import compute_dataset_fingerprint
+        _, validation_bytes, _ = publish._build_receipt(
+            dataset_version=dataset_version, schema_sha256="ab" * 32,
+            composition=[{"cohort_id": cohort_id, "release_id": release_id, "content_sha256": source_sha}],
+            partitions=[census_part, obs_part],
+            dataset_fingerprint=compute_dataset_fingerprint(dataset_id=dataset_id,
+                dataset_version=dataset_version, schema_id=publish.CORPUS_SCHEMA_ID,
+                schema_sha256="ab" * 32, partitions=[census_part, obs_part]),
+            generation_reason="COHORT_IMPORT", published_at=created,
+            superseded_dataset_manifest_id=None,
+        )
     dataset = build_dataset_manifest(
         dataset_id=dataset_id,
         dataset_version=dataset_version,
@@ -389,16 +404,13 @@ def _publish_dataset(
     (partitions / f"{obs_part.partition_manifest_id}.json").write_bytes(
         canonical_manifest_bytes(obs_part)
     )
-    (manifests / f"{manifest_id}.published").write_text(
-        json.dumps(
-            {
-                "dataset_manifest_id": manifest_id,
-                "dataset_fingerprint": dataset.dataset_fingerprint,
-            },
-            sort_keys=True,
-        ),
-        encoding="utf-8",
-    )
+    marker = {"dataset_manifest_id": manifest_id, "dataset_fingerprint": dataset.dataset_fingerprint}
+    if dataset_id == FROZEN_DATASET:
+        marker.update(commit_point=publish.COMMIT_POINT_KIND, cohort_id=cohort_id,
+            release_id=release_id, corpus_version=1, cumulative_cohort_count=1,
+            metadata_clock_at=publish._stamp_utc(created), published_at=publish._stamp_utc(created))
+        publish._freeze_publication_clock(data_root=data_root, dataset_manifest_id=manifest_id, proposed=created)
+    (manifests / f"{manifest_id}.published").write_text(json.dumps(marker, sort_keys=True), encoding="utf-8")
     (manifests / f"{manifest_id}.validation.json").write_bytes(validation_bytes)
     if dataset_id == FROZEN_DATASET:
         from solana_alpha_lab.factory.live_cohort_discovery_release import REQUIRED_LABELS
@@ -457,6 +469,9 @@ def _install_canonical_corpus(
     release_id: str = FROZEN_RELEASE,
     dataset_version: str = "corpus-v1-REL-20260902T111900Z-20260909T111900Z",
 ) -> dict[str, str]:
+    if dataset_id == FROZEN_DATASET:
+        from solana_alpha_lab.factory.live_corpus_manifest_publish import canonical_dataset_version
+        dataset_version = canonical_dataset_version(dataset_version)
     staging = data_root / "_fixture"
     staging.mkdir(parents=True, exist_ok=True)
     census_src, obs_src = _balanced_fixture(

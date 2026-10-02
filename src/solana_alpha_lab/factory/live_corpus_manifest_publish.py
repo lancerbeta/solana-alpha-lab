@@ -70,6 +70,7 @@ CANONICAL_GENERATION_TASK_IMPORT = "LIVE-COHORT-DISCOVERY-RELEASE-SERIES-V1"
 CANONICAL_GENERATION_TASK_REPAIR = "LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-V1"
 LEGACY_CORPUS_REQUIRES_REPAIR = "CURRENT_CORPUS_LEGACY_METADATA_REQUIRES_REPAIR"
 COMMIT_POINT_KIND = "LIVE_LIFECYCLE_DISCOVERY_CORPUS_PUBLICATION_V1"
+REPAIR_GENERATION_REASON = "METADATA_CONTRACT_REPAIR"
 CENSUS_NAME = "census.parquet"
 OBSERVATIONS_NAME = "observations.parquet"
 RELEASE_MANIFEST_NAME = "release_manifest.json"
@@ -104,8 +105,20 @@ def repair_dataset_version(
     base = re.sub(r"\.metadata-[0-9a-f]{64}$", "", base)
     metadata_sha = sha256_bytes(_canonical_receipt_bytes({
         "profile": "LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2",
-        "schema_sha256": schema_sha256,
-        "logical_row_profile": LOGICAL_ROW_PROFILE,
+        "metadata_contract": {
+            "dataset_id": CORPUS_DATASET_ID,
+            "schema_id": CORPUS_SCHEMA_ID,
+            "schema_sha256": schema_sha256,
+            "logical_row_profile": LOGICAL_ROW_PROFILE,
+            "validation_receipt_schema": VALIDATION_RECEIPT_SCHEMA,
+            "validation_receipt_schema_version": VALIDATION_RECEIPT_SCHEMA_VERSION,
+            "publication_commit_point": COMMIT_POINT_KIND,
+            "publication_clock_policy": "TARGET_FROZEN_CLOCK_V1",
+            "canonical_metadata_suffix": CANONICAL_METADATA_SUFFIX,
+            "repair_generation_task_id": CANONICAL_GENERATION_TASK_REPAIR,
+            "repair_generation_reason": REPAIR_GENERATION_REASON,
+            "required_labels": dict(REQUIRED_LABELS),
+        },
         "composition": [{key: item[key] for key in ("cohort_id", "content_sha256", "release_id")}
                         for item in composition],
     }))
@@ -907,14 +920,15 @@ def _publish_from_claims(
         partitions=partitions,
         receipt_bytes=receipt_bytes,
         published=published,
-        record_sizes=generation_reason != "METADATA_CONTRACT_REPAIR",
+        record_sizes=generation_reason != REPAIR_GENERATION_REASON,
     )
     if fault_before_visibility is not None:
         fault_before_visibility()
     prepared = inspect_canonical_root(data_root, dataset_manifest_id,
-        verify_parquet_bytes=generation_reason == "METADATA_CONTRACT_REPAIR")
+        verify_parquet_bytes=generation_reason == REPAIR_GENERATION_REASON)
     _require(prepared["complete"], "CANDIDATE_VERIFICATION_FAILED")
-    _require(prepared["dataset"] == dataset and prepared["partitions"] == partitions,
+    _require(prepared["dataset"] == dataset
+             and prepared["partitions"] == sorted(partitions, key=lambda part: part.partition_id),
              "CANDIDATE_VERIFICATION_FAILED")
     _require((_manifests_dir(data_root) / f"{dataset_manifest_id}.validation.json").read_bytes() == receipt_bytes,
              "CANDIDATE_VERIFICATION_FAILED")
@@ -1027,10 +1041,14 @@ def repair_live_corpus_manifests(
         _require({claim.partition_id: claim for claim in claims} == expected_claims,
                  "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
 
-    if is_canonical and current.schema_sha256 == schema:
+    repaired_version = repair_dataset_version(current.dataset_version, schema, cohorts)
+    has_metadata_revision = bool(re.search(r"\.metadata-[0-9a-f]{64}$",
+                                          current.dataset_version.removesuffix(CANONICAL_METADATA_SUFFIX)))
+    if (is_canonical and current.schema_sha256 == schema
+            and (not has_metadata_revision or current.dataset_version == repaired_version)):
         _reconcile_current_labels(data_root=root, dataset_manifest_id=current_mid,
             labels=labels, lineage_out=lineage,
-            previous_current_mid=labels.get("superseded_dataset_manifest_id"))
+            previous_current_mid=latest.get("superseded_dataset_manifest_id"))
         return {"status": "IDEMPOTENT_REPAIR", "corpus_version": version,
             "corpus_version_before": version, "dataset_id": CORPUS_DATASET_ID,
             "dataset_manifest_id_before": current_mid, "dataset_manifest_id": current_mid,
@@ -1038,9 +1056,8 @@ def repair_live_corpus_manifests(
             "logical_rows_measured_partitions": len(measured), "epoch_bump": False,
             "metadata_identity_changed": False, "scientific_epoch_changed": False,
             "candidate_disposition": "CURRENT_VERIFIED", "lineage_switched": False,
-            "superseded_dataset_manifest_id": labels.get("superseded_dataset_manifest_id")}
+            "superseded_dataset_manifest_id": latest.get("superseded_dataset_manifest_id")}
 
-    repaired_version = repair_dataset_version(current.dataset_version, schema, cohorts)
     repaired_mid = compute_dataset_manifest_id(CORPUS_DATASET_ID, repaired_version)
     _require(repaired_mid != current_mid, "CANONICAL_TARGET_CONFLICT")
     latest["superseded_dataset_manifest_id"] = current_mid
@@ -1048,8 +1065,11 @@ def repair_live_corpus_manifests(
     latest["dataset_version"] = repaired_version
     lineage_out = {**lineage, "cohorts": cohorts,
         "current_dataset_manifest_id": repaired_mid, "versions": _lineage_versions(cohorts)}
-    candidate_labels = {**labels, "dataset_version": repaired_version,
-                        "superseded_dataset_manifest_id": current_mid}
+    # A predecessor describes the visibility transition, not this immutable
+    # target. Keep it in lineage and the result, never candidate root bytes.
+    candidate_labels = {key: value for key, value in labels.items()
+                        if key != "superseded_dataset_manifest_id"}
+    candidate_labels["dataset_version"] = repaired_version
     composition = [{key: item[key] for key in ("cohort_id", "content_sha256", "release_id")}
                    for item in cohorts]
     candidate_path = _manifests_dir(root) / f"{repaired_mid}.json"
@@ -1068,7 +1088,7 @@ def repair_live_corpus_manifests(
         _require({part.partition_id: claims_from_partition(part) for part in already["partitions"]}
                  == {claim.partition_id: claim for claim in claims}, "CANONICAL_TARGET_CONFLICT")
         stored_labels = json.loads((_manifests_dir(root) / f"{repaired_mid}.labels.json").read_bytes())
-        administrative = {"is_current_corpus_version", "superseded_dataset_manifest_id"}
+        administrative = {"is_current_corpus_version"}
         _require({key: value for key, value in stored_labels.items() if key not in administrative}
                  == {key: value for key, value in candidate_labels.items() if key not in administrative},
                  "CANONICAL_TARGET_CONFLICT")
@@ -1091,12 +1111,12 @@ def repair_live_corpus_manifests(
         dataset, _parts, fingerprint = _publish_from_claims(
             data_root=root, dataset_version=repaired_version,
             generation_task_id=CANONICAL_GENERATION_TASK_REPAIR,
-            generation_run_id=f"repair-{current_mid[8:24]}",
-            generation_reason="METADATA_CONTRACT_REPAIR",
+            generation_run_id=f"repair-{repaired_mid[8:]}",
+            generation_reason=REPAIR_GENERATION_REASON,
             published_at=(published_at or datetime.now(tz=UTC)).astimezone(UTC),
             composition=composition, claims=claims, labels=candidate_labels,
             lineage_out=lineage_out, previous_current_mid=current_mid,
-            superseded_dataset_manifest_id=current_mid,
+            superseded_dataset_manifest_id=None,
             fault_before_visibility=fault_before_visibility,
             expected_lineage=lineage,
         )

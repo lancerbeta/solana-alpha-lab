@@ -1,13 +1,13 @@
 {
   "candidate": {
     "base": "b24ec87f5308377fe7d5543f5db690d9fe8c2532",
-    "diff_sha256": "ae741508d6ecdbf3870b8a3f7228de28c9c8f585d5523910293735b1fe0248ad",
-    "head": "b24ec87f5308377fe7d5543f5db690d9fe8c2532"
+    "diff_sha256": "0c27d002e80098db6e0f56e8420cbbe190f488efe6884fca16b268b8bce3149c",
+    "head": "e31edadc945a0cc6ea760921b501d352aafded0e"
   },
   "evidence": [
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/live_corpus_manifest_publish.py",
-      "sha256_or_fingerprint": "eee652db9e91b3a626caac6963ecf021d4664928e2a717daffa80a94cf259bb9"
+      "sha256_or_fingerprint": "04768cecea68c2a3a650dfb5fd20dba5da3cee12ab9eafd76f2b3599e5eb074e"
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_preflight.py",
@@ -23,7 +23,7 @@
     },
     {
       "logical_ref": "repo://tests/test_live_corpus_schema_drift_atomic_repair_v2.py",
-      "sha256_or_fingerprint": "042082f8a4e029dc834370862d6b8640a7e137c572a8879b425e4ad9b7ea6186"
+      "sha256_or_fingerprint": "f6ca5efe389a33d88987a1b1cd399a88d276d390d8254d7ac9115c8252f65a59"
     },
     {
       "logical_ref": "repo://tests/test_hfic_market_evidence_epoch_decision_basis_v2.py",
@@ -31,11 +31,19 @@
     },
     {
       "logical_ref": "repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md",
-      "sha256_or_fingerprint": "f02d3618eb9a2a8300e6aa9f154fa33bb2c378ceaa9d9837ff686db9cd6de913"
+      "sha256_or_fingerprint": "f0acdfe3c2daf85caccdc18979a34eedc68906322e6ac88b4299bd4ae0d75be7"
     },
     {
       "logical_ref": "repo://docs/reports/live_corpus_schema_drift_atomic_repair_v2/owner_readout.md",
-      "sha256_or_fingerprint": "c8e6b819adb97435b417e1ab2b756c50e5228aaf5bbe63a6957b39b4dd56e0a7"
+      "sha256_or_fingerprint": "2798e13040f986e808211f5ebc8f73666763d86c73aa7e2558395b1fc31099f1"
+    },
+    {
+      "logical_ref": "repo://tests/test_live_cohort_to_forge_operational_closure_v1.py",
+      "sha256_or_fingerprint": "4877ec661bc9c86edfdd81333a574d8abd60155ae16cb754f5578769e8b4dd2c"
+    },
+    {
+      "logical_ref": "repo://tests/test_hfic_censoring_ignorability_diagnostic_v1.py",
+      "sha256_or_fingerprint": "e58de6f5d02a7d39adaa909a1d759e850fa54f42bd78b13357eefc7f68cb2105"
     }
   ],
   "independence": {
@@ -59,7 +67,7 @@
     "NO_MULTIWRITER_OR_POWER_LOSS_DURABILITY_GUARANTEE",
     "Snapshot is staged implementation at actual existing HEAD; packet and three delivery-chain evidence files are excluded to avoid self-binding. Final content inventory is reviewed separately."
   ],
-  "packet_fingerprint_sha256": "9b8a0208101bcb59ab3175dafbf0c2c4f55f0d57155e1412a80648c49d8b7730",
+  "packet_fingerprint_sha256": "28c61e94cc9a69495ea2746f033744366c4edd3db977b51522f5756f696eb3bd",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
@@ -91,9 +99,9 @@
       "scope": "LIVE corpus only; non-LIVE selection unchanged."
     },
     {
-      "claim": "Unchanged composition plus effective schema contract produces a deterministic new LIVE metadata root; same contract retries/reuses immutable history.",
+      "claim": "Unchanged composition and bounded LIVE metadata contract produce the same target MID and predecessor-independent immutable candidate bytes, including partial B then C then B; the target-frozen publication clock is reused.",
       "claim_id": "IDENTITY",
-      "scope": "LIVE dataset_version only, unchanged TASK-06 builders and corpus_version."
+      "scope": "LIVE dataset_version only, unchanged TASK-06 builders/corpus_version; transition predecessor stays in lineage/readback."
     },
     {
       "claim": "Pre-switch failure leaves existing current root/lineage/labels/market unchanged; complete candidate verification precedes one lineage replacement. Post-switch readers use NEW even if labels stale.",
@@ -112,7 +120,7 @@
     }
   ],
   "task": {
-    "task_contract_sha256": "209af219478d883ddbfead96e566a17b486aaf19b2e3af7ecfd4d3248d5e5b70",
+    "task_contract_sha256": "12cc54a7f78561fc8819339aba245f206882f5f0778dff330823739694aac36e",
     "task_id": "LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2"
   }
 }

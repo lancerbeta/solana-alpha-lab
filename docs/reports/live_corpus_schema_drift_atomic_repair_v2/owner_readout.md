@@ -46,14 +46,31 @@ before and after repair; actual fourth synthetic cohort import produces 4.
 Repair returns BUILT, metadata_identity_changed=true, lineage_switched=true,
 scientific_epoch_changed=false and epoch_bump=false; rerun is IDEMPOTENT_REPAIR.
 Compatible B -> C -> B metadata roots reuse immutable historical provenance.
-Missing current clock/publication blocks consumers; damaged non-current
+The owner P1 regression also covers A -> partial B -> C -> B, interrupted after
+receipt and dataset construction: B MID and existing immutable candidate bytes
+stay identical, no conflict/manual deletion/restore, epoch and occupied budgets
+remain unchanged. Repair generation_run_id derives from target MID; candidate
+receipt predecessor is null and labels omit it. Lineage/readback retain the
+actual transition predecessor. The LIVE-local identity explicitly binds schema,
+logical profile, receipt schema/version, commit/clock contract, generation
+constants and static required labels. Receipt-version-only drift gets a new
+metadata identity and remains idempotent without creating a scientific epoch.
+Missing canonical current clock/publication blocks consumers; damaged non-current
 dataset/labels/partitions do not poison old current market or rows.
 
 REAL_DATA_PLANE_MUTATED: false. REAL_C4_ACCESSED: false. C4_IMPORTED: false.
 FORGE_RUN: false. Tests and faults run on isolated fixture directories only.
 
-Focused validation: 57 tests PASS, including the V2 vertical suite, predecessor
-repair tests, unchanged scientific-identity assertions and 12-import series.
+Focused validation: 142 tests PASS (one skipped), including the V2 vertical suite,
+predecessor repair tests, scientific-identity assertions, 12-import series and
+shared censoring/selection fixture consumers; two previously failing operational
+closure tests also PASS. Old synthetic LIVE helpers lacked canonical version,
+full receipt/clock/marker or valid TASK-06 identity. Fixtures now use existing
+production builders/publication; current-root checks remain unchanged. Another
+CI failure compared equal partitions in different orders: exact model comparison
+now uses canonical partition-id order, retaining every integrity check and
+original composition/receipt order. Both original temporal oracle/saved-result
+verticals PASS on unchanged source. Total: 146 focused tests, one skipped.
 Semantic search readback via existing catalog_cli search-assets: all four owner
 questions return the intended owner as the sole result (rank 1):
 "how does live RDP get into Forge" -> MODULE-LIVE-COHORT-TO-FORGE-001;
@@ -62,7 +79,6 @@ questions return the intended owner as the sole result (rank 1):
 MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001. Publication owner now points to this
 task's recovery contract. Existing ACTIVE binding and semantic route are retained;
 generated navigation comes from harness_sync, with no redundant route.
-
 Residuals: metadata repair scans current parquet to prove logical reconstruction;
 immutable conflicts need inspection, not automatic overwrite. Atomic lineage
 replacement assumes serialized owner operations; power-loss/multi-writer

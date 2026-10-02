@@ -31,6 +31,8 @@ managed_write_set:
   - tests/test_live_corpus_schema_drift_atomic_repair_v2.py
   - tests/test_live_corpus_manifest_contract_repair_v1.py
   - tests/test_hfic_market_evidence_epoch_decision_basis_v2.py
+  - tests/test_live_cohort_to_forge_operational_closure_v1.py
+  - tests/test_hfic_censoring_ignorability_diagnostic_v1.py
   - tests/test_live_cohort_discovery_release_series.py
   - docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md
   - docs/reports/live_corpus_schema_drift_atomic_repair_v2/owner_readout.md
@@ -105,8 +107,8 @@ changing corpus version, market epoch or consumed AUTO/distinct-focus slots.
   cannot partially change current scientific evidence or require manual recovery.
 - CAPABILITY_OR_EVIDENCE: scratch incident, crash/retry/current-consumer,
   synthetic fourth import and existing operator CLI verticals.
-- STOP: exact-head CI PASS and ready_for_owner_phrase=true. No merge before a
-  new exact owner phrase for this candidate.
+- STOP: exact-head CI PASS and ready_for_owner_phrase=true. No merge in this
+  continuation; return the newly bound exact owner phrase.
 - NEXT: OPERATE C1-C3 repair -> exact C4 import -> canonical readback -> STOP_BEFORE_FORGE.
 - REPLAN_TRIGGER: V2 identity redesign, unrelated DatasetManifest redesign,
   new durable transaction infrastructure, real historical migration or an
@@ -125,6 +127,13 @@ Use a LIVE-local deterministic metadata-contract digest in dataset_version;
 TASK-06 remains the dataset/partition identity algorithm. No clock/random/retry
 number in root identity. Composition and effective schema contract bind it;
 same composition and contract converge on the same repaired root.
+The explicit LIVE metadata projection binds schema identity, logical row profile,
+receipt schema/version, publication commit/clock policy, required static labels
+and repair generation constants. Repair generation_run_id is target-derived;
+candidate labels and receipt do not contain the transition predecessor. Lineage
+and result readback retain that transition truth. A partial B interrupted after
+receipt/dataset construction, followed by successful C and then B, must reuse
+the same B identity and immutable bytes without manual deletion or restore.
 
 Capture old lineage and current root without writes. Reconstruct logical rows
 and verify immutable parquet/release composition before preparing replacement.
@@ -151,6 +160,10 @@ adversaries across all actual current consumers; parquet drift, impossible
 logical reconstruction, conflicting candidate, safe retry and real synthetic
 fourth import (v4, four cohorts once, duplicate zero), and existing CLI terminals.
 Historical roots, parquet and sealed fixture releases remain immutable.
+Current-root integrity stays strict for legacy synthetic LIVE fixtures: update
+their publication to canonical TASK-06 manifests, full receipt/clock/marker.
+Partition verification compares exact models in canonical partition-id order;
+overlapping campaigns imported in another order retain their composition order.
 
 Architecture answers: second current owners; before/after pointer crashes;
 stale-label consumers; metadata-only new budgets; conflicting-byte overwrite;
