@@ -19,6 +19,7 @@
       "findings": [
         "ISOLATED_READ_ONLY: exact final candidate and 29 committed bindings verified; unchanged product bytes retain tested recovery/parser corrections.",
         "20 final combined integration tests PASS; three incoming and five task Catalog assets preserved, 1885 assets, generator check PASS.",
+        "Final context correction selects exactly three canonical DELIVERY_EVIDENCE files as RESOLVED; 26 other bindings and product bytes remain unchanged.",
         "TASK21 changes only Catalog SHA/bytes; no live resource or delivery claim."
       ]
     },
@@ -28,7 +29,8 @@
       "findings": [
         "ISOLATED_READ_ONLY: full bounded DoD and 29 bindings verified against final base/head; 20 integration and 15 semantic tests independently repeated PASS.",
         "Four historical BEFORE and 12 unchanged AFTER/scale profiles demonstrate the synthetic envelope only; baseline remains bound to its measured historical commit.",
-        "Runbooks preserve current main text and separate resource, snapshot, Telegram and commissioning proofs; no authority expansion."
+        "Runbooks preserve current main text and separate resource, snapshot, Telegram and commissioning proofs; no authority expansion.",
+        "Final L2 DELIVERY_EVIDENCE selection closes the grounding gap without changing DoD, review roles, external caps or owner authority."
       ]
     },
     {
@@ -36,7 +38,8 @@
       "verdict": "PASS",
       "findings": [
         "ISOLATED_READ_ONLY; SEMANTIC_PREMISE PASS; final diff, contract, evidence and all 29 bindings verified.",
-        "packet_fingerprint_sha256=02212d5624ceb57817e2e5946c78c5e6939ffbd65868066a3eb423e7b9778192",
+        "packet_fingerprint_sha256=b139fc85a7e83143a4f7c2a624958b692de594beddc91716c0430c80d18b8999",
+        "Final context correction selects the existing three evidence files; exact-base/head, hashes, committed blobs, role-set and inventory gates remain enforced.",
         "Invalid projections cannot prove recovery; UNKNOWN stays null and has its own incident; prior provider/source incidents cannot clear on UNKNOWN.",
         "Truth remains operational SQLite separately from immutable RDP/Parquet, manifests, sealed lineage and committed lifecycle evidence. Freshness is not scientific publication or PIT availability.",
         "Linear timestamp scan, single-row native JSON, filesystem and live resource costs remain commissioning limits; PACKET_INFORMATION_PATH only, MODEL_DIVERSITY_UNPROVEN."
@@ -48,7 +51,8 @@
       "findings": [
         "ISOLATED_READ_ONLY: final candidate and bindings verified; prior operator gaps closed without authority regression.",
         "Bounded read-only freshness probe, two distinct watch cycles, journal/delivery evidence, pending failure BLOCKED and dedupe provenance are explicit.",
-        "Exact-SHA commissioning/rollback preserves collector, renewal and runtime/scientific bytes; live commissioning not established."
+        "Exact-SHA commissioning/rollback preserves collector, renewal and runtime/scientific bytes; live commissioning not established.",
+        "Final context and mechanical Catalog/TASK21 corrections leave operator surfaces and authority unchanged."
       ]
     }
   ],
