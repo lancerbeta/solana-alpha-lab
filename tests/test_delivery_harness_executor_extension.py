@@ -307,6 +307,7 @@ class ExecutorExtensionTests(unittest.TestCase):
             PHRASE,
             FakeRunner,
             exact_context_builder,
+            fixture_post_context_verifier,
             grounded_delivery_checks,
             grounded_evidence,
         )
@@ -399,6 +400,7 @@ class ExecutorExtensionTests(unittest.TestCase):
                         submission_receipt=submitted,
                         runner=failed,
                         context_builder=exact_context_builder(self.gate),
+                        frozen_context_verifier=fixture_post_context_verifier(self.gate),
                     )
                 self.assertFalse(any(call[:3] == ("gh", "pr", "merge") for call in failed.calls))
 

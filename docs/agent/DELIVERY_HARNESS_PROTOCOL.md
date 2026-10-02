@@ -203,6 +203,22 @@ ordered parents are exactly the frozen base then approved head, plus exact push
 CI success. Read-only polling needs no
 second owner approval; merge submission alone is never a completed delivery.
 
+For task-contract receipts, post-merge readback replays the complete frozen
+delivery context from immutable approved-head Git bytes in a private scratch
+repository with the task's frozen upstream. It proves the clean head/tree,
+task path/hash, exact selected context and frozen delivery scope independently
+of the elected checkout or advanced origin/main. Base policy/profile remain
+bound to the frozen base. The source checkout, refs, index and configuration
+are not rewound or changed by that proof. Only ordinary tracked files are
+supported; symlinks/submodules fail closed. LIVE_PR_HEAD retains its existing
+verification path because it has no frozen task-contract base binding.
+Git process write-location overrides and command-scope configuration other
+than safe.directory allowances fail closed; scratch hooks/fsmonitor are
+disabled. Unsafe Windows path aliases fail before scratch materialization.
+The preserved PR head branch must also equal the frozen task branch.
+Pre-merge live context verification and task Git freshness are unchanged.
+This is immediate exact-merge closure, not historical ancestor acceptance.
+
 Guarded merge requires every key present on the expected-base
 `delivery-harness/project-profile.yaml` to match the live profile. Additive
 live-only top-level keys do not raise `PROJECT_PROFILE_BASE_BINDING_INVALID`.

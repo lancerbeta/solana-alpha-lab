@@ -7,9 +7,11 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from pathlib import PurePosixPath, PureWindowsPath
 from typing import Any
@@ -1705,6 +1707,145 @@ def verify_live_context_receipt(
     return rebuilt
 
 
+def verify_post_merge_context(
+    root: Path,
+    receipt: dict[str, Any],
+    *,
+    repository: str,
+    route: str,
+    runner=run_read,
+    context_builder=rebuild_context_receipt,
+) -> tuple[dict[str, Any], tuple[str, str, list[str], str], dict[str, Any]]:
+    """Replay task context at immutable H/A, never at the advanced live upstream.
+
+    The private repository shares only object reads. Its refs/index/config and
+    raw tracked bytes are disposable; no checkout filters or hooks are invoked.
+    LIVE_PR_HEAD has no frozen task binding and retains its predecessor path.
+    """
+    verify_context_receipt(root, receipt)
+    if is_live_pr_head(receipt):
+        verified = verify_live_context_receipt(
+            root, receipt, route=route, context_builder=context_builder
+        )
+        scope = guarded_delivery_scope(root, verified, repository=repository, runner=runner)
+        try:
+            policy = load_base_bound_policy(root, expected_base=scope[0], runner=runner, context_receipt=verified)
+        except ValueError:
+            raise ValueError("POST_MERGE_READBACK_FAILED") from None
+        return verified, scope, policy
+    # These process overrides can redirect scratch writes into the elected
+    # repository or override local hook isolation. Refuse them, never mutate
+    # process-global environment around a caller's context builder.
+    if any(os.environ.get(key) for key in (
+        "GIT_DIR", "GIT_COMMON_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE",
+        "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+        "GIT_CONFIG", "GIT_CONFIG_PARAMETERS",
+    )):
+        raise ValueError("CONTEXT_RECEIPT_INVALID")
+    try:
+        config_count = int(os.environ.get("GIT_CONFIG_COUNT", "0"))
+    except ValueError:
+        raise ValueError("CONTEXT_RECEIPT_INVALID") from None
+    # Sandbox ownership allowances are read-only. Any other command-scope
+    # config can supersede the scratch's local hooks/fsmonitor protections.
+    if config_count < 0 or any(
+        os.environ.get(f"GIT_CONFIG_KEY_{index}", "").casefold() != "safe.directory"
+        for index in range(config_count)
+    ):
+        raise ValueError("CONTEXT_RECEIPT_INVALID")
+    state = receipt["repository"]
+    head = state["head"]
+    if state["dirty"] or state["name"] != repository or receipt["route"] != route:
+        raise ValueError("CONTEXT_RECEIPT_LIVE_MISMATCH")
+    tree = runner(["git", "--no-replace-objects", "rev-parse", f"{head}^{{tree}}"], root).decode("ascii").strip()
+    if tree != state["tree"]:
+        raise ValueError("CONTEXT_RECEIPT_LIVE_MISMATCH")
+    branch = state["branch"]
+    runner(["git", "check-ref-format", f"refs/heads/{branch}"], root)
+    objects = runner(["git", "rev-parse", "--path-format=absolute", "--git-path", "objects"], root).decode("utf-8").strip()
+    origin = runner(["git", "remote", "get-url", "origin"], root).decode("utf-8").strip()
+    if github_repository_from_origin(origin) != repository:
+        raise ValueError("POST_MERGE_READBACK_FAILED")
+    entries = decode_nul_fields(
+        runner(["git", "--no-replace-objects", "ls-tree", "-r", "-z", head], root),
+        "CONTEXT_RECEIPT_INVALID",
+    )
+    blobs: list[tuple[str, str]] = []
+    for entry in entries:
+        header, separator, path = entry.partition("\t")
+        fields = header.split()
+        if not separator or len(fields) != 3 or fields[0] not in {"100644", "100755"} or fields[1] != "blob":
+            raise ValueError("CONTEXT_RECEIPT_INVALID")
+        path = safe_repo_path(path)
+        reserved = {"CON", "PRN", "AUX", "NUL", "CONIN$", "CONOUT$"} | {
+            prefix + suffix for prefix in ("COM", "LPT") for suffix in "123456789¹²³"
+        }
+        if any(character in path for character in ':<>"|?*') or any(
+            part.rstrip(" .") != part or part.split(".", 1)[0].rstrip(" ").upper() in reserved
+            for part in path.split("/")
+        ):
+            raise ValueError("CONTEXT_RECEIPT_INVALID")
+        blobs.append((fields[2], path))
+    # One binary batch preserves literal Git blob bytes (no autocrlf, smudge,
+    # export-ignore/export-subst or symlink traversal through an archive).
+    batch = subprocess.run(
+        ["git", "--no-replace-objects", "cat-file", "--batch"], cwd=root,
+        input=("".join(oid + "\n" for oid, _ in blobs)).encode("ascii"),
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False, shell=False,
+    )
+    if batch.returncode:
+        raise ValueError("CONTEXT_RECEIPT_INVALID")
+    with tempfile.TemporaryDirectory(prefix="smial-frozen-delivery-") as temporary:
+        frozen = Path(temporary)
+        hooks = frozen / ".git/no-hooks"
+        run_read(["git", "-c", f"core.hooksPath={hooks}", "-c", "core.fsmonitor=false", "init", "--template="], frozen)
+        hooks.mkdir()
+        run_read(["git", "config", "--local", "core.hooksPath", str(hooks)], frozen)
+        run_read(["git", "config", "--local", "core.fsmonitor", "false"], frozen)
+        (frozen / ".git/objects/info/alternates").write_text(Path(objects).as_posix() + "\n", encoding="utf-8", newline="\n")
+        run_read(["git", "config", "--local", "core.autocrlf", "false"], frozen)
+        run_read(["git", "config", "--local", "core.filemode", "false"], frozen)
+        run_read(["git", "config", "--local", "remote.origin.url", origin], frozen)
+        (frozen / ".git/info").mkdir(exist_ok=True)
+        (frozen / ".git/info/exclude").write_text("__pycache__/\n", encoding="utf-8")
+        (frozen / ".git/info/attributes").write_text(
+            "* -filter -working-tree-encoding -text -eol -ident\n", encoding="utf-8", newline="\n"
+        )
+        offset = 0
+        for oid, path in blobs:
+            end = batch.stdout.find(b"\n", offset)
+            header = batch.stdout[offset:end].decode("ascii").split()
+            if end < offset or len(header) != 3 or header[:2] != [oid, "blob"] or not header[2].isdigit():
+                raise ValueError("CONTEXT_RECEIPT_INVALID")
+            size = int(header[2])
+            start = end + 1
+            offset = start + size + 1
+            if offset > len(batch.stdout) or batch.stdout[offset - 1:offset] != b"\n":
+                raise ValueError("CONTEXT_RECEIPT_INVALID")
+            destination = (frozen / path).resolve()
+            if frozen.resolve() not in destination.parents:
+                raise ValueError("CONTEXT_RECEIPT_INVALID")
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(batch.stdout[start:start + size])
+        if offset != len(batch.stdout):
+            raise ValueError("CONTEXT_RECEIPT_INVALID")
+        run_read(["git", "symbolic-ref", "HEAD", f"refs/heads/{branch}"], frozen)
+        run_read(["git", "update-ref", f"refs/heads/{branch}", head], frozen)
+        run_read(["git", "read-tree", head], frozen)
+        base, upstream, upstream_oid, _ = task_delivery_scope(frozen, receipt)
+        run_read(["git", "check-ref-format", f"refs/remotes/{upstream}"], frozen)
+        run_read(["git", "update-ref", f"refs/remotes/{upstream}", upstream_oid], frozen)
+        verified = verify_live_context_receipt(
+            frozen, receipt, route=route, context_builder=context_builder
+        )
+        scope = guarded_delivery_scope(frozen, verified, repository=repository)
+        try:
+            policy = load_base_bound_policy(frozen, expected_base=base, context_receipt=verified)
+        except ValueError:
+            raise ValueError("POST_MERGE_READBACK_FAILED") from None
+        return verified, scope, policy
+
+
 def delivery_inventory_sha256(
     root: Path,
     *,
@@ -2384,13 +2525,13 @@ def build_post_merge_receipt(
     submission_receipt: dict[str, Any],
     runner=run_read,
     context_builder=rebuild_context_receipt,
+    frozen_context_verifier=verify_post_merge_context,
 ) -> dict[str, Any]:
-    verified_context = verify_live_context_receipt(
-        root, context_receipt, route=route, context_builder=context_builder
+    verified_context, scope, policy = frozen_context_verifier(
+        root, context_receipt, repository=repository, route=route,
+        runner=runner, context_builder=context_builder,
     )
-    expected_base, expected_upstream_oid, _, default_branch = guarded_delivery_scope(
-        root, verified_context, repository=repository, runner=runner
-    )
+    expected_base, expected_upstream_oid, _, default_branch = scope
     repository_state = verified_context.get("repository")
     approved_head = (
         repository_state.get("head") if isinstance(repository_state, dict) else None
@@ -2461,6 +2602,7 @@ def build_post_merge_receipt(
         and pr.get("baseRefName") == default_branch
         and isinstance(head_branch, str)
         and bool(head_branch)
+        and (is_live_pr_head(verified_context) or head_branch == repository_state["branch"])
         and isinstance(pr_merge_oid, str)
         and re.fullmatch(r"[0-9a-f]{40}", pr_merge_oid) is not None
     ):
@@ -2506,15 +2648,6 @@ def build_post_merge_receipt(
     ):
         raise ValueError("POST_MERGE_COMMIT_READBACK_INVALID")
     parent_oids = lineage[1:]
-    try:
-        policy = load_base_bound_policy(
-            root,
-            expected_base=expected_base,
-            runner=runner,
-            context_receipt=verified_context,
-        )
-    except ValueError:
-        raise ValueError("POST_MERGE_READBACK_FAILED") from None
     if not _policy_v2_is_closed(policy):
         raise ValueError("POST_MERGE_READBACK_FAILED")
     check_policy = policy["github_checks"]

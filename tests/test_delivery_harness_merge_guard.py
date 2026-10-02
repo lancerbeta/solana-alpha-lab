@@ -414,6 +414,19 @@ def exact_context_builder(module: ModuleType, receipt: dict[str, object] | None 
     return build
 
 
+def fixture_post_context_verifier(module: ModuleType):
+    """Legacy synthetic-OID unit fixture; real frozen proof is tested on a DAG."""
+    def verify(root, receipt, *, repository, route, runner, context_builder):
+        verified = module.verify_live_context_receipt(root, receipt, route=route, context_builder=context_builder)
+        scope = module.guarded_delivery_scope(root, verified, repository=repository, runner=runner)
+        try:
+            policy = module.load_base_bound_policy(root, expected_base=scope[0], runner=runner, context_receipt=verified)
+        except ValueError:
+            raise ValueError("POST_MERGE_READBACK_FAILED") from None
+        return verified, scope, policy
+    return verify
+
+
 def grounded_evidence(
     root: Path, receipt: dict[str, object], **_kwargs: object
 ) -> dict[str, object]:
@@ -1710,6 +1723,7 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                 submission_receipt=guarded_submission_receipt(self.module),
                 runner=runner,
                 context_builder=exact_context_builder(self.module),
+                frozen_context_verifier=fixture_post_context_verifier(self.module),
             )
         self.assertEqual(post["base_branch"], "trunk")
 
@@ -1738,6 +1752,7 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
             submission_receipt=guarded_submission_receipt(self.module),
             runner=runner,
             context_builder=exact_context_builder(self.module),
+            frozen_context_verifier=fixture_post_context_verifier(self.module),
         )
         unsigned = dict(receipt); observed = unsigned.pop("receipt_sha256")
         self.assertEqual(observed, self.module.sha256_bytes(self.module.canonical_json_bytes(unsigned)))
@@ -1840,6 +1855,7 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                 submission_receipt=guarded_submission_receipt(self.module),
                 runner=runner,
                 context_builder=exact_context_builder(self.module),
+                frozen_context_verifier=fixture_post_context_verifier(self.module),
             )
         self.assertFalse(any(call[:2] == ("git", "fetch") for call in runner.calls))
         self.assertFalse(any("rev-list" in call for call in runner.calls))
@@ -1862,6 +1878,7 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                         submission_receipt=guarded_submission_receipt(self.module),
                         runner=runner,
                         context_builder=exact_context_builder(self.module),
+                        frozen_context_verifier=fixture_post_context_verifier(self.module),
                     )
 
     def test_post_merge_requires_grounded_submission_and_base_owned_policy(self) -> None:
@@ -1873,6 +1890,7 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
             submission_receipt=guarded_submission_receipt(self.module),
             runner=runner,
             context_builder=exact_context_builder(self.module),
+            frozen_context_verifier=fixture_post_context_verifier(self.module),
         )
         self.assertIn(
             ("git", "show", f"{BASE}:control/owner_attention_gate_v2.yaml"),
@@ -1890,6 +1908,7 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                 submission_receipt=invalid,
                 runner=FakeRunner(),
                 context_builder=exact_context_builder(self.module),
+                frozen_context_verifier=fixture_post_context_verifier(self.module),
             )
         with self.assertRaisesRegex(ValueError, "POST_MERGE_READBACK_FAILED"):
             self.module.build_post_merge_receipt(
@@ -1903,6 +1922,7 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                     base_mismatch_path="control/owner_attention_gate_v2.yaml"
                 ),
                 context_builder=exact_context_builder(self.module),
+                frozen_context_verifier=fixture_post_context_verifier(self.module),
             )
 
     def test_merge_readiness_is_ready_without_phrase_and_does_not_merge(self) -> None:

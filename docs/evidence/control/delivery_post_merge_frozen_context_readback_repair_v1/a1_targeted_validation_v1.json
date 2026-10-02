@@ -1,0 +1,104 @@
+{
+  "schema": "smial.bounded-targeted-validation",
+  "schema_version": "1.0",
+  "task_id": "DELIVERY_POST_MERGE_FROZEN_CONTEXT_READBACK_REPAIR_V1",
+  "base_sha": "92e0143d2e8cacf39b9b74cad49b2d3c00f70055",
+  "result": "PASS",
+  "command": "python -B -m unittest tests.test_delivery_post_merge_frozen_context_v1 tests.test_delivery_harness_merge_guard -q",
+  "tests_run": 51,
+  "duration_seconds": 92.36,
+  "red_before": "REAL_GIT_A_H_M_CANONICAL_POST_TASK_EXPECTED_BASE_MISMATCH",
+  "green_after": "REAL_GIT_A_H_M_ORIGIN_MAIN_M_POST_PASS_PREMERGE_STALE_BASE_DENY",
+  "covered": [
+    "SELF_HASH_AND_REHASHED_CONTEXT_SUBSTITUTIONS",
+    "HEAD_TREE_TASK_BYTES_SELECTED_REFS_BRANCH_DIRTY",
+    "REAL_FROZEN_CONTRACT_WRONG_BASE",
+    "REAL_REVERSED_EXTRA_SINGLE_PARENTS",
+    "REPO_PR_MERGED_APPROVED_HEAD",
+    "BRANCH_PRESERVATION",
+    "MISSING_FAILING_WRONG_SHA_CI",
+    "EXACT_CURRENT_MAIN",
+    "SOURCE_REFS_STATUS_CONFIG_UNCHANGED",
+    "DETACHED_POST_MERGE_CHECKOUT_UNCOMMITTED_BYTES_IGNORED",
+    "PREMERGE_STALE_BASE_DENY",
+    "GIT_ENV_SOURCE_INDEX_REDIRECTION_DENY",
+    "GLOBAL_HOOKS_FSMONITOR_CLEAN_FILTER_NOT_EXECUTED",
+    "WINDOWS_DRIVE_ADS_ALIAS_PREALLOCATION_DENY",
+    "FROZEN_TASK_BRANCH_NAME_PRESERVED",
+    "SOURCE_RAW_INDEX_UNCHANGED",
+    "RESERVED_DOS_DEVICE_NAMES_AND_EXTENSIONS_DENY_BEFORE_ALLOCATION"
+  ],
+  "incident_362": {
+    "approved_head": "8af67e4f24f8d98b730547a8f35f0e3410961bc8",
+    "frozen_base": "68b986e12e5752d36b3cc2e14d85a855fa90b09f",
+    "merge_commit": "92e0143d2e8cacf39b9b74cad49b2d3c00f70055",
+    "merge": "SUCCESS",
+    "direct_ordered_topology_readback": "SUCCESS",
+    "exact_merge_push_ci": "SUCCESS",
+    "exact_merge_push_run_id": 36950977906,
+    "canonical_terminal_receipt": "BLOCKED_TASK_EXPECTED_BASE_MISMATCH",
+    "historical_receipt_fabricated": false,
+    "pr_mutated": false
+  },
+  "non_claims": [
+    "NO_PRODUCT_SCIENCE_CHANGE",
+    "NO_REAL_DATA_PLANE_MUTATION",
+    "NO_C4",
+    "NO_FORGE",
+    "NO_MERGE",
+    "NO_LIVE_PR_HEAD_REDESIGN"
+  ],
+  "architecture_profile": {
+    "profile": "STANDARD",
+    "reason": "NO_SEMANTIC_TRIGGER",
+    "authority_granted": false
+  },
+  "implementation_sha256": {
+    "scripts/owner_attention_gate.py": "91a2ef21e4340cf5c8a404faa72fd61a878c81fb724a96b05873fc8ae07ebfc9",
+    "tests/test_delivery_post_merge_frozen_context_v1.py": "81fc125cc25ea70548e319103e153e494c18cb7e9005ca21c77a27a22fead68b",
+    "tests/test_delivery_harness_merge_guard.py": "28744d03e23c3e3e9ec5544e4439cae4648dfd43e402265d960b1867d0c1c4b9",
+    "tests/test_delivery_harness_executor_extension.py": "1d8ce9771098ec20a47bf151e480bc95f1b8f1867a9c178474704e1d579e2d9f"
+  },
+  "preflight_remediation": {
+    "reason": "SHADOW_PIN_DRIFT:docs/evidence/control/owner_attention_gate_acceptance_v1.json->scripts/owner_attention_gate.py",
+    "change": "SEPARATE_EVALUATOR_SHA_REPIN_ONLY_VERDICTS_AND_HISTORY_PRESERVED"
+  },
+  "ci_fixture_remediation": {
+    "failed_head": "486e7fa797f4ac0e0b60c8f770c1d56c21ec011d",
+    "failed_run_id": 36978287766,
+    "reason": "SYNTHETIC_OID_RUNNER_MISSING_EXPLICIT_FROZEN_FIXTURE_VERIFIER",
+    "red_local": "EXECUTOR_EXTENSION_JOURNEY_TWO_ROUTE_SUBTESTS_ASSERTION_ERROR",
+    "fix": "EXPLICIT_EXISTING_FIXTURE_VERIFIER_FOR_SYNTHETIC_OID_POST_MERGE_CALL_ONLY",
+    "production_verifier_changed": false,
+    "direct_consumer_command": "python -B -m unittest tests.test_delivery_harness_executor_extension -q",
+    "direct_consumer_tests_run": 6,
+    "direct_consumer_duration_seconds": 1.66,
+    "direct_consumer_result": "PASS"
+  },
+  "ci_protocol_pin_remediation": {
+    "failed_run_id": 36978287766,
+    "reason": "CURRENT_BYTE_PROTOCOL_SHA_PIN_DRIFT",
+    "change": "PROTOCOL_IMPLEMENTATION_SHA_REPIN_ONLY_HISTORICAL_VERDICT_AND_SCOPE_PRESERVED",
+    "direct_consumer_command": "python -B -m unittest tests.test_delivery_harness_contract -q",
+    "direct_consumer_tests_run": 9,
+    "direct_consumer_duration_seconds": 2.053,
+    "direct_consumer_result": "PASS",
+    "repinned_paths": [
+      "docs/agent/DELIVERY_HARNESS_PROTOCOL.md",
+      "scripts/owner_attention_gate.py",
+      "tests/test_delivery_harness_merge_guard.py"
+    ]
+  },
+  "ci_portable_pin_remediation": {
+    "failed_run_id": 36978287766,
+    "reason": "PORTABLE_TEMPLATE_HASH_MISMATCH",
+    "change": "SINGLE_CANONICAL_GATE_SOURCE_SHA_REPIN_AND_CORRESPONDING_HARNESS_ACCEPTANCE_MANIFEST_PIN_ONLY",
+    "production_code_changed": false,
+    "direct_consumer_command": "python -B -m unittest tests.test_delivery_harness_bootstrap tests.test_delivery_harness_contract -q",
+    "direct_consumer_tests_run": 36,
+    "direct_consumer_duration_seconds": 16.054,
+    "direct_consumer_result": "PASS",
+    "runtime": "PYTHONUTF8=1",
+    "windows_runtime_diagnostic": "STDLIB_SUBPROCESS_CP1251_UNICODEENCODEERROR_CONFIRMED_UTF8_INHERITANCE_RESOLVED_WITHOUT_CODE_CHANGE"
+  }
+}
