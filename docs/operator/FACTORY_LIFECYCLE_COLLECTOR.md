@@ -18,7 +18,8 @@ collector; host locator не дублировать.
 ## Historical 2026-09-04 chain (not current health)
 
 These terminals are historical evidence. They do **not** prove current runtime
-health; that requires a fresh `doctor` / `status` / operational-packet readback.
+health; use the narrow `mode=ro` probe above for operational facts and the
+separately gated commissioning procedure for resource/source/publication proof.
 
 | Proven historically | Terminal / interpretation |
 |---|---|
@@ -247,7 +248,7 @@ uv run --locked --managed-python python -B scripts/observation_schedule.py rollo
 ```
 
 Accept only `ROLLOVER_COMMITTED` or an idempotent `ROLLOVER_REPLAY`, then
-verify the bound status rows and immutable events below. For any other result,
+verify the bound raw activation rows and immutable events below. For any other result,
 inspect its `terminal` and `next_action` before retrying. Never move the
 cutover into the past.
 
@@ -255,16 +256,21 @@ If `rollover` returns
 `ROLLOVER_IMMUTABLE_PROOF_UNAVAILABLE` with
 `next_action=INSPECT_IMMUTABLE_ROLLOVER_PROOF_AND_OPEN_RECOVERY_ATOM`, stop
 retrying the SQLite projection. This is a rollover proof check, not the late
-recovery check below. Read both operational `last_transition_event_id` values
-for the predecessor and successor with the existing read-only `status` command:
+recovery check below. Run the narrow `mode=ro` SQLite probe from
+`docs/operator/FACTORY_UNATTENDED_OPERABILITY.md`, section
+«Узкий pre-deploy SQLite readback», twice with these exact argument pairs:
 
 ```text
-# Read-only SQLite probe: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md, section Узкий pre-deploy SQLite readback; use the exact schedule/activation IDs named here.
-# Read-only SQLite probe: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md, section Узкий pre-deploy SQLite readback; use the exact schedule/activation IDs named here.
+<PREDECESSOR_SCHEDULE_SHA256> <PREDECESSOR_ACTIVATION_ID>
+<SUCCESSOR_SCHEDULE_SHA256> <SUCCESSOR_ACTIVATION_ID>
 ```
 
-Take `activations[0].transition_event_id` from each JSON result; `UNKNOWN`
-is a terminal proof gap. Then inspect both immutable events:
+Take `activation_and_authority_raw[0].last_transition_event_id` from each JSON
+result. The row's `schedule_sha256` and `activation_id` must match its argument
+pair. An absent row, missing/empty/null/`UNKNOWN` event ID, or identity mismatch
+is a terminal `UNKNOWN/BLOCKED` proof gap: stop and do not guess a locator.
+The raw ID is only a pointer, not immutable/as-of proof. Then inspect both
+immutable events:
 
 ```text
 uv run --locked --managed-python python -B -c "import json; from pathlib import Path; from solana_alpha_lab.factory.research_store import ResearchStore; s=ResearchStore(Path('<DATA_ROOT>'), create_if_missing=False); ids={('<PREDECESSOR_SCHEDULE_SHA256>','<PREDECESSOR_ACTIVATION_ID>','<PREDECESSOR_TRANSITION_EVENT_ID>'),('<SUCCESSOR_SCHEDULE_SHA256>','<SUCCESSOR_ACTIVATION_ID>','<SUCCESSOR_TRANSITION_EVENT_ID>')}; print(json.dumps([{'record_id':r.record_id,'record_kind':str(r.record_kind),'entity_id':r.entity_id,'run_id':r.run_id,'transaction_id':r.transaction_id,'effective_at':r.effective_at.isoformat(),'payload':json.loads(r.payload_json)} for r in s.iter_committed_records() if (str(r.entity_id),str(r.run_id or ''),r.record_id) in ids], sort_keys=True))"
@@ -429,14 +435,20 @@ exact SHA is on the host.
 
 For `SUCCESSOR_STATE=UNKNOWN` or `UNKNOWN/BLOCKED`, do not infer an expiry or
 claim continuity. Use the two `CONTINUITY_*` identity fields from the alert
-with the read-only status command:
+as the exact argument pair for the narrow `mode=ro` SQLite probe from
+`docs/operator/FACTORY_UNATTENDED_OPERABILITY.md`, section
+«Узкий pre-deploy SQLite readback»:
 
 ```text
-# Read-only SQLite probe: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md, section Узкий pre-deploy SQLite readback; use the exact schedule/activation IDs named here.
+<CONTINUITY_SCHEDULE_SHA256> <CONTINUITY_ACTIVATION_ID>
 ```
 
-Take `activations[0].transition_event_id` from that JSON and inspect its
-committed ResearchStore record with this read-only query:
+Take `activation_and_authority_raw[0].last_transition_event_id` from that JSON.
+The row's `schedule_sha256` and `activation_id` must match the alert's two
+identifiers. An absent row, missing/empty/null/`UNKNOWN` event ID, or identity
+mismatch leaves `UNKNOWN/BLOCKED`: stop and do not guess a locator. The raw ID
+is only a pointer, not immutable/as-of proof. Inspect its committed
+ResearchStore record with this read-only query:
 
 `<DATA_ROOT>` means the `data_root` value in
 `configs/observation_schedule_runtime_v1.yaml` (currently
@@ -451,9 +463,9 @@ elapsed admission window or completed cutover.
 uv run --locked --managed-python python -B -c "import json; from pathlib import Path; from solana_alpha_lab.factory.research_store import ResearchStore; s=ResearchStore(Path('<DATA_ROOT>'), create_if_missing=False); selector=('<CONTINUITY_SCHEDULE_SHA256>','<CONTINUITY_ACTIVATION_ID>','<TRANSITION_EVENT_ID>'); print(json.dumps([{'record_id':r.record_id,'record_kind':str(r.record_kind),'entity_id':r.entity_id,'run_id':r.run_id,'effective_at':r.effective_at.isoformat(),'payload':json.loads(r.payload_json)} for r in s.iter_committed_records() if (str(r.entity_id),str(r.run_id or ''),r.record_id)==selector], sort_keys=True))"
 ```
 
-The status row must match both identifiers, and exactly one committed
+The raw activation row must match both identifiers, and exactly one committed
 `OBSERVATION_SCHEDULE_STATE` record must match its state and transition event.
-If status is absent, the event is missing/malformed, or the identities/state do
+If the row is absent, the event is missing/malformed, or the identities/state do
 not match, keep `UNKNOWN/BLOCKED` and open a separate recovery atom; do not
 rewrite SQLite lifecycle projections or append-only history. A valid current
 transition record alone does not prove a campaign cutover: wait for the watch
@@ -523,7 +535,7 @@ rollover happened in its implementing atom**.
 ```text
 MERGED CAPABILITY
 → exact-SHA deploy gate
-→ fresh runtime doctor/status
+→ narrow mode=ro operational readback + separately gated commissioning
 → zero-network M1 successor preflight
 → owner reviews exact proposal
 → exact owner schedule authorization
@@ -592,7 +604,8 @@ Live terminal `OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_LIVE_PASS` is a
 migration APPLY. Do not resume by intuition after a hard fail — immediately
 `PAUSED_OPERATOR` and keep evidence.
 
-Take `schedule_sha256` and `activation_id` from status. Do not invent them.
+Take `schedule_sha256` and `activation_id` from the accepted campaign envelope;
+verify their exact row with the narrow `mode=ro` probe above. Do not invent them.
 
 ### A. PAUSED preflight
 
@@ -730,7 +743,8 @@ mandatory; wall-time redesign is not.
 sudo systemctl stop factory-observation-schedule.timer
 ```
 
-Resume uses `--schedule-sha256` and `--activation-id` from status:
+Resume uses `--schedule-sha256` and `--activation-id` from the accepted campaign
+envelope, verified by the narrow `mode=ro` probe above:
 
 ```
 /usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py resume --runtime-config configs/observation_schedule_runtime_v1.yaml --schedule-sha256 <schedule_sha256> --activation-id <activation_id>

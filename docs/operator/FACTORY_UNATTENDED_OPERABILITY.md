@@ -97,7 +97,8 @@ connection.execute('PRAGMA query_only=ON')
 connection.execute('PRAGMA cache_size=-2048')
 connection.set_progress_handler(lambda: int(time.monotonic() > deadline), 1000)
 queries = {
-    'activation_and_authority_raw': ("""SELECT a.state, a.starts_at, a.stops_admitting_at, a.updated_at,
+    'activation_and_authority_raw': ("""SELECT a.schedule_sha256, a.activation_id,
+        a.state, a.starts_at, a.stops_admitting_at, a.updated_at,
         a.transition_sequence, a.last_transition_event_id,
         a.authority_receipt_sha256, r.expires_at AS authority_expires_at
         FROM schedule_activations AS a

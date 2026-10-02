@@ -103,14 +103,17 @@ costs тоже нуждаются в host commissioning. Измерений хв
 
 Read-only continuity checkpoint после renewal 2026-10-03 09:40 МСК:
 тот же cohort family, окно через 2026-10-05 13:00 UTC, актуальная authority и
-доказанный rollover. Возьмите exact IDs из свежего status, не из исторического
-Git отчёта. Если continuity не доказана — exact blocker владельцу; не authorize.
+доказанный rollover. Возьмите exact IDs из принятого campaign envelope и
+проверьте узким mode=ro probe. Если continuity не доказана — exact blocker
+владельцу; не authorize.
 Автоматизация не создавалась, будущий readback ещё не выполнен.
 
 ## Deploy / rollback после отдельного разрешения
 
 Pre-deploy probe теперь использует только scoped primary-key / bounded rowid
 SQLite queries с mode=ro и без payload_json; generic status не вызывается.
+Оба recovery consumer используют возвращённый last_transition_event_id и
+проверяют scope; отсутствующий locator оставляет UNKNOWN/BLOCKED.
 Timer readback показывает installed disabled units. Canary повторяет effective
 unit environment и backup sink, сохраняет unit через remain-after-exit и
 проверяет численный MemoryPeak/monotonic clocks; missing peak остаётся UNKNOWN.

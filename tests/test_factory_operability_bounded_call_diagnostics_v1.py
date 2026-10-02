@@ -82,6 +82,9 @@ class BoundedCallTests(unittest.TestCase):
     def test_predeploy_sql_probe_never_reads_payload_and_preserves_sqlite(self):
         for index in range(40):
             self.call(NOW - timedelta(days=2), huge='x' * 20000)
+        self.store._conn.execute("UPDATE schedule_activations SET last_transition_event_id=? WHERE schedule_sha256=? AND activation_id=?",
+                                 ('fixture-immutable-transition', DIGEST, 'A'))
+        self.store._conn.commit()
         database = Path(self.store.path)
         files = [database, Path(str(database) + '-wal')]
         before = {str(path): path.read_bytes() for path in files if path.exists()}
@@ -106,6 +109,15 @@ class BoundedCallTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(result['probe_state'], 'RAW_READBACK')
         self.assertEqual(len(result['activation_and_authority_raw']), 1)
+        row = result['activation_and_authority_raw'][0]
+        self.assertEqual((row['schedule_sha256'], row['activation_id']), (DIGEST, 'A'))
+        lifecycle = (ROOT / 'docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md').read_text(encoding='utf-8')
+        locators = re.findall(r'Take `([^`]+)` from (?:each|that) JSON', lifecycle)
+        self.assertEqual(len(locators), 2, 'Both immutable recovery consumers must declare their JSON locator')
+        for locator in locators:
+            match = re.fullmatch(r'([a-z_]+)\[0\]\.([a-z_]+)', locator)
+            self.assertIsNotNone(match, locator)
+            self.assertEqual(result[match[1]][0][match[2]], 'fixture-immutable-transition')
         self.assertEqual(len(result['call_tail_raw']), 32)
         self.assertEqual(result['source_http_success'], 'UNKNOWN')
         self.assertEqual(result['scientific_publication'], 'UNKNOWN')
