@@ -6,15 +6,21 @@ import json
 import os
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Mapping
+from typing import TYPE_CHECKING, Any, Callable, Mapping
 
-from solana_alpha_lab.factory.collector_operational_packet import (
-    build_collector_operational_packet,
-)
-from solana_alpha_lab.factory.collector_owner_pulse import emit_daily_owner_pulse
-from solana_alpha_lab.factory.observation_schedule import render_utc
-from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
-from solana_alpha_lab.factory.remote_ops import RemoteOpsError
+if TYPE_CHECKING:
+    from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+
+
+def build_collector_operational_packet(**kwargs: Any) -> dict[str, Any]:
+    # Snapshot readers must not import the packet or open a collector store.
+    from solana_alpha_lab.factory.collector_operational_packet import build_collector_operational_packet as build
+    return build(**kwargs)
+
+
+def emit_daily_owner_pulse(**kwargs: Any) -> dict[str, Any]:
+    from solana_alpha_lab.factory.collector_owner_pulse import emit_daily_owner_pulse as emit
+    return emit(**kwargs)
 
 STATE_RELATIVE = "local/factory_v1/operability_incident_state.json"
 SNAPSHOT_RELATIVE = "local/factory_v1/operability_collector_snapshot.json"
@@ -178,7 +184,11 @@ def load_collector_snapshot_file(path: Path) -> tuple[str, dict[str, Any] | None
         return "MISSING", None
     try:
         with path.open("rb") as handle:
-            blob = handle.read(COLLECTOR_SNAPSHOT_FILE_MAX_BYTES + 1)
+            if os.fstat(handle.fileno()).st_size > COLLECTOR_SNAPSHOT_FILE_MAX_BYTES:
+                return "INVALID", None
+            blob = handle.read(COLLECTOR_SNAPSHOT_FILE_MAX_BYTES)
+            if os.fstat(handle.fileno()).st_size != len(blob):
+                return "INVALID", None
     except OSError:
         return "INVALID", None
     if len(blob) > COLLECTOR_SNAPSHOT_FILE_MAX_BYTES:
@@ -229,6 +239,10 @@ def classify_incidents(
         found["SUSTAINED_PROVIDER_FAILURE"] = "Provider errors are material."
     if "DISCOVERY_GAP" in classes:
         found["MATERIAL_COVERAGE_DEGRADATION"] = "Discovery gap confirmed."
+    if "PROVIDER_STATE_UNKNOWN" in classes:
+        found["MATERIAL_COVERAGE_DEGRADATION"] = (
+            "Call diagnostics UNKNOWN; inspect scope/timestamps. Provider recovery is not proven."
+        )
     if "CAMPAIGN_SUCCESSOR_REQUIRED" in classes:
         remaining = packet.get("campaign_time_remaining_seconds")
         successor_state = str(packet.get("campaign_successor_state") or "UNKNOWN")
@@ -404,6 +418,9 @@ def evaluate_operability(
     persist: bool | None = None,
     transport: Callable[[str, str, str], None] | None = None,
 ) -> dict[str, Any]:
+    from solana_alpha_lab.factory.observation_schedule import render_utc
+    from solana_alpha_lab.factory.remote_ops import RemoteOpsError
+
     clock = now or datetime.now(UTC)
     if clock.tzinfo is None:
         clock = clock.replace(tzinfo=UTC)
@@ -459,6 +476,12 @@ def evaluate_operability(
 
     for code in list(active):
         if code in present:
+            continue
+        if packet.get("call_diagnostics_status") == "UNKNOWN" and (
+            code == "SUSTAINED_PROVIDER_FAILURE"
+            or (code == "SOURCE_DATA_STALE" and packet.get("source_poll_age") in (None, "UNKNOWN"))
+        ):
+            # Missing diagnostics cannot prove a recovery of an existing incident.
             continue
         record = active.pop(code)
         if record.get("notified") is True:

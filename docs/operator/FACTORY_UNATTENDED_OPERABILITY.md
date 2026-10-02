@@ -1,5 +1,44 @@
 # Factory unattended operability
 
+За минуту проверьте три независимых факта:
+
+| Слой | Что подтверждает работу | Что ещё не доказано |
+|---|---|---|
+| Collector пишет | растут source-poll clocks; при наличии due появляется новая научная публикация | работа watch и доставка Telegram |
+| Watch сообщает | два завершённых запуска; свежий валидный `operability_collector_snapshot.json`; подтверждённая доставка incident/recovery | внешний наблюдатель замечает смерть VPS |
+| Внешнее наблюдение настроено | выбранный владельцем off-host получатель заметил намеренно пропущенный heartbeat | без этого статус `NOT_CONFIGURED`, даже если локальный timer включён |
+
+Симптом OOM watch: collector работает, а snapshot стареет и сообщения замолкают.
+Heartbeat посылается только при свежем snapshot watch: возраст <=1080 секунд;
+missing/stale/invalid → `NO_PING` с typed reason и нулём сетевых вызовов.
+Snapshot доказывает выполнение watch, но не доставку Telegram.
+
+Первая read-only проверка на хосте из `/opt/solana-alpha-lab`:
+
+```sh
+date -u
+cat .factory_deploy_sha
+systemctl show factory-operability-watch.service factory-collector-owner-pulse.service --property=Result,ExecMainStatus,MemoryPeak,MemoryMax,TimeoutStartUSec
+systemctl list-timers factory-operability-watch.timer factory-collector-owner-pulse.timer factory-observation-schedule.timer factory-same-envelope-renewal.timer --no-pager
+journalctl -k --since '24 hours ago' --grep='oom-kill|Out of memory|Killed process' --no-pager -n 20
+stat -c 'snapshot bytes=%s modified=%y' local/factory_v1/operability_collector_snapshot.json
+df -h /opt/solana-alpha-lab
+```
+
+Проверьте snapshot `observed_at`, schema, размер <=65536 байт и freshness
+по текущему clock. Дополните проверку узким `observation_schedule.py status`
+из collector runbook. Не читайте весь ledger и не запускайте старый полный
+packet на хосте после OOM. `PROVIDER_STATE_UNKNOWN` означает непроверяемую
+диагностику: проверьте scope и clocks, не объявляйте провайдера здоровым.
+Heartbeat с настроенным URL и свежим snapshot — реальный HTTPS-запрос;
+не используйте его как read-only probe.
+
+Если два отчётных timer временно отключены, collector и same-envelope renewal
+продолжают свои циклы; incident/recovery и ежедневной Telegram-карточки нет.
+Snapshot становится stale, heartbeat не пингует. Без внешнего получателя
+смерть watch/VPS не даёт доказанного оповещения. Git не фиксирует текущее
+enablement: эти факты устанавливает только датированный VPS readback.
+
 Canonical operator entrypoint for ordinary unattended Factory operations.
 Git owns capability and procedure. The live VPS owns current runtime. This
 file never claims current disk %, archive day, HOT90 stage, or Telegram
@@ -76,7 +115,9 @@ capability.
 
 A future off-host watchdog owns “can anything outside the VPS still hear
 from it?”. This repository provides only a provider-neutral HTTPS GET to
-`FACTORY_EXTERNAL_HEARTBEAT_URL`. Unconfigured is a typed no-op. No URL,
+`FACTORY_EXTERNAL_HEARTBEAT_URL`, conditional on valid fresh watch evidence.
+Snapshot reads are bounded to 65536 bytes; no collector store or operational
+packet is imported. Unconfigured is a typed no-op. No URL,
 account, or provider is in Git.
 
 ## WHAT MESSAGE SHOULD THE OWNER EXPECT?
@@ -103,6 +144,8 @@ Parser footer fields: `MESSAGE_TYPE`, `STATE`, `INCIDENT`, `COLLECTOR_STATE`,
   runtime is `DURABILITY_CUTOVER`/`RETENTION_ACTIVE` with Drive writes
   enabled; otherwise typed no-op. Do not use it as a read-only probe.
 - `scripts/factory_external_heartbeat.py` — no-op unless URL is configured.
+  With a URL it can send a real ping; missing/stale/invalid watch snapshot
+  returns `NO_PING` with zero network calls.
 - `scripts/factory_remote_doctor.py` status/offhost-status surfaces from the
   collector runbook (do not pass `--backup` unless that exact OPERATE atom
   is named).
@@ -158,39 +201,95 @@ exact deploy SHA if required. Do not “rollback” by deleting runtime truth.
 
 ## Commissioning (future OPERATE, not this Git change)
 
-1. Fresh host readback (SHA, HOT90 runtime, services, disk, backup).
-2. Exact live SHA vs exact merged-target SHA review.
-3. Owner-gated exact-SHA deploy.
-4. Post-deploy HOT90 runtime continuity readback.
-5. Owner-gated install/enable of the new **timers** together (heartbeat
-   optional; stays `NOT_CONFIGURED` until separately authorized):
+Это отдельный owner-gated deploy после merge. До него нужен датированный
+readback SHA, backup/archive receipt и exact remote verification, диска,
+collector/source/RDP progression, timer/service state и campaign continuity.
+Неизвестный backup/archive, отсутствующая continuity или остановившийся
+collector — blocker. Авторизация кампании не входит в ремонт отчётов.
 
-```
-sudo systemctl enable --now factory-hot90-closed-day-archive.timer
+1. Сохраните `PREVIOUS_SHA`, точный merged `TARGET_SHA`, подтверждённый
+   `MAIN_SHA` и prior unit state. SHA — 40 lowercase hex. `<SOURCE_REPO>` —
+   существующий source Git repository на host с этими objects; deploy root
+   `/opt/solana-alpha-lab` не содержит `.git`. Отчётные timer оставьте выключенными.
+2. После отдельного разрешения владельца выполните existing release; затем
+   установите только затронутые unit templates:
+
+```sh
+sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_live_release.py --repo <SOURCE_REPO> --deploy-root /opt/solana-alpha-lab --target-sha <TARGET_SHA> --main-sha <MAIN_SHA> --live-sha <PREVIOUS_SHA> --mode canonical-forward
+sudo install -m 0644 configs/factory_remote_ops/factory-operability-watch.service /etc/systemd/system/factory-operability-watch.service
+sudo install -m 0644 configs/factory_remote_ops/factory-collector-owner-pulse.service /etc/systemd/system/factory-collector-owner-pulse.service
+sudo install -m 0644 configs/factory_remote_ops/factory-operability-watch.timer /etc/systemd/system/factory-operability-watch.timer
+sudo install -m 0644 configs/factory_remote_ops/factory-collector-owner-pulse.timer /etc/systemd/system/factory-collector-owner-pulse.timer
+sudo systemctl daemon-reload
 ```
 
+3. Watch dry-run под лимитом; `oneshot` делает TimeoutStartSec ограничением
+   всей команды. Сохраните terminal, wall и memory accounting из вывода `--wait`:
+
+```sh
+sudo systemd-run --unit=factory-watch-commissioning --service-type=oneshot --wait --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab /usr/bin/uv run --locked --managed-python python -B scripts/factory_operability_watch.py --mode dry-run --skip-systemd
 ```
+
+[`systemd-run --wait`](https://raw.githubusercontent.com/systemd/systemd/main/man/systemd-run.xml)
+выводит runtime/exit и доступные accounting data; успешно завершённая transient
+unit может сразу исчезнуть. Не считывайте её отсутствующий MemoryPeak как ноль.
+Если host не отдаёт peak, результат `UNKNOWN` и timer не включать до отдельного
+профиля под теми же лимитами. Требуется peak <512 MiB, wall <120s и exit=0.
+Git fixture evidence не заменяет host проверку. По read-only dry-run preview
+также проверьте snapshot/incident semantics; dry-run snapshot не записывает.
+
+4. Только после PASS включите watch. Подтвердите два последовательных цикла,
+   свежий валидный snapshot, MemoryPeak/время, incident/recovery и Telegram
+   delivery/retry с отдельно разрешённой проверкой. Collector/renewal продолжаются:
+
+```sh
 sudo systemctl enable --now factory-operability-watch.timer
+systemctl show factory-operability-watch.service --property=Result,ExecMainStatus,MemoryPeak
 ```
 
+5. Отдельно выполните bounded pulse dry-run:
+
+```sh
+sudo systemd-run --unit=factory-pulse-commissioning --service-type=oneshot --wait --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab /usr/bin/uv run --locked --managed-python python -B scripts/collector_owner_pulse.py --mode dry-run
 ```
+
+При тех же PASS-критериях включите pulse и подтвердите его реальный запуск
+и daily delivery. Два отчётных timer не включаются одним шагом:
+
+```sh
 sudo systemctl enable --now factory-collector-owner-pulse.timer
+sudo systemctl start factory-collector-owner-pulse.service
+systemctl show factory-collector-owner-pulse.service --property=Result,ExecMainStatus,MemoryPeak
 ```
 
-```
-sudo systemctl enable --now factory-external-heartbeat.timer
+6. Внешний получатель, URL и Telegram-маршрут требуют отдельного решения
+   владельца. До подключения и теста пропущенного heartbeat — `NOT_CONFIGURED`.
+   Fresh watch snapshot сам по себе не доказывает Telegram-доставку.
+
+Stop: OOM, timeout, peak >=512 MiB, wall >=120s, stale/invalid snapshot,
+неустраняемый delivery failure или регрессия collector/source/RDP. Остановите
+только проблемный отчётный timer и его service, если он ещё работает.
+Collector и same-envelope renewal сохраните. Откат — exact SHA:
+
+```sh
+sudo systemctl disable --now <FAILED_REPORT_TIMER>
+sudo systemctl stop <FAILED_REPORT_SERVICE>
+sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_live_release.py --repo <SOURCE_REPO> --deploy-root /opt/solana-alpha-lab --target-sha <PREVIOUS_SHA> --main-sha <MAIN_SHA> --live-sha <CURRENT_LIVE_SHA> --mode canonical-rollback
 ```
 
-That last timer is optional. Skip it unless a heartbeat URL is separately
-authorized.
+Повторно установите обе service templates от rollback tree и выполните
+`daemon-reload`. Если predecessor template не содержит caps, сохраните
+MemoryMax=768M/TimeoutStartSec=180s отдельным операционным drop-in; отчётные
+timer остаются выключенными до повторной commissioning. Подтвердите deploy
+pin и сохранённые состояния collector/renewal. Release дожидается текущего
+oneshot и восстанавливает prior unit state; не убивайте collector и не удаляйте
+`local/`, SQLite, RDP, dedupe, snapshots или receipts. `UNRESOLVED_RECOVERY`
+требует отдельного recovery gate из host runbook; unit вслепую не запускать.
 
-6. One real eligible closed-day archive → Drive → exact SHA → receipt.
-7. Next scheduled or one real DAILY delivery.
-8. Incident dry proof (no Telegram, no state write; cards are in
-   `preview_messages`):
+## Проверка результата через 7 и 30 дней
 
-```
-/usr/bin/uv run --locked --managed-python python -B scripts/factory_operability_watch.py --mode dry-run --skip-systemd
-```
-9. Collector/source progression and mutable backup unchanged.
-10. External heartbeat remains `NOT_CONFIGURED` until separately authorized.
+Один датированный readback на каждом рубеже: OOM/service failures; MemoryPeak
+watch/pulse против роста ledger; source clocks и RDP progression при наличии
+due; backup/archive verification; очередной same-family rollover; факт
+доставки daily и incident/recovery. Это контроль после commissioning, а не
+новая ежедневная ручная процедура или новая automation.

@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import yaml
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -110,7 +111,21 @@ def _parse_json_blob(stdout: str) -> dict:
 class CollectorOwnerPulseCliGitShaRepairTests(unittest.TestCase):
     def test_a_checkout_dry_run_renders(self) -> None:
         """A) Normal repository checkout reaches successful dry-run render."""
-        completed = _run_pulse_cli(cwd=ROOT)
+        # An operational read must not initialize/migrate the default store.
+        local = ROOT / "local"
+        local.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=local) as tmp:
+            fixture = Path(tmp)
+            path = fixture / "fixture.sqlite"
+            store = ObservationScheduleStore(path)
+            store.close()
+            config = yaml.safe_load((ROOT / "configs/observation_schedule_runtime_v1.yaml").read_text())
+            config["ops_store_relative"] = path.relative_to(ROOT).as_posix()
+            config_path = fixture / "runtime.json"
+            config_path.write_text(json.dumps(config), encoding="utf-8")
+            before = path.read_bytes()
+            completed = _run_pulse_cli(cwd=ROOT, extra_args=["--runtime-config", config_path.relative_to(ROOT).as_posix()])
+            self.assertEqual(path.read_bytes(), before)
         self.assertEqual(completed.returncode, 0, completed.stderr)
         self.assertNotIn("TypeError", completed.stderr)
         self.assertNotIn(

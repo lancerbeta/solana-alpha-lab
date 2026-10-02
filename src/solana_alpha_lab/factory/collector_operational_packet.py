@@ -77,6 +77,7 @@ HEALTH_CLASSES = (
     "PROVIDER_AUTH_FAILED",
     "PROVIDER_RATE_LIMITED",
     "PROVIDER_FAILED",
+    "PROVIDER_STATE_UNKNOWN",
     "DISCOVERY_GAP",
     "DISCOVERY_COVERAGE_UNKNOWN",
     "BACKLOG_RISK",
@@ -789,7 +790,7 @@ def _count_x_eligible_24h(
         return UNKNOWN
     seen = 0
     found_x = False
-    for row in store.due_in_states(
+    for row in store.iter_due_in_states(
         (
             "OBSERVED",
             "X_POPULATION_INELIGIBLE",
@@ -798,6 +799,8 @@ def _count_x_eligible_24h(
             "CENSORED",
             "CENSORED_LATE",
         ),
+        schedule_sha256=digest,
+        activation_id=act_id,
         due_at_max=now + timedelta(days=365),
     ):
         if str(row.get("schedule_sha256")) != digest:
@@ -894,6 +897,8 @@ def _live_release_fields(
 def compose_health_classes(packet: Mapping[str, Any]) -> list[str]:
     flags: list[str] = []
     activation_state = str(packet.get("activation_state") or "")
+    if packet.get("call_diagnostics_status") == "UNKNOWN":
+        flags.append("PROVIDER_STATE_UNKNOWN")
     if activation_state == "ACTIVE":
         flags.append("PROCESS_OK")
 
@@ -1025,6 +1030,7 @@ def collector_verdict(health_classes: list[str]) -> str:
         "DATA_STALE",
         "PROVIDER_RATE_LIMITED",
         "PROVIDER_FAILED",
+        "PROVIDER_STATE_UNKNOWN",
         "DISCOVERY_GAP",
         "BACKLOG_RISK",
         "RDP_PUBLICATION_STALE",
@@ -1403,6 +1409,7 @@ def build_collector_operational_packet(
         or UNKNOWN,
         # COLLECTION
         "last_tick_at": base.get("last_tick_at") or UNKNOWN,
+        "call_diagnostics_status": base.get("call_diagnostics_status") or UNKNOWN,
         "last_source_poll_attempt_at": base.get("last_source_poll_attempt_at") or UNKNOWN,
         "last_source_poll_success_at": base.get("last_source_poll_success_at")
         or UNKNOWN,

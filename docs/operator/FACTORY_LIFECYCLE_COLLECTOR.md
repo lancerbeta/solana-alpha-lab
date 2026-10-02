@@ -86,6 +86,26 @@ authority and no provider calls.
 
 ## Routine methods (exact commands)
 
+### Как понять, что collector сохраняет данные
+
+`TICK_COMPLETE` означает завершённый проход планировщика. Он сам по себе не
+доказывает успешный source poll или запись научного RDP. Более поздний
+`HTTP_OK`/успешный source poll подтверждает получение источника; due показывает,
+какая работа должна быть выполнена в данном scope. Научная запись подтверждается
+новой committed publication/manifest и её доступностью в RDP.
+
+`published=0`, когда due отсутствует, — ожидаемый пустой цикл; это не потеря
+данных. При наличии due проверьте state, budget, dependency и publication receipt.
+STARTED не является успехом; восстановление провайдера доказывает только более
+поздний `HTTP_OK` того же primitive. Неверные/будущие timestamps в call diagnostics
+дают `UNKNOWN`, а не нулевой счётчик или здорового провайдера.
+
+Operability читает краткую SQL-проекцию calls за 24h и undated rows, агрегирует
+потоком; старые большие payload не загружаются в Python. Timestamp scan остаётся
+линейным по числу ledger rows; индекс/retention не меняются. Watch работает каждые
+15 минут; безопасность реального запуска проверяется отдельно по
+`FACTORY_UNATTENDED_OPERABILITY.md`.
+
 All host commands: SSH as `factory`, then `cd /opt/solana-alpha-lab`.
 
 ### Read-only

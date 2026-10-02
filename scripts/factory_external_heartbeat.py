@@ -16,7 +16,7 @@ from solana_alpha_lab.factory.external_heartbeat import run_external_heartbeat  
 
 
 def main(argv: list[str] | None = None) -> int:
-    result = run_external_heartbeat()
+    result = run_external_heartbeat(root=ROOT)
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0 if result.get("terminal") in {"NOT_CONFIGURED", "HEARTBEAT_SENT"} else 1
 

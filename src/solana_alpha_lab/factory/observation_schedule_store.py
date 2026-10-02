@@ -28,6 +28,9 @@ _STORE_READ_STATS = {
     "get_candidate_calls": 0,
     "iter_candidates_pages": 0,
     "count_due_in_states_calls": 0,
+    "call_ledger_timestamp_rows_examined": 0,
+    "call_diagnostics_rows_returned": 0,
+    "call_payloads_decoded": 0,
 }
 
 
@@ -2479,6 +2482,49 @@ class ObservationScheduleStore:
             payload["payload"] = json.loads(payload["payload_json"])
             decoded.append(payload)
         return decoded
+
+    def iter_operability_calls(self, *, window_start: datetime) -> Iterator[dict[str, Any]]:
+        """Recent/undated scalar diagnostics, never full historical payloads.
+
+        No migration/index or fallback. One timestamp-only scan excludes old
+        rows before SQLite projects JSON fields. The cursor has no ORDER BY
+        or temporary all-call result. Python retains only one projected row.
+        Invalid timestamps remain visible so the consumer can fail closed.
+        """
+        def timestamp_key(updated: object, created: object) -> str:
+            _STORE_READ_STATS["call_ledger_timestamp_rows_examined"] += 1
+            try:
+                parsed = parse_utc(updated or created)
+                return parsed.isoformat(timespec="microseconds").replace("+00:00", "Z")
+            except (ValueError, TypeError, OverflowError):
+                return "~"  # Invalid sorts beyond valid UTC keys; never excluded.
+
+        self._conn.create_function("smial_operability_time", 2, timestamp_key, deterministic=True)
+        fields = ("schedule_sha256", "activation_id", "http_class", "status", "missing_reason")
+        valid_object = "json_valid(payload_json) AND json_type(payload_json) = 'object'"
+        document = f"CASE WHEN json_valid(payload_json) THEN CASE WHEN json_type(payload_json) = 'object' THEN payload_json ELSE '{{}}' END ELSE '{{}}' END"
+        extracts = []
+        shape_checks = []
+        for field in fields:
+            kind = f"json_type({document}, '$.{field}')"
+            value = f"json_extract({document}, '$.{field}')"
+            extracts.append(f"CASE WHEN {kind} = 'text' THEN substr({value}, 1, 512) END AS {field}")
+            shape_checks.append(f"({kind} IS NULL OR {kind} = 'null' OR ({kind} = 'text' AND length({value}) <= 512))")
+        # CASE, not AND, guards json_type from malformed JSON evaluation.
+        validity = f"CASE WHEN json_valid(payload_json) THEN CASE WHEN {valid_object} AND {' AND '.join(shape_checks)} THEN 1 ELSE 0 END ELSE 0 END"
+        cursor = self._conn.execute(
+            f"SELECT primitive_id, state, created_at, updated_at, {', '.join(extracts)}, {validity} AS diagnostics_payload_valid "
+            "FROM call_ledger WHERE smial_operability_time(updated_at, created_at) >= ?",
+            (window_start.astimezone(UTC).isoformat(timespec="microseconds").replace("+00:00", "Z"),),
+        )
+        try:
+            for row in cursor:
+                _STORE_READ_STATS["call_diagnostics_rows_returned"] += 1
+                projected = dict(row)
+                projected["payload"] = {field: projected.pop(field) for field in fields}
+                yield projected
+        finally:
+            cursor.close()
 
     def list_calls(self, *, primitive_id: str | None = None) -> list[dict[str, Any]]:
         if primitive_id:

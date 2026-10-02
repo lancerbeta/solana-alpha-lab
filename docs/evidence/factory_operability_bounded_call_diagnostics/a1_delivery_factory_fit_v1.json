@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-OPERABILITY-BOUNDED-CALL-FIT-001",
+  "as_of": "2026-10-02",
+  "task_id": "FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "HOST_COMMISSIONING_AND_2026_10_03_SUCCESSOR_READBACK"
+  },
+  "dimensions": {
+    "mission": "PASS resource-safe operability preserves collection instead of building monitoring infrastructure",
+    "flexibility_and_history": "PASS no scientific/history rewrite, retention or index migration",
+    "context_efficiency": "PASS one exact task and offline fixture profiles",
+    "research_truth": "PASS campaign and same-primitive recovery preserved; invalid/future diagnostics UNKNOWN",
+    "owner_operability": "PASS three independent states, cheap checks, staged commissioning and exact rollback",
+    "execution_to_cashflow": "PASS indirect collection safety, no alpha or cashflow claim",
+    "monitoring_and_recovery": "PASS watch/pulse caps and fresh-snapshot conditional heartbeat; no Telegram proof inferred from snapshot",
+    "build_vs_buy": "PASS existing SQL, stores, iterators, dedupe and Delivery Harness; no dependency or service",
+    "security": "PASS zero provider/credential/network/live actions except authorized GitHub delivery transport",
+    "red_team": "PASS full-packet and twofold history tests; host result remains UNKNOWN"
+  },
+  "limits": [
+    "NO_LIVE_MEMORYPEAK_PROOF",
+    "NO_LIVE_TELEGRAM_PROOF",
+    "LINEAR_LEDGER_TIMESTAMP_SCAN",
+    "NO_DEPLOY",
+    "EXTERNAL_RECEIVER_NOT_CONFIGURED"
+  ],
+  "recovery": "REVERT_GIT; SEPARATE_OWNER_GATED_EXACT_SHA_ROLLBACK_WITH_REPORT_TIMERS_OFF"
+}

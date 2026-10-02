@@ -6603,6 +6603,16 @@
       "target_asset_id": "CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001"
     },
     {
+      "source_asset_id": "EVIDENCE-FACTORY-OPERABILITY-BOUNDED-CALL-RESOURCES-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-FACTORY-OPERABILITY-RESOURCE-PROFILE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-OPERABILITY-BOUNDED-CALL-RESOURCES-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-RUNTIME-001"
@@ -14048,6 +14058,21 @@
       "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FACTORY-UNATTENDED-OPERABILITY-001"
+    },
+    {
+      "source_asset_id": "REPORT-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-OPERABILITY-BOUNDED-CALL-RESOURCES-001"
+    },
+    {
+      "source_asset_id": "REPORT-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001"
+    },
+    {
       "source_asset_id": "REPORT-FACTORY-ORDINARY-HYPOTHESIS-OWNER-READOUT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001"
@@ -15448,6 +15473,16 @@
       "target_asset_id": "CTRL-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
     },
     {
+      "source_asset_id": "SCRIPT-FACTORY-OPERABILITY-RESOURCE-PROFILE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-COLLECTOR-READ-MODEL-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-FACTORY-OPERABILITY-RESOURCE-PROFILE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001"
+    },
+    {
       "source_asset_id": "SCRIPT-FACTORY-ORDINARY-MARKET-HYPOTHESIS-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001"
@@ -16731,6 +16766,16 @@
       "source_asset_id": "TEST-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-HOT90-RUNTIME-ACTIVATION-BOUNDARY-REPAIR-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-COLLECTOR-READ-MODEL-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-OPERABILITY-MEMORY-COLLISION-REPAIR-001",

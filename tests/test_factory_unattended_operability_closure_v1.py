@@ -684,10 +684,18 @@ class IncidentDailyHeartbeatUtcTests(unittest.TestCase):
             seen.append(url)
             return 204
 
-        sent = run_external_heartbeat(
-            environ={HEARTBEAT_ENV: "https://example.invalid/hb"},
-            transport=transport,
-        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            snapshot_path = root / SNAPSHOT_RELATIVE
+            snapshot_path.parent.mkdir(parents=True)
+            snapshot_path.write_text(json.dumps(build_collector_snapshot(
+                {"health_classes": []}, observed_at=NOW.isoformat().replace("+00:00", "Z")
+            )), encoding="utf-8")
+            sent = run_external_heartbeat(
+                root=root, now=NOW,
+                environ={HEARTBEAT_ENV: "https://example.invalid/hb"},
+                transport=transport,
+            )
         self.assertEqual(sent["terminal"], "HEARTBEAT_SENT")
         self.assertEqual(seen, ["https://example.invalid/hb"])
         self.assertFalse(sent["url_logged"])

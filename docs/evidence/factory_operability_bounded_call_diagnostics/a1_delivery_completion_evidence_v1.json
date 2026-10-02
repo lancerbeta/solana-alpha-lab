@@ -1,0 +1,64 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-OPERABILITY-BOUNDED-CALL-COMPLETION-001",
+  "as_of": "2026-10-02",
+  "task_id": "FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1",
+  "state_change": "GIT_CANDIDATE_FOR_EXACT_HEAD_CI_AND_MERGE_READINESS",
+  "base_main": "5263abdd327455f239767c0c31855909f90435b7",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_operability_bounded_call_diagnostics/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_117_FOCUSED_TESTS_AND_16_RESOURCE_PROFILES",
+    "independent_review": {
+      "path": "docs/evidence/factory_operability_bounded_call_diagnostics/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_BOUNDED_READ_VERTICAL_CONSUMERS",
+      "PASS_SCOPE_TIMESTAMP_AND_RECOVERY_EDGE_TRUTH",
+      "PASS_DOUBLE_HISTORY_MEMORY_SCALE",
+      "PASS_2_GIB_SYNTHETIC_STORE_WATCH_PULSE_ENVELOPE",
+      "PASS_FAKE_TELEGRAM_DELIVERY_RETRY_DEDUPE_RECOVERY"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_DEPLOY",
+    "NO_VPS_MUTATION",
+    "NO_LIVE_SQLITE_MUTATION",
+    "NO_LIVE_TELEGRAM_SEND",
+    "NO_LIVE_MEMORYPEAK_PROOF",
+    "NO_PROVIDER_CALLS",
+    "NO_CAMPAIGN_AUTHORITY_CHANGE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "live_telegram_sends": 0,
+    "live_database_mutations": 0,
+    "credentials_read": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

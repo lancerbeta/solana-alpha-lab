@@ -5,6 +5,8 @@ from __future__ import annotations
 import os
 import urllib.error
 import urllib.request
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any, Callable, Mapping
 
 HEARTBEAT_ENV = "FACTORY_EXTERNAL_HEARTBEAT_URL"
@@ -17,6 +19,8 @@ def run_external_heartbeat(
     environ: Mapping[str, str] | None = None,
     transport: Callable[[str], int] | None = None,
     timeout_seconds: int = 5,
+    root: Path | None = None,
+    now: datetime | None = None,
 ) -> dict[str, Any]:
     env = environ if environ is not None else os.environ
     url = str(env.get(HEARTBEAT_ENV) or "").strip()
@@ -32,6 +36,18 @@ def run_external_heartbeat(
             "network_calls": 0,
             "url_logged": False,
         }
+    from solana_alpha_lab.factory.operability_watch import (
+        SNAPSHOT_RELATIVE, evaluate_collector_snapshot_freshness, load_collector_snapshot_file,
+    )
+
+    repository_root = root if root is not None else Path(__file__).resolve().parents[3]
+    state, snapshot = load_collector_snapshot_file(repository_root / SNAPSHOT_RELATIVE)
+    age = None
+    if state == "PRESENT" and snapshot is not None:
+        state, age = evaluate_collector_snapshot_freshness(snapshot["observed_at"], now=now or datetime.now(UTC))
+    if state != "FRESH":
+        return {"terminal": "NO_PING", "reason": f"WATCH_SNAPSHOT_{state}",
+                "network_calls": 0, "url_logged": False, "snapshot_age_seconds": age}
     if transport is not None:
         status = transport(url)
         return {
