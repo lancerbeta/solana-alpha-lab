@@ -30,11 +30,11 @@ V1 epoch: `ae771cf5c1e7692c007b442c0048e7547005dc09125eeb9eb75e24406e429749`.
 V2 epoch: `4896afd0e029f08032247e80b24d01e94bdbdd1ee702c176871aa52a69c3a495`.
 Это смена версии хеша, а не новый scientific market.
 
-Validation на исправленном кандидате: 29 V2/budget tests PASS; полный
-owner-gold 54 PASS; два ordinary consumer tests PASS; direct preflight 19
-tests — 18 PASS и один существующий non-critical skip. Новых skips нет.
-Exact-head CI и owner merge gate проверяются отдельно; локальные tests не
-означают delivery DONE.
+Финальный focused validation: 30 V2/budget и 29 identity/direct consumer
+tests PASS; preflight — 18 PASS и один существующий non-critical skip.
+Полный owner-gold 54 PASS относится к фазе до последнего conflict guard.
+Финальный полный suite ждёт exact-head CI; owner merge gate проверяется
+отдельно. Локальные tests не означают delivery DONE. Новых skips нет.
 
 Независимые critics выявили и потребовали закрыть alias-профиль manifest,
 missing LIVE labels/fence и восстановление явного NULL reservation.
