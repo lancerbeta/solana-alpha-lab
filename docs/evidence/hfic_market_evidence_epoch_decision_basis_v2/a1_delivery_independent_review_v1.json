@@ -15,49 +15,34 @@
   "reviews": [
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "packet_fingerprint_sha256=ad63e91ca151faa551ec8a66ee15d7665699dcbdd424bd32c4db82b0fedc08f0",
-        "PASS: publication-only wrappers are excluded from scientific hash and cannot reset proven occupancy; current canonical integrity remains mandatory.",
-        "PASS: malformed manifest aliases, incomplete LIVE required labels and invalid current inputs produce typed STOP rather than new market.",
-        "PASS: validated V1 membership counts occupied quota/slots; ambiguous V1 continuity blocks; explicit NULL reservation is never restored.",
-        "PASS: verified new synthetic cohort/source/content/PIT creates a new market; separate owner look authority remains required.",
-        "Tests can still pass for incorrect source availability timestamps or overlapping cohorts. Identity/integrity does not prove source PIT quality, statistical independence or alpha; input retains NOT_EVALUATED PIT semantics.",
-        "PACKET_INFORMATION_PATH isolated; model diversity UNPROVEN; no real store/C4/scientific operation."
+        "Prior review is stale after exact-head CI remediation; fresh isolated review required."
       ]
     },
     {
       "role": "CODE_REVIEWER",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "PASS exact frozen inventory and direct production consumers; no blocking code findings.",
-        "Canonical filename/parsed ID binding closes alias bypass; missing mandatory LIVE fields fail closed using existing REQUIRED_LABELS; explicit NULL reservation remains UNKNOWN.",
-        "Generic optional reuse flag matches actual bool-default; proven V1 scope retains budgets and same-slot occupancy.",
-        "Four-role required review plan is adequate; no heavy rerun or real data access."
+        "Prior review is stale after exact-head CI remediation; fresh isolated review required."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "PASS scoped outcome and all DoD/non-claims; metadata/schema invariance, new scientific evidence and integrity STOP covered.",
-        "Scoped C1-C3 receipt compares every budget field except algorithm identity hash and unchanged scoped inventory: AUTO=1 focus=3 remaining=0.",
-        "Focused validation: 29 V2/budget, 54 owner-gold, 2 ordinary PASS; preflight 18 PASS plus one existing skip, no new skip.",
-        "No scientific acceptance or merge claim; ambiguous V1 continuity remains blocked."
+        "Prior review is stale after exact-head CI remediation; fresh isolated review required."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "PASS corrected exact operator path: forge-run --no-write reads saved artifacts; preflight JSON search_budget carries counters.",
-        "--no-auto-commission sets persist=False and disables commissioning/context persistence; no new session/look.",
-        "MARKET_EPOCH_CONTINUITY_UNRESOLVED gives actionable proof/read-only recovery and forbids history rewrite, quarantine/reset or new session.",
-        "No stronger owner claim, scientific acceptance or merge readiness inferred."
+        "Prior review is stale after exact-head CI remediation; fresh isolated review required."
       ]
     }
   ],
-  "verdict": "PASS",
+  "verdict": "NOT_READY",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "MODEL_DIVERSITY_UNPROVEN",

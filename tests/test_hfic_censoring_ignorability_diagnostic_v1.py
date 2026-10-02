@@ -23,7 +23,6 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from solana_alpha_lab.contracts.schema_v1 import DatasetManifest
 from solana_alpha_lab.factory.capabilities import (
     CAPABILITY_ROUTER,
     CapabilityError,
@@ -73,6 +72,7 @@ from solana_alpha_lab.factory.live_cohort_source_bundle import (
     sha256_file_streaming,
 )
 from solana_alpha_lab.storage.manifests import (
+    build_dataset_manifest,
     build_partition_manifest,
     canonical_manifest_bytes,
     compute_dataset_manifest_id,
@@ -321,20 +321,6 @@ def _publish_dataset(
 ) -> str:
     created = datetime(2026, 9, 13, 11, 57, 49, tzinfo=UTC)
     manifest_id = compute_dataset_manifest_id(dataset_id, dataset_version)
-    dataset = DatasetManifest(
-        dataset_manifest_id=manifest_id,
-        dataset_id=dataset_id,
-        dataset_version=dataset_version,
-        schema_id="SCHEMA-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
-        schema_sha256="ab" * 32,
-        dataset_fingerprint="cd" * 32,
-        generation_task_id="LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1",
-        generation_run_id=f"import-{manifest_id[-16:]}",
-        validation_receipt_sha256="ef" * 32,
-        first_reliable_available_at=created,
-        created_at=created,
-        content_sha256="11" * 32,
-    )
     census_part = build_partition_manifest(
         dataset_id=dataset_id,
         dataset_version=dataset_version,
@@ -368,6 +354,34 @@ def _publish_dataset(
     manifests = data_root / "datasets" / "manifests"
     partitions = manifests / "partitions"
     partitions.mkdir(parents=True, exist_ok=True)
+    source_sha = hashlib.sha256((census_sha + obs_sha).encode("ascii")).hexdigest()
+    validation_bytes = json.dumps(
+        {
+            "corpus_composition": [{
+                "cohort_id": cohort_id,
+                "release_id": release_id,
+                "content_sha256": source_sha,
+            }],
+            "partition_manifest_ids": sorted([
+                census_part.partition_manifest_id,
+                obs_part.partition_manifest_id,
+            ]),
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    dataset = build_dataset_manifest(
+        dataset_id=dataset_id,
+        dataset_version=dataset_version,
+        schema_id="SCHEMA-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+        schema_sha256="ab" * 32,
+        generation_task_id="LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1",
+        generation_run_id=f"import-{manifest_id[-16:]}",
+        validation_receipt_sha256=hashlib.sha256(validation_bytes).hexdigest(),
+        first_reliable_available_at=created,
+        created_at=created,
+        partitions=[census_part, obs_part],
+    )
     (manifests / f"{manifest_id}.json").write_bytes(canonical_manifest_bytes(dataset))
     (partitions / f"{census_part.partition_manifest_id}.json").write_bytes(
         canonical_manifest_bytes(census_part)
@@ -375,32 +389,34 @@ def _publish_dataset(
     (partitions / f"{obs_part.partition_manifest_id}.json").write_bytes(
         canonical_manifest_bytes(obs_part)
     )
-    source_sha = hashlib.sha256((census_sha + obs_sha).encode("ascii")).hexdigest()
     (manifests / f"{manifest_id}.published").write_text(
         json.dumps(
             {
                 "dataset_manifest_id": manifest_id,
-                "dataset_fingerprint": "cd" * 32,
+                "dataset_fingerprint": dataset.dataset_fingerprint,
             },
             sort_keys=True,
         ),
         encoding="utf-8",
     )
-    (manifests / f"{manifest_id}.validation.json").write_text(
-        json.dumps(
-            {
-                "corpus_composition": [
-                    {
-                        "cohort_id": cohort_id,
-                        "release_id": release_id,
-                        "content_sha256": source_sha,
-                    }
-                ]
-            },
-            sort_keys=True,
-        ),
-        encoding="utf-8",
-    )
+    (manifests / f"{manifest_id}.validation.json").write_bytes(validation_bytes)
+    if dataset_id == FROZEN_DATASET:
+        from solana_alpha_lab.factory.live_cohort_discovery_release import REQUIRED_LABELS
+
+        (manifests / f"{manifest_id}.labels.json").write_text(
+            json.dumps({
+                **REQUIRED_LABELS,
+                "logical_dataset_id": dataset_id,
+                "yield_eligible": census_n,
+                "base_X": census_n,
+                "yield_missing": 0,
+                "feature_families": [],
+                "dataset_terminal": "SAMPLE_VALID",
+                "corpus_version": 1,
+                "is_current_corpus_version": True,
+            }, sort_keys=True),
+            encoding="utf-8",
+        )
     return manifest_id
 
 

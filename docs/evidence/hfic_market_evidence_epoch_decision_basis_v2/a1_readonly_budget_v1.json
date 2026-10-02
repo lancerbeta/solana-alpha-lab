@@ -134,12 +134,55 @@
       "existing_skipped": 1
     },
     "git_diff_check": "PASS",
-    "factory_static": "PASS"
+    "factory_static": "PASS",
+    "ci_remediation": {
+      "failed_head": "a71dfdadfbafafa9371101e3e8692795a11e0dce",
+      "failed_run": 36941236944,
+      "temporal_cli_dual_root": {
+        "count": 1,
+        "verdict": "PASS",
+        "production_fix": "Carry the validated canonical market root through both ordinary gates; explicit row root stays separate."
+      },
+      "closure_and_historical_basis": {
+        "count": 2,
+        "verdict": "PASS"
+      },
+      "selection_gate": {
+        "count": 1,
+        "verdict": "PASS"
+      },
+      "ladder_freeze_readback": {
+        "count": 27,
+        "verdict": "PASS"
+      },
+      "vanilla_and_saved_revision": {
+        "count": 2,
+        "verdict": "PASS"
+      },
+      "v2_and_budget": {
+        "count": 29,
+        "verdict": "PASS"
+      },
+      "owner_gold": {
+        "count": 54,
+        "verdict": "PASS"
+      },
+      "censoring_fixture_consumers": {
+        "count": 54,
+        "verdict": "PASS_IN_MIXED_RUN_WITH_TWO_SEPARATE_LOCAL_LIVE_SMOKE_FAILURES"
+      },
+      "forge_input_synthetic": {
+        "count": 11,
+        "verdict": "PASS"
+      },
+      "new_exact_head_ci": "REQUIRED_LIVE_BEFORE_MERGE_READINESS"
+    }
   },
   "limitations": [
     "Read-only proof is scoped to dataset metadata, current canonical corpus parquet and committed ResearchStore inventory; not every byte in the data plane.",
     "One existing non-critical preflight skip remains; no new skip introduced.",
-    "No scientific run, no real C4 access, no acceptance or merge authority."
+    "No scientific run, no real C4 access, no acceptance or merge authority.",
+    "A broader local consumer run automatically read the installed C1-C3 v3 plane. Its byte/mtime inventory stayed unchanged; two legacy LIVE smoke assertions failed (hard-coded v2 and expected preflight receipt absent). They are not claimed PASS, not rewritten in this atom, and excluded from the isolated synthetic rerun. Required real-budget proof remains separately scoped."
   ],
   "post_review_corrected_code_readback": "Same saved C1-C3 epoch and every budget field confirmed; no real mutation."
 }

@@ -67,3 +67,25 @@ quota/estimand changes, provider/deploy и LIVE repair.
 `LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2`.
 Factory Fit FULL_REVIEW. Capability radar NOW=NONE; WATCH=metadata repair
 must retain the V2 scientific projection and verify integrity before publish.
+
+## Exact-head CI remediation
+
+CI on a71dfdadfbafafa9371101e3e8692795a11e0dce failed. The temporal CLI
+recomputed ordinary admission from the explicit row root after validating the
+canonical market/store root. Both gates now retain the validated market root;
+invalid identity remains a typed STOP. The original failing vertical test PASS.
+
+Fixture corrections retain integrity and continuity checks: canonical roots
+use real builder/fingerprint/receipt hashes and required LIVE labels; frozen
+priors carry a verified earlier synthetic basis; ladder freeze/readback use the
+same effective payload; the vanilla oracle includes verified partition claims;
+source/revision selection is checked in both storage orders.
+
+Focused remediation PASS: closure 2, selection 1, ladder 27, vanilla/revision 2,
+V2/budget 29, full owner-gold 54, censoring consumers 54, synthetic Forge input 11.
+A broader local consumer run also automatically read the installed C1-C3 v3
+plane. Its inventory remained unchanged. Two legacy LIVE smoke assertions
+failed: hard-coded corpus v2 and expected preflight receipt absent. They remain
+explicit limitations, not PASS or a newly skipped assertion; the isolated rerun
+selects synthetic cases only. No real repair, C4, or scientific operation.
+Fresh review, evidence binding and new exact-head CI remain mandatory.

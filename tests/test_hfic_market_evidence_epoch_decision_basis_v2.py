@@ -288,13 +288,22 @@ class ScientificMarketV2Tests(unittest.TestCase):
                     self.current()
 
     def test_ordinary_gate_translates_integrity_failure(self):
-        from solana_alpha_lab.factory.hfic_ordinary_operation import _admit, OrdinaryOperationError
+        from solana_alpha_lab.factory.hfic_ordinary_operation import (
+            _admit, _assert_preflight_journal, OrdinaryOperationError,
+        )
         from solana_alpha_lab.factory.research_store import ResearchStore
         epoch, _ = self.current()
         path = self.labels_path()
         path.write_bytes(b"{corrupted")
         with self.assertRaisesRegex(OrdinaryOperationError, "MARKET_EVIDENCE_BASIS_INCOMPLETE"):
             _admit(ResearchStore(self.data), {"market_evidence_epoch_sha256": epoch, "owner_focus": "AUTO"}, repo_root=ROOT, data_root=self.data)
+        with self.assertRaisesRegex(OrdinaryOperationError, "MARKET_EVIDENCE_BASIS_INCOMPLETE"):
+            _assert_preflight_journal(
+                ResearchStore(self.data),
+                {"market_evidence_epoch_sha256": epoch, "owner_focus": "AUTO"},
+                "UNUSED-BECAUSE-INTEGRITY-STOPS-FIRST",
+                repo_root=ROOT, data_root=self.data,
+            )
 
     def test_lineage_tamper_is_incomplete_not_new_market(self):
         path = self.data / "datasets/live_lifecycle_corpus/lineage.json"

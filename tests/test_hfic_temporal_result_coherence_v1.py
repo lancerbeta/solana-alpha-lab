@@ -986,7 +986,11 @@ class SavedResultRevisionVerticalTests(unittest.TestCase):
 
             # 5. The revision: same question, same input, lineage, no new MAIN.
             looks = _journal_looks(data_root, journal)
-            source, revision = looks
+            source = next(item for item in looks if item["record_id"] == v3_ref)
+            revision = next(
+                item for item in looks
+                if (item.get("revision_of") or {}).get("record_id") == v3_ref
+            )
             self.assertEqual(source["record_id"], v3_ref)
             self.assertEqual(revision["calculation_version"], TEMPORAL_CALCULATION_VERSION)
             self.assertEqual(revision["look_class"], "CALCULATION_REVISION")
@@ -1018,11 +1022,12 @@ class SavedResultRevisionVerticalTests(unittest.TestCase):
             self.assertEqual(
                 next(r.payload_json for r in store.iter_committed_records() if r.record_id == v3_ref), v3_payload
             )
-            # The earliest stored row would shadow the revision under first-match selection.
-            first_match = next(
-                item for item in looks if item.get("operation_sha256") == op_sha and item.get("spec_sha256") == source["spec_sha256"]
-            )
-            self.assertEqual(first_match["record_id"], v3_ref)
+            # Storage order is not causal order; the production selector must
+            # follow revision lineage in either partition-hash ordering.
+            from solana_alpha_lab.factory.hfic_ordinary_operation import _operation_result
+            for ordered in ([source, revision], [revision, source]):
+                selected = _operation_result(ordered, op_sha, source["spec_sha256"])
+                self.assertEqual(selected["record_id"], revision["record_id"])
 
             # 6. Ordinary replay returns the revision without the evaluator, here and in a new process.
             with mock.patch.object(temporal, "execute_temporal_discovery", counting):

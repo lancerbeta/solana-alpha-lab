@@ -33,6 +33,12 @@ managed_write_set:
   - tests/test_forge_evidence_identity_and_owner_gold_v1.py
   - tests/test_hfic_search_budget_epoch_guard_v1.py
   - tests/test_hfic_preflight.py
+  - tests/test_live_cohort_to_forge_operational_closure_v1.py
+  - tests/test_hfic_censoring_ignorability_diagnostic_v1.py
+  - tests/test_forge_input_truth_and_visibility_v1.py
+  - tests/test_forge_representation_ladder_v1.py
+  - tests/test_live_cohort_vanilla_owner_path_v1.py
+  - tests/test_hfic_temporal_result_coherence_v1.py
   - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
   - docs/reports/hfic_market_evidence_epoch_decision_basis_v2/a1_owner_readout_v1.md
   - docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_readonly_budget_v1.json

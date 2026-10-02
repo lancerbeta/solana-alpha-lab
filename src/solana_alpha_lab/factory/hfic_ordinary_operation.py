@@ -301,11 +301,17 @@ def _assert_preflight_journal(
 
     from pathlib import Path
 
-    from solana_alpha_lab.factory.hfic_evidence_identity import compute_split_identity
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        EvidenceIdentityError,
+        compute_split_identity,
+    )
     from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
     from solana_alpha_lab.factory.hfic_session import PROMPT_VERSION, search_key_sha256
 
-    split = compute_split_identity(Path(repo_root), Path(data_root), store=store)
+    try:
+        split = compute_split_identity(Path(repo_root), Path(data_root), store=store)
+    except EvidenceIdentityError as exc:
+        raise OrdinaryOperationError(str(exc)) from exc
     epoch = str(split.get("market_evidence_epoch_sha256") or "")
     if epoch != str(operation.get("market_evidence_epoch_sha256") or ""):
         raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")

@@ -32288,7 +32288,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: a7c124b348e19b878e4f08099310e4b11327ce79cc84069d38b8f648f2a4d2c7}
+  integrity: {kind: sha256, sha256: 22e83da8dd88988100b30733e60cd85af06b72c60d738507f191311bb618eff2}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34212,7 +34212,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_cohort_to_forge_operational_closure_v1.py', repository_path: tests/test_live_cohort_to_forge_operational_closure_v1.py}
-  integrity: {kind: sha256, sha256: 59c58849a62ff4a7f452aacbfc3eebbef69983a7af1115f2ecffd105f6616d47}
+  integrity: {kind: sha256, sha256: 2ee5470fd79d7afe451e8fee7ed147d708884ac74a86dd62231e086fe60cb2de}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37800,7 +37800,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_censoring_ignorability_diagnostic_v1.py', repository_path: tests/test_hfic_censoring_ignorability_diagnostic_v1.py}
-  integrity: {kind: sha256, sha256: b56ae9d5372f30b1a8830008810c398105844a50ef19d2234f0411bf5b62c56a}
+  integrity: {kind: sha256, sha256: 26b388ba371ae6449faddc04a56fbec4c13bd9afe136109e591133472571f9a1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001}
@@ -38346,7 +38346,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_INPUT_TRUTH_AND_VISIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_forge_input_truth_and_visibility_v1.py', repository_path: tests/test_forge_input_truth_and_visibility_v1.py}
-  integrity: {kind: sha256, sha256: 0bedd96c5fdfb9935ae4b643adcb0381c14ae2971b7a569f7af048a643c841ff}
+  integrity: {kind: sha256, sha256: 786caacc6b9b756c899d3807aeb766c04cc1629bcdc0604329a3eb2a4123f50e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001}
@@ -38444,7 +38444,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_REPRESENTATION_LADDER_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_forge_representation_ladder_v1.py', repository_path: tests/test_forge_representation_ladder_v1.py}
-  integrity: {kind: sha256, sha256: 208d906615f4d6a83ec00ead1b554a761f192f4c7148f322ed4b85b8a0de7c38}
+  integrity: {kind: sha256, sha256: d42c563c40397140f9b45f376afe0161a245898f09fb62c11ef55d5a7db6e7b7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}
@@ -38749,7 +38749,7 @@ records:
     repository_path: docs/tasks/HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2.md
   integrity:
     kind: sha256
-    sha256: 5242d19aca75d9e15425f6b94b42172672c2afc809557f865e235719509c0a5e
+    sha256: 16e6996a2da443731625b3dec04fbea7e0dc9d5633c9e4f9ec2fd892c33736bd
   access:
     mode: read_only
     method: file
@@ -38791,7 +38791,7 @@ records:
     repository_path: tests/test_hfic_market_evidence_epoch_decision_basis_v2.py
   integrity:
     kind: sha256
-    sha256: 1cee11bd370828ba777bbddf74fd5279ecdfe33d2099f2947c5453269ed425da
+    sha256: 48bbc1dba9b644ca217fe8eb4d978eb7f3228c2deed725993e7dd42ea9dc4f4c
   access:
     mode: read_only
     method: file
@@ -38831,7 +38831,7 @@ records:
     repository_path: docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_readonly_budget_v1.json
   integrity:
     kind: sha256
-    sha256: 400b99cf07bbbd9155ddb1033e0420cf19d146a023f2800e2d7bf0d158953c01
+    sha256: 4499aa7c9a2fd548066441af725328fbe9f6db19b49f1de09f5e30ff8766c903
   access:
     mode: read_only
     method: file
@@ -38868,7 +38868,7 @@ records:
     repository_path: docs/reports/hfic_market_evidence_epoch_decision_basis_v2/a1_owner_readout_v1.md
   integrity:
     kind: sha256
-    sha256: ebba1bd570e98be176ce7e227284acb51a9990c201757da77487409875561ecc
+    sha256: 12eefcfc66e0a6971d1cfaca5e17d58b25610cd82b600b0ab4ff530e290ad74f
   access:
     mode: read_only
     method: file

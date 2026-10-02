@@ -213,29 +213,12 @@ def _production_control_preflight(
         search_key_sha256,
     )
 
-    def _enumerate_production(_root: Path, **_kwargs: object):
-        # Fixture enumerate returns thin rows; stamp the same evidence_role /
-        # feature fields real enumerate_rdp_datasets emits so the production
-        # packet writer is exercised without replacing it.
-        live, warnings = _enumerate_live(_root)
-        enriched: list[dict[str, object]] = []
-        for item in live:
-            row = dict(item)
-            row.setdefault("evidence_role", "UNSPECIFIED")
-            row.setdefault("feature_families", [])
-            row.setdefault("feature_hint", None)
-            row.setdefault("feature_usable", True)
-            row.setdefault("yield_missing", 0)
-            row.setdefault("dataset_terminal", None)
-            enriched.append(row)
-        return enriched, warnings
-
     git = repository_git_snapshot(repo_root)
     from solana_alpha_lab.factory.hfic_evidence_identity import compute_split_identity
 
     with patch(
         "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-        side_effect=_enumerate_production,
+        side_effect=_enumerate_live,
     ):
         from solana_alpha_lab.factory.forge_input_receipt import (
             build_forge_input_receipt,
@@ -286,6 +269,7 @@ def _production_control_preflight(
         "forge_input_receipt": forge_input,
         # Same production split axes as run_preflight / forge-input admission.
         "market_evidence_epoch_sha256": split["market_evidence_epoch_sha256"],
+        "market_evidence_basis": split["market_evidence_basis"],
         "capability_epoch_sha256": split["capability_epoch_sha256"],
         "legacy_combined_evidence_epoch_sha256": split[
             "legacy_combined_evidence_epoch_sha256"
@@ -1892,6 +1876,7 @@ def _v2_preflight(
     )
     return {
         "receipt_id": "HFIC-PREFLIGHT-V2-FIXTURE-001",
+        "market_evidence_basis": split["market_evidence_basis"],
         "evidence_epoch_sha256": market_epoch,
         "market_evidence_epoch_sha256": market_epoch,
         "capability_epoch_sha256": capability_epoch,

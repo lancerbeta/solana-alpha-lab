@@ -50,11 +50,11 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_29_V2_BUDGET_54_GOLD_2_ORDINARY_19_PREFLIGHT_ONE_EXISTING_SKIP",
+    "targeted": "PASS_V2_BUDGET_29_GOLD_54_ORDINARY_2_PREFLIGHT_18_PLUS_1_EXISTING_SKIP_CI_FAILURE_CASES_AND_SYNTHETIC_CONSUMERS",
     "independent_review": {
       "path": "docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_delivery_independent_review_v1.json",
       "sha256": "5374287e9bce19cd4b28764bdb261fc9c6d4bf3f1c7411d5a0d913bce00995f2",
-      "verdict": "PASS"
+      "verdict": "NOT_READY"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
@@ -66,7 +66,10 @@
       "PASS_PREFLIGHT_19_ONE_EXISTING_SKIP",
       "PASS_FACTORY_STATIC",
       "PASS_C1_C3_READONLY_BUDGET_INVENTORY",
-      "PASS_ALIAS_LIVE_LABELS_NULL_RESERVATION_AND_CONTINUITY_UX_REGRESSIONS"
+      "PASS_ALIAS_LIVE_LABELS_NULL_RESERVATION_AND_CONTINUITY_UX_REGRESSIONS",
+      "PASS_CI_TEMPORAL_CLI_DUAL_ROOT",
+      "PASS_CLOSURE_2_SELECTION_1_LADDER_27_VANILLA_REVISION_2",
+      "PASS_CENSORING_54_AND_SYNTHETIC_FORGE_INPUT_11"
     ]
   },
   "non_claims": [

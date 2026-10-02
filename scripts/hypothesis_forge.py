@@ -1177,6 +1177,7 @@ def cmd_discovery_execute(
             "source_result_sha256": str(correct_result_sha256),
         }
     gate: dict[str, object] = {"disposition": "EXECUTE"}
+    market_root: Path | None = None
     if temporal_query:
         from solana_alpha_lab.factory.hfic_evidence_identity import (
             EvidenceIdentityError,
@@ -1209,6 +1210,8 @@ def cmd_discovery_execute(
                 continue
             if found not in epochs:
                 epochs.append(found)
+            if market_root is None:
+                market_root = root
         if not epochs:
             return emit(
                 {
@@ -1295,7 +1298,7 @@ def cmd_discovery_execute(
                 binding_cohorts=cohorts,
                 verified_market=epoch,
                 repo_root=repo_root,
-                data_root=store_root or explicit_data_root,
+                data_root=market_root,
                 correction=correction,
             )
         except OrdinaryOperationError as exc:
@@ -1359,7 +1362,7 @@ def cmd_discovery_execute(
             verified_market=epoch if temporal_query else None,
             correction=correction,
             repo_root=repo_root,
-            data_root=explicit_data_root or store_root,
+            data_root=market_root if temporal_query else explicit_data_root or store_root,
         )
     except GroundedDiscoveryError as exc:
         if temporal_query and (
