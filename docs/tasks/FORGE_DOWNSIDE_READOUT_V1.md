@@ -98,10 +98,7 @@ context_requirements:
       - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
       - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
       - docs/contracts/forge_downside_descriptive_v1.md
-    DELIVERY_EVIDENCE:
-      - docs/evidence/forge_downside_readout_v1/a1_delivery_completion_evidence_v1.json
-      - docs/evidence/forge_downside_readout_v1/a1_delivery_independent_review_v1.json
-      - docs/evidence/forge_downside_readout_v1/a1_delivery_factory_fit_v1.json
+    DELIVERY_EVIDENCE: []
     HISTORICAL_CONTEXT: []
 ---
 
