@@ -1837,6 +1837,30 @@ def session_matches_market_epoch(
 
     stamped = session.get("market_evidence_epoch_sha256")
     if (
+        market_evidence_basis is not None
+        and market_evidence_basis.get("basis_version") == MARKET_BASIS_VERSION
+        and _session_identity_is_invalid(session)
+        and "identity_conflict_market_epochs" in session
+    ):
+        if market_evidence_epoch_sha256(market_evidence_basis) != market_evidence_epoch:
+            raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        recognized = {
+            market_evidence_epoch,
+            _validated_v1_epoch(_v1_publication_basis(market_evidence_basis)),
+        }
+        conflict_markets = session.get("identity_conflict_market_epochs")
+        if not (
+            session.get("identity_conflict_market_scope_complete") is True
+            and isinstance(conflict_markets, list)
+            and conflict_markets
+            and all(isinstance(value, str) and value in recognized for value in conflict_markets)
+        ):
+            # The reader retains raw stamps of every conflicting cycle, but
+            # only the latest frozen basis. A nonmatching old V1 stamp after
+            # republish cannot prove that all earlier scientific scopes differ.
+            # Apply the same STOP to quota readback and slot admission.
+            raise EvidenceIdentityError("MARKET_EPOCH_CONTINUITY_UNRESOLVED")
+    if (
         isinstance(stamped, str)
         and re.fullmatch(r"[0-9a-f]{64}", stamped) is not None
         and re.fullmatch(r"[0-9a-f]{64}", market_evidence_epoch) is not None

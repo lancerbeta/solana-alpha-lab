@@ -1,8 +1,8 @@
 {
   "candidate": {
     "base": "68b986e12e5752d36b3cc2e14d85a855fa90b09f",
-    "diff_sha256": "f834ec3f2850e495dc8cd338ee8ac0dbf41399c48b929c0a31e396009db85b83",
-    "head": "d243e74eae67b89f50fc8041e8c14cef424f34ae"
+    "diff_sha256": "b19d9edb86c761e02cbc31f083435ddcaa056c94515bc1b29b97fc8745cd4163",
+    "head": "a8deb9a7cb5dd05614b8556d563c7d2384228cc4"
   },
   "evidence": [
     {
@@ -23,11 +23,11 @@
     },
     {
       "logical_ref": "repo://tests/test_hfic_market_evidence_epoch_decision_basis_v2.py",
-      "sha256_or_fingerprint": "1cee11bd370828ba777bbddf74fd5279ecdfe33d2099f2947c5453269ed425da"
+      "sha256_or_fingerprint": "48bbc1dba9b644ca217fe8eb4d978eb7f3228c2deed725993e7dd42ea9dc4f4c"
     },
     {
       "logical_ref": "repo://docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_readonly_budget_v1.json",
-      "sha256_or_fingerprint": "400b99cf07bbbd9155ddb1033e0420cf19d146a023f2800e2d7bf0d158953c01"
+      "sha256_or_fingerprint": "4499aa7c9a2fd548066441af725328fbe9f6db19b49f1de09f5e30ff8766c903"
     }
   ],
   "independence": {
@@ -52,7 +52,7 @@
     "NO_MERGE",
     "AMBIGUOUS_V1_WRAPPER_CONTINUITY_NOT_PROVEN"
   ],
-  "packet_fingerprint_sha256": "ad63e91ca151faa551ec8a66ee15d7665699dcbdd424bd32c4db82b0fedc08f0",
+  "packet_fingerprint_sha256": "f3643f0c1fbfd41137762ed247099a654bedb5dc8e5100b451b70b136622cf7a",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
@@ -108,7 +108,7 @@
     }
   ],
   "task": {
-    "task_contract_sha256": "5242d19aca75d9e15425f6b94b42172672c2afc809557f865e235719509c0a5e",
+    "task_contract_sha256": "16e6996a2da443731625b3dec04fbea7e0dc9d5633c9e4f9ec2fd892c33736bd",
     "task_id": "HFIC_MARKET_EVIDENCE_EPOCH_DECISION_BASIS_V2"
   }
 }

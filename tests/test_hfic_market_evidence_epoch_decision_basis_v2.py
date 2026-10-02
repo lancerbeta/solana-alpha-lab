@@ -244,6 +244,43 @@ class ScientificMarketV2Tests(unittest.TestCase):
                     self.assertEqual(admission["action"], "STOP")
                 self.assertEqual(original_bytes, [record.payload_json for record in records])
 
+    def test_conflicting_v1_history_cannot_disappear_after_wrapper_republish(self):
+        from solana_alpha_lab.factory.hfic_session import list_hfic_sessions
+
+        _, original_basis = self.current()
+        old_v1_basis = _v1_publication_basis(original_basis)
+        old_v1_epoch = _validated_v1_epoch(old_v1_basis)
+        earlier = {**self.session(old_v1_epoch, old_v1_basis),
+                   "hfic_protocol": "HFIC-V1.2", "phase": "SYNTHESIS_COMPLETE",
+                   "hfic_cycle_seq": 1}
+        other_data = self.base / "other-scientific-market"
+        shutil.copytree(self.data, other_data)
+        release, _, _ = _seal_week(self.base, 3)
+        import_live_cohort(release_root=release, data_root=other_data,
+                          import_time=datetime(2026, 2, 13, tzinfo=UTC))
+        other_epoch, other_basis = compute_market_epoch_for_data_root(ROOT, other_data)
+        later = {**self.session(other_epoch, other_basis),
+                 "hfic_protocol": "HFIC-V1.2", "phase": "SYNTHESIS_COMPLETE",
+                 "hfic_cycle_seq": 2}
+        self.republish_metadata()
+        epoch, basis = self.current()
+        self.assertNotEqual(old_v1_epoch, _validated_v1_epoch(_v1_publication_basis(basis)))
+        self.assertNotEqual(epoch, other_epoch)
+        records = [SimpleNamespace(record_kind="RESEARCH_CYCLE", payload_json=json.dumps(payload),
+                   effective_at="2026-10-02T00:00:00Z", record_id="CYCLE-" + str(n))
+                   for n, payload in enumerate((earlier, later))]
+        original_bytes = [record.payload_json for record in records]
+        rows = list_hfic_sessions(SimpleNamespace(iter_committed_records=lambda: iter(records)))
+        self.assertEqual(rows[0]["identity_binding_status"], "CONFLICT")
+        admission = resolve_scientific_admission(rows, market_evidence_epoch=epoch,
+                    market_evidence_basis=basis, representation_id="BASE",
+                    representation_semantic_version="HFIC-V1.2", owner_focus="AUTO", repo_root=ROOT)
+        self.assertEqual(admission["action"], "STOP")
+        self.assertEqual(admission["reason_code"], "MARKET_EPOCH_CONTINUITY_UNRESOLVED")
+        with self.assertRaisesRegex(EvidenceIdentityError, "MARKET_EPOCH_CONTINUITY_UNRESOLVED"):
+            epoch_search_budget_usage(rows, evidence_epoch=epoch, market_evidence_basis=basis)
+        self.assertEqual(original_bytes, [record.payload_json for record in records])
+
     def test_invalid_extra_canonical_dataset_cannot_disappear_into_fresh_budget(self):
         manifests = self.data / "datasets/manifests"
         mid = json.loads((self.data / "datasets/live_lifecycle_corpus/lineage.json").read_bytes())["current_dataset_manifest_id"]

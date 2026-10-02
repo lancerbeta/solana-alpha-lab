@@ -27,7 +27,7 @@ inventory не изменились. Точные hashes и scope:
 [read-only proof](../../evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_readonly_budget_v1.json).
 
 V1 epoch: `ae771cf5c1e7692c007b442c0048e7547005dc09125eeb9eb75e24406e429749`.
-V2 epoch: `e722f33420194c1e28e9ba39ddb6bb0c129064f812530588cd4777b0376e1a8e`.
+V2 epoch: `4896afd0e029f08032247e80b24d01e94bdbdd1ee702c176871aa52a69c3a495`.
 Это смена версии хеша, а не новый scientific market.
 
 Validation на исправленном кандидате: 29 V2/budget tests PASS; полный
@@ -89,3 +89,28 @@ failed: hard-coded corpus v2 and expected preflight receipt absent. They remain
 explicit limitations, not PASS or a newly skipped assertion; the isolated rerun
 selects synthetic cases only. No real repair, C4, or scientific operation.
 Fresh review, evidence binding and new exact-head CI remain mandatory.
+
+## Final conflict continuity correction
+
+An isolated code critic found that a conflicting lifecycle containing an old
+V1 stamp could disappear after wrapper republish when only its latest frozen
+basis proved another market. A production-shaped lifecycle-reader regression
+first returned START_NEW_SESSION incorrectly. Shared market matching now
+returns MARKET_EPOCH_CONTINUITY_UNRESOLVED for such unproven cycle scopes,
+for both admission and budget readback. Historical records remain unchanged;
+corrupt reservations retain SCIENTIFIC_IDENTITY_CONFLICT. Final focused suite:
+30 V2/budget plus 29 identity/direct consumers PASS; preflight 18 PASS plus one
+existing skip. The 54-test full owner-gold PASS precedes this final guard;
+exact-head CI owns the final full suite.
+
+Fresh real C1-C3 readback preserves all budget fields: AUTO=1, focus=3,
+remaining=0, identity_conflicts=0; lineage and committed payloads unchanged.
+The previous V2 draft hash was stale after the earlier generic optional reuse
+flag correction (None to the actual False consumer default). An offline
+projection substitution exactly reproduces that old hash. This receipt now
+names the verified current V2 hash; V1 identity remains ae771cf5...9749.
+No new scientific capacity or market-composition change occurred.
+
+Residual control obligation: future A3 consumers of new decision-bearing fields
+must extend the shared scientific projection and regression coverage. Unknown
+conflicting scope remains blocked even if its latest cycle is another market.

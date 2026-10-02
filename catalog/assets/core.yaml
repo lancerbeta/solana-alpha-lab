@@ -38484,7 +38484,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_evidence_identity.py', repository_path: src/solana_alpha_lab/factory/hfic_evidence_identity.py}
-  integrity: {kind: sha256, sha256: b7a2d75b872a2f1ad0f30da502896055e0dc1d050e1456c55380626c3a38a93f}
+  integrity: {kind: sha256, sha256: 2de64471450a880674330303ed9434fcc62aa90c733d51719675a31def79c770}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
@@ -38791,7 +38791,7 @@ records:
     repository_path: tests/test_hfic_market_evidence_epoch_decision_basis_v2.py
   integrity:
     kind: sha256
-    sha256: 48bbc1dba9b644ca217fe8eb4d978eb7f3228c2deed725993e7dd42ea9dc4f4c
+    sha256: f0d4e038ed341fb149b4bc6ab0a1d0fdf67e56b138ad3a2ed85111097f9b09ff
   access:
     mode: read_only
     method: file
@@ -38831,7 +38831,7 @@ records:
     repository_path: docs/evidence/hfic_market_evidence_epoch_decision_basis_v2/a1_readonly_budget_v1.json
   integrity:
     kind: sha256
-    sha256: 4499aa7c9a2fd548066441af725328fbe9f6db19b49f1de09f5e30ff8766c903
+    sha256: 4a364fc78817c67e5fcd2a4c86b5faab93e2ec3ab9a5f8019f77e77f23a2d350
   access:
     mode: read_only
     method: file
@@ -38868,7 +38868,7 @@ records:
     repository_path: docs/reports/hfic_market_evidence_epoch_decision_basis_v2/a1_owner_readout_v1.md
   integrity:
     kind: sha256
-    sha256: 12eefcfc66e0a6971d1cfaca5e17d58b25610cd82b600b0ab4ff530e290ad74f
+    sha256: 9845e8d6a1d903f96a8f8c3206d6d691d130ed0e74862a4f21fda36992f49cff
   access:
     mode: read_only
     method: file

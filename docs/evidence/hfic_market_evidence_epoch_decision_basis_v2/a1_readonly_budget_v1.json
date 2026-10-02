@@ -10,8 +10,8 @@
     "REL-20260914T173510Z-20260921T173510Z"
   ],
   "v1_market_evidence_epoch_sha256": "ae771cf5c1e7692c007b442c0048e7547005dc09125eeb9eb75e24406e429749",
-  "v2_market_evidence_epoch_sha256": "e722f33420194c1e28e9ba39ddb6bb0c129064f812530588cd4777b0376e1a8e",
-  "scientific_projection_sha256": "e722f33420194c1e28e9ba39ddb6bb0c129064f812530588cd4777b0376e1a8e",
+  "v2_market_evidence_epoch_sha256": "4896afd0e029f08032247e80b24d01e94bdbdd1ee702c176871aa52a69c3a495",
+  "scientific_projection_sha256": "4896afd0e029f08032247e80b24d01e94bdbdd1ee702c176871aa52a69c3a495",
   "budget_before": {
     "evidence_epoch_sha256": "ae771cf5c1e7692c007b442c0048e7547005dc09125eeb9eb75e24406e429749",
     "auto_sessions_used": 1,
@@ -39,7 +39,7 @@
     "legacy_market_occupancy": 0
   },
   "budget_after": {
-    "evidence_epoch_sha256": "e722f33420194c1e28e9ba39ddb6bb0c129064f812530588cd4777b0376e1a8e",
+    "evidence_epoch_sha256": "4896afd0e029f08032247e80b24d01e94bdbdd1ee702c176871aa52a69c3a495",
     "auto_sessions_used": 1,
     "auto_sessions_per_evidence_epoch": 1,
     "distinct_focus_used": 3,
@@ -116,12 +116,12 @@
   "comparison_semantics": "Compare every budget field except evidence_epoch_sha256, whose algorithm changes from V1 to V2. Scientific occupancy and representation slot readback remain identical.",
   "candidate_test_validation": {
     "v2_and_budget_tests": {
-      "count": 29,
-      "verdict": "PASS_FINAL_CORRECTED_CANDIDATE"
+      "count": 30,
+      "verdict": "PASS_FINAL_CONFLICT_GUARD"
     },
     "owner_gold": {
       "count": 54,
-      "verdict": "PASS_FULL_RUN_FINAL_CORRECTED_CANDIDATE"
+      "verdict": "PASS_FULL_RUN_BEFORE_FINAL_CONFLICT_GUARD"
     },
     "ordinary_consumer_tests": {
       "count": 2,
@@ -176,6 +176,11 @@
         "verdict": "PASS"
       },
       "new_exact_head_ci": "REQUIRED_LIVE_BEFORE_MERGE_READINESS"
+    },
+    "final_conflict_guard_consumers": {
+      "count": 29,
+      "verdict": "PASS_ALL_IDENTITY_UNIT_AND_ORDINARY_PREFLIGHT",
+      "new_regression": "RED_START_NEW_SESSION_THEN_GREEN_STOP_FOR_BUDGET_AND_ADMISSION"
     }
   },
   "limitations": [
@@ -184,5 +189,76 @@
     "No scientific run, no real C4 access, no acceptance or merge authority.",
     "A broader local consumer run automatically read the installed C1-C3 v3 plane. Its byte/mtime inventory stayed unchanged; two legacy LIVE smoke assertions failed (hard-coded v2 and expected preflight receipt absent). They are not claimed PASS, not rewritten in this atom, and excluded from the isolated synthetic rerun. Required real-budget proof remains separately scoped."
   ],
-  "post_review_corrected_code_readback": "Same saved C1-C3 epoch and every budget field confirmed; no real mutation."
+  "post_review_corrected_code_readback": "Superseded draft hash corrected by fresh direct readback; no real mutation and every scientific budget field preserved.",
+  "superseded_v2_draft_projection": {
+    "sha256": "e722f33420194c1e28e9ba39ddb6bb0c129064f812530588cd4777b0376e1a8e",
+    "reason": "Captured before generic optional reuse flag was normalized to the actual False consumer default. Offline replacing False with None exactly reproduces this old draft hash. V1 identity and every budget field remained unchanged."
+  },
+  "post_conflict_fix_readback": {
+    "verdict": "PASS",
+    "scientific_budget_preserved": true,
+    "sessions_n": 20,
+    "v1_market_evidence_epoch_sha256": "ae771cf5c1e7692c007b442c0048e7547005dc09125eeb9eb75e24406e429749",
+    "v2_market_evidence_epoch_sha256": "4896afd0e029f08032247e80b24d01e94bdbdd1ee702c176871aa52a69c3a495",
+    "budget_before": {
+      "evidence_epoch_sha256": "ae771cf5c1e7692c007b442c0048e7547005dc09125eeb9eb75e24406e429749",
+      "auto_sessions_used": 1,
+      "auto_sessions_per_evidence_epoch": 1,
+      "distinct_focus_used": 3,
+      "distinct_focus_sessions_per_evidence_epoch": 3,
+      "distinct_focus_remaining": 0,
+      "focus_key_sha256_set": [
+        "8a1646ddf22d71e820c0f4df366e7659bf1776c2dc776e39edd70d186ded45ed",
+        "929260ad9b9ea9fe0f3553dd964f4ff3deb5792efd031a2b90f573fe91f012bb",
+        "c7c6793350f1cf9cede1e074e2c27c95bb6e8eabeef254e3c9591e9d82e7619e"
+      ],
+      "representation_slots": [
+        {
+          "representation_id": "BASE",
+          "representation_semantic_version": "HFIC-V1.2",
+          "scientific_slot_sha256": "683b3ed3d3b4840c88406cca80905c0cf04ae1f642dd01afa6b81e5cddbc58f1",
+          "session_ids": [
+            "HFIC-SESS-481C699406A919C1",
+            "HFIC-SESS-222A589D8A2731D8",
+            "HFIC-SESS-C351F146CF899F1F"
+          ]
+        }
+      ],
+      "legacy_market_occupancy": 0
+    },
+    "budget_after": {
+      "evidence_epoch_sha256": "4896afd0e029f08032247e80b24d01e94bdbdd1ee702c176871aa52a69c3a495",
+      "auto_sessions_used": 1,
+      "auto_sessions_per_evidence_epoch": 1,
+      "distinct_focus_used": 3,
+      "distinct_focus_sessions_per_evidence_epoch": 3,
+      "distinct_focus_remaining": 0,
+      "focus_key_sha256_set": [
+        "8a1646ddf22d71e820c0f4df366e7659bf1776c2dc776e39edd70d186ded45ed",
+        "929260ad9b9ea9fe0f3553dd964f4ff3deb5792efd031a2b90f573fe91f012bb",
+        "c7c6793350f1cf9cede1e074e2c27c95bb6e8eabeef254e3c9591e9d82e7619e"
+      ],
+      "representation_slots": [
+        {
+          "representation_id": "BASE",
+          "representation_semantic_version": "HFIC-V1.2",
+          "scientific_slot_sha256": "683b3ed3d3b4840c88406cca80905c0cf04ae1f642dd01afa6b81e5cddbc58f1",
+          "session_ids": [
+            "HFIC-SESS-481C699406A919C1",
+            "HFIC-SESS-222A589D8A2731D8",
+            "HFIC-SESS-C351F146CF899F1F"
+          ]
+        }
+      ],
+      "legacy_market_occupancy": 0
+    },
+    "identity_conflicts_n": 0,
+    "lineage_sha256": "51950a3a2b8f76d86df687063f8b1fe8ba2e8b4aaec1d219e39bcee937adc1a2",
+    "committed_payload_digest_before": "841eb202b998adfaf169072d8cbba0f5037869941f82eb851ba44a760c55b705",
+    "committed_payload_digest_after": "841eb202b998adfaf169072d8cbba0f5037869941f82eb851ba44a760c55b705",
+    "scope": "Current C1-C3 budget, lineage bytes and committed record payloads; no full data-plane inventory claim.",
+    "real_mutation": false,
+    "c4_access": false,
+    "scientific_run": false
+  }
 }
