@@ -22,14 +22,14 @@
   "factory_fit": {
     "path": "docs/evidence/live_corpus_schema_drift_atomic_repair_v2/factory_fit.json",
     "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-    "verdict": "NOT_READY"
+    "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_57_PRODUCTION_SHAPED_REPAIR_IMPORT_SCIENTIFIC_CONSUMER_TESTS",
     "independent_review": {
       "path": "docs/evidence/live_corpus_schema_drift_atomic_repair_v2/independent_review.json",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
@@ -38,7 +38,11 @@
       "PASS_METADATA_EPOCH_AND_OCCUPANCY_INVARIANCE",
       "PASS_57_FOCUSED_TESTS",
       "PASS_FOUR_SEMANTIC_SEARCH_QUESTIONS",
-      "PASS_GENERATED_NAVIGATION_SYNC"
+      "PASS_GENERATED_NAVIGATION_SYNC",
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_PRECOMMIT_SECRET_DERIVED_CONTRACT_CHECKS",
+      "PASS_FOUR_INDEPENDENT_FINAL_INVENTORY_REVIEWS",
+      "PASS_SEMANTIC_PREMISE_VALIDATE_LAUNCH"
     ]
   },
   "non_claims": [
