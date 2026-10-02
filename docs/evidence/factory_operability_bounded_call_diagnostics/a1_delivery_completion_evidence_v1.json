@@ -11,7 +11,7 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "50e53748836a48fcad93e43b8eeb0381731c13ff4e6f9e152029b77c4920ebe3",
+    "catalog/assets/core.yaml": "6f073164528e8a4f258f90b47ef57a461e240bf0978e53b6fd8bbb8121bae0dd",
     "catalog/assets/lifecycle.yaml": "c60b6b212bcf03526d029da8bc116b30751323173dff7b1ea8922f4e40c15db6",
     "catalog/catalog_manifest.yaml": "c8c6d7c7f2f205d2d0af1453a7f13b26c17fec39f62dca80672b1ab1b6404757",
     "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "6787cc13eb2ae164c252501dba8a25bd13e290d644f29d66616fe67798676713",
@@ -21,11 +21,11 @@
     "configs/factory_semantic_operability_v1.yaml": "5c273dccb867b31e345743e6d93e06799b5a25fa386d565c17745f9e9d4c8fc5",
     "docs/PROJECT_MAP.md": "12e82714f528f584df6c343e49f0104d5cc026ecb69e15c48cdd3d7db106f2cc",
     "docs/evidence/factory_operability_bounded_call_diagnostics/a1_resource_profile_v1.json": "bf5c75992c5994425e5e4d4b2fccb381a5d0fffa793b64dea3ce217e026c6dc1",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "37ab9caf55fcab43ca94d89d837548b4be5af935033a07a7afa9f4d79484554b",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "2acbb0cc6c53446bcdc9b7ea7e5c268e21e80963a2925b5be8ebb4f97df9360e",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "86ff47fca6365f8f4e6ef2d7cec9904e7374e6260138769426644aeb912b3cb4",
     "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "1f651879d093c21688479f7ba4a569b66ed88518ac2aa0008d05d9267754667c",
     "docs/reports/factory_operability_bounded_call_diagnostics/a1_owner_readout_v1.md": "aec81e53583ce271c4ee3667124cf11065bb284561750f0294aebcbe17b1b104",
-    "docs/tasks/FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1.md": "4ccf1dd53ff1d31237707b7b8fcc081d5bc4cdae7f3dd6b51ccb2c9333fbadbb",
+    "docs/tasks/FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1.md": "62aafded2ed0514c2c4a2efac6b38ba9d2c8119d84cf0c1d410095087055a30a",
     "scripts/collector_owner_pulse.py": "004032ba9beaabb728eaecb6fde8165d203226bbe495275c81bee593bb587446",
     "scripts/factory_external_heartbeat.py": "a33e223f82f0674c86863843b09741fffee366d385ef2fc83ab4f1dfd386be27",
     "scripts/factory_operability_watch.py": "92ba763cabcba7840510a0d7467805a2ba0e4b73d1e6eab34c684bcd16701efd",
@@ -51,14 +51,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_operability_bounded_call_diagnostics/a1_delivery_factory_fit_v1.json",
-    "sha256": "d0021ac0ad0417e0fc54761f989b107c4b272cdc42ab7c36117d9cb428493467",
+    "sha256": "a98e626dce55fceba3dc2fa8e3d493b30795364114cd2d7af160e664f990fa0f",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_120_FOCUSED_AND_15_SEMANTIC_TESTS_AND_16_RESOURCE_PROFILES",
     "independent_review": {
       "path": "docs/evidence/factory_operability_bounded_call_diagnostics/a1_delivery_independent_review_v1.json",
-      "sha256": "6afa4188761f56c7833f452655479c03f60f30bd3570827033e8cb999d3334d3",
+      "sha256": "0bc8b3f892751a4e5339b9db72245f1333a97ac5300b1c5da6bb5ba287c5a0aa",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

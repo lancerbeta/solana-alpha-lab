@@ -6,8 +6,8 @@
   "task_id": "FACTORY_OPERABILITY_BOUNDED_CALL_DIAGNOSTICS_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "485331f8b6a940031750377585ca1aa2f568321f45ea85c52e4e67a8cfbc3858",
-  "reviewed_inventory_sha256": "530f42aa95c5fb1ba5c85c62f8d9959a9d91100890e896f3f590d26643be371b",
+  "reviewed_bindings_sha256": "8b0a150fe880b0dbcbd2922ee70ca6010d206c2fc265449ba40b18b822e7d0e2",
+  "reviewed_inventory_sha256": "75452504a6e9693cd43ab07b126e0c85158e0ae1292c81bde06cebe87754e10f",
   "capability_radar": {
     "now": "NONE",
     "watch": "HOST_COMMISSIONING_AND_2026_10_03_SUCCESSOR_READBACK"
