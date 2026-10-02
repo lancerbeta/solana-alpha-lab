@@ -3178,32 +3178,25 @@ def current_corpus_partition_rows(
     kind: str = "census",
 ) -> list[dict[str, Any]]:
     """Read census/observation rows exposed by the current cumulative corpus version."""
-    from solana_alpha_lab.factory.live_corpus_manifest_publish import inspect_canonical_root
+    from solana_alpha_lab.factory.live_corpus_manifest_publish import (
+        inspect_canonical_root, _load_dataset_manifest,
+    )
 
     lineage = _load_lineage(data_root)
     current_mid = lineage.get("current_dataset_manifest_id")
     _require(isinstance(current_mid, str) and current_mid, "CURRENT_CORPUS_MISSING")
-    inspection = inspect_canonical_root(data_root, str(current_mid))
+    current = _load_dataset_manifest(data_root, str(current_mid))
+    inspection = inspect_canonical_root(data_root, str(current_mid),
+        expected_schema_sha256=current.schema_sha256)
     _require(bool(inspection.get("complete")), "DATASET_PUBLICATION_INCOMPLETE")
-    partition_dir = Path(data_root) / "datasets" / "manifests" / "partitions"
     rows: list[dict[str, Any]] = []
-    for path in sorted(partition_dir.glob("partition-*.json")):
-        if path.is_symlink() or not path.is_file():
-            continue
-        try:
-            part = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-            raise LiveCohortReleaseError("CANONICAL_ROOT_INCOMPLETE")
-        if not isinstance(part, Mapping):
-            raise LiveCohortReleaseError("CANONICAL_ROOT_INCOMPLETE")
-        if str(part.get("dataset_manifest_id") or "") != current_mid:
-            continue
-        partition_id = str(part.get("partition_id") or "")
+    for part in inspection["partitions"]:
+        partition_id = part.partition_id
         if kind == "census" and not partition_id.endswith("-CENSUS"):
             continue
         if kind == "observations" and not partition_id.endswith("-OBS"):
             continue
-        location = str(part.get("logical_location") or "")
+        location = part.logical_location
         parquet_path = Path(data_root) / location
         _require(
             parquet_path.is_file() and not parquet_path.is_symlink(),
@@ -3293,6 +3286,15 @@ def select_current_datasets_for_forge(
 
     selected: list[dict[str, Any]] = []
     for _logical, group in by_logical.items():
+        if any(item.get("dataset_id") == CORPUS_DATASET_ID
+               and "live_corpus_current_manifest_id" in item for item in group):
+            authorities = {item.get("live_corpus_current_manifest_id") for item in group}
+            _require(len(authorities) == 1 and None not in authorities, "CURRENT_CORPUS_MISSING")
+            current_id = next(iter(authorities))
+            current = [item for item in group if item.get("dataset_manifest_id") == current_id]
+            _require(len(current) == 1, "CURRENT_CORPUS_MISSING")
+            selected.append(current[0])
+            continue
         if len(group) == 1:
             selected.append(group[0])
             continue

@@ -7,6 +7,7 @@ repair_live_corpus_manifests.
 from __future__ import annotations
 
 import json
+import re
 import shutil
 from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime
@@ -17,7 +18,6 @@ from solana_alpha_lab.contracts.schema_v1 import DatasetManifest, PartitionManif
 from solana_alpha_lab.factory.discovery_evidence_release import (
     _publish_bytes,
     _render_utc,
-    _require,
     sha256_bytes,
 )
 from solana_alpha_lab.factory.live_corpus_logical_rows import (
@@ -75,6 +75,11 @@ OBSERVATIONS_NAME = "observations.parquet"
 RELEASE_MANIFEST_NAME = "release_manifest.json"
 
 
+def _require(condition: bool, code: str) -> None:
+    if not condition:
+        raise LiveCohortReleaseError(code)
+
+
 def _stamp_utc(value: datetime) -> str:
     return (
         value.astimezone(UTC)
@@ -91,11 +96,50 @@ def canonical_dataset_version(version: str) -> str:
     return f"{version}{CANONICAL_METADATA_SUFFIX}"
 
 
+def repair_dataset_version(
+    version: str, schema_sha256: str, composition: Sequence[Mapping[str, Any]],
+) -> str:
+    """LIVE-local metadata revision; TASK-06 identity itself is unchanged."""
+    base = canonical_dataset_version(version).removesuffix(CANONICAL_METADATA_SUFFIX)
+    base = re.sub(r"\.metadata-[0-9a-f]{64}$", "", base)
+    metadata_sha = sha256_bytes(_canonical_receipt_bytes({
+        "profile": "LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2",
+        "schema_sha256": schema_sha256,
+        "logical_row_profile": LOGICAL_ROW_PROFILE,
+        "composition": [{key: item[key] for key in ("cohort_id", "content_sha256", "release_id")}
+                        for item in composition],
+    }))
+    return f"{base}.metadata-{metadata_sha}{CANONICAL_METADATA_SUFFIX}"
+
+
+def _safe_path(data_root: Path, path: Path) -> None:
+    root = Path(data_root).absolute()
+    absolute = path.absolute()
+    _require(absolute.is_relative_to(root), "LIVE_CORPUS_PATH_INTEGRITY")
+    for item in (absolute, *absolute.parents):
+        _require(not item.is_symlink() and not item.is_junction(), "LIVE_CORPUS_PATH_INTEGRITY")
+        if item == root:
+            break
+
+
+def _publish_metadata(data_root: Path, path: Path, payload: bytes) -> None:
+    _safe_path(data_root, path)
+    _safe_path(data_root, path.with_name(f"{path.name}.tmp"))
+    try:
+        _publish_bytes(path, payload)
+    except Exception as exc:
+        if str(exc) == "CANONICAL_TARGET_CONFLICT":
+            raise LiveCohortReleaseError("CANONICAL_TARGET_CONFLICT") from exc
+        raise
+
+
 def _manifests_dir(data_root: Path) -> Path:
     return Path(data_root) / "datasets" / "manifests"
 
 
 def _atomic_replace_json(path: Path, payload: Mapping[str, Any]) -> None:
+    _require(not path.is_symlink() and not path.with_name(f"{path.name}.tmp").is_symlink(),
+             "LIVE_CORPUS_PATH_INTEGRITY")
     path.parent.mkdir(parents=True, exist_ok=True)
     encoded = json.dumps(dict(payload), sort_keys=True, separators=(",", ":")).encode(
         "utf-8"
@@ -197,6 +241,7 @@ def _freeze_publication_clock(
     proposed: datetime,
 ) -> datetime:
     path = _manifests_dir(data_root) / f"{dataset_manifest_id}.publication-clock.json"
+    _safe_path(data_root, path)
     encoded = json.dumps(
         {
             "created_at": _stamp_utc(proposed),
@@ -213,8 +258,10 @@ def _freeze_publication_clock(
         _require(isinstance(loaded, Mapping), "PUBLICATION_CLOCK_CORRUPT")
         raw = loaded.get("created_at")
         _require(isinstance(raw, str) and raw, "PUBLICATION_CLOCK_CORRUPT")
+        _require(loaded == {"created_at": raw, "first_reliable_available_at": raw},
+                 "PUBLICATION_CLOCK_CORRUPT")
         return _parse_utc_local(raw)
-    _publish_bytes(path, encoded)
+    _publish_metadata(data_root, path, encoded)
     return proposed
 
 
@@ -222,9 +269,12 @@ def _parse_utc_local(value: str) -> datetime:
     text = value.strip()
     if text.endswith("Z"):
         text = text[:-1] + "+00:00"
-    parsed = datetime.fromisoformat(text)
+    try:
+        parsed = datetime.fromisoformat(text)
+    except ValueError as exc:
+        raise LiveCohortReleaseError("PUBLICATION_CLOCK_CORRUPT") from exc
     if parsed.tzinfo is None:
-        raise LiveCohortReleaseError("CLOCK_NOT_AWARE")
+        raise LiveCohortReleaseError("PUBLICATION_CLOCK_CORRUPT")
     return parsed.astimezone(UTC)
 
 
@@ -238,6 +288,9 @@ def _published_marker_ok(published_path: Path, dataset: DatasetManifest) -> bool
     return (
         isinstance(published, dict)
         and published.get("dataset_fingerprint") == dataset.dataset_fingerprint
+        and published.get("dataset_manifest_id") == dataset.dataset_manifest_id
+        and published.get("published_at") == _stamp_utc(dataset.created_at)
+        and published.get("metadata_clock_at") == _stamp_utc(dataset.created_at)
     )
 
 
@@ -296,6 +349,7 @@ def inspect_canonical_root(
     dataset_manifest_id: str,
     *,
     verify_parquet_bytes: bool = True,
+    expected_schema_sha256: str | None = None,
 ) -> dict[str, Any]:
     """Return whether a LIVE CORPUS dataset root is TASK-06-valid and published."""
 
@@ -318,7 +372,7 @@ def inspect_canonical_root(
         partitions = _load_partitions_for_dataset(data_root, dataset_manifest_id)
     except Exception:
         return {**empty, "reason": "CORRUPT"}
-    if dataset.schema_sha256 != live_corpus_schema_sha256():
+    if dataset.schema_sha256 != (expected_schema_sha256 or live_corpus_schema_sha256()):
         return {**empty, "dataset": dataset, "partitions": partitions, "reason": "SCHEMA_SHA_MISMATCH"}
     if not str(dataset.dataset_version).endswith(CANONICAL_METADATA_SUFFIX):
         return {**empty, "dataset": dataset, "partitions": partitions, "reason": "LEGACY_VERSION"}
@@ -345,6 +399,7 @@ def inspect_canonical_root(
         return {**empty, "dataset": dataset, "partitions": partitions, "reason": "FINGERPRINT_MISMATCH"}
     artifacts_ok = True
     labels_ok = False
+    labels_payload = None
     if labels_path.is_file() and not labels_path.is_symlink():
         try:
             labels_payload = json.loads(labels_path.read_text(encoding="utf-8"))
@@ -356,9 +411,41 @@ def inspect_canonical_root(
             and bool(labels_payload.get("dataset_terminal"))
         )
     published_ok = _published_marker_ok(published_path, dataset)
+    composition = receipt.get("corpus_composition")
+    if published_ok and labels_ok and isinstance(composition, list) and composition:
+        latest_component = composition[-1]
+        published_ok = isinstance(latest_component, Mapping) and json.loads(published_path.read_bytes()) == {
+            "commit_point": COMMIT_POINT_KIND,
+            "cohort_id": latest_component.get("cohort_id"),
+            "corpus_version": labels_payload.get("corpus_version"),
+            "cumulative_cohort_count": len(composition),
+            "dataset_fingerprint": dataset.dataset_fingerprint,
+            "dataset_manifest_id": dataset.dataset_manifest_id,
+            "metadata_clock_at": _stamp_utc(dataset.created_at),
+            "published_at": _stamp_utc(dataset.created_at),
+            "release_id": latest_component.get("release_id"),
+        }
+    else:
+        published_ok = False
+    clock_path = manifests / f"{dataset_manifest_id}.publication-clock.json"
+    _safe_path(data_root, clock_path)
+    try:
+        stored_clock = json.loads(clock_path.read_bytes())
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        stored_clock = None
+    clock_ok = stored_clock == {
+        "created_at": _stamp_utc(dataset.created_at),
+        "first_reliable_available_at": _stamp_utc(dataset.first_reliable_available_at),
+    }
+    clock_ok = clock_ok and receipt.get("published_at") == _stamp_utc(dataset.created_at)
+    clock_ok = clock_ok and all(
+        part.created_at == dataset.created_at and part.first_reliable_available_at == dataset.first_reliable_available_at
+        for part in partitions
+    )
     parquet_ok = True
     for part in partitions:
         parquet_path = Path(data_root) / part.logical_location
+        _safe_path(data_root, parquet_path)
         if parquet_path.is_symlink() or not parquet_path.is_file():
             parquet_ok = False
             break
@@ -373,15 +460,15 @@ def inspect_canonical_root(
         if sha256_file_streaming(parquet_path) != part.file_sha256:
             parquet_ok = False
             break
-        if recorded is None:
-            _write_recorded_parquet_size(data_root, part.partition_id, size)
-    complete = artifacts_ok and labels_ok and published_ok and parquet_ok
+    complete = artifacts_ok and labels_ok and published_ok and parquet_ok and clock_ok
     if not labels_ok:
         reason = "LABELS_MISSING"
     elif not parquet_ok:
         reason = "CORPUS_PARQUET_SHA_MISMATCH"
     elif not published_ok:
         reason = "UNPUBLISHED"
+    elif not clock_ok:
+        reason = "PUBLICATION_CLOCK_CORRUPT"
     else:
         reason = "OK"
     return {
@@ -438,6 +525,8 @@ def _measure_parquet(
         )
     except LiveCorpusLogicalRowError as exc:
         raise _wrap_logical(exc) from exc
+    except (ValueError, TypeError, OSError) as exc:
+        raise LiveCohortReleaseError("LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE") from exc
     measured.append(logical_location)
     return claims
 
@@ -592,7 +681,7 @@ def _feature_union(components: Sequence[Mapping[str, Any]]) -> list[str]:
     return [item for item in FEATURE_FAMILY_ORDER if item in seen] or ordered
 
 
-def _stage_labels_and_lineage(
+def _reconcile_current_labels(
     *,
     data_root: Path,
     dataset_manifest_id: str,
@@ -602,18 +691,25 @@ def _stage_labels_and_lineage(
 ) -> None:
     root = Path(data_root)
     manifests = _manifests_dir(root)
-    _atomic_replace_json(manifests / f"{dataset_manifest_id}.labels.json", labels)
-    if previous_current_mid and previous_current_mid != dataset_manifest_id:
-        prev_labels_path = manifests / f"{previous_current_mid}.labels.json"
-        if prev_labels_path.is_file() and not prev_labels_path.is_symlink():
-            try:
-                old = json.loads(prev_labels_path.read_text(encoding="utf-8"))
-            except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-                old = None
-            if isinstance(old, dict):
-                old["is_current_corpus_version"] = False
-                _atomic_replace_json(prev_labels_path, old)
-    write_live_corpus_lineage(root, lineage_out)
+    current_labels = {**labels, "is_current_corpus_version": True}
+    current_path = manifests / f"{dataset_manifest_id}.labels.json"
+    _safe_path(root, current_path)
+    if json.loads(current_path.read_bytes()) != current_labels:
+        _atomic_replace_json(current_path, current_labels)
+    # A reused historical candidate may name an older provenance parent.
+    # Every LIVE flag is derived from the one lineage pointer, not that parent.
+    for prev_labels_path in sorted(manifests.glob("*.labels.json")):
+        if prev_labels_path == current_path:
+            continue
+        _safe_path(root, prev_labels_path)
+        try:
+            old = json.loads(prev_labels_path.read_bytes())
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            continue
+        if (isinstance(old, dict) and old.get("logical_dataset_id") == CORPUS_DATASET_ID
+                and old.get("is_current_corpus_version") is not False):
+            old["is_current_corpus_version"] = False
+            _atomic_replace_json(prev_labels_path, old)
 
 
 def _commit_canonical_root(
@@ -623,28 +719,29 @@ def _commit_canonical_root(
     partitions: Sequence[PartitionManifest],
     receipt_bytes: bytes,
     published: Mapping[str, Any],
+    record_sizes: bool = True,
 ) -> None:
     root = Path(data_root)
     manifests = _manifests_dir(root)
     for part in partitions:
-        _publish_bytes(
+        _publish_metadata(root,
             manifests / "partitions" / f"{part.partition_manifest_id}.json",
             canonical_manifest_bytes(part),
         )
         parquet_path = root / part.logical_location
-        if parquet_path.is_file() and not parquet_path.is_symlink():
+        if record_sizes and parquet_path.is_file() and not parquet_path.is_symlink():
             _write_recorded_parquet_size(
                 root, part.partition_id, int(parquet_path.stat().st_size)
             )
-    _publish_bytes(
+    _publish_metadata(root,
         manifests / f"{dataset.dataset_manifest_id}.validation.json",
         receipt_bytes,
     )
-    _publish_bytes(
+    _publish_metadata(root,
         manifests / f"{dataset.dataset_manifest_id}.json",
         canonical_manifest_bytes(dataset),
     )
-    _publish_bytes(
+    _publish_metadata(root,
         manifests / f"{dataset.dataset_manifest_id}.published",
         json.dumps(dict(published), sort_keys=True, separators=(",", ":")).encode(
             "utf-8"
@@ -713,6 +810,20 @@ def _claims_for_cohort(
     return out
 
 
+def _commit_visibility(
+    *, data_root: Path, dataset_manifest_id: str, labels: Mapping[str, Any],
+    lineage_out: Mapping[str, Any], expected_lineage: Mapping[str, Any] | None,
+) -> None:
+    """One LIVE-local lineage visibility switch followed by derived cleanup."""
+    _safe_path(data_root, Path(data_root) / "datasets/live_lifecycle_corpus/lineage.json")
+    _safe_path(data_root, Path(data_root) / "datasets/live_lifecycle_corpus/lineage.json.tmp")
+    if expected_lineage is not None:
+        _require(load_live_corpus_lineage(data_root) == expected_lineage, "CORPUS_CURRENT_BASIS_CHANGED")
+    write_live_corpus_lineage(data_root, lineage_out)
+    _reconcile_current_labels(data_root=data_root, dataset_manifest_id=dataset_manifest_id,
+        labels=labels, lineage_out=lineage_out, previous_current_mid=None)
+
+
 def _publish_from_claims(
     *,
     data_root: Path,
@@ -728,18 +839,10 @@ def _publish_from_claims(
     previous_current_mid: str | None,
     superseded_dataset_manifest_id: str | None,
     fault_before_visibility: Callable[[], None] | None,
+    expected_lineage: Mapping[str, Any] | None = None,
 ) -> tuple[DatasetManifest, list[PartitionManifest], str]:
     schema_sha256 = live_corpus_schema_sha256()
     dataset_manifest_id = compute_dataset_manifest_id(CORPUS_DATASET_ID, dataset_version)
-    _stage_labels_and_lineage(
-        data_root=data_root,
-        dataset_manifest_id=dataset_manifest_id,
-        labels=labels,
-        lineage_out=lineage_out,
-        previous_current_mid=previous_current_mid,
-    )
-    if fault_before_visibility is not None:
-        fault_before_visibility()
     clock = _freeze_publication_clock(data_root, dataset_manifest_id, published_at)
     partitions = _build_partitions(
         dataset_version=dataset_version,
@@ -785,79 +888,53 @@ def _publish_from_claims(
         "published_at": _stamp_utc(clock),
         "release_id": composition[-1]["release_id"] if composition else None,
     }
+    labels_path = _manifests_dir(data_root) / f"{dataset_manifest_id}.labels.json"
+    staged_labels = {**labels, "is_current_corpus_version": False}
+    if labels_path.exists():
+        _safe_path(data_root, labels_path)
+        try:
+            existing = json.loads(labels_path.read_bytes())
+        except (ValueError, UnicodeDecodeError) as exc:
+            raise LiveCohortReleaseError("CANONICAL_TARGET_CONFLICT") from exc
+        _require(isinstance(existing, dict), "CANONICAL_TARGET_CONFLICT")
+        _require({**existing, "is_current_corpus_version": False} == staged_labels,
+                 "CANONICAL_TARGET_CONFLICT")
+    else:
+        _publish_metadata(data_root, labels_path, _canonical_receipt_bytes(staged_labels))
     _commit_canonical_root(
         data_root=data_root,
         dataset=dataset,
         partitions=partitions,
         receipt_bytes=receipt_bytes,
         published=published,
+        record_sizes=generation_reason != "METADATA_CONTRACT_REPAIR",
     )
+    if fault_before_visibility is not None:
+        fault_before_visibility()
+    prepared = inspect_canonical_root(data_root, dataset_manifest_id,
+        verify_parquet_bytes=generation_reason == "METADATA_CONTRACT_REPAIR")
+    _require(prepared["complete"], "CANDIDATE_VERIFICATION_FAILED")
+    _require(prepared["dataset"] == dataset and prepared["partitions"] == partitions,
+             "CANDIDATE_VERIFICATION_FAILED")
+    _require((_manifests_dir(data_root) / f"{dataset_manifest_id}.validation.json").read_bytes() == receipt_bytes,
+             "CANDIDATE_VERIFICATION_FAILED")
+    _require(json.loads(labels_path.read_bytes()) == staged_labels
+             or json.loads(labels_path.read_bytes()) == {**staged_labels, "is_current_corpus_version": True},
+             "CANDIDATE_VERIFICATION_FAILED")
+    _require(json.loads((_manifests_dir(data_root) / f"{dataset_manifest_id}.published").read_bytes()) == published,
+             "CANDIDATE_VERIFICATION_FAILED")
+    _commit_visibility(data_root=data_root, dataset_manifest_id=dataset_manifest_id,
+        labels=labels, lineage_out=lineage_out, expected_lineage=expected_lineage)
     return dataset, list(partitions), fingerprint
 
 
-def _retract_unpublished_canonical_metadata(
-    data_root: Path, dataset_manifest_id: str
-) -> None:
-    """Drop unpublished TASK-06 files so a retry can freeze a new visibility clock.
-
-    Never deletes parquet, labels, lineage, or a root that already has .published.
-    Never deletes a legacy (non-canonical) current dataset.json.
-    """
-
-    manifests = _manifests_dir(data_root)
-    published_path = manifests / f"{dataset_manifest_id}.published"
-    dataset_path = manifests / f"{dataset_manifest_id}.json"
-    dataset: DatasetManifest | None = None
-    if dataset_path.is_file() and not dataset_path.is_symlink():
-        try:
-            dataset = _load_dataset_manifest(data_root, dataset_manifest_id)
-        except Exception:
-            dataset = None
-        if dataset is not None and not str(dataset.dataset_version).endswith(
-            CANONICAL_METADATA_SUFFIX
-        ):
-            return
-    if dataset is not None and _published_marker_ok(published_path, dataset):
-        return
-    if published_path.is_file() and not published_path.is_symlink():
-        published_path.unlink()
-    for path in (
-        dataset_path,
-        manifests / f"{dataset_manifest_id}.validation.json",
-        manifests / f"{dataset_manifest_id}.publication-clock.json",
-    ):
-        if path.is_file() and not path.is_symlink():
-            path.unlink()
-    part_dir = manifests / "partitions"
-    if not part_dir.is_dir():
-        return
-    for path in part_dir.glob("partition-*.json"):
-        if path.is_symlink() or not path.is_file():
-            continue
-        try:
-            payload = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-            continue
-        if payload.get("dataset_manifest_id") == dataset_manifest_id:
-            path.unlink()
-
-
-def finish_unpublished_visibility(
-    data_root: Path, dataset_manifest_id: str
-) -> DatasetManifest:
-    """Recover an unpublished canonical root with a new visibility clock."""
-
-    inspection = inspect_canonical_root(data_root, dataset_manifest_id)
-    if inspection["complete"] and inspection.get("dataset") is not None:
-        return inspection["dataset"]
-    labels_path = _manifests_dir(data_root) / f"{dataset_manifest_id}.labels.json"
-    _require(labels_path.is_file() and not labels_path.is_symlink(), "DATASET_LABELS_MISSING")
-    _retract_unpublished_canonical_metadata(data_root, dataset_manifest_id)
-    repaired = repair_live_corpus_manifests(data_root=data_root)
-    rebuilt = inspect_canonical_root(data_root, str(repaired["dataset_manifest_id"]))
-    dataset = rebuilt.get("dataset")
-    _require(rebuilt["complete"] and dataset is not None, "CANONICAL_ROOT_INCOMPLETE")
-    return dataset
+def finish_unpublished_visibility(data_root: Path, dataset_manifest_id: str) -> DatasetManifest:
+    """Compatibility entry; never retract or regenerate a broken current root."""
+    lineage = load_live_corpus_lineage(data_root)
+    _require(lineage.get("current_dataset_manifest_id") == dataset_manifest_id,
+             "CURRENT_CORPUS_MISSING")
+    result = repair_live_corpus_manifests(data_root=data_root)
+    return _load_dataset_manifest(data_root, result["dataset_manifest_id"])
 
 
 def repair_live_corpus_manifests(
@@ -866,192 +943,171 @@ def repair_live_corpus_manifests(
     published_at: datetime | None = None,
     fault_before_visibility: Callable[[], None] | None = None,
 ) -> dict[str, Any]:
-    """Republish current LIVE CORPUS composition as TASK-06-valid metadata."""
-
-    lineage = load_live_corpus_lineage(data_root)
+    """Prepare/verify replacement metadata, then atomically select it in lineage."""
+    root = Path(data_root)
+    _safe_path(root, root / "datasets/manifests/partitions")
+    _safe_path(root, root / "datasets/live_lifecycle_corpus/lineage.json")
+    lineage = load_live_corpus_lineage(root)
     current_mid = lineage.get("current_dataset_manifest_id")
-    _require(isinstance(current_mid, str) and current_mid, "CURRENT_CORPUS_MISSING")
-    inspection = inspect_canonical_root(data_root, current_mid)
-    if inspection.get("reason") == "CORPUS_PARQUET_SHA_MISMATCH":
-        raise LiveCohortReleaseError("CORPUS_PARQUET_SHA_MISMATCH")
-    if inspection["complete"]:
-        dataset = inspection["dataset"]
-        return {
-            "status": "IDEMPOTENT_REPAIR",
-            "corpus_version": lineage.get("current_corpus_version"),
-            "dataset_id": CORPUS_DATASET_ID,
-            "dataset_manifest_id": current_mid,
-            "dataset_version": dataset.dataset_version if dataset is not None else None,
-            "dataset_fingerprint": dataset.dataset_fingerprint if dataset is not None else None,
-            "logical_rows_measured_partitions": 0,
-            "superseded_dataset_manifest_id": None,
-            "epoch_bump": False,
-        }
-    prior_by_id: dict[str, LiveCorpusPartitionClaims] | None = None
-    if inspection["artifacts_ok"] and inspection.get("partitions"):
-        prior_by_id = {
-            part.partition_id: claims_from_partition(part)
-            for part in inspection["partitions"]
-        }
-    _retract_unpublished_canonical_metadata(data_root, str(current_mid))
+    _require(isinstance(current_mid, str) and bool(re.fullmatch(r"dataset-[0-9a-f]{64}", current_mid)),
+             "CURRENT_CORPUS_MISSING")
+    current = _load_dataset_manifest(root, current_mid)
+    _require(current.dataset_id == CORPUS_DATASET_ID, "CORPUS_LINEAGE_INCOMPLETE")
+    cohorts = _cohorts_from_lineage(lineage)
+    for item in cohorts:
+        for key in ("census_rel", "obs_rel", "census_sha256", "observations_sha256",
+                    "sealed_at", "cohort_id", "release_id", "content_sha256",
+                    "dataset_manifest_id", "corpus_version", "dataset_version"):
+            _require(item.get(key), "CORPUS_LINEAGE_INCOMPLETE")
+        for key in ("yield_eligible", "yield_missing", "census_row_count", "observation_row_count"):
+            _lineage_int(item, key)
+    version = lineage.get("current_corpus_version")
+    _require(type(version) is int and version == len(cohorts), "CORPUS_LINEAGE_INCOMPLETE")
+    _require(len({item["cohort_id"] for item in cohorts}) == len(cohorts)
+             and len({item["release_id"] for item in cohorts}) == len(cohorts),
+             "CORPUS_LINEAGE_INCOMPLETE")
+    latest = cohorts[-1]
+    _require(latest["corpus_version"] == version and latest["dataset_manifest_id"] == current_mid,
+             "CORPUS_LINEAGE_INCOMPLETE")
 
-    existing_cohorts = _cohorts_from_lineage(lineage)
-    for prior in existing_cohorts:
-        for key in (
-            "census_rel",
-            "obs_rel",
-            "census_sha256",
-            "observations_sha256",
-            "sealed_at",
-            "cohort_id",
-            "release_id",
-            "content_sha256",
-            "dataset_manifest_id",
-            "corpus_version",
-        ):
-            _require(prior.get(key), "CORPUS_LINEAGE_INCOMPLETE")
-
-    current_version = lineage.get("current_corpus_version")
-    latest = existing_cohorts[-1]
-    for item in existing_cohorts:
-        if item.get("corpus_version") == current_version:
-            latest = item
-            break
-    raw_version = str(latest.get("dataset_version") or "")
-    if not raw_version:
-        raw_version = f"corpus-v{int(latest.get('corpus_version') or 1)}-{latest['cohort_id']}"
-    repaired_version = canonical_dataset_version(raw_version)
-    repaired_mid = compute_dataset_manifest_id(CORPUS_DATASET_ID, repaired_version)
-    already = inspect_canonical_root(data_root, repaired_mid)
-    repaired_labels = _manifests_dir(data_root) / f"{repaired_mid}.labels.json"
-    if already["complete"] and already["dataset"] is not None and repaired_labels.is_file():
-        dataset = already["dataset"]
-        latest["superseded_dataset_manifest_id"] = latest.get(
-            "superseded_dataset_manifest_id"
-        ) or current_mid
-        latest["dataset_manifest_id"] = repaired_mid
-        latest["dataset_version"] = repaired_version
-        lineage_out = {
-            "cohorts": existing_cohorts,
-            "corpus_dataset_id": CORPUS_DATASET_ID,
-            "current_corpus_version": current_version,
-            "current_dataset_manifest_id": repaired_mid,
-            "versions": _lineage_versions(existing_cohorts),
-        }
-        write_live_corpus_lineage(data_root, lineage_out)
-        return {
-            "status": "IDEMPOTENT_REPAIR",
-            "corpus_version": current_version,
-            "dataset_id": CORPUS_DATASET_ID,
-            "dataset_manifest_id": repaired_mid,
-            "dataset_version": dataset.dataset_version,
-            "dataset_fingerprint": dataset.dataset_fingerprint,
-            "logical_rows_measured_partitions": 0,
-            "superseded_dataset_manifest_id": latest.get("superseded_dataset_manifest_id"),
-            "epoch_bump": False,
-        }
-    _retract_unpublished_canonical_metadata(data_root, repaired_mid)
-
+    # Validate the old contract on its own terms. A schema mismatch alone is
+    # repairable; invalid already-repaired history is never regenerated.
+    old = inspect_canonical_root(root, current_mid, expected_schema_sha256=current.schema_sha256)
+    is_canonical = current.dataset_version.endswith(CANONICAL_METADATA_SUFFIX)
+    if is_canonical:
+        _require(old["complete"], str(old["reason"]))
+        old_receipt = json.loads((_manifests_dir(root) / f"{current_mid}.validation.json").read_bytes())
+        _require(old_receipt.get("corpus_composition") == [
+            {key: item[key] for key in ("cohort_id", "content_sha256", "release_id")}
+            for item in cohorts], "CORPUS_LINEAGE_INCOMPLETE")
+    labels_path = _manifests_dir(root) / f"{current_mid}.labels.json"
+    _safe_path(root, labels_path)
+    _require(labels_path.is_file(), "DATASET_LABELS_MISSING")
+    try:
+        labels = json.loads(labels_path.read_bytes())
+    except (ValueError, UnicodeDecodeError) as exc:
+        raise LiveCohortReleaseError("DATASET_LABELS_MISSING") from exc
+    _require(isinstance(labels, dict), "DATASET_LABELS_MISSING")
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        EvidenceIdentityError, require_live_scientific_labels,
+    )
+    try:
+        require_live_scientific_labels(CORPUS_DATASET_ID, labels)
+    except EvidenceIdentityError as exc:
+        raise LiveCohortReleaseError(str(exc)) from exc
+    _require(labels.get("corpus_version") == version, "CORPUS_LINEAGE_INCOMPLETE")
+    schema = live_corpus_schema_sha256()
     measured: list[str] = []
     claims: list[LiveCorpusPartitionClaims] = []
-    for cohort in existing_cohorts:
-        claims.extend(
-            _claims_for_cohort(
-                data_root=data_root,
-                cohort=cohort,
-                prior_by_id=prior_by_id,
-                measured=measured,
-                allow_measure=True,
-            )
-        )
-    superseded_stored = latest.get("superseded_dataset_manifest_id")
-    superseded = (
-        str(superseded_stored)
-        if isinstance(superseded_stored, str) and superseded_stored
-        else None
-    )
-    if superseded == repaired_mid:
-        superseded = None
-    if not str(latest.get("dataset_version") or "").endswith(CANONICAL_METADATA_SUFFIX):
-        if current_mid != repaired_mid:
-            superseded = str(current_mid)
-    latest["superseded_dataset_manifest_id"] = superseded
+    # Repair always measures parquet and logical rows; never fills a cache in
+    # the old root. Lineage is an immutable scientific composition binding.
+    for item in cohorts:
+        cohort_claims = []
+        for kind, rel_key, sha_key, count_key, suffix in (
+            (KIND_CENSUS, "census_rel", "census_sha256", "census_row_count", "-CENSUS"),
+            (KIND_OBS, "obs_rel", "observations_sha256", "observation_row_count", "-OBS"),
+        ):
+            rel = str(item[rel_key])
+            _require(not Path(rel).is_absolute() and ".." not in Path(rel).parts,
+                     "LIVE_CORPUS_PATH_INTEGRITY")
+            path = root / rel
+            _safe_path(root, path)
+            _require(path.is_file(), "LIVE_CORPUS_PARQUET_MISSING")
+            _require(sha256_file_streaming(path) == item[sha_key], "CORPUS_PARQUET_SHA_MISMATCH")
+            claim = _measure_parquet(path, kind=kind,
+                partition_id=f"PARTITION-LIVE-COHORT-{item['cohort_id']}{suffix}",
+                logical_location=rel, measured=measured)
+            _require(claim.row_count == int(item[count_key]), "LIVE_CORPUS_ROW_COUNT_MISMATCH")
+            cohort_claims.append(claim)
+        _require(sha256_files_concat_streaming([root / str(item["census_rel"]), root / str(item["obs_rel"])])
+                 == item["content_sha256"], "CORPUS_PARQUET_SHA_MISMATCH")
+        claims.extend(cohort_claims)
+    if is_canonical:
+        expected_claims = {part.partition_id: claims_from_partition(part) for part in old["partitions"]}
+        _require({claim.partition_id: claim for claim in claims} == expected_claims,
+                 "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
+
+    if is_canonical and current.schema_sha256 == schema:
+        _reconcile_current_labels(data_root=root, dataset_manifest_id=current_mid,
+            labels=labels, lineage_out=lineage,
+            previous_current_mid=labels.get("superseded_dataset_manifest_id"))
+        return {"status": "IDEMPOTENT_REPAIR", "corpus_version": version,
+            "corpus_version_before": version, "dataset_id": CORPUS_DATASET_ID,
+            "dataset_manifest_id_before": current_mid, "dataset_manifest_id": current_mid,
+            "dataset_version": current.dataset_version, "dataset_fingerprint": current.dataset_fingerprint,
+            "logical_rows_measured_partitions": len(measured), "epoch_bump": False,
+            "metadata_identity_changed": False, "scientific_epoch_changed": False,
+            "candidate_disposition": "CURRENT_VERIFIED", "lineage_switched": False,
+            "superseded_dataset_manifest_id": labels.get("superseded_dataset_manifest_id")}
+
+    repaired_version = repair_dataset_version(current.dataset_version, schema, cohorts)
+    repaired_mid = compute_dataset_manifest_id(CORPUS_DATASET_ID, repaired_version)
+    _require(repaired_mid != current_mid, "CANONICAL_TARGET_CONFLICT")
+    latest["superseded_dataset_manifest_id"] = current_mid
     latest["dataset_manifest_id"] = repaired_mid
     latest["dataset_version"] = repaired_version
-    version_n = int(current_version or latest.get("corpus_version") or 1)
-    composition = [
-        {
-            "cohort_id": item["cohort_id"],
-            "content_sha256": item["content_sha256"],
-            "release_id": item["release_id"],
-        }
-        for item in existing_cohorts
-    ]
-    feature_union = _feature_union(existing_cohorts)
-    yield_eligible_sum = sum(_lineage_int(item, "yield_eligible") for item in existing_cohorts)
-    yield_missing_sum = sum(_lineage_int(item, "yield_missing") for item in existing_cohorts)
-    census_rows_sum = sum(_lineage_int(item, "census_row_count") for item in existing_cohorts)
-    obs_rows_sum = sum(_lineage_int(item, "observation_row_count") for item in existing_cohorts)
-    clock_proposed = (published_at or datetime.now(tz=UTC)).astimezone(UTC)
-    labels = {
-        **REQUIRED_LABELS,
-        "accepted_hypothesis_id": None,
-        "census_row_count_cumulative": census_rows_sum,
-        "cohort_id": latest["cohort_id"],
-        "cohort_lineage": [str(item["cohort_id"]) for item in existing_cohorts],
-        "corpus_version": version_n,
-        "cumulative_composition": True,
-        "dataset_terminal": _dataset_terminal_from_current(
-            data_root, str(current_mid), latest
-        ),
-        "dataset_version": repaired_version,
-        "discovery_coverage_class": latest.get("discovery_coverage_class"),
-        "feature_families": feature_union,
-        "feature_hint": None,
-        "imported_at": _render_utc(clock_proposed),
-        "is_current_corpus_version": True,
-        "observation_row_count_cumulative": obs_rows_sum,
-        "readiness_state": latest.get("readiness_state"),
-        "release_id": latest["release_id"],
-        "superseded_dataset_manifest_id": superseded,
-        "yield_eligible": yield_eligible_sum,
-        "yield_missing": yield_missing_sum,
-    }
-    lineage_out = {
-        "cohorts": existing_cohorts,
-        "corpus_dataset_id": CORPUS_DATASET_ID,
-        "current_corpus_version": version_n,
-        "current_dataset_manifest_id": repaired_mid,
-        "versions": _lineage_versions(existing_cohorts),
-    }
-    dataset, _parts, fingerprint = _publish_from_claims(
-        data_root=data_root,
-        dataset_version=repaired_version,
-        generation_task_id=CANONICAL_GENERATION_TASK_REPAIR,
-        generation_run_id=f"repair-{current_mid[8:24]}" if current_mid.startswith("dataset-") else "repair-canonical-v1",
-        generation_reason="METADATA_CONTRACT_REPAIR",
-        published_at=clock_proposed,
-        composition=composition,
-        claims=claims,
-        labels=labels,
-        lineage_out=lineage_out,
-        previous_current_mid=superseded,
-        superseded_dataset_manifest_id=superseded,
-        fault_before_visibility=fault_before_visibility,
-    )
-    return {
-        "status": "REPAIRED",
-        "corpus_version": version_n,
-        "dataset_id": CORPUS_DATASET_ID,
-        "dataset_manifest_id": dataset.dataset_manifest_id,
-        "dataset_version": dataset.dataset_version,
-        "dataset_fingerprint": fingerprint,
-        "logical_rows_measured_partitions": len(measured),
-        "measured_logical_locations": measured,
-        "superseded_dataset_manifest_id": superseded,
-        "cohort_count": len(existing_cohorts),
-        "epoch_bump": True,
-    }
+    lineage_out = {**lineage, "cohorts": cohorts,
+        "current_dataset_manifest_id": repaired_mid, "versions": _lineage_versions(cohorts)}
+    candidate_labels = {**labels, "dataset_version": repaired_version,
+                        "superseded_dataset_manifest_id": current_mid}
+    composition = [{key: item[key] for key in ("cohort_id", "content_sha256", "release_id")}
+                   for item in cohorts]
+    candidate_path = _manifests_dir(root) / f"{repaired_mid}.json"
+    candidate_marker = _manifests_dir(root) / f"{repaired_mid}.published"
+    disposition = "BUILT"
+    if candidate_path.exists() or candidate_marker.exists():
+        candidate = inspect_canonical_root(root, repaired_mid)
+        disposition = "REUSED" if candidate["complete"] else "REBUILT_PARTIAL"
+    elif (_manifests_dir(root) / f"{repaired_mid}.publication-clock.json").exists():
+        disposition = "REBUILT_PARTIAL"
+    already = inspect_canonical_root(root, repaired_mid)
+    if already["complete"]:
+        dataset = already["dataset"]
+        _require(dataset.dataset_version == repaired_version and dataset.schema_sha256 == schema,
+                 "CANONICAL_TARGET_CONFLICT")
+        _require({part.partition_id: claims_from_partition(part) for part in already["partitions"]}
+                 == {claim.partition_id: claim for claim in claims}, "CANONICAL_TARGET_CONFLICT")
+        stored_labels = json.loads((_manifests_dir(root) / f"{repaired_mid}.labels.json").read_bytes())
+        administrative = {"is_current_corpus_version", "superseded_dataset_manifest_id"}
+        _require({key: value for key, value in stored_labels.items() if key not in administrative}
+                 == {key: value for key, value in candidate_labels.items() if key not in administrative},
+                 "CANONICAL_TARGET_CONFLICT")
+        receipt = json.loads((_manifests_dir(root) / f"{repaired_mid}.validation.json").read_bytes())
+        _require(receipt.get("corpus_composition") == composition
+                 and receipt.get("logical_row_profile") == LOGICAL_ROW_PROFILE,
+                 "CANONICAL_TARGET_CONFLICT")
+        if fault_before_visibility is not None:
+            fault_before_visibility()
+        recheck = inspect_canonical_root(root, repaired_mid)
+        _require(recheck["complete"] and recheck["dataset"] == dataset
+                 and recheck["partitions"] == already["partitions"]
+                 and json.loads((_manifests_dir(root) / f"{repaired_mid}.labels.json").read_bytes()) == stored_labels,
+                 "CANDIDATE_VERIFICATION_FAILED")
+        _commit_visibility(data_root=root, dataset_manifest_id=repaired_mid,
+            labels=stored_labels, lineage_out=lineage_out, expected_lineage=lineage)
+        fingerprint = dataset.dataset_fingerprint
+        disposition = "REUSED"
+    else:
+        dataset, _parts, fingerprint = _publish_from_claims(
+            data_root=root, dataset_version=repaired_version,
+            generation_task_id=CANONICAL_GENERATION_TASK_REPAIR,
+            generation_run_id=f"repair-{current_mid[8:24]}",
+            generation_reason="METADATA_CONTRACT_REPAIR",
+            published_at=(published_at or datetime.now(tz=UTC)).astimezone(UTC),
+            composition=composition, claims=claims, labels=candidate_labels,
+            lineage_out=lineage_out, previous_current_mid=current_mid,
+            superseded_dataset_manifest_id=current_mid,
+            fault_before_visibility=fault_before_visibility,
+            expected_lineage=lineage,
+        )
+    return {"status": "REPAIRED", "corpus_version": version, "corpus_version_before": version,
+        "dataset_id": CORPUS_DATASET_ID, "dataset_manifest_id_before": current_mid,
+        "dataset_manifest_id": dataset.dataset_manifest_id, "dataset_version": dataset.dataset_version,
+        "dataset_fingerprint": fingerprint, "logical_rows_measured_partitions": len(measured),
+        "measured_logical_locations": measured, "superseded_dataset_manifest_id": current_mid,
+        "cohort_count": len(cohorts), "epoch_bump": False,
+        "metadata_identity_changed": True, "scientific_epoch_changed": False,
+        "candidate_disposition": disposition, "lineage_switched": True}
 
 
 def _producer_for_imported_schedule(manifest: Mapping[str, Any]) -> str:
@@ -1192,7 +1248,7 @@ def import_live_cohort_canonical(
                     "logical_rows_measured_partitions": rebuilt.get(
                         "logical_rows_measured_partitions", 0
                     ),
-                    "epoch_bump": True,
+                    "epoch_bump": bool(rebuilt.get("epoch_bump")),
                 }
             if (
                 matching is not None
@@ -1250,6 +1306,15 @@ def import_live_cohort_canonical(
 
     version_n = len(existing_cohorts) + 1
     dataset_version = canonical_dataset_version(f"corpus-v{version_n}-{cohort_id}")
+    # A prepared first-import candidate already froze its publication clock.
+    # Retry reuses it rather than changing immutable metadata under the same ID.
+    frozen_clock = _manifests_dir(data_root) / (
+        f"{compute_dataset_manifest_id(CORPUS_DATASET_ID, dataset_version)}.publication-clock.json"
+    )
+    if frozen_clock.exists():
+        imported_at = _freeze_publication_clock(
+            data_root, compute_dataset_manifest_id(CORPUS_DATASET_ID, dataset_version), imported_at
+        )
     census_part_id = f"PARTITION-LIVE-COHORT-{cohort_id}-CENSUS"
     obs_part_id = f"PARTITION-LIVE-COHORT-{cohort_id}-OBS"
     date_key = imported_at.strftime("%Y-%m-%d")

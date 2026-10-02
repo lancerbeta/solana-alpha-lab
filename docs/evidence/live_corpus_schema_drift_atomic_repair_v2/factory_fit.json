@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2-FIT",
+  "as_of": "2026-10-02",
+  "task_id": "LIVE_CORPUS_SCHEMA_DRIFT_ATOMIC_REPAIR_V2",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "NOT_READY",
+  "dimensions": {
+    "mission": "PENDING_FINAL_REVIEW",
+    "flexibility_and_history": "PENDING_FINAL_REVIEW",
+    "context_efficiency": "PENDING_FINAL_REVIEW",
+    "research_truth": "PENDING_FINAL_REVIEW",
+    "owner_operability": "PENDING_FINAL_REVIEW",
+    "execution_to_cashflow": "PENDING_FINAL_REVIEW",
+    "monitoring_and_recovery": "PENDING_FINAL_REVIEW",
+    "build_vs_buy": "PENDING_FINAL_REVIEW",
+    "security": "PENDING_FINAL_REVIEW",
+    "red_team": "PENDING_FINAL_REVIEW"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Separate owner-authorized real metadata repair and verified C4 import after merge."
+  },
+  "recovery": "Same repair command for compatible preparation or stale derived labels; typed integrity STOP; ordinary Git revert preserves runtime history.",
+  "limits": [
+    "SERIALIZED_REPAIR_IMPORT_OPERATIONS",
+    "NO_POWER_LOSS_DURABILITY_CLAIM",
+    "NO_RUNTIME_SUCCESS_CLAIM",
+    "NO_REAL_DATA_C4_FORGE",
+    "NO_MERGE"
+  ]
+}

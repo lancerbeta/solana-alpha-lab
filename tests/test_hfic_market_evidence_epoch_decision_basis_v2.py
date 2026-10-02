@@ -371,6 +371,7 @@ class ScientificMarketV2Tests(unittest.TestCase):
         version = old.dataset_version.removesuffix(".canonical-v1") + ".schema-B.canonical-v1"
         mid = compute_dataset_manifest_id(old.dataset_id, version)
         clock = datetime(2026, 10, 1, tzinfo=UTC)
+        publication_at = clock.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         parts = []
         for part_id in receipt["partition_manifest_ids"]:
             old_part = PartitionManifest.model_validate_json((manifests / "partitions" / (part_id + ".json")).read_bytes())
@@ -391,7 +392,10 @@ class ScientificMarketV2Tests(unittest.TestCase):
             (manifests / "partitions" / (part.partition_manifest_id + ".json")).write_bytes(canonical_manifest_bytes(part))
         schema_sha = "b" * 64
         fp = compute_dataset_fingerprint(dataset_id=old.dataset_id, dataset_version=version, schema_id=old.schema_id, schema_sha256=schema_sha, partitions=parts)
-        receipt.update(dataset_manifest_id=mid, dataset_fingerprint=fp, partition_manifest_ids=[p.partition_manifest_id for p in parts])
+        receipt.update(dataset_manifest_id=mid, dataset_fingerprint=fp,
+                       dataset_version=version, schema_sha256=schema_sha,
+                       published_at=publication_at,
+                       partition_manifest_ids=[p.partition_manifest_id for p in parts])
         receipt_bytes = json.dumps(receipt, sort_keys=True, separators=(",", ":")).encode()
         new = build_dataset_manifest(dataset_id=old.dataset_id, dataset_version=version, schema_id=old.schema_id, schema_sha256=schema_sha,
                                      generation_task_id=old.generation_task_id, generation_run_id=old.generation_run_id,
@@ -400,13 +404,17 @@ class ScientificMarketV2Tests(unittest.TestCase):
         verify_dataset_manifest(new, partitions=parts)
         (manifests / (mid + ".json")).write_bytes(canonical_manifest_bytes(new))
         (manifests / (mid + ".validation.json")).write_bytes(receipt_bytes)
+        (manifests / (mid + ".publication-clock.json")).write_text(json.dumps({
+            "created_at": publication_at, "first_reliable_available_at": publication_at,
+        }), encoding="utf-8")
         labels = json.loads((manifests / (old_mid + ".labels.json")).read_bytes())
         labels["is_current_corpus_version"] = False
         (manifests / (old_mid + ".labels.json")).write_text(json.dumps(labels), encoding="utf-8")
         labels.update(is_current_corpus_version=True, dataset_version=version, imported_at=clock.isoformat())
         (manifests / (mid + ".labels.json")).write_text(json.dumps(labels), encoding="utf-8")
         published = json.loads((manifests / (old_mid + ".published")).read_bytes())
-        published.update(dataset_manifest_id=mid, dataset_fingerprint=fp)
+        published.update(dataset_manifest_id=mid, dataset_fingerprint=fp,
+                         metadata_clock_at=publication_at, published_at=publication_at)
         (manifests / (mid + ".published")).write_text(json.dumps(published), encoding="utf-8")
         lineage["current_dataset_manifest_id"] = mid
         lineage["cohorts"][-1].update(dataset_manifest_id=mid, dataset_version=version)

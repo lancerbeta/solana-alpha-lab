@@ -922,8 +922,9 @@ Primitives remain available (`build-live-source` requires `--cohort-id` and
 `import-live`). If `import-live` fail-closes with `CURRENT_CORPUS_LEGACY_METADATA_REQUIRES_REPAIR`,
 JSON `next` is `REPAIR_LIVE_CORPUS_METADATA_FIRST`. Run repair, then paste the
 **exact same** `import-live` command that just failed (same `--release-root`).
-Do not treat repair itself as the import. If repair is interrupted, or
-`.published` is missing/corrupt, rerun the same repair command.
+Do not treat repair itself as the import. An interrupted candidate preparation
+can be retried with the same repair command. A missing/corrupt `.published`
+on the **current** root is a typed STOP; do not regenerate current history.
 
 ```
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py repair-live-corpus-manifests
@@ -932,6 +933,39 @@ uv run --locked --managed-python python -B scripts/discovery_evidence_release.py
 CLI `status` `PASS` carries operational `result.status` `REPAIRED` or
 `IDEMPOTENT_REPAIR`. That means the metadata root is published. It does not
 prove parquet rewrite, MAR, or alpha.
+
+Current LIVE corpus has one owner: `datasets/live_lifecycle_corpus/lineage.json`
+field `current_dataset_manifest_id`. The labels flag
+`is_current_corpus_version` is a derived cache. If a process stops after the
+lineage switch while old labels remain true/new labels false, current consumers
+still select the new verified root. Rerun the same repair command to reconcile
+labels; no manual pointer or label editing is needed.
+
+Schema drift gives unchanged composition a deterministic LIVE metadata revision
+in `dataset_version` (`.metadata-<composition-and-schema-sha256>.canonical-v1`), using
+the existing TASK-06 identity builders. It never increments `corpus_version`
+and preserves `MARKET_EVIDENCE_BASIS_V2` epoch and consumed AUTO/focus slots.
+Only a later verified cohort import changes composition/version. Repair writes
+replacement metadata with current=false, verifies it, then atomically replaces
+lineage. Before that switch the old current root and labels remain unchanged.
+Parquet and sealed releases are never rewritten.
+
+Read `result.dataset_manifest_id_before` / `dataset_manifest_id`,
+`corpus_version_before` / `corpus_version`, `candidate_disposition`
+(`BUILT`, `REBUILT_PARTIAL`, `REUSED`, `CURRENT_VERIFIED`), `lineage_switched`,
+`metadata_identity_changed`, `scientific_epoch_changed` and `epoch_bump`.
+`IDEMPOTENT_REPAIR` selects the same identity and may finish derived label
+cleanup. `REBUILT_PARTIAL` completes compatible unpublished candidate artifacts;
+conflicting immutable candidate bytes are never overwritten.
+
+On an interrupted preparation, read lineage and rerun the same command. On
+`CANONICAL_TARGET_CONFLICT`, `CANDIDATE_VERIFICATION_FAILED`,
+`LIVE_CORPUS_PATH_INTEGRITY`, `CORPUS_PARQUET_SHA_MISMATCH`,
+`LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE` or invalid current-root
+publication, STOP and inspect the exact JSON `code`/`next`; do not retry-loop,
+delete candidate/history or rewrite parquet. `CORPUS_CURRENT_BASIS_CHANGED`
+requires re-reading the current lineage. Run repair/import serially: lineage's
+atomic replacement is a visibility boundary, not a multi-writer lock.
 
 If repair fail-closes with `CORPUS_LINEAGE_INCOMPLETE` or
 `DATASET_TERMINAL_MISSING`, JSON `next` is

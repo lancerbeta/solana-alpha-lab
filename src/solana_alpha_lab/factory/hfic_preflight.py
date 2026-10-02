@@ -1055,6 +1055,40 @@ def enumerate_rdp_datasets(
                 }
             )
             continue
+        if current_corpus_id and path.stem != current_corpus_id:
+            # Prepared/historical LIVE roots cannot affect current market
+            # integrity. Their labels identify the LIVE-local publication,
+            # while lineage alone determines which root must validate.
+            historical_labels = manifests_dir / f"{path.stem}.labels.json"
+            loaded = None
+            if historical_labels.is_file() and not _is_symlink_path(historical_labels):
+                try:
+                    loaded = json.loads(historical_labels.read_bytes())
+                except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+                    pass
+            live_clock = manifests_dir / f"{path.stem}.publication-clock.json"
+            # This sidecar is written only by the LIVE publisher (including
+            # before candidate labels). It identifies the publication domain;
+            # it never determines currentness or proves candidate integrity.
+            is_live_publication = live_clock.exists() and not _is_symlink_path(live_clock)
+            is_live_publication = is_live_publication or (
+                isinstance(loaded, dict) and loaded.get("logical_dataset_id") == CORPUS_DATASET_ID
+            )
+            if is_live_publication:
+                if live_corpus_current_only:
+                    _ENUMERATE_WORK["superseded_live_corpus_skipped"] += 1
+                else:
+                    try:
+                        historical = DatasetManifest.model_validate_json(path.read_bytes())
+                    except Exception:
+                        continue
+                    if historical.dataset_manifest_id != path.stem or historical.dataset_id != CORPUS_DATASET_ID:
+                        continue
+                    entries.append({"dataset_manifest_id": path.stem,
+                        "dataset_fingerprint": historical.dataset_fingerprint,
+                        "dataset_id": CORPUS_DATASET_ID, "parquet_verified": False, "labels": loaded})
+                    _ENUMERATE_WORK["superseded_corpus_metadata_only"] += 1
+                continue
         try:
             manifest = DatasetManifest.model_validate_json(path.read_bytes())
         except (OSError, UnicodeDecodeError, json.JSONDecodeError, Exception):
@@ -1068,6 +1102,20 @@ def enumerate_rdp_datasets(
         if path.stem != manifest.dataset_manifest_id:
             warnings.append({"code": "DATASET_MANIFEST_ID_MISMATCH", "dataset_manifest_id": path.stem})
             continue
+        if manifest.dataset_id == CORPUS_DATASET_ID and not current_corpus_id:
+            warnings.append({"code": "CURRENT_CORPUS_MISSING", "dataset_manifest_id": path.stem})
+            continue
+        if manifest.dataset_id == CORPUS_DATASET_ID and manifest.dataset_manifest_id == current_corpus_id:
+            from solana_alpha_lab.factory.live_corpus_manifest_publish import inspect_canonical_root
+            try:
+                current_integrity = inspect_canonical_root(data_root, current_corpus_id,
+                    expected_schema_sha256=manifest.schema_sha256, verify_parquet_bytes=False)
+            except Exception:
+                current_integrity = {"complete": False, "reason": "CURRENT_ROOT_INVALID"}
+            if not current_integrity["complete"]:
+                warnings.append({"code": "DATASET_PUBLICATION_INCOMPLETE",
+                    "dataset_manifest_id": current_corpus_id, "reason": current_integrity["reason"]})
+                continue
         canonical = bool(re.fullmatch(r"dataset-[0-9a-f]{64}", manifest.dataset_manifest_id))
         labels_path = manifests_dir / f"{manifest.dataset_manifest_id}.labels.json"
         labels: dict[str, Any] | None = None
@@ -1328,6 +1376,9 @@ def enumerate_rdp_datasets(
     for item in entries:
         unique.setdefault(str(item["dataset_manifest_id"]), item)
     entries = list(unique.values())
+    for entry in entries:
+        if entry.get("dataset_id") == CORPUS_DATASET_ID:
+            entry["live_corpus_current_manifest_id"] = current_corpus_id
     entries.sort(key=lambda item: item["dataset_manifest_id"])
     return entries, warnings
 
