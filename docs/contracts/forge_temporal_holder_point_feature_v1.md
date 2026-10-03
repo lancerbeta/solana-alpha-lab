@@ -34,7 +34,9 @@ The public `discovery-preview` accepts a full temporal query and derives a
 feature-only view. Its Arrow loader selects points at or before the decision;
 the target never enters the returned value rows. Full-query and feature-only
 forms share pre-values validation, so forbidden operators or future points
-cannot reach the loader. Optional point features are
+cannot reach the loader. Null/empty default clock spellings use the canonical
+EVENT_TIME_V1 normalization. Feature-point deadline may not exceed decision
+deadline, matching the common evaluator's fail-closed boundary. Optional point features are
 read through the common cell owner with explicit value/status pairs. A missing
 holder remains visible alongside a present price. Traditional previews retain
 their existing identity when optional features/policy are absent.
@@ -60,6 +62,9 @@ preserved in `docs/tasks/FORGE_TEMPORAL_HOLDER_POINT_FEATURE_V1.md`.
 The frozen future question is BASE_X, decision Y900, holder point Y900 >=3,
 PRICE_RELATIVE_PROXY Y900→Y14400, exactly one MAIN after separate authorization.
 No alternative threshold, price/liquidity condition, interaction or adaptation.
+The synthetic candidate explicitly uses PREDICTIVE, declares known confounds
+and the frozen taxonomy. Its complement is baseline-minus-matched after subset
+proof, retaining V5 UNKNOWN semantics; it never substitutes a known-holder sample.
 
 The idea is outcome-exposed: prior D2 on the same C1–C4 showed that the apparent
 downside difference substantially tracked whether price moved. Activity and

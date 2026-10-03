@@ -1743,6 +1743,11 @@ Consumer `EARLY_HOLDER_STATE_TO_PRICE_PATH_15M_TO_4H` preregistered как
 holder Y900 >=3 → PRICE_RELATIVE_PROXY Y900→Y14400. Его real MAIN требует
 отдельного разрешения после merge; C5 остаётся закрыт. Prior D2 activity/
 price-staleness exposure сохраняется; C1–C4 result только EXPLORATORY.
+Для этого вопроса явно задайте `claim_form=PREDICTIVE`, activity/staleness/
+prior-exposure в `confounders` и frozen taxonomy в
+`pass_fail_inconclusive_semantics`. Complement — только additive
+baseline-minus-matched после subset proof; UNKNOWN остаётся по V5, отдельную
+known-holder выборку не создавайте. Synthetic proof не запускает real MAIN.
 
 При каждом использовании сохраняйте в research packet:
 

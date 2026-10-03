@@ -1587,7 +1587,7 @@
     "CLOSED_FAMILY:CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY",
     "CLOSED_FAMILY:CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY"
   ],
-  "live_git_head": "21678a861ebfa65297b668e5bed4ea830ab99fdd",
+  "live_git_head": "d3ffe17930da3dbaa18aa87ccf9fd47b0825c79a",
   "market_evidence_epoch_sha256": "8eb4da36b395174df95ddaeb8bf0ed687b0a40411cc09b6ecb53204fe5397b12",
   "non_claims": [
     "NO_ALPHA",
@@ -1626,8 +1626,8 @@
     "max_records": 64,
     "schema": "smial.hfic-prior-memory-snapshot",
     "schema_version": "1.0",
-    "snapshot_sha256": "f772919162d1f07ff36e8536312bfbf434d23d7cce4d76a982d4d35f7a66cdc9",
-    "store_inventory_digest": "49895f89b82d11c95960e866c432e1824a9436f5a329699c2d2206bdf4a35795"
+    "snapshot_sha256": "ff8f6fa063e778770903cc9aee225ed17a3c0354b6658af7f07053048c130739",
+    "store_inventory_digest": "605d6d53fc8f1cbfda9900f32f03c8d1978bbaceb8821e2d98664d81b94fcb0c"
   },
   "prior_work_queries": [
     "QUERY-HFIC-EXACT-RELATED-PRIOR-001",
@@ -1647,21 +1647,24 @@
   "research_memory_as_of": "2026-08-25T00:00:00Z",
   "selected_candidate": {
     "actor_counterparty": "BASE_X holders and later buyers; ownership concentration unmeasured",
-    "alternative_world": "NOT_DECLARED_IN_DRAFT",
+    "alternative_world": "Holder changes mark activity without a positive directional price signal.",
     "available_data_bindings": [],
-    "candidate_id": "HFIC-CAND-25D48833E3C5",
+    "candidate_id": "HFIC-CAND-583C211CE996",
     "cheapest_falsifier": "One separately authorized fixed holder Y900 >=3 PRICE_RELATIVE_PROXY Y900->Y14400 MAIN with frozen taxonomy.",
     "claim": "The fixed early holder group may have positive later price direction.",
-    "claim_form": "CAUSAL",
+    "claim_form": "PREDICTIVE",
     "confounders": [
-      "NOT_DECLARED_IN_DRAFT"
+      "activity",
+      "price staleness",
+      "prior D2 outcome exposure on C1-C4"
     ],
     "decision_timestamp": "Y900",
     "decision_unlocked": "Whether the exploratory fixed holder question merits a separately authorized new chronological OOS; no entry edge or promotion.",
     "disconfirming_prediction": "Holder >=3 has no supported positive directional price contrast after descriptive activity decomposition.",
     "estimand": "price_relative_proxy",
     "execution_capacity_risks": [
-      "NOT_DECLARED_IN_DRAFT"
+      "Mark-price proxy has no fill, route, latency, size or realized NetReturn proof",
+      "BASE cost stress is ASSUMPTION_NOT_CALIBRATED"
     ],
     "grounding": {
       "capability_bindings": [
@@ -1680,17 +1683,21 @@
     },
     "horizon_notional": "Y900 -> Y14400; PRICE_RELATIVE_PROXY; no executable notional",
     "mechanism": "Early holder state may mark participation; activity and price staleness are known confounds, causality unknown.",
-    "missing_or_forward_only_data": [],
+    "missing_or_forward_only_data": [
+      "Holder UNKNOWN remains UNKNOWN; no zero fallback",
+      "Future target support remains a separate real-MAIN question"
+    ],
     "nearest_prior_and_difference": "Prior D2 on C1-C4 exposed activity/staleness confounding; this frozen >=3 holder question remains exploratory.",
-    "negative_control": "Known-holder <3 complement, only where additive subset derivation is valid; missing is excluded, no second look.",
-    "pass_fail_inconclusive_semantics": "NOT_DECLARED_IN_DRAFT",
+    "negative_control": "Baseline-minus-matched additive complement only after subset proof; UNKNOWN and missing retain V5 semantics, no second look or new sample.",
+    "pass_fail_inconclusive_semantics": "Frozen task taxonomy: HOLDER_NO_POSITIVE_ENTRY_EDGE | HOLDER_ACTIVITY_ONLY | HOLDER_DIRECTIONAL_EDGE_COHORT_UNSTABLE | HOLDER_DIRECTIONAL_EDGE_OOS_WORTHY | HOLDER_RESULT_INCONCLUSIVE. C1-C4 EXPLORATORY; no threshold adaptation or automatic promotion.",
     "pit_leakage_survivorship_risks": [
-      "NOT_DECLARED_IN_DRAFT"
+      "Unavailable, late, conflicting or bad-lineage cells stay UNKNOWN",
+      "Retain BASE_X denominator and V5 missingness; no survivor-only sample"
     ],
     "population": "BASE_X",
     "primary_x": "FIELD-HOLDER-COUNT-001 point_value Y900 >= 3.0",
     "primary_y": "PRICE_RELATIVE_PROXY Y900 -> Y14400",
-    "proposed_method": "NOT_DECLARED_IN_DRAFT",
+    "proposed_method": "Exactly one separately authorized MAIN: BASE_X, Y900, holder >=3, PRICE_RELATIVE_PROXY Y900->Y14400; descriptive activity decomposition and additive subset complement only.",
     "required_capability_ids": [
       "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
     ],
@@ -1699,7 +1706,7 @@
     "unresolved_requirements": [
       "HOLDER_POINT_FEATURE_EXPLORATORY"
     ],
-    "why_not_arbitraged": "NOT_DECLARED_IN_DRAFT"
+    "why_not_arbitraged": "UNKNOWN; no alpha or causal mechanism established by this exploratory association."
   },
   "session_id": "HFIC-SESS-99710B1278685B37",
   "strongest_rejected_alternative": "NONE",

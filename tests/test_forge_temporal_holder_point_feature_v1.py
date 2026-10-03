@@ -74,6 +74,35 @@ def old_cases():
 
 
 class HolderPolicyTests(unittest.TestCase):
+    def test_preview_mixed_point_deadline_matches_canonical_feature(self):
+        from solana_alpha_lab.factory.hfic_grounded_discovery import _grouped_cells
+
+        binding = _binding()
+        binding[0]["schedule_point_lateness"] = {"X300": 300, "Y900": 1800, "Y1800": 300}
+        feature = {"name": "h", "op": "point_value", "field_id": HOLDER, "point": "Y900"}
+        spec = {"decision": {"point_id": "Y1800"}, "schedule": {"points": ["Y900", "Y1800"], "lateness_seconds": 300}, "features": [feature], "seed": "mixed-clock"}
+        observations = [row("match", "X300", LIQ, 1000), row("match", "Y900", HOLDER, 3, late=1300)]
+        preview = temporal.build_feature_preview([_census("match")], observations, spec, binding)
+        value, _lineage = temporal._feature_value_with_lineage(_grouped_cells(observations), cohort=binding[0]["cohort_id"],
+            release=binding[0]["release_id"], mint="match", anchor=ANCHOR, feature=feature, lateness=300,
+            decision_deadline=temporal._deadline_for(ANCHOR, "Y1800", 300),
+            due_offset_for=lambda point: temporal._clock(binding[0], point, 300)[0],
+            lateness_for=lambda point: temporal._clock(binding[0], point, 300)[1])
+        self.assertIsNone(value)
+        self.assertIsNone(preview["examples"][0]["feature_values"]["h"])
+        self.assertEqual(preview["examples"][0]["feature_status"]["h"], "ABSENT")
+
+    def test_preview_default_clock_normalization_matches_query(self):
+        spec = {"decision": {"point_id": "Y900"}, "schedule": {"points": ["Y900"], "lateness_seconds": 300}, "features": holder_spec()["features"], "seed": "default-clock"}
+        census, observations = synthetic_rows()
+        base = temporal.build_feature_preview(census, observations, spec, _binding())
+        for default in (None, ""):
+            query = holder_spec(schedule={"lateness_seconds": 300, "observation_clock_policy": default})
+            self.assertEqual(temporal.validate_temporal_query(query)["scientific_body"]["observation_clock_policy"], temporal.OBSERVATION_CLOCK_EVENT_TIME_V1)
+            variant = copy.deepcopy(spec)
+            variant["schedule"]["observation_clock_policy"] = default
+            self.assertEqual(temporal.build_feature_preview(census, observations, variant, _binding()), base)
+
     def test_numeric_card_labels_are_lossless_and_wrong_threshold_refuses(self):
         from solana_alpha_lab.factory.hfic_session import _bind_selected_look, HficSessionError
 
@@ -255,6 +284,36 @@ def publish_holder(workspace):
 
 
 class HolderVerticalTests(unittest.TestCase):
+    def test_public_full_query_preview_accepts_default_clock_spellings(self):
+        from tests.test_hfic_cli import run_cli
+        from tests.test_hfic_ordinary_operation_acceptance_v1 import _forge, _operation
+        from tests.test_hfic_temporal_production_runner_v1 import DOCUMENT_LATENESS
+        from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            data_root = publish_holder(workspace)
+            pre = run_cli("preflight", "--discovery-contract", "--owner-focus", FOCUS, "--format", "json", data_root=data_root)
+            self.assertEqual(pre.returncode, 0, pre.stdout + pre.stderr)
+            receipt = json.loads(pre.stdout)
+            journal, market = receipt["search_key_sha256"], receipt["market_evidence_epoch_sha256"]
+            previews = []
+            for default in (None, ""):
+                spec = holder_spec(schedule={"lateness_seconds": DOCUMENT_LATENESS, "observation_clock_policy": default})
+                spec_path, op_path = workspace / "spec.json", workspace / "operation.json"
+                spec_path.write_text(json.dumps(spec), encoding="utf-8")
+                op_path.write_text(json.dumps(_operation(spec, focus=FOCUS, journal=journal, market=market,
+                    text="Synthetic two-spelling default-clock preview only", cap={"main": 0, "adaptive": 0, "preview": 2})), encoding="utf-8")
+                with contextlib.redirect_stdout(io.StringIO()) as output:
+                    code = _forge().cmd_discovery_preview(ROOT, explicit_data_root=data_root, spec_path=spec_path, binding_path=None,
+                        census_path=None, observations_path=None, cohort_partitions=None, prior_preview_hash=None,
+                        store_root=data_root, journal_scope=journal, operation_path=op_path)
+                self.assertEqual(code, 0, output.getvalue())
+                previews.append(json.loads(output.getvalue().splitlines()[-1]))
+            self.assertEqual(previews[0]["preview_sha256"], previews[1]["preview_sha256"])
+            self.assertEqual(list_discovery_looks(ResearchStore(data_root), journal), [])
+
     def test_public_preview_discovery_replay_packets_and_registered_capability(self):
         from tests.test_hfic_cli import bind_draft, run_cli
         from tests.test_hfic_ordinary_operation_acceptance_v1 import _forge, _operation
@@ -343,6 +402,8 @@ class HolderVerticalTests(unittest.TestCase):
             card = {**source["candidates"][0], **scope, **identity,
                     "label": "HOLDER-POINT-Y900-EXPLORATORY",
                     "novelty_class": "REFORMULATION",
+                    "claim_form": "PREDICTIVE",
+                    "mundane_alternative": "Activity and price staleness explain the association; holder state may have no positive directional information.",
                     "actor_counterparty": "BASE_X holders and later buyers; ownership concentration unmeasured",
                     "state_transition": "Y900 holder state -> Y14400 relative price mark; association only",
                     "required_feature_ids": [], "unresolved_requirements": ["HOLDER_POINT_FEATURE_EXPLORATORY"],
@@ -351,7 +412,15 @@ class HolderVerticalTests(unittest.TestCase):
                     "prior_work_refs": [],
                     "material_difference_from_prior": "Prior D2 on C1-C4 exposed activity/staleness confounding; this frozen >=3 holder question remains exploratory.",
                     "disconfirming_prediction": "Holder >=3 has no supported positive directional price contrast after descriptive activity decomposition.",
-                    "negative_control": "Known-holder <3 complement, only where additive subset derivation is valid; missing is excluded, no second look.",
+                    "negative_control": "Baseline-minus-matched additive complement only after subset proof; UNKNOWN and missing retain V5 semantics, no second look or new sample.",
+                    "alternative_world": "Holder changes mark activity without a positive directional price signal.",
+                    "confounders": ["activity", "price staleness", "prior D2 outcome exposure on C1-C4"],
+                    "why_not_arbitraged": "UNKNOWN; no alpha or causal mechanism established by this exploratory association.",
+                    "pit_leakage_survivorship_risks": ["Unavailable, late, conflicting or bad-lineage cells stay UNKNOWN", "Retain BASE_X denominator and V5 missingness; no survivor-only sample"],
+                    "execution_capacity_risks": ["Mark-price proxy has no fill, route, latency, size or realized NetReturn proof", "BASE cost stress is ASSUMPTION_NOT_CALIBRATED"],
+                    "missing_or_forward_only_data": ["Holder UNKNOWN remains UNKNOWN; no zero fallback", "Future target support remains a separate real-MAIN question"],
+                    "proposed_method": "Exactly one separately authorized MAIN: BASE_X, Y900, holder >=3, PRICE_RELATIVE_PROXY Y900->Y14400; descriptive activity decomposition and additive subset complement only.",
+                    "pass_fail_inconclusive_semantics": "Frozen task taxonomy: HOLDER_NO_POSITIVE_ENTRY_EDGE | HOLDER_ACTIVITY_ONLY | HOLDER_DIRECTIONAL_EDGE_COHORT_UNSTABLE | HOLDER_DIRECTIONAL_EDGE_OOS_WORTHY | HOLDER_RESULT_INCONCLUSIVE. C1-C4 EXPLORATORY; no threshold adaptation or automatic promotion.",
                     "cheapest_falsifier": "One separately authorized fixed holder Y900 >=3 PRICE_RELATIVE_PROXY Y900->Y14400 MAIN with frozen taxonomy.",
                     "kill_if": ["PIT holder selection or lineage is invalid; return technical/inconclusive stop, never zero", "Frozen taxonomy finds no positive directional edge or activity-only association"],
                     "decision_unlocked": "Whether the exploratory fixed holder question merits a separately authorized new chronological OOS; no entry edge or promotion.",
@@ -365,6 +434,11 @@ class HolderVerticalTests(unittest.TestCase):
             packet = frozen["critic_input_packet"]
             self.assertNotIn("MEU", json.dumps(packet["selected_candidate"]))
             self.assertNotIn("liquidity", json.dumps(packet["selected_candidate"]).lower())
+            self.assertEqual(packet["selected_candidate"]["claim_form"], "PREDICTIVE")
+            for field in ("confounders", "negative_control", "pass_fail_inconclusive_semantics", "pit_leakage_survivorship_risks", "proposed_method"):
+                self.assertEqual(packet["selected_candidate"][field], card[field])
+            self.assertEqual(result["baseline"]["observed_n"] - result["observed_target_n"], 8)
+            self.assertNotIn("Known-holder <3", packet["selected_candidate"]["negative_control"])
             self.assertEqual(packet["selected_candidate"]["primary_x"], identity["primary_x_family"])
             self.assertEqual(packet["selected_candidate"]["primary_y"], identity["primary_y"])
             self.assertEqual(packet["grounded_evidence"]["descriptive_readout"]["scientific_identity"], identity)

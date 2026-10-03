@@ -34594,7 +34594,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 2167fe1eadfb940baea1b395a0dd93240af52475419378f8091f9bfcc775727d}
+  integrity: {kind: sha256, sha256: 006a22e25a700bbc6117c84e1a8f85f82a01c95d9de2e121a8929d73cb49ba03}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37928,7 +37928,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: 392b413f07548599f117779fcbb96224fae16417e1f9b5d5de1d0c02860d1f5b}
+  integrity: {kind: sha256, sha256: abc4bba23f7db63e526d2f2915be2a0a5f5692b78d44ee6c5ae0b293d09c2521}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}
@@ -39464,7 +39464,7 @@ records:
   as_of: '2026-10-03'
   truth_owner: FORGE_TEMPORAL_HOLDER_POINT_FEATURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_temporal_holder_point_feature_v1.md', repository_path: docs/contracts/forge_temporal_holder_point_feature_v1.md}
-  integrity: {kind: sha256, sha256: 65921c5c351ffaa2caf755995901f68dfa7eb375793aa3ee00f68e2da49a2f13}
+  integrity: {kind: sha256, sha256: 5bbec6030346a33684f1af5dd2f68d94511bdf84bf32ad17fdb2ef1d435bbc49}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-TEMPORAL-DISCOVERY-001}

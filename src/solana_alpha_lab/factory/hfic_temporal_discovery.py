@@ -2886,6 +2886,8 @@ def validate_feature_preview_spec(spec: Mapping[str, Any]) -> dict[str, Any]:
         if feature["point"] not in point_ids:
             raise GroundedDiscoveryError("SCHEDULE_INVALID")
     clock_policy = schedule.get("observation_clock_policy", OBSERVATION_CLOCK_EVENT_TIME_V1)
+    if clock_policy in (None, ""):
+        clock_policy = OBSERVATION_CLOCK_EVENT_TIME_V1
     if clock_policy not in OBSERVATION_CLOCK_POLICIES:
         raise GroundedDiscoveryError("OBSERVATION_CLOCK_POLICY_INVALID")
     seed = spec.get("seed")
@@ -2991,9 +2993,15 @@ def build_feature_preview(
             for feature in features:
                 point = feature["point"]
                 due, _late = _clock(preview_binding[(cohort, release)], point, lateness)
+                point_deadline = preview_deadline(anchor, cohort, release, point)
+                decision_deadline = preview_deadline(anchor, cohort, release, decision_point)
+                # Same fail-closed boundary as _feature_value_with_lineage.read.
+                if point_deadline is None or decision_deadline is None or point_deadline > decision_deadline:
+                    cells[feature["name"]] = {"status": "ABSENT"}
+                    continue
                 cells[feature["name"]] = _cell(
                     grouped, (cohort, release, mint, point, feature["field_id"]),
-                    preview_deadline(anchor, cohort, release, point),
+                    point_deadline,
                     snapshot_policy=(clock_policy if clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1 else None),
                     point_due_at=_due_moment(anchor, due),
                 )

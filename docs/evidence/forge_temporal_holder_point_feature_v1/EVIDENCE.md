@@ -70,6 +70,13 @@ are lossless; one pure preview validator runs before the loader and is reused
 by the evaluator; the entire synthetic scientific card is holder-specific.
 Regression distinguishes >=3 from >=3.0000001, refuses the wrong card, requires
 zero loader calls for invalid previews and rejects MEU/liquidity fixture text.
+The mixed-point preview now applies the evaluator's point-versus-decision
+deadline guard; null/empty default clocks normalize identically in both paths.
+Public full-query preview covers both default spellings without a MAIN.
+The complete card explicitly uses PREDICTIVE, declares activity/staleness/prior
+exposure, propagates frozen taxonomy and names only baseline-minus-matched
+additive complement after subset proof. UNKNOWN follows V5; no known-holder
+resample is substituted. Production packet assertions cover those declarations.
 Validator, typed loader,
 mixed-point clocks, missingness/lineage, spec identity, ordinary cap/intent,
 interrupted reply/cold replay, V5, Prompt A, Critic, owner and registered consumer
