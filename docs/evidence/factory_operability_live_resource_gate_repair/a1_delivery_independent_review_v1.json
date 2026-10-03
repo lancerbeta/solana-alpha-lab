@@ -26,9 +26,12 @@
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "Fresh source review identified stale binder-excluded evidence after main integration; evidence repinned, independent rereview pending."
+        "ISOLATED_READ_ONLY: source HEAD f4c83d9b062dd4d88dbc49d19ababccd5492dea6 and evidence-only HEAD 890f61dce489087668368d80c22b7ff7f34af92d verified.",
+        "Completion base_main, implementation map, fit/review bindings and actual referenced SHA are consistent after main integration.",
+        "Vertical resource proof remains falsifiable; exact-head Linux cgroup CI required before readiness; no live acceptance.",
+        "No confirmed remaining DoD gap in candidate admission scope."
       ]
     },
     {
@@ -47,13 +50,16 @@
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "Fresh exact-source independent review pending."
+        "ISOLATED_READ_ONLY: source HEAD f4c83d9b062dd4d88dbc49d19ababccd5492dea6, frozen diff and all 24 implementation bindings verified.",
+        "Canonical report templates and operator recovery path unchanged from previous PASS; base integration preserved consumer semantics.",
+        "First ordinary cycle with timer off, InvocationID-scoped resource readback and mandatory checks gate enablement.",
+        "No confirmed owner-operability gap; exact-head Linux CI and separate commissioning remain required."
       ]
     }
   ],
-  "verdict": "NOT_READY",
+  "verdict": "PASS",
   "non_claims": [
     "NO_MERGE_AUTHORITY",
     "MODEL_DIVERSITY_UNPROVEN",
