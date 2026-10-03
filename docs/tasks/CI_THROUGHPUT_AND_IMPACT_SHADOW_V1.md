@@ -166,5 +166,5 @@ path at least 25 % better than the baseline mean above or about 15 min or less,
 with no queueing; coverage and disjointness proven;
 renderer equals workflow; focused suite green with no expected failures; full
 exact-head GitHub CI green with per-shard elapsed, wall clock, queue skew and
-setup overhead compared against two fresh pre-change runs; reviewers PASS;
+setup overhead compared against the three fresh pre-change baseline runs; reviewers PASS;
 merge-readiness read back; merge not performed.

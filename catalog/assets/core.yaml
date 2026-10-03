@@ -936,7 +936,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: e5709333986d31f14972287589ad39ae423afe83114ef22f46c4cddb0f3a3cf4
+    sha256: 5cabc0da817371608667f82a205c06ed86180dab1a2734bdf0022a826c499519
   access:
     mode: read_only
     method: command

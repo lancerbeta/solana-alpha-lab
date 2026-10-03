@@ -36,14 +36,14 @@ DELIVERY_PREFLIGHT_SCHEMA = (
 # CI job limits are budgets, not headroom: a job near its limit is a
 # regression to diagnose from the shard log's module_done/slow_module lines.
 # Tracked-only delivery preflight keeps its separate local full-gate cap.
+GITHUB_VALIDATE_TIMEOUT_MINUTES = 25
+GITHUB_VALIDATE_TESTS_TIMEOUT_MINUTES = 30
+GITHUB_AGGREGATOR_TIMEOUT_MINUTES = 5
 # General test shard count range the workflow contract admits. This validator is
 # a trusted validation path; scripts/ci_test_partition.py keeps the planner's own
 # bounds and tests/test_ci_test_partition.py pins the two ranges together.
 SHARD_COUNT_MIN = 4
 SHARD_COUNT_MAX = 6
-GITHUB_VALIDATE_TIMEOUT_MINUTES = 25
-GITHUB_VALIDATE_TESTS_TIMEOUT_MINUTES = 30
-GITHUB_AGGREGATOR_TIMEOUT_MINUTES = 5
 DELIVERY_PREFLIGHT_TIMEOUT_MINUTES = 25
 DELIVERY_PREFLIGHT_TIMEOUT_SECONDS = DELIVERY_PREFLIGHT_TIMEOUT_MINUTES * 60
 CI_TEST_SHARDS_PLAN = ROOT / "configs/ci_test_shards_v1.json"
