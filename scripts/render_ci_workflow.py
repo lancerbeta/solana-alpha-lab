@@ -92,7 +92,7 @@ jobs:
 
   validate-tests:
     runs-on: ubuntu-24.04
-    timeout-minutes: {ci.GITHUB_VALIDATE_TIMEOUT_MINUTES}
+    timeout-minutes: {ci.GITHUB_VALIDATE_TESTS_TIMEOUT_MINUTES}
     env:
       UV_NO_ENV_FILE: "1"
       PYTHONDONTWRITEBYTECODE: "1"
@@ -120,18 +120,23 @@ jobs:
       - name: Validate repository
         run: {shard_command}
 
+  validate-operability-resources:
+    uses: {ci.RESOURCE_PROOF_WORKFLOW}
+
   validate:
     if: ${{{{ always() }}}}
     needs:
       - validate-core
       - validate-execution
       - validate-tests
+      - validate-operability-resources
     runs-on: ubuntu-24.04
     timeout-minutes: {ci.GITHUB_AGGREGATOR_TIMEOUT_MINUTES}
     env:
       CORE_RESULT: ${{{{ needs.validate-core.result }}}}
       EXECUTION_RESULT: ${{{{ needs.validate-execution.result }}}}
       TESTS_RESULT: ${{{{ needs.validate-tests.result }}}}
+      RESOURCES_RESULT: ${{{{ needs.validate-operability-resources.result }}}}
     steps:
       - name: Deny non-success core or shard results
         run: |

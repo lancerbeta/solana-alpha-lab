@@ -4,9 +4,11 @@ import copy
 import contextlib
 import importlib.util
 import io
+import json
 import os
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -42,6 +44,36 @@ class CiWorkflowTests(unittest.TestCase):
 
     def test_exact_workflow_contract_passes(self) -> None:
         ci.validate_workflow_text(self.text)
+
+    def test_renderer_reproduces_committed_workflow(self) -> None:
+        renderer = load_module("render_ci_workflow_for_test", "scripts/render_ci_workflow.py")
+        rendered = renderer.render_workflow()
+        self.assertEqual(rendered, self.text)
+        ci.validate_workflow_text(rendered)
+
+    def test_shard_matrix_and_command_follow_the_committed_plan(self) -> None:
+        count = ci.load_shard_plan()["shard_count"]
+        self.assertGreaterEqual(count, ci.SHARD_COUNT_MIN)
+        self.assertLessEqual(count, ci.SHARD_COUNT_MAX)
+        tests = yaml.load(self.text, Loader=yaml.BaseLoader)["jobs"]["validate-tests"]
+        self.assertEqual(tests["strategy"]["matrix"]["shard"], [str(i) for i in range(count)])
+        self.assertEqual(tests["strategy"]["max-parallel"], str(count))
+        self.assertIn(f"--count {count} ", tests["steps"][3]["run"])
+
+    def test_plan_count_outside_ci_range_is_rejected(self) -> None:
+        plan = ci.load_shard_plan()
+        for bad in (ci.SHARD_COUNT_MIN - 1, ci.SHARD_COUNT_MAX + 1):
+            mutated = {**plan, "shard_count": bad, "shards": (plan["shards"] * 2)[:bad]}
+            with self.subTest(count=bad), tempfile.TemporaryDirectory() as tmp:
+                path = Path(tmp) / "plan.json"
+                path.write_text(json.dumps(mutated), encoding="utf-8")
+                original = ci.CI_TEST_SHARDS_PLAN
+                ci.CI_TEST_SHARDS_PLAN = path
+                try:
+                    with self.assertRaises(ci.CiValidationError):
+                        ci.load_shard_plan()
+                finally:
+                    ci.CI_TEST_SHARDS_PLAN = original
 
     def test_parameterless_manual_dispatch_is_admitted(self) -> None:
         candidate = self.text.replace(

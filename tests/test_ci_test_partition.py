@@ -159,11 +159,107 @@ class CiTestPartitionTests(unittest.TestCase):
         self.assertIn("tests/test_brand_new.py", selected)
         self.assertNotIn("tests/test_gone.py", selected)
 
-    def test_choose_shard_count_prefers_three_when_possible(self) -> None:
-        modules = {f"tests/test_{i}.py": 100.0 for i in range(9)}
-        self.assertEqual(partition.choose_shard_count(modules), 3)
-        heavy = {f"tests/test_{i}.py": 200.0 for i in range(8)}
-        self.assertEqual(partition.choose_shard_count(heavy), 4)
+    def test_choose_shard_count_is_minimal_in_ci_range(self) -> None:
+        light = {f"tests/test_{i}.py": 100.0 for i in range(12)}
+        self.assertEqual(partition.choose_shard_count(light), partition.SHARD_COUNT_MIN)
+        # 60 x 80 s = 4800 s: 4 shards -> 1200 s, 5 -> 960 s, 6 -> 800 s
+        heavy = {f"tests/test_{i}.py": 80.0 for i in range(60)}
+        self.assertEqual(partition.choose_shard_count(heavy), 6)
+        # a single module longer than the target can never be balanced away
+        unbalanced = {"tests/test_huge.py": 2000.0, "tests/test_small.py": 1.0}
+        self.assertEqual(partition.choose_shard_count(unbalanced), partition.SHARD_COUNT_MAX)
+
+    def test_plan_accepts_up_to_six_shards_and_rejects_more(self) -> None:
+        modules = {f"tests/test_{i}.py": float(i + 1) for i in range(30)}
+        plan = partition.plan_shards(modules, shard_count=6, source_profile_sha256="x")
+        self.assertEqual(len(plan["shards"]), 6)
+        with self.assertRaises(partition.PartitionError):
+            partition.plan_shards(modules, shard_count=7, source_profile_sha256="x")
+
+    def test_equal_loads_balance_module_counts(self) -> None:
+        modules = {f"tests/test_{i:02d}.py": 0.0 for i in range(12)}
+        plan = partition.plan_shards(modules, shard_count=4, source_profile_sha256="x")
+        self.assertEqual([len(shard) for shard in plan["shards"]], [3, 3, 3, 3])
+
+    def test_module_done_logs_give_median_and_ignore_runtime_modules(self) -> None:
+        inventory = ["tests/test_a.py", "tests/test_b.py", "tests/test_idle.py"]
+        logs = [
+            "module_done seconds=10.0 cases=3 module=test_a\n"
+            "module_done seconds=1.0 cases=1 module=test_b\n"
+            "module_done seconds=5.0 cases=1 module=test_made_at_runtime\n",
+            "module_done seconds=30.0 cases=3 module=test_a\n"
+            "module_done seconds=2.0 cases=1 module=tests.test_b\n"
+            "module_done seconds=4.0 cases=1 module=test_b\n",
+            "module_done seconds=20.0 cases=3 module=test_a\n",
+        ]
+        seconds, note = partition.module_seconds_from_logs(logs, inventory)
+        self.assertEqual(seconds["tests/test_a.py"], 20.0)
+        # dotted and bare import names of one file add up inside one log
+        self.assertEqual(seconds["tests/test_b.py"], 3.5)
+        self.assertNotIn("tests/test_made_at_runtime.py", seconds)
+        self.assertEqual(note["unprofiled_inventory_modules"], ["tests/test_idle.py"])
+        self.assertEqual(note["kind"], "CI_MODULE_DONE_MEDIAN")
+        with self.assertRaises(partition.PartitionError):
+            partition.module_seconds_from_logs(["no telemetry"], inventory)
+
+    def test_cli_builds_plan_from_logs_and_compares_counts(self) -> None:
+        import contextlib
+        import io
+
+        inventory = sorted(
+            p.relative_to(ROOT).as_posix() for p in (ROOT / "tests").glob("test_*.py")
+        )
+        manifest = json.loads((ROOT / "configs/execution_domain_v1.json").read_text())
+        reserved = set(manifest["required_fast_test_modules"])
+        general = [p for p in inventory if p not in reserved][:12]
+        lines = "".join(
+            f"module_done seconds={10.0 + i} cases=1 module={Path(p).stem}\n"
+            for i, p in enumerate(general)
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            log = Path(tmp) / "shard.log"
+            log.write_text(lines, encoding="utf-8")
+            out = Path(tmp) / "plan.json"
+            common = [
+                "--module-done-log", str(log),
+                "--reserved-manifest", str(ROOT / "configs/execution_domain_v1.json"),
+            ]
+            buffer = io.StringIO()
+            with contextlib.redirect_stdout(buffer):
+                code = partition.main(common + ["--compare-counts", "4,5,6"])
+            self.assertEqual(code, 0)
+            self.assertIn("chosen_by_target=4", buffer.getvalue())
+            self.assertFalse(out.exists())
+            with contextlib.redirect_stdout(io.StringIO()):
+                code = partition.main(
+                    common
+                    + ["--shard-count", "5", "--output", str(out), "--source-run", "1"]
+                )
+            self.assertEqual(code, 0)
+            plan = partition.load_plan(out)
+            self.assertEqual(plan["shard_count"], 5)
+            self.assertEqual(plan["profile"]["source_runs"], ["1"])
+            self.assertEqual(set(plan["module_seconds"]), set(general))
+            with contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(partition.main(common), 2)
+
+    def test_committed_plan_is_reproducible_from_its_embedded_profile(self) -> None:
+        plan = partition.load_plan(ROOT / "configs/ci_test_shards_v1.json")
+        self.assertGreaterEqual(plan["shard_count"], partition.SHARD_COUNT_MIN)
+        self.assertLessEqual(plan["shard_count"], partition.SHARD_COUNT_MAX)
+        self.assertEqual(plan["profile"]["kind"], "CI_MODULE_DONE_MEDIAN")
+        self.assertTrue(plan["profile"]["source_runs"])
+        seconds = plan["module_seconds"]
+        self.assertEqual(plan["source_profile_sha256"], partition.canonical_json_sha256(seconds))
+        rebuilt = partition.plan_shards(
+            seconds,
+            shard_count=plan["shard_count"],
+            source_profile_sha256=plan["source_profile_sha256"],
+        )
+        self.assertEqual(rebuilt["shards"], plan["shards"])
+        self.assertEqual(rebuilt["projected_seconds"], plan["projected_seconds"])
+        self.assertLessEqual(plan["projected_max_seconds"], partition.SHARD_TARGET_MAX_SECONDS)
+        self.assertLessEqual(partition.load_balance_ratio(plan), partition.SHARD_TARGET_MAX_MIN_RATIO)
 
     def _cover(
         self, current: list[str], plan: dict

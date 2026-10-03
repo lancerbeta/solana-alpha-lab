@@ -333,16 +333,18 @@ class ExecutionDomainModularityTests(unittest.TestCase):
         )
         current_general = [path for path in current if path not in reserved]
         covered: list[str] = []
-        for shard_index in range(4):
+        count = plan["shard_count"]
+        for shard_index in range(count):
             covered.extend(
                 partition.select_modules_for_shard(
                     current_general,
                     plan=plan,
                     index=shard_index,
-                    count=4,
+                    count=count,
                 )
             )
         self.assertFalse(reserved & set(covered))
+        self.assertEqual(len(covered), len(set(covered)))
         self.assertEqual(set(covered) | reserved, set(current))
 
     def test_subtract_reserved_modules_fails_on_stale_manifest_entry(self) -> None:

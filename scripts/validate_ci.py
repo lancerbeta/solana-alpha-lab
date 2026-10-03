@@ -19,6 +19,9 @@ from typing import Any, Callable
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT / "scripts") not in sys.path:
+    sys.path.insert(0, str(ROOT / "scripts"))
+from ci_test_partition import SHARD_COUNT_MAX, SHARD_COUNT_MIN  # noqa: E402
 WORKFLOW_PATH = ROOT / ".github/workflows/ci.yml"
 LOCK_PATH = ROOT / "uv.lock"
 EXPECTED_PYTHON = (3, 13, 14)
@@ -623,7 +626,11 @@ def load_shard_plan() -> dict[str, Any]:
     shards = document.get("shards")
     if document.get("schema") != "smial.ci-test-shards.v1":
         raise CiValidationError("ci_test_shards_plan_schema_mismatch")
-    if not isinstance(count, int) or count < 3 or count > 4:
+    if (
+        not isinstance(count, int)
+        or count < SHARD_COUNT_MIN
+        or count > SHARD_COUNT_MAX
+    ):
         raise CiValidationError("ci_test_shards_plan_count_invalid")
     if not isinstance(shards, list) or len(shards) != count:
         raise CiValidationError("ci_test_shards_plan_shards_invalid")
