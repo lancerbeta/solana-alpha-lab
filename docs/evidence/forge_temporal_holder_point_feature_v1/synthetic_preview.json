@@ -1,0 +1,271 @@
+{
+  "decision_point": "Y900",
+  "examples": [
+    {
+      "anonymous_id": "4307fe42548f48b3",
+      "feature_status": {
+        "holder_y900": "OBSERVED"
+      },
+      "feature_values": {
+        "holder_y900": 6.0
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    },
+    {
+      "anonymous_id": "70511f7a14a1b365",
+      "feature_status": {
+        "holder_y900": "OBSERVED"
+      },
+      "feature_values": {
+        "holder_y900": 3.0
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    },
+    {
+      "anonymous_id": "bde26a47c2a3bbc4",
+      "feature_status": {
+        "holder_y900": "OBSERVED"
+      },
+      "feature_values": {
+        "holder_y900": 6.0
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    },
+    {
+      "anonymous_id": "f6ebfdaae0c6a0e4",
+      "feature_status": {
+        "holder_y900": "OBSERVED"
+      },
+      "feature_values": {
+        "holder_y900": 0.0
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    },
+    {
+      "anonymous_id": "192a343f01029444",
+      "feature_status": {
+        "holder_y900": "OBSERVED"
+      },
+      "feature_values": {
+        "holder_y900": 0.0
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    },
+    {
+      "anonymous_id": "4bd2b362ec174db0",
+      "feature_status": {
+        "holder_y900": "ABSENT"
+      },
+      "feature_values": {
+        "holder_y900": null
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    },
+    {
+      "anonymous_id": "672930add7e4fa98",
+      "feature_status": {
+        "holder_y900": "OBSERVED"
+      },
+      "feature_values": {
+        "holder_y900": 0.0
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    },
+    {
+      "anonymous_id": "b84a51df109458bc",
+      "feature_status": {
+        "holder_y900": "ABSENT"
+      },
+      "feature_values": {
+        "holder_y900": null
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    },
+    {
+      "anonymous_id": "d8b5db5511c61336",
+      "feature_status": {
+        "holder_y900": "ABSENT"
+      },
+      "feature_values": {
+        "holder_y900": null
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    },
+    {
+      "anonymous_id": "d3bd25d215065161",
+      "feature_status": {
+        "holder_y900": "OBSERVED"
+      },
+      "feature_values": {
+        "holder_y900": 3.0
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    },
+    {
+      "anonymous_id": "b19658c3cd671e1c",
+      "feature_status": {
+        "holder_y900": "OBSERVED"
+      },
+      "feature_values": {
+        "holder_y900": 0.0
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    },
+    {
+      "anonymous_id": "514432187cecbb02",
+      "feature_status": {
+        "holder_y900": "OBSERVED"
+      },
+      "feature_values": {
+        "holder_y900": 3.0
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    },
+    {
+      "anonymous_id": "9cfa55e83db75584",
+      "feature_status": {
+        "holder_y900": "OBSERVED"
+      },
+      "feature_values": {
+        "holder_y900": 3.0
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    },
+    {
+      "anonymous_id": "9caedf28d604c6b6",
+      "feature_status": {
+        "holder_y900": "OBSERVED"
+      },
+      "feature_values": {
+        "holder_y900": 6.0
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    },
+    {
+      "anonymous_id": "76c0014a750231a2",
+      "feature_status": {
+        "holder_y900": "ABSENT"
+      },
+      "feature_values": {
+        "holder_y900": null
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    },
+    {
+      "anonymous_id": "26476471a0a4b943",
+      "feature_status": {
+        "holder_y900": "OBSERVED"
+      },
+      "feature_values": {
+        "holder_y900": 6.0
+      },
+      "liquidity_absolute": 1000.0,
+      "missing_mask": {
+        "Y900": "OBSERVED"
+      },
+      "price_relative": {
+        "Y900": 0.0
+      }
+    }
+  ],
+  "preview_sha256": "65fe6944d9a9c5e8600ef5291188b5cd1279b1fb59522d90bf0690ed057a7e51",
+  "sampling_rule": "HASH_MEMBERSHIP_SEED",
+  "schema": "smial.hfic-temporal-preview",
+  "schema_version": "1.0",
+  "scientific_writes": 0,
+  "selected_count": 16,
+  "silent_truncation": false,
+  "target_included": false,
+  "total_count": 16,
+  "values_are_features_only": true
+}

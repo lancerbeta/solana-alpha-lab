@@ -1,6 +1,6 @@
 ---
 task_id: FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
-task_version: "1.1"
+task_version: "1.2"
 status: READY
 as_of: "2026-10-03"
 owner: GOAL_OWNER
@@ -8,9 +8,9 @@ allowed_routes:
   - DIRECT_CODEX_DELIVERY
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 94b284534b6ad55a95002d51b9d04b4a5ced6bde
+  expected_base: 3c6ee4aca8614e91238fabdae264f03c68269fea
   expected_upstream: origin/main
-  expected_upstream_oid: 94b284534b6ad55a95002d51b9d04b4a5ced6bde
+  expected_upstream_oid: 3c6ee4aca8614e91238fabdae264f03c68269fea
   expected_branch: codex/factory-operability-live-resource-gate-repair-v1
   dirty_mode: ALLOW_REPORTED
 objective: >-

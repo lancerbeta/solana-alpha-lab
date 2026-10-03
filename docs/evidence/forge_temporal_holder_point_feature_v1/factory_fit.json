@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE_TEMPORAL_HOLDER_POINT_FEATURE_V1-FACTORY-FIT",
+  "as_of": "2026-10-03",
+  "task_id": "FORGE_TEMPORAL_HOLDER_POINT_FEATURE_V1",
+  "reviewed_bindings_sha256": "47294a834afea4e93b00c3ca32031ddaa398f1b99db69bb7ccfc93ce7d4354b8",
+  "reviewed_inventory_sha256": "7d2e71b63c190fef8d2f54a150b45feafdda173390504a8535cdb72c0a22b422",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "Remove the proven holder feature bottleneck for one preregistered intraday consumer, without executing its real look.",
+    "flexibility_and_history": "Holder point only; old PRICE/LIQ canonical specs, hashes and results exact. Existing V1-V5 readers, capability identity and trial history owners unchanged.",
+    "context_efficiency": "One field/operator rule and recipe-derived machine labels; existing typed loader, cell clocks, schema, result and packet owners reused. No new tool or dependency.",
+    "research_truth": "Missing, late, conflicting and bad-lineage holder cells fail closed. Threshold/point/target card tampering refused. Prior D2 exposure and activity/staleness confound retained; C1-C4 exploratory. Card explicitly PREDICTIVE with activity/staleness/exposure, frozen taxonomy and additive baseline-minus-matched complement only after subset proof; no causal or known-holder resample claim.",
+    "owner_operability": "Public early preview, saved V5 result, Prompt A, selected card, Critic and owner expose the same exact X/Y. Operator uses generated labels; frozen consumer taxonomy durable. Task L2 explicitly projects the already-declared completion/review/fit receipts; this is evidence visibility, not scientific or merge authority.",
+    "execution_to_cashflow": "PRICE_RELATIVE_PROXY and assumption-only stress, no NetReturn or entry-edge claim; future surviving gross signal still needs economics and execution gates.",
+    "monitoring_and_recovery": "Synthetic public reply loss recovers one landed MAIN; cold replay avoids value loader and new look. Registered capability returns same complete result without writes.",
+    "build_vs_buy": "Extend the existing evaluator and packet binding; no holder raw loader, provider call, new capability, parser or budget machinery.",
+    "security": "Disposable synthetic writes only; real C1-C4 holder-Y900 and metadata read-only inventory unchanged. C5 untouched, no credentials/provider/VPS.",
+    "red_team": "Broad-allowlist mutation cannot authorize holder ratios or target. Future point rejects before rows; duplicate conflicts, zero/missing and snapshot lineage use shared owners. Old identities pinned. Corrected nonmonotonic mixed-clock regression is red against prior builder; null/empty public preview clock forms follow canonical normalization."
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "EARLY_HOLDER_STATE_TO_PRICE_PATH_15M_TO_4H only after merge and separate exact one-MAIN authorization"
+  },
+  "recovery": "Separately authorized ordinary Git revert before real holder look; after saved holder evidence exists preserve its reader and append-only history through forward repair.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_REAL_SCIENTIFIC_WRITE",
+    "NO_MERGE",
+    "NO_FUTURE_MAIN_AUTHORITY",
+    "REAL_OPERATION_GATE_NOT_INVOKED",
+    "FEATURE_READINESS_NOT_FUTURE_TARGET_SUPPORT"
+  ]
+}

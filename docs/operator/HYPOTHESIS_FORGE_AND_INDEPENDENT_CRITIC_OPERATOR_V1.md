@@ -1731,6 +1731,24 @@ Preview: `discovery-preview --store <data-root> --journal-scope <search-key>`.
 
 ## 6. Версионный чекпоинт
 
+Temporal holder feature: `FIELD-HOLDER-COUNT-001` разрешён только для
+`point_value` не позже decision; target остаётся `PRICE_RELATIVE_PROXY`.
+Full temporal query можно передать в `discovery-preview`: preview читает
+только early points и показывает `feature_values` / `feature_status`.
+Из результата берите exact labels в
+`descriptive_readout.scientific_identity` для selected card. Подмена field,
+point, threshold или horizon даёт `LOOK_SCOPE_CONTRADICTION`.
+Контракт: `docs/contracts/forge_temporal_holder_point_feature_v1.md`.
+Consumer `EARLY_HOLDER_STATE_TO_PRICE_PATH_15M_TO_4H` preregistered как
+holder Y900 >=3 → PRICE_RELATIVE_PROXY Y900→Y14400. Его real MAIN требует
+отдельного разрешения после merge; C5 остаётся закрыт. Prior D2 activity/
+price-staleness exposure сохраняется; C1–C4 result только EXPLORATORY.
+Для этого вопроса явно задайте `claim_form=PREDICTIVE`, activity/staleness/
+prior-exposure в `confounders` и frozen taxonomy в
+`pass_fail_inconclusive_semantics`. Complement — только additive
+baseline-minus-matched после subset proof; UNKNOWN остаётся по V5, отдельную
+known-holder выборку не создавайте. Synthetic proof не запускает real MAIN.
+
 При каждом использовании сохраняйте в research packet:
 
 ```text

@@ -24,7 +24,7 @@ sys.path.insert(0, str(ROOT))
 NOW = datetime(2026, 10, 2, 12, tzinfo=UTC)
 ACTIVATION = "PROFILE"
 RECENT = "PRIM-JUPITER-TOKENS-V2-RECENT-001"
-BASE = "94b284534b6ad55a95002d51b9d04b4a5ced6bde"
+BASE = "3c6ee4aca8614e91238fabdae264f03c68269fea"
 
 
 def peak_rss_bytes() -> int:
