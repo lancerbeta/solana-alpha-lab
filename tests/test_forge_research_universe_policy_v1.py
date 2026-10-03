@@ -406,6 +406,25 @@ class UniversePolicyTests(unittest.TestCase):
             self.assertTrue(second["queries"][0]["new_look"])
             self.assertEqual(second["queries"][0]["look_class"], "ADAPTIVE")
             self.assertEqual(second["budget"]["main_count"], first["budget"]["main_count"])
+            grown = [dict(item) for item in rows]
+            grown[0] = dict(grown[0])
+            grown[0]["typed_value"] = "9"
+            fresh = record_operation(store, {
+                "owner_request_text": "synthetic observation change after the threshold move",
+                "owner_focus": "UNIVERSE_ADAPTATION_GROWN",
+                "journal_scope": "ab" * 32,
+                "market_evidence_epoch_sha256": "cd" * 32,
+                "spec": spec,
+                "owner_cap": {"main": 1, "adaptive": 0, "preview": 0},
+                "requested_completion": "LIMITED_RESULT",
+            })
+            third = run_recorded_discovery_query(
+                store, census=[_census("a")], observations=grown, spec=spec, binding=_binding(),
+                journal_scope="ab" * 32, candidate_scope=_scope(spec), git_sha=GIT_SHA,
+                operation_sha256=fresh["operation_sha256"], verified_market="cd" * 32,
+            )
+            self.assertEqual(third["queries"][0]["look_class"], "MAIN")
+            self.assertEqual(third["budget"]["main_count"], first["budget"]["main_count"] + 1)
 
     def test_zero_is_not_missing_and_fail_beats_unknown(self) -> None:
         fail = classify_universe_cells(

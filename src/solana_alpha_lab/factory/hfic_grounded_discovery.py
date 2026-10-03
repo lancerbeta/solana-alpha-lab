@@ -1501,6 +1501,21 @@ def data_binding_sha256(
     return hashlib.sha256(_canonical(body).encode("utf-8")).hexdigest()
 
 
+def same_rows_under_policy(
+    look: Mapping[str, Any],
+    *,
+    admitted: Mapping[str, Any],
+    census: Sequence[Mapping[str, Any]],
+    observations: Sequence[Mapping[str, Any]],
+    policy_sha: str,
+) -> bool:
+    """True when this look's binding is the current rows stamped with ``policy_sha``."""
+
+    stamped = dict(admitted)
+    stamped["universe_policy_semantic_sha256"] = policy_sha
+    return look.get("data_binding_sha256") == data_binding_sha256(stamped, census, observations)
+
+
 def _look_identity(
     spec_sha: str,
     binding_sha: str,
@@ -1872,6 +1887,12 @@ def run_recorded_discovery_query(
             gate_before_values,
         )
 
+        from solana_alpha_lab.factory.hfic_research_universe_policy import (
+            admitted_with_policy,
+            effective_policy,
+        )
+
+        gate_policy = effective_policy(store).get("definition")
         try:
             gate_before_values(
                 store,
@@ -1883,6 +1904,9 @@ def run_recorded_discovery_query(
                 correction=correction,
                 repo_root=repo_root,
                 data_root=data_root,
+                census=census,
+                observations=observations,
+                admitted=admitted_with_policy(admit_discovery_binding(binding), gate_policy),
             )
         except OrdinaryOperationError as exc:
             raise GroundedDiscoveryError(str(exc.code)) from exc
@@ -2032,7 +2056,21 @@ def run_recorded_discovery_query(
         same_spec = item.get("spec_sha256") == summary["spec_sha256"]
         changed_binding = item.get("data_binding_sha256") != binding_sha
         prior_policy = ((item.get("result") or {}).get("universe_policy") or {}).get("semantic_sha256")
-        if same_spec and changed_binding and prior_policy and current_policy and prior_policy != current_policy:
+        policy_only = (
+            same_spec
+            and changed_binding
+            and prior_policy
+            and current_policy
+            and prior_policy != current_policy
+            and same_rows_under_policy(
+                item,
+                admitted=computed["admitted"],
+                census=census,
+                observations=observations,
+                policy_sha=str(prior_policy),
+            )
+        )
+        if policy_only:
             policy_shift = True
             budget_history.append({**item, "spec_sha256": "DATA_BINDING_CHANGED"})
         elif same_spec and changed_binding:

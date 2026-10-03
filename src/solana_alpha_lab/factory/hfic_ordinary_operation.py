@@ -610,6 +610,9 @@ def gate_before_values(
     repo_root: Any = None,
     data_root: Any = None,
     correction: Mapping[str, Any] | None = None,
+    census: Sequence[Mapping[str, Any]] | None = None,
+    observations: Sequence[Mapping[str, Any]] | None = None,
+    admitted: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Metadata, admission and cap. Does not load outcome rows.
 
@@ -783,18 +786,37 @@ def gate_before_values(
         active_policy = effective_policy(store).get("semantic_sha256")
         classify_looks = []
         policy_shift = False
+        rows_known = census is not None and observations is not None and isinstance(admitted, Mapping)
         for item in looks:
             prior_policy = ((item.get("result") or {}).get("universe_policy") or {}).get("semantic_sha256")
-            if (
+            policy_differs = (
                 item.get("spec_sha256") == validated["spec_sha256"]
                 and prior_policy
                 and active_policy
                 and prior_policy != active_policy
-            ):
-                policy_shift = True
-                classify_looks.append({**item, "spec_sha256": "DATA_BINDING_CHANGED"})
-            else:
+            )
+            if not policy_differs:
                 classify_looks.append(item)
+                continue
+            if rows_known:
+                from solana_alpha_lab.factory.hfic_grounded_discovery import same_rows_under_policy
+
+                pure_policy = same_rows_under_policy(
+                    item,
+                    admitted=admitted,
+                    census=census,
+                    observations=observations,
+                    policy_sha=str(prior_policy),
+                )
+            else:
+                prior_operation = item.get("operation_sha256")
+                prior_fingerprint = None
+                if isinstance(prior_operation, str) and prior_operation:
+                    prior_fingerprint = get_operation(store, prior_operation).get("corpus_fingerprint")
+                pure_policy = bool(fingerprint and prior_fingerprint and fingerprint == prior_fingerprint)
+            if pure_policy:
+                policy_shift = True
+            classify_looks.append({**item, "spec_sha256": "DATA_BINDING_CHANGED"})
         classify_spec = spec
         if policy_shift:
             classify_spec = dict(spec)
