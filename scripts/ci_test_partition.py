@@ -5,11 +5,24 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
+import statistics
 from pathlib import Path
 from collections.abc import Collection, Mapping
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+
+# CI contract range for general test shards (validate_ci.load_shard_plan reads
+# the same bounds). The planner itself accepts any count up to the maximum.
+SHARD_COUNT_MIN = 4
+SHARD_COUNT_MAX = 6
+SHARD_TARGET_MAX_SECONDS = 15 * 60.0
+SHARD_TARGET_MAX_MIN_RATIO = 1.25
+MODULE_DONE_LINE = re.compile(
+    r"module_done seconds=(?P<seconds>[0-9.]+) cases=(?P<cases>[0-9]+) "
+    r"module=(?P<module>\S+)"
+)
 
 
 class PartitionError(ValueError):
@@ -26,7 +39,7 @@ def plan_shards(
     shard_count: int,
     source_profile_sha256: str,
 ) -> dict[str, Any]:
-    if shard_count < 1 or shard_count > 4:
+    if shard_count < 1 or shard_count > SHARD_COUNT_MAX:
         raise PartitionError("SHARD_COUNT_OUT_OF_RANGE")
     if not module_seconds:
         raise PartitionError("EMPTY_MODULE_INVENTORY")
@@ -37,7 +50,16 @@ def plan_shards(
     loads = [0.0] * shard_count
     shards: list[list[str]] = [[] for _ in range(shard_count)]
     for path, seconds in ordered:
-        index = min(range(shard_count), key=lambda i: (loads[i], i))
+        if seconds > 0.0:
+            index = min(range(shard_count), key=lambda i: (loads[i], i))
+        else:
+            # Modules below telemetry precision (module_done prints 0.1 s) add
+            # no load, so load alone would pile them all on one shard: spread
+            # that tail by module count instead.
+            index = min(
+                range(shard_count),
+                key=lambda i: (len(shards[i]), loads[i], i),
+            )
         shards[index].append(path)
         loads[index] += seconds
     for shard in shards:
@@ -52,16 +74,30 @@ def plan_shards(
     }
 
 
+def load_balance_ratio(plan: Mapping[str, Any]) -> float:
+    loads = [float(value) for value in plan["projected_seconds"]]
+    smallest = min(loads)
+    return float("inf") if smallest <= 0.0 else max(loads) / smallest
+
+
 def choose_shard_count(module_seconds: dict[str, float]) -> int:
-    for count in (3, 4):
+    """Minimal CI shard count that meets the projected wall-clock target.
+
+    Never maximises parallelism: the first count in the CI range whose
+    projected slowest shard fits the target with a balanced load wins.
+    """
+    for count in range(SHARD_COUNT_MIN, SHARD_COUNT_MAX + 1):
         plan = plan_shards(
             module_seconds,
             shard_count=count,
             source_profile_sha256="probe",
         )
-        if plan["projected_max_seconds"] <= 360.0:
+        if (
+            plan["projected_max_seconds"] <= SHARD_TARGET_MAX_SECONDS
+            and load_balance_ratio(plan) <= SHARD_TARGET_MAX_MIN_RATIO
+        ):
             return count
-    return 4
+    return SHARD_COUNT_MAX
 
 
 SAFE_UNSEEN_FALLBACK_SECONDS = 1.0
@@ -238,34 +274,160 @@ def subtract_reserved_modules(
     }
 
 
+def module_path_from_module_done(module: str) -> str:
+    """Map a module_done module name to its flat tests/ path."""
+    name = module[len("tests.") :] if module.startswith("tests.") else module
+    return f"tests/{name}.py"
+
+
+def module_seconds_from_logs(
+    log_texts: list[str],
+    inventory: Collection[str],
+) -> tuple[dict[str, float], dict[str, Any]]:
+    """Median per-module seconds from CI shard logs, limited to the inventory.
+
+    Names that are not current inventory modules (modules created by tests at
+    run time) are ignored. A module's samples are its per-log totals, so the
+    bare and dotted import names of one file add up inside one log.
+    """
+    wanted = {posix(path) for path in inventory}
+    samples: dict[str, list[float]] = {}
+    for text in log_texts:
+        # module_done is cumulative per exact module name, so a repeated line
+        # for one name keeps the largest value; distinct import names of one
+        # file (bare and dotted) add up.
+        by_name: dict[str, float] = {}
+        for match in MODULE_DONE_LINE.finditer(text):
+            name = match.group("module")
+            by_name[name] = max(by_name.get(name, 0.0), float(match.group("seconds")))
+        per_log: dict[str, float] = {}
+        for name, seconds in by_name.items():
+            path = module_path_from_module_done(name)
+            if path in wanted:
+                per_log[path] = per_log.get(path, 0.0) + seconds
+        for path, seconds in per_log.items():
+            samples.setdefault(path, []).append(seconds)
+    if not samples:
+        raise PartitionError("MODULE_DONE_TELEMETRY_MISSING")
+    medians = {
+        path: round(statistics.median(values), 3)
+        for path, values in sorted(samples.items())
+    }
+    provenance = {
+        "kind": "CI_MODULE_DONE_MEDIAN",
+        "log_count": len(log_texts),
+        "module_count": len(medians),
+        "min_samples_per_module": min(len(values) for values in samples.values()),
+        "unprofiled_inventory_modules": sorted(wanted - set(medians)),
+    }
+    return medians, provenance
+
+
+def compare_shard_counts(
+    module_seconds: Mapping[str, float],
+    counts: Collection[int],
+) -> list[dict[str, Any]]:
+    rows = []
+    for count in sorted(counts):
+        plan = plan_shards(
+            dict(module_seconds), shard_count=count, source_profile_sha256="probe"
+        )
+        rows.append(
+            {
+                "shard_count": count,
+                "projected_max_seconds": plan["projected_max_seconds"],
+                "projected_min_seconds": min(plan["projected_seconds"]),
+                "max_min_ratio": round(load_balance_ratio(plan), 4),
+            }
+        )
+    return rows
+
+
+def canonical_json_sha256(document: Any) -> str:
+    return hashlib.sha256(
+        json.dumps(document, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+
+
 def main(argv: list[str] | None = None) -> int:
     import argparse
-    import hashlib
-    import json
     import sys
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--profile", required=True, type=Path)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--profile", type=Path)
+    source.add_argument(
+        "--module-done-log",
+        type=Path,
+        action="append",
+        help="CI shard log with module_done telemetry; repeat for the median",
+    )
     parser.add_argument("--reserved-manifest", required=True, type=Path)
-    parser.add_argument("--shard-count", required=True, type=int)
-    parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--shard-count", type=int)
+    parser.add_argument("--compare-counts", help="comma list, e.g. 4,5,6; no write")
+    parser.add_argument("--output", type=Path)
+    parser.add_argument(
+        "--source-run",
+        action="append",
+        default=[],
+        help="exact-head CI run id that produced a --module-done-log",
+    )
+    parser.add_argument("--tests-root", type=Path, default=ROOT / "tests")
     args = parser.parse_args(argv)
     try:
-        profile_bytes = args.profile.read_bytes()
-        profile = json.loads(profile_bytes.decode("utf-8"))
         manifest = json.loads(args.reserved_manifest.read_text(encoding="utf-8"))
-        reserved = manifest.get("required_fast_test_modules") or []
-        general_modules = subtract_reserved_modules(
-            modules_from_profile(profile),
-            reserved,
-        )
+        reserved = {
+            posix(path) for path in (manifest.get("required_fast_test_modules") or [])
+        }
+        profile_note: dict[str, Any]
+        if args.module_done_log:
+            try:
+                inventory = {
+                    posix(path.resolve().relative_to(ROOT.resolve()))
+                    for path in args.tests_root.glob("test_*.py")
+                    if path.is_file()
+                }
+            except ValueError as exc:
+                raise PartitionError("TESTS_ROOT_OUTSIDE_REPOSITORY") from exc
+            general_modules, profile_note = module_seconds_from_logs(
+                [
+                    path.read_text(encoding="utf-8", errors="replace")
+                    for path in args.module_done_log
+                ],
+                inventory - reserved,
+            )
+            profile_sha256 = canonical_json_sha256(general_modules)
+            profile_note["source_runs"] = sorted(args.source_run)
+        else:
+            profile_bytes = args.profile.read_bytes()
+            profile = json.loads(profile_bytes.decode("utf-8"))
+            general_modules = subtract_reserved_modules(
+                modules_from_profile(profile),
+                reserved,
+            )
+            profile_sha256 = hashlib.sha256(profile_bytes).hexdigest()
+            profile_note = {"kind": "SEQUENTIAL_PROFILE_FILE"}
         if not general_modules:
             raise PartitionError("GENERAL_MODULE_INVENTORY_EMPTY")
+        if args.compare_counts:
+            counts = [int(value) for value in args.compare_counts.split(",")]
+            for row in compare_shard_counts(general_modules, counts):
+                print(json.dumps(row, sort_keys=True))
+            print(f"chosen_by_target={choose_shard_count(general_modules)}")
+            if args.output is None:
+                return 0
+        if args.shard_count is None or args.output is None:
+            raise PartitionError("SHARD_COUNT_AND_OUTPUT_REQUIRED")
         plan = plan_shards(
             general_modules,
             shard_count=args.shard_count,
-            source_profile_sha256=hashlib.sha256(profile_bytes).hexdigest(),
+            source_profile_sha256=profile_sha256,
         )
+        plan["profile"] = profile_note
+        plan["module_seconds"] = {
+            path: round(float(seconds), 3)
+            for path, seconds in sorted(general_modules.items())
+        }
         write_plan(args.output, plan)
     except (PartitionError, json.JSONDecodeError) as exc:
         print(f"PARTITION_ERROR: {exc}", file=sys.stderr)
