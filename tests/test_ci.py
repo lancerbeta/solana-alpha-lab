@@ -69,7 +69,7 @@ class CiWorkflowTests(unittest.TestCase):
         )
         self.assertEqual(
             set(document["jobs"]),
-            {"validate-core", "validate-execution", "validate-tests", "validate"},
+            {"validate-core", "validate-execution", "validate-tests", "validate-operability-resources", "validate"},
         )
         core = document["jobs"]["validate-core"]
         execution = document["jobs"]["validate-execution"]
@@ -97,7 +97,7 @@ class CiWorkflowTests(unittest.TestCase):
         self.assertEqual(final["if"], "${{ always() }}")
         self.assertEqual(
             final["needs"],
-            ["validate-core", "validate-execution", "validate-tests"],
+            ["validate-core", "validate-execution", "validate-tests", "validate-operability-resources"],
         )
         self.assertEqual(execution["needs"], ["validate-core"])
         self.assertNotIn("needs", tests)

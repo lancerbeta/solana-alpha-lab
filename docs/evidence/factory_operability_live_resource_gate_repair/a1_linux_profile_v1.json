@@ -24,8 +24,8 @@
     "inference": "Repeated immutable proof IO and a full call-table timestamp scan are measured hotspots; file-cache attribution is an inference, not a separately measured stage."
   },
   "focused_local_validation": {
-    "tests_collected": 95,
-    "tests_passed": 94,
+    "tests_collected": 138,
+    "tests_passed": 137,
     "tests_skipped": 1,
     "cli_fixture_recent_rows": 128,
     "immutable_manifests": 19,

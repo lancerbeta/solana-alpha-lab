@@ -55,6 +55,7 @@ SHARD_RUN_COMMAND_TEMPLATE = (
     "--reserved-manifest configs/execution_domain_v1.json"
 )
 CORE_ONLY_COMMAND = VALIDATION_COMMAND + " --core-only"
+RESOURCE_PROOF_WORKFLOW = "./.github/workflows/factory-operability-resource-proof.yml"
 AGGREGATOR_DENY_SCRIPT = """python - <<'PY'
 import os
 import sys
@@ -63,6 +64,7 @@ required = {
     "validate-core": os.environ.get("CORE_RESULT", ""),
     "validate-execution": os.environ.get("EXECUTION_RESULT", ""),
     "validate-tests": os.environ.get("TESTS_RESULT", ""),
+    "validate-operability-resources": os.environ.get("RESOURCES_RESULT", ""),
 }
 failed = {name: value for name, value in required.items() if value != "success"}
 if failed:
@@ -740,15 +742,19 @@ def expected_workflow() -> dict[str, Any]:
                 },
                 "steps": setup_steps(validate_command=shard_command),
             },
+            "validate-operability-resources": {
+                "uses": RESOURCE_PROOF_WORKFLOW,
+            },
             "validate": {
                 "if": "${{ always() }}",
-                "needs": ["validate-core", "validate-execution", "validate-tests"],
+                "needs": ["validate-core", "validate-execution", "validate-tests", "validate-operability-resources"],
                 "runs-on": "ubuntu-24.04",
                 "timeout-minutes": str(GITHUB_AGGREGATOR_TIMEOUT_MINUTES),
                 "env": {
                     "CORE_RESULT": "${{ needs.validate-core.result }}",
                     "EXECUTION_RESULT": "${{ needs.validate-execution.result }}",
                     "TESTS_RESULT": "${{ needs.validate-tests.result }}",
+                    "RESOURCES_RESULT": "${{ needs.validate-operability-resources.result }}",
                 },
                 "steps": [
                     {
@@ -790,10 +796,12 @@ def validate_workflow_text(text: str) -> None:
         SETUP_UV_PIN,
         CHECKOUT_PIN,
         SETUP_UV_PIN,
+        RESOURCE_PROOF_WORKFLOW,
     ]
     if uses != expected_uses:
         raise CiValidationError("workflow_action_set_mismatch")
-    if any(not re.search(r"@[0-9a-f]{40}$", reference) for reference in uses):
+    # A relative reusable workflow is taken from this exact candidate commit.
+    if any(reference != RESOURCE_PROOF_WORKFLOW and not re.search(r"@[0-9a-f]{40}$", reference) for reference in uses):
         raise CiValidationError("workflow_action_not_immutable")
     if "if: ${{ always() }}" not in text and "if: always()" not in text:
         raise CiValidationError("workflow_aggregator_missing_always")

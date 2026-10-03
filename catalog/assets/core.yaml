@@ -936,7 +936,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: bc9ea327fb96e00496355d3328ecaf71ae26d95e6c3dd9fb1b7700de140177b5
+    sha256: 14e2d2f32c9ac565eb37e0d63a2ed0bd7b0b1b1465aa4100a0da625eef322a59
   access:
     mode: read_only
     method: command
@@ -39468,7 +39468,7 @@ records:
     repository_path: docs/tasks/FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1.md
   integrity:
     kind: sha256
-    sha256: cfd7751177d1bbe1a9e6eecbf77aca37857eca5cd2187cc57fed663c0b8c8d5d
+    sha256: 6ffd260812f2d1d3299378c21afbba171c55e0111b148554f9c8afc346199c28
   access:
     mode: read_only
     method: file
@@ -39620,7 +39620,7 @@ records:
     repository_path: docs/evidence/factory_operability_live_resource_gate_repair/a1_linux_profile_v1.json
   integrity:
     kind: sha256
-    sha256: 0148a6fdf8dfc2ecb67f9366866d55f555ddd6eaf767f715108535671965250e
+    sha256: 2ba3a2416f797d89f6e613016f394bdd2bf7337d5026885eae26fa1b876874fa
   access:
     mode: read_only
     method: file
@@ -39660,7 +39660,7 @@ records:
     repository_path: docs/reports/factory_operability_live_resource_gate_repair/a1_owner_readout_v1.md
   integrity:
     kind: sha256
-    sha256: 4467229055ab65c4c522b9e055deafd4d54ee14efee841915dda4f9f897b529c
+    sha256: 6a798c8f6f47087190e744571d6f5ceaef1f3537876bb218ba33b2bc8eace92a
   access:
     mode: read_only
     method: file

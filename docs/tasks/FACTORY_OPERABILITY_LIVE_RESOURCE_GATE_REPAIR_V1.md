@@ -34,6 +34,8 @@ managed_write_set:
   - tests/operability_bounded_call_profile.py
   - .github/workflows/factory-operability-resource-proof.yml
   - .github/workflows/ci.yml
+  - scripts/validate_ci.py
+  - tests/test_ci.py
   - docs/operator/FACTORY_UNATTENDED_OPERABILITY.md
   - docs/evidence/factory_operability_live_resource_gate_repair/a1_linux_profile_v1.json
   - docs/evidence/factory_operability_live_resource_gate_repair/a1_delivery_completion_evidence_v1.json
