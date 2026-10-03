@@ -68,14 +68,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_downside_readout_v1/factory_fit.json",
-    "sha256": "3707998d636d2f8a6e9543b24a06b4e0a925c088839ffb44ea85f847a36d3fc9",
+    "sha256": "2399e8313aa48be9bc6854a7fefdd178b6fa5f10e00ea291c1718559c6562b0f",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FIVE_VERTICALS_AND_CONSOLIDATED_EXACT_VERSION_CONVERTER_REPLAY_PROMPT_CLOSURE",
     "independent_review": {
       "path": "docs/evidence/forge_downside_readout_v1/independent_review.json",
-      "sha256": "247b29c56823d420a1bba60ebb42ffb769e4a8bf4e8beb63c2ec2aee1b8d3817",
+      "sha256": "35560d2335f1f7ebc9fa156a0a08cecdbda9378941b0634afe51539c0e344f34",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
