@@ -151,10 +151,10 @@ def forge_input_owner_next(receipt: Mapping[str, Any]) -> str:
         return "STOP_OBSERVABILITY"
     if CURRENT_CORPUS_MISSING in codes:
         return "WAIT_FOR_IMPORT_OR_STOP"
-    if "UNIVERSE_POLICY_BINDING_MISMATCH" in codes:
-        return "RESTORE_RESEARCH_UNIVERSE_PROFILE_THEN_RETRY"
     if "UNIVERSE_POLICY_REQUIRED" in codes:
         return "PREVIEW_THEN_AUTHORIZED_APPLY"
+    if any(code.startswith("UNIVERSE_POLICY_") for code in codes):
+        return "RESTORE_RESEARCH_UNIVERSE_PROFILE_THEN_RETRY"
     if owner == OWNER_CLASS_INPUT_NOT_READY:
         return "WAIT_FOR_IMPORT_OR_STOP"
     return "WAIT_FOR_IMPORT_OR_STOP"

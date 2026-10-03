@@ -769,11 +769,20 @@ def cmd_preflight(
             + _preflight_writes_note(payload)
         )
     # Stamp and readout edits are inside the receipt hash.
-    try:
-        from solana_alpha_lab.factory.hfic_research_universe_policy import status_payload
-        from solana_alpha_lab.factory.research_store import ResearchStore
+    from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        UniversePolicyError,
+        status_payload,
+    )
+    from solana_alpha_lab.factory.research_store import ResearchStore
 
+    try:
         payload["universe_policy"] = status_payload(ResearchStore(data_root, create_if_missing=False))
+    except UniversePolicyError as exc:
+        payload["universe_policy"] = {
+            "state": "UNREADABLE",
+            "reason_code": exc.code,
+            "next_action": "RESTORE_RESEARCH_UNIVERSE_PROFILE_THEN_RETRY",
+        }
     except Exception as exc:
         payload["universe_policy"] = {
             "state": "UNREADABLE",

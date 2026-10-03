@@ -531,13 +531,16 @@ Authorized persist (same slash, after READY):
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --persist --format json --owner-focus AUTO
 ```
 
-Typed owner `forge_input_next` on that surface: `WAIT_FOR_IMPORT_OR_STOP` or
-`STOP_OBSERVABILITY` when not runnable; `STOP_BEFORE_SYNTHESIS` when
-runnable (FORGE INPUT visibility — Prompt A only if preflight `action` is
-not `STOP` and `forge_runnable` is true; this is not CONTROL next and not
-an observability halt). Always read `evidence_surface_mode` (`ordinary`
-when JSON null). Historical PASS `router_decision` prints as `caveat_router`
-on the owner block. Do not paste a slash as recovery.
+Typed owner `forge_input_next` on that surface: `WAIT_FOR_IMPORT_OR_STOP`
+when the corpus is missing; `PREVIEW_THEN_AUTHORIZED_APPLY` when the corpus
+is fine but the research-universe profile is absent; `RESTORE_RESEARCH_UNIVERSE_PROFILE_THEN_RETRY`
+when that profile is damaged; `STOP_OBSERVABILITY` for an observability halt;
+`STOP_BEFORE_SYNTHESIS` when runnable (FORGE INPUT visibility — Prompt A
+only if preflight `action` is not `STOP` and `forge_runnable` is true; this
+is not CONTROL next and not an observability halt). Always read
+`evidence_surface_mode` (`ordinary` when JSON null). Historical PASS
+`router_decision` prints as `caveat_router` on the owner block. Do not paste
+a slash as recovery.
 
 `forge-control-ready` remains an expert diagnostic. Happy terminal
 `FORGE_CONTROL_READY` is not the owner next after `forge-input`. Do not treat
@@ -1769,7 +1772,7 @@ lane_classifier_terminal_or_none
 
 ## Research universe
 
-Живые минимумы holders и liquidity лежат в ResearchStore. Этот файл их не хранит. Активный снимок (`semantic_sha256`, минимумы и смысл популяции) всегда входит в `FORGE_CONTEXT_PACKET` до Prompt A. Пока профиля нет или он повреждён, новый synthesis не runnable: `forge_runnable=false` и типизированный blocker. Уже сохранённый result, replay и recovery читаются без сегодняшнего профиля. Новый look без профиля отвечает `UNIVERSE_POLICY_REQUIRED` и не ищет по неотфильтрованному BASE_X.
+Живые минимумы holders и liquidity лежат в ResearchStore. Этот файл их не хранит. Активный снимок (`semantic_sha256`, минимумы и смысл популяции) всегда входит в `FORGE_CONTEXT_PACKET` до Prompt A. Пока профиля нет, новый synthesis не runnable: `forge_runnable=false`, `UNIVERSE_POLICY_REQUIRED` и `forge_input_next=PREVIEW_THEN_AUTHORIZED_APPLY` — это не missing corpus. Повреждённый профиль — свой typed code и `forge_input_next=RESTORE_RESEARCH_UNIVERSE_PROFILE_THEN_RETRY`; тот же `next_action` на `discovery-execute` и в preflight `universe_policy`. Уже сохранённый result, replay и recovery читаются без сегодняшнего профиля. Новый look без профиля отвечает `UNIVERSE_POLICY_REQUIRED` и не ищет по неотфильтрованному BASE_X.
 
 Сохраните stdout preview целиком в файл и передайте его в apply. Подтверждение активного профиля — отдельный status, не ответ apply.
 
