@@ -536,11 +536,16 @@ sudo systemctl stop "$WATCH_CANARY.service"
 ```sh
 COMMISSIONING_START=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 sudo systemctl enable --now factory-operability-watch.timer
+sudo systemctl start factory-operability-watch.service
 systemctl show factory-operability-watch.service --property=InvocationID,ExecMainStartTimestamp,ExecMainExitTimestamp,Result,ExecMainStatus
 canary_readback factory-operability-watch.service ordinary
 journalctl --unit=factory-operability-watch.service --since "$COMMISSIONING_START" --output=short-iso --no-pager
 ```
 
+Первый цикл выполняется обычной service командой `systemctl start`, которая
+ждёт завершения start job под TimeoutStartSec=180s; включение timer само по
+себе не является завершением watch. Второй цикл — следующий timer tick.
+При nonzero start не продолжайте readback/enablement.
 Для ordinary readback unit должна завершиться в `inactive/dead`; пик берётся
 из journal только её сохранённого InvocationID. При отсутствии ровно одной
 числовой записи helper результат UNKNOWN, rollout остановить.
