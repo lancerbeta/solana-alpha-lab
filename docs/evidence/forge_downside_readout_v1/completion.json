@@ -67,14 +67,14 @@
   "factory_fit": {
     "path": "docs/evidence/forge_downside_readout_v1/factory_fit.json",
     "sha256": "f198f1f98d915dfaeca5967da0e30436f563059453b8b64b75d7eeb02a1d2a9f",
-    "verdict": "PENDING"
+    "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FIVE_VERTICALS_AND_REPLAY_REFUSAL_CALENDAR_REGRESSIONS_AND_EXACT_IMPLEMENTATION_DIRECT_CONSUMERS",
     "independent_review": {
       "path": "docs/evidence/forge_downside_readout_v1/independent_review.json",
       "sha256": "ac7bb434f1badd2d75834e493aa3e45e66b98e0d617e335cca72d855cd3378ba",
-      "verdict": "PENDING"
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
@@ -87,7 +87,8 @@
       "PASS_PUBLIC_FREEZE_COMPACT_TAMPER_ZERO_WRITE",
       "PASS_FOREIGN_SELECTED_RUNNER_UP_COMPACT_DETACHMENT",
       "PASS_INDEPENDENT_NUMERIC_PIT_CONTROLS_25_OF_25",
-      "PASS_EXACT_IMPLEMENTATION_DIRECT_CONSUMERS_2_OF_2_164_514_SECONDS"
+      "PASS_EXACT_IMPLEMENTATION_DIRECT_CONSUMERS_2_OF_2_164_514_SECONDS",
+      "PASS_CATALOG_SHADOW_PIN_PROPAGATION_HISTORICAL_CLAIMS_UNCHANGED"
     ]
   },
   "non_claims": [

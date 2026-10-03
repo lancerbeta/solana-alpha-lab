@@ -17,28 +17,30 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "P0/P1/P2 NONE on implementation head a19dc22124465fd3c9d0bf5e354914eaf1440376 and exact 41-file inventory; independent chain and clean working bytes confirmed.",
+        "P0/P1 NONE/P2 NONE on current head 06c19e694dce9879b323d22127afff216736c720 and exact 42-file inventory; canonical chain and raw committed/worktree bytes independently confirmed. Prior product review retained only after unchanged 40 product/test/downside evidence hashes were verified.",
         "Ordinary interrupted landing recovers through the sole state-aware note_look_landed owner; readout revision/replay excluded; source/spec/input/numeric refusal precedes intent/reservation/append.",
         "Four persisted packet projections independently match; 12 in-memory compact tamper cases typed GROUNDED_RESULT_MISMATCH; legacy omission valid but false supplied projection refused; selected/runner-up foreign statistics detached.",
-        "Limits: no repeated full suite or actual D2 execution; public lifecycle proofs inspected in tests and evidence; no runtime/provider writes."
+        "Limits: no repeated full suite or actual D2 execution; public lifecycle proofs inspected in tests and evidence; no runtime/provider writes.",
+        "New delivery-only delta independently checked: task managed write set adds one exact historical evidence path; only Catalog protected-input sha256/bytes are re-pinned to current Git blob. Restoring those two values makes historical JSON deep-equal; objective/caps/stops and old scientific claims unchanged."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "P0/P1 NONE; all five vertical proofs satisfied on exact 41-file inventory and implementation head a19dc22124465fd3c9d0bf5e354914eaf1440376.",
+        "P0/P1 NONE on current head 06c19e694dce9879b323d22127afff216736c720 and exact 42-file inventory; canonical chain and raw committed/worktree bytes independently confirmed. Prior product review retained only after unchanged 40 product/test/downside evidence hashes were verified.",
         "Independently executed 25 numeric/PIT/sample/snapshot/clock controls PASS and actual public owner path PASS in 55.723 seconds, including three freeze tamper refusals with committed inventory equality.",
         "Exact D2 source, actual scratch revision and cold retry stdout independently inspected: one append, old numbers/records/terminal/market/budget unchanged, retry zero computation/write and canonical byte-size-mtime digest equal.",
         "Raw blind input restoration and current Prompt B checked; failed primary retained and dependent regression all four frozen behavioral golds PASS; actual backend UNKNOWN, no general calibration or model diversity claim.",
-        "Limits: D2 not personally re-executed; exact-head CI and owner gate remain separate delivery conditions."
+        "Limits: D2 not personally re-executed; exact-head CI and owner gate remain separate delivery conditions.",
+        "New delivery-only delta independently checked: task managed write set adds one exact historical evidence path; only Catalog protected-input sha256/bytes are re-pinned to current Git blob. Restoring those two values makes historical JSON deep-equal; objective/caps/stops and old scientific claims unchanged."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "SEMANTIC_PREMISE PASS; packet_fingerprint_sha256=3bad2cd347750257abbb586112afd9a53ea7a1f4a95533bd4cdf01928fb040a3; diff hash independently verified. Packet plus diff only, without implementation transcript.",
+        "SEMANTIC_PREMISE PASS on new candidate 06c19e694dce9879b323d22127afff216736c720; packet_fingerprint_sha256=580731024ec5143fca6c81644a966fa9c9b28f14e15275829c24633df294d2ba; diff hash and six-key canonical fingerprint independently reproduced; nine exposed evidence hashes reconstructed. Packet plus diff only, without implementation transcript.",
         "Exact unchanged sample owns descriptive metrics; persisted result owns compact projection; source-bound coherent V4 revision does not reopen slot, transfer frozen verdict or grant budget. Ordinary landing and revision replay are separate modes with one recovery owner.",
         "What can pass tests yet break research validity: observed-only selection bias, post-outcome threshold choice, matched-including baseline misread as independent control, missing/truncated support misread as full coverage, or frozen verdict transferred to new refs. Current contract forbids these inferences; future assessment compliance not proven.",
         "Limits: no runtime/Git/provider/test execution; full blind outputs absent from diff, their hash binding inspected but content/gold independently unconfirmed by this role."
@@ -48,15 +50,16 @@
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "P0/P1 NONE; exact HEAD, clean branch and all 41 committed/worktree hashes independently confirmed.",
+        "P0/P1 NONE on current head 06c19e694dce9879b323d22127afff216736c720 and exact 42-file inventory; canonical chain and raw committed/worktree bytes independently confirmed. Prior product review retained only after unchanged 40 product/test/downside evidence hashes were verified.",
         "Four coherent corrected frozen packets contain inline matched/baseline support, median and downside matching production and owner projections; packet sizes 26.8-27.1 KB. Legacy unavailable, missing-only calendar and detail truncation are explicit.",
         "Current Prompt B equals frozen snapshot and all 10 raw CRLF input hashes restore; primary FAIL retained, corrected PASS dependent, no general calibration claim.",
         "Actual isolated D2 revision/retry evidence preserves source advisory, old terminal/budget and canonical digest; exact runbook mapping and separately authorized real-enrichment gate usable.",
-        "Limits: no new tests/runtime/scientific look; review does not substitute evidence binding, exact-head CI or merge-readiness."
+        "Limits: no new tests/runtime/scientific look; review does not substitute evidence binding, exact-head CI or merge-readiness.",
+        "New delivery-only delta independently checked: task managed write set adds one exact historical evidence path; only Catalog protected-input sha256/bytes are re-pinned to current Git blob. Restoring those two values makes historical JSON deep-equal; objective/caps/stops and old scientific claims unchanged."
       ]
     }
   ],
-  "verdict": "PENDING",
+  "verdict": "PASS",
   "non_claims": [
     "NO_MERGE",
     "NO_REAL_RUNTIME_WRITE",

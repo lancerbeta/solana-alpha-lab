@@ -7,10 +7,10 @@
   "reviewed_bindings_sha256": "c81218da0a5995492bec7c414477586b612b545c29a3d781ccfa9c137ba514c8",
   "reviewed_inventory_sha256": "dbff1b07207485cab284df9d16de7c70497eb1a8b4133c807690794c16fdcbfc",
   "mode": "FULL_REVIEW",
-  "verdict": "PENDING",
+  "verdict": "PASS",
   "dimensions": {
     "mission": "Fixed downside readout reaches persisted/replay/Prompt A/Critic/owner within one named loop",
-    "flexibility_and_history": "V1-V4 are readable as-is; closed coherent V4 gets one explicit source-bound append-only V5 revision",
+    "flexibility_and_history": "V1-V4 readable as-is; closed coherent V4 receives explicit source-bound append-only V5 revision; mandatory Catalog protected-input hash/size propagation changes no historical claims.",
     "context_efficiency": "Matched/baseline comparison inline and persisted-projection-verified; bounded detail prefix with explicit truncation; unchanged cap. One primary native batch plus one explicitly dependent fixture regression, no hidden retries.",
     "research_truth": "Independent numeric/PIT controls PASS; PIT/sample/old numerics/spec/input/market/budget preserved; missing not zero risk and source-bound historical assessment not transferred.",
     "owner_operability": "Exact correction/runbook/retry and source-bound frozen-verdict review advisory",
