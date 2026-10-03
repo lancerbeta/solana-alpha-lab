@@ -1282,6 +1282,25 @@ def cmd_discovery_execute(
                         },
                         exit_code=2,
                     )
+            if explicit_data_root is not None:
+                from solana_alpha_lab.factory.hfic_grounded_discovery import (
+                    resolve_published_discovery_binding,
+                )
+
+                try:
+                    resolve_published_discovery_binding(explicit_data_root)
+                except GroundedDiscoveryError as exc:
+                    body = {
+                        "reason_code": exc.code,
+                        "values_loaded": False,
+                        "writes": False,
+                        "scientific_negative": False,
+                    }
+                    if exc.code == "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE":
+                        body["next_action"] = (
+                            "RESTORE_PUBLISHED_PARTITION_BYTES_THEN_RETRY_DISCOVERY_EXECUTE"
+                        )
+                    return emit(body, exit_code=2)
             cohorts = []
             if isinstance(binding_doc, dict):
                 cohorts = list(binding_doc.get("cohorts") or [])
@@ -1580,6 +1599,26 @@ def cmd_discovery_preview(
                 },
                 exit_code=2,
             )
+        if explicit_data_root is not None:
+            from solana_alpha_lab.factory.hfic_grounded_discovery import (
+                GroundedDiscoveryError,
+                resolve_published_discovery_binding,
+            )
+
+            try:
+                resolve_published_discovery_binding(explicit_data_root)
+            except GroundedDiscoveryError as exc:
+                body = {
+                    "reason_code": exc.code,
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                }
+                if exc.code == "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE":
+                    body["next_action"] = (
+                        "RESTORE_PUBLISHED_PARTITION_BYTES_THEN_RETRY_DISCOVERY_EXECUTE"
+                    )
+                return emit(body, exit_code=2)
         try:
             if operation_path is not None:
                 request = json.loads(operation_path.read_text(encoding="utf-8"))
@@ -1648,6 +1687,8 @@ def cmd_discovery_preview(
                         resolve_published_discovery_binding(explicit_data_root).get("cohorts")
                         or []
                     )
+                except GroundedDiscoveryError:
+                    raise
                 except Exception:
                     binding_cohorts = []
             preview_gate = authorize_temporal_attempt(

@@ -392,6 +392,17 @@ def resolve_published_discovery_binding(data_root: Path) -> dict[str, Any]:
     }
 
 
+def require_published_logical_content(data_root: Any) -> None:
+    """Check a published corpus before a look is reserved. No lineage file means nothing to check."""
+
+    if data_root is None:
+        return
+    root = Path(data_root)
+    if not (root / "datasets" / "live_lifecycle_corpus" / "lineage.json").is_file():
+        return
+    resolve_published_discovery_binding(root)
+
+
 def _assert_published_logical_content(data_root: Path, cohorts: Sequence[Mapping[str, Any]]) -> None:
     """Reject a partition whose logical content hash no longer matches its bytes."""
 
@@ -405,7 +416,7 @@ def _assert_published_logical_content(data_root: Path, cohorts: Sequence[Mapping
 
     partition_dir = data_root / "datasets" / "manifests" / "partitions"
     if not partition_dir.is_dir():
-        return
+        raise GroundedDiscoveryError("LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
     by_location: dict[str, Any] = {}
     for path in partition_dir.glob("partition-*.json"):
         if not path.is_file() or path.is_symlink():
@@ -424,7 +435,7 @@ def _assert_published_logical_content(data_root: Path, cohorts: Sequence[Mapping
                 continue
             part = by_location.get(rel.replace("\\", "/"))
             if part is None:
-                continue
+                raise GroundedDiscoveryError("LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
             try:
                 measured = measure_live_corpus_parquet(
                     data_root / rel,

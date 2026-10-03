@@ -626,6 +626,7 @@ def authorize_temporal_attempt(
             raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")
         if owner_allowance(store, operation, "preview") < 1:
             raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
+        _require_published_logical_content(data_root)
         _reserve(store, operation, spec_sha256=spec_sha, look_class="preview")
         if fingerprint and not stamped:
             updated = dict(operation)
@@ -902,6 +903,7 @@ def gate_before_values(
         updated["corpus_fingerprint"] = fingerprint
         _append(store, kind=OPERATION_KIND, body=updated, record_prefix="HFIC-ART-OP")
         operation = get_operation(store, operation_sha256)
+    _require_published_logical_content(data_root)
     _reserve(store, operation, spec_sha256=validated["spec_sha256"], look_class=kind)
     return {
         "disposition": "RESERVED",
@@ -912,6 +914,22 @@ def gate_before_values(
         "spec_sha256": validated["spec_sha256"],
         "look_class": "ADAPTIVE" if kind == "adaptive" else "MAIN",
     }
+
+
+def _require_published_logical_content(data_root: Any) -> None:
+    """A published corpus is checked before a look slot is reserved."""
+
+    if data_root is None:
+        return
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        require_published_logical_content,
+    )
+
+    try:
+        require_published_logical_content(data_root)
+    except GroundedDiscoveryError as exc:
+        raise OrdinaryOperationError(exc.code) from exc
 
 
 def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look_class: str = "main") -> None:
