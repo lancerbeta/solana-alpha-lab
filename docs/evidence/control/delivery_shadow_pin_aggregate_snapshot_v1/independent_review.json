@@ -1,0 +1,40 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "DELIVERY_SHADOW_PIN_AGGREGATE_SNAPSHOT_V1-REVIEW",
+  "as_of": "2026-10-03",
+  "task_id": "DELIVERY_SHADOW_PIN_AGGREGATE_SNAPSHOT_V1",
+  "reviewed_bindings_sha256": "1220317098d71168a58f8075c7cca20666fdf874be35dfbce67bd40b85efeb96",
+  "reviewed_inventory_sha256": "c09589b9dcd7b180552cd75335f56ceae27862250cd491706a00610c5fb9bad3",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated read-only review of content_head=b418df808951dbf4b0ce6fca6df0af2dee4d64d8; later delta is the compact EVIDENCE.md summary plus a hash-only repin of three delivery_harness_acceptance_v1.json implementation_bindings (owner-approved) and its write-set entry, not re-reviewed. No mutation.",
+        "No P0/P1. Exempt set matches harness_sync posix constants; skip precedes TARGET_MISSING lookup; non-aggregate pins keep DENY; 16 shadow-pin tests OK.",
+        "P2 residual: no test locks the aggregate-target-missing skip; ./-prefixed pins were never scanned (unchanged)."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated read-only review of content_head=b418df808951dbf4b0ce6fca6df0af2dee4d64d8; later delta is the compact EVIDENCE.md summary plus a hash-only repin of three delivery_harness_acceptance_v1.json implementation_bindings (owner-approved) and its write-set entry, not re-reviewed. No mutation.",
+        "Drift let through: only an old historical snapshot sha no longer matching a live aggregate (previously a mechanically unsatisfiable DENY). Still caught: harness_sync.check_drift via preflight (scoped by changed paths) plus CI validate_ci --core-only; non-aggregate pins keep DENY; exemption is path-exact, not prefix/glob.",
+        "What could pass tests and still hurt evidence honesty: an old acceptance claims aggregate bytes no longer at HEAD; now written snapshot-only policy, bytes stay in Git history. No PIT/estimand/cohort data path depends on these aggregates.",
+        "P2 residual: exempt pins are skipped silently (no audit count)."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_MERGE",
+    "MODEL_DIVERSITY_UNPROVEN",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}

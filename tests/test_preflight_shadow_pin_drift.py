@@ -142,6 +142,55 @@ class ShadowPinDiscriminatorTests(unittest.TestCase):
         )
         self.assertEqual(reasons, [])
 
+    def _pin(self, target: str) -> dict:
+        return {
+            "docs/evidence/hist/acceptance.json": {
+                "protected_inputs": [{"path": target, "sha256": SHA_A}]
+            }
+        }
+
+    def test_catalog_registry_pin_is_snapshot_only(self) -> None:
+        target = "catalog/assets/core.yaml"
+        self.assertEqual(
+            self._scan(self._pin(target), changed={target}, blobs={target: SHA_B}),
+            [],
+        )
+
+    def test_nav_output_and_manifest_pins_are_snapshot_only(self) -> None:
+        harness_sync = self.module._load_harness_sync_module()
+        for target in (harness_sync.NAV_OUTPUTS[0], harness_sync.MANIFEST_RELATIVE):
+            self.assertEqual(
+                self._scan(self._pin(target), changed={target}, blobs={target: SHA_B}),
+                [],
+                target,
+            )
+
+    def test_product_path_pin_still_denies(self) -> None:
+        target = "src/solana_alpha_lab/task21_owner_pulse.py"
+        self.assertEqual(
+            self._scan(self._pin(target), changed={target}, blobs={target: SHA_B}),
+            [f"SHADOW_PIN_DRIFT:docs/evidence/hist/acceptance.json->{target}"],
+        )
+
+    def test_exempt_set_is_exactly_the_harness_sync_constants(self) -> None:
+        harness_sync = self.module._load_harness_sync_module()
+        self.assertEqual(
+            self.module.harness_owned_aggregate_paths(),
+            frozenset(
+                {
+                    harness_sync.MANIFEST_RELATIVE,
+                    *harness_sync.ASSET_REGISTRIES,
+                    *harness_sync.NAV_OUTPUTS,
+                }
+            ),
+        )
+        for target in self.module.harness_owned_aggregate_paths():
+            self.assertEqual(
+                self._scan(self._pin(target), changed={target}, blobs={target: SHA_B}),
+                [],
+                target,
+            )
+
     def test_registry_contains_only_known_frozen_files(self) -> None:
         self.assertEqual(
             self.module.FROZEN_SEMANTICS_EVIDENCE_FILES,

@@ -1,0 +1,68 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "DELIVERY_SHADOW_PIN_AGGREGATE_SNAPSHOT_V1-ACCEPTANCE",
+  "as_of": "2026-10-03",
+  "task_id": "DELIVERY_SHADOW_PIN_AGGREGATE_SNAPSHOT_V1",
+  "state_change": "AGGREGATE_HISTORICAL_PINS_SNAPSHOT_ONLY_IN_PREFLIGHT_SHADOW_PIN_SCAN",
+  "base_main": "72330ae1727631cb5c0dacc0ab6bc6f65fee2b80",
+  "implementation_bindings": {
+    ".agents/skills/delivery-harness/SKILL.md": "33f6799cb9bf93f1b5f2537e71da55ad3ba9842fec292a075e78c781996e5ad0",
+    "catalog/assets/core.yaml": "65909954dd787e904aa0d03e6d08a657d7f7dd51d52813930120f94cd1fbd7a5",
+    "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "998d7fc58b3a92e0a2a6a164d329ef2c64735b488348bf5125ad9494b6c3f18c",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "e919f3cb713642a645b7f2ee04eb8e42697c727582433b4e321b838caa4f837f",
+    "docs/evidence/control/delivery_shadow_pin_aggregate_snapshot_v1/EVIDENCE.md": "93d621780964c21bf107499e002a7b550cc6b129d4a707718e4c924f713ab3d5",
+    "docs/tasks/DELIVERY_SHADOW_PIN_AGGREGATE_SNAPSHOT_V1.md": "a614335852cbdf447d61cf156a3caa42a051bcbec93fabc9983f68de9ceed509",
+    "scripts/delivery_harness.py": "c764025cf76c0019b139e30bda2c482cfc166ac76fa555a67776dcde8055abf0",
+    "tests/test_preflight_shadow_pin_drift.py": "c0ca39bd71de9b0c9604433873fc9fe607edb80be896e7ac9c0c8ba493e839e4"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/control/delivery_shadow_pin_aggregate_snapshot_v1/factory_fit.json",
+    "sha256": "a599afc297b2257911f9a44cff21225de78f485acd9e95d54b7b5e62a1e8ed87",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_16_SHADOW_PIN_TESTS_AND_REAL_TREE_DRY_RUN",
+    "independent_review": {
+      "path": "docs/evidence/control/delivery_shadow_pin_aggregate_snapshot_v1/independent_review.json",
+      "sha256": "3f6aa39758361c9b9fe2c9a7bd67770f8cfbef0405c3c461b81f3d6d93897cda",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_PREFLIGHT_SHADOW_PIN_UNIT_TESTS",
+      "PASS_REAL_TREE_DRY_RUN_BEFORE_AFTER",
+      "PASS_ISOLATED_CODE_AND_ARCHITECTURE_REVIEW",
+      "PASS_INCREMENTAL_DERIVED_SYNC_AND_PRECOMMIT_CHECKS"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_MERGE",
+    "NO_PRODUCT_CHANGE"
+  ],
+  "side_effects": {
+    "real_scientific_writes": 0,
+    "real_runtime_writes": 0,
+    "provider_calls": 0,
+    "next_cohort_access": false,
+    "synthetic_disposable_test_writes": false
+  },
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE"
+}
