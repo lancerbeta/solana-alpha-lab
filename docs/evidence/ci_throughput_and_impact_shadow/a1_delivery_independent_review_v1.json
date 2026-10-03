@@ -4,8 +4,8 @@
   "review_id": "CI-THROUGHPUT-AND-IMPACT-SHADOW-INDEPENDENT-REVIEW-001",
   "as_of": "2026-10-03",
   "task_id": "CI_THROUGHPUT_AND_IMPACT_SHADOW_V1",
-  "reviewed_bindings_sha256": "5c665c99baa4d894d79b2c6af72fabcd8a8d1c4b48fe5436d12e72fe4759d930",
-  "reviewed_inventory_sha256": "aa8ae63a6dcba52e149eb33c0bf229e5442dca019ed5d5b18247e5e553ba42fd",
+  "reviewed_bindings_sha256": "f3cf5356b31a9ee81314270e8febae5e06e3fed7d504f9e42ceb14d9d6f9f6f0",
+  "reviewed_inventory_sha256": "69d823bd21a91c6c9c6f2d47adf7cfedfb705fb4075ac387d6b20cc6866d1b2f",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
