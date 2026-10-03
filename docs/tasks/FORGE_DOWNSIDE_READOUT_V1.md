@@ -59,6 +59,7 @@ managed_write_set:
   - docs/OPERATOR_NAVIGATION.md
   - docs/PROJECT_MAP.md
   - docs/evidence/forge_downside_readout_v1/**
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
 
 external_caps:
   network: false
