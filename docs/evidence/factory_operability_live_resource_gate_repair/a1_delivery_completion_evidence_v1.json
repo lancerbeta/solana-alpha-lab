@@ -54,8 +54,8 @@
     "targeted": "PASS_78_FOCUSED_TESTS",
     "independent_review": {
       "path": "docs/evidence/factory_operability_live_resource_gate_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "6dbb07ccd7967560e8aee7b2a3015367be84753a698c8224d2f6c5bd21e27ee2",
-      "verdict": "NOT_READY"
+      "sha256": "671ceb5df9f3e0d03c1410d4fcfb28a36bd8d9fd6b1605dac94b2a0fbab948bd",
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",

@@ -15,34 +15,49 @@
   "reviews": [
     {
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "Focused CI consumer fixture correction and updated source binding review pending; prior verdict is not claimed for changed candidate."
+        "ISOLATED_READ_ONLY: frozen HEAD 61dac1cfcef29580daadc9a62dd18b1e5eda65e3, exact contract and implementation bindings verified.",
+        "Focused existing runbook-consumer fixture correction preserves runtime/runbook; exact-head Linux CI remains required before readiness.",
+        "No live commissioning acceptance or merge authority.",
+        "Mock now supplies exact InvocationID, numeric MemoryMax, same-invocation saved kernel peak and actual wrapper argv; negative journal/threshold cases remain fail closed."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "Focused CI consumer fixture correction and updated source binding review pending; prior verdict is not claimed for changed candidate."
+        "ISOLATED_READ_ONLY: frozen HEAD 61dac1cfcef29580daadc9a62dd18b1e5eda65e3 and exact source bindings verified.",
+        "Completion base_main, implementation map, fit/review bindings and actual referenced SHA are consistent after main integration.",
+        "Vertical resource proof remains falsifiable; exact-head Linux cgroup CI required before readiness; no live acceptance.",
+        "No confirmed remaining DoD gap in candidate admission scope."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "Focused CI consumer fixture correction and updated source binding review pending; prior verdict is not claimed for changed candidate."
+        "ISOLATED_READ_ONLY: frozen HEAD 61dac1cfcef29580daadc9a62dd18b1e5eda65e3, exact contract and implementation bindings verified.",
+        "Focused existing runbook-consumer fixture correction preserves runtime/runbook; exact-head Linux CI remains required before readiness.",
+        "No live commissioning acceptance or merge authority.",
+        "SEMANTIC_PREMISE PASS; packet_fingerprint_sha256=9be6957874f9f8ef66dbc4907a3f08d9d766873290e9613cd18561c74780cc05",
+        "Python exact-time/UNKNOWN and packet-local immutable proof reuse preserved; scientific member predecessor default retained.",
+        "Tests can pass while live envelope, global scientific integrity or arbitrary timestamp anomalies remain unproven.",
+        "PACKET_INFORMATION_PATH; PROCESS_OBLIGATION; MODEL_DIVERSITY_UNPROVEN."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "Focused CI consumer fixture correction and updated source binding review pending; prior verdict is not claimed for changed candidate."
+        "ISOLATED_READ_ONLY: frozen HEAD 61dac1cfcef29580daadc9a62dd18b1e5eda65e3, frozen diff and all implementation bindings verified.",
+        "Canonical report templates and operator recovery path unchanged from previous PASS; base integration preserved consumer semantics.",
+        "First ordinary cycle with timer off, InvocationID-scoped resource readback and mandatory checks gate enablement.",
+        "No confirmed owner-operability gap; exact-head Linux CI and separate commissioning remain required."
       ]
     }
   ],
-  "verdict": "NOT_READY",
+  "verdict": "PASS",
   "non_claims": [
     "NO_MERGE_AUTHORITY",
     "MODEL_DIVERSITY_UNPROVEN",
