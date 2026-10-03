@@ -50,12 +50,16 @@ def plan_shards(
     loads = [0.0] * shard_count
     shards: list[list[str]] = [[] for _ in range(shard_count)]
     for path, seconds in ordered:
-        # Equal loads (the long tail of near-zero modules) fall back to the
-        # emptier shard so module counts stay balanced too.
-        index = min(
-            range(shard_count),
-            key=lambda i: (loads[i], len(shards[i]), i),
-        )
+        if seconds > 0.0:
+            index = min(range(shard_count), key=lambda i: (loads[i], i))
+        else:
+            # Modules below telemetry precision (module_done prints 0.1 s) add
+            # no load, so load alone would pile them all on one shard: spread
+            # that tail by module count instead.
+            index = min(
+                range(shard_count),
+                key=lambda i: (len(shards[i]), loads[i], i),
+            )
         shards[index].append(path)
         loads[index] += seconds
     for shard in shards:

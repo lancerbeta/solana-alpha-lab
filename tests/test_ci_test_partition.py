@@ -176,6 +176,19 @@ class CiTestPartitionTests(unittest.TestCase):
         with self.assertRaises(partition.PartitionError):
             partition.plan_shards(modules, shard_count=7, source_profile_sha256="x")
 
+    def test_zero_weight_tail_spreads_across_shards(self) -> None:
+        # near-identical but not equal positive loads, then a long zero tail:
+        # load-only placement would send every zero module to the lightest shard
+        modules = {f"tests/test_heavy_{i}.py": 100.0 + 0.01 * i for i in range(6)}
+        modules.update({f"tests/test_zero_{i:03d}.py": 0.0 for i in range(60)})
+        plan = partition.plan_shards(modules, shard_count=6, source_profile_sha256="x")
+        zeros = [
+            sum(1 for path in shard if "test_zero_" in path) for shard in plan["shards"]
+        ]
+        self.assertEqual(zeros, [10] * 6)
+        for shard in plan["shards"]:
+            self.assertEqual(len(shard), 11)
+
     def test_equal_loads_balance_module_counts(self) -> None:
         modules = {f"tests/test_{i:02d}.py": 0.0 for i in range(12)}
         plan = partition.plan_shards(modules, shard_count=4, source_profile_sha256="x")
@@ -262,6 +275,16 @@ class CiTestPartitionTests(unittest.TestCase):
         spec.loader.exec_module(validator)
         self.assertEqual(partition.SHARD_COUNT_MIN, validator.SHARD_COUNT_MIN)
         self.assertEqual(partition.SHARD_COUNT_MAX, validator.SHARD_COUNT_MAX)
+
+    def test_committed_plan_spreads_zero_weight_modules(self) -> None:
+        plan = partition.load_plan(ROOT / "configs/ci_test_shards_v1.json")
+        seconds = plan["module_seconds"]
+        zeros = [
+            sum(1 for path in shard if seconds.get(path, 0.0) <= 0.0)
+            for shard in plan["shards"]
+        ]
+        self.assertGreater(sum(zeros), 0)
+        self.assertLessEqual(max(zeros) - min(zeros), 1)
 
     def test_committed_plan_provenance_matches_the_plan(self) -> None:
         plan = partition.load_plan(ROOT / "configs/ci_test_shards_v1.json")
