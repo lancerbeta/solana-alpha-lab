@@ -1262,7 +1262,7 @@ def cmd_discovery_execute(
                 if not isinstance(request, dict):
                     raise OrdinaryOperationError("ORDINARY_OPERATION_REQUEST_REQUIRED")
                 before_records = len(list_operations(op_store))
-                operation = record_operation(op_store, request)
+                operation = record_operation(op_store, request, create_if_missing=correction is None)
                 service_writes = int(len(list_operations(op_store)) > before_records)
                 operation_sha256 = str(operation.get("operation_sha256") or "")
             elif claimed_market == "":
@@ -1321,10 +1321,28 @@ def cmd_discovery_execute(
             return emit(stop, exit_code=2)
         evidence = dict(gate.get("evidence") or {})
         evidence["values_loaded"] = False
-        evidence["writes"] = False
+        evidence["writes"] = bool(service_writes)
         evidence["scientific_negative"] = False
         if operation_sha256:
-            evidence["ordinary_operation"] = note_look_landed(op_store, str(operation_sha256)).get("status")
+            before_operations = len(list_operations(op_store))
+            operation_state = get_operation(op_store, str(operation_sha256))
+            # Ordinary crash recovery completes the original landing transition.
+            # A saved readout revision has no lifecycle transition to complete.
+            if correction is None and not evidence.get("revision_of"):
+                operation_state = note_look_landed(op_store, str(operation_sha256))
+            lifecycle_delta = len(list_operations(op_store)) - before_operations
+            evidence["ordinary_operation"] = operation_state.get("status")
+            evidence["writes"] = bool(service_writes) or lifecycle_delta > 0
+            evidence["record_delta"] = {"discovery_look_records": 0, "ordinary_operation_records": service_writes + lifecycle_delta}
+            evidence["scientific_look_delta"] = {"main": 0, "adaptive": 0}
+            from solana_alpha_lab.factory.hfic_ordinary_operation import project_ordinary_operation
+
+            if correction is None and not evidence.get("revision_of"):
+                evidence["ordinary_operation_readout"] = project_ordinary_operation(
+                    op_store,
+                    owner_focus=str(operation_state.get("owner_focus") or ""),
+                    market_evidence_epoch_sha256=str(operation_state.get("market_evidence_epoch_sha256") or ""),
+                )
         evidence["operation_sha256"] = (gate.get("operation") or {}).get("operation_sha256")
         _assert_no_path_leak(evidence, str(store_root), str(repo_root))
         return emit(evidence)
@@ -1411,7 +1429,13 @@ def cmd_discovery_execute(
     evidence["authority_source"] = (loaded["binding"] or {}).get("authority_source")
     evidence["values_loaded"] = True
     if operation_sha256:
-        evidence["ordinary_operation"] = note_look_landed(op_store, str(operation_sha256)).get("status")
+        operation_state = (
+            get_operation(op_store, str(operation_sha256))
+            if correction is not None
+            else note_look_landed(op_store, str(operation_sha256))
+        )
+        evidence["ordinary_operation"] = operation_state.get("status")
+        evidence["operation_sha256"] = str(operation_sha256)
     _assert_no_path_leak(evidence, str(store_root), str(repo_root))
     if data_root is not None:
         _assert_no_path_leak(evidence, str(data_root))

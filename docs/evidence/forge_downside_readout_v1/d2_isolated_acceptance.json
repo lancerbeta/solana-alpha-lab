@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "source_ref": "HFIC-ART-DISCOVERY-066E0BBA20351490BD3E6EA123B889B4733CA583",
+  "source_result_sha256": "ddc8a33196ee0144e9743bb98c2d45c70b4e4d396072d91552bb13346eec27a3",
+  "spec_sha256": "920e18da8fb26e4e88fe18b579ae5f69b5f466078c625354b558aa5f41d9314b",
+  "input_sha256": "b3d419319957bdef8cce0238cec6c9a96904dd45e82f1de214d71c8a25281697",
+  "old_numbers": {
+    "matched_n": 111,
+    "mean_target": -0.06902620062974765,
+    "median_target": 0.0,
+    "observed_target_n": 105
+  },
+  "new_numbers_equal": true,
+  "old_records_unchanged": true,
+  "source_terminal_unchanged": true,
+  "budget_unchanged": true,
+  "record_delta": 1,
+  "retry_values_loaded": false,
+  "retry_zero_write": true,
+  "canonical_nonmutation": true,
+  "canonical_before": "3238283339a512d14cd53f197d6516ed569ec49a0bab9f5c003f62ef42b93a47",
+  "canonical_after": "3238283339a512d14cd53f197d6516ed569ec49a0bab9f5c003f62ef42b93a47",
+  "scope": "DISPOSABLE_CLOSED_D2_COPY_PUBLIC_CLI_ONLY",
+  "real_scientific_writes": 0,
+  "proof_limits": [
+    "Current operational inventories and market rows remain outside Git",
+    "Metadata-only readout revision does not reassess the frozen verdict",
+    "Cold retry used exact source/spec/input/operation"
+  ]
+}

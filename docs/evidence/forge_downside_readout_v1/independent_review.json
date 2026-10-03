@@ -1,0 +1,22 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE_DOWNSIDE_READOUT_V1-REVIEW",
+  "as_of": "2026-10-03",
+  "task_id": "FORGE_DOWNSIDE_READOUT_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [],
+  "verdict": "PENDING",
+  "non_claims": [
+    "NO_MERGE",
+    "NO_REAL_RUNTIME_WRITE",
+    "NO_SCIENTIFIC_VERDICT"
+  ]
+}

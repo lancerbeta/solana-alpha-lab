@@ -845,6 +845,36 @@ decision_unlocked
 
 Сначала простой diagnostic/bucket/negative-control. Сложная модель разрешена только если она закрывает named ambiguity, которую простой метод не различает.
 
+Для существующего `PRICE_RELATIVE_PROXY` используй машинный
+`descriptive_readout` профиля `DOWNSIDE_DESCRIPTIVE_V1`: matched рядом с
+same-decision baseline, observed/eligible/missing, mean/median, частота
+`<=-20%` и `<=-50%`, ES10 и концентрация отрицательного вклада. Одинаковые
+медианы сами по себе не опровергают tail/veto-вопрос. Различай частоту,
+тяжесть и концентрацию: все метрики не обязаны различаться одновременно.
+Baseline может включать matched и не является независимым контролем.
+Missing не означает нулевой риск; малое N не доказывает отсутствие эффекта.
+ES10 — описательная оценка proxy со знаком return, не confidence interval.
+Большое различие не доказывает исполнимую стратегию и не даёт automatic
+promotion. Для veto нужна отдельная проверка базовой политики, потерянных
+выигрышей и затрат. Не подбирай порог, outcome или горизонт после просмотра
+tails без отдельного scientific accounting. `LEGACY_READOUT_UNAVAILABLE`
+означает ограничение tail-оценки, а не отрицательную науку.
+
+Для существующего `PRICE_RELATIVE_PROXY` используй машинный
+`descriptive_readout` профиля `DOWNSIDE_DESCRIPTIVE_V1`: matched рядом с
+same-decision baseline, observed/eligible/missing, mean/median, частота
+`<=-20%` и `<=-50%`, ES10 и концентрация отрицательного вклада. Одинаковые
+медианы сами по себе не опровергают tail/veto-вопрос. Различай частоту,
+тяжесть и концентрацию: все метрики не обязаны различаться одновременно.
+Baseline может включать matched и не является независимым контролем.
+Missing не означает нулевой риск; малое N не доказывает отсутствие эффекта.
+ES10 — описательная оценка proxy со знаком return, не confidence interval.
+Большое различие не доказывает исполнимую стратегию и не даёт automatic
+promotion. Для veto нужна отдельная проверка базовой политики, потерянных
+выигрышей и затрат. Не подбирай порог, outcome или горизонт после просмотра
+tails без отдельного scientific accounting. `LEGACY_READOUT_UNAVAILABLE`
+означает ограничение tail-оценки, а не отрицательную науку.
+
 ## A7. Novelty и prior-work audit
 
 Для каждого кандидата проведи три проверки:
@@ -1262,6 +1292,28 @@ family close. `MARKET_UNVERIFIED` и `JOURNAL_CHANGED` означают, что 
 
 ### 5. Statistics / multiplicity
 
+При tail/veto-вопросе прочитай `grounded_evidence.descriptive_readout`.
+Не используй равенство медиан как самостоятельный falsifier. Сопоставь
+частоту фиксированных loss events, ES10, отрицательную массу и её
+концентрацию с baseline, включая observed/missing и tail mass support.
+Не требуй различия всех метрик одновременно. All-missing не является
+нулевым риском; одиночный extreme outcome не доказывает alpha и не является
+универсальным KILL. Baseline может включать matched. Без tail metrics или
+coverage ограничь claim; не выдумывай числа. Описательное различие не
+доказывает полезность veto: нужны последствия относительно базовой
+политики, потерянные выигрыши и затраты. Не меняй пороги/estimand по tails.
+
+При tail/veto-вопросе прочитай `grounded_evidence.descriptive_readout`.
+Не используй равенство медиан как самостоятельный falsifier. Сопоставь
+частоту фиксированных loss events, ES10, отрицательную массу и её
+концентрацию с baseline, включая observed/missing и tail mass support.
+Не требуй различия всех метрик одновременно. All-missing не является
+нулевым риском; одиночный extreme outcome не доказывает alpha и не является
+универсальным KILL. Baseline может включать matched. Без tail metrics или
+coverage ограничь claim; не выдумывай числа. Описательное различие не
+доказывает полезность veto: нужны последствия относительно базовой
+политики, потерянные выигрыши и затраты. Не меняй пороги/estimand по tails.
+
 - Unit и clusters корректны?
 - Есть ли достаточный tail/regime/effective sample?
 - Method не сложнее question/data?
@@ -1636,8 +1688,9 @@ ordinary temporal query в остатке бюджета → после ново
 Это не исторический run и не разрешение apply. Повреждённый или частичный
 aggregate блокирует fallback.
 Writer temporal calculation —
-`HFIC_TEMPORAL_DISCOVERY_CALC_V4` (V4: `by_cohort` на той же matched-выборке, что
-pooled и calendar). V1/V2/V3 читаются как есть, без evaluator и без выдуманного
+`HFIC_TEMPORAL_DISCOVERY_CALC_V5` (V5: фиксированный
+`DOWNSIDE_DESCRIPTIVE_V1`; V4 исправил `by_cohort` на ту же matched-выборку, что
+pooled и calendar). V1/V2/V3/V4 читаются как есть, без evaluator и без выдуманного
 среза. Обычный повтор того же вопроса возвращает сохранённый result; старую
 версию он не пересчитывает. Исправление — только явное:
 `discovery-execute ... --correct-result-ref <ref> --correct-result-sha256 <hash>`.
@@ -1650,6 +1703,35 @@ freeze по старому ref даёт `GROUNDED_RESULT_SUPERSEDED`. Повто
 отвечает `correction_already_applied` без записи. Спент SIMPLE остаётся
 спентом, но несогласованный summary не даёт scientific terminal
 (`CORRECT_CALCULATION_REVISION`). Grounded `CALCULATION_VERSION` не меняется.
+
+Для явного дополнения coherent V4, включая закрытый вопрос, сначала read-only
+сверьте exact saved ref/hash, operation, journal, spec, frozen input и текущий
+market. Используйте сохранённый spec и существующую operation, без нового cap:
+
+Если старая operation не содержит `spec_canonical`, источник вопроса — exact
+saved result `spec`, не новый draft. Для canonical wrapper с `scientific_body=b`
+механически перенесите: `population=b.population`, `decision.point_id=b.decision_point`
+и `time_policy=BOUND_SCHEDULE_CUTOFF`, `schedule.lateness_seconds=b.schedule_lateness_seconds`,
+`schedule.observation_clock_policy=b.observation_clock_policy`, `features=b.features`,
+`all=b.predicates`, `target=b.target`, `entry_model=b.entry_model`,
+`cost_profile=b.cost_profile`, `evaluation=b.evaluation`. Из wrapper сохраните
+`schema`, `schema_version`, `query_id`, `search_tier`, `budget_allocation` и
+`adaptation_of`, если он был. Перед запуском `validate_temporal_query(spec).spec_sha256`
+должен строго совпасть с source `spec_sha256`; несовпадение — STOP.
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <data-root> discovery-execute --store <data-root> --spec <exact-saved-spec.json> --candidate-scope <saved-scope.json> --journal-scope <journal-sha256> --operation-sha256 <saved-operation-sha256> --correct-result-ref <saved-V4-ref> --correct-result-sha256 <saved-V4-sha256> --format json
+```
+
+Нормальный результат — `CALCULATION_REVISION`, reason `DOWNSIDE_READOUT_ADDED`,
+`new_look=false`. Readback должен показать V5, COHERENT и source lineage при
+неизменных старых числах, input/market, session/slot/reservation и полном
+budget. Exact retry возвращает `correction_already_applied=true`,
+`values_loaded=false`, `writes=false`. Mismatch — typed STOP; не правьте
+историю и не открывайте slot. `assessment_advisory` сообщает
+`REVIEW_REQUIRED_FOR_ASSESSMENT_BOUND_TO_SOURCE`: frozen verdict всё ещё
+относится к прежнему result, новая оценка требует отдельного разрешения.
+Runbook описывает capability; этот delivery atom не разрешает real enrichment.
 Preview: `discovery-preview --store <data-root> --journal-scope <search-key>`.
 Оба флага вместе включают память preview. Коды `SCHEDULE_CONTEXT_UNBOUND`,
 `SCHEDULE_LATENESS_MISMATCH`, `PREVIEW_ENVELOPE_EXHAUSTED` и

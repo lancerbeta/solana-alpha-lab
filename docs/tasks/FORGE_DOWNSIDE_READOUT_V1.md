@@ -52,6 +52,7 @@ managed_write_set:
   - tests/test_hfic_temporal_owner_path_v1.py
   - tests/test_forge_downside_readout_v1.py
   - catalog/assets/core.yaml
+  - catalog/assets/lifecycle.yaml
   - catalog/catalog_manifest.yaml
   - catalog/generated/**
   - docs/FACTORY_SEMANTIC_MAP.md
@@ -81,6 +82,7 @@ context_requirements:
   catalog_asset_ids: []
   l2_roles:
     - ARCHITECTURE_DECISIONS
+    - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
   exact_role_asset_ids:
@@ -97,7 +99,10 @@ context_requirements:
       - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
       - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
       - docs/contracts/forge_downside_descriptive_v1.md
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/forge_downside_readout_v1/completion.json
+      - docs/evidence/forge_downside_readout_v1/independent_review.json
+      - docs/evidence/forge_downside_readout_v1/factory_fit.json
     HISTORICAL_CONTEXT: []
 ---
 

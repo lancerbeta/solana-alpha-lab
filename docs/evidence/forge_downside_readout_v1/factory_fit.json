@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE_DOWNSIDE_READOUT_V1-FACTORY-FIT",
+  "as_of": "2026-10-03",
+  "task_id": "FORGE_DOWNSIDE_READOUT_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PENDING",
+  "dimensions": {
+    "mission": "Fixed downside readout reaches persisted/replay/Prompt A/Critic/owner within one named loop",
+    "flexibility_and_history": "V1-V4 are readable as-is; closed coherent V4 gets one explicit source-bound append-only V5 revision",
+    "context_efficiency": "Inline matched/baseline, bounded detail prefix and explicit truncation, unchanged packet cap",
+    "research_truth": "PIT/sample/old numerics/spec/input/market and budget preserved; missing never zero risk",
+    "owner_operability": "Exact correction/runbook/retry and source-bound frozen-verdict review advisory",
+    "execution_to_cashflow": "No alpha or economics claim; separate baseline-policy falsifier remains an owner decision",
+    "monitoring_and_recovery": "Ordinary crash replay lands once; correction before-append faults zero-write, after-append replay converges",
+    "build_vs_buy": "One pure helper plus existing store/packet owners; no dependency or second transaction mechanism",
+    "security": "Synthetic/disposable writes only; canonical data inputs read-only; no provider or next cohort",
+    "red_team": "Typed refusal on source/spec/input/numeric mismatch; no closed-slot grant, no automatic verdict"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "Separately authorized Git revert; never delete appended result history. After a real V5 write prefer a forward-compatible reader to unsupported downgrade.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_REAL_V5_WRITE",
+    "NO_AUTOMATIC_REASSESSMENT",
+    "BOUNDED_NATIVE_SMOKE_NOT_GENERAL_MODEL_CALIBRATION"
+  ]
+}

@@ -331,7 +331,8 @@ class CounterexampleTests(unittest.TestCase):
             _member_rows("b", COHORT, RELEASE, mark=MATCH, exit_price=0.9),
         ]
         old, new = self._pair(parts, [_bind(COHORT, RELEASE)])
-        self.assertEqual(old["by_cohort"], new["by_cohort"])
+        for before, after in zip(old["by_cohort"], new["by_cohort"], strict=True):
+            self.assertEqual(before, {key: after[key] for key in before})
         self.assertEqual(temporal_result_coherence(old)["status"], "COHERENT")
 
 
@@ -482,6 +483,7 @@ class CoherenceCheckTests(unittest.TestCase):
         self.assertEqual(temporal_result_coherence({"calculation_version": "V1"})["status"], "COHERENT")
         legacy = dict(self.summary)
         legacy.pop("by_cohort")
+        legacy["calculation_version"] = temporal.TEMPORAL_CALCULATION_VERSION_V4
         self.assertEqual(temporal_result_coherence(legacy)["status"], "COHERENT")
 
     def test_readout_marks_an_incoherent_result_not_science_ready(self) -> None:
@@ -1344,7 +1346,8 @@ class RevisionGateTests(unittest.TestCase):
             }
             revised = run_recorded_discovery_query(ResearchStore(Path(raw)), correction=correction, **kwargs)
             self.assertEqual(revised["revision_of"]["reason"]["code"], "CALCULATION_VERSION_SUPERSEDED")
-            self.assertEqual(revised["result"]["by_cohort"], evidence["result"]["by_cohort"])
+            for before, after in zip(evidence["result"]["by_cohort"], revised["result"]["by_cohort"], strict=True):
+                self.assertEqual(before, {key: after[key] for key in before})
             with self.assertRaises(GroundedDiscoveryError) as superseded:
                 assert_computed_grounded_evidence(ResearchStore(Path(raw)), evidence)
             self.assertEqual(superseded.exception.code, "GROUNDED_RESULT_SUPERSEDED")

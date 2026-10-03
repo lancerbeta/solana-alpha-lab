@@ -2125,6 +2125,37 @@ def build_forge_context_packet(
             ),
         },
     }
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        descriptive_return_readout,
+        list_discovery_looks,
+    )
+    from solana_alpha_lab.factory.hfic_temporal_discovery import current_look_evidence
+
+    # Exact-journal evidence only. This is a readout, never another evaluator
+    # pass or a scientific grant. Summary comparisons survive packet pressure;
+    # slice details remain in the immutable result refs.
+    journal_looks = list_discovery_looks(store, search_key)
+    readouts = {}
+    for look in journal_looks:
+        current = current_look_evidence(look, journal_looks)
+        result = current.get("result")
+        if not isinstance(result, Mapping) or result.get("schema") != "smial.hfic-temporal-query":
+            continue
+        ref = str(current.get("record_id") or "")
+        readouts[ref] = {
+            "result_ref": ref,
+            "result_sha256": current.get("result_sha256"),
+            "spec_sha256": current.get("spec_sha256"),
+            "calculation_version": current.get("calculation_version"),
+            "revision_of": current.get("revision_of"),
+            "assessment_advisory": (
+                "REVIEW_REQUIRED_FOR_ASSESSMENT_BOUND_TO_SOURCE"
+                if current.get("revision_of") else None
+            ),
+            "descriptive_readout": descriptive_return_readout(result, detail_limit=0),
+        }
+    if readouts:
+        packet["grounded_readouts"] = list(readouts.values())
     from solana_alpha_lab.factory.hfic_scientific_disposition import (
         compact_counts_only,
         safe_disposition_context,

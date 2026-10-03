@@ -89,7 +89,9 @@ def _cap_field(value: object) -> int | None:
     return value
 
 
-def record_operation(store: Any, request: Mapping[str, Any]) -> dict[str, Any]:
+def record_operation(
+    store: Any, request: Mapping[str, Any], *, create_if_missing: bool = True
+) -> dict[str, Any]:
     """Persist one explicit owner request. The same bytes return the same row."""
 
     text = request.get("owner_request_text")
@@ -157,6 +159,8 @@ def record_operation(store: Any, request: Mapping[str, Any]) -> dict[str, Any]:
     for existing in list_operations(store):
         if existing.get("operation_sha256") == digest:
             return existing
+    if not create_if_missing:
+        raise OrdinaryOperationError("CALCULATION_REVISION_EXISTING_OPERATION_REQUIRED")
     stored = {
         **identity_body,
         "spec_sha256": None if not exact or validated is None else validated["spec_sha256"],
@@ -238,6 +242,7 @@ def result_readout(look: Mapping[str, Any]) -> dict[str, Any]:
     from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_result_coherence
 
     result = look.get("result") if isinstance(look.get("result"), Mapping) else {}
+    from solana_alpha_lab.factory.hfic_grounded_discovery import descriptive_return_readout
     coherence = temporal_result_coherence(result)
     body: dict[str, Any] = {
         "result_ref": look.get("record_id"),
@@ -247,9 +252,11 @@ def result_readout(look: Mapping[str, Any]) -> dict[str, Any]:
         "new_look": look.get("new_look"),
         "result_coherence": coherence["status"],
         "science_ready": coherence["status"] == "COHERENT" and result.get("technical_failure") is not True,
+        "descriptive_readout": descriptive_return_readout(result),
     }
     if isinstance(look.get("revision_of"), Mapping):
         body["revision_of"] = dict(look["revision_of"])
+        body["assessment_advisory"] = "REVIEW_REQUIRED_FOR_ASSESSMENT_BOUND_TO_SOURCE"
     if coherence["status"] != "COHERENT":
         body["incoherent_fields"] = coherence["issues"]
         body["repair_action"] = coherence["repair_action"]
@@ -670,6 +677,7 @@ def gate_before_values(
             "result_sha256": stored.get("result_sha256"),
             "result_refs": [stored.get("record_id")],
             "result": stored.get("result"),
+            "descriptive_readout": result_readout(stored)["descriptive_readout"],
             "journal_scope": journal_scope,
             "spec_sha256": validated["spec_sha256"],
             "data_binding_sha256": stored.get("data_binding_sha256"),
@@ -688,6 +696,7 @@ def gate_before_values(
         }
         if isinstance(stored.get("revision_of"), Mapping):
             evidence["revision_of"] = dict(stored["revision_of"])
+            evidence["assessment_advisory"] = "REVIEW_REQUIRED_FOR_ASSESSMENT_BOUND_TO_SOURCE"
         if correction is not None:
             evidence["correction_already_applied"] = True
         return {
@@ -710,7 +719,18 @@ def gate_before_values(
         except GroundedDiscoveryError as exc:
             raise OrdinaryOperationError(exc.code) from exc
         if _closed_slot(admission, list_hfic_sessions(store)):
-            raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")
+            from solana_alpha_lab.factory.hfic_temporal_discovery import (
+                TEMPORAL_CALCULATION_VERSION_V4,
+                temporal_result_coherence,
+            )
+
+            # The slot remains closed to science. Only a source-bound,
+            # output-only enrichment of a coherent V4 result may pass.
+            if not (
+                source.get("calculation_version") == TEMPORAL_CALCULATION_VERSION_V4
+                and temporal_result_coherence(source["result"])["status"] == "COHERENT"
+            ):
+                raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")
         return {
             "disposition": "CORRECTION",
             "values_loaded": False,
@@ -853,6 +873,8 @@ def note_look_landed(store: Any, operation_sha256: str) -> dict[str, Any]:
 
     operation = get_operation(store, operation_sha256)
     status = operation.get("status")
+    if status != "OPEN":
+        return operation
     if owner_allowance(store, operation, "main") < 1 and operation.get("requested_completion") == LIMITED_RESULT:
         status = "PAUSED_CAP"
     if status == operation.get("status"):
@@ -985,4 +1007,23 @@ def merge_ordinary_readout(payload: dict[str, Any], projection: Mapping[str, Any
         payload["next_action"] = "AUTHORIZE_ADDITIONAL_LOOKS"
         payload["owner_final"] = "OPERATION_PAUSED_SEARCH_OPEN"
     payload["ordinary_operation"] = proj
+    readout = (proj.get("result") or {}).get("descriptive_readout")
+    if isinstance(readout, Mapping):
+        if readout.get("status") == "LEGACY_READOUT_UNAVAILABLE":
+            line = str(readout.get("message") or "")
+        else:
+            parts = []
+            for label in ("matched", "baseline"):
+                row = readout.get(label) or {}
+                tail = row.get("downside") or {}
+                parts.append(
+                    f"{label}: observed/eligible/missing={tail.get('observed_n')}/{row.get('eligible_n')}/{tail.get('missing_n')}, "
+                    f"mean={row.get('mean_target')}, median={row.get('median_target')}, "
+                    f"<=-20%={tail.get('le_minus_20_n')}/{tail.get('le_minus_20_rate')}, "
+                    f"<=-50%={tail.get('le_minus_50_n')}/{tail.get('le_minus_50_rate')}, "
+                    f"ES10={tail.get('es10_return')}, worst_negative_share={tail.get('worst_negative_share')}"
+                )
+            line = "\n".join(parts)
+        if line:
+            payload["owner_readout"] = str(payload.get("owner_readout") or "") + "\n" + line
     return payload

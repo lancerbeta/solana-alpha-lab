@@ -47,3 +47,14 @@ revision without evaluation or writes. Historical verdicts stay bound to
 their original refs; a newer readout asks for review rather than silently
 changing a verdict. Fixed downside exposure is recorded as descriptive
 evidence, not a new threshold trial.
+
+V5 calendar rows use the same matched population and existing calendar key.
+Existing observed counts and means are unchanged; missing-only keys add rows
+with observed zero, null mean and explicit missing support. Compact packets
+keep matched/baseline support and mark detail totals, included prefix and
+truncation. A detail prefix is not complete calendar coverage.
+
+Ordinary replay completes an interrupted landing through the existing
+state-aware `note_look_landed` owner: an OPEN limited operation whose MAIN cap
+is spent becomes PAUSED_CAP. Already terminal states are immutable. Readout
+revision and its replay have no landing transition and never invoke that owner.

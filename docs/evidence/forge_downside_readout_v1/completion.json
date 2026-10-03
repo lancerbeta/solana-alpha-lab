@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE_DOWNSIDE_READOUT_V1-ACCEPTANCE",
+  "as_of": "2026-10-03",
+  "task_id": "FORGE_DOWNSIDE_READOUT_V1",
+  "state_change": "FIXED_DOWNSIDE_V5_AND_CLOSED_SOURCE_BOUND_READOUT_REVISION",
+  "base_main": "8e72dbb492d1d430231f9e225e6000be0e1d6922",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_downside_readout_v1/factory_fit.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PENDING"
+  },
+  "validation": {
+    "targeted": "PASS_FIVE_VERTICALS_AND_REPLAY_REFUSAL_CALENDAR_REGRESSIONS",
+    "independent_review": {
+      "path": "docs/evidence/forge_downside_readout_v1/independent_review.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_NUMERIC_GOLD",
+      "PASS_ORDINARY_CRASH_REPLAY",
+      "PASS_REJECTED_CORRECTION_ZERO_WRITE",
+      "PASS_READOUT_REVISION_LIFECYCLE_UNCHANGED",
+      "PASS_CALENDAR_MISSING_TRUNCATION_COMPATIBILITY"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_AUTOMATIC_VERDICT",
+    "NO_REAL_SCIENTIFIC_WRITE",
+    "NO_MERGE",
+    "NO_GENERAL_LLM_CALIBRATION"
+  ],
+  "side_effects": {
+    "real_scientific_writes": 0,
+    "provider_calls": 0,
+    "next_cohort_access": false,
+    "synthetic_disposable_test_writes": true
+  }
+}

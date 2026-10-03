@@ -268,6 +268,10 @@ class TemporalOwnerPathTests(unittest.TestCase):
             )
             self.assertEqual(preflight_after.returncode, 0, preflight_after.stderr)
             source_receipt = json.loads(preflight_after.stdout)
+            readouts = source_receipt["forge_context_packet"]["grounded_readouts"]
+            handed_readout = next(row for row in readouts if row["result_ref"] == evidence["result_refs"][0])
+            self.assertEqual(handed_readout["descriptive_readout"]["matched"]["downside"], evidence["result"]["downside"])
+            self.assertEqual(handed_readout["descriptive_readout"]["baseline"]["median_target"], evidence["result"]["baseline"]["median_target"])
             source = json.loads(
                 (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(encoding="utf-8")
             )
@@ -332,6 +336,8 @@ class TemporalOwnerPathTests(unittest.TestCase):
             frozen = json.loads(frozen_run.stdout)
             packet = frozen["critic_input_packet"]
             handed = packet["grounded_evidence"]
+            self.assertEqual(handed["descriptive_readout"], evidence["descriptive_readout"])
+            self.assertEqual(handed["descriptive_readout"]["matched"]["median_target"], evidence["result"]["median_target"])
             self.assertEqual(handed["result"]["target_kind"], "PRICE_RELATIVE_PROXY")
             self.assertEqual(handed["result"]["cost"]["scenarios"]["BASE"]["label"], "ESTIMATED_NET_PROXY")
             self.assertEqual(handed["result_refs"], evidence["result_refs"])
