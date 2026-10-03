@@ -219,6 +219,61 @@ def _published_file_hash_mismatch(root: Path) -> bool:
     return False
 
 
+def _published_gate_cohorts(
+    data_root: Path,
+    binding_doc: object,
+) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
+    """Published cohorts for the gate. A disagreeing --binding writes nothing."""
+
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        resolve_published_discovery_binding,
+    )
+
+    try:
+        published = list(resolve_published_discovery_binding(data_root).get("cohorts") or [])
+    except GroundedDiscoveryError as exc:
+        body = {
+            "reason_code": exc.code,
+            "values_loaded": False,
+            "writes": False,
+            "scientific_negative": False,
+        }
+        if exc.code == "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE":
+            body["next_action"] = "RESTORE_PUBLISHED_PARTITION_BYTES_THEN_RETRY_DISCOVERY_EXECUTE"
+        return [], body
+    if isinstance(binding_doc, dict):
+        by_id = {
+            str(item.get("cohort_id")): item
+            for item in published
+            if isinstance(item, dict)
+        }
+        supplied = binding_doc.get("cohorts") or []
+        if not isinstance(supplied, list):
+            supplied = []
+        for item in supplied:
+            if not isinstance(item, dict):
+                return [], {
+                    "reason_code": "BINDING_HASH_MISMATCH",
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                }
+            match = by_id.get(str(item.get("cohort_id")))
+            if (
+                match is None
+                or item.get("census_sha256") != match.get("census_sha256")
+                or item.get("observations_sha256") != match.get("observations_sha256")
+            ):
+                return [], {
+                    "reason_code": "BINDING_HASH_MISMATCH",
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                }
+    return published, None
+
+
 _REPAIR_OWNER_NEXT = {
     "PARENT_SESSION_MISSING": "PROVIDE_PARENT_SESSION_ID_FROM_SHOW_SESSION",
     "PARENT_SESSION_REQUIRED": "SHOW_SESSION_THEN_REPAIR_CONTINUATION_DRAFT",
@@ -1282,50 +1337,13 @@ def cmd_discovery_execute(
                         },
                         exit_code=2,
                     )
+            cohorts: list[dict[str, Any]] = []
             if explicit_data_root is not None:
-                from solana_alpha_lab.factory.hfic_grounded_discovery import (
-                    resolve_published_discovery_binding,
-                )
-
-                try:
-                    resolve_published_discovery_binding(explicit_data_root)
-                except GroundedDiscoveryError as exc:
-                    body = {
-                        "reason_code": exc.code,
-                        "values_loaded": False,
-                        "writes": False,
-                        "scientific_negative": False,
-                    }
-                    if exc.code == "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE":
-                        body["next_action"] = (
-                            "RESTORE_PUBLISHED_PARTITION_BYTES_THEN_RETRY_DISCOVERY_EXECUTE"
-                        )
-                    return emit(body, exit_code=2)
-            cohorts = []
-            if isinstance(binding_doc, dict):
+                cohorts, refusal = _published_gate_cohorts(explicit_data_root, binding_doc)
+                if refusal is not None:
+                    return emit(refusal, exit_code=2)
+            elif isinstance(binding_doc, dict):
                 cohorts = list(binding_doc.get("cohorts") or [])
-            elif explicit_data_root is not None:
-                from solana_alpha_lab.factory.hfic_grounded_discovery import (
-                    resolve_published_discovery_binding,
-                )
-
-                try:
-                    published = resolve_published_discovery_binding(explicit_data_root)
-                    cohorts = list(published.get("cohorts") or [])
-                except GroundedDiscoveryError as exc:
-                    body = {
-                        "reason_code": exc.code,
-                        "values_loaded": False,
-                        "writes": False,
-                        "scientific_negative": False,
-                    }
-                    if exc.code == "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE":
-                        body["next_action"] = (
-                            "RESTORE_PUBLISHED_PARTITION_BYTES_THEN_RETRY_DISCOVERY_EXECUTE"
-                        )
-                    return emit(body, exit_code=2)
-                except Exception:
-                    cohorts = []
             if operation_path is not None:
                 request = preview_request
                 if not isinstance(request, dict):
@@ -1599,26 +1617,11 @@ def cmd_discovery_preview(
                 },
                 exit_code=2,
             )
+        preview_published: list[dict[str, Any]] | None = None
         if explicit_data_root is not None:
-            from solana_alpha_lab.factory.hfic_grounded_discovery import (
-                GroundedDiscoveryError,
-                resolve_published_discovery_binding,
-            )
-
-            try:
-                resolve_published_discovery_binding(explicit_data_root)
-            except GroundedDiscoveryError as exc:
-                body = {
-                    "reason_code": exc.code,
-                    "values_loaded": False,
-                    "writes": False,
-                    "scientific_negative": False,
-                }
-                if exc.code == "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE":
-                    body["next_action"] = (
-                        "RESTORE_PUBLISHED_PARTITION_BYTES_THEN_RETRY_DISCOVERY_EXECUTE"
-                    )
-                return emit(body, exit_code=2)
+            preview_published, refusal = _published_gate_cohorts(explicit_data_root, binding_doc)
+            if refusal is not None:
+                return emit(refusal, exit_code=2)
         try:
             if operation_path is not None:
                 request = json.loads(operation_path.read_text(encoding="utf-8"))
@@ -1675,22 +1678,10 @@ def cmd_discovery_preview(
                 )
             epoch = epochs[0]
             binding_cohorts: list[dict[str, Any]] = []
-            if binding_doc is not None and isinstance(binding_doc, dict):
+            if preview_published is not None:
+                binding_cohorts = preview_published
+            elif binding_doc is not None and isinstance(binding_doc, dict):
                 binding_cohorts = list(binding_doc.get("cohorts") or [])
-            elif explicit_data_root is not None:
-                from solana_alpha_lab.factory.hfic_grounded_discovery import (
-                    resolve_published_discovery_binding,
-                )
-
-                try:
-                    binding_cohorts = list(
-                        resolve_published_discovery_binding(explicit_data_root).get("cohorts")
-                        or []
-                    )
-                except GroundedDiscoveryError:
-                    raise
-                except Exception:
-                    binding_cohorts = []
             preview_gate = authorize_temporal_attempt(
                 preview_store,
                 operation_sha256=str(operation_sha256),

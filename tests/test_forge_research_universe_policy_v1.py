@@ -529,6 +529,31 @@ class UniversePolicyTests(unittest.TestCase):
             self.assertEqual(again_body["scientific_look_delta"]["main"], 0)
             self.assertEqual(again_body["result_refs"], evidence["result_refs"])
             self.assertEqual(again_body["result"]["universe_policy"]["min_liquidity_usd"], "5000")
+            from solana_alpha_lab.factory.hfic_grounded_discovery import resolve_published_discovery_binding
+
+            tampered = resolve_published_discovery_binding(data_root)
+            tampered["cohorts"][0]["observations_sha256"] = "ab" * 32
+            binding_path = workspace / "stale-binding.json"
+            binding_path.write_text(json.dumps(tampered), encoding="utf-8")
+            stale_op = workspace / "stale-binding-op.json"
+            stale_op.write_text(json.dumps(_operation(
+                spec, focus=FOCUS, journal=journal, market=market,
+                text="Stale binding must not open a look",
+                cap={"main": 1, "adaptive": 0, "preview": 0},
+            )), encoding="utf-8")
+            stale = run_cli(
+                "discovery-execute", "--store", str(data_root), "--spec", str(spec_path),
+                "--candidate-scope", str(scope_path), "--journal-scope", journal,
+                "--operation", str(stale_op), "--binding", str(binding_path),
+                "--format", "json", data_root=data_root,
+            )
+            self.assertNotEqual(stale.returncode, 0)
+            stale_body = json.loads(stale.stdout)
+            self.assertEqual(stale_body["reason_code"], "BINDING_HASH_MISMATCH")
+            self.assertFalse(stale_body["writes"])
+            self.assertFalse(json.loads(run_cli(
+                "universe-policy-status", "--format", "json", data_root=data_root
+            ).stdout)["pending_operation"])
 
     def test_threshold_change_is_adaptation_not_a_second_main(self) -> None:
         from solana_alpha_lab.factory.hfic_grounded_discovery import run_recorded_discovery_query
