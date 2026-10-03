@@ -1,0 +1,101 @@
+{
+  "assessment_advisory": null,
+  "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V5",
+  "descriptive_readout": {
+    "assessment": "DESCRIPTIVE_ONLY_NO_AUTOMATIC_VERDICT",
+    "baseline": {
+      "downside": {
+        "es10_return": 0.0,
+        "es10_tail_mass_n": 1.6,
+        "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+        "le_minus_20_n": 0,
+        "le_minus_20_rate": 0.0,
+        "le_minus_50_n": 0,
+        "le_minus_50_rate": 0.0,
+        "missing_n": 0,
+        "negative_mass": 0,
+        "negative_n": 0,
+        "observed_n": 16,
+        "p05": 0.0,
+        "p10": 0.0,
+        "p25": 0.0,
+        "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+        "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+        "status": "OBSERVED",
+        "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+        "worst_negative_share": null,
+        "zero_n": 12
+      },
+      "eligible_n": 16,
+      "mean_target": 0.04999999999999999,
+      "median_target": 0.0,
+      "view": "BASELINE_DECISION_ELIGIBLE"
+    },
+    "baseline_may_include_matched": true,
+    "detail_truncation": {
+      "ablations": {
+        "included": 0,
+        "total": 1,
+        "truncated": true
+      },
+      "by_calendar_block": {
+        "included": 0,
+        "total": 4,
+        "truncated": true
+      },
+      "by_cohort": {
+        "included": 0,
+        "total": 4,
+        "truncated": true
+      }
+    },
+    "details": {
+      "ablations": [],
+      "by_calendar_block": [],
+      "by_cohort": []
+    },
+    "matched": {
+      "downside": {
+        "es10_return": 0.0,
+        "es10_tail_mass_n": 0.8,
+        "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+        "le_minus_20_n": 0,
+        "le_minus_20_rate": 0.0,
+        "le_minus_50_n": 0,
+        "le_minus_50_rate": 0.0,
+        "missing_n": 0,
+        "negative_mass": 0,
+        "negative_n": 0,
+        "observed_n": 8,
+        "p05": 0.0,
+        "p10": 0.0,
+        "p25": 0.0,
+        "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+        "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+        "status": "OBSERVED",
+        "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+        "worst_negative_share": null,
+        "zero_n": 4
+      },
+      "eligible_n": 8,
+      "mean_target": 0.09999999999999998,
+      "median_target": 0.09999999999999998,
+      "view": "MATCHED_OBSERVED"
+    },
+    "missingness": "OBSERVED_DENOMINATOR_ONLY_NO_MAR_ASSUMPTION",
+    "scientific_identity": {
+      "decision_timestamp": "Y900",
+      "horizon_notional": "Y900 -> Y14400; PRICE_RELATIVE_PROXY; no executable notional",
+      "primary_x_family": "FIELD-HOLDER-COUNT-001 point_value Y900 >= 3.0",
+      "primary_y": "PRICE_RELATIVE_PROXY Y900 -> Y14400",
+      "target": "PRICE_RELATIVE_PROXY:Y900:Y14400:FIELD-USD-PRICE-001"
+    },
+    "selection_policy": "CANONICAL_ORDER_PREFIX",
+    "status": "DESCRIPTIVE_PROXY",
+    "tail_support": "DESCRIPTIVE_ESTIMATE_NOT_CONFIDENCE_INTERVAL"
+  },
+  "result_ref": "HFIC-ART-DISCOVERY-5FAF1ACD4527D3083CB0D55649305F42AADD3FF3",
+  "result_sha256": "0c7a8f1a7803177f0a066bb7ab1b622f70e242fa2b8e7f4cd7eba1dde5ae691a",
+  "revision_of": null,
+  "spec_sha256": "cedd857b0f089bd9a8dde870fe1fa92021466f343322d05a95cd535fa70ee09d"
+}

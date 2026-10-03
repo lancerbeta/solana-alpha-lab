@@ -420,6 +420,7 @@ def load_admitted_partition_rows(
     partitions: Sequence[tuple[str, Path, Path]] | None,
     census_path: Path | None,
     observations_path: Path | None,
+    observation_filters: list[tuple[str, str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Admit, then hash-check, then load. Authority failures do not call the loader."""
 
@@ -497,7 +498,7 @@ def load_admitted_partition_rows(
                 stamped["cohort_id"] = cohort_id
                 stamped["release_id"] = binding_row.get("release_id")
                 census.append(stamped)
-            for row in load_parquet_rows(obs_file):
+            for row in (load_parquet_rows(obs_file, filters=observation_filters) if observation_filters is not None else load_parquet_rows(obs_file)):
                 stamped = dict(row)
                 stamped["cohort_id"] = cohort_id
                 stamped["release_id"] = binding_row.get("release_id")
@@ -517,7 +518,7 @@ def load_admitted_partition_rows(
         if distinct != {(census_sha, observations_sha)}:
             raise GroundedDiscoveryError("BINDING_HASH_MISMATCH")
         census = load_parquet_rows(census_path)
-        observations = load_parquet_rows(observations_path)
+        observations = (load_parquet_rows(observations_path, filters=observation_filters) if observation_filters is not None else load_parquet_rows(observations_path))
     return {
         "binding": dict(binding_doc),
         "cohorts": cohorts,
@@ -1596,8 +1597,11 @@ def descriptive_return_readout(result: Mapping[str, Any], *, detail_limit: int =
         rows = [row for row in (result.get(key) or []) if isinstance(row, Mapping)]
         details[key] = [view(row) for row in rows[:detail_limit]]
         truncation[key] = {"total": len(rows), "included": min(len(rows), detail_limit), "truncated": len(rows) > detail_limit}
+    from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_holder_claim_identity
+    identity = temporal_holder_claim_identity(result)
     return {
         "status": "DESCRIPTIVE_PROXY",
+        **({"scientific_identity": identity} if identity else {}),
         "matched": view(result, matched=True),
         "baseline": view(result.get("baseline") or {}),
         "details": details,
@@ -2165,10 +2169,10 @@ def _append_discovery_look(
     store.append([event], transaction_id=event.transaction_id)
 
 
-def load_parquet_rows(path: Path) -> list[dict[str, Any]]:
+def load_parquet_rows(path: Path, *, filters: list[tuple[str, str, Any]] | None = None) -> list[dict[str, Any]]:
     import pyarrow.parquet as pq
 
-    table = pq.read_table(Path(path))
+    table = pq.read_table(Path(path), filters=filters)
     return table.to_pylist()
 
 

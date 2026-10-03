@@ -1,0 +1,9 @@
+{
+  "interrupted_reply_recovered": true,
+  "loader_free_cold_replay": true,
+  "main_looks": 1,
+  "namespace": "DISPOSABLE_SYNTHETIC_ONLY",
+  "real_looks": 0,
+  "status": "PASS",
+  "tampered_bindings_refused": 5
+}

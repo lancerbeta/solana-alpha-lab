@@ -1,0 +1,70 @@
+{
+  "C5_accessed": false,
+  "by_cohort": [
+    {
+      "cohort_id": "REL-20260902T111900Z-20260909T111900Z",
+      "holder_y900_cell_status": {
+        "ABSENT": 2,
+        "AVAILABILITY_AFTER_DEADLINE": 24,
+        "OBSERVED": 367,
+        "SNAPSHOT_LINEAGE_UNINTERPRETABLE": 82
+      },
+      "holder_y900_rows": 610,
+      "observed_zero_n": 0
+    },
+    {
+      "cohort_id": "REL-20260909T111900Z-20260916T111900Z",
+      "holder_y900_cell_status": {
+        "ABSENT": 8,
+        "AVAILABILITY_AFTER_DEADLINE": 7,
+        "OBSERVED": 162,
+        "SNAPSHOT_LINEAGE_UNINTERPRETABLE": 76
+      },
+      "holder_y900_rows": 305,
+      "observed_zero_n": 0
+    },
+    {
+      "cohort_id": "REL-20260914T173510Z-20260921T173510Z",
+      "holder_y900_cell_status": {
+        "ABSENT": 1,
+        "AVAILABILITY_AFTER_DEADLINE": 10,
+        "OBSERVED": 374,
+        "SNAPSHOT_LINEAGE_UNINTERPRETABLE": 40
+      },
+      "holder_y900_rows": 520,
+      "observed_zero_n": 0
+    },
+    {
+      "cohort_id": "REL-20260922T113319Z-20260929T113319Z",
+      "holder_y900_cell_status": {
+        "AVAILABILITY_AFTER_DEADLINE": 50,
+        "OBSERVED": 254,
+        "SNAPSHOT_LINEAGE_UNINTERPRETABLE": 105
+      },
+      "holder_y900_rows": 482,
+      "observed_zero_n": 0
+    }
+  ],
+  "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+  "future_main_authorized": false,
+  "holder_pit_selection": "COMMON_TEMPORAL_CELL_OWNER",
+  "inventory_after": "15ea38b43bfb7d4e65c558aecad7147600d27f4f1d9edbbd213660a17080e250",
+  "inventory_before": "15ea38b43bfb7d4e65c558aecad7147600d27f4f1d9edbbd213660a17080e250",
+  "inventory_unchanged": true,
+  "operation_gate": "NOT_INVOKED_NO_REAL_OPERATION_AUTHORITY",
+  "provider_calls": 0,
+  "published_binding_admission": "PASS",
+  "query_validation": "PASS",
+  "real_dispositions": 0,
+  "real_looks": 0,
+  "real_operations": 0,
+  "real_reservations": 0,
+  "real_sessions": 0,
+  "record_count_after": 380,
+  "record_count_before": 380,
+  "schedule_admission": "PASS",
+  "scope": "CANONICAL_C1_C4_HOLDER_Y900_FEATURE_ONLY",
+  "spec_sha256": "cedd857b0f089bd9a8dde870fe1fa92021466f343322d05a95cd535fa70ee09d",
+  "status": "PASS",
+  "target_values_read": false
+}

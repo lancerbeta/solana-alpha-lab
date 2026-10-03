@@ -1,0 +1,524 @@
+{
+  "canonical_spec": {
+    "adaptation_of": null,
+    "budget_allocation": "AUTO",
+    "query_id": "impulse_pullback_liquidity",
+    "schema": "smial.hfic-temporal-query",
+    "schema_version": "1.0",
+    "scientific_body": {
+      "cost_profile": {
+        "excluded_components": [
+          "INFRASTRUCTURE_OVERHEAD",
+          "LIVE_FEE_SCHEDULE",
+          "OBSERVED_FILL"
+        ],
+        "haircut_basis": "MARK_NOT_QUOTE",
+        "included_components": [
+          "EXIT_FAILURE_STRESS",
+          "ROUND_TRIP_HAIRCUT",
+          "SEPARATE_CASH_F"
+        ],
+        "kind": "ASSUMPTION_STRESS_ONLY",
+        "scenarios": {
+          "BASE": {
+            "f": 0.0,
+            "h": 0.1,
+            "q": 0.05,
+            "r_fail": -1.0
+          },
+          "LOW": {
+            "f": 0.0,
+            "h": 0.03,
+            "q": 0.0,
+            "r_fail": -1.0
+          },
+          "STRESS": {
+            "f": 0.02,
+            "h": 0.25,
+            "q": 0.2,
+            "r_fail": -1.0
+          }
+        },
+        "source_status": "ASSUMPTION_NOT_CALIBRATED"
+      },
+      "decision_point": "Y3600",
+      "entry_model": {
+        "assumed_latency_seconds": 30,
+        "kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT"
+      },
+      "evaluation": {
+        "ablations": "DROP_ONE_CONDITION",
+        "baseline": "SAME_DECISION_ELIGIBLE",
+        "calendar_block": "UTC_DAY_OF_DECISION"
+      },
+      "features": [
+        {
+          "field_id": "FIELD-LIQUIDITY-USD-001",
+          "name": "liq",
+          "op": "point_value",
+          "point": "Y3600"
+        }
+      ],
+      "observation_clock_policy": "EVENT_TIME_V1",
+      "population": "BASE_X",
+      "predicates": [
+        {
+          "feature": "liq",
+          "op": "gte",
+          "value": 3.0
+        }
+      ],
+      "schedule_lateness_seconds": 300,
+      "target": {
+        "exit_point": "Y7200",
+        "field_id": "FIELD-USD-PRICE-001",
+        "kind": "PRICE_RELATIVE_PROXY",
+        "reference_point": "Y3600"
+      }
+    },
+    "search_tier": "SIMPLE_SCREEN",
+    "spec_sha256": "3f25db807f4b600483435bd44d55790e753b576b0e91df96bcd521abb69dbaa6"
+  },
+  "frozen_base": "94b284534b6ad55a95002d51b9d04b4a5ced6bde",
+  "result": {
+    "ablations": [
+      {
+        "downside": {
+          "es10_return": 0.19999999999999996,
+          "es10_tail_mass_n": 0.1,
+          "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": 0.0,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": 0.0,
+          "missing_n": 0,
+          "negative_mass": 0,
+          "negative_n": 0,
+          "observed_n": 1,
+          "p05": 0.19999999999999996,
+          "p10": 0.19999999999999996,
+          "p25": 0.19999999999999996,
+          "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+          "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+          "status": "OBSERVED",
+          "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+          "worst_negative_share": null,
+          "zero_n": 0
+        },
+        "dropped_feature": "liq",
+        "mean_target": 0.19999999999999996,
+        "mean_target_kind": "PRICE_RELATIVE_PROXY",
+        "median_target": 0.19999999999999996,
+        "observed_n": 1,
+        "selection_relevant": true,
+        "view": "ABLATION_DROP_liq"
+      }
+    ],
+    "base_x_n": 1,
+    "baseline": {
+      "downside": {
+        "es10_return": 0.19999999999999996,
+        "es10_tail_mass_n": 0.1,
+        "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+        "le_minus_20_n": 0,
+        "le_minus_20_rate": 0.0,
+        "le_minus_50_n": 0,
+        "le_minus_50_rate": 0.0,
+        "missing_n": 0,
+        "negative_mass": 0,
+        "negative_n": 0,
+        "observed_n": 1,
+        "p05": 0.19999999999999996,
+        "p10": 0.19999999999999996,
+        "p25": 0.19999999999999996,
+        "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+        "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+        "status": "OBSERVED",
+        "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+        "worst_negative_share": null,
+        "zero_n": 0
+      },
+      "mean_target": 0.19999999999999996,
+      "mean_target_kind": "PRICE_RELATIVE_PROXY",
+      "median_target": 0.19999999999999996,
+      "observed_n": 1,
+      "view": "BASELINE_DECISION_ELIGIBLE"
+    },
+    "block_count": 1,
+    "by_calendar_block": [
+      {
+        "downside": {
+          "es10_return": 0.19999999999999996,
+          "es10_tail_mass_n": 0.1,
+          "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": 0.0,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": 0.0,
+          "missing_n": 0,
+          "negative_mass": 0,
+          "negative_n": 0,
+          "observed_n": 1,
+          "p05": 0.19999999999999996,
+          "p10": 0.19999999999999996,
+          "p25": 0.19999999999999996,
+          "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+          "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+          "status": "OBSERVED",
+          "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+          "worst_negative_share": null,
+          "zero_n": 0
+        },
+        "mean_target": 0.19999999999999996,
+        "mean_target_kind": "PRICE_RELATIVE_PROXY",
+        "median_target": 0.19999999999999996,
+        "observed_n": 1,
+        "view": "2026-09-03"
+      }
+    ],
+    "by_cohort": [
+      {
+        "base_x_n": 1,
+        "cohort_id": "REL-20260902T111900Z-20260909T111900Z",
+        "decision_eligible_n": 1,
+        "denominator_base_x": 1,
+        "downside": {
+          "es10_return": 0.19999999999999996,
+          "es10_tail_mass_n": 0.1,
+          "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": 0.0,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": 0.0,
+          "missing_n": 0,
+          "negative_mass": 0,
+          "negative_n": 0,
+          "observed_n": 1,
+          "p05": 0.19999999999999996,
+          "p10": 0.19999999999999996,
+          "p25": 0.19999999999999996,
+          "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+          "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+          "status": "OBSERVED",
+          "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+          "worst_negative_share": null,
+          "zero_n": 0
+        },
+        "exclusion_reasons": {},
+        "feature_admissible": 1,
+        "feature_unknown_n": 0,
+        "independent_replication": false,
+        "matched_n": 1,
+        "mean_target": 0.19999999999999996,
+        "mean_target_kind": "PRICE_RELATIVE_PROXY",
+        "median_target": 0.19999999999999996,
+        "membership": "DESCRIPTIVE_NOT_INDEPENDENT",
+        "missing_target_n": 0,
+        "observed_target_n": 1,
+        "population_n": 1,
+        "shared_decision_n": 0,
+        "target_exclusion_reasons": {},
+        "target_observed_after_decision": 1,
+        "view": "REL-20260902T111900Z-20260909T111900Z"
+      }
+    ],
+    "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V5",
+    "claim_level": "EXPLORATORY_PROXY",
+    "cohort_independent_replication": false,
+    "cohort_slices_are_descriptive": true,
+    "contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
+    "cost": {
+      "decision_sensitivity": "FRAGILE",
+      "excluded_components": [
+        "INFRASTRUCTURE_OVERHEAD",
+        "LIVE_FEE_SCHEDULE",
+        "OBSERVED_FILL"
+      ],
+      "haircut_basis": "MARK_NOT_QUOTE",
+      "included_components": [
+        "EXIT_FAILURE_STRESS",
+        "ROUND_TRIP_HAIRCUT",
+        "SEPARATE_CASH_F"
+      ],
+      "labeled_net_return": false,
+      "scenarios": {
+        "BASE": {
+          "basis": "OBSERVED_CASE_MEAN",
+          "estimated_net_proxy": 0.026000000000000065,
+          "h_break_even": 0.12280701754385959,
+          "h_break_even_applicable": true,
+          "h_break_even_inside_unit_interval": true,
+          "label": "ESTIMATED_NET_PROXY",
+          "r_success": 0.08000000000000007
+        },
+        "LOW": {
+          "basis": "OBSERVED_CASE_MEAN",
+          "estimated_net_proxy": 0.16399999999999992,
+          "h_break_even": 0.16666666666666663,
+          "h_break_even_applicable": true,
+          "h_break_even_inside_unit_interval": true,
+          "label": "ESTIMATED_NET_PROXY",
+          "r_success": 0.16399999999999992
+        },
+        "STRESS": {
+          "basis": "OBSERVED_CASE_MEAN",
+          "estimated_net_proxy": -0.3000000000000001,
+          "h_break_even": -0.0625,
+          "h_break_even_applicable": true,
+          "h_break_even_inside_unit_interval": false,
+          "label": "ESTIMATED_NET_PROXY",
+          "r_success": -0.10000000000000009
+        }
+      },
+      "source_status": "ASSUMPTION_NOT_CALIBRATED",
+      "status": "EVALUATED"
+    },
+    "decision_eligible_n": 1,
+    "downside": {
+      "es10_return": 0.19999999999999996,
+      "es10_tail_mass_n": 0.1,
+      "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+      "le_minus_20_n": 0,
+      "le_minus_20_rate": 0.0,
+      "le_minus_50_n": 0,
+      "le_minus_50_rate": 0.0,
+      "missing_n": 0,
+      "negative_mass": 0,
+      "negative_n": 0,
+      "observed_n": 1,
+      "p05": 0.19999999999999996,
+      "p10": 0.19999999999999996,
+      "p25": 0.19999999999999996,
+      "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+      "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+      "status": "OBSERVED",
+      "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+      "worst_negative_share": null,
+      "zero_n": 0
+    },
+    "downside_readout_exposure": {
+      "fixed_metrics": [
+        "p05",
+        "p10",
+        "p25",
+        "le_minus_20_rate",
+        "le_minus_50_rate",
+        "es10_return",
+        "negative_mass",
+        "worst_negative_share"
+      ],
+      "new_threshold_trials": false,
+      "profile": "DOWNSIDE_DESCRIPTIVE_V1"
+    },
+    "duplicate_delivery_count": 0,
+    "eligibility_uses_target": false,
+    "engine_emits_alpha": false,
+    "exclusion_reasons": {},
+    "experiment_recipe": {
+      "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+      "cost_label": "ESTIMATED_NET_PROXY",
+      "frozen_input": [
+        {
+          "census_rel": null,
+          "census_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "cohort_id": "REL-20260902T111900Z-20260909T111900Z",
+          "dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+          "dataset_manifest_id": null,
+          "evidence_role": "EXPLORATORY_REUSE",
+          "holdout": false,
+          "observations_rel": null,
+          "observations_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "release_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "schedule_lateness_seconds": 300,
+          "schedule_point_due_offset_seconds": null,
+          "schedule_point_lateness": null,
+          "schedule_sha256": null
+        }
+      ],
+      "labeled_net_return": false,
+      "observation_clock_policy": "EVENT_TIME_V1",
+      "schema": "smial.hfic-temporal-query",
+      "schema_version": "1.0",
+      "scientific_identity": "3f25db807f4b600483435bd44d55790e753b576b0e91df96bcd521abb69dbaa6",
+      "spec": {
+        "adaptation_of": null,
+        "budget_allocation": "AUTO",
+        "query_id": "impulse_pullback_liquidity",
+        "schema": "smial.hfic-temporal-query",
+        "schema_version": "1.0",
+        "scientific_body": {
+          "cost_profile": {
+            "excluded_components": [
+              "INFRASTRUCTURE_OVERHEAD",
+              "LIVE_FEE_SCHEDULE",
+              "OBSERVED_FILL"
+            ],
+            "haircut_basis": "MARK_NOT_QUOTE",
+            "included_components": [
+              "EXIT_FAILURE_STRESS",
+              "ROUND_TRIP_HAIRCUT",
+              "SEPARATE_CASH_F"
+            ],
+            "kind": "ASSUMPTION_STRESS_ONLY",
+            "scenarios": {
+              "BASE": {
+                "f": 0.0,
+                "h": 0.1,
+                "q": 0.05,
+                "r_fail": -1.0
+              },
+              "LOW": {
+                "f": 0.0,
+                "h": 0.03,
+                "q": 0.0,
+                "r_fail": -1.0
+              },
+              "STRESS": {
+                "f": 0.02,
+                "h": 0.25,
+                "q": 0.2,
+                "r_fail": -1.0
+              }
+            },
+            "source_status": "ASSUMPTION_NOT_CALIBRATED"
+          },
+          "decision_point": "Y3600",
+          "entry_model": {
+            "assumed_latency_seconds": 30,
+            "kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT"
+          },
+          "evaluation": {
+            "ablations": "DROP_ONE_CONDITION",
+            "baseline": "SAME_DECISION_ELIGIBLE",
+            "calendar_block": "UTC_DAY_OF_DECISION"
+          },
+          "features": [
+            {
+              "field_id": "FIELD-LIQUIDITY-USD-001",
+              "name": "liq",
+              "op": "point_value",
+              "point": "Y3600"
+            }
+          ],
+          "observation_clock_policy": "EVENT_TIME_V1",
+          "population": "BASE_X",
+          "predicates": [
+            {
+              "feature": "liq",
+              "op": "gte",
+              "value": 3.0
+            }
+          ],
+          "schedule_lateness_seconds": 300,
+          "target": {
+            "exit_point": "Y7200",
+            "field_id": "FIELD-USD-PRICE-001",
+            "kind": "PRICE_RELATIVE_PROXY",
+            "reference_point": "Y3600"
+          }
+        },
+        "search_tier": "SIMPLE_SCREEN",
+        "spec_sha256": "3f25db807f4b600483435bd44d55790e753b576b0e91df96bcd521abb69dbaa6"
+      },
+      "target_kind": "PRICE_RELATIVE_PROXY"
+    },
+    "feature_admissible_n": 1,
+    "feature_unknown_n": 0,
+    "independence": "UNKNOWN",
+    "independent_replication": null,
+    "integrity_conflict_count": 0,
+    "labeled_net_return": false,
+    "later_target_observed_n": 1,
+    "main_question_count_includes_variants": false,
+    "matched_feature_means": {
+      "liq": 9000.0
+    },
+    "matched_n": 1,
+    "mean_target": 0.19999999999999996,
+    "mean_target_kind": "PRICE_RELATIVE_PROXY",
+    "mean_target_units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+    "median_target": 0.19999999999999996,
+    "missing_is_not_zero": true,
+    "missing_stress_model": {
+      "label": "MODEL",
+      "mean_target": 0.19999999999999996,
+      "stress_return": -1.0,
+      "writes_raw_history": false
+    },
+    "missing_target_mean_to_zero": null,
+    "missing_target_n": 0,
+    "non_claims": [
+      "NO_ALPHA",
+      "NO_NET_RETURN",
+      "NO_INTRABAR_STOP",
+      "NO_CAUSAL_IDENTIFICATION",
+      "NO_SOURCE_PRICE_EVENT_TIME"
+    ],
+    "observation_clock_policy": "EVENT_TIME_V1",
+    "observation_index_passes": 1,
+    "observed_target_n": 1,
+    "pooled": {
+      "denominator_base_x": 1,
+      "downside": {
+        "es10_return": 0.19999999999999996,
+        "es10_tail_mass_n": 0.1,
+        "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+        "le_minus_20_n": 0,
+        "le_minus_20_rate": 0.0,
+        "le_minus_50_n": 0,
+        "le_minus_50_rate": 0.0,
+        "missing_n": 0,
+        "negative_mass": 0,
+        "negative_n": 0,
+        "observed_n": 1,
+        "p05": 0.19999999999999996,
+        "p10": 0.19999999999999996,
+        "p25": 0.19999999999999996,
+        "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+        "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+        "status": "OBSERVED",
+        "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+        "worst_negative_share": null,
+        "zero_n": 0
+      },
+      "feature_admissible": 1,
+      "independent_replication": null,
+      "mean_target": 0.19999999999999996,
+      "mean_target_kind": "PRICE_RELATIVE_PROXY",
+      "median_target": 0.19999999999999996,
+      "target_observed_after_decision": 1,
+      "view": "pooled"
+    },
+    "population": "BASE_X",
+    "population_n": 1,
+    "query_id": "impulse_pullback_liquidity",
+    "required_cohorts": [
+      "REL-20260902T111900Z-20260909T111900Z"
+    ],
+    "schema": "smial.hfic-temporal-query",
+    "search_tier": "SIMPLE_SCREEN",
+    "source_price_event_time": "UNKNOWN",
+    "spec_sha256": "3f25db807f4b600483435bd44d55790e753b576b0e91df96bcd521abb69dbaa6",
+    "target_exclusion_reasons": {
+      "by_cohort": {
+        "REL-20260902T111900Z-20260909T111900Z": {}
+      },
+      "pooled": {}
+    },
+    "target_kind": "PRICE_RELATIVE_PROXY",
+    "unique_decision_n": 1,
+    "unique_mint_n": 1,
+    "viewed_variants": [
+      "MATCHED_OBSERVED",
+      "BASELINE_DECISION_ELIGIBLE",
+      "ABLATION_DROP_liq",
+      "COST_LOW",
+      "COST_BASE",
+      "COST_STRESS",
+      "MISSING_STRESS_MODEL",
+      "DOWNSIDE_DESCRIPTIVE_V1"
+    ],
+    "winner_share_of_positive": 1.0
+  },
+  "spec_sha256": "3f25db807f4b600483435bd44d55790e753b576b0e91df96bcd521abb69dbaa6"
+}

@@ -87,6 +87,7 @@ MAX_PREDICATES = 6
 MAX_FEATURES = 12
 MAX_SCHEDULE_POINTS = 8
 ALLOWED_FIELDS = frozenset({PRICE, LIQUIDITY})
+HOLDER_COUNT = "FIELD-HOLDER-COUNT-001"
 TIERS = frozenset({"SIMPLE_SCREEN", "COMPOUND_SCREEN"})
 FEATURE_OPS = frozenset(
     {
@@ -174,7 +175,13 @@ def _canonical_feature(feature: Mapping[str, Any]) -> dict[str, Any]:
         raise GroundedDiscoveryError("FEATURE_OP_UNSUPPORTED")
     body: dict[str, Any] = {"name": name, "op": op}
     if op in {"point_value", "ratio", "return_ratio", "drawdown_from_grid_max", "rebound_from_grid_min"}:
-        body["field_id"] = _field(feature.get("field_id"))
+        # Field x operator policy is independent of the broad legacy allowlist.
+        if feature.get("field_id") == HOLDER_COUNT:
+            if op != "point_value":
+                raise GroundedDiscoveryError("FEATURE_OP_UNSUPPORTED")
+            body["field_id"] = HOLDER_COUNT
+        else:
+            body["field_id"] = _field(feature.get("field_id"))
     if op == "point_value":
         body["point"] = _point(feature.get("point"))
     elif op == "ratio":
@@ -404,7 +411,9 @@ def validate_temporal_query(spec: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "query_id": body["query_id"],
         "decision_points": [body["decision_point"]],
-        "decision_fields": [PRICE, LIQUIDITY],
+        "decision_fields": [PRICE, LIQUIDITY] + (
+            [HOLDER_COUNT] if any(f.get("field_id") == HOLDER_COUNT for f in body["features"]) else []
+        ),
         "target_point": body["target"]["exit_point"],
         "target_field": PRICE,
         "explanatory": [],
@@ -2846,19 +2855,11 @@ def execute_temporal_discovery(
     }
 
 
-def build_feature_preview(
-    census: Sequence[Mapping[str, Any]],
-    observations: Sequence[Mapping[str, Any]],
-    spec: Mapping[str, Any],
-    binding: Sequence[Mapping[str, Any]],
-    *,
-    prior_preview_hashes: Sequence[str] = (),
-) -> dict[str, Any]:
-    """Feature-only preview. Target and survival labels are not computed."""
+def validate_feature_preview_spec(spec: Mapping[str, Any]) -> dict[str, Any]:
+    """Pure pre-values policy shared by the CLI and feature-only evaluator."""
 
     if isinstance(spec, Mapping) and "target" in spec:
         raise GroundedDiscoveryError("PREVIEW_FORBIDS_TARGET")
-    admitted = admit_discovery_binding(binding)
     decision = _require_mapping(spec.get("decision"), "DECISION_INVALID")
     decision_point = _point(decision.get("point_id"))
     schedule = _require_mapping(spec.get("schedule"), "SCHEDULE_INVALID")
@@ -2871,12 +2872,49 @@ def build_feature_preview(
     point_ids = [_point(item) for item in points]
     if any(POINT_OFFSET[item] > POINT_OFFSET[decision_point] for item in point_ids):
         raise GroundedDiscoveryError("FEATURE_AFTER_DECISION")
-    for item in binding:
-        for point in ["X300", *point_ids]:
-            _clock(item, point, lateness)
+    features_in = spec.get("features", [])
+    if not isinstance(features_in, list):
+        raise GroundedDiscoveryError("FEATURE_INVALID")
+    features = [_canonical_feature(_require_mapping(f, "FEATURE_INVALID")) for f in features_in]
+    if len(features) > MAX_FEATURES or len({f["name"] for f in features}) != len(features):
+        raise GroundedDiscoveryError("FEATURE_INVALID")
+    for feature in features:
+        if feature["op"] != "point_value":
+            raise GroundedDiscoveryError("FEATURE_OP_UNSUPPORTED")
+        if POINT_OFFSET[feature["point"]] > POINT_OFFSET[decision_point]:
+            raise GroundedDiscoveryError("FEATURE_AFTER_DECISION")
+        if feature["point"] not in point_ids:
+            raise GroundedDiscoveryError("SCHEDULE_INVALID")
+    clock_policy = schedule.get("observation_clock_policy", OBSERVATION_CLOCK_EVENT_TIME_V1)
+    if clock_policy in (None, ""):
+        clock_policy = OBSERVATION_CLOCK_EVENT_TIME_V1
+    if clock_policy not in OBSERVATION_CLOCK_POLICIES:
+        raise GroundedDiscoveryError("OBSERVATION_CLOCK_POLICY_INVALID")
     seed = spec.get("seed")
     if not isinstance(seed, str) or not seed:
         raise GroundedDiscoveryError("PREVIEW_SEED_REQUIRED")
+    return {"decision_point": decision_point, "lateness": lateness, "point_ids": point_ids,
+            "features": features, "clock_policy": clock_policy, "seed": seed}
+
+
+def build_feature_preview(
+    census: Sequence[Mapping[str, Any]],
+    observations: Sequence[Mapping[str, Any]],
+    spec: Mapping[str, Any],
+    binding: Sequence[Mapping[str, Any]],
+    *,
+    prior_preview_hashes: Sequence[str] = (),
+) -> dict[str, Any]:
+    """Feature-only preview. Target and survival labels are not computed."""
+
+    checked = validate_feature_preview_spec(spec)
+    admitted = admit_discovery_binding(binding)
+    decision_point, lateness = checked["decision_point"], checked["lateness"]
+    point_ids, features = checked["point_ids"], checked["features"]
+    clock_policy, seed = checked["clock_policy"], checked["seed"]
+    for item in binding:
+        for point in ["X300", *point_ids]:
+            _clock(item, point, lateness)
     identity = _sha256(
         {
             "decision_point": decision_point,
@@ -2884,6 +2922,8 @@ def build_feature_preview(
             "points": point_ids,
             "seed": seed,
             "population": "BASE_X",
+            **({"features": features} if features else {}),
+            **({"observation_clock_policy": clock_policy} if clock_policy != OBSERVATION_CLOCK_EVENT_TIME_V1 else {}),
         }
     )
     prior = [str(item) for item in prior_preview_hashes]
@@ -2948,6 +2988,27 @@ def build_feature_preview(
                 "missing_mask": missing,
             }
         )
+        if features:
+            cells = {}
+            for feature in features:
+                point = feature["point"]
+                due, _late = _clock(preview_binding[(cohort, release)], point, lateness)
+                point_deadline = preview_deadline(anchor, cohort, release, point)
+                decision_deadline = preview_deadline(anchor, cohort, release, decision_point)
+                # Same fail-closed boundary as _feature_value_with_lineage.read.
+                if point_deadline is None or decision_deadline is None or point_deadline > decision_deadline:
+                    cells[feature["name"]] = {"status": "ABSENT"}
+                    continue
+                cells[feature["name"]] = _cell(
+                    grouped, (cohort, release, mint, point, feature["field_id"]),
+                    point_deadline,
+                    snapshot_policy=(clock_policy if clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1 else None),
+                    point_due_at=_due_moment(anchor, due),
+                )
+            examples[-1]["feature_values"] = {
+                name: cell.get("value") if cell.get("status") == "OBSERVED" else None for name, cell in cells.items()
+            }
+            examples[-1]["feature_status"] = {name: cell.get("status") for name, cell in cells.items()}
     examples.sort(key=lambda item: str(item["sample_key"]))
     selected = examples[:PREVIEW_EXAMPLE_LIMIT]
     for item in selected:
@@ -3090,6 +3151,38 @@ def _public_query_from_recipe(recipe: Mapping[str, Any]) -> dict[str, Any]:
     if query.get("adaptation_of") is not None:
         public["adaptation_of"] = query["adaptation_of"]
     return public
+
+
+def temporal_holder_claim_identity(result: Mapping[str, Any]) -> dict[str, str]:
+    """Exact card labels derived from the saved recipe, only for the new surface.
+
+    Legacy PRICE/LIQUIDITY packets keep their identities and readout bytes.
+    This is display/binding, never a query parser or a second evaluator.
+    """
+    recipe = result.get("experiment_recipe")
+    if not isinstance(recipe, Mapping):
+        return {}
+    saved = recipe.get("spec")
+    body = saved.get("scientific_body") if isinstance(saved, Mapping) else None
+    if not isinstance(body, Mapping) or not any(f.get("field_id") == HOLDER_COUNT for f in body.get("features", []) if isinstance(f, Mapping)):
+        return {}
+    public = _public_query_from_recipe(recipe)
+    bound = validate_temporal_query(public)
+    if bound["spec_sha256"] != result.get("spec_sha256") or bound["spec_sha256"] != recipe.get("scientific_identity"):
+        raise GroundedDiscoveryError("GROUNDED_RESULT_MISMATCH")
+    features, predicates = body["features"], body["predicates"]
+    x = _canonical({"features": features, "predicates": predicates})
+    if len(features) == len(predicates) == 1 and features[0]["op"] == "point_value" and predicates[0]["feature"] == features[0]["name"]:
+        feature, predicate = features[0], predicates[0]
+        symbol = {"gt": ">", "gte": ">=", "lt": "<", "lte": "<="}.get(predicate["op"])
+        if symbol:
+            threshold = json.dumps(predicate["value"], allow_nan=False)
+            x = f"{feature['field_id']} point_value {feature['point']} {symbol} {threshold}"
+    target = body["target"]
+    horizon = f"{target['reference_point']} -> {target['exit_point']}"
+    return {"primary_x_family": x, "primary_y": f"{target['kind']} {horizon}",
+            "horizon_notional": f"{horizon}; {target['kind']}; no executable notional",
+            "decision_timestamp": body["decision_point"], "target": temporal_target_label(public)}
 
 
 def _require_manifest_and_cutoff(

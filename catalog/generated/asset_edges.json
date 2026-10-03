@@ -5943,6 +5943,16 @@
       "target_asset_id": "CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001"
     },
     {
+      "source_asset_id": "DOC-FORGE-TEMPORAL-HOLDER-POINT-FEATURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FORGE-DOWNSIDE-DESCRIPTIVE-001"
+    },
+    {
+      "source_asset_id": "DOC-FORGE-TEMPORAL-HOLDER-POINT-FEATURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-TEMPORAL-DISCOVERY-001"
+    },
+    {
       "source_asset_id": "DOC-HFIC-SCIENTIFIC-DISCOVERY-PROSPECTS-001",
       "relation": "derived_from",
       "target_asset_id": "DOC-HFIC-SCIENTIFIC-DISCOVERY-RESEARCH-001"
