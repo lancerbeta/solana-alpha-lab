@@ -22,6 +22,7 @@ managed_write_set:
   - docs/tasks/FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1.md
   - src/solana_alpha_lab/factory/observation_schedule_store.py
   - src/solana_alpha_lab/factory/research_store.py
+  - src/solana_alpha_lab/factory/observation_schedule_lifecycle.py
   - src/solana_alpha_lab/factory/collector_read_model.py
   - src/solana_alpha_lab/factory/collector_operational_packet.py
   - src/solana_alpha_lab/factory/operability_watch.py
@@ -134,11 +135,19 @@ The Linux proof runs in the candidate PR workflow before merge-readiness;
 draft CI overlap is permitted without claiming that an unexecuted gate passed.
 Immutable manifest headers are enumerated once per packet; only relevant
 partitions are verified, once, and no cross-cycle cache owns scientific truth.
+State-transition proofs omit the member predecessor search they do not consume;
+scientific member reconstruction retains its existing default search. The growth
+fixture includes old member partitions for foreign schedule/activation identities.
 This residual metadata cost is explicit and tested on doubled manifest history.
 An existing populated store receives the built-in SQLite expression index only
 through explicit backed-up commissioning, with a 5-second lock wait, limited
 SQLite cache and a 120-second progress deadline. Missing/wrong index yields
 UNKNOWN; no recovery full scan. Old writer rollback must still INSERT/UPDATE.
+The indexed resource proof covers producer UTC timestamps and comma/empty
+fraction compatibility forms. Other Python-valid ISO forms and malformed times
+remain conservative header candidates; exact Python filtering precedes payload
+projection. This anomaly cost is not claimed constant for arbitrary corrupt
+or externally rewritten timestamp history.
 
 ## Boundaries and delivery
 

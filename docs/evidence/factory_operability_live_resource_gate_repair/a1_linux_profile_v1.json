@@ -24,15 +24,17 @@
     "inference": "Repeated immutable proof IO and a full call-table timestamp scan are measured hotspots; file-cache attribution is an inference, not a separately measured stage."
   },
   "focused_local_validation": {
-    "tests_collected": 91,
-    "tests_passed": 90,
+    "tests_collected": 93,
+    "tests_passed": 92,
     "tests_skipped": 1,
     "cli_fixture_recent_rows": 128,
     "immutable_manifests": 19,
     "baseline_manifest_reads": 57,
     "repaired_manifest_reads": 19,
-    "baseline_partition_verifications": 9,
+    "baseline_partition_verifications": 33,
     "repaired_partition_verifications": 3,
+    "baseline_old_member_payload_reads": 24,
+    "repaired_old_member_payload_reads": 0,
     "baseline_timestamp_udf_evaluations": 1152,
     "local_os": "Windows",
     "not_linux_cgroup_proof": true
@@ -50,6 +52,7 @@
       256,
       512
     ],
+    "old_member_partitions_for_foreign_identity": [128, 256],
     "fixture_cache_eviction": "fsync followed by advisory posix_fadvise DONTNEED on synthetic fixture files only; residency is not independently verified",
     "resource_guard": "768 MiB / 180 seconds",
     "acceptance": "Each repaired CLI <512 MiB / <120 seconds; doubled-history peak <=1.25x+8MiB, wall <=1.5x+1s; exact diagnostics and no old payload reads",
@@ -57,6 +60,7 @@
   },
   "limits": [
     "MANIFEST_HEADERS_ENUMERATED_ONCE_PER_PACKET",
+    "NON_SQL_TIMESTAMP_HEADERS_REMAIN_CONSERVATIVE_CANDIDATES",
     "NO_LIVE_REPAIR_CANARY_YET",
     "NO_TELEGRAM_DELIVERY_PROOF_YET"
   ]

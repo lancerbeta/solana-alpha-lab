@@ -105,12 +105,17 @@ def create_fixture(root: Path, old_rows: int, payload_bytes: int, recent_rows: i
     # payloads must not be opened by the report's lifecycle proof route.
     research = ResearchStore(rdp)
     for i in range(max(1, old_rows // 64)):
-        transaction = f"RESEARCH-TXN-PROFILE-HISTORY-{i:06}"
+        member = i % 2 == 0
+        transaction = (f"RESEARCH-TXN-MEM-PROFILE-HISTORY-{i:06}" if member
+                       else f"RESEARCH-TXN-PROFILE-HISTORY-{i:06}")
         event = _research_event(
-            record_id=f"PROFILE-HISTORY-{i:06}", record_kind=RecordKind.RESEARCH_ARTIFACT,
-            entity_id=f"PROFILE-HISTORY-{i:06}", payload={"synthetic_history": "x" * 16384},
+            record_id=f"PROFILE-HISTORY-{i:06}",
+            record_kind=RecordKind.OBSERVATION_MEMBER_BATCH if member else RecordKind.RESEARCH_ARTIFACT,
+            entity_id="f" * 64 if member else f"PROFILE-HISTORY-{i:06}",
+            payload={"synthetic_history": "x" * 16384, "schedule_sha256": "f" * 64,
+                     "batch_id": f"PROFILE-HISTORY-{i:06}"},
             now=datetime(2026, 9, 1, tzinfo=UTC), producer_git_sha="c" * 40,
-            run_id=None, transaction_id=transaction,
+            run_id="ACT-PROFILE-HISTORY" if member else None, transaction_id=transaction,
         )
         parquet, records = research._stage_parquet([event])
         manifest = research._build_manifest(transaction_id=transaction, records=records, parquet_bytes=parquet)
@@ -177,6 +182,8 @@ def measure(root: Path, consumer: str, *, baseline: bool = False) -> dict[str, o
     from solana_alpha_lab.factory.research_store import ResearchStore
     from solana_alpha_lab.factory import observation_schedule_store as store_module
 
+    original_bounded = ResearchStore.iter_lifecycle_records_bounded
+
     if baseline:
         # Execute only the exact frozen-base query method. All other consumer
         # inputs are identical; disable the new per-packet reuse as well.
@@ -194,6 +201,10 @@ def measure(root: Path, consumer: str, *, baseline: bool = False) -> dict[str, o
         uncached = packet_module.build_collector_operational_packet.__wrapped__
         operability_watch.build_collector_operational_packet = uncached
         collector_owner_pulse.build_collector_operational_packet = uncached
+        def legacy_predecessor(self, **kwargs):
+            kwargs["include_member_predecessor"] = True
+            return original_bounded(self, **kwargs)
+        ResearchStore.iter_lifecycle_records_bounded = legacy_predecessor
 
     reset_store_read_stats()
     legacy_counts = {"call_ledger_rows_returned": 0, "call_payloads_decoded": 0}
@@ -207,7 +218,7 @@ def measure(root: Path, consumer: str, *, baseline: bool = False) -> dict[str, o
         return rows
 
     ObservationScheduleStore.list_calls = observed_list_calls
-    observed = {"manifest_reads": 0, "partition_verifications": 0}
+    observed = {"manifest_reads": 0, "partition_verifications": 0, "old_member_payload_reads": 0}
     original_manifest = ResearchStore._read_manifest
     original_partition = ResearchStore._verify_partition
     original_model = packet_module.build_collector_read_model
@@ -220,7 +231,9 @@ def measure(root: Path, consumer: str, *, baseline: bool = False) -> dict[str, o
     def verify_partition(self, manifest):
         observed["partition_verifications"] += 1
         if "PROFILE-HISTORY" in manifest.partition_id:
-            raise RuntimeError("IRRELEVANT_HISTORY_PAYLOAD_OPENED")
+            observed["old_member_payload_reads"] += 1
+            if not baseline:
+                raise RuntimeError("IRRELEVANT_HISTORY_PAYLOAD_OPENED")
         return original_partition(self, manifest)
 
     def read_model(*args, **kwargs):
@@ -270,6 +283,7 @@ def measure(root: Path, consumer: str, *, baseline: bool = False) -> dict[str, o
     ObservationScheduleStore.list_calls = original
     ResearchStore._read_manifest = original_manifest
     ResearchStore._verify_partition = original_partition
+    ResearchStore.iter_lifecycle_records_bounded = original_bounded
     packet_module.build_collector_read_model = original_model
     summary.update(model_summary)
     store.close()
@@ -358,7 +372,8 @@ def cgroup_gate(root: Path, consumer: str, *, baseline: bool = False) -> dict[st
             "call_diagnostics_payload_projections") == recent_rows
         reuse_proven = len(measured) == 1 and measured[0].get("immutable_reads", {}).get(
             "manifest_reads") == fixture["immutable_manifests"]
-        baseline_reproduced = stats.get("call_ledger_timestamp_rows_examined") == fixture["old_call_rows"] + recent_rows
+        baseline_reproduced = (stats.get("call_ledger_timestamp_rows_examined") == fixture["old_call_rows"] + recent_rows
+                               and measured[0].get("immutable_reads", {}).get("old_member_payload_reads", 0) > 0)
         success = completed and (baseline_reproduced if baseline else (
             read_bound and reuse_proven and peak < 512 * 1024 * 1024 and wall < 120))
         return {"consumer": consumer, "baseline": baseline, "pass": success,

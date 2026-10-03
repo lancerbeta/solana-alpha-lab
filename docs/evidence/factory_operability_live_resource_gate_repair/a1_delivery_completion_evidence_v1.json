@@ -25,7 +25,7 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_90_OF_91_FOCUSED_TESTS_1_SKIP",
+    "targeted": "PASS_92_OF_93_FOCUSED_TESTS_1_SKIP",
     "independent_review": {
       "path": "docs/evidence/factory_operability_live_resource_gate_repair/a1_delivery_independent_review_v1.json",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 import json
+import io
 import sqlite3
 import tempfile
 import unittest
@@ -20,11 +21,29 @@ from solana_alpha_lab.factory.observation_schedule_store import (
     reset_store_read_stats, store_read_stats,
 )
 from solana_alpha_lab.factory.research_store import (
-    ResearchStore, reuse_lifecycle_reads_within_packet,
+    ResearchStore, RecordKind, reuse_lifecycle_reads_within_packet,
 )
 
 
 class OperabilityIndexTests(unittest.TestCase):
+    def test_preparation_cli_distinguishes_lock_deadline_without_error_payload(self) -> None:
+        from scripts import factory_prepare_operability_index as preparation
+        for error_code, expected in ((sqlite3.SQLITE_BUSY, "STORE_BUSY"),
+                                     (sqlite3.SQLITE_LOCKED, "STORE_BUSY"),
+                                     (sqlite3.SQLITE_INTERRUPT, "INDEX_PREPARATION_DEADLINE"),
+                                     (sqlite3.SQLITE_CORRUPT, "SQLITE_INDEX_PREPARATION_FAILED")):
+            error = sqlite3.OperationalError("sensitive path and query text")
+            error.sqlite_errorcode = error_code
+            output = io.StringIO()
+            with self.subTest(error_code=error_code), \
+                 patch.object(sys, "argv", ["prepare", "--db", "/synthetic/store.sqlite"]), \
+                 patch.object(preparation, "prepare", side_effect=error), \
+                 patch.object(sys, "stdout", output), \
+                 self.assertRaises(SystemExit) as stopped:
+                preparation.main()
+            self.assertEqual(stopped.exception.code, 2)
+            self.assertEqual(output.getvalue(), f"INDEX_PREPARATION={expected}\n")
+
     def test_seek_margin_and_python_only_timestamps_do_not_enter_window(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             store = ObservationScheduleStore(Path(temp, "ops.sqlite"))
@@ -139,6 +158,30 @@ class OperabilityIndexTests(unittest.TestCase):
 
 
 class PacketScopedImmutableReadTests(unittest.TestCase):
+    def test_state_only_proof_skips_old_members_and_scientific_default_retains_predecessor(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            store = ResearchStore(Path(temp))
+            manifest = SimpleNamespace(
+                partition_id="RESEARCH-TXN-MEM-OLD", partition_manifest_id="partition-old",
+                logical_location="research/events/old.parquet",
+                min_event_time=datetime(2026, 9, 1, tzinfo=UTC),
+                max_event_time=datetime(2026, 9, 1, tzinfo=UTC),
+            )
+            record = SimpleNamespace(record_kind=RecordKind.OBSERVATION_MEMBER_BATCH,
+                                     payload_json=json.dumps({"schedule_sha256": "a" * 64}),
+                                     run_id="ACT-A", record_id="OLD", entity_id="a" * 64)
+            args = dict(schedule_sha256="a" * 64, activation_id="ACT-A",
+                        window_start=datetime(2026, 10, 2, tzinfo=UTC))
+            with patch.object(store, "_committed_manifests", return_value=(manifest,)), \
+                 patch.object(store, "_verify_partition_with_size", return_value=((record,), 10)) as read:
+                records, telemetry = store.iter_lifecycle_records_bounded(**args, include_member_predecessor=False)
+                self.assertEqual(records, ())
+                self.assertEqual(telemetry.research_event_partitions_opened, 0)
+                read.assert_not_called()
+                records, telemetry = store.iter_lifecycle_records_bounded(**args)
+                self.assertEqual(records, (record,))
+                self.assertEqual(telemetry.research_event_partitions_opened, 1)
+
     def test_repeated_proofs_share_one_inventory_and_verified_partition(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

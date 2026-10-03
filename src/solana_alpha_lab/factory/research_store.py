@@ -1565,13 +1565,16 @@ class ResearchStore:
         window_start: datetime | None = None,
         closure_cutoff: datetime | None = None,
         schedule_only: bool = False,
+        include_member_predecessor: bool = True,
     ) -> tuple[tuple[ResearchEvent, ...], "ResearchStoreBoundTelemetry"]:
         """Open only temporally relevant observation-lifecycle partitions.
 
         Manifest JSON headers may be enumerated for the whole store. Parquet
         payload verification/decode is restricted to the schedule identity
         partition plus window/cutoff overlap and a newest-first predecessor
-        search. This is not a second scientific truth owner.
+        search. State-only consumers can omit that member predecessor search;
+        scientific reconstruction keeps it by default. This is not a second
+        scientific truth owner.
         """
 
         manifests = self._committed_manifests()
@@ -1638,7 +1641,8 @@ class ResearchStore:
                 reverse=True,
             )
             member_befores = [
-                item for item in before if _member_lifecycle_partition(item.partition_id)
+                item for item in before if include_member_predecessor
+                and _member_lifecycle_partition(item.partition_id)
             ]
             skipped_by_time += len(before) - len(member_befores)
             predecessor_opened = 0
@@ -2268,6 +2272,7 @@ class ExistingResearchStoreReader:
         window_start: datetime | None = None,
         closure_cutoff: datetime | None = None,
         schedule_only: bool = False,
+        include_member_predecessor: bool = True,
     ) -> tuple[tuple[ResearchEvent, ...], ResearchStoreBoundTelemetry]:
         return self._store.iter_lifecycle_records_bounded(
             schedule_sha256=schedule_sha256,
@@ -2275,6 +2280,7 @@ class ExistingResearchStoreReader:
             window_start=window_start,
             closure_cutoff=closure_cutoff,
             schedule_only=schedule_only,
+            include_member_predecessor=include_member_predecessor,
         )
 
 

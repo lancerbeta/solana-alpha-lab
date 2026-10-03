@@ -32009,7 +32009,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_store.py', repository_path: src/solana_alpha_lab/factory/research_store.py}
-  integrity: {kind: sha256, sha256: 019f4abbe67017130a34a29c55935e2f44614273e6e36c352874f68747a009fa}
+  integrity: {kind: sha256, sha256: 4a7d215f2dc430c401fdf81e5fef5e6c9441ccf57cfd077fdd64c527be0fbd86}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -33169,7 +33169,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_lifecycle.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_lifecycle.py}
-  integrity: {kind: sha256, sha256: 481e601ca5fdf73a0bac7ca16c6f9076d1ff83ee1061fdc47c716afab49d7cce}
+  integrity: {kind: sha256, sha256: 44aeca186b729e5d9f2c42f39c604afb6c5c510b21c79d87299e818d5d7b5770}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -36444,7 +36444,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_UNATTENDED_OPERABILITY.md', repository_path: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md}
-  integrity: {kind: sha256, sha256: 964f521cd7bb10a0b674fe039514c7fb158f4c7883550aed2fdb7c22c08c1239}
+  integrity: {kind: sha256, sha256: c6890df81c72c9fd858f359745a4d5212d1828426739992781e69d2b000add91}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
@@ -39333,7 +39333,7 @@ records:
     repository_path: tests/operability_bounded_call_profile.py
   integrity:
     kind: sha256
-    sha256: 39a4bff03d18bd036fb0b0fc82d16f565421d227f97cddffec14e27c447df1ee
+    sha256: 9c0f9e622d085027ebe671bf710c12c2eca2efbd0e7ce93cafabde99a11e6f21
   access:
     mode: read_only
     method: file
@@ -39468,7 +39468,7 @@ records:
     repository_path: docs/tasks/FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1.md
   integrity:
     kind: sha256
-    sha256: 021e8660a77ebca5ecf41716558794d60068906bab89dfa7287fa63e96823706
+    sha256: 70350b7b225811396a52a6502e55e37942ca12598aa126845e3a5695a785ff60
   access:
     mode: read_only
     method: file
@@ -39504,7 +39504,7 @@ records:
     repository_path: tests/test_factory_operability_live_resource_gate_repair_v1.py
   integrity:
     kind: sha256
-    sha256: 8de1f938ab53ab9216c87bf95a2c74e4beca8ac33758a6be02c7055c29e18d1b
+    sha256: a32fbd1b13301cd6605f1c8d2dbd732ae7f3f8f642c4996fb00f1f87b3be64b4
   access:
     mode: read_only
     method: file
@@ -39542,7 +39542,7 @@ records:
     repository_path: scripts/factory_prepare_operability_index.py
   integrity:
     kind: sha256
-    sha256: 0707eed1d5e4d8fedd2fd07cbc01128ec2c43b46c8f1ea0c7aa58aad0f959830
+    sha256: bdc0ac1824a93e524fce39dba3a09edd06993699b13bc2647252e29a1b1d734e
   access:
     mode: read_only
     method: file
@@ -39580,7 +39580,7 @@ records:
     repository_path: .github/workflows/factory-operability-resource-proof.yml
   integrity:
     kind: sha256
-    sha256: 66fdef92efde841172d4e715b7571d542377922af33fffcc0555fc2e6390837d
+    sha256: 769eec0e3434ead4bc9593cc3a53036fee67623a2f264aed23b016d8390f0164
   access:
     mode: read_only
     method: file
@@ -39620,7 +39620,7 @@ records:
     repository_path: docs/evidence/factory_operability_live_resource_gate_repair/a1_linux_profile_v1.json
   integrity:
     kind: sha256
-    sha256: 8bc65dcef6768c74e1428f2fc25767c21f8d2ebcceeae3afca3e51757c70a6c7
+    sha256: 5d59eee1c032ddb0236a6d12d1abc788f7e14dab8a95685ff7fd2f860f6f9ac6
   access:
     mode: read_only
     method: file
@@ -39660,7 +39660,7 @@ records:
     repository_path: docs/reports/factory_operability_live_resource_gate_repair/a1_owner_readout_v1.md
   integrity:
     kind: sha256
-    sha256: 8e2d4a260d774100b5d3dd9fc977381b59d66463c05e92b2dd1655151283acb9
+    sha256: 54f17c67ffda429ac22a5e118063983f09c82ee032d4f22a6a5a08570320cf65
   access:
     mode: read_only
     method: file

@@ -6,6 +6,7 @@ on:
     paths:
       - "src/solana_alpha_lab/factory/observation_schedule_store.py"
       - "src/solana_alpha_lab/factory/research_store.py"
+      - "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py"
       - "src/solana_alpha_lab/factory/collector_operational_packet.py"
       - "tests/operability_bounded_call_profile.py"
       - "tests/test_factory_operability_live_resource_gate_repair_v1.py"
@@ -16,6 +17,7 @@ on:
     paths:
       - "src/solana_alpha_lab/factory/observation_schedule_store.py"
       - "src/solana_alpha_lab/factory/research_store.py"
+      - "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py"
       - "src/solana_alpha_lab/factory/collector_operational_packet.py"
       - "tests/operability_bounded_call_profile.py"
       - "tests/test_factory_operability_live_resource_gate_repair_v1.py"

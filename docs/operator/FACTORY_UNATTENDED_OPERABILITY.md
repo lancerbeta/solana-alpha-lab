@@ -15,7 +15,7 @@ Snapshot доказывает выполнение watch, но не достав
 
 Ремонт `FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1`: для уже заполненного
 store индекс `idx_call_ledger_operability_time` строится явной командой
-`scripts/factory_prepare_operability_index.py --db <absolute-ops-store-path>`
+`sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_prepare_operability_index.py --db <absolute-ops-store-path>`
 в отдельном разрешённом commissioning после проверенного backup и короткой
 приостановки collector. Обычный старт collector индекс не строит. До этого watch/pulse
 показывают `UNKNOWN` вместо полного прохода старых вызовов или ложного нуля.
@@ -23,6 +23,12 @@ store индекс `idx_call_ledger_operability_time` строится явно�
 построиться этой командой и подтвердите `EXPLAIN QUERY PLAN` с этим именем
 индекса. Команда проверяет запас места, берёт ограниченный по ожиданию lock,
 отказывается при несовпадающем индексе и печатает только итог/размер/время.
+При `STORE_BUSY` не повторяйте построение в цикле: восстановите collector и
+остановите commissioning до устранения конкурирующего writer. При
+`INDEX_PREPARATION_DEADLINE` transaction откатывается: восстановите collector,
+оставьте report timers off и пересмотрите бюджет подготовки на копии базы.
+При другом отказе также восстановите collector и остановитесь с typed reason;
+не удаляйте индекс и не запускайте полный watch как запасной путь.
 Индекс использует только встроенные функции SQLite: старый collector после
 отката сохраняет возможность записи. Immutable proof внутри одного packet читается повторно
 из уже проверенного снимка; следующий packet проверяет его заново. Никакой

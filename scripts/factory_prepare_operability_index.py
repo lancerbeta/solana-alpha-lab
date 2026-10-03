@@ -69,6 +69,13 @@ def main() -> None:
     except (RuntimeError, sqlite3.Error, OSError) as exc:
         # Errors are typed and contain no absolute path, query result or payload.
         code = str(exc) if isinstance(exc, RuntimeError) else "SQLITE_INDEX_PREPARATION_FAILED"
+        if isinstance(exc, sqlite3.Error):
+            primary = getattr(exc, "sqlite_errorcode", 0) & 0xFF
+            code = {
+                sqlite3.SQLITE_BUSY: "STORE_BUSY",
+                sqlite3.SQLITE_LOCKED: "STORE_BUSY",
+                sqlite3.SQLITE_INTERRUPT: "INDEX_PREPARATION_DEADLINE",
+            }.get(primary, code)
         print(f"INDEX_PREPARATION={code}")
         raise SystemExit(2) from None
     print(" ".join(f"{key}={value}" for key, value in result.items()))
