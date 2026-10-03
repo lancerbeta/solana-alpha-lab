@@ -21,15 +21,23 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PENDING_FINAL_STABLE_TREE_RECHECK",
+    "targeted": "PASS_TWELVE_HOLDER_CHECKS_WITH_PROPORTIONAL_RECHECK_AND_27_EXISTING_CONSUMER_TESTS",
     "independent_review": {
       "path": "docs/evidence/forge_temporal_holder_point_feature_v1/independent_review.json",
       "sha256": null,
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
-    "project_checks": []
+    "project_checks": [
+      "PASS_OLD_PRICE_LIQUIDITY_SPEC_AND_COMPLETE_RESULT_FIXTURES",
+      "PASS_EXISTING_TEMPORAL_OWNER_PATH_AND_V1_V5_READERS",
+      "PASS_PUBLIC_PRODUCTION_VERTICAL_AND_LOADER_FREE_COLD_REPLAY",
+      "PASS_REGISTERED_SAME_SPEC_AND_COMPLETE_RESULT",
+      "PASS_REAL_FEATURE_ONLY_COMPATIBILITY_UNCHANGED_380_RECORD_INVENTORY",
+      "PASS_SEMANTIC_PACKET_VALIDATE_LAUNCH_AND_ISOLATED_REQUIRED_REVIEWS",
+      "PASS_INCREMENTAL_DERIVED_SYNC_AND_PRECOMMIT_SECRET_JIT_CHECKS"
+    ]
   },
   "non_claims": [
     "NO_ALPHA",

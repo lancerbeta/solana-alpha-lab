@@ -4,20 +4,135 @@
   "review_id": "FORGE_TEMPORAL_HOLDER_POINT_FEATURE_V1-REVIEW",
   "as_of": "2026-10-03",
   "task_id": "FORGE_TEMPORAL_HOLDER_POINT_FEATURE_V1",
-  "reviewed_bindings_sha256": null,
-  "reviewed_inventory_sha256": null,
+  "reviewed_bindings_sha256": "261edf0dd43b05a1599ba993165c5f574ab17f3763c533139a23dfc2ed5984e4",
+  "reviewed_inventory_sha256": "8f480018803cea5716e5587cb6f64760e7ffb07aca62fb3890a52af2269f86f0",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
     "OWNER_UX_CRITIC"
   ],
-  "reviews": [],
-  "verdict": "NOT_READY",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated read-only content review PASS; content_head=0edecf73a05df4e4d8b4f09a25235f5c64977dad; 25/25 bindings and frozen diff verified. No real store, outcome, provider or runtime access; no mutation.",
+        "No open P0/P1/P2. Holder point-only/target denial, lossless threshold identity, pre-values preview validation and canonical clocks verified.",
+        "10 HolderPolicyTests PASS. Corrected mixed-point regression fails with the old d3ffe179 builder in memory (3.0 is not None); current builder returns ABSENT.",
+        "Public production CLI vertical inspected through committed exports/assertions rather than independently rerun. Earlier local suite had implementation-hash/unstable-index failures while content changed; affected tests subsequently passed on stable committed bytes. The new public two-clock-spelling fixture initially exhausted its one-preview cap; its disposable cap was corrected to two and the failed case passed. Production budget semantics unchanged."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated read-only content review PASS; content_head=0edecf73a05df4e4d8b4f09a25235f5c64977dad; 25/25 bindings and frozen diff verified. No real store, outcome, provider or runtime access; no mutation.",
+        "Actual holder-specific PREDICTIVE card, baseline-minus-matched additive complement after subset proof, V5 UNKNOWN/missingness, confounders, prior D2 exposure and five frozen terminals verified.",
+        "Public production binding/preview/MAIN/interrupted reply/cold replay and exact X/Y across Prompt A, candidate, Critic, owner plus registered complete-result replay satisfy content DoD. Real receipt proves feature readiness only; no target support or scientific verdict.",
+        "Final delta is only two mixed-point fixture lines; production code/docs/receipts byte-identical to accepted prior content. Tests not independently run by this role."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated read-only content review PASS; content_head=0edecf73a05df4e4d8b4f09a25235f5c64977dad; 25/25 bindings and frozen diff verified. No real store, outcome, provider or runtime access; no mutation.",
+        "packet_fingerprint_sha256=a20f6ad58a34899860ce9ddb55a57218389835d313c33fdb5b96f7523c68b0c5; SEMANTIC_PREMISE packet validate-launch PASS. Packet+diff only, no implementation transcript. Independence attests PACKET_INFORMATION_PATH; launch isolation is PROCESS_OBLIGATION.",
+        "What could pass unit tests here and still corrupt scientific validity? A synthetic path could pass while a later real verdict substitutes feature readiness for target support, converts UNKNOWN to zero, creates a known-holder sample instead of additive complement, or hides prior outcome exposure/activity confounding. Candidate explicitly preserves those limits and grants no science/promotion authority.",
+        "Shared PIT cell/clock owners, old PRICE/LIQ identities/readers, proxy semantics, saved recipe replay, predictive card and fail-closed holder policy remain authoritative. Tests not run by this role."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated read-only content review PASS; content_head=0edecf73a05df4e4d8b4f09a25235f5c64977dad; 25/25 bindings and frozen diff verified. No real store, outcome, provider or runtime access; no mutation.",
+        "Actual generated X/Y/decision/horizon labels agree across Prompt A, selected candidate, Critic and owner. Preview exposes observed zero separately from ABSENT/null holder; operator can copy the recipe-derived machine labels.",
+        "Actual committed card is holder-specific PREDICTIVE with activity/staleness/prior-D2 exposure, five future terminals, additive baseline-minus-matched after subset proof and UNKNOWN/V5 caveats.",
+        "Raw result/Critic keep ASSUMPTION_NOT_CALIBRATED and ESTIMATED_NET_PROXY cost limits; owner numeric surface makes no NetReturn claim. Cold replay artifact shows replayed_without_evaluator=true and main delta0, PAUSED_CAP. No CLI tests or real-data reads by this role."
+      ]
+    }
+  ],
+  "verdict": "PASS",
   "non_claims": [
     "NO_MERGE",
     "NO_SCIENTIFIC_VERDICT",
     "MODEL_DIVERSITY_UNPROVEN",
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Lossy numeric threshold labels could bind distinct scientific predicates to the same card.",
+      "observed_head": "21678a861ebfa65297b668e5bed4ea830ab99fdd",
+      "resolved_by_head": "0edecf73a05df4e4d8b4f09a25235f5c64977dad"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Feature-only preview validated unsupported/future point features after the value loader.",
+      "observed_head": "21678a861ebfa65297b668e5bed4ea830ab99fdd",
+      "resolved_by_head": "0edecf73a05df4e4d8b4f09a25235f5c64977dad"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Synthetic scientific card inherited liquidity/MEU mechanism and falsifier text.",
+      "observed_head": "21678a861ebfa65297b668e5bed4ea830ab99fdd",
+      "resolved_by_head": "0edecf73a05df4e4d8b4f09a25235f5c64977dad"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Lossy threshold identity and inherited scientific card text weakened saved-recipe truth.",
+      "observed_head": "21678a861ebfa65297b668e5bed4ea830ab99fdd",
+      "resolved_by_head": "0edecf73a05df4e4d8b4f09a25235f5c64977dad"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Preview omitted canonical feature-point deadline <= decision deadline guard for mixed clocks.",
+      "observed_head": "d3ffe17930da3dbaa18aa87ccf9fd47b0825c79a",
+      "resolved_by_head": "0edecf73a05df4e4d8b4f09a25235f5c64977dad"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Null/empty default-clock spelling differed between query and preview.",
+      "observed_head": "d3ffe17930da3dbaa18aa87ccf9fd47b0825c79a",
+      "resolved_by_head": "0edecf73a05df4e4d8b4f09a25235f5c64977dad"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Negative control substituted a known-holder complement for frozen baseline-minus-matched V5 quantities.",
+      "observed_head": "d3ffe17930da3dbaa18aa87ccf9fd47b0825c79a",
+      "resolved_by_head": "0edecf73a05df4e4d8b4f09a25235f5c64977dad"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Card used inherited CAUSAL default and omitted known confounders and frozen taxonomy.",
+      "observed_head": "d3ffe17930da3dbaa18aa87ccf9fd47b0825c79a",
+      "resolved_by_head": "0edecf73a05df4e4d8b4f09a25235f5c64977dad"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Mixed-point regression omitted due-offset map, so clock fallback made it pass the old builder.",
+      "observed_head": "8fa9c03686669c12712b5f7099118188ef8e7b80",
+      "resolved_by_head": "0edecf73a05df4e4d8b4f09a25235f5c64977dad"
+    }
   ]
 }
