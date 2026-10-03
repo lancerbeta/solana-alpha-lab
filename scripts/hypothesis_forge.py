@@ -1633,12 +1633,34 @@ def cmd_discovery_preview(
                 exit_code=2,
             )
     try:
+        # A full temporal question authorizes preview, but its target must never
+        # enter the value loader or the feature-only preview identity.
+        preview_spec = spec
+        if temporal_preview:
+            from solana_alpha_lab.factory.hfic_grounded_discovery import POINT_OFFSET
+            body = validate_temporal_query(spec)["scientific_body"]
+            points = {body["decision_point"]}
+            for feature in body["features"]:
+                points.update(feature[key] for key in ("point", "start", "end", "numerator", "denominator", "at") if key in feature)
+                points.update(feature.get("points") or [])
+            preview_spec = {"decision": spec["decision"], "schedule": {**spec["schedule"], "points": sorted(points, key=POINT_OFFSET.get)},
+                            "features": [f for f in body["features"] if f["op"] == "point_value"], "seed": spec.get("seed") or spec["query_id"]}
+        if "target" in preview_spec:
+            raise GroundedDiscoveryError("PREVIEW_FORBIDS_TARGET")
+        from solana_alpha_lab.factory.hfic_grounded_discovery import POINT_OFFSET
+        decision_point = preview_spec.get("decision", {}).get("point_id")
+        point_ids = preview_spec.get("schedule", {}).get("points")
+        if decision_point not in POINT_OFFSET or not isinstance(point_ids, list) or not point_ids:
+            raise GroundedDiscoveryError("SCHEDULE_INVALID")
+        if any(p not in POINT_OFFSET or POINT_OFFSET[p] > POINT_OFFSET[decision_point] for p in point_ids):
+            raise GroundedDiscoveryError("FEATURE_AFTER_DECISION")
         loaded = load_admitted_partition_rows(
             data_root=explicit_data_root,
             binding_doc=binding_doc,
             partitions=cohort_partitions,
             census_path=census_path,
             observations_path=observations_path,
+            observation_filters=[("point_id", "in", sorted({"X300", *point_ids}))],
         )
         if (store_root is None) != (not journal_scope):
             return emit_error("PREVIEW_STORE_SCOPE_REQUIRED")
@@ -1651,7 +1673,7 @@ def cmd_discovery_preview(
         payload = build_feature_preview(
             loaded["census"],
             loaded["observations"],
-            spec,
+            preview_spec,
             loaded["cohorts"],
             prior_preview_hashes=remembered,
         )

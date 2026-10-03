@@ -69,7 +69,10 @@ context_requirements:
       - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
       - src/solana_alpha_lab/factory/hfic_session.py
       - configs/experiment_capability_registry_v2.yaml
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/forge_temporal_holder_point_feature_v1/completion.json
+      - docs/evidence/forge_temporal_holder_point_feature_v1/independent_review.json
+      - docs/evidence/forge_temporal_holder_point_feature_v1/factory_fit.json
     HISTORICAL_CONTEXT: []
 ---
 

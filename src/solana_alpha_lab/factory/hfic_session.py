@@ -1729,6 +1729,12 @@ def _bind_selected_look(
         raw = grounded.get("candidate_scope")
         look_scope = dict(raw) if isinstance(raw, Mapping) else {}
     relation = relate_look_scope(look_scope, card_claim_scope(selected_card))
+    from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_holder_claim_identity
+
+    result = grounded.get("result")
+    identity = temporal_holder_claim_identity(result) if isinstance(result, Mapping) else {}
+    if identity and any(selected_card.get(key) != value for key, value in identity.items()):
+        raise HficSessionError("LOOK_SCOPE_CONTRADICTION")
     if relation == "LOOK_SCOPE_CONTRADICTION" and strict:
         raise HficSessionError("LOOK_SCOPE_CONTRADICTION")
     if relation == "LOOK_SCOPE_MATCH":
