@@ -10,7 +10,19 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".github/workflows/ci.yml": "a83e3dfbb4905e7d901eba05f55db16e10fb4b2b1dbf0cdefb284458d48b26ed",
+    "catalog/assets/core.yaml": "c044c96496a37222e1ae6663c3e87b3baebb919ff037f19383d0619798db63de",
+    "configs/ci_test_shards_v1.json": "1c9046213c7b73567a7c339b6bb1ded5aed25a68356501845e65ad92a9e37bec",
+    "docs/reports/ci_throughput_and_impact_shadow/a1_owner_readout_v1.md": "dd7a894d533f78a1a83590e3511d78f429cda111afc333efb43d348aeb60606d",
+    "docs/tasks/CI_THROUGHPUT_AND_IMPACT_SHADOW_V1.md": "75e376ed6be2c903103343acc27582ef72eaab5dfab8a03fa977e26083019332",
+    "scripts/ci_test_partition.py": "4b1d1418b703e4ff01772555ac3dcbc6c0e200810e6fbb5eb2410369499c6954",
+    "scripts/render_ci_workflow.py": "e448f47c8d1fb642fc230be47f13fbad7a54e08e1e85b0cc52b3e283b1b6c066",
+    "scripts/validate_ci.py": "5cabc0da817371608667f82a205c06ed86180dab1a2734bdf0022a826c499519",
+    "tests/test_ci.py": "8eb02bbe4cc9459d9d0e22cb59fb6cd545e56e8a3a12df1cf29f13d541922439",
+    "tests/test_ci_test_partition.py": "a8b8ef2825de69f14111a60cc4a51a433607b140805ffa01cb879d746aff09f1",
+    "tests/test_execution_domain_modularity_and_fast_ci_v1.py": "bedd112aadaac3460235a52d5e16c5799ad526fb04707f94c5175278ad756500"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +33,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/ci_throughput_and_impact_shadow/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "6ba52180dc39ee764b1eb36b76a92447304ef247eb71027dca98b0fe89ed8765",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_CI_THROUGHPUT_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/ci_throughput_and_impact_shadow/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "91066963b73f9af5e1de33eb64d2ec0e6ad4d071fed41001e2031dfec4192a9a",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
