@@ -26,5 +26,9 @@
     "Current operational inventories and market rows remain outside Git",
     "Metadata-only readout revision does not reassess the frozen verdict",
     "Cold retry used exact source/spec/input/operation"
-  ]
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Git-native readout delivery only; owner-managed optional export registry and release artifacts unchanged."
+  }
 }

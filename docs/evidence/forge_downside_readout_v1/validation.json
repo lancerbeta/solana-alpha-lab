@@ -52,5 +52,21 @@
     },
     "scope_detachment": "PASS_SELECTED_AND_RUNNER_UP",
     "frozen_corrected_blind_projection_equality": "PASS_4_OF_4_NO_MODEL_RERUN"
+  },
+  "ci_first_attempt": {
+    "head": "2464894798b1d337cc76c92e4d7d26687c4c3e72",
+    "run_id": 37113410106,
+    "status": "FAIL_REQUIRED_JOB",
+    "failed_job": "validate-tests (2)",
+    "failed_test": "test_project_sources_release_registry.ProjectSourcesReleaseRegistryTests.test_changed_acceptance_receipts_declare_source_disposition",
+    "reason": "SOURCE_DISPOSITION_REQUIRED",
+    "repair": "Explicit NO_CHANGE on D2 acceptance receipt; no Project Sources release or scientific payload changed.",
+    "run_status_at_readback": "in_progress",
+    "focused_repair": {
+      "status": "PASS",
+      "tests": 1,
+      "seconds": 0.185,
+      "test": "test_changed_acceptance_receipts_declare_source_disposition"
+    }
   }
 }

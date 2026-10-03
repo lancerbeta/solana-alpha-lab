@@ -68,14 +68,14 @@
   "factory_fit": {
     "path": "docs/evidence/forge_downside_readout_v1/factory_fit.json",
     "sha256": "3707998d636d2f8a6e9543b24a06b4e0a925c088839ffb44ea85f847a36d3fc9",
-    "verdict": "PASS"
+    "verdict": "PENDING"
   },
   "validation": {
     "targeted": "PASS_FIVE_VERTICALS_AND_REPLAY_REFUSAL_CALENDAR_REGRESSIONS_AND_EXACT_IMPLEMENTATION_DIRECT_CONSUMERS",
     "independent_review": {
       "path": "docs/evidence/forge_downside_readout_v1/independent_review.json",
       "sha256": "247b29c56823d420a1bba60ebb42ffb769e4a8bf4e8beb63c2ec2aee1b8d3817",
-      "verdict": "PASS"
+      "verdict": "PENDING"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
