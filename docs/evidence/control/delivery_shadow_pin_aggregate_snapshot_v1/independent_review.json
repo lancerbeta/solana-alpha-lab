@@ -4,8 +4,8 @@
   "review_id": "DELIVERY_SHADOW_PIN_AGGREGATE_SNAPSHOT_V1-REVIEW",
   "as_of": "2026-10-03",
   "task_id": "DELIVERY_SHADOW_PIN_AGGREGATE_SNAPSHOT_V1",
-  "reviewed_bindings_sha256": "ff25e1c22fb02e54b76649d68c70075c7e0c48e262039b57af008f13c9bb9054",
-  "reviewed_inventory_sha256": "9e878e889a820b45061128918388006751a81b5e85843f250e271db0bc57e397",
+  "reviewed_bindings_sha256": "1220317098d71168a58f8075c7cca20666fdf874be35dfbce67bd40b85efeb96",
+  "reviewed_inventory_sha256": "c09589b9dcd7b180552cd75335f56ceae27862250cd491706a00610c5fb9bad3",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER"
