@@ -734,6 +734,9 @@ class V3CalculationRevisionTests(unittest.TestCase):
             census, observations = _rows(parts)
             journal, market, focus = "44" * 32, "ab" * 32, "REVISION_FOCUS"
             spec = _query("disposition-revision")
+            from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+
+            ensure_profile(ResearchStore(root), repo_root=ROOT_DIR, min_holders=0, min_liquidity_usd=0)
             operation = record_operation(
                 ResearchStore(root),
                 {

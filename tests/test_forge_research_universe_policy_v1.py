@@ -263,6 +263,13 @@ class UniversePolicyTests(unittest.TestCase):
             self.assertEqual(pre.returncode, 0, pre.stdout + pre.stderr)
             receipt = json.loads(pre.stdout)
             self.assertEqual(receipt["universe_policy"]["state"], "ABSENT")
+            self.assertEqual(receipt["forge_context_packet"]["universe_policy"]["state"], "ABSENT")
+            self.assertEqual(
+                receipt["forge_context_packet"]["universe_policy"]["blocker"],
+                "UNIVERSE_POLICY_REQUIRED",
+            )
+            self.assertFalse(receipt["forge_input_receipt"]["forge_runnable"])
+            self.assertIn("UNIVERSE_POLICY_REQUIRED", receipt["forge_input_receipt"]["blocking_reason_codes"])
             journal, market = receipt["search_key_sha256"], receipt["market_evidence_epoch_sha256"]
             spec_path = workspace / "spec.json"
             scope_path = workspace / "scope.json"
@@ -624,6 +631,128 @@ class UniversePolicyTests(unittest.TestCase):
             )
             self.assertEqual(third["queries"][0]["look_class"], "MAIN")
             self.assertEqual(third["budget"]["main_count"], first["budget"]["main_count"] + 1)
+
+    def test_saved_history_stays_readable_when_todays_profile_is_missing_or_broken(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            GroundedDiscoveryError,
+            list_discovery_looks,
+            run_recorded_discovery_query,
+        )
+        from solana_alpha_lab.factory.hfic_ordinary_operation import record_operation
+        from solana_alpha_lab.factory.hfic_research_universe_policy import (
+            UniversePolicyError,
+            ensure_profile,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from tests.test_hfic_temporal_discovery_v1 import GIT_SHA, _binding, _census, _obs, _path, _scope, _spec
+
+        spec = _spec(search_tier="SIMPLE_SCREEN", query_id="universe-history")
+        other = _spec(search_tier="SIMPLE_SCREEN", query_id="universe-history-new")
+        rows = _path("a", [1.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92) + [
+            _obs("a", "Y3600", "FIELD-HOLDER-COUNT-001", 50)
+        ]
+        journal = "ab" * 32
+
+        class _WithoutPolicy:
+            def __init__(self, inner: ResearchStore) -> None:
+                self._inner = inner
+
+            def iter_committed_records(self):
+                for record in self._inner.iter_committed_records():
+                    payload = json.loads(record.payload_json)
+                    if payload.get("artifact_kind") == "FORGE_RESEARCH_UNIVERSE_POLICY":
+                        continue
+                    yield record
+
+            def __getattr__(self, name: str):
+                return getattr(self._inner, name)
+
+        with tempfile.TemporaryDirectory() as raw:
+            store = ResearchStore(Path(raw))
+            ensure_profile(store, repo_root=ROOT, min_holders=50, min_liquidity_usd=5000)
+            operation = record_operation(store, {
+                "owner_request_text": "saved before the profile disappeared",
+                "owner_focus": "UNIVERSE_HISTORY",
+                "journal_scope": journal,
+                "market_evidence_epoch_sha256": "cd" * 32,
+                "spec": spec,
+                "owner_cap": {"main": 1, "adaptive": 0, "preview": 0},
+                "requested_completion": "LIMITED_RESULT",
+            })
+            first = run_recorded_discovery_query(
+                store, census=[_census("a")], observations=rows, spec=spec, binding=_binding(),
+                journal_scope=journal, candidate_scope=_scope(spec), git_sha=GIT_SHA,
+                operation_sha256=operation["operation_sha256"], verified_market="cd" * 32,
+            )
+            hidden = _WithoutPolicy(store)
+            from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
+
+            self.assertEqual(effective_policy(hidden)["state"], "ABSENT")
+            before = len(list(store.iter_committed_records()))
+            replay = run_recorded_discovery_query(
+                hidden, census=[_census("a")], observations=rows, spec=spec, binding=_binding(),
+                journal_scope=journal, candidate_scope=_scope(spec), git_sha=GIT_SHA,
+                operation_sha256=operation["operation_sha256"], verified_market="cd" * 32,
+            )
+            self.assertEqual(replay["result_refs"], first["result_refs"])
+            self.assertFalse(replay["queries"][0]["new_look"])
+            self.assertEqual(len(list(store.iter_committed_records())), before)
+            fresh = record_operation(store, {
+                "owner_request_text": "new look without a profile",
+                "owner_focus": "UNIVERSE_HISTORY_NEW",
+                "journal_scope": journal,
+                "market_evidence_epoch_sha256": "cd" * 32,
+                "spec": other,
+                "owner_cap": {"main": 1, "adaptive": 0, "preview": 0},
+                "requested_completion": "LIMITED_RESULT",
+            })
+            before_new = len(list(store.iter_committed_records()))
+            with self.assertRaises(GroundedDiscoveryError) as missing:
+                run_recorded_discovery_query(
+                    hidden, census=[_census("a")], observations=rows, spec=other, binding=_binding(),
+                    journal_scope=journal, candidate_scope=_scope(other), git_sha=GIT_SHA,
+                    operation_sha256=fresh["operation_sha256"], verified_market="cd" * 32,
+                )
+            self.assertEqual(missing.exception.code, "UNIVERSE_POLICY_REQUIRED")
+            self.assertEqual(len(list(store.iter_committed_records())), before_new)
+            self.assertTrue(list_discovery_looks(hidden, journal))
+
+            def broken(ignored: object) -> dict:
+                raise UniversePolicyError("UNIVERSE_POLICY_BINDING_MISMATCH")
+
+            with mock.patch(
+                "solana_alpha_lab.factory.hfic_research_universe_policy.effective_policy",
+                broken,
+            ):
+                still = run_recorded_discovery_query(
+                    store, census=[_census("a")], observations=rows, spec=spec, binding=_binding(),
+                    journal_scope=journal, candidate_scope=_scope(spec), git_sha=GIT_SHA,
+                    operation_sha256=operation["operation_sha256"], verified_market="cd" * 32,
+                )
+                self.assertEqual(still["result_refs"], first["result_refs"])
+                with self.assertRaises(GroundedDiscoveryError) as damaged:
+                    run_recorded_discovery_query(
+                        store, census=[_census("a")], observations=rows, spec=other, binding=_binding(),
+                        journal_scope=journal, candidate_scope=_scope(other), git_sha=GIT_SHA,
+                        operation_sha256=fresh["operation_sha256"], verified_market="cd" * 32,
+                    )
+            self.assertEqual(damaged.exception.code, "UNIVERSE_POLICY_BINDING_MISMATCH")
+            self.assertEqual(list_discovery_looks(store, journal)[0]["record_id"], first["result_refs"][0])
+
+    def test_one_command_verifies_a_published_partition_once(self) -> None:
+        from solana_alpha_lab.factory import hfic_grounded_discovery as discovery
+
+        calls = {"n": 0}
+
+        def once(root: Path) -> dict:
+            calls["n"] += 1
+            return {"cohorts": []}
+
+        with mock.patch.object(discovery, "_resolve_published_discovery_binding", once):
+            with discovery.publication_verification_scope():
+                discovery.resolve_published_discovery_binding(Path("."))
+                discovery.resolve_published_discovery_binding(Path("."))
+        self.assertEqual(calls["n"], 1)
 
     def test_zero_is_not_missing_and_fail_beats_unknown(self) -> None:
         fail = classify_universe_cells(

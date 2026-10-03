@@ -8,11 +8,13 @@ look is a ResearchStore artifact, not a scientific-slot reservation.
 
 from __future__ import annotations
 
+import contextvars
 import hashlib
 import json
 import re
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -284,7 +286,49 @@ def _attach_verified_schedule(root: Path, cohorts: list[dict[str, Any]]) -> None
         cohort.update(projected)
 
 
+_publication_cache: contextvars.ContextVar[dict[str, dict[str, Any]] | None] = contextvars.ContextVar(
+    "published_binding_cache",
+    default=None,
+)
+_logical_verify_counts: contextvars.ContextVar[dict[str, int] | None] = contextvars.ContextVar(
+    "logical_verify_counts",
+    default=None,
+)
+
+
+@contextmanager
+def publication_verification_scope():
+    """One public command verifies each published partition once, then reuses it."""
+
+    cache_token = _publication_cache.set({})
+    count_token = _logical_verify_counts.set({})
+    try:
+        yield
+    finally:
+        _publication_cache.reset(cache_token)
+        _logical_verify_counts.reset(count_token)
+
+
+def logical_verify_counts() -> dict[str, int]:
+    counts = _logical_verify_counts.get()
+    return dict(counts) if isinstance(counts, dict) else {}
+
+
 def resolve_published_discovery_binding(data_root: Path) -> dict[str, Any]:
+    """Published admission binding. Inside a command scope the logical scan runs once."""
+
+    root = Path(data_root)
+    cache = _publication_cache.get()
+    key = str(root)
+    if isinstance(cache, dict) and key in cache:
+        return cache[key]
+    resolved = _resolve_published_discovery_binding(root)
+    if isinstance(cache, dict):
+        cache[key] = resolved
+    return resolved
+
+
+def _resolve_published_discovery_binding(data_root: Path) -> dict[str, Any]:
     """Build the admission binding from a canonical publication.
 
     Does not read parquet values. Hashes are streamed. ``holdout=false`` is
@@ -436,6 +480,10 @@ def _assert_published_logical_content(data_root: Path, cohorts: Sequence[Mapping
             part = by_location.get(rel.replace("\\", "/"))
             if part is None:
                 raise GroundedDiscoveryError("LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
+            counts = _logical_verify_counts.get()
+            if isinstance(counts, dict):
+                part_id = str(part.partition_id)
+                counts[part_id] = counts.get(part_id, 0) + 1
             try:
                 measured = measure_live_corpus_parquet(
                     data_root / rel,
@@ -1946,11 +1994,33 @@ def run_recorded_discovery_query(
         )
 
         from solana_alpha_lab.factory.hfic_research_universe_policy import (
+            UniversePolicyError,
             admitted_with_policy,
             effective_policy,
         )
 
-        gate_policy = effective_policy(store).get("definition")
+        policy_error: UniversePolicyError | None = None
+        try:
+            policy_head = effective_policy(store)
+        except UniversePolicyError as exc:
+            policy_error = exc
+            policy_head = {"definition": None}
+        gate_policy = policy_head.get("definition")
+        if (gate_policy is None or policy_error is not None) and correction is None:
+            from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+
+            early_spec = validate_temporal_query(spec)["spec_sha256"]
+            owned_now = [
+                item
+                for item in list_discovery_looks(store, journal_scope)
+                if item.get("operation_sha256") == operation_sha256
+                and item.get("spec_sha256") == early_spec
+                and isinstance(item.get("result"), Mapping)
+            ]
+            if not owned_now:
+                raise GroundedDiscoveryError(
+                    policy_error.code if policy_error is not None else "UNIVERSE_POLICY_REQUIRED"
+                )
         try:
             gate_before_values(
                 store,
@@ -1973,11 +2043,19 @@ def run_recorded_discovery_query(
     replayed = None
     source_look: Mapping[str, Any] | None = None
     from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        UniversePolicyError,
         admitted_with_policy,
         effective_policy,
     )
 
-    policy_definition = effective_policy(store).get("definition")
+    if not _is_temporal_query(spec):
+        policy_error = None
+        try:
+            policy_head = effective_policy(store)
+        except UniversePolicyError as exc:
+            policy_error = exc
+            policy_head = {"definition": None}
+    policy_definition = policy_head.get("definition")
     revising_legacy = False
     if _is_temporal_query(spec):
         from solana_alpha_lab.factory.hfic_temporal_discovery import (
@@ -2035,7 +2113,41 @@ def run_recorded_discovery_query(
                 if item.get("calculation_version") in TEMPORAL_CALCULATION_VERSIONS_READABLE
             ]
             replayed = current_look_evidence(historical[-1], historical) if historical else None
+            if replayed is None and (policy_definition is None or policy_error is not None):
+                # Today's profile is not required to read this operation's saved result.
+                owned = [
+                    item
+                    for item in journal_looks
+                    if item.get("operation_sha256") == operation_sha256
+                    and item.get("spec_sha256") == prevalidated["spec_sha256"]
+                    and isinstance(item.get("result"), Mapping)
+                ]
+                current = next(
+                    (
+                        item
+                        for item in owned
+                        if item.get("calculation_version") == TEMPORAL_CALCULATION_VERSION
+                    ),
+                    None,
+                )
+                if current is not None:
+                    replayed = current
+                elif owned:
+                    readable = [
+                        item
+                        for item in owned
+                        if item.get("calculation_version") in TEMPORAL_CALCULATION_VERSIONS_READABLE
+                    ]
+                    replayed = current_look_evidence(readable[-1], readable) if readable else None
+    readback_look = None
+    revising_legacy = source_look is not None and not isinstance(
+        (source_look.get("result") or {}).get("universe_policy"), Mapping
+    )
     if replayed is None:
+        if policy_error is not None and not revising_legacy:
+            raise GroundedDiscoveryError(policy_error.code)
+        if policy_definition is None and not revising_legacy:
+            raise GroundedDiscoveryError("UNIVERSE_POLICY_REQUIRED")
         if _is_temporal_query(spec):
             from solana_alpha_lab.factory.hfic_temporal_discovery import classify_temporal_look
 
@@ -2049,11 +2161,6 @@ def run_recorded_discovery_query(
                     search_tier=str(prevalidated["search_tier"]),
                     git_sha=git_sha,
                 )
-        revising_legacy = source_look is not None and not isinstance(
-            (source_look.get("result") or {}).get("universe_policy"), Mapping
-        )
-        if policy_definition is None and not revising_legacy:
-            raise GroundedDiscoveryError("UNIVERSE_POLICY_REQUIRED")
         computed = execute_discovery_from_rows(
             census,
             observations,
@@ -2082,6 +2189,7 @@ def run_recorded_discovery_query(
             "members_projected": 0,
             "replayed_without_evaluator": True,
         }
+        readback_look = replayed if policy_definition is None or policy_error is not None else None
     summary = computed["summary"]
     calc_version = str(summary.get("calculation_version") or CALCULATION_VERSION)
     temporal = summary.get("schema") == "smial.hfic-temporal-query"
@@ -2104,6 +2212,10 @@ def run_recorded_discovery_query(
         ),
         None,
     )
+    if readback_look is not None:
+        binding_sha = str(readback_look.get("data_binding_sha256") or binding_sha)
+        digest = str(readback_look.get("result_sha256") or digest)
+        existing = readback_look
     if existing is not None and temporal and isinstance(existing.get("result"), Mapping):
         summary = existing["result"]
         digest = str(existing.get("result_sha256") or result_sha256(summary))

@@ -89,6 +89,13 @@ def _live_dataset(mid: str = "MID-CURRENT") -> dict[str, object]:
     }
 
 
+def _activate_neutral_universe(data_root: Path) -> None:
+    from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    ensure_profile(ResearchStore(data_root), repo_root=ROOT, min_holders=0, min_liquidity_usd=0)
+
+
 def _enumerate_live(_data_root: Path, **_kwargs: object):
     return [_live_dataset()], []
 
@@ -121,6 +128,7 @@ class ForgeInputReceiptTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
+            _activate_neutral_universe(data_root)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 side_effect=_enumerate_live,
@@ -184,6 +192,7 @@ class ForgeInputReceiptTests(unittest.TestCase):
                 _write_lineage(plane)
                 from_linked = resolve_data_root(linked, env={})
                 self.assertEqual(from_linked, plane.resolve())
+                _activate_neutral_universe(from_linked)
                 with patch(
                     "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                     side_effect=_enumerate_live,
@@ -243,6 +252,7 @@ class ForgeInputReceiptTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root, mid="MID-C2")
+            _activate_neutral_universe(data_root)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 side_effect=lambda _root: ([_live_dataset("MID-C2")], []),
@@ -503,7 +513,10 @@ class ForgeInputReceiptTests(unittest.TestCase):
 
         before = fingerprint()
         receipt = build_forge_input_receipt(data_root, repo_root=ROOT)
-        self.assertTrue(receipt["forge_runnable"])
+        if receipt["forge_runnable"]:
+            self.assertNotIn("UNIVERSE_POLICY_REQUIRED", receipt["blocking_reason_codes"])
+        else:
+            self.assertIn("UNIVERSE_POLICY_REQUIRED", receipt["blocking_reason_codes"])
         self.assertEqual(receipt["visibility"]["packet_vision"], "PASS")
         with patch(
             "solana_alpha_lab.factory.hfic_preflight.ResearchStore", SpyStore
@@ -523,7 +536,7 @@ class ForgeInputReceiptTests(unittest.TestCase):
             str(preflight.get("terminal") or ""), FORGE_VISION_INTEGRITY_BLOCKED
         )
         attached = preflight.get("forge_input_receipt") or {}
-        self.assertTrue(attached.get("forge_runnable"))
+        self.assertEqual(attached.get("forge_runnable"), receipt["forge_runnable"])
         self.assertEqual(attached.get("owner_class"), receipt["owner_class"])
         self.assertEqual(
             attached.get("blocking_reason_codes"), receipt["blocking_reason_codes"]
@@ -536,8 +549,15 @@ class ForgeInputReceiptTests(unittest.TestCase):
         self.assertEqual(vision.get("status"), "PASS")
         self.assertEqual(receipt["writes"]["research_store"], 0)
         self.assertEqual(receipt["writes"]["session"], 0)
-        control = forge_control_ready(data_root=data_root, repo_root=ROOT)
-        self.assertEqual(control.get("terminal"), "FORGE_CONTROL_READY")
+        from solana_alpha_lab.factory.live_cohort_to_forge import LiveCohortToForgeError
+
+        if receipt["forge_runnable"]:
+            control = forge_control_ready(data_root=data_root, repo_root=ROOT)
+            self.assertEqual(control.get("terminal"), "FORGE_CONTROL_READY")
+        else:
+            with self.assertRaises(LiveCohortToForgeError) as blocked:
+                forge_control_ready(data_root=data_root, repo_root=ROOT)
+            self.assertEqual(str(blocked.exception), "UNIVERSE_POLICY_REQUIRED")
 
     def test_persist_false_skips_legacy_commission_repair(self) -> None:
         from solana_alpha_lab.factory.hfic_preflight import (
@@ -661,9 +681,12 @@ class RealPlaneNoWriteTests(unittest.TestCase):
         self.assertEqual(receipt["visibility"]["packet_vision"], "PASS")
         self.assertEqual(receipt["visibility"]["pit_semantics"], "NOT_EVALUATED")
         self.assertEqual(receipt["visibility"]["missingness_visible"], "NOT_EVALUATED")
-        self.assertTrue(receipt["forge_runnable"])
         block = format_forge_input_owner_block(receipt)
-        self.assertIn("forge_input_next: STOP_BEFORE_SYNTHESIS", block)
+        if receipt["forge_runnable"]:
+            self.assertIn("forge_input_next: STOP_BEFORE_SYNTHESIS", block)
+        else:
+            self.assertIn("UNIVERSE_POLICY_REQUIRED", receipt["blocking_reason_codes"])
+            self.assertIn("forge_input_next: PREVIEW_THEN_AUTHORIZED_APPLY", block)
         self.assertIn("evidence_surface_mode: ordinary", block)
         hist = receipt.get("historical_calibration") or []
         if hist and hist[0].get("router_decision") and hist[0].get("integrity") == "PASS":

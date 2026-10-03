@@ -100,7 +100,10 @@ def _rows() -> tuple[list[dict], list[dict]]:
     census = [_census("mint-a")]
     observations = [
         _obs("mint-a", "X300", LIQ, 1000.0),
+        _obs("mint-a", "X300", "FIELD-HOLDER-COUNT-001", 50),
         _obs("mint-a", "X300", PRICE, 1.0),
+        _obs("mint-a", "Y1800", "FIELD-HOLDER-COUNT-001", 50),
+        _obs("mint-a", "Y3600", "FIELD-HOLDER-COUNT-001", 50),
         _obs("mint-a", "Y1800", LIQ, 1000.0),
         _obs("mint-a", "Y1800", PRICE, 1.2),
         _obs("mint-a", "Y3600", LIQ, 900.0),
@@ -152,6 +155,10 @@ def _operation(spec: dict, *, completion: str, cap_main: int, parent: str | None
 
 
 def _cli(store: Path, *args: str) -> dict:
+    if "discovery-execute" in args or "discovery-preview" in args:
+        from tests.test_hfic_cli import _activate_neutral_universe
+
+        _activate_neutral_universe(store)
     completed = subprocess.run(
         [sys.executable, "-B", str(ROOT / "scripts" / "hypothesis_forge.py"), "--root", str(ROOT), *args],
         cwd=ROOT,

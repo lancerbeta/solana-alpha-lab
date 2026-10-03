@@ -1810,6 +1810,45 @@ def _control_bound_visible_cohort_ids(data_root: Path) -> list[str]:
     return ids
 
 
+def _packet_active_universe(store: Any) -> dict[str, Any]:
+    """Active market-scale profile for Prompt A. History stays readable either way."""
+
+    from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        UniversePolicyError,
+        effective_policy,
+    )
+
+    try:
+        head = effective_policy(store)
+    except UniversePolicyError as exc:
+        return {
+            "state": "UNREADABLE",
+            "semantic_sha256": None,
+            "min_holders": None,
+            "min_liquidity_usd": None,
+            "effective_population": "NEW_SYNTHESIS_BLOCKED_HISTORY_READABLE",
+            "blocker": exc.code,
+        }
+    if head.get("state") != "ACTIVE" or not isinstance(head.get("definition"), dict):
+        return {
+            "state": "ABSENT",
+            "semantic_sha256": None,
+            "min_holders": None,
+            "min_liquidity_usd": None,
+            "effective_population": "NEW_SYNTHESIS_BLOCKED_UNTIL_PREVIEW_APPLY",
+            "blocker": "UNIVERSE_POLICY_REQUIRED",
+        }
+    definition = head["definition"]
+    return {
+        "state": "ACTIVE",
+        "semantic_sha256": head.get("semantic_sha256"),
+        "min_holders": definition.get("min_holders"),
+        "min_liquidity_usd": definition.get("min_liquidity_usd"),
+        "effective_population": "PASS_AT_DECISION_TIME_INSIDE_BASE_X",
+        "blocker": None,
+    }
+
+
 def build_forge_context_packet(
     repo_root: Path,
     data_root: Path,
@@ -2125,6 +2164,7 @@ def build_forge_context_packet(
             ),
         },
     }
+    packet["universe_policy"] = _packet_active_universe(store)
     from solana_alpha_lab.factory.hfic_grounded_discovery import (
         descriptive_return_readout,
         list_discovery_looks,

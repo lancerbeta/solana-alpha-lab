@@ -26,6 +26,7 @@ from tests.test_hfic_temporal_discovery_v1 import (  # noqa: E402
     _binding,
     _census,
     _explicit_cost,
+    _obs,
     _path,
     _spec,
 )
@@ -41,6 +42,7 @@ def _sha256_file(path: Path) -> str:
 def _write_partition(directory: Path) -> tuple[Path, Path, list[dict]]:
     census = [_census("cost-mint")]
     observations = _path("cost-mint", [1.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92)
+    observations.append(_obs("cost-mint", "Y3600", "FIELD-HOLDER-COUNT-001", 50))
     census_path = directory / "census.parquet"
     observations_path = directory / "observations.parquet"
     pq.write_table(pa.Table.from_pylist(census), census_path)

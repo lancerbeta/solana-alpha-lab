@@ -1769,7 +1769,7 @@ lane_classifier_terminal_or_none
 
 ## Research universe
 
-Живые минимумы holders и liquidity лежат в ResearchStore. Этот файл их не хранит. Пока профиля нет, `discovery-execute` отвечает `UNIVERSE_POLICY_REQUIRED` и не ищет по неотфильтрованному BASE_X.
+Живые минимумы holders и liquidity лежат в ResearchStore. Этот файл их не хранит. Активный снимок (`semantic_sha256`, минимумы и смысл популяции) всегда входит в `FORGE_CONTEXT_PACKET` до Prompt A. Пока профиля нет или он повреждён, новый synthesis не runnable: `forge_runnable=false` и типизированный blocker. Уже сохранённый result, replay и recovery читаются без сегодняшнего профиля. Новый look без профиля отвечает `UNIVERSE_POLICY_REQUIRED` и не ищет по неотфильтрованному BASE_X.
 
 Сохраните stdout preview целиком в файл и передайте его в apply. Подтверждение активного профиля — отдельный status, не ответ apply.
 

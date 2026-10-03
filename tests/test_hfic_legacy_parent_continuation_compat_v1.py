@@ -162,6 +162,9 @@ class LegacyParentContinuationCompatTests(TestCase):
         from solana_alpha_lab.factory.hfic_grounded_discovery import (
             run_recorded_discovery_query,
         )
+        from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+
+        ensure_profile(store, repo_root=ROOT, min_holders=0, min_liquidity_usd=0)
 
         rows = SnapshotTargetTests()._rows_legal()
         census = [_census()]
