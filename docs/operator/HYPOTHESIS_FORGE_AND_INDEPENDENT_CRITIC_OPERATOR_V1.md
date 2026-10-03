@@ -1769,12 +1769,14 @@ lane_classifier_terminal_or_none
 
 ## Research universe
 
-Новые запуски Кузни берут активный профиль holders/liquidity из ResearchStore, не из этого файла. Пока профиля нет, `discovery-execute` останавливается с `UNIVERSE_POLICY_REQUIRED` и не ищет по неотфильтрованному BASE_X. Смена 5000 → 20000 — тот же путь, без PR:
+Живые минимумы holders и liquidity лежат в ResearchStore. Этот файл их не хранит. Пока профиля нет, `discovery-execute` отвечает `UNIVERSE_POLICY_REQUIRED` и не ищет по неотфильтрованному BASE_X.
+
+Сохраните stdout preview целиком в файл и передайте его в apply. Подтверждение активного профиля — отдельный status, не ответ apply.
 
 ```text
-universe-policy-status
-universe-policy-preview --min-holders 50 --min-liquidity-usd 5000 --decision-point Y900
-universe-policy-apply --proposal <preview.json> --confirm-append-only
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <DATA_ROOT> universe-policy-preview --min-holders 50 --min-liquidity-usd 5000 --decision-point Y900 --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <DATA_ROOT> universe-policy-apply --proposal proposal.json --confirm-append-only --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <DATA_ROOT> universe-policy-status --format json
 ```
 
-Preview не читает будущий outcome. Apply при открытой Forge operation не пишет ничего. Повтор того же apply — readback без новой активации. Уже сохранённый result хранит свой semantic hash; replay рецепта не подменяет его текущим профилем. Это настройка популяции, не MAIN и не смена стратегии.
+Preview показывает before/after, `claim_boundary` и `next_action`. С `--decision-point` он считает PASS/FAIL/UNKNOWN и не читает будущий outcome. Без `--confirm-append-only` apply возвращает `UNIVERSE_POLICY_CONFIRM_REQUIRED` и ничего не пишет. Устаревший proposal — `UNIVERSE_POLICY_PREVIEW_STALE`: повторите preview, не чините файл. Открытая Forge operation — `UNIVERSE_POLICY_PENDING_OPERATION`: закончите или остановите её, затем снова preview, потому что digest store уже другой. Повтор тех же значений — `NO_CHANGE`. Смена 5000 на 20000 — те же три команды, без PR. Уже сохранённый result хранит свой semantic hash; replay рецепта не подменяет его текущим профилем. Это настройка популяции, не MAIN и не смена стратегии.

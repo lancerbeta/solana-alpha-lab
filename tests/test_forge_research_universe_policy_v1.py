@@ -244,9 +244,20 @@ class UniversePolicyTests(unittest.TestCase):
             self.assertNotEqual(widened["semantic_sha256"], status["semantic_sha256"])
             stored = run_registered_fixed_time_proxy(
                 root=ROOT, registry_path=ROOT / "configs/experiment_capability_registry_v2.yaml",
-                recipe=result["experiment_recipe"], data_root=data_root,
+                recipe=result["experiment_recipe"], data_root=quiet,
             )
+            live = json.loads(run_cli("universe-policy-status", "--format", "json", data_root=quiet).stdout)
+            self.assertEqual(live["min_liquidity_usd"], "20000")
             self.assertEqual(stored["summary"]["universe_policy"]["min_liquidity_usd"], "5000")
+            from solana_alpha_lab.factory.hfic_grounded_discovery import format_discovery_readout
+
+            readout = format_discovery_readout(evidence)
+            self.assertEqual(readout["universe_policy"]["semantic_sha256"], status["semantic_sha256"])
+            self.assertLessEqual(result["baseline"]["observed_n"], result["universe_policy"]["n_pass"])
+            self.assertEqual(
+                result["universe_policy"]["n_pass"] + result["universe_policy"]["n_fail"] + result["universe_policy"]["n_unknown"],
+                result["universe_policy"]["n_base"],
+            )
             self.assertEqual(semantic_sha256(result["experiment_recipe"]["universe_policy"]), status["semantic_sha256"])
 
     def test_zero_is_not_missing_and_fail_beats_unknown(self) -> None:
