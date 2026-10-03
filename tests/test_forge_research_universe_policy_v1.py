@@ -194,6 +194,8 @@ class UniversePolicyTests(unittest.TestCase):
             self.assertEqual(status["min_holders"], "50")
             self.assertEqual(status["min_liquidity_usd"], "5000")
             self.assertEqual(status["semantic_sha256"], applied["semantic_sha256"])
+            open_root = workspace / "open-run"
+            shutil.copytree(data_root, open_root)
             executed = run_cli(
                 "discovery-execute", "--store", str(data_root), "--spec", str(spec_path),
                 "--candidate-scope", str(scope_path), "--journal-scope", journal,
@@ -223,19 +225,35 @@ class UniversePolicyTests(unittest.TestCase):
                 )
             self.assertIn("UNIVERSE_POLICY_BINDING_MISMATCH", str(mismatch.exception))
             self.assertEqual(evidence.get("ordinary_operation"), "PAUSED_CAP", evidence.get("ordinary_operation"))
+            blocked_status = json.loads(run_cli("universe-policy-status", "--format", "json", data_root=blocked_root).stdout)
+            self.assertFalse(blocked_status["pending_operation"])
+            open_op = workspace / "open-op.json"
+            open_op.write_text(json.dumps(_operation(
+                spec, focus=FOCUS, journal=journal, market=market,
+                text="Synthetic open run keeps the profile frozen",
+                cap={"main": None, "adaptive": None, "preview": None},
+            )), encoding="utf-8")
+            opened = run_cli(
+                "discovery-execute", "--store", str(open_root), "--spec", str(spec_path),
+                "--candidate-scope", str(scope_path), "--journal-scope", journal,
+                "--operation", str(open_op), "--format", "json", data_root=open_root,
+            )
+            self.assertEqual(opened.returncode, 0, opened.stdout + opened.stderr)
+            self.assertEqual(json.loads(opened.stdout).get("ordinary_operation"), "OPEN")
             pending_preview = run_cli(
                 "universe-policy-preview", "--min-holders", "50", "--min-liquidity-usd", "20000",
-                "--decision-point", "Y900", "--format", "json", data_root=blocked_root,
+                "--decision-point", "Y900", "--format", "json", data_root=open_root,
             )
             self.assertEqual(pending_preview.returncode, 0, pending_preview.stdout + pending_preview.stderr)
             pending_path = workspace / "pending-20k.json"
             pending_path.write_text(json.dumps(json.loads(pending_preview.stdout)["proposal"]), encoding="utf-8")
             refused = run_cli(
                 "universe-policy-apply", "--proposal", str(pending_path), "--confirm-append-only",
-                "--format", "json", data_root=blocked_root,
+                "--format", "json", data_root=open_root,
             )
             self.assertNotEqual(refused.returncode, 0)
             self.assertIn("UNIVERSE_POLICY_PENDING_OPERATION", refused.stdout + refused.stderr)
+            self.assertIn("FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW", refused.stdout)
             prompt = run_cli("preflight", "--discovery-contract", "--owner-focus", FOCUS, "--format", "json", data_root=data_root)
             self.assertEqual(prompt.returncode, 0, prompt.stdout + prompt.stderr)
             prompt_receipt = json.loads(prompt.stdout)

@@ -1268,6 +1268,20 @@ def cmd_discovery_execute(
             )
         op_store = ResearchStore(store_root)
         try:
+            if correction is None:
+                from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
+
+                if effective_policy(op_store).get("state") != "ACTIVE":
+                    return emit(
+                        {
+                            "reason_code": "UNIVERSE_POLICY_REQUIRED",
+                            "values_loaded": False,
+                            "writes": False,
+                            "scientific_negative": False,
+                            "next_action": "PREVIEW_THEN_AUTHORIZED_APPLY",
+                        },
+                        exit_code=2,
+                    )
             if operation_path is not None:
                 request = preview_request
                 if not isinstance(request, dict):
@@ -1937,8 +1951,17 @@ def cmd_universe_policy_apply(
             confirm_append_only=confirm_append_only,
         )
     except UniversePolicyError as exc:
+        next_action = {
+            "UNIVERSE_POLICY_PENDING_OPERATION": "FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW",
+            "UNIVERSE_POLICY_PREVIEW_STALE": "REPEAT_PREVIEW",
+            "UNIVERSE_POLICY_CONFIRM_REQUIRED": "RETRY_APPLY_WITH_CONFIRM_APPEND_ONLY",
+        }.get(exc.code, "READ_UNIVERSE_POLICY_STATUS")
         return emit(
-            {"reason_code": exc.code, "writes": {"research_store": 0}},
+            {
+                "reason_code": exc.code,
+                "next_action": next_action,
+                "writes": {"research_store": 0},
+            },
             exit_code=2,
         )
     _assert_no_path_leak(payload, str(data_root), str(repo_root))

@@ -262,6 +262,12 @@ def _deny_exhausted_preview(store: Any) -> None:
 def status_payload(store: Any) -> dict[str, Any]:
     head = effective_policy(store)
     definition = head.get("definition") or {}
+    pending = bool(_open_operations(store))
+    next_action = (
+        "FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW"
+        if pending
+        else head["next_action"]
+    )
     return {
         "action": "UNIVERSE_POLICY_STATUS",
         "state": head["state"],
@@ -272,7 +278,8 @@ def status_payload(store: Any) -> dict[str, Any]:
         "semantic_sha256": head.get("semantic_sha256"),
         "policy_head_sha256": head["policy_head_sha256"],
         "policy_sequence": head["policy_sequence"],
-        "next_action": head["next_action"],
+        "pending_operation": pending,
+        "next_action": next_action,
         "claim_boundary": "Thresholds are owner market-scale settings, not a return result and not strategy promotion.",
         "authority": _authority_zero(),
         "writes": {"research_store": 0},
