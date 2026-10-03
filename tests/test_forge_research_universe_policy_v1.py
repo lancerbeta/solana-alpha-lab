@@ -327,6 +327,11 @@ class UniversePolicyTests(unittest.TestCase):
             self.assertTrue(adapted_body["queries"][0]["new_look"])
             self.assertEqual(adapted_body["scientific_look_delta"]["main"], 0)
             self.assertEqual(adapted_body["result"]["universe_policy"]["min_liquidity_usd"], "20000")
+            self.assertEqual(adapted_body["result"]["universe_policy"]["n_pass"], 0)
+            self.assertLessEqual(
+                adapted_body["result"]["matched_n"],
+                adapted_body["result"]["universe_policy"]["n_pass"],
+            )
             self.assertNotEqual(adapted_body["result_refs"], evidence["result_refs"])
             stored = run_registered_fixed_time_proxy(
                 root=ROOT, registry_path=ROOT / "configs/experiment_capability_registry_v2.yaml",
