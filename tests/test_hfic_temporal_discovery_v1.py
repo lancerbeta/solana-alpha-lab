@@ -532,10 +532,24 @@ class TemporalArithmeticTests(unittest.TestCase):
         self.assertEqual(compound["look_class"], "MAIN")
         self.assertEqual(compound["compound_main_count"], 1)
         census = [_census("a")]
-        observations = _path("a", [1.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92)
+        observations = _path("a", [1.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92) + [
+            _obs("a", "Y3600", "FIELD-HOLDER-COUNT-001", 50)
+        ]
         spec = _spec()
         with tempfile.TemporaryDirectory() as raw:
             store = ResearchStore(Path(raw))
+            from solana_alpha_lab.factory.hfic_research_universe_policy import (
+                apply_universe_policy,
+                preview_universe_policy,
+            )
+
+            preview = preview_universe_policy(store, min_holders=0, min_liquidity_usd=0)
+            apply_universe_policy(
+                store,
+                repo_root=Path(__file__).resolve().parents[1],
+                proposal=preview["proposal"],
+                confirm_append_only=True,
+            )
             clock = datetime(2026, 9, 27, tzinfo=UTC)
             opened = run_recorded_discovery_query(
                 store,

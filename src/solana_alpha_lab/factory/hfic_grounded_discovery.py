@@ -1244,6 +1244,8 @@ def execute_discovery_from_rows(
     observations: Sequence[Mapping[str, Any]],
     spec: Mapping[str, Any],
     binding: Sequence[Mapping[str, Any]],
+    *,
+    universe_policy: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Compute BASE_X, PIT features and a later target from production-shaped rows.
 
@@ -1254,7 +1256,11 @@ def execute_discovery_from_rows(
     if _is_temporal_query(spec):
         from solana_alpha_lab.factory.hfic_temporal_discovery import execute_temporal_discovery
 
-        return execute_temporal_discovery(census, observations, spec, binding)
+        return execute_temporal_discovery(
+            census, observations, spec, binding, universe_policy=universe_policy
+        )
+    if universe_policy is not None:
+        raise GroundedDiscoveryError("UNIVERSE_POLICY_REPRESENTATION_UNSUPPORTED")
     bound_spec = validate_query_spec(spec)
     for item in binding:
         if "holdout" not in item:
@@ -1817,6 +1823,12 @@ def run_recorded_discovery_query(
         raise GroundedDiscoveryError("CALCULATION_REVISION_UNSUPPORTED")
     replayed = None
     source_look: Mapping[str, Any] | None = None
+    from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        admitted_with_policy,
+        effective_policy,
+    )
+
+    policy_definition = effective_policy(store).get("definition")
     if _is_temporal_query(spec):
         from solana_alpha_lab.factory.hfic_temporal_discovery import (
             TEMPORAL_CALCULATION_VERSION,
@@ -1829,7 +1841,7 @@ def run_recorded_discovery_query(
         )
 
         prevalidated = validate_temporal_query(spec)
-        admitted_meta = admit_discovery_binding(binding)
+        admitted_meta = admitted_with_policy(admit_discovery_binding(binding), policy_definition)
         pre_binding_sha = data_binding_sha256(admitted_meta, census, observations)
         journal_looks = list_discovery_looks(store, journal_scope)
         same_question = [
@@ -1887,7 +1899,18 @@ def run_recorded_discovery_query(
                     search_tier=str(prevalidated["search_tier"]),
                     git_sha=git_sha,
                 )
-        computed = execute_discovery_from_rows(census, observations, spec, binding)
+        revising_legacy = source_look is not None and not isinstance(
+            (source_look.get("result") or {}).get("universe_policy"), Mapping
+        )
+        if policy_definition is None and not revising_legacy:
+            raise GroundedDiscoveryError("UNIVERSE_POLICY_REQUIRED")
+        computed = execute_discovery_from_rows(
+            census,
+            observations,
+            spec,
+            binding,
+            universe_policy=None if revising_legacy else policy_definition,
+        )
         if source_look is not None:
             recipe = computed["summary"].get("experiment_recipe") or {}
             stored_recipe = source_look["result"].get("experiment_recipe") or {}
@@ -1904,7 +1927,7 @@ def run_recorded_discovery_query(
             assert_downside_revision_preserves_v4(source_look["result"], computed["summary"])
     else:
         computed = {
-            "admitted": admit_discovery_binding(binding),
+            "admitted": admitted_meta,
             "summary": replayed["result"],
             "members_projected": 0,
             "replayed_without_evaluator": True,

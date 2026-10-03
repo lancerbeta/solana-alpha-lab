@@ -125,6 +125,7 @@ def _publish(
     with_schedule: bool = True,
     snapshot_transport: str | None = None,
     exit_price: str = "1.44",
+    activate_universe: bool = True,
 ) -> None:
     data_root.mkdir(parents=True, exist_ok=True)
     admission = CAMPAIGN_STARTS + timedelta(days=7 * week)
@@ -162,6 +163,7 @@ def _publish(
                 _timed("MintW0A", "X300", LIQUIDITY, "10000", admission),
                 _timed("MintW0A", "Y1800", LIQUIDITY, "10000", admission),
                 _timed("MintW0A", "Y3600", LIQUIDITY, "9000", admission),
+                _timed("MintW0A", "Y3600", "FIELD-HOLDER-COUNT-001", "50", admission),
             ]
         )
     if snapshot_transport in {"new", "legacy"}:
@@ -201,6 +203,22 @@ def _publish(
             now=as_of,
             producer_git_sha=PRODUCER,
             activation_id=ACTIVATION,
+        )
+    from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        apply_universe_policy,
+        effective_policy,
+        preview_universe_policy,
+    )
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    store = ResearchStore(data_root)
+    if activate_universe and effective_policy(store)["state"] != "ACTIVE":
+        preview = preview_universe_policy(store, min_holders=0, min_liquidity_usd=0)
+        apply_universe_policy(
+            store,
+            repo_root=ROOT,
+            proposal=preview["proposal"],
+            confirm_append_only=True,
         )
 
 
