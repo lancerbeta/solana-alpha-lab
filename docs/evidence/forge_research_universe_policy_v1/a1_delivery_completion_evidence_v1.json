@@ -4,36 +4,13 @@
   "acceptance_id": "FORGE-RESEARCH-UNIVERSE-POLICY-COMPLETION-001",
   "as_of": "2026-10-04",
   "task_id": "FORGE_RESEARCH_UNIVERSE_POLICY_V1",
-  "state_change": "NEW_FORGE_RUNS_REQUIRE_AN_ACTIVE_RESEARCH_UNIVERSE_PROFILE_CHANGED_BY_PREVIEW_APPLY_READBACK_FROZEN_RECIPES_KEEP_THEIR_SNAPSHOT",
+  "state_change": "NEW_FORGE_RUNS_REQUIRE_AN_ACTIVE_RESEARCH_UNIVERSE_PROFILE_VISIBLE_IN_FORGE_CONTEXT_PACKET_BEFORE_PROMPT_A_HISTORY_READABLE_WITHOUT_TODAYS_PROFILE_PUBLIC_COMMANDS_VERIFY_PUBLISHED_PARTITIONS_ONCE",
   "base_main": "0c472f5b24cd0257959c73c6b4cca9d19cef354d",
   "capability_radar_now": "NONE",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "implementation_bindings": {
-    ".agents/skills/hypothesis-forge/SKILL.md": "85bf0632dfcb83769255fc61f0193a6ab457d5dc783256e202e020a0445b8483",
-    "catalog/assets/core.yaml": "a2911bf546d9a2758e327ff96437780909fa11d299bf45cce9fe7daa71d8d128",
-    "catalog/schemas/forge_research_universe_policy_v1.schema.json": "f0670595dd35b1bf72eda4740d61cb81d00ca6fe5b2520edc0f778e4ae5e743f",
-    "docs/contracts/forge_research_universe_policy_v1.md": "373a5006007340d827b07ae1e03f2eaa1ef443635beef938b2fa5c23a65ffeb0",
-    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "a2f66a0d72dd5d7b331a357a96634e356b301420400cbe4201362eab132cd556",
-    "docs/reports/forge_research_universe_policy_v1/a1_owner_readout_v1.md": "4b5167fb7052e991dd842a7043a4635722f960a0962a67e7a2c9a15d4a85be83",
-    "docs/tasks/FORGE_RESEARCH_UNIVERSE_POLICY_V1.md": "d06febaa58c792b16dc15f45647e0218d822fbe7016c5581f5c64618867ae763",
-    "scripts/hypothesis_forge.py": "8c283bf819018e6760d48713ae67c91aaa91b3a0cca9abf669a4de1efbf4643e",
-    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "d5c0ccb5bc15fd38752863fd5cb17bfebc050ab40d548278656e8767d89f8be4",
-    "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "15319ffdda70a440ce19c431abf47982cfaf64a169ccce6f0823dc4ef7e50c66",
-    "src/solana_alpha_lab/factory/hfic_preflight.py": "327f843c9dd3eff3bd00291d9ba1a3af0160d9467430d3725e07fe685d39ea36",
-    "src/solana_alpha_lab/factory/hfic_research_universe_policy.py": "99d8701089dbf66cc38b3ba9d7dcfcb93c5db9d5a8cd59265a787f6683f49c79",
-    "src/solana_alpha_lab/factory/hfic_session.py": "c1b0ab81db3c14d71a2bee90dfcf7c32985d03f5c046a3fb6f65df7b22b15323",
-    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "39b532bca1fc1ee9e986ebcf0645c02991f93db9cb48346377740275a395a188",
-    "tests/test_forge_research_universe_policy_v1.py": "062f7a5874ad7dbbe471240a8c4cb62258b869354b2b43c8fb10b829195e19c7",
-    "tests/test_forge_runtime_discovery_binding_v1.py": "8b653890c6904bc1772472e1bc66cbd03149801129c1203571d454f2ec21608e",
-    "tests/test_forge_temporal_holder_point_feature_v1.py": "37175a23309b144f5475e2db80236def4bc5641d5cc82a80429cdcc0b8854be4",
-    "tests/test_hfic_grounded_discovery_v1.py": "8ab27bc34c1eedd0cf9b827e4c994d471fbb263cda48c62461cfe7d34a1cb147",
-    "tests/test_hfic_temporal_discovery_v1.py": "47c760defc7b32e4308ff28ba76fdec8bca9e495b8eb9d889f9ea0a484ba6bd7",
-    "tests/test_hfic_temporal_operability_repair_v1.py": "06fc9fa4dab3bea5d4d95a6cb9d64202394c3a9eb62d0810329c0e102bd6449f",
-    "tests/test_hfic_temporal_production_runner_v1.py": "e06750662fe32221c37476654ce406964f33142ad43d8f452971eb7d5e777dd1",
-    "tests/test_hfic_temporal_result_coherence_v1.py": "7409ada52c2d0b377e48b6c7dbc4c14023ade854680f190c8bfdee3fee9eacc1"
-  },
+  "implementation_bindings": {},
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -44,14 +21,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_research_universe_policy_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "f1461039e1e4fd54dc8fa2c4c7246902bad6b9ae1afc15c82a25040d7b996047",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FORGE_RESEARCH_UNIVERSE_POLICY_PUBLIC_PATH",
     "independent_review": {
       "path": "docs/evidence/forge_research_universe_policy_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "c5fb0ca46a429679c7f2b3221192f3bb441c4a494921cffc5f8f0a30e2fe97e1",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
@@ -60,7 +37,7 @@
       "PASS_DELIVERY_HARNESS_CHECK",
       "PASS_PUBLIC_OWNER_PATH",
       "PASS_CATALOG_SYNC",
-      "PASS_ISOLATED_QUADRUPLE_REVIEW"
+      "PASS_ISOLATED_QUADRUPLE_REVIEW_ON_41AC7F0D"
     ]
   },
   "non_claims": [
