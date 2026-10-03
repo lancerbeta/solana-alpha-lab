@@ -7,18 +7,18 @@
   "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "mode": "FULL_REVIEW",
-  "verdict": "PENDING",
+  "verdict": "PASS",
   "dimensions": {
     "mission": "Fixed downside readout reaches persisted/replay/Prompt A/Critic/owner within one named loop",
     "flexibility_and_history": "V1-V4 are readable as-is; closed coherent V4 gets one explicit source-bound append-only V5 revision",
-    "context_efficiency": "Inline matched/baseline, bounded detail prefix and explicit truncation, unchanged packet cap",
-    "research_truth": "PIT/sample/old numerics/spec/input/market and budget preserved; missing never zero risk",
+    "context_efficiency": "Matched/baseline comparison inline and persisted-projection-verified; bounded detail prefix with explicit truncation; unchanged cap. One primary native batch plus one explicitly dependent fixture regression, no hidden retries.",
+    "research_truth": "Independent numeric/PIT controls PASS; PIT/sample/old numerics/spec/input/market/budget preserved; missing not zero risk and source-bound historical assessment not transferred.",
     "owner_operability": "Exact correction/runbook/retry and source-bound frozen-verdict review advisory",
     "execution_to_cashflow": "No alpha or economics claim; separate baseline-policy falsifier remains an owner decision",
     "monitoring_and_recovery": "Ordinary crash replay lands once; correction before-append faults zero-write, after-append replay converges",
     "build_vs_buy": "One pure helper plus existing store/packet owners; no dependency or second transaction mechanism",
     "security": "Synthetic/disposable writes only; canonical data inputs read-only; no provider or next cohort",
-    "red_team": "Typed refusal on source/spec/input/numeric mismatch; no closed-slot grant, no automatic verdict"
+    "red_team": "Public source/spec/input/old-numeric rejection is zero-write; compact tamper refused by existing evidence gate and foreign descriptors detached; ordinary crash recovers once, closed revision never grants budget."
   },
   "capability_radar": {
     "now": "NONE",
