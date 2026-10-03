@@ -33,6 +33,7 @@ managed_write_set:
   - docs/PROJECT_MAP.md
   - docs/OPERATOR_NAVIGATION.md
   - docs/evidence/control/delivery_shadow_pin_aggregate_snapshot_v1/**
+  - docs/evidence/control/delivery_harness_acceptance_v1.json
 external_caps:
   network: false
   credentials: false

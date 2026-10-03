@@ -32,5 +32,14 @@ it changes the Catalog. Base-policy exception not used.
 `tests/test_preflight_shadow_pin_drift.py`: 16 tests OK (4 new: catalog registry, nav+manifest, product path still denies,
 exempt set equals harness_sync constants).
 
+## Second gate found in CI (different root cause)
+`test_acceptance_binds_final_implementation_and_non_claims` requires `delivery_harness_acceptance_v1.json`
+`implementation_bindings` to equal the current bytes of the harness itself. This is an intentional binding, not
+historical evidence (precedents 4c3136cb, d1c527eb). Owner decision: repin exactly three sha256 values
+(`scripts/delivery_harness.py`, SKILL.md, DELIVERY_HARNESS_PROTOCOL.md) in this PR; harness files are NOT made
+snapshot-only. The file is added to the task write set.
+
 ## Residuals
-No test locks the aggregate-target-missing skip; `./`-prefixed pins were never scanned (unchanged).
+- Exempted aggregate pins have no skip counter or audit (not fixed in this PR).
+- The second aggregate pin, task34a -> docs/OPERATOR_NAVIGATION.md, is closed by the same rule.
+- No test locks the aggregate-target-missing skip; `./`-prefixed pins were never scanned (unchanged).

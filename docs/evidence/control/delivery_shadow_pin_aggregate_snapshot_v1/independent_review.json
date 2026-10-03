@@ -15,7 +15,7 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Isolated read-only review of content_head=b418df808951dbf4b0ce6fca6df0af2dee4d64d8; final delta is the compact EVIDENCE.md summary only. No mutation.",
+        "Isolated read-only review of content_head=b418df808951dbf4b0ce6fca6df0af2dee4d64d8; later delta is the compact EVIDENCE.md summary plus a hash-only repin of three delivery_harness_acceptance_v1.json implementation_bindings (owner-approved) and its write-set entry, not re-reviewed. No mutation.",
         "No P0/P1. Exempt set matches harness_sync posix constants; skip precedes TARGET_MISSING lookup; non-aggregate pins keep DENY; 16 shadow-pin tests OK.",
         "P2 residual: no test locks the aggregate-target-missing skip; ./-prefixed pins were never scanned (unchanged)."
       ]
@@ -24,7 +24,7 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Isolated read-only review of content_head=b418df808951dbf4b0ce6fca6df0af2dee4d64d8; final delta is the compact EVIDENCE.md summary only. No mutation.",
+        "Isolated read-only review of content_head=b418df808951dbf4b0ce6fca6df0af2dee4d64d8; later delta is the compact EVIDENCE.md summary plus a hash-only repin of three delivery_harness_acceptance_v1.json implementation_bindings (owner-approved) and its write-set entry, not re-reviewed. No mutation.",
         "Drift let through: only an old historical snapshot sha no longer matching a live aggregate (previously a mechanically unsatisfiable DENY). Still caught: harness_sync.check_drift via preflight (scoped by changed paths) plus CI validate_ci --core-only; non-aggregate pins keep DENY; exemption is path-exact, not prefix/glob.",
         "What could pass tests and still hurt evidence honesty: an old acceptance claims aggregate bytes no longer at HEAD; now written snapshot-only policy, bytes stay in Git history. No PIT/estimand/cohort data path depends on these aggregates.",
         "P2 residual: exempt pins are skipped silently (no audit count)."
