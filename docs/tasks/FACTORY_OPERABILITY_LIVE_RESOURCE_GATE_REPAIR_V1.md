@@ -1,6 +1,6 @@
 ---
 task_id: FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
-task_version: "1.2"
+task_version: "1.3"
 status: READY
 as_of: "2026-10-03"
 owner: GOAL_OWNER
@@ -34,6 +34,7 @@ managed_write_set:
   - configs/factory_remote_ops/factory-operability-watch.service
   - configs/factory_remote_ops/factory-collector-owner-pulse.service
   - tests/test_factory_operability_live_resource_gate_repair_v1.py
+  - tests/test_factory_operability_bounded_call_diagnostics_v1.py
   - tests/operability_bounded_call_profile.py
   - .github/workflows/factory-operability-resource-proof.yml
   - .github/workflows/ci.yml

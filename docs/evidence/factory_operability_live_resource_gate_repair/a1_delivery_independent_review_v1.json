@@ -15,51 +15,34 @@
   "reviews": [
     {
       "role": "CODE_REVIEWER",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "ISOLATED_READ_ONLY: frozen HEAD/diff and all exact implementation SHA bindings verified.",
-        "Indexed diagnostics, packet-scoped proof reuse, old-writer rollback, typed cgroup capture and mandatory CI preserved.",
-        "First ordinary cycle while timer off; required non-PASS explicitly disables report timer; healthy no-incident watch does not require an uncreated message.",
-        "Exact-head Linux CI remains required; no live repair or merge authority.",
-        "Fresh source HEAD f4c83d9b062dd4d88dbc49d19ababccd5492dea6 and new base integration verified."
+        "Focused CI consumer fixture correction and updated source binding review pending; prior verdict is not claimed for changed candidate."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "ISOLATED_READ_ONLY: source HEAD f4c83d9b062dd4d88dbc49d19ababccd5492dea6 and evidence-only HEAD 890f61dce489087668368d80c22b7ff7f34af92d verified.",
-        "Completion base_main, implementation map, fit/review bindings and actual referenced SHA are consistent after main integration.",
-        "Vertical resource proof remains falsifiable; exact-head Linux cgroup CI required before readiness; no live acceptance.",
-        "No confirmed remaining DoD gap in candidate admission scope."
+        "Focused CI consumer fixture correction and updated source binding review pending; prior verdict is not claimed for changed candidate."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "ISOLATED_READ_ONLY; SEMANTIC_PREMISE PASS; frozen packet/diff and exact implementation bindings verified.",
-        "packet_fingerprint_sha256=776e2f3186b41c86bc549d04043fd2b992941f607444993330564dab29cee6cc",
-        "Python exact time, UNKNOWN/recovery and lifecycle availability semantics preserved; scientific member predecessor default retained.",
-        "Immutable verified reads are reused for one packet only; durable truth remains Parquet/manifests.",
-        "Stdlib same-cgroup kernel peak, InvocationID readback and safe commissioning boundary reviewed.",
-        "Tests can pass while live envelope, global scientific integrity or arbitrary timestamp anomalies remain unproven.",
-        "PACKET_INFORMATION_PATH; PROCESS_OBLIGATION; MODEL_DIVERSITY_UNPROVEN.",
-        "Exact base 3c6ee4aca8614e91238fabdae264f03c68269fea integration and fresh source HEAD f4c83d9b062dd4d88dbc49d19ababccd5492dea6 reviewed; baseline remains equivalent."
+        "Focused CI consumer fixture correction and updated source binding review pending; prior verdict is not claimed for changed candidate."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "ISOLATED_READ_ONLY: source HEAD f4c83d9b062dd4d88dbc49d19ababccd5492dea6, frozen diff and all 24 implementation bindings verified.",
-        "Canonical report templates and operator recovery path unchanged from previous PASS; base integration preserved consumer semantics.",
-        "First ordinary cycle with timer off, InvocationID-scoped resource readback and mandatory checks gate enablement.",
-        "No confirmed owner-operability gap; exact-head Linux CI and separate commissioning remain required."
+        "Focused CI consumer fixture correction and updated source binding review pending; prior verdict is not claimed for changed candidate."
       ]
     }
   ],
-  "verdict": "PASS",
+  "verdict": "NOT_READY",
   "non_claims": [
     "NO_MERGE_AUTHORITY",
     "MODEL_DIVERSITY_UNPROVEN",

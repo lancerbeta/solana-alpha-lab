@@ -24,9 +24,9 @@
     "inference": "Repeated immutable proof IO and a full call-table timestamp scan are measured hotspots; file-cache attribution is an inference, not a separately measured stage."
   },
   "focused_local_validation": {
-    "tests_collected": 143,
-    "tests_passed": 142,
-    "tests_skipped": 1,
+    "tests_collected": 78,
+    "tests_passed": 78,
+    "tests_skipped": 0,
     "cli_fixture_recent_rows": 128,
     "immutable_manifests": 19,
     "baseline_manifest_reads": 57,
@@ -37,7 +37,12 @@
     "repaired_old_member_payload_reads": 0,
     "baseline_timestamp_udf_evaluations": 1152,
     "local_os": "Windows",
-    "not_linux_cgroup_proof": true
+    "not_linux_cgroup_proof": true,
+    "test_modules": [
+      "tests/test_factory_operability_bounded_call_diagnostics_v1.py",
+      "tests/test_factory_operability_live_resource_gate_repair_v1.py",
+      "tests/test_ci.py"
+    ]
   },
   "mandatory_linux_regression": {
     "workflow": ".github/workflows/factory-operability-resource-proof.yml",

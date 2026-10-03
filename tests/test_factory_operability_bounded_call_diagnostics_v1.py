@@ -148,11 +148,14 @@ class BoundedCallTests(unittest.TestCase):
     def test_canary_readback_requires_peak_clocks_and_exact_success(self):
         fields = {'ActiveState': 'active', 'SubState': 'exited', 'Result': 'success',
                   'ExecMainStatus': '0', 'MemoryPeak': str(75 * 1024**2),
+                  'MemoryMax': str(768 * 1024**2), 'InvocationID': 'a' * 32,
                   'ExecMainStartTimestampMonotonic': '1000000', 'ExecMainExitTimestampMonotonic': '2700000'}
         cases = [(fields, 'PASS')]
-        for key in fields:
+        for key in fields.keys() - {'MemoryPeak'}:
             cases.append(({name: value for name, value in fields.items() if name != key}, 'UNKNOWN'))
-        cases += [(dict(fields, MemoryPeak=value), 'UNKNOWN') for value in ('', '0', 'infinity', str(2**64 - 1))]
+        cases.append(({name: value for name, value in fields.items() if name != 'MemoryPeak'}, 'PASS'))
+        cases += [(dict(fields, MemoryPeak=value), 'PASS') for value in ('', '0', 'infinity', '[not set]')]
+        cases.append((dict(fields, MemoryPeak=str(2**64 - 1)), 'UNKNOWN'))
         cases += [(dict(fields, MemoryPeak=str(512 * 1024**2)), 'BLOCKED'),
                   (dict(fields, ExecMainExitTimestampMonotonic='121000000'), 'BLOCKED'),
                   (dict(fields, ExecMainExitTimestampMonotonic='1000000'), 'UNKNOWN'),
@@ -162,10 +165,39 @@ class BoundedCallTests(unittest.TestCase):
         for values, expected in cases:
             with self.subTest(values=values):
                 completed = SimpleNamespace(returncode=0, stdout='\n'.join(f'{key}={value}' for key, value in values.items()))
-                with patch('subprocess.run', return_value=completed):
-                    exit_code, result = self.execute_runbook_code(code, ['factory-watch-canary-example.service'])
+                saved = {'cgroup_memory_peak_bytes': 75 * 1024**2,
+                         'cgroup_memory_max_bytes': 768 * 1024**2}
+                def run(command, **kwargs):
+                    if 'journalctl' in command:
+                        self.assertIn('_SYSTEMD_INVOCATION_ID=' + fields['InvocationID'], command)
+                        return SimpleNamespace(returncode=0, stdout=json.dumps(saved))
+                    return completed
+                with patch('subprocess.run', side_effect=run):
+                    exit_code, result = self.execute_runbook_code(code, ['factory-watch-canary-example.service', 'canary'])
                 self.assertEqual(exit_code, 0 if expected == 'PASS' else 2)
                 self.assertEqual(result['resource_state'], expected)
+
+    def test_canary_kernel_fallback_requires_unique_matching_numeric_evidence(self):
+        fields = {'ActiveState': 'active', 'SubState': 'exited', 'Result': 'success',
+                  'ExecMainStatus': '0', 'MemoryPeak': '[not set]',
+                  'MemoryMax': str(768 * 1024**2), 'InvocationID': 'a' * 32,
+                  'ExecMainStartTimestampMonotonic': '1000000', 'ExecMainExitTimestampMonotonic': '2700000'}
+        valid = {'cgroup_memory_peak_bytes': 75 * 1024**2, 'cgroup_memory_max_bytes': 768 * 1024**2}
+        cases = [([], 'UNKNOWN'), ([valid, valid], 'UNKNOWN'),
+                 ([dict(valid, cgroup_memory_peak_bytes=0)], 'UNKNOWN'),
+                 ([dict(valid, cgroup_memory_peak_bytes='75')], 'UNKNOWN'),
+                 ([dict(valid, cgroup_memory_max_bytes=1024 * 1024**2)], 'UNKNOWN'),
+                 ([dict(valid, cgroup_memory_peak_bytes=512 * 1024**2)], 'BLOCKED')]
+        code = self.runbook_code('resource_state')
+        for saved, expected in cases:
+            def run(command, **kwargs):
+                if 'journalctl' in command:
+                    return SimpleNamespace(returncode=0, stdout='\n'.join(json.dumps(value) for value in saved))
+                return SimpleNamespace(returncode=0, stdout='\n'.join(f'{key}={value}' for key, value in fields.items()))
+            with self.subTest(saved=saved), patch('subprocess.run', side_effect=run):
+                exit_code, result = self.execute_runbook_code(code, ['factory-watch-canary-example.service', 'canary'])
+            self.assertEqual(exit_code, 2)
+            self.assertEqual(result['resource_state'], expected)
 
     def test_canary_readback_unavailable_is_typed_unknown(self):
         code = self.runbook_code('resource_state')
