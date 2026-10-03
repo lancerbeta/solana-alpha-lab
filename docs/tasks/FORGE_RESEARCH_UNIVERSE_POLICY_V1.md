@@ -14,9 +14,9 @@ required_review_roles:
 - OWNER_UX_CRITIC
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 3d2f75dc442cf3010d84f306404fc7a107eb88a4
+  expected_base: 0c472f5b24cd0257959c73c6b4cca9d19cef354d
   expected_upstream: origin/main
-  expected_upstream_oid: 3d2f75dc442cf3010d84f306404fc7a107eb88a4
+  expected_upstream_oid: 0c472f5b24cd0257959c73c6b4cca9d19cef354d
   expected_branch: cursor/forge-research-universe-policy-v1
   dirty_mode: ALLOW_REPORTED
 objective: >-
@@ -251,8 +251,8 @@ activation history keeps every change.
 
 ## Entry
 
-Checked on this worktree, base `3d2f75dc442cf3010d84f306404fc7a107eb88a4`
-(`Merge pull request #370`). #368 remains an ancestor. The design note's
+Checked on this worktree, base `0c472f5b24cd0257959c73c6b4cca9d19cef354d`
+(`Merge pull request #371`). #370 and #368 remain ancestors. The design note's
 open-PR / pre-merge main `94b284534b6ad55a95002d51b9d04b4a5ced6bde` is stale.
 
 Semantic routes actually resolved, not treated as authority:
