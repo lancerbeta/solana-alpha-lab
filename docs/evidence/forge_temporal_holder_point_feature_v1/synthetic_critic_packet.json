@@ -4,7 +4,7 @@
     "git_mutation": 0,
     "provider_api_rpc_wss_calls": 0
   },
-  "capability_epoch_sha256": "482c208558316e4c49791e1fc0ed5d4300c6400f1dafd448e1db6a05d5612c0e",
+  "capability_epoch_sha256": "41a507533df4e26cd25049f7e960566c25ca607830bfd87b72b6bb379f7016e4",
   "evidence_epoch_sha256": "8eb4da36b395174df95ddaeb8bf0ed687b0a40411cc09b6ecb53204fe5397b12",
   "generated_at": "2026-08-25T00:00:00Z",
   "generator_prompt_version": "HFIC-V1.2",
@@ -360,7 +360,7 @@
       "scientific_identity": {
         "decision_timestamp": "Y900",
         "horizon_notional": "Y900 -> Y14400; PRICE_RELATIVE_PROXY; no executable notional",
-        "primary_x_family": "FIELD-HOLDER-COUNT-001 point_value Y900 >= 3",
+        "primary_x_family": "FIELD-HOLDER-COUNT-001 point_value Y900 >= 3.0",
         "primary_y": "PRICE_RELATIVE_PROXY Y900 -> Y14400",
         "target": "PRICE_RELATIVE_PROXY:Y900:Y14400:FIELD-USD-PRICE-001"
       },
@@ -742,7 +742,7 @@
           "scientific_identity": {
             "decision_timestamp": "Y900",
             "horizon_notional": "Y900 -> Y14400; PRICE_RELATIVE_PROXY; no executable notional",
-            "primary_x_family": "FIELD-HOLDER-COUNT-001 point_value Y900 >= 3",
+            "primary_x_family": "FIELD-HOLDER-COUNT-001 point_value Y900 >= 3.0",
             "primary_y": "PRICE_RELATIVE_PROXY Y900 -> Y14400",
             "target": "PRICE_RELATIVE_PROXY:Y900:Y14400:FIELD-USD-PRICE-001"
           },
@@ -1587,7 +1587,7 @@
     "CLOSED_FAMILY:CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY",
     "CLOSED_FAMILY:CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY"
   ],
-  "live_git_head": "fa5aced85b1cba6da3a45a96224e4108250be7e7",
+  "live_git_head": "21678a861ebfa65297b668e5bed4ea830ab99fdd",
   "market_evidence_epoch_sha256": "8eb4da36b395174df95ddaeb8bf0ed687b0a40411cc09b6ecb53204fe5397b12",
   "non_claims": [
     "NO_ALPHA",
@@ -1626,8 +1626,8 @@
     "max_records": 64,
     "schema": "smial.hfic-prior-memory-snapshot",
     "schema_version": "1.0",
-    "snapshot_sha256": "aad18ef320bbbdefcfb1a9243ea42ff1a2e528c38831d803eb571ac0891209e7",
-    "store_inventory_digest": "7d4562171fadb8bece34535702080a067a88658e87f904f8cd94d11d31146292"
+    "snapshot_sha256": "f772919162d1f07ff36e8536312bfbf434d23d7cce4d76a982d4d35f7a66cdc9",
+    "store_inventory_digest": "49895f89b82d11c95960e866c432e1824a9436f5a329699c2d2206bdf4a35795"
   },
   "prior_work_queries": [
     "QUERY-HFIC-EXACT-RELATED-PRIOR-001",
@@ -1646,19 +1646,19 @@
   },
   "research_memory_as_of": "2026-08-25T00:00:00Z",
   "selected_candidate": {
-    "actor_counterparty": "thin-liquidity mints versus later buyers",
+    "actor_counterparty": "BASE_X holders and later buyers; ownership concentration unmeasured",
     "alternative_world": "NOT_DECLARED_IN_DRAFT",
     "available_data_bindings": [],
-    "candidate_id": "HFIC-CAND-8B942DE0E858",
-    "cheapest_falsifier": "stratified MEU by PIT ratio bucket on offline panel",
+    "candidate_id": "HFIC-CAND-25D48833E3C5",
+    "cheapest_falsifier": "One separately authorized fixed holder Y900 >=3 PRICE_RELATIVE_PROXY Y900->Y14400 MAIN with frozen taxonomy.",
     "claim": "The fixed early holder group may have positive later price direction.",
     "claim_form": "CAUSAL",
     "confounders": [
       "NOT_DECLARED_IN_DRAFT"
     ],
     "decision_timestamp": "Y900",
-    "decision_unlocked": "whether liquidity-ratio lane is worth Fast Lane experiment",
-    "disconfirming_prediction": "Matched thick-liquidity cohort shows no MEU lift.",
+    "decision_unlocked": "Whether the exploratory fixed holder question merits a separately authorized new chronological OOS; no entry edge or promotion.",
+    "disconfirming_prediction": "Holder >=3 has no supported positive directional price contrast after descriptive activity decomposition.",
     "estimand": "price_relative_proxy",
     "execution_capacity_risks": [
       "NOT_DECLARED_IN_DRAFT"
@@ -1671,7 +1671,7 @@
           "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
         }
       ],
-      "context_packet_sha256": "72b115ee965bf9d0c9bc045eb3e1c65f42f0e3daa5190bda078f042bbab1f1e9",
+      "context_packet_sha256": "27fc1813e99ed750150c26fd6342100d158906143468f6623f8d0ab920a37d99",
       "feature_bindings": [],
       "terminal": "GROUNDED_WITH_GAPS",
       "unresolved_requirements": [
@@ -1679,23 +1679,23 @@
       ]
     },
     "horizon_notional": "Y900 -> Y14400; PRICE_RELATIVE_PROXY; no executable notional",
-    "mechanism": "Early holder state may mark participation; activity is a known confound.",
+    "mechanism": "Early holder state may mark participation; activity and price staleness are known confounds, causality unknown.",
     "missing_or_forward_only_data": [],
-    "nearest_prior_and_difference": "Uses PIT-ready ratio feature rather than historical reconstructible proxy.",
-    "negative_control": "matched mcap without thin liquidity",
+    "nearest_prior_and_difference": "Prior D2 on C1-C4 exposed activity/staleness confounding; this frozen >=3 holder question remains exploratory.",
+    "negative_control": "Known-holder <3 complement, only where additive subset derivation is valid; missing is excluded, no second look.",
     "pass_fail_inconclusive_semantics": "NOT_DECLARED_IN_DRAFT",
     "pit_leakage_survivorship_risks": [
       "NOT_DECLARED_IN_DRAFT"
     ],
     "population": "BASE_X",
-    "primary_x": "FIELD-HOLDER-COUNT-001 point_value Y900 >= 3",
+    "primary_x": "FIELD-HOLDER-COUNT-001 point_value Y900 >= 3.0",
     "primary_y": "PRICE_RELATIVE_PROXY Y900 -> Y14400",
     "proposed_method": "NOT_DECLARED_IN_DRAFT",
     "required_capability_ids": [
       "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
     ],
     "required_feature_ids": [],
-    "state_transition": "thin_liquidity -> exit_route_unavailable",
+    "state_transition": "Y900 holder state -> Y14400 relative price mark; association only",
     "unresolved_requirements": [
       "HOLDER_POINT_FEATURE_EXPLORATORY"
     ],

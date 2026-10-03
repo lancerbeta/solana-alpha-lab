@@ -2855,19 +2855,11 @@ def execute_temporal_discovery(
     }
 
 
-def build_feature_preview(
-    census: Sequence[Mapping[str, Any]],
-    observations: Sequence[Mapping[str, Any]],
-    spec: Mapping[str, Any],
-    binding: Sequence[Mapping[str, Any]],
-    *,
-    prior_preview_hashes: Sequence[str] = (),
-) -> dict[str, Any]:
-    """Feature-only preview. Target and survival labels are not computed."""
+def validate_feature_preview_spec(spec: Mapping[str, Any]) -> dict[str, Any]:
+    """Pure pre-values policy shared by the CLI and feature-only evaluator."""
 
     if isinstance(spec, Mapping) and "target" in spec:
         raise GroundedDiscoveryError("PREVIEW_FORBIDS_TARGET")
-    admitted = admit_discovery_binding(binding)
     decision = _require_mapping(spec.get("decision"), "DECISION_INVALID")
     decision_point = _point(decision.get("point_id"))
     schedule = _require_mapping(spec.get("schedule"), "SCHEDULE_INVALID")
@@ -2880,7 +2872,10 @@ def build_feature_preview(
     point_ids = [_point(item) for item in points]
     if any(POINT_OFFSET[item] > POINT_OFFSET[decision_point] for item in point_ids):
         raise GroundedDiscoveryError("FEATURE_AFTER_DECISION")
-    features = [_canonical_feature(_require_mapping(f, "FEATURE_INVALID")) for f in spec.get("features", [])]
+    features_in = spec.get("features", [])
+    if not isinstance(features_in, list):
+        raise GroundedDiscoveryError("FEATURE_INVALID")
+    features = [_canonical_feature(_require_mapping(f, "FEATURE_INVALID")) for f in features_in]
     if len(features) > MAX_FEATURES or len({f["name"] for f in features}) != len(features):
         raise GroundedDiscoveryError("FEATURE_INVALID")
     for feature in features:
@@ -2893,12 +2888,31 @@ def build_feature_preview(
     clock_policy = schedule.get("observation_clock_policy", OBSERVATION_CLOCK_EVENT_TIME_V1)
     if clock_policy not in OBSERVATION_CLOCK_POLICIES:
         raise GroundedDiscoveryError("OBSERVATION_CLOCK_POLICY_INVALID")
-    for item in binding:
-        for point in ["X300", *point_ids]:
-            _clock(item, point, lateness)
     seed = spec.get("seed")
     if not isinstance(seed, str) or not seed:
         raise GroundedDiscoveryError("PREVIEW_SEED_REQUIRED")
+    return {"decision_point": decision_point, "lateness": lateness, "point_ids": point_ids,
+            "features": features, "clock_policy": clock_policy, "seed": seed}
+
+
+def build_feature_preview(
+    census: Sequence[Mapping[str, Any]],
+    observations: Sequence[Mapping[str, Any]],
+    spec: Mapping[str, Any],
+    binding: Sequence[Mapping[str, Any]],
+    *,
+    prior_preview_hashes: Sequence[str] = (),
+) -> dict[str, Any]:
+    """Feature-only preview. Target and survival labels are not computed."""
+
+    checked = validate_feature_preview_spec(spec)
+    admitted = admit_discovery_binding(binding)
+    decision_point, lateness = checked["decision_point"], checked["lateness"]
+    point_ids, features = checked["point_ids"], checked["features"]
+    clock_policy, seed = checked["clock_policy"], checked["seed"]
+    for item in binding:
+        for point in ["X300", *point_ids]:
+            _clock(item, point, lateness)
     identity = _sha256(
         {
             "decision_point": decision_point,
@@ -3154,7 +3168,8 @@ def temporal_holder_claim_identity(result: Mapping[str, Any]) -> dict[str, str]:
         feature, predicate = features[0], predicates[0]
         symbol = {"gt": ">", "gte": ">=", "lt": "<", "lte": "<="}.get(predicate["op"])
         if symbol:
-            x = f"{feature['field_id']} point_value {feature['point']} {symbol} {predicate['value']:g}"
+            threshold = json.dumps(predicate["value"], allow_nan=False)
+            x = f"{feature['field_id']} point_value {feature['point']} {symbol} {threshold}"
     target = body["target"]
     horizon = f"{target['reference_point']} -> {target['exit_point']}"
     return {"primary_x_family": x, "primary_y": f"{target['kind']} {horizon}",

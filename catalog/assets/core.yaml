@@ -32288,7 +32288,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 7561d54b48aa22cca8e6f53901471f64f405b8db49d8568513a2b0777219540e}
+  integrity: {kind: sha256, sha256: 5bd39dbe1f3e7d84829132f9f08cc3be11bbcfe9fe0b71a05e0abecd5b2fdd8a}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37928,7 +37928,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: 82882f1da6e4c15b0dfb6421e066c77b7688c5a97d9fb0751f4eba0518ae88a0}
+  integrity: {kind: sha256, sha256: 392b413f07548599f117779fcbb96224fae16417e1f9b5d5de1d0c02860d1f5b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}
@@ -39464,7 +39464,7 @@ records:
   as_of: '2026-10-03'
   truth_owner: FORGE_TEMPORAL_HOLDER_POINT_FEATURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_temporal_holder_point_feature_v1.md', repository_path: docs/contracts/forge_temporal_holder_point_feature_v1.md}
-  integrity: {kind: sha256, sha256: 8c95c8c50bc940164a8974599c104d57391593968d4e36b5d1b72c47bfd71986}
+  integrity: {kind: sha256, sha256: 65921c5c351ffaa2caf755995901f68dfa7eb375793aa3ee00f68e2da49a2f13}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-TEMPORAL-DISCOVERY-001}

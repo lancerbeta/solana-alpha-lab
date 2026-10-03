@@ -74,6 +74,45 @@ def old_cases():
 
 
 class HolderPolicyTests(unittest.TestCase):
+    def test_numeric_card_labels_are_lossless_and_wrong_threshold_refuses(self):
+        from solana_alpha_lab.factory.hfic_session import _bind_selected_look, HficSessionError
+
+        census, observations = synthetic_rows()
+        identities = []
+        results = []
+        for threshold in (3, 3.0000001, 1000001, 1000002):
+            spec = holder_spec()
+            spec["all"][0]["value"] = threshold
+            result = execute_discovery_from_rows(census, observations, spec, _binding())["summary"]
+            results.append(result)
+            identities.append(temporal.temporal_holder_claim_identity(result))
+        self.assertEqual(len({identity["primary_x_family"] for identity in identities}), 4)
+        self.assertEqual((results[0]["matched_n"], results[1]["matched_n"]), (1, 0))
+        self.assertNotEqual(results[0]["spec_sha256"], results[1]["spec_sha256"])
+        with self.assertRaises(HficSessionError) as refusal:
+            _bind_selected_look({"result": results[1], "candidate_scope": identities[1]}, identities[0], store=None)
+        self.assertEqual(str(refusal.exception), "LOOK_SCOPE_CONTRADICTION")
+
+    def test_feature_only_cli_refuses_policy_before_loader(self):
+        from tests.test_hfic_ordinary_operation_acceptance_v1 import _forge
+
+        cli = _forge()
+        spec = {"decision": {"point_id": "Y900"}, "schedule": {"points": ["Y900"], "lateness_seconds": 300}, "seed": "negative-policy"}
+        bad_features = [
+            {"name": "h", "op": "ratio", "field_id": HOLDER, "numerator": "Y900", "denominator": "X300"},
+            {"name": "h", "op": "point_value", "field_id": HOLDER, "point": "Y1800"},
+        ]
+        with tempfile.TemporaryDirectory() as raw:
+            path = Path(raw) / "preview.json"
+            for feature, code in zip(bad_features, ("FEATURE_OP_UNSUPPORTED", "FEATURE_AFTER_DECISION")):
+                path.write_text(json.dumps({**spec, "features": [feature]}), encoding="utf-8")
+                with self.subTest(feature=feature), mock.patch("solana_alpha_lab.factory.hfic_grounded_discovery.load_admitted_partition_rows", side_effect=AssertionError("invalid preview loaded values")) as loader, contextlib.redirect_stderr(io.StringIO()) as output:
+                    status = cli.cmd_discovery_preview(ROOT, explicit_data_root=Path(raw), spec_path=path, binding_path=None,
+                        census_path=None, observations_path=None, cohort_partitions=None, prior_preview_hash=None)
+                self.assertEqual(status, 1)
+                self.assertIn(code, output.getvalue())
+                loader.assert_not_called()
+
     def test_holder_is_point_only_and_projection_is_query_local(self):
         self.assertIn(HOLDER, temporal.validate_temporal_query(holder_spec())["decision_fields"])
         self.assertNotIn(HOLDER, temporal.validate_temporal_query(_spec())["decision_fields"])
@@ -114,7 +153,7 @@ class HolderPolicyTests(unittest.TestCase):
 
     def test_old_frozen_specs_and_results_are_exact(self):
         for name, spec in old_cases().items():
-            golden = json.loads((ROOT / f"tests/fixtures/forge_holder_point_v1/old_{name}.json").read_text())
+            golden = json.loads((ROOT / f"tests/fixtures/forge_holder_point_v1/old_{name}.json").read_text(encoding="utf-8"))
             self.assertEqual(temporal.canonical_temporal_spec(spec), golden["canonical_spec"])
             self.assertEqual(temporal.validate_temporal_query(spec)["spec_sha256"], golden["spec_sha256"])
             result = execute_discovery_from_rows([_census("old")], _path("old", [1, 1.5, 2, 1.6], (10000, 9000), 1.92), spec, _binding())["summary"]
@@ -296,15 +335,26 @@ class HolderVerticalTests(unittest.TestCase):
             self.assertEqual(cold.returncode, 0, cold.stdout + cold.stderr)
             receipt = json.loads(cold.stdout)
             identity = temporal.temporal_holder_claim_identity(result)
-            self.assertEqual(identity["primary_x_family"], f"{HOLDER} point_value Y900 >= 3")
+            self.assertEqual(identity["primary_x_family"], f"{HOLDER} point_value Y900 >= 3.0")
             self.assertEqual(identity["primary_y"], "PRICE_RELATIVE_PROXY Y900 -> Y14400")
             prompt = receipt["forge_context_packet"]["grounded_readouts"][-1]
             self.assertEqual(prompt["descriptive_readout"]["scientific_identity"], identity)
-            source = json.loads((ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text())
+            source = json.loads((ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(encoding="utf-8"))
             card = {**source["candidates"][0], **scope, **identity,
+                    "label": "HOLDER-POINT-Y900-EXPLORATORY",
+                    "novelty_class": "REFORMULATION",
+                    "actor_counterparty": "BASE_X holders and later buyers; ownership concentration unmeasured",
+                    "state_transition": "Y900 holder state -> Y14400 relative price mark; association only",
                     "required_feature_ids": [], "unresolved_requirements": ["HOLDER_POINT_FEATURE_EXPLORATORY"],
                     "claim": "The fixed early holder group may have positive later price direction.",
-                    "mechanism": "Early holder state may mark participation; activity is a known confound.",
+                    "mechanism": "Early holder state may mark participation; activity and price staleness are known confounds, causality unknown.",
+                    "prior_work_refs": [],
+                    "material_difference_from_prior": "Prior D2 on C1-C4 exposed activity/staleness confounding; this frozen >=3 holder question remains exploratory.",
+                    "disconfirming_prediction": "Holder >=3 has no supported positive directional price contrast after descriptive activity decomposition.",
+                    "negative_control": "Known-holder <3 complement, only where additive subset derivation is valid; missing is excluded, no second look.",
+                    "cheapest_falsifier": "One separately authorized fixed holder Y900 >=3 PRICE_RELATIVE_PROXY Y900->Y14400 MAIN with frozen taxonomy.",
+                    "kill_if": ["PIT holder selection or lineage is invalid; return technical/inconclusive stop, never zero", "Frozen taxonomy finds no positive directional edge or activity-only association"],
+                    "decision_unlocked": "Whether the exploratory fixed holder question merits a separately authorized new chronological OOS; no entry edge or promotion.",
                     "required_capability_ids": [temporal.TEMPORAL_CAPABILITY_ID]}
             draft = bind_draft({**source, "owner_focus": FOCUS, "candidates": [card]}, receipt)
             draft.pop("runner_up_candidate_ref", None)
@@ -313,6 +363,8 @@ class HolderVerticalTests(unittest.TestCase):
             draft["grounded_evidence"] = evidence
             frozen = freeze_draft(draft, preflight_receipt=receipt, store=ResearchStore(data_root), repo_root=ROOT)
             packet = frozen["critic_input_packet"]
+            self.assertNotIn("MEU", json.dumps(packet["selected_candidate"]))
+            self.assertNotIn("liquidity", json.dumps(packet["selected_candidate"]).lower())
             self.assertEqual(packet["selected_candidate"]["primary_x"], identity["primary_x_family"])
             self.assertEqual(packet["selected_candidate"]["primary_y"], identity["primary_y"])
             self.assertEqual(packet["grounded_evidence"]["descriptive_readout"]["scientific_identity"], identity)

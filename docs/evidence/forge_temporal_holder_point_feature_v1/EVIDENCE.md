@@ -62,8 +62,15 @@ cells remain UNKNOWN. No fallback or new clock interpretation is introduced.
 "What predictable failure will the very first real holder MAIN hit that my
 synthetic/vertical proof did not exercise?"
 
-The two proven gaps were preview feature/target separation and feature/predicate
-binding to the selected card. Both are closed here. Validator, typed loader,
+The initial gaps were preview feature/target separation and feature/predicate
+binding to the selected card. Isolated review then found lossy numeric labels,
+feature-only preview validation after the loader, and inherited liquidity/MEU
+text in the holder fixture. All are closed in this atom: canonical float labels
+are lossless; one pure preview validator runs before the loader and is reused
+by the evaluator; the entire synthetic scientific card is holder-specific.
+Regression distinguishes >=3 from >=3.0000001, refuses the wrong card, requires
+zero loader calls for invalid previews and rejects MEU/liquidity fixture text.
+Validator, typed loader,
 mixed-point clocks, missingness/lineage, spec identity, ordinary cap/intent,
 interrupted reply/cold replay, V5, Prompt A, Critic, owner and registered consumer
 are exercised through existing owners. No holder-specific raw loader exists.

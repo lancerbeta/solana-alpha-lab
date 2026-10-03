@@ -341,7 +341,7 @@
     "scientific_identity": {
       "decision_timestamp": "Y900",
       "horizon_notional": "Y900 -> Y14400; PRICE_RELATIVE_PROXY; no executable notional",
-      "primary_x_family": "FIELD-HOLDER-COUNT-001 point_value Y900 >= 3",
+      "primary_x_family": "FIELD-HOLDER-COUNT-001 point_value Y900 >= 3.0",
       "primary_y": "PRICE_RELATIVE_PROXY Y900 -> Y14400",
       "target": "PRICE_RELATIVE_PROXY:Y900:Y14400:FIELD-USD-PRICE-001"
     },
@@ -721,7 +721,7 @@
         "scientific_identity": {
           "decision_timestamp": "Y900",
           "horizon_notional": "Y900 -> Y14400; PRICE_RELATIVE_PROXY; no executable notional",
-          "primary_x_family": "FIELD-HOLDER-COUNT-001 point_value Y900 >= 3",
+          "primary_x_family": "FIELD-HOLDER-COUNT-001 point_value Y900 >= 3.0",
           "primary_y": "PRICE_RELATIVE_PROXY Y900 -> Y14400",
           "target": "PRICE_RELATIVE_PROXY:Y900:Y14400:FIELD-USD-PRICE-001"
         },

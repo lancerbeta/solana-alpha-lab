@@ -1463,7 +1463,7 @@ def cmd_discovery_preview(
         GroundedDiscoveryError,
         load_admitted_partition_rows,
     )
-    from solana_alpha_lab.factory.hfic_temporal_discovery import build_feature_preview
+    from solana_alpha_lab.factory.hfic_temporal_discovery import build_feature_preview, validate_feature_preview_spec
 
     try:
         spec = json.loads(spec_path.read_text(encoding="utf-8"))
@@ -1645,15 +1645,8 @@ def cmd_discovery_preview(
                 points.update(feature.get("points") or [])
             preview_spec = {"decision": spec["decision"], "schedule": {**spec["schedule"], "points": sorted(points, key=POINT_OFFSET.get)},
                             "features": [f for f in body["features"] if f["op"] == "point_value"], "seed": spec.get("seed") or spec["query_id"]}
-        if "target" in preview_spec:
-            raise GroundedDiscoveryError("PREVIEW_FORBIDS_TARGET")
-        from solana_alpha_lab.factory.hfic_grounded_discovery import POINT_OFFSET
-        decision_point = preview_spec.get("decision", {}).get("point_id")
-        point_ids = preview_spec.get("schedule", {}).get("points")
-        if decision_point not in POINT_OFFSET or not isinstance(point_ids, list) or not point_ids:
-            raise GroundedDiscoveryError("SCHEDULE_INVALID")
-        if any(p not in POINT_OFFSET or POINT_OFFSET[p] > POINT_OFFSET[decision_point] for p in point_ids):
-            raise GroundedDiscoveryError("FEATURE_AFTER_DECISION")
+        checked_preview = validate_feature_preview_spec(preview_spec)
+        point_ids = checked_preview["point_ids"]
         loaded = load_admitted_partition_rows(
             data_root=explicit_data_root,
             binding_doc=binding_doc,

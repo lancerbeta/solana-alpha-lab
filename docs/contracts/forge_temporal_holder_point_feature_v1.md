@@ -32,7 +32,9 @@ from base `94b284534b6ad55a95002d51b9d04b4a5ced6bde`. Holder enters the
 
 The public `discovery-preview` accepts a full temporal query and derives a
 feature-only view. Its Arrow loader selects points at or before the decision;
-the target never enters the returned value rows. Optional point features are
+the target never enters the returned value rows. Full-query and feature-only
+forms share pre-values validation, so forbidden operators or future points
+cannot reach the loader. Optional point features are
 read through the common cell owner with explicit value/status pairs. A missing
 holder remains visible alongside a present price. Traditional previews retain
 their existing identity when optional features/policy are absent.
@@ -40,7 +42,8 @@ their existing identity when optional features/policy are absent.
 The immutable result recipe owns the scientific identity. For holder queries,
 `temporal_holder_claim_identity()` derives exact `primary_x_family`, `primary_y`,
 `horizon_notional`, decision and target labels from that recipe and verifies its
-digest. `descriptive_readout.scientific_identity` carries them through Prompt A,
+digest. Numeric thresholds use lossless canonical float text: `3.0` differs
+from `3.0000001`. `descriptive_readout.scientific_identity` carries them through Prompt A,
 Critic and owner projection. Selected cards must carry those exact machine
 labels; mismatch fails with `LOOK_SCOPE_CONTRADICTION`. This is a closed
 display/binding function, not an expression parser. Complex canonical recipes
