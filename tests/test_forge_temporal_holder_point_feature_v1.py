@@ -265,7 +265,8 @@ def publish_holder(workspace):
             mint = f"holder-w{week}-{i}"
             snapshot["members"].append({**template, "mint": mint, "candidate_state": "X_ELIGIBLE"})
             for point, field, value in (("X300", LIQ, 1000), ("X300", PRICE, 1), ("Y900", PRICE, 1),
-                                        ("Y900", HOLDER, holder), ("Y14400", PRICE, 1.2 if i == 0 else 1.0)):
+                                        ("Y900", LIQ, 10000), ("Y900", HOLDER, holder),
+                                        ("Y14400", PRICE, 1.2 if i == 0 else 1.0)):
                 item = _obs(mint, point, admission, missing=value is None)
                 offset = {"X300": 300, "Y900": 900, "Y14400": 14400}[point]
                 stamp = (anchor + timedelta(seconds=offset + runner.DOCUMENT_LATENESS)).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -282,6 +283,17 @@ def publish_holder(workspace):
     with mock.patch.object(runner, "_snapshot_for_week", side_effect=snapshot), mock.patch.object(runner, "_schedule", return_value=schedule):
         for week in range(4):
             runner._publish(data_root, workspace, week=week)
+    from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        apply_universe_policy,
+        effective_policy,
+        preview_universe_policy,
+    )
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    store = ResearchStore(data_root)
+    if effective_policy(store)["state"] != "ACTIVE":
+        proposal = preview_universe_policy(store, min_holders=0, min_liquidity_usd=0)["proposal"]
+        apply_universe_policy(store, repo_root=ROOT, proposal=proposal, confirm_append_only=True)
     return data_root
 
 
@@ -377,7 +389,8 @@ class HolderVerticalTests(unittest.TestCase):
             evidence = json.loads(completed.stdout)
             result = evidence["result"]
             self.assertEqual(result["matched_n"], 8)
-            self.assertEqual(result["feature_unknown_n"], 4)
+            self.assertEqual(result["feature_unknown_n"], 0)
+            self.assertEqual(result["universe_policy"]["n_unknown"], 4)
             self.assertEqual(result["downside"]["zero_n"], 4)
             self.assertEqual(len(result["by_cohort"]), 4)
             self.assertEqual(result["calculation_version"], temporal.TEMPORAL_CALCULATION_VERSION_V5)
@@ -439,7 +452,7 @@ class HolderVerticalTests(unittest.TestCase):
             self.assertEqual(packet["selected_candidate"]["claim_form"], "PREDICTIVE")
             for field in ("confounders", "negative_control", "pass_fail_inconclusive_semantics", "pit_leakage_survivorship_risks", "proposed_method"):
                 self.assertEqual(packet["selected_candidate"][field], card[field])
-            self.assertEqual(result["baseline"]["observed_n"] - result["observed_target_n"], 8)
+            self.assertEqual(result["baseline"]["observed_n"] - result["observed_target_n"], 4)
             self.assertNotIn("Known-holder <3", packet["selected_candidate"]["negative_control"])
             self.assertEqual(packet["selected_candidate"]["primary_x"], identity["primary_x_family"])
             self.assertEqual(packet["selected_candidate"]["primary_y"], identity["primary_y"])

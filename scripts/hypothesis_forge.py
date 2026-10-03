@@ -602,6 +602,17 @@ def cmd_preflight(
             + _preflight_writes_note(payload)
         )
     # Stamp and readout edits are inside the receipt hash.
+    try:
+        from solana_alpha_lab.factory.hfic_research_universe_policy import status_payload
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        payload["universe_policy"] = status_payload(ResearchStore(data_root, create_if_missing=False))
+    except Exception as exc:
+        payload["universe_policy"] = {
+            "state": "UNREADABLE",
+            "reason_code": getattr(exc, "code", None) or type(exc).__name__,
+            "next_action": "RESTORE_RESEARCH_STORE_THEN_READ_STATUS",
+        }
     payload["preflight_receipt_sha256"] = canonical_preflight_receipt_sha256(payload)
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     exit_code = 0 if receipt["action"] != "STOP" else 2
@@ -1663,12 +1674,35 @@ def cmd_discovery_preview(
             from solana_alpha_lab.factory.research_store import ResearchStore
 
             remembered = stored_preview_hashes(ResearchStore(store_root), journal_scope)
+        from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        policy_store = preview_store
+        if policy_store is None and explicit_data_root is not None:
+            policy_store = ResearchStore(explicit_data_root, create_if_missing=False)
+        if policy_store is None:
+            return emit(
+                {"reason_code": "UNIVERSE_POLICY_REQUIRED", "values_loaded": False, "writes": False},
+                exit_code=2,
+            )
+        policy_definition = effective_policy(policy_store).get("definition")
+        if policy_definition is None:
+            return emit(
+                {
+                    "reason_code": "UNIVERSE_POLICY_REQUIRED",
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                },
+                exit_code=2,
+            )
         payload = build_feature_preview(
             loaded["census"],
             loaded["observations"],
             preview_spec,
             loaded["cohorts"],
             prior_preview_hashes=remembered,
+            universe_policy=policy_definition,
         )
         if store_root is not None and journal_scope:
             from solana_alpha_lab.factory.hfic_temporal_discovery import persist_feature_preview
@@ -1803,6 +1837,110 @@ def cmd_memory_policy_apply(
         proposal=body,
         confirm_append_only=confirm_append_only,
     )
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_universe_policy_status(repo_root: Path, explicit_data_root: Path | None) -> int:
+    from solana_alpha_lab.factory.hfic_research_universe_policy import status_payload
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    payload = status_payload(store)
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_universe_policy_preview(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    min_holders: str,
+    min_liquidity_usd: str,
+    decision_point: str | None,
+) -> int:
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        load_admitted_partition_rows,
+    )
+    from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        UniversePolicyError,
+        preview_universe_policy,
+        profile_definition,
+    )
+    from solana_alpha_lab.factory.hfic_temporal_discovery import universe_population_counts
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    counts = None
+    if decision_point:
+        try:
+            definition = profile_definition(min_holders, min_liquidity_usd)
+            loaded = load_admitted_partition_rows(
+                data_root=data_root,
+                binding_doc=None,
+                partitions=None,
+                census_path=None,
+                observations_path=None,
+                observation_filters=[("point_id", "in", sorted({decision_point, "X300"}))],
+            )
+            counts = universe_population_counts(
+                loaded["census"],
+                loaded["observations"],
+                loaded["cohorts"],
+                decision_point=decision_point,
+                definition=definition,
+            )
+        except (GroundedDiscoveryError, UniversePolicyError) as exc:
+            return emit(
+                {"reason_code": exc.code, "values_loaded": False, "writes": {"research_store": 0}},
+                exit_code=2,
+            )
+    try:
+        payload = preview_universe_policy(
+            store,
+            min_holders=min_holders,
+            min_liquidity_usd=min_liquidity_usd,
+            counts=counts,
+        )
+    except UniversePolicyError as exc:
+        return emit(
+            {"reason_code": exc.code, "values_loaded": False, "writes": {"research_store": 0}},
+            exit_code=2,
+        )
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_universe_policy_apply(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    proposal_path: Path,
+    confirm_append_only: bool,
+) -> int:
+    from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        UniversePolicyError,
+        apply_universe_policy,
+    )
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    proposal = _load_json_file(proposal_path)
+    nested = proposal.get("proposal")
+    body = nested if isinstance(nested, dict) else proposal
+    try:
+        payload = apply_universe_policy(
+            store,
+            repo_root=repo_root,
+            proposal=body,
+            confirm_append_only=confirm_append_only,
+        )
+    except UniversePolicyError as exc:
+        return emit(
+            {"reason_code": exc.code, "writes": {"research_store": 0}},
+            exit_code=2,
+        )
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     return emit(payload)
 
@@ -3352,6 +3490,26 @@ def build_parser() -> argparse.ArgumentParser:
         help="required; appends policy only; never rewrites historical RDP bytes",
     )
     apply_cmd.add_argument("--format", choices=("json",), default="json")
+    universe_status = subparsers.add_parser(
+        "universe-policy-status",
+        help="read the active Forge research-universe profile from ResearchStore",
+    )
+    universe_status.add_argument("--format", choices=("json",), default="json")
+    universe_preview = subparsers.add_parser(
+        "universe-policy-preview",
+        help="preview holders and liquidity minima; optional decision-point counts do not read outcomes",
+    )
+    universe_preview.add_argument("--min-holders", required=True)
+    universe_preview.add_argument("--min-liquidity-usd", required=True)
+    universe_preview.add_argument("--decision-point", default=None)
+    universe_preview.add_argument("--format", choices=("json",), default="json")
+    universe_apply = subparsers.add_parser(
+        "universe-policy-apply",
+        help="append one authorized research-universe activation",
+    )
+    universe_apply.add_argument("--proposal", type=Path, required=True)
+    universe_apply.add_argument("--confirm-append-only", action="store_true")
+    universe_apply.add_argument("--format", choices=("json",), default="json")
     reopen_preview = subparsers.add_parser(
         "preview-reopened-prior-routing",
         help="read-only CONTROL reconsideration preview after planned legacy-prior commission and exact-session quarantine",
@@ -3684,6 +3842,23 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.command == "memory-policy-apply":
             return cmd_memory_policy_apply(
+                repo_root,
+                explicit_data_root=args.data_root,
+                proposal_path=args.proposal,
+                confirm_append_only=bool(args.confirm_append_only),
+            )
+        if args.command == "universe-policy-status":
+            return cmd_universe_policy_status(repo_root, args.data_root)
+        if args.command == "universe-policy-preview":
+            return cmd_universe_policy_preview(
+                repo_root,
+                explicit_data_root=args.data_root,
+                min_holders=str(args.min_holders),
+                min_liquidity_usd=str(args.min_liquidity_usd),
+                decision_point=args.decision_point,
+            )
+        if args.command == "universe-policy-apply":
+            return cmd_universe_policy_apply(
                 repo_root,
                 explicit_data_root=args.data_root,
                 proposal_path=args.proposal,

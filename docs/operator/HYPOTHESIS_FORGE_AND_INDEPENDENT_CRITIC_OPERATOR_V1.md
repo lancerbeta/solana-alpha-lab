@@ -1766,3 +1766,15 @@ lane_classifier_terminal_or_none
 ```
 
 Сам файл не является Git authority и не разрешает experiment/provider execution. Если этот процесс докажет повторяемую ценность и будет превращён в canonical capability, его schema, guards и deterministic stages должны пройти отдельный Promotion/Change Lane один раз; отдельные nightly hypotheses и runs остаются в Research Data Plane без PR/CI.
+
+## Research universe
+
+Новые запуски Кузни берут активный профиль holders/liquidity из ResearchStore, не из этого файла. Пока профиля нет, `discovery-execute` останавливается с `UNIVERSE_POLICY_REQUIRED` и не ищет по неотфильтрованному BASE_X. Смена 5000 → 20000 — тот же путь, без PR:
+
+```text
+universe-policy-status
+universe-policy-preview --min-holders 50 --min-liquidity-usd 5000 --decision-point Y900
+universe-policy-apply --proposal <preview.json> --confirm-append-only
+```
+
+Preview не читает будущий outcome. Apply при открытой Forge operation не пишет ничего. Повтор того же apply — readback без новой активации. Уже сохранённый result хранит свой semantic hash; replay рецепта не подменяет его текущим профилем. Это настройка популяции, не MAIN и не смена стратегии.

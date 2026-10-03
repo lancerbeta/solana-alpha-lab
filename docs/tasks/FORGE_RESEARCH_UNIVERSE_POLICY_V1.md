@@ -42,6 +42,9 @@ managed_write_set:
 - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
 - configs/hypothesis_forge_independent_critic_v1.yaml
 - tests/test_forge_research_universe_policy_v1.py
+- tests/test_hfic_temporal_discovery_v1.py
+- tests/test_hfic_temporal_production_runner_v1.py
+- tests/test_forge_temporal_holder_point_feature_v1.py
 - catalog/schemas/forge_research_universe_policy_v1.schema.json
 - catalog/assets/core.yaml
 - catalog/assets/lifecycle.yaml

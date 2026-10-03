@@ -2301,6 +2301,8 @@ def execute_temporal_discovery(
     observations: Sequence[Mapping[str, Any]],
     spec: Mapping[str, Any],
     binding: Sequence[Mapping[str, Any]],
+    *,
+    universe_policy: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Compute one temporal query. Binding is admitted before any value read."""
 
@@ -2476,7 +2478,35 @@ def execute_temporal_discovery(
                 in_base = True
         feature_values: dict[str, float | None] = {}
         decision_eligible = False
-        if in_base:
+        universe_status = None
+        universe_reasons: list[str] = []
+        search_base = in_base
+        if in_base and universe_policy is not None:
+            from solana_alpha_lab.factory.hfic_research_universe_policy import (
+                classify_universe_cells,
+            )
+
+            decision_due, _decision_late = _due_late(cohort, release, decision_point)
+            point_due = _due_moment(anchor, decision_due) if snapshot_policy else None
+            holder_cell = _cell(
+                grouped,
+                (cohort, release, mint, decision_point, HOLDER_COUNT),
+                decision_deadline,
+                snapshot_policy=snapshot_policy,
+                point_due_at=point_due,
+            )
+            liquidity_cell = _cell(
+                grouped,
+                (cohort, release, mint, decision_point, LIQUIDITY),
+                decision_deadline,
+                snapshot_policy=snapshot_policy,
+                point_due_at=point_due,
+            )
+            verdict = classify_universe_cells(holder_cell, liquidity_cell, universe_policy)
+            universe_status = str(verdict["status"])
+            universe_reasons = list(verdict["reasons"])
+            search_base = universe_status == "PASS"
+        if search_base:
             decision_due, _decision_late = _due_late(cohort, release, decision_point)
             decision_price = _cell(
                 grouped,
@@ -2525,7 +2555,7 @@ def execute_temporal_discovery(
         target_observed = False
         target_exclusion = None
         selected_source_event = "UNKNOWN"
-        if in_base and decision_deadline is not None:
+        if search_base and decision_deadline is not None:
             entry_at = decision_deadline + timedelta(
                 seconds=int(body["entry_model"]["assumed_latency_seconds"])
             )
@@ -2618,6 +2648,14 @@ def execute_temporal_discovery(
                 "source_price_event_time": selected_source_event,
                 "block": block,
                 "exclusion": exclusion,
+                **(
+                    {
+                        "universe_status": universe_status,
+                        "universe_reasons": universe_reasons,
+                    }
+                    if universe_policy is not None
+                    else {}
+                ),
             }
         )
         _note_cohort_membership(cohort_membership, cohort, identity, members[-1])
@@ -2840,6 +2878,25 @@ def execute_temporal_discovery(
             ),
         ],
     }
+    if universe_policy is not None:
+        from solana_alpha_lab.factory.hfic_research_universe_policy import snapshot
+
+        counted = [item for item in members if item.get("in_base")]
+        counts = {
+            status: sum(1 for item in counted if item.get("universe_status") == status)
+            for status in ("PASS", "FAIL", "UNKNOWN")
+        }
+        if sum(counts.values()) != len(counted):
+            raise GroundedDiscoveryError("UNIVERSE_POLICY_COUNT_MISMATCH")
+        bound_policy = snapshot(universe_policy)
+        summary["universe_policy"] = {
+            **bound_policy,
+            "n_base": len(counted),
+            "n_pass": counts["PASS"],
+            "n_fail": counts["FAIL"],
+            "n_unknown": counts["UNKNOWN"],
+        }
+        summary["experiment_recipe"]["universe_policy"] = bound_policy
     stop = snapshot_input_technical_stop(summary)
     if stop is not None:
         summary["technical_stop"] = stop
@@ -2848,8 +2905,10 @@ def execute_temporal_discovery(
         summary["reason_code"] = stop["reason_code"]
         summary["scientific_negative"] = False
     require_coherent_temporal_result(summary)
+    from solana_alpha_lab.factory.hfic_research_universe_policy import admitted_with_policy
+
     return {
-        "admitted": admitted,
+        "admitted": admitted_with_policy(admitted, universe_policy),
         "summary": summary,
         "members_projected": len(members),
     }
@@ -2897,6 +2956,75 @@ def validate_feature_preview_spec(spec: Mapping[str, Any]) -> dict[str, Any]:
             "features": features, "clock_policy": clock_policy, "seed": seed}
 
 
+def universe_population_counts(
+    census: Sequence[Mapping[str, Any]],
+    observations: Sequence[Mapping[str, Any]],
+    binding: Sequence[Mapping[str, Any]],
+    *,
+    decision_point: str,
+    definition: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Eligibility counts at one decision time. Does not read a future target."""
+
+    from solana_alpha_lab.factory.hfic_grounded_discovery import admit_discovery_binding
+    from solana_alpha_lab.factory.hfic_research_universe_policy import classify_universe_cells
+
+    point = _point(decision_point)
+    admitted = admit_discovery_binding(binding)
+    grouped = _grouped_cells(observations)
+    binding_by = {(str(item.get("cohort_id")), str(item.get("release_id"))): item for item in binding}
+    admitted_pairs = {(str(item["cohort_id"]), str(item["release_id"])) for item in admitted["cohorts"]}
+    counts = {"PASS": 0, "FAIL": 0, "UNKNOWN": 0}
+    reason_counts: dict[str, int] = defaultdict(int)
+    for row in census:
+        mint = str(row.get("mint") or "")
+        cohort = str(row.get("cohort_id") or "")
+        release = str(row.get("release_id") or "")
+        if not mint or (cohort, release) not in admitted_pairs:
+            continue
+        item = binding_by.get((cohort, release))
+        if item is None:
+            raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
+        late_map = item.get("schedule_point_lateness") if isinstance(item.get("schedule_point_lateness"), Mapping) else {}
+        query_lateness = late_map.get("X300", item.get("schedule_lateness_seconds"))
+        if isinstance(query_lateness, bool) or not isinstance(query_lateness, int):
+            raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
+        anchor = row.get("authoritative_anchor")
+        decision_due, decision_late = _clock(item, point, query_lateness)
+        decision_deadline = _deadline_for(anchor, point, decision_late, due_offset=decision_due)
+        if str(row.get("candidate_state") or "") != "X_ELIGIBLE" or decision_deadline is None:
+            continue
+        x_due, x_late = _clock(item, "X300", query_lateness)
+        liquidity = _cell(
+            grouped,
+            (cohort, release, mint, "X300", LIQUIDITY),
+            _deadline_for(anchor, "X300", x_late, due_offset=x_due),
+        )
+        if liquidity.get("status") != "OBSERVED":
+            continue
+        clock_policy = str(item.get("observation_clock_policy") or OBSERVATION_CLOCK_EVENT_TIME_V1)
+        snapshot_policy = clock_policy if clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1 else None
+        point_due = _due_moment(anchor, decision_due) if snapshot_policy else None
+        verdict = classify_universe_cells(
+            _cell(grouped, (cohort, release, mint, point, HOLDER_COUNT), decision_deadline, snapshot_policy=snapshot_policy, point_due_at=point_due),
+            _cell(grouped, (cohort, release, mint, point, LIQUIDITY), decision_deadline, snapshot_policy=snapshot_policy, point_due_at=point_due),
+            definition,
+        )
+        counts[str(verdict["status"])] += 1
+        for reason in verdict["reasons"]:
+            reason_counts[reason] += 1
+    n_base = sum(counts.values())
+    return {
+        "decision_point": point,
+        "n_base": n_base,
+        "n_pass": counts["PASS"],
+        "n_fail": counts["FAIL"],
+        "n_unknown": counts["UNKNOWN"],
+        "reason_counts": dict(sorted(reason_counts.items())),
+        "future_outcomes_read": False,
+    }
+
+
 def build_feature_preview(
     census: Sequence[Mapping[str, Any]],
     observations: Sequence[Mapping[str, Any]],
@@ -2904,6 +3032,7 @@ def build_feature_preview(
     binding: Sequence[Mapping[str, Any]],
     *,
     prior_preview_hashes: Sequence[str] = (),
+    universe_policy: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Feature-only preview. Target and survival labels are not computed."""
 
@@ -2915,6 +3044,12 @@ def build_feature_preview(
     for item in binding:
         for point in ["X300", *point_ids]:
             _clock(item, point, lateness)
+    from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        classify_universe_cells,
+        snapshot,
+    )
+
+    policy_identity = snapshot(universe_policy)["semantic_sha256"] if universe_policy is not None else None
     identity = _sha256(
         {
             "decision_point": decision_point,
@@ -2924,6 +3059,7 @@ def build_feature_preview(
             "population": "BASE_X",
             **({"features": features} if features else {}),
             **({"observation_clock_policy": clock_policy} if clock_policy != OBSERVATION_CLOCK_EVENT_TIME_V1 else {}),
+            **({"universe_policy_semantic_sha256": policy_identity} if policy_identity else {}),
         }
     )
     prior = [str(item) for item in prior_preview_hashes]
@@ -2941,6 +3077,7 @@ def build_feature_preview(
     admitted_pairs = {(str(item["cohort_id"]), str(item["release_id"])) for item in admitted["cohorts"]}
     examples: list[dict[str, Any]] = []
     total = 0
+    universe_counts = {"PASS": 0, "FAIL": 0, "UNKNOWN": 0}
     for row in census:
         mint = str(row.get("mint") or "")
         cohort = str(row.get("cohort_id") or "")
@@ -2958,6 +3095,29 @@ def build_feature_preview(
         if liquidity.get("status") != "OBSERVED":
             continue
         total += 1
+        universe_verdict = None
+        if universe_policy is not None:
+            decision_deadline = preview_deadline(anchor, cohort, release, decision_point)
+            due, _late = _clock(preview_binding[(cohort, release)], decision_point, lateness)
+            point_due = _due_moment(anchor, due) if clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1 else None
+            universe_verdict = classify_universe_cells(
+                _cell(
+                    grouped,
+                    (cohort, release, mint, decision_point, HOLDER_COUNT),
+                    decision_deadline,
+                    snapshot_policy=(clock_policy if point_due is not None else None),
+                    point_due_at=point_due,
+                ),
+                _cell(
+                    grouped,
+                    (cohort, release, mint, decision_point, LIQUIDITY),
+                    decision_deadline,
+                    snapshot_policy=(clock_policy if point_due is not None else None),
+                    point_due_at=point_due,
+                ),
+                universe_policy,
+            )
+            universe_counts[str(universe_verdict["status"])] += 1
         prices: dict[str, float | None] = {}
         missing: dict[str, str] = {}
         for point in point_ids:
@@ -2986,6 +3146,11 @@ def build_feature_preview(
                 "price_relative": relative,
                 "liquidity_absolute": liquidity.get("value"),
                 "missing_mask": missing,
+                **(
+                    {"universe_status": universe_verdict["status"], "universe_reasons": universe_verdict["reasons"]}
+                    if universe_verdict is not None
+                    else {}
+                ),
             }
         )
         if features:
@@ -3024,6 +3189,15 @@ def build_feature_preview(
         "total_count": total,
         "silent_truncation": False,
         "examples": selected,
+        **(
+            {
+                "universe_policy": snapshot(universe_policy),
+                "universe_counts": universe_counts,
+                "n_base": total,
+            }
+            if universe_policy is not None
+            else {}
+        ),
     }
     encoded = _canonical(payload).encode("utf-8")
     if len(encoded) > PREVIEW_BYTE_LIMIT:
@@ -3295,11 +3469,21 @@ def run_temporal_fixed_time_from_spec(
         census_path=None,
         observations_path=None,
     )
+    from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        UniversePolicyError,
+        recipe_policy,
+    )
+
+    try:
+        frozen_policy = recipe_policy(recipe)
+    except UniversePolicyError as exc:
+        raise GroundedDiscoveryError(exc.code) from exc
     computed = execute_temporal_discovery(
         loaded["census"],
         loaded["observations"],
         public,
         loaded["cohorts"],
+        universe_policy=frozen_policy,
     )
     summary = computed["summary"]
     return {
