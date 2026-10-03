@@ -45,6 +45,10 @@ managed_write_set:
 - tests/test_hfic_temporal_discovery_v1.py
 - tests/test_hfic_temporal_production_runner_v1.py
 - tests/test_forge_temporal_holder_point_feature_v1.py
+- tests/test_hfic_temporal_operability_repair_v1.py
+- tests/test_hfic_temporal_result_coherence_v1.py
+- tests/test_hfic_grounded_discovery_v1.py
+- tests/test_forge_runtime_discovery_binding_v1.py
 - catalog/schemas/forge_research_universe_policy_v1.schema.json
 - catalog/assets/core.yaml
 - catalog/assets/lifecycle.yaml
