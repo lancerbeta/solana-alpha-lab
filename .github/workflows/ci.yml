@@ -75,13 +75,15 @@ jobs:
       PYTHONDONTWRITEBYTECODE: "1"
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 6
       matrix:
         shard:
           - 0
           - 1
           - 2
           - 3
+          - 4
+          - 5
     steps:
       - name: Check out repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -98,7 +100,7 @@ jobs:
       - name: Configure local hooks
         run: git config --local core.hooksPath .githooks
       - name: Validate repository
-        run: uv run --locked --managed-python python -B scripts/run_ci_test_shard.py --index ${{ matrix.shard }} --count 4 --plan configs/ci_test_shards_v1.json --reserved-manifest configs/execution_domain_v1.json
+        run: uv run --locked --managed-python python -B scripts/run_ci_test_shard.py --index ${{ matrix.shard }} --count 6 --plan configs/ci_test_shards_v1.json --reserved-manifest configs/execution_domain_v1.json
 
   validate-operability-resources:
     uses: ./.github/workflows/factory-operability-resource-proof.yml

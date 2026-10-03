@@ -39,6 +39,11 @@ DELIVERY_PREFLIGHT_SCHEMA = (
 GITHUB_VALIDATE_TIMEOUT_MINUTES = 25
 GITHUB_VALIDATE_TESTS_TIMEOUT_MINUTES = 30
 GITHUB_AGGREGATOR_TIMEOUT_MINUTES = 5
+# General test shard count range the workflow contract admits. This validator is
+# a trusted validation path; scripts/ci_test_partition.py keeps the planner's own
+# bounds and tests/test_ci_test_partition.py pins the two ranges together.
+SHARD_COUNT_MIN = 4
+SHARD_COUNT_MAX = 6
 DELIVERY_PREFLIGHT_TIMEOUT_MINUTES = 25
 DELIVERY_PREFLIGHT_TIMEOUT_SECONDS = DELIVERY_PREFLIGHT_TIMEOUT_MINUTES * 60
 CI_TEST_SHARDS_PLAN = ROOT / "configs/ci_test_shards_v1.json"
@@ -623,7 +628,11 @@ def load_shard_plan() -> dict[str, Any]:
     shards = document.get("shards")
     if document.get("schema") != "smial.ci-test-shards.v1":
         raise CiValidationError("ci_test_shards_plan_schema_mismatch")
-    if not isinstance(count, int) or count < 3 or count > 4:
+    if (
+        not isinstance(count, int)
+        or count < SHARD_COUNT_MIN
+        or count > SHARD_COUNT_MAX
+    ):
         raise CiValidationError("ci_test_shards_plan_count_invalid")
     if not isinstance(shards, list) or len(shards) != count:
         raise CiValidationError("ci_test_shards_plan_shards_invalid")
