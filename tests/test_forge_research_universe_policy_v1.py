@@ -482,7 +482,14 @@ class UniversePolicyTests(unittest.TestCase):
             self.assertNotEqual(grown.returncode, 0)
             grown_body = json.loads(grown.stdout)
             self.assertEqual(grown_body["reason_code"], "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
+            self.assertFalse(grown_body["writes"])
+            self.assertEqual(
+                grown_body["next_action"],
+                "RESTORE_PUBLISHED_PARTITION_BYTES_THEN_RETRY_DISCOVERY_EXECUTE",
+            )
             self.assertNotEqual(grown_body.get("scientific_look_delta", {}).get("main"), 1)
+            grown_status = json.loads(run_cli("universe-policy-status", "--format", "json", data_root=grown_root).stdout)
+            self.assertFalse(grown_status["pending_operation"])
             stored = run_registered_fixed_time_proxy(
                 root=ROOT, registry_path=ROOT / "configs/experiment_capability_registry_v2.yaml",
                 recipe=result["experiment_recipe"], data_root=data_root,

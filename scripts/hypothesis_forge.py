@@ -1282,6 +1282,31 @@ def cmd_discovery_execute(
                         },
                         exit_code=2,
                     )
+            cohorts = []
+            if isinstance(binding_doc, dict):
+                cohorts = list(binding_doc.get("cohorts") or [])
+            elif explicit_data_root is not None:
+                from solana_alpha_lab.factory.hfic_grounded_discovery import (
+                    resolve_published_discovery_binding,
+                )
+
+                try:
+                    published = resolve_published_discovery_binding(explicit_data_root)
+                    cohorts = list(published.get("cohorts") or [])
+                except GroundedDiscoveryError as exc:
+                    body = {
+                        "reason_code": exc.code,
+                        "values_loaded": False,
+                        "writes": False,
+                        "scientific_negative": False,
+                    }
+                    if exc.code == "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE":
+                        body["next_action"] = (
+                            "RESTORE_PUBLISHED_PARTITION_BYTES_THEN_RETRY_DISCOVERY_EXECUTE"
+                        )
+                    return emit(body, exit_code=2)
+                except Exception:
+                    cohorts = []
             if operation_path is not None:
                 request = preview_request
                 if not isinstance(request, dict):
@@ -1302,29 +1327,6 @@ def cmd_discovery_execute(
                         },
                         exit_code=2,
                     )
-            cohorts = []
-            if isinstance(binding_doc, dict):
-                cohorts = list(binding_doc.get("cohorts") or [])
-            elif explicit_data_root is not None:
-                from solana_alpha_lab.factory.hfic_grounded_discovery import (
-                    resolve_published_discovery_binding,
-                )
-
-                try:
-                    published = resolve_published_discovery_binding(explicit_data_root)
-                    cohorts = list(published.get("cohorts") or [])
-                except GroundedDiscoveryError as exc:
-                    return emit(
-                        {
-                            "reason_code": exc.code,
-                            "values_loaded": False,
-                            "writes": bool(service_writes),
-                            "scientific_negative": False,
-                        },
-                        exit_code=2,
-                    )
-                except Exception:
-                    cohorts = []
             gate = gate_before_values(
                 op_store,
                 operation_sha256=str(operation_sha256),
