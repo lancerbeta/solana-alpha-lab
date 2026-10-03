@@ -13,18 +13,18 @@
   "implementation_bindings": {
     ".github/workflows/ci.yml": "df13f11a9a0ec84e023f5ef9e27ecced6253aabec36366fbb3176e4fa0ea9b99",
     ".github/workflows/factory-operability-resource-proof.yml": "a96607e842fce3d967f83d83fdbe806b217b4c71b29f1e74fc1a8fe7d71a3710",
-    "catalog/assets/core.yaml": "1f48718ee5e68f944f145e1e3d868ea3b3a3214de1bc52a595cc20adf49edfa9",
+    "catalog/assets/core.yaml": "eacb28bb4ac3b56fe4bd30ac65f503880bb39befcb55abc0a2a7c491c63e3dc6",
     "catalog/assets/lifecycle.yaml": "64017b6e43ac387bc0b2d3eb2d610d1311bcfe2cd19a3ba22fea6389ae49bb3f",
     "catalog/catalog_manifest.yaml": "fdae5ca4b6dd847a7039a030fdd74d0b4c94f5b26629e82eccad7c753978347e",
     "catalog/generated/asset_edges.json": "fa1f1905eda09c646ef9e2e07e35e800c9d85fd9263c246555ba526a20c78ea8",
     "configs/factory_remote_ops/factory-collector-owner-pulse.service": "f26b9aab16cb31eb48a322d60511a42ef853f1caedcb508a4322a3d896821d00",
     "configs/factory_remote_ops/factory-operability-watch.service": "d4cba8cacff48eed69206026c8b1eaee2ae98d1b980f13729db81db563d0d71a",
     "docs/PROJECT_MAP.md": "c8c06e1e9314a2e1dbf49b25af1a4355c3d3e43bb31034f3cdf68005334ac935",
-    "docs/evidence/factory_operability_live_resource_gate_repair/a1_linux_profile_v1.json": "5b0b0afcc14714a818b6b82a7e71345b74687ae8015c0bc2959e9678948f70f7",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "27b6fd691adbf2b40b4b8f19daea2676a2e7d5e412b4faf9b4518382d86c190f",
+    "docs/evidence/factory_operability_live_resource_gate_repair/a1_linux_profile_v1.json": "eaa9451069eb719bcb51fc5c3ace275135e5d3689e40228a4210eed914d5395f",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "05d19d34d8705bc1485a33187dc2f22ab8cc81c1e95d8ba724f8e40b583cb9ba",
     "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "f79f776a07c3ef8fcc67fc786ada01074454766e5f398f7b7d0b7154e4d75d87",
-    "docs/reports/factory_operability_live_resource_gate_repair/a1_owner_readout_v1.md": "0d4eb98ef7de08ad4c347aa2a99c9affe792f5846117fec80a8ce0673701ff48",
-    "docs/tasks/FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1.md": "eea7df5217b2eb7b6c8fcf81ee3a98e31a719d88e1a47e56f05deae90cd4b394",
+    "docs/reports/factory_operability_live_resource_gate_repair/a1_owner_readout_v1.md": "a40c3cf7780af12eb61d8f1a5813662d27c0a142f4eaeae96d21170d914efaf7",
+    "docs/tasks/FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1.md": "0152382d38dbc0e71cf23e5ef288cf940054731aefbd12d62bdcc9508efdbff2",
     "scripts/factory_cgroup_peak.py": "f3723fe471d8ccb1825070ca513969d66a0cfe27c3babbf08534a3321223f113",
     "scripts/factory_prepare_operability_index.py": "bdc0ac1824a93e524fce39dba3a09edd06993699b13bc2647252e29a1b1d734e",
     "scripts/validate_ci.py": "14e2d2f32c9ac565eb37e0d63a2ed0bd7b0b1b1465aa4100a0da625eef322a59",
@@ -34,6 +34,7 @@
     "src/solana_alpha_lab/factory/research_store.py": "4a7d215f2dc430c401fdf81e5fef5e6c9441ccf57cfd077fdd64c527be0fbd86",
     "tests/operability_bounded_call_profile.py": "6dcd27e257da84606f79fb6f26d359ec303a00e2d2885cf2b7d90f4e1b337a4c",
     "tests/test_ci.py": "53275821d5b1ed3308fd746d6e0989bee6ada9754f4a48f4bf54e8458e2ba59e",
+    "tests/test_factory_operability_bounded_call_diagnostics_v1.py": "fd6abd60969e559d1ea920d7becdbc200398252b98a905bcc83da95bf09aaf6f",
     "tests/test_factory_operability_live_resource_gate_repair_v1.py": "1bbfa22715236426904afe699c0c7e78962d81accb2df1f6f37683d4366c3dba"
   },
   "active_stop_conditions": [],
@@ -46,14 +47,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_operability_live_resource_gate_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "278a29ceb84e10b3d6074b95bc6fde59cc95417d90ac50b82764350b04519e53",
+    "sha256": "d7a8328f69e340e19c8f2a01d51eb6f6909a436fd881949bfa48693b6deb7f70",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_78_FOCUSED_TESTS",
     "independent_review": {
       "path": "docs/evidence/factory_operability_live_resource_gate_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "8ee5891cf98eb02de85c275091be91d2c7fb62e37ddd4707c9af39f058f8e558",
+      "sha256": "6dbb07ccd7967560e8aee7b2a3015367be84753a698c8224d2f6c5bd21e27ee2",
       "verdict": "NOT_READY"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

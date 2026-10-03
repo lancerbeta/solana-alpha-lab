@@ -6,8 +6,8 @@
   "task_id": "FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "4610dfa51d169da17629ba119153fdaf8154cad4c2f0285627566603edf0fcc9",
-  "reviewed_inventory_sha256": "c11851c9479ad899c1205b43d4e7a1d6ec17a2e8b1c0db1b71d6cc0d59b6d837",
+  "reviewed_bindings_sha256": "f77bbc8a97ef565ff425f0d072bb66f39d729e3c06a59427347f115f764b3d19",
+  "reviewed_inventory_sha256": "6d18f54a006e9f2efb3a354dd3175328c298971cac2a38fa2af24278d024b4b6",
   "capability_radar": {
     "now": "NONE",
     "watch": "RESOURCE_THRESHOLD_OR_STALE_REPORT_SNAPSHOT"
