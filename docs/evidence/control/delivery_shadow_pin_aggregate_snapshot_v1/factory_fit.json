@@ -1,0 +1,34 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "DELIVERY_SHADOW_PIN_AGGREGATE_SNAPSHOT_V1-FACTORY-FIT",
+  "as_of": "2026-10-03",
+  "task_id": "DELIVERY_SHADOW_PIN_AGGREGATE_SNAPSHOT_V1",
+  "reviewed_bindings_sha256": "47294a834afea4e93b00c3ca32031ddaa398f1b99db69bb7ccfc93ce7d4354b8",
+  "reviewed_inventory_sha256": "7d2e71b63c190fef8d2f54a150b45feafdda173390504a8535cdb72c0a22b422",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "Remove the recurring rewrite of a historical evidence file on every Catalog PR without losing any guard.",
+    "flexibility_and_history": "Historical evidence untouched and not rewritten; aggregate pins become snapshot-only, other pins and frozen registry unchanged.",
+    "context_efficiency": "One shared frozenset from existing harness_sync constants; no new registry or config.",
+    "research_truth": "No data, PIT or estimand path touched; stale aggregate shas in old acceptances are explicit snapshots recoverable from Git.",
+    "owner_operability": "Ordinary Catalog PRs stop failing preflight on an unsatisfiable pin; owner phrase flow unchanged.",
+    "execution_to_cashflow": "No product or trading surface.",
+    "monitoring_and_recovery": "Revert is an ordinary Git revert; harness_sync.check_drift still guards aggregates.",
+    "build_vs_buy": "Reuses existing constants and scan; nothing built.",
+    "security": "No network, credentials, provider, wallet or settings change.",
+    "red_team": "Product-path pins still DENY (10 DENYs for task21_owner_pulse.py before and after); exempt set is path-exact."
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "Ordinary Git revert of the task commits restores the prior scan.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_MERGE",
+    "NO_PRODUCT_CHANGE",
+    "NO_HISTORICAL_EVIDENCE_REWRITE"
+  ]
+}

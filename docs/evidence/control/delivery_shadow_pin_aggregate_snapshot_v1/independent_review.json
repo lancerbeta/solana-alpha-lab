@@ -1,0 +1,40 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "DELIVERY_SHADOW_PIN_AGGREGATE_SNAPSHOT_V1-REVIEW",
+  "as_of": "2026-10-03",
+  "task_id": "DELIVERY_SHADOW_PIN_AGGREGATE_SNAPSHOT_V1",
+  "reviewed_bindings_sha256": "47294a834afea4e93b00c3ca32031ddaa398f1b99db69bb7ccfc93ce7d4354b8",
+  "reviewed_inventory_sha256": "7d2e71b63c190fef8d2f54a150b45feafdda173390504a8535cdb72c0a22b422",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated read-only review of content_head=b418df808951dbf4b0ce6fca6df0af2dee4d64d8; final delta is the compact EVIDENCE.md summary only. No mutation.",
+        "No P0/P1. Exempt set matches harness_sync posix constants; skip precedes TARGET_MISSING lookup; non-aggregate pins keep DENY; 16 shadow-pin tests OK.",
+        "P2 residual: no test locks the aggregate-target-missing skip; ./-prefixed pins were never scanned (unchanged)."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Isolated read-only review of content_head=b418df808951dbf4b0ce6fca6df0af2dee4d64d8; final delta is the compact EVIDENCE.md summary only. No mutation.",
+        "Drift let through: only an old historical snapshot sha no longer matching a live aggregate (previously a mechanically unsatisfiable DENY). Still caught: harness_sync.check_drift via preflight (scoped by changed paths) plus CI validate_ci --core-only; non-aggregate pins keep DENY; exemption is path-exact, not prefix/glob.",
+        "What could pass tests and still hurt evidence honesty: an old acceptance claims aggregate bytes no longer at HEAD; now written snapshot-only policy, bytes stay in Git history. No PIT/estimand/cohort data path depends on these aggregates.",
+        "P2 residual: exempt pins are skipped silently (no audit count)."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_MERGE",
+    "MODEL_DIVERSITY_UNPROVEN",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}
