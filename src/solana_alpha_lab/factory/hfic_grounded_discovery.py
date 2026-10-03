@@ -1816,7 +1816,9 @@ def run_recorded_discovery_query(
     if _is_temporal_query(spec):
         from solana_alpha_lab.factory.hfic_temporal_discovery import (
             TEMPORAL_CALCULATION_VERSION,
+            TEMPORAL_CALCULATION_VERSION_V5,
             TEMPORAL_CALCULATION_VERSIONS_READABLE,
+            saved_downside_revision,
             validate_temporal_query,
             verify_calculation_revision_source,
         )
@@ -1837,12 +1839,21 @@ def run_recorded_discovery_query(
             None,
         )
         if correction is not None:
+            saved = saved_downside_revision(
+                [item for item in same_question if item.get("operation_sha256") == operation_sha256],
+                correction,
+            )
+            if saved is not None:
+                replayed = saved
             source_look = verify_calculation_revision_source(
                 journal_looks,
                 correction=correction,
                 spec=spec,
                 binding=list(binding),
                 operation_sha256=operation_sha256,
+                target_calculation_version=(
+                    TEMPORAL_CALCULATION_VERSION_V5 if saved is not None else TEMPORAL_CALCULATION_VERSION
+                ),
             )
             if source_look.get("data_binding_sha256") != pre_binding_sha:
                 raise GroundedDiscoveryError("CALCULATION_REVISION_INPUT_MISMATCH")

@@ -46,6 +46,7 @@ TEMPORAL_CALCULATION_VERSIONS_READABLE = frozenset(
         TEMPORAL_CALCULATION_VERSION_V2,
         TEMPORAL_CALCULATION_VERSION_V3,
         TEMPORAL_CALCULATION_VERSION_V4,
+        TEMPORAL_CALCULATION_VERSION_V5,
         TEMPORAL_CALCULATION_VERSION,
     }
 )
@@ -1795,6 +1796,28 @@ def require_coherent_temporal_result(summary: Mapping[str, Any]) -> None:
         raise GroundedDiscoveryError("TEMPORAL_RESULT_INCOHERENT")
 
 
+def saved_downside_revision(
+    looks: Sequence[Mapping[str, Any]], correction: Mapping[str, Any]
+) -> Mapping[str, Any] | None:
+    """Read this atom's exact saved V5 revision independently of the writer."""
+
+    for look in reversed(looks):
+        lineage = look.get("revision_of")
+        if not isinstance(lineage, Mapping):
+            continue
+        reason = lineage.get("reason")
+        if (
+            look.get("calculation_version") == TEMPORAL_CALCULATION_VERSION_V5
+            and lineage.get("calculation_version") == TEMPORAL_CALCULATION_VERSION_V4
+            and lineage.get("record_id") == correction.get("source_result_ref")
+            and lineage.get("result_sha256") == correction.get("source_result_sha256")
+            and isinstance(reason, Mapping)
+            and reason.get("code") == "DOWNSIDE_READOUT_ADDED"
+        ):
+            return look
+    return None
+
+
 def verify_calculation_revision_source(
     looks: Sequence[Mapping[str, Any]],
     *,
@@ -1802,6 +1825,7 @@ def verify_calculation_revision_source(
     spec: Mapping[str, Any],
     binding: Sequence[Mapping[str, Any]] | None = None,
     operation_sha256: str | None = None,
+    target_calculation_version: str | None = None,
 ) -> Mapping[str, Any]:
     """Bind one explicit correction to one saved look of the same question.
 
@@ -1827,7 +1851,10 @@ def verify_calculation_revision_source(
     if operation_sha256 and owner and owner != operation_sha256:
         raise GroundedDiscoveryError("CALCULATION_REVISION_OPERATION_MISMATCH")
     version = source.get("calculation_version")
-    if version == TEMPORAL_CALCULATION_VERSION:
+    target_version = target_calculation_version or TEMPORAL_CALCULATION_VERSION
+    if version == TEMPORAL_CALCULATION_VERSION_V4 and target_version != TEMPORAL_CALCULATION_VERSION_V5:
+        raise GroundedDiscoveryError("CALCULATION_REVISION_UNSUPPORTED")
+    if version == target_version:
         raise GroundedDiscoveryError("CALCULATION_REVISION_NOT_REQUIRED")
     if version not in TEMPORAL_CALCULATION_VERSIONS_READABLE:
         raise GroundedDiscoveryError("CALCULATION_REVISION_SOURCE_UNREADABLE")
@@ -1854,8 +1881,8 @@ def assert_downside_revision_preserves_v4(
 
     if source.get("calculation_version") != TEMPORAL_CALCULATION_VERSION_V4:
         return
-    if candidate.get("calculation_version") != TEMPORAL_CALCULATION_VERSION:
-        raise GroundedDiscoveryError("CALCULATION_REVISION_OLD_NUMERIC_CHANGED")
+    if candidate.get("calculation_version") != TEMPORAL_CALCULATION_VERSION_V5:
+        raise GroundedDiscoveryError("CALCULATION_REVISION_UNSUPPORTED")
 
     def equal_old(left: Any, right: Any, path: tuple[str, ...] = ()) -> bool:
         if isinstance(left, Mapping):
@@ -3044,7 +3071,7 @@ def _public_query_from_recipe(recipe: Mapping[str, Any]) -> dict[str, Any]:
         and clock_policy != OBSERVATION_CLOCK_EVENT_TIME_V1
     ):
         schedule["observation_clock_policy"] = clock_policy
-    return {
+    public = {
         "schema": TEMPORAL_SCHEMA,
         "schema_version": TEMPORAL_SCHEMA_VERSION,
         "query_id": query.get("query_id") or "frozen-recipe",
@@ -3060,6 +3087,9 @@ def _public_query_from_recipe(recipe: Mapping[str, Any]) -> dict[str, Any]:
         "cost_profile": body.get("cost_profile"),
         "evaluation": body.get("evaluation") or {},
     }
+    if query.get("adaptation_of") is not None:
+        public["adaptation_of"] = query["adaptation_of"]
+    return public
 
 
 def _require_manifest_and_cutoff(

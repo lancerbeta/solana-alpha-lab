@@ -30,6 +30,31 @@ from tests.test_hfic_temporal_discovery_v1 import (
 
 
 class DownsideNumerics(unittest.TestCase):
+    def test_next_writer_keeps_v5_historical_readability(self) -> None:
+        # Rebuild the module with the next writer alias, rather than patching a
+        # set that was already initialized by the V5 build.
+        source = Path(temporal.__file__).read_text(encoding="utf-8")
+        source = source.replace(
+            "TEMPORAL_CALCULATION_VERSION = TEMPORAL_CALCULATION_VERSION_V5",
+            'TEMPORAL_CALCULATION_VERSION = "HFIC_TEMPORAL_DISCOVERY_CALC_V6"',
+            1,
+        )
+        namespace = {"__name__": temporal.__name__, "__file__": temporal.__file__}
+        exec(compile(source, temporal.__file__, "exec"), namespace)
+        self.assertEqual(namespace["TEMPORAL_CALCULATION_VERSION"], "HFIC_TEMPORAL_DISCOVERY_CALC_V6")
+        self.assertIn(temporal.TEMPORAL_CALCULATION_VERSION_V5,
+                      namespace["TEMPORAL_CALCULATION_VERSIONS_READABLE"])
+
+    def test_saved_recipe_converter_preserves_full_query_and_clock(self) -> None:
+        spec = _spec()
+        spec["schedule"]["observation_clock_policy"] = temporal.OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
+        spec["adaptation_of"] = "a" * 64
+        recipe = {"spec": temporal.canonical_temporal_spec(spec)}
+        converted = temporal._public_query_from_recipe(recipe)
+        self.assertEqual(temporal.canonical_temporal_spec(converted), recipe["spec"])
+        self.assertEqual(temporal.validate_temporal_query(converted)["spec_sha256"],
+                         temporal.validate_temporal_query(spec)["spec_sha256"])
+
     def test_detached_and_runner_up_scopes_drop_compact_numbers(self) -> None:
         from solana_alpha_lab.factory.hfic_session import (
             _bind_selected_look, _rebind_runner_up_grounded_evidence,
@@ -309,6 +334,12 @@ class ClosedRevisionVertical(unittest.TestCase):
             sessions = list_hfic_sessions(store)
             budget = epoch_search_budget_usage(sessions, evidence_epoch=market)
             inventory = store.diagnostics().committed_inventory_sha256
+            # A future writer does not inherit this atom's closed V4 -> V5
+            # exception. Public admission must refuse before evaluation/writes.
+            with mock.patch.object(temporal, "TEMPORAL_CALCULATION_VERSION", "HFIC_TEMPORAL_DISCOVERY_CALC_V6"), mock.patch.object(temporal, "execute_temporal_discovery", side_effect=AssertionError("unsupported transition evaluated")):
+                code, refused = execute(correction)
+            self.assertEqual((code, refused["reason_code"]), (2, "CALCULATION_REVISION_UNSUPPORTED"))
+            self.assertEqual(store.diagnostics().committed_inventory_sha256, inventory)
             with mock.patch.object(temporal, "execute_temporal_discovery", side_effect=AssertionError("legacy replay evaluated")):
                 code, replay = execute()
             self.assertEqual(code, 0, replay)
@@ -352,6 +383,7 @@ class ClosedRevisionVertical(unittest.TestCase):
             self.assertEqual((code, refused["reason_code"]), (2, "CALCULATION_REVISION_OLD_NUMERIC_CHANGED"))
             self.assertEqual(store.diagnostics().committed_inventory_sha256, inventory)
             request = json.loads(op_path.read_text(encoding="utf-8"))
+            original_request = copy.deepcopy(request)
             request["owner_request_text"] = "new operation forbidden for correction"
             op_path.write_text(json.dumps(request), encoding="utf-8")
             output = io.StringIO()
@@ -359,6 +391,7 @@ class ClosedRevisionVertical(unittest.TestCase):
                 code = forge.cmd_discovery_execute(root, store_root=data_root, census_path=None, observations_path=None, binding_path=None, spec_path=spec_path, journal_scope=journal, candidate_scope_path=scope_path, explicit_data_root=data_root, operation_path=op_path, correct_result_ref=correction[0], correct_result_sha256=correction[1])
             self.assertEqual((code, json.loads(output.getvalue())["reason_code"]), (2, "CALCULATION_REVISION_EXISTING_OPERATION_REQUIRED"))
             self.assertEqual(store.diagnostics().committed_inventory_sha256, inventory)
+            op_path.write_text(json.dumps(original_request), encoding="utf-8")
             with mock.patch.object(grounded, "_append_discovery_look", side_effect=RuntimeError("before-commit")):
                 with self.assertRaises(RuntimeError):
                     execute(correction)
@@ -391,6 +424,16 @@ class ClosedRevisionVertical(unittest.TestCase):
             self.assertEqual(code, 0, retry)
             self.assertTrue(retry["correction_already_applied"])
             self.assertFalse(retry["writes"])
+            self.assertEqual(store.diagnostics().committed_inventory_sha256, after_inventory)
+            # Saved exact V5 remains evidence when a later writer is selected:
+            # both correction retry and ordinary readback use its saved bytes.
+            with mock.patch.object(temporal, "TEMPORAL_CALCULATION_VERSION", "HFIC_TEMPORAL_DISCOVERY_CALC_V6"), mock.patch.object(temporal, "execute_temporal_discovery", side_effect=AssertionError("saved V5 replay evaluated")):
+                for request in (correction, None):
+                    code, next_writer_replay = execute(request)
+                    self.assertEqual(code, 0, next_writer_replay)
+                    self.assertEqual(next_writer_replay["result_refs"], revised["result_refs"])
+                    self.assertEqual(next_writer_replay["calculation_version"], temporal.TEMPORAL_CALCULATION_VERSION_V5)
+                    self.assertFalse(next_writer_replay["writes"])
             self.assertEqual(store.diagnostics().committed_inventory_sha256, after_inventory)
             cold = run_cli("discovery-execute", "--store", str(data_root), "--spec", str(spec_path), "--candidate-scope", str(scope_path), "--journal-scope", journal, "--operation-sha256", op_sha, "--correct-result-ref", correction[0], "--correct-result-sha256", correction[1], "--format", "json", data_root=data_root)
             self.assertEqual(cold.returncode, 0, cold.stderr + cold.stdout)

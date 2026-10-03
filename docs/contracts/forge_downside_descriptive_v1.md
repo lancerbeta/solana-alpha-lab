@@ -58,3 +58,12 @@ Ordinary replay completes an interrupted landing through the existing
 state-aware `note_look_landed` owner: an OPEN limited operation whose MAIN cap
 is spent becomes PAUSED_CAP. Already terminal states are immutable. Readout
 revision and its replay have no landing transition and never invoke that owner.
+
+The closed-slot exception is exactly coherent V4 to literal V5 with
+`DOWNSIDE_READOUT_ADDED`; a future writer alias grants no further transition.
+Unsupported V4 transitions stop before evaluator, intents, reservations or
+lifecycle writes. Literal V5 remains in readable historical versions. When
+that source-bound V5 revision exists, correction retry reads it even if the
+current writer alias has advanced; it does not request another calculation.
+Canonical saved recipes convert through the existing `_public_query_from_recipe`
+owner, preserving the full canonical query including adaptation and clocks.

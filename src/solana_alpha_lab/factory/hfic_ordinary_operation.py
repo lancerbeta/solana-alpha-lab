@@ -653,10 +653,22 @@ def gate_before_values(
         raise OrdinaryOperationError(str(admission.get("reason_code") or "SCIENTIFIC_ADMISSION_STOP"))
     from solana_alpha_lab.factory.hfic_temporal_discovery import (
         TEMPORAL_CALCULATION_VERSION,
+        TEMPORAL_CALCULATION_VERSION_V5,
+        saved_downside_revision,
         verify_calculation_revision_source,
     )
 
     stored = _operation_result(looks, operation_sha256, validated["spec_sha256"])
+    target_version = TEMPORAL_CALCULATION_VERSION
+    if correction is not None:
+        saved = saved_downside_revision(
+            [item for item in looks if item.get("operation_sha256") == operation_sha256
+             and item.get("spec_sha256") == validated["spec_sha256"]],
+            correction,
+        )
+        if saved is not None:
+            stored = saved
+            target_version = TEMPORAL_CALCULATION_VERSION_V5
     if stored is not None and correction is not None:
         # A correction request is checked even when its revision already exists.
         try:
@@ -665,10 +677,11 @@ def gate_before_values(
                 correction=correction,
                 spec=spec,
                 operation_sha256=operation_sha256,
+                target_calculation_version=target_version,
             )
         except GroundedDiscoveryError as exc:
             raise OrdinaryOperationError(exc.code) from exc
-        if stored.get("calculation_version") != TEMPORAL_CALCULATION_VERSION:
+        if stored.get("calculation_version") != target_version:
             stored = None
     if stored is not None:
         evidence: dict[str, Any] = {
@@ -728,6 +741,7 @@ def gate_before_values(
             # output-only enrichment of a coherent V4 result may pass.
             if not (
                 source.get("calculation_version") == TEMPORAL_CALCULATION_VERSION_V4
+                and TEMPORAL_CALCULATION_VERSION == TEMPORAL_CALCULATION_VERSION_V5
                 and temporal_result_coherence(source["result"])["status"] == "COHERENT"
             ):
                 raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")

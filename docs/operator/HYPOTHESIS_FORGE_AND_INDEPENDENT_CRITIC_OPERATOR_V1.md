@@ -860,21 +860,6 @@ promotion. Для veto нужна отдельная проверка базов
 tails без отдельного scientific accounting. `LEGACY_READOUT_UNAVAILABLE`
 означает ограничение tail-оценки, а не отрицательную науку.
 
-Для существующего `PRICE_RELATIVE_PROXY` используй машинный
-`descriptive_readout` профиля `DOWNSIDE_DESCRIPTIVE_V1`: matched рядом с
-same-decision baseline, observed/eligible/missing, mean/median, частота
-`<=-20%` и `<=-50%`, ES10 и концентрация отрицательного вклада. Одинаковые
-медианы сами по себе не опровергают tail/veto-вопрос. Различай частоту,
-тяжесть и концентрацию: все метрики не обязаны различаться одновременно.
-Baseline может включать matched и не является независимым контролем.
-Missing не означает нулевой риск; малое N не доказывает отсутствие эффекта.
-ES10 — описательная оценка proxy со знаком return, не confidence interval.
-Большое различие не доказывает исполнимую стратегию и не даёт automatic
-promotion. Для veto нужна отдельная проверка базовой политики, потерянных
-выигрышей и затрат. Не подбирай порог, outcome или горизонт после просмотра
-tails без отдельного scientific accounting. `LEGACY_READOUT_UNAVAILABLE`
-означает ограничение tail-оценки, а не отрицательную науку.
-
 ## A7. Novelty и prior-work audit
 
 Для каждого кандидата проведи три проверки:
@@ -1303,17 +1288,6 @@ coverage ограничь claim; не выдумывай числа. Описа�
 доказывает полезность veto: нужны последствия относительно базовой
 политики, потерянные выигрыши и затраты. Не меняй пороги/estimand по tails.
 
-При tail/veto-вопросе прочитай `grounded_evidence.descriptive_readout`.
-Не используй равенство медиан как самостоятельный falsifier. Сопоставь
-частоту фиксированных loss events, ES10, отрицательную массу и её
-концентрацию с baseline, включая observed/missing и tail mass support.
-Не требуй различия всех метрик одновременно. All-missing не является
-нулевым риском; одиночный extreme outcome не доказывает alpha и не является
-универсальным KILL. Baseline может включать matched. Без tail metrics или
-coverage ограничь claim; не выдумывай числа. Описательное различие не
-доказывает полезность veto: нужны последствия относительно базовой
-политики, потерянные выигрыши и затраты. Не меняй пороги/estimand по tails.
-
 - Unit и clusters корректны?
 - Есть ли достаточный tail/regime/effective sample?
 - Method не сложнее question/data?
@@ -1709,15 +1683,32 @@ freeze по старому ref даёт `GROUNDED_RESULT_SUPERSEDED`. Повто
 market. Используйте сохранённый spec и существующую operation, без нового cap:
 
 Если старая operation не содержит `spec_canonical`, источник вопроса — exact
-saved result `spec`, не новый draft. Для canonical wrapper с `scientific_body=b`
-механически перенесите: `population=b.population`, `decision.point_id=b.decision_point`
-и `time_policy=BOUND_SCHEDULE_CUTOFF`, `schedule.lateness_seconds=b.schedule_lateness_seconds`,
-`schedule.observation_clock_policy=b.observation_clock_policy`, `features=b.features`,
-`all=b.predicates`, `target=b.target`, `entry_model=b.entry_model`,
-`cost_profile=b.cost_profile`, `evaluation=b.evaluation`. Из wrapper сохраните
-`schema`, `schema_version`, `query_id`, `search_tier`, `budget_allocation` и
-`adaptation_of`, если он был. Перед запуском `validate_temporal_query(spec)["spec_sha256"]`
-должен строго совпасть с source `spec_sha256`; несовпадение — STOP.
+saved result `experiment_recipe`, не новый draft. Используйте existing canonical
+conversion owner. Этот пример читает JSON сохранённого look payload и создаёт
+query только в разрешённой disposable копии (или отдельно разрешённой real
+operation); source ref/hash и operation binding сначала проверяются read-only:
+
+```python
+import json
+from pathlib import Path
+from solana_alpha_lab.factory.hfic_temporal_discovery import (
+    _public_query_from_recipe, canonical_temporal_spec, validate_temporal_query,
+)
+
+source = json.loads(Path("exact-saved-look-payload.json").read_text(encoding="utf-8"))
+recipe = source["result"]["experiment_recipe"]
+query = _public_query_from_recipe(recipe)
+assert validate_temporal_query(query)["spec_sha256"] == source["spec_sha256"]
+assert canonical_temporal_spec(query) == recipe["spec"] == source["spec"]
+Path("exact-saved-spec.json").write_text(json.dumps(query), encoding="utf-8")
+```
+
+Несовпадение — STOP. Helper сохраняет target, predicates, lateness, clock policy
+и adaptation binding; не реконструируйте их вручную. Candidate scope, journal
+и operation SHA берутся из того же exact source, без новой operation/cap.
+Closed исключение строго `coherent V4 -> exact V5 / DOWNSIDE_READOUT_ADDED`.
+Следующий writer не наследует это разрешение. Уже сохранённая exact V5 revision
+остаётся читаемой и retry не запускает следующий пересчёт.
 
 ```text
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <data-root> discovery-execute --store <data-root> --spec <exact-saved-spec.json> --candidate-scope <saved-scope.json> --journal-scope <journal-sha256> --operation-sha256 <saved-operation-sha256> --correct-result-ref <saved-V4-ref> --correct-result-sha256 <saved-V4-sha256> --format json

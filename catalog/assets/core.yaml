@@ -34594,7 +34594,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 0767c77226918748726adfaca09e9b1799cc167f1266eaf1507ec40d7c1645ea}
+  integrity: {kind: sha256, sha256: 28a6d9cefcb37d361c879de9740b9ac03e6678fde6b96e9c58536aa173ae3164}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37928,7 +37928,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: ea4048e2e95fac0c6d0b5add91a9a138dcb7d5733e594aebf43b8ca817d0f5f4}
+  integrity: {kind: sha256, sha256: 04c1b95c85a2c2eae3e374e5d8a01cd5649bd27a792d66268b65f3115fd72c8d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}
@@ -39445,7 +39445,7 @@ records:
   as_of: '2026-10-03'
   truth_owner: FORGE_DOWNSIDE_READOUT_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_downside_descriptive_v1.md', repository_path: docs/contracts/forge_downside_descriptive_v1.md}
-  integrity: {kind: sha256, sha256: b720108e420f5e1ae40a318b0d98208fb392639246215d80e1dde5d6607d321f}
+  integrity: {kind: sha256, sha256: f31c3b26aeb39edc3e4de65dd75ca3508f145252b268140919befc2dc7dc5b69}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}

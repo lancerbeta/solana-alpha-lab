@@ -1,0 +1,53 @@
+{
+  "scope": "EXACT_PROMPT_DUPLICATE_REMOVAL_ONLY",
+  "status": "PASS",
+  "prompts": {
+    "A": {
+      "extraction": "UTF8 LF text between BEGIN/END PROMPT A; no trimming",
+      "old_sha256": "5c73f0dc61d7268dd9e026e4cf42e653d618d883aa5d6f511e347143025ebf51",
+      "new_sha256": "75aafc4bccc83eb8524dd2b1acc2c048a85120f4c6a1c6b501ecc147cfb51eb9",
+      "old_crlf_sha256": "74903c5f0b68a623cd1daf587ec304156ea4edd6b93d6d93f044ed6e533ec490",
+      "removed_exact_block_sha256": "a83f9ce37c5ad46d6b1fb6c4dcd4ff39f367c768aa9a9317733829c4d69a05ae",
+      "removed_copies": 1,
+      "exact_duplicate_only": true,
+      "unique_instructions_unchanged": true
+    },
+    "B": {
+      "extraction": "UTF8 LF text between BEGIN/END PROMPT B; no trimming",
+      "old_sha256": "29689b871c6a00962641331463828ee1a6bf494bb6f4b55917167a0b438fa738",
+      "new_sha256": "7ffa1f2cdcc7ee7f1396b66a5f37de07b053bf1c2fed9addd708d9aefb76fadf",
+      "old_crlf_sha256": "86675e77148ea63dedcd440771dbed2b7449114219c39426a8a8db1ef7cd6901",
+      "removed_exact_block_sha256": "f222554d688a24e86dfbbd1e82085e8221622508fad34aea7f6b2bc9d3d633cf",
+      "removed_copies": 1,
+      "exact_duplicate_only": true,
+      "unique_instructions_unchanged": true
+    }
+  },
+  "historical_blind_artifacts_unchanged": {
+    "blind_correction_manifest.json": "baa0352d1e274c5b11e2feb7ff336ab380f2c7f7f56acc192de176236e3976c1",
+    "blind_gold.json": "f352112efa66922fefd1c37161fc7bc2bdc69323593124e5837b46e6b03d0524",
+    "blind_gold_verdicts.json": "43542f7b0c281a9fb32463145cced88cd6eb3577d5301990148796998ed3c321",
+    "blind_manifest.json": "962292e37cdf99f2ade543657d6f738f2175a31f9316fc1efe162aa80efa58b5",
+    "blind_primary_output.json": "135c77f248790c59f4dd94567fd48306bbf15bb265dbe80171f4475fdd0d9d82",
+    "blind_regression_output.json": "743801e2a5f40b582cb9259491a7a5d08fb551cf1148ce1fb603b0fb5f73d828",
+    "blind_correction_input/K1.json": "9d8f9211207c99b06bd4fda468add4b35a4cf26bc90d61d8e239cc8aec994302",
+    "blind_correction_input/K2.json": "8bd49ecfe183a14c93bcdb7b916991142408993ae178d5c8ee113978329eabe8",
+    "blind_correction_input/K3.json": "8abfd96d5deb6aca573bc19dc376420b7c899a071474db24a90347852fb8437c",
+    "blind_correction_input/K4.json": "df73796e8b4d68825d1f3267449bca6a66ac9cfc821d143bb0354ddaf14c68bb",
+    "blind_correction_input/prompt_b.txt": "dc00c9081f69565f822dea62378c4b332bb5bb5909692aca99d66445e1d02b1f",
+    "blind_input/K1.json": "3b1c335ef825dc326fdf0b151b22e710cd839cf61887b107552c9002fee43af9",
+    "blind_input/K2.json": "031b8cdb1f729bb23c9ae76c7882a7c071847da646edf5c048c2afaa5d0a8485",
+    "blind_input/K3.json": "0a7bc0cb2230e696c747c85ee1ac5548b2f68b37448274512265dbf2d8622090",
+    "blind_input/K4.json": "b4198877b1839d130e7bb4f02ac59cb1e0372bf5b4dcffb232ab2ad5dd2ff9e2",
+    "blind_input/prompt_b.txt": "dc00c9081f69565f822dea62378c4b332bb5bb5909692aca99d66445e1d02b1f"
+  },
+  "new_llm_execution": false,
+  "behavioral_evidence_scope": [
+    "Existing primary and dependent blind batches ran the old duplicated Prompt B bytes.",
+    "Hashes bind bytes, not execution chronology.",
+    "Dedup preserves each unique instruction and packet semantics; behavioral carryforward is subject to required review.",
+    "No measured behavioral equivalence on deduplicated bytes; four frozen cases only, no general calibration.",
+    "Prompt A evidence proves actual packet transport, not blind generator behavior.",
+    "No mandatory final-byte rerun gate identified in current acceptance; owner explicitly requests no automatic dedup rerun."
+  ]
+}
