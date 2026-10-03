@@ -4,8 +4,8 @@
   "review_id": "FORGE_TEMPORAL_HOLDER_POINT_FEATURE_V1-REVIEW",
   "as_of": "2026-10-03",
   "task_id": "FORGE_TEMPORAL_HOLDER_POINT_FEATURE_V1",
-  "reviewed_bindings_sha256": "261edf0dd43b05a1599ba993165c5f574ab17f3763c533139a23dfc2ed5984e4",
-  "reviewed_inventory_sha256": "8f480018803cea5716e5587cb6f64760e7ffb07aca62fb3890a52af2269f86f0",
+  "reviewed_bindings_sha256": "47294a834afea4e93b00c3ca32031ddaa398f1b99db69bb7ccfc93ce7d4354b8",
+  "reviewed_inventory_sha256": "7d2e71b63c190fef8d2f54a150b45feafdda173390504a8535cdb72c0a22b422",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -17,7 +17,7 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "Isolated read-only content review PASS; content_head=0edecf73a05df4e4d8b4f09a25235f5c64977dad; 25/25 bindings and frozen diff verified. No real store, outcome, provider or runtime access; no mutation.",
+        "Isolated read-only content review PASS; content_head=25fc643d2a2fe44e56c503e9a48da3f3ff7d4451; 25/25 bindings and frozen diff verified. Only final delta activates already-declared DELIVERY_EVIDENCE in task L2; other24 reviewed blobs byte-identical to accepted0edecf73. Scope/authority/required roles unchanged. No real store, outcome, provider or runtime access; no mutation.",
         "No open P0/P1/P2. Holder point-only/target denial, lossless threshold identity, pre-values preview validation and canonical clocks verified.",
         "10 HolderPolicyTests PASS. Corrected mixed-point regression fails with the old d3ffe179 builder in memory (3.0 is not None); current builder returns ABSENT.",
         "Public production CLI vertical inspected through committed exports/assertions rather than independently rerun. Earlier local suite had implementation-hash/unstable-index failures while content changed; affected tests subsequently passed on stable committed bytes. The new public two-clock-spelling fixture initially exhausted its one-preview cap; its disposable cap was corrected to two and the failed case passed. Production budget semantics unchanged."
@@ -27,18 +27,18 @@
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Isolated read-only content review PASS; content_head=0edecf73a05df4e4d8b4f09a25235f5c64977dad; 25/25 bindings and frozen diff verified. No real store, outcome, provider or runtime access; no mutation.",
+        "Isolated read-only content review PASS; content_head=25fc643d2a2fe44e56c503e9a48da3f3ff7d4451; 25/25 bindings and frozen diff verified. Only final delta activates already-declared DELIVERY_EVIDENCE in task L2; other24 reviewed blobs byte-identical to accepted0edecf73. Scope/authority/required roles unchanged. No real store, outcome, provider or runtime access; no mutation.",
         "Actual holder-specific PREDICTIVE card, baseline-minus-matched additive complement after subset proof, V5 UNKNOWN/missingness, confounders, prior D2 exposure and five frozen terminals verified.",
         "Public production binding/preview/MAIN/interrupted reply/cold replay and exact X/Y across Prompt A, candidate, Critic, owner plus registered complete-result replay satisfy content DoD. Real receipt proves feature readiness only; no target support or scientific verdict.",
-        "Final delta is only two mixed-point fixture lines; production code/docs/receipts byte-identical to accepted prior content. Tests not independently run by this role."
+        "Final delta is only task L2 DELIVERY_EVIDENCE activation; production/test/scientific/owner values unchanged. Tests not independently run by this role."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Isolated read-only content review PASS; content_head=0edecf73a05df4e4d8b4f09a25235f5c64977dad; 25/25 bindings and frozen diff verified. No real store, outcome, provider or runtime access; no mutation.",
-        "packet_fingerprint_sha256=a20f6ad58a34899860ce9ddb55a57218389835d313c33fdb5b96f7523c68b0c5; SEMANTIC_PREMISE packet validate-launch PASS. Packet+diff only, no implementation transcript. Independence attests PACKET_INFORMATION_PATH; launch isolation is PROCESS_OBLIGATION.",
+        "Isolated read-only content review PASS; content_head=25fc643d2a2fe44e56c503e9a48da3f3ff7d4451; 25/25 bindings and frozen diff verified. Only final delta activates already-declared DELIVERY_EVIDENCE in task L2; other24 reviewed blobs byte-identical to accepted0edecf73. Scope/authority/required roles unchanged. No real store, outcome, provider or runtime access; no mutation.",
+        "packet_fingerprint_sha256=88af134bf764e7585fa63cd912f3526d09fd4a9c351410afea24f33991e3a13e; SEMANTIC_PREMISE packet validate-launch PASS. Packet+diff only, no implementation transcript. Independence attests PACKET_INFORMATION_PATH; launch isolation is PROCESS_OBLIGATION.",
         "What could pass unit tests here and still corrupt scientific validity? A synthetic path could pass while a later real verdict substitutes feature readiness for target support, converts UNKNOWN to zero, creates a known-holder sample instead of additive complement, or hides prior outcome exposure/activity confounding. Candidate explicitly preserves those limits and grants no science/promotion authority.",
         "Shared PIT cell/clock owners, old PRICE/LIQ identities/readers, proxy semantics, saved recipe replay, predictive card and fail-closed holder policy remain authoritative. Tests not run by this role."
       ]
@@ -47,7 +47,7 @@
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "Isolated read-only content review PASS; content_head=0edecf73a05df4e4d8b4f09a25235f5c64977dad; 25/25 bindings and frozen diff verified. No real store, outcome, provider or runtime access; no mutation.",
+        "Isolated read-only content review PASS; content_head=25fc643d2a2fe44e56c503e9a48da3f3ff7d4451; 25/25 bindings and frozen diff verified. Only final delta activates already-declared DELIVERY_EVIDENCE in task L2; other24 reviewed blobs byte-identical to accepted0edecf73. Scope/authority/required roles unchanged. No real store, outcome, provider or runtime access; no mutation.",
         "Actual generated X/Y/decision/horizon labels agree across Prompt A, selected candidate, Critic and owner. Preview exposes observed zero separately from ABSENT/null holder; operator can copy the recipe-derived machine labels.",
         "Actual committed card is holder-specific PREDICTIVE with activity/staleness/prior-D2 exposure, five future terminals, additive baseline-minus-matched after subset proof and UNKNOWN/V5 caveats.",
         "Raw result/Critic keep ASSUMPTION_NOT_CALIBRATED and ESTIMATED_NET_PROXY cost limits; owner numeric surface makes no NetReturn claim. Cold replay artifact shows replayed_without_evaluator=true and main delta0, PAUSED_CAP. No CLI tests or real-data reads by this role."
