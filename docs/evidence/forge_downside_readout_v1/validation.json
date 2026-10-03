@@ -31,5 +31,26 @@
   },
   "local_full_gate": "NOT_RUN_PER_CURRENT_HARNESS",
   "ci": "REQUIRED_LIVE_EXACT_PR_HEAD",
-  "integrity_checks_weakened": false
+  "integrity_checks_weakened": false,
+  "transport_integrity_remediation": {
+    "reviewed_head": "c4f0bcaa35921e45d598707ba099f71d9f1c3647",
+    "confirmed_p1": "SUPPLIED_COMPACT_READOUT_NOT_BOUND_TO_PERSISTED_RESULT",
+    "new_regressions": {
+      "status": "PASS",
+      "tests": 8
+    },
+    "public_freeze_tamper_refusal": {
+      "status": "PASS",
+      "tests": 1,
+      "seconds": 53.662,
+      "committed_inventory_equal": true,
+      "cases": [
+        "matched_rate",
+        "baseline_median",
+        "missing_block"
+      ]
+    },
+    "scope_detachment": "PASS_SELECTED_AND_RUNNER_UP",
+    "frozen_corrected_blind_projection_equality": "PASS_4_OF_4_NO_MODEL_RERUN"
+  }
 }

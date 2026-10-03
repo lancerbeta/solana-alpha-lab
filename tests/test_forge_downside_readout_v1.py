@@ -30,6 +30,21 @@ from tests.test_hfic_temporal_discovery_v1 import (
 
 
 class DownsideNumerics(unittest.TestCase):
+    def test_detached_and_runner_up_scopes_drop_compact_numbers(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import (
+            _bind_selected_look, _rebind_runner_up_grounded_evidence,
+        )
+        evidence = {"result": {"some": "computed"}, "result_sha256": "00" * 32,
+                    "result_refs": ["saved-look"], "descriptive_readout": {"matched": {"median_target": -0.5}}}
+        detached = _bind_selected_look(evidence, {}, store=None)
+        self.assertFalse(detached["look_confirms_selected"])
+        self.assertNotIn("result", detached)
+        self.assertNotIn("descriptive_readout", detached)
+        packet = {"grounded_evidence": evidence}
+        _rebind_runner_up_grounded_evidence(packet, {})
+        self.assertNotIn("result", packet["grounded_evidence"])
+        self.assertNotIn("descriptive_readout", packet["grounded_evidence"])
+
     def test_g3_same_median_different_event_frequency(self) -> None:
         spec = _spec(
             tier="SIMPLE_SCREEN",

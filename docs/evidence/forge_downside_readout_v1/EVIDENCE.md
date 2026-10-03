@@ -158,6 +158,18 @@ canonical fingerprint, and zero-write cold retry.
 Final required independent role results and exact inventory are owned
 by the three delivery JSON files. Exact-head PR CI is an external current gate.
 
+Independent code review then found a P1 on `c4f0bcaa`: a supplied compact
+`descriptive_readout` could disagree with its validated persisted result/hash.
+The existing evidence gate now requires V5's exact canonical projection;
+legacy drafts may omit the field but cannot supply a false one. Public `freeze`
+rejects changed matched rate, baseline median or missing block with
+`GROUNDED_RESULT_MISMATCH` and equal committed inventory (owner-path test PASS,
+53.662 seconds). Selected/runner-up scope detachment also removes the compact
+block together with the unrelated full result; its negative test passes.
+All eight new regressions passed during this repair. The four frozen corrected
+blind readouts match the repaired production projection exactly, so no new
+model batch is needed; production Prompt B semantics remain unchanged.
+
 Semantic owner: `docs/contracts/forge_downside_descriptive_v1.md`; route remains
 `SEM-HYPOTHESIS-FORGE`, Catalog search term `downside` resolves the contract,
 operator and temporal calculator. No new route, README entrypoint or framework.

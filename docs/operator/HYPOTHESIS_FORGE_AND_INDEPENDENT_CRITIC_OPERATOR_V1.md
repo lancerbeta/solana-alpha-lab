@@ -1716,7 +1716,7 @@ saved result `spec`, не новый draft. Для canonical wrapper с `scienti
 `all=b.predicates`, `target=b.target`, `entry_model=b.entry_model`,
 `cost_profile=b.cost_profile`, `evaluation=b.evaluation`. Из wrapper сохраните
 `schema`, `schema_version`, `query_id`, `search_tier`, `budget_allocation` и
-`adaptation_of`, если он был. Перед запуском `validate_temporal_query(spec).spec_sha256`
+`adaptation_of`, если он был. Перед запуском `validate_temporal_query(spec)["spec_sha256"]`
 должен строго совпасть с source `spec_sha256`; несовпадение — STOP.
 
 ```text

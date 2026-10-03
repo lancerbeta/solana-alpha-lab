@@ -1532,6 +1532,19 @@ def assert_computed_grounded_evidence(
 
         # Matching hashes prove the bytes, not that the views agree.
         require_coherent_temporal_result(summary)
+        # Draft transport is not a second owner of the compact statistics.
+        # V5 requires its exact projection; legacy drafts may omit that field.
+        from solana_alpha_lab.factory.hfic_temporal_discovery import (
+            TEMPORAL_CALCULATION_VERSION_V5,
+        )
+
+        if "descriptive_readout" in bound or summary.get("calculation_version") == TEMPORAL_CALCULATION_VERSION_V5:
+            try:
+                matches = _canonical(bound.get("descriptive_readout")) == _canonical(descriptive_return_readout(summary))
+            except (TypeError, ValueError):
+                matches = False
+            if not matches:
+                raise GroundedDiscoveryError("GROUNDED_RESULT_MISMATCH")
         current = current_look_evidence(last, journal_looks)
         if str(current.get("record_id") or "") != str(last.get("record_id") or ""):
             raise GroundedDiscoveryError("GROUNDED_RESULT_SUPERSEDED")

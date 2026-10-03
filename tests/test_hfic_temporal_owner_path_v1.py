@@ -295,6 +295,25 @@ class TemporalOwnerPathTests(unittest.TestCase):
             receipt_path = workspace / "preflight.json"
             draft_path.write_text(json.dumps(draft), encoding="utf-8")
             receipt_path.write_text(json.dumps(source_receipt), encoding="utf-8")
+            from solana_alpha_lab.factory.research_store import ResearchStore
+            inventory = ResearchStore(data_root, create_if_missing=False).diagnostics().committed_inventory_sha256
+            for tamper in ("matched_rate", "baseline_median", "missing_block"):
+                damaged = json.loads(json.dumps(draft))
+                readout = damaged["grounded_evidence"]["descriptive_readout"]
+                if tamper == "matched_rate":
+                    readout["matched"]["downside"]["le_minus_50_rate"] = 0.987654321
+                elif tamper == "baseline_median":
+                    readout["baseline"]["median_target"] = 123.0
+                else:
+                    damaged["grounded_evidence"].pop("descriptive_readout")
+                draft_path.write_text(json.dumps(damaged), encoding="utf-8")
+                rejected = run_cli("freeze", "--draft", str(draft_path),
+                                   "--preflight-receipt", str(receipt_path),
+                                   "--format", "json", data_root=data_root)
+                self.assertNotEqual(rejected.returncode, 0)
+                self.assertIn("GROUNDED_RESULT_MISMATCH", rejected.stdout + rejected.stderr)
+                self.assertEqual(ResearchStore(data_root, create_if_missing=False).diagnostics().committed_inventory_sha256, inventory)
+            draft_path.write_text(json.dumps(draft), encoding="utf-8")
             persisted = run_cli(
                 "persist-draft",
                 "--draft",
