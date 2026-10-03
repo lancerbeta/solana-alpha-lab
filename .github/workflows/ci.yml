@@ -100,18 +100,23 @@ jobs:
       - name: Validate repository
         run: uv run --locked --managed-python python -B scripts/run_ci_test_shard.py --index ${{ matrix.shard }} --count 4 --plan configs/ci_test_shards_v1.json --reserved-manifest configs/execution_domain_v1.json
 
+  validate-operability-resources:
+    uses: ./.github/workflows/factory-operability-resource-proof.yml
+
   validate:
     if: ${{ always() }}
     needs:
       - validate-core
       - validate-execution
       - validate-tests
+      - validate-operability-resources
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     env:
       CORE_RESULT: ${{ needs.validate-core.result }}
       EXECUTION_RESULT: ${{ needs.validate-execution.result }}
       TESTS_RESULT: ${{ needs.validate-tests.result }}
+      RESOURCES_RESULT: ${{ needs.validate-operability-resources.result }}
     steps:
       - name: Deny non-success core or shard results
         run: |
@@ -123,6 +128,7 @@ jobs:
               "validate-core": os.environ.get("CORE_RESULT", ""),
               "validate-execution": os.environ.get("EXECUTION_RESULT", ""),
               "validate-tests": os.environ.get("TESTS_RESULT", ""),
+              "validate-operability-resources": os.environ.get("RESOURCES_RESULT", ""),
           }
           failed = {name: value for name, value in required.items() if value != "success"}
           if failed:

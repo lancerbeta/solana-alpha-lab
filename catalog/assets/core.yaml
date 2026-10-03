@@ -897,7 +897,7 @@ records:
     repository_path: .github/workflows/ci.yml
   integrity:
     kind: sha256
-    sha256: 9f11ee664ac75970e035c575eb71dd2ac1410fbc116d99bca6ca5514cba7c439
+    sha256: df13f11a9a0ec84e023f5ef9e27ecced6253aabec36366fbb3176e4fa0ea9b99
   access:
     mode: read_only
     method: file
@@ -936,7 +936,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: bc9ea327fb96e00496355d3328ecaf71ae26d95e6c3dd9fb1b7700de140177b5
+    sha256: 14e2d2f32c9ac565eb37e0d63a2ed0bd7b0b1b1465aa4100a0da625eef322a59
   access:
     mode: read_only
     method: command
@@ -32009,7 +32009,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_store.py', repository_path: src/solana_alpha_lab/factory/research_store.py}
-  integrity: {kind: sha256, sha256: 04841c2f66776404aa5538d9638f866c89bca7523a78b0d82f9275c11738eb8a}
+  integrity: {kind: sha256, sha256: 4a7d215f2dc430c401fdf81e5fef5e6c9441ccf57cfd077fdd64c527be0fbd86}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -33169,7 +33169,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_lifecycle.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_lifecycle.py}
-  integrity: {kind: sha256, sha256: 481e601ca5fdf73a0bac7ca16c6f9076d1ff83ee1061fdc47c716afab49d7cce}
+  integrity: {kind: sha256, sha256: 44aeca186b729e5d9f2c42f39c604afb6c5c510b21c79d87299e818d5d7b5770}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -34340,7 +34340,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: a908a8f3fd894818b7ae11f673161d9b302304e7f2c4f143514022b75b794282}
+  integrity: {kind: sha256, sha256: da019e96e456707fe59229d1c40290ee0f3998ba9c4d3799fdc0c1e3893886c6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -36444,7 +36444,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_UNATTENDED_OPERABILITY.md', repository_path: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md}
-  integrity: {kind: sha256, sha256: 29f55fe1153b779056d9d9cd2259b43f5b5b70b23fe6971f7cb5ba9860ccad3c}
+  integrity: {kind: sha256, sha256: f79f776a07c3ef8fcc67fc786ada01074454766e5f398f7b7d0b7154e4d75d87}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
@@ -39295,7 +39295,7 @@ records:
     repository_path: tests/test_factory_operability_bounded_call_diagnostics_v1.py
   integrity:
     kind: sha256
-    sha256: d74c06b99e68fef6a643a5cf7e3de2cd04fac22799867b6b74f72c0df9bd262c
+    sha256: fd6abd60969e559d1ea920d7becdbc200398252b98a905bcc83da95bf09aaf6f
   access:
     mode: read_only
     method: file
@@ -39333,7 +39333,7 @@ records:
     repository_path: tests/operability_bounded_call_profile.py
   integrity:
     kind: sha256
-    sha256: 22cc892bb476df62151b278e751f8d85d57d2759a3776291a4ef8cc6840e80b5
+    sha256: 6dcd27e257da84606f79fb6f26d359ec303a00e2d2885cf2b7d90f4e1b337a4c
   access:
     mode: read_only
     method: file
@@ -39454,7 +39454,278 @@ records:
   evidence: []
   search_terms: [SEM-HYPOTHESIS-FORGE, DOWNSIDE_DESCRIPTIVE_V1, DOWNSIDE_READOUT_ADDED, CALC_V5, ES10, TAIL, CLOSED_V4, LOSS_CONCENTRATION]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Measured Factory resource repair contract; separate live commissioning.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-03'
+  truth_owner: FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/tasks/FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1.md
+    repository_path: docs/tasks/FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1.md
+  integrity:
+    kind: sha256
+    sha256: 0152382d38dbc0e71cf23e5ef288cf940054731aefbd12d62bdcc9508efdbff2
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations: []
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
+  - watch OOM
+  - MemoryPeak
+  - cold cgroup
+  - index preparation
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: TEST-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Exact time cut, UNKNOWN, old writer rollback, index preparation and cgroup
+    false-PASS proof.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-03'
+  truth_owner: FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
+  location:
+    kind: git_path
+    logical_uri: repo://tests/test_factory_operability_live_resource_gate_repair_v1.py
+    repository_path: tests/test_factory_operability_live_resource_gate_repair_v1.py
+  integrity:
+    kind: sha256
+    sha256: 1bbfa22715236426904afe699c0c7e78962d81accb2df1f6f37683d4366c3dba
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
+  - watch OOM
+  - MemoryPeak
+  - cold cgroup
+  - index preparation
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: SCRIPT-FACTORY-PREPARE-OPERABILITY-INDEX-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Explicit one-time backup-first call index preparation; limited lock/cache/time;
+    no payload output.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-03'
+  truth_owner: FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/factory_prepare_operability_index.py
+    repository_path: scripts/factory_prepare_operability_index.py
+  integrity:
+    kind: sha256
+    sha256: bdc0ac1824a93e524fce39dba3a09edd06993699b13bc2647252e29a1b1d734e
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
+  - watch OOM
+  - MemoryPeak
+  - cold cgroup
+  - index preparation
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: CTRL-FACTORY-OPERABILITY-RESOURCE-CI-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact candidate growing-history real-CLI fsync/advisory-evicted Linux cgroup proof before
+    merge.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-03'
+  truth_owner: FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
+  location:
+    kind: git_path
+    logical_uri: repo://.github/workflows/factory-operability-resource-proof.yml
+    repository_path: .github/workflows/factory-operability-resource-proof.yml
+  integrity:
+    kind: sha256
+    sha256: a96607e842fce3d967f83d83fdbe806b217b4c71b29f1e74fc1a8fe7d71a3710
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001
+  - relation_type: depends_on
+    target_asset_id: SCRIPT-FACTORY-OPERABILITY-RESOURCE-PROFILE-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
+  - watch OOM
+  - MemoryPeak
+  - cold cgroup
+  - index preparation
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Measured entry Linux bottleneck and mandatory exact-head regression proof;
+    no unexecuted PASS claim.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-03'
+  truth_owner: FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/factory_operability_live_resource_gate_repair/a1_linux_profile_v1.json
+    repository_path: docs/evidence/factory_operability_live_resource_gate_repair/a1_linux_profile_v1.json
+  integrity:
+    kind: sha256
+    sha256: eaa9451069eb719bcb51fc5c3ace275135e5d3689e40228a4210eed914d5395f
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001
+  - relation_type: depends_on
+    target_asset_id: CTRL-FACTORY-OPERABILITY-RESOURCE-CI-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
+  - watch OOM
+  - MemoryPeak
+  - cold cgroup
+  - index preparation
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: REPORT-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Owner repair readout, resource proof limits and commissioning/rollback
+    sequence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-03'
+  truth_owner: FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/reports/factory_operability_live_resource_gate_repair/a1_owner_readout_v1.md
+    repository_path: docs/reports/factory_operability_live_resource_gate_repair/a1_owner_readout_v1.md
+  integrity:
+    kind: sha256
+    sha256: a40c3cf7780af12eb61d8f1a5813662d27c0a142f4eaeae96d21170d914efaf7
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001
+  - relation_type: depends_on
+    target_asset_id: EVIDENCE-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001
+  - relation_type: depends_on
+    target_asset_id: DOC-FACTORY-UNATTENDED-OPERABILITY-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
+  - watch OOM
+  - MemoryPeak
+  - cold cgroup
+  - index preparation
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
 
+- asset_id: SCRIPT-FACTORY-CGROUP-PEAK-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Standard-library same-unit kernel memory.peak capture before oneshot cgroup
+    disposal; fail closed without payload or secrets.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-03'
+  truth_owner: FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
+  location:
+    kind: git_path
+    logical_uri: repo://scripts/factory_cgroup_peak.py
+    repository_path: scripts/factory_cgroup_peak.py
+  integrity:
+    kind: sha256
+    sha256: f3723fe471d8ccb1825070ca513969d66a0cfe27c3babbf08534a3321223f113
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - Factory
+  - cgroup
+  - memory.peak
+  - ExecStartPost
+  - ordinary watch pulse resource proof
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
 - asset_id: DOC-FORGE-TEMPORAL-HOLDER-POINT-FEATURE-001
   record_version: '1.0'
   asset_type: control_document

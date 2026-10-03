@@ -1,0 +1,34 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-OPERABILITY-LIVE-RESOURCE-FIT-001",
+  "as_of": "2026-10-03",
+  "task_id": "FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "f77bbc8a97ef565ff425f0d072bb66f39d729e3c06a59427347f115f764b3d19",
+  "reviewed_inventory_sha256": "6d18f54a006e9f2efb3a354dd3175328c298971cac2a38fa2af24278d024b4b6",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "RESOURCE_THRESHOLD_OR_STALE_REPORT_SNAPSHOT"
+  },
+  "dimensions": {
+    "mission": "Keep data collection and owner reporting safe with two measured local repairs.",
+    "flexibility_and_history": "Additive built-in SQLite index; old writers remain compatible; no immutable history rewrite.",
+    "context_efficiency": "One bounded task, existing tools, focused tests and one CI resource loop.",
+    "research_truth": "Exact Python time cut, preserved UNKNOWN, verified immutable partitions, no cache between cycles.",
+    "owner_operability": "Backup-first index preparation, same stdlib kernel peak on canary/ordinary units, InvocationID readback, timer enable only after required checks.",
+    "execution_to_cashflow": "Collection continuity only; no alpha or cashflow claim.",
+    "monitoring_and_recovery": "Candidate CI resource proof plus separate real-host canaries and delivery; current disabled reports stay protected until commissioning.",
+    "build_vs_buy": "SQLite, ResearchStore and existing systemd only; no added dependency or monitoring service.",
+    "security": "No provider calls, secret values or payload output; synthetic history and GitHub delivery only.",
+    "red_team": "Old query reproduced, malformed/equal/future/edge time, mismatched index, old writer and cgroup false-PASS cases tested."
+  },
+  "limits": [
+    "EXACT_HEAD_LINUX_CI_REQUIRED",
+    "MANIFEST_HEADER_COST_REMAINS_LINEAR",
+    "LIVE_COMMISSIONING_REQUIRED",
+    "EXTERNAL_RECEIVER_NOT_CONFIGURED"
+  ],
+  "recovery": "Exact-SHA code rollback remains writable with the added built-in index; keep report timers off on failed canary."
+}

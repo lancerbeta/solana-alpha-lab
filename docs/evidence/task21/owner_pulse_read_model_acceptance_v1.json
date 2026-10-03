@@ -122,7 +122,7 @@
   ],
   "project_sources_disposition": {
     "kind": "NO_CHANGE",
-    "reason": "Risk-routed review control-plane atom re-pinned stale artifact hash bindings (AGENTS.md, owner_attention_gate.py, catalog core.yaml bytes legitimately changed by this atom); no Project Source semantic role or release payload changes."
+    "reason": "Risk-routed review control-plane atom re-pinned stale artifact hash bindings (AGENTS.md, owner_attention_gate.py, catalog core.yaml bytes legitimately changed by this atom); no Project Source semantic role or release payload changes. FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1 mechanically re-pins only the Catalog protected-input binding; historical semantic acceptance is unchanged."
   },
   "protected_inputs": [
     {
@@ -171,9 +171,9 @@
       "sha256": "eaa6bdd038ef7f265fbbb7d2daeb2e84a34455e330be35c7f9366a283e99dc0c"
     },
     {
-      "bytes": 2014612,
+      "bytes": 2023180,
       "path": "catalog/assets/core.yaml",
-      "sha256": "f60efdb0e7472776627d4661e2ae0ef66015bef817abc41eebf082d761e8649c"
+      "sha256": "eacb28bb4ac3b56fe4bd30ac65f503880bb39befcb55abc0a2a7c491c63e3dc6"
     }
   ],
   "reconciliation_patch": {

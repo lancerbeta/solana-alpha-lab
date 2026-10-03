@@ -1,0 +1,86 @@
+{
+  "schema": "smial.factory-operability-resource-profile",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1",
+  "as_of": "2026-10-03",
+  "status": "CANDIDATE_REQUIRES_EXACT_HEAD_LINUX_CI",
+  "live_baseline": {
+    "authorized_diagnostic_runs": 1,
+    "watch_wall_seconds": 106.816,
+    "process_peak_rss_bytes": 193110016,
+    "cgroup_memory_peak_bytes": 805306368,
+    "cgroup_memory_max_bytes": 805306368,
+    "timeout_seconds": 180,
+    "call_diagnostics_seconds": 16.17,
+    "timestamp_udf_evaluations": 48008,
+    "recent_call_rows": 1162,
+    "collector_read_model_seconds": 19.315,
+    "immutable_activation_checks_seconds": [
+      16.953,
+      16.718,
+      17.0
+    ],
+    "successor_continuity_seconds": 32.643,
+    "inference": "Repeated immutable proof IO and a full call-table timestamp scan are measured hotspots; file-cache attribution is an inference, not a separately measured stage."
+  },
+  "focused_local_validation": {
+    "tests_collected": 78,
+    "tests_passed": 78,
+    "tests_skipped": 0,
+    "cli_fixture_recent_rows": 128,
+    "immutable_manifests": 19,
+    "baseline_manifest_reads": 57,
+    "repaired_manifest_reads": 19,
+    "baseline_partition_verifications": 33,
+    "repaired_partition_verifications": 3,
+    "baseline_old_member_payload_reads": 24,
+    "repaired_old_member_payload_reads": 0,
+    "baseline_timestamp_udf_evaluations": 1152,
+    "local_os": "Windows",
+    "not_linux_cgroup_proof": true,
+    "test_modules": [
+      "tests/test_factory_operability_bounded_call_diagnostics_v1.py",
+      "tests/test_factory_operability_live_resource_gate_repair_v1.py",
+      "tests/test_ci.py"
+    ]
+  },
+  "mandatory_linux_regression": {
+    "workflow": ".github/workflows/factory-operability-resource-proof.yml",
+    "required_parent": "Repository validation / validate depends on validate-operability-resources reusable workflow",
+    "command": "uv run --locked --managed-python python -B tests/operability_bounded_call_profile.py cgroup-suite --root local/resource-proof",
+    "old_call_rows": [
+      16384,
+      32768
+    ],
+    "old_payload_bytes_per_row": 32768,
+    "recent_call_rows_fixed": 1162,
+    "real_old_parquet_partitions": [
+      256,
+      512
+    ],
+    "old_member_partitions_for_foreign_identity": [
+      128,
+      256
+    ],
+    "fixture_cache_eviction": "fsync followed by advisory posix_fadvise DONTNEED on synthetic fixture files only; residency is not independently verified",
+    "resource_guard": "768 MiB / 180 seconds",
+    "baseline_falsifier": "Exact historical scan/member-read counters or independently observed cgroup oom-kill/timeout; ordinary launch/data failures never qualify",
+    "acceptance": "Each repaired CLI <512 MiB / <120 seconds; doubled-history peak <=1.25x+8MiB, wall <=1.5x+1s; exact diagnostics and no old payload reads",
+    "result": "ENFORCED_ON_EXACT_PR_HEAD_BEFORE_MERGE_READINESS",
+    "peak_capture": "Stdlib kernel memory.peak reader before cgroup disposal, shared with ordinary report units; InvocationID-scoped journal readback. Same-unit numeric MemoryMax/peak plus completed consumer and monotonic clocks required."
+  },
+  "limits": [
+    "MANIFEST_HEADERS_ENUMERATED_ONCE_PER_PACKET",
+    "NON_SQL_TIMESTAMP_HEADERS_REMAIN_CONSERVATIVE_CANDIDATES",
+    "NO_LIVE_REPAIR_CANARY_YET",
+    "NO_TELEGRAM_DELIVERY_PROOF_YET"
+  ],
+  "measurement_bootstrap_probe": {
+    "result": "PASS",
+    "native_completed_unit_memory_peak": "[not set]",
+    "kernel_peak_bytes": 21274624,
+    "kernel_memory_max_bytes": 134217728,
+    "consumer": "temporary 16 MiB allocation, not Factory",
+    "factory_code_data_timers_changed": false
+  }
+}

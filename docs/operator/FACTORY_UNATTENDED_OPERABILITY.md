@@ -13,6 +13,31 @@ Heartbeat посылается только при свежем snapshot watch: 
 missing/stale/invalid → `NO_PING` с typed reason и нулём сетевых вызовов.
 Snapshot доказывает выполнение watch, но не доставку Telegram.
 
+Ремонт `FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1`: для уже заполненного
+store индекс `idx_call_ledger_operability_time` строится явной командой
+`sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_prepare_operability_index.py --db <absolute-ops-store-path>`
+в отдельном разрешённом commissioning после проверенного backup и короткой
+приостановки collector. Обычный старт collector индекс не строит. До этого watch/pulse
+показывают `UNKNOWN` вместо полного прохода старых вызовов или ложного нуля.
+В commissioning сначала проверьте backup и запас места, дайте индексу
+построиться этой командой и подтвердите `EXPLAIN QUERY PLAN` с этим именем
+индекса. Команда проверяет запас места, берёт ограниченный по ожиданию lock,
+отказывается при несовпадающем индексе и печатает только итог/размер/время.
+При `STORE_BUSY` не повторяйте построение в цикле: восстановите collector и
+остановите commissioning до устранения конкурирующего writer. При
+`INDEX_PREPARATION_DEADLINE` transaction откатывается: восстановите collector,
+оставьте report timers off и пересмотрите бюджет подготовки на копии базы.
+При другом отказе также восстановите collector и остановитесь с typed reason;
+не удаляйте индекс и не запускайте полный watch как запасной путь.
+Индекс использует только встроенные функции SQLite: старый collector после
+отката сохраняет возможность записи. Immutable proof внутри одного packet читается повторно
+из уже проверенного снимка; следующий packet проверяет его заново. Никакой
+научный факт не кэшируется между циклами. Watch/pulse timers остаются
+выключенными до успешного отдельного post-merge canary по реальным unit env,
+MemoryPeak <512 MiB и wall <120 s; затем нужны два обычных watch-цикла и
+реальная подтверждённая доставка дневного Telegram перед включением pulse.
+External heartbeat остаётся выключенным до отдельной настройки получателя.
+
 Первая read-only проверка на хосте из `/opt/solana-alpha-lab`:
 
 ```sh
@@ -416,7 +441,7 @@ git-side default sink. Canary сохраняет этот фактический
 
 ```sh
 WATCH_CANARY="factory-watch-canary-$(date -u +%Y%m%dT%H%M%SZ)"
-sudo systemd-run --unit="$WATCH_CANARY" --service-type=oneshot --remain-after-exit --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab --property=EnvironmentFile=-/etc/solana-alpha-lab/secrets.env --property=NoNewPrivileges=yes /usr/bin/uv run --locked --managed-python python -B scripts/factory_operability_watch.py --mode dry-run
+sudo systemd-run --unit="$WATCH_CANARY" --service-type=oneshot --remain-after-exit --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab --property=EnvironmentFile=-/etc/solana-alpha-lab/secrets.env --property="ExecStartPost=/usr/bin/python3 -B scripts/factory_cgroup_peak.py" --property=NoNewPrivileges=yes /usr/bin/uv run --locked --managed-python python -B scripts/factory_operability_watch.py --mode dry-run
 ```
 
 `Type=oneshot` завершает start job после команды. `--remain-after-exit`
@@ -428,13 +453,14 @@ sudo systemd-run --unit="$WATCH_CANARY" --service-type=oneshot --remain-after-ex
 
 ```sh
 canary_readback() {
-    /usr/bin/uv run --locked --managed-python python -B - "$1" <<'PY'
+    /usr/bin/uv run --locked --managed-python python -B - "$1" "${2:-canary}" <<'PY'
 import json
+import re
 import subprocess
 import sys
 
 properties = ('ActiveState', 'SubState', 'Result', 'ExecMainStatus', 'MemoryPeak',
-              'ExecMainStartTimestampMonotonic', 'ExecMainExitTimestampMonotonic')
+              'ExecMainStartTimestampMonotonic', 'ExecMainExitTimestampMonotonic', 'MemoryMax', 'InvocationID')
 try:
     read = subprocess.run(['systemctl', 'show', sys.argv[1],
                            '--property=' + ','.join(properties)],
@@ -450,14 +476,34 @@ if read.returncode == 0:
         state = 'BLOCKED'
     elif values.get('Result') == 'success' and values.get('ExecMainStatus') == '0':
         try:
-            peak = int(values['MemoryPeak'])
+            raw_peak = values.get('MemoryPeak', '')
+            peak = int(raw_peak) if raw_peak.isdecimal() else 0
+            invocation = values.get('InvocationID', '')
+            if not re.fullmatch('[0-9a-f]{32}', invocation):
+                raise ValueError('RESOURCE_INVOCATION_UNAVAILABLE')
+            journal = subprocess.run(['sudo', 'journalctl', '-u', sys.argv[1],
+                                      '_SYSTEMD_INVOCATION_ID=' + invocation, '-o', 'cat',
+                                      '--no-pager', '-n', '30'], capture_output=True,
+                                     text=True, timeout=5, check=False)
+            saved = [json.loads(line) for line in journal.stdout.splitlines()
+                     if line.startswith('{') and '"cgroup_memory_peak_bytes"' in line]
+            if journal.returncode != 0 or len(saved) != 1:
+                raise ValueError('RESOURCE_PEAK_UNAVAILABLE')
+            saved_peak = saved[0].get('cgroup_memory_peak_bytes')
+            if (type(saved_peak) is not int or not 0 < saved_peak <= 768 * 1024**2
+                    or saved[0].get('cgroup_memory_max_bytes') != 768 * 1024**2
+                    or values.get('MemoryMax') != str(768 * 1024**2)):
+                raise ValueError('RESOURCE_PEAK_UNAVAILABLE')
+            peak = max(peak, saved_peak)
             started = int(values['ExecMainStartTimestampMonotonic'])
             ended = int(values['ExecMainExitTimestampMonotonic'])
             if 0 < peak < 2**64 - 1 and 0 < started < ended:
                 wall = (ended - started) / 1_000_000
-                if values.get('ActiveState') == 'active' and values.get('SubState') == 'exited':
+                terminal = (values.get('ActiveState'), values.get('SubState'))
+                expected_terminal = ('inactive', 'dead') if sys.argv[2] == 'ordinary' else ('active', 'exited')
+                if terminal == expected_terminal:
                     state = 'PASS' if peak < 512 * 1024**2 and wall < 120 else 'BLOCKED'
-        except (KeyError, ValueError):
+        except (KeyError, ValueError, OSError, subprocess.SubprocessError):
             pass
 print(json.dumps({'resource_state': state, 'memory_peak_bytes': peak, 'wall_seconds': wall}))
 raise SystemExit(0 if state == 'PASS' else 2)
@@ -466,7 +512,11 @@ PY
 canary_readback "$WATCH_CANARY.service"
 ```
 
-`MemoryPeak` — cgroup peak всех дочерних процессов; это не sampling RSS одного
+`ExecStartPost` сохраняет kernel `memory.peak` через stdlib script сразу после oneshot до удаления
+cgroup. Ubuntu может вернуть `MemoryPeak=[not set]` уже после завершения;
+тогда используется единственная числовая запись из journal той же уникальной
+unit/InvocationID с совпавшим `memory.max=768 MiB`. Штатные service templates
+используют тот же helper; он не читает operational store или environment values. Это cgroup peak всех дочерних процессов; это не sampling RSS одного
 Python PID. Positive numeric peak, monotonic duration, успешное завершение и
 пороги <512 MiB / <120s обязательны. Неподдерживаемый/пустой/infinity/нулевой
 пик, пропавшая unit или отсутствующий clock → `UNKNOWN`, rollout остановить.
@@ -485,9 +535,33 @@ sudo systemctl stop "$WATCH_CANARY.service"
 
 ```sh
 COMMISSIONING_START=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
-sudo systemctl enable --now factory-operability-watch.timer
-systemctl show factory-operability-watch.service --property=InvocationID,ExecMainStartTimestamp,ExecMainExitTimestamp,Result,ExecMainStatus,MemoryPeak
+if ! sudo systemctl start factory-operability-watch.service || ! canary_readback factory-operability-watch.service ordinary; then
+    sudo systemctl disable --now factory-operability-watch.timer
+    exit 2
+fi
+systemctl show factory-operability-watch.service --property=InvocationID,ExecMainStartTimestamp,ExecMainExitTimestamp,Result,ExecMainStatus
 journalctl --unit=factory-operability-watch.service --since "$COMMISSIONING_START" --output=short-iso --no-pager
+```
+
+Первый цикл выполняется обычной service командой `systemctl start`, которая
+ждёт завершения start job под TimeoutStartSec=180s; включение timer само по
+себе не является завершением watch. Второй цикл — следующий timer tick.
+Первый ordinary запуск и его resource readback выполняются при выключенном
+timer. Любой nonzero/UNKNOWN выключает timer явной командой; включение
+разрешено только после успешного завершения, свежего snapshot и проверки
+отсутствия pending/transport error (для pulse дополнительно реальная daily delivery).
+Для ordinary readback unit должна завершиться в `inactive/dead`; пик берётся
+из journal только её сохранённого InvocationID. При отсутствии ровно одной
+числовой записи helper результат UNKNOWN, rollout остановить.
+До включения watch timer должны отдельно пройти первый ordinary resource
+readback, свежий валидный snapshot и отсутствие pending/transport error.
+При здоровом состоянии без incident сообщение не обязано создаваться: это
+допускает enable, но не устанавливает доказательство incident/recovery delivery.
+UNKNOWN любого обязательного входа оставляет timer выключенным. Только после
+этих PASS выполняется отдельная команда:
+
+```sh
+sudo systemctl enable --now factory-operability-watch.timer
 ```
 
 После каждого из двух обычных 15-минутных запусков сохраните этот readback и
@@ -509,19 +583,22 @@ Incident/recovery считается проверенным только по с
 ```sh
 check_report_environment factory-collector-owner-pulse.service
 PULSE_CANARY="factory-pulse-canary-$(date -u +%Y%m%dT%H%M%SZ)"
-sudo systemd-run --unit="$PULSE_CANARY" --service-type=oneshot --remain-after-exit --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab --property=EnvironmentFile=-/etc/solana-alpha-lab/secrets.env --property=NoNewPrivileges=yes /usr/bin/uv run --locked --managed-python python -B scripts/collector_owner_pulse.py --mode dry-run --record-storage-history
+sudo systemd-run --unit="$PULSE_CANARY" --service-type=oneshot --remain-after-exit --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab --property=EnvironmentFile=-/etc/solana-alpha-lab/secrets.env --property="ExecStartPost=/usr/bin/python3 -B scripts/factory_cgroup_peak.py" --property=NoNewPrivileges=yes /usr/bin/uv run --locked --managed-python python -B scripts/collector_owner_pulse.py --mode dry-run --record-storage-history
 canary_readback "$PULSE_CANARY.service"
 sudo systemctl stop "$PULSE_CANARY.service"
 ```
 
-При тех же PASS-критериях включите pulse и подтвердите его реальный запуск
-и daily delivery. Два отчётных timer не включаются одним шагом:
+При тех же PASS-критериях выполните первый ordinary pulse с выключенным
+timer и подтвердите его реальную daily delivery. Два отчётных timer
+не включаются одним шагом:
 
 ```sh
 PULSE_START=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
-sudo systemctl enable --now factory-collector-owner-pulse.timer
-sudo systemctl start factory-collector-owner-pulse.service
-systemctl show factory-collector-owner-pulse.service --property=InvocationID,ExecMainStartTimestamp,ExecMainExitTimestamp,Result,ExecMainStatus,MemoryPeak
+if ! sudo systemctl start factory-collector-owner-pulse.service || ! canary_readback factory-collector-owner-pulse.service ordinary; then
+    sudo systemctl disable --now factory-collector-owner-pulse.timer
+    exit 2
+fi
+systemctl show factory-collector-owner-pulse.service --property=InvocationID,ExecMainStartTimestamp,ExecMainExitTimestamp,Result,ExecMainStatus
 journalctl --unit=factory-collector-owner-pulse.service --since "$PULSE_START" --output=short-iso --no-pager
 ```
 
@@ -530,12 +607,32 @@ journalctl --unit=factory-collector-owner-pulse.service --since "$PULSE_START" -
 со ссылкой на ранее доказанную доставку этого day; один dedupe не доказывает
 её. `delivered=False deduped=False`, отсутствие delivery footer, pending или
 failure — `BLOCKED`. Snapshot и exit=0 delivery footer не заменяют.
+Только после PASS первого ordinary resource readback, snapshot и доказанной
+реальной daily delivery включите pulse отдельной командой; UNKNOWN
+оставляет timer выключенным:
+
+```sh
+sudo systemctl enable --now factory-collector-owner-pulse.timer
+```
 
 6. Внешний получатель, URL и Telegram-маршрут требуют отдельного решения
    владельца. До подключения и теста пропущенного heartbeat — `NOT_CONFIGURED`.
    Fresh watch snapshot сам по себе не доказывает Telegram-доставку.
 
-Stop: OOM, timeout, peak >=512 MiB, wall >=120s, stale/invalid snapshot,
+После enable любой non-PASS обязательного для данного цикла входа
+(ресурсы, свежий InvocationID/snapshot, pending/transport error или отказ
+фактически созданного сообщения) немедленно выключает только
+соответствующий report timer; не оставляйте его повторять проблемный запуск.
+Watch без incident/recovery сообщения не выключается из-за UNKNOWN его
+непроизошедшей delivery. Для pulse реальная daily delivery обязательна:
+
+```sh
+sudo systemctl disable --now factory-operability-watch.timer
+# Для отказа pulse вместо watch:
+# sudo systemctl disable --now factory-collector-owner-pulse.timer
+```
+
+Stop: UNKNOWN обязательного входа, OOM, timeout, peak >=512 MiB, wall >=120s, stale/invalid snapshot,
 неустраняемый delivery failure или регрессия collector/source/RDP. Остановите
 только проблемный отчётный timer и его service, если он ещё работает.
 Collector и same-envelope renewal сохраните. Откат — exact SHA:

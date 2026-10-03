@@ -934,6 +934,7 @@ def _draining_transition_evidence(
         records, _telemetry = ResearchStore(
             data_root, create_if_missing=False
         ).iter_lifecycle_records_bounded(
+            include_member_predecessor=False,
             schedule_sha256=schedule_sha256,
             activation_id=activation_id,
             # Rollover may drain before the predecessor admission window
@@ -1152,6 +1153,7 @@ def rollover_research_event_proven(
         records, _telemetry = ResearchStore(
             data_root, create_if_missing=False
         ).iter_lifecycle_records_bounded(
+            include_member_predecessor=False,
             schedule_sha256=predecessor_schedule,
             activation_id=predecessor_activation,
             window_start=predecessor_starts,
@@ -1235,6 +1237,7 @@ def rollover_research_event_proven(
         successor_records, _telemetry = ResearchStore(
             data_root, create_if_missing=False
         ).iter_lifecycle_records_bounded(
+            include_member_predecessor=False,
             schedule_sha256=successor_schedule,
             activation_id=successor_activation,
             window_start=successor_starts,
@@ -1445,6 +1448,7 @@ def activation_transition_research_event_proven(
         records, _telemetry = ResearchStore(
             data_root, create_if_missing=False
         ).iter_lifecycle_records_bounded(
+            include_member_predecessor=False,
             schedule_sha256=schedule_sha256,
             activation_id=activation_id,
             window_start=starts,
@@ -1539,6 +1543,7 @@ def _prior_active_transition_research_event_proven(
         records, _telemetry = ResearchStore(
             data_root, create_if_missing=False
         ).iter_lifecycle_records_bounded(
+            include_member_predecessor=False,
             schedule_sha256=schedule_sha256,
             activation_id=activation_id,
             window_start=starts,
