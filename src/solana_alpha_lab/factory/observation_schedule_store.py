@@ -29,6 +29,7 @@ _STORE_READ_STATS = {
     "iter_candidates_pages": 0,
     "count_due_in_states_calls": 0,
     "call_ledger_timestamp_rows_examined": 0,
+    "call_diagnostics_index_candidates": 0,
     "call_diagnostics_rows_returned": 0,
     "call_payloads_decoded": 0,
 }
@@ -119,6 +120,23 @@ def transition_event_id_for(
 def _now(clock: datetime | None = None) -> str:
     value = clock.astimezone(UTC) if clock is not None else datetime.now(UTC)
     return render_utc(value)
+
+
+_OPERABILITY_RAW_TIME = "COALESCE(NULLIF(updated_at, ''), created_at)"
+# SQLite built-ins only: an older collector can still write after code rollback.
+# Non-UTC, malformed and impossible calendar dates sort after every valid date
+# and are returned to the Python consumer as UNKNOWN evidence.
+OPERABILITY_TIME_SQL = (
+    f"CASE WHEN typeof({_OPERABILITY_RAW_TIME}) = 'text' "
+    f"AND substr({_OPERABILITY_RAW_TIME}, -1) = 'Z' "
+    f"AND substr({_OPERABILITY_RAW_TIME}, 1, 19) = "
+    f"strftime('%Y-%m-%dT%H:%M:%S', {_OPERABILITY_RAW_TIME}, '+0 seconds') "
+    f"THEN julianday({_OPERABILITY_RAW_TIME}) ELSE 1e99 END"
+)
+OPERABILITY_INDEX_SQL = (
+    "CREATE INDEX IF NOT EXISTS idx_call_ledger_operability_time "
+    f"ON call_ledger({OPERABILITY_TIME_SQL})"
+)
 
 
 class ObservationScheduleStore:
@@ -328,6 +346,10 @@ class ObservationScheduleStore:
         self._ensure_column("call_ledger", "call_occurrence_id", "TEXT")
         self._ensure_column("scheduler_leases", "lease_token", "TEXT NOT NULL DEFAULT ''")
         self._migrate_call_ledger_to_occurrence_primary_key()
+        # Existing histories require an explicit, backed-up commissioning step.
+        # Never build a large index on collector startup.
+        if self._conn.execute("SELECT 1 FROM call_ledger LIMIT 1").fetchone() is None:
+            self._conn.execute(OPERABILITY_INDEX_SQL)
         registered_rows = self._conn.execute(
             "SELECT schedule_sha256, schedule_key, created_at FROM registered_schedules"
         ).fetchall()
@@ -2486,20 +2508,23 @@ class ObservationScheduleStore:
     def iter_operability_calls(self, *, window_start: datetime) -> Iterator[dict[str, Any]]:
         """Recent/undated scalar diagnostics, never full historical payloads.
 
-        No migration/index or fallback. One timestamp-only scan excludes old
-        rows before SQLite projects JSON fields. The cursor has no ORDER BY
-        or temporary all-call result. Python retains only one projected row.
-        Invalid timestamps remain visible so the consumer can fail closed.
+        The expression index seeks recent rows before JSON projection. Invalid
+        timestamps remain visible so the consumer can fail closed. No full
+        historical fallback is allowed when the index is absent.
         """
-        def timestamp_key(updated: object, created: object) -> str:
-            _STORE_READ_STATS["call_ledger_timestamp_rows_examined"] += 1
-            try:
-                parsed = parse_utc(updated or created)
-                return parsed.isoformat(timespec="microseconds").replace("+00:00", "Z")
-            except (ValueError, TypeError, OverflowError):
-                return "~"  # Invalid sorts beyond valid UTC keys; never excluded.
-
-        self._conn.create_function("smial_operability_time", 2, timestamp_key, deterministic=True)
+        index = self._conn.execute(
+            "SELECT sql FROM sqlite_master WHERE type='index' "
+            "AND name='idx_call_ledger_operability_time'"
+        ).fetchone()
+        expected_sql = OPERABILITY_INDEX_SQL.replace("IF NOT EXISTS ", "")
+        if index is None or str(index[0]).replace("IF NOT EXISTS ", "") != expected_sql:
+            # A pre-migration read-only store must not silently scan history or
+            # turn missing diagnostics into zero calls / a false recovery.
+            yield {
+                "primitive_id": "", "state": "", "created_at": "",
+                "updated_at": "", "payload": {}, "diagnostics_payload_valid": 0,
+            }
+            return
         fields = ("schedule_sha256", "activation_id", "http_class", "status", "missing_reason")
         valid_object = "json_valid(payload_json) AND json_type(payload_json) = 'object'"
         document = f"CASE WHEN json_valid(payload_json) THEN CASE WHEN json_type(payload_json) = 'object' THEN payload_json ELSE '{{}}' END ELSE '{{}}' END"
@@ -2512,13 +2537,27 @@ class ObservationScheduleStore:
             shape_checks.append(f"({kind} IS NULL OR {kind} = 'null' OR ({kind} = 'text' AND length({value}) <= 512))")
         # CASE, not AND, guards json_type from malformed JSON evaluation.
         validity = f"CASE WHEN json_valid(payload_json) THEN CASE WHEN {valid_object} AND {' AND '.join(shape_checks)} THEN 1 ELSE 0 END ELSE 0 END"
+        # julianday has millisecond precision; one-second margin makes the
+        # indexed candidate set a superset of Python's exact microsecond cut.
+        cutoff = window_start.astimezone(UTC).timestamp()
         cursor = self._conn.execute(
             f"SELECT primitive_id, state, created_at, updated_at, {', '.join(extracts)}, {validity} AS diagnostics_payload_valid "
-            "FROM call_ledger WHERE smial_operability_time(updated_at, created_at) >= ?",
-            (window_start.astimezone(UTC).isoformat(timespec="microseconds").replace("+00:00", "Z"),),
+            f"FROM call_ledger INDEXED BY idx_call_ledger_operability_time WHERE {OPERABILITY_TIME_SQL} >= julianday(?)",
+            (datetime.fromtimestamp(cutoff - 1, UTC).isoformat().replace("+00:00", "Z"),),
         )
         try:
             for row in cursor:
+                _STORE_READ_STATS["call_diagnostics_index_candidates"] += 1
+                # The SQL key is a conservative candidate filter, not the
+                # temporal truth owner. Python also accepts UTC forms SQLite
+                # does not, and the one-second seek margin must not leak into
+                # 24-hour counters or recovery evidence.
+                try:
+                    effective = parse_utc(row["updated_at"] or row["created_at"])
+                except (ValueError, TypeError, OverflowError):
+                    effective = None
+                if effective is not None and effective < window_start:
+                    continue
                 _STORE_READ_STATS["call_diagnostics_rows_returned"] += 1
                 projected = dict(row)
                 projected["payload"] = {field: projected.pop(field) for field in fields}

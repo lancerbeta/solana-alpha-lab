@@ -1,0 +1,22 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-OPERABILITY-LIVE-RESOURCE-REVIEW-001",
+  "as_of": "2026-10-03",
+  "task_id": "FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [],
+  "verdict": "NOT_READY",
+  "non_claims": [
+    "NO_MERGE_AUTHORITY",
+    "MODEL_DIVERSITY_UNPROVEN",
+    "NO_LIVE_COMMISSIONING_PROOF"
+  ]
+}

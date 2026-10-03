@@ -1,0 +1,62 @@
+{
+  "schema": "smial.factory-operability-resource-profile",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1",
+  "as_of": "2026-10-03",
+  "status": "CANDIDATE_REQUIRES_EXACT_HEAD_LINUX_CI",
+  "live_baseline": {
+    "authorized_diagnostic_runs": 1,
+    "watch_wall_seconds": 106.816,
+    "process_peak_rss_bytes": 193110016,
+    "cgroup_memory_peak_bytes": 805306368,
+    "cgroup_memory_max_bytes": 805306368,
+    "timeout_seconds": 180,
+    "call_diagnostics_seconds": 16.17,
+    "timestamp_udf_evaluations": 48008,
+    "recent_call_rows": 1162,
+    "collector_read_model_seconds": 19.315,
+    "immutable_activation_checks_seconds": [
+      16.953,
+      16.718,
+      17.0
+    ],
+    "successor_continuity_seconds": 32.643,
+    "inference": "Repeated immutable proof IO and a full call-table timestamp scan are measured hotspots; file-cache attribution is an inference, not a separately measured stage."
+  },
+  "focused_local_validation": {
+    "tests_passed": 91,
+    "tests_skipped": 1,
+    "cli_fixture_recent_rows": 128,
+    "immutable_manifests": 19,
+    "baseline_manifest_reads": 57,
+    "repaired_manifest_reads": 19,
+    "baseline_partition_verifications": 9,
+    "repaired_partition_verifications": 3,
+    "baseline_timestamp_udf_evaluations": 1152,
+    "local_os": "Windows",
+    "not_linux_cgroup_proof": true
+  },
+  "mandatory_linux_regression": {
+    "workflow": ".github/workflows/factory-operability-resource-proof.yml",
+    "command": "uv run --locked --managed-python python -B tests/operability_bounded_call_profile.py cgroup-suite --root local/resource-proof",
+    "old_call_rows": [
+      16384,
+      32768
+    ],
+    "old_payload_bytes_per_row": 32768,
+    "recent_call_rows_fixed": 128,
+    "real_old_parquet_partitions": [
+      256,
+      512
+    ],
+    "cold_cache": "posix_fadvise DONTNEED on synthetic fixture files only",
+    "resource_guard": "768 MiB / 180 seconds",
+    "acceptance": "Each repaired CLI <512 MiB / <120 seconds; doubled-history peak <=1.25x+8MiB, wall <=1.5x+1s; exact diagnostics and no old payload reads",
+    "result": "ENFORCED_ON_EXACT_PR_HEAD_BEFORE_MERGE_READINESS"
+  },
+  "limits": [
+    "MANIFEST_HEADERS_ENUMERATED_ONCE_PER_PACKET",
+    "NO_LIVE_REPAIR_CANARY_YET",
+    "NO_TELEGRAM_DELIVERY_PROOF_YET"
+  ]
+}

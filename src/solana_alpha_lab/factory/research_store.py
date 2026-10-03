@@ -14,9 +14,11 @@ import tempfile
 import uuid
 from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
+from functools import wraps
 from pathlib import Path, PurePosixPath
 from typing import Annotated, Any
 
@@ -39,6 +41,26 @@ from solana_alpha_lab.factory.run_passport import (
     RunPassportError,
     validate_run_passport,
 )
+
+
+_lifecycle_read_cache: ContextVar[dict[tuple[str, str], Any] | None] = ContextVar(
+    "lifecycle_read_cache", default=None
+)
+
+
+def reuse_lifecycle_reads_within_packet(func: Callable[..., Any]) -> Callable[..., Any]:
+    """Reuse immutable manifests/verified partitions only for one packet call.
+
+    A fresh process/call gets a fresh snapshot; no mutable cross-cycle proof cache.
+    """
+    @wraps(func)
+    def wrapped(*args: Any, **kwargs: Any) -> Any:
+        token = _lifecycle_read_cache.set({})
+        try:
+            return func(*args, **kwargs)
+        finally:
+            _lifecycle_read_cache.reset(token)
+    return wrapped
 
 
 RESEARCH_DATASET_ID = "research-events"
@@ -1340,13 +1362,17 @@ class ResearchStore:
         return manifest
 
     def _committed_manifests(self) -> tuple[PartitionManifest, ...]:
+        scope = _lifecycle_read_cache.get()
+        key = (str(self._root), "manifests")
+        if scope is not None and key in scope:
+            return scope[key]
         manifests = tuple(
             self._read_manifest(path) for path in self._manifest_files()
         )
         partition_ids = [manifest.partition_id for manifest in manifests]
         if len(partition_ids) != len(set(partition_ids)):
             raise ResearchStoreError("DUPLICATE_COMMITTED_TRANSACTION")
-        return tuple(
+        result = tuple(
             sorted(
                 manifests,
                 key=lambda manifest: (
@@ -1355,6 +1381,9 @@ class ResearchStore:
                 ),
             )
         )
+        if scope is not None:
+            scope[key] = result
+        return result
 
     def _verify_partition(
         self,
@@ -1677,6 +1706,10 @@ class ResearchStore:
     def _verify_partition_with_size(
         self, manifest: PartitionManifest
     ) -> tuple[tuple[ResearchEvent, ...], int]:
+        scope = _lifecycle_read_cache.get()
+        key = (str(self._root), str(manifest.partition_manifest_id))
+        if scope is not None and key in scope:
+            return scope[key]
         path = _target_path(
             self._root,
             manifest.logical_location,
@@ -1686,7 +1719,10 @@ class ResearchStore:
             nbytes = int(path.stat().st_size) if path.is_file() else 0
         except OSError:
             nbytes = 0
-        return self._verify_partition(manifest), nbytes
+        result = (self._verify_partition(manifest), nbytes)
+        if scope is not None:
+            scope[key] = result
+        return result
 
     def test_write_partition_without_manifest(
         self,

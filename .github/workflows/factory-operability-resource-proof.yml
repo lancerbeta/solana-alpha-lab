@@ -1,0 +1,45 @@
+name: Factory operability resource proof
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/solana_alpha_lab/factory/observation_schedule_store.py"
+      - "src/solana_alpha_lab/factory/research_store.py"
+      - "src/solana_alpha_lab/factory/collector_operational_packet.py"
+      - "tests/operability_bounded_call_profile.py"
+      - "tests/test_factory_operability_live_resource_gate_repair_v1.py"
+      - ".github/workflows/factory-operability-resource-proof.yml"
+  push:
+    branches: [main]
+    paths:
+      - "src/solana_alpha_lab/factory/observation_schedule_store.py"
+      - "src/solana_alpha_lab/factory/research_store.py"
+      - "src/solana_alpha_lab/factory/collector_operational_packet.py"
+      - "tests/operability_bounded_call_profile.py"
+      - "tests/test_factory_operability_live_resource_gate_repair_v1.py"
+      - ".github/workflows/factory-operability-resource-proof.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  watch-and-pulse:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      UV_NO_ENV_FILE: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          version: "0.11.29"
+          checksum: "04f8b82f5d47f0512dcd32c67a4a6f16a0ea27c81537c338fd0ad6b23cebe829"
+          python-version: "3.13.14"
+          enable-cache: false
+      - name: Frozen-base falsifier and repaired CLIs on doubled cold history
+        run: uv run --locked --managed-python python -B tests/operability_bounded_call_profile.py cgroup-suite --root local/resource-proof

@@ -13,6 +13,25 @@ Heartbeat посылается только при свежем snapshot watch: 
 missing/stale/invalid → `NO_PING` с typed reason и нулём сетевых вызовов.
 Snapshot доказывает выполнение watch, но не доставку Telegram.
 
+Ремонт `FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1`: для уже заполненного
+store индекс `idx_call_ledger_operability_time` строится явной командой
+`scripts/factory_prepare_operability_index.py --db <absolute-ops-store-path>`
+в отдельном разрешённом commissioning после проверенного backup и короткой
+приостановки collector. Обычный старт collector индекс не строит. До этого watch/pulse
+показывают `UNKNOWN` вместо полного прохода старых вызовов или ложного нуля.
+В commissioning сначала проверьте backup и запас места, дайте индексу
+построиться этой командой и подтвердите `EXPLAIN QUERY PLAN` с этим именем
+индекса. Команда проверяет запас места, берёт ограниченный по ожиданию lock,
+отказывается при несовпадающем индексе и печатает только итог/размер/время.
+Индекс использует только встроенные функции SQLite: старый collector после
+отката сохраняет возможность записи. Immutable proof внутри одного packet читается повторно
+из уже проверенного снимка; следующий packet проверяет его заново. Никакой
+научный факт не кэшируется между циклами. Watch/pulse timers остаются
+выключенными до успешного отдельного post-merge canary по реальным unit env,
+MemoryPeak <512 MiB и wall <120 s; затем нужны два обычных watch-цикла и
+реальная подтверждённая доставка дневного Telegram перед включением pulse.
+External heartbeat остаётся выключенным до отдельной настройки получателя.
+
 Первая read-only проверка на хосте из `/opt/solana-alpha-lab`:
 
 ```sh

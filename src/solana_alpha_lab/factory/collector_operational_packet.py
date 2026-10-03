@@ -46,6 +46,7 @@ from solana_alpha_lab.factory.remote_ops import (
     load_config,
     resolve_backup_sink,
 )
+from solana_alpha_lab.factory.research_store import reuse_lifecycle_reads_within_packet
 
 UNKNOWN = "UNKNOWN"
 NOT_APPLICABLE = "NOT_APPLICABLE"
@@ -1049,6 +1050,7 @@ def collector_verdict(health_classes: list[str]) -> str:
     return "DEGRADED"
 
 
+@reuse_lifecycle_reads_within_packet
 def build_collector_operational_packet(
     *,
     root: Path,

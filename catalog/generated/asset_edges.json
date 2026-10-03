@@ -3018,6 +3018,16 @@
       "target_asset_id": "TEST-FACTORY-OPERABILITY-MEMORY-COLLISION-REPAIR-001"
     },
     {
+      "source_asset_id": "CTRL-FACTORY-OPERABILITY-RESOURCE-CI-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-FACTORY-OPERABILITY-RESOURCE-PROFILE-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-OPERABILITY-RESOURCE-CI-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001"
+    },
+    {
       "source_asset_id": "CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-COLLECTOR-OPERATIONAL-PACKET-001"
@@ -6636,6 +6646,16 @@
       "source_asset_id": "EVIDENCE-FACTORY-OPERABILITY-BOUNDED-CALL-RESOURCES-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-RESOURCE-CI-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001"
     },
     {
       "source_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001",
@@ -14098,6 +14118,21 @@
       "target_asset_id": "CTRL-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001"
     },
     {
+      "source_asset_id": "REPORT-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FACTORY-UNATTENDED-OPERABILITY-001"
+    },
+    {
+      "source_asset_id": "REPORT-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001"
+    },
+    {
+      "source_asset_id": "REPORT-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001"
+    },
+    {
       "source_asset_id": "REPORT-FACTORY-ORDINARY-HYPOTHESIS-OWNER-READOUT-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001"
@@ -15533,6 +15568,11 @@
       "target_asset_id": "CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001"
     },
     {
+      "source_asset_id": "SCRIPT-FACTORY-PREPARE-OPERABILITY-INDEX-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001"
+    },
+    {
       "source_asset_id": "SCRIPT-FACTORY-REMOTE-DOCTOR-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-REMOTE-OPS-001"
@@ -16811,6 +16851,11 @@
       "source_asset_id": "TEST-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-OPERABILITY-MEMORY-COLLISION-REPAIR-001",
