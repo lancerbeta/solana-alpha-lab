@@ -126,7 +126,13 @@ stale bindings, write-set violations, derived drift, malformed evidence,
 SEPARATE historical shadow-pin drift against the candidate diff, and
 worktree-versus-committed byte divergence (CRLF), claims no CI/merge/acceptance,
 and a normal push requires its PASS. Frozen-commit pin semantics
-(`FROZEN_SEMANTICS_EVIDENCE_FILES`) stay exempt. It does
+(`FROZEN_SEMANTICS_EVIDENCE_FILES`) stay exempt, and pins to harness-owned
+aggregate paths (`harness_sync` `MANIFEST_RELATIVE`/`ASSET_REGISTRIES`/
+`NAV_OUTPUTS`) are snapshot-only because `check_drift` still guards them.
+Evidence policy: commit what cannot be regenerated (real-run receipts, review
+verdicts, completion bindings, owner/critic decisions); for reproducible
+synthetic runs commit key numbers, output sha256 and the reproduce command, not
+machine dumps; test goldens go to `tests/fixtures/`. It does
 not replace merge-readiness. After exact-head CI run
 `scripts/owner_attention_gate.py --merge-readiness` (no phrase, no `gh pr merge`).
 STOP for one exact owner approval only when `ready_for_owner_phrase` is true;

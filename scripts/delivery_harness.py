@@ -155,6 +155,20 @@ FROZEN_SEMANTICS_EVIDENCE_FILES = frozenset(
 )
 
 
+def harness_owned_aggregate_paths() -> frozenset[str]:
+    """Harness-owned aggregate/derived paths: Catalog manifest, asset
+    registries and generated navigation outputs.
+
+    Single shared definition, read live from ``harness_sync`` constants so a
+    registry added there is exempt here automatically (no second list).
+    """
+
+    harness = _load_harness_sync_module()
+    return frozenset(
+        (harness.MANIFEST_RELATIVE, *harness.ASSET_REGISTRIES, *harness.NAV_OUTPUTS)
+    )
+
+
 def path_in_managed_write_set(path: str, managed: list[str]) -> bool:
     """Exact task write-set membership delegated to the gate's authority.
 
@@ -553,6 +567,11 @@ def _preflight_shadow_pin_problems(
     - the evidence file is not in the frozen-semantics registry
     - the pinned path IS in the candidate diff
     - pinned sha256 != sha256(git show HEAD:pinned_path)
+
+    A pin to a harness-owned aggregate path (``harness_owned_aggregate_paths``)
+    is snapshot-only history and never blocks. Aggregates stay guarded by
+    ``harness_sync.check_drift`` (derived-drift / Catalog validation, run by
+    preflight on the changed paths), so no protection is lost.
     """
 
     if not changed:
@@ -565,6 +584,7 @@ def _preflight_shadow_pin_problems(
         committed[path] = lookup(path)
     exempt = frozen_evidence if frozen_evidence is not None else FROZEN_SEMANTICS_EVIDENCE_FILES
     scan_root = evidence_root if evidence_root is not None else (root / "docs" / "evidence")
+    aggregates = harness_owned_aggregate_paths()
     reasons: list[str] = []
     if not scan_root.is_dir():
         return []
@@ -580,7 +600,7 @@ def _preflight_shadow_pin_problems(
         except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError):
             continue
         for pinned_path, sha in walk_path_sha256_pins(payload):
-            if pinned_path not in changed:
+            if pinned_path not in changed or pinned_path in aggregates:
                 continue
             actual = committed.get(pinned_path)
             if actual is None:

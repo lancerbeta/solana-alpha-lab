@@ -113,6 +113,18 @@ local classes that CI previously had to catch after push: SEPARATE
 historical `{path,sha256}` pins whose target is in the candidate diff, and
 worktree bytes that differ from `git show HEAD:<path>`. Frozen-commit
 evidence files listed in `FROZEN_SEMANTICS_EVIDENCE_FILES` are exempt.
+A historical pin to a harness-owned aggregate path (Catalog manifest, asset
+registries, generated navigation outputs; one shared set read from the
+`harness_sync` constants `MANIFEST_RELATIVE`, `ASSET_REGISTRIES`, `NAV_OUTPUTS`)
+is snapshot-only: it records the bytes then and never blocks a later change.
+Aggregates stay guarded by `harness_sync.check_drift` (derived drift and Catalog
+validation) in the same preflight; pins to every other path keep the DENY.
+
+Evidence policy (forward-only): commit what cannot be regenerated (real-run
+receipts, review verdicts, completion bindings, owner/critic decisions). For a
+reproducible synthetic run commit a compact summary: key numbers, sha256 of the
+outputs and the exact reproduce command, not multi-hundred-line machine dumps.
+Goldens a test consumes belong in `tests/fixtures/`, not `docs/evidence/`.
 Zero GitHub/network calls and zero mutations. Exit 0 and
 `ready_for_first_push: true` are required before any normal remote task-branch
 push; it claims no CI, no merge authority and no product acceptance, and does
