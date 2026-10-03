@@ -1700,6 +1700,17 @@ def format_discovery_readout(evidence: Mapping[str, Any]) -> dict[str, Any]:
         ),
         "non_claims": ["NO_ALPHA", "NO_CAUSAL_IDENTIFICATION", "NO_MARKET_FORGE"],
     }
+    policy = result.get("universe_policy")
+    if isinstance(policy, Mapping):
+        payload["universe_policy"] = {
+            "semantic_sha256": policy.get("semantic_sha256"),
+            "min_holders": policy.get("min_holders"),
+            "min_liquidity_usd": policy.get("min_liquidity_usd"),
+            "n_pass": policy.get("n_pass"),
+            "n_fail": policy.get("n_fail"),
+            "n_unknown": policy.get("n_unknown"),
+            "n_base": policy.get("n_base"),
+        }
     if result.get("target_kind"):
         payload["target_kind"] = result.get("target_kind")
         payload["mean_target_units"] = result.get("mean_target_units")
@@ -1873,6 +1884,7 @@ def run_recorded_discovery_query(
     )
 
     policy_definition = effective_policy(store).get("definition")
+    revising_legacy = False
     if _is_temporal_query(spec):
         from solana_alpha_lab.factory.hfic_temporal_discovery import (
             TEMPORAL_CALCULATION_VERSION,
@@ -2117,6 +2129,11 @@ def run_recorded_discovery_query(
         },
         "candidate_scope": confirming,
         "look_scope_relation": relation,
+        **(
+            {"universe_population": "LEGACY_FROZEN_POPULATION"}
+            if revising_legacy
+            else {}
+        ),
         "priors": [dict(item) for item in (priors or [])],
         "scientific_slot_reserved": False,
     }
