@@ -43,8 +43,9 @@
     "docs/evidence/forge_downside_readout_v1/performance.json": "32765640dd30a79b022447656763c0c9cd8e381696bca67f3ffd35739cbeb610",
     "docs/evidence/forge_downside_readout_v1/reproduce_packets.py": "fa19c9e48c24636e1ae348de4d6e58828eb922c1b5872ab5e7b28b764144fbec",
     "docs/evidence/forge_downside_readout_v1/validation.json": "fb47167a028af4f9bef67130c283f8efd657a55d2e0abaa4fe47cf173bf73d98",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "f4f59f212153fb2dfff1e739d7d48443eee1ead1e601205dac3088cc3443c229",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "0767c77226918748726adfaca09e9b1799cc167f1266eaf1507ec40d7c1645ea",
-    "docs/tasks/FORGE_DOWNSIDE_READOUT_V1.md": "5cd56cbe5b9e56564a199364243848ec12c6b518788d7659d0f017a2e7b5bc94",
+    "docs/tasks/FORGE_DOWNSIDE_READOUT_V1.md": "b039805608cdc1601eeaa25354522d66ddca6ecb369a01095ebf62148b4a4e2c",
     "scripts/hypothesis_forge.py": "2e04fe57eeaed364264ac57b589f59c013ac4d410714cd7ed6ff095fe4601953",
     "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "e98f0b036be9ab10ec041f9f2ba79a43005c14715589973de38eed0f90149094",
     "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "fd826a557d7e1a5e6a2e7a3464769b85cc551929b2107fb962c7740b9ab7ad54",
@@ -66,14 +67,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_downside_readout_v1/factory_fit.json",
-    "sha256": "f198f1f98d915dfaeca5967da0e30436f563059453b8b64b75d7eeb02a1d2a9f",
+    "sha256": "3707998d636d2f8a6e9543b24a06b4e0a925c088839ffb44ea85f847a36d3fc9",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FIVE_VERTICALS_AND_REPLAY_REFUSAL_CALENDAR_REGRESSIONS_AND_EXACT_IMPLEMENTATION_DIRECT_CONSUMERS",
     "independent_review": {
       "path": "docs/evidence/forge_downside_readout_v1/independent_review.json",
-      "sha256": "ac7bb434f1badd2d75834e493aa3e45e66b98e0d617e335cca72d855cd3378ba",
+      "sha256": "247b29c56823d420a1bba60ebb42ffb769e4a8bf4e8beb63c2ec2aee1b8d3817",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
