@@ -30,6 +30,7 @@ _STORE_READ_STATS = {
     "count_due_in_states_calls": 0,
     "call_ledger_timestamp_rows_examined": 0,
     "call_diagnostics_index_candidates": 0,
+    "call_diagnostics_payload_projections": 0,
     "call_diagnostics_rows_returned": 0,
     "call_payloads_decoded": 0,
 }
@@ -123,15 +124,17 @@ def _now(clock: datetime | None = None) -> str:
 
 
 _OPERABILITY_RAW_TIME = "COALESCE(NULLIF(updated_at, ''), created_at)"
+_OPERABILITY_SQL_TIME = f"replace(replace({_OPERABILITY_RAW_TIME}, ',', '.'), '.Z', 'Z')"
 # SQLite built-ins only: an older collector can still write after code rollback.
 # Non-UTC, malformed and impossible calendar dates sort after every valid date
 # and are returned to the Python consumer as UNKNOWN evidence.
 OPERABILITY_TIME_SQL = (
     f"CASE WHEN typeof({_OPERABILITY_RAW_TIME}) = 'text' "
     f"AND substr({_OPERABILITY_RAW_TIME}, -1) = 'Z' "
+    f"AND substr({_OPERABILITY_RAW_TIME}, 1, 4) != '0000' "
     f"AND substr({_OPERABILITY_RAW_TIME}, 1, 19) = "
-    f"strftime('%Y-%m-%dT%H:%M:%S', {_OPERABILITY_RAW_TIME}, '+0 seconds') "
-    f"THEN julianday({_OPERABILITY_RAW_TIME}) ELSE 1e99 END"
+    f"strftime('%Y-%m-%dT%H:%M:%S', {_OPERABILITY_SQL_TIME}, '+0 seconds') "
+    f"THEN julianday({_OPERABILITY_SQL_TIME}) ELSE 1e99 END"
 )
 OPERABILITY_INDEX_SQL = (
     "CREATE INDEX IF NOT EXISTS idx_call_ledger_operability_time "
@@ -2541,7 +2544,7 @@ class ObservationScheduleStore:
         # indexed candidate set a superset of Python's exact microsecond cut.
         cutoff = window_start.astimezone(UTC).timestamp()
         cursor = self._conn.execute(
-            f"SELECT primitive_id, state, created_at, updated_at, {', '.join(extracts)}, {validity} AS diagnostics_payload_valid "
+            "SELECT rowid AS operability_rowid, primitive_id, state, created_at, updated_at "
             f"FROM call_ledger INDEXED BY idx_call_ledger_operability_time WHERE {OPERABILITY_TIME_SQL} >= julianday(?)",
             (datetime.fromtimestamp(cutoff - 1, UTC).isoformat().replace("+00:00", "Z"),),
         )
@@ -2558,8 +2561,15 @@ class ObservationScheduleStore:
                     effective = None
                 if effective is not None and effective < window_start:
                     continue
+                payload_fields = self._conn.execute(
+                    f"SELECT {', '.join(extracts)}, {validity} AS diagnostics_payload_valid "
+                    "FROM call_ledger WHERE rowid = ?", (row["operability_rowid"],),
+                ).fetchone()
+                _STORE_READ_STATS["call_diagnostics_payload_projections"] += 1
                 _STORE_READ_STATS["call_diagnostics_rows_returned"] += 1
                 projected = dict(row)
+                projected.pop("operability_rowid")
+                projected.update(dict(payload_fields))
                 projected["payload"] = {field: projected.pop(field) for field in fields}
                 yield projected
         finally:

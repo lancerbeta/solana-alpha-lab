@@ -39333,7 +39333,7 @@ records:
     repository_path: tests/operability_bounded_call_profile.py
   integrity:
     kind: sha256
-    sha256: 7b9ef6bedaa2d462511284b75737ea856235bf16de36dd085df1057457242a5c
+    sha256: 39a4bff03d18bd036fb0b0fc82d16f565421d227f97cddffec14e27c447df1ee
   access:
     mode: read_only
     method: file
@@ -39504,7 +39504,7 @@ records:
     repository_path: tests/test_factory_operability_live_resource_gate_repair_v1.py
   integrity:
     kind: sha256
-    sha256: 8633d320b3613a427fb83262a34e426588583b993fdddea208adcb611ca1a043
+    sha256: 8de1f938ab53ab9216c87bf95a2c74e4beca8ac33758a6be02c7055c29e18d1b
   access:
     mode: read_only
     method: file
@@ -39580,7 +39580,7 @@ records:
     repository_path: .github/workflows/factory-operability-resource-proof.yml
   integrity:
     kind: sha256
-    sha256: ff5704a7e6dc61d7301a2ef2d6e03ed6c6aaff1894ca301146dcc85350576bd5
+    sha256: 66fdef92efde841172d4e715b7571d542377922af33fffcc0555fc2e6390837d
   access:
     mode: read_only
     method: file
@@ -39620,7 +39620,7 @@ records:
     repository_path: docs/evidence/factory_operability_live_resource_gate_repair/a1_linux_profile_v1.json
   integrity:
     kind: sha256
-    sha256: a11a1f73fd1154b2a7664e2e16c0442803187bc5e2f0148ef0b9fe8bade8f546
+    sha256: 8bc65dcef6768c74e1428f2fc25767c21f8d2ebcceeae3afca3e51757c70a6c7
   access:
     mode: read_only
     method: file
@@ -39660,7 +39660,7 @@ records:
     repository_path: docs/reports/factory_operability_live_resource_gate_repair/a1_owner_readout_v1.md
   integrity:
     kind: sha256
-    sha256: 847a40f2195c551176289ebe12853db12346762c9125f756f0ddca40cd5c298c
+    sha256: 8e2d4a260d774100b5d3dd9fc977381b59d66463c05e92b2dd1655151283acb9
   access:
     mode: read_only
     method: file

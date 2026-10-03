@@ -55,7 +55,7 @@ def peak_rss_bytes() -> int:
     return int(counters.PeakWorkingSetSize)
 
 
-def create_fixture(root: Path, old_rows: int, payload_bytes: int) -> dict[str, object]:
+def create_fixture(root: Path, old_rows: int, payload_bytes: int, recent_rows: int = 128) -> dict[str, object]:
     root = root.resolve()
     from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
     from solana_alpha_lab.factory.observation_schedule import canonical_sha256, parse_utc, render_utc, validate_observation_schedule
@@ -125,7 +125,8 @@ def create_fixture(root: Path, old_rows: int, payload_bytes: int) -> dict[str, o
     store._conn.executemany(
         "INSERT INTO call_ledger VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         ((f"r{i}", f"c{i}", f"a{i}", "COMPLETED", RECENT, payload,
-          "2026-09-01T00:00:00Z", "2026-09-01T00:00:00Z") for i in range(old_rows)),
+          "2026-09-01T00:00:00Z", ("2026-09-01T00:00:00Z",
+          "2026-09-01T00:00:00,123Z", "2026-09-01T00:00:00.Z")[i % 3]) for i in range(old_rows)),
     )
     recent_payload = json.dumps({"schedule_sha256": digest, "activation_id": ACTIVATION,
                                  "http_class": "HTTP_OK", "status": "OBSERVED",
@@ -133,7 +134,7 @@ def create_fixture(root: Path, old_rows: int, payload_bytes: int) -> dict[str, o
     store._conn.executemany(
         "INSERT INTO call_ledger VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         ((f"rr{i}", f"cc{i}", f"aa{i}", "COMPLETED", RECENT, recent_payload, stamp, stamp)
-         for i in range(128)),
+         for i in range(recent_rows)),
     )
     small = json.dumps({"note": "x" * 2048})
     store._conn.executemany("INSERT INTO candidate_members VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -156,7 +157,7 @@ def create_fixture(root: Path, old_rows: int, payload_bytes: int) -> dict[str, o
         runtime["data_root"] = rdp.relative_to(ROOT).as_posix()
         runtime["producer_git_sha"] = "c" * 40
         (root / "runtime.yaml").write_text(yaml.safe_dump(runtime), encoding="utf-8")
-    fixture = {"old_call_rows": old_rows, "recent_call_rows": 128,
+    fixture = {"old_call_rows": old_rows, "recent_call_rows": recent_rows,
             "old_payload_bytes_per_row": len(payload.encode()), "sqlite_bytes": path.stat().st_size,
             "candidate_rows": 6000, "due_rows": 12000, "rdp_files": 2500,
             "rdp_bytes": 2500 * 1024, "immutable_manifests": manifest_count,
@@ -285,10 +286,13 @@ def cgroup_gate(root: Path, consumer: str, *, baseline: bool = False) -> dict[st
     root = root.resolve()
     root.relative_to(ROOT / "local")  # cache eviction is restricted to the synthetic fixture
     fixture = json.loads((root / "fixture.json").read_text(encoding="utf-8"))
-    # Cold-cache proof without a global drop_caches or touching live files.
+    recent_rows = int(fixture.get("recent_call_rows", 128))
+    # Flush synthetic files before advisory eviction. This is a preparation
+    # policy, not a claim that actual cache residency has been measured.
     for path in root.rglob("*"):
         if path.is_file():
             with path.open("rb") as handle:
+                os.fsync(handle.fileno())
                 os.posix_fadvise(handle.fileno(), 0, 0, os.POSIX_FADV_DONTNEED)
     unit = f"factory-resource-proof-{consumer}-{uuid.uuid4().hex[:8]}"
     command = [
@@ -306,15 +310,20 @@ def cgroup_gate(root: Path, consumer: str, *, baseline: bool = False) -> dict[st
     try:
         launch = subprocess.run(command, capture_output=True, text=True, timeout=210,
                                 check=False)
-        state = subprocess.run(
-            ["sudo", "systemctl", "show", f"{unit}.service", "--no-pager",
-             "-p", "Result", "-p", "ExecMainStatus", "-p", "MemoryPeak",
-             "-p", "MemoryMax", "-p", "ExecMainStartTimestampMonotonic",
-             "-p", "ExecMainExitTimestampMonotonic", "-p", "ActiveState",
-             "-p", "SubState"],
-            capture_output=True, text=True, timeout=10, check=False,
-        )
-        fields = dict(line.split("=", 1) for line in state.stdout.splitlines() if "=" in line)
+        deadline = time.monotonic() + 195
+        while True:
+            state = subprocess.run(
+                ["sudo", "systemctl", "show", f"{unit}.service", "--no-pager",
+                 "-p", "Result", "-p", "ExecMainStatus", "-p", "MemoryPeak",
+                 "-p", "MemoryMax", "-p", "ExecMainStartTimestampMonotonic",
+                 "-p", "ExecMainExitTimestampMonotonic", "-p", "ActiveState", "-p", "SubState"],
+                capture_output=True, text=True, timeout=10, check=False)
+            fields = dict(line.split("=", 1) for line in state.stdout.splitlines() if "=" in line)
+            if state.returncode or fields.get("SubState") not in ("running", "start", "start-pre", "start-post"):
+                break
+            if time.monotonic() >= deadline:
+                break
+            time.sleep(1)
         journal = subprocess.run(
             ["sudo", "journalctl", "-u", f"{unit}.service", "-o", "cat",
              "--no-pager", "-n", "30"],
@@ -338,21 +347,23 @@ def cgroup_gate(root: Path, consumer: str, *, baseline: bool = False) -> dict[st
             and len(measured) == 1 and measured[0].get("consumer") == consumer
             and measured[0].get("baseline") is baseline
             and measured[0].get("store_read_stats", {}).get(
-                "call_diagnostics_rows_returned") == 128
+                "call_diagnostics_rows_returned") == recent_rows
             and measured[0].get("result", {}).get("cli_exit") == 0
-            and measured[0]["result"].get("observations_24h") == 128
+            and measured[0]["result"].get("observations_24h") == recent_rows
             and measured[0]["result"].get("call_diagnostics_status") == "EXACT"
             and measured[0].get("immutable_reads", {}).get("partition_verifications", 0) > 0
         )
         stats = measured[0].get("store_read_stats", {}) if len(measured) == 1 else {}
-        read_bound = stats.get("call_diagnostics_index_candidates") == 128
+        read_bound = stats.get("call_diagnostics_index_candidates") == recent_rows and stats.get(
+            "call_diagnostics_payload_projections") == recent_rows
         reuse_proven = len(measured) == 1 and measured[0].get("immutable_reads", {}).get(
             "manifest_reads") == fixture["immutable_manifests"]
-        baseline_reproduced = stats.get("call_ledger_timestamp_rows_examined") == fixture["old_call_rows"] + 128
+        baseline_reproduced = stats.get("call_ledger_timestamp_rows_examined") == fixture["old_call_rows"] + recent_rows
         success = completed and (baseline_reproduced if baseline else (
             read_bound and reuse_proven and peak < 512 * 1024 * 1024 and wall < 120))
         return {"consumer": consumer, "baseline": baseline, "pass": success,
-                "fixture": fixture, "cold_fixture_cache": True,
+                "fixture": fixture, "fixture_cache_eviction": "FSYNC_AND_ADVISORY_DONTNEED",
+                "cache_residency_verified": False,
                 "memory_peak_bytes": peak or None, "wall_seconds": wall,
                 "memory_max_bytes": int(fields.get("MemoryMax") or 0) or None,
                 "legacy_timestamp_udf_evaluations": stats.get("call_ledger_timestamp_rows_examined"),
@@ -369,11 +380,11 @@ def cgroup_gate(root: Path, consumer: str, *, baseline: bool = False) -> dict[st
 
 
 def cgroup_suite(root: Path) -> dict[str, object]:
-    """Growing-history vertical loop, every consumer in a fresh cold cgroup."""
+    """Growing-history vertical loop, every consumer in a fresh cgroup."""
     runs = []
     for rows in (16384, 32768):
         fixture_root = root / str(rows)
-        create_fixture(fixture_root, rows, 32768)
+        create_fixture(fixture_root, rows, 32768, recent_rows=1162)
         # Exercise explicit migration on a populated synthetic copy, not only
         # index maintenance while filling an empty new database.
         import sqlite3
@@ -393,8 +404,8 @@ def cgroup_suite(root: Path) -> dict[str, object]:
             scalable = scalable and (
                 second["memory_peak_bytes"] <= first["memory_peak_bytes"] * 1.25 + 8 * 1024**2
                 and second["wall_seconds"] <= first["wall_seconds"] * 1.5 + 1)
-    return {"pass": scalable, "proof": "GROWING_HISTORY_COLD_CGROUP_REAL_CLI",
-            "history_rows": [16384, 32768], "recent_rows_fixed": 128,
+    return {"pass": scalable, "proof": "GROWING_HISTORY_CGROUP_REAL_CLI",
+            "history_rows": [16384, 32768], "recent_rows_fixed": 1162,
             "old_parquet_payload_opened": False,
             "limitation": "manifest headers enumerated once per packet; no historical call scan or old Parquet payload read"}
 

@@ -18,11 +18,12 @@ Immutable manifests и проверенные релевантные partitions 
 не открываются; заголовки manifest всё ещё перечисляются один раз за packet.
 Это остаточная стоимость, а не обещание бесконечного масштаба.
 
-91 адресный тест PASS, один platform skip. На реальной синтетической цепочке
+Из 91 адресного теста 90 PASS, один platform skip. На реальной синтетической цепочке
 один packet читает 19 manifest вместо 57 и проверяет 3 partitions вместо 9;
 24-hour diagnostics остаётся EXACT с 128 свежими наблюдениями. Windows-измерение
 не заменяет Linux. Перед merge обязателен PASS workflow Factory operability
-resource proof на точном head: два размера истории, холодный файловый кэш,
+resource proof на точном head: два размера истории и 1162 свежих вызова; fsync и
+advisory DONTNEED для synthetic файлов (резидентность кэша отдельно не доказана),
 768 MiB/180 с guard и <512 MiB/<120 с для каждого настоящего CLI.
 
 После merge: свежий host preflight/backup, точный release pin, короткое controlled

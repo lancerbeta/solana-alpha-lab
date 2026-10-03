@@ -9,6 +9,7 @@ on:
       - "src/solana_alpha_lab/factory/collector_operational_packet.py"
       - "tests/operability_bounded_call_profile.py"
       - "tests/test_factory_operability_live_resource_gate_repair_v1.py"
+      - "scripts/factory_prepare_operability_index.py"
       - ".github/workflows/factory-operability-resource-proof.yml"
   push:
     branches: [main]
@@ -18,6 +19,7 @@ on:
       - "src/solana_alpha_lab/factory/collector_operational_packet.py"
       - "tests/operability_bounded_call_profile.py"
       - "tests/test_factory_operability_live_resource_gate_repair_v1.py"
+      - "scripts/factory_prepare_operability_index.py"
       - ".github/workflows/factory-operability-resource-proof.yml"
 
 permissions:
@@ -41,5 +43,5 @@ jobs:
           checksum: "04f8b82f5d47f0512dcd32c67a4a6f16a0ea27c81537c338fd0ad6b23cebe829"
           python-version: "3.13.14"
           enable-cache: false
-      - name: Frozen-base falsifier and repaired CLIs on doubled cold history
+      - name: Frozen-base falsifier and repaired CLIs on doubled fsync-evicted history
         run: uv run --locked --managed-python python -B tests/operability_bounded_call_profile.py cgroup-suite --root local/resource-proof

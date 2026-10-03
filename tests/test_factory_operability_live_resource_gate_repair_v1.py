@@ -30,7 +30,7 @@ class OperabilityIndexTests(unittest.TestCase):
             store = ObservationScheduleStore(Path(temp, "ops.sqlite"))
             cutoff = datetime(2026, 10, 2, 12, tzinfo=UTC)
             stamps = ["2026-09-01T12:00:00,123Z", "2026-09-01T12:00:00.Z",
-                      "2026-10-02T11:59:59.999999Z", "2026-02-30T12:00:00Z",
+                      "2026-10-02T11:59:59.999999Z", "2026-02-30T12:00:00Z", "0000-09-01T12:00:00Z",
                       "2026-10-02T12:00:00Z", "2026-10-02T12:00:00.000001Z"]
             store._conn.executemany(
                 "INSERT INTO call_ledger VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
@@ -51,6 +51,8 @@ class OperabilityIndexTests(unittest.TestCase):
                 ((f"r{i}", f"c{i}", f"a{i}", "COMPLETED", "P", "{}", old, old)
                  for i in range(5000)),
             )
+            store._conn.execute("UPDATE call_ledger SET updated_at='2026-09-01T00:00:00,123Z' WHERE rowid % 3 = 0")
+            store._conn.execute("UPDATE call_ledger SET updated_at='2026-09-01T00:00:00.Z' WHERE rowid % 3 = 1")
             store._conn.execute(
                 "INSERT INTO call_ledger VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 ("recent", "recent", "recent", "COMPLETED", "P", "{}", recent, recent),
@@ -66,6 +68,7 @@ class OperabilityIndexTests(unittest.TestCase):
             self.assertEqual({r["updated_at"] for r in rows}, {recent, "invalid"})
             self.assertEqual(store_read_stats()["call_ledger_timestamp_rows_examined"], 0)
             self.assertEqual(store_read_stats()["call_diagnostics_index_candidates"], 2)
+            self.assertEqual(store_read_stats()["call_diagnostics_payload_projections"], 2)
             plan = store._conn.execute(
                 "EXPLAIN QUERY PLAN SELECT * FROM call_ledger "
                 f"WHERE {OPERABILITY_TIME_SQL} >= julianday(?)",
@@ -176,7 +179,8 @@ class CgroupProofGateTests(unittest.TestCase):
                       "ExecMainExitTimestampMonotonic": "2000000"}
             measured = {"consumer": "watch", "baseline": False,
                         "store_read_stats": {"call_diagnostics_rows_returned": 128,
-                                             "call_diagnostics_index_candidates": 128},
+                                             "call_diagnostics_index_candidates": 128,
+                                             "call_diagnostics_payload_projections": 128},
                         "result": {"cli_exit": 0, "observations_24h": 128, "call_diagnostics_status": "EXACT"},
                         "immutable_reads": {"partition_verifications": 3, "manifest_reads": 3}}
             cases = [(fields, measured, True), (dict(fields, SubState="running"), measured, False),
@@ -194,6 +198,9 @@ class CgroupProofGateTests(unittest.TestCase):
                      patch.object(profile.sys, "platform", "linux"), \
                      patch.object(profile.os, "posix_fadvise", create=True), \
                      patch.object(profile.os, "POSIX_FADV_DONTNEED", 4, create=True), \
+                     patch.object(profile.os, "fsync"), \
+                     patch.object(profile.time, "monotonic", side_effect=[0, 196]), \
+                     patch.object(profile.time, "sleep"), \
                      patch.object(profile.subprocess, "run", side_effect=run):
                     self.assertEqual(profile.cgroup_gate(root, "watch")["pass"], expected)
 
