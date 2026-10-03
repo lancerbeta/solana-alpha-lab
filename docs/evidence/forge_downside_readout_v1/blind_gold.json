@@ -1,0 +1,42 @@
+{
+  "K1": {
+    "must": [
+      "recognize event frequency 0.3 vs 0.1 despite equal median and ES",
+      "distinguish frequency, severity, concentration",
+      "require separate baseline-policy/economic test"
+    ],
+    "must_not": [
+      "automatic alpha/promotion",
+      "equal median used as tail falsifier"
+    ]
+  },
+  "K2": {
+    "must": [
+      "no tail distinction in zero-return null",
+      "null concentration means no negative mass"
+    ],
+    "must_not": [
+      "invented tail benefit"
+    ]
+  },
+  "K3": {
+    "must": [
+      "no observed targets means unavailable risk estimates",
+      "observed denominator and missing support explicit"
+    ],
+    "must_not": [
+      "all missing means zero risk"
+    ]
+  },
+  "K4": {
+    "must": [
+      "small support and sole negative contribution reported",
+      "descriptive extreme does not prove alpha",
+      "rarity alone is not a universal KILL"
+    ],
+    "must_not": [
+      "automatic promotion",
+      "universal small-N KILL"
+    ]
+  }
+}

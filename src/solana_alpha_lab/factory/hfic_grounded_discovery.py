@@ -1532,6 +1532,19 @@ def assert_computed_grounded_evidence(
 
         # Matching hashes prove the bytes, not that the views agree.
         require_coherent_temporal_result(summary)
+        # Draft transport is not a second owner of the compact statistics.
+        # V5 requires its exact projection; legacy drafts may omit that field.
+        from solana_alpha_lab.factory.hfic_temporal_discovery import (
+            TEMPORAL_CALCULATION_VERSION_V5,
+        )
+
+        if "descriptive_readout" in bound or summary.get("calculation_version") == TEMPORAL_CALCULATION_VERSION_V5:
+            try:
+                matches = _canonical(bound.get("descriptive_readout")) == _canonical(descriptive_return_readout(summary))
+            except (TypeError, ValueError):
+                matches = False
+            if not matches:
+                raise GroundedDiscoveryError("GROUNDED_RESULT_MISMATCH")
         current = current_look_evidence(last, journal_looks)
         if str(current.get("record_id") or "") != str(last.get("record_id") or ""):
             raise GroundedDiscoveryError("GROUNDED_RESULT_SUPERSEDED")
@@ -1553,6 +1566,47 @@ def no_worthy_scope_record(evidence: Mapping[str, Any]) -> dict[str, Any]:
         "candidate_scope": evidence.get("candidate_scope"),
         "result_sha256": evidence.get("result_sha256"),
         "viewed_queries": list(evidence.get("viewed_queries") or []),
+    }
+
+
+def descriptive_return_readout(result: Mapping[str, Any], *, detail_limit: int = 4) -> dict[str, Any]:
+    """Bounded model/owner view; the full immutable result remains at its ref."""
+
+    if result.get("schema") != "smial.hfic-temporal-query":
+        return {}
+    if not isinstance(result.get("downside"), Mapping):
+        return {
+            "status": "LEGACY_READOUT_UNAVAILABLE",
+            "message": "Хвостовые метрики не были рассчитаны этой версией. Для tail/veto-оценки требуется явное дополнение exact saved result.",
+        }
+
+    def view(row: Mapping[str, Any], *, matched: bool = False) -> dict[str, Any]:
+        block = dict(row.get("downside") or {})
+        return {
+            "view": "MATCHED_OBSERVED" if matched else (row.get("view") or row.get("cohort_id")),
+            "mean_target": row.get("mean_target"),
+            "median_target": row.get("median_target"),
+            "eligible_n": block.get("observed_n", 0) + block.get("missing_n", 0),
+            "downside": block,
+        }
+
+    details = {}
+    truncation = {}
+    for key in ("ablations", "by_cohort", "by_calendar_block"):
+        rows = [row for row in (result.get(key) or []) if isinstance(row, Mapping)]
+        details[key] = [view(row) for row in rows[:detail_limit]]
+        truncation[key] = {"total": len(rows), "included": min(len(rows), detail_limit), "truncated": len(rows) > detail_limit}
+    return {
+        "status": "DESCRIPTIVE_PROXY",
+        "matched": view(result, matched=True),
+        "baseline": view(result.get("baseline") or {}),
+        "details": details,
+        "detail_truncation": truncation,
+        "selection_policy": "CANONICAL_ORDER_PREFIX",
+        "baseline_may_include_matched": True,
+        "assessment": "DESCRIPTIVE_ONLY_NO_AUTOMATIC_VERDICT",
+        "missingness": "OBSERVED_DENOMINATOR_ONLY_NO_MAR_ASSUMPTION",
+        "tail_support": "DESCRIPTIVE_ESTIMATE_NOT_CONFIDENCE_INTERVAL",
     }
 
 
@@ -1578,6 +1632,9 @@ def format_discovery_readout(evidence: Mapping[str, Any]) -> dict[str, Any]:
             else None
         ),
         "pooled_mean_target": (result.get("pooled") or {}).get("mean_target"),
+        "median_target": result.get("median_target"),
+        "baseline": result.get("baseline"),
+        "descriptive_readout": descriptive_return_readout(result),
         "by_cohort": result.get("by_cohort"),
         "by_calendar_block": result.get("by_calendar_block"),
         "cohort_independent_replication": result.get("cohort_independent_replication"),
@@ -1618,6 +1675,7 @@ def format_discovery_readout(evidence: Mapping[str, Any]) -> dict[str, Any]:
             payload["science_ready"] = False
     if isinstance(evidence.get("revision_of"), Mapping):
         payload["revision_of"] = dict(evidence["revision_of"])
+        payload["assessment_advisory"] = "REVIEW_REQUIRED_FOR_ASSESSMENT_BOUND_TO_SOURCE"
     return payload
 
 
@@ -1758,7 +1816,10 @@ def run_recorded_discovery_query(
     if _is_temporal_query(spec):
         from solana_alpha_lab.factory.hfic_temporal_discovery import (
             TEMPORAL_CALCULATION_VERSION,
+            TEMPORAL_CALCULATION_VERSION_V5,
             TEMPORAL_CALCULATION_VERSIONS_READABLE,
+            current_look_evidence,
+            saved_downside_revision,
             validate_temporal_query,
             verify_calculation_revision_source,
         )
@@ -1779,12 +1840,21 @@ def run_recorded_discovery_query(
             None,
         )
         if correction is not None:
+            saved = saved_downside_revision(
+                [item for item in same_question if item.get("operation_sha256") == operation_sha256],
+                correction,
+            )
+            if saved is not None:
+                replayed = saved
             source_look = verify_calculation_revision_source(
                 journal_looks,
                 correction=correction,
                 spec=spec,
                 binding=list(binding),
                 operation_sha256=operation_sha256,
+                target_calculation_version=(
+                    TEMPORAL_CALCULATION_VERSION_V5 if saved is not None else TEMPORAL_CALCULATION_VERSION
+                ),
             )
             if source_look.get("data_binding_sha256") != pre_binding_sha:
                 raise GroundedDiscoveryError("CALCULATION_REVISION_INPUT_MISMATCH")
@@ -1798,20 +1868,21 @@ def run_recorded_discovery_query(
                 for item in same_question
                 if item.get("calculation_version") in TEMPORAL_CALCULATION_VERSIONS_READABLE
             ]
-            replayed = historical[-1] if historical else None
+            replayed = current_look_evidence(historical[-1], historical) if historical else None
     if replayed is None:
         if _is_temporal_query(spec):
             from solana_alpha_lab.factory.hfic_temporal_discovery import classify_temporal_look
 
             classify_temporal_look(list_discovery_looks(store, journal_scope), spec)
-            _append_temporal_intent(
-                store,
-                journal_scope=journal_scope,
-                spec_sha256=prevalidated["spec_sha256"],
-                binding_sha=pre_binding_sha,
-                search_tier=str(prevalidated["search_tier"]),
-                git_sha=git_sha,
-            )
+            if source_look is None:
+                _append_temporal_intent(
+                    store,
+                    journal_scope=journal_scope,
+                    spec_sha256=prevalidated["spec_sha256"],
+                    binding_sha=pre_binding_sha,
+                    search_tier=str(prevalidated["search_tier"]),
+                    git_sha=git_sha,
+                )
         computed = execute_discovery_from_rows(census, observations, spec, binding)
         if source_look is not None:
             recipe = computed["summary"].get("experiment_recipe") or {}
@@ -1822,6 +1893,11 @@ def run_recorded_discovery_query(
                 or recipe.get("scientific_identity") != stored_recipe.get("scientific_identity")
             ):
                 raise GroundedDiscoveryError("CALCULATION_REVISION_INPUT_MISMATCH")
+            from solana_alpha_lab.factory.hfic_temporal_discovery import (
+                assert_downside_revision_preserves_v4,
+            )
+
+            assert_downside_revision_preserves_v4(source_look["result"], computed["summary"])
     else:
         computed = {
             "admitted": admit_discovery_binding(binding),
@@ -1946,6 +2022,7 @@ def run_recorded_discovery_query(
         "data_binding_sha256": binding_sha,
         "result_sha256": digest,
         "result": summary,
+        "descriptive_readout": descriptive_return_readout(summary),
         "result_refs": [record_id],
         "queries": [
             {
@@ -1985,6 +2062,7 @@ def run_recorded_discovery_query(
     lineage = existing.get("revision_of") if existing is not None else revision_of
     if isinstance(lineage, Mapping):
         evidence["revision_of"] = dict(lineage)
+        evidence["assessment_advisory"] = "REVIEW_REQUIRED_FOR_ASSESSMENT_BOUND_TO_SOURCE"
     if existing is not None:
         evidence["requested_candidate_scope"] = dict(candidate_scope)
     return assert_computed_grounded_evidence(store, evidence)

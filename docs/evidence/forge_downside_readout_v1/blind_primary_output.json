@@ -1,0 +1,728 @@
+{
+  "batch_type": "NATIVE_ISOLATED_INDEPENDENT_HYPOTHESIS_CRITIC",
+  "execution_context": {
+    "model": "UNKNOWN",
+    "client": "UNKNOWN",
+    "effort": "UNKNOWN",
+    "basis": "Точные model/client/effort не подтверждены доступным execution context."
+  },
+  "scope_receipt": {
+    "prompt": "blind_input/prompt_b.txt",
+    "prompt_raw_file_sha256": "86675e77148ea63dedcd440771dbed2b7449114219c39426a8a8db1ef7cd6901",
+    "packets_read_in_full": [
+      "K1.json",
+      "K2.json",
+      "K3.json",
+      "K4.json"
+    ],
+    "other_file_reads": 0,
+    "git_mutation": 0,
+    "runtime_writes": 0,
+    "research_store_access": 0,
+    "research_store_writes": 0,
+    "provider_calls": 0,
+    "web_calls": 0,
+    "holdout_access": 0,
+    "experiment_execution": 0,
+    "new_outcome_calculations": 0,
+    "automatic_promotion": false,
+    "identity_calculations": "Только SHA256 фактических байтов пяти разрешённых файлов; outcomes не пересчитывались.",
+    "evaluation_independence": "Каждый вывод основан только на соответствующем packet и prompt_b.txt."
+  },
+  "results": {
+    "K1": {
+      "packet_identities": {
+        "packet_schema": "smial.hypothesis-critic-input",
+        "packet_version": "1.4",
+        "session_id": "HFIC-SESS-927FC24067A3231C",
+        "selected_candidate_id": "HFIC-CAND-9CB7AFDEE7A6",
+        "owner_focus": "FIXED_DOWNSIDE_K1",
+        "live_git_head": "f5023465fe01d2947ccafb23659bcad133669a9a",
+        "market_evidence_epoch_sha256": "0bcd2b0784911dba913df5daf512bbc3810078d27463f244bbc860c68290e3f2",
+        "capability_epoch_sha256": "4e304e5a1a10d9d428d6848c36f4501682dfddd21005b4c530c3ee93c5b5d5bf",
+        "grounding_context_packet_sha256": "eff9d00fc2813a5efb07f078d47b7a9af42761feb3df446e6351418786875587",
+        "prior_memory_snapshot_sha256": "4f3fdc896af29d63cdfafbd2a75b3e9ff760860bcee0ae3dc91a8f8d7912f27c",
+        "data_binding_sha256": "66c5967649bc3a40c90cd002b7dc14db2903892649542ca18608c59e13ab3db3",
+        "result_sha256": "51c57576ece585ff4e92965a54b4a43fdc370c5cc2974d73dbb1495184d081d6",
+        "query_spec_sha256": "833f2c84aa897042e81b6a63a5f224e7d56af3cc732bb5a105802af3dcd39311",
+        "raw_packet_file_sha256": "822e71287e06b52baf27a381e5a13c0655dbcf8c0d4c62db20d582c2c8bf8168",
+        "critic_input_packet_sha256": "UNKNOWN",
+        "selected_definition_sha256": "UNKNOWN",
+        "identity_binding_status": "Session и candidate ID скопированы. Canonical packet serialization и canonical selected-definition identity не подтверждены разрешёнными входами. Raw file hash не выдан за canonical identity; query spec hash и prior definition hash не подставлены вместо selected definition."
+      },
+      "hypothesis_critic_result_v1": null,
+      "machine_result_status": "NOT_EMITTED_CANONICAL_IDENTITY_BINDINGS_UNVERIFIED",
+      "critic_terminal": {
+        "code": "KILL_UNBOUND_EVIDENCE",
+        "reason": "Приложенный расчёт абсолютного liquidity mark на Y3600→Y7200 не связан с выбранным ratio-кандидатом и его H900/quote-only определением.",
+        "scope": "Остановка текущего packet; научное закрытие механизма не установлено."
+      },
+      "independent_reality_receipt": {
+        "input_completeness": "Session ID, prior_memory и freeze-owned grounding присутствуют.",
+        "grounding_preserved": {
+          "feature_id": "FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO",
+          "availability_class": "PIT_READY",
+          "available_to_strategy_semantics": "BOUNDED_PIT_READY_EXPLICIT_SCOPE",
+          "capability_id": "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+          "accepted": true,
+          "authority_granted": false
+        },
+        "verified_scope": "Содержимое разрешённого packet и его внутренние соответствия.",
+        "external_verification": "Git head, Catalog, manifests, source fingerprints, schedule и classifier не проверялись: чтения за пределами пяти файлов запрещены.",
+        "holdout_receipt": "В recipe указано holdout=false и EXPLORATORY_REUSE. Пустой holdouts_not_touched не является независимым доказательством всей истории доступа.",
+        "binding_conflict": "Primary X кандидата — LIQUIDITY_TO_MCAP_RATIO; scientific_body использует FIELD-LIQUIDITY-USD-001, point_value на Y3600 и predicate mark>=0.5. Horizon кандидата — H900 / 0.01 SOL quote-only reverse sell; target расчёта — price proxy Y3600→Y7200. LOOK_SCOPE_MATCH не разрешает эти явные различия."
+      },
+      "strongest_kill_case": "Группа может собирать обычный риск определённого mint/day или режима, а liquidity state только сопровождать его. Абсолютный mark не доказывает действие ratio; ценовая потеря не доказывает исчезновение sell route. При одной описательной когорте и отсутствии реализованного mcap-контроля более частые потери могут не переноситься на будущую политику отказа. Даже реальное различие price proxy ещё не устанавливает, что veto улучшит результат после затрат и пропущенных возможностей.",
+      "interpretation": {
+        "descriptive_support": "SUPPORTED_NARROW_DOWNSIDE_FREQUENCY_DISTINCTION",
+        "matched_vs_same_decision_baseline": "У matched чаще фиксированные крупные потери: 3/10 против 4/40 и для <=-20%, и для <=-50%. ES10 одинаков: -0.5. Значит, таблица показывает различие частоты потерь при одинаковой описанной тяжести нижнего хвоста, а не отсутствие различия.",
+        "median_interpretation": "Обе медианы равны 0; это не самостоятельный falsifier tail/veto-вопроса.",
+        "negative_mass_interpretation": "Negative mass равна 1.5 у matched и 2.0 у baseline при разных observed N. Меньшая абсолютная сумма у меньшей группы не означает меньший риск.",
+        "concentration_interpretation": "Worst negative share составляет 0.3333333333333333 против 0.25. Описанный хвост matched не сводится к одному отрицательному outcome, но независимость событий неизвестна.",
+        "scientific_verdict": "Избранный ratio/H900 механизм этим расчётом не проверен. Причинность, воспроизводимость и экономическая полезность veto не установлены."
+      },
+      "evidence": {
+        "source": "grounded_evidence.descriptive_readout",
+        "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+        "matched": {
+          "eligible_n": 10,
+          "observed_n": 10,
+          "missing_n": 0,
+          "mean_target": -0.15,
+          "median_target": 0.0,
+          "p05": -0.5,
+          "p10": -0.5,
+          "p25": -0.375,
+          "le_minus_20_n": 3,
+          "le_minus_20_rate": 0.3,
+          "le_minus_50_n": 3,
+          "le_minus_50_rate": 0.3,
+          "es10_return": -0.5,
+          "es10_tail_mass_n": 1.0,
+          "negative_n": 3,
+          "negative_mass": 1.5,
+          "worst_negative_share": 0.3333333333333333,
+          "zero_n": 7
+        },
+        "baseline": {
+          "eligible_n": 40,
+          "observed_n": 40,
+          "missing_n": 0,
+          "mean_target": -0.05,
+          "median_target": 0.0,
+          "p05": -0.5,
+          "p10": -0.04999999999999982,
+          "p25": 0.0,
+          "le_minus_20_n": 4,
+          "le_minus_20_rate": 0.1,
+          "le_minus_50_n": 4,
+          "le_minus_50_rate": 0.1,
+          "es10_return": -0.5,
+          "es10_tail_mass_n": 4.0,
+          "negative_n": 4,
+          "negative_mass": 2.0,
+          "worst_negative_share": 0.25,
+          "zero_n": 36
+        },
+        "baseline_may_include_matched": true,
+        "ablation": "ABLATION_DROP_mark совпадает с приведённым baseline.",
+        "replication": "Один календарный блок; cohort slice — DESCRIPTIVE_NOT_INDEPENDENT, independent_replication=false.",
+        "budget": {
+          "main_count": 1,
+          "adaptive_count": 0,
+          "new_threshold_trials": false
+        }
+      },
+      "limitations": [
+        "ES10 tail mass matched равна 1.0; это описательная оценка без confidence interval.",
+        "Baseline может включать matched; сравнение не является независимым двухвыборочным тестом.",
+        "Нет результатов negative control matched mcap without thin liquidity.",
+        "Price proxy не измеряет исполнимый выход, intended-notional эффект, quote persistence или net return.",
+        "Cost stack отсутствует; decision_sensitivity=NOT_EVALUATED.",
+        "PIT_READY ratio сохранён в его bounded scope; он не доказывает доступность другого mark или historical execution.",
+        "Source price event time и independence отмечены UNKNOWN.",
+        "Просмотренные варианты известны, но main_question_count_includes_variants=false; полный trial accounting не подтверждён."
+      ],
+      "attack_results": {
+        "novelty_memory": {
+          "status": "UNKNOWN",
+          "evidence": "Единственная capsule HYP-QUOTE-NATIVE-FRICTION-H900-V1 имеет memory_status=HISTORICAL и mechanism=classify_audition_terminal. Actor, population, decision time, X/Y, horizon и terminal не заполнены. Эквивалентность и наследование отрицательного результата не доказаны; automatic hard-close недопустим."
+        },
+        "mechanism_counterparty": {
+          "status": "UNKNOWN",
+          "evidence": "Описательное различие частоты согласуется с возможным risk marker. Нет наблюдения exit_route_unavailable, проверки actor story или ответа why_not_arbitraged. Альтернатива обычного mint/regime риска остаётся открытой."
+        },
+        "estimand_universe_pit": {
+          "status": "FAIL",
+          "evidence": "BASE_X=40, decision_eligible_n=40, eligibility_uses_target=false; это packet-level сведения. Материально не совпадают ratio и абсолютный mark, H900 и Y3600→Y7200. PIT_READY grounding ratio не перенесён на другой X."
+        },
+        "execution_economics": {
+          "status": "FAIL",
+          "evidence": "Primary evidence — EXPLORATORY_PROXY, labeled_net_return=false, cost=ABSENT. Оно не обосновывает route-вопрос или полезность отказа относительно базовой политики."
+        },
+        "statistics_multiplicity": {
+          "status": "UNKNOWN",
+          "evidence": "Фиксированные loss frequencies различаются при одинаковом ES10; это сохранено. Но matched N=10, tail mass=1.0, один блок, зависимость baseline и matched и отсутствие uncertainty ограничивают научный вывод."
+        },
+        "alternative_world_falsifiability": {
+          "status": "FAIL",
+          "evidence": "Чтение descriptive table не различает liquidity mechanism и общий risk/regime marker. Negative control назван, но его результат отсутствует; useful distinction не имеет фиксированного критерия."
+        },
+        "information_value_opportunity_cost": {
+          "status": "UNKNOWN",
+          "evidence": "Таблица информативна для узкого вопроса о частоте потерь. Решения PASS/FAIL/INCONCLUSIVE и последствия veto не определены, поэтому переход к Fast Lane не обоснован."
+        },
+        "capability_data_delta": {
+          "status": "UNKNOWN",
+          "evidence": "Grounding сообщает принятую replay capability с authority_granted=false; calculation recipe называет CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001. Совместимость не подтверждена. Оснований строить новый компонент или заказывать collection нет."
+        }
+      },
+      "material_defects": [
+        "Selected definition не связано с scientific_body приложенного расчёта.",
+        "Причинный claim и state transition к unavailable route не идентифицируются по переданному price proxy.",
+        "Нет экономического counterfactual для политики отказа."
+      ],
+      "revision_contract": "NONE",
+      "final_hypothesis_contract": "NONE",
+      "validated_spec_and_classifier_receipt": "NONE",
+      "final_execution_unit": "NONE",
+      "non_claims": [
+        "NO_ALPHA",
+        "NO_NET_RETURN",
+        "NO_CAUSAL_IDENTIFICATION",
+        "NO_INTRABAR_STOP",
+        "NO_SOURCE_PRICE_EVENT_TIME",
+        "NO_INDEPENDENT_REPLICATION",
+        "NO_AUTOMATIC_PROMOTION",
+        "NO_SCIENTIFIC_HARD_CLOSE_FROM_BINDING_STOP"
+      ],
+      "next": {
+        "action": "REQUEST_CORRECTED_EXISTING_EVIDENCE_BINDING",
+        "instruction": "Запросить один packet, который связывает неизменный selected candidate с уже существующим immutable receipt именно ratio/H900 определения; без новых outcomes и без изменения механизма."
+      }
+    },
+    "K2": {
+      "packet_identities": {
+        "packet_schema": "smial.hypothesis-critic-input",
+        "packet_version": "1.4",
+        "session_id": "HFIC-SESS-61497DE1C384D3FF",
+        "selected_candidate_id": "HFIC-CAND-9CB7AFDEE7A6",
+        "owner_focus": "FIXED_DOWNSIDE_K2",
+        "live_git_head": "f5023465fe01d2947ccafb23659bcad133669a9a",
+        "market_evidence_epoch_sha256": "0bcd2b0784911dba913df5daf512bbc3810078d27463f244bbc860c68290e3f2",
+        "capability_epoch_sha256": "4e304e5a1a10d9d428d6848c36f4501682dfddd21005b4c530c3ee93c5b5d5bf",
+        "grounding_context_packet_sha256": "b9305963b59b4e8f1d0191496b250651803bc1ce85b0e4c8a265039c4225a5ff",
+        "prior_memory_snapshot_sha256": "8fe03c91dff421931de93bdb30a03658e21ca6643068b4a2b1fcce61debc4fbd",
+        "data_binding_sha256": "898b6c863a8a124c72963ac15fd58849f48fde4a48ec82bceb648ed3b4bcfe92",
+        "result_sha256": "945b8a504a63c223b979c4c5602a31f26cc95b9393b3a3093708b3774b4d5db1",
+        "query_spec_sha256": "833f2c84aa897042e81b6a63a5f224e7d56af3cc732bb5a105802af3dcd39311",
+        "raw_packet_file_sha256": "56bf58233d934204a83ecc146f0f7d726a40f121329b93c683e1a7dab200b30c",
+        "critic_input_packet_sha256": "UNKNOWN",
+        "selected_definition_sha256": "UNKNOWN",
+        "identity_binding_status": "Session и candidate ID скопированы. Canonical packet и selected-definition hashes не подтверждены; raw file, query spec и prior definition hashes не подставлены вместо них."
+      },
+      "hypothesis_critic_result_v1": null,
+      "machine_result_status": "NOT_EMITTED_CANONICAL_IDENTITY_BINDINGS_UNVERIFIED",
+      "critic_terminal": {
+        "code": "KILL_UNBOUND_EVIDENCE",
+        "reason": "Расчёт absolute mark/Y3600→Y7200 не связан с выбранным ratio/H900 кандидатом; отсутствие различия в этой таблице не закрывает другой estimand.",
+        "scope": "Остановка текущего packet; широкое научное закрытие liquidity mechanism не установлено."
+      },
+      "independent_reality_receipt": {
+        "input_completeness": "Session ID, prior_memory и freeze-owned grounding присутствуют.",
+        "grounding_preserved": {
+          "feature_id": "FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO",
+          "availability_class": "PIT_READY",
+          "available_to_strategy_semantics": "BOUNDED_PIT_READY_EXPLICIT_SCOPE",
+          "capability_id": "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+          "accepted": true,
+          "authority_granted": false
+        },
+        "verified_scope": "Содержимое разрешённого packet и его внутренние соответствия.",
+        "external_verification": "Live Git, Catalog, manifests, source fingerprints, schedule и classifier не проверялись в пределах разрешённых чтений.",
+        "holdout_receipt": "Recipe сообщает holdout=false и EXPLORATORY_REUSE; независимо история доступа не подтверждена.",
+        "binding_conflict": "Кандидат требует LIQUIDITY_TO_MCAP_RATIO и H900 / 0.01 SOL quote-only reverse sell. Расчёт применяет FIELD-LIQUIDITY-USD-001, mark>=0.5 на Y3600 и price proxy до Y7200. LOOK_SCOPE_MATCH не доказывает их эквивалентность."
+      },
+      "strongest_kill_case": "В данном наблюдаемом price window liquidity-mark partition ничего не различает: и matched, и baseline целиком состоят из нулевых target. Экономический фильтр на этой основе добавит правило без продемонстрированной пользы. Спасать такое наблюдение новым threshold, другим горизонтом или complexity после просмотра значений нельзя. Однако эти нули не доказывают отсутствие редкого риска в других наблюдениях или истинность нулевого ratio/H900 эффекта.",
+      "interpretation": {
+        "descriptive_support": "NO_OBSERVED_DOWNSIDE_DISTINCTION",
+        "matched_vs_same_decision_baseline": "При полном reported coverage matched и baseline не имеют наблюдаемых отрицательных outcomes, фиксированных loss events или отрицательной массы; ES10 равен 0 в обеих группах.",
+        "median_interpretation": "Вывод об отсутствии описательного различия основан на loss events, ES10, negative mass и coverage, а не только на одинаковых медианах.",
+        "negative_mass_interpretation": "Negative mass=0 при observed_n=10 и 40. Это наблюдаемые нули данного proxy window, а не missing values.",
+        "concentration_interpretation": "Worst negative share=null, потому что отрицательной массы нет; это не нулевая концентрация и не missing outcome.",
+        "scientific_verdict": "Переданный расчёт не даёт поддержки downside distinction в своей наблюдаемой области. Избранный ratio/H900 механизм не проверен; редкий риск за пределами этой области не исключён."
+      },
+      "evidence": {
+        "source": "grounded_evidence.descriptive_readout",
+        "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+        "matched": {
+          "eligible_n": 10,
+          "observed_n": 10,
+          "missing_n": 0,
+          "mean_target": 0.0,
+          "median_target": 0.0,
+          "p05": 0.0,
+          "p10": 0.0,
+          "p25": 0.0,
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": 0.0,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": 0.0,
+          "es10_return": 0.0,
+          "es10_tail_mass_n": 1.0,
+          "negative_n": 0,
+          "negative_mass": 0,
+          "worst_negative_share": null,
+          "zero_n": 10
+        },
+        "baseline": {
+          "eligible_n": 40,
+          "observed_n": 40,
+          "missing_n": 0,
+          "mean_target": 0.0,
+          "median_target": 0.0,
+          "p05": 0.0,
+          "p10": 0.0,
+          "p25": 0.0,
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": 0.0,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": 0.0,
+          "es10_return": 0.0,
+          "es10_tail_mass_n": 4.0,
+          "negative_n": 0,
+          "negative_mass": 0,
+          "worst_negative_share": null,
+          "zero_n": 40
+        },
+        "baseline_may_include_matched": true,
+        "ablation": "ABLATION_DROP_mark также содержит только наблюдаемые нулевые target.",
+        "replication": "Один календарный блок; cohort slice описательный и не независимый.",
+        "budget": {
+          "main_count": 1,
+          "adaptive_count": 0,
+          "new_threshold_trials": false
+        }
+      },
+      "limitations": [
+        "Нулевые price returns в конечной выборке не доказывают нулевой будущий tail risk.",
+        "ES10 tail mass matched равна 1.0; confidence interval не приведён.",
+        "Baseline может включать matched; независимая контрольная группа не подтверждена.",
+        "Нулевой price proxy не доказывает доступность sell route или отсутствие execution costs.",
+        "Cost stack отсутствует, net return не измерен и последствия veto не оценены.",
+        "Actual source price event time и independence неизвестны.",
+        "Нет bound результата ratio/H900 и нет реализованного mcap negative control."
+      ],
+      "attack_results": {
+        "novelty_memory": {
+          "status": "UNKNOWN",
+          "evidence": "Capsule HYP-QUOTE-NATIVE-FRICTION-H900-V1 — HISTORICAL, mechanism=classify_audition_terminal; actor, population, timestamp, X/Y, horizon и terminal не заполнены. Duplicate либо наследуемый scientific hard-close не установлен."
+        },
+        "mechanism_counterparty": {
+          "status": "UNKNOWN",
+          "evidence": "Наблюдаемой downside heterogeneity нет. При этом отсутствие событий в данном окне не опровергает механизм для другого bound estimand; counterparty и exit-route story не измерены."
+        },
+        "estimand_universe_pit": {
+          "status": "FAIL",
+          "evidence": "Reported BASE_X и eligible N равны 40, eligibility_uses_target=false. Но recipe X и horizon не соответствуют selected definition; PIT_READY ratio нельзя считать доказательством другого mark."
+        },
+        "execution_economics": {
+          "status": "FAIL",
+          "evidence": "Price proxy не даёт потенциальной наблюдаемой downside выгоды для veto в этой таблице. Execution и costs отсутствуют, поэтому экономическая полезность не установлена."
+        },
+        "statistics_multiplicity": {
+          "status": "UNKNOWN",
+          "evidence": "Описательно нет различия по фиксированным loss events, ES10 и negative mass при полном coverage. Нет uncertainty bound или заданной достаточности выборки для исключения редких потерь."
+        },
+        "alternative_world_falsifiability": {
+          "status": "FAIL",
+          "evidence": "Все нулевые targets совместимы и с отсутствием эффекта, и с окном без событий либо грубым price proxy. Cheapest falsifier и отсутствующий control не различают эти миры."
+        },
+        "information_value_opportunity_cost": {
+          "status": "FAIL",
+          "evidence": "Эта таблица не предоставляет описательного основания продолжать именно этот mark/window как полезный veto. Перенос такого вывода на selected ratio/H900 требует сначала корректной связи estimand."
+        },
+        "capability_data_delta": {
+          "status": "UNKNOWN",
+          "evidence": "Принятая replay capability не предоставляет authority и не подтверждает scientific recipe. Из отсутствия эффекта в таблице не следует необходимость новых features, инфраструктуры или collection."
+        }
+      },
+      "material_defects": [
+        "Материальный конфликт selected X/horizon и приложенного recipe.",
+        "Никакой наблюдаемой downside distinction в переданной области нет.",
+        "Scientific uncertainty и экономические последствия отказа не определены."
+      ],
+      "revision_contract": "NONE",
+      "final_hypothesis_contract": "NONE",
+      "validated_spec_and_classifier_receipt": "NONE",
+      "final_execution_unit": "NONE",
+      "non_claims": [
+        "NO_ALPHA",
+        "NO_NET_RETURN",
+        "NO_CAUSAL_IDENTIFICATION",
+        "NO_ZERO_FUTURE_RISK_CLAIM",
+        "NO_INTRABAR_STOP",
+        "NO_SOURCE_PRICE_EVENT_TIME",
+        "NO_AUTOMATIC_PROMOTION",
+        "NO_SCIENTIFIC_HARD_CLOSE_FROM_BINDING_STOP"
+      ],
+      "next": {
+        "action": "REQUEST_CORRECTED_EXISTING_EVIDENCE_BINDING",
+        "instruction": "Запросить один packet с уже существующим immutable receipt неизменного ratio/H900 selected candidate; не переносить отсутствие различия mark/Y3600→Y7200 на другой вопрос и не открывать новые outcomes."
+      }
+    },
+    "K3": {
+      "packet_identities": {
+        "packet_schema": "smial.hypothesis-critic-input",
+        "packet_version": "1.4",
+        "session_id": "HFIC-SESS-90C8D350F8D7EAC5",
+        "selected_candidate_id": "HFIC-CAND-9CB7AFDEE7A6",
+        "owner_focus": "FIXED_DOWNSIDE_K3",
+        "live_git_head": "f5023465fe01d2947ccafb23659bcad133669a9a",
+        "market_evidence_epoch_sha256": "0bcd2b0784911dba913df5daf512bbc3810078d27463f244bbc860c68290e3f2",
+        "capability_epoch_sha256": "4e304e5a1a10d9d428d6848c36f4501682dfddd21005b4c530c3ee93c5b5d5bf",
+        "grounding_context_packet_sha256": "71eee21aedd20005611422b6398610d47a5b76e56ba92f15aa5ed32199ed9cce",
+        "prior_memory_snapshot_sha256": "3b61cb41349fcafc7b0ce5bb9aed8e04dc7bd7c94d37275b820e046467c29cd9",
+        "data_binding_sha256": "ae3b001695fd9c5bea3717b760db6269ddaa9198acb5634319ce81dabc3da675",
+        "result_sha256": "90ecebc2169ccd1e4439dd8e1ff310e6fbc84855861f985574c5706bef8401d8",
+        "query_spec_sha256": "833f2c84aa897042e81b6a63a5f224e7d56af3cc732bb5a105802af3dcd39311",
+        "raw_packet_file_sha256": "e22361f680bb10b04e7bc3b0aceeded716394702dc271f56a84a3824e27d2860",
+        "critic_input_packet_sha256": "UNKNOWN",
+        "selected_definition_sha256": "UNKNOWN",
+        "identity_binding_status": "Session и candidate ID скопированы. Canonical identity hashes не подтверждены; raw file hash не подменяет canonical packet identity, а prior hash не является selected definition."
+      },
+      "hypothesis_critic_result_v1": null,
+      "machine_result_status": "NOT_EMITTED_CANONICAL_IDENTITY_BINDINGS_UNVERIFIED",
+      "critic_terminal": {
+        "code": "KILL_UNBOUND_EVIDENCE",
+        "reason": "Расчёт не соответствует selected ratio/H900 definition и не содержит ни одного observed target, поэтому scientific вывод о downside из него невозможен.",
+        "scope": "Техническая остановка текущего packet; data absence не признана отрицательным scientific evidence."
+      },
+      "independent_reality_receipt": {
+        "input_completeness": "Session ID, prior_memory и freeze-owned grounding присутствуют.",
+        "grounding_preserved": {
+          "feature_id": "FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO",
+          "availability_class": "PIT_READY",
+          "available_to_strategy_semantics": "BOUNDED_PIT_READY_EXPLICIT_SCOPE",
+          "capability_id": "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+          "accepted": true,
+          "authority_granted": false
+        },
+        "verified_scope": "Содержимое разрешённого packet, reported coverage и внутренние соответствия.",
+        "external_verification": "Live Git, manifests, schemas, immutable release schedule и classifier не проверялись; выход за пять файлов запрещён.",
+        "holdout_receipt": "Recipe сообщает holdout=false и EXPLORATORY_REUSE; независимой проверки всей истории доступа нет.",
+        "binding_conflict": "Selected X=LIQUIDITY_TO_MCAP_RATIO и H900 quote-only horizon не соответствуют FIELD-LIQUIDITY-USD-001 mark>=0.5 и price target Y3600→Y7200.",
+        "coverage_receipt": "BASE_X=40 сохранён; matched eligible=10 с observed=0 и missing=10; baseline eligible=40 с observed=0 и missing=40."
+      },
+      "strongest_kill_case": "Пропуски exit target могут быть связаны с наиболее неблагоприятными состояниями. Их исключение или трактовка как нулевых потерь искусственно превратит неизвестный риск в безопасный. Одновременно EXIT_ABSENT не доказывает невозможность торгового выхода: причина может быть в наблюдении или binding. При нулевом observed N любые заявления о частоте, тяжести либо отличии downside сейчас не проверяемы.",
+      "interpretation": {
+        "descriptive_support": "UNKNOWN_NO_OBSERVED_TARGET",
+        "matched_vs_same_decision_baseline": "Сравнить downside нельзя: outcomes отсутствуют в обеих группах. Loss-event counts равны 0 только среди нуля наблюдений; rates, ES10 и negative mass остаются null.",
+        "median_interpretation": "Median target=null в обеих группах. Это отсутствие оценки, а не равенство медиан или нулевой эффект.",
+        "negative_mass_interpretation": "Negative mass=null; negative_n=0 не означает отсутствие потерь в eligible population.",
+        "concentration_interpretation": "Worst negative share и tail mass=null; поддержку хвоста нельзя оценить.",
+        "stress_model_interpretation": "missing_stress_model.mean_target=-1.0 имеет label=MODEL. Это сценарное допущение, не observed loss и не замена descriptive outcomes.",
+        "scientific_verdict": "Downside effect и полезность veto неизвестны. Ни PASS, ни механизм-level KILL из all-missing данных не следуют."
+      },
+      "evidence": {
+        "source": "grounded_evidence.descriptive_readout",
+        "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+        "matched": {
+          "eligible_n": 10,
+          "status": "NO_OBSERVED_TARGET",
+          "observed_n": 0,
+          "missing_n": 10,
+          "mean_target": null,
+          "median_target": null,
+          "p05": null,
+          "p10": null,
+          "p25": null,
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": null,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": null,
+          "es10_return": null,
+          "es10_tail_mass_n": null,
+          "negative_n": 0,
+          "negative_mass": null,
+          "worst_negative_share": null,
+          "zero_n": 0
+        },
+        "baseline": {
+          "eligible_n": 40,
+          "status": "NO_OBSERVED_TARGET",
+          "observed_n": 0,
+          "missing_n": 40,
+          "mean_target": null,
+          "median_target": null,
+          "p05": null,
+          "p10": null,
+          "p25": null,
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": null,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": null,
+          "es10_return": null,
+          "es10_tail_mass_n": null,
+          "negative_n": 0,
+          "negative_mass": null,
+          "worst_negative_share": null,
+          "zero_n": 0
+        },
+        "baseline_may_include_matched": true,
+        "base_x_n": 40,
+        "matched_target_exclusion_reasons": {
+          "EXIT_ABSENT": 10
+        },
+        "ablation": "ABLATION_DROP_mark также имеет observed_n=0 и missing_n=40.",
+        "replication": "block_count=0; имеющиеся calendar/cohort строки не содержат observed outcomes и не являются независимой replication.",
+        "budget": {
+          "main_count": 1,
+          "adaptive_count": 0,
+          "new_threshold_trials": false
+        }
+      },
+      "limitations": [
+        "Нет наблюдаемого знаменателя для downside rates.",
+        "Нет tail metrics или uncertainty; MAR assumption отсутствует.",
+        "EXIT_ABSENT не равен доказанному отсутствию executable sell route.",
+        "Stress model нельзя повышать до observed scientific evidence.",
+        "BASE_X=40 нельзя сжимать до нуля или считать полным outcome coverage.",
+        "Результат ratio/H900 не bound; PIT_READY X не гарантирует наличие Y.",
+        "Costs, foregone wins и политика относительно baseline не оценены."
+      ],
+      "attack_results": {
+        "novelty_memory": {
+          "status": "UNKNOWN",
+          "evidence": "Единственная HISTORICAL capsule описывает classify_audition_terminal, остальные научные измерения mostly null; prior scientific terminal не указан. Duplicate или inherited negative evidence не установлен."
+        },
+        "mechanism_counterparty": {
+          "status": "UNKNOWN",
+          "evidence": "Ни adverse price paths, ни unavailable route не наблюдаются в переданных outcomes. All-missing не подтверждает и не опровергает actor/mechanism story."
+        },
+        "estimand_universe_pit": {
+          "status": "FAIL",
+          "evidence": "Recipe не соответствует selected X/horizon. Eligible BASE_X сохранён, eligibility_uses_target=false, но требуется различать отсутствующий target и population; ретроспективное availability не реконструировалось."
+        },
+        "execution_economics": {
+          "status": "UNKNOWN",
+          "evidence": "Нулевой observed N и cost=ABSENT не позволяют оценить break-even, route или последствия veto. MODEL=-1.0 не исполнимый economic outcome."
+        },
+        "statistics_multiplicity": {
+          "status": "UNKNOWN",
+          "evidence": "Matched observed=0/missing=10, baseline observed=0/missing=40. Counts 0 при rates=null не являются нулевым риском; ES10, tail mass и concentration не оценены."
+        },
+        "alternative_world_falsifiability": {
+          "status": "FAIL",
+          "evidence": "Data gap и истинный adverse-risk mechanism дают одну и ту же отсутствующую таблицу. Cheapest falsifier в текущем packet не различает эти миры."
+        },
+        "information_value_opportunity_cost": {
+          "status": "UNKNOWN",
+          "evidence": "Packet сообщает coverage problem, но не market answer. Он не обосновывает экономический run, compound escalation или новую collection."
+        },
+        "capability_data_delta": {
+          "status": "UNKNOWN",
+          "evidence": "PIT_READY feature и принятая replay capability не устраняют missing Y. Причина data gap и доступность existing repair неизвестны; автоматический заказ collection не разрешён."
+        }
+      },
+      "material_defects": [
+        "Selected candidate не связан с recipe X/horizon.",
+        "Все required price targets в описанных matched и baseline views отсутствуют.",
+        "Нет classifier receipt, который позволил бы материализовать data-option execution unit."
+      ],
+      "revision_contract": "NONE",
+      "final_hypothesis_contract": "NONE",
+      "validated_spec_and_classifier_receipt": "NONE",
+      "final_execution_unit": "NONE",
+      "non_claims": [
+        "NO_ALPHA",
+        "NO_NET_RETURN",
+        "NO_CAUSAL_IDENTIFICATION",
+        "NO_ZERO_RISK_FROM_MISSINGNESS",
+        "NO_OBSERVED_LOSS_FROM_STRESS_MODEL",
+        "NO_ROUTE_UNAVAILABLE_FROM_EXIT_ABSENT",
+        "NO_BASE_X_SHRINKAGE",
+        "NO_AUTOMATIC_COLLECTION",
+        "NO_AUTOMATIC_PROMOTION",
+        "NO_SCIENTIFIC_HARD_CLOSE_FROM_DATA_ABSENCE"
+      ],
+      "next": {
+        "action": "REPORT_OUTCOME_COVERAGE_KEEP_BASE_X",
+        "instruction": "Вернуть coverage report с BASE_X=40, matched eligible=10/observed=0/missing=10 и baseline eligible=40/observed=0/missing=40, сохранив EXIT_ABSENT и конфликт estimand. Это допустимое read-only решение, не подтверждённый classifier outcome и не заказ collection."
+      }
+    },
+    "K4": {
+      "packet_identities": {
+        "packet_schema": "smial.hypothesis-critic-input",
+        "packet_version": "1.4",
+        "session_id": "HFIC-SESS-E9E294C3F7A60911",
+        "selected_candidate_id": "HFIC-CAND-9CB7AFDEE7A6",
+        "owner_focus": "FIXED_DOWNSIDE_K4",
+        "live_git_head": "f5023465fe01d2947ccafb23659bcad133669a9a",
+        "market_evidence_epoch_sha256": "0bcd2b0784911dba913df5daf512bbc3810078d27463f244bbc860c68290e3f2",
+        "capability_epoch_sha256": "4e304e5a1a10d9d428d6848c36f4501682dfddd21005b4c530c3ee93c5b5d5bf",
+        "grounding_context_packet_sha256": "95f4d464e2e44ba04edf9547190fc646b68381c8776b0908a91d282f56f27097",
+        "prior_memory_snapshot_sha256": "af4b3a4a9387cfc992faeac60d5d7c39f114f6e8ad567a454184f7e20f637761",
+        "data_binding_sha256": "ce759721ee9192418f76292288c24a067838cb7137897ea60e1e245e6345cbfc",
+        "result_sha256": "bac28d785fbe392ceb6c70996116aa4f566e7c48024599274d265f816b9df691",
+        "query_spec_sha256": "833f2c84aa897042e81b6a63a5f224e7d56af3cc732bb5a105802af3dcd39311",
+        "raw_packet_file_sha256": "2c1a9ac042eec6d4b48807282c5692b99889e18c639ff17747dc191c432dce0e",
+        "critic_input_packet_sha256": "UNKNOWN",
+        "selected_definition_sha256": "UNKNOWN",
+        "identity_binding_status": "Session и candidate ID скопированы. Canonical packet и selected-definition identity не подтверждены; raw file hash отдельно, без подмены machine identity."
+      },
+      "hypothesis_critic_result_v1": null,
+      "machine_result_status": "NOT_EMITTED_CANONICAL_IDENTITY_BINDINGS_UNVERIFIED",
+      "critic_terminal": {
+        "code": "KILL_UNBOUND_EVIDENCE",
+        "reason": "Единичный тяжёлый хвост в absolute-mark/Y3600→Y7200 расчёте не связан с выбранным ratio/H900 definition.",
+        "scope": "Остановка текущего packet вследствие binding; extreme outcome не использован как универсальное основание закрыть механизм."
+      },
+      "independent_reality_receipt": {
+        "input_completeness": "Session ID, prior_memory и freeze-owned grounding присутствуют.",
+        "grounding_preserved": {
+          "feature_id": "FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO",
+          "availability_class": "PIT_READY",
+          "available_to_strategy_semantics": "BOUNDED_PIT_READY_EXPLICIT_SCOPE",
+          "capability_id": "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+          "accepted": true,
+          "authority_granted": false
+        },
+        "verified_scope": "Содержимое разрешённого packet, descriptive readout и внутренние соответствия.",
+        "external_verification": "Live Git, Catalog, manifests, source fingerprints, schedule и classifier не проверялись за пределами разрешённых файлов.",
+        "holdout_receipt": "Recipe сообщает holdout=false и EXPLORATORY_REUSE; независимо полная история доступа не проверена.",
+        "binding_conflict": "Ratio feature и H900 quote-only definition выбранного кандидата не совпадают с absolute liquidity mark>=0.5 и price target Y3600→Y7200."
+      },
+      "strongest_kill_case": "Один idiosyncratic collapse внутри группы из двух наблюдений может создать впечатление мощного risk marker. Baseline включает потенциально ту же потерю, поэтому сравнение отражает концентрацию одной реализации в маленькой группе и её разбавление в широкой population, а не независимое подтверждение механизма. Без второго tail event, независимой replication и реализованного mcap control нельзя отличить устойчивый liquidity effect от случайного попадания одного mint. При этом сам тяжёлый outcome остаётся реальным описательным предупреждением, а не поводом объявить вопрос бессмысленным.",
+      "interpretation": {
+        "descriptive_support": "SEVERE_OBSERVED_DOWNSIDE_WITH_VERY_THIN_SUPPORT",
+        "matched_vs_same_decision_baseline": "У matched фиксированные loss events встречаются в 1/2 наблюдений против 1/40 у baseline; ES10 составляет -0.9 против -0.225. Это заметное описательное различие, но оно поддержано одним отрицательным outcome.",
+        "median_interpretation": "Медиана matched=-0.45 против 0 у baseline; при N=2 её нельзя считать устойчивой характеристикой population.",
+        "negative_mass_interpretation": "Negative mass одинакова, 0.9, а negative_n=1 в обеих группах. Абсолютная масса не даёт независимой дополнительной поддержки effect.",
+        "concentration_interpretation": "Worst negative share=1.0 в обеих группах: вся отрицательная масса сосредоточена в одном outcome. ES10 tail mass matched=0.2 означает дробную поддержку одного наблюдения, не повторение хвостовых событий.",
+        "scientific_verdict": "Таблица содержит тяжёлый tail alert, но не доказывает устойчивый excess risk, alpha или полезность veto. Избранный ratio/H900 механизм не проверен."
+      },
+      "evidence": {
+        "source": "grounded_evidence.descriptive_readout",
+        "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+        "matched": {
+          "eligible_n": 2,
+          "observed_n": 2,
+          "missing_n": 0,
+          "mean_target": -0.45,
+          "median_target": -0.45,
+          "p05": -0.855,
+          "p10": -0.81,
+          "p25": -0.675,
+          "le_minus_20_n": 1,
+          "le_minus_20_rate": 0.5,
+          "le_minus_50_n": 1,
+          "le_minus_50_rate": 0.5,
+          "es10_return": -0.9,
+          "es10_tail_mass_n": 0.2,
+          "negative_n": 1,
+          "negative_mass": 0.9,
+          "worst_negative_share": 1.0,
+          "zero_n": 1
+        },
+        "baseline": {
+          "eligible_n": 40,
+          "observed_n": 40,
+          "missing_n": 0,
+          "mean_target": -0.0225,
+          "median_target": 0.0,
+          "p05": 0.0,
+          "p10": 0.0,
+          "p25": 0.0,
+          "le_minus_20_n": 1,
+          "le_minus_20_rate": 0.025,
+          "le_minus_50_n": 1,
+          "le_minus_50_rate": 0.025,
+          "es10_return": -0.225,
+          "es10_tail_mass_n": 4.0,
+          "negative_n": 1,
+          "negative_mass": 0.9,
+          "worst_negative_share": 1.0,
+          "zero_n": 39
+        },
+        "baseline_may_include_matched": true,
+        "ablation": "ABLATION_DROP_mark совпадает с baseline; это не независимый negative control.",
+        "replication": "Один календарный блок и одна описательная cohort slice; independent_replication=false.",
+        "budget": {
+          "main_count": 1,
+          "adaptive_count": 0,
+          "new_threshold_trials": false
+        }
+      },
+      "limitations": [
+        "Matched N=2 и только один отрицательный outcome.",
+        "ES10 matched опирается на fractional tail mass=0.2; quantiles интерполированы и не являются числом независимых tail events.",
+        "Worst negative share=1.0 у обеих групп, поэтому концентрация максимальна.",
+        "Baseline может включать matched; строгая независимость и фактический membership overlap не проверены.",
+        "Нет uncertainty, cluster-adjusted оценки или independent replication.",
+        "Price proxy не подтверждает route failure, causality или net economics.",
+        "Costs, потерянные выигрыши и последствия veto относительно baseline отсутствуют.",
+        "PIT_READY ratio не повышен до доказательства absolute mark или executable policy."
+      ],
+      "attack_results": {
+        "novelty_memory": {
+          "status": "UNKNOWN",
+          "evidence": "Capsule HYP-QUOTE-NATIVE-FRICTION-H900-V1 имеет HISTORICAL status и receipt-classification mechanism, но null actor/population/timestamp/X/Y/horizon и неизвестный scientific terminal. Duplicate либо inherited hard-close не доказан."
+        },
+        "mechanism_counterparty": {
+          "status": "UNKNOWN",
+          "evidence": "Тяжёлый observed loss согласуется с возможным risk marker, но один outcome также совместим с idiosyncratic collapse. Thin-liquidity и unavailable-route механизм непосредственно не наблюдаются."
+        },
+        "estimand_universe_pit": {
+          "status": "FAIL",
+          "evidence": "Recipe X/horizon не совпадают с selected definition. BASE_X=40, eligible=40 и eligibility_uses_target=false сохранены как packet-level сведения; target-conditioned universe не сконструирован."
+        },
+        "execution_economics": {
+          "status": "FAIL",
+          "evidence": "ES10=-0.9 — описательный price proxy, не исполнимый net loss или benefit от veto. Costs, route, landing, quote persistence и policy counterfactual отсутствуют."
+        },
+        "statistics_multiplicity": {
+          "status": "UNKNOWN",
+          "evidence": "Сравнение loss frequencies и ES10 показывает тяжёлое описательное различие. Однако negative_n=1, worst_negative_share=1.0, matched tail mass=0.2 и один блок не дают достаточной подтверждённой поддержки устойчивости; extreme outcome не принят за alpha или universal KILL."
+        },
+        "alternative_world_falsifiability": {
+          "status": "FAIL",
+          "evidence": "Current readout не различает устойчивый liquidity mechanism и случайный единичный collapse. Названный mcap control не представлен, useful distinction не имеет фиксированного decision criterion."
+        },
+        "information_value_opportunity_cost": {
+          "status": "UNKNOWN",
+          "evidence": "Tail alert полезен как описание, но не обосновывает запуск экономического теста или promotion. PASS/FAIL/INCONCLUSIVE последствия отсутствуют; новая threshold search не оправдана."
+        },
+        "capability_data_delta": {
+          "status": "UNKNOWN",
+          "evidence": "Replay capability accepted=true, authority_granted=false; scientific recipe compatibility не подтверждена. Из одного tail event не следует необходимость collection или инфраструктуры."
+        }
+      },
+      "material_defects": [
+        "Selected ratio/H900 definition не связано с absolute-mark/window evidence.",
+        "Описательное различие полностью опирается на один negative outcome без independent replication.",
+        "Нет economic policy counterfactual и фиксированных decision semantics."
+      ],
+      "revision_contract": "NONE",
+      "final_hypothesis_contract": "NONE",
+      "validated_spec_and_classifier_receipt": "NONE",
+      "final_execution_unit": "NONE",
+      "non_claims": [
+        "NO_ALPHA",
+        "NO_NET_RETURN",
+        "NO_CAUSAL_IDENTIFICATION",
+        "NO_INDEPENDENT_REPLICATION",
+        "NO_STABLE_TAIL_RATE_FROM_ONE_EVENT",
+        "NO_UNIVERSAL_KILL_FROM_EXTREME_OUTCOME",
+        "NO_INTRABAR_STOP",
+        "NO_SOURCE_PRICE_EVENT_TIME",
+        "NO_AUTOMATIC_PROMOTION",
+        "NO_SCIENTIFIC_HARD_CLOSE_FROM_BINDING_STOP"
+      ],
+      "next": {
+        "action": "REQUEST_CORRECTED_EXISTING_EVIDENCE_BINDING",
+        "instruction": "Запросить один packet с immutable receipt неизменного ratio/H900 selected candidate и существующими evidence bindings; сохранить единичный tail как descriptive alert, без новых outcomes, порогов или promotion."
+      }
+    }
+  }
+}

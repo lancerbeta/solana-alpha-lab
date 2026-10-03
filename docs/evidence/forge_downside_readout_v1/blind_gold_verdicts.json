@@ -1,0 +1,49 @@
+{
+  "primary": {
+    "behavior_rubric": {
+      "K1": "PASS",
+      "K2": "PASS",
+      "K3": "PASS",
+      "K4": "PASS"
+    },
+    "fixture_integration": "FAIL_RATIO_H900_LEFTOVER_UNBOUND",
+    "overall": "NOT_READY",
+    "output_raw_sha256": "c75c938442fb81cc31fcde4dfd9497bc637444df75e13b0883338cde537341f1"
+  },
+  "dependent_regression": {
+    "not_independent_replication": true,
+    "output_raw_sha256": "7beaea17bbad30d7133b4660e9740237b471b3970e7322a3e8dcbb3d08eee87e",
+    "case_verdicts": {
+      "K1": {
+        "gold": "PASS",
+        "basis": "0.3 vs 0.1 event frequency, equal median and ES acknowledged; frequency/severity/concentration separated; separate utility test needed"
+      },
+      "K2": {
+        "gold": "PASS",
+        "basis": "Zero-return null has no tail distinction; no negative mass is distinct from future zero risk"
+      },
+      "K3": {
+        "gold": "PASS",
+        "basis": "No observed denominator; null risk estimates are unavailable, not zero risk"
+      },
+      "K4": {
+        "gold": "PASS",
+        "basis": "Two observations and one concentrated loss cannot prove alpha or universal KILL; fractional tail support explicit"
+      }
+    },
+    "fixture_integration": "PASS_READOUT_BINDING_NO_RATIO_HORIZON_MISMATCH",
+    "protocol_finalized": false,
+    "terminals": {
+      "K1": "REVISE_ONCE",
+      "K2": "KILL_LOW_INFORMATION_VALUE",
+      "K3": "REVISE_ONCE",
+      "K4": "REVISE_ONCE"
+    }
+  },
+  "gold_seen_by_reviewers": false,
+  "actual_backend_model": "UNKNOWN",
+  "configured_model": "gpt-6.1-sol",
+  "configured_effort": "xhigh",
+  "client": "CODEX_NATIVE_ISOLATED_AGENT",
+  "no_general_model_calibration_claim": true
+}

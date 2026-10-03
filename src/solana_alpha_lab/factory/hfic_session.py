@@ -1273,6 +1273,7 @@ def _proven_runner_scope(
 
 
 _COMPUTED_LOOK_KEYS = (
+    "descriptive_readout",
     "result",
     "result_sha256",
     "result_refs",
@@ -1741,6 +1742,7 @@ def _bind_selected_look(
         for key, value in grounded.items()
         if key
         not in {
+            "descriptive_readout",
             "result",
             "result_sha256",
             "result_refs",

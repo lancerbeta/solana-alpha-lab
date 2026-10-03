@@ -37,6 +37,19 @@ looks. Revise that exact result with `discovery-execute ... --correct-result-ref
 one `CALCULATION_REVISION` with `new_look=false` and spends no MAIN. Then read
 the saved question again.
 
+Temporal V5 carries `descriptive_readout` beside the full persisted result.
+Use that same machine block for Prompt A, Critic and owner: compare matched
+with baseline, support/missingness, event frequency, ES10 and loss
+concentration. Equal medians alone do not falsify a tail/veto question.
+Legacy V1–V4 replay without computation and explicitly report unavailable
+tails. An exact coherent closed V4 may receive an owner-authorized
+readout-only `discovery-execute --correct-result-ref <ref>
+--correct-result-sha256 <hash>` on its saved spec/input/operation and current
+market. Reason is `DOWNSIDE_READOUT_ADDED`; no new look, slot reopening,
+freeze, assessment or budget. Exact retry reads the saved revision without
+evaluation/writes. Historical terminal stays source-bound; reassessment is
+separate. Contract: `docs/contracts/forge_downside_descriptive_v1.md`.
+
 After reading a saved result or finishing a bounded pre-values synthesis
 inside this authorized run, record its authored assessment with
 `disposition-record --input <packet>` (normal path, not a backfill; see

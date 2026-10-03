@@ -1,0 +1,47 @@
+{
+  "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+  "n_measurements": 101,
+  "pure_helper_ms": {
+    "0": {
+      "median_ms": 0.0016,
+      "max_ms": 0.0043
+    },
+    "10": {
+      "median_ms": 0.0037,
+      "max_ms": 0.0087
+    },
+    "105": {
+      "median_ms": 0.0188,
+      "max_ms": 0.0322
+    },
+    "1159": {
+      "median_ms": 0.1738,
+      "max_ms": 0.3128
+    }
+  },
+  "detail_fixture": {
+    "cohorts": 4,
+    "calendar_blocks": 28
+  },
+  "compact_bytes": 8285,
+  "truncation": {
+    "ablations": {
+      "total": 1,
+      "included": 1,
+      "truncated": false
+    },
+    "by_cohort": {
+      "total": 4,
+      "included": 4,
+      "truncated": false
+    },
+    "by_calendar_block": {
+      "total": 28,
+      "included": 4,
+      "truncated": true
+    }
+  },
+  "summary_comparison_kept": true,
+  "production_packet_limit": 65536,
+  "no_limit_change": true
+}

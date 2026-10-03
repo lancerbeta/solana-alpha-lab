@@ -586,12 +586,7 @@ class TemporalArithmeticTests(unittest.TestCase):
             self.assertNotEqual(fresh["result"]["mean_target"], None)
         # Tier progress consumes discovery look results (classification metadata
         # alone is not scientific evidence — see look_counts_toward_scientific_search).
-        scientific_result = {
-            "population_n": 1,
-            "observed_target_n": 1,
-            "decision_eligible_n": 1,
-            "calculation_version": TEMPORAL_CALCULATION_VERSION,
-        }
+        scientific_result = opened["result"]
         first_look = {**first, "result": scientific_result}
         compound_look = {**compound, "result": scientific_result}
         progress = assess_tier_progress([first_look], freeze_worthy=False)

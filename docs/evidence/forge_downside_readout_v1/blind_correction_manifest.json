@@ -1,0 +1,54 @@
+{
+  "batch": "DEPENDENT_REGRESSION_AFTER_PRIMARY_FIXTURE_BINDING_FAILURE",
+  "inputs": {
+    "K1.json": "1e977d4f6c5c32e5ba47e939aad9030b979d6668acc8d8ceec8a447a4994c107",
+    "K2.json": "f653b244d0b7a53513e77ee6dbcf24098acab9af0e2901eab169c2533b8e0c01",
+    "K3.json": "aa3b3a14013b8559f4e81eeb4accabcc49954f482eb7c3752117fec41e4c9a67",
+    "K4.json": "ce6b50ede7b1430d6189870692e56cc04a7edcc0af23357beea3dd6a1b0a2b67",
+    "prompt_b.txt": "86675e77148ea63dedcd440771dbed2b7449114219c39426a8a8db1ef7cd6901"
+  },
+  "gold_sha256": "e92a21ef78e6c637c968aa77390681428fe708f1f5135a1ef31e91fd8a17dc65",
+  "input_policy": "CURRENT_PRODUCTION_PROMPT_B_AND_PRODUCTION_FREEZE_PACKETS_ONLY_NO_GOLD_NO_PRD",
+  "configured_model": "gpt-6.1-sol",
+  "configured_effort": "xhigh",
+  "client": "CODEX_NATIVE_ISOLATED_AGENT",
+  "actual_backend_model": "UNKNOWN",
+  "primary_output_raw_sha256": "c75c938442fb81cc31fcde4dfd9497bc637444df75e13b0883338cde537341f1",
+  "not_independent_replication": true,
+  "stored_snapshots": {
+    "K1.json": {
+      "sha256": "9d8f9211207c99b06bd4fda468add4b35a4cf26bc90d61d8e239cc8aec994302",
+      "original_line_endings": "CRLF",
+      "original_eof_newlines": 1
+    },
+    "K2.json": {
+      "sha256": "8bd49ecfe183a14c93bcdb7b916991142408993ae178d5c8ee113978329eabe8",
+      "original_line_endings": "CRLF",
+      "original_eof_newlines": 1
+    },
+    "K3.json": {
+      "sha256": "8abfd96d5deb6aca573bc19dc376420b7c899a071474db24a90347852fb8437c",
+      "original_line_endings": "CRLF",
+      "original_eof_newlines": 1
+    },
+    "K4.json": {
+      "sha256": "df73796e8b4d68825d1f3267449bca6a66ac9cfc821d143bb0354ddaf14c68bb",
+      "original_line_endings": "CRLF",
+      "original_eof_newlines": 1
+    },
+    "prompt_b.txt": {
+      "sha256": "dc00c9081f69565f822dea62378c4b332bb5bb5909692aca99d66445e1d02b1f",
+      "original_line_endings": "CRLF",
+      "original_eof_newlines": 2
+    }
+  },
+  "serialization": "Git snapshots normalize CRLF to LF and trim surplus prompt EOF blanks only. inputs are the raw bytes actually read by the native reviewer; raw bytes are reconstructible from snapshot plus original_line_endings/original_eof_newlines.",
+  "gold_stored_snapshot": {
+    "sha256": "f352112efa66922fefd1c37161fc7bc2bdc69323593124e5837b46e6b03d0524",
+    "original_line_endings": "CRLF",
+    "original_eof_newlines": 1
+  },
+  "output_raw_sha256": "7beaea17bbad30d7133b4660e9740237b471b3970e7322a3e8dcbb3d08eee87e",
+  "output_sanitized_sha256": "743801e2a5f40b582cb9259491a7a5d08fb551cf1148ce1fb603b0fb5f73d828",
+  "output_sanitization": "Only absolute artifact paths replaced with logical refs; full conclusions retained; LF serialization."
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE_DOWNSIDE_READOUT_V1-FACTORY-FIT",
+  "as_of": "2026-10-03",
+  "task_id": "FORGE_DOWNSIDE_READOUT_V1",
+  "reviewed_bindings_sha256": "b3badb707df1bdb8807306c3a96c0ccd614c7ff8f24671e82720060925c071d3",
+  "reviewed_inventory_sha256": "6874d35f55a1dc1c2a964f2e3da2d6026d48939e6ffc5bb59d704efbc457f72c",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "Fixed downside readout reaches persisted/replay/Prompt A/Critic/owner within one named loop",
+    "flexibility_and_history": "Literal V5 remains readable as writer advances; closed coherent V4-to-exact-V5 only. Saved V5 retry reads lineage without recalculation. Historical records/terminal/budget unchanged; mandatory Catalog pin rehash changes no historical claims.",
+    "context_efficiency": "Mandatory matched/baseline comparison is source-owned; detail prefix explicitly truncated and cap unchanged. Exact prompt duplicates removed; one failed native primary plus one dependent fixture regression retained, no hidden retry or model run on deduplicated bytes.",
+    "research_truth": "Independent numeric/PIT controls PASS; PIT/sample/old numerics/spec/input/market/budget preserved; missing not zero risk and source-bound historical assessment not transferred.",
+    "owner_operability": "Existing canonical recipe converter and executable exact-spec example replace manual reconstruction; same source/spec/input/operation and source-bound frozen-assessment advisory; exact cold retry.",
+    "execution_to_cashflow": "No alpha or economics claim; separate baseline-policy falsifier remains an owner decision",
+    "monitoring_and_recovery": "Ordinary crash replay lands once; correction before-append faults zero-write, after-append replay converges",
+    "build_vs_buy": "One pure helper plus existing store/packet owners; no dependency or second transaction mechanism",
+    "security": "Synthetic/disposable writes only; canonical data inputs read-only; no provider or next cohort",
+    "red_team": "Unsupported future V4 transition is zero-write and no evaluator; saved V5 replay survives alias changes. Source/spec/input/numerics and compact tamper typed refusals, foreign scope detachment, ordinary interrupted landing once, closed revision never grants science/budget."
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "Separately authorized Git revert; never delete appended result history. After a real V5 write prefer a forward-compatible reader to unsupported downgrade.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_REAL_V5_WRITE",
+    "NO_AUTOMATIC_REASSESSMENT",
+    "BOUNDED_NATIVE_SMOKE_NOT_GENERAL_MODEL_CALIBRATION",
+    "DEDUPLICATED_PROMPT_BEHAVIOR_NOT_EXPERIMENTALLY_MEASURED",
+    "OLD_PROMPT_B_FOUR_CASE_EVIDENCE_CARRYFORWARD_ONLY",
+    "PROMPT_A_TRANSPORT_NOT_BLIND_GENERATOR_BEHAVIOR"
+  ]
+}

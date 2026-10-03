@@ -1,0 +1,102 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE_DOWNSIDE_READOUT_V1-REVIEW",
+  "as_of": "2026-10-03",
+  "task_id": "FORGE_DOWNSIDE_READOUT_V1",
+  "reviewed_bindings_sha256": "b3badb707df1bdb8807306c3a96c0ccd614c7ff8f24671e82720060925c071d3",
+  "reviewed_inventory_sha256": "6874d35f55a1dc1c2a964f2e3da2d6026d48939e6ffc5bb59d704efbc457f72c",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "P0/P1/P2 NONE. Canonical chain, frozen diff hash and all 43 worktree SHA independently confirmed; Git clean and unchanged. Exact content head e506625dd622039f3725e45e82bb9dfa87c265ea; bindings b3badb707df1bdb8807306c3a96c0ccd614c7ff8f24671e82720060925c071d3; inventory 6874d35f55a1dc1c2a964f2e3da2d6026d48939e6ffc5bb59d704efbc457f72c; 43 files.",
+        "Three targeted synthetic checks PASS in 40.004 seconds: fresh next-writer readability, full recipe clock/adaptation roundtrip, complete public closed-V4 revision/retry. Unsupported transition refuses before evaluator/write; future ordinary/correction replay reads saved V5 without calculation or mutation.",
+        "Prompt A/B old/new extraction and removed-block hashes verified: only one exact repeat removed from each. All 16 blind artifacts byte-identical. Bounded evidence carryforward accepted; old smoke is old-byte evidence, no experimental equivalence on final bytes or general calibration claimed.",
+        "Accepted math/ordinary proofs preserved; D2 conversion checked as committed receipt, no real data access. Catalog pin matches current blob without old claim changes. No source/Git/runtime/provider edits; CI/merge remain external gates."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "P0/P1/P2 NONE. Canonical chain and all 43 raw bindings independently matched. Exact content head e506625dd622039f3725e45e82bb9dfa87c265ea; bindings b3badb707df1bdb8807306c3a96c0ccd614c7ff8f24671e82720060925c071d3; inventory 6874d35f55a1dc1c2a964f2e3da2d6026d48939e6ffc5bb59d704efbc457f72c; 43 files.",
+        "Exact literal V4-to-V5 authority and saved V5 future-writer replay verified; three affected checks independently PASS in 38.785 seconds. Initial 12/13 test run retained honestly. D2 acceptance script, actual stdout and summary confirm full converter/spec identity, one isolated append, unchanged old numbers/history/terminal/budget and zero-write retry.",
+        "Bounded behavioral carryforward accepted against current PRD and consolidated owner closure. Exact duplicate removal and old/new hashes verified, 16 frozen blind artifacts unchanged, four saved projections equal current canonical projection. No hash chronology or final-byte model-execution claim.",
+        "Limits: actual D2 creation proof is bound to 6bf603 implementation; subsequent historical fallback is covered by complete public regression on final content. No canonical data read by reviewer. Deduplicated prompt not model-executed; backend UNKNOWN; Prompt A is transport evidence only. Final binding and exact-head CI required."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "P0/P1/P2 NONE; semantic_verdict=PASS mapped to architecture PASS. Frozen packet+diff only, plus root authority/task; no implementation transcript, tests, real data or provider access. Exact content head e506625dd622039f3725e45e82bb9dfa87c265ea; bindings b3badb707df1bdb8807306c3a96c0ccd614c7ff8f24671e82720060925c071d3; inventory 6874d35f55a1dc1c2a964f2e3da2d6026d48939e6ffc5bb59d704efbc457f72c; 43 files.",
+        "packet_fingerprint_sha256=433de11c226c7ea029616d49842c3d95f66591cac7d88cea7a905688d4811cfb",
+        "C1-C6 accepted: fixed descriptive sample/denominators; persisted result owns compact numbers; source-bound literal V4-to-V5 only, saved V5 historical replay, append-only closed scientific history/budget, sole ordinary landing owner, canonical D2 converter and exact prompt duplicate-only delta.",
+        "Bounded old-byte Prompt B evidence carryforward accepted, not measured new-byte behavior. What can pass tests yet break research validity: observed rates interpreted as future risk, matched-inclusive baseline treated as independent, missing or calendar prefix treated as complete/negative science, descriptive contrast promoted to veto usefulness/alpha, post-tail threshold selection without accounting, historical verdict silently adopting V5. Dedup may change model instruction salience; unique-rule equality is not behavioral equivalence.",
+        "PASS bounded to packet claims and non-claims; no future migration authority, new science, real runtime or general LLM calibration. Packet information path is independent; cryptographic reviewer identity/model diversity unproven. Other roles, exact-head CI and owner phrase still required."
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "P0/P1/P2 NONE. Exact content head e506625dd622039f3725e45e82bb9dfa87c265ea; bindings b3badb707df1bdb8807306c3a96c0ccd614c7ff8f24671e82720060925c071d3; inventory 6874d35f55a1dc1c2a964f2e3da2d6026d48939e6ffc5bb59d704efbc457f72c; 43 files.",
+        "Canonical chain, candidate diff/packet and all 43 committed/worktree raw SHA independently matched; clean tree. Production converter executable runbook checks full canonical spec/source identity before correction and replaces manual11field mapping. Closed exception is literal V4-to-V5; saved V5 retry remains evidence, not a new calculation.",
+        "Owner surfaces retain mandatory matched/baseline/support/median/downside, legacy unavailable and honest calendar/detail truncation. Existing projection/evidence-validation/owner-readout bodies unchanged; actual frozen packets available. assessment_advisory keeps historical verdict source-bound and D2 is not automatically rescued.",
+        "Bounded carryforward accepted for current acceptance without repeating smoke: each prompt loses one exact copy, unique text/hash verified and 16 historical frozen artifacts unchanged. Four-case old Prompt B evidence only; no final-byte execution, measured behavioral equivalence, general calibration or hash chronology claimed. Prompt A transport is not blind generator behavior.",
+        "Limits: no tests/model execution or runtime/provider operations in this UX review. Exact-head CI and machine merge-readiness are separate gates; no merge authority."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_MERGE",
+    "NO_REAL_RUNTIME_WRITE",
+    "NO_SCIENTIFIC_VERDICT",
+    "MODEL_DIVERSITY_UNPROVEN",
+    "PACKET_INFORMATION_PATH_NOT_FULL_BLIND_CONTENT_REVIEW_BY_ARCHITECTURE",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P1: supplied compact readout could disagree with hash-valid persisted result and reach Critic. Resolved by canonical projection comparison at existing freeze evidence gate and public zero-write tamper regressions.",
+      "observed_head": "c4f0bcaa35921e45d598707ba099f71d9f1c3647",
+      "resolved_by_head": "a19dc22124465fd3c9d0bf5e354914eaf1440376"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P1: supplied compact readout could disagree with hash-valid persisted result and reach Critic. Resolved by canonical projection comparison at existing freeze evidence gate and public zero-write tamper regressions.",
+      "observed_head": "c4f0bcaa35921e45d598707ba099f71d9f1c3647",
+      "resolved_by_head": "a19dc22124465fd3c9d0bf5e354914eaf1440376"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "P1: supplied compact readout could disagree with hash-valid persisted result and reach Critic. Resolved by canonical projection comparison at existing freeze evidence gate and public zero-write tamper regressions.",
+      "observed_head": "c4f0bcaa35921e45d598707ba099f71d9f1c3647",
+      "resolved_by_head": "a19dc22124465fd3c9d0bf5e354914eaf1440376"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Foreign selected/runner-up detachment retained compact statistics after full result removal. Resolved within existing computed-look detachment keys and regression.",
+      "observed_head": "c4f0bcaa35921e45d598707ba099f71d9f1c3647",
+      "resolved_by_head": "a19dc22124465fd3c9d0bf5e354914eaf1440376"
+    }
+  ]
+}

@@ -36,17 +36,23 @@ TEMPORAL_CALCULATION_VERSION_V1 = "HFIC_TEMPORAL_DISCOVERY_CALC_V1"
 TEMPORAL_CALCULATION_VERSION_V2 = "HFIC_TEMPORAL_DISCOVERY_CALC_V2"
 TEMPORAL_CALCULATION_VERSION_V3 = "HFIC_TEMPORAL_DISCOVERY_CALC_V3"
 # V4: by_cohort reads the same matched sample as pooled and calendar.
-TEMPORAL_CALCULATION_VERSION = "HFIC_TEMPORAL_DISCOVERY_CALC_V4"
+TEMPORAL_CALCULATION_VERSION_V4 = "HFIC_TEMPORAL_DISCOVERY_CALC_V4"
+# V5 adds a fixed descriptive downside readout to the same admitted sample.
+TEMPORAL_CALCULATION_VERSION_V5 = "HFIC_TEMPORAL_DISCOVERY_CALC_V5"
+TEMPORAL_CALCULATION_VERSION = TEMPORAL_CALCULATION_VERSION_V5
 TEMPORAL_CALCULATION_VERSIONS_READABLE = frozenset(
     {
         TEMPORAL_CALCULATION_VERSION_V1,
         TEMPORAL_CALCULATION_VERSION_V2,
         TEMPORAL_CALCULATION_VERSION_V3,
+        TEMPORAL_CALCULATION_VERSION_V4,
+        TEMPORAL_CALCULATION_VERSION_V5,
         TEMPORAL_CALCULATION_VERSION,
     }
 )
 COHORT_CONDITIONAL_SAMPLE_CORRECTION = "COHORT_CONDITIONAL_SAMPLE_V4"
 RESULT_COHERENCE_TOLERANCE = 1e-9
+DOWNSIDE_PROFILE = "DOWNSIDE_DESCRIPTIVE_V1"
 TEMPORAL_CAPABILITY_ID = "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
 OBSERVATION_CLOCK_EVENT_TIME_V1 = "EVENT_TIME_V1"
 OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1 = "PROVIDER_REPORTED_SNAPSHOT_V1"
@@ -1318,7 +1324,9 @@ def _cohort_rows(
                 "feature_admissible": sum(1 for item in active if item.get("decision_eligible")),
                 "target_observed_after_decision": len(observed),
                 "mean_target": _mean(observed),
+                "median_target": _median(observed),
                 "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                "downside": downside_descriptive(observed, missing_n=len(missing)),
                 "exclusion_reasons": dict(sorted(exclusions.items())),
                 "target_exclusion_reasons": dict(sorted(target_exclusions.items())),
                 "independent_replication": False,
@@ -1343,6 +1351,57 @@ def _median(values: Sequence[float]) -> float | None:
     if len(ordered) % 2:
         return ordered[mid]
     return (ordered[mid - 1] + ordered[mid]) / 2.0
+
+
+def downside_descriptive(values: Sequence[float], *, missing_n: int) -> dict[str, Any]:
+    """Fixed return-sign downside profile over one existing observed view."""
+
+    if isinstance(missing_n, bool) or not isinstance(missing_n, int) or missing_n < 0:
+        raise GroundedDiscoveryError("DOWNSIDE_SUPPORT_INVALID")
+    if any(not math.isfinite(value) for value in values):
+        raise GroundedDiscoveryError("TEMPORAL_TARGET_NONFINITE")
+    ordered = sorted(values)
+    n = len(ordered)
+    negative = [-value for value in ordered if value < 0]
+    negative_mass = sum(negative)
+    count20 = sum(value <= -0.20 for value in ordered)
+    count50 = sum(value <= -0.50 for value in ordered)
+
+    def quantile(q: float) -> float | None:
+        if not n:
+            return None
+        h = (n - 1) * q
+        j = math.floor(h)
+        g = h - j
+        return (1 - g) * ordered[j] + g * ordered[min(j + 1, n - 1)]
+
+    k, remainder = divmod(n, 10)
+    tail_mass = n / 10 if n else None
+    tail_total = sum(ordered[:k])
+    if remainder:
+        tail_total += (remainder / 10) * ordered[k]
+    return {
+        "profile": DOWNSIDE_PROFILE,
+        "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+        "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+        "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+        "status": "OBSERVED" if n else "NO_OBSERVED_TARGET",
+        "observed_n": n,
+        "missing_n": missing_n,
+        "negative_n": len(negative),
+        "zero_n": sum(value == 0 for value in ordered),
+        "p05": quantile(0.05),
+        "p10": quantile(0.10),
+        "p25": quantile(0.25),
+        "le_minus_20_n": count20,
+        "le_minus_20_rate": count20 / n if n else None,
+        "le_minus_50_n": count50,
+        "le_minus_50_rate": count50 / n if n else None,
+        "es10_return": tail_total / tail_mass if n else None,
+        "es10_tail_mass_n": tail_mass,
+        "negative_mass": negative_mass if n else None,
+        "worst_negative_share": max(negative) / negative_mass if negative_mass else None,
+    }
 
 
 def classify_temporal_look(
@@ -1456,6 +1515,107 @@ def _view_issues(
         issues.append({"view": view, "field": "mean_target", "expected": None, "actual": row.get("mean_target")})
     if observed > 0 and "mean_target" in row and row.get("mean_target") is None:
         issues.append({"view": view, "field": "mean_target", "expected": "NUMBER", "actual": None})
+    return issues
+
+
+def _downside_issues(
+    view: str,
+    row: Mapping[str, Any],
+    *,
+    observed_key: str,
+    missing_key: str | None = None,
+) -> list[dict[str, Any]]:
+    block = row.get("downside")
+    issues: list[dict[str, Any]] = []
+
+    def issue(field: str, expected: object, actual: object) -> None:
+        issues.append({"view": view, "field": f"downside.{field}", "expected": expected, "actual": actual})
+
+    def number(value: object) -> float | None:
+        # Stored V5 statistics are JSON numbers, never string coercions.
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return None
+        return _finite_number(value)
+
+    if not isinstance(block, Mapping):
+        issue("block", "DOWNSIDE_DESCRIPTIVE_V1", block)
+        return issues
+    for field, expected in (
+        ("profile", DOWNSIDE_PROFILE),
+        ("units", "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE"),
+        ("quantile_method", "HYNDMAN_FAN_TYPE_7_LINEAR"),
+        ("es_method", "EMPIRICAL_LOWER_10_FRACTIONAL_MASS"),
+    ):
+        if block.get(field) != expected:
+            issue(field, expected, block.get(field))
+    n = _int_or_none(block.get("observed_n"))
+    m = _int_or_none(block.get("missing_n"))
+    if n is None or n < 0 or n != _int_or_none(row.get(observed_key)):
+        issue("observed_n", row.get(observed_key), block.get("observed_n"))
+        return issues
+    if m is None or m < 0:
+        issue("missing_n", "NONNEGATIVE_INT", block.get("missing_n"))
+    elif missing_key and m != _int_or_none(row.get(missing_key)):
+        issue("missing_n", row.get(missing_key), m)
+    counts = {}
+    for field in ("negative_n", "zero_n", "le_minus_20_n", "le_minus_50_n"):
+        value = _int_or_none(block.get(field))
+        if value is None or not 0 <= value <= n:
+            issue(field, f"INT_0_TO_{n}", block.get(field))
+        else:
+            counts[field] = value
+    if len(counts) == 4:
+        if not 0 <= counts["le_minus_50_n"] <= counts["le_minus_20_n"] <= counts["negative_n"] <= n:
+            issue("event_counts", "k50<=k20<=negative_n<=observed_n", counts)
+        if counts["negative_n"] + counts["zero_n"] > n:
+            issue("zero_n", f"<= {n - counts['negative_n']}", counts["zero_n"])
+    for count_field, rate_field in (
+        ("le_minus_20_n", "le_minus_20_rate"),
+        ("le_minus_50_n", "le_minus_50_rate"),
+    ):
+        actual = block.get(rate_field)
+        expected = counts[count_field] / n if n and count_field in counts else None
+        if expected is None:
+            if actual is not None:
+                issue(rate_field, None, actual)
+        elif number(actual) is None or _means_differ(actual, expected):
+            issue(rate_field, expected, actual)
+    numeric_fields = ("p05", "p10", "p25", "es10_return", "es10_tail_mass_n")
+    if n == 0:
+        if block.get("status") != "NO_OBSERVED_TARGET":
+            issue("status", "NO_OBSERVED_TARGET", block.get("status"))
+        for field in (*numeric_fields, "worst_negative_share"):
+            if block.get(field) is not None:
+                issue(field, None, block.get(field))
+    else:
+        if block.get("status") != "OBSERVED":
+            issue("status", "OBSERVED", block.get("status"))
+        for field in numeric_fields:
+            if number(block.get(field)) is None:
+                issue(field, "FINITE_NUMBER", block.get(field))
+        q = [number(block.get(field)) for field in ("p05", "p10", "p25")]
+        if all(value is not None for value in q) and q != sorted(q):
+            issue("quantiles", "p05<=p10<=p25", q)
+        if _means_differ(block.get("es10_tail_mass_n"), n / 10):
+            issue("es10_tail_mass_n", n / 10, block.get("es10_tail_mass_n"))
+    median = row.get("median_target")
+    if (n == 0 and median is not None) or (n > 0 and number(median) is None):
+        issue("median_target", None if n == 0 else "FINITE_NUMBER", median)
+    mass = number(block.get("negative_mass"))
+    if n == 0:
+        if block.get("negative_mass") is not None:
+            issue("negative_mass", None, block.get("negative_mass"))
+    elif mass is None or mass < 0:
+        issue("negative_mass", "NONNEGATIVE_FINITE", block.get("negative_mass"))
+    elif mass == 0:
+        if counts.get("negative_n", 0) != 0:
+            issue("negative_mass", "POSITIVE_WHEN_NEGATIVE_N", mass)
+        if block.get("worst_negative_share") is not None:
+            issue("worst_negative_share", None, block.get("worst_negative_share"))
+    else:
+        share = number(block.get("worst_negative_share"))
+        if counts.get("negative_n", 0) == 0 or share is None or not 0 < share <= 1:
+            issue("worst_negative_share", "FINITE_0_TO_1", block.get("worst_negative_share"))
     return issues
 
 
@@ -1579,6 +1739,49 @@ def temporal_result_coherence(summary: Mapping[str, Any]) -> dict[str, Any]:
                     "actual": sums["observed_target_n"],
                 }
             )
+    if summary.get("calculation_version") == TEMPORAL_CALCULATION_VERSION_V5:
+        issues.extend(
+            _downside_issues(
+                "summary", summary,
+                observed_key="observed_target_n", missing_key="missing_target_n",
+            )
+        )
+        if isinstance(pooled, Mapping):
+            issues.extend(_downside_issues("pooled", pooled, observed_key="target_observed_after_decision"))
+            if pooled.get("downside") != summary.get("downside"):
+                issues.append({"view": "pooled", "field": "downside", "expected": "SUMMARY_ALIAS", "actual": pooled.get("downside")})
+        else:
+            issues.append({"view": "pooled", "field": "downside", "expected": "VIEW", "actual": pooled})
+        baseline = summary.get("baseline")
+        if isinstance(baseline, Mapping):
+            issues.extend(_downside_issues("baseline", baseline, observed_key="observed_n"))
+        else:
+            issues.append({"view": "baseline", "field": "downside", "expected": "VIEW", "actual": baseline})
+        for field in ("ablations", "by_calendar_block", "by_cohort"):
+            rows = summary.get(field)
+            if not isinstance(rows, list):
+                issues.append({"view": field, "field": "downside", "expected": "VIEW_LIST", "actual": rows})
+                continue
+            for index, row in enumerate(rows):
+                if not isinstance(row, Mapping):
+                    issues.append({"view": field, "field": "row", "expected": "VIEW", "actual": index})
+                    continue
+                observed_key = "observed_target_n" if field == "by_cohort" else "observed_n"
+                issues.extend(
+                    _downside_issues(
+                        f"{field}:{row.get('view', index)}", row,
+                        observed_key=observed_key,
+                        missing_key="missing_target_n" if field == "by_cohort" else None,
+                    )
+                )
+        if isinstance(blocks, list):
+            block_missing = sum(
+                (row.get("downside") or {}).get("missing_n", 0)
+                for row in blocks if isinstance(row, Mapping) and isinstance(row.get("downside"), Mapping)
+                and isinstance(row["downside"].get("missing_n"), int)
+            )
+            if block_missing != summary.get("missing_target_n"):
+                issues.append({"view": "by_calendar_block", "field": "downside.missing_n_sum", "expected": summary.get("missing_target_n"), "actual": block_missing})
     return {
         "status": "INCOHERENT" if issues else "COHERENT",
         # COHERENT means no stored view contradicts another; absent fields are not checked.
@@ -1593,6 +1796,28 @@ def require_coherent_temporal_result(summary: Mapping[str, Any]) -> None:
         raise GroundedDiscoveryError("TEMPORAL_RESULT_INCOHERENT")
 
 
+def saved_downside_revision(
+    looks: Sequence[Mapping[str, Any]], correction: Mapping[str, Any]
+) -> Mapping[str, Any] | None:
+    """Read this atom's exact saved V5 revision independently of the writer."""
+
+    for look in reversed(looks):
+        lineage = look.get("revision_of")
+        if not isinstance(lineage, Mapping):
+            continue
+        reason = lineage.get("reason")
+        if (
+            look.get("calculation_version") == TEMPORAL_CALCULATION_VERSION_V5
+            and lineage.get("calculation_version") == TEMPORAL_CALCULATION_VERSION_V4
+            and lineage.get("record_id") == correction.get("source_result_ref")
+            and lineage.get("result_sha256") == correction.get("source_result_sha256")
+            and isinstance(reason, Mapping)
+            and reason.get("code") == "DOWNSIDE_READOUT_ADDED"
+        ):
+            return look
+    return None
+
+
 def verify_calculation_revision_source(
     looks: Sequence[Mapping[str, Any]],
     *,
@@ -1600,6 +1825,7 @@ def verify_calculation_revision_source(
     spec: Mapping[str, Any],
     binding: Sequence[Mapping[str, Any]] | None = None,
     operation_sha256: str | None = None,
+    target_calculation_version: str | None = None,
 ) -> Mapping[str, Any]:
     """Bind one explicit correction to one saved look of the same question.
 
@@ -1625,10 +1851,19 @@ def verify_calculation_revision_source(
     if operation_sha256 and owner and owner != operation_sha256:
         raise GroundedDiscoveryError("CALCULATION_REVISION_OPERATION_MISMATCH")
     version = source.get("calculation_version")
-    if version == TEMPORAL_CALCULATION_VERSION:
+    target_version = target_calculation_version or TEMPORAL_CALCULATION_VERSION
+    if version == TEMPORAL_CALCULATION_VERSION_V4 and target_version != TEMPORAL_CALCULATION_VERSION_V5:
+        raise GroundedDiscoveryError("CALCULATION_REVISION_UNSUPPORTED")
+    if version == target_version:
         raise GroundedDiscoveryError("CALCULATION_REVISION_NOT_REQUIRED")
     if version not in TEMPORAL_CALCULATION_VERSIONS_READABLE:
         raise GroundedDiscoveryError("CALCULATION_REVISION_SOURCE_UNREADABLE")
+    if version == TEMPORAL_CALCULATION_VERSION_V4 and (
+        temporal_result_coherence(source["result"])["status"] != "COHERENT"
+        or source["result"].get("technical_failure") is True
+        or source["result"].get("technical_stop") is not None
+    ):
+        raise GroundedDiscoveryError("CALCULATION_REVISION_SOURCE_UNSAFE")
     recipe = source["result"].get("experiment_recipe")
     if not isinstance(recipe, Mapping) or not isinstance(recipe.get("frozen_input"), list):
         raise GroundedDiscoveryError("CALCULATION_REVISION_SOURCE_UNVERIFIABLE")
@@ -1637,6 +1872,55 @@ def verify_calculation_revision_source(
     if binding is not None and list(recipe["frozen_input"]) != temporal_frozen_input(binding):
         raise GroundedDiscoveryError("CALCULATION_REVISION_INPUT_MISMATCH")
     return source
+
+
+def assert_downside_revision_preserves_v4(
+    source: Mapping[str, Any], candidate: Mapping[str, Any]
+) -> None:
+    """Check every stored V4 field before an output-only V5 append."""
+
+    if source.get("calculation_version") != TEMPORAL_CALCULATION_VERSION_V4:
+        return
+    if candidate.get("calculation_version") != TEMPORAL_CALCULATION_VERSION_V5:
+        raise GroundedDiscoveryError("CALCULATION_REVISION_UNSUPPORTED")
+
+    def equal_old(left: Any, right: Any, path: tuple[str, ...] = ()) -> bool:
+        if isinstance(left, Mapping):
+            if not isinstance(right, Mapping):
+                return False
+            return all(
+                key in right and (
+                    path == () and key == "calculation_version"
+                    or equal_old(value, right[key], (*path, str(key)))
+                )
+                for key, value in left.items()
+            )
+        if isinstance(left, list):
+            if not isinstance(right, list):
+                return False
+            if path == ("viewed_variants",):
+                return right == [*left, DOWNSIDE_PROFILE]
+            if path == ("by_calendar_block",):
+                old_views = {str(row.get("view")) for row in left if isinstance(row, Mapping)}
+                indexed = {str(row.get("view")): row for row in right if isinstance(row, Mapping)}
+                if len(indexed) != len(right):
+                    return False
+                for row in right:
+                    if str(row.get("view")) not in old_views and row.get("observed_n") != 0:
+                        return False
+                return all(
+                    isinstance(row, Mapping)
+                    and str(row.get("view")) in indexed
+                    and equal_old(row, indexed[str(row.get("view"))], (*path, str(row.get("view"))))
+                    for row in left
+                )
+            return len(left) == len(right) and all(
+                equal_old(a, b, (*path, str(i))) for i, (a, b) in enumerate(zip(left, right, strict=True))
+            )
+        return type(left) is type(right) and left == right
+
+    if not equal_old(source, candidate):
+        raise GroundedDiscoveryError("CALCULATION_REVISION_OLD_NUMERIC_CHANGED")
 
 
 def calculation_revision_reason(source_result: Mapping[str, Any]) -> dict[str, Any]:
@@ -1648,6 +1932,12 @@ def calculation_revision_reason(source_result: Mapping[str, Any]) -> dict[str, A
             "code": COHORT_CONDITIONAL_SAMPLE_CORRECTION,
             "source_coherence": "INCOHERENT",
             "source_issue_fields": sorted({f"{item['view']}.{item['field']}" for item in coherence["issues"]}),
+        }
+    if source_result.get("calculation_version") == TEMPORAL_CALCULATION_VERSION_V4:
+        return {
+            "code": "DOWNSIDE_READOUT_ADDED",
+            "source_coherence": "COHERENT",
+            "source_issue_fields": [],
         }
     return {
         "code": "CALCULATION_VERSION_SUPERSEDED",
@@ -2327,6 +2617,7 @@ def execute_temporal_discovery(
     matched_members, observed, missing_target = _conditional_sample(decision_members)
     observed_values = [float(item["target"]) for item in observed]
     observed_mean = _mean(observed_values)
+    matched_downside = downside_descriptive(observed_values, missing_n=len(missing_target))
     known_source_events = [
         str(item.get("source_price_event_time"))
         for item in observed
@@ -2338,24 +2629,31 @@ def execute_temporal_discovery(
     if body["evaluation"]["ablations"] == "DROP_ONE_CONDITION":
         for dropped in predicates:
             kept = [item for item in predicates if item is not dropped]
-            subset = []
+            subset_members = []
             for member in decision_members:
-                if not member["target_is_observed"] or member["target"] is None:
-                    continue
                 hits = [
                     _predicate_holds(member["feature_values"].get(str(item["feature"])), item)
                     for item in kept
                 ]
                 if all(hit is True for hit in hits):
-                    subset.append(float(member["target"]))
+                    subset_members.append(member)
+            subset = [
+                float(member["target"])
+                for member in subset_members
+                if member["target_is_observed"] and member["target"] is not None
+            ]
             ablations.append(
                 {
                     "view": f"ABLATION_DROP_{dropped['feature']}",
                     "dropped_feature": dropped["feature"],
                     "observed_n": len(subset),
                     "mean_target": _mean(subset),
+                    "median_target": _median(subset),
                     "mean_target_kind": "PRICE_RELATIVE_PROXY",
                     "selection_relevant": True,
+                    "downside": downside_descriptive(
+                        subset, missing_n=len(subset_members) - len(subset)
+                    ),
                 }
             )
     baseline_values = [
@@ -2366,6 +2664,9 @@ def execute_temporal_discovery(
     by_block: dict[str, list[float]] = defaultdict(list)
     for item in observed:
         by_block[str(item["block"])].append(float(item["target"]))
+    by_block_missing: dict[str, int] = defaultdict(int)
+    for item in missing_target:
+        by_block_missing[str(item["block"])] += 1
     profile = body["cost_profile"]
     costs = _cost_views(observed_mean, profile)
     viewed = ["MATCHED_OBSERVED", "BASELINE_DECISION_ELIGIBLE"]
@@ -2373,6 +2674,7 @@ def execute_temporal_discovery(
     if costs["status"] == "EVALUATED":
         viewed.extend(f"COST_{name}" for name in ("LOW", "BASE", "STRESS"))
         viewed.append("MISSING_STRESS_MODEL")
+    viewed.append(DOWNSIDE_PROFILE)
     positive = [value for value in observed_values if value > 0]
     winner_share = max(positive) / sum(positive) if positive else None
     missing_mean_to_zero = None
@@ -2425,6 +2727,7 @@ def execute_temporal_discovery(
         "feature_admissible_n": len(decision_members),
         "mean_target": observed_mean,
         "median_target": _median(observed_values),
+        "downside": matched_downside,
         "winner_share_of_positive": winner_share,
         "missing_target_mean_to_zero": missing_mean_to_zero,
         "missing_stress_model": {
@@ -2447,7 +2750,11 @@ def execute_temporal_discovery(
             "view": "BASELINE_DECISION_ELIGIBLE",
             "observed_n": len(baseline_values),
             "mean_target": _mean(baseline_values),
+            "median_target": _median(baseline_values),
             "mean_target_kind": "PRICE_RELATIVE_PROXY",
+            "downside": downside_descriptive(
+                baseline_values, missing_n=len(decision_members) - len(baseline_values)
+            ),
         },
         "ablations": ablations,
         "by_calendar_block": [
@@ -2455,15 +2762,27 @@ def execute_temporal_discovery(
                 "view": key,
                 "observed_n": len(values),
                 "mean_target": _mean(values),
+                "median_target": _median(values),
                 "mean_target_kind": "PRICE_RELATIVE_PROXY",
+                "downside": downside_descriptive(values, missing_n=by_block_missing.get(key, 0)),
             }
-            for key, values in sorted(by_block.items())
+            for key, values in sorted(
+                (key, by_block.get(key, [])) for key in set(by_block) | set(by_block_missing)
+            )
         ],
         "by_cohort": by_cohort_rows,
         "cohort_slices_are_descriptive": True,
         "cohort_independent_replication": False,
         "cost": costs,
         "viewed_variants": viewed,
+        "downside_readout_exposure": {
+            "profile": DOWNSIDE_PROFILE,
+            "fixed_metrics": [
+                "p05", "p10", "p25", "le_minus_20_rate", "le_minus_50_rate",
+                "es10_return", "negative_mass", "worst_negative_share",
+            ],
+            "new_threshold_trials": False,
+        },
         "main_question_count_includes_variants": False,
         "pooled": {
             "view": "pooled",
@@ -2471,6 +2790,8 @@ def execute_temporal_discovery(
             "feature_admissible": len(decision_members),
             "target_observed_after_decision": len(observed),
             "mean_target": observed_mean,
+            "median_target": _median(observed_values),
+            "downside": matched_downside,
             "mean_target_kind": "PRICE_RELATIVE_PROXY",
             "independent_replication": None,
         },
@@ -2750,7 +3071,7 @@ def _public_query_from_recipe(recipe: Mapping[str, Any]) -> dict[str, Any]:
         and clock_policy != OBSERVATION_CLOCK_EVENT_TIME_V1
     ):
         schedule["observation_clock_policy"] = clock_policy
-    return {
+    public = {
         "schema": TEMPORAL_SCHEMA,
         "schema_version": TEMPORAL_SCHEMA_VERSION,
         "query_id": query.get("query_id") or "frozen-recipe",
@@ -2766,6 +3087,9 @@ def _public_query_from_recipe(recipe: Mapping[str, Any]) -> dict[str, Any]:
         "cost_profile": body.get("cost_profile"),
         "evaluation": body.get("evaluation") or {},
     }
+    if query.get("adaptation_of") is not None:
+        public["adaptation_of"] = query["adaptation_of"]
+    return public
 
 
 def _require_manifest_and_cutoff(

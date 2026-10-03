@@ -1,0 +1,106 @@
+{
+  "scope": "FOCUSED_IMPLEMENTATION_AND_DIRECT_CONSUMER_CHECKS",
+  "implementation_head": "473a21d2f987c411d4466e286e4139d7ed3f53bf",
+  "final_focused": {
+    "status": "PASS",
+    "tests": 10,
+    "seconds": 252.302,
+    "modules": [
+      "tests.test_forge_downside_readout_v1",
+      "tests.test_hfic_temporal_owner_path_v1"
+    ],
+    "repeated_failures": [
+      "tests.test_hfic_temporal_result_coherence_v1.SavedResultRevisionVerticalTests.test_saved_wrong_simple_is_revised_without_a_new_main",
+      "tests.test_hfic_temporal_production_runner_v1.TemporalVerticalTests.test_published_journal_reaches_document_runner_readback"
+    ]
+  },
+  "earlier_broad": {
+    "tests": 87,
+    "passed": 85,
+    "failed": 2,
+    "root_cause": "IMPLEMENTATION_HASH_MISMATCH_UNCOMMITTED_GIT_BLOB_BINDING",
+    "not_claimed_green": true
+  },
+  "proofs": {
+    "ORDINARY_CRASH_REPLAY": "PASS",
+    "READOUT_REVISION_LIFECYCLE_UNCHANGED": "PASS",
+    "REJECTED_CORRECTION_ZERO_WRITE": "PASS",
+    "ACTUAL_PROMPT_A_CRITIC_PACKET": "PASS",
+    "CALENDAR_MISSING_TRUNCATION_COMPATIBILITY": "PASS",
+    "REAL_D2_ISOLATED_COPY_PROOF": "PASS"
+  },
+  "local_full_gate": "NOT_RUN_PER_CURRENT_HARNESS",
+  "ci": "REQUIRED_LIVE_EXACT_PR_HEAD",
+  "integrity_checks_weakened": false,
+  "transport_integrity_remediation": {
+    "reviewed_head": "c4f0bcaa35921e45d598707ba099f71d9f1c3647",
+    "confirmed_p1": "SUPPLIED_COMPACT_READOUT_NOT_BOUND_TO_PERSISTED_RESULT",
+    "new_regressions": {
+      "status": "PASS",
+      "tests": 8
+    },
+    "public_freeze_tamper_refusal": {
+      "status": "PASS",
+      "tests": 1,
+      "seconds": 53.662,
+      "committed_inventory_equal": true,
+      "cases": [
+        "matched_rate",
+        "baseline_median",
+        "missing_block"
+      ]
+    },
+    "scope_detachment": "PASS_SELECTED_AND_RUNNER_UP",
+    "frozen_corrected_blind_projection_equality": "PASS_4_OF_4_NO_MODEL_RERUN"
+  },
+  "ci_first_attempt": {
+    "head": "2464894798b1d337cc76c92e4d7d26687c4c3e72",
+    "run_id": 37113410106,
+    "status": "FAIL_REQUIRED_JOB",
+    "failed_job": "validate-tests (2)",
+    "failed_test": "test_project_sources_release_registry.ProjectSourcesReleaseRegistryTests.test_changed_acceptance_receipts_declare_source_disposition",
+    "reason": "SOURCE_DISPOSITION_REQUIRED",
+    "repair": "Explicit NO_CHANGE on D2 acceptance receipt; no Project Sources release or scientific payload changed.",
+    "run_status_at_readback": "completed",
+    "focused_repair": {
+      "status": "PASS",
+      "tests": 1,
+      "seconds": 0.185,
+      "test": "test_changed_acceptance_receipts_declare_source_disposition"
+    },
+    "conclusion": "failure",
+    "other_required_jobs": "PASS_CORE_EXECUTION_TEST_SHARDS_0_1_3"
+  },
+  "consolidated_closure": {
+    "reviewed_head": "2464894798b1d337cc76c92e4d7d26687c4c3e72",
+    "EXACT_V4_V5_AUTHORITY": "PASS_PUBLIC_UNSUPPORTED_FUTURE_REFUSAL_ZERO_WRITE",
+    "V5_HISTORICAL_READABILITY": "PASS_FRESH_NEXT_WRITER_MODULE_AND_SAVED_V5_PUBLIC_REPLAY",
+    "D2_SPEC_ROUNDTRIP": "PASS_PRODUCTION_CONVERTER_FULL_CANONICAL_SPEC_PUBLIC_CORRECTION_AND_COLD_RETRY",
+    "PROMPT_DEDUP_AND_BEHAVIORAL_EVIDENCE_SCOPE": "PASS_EXACT_DUPLICATES_ONLY_16_FROZEN_ARTIFACTS_UNCHANGED_REQUIRED_REVIEW_CARRYFORWARD",
+    "focused_initial": {
+      "tests": 13,
+      "passed": 12,
+      "failed": 1,
+      "seconds": 257.077,
+      "not_claimed_green": true,
+      "failure": "Future writer ordinary readback selected V4 by record-ID fallback, after correction retry already read saved V5."
+    },
+    "minimal_fix": "Reuse existing current_look_evidence lineage resolver in ordinary and recorded-query historical fallback; no new recovery mechanism.",
+    "affected_public_regression_after_fix": {
+      "status": "PASS",
+      "tests": 1,
+      "seconds": 38.495,
+      "test": "ClosedRevisionVertical.test_closed_v4_public_revision_cold_replay_and_unchanged_history"
+    },
+    "accepted_proofs_preserved": [
+      "ORDINARY_CRASH_REPLAY",
+      "READOUT_REVISION_LIFECYCLE_UNCHANGED",
+      "REJECTED_CORRECTION_ZERO_WRITE",
+      "ACTUAL_PROMPT_A_CRITIC_PACKET",
+      "CALENDAR_MISSING_TRUNCATION_COMPATIBILITY"
+    ],
+    "model_rerun": false,
+    "deduplicated_prompt_behavior_experimentally_measured": false,
+    "exact_head_ci": "REQUIRED_NEW_UNCHANGED_GREEN_HEAD"
+  }
+}

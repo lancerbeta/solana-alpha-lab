@@ -36,6 +36,12 @@ before freeze when no candidate is worth freezing. The shared budget stays
 6 main + 2 adaptive. Do not mark a tier executed unless its saved looks say so.
 `PRICE_RELATIVE_PROXY` and `ESTIMATED_NET_PROXY` are not `NetReturn`.
 
+Use temporal V5 `descriptive_readout` for matched/baseline support, median,
+fixed loss-event rates, ES10 and loss concentration. Equal medians do not
+alone falsify tails. Legacy tails are explicitly unavailable. An exact
+owner-authorized coherent closed V4 readout enrichment uses the existing
+source-bound correction command; it never restarts Forge or frees budget.
+
 A5 identity: market epoch admits/resumes/budgets; capability epoch does not
 free AUTO/focus quota; START ≠ RESUME ≠ REUSED; incomplete market is BLOCKED
 (not a synthetic digest). Merge phrase and scientific market run stay separate
