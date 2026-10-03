@@ -78,7 +78,9 @@ class HolderPolicyTests(unittest.TestCase):
         from solana_alpha_lab.factory.hfic_grounded_discovery import _grouped_cells
 
         binding = _binding()
+        binding[0]["schedule_point_due_offset_seconds"] = {"X300": 300, "Y900": 900, "Y1800": 1800}
         binding[0]["schedule_point_lateness"] = {"X300": 300, "Y900": 1800, "Y1800": 300}
+        self.assertEqual(temporal._clock(binding[0], "Y900", 300), (900, 1800))
         feature = {"name": "h", "op": "point_value", "field_id": HOLDER, "point": "Y900"}
         spec = {"decision": {"point_id": "Y1800"}, "schedule": {"points": ["Y900", "Y1800"], "lateness_seconds": 300}, "features": [feature], "seed": "mixed-clock"}
         observations = [row("match", "X300", LIQ, 1000), row("match", "Y900", HOLDER, 3, late=1300)]
