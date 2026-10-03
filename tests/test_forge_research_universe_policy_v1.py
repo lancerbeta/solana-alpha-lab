@@ -391,6 +391,10 @@ class UniversePolicyTests(unittest.TestCase):
                 "--decision-point", "Y900", "--format", "json", data_root=open_root,
             )
             self.assertEqual(pending_preview.returncode, 0, pending_preview.stdout + pending_preview.stderr)
+            self.assertEqual(
+                json.loads(pending_preview.stdout)["next_action"],
+                "FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW",
+            )
             pending_path = workspace / "pending-20k.json"
             pending_path.write_text(json.dumps(json.loads(pending_preview.stdout)["proposal"]), encoding="utf-8")
             refused = run_cli(

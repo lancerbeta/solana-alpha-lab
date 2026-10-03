@@ -320,6 +320,7 @@ def preview_universe_policy(
     proposal = _proposal(store, min_holders=min_holders, min_liquidity_usd=min_liquidity_usd)
     definition = proposal["definition"]
     before = head.get("definition") or {}
+    pending = bool(_open_operations(store))
     return {
         "action": "UNIVERSE_POLICY_PREVIEW",
         "status": "NO_CHANGE" if proposal["semantic_sha256"] == head.get("semantic_sha256") else "PROPOSED",
@@ -339,7 +340,14 @@ def preview_universe_policy(
         "proposal_sha256": proposal["proposal_sha256"],
         "expected_policy_head_sha256": head["policy_head_sha256"],
         "claim_boundary": "Coverage is eligibility only. It is not a ranked profile and not a market-quality verdict.",
-        "next_action": "AUTHORIZED_APPLY" if proposal["semantic_sha256"] != head.get("semantic_sha256") else "READ_ACTIVE_PROFILE",
+        "pending_operation": pending,
+        "next_action": (
+            "FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW"
+            if pending
+            else "AUTHORIZED_APPLY"
+            if proposal["semantic_sha256"] != head.get("semantic_sha256")
+            else "READ_ACTIVE_PROFILE"
+        ),
         "authority": _authority_zero(),
         "writes": {"research_store": 0},
     }
