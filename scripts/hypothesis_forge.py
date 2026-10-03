@@ -1555,6 +1555,19 @@ def cmd_discovery_preview(
                 exit_code=2,
             )
         preview_store = ResearchStore(store_root, create_if_missing=False)
+        from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
+
+        if effective_policy(preview_store).get("state") != "ACTIVE":
+            return emit(
+                {
+                    "reason_code": "UNIVERSE_POLICY_REQUIRED",
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                    "next_action": "PREVIEW_THEN_AUTHORIZED_APPLY",
+                },
+                exit_code=2,
+            )
         try:
             if operation_path is not None:
                 request = json.loads(operation_path.read_text(encoding="utf-8"))
