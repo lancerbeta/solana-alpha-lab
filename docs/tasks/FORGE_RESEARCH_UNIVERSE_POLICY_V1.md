@@ -34,6 +34,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hfic_temporal_discovery.py
 - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
 - src/solana_alpha_lab/factory/hfic_preflight.py
+- src/solana_alpha_lab/factory/forge_input_receipt.py
 - src/solana_alpha_lab/factory/hfic_representation_ladder.py
 - src/solana_alpha_lab/factory/hfic_session.py
 - src/solana_alpha_lab/factory/hfic_evidence_identity.py
@@ -42,6 +43,13 @@ managed_write_set:
 - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
 - configs/hypothesis_forge_independent_critic_v1.yaml
 - tests/test_forge_research_universe_policy_v1.py
+- tests/test_forge_input_truth_and_visibility_v1.py
+- tests/test_hfic_cli.py
+- tests/test_hfic_legacy_parent_continuation_compat_v1.py
+- tests/test_hfic_ordinary_operation_acceptance_v1.py
+- tests/test_hfic_ordinary_operation_v1.py
+- tests/test_hfic_scientific_disposition_continuity_v1.py
+- tests/test_hfic_temporal_owner_path_v1.py
 - tests/test_hfic_temporal_discovery_v1.py
 - tests/test_hfic_temporal_production_runner_v1.py
 - tests/test_forge_temporal_holder_point_feature_v1.py
