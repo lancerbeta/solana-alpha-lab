@@ -15543,6 +15543,11 @@
       "target_asset_id": "CTRL-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
     },
     {
+      "source_asset_id": "SCRIPT-FACTORY-CGROUP-PEAK-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-LIVE-RESOURCE-REPAIR-001"
+    },
+    {
       "source_asset_id": "SCRIPT-FACTORY-OPERABILITY-RESOURCE-PROFILE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-COLLECTOR-READ-MODEL-001"

@@ -24,8 +24,8 @@
     "inference": "Repeated immutable proof IO and a full call-table timestamp scan are measured hotspots; file-cache attribution is an inference, not a separately measured stage."
   },
   "focused_local_validation": {
-    "tests_collected": 140,
-    "tests_passed": 139,
+    "tests_collected": 143,
+    "tests_passed": 142,
     "tests_skipped": 1,
     "cli_fixture_recent_rows": 128,
     "immutable_manifests": 19,
@@ -62,7 +62,7 @@
     "baseline_falsifier": "Exact historical scan/member-read counters or independently observed cgroup oom-kill/timeout; ordinary launch/data failures never qualify",
     "acceptance": "Each repaired CLI <512 MiB / <120 seconds; doubled-history peak <=1.25x+8MiB, wall <=1.5x+1s; exact diagnostics and no old payload reads",
     "result": "ENFORCED_ON_EXACT_PR_HEAD_BEFORE_MERGE_READINESS",
-    "peak_capture": "Kernel memory.peak via ExecStartPost before cgroup disposal; ExecStopPost for failed starts. Same-unit numeric MemoryMax/peak plus completed consumer and monotonic clocks required."
+    "peak_capture": "Stdlib kernel memory.peak reader before cgroup disposal, shared with ordinary report units; InvocationID-scoped journal readback. Same-unit numeric MemoryMax/peak plus completed consumer and monotonic clocks required."
   },
   "limits": [
     "MANIFEST_HEADERS_ENUMERATED_ONCE_PER_PACKET",

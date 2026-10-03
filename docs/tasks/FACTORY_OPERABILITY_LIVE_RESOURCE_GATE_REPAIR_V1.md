@@ -1,6 +1,6 @@
 ---
 task_id: FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1
-task_version: "1.0"
+task_version: "1.1"
 status: READY
 as_of: "2026-10-03"
 owner: GOAL_OWNER
@@ -30,6 +30,9 @@ managed_write_set:
   - scripts/factory_operability_watch.py
   - scripts/collector_owner_pulse.py
   - scripts/factory_prepare_operability_index.py
+  - scripts/factory_cgroup_peak.py
+  - configs/factory_remote_ops/factory-operability-watch.service
+  - configs/factory_remote_ops/factory-collector-owner-pulse.service
   - tests/test_factory_operability_live_resource_gate_repair_v1.py
   - tests/operability_bounded_call_profile.py
   - .github/workflows/factory-operability-resource-proof.yml
@@ -135,6 +138,10 @@ outputs with frozen cases. Save a payload-free machine receipt with fixture
 size, cgroup limit, peak, wall, actual index candidates/UDF evaluations and commands. Failure/absence is
 `NOT_READY`, not a claim based on Windows RSS or a unit file alone.
 The Linux proof runs in the candidate PR workflow before merge-readiness;
+The same standard-library kernel peak reader runs after ordinary report
+oneshots, before systemd disposes their cgroup; readback is bound to the
+specific InvocationID. This closes the measured Ubuntu completed-unit
+MemoryPeak=[not set] gap without a new daemon, dependency or limit increase.
 the required Repository validation aggregator depends on its reusable job.
 Affected-path selection fails closed and defaults to running when no base is
 available; an absent, failed, skipped or cancelled resource job denies validate.

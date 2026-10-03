@@ -441,7 +441,7 @@ git-side default sink. Canary сохраняет этот фактический
 
 ```sh
 WATCH_CANARY="factory-watch-canary-$(date -u +%Y%m%dT%H%M%SZ)"
-sudo systemd-run --unit="$WATCH_CANARY" --service-type=oneshot --remain-after-exit --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab --property=EnvironmentFile=-/etc/solana-alpha-lab/secrets.env --property="ExecStartPost=/usr/bin/uv run --locked --managed-python python -B tests/operability_bounded_call_profile.py cgroup-peak --root local" --property=NoNewPrivileges=yes /usr/bin/uv run --locked --managed-python python -B scripts/factory_operability_watch.py --mode dry-run
+sudo systemd-run --unit="$WATCH_CANARY" --service-type=oneshot --remain-after-exit --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab --property=EnvironmentFile=-/etc/solana-alpha-lab/secrets.env --property="ExecStartPost=/usr/bin/python3 -B scripts/factory_cgroup_peak.py" --property=NoNewPrivileges=yes /usr/bin/uv run --locked --managed-python python -B scripts/factory_operability_watch.py --mode dry-run
 ```
 
 `Type=oneshot` завершает start job после команды. `--remain-after-exit`
@@ -453,13 +453,14 @@ sudo systemd-run --unit="$WATCH_CANARY" --service-type=oneshot --remain-after-ex
 
 ```sh
 canary_readback() {
-    /usr/bin/uv run --locked --managed-python python -B - "$1" <<'PY'
+    /usr/bin/uv run --locked --managed-python python -B - "$1" "${2:-canary}" <<'PY'
 import json
+import re
 import subprocess
 import sys
 
 properties = ('ActiveState', 'SubState', 'Result', 'ExecMainStatus', 'MemoryPeak',
-              'ExecMainStartTimestampMonotonic', 'ExecMainExitTimestampMonotonic', 'MemoryMax')
+              'ExecMainStartTimestampMonotonic', 'ExecMainExitTimestampMonotonic', 'MemoryMax', 'InvocationID')
 try:
     read = subprocess.run(['systemctl', 'show', sys.argv[1],
                            '--property=' + ','.join(properties)],
@@ -477,7 +478,11 @@ if read.returncode == 0:
         try:
             raw_peak = values.get('MemoryPeak', '')
             peak = int(raw_peak) if raw_peak.isdecimal() else 0
-            journal = subprocess.run(['sudo', 'journalctl', '-u', sys.argv[1], '-o', 'cat',
+            invocation = values.get('InvocationID', '')
+            if not re.fullmatch('[0-9a-f]{32}', invocation):
+                raise ValueError('RESOURCE_INVOCATION_UNAVAILABLE')
+            journal = subprocess.run(['sudo', 'journalctl', '-u', sys.argv[1],
+                                      '_SYSTEMD_INVOCATION_ID=' + invocation, '-o', 'cat',
                                       '--no-pager', '-n', '30'], capture_output=True,
                                      text=True, timeout=5, check=False)
             saved = [json.loads(line) for line in journal.stdout.splitlines()
@@ -494,7 +499,9 @@ if read.returncode == 0:
             ended = int(values['ExecMainExitTimestampMonotonic'])
             if 0 < peak < 2**64 - 1 and 0 < started < ended:
                 wall = (ended - started) / 1_000_000
-                if values.get('ActiveState') == 'active' and values.get('SubState') == 'exited':
+                terminal = (values.get('ActiveState'), values.get('SubState'))
+                expected_terminal = ('inactive', 'dead') if sys.argv[2] == 'ordinary' else ('active', 'exited')
+                if terminal == expected_terminal:
                     state = 'PASS' if peak < 512 * 1024**2 and wall < 120 else 'BLOCKED'
         except (KeyError, ValueError, OSError, subprocess.SubprocessError):
             pass
@@ -505,10 +512,11 @@ PY
 canary_readback "$WATCH_CANARY.service"
 ```
 
-`ExecStartPost` сохраняет kernel `memory.peak` сразу после oneshot до удаления
+`ExecStartPost` сохраняет kernel `memory.peak` через stdlib script сразу после oneshot до удаления
 cgroup. Ubuntu может вернуть `MemoryPeak=[not set]` уже после завершения;
 тогда используется единственная числовая запись из journal той же уникальной
-unit с совпавшим `memory.max=768 MiB`. Это cgroup peak всех дочерних процессов; это не sampling RSS одного
+unit/InvocationID с совпавшим `memory.max=768 MiB`. Штатные service templates
+используют тот же helper; он не читает operational store или environment values. Это cgroup peak всех дочерних процессов; это не sampling RSS одного
 Python PID. Positive numeric peak, monotonic duration, успешное завершение и
 пороги <512 MiB / <120s обязательны. Неподдерживаемый/пустой/infinity/нулевой
 пик, пропавшая unit или отсутствующий clock → `UNKNOWN`, rollout остановить.
@@ -528,10 +536,14 @@ sudo systemctl stop "$WATCH_CANARY.service"
 ```sh
 COMMISSIONING_START=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 sudo systemctl enable --now factory-operability-watch.timer
-systemctl show factory-operability-watch.service --property=InvocationID,ExecMainStartTimestamp,ExecMainExitTimestamp,Result,ExecMainStatus,MemoryPeak
+systemctl show factory-operability-watch.service --property=InvocationID,ExecMainStartTimestamp,ExecMainExitTimestamp,Result,ExecMainStatus
+canary_readback factory-operability-watch.service ordinary
 journalctl --unit=factory-operability-watch.service --since "$COMMISSIONING_START" --output=short-iso --no-pager
 ```
 
+Для ordinary readback unit должна завершиться в `inactive/dead`; пик берётся
+из journal только её сохранённого InvocationID. При отсутствии ровно одной
+числовой записи helper результат UNKNOWN, rollout остановить.
 После каждого из двух обычных 15-минутных запусков сохраните этот readback и
 результат snapshot probe выше. Нужны два разных InvocationID/start times и
 два завершения после deploy, exit=0, peak <512 MiB, wall <120s, продвижение
@@ -551,7 +563,7 @@ Incident/recovery считается проверенным только по с
 ```sh
 check_report_environment factory-collector-owner-pulse.service
 PULSE_CANARY="factory-pulse-canary-$(date -u +%Y%m%dT%H%M%SZ)"
-sudo systemd-run --unit="$PULSE_CANARY" --service-type=oneshot --remain-after-exit --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab --property=EnvironmentFile=-/etc/solana-alpha-lab/secrets.env --property="ExecStartPost=/usr/bin/uv run --locked --managed-python python -B tests/operability_bounded_call_profile.py cgroup-peak --root local" --property=NoNewPrivileges=yes /usr/bin/uv run --locked --managed-python python -B scripts/collector_owner_pulse.py --mode dry-run --record-storage-history
+sudo systemd-run --unit="$PULSE_CANARY" --service-type=oneshot --remain-after-exit --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab --property=EnvironmentFile=-/etc/solana-alpha-lab/secrets.env --property="ExecStartPost=/usr/bin/python3 -B scripts/factory_cgroup_peak.py" --property=NoNewPrivileges=yes /usr/bin/uv run --locked --managed-python python -B scripts/collector_owner_pulse.py --mode dry-run --record-storage-history
 canary_readback "$PULSE_CANARY.service"
 sudo systemctl stop "$PULSE_CANARY.service"
 ```
@@ -563,7 +575,8 @@ sudo systemctl stop "$PULSE_CANARY.service"
 PULSE_START=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 sudo systemctl enable --now factory-collector-owner-pulse.timer
 sudo systemctl start factory-collector-owner-pulse.service
-systemctl show factory-collector-owner-pulse.service --property=InvocationID,ExecMainStartTimestamp,ExecMainExitTimestamp,Result,ExecMainStatus,MemoryPeak
+systemctl show factory-collector-owner-pulse.service --property=InvocationID,ExecMainStartTimestamp,ExecMainExitTimestamp,Result,ExecMainStatus
+canary_readback factory-collector-owner-pulse.service ordinary
 journalctl --unit=factory-collector-owner-pulse.service --since "$PULSE_START" --output=short-iso --no-pager
 ```
 

@@ -40,6 +40,9 @@ jobs:
               'tests/operability_bounded_call_profile.py',
               'tests/test_factory_operability_live_resource_gate_repair_v1.py',
               'scripts/factory_prepare_operability_index.py',
+              'scripts/factory_cgroup_peak.py',
+              'configs/factory_remote_ops/factory-operability-watch.service',
+              'configs/factory_remote_ops/factory-collector-owner-pulse.service',
               '.github/workflows/factory-operability-resource-proof.yml',
               '.github/workflows/ci.yml',
           }

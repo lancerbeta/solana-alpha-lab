@@ -295,18 +295,8 @@ def measure(root: Path, consumer: str, *, baseline: bool = False) -> dict[str, o
 
 def emit_cgroup_peak() -> dict[str, int]:
     """Post-command hook reads the kernel peak before the unit cgroup dies."""
-    paths = [line.split("::", 1)[1] for line in Path("/proc/self/cgroup").read_text().splitlines()
-             if line.startswith("0::")]
-    if len(paths) != 1:
-        raise ValueError("CGROUP_V2_UNAVAILABLE")
-    mount = Path("/sys/fs/cgroup").resolve()
-    current = (mount / paths[0].lstrip("/")).resolve()
-    current.relative_to(mount)
-    peak = int((current / "memory.peak").read_text().strip())
-    maximum = int((current / "memory.max").read_text().strip())
-    if not 0 < peak <= maximum:
-        raise ValueError("CGROUP_PEAK_UNAVAILABLE")
-    return {"cgroup_memory_peak_bytes": peak, "cgroup_memory_max_bytes": maximum}
+    from scripts.factory_cgroup_peak import read_cgroup_peak
+    return read_cgroup_peak()
 
 
 def cgroup_gate(root: Path, consumer: str, *, baseline: bool = False) -> dict[str, object]:
@@ -331,8 +321,8 @@ def cgroup_gate(root: Path, consumer: str, *, baseline: bool = False) -> dict[st
         "--property=MemoryMax=768M", "--property=TimeoutStartSec=180s",
         "--property=PrivateNetwork=yes", "--property=RestrictAddressFamilies=AF_UNIX",
         f"--property=WorkingDirectory={ROOT}",
-        f"--property=ExecStartPost={sys.executable} -B {Path(__file__).resolve()} cgroup-peak --root {root}",
-        f"--property=ExecStopPost={sys.executable} -B {Path(__file__).resolve()} cgroup-peak --root {root}",
+        f"--property=ExecStartPost={sys.executable} -B {ROOT / 'scripts/factory_cgroup_peak.py'}",
+        f"--property=ExecStopPost={sys.executable} -B {ROOT / 'scripts/factory_cgroup_peak.py'}",
         "--property=NoNewPrivileges=yes", sys.executable, "-B",
         str(Path(__file__).resolve()), "measure", "--root", str(root.resolve()),
         "--consumer", consumer,

@@ -216,6 +216,41 @@ class CgroupProofGateTests(unittest.TestCase):
     def setUp(self) -> None:
         (ROOT / "local").mkdir(exist_ok=True)
 
+    def test_kernel_peak_reader_requires_own_v2_numeric_bounded_counter(self) -> None:
+        from scripts.factory_cgroup_peak import read_cgroup_peak
+        for group, peak, maximum, valid in (("0::/system.slice/fixture.service", "83886080", "805306368", True),
+                                            ("1:memory:/legacy", "83886080", "805306368", False),
+                                            ("0::/../../outside", "83886080", "805306368", False),
+                                            ("0::/fixture", "0", "805306368", False),
+                                            ("0::/fixture", "83886080", "max", False),
+                                            ("0::/fixture", "83886081", "83886080", False)):
+            with self.subTest(group=group, valid=valid), \
+                 patch.object(Path, "read_text", side_effect=[group, peak, maximum]):
+                if valid:
+                    self.assertEqual(read_cgroup_peak()["cgroup_memory_peak_bytes"], int(peak))
+                else:
+                    with self.assertRaises(ValueError):
+                        read_cgroup_peak()
+
+    def test_kernel_peak_cli_failure_contains_no_path_exception_or_false_zero(self) -> None:
+        from scripts import factory_cgroup_peak as helper
+        output = io.StringIO()
+        with patch.object(helper, "read_cgroup_peak", side_effect=OSError("private file path")), \
+             patch.object(sys, "stdout", output), self.assertRaises(SystemExit) as stopped:
+            helper.main()
+        self.assertEqual(stopped.exception.code, 2)
+        self.assertEqual(json.loads(output.getvalue()), {"resource_state": "UNKNOWN",
+                                                        "reason": "KERNEL_CGROUP_PEAK_UNAVAILABLE"})
+
+    def test_ordinary_units_and_invocation_scoped_readback_use_same_peak_reader(self) -> None:
+        for name in ("factory-operability-watch", "factory-collector-owner-pulse"):
+            unit = (ROOT / f"configs/factory_remote_ops/{name}.service").read_text()
+            self.assertIn("ExecStartPost=/usr/bin/python3 -B scripts/factory_cgroup_peak.py", unit)
+            self.assertIn("MemoryMax=768M", unit)
+        runbook = (ROOT / "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md").read_text(encoding="utf-8")
+        self.assertIn("'_SYSTEMD_INVOCATION_ID=' + invocation", runbook)
+        self.assertIn("canary_readback factory-operability-watch.service ordinary", runbook)
+
     def test_unavailable_resource_property_reports_safe_stage_never_pass(self) -> None:
         import operability_bounded_call_profile as profile
         with tempfile.TemporaryDirectory(dir=ROOT / "local") as temp:
