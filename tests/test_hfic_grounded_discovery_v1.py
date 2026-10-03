@@ -609,6 +609,8 @@ class ProductionRowRecipeTests(unittest.TestCase):
             )
             self.assertTrue(first["queries"][0]["new_look"])
             self.assertEqual(first["budget"]["main_count"], 1)
+            self.assertEqual(first["result"]["universe_policy"]["min_holders"], "0")
+            self.assertEqual(first["result"]["universe_policy"]["min_liquidity_usd"], "0")
             resumed = ResearchStore(Path(raw))
             second = run_recorded_discovery_query(
                 resumed,

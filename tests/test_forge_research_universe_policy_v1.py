@@ -331,6 +331,57 @@ class UniversePolicyTests(unittest.TestCase):
             self.assertEqual(returned_body["result"]["universe_policy"]["min_liquidity_usd"], "5000")
             self.assertEqual(main_after_a, evidence["budget"]["main_count"])
 
+    def test_threshold_change_is_adaptation_not_a_second_main(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import run_recorded_discovery_query
+        from solana_alpha_lab.factory.hfic_ordinary_operation import record_operation
+        from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from tests.test_hfic_temporal_discovery_v1 import GIT_SHA, _binding, _census, _obs, _path, _scope, _spec
+
+        spec = _spec(search_tier="SIMPLE_SCREEN", query_id="universe-adaptation")
+        rows = _path("a", [1.0, 1.5, 2.0, 1.6], (10000.0, 9000.0), 1.92) + [
+            _obs("a", "Y3600", "FIELD-HOLDER-COUNT-001", 50)
+        ]
+        with tempfile.TemporaryDirectory() as raw:
+            store = ResearchStore(Path(raw))
+            ensure_profile(store, repo_root=ROOT, min_holders=0, min_liquidity_usd=0)
+            operation = record_operation(store, {
+                "owner_request_text": "synthetic policy adaptation",
+                "owner_focus": "UNIVERSE_ADAPTATION",
+                "journal_scope": "ab" * 32,
+                "market_evidence_epoch_sha256": "cd" * 32,
+                "spec": spec,
+                "owner_cap": {"main": 1, "adaptive": None, "preview": None},
+                "requested_completion": "LIMITED_RESULT",
+            })
+            first = run_recorded_discovery_query(
+                store, census=[_census("a")], observations=rows, spec=spec, binding=_binding(),
+                journal_scope="ab" * 32, candidate_scope=_scope(spec), git_sha=GIT_SHA,
+                operation_sha256=operation["operation_sha256"], verified_market="cd" * 32,
+            )
+            self.assertEqual(first["queries"][0]["look_class"], "MAIN")
+            from solana_alpha_lab.factory.hfic_ordinary_operation import note_look_landed
+
+            self.assertEqual(note_look_landed(store, operation["operation_sha256"])["status"], "PAUSED_CAP")
+            ensure_profile(store, repo_root=ROOT, min_holders=50, min_liquidity_usd=20000)
+            follow = record_operation(store, {
+                "owner_request_text": "synthetic policy adaptation follow-up",
+                "owner_focus": "UNIVERSE_ADAPTATION_FOLLOW",
+                "journal_scope": "ab" * 32,
+                "market_evidence_epoch_sha256": "cd" * 32,
+                "spec": spec,
+                "owner_cap": {"main": 0, "adaptive": 1, "preview": 0},
+                "requested_completion": "LIMITED_RESULT",
+            })
+            second = run_recorded_discovery_query(
+                store, census=[_census("a")], observations=rows, spec=spec, binding=_binding(),
+                journal_scope="ab" * 32, candidate_scope=_scope(spec), git_sha=GIT_SHA,
+                operation_sha256=follow["operation_sha256"], verified_market="cd" * 32,
+            )
+            self.assertTrue(second["queries"][0]["new_look"])
+            self.assertEqual(second["queries"][0]["look_class"], "ADAPTIVE")
+            self.assertEqual(second["budget"]["main_count"], first["budget"]["main_count"])
+
     def test_zero_is_not_missing_and_fail_beats_unknown(self) -> None:
         fail = classify_universe_cells(
             {"status": "OBSERVED", "value": 0},

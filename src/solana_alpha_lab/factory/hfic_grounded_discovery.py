@@ -2026,15 +2026,24 @@ def run_recorded_discovery_query(
         summary = existing["result"]
         digest = str(existing.get("result_sha256") or result_sha256(summary))
     budget_history = []
+    policy_shift = False
+    current_policy = (summary.get("universe_policy") or {}).get("semantic_sha256")
     for item in previous:
-        if (
-            item.get("spec_sha256") == summary["spec_sha256"]
-            and item.get("data_binding_sha256") != binding_sha
-        ):
+        same_spec = item.get("spec_sha256") == summary["spec_sha256"]
+        changed_binding = item.get("data_binding_sha256") != binding_sha
+        prior_policy = ((item.get("result") or {}).get("universe_policy") or {}).get("semantic_sha256")
+        if same_spec and changed_binding and prior_policy and current_policy and prior_policy != current_policy:
+            policy_shift = True
+            budget_history.append({**item, "spec_sha256": "DATA_BINDING_CHANGED"})
+        elif same_spec and changed_binding:
             budget_history.append({**item, "spec_sha256": "DATA_BINDING_CHANGED"})
         else:
             budget_history.append(item)
-    look = classify_query_look(budget_history, spec)
+    classify_spec = spec
+    if policy_shift and _is_temporal_query(spec):
+        classify_spec = dict(spec)
+        classify_spec["adaptation_of"] = summary["spec_sha256"]
+    look = classify_query_look(budget_history, classify_spec)
     revision_of: dict[str, Any] | None = None
     if source_look is not None:
         from solana_alpha_lab.factory.hfic_temporal_discovery import (

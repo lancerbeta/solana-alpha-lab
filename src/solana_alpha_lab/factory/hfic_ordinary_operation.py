@@ -778,7 +778,28 @@ def gate_before_values(
     if _closed_slot(admission, list_hfic_sessions(store)):
         raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")
     try:
-        classified = classify_temporal_look(looks, spec)
+        from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
+
+        active_policy = effective_policy(store).get("semantic_sha256")
+        classify_looks = []
+        policy_shift = False
+        for item in looks:
+            prior_policy = ((item.get("result") or {}).get("universe_policy") or {}).get("semantic_sha256")
+            if (
+                item.get("spec_sha256") == validated["spec_sha256"]
+                and prior_policy
+                and active_policy
+                and prior_policy != active_policy
+            ):
+                policy_shift = True
+                classify_looks.append({**item, "spec_sha256": "DATA_BINDING_CHANGED"})
+            else:
+                classify_looks.append(item)
+        classify_spec = spec
+        if policy_shift:
+            classify_spec = dict(spec)
+            classify_spec["adaptation_of"] = validated["spec_sha256"]
+        classified = classify_temporal_look(classify_looks, classify_spec)
     except Exception as exc:
         code = getattr(exc, "code", None) or "QUERY_SPEC_INVALID"
         raise OrdinaryOperationError(str(code)) from exc
