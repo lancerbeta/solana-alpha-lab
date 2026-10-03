@@ -479,11 +479,10 @@ class UniversePolicyTests(unittest.TestCase):
                 "--candidate-scope", str(scope_path), "--journal-scope", journal,
                 "--operation", str(grown_op), "--format", "json", data_root=grown_root,
             )
-            self.assertEqual(grown.returncode, 0, grown.stdout + grown.stderr)
+            self.assertNotEqual(grown.returncode, 0)
             grown_body = json.loads(grown.stdout)
-            self.assertEqual(grown_body["queries"][0]["look_class"], "MAIN")
-            self.assertEqual(grown_body["scientific_look_delta"]["main"], 1)
-            self.assertEqual(grown_body["result"]["universe_policy"]["min_liquidity_usd"], "20000")
+            self.assertEqual(grown_body["reason_code"], "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
+            self.assertNotEqual(grown_body.get("scientific_look_delta", {}).get("main"), 1)
             stored = run_registered_fixed_time_proxy(
                 root=ROOT, registry_path=ROOT / "configs/experiment_capability_registry_v2.yaml",
                 recipe=result["experiment_recipe"], data_root=data_root,

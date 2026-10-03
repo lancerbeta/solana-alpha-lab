@@ -380,6 +380,7 @@ def resolve_published_discovery_binding(data_root: Path) -> dict[str, Any]:
         )
     _attach_verified_schedule(root, bound_cohorts)
     admitted = admit_discovery_binding(bound_cohorts)
+    _assert_published_logical_content(root, bound_cohorts)
     return {
         **admitted,
         "authority_source": _AUTHORITY_SOURCE,
@@ -389,6 +390,52 @@ def resolve_published_discovery_binding(data_root: Path) -> dict[str, Any]:
         "dataset_version": str(labels.get("dataset_version") or ""),
         "cohorts": bound_cohorts,
     }
+
+
+def _assert_published_logical_content(data_root: Path, cohorts: Sequence[Mapping[str, Any]]) -> None:
+    """Reject a partition whose logical content hash no longer matches its bytes."""
+
+    from solana_alpha_lab.factory.live_corpus_logical_rows import (
+        KIND_CENSUS,
+        KIND_OBS,
+        LiveCorpusLogicalRowError,
+        measure_live_corpus_parquet,
+    )
+    from solana_alpha_lab.storage.manifests import PartitionManifest
+
+    partition_dir = data_root / "datasets" / "manifests" / "partitions"
+    if not partition_dir.is_dir():
+        return
+    by_location: dict[str, Any] = {}
+    for path in partition_dir.glob("partition-*.json"):
+        if not path.is_file() or path.is_symlink():
+            continue
+        try:
+            part = PartitionManifest.model_validate_json(path.read_bytes())
+        except (OSError, UnicodeDecodeError, ValueError):
+            raise GroundedDiscoveryError("LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
+        by_location[str(part.logical_location).replace("\\", "/")] = part
+    for cohort in cohorts:
+        for rel, kind in (
+            (cohort.get("census_rel"), KIND_CENSUS),
+            (cohort.get("observations_rel") or cohort.get("obs_rel"), KIND_OBS),
+        ):
+            if not isinstance(rel, str) or not rel:
+                continue
+            part = by_location.get(rel.replace("\\", "/"))
+            if part is None:
+                continue
+            try:
+                measured = measure_live_corpus_parquet(
+                    data_root / rel,
+                    kind=kind,
+                    partition_id=part.partition_id,
+                    logical_location=rel,
+                )
+            except (LiveCorpusLogicalRowError, OSError, ValueError) as exc:
+                raise GroundedDiscoveryError("LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE") from exc
+            if measured.content_sha256 != part.content_sha256 or measured.file_sha256 != part.file_sha256:
+                raise GroundedDiscoveryError("LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
 
 
 def collapse_exact_partition_duplicates(

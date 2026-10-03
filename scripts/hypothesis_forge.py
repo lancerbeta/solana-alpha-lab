@@ -1313,6 +1313,16 @@ def cmd_discovery_execute(
                 try:
                     published = resolve_published_discovery_binding(explicit_data_root)
                     cohorts = list(published.get("cohorts") or [])
+                except GroundedDiscoveryError as exc:
+                    return emit(
+                        {
+                            "reason_code": exc.code,
+                            "values_loaded": False,
+                            "writes": bool(service_writes),
+                            "scientific_negative": False,
+                        },
+                        exit_code=2,
+                    )
                 except Exception:
                     cohorts = []
             gate = gate_before_values(
