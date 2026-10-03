@@ -82,6 +82,15 @@ distinction, not independent control, executable veto benefit, alpha or NetRetur
    launch. Model configuration is gpt-6.1-sol/xhigh/native Codex; actual backend
    identity is UNKNOWN unless the isolated execution confirms it. No external
    API, scientific assessment write or protocol-finalization claim.
+   The dependent regression passed all four frozen behavioral golds;
+   terminals were REVISE_ONCE for K1/K3/K4 and KILL_LOW_INFORMATION_VALUE for
+   K2. Full output is `blind_regression_output.json`; rubric grading and limits
+   are `blind_gold_verdicts.json`. These terminals are semantic smoke outputs,
+   not production-finalized scientific dispositions. Raw file hashes bind the
+   actual model inputs/outputs. Git snapshots normalize only line endings and
+   surplus prompt EOF blanks; manifests retain restoration metadata and
+   separate snapshot hashes. Absolute artifact paths in outputs are sanitized
+   to logical refs; no conclusions are omitted.
 
 **CALENDAR_MISSING_TRUNCATION_COMPATIBILITY:** six matched days, two observed
 and four missing. V4's two observed keys retain their counts/means in V5;
@@ -140,8 +149,13 @@ explicit truncation, mandatory comparison retained. Production cap remains
 Eight focused owner suites initially ran 87 tests: 85 passed; two consumer
 failures were `IMPLEMENTATION_HASH_MISMATCH` because current source hashes
 had not yet been committed to the Git head used by implementation verification.
-They require rerun after stable source/Catalog commit; integrity checks are not
-weakened. Final required independent role results and exact inventory are owned
+After stable source/Catalog commit `473a21d2f987c411d4466e286e4139d7ed3f53bf`,
+both previously failing consumers, all seven new regressions and the actual
+packet owner path passed: 10 tests in 252.302 seconds. Integrity checks are not
+weakened. Exact D2 copy proof was repeated on this committed implementation and
+again passed with the same revision identity, one append, unchanged budget and
+canonical fingerprint, and zero-write cold retry.
+Final required independent role results and exact inventory are owned
 by the three delivery JSON files. Exact-head PR CI is an external current gate.
 
 Semantic owner: `docs/contracts/forge_downside_descriptive_v1.md`; route remains

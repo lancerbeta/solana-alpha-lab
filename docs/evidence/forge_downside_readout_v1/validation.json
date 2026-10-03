@@ -1,0 +1,35 @@
+{
+  "scope": "FOCUSED_IMPLEMENTATION_AND_DIRECT_CONSUMER_CHECKS",
+  "implementation_head": "473a21d2f987c411d4466e286e4139d7ed3f53bf",
+  "final_focused": {
+    "status": "PASS",
+    "tests": 10,
+    "seconds": 252.302,
+    "modules": [
+      "tests.test_forge_downside_readout_v1",
+      "tests.test_hfic_temporal_owner_path_v1"
+    ],
+    "repeated_failures": [
+      "tests.test_hfic_temporal_result_coherence_v1.SavedResultRevisionVerticalTests.test_saved_wrong_simple_is_revised_without_a_new_main",
+      "tests.test_hfic_temporal_production_runner_v1.TemporalVerticalTests.test_published_journal_reaches_document_runner_readback"
+    ]
+  },
+  "earlier_broad": {
+    "tests": 87,
+    "passed": 85,
+    "failed": 2,
+    "root_cause": "IMPLEMENTATION_HASH_MISMATCH_UNCOMMITTED_GIT_BLOB_BINDING",
+    "not_claimed_green": true
+  },
+  "proofs": {
+    "ORDINARY_CRASH_REPLAY": "PASS",
+    "READOUT_REVISION_LIFECYCLE_UNCHANGED": "PASS",
+    "REJECTED_CORRECTION_ZERO_WRITE": "PASS",
+    "ACTUAL_PROMPT_A_CRITIC_PACKET": "PASS",
+    "CALENDAR_MISSING_TRUNCATION_COMPATIBILITY": "PASS",
+    "REAL_D2_ISOLATED_COPY_PROOF": "PASS"
+  },
+  "local_full_gate": "NOT_RUN_PER_CURRENT_HARNESS",
+  "ci": "REQUIRED_LIVE_EXACT_PR_HEAD",
+  "integrity_checks_weakened": false
+}

@@ -1,0 +1,49 @@
+{
+  "batch": "PRIMARY_SINGLE_BATCH",
+  "inputs": {
+    "K1.json": "822e71287e06b52baf27a381e5a13c0655dbcf8c0d4c62db20d582c2c8bf8168",
+    "K2.json": "56bf58233d934204a83ecc146f0f7d726a40f121329b93c683e1a7dab200b30c",
+    "K3.json": "e22361f680bb10b04e7bc3b0aceeded716394702dc271f56a84a3824e27d2860",
+    "K4.json": "2c1a9ac042eec6d4b48807282c5692b99889e18c639ff17747dc191c432dce0e",
+    "prompt_b.txt": "86675e77148ea63dedcd440771dbed2b7449114219c39426a8a8db1ef7cd6901"
+  },
+  "gold_sha256": "e92a21ef78e6c637c968aa77390681428fe708f1f5135a1ef31e91fd8a17dc65",
+  "input_policy": "CURRENT_PRODUCTION_PROMPT_B_AND_PRODUCTION_FREEZE_PACKETS_ONLY_NO_GOLD_NO_PRD",
+  "configured_model": "gpt-6.1-sol",
+  "configured_effort": "xhigh",
+  "client": "CODEX_NATIVE_ISOLATED_AGENT",
+  "actual_backend_model": "UNKNOWN",
+  "stored_snapshots": {
+    "K1.json": {
+      "sha256": "3b1c335ef825dc326fdf0b151b22e710cd839cf61887b107552c9002fee43af9",
+      "original_line_endings": "CRLF",
+      "original_eof_newlines": 1
+    },
+    "K2.json": {
+      "sha256": "031b8cdb1f729bb23c9ae76c7882a7c071847da646edf5c048c2afaa5d0a8485",
+      "original_line_endings": "CRLF",
+      "original_eof_newlines": 1
+    },
+    "K3.json": {
+      "sha256": "0a7bc0cb2230e696c747c85ee1ac5548b2f68b37448274512265dbf2d8622090",
+      "original_line_endings": "CRLF",
+      "original_eof_newlines": 1
+    },
+    "K4.json": {
+      "sha256": "b4198877b1839d130e7bb4f02ac59cb1e0372bf5b4dcffb232ab2ad5dd2ff9e2",
+      "original_line_endings": "CRLF",
+      "original_eof_newlines": 1
+    },
+    "prompt_b.txt": {
+      "sha256": "dc00c9081f69565f822dea62378c4b332bb5bb5909692aca99d66445e1d02b1f",
+      "original_line_endings": "CRLF",
+      "original_eof_newlines": 2
+    }
+  },
+  "serialization": "Git snapshots normalize CRLF to LF and trim surplus prompt EOF blanks only. inputs are the raw bytes actually read by the native reviewer; raw bytes are reconstructible from snapshot plus original_line_endings/original_eof_newlines.",
+  "gold_stored_snapshot": {
+    "sha256": "f352112efa66922fefd1c37161fc7bc2bdc69323593124e5837b46e6b03d0524",
+    "original_line_endings": "CRLF",
+    "original_eof_newlines": 1
+  }
+}

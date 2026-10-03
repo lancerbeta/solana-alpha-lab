@@ -1,0 +1,774 @@
+{
+  "authority": {
+    "experiment_execution": 0,
+    "git_mutation": 0,
+    "provider_api_rpc_wss_calls": 0
+  },
+  "capability_epoch_sha256": "16b0370cc5408e2ea2b0e79849940d3db574705c1257b35eea113df57e33ac55",
+  "evidence_epoch_sha256": "0bcd2b0784911dba913df5daf512bbc3810078d27463f244bbc860c68290e3f2",
+  "generated_at": "2026-08-25T00:00:00Z",
+  "generator_prompt_version": "HFIC-V1.2",
+  "grounded_evidence": {
+    "authority_source": null,
+    "budget": {
+      "adaptive_count": 0,
+      "adaptive_limit": 2,
+      "compound_main_count": 0,
+      "main_count": 1,
+      "main_limit": 6,
+      "simple_main_count": 1,
+      "viewed_variants": [
+        "MATCHED_OBSERVED",
+        "BASELINE_DECISION_ELIGIBLE",
+        "ABLATION_DROP_mark",
+        "DOWNSIDE_DESCRIPTIVE_V1"
+      ]
+    },
+    "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V5",
+    "candidate_scope": {
+      "decision_timestamp": "Y3600",
+      "estimand": "price_relative_proxy",
+      "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+      "explanatory_condition": "mark",
+      "population": "BASE_X",
+      "representation_scope": "TEMPORAL_PRICE_LIQUIDITY",
+      "target": "PRICE_RELATIVE_PROXY:Y3600:Y7200:FIELD-USD-PRICE-001"
+    },
+    "canonical_prior_comparison": true,
+    "contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
+    "data_binding_sha256": "ae3b001695fd9c5bea3717b760db6269ddaa9198acb5634319ce81dabc3da675",
+    "descriptive_readout": {
+      "assessment": "DESCRIPTIVE_ONLY_NO_AUTOMATIC_VERDICT",
+      "baseline": {
+        "downside": {
+          "es10_return": null,
+          "es10_tail_mass_n": null,
+          "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": null,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": null,
+          "missing_n": 40,
+          "negative_mass": null,
+          "negative_n": 0,
+          "observed_n": 0,
+          "p05": null,
+          "p10": null,
+          "p25": null,
+          "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+          "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+          "status": "NO_OBSERVED_TARGET",
+          "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+          "worst_negative_share": null,
+          "zero_n": 0
+        },
+        "eligible_n": 40,
+        "mean_target": null,
+        "median_target": null,
+        "view": "BASELINE_DECISION_ELIGIBLE"
+      },
+      "baseline_may_include_matched": true,
+      "detail_truncation": {
+        "ablations": {
+          "included": 1,
+          "total": 1,
+          "truncated": false
+        },
+        "by_calendar_block": {
+          "included": 1,
+          "total": 1,
+          "truncated": false
+        },
+        "by_cohort": {
+          "included": 1,
+          "total": 1,
+          "truncated": false
+        }
+      },
+      "details": {
+        "ablations": [
+          {
+            "downside": {
+              "es10_return": null,
+              "es10_tail_mass_n": null,
+              "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+              "le_minus_20_n": 0,
+              "le_minus_20_rate": null,
+              "le_minus_50_n": 0,
+              "le_minus_50_rate": null,
+              "missing_n": 40,
+              "negative_mass": null,
+              "negative_n": 0,
+              "observed_n": 0,
+              "p05": null,
+              "p10": null,
+              "p25": null,
+              "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+              "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+              "status": "NO_OBSERVED_TARGET",
+              "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+              "worst_negative_share": null,
+              "zero_n": 0
+            },
+            "eligible_n": 40,
+            "mean_target": null,
+            "median_target": null,
+            "view": "ABLATION_DROP_mark"
+          }
+        ],
+        "by_calendar_block": [
+          {
+            "downside": {
+              "es10_return": null,
+              "es10_tail_mass_n": null,
+              "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+              "le_minus_20_n": 0,
+              "le_minus_20_rate": null,
+              "le_minus_50_n": 0,
+              "le_minus_50_rate": null,
+              "missing_n": 10,
+              "negative_mass": null,
+              "negative_n": 0,
+              "observed_n": 0,
+              "p05": null,
+              "p10": null,
+              "p25": null,
+              "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+              "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+              "status": "NO_OBSERVED_TARGET",
+              "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+              "worst_negative_share": null,
+              "zero_n": 0
+            },
+            "eligible_n": 10,
+            "mean_target": null,
+            "median_target": null,
+            "view": "2026-09-03"
+          }
+        ],
+        "by_cohort": [
+          {
+            "downside": {
+              "es10_return": null,
+              "es10_tail_mass_n": null,
+              "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+              "le_minus_20_n": 0,
+              "le_minus_20_rate": null,
+              "le_minus_50_n": 0,
+              "le_minus_50_rate": null,
+              "missing_n": 10,
+              "negative_mass": null,
+              "negative_n": 0,
+              "observed_n": 0,
+              "p05": null,
+              "p10": null,
+              "p25": null,
+              "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+              "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+              "status": "NO_OBSERVED_TARGET",
+              "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+              "worst_negative_share": null,
+              "zero_n": 0
+            },
+            "eligible_n": 10,
+            "mean_target": null,
+            "median_target": null,
+            "view": "REL-20260902T111900Z-20260909T111900Z"
+          }
+        ]
+      },
+      "matched": {
+        "downside": {
+          "es10_return": null,
+          "es10_tail_mass_n": null,
+          "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": null,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": null,
+          "missing_n": 10,
+          "negative_mass": null,
+          "negative_n": 0,
+          "observed_n": 0,
+          "p05": null,
+          "p10": null,
+          "p25": null,
+          "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+          "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+          "status": "NO_OBSERVED_TARGET",
+          "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+          "worst_negative_share": null,
+          "zero_n": 0
+        },
+        "eligible_n": 10,
+        "mean_target": null,
+        "median_target": null,
+        "view": "MATCHED_OBSERVED"
+      },
+      "missingness": "OBSERVED_DENOMINATOR_ONLY_NO_MAR_ASSUMPTION",
+      "selection_policy": "CANONICAL_ORDER_PREFIX",
+      "status": "DESCRIPTIVE_PROXY",
+      "tail_support": "DESCRIPTIVE_ESTIMATE_NOT_CONFIDENCE_INTERVAL"
+    },
+    "duplicate_partitions_eliminated": 0,
+    "journal_scope": "90c8d350f8d7eac5be02914511cf773b5d8a8da5deed5a541de7ea1c22f56f22",
+    "live_store_selected": false,
+    "look_confirms_selected": true,
+    "look_scope_relation": "LOOK_SCOPE_MATCH",
+    "operation_sha256": "38cea5a5514fe207033bf64f5bac20e1db1fca316d9cc6fd3678f07a74c173ce",
+    "ordinary_operation": "PAUSED_CAP",
+    "prior_scope_relations": [
+      {
+        "hypothesis_version_id": "HYP-QUOTE-NATIVE-FRICTION-H900-V1",
+        "question_id": null,
+        "question_id_is_not_a_scientific_difference": true,
+        "relation": "UNKNOWN_SCOPE_NEEDS_RESOLUTION"
+      }
+    ],
+    "priors": [],
+    "queries": [
+      {
+        "look_class": "MAIN",
+        "new_look": true,
+        "query_id": "impulse_pullback_liquidity",
+        "record_id": "HFIC-ART-DISCOVERY-A78D8F702B107759DFE44330F577A3A171952359",
+        "search_tier": "SIMPLE_SCREEN",
+        "spec_sha256": "833f2c84aa897042e81b6a63a5f224e7d56af3cc732bb5a105802af3dcd39311"
+      }
+    ],
+    "record_delta": {
+      "discovery_look_records": 1
+    },
+    "result": {
+      "ablations": [
+        {
+          "downside": {
+            "es10_return": null,
+            "es10_tail_mass_n": null,
+            "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+            "le_minus_20_n": 0,
+            "le_minus_20_rate": null,
+            "le_minus_50_n": 0,
+            "le_minus_50_rate": null,
+            "missing_n": 40,
+            "negative_mass": null,
+            "negative_n": 0,
+            "observed_n": 0,
+            "p05": null,
+            "p10": null,
+            "p25": null,
+            "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+            "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+            "status": "NO_OBSERVED_TARGET",
+            "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+            "worst_negative_share": null,
+            "zero_n": 0
+          },
+          "dropped_feature": "mark",
+          "mean_target": null,
+          "mean_target_kind": "PRICE_RELATIVE_PROXY",
+          "median_target": null,
+          "observed_n": 0,
+          "selection_relevant": true,
+          "view": "ABLATION_DROP_mark"
+        }
+      ],
+      "base_x_n": 40,
+      "baseline": {
+        "downside": {
+          "es10_return": null,
+          "es10_tail_mass_n": null,
+          "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": null,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": null,
+          "missing_n": 40,
+          "negative_mass": null,
+          "negative_n": 0,
+          "observed_n": 0,
+          "p05": null,
+          "p10": null,
+          "p25": null,
+          "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+          "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+          "status": "NO_OBSERVED_TARGET",
+          "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+          "worst_negative_share": null,
+          "zero_n": 0
+        },
+        "mean_target": null,
+        "mean_target_kind": "PRICE_RELATIVE_PROXY",
+        "median_target": null,
+        "observed_n": 0,
+        "view": "BASELINE_DECISION_ELIGIBLE"
+      },
+      "block_count": 0,
+      "by_calendar_block": [
+        {
+          "downside": {
+            "es10_return": null,
+            "es10_tail_mass_n": null,
+            "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+            "le_minus_20_n": 0,
+            "le_minus_20_rate": null,
+            "le_minus_50_n": 0,
+            "le_minus_50_rate": null,
+            "missing_n": 10,
+            "negative_mass": null,
+            "negative_n": 0,
+            "observed_n": 0,
+            "p05": null,
+            "p10": null,
+            "p25": null,
+            "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+            "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+            "status": "NO_OBSERVED_TARGET",
+            "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+            "worst_negative_share": null,
+            "zero_n": 0
+          },
+          "mean_target": null,
+          "mean_target_kind": "PRICE_RELATIVE_PROXY",
+          "median_target": null,
+          "observed_n": 0,
+          "view": "2026-09-03"
+        }
+      ],
+      "by_cohort": [
+        {
+          "base_x_n": 40,
+          "cohort_id": "REL-20260902T111900Z-20260909T111900Z",
+          "decision_eligible_n": 40,
+          "denominator_base_x": 40,
+          "downside": {
+            "es10_return": null,
+            "es10_tail_mass_n": null,
+            "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+            "le_minus_20_n": 0,
+            "le_minus_20_rate": null,
+            "le_minus_50_n": 0,
+            "le_minus_50_rate": null,
+            "missing_n": 10,
+            "negative_mass": null,
+            "negative_n": 0,
+            "observed_n": 0,
+            "p05": null,
+            "p10": null,
+            "p25": null,
+            "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+            "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+            "status": "NO_OBSERVED_TARGET",
+            "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+            "worst_negative_share": null,
+            "zero_n": 0
+          },
+          "exclusion_reasons": {},
+          "feature_admissible": 40,
+          "feature_unknown_n": 0,
+          "independent_replication": false,
+          "matched_n": 10,
+          "mean_target": null,
+          "mean_target_kind": "PRICE_RELATIVE_PROXY",
+          "median_target": null,
+          "membership": "DESCRIPTIVE_NOT_INDEPENDENT",
+          "missing_target_n": 10,
+          "observed_target_n": 0,
+          "population_n": 40,
+          "shared_decision_n": 0,
+          "target_exclusion_reasons": {
+            "EXIT_ABSENT": 10
+          },
+          "target_observed_after_decision": 0,
+          "view": "REL-20260902T111900Z-20260909T111900Z"
+        }
+      ],
+      "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V5",
+      "claim_level": "EXPLORATORY_PROXY",
+      "cohort_independent_replication": false,
+      "cohort_slices_are_descriptive": true,
+      "contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
+      "cost": {
+        "decision_sensitivity": "NOT_EVALUATED",
+        "labeled_net_return": false,
+        "scenarios": {},
+        "source_status": null,
+        "status": "ABSENT"
+      },
+      "decision_eligible_n": 40,
+      "downside": {
+        "es10_return": null,
+        "es10_tail_mass_n": null,
+        "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+        "le_minus_20_n": 0,
+        "le_minus_20_rate": null,
+        "le_minus_50_n": 0,
+        "le_minus_50_rate": null,
+        "missing_n": 10,
+        "negative_mass": null,
+        "negative_n": 0,
+        "observed_n": 0,
+        "p05": null,
+        "p10": null,
+        "p25": null,
+        "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+        "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+        "status": "NO_OBSERVED_TARGET",
+        "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+        "worst_negative_share": null,
+        "zero_n": 0
+      },
+      "downside_readout_exposure": {
+        "fixed_metrics": [
+          "p05",
+          "p10",
+          "p25",
+          "le_minus_20_rate",
+          "le_minus_50_rate",
+          "es10_return",
+          "negative_mass",
+          "worst_negative_share"
+        ],
+        "new_threshold_trials": false,
+        "profile": "DOWNSIDE_DESCRIPTIVE_V1"
+      },
+      "duplicate_delivery_count": 0,
+      "eligibility_uses_target": false,
+      "engine_emits_alpha": false,
+      "exclusion_reasons": {},
+      "experiment_recipe": {
+        "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+        "cost_label": "ABSENT",
+        "frozen_input": [
+          {
+            "census_rel": "census.parquet",
+            "census_sha256": "123bf693cc033e83931908a4d2e8237b2e4c587472e908debda26c88ced0b5cd",
+            "cohort_id": "REL-20260902T111900Z-20260909T111900Z",
+            "dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+            "dataset_manifest_id": null,
+            "evidence_role": "EXPLORATORY_REUSE",
+            "holdout": false,
+            "observations_rel": "observations.parquet",
+            "observations_sha256": "8814f5c2d3b97a9eb95ec401525d30019a4f80a7428c5a7d925a84ba47d38557",
+            "release_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "schedule_lateness_seconds": 300,
+            "schedule_point_due_offset_seconds": null,
+            "schedule_point_lateness": null,
+            "schedule_sha256": null
+          }
+        ],
+        "labeled_net_return": false,
+        "observation_clock_policy": "EVENT_TIME_V1",
+        "schema": "smial.hfic-temporal-query",
+        "schema_version": "1.0",
+        "scientific_identity": "833f2c84aa897042e81b6a63a5f224e7d56af3cc732bb5a105802af3dcd39311",
+        "spec": {
+          "adaptation_of": null,
+          "budget_allocation": "AUTO",
+          "query_id": "impulse_pullback_liquidity",
+          "schema": "smial.hfic-temporal-query",
+          "schema_version": "1.0",
+          "scientific_body": {
+            "cost_profile": null,
+            "decision_point": "Y3600",
+            "entry_model": {
+              "assumed_latency_seconds": 30,
+              "kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT"
+            },
+            "evaluation": {
+              "ablations": "DROP_ONE_CONDITION",
+              "baseline": "SAME_DECISION_ELIGIBLE",
+              "calendar_block": "UTC_DAY_OF_DECISION"
+            },
+            "features": [
+              {
+                "field_id": "FIELD-LIQUIDITY-USD-001",
+                "name": "mark",
+                "op": "point_value",
+                "point": "Y3600"
+              }
+            ],
+            "observation_clock_policy": "EVENT_TIME_V1",
+            "population": "BASE_X",
+            "predicates": [
+              {
+                "feature": "mark",
+                "op": "gte",
+                "value": 0.5
+              }
+            ],
+            "schedule_lateness_seconds": 300,
+            "target": {
+              "exit_point": "Y7200",
+              "field_id": "FIELD-USD-PRICE-001",
+              "kind": "PRICE_RELATIVE_PROXY",
+              "reference_point": "Y3600"
+            }
+          },
+          "search_tier": "SIMPLE_SCREEN",
+          "spec_sha256": "833f2c84aa897042e81b6a63a5f224e7d56af3cc732bb5a105802af3dcd39311"
+        },
+        "target_kind": "PRICE_RELATIVE_PROXY"
+      },
+      "feature_admissible_n": 40,
+      "feature_unknown_n": 0,
+      "independence": "UNKNOWN",
+      "independent_replication": null,
+      "integrity_conflict_count": 0,
+      "labeled_net_return": false,
+      "later_target_observed_n": 0,
+      "main_question_count_includes_variants": false,
+      "matched_feature_means": {
+        "mark": 1.0
+      },
+      "matched_n": 10,
+      "mean_target": null,
+      "mean_target_kind": "PRICE_RELATIVE_PROXY",
+      "mean_target_units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+      "median_target": null,
+      "missing_is_not_zero": true,
+      "missing_stress_model": {
+        "label": "MODEL",
+        "mean_target": -1.0,
+        "stress_return": -1.0,
+        "writes_raw_history": false
+      },
+      "missing_target_mean_to_zero": null,
+      "missing_target_n": 10,
+      "non_claims": [
+        "NO_ALPHA",
+        "NO_NET_RETURN",
+        "NO_INTRABAR_STOP",
+        "NO_CAUSAL_IDENTIFICATION",
+        "NO_SOURCE_PRICE_EVENT_TIME"
+      ],
+      "observation_clock_policy": "EVENT_TIME_V1",
+      "observation_index_passes": 1,
+      "observed_target_n": 0,
+      "pooled": {
+        "denominator_base_x": 40,
+        "downside": {
+          "es10_return": null,
+          "es10_tail_mass_n": null,
+          "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": null,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": null,
+          "missing_n": 10,
+          "negative_mass": null,
+          "negative_n": 0,
+          "observed_n": 0,
+          "p05": null,
+          "p10": null,
+          "p25": null,
+          "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+          "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+          "status": "NO_OBSERVED_TARGET",
+          "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+          "worst_negative_share": null,
+          "zero_n": 0
+        },
+        "feature_admissible": 40,
+        "independent_replication": null,
+        "mean_target": null,
+        "mean_target_kind": "PRICE_RELATIVE_PROXY",
+        "median_target": null,
+        "target_observed_after_decision": 0,
+        "view": "pooled"
+      },
+      "population": "BASE_X",
+      "population_n": 40,
+      "query_id": "impulse_pullback_liquidity",
+      "required_cohorts": [
+        "REL-20260902T111900Z-20260909T111900Z"
+      ],
+      "schema": "smial.hfic-temporal-query",
+      "search_tier": "SIMPLE_SCREEN",
+      "source_price_event_time": "UNKNOWN",
+      "spec_sha256": "833f2c84aa897042e81b6a63a5f224e7d56af3cc732bb5a105802af3dcd39311",
+      "target_exclusion_reasons": {
+        "by_cohort": {
+          "REL-20260902T111900Z-20260909T111900Z": {
+            "EXIT_ABSENT": 10
+          }
+        },
+        "pooled": {
+          "EXIT_ABSENT": 10
+        }
+      },
+      "target_kind": "PRICE_RELATIVE_PROXY",
+      "unique_decision_n": 40,
+      "unique_mint_n": 40,
+      "viewed_variants": [
+        "MATCHED_OBSERVED",
+        "BASELINE_DECISION_ELIGIBLE",
+        "ABLATION_DROP_mark",
+        "DOWNSIDE_DESCRIPTIVE_V1"
+      ],
+      "winner_share_of_positive": null
+    },
+    "result_refs": [
+      "HFIC-ART-DISCOVERY-A78D8F702B107759DFE44330F577A3A171952359"
+    ],
+    "result_sha256": "90ecebc2169ccd1e4439dd8e1ff310e6fbc84855861f985574c5706bef8401d8",
+    "scientific_look_delta": {
+      "adaptive": 0,
+      "main": 1
+    },
+    "scientific_slot_reserved": false,
+    "scientific_writes": 0,
+    "tier_progress": {
+      "action": "ESCALATE_COMPOUND",
+      "compound_executed": false,
+      "compound_status": "NOT_STARTED",
+      "evidence_revision_required": false,
+      "freeze_worthy": false,
+      "search_exhausted_allowed": false,
+      "simple_executed": true
+    },
+    "values_loaded": true,
+    "viewed_queries": [
+      {
+        "look_class": "MAIN",
+        "new_look": true,
+        "query_id": "impulse_pullback_liquidity",
+        "result_sha256": "90ecebc2169ccd1e4439dd8e1ff310e6fbc84855861f985574c5706bef8401d8",
+        "search_tier": "SIMPLE_SCREEN",
+        "spec_sha256": "833f2c84aa897042e81b6a63a5f224e7d56af3cc732bb5a105802af3dcd39311"
+      }
+    ],
+    "writes": true
+  },
+  "holdouts_not_touched": [],
+  "known_unknowns": [
+    "HFIC_FREEZE_BOUNDED",
+    "CLOSED_FAMILY:CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY",
+    "CLOSED_FAMILY:CLOSE_EXACT_FRICTION_VETO_FAMILY",
+    "CLOSED_FAMILY:CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY",
+    "CLOSED_FAMILY:CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY",
+    "CLOSED_FAMILY:CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY"
+  ],
+  "live_git_head": "f5023465fe01d2947ccafb23659bcad133669a9a",
+  "market_evidence_epoch_sha256": "0bcd2b0784911dba913df5daf512bbc3810078d27463f244bbc860c68290e3f2",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_AUTHORITY_FROM_CAPABILITY"
+  ],
+  "owner_focus": "FIXED_DOWNSIDE_K3",
+  "packet_schema": "smial.hypothesis-critic-input",
+  "packet_version": "1.4",
+  "prior_memory": {
+    "bytes": 863,
+    "capsules": [
+      {
+        "actor_counterparty": null,
+        "cheapest_falsifier": "Re-derived terminal from the canonical runtime receipt disagrees with the Git-canonical acceptance terminal.",
+        "claim": null,
+        "decision_kind": null,
+        "decision_timestamp": null,
+        "definition_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "hfic_protocol": null,
+        "horizon_notional": null,
+        "hypothesis_version_id": "HYP-QUOTE-NATIVE-FRICTION-H900-V1",
+        "mechanism": "classify_audition_terminal",
+        "memory_status": "HISTORICAL",
+        "negative_control": null,
+        "population": null,
+        "primary_x_family": null,
+        "primary_y": null,
+        "reason_code": null,
+        "session_id": null
+      }
+    ],
+    "complete": true,
+    "eligible_count": 1,
+    "emitted_count": 1,
+    "max_bytes": 65536,
+    "max_records": 64,
+    "schema": "smial.hfic-prior-memory-snapshot",
+    "schema_version": "1.0",
+    "snapshot_sha256": "6746b8d13673f8158d4aa0543cfacdc57ca6f40ac0920b86409feab85ba54515",
+    "store_inventory_digest": "eea89bcde9860062a6f48527c85adc897ccb30381dd8798e3b0f8d977dbae0ae"
+  },
+  "prior_work_queries": [
+    "QUERY-HFIC-EXACT-RELATED-PRIOR-001",
+    "QUERY-HFIC-SESSION-BY-SEARCH-KEY-001",
+    "QUERY-HFIC-PENDING-SESSION-001"
+  ],
+  "provisional_execution_unit": "NONE",
+  "provisional_lane": {
+    "exact_gap": "PROVISIONAL_LANE_NOT_YET_CLASSIFIED",
+    "required_capability_ids": [
+      "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+    ],
+    "required_data_bindings": [],
+    "required_query_recipe_ids": [],
+    "value": "DATA_OPTION_CANDIDATE"
+  },
+  "research_memory_as_of": "2026-08-25T00:00:00Z",
+  "selected_candidate": {
+    "actor_counterparty": "thin-liquidity mints versus later buyers",
+    "alternative_world": "NOT_DECLARED_IN_DRAFT",
+    "available_data_bindings": [],
+    "candidate_id": "HFIC-CAND-1B0646B07E85",
+    "cheapest_falsifier": "Read the fixed matched and same-decision baseline downside description before choosing a separate economic test.",
+    "claim": "The early liquidity-mark group may have different subsequent downside relevant to abstention.",
+    "claim_form": "CAUSAL",
+    "confounders": [
+      "NOT_DECLARED_IN_DRAFT"
+    ],
+    "decision_timestamp": "Y3600",
+    "decision_unlocked": "Whether a separate baseline-policy economic test is justified.",
+    "disconfirming_prediction": "The same-decision comparison provides no useful downside distinction.",
+    "estimand": "price_relative_proxy",
+    "execution_capacity_risks": [
+      "NOT_DECLARED_IN_DRAFT"
+    ],
+    "grounding": {
+      "capability_bindings": [
+        {
+          "accepted": true,
+          "authority_granted": false,
+          "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+        }
+      ],
+      "context_packet_sha256": "71eee21aedd20005611422b6398610d47a5b76e56ba92f15aa5ed32199ed9cce",
+      "feature_bindings": [],
+      "terminal": "GROUNDED_WITH_GAPS",
+      "unresolved_requirements": [
+        "DECISION_LIQUIDITY_FEAT_NOT_DECLARED_READOUT_ONLY"
+      ]
+    },
+    "horizon_notional": "Y3600 to Y7200 PRICE_RELATIVE_PROXY; no executable notional",
+    "mechanism": "Early liquidity state may distinguish later adverse price paths.",
+    "missing_or_forward_only_data": [],
+    "nearest_prior_and_difference": "Existing decision liquidity mark and fixed later price target; no ratio or route-unavailability claim.",
+    "negative_control": "Same-decision BASE_X baseline may include matched.",
+    "pass_fail_inconclusive_semantics": "NOT_DECLARED_IN_DRAFT",
+    "pit_leakage_survivorship_risks": [
+      "NOT_DECLARED_IN_DRAFT"
+    ],
+    "population": "BASE_X",
+    "primary_x": "FIELD-LIQUIDITY-USD-001 point_value Y3600 mark>=0.5",
+    "primary_y": "PRICE_RELATIVE_PROXY",
+    "proposed_method": "NOT_DECLARED_IN_DRAFT",
+    "required_capability_ids": [
+      "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+    ],
+    "required_feature_ids": [],
+    "state_transition": "early liquidity mark to later adverse price path",
+    "unresolved_requirements": [
+      "DECISION_LIQUIDITY_FEAT_NOT_DECLARED_READOUT_ONLY"
+    ],
+    "why_not_arbitraged": "NOT_DECLARED_IN_DRAFT"
+  },
+  "session_id": "HFIC-SESS-90C8D350F8D7EAC5",
+  "strongest_rejected_alternative": "NONE",
+  "truth_roots_used": [
+    "catalog/catalog_manifest.yaml",
+    "configs/hypothesis_forge_independent_critic_v1.yaml",
+    "configs/experiment_capability_registry_v2.yaml",
+    "registries/decisions_negative_results.yaml"
+  ]
+}
