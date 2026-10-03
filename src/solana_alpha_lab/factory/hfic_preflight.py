@@ -2154,6 +2154,13 @@ def build_forge_context_packet(
             ),
             "descriptive_readout": descriptive_return_readout(result, detail_limit=0),
         }
+        policy = result.get("universe_policy")
+        if isinstance(policy, Mapping) and policy.get("semantic_sha256"):
+            readouts[ref]["universe_policy"] = {
+                "semantic_sha256": policy.get("semantic_sha256"),
+                "min_holders": policy.get("min_holders"),
+                "min_liquidity_usd": policy.get("min_liquidity_usd"),
+            }
     if readouts:
         packet["grounded_readouts"] = list(readouts.values())
     from solana_alpha_lab.factory.hfic_scientific_disposition import (

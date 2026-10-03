@@ -194,8 +194,6 @@ class UniversePolicyTests(unittest.TestCase):
             self.assertEqual(status["min_holders"], "50")
             self.assertEqual(status["min_liquidity_usd"], "5000")
             self.assertEqual(status["semantic_sha256"], applied["semantic_sha256"])
-            quiet = workspace / "quiet"
-            shutil.copytree(data_root, quiet)
             executed = run_cli(
                 "discovery-execute", "--store", str(data_root), "--spec", str(spec_path),
                 "--candidate-scope", str(scope_path), "--journal-scope", journal,
@@ -224,41 +222,78 @@ class UniversePolicyTests(unittest.TestCase):
                     recipe=tampered, data_root=data_root,
                 )
             self.assertIn("UNIVERSE_POLICY_BINDING_MISMATCH", str(mismatch.exception))
-            again = _apply(data_root, workspace, "50", "5000")
-            self.assertEqual(again["status"], "NO_CHANGE")
-            pending = run_cli(
+            self.assertEqual(evidence.get("ordinary_operation"), "PAUSED_CAP", evidence.get("ordinary_operation"))
+            pending_preview = run_cli(
                 "universe-policy-preview", "--min-holders", "50", "--min-liquidity-usd", "20000",
-                "--decision-point", "Y900", "--format", "json", data_root=data_root,
+                "--decision-point", "Y900", "--format", "json", data_root=blocked_root,
             )
-            self.assertEqual(pending.returncode, 0, pending.stdout + pending.stderr)
+            self.assertEqual(pending_preview.returncode, 0, pending_preview.stdout + pending_preview.stderr)
             pending_path = workspace / "pending-20k.json"
-            pending_path.write_text(json.dumps(json.loads(pending.stdout)["proposal"]), encoding="utf-8")
+            pending_path.write_text(json.dumps(json.loads(pending_preview.stdout)["proposal"]), encoding="utf-8")
             refused = run_cli(
                 "universe-policy-apply", "--proposal", str(pending_path), "--confirm-append-only",
-                "--format", "json", data_root=data_root,
+                "--format", "json", data_root=blocked_root,
             )
             self.assertNotEqual(refused.returncode, 0)
             self.assertIn("UNIVERSE_POLICY_PENDING_OPERATION", refused.stdout + refused.stderr)
-            widened = _apply(quiet, workspace, "50", "20000")
+            prompt = run_cli("preflight", "--discovery-contract", "--owner-focus", FOCUS, "--format", "json", data_root=data_root)
+            self.assertEqual(prompt.returncode, 0, prompt.stdout + prompt.stderr)
+            prompt_receipt = json.loads(prompt.stdout)
+            readouts = prompt_receipt["forge_context_packet"]["grounded_readouts"]
+            self.assertEqual(readouts[-1]["universe_policy"]["semantic_sha256"], status["semantic_sha256"])
+            from tests.test_hfic_cli import bind_draft
+            from solana_alpha_lab.factory.hfic_session import freeze_draft
+
+            source = json.loads((ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(encoding="utf-8"))
+            card = dict(source["candidates"][0])
+            card.update({
+                "label": "UNIVERSE-POLICY-Y900",
+                "population": "BASE_X",
+                "decision_timestamp": "Y900",
+                "target": "PRICE_RELATIVE_PROXY:Y900:Y7200:FIELD-USD-PRICE-001",
+                "estimand": "price_relative_proxy",
+                "explanatory_condition": "mark",
+            })
+            draft = bind_draft({**source, "owner_focus": FOCUS, "candidates": [card]}, prompt_receipt)
+            for key in ("runner_up_candidate_ref", "strongest_rejected_alternative"):
+                draft.pop(key, None)
+            draft["selected_candidate_ref"] = card["label"]
+            draft["grounded_evidence"] = evidence
+            frozen = freeze_draft(draft, preflight_receipt=prompt_receipt, store=ResearchStore(data_root), repo_root=ROOT)
+            critic = frozen["critic_input_packet"]
+            self.assertEqual(
+                critic["grounded_evidence"]["universe_policy"]["universe_policy_semantic_sha256"],
+                status["semantic_sha256"],
+            )
+            self.assertEqual(
+                critic["grounded_evidence"]["result"]["universe_policy"]["semantic_sha256"],
+                status["semantic_sha256"],
+            )
+            main_after_a = evidence["budget"]["main_count"]
+            widened = _apply(data_root, workspace, "50", "20000")
             self.assertEqual(widened["min_liquidity_usd"], "20000")
-            self.assertNotEqual(widened["semantic_sha256"], status["semantic_sha256"])
             stored = run_registered_fixed_time_proxy(
                 root=ROOT, registry_path=ROOT / "configs/experiment_capability_registry_v2.yaml",
-                recipe=result["experiment_recipe"], data_root=quiet,
+                recipe=result["experiment_recipe"], data_root=data_root,
             )
-            live = json.loads(run_cli("universe-policy-status", "--format", "json", data_root=quiet).stdout)
+            live = json.loads(run_cli("universe-policy-status", "--format", "json", data_root=data_root).stdout)
             self.assertEqual(live["min_liquidity_usd"], "20000")
             self.assertEqual(stored["summary"]["universe_policy"]["min_liquidity_usd"], "5000")
-            from solana_alpha_lab.factory.hfic_grounded_discovery import format_discovery_readout
-
-            readout = format_discovery_readout(evidence)
-            self.assertEqual(readout["universe_policy"]["semantic_sha256"], status["semantic_sha256"])
-            self.assertLessEqual(result["baseline"]["observed_n"], result["universe_policy"]["n_pass"])
-            self.assertEqual(
-                result["universe_policy"]["n_pass"] + result["universe_policy"]["n_fail"] + result["universe_policy"]["n_unknown"],
-                result["universe_policy"]["n_base"],
+            restored = _apply(data_root, workspace, "50", "5000")
+            self.assertEqual(restored["min_liquidity_usd"], "5000")
+            self.assertEqual(restored["semantic_sha256"], status["semantic_sha256"])
+            returned = run_cli(
+                "discovery-execute", "--store", str(data_root), "--spec", str(spec_path),
+                "--candidate-scope", str(scope_path), "--journal-scope", journal,
+                "--operation", str(op_path), "--format", "json", data_root=data_root,
             )
-            self.assertEqual(semantic_sha256(result["experiment_recipe"]["universe_policy"]), status["semantic_sha256"])
+            self.assertEqual(returned.returncode, 0, returned.stdout + returned.stderr)
+            returned_body = json.loads(returned.stdout)
+            self.assertFalse(returned_body["queries"][0]["new_look"])
+            self.assertEqual(returned_body["scientific_look_delta"]["main"], 0)
+            self.assertEqual(returned_body["result_refs"], evidence["result_refs"])
+            self.assertEqual(returned_body["result"]["universe_policy"]["min_liquidity_usd"], "5000")
+            self.assertEqual(main_after_a, evidence["budget"]["main_count"])
 
     def test_zero_is_not_missing_and_fail_beats_unknown(self) -> None:
         fail = classify_universe_cells(

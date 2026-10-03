@@ -237,7 +237,13 @@ def effective_policy(store: Any) -> dict[str, Any]:
 def _open_operations(store: Any) -> list[dict[str, Any]]:
     from solana_alpha_lab.factory.hfic_ordinary_operation import list_operations
 
-    return [item for item in list_operations(store) if item.get("status") == "OPEN"]
+    latest: dict[str, dict[str, Any]] = {}
+    for item in list_operations(store):
+        digest = str(item.get("operation_sha256") or "")
+        previous = latest.get(digest)
+        if previous is None or str(item.get("_recorded_at") or "") >= str(previous.get("_recorded_at") or ""):
+            latest[digest] = item
+    return [item for item in latest.values() if item.get("status") == "OPEN"]
 
 
 def _deny_pending(store: Any) -> None:

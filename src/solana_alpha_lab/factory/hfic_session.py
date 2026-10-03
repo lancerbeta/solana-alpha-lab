@@ -2127,6 +2127,13 @@ def freeze_draft(
     elif isinstance(grounded, Mapping):
         packet["grounded_evidence"] = grounded
     handed = packet.get("grounded_evidence")
+    if isinstance(handed, Mapping):
+        from solana_alpha_lab.factory.hfic_research_universe_policy import claim_fields
+
+        bound_policy = claim_fields(handed.get("result") if isinstance(handed.get("result"), Mapping) else None)
+        if bound_policy:
+            handed = {**dict(handed), "universe_policy": bound_policy}
+            packet["grounded_evidence"] = handed
     if isinstance(handed, Mapping) and store is not None:
         result = handed.get("result") if isinstance(handed.get("result"), Mapping) else {}
         if isinstance(result, Mapping) and result.get("schema") == "smial.hfic-temporal-query":
