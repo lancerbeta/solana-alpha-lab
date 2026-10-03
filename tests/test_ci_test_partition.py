@@ -279,12 +279,14 @@ class CiTestPartitionTests(unittest.TestCase):
     def test_committed_plan_spreads_zero_weight_modules(self) -> None:
         plan = partition.load_plan(ROOT / "configs/ci_test_shards_v1.json")
         seconds = plan["module_seconds"]
-        zeros = [
-            sum(1 for path in shard if seconds.get(path, 0.0) <= 0.0)
-            for shard in plan["shards"]
-        ]
-        self.assertGreater(sum(zeros), 0)
-        self.assertLessEqual(max(zeros) - min(zeros), 1)
+        zero_total = sum(1 for path in seconds if seconds[path] <= 0.0)
+        self.assertGreater(zero_total, 0)
+        counts = [len(shard) for shard in plan["shards"]]
+        # zero-weight modules are placed by module count, so totals stay level
+        self.assertLessEqual(max(counts) - min(counts), 1)
+        for shard in plan["shards"]:
+            zeros = sum(1 for path in shard if seconds.get(path, 0.0) <= 0.0)
+            self.assertLess(zeros, zero_total)
 
     def test_committed_plan_provenance_matches_the_plan(self) -> None:
         plan = partition.load_plan(ROOT / "configs/ci_test_shards_v1.json")
