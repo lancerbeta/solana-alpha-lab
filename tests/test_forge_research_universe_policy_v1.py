@@ -85,6 +85,134 @@ def _publish_cases(workspace: Path) -> Path:
     return data_root
 
 
+def _change_published_observation(data_root: Path) -> None:
+    """Rewrite one sealed observation and the publication hashes that name it."""
+
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    from solana_alpha_lab.factory.live_cohort_discovery_release import (
+        load_live_corpus_lineage,
+        write_live_corpus_lineage,
+    )
+    from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
+    from solana_alpha_lab.factory.live_corpus_manifest_publish import (
+        COMMIT_POINT_KIND,
+        _build_dataset,
+        _build_receipt,
+        _commit_canonical_root,
+        _load_dataset_manifest,
+        _load_partitions_for_dataset,
+    )
+    from solana_alpha_lab.storage.manifests import (
+        build_partition_manifest,
+        compute_dataset_fingerprint,
+    )
+
+    lineage = load_live_corpus_lineage(data_root)
+    cohorts = [item for item in lineage.get("cohorts") or [] if isinstance(item, dict)]
+    if not cohorts:
+        raise AssertionError("published cohort missing")
+    cohort = cohorts[-1]
+    path = data_root / str(cohort["obs_rel"])
+    table = pq.read_table(path)
+    values = table.column("typed_value").to_pylist()
+    if not values:
+        raise AssertionError("published observations empty")
+    values[0] = "9" if values[0] != "9" else "8"
+    column = table.schema.get_field_index("typed_value")
+    table = table.set_column(column, "typed_value", pa.array(values, type=pa.string()))
+    pq.write_table(table, path)
+    file_sha = sha256_file_streaming(path)
+    cohort["observations_sha256"] = file_sha
+    write_live_corpus_lineage(data_root, lineage)
+    manifest_id = str(cohort["dataset_manifest_id"])
+    dataset = _load_dataset_manifest(data_root, manifest_id)
+    partitions = _load_partitions_for_dataset(data_root, manifest_id)
+    replaced = False
+    rebuilt: list = []
+    for part in partitions:
+        if part.logical_location != cohort["obs_rel"]:
+            rebuilt.append(part)
+            continue
+        replaced = True
+        old_path = data_root / "datasets" / "manifests" / "partitions" / f"{part.partition_manifest_id}.json"
+        rebuilt.append(build_partition_manifest(
+            dataset_id=dataset.dataset_id,
+            dataset_version=dataset.dataset_version,
+            partition_id=part.partition_id,
+            logical_location=part.logical_location,
+            file_sha256=file_sha,
+            content_sha256=part.content_sha256,
+            row_count=part.row_count,
+            min_event_time=part.min_event_time,
+            max_event_time=part.max_event_time,
+            min_available_to_strategy_at=part.min_available_to_strategy_at,
+            max_available_to_strategy_at=part.max_available_to_strategy_at,
+            first_reliable_available_at=part.first_reliable_available_at,
+            created_at=part.created_at,
+        ))
+        if old_path.is_file():
+            old_path.unlink()
+        size_path = data_root / "datasets" / "manifests" / "partitions" / f"{part.partition_id}.bytes"
+        if size_path.is_file():
+            size_path.unlink()
+    if not replaced:
+        raise AssertionError("observation partition missing")
+    receipt_path = data_root / "datasets" / "manifests" / f"{manifest_id}.validation.json"
+    previous = json.loads(receipt_path.read_text(encoding="utf-8"))
+    fingerprint = compute_dataset_fingerprint(
+        dataset_id=dataset.dataset_id,
+        dataset_version=dataset.dataset_version,
+        schema_id=dataset.schema_id,
+        schema_sha256=dataset.schema_sha256,
+        partitions=rebuilt,
+    )
+    _receipt, receipt_bytes, receipt_sha = _build_receipt(
+        dataset_version=dataset.dataset_version,
+        schema_sha256=dataset.schema_sha256,
+        composition=previous["corpus_composition"],
+        partitions=rebuilt,
+        dataset_fingerprint=fingerprint,
+        generation_reason=str(previous.get("generation_reason") or "OBSERVATION_REVISION"),
+        published_at=dataset.created_at,
+        superseded_dataset_manifest_id=previous.get("superseded_dataset_manifest_id"),
+    )
+    revised = _build_dataset(
+        dataset_version=dataset.dataset_version,
+        schema_sha256=dataset.schema_sha256,
+        partitions=rebuilt,
+        validation_receipt_sha256=receipt_sha,
+        published_at=dataset.created_at,
+        generation_task_id=dataset.generation_task_id,
+        generation_run_id=dataset.generation_run_id,
+    )
+    manifests = data_root / "datasets" / "manifests"
+    for name in (f"{manifest_id}.validation.json", f"{manifest_id}.json", f"{manifest_id}.published"):
+        target = manifests / name
+        if target.is_file():
+            target.unlink()
+    labels = json.loads((manifests / f"{manifest_id}.labels.json").read_text(encoding="utf-8"))
+    latest = previous["corpus_composition"][-1]
+    _commit_canonical_root(
+        data_root=data_root,
+        dataset=revised,
+        partitions=rebuilt,
+        receipt_bytes=receipt_bytes,
+        published={
+            "commit_point": COMMIT_POINT_KIND,
+            "cohort_id": latest.get("cohort_id"),
+            "corpus_version": labels.get("corpus_version"),
+            "cumulative_cohort_count": len(previous["corpus_composition"]),
+            "dataset_fingerprint": revised.dataset_fingerprint,
+            "dataset_manifest_id": revised.dataset_manifest_id,
+            "metadata_clock_at": previous.get("published_at"),
+            "published_at": previous.get("published_at"),
+            "release_id": latest.get("release_id"),
+        },
+    )
+
+
 def _apply(data_root: Path, workspace: Path, holders: str, liquidity: str) -> dict:
     preview = run_cli(
         "universe-policy-preview",
@@ -333,6 +461,25 @@ class UniversePolicyTests(unittest.TestCase):
                 adapted_body["result"]["universe_policy"]["n_pass"],
             )
             self.assertNotEqual(adapted_body["result_refs"], evidence["result_refs"])
+            grown_root = workspace / "grown"
+            shutil.copytree(data_root, grown_root)
+            _change_published_observation(grown_root)
+            grown_op = workspace / "grown-op.json"
+            grown_op.write_text(json.dumps(_operation(
+                spec, focus=FOCUS, journal=journal, market=market,
+                text="Same question after a published observation changes",
+                cap={"main": 1, "adaptive": 0, "preview": 0},
+            )), encoding="utf-8")
+            grown = run_cli(
+                "discovery-execute", "--store", str(grown_root), "--spec", str(spec_path),
+                "--candidate-scope", str(scope_path), "--journal-scope", journal,
+                "--operation", str(grown_op), "--format", "json", data_root=grown_root,
+            )
+            self.assertEqual(grown.returncode, 0, grown.stdout + grown.stderr)
+            grown_body = json.loads(grown.stdout)
+            self.assertEqual(grown_body["queries"][0]["look_class"], "MAIN")
+            self.assertEqual(grown_body["scientific_look_delta"]["main"], 1)
+            self.assertEqual(grown_body["result"]["universe_policy"]["min_liquidity_usd"], "20000")
             stored = run_registered_fixed_time_proxy(
                 root=ROOT, registry_path=ROOT / "configs/experiment_capability_registry_v2.yaml",
                 recipe=result["experiment_recipe"], data_root=data_root,
