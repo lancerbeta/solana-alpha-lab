@@ -198,7 +198,11 @@ def _member_rows(
 
     census = _move(_census(mint), cohort, release)
     census["authoritative_anchor"] = anchor.strftime("%Y-%m-%dT%H:%M:%SZ")
-    rows = [_move(_obs(mint, "X300", LIQUIDITY, 1000.0, at=_stamp(anchor, "X300")), cohort, release)]
+    rows = [
+        _move(_obs(mint, "X300", LIQUIDITY, 1000.0, at=_stamp(anchor, "X300")), cohort, release),
+        _move(_obs(mint, "Y3600", LIQUIDITY, 10000.0, at=_stamp(anchor, "Y3600")), cohort, release),
+        _move(_obs(mint, "Y3600", "FIELD-HOLDER-COUNT-001", 50.0, at=_stamp(anchor, "Y3600")), cohort, release),
+    ]
     prices = {"X300": 1.0, "Y900": 1.0, "Y1800": mark, "Y3600": reference}
     for point in POINTS:
         if prices[point] is None:
@@ -667,6 +671,8 @@ def publish_mixed(data_root: Path, workspace: Path) -> list[str]:
             member["candidate_state"] = "X_ELIGIBLE" if len(entry) < 5 else "ADMITTED"
             members.append(member)
             observations.append(_timed(mint, "X300", LIQUIDITY, "10000", anchor))
+            observations.append(_timed(mint, "Y3600", LIQUIDITY, "10000", anchor))
+            observations.append(_timed(mint, "Y3600", "FIELD-HOLDER-COUNT-001", "50", anchor))
             for point, value in (("X300", "1.0"), ("Y900", "1.0"), ("Y1800", mark), ("Y3600", "1.0")):
                 if value is not None:
                     observations.append(_timed(mint, point, PRICE, value, anchor))
@@ -716,6 +722,10 @@ def publish_mixed(data_root: Path, workspace: Path) -> list[str]:
         producer_git_sha=PRODUCER,
         activation_id=ACTIVATION,
     )
+    from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    ensure_profile(ResearchStore(data_root), repo_root=ROOT, min_holders=0, min_liquidity_usd=0)
     return ids
 
 
@@ -1226,6 +1236,9 @@ class RevisionGateTests(unittest.TestCase):
         market = "ab" * 32
         spec = _query("gate-revision")
         store = ResearchStore(raw)
+        from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+
+        ensure_profile(store, repo_root=ROOT, min_holders=0, min_liquidity_usd=0)
         operation = record_operation(
             store,
             {

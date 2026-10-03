@@ -1160,6 +1160,20 @@ def _grouped_cells(
     return grouped
 
 
+def _universe_cell(row: Mapping[str, Any] | None) -> dict[str, Any]:
+    if not isinstance(row, Mapping):
+        return {"status": "ABSENT"}
+    if str(row.get("state") or "") != "OBSERVED":
+        return {"status": "MISSING"}
+    try:
+        number = float(row.get("typed_value"))
+    except (TypeError, ValueError):
+        return {"status": "MISSING"}
+    if number != number or number in {float("inf"), float("-inf")}:
+        return {"status": "MISSING"}
+    return {"status": "OBSERVED", "value": number}
+
+
 def _pit_cell(
     grouped: Mapping[tuple[str, str, str, str, str], Sequence[Mapping[str, Any]]],
     key: tuple[str, str, str, str, str],
@@ -1259,8 +1273,6 @@ def execute_discovery_from_rows(
         return execute_temporal_discovery(
             census, observations, spec, binding, universe_policy=universe_policy
         )
-    if universe_policy is not None:
-        raise GroundedDiscoveryError("UNIVERSE_POLICY_REPRESENTATION_UNSUPPORTED")
     bound_spec = validate_query_spec(spec)
     for item in binding:
         if "holdout" not in item:
@@ -1316,10 +1328,40 @@ def execute_discovery_from_rows(
                 exclusion = "PIT_LIQUIDITY_MISSING"
             else:
                 in_base = True
+        universe_pass = True
+        if in_base and universe_policy is not None and anchor is not None:
+            from solana_alpha_lab.factory.hfic_research_universe_policy import (
+                HOLDER_FIELD_ID,
+                classify_universe_cells,
+            )
+
+            decision_deadline = _deadline(anchor, decision_offset)
+            decision_point = max(
+                (str(point) for point in bound_spec["decision_points"]),
+                key=_point_offset,
+            )
+            verdict = classify_universe_cells(
+                _universe_cell(
+                    _pit_cell(
+                        grouped,
+                        (cohort, release, mint, decision_point, HOLDER_FIELD_ID),
+                        decision_deadline,
+                    )
+                ),
+                _universe_cell(
+                    _pit_cell(
+                        grouped,
+                        (cohort, release, mint, decision_point, LIQUIDITY),
+                        decision_deadline,
+                    )
+                ),
+                universe_policy,
+            )
+            universe_pass = verdict["status"] == "PASS"
         decision_ready = False
         decision_at = None
         flags: dict[str, bool | None] = {}
-        if in_base and anchor is not None:
+        if in_base and universe_pass and anchor is not None:
             decision_at = _deadline(anchor, decision_offset).strftime("%Y-%m-%dT%H:%M:%SZ")
             decision_ready = True
             for point in bound_spec["decision_points"]:
@@ -1342,7 +1384,7 @@ def execute_discovery_from_rows(
         target_state = "ABSENT"
         target_at = None
         target_value = None
-        if in_base and anchor is not None:
+        if in_base and universe_pass and anchor is not None:
             deadline = _deadline(anchor, decision_offset)
             due = anchor + timedelta(
                 seconds=_point_offset(bound_spec["target_point"]) + PIT_LATENESS_SECONDS
@@ -1410,8 +1452,10 @@ def execute_discovery_from_rows(
     summary["traders_complete_required"] = False
     summary["eligibility_uses_target"] = False
     summary["calculation_version"] = CALCULATION_VERSION
+    from solana_alpha_lab.factory.hfic_research_universe_policy import admitted_with_policy
+
     return {
-        "admitted": admitted,
+        "admitted": admitted_with_policy(admitted, universe_policy),
         "summary": summary,
         "members_projected": len(members),
     }

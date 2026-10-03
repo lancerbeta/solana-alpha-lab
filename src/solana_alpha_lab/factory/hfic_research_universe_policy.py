@@ -450,6 +450,38 @@ def apply_universe_policy(
     }
 
 
+def ensure_profile(
+    store: ResearchStore,
+    *,
+    repo_root: Any,
+    min_holders: object,
+    min_liquidity_usd: object,
+) -> dict[str, Any]:
+    """Preview and apply through the production owner. Same values are a readback."""
+
+    wanted = profile_definition(min_holders, min_liquidity_usd)
+    current = effective_policy(store)
+    if current.get("semantic_sha256") == semantic_sha256(wanted):
+        return {
+            "action": "UNIVERSE_POLICY_APPLY",
+            "status": NO_CHANGE,
+            "semantic_sha256": current["semantic_sha256"],
+            "min_holders": wanted["min_holders"],
+            "min_liquidity_usd": wanted["min_liquidity_usd"],
+        }
+    preview = preview_universe_policy(
+        store,
+        min_holders=wanted["min_holders"],
+        min_liquidity_usd=wanted["min_liquidity_usd"],
+    )
+    return apply_universe_policy(
+        store,
+        repo_root=repo_root,
+        proposal=preview["proposal"],
+        confirm_append_only=True,
+    )
+
+
 def snapshot(definition: Mapping[str, Any]) -> dict[str, str]:
     body = profile_definition(definition.get("min_holders"), definition.get("min_liquidity_usd"))
     return {**body, "semantic_sha256": semantic_sha256(body)}

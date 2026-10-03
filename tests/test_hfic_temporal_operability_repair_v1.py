@@ -55,6 +55,9 @@ SYNTH_MARKET = "ab" * 32
 
 def _ordinary_gate(store, journal: str) -> dict[str, str]:
     from solana_alpha_lab.factory.hfic_ordinary_operation import list_operations, record_operation
+    from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+
+    ensure_profile(store, repo_root=ROOT, min_holders=0, min_liquidity_usd=0)
 
     journal_key = journal
     found = [
@@ -249,6 +252,8 @@ class SnapshotTargetTests(unittest.TestCase):
         exit_available = _stamp("Y7200", lateness=0, extra=120)
         return [
             _obs(mint, "X300", LIQ, 1000.0, available=_stamp("X300", lateness=300)),
+            _obs(mint, "Y3600", LIQ, 10000.0, available=decision_available),
+            _obs(mint, "Y3600", "FIELD-HOLDER-COUNT-001", 50.0, available=decision_available),
             _obs(mint, "Y3600", PRICE, 1.0, available=decision_available),
             _obs(
                 mint,
@@ -590,6 +595,8 @@ class SnapshotNegativeControlsTests(unittest.TestCase):
         exit_available = _stamp("Y7200", lateness=0, extra=120)
         return [
             _obs("mint-a", "X300", LIQ, 1000.0, available=_stamp("X300", lateness=300)),
+            _obs("mint-a", "Y3600", LIQ, 10000.0, available=decision_available),
+            _obs("mint-a", "Y3600", "FIELD-HOLDER-COUNT-001", 50.0, available=decision_available),
             _obs("mint-a", "Y3600", PRICE, 1.0, available=decision_available),
             _obs(
                 "mint-a",
