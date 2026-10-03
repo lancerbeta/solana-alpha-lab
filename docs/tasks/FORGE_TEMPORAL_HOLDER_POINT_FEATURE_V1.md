@@ -58,7 +58,7 @@ stop_conditions:
   - MERGE_BEFORE_EXACT_OWNER_PHRASE
 context_requirements:
   catalog_asset_ids: [MODULE-HFIC-TEMPORAL-DISCOVERY-001]
-  l2_roles: [ARCHITECTURE_DECISIONS]
+  l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
