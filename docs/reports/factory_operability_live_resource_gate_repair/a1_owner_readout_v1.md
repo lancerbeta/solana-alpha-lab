@@ -24,7 +24,7 @@ member predecessor. Научная реконструкция members сохра
 Заголовки manifest всё ещё перечисляются один раз за packet.
 Это остаточная стоимость, а не обещание бесконечного масштаба.
 
-Из 138 адресных тестов 137 PASS, один platform skip. На реальной синтетической цепочке
+Из 140 адресных тестов 139 PASS, один platform skip. На реальной синтетической цепочке
 один packet читает 19 manifest вместо 57 и проверяет 3 partitions вместо 33;
 старые member payload читаются 0 раз вместо 24. История включает чужие member batches;
 24-hour diagnostics остаётся EXACT с 128 свежими наблюдениями. Windows-измерение
@@ -47,3 +47,9 @@ canaries под прежними unit env и caps, два watch-цикла, по
 
 Операционные receipts, backups, synthetic fixtures и live payload остаются вне Git.
 Новая служба, dependency, provider route и авторизация кампании не добавляются.
+
+Linux-bootstrap: завершённая unit на Ubuntu возвращает `MemoryPeak=[not set]`.
+Kernel peak сохранён через `ExecStartPost` до удаления cgroup; временная
+16 MiB проба подтвердила 21 274 624 байт под cap 128 MiB. Это проверка
+измерителя, не repaired Factory canary. Отсутствующий/нечисловой пик
+и несовпавший cap по-прежнему не дают PASS.

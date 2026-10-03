@@ -24,8 +24,8 @@
     "inference": "Repeated immutable proof IO and a full call-table timestamp scan are measured hotspots; file-cache attribution is an inference, not a separately measured stage."
   },
   "focused_local_validation": {
-    "tests_collected": 138,
-    "tests_passed": 137,
+    "tests_collected": 140,
+    "tests_passed": 139,
     "tests_skipped": 1,
     "cli_fixture_recent_rows": 128,
     "immutable_manifests": 19,
@@ -53,17 +53,29 @@
       256,
       512
     ],
-    "old_member_partitions_for_foreign_identity": [128, 256],
+    "old_member_partitions_for_foreign_identity": [
+      128,
+      256
+    ],
     "fixture_cache_eviction": "fsync followed by advisory posix_fadvise DONTNEED on synthetic fixture files only; residency is not independently verified",
     "resource_guard": "768 MiB / 180 seconds",
     "baseline_falsifier": "Exact historical scan/member-read counters or independently observed cgroup oom-kill/timeout; ordinary launch/data failures never qualify",
     "acceptance": "Each repaired CLI <512 MiB / <120 seconds; doubled-history peak <=1.25x+8MiB, wall <=1.5x+1s; exact diagnostics and no old payload reads",
-    "result": "ENFORCED_ON_EXACT_PR_HEAD_BEFORE_MERGE_READINESS"
+    "result": "ENFORCED_ON_EXACT_PR_HEAD_BEFORE_MERGE_READINESS",
+    "peak_capture": "Kernel memory.peak via ExecStartPost before cgroup disposal; ExecStopPost for failed starts. Same-unit numeric MemoryMax/peak plus completed consumer and monotonic clocks required."
   },
   "limits": [
     "MANIFEST_HEADERS_ENUMERATED_ONCE_PER_PACKET",
     "NON_SQL_TIMESTAMP_HEADERS_REMAIN_CONSERVATIVE_CANDIDATES",
     "NO_LIVE_REPAIR_CANARY_YET",
     "NO_TELEGRAM_DELIVERY_PROOF_YET"
-  ]
+  ],
+  "measurement_bootstrap_probe": {
+    "result": "PASS",
+    "native_completed_unit_memory_peak": "[not set]",
+    "kernel_peak_bytes": 21274624,
+    "kernel_memory_max_bytes": 134217728,
+    "consumer": "temporary 16 MiB allocation, not Factory",
+    "factory_code_data_timers_changed": false
+  }
 }

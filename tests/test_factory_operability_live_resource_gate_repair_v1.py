@@ -213,6 +213,28 @@ class PacketScopedImmutableReadTests(unittest.TestCase):
 
 
 class CgroupProofGateTests(unittest.TestCase):
+    def setUp(self) -> None:
+        (ROOT / "local").mkdir(exist_ok=True)
+
+    def test_unavailable_resource_property_reports_safe_stage_never_pass(self) -> None:
+        import operability_bounded_call_profile as profile
+        with tempfile.TemporaryDirectory(dir=ROOT / "local") as temp:
+            root = Path(temp)
+            (root / "fixture.json").write_text(json.dumps({"old_call_rows": 5000,
+                                                           "immutable_manifests": 3}))
+            def run(command, **kwargs):
+                output = "SubState=exited\nMemoryPeak=[not set]\nMemoryMax=805306368" if "show" in command else ""
+                return SimpleNamespace(returncode=0, stdout=output, stderr="private exception payload")
+            with patch.object(profile.sys, "platform", "linux"), \
+                 patch.object(profile.os, "posix_fadvise", create=True), \
+                 patch.object(profile.os, "POSIX_FADV_DONTNEED", 4, create=True), \
+                 patch.object(profile.os, "fsync"), \
+                 patch.object(profile.subprocess, "run", side_effect=run):
+                result = profile.cgroup_gate(root, "watch")
+            self.assertFalse(result["pass"])
+            self.assertIsNone(result["memory_peak_bytes"])
+            self.assertNotIn("private", json.dumps(result))
+
     def test_required_ci_aggregator_and_affected_scope_fail_closed(self) -> None:
         main = yaml.safe_load((ROOT / ".github/workflows/ci.yml").read_text())
         job = main["jobs"]["validate"]
@@ -300,6 +322,37 @@ class CgroupProofGateTests(unittest.TestCase):
                      patch.object(profile.os, "fsync"), \
                      patch.object(profile.time, "monotonic", side_effect=[0, 196]), \
                      patch.object(profile.time, "sleep"), \
+                     patch.object(profile.subprocess, "run", side_effect=run):
+                    self.assertEqual(profile.cgroup_gate(root, "watch")["pass"], expected)
+
+    def test_stop_post_kernel_peak_restores_unavailable_property_without_weakening_gate(self) -> None:
+        import operability_bounded_call_profile as profile
+        with tempfile.TemporaryDirectory(dir=ROOT / "local") as temp:
+            root = Path(temp)
+            (root / "fixture.json").write_text(json.dumps({"old_call_rows": 5000, "immutable_manifests": 3}))
+            fields = {"ActiveState": "active", "SubState": "exited", "Result": "success",
+                      "ExecMainStatus": "0", "MemoryMax": str(768 * 1024**2), "MemoryPeak": "[not set]",
+                      "ExecMainStartTimestampMonotonic": "1000000", "ExecMainExitTimestampMonotonic": "2000000"}
+            measured = {"consumer": "watch", "baseline": False,
+                        "store_read_stats": {"call_diagnostics_rows_returned": 128,
+                                             "call_diagnostics_index_candidates": 128,
+                                             "call_diagnostics_payload_projections": 128},
+                        "result": {"cli_exit": 0, "observations_24h": 128, "call_diagnostics_status": "EXACT"},
+                        "immutable_reads": {"partition_verifications": 3, "manifest_reads": 3}}
+            for peak, maximum, copies, expected in ((80 * 1024**2, 768 * 1024**2, 1, True),
+                                                    (512 * 1024**2, 768 * 1024**2, 1, False),
+                                                    (80 * 1024**2, 1024 * 1024**2, 1, False),
+                                                    (80 * 1024**2, 768 * 1024**2, 2, False)):
+                saved = json.dumps({"cgroup_memory_peak_bytes": peak, "cgroup_memory_max_bytes": maximum})
+                def run(command, **kwargs):
+                    output = ("\n".join(f"{k}={v}" for k, v in fields.items()) if "show" in command
+                              else "\n".join([json.dumps(measured), *([saved] * copies)]) if "journalctl" in command else "")
+                    return SimpleNamespace(returncode=0, stdout=output, stderr="")
+                with self.subTest(peak=peak, maximum=maximum, copies=copies), \
+                     patch.object(profile.sys, "platform", "linux"), \
+                     patch.object(profile.os, "posix_fadvise", create=True), \
+                     patch.object(profile.os, "POSIX_FADV_DONTNEED", 4, create=True), \
+                     patch.object(profile.os, "fsync"), \
                      patch.object(profile.subprocess, "run", side_effect=run):
                     self.assertEqual(profile.cgroup_gate(root, "watch")["pass"], expected)
 

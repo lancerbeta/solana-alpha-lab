@@ -293,6 +293,22 @@ def measure(root: Path, consumer: str, *, baseline: bool = False) -> dict[str, o
             "measurement": "fresh process; OS lifetime peak working set/RSS; timed complete consumer; no network"}
 
 
+def emit_cgroup_peak() -> dict[str, int]:
+    """Post-command hook reads the kernel peak before the unit cgroup dies."""
+    paths = [line.split("::", 1)[1] for line in Path("/proc/self/cgroup").read_text().splitlines()
+             if line.startswith("0::")]
+    if len(paths) != 1:
+        raise ValueError("CGROUP_V2_UNAVAILABLE")
+    mount = Path("/sys/fs/cgroup").resolve()
+    current = (mount / paths[0].lstrip("/")).resolve()
+    current.relative_to(mount)
+    peak = int((current / "memory.peak").read_text().strip())
+    maximum = int((current / "memory.max").read_text().strip())
+    if not 0 < peak <= maximum:
+        raise ValueError("CGROUP_PEAK_UNAVAILABLE")
+    return {"cgroup_memory_peak_bytes": peak, "cgroup_memory_max_bytes": maximum}
+
+
 def cgroup_gate(root: Path, consumer: str, *, baseline: bool = False) -> dict[str, object]:
     """Linux CI gate using the same oneshot cap as Factory report services."""
     if sys.platform != "linux":
@@ -315,15 +331,20 @@ def cgroup_gate(root: Path, consumer: str, *, baseline: bool = False) -> dict[st
         "--property=MemoryMax=768M", "--property=TimeoutStartSec=180s",
         "--property=PrivateNetwork=yes", "--property=RestrictAddressFamilies=AF_UNIX",
         f"--property=WorkingDirectory={ROOT}",
+        f"--property=ExecStartPost={sys.executable} -B {Path(__file__).resolve()} cgroup-peak --root {root}",
+        f"--property=ExecStopPost={sys.executable} -B {Path(__file__).resolve()} cgroup-peak --root {root}",
         "--property=NoNewPrivileges=yes", sys.executable, "-B",
         str(Path(__file__).resolve()), "measure", "--root", str(root.resolve()),
         "--consumer", consumer,
     ]
     if baseline:
         command.append("--baseline")
+    stage = "LAUNCH"
+    fields: dict[str, str] = {}
     try:
         launch = subprocess.run(command, capture_output=True, text=True, timeout=210,
                                 check=False)
+        stage = "UNIT_STATE"
         deadline = time.monotonic() + 195
         while True:
             state = subprocess.run(
@@ -338,14 +359,24 @@ def cgroup_gate(root: Path, consumer: str, *, baseline: bool = False) -> dict[st
             if time.monotonic() >= deadline:
                 break
             time.sleep(1)
+        stage = "JOURNAL"
         journal = subprocess.run(
             ["sudo", "journalctl", "-u", f"{unit}.service", "-o", "cat",
              "--no-pager", "-n", "30"],
             capture_output=True, text=True, timeout=10, check=False,
         )
+        stage = "MEASUREMENT_JSON"
         measured = [json.loads(line) for line in journal.stdout.splitlines()
                     if line.startswith("{") and '"consumer"' in line]
-        peak = int(fields.get("MemoryPeak") or 0)
+        peaks = [json.loads(line) for line in journal.stdout.splitlines()
+                 if line.startswith("{") and '"cgroup_memory_peak_bytes"' in line]
+        stage = "RESOURCE_PROPERTIES"
+        raw_peak = fields.get("MemoryPeak", "")
+        peak = int(raw_peak) if raw_peak.isdecimal() else 0
+        if len(peaks) == 1 and peaks[0].get("cgroup_memory_max_bytes") == 768 * 1024**2:
+            saved_peak = peaks[0].get("cgroup_memory_peak_bytes")
+            if type(saved_peak) is int and 0 < saved_peak <= 768 * 1024**2:
+                peak = max(peak, saved_peak)
         start = int(fields.get("ExecMainStartTimestampMonotonic") or 0)
         end = int(fields.get("ExecMainExitTimestampMonotonic") or 0)
         wall = (end - start) / 1_000_000 if end > start > 0 else None
@@ -395,9 +426,17 @@ def cgroup_gate(root: Path, consumer: str, *, baseline: bool = False) -> dict[st
                 "baseline_resource_falsifier": "RESOURCE_EXHAUSTED" if baseline_exhausted else None,
                 "result": fields.get("Result") or "UNKNOWN",
                 "launch_exit": launch.returncode}
-    except (OSError, ValueError, subprocess.TimeoutExpired):
+    except (OSError, ValueError, subprocess.TimeoutExpired) as error:
+        # Only known scalar properties and a stage code: no launcher/journal
+        # text, filesystem paths, exception messages or fixture payload.
+        properties = {key: value if value.isdecimal() or value in
+                      {"infinity", "[not set]"} else "NON_NUMERIC"
+                      for key, value in fields.items() if key in
+                      {"MemoryPeak", "MemoryMax", "ExecMainStartTimestampMonotonic",
+                       "ExecMainExitTimestampMonotonic"}}
         return {"consumer": consumer, "baseline": baseline, "pass": False,
-                "result": "RESOURCE_PROOF_UNAVAILABLE"}
+                "result": "RESOURCE_PROOF_UNAVAILABLE", "stage": stage,
+                "error_kind": type(error).__name__, "resource_properties": properties}
     finally:
         subprocess.run(["sudo", "systemctl", "stop", f"{unit}.service"],
                        capture_output=True, timeout=10, check=False)
@@ -436,14 +475,16 @@ def cgroup_suite(root: Path) -> dict[str, object]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("mode", choices=("create", "measure", "cgroup-gate", "cgroup-suite"))
+    parser.add_argument("mode", choices=("create", "measure", "cgroup-gate", "cgroup-suite", "cgroup-peak"))
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--old-rows", type=int, default=2048)
     parser.add_argument("--payload-bytes", type=int, default=65536)
     parser.add_argument("--consumer", choices=("read_model", "packet", "watch", "pulse"))
     parser.add_argument("--baseline", action="store_true")
     args = parser.parse_args()
-    if args.mode == "create":
+    if args.mode == "cgroup-peak":
+        result = emit_cgroup_peak()
+    elif args.mode == "create":
         result = create_fixture(args.root, args.old_rows, args.payload_bytes)
     elif args.mode == "measure":
         result = measure(args.root, args.consumer, baseline=args.baseline)

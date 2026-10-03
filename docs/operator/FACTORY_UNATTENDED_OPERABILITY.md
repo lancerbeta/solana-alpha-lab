@@ -441,7 +441,7 @@ git-side default sink. Canary сохраняет этот фактический
 
 ```sh
 WATCH_CANARY="factory-watch-canary-$(date -u +%Y%m%dT%H%M%SZ)"
-sudo systemd-run --unit="$WATCH_CANARY" --service-type=oneshot --remain-after-exit --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab --property=EnvironmentFile=-/etc/solana-alpha-lab/secrets.env --property=NoNewPrivileges=yes /usr/bin/uv run --locked --managed-python python -B scripts/factory_operability_watch.py --mode dry-run
+sudo systemd-run --unit="$WATCH_CANARY" --service-type=oneshot --remain-after-exit --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab --property=EnvironmentFile=-/etc/solana-alpha-lab/secrets.env --property="ExecStartPost=/usr/bin/uv run --locked --managed-python python -B tests/operability_bounded_call_profile.py cgroup-peak --root local" --property=NoNewPrivileges=yes /usr/bin/uv run --locked --managed-python python -B scripts/factory_operability_watch.py --mode dry-run
 ```
 
 `Type=oneshot` завершает start job после команды. `--remain-after-exit`
@@ -459,7 +459,7 @@ import subprocess
 import sys
 
 properties = ('ActiveState', 'SubState', 'Result', 'ExecMainStatus', 'MemoryPeak',
-              'ExecMainStartTimestampMonotonic', 'ExecMainExitTimestampMonotonic')
+              'ExecMainStartTimestampMonotonic', 'ExecMainExitTimestampMonotonic', 'MemoryMax')
 try:
     read = subprocess.run(['systemctl', 'show', sys.argv[1],
                            '--property=' + ','.join(properties)],
@@ -475,14 +475,28 @@ if read.returncode == 0:
         state = 'BLOCKED'
     elif values.get('Result') == 'success' and values.get('ExecMainStatus') == '0':
         try:
-            peak = int(values['MemoryPeak'])
+            raw_peak = values.get('MemoryPeak', '')
+            peak = int(raw_peak) if raw_peak.isdecimal() else 0
+            journal = subprocess.run(['sudo', 'journalctl', '-u', sys.argv[1], '-o', 'cat',
+                                      '--no-pager', '-n', '30'], capture_output=True,
+                                     text=True, timeout=5, check=False)
+            saved = [json.loads(line) for line in journal.stdout.splitlines()
+                     if line.startswith('{') and '"cgroup_memory_peak_bytes"' in line]
+            if journal.returncode != 0 or len(saved) != 1:
+                raise ValueError('RESOURCE_PEAK_UNAVAILABLE')
+            saved_peak = saved[0].get('cgroup_memory_peak_bytes')
+            if (type(saved_peak) is not int or not 0 < saved_peak <= 768 * 1024**2
+                    or saved[0].get('cgroup_memory_max_bytes') != 768 * 1024**2
+                    or values.get('MemoryMax') != str(768 * 1024**2)):
+                raise ValueError('RESOURCE_PEAK_UNAVAILABLE')
+            peak = max(peak, saved_peak)
             started = int(values['ExecMainStartTimestampMonotonic'])
             ended = int(values['ExecMainExitTimestampMonotonic'])
             if 0 < peak < 2**64 - 1 and 0 < started < ended:
                 wall = (ended - started) / 1_000_000
                 if values.get('ActiveState') == 'active' and values.get('SubState') == 'exited':
                     state = 'PASS' if peak < 512 * 1024**2 and wall < 120 else 'BLOCKED'
-        except (KeyError, ValueError):
+        except (KeyError, ValueError, OSError, subprocess.SubprocessError):
             pass
 print(json.dumps({'resource_state': state, 'memory_peak_bytes': peak, 'wall_seconds': wall}))
 raise SystemExit(0 if state == 'PASS' else 2)
@@ -491,7 +505,10 @@ PY
 canary_readback "$WATCH_CANARY.service"
 ```
 
-`MemoryPeak` — cgroup peak всех дочерних процессов; это не sampling RSS одного
+`ExecStartPost` сохраняет kernel `memory.peak` сразу после oneshot до удаления
+cgroup. Ubuntu может вернуть `MemoryPeak=[not set]` уже после завершения;
+тогда используется единственная числовая запись из journal той же уникальной
+unit с совпавшим `memory.max=768 MiB`. Это cgroup peak всех дочерних процессов; это не sampling RSS одного
 Python PID. Positive numeric peak, monotonic duration, успешное завершение и
 пороги <512 MiB / <120s обязательны. Неподдерживаемый/пустой/infinity/нулевой
 пик, пропавшая unit или отсутствующий clock → `UNKNOWN`, rollout остановить.
@@ -534,7 +551,7 @@ Incident/recovery считается проверенным только по с
 ```sh
 check_report_environment factory-collector-owner-pulse.service
 PULSE_CANARY="factory-pulse-canary-$(date -u +%Y%m%dT%H%M%SZ)"
-sudo systemd-run --unit="$PULSE_CANARY" --service-type=oneshot --remain-after-exit --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab --property=EnvironmentFile=-/etc/solana-alpha-lab/secrets.env --property=NoNewPrivileges=yes /usr/bin/uv run --locked --managed-python python -B scripts/collector_owner_pulse.py --mode dry-run --record-storage-history
+sudo systemd-run --unit="$PULSE_CANARY" --service-type=oneshot --remain-after-exit --property=MemoryAccounting=yes --property=MemoryMax=768M --property=TimeoutStartSec=180s --property=WorkingDirectory=/opt/solana-alpha-lab --property=EnvironmentFile=-/etc/solana-alpha-lab/secrets.env --property="ExecStartPost=/usr/bin/uv run --locked --managed-python python -B tests/operability_bounded_call_profile.py cgroup-peak --root local" --property=NoNewPrivileges=yes /usr/bin/uv run --locked --managed-python python -B scripts/collector_owner_pulse.py --mode dry-run --record-storage-history
 canary_readback "$PULSE_CANARY.service"
 sudo systemctl stop "$PULSE_CANARY.service"
 ```

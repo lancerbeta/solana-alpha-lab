@@ -36444,7 +36444,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_UNATTENDED_OPERABILITY.md', repository_path: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md}
-  integrity: {kind: sha256, sha256: c6890df81c72c9fd858f359745a4d5212d1828426739992781e69d2b000add91}
+  integrity: {kind: sha256, sha256: 78f0fb04425661be2b1b6075eb46ef45feb46e8c72d4ebbd45a043ce25ea7ad5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
@@ -39333,7 +39333,7 @@ records:
     repository_path: tests/operability_bounded_call_profile.py
   integrity:
     kind: sha256
-    sha256: a0cbe9bda04a7e58fb667cf1a6696fc8fccde3c5bd544609d75af49aa7322f74
+    sha256: c1e94f7431c831fe00dc067d240fc4db5c9ac1a5fdde7415f295f1f8088e5641
   access:
     mode: read_only
     method: file
@@ -39504,7 +39504,7 @@ records:
     repository_path: tests/test_factory_operability_live_resource_gate_repair_v1.py
   integrity:
     kind: sha256
-    sha256: f746ac504b7b5d28f25533d1bf82abf74fda492d9c38bda0a8ad56ed7280f07d
+    sha256: 5d7a1b4c434b6d0043160a95cb4a96d4caf88839d4c2556a52fb9847b383c117
   access:
     mode: read_only
     method: file
@@ -39620,7 +39620,7 @@ records:
     repository_path: docs/evidence/factory_operability_live_resource_gate_repair/a1_linux_profile_v1.json
   integrity:
     kind: sha256
-    sha256: 2ba3a2416f797d89f6e613016f394bdd2bf7337d5026885eae26fa1b876874fa
+    sha256: 4c6cb9cd9707bf34ba3690929ed0686f072b60db35d22ed257a4b487736e609d
   access:
     mode: read_only
     method: file
@@ -39660,7 +39660,7 @@ records:
     repository_path: docs/reports/factory_operability_live_resource_gate_repair/a1_owner_readout_v1.md
   integrity:
     kind: sha256
-    sha256: 6a798c8f6f47087190e744571d6f5ceaef1f3537876bb218ba33b2bc8eace92a
+    sha256: ac6ee94471b7678a02f51904baf888bff5b4724c43d9c64656e362d3fc3cc404
   access:
     mode: read_only
     method: file
