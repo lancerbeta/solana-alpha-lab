@@ -4,8 +4,8 @@
   "review_id": "FACTORY-OPERABILITY-LIVE-RESOURCE-REVIEW-001",
   "as_of": "2026-10-03",
   "task_id": "FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1",
-  "reviewed_bindings_sha256": "683ba2ac5d43eeda8db1359062671ffbd8b6416322ed534c0419378aef70d422",
-  "reviewed_inventory_sha256": "ddca3c064687f90451e5576a64e3e7e1aeaeb024e1afb0376170c66c8a54aab6",
+  "reviewed_bindings_sha256": "4610dfa51d169da17629ba119153fdaf8154cad4c2f0285627566603edf0fcc9",
+  "reviewed_inventory_sha256": "c11851c9479ad899c1205b43d4e7a1d6ec17a2e8b1c0db1b71d6cc0d59b6d837",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -20,17 +20,15 @@
         "ISOLATED_READ_ONLY: frozen HEAD/diff and all exact implementation SHA bindings verified.",
         "Indexed diagnostics, packet-scoped proof reuse, old-writer rollback, typed cgroup capture and mandatory CI preserved.",
         "First ordinary cycle while timer off; required non-PASS explicitly disables report timer; healthy no-incident watch does not require an uncreated message.",
-        "Exact-head Linux CI remains required; no live repair or merge authority."
+        "Exact-head Linux CI remains required; no live repair or merge authority.",
+        "Fresh source HEAD f4c83d9b062dd4d88dbc49d19ababccd5492dea6 and new base integration verified."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "ISOLATED_READ_ONLY: exact contract and frozen implementation inventory verified.",
-        "Vertical resource proof remains falsifiable; no bootstrap, Windows RSS or synthetic result promoted to live acceptance.",
-        "Resource/snapshot/transport and pulse actual daily delivery gate timer enablement; UNKNOWN preserved for required inputs.",
-        "Exact-head Linux CI still required before readiness."
+        "Fresh source review identified stale binder-excluded evidence after main integration; evidence repinned, independent rereview pending."
       ]
     },
     {
@@ -38,26 +36,24 @@
       "verdict": "PASS",
       "findings": [
         "ISOLATED_READ_ONLY; SEMANTIC_PREMISE PASS; frozen packet/diff and exact implementation bindings verified.",
-        "packet_fingerprint_sha256=373c7138b959cb32195e7739b9d1611de8f1eb8794ce91ede0cd1fed8d1547ce",
+        "packet_fingerprint_sha256=776e2f3186b41c86bc549d04043fd2b992941f607444993330564dab29cee6cc",
         "Python exact time, UNKNOWN/recovery and lifecycle availability semantics preserved; scientific member predecessor default retained.",
         "Immutable verified reads are reused for one packet only; durable truth remains Parquet/manifests.",
         "Stdlib same-cgroup kernel peak, InvocationID readback and safe commissioning boundary reviewed.",
         "Tests can pass while live envelope, global scientific integrity or arbitrary timestamp anomalies remain unproven.",
-        "PACKET_INFORMATION_PATH; PROCESS_OBLIGATION; MODEL_DIVERSITY_UNPROVEN."
+        "PACKET_INFORMATION_PATH; PROCESS_OBLIGATION; MODEL_DIVERSITY_UNPROVEN.",
+        "Exact base 3c6ee4aca8614e91238fabdae264f03c68269fea integration and fresh source HEAD f4c83d9b062dd4d88dbc49d19ababccd5492dea6 reviewed; baseline remains equivalent."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "ISOLATED_READ_ONLY: frozen contract, diff and exact implementation bindings verified.",
-        "Ordinary units retain peak via shared helper; first cycle with timer off, InvocationID-scoped readback, enable after mandatory checks.",
-        "Healthy watch absence of incident is distinct from transport failure; pulse requires actual daily delivery.",
-        "No remaining confirmed owner-operability gap; exact-head Linux and separate commissioning still required."
+        "Fresh exact-source independent review pending."
       ]
     }
   ],
-  "verdict": "PASS",
+  "verdict": "NOT_READY",
   "non_claims": [
     "NO_MERGE_AUTHORITY",
     "MODEL_DIVERSITY_UNPROVEN",
