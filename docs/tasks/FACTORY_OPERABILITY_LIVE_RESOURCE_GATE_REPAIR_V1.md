@@ -33,6 +33,7 @@ managed_write_set:
   - tests/test_factory_operability_live_resource_gate_repair_v1.py
   - tests/operability_bounded_call_profile.py
   - .github/workflows/factory-operability-resource-proof.yml
+  - .github/workflows/ci.yml
   - docs/operator/FACTORY_UNATTENDED_OPERABILITY.md
   - docs/evidence/factory_operability_live_resource_gate_repair/a1_linux_profile_v1.json
   - docs/evidence/factory_operability_live_resource_gate_repair/a1_delivery_completion_evidence_v1.json
@@ -132,6 +133,9 @@ outputs with frozen cases. Save a payload-free machine receipt with fixture
 size, cgroup limit, peak, wall, actual index candidates/UDF evaluations and commands. Failure/absence is
 `NOT_READY`, not a claim based on Windows RSS or a unit file alone.
 The Linux proof runs in the candidate PR workflow before merge-readiness;
+the required Repository validation aggregator depends on its reusable job.
+Affected-path selection fails closed and defaults to running when no base is
+available; an absent, failed, skipped or cancelled resource job denies validate.
 draft CI overlap is permitted without claiming that an unexecuted gate passed.
 Immutable manifest headers are enumerated once per packet; only relevant
 partitions are verified, once, and no cross-cycle cache owns scientific truth.

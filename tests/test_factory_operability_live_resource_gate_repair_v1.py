@@ -5,6 +5,9 @@ from __future__ import annotations
 import sys
 import json
 import io
+import os
+import subprocess
+import yaml
 import sqlite3
 import tempfile
 import unittest
@@ -210,6 +213,59 @@ class PacketScopedImmutableReadTests(unittest.TestCase):
 
 
 class CgroupProofGateTests(unittest.TestCase):
+    def test_required_ci_aggregator_and_affected_scope_fail_closed(self) -> None:
+        main = yaml.safe_load((ROOT / ".github/workflows/ci.yml").read_text())
+        job = main["jobs"]["validate"]
+        self.assertIn("validate-operability-resources", job["needs"])
+        aggregate = "\n".join(job["steps"][0]["run"].splitlines()[1:-1])
+        for outcome in ("success", "failure", "skipped", "cancelled", ""):
+            env = dict(os.environ, CORE_RESULT="success", EXECUTION_RESULT="success",
+                       TESTS_RESULT="success", RESOURCES_RESULT=outcome)
+            result = subprocess.run([sys.executable, "-c", aggregate], env=env,
+                                    capture_output=True, text=True, timeout=10)
+            self.assertEqual(result.returncode == 0, outcome == "success")
+        resource = yaml.safe_load((ROOT / ".github/workflows/factory-operability-resource-proof.yml").read_text())
+        scope_step = next(step for step in resource["jobs"]["watch-and-pulse"]["steps"] if step.get("id") == "scope")
+        scope = "\n".join(scope_step["run"].splitlines()[1:-1])
+        with tempfile.TemporaryDirectory() as temp:
+            for base, expected in (("", "true"), ("HEAD", "false"), ("not-a-valid-commit", None)):
+                output = Path(temp, "output.txt")
+                output.write_text("")
+                result = subprocess.run([sys.executable, "-c", scope], cwd=ROOT,
+                                        env=dict(os.environ, RESOURCE_BASE=base, GITHUB_OUTPUT=str(output)),
+                                        capture_output=True, text=True, timeout=10)
+                if expected is None:
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertEqual(output.read_text(), "")
+                else:
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(output.read_text(), f"required={expected}\n")
+
+    def test_baseline_resource_exhaustion_is_falsifier_never_repaired_pass(self) -> None:
+        import operability_bounded_call_profile as profile
+        with tempfile.TemporaryDirectory(dir=ROOT / "local") as temp:
+            root = Path(temp)
+            (root / "fixture.json").write_text(json.dumps({"old_call_rows": 5000, "immutable_manifests": 3}))
+            for result, peak, seconds in (("oom-kill", 768 * 1024**2, 5),
+                                          ("timeout", 80 * 1024**2, 180),
+                                          ("exit-code", 80 * 1024**2, 5)):
+                fields = {"ActiveState": "failed", "SubState": "failed", "Result": result,
+                          "ExecMainStatus": "9", "MemoryMax": str(768 * 1024**2), "MemoryPeak": str(peak),
+                          "ExecMainStartTimestampMonotonic": "1000000",
+                          "ExecMainExitTimestampMonotonic": str(1000000 + seconds * 1000000)}
+                def run(command, **kwargs):
+                    output = "\n".join(f"{k}={v}" for k, v in fields.items()) if "show" in command else ""
+                    return SimpleNamespace(returncode=1 if "systemd-run" in command else 0, stdout=output, stderr="")
+                for baseline in (True, False):
+                    with self.subTest(result=result, baseline=baseline), \
+                         patch.object(profile.sys, "platform", "linux"), \
+                         patch.object(profile.os, "posix_fadvise", create=True), \
+                         patch.object(profile.os, "POSIX_FADV_DONTNEED", 4, create=True), \
+                         patch.object(profile.os, "fsync"), \
+                         patch.object(profile.subprocess, "run", side_effect=run):
+                        self.assertEqual(profile.cgroup_gate(root, "watch", baseline=baseline)["pass"],
+                                         baseline and result in ("oom-kill", "timeout"))
+
     def test_running_missing_peak_unknown_data_and_threshold_cannot_pass(self) -> None:
         import operability_bounded_call_profile as profile
         (ROOT / "local").mkdir(exist_ok=True)

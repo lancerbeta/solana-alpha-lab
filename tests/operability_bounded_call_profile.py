@@ -374,8 +374,16 @@ def cgroup_gate(root: Path, consumer: str, *, baseline: bool = False) -> dict[st
             "manifest_reads") == fixture["immutable_manifests"]
         baseline_reproduced = (stats.get("call_ledger_timestamp_rows_examined") == fixture["old_call_rows"] + recent_rows
                                and measured[0].get("immutable_reads", {}).get("old_member_payload_reads", 0) > 0)
-        success = completed and (baseline_reproduced if baseline else (
-            read_bound and reuse_proven and peak < 512 * 1024 * 1024 and wall < 120))
+        baseline_exhausted = (
+            baseline and launch.returncode in (0, 1) and state.returncode == journal.returncode == 0
+            and fields.get("MemoryMax") == str(768 * 1024 * 1024)
+            and fields.get("ActiveState") == "failed" and fields.get("SubState") == "failed"
+            and 0 < peak <= 768 * 1024 * 1024 and wall is not None and 0 < wall <= 195
+            and ((fields.get("Result") == "oom-kill" and peak >= 512 * 1024 * 1024)
+                 or (fields.get("Result") == "timeout" and wall >= 175))
+        )
+        success = ((completed and baseline_reproduced) or baseline_exhausted) if baseline else (
+            completed and read_bound and reuse_proven and peak < 512 * 1024 * 1024 and wall < 120)
         return {"consumer": consumer, "baseline": baseline, "pass": success,
                 "fixture": fixture, "fixture_cache_eviction": "FSYNC_AND_ADVISORY_DONTNEED",
                 "cache_residency_verified": False,
@@ -384,6 +392,7 @@ def cgroup_gate(root: Path, consumer: str, *, baseline: bool = False) -> dict[st
                 "legacy_timestamp_udf_evaluations": stats.get("call_ledger_timestamp_rows_examined"),
                 "index_candidates_returned": stats.get("call_diagnostics_index_candidates"),
                 "consumer_measurement": measured[0] if len(measured) == 1 else None,
+                "baseline_resource_falsifier": "RESOURCE_EXHAUSTED" if baseline_exhausted else None,
                 "result": fields.get("Result") or "UNKNOWN",
                 "launch_exit": launch.returncode}
     except (OSError, ValueError, subprocess.TimeoutExpired):

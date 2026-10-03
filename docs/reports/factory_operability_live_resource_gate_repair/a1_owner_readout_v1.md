@@ -24,7 +24,7 @@ member predecessor. Научная реконструкция members сохра
 Заголовки manifest всё ещё перечисляются один раз за packet.
 Это остаточная стоимость, а не обещание бесконечного масштаба.
 
-Из 93 адресных тестов 92 PASS, один platform skip. На реальной синтетической цепочке
+Из 95 адресных тестов 94 PASS, один platform skip. На реальной синтетической цепочке
 один packet читает 19 manifest вместо 57 и проверяет 3 partitions вместо 33;
 старые member payload читаются 0 раз вместо 24. История включает чужие member batches;
 24-hour diagnostics остаётся EXACT с 128 свежими наблюдениями. Windows-измерение
@@ -32,6 +32,9 @@ member predecessor. Научная реконструкция members сохра
 resource proof на точном head: два размера истории и 1162 свежих вызова; fsync и
 advisory DONTNEED для synthetic файлов (резидентность кэша отдельно не доказана),
 768 MiB/180 с guard и <512 MiB/<120 с для каждого настоящего CLI.
+Ресурсный job включён в обязательный `Repository validation / validate`,
+поэтому его missing/failure/skipped/cancelled не даёт зелёный merge-gate.
+Для нерелевантных diff proof пропускает только тяжёлый step, сам job проверяется.
 
 После merge: свежий host preflight/backup, точный release pin, короткое controlled
 collector stop для однократного prepare-index с rollback при отказе, затем restart

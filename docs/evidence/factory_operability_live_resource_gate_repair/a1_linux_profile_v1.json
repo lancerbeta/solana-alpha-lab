@@ -24,8 +24,8 @@
     "inference": "Repeated immutable proof IO and a full call-table timestamp scan are measured hotspots; file-cache attribution is an inference, not a separately measured stage."
   },
   "focused_local_validation": {
-    "tests_collected": 93,
-    "tests_passed": 92,
+    "tests_collected": 95,
+    "tests_passed": 94,
     "tests_skipped": 1,
     "cli_fixture_recent_rows": 128,
     "immutable_manifests": 19,
@@ -41,6 +41,7 @@
   },
   "mandatory_linux_regression": {
     "workflow": ".github/workflows/factory-operability-resource-proof.yml",
+    "required_parent": "Repository validation / validate depends on validate-operability-resources reusable workflow",
     "command": "uv run --locked --managed-python python -B tests/operability_bounded_call_profile.py cgroup-suite --root local/resource-proof",
     "old_call_rows": [
       16384,
@@ -55,6 +56,7 @@
     "old_member_partitions_for_foreign_identity": [128, 256],
     "fixture_cache_eviction": "fsync followed by advisory posix_fadvise DONTNEED on synthetic fixture files only; residency is not independently verified",
     "resource_guard": "768 MiB / 180 seconds",
+    "baseline_falsifier": "Exact historical scan/member-read counters or independently observed cgroup oom-kill/timeout; ordinary launch/data failures never qualify",
     "acceptance": "Each repaired CLI <512 MiB / <120 seconds; doubled-history peak <=1.25x+8MiB, wall <=1.5x+1s; exact diagnostics and no old payload reads",
     "result": "ENFORCED_ON_EXACT_PR_HEAD_BEFORE_MERGE_READINESS"
   },
