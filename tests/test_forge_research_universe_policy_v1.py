@@ -196,6 +196,24 @@ class UniversePolicyTests(unittest.TestCase):
             self.assertEqual(status["semantic_sha256"], applied["semantic_sha256"])
             open_root = workspace / "open-run"
             shutil.copytree(data_root, open_root)
+            twenty_root = workspace / "twenty"
+            shutil.copytree(data_root, twenty_root)
+            self.assertEqual(_apply(twenty_root, workspace, "50", "20000")["min_liquidity_usd"], "20000")
+            twenty_op = workspace / "twenty-op.json"
+            twenty_op.write_text(json.dumps(_operation(
+                spec, focus=FOCUS, journal=journal, market=market,
+                text="Synthetic 20k admission on the same code path",
+                cap={"main": 1, "adaptive": 0, "preview": 1},
+            )), encoding="utf-8")
+            twenty = run_cli(
+                "discovery-execute", "--store", str(twenty_root), "--spec", str(spec_path),
+                "--candidate-scope", str(scope_path), "--journal-scope", journal,
+                "--operation", str(twenty_op), "--format", "json", data_root=twenty_root,
+            )
+            self.assertEqual(twenty.returncode, 0, twenty.stdout + twenty.stderr)
+            twenty_result = json.loads(twenty.stdout)["result"]["universe_policy"]
+            self.assertEqual(twenty_result["min_liquidity_usd"], "20000")
+            self.assertLess(twenty_result["n_pass"], 3)
             executed = run_cli(
                 "discovery-execute", "--store", str(data_root), "--spec", str(spec_path),
                 "--candidate-scope", str(scope_path), "--journal-scope", journal,

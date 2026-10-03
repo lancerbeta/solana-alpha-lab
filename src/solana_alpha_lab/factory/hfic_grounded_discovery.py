@@ -1295,6 +1295,7 @@ def execute_discovery_from_rows(
     grouped = _grouped_cells(observations)
     decision_offset = max(_point_offset(point) for point in bound_spec["decision_points"])
     members: list[dict[str, Any]] = []
+    universe_counts = {"PASS": 0, "FAIL": 0, "UNKNOWN": 0}
     cohort_ids = [str(item["cohort_id"]) for item in admitted["cohorts"]]
     admitted_pairs = {
         (str(item["cohort_id"]), str(item["release_id"])) for item in admitted["cohorts"]
@@ -1357,6 +1358,7 @@ def execute_discovery_from_rows(
                 ),
                 universe_policy,
             )
+            universe_counts[str(verdict["status"])] += 1
             universe_pass = verdict["status"] == "PASS"
         decision_ready = False
         decision_at = None
@@ -1452,6 +1454,16 @@ def execute_discovery_from_rows(
     summary["traders_complete_required"] = False
     summary["eligibility_uses_target"] = False
     summary["calculation_version"] = CALCULATION_VERSION
+    if universe_policy is not None:
+        from solana_alpha_lab.factory.hfic_research_universe_policy import snapshot
+
+        summary["universe_policy"] = {
+            **snapshot(universe_policy),
+            "n_base": sum(universe_counts.values()),
+            "n_pass": universe_counts["PASS"],
+            "n_fail": universe_counts["FAIL"],
+            "n_unknown": universe_counts["UNKNOWN"],
+        }
     from solana_alpha_lab.factory.hfic_research_universe_policy import admitted_with_policy
 
     return {
