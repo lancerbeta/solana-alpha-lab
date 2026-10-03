@@ -184,6 +184,7 @@ class CiTestPartitionTests(unittest.TestCase):
     def test_module_done_logs_give_median_and_ignore_runtime_modules(self) -> None:
         inventory = ["tests/test_a.py", "tests/test_b.py", "tests/test_idle.py"]
         logs = [
+            "module_done seconds=4.0 cases=1 module=test_a\n"
             "module_done seconds=10.0 cases=3 module=test_a\n"
             "module_done seconds=1.0 cases=1 module=test_b\n"
             "module_done seconds=5.0 cases=1 module=test_made_at_runtime\n",
@@ -242,6 +243,35 @@ class CiTestPartitionTests(unittest.TestCase):
             self.assertEqual(set(plan["module_seconds"]), set(general))
             with contextlib.redirect_stderr(io.StringIO()):
                 self.assertEqual(partition.main(common), 2)
+                outside = Path(tmp) / "elsewhere"
+                outside.mkdir()
+                self.assertEqual(
+                    partition.main(
+                        common + ["--shard-count", "4", "--output", str(out),
+                                  "--tests-root", str(outside)]
+                    ),
+                    2,
+                )
+
+    def test_planner_and_workflow_contract_share_one_shard_range(self) -> None:
+        spec = importlib.util.spec_from_file_location(
+            "validate_ci_for_range", ROOT / "scripts/validate_ci.py"
+        )
+        assert spec and spec.loader
+        validator = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(validator)
+        self.assertEqual(partition.SHARD_COUNT_MIN, validator.SHARD_COUNT_MIN)
+        self.assertEqual(partition.SHARD_COUNT_MAX, validator.SHARD_COUNT_MAX)
+
+    def test_committed_plan_provenance_matches_the_plan(self) -> None:
+        plan = partition.load_plan(ROOT / "configs/ci_test_shards_v1.json")
+        profile = plan["profile"]
+        planned, _dups = partition.union_and_duplicates(plan)
+        self.assertEqual(set(plan["module_seconds"]), planned)
+        self.assertEqual(profile["module_count"], len(plan["module_seconds"]))
+        self.assertEqual(profile["log_count"], 4 * 4)
+        self.assertEqual(len(profile["source_runs"]), 4)
+        self.assertFalse(set(profile["unprofiled_inventory_modules"]) & planned)
 
     def test_committed_plan_is_reproducible_from_its_embedded_profile(self) -> None:
         plan = partition.load_plan(ROOT / "configs/ci_test_shards_v1.json")

@@ -19,9 +19,6 @@ from typing import Any, Callable
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT / "scripts") not in sys.path:
-    sys.path.insert(0, str(ROOT / "scripts"))
-from ci_test_partition import SHARD_COUNT_MAX, SHARD_COUNT_MIN  # noqa: E402
 WORKFLOW_PATH = ROOT / ".github/workflows/ci.yml"
 LOCK_PATH = ROOT / "uv.lock"
 EXPECTED_PYTHON = (3, 13, 14)
@@ -39,6 +36,11 @@ DELIVERY_PREFLIGHT_SCHEMA = (
 # CI job limits are budgets, not headroom: a job near its limit is a
 # regression to diagnose from the shard log's module_done/slow_module lines.
 # Tracked-only delivery preflight keeps its separate local full-gate cap.
+# General test shard count range the workflow contract admits. This validator is
+# a trusted validation path; scripts/ci_test_partition.py keeps the planner's own
+# bounds and tests/test_ci_test_partition.py pins the two ranges together.
+SHARD_COUNT_MIN = 4
+SHARD_COUNT_MAX = 6
 GITHUB_VALIDATE_TIMEOUT_MINUTES = 25
 GITHUB_VALIDATE_TESTS_TIMEOUT_MINUTES = 30
 GITHUB_AGGREGATOR_TIMEOUT_MINUTES = 5

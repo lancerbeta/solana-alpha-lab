@@ -17,15 +17,17 @@ uv run --locked --managed-python python -B scripts/ci_test_partition.py --module
 
 ## Why 6 shards
 
-Fresh profile: 448 general modules, 4146 s of test time, longest module 276 s. Baseline runs `37062503153`, `37129255347`, `37131300645`, `37137684221` (4 shards, stale plan): max shard 1252 / 1174 / 1202 / 1245 s (mean 1218 s), job wall 17-21 min.
+Fresh profile: 448 general modules, 4146 s of test time, longest module 276 s. Baseline exact-head PR runs `37137684221`, `37131300645`, `37129255347` (4 shards, stale plan, different heads): run wall 1271 / 1229 / 1200 s (20.0-21.2 min), max shard test elapsed 1245 / 1202 / 1175 s (mean 1207 s), setup 10-13 s per job, queue 1-2 s.
 
-| shards | projected max | modelled real max (runner noise sd 0.14) | gain vs 1218 s |
-| ---: | ---: | ---: | ---: |
-| 4 (fresh plan) | 1037 s | about 1107 s | about 9 % |
-| 5 | 829 s | about 885 s, P(<= 15 min) 0.51 | about 27 % (borderline) |
-| 6 | 691 s | about 759 s, P(<= 15 min) 1.00 | about 38 % |
+Real shards vary about 14 % around the profile (16 observed shard factors, 0.63-1.12). Two noise models (resampling those observed factors; independent lognormal sd 0.14) bracket the expected slowest shard, excluding about 15 s per-job setup:
 
-5 is not close to 6, and 4 on a fresh profile alone gives little. The exact-head run confirms or refutes this; if the extra runners only queue, the plan is reduced rather than timeouts or the model tuned.
+| shards | projected max | modelled real max | gain vs 1207 s | P(<= 15 min) |
+| ---: | ---: | ---: | ---: | ---: |
+| 4 (fresh plan) | 1037 s | 1107-1204 s | 0-8 % | about 0 |
+| 5 | 829 s | 885-982 s | 19-27 % | 0.2-0.5 |
+| 6 | 691 s | 759-828 s | 31-37 % | 0.8-1.0 |
+
+5 reaches the 25 % bar only in the optimistic model; 6 clears it in both. The exact-head run confirms or refutes this; if the extra runners only queue, the plan is reduced rather than timeouts or the model tuned.
 
 ## Part B terminal: `NO_MATERIAL_SELECTION_VALUE`
 

@@ -289,11 +289,18 @@ def module_seconds_from_logs(
     wanted = {posix(path) for path in inventory}
     samples: dict[str, list[float]] = {}
     for text in log_texts:
-        per_log: dict[str, float] = {}
+        # module_done is cumulative per exact module name, so a repeated line
+        # for one name keeps the largest value; distinct import names of one
+        # file (bare and dotted) add up.
+        by_name: dict[str, float] = {}
         for match in MODULE_DONE_LINE.finditer(text):
-            path = module_path_from_module_done(match.group("module"))
+            name = match.group("module")
+            by_name[name] = max(by_name.get(name, 0.0), float(match.group("seconds")))
+        per_log: dict[str, float] = {}
+        for name, seconds in by_name.items():
+            path = module_path_from_module_done(name)
             if path in wanted:
-                per_log[path] = per_log.get(path, 0.0) + float(match.group("seconds"))
+                per_log[path] = per_log.get(path, 0.0) + seconds
         for path, seconds in per_log.items():
             samples.setdefault(path, []).append(seconds)
     if not samples:
@@ -370,11 +377,14 @@ def main(argv: list[str] | None = None) -> int:
         }
         profile_note: dict[str, Any]
         if args.module_done_log:
-            inventory = {
-                posix(path.resolve().relative_to(ROOT.resolve()))
-                for path in args.tests_root.glob("test_*.py")
-                if path.is_file()
-            }
+            try:
+                inventory = {
+                    posix(path.resolve().relative_to(ROOT.resolve()))
+                    for path in args.tests_root.glob("test_*.py")
+                    if path.is_file()
+                }
+            except ValueError as exc:
+                raise PartitionError("TESTS_ROOT_OUTSIDE_REPOSITORY") from exc
             general_modules, profile_note = module_seconds_from_logs(
                 [
                     path.read_text(encoding="utf-8", errors="replace")

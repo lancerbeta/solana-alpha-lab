@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "CI-THROUGHPUT-AND-IMPACT-SHADOW-FACTORY-FIT-001",
+  "as_of": "2026-10-03",
+  "task_id": "CI_THROUGHPUT_AND_IMPACT_SHADOW_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_SHORTER_PR_CYCLE_NO_PRODUCT_CHANGE",
+    "flexibility_and_history": "PASS_PLAN_REPRODUCIBLE_FROM_EMBEDDED_PROFILE_ROLLBACK_IS_REVERT",
+    "context_efficiency": "PASS_NO_NEW_FILE_OR_DOC_LAYER",
+    "research_truth": "NOT_APPLICABLE_NO_SCIENCE_PIT_OR_EXECUTION_SEMANTICS",
+    "owner_operability": "PASS_ONE_REPROFILE_COMMAND_STALE_WARNING_UNCHANGED",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_EXPERIMENT_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_EXACT_HEAD_PER_SHARD_TIMINGS_AND_COVERAGE_PROOF",
+    "build_vs_buy": "PASS_EXISTING_SHARD_RUNNER_NO_SELECTOR_NO_CACHE_NO_SERVICE",
+    "security": "PASS_NO_SECRETS_OR_ABSOLUTE_PATHS",
+    "red_team": "PASS_SELECTOR_STOPPED_ON_REPLAY_EVIDENCE_FULL_SUITE_UNCHANGED"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "SLOW_MODULES_ABOVE_300S_OR_CRITICAL_PATH_ABOVE_15MIN_AFTER_CHANGE"
+  },
+  "recovery": "Ordinary Git revert of the merge commit; restoring configs/ci_test_shards_v1.json and the ci.yml render returns the 4-shard plan. No persisted state.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_IMPACT_SELECTOR",
+    "NO_RESULT_CACHE",
+    "NO_TEST_WEAKENED_OR_TIMEOUT_CHANGED",
+    "EXACT_HEAD_CI_STILL_REQUIRED"
+  ]
+}

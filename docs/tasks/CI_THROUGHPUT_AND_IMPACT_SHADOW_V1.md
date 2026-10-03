@@ -98,9 +98,16 @@ Version 1.1 narrows the atom after the owner accepted the Part B stop.
   seconds so it is reproducible; exact-head FULL timings before/after.
 - `STOP`: merge-readiness readback; no merge.
 - `NEXT`: decide from the real after-state whether any further CI atom exists.
-- `REPLAN_TRIGGER`: 6 shards give no material gain (queue/concurrency): choose
-  the minimal 5/4 plan or stop `ADDITIONAL_SHARDS_NO_USER_VISIBLE_GAIN`.
-  Never raise a timeout or tune the model to pass.
+- `REPLAN_TRIGGER`: the exact-head critical path (max shard test elapsed, and
+  run wall clock) is neither at least 25 % better than the fresh pre-change
+  baseline nor about 15 min or less, or extra shards queue instead of running:
+  choose the minimal 5/4 plan that is objectively better on speed and
+  simplicity, or stop `ADDITIONAL_SHARDS_NO_USER_VISIBLE_GAIN`. Never raise a
+  timeout or tune the model to pass.
+- Baseline: three successful pre-change exact-head PR runs on different heads
+  (`37137684221`, `37131300645`, `37129255347`), run wall 1271 / 1229 / 1200 s,
+  max shard test elapsed 1245 / 1202 / 1175 s (mean 1207 s), setup 10-13 s per
+  job, queue 1-2 s, start skew 0-1 s. The comparison is against that mean.
 
 ## Invariants
 
@@ -132,6 +139,13 @@ implemented in this PR. Result:
 - EXECUTION is a clean boundary (4 source modules, 15 tests, ~0 s in the general
   profile) but was never the only group touched in 45 merges. FACTORY_OPERABILITY
   is blocked by the shared hub `research_store.py` (closure about 75 % of time).
+- Thresholds: the 70 % time cap and the "no value" reading come from the owner
+  stop rule (selector usually selecting more than about 70 % of the suite); the
+  ~7 minute bar is the existing `CI_OWNED_DELIVERY_PILOT` minimum saving. Replay
+  window: first 45 first-parent merges at base `72330ae1` (PR #324-#369), each
+  diff `first_parent..merge`, weighted by the fresh per-module profile. The
+  prototype lived only in a local, unpushed branch and may be lost; this section
+  is the durable record.
 - Main FULL reasons among the 36 eligible: unclassified test 18, unknown source
   path 7, unproven Catalog propagation 4, group not admitted 1.
 
@@ -147,7 +161,9 @@ and `ci.yml` render returns the 4-shard plan. No persisted state.
 ## Definition of Done
 
 Exact base/head recorded; fresh profile with provenance; deterministic 6-shard
-plan reproducible from the plan file; coverage and disjointness proven;
+plan reproducible from the plan file; exact-head FULL run shows the critical
+path at least 25 % better than the baseline mean above or about 15 min or less,
+with no queueing; coverage and disjointness proven;
 renderer equals workflow; focused suite green with no expected failures; full
 exact-head GitHub CI green with per-shard elapsed, wall clock, queue skew and
 setup overhead compared against two fresh pre-change runs; reviewers PASS;
