@@ -66,8 +66,8 @@ distinction, not independent control, executable veto benefit, alpha or NetRetur
    without hardlinks or whole-RDP clone. Public correction, cold readback and
    retry used the actual saved operation, unchanged cap, journal and terminal.
    Saved operation has no public spec; the canonical result wrapper was
-   mechanically flattened and exact spec SHA verified, as documented in the
-   runbook. Old matched=111, observed=105, mean=-0.06902620062974765, median=0
+   mechanically flattened in the initial proof. Consolidated closure repeated
+   the full public path using the production recipe converter; see below. Old matched=111, observed=105, mean=-0.06902620062974765, median=0
    remained equal. One scratch revision, zero real scientific writes. Raw market
    rows and mutable operational inventories remain outside Git.
 5. **LLM_BLIND_CASE_RESULTS.** One primary native isolated batch received only
@@ -183,3 +183,40 @@ after one, an old reader can honestly stop at unsupported version.
 One next step after approved merge: separately authorize exact D2 readout-only
 enrichment → cold readback → STOP. Independent reassessment and any subsequent
 economic falsifier remain separate owner decisions.
+
+## Consolidated closure of PR #367
+
+| Finding | Exact closure | Evidence | Residual |
+|---|---|---|---|
+| CI receipt | D2 receipt explicitly declares Project Sources `NO_CHANGE`; policy unchanged | Targeted registry test PASS; first CI otherwise passed core/execution/shards 0/1/3 | New exact-head CI remains required |
+| Exact version authority | Closed exception is coherent V4 -> literal V5 / `DOWNSIDE_READOUT_ADDED`; future writer refuses before evaluator/writes | Public closed-source regression; zero inventory delta on unsupported transition | No future migration authority |
+| V5 historical readability | Literal V5 retained in readable set; source-bound saved revision replay ignores future writer alias | Fresh-module alias simulation and public correction/ordinary replay with evaluator forbidden | Saved evidence only, no automatic recalculation |
+| D2 adoption | Existing `_public_query_from_recipe`, then full canonical equality and exact spec SHA; same source/operation correction path | `d2_isolated_acceptance.json.canonical_conversion_proof`; one scratch append, unchanged old records/budget/terminal, cold zero-write retry | Real D2 enrichment requires separate authority |
+| Prompt duplicates | One exact repeated block removed from each production prompt; unique instructions unchanged | `prompt_dedup_evidence.json`: old/new extraction hashes and unchanged 16 frozen blind artifacts | No LLM run on deduplicated bytes; bounded carryforward judged by required reviews |
+| Ordinary crash replay | Already closed; sole state-aware landing owner preserved | Ordinary public crash regression PASS again in the 13-test focused run | No second recovery mechanism |
+| Closed revision / packet / calendar | Accepted boundaries retained | Source/spec/input/numeric refusal, immutable lifecycle/budget, actual Prompt A/Critic packet, explicit missing/truncation proofs | Historical assessment does not automatically adopt V5 evidence |
+
+The first new focused run passed 12 of 13 tests. The remaining assertion
+exposed ordinary future-writer fallback selecting V4 by record ID instead of
+its saved V5 revision. Reusing the existing lineage resolver fixes that seam;
+the affected complete public regression then passed (38.495 seconds).
+Direct saved-wrong-simple and production document-runner consumers passed.
+Full required role reviews bind the final implementation inventory separately.
+
+The actual D2 recipe converter preserved the entire canonical wrapper,
+including target, predicates, lateness/clock and operation binding, with
+spec SHA `920e18da8fb26e4e88fe18b579ae5f69b5f466078c625354b558aa5f41d9314b`.
+Its public V4->V5 revision converged to the same saved V5 identity as the
+earlier isolated proof. Canonical before/after bytes, sizes and mtimes matched;
+the machine inventory remains outside Git except its bounded digest receipt.
+
+The old blind primary and dependent batches executed the old duplicated
+Prompt B. Hashes identify bytes and cannot prove execution chronology.
+Dedup removes only repeated text; semantic instruction content and production
+packet behavior are unchanged. The current acceptance does not mandate a
+fresh run after this dedup-only delta; the owner's consolidated closure
+explicitly requires review of evidence carryforward instead of automatic
+LLM reruns. Required reviews must judge that bounded transfer. Behavioral
+equivalence on final deduplicated bytes has not been experimentally measured;
+existing four-case Prompt B behavior does not establish general calibration,
+nor blind Prompt A generation. Historical inputs/outputs/manifests are intact.

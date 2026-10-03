@@ -221,7 +221,10 @@ def _operation_result(
     The earliest stored row must not shadow a later calculation revision.
     """
 
-    from solana_alpha_lab.factory.hfic_temporal_discovery import TEMPORAL_CALCULATION_VERSION
+    from solana_alpha_lab.factory.hfic_temporal_discovery import (
+        TEMPORAL_CALCULATION_VERSION,
+        current_look_evidence,
+    )
 
     owned = [
         item
@@ -233,7 +236,7 @@ def _operation_result(
     current = [item for item in owned if item.get("calculation_version") == TEMPORAL_CALCULATION_VERSION]
     if current:
         return current[-1]
-    return owned[-1] if owned else None
+    return current_look_evidence(owned[-1], owned) if owned else None
 
 
 def result_readout(look: Mapping[str, Any]) -> dict[str, Any]:

@@ -61,12 +61,46 @@
     "failed_test": "test_project_sources_release_registry.ProjectSourcesReleaseRegistryTests.test_changed_acceptance_receipts_declare_source_disposition",
     "reason": "SOURCE_DISPOSITION_REQUIRED",
     "repair": "Explicit NO_CHANGE on D2 acceptance receipt; no Project Sources release or scientific payload changed.",
-    "run_status_at_readback": "in_progress",
+    "run_status_at_readback": "completed",
     "focused_repair": {
       "status": "PASS",
       "tests": 1,
       "seconds": 0.185,
       "test": "test_changed_acceptance_receipts_declare_source_disposition"
-    }
+    },
+    "conclusion": "failure",
+    "other_required_jobs": "PASS_CORE_EXECUTION_TEST_SHARDS_0_1_3"
+  },
+  "consolidated_closure": {
+    "reviewed_head": "2464894798b1d337cc76c92e4d7d26687c4c3e72",
+    "EXACT_V4_V5_AUTHORITY": "PASS_PUBLIC_UNSUPPORTED_FUTURE_REFUSAL_ZERO_WRITE",
+    "V5_HISTORICAL_READABILITY": "PASS_FRESH_NEXT_WRITER_MODULE_AND_SAVED_V5_PUBLIC_REPLAY",
+    "D2_SPEC_ROUNDTRIP": "PASS_PRODUCTION_CONVERTER_FULL_CANONICAL_SPEC_PUBLIC_CORRECTION_AND_COLD_RETRY",
+    "PROMPT_DEDUP_AND_BEHAVIORAL_EVIDENCE_SCOPE": "PASS_EXACT_DUPLICATES_ONLY_16_FROZEN_ARTIFACTS_UNCHANGED_REQUIRED_REVIEW_CARRYFORWARD",
+    "focused_initial": {
+      "tests": 13,
+      "passed": 12,
+      "failed": 1,
+      "seconds": 257.077,
+      "not_claimed_green": true,
+      "failure": "Future writer ordinary readback selected V4 by record-ID fallback, after correction retry already read saved V5."
+    },
+    "minimal_fix": "Reuse existing current_look_evidence lineage resolver in ordinary and recorded-query historical fallback; no new recovery mechanism.",
+    "affected_public_regression_after_fix": {
+      "status": "PASS",
+      "tests": 1,
+      "seconds": 38.495,
+      "test": "ClosedRevisionVertical.test_closed_v4_public_revision_cold_replay_and_unchanged_history"
+    },
+    "accepted_proofs_preserved": [
+      "ORDINARY_CRASH_REPLAY",
+      "READOUT_REVISION_LIFECYCLE_UNCHANGED",
+      "REJECTED_CORRECTION_ZERO_WRITE",
+      "ACTUAL_PROMPT_A_CRITIC_PACKET",
+      "CALENDAR_MISSING_TRUNCATION_COMPATIBILITY"
+    ],
+    "model_rerun": false,
+    "deduplicated_prompt_behavior_experimentally_measured": false,
+    "exact_head_ci": "REQUIRED_NEW_UNCHANGED_GREEN_HEAD"
   }
 }

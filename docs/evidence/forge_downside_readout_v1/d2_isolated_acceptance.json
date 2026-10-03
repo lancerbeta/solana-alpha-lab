@@ -30,5 +30,25 @@
   "project_sources_disposition": {
     "kind": "NO_CHANGE",
     "reason": "Git-native readout delivery only; owner-managed optional export registry and release artifacts unchanged."
+  },
+  "canonical_conversion_proof": {
+    "converter_roundtrip": true,
+    "conversion_owner": "hfic_temporal_discovery._public_query_from_recipe",
+    "full_canonical_spec_equal": true,
+    "operation_sha256": "76b57b42375c27075d16007ff52e72a232f1db932037ec526efae91654677b50",
+    "source_ref": "HFIC-ART-DISCOVERY-066E0BBA20351490BD3E6EA123B889B4733CA583",
+    "source_result_sha256": "ddc8a33196ee0144e9743bb98c2d45c70b4e4d396072d91552bb13346eec27a3",
+    "spec_sha256": "920e18da8fb26e4e88fe18b579ae5f69b5f466078c625354b558aa5f41d9314b",
+    "input_sha256": "b3d419319957bdef8cce0238cec6c9a96904dd45e82f1de214d71c8a25281697",
+    "revision_ref": "HFIC-ART-DISCOVERY-A010A177DA4BE4350F349C831ED715BB3745D7D0",
+    "revision_sha256": "6073be587238dfaf64b4a59584bf25a888496a22081b82a17a484cf9f17dfa5b",
+    "record_delta": 1,
+    "new_numbers_equal": true,
+    "budget_unchanged": true,
+    "old_records_unchanged": true,
+    "retry_values_loaded": false,
+    "retry_zero_write": true,
+    "canonical_nonmutation": true,
+    "implementation_head": "6bf603116577d10ca8987f413b2cd0273060da5f"
   }
 }

@@ -1818,6 +1818,7 @@ def run_recorded_discovery_query(
             TEMPORAL_CALCULATION_VERSION,
             TEMPORAL_CALCULATION_VERSION_V5,
             TEMPORAL_CALCULATION_VERSIONS_READABLE,
+            current_look_evidence,
             saved_downside_revision,
             validate_temporal_query,
             verify_calculation_revision_source,
@@ -1867,7 +1868,7 @@ def run_recorded_discovery_query(
                 for item in same_question
                 if item.get("calculation_version") in TEMPORAL_CALCULATION_VERSIONS_READABLE
             ]
-            replayed = historical[-1] if historical else None
+            replayed = current_look_evidence(historical[-1], historical) if historical else None
     if replayed is None:
         if _is_temporal_query(spec):
             from solana_alpha_lab.factory.hfic_temporal_discovery import classify_temporal_look
