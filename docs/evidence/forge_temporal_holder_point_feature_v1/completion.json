@@ -6,7 +6,33 @@
   "task_id": "FORGE_TEMPORAL_HOLDER_POINT_FEATURE_V1",
   "state_change": "TYPED_HOLDER_POINT_ONLY_WITH_PRODUCTION_VERTICAL_REPLAY_AND_EXACT_XY_BINDING",
   "base_main": "94b284534b6ad55a95002d51b9d04b4a5ced6bde",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "f60efdb0e7472776627d4661e2ae0ef66015bef817abc41eebf082d761e8649c",
+    "catalog/assets/lifecycle.yaml": "750230cbdc937296d6cfc9017c1ab93467078aa8776b8b990769d62dc224cfbd",
+    "catalog/catalog_manifest.yaml": "ca6050e6687152a7a0edf27aa22d8759d0055c53ed3cec88e628e8196e37e36d",
+    "catalog/generated/asset_edges.json": "c60f41ac4ad9669374891413ea1a5df04d3e4b3be5ca575110f1609c06b07b4b",
+    "docs/PROJECT_MAP.md": "73847424080ad5a6461aa1c72ebb0d1593832bbb359f9d4d7719f7a00b926830",
+    "docs/contracts/forge_temporal_holder_point_feature_v1.md": "5bbec6030346a33684f1af5dd2f68d94511bdf84bf32ad17fdb2ef1d435bbc49",
+    "docs/evidence/forge_temporal_holder_point_feature_v1/EVIDENCE.md": "6d37967cc8e2dcb568ba3dee2b6a780375f3d68b8a499d49f432b916532d4728",
+    "docs/evidence/forge_temporal_holder_point_feature_v1/real_compatibility.json": "e1b6846cf8d931fb38d6c3783b9db5f1541a619e35806ec061438ff1dfcfb137",
+    "docs/evidence/forge_temporal_holder_point_feature_v1/synthetic_critic_packet.json": "94d1955b5ed601ab7e78b9bd218b37a89baa074d49e91699598fb041ccfbcdcf",
+    "docs/evidence/forge_temporal_holder_point_feature_v1/synthetic_discovery.json": "e4de05ef6006de8d4da1e87b3704fdfedad9d7362c75787f044303fad6eddd33",
+    "docs/evidence/forge_temporal_holder_point_feature_v1/synthetic_offline.json": "4994769b76423a098a1c4884f6b89ea4400e3a3691f941e5c2a1eb6aeed83da3",
+    "docs/evidence/forge_temporal_holder_point_feature_v1/synthetic_owner.json": "feea36c2111eb7e94d7e8c617a1c11bd24d17ff2c373187a7d48c942109d5b06",
+    "docs/evidence/forge_temporal_holder_point_feature_v1/synthetic_preview.json": "bbf8b1a82b00938756c697fba29b7ce386f967904583e2d4e62c6736e7762e6e",
+    "docs/evidence/forge_temporal_holder_point_feature_v1/synthetic_prompt_a.json": "c527d728af5c0812cbcd54804615ccbe41b0050b009a1a318357e62639cdf286",
+    "docs/evidence/forge_temporal_holder_point_feature_v1/synthetic_proof.json": "a83220376e63ad1f9906112101c2a5cfcacd74d3428c1d7540a21051f6c801ea",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "6a16fe3258403ed78e3941e944d6ba33713c76d260664c138613d11c6b146b93",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "006a22e25a700bbc6117c84e1a8f85f82a01c95d9de2e121a8929d73cb49ba03",
+    "docs/tasks/FORGE_TEMPORAL_HOLDER_POINT_FEATURE_V1.md": "9b9e3b1cd6b971a39696059f6142630bce321e747ee353046216d12071f89848",
+    "scripts/hypothesis_forge.py": "5bd39dbe1f3e7d84829132f9f08cc3be11bbcfe9fe0b71a05e0abecd5b2fdd8a",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "e3ade12cedc636612c6b400892e911515c71640b581ae269565e79eddb4fd49e",
+    "src/solana_alpha_lab/factory/hfic_session.py": "8a5165ffe00b9c169aa07fedcb761e0209ecb243dbdb6d19271372dd857908b7",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "abc4bba23f7db63e526d2f2915be2a0a5f5692b78d44ee6c5ae0b293d09c2521",
+    "tests/fixtures/forge_holder_point_v1/old_liquidity.json": "20dc00a6ccbe383c2e66352590d1725f0a60d60344e55a4c13ef15935a1ebf11",
+    "tests/fixtures/forge_holder_point_v1/old_price.json": "355ddb4b8952d96a70312b62ee9c2f96ffc9993eb0f31aac234f737fb47c38cd",
+    "tests/test_forge_temporal_holder_point_feature_v1.py": "9ab0c3a4f397740be5d17c59093794cdf6f1ffda9c636db15d449bf33fe028c2"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -17,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_temporal_holder_point_feature_v1/factory_fit.json",
-    "sha256": null,
+    "sha256": "e65a7084f61bdd84b3c29cb1ab2a387b74a6427019df9e87a5918485890dec90",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_TWELVE_HOLDER_CHECKS_WITH_PROPORTIONAL_RECHECK_AND_27_EXISTING_CONSUMER_TESTS",
     "independent_review": {
       "path": "docs/evidence/forge_temporal_holder_point_feature_v1/independent_review.json",
-      "sha256": null,
+      "sha256": "0416cc50b69a3f5338cf3973cf5c59afcfc85848d349825f3d33090f77548678",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
