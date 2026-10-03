@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-RESEARCH-UNIVERSE-POLICY-FACTORY-FIT-001",
+  "as_of": "2026-10-04",
+  "task_id": "FORGE_RESEARCH_UNIVERSE_POLICY_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_NEW_FORGE_SEARCH_USES_OWNER_MARKET_SCALE_OVER_EXISTING_BASE_X",
+    "flexibility_and_history": "PASS_PREVIEW_APPLY_READBACK_ON_EXISTING_RESEARCH_STORE_ROLLBACK_IS_REVERT",
+    "context_efficiency": "PASS_ONE_POLICY_MODULE_NO_NEW_STORE_OR_JOURNAL",
+    "research_truth": "PASS_DECISION_TIME_HOLDER_AND_LIQUIDITY_FAIL_BEATS_UNKNOWN_RECIPE_SNAPSHOT_WINS",
+    "owner_operability": "PASS_STATUS_PREVIEW_APPLY_SAME_COMMANDS_FOR_5K_AND_20K",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_STRATEGY_PROMOTION_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_OPEN_OPERATION_AND_STALE_PREVIEW_HAVE_TYPED_NEXT_ACTIONS",
+    "build_vs_buy": "PASS_WRAPS_MEMORY_POLICY_PREVIEW_APPLY_AND_CANONICAL_PIT_SELECTOR",
+    "security": "PASS_NO_SECRETS_NO_WALLET_NO_PROVIDER",
+    "red_team": "PASS_MISSING_PROFILE_AND_HASH_MISMATCH_WRITE_NOTHING"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "OWNER_ACTIVATION_OF_50_HOLDERS_AND_5000_USD_AFTER_MERGE"
+  },
+  "recovery": "Ordinary Git revert of the merge commit. No live profile is activated by this atom. ResearchStore append-only rows already written in a local store stay local.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_PRODUCTION_ACTIVATION",
+    "NO_MAIN_LOOK",
+    "NO_NEW_FILTER_TYPE",
+    "EXACT_HEAD_CI_STILL_REQUIRED"
+  ]
+}
