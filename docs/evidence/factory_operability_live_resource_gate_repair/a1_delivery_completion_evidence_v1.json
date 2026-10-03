@@ -10,7 +10,29 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".github/workflows/ci.yml": "df13f11a9a0ec84e023f5ef9e27ecced6253aabec36366fbb3176e4fa0ea9b99",
+    ".github/workflows/factory-operability-resource-proof.yml": "eb2178a00e5c37d12f17fecd33f4342b87cb700ba4914cba45cbc69da1562c32",
+    "catalog/assets/core.yaml": "2c63231c11ad163719a148418281548efed50c3151fa02304ff66c6ebf2da6e4",
+    "catalog/assets/lifecycle.yaml": "9628719fb4b8bd16d347dc3149153c7ea15d04ee5a0fc763049ab2f7b2fe00c6",
+    "catalog/catalog_manifest.yaml": "ccf5aaacbde81e6eaa80b9685818435a55f674cbae479115cae2fa03908b4fe7",
+    "catalog/generated/asset_edges.json": "cb550b907687d5c61341b17f510afffc4952108ab3a7eb23502118acc605cf73",
+    "docs/PROJECT_MAP.md": "53e98f52d65e4491e44d66b8e5580d95209f62b36994eb119e2f783d956c50cf",
+    "docs/evidence/factory_operability_live_resource_gate_repair/a1_linux_profile_v1.json": "2ba3a2416f797d89f6e613016f394bdd2bf7337d5026885eae26fa1b876874fa",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "878385248d4dd0c631d1179d41450f97f56ff42a18a3692a8b9560fd13e4434d",
+    "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "c6890df81c72c9fd858f359745a4d5212d1828426739992781e69d2b000add91",
+    "docs/reports/factory_operability_live_resource_gate_repair/a1_owner_readout_v1.md": "6a798c8f6f47087190e744571d6f5ceaef1f3537876bb218ba33b2bc8eace92a",
+    "docs/tasks/FACTORY_OPERABILITY_LIVE_RESOURCE_GATE_REPAIR_V1.md": "6ffd260812f2d1d3299378c21afbba171c55e0111b148554f9c8afc346199c28",
+    "scripts/factory_prepare_operability_index.py": "bdc0ac1824a93e524fce39dba3a09edd06993699b13bc2647252e29a1b1d734e",
+    "scripts/validate_ci.py": "14e2d2f32c9ac565eb37e0d63a2ed0bd7b0b1b1465aa4100a0da625eef322a59",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "da019e96e456707fe59229d1c40290ee0f3998ba9c4d3799fdc0c1e3893886c6",
+    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "44aeca186b729e5d9f2c42f39c604afb6c5c510b21c79d87299e818d5d7b5770",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "d4ae25372b8e25a132a3e958763d82aca596a28f294eadfbf604754d4d0015fb",
+    "src/solana_alpha_lab/factory/research_store.py": "4a7d215f2dc430c401fdf81e5fef5e6c9441ccf57cfd077fdd64c527be0fbd86",
+    "tests/operability_bounded_call_profile.py": "a0cbe9bda04a7e58fb667cf1a6696fc8fccde3c5bd544609d75af49aa7322f74",
+    "tests/test_ci.py": "53275821d5b1ed3308fd746d6e0989bee6ada9754f4a48f4bf54e8458e2ba59e",
+    "tests/test_factory_operability_live_resource_gate_repair_v1.py": "f746ac504b7b5d28f25533d1bf82abf74fda492d9c38bda0a8ad56ed7280f07d"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_operability_live_resource_gate_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "eb0ed0ee8bf76242abd218b4d0b39eb28c553ba1e90e8c6aa3134bc8b499b093",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_137_OF_138_FOCUSED_TESTS_1_SKIP",
     "independent_review": {
       "path": "docs/evidence/factory_operability_live_resource_gate_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "0df790c4c9b91f75dfe374caf07acc233c3e869934c913f5634f7d55889b100d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
