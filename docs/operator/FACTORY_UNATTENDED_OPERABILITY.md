@@ -535,20 +535,35 @@ sudo systemctl stop "$WATCH_CANARY.service"
 
 ```sh
 COMMISSIONING_START=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
-sudo systemctl enable --now factory-operability-watch.timer
-sudo systemctl start factory-operability-watch.service
+if ! sudo systemctl start factory-operability-watch.service || ! canary_readback factory-operability-watch.service ordinary; then
+    sudo systemctl disable --now factory-operability-watch.timer
+    exit 2
+fi
 systemctl show factory-operability-watch.service --property=InvocationID,ExecMainStartTimestamp,ExecMainExitTimestamp,Result,ExecMainStatus
-canary_readback factory-operability-watch.service ordinary
 journalctl --unit=factory-operability-watch.service --since "$COMMISSIONING_START" --output=short-iso --no-pager
 ```
 
 Первый цикл выполняется обычной service командой `systemctl start`, которая
 ждёт завершения start job под TimeoutStartSec=180s; включение timer само по
 себе не является завершением watch. Второй цикл — следующий timer tick.
-При nonzero start не продолжайте readback/enablement.
+Первый ordinary запуск и его resource readback выполняются при выключенном
+timer. Любой nonzero/UNKNOWN выключает timer явной командой; включение
+разрешено только после успешного завершения, свежего snapshot и проверки
+отсутствия pending/transport error (для pulse дополнительно реальная daily delivery).
 Для ordinary readback unit должна завершиться в `inactive/dead`; пик берётся
 из journal только её сохранённого InvocationID. При отсутствии ровно одной
 числовой записи helper результат UNKNOWN, rollout остановить.
+До включения watch timer должны отдельно пройти первый ordinary resource
+readback, свежий валидный snapshot и отсутствие pending/transport error.
+При здоровом состоянии без incident сообщение не обязано создаваться: это
+допускает enable, но не устанавливает доказательство incident/recovery delivery.
+UNKNOWN любого обязательного входа оставляет timer выключенным. Только после
+этих PASS выполняется отдельная команда:
+
+```sh
+sudo systemctl enable --now factory-operability-watch.timer
+```
+
 После каждого из двух обычных 15-минутных запусков сохраните этот readback и
 результат snapshot probe выше. Нужны два разных InvocationID/start times и
 два завершения после deploy, exit=0, peak <512 MiB, wall <120s, продвижение
@@ -573,15 +588,17 @@ canary_readback "$PULSE_CANARY.service"
 sudo systemctl stop "$PULSE_CANARY.service"
 ```
 
-При тех же PASS-критериях включите pulse и подтвердите его реальный запуск
-и daily delivery. Два отчётных timer не включаются одним шагом:
+При тех же PASS-критериях выполните первый ordinary pulse с выключенным
+timer и подтвердите его реальную daily delivery. Два отчётных timer
+не включаются одним шагом:
 
 ```sh
 PULSE_START=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
-sudo systemctl enable --now factory-collector-owner-pulse.timer
-sudo systemctl start factory-collector-owner-pulse.service
+if ! sudo systemctl start factory-collector-owner-pulse.service || ! canary_readback factory-collector-owner-pulse.service ordinary; then
+    sudo systemctl disable --now factory-collector-owner-pulse.timer
+    exit 2
+fi
 systemctl show factory-collector-owner-pulse.service --property=InvocationID,ExecMainStartTimestamp,ExecMainExitTimestamp,Result,ExecMainStatus
-canary_readback factory-collector-owner-pulse.service ordinary
 journalctl --unit=factory-collector-owner-pulse.service --since "$PULSE_START" --output=short-iso --no-pager
 ```
 
@@ -590,12 +607,32 @@ journalctl --unit=factory-collector-owner-pulse.service --since "$PULSE_START" -
 со ссылкой на ранее доказанную доставку этого day; один dedupe не доказывает
 её. `delivered=False deduped=False`, отсутствие delivery footer, pending или
 failure — `BLOCKED`. Snapshot и exit=0 delivery footer не заменяют.
+Только после PASS первого ordinary resource readback, snapshot и доказанной
+реальной daily delivery включите pulse отдельной командой; UNKNOWN
+оставляет timer выключенным:
+
+```sh
+sudo systemctl enable --now factory-collector-owner-pulse.timer
+```
 
 6. Внешний получатель, URL и Telegram-маршрут требуют отдельного решения
    владельца. До подключения и теста пропущенного heartbeat — `NOT_CONFIGURED`.
    Fresh watch snapshot сам по себе не доказывает Telegram-доставку.
 
-Stop: OOM, timeout, peak >=512 MiB, wall >=120s, stale/invalid snapshot,
+После enable любой non-PASS обязательного для данного цикла входа
+(ресурсы, свежий InvocationID/snapshot, pending/transport error или отказ
+фактически созданного сообщения) немедленно выключает только
+соответствующий report timer; не оставляйте его повторять проблемный запуск.
+Watch без incident/recovery сообщения не выключается из-за UNKNOWN его
+непроизошедшей delivery. Для pulse реальная daily delivery обязательна:
+
+```sh
+sudo systemctl disable --now factory-operability-watch.timer
+# Для отказа pulse вместо watch:
+# sudo systemctl disable --now factory-collector-owner-pulse.timer
+```
+
+Stop: UNKNOWN обязательного входа, OOM, timeout, peak >=512 MiB, wall >=120s, stale/invalid snapshot,
 неустраняемый delivery failure или регрессия collector/source/RDP. Остановите
 только проблемный отчётный timer и его service, если он ещё работает.
 Collector и same-envelope renewal сохраните. Откат — exact SHA:
