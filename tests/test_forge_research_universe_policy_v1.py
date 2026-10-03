@@ -308,6 +308,26 @@ class UniversePolicyTests(unittest.TestCase):
             main_after_a = evidence["budget"]["main_count"]
             widened = _apply(data_root, workspace, "50", "20000")
             self.assertEqual(widened["min_liquidity_usd"], "20000")
+            adapt_op = workspace / "adapt-op.json"
+            adapt_body = _operation(
+                spec, focus=FOCUS, journal=journal, market=market,
+                text="Same question after the live profile moves to 20k",
+                cap={"main": 0, "adaptive": 1, "preview": 0},
+            )
+            adapt_body["parent_operation_sha256"] = evidence["operation_sha256"]
+            adapt_op.write_text(json.dumps(adapt_body), encoding="utf-8")
+            adapted = run_cli(
+                "discovery-execute", "--store", str(data_root), "--spec", str(spec_path),
+                "--candidate-scope", str(scope_path), "--journal-scope", journal,
+                "--operation", str(adapt_op), "--format", "json", data_root=data_root,
+            )
+            self.assertEqual(adapted.returncode, 0, adapted.stdout + adapted.stderr)
+            adapted_body = json.loads(adapted.stdout)
+            self.assertEqual(adapted_body["queries"][0]["look_class"], "ADAPTIVE")
+            self.assertTrue(adapted_body["queries"][0]["new_look"])
+            self.assertEqual(adapted_body["scientific_look_delta"]["main"], 0)
+            self.assertEqual(adapted_body["result"]["universe_policy"]["min_liquidity_usd"], "20000")
+            self.assertNotEqual(adapted_body["result_refs"], evidence["result_refs"])
             stored = run_registered_fixed_time_proxy(
                 root=ROOT, registry_path=ROOT / "configs/experiment_capability_registry_v2.yaml",
                 recipe=result["experiment_recipe"], data_root=data_root,
