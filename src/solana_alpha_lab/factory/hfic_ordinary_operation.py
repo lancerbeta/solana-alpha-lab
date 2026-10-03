@@ -239,6 +239,59 @@ def _operation_result(
     return current_look_evidence(owned[-1], owned) if owned else None
 
 
+def _same_active_profile_look(
+    store: Any,
+    looks: Sequence[Mapping[str, Any]],
+    spec_sha256: str,
+    *,
+    fingerprint: str | None,
+    census: Sequence[Mapping[str, Any]] | None = None,
+    observations: Sequence[Mapping[str, Any]] | None = None,
+    admitted: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any] | None:
+    """A saved look of this spec, profile and rows. A new operation may read it."""
+
+    from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
+    from solana_alpha_lab.factory.hfic_temporal_discovery import TEMPORAL_CALCULATION_VERSION
+
+    active = effective_policy(store).get("semantic_sha256")
+    if not isinstance(active, str) or not active:
+        return None
+    rows_known = census is not None and observations is not None and isinstance(admitted, Mapping)
+    matched: list[Mapping[str, Any]] = []
+    for item in looks:
+        if item.get("spec_sha256") != spec_sha256 or item.get("new_look") is not True:
+            continue
+        if not isinstance(item.get("result"), Mapping):
+            continue
+        prior = ((item.get("result") or {}).get("universe_policy") or {}).get("semantic_sha256")
+        if prior != active:
+            continue
+        if rows_known:
+            from solana_alpha_lab.factory.hfic_grounded_discovery import same_rows_under_policy
+
+            if not same_rows_under_policy(
+                item,
+                admitted=admitted,
+                census=census,
+                observations=observations,
+                policy_sha=str(prior),
+            ):
+                continue
+        else:
+            prior_operation = item.get("operation_sha256")
+            prior_fingerprint = None
+            if isinstance(prior_operation, str) and prior_operation:
+                prior_fingerprint = get_operation(store, prior_operation).get("corpus_fingerprint")
+            if not (fingerprint and prior_fingerprint and fingerprint == prior_fingerprint):
+                continue
+        matched.append(item)
+    current = [item for item in matched if item.get("calculation_version") == TEMPORAL_CALCULATION_VERSION]
+    if current:
+        return current[-1]
+    return matched[-1] if matched else None
+
+
 def result_readout(look: Mapping[str, Any]) -> dict[str, Any]:
     """Version, lineage and coherence of one saved result. Reads no values."""
 
@@ -665,6 +718,16 @@ def gate_before_values(
     )
 
     stored = _operation_result(looks, operation_sha256, validated["spec_sha256"])
+    if stored is None and correction is None:
+        stored = _same_active_profile_look(
+            store,
+            looks,
+            validated["spec_sha256"],
+            fingerprint=fingerprint,
+            census=census,
+            observations=observations,
+            admitted=admitted,
+        )
     target_version = TEMPORAL_CALCULATION_VERSION
     if correction is not None:
         saved = saved_downside_revision(

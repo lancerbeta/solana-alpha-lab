@@ -505,6 +505,23 @@ class UniversePolicyTests(unittest.TestCase):
             self.assertEqual(returned_body["result_refs"], evidence["result_refs"])
             self.assertEqual(returned_body["result"]["universe_policy"]["min_liquidity_usd"], "5000")
             self.assertEqual(main_after_a, evidence["budget"]["main_count"])
+            again_op = workspace / "again-op.json"
+            again_op.write_text(json.dumps(_operation(
+                spec, focus=FOCUS, journal=journal, market=market,
+                text="Return to the 5k result without a new main",
+                cap={"main": 0, "adaptive": 0, "preview": 0},
+            )), encoding="utf-8")
+            again = run_cli(
+                "discovery-execute", "--store", str(data_root), "--spec", str(spec_path),
+                "--candidate-scope", str(scope_path), "--journal-scope", journal,
+                "--operation", str(again_op), "--format", "json", data_root=data_root,
+            )
+            self.assertEqual(again.returncode, 0, again.stdout + again.stderr)
+            again_body = json.loads(again.stdout)
+            self.assertFalse(again_body["queries"][0]["new_look"])
+            self.assertEqual(again_body["scientific_look_delta"]["main"], 0)
+            self.assertEqual(again_body["result_refs"], evidence["result_refs"])
+            self.assertEqual(again_body["result"]["universe_policy"]["min_liquidity_usd"], "5000")
 
     def test_threshold_change_is_adaptation_not_a_second_main(self) -> None:
         from solana_alpha_lab.factory.hfic_grounded_discovery import run_recorded_discovery_query
