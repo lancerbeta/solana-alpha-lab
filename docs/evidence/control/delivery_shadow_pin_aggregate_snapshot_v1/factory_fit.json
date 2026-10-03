@@ -4,8 +4,8 @@
   "review_id": "DELIVERY_SHADOW_PIN_AGGREGATE_SNAPSHOT_V1-FACTORY-FIT",
   "as_of": "2026-10-03",
   "task_id": "DELIVERY_SHADOW_PIN_AGGREGATE_SNAPSHOT_V1",
-  "reviewed_bindings_sha256": "47294a834afea4e93b00c3ca32031ddaa398f1b99db69bb7ccfc93ce7d4354b8",
-  "reviewed_inventory_sha256": "7d2e71b63c190fef8d2f54a150b45feafdda173390504a8535cdb72c0a22b422",
+  "reviewed_bindings_sha256": "ff25e1c22fb02e54b76649d68c70075c7e0c48e262039b57af008f13c9bb9054",
+  "reviewed_inventory_sha256": "9e878e889a820b45061128918388006751a81b5e85843f250e271db0bc57e397",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
