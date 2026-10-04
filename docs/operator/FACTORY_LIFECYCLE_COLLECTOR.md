@@ -101,7 +101,7 @@ result = {'proof': 'UNKNOWN', 'as_of': render_utc(now)}
 try:
     sha, activation = sys.argv[1:]
     assert re.fullmatch('[0-9a-f]{64}', sha) and re.fullmatch('[A-Z0-9-]{1,128}', activation)
-    store = ObservationScheduleStore(Path('local/factory_v1/observation_schedule_state.sqlite'), readonly=True, immutable=False)
+    store = ObservationScheduleStore(Path('local/factory_v1/observation_schedule_state.sqlite').resolve(), readonly=True, immutable=False)
     try:
         store._conn.execute('PRAGMA query_only=ON')
         assert store._conn.execute('PRAGMA query_only').fetchone()[0] == 1
@@ -122,7 +122,7 @@ try:
         prior_state='ACTIVE', new_state='DRAINING', transition_sequence=row['transition_sequence'],
         effective_at=render_utc(effective), authority_receipt_sha256=row['authority_receipt_sha256'])
     assert expected == row['last_transition_event_id']
-    proof = _draining_transition_evidence(Path('local/factory_v1/observation_rdp'), row, now=now, exact_transition=True)
+    proof = _draining_transition_evidence(Path('local/factory_v1/observation_rdp').resolve(), row, now=now, exact_transition=True)
     assert proof and proof[0] == effective
     result.update(proof='VERIFIED', schedule_sha256=sha, activation_id=activation,
                   transition_event_id=expected, effective_at=render_utc(effective), effective_now=effective <= now)
