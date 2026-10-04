@@ -41,6 +41,7 @@ managed_write_set:
 - catalog/assets/core.yaml
 - catalog/assets/lifecycle.yaml
 - catalog/assets/features.yaml
+- catalog/schemas/hypothesis_forge_draft_v1_2.schema.json
 - catalog/relations/**
 - catalog/fixtures/semantic_route_gold_queries_v1.yaml
 - catalog/catalog_manifest.yaml

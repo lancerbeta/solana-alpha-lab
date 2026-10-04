@@ -146,6 +146,14 @@ class EntryWitness(unittest.TestCase):
         from solana_alpha_lab.factory.hfic_control_integrity import fast_lane_availability_denial_codes
         card = {"required_feature_ids": [], "required_capability_ids": [temporal.TEMPORAL_CAPABILITY_ID],
                 "unresolved_requirements": []}
+        import jsonschema
+        schema=json.loads((ROOT/"catalog/schemas/hypothesis_forge_draft_v1_2.schema.json").read_text(encoding="utf-8"))
+        draft=json.loads((ROOT/"tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(encoding="utf-8"))
+        draft["candidates"][0].update(card)
+        jsonschema.validate(draft,schema)
+        draft["candidates"][0]["required_capability_ids"]=[]
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.validate(draft,schema)
         grounding = ground_candidate(card, repo_root=ROOT, context_packet_sha256="1"*64,
                                      accepted_capability_ids=[temporal.TEMPORAL_CAPABILITY_ID])
         self.assertEqual(grounding["terminal"], "GROUNDED")
@@ -631,9 +639,8 @@ def prepare_scientific_path(test, workspace, *, focus="SYNTHETIC_RAW_SCIENTIFIC_
         denied=run_cli("freeze","--draft",str(bad_path),"--preflight-receipt",str(receipt_path),"--format","json",data_root=root)
         test.assertNotEqual(denied.returncode,0,denied.stdout+denied.stderr)
         reason=denied.stderr.strip()
-        # The public CLI preserves its existing protocol-error envelope for
-        # invalid draft/evidence; the pure owners above prove typed causes.
-        expected="GROUNDED_EVIDENCE_REQUIRED" if fault == "unbound" else "HFIC_PROTOCOL_INVALID"
+        expected={"unbound":"GROUNDED_EVIDENCE_REQUIRED", "tampered":"GROUNDED_RESULT_MISMATCH",
+                  "unknown_cap":"FORGE_CANDIDATE_UNKNOWN_CAPABILITY_ID"}[fault]
         test.assertEqual(reason,expected,denied.stdout+denied.stderr)
         test.assertEqual(ResearchStore(root).diagnostics().committed_inventory_sha256,before)
     persisted=call("persist-draft","--draft",str(draft_path),"--preflight-receipt",str(receipt_path),"--representation-id","BASE")
