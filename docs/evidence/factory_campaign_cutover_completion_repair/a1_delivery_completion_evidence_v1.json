@@ -1,0 +1,58 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-CAMPAIGN-CUTOVER-COMPLETION-001",
+  "as_of": "2026-10-04",
+  "task_id": "FACTORY_CAMPAIGN_CUTOVER_COMPLETION_REPAIR_V1",
+  "state_change": "GIT_CANDIDATE_REQUIRES_EXACT_HEAD_CI_AND_MERGE_READINESS",
+  "base_main": "fc3db6cf164d73b1289bda8472c21f3d4e3edea7",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/FACTORY_CAMPAIGN_CUTOVER_COMPLETION_REPAIR_V1.md": "af8e538482665d4576d1d346313a33bcca93f8972350e1811d408808397868c9"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_campaign_cutover_completion_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_73_FOCUSED_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/factory_campaign_cutover_completion_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_RED_PREMATURE_COMPLETION_REPRODUCED",
+      "PASS_REAL_LIFECYCLE_CLI_TICK_LOOP",
+      "PASS_EFFECTIVE_CLOSURE_UNKNOWN_OBLIGATIONS_AND_REPLAY"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_COMMISSIONING_IN_GIT_RECEIPT",
+    "NO_NATURAL_PRODUCTION_ROLLOVER_PROOF",
+    "PUBLICATION_LAG_NOT_REPAIRED"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "live_telegram_sends": 0,
+    "live_database_mutations": 0,
+    "credentials_read": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

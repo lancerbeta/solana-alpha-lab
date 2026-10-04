@@ -25,6 +25,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (
     activate_schedule,
     authorize_schedule,
     complete_draining_schedule,
+    drain_expired_admission,
     expected_authority_phrase,
     pause_schedule,
     register_schedule,
@@ -377,12 +378,14 @@ class ObservationScheduleLifecycleTests(unittest.TestCase):
                 now=NOW,
                 producer_git_sha=GIT,
             )
-            store.transition_activation(
+            closed_at = parse_utc(document["activation"]["stops_admitting_at"])
+            drain_expired_admission(
+                data_root=data_root,
+                store=store,
                 schedule_sha256=digest,
                 activation_id="ACT-OBS-DRAIN",
-                new_state="DRAINING",
-                effective_at="2026-09-01T00:20:00Z",
-                clock=NOW,
+                now=closed_at,
+                producer_git_sha=GIT,
             )
             due = {
                 "schedule_sha256": digest,
@@ -401,7 +404,7 @@ class ObservationScheduleLifecycleTests(unittest.TestCase):
                 store=store,
                 schedule_sha256=digest,
                 activation_id="ACT-OBS-DRAIN",
-                now=NOW,
+                now=closed_at,
                 producer_git_sha=GIT,
             )
             self.assertEqual(pending["terminal"], "DRAINING_PENDING")
@@ -415,7 +418,7 @@ class ObservationScheduleLifecycleTests(unittest.TestCase):
                 store=store,
                 schedule_sha256=digest,
                 activation_id="ACT-OBS-DRAIN",
-                now=NOW,
+                now=closed_at,
                 producer_git_sha=GIT,
             )
             self.assertEqual(completed["terminal"], "COMPLETED")

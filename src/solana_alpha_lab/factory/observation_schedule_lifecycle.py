@@ -1997,7 +1997,7 @@ def complete_draining_schedule(
     now: datetime,
     producer_git_sha: str,
 ) -> dict[str, Any]:
-    """Complete a drained activation only after every obligation is resolved."""
+    """Complete only after proven effective admission closure and resolved work."""
     existing = store.get_activation(schedule_sha256, activation_id)
     if existing is None:
         raise ObservationLifecycleError("ACTIVATION_MISSING")
@@ -2010,6 +2010,37 @@ def complete_draining_schedule(
         }
     if existing["state"] != "DRAINING":
         raise ObservationLifecycleError("ACTIVATION_NOT_DRAINING")
+    # A prepared rollover stores DRAINING before its effective cutover. Empty
+    # queues do not close admission. The committed transition, including a valid
+    # early rollover, owns that boundary; mutable state/window alone cannot.
+    payload = existing.get("payload")
+    try:
+        projection_matches = (
+            isinstance(payload, Mapping)
+            and payload.get("new_state") == "DRAINING"
+            and payload.get("prior_state") == "ACTIVE"
+            and payload.get("transition_event_id") == existing["last_transition_event_id"]
+            and int(payload["transition_sequence"]) == int(existing["transition_sequence"])
+            and payload.get("authority_receipt_sha256") == existing.get("authority_receipt_sha256")
+        )
+        effective = parse_utc(str(payload["transition_effective_at"])) if projection_matches else None
+    except (KeyError, TypeError, ValueError):
+        effective = None
+    closure = _draining_transition_evidence(data_root, existing, now=now) if effective is not None else None
+    if closure is None or closure[0] != effective:
+        return {
+            "terminal": "DRAINING_PROOF_UNKNOWN",
+            "activation_id": activation_id,
+            "schedule_sha256": schedule_sha256,
+            "state": "DRAINING",
+        }
+    if closure[0] > now or store.restore_marker_unresolved():
+        return {
+            "terminal": "DRAINING_PENDING",
+            "activation_id": activation_id,
+            "schedule_sha256": schedule_sha256,
+            "state": "DRAINING",
+        }
     if has_open_publication_jobs(
         data_root=data_root,
         schedule_sha256=schedule_sha256,

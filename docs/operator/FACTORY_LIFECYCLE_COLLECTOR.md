@@ -41,6 +41,29 @@ valid only when the writer is frozen.
 
 ## Architecture
 
+### Completion after a prepared rollover
+
+Prepared rollover persists raw `DRAINING` for the predecessor and a future
+transition for its successor. Before `cutover_at`, the predecessor still has
+effective `ACTIVE` admission. An empty queue must not produce `COMPLETE`.
+Ticks use one UTC entry clock even if processing finishes across the boundary.
+
+Completion requires a matching committed, already effective DRAINING transition
+(window closure or valid early rollover) and resolved due/publication/recovery
+obligations. Future closure returns `DRAINING_PENDING`. Missing/malformed proof
+returns `DRAINING_PROOF_UNKNOWN`, leaves the activation/sequence unchanged and
+requires reconciliation of the exact transition; restarting the service does not
+repair missing proof. Do not edit operational SQLite or resume `COMPLETE` to
+restore capture. Any emergency replacement uses a new exact owner authorization,
+records the actual forward capture start, and preserves the historical gap.
+
+Repair proof: `tests/test_factory_campaign_cutover_completion_repair_v1.py` runs
+real lifecycle and CLI/tick composition with fake transport, including process
+restart, empty queues, early cutover, paused successor and one committed completion.
+This isolated loop proves the code invariant. Production acceptance additionally
+requires installed SHA, normal source progression and a new scientific publication;
+future natural rollover is proved only when it actually occurs.
+
 | Plane | Where | Role |
 |---|---|---|
 | Live Observation Plane | VPS `/opt/solana-alpha-lab` | moving collector truth (schedule, SQLite, observation_rdp) |
