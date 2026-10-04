@@ -1,0 +1,34 @@
+{
+  "preview": {
+    "decision_point": "Y3600",
+    "examples": [
+      {
+        "anonymous_id": "daeaf1e6b5ad3f39",
+        "feature_status": {
+          "h": "OBSERVED"
+        },
+        "feature_values": {
+          "h": 120.0
+        },
+        "liquidity_absolute": 1000.0,
+        "missing_mask": {
+          "X300": "OBSERVED",
+          "Y3600": "OBSERVED"
+        },
+        "price_relative": {
+          "X300": 0.0,
+          "Y3600": 0.19999999999999996
+        }
+      }
+    ],
+    "preview_sha256": "fd9f790efe9130bccabd87ed6c5d5a374ec7d1baa8ddbe928ee4639799eedc83",
+    "sampling_rule": "HASH_MEMBERSHIP_SEED",
+    "schema": "smial.hfic-temporal-preview",
+    "schema_version": "1.0",
+    "selected_count": 1,
+    "silent_truncation": false,
+    "target_included": false,
+    "total_count": 1
+  },
+  "source_base": "27366b752cd0fae9683dd50373ea8ff8da5a6f6d"
+}

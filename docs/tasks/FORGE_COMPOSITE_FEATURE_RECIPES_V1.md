@@ -118,13 +118,16 @@ authorized real dynamics experiment after support/precision assessment.
    start<end<=decision; unknown new parameters refuse. No EWM, holder targets,
    holder generic ratio or new PRICE/LIQUIDITY operators. Missing/late/conflict,
    booleans and nonfinite values are unavailable, never zero or epsilon.
-2. Preview projects every declared pre-decision dependency from a full query,
+2. For raw-holder composites with holder delta/return_ratio, preview projects
+   every declared pre-decision dependency from a full query,
    excludes target before loading and uses the same feature owner as MAIN.
    Exact full pooled/cohort support precedes 24-example truncation. Show BASE_X,
    universe PASS/FAIL/UNKNOWN, distinct decision eligibility, feature and joint
    calculable/unavailable counts, reasons, identity and duplicate diagnostics.
    Counts are seed-independent and numerically future-prefix invariant.
    Membership/decision identity comes from evaluator; do not count census rows.
+   Non-raw recipes preserve pre-PR point-only preview projection/identity/output;
+   their legacy MAIN conflict policy is unchanged.
 3. Existing DISCOVERY_FEATURE_PREVIEW preserves recipe/input/policy and summary.
    Verified exact cold readback loads zero values and spends no new allowance.
    Legacy missing payload is explicit; changed inputs never receive stale replay.
@@ -155,3 +158,14 @@ must identify a change that passes tests but breaks research validity. Finish
 content before evidence binding; incremental generated sync; local preflight;
 one PR; exact-head CI; readiness; exact machine phrase. No full local gate
 before PR and no live semantic acceptance from synthetic or CI evidence.
+
+## Owner repair request in the same PR
+
+Reviewed head 579b7fc8d2cc2210c2aec23d2b80f34b96db88d5 is historical.
+P1-A: accepted capability-only raw candidates are GROUNDED without fabricated gaps;
+unknown/unaccepted CAP and unbound/tampered computed evidence still refuse.
+P1-B: full-prefix preview is confined to holder delta/return_ratio composites;
+legacy PRICE/LIQ dynamic preview retains historical projection and identity.
+Re-prove A-F, native Critic and all required isolated roles on new content.
+P2 saved-preview first-match and UniversePolicyError propagation remain deferred.
+No new FEAT/CAP, budget, estimand, live or real-science authority is granted.

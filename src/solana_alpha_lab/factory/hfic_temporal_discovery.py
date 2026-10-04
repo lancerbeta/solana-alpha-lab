@@ -3090,7 +3090,10 @@ def validate_feature_preview_spec(spec: Mapping[str, Any]) -> dict[str, Any]:
     features = [_canonical_feature(_require_mapping(f, "FEATURE_INVALID")) for f in features_in]
     if len(features) > MAX_FEATURES or len({f["name"] for f in features}) != len(features):
         raise GroundedDiscoveryError("FEATURE_INVALID")
+    raw_holder_recipe = any(f.get("field_id") == HOLDER_COUNT and f["op"] in {"delta", "return_ratio"} for f in features)
     for feature in features:
+        if not raw_holder_recipe and feature["op"] != "point_value":
+            raise GroundedDiscoveryError("FEATURE_OP_UNSUPPORTED")
         for point, _field_id in _feature_dependencies(feature):
             if POINT_OFFSET[point] > POINT_OFFSET[decision_point]:
                 raise GroundedDiscoveryError("FEATURE_AFTER_DECISION")
@@ -3189,7 +3192,7 @@ def build_feature_preview(
     """Feature-only preview. Target and survival labels are not computed."""
 
     checked = validate_feature_preview_spec(spec)
-    if any(f["op"] != "point_value" for f in checked["features"]):
+    if any(f.get("field_id") == HOLDER_COUNT and f["op"] in {"delta", "return_ratio"} for f in checked["features"]):
         return _build_recipe_preview(census, observations, spec, binding,
                                      prior_preview_hashes=prior_preview_hashes, universe_policy=universe_policy)
     admitted = admit_discovery_binding(binding)

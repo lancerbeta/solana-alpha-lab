@@ -105,7 +105,7 @@ def ground_candidate(
     capability_ids = [str(item) for item in raw_caps]
     unresolved = [str(item).strip() for item in raw_unresolved if str(item).strip()]
 
-    if not feature_ids and not unresolved:
+    if not feature_ids and not capability_ids and not unresolved:
         raise HficGroundingError(MISSING_RESEARCH_INPUT)
 
     feature_bindings: list[dict[str, Any]] = []

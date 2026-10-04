@@ -1949,12 +1949,13 @@ def _cmd_discovery_preview(
         if temporal_preview:
             from solana_alpha_lab.factory.hfic_grounded_discovery import POINT_OFFSET
             body = validate_temporal_query(spec)["scientific_body"]
+            raw_holder_recipe = any(f.get("field_id") == "FIELD-HOLDER-COUNT-001" and f["op"] in {"delta", "return_ratio"} for f in body["features"])
             points = {body["decision_point"]}
             for feature in body["features"]:
                 points.update(feature[key] for key in ("point", "start", "end", "numerator", "denominator", "at") if key in feature)
                 points.update(feature.get("points") or [])
             preview_spec = {"decision": spec["decision"], "schedule": {**spec["schedule"], "points": sorted(points, key=POINT_OFFSET.get)},
-                            "features": body["features"], "seed": spec.get("seed") or spec["query_id"]}
+                            "features": body["features"] if raw_holder_recipe else [f for f in body["features"] if f["op"] == "point_value"], "seed": spec.get("seed") or spec["query_id"]}
         checked_preview = validate_feature_preview_spec(preview_spec)
         point_ids = checked_preview["point_ids"]
         loaded = load_admitted_partition_rows(

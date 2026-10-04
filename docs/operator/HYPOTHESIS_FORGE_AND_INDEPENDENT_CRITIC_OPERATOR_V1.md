@@ -1834,7 +1834,7 @@ support if needed -> exact query. Holder growth alone can be SIMPLE; holder
 
 growth with an independent price/liquidity mechanism can be COMPOUND_FIRST.
 
-Usually 1–3 meaningful predicates suffice. A full mixed preview keeps all
+Usually 1–3 meaningful predicates suffice. A raw-holder mixed preview (holder delta/return_ratio) keeps all
 
 declared features and reports full joint support on decision eligibility before
 
@@ -1843,6 +1843,8 @@ declared features and reports full joint support on decision eligibility before
 Support does not prove variance, precision, independence or alpha. A changed
 
 seed spends exposure; do not sweep windows/thresholds/components.
+
+Without raw holder dynamics, preview keeps the historical point_value-only projection; no full joint prefix support claim. An accepted temporal capability can ground a raw candidate with required_feature_ids=[] and unresolved_requirements=[], but exact computed grounded_evidence remains mandatory at freeze. Capability binding grants no authority; GROUNDED does not imply scientific acceptance.
 
 
 

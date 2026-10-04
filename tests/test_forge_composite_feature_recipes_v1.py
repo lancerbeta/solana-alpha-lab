@@ -130,7 +130,45 @@ def future_prefix_witness() -> dict:
     }
 
 
+def legacy_preview_fixture_inputs():
+    from tests.test_hfic_temporal_discovery_v1 import _obs
+    census, rows = _member_path("legacy-preview", COHORT, RELEASE, ANCHOR,
+                               [1,1.2,1.5,1.2], (10000,9000), 1.44)
+    rows.append({**_obs("legacy-preview","Y3600",HOLDER,120),"cohort_id":COHORT,"release_id":RELEASE})
+    spec={"decision":_simple()["decision"],"schedule":{**_simple()["schedule"],"points":["X300","Y3600"]},
+          "features":[{"name":"h","op":"point_value","field_id":HOLDER,"point":"Y3600"}],"seed":"legacy-base"}
+    return [census], [r for r in rows if r["point_id"] in {"X300","Y3600"}], spec, [_bind(COHORT,RELEASE)]
+
+
 class EntryWitness(unittest.TestCase):
+    def test_capability_only_grounding_is_accepted_without_authority(self):
+        from solana_alpha_lab.factory.hfic_grounding import ground_candidate, HficGroundingError
+        from solana_alpha_lab.factory.hfic_control_integrity import fast_lane_availability_denial_codes
+        card = {"required_feature_ids": [], "required_capability_ids": [temporal.TEMPORAL_CAPABILITY_ID],
+                "unresolved_requirements": []}
+        grounding = ground_candidate(card, repo_root=ROOT, context_packet_sha256="1"*64,
+                                     accepted_capability_ids=[temporal.TEMPORAL_CAPABILITY_ID])
+        self.assertEqual(grounding["terminal"], "GROUNDED")
+        self.assertEqual(grounding["feature_bindings"], [])
+        self.assertEqual(grounding["unresolved_requirements"], [])
+        self.assertEqual(grounding["capability_bindings"], [{"capability_id": temporal.TEMPORAL_CAPABILITY_ID,
+                        "accepted": True, "authority_granted": False}])
+        self.assertEqual(fast_lane_availability_denial_codes({**card, "grounding": grounding}), [])
+        for required, accepted in ((temporal.TEMPORAL_CAPABILITY_ID, []), ("CAP-UNKNOWN", [temporal.TEMPORAL_CAPABILITY_ID])):
+            with self.subTest(required=required), self.assertRaisesRegex(HficGroundingError, "UNKNOWN_CAPABILITY"):
+                ground_candidate({**card, "required_capability_ids": [required]}, repo_root=ROOT,
+                                 context_packet_sha256="1"*64, accepted_capability_ids=accepted)
+
+    def test_non_holder_dynamic_feature_preview_keeps_legacy_refusal(self):
+        from solana_alpha_lab.factory.hfic_grounded_discovery import GroundedDiscoveryError
+        spec = mixed_spec()
+        spec["features"][0] = {"name":"holders", "op":"point_value", "field_id":HOLDER, "point":"Y900"}
+        preview_spec = {"decision":spec["decision"], "schedule":{**spec["schedule"], "points":["X300","Y900"]},
+                        "features":spec["features"], "seed":"legacy"}
+        with mock.patch.object(temporal, "_build_recipe_preview", side_effect=AssertionError("raw owner invoked")):
+            with self.assertRaisesRegex(GroundedDiscoveryError, "FEATURE_OP_UNSUPPORTED"):
+                temporal.build_feature_preview([], [], preview_spec, [])
+
     def test_holder_raw_recipe_is_supported(self):
         spec = _simple()
         spec["features"] = [{"name": "impulse", "op": "delta", "field_id": "FIELD-HOLDER-COUNT-001",
@@ -146,6 +184,12 @@ class EntryWitness(unittest.TestCase):
 
 
 class RawArithmeticTests(unittest.TestCase):
+    def test_legacy_preview_exact_base_output(self):
+        expected=json.loads((ROOT/"tests/fixtures/forge_composite_feature_recipes_v1/legacy_preview_base_v1.json").read_text(encoding="utf-8"))
+        with mock.patch.object(temporal,"_build_recipe_preview",side_effect=AssertionError("raw owner invoked")):
+            actual=temporal.build_feature_preview(*legacy_preview_fixture_inputs())
+        self.assertEqual(actual,expected["preview"])
+
     def test_equal_relative_targets_do_not_hide_source_copy_conflict(self):
         from tests.test_hfic_temporal_discovery_v1 import _obs
         copies=[]
@@ -218,6 +262,9 @@ class RawArithmeticTests(unittest.TestCase):
         query=_simple()
         query.update(features=[{"name":"h","op":"delta","field_id":HOLDER,"start":"X300","end":"Y3600"}],
                      all=[{"feature":"h","op":"gt","value":0}])
+        query["features"].extend([
+            {"name":"p","op":"return_ratio","field_id":PRICE,"start":"X300","end":"Y3600"},
+            {"name":"l","op":"ratio","field_id":LIQ,"numerator":"Y3600","denominator":"X300"}])
         projected={"decision":query["decision"],"schedule":{**query["schedule"],"points":["X300","Y3600"]},"features":query["features"],"seed":"prefix"}
         policy=profile_definition(50,5000)
         counts=[]
@@ -297,6 +344,32 @@ class RawArithmeticTests(unittest.TestCase):
 
 
 class PublicSupportTests(unittest.TestCase):
+    def test_public_legacy_mixed_preview_projects_only_point_features(self):
+        from tests.test_hfic_cli import run_cli
+        from tests.test_hfic_ordinary_operation_acceptance_v1 import _forge, _operation
+        with tempfile.TemporaryDirectory() as raw:
+            workspace=Path(raw); root=publish_raw(workspace)
+            pre=run_cli("preflight","--discovery-contract","--owner-focus","SYNTHETIC_LEGACY_PREVIEW","--format","json",data_root=root)
+            self.assertEqual(pre.returncode,0,pre.stdout+pre.stderr)
+            receipt=json.loads(pre.stdout)
+            spec=mixed_spec()
+            spec["features"][0]={"name":"holders","op":"point_value","field_id":HOLDER,"point":"Y900"}
+            path,op_path=workspace/"legacy.json",workspace/"legacy.op.json"
+            path.write_text(json.dumps(spec),encoding="utf-8")
+            op_path.write_text(json.dumps(_operation(spec,focus="SYNTHETIC_LEGACY_PREVIEW",journal=receipt["search_key_sha256"],
+                market=receipt["market_evidence_epoch_sha256"],text="Synthetic legacy projection",cap={"main":1,"adaptive":0,"preview":1})),encoding="utf-8")
+            with mock.patch.object(temporal,"_build_recipe_preview",side_effect=AssertionError("raw owner invoked")),mock.patch.object(temporal,"build_feature_preview",wraps=temporal.build_feature_preview) as builder,contextlib.redirect_stdout(io.StringIO()) as out:
+                code=_forge().cmd_discovery_preview(ROOT,explicit_data_root=root,spec_path=path,binding_path=None,census_path=None,observations_path=None,
+                    cohort_partitions=None,prior_preview_hash=None,store_root=root,journal_scope=receipt["search_key_sha256"],operation_path=op_path)
+            self.assertEqual(code,0,out.getvalue())
+            projected=builder.call_args.args[2]
+            self.assertEqual(projected["features"],[spec["features"][0]])
+            self.assertEqual(projected["schedule"]["points"],["X300","Y900"])
+            self.assertNotIn("target",projected)
+            preview=json.loads(out.getvalue().splitlines()[-1])
+            self.assertNotIn("support_summary",preview)
+            self.assertNotIn("feature_recipe",preview)
+
     def test_identical_support_retains_each_operation_binding(self):
         from solana_alpha_lab.factory.research_store import ResearchStore
         with tempfile.TemporaryDirectory() as raw:
@@ -526,7 +599,7 @@ def prepare_scientific_path(test, workspace, *, focus="SYNTHETIC_RAW_SCIENTIFIC_
           "decision_unlocked":"Whether a separately authorized chronological validation is justified; synthetic acceptance grants no science permission.",
           "kill_if":["PIT lineage fails","No supported directional contrast"],
           "prior_work_refs":[],"material_difference_from_prior":"New raw holder dynamics, no prior exact close claimed.",
-          "unresolved_requirements":["RAW_HOLDER_DYNAMIC_EXPLORATORY"]}
+          "unresolved_requirements":[]}
     draft=bind_draft({**source,"owner_focus":focus,"candidates":[card]},fresh)
     draft.pop("runner_up_candidate_ref",None);draft.pop("strongest_rejected_alternative",None)
     draft["selected_candidate_ref"]=card["label"];draft["grounded_evidence"]=evidence
@@ -543,11 +616,36 @@ def prepare_scientific_path(test, workspace, *, focus="SYNTHETIC_RAW_SCIENTIFIC_
             assert_computed_grounded_evidence(ResearchStore(root),tampered,expected_journal_scope=receipt["search_key_sha256"])
     draft_path,receipt_path=workspace/"native-draft.json",workspace/"native-preflight.json"
     draft_path.write_text(json.dumps(draft),encoding="utf-8");receipt_path.write_text(json.dumps(fresh),encoding="utf-8")
+    # Public freeze must still bind actual evidence even with an accepted capability.
+    before=ResearchStore(root).diagnostics().committed_inventory_sha256
+    for fault in ("unbound", "tampered", "unknown_cap"):
+        refused=copy.deepcopy(draft)
+        if fault == "unbound":
+            refused.pop("grounded_evidence")
+        elif fault == "tampered":
+            refused["grounded_evidence"]["result"]["experiment_recipe"]["spec"]["scientific_body"]["features"][0]["op"]="return_ratio"
+        else:
+            refused["candidates"][0]["required_capability_ids"]=["CAP-UNKNOWN"]
+        bad_path=workspace/f"refused-{fault}.json"
+        bad_path.write_text(json.dumps(refused),encoding="utf-8")
+        denied=run_cli("freeze","--draft",str(bad_path),"--preflight-receipt",str(receipt_path),"--format","json",data_root=root)
+        test.assertNotEqual(denied.returncode,0,denied.stdout+denied.stderr)
+        reason=json.loads(denied.stdout)["reason_code"]
+        test.assertIn(reason,{"GROUNDED_EVIDENCE_REQUIRED","GROUNDED_RESULT_MISMATCH","FORGE_CANDIDATE_UNKNOWN_CAPABILITY_ID"},denied.stdout)
+        test.assertEqual(ResearchStore(root).diagnostics().committed_inventory_sha256,before)
     persisted=call("persist-draft","--draft",str(draft_path),"--preflight-receipt",str(receipt_path),"--representation-id","BASE")
     resume=call("preflight","--discovery-contract","--owner-focus",focus)
     receipt_path.write_text(json.dumps(resume),encoding="utf-8")
     frozen=call("freeze","--draft",str(draft_path),"--preflight-receipt",str(receipt_path))
     packet=frozen["critic_input_packet"]
+    from solana_alpha_lab.factory.hfic_control_integrity import fast_lane_availability_denial_codes
+    selected=packet["selected_candidate"]
+    test.assertEqual(selected["required_feature_ids"],[])
+    test.assertEqual(selected["grounding"]["terminal"],"GROUNDED")
+    test.assertEqual(selected["grounding"]["feature_bindings"],[])
+    test.assertEqual(selected["grounding"]["unresolved_requirements"],[])
+    test.assertEqual(selected["grounding"]["capability_bindings"],[{"capability_id":temporal.TEMPORAL_CAPABILITY_ID,"accepted":True,"authority_granted":False}])
+    test.assertEqual(fast_lane_availability_denial_codes(selected),[])
     test.assertEqual(packet["selected_candidate"]["primary_x"],identity["primary_x_family"])
     test.assertEqual(packet["grounded_evidence"]["descriptive_readout"]["scientific_identity"],identity)
     packet_path=workspace/"native-critic-packet.json"
@@ -577,7 +675,10 @@ def finish_scientific_path(test, workspace, context, critic):
         path=workspace/"native-classification.json";path.write_text(json.dumps(packet),encoding="utf-8")
         finished=call("classify","--session-id",context["frozen"]["session_id"],"--experiment-spec",str(path))
     owner=call("forge-run","--owner-focus",context["focus"],"--persist")
-    cold=call("forge-run","--owner-focus",context["focus"],"--no-write")
+    before_cold=ResearchStore(root).diagnostics().committed_inventory_sha256
+    with mock.patch("solana_alpha_lab.factory.hfic_grounded_discovery.load_admitted_partition_rows",side_effect=AssertionError("cold values read")),mock.patch.object(temporal,"execute_temporal_discovery",side_effect=AssertionError("cold evaluator call")):
+        cold=call("forge-run","--owner-focus",context["focus"],"--no-write")
+    test.assertEqual(ResearchStore(root).diagnostics().committed_inventory_sha256,before_cold)
     test.assertEqual(cold["ordinary_operation"]["effective_state"],"COMPLETED",cold)
     before=ResearchStore(root).diagnostics().committed_inventory_sha256
     with mock.patch.object(temporal,"execute_temporal_discovery",wraps=temporal.execute_temporal_discovery) as evaluator:
@@ -586,7 +687,7 @@ def finish_scientific_path(test, workspace, context, critic):
         test.assertEqual(evaluator.call_count,1)
     test.assertEqual(replay["summary"],context["evidence"]["result"])
     test.assertEqual(ResearchStore(root).diagnostics().committed_inventory_sha256,before)
-    return {"finalized":finished,"owner":owner,"cold":cold,"registered_replay_evaluator_calls":1}
+    return {"finalized":finished,"owner":owner,"cold":cold,"registered_replay_evaluator_calls":1,"cold_readback_evaluator_calls":0,"cold_readback_value_loads":0}
 
 
 class ScientificPathTests(unittest.TestCase):

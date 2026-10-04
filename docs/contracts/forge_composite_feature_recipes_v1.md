@@ -47,6 +47,13 @@ through grounded input, candidate, freeze, Critic and owner. No date-pair FEAT,
 new CAP, expression parser or ritual CALC/schema bump is introduced. Old
 PRICE/LIQUIDITY/holder-point specs, hashes and numerical outputs stay frozen.
 
+An accepted required capability is research input even with no FEAT and no
+unresolved requirement. Raw candidates bind the existing accepted temporal CAP
+and exact computed grounded evidence; freeze retains result recipe/spec SHA and
+candidate identity verification. Unknown/unaccepted CAP or absent/tampered evidence
+refuses. `GROUNDED` is mechanical binding, not scientific acceptance or authority.
+Do not invent an unresolved raw-holder requirement to satisfy grounding.
+
 ## Common prefix population and full support
 
 For a new holder transform, `_project_temporal_members` is the common preview
@@ -60,7 +67,8 @@ disagreement keeps prefix support but makes the raw MAIN target unavailable
 (`TARGET_DELIVERY_CONFLICT`), independent of delivery order. Undeclared cells
 cannot change prefix support. Legacy queries keep their accepted conflict policy.
 
-Public `discovery-preview` retains every declared feature and loads only its
+For raw-holder composites containing holder delta/return_ratio, public
+`discovery-preview` retains every declared feature and loads only its
 pre-decision points plus the mandatory membership cells. No target values are
 loaded. Full counts precede the 24-example sample: BASE_X; universe PASS/FAIL/
 UNKNOWN; decision eligibility, which additionally needs decision price; each
@@ -71,6 +79,10 @@ Unique mint/decision counts and duplicate/integrity diagnostics retain their
 grain. Cohort sums need disjointness proof; independence remains UNKNOWN.
 Counts are seed-independent. Output cap remains 64 KiB; excess returns typed
 `PREVIEW_TOO_LARGE`, not a truncated population presented as complete.
+Queries without either raw holder transform retain the pre-PR preview projection:
+all pre-decision points, point_value features only, historical preview identity
+and output. Direct feature-only non-holder dynamic specs retain their typed
+`FEATURE_OP_UNSUPPORTED` refusal. They acquire no full joint prefix support contract.
 
 ## Persistence and fresh admission
 
