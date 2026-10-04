@@ -17,7 +17,7 @@ uv run --locked --managed-python python -B -m unittest tests.test_factory_campai
 ```
 
 Reviewer falsifiers are now regressions: coherent SQLite sequence/authority drift
-cannot match the immutable event ID. Completion opens only its named committed
+cannot match the immutable event ID. Completion proof lookup opens only its named committed
 transaction; 10 versus 200 unrelated member headers still open exactly one state
 payload. Future or pending drain returns before the immutable lookup.
 
