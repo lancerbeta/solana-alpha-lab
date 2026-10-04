@@ -11,7 +11,7 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "ce87889290ccb2ea7abc6cffd4e1bc9758b9574182e0799f0c804f964c59db75",
+    "catalog/assets/core.yaml": "be0c5da52a1083893e8ca8a1ffd60276d2994a9f3e83b6d43ca5b6f2a8da6d7a",
     "catalog/assets/lifecycle.yaml": "1438ddb7ea89492d189e05b20c0e819741c718ff4d7120300dbd867e7061b464",
     "catalog/catalog_manifest.yaml": "0e753c03a6fad9c20cf21c584058c2b4c3397182599328bd3bbaaa148ade8f5e",
     "catalog/generated/asset_edges.json": "6fcfe100aa8835d174562ccc72c2b9bee60f5864984b30cf37ba1470da948025",
@@ -34,14 +34,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_campaign_cutover_completion_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "a0c0175725051c57673d2f1d56cd927259b5a325985c1a24b63f36ea3cfe0a57",
+    "sha256": "c8bd1ce4953b9c1047a566e595d5e2e9299ef570e463ef554b029a94c52476bc",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_76_FOCUSED_TESTS",
     "independent_review": {
       "path": "docs/evidence/factory_campaign_cutover_completion_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "80db7b4134399026aa58ad6b1691bd98ca31b50f5da0882c66efd92e6cad5a1c",
+      "sha256": "e7de2d5b6bf6bda9ed16f8a5eb01092d684e4f3e0eac54523a59c6b5443548d9",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

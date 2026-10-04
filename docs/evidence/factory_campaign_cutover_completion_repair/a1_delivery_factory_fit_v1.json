@@ -6,8 +6,8 @@
   "task_id": "FACTORY_CAMPAIGN_CUTOVER_COMPLETION_REPAIR_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "b09e37dc27e9574920169b580a990315219806dfb07625dd934aa547b371b8e8",
-  "reviewed_inventory_sha256": "5bd6e93b681b0183d7b67567d3e8f5a00fa1669ebbee47dbcb03d142873565ac",
+  "reviewed_bindings_sha256": "49dce1761eed6334922d35fe971e7637bad7c82b4a0beb0a1e43e4b802826a1c",
+  "reviewed_inventory_sha256": "0b9aca12b609463487dbb735b3ddd1609b8d832488901a919b023e95a15244d2",
   "capability_radar": {
     "now": "NONE",
     "watch": "MEASURED_PUBLICATION_BACKLOG_OR_NATURAL_ROLLOVER_FAILURE"
