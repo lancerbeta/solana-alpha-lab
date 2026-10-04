@@ -21,7 +21,12 @@ from solana_alpha_lab.factory.hfic_temporal_discovery import (  # noqa: E402
     run_registered_fixed_time_proxy,
     temporal_target_label,
 )
-from tests.test_hfic_cli import bind_draft, populate_real_c1_c2, run_cli  # noqa: E402
+from tests.test_hfic_cli import (  # noqa: E402
+    _activate_neutral_universe,
+    bind_draft,
+    populate_real_c1_c2,
+    run_cli,
+)
 from tests.test_hfic_temporal_discovery_v1 import (  # noqa: E402
     _binding,
     _census,
@@ -113,6 +118,7 @@ class TemporalOwnerPathTests(unittest.TestCase):
             workspace = Path(raw)
             data_root = workspace / "rdp"
             populate_real_c1_c2(data_root, workspace)
+            _activate_neutral_universe(data_root)
             preflight = run_cli(
                 "preflight",
                 "--discovery-contract",
