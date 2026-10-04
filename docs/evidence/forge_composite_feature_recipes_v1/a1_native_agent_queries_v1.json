@@ -27,12 +27,12 @@
         "end": "Y900",
         "field_id": "FIELD-HOLDER-COUNT-001",
         "name": "holders",
-        "op": "delta",
+        "op": "return_ratio",
         "start": "X300"
       }
     ],
     "population": "BASE_X",
-    "query_id": "SYNTHETIC_HOLDER_DELTA_X300_Y900_SIMPLE",
+    "query_id": "SYNTHETIC_RAW_HOLDER_SIMPLE_NATIVE_V4",
     "schedule": {
       "lateness_seconds": 300,
       "observation_clock_policy": "PROVIDER_REPORTED_SNAPSHOT_V1"
@@ -56,7 +56,7 @@
       },
       {
         "feature": "price",
-        "op": "gt",
+        "op": "gte",
         "value": 0
       },
       {
@@ -104,7 +104,7 @@
       }
     ],
     "population": "BASE_X",
-    "query_id": "SYNTHETIC_HOLDER_PRICE_LIQUIDITY_X300_Y900_COMPOUND_FIRST",
+    "query_id": "SYNTHETIC_RAW_HOLDER_PRICE_LIQ_COMPOUND_NATIVE_V4",
     "schedule": {
       "lateness_seconds": 300,
       "observation_clock_policy": "PROVIDER_REPORTED_SNAPSHOT_V1"

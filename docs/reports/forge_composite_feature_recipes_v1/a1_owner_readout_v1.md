@@ -1,7 +1,8 @@
 # FORGE_COMPOSITE_FEATURE_RECIPES_V1 — candidate readout
 
 Обычный Forge принимает raw holder `delta` и `return_ratio` в смешанной query.
-Preview показывает вычислимость всех объявленных features на полном decision
+Для raw-holder composite с holder delta/return_ratio preview показывает
+вычислимость всех объявленных features на полном decision
 population до выбора 24 примеров. Target values в preview не загружаются.
 Текущий смысл и синтаксис принадлежат
 `docs/contracts/forge_composite_feature_recipes_v1.md`
@@ -10,24 +11,25 @@ population до выбора 24 примеров. Target values в preview не 
 Base: `27366b752cd0fae9683dd50373ea8ff8da5a6f6d`, включая lifecycle #373.
 Task: `docs/tasks/FORGE_COMPOSITE_FEATURE_RECIPES_V1.md`.
 Native acceptance выполнена на implementation commit
-`bf59202d4ce4e4af556460cba9d5261e79984394`.
+`66abc2bb41db2e7f4cb2704980f74f4aafd0da7b` после owner P1 repair request.
 Blueprint V4 — design context; authority — Executor Brief V4, SHA256
 `d3abed94024646c2256199d954e28a1971c7e26c5eeb346890810493f53c92fc`.
 
 | Slice | Проверяемый результат |
 |---|---|
-| A | Raw arithmetic; положительный denominator для return; отсутствующие, late, conflict, bool/nonfinite дают unavailable. Bound `start < end <= decision`; лишние новые параметры отвергаются. Старые temporal tests проходят. |
+| A | Raw arithmetic, closed windows/parameters, typed unavailable. Accepted CAP-only проходит draft schema и grounding; unknown/unaccepted CAP отказывает. Legacy preview совпадает с frozen-base golden; legacy grounding/availability/temporal и schema/freeze tests PASS. |
 | B | 48 BASE_X; universe 40 PASS / 4 FAIL / 4 UNKNOWN; 36 decision eligible. Joint calculable: delta 24, return_ratio 20. Это полные counts для четырёх cohorts, отдельно от 24 examples. Zero target-value loads; cold preview без values и новой reservation. |
 | C | Fresh direct decision-cell tautology/impossible query отвергается до values/reservation. Redundant conjunct в meaningful compound даёт warning; исходный hash сохраняется. Saved result, correction и pending recovery используют прежние owners. |
-| D | Public MAIN → persisted grounded evidence → persist-draft → resume → freeze → native isolated Critic → required finalize → `forge-run --persist`. Ни production bindings, ни terminal state не дописаны fixture вручную. |
+| D | Public MAIN → saved computed evidence → persist-draft → resume → freeze GROUNDED → свежий isolated Critic → actual finalize → `forge-run --persist`. FEAT bindings=[], accepted temporal CAP bound, unresolved=[], availability denial codes=[]. Unbound/tampered evidence и unknown CAP отказывают без store writes. |
 | E | Reply-loss recovery: evaluator calls 0. Cold owner readback: values/evaluator 0, inventory unchanged, operation COMPLETED. Registered numerical replay: evaluator 1, точное равенство сохранённому summary. Следующий legacy cycle завершён SEARCH_EXHAUSTED_CURRENT_EVIDENCE. |
-| F | Агент без истории чата получил actual pre-search packet и текущую инструкцию; после исправления отсутствовавшего полного JSON example составил валидные SIMPLE и COMPOUND_FIRST. EWM и alpha не придуманы. Русские semantic gold queries ведут к действующим owners. |
+| F | Новый агент без истории чата по actual pre-search packet, skill и operator составил SIMPLE holder return_ratio и COMPOUND_FIRST holder delta + PRICE/LIQ. Обе query проходят validator; descriptor совпадает с production owner. Semantic/Catalog owners coherent. |
 
-Native Critic вернул `KILL_UNBOUND_EVIDENCE`; существующий owner-final —
-`NON_SCIENTIFIC_STOP`. Это корректное завершение технического synthetic screen.
-Classifier на таком KILL не требуется. Market evidence, prior scope и strategy
-availability остаются UNKNOWN; RAW_HOLDER_DYNAMIC_EXPLORATORY не превращён в
-фиктивный FEAT. Нативный transport и engineering path прошли, научного PASS нет.
+Свежий native Critic вернул `KILL_LOW_INFORMATION_VALUE`: в synthetic packet
+matched и baseline имеют одинаковые PRICE_RELATIVE_PROXY mean/lower-tail metrics;
+удаление holder-condition их сохраняет. Отдельного holder contrast нет.
+Существующий owner-final — `NON_SCIENTIFIC_STOP`; classifier на таком KILL не
+требуется. Recipe полностью GROUNDED механически, без выдуманного unresolved gap.
+Capability binding не даёт authority; научного PASS и вывода о реальном рынке нет.
 Прямые DocumentRunner/classification и saved-result revision consumers проходят
 на committed implementation; новые формулы обслуживает существующий registered
 `CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001`.
@@ -39,11 +41,15 @@ Target conflict не удаляет pre-decision seat и не меняет suppo
 Завершённые ordinary KILL sessions находятся cold reader вместо возврата к
 старому draft; их прежний terminal не меняется и REUSED_VALID не добавляется.
 
-Совместимость: old point/PRICE-only recipes, scientific hashes и числа остаются
+P1-B: query без holder delta/return_ratio сохраняет pre-PR preview projection:
+pre-decision points и только point_value features, прежние identity/output.
+Новый full joint prefix support owner на неё не распространяется.
+Совместимость: old point/PRICE/LIQ recipes, scientific hashes и числа остаются
 заморожены, включая их прежнюю обработку conflicting future deliveries.
 Новая RAW query использует dependency-prefix integrity в общем membership owner.
-Это ограничение сохранённой совместимости явно покрыто regression witness;
-не заявляется новое поведение старого frozen evaluator.
+Это ограничение сохранённой совместимости покрыто public regression и точным
+base-output golden. P2 first-match saved preview и UniversePolicyError propagation
+сознательно оставлены вне NOW; новый repair PR или backlog не создавались.
 
 Evidence: `docs/evidence/forge_composite_feature_recipes_v1/`:
 

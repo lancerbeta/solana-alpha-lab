@@ -1,54 +1,308 @@
 {
   "critic": {
-    "agent_task": "delivery_native_critic",
-    "allowed_scientific_input": "ACTUAL_FROZEN_CRITIC_INPUT_PACKET_ONLY",
-    "experiment_execution": 0,
-    "git_mutations": 0,
-    "incidental_adjacent_source": "Generic run_live_classifier header/start visible during identity lookup; not scientific input; classifier never invoked",
-    "input_canonical_sha256": "2cc1c656b3f16a3276a7f3ff68786f774d997dbffa97826d2d41d240232c309f",
-    "input_file_logical_ref": "local/forge_composite_native_delivery/native-critic-packet.json",
-    "input_file_sha256": "ff5a730c448579732c1a1d49f86be92ee01e7b35262c6834c4d7f01651654486",
-    "output_artifact_write_after_verdict": 1,
-    "output_writes_during_critic": 0,
-    "parent_chat_read": false,
-    "product_diff_or_tests_read": false,
-    "provider_calls": 0,
-    "rdp_store_read": false,
-    "reads": [
-      "critic skill/policy/input/result schemas",
-      "operator PROMPT B",
-      "hfic_identity.py:1-96",
-      "run_passport.py:199-217",
-      "hfic_session.py identity/hash excerpts:2281-2295,6039-6056,6452-6496,7089-7107",
-      "hypothesis_forge.py import/identity routing only"
-    ],
-    "result_file_sha256": "b550cb24c7df09e3f36df3486cb1571658a81cce6aad55e03a34025fd56e72aa"
+    "actual_attestation": {
+      "classifier_run": false,
+      "created_at": "2026-10-04T17:33:45.344600+00:00",
+      "critic_input_packet_sha256": "de25b249c3f7eaa438e8eed33ac640932b565f0295aa95779ba8feff33e9950f",
+      "critic_terminal": "KILL_LOW_INFORMATION_VALUE",
+      "experiment_spec_emitted": false,
+      "external_machine_reads": "Existing .venv Python 3.13.14 executable, its standard library, jsonschema/pydantic dependencies and import metadata were read by runtime. These machine dependencies are not scientific inputs and are not individually enumerated.",
+      "isolation": {
+        "experiment_runs": 0,
+        "forge_narrative_read": false,
+        "forge_scratchpad_read": false,
+        "fresh_subagent_context": true,
+        "git_mutations": 0,
+        "holdout_access": false,
+        "implementation_diff_read": false,
+        "new_outcomes_read": false,
+        "other_agent_results_read": false,
+        "outer_native_context_read": false,
+        "parent_scientific_chat_read": false,
+        "provider_calls": 0,
+        "raw_datasets_read": false,
+        "researchstore_or_active_rdp_read": false,
+        "scope_selection_from_hidden_session": false,
+        "tests_read": false
+      },
+      "isolation_limits": [
+        "Operational isolation was observed by the critic; the shared filesystem is not an OS-enforced packet-only sandbox. Other files remained technically accessible and were not opened.",
+        "The parent task supplied routing/output instructions and generic repository/operator constraints. No parent Forge scientific narrative, native outer context or other critic verdict was present in the scientific inputs actually used.",
+        "Operator guide extraction read full file bytes inside PowerShell, but the model received only Prompt B and heading-marker locations. Prompt A/C bodies were not used.",
+        "Only identity code and exact Catalog/capability excerpts were used beyond the packet and operator pack. Python imports read two package initializers and the canonical-hash module as listed.",
+        "This is a synthetic packet verdict. Referenced raw releases, persisted research artifacts, upstream nonaccess and independent runtime provenance were not audited or replayed. Packet hashes alone do not prove market evidence.",
+        "No schema for this auxiliary attestation was requested or claimed canonical. The scientific result was validated against the existing hypothesis_critic_result_v1 schema."
+      ],
+      "live_git_head": "66abc2bb41db2e7f4cb2704980f74f4aafd0da7b",
+      "next": "STOP",
+      "other_workspace_edits_reverted": false,
+      "packet_file_raw_sha256": "239d445a702ef52f5600275c279180d6e1fc77f76650d4adbdcdbba3894c1b29",
+      "packet_schema_validation": "PASS",
+      "read_only_metadata_operations": [
+        "git rev-parse --show-toplevel",
+        "git rev-parse HEAD",
+        "git ls-files --error-unmatch for the two output paths",
+        "file discovery excluding tests/local to locate identity implementation",
+        "runtime path and version checks"
+      ],
+      "read_set": [
+        {
+          "bytes": 10932,
+          "file_raw_sha256": "b027dc9a699f74e8d3f83ae165089c4d84c2d170945012103f33eaef66194d2e",
+          "path": ".agents/skills/independent-hypothesis-critic/SKILL.md",
+          "purpose_and_extent": "Operator instruction; full text delivered to critic."
+        },
+        {
+          "bytes": 7234,
+          "file_raw_sha256": "e76ec851c88b9198a9ea04a58a7d68f77d93aaf0f8910c4600c8a9949ef47a06",
+          "path": "configs/hypothesis_forge_independent_critic_v1.yaml",
+          "purpose_and_extent": "Critic authority and policy; full text delivered."
+        },
+        {
+          "bytes": 127347,
+          "file_raw_sha256": "3abafc5f04616f06c58785cfad61b886650c51143cd0cf6db4fded52c413ccf2",
+          "path": "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md",
+          "purpose_and_extent": "PowerShell read file bytes for extraction; only PROMPT B lines 1140-1491 and prompt-heading locations were exposed. Initial marker extraction failed because three B headings matched; no Prompt A or C body was delivered."
+        },
+        {
+          "bytes": 14960,
+          "file_raw_sha256": "d4a7951e5a9e20a5cc4bff9b91f70031ef6d7ef96f2410cfac8de6751205d9e3",
+          "path": "catalog/schemas/hypothesis_critic_input_v1.schema.json",
+          "purpose_and_extent": "Input schema full bytes parsed by validator; schema text was initially output in a truncated aggregate."
+        },
+        {
+          "bytes": 3932,
+          "file_raw_sha256": "b4e72ddb954fe126edc0ba94acea49c17297bacd0a3bf8cf5b13d6489e252284",
+          "path": "catalog/schemas/hypothesis_critic_result_v1.schema.json",
+          "purpose_and_extent": "Result schema full text and full machine validation."
+        },
+        {
+          "bytes": 83811,
+          "file_raw_sha256": "239d445a702ef52f5600275c279180d6e1fc77f76650d4adbdcdbba3894c1b29",
+          "path": "local/forge_composite_p1_native_v4/native-critic-packet.json",
+          "purpose_and_extent": "Sole scientific and research-memory input. Full JSON bytes parsed; selected candidate, prior capsule, grounding, grounded comparison, result summaries, cost, ablations and descriptive_readout excerpts were reviewed. Large initial output was truncated; no raw dataset values opened."
+        },
+        {
+          "bytes": 176904,
+          "file_raw_sha256": "b32ecb0286292eee2462177c4e169309a25e532067e3b791c4c71e5ff9eaadc8",
+          "path": "scripts/hypothesis_forge.py",
+          "purpose_and_extent": "Identity symbol search and lines 1-105 locating the existing hfic_session identity flow; not executed."
+        },
+        {
+          "bytes": 375270,
+          "file_raw_sha256": "c1b0ab81db3c14d71a2bee90dfcf7c32985d03f5c046a3fb6f65df7b22b15323",
+          "path": "src/solana_alpha_lab/factory/hfic_session.py",
+          "purpose_and_extent": "Identity-only symbol searches and excerpts: selected-candidate primary_x mapping, selected identity binding, packet canonical hashing, canonical bytes. Full bytes loaded by PowerShell extraction; module not imported or executed."
+        },
+        {
+          "bytes": 3845,
+          "file_raw_sha256": "b11b1ed3093b8c0b52883d7cbf530167f0efe94f34ac08afbc7fdc8dc359c7ac",
+          "path": "src/solana_alpha_lab/factory/hfic_identity.py",
+          "purpose_and_extent": "Existing identity algorithm full text plus read-only execution of candidate_identity. primary_x maps to primary_x_family per existing selected-candidate exporter."
+        },
+        {
+          "bytes": 16321,
+          "file_raw_sha256": "50cdc6d938c0a28f01734140938c026a6203ab69b775940fd2dc2cf37070e5a5",
+          "path": "src/solana_alpha_lab/factory/run_passport.py",
+          "purpose_and_extent": "Canonical identity hash excerpts lines 1-33 and 199-219; full module imported only as an identity dependency. No passport or data operations invoked."
+        },
+        {
+          "bytes": 60,
+          "file_raw_sha256": "4334522e7db488900dea03cee86247bd38a57d9b9ef40b287550392f5955a97f",
+          "path": "src/solana_alpha_lab/__init__.py",
+          "purpose_and_extent": "Implicit Python package import, not delivered as scientific content."
+        },
+        {
+          "bytes": 105,
+          "file_raw_sha256": "394c42972ada8441f74aecfee7b23b36aea135e473a088b250dca3d12d6098f0",
+          "path": "src/solana_alpha_lab/factory/__init__.py",
+          "purpose_and_extent": "Implicit Python package import, not delivered as scientific content."
+        },
+        {
+          "bytes": 6886,
+          "file_raw_sha256": "49edf7b770d37db38edb89a49dcb66f73b6212d62642cda2faa14880456e4430",
+          "path": "configs/experiment_capability_registry_v2.yaml",
+          "purpose_and_extent": "Exact CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001 entry at line 177 onward; accepted/read-only/no-provider status verification only."
+        },
+        {
+          "bytes": 44488,
+          "file_raw_sha256": "91871f77373e4d18817d0d24147726f215292e3d7721e861020debcf6604e3c0",
+          "path": "catalog/catalog_manifest.yaml",
+          "purpose_and_extent": "Read-only text scan returned catalog identity/version and index labels; no indexed assets, tests or scientific records were opened."
+        }
+      ],
+      "result_canonical_sha256": "e6df0526b32fbad12c33610cda2eb4587ab15554f2a3b647eba272496bb0efef",
+      "result_file_raw_sha256": "89889e02ad9be838ab5902a9f17e0467c4dc226f435ab07789957dbaa772ef07",
+      "result_schema_validation": "PASS",
+      "schema": "smial.synthetic-native-critic-attestation",
+      "schema_version": "1.0",
+      "scientific_input_policy": {
+        "availability": "Freeze-owned packet 1.4 grounding preserved as given.",
+        "prior_memory": "Packet capsules only; exactly one capsule compared semantically.",
+        "sole_input": "local/forge_composite_p1_native_v4/native-critic-packet.json"
+      },
+      "selected_candidate_id": "HFIC-CAND-D3510E65D597",
+      "selected_definition_sha256": "d3510e65d5979a25e227f945a85b61265dcd1e01a7a224b7a06834c948ec2057",
+      "session_id": "HFIC-SESS-2E76697FBE8B00CE",
+      "tracked_output_paths": [],
+      "writes_authorized_and_performed": [
+        "local/forge_composite_p1_native_v4/native-critic-result.json",
+        "local/forge_composite_p1_native_v4/native-critic-attestation.json"
+      ]
+    },
+    "agent_task": "p1_native_critic",
+    "input_canonical_sha256": "de25b249c3f7eaa438e8eed33ac640932b565f0295aa95779ba8feff33e9950f",
+    "input_file_logical_ref": "local/forge_composite_p1_native_v4/native-critic-packet.json",
+    "input_file_sha256": "239d445a702ef52f5600275c279180d6e1fc77f76650d4adbdcdbba3894c1b29",
+    "result_file_sha256": "41e0f763ae2e396a14b4b6aef76e3116af31df2637e01450362faf85e2e6fd17"
   },
+  "execution_commit": "66abc2bb41db2e7f4cb2704980f74f4aafd0da7b",
   "model_diversity": "UNPROVEN",
   "presearch_agent": {
+    "actual_attestation": {
+      "acceptance_date": "2026-10-04",
+      "acceptance_kind": "CONCEPTUAL_SYNTHETIC_PRESEARCH_AGENT_USABILITY",
+      "actual_read_set": [
+        {
+          "path": "local/forge_composite_p1_native_v4/native-presearch-packet.json",
+          "sha256": "294d6ad4345ca2a5a7611fae8fb6d44d5b09f09568472824d8998457fb68fd34"
+        },
+        {
+          "path": ".agents/skills/hypothesis-forge/SKILL.md",
+          "sha256": "ec55b9ff96b57cc4408781c98f1301a8a8308c7f749d0323a65da1fd1049dcdd"
+        },
+        {
+          "path": "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md",
+          "sha256": "3abafc5f04616f06c58785cfad61b886650c51143cd0cf6db4fded52c413ccf2"
+        }
+      ],
+      "authored_queries": [
+        {
+          "budget_allocation": "AUTO",
+          "explanation": "SIMPLE: число holders выросло относительно X300 к decision Y900. Один meaningful predicate holders return_ratio > 0; положительный denominator обязателен.",
+          "feature_count": 1,
+          "predicate_count": 1,
+          "query_id": "SYNTHETIC_RAW_HOLDER_SIMPLE_NATIVE_V4",
+          "raw_transform": "return_ratio",
+          "search_tier": "SIMPLE_SCREEN"
+        },
+        {
+          "budget_allocation": "COMPOUND_FIRST",
+          "explanation": "COMPOUND_FIRST: число holders растёт, цена не падает и ликвидность не сокращается в том же раннем окне. Цена и ликвидность добавляют отдельные state constraints к holder growth; статистическая независимость механизмов не утверждается.",
+          "feature_count": 3,
+          "predicate_count": 3,
+          "query_id": "SYNTHETIC_RAW_HOLDER_PRICE_LIQ_COMPOUND_NATIVE_V4",
+          "raw_transform": "delta",
+          "search_tier": "COMPOUND_SCREEN"
+        }
+      ],
+      "authorized_output_files": [
+        "local/forge_composite_p1_native_v4/native-queries.json",
+        "local/forge_composite_p1_native_v4/presearch-attestation.json"
+      ],
+      "discovery_evidence": {
+        "decision": "Y900",
+        "feature_window": "X300 -> Y900",
+        "holder_supported_ops": [
+          "point_value",
+          "delta",
+          "return_ratio"
+        ],
+        "holder_transform_parameters": [
+          "field_id",
+          "start",
+          "end"
+        ],
+        "operator_example_location": "Raw composite recipes / Full query envelope",
+        "packet_location": "temporal_recipe_capabilities",
+        "rationale": "Форма полного query восстановлена из operator JSON example; перечень поддерживаемых raw holder transforms подтверждён actual pre-search packet. SIMPLE uses documented SIMPLE_SCREEN/AUTO reduction plus documented relative-growth alternative; mixed follows existing three-feature COMPOUND_FIRST example.",
+        "target_window": "Y900 -> Y14400"
+      },
+      "explained_behavior": {
+        "economics": "target PRICE_RELATIVE_PROXY, entry LAST_AVAILABLE_MARK_WITH_HAIRCUT с assumed_latency_seconds=30 и cost_profile:null сохранены из example. Null означает existing assumption-stress default; результат не являлся бы наблюдёнными fees/fills или исполненным NetReturn.",
+        "exposure": [
+          "Построены два фиксированных conceptual synthetic seeds без просмотра новых значений/outcomes и без sweep окон, thresholds или components.",
+          "Реальная смена seed тратит exposure; после outcomes изменение operator/window/threshold/component сохраняет adaptive/new-question accounting. SIMPLE и compound не создают отдельный новый бюджет.",
+          "Схожий holder prior может быть применим как prior exposure, но сам по себе не закрывает новый exact dynamics recipe. Переименование закрытого exact вопроса его не открывает.",
+          "Обычный documented shared budget 6 MAIN + 2 adaptive, AUTO reserve для compound и preview envelope не являются выданным здесь разрешением или подтверждённым остатком.",
+          "В этом acceptance не запускались preview, discovery-execute, MAIN, adaptive, freeze, Forge session, provider calls или store writes; научная exposure не расходовалась исполнением."
+        ],
+        "full_support_vs_examples": [
+          "Raw-holder mixed preview сохраняет все declared features и сообщает full joint support на полном decision-eligible наборе до ограничения examples до 24.",
+          "Лимит 24 относится к показанным examples, не к размеру population и не к знаменателю full support. Нельзя выводить full joint support по examples.",
+          "Universe PASS недостаточен для decision eligibility: требуется decision price.",
+          "Без raw holder dynamics действует историческая point_value-only projection; full joint prefix support для неё не заявлен.",
+          "Support подтверждает доступность/применимость рецепта, но не variance, precision, independence, достаточный sample size или alpha. Здесь реальные counts/support UNKNOWN.",
+          "PREVIEW_TOO_LARGE — stop, а не разрешение считать урезанные examples полным support; LEGACY_PREVIEW_DETAIL_UNAVAILABLE нельзя реконструировать молча."
+        ],
+        "grounding": [
+          "Raw field/operator/start/end capability уже присутствует в actual packet. Нужный raw recipe можно выразить без создания FEAT/CAP alias или нового operator.",
+          "Accepted temporal capability допускает candidate required_feature_ids=[] и unresolved_requirements=[]; эти пустые массивы не доказывают отсутствия data/PIT/missingness dependencies.",
+          "At freeze обязательны exact computed grounded_evidence и freeze-owned selected_candidate.grounding; нужен весь returned evidence object, не только result_refs и не hand-written summary.",
+          "Capability/recipe binding механически связывает exact query и supported computation; оно не предоставляет scientific/provider authority.",
+          "GROUNDED не означает scientific acceptance, PIT_READY всего corpus, прибыльность или стратегию. HISTORICAL_RECONSTRUCTIBLE/ FORWARD_ONLY из packet не повышаются до strategy-available.",
+          "В этом acceptance grounded_evidence не вычислено и не изготовлено; статус фактического candidate grounding UNKNOWN."
+        ],
+        "missingness_and_pit": [
+          "Обязательны bound start < end <= decision и PIT lineage. Y14400 используется только как target, не как feature или условие eligibility.",
+          "Окно, lateness_seconds=300 и clock policy взяты из разрешённого synthetic operator example; фактическая совместимость с corpus schedule без runtime/source не доказана.",
+          "Missing, late, conflicting, boolean/nonfinite и invalid-lineage cells unavailable. Нельзя заполнять пропуски нулями, интерполировать или заменять поздним наблюдением.",
+          "PIT означает допустимую доступность данных на cutoff стратегии с lineage; наличие исторической ячейки само по себе не доказывает такую доступность.",
+          "Отсутствие feature или decision price не является FAIL экономической гипотезы; missing target сохраняет отдельную неизвестность outcome."
+        ],
+        "units": {
+          "denominator": "Для return_ratio нужна положительная база; недопустимый denominator не превращается в ноль или бесконечность.",
+          "holder_delta": "H(Y900)-H(X300); HOLDER_COUNT, порог >0 означает положительный прирост count.",
+          "holder_return_ratio": "(H(Y900)-H(X300))/H(X300); DIMENSIONLESS_FRACTION, 1 означает +100%, 0.1 означает +10%. Порог >0 задаёт положительный рост, не end/start >0.",
+          "liquidity_ratio": "L(Y900)/L(X300); безразмерный ratio, >=1 означает сохранение либо рост ликвидности.",
+          "price_return_ratio": "(P(Y900)-P(X300))/P(X300); DIMENSIONLESS_FRACTION, >=0 означает отсутствие снижения цены."
+        },
+        "universe_and_meaningful_predicates": {
+          "effective_population": "PASS_AT_DECISION_TIME_INSIDE_BASE_X",
+          "explanation": "Оба запроса сохраняют BASE_X и применимость snapshot policy на decision. Growth >0 не следует из H(Y900)>=50: earlier holder count может быть меньше, равен или больше. Не добавлено ни слабое H>=3, ни повтор H>=50.",
+          "guards": "При H>=50 на bound decision H>=3 — UNIVERSE_NON_DISCRIMINATING_QUESTION; H<50 — UNIVERSE_IMPOSSIBLE_QUESTION. H>=50 AND delta>0 допускается с REDUNDANT_UNIVERSE_CONJUNCT; admitted exact spec/hash сохраняют. Earlier points и UNKNOWN equivalence не объявляют tautology.",
+          "live_policy_verification": "NOT_PERFORMED",
+          "min_holders": "50",
+          "min_liquidity_usd": "5000",
+          "semantic_sha256": "63b33150869273e8f5a0d5d214c8c679e24b5468125164ddcf95326bac4d533a",
+          "snapshot_source": "native-presearch-packet.json / universe_policy only",
+          "state": "ACTIVE"
+        }
+      },
+      "forbidden_input_reads": 0,
+      "git_mutations": 0,
+      "input_hashes_rechecked_before_write": true,
+      "input_root": "sal-forge-composite-v1",
+      "limitations": [
+        "Это acceptance discoverability/usability по трем разрешённым входам, не runtime/schema/validator acceptance.",
+        "Schemas, source, tests, diff, ResearchStore/RDP, actual corpus/schedules, parent chat и другие receipts не использовались.",
+        "Query JSON не выполнялись и не передавались validator/evaluator/Forge. Допустимость фактического schedule, input binding, PIT, численные support/outcomes, точность и alpha остаются UNKNOWN.",
+        "В operator есть исторический point_value-only checkpoint. Для fresh synthesis применён явно fresh раздел Raw composite recipes совместно с actual temporal_recipe_capabilities; исторические рецепты не переписываются.",
+        "Ни решение о real MAIN, ни budget/cap widening, ни provider/resource authority этим output не выдаются."
+      ],
+      "other_files_written": [],
+      "primary_packet_identity": {
+        "evidence_epoch_sha256": "6583c031fbab9115abb1acbfe00caaf924ced46a9ea995b7aa8466abe686082a",
+        "owner_focus": "SYNTHETIC_RAW_P1_NATIVE_V4",
+        "prompt_version": "HFIC-V1.2",
+        "search_key_sha256": "2e76697fbe8b00ce123d20c7632f724345cdf0af366beebaf8948d90272cc094"
+      },
+      "provider_calls": 0,
+      "read_set_note": "Только три перечисленных input files. Выполнены чтение текста, поиск внутри этих файлов и SHA256. Остальные corpus/source/schema/test/store/RDP/receipts/diff/Git не читались.",
+      "recipe_execution_performed": false,
+      "status": "PASS_CONCEPTUAL_DISCOVERABILITY_ONLY",
+      "store_or_rdp_writes": 0
+    },
     "actual_descriptor_matches_current_owner": true,
-    "agent_task": "native_presearch_recipe",
-    "allowed_inputs": [
-      "actual ordinary pre-search packet",
-      "hypothesis-forge skill",
-      "authorized operator guide"
-    ],
-    "behavior": "Witnessed missing complete example; same-atom guide repair enabled validator-ready SIMPLE and COMPOUND_FIRST; no EWM/alpha; full joint support distinguished from 24 examples",
-    "current_operator_sha256": "1452acd8cbc6b82195b955c2d0a2cdc9bc19f838ad108d37c67a157666974eda",
-    "input_file_logical_ref": "local/forge_composite_agent_presearch/presearch-packet.json",
-    "input_operator_commit": "bf59202d4ce4e4af556460cba9d5261e79984394",
-    "input_operator_sha256": "a35e5872e31ce921e8005bb865f7dc9a868e8fcb42941cfe63fd387feb6cdfd9",
-    "input_packet_sha256": "924ef417341f81ee3a8a7e6087c9a50218258598fa523baf927fb20a7da85e13",
-    "input_skill_sha256": "84f9842b61162dc5b3ef6a414aad0e70c96c036723596632020104ad7ae9607f",
-    "operator_delta": "Input guide reproducible from input_operator_commit plus two trailing newlines. Current guide adds typed failure recovery; recipe example and descriptor unchanged.",
-    "parent_chat_read": false,
-    "provider_calls": 0,
+    "agent_task": "p1_presearch_agent",
+    "input_file_logical_ref": "local/forge_composite_p1_native_v4/native-presearch-packet.json",
+    "input_operator_sha256": "3abafc5f04616f06c58785cfad61b886650c51143cd0cf6db4fded52c413ccf2",
+    "input_packet_sha256": "294d6ad4345ca2a5a7611fae8fb6d44d5b09f09568472824d8998457fb68fd34",
+    "input_skill_sha256": "ec55b9ff96b57cc4408781c98f1301a8a8308c7f749d0323a65da1fd1049dcdd",
     "query_spec_sha256": [
-      "1c192b3628e32af9dfe98c059d3e4d73e6a03c50f04d93b040011182acd4ebf5",
-      "5c89cb6eff5d9df459e7f122985bf46deeb814c0921336077fae2fe702a69c62"
-    ],
-    "source_schema_tests_diff_store_read": false,
-    "writes": 0
+      "2d5c7caafbc094a642a38da5719cf58982422fc53b64cf87a55bc151b3f702b3",
+      "ba7f707790e42a58c186ef092ad90fc04dc838b15623615a5aae6bf6a9f186da"
+    ]
   },
   "route": "NATIVE_ISOLATED_AGENT_FORK_NONE",
   "task_id": "FORGE_COMPOSITE_FEATURE_RECIPES_V1"

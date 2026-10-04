@@ -52,40 +52,35 @@
   "reviews": [
     {
       "findings": [
-        "Isolated full-content review plus final narrow delta; exact diff and bindings independently checked. P1 closed: fresh bound validation before reservation; saved/correction/pending precedence intact; repeated adversarial MAIN/preview witness has zero reservations; nine admission regression tests and final 22 arithmetic/legacy checks PASS; equal-ratio source-copy conflict is closed without changing legacy output. Final context metadata carry-forward independently checked: exact three evidence outlets selected, product source/tests unchanged. No remaining actionable finding."
-      ],
-      "role": "CODE_REVIEWER",
-      "verdict": "PASS"
-    },
-    {
-      "findings": [
-        "Isolated full-content review plus final narrow delta. A-F engineering evidence, actual descriptor/native query hashes, historical F input, native technical KILL lifecycle and registered numerical replay verified. No remaining outcome/DoD gap; no scientific acceptance or real-data grant."
-      ],
-      "role": "GOAL_DOD_CRITIC",
-      "verdict": "PASS"
-    },
-    {
-      "findings": [
-        "Independent read-only owner-UX review; preliminary code context reused, no implementation transcript. P2/P3 closed: safe typed recovery matrix and exact F input locator/history reproducibility. Full JSON, descriptor/native queries and all 24 content bindings verified. Model diversity/cryptographic identity unproven."
-      ],
-      "role": "OWNER_UX_CRITIC",
-      "verdict": "PASS"
-    },
-    {
-      "findings": [
-        "packet_fingerprint_sha256=bae0376261aa228d0f59e8ee3ab9dfe0143001e9cfa14becc875cc4a19470208",
-        "SEMANTIC_PREMISE PASS. Isolated packet/diff full review plus final delta; exact diff and all content bindings independently checked. PACKET_INFORMATION_PATH / PROCESS_OBLIGATION, diversity UNPROVEN.",
-        "P2 closed: selected lawful reference/exit source cells retained before arithmetic; equal relative targets no longer erase source-copy conflict. Four in-memory adversarial/legacy checks PASS; raw prefix denominators preserved in both delivery orders.",
-        "Default four-tuple/legacy output unchanged; new signature restricted to raw prefix branch. Legacy future-copy dependency remains explicitly limited compatibility; RAW claims cannot be extended to it.",
-        "Tests can pass while confusing equal ratios with source agreement or treating synthetic KILL as science. Both now constrained: native technical KILL is not market negative/reusable scientific evidence/new grant; schema/lifecycle authority unchanged. Immutable events/manifests remain durable truth, DuckDB rebuildable; no new evaluator/platform.",
-        "Final context-only carry-forward PASS: canonical resolver selects exact three completion evidence outlets, no evidence gap. Scope/write set/scientific claims/external caps/roles/stops/context budgets unchanged; product sources/tests/A-F hashes equal reviewed 604db700. Final deterministic rebind required before readiness."
+        "PENDING_NEW_EXACT_CONTENT_ISOLATED_REVIEW"
       ],
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "PASS"
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "PENDING_NEW_EXACT_CONTENT_ISOLATED_REVIEW"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "PENDING_NEW_EXACT_CONTENT_ISOLATED_REVIEW"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "PENDING_NEW_EXACT_CONTENT_ISOLATED_REVIEW"
+      ],
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "NOT_READY"
     }
   ],
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "task_id": "FORGE_COMPOSITE_FEATURE_RECIPES_V1",
-  "verdict": "PASS"
+  "verdict": "NOT_READY"
 }

@@ -1,7 +1,7 @@
 {
   "acceptance": {
     "A": {
-      "checks": "New arithmetic, positive denominator, typed unavailable, closed params/bound windows; legacy temporal 16 PASS",
+      "checks": "Raw arithmetic/closed windows; capability-only schema and grounding; unknown/unaccepted CAP fail-closed; legacy preview exact frozen-base golden and 40 legacy grounding/availability/temporal checks PASS",
       "selected_target_source_copy_integrity": "Equal ratios from contradictory selected reference/exit prices refuse TARGET_DELIVERY_CONFLICT; prefix eligibility/support preserved; both delivery orders verified",
       "verdict": "PASS"
     },
@@ -15,8 +15,10 @@
       "displayed_examples": 24,
       "each_operation_binding_persisted": true,
       "empty_admitted_cohort_explicit": true,
+      "legacy_non_raw_preview": "Public full mixed query projects only point_value features and preserves frozen-base identity/output; full-prefix owner never invoked",
       "outcome_value_loads": 0,
       "return_ratio_joint_calculable_n": 20,
+      "scope": "RAW_HOLDER_DELTA_RETURN_RATIO_COMPOSITES_ONLY",
       "universe": {
         "FAIL": 4,
         "PASS": 40,
@@ -32,12 +34,26 @@
       "verdict": "PASS"
     },
     "D": {
+      "availability_denial_codes": [],
       "classifier": "NOT_APPLICABLE_ON_NATIVE_KILL",
       "definition_sha256": "d3510e65d5979a25e227f945a85b61265dcd1e01a7a224b7a06834c948ec2057",
-      "native_terminal": "KILL_UNBOUND_EVIDENCE",
+      "grounding": {
+        "capability_bindings": [
+          {
+            "accepted": true,
+            "authority_granted": false,
+            "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+          }
+        ],
+        "context_packet_sha256": "376d63cfd7056fd43a2c0c8ad2c338b9f5907e787604d2305e0f2075dd3fff5f",
+        "feature_bindings": [],
+        "terminal": "GROUNDED",
+        "unresolved_requirements": []
+      },
+      "native_terminal": "KILL_LOW_INFORMATION_VALUE",
       "owner_final": "NON_SCIENTIFIC_STOP",
-      "owner_receipt_sha256": "dd081ecc0fc58efa774c68ae3ea0e4ed4d4f2651e6e740011339090de1199715",
-      "packet_canonical_sha256": "2cc1c656b3f16a3276a7f3ff68786f774d997dbffa97826d2d41d240232c309f",
+      "owner_receipt_sha256": "9e877b9fc91249b54ec00de68e81c5a2ff58abf35a5554a1e55c9bfdc116edcf",
+      "packet_canonical_sha256": "de25b249c3f7eaa438e8eed33ac640932b565f0295aa95779ba8feff33e9950f",
       "path": [
         "public MAIN commit despite reply loss",
         "exact saved grounded readback",
@@ -48,17 +64,28 @@
         "required finalize",
         "forge-run --persist"
       ],
-      "result_sha256": "b7be37449c132edf19a4987f82fb21dbd27f4be518a0cd9cf6451dbfe34b89b9",
+      "public_refused_faults": [
+        "GROUNDED_EVIDENCE_REQUIRED",
+        "GROUNDED_RESULT_MISMATCH",
+        "FORGE_CANDIDATE_UNKNOWN_CAPABILITY_ID"
+      ],
+      "refused_inventory_unchanged": true,
+      "required_capability_ids": [
+        "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+      ],
+      "required_feature_ids": [],
+      "result_sha256": "1a74de2532ae9c7eff18f984b8cb6b2d7ae58098bfa635c8fc5767b3f51bc95f",
       "scientific_acceptance": "NOT_CLAIMED",
-      "session_id": "HFIC-SESS-99DCDEEB83D93FFA",
+      "session_id": "HFIC-SESS-2E76697FBE8B00CE",
       "spec_sha256": "a81a55e0334c5cabd8586ed6ca359d99c2e4c35c404945d606c24e6a4fe19176",
+      "unresolved_requirements": [],
       "verdict": "PASS_ENGINEERING_PATH"
     },
     "E": {
       "cold_inventory_unchanged": true,
       "cold_owner_evaluator_calls": 0,
       "cold_owner_value_loads": 0,
-      "completion_output_sha256": "6191333d995546615bf23f58f56011affd80b0f9ea3f4ff22802c24adc9f80fb",
+      "completion_output_sha256": "65467296d77518f74b6292f69c22d7548c487e4c618dae5b4162546d8fc15389",
       "next_legacy_owner_final": "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
       "operation_state": "COMPLETED",
       "registered_replay_evaluator_calls": 1,
@@ -69,7 +96,7 @@
     "F": {
       "isolation_receipt": "a1_native_isolation_v1.json",
       "native_queries": "a1_native_agent_queries_v1.json",
-      "public_validator": "Both native query hashes match current validator; actual pre-search descriptor matches current owner",
+      "public_validator": "Fresh isolated packet-only agent queries validated; descriptor matches existing owner; guide/skill hashes exact to execution commit",
       "semantic_gold": "Existing plus Russian holder growth, mixed hypothesis and raw holder availability PASS",
       "verdict": "PASS"
     }
@@ -77,7 +104,7 @@
   "as_of": "2026-10-04",
   "authority_brief_sha256": "d3abed94024646c2256199d954e28a1971c7e26c5eeb346890810493f53c92fc",
   "base": "27366b752cd0fae9683dd50373ea8ff8da5a6f6d",
-  "execution_commit": "bf59202d4ce4e4af556460cba9d5261e79984394",
+  "execution_commit": "66abc2bb41db2e7f4cb2704980f74f4aafd0da7b",
   "generated_sync": {
     "base": "27366b752cd0fae9683dd50373ea8ff8da5a6f6d",
     "budget_expansion": false,
@@ -86,11 +113,12 @@
     "mode": "INCREMENTAL"
   },
   "limits": [
-    "Synthetic acceptance is not alpha/market negative/net return/PIT_READY/real-science grant",
-    "Legacy point/PRICE-only identities/population stay frozen, including inherited conflicting-future delivery behavior",
-    "Native negative owner-final is a technical stop; quota stays spent; no HARD_CLOSE",
-    "No merge; exact-head CI and owner phrase required"
+    "Synthetic evidence is not alpha/market negative/net return/PIT_READY/real-science grant",
+    "Legacy point/PRICE/LIQ preview projection and scientific identities/populations stay frozen",
+    "GROUNDED proves binding only; native scientific terminal retains existing lifecycle meaning; spent quota is not refunded",
+    "No merge; new exact-head CI and owner phrase required"
   ],
+  "owner_repair_request_sha256": "f11e73d8f21ccdf50c228bae81ba8d5373549ad65f2c5f9d39cb36287b53a2fd",
   "real_authority_effects": {
     "budget_estimand_expansion": 0,
     "c5_holdout_reads": 0,
@@ -108,48 +136,42 @@
   "scope": "RAW_ONLY_DISPOSABLE_SYNTHETIC",
   "targeted_validation": [
     {
-      "result": "13 PASS; empty-cohort test fixture repaired and passed separately; exact-head CI owns full module",
-      "scope": "new recipe module"
+      "result": "PASS",
+      "scope": "current composite module A-E including actual public freeze and next legacy cycle",
+      "seconds": 183.271,
+      "tests": 20
     },
     {
       "result": "PASS",
-      "scope": "legacy temporal plus repaired empty-cohort case",
-      "seconds": 4.822,
-      "tests": 17
+      "scope": "legacy temporal/grounding/availability",
+      "seconds": 9.02,
+      "tests": 40
     },
     {
       "result": "PASS",
-      "scope": "DocumentRunner + saved result revision + legacy cold KILL",
-      "seconds": 198.424,
-      "tests": 3
-    },
-    {
-      "result": "PASS_22_SKIPPED_1",
-      "scope": "preflight and physical-path CLI",
-      "seconds": 89.939,
-      "tests": 23
-    },
-    {
-      "result": "Earlier direct suites PASS after narrowed repairs",
-      "scope": "holder/lifecycle/universe/coherence/semantic direct consumers"
+      "scope": "holder point direct consumers",
+      "tests": 12
     },
     {
       "result": "PASS",
-      "scope": "semantic gold routing and Catalog search",
-      "seconds": 13.947,
+      "scope": "ordinary operations unchanged",
+      "tests": 14
+    },
+    {
+      "result": "PASS",
+      "scope": "saved result revision direct consumer",
+      "tests": 1
+    },
+    {
+      "result": "PASS",
+      "scope": "semantic operability and Catalog routing",
+      "seconds": 13.728,
       "tests": 18
     },
     {
       "result": "PASS",
-      "scope": "Public reversed bound-window MAIN/preview, raw arithmetic/overlap, existing ordinary-operation lifecycle",
-      "seconds": 261.863,
-      "tests": 22
-    },
-    {
-      "result": "PASS",
-      "scope": "Selected target-source signature regression plus raw arithmetic/overlap and legacy temporal",
-      "seconds": 2.762,
-      "tests": 22
+      "scope": "legacy v1.1/v1.2 draft-schema/freeze compatibility",
+      "tests": 3
     }
   ],
   "task_id": "FORGE_COMPOSITE_FEATURE_RECIPES_V1"
