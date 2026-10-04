@@ -66,6 +66,11 @@ Disagreement in membership cells excludes that identity. A future target-copy
 disagreement keeps prefix support but makes the raw MAIN target unavailable
 (`TARGET_DELIVERY_CONFLICT`), independent of delivery order. Undeclared cells
 cannot change prefix support. Legacy queries keep their accepted conflict policy.
+Copy comparison retains declared source cells and the projection from the common
+feature owner. Existing elapsed_seconds/utc_hour therefore retain bound clock
+semantics: contradictory projected values are unavailable, independent of copy
+order, without deleting the eligible seat. Equal arithmetic results cannot hide
+contradictory source operands.
 
 For raw-holder composites containing holder delta/return_ratio, public
 `discovery-preview` retains every declared feature and loads only its

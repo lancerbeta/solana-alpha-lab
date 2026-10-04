@@ -192,6 +192,42 @@ class EntryWitness(unittest.TestCase):
 
 
 class RawArithmeticTests(unittest.TestCase):
+    def test_raw_mixed_clock_conflict_preserves_seat_and_is_order_invariant(self):
+        from tests.test_hfic_temporal_discovery_v1 import _obs, OFFSETS
+        anchor=ANCHOR+timedelta(minutes=44,seconds=10)
+        copies=[]; binding=[_bind(COHORT,RELEASE),_bind(COHORT_B,RELEASE_B)]
+        for i,(cohort,release) in enumerate(((COHORT,RELEASE),(COHORT_B,RELEASE_B))):
+            census,rows=_member_path("clock-feature",cohort,release,anchor,[1,1.2,1.5,1.2],(10000,9000),1.44)
+            for point,value in (("X300",60),("Y3600",120)):
+                stamp=(anchor+timedelta(seconds=OFFSETS[point])).strftime("%Y-%m-%dT%H:%M:%SZ")
+                rows.append({**_obs("clock-feature",point,HOLDER,value,at=stamp),"cohort_id":cohort,"release_id":release})
+            copies.append((census,rows))
+            binding[i]["schedule_point_due_offset_seconds"]={**OFFSETS,"Y900":900+100*i}
+            binding[i]["schedule_point_lateness"]={point:300 for point in OFFSETS}
+        for holder_op in ("delta","return_ratio"):
+            for clock_feature,predicate in (
+                ({"name":"clock","op":"elapsed_seconds","start":"Y900","end":"Y1800"},{"feature":"clock","op":"gt","value":850}),
+                ({"name":"clock","op":"utc_hour","point":"Y900"},{"feature":"clock","op":"lt","value":1})):
+                query=_simple()
+                query.update(features=[{"name":"h","op":holder_op,"field_id":HOLDER,"start":"X300","end":"Y3600"},clock_feature],
+                             all=[{"feature":"h","op":"gt","value":0},predicate])
+                projected={"decision":query["decision"],"schedule":{**query["schedule"],"points":["X300","Y900","Y1800","Y3600"]},
+                           "features":query["features"],"seed":"clock-conflict"}
+                outputs=[]
+                for order in (copies,list(reversed(copies))):
+                    census=[c[0] for c in order];rows=[r for c in order for r in c[1]]
+                    result=execute_discovery_from_rows(census,rows,query,binding)["summary"]
+                    with mock.patch.object(temporal,"_target_projection",side_effect=AssertionError("preview read target")):
+                        preview=temporal.build_feature_preview(census,[r for r in rows if r["point_id"]!="Y7200"],projected,binding)
+                    self.assertEqual((result["decision_eligible_n"],result["matched_n"],result["feature_unknown_n"]),(1,0,1))
+                    pooled=preview["support_summary"]["pooled"]
+                    self.assertEqual((pooled["decision_eligible_n"],pooled["joint_calculable_n"]),(1,0))
+                    self.assertEqual(pooled["features"]["h"]["calculable_n"],1)
+                    self.assertEqual(pooled["features"]["clock"]["reason_counts"],{"DELIVERY_CONFLICT":1})
+                    self.assertIsNone(preview["examples"][0]["feature_values"]["clock"])
+                    outputs.append((result,preview))
+                self.assertEqual(outputs[0],outputs[1])
+
     def test_legacy_preview_exact_base_output(self):
         expected=json.loads((ROOT/"tests/fixtures/forge_composite_feature_recipes_v1/legacy_preview_base_v1.json").read_text(encoding="utf-8"))
         with mock.patch.object(temporal,"_build_recipe_preview",side_effect=AssertionError("raw owner invoked")):

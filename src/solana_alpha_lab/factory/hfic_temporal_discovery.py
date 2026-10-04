@@ -2463,7 +2463,19 @@ def _prefix_copy_integrity(census, grouped, body, binding, *, universe_policy, p
         if universe_policy is not None:
             membership.extend([(decision, HOLDER_COUNT), (decision, LIQUIDITY)])
         signatures[key] = (str(row.get("candidate_state") or ""), cells(membership))
-        features = {f["name"]: cells(_feature_dependencies(f)) for f in body["features"]}
+        features = {}
+        for feature in body["features"]:
+            # Cell values alone omit the bound clocks used by time features.
+            # Reuse the actual feature owner; retain cells so arithmetic cannot
+            # conceal contradictory operands with an equal derived value.
+            projection = _feature_value_with_lineage(
+                grouped, cohort=key[1], release=key[2], mint=key[0], anchor=anchor,
+                feature=feature, lateness=lateness, decision_deadline=cutoff,
+                due_offset_for=lambda point: _clock(item, point, lateness)[0],
+                lateness_for=lambda point: _clock(item, point, lateness)[1],
+                snapshot_policy=snapshot_policy,
+            )
+            features[feature["name"]] = (cells(_feature_dependencies(feature)), projection)
         target = None
         if not prefix_only:
             source_detail = {}
