@@ -75,7 +75,10 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
     - src/solana_alpha_lab/factory/hfic_temporal_discovery.py
     - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/forge_composite_feature_recipes_v1/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/forge_composite_feature_recipes_v1/a1_delivery_independent_review_v1.json
+    - docs/evidence/forge_composite_feature_recipes_v1/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

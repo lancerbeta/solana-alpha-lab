@@ -1,0 +1,52 @@
+{
+  "as_of": "2026-10-04",
+  "non_claims": [
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_MERGE"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "review_id": "FORGE-COMPOSITE-FEATURE-RECIPES-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "findings": [
+        "PENDING_ISOLATED_FINAL_REVIEW"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "PENDING_ISOLATED_FINAL_REVIEW"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "PENDING_ISOLATED_FINAL_REVIEW"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "PENDING_ISOLATED_FINAL_REVIEW"
+      ],
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "NOT_READY"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "FORGE_COMPOSITE_FEATURE_RECIPES_V1",
+  "verdict": "NOT_READY"
+}

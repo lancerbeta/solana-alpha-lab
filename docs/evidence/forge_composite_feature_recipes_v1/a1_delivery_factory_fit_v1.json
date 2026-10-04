@@ -1,0 +1,36 @@
+{
+  "as_of": "2026-10-04",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Separate owner real-contrast decision after support/precision assessment; concrete recipe plus explicit science authority triggers, engineering CI does not"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_WRAP_EXISTING_OWNERS_NO_DEPENDENCY_SERVICE",
+    "context_efficiency": "PASS_ONE_CURRENT_CONTRACT_BOUNDED_ROUTES_NO_PACKET_ROOT_BUDGET_INCREASE",
+    "execution_to_cashflow": "NOT_APPLICABLE_PRICE_RELATIVE_PROXY_NO_ALPHA_NET_RETURN",
+    "flexibility_and_history": "PASS_LEGACY_IDENTITIES_RESULTS_READERS_NEW_RAW_QUERY_LOCAL_PREFIX",
+    "mission": "PASS_NATIVE_RAW_COMPOSITION_WITHOUT_NEW_COMPONENT",
+    "monitoring_and_recovery": "PASS_REPLY_LOSS_DRAFT_RESUME_NATIVE_FINAL_COLD_REPLAY_NEXT_LEGACY",
+    "owner_operability": "PASS_FULL_JSON_WARNING_REFUSAL_RECOVERY_GUIDE_NATIVE_AGENT_VALIDATOR_PASS",
+    "red_team": "PASS_TARGET_CLOCK_ORDER_EMPTY_COHORT_CROSS_OPERATION_IDENTITY_TAMPER_GUARD",
+    "research_truth": "PASS_OUTCOME_FREE_FULL_SUPPORT_NOT_SAMPLE_SAVED_VS_NUMERICAL_REPLAY_UNKNOWN_NOT_NEGATIVE",
+    "security": "PASS_NO_PROVIDER_SIGNER_SECRET_HOLDOUT_LIVE_DATA_PATH_BYPASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_REAL_SCIENCE_GRANT",
+    "NO_MARKET_NEGATIVE",
+    "NO_EWM",
+    "NO_LIVE_STORE_PROFILE_OPERATION_MUTATION",
+    "EXACT_HEAD_CI_OWNER_PHRASE_REQUIRED"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "Base includes #373. Before new production records separately authorized revert; after use retain readers and forward-fix. No live migration.",
+  "review_id": "FORGE-COMPOSITE-FEATURE-RECIPES-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FORGE_COMPOSITE_FEATURE_RECIPES_V1",
+  "verdict": "PASS"
+}

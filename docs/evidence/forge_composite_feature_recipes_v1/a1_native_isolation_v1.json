@@ -1,0 +1,53 @@
+{
+  "critic": {
+    "agent_task": "delivery_native_critic",
+    "allowed_scientific_input": "ACTUAL_FROZEN_CRITIC_INPUT_PACKET_ONLY",
+    "experiment_execution": 0,
+    "git_mutations": 0,
+    "incidental_adjacent_source": "Generic run_live_classifier header/start visible during identity lookup; not scientific input; classifier never invoked",
+    "input_canonical_sha256": "2cc1c656b3f16a3276a7f3ff68786f774d997dbffa97826d2d41d240232c309f",
+    "input_file_logical_ref": "local/forge_composite_native_delivery/native-critic-packet.json",
+    "input_file_sha256": "ff5a730c448579732c1a1d49f86be92ee01e7b35262c6834c4d7f01651654486",
+    "output_artifact_write_after_verdict": 1,
+    "output_writes_during_critic": 0,
+    "parent_chat_read": false,
+    "product_diff_or_tests_read": false,
+    "provider_calls": 0,
+    "rdp_store_read": false,
+    "reads": [
+      "critic skill/policy/input/result schemas",
+      "operator PROMPT B",
+      "hfic_identity.py:1-96",
+      "run_passport.py:199-217",
+      "hfic_session.py identity/hash excerpts:2281-2295,6039-6056,6452-6496,7089-7107",
+      "hypothesis_forge.py import/identity routing only"
+    ],
+    "result_file_sha256": "b550cb24c7df09e3f36df3486cb1571658a81cce6aad55e03a34025fd56e72aa"
+  },
+  "model_diversity": "UNPROVEN",
+  "presearch_agent": {
+    "actual_descriptor_matches_current_owner": true,
+    "agent_task": "native_presearch_recipe",
+    "allowed_inputs": [
+      "actual ordinary pre-search packet",
+      "hypothesis-forge skill",
+      "authorized operator guide"
+    ],
+    "behavior": "Witnessed missing complete example; same-atom guide repair enabled validator-ready SIMPLE and COMPOUND_FIRST; no EWM/alpha; full joint support distinguished from 24 examples",
+    "current_operator_sha256": "fff7faf0bca1846472d5190097f23d8b544d5c8d7594316b422d5dd8319f8bab",
+    "input_operator_sha256": "a35e5872e31ce921e8005bb865f7dc9a868e8fcb42941cfe63fd387feb6cdfd9",
+    "input_packet_sha256": "924ef417341f81ee3a8a7e6087c9a50218258598fa523baf927fb20a7da85e13",
+    "input_skill_sha256": "84f9842b61162dc5b3ef6a414aad0e70c96c036723596632020104ad7ae9607f",
+    "operator_delta": "Two trailing newlines removed; prior input bytes reproducible by appending them to current guide",
+    "parent_chat_read": false,
+    "provider_calls": 0,
+    "query_spec_sha256": [
+      "1c192b3628e32af9dfe98c059d3e4d73e6a03c50f04d93b040011182acd4ebf5",
+      "5c89cb6eff5d9df459e7f122985bf46deeb814c0921336077fae2fe702a69c62"
+    ],
+    "source_schema_tests_diff_store_read": false,
+    "writes": 0
+  },
+  "route": "NATIVE_ISOLATED_AGENT_FORK_NONE",
+  "task_id": "FORGE_COMPOSITE_FEATURE_RECIPES_V1"
+}

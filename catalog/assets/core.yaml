@@ -39930,7 +39930,7 @@ records:
   as_of: '2026-10-04'
   truth_owner: FORGE_COMPOSITE_FEATURE_RECIPES_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FORGE_COMPOSITE_FEATURE_RECIPES_V1.md', repository_path: docs/tasks/FORGE_COMPOSITE_FEATURE_RECIPES_V1.md}
-  integrity: {kind: sha256, sha256: e31174aa35130fcef81a7ec76c4af2956287ba96096310d9b83493c9c9a86ea0}
+  integrity: {kind: sha256, sha256: 3133e927ecaec4107491cd9c8da3e6f3c7f608b37d3cc0db0bc8ecd406d5ec24}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -39955,4 +39955,45 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
   evidence: []
   search_terms: [SEM-HYPOTHESIS-FORGE, SEM-MARKET-DATA-FEATURES, holder growth, mixed hypothesis, raw holder availability, FORGE_COMPOSITE_FEATURE_RECIPES_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: EVIDENCE-FORGE-COMPOSITE-FEATURE-RECIPES-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Synthetic A-F, native isolated decisions and exact candidate delivery binding; no real science grant.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-04'
+  truth_owner: FORGE_COMPOSITE_FEATURE_RECIPES_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/evidence/forge_composite_feature_recipes_v1/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/forge_composite_feature_recipes_v1/a1_delivery_completion_evidence_v1.json}
+  integrity:
+    kind: runtime_receipt
+    reference: repo://docs/evidence/forge_composite_feature_recipes_v1/a1_delivery_completion_evidence_v1.json
+    note: Exact implementation/review/fit bindings are verified by Delivery Harness; avoid self-pinning a Catalog in this inventory.
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CTRL-FORGE-COMPOSITE-FEATURE-RECIPES-001}
+  - {relation_type: depends_on, target_asset_id: TEST-FORGE-COMPOSITE-FEATURE-RECIPES-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [FORGE_COMPOSITE_FEATURE_RECIPES_V1, raw holder recipes, full support, native acceptance]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: REPORT-FORGE-COMPOSITE-FEATURE-RECIPES-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Owner RAW capability readout, synthetic evidence limits, recovery and separate next science decision.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-04'
+  truth_owner: FORGE_COMPOSITE_FEATURE_RECIPES_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/forge_composite_feature_recipes_v1/a1_owner_readout_v1.md', repository_path: docs/reports/forge_composite_feature_recipes_v1/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: dceb24a006e2955bdef417f08b941f3df9d599ad490b423e9689b4e30717382d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
+  - {relation_type: depends_on, target_asset_id: EVIDENCE-FORGE-COMPOSITE-FEATURE-RECIPES-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [FORGE_COMPOSITE_FEATURE_RECIPES_V1, holder growth, mixed hypothesis, raw holder availability]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

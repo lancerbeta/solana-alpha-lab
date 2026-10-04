@@ -1,0 +1,56 @@
+{
+  "acceptance_id": "FORGE-COMPOSITE-FEATURE-RECIPES-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-10-04",
+  "base_main": "27366b752cd0fae9683dd50373ea8ff8da5a6f6d",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/forge_composite_feature_recipes_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {},
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_MARKET_NEGATIVE",
+    "NO_LIVE_STORE_MUTATION",
+    "NO_REAL_MAIN_ADAPTIVE",
+    "NO_HOLDOUT",
+    "NO_NEW_SCIENCE_GRANT",
+    "NO_MERGE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "external_actions": 0,
+    "local_writes": 1,
+    "network_calls": 0
+  },
+  "state_change": "RAW_COMPOSITE_RECIPES_FULL_PREFIX_SUPPORT_VERIFIED_SAVED_REPLAY_NATIVE_SYNTHETIC_LIFECYCLE",
+  "task_id": "FORGE_COMPOSITE_FEATURE_RECIPES_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/forge_composite_feature_recipes_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "project_checks": [
+      "PASS_DIRECT_CONSUMERS",
+      "PASS_NATIVE_SYNTHETIC_LIFECYCLE",
+      "PASS_ACTUAL_PRESEARCH_AGENT_BEHAVIOR"
+    ],
+    "targeted": "PASS_RAW_RECIPES_PUBLIC_VERTICAL_A_F"
+  }
+}
