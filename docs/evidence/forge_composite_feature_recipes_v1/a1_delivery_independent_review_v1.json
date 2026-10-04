@@ -11,7 +11,7 @@
       "finding": "P1: incompatible bound window admitted before reservation/value loading",
       "observed_head": "08d144f48baec24ffdbf79bdf2f26fab6d4fb834",
       "prior_verdict": "NOT_READY",
-      "resolved_by_head": "604db7009a2de873ea9d6703554da8f5a3e01da9",
+      "resolved_by_head": "1b1baf5cc7ad2e16d7df002fb868b0eb3b7a84b8",
       "role": "CODE_REVIEWER",
       "severity": "MAJOR"
     },
@@ -19,7 +19,7 @@
       "finding": "P2: failure meanings lacked safe next actions",
       "observed_head": "08d144f48baec24ffdbf79bdf2f26fab6d4fb834",
       "prior_verdict": "NOT_READY",
-      "resolved_by_head": "604db7009a2de873ea9d6703554da8f5a3e01da9",
+      "resolved_by_head": "1b1baf5cc7ad2e16d7df002fb868b0eb3b7a84b8",
       "role": "OWNER_UX_CRITIC",
       "severity": "MINOR"
     },
@@ -27,7 +27,7 @@
       "finding": "P3: native pre-search input packet lacked exact logical locator",
       "observed_head": "08d144f48baec24ffdbf79bdf2f26fab6d4fb834",
       "prior_verdict": "NOT_READY",
-      "resolved_by_head": "604db7009a2de873ea9d6703554da8f5a3e01da9",
+      "resolved_by_head": "1b1baf5cc7ad2e16d7df002fb868b0eb3b7a84b8",
       "role": "OWNER_UX_CRITIC",
       "severity": "MINOR"
     },
@@ -35,7 +35,7 @@
       "finding": "P2: equal relative target concealed conflicting selected source prices",
       "observed_head": "12fda667ca0a8c101e7cd6efae782a5997ae1dae",
       "prior_verdict": "NOT_READY",
-      "resolved_by_head": "604db7009a2de873ea9d6703554da8f5a3e01da9",
+      "resolved_by_head": "1b1baf5cc7ad2e16d7df002fb868b0eb3b7a84b8",
       "role": "ARCHITECTURE_CRITIC",
       "severity": "MINOR"
     }
@@ -47,12 +47,12 @@
     "OWNER_UX_CRITIC"
   ],
   "review_id": "FORGE-COMPOSITE-FEATURE-RECIPES-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "f6f54a0fc280389aa2b64846d46a93110ecc2fa7220568ffaa021180fcddb3b3",
-  "reviewed_inventory_sha256": "c4a676bc4f7727578609136bb6370011232b6b78055a2b602636453307e70da9",
+  "reviewed_bindings_sha256": "e7975ef3e1ccd489d26c5cdf956a6fdca9dcdae2cc96313015e76fe2050a4f00",
+  "reviewed_inventory_sha256": "95f6d7583fa8a02726b77eff3a9ec8c16b475c2a8b02f345bf31f68943077503",
   "reviews": [
     {
       "findings": [
-        "Isolated full-content review plus final narrow delta; exact diff and bindings independently checked. P1 closed: fresh bound validation before reservation; saved/correction/pending precedence intact; repeated adversarial MAIN/preview witness has zero reservations; nine admission regression tests and final 22 arithmetic/legacy checks PASS; equal-ratio source-copy conflict is closed without changing legacy output. No remaining actionable finding."
+        "Isolated full-content review plus final narrow delta; exact diff and bindings independently checked. P1 closed: fresh bound validation before reservation; saved/correction/pending precedence intact; repeated adversarial MAIN/preview witness has zero reservations; nine admission regression tests and final 22 arithmetic/legacy checks PASS; equal-ratio source-copy conflict is closed without changing legacy output. Final context metadata carry-forward independently checked: exact three evidence outlets selected, product source/tests unchanged. No remaining actionable finding."
       ],
       "role": "CODE_REVIEWER",
       "verdict": "PASS"
@@ -73,11 +73,12 @@
     },
     {
       "findings": [
-        "packet_fingerprint_sha256=4891b142d6f40cc7e9efcb27c875139cc4fabc70c06312be245d7966c6924a6c",
+        "packet_fingerprint_sha256=bae0376261aa228d0f59e8ee3ab9dfe0143001e9cfa14becc875cc4a19470208",
         "SEMANTIC_PREMISE PASS. Isolated packet/diff full review plus final delta; exact diff and all content bindings independently checked. PACKET_INFORMATION_PATH / PROCESS_OBLIGATION, diversity UNPROVEN.",
         "P2 closed: selected lawful reference/exit source cells retained before arithmetic; equal relative targets no longer erase source-copy conflict. Four in-memory adversarial/legacy checks PASS; raw prefix denominators preserved in both delivery orders.",
         "Default four-tuple/legacy output unchanged; new signature restricted to raw prefix branch. Legacy future-copy dependency remains explicitly limited compatibility; RAW claims cannot be extended to it.",
-        "Tests can pass while confusing equal ratios with source agreement or treating synthetic KILL as science. Both now constrained: native technical KILL is not market negative/reusable scientific evidence/new grant; schema/lifecycle authority unchanged. Immutable events/manifests remain durable truth, DuckDB rebuildable; no new evaluator/platform."
+        "Tests can pass while confusing equal ratios with source agreement or treating synthetic KILL as science. Both now constrained: native technical KILL is not market negative/reusable scientific evidence/new grant; schema/lifecycle authority unchanged. Immutable events/manifests remain durable truth, DuckDB rebuildable; no new evaluator/platform.",
+        "Final context-only carry-forward PASS: canonical resolver selects exact three completion evidence outlets, no evidence gap. Scope/write set/scientific claims/external caps/roles/stops/context budgets unchanged; product sources/tests/A-F hashes equal reviewed 604db700. Final deterministic rebind required before readiness."
       ],
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS"
