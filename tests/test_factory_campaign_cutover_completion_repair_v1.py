@@ -17,6 +17,7 @@ from solana_alpha_lab.factory.observation_schedule import load_observation_sched
 from solana_alpha_lab.factory.observation_schedule_lifecycle import (
     register_schedule, authorize_schedule, activate_schedule, rollover_schedule,
     complete_draining_schedule, pause_schedule,
+    _draining_transition_evidence,
 )
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
 from solana_alpha_lab.factory.research_store import ResearchStore
@@ -186,6 +187,45 @@ class CutoverRepairLoopTests(unittest.TestCase):
         before = self.row()
         self.assertEqual(self.complete(self.cutover)["terminal"], "DRAINING_PENDING")
         self.assertEqual(self.row(), before)
+
+    def test_coherent_sequence_drift_is_unknown(self):
+        row = self.row()
+        self.store._conn.execute("UPDATE schedule_activations SET transition_sequence=?, payload_json=? WHERE activation_id=?",
+            (999, json.dumps({**row["payload"], "transition_sequence": 999}), "ACT-PRE"))
+        self.store._conn.commit()
+        before = self.row()
+        self.assertEqual(self.complete(self.cutover)["terminal"], "DRAINING_PROOF_UNKNOWN")
+        self.assertEqual(self.row(), before)
+
+    def test_coherent_authority_drift_is_unknown(self):
+        row = self.row()
+        self.store._conn.execute("UPDATE schedule_activations SET authority_receipt_sha256=?, payload_json=? WHERE activation_id=?",
+            ("0" * 64, json.dumps({**row["payload"], "authority_receipt_sha256": "0" * 64}), "ACT-PRE"))
+        self.store._conn.commit()
+        before = self.row()
+        self.assertEqual(self.complete(self.cutover)["terminal"], "DRAINING_PROOF_UNKNOWN")
+        self.assertEqual(self.row(), before)
+
+    def test_completion_proof_never_opens_growing_member_history(self):
+        manifests = ResearchStore(self.data)._committed_manifests()
+        event_id = self.row()["last_transition_event_id"]
+        expected = "RESEARCH-TXN-" + event_id.upper()
+        verify = ResearchStore._verify_partition
+        for size in (10, 200):
+            opened = []
+            history = [manifests[0].model_copy(update={"partition_id": "RESEARCH-TXN-OBS-MEMB-" + str(i)})
+                       for i in range(size)]
+            def guarded_verify(research, manifest):
+                opened.append(manifest.partition_id)
+                self.assertEqual(manifest.partition_id, expected)
+                return verify(research, manifest)
+            with (
+                patch.object(ResearchStore, "_committed_manifests", return_value=tuple(manifests) + tuple(history)),
+                patch.object(ResearchStore, "_verify_partition", guarded_verify),
+            ):
+                self.assertIsNotNone(_draining_transition_evidence(self.data, self.row(),
+                                      now=self.cutover, exact_transition=True))
+            self.assertEqual(opened, [expected])
 
     def test_malformed_proof_never_mutates(self):
         original = self.row()["payload"]

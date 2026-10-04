@@ -15,14 +15,14 @@
   "dimensions": {
     "mission": "Preserve forward capture through prepared campaign rollover.",
     "flexibility_and_history": "No schema/history rewrite; valid early and expiry drain stay supported.",
-    "context_efficiency": "Two existing completion boundaries; 73 focused tests; one bounded atom.",
+    "context_efficiency": "Two existing completion boundaries; 76 focused tests; one bounded atom.",
     "research_truth": "Committed effective lifecycle proof owns closure; UNKNOWN remains no mutation.",
     "owner_operability": "Exact missing-proof terminal and native recovery procedure; no weekly manual reboot.",
     "execution_to_cashflow": "Data continuity only; no alpha/trading/cashflow claim.",
     "monitoring_and_recovery": "Existing Telegram/watch retained; isolated and ordinary live acceptance.",
     "build_vs_buy": "Existing lifecycle readers, SQLite and canonical release; no dependency.",
     "security": "Fake provider and synthetic stores; operational data outside Git.",
-    "red_team": "Future empty queue, restart, spanning tick, obligations and corrupt projection tested."
+    "red_team": "Future empty queue, restart, spanning tick, obligations, coherent projection corruption and growing member-history payload exclusion tested."
   },
   "limits": [
     "EXACT_HEAD_CI_REQUIRED",

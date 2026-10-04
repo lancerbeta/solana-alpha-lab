@@ -27,7 +27,7 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_73_FOCUSED_TESTS",
+    "targeted": "PASS_76_FOCUSED_TESTS",
     "independent_review": {
       "path": "docs/evidence/factory_campaign_cutover_completion_repair/a1_delivery_independent_review_v1.json",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
