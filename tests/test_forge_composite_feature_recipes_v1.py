@@ -630,8 +630,8 @@ def prepare_scientific_path(test, workspace, *, focus="SYNTHETIC_RAW_SCIENTIFIC_
         bad_path.write_text(json.dumps(refused),encoding="utf-8")
         denied=run_cli("freeze","--draft",str(bad_path),"--preflight-receipt",str(receipt_path),"--format","json",data_root=root)
         test.assertNotEqual(denied.returncode,0,denied.stdout+denied.stderr)
-        reason=json.loads(denied.stdout)["reason_code"]
-        test.assertIn(reason,{"GROUNDED_EVIDENCE_REQUIRED","GROUNDED_RESULT_MISMATCH","FORGE_CANDIDATE_UNKNOWN_CAPABILITY_ID"},denied.stdout)
+        reason=denied.stderr.strip()
+        test.assertIn(reason,{"GROUNDED_EVIDENCE_REQUIRED","GROUNDED_RESULT_MISMATCH","FORGE_CANDIDATE_UNKNOWN_CAPABILITY_ID"},denied.stdout+denied.stderr)
         test.assertEqual(ResearchStore(root).diagnostics().committed_inventory_sha256,before)
     persisted=call("persist-draft","--draft",str(draft_path),"--preflight-receipt",str(receipt_path),"--representation-id","BASE")
     resume=call("preflight","--discovery-contract","--owner-focus",focus)
