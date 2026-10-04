@@ -350,3 +350,15 @@ queries:
 - query_id: SGQ-COLLECTOR-WRITES-DATA
   query: collector writes data
   required_top_route: SEM-LIVE-COLLECTION
+- query_id: SGQ-HOLDER-GROWTH-RU
+  query: рост holders
+  required_top_route: SEM-HYPOTHESIS-FORGE
+- query_id: SGQ-MIXED-HYPOTHESIS-RU
+  query: смешанная гипотеза
+  required_top_route: SEM-HYPOTHESIS-FORGE
+- query_id: SGQ-RAW-HOLDER-AVAILABILITY
+  query: raw holder availability
+  required_top_route: SEM-MARKET-DATA-FEATURES
+- query_id: SGQ-RAW-HOLDER-AVAILABILITY-RU
+  query: доступность raw holders
+  required_top_route: SEM-MARKET-DATA-FEATURES

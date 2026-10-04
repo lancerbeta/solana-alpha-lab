@@ -175,6 +175,15 @@
         "anyOf": [
           {
             "properties": {
+              "required_capability_ids": {
+                "type": "array",
+                "minItems": 1,
+                "items": {"type": "string", "pattern": "^CAP-"}
+              }
+            }
+          },
+          {
+            "properties": {
               "required_feature_ids": {
                 "type": "array",
                 "minItems": 1,

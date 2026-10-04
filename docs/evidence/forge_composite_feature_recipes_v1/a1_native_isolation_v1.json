@@ -1,0 +1,492 @@
+{
+  "critic": {
+    "actual_attestation": {
+      "actual_read_set": [
+        {
+          "path": ".agents/skills/independent-hypothesis-critic/SKILL.md",
+          "purpose": "Critic authority, input isolation, copied identity and workflow",
+          "raw_file_bytes": 10932,
+          "raw_file_sha256": "b027dc9a699f74e8d3f83ae165089c4d84c2d170945012103f33eaef66194d2e",
+          "semantic_content_scope": "FULL",
+          "whole_file_hashing_only_beyond_semantic_scope": false
+        },
+        {
+          "path": "configs/hypothesis_forge_independent_critic_v1.yaml",
+          "purpose": "Critic configuration and schema paths",
+          "raw_file_bytes": 7234,
+          "raw_file_sha256": "e76ec851c88b9198a9ea04a58a7d68f77d93aaf0f8910c4600c8a9949ef47a06",
+          "semantic_content_scope": "FULL",
+          "whole_file_hashing_only_beyond_semantic_scope": false
+        },
+        {
+          "path": "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md",
+          "purpose": "Attack matrix, terminal policy and B7 format; heading locator exposed titles/references outside B but no Prompt A/C body",
+          "raw_file_bytes": 127347,
+          "raw_file_sha256": "3abafc5f04616f06c58785cfad61b886650c51143cd0cf6db4fded52c413ccf2",
+          "semantic_content_scope": "PROMPT_B_1144_1491_AND_HEADING_LOCATOR_ONLY",
+          "whole_file_hashing_only_beyond_semantic_scope": true
+        },
+        {
+          "path": "local/forge_composite_p1_native_v5/native-critic-packet.json",
+          "purpose": "Sole scientific and research-memory input",
+          "raw_file_bytes": 83811,
+          "raw_file_sha256": "ed58d1fe0e8cedb2f6c97ba07e9a18e1ce23410b0569004358d54fdf067fc040",
+          "semantic_content_scope": "FULL_PACKET_ONLY",
+          "whole_file_hashing_only_beyond_semantic_scope": false
+        },
+        {
+          "path": "catalog/schemas/hypothesis_critic_input_v1.schema.json",
+          "purpose": "Input schema validation",
+          "raw_file_bytes": 14960,
+          "raw_file_sha256": "d4a7951e5a9e20a5cc4bff9b91f70031ef6d7ef96f2410cfac8de6751205d9e3",
+          "semantic_content_scope": "FULL",
+          "whole_file_hashing_only_beyond_semantic_scope": false
+        },
+        {
+          "path": "catalog/schemas/hypothesis_critic_result_v1.schema.json",
+          "purpose": "Result schema validation",
+          "raw_file_bytes": 3932,
+          "raw_file_sha256": "b4e72ddb954fe126edc0ba94acea49c17297bacd0a3bf8cf5b13d6489e252284",
+          "semantic_content_scope": "FULL",
+          "whole_file_hashing_only_beyond_semantic_scope": false
+        },
+        {
+          "path": "src/solana_alpha_lab/factory/hfic_identity.py",
+          "purpose": "Current candidate normalization, identity field set and candidate ID prefix",
+          "raw_file_bytes": 3845,
+          "raw_file_sha256": "b11b1ed3093b8c0b52883d7cbf530167f0efe94f34ac08afbc7fdc8dc359c7ac",
+          "semantic_content_scope": "FULL_IDENTITY_HELPER",
+          "whole_file_hashing_only_beyond_semantic_scope": false
+        },
+        {
+          "path": "src/solana_alpha_lab/factory/run_passport.py",
+          "purpose": "Current canonical JSON/SHA256 algorithm",
+          "raw_file_bytes": 16321,
+          "raw_file_sha256": "50cdc6d938c0a28f01734140938c026a6203ab69b775940fd2dc2cf37070e5a5",
+          "semantic_content_scope": "IDENTITY_EXCERPTS_164_196_199_221_AND_FUNCTION_NAME_MATCHES",
+          "whole_file_hashing_only_beyond_semantic_scope": true
+        },
+        {
+          "path": "src/solana_alpha_lab/factory/hfic_session.py",
+          "purpose": "Verify frozen primary_x alias for primary_x_family and definition hash binding",
+          "raw_file_bytes": 375270,
+          "raw_file_sha256": "c1b0ab81db3c14d71a2bee90dfcf7c32985d03f5c046a3fb6f65df7b22b15323",
+          "semantic_content_scope": "IDENTITY_ALIAS_EXCERPT_1155_1198_AND_EXACT_IDENTITY_SEARCH_MATCHES_ONLY",
+          "whole_file_hashing_only_beyond_semantic_scope": true
+        },
+        {
+          "path": "src/solana_alpha_lab/factory/hfic_prior_memory.py",
+          "purpose": "Identity alias search returned primary_x_family/primary_x fallback; no memory records or other implementation inspected",
+          "raw_file_bytes": 20720,
+          "raw_file_sha256": "010533ef475932fc6396298c315dacae2b07d33e961481c45859564074a5f99f",
+          "semantic_content_scope": "IDENTITY_SEARCH_MATCH_LINE_469_ONLY",
+          "whole_file_hashing_only_beyond_semantic_scope": true
+        },
+        {
+          "path": "src/solana_alpha_lab/factory/hfic_preflight.py",
+          "purpose": "Identity search returned function declaration only",
+          "raw_file_bytes": 143189,
+          "raw_file_sha256": "5cf23c29a5372fddd23137011060dfe5c62ff93ed9818e9910cdab17ec3893af",
+          "semantic_content_scope": "IDENTITY_SEARCH_MATCH_LINE_2385_ONLY",
+          "whole_file_hashing_only_beyond_semantic_scope": true
+        },
+        {
+          "path": "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py",
+          "purpose": "Identity search returned definition field mapping only",
+          "raw_file_bytes": 41215,
+          "raw_file_sha256": "713671b0e91c34a9a0d9a23ffa6b033c31d4cd4c202cba5039de5ea4a6bd040c",
+          "semantic_content_scope": "IDENTITY_SEARCH_MATCH_LINE_148_ONLY",
+          "whole_file_hashing_only_beyond_semantic_scope": true
+        },
+        {
+          "path": "configs/experiment_capability_registry_v2.yaml",
+          "purpose": "Independent accepted/offline/authority Catalog binding",
+          "raw_file_bytes": 6886,
+          "raw_file_sha256": "49edf7b770d37db38edb89a49dcb66f73b6212d62642cda2faa14880456e4430",
+          "semantic_content_scope": "CAPABILITY_EXCERPTS_165_189_177_200_ONLY",
+          "whole_file_hashing_only_beyond_semantic_scope": true
+        },
+        {
+          "path": "catalog/catalog_manifest.yaml",
+          "purpose": "Read-only Catalog identity excerpt; no scientific prior content",
+          "raw_file_bytes": 44488,
+          "raw_file_sha256": "91871f77373e4d18817d0d24147726f215292e3d7721e861020debcf6604e3c0",
+          "semantic_content_scope": "HEADER_1_35_AND_ZERO_RESULT_QUERY_ID_SEARCH_ONLY",
+          "whole_file_hashing_only_beyond_semantic_scope": true
+        }
+      ],
+      "attestation_basis": "SELF_REPORTED_TOOL_HISTORY_AND_MECHANICAL_CONTENT_HASHES; no claim of OS sandbox enforcement, model diversity, signed identity or exclusive filesystem",
+      "authorized_write_operations_count": 3,
+      "authorized_write_set": [
+        "local/forge_composite_p1_native_v5/native-critic-result.json",
+        "local/forge_composite_p1_native_v5/native-critic-attestation.json"
+      ],
+      "authorized_writes_count": 2,
+      "authorized_writes_count_basis": "UNIQUE_OUTPUT_FILES",
+      "context_isolation_self_report": "Packet plus permitted skill/config/Prompt B/schema/identity/Catalog excerpts only; no Forge scientific narrative consumed",
+      "counts_basis": "Observed critic tool history; no prohibited read/write was attempted. OS-wide enforcement/counts were not instrumented.",
+      "critic_task_name": "/root/p1_native_v5_critic",
+      "cryptographic_agent_identity": "UNPROVEN",
+      "denied_read_attempts_count": 0,
+      "denied_write_attempts_count": 0,
+      "experiment_executions_count": 0,
+      "generated_at_utc": "2026-10-04T18:13:16.687506+00:00",
+      "git_mutations_count": 0,
+      "input": {
+        "canonical_sha256": "fa563940f69d7882757c0140d991b94549d9b04369b713acd4561790f6c0c7a7",
+        "path": "local/forge_composite_p1_native_v5/native-critic-packet.json",
+        "raw_bytes": 83811,
+        "raw_sha256": "ed58d1fe0e8cedb2f6c97ba07e9a18e1ce23410b0569004358d54fdf067fc040",
+        "schema_error_count": 0,
+        "schema_validation": "PASS"
+      },
+      "metadata_only_reads": [
+        {
+          "operation": "git rev-parse HEAD",
+          "purpose": "Independent immutable source identity",
+          "value": "86d0351cbdd38649a5efa01b7f6f9314aebef11f"
+        },
+        {
+          "operation": "rg --files src filtered by hypothesis|identity|critic",
+          "purpose": "Locate authorized identity helper; file names only"
+        },
+        {
+          "operation": "rg exact identity names in factory/hfic*.py",
+          "purpose": "Minimal identity excerpt discovery; returned matches recorded in actual_read_set"
+        },
+        {
+          "operation": "uv run --locked --managed-python python -B -; PYTHONPATH=src",
+          "purpose": "JSON schema validation, current-algorithm hashes and write exactly two authorized delivery artifacts",
+          "runtime_ancillary_reads": "UNINSTRUMENTED: uv project/lock/environment and jsonschema runtime dependencies; not scientific/research-memory inputs"
+        }
+      ],
+      "model_diversity": "UNPROVEN",
+      "new_MAIN_or_adaptive_looks_count": 0,
+      "operational_isolation": "UNPROVEN",
+      "output_verification_reads": {
+        "paths": [
+          "local/forge_composite_p1_native_v5/native-critic-result.json",
+          "local/forge_composite_p1_native_v5/native-critic-attestation.json"
+        ],
+        "purpose": "Own-output schema/hash verification and this exact attestation range/count correction; not additional research input"
+      },
+      "packet_live_git_head": "86d0351cbdd38649a5efa01b7f6f9314aebef11f",
+      "prohibited_inputs_not_read": [
+        "outer native-context.json",
+        "parent scientific transcript",
+        "other native receipts/results/queries",
+        "source implementation diff/tests",
+        "ResearchStore",
+        "active RDP",
+        "raw datasets",
+        "live corpus",
+        "C5",
+        "untouched/forward holdout",
+        "Forge scratchpad"
+      ],
+      "provider_calls_count": 0,
+      "research_data_plane_writes_count": 0,
+      "result": {
+        "canonical_sha256": "e0c723e531ea842b2aa97adabfb6d731388506a2456d7cfddcbbb4db9c50194a",
+        "path": "local/forge_composite_p1_native_v5/native-critic-result.json",
+        "raw_bytes": 11260,
+        "raw_sha256": "f2dc837e4c84632a9f11d8d95c305090e1df06f287a46172d3050c4803d42829",
+        "schema_error_count": 0,
+        "schema_validation": "PASS",
+        "verbatim_result": {
+          "attack_matrix": {
+            "1_novelty_memory": {
+              "evidence": "Единственная capsule HYP-QUOTE-NATIVE-FRICTION-H900-V1 имеет memory_status=HISTORICAL и mechanism=classify_audition_terminal. Claim, actor/counterparty, population, decision timestamp, X family, Y, horizon и negative control равны null; falsifier касается расхождения runtime terminal с Git acceptance. Это иной заявленный procedural вопрос, но scientific equivalence по обязательным осям не разрешима. Packet prior_scope_relations=UNKNOWN_SCOPE_NEEDS_RESOLUTION. Нет оснований объявлять EXACT_VALID_CLOSE или duplicate; UNKNOWN также не является PASS.",
+              "status": "UNKNOWN"
+            },
+            "2_mechanism_counterparty": {
+              "evidence": "Claim form PREDICTIVE: actor story и causal identification не требуются для первичного predictive screen. Participation story допускает activity/price-staleness confounding; why_not_arbitraged=NOT_DECLARED_IN_DRAFT. Packet не показывает знак или heterogeneity, которые отличали бы holder information от общего будущего mark.",
+              "status": "UNKNOWN"
+            },
+            "3_estimand_universe_pit": {
+              "evidence": "Population BASE_X=48 сохранена; decision_eligible=36, feature_unknown=12. Universe pass/fail/unknown=40/4/4, AVAILABILITY_AFTER_DEADLINE=4; eligibility_uses_target=false. Matched=16 и target observed=16 не переименованы в полный N. X300/Y900 предшествуют Y14400, но clock=PROVIDER_REPORTED_SNAPSHOT_V1, source_price_event_time=UNKNOWN. Grounding GROUNDED и capability accepted сохранены без повышения до PIT proof. История dead/no-route/failed и фактическая available_to_strategy_at независимо не проверены.",
+              "status": "UNKNOWN"
+            },
+            "4_execution_economics": {
+              "evidence": "Y честно обозначен PRICE_RELATIVE_PROXY; executable notional отсутствует, labeled_net_return=false. Assumption cost scenarios LOW/BASE/STRESS дают estimated_net_proxy 0.164/0.026/-0.300, decision_sensitivity=FRAGILE, source_status=ASSUMPTION_NOT_CALIBRATED, haircut_basis=MARK_NOT_QUOTE; observed fill/live fees не включены. Поэтому экономика и alpha не установлены. Для ограниченного predictive proxy вопроса отсутствие исполнения само по себе не является KILL.",
+              "status": "UNKNOWN"
+            },
+            "5_statistics_multiplicity": {
+              "evidence": "Matched observed=16, baseline observed=36; baseline may include matched. У обоих mean=0.19999999999999996 и ES10=0.19999999999999996; loss events <=-20% и <=-50% равны 0, negative_n=0, negative_mass=0, missing_n=0 только внутри respective observed support. ES10 tail mass=1.6/3.6. Все четыре drop-one ablations сохраняют тот же mean и downside; DROP holders расширяет observed N до 36 без улучшения или ухудшения target. Четыре calendar/cohort slices по 4 matched observations не являются independent replication; independence=UNKNOWN. Это KILL не по равенству медиан, а по отсутствию любого переданного fixed contrast, его holder ablation и synthetic-only nature. Viewed variants перечислены, main_question_count_includes_variants=false; uncertainty и effective-cluster precision не установлены.",
+              "status": "FAIL"
+            },
+            "6_alternative_world_falsifiability": {
+              "evidence": "Cheapest falsifier заявляет frozen contrast с SAME_DECISION_ELIGIBLE и no threshold sweep; этот контраст в packet уже не различает matched и baseline. alternative_world и pass_fail_inconclusive_semantics=NOT_DECLARED_IN_DRAFT. SAME_DECISION_ELIGIBLE является baseline, не независимым negative control; он может включать matched. Формулировка disconfirming_prediction совместима с полученным отсутствием поддержанного contrast. Смена условий после этого результата запрещена.",
+              "status": "FAIL"
+            },
+            "7_information_value_opportunity_cost": {
+              "evidence": "Claim explicitly says synthetic acceptance only; decision_unlocked требует решения о separately authorized chronological validation. Одинаковая описательная доходность у synthetic matched, baseline и ablations не несёт доказательной информации об incremental holder predictiveness на реальном рынке. Уже переданный readout достаточен, чтобы остановить именно этот кандидат без новых values, MAIN/adaptive looks или инфраструктуры. Инженерное acceptance значение native lifecycle не превращено в scientific evidence.",
+              "status": "FAIL"
+            },
+            "8_capability_data_delta": {
+              "evidence": "Freeze-owned grounding сохранён: CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001 accepted=true, authority_granted=false, feature_bindings=[], unresolved_requirements=[]; registry подтверждает accepted offline capability с нулевыми provider calls. Нет заявленного capability gap, не требуется новый компонент или collection. Это только отсутствие нового engineering gap, а не разрешение science execution или PASS hypothesis.",
+              "status": "PASS"
+            },
+            "critic_terminal_sentence": "Переданный synthetic-only packet не даёт положительного scientific основания для отдельной chronological validation: фиксированный holder condition не различает наблюдаемый PRICE_RELATIVE_PROXY относительно baseline.",
+            "final_execution_unit": "NONE",
+            "final_hypothesis_contract": "NONE",
+            "independent_reality_receipt": {
+              "candidate_id_prefix_matches": true,
+              "capability_catalog_verification": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001: ACCEPTED, OFFLINE_READ_ONLY, max_provider_calls=0, promotion_authority=NONE",
+              "grounded_result_canonical_hash_matches": true,
+              "grounding_preserved": {
+                "capability_bindings": [
+                  {
+                    "accepted": true,
+                    "authority_granted": false,
+                    "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+                  }
+                ],
+                "context_packet_sha256": "eaaee77e6ff70e01274245f79ec71408ecbe7d3260065ac67962bf7ee896218a",
+                "feature_bindings": [],
+                "terminal": "GROUNDED",
+                "unresolved_requirements": []
+              },
+              "holdout_access": "No critic holdout reads; packet holdouts_not_touched is an empty array, so upstream no-holdout history is not independently proven",
+              "independent_data_manifest_and_pit_verification": "UNPROVEN: no raw datasets, ResearchStore or active RDP were read; packet-bound release paths/hashes are provenance only",
+              "input_schema_validation": "PASS",
+              "model_diversity": "UNPROVEN",
+              "native_operation_state": "Packet reports OPEN, completed.look=true, completed.operation=false, completed.scientific_search=false; not consumed as authority for another look",
+              "operational_isolation": "UNPROVEN",
+              "packet_canonical_sha256": "fa563940f69d7882757c0140d991b94549d9b04369b713acd4561790f6c0c7a7",
+              "packet_head_matches_live_head": true,
+              "packet_raw_sha256": "ed58d1fe0e8cedb2f6c97ba07e9a18e1ce23410b0569004358d54fdf067fc040",
+              "prior_memory_scope": "Only packet prior_memory.capsules; 1 HISTORICAL capsule, no archaeology",
+              "selected_definition_algorithm": "hfic_identity.canonical_candidate_definition + run_passport.canonical_sha256; packet primary_x is the frozen alias of primary_x_family",
+              "shared_filesystem_isolation": "UNPROVEN",
+              "source_head": "86d0351cbdd38649a5efa01b7f6f9314aebef11f"
+            },
+            "owner_next": "STOP",
+            "revision_contract": "NONE",
+            "strongest_kill_case": "Синтетическая схема с одинаковым будущим +0.2 PRICE_RELATIVE_PROXY у decision-eligible baseline и выбранных members совместима с полностью неинформативным holder condition. Равный результат после удаления holder condition подтверждает эту mundane explanation на переданном support. Положительный mark и assumption-based cost proxy ничего не добавляют к predictive discrimination и не оправдывают научный переход на реальный рынок.",
+            "validated_spec_and_classifier_receipt": "NONE"
+          },
+          "authority": {
+            "experiment_execution": 0,
+            "git_mutation": 0,
+            "provider_api_rpc_wss_calls": 0
+          },
+          "classifier_receipt": null,
+          "critic_input_packet_sha256": "fa563940f69d7882757c0140d991b94549d9b04369b713acd4561790f6c0c7a7",
+          "critic_prompt_version": "HFIC-V1.1",
+          "critic_terminal": "KILL_LOW_INFORMATION_VALUE",
+          "experiment_spec": null,
+          "experiment_spec_packet": null,
+          "isolated_context_attestation": "NEW_CONTEXT_REQUIRED",
+          "material_defects": [
+            "Synthetic-only evidence cannot justify the named real-market chronological-validation decision; no incremental PRICE_RELATIVE_PROXY contrast is present in the frozen support.",
+            "All provided fixed downside metrics and the DROP holders ablation fail to distinguish the candidate from the decision-eligible baseline; this is descriptive absence of support in this packet, not a real-market family hard-close.",
+            "Alternative world and PASS/FAIL/INCONCLUSIVE semantics are NOT_DECLARED_IN_DRAFT; SAME_DECISION_ELIGIBLE is a potentially overlapping baseline rather than a discriminating independent negative control.",
+            "Prior scientific scope remains UNKNOWN_SCOPE_NEEDS_RESOLUTION; the sparse HISTORICAL capsule cannot establish novelty or previous scientific closure."
+          ],
+          "next": "STOP",
+          "non_claims": [
+            "NO_ALPHA",
+            "NO_NET_RETURN",
+            "NO_CAUSAL_IDENTIFICATION",
+            "NO_REAL_MARKET_EFFICACY_OR_FAILURE",
+            "NO_PERMANENT_REAL_MARKET_FAMILY_CLOSE",
+            "NO_STRATEGY_PROMOTION",
+            "NO_EXECUTION_AUTHORITY",
+            "NO_ADDITIONAL_MAIN_OR_ADAPTIVE_LOOK",
+            "NO_NEW_OUTCOMES",
+            "NO_HOLDOUT_ACCESS",
+            "NO_PRIOR_MEMORY_ARCHAEOLOGY",
+            "NO_CLASSIFIER_RUN_ON_KILL_PATH",
+            "OPERATIONAL_ISOLATION_UNPROVEN",
+            "SHARED_FILESYSTEM_ISOLATION_UNPROVEN",
+            "MODEL_DIVERSITY_UNPROVEN"
+          ],
+          "revision_receipt": null,
+          "schema": "smial.hypothesis-critic-result",
+          "schema_version": "1.1",
+          "selected_candidate_id": "HFIC-CAND-D3510E65D597",
+          "selected_definition_sha256": "d3510e65d5979a25e227f945a85b61265dcd1e01a7a224b7a06834c948ec2057",
+          "session_id": "HFIC-SESS-C6EB6B38A3D384EC"
+        }
+      },
+      "schema": "smial.hfic-native-critic-attestation",
+      "schema_version": "1.0",
+      "selected_candidate_id": "HFIC-CAND-D3510E65D597",
+      "selected_definition_fields": {
+        "actor_counterparty": "base_x holders and subsequent buyers no causal actor identification",
+        "cheapest_falsifier": "one frozen raw mixed price_relative_proxy contrast against same_decision_eligible no threshold sweep",
+        "claim": "fixed raw holder growth may discriminate later price_relative_proxy on the exact decision population synthetic acceptance only",
+        "decision_timestamp": "y900",
+        "horizon_notional": "y900 y14400 price_relative_proxy no executable notional",
+        "mechanism": "increasing participation may precede a later price direction activity and staleness remain confounders causality unknown",
+        "negative_control": "same_decision_eligible baseline no claim of independence or alpha",
+        "population": "base_x",
+        "primary_x_family": "features field_id field holder count 001 name bound_holders op point_value point y900 end y900 field_id field holder count 001 name holders op delta start x300 denominator x300 field_id field liquidity usd 001 name liquidity numerator y900 op ratio end y900 field_id field usd price 001 name price op return_ratio start x300 predicates feature bound_holders op gte value 50 0 feature holders op gt value 0 0 feature liquidity op gte value 1 0 feature price op gte value 0 0",
+        "primary_y": "price_relative_proxy y900 y14400"
+      },
+      "selected_definition_sha256": "d3510e65d5979a25e227f945a85b61265dcd1e01a7a224b7a06834c948ec2057",
+      "session_id": "HFIC-SESS-C6EB6B38A3D384EC",
+      "shared_filesystem_isolation": "UNPROVEN",
+      "shared_filesystem_present": true,
+      "source_head": "86d0351cbdd38649a5efa01b7f6f9314aebef11f",
+      "stop": "STOP; root owns any existing finalize/owner persistence; no critic production persist"
+    },
+    "agent_task": "p1_native_v5_critic",
+    "input_canonical_sha256": "fa563940f69d7882757c0140d991b94549d9b04369b713acd4561790f6c0c7a7",
+    "input_file_logical_ref": "local/forge_composite_p1_native_v5/native-critic-packet.json",
+    "input_file_sha256": "ed58d1fe0e8cedb2f6c97ba07e9a18e1ce23410b0569004358d54fdf067fc040",
+    "result_file_sha256": "03295d8fb64d81a721bd47a7bf67d0b5cb7a96c4f05614cc4d5e2c15daa5635c"
+  },
+  "execution_commit": "86d0351cbdd38649a5efa01b7f6f9314aebef11f",
+  "model_diversity": "UNPROVEN",
+  "presearch_agent": {
+    "actual_attestation": {
+      "acceptance_date": "2026-10-04",
+      "acceptance_kind": "CONCEPTUAL_SYNTHETIC_PRESEARCH_AGENT_USABILITY",
+      "actual_read_set": [
+        {
+          "path": "local/forge_composite_p1_native_v4/native-presearch-packet.json",
+          "sha256": "294d6ad4345ca2a5a7611fae8fb6d44d5b09f09568472824d8998457fb68fd34"
+        },
+        {
+          "path": ".agents/skills/hypothesis-forge/SKILL.md",
+          "sha256": "ec55b9ff96b57cc4408781c98f1301a8a8308c7f749d0323a65da1fd1049dcdd"
+        },
+        {
+          "path": "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md",
+          "sha256": "3abafc5f04616f06c58785cfad61b886650c51143cd0cf6db4fded52c413ccf2"
+        }
+      ],
+      "authored_queries": [
+        {
+          "budget_allocation": "AUTO",
+          "explanation": "SIMPLE: число holders выросло относительно X300 к decision Y900. Один meaningful predicate holders return_ratio > 0; положительный denominator обязателен.",
+          "feature_count": 1,
+          "predicate_count": 1,
+          "query_id": "SYNTHETIC_RAW_HOLDER_SIMPLE_NATIVE_V4",
+          "raw_transform": "return_ratio",
+          "search_tier": "SIMPLE_SCREEN"
+        },
+        {
+          "budget_allocation": "COMPOUND_FIRST",
+          "explanation": "COMPOUND_FIRST: число holders растёт, цена не падает и ликвидность не сокращается в том же раннем окне. Цена и ликвидность добавляют отдельные state constraints к holder growth; статистическая независимость механизмов не утверждается.",
+          "feature_count": 3,
+          "predicate_count": 3,
+          "query_id": "SYNTHETIC_RAW_HOLDER_PRICE_LIQ_COMPOUND_NATIVE_V4",
+          "raw_transform": "delta",
+          "search_tier": "COMPOUND_SCREEN"
+        }
+      ],
+      "authorized_output_files": [
+        "local/forge_composite_p1_native_v4/native-queries.json",
+        "local/forge_composite_p1_native_v4/presearch-attestation.json"
+      ],
+      "discovery_evidence": {
+        "decision": "Y900",
+        "feature_window": "X300 -> Y900",
+        "holder_supported_ops": [
+          "point_value",
+          "delta",
+          "return_ratio"
+        ],
+        "holder_transform_parameters": [
+          "field_id",
+          "start",
+          "end"
+        ],
+        "operator_example_location": "Raw composite recipes / Full query envelope",
+        "packet_location": "temporal_recipe_capabilities",
+        "rationale": "Форма полного query восстановлена из operator JSON example; перечень поддерживаемых raw holder transforms подтверждён actual pre-search packet. SIMPLE uses documented SIMPLE_SCREEN/AUTO reduction plus documented relative-growth alternative; mixed follows existing three-feature COMPOUND_FIRST example.",
+        "target_window": "Y900 -> Y14400"
+      },
+      "explained_behavior": {
+        "economics": "target PRICE_RELATIVE_PROXY, entry LAST_AVAILABLE_MARK_WITH_HAIRCUT с assumed_latency_seconds=30 и cost_profile:null сохранены из example. Null означает existing assumption-stress default; результат не являлся бы наблюдёнными fees/fills или исполненным NetReturn.",
+        "exposure": [
+          "Построены два фиксированных conceptual synthetic seeds без просмотра новых значений/outcomes и без sweep окон, thresholds или components.",
+          "Реальная смена seed тратит exposure; после outcomes изменение operator/window/threshold/component сохраняет adaptive/new-question accounting. SIMPLE и compound не создают отдельный новый бюджет.",
+          "Схожий holder prior может быть применим как prior exposure, но сам по себе не закрывает новый exact dynamics recipe. Переименование закрытого exact вопроса его не открывает.",
+          "Обычный documented shared budget 6 MAIN + 2 adaptive, AUTO reserve для compound и preview envelope не являются выданным здесь разрешением или подтверждённым остатком.",
+          "В этом acceptance не запускались preview, discovery-execute, MAIN, adaptive, freeze, Forge session, provider calls или store writes; научная exposure не расходовалась исполнением."
+        ],
+        "full_support_vs_examples": [
+          "Raw-holder mixed preview сохраняет все declared features и сообщает full joint support на полном decision-eligible наборе до ограничения examples до 24.",
+          "Лимит 24 относится к показанным examples, не к размеру population и не к знаменателю full support. Нельзя выводить full joint support по examples.",
+          "Universe PASS недостаточен для decision eligibility: требуется decision price.",
+          "Без raw holder dynamics действует историческая point_value-only projection; full joint prefix support для неё не заявлен.",
+          "Support подтверждает доступность/применимость рецепта, но не variance, precision, independence, достаточный sample size или alpha. Здесь реальные counts/support UNKNOWN.",
+          "PREVIEW_TOO_LARGE — stop, а не разрешение считать урезанные examples полным support; LEGACY_PREVIEW_DETAIL_UNAVAILABLE нельзя реконструировать молча."
+        ],
+        "grounding": [
+          "Raw field/operator/start/end capability уже присутствует в actual packet. Нужный raw recipe можно выразить без создания FEAT/CAP alias или нового operator.",
+          "Accepted temporal capability допускает candidate required_feature_ids=[] и unresolved_requirements=[]; эти пустые массивы не доказывают отсутствия data/PIT/missingness dependencies.",
+          "At freeze обязательны exact computed grounded_evidence и freeze-owned selected_candidate.grounding; нужен весь returned evidence object, не только result_refs и не hand-written summary.",
+          "Capability/recipe binding механически связывает exact query и supported computation; оно не предоставляет scientific/provider authority.",
+          "GROUNDED не означает scientific acceptance, PIT_READY всего corpus, прибыльность или стратегию. HISTORICAL_RECONSTRUCTIBLE/ FORWARD_ONLY из packet не повышаются до strategy-available.",
+          "В этом acceptance grounded_evidence не вычислено и не изготовлено; статус фактического candidate grounding UNKNOWN."
+        ],
+        "missingness_and_pit": [
+          "Обязательны bound start < end <= decision и PIT lineage. Y14400 используется только как target, не как feature или условие eligibility.",
+          "Окно, lateness_seconds=300 и clock policy взяты из разрешённого synthetic operator example; фактическая совместимость с corpus schedule без runtime/source не доказана.",
+          "Missing, late, conflicting, boolean/nonfinite и invalid-lineage cells unavailable. Нельзя заполнять пропуски нулями, интерполировать или заменять поздним наблюдением.",
+          "PIT означает допустимую доступность данных на cutoff стратегии с lineage; наличие исторической ячейки само по себе не доказывает такую доступность.",
+          "Отсутствие feature или decision price не является FAIL экономической гипотезы; missing target сохраняет отдельную неизвестность outcome."
+        ],
+        "units": {
+          "denominator": "Для return_ratio нужна положительная база; недопустимый denominator не превращается в ноль или бесконечность.",
+          "holder_delta": "H(Y900)-H(X300); HOLDER_COUNT, порог >0 означает положительный прирост count.",
+          "holder_return_ratio": "(H(Y900)-H(X300))/H(X300); DIMENSIONLESS_FRACTION, 1 означает +100%, 0.1 означает +10%. Порог >0 задаёт положительный рост, не end/start >0.",
+          "liquidity_ratio": "L(Y900)/L(X300); безразмерный ratio, >=1 означает сохранение либо рост ликвидности.",
+          "price_return_ratio": "(P(Y900)-P(X300))/P(X300); DIMENSIONLESS_FRACTION, >=0 означает отсутствие снижения цены."
+        },
+        "universe_and_meaningful_predicates": {
+          "effective_population": "PASS_AT_DECISION_TIME_INSIDE_BASE_X",
+          "explanation": "Оба запроса сохраняют BASE_X и применимость snapshot policy на decision. Growth >0 не следует из H(Y900)>=50: earlier holder count может быть меньше, равен или больше. Не добавлено ни слабое H>=3, ни повтор H>=50.",
+          "guards": "При H>=50 на bound decision H>=3 — UNIVERSE_NON_DISCRIMINATING_QUESTION; H<50 — UNIVERSE_IMPOSSIBLE_QUESTION. H>=50 AND delta>0 допускается с REDUNDANT_UNIVERSE_CONJUNCT; admitted exact spec/hash сохраняют. Earlier points и UNKNOWN equivalence не объявляют tautology.",
+          "live_policy_verification": "NOT_PERFORMED",
+          "min_holders": "50",
+          "min_liquidity_usd": "5000",
+          "semantic_sha256": "63b33150869273e8f5a0d5d214c8c679e24b5468125164ddcf95326bac4d533a",
+          "snapshot_source": "native-presearch-packet.json / universe_policy only",
+          "state": "ACTIVE"
+        }
+      },
+      "forbidden_input_reads": 0,
+      "git_mutations": 0,
+      "input_hashes_rechecked_before_write": true,
+      "input_root": "sal-forge-composite-v1",
+      "limitations": [
+        "Это acceptance discoverability/usability по трем разрешённым входам, не runtime/schema/validator acceptance.",
+        "Schemas, source, tests, diff, ResearchStore/RDP, actual corpus/schedules, parent chat и другие receipts не использовались.",
+        "Query JSON не выполнялись и не передавались validator/evaluator/Forge. Допустимость фактического schedule, input binding, PIT, численные support/outcomes, точность и alpha остаются UNKNOWN.",
+        "В operator есть исторический point_value-only checkpoint. Для fresh synthesis применён явно fresh раздел Raw composite recipes совместно с actual temporal_recipe_capabilities; исторические рецепты не переписываются.",
+        "Ни решение о real MAIN, ни budget/cap widening, ни provider/resource authority этим output не выдаются."
+      ],
+      "other_files_written": [],
+      "primary_packet_identity": {
+        "evidence_epoch_sha256": "6583c031fbab9115abb1acbfe00caaf924ced46a9ea995b7aa8466abe686082a",
+        "owner_focus": "SYNTHETIC_RAW_P1_NATIVE_V4",
+        "prompt_version": "HFIC-V1.2",
+        "search_key_sha256": "2e76697fbe8b00ce123d20c7632f724345cdf0af366beebaf8948d90272cc094"
+      },
+      "provider_calls": 0,
+      "read_set_note": "Только три перечисленных input files. Выполнены чтение текста, поиск внутри этих файлов и SHA256. Остальные corpus/source/schema/test/store/RDP/receipts/diff/Git не читались.",
+      "recipe_execution_performed": false,
+      "status": "PASS_CONCEPTUAL_DISCOVERABILITY_ONLY",
+      "store_or_rdp_writes": 0
+    },
+    "actual_descriptor_matches_current_owner": true,
+    "agent_task": "p1_presearch_agent",
+    "input_execution_commit": "66abc2bb41db2e7f4cb2704980f74f4aafd0da7b",
+    "input_file_logical_ref": "local/forge_composite_p1_native_v4/native-presearch-packet.json",
+    "input_operator_sha256": "3abafc5f04616f06c58785cfad61b886650c51143cd0cf6db4fded52c413ccf2",
+    "input_packet_sha256": "294d6ad4345ca2a5a7611fae8fb6d44d5b09f09568472824d8998457fb68fd34",
+    "input_skill_sha256": "ec55b9ff96b57cc4408781c98f1301a8a8308c7f749d0323a65da1fd1049dcdd",
+    "query_spec_sha256": [
+      "2d5c7caafbc094a642a38da5719cf58982422fc53b64cf87a55bc151b3f702b3",
+      "ba7f707790e42a58c186ef092ad90fc04dc838b15623615a5aae6bf6a9f186da"
+    ]
+  },
+  "route": "NATIVE_ISOLATED_AGENT_FORK_NONE",
+  "task_id": "FORGE_COMPOSITE_FEATURE_RECIPES_V1"
+}

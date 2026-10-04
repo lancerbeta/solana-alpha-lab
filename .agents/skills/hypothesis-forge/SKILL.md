@@ -82,6 +82,42 @@ Operator-executable prefix:
 `uv run --locked --managed-python python -B scripts/hypothesis_forge.py`.
 Required interpreter: CPython `3.13.14`. Do not invoke a bare workstation `python`.
 
+## Raw composite recipes
+
+Current fresh recipe owner: `docs/contracts/forge_composite_feature_recipes_v1.md`.
+Before selecting a discovery query, read actual ordinary preflight
+`forge_context_packet.temporal_recipe_capabilities`. Holder count supports
+`point_value`, `delta` and `return_ratio`; the two transforms require explicit
+field/start/end with bound start < end <= decision. Delta is holder count;
+return is a dimensionless fraction (1 = +100%) and needs a positive base.
+No EWM, generic holder ratio, holder target or interpolation exists. Missing,
+late, conflicting, boolean/nonfinite and invalid-lineage cells are unavailable.
+
+Mechanism -> smallest supported representation -> authorized feature-only
+support if needed -> exact query. Holder growth alone can be SIMPLE; holder
+growth with an independent price/liquidity mechanism can be COMPOUND_FIRST.
+Usually 1–3 meaningful predicates suffice. A raw-holder mixed preview (holder delta/return_ratio) keeps all
+declared features and reports full joint support on decision eligibility before
+24 examples. Universe PASS alone is insufficient: decision price is required.
+Support does not prove variance, precision, independence or alpha. A changed
+seed spends exposure; do not sweep windows/thresholds/components.
+
+Without raw holder dynamics, preview keeps the historical point_value-only projection; no full joint prefix support claim. An accepted temporal capability can ground a raw candidate with required_feature_ids=[] and unresolved_requirements=[], but exact computed grounded_evidence remains mandatory at freeze. Capability binding grants no authority; GROUNDED does not imply scientific acceptance.
+
+For bound H>=50, only H>=3 is a typed non-discriminating refusal, and H<50 is
+impossible. H>=50 AND delta(H)>0 proceeds with a redundant-conjunct warning;
+keep the exact spec/hash. Earlier points and unknown equivalence are not proven
+tautologies. Saved readback/correction uses frozen identity/policy before this
+fresh guard; STOPPED/COMPLETED cannot admit a new look. A cold saved support
+readback loads zero values; registered numerical replay performs the evaluator.
+Legacy missing support detail is explicit, never reconstructed silently.
+
+After outcomes, changes in operator/window/threshold/component retain existing
+adaptive/new-question accounting. Related holder prior is not exact closure of
+a new dynamics recipe; renaming an exact old question does not reopen it.
+Preserve exposure, prior applicability and resource permission separately.
+The atom's synthetic evidence grants no real MAIN/adaptive or live mutations.
+
 ## Authority
 
 Read `configs/hypothesis_forge_independent_critic_v1.yaml` and the operator pack at

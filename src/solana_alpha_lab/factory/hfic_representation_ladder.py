@@ -2592,6 +2592,7 @@ def _discover_ladder_stages(
         ordinary_pending: list[tuple[str, dict[str, Any], Mapping[str, Any]]] = []
         ordinary_pass: list[tuple[str, dict[str, Any], Mapping[str, Any]]] = []
         ordinary_trigger: list[tuple[str, dict[str, Any], Mapping[str, Any]]] = []
+        ordinary_stop: list[tuple[str, dict[str, Any], Mapping[str, Any]]] = []
         for sid, stage, bundle in grouped.get("BASE", []):
             if str(stage.get("evidence_surface_mode") or "") == CURRENT_REPRESENTATION_CONTROL_V1:
                 continue
@@ -2623,7 +2624,11 @@ def _discover_ladder_stages(
                 # completed KILL_MECHANISM is discoverable like NO_WORTHY and
                 # KILL_DUPLICATE instead of falling back to a stale draft.
                 ordinary_trigger.append(row)
-        ordinary_pick = ordinary_pending or ordinary_pass or ordinary_trigger
+            elif state == "SYNTHESIS_COMPLETE" and isinstance(terminal, str) and terminal.startswith("KILL_"):
+                # A validated terminal session remains discoverable even when it
+                # is a technical/statistical stop rather than reusable evidence.
+                ordinary_stop.append(row)
+        ordinary_pick = ordinary_pending or ordinary_pass or ordinary_trigger or ordinary_stop
         if ordinary_pick:
             picked = pick_session(
                 [
@@ -2638,7 +2643,8 @@ def _discover_ladder_stages(
             _sid, base_stage, _bundle = next(
                 item for item in ordinary_pick if item[0] == pick_id
             )
-            if str(base_stage.get("session_state") or "") == "SYNTHESIS_COMPLETE":
+            if (str(base_stage.get("session_state") or "") == "SYNTHESIS_COMPLETE"
+                and base_stage.get("effective_terminal") in (PASS_TERMINALS | CASE_A_TERMINALS | KNOWN_SCIENTIFIC_NEGATIVES)):
                 base_stage["execution_status"] = EXEC_REUSED
             base_stage["input_scope"] = "ORDINARY_BASE"
             resolved.append(base_stage)

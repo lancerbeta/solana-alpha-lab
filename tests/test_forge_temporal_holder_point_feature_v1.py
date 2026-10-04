@@ -144,12 +144,11 @@ class HolderPolicyTests(unittest.TestCase):
                 self.assertIn(code, output.getvalue())
                 loader.assert_not_called()
 
-    def test_holder_is_point_only_and_projection_is_query_local(self):
+    def test_holder_policy_and_projection_are_query_local(self):
         self.assertIn(HOLDER, temporal.validate_temporal_query(holder_spec())["decision_fields"])
         self.assertNotIn(HOLDER, temporal.validate_temporal_query(_spec())["decision_fields"])
         for op, params in (
             ("ratio", {"numerator": "Y900", "denominator": "X300"}),
-            ("return_ratio", {"start": "X300", "end": "Y900"}),
             ("drawdown_from_grid_max", {"points": ["X300", "Y900"], "at": "Y900"}),
             ("rebound_from_grid_min", {"points": ["X300", "Y900"], "at": "Y900"}),
         ):
@@ -224,7 +223,7 @@ class HolderPolicyTests(unittest.TestCase):
                 raise AssertionError("invalid query read values")
         negatives = []
         for op, params in (("ratio", {"numerator": "Y900", "denominator": "X300"}),
-                           ("return_ratio", {"start": "X300", "end": "Y900"}),
+                           ("ewm", {"start": "X300", "end": "Y900"}),
                            ("drawdown_from_grid_max", {"points": ["X300", "Y900"], "at": "Y900"}),
                            ("rebound_from_grid_min", {"points": ["X300", "Y900"], "at": "Y900"})):
             spec = holder_spec()

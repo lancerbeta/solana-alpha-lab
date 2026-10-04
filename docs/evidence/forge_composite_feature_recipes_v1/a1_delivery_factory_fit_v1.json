@@ -1,0 +1,37 @@
+{
+  "as_of": "2026-10-04",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Separate owner real-contrast decision after support/precision assessment; concrete recipe plus explicit science authority triggers, engineering CI does not"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_WRAP_EXISTING_OWNERS_NO_DEPENDENCY_SERVICE",
+    "context_efficiency": "PASS_ONE_CURRENT_CONTRACT_BOUNDED_ROUTES_NO_PACKET_ROOT_BUDGET_INCREASE",
+    "execution_to_cashflow": "NOT_APPLICABLE_PRICE_RELATIVE_PROXY_NO_ALPHA_NET_RETURN",
+    "flexibility_and_history": "PASS_LEGACY_IDENTITIES_RESULTS_READERS_NEW_RAW_QUERY_LOCAL_PREFIX",
+    "mission": "PASS_NATIVE_RAW_COMPOSITION_WITHOUT_NEW_COMPONENT",
+    "monitoring_and_recovery": "PASS_REPLY_LOSS_DRAFT_RESUME_NATIVE_FINAL_COLD_REPLAY_NEXT_LEGACY",
+    "owner_operability": "PASS_FULL_JSON_WARNING_REFUSAL_RECOVERY_GUIDE_NATIVE_AGENT_VALIDATOR_PASS",
+    "red_team": "PASS_SCHEMA_GROUNDING_CAPABILITY_ONLY_UNKNOWN_UNACCEPTED_TAMPERED_UNBOUND_NO_AUTHORITY_PREFIX_TARGET_CONFLICT_LEGACY_GOLD_BOUND_CLOCK_FEATURE_COPY_PROJECTION_BOTH_ORDERS",
+    "research_truth": "PASS_FULLY_GROUNDED_MECHANICAL_CAPABILITY_EVIDENCE_BINDING_WITHOUT_SCIENTIFIC_ACCEPTANCE_RAW_ONLY_FULL_PREFIX_LEGACY_OUTPUT",
+    "security": "PASS_NO_PROVIDER_SIGNER_SECRET_HOLDOUT_LIVE_DATA_PATH_BYPASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_REAL_SCIENCE_GRANT",
+    "NO_MARKET_NEGATIVE",
+    "NO_EWM",
+    "NO_LIVE_STORE_PROFILE_OPERATION_MUTATION",
+    "EXACT_HEAD_CI_OWNER_PHRASE_REQUIRED",
+    "Native verdict provenance: original producer UTF8 serialization raw_sha256=f2dc837e4c84632a9f11d8d95c305090e1df06f287a46172d3050c4803d42829; public finalize helper archived ASCII serialization raw_sha256=03295d8fb64d81a721bd47a7bf67d0b5cb7a96c4f05614cc4d5e2c15daa5635c; identical canonical_sha256=e0c723e531ea842b2aa97adabfb6d731388506a2456d7cfddcbbb4db9c50194a and JSON object. Original author attestation remains unchanged; its original raw SHA is distinct from the archive raw SHA, and exact producer bytes are recoverable with ensure_ascii=False, indent=2, sort_keys=False plus LF. No packet/candidate/scientific identity change."
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "Base includes #373. Before new production records separately authorized revert; after use retain readers and forward-fix. No live migration.",
+  "review_id": "FORGE-COMPOSITE-FEATURE-RECIPES-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "a40d87ff36b2371d822e853596f7257f98314071599a05c8eefe7f726e02d586",
+  "reviewed_inventory_sha256": "9f83fb476d7fc645d147f60a216d74da7bd99390f22419bac8d2d48a0fb6f508",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FORGE_COMPOSITE_FEATURE_RECIPES_V1",
+  "verdict": "PASS"
+}

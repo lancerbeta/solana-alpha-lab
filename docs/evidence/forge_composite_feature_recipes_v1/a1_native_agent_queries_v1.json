@@ -1,0 +1,122 @@
+[
+  {
+    "all": [
+      {
+        "feature": "holders",
+        "op": "gt",
+        "value": 0
+      }
+    ],
+    "budget_allocation": "AUTO",
+    "cost_profile": null,
+    "decision": {
+      "point_id": "Y900",
+      "time_policy": "BOUND_SCHEDULE_CUTOFF"
+    },
+    "entry_model": {
+      "assumed_latency_seconds": 30,
+      "kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT"
+    },
+    "evaluation": {
+      "ablations": "DROP_ONE_CONDITION",
+      "baseline": "SAME_DECISION_ELIGIBLE",
+      "calendar_block": "UTC_DAY_OF_DECISION"
+    },
+    "features": [
+      {
+        "end": "Y900",
+        "field_id": "FIELD-HOLDER-COUNT-001",
+        "name": "holders",
+        "op": "return_ratio",
+        "start": "X300"
+      }
+    ],
+    "population": "BASE_X",
+    "query_id": "SYNTHETIC_RAW_HOLDER_SIMPLE_NATIVE_V4",
+    "schedule": {
+      "lateness_seconds": 300,
+      "observation_clock_policy": "PROVIDER_REPORTED_SNAPSHOT_V1"
+    },
+    "schema": "smial.hfic-temporal-query",
+    "schema_version": "1.0",
+    "search_tier": "SIMPLE_SCREEN",
+    "target": {
+      "exit_point": "Y14400",
+      "field_id": "FIELD-USD-PRICE-001",
+      "kind": "PRICE_RELATIVE_PROXY",
+      "reference_point": "Y900"
+    }
+  },
+  {
+    "all": [
+      {
+        "feature": "holders",
+        "op": "gt",
+        "value": 0
+      },
+      {
+        "feature": "price",
+        "op": "gte",
+        "value": 0
+      },
+      {
+        "feature": "liquidity",
+        "op": "gte",
+        "value": 1
+      }
+    ],
+    "budget_allocation": "COMPOUND_FIRST",
+    "cost_profile": null,
+    "decision": {
+      "point_id": "Y900",
+      "time_policy": "BOUND_SCHEDULE_CUTOFF"
+    },
+    "entry_model": {
+      "assumed_latency_seconds": 30,
+      "kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT"
+    },
+    "evaluation": {
+      "ablations": "DROP_ONE_CONDITION",
+      "baseline": "SAME_DECISION_ELIGIBLE",
+      "calendar_block": "UTC_DAY_OF_DECISION"
+    },
+    "features": [
+      {
+        "end": "Y900",
+        "field_id": "FIELD-HOLDER-COUNT-001",
+        "name": "holders",
+        "op": "delta",
+        "start": "X300"
+      },
+      {
+        "end": "Y900",
+        "field_id": "FIELD-USD-PRICE-001",
+        "name": "price",
+        "op": "return_ratio",
+        "start": "X300"
+      },
+      {
+        "denominator": "X300",
+        "field_id": "FIELD-LIQUIDITY-USD-001",
+        "name": "liquidity",
+        "numerator": "Y900",
+        "op": "ratio"
+      }
+    ],
+    "population": "BASE_X",
+    "query_id": "SYNTHETIC_RAW_HOLDER_PRICE_LIQ_COMPOUND_NATIVE_V4",
+    "schedule": {
+      "lateness_seconds": 300,
+      "observation_clock_policy": "PROVIDER_REPORTED_SNAPSHOT_V1"
+    },
+    "schema": "smial.hfic-temporal-query",
+    "schema_version": "1.0",
+    "search_tier": "COMPOUND_SCREEN",
+    "target": {
+      "exit_point": "Y14400",
+      "field_id": "FIELD-USD-PRICE-001",
+      "kind": "PRICE_RELATIVE_PROXY",
+      "reference_point": "Y900"
+    }
+  }
+]

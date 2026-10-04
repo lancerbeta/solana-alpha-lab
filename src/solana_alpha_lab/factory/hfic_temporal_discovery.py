@@ -88,10 +88,12 @@ MAX_FEATURES = 12
 MAX_SCHEDULE_POINTS = 8
 ALLOWED_FIELDS = frozenset({PRICE, LIQUIDITY})
 HOLDER_COUNT = "FIELD-HOLDER-COUNT-001"
+HOLDER_OPS = frozenset({"point_value", "delta", "return_ratio"})
 TIERS = frozenset({"SIMPLE_SCREEN", "COMPOUND_SCREEN"})
 FEATURE_OPS = frozenset(
     {
         "point_value",
+        "delta",
         "ratio",
         "return_ratio",
         "drawdown_from_grid_max",
@@ -174,22 +176,28 @@ def _canonical_feature(feature: Mapping[str, Any]) -> dict[str, Any]:
     if op not in FEATURE_OPS:
         raise GroundedDiscoveryError("FEATURE_OP_UNSUPPORTED")
     body: dict[str, Any] = {"name": name, "op": op}
-    if op in {"point_value", "ratio", "return_ratio", "drawdown_from_grid_max", "rebound_from_grid_min"}:
+    if op in {"point_value", "delta", "ratio", "return_ratio", "drawdown_from_grid_max", "rebound_from_grid_min"}:
         # Field x operator policy is independent of the broad legacy allowlist.
         if feature.get("field_id") == HOLDER_COUNT:
-            if op != "point_value":
+            if op not in HOLDER_OPS:
                 raise GroundedDiscoveryError("FEATURE_OP_UNSUPPORTED")
+            if op != "point_value" and set(feature) != {"name", "op", "field_id", "start", "end"}:
+                raise GroundedDiscoveryError("FEATURE_PARAMETERS_INVALID")
             body["field_id"] = HOLDER_COUNT
         else:
+            if op == "delta":
+                raise GroundedDiscoveryError("FEATURE_OP_UNSUPPORTED")
             body["field_id"] = _field(feature.get("field_id"))
     if op == "point_value":
         body["point"] = _point(feature.get("point"))
     elif op == "ratio":
         body["numerator"] = _point(feature.get("numerator"))
         body["denominator"] = _point(feature.get("denominator"))
-    elif op == "return_ratio":
+    elif op in {"delta", "return_ratio"}:
         body["start"] = _point(feature.get("start"))
         body["end"] = _point(feature.get("end"))
+        if body["field_id"] == HOLDER_COUNT and POINT_OFFSET[body["start"]] >= POINT_OFFSET[body["end"]]:
+            raise GroundedDiscoveryError("FEATURE_WINDOW_INVALID")
     elif op in {"drawdown_from_grid_max", "rebound_from_grid_min"}:
         points = feature.get("points")
         if not isinstance(points, list) or not points:
@@ -783,6 +791,7 @@ def _feature_value_with_lineage(
     due_offset_for: Any = None,
     lateness_for: Any = None,
     snapshot_policy: str | None = None,
+    detail: dict[str, Any] | None = None,
 ) -> tuple[float | None, str | None]:
     """Return (value, lineage_blocker). Lineage blockers stay visible for fitness."""
 
@@ -805,6 +814,8 @@ def _feature_value_with_lineage(
             anchor, point, point_lateness(point), due_offset=due
         )
         if point_deadline is None or decision_deadline is None or point_deadline > decision_deadline:
+            if detail is not None:
+                detail.setdefault("reason", "ABSENT")
             return {"status": "ABSENT"}
         point_due_at = _due_moment(anchor, int(due)) if due is not None else None
         cell = _cell(
@@ -815,6 +826,10 @@ def _feature_value_with_lineage(
             point_due_at=point_due_at if snapshot_policy else None,
         )
         status = str(cell.get("status") or "")
+        if detail is not None:
+            detail.setdefault("sources", []).append({"point": point, "field_id": field, "status": status})
+            if status != "OBSERVED":
+                detail.setdefault("reason", status or "ABSENT")
         if lineage is None and status in SNAPSHOT_LINEAGE_BLOCKERS:
             lineage = status
         return cell
@@ -848,15 +863,29 @@ def _feature_value_with_lineage(
         if read(str(feature["end"]), PRICE).get("status") != "OBSERVED":
             return None, lineage
         return float((end - start).total_seconds()), lineage
-    if op == "return_ratio":
+    if op in {"delta", "return_ratio"}:
         start = read(str(feature["start"]), str(feature["field_id"]))
         end = read(str(feature["end"]), str(feature["field_id"]))
         if start.get("status") != "OBSERVED" or end.get("status") != "OBSERVED":
             return None, lineage
         denominator = float(start["value"])
+        if op == "delta":
+            value = float(end["value"]) - denominator
+            if not math.isfinite(value):
+                if detail is not None:
+                    detail["reason"] = "NONFINITE_RESULT"
+                return None, lineage
+            return value, lineage
         if denominator <= 0:
+            if detail is not None:
+                detail["reason"] = "NONPOSITIVE_DENOMINATOR"
             return None, lineage
-        return float(end["value"]) / denominator - 1.0, lineage
+        value = float(end["value"]) / denominator - 1.0
+        if feature.get("field_id") == HOLDER_COUNT and not math.isfinite(value):
+            if detail is not None:
+                detail["reason"] = "NONFINITE_RESULT"
+            return None, lineage
+        return value, lineage
     if op == "ratio":
         numerator = read(str(feature["numerator"]), str(feature["field_id"]))
         denominator_cell = read(str(feature["denominator"]), str(feature["field_id"]))
@@ -864,6 +893,8 @@ def _feature_value_with_lineage(
             return None, lineage
         denominator = float(denominator_cell["value"])
         if denominator <= 0:
+            if detail is not None:
+                detail["reason"] = "NONPOSITIVE_DENOMINATOR"
             return None, lineage
         return float(numerator["value"]) / denominator, lineage
     points = [str(item) for item in feature.get("points") or []]
@@ -881,6 +912,8 @@ def _feature_value_with_lineage(
     else:
         base = min(values)
     if base <= 0:
+        if detail is not None:
+            detail["reason"] = "NONPOSITIVE_DENOMINATOR"
         return None, lineage
     return float(at["value"]) / base - 1.0, lineage
 
@@ -953,9 +986,9 @@ def _query_points(body: Mapping[str, Any]) -> list[str]:
     points = [
         str(body["decision_point"]),
         "X300",
-        str(body["target"]["reference_point"]),
-        str(body["target"]["exit_point"]),
     ]
+    if body.get("target"):
+        points.extend([str(body["target"]["reference_point"]), str(body["target"]["exit_point"])])
     for feature in body["features"]:
         if not isinstance(feature, Mapping):
             continue
@@ -1144,6 +1177,13 @@ def _require_bound_schedule(binding: Sequence[Mapping[str, Any]], body: Mapping[
     for item in binding:
         for point in _query_points(body):
             _clock(item, point, lateness)
+        for feature in body["features"]:
+            if feature.get("field_id") == HOLDER_COUNT and feature["op"] in {"delta", "return_ratio"}:
+                start = _clock(item, feature["start"], lateness)[0]
+                end = _clock(item, feature["end"], lateness)[0]
+                decision = _clock(item, body["decision_point"], lateness)[0]
+                if not start < end <= decision:
+                    raise GroundedDiscoveryError("FEATURE_WINDOW_INVALID")
 
 
 def _signature_index(observations: Sequence[Mapping[str, Any]]) -> dict[tuple[str, str, str], tuple]:
@@ -1212,6 +1252,8 @@ def _cohort_view(member: Mapping[str, Any]) -> dict[str, Any]:
         "feature_unknown": bool(member.get("feature_unknown")) and not excluded,
         "exclusion": member.get("exclusion"),
         "integrity_excluded": excluded,
+        **({"feature_values": member.get("feature_values", {}), "feature_reasons": member["feature_reasons"],
+            "universe_status": member.get("universe_status")} if "feature_reasons" in member else {}),
     }
 
 
@@ -2296,40 +2338,177 @@ def temporal_frozen_input(binding: Sequence[Mapping[str, Any]]) -> list[dict[str
     ]
 
 
-def execute_temporal_discovery(
-    census: Sequence[Mapping[str, Any]],
-    observations: Sequence[Mapping[str, Any]],
-    spec: Mapping[str, Any],
-    binding: Sequence[Mapping[str, Any]],
-    *,
-    universe_policy: Mapping[str, Any] | None = None,
-) -> dict[str, Any]:
-    """Compute one temporal query. Binding is admitted before any value read."""
+def _feature_dependencies(feature: Mapping[str, Any]) -> list[tuple[str, str]]:
+    field = str(feature.get("field_id") or PRICE)
+    points = [str(feature[k]) for k in ("point", "start", "end", "numerator", "denominator", "at") if k in feature]
+    points.extend(str(p) for p in feature.get("points", []))
+    return list(dict.fromkeys((p, field) for p in points))
 
-    for item in binding:
-        if "holdout" not in item:
-            raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED")
-        if "evidence_role" not in item:
-            raise GroundedDiscoveryError("DISCOVERY_ROLE_AMBIGUOUS")
+
+def _target_projection(grouped, body, item, *, cohort, release, mint, anchor, decision_deadline, matched=True, source_detail=None):
+    """One target selector for evaluation and cross-delivery integrity; never used by preview."""
+    target_value, target_observed, target_exclusion = None, False, None
+    selected_source_event = "UNKNOWN"
+    clock_policy = body.get("observation_clock_policy")
+    snapshot_policy = clock_policy if clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1 else None
+    def _due_late(_cohort, _release, point):
+        return _clock(item, point, body["schedule_lateness_seconds"])
+    entry_at = decision_deadline + timedelta(
+        seconds=int(body["entry_model"]["assumed_latency_seconds"])
+    )
+    exit_point = str(body["target"]["exit_point"])
+    exit_due, exit_late = _due_late(cohort, release, exit_point)
+    exit_deadline = _deadline_for(anchor, exit_point, exit_late, due_offset=exit_due)
+    exit_rows = grouped.get((cohort, release, mint, exit_point, PRICE), ())
+    if clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1:
+        exit_due_at = _due_moment(anchor, exit_due)
+        selected, target_exclusion = _select_snapshot_exit(
+            exit_rows,
+            entry_at=entry_at,
+            exit_due_at=exit_due_at,
+            exit_deadline=exit_deadline,
+            query_policy=clock_policy,
+        )
+    else:
+        selected, target_exclusion = _select_event_time_exit(
+            exit_rows,
+            entry_at=entry_at,
+            exit_deadline=exit_deadline,
+        )
+    reference_point = str(body["target"]["reference_point"])
+    reference_due, reference_late = _due_late(cohort, release, reference_point)
+    reference_deadline = _deadline_for(
+        anchor, reference_point, reference_late, due_offset=reference_due
+    )
+    # Snapshot policy: reference must also meet its own point deadline.
+    # EVENT_TIME keeps decision_deadline-only cutoff for V1/V2 replay parity.
+    use_strict_reference = (
+        clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
+    )
+    if (
+        use_strict_reference
+        and reference_deadline is not None
+        and decision_deadline is not None
+        and reference_deadline < decision_deadline
+    ):
+        ref_cutoff = reference_deadline
+    else:
+        ref_cutoff = decision_deadline
+    reference = _cell(
+        grouped,
+        (cohort, release, mint, reference_point, PRICE),
+        ref_cutoff,
+        snapshot_policy=snapshot_policy,
+        point_due_at=_due_moment(anchor, reference_due) if snapshot_policy else None,
+    )
+    if source_detail is not None:
+        # Preserve selected lawful source cells before ratio arithmetic erases
+        # their absolute prices. Delivery-local transport IDs are not cell truth.
+        source_detail["selected_cells"] = tuple(
+            (point, cell.get("status"), cell.get("value"), cell.get("available_at"),
+             cell.get("source_price_event_time") or "UNKNOWN")
+            for point, cell in ((reference_point, reference), (exit_point, selected))
+        )
+    if (
+        selected.get("status") == "OBSERVED"
+        and reference.get("status") == "OBSERVED"
+        and float(reference["value"]) > 0
+    ):
+        target_value = float(selected["value"]) / float(reference["value"]) - 1.0
+        target_observed = True
+        target_exclusion = None
+        source_event = selected.get("source_price_event_time")
+        if source_event not in (None, ""):
+            selected_source_event = str(source_event)
+    elif selected.get("status") == "OBSERVED" and reference.get("status") != "OBSERVED":
+        ref_status = str(reference.get("status") or "")
+        if ref_status in SNAPSHOT_LINEAGE_BLOCKERS:
+            target_exclusion = ref_status
+        else:
+            target_exclusion = "REFERENCE_NOT_AVAILABLE"
+    elif matched and target_exclusion is None:
+        target_exclusion = "TARGET_UNOBSERVED"
+    return target_value, target_observed, target_exclusion, selected_source_event
+
+
+def _prefix_copy_integrity(census, grouped, body, binding, *, universe_policy, prefix_only):
+    """Compare legal dependency cells, keeping feature and target conflicts separate."""
+    by = {(str(i["cohort_id"]), str(i["release_id"])): i for i in binding}
+    decision = body["decision_point"]
+    lateness = body["schedule_lateness_seconds"]
+    snapshot_policy = body.get("observation_clock_policy")
+    if snapshot_policy != OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1:
+        snapshot_policy = None
+    signatures = {}
+    seats = defaultdict(list)
+    for row in census:
+        key = (str(row.get("mint") or ""), str(row.get("cohort_id") or ""), str(row.get("release_id") or ""))
+        item = by.get(key[1:])
+        if item is None or not key[0]:
+            continue
+        anchor = row.get("authoritative_anchor")
+        due, late = _clock(item, decision, lateness)
+        cutoff = _deadline_for(anchor, decision, late, due_offset=due)
+        identity = (key[0], cutoff.strftime("%Y-%m-%dT%H:%M:%SZ") if cutoff else str(anchor or ""))
+        def cells(pairs):
+            values = []
+            for point, field in pairs:
+                offset, tolerance = _clock(item, point, lateness)
+                deadline = _deadline_for(anchor, point, tolerance, due_offset=offset)
+                cell = _cell(grouped, (*key[1:], key[0], point, field), deadline,
+                             snapshot_policy=snapshot_policy, point_due_at=_due_moment(anchor, offset) if snapshot_policy else None)
+                values.append((point, field, cell.get("status"), cell.get("value")))
+            return tuple(values)
+        membership = [("X300", LIQUIDITY), (decision, PRICE)]
+        if universe_policy is not None:
+            membership.extend([(decision, HOLDER_COUNT), (decision, LIQUIDITY)])
+        signatures[key] = (str(row.get("candidate_state") or ""), cells(membership))
+        features = {}
+        for feature in body["features"]:
+            # Cell values alone omit the bound clocks used by time features.
+            # Reuse the actual feature owner; retain cells so arithmetic cannot
+            # conceal contradictory operands with an equal derived value.
+            projection = _feature_value_with_lineage(
+                grouped, cohort=key[1], release=key[2], mint=key[0], anchor=anchor,
+                feature=feature, lateness=lateness, decision_deadline=cutoff,
+                due_offset_for=lambda point: _clock(item, point, lateness)[0],
+                lateness_for=lambda point: _clock(item, point, lateness)[1],
+                snapshot_policy=snapshot_policy,
+            )
+            features[feature["name"]] = (cells(_feature_dependencies(feature)), projection)
+        target = None
+        if not prefix_only:
+            source_detail = {}
+            projection = _target_projection(grouped, body, item, cohort=key[1], release=key[2],
+                mint=key[0], anchor=anchor, decision_deadline=cutoff, source_detail=source_detail) if cutoff else (None, False, "DECISION_CLOCK_UNAVAILABLE", "UNKNOWN")
+            target = (projection, source_detail.get("selected_cells"))
+        seats[identity].append((features, target))
+    feature_conflicts, target_conflicts = {}, set()
+    for identity, copies in seats.items():
+        feature_conflicts[identity] = {f["name"] for f in body["features"]
+                                       if len({c[0][f["name"]] for c in copies}) > 1}
+        if not prefix_only and len({c[1] for c in copies}) > 1:
+            target_conflicts.add(identity)
+    return signatures, feature_conflicts, target_conflicts
+
+
+def _project_temporal_members(
+    census, observations, body, binding, *, universe_policy=None, prefix_only=False,
+):
+    """The evaluator's membership and feature owner; no targets in prefix mode."""
     admitted = admit_discovery_binding(binding)
-    frozen_source = temporal_frozen_input(binding)
-    bound = validate_temporal_query(spec)
-    body = bound["scientific_body"]
     lateness = int(body["schedule_lateness_seconds"])
-    _require_bound_schedule(binding, body, lateness)
     decision_point = str(body["decision_point"])
-    binding_by = {
-        (str(item.get("cohort_id")), str(item.get("release_id"))): item for item in binding
-    }
-
-    def _due_late(cohort_id: str, release_id: str, point: str) -> tuple[int, int]:
-        item = binding_by.get((cohort_id, release_id))
-        if item is None:
-            raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
-        return _clock(item, point, lateness)
-
-    signature_index = _signature_index(observations)
+    binding_by = {(str(i.get("cohort_id")), str(i.get("release_id"))): i for i in binding}
+    def _due_late(cohort, release, point):
+        return _clock(binding_by[(cohort, release)], point, lateness)
+    prefix_mode = prefix_only or any(f.get("field_id") == HOLDER_COUNT and f["op"] in {"delta", "return_ratio"} for f in body["features"])
     grouped = _grouped_cells(observations)
+    prefix_signatures, feature_conflicts, target_conflicts = ({}, {}, set())
+    if prefix_mode:
+        prefix_signatures, feature_conflicts, target_conflicts = _prefix_copy_integrity(
+            census, grouped, body, binding, universe_policy=universe_policy, prefix_only=prefix_only)
+    signature_index = prefix_signatures if prefix_mode else _signature_index(observations)
     admitted_pairs = {
         (str(item["cohort_id"]), str(item["release_id"])) for item in admitted["cohorts"]
     }
@@ -2477,6 +2656,7 @@ def execute_temporal_discovery(
             else:
                 in_base = True
         feature_values: dict[str, float | None] = {}
+        feature_reasons: dict[str, str] = {}
         decision_eligible = False
         universe_status = None
         universe_reasons: list[str] = []
@@ -2523,6 +2703,7 @@ def execute_temporal_discovery(
                 exclusion = decision_status
             if decision_eligible:
                 for feature in features:
+                    detail = {}
                     value, feature_lineage = _feature_value_with_lineage(
                         grouped,
                         cohort=cohort,
@@ -2539,7 +2720,13 @@ def execute_temporal_discovery(
                             cohort, release, point
                         )[1],
                         snapshot_policy=snapshot_policy,
+                        detail=detail if prefix_mode else None,
                     )
+                    if prefix_mode and feature["name"] in feature_conflicts.get(identity, set()):
+                        value, feature_lineage = None, None
+                        detail["reason"] = "DELIVERY_CONFLICT"
+                    if prefix_mode and value is None:
+                        feature_reasons[feature["name"]] = detail.get("reason") or "FEATURE_UNAVAILABLE"
                     feature_values[str(feature["name"])] = value
                     if (
                         feature_lineage in SNAPSHOT_LINEAGE_BLOCKERS
@@ -2555,74 +2742,12 @@ def execute_temporal_discovery(
         target_observed = False
         target_exclusion = None
         selected_source_event = "UNKNOWN"
-        if search_base and decision_deadline is not None:
-            entry_at = decision_deadline + timedelta(
-                seconds=int(body["entry_model"]["assumed_latency_seconds"])
-            )
-            exit_point = str(body["target"]["exit_point"])
-            exit_due, exit_late = _due_late(cohort, release, exit_point)
-            exit_deadline = _deadline_for(anchor, exit_point, exit_late, due_offset=exit_due)
-            exit_rows = grouped.get((cohort, release, mint, exit_point, PRICE), ())
-            if clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1:
-                exit_due_at = _due_moment(anchor, exit_due)
-                selected, target_exclusion = _select_snapshot_exit(
-                    exit_rows,
-                    entry_at=entry_at,
-                    exit_due_at=exit_due_at,
-                    exit_deadline=exit_deadline,
-                    query_policy=clock_policy,
-                )
-            else:
-                selected, target_exclusion = _select_event_time_exit(
-                    exit_rows,
-                    entry_at=entry_at,
-                    exit_deadline=exit_deadline,
-                )
-            reference_point = str(body["target"]["reference_point"])
-            reference_due, reference_late = _due_late(cohort, release, reference_point)
-            reference_deadline = _deadline_for(
-                anchor, reference_point, reference_late, due_offset=reference_due
-            )
-            # Snapshot policy: reference must also meet its own point deadline.
-            # EVENT_TIME keeps decision_deadline-only cutoff for V1/V2 replay parity.
-            use_strict_reference = (
-                clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
-            )
-            if (
-                use_strict_reference
-                and reference_deadline is not None
-                and decision_deadline is not None
-                and reference_deadline < decision_deadline
-            ):
-                ref_cutoff = reference_deadline
-            else:
-                ref_cutoff = decision_deadline
-            reference = _cell(
-                grouped,
-                (cohort, release, mint, reference_point, PRICE),
-                ref_cutoff,
-                snapshot_policy=snapshot_policy,
-                point_due_at=_due_moment(anchor, reference_due) if snapshot_policy else None,
-            )
-            if (
-                selected.get("status") == "OBSERVED"
-                and reference.get("status") == "OBSERVED"
-                and float(reference["value"]) > 0
-            ):
-                target_value = float(selected["value"]) / float(reference["value"]) - 1.0
-                target_observed = True
-                target_exclusion = None
-                source_event = selected.get("source_price_event_time")
-                if source_event not in (None, ""):
-                    selected_source_event = str(source_event)
-            elif selected.get("status") == "OBSERVED" and reference.get("status") != "OBSERVED":
-                ref_status = str(reference.get("status") or "")
-                if ref_status in SNAPSHOT_LINEAGE_BLOCKERS:
-                    target_exclusion = ref_status
-                else:
-                    target_exclusion = "REFERENCE_NOT_AVAILABLE"
-            elif matched and target_exclusion is None:
-                target_exclusion = "TARGET_UNOBSERVED"
+        if not prefix_only and identity in target_conflicts:
+            target_exclusion = "TARGET_DELIVERY_CONFLICT"
+        elif not prefix_only and search_base and decision_deadline is not None:
+            target_value, target_observed, target_exclusion, selected_source_event = _target_projection(
+                grouped, body, binding_by[(cohort, release)], cohort=cohort, release=release,
+                mint=mint, anchor=anchor, decision_deadline=decision_deadline, matched=matched)
         # Outcome fitness is scoped to matched members only. Publishing exit /
         # reference lineage for unmatched members would let a false predicate
         # zero-match collapse into a technical stop.
@@ -2640,6 +2765,7 @@ def execute_temporal_discovery(
                 "in_base": in_base,
                 "decision_eligible": decision_eligible,
                 "feature_values": feature_values,
+                **({"feature_reasons": feature_reasons, "cohort_id": cohort, "release_id": release} if prefix_mode else {}),
                 "feature_unknown": feature_unknown,
                 "matched": matched,
                 "target": target_value,
@@ -2659,6 +2785,45 @@ def execute_temporal_discovery(
             }
         )
         _note_cohort_membership(cohort_membership, cohort, identity, members[-1])
+    return members, cohort_membership, seen, duplicate_count, integrity_conflicts
+
+
+def execute_temporal_discovery(
+    census: Sequence[Mapping[str, Any]],
+    observations: Sequence[Mapping[str, Any]],
+    spec: Mapping[str, Any],
+    binding: Sequence[Mapping[str, Any]],
+    *,
+    universe_policy: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Compute one temporal query. Binding is admitted before any value read."""
+
+    for item in binding:
+        if "holdout" not in item:
+            raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED")
+        if "evidence_role" not in item:
+            raise GroundedDiscoveryError("DISCOVERY_ROLE_AMBIGUOUS")
+    admitted = admit_discovery_binding(binding)
+    frozen_source = temporal_frozen_input(binding)
+    bound = validate_temporal_query(spec)
+    body = bound["scientific_body"]
+    lateness = int(body["schedule_lateness_seconds"])
+    _require_bound_schedule(binding, body, lateness)
+    decision_point = str(body["decision_point"])
+    binding_by = {
+        (str(item.get("cohort_id")), str(item.get("release_id"))): item for item in binding
+    }
+
+    def _due_late(cohort_id: str, release_id: str, point: str) -> tuple[int, int]:
+        item = binding_by.get((cohort_id, release_id))
+        if item is None:
+            raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
+        return _clock(item, point, lateness)
+
+    members, cohort_membership, seen, duplicate_count, integrity_conflicts = _project_temporal_members(
+        census, observations, body, binding, universe_policy=universe_policy)
+    features, predicates = list(body["features"]), list(body["predicates"])
+    cohort_ids = [str(item["cohort_id"]) for item in admitted["cohorts"]]
     base_members = [item for item in members if item["in_base"]]
     decision_members = [item for item in base_members if item["decision_eligible"]]
     matched_members, observed, missing_target = _conditional_sample(decision_members)
@@ -2937,13 +3102,15 @@ def validate_feature_preview_spec(spec: Mapping[str, Any]) -> dict[str, Any]:
     features = [_canonical_feature(_require_mapping(f, "FEATURE_INVALID")) for f in features_in]
     if len(features) > MAX_FEATURES or len({f["name"] for f in features}) != len(features):
         raise GroundedDiscoveryError("FEATURE_INVALID")
+    raw_holder_recipe = any(f.get("field_id") == HOLDER_COUNT and f["op"] in {"delta", "return_ratio"} for f in features)
     for feature in features:
-        if feature["op"] != "point_value":
+        if not raw_holder_recipe and feature["op"] != "point_value":
             raise GroundedDiscoveryError("FEATURE_OP_UNSUPPORTED")
-        if POINT_OFFSET[feature["point"]] > POINT_OFFSET[decision_point]:
-            raise GroundedDiscoveryError("FEATURE_AFTER_DECISION")
-        if feature["point"] not in point_ids:
-            raise GroundedDiscoveryError("SCHEDULE_INVALID")
+        for point, _field_id in _feature_dependencies(feature):
+            if POINT_OFFSET[point] > POINT_OFFSET[decision_point]:
+                raise GroundedDiscoveryError("FEATURE_AFTER_DECISION")
+            if point not in point_ids:
+                raise GroundedDiscoveryError("SCHEDULE_INVALID")
     clock_policy = schedule.get("observation_clock_policy", OBSERVATION_CLOCK_EVENT_TIME_V1)
     if clock_policy in (None, ""):
         clock_policy = OBSERVATION_CLOCK_EVENT_TIME_V1
@@ -3037,6 +3204,9 @@ def build_feature_preview(
     """Feature-only preview. Target and survival labels are not computed."""
 
     checked = validate_feature_preview_spec(spec)
+    if any(f.get("field_id") == HOLDER_COUNT and f["op"] in {"delta", "return_ratio"} for f in checked["features"]):
+        return _build_recipe_preview(census, observations, spec, binding,
+                                     prior_preview_hashes=prior_preview_hashes, universe_policy=universe_policy)
     admitted = admit_discovery_binding(binding)
     decision_point, lateness = checked["decision_point"], checked["lateness"]
     point_ids, features = checked["point_ids"], checked["features"]
@@ -3205,6 +3375,141 @@ def build_feature_preview(
     return payload
 
 
+def _build_recipe_preview(census, observations, spec, binding, *, prior_preview_hashes, universe_policy):
+    checked = validate_feature_preview_spec(spec)
+    body = {"decision_point": checked["decision_point"], "schedule_lateness_seconds": checked["lateness"],
+            "observation_clock_policy": checked["clock_policy"], "features": checked["features"], "predicates": []}
+    _require_bound_schedule(binding, body, checked["lateness"])
+    from solana_alpha_lab.factory.hfic_research_universe_policy import snapshot
+    policy = snapshot(universe_policy) if universe_policy is not None else None
+    frozen = temporal_frozen_input(binding)
+    recipe = {"decision_point": checked["decision_point"], "features": sorted(checked["features"], key=lambda f: f["name"]),
+              "schedule": {"points": checked["point_ids"], "lateness_seconds": checked["lateness"],
+                           "observation_clock_policy": checked["clock_policy"]}}
+    identity = _sha256({"recipe": recipe, "seed": checked["seed"], "input": frozen, "policy": policy})
+    if identity not in prior_preview_hashes and len(set(prior_preview_hashes)) >= MAX_PREVIEW_SPECS:
+        raise GroundedDiscoveryError("PREVIEW_ENVELOPE_EXHAUSTED")
+    members, cohorts, _seen, duplicates, conflicts = _project_temporal_members(
+        census, observations, body, binding, universe_policy=universe_policy, prefix_only=True)
+    def counts(rows, *, detail):
+        base = [r for r in rows if r.get("in_base")]
+        eligible = [r for r in base if r.get("decision_eligible")]
+        joint = sum(all(r.get("feature_values", {}).get(f["name"]) is not None for f in checked["features"]) for r in eligible)
+        result = {"base_x_n": len(base), "universe": {s: sum(r.get("universe_status") == s for r in base) for s in ("PASS", "FAIL", "UNKNOWN")},
+                  "decision_eligible_n": len(eligible), "joint_calculable_n": joint, "joint_unavailable_n": len(eligible)-joint}
+        if detail:
+            result["features"] = {}
+            for f in checked["features"]:
+                name = f["name"]
+                n = sum(r.get("feature_values", {}).get(name) is not None for r in eligible)
+                reasons = defaultdict(int)
+                for r in eligible:
+                    if r.get("feature_values", {}).get(name) is None:
+                        reasons[r.get("feature_reasons", {}).get(name) or "FEATURE_UNAVAILABLE"] += 1
+                result["features"][name] = {"calculable_n": n, "unavailable_n": len(eligible)-n, "reason_counts": dict(sorted(reasons.items()))}
+        return result
+    summary = {"grain": "UNIQUE_MINT_DECISION_TIMESTAMP", "scope": "ALL_ADMITTED_DEPENDENCY_PREFIX",
+               "denominator": "DECISION_ELIGIBLE", "counts_truncated": False, "pooled": counts(members, detail=True),
+               "by_cohort": [{"cohort_id": c, **counts(list(rows.values()), detail=False)} for c, rows in sorted((str(i["cohort_id"]), cohorts.get(str(i["cohort_id"]), {})) for i in admit_discovery_binding(binding)["cohorts"])],
+               "duplicate_delivery_count": duplicates, "membership_integrity_conflict_count": conflicts,
+               "unique_mint_n": len({r["identity"][0] for r in members if r.get("in_base")}),
+               "unique_decision_n": sum(bool(r.get("in_base")) for r in members),
+               "cohort_sums_are_independent": False, "independence": "UNKNOWN"}
+    examples = []
+    for r in members:
+        if not r.get("decision_eligible"):
+            continue
+        anonymous = hashlib.sha256(f"{checked['seed']}:{r['identity']}".encode()).hexdigest()[:16]
+        examples.append({"anonymous_id": anonymous, "feature_values": r["feature_values"],
+                         "feature_status": {f["name"]: r.get("feature_reasons", {}).get(f["name"], "OBSERVED") for f in checked["features"]}})
+    examples.sort(key=lambda r: r["anonymous_id"])
+    payload = {"schema": "smial.hfic-temporal-preview", "schema_version": "1.0", "preview_sha256": identity,
+               "decision_point": checked["decision_point"], "target_included": False, "sampling_rule": "HASH_MEMBERSHIP_SEED",
+               "selected_count": min(len(examples), PREVIEW_EXAMPLE_LIMIT), "total_count": summary["pooled"]["base_x_n"],
+               "sample_population_n": len(examples), "examples_truncated": len(examples)>PREVIEW_EXAMPLE_LIMIT,
+               "silent_truncation": False, "examples": examples[:PREVIEW_EXAMPLE_LIMIT], "support_summary": summary,
+               "feature_recipe": recipe, "feature_recipe_sha256": _sha256(recipe), "frozen_input": frozen,
+               "input_sha256": _sha256({"input": frozen}), "universe_policy": policy}
+    if len(_canonical(payload).encode()) > PREVIEW_BYTE_LIMIT:
+        raise GroundedDiscoveryError("PREVIEW_TOO_LARGE")
+    return payload
+
+
+def recipe_capabilities() -> dict[str, Any]:
+    """Descriptor derived from the validator's closed field/operator policy."""
+    return {"fields": {HOLDER_COUNT: sorted(HOLDER_OPS), PRICE: sorted(FEATURE_OPS - {"delta"}),
+                       LIQUIDITY: sorted(FEATURE_OPS - {"delta"})},
+            "parameters": {"point_value": ["field_id", "point"], "delta": ["field_id", "start", "end"],
+                           "return_ratio": ["field_id", "start", "end"], "ratio": ["field_id", "numerator", "denominator"],
+                           "drawdown_from_grid_max": ["field_id", "points", "at"], "rebound_from_grid_min": ["field_id", "points", "at"],
+                           "elapsed_seconds": ["start", "end"], "utc_hour": ["point"]},
+            "units": {"holder_delta": "HOLDER_COUNT", "return_ratio": "DIMENSIONLESS_FRACTION"},
+            "constraints": ["HOLDER_START_LT_END_LE_DECISION_BOUND_SCHEDULE", "PIT_LINEAGE_REQUIRED",
+                            "MISSING_LATE_CONFLICT_UNAVAILABLE", "RETURN_DENOMINATOR_POSITIVE", "NO_EWM_NO_HOLDER_TARGET",
+                            "SUPPORT_IS_NOT_ALPHA", "EXACT_RECIPE_NO_SWEEP"]}
+
+
+def universe_question_guard(body: Mapping[str, Any], definition: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Prove only direct same-decision-cell dominance. Never edits the recipe."""
+    if not isinstance(definition, Mapping):
+        return []
+    features = {f["name"]: f for f in body["features"]}
+    redundant = []
+    for predicate in body["predicates"]:
+        f = features[predicate["feature"]]
+        minima = {definition.get("holder_field_id"): definition.get("min_holders"),
+                  definition.get("liquidity_field_id"): definition.get("min_liquidity_usd")}
+        if f["op"] != "point_value" or f.get("point") != body["decision_point"] or f.get("field_id") not in minima:
+            continue
+        minimum = _finite_number(minima[f["field_id"]])
+        if minimum is None:
+            continue
+        op, value = predicate["op"], predicate.get("value")
+        impossible = (op == "lt" and value <= minimum) or (op == "lte" and value < minimum) or (op == "between" and predicate["upper"] <= minimum)
+        if impossible:
+            raise GroundedDiscoveryError("UNIVERSE_IMPOSSIBLE_QUESTION")
+        if (op == "gte" and value <= minimum) or (op == "gt" and value < minimum):
+            redundant.append(dict(predicate))
+    if body["predicates"] and len(redundant) == len(body["predicates"]):
+        raise GroundedDiscoveryError("UNIVERSE_NON_DISCRIMINATING_QUESTION")
+    return [{"reason_code": "REDUNDANT_UNIVERSE_CONJUNCT", "predicate": p} for p in redundant]
+
+
+def saved_feature_preview(store, *, journal_scope, operation_sha256, spec_sha256, binding):
+    """Verified saved payload; metadata hashes may be read, scientific values never are."""
+    from solana_alpha_lab.factory.hfic_research_universe_policy import snapshot
+    for record in store.iter_committed_records():
+        if getattr(record.record_kind, "value", record.record_kind) != "RESEARCH_ARTIFACT":
+            continue
+        try:
+            wrapper = json.loads(record.payload_json)
+            canonical = wrapper.get("payload_canonical", "")
+            body = json.loads(canonical)
+        except (ValueError, TypeError):
+            continue
+        if not isinstance(body, dict) or any(body.get(k) != v for k, v in {
+            "artifact_kind": "DISCOVERY_FEATURE_PREVIEW", "journal_scope": journal_scope,
+            "operation_sha256": operation_sha256, "spec_sha256": spec_sha256}.items()):
+            continue
+        if hashlib.sha256(record.payload_json.encode()).hexdigest() != record.payload_sha256 or hashlib.sha256(canonical.encode()).hexdigest() != wrapper.get("payload_sha256"):
+            raise GroundedDiscoveryError("PREVIEW_PAYLOAD_INTEGRITY_MISMATCH")
+        payload = body.get("preview_payload")
+        if payload is None:
+            return {"preview_sha256": body["preview_sha256"], "detail_status": "LEGACY_PREVIEW_DETAIL_UNAVAILABLE"}
+        if not isinstance(payload, dict) or _sha256(payload) != body.get("preview_payload_sha256") or payload.get("preview_sha256") != body.get("preview_sha256"):
+            raise GroundedDiscoveryError("PREVIEW_PAYLOAD_INTEGRITY_MISMATCH")
+        if payload.get("frozen_input") != temporal_frozen_input(binding):
+            raise GroundedDiscoveryError("PREVIEW_INPUT_IDENTITY_MISMATCH")
+        policy = payload.get("universe_policy")
+        if policy is not None and snapshot(policy) != policy:
+            raise GroundedDiscoveryError("PREVIEW_POLICY_IDENTITY_MISMATCH")
+        recipe = payload.get("feature_recipe")
+        if not isinstance(recipe, dict) or _sha256(recipe) != payload.get("feature_recipe_sha256"):
+            raise GroundedDiscoveryError("PREVIEW_RECIPE_IDENTITY_MISMATCH")
+        return dict(payload)
+    raise GroundedDiscoveryError("PREVIEW_SAVED_PAYLOAD_NOT_FOUND")
+
+
 def stored_preview_hashes(store: Any, journal_scope: str) -> list[str]:
     found: list[str] = []
     for record in store.iter_committed_records():
@@ -3239,11 +3544,24 @@ def persist_feature_preview(
     """Remember a preview in the store. Identity includes the journal and the input."""
 
     digest = str(preview.get("preview_sha256") or "")
-    if digest in stored_preview_hashes(store, journal_scope):
-        return
-    identity = hashlib.sha256(
-        f"{journal_scope}:{digest}:{input_sha256}".encode("utf-8")
-    ).hexdigest()
+    if operation_sha256 and spec_sha256:
+        for record in store.iter_committed_records():
+            if getattr(record.record_kind, "value", record.record_kind) != "RESEARCH_ARTIFACT":
+                continue
+            try:
+                existing = json.loads(json.loads(record.payload_json).get("payload_canonical", ""))
+            except (ValueError, TypeError):
+                continue
+            if isinstance(existing, dict) and all(existing.get(k) == v for k, v in {
+                "artifact_kind": "DISCOVERY_FEATURE_PREVIEW", "journal_scope": journal_scope,
+                "preview_sha256": digest, "operation_sha256": operation_sha256, "spec_sha256": spec_sha256}.items()):
+                return
+        identity = _sha256({"journal_scope": journal_scope, "preview_sha256": digest,
+                            "input_sha256": input_sha256, "operation_sha256": operation_sha256, "spec_sha256": spec_sha256})
+    else:
+        if digest in stored_preview_hashes(store, journal_scope):
+            return
+        identity = hashlib.sha256(f"{journal_scope}:{digest}:{input_sha256}".encode("utf-8")).hexdigest()
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
     now = datetime.now(timezone.utc)
@@ -3255,6 +3573,8 @@ def persist_feature_preview(
         "selected_count": preview.get("selected_count"),
         "total_count": preview.get("total_count"),
     }
+    if "support_summary" in preview:
+        body.update(preview_payload=dict(preview), preview_payload_sha256=_sha256(preview), input_sha256=input_sha256)
     if operation_sha256:
         body["operation_sha256"] = operation_sha256
     if spec_sha256:

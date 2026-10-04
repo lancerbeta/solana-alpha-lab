@@ -3333,6 +3333,11 @@
       "target_asset_id": "TEST-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001"
     },
     {
+      "source_asset_id": "CTRL-FORGE-COMPOSITE-FEATURE-RECIPES-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001"
+    },
+    {
       "source_asset_id": "CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001",
       "relation": "contains",
       "target_asset_id": "MODULE-HFIC-EVIDENCE-IDENTITY-001"
@@ -5955,6 +5960,11 @@
     {
       "source_asset_id": "DOC-FORGE-TEMPORAL-HOLDER-POINT-FEATURE-001",
       "relation": "depends_on",
+      "target_asset_id": "DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001"
+    },
+    {
+      "source_asset_id": "DOC-FORGE-TEMPORAL-HOLDER-POINT-FEATURE-001",
+      "relation": "depends_on",
       "target_asset_id": "DOC-FORGE-DOWNSIDE-DESCRIPTIVE-001"
     },
     {
@@ -5996,6 +6006,11 @@
       "source_asset_id": "DOC-HYPOTHESIS-FORGE-OPERATOR-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001"
+    },
+    {
+      "source_asset_id": "DOC-HYPOTHESIS-FORGE-OPERATOR-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001"
     },
     {
       "source_asset_id": "DOC-HYPOTHESIS-FORGE-OPERATOR-001",
@@ -6916,6 +6931,16 @@
       "source_asset_id": "EVIDENCE-FACTORY-V1-PRODUCTION-LITE-RUNTIME-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FORGE-COMPOSITE-FEATURE-RECIPES-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-FORGE-COMPOSITE-FEATURE-RECIPES-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FORGE-COMPOSITE-FEATURE-RECIPES-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-FORGE-COMPOSITE-FEATURE-RECIPES-001"
     },
     {
       "source_asset_id": "EVIDENCE-FRESH-OOS-FRICTION-VETO-ACCEPTANCE-001",
@@ -11789,6 +11814,11 @@
     },
     {
       "source_asset_id": "MODULE-HFIC-TEMPORAL-DISCOVERY-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-TEMPORAL-DISCOVERY-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001"
     },
@@ -14216,6 +14246,16 @@
       "source_asset_id": "REPORT-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FACTORY-V1-PRODUCTION-LITE-RUNTIME-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "REPORT-FORGE-COMPOSITE-FEATURE-RECIPES-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001"
+    },
+    {
+      "source_asset_id": "REPORT-FORGE-COMPOSITE-FEATURE-RECIPES-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FORGE-COMPOSITE-FEATURE-RECIPES-001"
     },
     {
       "source_asset_id": "REPORT-FRESH-OOS-FRICTION-VETO-001",
@@ -17076,6 +17116,11 @@
       "source_asset_id": "TEST-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "TEST-FORGE-COMPOSITE-FEATURE-RECIPES-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001"
     },
     {
       "source_asset_id": "TEST-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001",

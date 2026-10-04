@@ -2254,6 +2254,9 @@ def build_forge_context_packet(
             packet["bound_visible_cohort_ids"] = bound_cohorts
         if control_packet_has_raw_sequences(packet):
             raise HficPreflightError("CONTROL_RAW_SEQUENCE_FORBIDDEN")
+    else:
+        from solana_alpha_lab.factory.hfic_temporal_discovery import recipe_capabilities
+        packet["temporal_recipe_capabilities"] = recipe_capabilities()
     from solana_alpha_lab.factory.hfic_vision_integrity import (
         FORGE_VISION_INTEGRITY_BLOCKED,
         compact_feature_grounding_entries,

@@ -1,0 +1,212 @@
+{
+  "acceptance": {
+    "A": {
+      "checks": "Raw arithmetic/closed windows; capability-only schema and grounding; unknown/unaccepted CAP fail-closed; legacy preview exact frozen-base golden and 40 legacy grounding/availability/temporal checks PASS",
+      "selected_target_source_copy_integrity": "Equal ratios from contradictory selected reference/exit prices refuse TARGET_DELIVERY_CONFLICT; prefix eligibility/support preserved; both delivery orders verified",
+      "verdict": "PASS"
+    },
+    "B": {
+      "base_x_n": 48,
+      "bound_clock_copy_integrity": "Declared dependency cells plus actual feature value/lineage projection; delta and return_ratio mixed with elapsed_seconds and utc_hour preserve decision seat, refuse conflicting clock feature, and produce identical MAIN/preview in both copy orders; preview target selector trapped",
+      "cohorts": 4,
+      "cold_value_loads": 0,
+      "counts_seed_independent": true,
+      "decision_eligible_n": 36,
+      "delta_joint_calculable_n": 24,
+      "displayed_examples": 24,
+      "each_operation_binding_persisted": true,
+      "empty_admitted_cohort_explicit": true,
+      "legacy_non_raw_preview": "Public full mixed query projects only point_value features and preserves frozen-base identity/output; full-prefix owner never invoked",
+      "outcome_value_loads": 0,
+      "return_ratio_joint_calculable_n": 20,
+      "scope": "RAW_HOLDER_DELTA_RETURN_RATIO_COMPOSITES_ONLY",
+      "universe": {
+        "FAIL": 4,
+        "PASS": 40,
+        "UNKNOWN": 4
+      },
+      "verdict": "PASS"
+    },
+    "C": {
+      "fresh_bound_window_refused_before_reservation_and_values": true,
+      "fresh_tautology_impossible_refused_before_values_and_reservation": true,
+      "redundant_warning_preserves_hash": true,
+      "saved_correction_pending_precedence": "Existing owners preserved; lifecycle/revision direct consumers PASS",
+      "verdict": "PASS"
+    },
+    "D": {
+      "availability_denial_codes": [],
+      "classifier": "NOT_APPLICABLE_ON_NATIVE_KILL",
+      "definition_sha256": "d3510e65d5979a25e227f945a85b61265dcd1e01a7a224b7a06834c948ec2057",
+      "grounding": {
+        "capability_bindings": [
+          {
+            "accepted": true,
+            "authority_granted": false,
+            "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+          }
+        ],
+        "context_packet_sha256": "eaaee77e6ff70e01274245f79ec71408ecbe7d3260065ac67962bf7ee896218a",
+        "feature_bindings": [],
+        "terminal": "GROUNDED",
+        "unresolved_requirements": []
+      },
+      "native_terminal": "KILL_LOW_INFORMATION_VALUE",
+      "owner_final": "NON_SCIENTIFIC_STOP",
+      "owner_receipt_sha256": "60a995dff678141b82d1dd378d65d28750a09f021341dcfcda8410363cafa017",
+      "packet_canonical_sha256": "fa563940f69d7882757c0140d991b94549d9b04369b713acd4561790f6c0c7a7",
+      "path": [
+        "public MAIN commit despite reply loss",
+        "exact saved grounded readback",
+        "persist-draft",
+        "resume generated draft",
+        "freeze actual agent input",
+        "native isolated Critic",
+        "required finalize",
+        "forge-run --persist"
+      ],
+      "public_refused_faults": [
+        "GROUNDED_EVIDENCE_REQUIRED",
+        "GROUNDED_RESULT_MISMATCH",
+        "FORGE_CANDIDATE_UNKNOWN_CAPABILITY_ID"
+      ],
+      "refused_inventory_unchanged": true,
+      "required_capability_ids": [
+        "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+      ],
+      "required_feature_ids": [],
+      "result_sha256": "856153dca9991bd9ca1d4ad195fefe7bf0ac72bf65b8e908937a21d659f06cb6",
+      "scientific_acceptance": "NOT_CLAIMED",
+      "session_id": "HFIC-SESS-C6EB6B38A3D384EC",
+      "spec_sha256": "a81a55e0334c5cabd8586ed6ca359d99c2e4c35c404945d606c24e6a4fe19176",
+      "unresolved_requirements": [],
+      "verdict": "PASS_ENGINEERING_PATH"
+    },
+    "E": {
+      "cold_inventory_unchanged": true,
+      "cold_owner_evaluator_calls": 0,
+      "cold_owner_value_loads": 0,
+      "completion_output_sha256": "36aaba2fb607bea5f6ff0cf4a540ee692e3e50033a66cb5c67a87797516584bc",
+      "next_legacy_owner_final": "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
+      "operation_state": "COMPLETED",
+      "registered_replay_evaluator_calls": 1,
+      "registered_replay_summary_equal": true,
+      "saved_evaluator_calls": 0,
+      "verdict": "PASS"
+    },
+    "F": {
+      "isolation_receipt": "a1_native_isolation_v1.json",
+      "native_queries": "a1_native_agent_queries_v1.json",
+      "public_validator": "Fresh P1 isolated packet-only agent queries validated; historical input commit66abc2 is explicit; current descriptor equals actual v4/v5 packets and guide/skill hashes are unchanged",
+      "semantic_gold": "Existing plus Russian holder growth, mixed hypothesis and raw holder availability PASS",
+      "verdict": "PASS"
+    }
+  },
+  "as_of": "2026-10-04",
+  "authority_brief_sha256": "d3abed94024646c2256199d954e28a1971c7e26c5eeb346890810493f53c92fc",
+  "base": "27366b752cd0fae9683dd50373ea8ff8da5a6f6d",
+  "execution_commit": "86d0351cbdd38649a5efa01b7f6f9314aebef11f",
+  "generated_sync": {
+    "base": "27366b752cd0fae9683dd50373ea8ff8da5a6f6d",
+    "budget_expansion": false,
+    "hashed_assets": 16,
+    "idempotency": "PASS_IMPACTED_CLOSURE_NOOP",
+    "mode": "INCREMENTAL"
+  },
+  "integration_remediation": {
+    "effect": "Only schedule protocol refusal transport restored and optional-export NO_CHANGE bookkeeping added; valid compute, recipe, population, grounding and budgets unchanged",
+    "failed_ci_head": "34412fd9d078afdfec0ed861b749f8e544ffdbeb",
+    "failed_ci_run": 37225705710,
+    "failures": [
+      "Legacy SCHEDULE_LATENESS_MISMATCH protocol stderr transport",
+      "Legacy SCHEDULE_CONTEXT_UNBOUND protocol stderr transport",
+      "SOURCE_DISPOSITION_REQUIRED for acceptance receipt"
+    ],
+    "log_logical_ref": "local/forge_composite_final_review/p1-ci-integration-checks.log",
+    "log_sha256": "0a618b4a09389ba84f77c8431074ce6fa963c6208756a76e97dadee67c3d7bac",
+    "source_fix_commit": "71c017e75eb6c6ae362721e0383379ebbb10a7e3",
+    "targeted_result": "PASS",
+    "targeted_seconds": 328.233,
+    "targeted_tests": 36
+  },
+  "limits": [
+    "Synthetic evidence is not alpha/market negative/net return/PIT_READY/real-science grant",
+    "Legacy point/PRICE/LIQ preview projection and scientific identities/populations stay frozen",
+    "GROUNDED proves binding only; native scientific terminal retains existing lifecycle meaning; spent quota is not refunded",
+    "One delegated guarded merge only after new exact-head CI and freshly bound machine phrase, then exact main/post-merge CI readback"
+  ],
+  "owner_repair_request_sha256": "f11e73d8f21ccdf50c228bae81ba8d5373549ad65f2c5f9d39cb36287b53a2fd",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT; repository engineering only; no export mutation, replacement, activation or smoke requirement."
+  },
+  "real_authority_effects": {
+    "budget_estimand_expansion": 0,
+    "c5_holdout_reads": 0,
+    "live_store_profile_operation_writes": 0,
+    "main_adaptive_looks": 0,
+    "market_value_reads": 0,
+    "new_CAP_FEAT": 0,
+    "provider_calls": 0
+  },
+  "reproduce": {
+    "direct_consumers": "PYTHONPATH=src uv run --locked --managed-python python -B -m unittest tests.test_hfic_temporal_production_runner_v1.TemporalVerticalTests.test_published_journal_reaches_document_runner_readback tests.test_hfic_temporal_result_coherence_v1.SavedResultRevisionVerticalTests.test_saved_wrong_simple_is_revised_without_a_new_main tests.test_hfic_candidate_cold_lifecycle_v1.ColdLifecycleVerticalTests.test_a1_one_candidate_kill_is_found_cold -v",
+    "native": "prepare_scientific_path(unittest.TestCase(), disposable absolute workspace); fresh isolated Critic on actual packet; public finalize and forge-run --persist/--no-write; registered replay and legacy _cycle. Native verdict independently authored, never scripted PASS.",
+    "pure_and_public": "PYTHONPATH=src uv run --locked --managed-python python -B -m unittest tests.test_forge_composite_feature_recipes_v1 tests.test_hfic_temporal_discovery_v1 -v"
+  },
+  "scope": "RAW_ONLY_DISPOSABLE_SYNTHETIC",
+  "targeted_validation": [
+    {
+      "result": "PASS",
+      "scope": "current composite module A-E including actual public freeze and next legacy cycle",
+      "seconds": 176.539,
+      "tests": 21
+    },
+    {
+      "result": "PASS",
+      "scope": "current arithmetic/clock-copy plus legacy temporal and holder-policy pure consumers",
+      "seconds": 2.897,
+      "tests": 38
+    },
+    {
+      "result": "PASS",
+      "scope": "legacy temporal/grounding/availability",
+      "seconds": 9.02,
+      "tests": 40
+    },
+    {
+      "result": "PASS",
+      "scope": "holder point direct consumers",
+      "tests": 12
+    },
+    {
+      "result": "PASS",
+      "scope": "ordinary operations unchanged",
+      "tests": 14
+    },
+    {
+      "result": "PASS",
+      "scope": "legacy draft schema/freeze compatibility",
+      "tests": 3
+    },
+    {
+      "result": "PASS",
+      "scope": "saved result revision direct consumer",
+      "tests": 1
+    },
+    {
+      "result": "PASS",
+      "scope": "semantic operability and Catalog routing",
+      "seconds": 13.728,
+      "tests": 18
+    },
+    {
+      "execution_commit": "71c017e75eb6c6ae362721e0383379ebbb10a7e3",
+      "result": "PASS",
+      "scope": "current complete composite module plus both CI-failing legacy public owner paths and Project Sources registry bookkeeping",
+      "seconds": 328.233,
+      "tests": 36
+    }
+  ],
+  "task_id": "FORGE_COMPOSITE_FEATURE_RECIPES_V1"
+}
