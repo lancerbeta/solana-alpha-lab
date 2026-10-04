@@ -1860,6 +1860,18 @@ readback loads zero values; registered numerical replay performs the evaluator.
 
 Legacy missing support detail is explicit, never reconstructed silently.
 
+Typed recovery for raw composite queries (each action stays within existing
+authority and exposure accounting):
+
+| Result | Next action |
+| --- | --- |
+| `FEATURE_WINDOW_INVALID` | Check bound point offsets; prepare a compatible exact recipe. Do not edit frozen bindings or refund quota. |
+| `UNIVERSE_NON_DISCRIMINATING_QUESTION` / `UNIVERSE_IMPOSSIBLE_QUESTION` | Form a meaningful supported question under current authority. Do not bypass the universe. |
+| `REDUNDANT_UNIVERSE_CONJUNCT` | Keep the exact admitted hash and proceed once; do not repeat MAIN to remove a warning. |
+| Saved preview integrity/input/policy/recipe mismatch | Stop; inspect and restore the exact source/artifact through its owner. Do not replay stale support or rebind around verification. |
+| `PREVIEW_TOO_LARGE` | Stop this preview; do not retry unchanged input, expand the cap or treat truncated examples as full support. A smaller question needs existing authority and exposure accounting. |
+| `LEGACY_PREVIEW_DETAIL_UNAVAILABLE` | Use historical readback as recorded. New detailed support requires preview allowance; never reconstruct silently. |
+
 
 
 After outcomes, changes in operator/window/threshold/component retain existing

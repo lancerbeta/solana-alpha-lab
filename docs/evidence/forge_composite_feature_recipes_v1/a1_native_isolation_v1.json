@@ -34,11 +34,13 @@
       "authorized operator guide"
     ],
     "behavior": "Witnessed missing complete example; same-atom guide repair enabled validator-ready SIMPLE and COMPOUND_FIRST; no EWM/alpha; full joint support distinguished from 24 examples",
-    "current_operator_sha256": "fff7faf0bca1846472d5190097f23d8b544d5c8d7594316b422d5dd8319f8bab",
+    "current_operator_sha256": "1452acd8cbc6b82195b955c2d0a2cdc9bc19f838ad108d37c67a157666974eda",
+    "input_file_logical_ref": "local/forge_composite_agent_presearch/presearch-packet.json",
+    "input_operator_commit": "bf59202d4ce4e4af556460cba9d5261e79984394",
     "input_operator_sha256": "a35e5872e31ce921e8005bb865f7dc9a868e8fcb42941cfe63fd387feb6cdfd9",
     "input_packet_sha256": "924ef417341f81ee3a8a7e6087c9a50218258598fa523baf927fb20a7da85e13",
     "input_skill_sha256": "84f9842b61162dc5b3ef6a414aad0e70c96c036723596632020104ad7ae9607f",
-    "operator_delta": "Two trailing newlines removed; prior input bytes reproducible by appending them to current guide",
+    "operator_delta": "Input guide reproducible from input_operator_commit plus two trailing newlines. Current guide adds typed failure recovery; recipe example and descriptor unchanged.",
     "parent_chat_read": false,
     "provider_calls": 0,
     "query_spec_sha256": [

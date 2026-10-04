@@ -651,6 +651,21 @@ def _closed_slot(admission: Mapping[str, Any], sessions: Sequence[Mapping[str, A
     return False
 
 
+def _fresh_temporal_warnings(
+    store: Any, validated: Mapping[str, Any], binding_cohorts: Sequence[Mapping[str, Any]] | None,
+) -> list[dict[str, Any]]:
+    """Check bound metadata before spending a fresh look or loading values."""
+    from solana_alpha_lab.factory.hfic_temporal_discovery import _require_bound_schedule, universe_question_guard
+    from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
+
+    try:
+        if binding_cohorts is not None:
+            _require_bound_schedule(binding_cohorts, validated["scientific_body"], validated["scientific_body"]["schedule_lateness_seconds"])
+        return universe_question_guard(validated["scientific_body"], effective_policy(store)["definition"])
+    except GroundedDiscoveryError as exc:
+        raise OrdinaryOperationError(exc.code) from exc
+
+
 def authorize_temporal_attempt(
     store: Any,
     *,
@@ -719,10 +734,9 @@ def authorize_temporal_attempt(
         if owner_allowance(store, operation, "preview") < 1:
             raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
         if spec.get("schema") == "smial.hfic-temporal-query":
-            from solana_alpha_lab.factory.hfic_temporal_discovery import universe_question_guard, validate_temporal_query
-            from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
+            from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
             try:
-                warnings = universe_question_guard(validate_temporal_query(spec)["scientific_body"], effective_policy(store)["definition"])
+                warnings = _fresh_temporal_warnings(store, validate_temporal_query(spec), binding_cohorts)
             except GroundedDiscoveryError as exc:
                 raise OrdinaryOperationError(exc.code) from exc
         else:
@@ -946,12 +960,7 @@ def gate_before_values(
         }
     if _closed_slot(admission, list_hfic_sessions(store)):
         raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")
-    from solana_alpha_lab.factory.hfic_temporal_discovery import universe_question_guard
-    from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
-    try:
-        warnings = universe_question_guard(validated["scientific_body"], effective_policy(store)["definition"])
-    except GroundedDiscoveryError as exc:
-        raise OrdinaryOperationError(exc.code) from exc
+    warnings = _fresh_temporal_warnings(store, validated, binding_cohorts)
     try:
         from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
 

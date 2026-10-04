@@ -39,7 +39,7 @@ def mixed_spec(op="delta"):
     return spec
 
 
-def publish_raw(workspace):
+def publish_raw(workspace, *, reversed_window=False):
     """Only transport fixture input is authored; publisher/import own every binding."""
     from tests import test_hfic_temporal_production_runner_v1 as runner
     from tests.test_live_cohort_discovery_release_series import _snapshot_for_week, _obs, CAMPAIGN_STARTS
@@ -50,6 +50,11 @@ def publish_raw(workspace):
     schedule.pop("schedule_sha256")
     schedule["y_points"].append({"point_id": "Y14400", "due_offset_seconds": 14400,
         "allowed_lateness_seconds": runner.DOCUMENT_LATENESS, "bundle_ids": ["BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-001"]})
+    if reversed_window:
+        for point in schedule["y_points"]:
+            if point["point_id"] in {"Y900", "Y1800"}:
+                point["due_offset_seconds"] = {"Y900":1800, "Y1800":900}[point["point_id"]]
+        schedule["y_points"].sort(key=lambda point: point["due_offset_seconds"])
     schedule = validate_observation_schedule(schedule, root=ROOT)
     schedule["schedule_sha256"] = schedule_sha256(schedule)
     def snapshot(week):
@@ -351,6 +356,40 @@ class PublicSupportTests(unittest.TestCase):
 
 
 class AdmissionTests(unittest.TestCase):
+    def test_public_bound_window_refusal_precedes_reservation_and_loader(self):
+        from tests.test_hfic_cli import run_cli
+        from tests.test_hfic_ordinary_operation_acceptance_v1 import _forge,_operation
+        from solana_alpha_lab.factory.hfic_grounded_discovery import resolve_published_discovery_binding
+        with tempfile.TemporaryDirectory() as raw:
+            workspace=Path(raw); root=publish_raw(workspace,reversed_window=True)
+            pre=run_cli("preflight","--discovery-contract","--owner-focus","SYNTHETIC_BOUND_WINDOW","--format","json",data_root=root)
+            self.assertEqual(pre.returncode,0,pre.stdout+pre.stderr)
+            receipt=json.loads(pre.stdout)
+            spec=mixed_spec()
+            spec["decision"]["point_id"]="Y3600"
+            spec["target"]["reference_point"]="Y3600"
+            spec["features"][0].update(start="Y900",end="Y1800")
+            # Textual order is valid; the production-sealed point clocks reverse it.
+            validate_temporal_query(spec)
+            binding=resolve_published_discovery_binding(root)["cohorts"]
+            self.assertTrue(all(b["schedule_point_due_offset_seconds"]["Y900"] > b["schedule_point_due_offset_seconds"]["Y1800"] for b in binding))
+            paths=[workspace/f"window-{name}.json" for name in ("spec","scope","op")]
+            scope={"population":"BASE_X","decision_timestamp":"Y3600","target":temporal.temporal_target_label(spec),
+                   "estimand":"price_relative_proxy","explanatory_condition":"holders","evidence_surface_mode":"ORDINARY_GROUNDED_DISCOVERY_V1"}
+            operation=_operation(spec,focus="SYNTHETIC_BOUND_WINDOW",journal=receipt["search_key_sha256"],
+                market=receipt["market_evidence_epoch_sha256"],text="Synthetic incompatible bound window",cap={"main":1,"adaptive":0,"preview":1})
+            for path,body in zip(paths,[spec,scope,operation]):path.write_text(json.dumps(body),encoding="utf-8")
+            for command in ("main","preview"):
+                with self.subTest(command=command),mock.patch("solana_alpha_lab.factory.hfic_ordinary_operation._reserve",side_effect=AssertionError("invalid window reserved")) as reserve, mock.patch("solana_alpha_lab.factory.hfic_grounded_discovery.load_admitted_partition_rows",side_effect=AssertionError("invalid window loaded")) as loader,contextlib.redirect_stdout(io.StringIO()) as out:
+                    if command=="main":
+                        code=_forge().cmd_discovery_execute(ROOT,store_root=root,census_path=None,observations_path=None,binding_path=None,
+                            spec_path=paths[0],journal_scope=receipt["search_key_sha256"],candidate_scope_path=paths[1],explicit_data_root=root,operation_path=paths[2])
+                    else:
+                        code=_forge().cmd_discovery_preview(ROOT,explicit_data_root=root,spec_path=paths[0],binding_path=None,census_path=None,observations_path=None,
+                            cohort_partitions=None,prior_preview_hash=None,store_root=root,journal_scope=receipt["search_key_sha256"],operation_path=paths[2])
+                self.assertEqual(code,2,out.getvalue());self.assertIn("FEATURE_WINDOW_INVALID",out.getvalue())
+                reserve.assert_not_called();loader.assert_not_called()
+
     def test_public_refusal_precedes_values_and_reservations(self):
         from tests.test_hfic_cli import run_cli
         from tests.test_hfic_ordinary_operation_acceptance_v1 import _forge,_operation

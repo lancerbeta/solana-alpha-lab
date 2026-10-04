@@ -96,6 +96,17 @@ today's minima. Existing authority/state/profile compare-and-recheck remains
 effective before actual execution. STOPPED/COMPLETED never allow a new look.
 Syntax/refusal/missingness/cap are not scientific negatives or quota refunds.
 
+Recovery follows the typed failure; none of these actions grants a new look:
+
+| Failure or warning | Next action |
+| --- | --- |
+| `FEATURE_WINDOW_INVALID` | Check the bound point offsets. Prepare a compatible exact recipe only within current operation authority; never edit a frozen binding or refund quota. |
+| `UNIVERSE_NON_DISCRIMINATING_QUESTION`, `UNIVERSE_IMPOSSIBLE_QUESTION` | Replace the question with a meaningful supported recipe within current authority and exposure accounting; never bypass the bound universe. |
+| `REDUNDANT_UNIVERSE_CONJUNCT` | Keep the admitted exact recipe/hash and proceed once. Do not repeat MAIN to remove the warning. |
+| Saved preview integrity, input, policy or recipe mismatch | Stop readback; inspect and restore the exact source/artifact through its owner. Never replay stale support or rebind to bypass verification. |
+| `PREVIEW_TOO_LARGE` | Stop this preview. Do not repeat unchanged input, increase the cap or use a truncated sample as full support. A smaller question requires its existing authority and exposure accounting. |
+| `LEGACY_PREVIEW_DETAIL_UNAVAILABLE` | Read the historical receipt as recorded. A new detailed preview requires current allowance; do not reconstruct it silently. |
+
 ## Agent and lifecycle consumers
 
 Actual ordinary preflight carries `temporal_recipe_capabilities`, derived from

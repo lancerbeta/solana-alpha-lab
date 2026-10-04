@@ -24,6 +24,7 @@
       "verdict": "PASS"
     },
     "C": {
+      "fresh_bound_window_refused_before_reservation_and_values": true,
       "fresh_tautology_impossible_refused_before_values_and_reservation": true,
       "redundant_warning_preserves_hash": true,
       "saved_correction_pending_precedence": "Existing owners preserved; lifecycle/revision direct consumers PASS",
@@ -136,6 +137,12 @@
       "scope": "semantic gold routing and Catalog search",
       "seconds": 13.947,
       "tests": 18
+    },
+    {
+      "result": "PASS",
+      "scope": "Public reversed bound-window MAIN/preview, raw arithmetic/overlap, existing ordinary-operation lifecycle",
+      "seconds": 261.863,
+      "tests": 22
     }
   ],
   "task_id": "FORGE_COMPOSITE_FEATURE_RECIPES_V1"
