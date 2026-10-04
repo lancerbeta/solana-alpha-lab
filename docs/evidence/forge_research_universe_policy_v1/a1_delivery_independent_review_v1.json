@@ -4,8 +4,8 @@
   "review_id": "FORGE-RESEARCH-UNIVERSE-POLICY-INDEPENDENT-REVIEW-001",
   "as_of": "2026-10-04",
   "task_id": "FORGE_RESEARCH_UNIVERSE_POLICY_V1",
-  "reviewed_bindings_sha256": "77adafb333c25ad60041f43d01e0d9c01045ec216adb4502e377745c2b5e2f25",
-  "reviewed_inventory_sha256": "153ba1cdce52af657d95a8a1f73dd9906b5bc7ebbc4dc1e24cec4af743656312",
+  "reviewed_bindings_sha256": "866fb56e490ce5675176e5224121660dd9362fdcd7d9f48c82b4a7838a55762f",
+  "reviewed_inventory_sha256": "432940be3fe113a44b9eb4f346f35b368b33936ef486b18846ef83fa7bee9b8d",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
