@@ -4,8 +4,8 @@
   "review_id": "FACTORY-CAMPAIGN-CUTOVER-REVIEW-001",
   "as_of": "2026-10-04",
   "task_id": "FACTORY_CAMPAIGN_CUTOVER_COMPLETION_REPAIR_V1",
-  "reviewed_bindings_sha256": "b09e37dc27e9574920169b580a990315219806dfb07625dd934aa547b371b8e8",
-  "reviewed_inventory_sha256": "5bd6e93b681b0183d7b67567d3e8f5a00fa1669ebbee47dbcb03d142873565ac",
+  "reviewed_bindings_sha256": "49dce1761eed6334922d35fe971e7637bad7c82b4a0beb0a1e43e4b802826a1c",
+  "reviewed_inventory_sha256": "0b9aca12b609463487dbb735b3ddd1609b8d832488901a919b023e95a15244d2",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -19,7 +19,8 @@
       "findings": [
         "Independent 76-test PASS plus missing-manifest targeted PASS; runtime tuple, exact proof lookup and cheap obligation guards reviewed.",
         "Final 12 Git/worktree bindings and operator path remediation verified.",
-        "Final delta review PASS at a27402ea114ba6962f70c36be53925f78ddc9dea after ordinary PR373 integration and exact contract1.1 base rebind; 12 bindings verified, runtime/tests unchanged."
+        "Final delta review PASS at a27402ea114ba6962f70c36be53925f78ddc9dea after ordinary PR373 integration and exact contract1.1 base rebind; 12 bindings verified, runtime/tests unchanged.",
+        "Final Catalog delta PASS at61619858f9489f43191a70536e36df444e001112: existing runtime_receipt type preserves exact discovery reference, mandatory Delivery Harness SHA verification and final12 implementation bindings; no gate weakening."
       ]
     },
     {
@@ -28,7 +29,8 @@
       "findings": [
         "Frozen-base RED and real canonical lifecycle/CLI loop establish falsifiable completion guard.",
         "Consistent projection with absent committed marker remains UNKNOWN without mutation; live commissioning remains separate.",
-        "Final delta review PASS at a27402ea114ba6962f70c36be53925f78ddc9dea after ordinary PR373 integration and exact contract1.1 base rebind; 12 bindings verified, runtime/tests unchanged."
+        "Final delta review PASS at a27402ea114ba6962f70c36be53925f78ddc9dea after ordinary PR373 integration and exact contract1.1 base rebind; 12 bindings verified, runtime/tests unchanged.",
+        "Final Catalog delta PASS at61619858f9489f43191a70536e36df444e001112: existing runtime_receipt type preserves exact discovery reference, mandatory Delivery Harness SHA verification and final12 implementation bindings; no gate weakening."
       ]
     },
     {
@@ -37,8 +39,9 @@
       "findings": [
         "Committed lifecycle truth, UTC availability, authority tuple, terminal history, recovery and bounded exact lookup preserve scope.",
         "PACKET_INFORMATION_PATH; PROCESS_OBLIGATION; MODEL_DIVERSITY_UNPROVEN.",
-        "packet_fingerprint_sha256=f3b5e7ebf31e69325180d8d07a1dbf7bc8905ec933488aa8f2cf8ca2e97cec5d",
-        "Final delta review PASS at a27402ea114ba6962f70c36be53925f78ddc9dea after ordinary PR373 integration and exact contract1.1 base rebind; 12 bindings verified, runtime/tests unchanged."
+        "Final delta review PASS at a27402ea114ba6962f70c36be53925f78ddc9dea after ordinary PR373 integration and exact contract1.1 base rebind; 12 bindings verified, runtime/tests unchanged.",
+        "packet_fingerprint_sha256=dd77a42749987c9784e4db153a71c6fec0c2037414bfde0138ea9ca9b1b8843a",
+        "Final Catalog delta PASS at61619858f9489f43191a70536e36df444e001112: existing runtime_receipt type preserves exact discovery reference, mandatory Delivery Harness SHA verification and final12 implementation bindings; no gate weakening."
       ]
     },
     {
@@ -47,7 +50,8 @@
       "findings": [
         "PENDING wait/work/recovery routes distinguished; runnable read-only exact proof invocation uses resolved paths/query_only and safe metadata output.",
         "VERIFIED is transition proof only, not campaign mutation authority or healthy drain.",
-        "Final delta review PASS at a27402ea114ba6962f70c36be53925f78ddc9dea after ordinary PR373 integration and exact contract1.1 base rebind; 12 bindings verified, runtime/tests unchanged."
+        "Final delta review PASS at a27402ea114ba6962f70c36be53925f78ddc9dea after ordinary PR373 integration and exact contract1.1 base rebind; 12 bindings verified, runtime/tests unchanged.",
+        "Final Catalog delta PASS at61619858f9489f43191a70536e36df444e001112: existing runtime_receipt type preserves exact discovery reference, mandatory Delivery Harness SHA verification and final12 implementation bindings; no gate weakening."
       ]
     }
   ],
