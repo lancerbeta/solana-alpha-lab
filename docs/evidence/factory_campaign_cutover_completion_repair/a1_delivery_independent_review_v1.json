@@ -4,8 +4,8 @@
   "review_id": "FACTORY-CAMPAIGN-CUTOVER-REVIEW-001",
   "as_of": "2026-10-04",
   "task_id": "FACTORY_CAMPAIGN_CUTOVER_COMPLETION_REPAIR_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "3ff06421dbffeeb3912b7e4c62d2e78f9d06e44141ad0b721518452e2348edcc",
+  "reviewed_inventory_sha256": "58581363da304c530a201581f78add114a3c9ef74afded1f0fe673a6bf2ab3b0",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -15,37 +15,93 @@
   "reviews": [
     {
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING_ISOLATED_REVIEW"
+        "Independent 76-test PASS plus missing-manifest targeted PASS; runtime tuple, exact proof lookup and cheap obligation guards reviewed.",
+        "Final 12 Git/worktree bindings and operator path remediation verified."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING_ISOLATED_REVIEW"
+        "Frozen-base RED and real canonical lifecycle/CLI loop establish falsifiable completion guard.",
+        "Consistent projection with absent committed marker remains UNKNOWN without mutation; live commissioning remains separate."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING_ISOLATED_REVIEW"
+        "Committed lifecycle truth, UTC availability, authority tuple, terminal history, recovery and bounded exact lookup preserve scope.",
+        "packet_fingerprint_sha256=df8a6e347d2ecf8320e1f0b17feb9dea5ed2256863982e245f89f91db80c41be",
+        "PACKET_INFORMATION_PATH; PROCESS_OBLIGATION; MODEL_DIVERSITY_UNPROVEN."
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING_ISOLATED_REVIEW"
+        "PENDING wait/work/recovery routes distinguished; runnable read-only exact proof invocation uses resolved paths/query_only and safe metadata output.",
+        "VERIFIED is transition proof only, not campaign mutation authority or healthy drain."
       ]
     }
   ],
-  "verdict": "PENDING",
+  "verdict": "PASS",
   "non_claims": [
     "NO_MERGE_AUTHORITY",
     "MODEL_DIVERSITY_UNPROVEN",
-    "NO_LIVE_COMMISSIONING_PROOF"
+    "NO_LIVE_COMMISSIONING_PROOF",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Coherent sequence/authority drift and premature broad lookup: fixed immutable tuple/falsifiers and exact lookup after cheap guards.",
+      "observed_head": "c580270d6807a32d0db01f6f0b1cb27b511e2c7a",
+      "resolved_by_head": "12f366674ac9732920e54a8604453548e3bc831d"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Missing-manifest falsifier masked by projection mismatch: fixed consistent projection, orphan payload, no COMPLETE mutation.",
+      "observed_head": "e73de4ca09f05927fcdc8c7ede35beb29dfeb799",
+      "resolved_by_head": "80a77057f7da9fbabcf374928cf2dee0ca7e9ea8"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Pending wait/work/recovery and UNKNOWN next step ambiguous: explicit scoped routes.",
+      "observed_head": "12f366674ac9732920e54a8604453548e3bc831d",
+      "resolved_by_head": "e73de4ca09f05927fcdc8c7ede35beb29dfeb799"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Runnable exact proof invocation absent: added bounded metadata-only command.",
+      "observed_head": "e73de4ca09f05927fcdc8c7ede35beb29dfeb799",
+      "resolved_by_head": "80a77057f7da9fbabcf374928cf2dee0ca7e9ea8"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Proof invocation paths rejected as relative: both resolved; literal command verified from fixture runtime cwd.",
+      "observed_head": "80a77057f7da9fbabcf374928cf2dee0ca7e9ea8",
+      "resolved_by_head": "986ac89328f1decfbd9990c6242e0c8e06921389"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Same operator path defect; scoped transition proof and authority boundaries retained after correction.",
+      "observed_head": "80a77057f7da9fbabcf374928cf2dee0ca7e9ea8",
+      "resolved_by_head": "986ac89328f1decfbd9990c6242e0c8e06921389"
+    }
   ]
 }
