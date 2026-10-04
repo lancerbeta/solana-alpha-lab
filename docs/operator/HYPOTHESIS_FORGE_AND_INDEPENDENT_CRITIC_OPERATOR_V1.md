@@ -1805,3 +1805,105 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-ro
 ```
 
 Остановка — конец исполнения этой операции, а не научный результат: нет `NO_WORTHY`, нет `SEARCH_EXHAUSTED`, сохранённые результаты и потраченные looks остаются, незавершённая reservation остаётся потраченной (UNKNOWN attempt). После остановки новый look, preview и resume отвечают `ORDINARY_OPERATION_STOPPED`; сохранённый результат читается. Дальнейшее исследование — новый запрос владельца. Изменившаяся операция — `OPERATION_STOP_PREVIEW_STALE`: повторите preview. Повтор — `NO_CHANGE`. Завершённую операцию остановить нельзя (`OPERATION_ALREADY_COMPLETED`). Preview coverage с `--decision-point`, отказанный по исчерпанному preview-лимиту открытой операции, возвращает `OWNER_CAP_EXHAUSTED` до чтения значений; остановите эту операцию или сделайте preview без `--decision-point`. Не «закрывайте всё OPEN» и не правьте store.
+
+## Raw composite recipes
+
+
+
+Current fresh recipe owner: `docs/contracts/forge_composite_feature_recipes_v1.md`.
+
+Before selecting a discovery query, read actual ordinary preflight
+
+`forge_context_packet.temporal_recipe_capabilities`. Holder count supports
+
+`point_value`, `delta` and `return_ratio`; the two transforms require explicit
+
+field/start/end with bound start < end <= decision. Delta is holder count;
+
+return is a dimensionless fraction (1 = +100%) and needs a positive base.
+
+No EWM, generic holder ratio, holder target or interpolation exists. Missing,
+
+late, conflicting, boolean/nonfinite and invalid-lineage cells are unavailable.
+
+
+
+Mechanism -> smallest supported representation -> authorized feature-only
+
+support if needed -> exact query. Holder growth alone can be SIMPLE; holder
+
+growth with an independent price/liquidity mechanism can be COMPOUND_FIRST.
+
+Usually 1–3 meaningful predicates suffice. A full mixed preview keeps all
+
+declared features and reports full joint support on decision eligibility before
+
+24 examples. Universe PASS alone is insufficient: decision price is required.
+
+Support does not prove variance, precision, independence or alpha. A changed
+
+seed spends exposure; do not sweep windows/thresholds/components.
+
+
+
+For bound H>=50, only H>=3 is a typed non-discriminating refusal, and H<50 is
+
+impossible. H>=50 AND delta(H)>0 proceeds with a redundant-conjunct warning;
+
+keep the exact spec/hash. Earlier points and unknown equivalence are not proven
+
+tautologies. Saved readback/correction uses frozen identity/policy before this
+
+fresh guard; STOPPED/COMPLETED cannot admit a new look. A cold saved support
+
+readback loads zero values; registered numerical replay performs the evaluator.
+
+Legacy missing support detail is explicit, never reconstructed silently.
+
+
+
+After outcomes, changes in operator/window/threshold/component retain existing
+
+adaptive/new-question accounting. Related holder prior is not exact closure of
+
+a new dynamics recipe; renaming an exact old question does not reopen it.
+
+Preserve exposure, prior applicability and resource permission separately.
+
+The atom's synthetic evidence grants no real MAIN/adaptive or live mutations.
+
+Full query envelope for an independently authorized fixed synthetic example
+(adapt only before outcomes and within the bound schedule; no live grant):
+
+```json
+{
+  "schema": "smial.hfic-temporal-query",
+  "schema_version": "1.0",
+  "query_id": "SYNTHETIC_RAW_MIXED_EXAMPLE",
+  "population": "BASE_X",
+  "search_tier": "COMPOUND_SCREEN",
+  "budget_allocation": "COMPOUND_FIRST",
+  "decision": {"point_id":"Y900","time_policy":"BOUND_SCHEDULE_CUTOFF"},
+  "schedule": {"lateness_seconds":300,"observation_clock_policy":"PROVIDER_REPORTED_SNAPSHOT_V1"},
+  "features": [
+    {"name":"holders","op":"delta","field_id":"FIELD-HOLDER-COUNT-001","start":"X300","end":"Y900"},
+    {"name":"price","op":"return_ratio","field_id":"FIELD-USD-PRICE-001","start":"X300","end":"Y900"},
+    {"name":"liquidity","op":"ratio","field_id":"FIELD-LIQUIDITY-USD-001","numerator":"Y900","denominator":"X300"}
+  ],
+  "all": [
+    {"feature":"holders","op":"gt","value":0},
+    {"feature":"price","op":"gte","value":0},
+    {"feature":"liquidity","op":"gte","value":1}
+  ],
+  "target": {"kind":"PRICE_RELATIVE_PROXY","reference_point":"Y900","exit_point":"Y14400","field_id":"FIELD-USD-PRICE-001"},
+  "entry_model": {"kind":"LAST_AVAILABLE_MARK_WITH_HAIRCUT","assumed_latency_seconds":30},
+  "evaluation": {"calendar_block":"UTC_DAY_OF_DECISION","baseline":"SAME_DECISION_ELIGIBLE","ablations":"DROP_ONE_CONDITION"},
+  "cost_profile": null
+}
+```
+
+`cost_profile: null` uses the existing assumption-stress default, never observed
+fees or fills. A SIMPLE version keeps the holder feature/predicate alone,
+sets `search_tier=SIMPLE_SCREEN` and `budget_allocation=AUTO`; it preserves
+decision/target/clock/entry/baseline. For relative growth use holder
+`return_ratio` with the same explicit start/end and positive-base constraint.

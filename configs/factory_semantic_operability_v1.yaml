@@ -62,10 +62,10 @@ routes:
       - гипотеза
       - кузница
       - normalized trajectory
-      - NORMALIZED_TRAJECTORY
+      - рост holders
       - representation ladder
-      - lifecycle representation
-      - другое представление lifecycle
+      - lifecycle representation; mixed hypothesis
+      - смешанная гипотеза
       - траектория токена
       - FORGE INPUT
       - forge-run
@@ -177,7 +177,8 @@ routes:
       - происходит с рынком
       - observed now
       - context cover
-      - PIT-ready
+      - raw holder availability
+      - доступность raw holders
     consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, FACTORY-001]
     root_binding_ids: [ACTIVE-FACTORY-MARKET-FEATURE-SURFACE, ACTIVE-MARKET-DATA-AWARENESS]
     root_asset_ids: []

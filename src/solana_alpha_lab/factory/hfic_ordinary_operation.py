@@ -685,6 +685,12 @@ def authorize_temporal_attempt(
             and item.get("spec_sha256") == spec_sha
         ]
         if owned:
+            from solana_alpha_lab.factory.hfic_temporal_discovery import saved_feature_preview
+            try:
+                payload = saved_feature_preview(store, journal_scope=journal_scope,
+                    operation_sha256=operation_sha256, spec_sha256=spec_sha, binding=binding_cohorts or [])
+            except GroundedDiscoveryError as exc:
+                raise OrdinaryOperationError(exc.code) from exc
             return {
                 "disposition": "REPLAY",
                 "values_loaded": False,
@@ -693,6 +699,7 @@ def authorize_temporal_attempt(
                 "look_class": "PREVIEW",
                 "preview_sha256": owned[-1].get("preview_sha256"),
                 "replayed_without_loader": True,
+                "preview_payload": payload,
             }
         # A stopped or completed operation replays saved previews, never a new one.
         _refuse_closed(store, operation)
@@ -711,6 +718,15 @@ def authorize_temporal_attempt(
             raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")
         if owner_allowance(store, operation, "preview") < 1:
             raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
+        if spec.get("schema") == "smial.hfic-temporal-query":
+            from solana_alpha_lab.factory.hfic_temporal_discovery import universe_question_guard, validate_temporal_query
+            from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
+            try:
+                warnings = universe_question_guard(validate_temporal_query(spec)["scientific_body"], effective_policy(store)["definition"])
+            except GroundedDiscoveryError as exc:
+                raise OrdinaryOperationError(exc.code) from exc
+        else:
+            warnings = []
         _require_published_logical_content(data_root)
         _reserve(store, operation, spec_sha256=spec_sha, look_class="preview")
         if fingerprint and not stamped:
@@ -722,6 +738,7 @@ def authorize_temporal_attempt(
             "operation": operation,
             "admission": admission,
             "look_class": "PREVIEW",
+            "query_warnings": warnings,
         }
     return gate_before_values(
         store,
@@ -929,6 +946,12 @@ def gate_before_values(
         }
     if _closed_slot(admission, list_hfic_sessions(store)):
         raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")
+    from solana_alpha_lab.factory.hfic_temporal_discovery import universe_question_guard
+    from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
+    try:
+        warnings = universe_question_guard(validated["scientific_body"], effective_policy(store)["definition"])
+    except GroundedDiscoveryError as exc:
+        raise OrdinaryOperationError(exc.code) from exc
     try:
         from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
 
@@ -995,6 +1018,7 @@ def gate_before_values(
         "admission": admission,
         "spec_sha256": validated["spec_sha256"],
         "look_class": "ADAPTIVE" if kind == "adaptive" else "MAIN",
+        "query_warnings": warnings,
     }
 
 

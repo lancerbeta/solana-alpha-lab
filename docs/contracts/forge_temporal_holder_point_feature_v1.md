@@ -7,10 +7,15 @@ This document grants no scientific, provider or merge authority.
 ## Feature policy
 
 `FIELD-HOLDER-COUNT-001` is the existing typed Tokens V2 observation. Ordinary
-temporal Forge accepts it only under `point_value` at or before the decision.
+temporal Forge originally accepted it under `point_value` at or before the decision.
+Current fresh raw recipe policy is owned by
+`docs/contracts/forge_composite_feature_recipes_v1.md`: it also permits holder
+`delta` and `return_ratio`. This historical consumer retains its exact point query.
 PRICE and LIQUIDITY keep their existing operator policy. The holder check is
 explicit and precedes the legacy allowlist, so widening that list cannot
-authorize holder ratio, return_ratio, drawdown or rebound. Target remains PRICE.
+authorize holder generic ratio, drawdown or rebound. Target remains PRICE.
+Historical hashes/results, the preregistered point consumer and prior exposure
+below are unchanged; the fresh universe guard grants no re-execution of it.
 
 Use the existing `FEATURE_OP_UNSUPPORTED`, `TARGET_INVALID` /
 `FIELD_NOT_IN_ALLOWLIST` and `FEATURE_AFTER_DECISION` errors. No new evaluator,

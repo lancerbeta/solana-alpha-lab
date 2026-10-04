@@ -474,6 +474,16 @@ def _assert_no_path_leak(payload: dict[str, Any], *forbidden: str) -> None:
 
     def walk(value: Any) -> None:
         if isinstance(value, str):
+            # Canonical scientific identities and persisted artifacts can contain
+            # serialized JSON. Inspect their decoded leaves: escaped JSON quotes
+            # are not root-relative Windows paths, while actual paths still are.
+            try:
+                decoded = json.loads(value)
+            except (ValueError, json.JSONDecodeError):
+                decoded = None
+            if isinstance(decoded, (dict, list)):
+                walk(decoded)
+                return
             assert_safe_text(value)
             return
         if isinstance(value, dict):
@@ -1663,6 +1673,8 @@ def _cmd_discovery_execute(
     if git_before.head_sha != git_after.head_sha:
         return emit_error("GIT_MUTATION_FORBIDDEN")
     evidence["scientific_writes"] = 0
+    if gate.get("query_warnings"):
+        evidence["query_warnings"] = gate["query_warnings"]
     if temporal_query:
         query_rows = evidence.get("queries") if isinstance(evidence.get("queries"), list) else []
         first_query = query_rows[0] if query_rows and isinstance(query_rows[0], dict) else {}
@@ -1911,6 +1923,7 @@ def _cmd_discovery_preview(
             if isinstance(preview_gate, dict) and preview_gate.get("disposition") == "REPLAY":
                 return emit(
                     {
+                        **dict(preview_gate.get("preview_payload") or {}),
                         "disposition": "REPLAY",
                         "preview_sha256": preview_gate.get("preview_sha256"),
                         "replayed_without_loader": True,
@@ -1941,7 +1954,7 @@ def _cmd_discovery_preview(
                 points.update(feature[key] for key in ("point", "start", "end", "numerator", "denominator", "at") if key in feature)
                 points.update(feature.get("points") or [])
             preview_spec = {"decision": spec["decision"], "schedule": {**spec["schedule"], "points": sorted(points, key=POINT_OFFSET.get)},
-                            "features": [f for f in body["features"] if f["op"] == "point_value"], "seed": spec.get("seed") or spec["query_id"]}
+                            "features": body["features"], "seed": spec.get("seed") or spec["query_id"]}
         checked_preview = validate_feature_preview_spec(preview_spec)
         point_ids = checked_preview["point_ids"]
         loaded = load_admitted_partition_rows(
@@ -2004,6 +2017,8 @@ def _cmd_discovery_preview(
             prior_preview_hashes=remembered,
             universe_policy=policy_definition,
         )
+        if preview_store is not None and preview_gate.get("query_warnings"):
+            payload["query_warnings"] = preview_gate["query_warnings"]
         if store_root is not None and journal_scope:
             from solana_alpha_lab.factory.hfic_temporal_discovery import persist_feature_preview
             from solana_alpha_lab.factory.research_store import ResearchStore
