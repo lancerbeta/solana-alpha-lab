@@ -31,6 +31,11 @@ and `b2f589a12a132c56c57623f1920d4574e6ab2b8e4f1694a254c5e7c2dd2c8c5d`.
 This fingerprint covers the normalized two-test/base/source/assertion summary;
 it does not claim a hash of an unsaved raw unittest traceback.
 
+After ordinary integration of PR373, the same two RED cases reproduced on new
+base `3e5add9101f0147a2aa8517c70ea66b5186293f8`; both source blob hashes above are
+unchanged. The new normalized two-test summary SHA256 is
+`8e9f7985626f7a5d7506c47559f08675136b327827fdf79ced6b87eeee261e7b`.
+
 No schema, provider route, sampling, budget, retry, timer or dependency change.
 No reopening of historical COMPLETE or filling of the capture gap. Existing runbook
 and Catalog relations document the same invariant.

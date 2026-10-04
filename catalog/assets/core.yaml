@@ -32288,7 +32288,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 6bfaab477731bc7dcb900514d42d722bf9f0a68e87b19adac6a3fdbcbd732c16}
+  integrity: {kind: sha256, sha256: 12b4c9efd66f43011ceb30c2a6a0eda140d38d2bc9f70c7f344b195456f18977}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34594,7 +34594,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 776060ebe428e44fdd0e8cfa82798403dad8e412e9eb46208762f7f7c5ac814a}
+  integrity: {kind: sha256, sha256: ffc33973d3b3d19cbb91b4662683a1be7d115c8fb1b2d23fa7b2026a85b82376}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34613,7 +34613,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: 85bf0632dfcb83769255fc61f0193a6ab457d5dc783256e202e020a0445b8483}
+  integrity: {kind: sha256, sha256: 1eaa64b4579c6a91d51c1bb56e71670d294f788dcff6b160460fa0c61f3dc01a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -39759,7 +39759,7 @@ records:
     repository_path: docs/tasks/FACTORY_CAMPAIGN_CUTOVER_COMPLETION_REPAIR_V1.md
   integrity:
     kind: sha256
-    sha256: af8e538482665d4576d1d346313a33bcca93f8972350e1811d408808397868c9
+    sha256: 71c24d227bcc20d6dd5ba1ef4fa288fb92b85e6333011338518bdb13e8cff27d
   access:
     mode: read_only
     method: file
@@ -39836,7 +39836,7 @@ records:
     repository_path: docs/evidence/factory_campaign_cutover_completion_repair/a1_delivery_completion_evidence_v1.json
   integrity:
     kind: sha256
-    sha256: ecacd7209c88f7d1bf0a41043cf9f1e042f064662703158aac308a15fd0b8651
+    sha256: 0183078442709fa1d03683a8868c2f093c18f200cafcd1dcdeca276ecc7e0b42
   access:
     mode: read_only
     method: file
@@ -39875,7 +39875,7 @@ records:
     repository_path: docs/reports/factory_campaign_cutover_completion_repair/a1_owner_readout_v1.md
   integrity:
     kind: sha256
-    sha256: 70711e74b05f5d1933498c69e9fc04d85f79d0a0e18eb960a39aa9290921f767
+    sha256: b8506ccc4b79fd69e40130609ccc95067bfe4310a7798caf05678be7786e73ad
   access:
     mode: read_only
     method: file

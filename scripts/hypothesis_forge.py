@@ -890,6 +890,15 @@ def cmd_forge_run(
         )
         if payload.get("no_write") is True or not existing:
             payload["owner_readout"] = format_forge_run_owner_readout(payload)
+        operation_view = payload.get("ordinary_operation")
+        if isinstance(operation_view, dict) and "\noperation: " not in str(payload.get("owner_readout") or ""):
+            from solana_alpha_lab.factory.hfic_ordinary_operation import operation_readout_line
+
+            payload["owner_readout"] = (
+                str(payload.get("owner_readout") or "").rstrip()
+                + "\n"
+                + operation_readout_line(operation_view, payload.get("owner_focus"))
+            )
         if history and "history:" not in str(payload.get("owner_readout") or ""):
             payload["owner_readout"] = str(payload.get("owner_readout") or "").rstrip() + "\n" + history
         context_lines = format_context_lines(payload.get("scientific_disposition_context"))
@@ -1090,9 +1099,14 @@ def cmd_forge_run(
         project_ordinary_operation,
     )
 
+    current_market = payload.get("market_evidence_epoch_sha256")
     projection = project_ordinary_operation(
         store,
         owner_focus=owner_focus if owner_focus.strip() else "AUTO",
+        # An older-market operation of the same focus does not speak for this run.
+        market_evidence_epoch_sha256=current_market
+        if isinstance(current_market, str) and len(current_market) == 64
+        else None,
     )
     payload = merge_ordinary_readout(payload, projection)
     payload = _attach_scientific_context(payload, store)
@@ -2151,17 +2165,39 @@ def cmd_universe_policy_preview(
     )
     from solana_alpha_lab.factory.hfic_research_universe_policy import (
         UniversePolicyError,
+        blocking_operations,
+        deny_counts_before_values,
         preview_universe_policy,
         profile_definition,
     )
-    from solana_alpha_lab.factory.hfic_temporal_discovery import universe_population_counts
+    from solana_alpha_lab.factory import hfic_temporal_discovery
 
     data_root = _existing_data_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root, create_if_missing=False)
     counts = None
+    values_loaded = False
+
+    def _refusal(code: str) -> int:
+        body: dict[str, Any] = {
+            "reason_code": code,
+            "values_loaded": values_loaded,
+            "writes": {"research_store": 0},
+        }
+        if code == "OWNER_CAP_EXHAUSTED":
+            body["blocking_operations"] = blocking_operations(store)
+            body["next_action"] = "STOP_OR_FINISH_THE_BLOCKING_OPERATION_OR_PREVIEW_WITHOUT_COUNTS"
+        _assert_no_path_leak(body, str(data_root), str(repo_root))
+        return emit(body, exit_code=2)
+
     if decision_point:
         try:
             definition = profile_definition(min_holders, min_liquidity_usd)
+            # A refusal known from metadata is decided before any value is read.
+            deny_counts_before_values(store)
+        except UniversePolicyError as exc:
+            return _refusal(exc.code)
+        try:
+            # The loader's own refusals are pre-value binding checks.
             loaded = load_admitted_partition_rows(
                 data_root=data_root,
                 binding_doc=None,
@@ -2170,7 +2206,8 @@ def cmd_universe_policy_preview(
                 observations_path=None,
                 observation_filters=[("point_id", "in", sorted({decision_point, "X300"}))],
             )
-            counts = universe_population_counts(
+            values_loaded = True
+            counts = hfic_temporal_discovery.universe_population_counts(
                 loaded["census"],
                 loaded["observations"],
                 loaded["cohorts"],
@@ -2178,10 +2215,7 @@ def cmd_universe_policy_preview(
                 definition=definition,
             )
         except (GroundedDiscoveryError, UniversePolicyError) as exc:
-            return emit(
-                {"reason_code": exc.code, "values_loaded": False, "writes": {"research_store": 0}},
-                exit_code=2,
-            )
+            return _refusal(exc.code)
     try:
         payload = preview_universe_policy(
             store,
@@ -2190,10 +2224,7 @@ def cmd_universe_policy_preview(
             counts=counts,
         )
     except UniversePolicyError as exc:
-        return emit(
-            {"reason_code": exc.code, "values_loaded": False, "writes": {"research_store": 0}},
-            exit_code=2,
-        )
+        return _refusal(exc.code)
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     return emit(payload)
 
@@ -2224,18 +2255,92 @@ def cmd_universe_policy_apply(
         )
     except UniversePolicyError as exc:
         next_action = {
-            "UNIVERSE_POLICY_PENDING_OPERATION": "FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW",
+            "UNIVERSE_POLICY_PENDING_OPERATION": "RESOLVE_BLOCKING_OPERATIONS_THEN_PREVIEW",
             "UNIVERSE_POLICY_PREVIEW_STALE": "REPEAT_PREVIEW",
             "UNIVERSE_POLICY_CONFIRM_REQUIRED": "RETRY_APPLY_WITH_CONFIRM_APPEND_ONLY",
         }.get(exc.code, "READ_UNIVERSE_POLICY_STATUS")
-        return emit(
-            {
-                "reason_code": exc.code,
-                "next_action": next_action,
-                "writes": {"research_store": 0},
-            },
-            exit_code=2,
+        body: dict[str, Any] = {
+            "reason_code": exc.code,
+            "next_action": next_action,
+            "writes": {"research_store": 0},
+        }
+        if exc.code == "UNIVERSE_POLICY_PENDING_OPERATION":
+            from solana_alpha_lab.factory.hfic_research_universe_policy import blocking_operations
+
+            body["blocking_operations"] = blocking_operations(store)
+        _assert_no_path_leak(body, str(data_root), str(repo_root))
+        return emit(body, exit_code=2)
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+_OPERATION_STOP_NEXT = {
+    "ORDINARY_OPERATION_NOT_FOUND": "CHECK_THE_EXACT_OPERATION_SHA256",
+    "ORDINARY_OPERATION_ID_INVALID": "CHECK_THE_EXACT_OPERATION_SHA256",
+    "OPERATION_STOP_REQUEST_REQUIRED": "REPEAT_PREVIEW_WITH_OWNER_REQUEST_TEXT",
+    "OPERATION_STOP_CONFIRM_REQUIRED": "RETRY_STOP_WITH_CONFIRM_APPEND_ONLY",
+    "OPERATION_STOP_PROPOSAL_INVALID": "REPEAT_PREVIEW",
+    "OPERATION_STOP_PREVIEW_STALE": "REPEAT_PREVIEW",
+    "OPERATION_ALREADY_COMPLETED": "READ_SAVED_RESULT",
+}
+
+
+def _operation_stop_refusal(code: str) -> int:
+    return emit(
+        {
+            "reason_code": code,
+            "next_action": _OPERATION_STOP_NEXT.get(code, "READ_UNIVERSE_POLICY_STATUS"),
+            "writes": {"research_store": 0},
+        },
+        exit_code=2,
+    )
+
+
+def cmd_operation_stop_preview(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    operation_sha256: str,
+    owner_request_text: str,
+) -> int:
+    from solana_alpha_lab.factory.hfic_ordinary_operation import (
+        OrdinaryOperationError,
+        preview_operation_stop,
+    )
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    try:
+        payload = preview_operation_stop(
+            store, operation_sha256=operation_sha256, owner_request_text=owner_request_text
         )
+    except OrdinaryOperationError as exc:
+        return _operation_stop_refusal(exc.code)
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_operation_stop(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    proposal_path: Path,
+    confirm_append_only: bool,
+) -> int:
+    from solana_alpha_lab.factory.hfic_ordinary_operation import (
+        OrdinaryOperationError,
+        apply_operation_stop,
+    )
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    proposal = _load_json_file(proposal_path)
+    nested = proposal.get("proposal")
+    body = nested if isinstance(nested, dict) else proposal
+    try:
+        payload = apply_operation_stop(store, proposal=body, confirm_append_only=confirm_append_only)
+    except OrdinaryOperationError as exc:
+        return _operation_stop_refusal(exc.code)
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     return emit(payload)
 
@@ -3805,6 +3910,20 @@ def build_parser() -> argparse.ArgumentParser:
     universe_apply.add_argument("--proposal", type=Path, required=True)
     universe_apply.add_argument("--confirm-append-only", action="store_true")
     universe_apply.add_argument("--format", choices=("json",), default="json")
+    stop_preview = subparsers.add_parser(
+        "operation-stop-preview",
+        help="read-only proposal to stop one exact ordinary operation; no verdict, no quota return",
+    )
+    stop_preview.add_argument("--operation-sha256", required=True)
+    stop_preview.add_argument("--owner-request-text", required=True)
+    stop_preview.add_argument("--format", choices=("json",), default="json")
+    stop_apply = subparsers.add_parser(
+        "operation-stop",
+        help="append one owner stop of an ordinary operation; requires --confirm-append-only",
+    )
+    stop_apply.add_argument("--proposal", type=Path, required=True)
+    stop_apply.add_argument("--confirm-append-only", action="store_true")
+    stop_apply.add_argument("--format", choices=("json",), default="json")
     reopen_preview = subparsers.add_parser(
         "preview-reopened-prior-routing",
         help="read-only CONTROL reconsideration preview after planned legacy-prior commission and exact-session quarantine",
@@ -4137,6 +4256,20 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.command == "memory-policy-apply":
             return cmd_memory_policy_apply(
+                repo_root,
+                explicit_data_root=args.data_root,
+                proposal_path=args.proposal,
+                confirm_append_only=bool(args.confirm_append_only),
+            )
+        if args.command == "operation-stop-preview":
+            return cmd_operation_stop_preview(
+                repo_root,
+                explicit_data_root=args.data_root,
+                operation_sha256=args.operation_sha256,
+                owner_request_text=args.owner_request_text,
+            )
+        if args.command == "operation-stop":
+            return cmd_operation_stop(
                 repo_root,
                 explicit_data_root=args.data_root,
                 proposal_path=args.proposal,

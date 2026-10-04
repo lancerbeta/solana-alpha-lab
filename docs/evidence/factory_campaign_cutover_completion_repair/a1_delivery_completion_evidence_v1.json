@@ -5,7 +5,7 @@
   "as_of": "2026-10-04",
   "task_id": "FACTORY_CAMPAIGN_CUTOVER_COMPLETION_REPAIR_V1",
   "state_change": "GIT_CANDIDATE_REQUIRES_EXACT_HEAD_CI_AND_MERGE_READINESS",
-  "base_main": "fc3db6cf164d73b1289bda8472c21f3d4e3edea7",
+  "base_main": "3e5add9101f0147a2aa8517c70ea66b5186293f8",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,

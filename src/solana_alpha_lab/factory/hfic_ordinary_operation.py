@@ -29,6 +29,19 @@ RESERVATION_KIND = "ORDINARY_LOOK_RESERVATION_V1"
 LIMITED_RESULT = "LIMITED_RESULT"
 SCIENTIFIC_TERMINAL = "SCIENTIFIC_TERMINAL"
 
+# Persisted operation statuses. COMPLETED is never written: it is derived
+# from the run's own persisted owner-final receipt.
+STATUS_OPEN = "OPEN"
+STATUS_PAUSED_CAP = "PAUSED_CAP"
+STATUS_STOPPED = "STOPPED"
+STATE_COMPLETED = "COMPLETED"
+STOP_REASON_CODE = "OWNER_CANCELLED_EXECUTION"
+STOP_PROPOSAL_SCHEMA = "smial.hfic-ordinary-operation-stop-proposal"
+NEXT_PERSIST_OWNER_FINAL = "PERSIST_OWNER_FINAL"
+NEXT_FINISH_OR_STOP = "FINISH_RUN_THEN_PERSIST_OWNER_FINAL_OR_STOP_OPERATION"
+NEXT_LOOK_OR_STOP = "RUN_AUTHORIZED_LOOK_OR_STOP_OPERATION"
+NEXT_STOP = "STOP_OPERATION"
+
 
 class OrdinaryOperationError(ValueError):
     def __init__(self, code: str) -> None:
@@ -175,7 +188,14 @@ def record_operation(
     return stored
 
 
-def _append(store: Any, *, kind: str, body: Mapping[str, Any], record_prefix: str) -> None:
+def _append(
+    store: Any,
+    *,
+    kind: str,
+    body: Mapping[str, Any],
+    record_prefix: str,
+    before_commit: Any = None,
+) -> None:
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
     now = datetime.now(timezone.utc)
@@ -204,7 +224,68 @@ def _append(store: Any, *, kind: str, body: Mapping[str, Any], record_prefix: st
         producer_git_sha="0" * 40,
         created_at=now,
     )
-    store.append([event], transaction_id=event.transaction_id)
+    store.append([event], transaction_id=event.transaction_id, before_commit=before_commit)
+
+
+def _append_transition(store: Any, updated: Mapping[str, Any], *, based_on_record_id: str) -> None:
+    """Compare-before-append under the writer lease.
+
+    A state row is written only while the row it was derived from is still the
+    latest one, so a late landing or stamp cannot overwrite a newer stop.
+    """
+
+    digest = str(updated.get("operation_sha256") or "")
+    body = {key: value for key, value in updated.items() if key not in {"record_id", "_recorded_at"}}
+
+    def _check() -> None:
+        if str(get_operation(store, digest).get("record_id") or "") != based_on_record_id:
+            raise OrdinaryOperationError("ORDINARY_OPERATION_STATE_CHANGED")
+
+    _append(store, kind=OPERATION_KIND, body=body, record_prefix="HFIC-ART-OP", before_commit=_check)
+
+
+def _stamp_fingerprint(store: Any, operation_sha256: str, fingerprint: str) -> dict[str, Any]:
+    """Record the first corpus fingerprint without reopening a stopped operation."""
+
+    for _attempt in range(5):
+        current = get_operation(store, operation_sha256)
+        stamped = current.get("corpus_fingerprint")
+        if stamped:
+            if stamped != fingerprint:
+                raise OrdinaryOperationError("ORDINARY_OPERATION_BINDING_MISMATCH")
+            return current
+        if current.get("status") == STATUS_STOPPED:
+            raise OrdinaryOperationError("ORDINARY_OPERATION_STOPPED")
+        updated = dict(current)
+        updated["corpus_fingerprint"] = fingerprint
+        try:
+            _append_transition(store, updated, based_on_record_id=str(current.get("record_id") or ""))
+        except OrdinaryOperationError as exc:
+            if exc.code != "ORDINARY_OPERATION_STATE_CHANGED":
+                raise
+            continue
+        return get_operation(store, operation_sha256)
+    raise OrdinaryOperationError("ORDINARY_OPERATION_STATE_CHANGED")
+
+
+def _refuse_stopped(operation: Mapping[str, Any]) -> None:
+    if operation.get("status") == STATUS_STOPPED:
+        raise OrdinaryOperationError("ORDINARY_OPERATION_STOPPED")
+
+
+def _refuse_closed(store: Any, operation: Mapping[str, Any]) -> None:
+    """No new or resumed evaluation once execution is over.
+
+    A stopped operation and a completed one (its run's owner-final is saved and
+    it no longer holds the research-universe gate) admit only replay of saved
+    results and explicit calculation revisions; otherwise a look could land
+    under a later profile than the one the run was frozen with.
+    """
+
+    _refuse_stopped(operation)
+    if operation.get("status") == STATUS_OPEN and operation.get("requested_completion") == SCIENTIFIC_TERMINAL:
+        if operation_lifecycle(store, operation)["effective_state"] == STATE_COMPLETED:
+            raise OrdinaryOperationError("ORDINARY_OPERATION_COMPLETED")
 
 
 def _looks(store: Any, journal: str) -> list[dict[str, Any]]:
@@ -613,6 +694,8 @@ def authorize_temporal_attempt(
                 "preview_sha256": owned[-1].get("preview_sha256"),
                 "replayed_without_loader": True,
             }
+        # A stopped or completed operation replays saved previews, never a new one.
+        _refuse_closed(store, operation)
         fingerprint = binding_fingerprint(binding_cohorts)
         stamped = operation.get("corpus_fingerprint")
         if fingerprint and stamped and fingerprint != stamped:
@@ -631,10 +714,7 @@ def authorize_temporal_attempt(
         _require_published_logical_content(data_root)
         _reserve(store, operation, spec_sha256=spec_sha, look_class="preview")
         if fingerprint and not stamped:
-            updated = dict(operation)
-            updated["corpus_fingerprint"] = fingerprint
-            _append(store, kind=OPERATION_KIND, body=updated, record_prefix="HFIC-ART-OP")
-            operation = get_operation(store, operation_sha256)
+            operation = _stamp_fingerprint(store, operation_sha256, fingerprint)
         return {
             "disposition": "EXECUTE",
             "values_loaded": False,
@@ -829,6 +909,9 @@ def gate_before_values(
             "source_result_sha256": source.get("result_sha256"),
             "source_calculation_version": source.get("calculation_version"),
         }
+    # Saved results and owner corrections stay readable after a stop or
+    # completion; a new or resumed evaluation does not start.
+    _refuse_closed(store, operation)
     pending = [
         item
         for item in _reservations(store, operation_sha256)
@@ -901,10 +984,7 @@ def gate_before_values(
     if owner_allowance(store, operation, kind) < 1:
         raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
     if fingerprint and not stamped:
-        updated = dict(operation)
-        updated["corpus_fingerprint"] = fingerprint
-        _append(store, kind=OPERATION_KIND, body=updated, record_prefix="HFIC-ART-OP")
-        operation = get_operation(store, operation_sha256)
+        operation = _stamp_fingerprint(store, operation_sha256, fingerprint)
     _require_published_logical_content(data_root)
     _reserve(store, operation, spec_sha256=validated["spec_sha256"], look_class=kind)
     return {
@@ -954,6 +1034,7 @@ def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look
         current = get_operation(store, digest)
         if any(item.get("spec_sha256") == spec_sha256 for item in _reservations(store, digest)):
             return
+        _refuse_closed(store, current)
         if owner_allowance(store, current, look_class) < 1:
             raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
 
@@ -1014,18 +1095,450 @@ def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look
 def note_look_landed(store: Any, operation_sha256: str) -> dict[str, Any]:
     """Cap limits new looks. Landing a saved look may pause or stop the operation."""
 
-    operation = get_operation(store, operation_sha256)
-    status = operation.get("status")
-    if status != "OPEN":
-        return operation
-    if owner_allowance(store, operation, "main") < 1 and operation.get("requested_completion") == LIMITED_RESULT:
-        status = "PAUSED_CAP"
-    if status == operation.get("status"):
-        return operation
-    updated = dict(operation)
-    updated["status"] = status
-    _append(store, kind=OPERATION_KIND, body=updated, record_prefix="HFIC-ART-OP")
-    return updated
+    for _attempt in range(5):
+        operation = get_operation(store, operation_sha256)
+        if operation.get("status") != STATUS_OPEN:
+            return operation
+        if not (
+            owner_allowance(store, operation, "main") < 1
+            and operation.get("requested_completion") == LIMITED_RESULT
+        ):
+            return operation
+        updated = dict(operation)
+        updated["status"] = STATUS_PAUSED_CAP
+        try:
+            _append_transition(store, updated, based_on_record_id=str(operation.get("record_id") or ""))
+        except OrdinaryOperationError as exc:
+            if exc.code != "ORDINARY_OPERATION_STATE_CHANGED":
+                raise
+            continue
+        return get_operation(store, operation_sha256)
+    return get_operation(store, operation_sha256)
+
+
+def _parse_time(value: object) -> datetime | None:
+    if isinstance(value, datetime):
+        return value
+    try:
+        return datetime.fromisoformat(str(value))
+    except (TypeError, ValueError):
+        return None
+
+
+def _operation_opened_at(store: Any, operation_sha256: str) -> datetime | None:
+    times = [
+        _parse_time(item.get("_recorded_at"))
+        for item in list_operations(store)
+        if item.get("operation_sha256") == operation_sha256
+    ]
+    known = [item for item in times if item is not None]
+    return min(known) if known else None
+
+
+def _run_receipts(store: Any) -> list[dict[str, Any]]:
+    """Persisted forge-run receipts with their record time. Reads no values."""
+
+    from solana_alpha_lab.factory.hfic_representation_ladder import FORGE_RUN_ARTIFACT_KIND
+
+    found: list[dict[str, Any]] = []
+    for record in store.iter_committed_records():
+        if getattr(record.record_kind, "value", record.record_kind) != "RESEARCH_ARTIFACT":
+            continue
+        try:
+            wrapper = json.loads(record.payload_json)
+        except (TypeError, json.JSONDecodeError):
+            continue
+        if not isinstance(wrapper, dict) or wrapper.get("artifact_kind") != FORGE_RUN_ARTIFACT_KIND:
+            continue
+        body = _load_body(record)
+        if body is None:
+            continue
+        found.append(
+            {
+                "body": body,
+                "record_id": str(getattr(record, "record_id", "") or ""),
+                "recorded_at": _parse_time(getattr(record, "created_at", None)),
+            }
+        )
+    return found
+
+
+def _session_search_keys(store: Any) -> dict[str, set[str]]:
+    from solana_alpha_lab.factory.hfic_session import list_hfic_sessions
+
+    keys: dict[str, set[str]] = {}
+    for row in list_hfic_sessions(store):
+        session_id = str(row.get("session_id") or "")
+        search_key = str(row.get("search_key_sha256") or "")
+        if session_id and search_key:
+            keys.setdefault(session_id, set()).add(search_key)
+    return keys
+
+
+def _run_completion(
+    operation: Mapping[str, Any],
+    *,
+    opened_at: datetime | None,
+    receipts: Sequence[Mapping[str, Any]],
+    session_keys: Mapping[str, set[str]],
+) -> tuple[dict[str, Any] | None, str]:
+    """The bound run's owner-final, or the exact reason it is not proven.
+
+    Bound means: same focus, market epoch and scientific slot; recorded at or
+    after this operation; OWNER_FINAL; and its BASE stage session carries this
+    operation's journal. A name match is not enough. Completion is monotone:
+    the earliest bound owner-final stays the proof, so a later in-progress or
+    blocked receipt for the same slot cannot reopen the operation.
+    """
+
+    from solana_alpha_lab.factory.hfic_representation_ladder import (
+        ACTION_NON_SCIENTIFIC_STOP,
+        ACTION_OWNER_CANDIDATE,
+        ACTION_SEARCH_EXHAUSTED,
+        OWNER_CLASS_FINAL,
+    )
+
+    focus = str(operation.get("owner_focus") or "")
+    market = str(operation.get("market_evidence_epoch_sha256") or "")
+    slot = str(operation.get("scientific_slot_sha256") or "")
+    journal = str(operation.get("journal_scope") or "")
+    finals = {ACTION_OWNER_CANDIDATE, ACTION_SEARCH_EXHAUSTED, ACTION_NON_SCIENTIFIC_STOP}
+    same_run = [
+        item
+        for item in receipts
+        if item["body"].get("owner_focus") == focus
+        and item["body"].get("market_evidence_epoch_sha256") == market
+        and item["body"].get("scientific_slot_sha256") == slot
+        and item.get("recorded_at") is not None
+    ]
+    if opened_at is None:
+        return None, "OPERATION_TIME_UNKNOWN"
+    def _final(item: Mapping[str, Any]) -> bool:
+        return (
+            item["body"].get("owner_class") == OWNER_CLASS_FINAL
+            and item["body"].get("owner_final") in finals
+        )
+
+    def _bound_session(body: Mapping[str, Any]) -> str | None:
+        for stage in body.get("stages") or []:
+            if not isinstance(stage, Mapping) or stage.get("representation_id") != "BASE":
+                continue
+            session_id = str(stage.get("session_id") or "")
+            if (
+                session_id
+                and journal in session_keys.get(session_id, set())
+                and stage.get("scientific_slot_sha256") in (None, slot)
+            ):
+                return session_id
+        return None
+
+    after = sorted(
+        (item for item in same_run if item["recorded_at"] >= opened_at),
+        key=lambda item: item["recorded_at"],
+    )
+    finals_after = [item for item in after if _final(item)]
+    bound = [(item, _bound_session(item["body"])) for item in finals_after]
+    bound = [(item, session_id) for item, session_id in bound if session_id is not None]
+    if not bound:
+        if finals_after:
+            return None, "RECEIPT_JOURNAL_UNBOUND"
+        if after:
+            return None, "LATEST_RECEIPT_NOT_FINAL"
+        if any(_final(item) for item in same_run):
+            return None, "OWNER_FINAL_BEFORE_OPERATION"
+        return None, "NO_OWNER_FINAL_RECEIPT"
+    proof, session_id = bound[0]
+    body = proof["body"]
+    return (
+        {
+            "kind": "RUN_OWNER_FINAL_RECEIPT",
+            "receipt_ref": proof["record_id"],
+            "receipt_sha256": body.get("receipt_sha256"),
+            "run_id": body.get("run_id"),
+            "owner_final": body.get("owner_final"),
+            "session_id": session_id,
+            "scientific": body.get("owner_final") != ACTION_NON_SCIENTIFIC_STOP,
+        },
+        "",
+    )
+
+
+def operation_lifecycle(
+    store: Any,
+    operation: Mapping[str, Any],
+    *,
+    receipts: Sequence[Mapping[str, Any]] | None = None,
+    session_keys: Mapping[str, set[str]] | None = None,
+) -> dict[str, Any]:
+    """Effective state of one operation. The only lifecycle owner; never writes."""
+
+    persisted = str(operation.get("status") or "")
+    if persisted == STATUS_STOPPED:
+        return {
+            "effective_state": STATUS_STOPPED,
+            "persisted_status": persisted,
+            "basis": {"kind": "OWNER_STOP", **dict(operation.get("lifecycle_event") or {})},
+        }
+    if persisted == STATUS_PAUSED_CAP:
+        return {"effective_state": STATUS_PAUSED_CAP, "persisted_status": persisted, "basis": {"kind": "OWNER_CAP"}}
+    if operation.get("requested_completion") != SCIENTIFIC_TERMINAL:
+        return {"effective_state": STATUS_OPEN, "persisted_status": persisted, "basis": None, "gap": "LIMITED_RESULT_OPEN"}
+    basis, gap = _run_completion(
+        operation,
+        opened_at=_operation_opened_at(store, str(operation.get("operation_sha256") or "")),
+        receipts=_run_receipts(store) if receipts is None else receipts,
+        session_keys=_session_search_keys(store) if session_keys is None else session_keys,
+    )
+    if basis is not None:
+        return {"effective_state": STATE_COMPLETED, "persisted_status": persisted, "basis": basis}
+    return {"effective_state": STATUS_OPEN, "persisted_status": persisted, "basis": None, "gap": gap}
+
+
+def _unresolved_reservations(store: Any, operation: Mapping[str, Any]) -> list[str]:
+    digest = str(operation.get("operation_sha256") or "")
+    landed = {
+        str(item.get("spec_sha256") or "")
+        for item in _looks(store, str(operation.get("journal_scope") or ""))
+        if item.get("operation_sha256") == digest and isinstance(item.get("result"), Mapping)
+    }
+    landed |= {
+        str(item.get("spec_sha256") or "")
+        for item in _feature_previews(store, str(operation.get("journal_scope") or ""))
+        if item.get("operation_sha256") == digest
+    }
+    return sorted(
+        {
+            str(item.get("spec_sha256") or "")
+            for item in _reservations(store, digest)
+            if str(item.get("spec_sha256") or "") not in landed
+        }
+        - {""}
+    )
+
+
+UNFINISHABLE_GAPS = frozenset({"OWNER_FINAL_BEFORE_OPERATION", "RECEIPT_JOURNAL_UNBOUND", "OPERATION_TIME_UNKNOWN"})
+
+
+def _blocking_next_action(
+    operation: Mapping[str, Any], lifecycle: Mapping[str, Any], *, profile_active: bool
+) -> str:
+    """STOP when the run cannot finish here; otherwise finish-or-stop.
+
+    Without an active profile no new look is admitted, so an open run cannot
+    reach its owner-final; persist cannot bind an unbound or earlier receipt.
+    """
+
+    if not profile_active or lifecycle.get("gap") in UNFINISHABLE_GAPS:
+        return NEXT_STOP
+    if operation.get("requested_completion") != SCIENTIFIC_TERMINAL:
+        return NEXT_LOOK_OR_STOP
+    return NEXT_FINISH_OR_STOP
+
+
+def effective_open_operations(store: Any) -> list[dict[str, Any]]:
+    """Operations that still hold the research-universe gate, with their lifecycle."""
+
+    latest: dict[str, dict[str, Any]] = {}
+    for item in list_operations(store):
+        digest = str(item.get("operation_sha256") or "")
+        previous = latest.get(digest)
+        if previous is None or str(item.get("_recorded_at") or "") >= str(previous.get("_recorded_at") or ""):
+            latest[digest] = item
+    candidates = [dict(item) for item in latest.values() if item.get("status") == STATUS_OPEN]
+    if not candidates:
+        return []
+    receipts = _run_receipts(store)
+    session_keys = _session_search_keys(store)
+    found: list[dict[str, Any]] = []
+    for operation in candidates:
+        operation.pop("_recorded_at", None)
+        lifecycle = operation_lifecycle(store, operation, receipts=receipts, session_keys=session_keys)
+        if lifecycle["effective_state"] == STATUS_OPEN:
+            found.append({**operation, "_lifecycle": lifecycle})
+    return found
+
+
+def describe_blocking_operations(
+    store: Any, operations: Sequence[Mapping[str, Any]], *, profile_active: bool
+) -> list[dict[str, Any]]:
+    """Owner-facing rows: which operation, why it blocks, and the exact next command."""
+
+    rows = []
+    for operation in operations:
+        lifecycle = operation.get("_lifecycle") or operation_lifecycle(store, operation)
+        digest = str(operation.get("operation_sha256") or "")
+        rows.append(
+            {
+                "operation_sha256": digest,
+                "owner_focus": operation.get("owner_focus"),
+                "requested_completion": operation.get("requested_completion"),
+                "persisted_status": operation.get("status"),
+                "effective_state": lifecycle.get("effective_state"),
+                "completion_gap": lifecycle.get("gap"),
+                "market_evidence_epoch_sha256": operation.get("market_evidence_epoch_sha256"),
+                "journal_scope": operation.get("journal_scope"),
+                "unresolved_reservations": len(_unresolved_reservations(store, operation)),
+                "preview_allowance": owner_allowance(store, operation, "preview"),
+                "next_action": _blocking_next_action(operation, lifecycle, profile_active=profile_active),
+                "stop_preview": f"operation-stop-preview --operation-sha256 {digest} --owner-request-text <owner text>",
+            }
+        )
+    return rows
+
+
+def _stop_proposal_body(operation: Mapping[str, Any], *, owner_request_text: str, unresolved: Sequence[str]) -> dict[str, Any]:
+    return {
+        "schema": STOP_PROPOSAL_SCHEMA,
+        "schema_version": "1.0",
+        "operation_sha256": operation.get("operation_sha256"),
+        "base_record_id": operation.get("record_id"),
+        "base_status": operation.get("status"),
+        "owner_request_text": owner_request_text,
+        "reason_code": STOP_REASON_CODE,
+        "unresolved_reservation_spec_sha256": list(unresolved),
+    }
+
+
+def _stop_text(value: object) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise OrdinaryOperationError("OPERATION_STOP_REQUEST_REQUIRED")
+    return value.strip()
+
+
+def _operation_id(value: object) -> str:
+    text = str(value or "").strip().lower()
+    if len(text) != 64 or any(char not in "0123456789abcdef" for char in text):
+        raise OrdinaryOperationError("ORDINARY_OPERATION_ID_INVALID")
+    return text
+
+
+def preview_operation_stop(store: Any, *, operation_sha256: object, owner_request_text: object) -> dict[str, Any]:
+    """Read-only proposal to cancel one exact operation's remaining execution."""
+
+    digest = _operation_id(operation_sha256)
+    text = _stop_text(owner_request_text)
+    operation = get_operation(store, digest)
+    lifecycle = operation_lifecycle(store, operation)
+    if lifecycle["effective_state"] == STATE_COMPLETED:
+        raise OrdinaryOperationError("OPERATION_ALREADY_COMPLETED")
+    landed = [
+        item.get("record_id")
+        for item in _looks(store, str(operation.get("journal_scope") or ""))
+        if item.get("operation_sha256") == digest and isinstance(item.get("result"), Mapping)
+    ]
+    base = {
+        "operation_sha256": digest,
+        "owner_focus": operation.get("owner_focus"),
+        "requested_completion": operation.get("requested_completion"),
+        "persisted_status": operation.get("status"),
+        "effective_state": lifecycle["effective_state"],
+        "saved_result_refs": landed,
+        "authority": {"experiment_execution": 0, "git_mutation": 0, "provider_api_rpc_wss_calls": 0},
+        "writes": {"research_store": 0},
+    }
+    if lifecycle["effective_state"] == STATUS_STOPPED:
+        return {
+            "action": "OPERATION_STOP_PREVIEW",
+            "status": "NO_CHANGE",
+            **base,
+            "stop": lifecycle["basis"],
+            "next_action": "READ_SAVED_RESULT",
+        }
+    unresolved = _unresolved_reservations(store, operation)
+    proposal = _stop_proposal_body(operation, owner_request_text=text, unresolved=unresolved)
+    proposal["proposal_sha256"] = _sha(proposal)
+    return {
+        "action": "OPERATION_STOP_PREVIEW",
+        "status": "PROPOSED",
+        **base,
+        "unresolved_reservation_spec_sha256": unresolved,
+        "effect": {
+            "scientific_verdict": None,
+            "quota_returned": False,
+            "saved_results_kept": True,
+            "new_looks_after_stop": "REFUSED",
+            "saved_result_replay_after_stop": "ALLOWED",
+        },
+        "claim_boundary": "A stop ends execution. It is not a negative result and does not free spent looks.",
+        "proposal": proposal,
+        "proposal_sha256": proposal["proposal_sha256"],
+        "next_action": "AUTHORIZED_STOP_APPLY",
+    }
+
+
+def apply_operation_stop(store: Any, *, proposal: Mapping[str, Any], confirm_append_only: bool) -> dict[str, Any]:
+    """Append one owner stop. Re-checks the exact target under the writer lease."""
+
+    if not confirm_append_only:
+        raise OrdinaryOperationError("OPERATION_STOP_CONFIRM_REQUIRED")
+    body = dict(proposal)
+    observed = body.pop("proposal_sha256", None)
+    if (
+        body.get("schema") != STOP_PROPOSAL_SCHEMA
+        or body.get("reason_code") != STOP_REASON_CODE
+        or not isinstance(observed, str)
+        or _sha(body) != observed
+    ):
+        raise OrdinaryOperationError("OPERATION_STOP_PROPOSAL_INVALID")
+    digest = _operation_id(body.get("operation_sha256"))
+    text = _stop_text(body.get("owner_request_text"))
+    operation = get_operation(store, digest)
+    lifecycle = operation_lifecycle(store, operation)
+    if lifecycle["effective_state"] == STATUS_STOPPED:
+        event = dict(operation.get("lifecycle_event") or {})
+        return {
+            "action": "OPERATION_STOP_APPLY",
+            "status": "NO_CHANGE",
+            "same_proposal": event.get("proposal_sha256") == observed,
+            "operation_sha256": digest,
+            "stop": event,
+            "next_action": "READ_SAVED_RESULT",
+            "writes": {"research_store": 0},
+        }
+    if lifecycle["effective_state"] == STATE_COMPLETED:
+        raise OrdinaryOperationError("OPERATION_ALREADY_COMPLETED")
+    base_record = str(body.get("base_record_id") or "")
+    unresolved = _unresolved_reservations(store, operation)
+    if (
+        str(operation.get("record_id") or "") != base_record
+        or list(body.get("unresolved_reservation_spec_sha256") or []) != unresolved
+    ):
+        raise OrdinaryOperationError("OPERATION_STOP_PREVIEW_STALE")
+    updated = {key: value for key, value in operation.items() if key != "record_id"}
+    updated["status"] = STATUS_STOPPED
+    updated["lifecycle_event"] = {
+        "kind": "OWNER_STOP",
+        "reason_code": STOP_REASON_CODE,
+        "owner_request_text": text,
+        "proposal_sha256": observed,
+        "previous_record_id": base_record,
+        "previous_status": operation.get("status"),
+        "unresolved_reservation_spec_sha256": unresolved,
+        "scientific_verdict": None,
+        "quota_returned": False,
+    }
+
+    def _check() -> None:
+        current = get_operation(store, digest)
+        if str(current.get("record_id") or "") != base_record:
+            raise OrdinaryOperationError("OPERATION_STOP_PREVIEW_STALE")
+        if _unresolved_reservations(store, current) != unresolved:
+            raise OrdinaryOperationError("OPERATION_STOP_PREVIEW_STALE")
+        if operation_lifecycle(store, current)["effective_state"] == STATE_COMPLETED:
+            raise OrdinaryOperationError("OPERATION_ALREADY_COMPLETED")
+
+    _append(store, kind=OPERATION_KIND, body=updated, record_prefix="HFIC-ART-OP", before_commit=_check)
+    stored = get_operation(store, digest)
+    return {
+        "action": "OPERATION_STOP_APPLY",
+        "status": "APPENDED",
+        "operation_sha256": digest,
+        "persisted_status": stored.get("status"),
+        "record_id": stored.get("record_id"),
+        "stop": stored.get("lifecycle_event"),
+        "next_action": "READ_UNIVERSE_POLICY_STATUS",
+        "writes": {"research_store": 1},
+    }
 
 
 def project_ordinary_operation(
@@ -1041,7 +1554,16 @@ def project_ordinary_operation(
         rows = [item for item in rows if item.get("market_evidence_epoch_sha256") == market_evidence_epoch_sha256]
     if not rows:
         return None
-    current = _latest_recorded(rows)
+    # The newest operation is the one opened last; a later stop row of an older
+    # operation must not hide it.
+    opened: dict[str, str] = {}
+    for item in rows:
+        digest = str(item.get("operation_sha256") or "")
+        stamp = str(item.get("_recorded_at") or "")
+        if digest not in opened or stamp < opened[digest]:
+            opened[digest] = stamp
+    newest = max(opened, key=lambda digest: opened[digest])
+    current = _latest_recorded([item for item in rows if item.get("operation_sha256") == newest])
     current.pop("_recorded_at", None)
     journal = str(current.get("journal_scope") or "")
     looks = _looks(store, journal)
@@ -1060,16 +1582,18 @@ def project_ordinary_operation(
         hold = POINT_OFFSET[exit_point] - POINT_OFFSET[reference]
     latest = _operation_result(looks, str(current.get("operation_sha256") or ""))
     readout = result_readout(latest) if latest is not None else None
+    lifecycle = operation_lifecycle(store, current)
+    effective = lifecycle["effective_state"]
     if readout is not None and readout.get("result_coherence") != "COHERENT":
         # A technical mismatch is repaired by a calculation revision, not by more looks.
         next_action = "CORRECT_CALCULATION_REVISION"
         next_needs_values = True
         next_needs_authority = False
-    elif current.get("status") == "PAUSED_CAP":
+    elif effective == STATUS_PAUSED_CAP:
         next_action = "AUTHORIZE_ADDITIONAL_LOOKS"
         next_needs_values = True
         next_needs_authority = True
-    elif current.get("status") == "STOPPED":
+    elif effective in {STATUS_STOPPED, STATE_COMPLETED}:
         next_action = "READ_SAVED_RESULT"
         next_needs_values = False
         next_needs_authority = False
@@ -1080,6 +1604,11 @@ def project_ordinary_operation(
     return {
         "operation_sha256": current.get("operation_sha256"),
         "status": current.get("status"),
+        "effective_state": effective,
+        "lifecycle_basis": lifecycle.get("basis"),
+        "completion_gap": lifecycle.get("gap"),
+        "requested_completion": current.get("requested_completion"),
+        "market_evidence_epoch_sha256": current.get("market_evidence_epoch_sha256"),
         "question_text": current.get("question_text"),
         "journal_scope": journal,
         "decision_point": decision,
@@ -1088,8 +1617,9 @@ def project_ordinary_operation(
         "exit_point": exit_point,
         "completed": {
             "look": latest is not None,
-            "operation": current.get("status") in {"PAUSED_CAP", "STOPPED"},
-            "scientific_search": False,
+            "operation": effective in {STATUS_PAUSED_CAP, STATUS_STOPPED, STATE_COMPLETED},
+            "scientific_search": effective == STATE_COMPLETED
+            and bool((lifecycle.get("basis") or {}).get("scientific")),
         },
         "result_refs": [latest.get("record_id")] if latest else [],
         "result_sha256": latest.get("result_sha256") if latest else None,
@@ -1104,11 +1634,34 @@ def project_ordinary_operation(
         "next_action": next_action,
         "next_needs_new_values": next_needs_values,
         "next_needs_new_authority": next_needs_authority,
-        "search_open": current.get("status") != "STOPPED",
+        "search_open": effective not in {STATUS_STOPPED, STATE_COMPLETED},
         "candidate_ready": any(
             item.get("owner_focus") == owner_focus for item in _iter_kind(store, "FORGE_DRAFT")
         ),
     }
+
+
+def operation_readout_line(projection: Mapping[str, Any], owner_focus: object) -> str:
+    """One owner line: which operation, its effective state and the exact next step."""
+
+    digest = str(projection.get("operation_sha256") or "")
+    line = f"operation: {digest} state={projection.get('effective_state')} next={projection.get('next_action')}"
+    if projection.get("next_action") == NEXT_PERSIST_OWNER_FINAL:
+        line += (
+            " — the run is owner-final; record it with forge-run --persist --owner-focus "
+            f"{owner_focus or ''}; that releases the operation"
+        )
+    elif projection.get("next_action") == NEXT_STOP:
+        line += (
+            " — this run cannot finish here; stop it with operation-stop-preview "
+            f"--operation-sha256 {digest} --owner-request-text <owner text>, then operation-stop"
+        )
+    elif projection.get("effective_state") == STATUS_STOPPED:
+        line += (
+            " — stopped by the owner; not a scientific result; saved looks stay spent; "
+            "more research needs a new owner request"
+        )
+    return line
 
 
 def merge_ordinary_readout(payload: dict[str, Any], projection: Mapping[str, Any] | None) -> dict[str, Any]:
@@ -1126,12 +1679,33 @@ def merge_ordinary_readout(payload: dict[str, Any], projection: Mapping[str, Any
         "RETURN_EXISTING_RUN",
         "NON_SCIENTIFIC_STOP",
     }
-    if blocked:
-        proj["next_action"] = str(payload.get("next_action") or "INPUT_NOT_READY")
+    effective = proj.get("effective_state")
+    if effective in {STATUS_STOPPED, STATE_COMPLETED}:
+        # The operation itself is over; a run-level blocker does not reopen it.
+        proj["next_action"] = "READ_SAVED_RESULT"
+        proj["next_needs_new_authority"] = False
+        proj["search_open"] = False
+    elif blocked:
+        codes = {str(item) for item in payload.get("blocking_reason_codes") or []}
+        if effective == STATUS_OPEN and "UNIVERSE_POLICY_REQUIRED" in codes:
+            # Without a profile this run cannot finish, and the profile cannot be
+            # applied while it is open: the executable step is the owner stop.
+            proj["next_action"] = NEXT_STOP
+        else:
+            proj["next_action"] = str(payload.get("next_action") or "INPUT_NOT_READY")
         proj["next_needs_new_authority"] = False
         proj["search_open"] = False
     elif final in terminals:
         proj["next_action"] = "READ_SAVED_RESULT"
+        if effective == STATUS_OPEN:
+            # The gate still counts this operation; the readback must say how to release it.
+            persistable = (
+                proj.get("requested_completion") == SCIENTIFIC_TERMINAL
+                and payload.get("owner_class") == "OWNER_FINAL"
+                and payload.get("market_evidence_epoch_sha256") == proj.get("market_evidence_epoch_sha256")
+                and proj.get("completion_gap") in {"NO_OWNER_FINAL_RECEIPT", "LATEST_RECEIPT_NOT_FINAL"}
+            )
+            proj["next_action"] = NEXT_PERSIST_OWNER_FINAL if persistable else NEXT_STOP
         proj["next_needs_new_authority"] = False
         proj["search_open"] = False
     elif str(payload.get("next_action") or "").startswith("RESUME_"):
@@ -1150,6 +1724,9 @@ def merge_ordinary_readout(payload: dict[str, Any], projection: Mapping[str, Any
         payload["next_action"] = "AUTHORIZE_ADDITIONAL_LOOKS"
         payload["owner_final"] = "OPERATION_PAUSED_SEARCH_OPEN"
     payload["ordinary_operation"] = proj
+    payload["owner_readout"] = (
+        str(payload.get("owner_readout") or "") + "\n" + operation_readout_line(proj, payload.get("owner_focus"))
+    )
     readout = (proj.get("result") or {}).get("descriptive_readout")
     if isinstance(readout, Mapping):
         if readout.get("status") == "LEGACY_READOUT_UNAVAILABLE":

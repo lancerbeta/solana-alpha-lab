@@ -1,15 +1,15 @@
 ---
 task_id: FACTORY_CAMPAIGN_CUTOVER_COMPLETION_REPAIR_V1
-task_version: "1.0"
+task_version: "1.1"
 status: READY
 as_of: "2026-10-04"
 owner: GOAL_OWNER
 allowed_routes: [DIRECT_CODEX_DELIVERY]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: fc3db6cf164d73b1289bda8472c21f3d4e3edea7
+  expected_base: 3e5add9101f0147a2aa8517c70ea66b5186293f8
   expected_upstream: origin/main
-  expected_upstream_oid: fc3db6cf164d73b1289bda8472c21f3d4e3edea7
+  expected_upstream_oid: 3e5add9101f0147a2aa8517c70ea66b5186293f8
   expected_branch: codex/factory-campaign-cutover-completion-repair-v1
   dirty_mode: ALLOW_REPORTED
 objective: >-
@@ -82,6 +82,10 @@ replay, typed absence, deadlines and authority. Reuse bounded immutable readers;
 no new full historical payload walk each tick.
 
 ## Vertical repair loop
+
+Version 1.1 integrates owner-noted merged PR373 by ordinary history-preserving
+merge and rebinds to its exact main. Its Forge paths do not alter either completion
+module; repeat the two RED cases on this base and retain the original proof.
 
 First reproduce RED on the frozen base. Through real register/authorize/activate/
 rollover and CLI/tick composition with fake provider and temporary SQLite/RDP,

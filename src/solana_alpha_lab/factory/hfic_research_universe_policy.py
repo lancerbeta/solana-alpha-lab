@@ -235,15 +235,34 @@ def effective_policy(store: Any) -> dict[str, Any]:
 
 
 def _open_operations(store: Any) -> list[dict[str, Any]]:
-    from solana_alpha_lab.factory.hfic_ordinary_operation import list_operations
+    """Operations whose effective lifecycle state is still OPEN.
 
-    latest: dict[str, dict[str, Any]] = {}
-    for item in list_operations(store):
-        digest = str(item.get("operation_sha256") or "")
-        previous = latest.get(digest)
-        if previous is None or str(item.get("_recorded_at") or "") >= str(previous.get("_recorded_at") or ""):
-            latest[digest] = item
-    return [item for item in latest.values() if item.get("status") == "OPEN"]
+    The ordinary-operation owner decides: a run with a bound owner-final
+    receipt or an owner stop no longer holds the gate.
+    """
+
+    from solana_alpha_lab.factory.hfic_ordinary_operation import effective_open_operations
+
+    return effective_open_operations(store)
+
+
+def _profile_active(store: Any) -> bool:
+    try:
+        return effective_policy(store).get("state") == "ACTIVE"
+    except UniversePolicyError:
+        return False
+
+
+def blocking_operations(store: Any, operations: list[dict[str, Any]] | None = None) -> list[dict[str, Any]]:
+    """Each open operation with its own executable next action (finish/persist or stop)."""
+
+    from solana_alpha_lab.factory.hfic_ordinary_operation import describe_blocking_operations
+
+    return describe_blocking_operations(
+        store,
+        _open_operations(store) if operations is None else operations,
+        profile_active=_profile_active(store),
+    )
 
 
 def _deny_pending(store: Any) -> None:
@@ -252,6 +271,8 @@ def _deny_pending(store: Any) -> None:
 
 
 def _deny_exhausted_preview(store: Any) -> None:
+    """Coverage counts read feature values; an open run's spent preview cap refuses them first."""
+
     from solana_alpha_lab.factory.hfic_ordinary_operation import owner_allowance
 
     for operation in _open_operations(store):
@@ -259,12 +280,19 @@ def _deny_exhausted_preview(store: Any) -> None:
             raise UniversePolicyError("OWNER_CAP_EXHAUSTED")
 
 
+def deny_counts_before_values(store: Any) -> None:
+    """Public pre-values admission for preview counts. Reads no market values."""
+
+    _deny_exhausted_preview(store)
+
+
 def status_payload(store: Any) -> dict[str, Any]:
     head = effective_policy(store)
     definition = head.get("definition") or {}
-    pending = bool(_open_operations(store))
+    open_operations = _open_operations(store)
+    pending = bool(open_operations)
     next_action = (
-        "FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW"
+        "RESOLVE_BLOCKING_OPERATIONS_THEN_PREVIEW"
         if pending
         else head["next_action"]
     )
@@ -279,6 +307,7 @@ def status_payload(store: Any) -> dict[str, Any]:
         "policy_head_sha256": head["policy_head_sha256"],
         "policy_sequence": head["policy_sequence"],
         "pending_operation": pending,
+        "blocking_operations": blocking_operations(store, open_operations),
         "next_action": next_action,
         "claim_boundary": "Thresholds are owner market-scale settings, not a return result and not strategy promotion.",
         "authority": _authority_zero(),
@@ -320,7 +349,8 @@ def preview_universe_policy(
     proposal = _proposal(store, min_holders=min_holders, min_liquidity_usd=min_liquidity_usd)
     definition = proposal["definition"]
     before = head.get("definition") or {}
-    pending = bool(_open_operations(store))
+    open_operations = _open_operations(store)
+    pending = bool(open_operations)
     return {
         "action": "UNIVERSE_POLICY_PREVIEW",
         "status": "NO_CHANGE" if proposal["semantic_sha256"] == head.get("semantic_sha256") else "PROPOSED",
@@ -341,8 +371,9 @@ def preview_universe_policy(
         "expected_policy_head_sha256": head["policy_head_sha256"],
         "claim_boundary": "Coverage is eligibility only. It is not a ranked profile and not a market-quality verdict.",
         "pending_operation": pending,
+        "blocking_operations": blocking_operations(store, open_operations),
         "next_action": (
-            "FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW"
+            "RESOLVE_BLOCKING_OPERATIONS_THEN_PREVIEW"
             if pending
             else "AUTHORIZED_APPLY"
             if proposal["semantic_sha256"] != head.get("semantic_sha256")
@@ -451,8 +482,15 @@ def apply_universe_policy(
         producer_git_sha=git.head_sha.lower(),
         created_at=now,
     )
+
+    def _still_current() -> None:
+        # Re-checked under the writer lease: no run opened and no other apply landed.
+        _deny_pending(store)
+        if effective_policy(store)["policy_head_sha256"] != head["policy_head_sha256"]:
+            raise UniversePolicyError("UNIVERSE_POLICY_PREVIEW_STALE")
+
     try:
-        store.append([event], transaction_id=transaction_id)
+        store.append([event], transaction_id=transaction_id, before_commit=_still_current)
     except ResearchStoreError as exc:
         raise UniversePolicyError(str(exc)) from exc
     store.rebuild_projection()

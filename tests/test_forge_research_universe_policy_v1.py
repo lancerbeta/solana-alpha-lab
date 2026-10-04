@@ -400,7 +400,7 @@ class UniversePolicyTests(unittest.TestCase):
             self.assertEqual(pending_preview.returncode, 0, pending_preview.stdout + pending_preview.stderr)
             self.assertEqual(
                 json.loads(pending_preview.stdout)["next_action"],
-                "FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW",
+                "RESOLVE_BLOCKING_OPERATIONS_THEN_PREVIEW",
             )
             pending_path = workspace / "pending-20k.json"
             pending_path.write_text(json.dumps(json.loads(pending_preview.stdout)["proposal"]), encoding="utf-8")
@@ -410,7 +410,7 @@ class UniversePolicyTests(unittest.TestCase):
             )
             self.assertNotEqual(refused.returncode, 0)
             self.assertIn("UNIVERSE_POLICY_PENDING_OPERATION", refused.stdout + refused.stderr)
-            self.assertIn("FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW", refused.stdout)
+            self.assertIn("RESOLVE_BLOCKING_OPERATIONS_THEN_PREVIEW", refused.stdout)
             prompt = run_cli("preflight", "--discovery-contract", "--owner-focus", FOCUS, "--format", "json", data_root=data_root)
             self.assertEqual(prompt.returncode, 0, prompt.stdout + prompt.stderr)
             prompt_receipt = json.loads(prompt.stdout)
