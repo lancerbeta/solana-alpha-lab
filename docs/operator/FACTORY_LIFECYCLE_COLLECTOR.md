@@ -41,6 +41,105 @@ valid only when the writer is frozen.
 
 ## Architecture
 
+### Completion after a prepared rollover
+
+Prepared rollover persists raw `DRAINING` for the predecessor and a future
+transition for its successor. Before `cutover_at`, the predecessor still has
+effective `ACTIVE` admission. An empty queue must not produce `COMPLETE`.
+Ticks use one UTC entry clock even if processing finishes across the boundary.
+
+Completion requires a matching committed, already effective DRAINING transition
+(window closure or valid early rollover) and resolved due/publication/recovery
+obligations. `DRAINING_PENDING` can mean a future closure, open due/publication work,
+or an unresolved restore marker; it is not a proof of healthy waiting. Missing/malformed proof
+returns `DRAINING_PROOF_UNKNOWN`, leaves the activation/sequence unchanged and
+requires reconciliation of the exact transition; restarting the service does not
+repair missing proof. Do not edit operational SQLite or resume `COMPLETE` to
+restore capture. Any emergency replacement uses a new exact owner authorization,
+records the actual forward capture start, and preserves the historical gap.
+
+Safe next step for either terminal: use the scoped SQLite `mode=ro` / `query_only`
+readback linked above, binding both exact schedule SHA and activation ID. Read only
+`schedule_activations` state/window, `last_transition_event_id`, sequence and the
+transition metadata in `payload_json`; read canonical `restore_markers` entry
+`marker_id='UNRESOLVED'`; count due rows in the existing open/unresolved states and
+inspect scoped open publication-job metadata. Do not load `call_ledger` or run the
+generic status CLI. A future `transition_effective_at` with no recovery blocker
+means wait until that UTC boundary and then recheck. Open work means finish the
+existing drain. An unresolved marker means stop completion and use the existing
+recovery gate; elapsed time or reboot cannot resolve it.
+
+For `DRAINING_PROOF_UNKNOWN`, bind the row's event ID to committed transaction
+`RESEARCH-TXN-<EVENT_ID_UPPERCASE>`. On the host, check only its manifest and selected
+partition with the existing ResearchStore verifier, then compare event kind,
+schedule/activation, prior/new state, effective time, sequence, authority receipt
+and creation/availability clocks. Missing or mismatching evidence stays UNKNOWN.
+Save a payload-free operational receipt outside Git with IDs, SHA, UTC readback
+and safe failure code; route a bounded recovery task for that exact mismatch.
+No data export, SQL rewrite, history resurrection or broader campaign authority
+follows from this diagnostic. If capture actually stopped, prepare a separately
+owner-authorized forward replacement as in this runbook's existing emergency path.
+
+Exact proof-only invocation on the Linux host (replace the two quoted placeholders
+from scoped readback). It reads live WAL consistently, verifies the named partition
+and prints only IDs/times/verdict. It never calls completion or a provider. VERIFIED
+means transition proof, not healthy drain or authority to change the campaign.
+
+```bash
+cd /opt/solana-alpha-lab
+sudo /usr/bin/uv run --locked --managed-python python -B - 'SCHEDULE_SHA256_FROM_READBACK' 'ACTIVATION_ID_FROM_READBACK' <<'PY'
+import json, re, signal, sys, time
+from datetime import datetime, timezone
+from pathlib import Path
+sys.path.insert(0, 'src')
+from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore, transition_event_id_for
+from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
+from solana_alpha_lab.factory.observation_schedule_lifecycle import _draining_transition_evidence
+signal.alarm(45)
+now = datetime.now(timezone.utc)
+result = {'proof': 'UNKNOWN', 'as_of': render_utc(now)}
+try:
+    sha, activation = sys.argv[1:]
+    assert re.fullmatch('[0-9a-f]{64}', sha) and re.fullmatch('[A-Z0-9-]{1,128}', activation)
+    store = ObservationScheduleStore(Path('local/factory_v1/observation_schedule_state.sqlite').resolve(), readonly=True, immutable=False)
+    try:
+        store._conn.execute('PRAGMA query_only=ON')
+        assert store._conn.execute('PRAGMA query_only').fetchone()[0] == 1
+        store._conn.execute('PRAGMA cache_size=-2048')
+        deadline = time.monotonic() + 5
+        store._conn.set_progress_handler(lambda: int(time.monotonic() > deadline), 1000)
+        row = store.get_activation(sha, activation)
+    finally:
+        store.close()
+    assert row and row['state'] == 'DRAINING'
+    p = row['payload']
+    effective = parse_utc(p['transition_effective_at'])
+    assert p['prior_state'] == 'ACTIVE' and p['new_state'] == 'DRAINING'
+    assert p['transition_event_id'] == row['last_transition_event_id']
+    assert p['transition_sequence'] == row['transition_sequence']
+    assert p['authority_receipt_sha256'] == row['authority_receipt_sha256']
+    expected = transition_event_id_for(schedule_sha256=sha, activation_id=activation,
+        prior_state='ACTIVE', new_state='DRAINING', transition_sequence=row['transition_sequence'],
+        effective_at=render_utc(effective), authority_receipt_sha256=row['authority_receipt_sha256'])
+    assert expected == row['last_transition_event_id']
+    proof = _draining_transition_evidence(Path('local/factory_v1/observation_rdp').resolve(), row, now=now, exact_transition=True)
+    assert proof and proof[0] == effective
+    result.update(proof='VERIFIED', schedule_sha256=sha, activation_id=activation,
+                  transition_event_id=expected, effective_at=render_utc(effective), effective_now=effective <= now)
+except Exception:
+    result['reason'] = 'SCOPED_TRANSITION_PROOF_UNAVAILABLE'
+print(json.dumps(result))
+raise SystemExit(0 if result['proof'] == 'VERIFIED' else 2)
+PY
+```
+
+Repair proof: `tests/test_factory_campaign_cutover_completion_repair_v1.py` runs
+real lifecycle and CLI/tick composition with fake transport, including process
+restart, empty queues, early cutover, paused successor and one committed completion.
+This isolated loop proves the code invariant. Production acceptance additionally
+requires installed SHA, normal source progression and a new scientific publication;
+future natural rollover is proved only when it actually occurs.
+
 | Plane | Where | Role |
 |---|---|---|
 | Live Observation Plane | VPS `/opt/solana-alpha-lab` | moving collector truth (schedule, SQLite, observation_rdp) |

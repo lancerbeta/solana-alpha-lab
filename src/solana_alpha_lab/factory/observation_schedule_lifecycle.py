@@ -904,6 +904,7 @@ def _draining_transition_evidence(
     row: Mapping[str, Any],
     *,
     now: datetime,
+    exact_transition: bool = False,
 ) -> tuple[datetime, bool] | None:
     """Return the append-only DRAINING transition evidence.
 
@@ -931,21 +932,24 @@ def _draining_transition_evidence(
     except Exception:
         return None
     try:
-        records, _telemetry = ResearchStore(
-            data_root, create_if_missing=False
-        ).iter_lifecycle_records_bounded(
-            include_member_predecessor=False,
-            schedule_sha256=schedule_sha256,
-            activation_id=activation_id,
-            # Rollover may drain before the predecessor admission window
-            # closes.  The immutable activation start is the smallest
-            # lifecycle boundary needed to recover that committed event.
-            window_start=starts,
-            # A committed rollover may be scheduled later in the predecessor
-            # window.  Its immutable event is available now even when its
-            # canonical effective_at is the future cutover.
-            closure_cutoff=max(now, stops),
-        )
+        research = ResearchStore(data_root, create_if_missing=False)
+        if exact_transition:
+            # Completion names one transaction. Reuse the store's committed
+            # transaction lookup and full partition verifier, with no MEM/OBS
+            # payload walk or new persistent index/truth owner.
+            manifest = research._existing_transaction(f"RESEARCH-TXN-{event_id.upper()}")
+            records = research._verify_partition(manifest) if manifest is not None else ()
+        else:
+            records, _telemetry = research.iter_lifecycle_records_bounded(
+                include_member_predecessor=False,
+                schedule_sha256=schedule_sha256,
+                activation_id=activation_id,
+                # Rollover may drain before the predecessor admission window
+                # closes. The activation start bounds that committed event.
+                window_start=starts,
+                # A prepared rollover is committed before effective cutover.
+                closure_cutoff=max(now, stops),
+            )
     except ResearchStoreError:
         return None
     for record in records:
@@ -1997,7 +2001,7 @@ def complete_draining_schedule(
     now: datetime,
     producer_git_sha: str,
 ) -> dict[str, Any]:
-    """Complete a drained activation only after every obligation is resolved."""
+    """Complete only after proven effective admission closure and resolved work."""
     existing = store.get_activation(schedule_sha256, activation_id)
     if existing is None:
         raise ObservationLifecycleError("ACTIVATION_MISSING")
@@ -2010,6 +2014,46 @@ def complete_draining_schedule(
         }
     if existing["state"] != "DRAINING":
         raise ObservationLifecycleError("ACTIVATION_NOT_DRAINING")
+    # A prepared rollover stores DRAINING before its effective cutover. Empty
+    # queues do not close admission. The committed transition, including a valid
+    # early rollover, owns that boundary; mutable state/window alone cannot.
+    payload = existing.get("payload")
+    try:
+        projection_matches = (
+            isinstance(payload, Mapping)
+            and payload.get("new_state") == "DRAINING"
+            and payload.get("prior_state") == "ACTIVE"
+            and payload.get("transition_event_id") == existing["last_transition_event_id"]
+            and int(payload["transition_sequence"]) == int(existing["transition_sequence"])
+            and payload.get("authority_receipt_sha256") == existing.get("authority_receipt_sha256")
+        )
+        effective = parse_utc(str(payload["transition_effective_at"])) if projection_matches else None
+        if effective is not None and transition_event_id_for(
+            schedule_sha256=schedule_sha256,
+            activation_id=activation_id,
+            prior_state="ACTIVE",
+            new_state="DRAINING",
+            transition_sequence=int(existing["transition_sequence"]),
+            effective_at=render_utc(effective),
+            authority_receipt_sha256=str(existing.get("authority_receipt_sha256") or ""),
+        ) != existing["last_transition_event_id"]:
+            effective = None
+    except (KeyError, TypeError, ValueError):
+        effective = None
+    if effective is None:
+        return {
+            "terminal": "DRAINING_PROOF_UNKNOWN",
+            "activation_id": activation_id,
+            "schedule_sha256": schedule_sha256,
+            "state": "DRAINING",
+        }
+    if effective > now or store.restore_marker_unresolved():
+        return {
+            "terminal": "DRAINING_PENDING",
+            "activation_id": activation_id,
+            "schedule_sha256": schedule_sha256,
+            "state": "DRAINING",
+        }
     if has_open_publication_jobs(
         data_root=data_root,
         schedule_sha256=schedule_sha256,
@@ -2030,6 +2074,16 @@ def complete_draining_schedule(
     ):
         return {
             "terminal": "DRAINING_PENDING",
+            "activation_id": activation_id,
+            "schedule_sha256": schedule_sha256,
+            "state": "DRAINING",
+        }
+    # Resolve open work cheaply first. Only an otherwise-completable activation
+    # reads committed lifecycle partitions; pending drain cycles do not rescan.
+    closure = _draining_transition_evidence(data_root, existing, now=now, exact_transition=True)
+    if closure is None or closure[0] != effective:
+        return {
+            "terminal": "DRAINING_PROOF_UNKNOWN",
             "activation_id": activation_id,
             "schedule_sha256": schedule_sha256,
             "state": "DRAINING",

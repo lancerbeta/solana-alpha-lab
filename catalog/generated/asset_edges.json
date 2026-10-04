@@ -6648,6 +6648,16 @@
       "target_asset_id": "CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001"
     },
     {
+      "source_asset_id": "EVIDENCE-FACTORY-CAMPAIGN-CUTOVER-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-FACTORY-CAMPAIGN-CUTOVER-REPAIR-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-CAMPAIGN-CUTOVER-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "TEST-FACTORY-CAMPAIGN-CUTOVER-REPAIR-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-FACTORY-OPERABILITY-BOUNDED-CALL-RESOURCES-001",
       "relation": "depends_on",
       "target_asset_id": "SCRIPT-FACTORY-OPERABILITY-RESOURCE-PROFILE-001"
@@ -14113,6 +14123,16 @@
       "target_asset_id": "EVIDENCE-EARLY-STRUCTURAL-BACKING-PIT-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "REPORT-FACTORY-CAMPAIGN-CUTOVER-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FACTORY-LIFECYCLE-COLLECTOR-001"
+    },
+    {
+      "source_asset_id": "REPORT-FACTORY-CAMPAIGN-CUTOVER-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "EVIDENCE-FACTORY-CAMPAIGN-CUTOVER-REPAIR-001"
+    },
+    {
       "source_asset_id": "REPORT-FACTORY-OPERABILITY-BOUNDED-CALL-DIAGNOSTICS-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-FACTORY-UNATTENDED-OPERABILITY-001"
@@ -16846,6 +16866,21 @@
       "source_asset_id": "TEST-FACTORY-97D-STORAGE-FORMAT-BENCHMARK-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-CAMPAIGN-CUTOVER-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-FACTORY-CAMPAIGN-CUTOVER-REPAIR-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-CAMPAIGN-CUTOVER-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OBSERVATION-SCHEDULE-LIFECYCLE-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-CAMPAIGN-CUTOVER-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OBSERVATION-SCHEDULER-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001",

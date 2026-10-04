@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-CAMPAIGN-CUTOVER-FIT-001",
+  "as_of": "2026-10-04",
+  "task_id": "FACTORY_CAMPAIGN_CUTOVER_COMPLETION_REPAIR_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "49dce1761eed6334922d35fe971e7637bad7c82b4a0beb0a1e43e4b802826a1c",
+  "reviewed_inventory_sha256": "0b9aca12b609463487dbb735b3ddd1609b8d832488901a919b023e95a15244d2",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "MEASURED_PUBLICATION_BACKLOG_OR_NATURAL_ROLLOVER_FAILURE"
+  },
+  "dimensions": {
+    "mission": "Preserve forward capture through prepared campaign rollover.",
+    "flexibility_and_history": "No schema/history rewrite; valid early and expiry drain stay supported.",
+    "context_efficiency": "Two existing completion boundaries; 76 focused tests; one bounded atom.",
+    "research_truth": "Committed effective lifecycle proof owns closure; UNKNOWN remains no mutation.",
+    "owner_operability": "Exact missing-proof terminal and native recovery procedure; no weekly manual reboot.",
+    "execution_to_cashflow": "Data continuity only; no alpha/trading/cashflow claim.",
+    "monitoring_and_recovery": "Existing Telegram/watch retained; isolated and ordinary live acceptance.",
+    "build_vs_buy": "Existing lifecycle readers, SQLite and canonical release; no dependency.",
+    "security": "Fake provider and synthetic stores; operational data outside Git.",
+    "red_team": "Future empty queue, restart, spanning tick, obligations, coherent projection corruption and growing member-history payload exclusion tested."
+  },
+  "limits": [
+    "EXACT_HEAD_CI_REQUIRED",
+    "LIVE_COMMISSIONING_REQUIRED",
+    "NATURAL_ROLLOVER_NOT_YET_OBSERVED",
+    "PUBLICATION_LAG_SEPARATE",
+    "EXTERNAL_RECEIVER_NOT_CONFIGURED"
+  ],
+  "recovery": "Canonical exact-SHA code rollback preserves operational data and immutable events."
+}

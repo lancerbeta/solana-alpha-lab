@@ -1,0 +1,69 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-CAMPAIGN-CUTOVER-COMPLETION-001",
+  "as_of": "2026-10-04",
+  "task_id": "FACTORY_CAMPAIGN_CUTOVER_COMPLETION_REPAIR_V1",
+  "state_change": "GIT_CANDIDATE_REQUIRES_EXACT_HEAD_CI_AND_MERGE_READINESS",
+  "base_main": "3e5add9101f0147a2aa8517c70ea66b5186293f8",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "be0c5da52a1083893e8ca8a1ffd60276d2994a9f3e83b6d43ca5b6f2a8da6d7a",
+    "catalog/assets/lifecycle.yaml": "1438ddb7ea89492d189e05b20c0e819741c718ff4d7120300dbd867e7061b464",
+    "catalog/catalog_manifest.yaml": "0e753c03a6fad9c20cf21c584058c2b4c3397182599328bd3bbaaa148ade8f5e",
+    "catalog/generated/asset_edges.json": "6fcfe100aa8835d174562ccc72c2b9bee60f5864984b30cf37ba1470da948025",
+    "docs/PROJECT_MAP.md": "f7478c4967cd901ac1d8395e8c3b28aa951862d9a3c86057a95b7beb15f2d03c",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "d0af957b0f52168d53fbbb604b7e26127789edf0cd304931ee64ef83d8588e38",
+    "docs/reports/factory_campaign_cutover_completion_repair/a1_owner_readout_v1.md": "b8506ccc4b79fd69e40130609ccc95067bfe4310a7798caf05678be7786e73ad",
+    "docs/tasks/FACTORY_CAMPAIGN_CUTOVER_COMPLETION_REPAIR_V1.md": "71c24d227bcc20d6dd5ba1ef4fa288fb92b85e6333011338518bdb13e8cff27d",
+    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "e4178061456ced6ec83b18ccf5fac7ebf810170c7f14d613b077a26a98d59323",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "acc1d273aaa2ec94d3dd85feaffa2d1fd59a99958db4e3a313ba215b2ba1f7f2",
+    "tests/test_factory_campaign_cutover_completion_repair_v1.py": "1395cd7c1f6866ca048c6fa15864d4c8d466ed7ef2873c89586ed6d2e87de87f",
+    "tests/test_observation_schedule_lifecycle.py": "6f2826f069cab0e7d59644bae41b208e3e99b98b5599bf8ea64ad132bbe30ce6"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_campaign_cutover_completion_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "c8bd1ce4953b9c1047a566e595d5e2e9299ef570e463ef554b029a94c52476bc",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_76_FOCUSED_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/factory_campaign_cutover_completion_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "e7de2d5b6bf6bda9ed16f8a5eb01092d684e4f3e0eac54523a59c6b5443548d9",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_RED_PREMATURE_COMPLETION_REPRODUCED",
+      "PASS_REAL_LIFECYCLE_CLI_TICK_LOOP",
+      "PASS_EFFECTIVE_CLOSURE_UNKNOWN_OBLIGATIONS_AND_REPLAY"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_COMMISSIONING_IN_GIT_RECEIPT",
+    "NO_NATURAL_PRODUCTION_ROLLOVER_PROOF",
+    "PUBLICATION_LAG_NOT_REPAIRED"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "live_telegram_sends": 0,
+    "live_database_mutations": 0,
+    "credentials_read": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

@@ -2259,7 +2259,7 @@ def tick_once(
             admission_just_closed = (
                 prior_activation_state == "ACTIVE" and not admission_open
             )
-            if admission_just_closed:
+            if predecessor_before_cutover or admission_just_closed:
                 draining_completion = {
                     "state": "DRAINING",
                     "terminal": "DRAINING_PENDING",
@@ -2273,6 +2273,8 @@ def tick_once(
                     now=now,
                     producer_git_sha=producer_git_sha,
                 )
+                if draining_completion["terminal"] == "DRAINING_PROOF_UNKNOWN":
+                    stop_reason = stop_reason or "DRAINING_PROOF_UNKNOWN"
         materialize_pending_observation_snapshots(
             data_root=data_root,
             store=store,
