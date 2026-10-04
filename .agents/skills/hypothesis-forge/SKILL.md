@@ -27,7 +27,13 @@ their own `next_action`. Do not emit `NO_WORTHY` or `WAIT_FOR_NEW_EVIDENCE`
 for that pause. A `STOPPED` operation
 or a real `CLOSED` repair slot is not reopened by a restart.
 A temporal `discovery-execute` and a stored preview require that operation;
-omitting it does not bypass the cap. A null owner cap is the protocol
+omitting it does not bypass the cap. A new Forge run also requires the
+active ResearchStore research-universe profile (`universe-policy-status`).
+Absence is `UNIVERSE_POLICY_REQUIRED`, not an unfiltered search. Change the
+two minima with `universe-policy-preview` then `universe-policy-apply
+--confirm-append-only`. Do not put the live minima in Git. Replay uses the
+recipe snapshot, not today's profile. Apply waits until no Forge operation
+is `OPEN`. A null owner cap is the protocol
 remainder, not a silent cap of one. Coverage without values stays
 `discovery-coverage`.
 `next_action=CORRECT_CALCULATION_REVISION` means the saved temporal result is

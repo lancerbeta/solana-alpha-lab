@@ -219,6 +219,179 @@ def _published_file_hash_mismatch(root: Path) -> bool:
     return False
 
 
+def _saved_result_readback(
+    store: Any,
+    *,
+    request: dict[str, Any] | None,
+    operation_sha256: str | None,
+    spec: object,
+    journal_scope: str,
+) -> bool:
+    """True when this call reads a saved result instead of starting a new look."""
+
+    from solana_alpha_lab.factory.hfic_ordinary_operation import (
+        OrdinaryOperationError,
+        _looks,
+        _operation_result,
+        get_operation,
+        record_operation,
+    )
+    from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+
+    existing = None
+    if isinstance(request, dict):
+        try:
+            existing = record_operation(store, request, create_if_missing=False)
+        except OrdinaryOperationError:
+            existing = None
+    elif isinstance(operation_sha256, str) and operation_sha256:
+        try:
+            existing = get_operation(store, operation_sha256)
+        except OrdinaryOperationError:
+            existing = None
+    if not isinstance(existing, dict):
+        return False
+    try:
+        spec_sha = validate_temporal_query(spec)["spec_sha256"]
+    except Exception:
+        return False
+    saved = _operation_result(_looks(store, journal_scope), str(existing.get("operation_sha256") or ""), spec_sha)
+    return isinstance(saved, Mapping) and isinstance(saved.get("result"), Mapping)
+
+
+def _saved_feature_preview_readback(
+    store: Any,
+    *,
+    request: dict[str, Any] | None,
+    operation_sha256: str | None,
+    spec: object,
+    journal_scope: str,
+) -> bool:
+    """True when this preview call reads a saved feature preview instead of a new one."""
+
+    from solana_alpha_lab.factory.hfic_ordinary_operation import (
+        OrdinaryOperationError,
+        _canonical,
+        _feature_previews,
+        get_operation,
+        record_operation,
+    )
+
+    existing = None
+    if isinstance(request, dict):
+        try:
+            existing = record_operation(store, request, create_if_missing=False)
+        except OrdinaryOperationError:
+            existing = None
+    elif isinstance(operation_sha256, str) and operation_sha256:
+        try:
+            existing = get_operation(store, operation_sha256)
+        except OrdinaryOperationError:
+            existing = None
+    if not isinstance(existing, dict) or not isinstance(spec, dict):
+        return False
+    spec_sha = hashlib.sha256(_canonical(dict(spec)).encode("utf-8")).hexdigest()
+    return any(
+        item.get("operation_sha256") == existing.get("operation_sha256")
+        and item.get("spec_sha256") == spec_sha
+        for item in _feature_previews(store, journal_scope)
+    )
+
+
+def _new_research_universe_blocker(store: Any) -> dict[str, Any] | None:
+    """Block a new look when today's profile is missing or damaged. Writes nothing."""
+
+    from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        UniversePolicyError,
+        effective_policy,
+    )
+
+    try:
+        state = effective_policy(store).get("state")
+    except UniversePolicyError as exc:
+        return {
+            "reason_code": exc.code,
+            "values_loaded": False,
+            "writes": False,
+            "scientific_negative": False,
+            "next_action": "RESTORE_RESEARCH_UNIVERSE_PROFILE_THEN_RETRY",
+        }
+    if state == "ACTIVE":
+        return None
+    return {
+        "reason_code": "UNIVERSE_POLICY_REQUIRED",
+        "values_loaded": False,
+        "writes": False,
+        "scientific_negative": False,
+        "next_action": "PREVIEW_THEN_AUTHORIZED_APPLY",
+    }
+
+
+def _published_gate_cohorts(
+    data_root: Path,
+    binding_doc: object,
+) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
+    """Published cohorts for the gate. A disagreeing --binding writes nothing."""
+
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        resolve_published_discovery_binding,
+    )
+
+    lineage = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+    if not lineage.is_file():
+        supplied = binding_doc.get("cohorts") if isinstance(binding_doc, dict) else []
+        return (list(supplied) if isinstance(supplied, list) else []), None
+    try:
+        published = list(resolve_published_discovery_binding(data_root).get("cohorts") or [])
+    except GroundedDiscoveryError as exc:
+        body = {
+            "reason_code": exc.code,
+            "values_loaded": False,
+            "writes": False,
+            "scientific_negative": False,
+        }
+        if exc.code == "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE":
+            body["next_action"] = "RESTORE_PUBLISHED_PARTITION_BYTES_THEN_RETRY_DISCOVERY_EXECUTE"
+        return [], body
+    if isinstance(binding_doc, dict):
+        by_id = {
+            str(item.get("cohort_id")): item
+            for item in published
+            if isinstance(item, dict)
+        }
+        supplied = binding_doc.get("cohorts") or []
+        if not isinstance(supplied, list):
+            supplied = []
+        verified: list[dict[str, Any]] = []
+        for item in supplied:
+            if not isinstance(item, dict):
+                return [], {
+                    "reason_code": "BINDING_HASH_MISMATCH",
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                }
+            match = by_id.get(str(item.get("cohort_id")))
+            if (
+                match is None
+                or item.get("census_sha256") != match.get("census_sha256")
+                or item.get("observations_sha256") != match.get("observations_sha256")
+            ):
+                return [], {
+                    "reason_code": "BINDING_HASH_MISMATCH",
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                }
+            # Keep the caller cohort set. A proper subset must still reach the
+            # ordinary gate so fingerprint / revision input mismatch can refuse
+            # it — do not silently widen back to the full published list.
+            verified.append(dict(match))
+        return verified, None
+    return published, None
+
+
 _REPAIR_OWNER_NEXT = {
     "PARENT_SESSION_MISSING": "PROVIDE_PARENT_SESSION_ID_FROM_SHOW_SESSION",
     "PARENT_SESSION_REQUIRED": "SHOW_SESSION_THEN_REPAIR_CONTINUATION_DRAFT",
@@ -602,6 +775,26 @@ def cmd_preflight(
             + _preflight_writes_note(payload)
         )
     # Stamp and readout edits are inside the receipt hash.
+    from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        UniversePolicyError,
+        status_payload,
+    )
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    try:
+        payload["universe_policy"] = status_payload(ResearchStore(data_root, create_if_missing=False))
+    except UniversePolicyError as exc:
+        payload["universe_policy"] = {
+            "state": "UNREADABLE",
+            "reason_code": exc.code,
+            "next_action": "RESTORE_RESEARCH_UNIVERSE_PROFILE_THEN_RETRY",
+        }
+    except Exception as exc:
+        payload["universe_policy"] = {
+            "state": "UNREADABLE",
+            "reason_code": getattr(exc, "code", None) or type(exc).__name__,
+            "next_action": "RESTORE_RESEARCH_STORE_THEN_READ_STATUS",
+        }
     payload["preflight_receipt_sha256"] = canonical_preflight_receipt_sha256(payload)
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     exit_code = 0 if receipt["action"] != "STOP" else 2
@@ -1101,6 +1294,44 @@ def cmd_discovery_execute(
     correct_result_ref: str | None = None,
     correct_result_sha256: str | None = None,
 ) -> int:
+    from solana_alpha_lab.factory.hfic_grounded_discovery import publication_verification_scope
+
+    with publication_verification_scope():
+        return _cmd_discovery_execute(
+            repo_root,
+            store_root=store_root,
+            census_path=census_path,
+            observations_path=observations_path,
+            binding_path=binding_path,
+            spec_path=spec_path,
+            journal_scope=journal_scope,
+            candidate_scope_path=candidate_scope_path,
+            cohort_partitions=cohort_partitions,
+            explicit_data_root=explicit_data_root,
+            operation_path=operation_path,
+            operation_sha256=operation_sha256,
+            correct_result_ref=correct_result_ref,
+            correct_result_sha256=correct_result_sha256,
+        )
+
+
+def _cmd_discovery_execute(
+    repo_root: Path,
+    *,
+    store_root: Path,
+    census_path: Path | None,
+    observations_path: Path | None,
+    binding_path: Path | None,
+    spec_path: Path,
+    journal_scope: str,
+    candidate_scope_path: Path,
+    cohort_partitions: list[tuple[str, Path, Path]] | None = None,
+    explicit_data_root: Path | None = None,
+    operation_path: Path | None = None,
+    operation_sha256: str | None = None,
+    correct_result_ref: str | None = None,
+    correct_result_sha256: str | None = None,
+) -> int:
     """Compute one ordinary discovery query into a caller-selected store.
 
     Does not default to the live ResearchStore and does not reserve a slot.
@@ -1235,6 +1466,7 @@ def cmd_discovery_execute(
         epoch = epochs[0]
         claimed_market = ""
         service_writes = 0
+        preview_request = None
         if operation_path is not None:
             try:
                 preview_request = json.loads(operation_path.read_text(encoding="utf-8"))
@@ -1257,6 +1489,23 @@ def cmd_discovery_execute(
             )
         op_store = ResearchStore(store_root)
         try:
+            if correction is None and not _saved_result_readback(
+                op_store,
+                request=preview_request if isinstance(preview_request, dict) else None,
+                operation_sha256=operation_sha256,
+                spec=spec,
+                journal_scope=journal_scope,
+            ):
+                refusal = _new_research_universe_blocker(op_store)
+                if refusal is not None:
+                    return emit(refusal, exit_code=2)
+            cohorts: list[dict[str, Any]] = []
+            if explicit_data_root is not None:
+                cohorts, refusal = _published_gate_cohorts(explicit_data_root, binding_doc)
+                if refusal is not None:
+                    return emit(refusal, exit_code=2)
+            elif isinstance(binding_doc, dict):
+                cohorts = list(binding_doc.get("cohorts") or [])
             if operation_path is not None:
                 request = preview_request
                 if not isinstance(request, dict):
@@ -1277,19 +1526,6 @@ def cmd_discovery_execute(
                         },
                         exit_code=2,
                     )
-            cohorts = []
-            if isinstance(binding_doc, dict):
-                cohorts = list(binding_doc.get("cohorts") or [])
-            elif explicit_data_root is not None:
-                from solana_alpha_lab.factory.hfic_grounded_discovery import (
-                    resolve_published_discovery_binding,
-                )
-
-                try:
-                    published = resolve_published_discovery_binding(explicit_data_root)
-                    cohorts = list(published.get("cohorts") or [])
-                except Exception:
-                    cohorts = []
             gate = gate_before_values(
                 op_store,
                 operation_sha256=str(operation_sha256),
@@ -1457,6 +1693,40 @@ def cmd_discovery_preview(
     operation_path: Path | None = None,
     operation_sha256: str | None = None,
 ) -> int:
+    from solana_alpha_lab.factory.hfic_grounded_discovery import publication_verification_scope
+
+    with publication_verification_scope():
+        return _cmd_discovery_preview(
+            repo_root,
+            explicit_data_root=explicit_data_root,
+            spec_path=spec_path,
+            binding_path=binding_path,
+            census_path=census_path,
+            observations_path=observations_path,
+            cohort_partitions=cohort_partitions,
+            prior_preview_hash=prior_preview_hash,
+            store_root=store_root,
+            journal_scope=journal_scope,
+            operation_path=operation_path,
+            operation_sha256=operation_sha256,
+        )
+
+
+def _cmd_discovery_preview(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    spec_path: Path,
+    binding_path: Path | None,
+    census_path: Path | None,
+    observations_path: Path | None,
+    cohort_partitions: list[tuple[str, Path, Path]] | None,
+    prior_preview_hash: list[str] | None,
+    store_root: Path | None = None,
+    journal_scope: str | None = None,
+    operation_path: Path | None = None,
+    operation_sha256: str | None = None,
+) -> int:
     """Feature-only preview. Store memory is written only when store and journal are both set."""
 
     from solana_alpha_lab.factory.hfic_grounded_discovery import (
@@ -1530,6 +1800,29 @@ def cmd_discovery_preview(
                 exit_code=2,
             )
         preview_store = ResearchStore(store_root, create_if_missing=False)
+        preview_request = None
+        if operation_path is not None:
+            try:
+                preview_request = json.loads(operation_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+                return emit_error("DISCOVERY_INPUT_INVALID")
+            if not isinstance(preview_request, dict):
+                return emit_error("DISCOVERY_INPUT_INVALID")
+        if not _saved_feature_preview_readback(
+            preview_store,
+            request=preview_request,
+            operation_sha256=operation_sha256,
+            spec=spec,
+            journal_scope=journal_scope,
+        ):
+            refusal = _new_research_universe_blocker(preview_store)
+            if refusal is not None:
+                return emit(refusal, exit_code=2)
+        preview_published: list[dict[str, Any]] | None = None
+        if explicit_data_root is not None:
+            preview_published, refusal = _published_gate_cohorts(explicit_data_root, binding_doc)
+            if refusal is not None:
+                return emit(refusal, exit_code=2)
         try:
             if operation_path is not None:
                 request = json.loads(operation_path.read_text(encoding="utf-8"))
@@ -1586,20 +1879,10 @@ def cmd_discovery_preview(
                 )
             epoch = epochs[0]
             binding_cohorts: list[dict[str, Any]] = []
-            if binding_doc is not None and isinstance(binding_doc, dict):
+            if preview_published is not None:
+                binding_cohorts = preview_published
+            elif binding_doc is not None and isinstance(binding_doc, dict):
                 binding_cohorts = list(binding_doc.get("cohorts") or [])
-            elif explicit_data_root is not None:
-                from solana_alpha_lab.factory.hfic_grounded_discovery import (
-                    resolve_published_discovery_binding,
-                )
-
-                try:
-                    binding_cohorts = list(
-                        resolve_published_discovery_binding(explicit_data_root).get("cohorts")
-                        or []
-                    )
-                except Exception:
-                    binding_cohorts = []
             preview_gate = authorize_temporal_attempt(
                 preview_store,
                 operation_sha256=str(operation_sha256),
@@ -1663,12 +1946,49 @@ def cmd_discovery_preview(
             from solana_alpha_lab.factory.research_store import ResearchStore
 
             remembered = stored_preview_hashes(ResearchStore(store_root), journal_scope)
+        from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        policy_store = preview_store
+        if policy_store is None and explicit_data_root is not None:
+            policy_store = ResearchStore(explicit_data_root, create_if_missing=False)
+        if policy_store is None:
+            return emit(
+                {"reason_code": "UNIVERSE_POLICY_REQUIRED", "values_loaded": False, "writes": False},
+                exit_code=2,
+            )
+        from solana_alpha_lab.factory.hfic_research_universe_policy import UniversePolicyError
+
+        try:
+            policy_definition = effective_policy(policy_store).get("definition")
+        except UniversePolicyError as exc:
+            return emit(
+                {
+                    "reason_code": exc.code,
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                    "next_action": "RESTORE_RESEARCH_UNIVERSE_PROFILE_THEN_RETRY",
+                },
+                exit_code=2,
+            )
+        if policy_definition is None:
+            return emit(
+                {
+                    "reason_code": "UNIVERSE_POLICY_REQUIRED",
+                    "values_loaded": False,
+                    "writes": False,
+                    "scientific_negative": False,
+                },
+                exit_code=2,
+            )
         payload = build_feature_preview(
             loaded["census"],
             loaded["observations"],
             preview_spec,
             loaded["cohorts"],
             prior_preview_hashes=remembered,
+            universe_policy=policy_definition,
         )
         if store_root is not None and journal_scope:
             from solana_alpha_lab.factory.hfic_temporal_discovery import persist_feature_preview
@@ -1803,6 +2123,119 @@ def cmd_memory_policy_apply(
         proposal=body,
         confirm_append_only=confirm_append_only,
     )
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_universe_policy_status(repo_root: Path, explicit_data_root: Path | None) -> int:
+    from solana_alpha_lab.factory.hfic_research_universe_policy import status_payload
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    payload = status_payload(store)
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_universe_policy_preview(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    min_holders: str,
+    min_liquidity_usd: str,
+    decision_point: str | None,
+) -> int:
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        load_admitted_partition_rows,
+    )
+    from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        UniversePolicyError,
+        preview_universe_policy,
+        profile_definition,
+    )
+    from solana_alpha_lab.factory.hfic_temporal_discovery import universe_population_counts
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    counts = None
+    if decision_point:
+        try:
+            definition = profile_definition(min_holders, min_liquidity_usd)
+            loaded = load_admitted_partition_rows(
+                data_root=data_root,
+                binding_doc=None,
+                partitions=None,
+                census_path=None,
+                observations_path=None,
+                observation_filters=[("point_id", "in", sorted({decision_point, "X300"}))],
+            )
+            counts = universe_population_counts(
+                loaded["census"],
+                loaded["observations"],
+                loaded["cohorts"],
+                decision_point=decision_point,
+                definition=definition,
+            )
+        except (GroundedDiscoveryError, UniversePolicyError) as exc:
+            return emit(
+                {"reason_code": exc.code, "values_loaded": False, "writes": {"research_store": 0}},
+                exit_code=2,
+            )
+    try:
+        payload = preview_universe_policy(
+            store,
+            min_holders=min_holders,
+            min_liquidity_usd=min_liquidity_usd,
+            counts=counts,
+        )
+    except UniversePolicyError as exc:
+        return emit(
+            {"reason_code": exc.code, "values_loaded": False, "writes": {"research_store": 0}},
+            exit_code=2,
+        )
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_universe_policy_apply(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    proposal_path: Path,
+    confirm_append_only: bool,
+) -> int:
+    from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        UniversePolicyError,
+        apply_universe_policy,
+    )
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    proposal = _load_json_file(proposal_path)
+    nested = proposal.get("proposal")
+    body = nested if isinstance(nested, dict) else proposal
+    try:
+        payload = apply_universe_policy(
+            store,
+            repo_root=repo_root,
+            proposal=body,
+            confirm_append_only=confirm_append_only,
+        )
+    except UniversePolicyError as exc:
+        next_action = {
+            "UNIVERSE_POLICY_PENDING_OPERATION": "FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW",
+            "UNIVERSE_POLICY_PREVIEW_STALE": "REPEAT_PREVIEW",
+            "UNIVERSE_POLICY_CONFIRM_REQUIRED": "RETRY_APPLY_WITH_CONFIRM_APPEND_ONLY",
+        }.get(exc.code, "READ_UNIVERSE_POLICY_STATUS")
+        return emit(
+            {
+                "reason_code": exc.code,
+                "next_action": next_action,
+                "writes": {"research_store": 0},
+            },
+            exit_code=2,
+        )
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     return emit(payload)
 
@@ -3352,6 +3785,26 @@ def build_parser() -> argparse.ArgumentParser:
         help="required; appends policy only; never rewrites historical RDP bytes",
     )
     apply_cmd.add_argument("--format", choices=("json",), default="json")
+    universe_status = subparsers.add_parser(
+        "universe-policy-status",
+        help="read the active Forge research-universe profile from ResearchStore",
+    )
+    universe_status.add_argument("--format", choices=("json",), default="json")
+    universe_preview = subparsers.add_parser(
+        "universe-policy-preview",
+        help="preview holders and liquidity minima; optional decision-point counts do not read outcomes",
+    )
+    universe_preview.add_argument("--min-holders", required=True)
+    universe_preview.add_argument("--min-liquidity-usd", required=True)
+    universe_preview.add_argument("--decision-point", default=None)
+    universe_preview.add_argument("--format", choices=("json",), default="json")
+    universe_apply = subparsers.add_parser(
+        "universe-policy-apply",
+        help="append one authorized research-universe activation",
+    )
+    universe_apply.add_argument("--proposal", type=Path, required=True)
+    universe_apply.add_argument("--confirm-append-only", action="store_true")
+    universe_apply.add_argument("--format", choices=("json",), default="json")
     reopen_preview = subparsers.add_parser(
         "preview-reopened-prior-routing",
         help="read-only CONTROL reconsideration preview after planned legacy-prior commission and exact-session quarantine",
@@ -3684,6 +4137,23 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.command == "memory-policy-apply":
             return cmd_memory_policy_apply(
+                repo_root,
+                explicit_data_root=args.data_root,
+                proposal_path=args.proposal,
+                confirm_append_only=bool(args.confirm_append_only),
+            )
+        if args.command == "universe-policy-status":
+            return cmd_universe_policy_status(repo_root, args.data_root)
+        if args.command == "universe-policy-preview":
+            return cmd_universe_policy_preview(
+                repo_root,
+                explicit_data_root=args.data_root,
+                min_holders=str(args.min_holders),
+                min_liquidity_usd=str(args.min_liquidity_usd),
+                decision_point=args.decision_point,
+            )
+        if args.command == "universe-policy-apply":
+            return cmd_universe_policy_apply(
                 repo_root,
                 explicit_data_root=args.data_root,
                 proposal_path=args.proposal,

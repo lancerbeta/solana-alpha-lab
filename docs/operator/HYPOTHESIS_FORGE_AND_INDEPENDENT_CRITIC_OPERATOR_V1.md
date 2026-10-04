@@ -531,13 +531,16 @@ Authorized persist (same slash, after READY):
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --persist --format json --owner-focus AUTO
 ```
 
-Typed owner `forge_input_next` on that surface: `WAIT_FOR_IMPORT_OR_STOP` or
-`STOP_OBSERVABILITY` when not runnable; `STOP_BEFORE_SYNTHESIS` when
-runnable (FORGE INPUT visibility — Prompt A only if preflight `action` is
-not `STOP` and `forge_runnable` is true; this is not CONTROL next and not
-an observability halt). Always read `evidence_surface_mode` (`ordinary`
-when JSON null). Historical PASS `router_decision` prints as `caveat_router`
-on the owner block. Do not paste a slash as recovery.
+Typed owner `forge_input_next` on that surface: `WAIT_FOR_IMPORT_OR_STOP`
+when the corpus is missing; `PREVIEW_THEN_AUTHORIZED_APPLY` when the corpus
+is fine but the research-universe profile is absent; `RESTORE_RESEARCH_UNIVERSE_PROFILE_THEN_RETRY`
+when that profile is damaged; `STOP_OBSERVABILITY` for an observability halt;
+`STOP_BEFORE_SYNTHESIS` when runnable (FORGE INPUT visibility — Prompt A
+only if preflight `action` is not `STOP` and `forge_runnable` is true; this
+is not CONTROL next and not an observability halt). Always read
+`evidence_surface_mode` (`ordinary` when JSON null). Historical PASS
+`router_decision` prints as `caveat_router` on the owner block. Do not paste
+a slash as recovery.
 
 `forge-control-ready` remains an expert diagnostic. Happy terminal
 `FORGE_CONTROL_READY` is not the owner next after `forge-input`. Do not treat
@@ -1766,3 +1769,17 @@ lane_classifier_terminal_or_none
 ```
 
 Сам файл не является Git authority и не разрешает experiment/provider execution. Если этот процесс докажет повторяемую ценность и будет превращён в canonical capability, его schema, guards и deterministic stages должны пройти отдельный Promotion/Change Lane один раз; отдельные nightly hypotheses и runs остаются в Research Data Plane без PR/CI.
+
+## Research universe
+
+Живые минимумы holders и liquidity лежат в ResearchStore. Этот файл их не хранит. Активный снимок (`semantic_sha256`, минимумы и смысл популяции) всегда входит в `FORGE_CONTEXT_PACKET` до Prompt A. Пока профиля нет, новый synthesis не runnable: `forge_runnable=false`, `UNIVERSE_POLICY_REQUIRED` и `forge_input_next=PREVIEW_THEN_AUTHORIZED_APPLY` — это не missing corpus. Повреждённый профиль — свой typed code и `forge_input_next=RESTORE_RESEARCH_UNIVERSE_PROFILE_THEN_RETRY`; тот же `next_action` на `discovery-execute` и в preflight `universe_policy`. Уже сохранённый result, replay и recovery читаются без сегодняшнего профиля. Новый look без профиля отвечает `UNIVERSE_POLICY_REQUIRED` и не ищет по неотфильтрованному BASE_X.
+
+Сохраните stdout preview целиком в файл и передайте его в apply. Подтверждение активного профиля — отдельный status, не ответ apply.
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <DATA_ROOT> universe-policy-preview --min-holders 50 --min-liquidity-usd 5000 --decision-point Y900 --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <DATA_ROOT> universe-policy-apply --proposal proposal.json --confirm-append-only --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <DATA_ROOT> universe-policy-status --format json
+```
+
+Preview показывает before/after, `claim_boundary` и `next_action`. С `--decision-point` он считает PASS/FAIL/UNKNOWN и не читает будущий outcome. Без `--confirm-append-only` apply возвращает `UNIVERSE_POLICY_CONFIRM_REQUIRED` и `next_action=RETRY_APPLY_WITH_CONFIRM_APPEND_ONLY`. Устаревший proposal — `UNIVERSE_POLICY_PREVIEW_STALE` и `next_action=REPEAT_PREVIEW`: повторите preview, не чините файл. `discovery-execute` без профиля отвечает `UNIVERSE_POLICY_REQUIRED` и не открывает operation. Если байты раздела не совпадают с записанным logical hash, тот же execute отвечает `LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE`, `writes: false` и `next_action=RESTORE_PUBLISHED_PARTITION_BYTES_THEN_RETRY_DISCOVERY_EXECUTE`: восстановите байты и повторите execute. Операция при этом не открывается. Уже открытый run — preview и apply возвращают `next_action=FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW`. Повторите тот же preview только когда `universe-policy-status` показывает `pending_operation=false`. Store не редактировать. Apply при открытом run возвращает `UNIVERSE_POLICY_PENDING_OPERATION`. Повтор тех же значений — `NO_CHANGE`. Смена 5000 на 20000 — те же три команды, без PR. Уже сохранённый result хранит свой semantic hash; replay рецепта не подменяет его текущим профилем. Это настройка популяции, не MAIN и не смена стратегии.

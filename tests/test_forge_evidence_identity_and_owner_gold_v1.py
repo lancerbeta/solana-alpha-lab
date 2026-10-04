@@ -186,6 +186,10 @@ def _commission_fixture(repo_root: Path, data_root: Path) -> None:
         json.dumps(build_offline_commission_packet(repo_root)), encoding="utf-8"
     )
     module.execute_commission_offline(repo_root, data_root, packet_path)
+    from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    ensure_profile(ResearchStore(data_root), repo_root=repo_root, min_holders=0, min_liquidity_usd=0)
 
 
 def _with_control_projection_rows(datasets: list[dict[str, object]]):
@@ -2794,7 +2798,8 @@ class OwnerGoldSequentialTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
-            _write_lineage(data_root)
+            # Incomplete-market no-write proof: do not pre-create research/.
+            _write_lineage(data_root, activate_universe=False)
             broken = dict(_enumerate_live(data_root)[0][0])
             broken["dataset_fingerprint"] = "not-a-fingerprint"
             with patch(

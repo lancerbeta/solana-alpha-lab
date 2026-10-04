@@ -169,6 +169,9 @@ class PublishedDiscoveryBindingTests(unittest.TestCase):
             spec_path.write_text(json.dumps(spec), encoding="utf-8")
             scope_path.write_text(json.dumps(scope), encoding="utf-8")
             journal = "published-binding-journal"
+            from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+
+            ensure_profile(ResearchStore(data), repo_root=ROOT, min_holders=0, min_liquidity_usd=0)
             first = run_cli(
                 "discovery-execute",
                 "--store",
@@ -740,6 +743,9 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                 encoding="utf-8",
             )
             journal = str(receipt["search_key_sha256"])
+            from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+
+            ensure_profile(ResearchStore(data_root), repo_root=ROOT, min_holders=0, min_liquidity_usd=0)
             completed = subprocess.run(
                 [
                     sys.executable,
@@ -1074,6 +1080,9 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             look_scope["representation_scope"] = "rep_A"
         scope_path.write_text(json.dumps(look_scope), encoding="utf-8")
         journal = str(receipt["search_key_sha256"])
+        from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+
+        ensure_profile(ResearchStore(data_root), repo_root=ROOT, min_holders=0, min_liquidity_usd=0)
         completed = subprocess.run(
             [
                 sys.executable,

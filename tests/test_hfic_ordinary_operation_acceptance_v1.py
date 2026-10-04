@@ -79,6 +79,9 @@ def _simple(query_id: str, *, value: float = 0.0, point: str = "Y3600") -> dict:
 def _publish_focus(workspace: Path, focus: str, *, exit_price: str = "1.44") -> tuple[Path, dict]:
     data_root = workspace / "rdp"
     _publish(data_root, workspace, exit_price=exit_price)
+    from tests.test_hfic_cli import _activate_neutral_universe
+
+    _activate_neutral_universe(data_root)
     preflight = run_cli(
         "preflight",
         "--discovery-contract",

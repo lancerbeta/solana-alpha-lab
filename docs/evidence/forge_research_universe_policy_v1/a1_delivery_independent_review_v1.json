@@ -1,0 +1,75 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-RESEARCH-UNIVERSE-POLICY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-10-04",
+  "task_id": "FORGE_RESEARCH_UNIVERSE_POLICY_V1",
+  "reviewed_bindings_sha256": "8b70e50b6816d3844c038d5b3fe492f1f84798b4f3c49fa2cbf8f000a1e685b1",
+  "reviewed_inventory_sha256": "7c3bf615e172f29e4a2c18371233ac7b5efccb3587586226d41afa161b16d56d",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_CONTEXT_PACKET_CARRIES_ACTIVE_UNIVERSE_BEFORE_PROMPT_A",
+        "PASS_SAVED_HISTORY_READABLE_WITHOUT_TODAYS_PROFILE",
+        "PASS_NEW_LOOK_STILL_UNIVERSE_POLICY_REQUIRED_WRITES_FALSE",
+        "PASS_PUBLICATION_VERIFY_ONCE_PER_PUBLIC_COMMAND",
+        "PASS_NARROW_BINDING_SUBSET_PRESERVED",
+        "PASS_CURRENT_VERSION_ONLY_CROSS_OPERATION_REPLAY",
+        "PASS_BARE_LEGACY_MATCH_SCOPED",
+        "PASS_NO_SECRETS"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_P1_ACTIVE_UNIVERSE_IN_FORGE_CONTEXT_PACKET",
+        "PASS_P1_PROFILE_GATE_ONLY_FOR_NEW_LOOK",
+        "PASS_P1_LOGICAL_VERIFY_ONCE_PER_COMMAND",
+        "PASS_SUBSET_BINDING_NO_WRITE",
+        "PASS_VISION_PREVIEW_LOCKS_COLLISION_FIXED",
+        "PASS_PUBLIC_5K_THEN_20K_ADAPTIVE_AND_A_TO_B_TO_A"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=c4056b3204adae1b5ca87f553dff382f202d521d9ccab7aa95dbbba1202a9d93",
+        "PASS_PROFILE_IS_LATER_VIEW_OVER_BASE_X",
+        "PASS_HISTORY_AND_FROZEN_RECIPE_SURVIVE_ABSENT_PROFILE",
+        "PASS_THRESHOLD_ONLY_IS_ADAPTIVE_NOT_SECOND_MAIN",
+        "PASS_BINDING_SCOPE_NO_SILENT_WIDEN",
+        "PASS_CROSS_OPERATION_STALE_REPLAY_BLOCKED",
+        "PACKET_INFORMATION_PATH",
+        "PROCESS_OBLIGATION"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_ABSENT_PROFILE_NEXT_PREVIEW_THEN_AUTHORIZED_APPLY",
+        "PASS_DAMAGED_PROFILE_NEXT_RESTORE_RESEARCH_UNIVERSE_PROFILE",
+        "PASS_MISSING_CORPUS_STAYS_WAIT_FOR_IMPORT",
+        "PASS_DISCOVERY_EXECUTE_NO_WRITE",
+        "PASS_RUNBOOK_NAMES_BOTH_UNIVERSE_NEXT_ACTIONS"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_PRODUCTION_ACTIVATION",
+    "NO_MERGE"
+  ]
+}

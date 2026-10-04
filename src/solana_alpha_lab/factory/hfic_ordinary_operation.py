@@ -239,6 +239,61 @@ def _operation_result(
     return current_look_evidence(owned[-1], owned) if owned else None
 
 
+def _same_active_profile_look(
+    store: Any,
+    looks: Sequence[Mapping[str, Any]],
+    spec_sha256: str,
+    *,
+    fingerprint: str | None,
+    census: Sequence[Mapping[str, Any]] | None = None,
+    observations: Sequence[Mapping[str, Any]] | None = None,
+    admitted: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any] | None:
+    """A saved look of this spec, profile and rows. A new operation may read it."""
+
+    from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
+    from solana_alpha_lab.factory.hfic_temporal_discovery import TEMPORAL_CALCULATION_VERSION
+
+    active = effective_policy(store).get("semantic_sha256")
+    if not isinstance(active, str) or not active:
+        return None
+    rows_known = census is not None and observations is not None and isinstance(admitted, Mapping)
+    matched: list[Mapping[str, Any]] = []
+    for item in looks:
+        if item.get("spec_sha256") != spec_sha256 or item.get("new_look") is not True:
+            continue
+        if not isinstance(item.get("result"), Mapping):
+            continue
+        prior = ((item.get("result") or {}).get("universe_policy") or {}).get("semantic_sha256")
+        if prior != active:
+            continue
+        if rows_known:
+            from solana_alpha_lab.factory.hfic_grounded_discovery import same_rows_under_policy
+
+            if not same_rows_under_policy(
+                item,
+                admitted=admitted,
+                census=census,
+                observations=observations,
+                policy_sha=str(prior),
+            ):
+                continue
+        else:
+            prior_operation = item.get("operation_sha256")
+            prior_fingerprint = None
+            if isinstance(prior_operation, str) and prior_operation:
+                prior_fingerprint = get_operation(store, prior_operation).get("corpus_fingerprint")
+            if not (fingerprint and prior_fingerprint and fingerprint == prior_fingerprint):
+                continue
+        matched.append(item)
+    # Only the live calculation version may cross-operation REPLAY.
+    # An older saved version must fall through to classify_temporal_look so
+    # CALCULATION_REVISION still requires an explicit correction (never a
+    # silent spendable MAIN / free REPLAY of stale arithmetic).
+    current = [item for item in matched if item.get("calculation_version") == TEMPORAL_CALCULATION_VERSION]
+    return current[-1] if current else None
+
+
 def result_readout(look: Mapping[str, Any]) -> dict[str, Any]:
     """Version, lineage and coherence of one saved result. Reads no values."""
 
@@ -573,6 +628,7 @@ def authorize_temporal_attempt(
             raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")
         if owner_allowance(store, operation, "preview") < 1:
             raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
+        _require_published_logical_content(data_root)
         _reserve(store, operation, spec_sha256=spec_sha, look_class="preview")
         if fingerprint and not stamped:
             updated = dict(operation)
@@ -610,6 +666,9 @@ def gate_before_values(
     repo_root: Any = None,
     data_root: Any = None,
     correction: Mapping[str, Any] | None = None,
+    census: Sequence[Mapping[str, Any]] | None = None,
+    observations: Sequence[Mapping[str, Any]] | None = None,
+    admitted: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Metadata, admission and cap. Does not load outcome rows.
 
@@ -662,6 +721,16 @@ def gate_before_values(
     )
 
     stored = _operation_result(looks, operation_sha256, validated["spec_sha256"])
+    if stored is None and correction is None:
+        stored = _same_active_profile_look(
+            store,
+            looks,
+            validated["spec_sha256"],
+            fingerprint=fingerprint,
+            census=census,
+            observations=observations,
+            admitted=admitted,
+        )
     target_version = TEMPORAL_CALCULATION_VERSION
     if correction is not None:
         saved = saved_downside_revision(
@@ -778,7 +847,47 @@ def gate_before_values(
     if _closed_slot(admission, list_hfic_sessions(store)):
         raise OrdinaryOperationError("ORDINARY_OPERATION_SLOT_CLOSED")
     try:
-        classified = classify_temporal_look(looks, spec)
+        from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
+
+        active_policy = effective_policy(store).get("semantic_sha256")
+        classify_looks = []
+        policy_shift = False
+        rows_known = census is not None and observations is not None and isinstance(admitted, Mapping)
+        for item in looks:
+            prior_policy = ((item.get("result") or {}).get("universe_policy") or {}).get("semantic_sha256")
+            policy_differs = (
+                item.get("spec_sha256") == validated["spec_sha256"]
+                and prior_policy
+                and active_policy
+                and prior_policy != active_policy
+            )
+            if not policy_differs:
+                classify_looks.append(item)
+                continue
+            if rows_known:
+                from solana_alpha_lab.factory.hfic_grounded_discovery import same_rows_under_policy
+
+                pure_policy = same_rows_under_policy(
+                    item,
+                    admitted=admitted,
+                    census=census,
+                    observations=observations,
+                    policy_sha=str(prior_policy),
+                )
+            else:
+                prior_operation = item.get("operation_sha256")
+                prior_fingerprint = None
+                if isinstance(prior_operation, str) and prior_operation:
+                    prior_fingerprint = get_operation(store, prior_operation).get("corpus_fingerprint")
+                pure_policy = bool(fingerprint and prior_fingerprint and fingerprint == prior_fingerprint)
+            if pure_policy:
+                policy_shift = True
+            classify_looks.append({**item, "spec_sha256": "DATA_BINDING_CHANGED"})
+        classify_spec = spec
+        if policy_shift:
+            classify_spec = dict(spec)
+            classify_spec["adaptation_of"] = validated["spec_sha256"]
+        classified = classify_temporal_look(classify_looks, classify_spec)
     except Exception as exc:
         code = getattr(exc, "code", None) or "QUERY_SPEC_INVALID"
         raise OrdinaryOperationError(str(code)) from exc
@@ -796,6 +905,7 @@ def gate_before_values(
         updated["corpus_fingerprint"] = fingerprint
         _append(store, kind=OPERATION_KIND, body=updated, record_prefix="HFIC-ART-OP")
         operation = get_operation(store, operation_sha256)
+    _require_published_logical_content(data_root)
     _reserve(store, operation, spec_sha256=validated["spec_sha256"], look_class=kind)
     return {
         "disposition": "RESERVED",
@@ -806,6 +916,22 @@ def gate_before_values(
         "spec_sha256": validated["spec_sha256"],
         "look_class": "ADAPTIVE" if kind == "adaptive" else "MAIN",
     }
+
+
+def _require_published_logical_content(data_root: Any) -> None:
+    """A published corpus is checked before a look slot is reserved."""
+
+    if data_root is None:
+        return
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        require_published_logical_content,
+    )
+
+    try:
+        require_published_logical_content(data_root)
+    except GroundedDiscoveryError as exc:
+        raise OrdinaryOperationError(exc.code) from exc
 
 
 def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look_class: str = "main") -> None:

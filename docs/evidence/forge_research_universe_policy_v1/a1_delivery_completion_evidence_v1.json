@@ -1,0 +1,90 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-RESEARCH-UNIVERSE-POLICY-COMPLETION-001",
+  "as_of": "2026-10-04",
+  "task_id": "FORGE_RESEARCH_UNIVERSE_POLICY_V1",
+  "state_change": "P1_REPAIR_ACTIVE_UNIVERSE_IN_PACKET_BEFORE_PROMPT_A_PROFILE_GATE_ONLY_FOR_NEW_LOOK_VERIFY_ONCE_PER_COMMAND_NO_SILENT_BINDING_WIDEN_CONSUMERS_PROPAGATED",
+  "base_main": "0c472f5b24cd0257959c73c6b4cca9d19cef354d",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "85bf0632dfcb83769255fc61f0193a6ab457d5dc783256e202e020a0445b8483",
+    "catalog/assets/core.yaml": "d5180c7a817c6b1a3db6d11329ed18814ce31675620992ea1c4b7e8b4af3ed36",
+    "catalog/schemas/forge_research_universe_policy_v1.schema.json": "f0670595dd35b1bf72eda4740d61cb81d00ca6fe5b2520edc0f778e4ae5e743f",
+    "docs/contracts/forge_research_universe_policy_v1.md": "373a5006007340d827b07ae1e03f2eaa1ef443635beef938b2fa5c23a65ffeb0",
+    "docs/evidence/forge_research_universe_policy_v1/a1_semantic_premise_packet_v1.json": "d1b54d8d2f61b1940f8292d4d982365004fd6a628bbd79ff06c589cb29f8cedd",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "776060ebe428e44fdd0e8cfa82798403dad8e412e9eb46208762f7f7c5ac814a",
+    "docs/reports/forge_research_universe_policy_v1/a1_owner_readout_v1.md": "14fc541754a580d593bba11eb50c1537984b0915f8d5bc5fd4e7017764ed67d9",
+    "docs/tasks/FORGE_RESEARCH_UNIVERSE_POLICY_V1.md": "e2e754f01803c3dcc48d7b557dfd123fdee37aaf5a79ad5e93cf2d75000448f2",
+    "scripts/hypothesis_forge.py": "6bfaab477731bc7dcb900514d42d722bf9f0a68e87b19adac6a3fdbcbd732c16",
+    "src/solana_alpha_lab/factory/forge_input_receipt.py": "ef4f1192983e47eb7c65f8ba79e409442ba475050d805ef8acd9197539bbc986",
+    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "0ca955807e9200dd1d3730ffde977ebde18854eeaf144fe858f757df22293de8",
+    "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "4ae1863348884292dbde0a45c36e3c076d6c9889fd3afa6da194976c1f57ecc4",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "57166f040fa6c49c62060bc38309583326581bfeb4659cb336fbfdafef6a1665",
+    "src/solana_alpha_lab/factory/hfic_research_universe_policy.py": "99d8701089dbf66cc38b3ba9d7dcfcb93c5db9d5a8cd59265a787f6683f49c79",
+    "src/solana_alpha_lab/factory/hfic_session.py": "c1b0ab81db3c14d71a2bee90dfcf7c32985d03f5c046a3fb6f65df7b22b15323",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "39b532bca1fc1ee9e986ebcf0645c02991f93db9cb48346377740275a395a188",
+    "tests/test_forge_evidence_identity_and_owner_gold_v1.py": "a72b55e816295145e0b8a2b5c38f39158902e2db1e676edc286f5a26b3378c8f",
+    "tests/test_forge_input_truth_and_visibility_v1.py": "65cf5049c5969eca9b27f81f17665282198f7661345d1fd97c29bf44c23bb2fd",
+    "tests/test_forge_representation_ladder_v1.py": "0c83d07a0604af2e8c42eef13633b8c781c0c356decfbb56a103d3d842f87a3e",
+    "tests/test_forge_research_universe_policy_v1.py": "ddd579d79e3b011dcec00e972ca3aca338baaadc8d2f1cb0dd54b7f630861475",
+    "tests/test_forge_runtime_discovery_binding_v1.py": "8b653890c6904bc1772472e1bc66cbd03149801129c1203571d454f2ec21608e",
+    "tests/test_forge_temporal_holder_point_feature_v1.py": "37175a23309b144f5475e2db80236def4bc5641d5cc82a80429cdcc0b8854be4",
+    "tests/test_hfic_cli.py": "6eb0abdea59a2310b4b1f5bf3c9e54ef532a128500fee37837038ae0d0eefeeb",
+    "tests/test_hfic_grounded_discovery_v1.py": "8ab27bc34c1eedd0cf9b827e4c994d471fbb263cda48c62461cfe7d34a1cb147",
+    "tests/test_hfic_legacy_parent_continuation_compat_v1.py": "c29bd5b2eaf9b3c99c7bbbff67be38f074201b0801e9430e59b54ea401af7e65",
+    "tests/test_hfic_ordinary_operation_acceptance_v1.py": "f3b459d0f5e63734992fda04ee066f7acbebf8744ddaf88c0f35e0264363d33d",
+    "tests/test_hfic_ordinary_operation_v1.py": "9962a1e1c9ecff549818281cd47df66d5d0db25120d219fbb3a03f83bdaf7694",
+    "tests/test_hfic_scientific_disposition_continuity_v1.py": "d4776b68365a547d6e0be58543e23b27a7940d1465eeb42a0a61180a766893fc",
+    "tests/test_hfic_temporal_discovery_v1.py": "9e97fe1dbaebe4fb5be3e438b21af3043726e7a9d719aa05416b4cdb5aa84e8b",
+    "tests/test_hfic_temporal_operability_repair_v1.py": "06fc9fa4dab3bea5d4d95a6cb9d64202394c3a9eb62d0810329c0e102bd6449f",
+    "tests/test_hfic_temporal_owner_path_v1.py": "ed80c599e3319dcbe56635d5b05e1eb2e91e7e519966781a6f6bdf4c34144ab4",
+    "tests/test_hfic_temporal_production_runner_v1.py": "e06750662fe32221c37476654ce406964f33142ad43d8f452971eb7d5e777dd1",
+    "tests/test_hfic_temporal_result_coherence_v1.py": "7409ada52c2d0b377e48b6c7dbc4c14023ade854680f190c8bfdee3fee9eacc1",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "33d543c5d37ca51afdc2170366dfaf43aa134f83a2372b5bd4ede7af5603990a"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_research_universe_policy_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "2b06a70019bb5342bf870a8071b51435e7feb89857cb5f3056374aac1c510638",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FORGE_RESEARCH_UNIVERSE_POLICY_PUBLIC_PATH",
+    "independent_review": {
+      "path": "docs/evidence/forge_research_universe_policy_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "188693613cae8eeb8e6bedad9b492a6bc543628055b10ab4a767b1761deb4664",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_PUBLIC_OWNER_PATH",
+      "PASS_CATALOG_SYNC",
+      "PASS_ISOLATED_QUADRUPLE_REVIEW_AFTER_P1_REPAIR"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_PRODUCTION_ACTIVATION",
+    "NO_MAIN_LOOK",
+    "NO_WALLET_OR_PROVIDER",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "network_calls": 0,
+    "local_writes": 1,
+    "external_actions": 0
+  }
+}

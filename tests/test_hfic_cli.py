@@ -110,6 +110,8 @@ def populate_real_c1_c2(data_root: Path, workspace: Path) -> None:
             import_time=as_of + timedelta(hours=1),
         )
         assert imported["status"] == "IMPORTED"
+    # Do not activate a universe on the shared template: seed copies into roots
+    # that may already own locks/, and FileExistsError would fail unrelated tests.
 
 
 _C1_C2_TEMPLATE: Path | None = None
@@ -140,6 +142,7 @@ def seed_minimal_market_basis(data_root: Path) -> None:
     source = c1_c2_template_data_root()
     data_root.mkdir(parents=True, exist_ok=True)
     if (data_root / "datasets" / "manifests").is_dir():
+        _activate_neutral_universe(data_root)
         return
     for child in source.iterdir():
         target = data_root / child.name
@@ -147,6 +150,17 @@ def seed_minimal_market_basis(data_root: Path) -> None:
             shutil.copytree(child, target, symlinks=False)
         else:
             shutil.copy2(child, target)
+    _activate_neutral_universe(data_root)
+
+
+def _activate_neutral_universe(data_root: Path) -> None:
+    """Let old discovery fixtures run new looks under a neutral 0/0 profile."""
+
+    from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    root = Path(__file__).resolve().parents[1]
+    ensure_profile(ResearchStore(data_root), repo_root=root, min_holders=0, min_liquidity_usd=0)
 
 
 def historical_preflight_view(
@@ -757,6 +771,7 @@ class HficTempRootE2ETests(unittest.TestCase):
             workspace = Path(tmp)
             data_root = workspace / "rdp"
             populate_real_c1_c2(data_root, workspace)
+            _activate_neutral_universe(data_root)
             snapshot_root = Path(tmp) / "snapshot"
             restore_root = Path(tmp) / "restored"
             preflight = run_cli(
@@ -1058,6 +1073,7 @@ class HficTempRootE2ETests(unittest.TestCase):
             workspace = Path(tmp)
             data_root = workspace / "rdp"
             populate_real_c1_c2(data_root, workspace)
+            _activate_neutral_universe(data_root)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",

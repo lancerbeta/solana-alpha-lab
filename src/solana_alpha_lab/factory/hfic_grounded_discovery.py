@@ -8,11 +8,13 @@ look is a ResearchStore artifact, not a scientific-slot reservation.
 
 from __future__ import annotations
 
+import contextvars
 import hashlib
 import json
 import re
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -284,7 +286,49 @@ def _attach_verified_schedule(root: Path, cohorts: list[dict[str, Any]]) -> None
         cohort.update(projected)
 
 
+_publication_cache: contextvars.ContextVar[dict[str, dict[str, Any]] | None] = contextvars.ContextVar(
+    "published_binding_cache",
+    default=None,
+)
+_logical_verify_counts: contextvars.ContextVar[dict[str, int] | None] = contextvars.ContextVar(
+    "logical_verify_counts",
+    default=None,
+)
+
+
+@contextmanager
+def publication_verification_scope():
+    """One public command verifies each published partition once, then reuses it."""
+
+    cache_token = _publication_cache.set({})
+    count_token = _logical_verify_counts.set({})
+    try:
+        yield
+    finally:
+        _publication_cache.reset(cache_token)
+        _logical_verify_counts.reset(count_token)
+
+
+def logical_verify_counts() -> dict[str, int]:
+    counts = _logical_verify_counts.get()
+    return dict(counts) if isinstance(counts, dict) else {}
+
+
 def resolve_published_discovery_binding(data_root: Path) -> dict[str, Any]:
+    """Published admission binding. Inside a command scope the logical scan runs once."""
+
+    root = Path(data_root)
+    cache = _publication_cache.get()
+    key = str(root)
+    if isinstance(cache, dict) and key in cache:
+        return cache[key]
+    resolved = _resolve_published_discovery_binding(root)
+    if isinstance(cache, dict):
+        cache[key] = resolved
+    return resolved
+
+
+def _resolve_published_discovery_binding(data_root: Path) -> dict[str, Any]:
     """Build the admission binding from a canonical publication.
 
     Does not read parquet values. Hashes are streamed. ``holdout=false`` is
@@ -380,6 +424,7 @@ def resolve_published_discovery_binding(data_root: Path) -> dict[str, Any]:
         )
     _attach_verified_schedule(root, bound_cohorts)
     admitted = admit_discovery_binding(bound_cohorts)
+    _assert_published_logical_content(root, bound_cohorts)
     return {
         **admitted,
         "authority_source": _AUTHORITY_SOURCE,
@@ -389,6 +434,67 @@ def resolve_published_discovery_binding(data_root: Path) -> dict[str, Any]:
         "dataset_version": str(labels.get("dataset_version") or ""),
         "cohorts": bound_cohorts,
     }
+
+
+def require_published_logical_content(data_root: Any) -> None:
+    """Check a published corpus before a look is reserved. No lineage file means nothing to check."""
+
+    if data_root is None:
+        return
+    root = Path(data_root)
+    if not (root / "datasets" / "live_lifecycle_corpus" / "lineage.json").is_file():
+        return
+    resolve_published_discovery_binding(root)
+
+
+def _assert_published_logical_content(data_root: Path, cohorts: Sequence[Mapping[str, Any]]) -> None:
+    """Reject a partition whose logical content hash no longer matches its bytes."""
+
+    from solana_alpha_lab.factory.live_corpus_logical_rows import (
+        KIND_CENSUS,
+        KIND_OBS,
+        LiveCorpusLogicalRowError,
+        measure_live_corpus_parquet,
+    )
+    from solana_alpha_lab.storage.manifests import PartitionManifest
+
+    partition_dir = data_root / "datasets" / "manifests" / "partitions"
+    if not partition_dir.is_dir():
+        raise GroundedDiscoveryError("LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
+    by_location: dict[str, Any] = {}
+    for path in partition_dir.glob("partition-*.json"):
+        if not path.is_file() or path.is_symlink():
+            continue
+        try:
+            part = PartitionManifest.model_validate_json(path.read_bytes())
+        except (OSError, UnicodeDecodeError, ValueError):
+            raise GroundedDiscoveryError("LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
+        by_location[str(part.logical_location).replace("\\", "/")] = part
+    for cohort in cohorts:
+        for rel, kind in (
+            (cohort.get("census_rel"), KIND_CENSUS),
+            (cohort.get("observations_rel") or cohort.get("obs_rel"), KIND_OBS),
+        ):
+            if not isinstance(rel, str) or not rel:
+                continue
+            part = by_location.get(rel.replace("\\", "/"))
+            if part is None:
+                raise GroundedDiscoveryError("LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
+            counts = _logical_verify_counts.get()
+            if isinstance(counts, dict):
+                part_id = str(part.partition_id)
+                counts[part_id] = counts.get(part_id, 0) + 1
+            try:
+                measured = measure_live_corpus_parquet(
+                    data_root / rel,
+                    kind=kind,
+                    partition_id=part.partition_id,
+                    logical_location=rel,
+                )
+            except (LiveCorpusLogicalRowError, OSError, ValueError) as exc:
+                raise GroundedDiscoveryError("LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE") from exc
+            if measured.content_sha256 != part.content_sha256 or measured.file_sha256 != part.file_sha256:
+                raise GroundedDiscoveryError("LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
 
 
 def collapse_exact_partition_duplicates(
@@ -447,6 +553,16 @@ def load_admitted_partition_rows(
                 )
                 for item in published["cohorts"]
             }
+            verified_cohorts: list[Mapping[str, Any]] = []
+            published_by_pair = {
+                (
+                    str(item.get("cohort_id")),
+                    str(item.get("census_sha256")),
+                    str(item.get("observations_sha256")),
+                ): item
+                for item in published["cohorts"]
+                if isinstance(item, Mapping)
+            }
             for item in cohorts:
                 if not isinstance(item, Mapping):
                     raise GroundedDiscoveryError("DISCOVERY_BINDING_INCOMPLETE")
@@ -455,10 +571,14 @@ def load_admitted_partition_rows(
                     str(item.get("census_sha256")),
                     str(item.get("observations_sha256")),
                 )
-                if pair not in published_pairs:
+                match = published_by_pair.get(pair)
+                if match is None:
                     raise GroundedDiscoveryError("DISCOVERY_AUTHORITY_ABSENT")
-            binding_doc = published
-            cohorts = published["cohorts"]
+                # Keep the caller cohort set. Do not silently widen a verified
+                # subset back to the full published corpus.
+                verified_cohorts.append(match)
+            cohorts = list(verified_cohorts)
+            binding_doc = {**dict(binding_doc), "cohorts": cohorts}
     admit_discovery_binding(cohorts)
     by_cohort = {str(item.get("cohort_id")): item for item in cohorts if isinstance(item, Mapping)}
     supplied = list(partitions or [])
@@ -1160,6 +1280,20 @@ def _grouped_cells(
     return grouped
 
 
+def _universe_cell(row: Mapping[str, Any] | None) -> dict[str, Any]:
+    if not isinstance(row, Mapping):
+        return {"status": "ABSENT"}
+    if str(row.get("state") or "") != "OBSERVED":
+        return {"status": "MISSING"}
+    try:
+        number = float(row.get("typed_value"))
+    except (TypeError, ValueError):
+        return {"status": "MISSING"}
+    if number != number or number in {float("inf"), float("-inf")}:
+        return {"status": "MISSING"}
+    return {"status": "OBSERVED", "value": number}
+
+
 def _pit_cell(
     grouped: Mapping[tuple[str, str, str, str, str], Sequence[Mapping[str, Any]]],
     key: tuple[str, str, str, str, str],
@@ -1244,6 +1378,8 @@ def execute_discovery_from_rows(
     observations: Sequence[Mapping[str, Any]],
     spec: Mapping[str, Any],
     binding: Sequence[Mapping[str, Any]],
+    *,
+    universe_policy: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Compute BASE_X, PIT features and a later target from production-shaped rows.
 
@@ -1254,7 +1390,9 @@ def execute_discovery_from_rows(
     if _is_temporal_query(spec):
         from solana_alpha_lab.factory.hfic_temporal_discovery import execute_temporal_discovery
 
-        return execute_temporal_discovery(census, observations, spec, binding)
+        return execute_temporal_discovery(
+            census, observations, spec, binding, universe_policy=universe_policy
+        )
     bound_spec = validate_query_spec(spec)
     for item in binding:
         if "holdout" not in item:
@@ -1277,6 +1415,7 @@ def execute_discovery_from_rows(
     grouped = _grouped_cells(observations)
     decision_offset = max(_point_offset(point) for point in bound_spec["decision_points"])
     members: list[dict[str, Any]] = []
+    universe_counts = {"PASS": 0, "FAIL": 0, "UNKNOWN": 0}
     cohort_ids = [str(item["cohort_id"]) for item in admitted["cohorts"]]
     admitted_pairs = {
         (str(item["cohort_id"]), str(item["release_id"])) for item in admitted["cohorts"]
@@ -1310,10 +1449,41 @@ def execute_discovery_from_rows(
                 exclusion = "PIT_LIQUIDITY_MISSING"
             else:
                 in_base = True
+        universe_pass = True
+        if in_base and universe_policy is not None and anchor is not None:
+            from solana_alpha_lab.factory.hfic_research_universe_policy import (
+                HOLDER_FIELD_ID,
+                classify_universe_cells,
+            )
+
+            decision_deadline = _deadline(anchor, decision_offset)
+            decision_point = max(
+                (str(point) for point in bound_spec["decision_points"]),
+                key=_point_offset,
+            )
+            verdict = classify_universe_cells(
+                _universe_cell(
+                    _pit_cell(
+                        grouped,
+                        (cohort, release, mint, decision_point, HOLDER_FIELD_ID),
+                        decision_deadline,
+                    )
+                ),
+                _universe_cell(
+                    _pit_cell(
+                        grouped,
+                        (cohort, release, mint, decision_point, LIQUIDITY),
+                        decision_deadline,
+                    )
+                ),
+                universe_policy,
+            )
+            universe_counts[str(verdict["status"])] += 1
+            universe_pass = verdict["status"] == "PASS"
         decision_ready = False
         decision_at = None
         flags: dict[str, bool | None] = {}
-        if in_base and anchor is not None:
+        if in_base and universe_pass and anchor is not None:
             decision_at = _deadline(anchor, decision_offset).strftime("%Y-%m-%dT%H:%M:%SZ")
             decision_ready = True
             for point in bound_spec["decision_points"]:
@@ -1336,7 +1506,7 @@ def execute_discovery_from_rows(
         target_state = "ABSENT"
         target_at = None
         target_value = None
-        if in_base and anchor is not None:
+        if in_base and universe_pass and anchor is not None:
             deadline = _deadline(anchor, decision_offset)
             due = anchor + timedelta(
                 seconds=_point_offset(bound_spec["target_point"]) + PIT_LATENESS_SECONDS
@@ -1404,8 +1574,20 @@ def execute_discovery_from_rows(
     summary["traders_complete_required"] = False
     summary["eligibility_uses_target"] = False
     summary["calculation_version"] = CALCULATION_VERSION
+    if universe_policy is not None:
+        from solana_alpha_lab.factory.hfic_research_universe_policy import snapshot
+
+        summary["universe_policy"] = {
+            **snapshot(universe_policy),
+            "n_base": sum(universe_counts.values()),
+            "n_pass": universe_counts["PASS"],
+            "n_fail": universe_counts["FAIL"],
+            "n_unknown": universe_counts["UNKNOWN"],
+        }
+    from solana_alpha_lab.factory.hfic_research_universe_policy import admitted_with_policy
+
     return {
-        "admitted": admitted,
+        "admitted": admitted_with_policy(admitted, universe_policy),
         "summary": summary,
         "members_projected": len(members),
     }
@@ -1437,6 +1619,21 @@ def data_binding_sha256(
         "observations": _jsonable(list(observations)),
     }
     return hashlib.sha256(_canonical(body).encode("utf-8")).hexdigest()
+
+
+def same_rows_under_policy(
+    look: Mapping[str, Any],
+    *,
+    admitted: Mapping[str, Any],
+    census: Sequence[Mapping[str, Any]],
+    observations: Sequence[Mapping[str, Any]],
+    policy_sha: str,
+) -> bool:
+    """True when this look's binding is the current rows stamped with ``policy_sha``."""
+
+    stamped = dict(admitted)
+    stamped["universe_policy_semantic_sha256"] = policy_sha
+    return look.get("data_binding_sha256") == data_binding_sha256(stamped, census, observations)
 
 
 def _look_identity(
@@ -1650,6 +1847,17 @@ def format_discovery_readout(evidence: Mapping[str, Any]) -> dict[str, Any]:
         ),
         "non_claims": ["NO_ALPHA", "NO_CAUSAL_IDENTIFICATION", "NO_MARKET_FORGE"],
     }
+    policy = result.get("universe_policy")
+    if isinstance(policy, Mapping):
+        payload["universe_policy"] = {
+            "semantic_sha256": policy.get("semantic_sha256"),
+            "min_holders": policy.get("min_holders"),
+            "min_liquidity_usd": policy.get("min_liquidity_usd"),
+            "n_pass": policy.get("n_pass"),
+            "n_fail": policy.get("n_fail"),
+            "n_unknown": policy.get("n_unknown"),
+            "n_base": policy.get("n_base"),
+        }
     if result.get("target_kind"):
         payload["target_kind"] = result.get("target_kind")
         payload["mean_target_units"] = result.get("mean_target_units")
@@ -1799,6 +2007,34 @@ def run_recorded_discovery_query(
             gate_before_values,
         )
 
+        from solana_alpha_lab.factory.hfic_research_universe_policy import (
+            UniversePolicyError,
+            admitted_with_policy,
+            effective_policy,
+        )
+
+        policy_error: UniversePolicyError | None = None
+        try:
+            policy_head = effective_policy(store)
+        except UniversePolicyError as exc:
+            policy_error = exc
+            policy_head = {"definition": None}
+        gate_policy = policy_head.get("definition")
+        if (gate_policy is None or policy_error is not None) and correction is None:
+            from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+
+            early_spec = validate_temporal_query(spec)["spec_sha256"]
+            owned_now = [
+                item
+                for item in list_discovery_looks(store, journal_scope)
+                if item.get("operation_sha256") == operation_sha256
+                and item.get("spec_sha256") == early_spec
+                and isinstance(item.get("result"), Mapping)
+            ]
+            if not owned_now:
+                raise GroundedDiscoveryError(
+                    policy_error.code if policy_error is not None else "UNIVERSE_POLICY_REQUIRED"
+                )
         try:
             gate_before_values(
                 store,
@@ -1810,6 +2046,9 @@ def run_recorded_discovery_query(
                 correction=correction,
                 repo_root=repo_root,
                 data_root=data_root,
+                census=census,
+                observations=observations,
+                admitted=admitted_with_policy(admit_discovery_binding(binding), gate_policy),
             )
         except OrdinaryOperationError as exc:
             raise GroundedDiscoveryError(str(exc.code)) from exc
@@ -1817,6 +2056,21 @@ def run_recorded_discovery_query(
         raise GroundedDiscoveryError("CALCULATION_REVISION_UNSUPPORTED")
     replayed = None
     source_look: Mapping[str, Any] | None = None
+    from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        UniversePolicyError,
+        admitted_with_policy,
+        effective_policy,
+    )
+
+    if not _is_temporal_query(spec):
+        policy_error = None
+        try:
+            policy_head = effective_policy(store)
+        except UniversePolicyError as exc:
+            policy_error = exc
+            policy_head = {"definition": None}
+    policy_definition = policy_head.get("definition")
+    revising_legacy = False
     if _is_temporal_query(spec):
         from solana_alpha_lab.factory.hfic_temporal_discovery import (
             TEMPORAL_CALCULATION_VERSION,
@@ -1829,14 +2083,38 @@ def run_recorded_discovery_query(
         )
 
         prevalidated = validate_temporal_query(spec)
-        admitted_meta = admit_discovery_binding(binding)
+        bare_admitted = admit_discovery_binding(binding)
+        bare_binding_sha = data_binding_sha256(bare_admitted, census, observations)
+        admitted_meta = admitted_with_policy(bare_admitted, policy_definition)
         pre_binding_sha = data_binding_sha256(admitted_meta, census, observations)
+
+        def _same_question_binding(item: Mapping[str, Any]) -> bool:
+            stored_sha = item.get("data_binding_sha256")
+            if stored_sha == pre_binding_sha:
+                return True
+            # Pre-policy looks carry the bare admission hash. Today's profile
+            # stamps universe_policy_semantic_sha256 into admitted metadata even
+            # at 0/0, so revision/readback must still recognize those rows —
+            # but only for this operation, an explicit correction, or when
+            # today's profile is absent (history readback). A fresh operation
+            # under an active profile must not free-replay another look's
+            # unfiltered legacy result.
+            if stored_sha != bare_binding_sha:
+                return False
+            if isinstance((item.get("result") or {}).get("universe_policy"), Mapping):
+                return False
+            if correction is not None:
+                return True
+            if policy_definition is None or policy_error is not None:
+                return True
+            return item.get("operation_sha256") == operation_sha256
+
         journal_looks = list_discovery_looks(store, journal_scope)
         same_question = [
             item
             for item in journal_looks
             if item.get("spec_sha256") == prevalidated["spec_sha256"]
-            and item.get("data_binding_sha256") == pre_binding_sha
+            and _same_question_binding(item)
             and isinstance(item.get("result"), Mapping)
         ]
         replayed = next(
@@ -1860,7 +2138,10 @@ def run_recorded_discovery_query(
                     TEMPORAL_CALCULATION_VERSION_V5 if saved is not None else TEMPORAL_CALCULATION_VERSION
                 ),
             )
-            if source_look.get("data_binding_sha256") != pre_binding_sha:
+            allowed_source_bindings = {pre_binding_sha}
+            if not isinstance((source_look.get("result") or {}).get("universe_policy"), Mapping):
+                allowed_source_bindings.add(bare_binding_sha)
+            if source_look.get("data_binding_sha256") not in allowed_source_bindings:
                 raise GroundedDiscoveryError("CALCULATION_REVISION_INPUT_MISMATCH")
             if replayed is not None:
                 # Already applied: the verified request reads the saved revision.
@@ -1873,7 +2154,41 @@ def run_recorded_discovery_query(
                 if item.get("calculation_version") in TEMPORAL_CALCULATION_VERSIONS_READABLE
             ]
             replayed = current_look_evidence(historical[-1], historical) if historical else None
+            if replayed is None and (policy_definition is None or policy_error is not None):
+                # Today's profile is not required to read this operation's saved result.
+                owned = [
+                    item
+                    for item in journal_looks
+                    if item.get("operation_sha256") == operation_sha256
+                    and item.get("spec_sha256") == prevalidated["spec_sha256"]
+                    and isinstance(item.get("result"), Mapping)
+                ]
+                current = next(
+                    (
+                        item
+                        for item in owned
+                        if item.get("calculation_version") == TEMPORAL_CALCULATION_VERSION
+                    ),
+                    None,
+                )
+                if current is not None:
+                    replayed = current
+                elif owned:
+                    readable = [
+                        item
+                        for item in owned
+                        if item.get("calculation_version") in TEMPORAL_CALCULATION_VERSIONS_READABLE
+                    ]
+                    replayed = current_look_evidence(readable[-1], readable) if readable else None
+    readback_look = None
+    revising_legacy = source_look is not None and not isinstance(
+        (source_look.get("result") or {}).get("universe_policy"), Mapping
+    )
     if replayed is None:
+        if policy_error is not None and not revising_legacy:
+            raise GroundedDiscoveryError(policy_error.code)
+        if policy_definition is None and not revising_legacy:
+            raise GroundedDiscoveryError("UNIVERSE_POLICY_REQUIRED")
         if _is_temporal_query(spec):
             from solana_alpha_lab.factory.hfic_temporal_discovery import classify_temporal_look
 
@@ -1887,7 +2202,13 @@ def run_recorded_discovery_query(
                     search_tier=str(prevalidated["search_tier"]),
                     git_sha=git_sha,
                 )
-        computed = execute_discovery_from_rows(census, observations, spec, binding)
+        computed = execute_discovery_from_rows(
+            census,
+            observations,
+            spec,
+            binding,
+            universe_policy=None if revising_legacy else policy_definition,
+        )
         if source_look is not None:
             recipe = computed["summary"].get("experiment_recipe") or {}
             stored_recipe = source_look["result"].get("experiment_recipe") or {}
@@ -1904,11 +2225,15 @@ def run_recorded_discovery_query(
             assert_downside_revision_preserves_v4(source_look["result"], computed["summary"])
     else:
         computed = {
-            "admitted": admit_discovery_binding(binding),
+            "admitted": admitted_meta,
             "summary": replayed["result"],
             "members_projected": 0,
             "replayed_without_evaluator": True,
         }
+        # Always keep the saved look's binding/identity. Recomputing the
+        # admission hash under today's profile would mint a second record for
+        # the same summary (legacy bare bindings and frozen snapshots).
+        readback_look = replayed
     summary = computed["summary"]
     calc_version = str(summary.get("calculation_version") or CALCULATION_VERSION)
     temporal = summary.get("schema") == "smial.hfic-temporal-query"
@@ -1931,19 +2256,46 @@ def run_recorded_discovery_query(
         ),
         None,
     )
+    if readback_look is not None:
+        binding_sha = str(readback_look.get("data_binding_sha256") or binding_sha)
+        digest = str(readback_look.get("result_sha256") or digest)
+        existing = readback_look
     if existing is not None and temporal and isinstance(existing.get("result"), Mapping):
         summary = existing["result"]
         digest = str(existing.get("result_sha256") or result_sha256(summary))
     budget_history = []
+    policy_shift = False
+    current_policy = (summary.get("universe_policy") or {}).get("semantic_sha256")
     for item in previous:
-        if (
-            item.get("spec_sha256") == summary["spec_sha256"]
-            and item.get("data_binding_sha256") != binding_sha
-        ):
+        same_spec = item.get("spec_sha256") == summary["spec_sha256"]
+        changed_binding = item.get("data_binding_sha256") != binding_sha
+        prior_policy = ((item.get("result") or {}).get("universe_policy") or {}).get("semantic_sha256")
+        policy_only = (
+            same_spec
+            and changed_binding
+            and prior_policy
+            and current_policy
+            and prior_policy != current_policy
+            and same_rows_under_policy(
+                item,
+                admitted=computed["admitted"],
+                census=census,
+                observations=observations,
+                policy_sha=str(prior_policy),
+            )
+        )
+        if policy_only:
+            policy_shift = True
+            budget_history.append({**item, "spec_sha256": "DATA_BINDING_CHANGED"})
+        elif same_spec and changed_binding:
             budget_history.append({**item, "spec_sha256": "DATA_BINDING_CHANGED"})
         else:
             budget_history.append(item)
-    look = classify_query_look(budget_history, spec)
+    classify_spec = spec
+    if policy_shift and _is_temporal_query(spec):
+        classify_spec = dict(spec)
+        classify_spec["adaptation_of"] = summary["spec_sha256"]
+    look = classify_query_look(budget_history, classify_spec)
     revision_of: dict[str, Any] | None = None
     if source_look is not None:
         from solana_alpha_lab.factory.hfic_temporal_discovery import (
@@ -2050,6 +2402,11 @@ def run_recorded_discovery_query(
         },
         "candidate_scope": confirming,
         "look_scope_relation": relation,
+        **(
+            {"universe_population": "LEGACY_FROZEN_POPULATION"}
+            if revising_legacy
+            else {}
+        ),
         "priors": [dict(item) for item in (priors or [])],
         "scientific_slot_reserved": False,
     }

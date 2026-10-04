@@ -389,6 +389,7 @@ def _rows():
         if price is not None:
             observations.append(_obs(mint, "X300", PRICE, price, at=decision_at, cohort=cohort))
         observations.append(_obs(mint, "X300", LIQ, 100.0, at=decision_at, cohort=cohort))
+        observations.append(_obs(mint, "X300", "FIELD-HOLDER-COUNT-001", 50.0, at=decision_at, cohort=cohort))
         observations.append(
             _obs(mint, "Y1800", PRICE, target, at=target_at, state=target_state, cohort=cohort)
         )
@@ -461,7 +462,15 @@ def _operation_file(store: Path, spec: Path, journal: str) -> Path:
     return path
 
 
+def _activate_store(store: Path) -> None:
+    from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    ensure_profile(ResearchStore(store), repo_root=ROOT, min_holders=0, min_liquidity_usd=0)
+
+
 def _discovery_execute_published(store: Path, spec: Path, scope: Path, journal: str, extra: list[str]):
+    _activate_store(store)
     operation = _operation_file(store, spec, journal)
     return subprocess.run(
         [
@@ -497,6 +506,7 @@ def _discovery_execute_published(store: Path, spec: Path, scope: Path, journal: 
 
 
 def _discovery_execute(store: Path, binding: Path, spec: Path, scope: Path, journal: str, extra: list[str]):
+    _activate_store(store)
     operation = _operation_file(store, spec, journal)
     return subprocess.run(
         [
@@ -584,6 +594,7 @@ class ProductionRowRecipeTests(unittest.TestCase):
         scope = _scope()
         with tempfile.TemporaryDirectory() as raw:
             store = ResearchStore(Path(raw))
+            _activate_store(Path(raw))
             clock = datetime(2026, 9, 26, 12, 0, tzinfo=UTC)
             first = run_recorded_discovery_query(
                 store,
@@ -598,6 +609,8 @@ class ProductionRowRecipeTests(unittest.TestCase):
             )
             self.assertTrue(first["queries"][0]["new_look"])
             self.assertEqual(first["budget"]["main_count"], 1)
+            self.assertEqual(first["result"]["universe_policy"]["min_holders"], "0")
+            self.assertEqual(first["result"]["universe_policy"]["min_liquidity_usd"], "0")
             resumed = ResearchStore(Path(raw))
             second = run_recorded_discovery_query(
                 resumed,

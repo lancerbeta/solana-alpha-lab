@@ -149,7 +149,13 @@ def forge_input_owner_next(receipt: Mapping[str, Any]) -> str:
     owner = str(receipt.get("owner_class") or "")
     if owner == OWNER_CLASS_OBSERVABILITY_BLOCKED:
         return "STOP_OBSERVABILITY"
-    if CURRENT_CORPUS_MISSING in codes or owner == OWNER_CLASS_INPUT_NOT_READY:
+    if CURRENT_CORPUS_MISSING in codes:
+        return "WAIT_FOR_IMPORT_OR_STOP"
+    if "UNIVERSE_POLICY_REQUIRED" in codes:
+        return "PREVIEW_THEN_AUTHORIZED_APPLY"
+    if any(code.startswith("UNIVERSE_POLICY_") for code in codes):
+        return "RESTORE_RESEARCH_UNIVERSE_PROFILE_THEN_RETRY"
+    if owner == OWNER_CLASS_INPUT_NOT_READY:
         return "WAIT_FOR_IMPORT_OR_STOP"
     return "WAIT_FOR_IMPORT_OR_STOP"
 
@@ -488,6 +494,28 @@ def build_forge_input_receipt(
         body["market_evidence_epoch_sha256"] = market_epoch
     if capability_epoch is not None:
         body["capability_epoch_sha256"] = capability_epoch
+    from solana_alpha_lab.factory.hfic_research_universe_policy import (
+        UniversePolicyError,
+        effective_policy,
+    )
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    policy_code = None
+    try:
+        policy_state = effective_policy(ResearchStore(Path(data_root), create_if_missing=False)).get("state")
+    except UniversePolicyError as exc:
+        policy_state = "UNREADABLE"
+        policy_code = exc.code
+    except Exception:
+        policy_state = "ABSENT"
+    if forge_runnable and policy_state != "ACTIVE":
+        blocking.append(policy_code or "UNIVERSE_POLICY_REQUIRED")
+        forge_runnable = False
+        if owner_class == OWNER_CLASS_READY:
+            owner_class = OWNER_CLASS_INPUT_NOT_READY
+    body["owner_class"] = owner_class
+    body["forge_runnable"] = forge_runnable
+    body["blocking_reason_codes"] = list(dict.fromkeys(blocking))
     hashed = dict(body)
     hashed["receipt_sha256"] = canonical_sha256(body)
     return hashed
