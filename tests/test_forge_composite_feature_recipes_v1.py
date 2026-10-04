@@ -146,6 +146,32 @@ class EntryWitness(unittest.TestCase):
 
 
 class RawArithmeticTests(unittest.TestCase):
+    def test_equal_relative_targets_do_not_hide_source_copy_conflict(self):
+        from tests.test_hfic_temporal_discovery_v1 import _obs
+        copies=[]
+        for cohort,release,reference,exit_price in [(COHORT,RELEASE,1,1.44),(COHORT_B,RELEASE_B,2,2.88)]:
+            census,rows=_member_path("scaled-copy",cohort,release,ANCHOR,[reference,1.2,1.5,1.2],(10000,9000),exit_price)
+            for point,value in [("X300",60),("Y3600",120)]:
+                rows.append({**_obs("scaled-copy",point,HOLDER,value),"cohort_id":cohort,"release_id":release})
+            copies.append((census,rows))
+        query=_simple()
+        query["target"]["reference_point"]="X300"
+        query.update(features=[{"name":"h","op":"delta","field_id":HOLDER,"start":"X300","end":"Y3600"}],
+                     all=[{"feature":"h","op":"gt","value":0}])
+        projected={"decision":query["decision"],"schedule":{**query["schedule"],"points":["X300","Y3600"]},"features":query["features"],"seed":"scaled"}
+        binding=[_bind(COHORT,RELEASE),_bind(COHORT_B,RELEASE_B)]
+        outputs=[]
+        for order in (copies,list(reversed(copies))):
+            census=[c[0] for c in order];rows=[r for c in order for r in c[1]]
+            result=execute_discovery_from_rows(census,rows,query,binding)["summary"]
+            preview=temporal.build_feature_preview(census,[r for r in rows if r["point_id"] in {"X300","Y3600"}],projected,binding)
+            self.assertEqual(result["decision_eligible_n"],1)
+            self.assertEqual((result["observed_target_n"],result["missing_target_n"]),(0,1))
+            self.assertEqual(result["target_exclusion_reasons"]["pooled"],{"TARGET_DELIVERY_CONFLICT":1})
+            self.assertEqual(preview["support_summary"]["pooled"]["joint_calculable_n"],1)
+            outputs.append(result)
+        self.assertEqual(outputs[0],outputs[1])
+
     def test_same_value_target_clock_conflict_is_order_invariant(self):
         from tests.test_hfic_temporal_discovery_v1 import _obs
         copies=[]

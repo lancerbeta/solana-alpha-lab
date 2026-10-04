@@ -2,6 +2,7 @@
   "acceptance": {
     "A": {
       "checks": "New arithmetic, positive denominator, typed unavailable, closed params/bound windows; legacy temporal 16 PASS",
+      "selected_target_source_copy_integrity": "Equal ratios from contradictory selected reference/exit prices refuse TARGET_DELIVERY_CONFLICT; prefix eligibility/support preserved; both delivery orders verified",
       "verdict": "PASS"
     },
     "B": {
@@ -142,6 +143,12 @@
       "result": "PASS",
       "scope": "Public reversed bound-window MAIN/preview, raw arithmetic/overlap, existing ordinary-operation lifecycle",
       "seconds": 261.863,
+      "tests": 22
+    },
+    {
+      "result": "PASS",
+      "scope": "Selected target-source signature regression plus raw arithmetic/overlap and legacy temporal",
+      "seconds": 2.762,
       "tests": 22
     }
   ],

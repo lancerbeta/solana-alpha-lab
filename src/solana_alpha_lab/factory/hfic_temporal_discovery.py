@@ -2345,7 +2345,7 @@ def _feature_dependencies(feature: Mapping[str, Any]) -> list[tuple[str, str]]:
     return list(dict.fromkeys((p, field) for p in points))
 
 
-def _target_projection(grouped, body, item, *, cohort, release, mint, anchor, decision_deadline, matched=True):
+def _target_projection(grouped, body, item, *, cohort, release, mint, anchor, decision_deadline, matched=True, source_detail=None):
     """One target selector for evaluation and cross-delivery integrity; never used by preview."""
     target_value, target_observed, target_exclusion = None, False, None
     selected_source_event = "UNKNOWN"
@@ -2401,6 +2401,14 @@ def _target_projection(grouped, body, item, *, cohort, release, mint, anchor, de
         snapshot_policy=snapshot_policy,
         point_due_at=_due_moment(anchor, reference_due) if snapshot_policy else None,
     )
+    if source_detail is not None:
+        # Preserve selected lawful source cells before ratio arithmetic erases
+        # their absolute prices. Delivery-local transport IDs are not cell truth.
+        source_detail["selected_cells"] = tuple(
+            (point, cell.get("status"), cell.get("value"), cell.get("available_at"),
+             cell.get("source_price_event_time") or "UNKNOWN")
+            for point, cell in ((reference_point, reference), (exit_point, selected))
+        )
     if (
         selected.get("status") == "OBSERVED"
         and reference.get("status") == "OBSERVED"
@@ -2458,8 +2466,10 @@ def _prefix_copy_integrity(census, grouped, body, binding, *, universe_policy, p
         features = {f["name"]: cells(_feature_dependencies(f)) for f in body["features"]}
         target = None
         if not prefix_only:
-            target = _target_projection(grouped, body, item, cohort=key[1], release=key[2],
-                                        mint=key[0], anchor=anchor, decision_deadline=cutoff) if cutoff else (None, False, "DECISION_CLOCK_UNAVAILABLE", "UNKNOWN")
+            source_detail = {}
+            projection = _target_projection(grouped, body, item, cohort=key[1], release=key[2],
+                mint=key[0], anchor=anchor, decision_deadline=cutoff, source_detail=source_detail) if cutoff else (None, False, "DECISION_CLOCK_UNAVAILABLE", "UNKNOWN")
+            target = (projection, source_detail.get("selected_cells"))
         seats[identity].append((features, target))
     feature_conflicts, target_conflicts = {}, set()
     for identity, copies in seats.items():
