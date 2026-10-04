@@ -10,7 +10,21 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "1eaa64b4579c6a91d51c1bb56e71670d294f788dcff6b160460fa0c61f3dc01a",
+    "catalog/assets/core.yaml": "cf68128be8893e6184edc0025543817e0e664c5ca6de11729156e6fa06809beb",
+    "docs/contracts/forge_ordinary_operation_lifecycle_v1.md": "954edb404504be15fb871bb10b08b81c034b850f5d53dd8ed7c546f5537bab2a",
+    "docs/contracts/forge_research_universe_policy_v1.md": "6d8175a4c766f56daa66de5bd09cda22412c26f7b207a7d1dfea6d61765a4413",
+    "docs/evidence/forge_ordinary_operation_lifecycle_repair_v1/a1_semantic_premise_packet_v1.json": "f4770d00bca9ebfa33d364e33b87f22be50c834782c8719f25a5030786350cec",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "ffc33973d3b3d19cbb91b4662683a1be7d115c8fb1b2d23fa7b2026a85b82376",
+    "docs/reports/forge_ordinary_operation_lifecycle_repair_v1/a1_owner_readout_v1.md": "90d15fa8a0a77f2b792648f7eae80875efb36f42bd99f9ae51c3a04e90c75ffa",
+    "docs/tasks/FORGE_ORDINARY_OPERATION_LIFECYCLE_REPAIR_V1.md": "8786d8010ad0a75d3da67cfae3d57c57a5a4a4ef2eb9c613743a621512225a3d",
+    "scripts/hypothesis_forge.py": "12b4c9efd66f43011ceb30c2a6a0eda140d38d2bc9f70c7f344b195456f18977",
+    "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "b2477d158900a5c5b76228641ba8d8725998fb6e10e4ef49af62501c7a1461d3",
+    "src/solana_alpha_lab/factory/hfic_research_universe_policy.py": "a03082fd63d98d1f60124b9b07f89d8b06dacd03b8c89f198730cefa137e5c2e",
+    "tests/test_forge_ordinary_operation_lifecycle_v1.py": "8ab516c97baaf272fe74b540b92e144e41ed5c884245d781ea49bf2334340b5d",
+    "tests/test_forge_research_universe_policy_v1.py": "67129cc2196b634e038e8706fb2b0da2396cd5395e4cdc6e79e9168cea1f034a"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +35,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_ordinary_operation_lifecycle_repair_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "9471fc66a318111ac0284738eb9453110621b2d04a6aed98905e7c1ace8cabeb",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FORGE_ORDINARY_OPERATION_LIFECYCLE_PUBLIC_PATH",
     "independent_review": {
       "path": "docs/evidence/forge_ordinary_operation_lifecycle_repair_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "3724994db3a3e146eb46b0d1409e49a3e2636cc2b68f83896898d7b425fd356f",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

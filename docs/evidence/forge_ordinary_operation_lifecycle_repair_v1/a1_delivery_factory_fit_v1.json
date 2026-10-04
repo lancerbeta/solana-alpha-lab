@@ -4,8 +4,8 @@
   "review_id": "FORGE-ORDINARY-OPERATION-LIFECYCLE-REPAIR-FACTORY-FIT-001",
   "as_of": "2026-10-04",
   "task_id": "FORGE_ORDINARY_OPERATION_LIFECYCLE_REPAIR_V1",
-  "reviewed_bindings_sha256": "8b70e50b6816d3844c038d5b3fe492f1f84798b4f3c49fa2cbf8f000a1e685b1",
-  "reviewed_inventory_sha256": "7c3bf615e172f29e4a2c18371233ac7b5efccb3587586226d41afa161b16d56d",
+  "reviewed_bindings_sha256": "6699c3c357925c1de8c28ab0cb113db6d8cc5d8cb37c1f91a3b7c91faed90158",
+  "reviewed_inventory_sha256": "d7f1ffbc83db466523fb6fecb7012ebdd76e3bbdb71f81d0d2bd547451c22f5c",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
