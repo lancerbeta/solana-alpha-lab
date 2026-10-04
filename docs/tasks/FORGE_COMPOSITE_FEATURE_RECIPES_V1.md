@@ -66,7 +66,7 @@ stop_conditions:
 - MERGE_WITHOUT_EXACT_OWNER_PHRASE
 context_requirements:
   catalog_asset_ids: [DOC-HYPOTHESIS-FORGE-OPERATOR-001, MODULE-FACTORY-V1-RESEARCH-STORE-001]
-  l2_roles: [ARCHITECTURE_DECISIONS]
+  l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
   l3_roles: []
   roadmap_path: null
   exact_role_paths:

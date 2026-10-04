@@ -39930,7 +39930,7 @@ records:
   as_of: '2026-10-04'
   truth_owner: FORGE_COMPOSITE_FEATURE_RECIPES_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FORGE_COMPOSITE_FEATURE_RECIPES_V1.md', repository_path: docs/tasks/FORGE_COMPOSITE_FEATURE_RECIPES_V1.md}
-  integrity: {kind: sha256, sha256: 3133e927ecaec4107491cd9c8da3e6f3c7f608b37d3cc0db0bc8ecd406d5ec24}
+  integrity: {kind: sha256, sha256: 019369701e86517137a5afe5de2b11c4e3d9ff886962ef4f29ed29274100dd56}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
