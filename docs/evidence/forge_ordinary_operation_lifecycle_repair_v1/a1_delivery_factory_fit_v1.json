@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-ORDINARY-OPERATION-LIFECYCLE-REPAIR-FACTORY-FIT-001",
+  "as_of": "2026-10-04",
+  "task_id": "FORGE_ORDINARY_OPERATION_LIFECYCLE_REPAIR_V1",
+  "reviewed_bindings_sha256": "6699c3c357925c1de8c28ab0cb113db6d8cc5d8cb37c1f91a3b7c91faed90158",
+  "reviewed_inventory_sha256": "d7f1ffbc83db466523fb6fecb7012ebdd76e3bbdb71f81d0d2bd547451c22f5c",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_FINISHED_OR_CANCELLED_OPERATION_NO_LONGER_BLOCKS_UNIVERSE_PROFILE",
+    "flexibility_and_history": "PASS_NO_HISTORY_REWRITE_STOP_IS_APPEND_ONLY_COMPLETED_IS_DERIVED",
+    "context_efficiency": "PASS_ONE_LIFECYCLE_OWNER_REUSES_FORGE_RUN_RECEIPT",
+    "research_truth": "PASS_STOP_IS_NOT_A_VERDICT_RESERVATIONS_STAY_SPENT_FROZEN_PROFILE_BINDING_KEPT",
+    "owner_operability": "PASS_EXACT_ID_STOP_PREVIEW_APPLY_AND_BLOCKING_ROWS_WITH_NEXT_ACTION",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_STRATEGY_PROMOTION_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_STALE_STOP_CRASH_RETRY_AND_LATE_LANDING_HANDLED",
+    "build_vs_buy": "PASS_WRAPS_RESEARCH_STORE_WRITER_LEASE_NO_NEW_LOCK_SERVICE",
+    "security": "PASS_NO_SECRETS_NO_WALLET_NO_PROVIDER",
+    "red_team": "PASS_FOREIGN_EARLY_NONFINAL_UNBOUND_RECEIPTS_DO_NOT_COMPLETE"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "BOUNDED_LIVE_RECOVERY_OF_THREE_NAMED_OPERATIONS_AFTER_MERGE"
+  },
+  "recovery": "Ordinary Git revert before any live stop record. After a live stop record, forward-fix only. No live store is changed by this atom.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_LIVE_STORE_MUTATION",
+    "NO_PRODUCTION_ACTIVATION",
+    "NO_NEW_SCIENTIFIC_VERDICT",
+    "EXACT_HEAD_CI_STILL_REQUIRED"
+  ]
+}

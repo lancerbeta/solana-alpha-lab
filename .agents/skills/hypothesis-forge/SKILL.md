@@ -33,7 +33,13 @@ Absence is `UNIVERSE_POLICY_REQUIRED`, not an unfiltered search. Change the
 two minima with `universe-policy-preview` then `universe-policy-apply
 --confirm-append-only`. Do not put the live minima in Git. Replay uses the
 recipe snapshot, not today's profile. Apply waits until no Forge operation
-is `OPEN`. A null owner cap is the protocol
+is effectively `OPEN` (`blocking_operations` names each one). A
+`SCIENTIFIC_TERMINAL` operation completes from its own persisted owner-final:
+at the run owner-final, run `forge-run --persist` for that focus. An
+unneeded or stuck operation is stopped only by exact id with
+`operation-stop-preview` then `operation-stop --confirm-append-only`; a stop
+is not a scientific result and returns no quota. Contract:
+`docs/contracts/forge_ordinary_operation_lifecycle_v1.md`. A null owner cap is the protocol
 remainder, not a silent cap of one. Coverage without values stays
 `discovery-coverage`.
 `next_action=CORRECT_CALCULATION_REVISION` means the saved temporal result is
@@ -473,6 +479,9 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
 9. Verify `SYNTHESIS_COMPLETE` / RDP receipt, Git mutation 0, provider calls 0
    before telling the owner the cycle is complete. If `forge-run` next is
    still `START_V1` / `RESUME_V1`, the bounded run is not evening-complete.
+   At the run owner-final, record it with `forge-run --persist --owner-focus
+   <FOCUS>` (idempotent); the ordinary operation then reads `COMPLETED` and
+   no longer holds the research-universe profile.
 10. On crash/retry, resume; never regenerate the same evidence+focus search.
 
 ## Mandatory auto-handoff (non-negotiable)
