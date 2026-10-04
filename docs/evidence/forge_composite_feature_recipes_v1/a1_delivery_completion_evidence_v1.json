@@ -9,12 +9,12 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/forge_composite_feature_recipes_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "ff302b0cf3aa4f23608c378c12cd34d5c010348c2005a975f269c48d8e881ace",
+    "sha256": "9b271284fe123c2621d052329be9301cb082a72ac11d9e9065938d5ab33a28ae",
     "verdict": "PASS"
   },
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "84f9842b61162dc5b3ef6a414aad0e70c96c036723596632020104ad7ae9607f",
-    "catalog/assets/core.yaml": "c76fc5375f9ce1aab3ed75818c78c0b50cdb38456fab16d17bdba7c72c3776de",
+    "catalog/assets/core.yaml": "28ca4395c3e5e9d9f3794d2f5443d689f7f1169bdebd7f8b78d3ab2f0b1e60f0",
     "catalog/assets/lifecycle.yaml": "312115635c5b61581659a8530f34cf23e66c45d1fb8f4410777c8efe19ccaa1b",
     "catalog/catalog_manifest.yaml": "91871f77373e4d18817d0d24147726f215292e3d7721e861020debcf6604e3c0",
     "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "ac9eb14302ad164a11a9a2fb4579db079d6060979dab6037db13a687720a454b",
@@ -29,7 +29,7 @@
     "docs/evidence/forge_composite_feature_recipes_v1/a1_vertical_acceptance_v1.json": "4af0305a73666598dbac1e2e02a18ac2f104872a7e2881cdd3f88a0714568268",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "1452acd8cbc6b82195b955c2d0a2cdc9bc19f838ad108d37c67a157666974eda",
     "docs/reports/forge_composite_feature_recipes_v1/a1_owner_readout_v1.md": "dceb24a006e2955bdef417f08b941f3df9d599ad490b423e9689b4e30717382d",
-    "docs/tasks/FORGE_COMPOSITE_FEATURE_RECIPES_V1.md": "3133e927ecaec4107491cd9c8da3e6f3c7f608b37d3cc0db0bc8ecd406d5ec24",
+    "docs/tasks/FORGE_COMPOSITE_FEATURE_RECIPES_V1.md": "019369701e86517137a5afe5de2b11c4e3d9ff886962ef4f29ed29274100dd56",
     "scripts/hypothesis_forge.py": "27a0566f66587f56190e3f8b18e588bc8bfae1b926dcc6bad9076aff87f10958",
     "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "7ceb778c3c65a523ec5674d20263b467c6d70be57623ad37f21db38b0de1d5ce",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "5cf23c29a5372fddd23137011060dfe5c62ff93ed9818e9910cdab17ec3893af",
@@ -69,7 +69,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/forge_composite_feature_recipes_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "141874dd1a2e79f664f8658063203b85c61573be411a66741163d7d388e4e0b1",
+      "sha256": "f2763ba029d0b1cf72152b07e5a517bda75acebadfec7663518244a6f894e068",
       "verdict": "PASS"
     },
     "project_checks": [
