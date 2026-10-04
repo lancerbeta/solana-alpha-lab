@@ -207,12 +207,14 @@ def _production_control_preflight(
 
     from solana_alpha_lab.factory.hfic_preflight import build_forge_context_packet
     from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
+    from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
     from solana_alpha_lab.factory.hfic_session import (
         PROMPT_VERSION,
         focus_key_sha256,
         search_key_sha256,
     )
 
+    ensure_profile(store, repo_root=repo_root, min_holders=0, min_liquidity_usd=0)
     git = repository_git_snapshot(repo_root)
     from solana_alpha_lab.factory.hfic_evidence_identity import compute_split_identity
 
@@ -1399,7 +1401,13 @@ class RealNoWriteVerticalTests(unittest.TestCase):
         else:
             self.assertIn(
                 receipt["next_action"],
-                {ACTION_OBSERVABILITY_BLOCKED, ACTION_SEARCH_EXHAUSTED, ACTION_RETURN_EXISTING},
+                {
+                    ACTION_OBSERVABILITY_BLOCKED,
+                    ACTION_SEARCH_EXHAUSTED,
+                    ACTION_RETURN_EXISTING,
+                    # Real plane may honestly lack today's research-universe profile.
+                    "INPUT_NOT_READY",
+                },
             )
             self.assertEqual(receipt["writes"]["forge_run"], 0)
         self.assertIsInstance(receipt["market_evidence_epoch_sha256"], str)

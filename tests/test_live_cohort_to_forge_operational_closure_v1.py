@@ -360,6 +360,8 @@ def _cli_module():
 
 def _commission(data_root: Path) -> None:
     from solana_alpha_lab.factory.hfic_preflight import build_offline_commission_packet
+    from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+    from solana_alpha_lab.factory.research_store import ResearchStore
 
     path = ROOT / "scripts" / "hypothesis_fast_lane.py"
     spec = importlib.util.spec_from_file_location(
@@ -373,6 +375,7 @@ def _commission(data_root: Path) -> None:
     packet_path = data_root / "offline_commission.json"
     packet_path.write_text(json.dumps(packet), encoding="utf-8")
     module.execute_commission_offline(ROOT, data_root, packet_path)
+    ensure_profile(ResearchStore(data_root), repo_root=ROOT, min_holders=0, min_liquidity_usd=0)
 
 
 ELIGIBLE_SESSION = "HFIC-SESS-ELIGIBLEAAAAAA"

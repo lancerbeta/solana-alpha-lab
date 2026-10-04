@@ -57,6 +57,9 @@ managed_write_set:
 - tests/test_hfic_temporal_result_coherence_v1.py
 - tests/test_hfic_grounded_discovery_v1.py
 - tests/test_forge_runtime_discovery_binding_v1.py
+- tests/test_forge_evidence_identity_and_owner_gold_v1.py
+- tests/test_forge_representation_ladder_v1.py
+- tests/test_live_cohort_to_forge_operational_closure_v1.py
 - catalog/schemas/forge_research_universe_policy_v1.schema.json
 - catalog/assets/core.yaml
 - catalog/assets/lifecycle.yaml

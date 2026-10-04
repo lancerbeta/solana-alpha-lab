@@ -110,7 +110,8 @@ def populate_real_c1_c2(data_root: Path, workspace: Path) -> None:
             import_time=as_of + timedelta(hours=1),
         )
         assert imported["status"] == "IMPORTED"
-    _activate_neutral_universe(data_root)
+    # Do not activate a universe on the shared template: seed copies into roots
+    # that may already own locks/, and FileExistsError would fail unrelated tests.
 
 
 _C1_C2_TEMPLATE: Path | None = None
@@ -770,6 +771,7 @@ class HficTempRootE2ETests(unittest.TestCase):
             workspace = Path(tmp)
             data_root = workspace / "rdp"
             populate_real_c1_c2(data_root, workspace)
+            _activate_neutral_universe(data_root)
             snapshot_root = Path(tmp) / "snapshot"
             restore_root = Path(tmp) / "restored"
             preflight = run_cli(
@@ -1071,6 +1073,7 @@ class HficTempRootE2ETests(unittest.TestCase):
             workspace = Path(tmp)
             data_root = workspace / "rdp"
             populate_real_c1_c2(data_root, workspace)
+            _activate_neutral_universe(data_root)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",

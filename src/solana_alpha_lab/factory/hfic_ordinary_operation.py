@@ -286,10 +286,12 @@ def _same_active_profile_look(
             if not (fingerprint and prior_fingerprint and fingerprint == prior_fingerprint):
                 continue
         matched.append(item)
+    # Only the live calculation version may cross-operation REPLAY.
+    # An older saved version must fall through to classify_temporal_look so
+    # CALCULATION_REVISION still requires an explicit correction (never a
+    # silent spendable MAIN / free REPLAY of stale arithmetic).
     current = [item for item in matched if item.get("calculation_version") == TEMPORAL_CALCULATION_VERSION]
-    if current:
-        return current[-1]
-    return matched[-1] if matched else None
+    return current[-1] if current else None
 
 
 def result_readout(look: Mapping[str, Any]) -> dict[str, Any]:

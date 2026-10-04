@@ -1072,6 +1072,14 @@ class TemporalCohortSliceTests(unittest.TestCase):
         self.assertNotIn("by_cohort", legacy)
         with tempfile.TemporaryDirectory() as raw:
             store = ResearchStore(Path(raw))
+            from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+
+            ensure_profile(
+                store,
+                repo_root=Path(__file__).resolve().parents[1],
+                min_holders=0,
+                min_liquidity_usd=0,
+            )
             clock = datetime(2026, 9, 27, tzinfo=UTC)
             binding_sha = data_binding_sha256(computed["admitted"], census, observations)
             identity = _look_identity(

@@ -1,0 +1,100 @@
+{
+  "candidate": {
+    "base": "0c472f5b24cd0257959c73c6b4cca9d19cef354d",
+    "diff_sha256": "c05edb87a18ce678b4f27e44c9f19755416944003dc5273a859ea2eb4bd3577a",
+    "head": "262f894b4c3340e162dd7999ed53f62b315c45a6"
+  },
+  "evidence": [
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_grounded_discovery.py",
+      "sha256_or_fingerprint": "0ca955807e9200dd1d3730ffde977ebde18854eeaf144fe858f757df22293de8"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_ordinary_operation.py",
+      "sha256_or_fingerprint": "4ae1863348884292dbde0a45c36e3c076d6c9889fd3afa6da194976c1f57ecc4"
+    },
+    {
+      "logical_ref": "repo://scripts/hypothesis_forge.py",
+      "sha256_or_fingerprint": "6bfaab477731bc7dcb900514d42d722bf9f0a68e87b19adac6a3fdbcbd732c16"
+    },
+    {
+      "logical_ref": "repo://tests/test_forge_research_universe_policy_v1.py",
+      "sha256_or_fingerprint": "ddd579d79e3b011dcec00e972ca3aca338baaadc8d2f1cb0dd54b7f630861475"
+    }
+  ],
+  "independence": {
+    "claim_scope": "PACKET_INFORMATION_PATH",
+    "context_isolated": true,
+    "implementation_transcript_seen": false,
+    "launch_isolation": "PROCESS_OBLIGATION",
+    "model_diversity": "UNPROVEN",
+    "model_diversity_identity": null,
+    "packet_bound": true,
+    "readonly": true
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_PRODUCTION_ACTIVATION",
+    "NO_MAIN_LOOK",
+    "NO_WALLET_OR_PROVIDER",
+    "NO_MERGE",
+    "NO_BASE_X_REDEFINITION"
+  ],
+  "packet_fingerprint_sha256": "c4056b3204adae1b5ca87f553dff382f202d521d9ccab7aa95dbbba1202a9d93",
+  "questions": [
+    "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
+    "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
+    "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL",
+    "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE",
+    "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY",
+    "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING",
+    "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER",
+    "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE",
+    "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM",
+    "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS"
+  ],
+  "review": {
+    "architecture_owner": "ARCHITECTURE_CRITIC",
+    "profile": "SEMANTIC_PREMISE",
+    "risk_dimensions": [
+      "SCIENTIFIC_ESTIMAND",
+      "EVIDENCE_ADMISSIBILITY",
+      "PIT_OR_AVAILABILITY_SEMANTICS",
+      "RESEARCH_TRUTH_OWNERSHIP",
+      "UNKNOWN_VS_NEGATIVE_EVIDENCE"
+    ]
+  },
+  "schema": "smial.semantic-premise-review-packet",
+  "schema_version": "1.0",
+  "semantic_claims": [
+    {
+      "claim": "Active universe snapshot is visible in FORGE_CONTEXT_PACKET before Prompt A",
+      "claim_id": "C1",
+      "scope": "forge_context_packet"
+    },
+    {
+      "claim": "Universe profile gate applies only to new research looks",
+      "claim_id": "C2",
+      "scope": "discovery_admission"
+    },
+    {
+      "claim": "Saved history replay and recovery remain readable without todays profile",
+      "claim_id": "C3",
+      "scope": "history_readback"
+    },
+    {
+      "claim": "Published logical corpus integrity verifies at most once per public command",
+      "claim_id": "C4",
+      "scope": "publication_verification"
+    },
+    {
+      "claim": "Threshold-only universe change is adaptive not a second MAIN",
+      "claim_id": "C5",
+      "scope": "look_classification"
+    }
+  ],
+  "task": {
+    "task_contract_sha256": "e2e754f01803c3dcc48d7b557dfd123fdee37aaf5a79ad5e93cf2d75000448f2",
+    "task_id": "FORGE_RESEARCH_UNIVERSE_POLICY_V1"
+  }
+}

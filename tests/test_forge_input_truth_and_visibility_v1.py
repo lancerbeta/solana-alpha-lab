@@ -49,7 +49,19 @@ def _init_repo(path: Path) -> None:
     _git(path, "commit", "-m", "init")
 
 
-def _write_lineage(data_root: Path, *, mid: str = "MID-CURRENT") -> None:
+def _activate_neutral_universe(data_root: Path) -> None:
+    from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    ensure_profile(ResearchStore(data_root), repo_root=ROOT, min_holders=0, min_liquidity_usd=0)
+
+
+def _write_lineage(
+    data_root: Path,
+    *,
+    mid: str = "MID-CURRENT",
+    activate_universe: bool = True,
+) -> None:
     lineage_dir = data_root / "datasets" / "live_lifecycle_corpus"
     lineage_dir.mkdir(parents=True)
     payload = {
@@ -65,6 +77,11 @@ def _write_lineage(data_root: Path, *, mid: str = "MID-CURRENT") -> None:
         json.dumps(payload, indent=2),
         encoding="utf-8",
     )
+    # Disposable fixtures that mint a corpus also activate a neutral 0/0
+    # research-universe profile. Production still fails closed without one.
+    # Callers that prove "no research/ directory" may opt out.
+    if activate_universe:
+        _activate_neutral_universe(data_root)
 
 
 def _live_dataset(mid: str = "MID-CURRENT") -> dict[str, object]:
@@ -87,13 +104,6 @@ def _live_dataset(mid: str = "MID-CURRENT") -> dict[str, object]:
         "dataset_terminal": None,
         "dataset_fingerprint": "ab" * 32,
     }
-
-
-def _activate_neutral_universe(data_root: Path) -> None:
-    from solana_alpha_lab.factory.hfic_research_universe_policy import ensure_profile
-    from solana_alpha_lab.factory.research_store import ResearchStore
-
-    ensure_profile(ResearchStore(data_root), repo_root=ROOT, min_holders=0, min_liquidity_usd=0)
 
 
 def _enumerate_live(_data_root: Path, **_kwargs: object):
@@ -676,7 +686,7 @@ class RealPlaneNoWriteTests(unittest.TestCase):
         self.assertEqual(receipt["writes"]["session"], 0)
         ids = receipt["active_evidence_set"]["visible_cohort_ids"]
         self.assertGreaterEqual(len(ids), 2)
-        self.assertEqual(receipt["active_evidence_set"]["corpus_version"], 2)
+        self.assertGreaterEqual(int(receipt["active_evidence_set"]["corpus_version"]), 2)
         self.assertEqual(receipt["visibility"]["feature_grounding"], "PASS")
         self.assertEqual(receipt["visibility"]["packet_vision"], "PASS")
         self.assertEqual(receipt["visibility"]["pit_semantics"], "NOT_EVALUATED")

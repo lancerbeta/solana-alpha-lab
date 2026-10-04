@@ -363,6 +363,7 @@ def _published_gate_cohorts(
         supplied = binding_doc.get("cohorts") or []
         if not isinstance(supplied, list):
             supplied = []
+        verified: list[dict[str, Any]] = []
         for item in supplied:
             if not isinstance(item, dict):
                 return [], {
@@ -383,6 +384,11 @@ def _published_gate_cohorts(
                     "writes": False,
                     "scientific_negative": False,
                 }
+            # Keep the caller cohort set. A proper subset must still reach the
+            # ordinary gate so fingerprint / revision input mismatch can refuse
+            # it — do not silently widen back to the full published list.
+            verified.append(dict(match))
+        return verified, None
     return published, None
 
 

@@ -553,6 +553,16 @@ def load_admitted_partition_rows(
                 )
                 for item in published["cohorts"]
             }
+            verified_cohorts: list[Mapping[str, Any]] = []
+            published_by_pair = {
+                (
+                    str(item.get("cohort_id")),
+                    str(item.get("census_sha256")),
+                    str(item.get("observations_sha256")),
+                ): item
+                for item in published["cohorts"]
+                if isinstance(item, Mapping)
+            }
             for item in cohorts:
                 if not isinstance(item, Mapping):
                     raise GroundedDiscoveryError("DISCOVERY_BINDING_INCOMPLETE")
@@ -561,10 +571,14 @@ def load_admitted_partition_rows(
                     str(item.get("census_sha256")),
                     str(item.get("observations_sha256")),
                 )
-                if pair not in published_pairs:
+                match = published_by_pair.get(pair)
+                if match is None:
                     raise GroundedDiscoveryError("DISCOVERY_AUTHORITY_ABSENT")
-            binding_doc = published
-            cohorts = published["cohorts"]
+                # Keep the caller cohort set. Do not silently widen a verified
+                # subset back to the full published corpus.
+                verified_cohorts.append(match)
+            cohorts = list(verified_cohorts)
+            binding_doc = {**dict(binding_doc), "cohorts": cohorts}
     admit_discovery_binding(cohorts)
     by_cohort = {str(item.get("cohort_id")): item for item in cohorts if isinstance(item, Mapping)}
     supplied = list(partitions or [])
@@ -2069,14 +2083,38 @@ def run_recorded_discovery_query(
         )
 
         prevalidated = validate_temporal_query(spec)
-        admitted_meta = admitted_with_policy(admit_discovery_binding(binding), policy_definition)
+        bare_admitted = admit_discovery_binding(binding)
+        bare_binding_sha = data_binding_sha256(bare_admitted, census, observations)
+        admitted_meta = admitted_with_policy(bare_admitted, policy_definition)
         pre_binding_sha = data_binding_sha256(admitted_meta, census, observations)
+
+        def _same_question_binding(item: Mapping[str, Any]) -> bool:
+            stored_sha = item.get("data_binding_sha256")
+            if stored_sha == pre_binding_sha:
+                return True
+            # Pre-policy looks carry the bare admission hash. Today's profile
+            # stamps universe_policy_semantic_sha256 into admitted metadata even
+            # at 0/0, so revision/readback must still recognize those rows —
+            # but only for this operation, an explicit correction, or when
+            # today's profile is absent (history readback). A fresh operation
+            # under an active profile must not free-replay another look's
+            # unfiltered legacy result.
+            if stored_sha != bare_binding_sha:
+                return False
+            if isinstance((item.get("result") or {}).get("universe_policy"), Mapping):
+                return False
+            if correction is not None:
+                return True
+            if policy_definition is None or policy_error is not None:
+                return True
+            return item.get("operation_sha256") == operation_sha256
+
         journal_looks = list_discovery_looks(store, journal_scope)
         same_question = [
             item
             for item in journal_looks
             if item.get("spec_sha256") == prevalidated["spec_sha256"]
-            and item.get("data_binding_sha256") == pre_binding_sha
+            and _same_question_binding(item)
             and isinstance(item.get("result"), Mapping)
         ]
         replayed = next(
@@ -2100,7 +2138,10 @@ def run_recorded_discovery_query(
                     TEMPORAL_CALCULATION_VERSION_V5 if saved is not None else TEMPORAL_CALCULATION_VERSION
                 ),
             )
-            if source_look.get("data_binding_sha256") != pre_binding_sha:
+            allowed_source_bindings = {pre_binding_sha}
+            if not isinstance((source_look.get("result") or {}).get("universe_policy"), Mapping):
+                allowed_source_bindings.add(bare_binding_sha)
+            if source_look.get("data_binding_sha256") not in allowed_source_bindings:
                 raise GroundedDiscoveryError("CALCULATION_REVISION_INPUT_MISMATCH")
             if replayed is not None:
                 # Already applied: the verified request reads the saved revision.
@@ -2189,7 +2230,10 @@ def run_recorded_discovery_query(
             "members_projected": 0,
             "replayed_without_evaluator": True,
         }
-        readback_look = replayed if policy_definition is None or policy_error is not None else None
+        # Always keep the saved look's binding/identity. Recomputing the
+        # admission hash under today's profile would mint a second record for
+        # the same summary (legacy bare bindings and frozen snapshots).
+        readback_look = replayed
     summary = computed["summary"]
     calc_version = str(summary.get("calculation_version") or CALCULATION_VERSION)
     temporal = summary.get("schema") == "smial.hfic-temporal-query"
