@@ -120,6 +120,10 @@
     "No merge; new exact-head CI and owner phrase required"
   ],
   "owner_repair_request_sha256": "f11e73d8f21ccdf50c228bae81ba8d5373549ad65f2c5f9d39cb36287b53a2fd",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT; repository engineering only; no export mutation, replacement, activation or smoke requirement."
+  },
   "real_authority_effects": {
     "budget_estimand_expansion": 0,
     "c5_holdout_reads": 0,

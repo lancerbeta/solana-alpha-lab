@@ -1562,6 +1562,9 @@ def _cmd_discovery_execute(
                 correction=correction,
             )
         except OrdinaryOperationError as exc:
+            # Earlier bound checks preserve the historical protocol transport.
+            if exc.code in {"SCHEDULE_CONTEXT_UNBOUND", "SCHEDULE_LATENESS_MISMATCH", "CANONICAL_X300_SCHEDULE_INCOMPATIBLE"}:
+                return emit_error(exc.code)
             return emit(
                 {
                     "reason_code": exc.code,
@@ -1933,6 +1936,8 @@ def _cmd_discovery_preview(
                     }
                 )
         except OrdinaryOperationError as exc:
+            if exc.code in {"SCHEDULE_CONTEXT_UNBOUND", "SCHEDULE_LATENESS_MISMATCH", "CANONICAL_X300_SCHEDULE_INCOMPATIBLE"}:
+                return emit_error(exc.code)
             return emit(
                 {
                     "reason_code": exc.code,
