@@ -39835,8 +39835,9 @@ records:
     logical_uri: repo://docs/evidence/factory_campaign_cutover_completion_repair/a1_delivery_completion_evidence_v1.json
     repository_path: docs/evidence/factory_campaign_cutover_completion_repair/a1_delivery_completion_evidence_v1.json
   integrity:
-    kind: sha256
-    sha256: 0183078442709fa1d03683a8868c2f093c18f200cafcd1dcdeca276ecc7e0b42
+    kind: runtime_receipt
+    reference: repo://docs/evidence/factory_campaign_cutover_completion_repair/a1_delivery_completion_evidence_v1.json
+    note: Exact implementation, review and fit SHA are verified by Delivery Harness bind-evidence. This dynamic receipt cannot SHA-pin a Catalog that is itself in its implementation inventory.
   access:
     mode: read_only
     method: file
