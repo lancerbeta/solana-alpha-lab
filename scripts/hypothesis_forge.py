@@ -1099,9 +1099,14 @@ def cmd_forge_run(
         project_ordinary_operation,
     )
 
+    current_market = payload.get("market_evidence_epoch_sha256")
     projection = project_ordinary_operation(
         store,
         owner_focus=owner_focus if owner_focus.strip() else "AUTO",
+        # An older-market operation of the same focus does not speak for this run.
+        market_evidence_epoch_sha256=current_market
+        if isinstance(current_market, str) and len(current_market) == 64
+        else None,
     )
     payload = merge_ordinary_readout(payload, projection)
     payload = _attach_scientific_context(payload, store)
@@ -2250,7 +2255,7 @@ def cmd_universe_policy_apply(
         )
     except UniversePolicyError as exc:
         next_action = {
-            "UNIVERSE_POLICY_PENDING_OPERATION": "FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW",
+            "UNIVERSE_POLICY_PENDING_OPERATION": "RESOLVE_BLOCKING_OPERATIONS_THEN_PREVIEW",
             "UNIVERSE_POLICY_PREVIEW_STALE": "REPEAT_PREVIEW",
             "UNIVERSE_POLICY_CONFIRM_REQUIRED": "RETRY_APPLY_WITH_CONFIRM_APPEND_ONLY",
         }.get(exc.code, "READ_UNIVERSE_POLICY_STATUS")

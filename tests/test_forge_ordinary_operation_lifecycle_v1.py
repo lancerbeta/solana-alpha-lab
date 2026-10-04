@@ -16,7 +16,7 @@ import json
 import sys
 import tempfile
 import unittest
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest import mock
 
@@ -28,6 +28,9 @@ if str(SRC) not in sys.path:
 from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks  # noqa: E402
 from solana_alpha_lab.factory.hfic_ordinary_operation import (  # noqa: E402
     OrdinaryOperationError,
+    _append_transition,
+    _run_completion,
+    authorize_temporal_attempt,
     gate_before_values,
     get_operation,
     list_operations,
@@ -275,6 +278,9 @@ def _cycle(test: unittest.TestCase, data_root: Path, workspace: Path, focus: str
         "market": market,
         "result_refs": [first["result_refs"], second["result_refs"]],
         "owner_final": persisted["owner_final"],
+        "operation": operation,
+        "compound": compound,
+        "second": second,
     }
 
 
@@ -301,9 +307,24 @@ class OrdinaryOperationLifecycleTests(unittest.TestCase):
             store = ResearchStore(data_root, create_if_missing=False)
             looks_before = list_discovery_looks(store, first["journal"])
             self.assertEqual(_apply_profile(self, data_root, workspace, "50", "20000")["min_liquidity_usd"], "20000")
+            # Under the new profile the completed run admits no new evaluation;
+            # its saved result still replays on its own 5k snapshot.
+            fresh_spec = json.loads(json.dumps(first["compound"]))
+            fresh_spec["query_id"] = "after-completion"
+            fresh_spec["all"][1]["value"] = 70
+            refused = _execute(data_root, workspace, fresh_spec, first["operation"], "after-completion")
+            self.assertEqual(refused.get("reason_code"), "ORDINARY_OPERATION_COMPLETED", refused)
+            self.assertFalse(refused["values_loaded"])
+            replay = _execute(data_root, workspace, first["compound"], first["operation"], "replay-completed")
+            self.assertEqual(replay["_exit"], 0, replay)
+            self.assertFalse(replay["queries"][0]["new_look"])
+            self.assertEqual(replay["result"]["universe_policy"]["min_liquidity_usd"], "5000")
             second = _cycle(self, data_root, workspace, "LIFECYCLE_CYCLE_TWO")
             self.assertNotEqual(second["operation_sha256"], first["operation_sha256"])
             self.assertFalse(_status(data_root)["pending_operation"])
+            second_policy = second["second"]["result"]["universe_policy"]
+            self.assertEqual(second_policy["min_liquidity_usd"], "20000")
+            self.assertLess(second_policy["n_pass"], first["second"]["result"]["universe_policy"]["n_pass"])
             store = ResearchStore(data_root, create_if_missing=False)
             looks_after = list_discovery_looks(store, first["journal"])
             self.assertEqual(
@@ -324,6 +345,20 @@ class OrdinaryOperationLifecycleTests(unittest.TestCase):
             self.assertEqual(stop["_exit"], 2, stop)
             self.assertEqual(stop["reason_code"], "OPERATION_ALREADY_COMPLETED")
             self.assertEqual(stop["next_action"], "READ_SAVED_RESULT")
+            # A -> B -> A: returning to 5k frees nothing and keeps both runs completed.
+            mains_before = {
+                key: [item.get("record_id") for item in list_discovery_looks(store, run["journal"])]
+                for key, run in (("one", first), ("two", second))
+            }
+            self.assertEqual(_apply_profile(self, data_root, workspace, "50", "5000")["min_liquidity_usd"], "5000")
+            store = ResearchStore(data_root, create_if_missing=False)
+            self.assertFalse(_status(data_root)["pending_operation"])
+            for key, run in (("one", first), ("two", second)):
+                self.assertEqual(
+                    [item.get("record_id") for item in list_discovery_looks(store, run["journal"])], mains_before[key]
+                )
+                lifecycle = operation_lifecycle(store, get_operation(store, run["operation_sha256"]))
+                self.assertEqual(lifecycle["effective_state"], "COMPLETED")
 
     def test_r2_r4_r5_owner_stop_without_profile_keeps_history_and_quota(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -347,15 +382,19 @@ class OrdinaryOperationLifecycleTests(unittest.TestCase):
                 verified_market=market, repo_root=ROOT, data_root=data_root,
             )
             self.assertEqual(reserved["disposition"], "RESERVED")
-            main_before = owner_allowance(store, get_operation(store, digest), "main")
             status = _status(data_root)
             self.assertTrue(status["pending_operation"])
             self.assertEqual(status["state"], "ABSENT")
             [blocking] = status["blocking_operations"]
             self.assertEqual(blocking["operation_sha256"], digest)
             self.assertEqual(blocking["unresolved_reservations"], 1)
+            # Without a profile this run cannot finish: the only executable step is the stop.
+            self.assertEqual(blocking["next_action"], "STOP_OPERATION")
+            before_stop = _cli(data_root, "forge-run", "--owner-focus", "LIFECYCLE_STOP", "--no-write")
+            self.assertEqual(before_stop["ordinary_operation"]["next_action"], "STOP_OPERATION", before_stop)
+            self.assertIn(f"operation: {digest} state=OPEN next=STOP_OPERATION", before_stop["owner_readout"])
             refused_apply = _cli(data_root, "universe-policy-preview", "--min-holders", "50", "--min-liquidity-usd", "5000")
-            self.assertEqual(refused_apply["next_action"], "FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW")
+            self.assertEqual(refused_apply["next_action"], "RESOLVE_BLOCKING_OPERATIONS_THEN_PREVIEW")
             unknown = _cli(data_root, "operation-stop-preview", "--operation-sha256", "ef" * 32,
                            "--owner-request-text", "stop a foreign id")
             self.assertEqual(unknown["reason_code"], "ORDINARY_OPERATION_NOT_FOUND", unknown)
@@ -381,6 +420,24 @@ class OrdinaryOperationLifecycleTests(unittest.TestCase):
             tampered = _cli(data_root, "operation-stop", "--proposal", str(forged_path), "--confirm-append-only")
             self.assertEqual(tampered["reason_code"], "OPERATION_STOP_PROPOSAL_INVALID", tampered)
             self.assertEqual(ResearchStore(data_root, create_if_missing=False).diagnostics().committed_inventory_sha256, inventory)
+            # A writer reserves another attempt after the preview: the proposal is stale at apply.
+            _simple, compound = _specs("lifecycle-stop")
+            second_reservation = gate_before_values(
+                store, operation_sha256=digest, spec=compound, journal_scope=journal,
+                verified_market=market, repo_root=ROOT, data_root=data_root,
+            )
+            self.assertEqual(second_reservation["disposition"], "RESERVED")
+            main_before = owner_allowance(store, get_operation(store, digest), "main")
+            inventory = ResearchStore(data_root, create_if_missing=False).diagnostics().committed_inventory_sha256
+            outdated = _cli(data_root, "operation-stop", "--proposal", str(proposal_path), "--confirm-append-only")
+            self.assertEqual(outdated["reason_code"], "OPERATION_STOP_PREVIEW_STALE", outdated)
+            self.assertEqual(outdated["next_action"], "REPEAT_PREVIEW")
+            self.assertEqual(ResearchStore(data_root, create_if_missing=False).diagnostics().committed_inventory_sha256, inventory)
+            preview = _cli(data_root, "operation-stop-preview", "--operation-sha256", digest,
+                           "--owner-request-text", "Owner cancels the unfinished pre-policy search")
+            self.assertEqual(preview["_exit"], 0, preview)
+            proposal_path.write_text(json.dumps(preview["proposal"]), encoding="utf-8")
+            open_row = get_operation(store, digest)
             other = _cli(data_root, "operation-stop-preview", "--operation-sha256", digest,
                          "--owner-request-text", "A second, different owner wording")
             other_path = workspace / "other.json"
@@ -392,7 +449,21 @@ class OrdinaryOperationLifecycleTests(unittest.TestCase):
             store = ResearchStore(data_root, create_if_missing=False)
             stopped_row = get_operation(store, digest)
             self.assertEqual(stopped_row["status"], "STOPPED")
-            self.assertEqual(stopped_row["lifecycle_event"]["unresolved_reservation_spec_sha256"], [reserved["spec_sha256"]])
+            self.assertEqual(
+                stopped_row["lifecycle_event"]["unresolved_reservation_spec_sha256"],
+                sorted([reserved["spec_sha256"], second_reservation["spec_sha256"]]),
+            )
+            # A transition derived from the pre-stop row cannot land after the stop.
+            with self.assertRaises(OrdinaryOperationError) as changed:
+                _append_transition(store, {**open_row, "status": "PAUSED_CAP"}, based_on_record_id=open_row["record_id"])
+            self.assertEqual(changed.exception.code, "ORDINARY_OPERATION_STATE_CHANGED")
+            with self.assertRaises(OrdinaryOperationError) as previewed:
+                authorize_temporal_attempt(
+                    store, operation_sha256=digest, spec={"decision": {"point_id": "Y900"}},
+                    journal_scope=journal, verified_market=market, look_kind="preview",
+                    repo_root=ROOT, data_root=data_root,
+                )
+            self.assertEqual(previewed.exception.code, "ORDINARY_OPERATION_STOPPED")
             self.assertIsNone(stopped_row["lifecycle_event"]["scientific_verdict"])
             repeat = _cli(data_root, "operation-stop", "--proposal", str(proposal_path), "--confirm-append-only")
             self.assertEqual(repeat["status"], "NO_CHANGE", repeat)
@@ -453,7 +524,9 @@ class OrdinaryOperationLifecycleTests(unittest.TestCase):
             path.write_text(json.dumps(preview["proposal"]), encoding="utf-8")
             refused = _cli(data_root, "universe-policy-apply", "--proposal", str(path), "--confirm-append-only")
             self.assertEqual(refused["reason_code"], "UNIVERSE_POLICY_PENDING_OPERATION", refused)
-            self.assertEqual(len(refused["blocking_operations"]), 1)
+            [row] = refused["blocking_operations"]
+            self.assertEqual(row["next_action"], "FINISH_RUN_THEN_PERSIST_OWNER_FINAL_OR_STOP_OPERATION")
+            self.assertEqual(refused["next_action"], "RESOLVE_BLOCKING_OPERATIONS_THEN_PREVIEW")
 
     def test_r6_predictable_preview_refusal_never_calls_the_loader(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -505,58 +578,86 @@ class OrdinaryOperationLifecycleTests(unittest.TestCase):
 
 
 class OperationCompletionBindingTests(unittest.TestCase):
-    """R7: only the bound run's owner-final receipt completes an operation."""
+    """R7: only the bound run's owner-final receipt completes an operation, and it stays completed."""
 
     MARKET = "ab" * 32
     JOURNAL = "cd" * 32
+    SLOT = "ef" * 32
     FOCUS = "LIFECYCLE_BINDING"
+    SESSION = "HFIC-SESS-BOUND"
+    OPENED = datetime(2026, 10, 4, 12, 0, tzinfo=timezone.utc)
 
-    def _receipt(self, store: ResearchStore, **overrides) -> None:
-        from solana_alpha_lab.factory.hfic_evidence_identity import scientific_slot_sha256
-        from solana_alpha_lab.factory.hfic_representation_ladder import _persist_run_receipt
-        from solana_alpha_lab.factory.run_passport import canonical_sha256
+    def _operation(self) -> dict:
+        return {
+            "owner_focus": self.FOCUS,
+            "market_evidence_epoch_sha256": self.MARKET,
+            "scientific_slot_sha256": self.SLOT,
+            "journal_scope": self.JOURNAL,
+            "requested_completion": "SCIENTIFIC_TERMINAL",
+        }
 
-        slot = scientific_slot_sha256(
-            market_evidence_epoch_sha256=self.MARKET, representation_id="BASE",
-            representation_semantic_version="HFIC-V1.2", owner_focus=self.FOCUS,
-        )
+    def _receipt(self, minutes: int, **overrides) -> dict:
         body = {
-            "schema": "smial.forge-run-receipt",
             "owner_focus": self.FOCUS,
             "owner_class": "OWNER_FINAL",
             "owner_final": "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
             "market_evidence_epoch_sha256": self.MARKET,
-            "scientific_slot_sha256": slot,
-            "stages": [{"representation_id": "BASE", "session_id": "HFIC-SESS-UNKNOWN", "scientific_slot_sha256": slot}],
-            "run_id": "FORGE-RUN-SYNTHETIC",
+            "scientific_slot_sha256": self.SLOT,
+            "stages": [{"representation_id": "BASE", "session_id": self.SESSION, "scientific_slot_sha256": self.SLOT}],
+            "receipt_sha256": f"{minutes:064d}",
         }
         body.update(overrides)
-        body["receipt_sha256"] = canonical_sha256(body)
-        _persist_run_receipt(store, body, repo_root=ROOT)
+        return {
+            "body": body,
+            "record_id": f"HFIC-ART-FORGE-RUN-{minutes}",
+            "recorded_at": self.OPENED + timedelta(minutes=minutes),
+        }
 
-    def _operation(self, store: ResearchStore) -> dict:
-        return record_operation(store, {
-            "owner_request_text": "binding witness",
-            "owner_focus": self.FOCUS,
-            "journal_scope": self.JOURNAL,
-            "market_evidence_epoch_sha256": self.MARKET,
-            "requested_completion": "SCIENTIFIC_TERMINAL",
-            "owner_cap": {"main": None, "adaptive": None, "preview": None},
-        })
+    def _complete(self, *receipts: dict, keys: dict | None = None) -> tuple:
+        return _run_completion(
+            self._operation(),
+            opened_at=self.OPENED,
+            receipts=list(receipts),
+            session_keys={self.SESSION: {self.JOURNAL}} if keys is None else keys,
+        )
 
-    def test_foreign_non_final_early_or_unbound_receipts_do_not_complete(self) -> None:
-        with tempfile.TemporaryDirectory() as raw:
-            store = ResearchStore(Path(raw) / "rdp")
-            self._receipt(store, run_id="EARLY")
-            operation = self._operation(store)
-            self._receipt(store, run_id="FOREIGN-MARKET", market_evidence_epoch_sha256="ef" * 32)
-            self._receipt(store, run_id="FOREIGN-SLOT", scientific_slot_sha256="12" * 32)
-            self._receipt(store, run_id="FOREIGN-FOCUS", owner_focus="OTHER_FOCUS")
-            self._receipt(store, run_id="UNBOUND-SESSION")
-            self._receipt(store, run_id="IN-PROGRESS", owner_class="FORGE_RUN_IN_PROGRESS", owner_final=None)
-            lifecycle = operation_lifecycle(store, get_operation(store, operation["operation_sha256"]))
-            self.assertEqual(lifecycle["effective_state"], "OPEN", lifecycle)
-            self.assertEqual(get_operation(store, operation["operation_sha256"])["status"], "OPEN")
+    def test_bound_owner_final_completes_and_each_binding_is_required(self) -> None:
+        basis, gap = self._complete(self._receipt(5))
+        self.assertEqual(gap, "")
+        self.assertEqual(basis["kind"], "RUN_OWNER_FINAL_RECEIPT")
+        self.assertTrue(basis["scientific"])
+        cases = {
+            "foreign market": (self._receipt(5, market_evidence_epoch_sha256="12" * 32), "NO_OWNER_FINAL_RECEIPT"),
+            "foreign slot": (self._receipt(5, scientific_slot_sha256="12" * 32), "NO_OWNER_FINAL_RECEIPT"),
+            "foreign focus": (self._receipt(5, owner_focus="OTHER_FOCUS"), "NO_OWNER_FINAL_RECEIPT"),
+            "before the operation": (self._receipt(-5), "OWNER_FINAL_BEFORE_OPERATION"),
+            "not final": (self._receipt(5, owner_class="FORGE_RUN_IN_PROGRESS", owner_final=None), "LATEST_RECEIPT_NOT_FINAL"),
+            "blocked final word": (self._receipt(5, owner_class="INPUT_NOT_READY", owner_final="INPUT_NOT_READY"), "LATEST_RECEIPT_NOT_FINAL"),
+            "unbound journal": (
+                self._receipt(5, stages=[{"representation_id": "BASE", "session_id": "HFIC-SESS-OTHER"}]),
+                "RECEIPT_JOURNAL_UNBOUND",
+            ),
+            "non-BASE stage only": (
+                self._receipt(5, stages=[{"representation_id": "NORMALIZED_TRAJECTORY_V1", "session_id": self.SESSION}]),
+                "RECEIPT_JOURNAL_UNBOUND",
+            ),
+        }
+        for label, (receipt, expected) in cases.items():
+            with self.subTest(label):
+                basis, gap = self._complete(receipt)
+                self.assertIsNone(basis)
+                self.assertEqual(gap, expected)
+
+    def test_non_scientific_stop_completes_without_a_scientific_claim(self) -> None:
+        basis, _gap = self._complete(self._receipt(5, owner_final="NON_SCIENTIFIC_STOP"))
+        self.assertFalse(basis["scientific"])
+
+    def test_completion_is_monotone(self) -> None:
+        final = self._receipt(5)
+        later = self._receipt(9, owner_class="FORGE_RUN_IN_PROGRESS", owner_final=None)
+        basis, gap = self._complete(final, later)
+        self.assertEqual(gap, "")
+        self.assertEqual(basis["receipt_ref"], final["record_id"])
 
 
 if __name__ == "__main__":

@@ -184,5 +184,6 @@ libraries, live store recovery (phase B, separate scope).
 | R7 | Foreign market/journal/receipt, a non-final receipt or a pre-operation receipt does not complete the operation; A→B→A keeps budget |
 
 Rollback: before live lifecycle records, an ordinary revert. After live
-stop records exist, keep the reader (older code would read `STOPPED` as not
-`OPEN` already); never delete data-plane history.
+stop records exist, forward-fix only (older code treats `STOPPED` as not
+`OPEN` for the gate but does not refuse admission); never delete data-plane
+history.

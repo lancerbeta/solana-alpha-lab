@@ -246,10 +246,23 @@ def _open_operations(store: Any) -> list[dict[str, Any]]:
     return effective_open_operations(store)
 
 
+def _profile_active(store: Any) -> bool:
+    try:
+        return effective_policy(store).get("state") == "ACTIVE"
+    except UniversePolicyError:
+        return False
+
+
 def blocking_operations(store: Any, operations: list[dict[str, Any]] | None = None) -> list[dict[str, Any]]:
+    """Each open operation with its own executable next action (finish/persist or stop)."""
+
     from solana_alpha_lab.factory.hfic_ordinary_operation import describe_blocking_operations
 
-    return describe_blocking_operations(store, _open_operations(store) if operations is None else operations)
+    return describe_blocking_operations(
+        store,
+        _open_operations(store) if operations is None else operations,
+        profile_active=_profile_active(store),
+    )
 
 
 def _deny_pending(store: Any) -> None:
@@ -279,7 +292,7 @@ def status_payload(store: Any) -> dict[str, Any]:
     open_operations = _open_operations(store)
     pending = bool(open_operations)
     next_action = (
-        "FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW"
+        "RESOLVE_BLOCKING_OPERATIONS_THEN_PREVIEW"
         if pending
         else head["next_action"]
     )
@@ -360,7 +373,7 @@ def preview_universe_policy(
         "pending_operation": pending,
         "blocking_operations": blocking_operations(store, open_operations),
         "next_action": (
-            "FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW"
+            "RESOLVE_BLOCKING_OPERATIONS_THEN_PREVIEW"
             if pending
             else "AUTHORIZED_APPLY"
             if proposal["semantic_sha256"] != head.get("semantic_sha256")

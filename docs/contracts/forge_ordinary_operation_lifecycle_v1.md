@@ -23,10 +23,12 @@ proven by the run's own persisted `FORGE_RUN_RECEIPT` and nothing else:
 
 - same focus, market epoch and scientific slot as the operation;
 - recorded at or after the operation was opened;
-- the latest such receipt has `owner_class=OWNER_FINAL` and `owner_final` in
-  `OWNER_CANDIDATE`, `SEARCH_EXHAUSTED_CURRENT_EVIDENCE` or
-  `NON_SCIENTIFIC_STOP`;
+- `owner_class=OWNER_FINAL` and `owner_final` in `OWNER_CANDIDATE`,
+  `SEARCH_EXHAUSTED_CURRENT_EVIDENCE` or `NON_SCIENTIFIC_STOP`;
 - its BASE stage session carries the operation's journal.
+
+The earliest such bound receipt is the proof. Completion is monotone: a later
+in-progress or blocked receipt of the same slot does not reopen the operation.
 
 A focus name, a UI terminal word, a missing process, an older-market
 receipt or an in-progress receipt is not completion. `NON_SCIENTIFIC_STOP`
@@ -54,13 +56,17 @@ operation is `NO_CHANGE`. A `COMPLETED` operation is refused with
 `OPERATION_ALREADY_COMPLETED`; read its saved result instead. No active
 research-universe profile is required.
 
-A stop ends execution. It records no scientific verdict, never creates
+A stop ends this operation's ordinary looks and previews; it does not gate
+forge-run freeze, Critic or `--persist`, and a later scientific owner-final
+receipt of the same slot is not erased by it. It records no scientific verdict, never creates
 `NO_WORTHY` or `SEARCH_EXHAUSTED`, keeps every saved result, and keeps every
 reservation and look spent. An unresolved reservation is listed in the stop
 record as an UNKNOWN attempt, not erased.
 
 After a stop no new look, preview or resume is admitted
-(`ORDINARY_OPERATION_STOPPED`). Saved results still replay, and an explicit
+(`ORDINARY_OPERATION_STOPPED`); the same holds for a `COMPLETED` operation
+(`ORDINARY_OPERATION_COMPLETED`), so no look can land under a later profile
+than the run was frozen with. Saved results still replay, and an explicit
 calculation revision of a saved result stays available. A writer already past
 the last admission check finishes under the profile snapshot it captured; it
 cannot switch to a later profile. Every operation-state append is
@@ -73,8 +79,8 @@ stopped operation back into `OPEN`.
 `blocking_operations`: operation id, focus, requested completion, persisted
 and effective state, completion gap, unresolved reservations and the next
 action (`FINISH_RUN_THEN_PERSIST_OWNER_FINAL_OR_STOP_OPERATION`,
-`RUN_AUTHORIZED_LOOK_OR_STOP_OPERATION` or `STOP_OPERATION` when the bound
-owner-final predates the operation). Apply re-checks the pending state and the
+`RUN_AUTHORIZED_LOOK_OR_STOP_OPERATION` or `STOP_OPERATION` when no profile is active, the receipt is unbound, or the
+bound owner-final predates the operation). Apply re-checks the pending state and the
 policy head under the writer lease.
 
 `universe-policy-preview --decision-point` decides a preview-allowance refusal
@@ -83,6 +89,7 @@ read reports `values_loaded=true`.
 
 ## Rollback
 
-Before any live stop record, an ordinary revert. Afterwards keep a reader: the
-previous code already treats `STOPPED` as not `OPEN`. Never delete data-plane
-history.
+Before any live stop record, an ordinary revert. After a live stop record,
+forward-fix only: the previous code treats `STOPPED` as not `OPEN` for the gate
+but does not refuse admission, so reverting would re-admit looks on stopped
+operations. Never delete data-plane history.

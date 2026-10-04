@@ -1786,10 +1786,17 @@ Preview показывает before/after, `claim_boundary` и `next_action`. С
 
 ### Завершение и остановка ordinary operation
 
-Контракт: `docs/contracts/forge_ordinary_operation_lifecycle_v1.md`. Профиль держат только операции в effective state `OPEN`. `universe-policy-status` и `universe-policy-preview` перечисляют их в `blocking_operations`: id, focus, `completion_gap` и точный `next_action`.
+Контракт: `docs/contracts/forge_ordinary_operation_lifecycle_v1.md`. Профиль держат только операции в effective state `OPEN`. `universe-policy-status`, `universe-policy-preview` и отказ apply перечисляют их в `blocking_operations`: полный id, focus, `completion_gap`, число незавершённых reservations и свой `next_action`. Верхний `next_action=RESOLVE_BLOCKING_OPERATIONS_THEN_PREVIEW` означает: действуйте по строке каждой операции.
 
-- Run уже owner-final, но receipt не сохранён (`forge-run --no-write` показывает `next=PERSIST_OWNER_FINAL`): выполните `forge-run --persist --owner-focus <FOCUS>`. Это идемпотентно; завершение операции выводится из этого receipt, отдельной записи нет.
-- Run не нужен или не может продолжиться: остановите ровно эту операцию. Профиль не требуется.
+Коды строки:
+
+- `FINISH_RUN_THEN_PERSIST_OWNER_FINAL_OR_STOP_OPERATION` — профиль активен, run может дойти до owner-final: завершите его, затем `forge-run --persist --owner-focus <FOCUS>`; либо остановите операцию.
+- `RUN_AUTHORIZED_LOOK_OR_STOP_OPERATION` — то же для `LIMITED_RESULT`.
+- `STOP_OPERATION` — run здесь завершиться не может: профиля нет (новый look без него отказывает), receipt принадлежит другой привязке (`RECEIPT_JOURNAL_UNBOUND`, `OPERATION_TIME_UNKNOWN`) или owner-final записан раньше операции (`OWNER_FINAL_BEFORE_OPERATION`). Остаётся только остановка по id.
+
+Run уже owner-final, но receipt не сохранён (`ordinary_operation.next_action=PERSIST_OWNER_FINAL`, то же в строке `operation:` вывода): `forge-run --persist --owner-focus <FOCUS>`. Это идемпотентно, отдельной записи завершения нет. Завершённая операция больше не принимает новых looks и resume (`ORDINARY_OPERATION_COMPLETED`); сохранённый результат читается.
+
+Остановка конкретной операции не требует профиля. Сохраните stdout preview в `stop.json`:
 
 ```text
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <DATA_ROOT> operation-stop-preview --operation-sha256 <OPERATION_SHA256> --owner-request-text "<текст владельца>" --format json
@@ -1797,4 +1804,4 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-ro
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <DATA_ROOT> universe-policy-status --format json
 ```
 
-Остановка — это конец исполнения, а не научный результат: нет `NO_WORTHY`, нет `SEARCH_EXHAUSTED`, сохранённые результаты и потраченные looks остаются, незавершённая reservation остаётся потраченной (UNKNOWN attempt). После остановки новый look, preview и resume отвечают `ORDINARY_OPERATION_STOPPED`; сохранённый результат по-прежнему читается. Изменившаяся операция — `OPERATION_STOP_PREVIEW_STALE`: повторите preview. Повтор — `NO_CHANGE`. Завершённую операцию остановить нельзя (`OPERATION_ALREADY_COMPLETED`). Не «закрывайте всё OPEN» и не правьте store.
+Остановка — конец исполнения этой операции, а не научный результат: нет `NO_WORTHY`, нет `SEARCH_EXHAUSTED`, сохранённые результаты и потраченные looks остаются, незавершённая reservation остаётся потраченной (UNKNOWN attempt). После остановки новый look, preview и resume отвечают `ORDINARY_OPERATION_STOPPED`; сохранённый результат читается. Дальнейшее исследование — новый запрос владельца. Изменившаяся операция — `OPERATION_STOP_PREVIEW_STALE`: повторите preview. Повтор — `NO_CHANGE`. Завершённую операцию остановить нельзя (`OPERATION_ALREADY_COMPLETED`). Preview coverage с `--decision-point`, отказанный по исчерпанному preview-лимиту открытой операции, возвращает `OWNER_CAP_EXHAUSTED` до чтения значений; остановите эту операцию или сделайте preview без `--decision-point`. Не «закрывайте всё OPEN» и не правьте store.

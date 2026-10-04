@@ -273,6 +273,21 @@ def _refuse_stopped(operation: Mapping[str, Any]) -> None:
         raise OrdinaryOperationError("ORDINARY_OPERATION_STOPPED")
 
 
+def _refuse_closed(store: Any, operation: Mapping[str, Any]) -> None:
+    """No new or resumed evaluation once execution is over.
+
+    A stopped operation and a completed one (its run's owner-final is saved and
+    it no longer holds the research-universe gate) admit only replay of saved
+    results and explicit calculation revisions; otherwise a look could land
+    under a later profile than the one the run was frozen with.
+    """
+
+    _refuse_stopped(operation)
+    if operation.get("status") == STATUS_OPEN and operation.get("requested_completion") == SCIENTIFIC_TERMINAL:
+        if operation_lifecycle(store, operation)["effective_state"] == STATE_COMPLETED:
+            raise OrdinaryOperationError("ORDINARY_OPERATION_COMPLETED")
+
+
 def _looks(store: Any, journal: str) -> list[dict[str, Any]]:
     return list_discovery_looks(store, journal)
 
@@ -679,8 +694,8 @@ def authorize_temporal_attempt(
                 "preview_sha256": owned[-1].get("preview_sha256"),
                 "replayed_without_loader": True,
             }
-        # A stopped operation still replays its saved previews, never a new one.
-        _refuse_stopped(operation)
+        # A stopped or completed operation replays saved previews, never a new one.
+        _refuse_closed(store, operation)
         fingerprint = binding_fingerprint(binding_cohorts)
         stamped = operation.get("corpus_fingerprint")
         if fingerprint and stamped and fingerprint != stamped:
@@ -894,9 +909,9 @@ def gate_before_values(
             "source_result_sha256": source.get("result_sha256"),
             "source_calculation_version": source.get("calculation_version"),
         }
-    # Saved results and owner corrections stay readable after a stop; a new or
-    # resumed evaluation does not start.
-    _refuse_stopped(operation)
+    # Saved results and owner corrections stay readable after a stop or
+    # completion; a new or resumed evaluation does not start.
+    _refuse_closed(store, operation)
     pending = [
         item
         for item in _reservations(store, operation_sha256)
@@ -1019,7 +1034,7 @@ def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look
         current = get_operation(store, digest)
         if any(item.get("spec_sha256") == spec_sha256 for item in _reservations(store, digest)):
             return
-        _refuse_stopped(current)
+        _refuse_closed(store, current)
         if owner_allowance(store, current, look_class) < 1:
             raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
 
@@ -1170,8 +1185,10 @@ def _run_completion(
     """The bound run's owner-final, or the exact reason it is not proven.
 
     Bound means: same focus, market epoch and scientific slot; recorded at or
-    after this operation; the latest such receipt is OWNER_FINAL; and its BASE
-    stage session carries this operation's journal. A name match is not enough.
+    after this operation; OWNER_FINAL; and its BASE stage session carries this
+    operation's journal. A name match is not enough. Completion is monotone:
+    the earliest bound owner-final stays the proof, so a later in-progress or
+    blocked receipt for the same slot cannot reopen the operation.
     """
 
     from solana_alpha_lab.factory.hfic_representation_ladder import (
@@ -1196,39 +1213,46 @@ def _run_completion(
     ]
     if opened_at is None:
         return None, "OPERATION_TIME_UNKNOWN"
-    after = [item for item in same_run if item["recorded_at"] >= opened_at]
-    if not after:
-        earlier_final = any(
+    def _final(item: Mapping[str, Any]) -> bool:
+        return (
             item["body"].get("owner_class") == OWNER_CLASS_FINAL
             and item["body"].get("owner_final") in finals
-            for item in same_run
         )
-        return None, "OWNER_FINAL_BEFORE_OPERATION" if earlier_final else "NO_OWNER_FINAL_RECEIPT"
-    latest = max(after, key=lambda item: item["recorded_at"])
-    body = latest["body"]
-    if body.get("owner_class") != OWNER_CLASS_FINAL or body.get("owner_final") not in finals:
-        return None, "LATEST_RECEIPT_NOT_FINAL"
-    base = [
-        stage
-        for stage in body.get("stages") or []
-        if isinstance(stage, Mapping) and stage.get("representation_id") == "BASE"
-    ]
-    session_id = next(
-        (
-            str(stage.get("session_id"))
-            for stage in base
-            if stage.get("session_id")
-            and journal in session_keys.get(str(stage.get("session_id")), set())
-            and stage.get("scientific_slot_sha256") in (None, slot)
-        ),
-        None,
+
+    def _bound_session(body: Mapping[str, Any]) -> str | None:
+        for stage in body.get("stages") or []:
+            if not isinstance(stage, Mapping) or stage.get("representation_id") != "BASE":
+                continue
+            session_id = str(stage.get("session_id") or "")
+            if (
+                session_id
+                and journal in session_keys.get(session_id, set())
+                and stage.get("scientific_slot_sha256") in (None, slot)
+            ):
+                return session_id
+        return None
+
+    after = sorted(
+        (item for item in same_run if item["recorded_at"] >= opened_at),
+        key=lambda item: item["recorded_at"],
     )
-    if session_id is None:
-        return None, "RECEIPT_JOURNAL_UNBOUND"
+    finals_after = [item for item in after if _final(item)]
+    bound = [(item, _bound_session(item["body"])) for item in finals_after]
+    bound = [(item, session_id) for item, session_id in bound if session_id is not None]
+    if not bound:
+        if finals_after:
+            return None, "RECEIPT_JOURNAL_UNBOUND"
+        if after:
+            return None, "LATEST_RECEIPT_NOT_FINAL"
+        if any(_final(item) for item in same_run):
+            return None, "OWNER_FINAL_BEFORE_OPERATION"
+        return None, "NO_OWNER_FINAL_RECEIPT"
+    proof, session_id = bound[0]
+    body = proof["body"]
     return (
         {
             "kind": "RUN_OWNER_FINAL_RECEIPT",
-            "receipt_ref": latest["record_id"],
+            "receipt_ref": proof["record_id"],
             "receipt_sha256": body.get("receipt_sha256"),
             "run_id": body.get("run_id"),
             "owner_final": body.get("owner_final"),
@@ -1292,11 +1316,22 @@ def _unresolved_reservations(store: Any, operation: Mapping[str, Any]) -> list[s
     )
 
 
-def _blocking_next_action(operation: Mapping[str, Any], lifecycle: Mapping[str, Any]) -> str:
+UNFINISHABLE_GAPS = frozenset({"OWNER_FINAL_BEFORE_OPERATION", "RECEIPT_JOURNAL_UNBOUND", "OPERATION_TIME_UNKNOWN"})
+
+
+def _blocking_next_action(
+    operation: Mapping[str, Any], lifecycle: Mapping[str, Any], *, profile_active: bool
+) -> str:
+    """STOP when the run cannot finish here; otherwise finish-or-stop.
+
+    Without an active profile no new look is admitted, so an open run cannot
+    reach its owner-final; persist cannot bind an unbound or earlier receipt.
+    """
+
+    if not profile_active or lifecycle.get("gap") in UNFINISHABLE_GAPS:
+        return NEXT_STOP
     if operation.get("requested_completion") != SCIENTIFIC_TERMINAL:
         return NEXT_LOOK_OR_STOP
-    if lifecycle.get("gap") == "OWNER_FINAL_BEFORE_OPERATION":
-        return NEXT_STOP
     return NEXT_FINISH_OR_STOP
 
 
@@ -1323,7 +1358,9 @@ def effective_open_operations(store: Any) -> list[dict[str, Any]]:
     return found
 
 
-def describe_blocking_operations(store: Any, operations: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+def describe_blocking_operations(
+    store: Any, operations: Sequence[Mapping[str, Any]], *, profile_active: bool
+) -> list[dict[str, Any]]:
     """Owner-facing rows: which operation, why it blocks, and the exact next command."""
 
     rows = []
@@ -1341,7 +1378,8 @@ def describe_blocking_operations(store: Any, operations: Sequence[Mapping[str, A
                 "market_evidence_epoch_sha256": operation.get("market_evidence_epoch_sha256"),
                 "journal_scope": operation.get("journal_scope"),
                 "unresolved_reservations": len(_unresolved_reservations(store, operation)),
-                "next_action": _blocking_next_action(operation, lifecycle),
+                "preview_allowance": owner_allowance(store, operation, "preview"),
+                "next_action": _blocking_next_action(operation, lifecycle, profile_active=profile_active),
                 "stop_preview": f"operation-stop-preview --operation-sha256 {digest} --owner-request-text <owner text>",
             }
         )
@@ -1486,6 +1524,8 @@ def apply_operation_stop(store: Any, *, proposal: Mapping[str, Any], confirm_app
             raise OrdinaryOperationError("OPERATION_STOP_PREVIEW_STALE")
         if _unresolved_reservations(store, current) != unresolved:
             raise OrdinaryOperationError("OPERATION_STOP_PREVIEW_STALE")
+        if operation_lifecycle(store, current)["effective_state"] == STATE_COMPLETED:
+            raise OrdinaryOperationError("OPERATION_ALREADY_COMPLETED")
 
     _append(store, kind=OPERATION_KIND, body=updated, record_prefix="HFIC-ART-OP", before_commit=_check)
     stored = get_operation(store, digest)
@@ -1514,7 +1554,16 @@ def project_ordinary_operation(
         rows = [item for item in rows if item.get("market_evidence_epoch_sha256") == market_evidence_epoch_sha256]
     if not rows:
         return None
-    current = _latest_recorded(rows)
+    # The newest operation is the one opened last; a later stop row of an older
+    # operation must not hide it.
+    opened: dict[str, str] = {}
+    for item in rows:
+        digest = str(item.get("operation_sha256") or "")
+        stamp = str(item.get("_recorded_at") or "")
+        if digest not in opened or stamp < opened[digest]:
+            opened[digest] = stamp
+    newest = max(opened, key=lambda digest: opened[digest])
+    current = _latest_recorded([item for item in rows if item.get("operation_sha256") == newest])
     current.pop("_recorded_at", None)
     journal = str(current.get("journal_scope") or "")
     looks = _looks(store, journal)
@@ -1595,17 +1644,23 @@ def project_ordinary_operation(
 def operation_readout_line(projection: Mapping[str, Any], owner_focus: object) -> str:
     """One owner line: which operation, its effective state and the exact next step."""
 
-    line = (
-        f"operation: {str(projection.get('operation_sha256') or '')[:16]} "
-        f"state={projection.get('effective_state')} next={projection.get('next_action')}"
-    )
+    digest = str(projection.get("operation_sha256") or "")
+    line = f"operation: {digest} state={projection.get('effective_state')} next={projection.get('next_action')}"
     if projection.get("next_action") == NEXT_PERSIST_OWNER_FINAL:
         line += (
             " — the run is owner-final; record it with forge-run --persist --owner-focus "
             f"{owner_focus or ''}; that releases the operation"
         )
+    elif projection.get("next_action") == NEXT_STOP:
+        line += (
+            " — this run cannot finish here; stop it with operation-stop-preview "
+            f"--operation-sha256 {digest} --owner-request-text <owner text>, then operation-stop"
+        )
     elif projection.get("effective_state") == STATUS_STOPPED:
-        line += " — stopped by the owner; not a scientific result; saved looks stay spent"
+        line += (
+            " — stopped by the owner; not a scientific result; saved looks stay spent; "
+            "more research needs a new owner request"
+        )
     return line
 
 
@@ -1631,20 +1686,26 @@ def merge_ordinary_readout(payload: dict[str, Any], projection: Mapping[str, Any
         proj["next_needs_new_authority"] = False
         proj["search_open"] = False
     elif blocked:
-        proj["next_action"] = str(payload.get("next_action") or "INPUT_NOT_READY")
+        codes = {str(item) for item in payload.get("blocking_reason_codes") or []}
+        if effective == STATUS_OPEN and "UNIVERSE_POLICY_REQUIRED" in codes:
+            # Without a profile this run cannot finish, and the profile cannot be
+            # applied while it is open: the executable step is the owner stop.
+            proj["next_action"] = NEXT_STOP
+        else:
+            proj["next_action"] = str(payload.get("next_action") or "INPUT_NOT_READY")
         proj["next_needs_new_authority"] = False
         proj["search_open"] = False
     elif final in terminals:
         proj["next_action"] = "READ_SAVED_RESULT"
-        if (
-            effective == STATUS_OPEN
-            and proj.get("requested_completion") == SCIENTIFIC_TERMINAL
-            and payload.get("owner_class") == "OWNER_FINAL"
-            and payload.get("market_evidence_epoch_sha256") == proj.get("market_evidence_epoch_sha256")
-            and proj.get("completion_gap") in {"NO_OWNER_FINAL_RECEIPT", "LATEST_RECEIPT_NOT_FINAL"}
-        ):
-            # The run is final but its owner-final receipt is not saved yet.
-            proj["next_action"] = NEXT_PERSIST_OWNER_FINAL
+        if effective == STATUS_OPEN:
+            # The gate still counts this operation; the readback must say how to release it.
+            persistable = (
+                proj.get("requested_completion") == SCIENTIFIC_TERMINAL
+                and payload.get("owner_class") == "OWNER_FINAL"
+                and payload.get("market_evidence_epoch_sha256") == proj.get("market_evidence_epoch_sha256")
+                and proj.get("completion_gap") in {"NO_OWNER_FINAL_RECEIPT", "LATEST_RECEIPT_NOT_FINAL"}
+            )
+            proj["next_action"] = NEXT_PERSIST_OWNER_FINAL if persistable else NEXT_STOP
         proj["next_needs_new_authority"] = False
         proj["search_open"] = False
     elif str(payload.get("next_action") or "").startswith("RESUME_"):
