@@ -70,6 +70,7 @@ context_requirements:
   - DOC-HYPOTHESIS-FORGE-OPERATOR-001
   l2_roles:
   - ARCHITECTURE_DECISIONS
+  - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
@@ -80,7 +81,10 @@ context_requirements:
     - src/solana_alpha_lab/factory/hfic_research_universe_policy.py
     - src/solana_alpha_lab/factory/hfic_representation_ladder.py
     - docs/contracts/forge_research_universe_policy_v1.md
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/forge_ordinary_operation_lifecycle_repair_v1/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/forge_ordinary_operation_lifecycle_repair_v1/a1_delivery_independent_review_v1.json
+    - docs/evidence/forge_ordinary_operation_lifecycle_repair_v1/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

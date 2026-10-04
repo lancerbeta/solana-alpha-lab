@@ -1,0 +1,105 @@
+{
+  "candidate": {
+    "base": "fc3db6cf164d73b1289bda8472c21f3d4e3edea7",
+    "diff_sha256": "da5a0c6f6a1bc3e43c83dda5bb464a47dff6011094f134a9ad4e131d80a35dc8",
+    "head": "60bff45e70c443f9320e44fc3f5676292ecf161e"
+  },
+  "evidence": [
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_ordinary_operation.py",
+      "sha256_or_fingerprint": "b2477d158900a5c5b76228641ba8d8725998fb6e10e4ef49af62501c7a1461d3"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_research_universe_policy.py",
+      "sha256_or_fingerprint": "a03082fd63d98d1f60124b9b07f89d8b06dacd03b8c89f198730cefa137e5c2e"
+    },
+    {
+      "logical_ref": "repo://scripts/hypothesis_forge.py",
+      "sha256_or_fingerprint": "12b4c9efd66f43011ceb30c2a6a0eda140d38d2bc9f70c7f344b195456f18977"
+    },
+    {
+      "logical_ref": "repo://tests/test_forge_ordinary_operation_lifecycle_v1.py",
+      "sha256_or_fingerprint": "8ab516c97baaf272fe74b540b92e144e41ed5c884245d781ea49bf2334340b5d"
+    },
+    {
+      "logical_ref": "repo://docs/contracts/forge_ordinary_operation_lifecycle_v1.md",
+      "sha256_or_fingerprint": "954edb404504be15fb871bb10b08b81c034b850f5d53dd8ed7c546f5537bab2a"
+    }
+  ],
+  "independence": {
+    "claim_scope": "PACKET_INFORMATION_PATH",
+    "context_isolated": true,
+    "implementation_transcript_seen": false,
+    "launch_isolation": "PROCESS_OBLIGATION",
+    "model_diversity": "UNPROVEN",
+    "model_diversity_identity": null,
+    "packet_bound": true,
+    "readonly": true
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NEW_SCIENTIFIC_VERDICT",
+    "NO_QUOTA_RESET",
+    "NO_LIVE_STORE_MUTATION",
+    "NO_PRODUCTION_ACTIVATION",
+    "NO_MERGE",
+    "NO_WALLET_OR_PROVIDER"
+  ],
+  "packet_fingerprint_sha256": "07bfa0bb2a4fd18bb6ec8f8b8adc4effb3165b9657a83639ad00f1cc3759a7d7",
+  "questions": [
+    "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
+    "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
+    "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL",
+    "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE",
+    "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY",
+    "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING",
+    "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER",
+    "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE",
+    "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM",
+    "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS"
+  ],
+  "review": {
+    "architecture_owner": "ARCHITECTURE_CRITIC",
+    "profile": "SEMANTIC_PREMISE",
+    "risk_dimensions": [
+      "UNKNOWN_VS_NEGATIVE_EVIDENCE",
+      "RESEARCH_TRUTH_OWNERSHIP",
+      "EXECUTION_TRUTH_SEMANTICS",
+      "OWNER_AUTHORITY_SEMANTICS",
+      "EVIDENCE_ADMISSIBILITY"
+    ]
+  },
+  "schema": "smial.semantic-premise-review-packet",
+  "schema_version": "1.0",
+  "semantic_claims": [
+    {
+      "claim": "A SCIENTIFIC_TERMINAL operation is COMPLETED only from its own persisted OWNER_FINAL forge-run receipt bound by focus, market, slot, journal and record time",
+      "claim_id": "C1",
+      "scope": "operation_lifecycle"
+    },
+    {
+      "claim": "An owner stop ends execution without a scientific verdict, keeps saved results and keeps reservations and looks spent",
+      "claim_id": "C2",
+      "scope": "operation_stop"
+    },
+    {
+      "claim": "After a stop or completion no new look, preview or resume is admitted while saved results stay replayable",
+      "claim_id": "C3",
+      "scope": "discovery_admission"
+    },
+    {
+      "claim": "Only effectively OPEN operations hold the research-universe gate and apply re-checks it under the writer lease",
+      "claim_id": "C4",
+      "scope": "universe_policy_gate"
+    },
+    {
+      "claim": "A predictable preview-count refusal is decided before market values load and values_loaded reports the fact",
+      "claim_id": "C5",
+      "scope": "universe_preview"
+    }
+  ],
+  "task": {
+    "task_contract_sha256": "81ab8bcc1f25bb4f37bc2862ac1fbd3a476d4add85104b8353ccc5f685886570",
+    "task_id": "FORGE_ORDINARY_OPERATION_LIFECYCLE_REPAIR_V1"
+  }
+}
