@@ -1783,3 +1783,18 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-ro
 ```
 
 Preview показывает before/after, `claim_boundary` и `next_action`. С `--decision-point` он считает PASS/FAIL/UNKNOWN и не читает будущий outcome. Без `--confirm-append-only` apply возвращает `UNIVERSE_POLICY_CONFIRM_REQUIRED` и `next_action=RETRY_APPLY_WITH_CONFIRM_APPEND_ONLY`. Устаревший proposal — `UNIVERSE_POLICY_PREVIEW_STALE` и `next_action=REPEAT_PREVIEW`: повторите preview, не чините файл. `discovery-execute` без профиля отвечает `UNIVERSE_POLICY_REQUIRED` и не открывает operation. Если байты раздела не совпадают с записанным logical hash, тот же execute отвечает `LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE`, `writes: false` и `next_action=RESTORE_PUBLISHED_PARTITION_BYTES_THEN_RETRY_DISCOVERY_EXECUTE`: восстановите байты и повторите execute. Операция при этом не открывается. Уже открытый run — preview и apply возвращают `next_action=FINISH_OPEN_FORGE_OPERATION_THEN_PREVIEW`. Повторите тот же preview только когда `universe-policy-status` показывает `pending_operation=false`. Store не редактировать. Apply при открытом run возвращает `UNIVERSE_POLICY_PENDING_OPERATION`. Повтор тех же значений — `NO_CHANGE`. Смена 5000 на 20000 — те же три команды, без PR. Уже сохранённый result хранит свой semantic hash; replay рецепта не подменяет его текущим профилем. Это настройка популяции, не MAIN и не смена стратегии.
+
+### Завершение и остановка ordinary operation
+
+Контракт: `docs/contracts/forge_ordinary_operation_lifecycle_v1.md`. Профиль держат только операции в effective state `OPEN`. `universe-policy-status` и `universe-policy-preview` перечисляют их в `blocking_operations`: id, focus, `completion_gap` и точный `next_action`.
+
+- Run уже owner-final, но receipt не сохранён (`forge-run --no-write` показывает `next=PERSIST_OWNER_FINAL`): выполните `forge-run --persist --owner-focus <FOCUS>`. Это идемпотентно; завершение операции выводится из этого receipt, отдельной записи нет.
+- Run не нужен или не может продолжиться: остановите ровно эту операцию. Профиль не требуется.
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <DATA_ROOT> operation-stop-preview --operation-sha256 <OPERATION_SHA256> --owner-request-text "<текст владельца>" --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <DATA_ROOT> operation-stop --proposal stop.json --confirm-append-only --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <DATA_ROOT> universe-policy-status --format json
+```
+
+Остановка — это конец исполнения, а не научный результат: нет `NO_WORTHY`, нет `SEARCH_EXHAUSTED`, сохранённые результаты и потраченные looks остаются, незавершённая reservation остаётся потраченной (UNKNOWN attempt). После остановки новый look, preview и resume отвечают `ORDINARY_OPERATION_STOPPED`; сохранённый результат по-прежнему читается. Изменившаяся операция — `OPERATION_STOP_PREVIEW_STALE`: повторите preview. Повтор — `NO_CHANGE`. Завершённую операцию остановить нельзя (`OPERATION_ALREADY_COMPLETED`). Не «закрывайте всё OPEN» и не правьте store.

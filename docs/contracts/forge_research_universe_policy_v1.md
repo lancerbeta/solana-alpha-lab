@@ -20,7 +20,11 @@ search. `FAIL` and `UNKNOWN` stay in the admission denominator.
 
 No active profile, a stale proposal, or a hash mismatch does not drop the
 filter. A new public run stops with `UNIVERSE_POLICY_REQUIRED` or
-`UNIVERSE_POLICY_BINDING_MISMATCH`. An open Forge operation blocks apply.
+`UNIVERSE_POLICY_BINDING_MISMATCH`. An effectively open Forge operation
+blocks apply; the check is repeated under the writer lease. Completed and
+owner-stopped operations do not block. Effective state, completion proof and
+the owner stop belong to `docs/contracts/forge_ordinary_operation_lifecycle_v1.md`.
+A preview-allowance refusal for counts is decided before values are read.
 The same semantic profile applied again is a readback, not a new look and
 not a new quota. A saved recipe replays its own snapshot when the active
 profile later changes.
