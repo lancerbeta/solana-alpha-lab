@@ -11,7 +11,7 @@ population до выбора 24 примеров. Target values в preview не 
 Base: `27366b752cd0fae9683dd50373ea8ff8da5a6f6d`, включая lifecycle #373.
 Task: `docs/tasks/FORGE_COMPOSITE_FEATURE_RECIPES_V1.md`.
 Native acceptance выполнена на implementation commit
-`66abc2bb41db2e7f4cb2704980f74f4aafd0da7b` после owner P1 repair request.
+`86d0351cbdd38649a5efa01b7f6f9314aebef11f` после owner P1 repair request и clock-copy исправления.
 Blueprint V4 — design context; authority — Executor Brief V4, SHA256
 `d3abed94024646c2256199d954e28a1971c7e26c5eeb346890810493f53c92fc`.
 
@@ -47,6 +47,10 @@ pre-decision points и только point_value features, прежние identit
 Совместимость: old point/PRICE/LIQ recipes, scientific hashes и числа остаются
 заморожены, включая их прежнюю обработку conflicting future deliveries.
 Новая RAW query использует dependency-prefix integrity в общем membership owner.
+Declared feature copies сравниваются по source cells и фактической value/lineage
+projection существующего feature owner. Разные bound clocks для elapsed_seconds
+или utc_hour дают DELIVERY_CONFLICT независимо от порядка копий, сохраняя
+decision seat; оба raw holder operators и оба временных feature проверены.
 Это ограничение сохранённой совместимости покрыто public regression и точным
 base-output golden. P2 first-match saved preview и UniversePolicyError propagation
 сознательно оставлены вне NOW; новый repair PR или backlog не создавались.
@@ -58,6 +62,14 @@ Evidence: `docs/evidence/forge_composite_feature_recipes_v1/`:
 - `a1_native_agent_queries_v1.json` — обе авторские query;
 - `a1_native_isolation_v1.json` — реальные inputs/read sets и границы изоляции;
 - delivery completion/review/Factory Fit — точные candidate bindings через Harness.
+
+Slice F выполнена свежим P1 агентом на actual pre-search packet commit
+`66abc2bb41db2e7f4cb2704980f74f4aafd0da7b`; exact input locator/hash
+сохранён в isolation receipt. После clock-copy patch descriptor сверён с actual
+v4/v5 packets и текущим owner; обе query повторно валидированы, skill/operator
+bytes остались неизменны. Fresh v5 Critic использовал только собственный v5 packet.
+
+Все 21 current composite tests и 38 arithmetic/clock-copy/legacy pure checks PASS.
 
 Synthetic machine dumps остаются в игнорируемом `local/`; обязательные key
 numbers, независимые решения и bindings сохранены в Git. Model diversity

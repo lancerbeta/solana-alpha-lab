@@ -7,6 +7,7 @@
     },
     "B": {
       "base_x_n": 48,
+      "bound_clock_copy_integrity": "Declared dependency cells plus actual feature value/lineage projection; delta and return_ratio mixed with elapsed_seconds and utc_hour preserve decision seat, refuse conflicting clock feature, and produce identical MAIN/preview in both copy orders; preview target selector trapped",
       "cohorts": 4,
       "cold_value_loads": 0,
       "counts_seed_independent": true,
@@ -45,15 +46,15 @@
             "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
           }
         ],
-        "context_packet_sha256": "376d63cfd7056fd43a2c0c8ad2c338b9f5907e787604d2305e0f2075dd3fff5f",
+        "context_packet_sha256": "eaaee77e6ff70e01274245f79ec71408ecbe7d3260065ac67962bf7ee896218a",
         "feature_bindings": [],
         "terminal": "GROUNDED",
         "unresolved_requirements": []
       },
       "native_terminal": "KILL_LOW_INFORMATION_VALUE",
       "owner_final": "NON_SCIENTIFIC_STOP",
-      "owner_receipt_sha256": "9e877b9fc91249b54ec00de68e81c5a2ff58abf35a5554a1e55c9bfdc116edcf",
-      "packet_canonical_sha256": "de25b249c3f7eaa438e8eed33ac640932b565f0295aa95779ba8feff33e9950f",
+      "owner_receipt_sha256": "60a995dff678141b82d1dd378d65d28750a09f021341dcfcda8410363cafa017",
+      "packet_canonical_sha256": "fa563940f69d7882757c0140d991b94549d9b04369b713acd4561790f6c0c7a7",
       "path": [
         "public MAIN commit despite reply loss",
         "exact saved grounded readback",
@@ -74,9 +75,9 @@
         "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
       ],
       "required_feature_ids": [],
-      "result_sha256": "1a74de2532ae9c7eff18f984b8cb6b2d7ae58098bfa635c8fc5767b3f51bc95f",
+      "result_sha256": "856153dca9991bd9ca1d4ad195fefe7bf0ac72bf65b8e908937a21d659f06cb6",
       "scientific_acceptance": "NOT_CLAIMED",
-      "session_id": "HFIC-SESS-2E76697FBE8B00CE",
+      "session_id": "HFIC-SESS-C6EB6B38A3D384EC",
       "spec_sha256": "a81a55e0334c5cabd8586ed6ca359d99c2e4c35c404945d606c24e6a4fe19176",
       "unresolved_requirements": [],
       "verdict": "PASS_ENGINEERING_PATH"
@@ -85,7 +86,7 @@
       "cold_inventory_unchanged": true,
       "cold_owner_evaluator_calls": 0,
       "cold_owner_value_loads": 0,
-      "completion_output_sha256": "65467296d77518f74b6292f69c22d7548c487e4c618dae5b4162546d8fc15389",
+      "completion_output_sha256": "36aaba2fb607bea5f6ff0cf4a540ee692e3e50033a66cb5c67a87797516584bc",
       "next_legacy_owner_final": "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
       "operation_state": "COMPLETED",
       "registered_replay_evaluator_calls": 1,
@@ -96,7 +97,7 @@
     "F": {
       "isolation_receipt": "a1_native_isolation_v1.json",
       "native_queries": "a1_native_agent_queries_v1.json",
-      "public_validator": "Fresh isolated packet-only agent queries validated; descriptor matches existing owner; guide/skill hashes exact to execution commit",
+      "public_validator": "Fresh P1 isolated packet-only agent queries validated; historical input commit66abc2 is explicit; current descriptor equals actual v4/v5 packets and guide/skill hashes are unchanged",
       "semantic_gold": "Existing plus Russian holder growth, mixed hypothesis and raw holder availability PASS",
       "verdict": "PASS"
     }
@@ -104,7 +105,7 @@
   "as_of": "2026-10-04",
   "authority_brief_sha256": "d3abed94024646c2256199d954e28a1971c7e26c5eeb346890810493f53c92fc",
   "base": "27366b752cd0fae9683dd50373ea8ff8da5a6f6d",
-  "execution_commit": "66abc2bb41db2e7f4cb2704980f74f4aafd0da7b",
+  "execution_commit": "86d0351cbdd38649a5efa01b7f6f9314aebef11f",
   "generated_sync": {
     "base": "27366b752cd0fae9683dd50373ea8ff8da5a6f6d",
     "budget_expansion": false,
@@ -138,8 +139,14 @@
     {
       "result": "PASS",
       "scope": "current composite module A-E including actual public freeze and next legacy cycle",
-      "seconds": 183.271,
-      "tests": 20
+      "seconds": 176.539,
+      "tests": 21
+    },
+    {
+      "result": "PASS",
+      "scope": "current arithmetic/clock-copy plus legacy temporal and holder-policy pure consumers",
+      "seconds": 2.897,
+      "tests": 38
     },
     {
       "result": "PASS",
@@ -159,6 +166,11 @@
     },
     {
       "result": "PASS",
+      "scope": "legacy draft schema/freeze compatibility",
+      "tests": 3
+    },
+    {
+      "result": "PASS",
       "scope": "saved result revision direct consumer",
       "tests": 1
     },
@@ -167,11 +179,6 @@
       "scope": "semantic operability and Catalog routing",
       "seconds": 13.728,
       "tests": 18
-    },
-    {
-      "result": "PASS",
-      "scope": "legacy v1.1/v1.2 draft-schema/freeze compatibility",
-      "tests": 3
     }
   ],
   "task_id": "FORGE_COMPOSITE_FEATURE_RECIPES_V1"

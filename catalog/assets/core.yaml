@@ -39988,7 +39988,7 @@ records:
   as_of: '2026-10-04'
   truth_owner: FORGE_COMPOSITE_FEATURE_RECIPES_V1
   location: {kind: git_path, logical_uri: 'repo://docs/reports/forge_composite_feature_recipes_v1/a1_owner_readout_v1.md', repository_path: docs/reports/forge_composite_feature_recipes_v1/a1_owner_readout_v1.md}
-  integrity: {kind: sha256, sha256: 16e5b12b4036c76cb7ba5a97f8b7116d0cc1d5638da6d8ec59cf966c8a306e84}
+  integrity: {kind: sha256, sha256: 96d94b26fb669347f799802add2b9b1d2e5aa3a861d39db450b2e1ccb6cbfb35}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
