@@ -34,7 +34,8 @@
   "side_effects": {
     "external_actions": 0,
     "local_writes": 1,
-    "network_calls": 0
+    "network_calls": 0,
+    "scope": "PRODUCT_DOMAIN_EXCLUDING_AUTHORIZED_ROUTINE_GIT_GITHUB_DELIVERY_TRANSPORT"
   },
   "state_change": "RAW_COMPOSITE_RECIPES_FULL_PREFIX_SUPPORT_VERIFIED_SAVED_REPLAY_NATIVE_SYNTHETIC_LIFECYCLE",
   "task_id": "FORGE_COMPOSITE_FEATURE_RECIPES_V1",
@@ -44,12 +45,15 @@
     "independent_review": {
       "path": "docs/evidence/forge_composite_feature_recipes_v1/a1_delivery_independent_review_v1.json",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "verdict": "PENDING"
+      "verdict": "PASS"
     },
     "project_checks": [
       "PASS_DIRECT_CONSUMERS",
       "PASS_NATIVE_SYNTHETIC_LIFECYCLE",
-      "PASS_ACTUAL_PRESEARCH_AGENT_BEHAVIOR"
+      "PASS_ACTUAL_PRESEARCH_AGENT_BEHAVIOR",
+      "PASS_32_RECIPE_AND_LEGACY_TEMPORAL_TESTS_AT_CONTENT_HEAD",
+      "PASS_22_ADMISSION_ARITHMETIC_ORDINARY_OPERATION_TESTS",
+      "PASS_HARNESS_CHECK"
     ],
     "targeted": "PASS_RAW_RECIPES_PUBLIC_VERTICAL_A_F"
   }

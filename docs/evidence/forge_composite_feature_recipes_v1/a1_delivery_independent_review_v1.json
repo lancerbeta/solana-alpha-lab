@@ -6,6 +6,40 @@
     "NO_ALPHA",
     "NO_MERGE"
   ],
+  "remediation_history": [
+    {
+      "finding": "P1: incompatible bound window admitted before reservation/value loading",
+      "observed_head": "08d144f48baec24ffdbf79bdf2f26fab6d4fb834",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "604db7009a2de873ea9d6703554da8f5a3e01da9",
+      "role": "CODE_REVIEWER",
+      "severity": "MAJOR"
+    },
+    {
+      "finding": "P2: failure meanings lacked safe next actions",
+      "observed_head": "08d144f48baec24ffdbf79bdf2f26fab6d4fb834",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "604db7009a2de873ea9d6703554da8f5a3e01da9",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "P3: native pre-search input packet lacked exact logical locator",
+      "observed_head": "08d144f48baec24ffdbf79bdf2f26fab6d4fb834",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "604db7009a2de873ea9d6703554da8f5a3e01da9",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "P2: equal relative target concealed conflicting selected source prices",
+      "observed_head": "12fda667ca0a8c101e7cd6efae782a5997ae1dae",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "604db7009a2de873ea9d6703554da8f5a3e01da9",
+      "role": "ARCHITECTURE_CRITIC",
+      "severity": "MINOR"
+    }
+  ],
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -13,40 +47,44 @@
     "OWNER_UX_CRITIC"
   ],
   "review_id": "FORGE-COMPOSITE-FEATURE-RECIPES-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "f6f54a0fc280389aa2b64846d46a93110ecc2fa7220568ffaa021180fcddb3b3",
+  "reviewed_inventory_sha256": "c4a676bc4f7727578609136bb6370011232b6b78055a2b602636453307e70da9",
   "reviews": [
     {
       "findings": [
-        "PENDING_ISOLATED_FINAL_REVIEW"
+        "Isolated full-content review plus final narrow delta; exact diff and bindings independently checked. P1 closed: fresh bound validation before reservation; saved/correction/pending precedence intact; repeated adversarial MAIN/preview witness has zero reservations; nine admission regression tests and final 22 arithmetic/legacy checks PASS; equal-ratio source-copy conflict is closed without changing legacy output. No remaining actionable finding."
       ],
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     {
       "findings": [
-        "PENDING_ISOLATED_FINAL_REVIEW"
+        "Isolated full-content review plus final narrow delta. A-F engineering evidence, actual descriptor/native query hashes, historical F input, native technical KILL lifecycle and registered numerical replay verified. No remaining outcome/DoD gap; no scientific acceptance or real-data grant."
       ],
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     {
       "findings": [
-        "PENDING_ISOLATED_FINAL_REVIEW"
-      ],
-      "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY"
-    },
-    {
-      "findings": [
-        "PENDING_ISOLATED_FINAL_REVIEW"
+        "Independent read-only owner-UX review; preliminary code context reused, no implementation transcript. P2/P3 closed: safe typed recovery matrix and exact F input locator/history reproducibility. Full JSON, descriptor/native queries and all 24 content bindings verified. Model diversity/cryptographic identity unproven."
       ],
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "packet_fingerprint_sha256=4891b142d6f40cc7e9efcb27c875139cc4fabc70c06312be245d7966c6924a6c",
+        "SEMANTIC_PREMISE PASS. Isolated packet/diff full review plus final delta; exact diff and all content bindings independently checked. PACKET_INFORMATION_PATH / PROCESS_OBLIGATION, diversity UNPROVEN.",
+        "P2 closed: selected lawful reference/exit source cells retained before arithmetic; equal relative targets no longer erase source-copy conflict. Four in-memory adversarial/legacy checks PASS; raw prefix denominators preserved in both delivery orders.",
+        "Default four-tuple/legacy output unchanged; new signature restricted to raw prefix branch. Legacy future-copy dependency remains explicitly limited compatibility; RAW claims cannot be extended to it.",
+        "Tests can pass while confusing equal ratios with source agreement or treating synthetic KILL as science. Both now constrained: native technical KILL is not market negative/reusable scientific evidence/new grant; schema/lifecycle authority unchanged. Immutable events/manifests remain durable truth, DuckDB rebuildable; no new evaluator/platform."
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
     }
   ],
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "task_id": "FORGE_COMPOSITE_FEATURE_RECIPES_V1",
-  "verdict": "NOT_READY"
+  "verdict": "PASS"
 }
