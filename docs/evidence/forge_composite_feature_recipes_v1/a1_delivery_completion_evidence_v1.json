@@ -70,7 +70,7 @@
     "independent_review": {
       "path": "docs/evidence/forge_composite_feature_recipes_v1/a1_delivery_independent_review_v1.json",
       "sha256": "f2763ba029d0b1cf72152b07e5a517bda75acebadfec7663518244a6f894e068",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     "project_checks": [
       "PASS_21_CURRENT_COMPOSITE_MODULE_A_E",
@@ -82,7 +82,8 @@
       "PASS_SAVED_RESULT_REVISION",
       "PASS_18_SEMANTIC_CATALOG",
       "PASS_FRESH_NATIVE_SCIENTIFIC_LIFECYCLE",
-      "PASS_FRESH_PRESEARCH_PACKET_AGENT"
+      "PASS_FRESH_PRESEARCH_PACKET_AGENT",
+      "PASS_NATIVE_VERDICT_PRODUCER_ARCHIVE_CANONICAL_SERIALIZATION_PROVENANCE"
     ],
     "targeted": "PASS_RAW_RECIPES_PUBLIC_VERTICAL_A_F"
   }
