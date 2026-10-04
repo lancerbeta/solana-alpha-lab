@@ -161,6 +161,22 @@ class CutoverRepairLoopTests(unittest.TestCase):
         self.assertEqual(json.loads(events[0].payload_json)["state"], "COMPLETE")
 
     def test_missing_or_uncommitted_proof_never_mutates(self):
+        # Keep the entire mutable tuple valid, but remove the named commit
+        # marker in this temporary fixture. The orphan Parquet is not proof.
+        research = ResearchStore(self.data, create_if_missing=False)
+        manifest = research._existing_transaction("RESEARCH-TXN-" + self.row()["last_transition_event_id"].upper())
+        self.assertIsNotNone(manifest)
+        marker = self.data / "research/manifests/partitions" / (manifest.partition_manifest_id + ".json")
+        saved_marker = marker.read_bytes()
+        marker.unlink()
+        try:
+            before = self.row()
+            self.assertEqual(self.complete(self.cutover)["terminal"], "DRAINING_PROOF_UNKNOWN")
+            self.assertEqual(self.row(), before)
+            self.assertFalse(any(json.loads(r.payload_json).get("state") == "COMPLETE"
+                                 for r in research.iter_committed_records()))
+        finally:
+            marker.write_bytes(saved_marker)
         # Corrupt only the temporary mutable projection: this event is absent
         # from the immutable store, even though the raw row claims DRAINING.
         self.store._conn.execute("UPDATE schedule_activations SET last_transition_event_id=? WHERE activation_id=?",
