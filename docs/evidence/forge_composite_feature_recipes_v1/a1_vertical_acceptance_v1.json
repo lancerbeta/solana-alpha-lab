@@ -113,11 +113,27 @@
     "idempotency": "PASS_IMPACTED_CLOSURE_NOOP",
     "mode": "INCREMENTAL"
   },
+  "integration_remediation": {
+    "effect": "Only schedule protocol refusal transport restored and optional-export NO_CHANGE bookkeeping added; valid compute, recipe, population, grounding and budgets unchanged",
+    "failed_ci_head": "34412fd9d078afdfec0ed861b749f8e544ffdbeb",
+    "failed_ci_run": 37225705710,
+    "failures": [
+      "Legacy SCHEDULE_LATENESS_MISMATCH protocol stderr transport",
+      "Legacy SCHEDULE_CONTEXT_UNBOUND protocol stderr transport",
+      "SOURCE_DISPOSITION_REQUIRED for acceptance receipt"
+    ],
+    "log_logical_ref": "local/forge_composite_final_review/p1-ci-integration-checks.log",
+    "log_sha256": "0a618b4a09389ba84f77c8431074ce6fa963c6208756a76e97dadee67c3d7bac",
+    "source_fix_commit": "71c017e75eb6c6ae362721e0383379ebbb10a7e3",
+    "targeted_result": "PASS",
+    "targeted_seconds": 328.233,
+    "targeted_tests": 36
+  },
   "limits": [
     "Synthetic evidence is not alpha/market negative/net return/PIT_READY/real-science grant",
     "Legacy point/PRICE/LIQ preview projection and scientific identities/populations stay frozen",
     "GROUNDED proves binding only; native scientific terminal retains existing lifecycle meaning; spent quota is not refunded",
-    "No merge; new exact-head CI and owner phrase required"
+    "One delegated guarded merge only after new exact-head CI and freshly bound machine phrase, then exact main/post-merge CI readback"
   ],
   "owner_repair_request_sha256": "f11e73d8f21ccdf50c228bae81ba8d5373549ad65f2c5f9d39cb36287b53a2fd",
   "project_sources_disposition": {
@@ -183,6 +199,13 @@
       "scope": "semantic operability and Catalog routing",
       "seconds": 13.728,
       "tests": 18
+    },
+    {
+      "execution_commit": "71c017e75eb6c6ae362721e0383379ebbb10a7e3",
+      "result": "PASS",
+      "scope": "current complete composite module plus both CI-failing legacy public owner paths and Project Sources registry bookkeeping",
+      "seconds": 328.233,
+      "tests": 36
     }
   ],
   "task_id": "FORGE_COMPOSITE_FEATURE_RECIPES_V1"

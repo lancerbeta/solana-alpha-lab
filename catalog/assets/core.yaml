@@ -39930,7 +39930,7 @@ records:
   as_of: '2026-10-04'
   truth_owner: FORGE_COMPOSITE_FEATURE_RECIPES_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FORGE_COMPOSITE_FEATURE_RECIPES_V1.md', repository_path: docs/tasks/FORGE_COMPOSITE_FEATURE_RECIPES_V1.md}
-  integrity: {kind: sha256, sha256: 95702f2d75388ac2b6efa6079031fdcdb12118ea83656603617d1ff14d0229a4}
+  integrity: {kind: sha256, sha256: 86334b4032f21d43788549e317b9325175df0355f397aa150c25ee9beaa6b775}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -39988,7 +39988,7 @@ records:
   as_of: '2026-10-04'
   truth_owner: FORGE_COMPOSITE_FEATURE_RECIPES_V1
   location: {kind: git_path, logical_uri: 'repo://docs/reports/forge_composite_feature_recipes_v1/a1_owner_readout_v1.md', repository_path: docs/reports/forge_composite_feature_recipes_v1/a1_owner_readout_v1.md}
-  integrity: {kind: sha256, sha256: 96d94b26fb669347f799802add2b9b1d2e5aa3a861d39db450b2e1ccb6cbfb35}
+  integrity: {kind: sha256, sha256: 2695c869f4ccc7a127f398008afe9df7497c156abc4dffe926f60ff7f1d4b24d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}

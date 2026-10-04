@@ -99,8 +99,12 @@ persisted support; fresh-query dominance guard; pre-search descriptor; A–F.
 Consumer: ordinary Forge agent and operator. Cheapest falsifier: reject raw
 holder syntax on the existing validator, then compare outcome-free membership
 with evaluator decision eligibility while changing only future target cells.
-STOP: exact-head CI and machine ready_for_owner_phrase=true, or one evidenced
-material blocker requiring a different scientific contract.
+STOP: verified guarded merge and exact default-branch/post-merge CI readback,
+or one evidenced material blocker requiring a different scientific contract.
+Owner direct authorization on 2026-10-04 delegates use of the exact freshly
+rendered machine owner phrase for PR #375 after new exact-head CI PASS and
+ready_for_owner_phrase=true. Keep the phrase/head/PR binding and guarded merge;
+no second owner pause is required for that one ordinary merge.
 NEXT: separate owner decision on real holder-dynamics science; no auto MAIN.
 REPLAN_TRIGGER: necessary legacy identity/population/estimand/budget change,
 impossible falsifier, repeated material blocker or another evaluator/service.

@@ -90,6 +90,15 @@ support/precision; стоимость и риск — новые scientific expo
 явная science authority активирует этот шаг. Tool radar NOW: NONE; существующие
 owners и CLI достаточны. Следующий engineering NOW или EWM не предлагаются.
 
-Delivery stop: exact-head CI PASS и machine `ready_for_owner_phrase=true`.
-Merge выполняется только после отдельной точной owner phrase, затем обязательный
-post-merge readback. Этот readout сам не утверждает CI, merge или canonical DONE.
+CI integration: schedule binding refusals сохраняют исторические stderr codes
+даже при ранней pre-value/pre-reservation проверке. Legacy optional-export
+bookkeeping получает NO_CHANGE без release/activation/smoke. После фикса
+`71c017e75eb6c6ae362721e0383379ebbb10a7e3` прошли 36 targeted checks: весь
+composite module, оба CI-failing public owner paths и registry bookkeeping.
+Native Critic сохраняет фактический execution commit86; valid calculator и
+scientific binding не изменились от CLI refusal transport repair.
+
+Owner прямо разрешил 2026-10-04 для PR #375 после нового exact-head CI PASS и
+`ready_for_owner_phrase=true` самому подставить свежую machine phrase в guarded
+merge. Затем обязательны exact main и post-merge CI readback; это текущий stop.
+Этот readout сам не утверждает CI, merge или canonical DONE.
