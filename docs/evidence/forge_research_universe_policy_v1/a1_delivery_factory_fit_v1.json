@@ -4,8 +4,8 @@
   "review_id": "FORGE-RESEARCH-UNIVERSE-POLICY-FACTORY-FIT-001",
   "as_of": "2026-10-04",
   "task_id": "FORGE_RESEARCH_UNIVERSE_POLICY_V1",
-  "reviewed_bindings_sha256": "866fb56e490ce5675176e5224121660dd9362fdcd7d9f48c82b4a7838a55762f",
-  "reviewed_inventory_sha256": "432940be3fe113a44b9eb4f346f35b368b33936ef486b18846ef83fa7bee9b8d",
+  "reviewed_bindings_sha256": "8b70e50b6816d3844c038d5b3fe492f1f84798b4f3c49fa2cbf8f000a1e685b1",
+  "reviewed_inventory_sha256": "7c3bf615e172f29e4a2c18371233ac7b5efccb3587586226d41afa161b16d56d",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
