@@ -3,20 +3,20 @@
   "schema_version": "1.0",
   "task_id": "OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1",
   "as_of": "2026-10-05",
-  "measured_at_head": "c5ef3a7a648c78bfc923f7d4514fa31db0d5547e",
+  "measured_at_head": "8a72ebcbe3dafa1112e0014a21a422135488278a",
   "evidence_class": "SYNTHETIC_LOCAL_WORKSTATION",
   "reproduce": "OEP_VERTICAL_WORK=<empty-scratch-dir> uv run --locked --managed-python python -B -m unittest tests.test_opportunity_episodes_vertical_v1",
   "report_sha256": {
-    "p1": "392d16c64046116c8c6bf219d591e44f590302129f29d07ff3b1cbd2c30af28b",
-    "p2": "ee808c312cc798d1a163b4d07a874a3654be0ce676efe46982ef53800709ba49",
-    "p3": "e5a1b76b770ef8612934bba5fbd312b00727d72ed81f84661c2d4b418e1b11c4"
+    "p1": "86903358f5ca88ad19a15feb3c39f3cfe9fadd71e7448b1aefde9d4b6eb37467",
+    "p2": "5264dc2d6954facbc0fab0b4ddb4bfa582f7b9d16df9e1bf492cddbe96a59b58",
+    "p3": "956db08b2d4d67a585cba5e85120c72fa486fabf70bec981469140a1ce420ebb"
   },
   "processes": {
     "P1_capture_host": {
       "entry": "scripts/observation_schedule.py::main tick --once with TickPhysicalOverrides",
-      "ticks": 112,
+      "ticks": 121,
       "tick_terminals": {
-        "TICK_COMPLETE": 112
+        "TICK_COMPLETE": 121
       },
       "admissions": 25,
       "cohorts": [
@@ -25,9 +25,9 @@
         "REL-20261012T000000Z-20261013T000000Z"
       ],
       "slot_states": {
-        "CENSORED": 2565,
-        "DISAPPEARED": 10,
-        "OBSERVED": 875
+        "CENSORED": 2516,
+        "DISAPPEARED": 11,
+        "OBSERVED": 923
       },
       "activation_state": "COMPLETE",
       "outbox_after_complete": {
@@ -36,18 +36,18 @@
         "unpublished": 0
       },
       "capture_packets": 3,
-      "wall_seconds": 158.88,
-      "tick_wall_mean_seconds": 1.379,
-      "peak_rss_bytes": 120582144,
+      "wall_seconds": 181.19,
+      "tick_wall_mean_seconds": 1.466,
+      "peak_rss_bytes": 119287808,
       "storage_bytes": {
-        "export_bytes": 115849,
-        "manifest_bytes": 295138,
-        "ops_sqlite_bytes": 8224768,
+        "export_bytes": 122717,
+        "manifest_bytes": 318849,
+        "ops_sqlite_bytes": 8306688,
         "ops_wal_bytes": 0,
-        "publication_parquet_bytes": 4041571,
-        "raw_plane_bytes": 250810,
-        "rdp_total_bytes": 15146221,
-        "research_store_bytes": 2100292
+        "publication_parquet_bytes": 4348025,
+        "raw_plane_bytes": 284992,
+        "rdp_total_bytes": 15772636,
+        "research_store_bytes": 2264135
       }
     },
     "P2_workstation": {
@@ -78,44 +78,64 @@
         ],
         [
           "IMPORTED",
-          260
+          261
         ]
       ],
       "population_card_first": {
         "admissions_n": 12,
         "cohorts": [
           {
+            "admission_window_utc": {
+              "end_exclusive": "2026-10-09T00:00:00Z",
+              "start": "2026-10-08T00:00:00Z"
+            },
             "admissions_n": 12,
             "cohort_id": "REL-20261008T000000Z-20261009T000000Z",
-            "release_id": "d5cdf32454ebf88c411267362006f40d007bee502aeac5caf1b2ef804ecd425b"
+            "release_id": "fe8d52d13cce7499ebe4469260597f3ea0a4776bca879a804125afedccf78bed"
           }
         ],
+        "denominator_explanation": "every committed admission counts; a value that was not observed is an explicit gap state, never zero, and never removes the episode from the base",
         "distinct_mint_n": 12,
         "episodes_n": 12,
-        "repeated_mint_n": 0
+        "repeated_mint_n": 0,
+        "selection_explanation": "Jupiter category nominations are read every round; a mint is admitted only when every registered source answered, its protection decision is ALLOW and its deterministic weekly ticket wins within the round, day and active quotas"
       },
       "population_card_next": {
         "admissions_n": 25,
         "cohorts": [
           {
+            "admission_window_utc": {
+              "end_exclusive": "2026-10-09T00:00:00Z",
+              "start": "2026-10-08T00:00:00Z"
+            },
             "admissions_n": 12,
             "cohort_id": "REL-20261008T000000Z-20261009T000000Z",
-            "release_id": "d5cdf32454ebf88c411267362006f40d007bee502aeac5caf1b2ef804ecd425b"
+            "release_id": "fe8d52d13cce7499ebe4469260597f3ea0a4776bca879a804125afedccf78bed"
           },
           {
+            "admission_window_utc": {
+              "end_exclusive": "2026-10-12T00:00:00Z",
+              "start": "2026-10-11T00:00:00Z"
+            },
             "admissions_n": 1,
             "cohort_id": "REL-20261011T000000Z-20261012T000000Z",
-            "release_id": "b5b41bea24e68aa05aaea5aecea769de1031fc9890f0a10addbafa0bafa09871"
+            "release_id": "16d5ed3f6c4475d4297c5c1d301c85e2a7e36212585f502e3788d5795e839078"
           },
           {
+            "admission_window_utc": {
+              "end_exclusive": "2026-10-13T00:00:00Z",
+              "start": "2026-10-12T00:00:00Z"
+            },
             "admissions_n": 12,
             "cohort_id": "REL-20261012T000000Z-20261013T000000Z",
-            "release_id": "f0010da8aadad68e30eeae37ea081f5f32868d489a00130dc2275e95f4d55a18"
+            "release_id": "eea6f29ad123bbfb8e06d15f298787918523da753aab5cb64336c8f8ef86e67e"
           }
         ],
+        "denominator_explanation": "every committed admission counts; a value that was not observed is an explicit gap state, never zero, and never removes the episode from the base",
         "distinct_mint_n": 24,
         "episodes_n": 25,
-        "repeated_mint_n": 1
+        "repeated_mint_n": 1,
+        "selection_explanation": "Jupiter category nominations are read every round; a mint is admitted only when every registered source answered, its protection decision is ALLOW and its deterministic weekly ticket wins within the round, day and active quotas"
       },
       "run1": {
         "episode_counts": {
@@ -145,20 +165,36 @@
           "main": 0
         }
       },
-      "controlled_null": {
-        "baseline_mean_target": 0.018181818181818257,
+      "controlled_null_exit_e21600": {
+        "baseline_mean_target": 0.025000000000000078,
         "episode_counts": {
           "n_admitted": 12,
           "n_decision_eligible": 12,
           "n_joint_feature_supported": 12,
           "n_matched": 12,
-          "n_target_available": 11,
+          "n_target_available": 12,
           "repeated_mint_n": 0,
           "unique_episode_n": 12,
           "unique_mint_n": 12
         },
         "exit": 0,
-        "mean_target": 0.018181818181818257
+        "mean_target": 0.025000000000000078
+      },
+      "target_attrition_run1": {
+        "adjustment": "NONE_REPORTED_ONLY",
+        "decision_baseline": {
+          "SNAPSHOT_OCCURRENCE_UNBOUND": 1
+        },
+        "matched": {
+          "SNAPSHOT_OCCURRENCE_UNBOUND": 1
+        }
+      },
+      "preflight_without_policy": {
+        "action": "START_NEW_SESSION",
+        "exit": 0,
+        "next_action": null,
+        "terminal": "NO_GIT_FAST_LANE_PROVEN",
+        "universe_policy_state": "ABSENT"
       },
       "lifecycle": {
         "grounding": "GROUNDED",
@@ -190,29 +226,30 @@
         }
       },
       "consume_wall_seconds": [
-        3.92,
-        2.69,
-        4.32
+        4.14,
+        2.78,
+        4.35
       ],
-      "wall_seconds": 84.92,
-      "peak_rss_bytes": 488747008,
+      "wall_seconds": 91.05,
+      "peak_rss_bytes": 510267392,
       "storage_bytes": {
-        "episode_corpus_bytes": 455237,
-        "mirror_bytes": 5036282,
-        "plane_total_bytes": 5301221,
-        "sealed_release_bytes": 449597
+        "episode_corpus_bytes": 496034,
+        "mirror_bytes": 5433334,
+        "plane_total_bytes": 5367632,
+        "sealed_release_bytes": 489884
       }
     },
     "P3_cold_relocated": {
       "original_roots_probe": "BLOCKED",
       "blocked_events_during_cold": [],
       "verified_releases": 3,
+      "e259200_observed_episodes_in_cold_corpus": 4,
       "saved_readback_current": {
         "blocking_reason_codes": [
           "START_BASE"
         ],
         "exit": 0,
-        "market_evidence_epoch_sha256": "ab08201112e5a6236051391a01332dc45d25a948fdbee4b2653010cec9605ab6",
+        "market_evidence_epoch_sha256": "72926bbcacbe34841371d65b701e2e2a48ad0d6d5cce3b50aad654183c215b4e",
         "owner_class": "FORGE_RUN_IN_PROGRESS",
         "owner_final": "OPERATION_PAUSED_SEARCH_OPEN",
         "store_unchanged": true
@@ -222,11 +259,12 @@
           "START_BASE"
         ],
         "exit": 0,
-        "market_evidence_epoch_sha256": "ab08201112e5a6236051391a01332dc45d25a948fdbee4b2653010cec9605ab6",
+        "market_evidence_epoch_sha256": "72926bbcacbe34841371d65b701e2e2a48ad0d6d5cce3b50aad654183c215b4e",
         "owner_class": "FORGE_RUN_IN_PROGRESS",
         "owner_final": null
       },
       "numerical_replay": {
+        "baseline_mean_target": 0.018181818181818257,
         "equal_to_saved": true,
         "evaluator_calls": 1,
         "summary": {
@@ -245,8 +283,8 @@
           "observed_target_n": 5
         }
       },
-      "wall_seconds": 10.06,
-      "peak_rss_bytes": 266461184
+      "wall_seconds": 10.76,
+      "peak_rss_bytes": 277032960
     }
   },
   "independent_oracle": {
@@ -271,16 +309,16 @@
       "unique_mint": 24,
       "repeated_mint": 1
     },
-    "null_expected": "matched == decision baseline exactly",
+    "null_expected": "exit E21600, all 12 matched and observed: (6*0.10 + 6*(0.931/0.98 - 1))/12 = 0.025 == decision baseline",
     "derived_without": "production resolver, selector or evaluator"
   },
   "resource_model": {
     "basis": "measured synthetic run on a Windows workstation; template profile 100 admissions/day, 138 obligations/episode, 672 modeled calls/day; MODEL, not a host envelope",
     "per_unit": {
-      "ops_sqlite_bytes_per_obligation": 2384.0,
-      "publication_parquet_bytes_per_obligation": 1171.5,
-      "workstation_corpus_bytes_per_admission": 18209.5,
-      "workstation_mirror_bytes_per_admission": 201451.3
+      "ops_sqlite_bytes_per_obligation": 2407.7,
+      "publication_parquet_bytes_per_obligation": 1260.3,
+      "workstation_corpus_bytes_per_admission": 19841.4,
+      "workstation_mirror_bytes_per_admission": 217333.4
     },
     "projections": [
       {
@@ -288,30 +326,30 @@
         "admissions": 3000,
         "obligations": 414000,
         "provider_calls_modeled": 20160,
-        "ops_sqlite_bytes_model": 986972160,
-        "publication_parquet_bytes_model": 484988520,
-        "workstation_corpus_bytes_model": 54628440,
-        "workstation_mirror_bytes_model": 604353840
+        "ops_sqlite_bytes_model": 996802560,
+        "publication_parquet_bytes_model": 521762999,
+        "workstation_corpus_bytes_model": 59524080,
+        "workstation_mirror_bytes_model": 652000080
       },
       {
         "days": 97,
         "admissions": 9700,
         "obligations": 1338600,
         "provider_calls_modeled": 65184,
-        "ops_sqlite_bytes_model": 3191209984,
-        "publication_parquet_bytes_model": 1568129548,
-        "workstation_corpus_bytes_model": 176631956,
-        "workstation_mirror_bytes_model": 1954077416
+        "ops_sqlite_bytes_model": 3222994944,
+        "publication_parquet_bytes_model": 1687033699,
+        "workstation_corpus_bytes_model": 192461192,
+        "workstation_mirror_bytes_model": 2108133591
       },
       {
         "days": 365,
         "admissions": 36500,
         "obligations": 5037000,
         "provider_calls_modeled": 245280,
-        "ops_sqlite_bytes_model": 12008161280,
-        "publication_parquet_bytes_model": 5900693660,
-        "workstation_corpus_bytes_model": 664646020,
-        "workstation_mirror_bytes_model": 7352971720
+        "ops_sqlite_bytes_model": 12127764480,
+        "publication_parquet_bytes_model": 6348116499,
+        "workstation_corpus_bytes_model": 724209640,
+        "workstation_mirror_bytes_model": 7932667639
       }
     ],
     "tick_cost_growth": {
