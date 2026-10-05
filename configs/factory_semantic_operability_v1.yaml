@@ -272,7 +272,7 @@ routes:
       - NOMINATION_T0
     consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, FACTORY-001]
     root_binding_ids: [ACTIVE-LIVE-LIFECYCLE-EVIDENCE]
-    root_asset_ids: [MODULE-LIVE-COHORT-TO-FORGE-001, DOC-OPPORTUNITY-EPISODES-OPERATOR-001, DOC-OPPORTUNITY-EPISODES-CONTRACT-001]
+    root_asset_ids: [MODULE-LIVE-COHORT-TO-FORGE-001]
     query_recipe_ids: []
     status_plane: MIXED
     runtime_resolution: {mode: NONE, operator_asset_ids: []}

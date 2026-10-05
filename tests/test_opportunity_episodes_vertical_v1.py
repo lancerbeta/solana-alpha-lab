@@ -313,6 +313,36 @@ def vertical_spec(query_id: str) -> dict[str, Any]:
     }
 
 
+def null_spec(query_id: str) -> dict[str, Any]:
+    """Controlled null: every admission passes, so matched must equal the baseline."""
+
+    spec = vertical_spec(query_id)
+    spec["all"] = [
+        {"feature": "liq", "op": "lte", "value": 1000000},
+        {"feature": "elapsed", "op": "gt", "value": 0},
+    ]
+    return spec
+
+
+def _tampered_release_refused(mirror: Path, scratch: Path) -> dict[str, Any]:
+    from solana_alpha_lab.factory.live_cohort_discovery_release import verify_live_cohort
+
+    releases = sorted(path.parent for path in (mirror / "sealed_releases").rglob("release_manifest.json"))
+    copy = scratch / "tampered-release"
+    shutil.copytree(releases[0], copy)
+    target = sorted(path for path in copy.rglob("*.parquet"))[0]
+    data = bytearray(target.read_bytes())
+    data[len(data) // 2] ^= 0x01
+    target.write_bytes(bytes(data))
+    try:
+        verify_live_cohort(copy)
+    except Exception as exc:  # the refusal code is the evidence
+        return {"refused": True, "code": str(exc).split(":")[0][:80]}
+    finally:
+        shutil.rmtree(copy, ignore_errors=True)
+    return {"refused": False, "code": None}
+
+
 def _import_legacy(plane: Path, scratch: Path) -> dict[str, Any]:
     from solana_alpha_lab.factory.live_cohort_discovery_release import (
         cohort_id_for_admission,
@@ -350,6 +380,39 @@ def _consume(packets: list[str], *, source: Path, mirror: Path, plane: Path) -> 
     return payload
 
 
+def _consume_torn(packet: str, *, source: Path, mirror: Path, plane: Path) -> dict[str, Any]:
+    """Same consume entry in-process; the process dies after labels, before lineage moves."""
+
+    from unittest import mock
+
+    import scripts.discovery_evidence_release as release_cli
+    from solana_alpha_lab.factory import opportunity_episode_release as release
+
+    real = release._publish_bytes
+
+    def crash_on_marker(path, data):
+        if str(path).endswith(".published"):
+            raise KeyboardInterrupt("SIMULATED_PROCESS_DEATH_BEFORE_LINEAGE")
+        return real(path, data)
+
+    argv = ["unpack-next-live-cohort", "--collection", "OPPORTUNITY_EPISODES", "--max-cohorts", "1",
+            "--source-rdp", str(source), "--mirror-rdp", str(mirror), "--data-root", str(plane),
+            "--as-of", AS_OF.strftime("%Y-%m-%dT%H:%M:%SZ"), "--release-builder-git-sha", "b" * 40, "--capture-packet", packet]
+    lineage = plane / "datasets" / "opportunity_episodes_corpus" / "lineage.json"
+    before = lineage.read_bytes()
+    died = False
+    # The command normally re-runs itself as a resource-limited worker; this
+    # process plays that worker so the injected death lands inside the import.
+    with mock.patch.dict(os.environ, {release_cli.SOURCE_BUILD_WORKER_ENV: "1"}), \
+            mock.patch.object(release_cli, "apply_source_build_address_limit", lambda: None), \
+            mock.patch.object(release, "_publish_bytes", side_effect=crash_on_marker), contextlib.redirect_stdout(io.StringIO()):
+        try:
+            release_cli.main(argv)
+        except KeyboardInterrupt:
+            died = True
+    return {"died": died, "lineage_unchanged": lineage.read_bytes() == before}
+
+
 def phase_p2(work: Path) -> dict[str, Any]:
     from solana_alpha_lab.factory import hfic_temporal_discovery as temporal
     from solana_alpha_lab.factory.hfic_research_universe_policy import apply_universe_policy, preview_universe_policy
@@ -369,6 +432,7 @@ def phase_p2(work: Path) -> dict[str, Any]:
     report["consume_first"] = first
     replay_import = _consume(packets[:1], source=source, mirror=mirror, plane=plane)
     report["consume_repeat"] = replay_import
+    report["tampered_release"] = _tampered_release_refused(mirror, p2)
     store = ResearchStore(plane)
     proposal = preview_universe_policy(store, min_holders=50, min_liquidity_usd=5000)["proposal"]
     apply_universe_policy(store, repo_root=ROOT, proposal=proposal, confirm_append_only=True)
@@ -438,7 +502,25 @@ def phase_p2(work: Path) -> dict[str, Any]:
     report["finalize"] = {"session_state": finished.get("session_state"), "terminal": finished.get("final_session_terminal")}
     owner = _forge_call("forge-run", "--owner-focus", pre["owner_focus"], "--persist", data_root=plane)
     report["forge_run_owner"] = (owner.get("ordinary_operation") or {}).get("effective_state")
+    # D8 controlled null on the same evidence, separate focus and journal.
+    pre_null = _forge_call("preflight", "--discovery-contract", "--collection", "OPPORTUNITY_EPISODES", "--owner-focus", "VERTICAL_SYNTH_NULL", data_root=plane)
+    spec_null = null_spec("VERTICAL-NULL-1")
+    scope_null = dict(scope, target=temporal.temporal_target_label(spec_null), explanatory_condition="liquidity")
+    operation_null = _operation(spec_null, focus=pre_null["owner_focus"], journal=pre_null["search_key_sha256"], market=pre_null["market_evidence_epoch_sha256"],
+                                text="Synthetic vertical controlled null", cap={"main": 1, "adaptive": 0, "preview": 1}, completion="LIMITED_RESULT")
+    evidence_null = _discovery(plane, p2, tag="null", spec=spec_null, scope=scope_null, operation=operation_null)
+    null_result = evidence_null.get("result") or {}
+    report["null"] = {"exit": evidence_null["_exit_code"], "episode_counts": null_result.get("episode_counts"),
+                      "mean_target": null_result.get("mean_target"), "baseline_mean_target": (null_result.get("baseline") or {}).get("mean_target")}
     (p2 / "run1-evidence.json").write_text(json.dumps(evidence), encoding="utf-8")
+    # D5 import crash: a torn import leaves lineage on the old version and the
+    # Forge input fails closed; the ordinary repeat of the same command repairs it.
+    report["torn_import"] = _consume_torn(packets[1], source=source, mirror=mirror, plane=plane)
+    torn_pre = run_cli("preflight", "--discovery-contract", "--collection", "OPPORTUNITY_EPISODES",
+                       "--owner-focus", "VERTICAL_SYNTH_FOCUS_TORN", "--format", "json", data_root=plane)
+    torn_body = json.loads(torn_pre.stdout.strip().splitlines()[-1]) if torn_pre.stdout.strip() else {}
+    report["torn_import"]["preflight_exit"] = torn_pre.returncode
+    report["torn_import"]["preflight_terminal"] = torn_body.get("terminal")
     # Next run: two more cohorts (tiny incomplete + next cycle) via the same command.
     report["consume_next"] = _consume(packets[1:], source=source, mirror=mirror, plane=plane)
     pre2 = _forge_call("preflight", "--discovery-contract", "--collection", "OPPORTUNITY_EPISODES", "--owner-focus", "VERTICAL_SYNTH_FOCUS_NEXT", data_root=plane)
@@ -597,6 +679,12 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         self.assertEqual(p2["consume_first"]["result"]["cohorts"][0]["import_status"], "IMPORTED")
         self.assertEqual(p2["consume_repeat"]["result"]["cohorts"][0]["import_status"], "PASS_ALREADY_PRESENT_EXACT")
         self.assertEqual(p2["consume_repeat"]["result"]["cohorts"][0]["transferred_files"], 0)
+        self.assertTrue(p2["tampered_release"]["refused"], p2["tampered_release"])
+        # D5: torn import is fail-closed and repaired by the same command.
+        self.assertTrue(p2["torn_import"]["died"])
+        self.assertTrue(p2["torn_import"]["lineage_unchanged"])
+        self.assertNotEqual(p2["torn_import"]["preflight_exit"], 0)
+        self.assertEqual(p2["torn_import"]["preflight_terminal"], "MARKET_EVIDENCE_BASIS_INCOMPLETE")
         self.assertEqual(p2["consume_next"]["result"]["imported_n"], 2)
         # D7: generated card and packet.
         card = p2["packet_card"]
@@ -621,6 +709,12 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         self.assertNotEqual(p2["critic_missing"]["exit"], 0)
         self.assertEqual(p2["finalize"]["terminal"], "KILL_STATISTICALLY_UNIDENTIFIABLE")
         self.assertEqual(p2["forge_run_owner"], "COMPLETED")
+        # D8 controlled null: matched equals the decision baseline exactly.
+        null = p2["null"]
+        self.assertEqual(null["exit"], 0)
+        self.assertEqual((null["episode_counts"]["n_matched"], null["episode_counts"]["n_target_available"]), (12, 11))
+        self.assertAlmostEqual(null["mean_target"], (5 * 0.10 + 6 * (0.931 / 0.98 - 1)) / 11, places=9)
+        self.assertAlmostEqual(null["mean_target"], null["baseline_mean_target"], places=12)
         # D9: next run on new evidence is a normal new look; exact repeat spent none.
         self.assertNotEqual(p2["preflight_1"]["market_evidence_epoch_sha256"], p2["preflight_2"]["market_evidence_epoch_sha256"])
         self.assertEqual(p2["run2"]["scientific_look_delta"], {"main": 1, "adaptive": 0})

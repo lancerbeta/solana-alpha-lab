@@ -34541,7 +34541,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: 2b77248db771989827eeb18c4e54888fb5849ac46c1eaec99637df5a918bc99f}
+  integrity: {kind: sha256, sha256: 173c066e5f9004c67ec72ef5a3fca8bc276eced59de13823290665e8f2f7c07e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34651,7 +34651,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/FACTORY_SEMANTIC_MAP.md', repository_path: docs/FACTORY_SEMANTIC_MAP.md}
-  integrity: {kind: sha256, sha256: 4c58ea3690553802a04c6522bb623534cf3f0af9f7e1cd617b23539861c1003e}
+  integrity: {kind: sha256, sha256: 302b2a57761a8b46310ec6fca1a0c2781956f7643a524555328630ce68f08c5d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34669,7 +34669,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/semantic_route_gold_queries_v1.yaml', repository_path: catalog/fixtures/semantic_route_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: ac9eb14302ad164a11a9a2fb4579db079d6060979dab6037db13a687720a454b}
+  integrity: {kind: sha256, sha256: 6399e50f9e77b4aafd98d37e5ebac4abdbd792dd372f8c3a18a466d52e0d4721}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -40197,7 +40197,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_opportunity_episodes_vertical_v1.py', repository_path: tests/test_opportunity_episodes_vertical_v1.py}
-  integrity: {kind: sha256, sha256: f5ab638215f95bc7efb28ee4753e7ce6fcb7ae3ac5e59d2e96c71bf9d4927701}
+  integrity: {kind: sha256, sha256: da24953092f9ff3fb82bec284c78b3fc6c2a5bb2d114de5c88ead9c36b7c8731}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
