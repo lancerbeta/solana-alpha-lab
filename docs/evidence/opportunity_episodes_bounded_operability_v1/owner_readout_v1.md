@@ -112,8 +112,8 @@ completeness из этого не следует.
 
 Existing `remote_ops.package_backup` без pruning упаковал producer + workstation
 с schedule/raw/protection dependencies; `restore_backup_isolated` восстановил
-новый root. Bundle24,739,754 bytes, SHA256
-`02254d11bc1ca4ef4cffe502c6a7fa31e66072ede8212c33423797f61ae3e673`.
+новый root. Final bundle24,739,594 bytes, SHA256
+`ccc2ec8dd8ee6dbd4256296df46e89fa7e5ca7b15e5ac900768bdb7a0dad68b9`.
 Original roots и provider network заблокированы для cold phase.
 Три releases verify; saved public read не меняет history; numerical replay
 совпадает с oracle. Exact duplicate import=PASS_ALREADY_PRESENT_EXACT и history
@@ -128,7 +128,8 @@ WRITE_LOOKUP_STALE_PREPARATION_REQUIRED; явная reprepare возвращае
 ## FACT / MODEL / UNKNOWN и следующий gate
 
 FACT: cold work/bytes/RSS, canonical validation, локальные R1–R4, rollback,
-164 focused tests PASS (2 platform symlink skips) + one vertical test PASS.
+211 focused tests PASS (2 platform symlink skips), дополнительный exhausted-STARTED
+regression и один повторный полный vertical test PASS.
 MODEL: 1/7/30/60-day equivalents, 139 observation rows/admission, 24/day canary,
 per-route/account envelope, all-copy 30/97d forecasts и drain reserve.
 UNKNOWN: actual payload distribution, Linux acceptance, whole Factory reserve,
