@@ -666,8 +666,6 @@ def append_storage_history(
     path.parent.mkdir(parents=True, exist_ok=True)
     row = {
         "observed_at": observed_at,
-        "collection": base.get("collection") or "UNKNOWN",
-        "episode_operability": base.get("episode_operability"),
         "disk_used_pct": disk_used_pct,
         "sqlite_bytes": sqlite_bytes,
         "rdp_bytes": rdp_bytes,
@@ -1376,6 +1374,8 @@ def build_collector_operational_packet(
         "schema": "smial.collector-operational-packet",
         "schema_version": "1.0",
         "observed_at": observed_at,
+        "collection": base.get("collection") or "UNKNOWN",
+        "episode_operability": base.get("episode_operability"),
         "period_seconds": period_seconds,
         # IDENTITY
         "deploy_git_sha": base.get("deploy_git_sha") or UNKNOWN,

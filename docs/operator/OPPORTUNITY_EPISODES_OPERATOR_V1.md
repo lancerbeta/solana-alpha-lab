@@ -146,3 +146,10 @@ HOST_PASS. При `WRITE_LOOKUP_*` сначала сохранить canonical e
 identity. При fragmented cohort — явный отказ до partial export; V1 canary
 без intraday profile switches. Public import точного release не расходует новый
 look; real first question/MAIN budget фиксируются отдельно после canary.
+
+При `EPISODE_COHORT_FRAGMENTED_UNSUPPORTED` сохранить оба activation ledger,
+canonical RDP и уже frozen dependencies. Прекратить capture/import retry:
+ожидание maturity не объединит два activation/profile в один cohort. Нужен
+отдельный owner gate на поддерживаемую границу cohort/export; не менять cohort ID,
+не исключать одну часть и не удалять evidence. Общий CLI NEXT
+`STOP_INSPECT_FAIL_CODE` для этого кода означает именно этот terminal stop.

@@ -37,15 +37,16 @@ Model cadence: 288 publication slots/day × 3 ResearchStore transactions =
 
 | Equivalent days | Transactions | Final cold normal wall | RSS bytes | Canonical opens / bytes | Full inventory |
 |---|---:|---:|---:|---:|---:|
-| 1 | 864 | 0.817s | 91,684,864 | 7 / 81,460 | 0 |
-| 7 | 6048 | 0.870s | 91,553,792 | 7 / 81,460 | 0 |
-| 30 | 25920 | 0.847s | 91,750,400 | 7 / 81,460 | 0 |
-| 60 | 51840 | 0.793s | 92,430,336 | 7 / 81,460 | 0 |
+| 1 | 864 | 0.732s | 91,488,256 | 7 / 81,460 | 0 |
+| 7 | 6048 | 0.761s | 92,127,232 | 7 / 81,460 | 0 |
+| 30 | 25920 | 0.670s | 92,557,312 | 7 / 81,460 | 0 |
+| 60 | 51840 | 0.926s | 92,508,160 | 7 / 81,460 | 0 |
 
 Каждый normal tick публикует один batch. При doubles history растёт bounded trie
-route work (path bytes 481,160→490,276), а не payload scan. Final fresh restart:
+route work (path bytes 484,020→491,794), а не payload scan. Final fresh restart:
 один canonical partition, 8,142 bytes, no provider attempt; status: zero
-canonical payload reads. Ceiling был frozen до final proof: tick wall<30s,
+canonical payload reads. После critic repairs повторены 12 fresh-process
+normal/restart/status runs на тех же aged roots, с новым normal work. Ceiling был frozen до final proof: tick wall<30s,
 RSS<512MiB, fixed-work opens≤7, full inventory=0. Это local Windows limits.
 Linux oneshot, filesystem stamp semantics и power-loss durability UNVERIFIED.
 
@@ -161,3 +162,9 @@ per phase), `scripts/prove_opportunity_episode_rehearsals.py`,
 `tests/test_opportunity_episodes_vertical_v1.py` with `OEP_VERTICAL_WORK` absolute
 new root. Full local proof roots and hashes are referenced by summary. New
 roots preserve failed evidence; scripts refuse an already-present proof root.
+
+Post-review regression: 21 focused direct-consumer tests PASS, включая реальную
+сборку operational packet и запись storage history. Mixed legacy/new terminal
+metadata сохраняет null общего missing-count; известная часть не выдаётся за
+полный ноль. Linux fsync claim ограничен lookup files и immediate parent,
+canonical/ancestor directory power-loss durability остаётся UNVERIFIED.

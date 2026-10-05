@@ -3439,18 +3439,19 @@ class ObservationScheduleStore:
             "SUM(json_extract(payload_json,'$.attempt_class')='ATTEMPTED'), "
             "SUM(json_extract(payload_json,'$.attempt_class')='UNKNOWN'), "
             "SUM(json_extract(payload_json,'$.field_value_missing_count')), "
-            "SUM(state NOT IN ('PENDING','DUE','CLAIMED') AND json_extract(payload_json,'$.attempt_class') IS NULL) FROM due_observations "
+            "SUM(state NOT IN ('PENDING','DUE','CLAIMED') AND json_extract(payload_json,'$.attempt_class') IS NULL), "
+            "SUM(state NOT IN ('PENDING','DUE','CLAIMED') AND json_extract(payload_json,'$.field_value_missing_count') IS NULL) FROM due_observations "
             "WHERE schedule_sha256=? AND activation_id=?", scope).fetchone()
         return {"collection": "OPPORTUNITY_EPISODES", "intake_enabled": bool(activation and activation["state"] == "ACTIVE"
                 and now < parse_utc(str(activation["stops_admitting_at"]))),
                 "last_completed_nomination_frame_at": frame[0] if frame else None,
                 "admitted_obligations": admitted, "open_obligations": open_n,
                 "terminal_obligations": admitted - open_n, "slot_states": slots,
-                "execution_metadata_status": "UNKNOWN_LEGACY_METADATA" if execution[4] else "EXACT",
+                "execution_metadata_status": "UNKNOWN_LEGACY_METADATA" if execution[4] or execution[5] else "EXACT",
                 "no_request_slots": None if execution[4] else int(execution[0] or 0),
                 "attempted_slots": None if execution[4] else int(execution[1] or 0),
                 "ambiguous_attempt_slots": None if execution[4] else int(execution[2] or 0),
-                "field_values_missing": int(execution[3]) if execution[3] is not None else None,
+                "field_values_missing": int(execution[3]) if not execution[5] and execution[3] is not None else None,
                 "late_slots": slots.get("CENSORED_LATE", 0),
                 "unpublished_backlog": int(outbox[0]),
                 "oldest_unpublished_age_seconds": max(0, int((now - parse_utc(outbox[1])).total_seconds())) if outbox[1] else 0,

@@ -10,6 +10,7 @@ from unittest.mock import patch
 from collections import namedtuple
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from contextlib import closing
 
 from tests.test_opportunity_episodes_harness_v1 import EpisodeScenario, SyntheticJupiter, nominate, synth_mint, token_object
 from solana_alpha_lab.factory.live_cohort_vanilla_path import capture_freeze_export
@@ -206,6 +207,53 @@ class EpisodeOperabilityTests(unittest.TestCase):
         final = sc.tick(START + timedelta(hours=75))
         self.assertEqual(final["activation_state"], "COMPLETE")
         self.assertEqual(sc.unpublished(), 0)
+
+    def test_operational_packet_preserves_episode_scope_and_storage_history_writes(self):
+        from solana_alpha_lab.factory.collector_operational_packet import (
+            append_storage_history, build_collector_operational_packet)
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        sc = self.scenario()
+        self.mature(sc)
+        with closing(ObservationScheduleStore(sc.ops_path)) as store:
+            packet = build_collector_operational_packet(
+                root=sc.data_root.parent, store=store, now=START + timedelta(hours=76),
+                observation_rdp=sc.data_root, schedule_sha256=sc.schedule["schedule_sha256"],
+                activation_id=sc.activation_id, remote_config={}, environ={})
+        self.assertEqual(packet["collection"], "OPPORTUNITY_EPISODES")
+        self.assertEqual(packet["episode_operability"]["open_obligations"], 0)
+        self.assertEqual(packet["episode_operability"]["unpublished_backlog"], 0)
+        path = append_storage_history(sc.data_root.parent, observed_at=packet["observed_at"],
+            disk_used_pct=40, sqlite_bytes=123, rdp_bytes=456)
+        self.assertEqual(json.loads(path.read_text(encoding="utf-8")),
+            {"observed_at": packet["observed_at"], "disk_used_pct": 40,
+             "sqlite_bytes": 123, "rdp_bytes": 456})
+
+    def test_mixed_legacy_metadata_never_turns_unknown_missingness_into_zero(self):
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        sc = self.scenario()
+        self.mature(sc)
+        with closing(ObservationScheduleStore(sc.ops_path)) as store:
+            params = {"schedule_sha256": sc.schedule["schedule_sha256"],
+                      "activation_id": sc.activation_id, "now": START + timedelta(hours=76)}
+            # A known zero subset must not conceal one legacy unknown terminal row.
+            store._conn.execute("UPDATE due_observations SET payload_json="
+                                "json_set(payload_json, '$.field_value_missing_count', 0)")
+            exact = store.episode_operability_projection(**params)
+            self.assertEqual(exact["execution_metadata_status"], "EXACT")
+            self.assertEqual(exact["field_values_missing"], 0)
+            row = store._conn.execute("SELECT rowid, payload_json FROM due_observations LIMIT 1").fetchone()
+            payload = json.loads(row[1])
+            del payload["field_value_missing_count"]
+            store._conn.execute("UPDATE due_observations SET payload_json=? WHERE rowid=?",
+                                (json.dumps(payload), row[0]))
+            missing = store.episode_operability_projection(**params)
+            self.assertEqual(missing["execution_metadata_status"], "UNKNOWN_LEGACY_METADATA")
+            self.assertIsNone(missing["field_values_missing"])
+            self.assertIsNotNone(missing["attempted_slots"])
+            store._conn.execute("UPDATE due_observations SET payload_json='{}' WHERE rowid=?", (row[0],))
+            legacy = store.episode_operability_projection(**params)
+            self.assertIsNone(legacy["field_values_missing"])
+            self.assertIsNone(legacy["attempted_slots"])
 
     def test_call_reservation_covers_request_day_after_durable_start_delay(self):
         from tests.test_opportunity_episodes_harness_v1 import ROOT

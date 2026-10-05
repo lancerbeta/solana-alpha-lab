@@ -55,8 +55,11 @@ Write/recovery order:
 2. Write immutable derived nodes, then fsynced pending prior/next roots naming
    one exact transaction; only then publish its immutable canonical manifest.
 3. Record the published namespace stamp durably, then atomically publish the
-   root and remove pending. Linux files and directory entries are fsynced;
-   Windows tests establish process-crash behavior, not power-loss durability.
+   root and remove pending. Lookup files and their immediate parent directory
+   are fsynced on Linux. Canonical manifest/Parquet directory entries and newly
+   created ancestor directories do not have a proven power-loss durability
+   guarantee here. Windows tests establish process-crash behavior; Linux
+   power-loss durability remains UNVERIFIED.
 
 Pending before manifest: a fenced writer verifies the unchanged source stamp
 and restores the prior root. Pending after durable published stamp: it verifies

@@ -34340,7 +34340,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: 37cb0f4dde60a86f76d9055d147f5e1210ab9af92b4a838dea09ec32d06bee54}
+  integrity: {kind: sha256, sha256: 659ba84ec9920ef4071ebbb7a382e39e69e8a23d3fabe2c3404888cd415daf6d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -40044,7 +40044,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md', repository_path: docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 42e65636dec6bc4c104a887b2069f0fc19edc2783a519128b3ea8addb1b4b8f3}
+  integrity: {kind: sha256, sha256: 6007ca75d4e18e78d4e3a4e44e5b1758b93d82108be7e41e7dfe64502ff503ab}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
@@ -40253,7 +40253,7 @@ records:
   as_of: '2026-10-06'
   truth_owner: OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/research_write_lookup_v1.md', repository_path: docs/contracts/research_write_lookup_v1.md}
-  integrity: {kind: sha256, sha256: ea44dcd72412fe6bc31988e812201eec6e9a78e527b58bfbc35e901a5e4df77e}
+  integrity: {kind: sha256, sha256: 696c2168dfb8a076b22e49f6c1f292c58152209b6b357c1ab9835994699eb05e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-001}
@@ -40309,7 +40309,7 @@ records:
   as_of: '2026-10-06'
   truth_owner: OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/opportunity_episodes_bounded_operability_v1/owner_readout_v1.md', repository_path: docs/evidence/opportunity_episodes_bounded_operability_v1/owner_readout_v1.md}
-  integrity: {kind: sha256, sha256: f5a8c39df3c6f0f61a9894bf3ed23eab0299236f4eaf1f63d9e9a37355a994f5}
+  integrity: {kind: sha256, sha256: e260f8f13adcdf418d8456871c938d1b6ac46b603092d564460379206dac4869}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-001}
