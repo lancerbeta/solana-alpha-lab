@@ -660,7 +660,7 @@ def _fresh_temporal_warnings(
 
     try:
         if binding_cohorts is not None:
-            _require_bound_schedule(binding_cohorts, validated["scientific_body"], validated["scientific_body"]["schedule_lateness_seconds"])
+            _require_bound_schedule(binding_cohorts, validated["scientific_body"], validated["scientific_body"].get("schedule_lateness_seconds"))
         return universe_question_guard(validated["scientific_body"], effective_policy(store)["definition"])
     except GroundedDiscoveryError as exc:
         raise OrdinaryOperationError(exc.code) from exc

@@ -54,6 +54,9 @@ PROTECTION_VERSION = "OPPORTUNITY_EPISODE_PROTECTION_V1"
 ASSIGNMENT_SCHEMA = "smial.protected-identity-assignment"
 ASSIGNMENT_DIR = "protection/assignments"
 TIME_FEATURE_CLOCK = "FIRST_RELIABLE_AVAILABLE_AT"
+# Ordinary Forge collection scope. The owner focus carries it so every
+# search-key recomputation from the stored focus keeps the same scope.
+EPISODE_FOCUS_PREFIX = "OPPORTUNITY_EPISODES:"
 ROUNDS_PER_DAY = 96
 MAX_QUERY_POINTS = 8
 
@@ -95,6 +98,18 @@ class OpportunityEpisodeError(ValueError):
 
 def is_episode_schedule(document: object) -> bool:
     return isinstance(document, Mapping) and document.get("schema") == EPISODE_SCHEDULE_SCHEMA
+
+
+def collection_for_focus(owner_focus: object) -> str | None:
+    """OPPORTUNITY_EPISODES when the focus names that collection, else legacy."""
+
+    text = str(owner_focus or "")
+    return COLLECTION if text.startswith(EPISODE_FOCUS_PREFIX) else None
+
+
+def episode_focus(owner_focus: str) -> str:
+    text = str(owner_focus or "").strip()
+    return text if text.startswith(EPISODE_FOCUS_PREFIX) else f"{EPISODE_FOCUS_PREFIX}{text}"
 
 
 def v1_offsets() -> tuple[int, ...]:

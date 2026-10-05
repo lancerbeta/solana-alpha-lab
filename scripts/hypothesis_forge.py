@@ -330,20 +330,30 @@ def _new_research_universe_blocker(store: Any) -> dict[str, Any] | None:
 def _published_gate_cohorts(
     data_root: Path,
     binding_doc: object,
+    population: object = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
-    """Published cohorts for the gate. A disagreeing --binding writes nothing."""
+    """Published cohorts for the gate. A disagreeing --binding writes nothing.
+
+    ``population=OPPORTUNITY_EPISODES`` reads the separate episode corpus.
+    """
 
     from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        EPISODE_POPULATION,
         GroundedDiscoveryError,
         resolve_published_discovery_binding,
+        resolve_published_episode_binding,
     )
 
-    lineage = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+    episode = population == EPISODE_POPULATION
+    lineage = data_root / "datasets" / (
+        "opportunity_episodes_corpus" if episode else "live_lifecycle_corpus"
+    ) / "lineage.json"
     if not lineage.is_file():
         supplied = binding_doc.get("cohorts") if isinstance(binding_doc, dict) else []
         return (list(supplied) if isinstance(supplied, list) else []), None
+    resolver = resolve_published_episode_binding if episode else resolve_published_discovery_binding
     try:
-        published = list(resolve_published_discovery_binding(data_root).get("cohorts") or [])
+        published = list(resolver(data_root).get("cohorts") or [])
     except GroundedDiscoveryError as exc:
         body = {
             "reason_code": exc.code,
@@ -1525,7 +1535,9 @@ def _cmd_discovery_execute(
                     return emit(refusal, exit_code=2)
             cohorts: list[dict[str, Any]] = []
             if explicit_data_root is not None:
-                cohorts, refusal = _published_gate_cohorts(explicit_data_root, binding_doc)
+                cohorts, refusal = _published_gate_cohorts(
+                    explicit_data_root, binding_doc, spec.get("population")
+                )
                 if refusal is not None:
                     return emit(refusal, exit_code=2)
             elif isinstance(binding_doc, dict):
@@ -1617,6 +1629,7 @@ def _cmd_discovery_execute(
             partitions=cohort_partitions,
             census_path=census_path,
             observations_path=observations_path,
+            population=spec.get("population"),
         )
     except GroundedDiscoveryError as exc:
         return emit_error(exc.code)

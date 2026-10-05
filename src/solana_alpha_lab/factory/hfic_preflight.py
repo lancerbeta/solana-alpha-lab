@@ -200,8 +200,12 @@ def select_forge_packet_datasets(
     *,
     evidence_surface_mode: str | None = None,
     max_datasets: int = MAX_DATASETS,
+    protected: Callable[[Mapping[str, Any]], bool] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Current-version selection with a protected LIVE CORPUS slot.
+
+    ``protected`` selects a different collection corpus to protect (the
+    OPPORTUNITY_EPISODES corpus for that focus); default is LIVE.
 
     Ordinary and CONTROL packets share this membership rule so compatibility
     readiness cannot hide a live-corpus drop that actual slash would see.
@@ -220,8 +224,9 @@ def select_forge_packet_datasets(
 
     # Wrapper IDs must not reshuffle the bounded evidence packet on republish.
     current.sort(key=scientific_order)
-    corpus = [item for item in current if is_live_corpus_dataset(item)]
-    others = [item for item in current if not is_live_corpus_dataset(item)]
+    is_protected = protected or is_live_corpus_dataset
+    corpus = [item for item in current if is_protected(item)]
+    others = [item for item in current if not is_protected(item)]
     slots = max(0, max_datasets - len(corpus))
     selected = corpus + others[:slots]
     selected.sort(key=scientific_order)

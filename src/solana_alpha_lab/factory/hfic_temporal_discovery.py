@@ -1419,9 +1419,24 @@ def _select_event_time_exit(
     return selected, None
 
 
-def _require_bound_schedule(binding: Sequence[Mapping[str, Any]], body: Mapping[str, Any], lateness: int) -> None:
+def _require_bound_schedule(binding: Sequence[Mapping[str, Any]], body: Mapping[str, Any], lateness: int | None) -> None:
     """Preview and evaluation share the verified point clocks. A missing field does not skip the check."""
 
+    if is_episode_body(body):
+        # Episode clocks come from the frozen resolver binding of each cohort.
+        from solana_alpha_lab.factory.opportunity_episodes import (
+            OpportunityEpisodeError,
+            require_binding,
+        )
+
+        for item in binding:
+            if item.get("population") != EPISODE_POPULATION:
+                raise GroundedDiscoveryError("POPULATION_BINDING_MISMATCH")
+            try:
+                require_binding(item.get("schedule_binding"))
+            except OpportunityEpisodeError as exc:
+                raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND") from exc
+        return
     for item in binding:
         for point in _query_points(body):
             _clock(item, point, lateness)

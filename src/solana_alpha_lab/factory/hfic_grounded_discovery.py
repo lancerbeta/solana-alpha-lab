@@ -71,6 +71,18 @@ def query_spec_sha256(spec: Mapping[str, Any]) -> str:
 
 
 def _point_offset(point_id: object) -> int:
+    if isinstance(point_id, str) and point_id.startswith("E"):
+        # OPPORTUNITY_EPISODES grid (disjoint E-namespace); POINT_OFFSET is
+        # never extended or aliased.
+        from solana_alpha_lab.factory.opportunity_episodes import (
+            OpportunityEpisodeError,
+            point_offset,
+        )
+
+        try:
+            return point_offset(point_id)
+        except OpportunityEpisodeError as exc:
+            raise GroundedDiscoveryError("POINT_NOT_IN_ALLOWLIST") from exc
     if not isinstance(point_id, str) or point_id not in POINT_OFFSET:
         raise GroundedDiscoveryError("POINT_NOT_IN_ALLOWLIST")
     return POINT_OFFSET[point_id]

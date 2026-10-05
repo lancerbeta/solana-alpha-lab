@@ -1046,6 +1046,7 @@ def import_episode_release(
         "observation_field_state_counts": manifest["observation_field_state_counts"],
         "feature_families": manifest["feature_families"],
         "closure_receipt_sha256": manifest["closure_receipt_sha256"],
+        "source_sha256": manifest["source_sha256"],
         "evidence_role": EVIDENCE_ROLE,
     }
     cumulative = cohorts + [component]
@@ -1064,7 +1065,24 @@ def import_episode_release(
                 created_at=imported_at,
             )
             partitions.append(part)
-    validation_sha = canonical_sha256({"composition": [(i["cohort_id"], i["release_id"]) for i in cumulative]})
+    manifests = Path(data_root) / "datasets" / "manifests"
+    validation_receipt = {
+        "schema": "smial.opportunity-episodes-dataset-validation-receipt",
+        "schema_version": "1.0",
+        "dataset_id": LOGICAL_DATASET_ID,
+        "dataset_version": dataset_version,
+        "partition_manifest_ids": sorted(part.partition_manifest_id for part in partitions),
+        "corpus_composition": [
+            {
+                "cohort_id": i["cohort_id"],
+                "release_id": i["release_id"],
+                "content_sha256": i["source_sha256"],
+            }
+            for i in cumulative
+        ],
+    }
+    validation_bytes = json.dumps(validation_receipt, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    validation_sha = __import__("hashlib").sha256(validation_bytes).hexdigest()
     dataset = build_dataset_manifest(
         dataset_id=LOGICAL_DATASET_ID,
         dataset_version=dataset_version,
@@ -1077,11 +1095,11 @@ def import_episode_release(
         created_at=imported_at,
         partitions=partitions,
     )
-    manifests = Path(data_root) / "datasets" / "manifests"
     for part in partitions:
         path = manifests / "partitions" / f"{part.partition_manifest_id}.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         _publish_bytes(path, part.model_dump_json().encode("utf-8"))
+    _publish_bytes(manifests / f"{dataset.dataset_manifest_id}.validation.json", validation_bytes)
     _publish_bytes(manifests / f"{dataset.dataset_manifest_id}.json", dataset.model_dump_json().encode("utf-8"))
     labels = {
         **REQUIRED_EPISODE_LABELS,
@@ -1092,10 +1110,30 @@ def import_episode_release(
         "feature_families": sorted({fam for item in cumulative for fam in item["feature_families"]}, key=FEATURE_FAMILY_ORDER.index),
         "imported_at": render_utc(imported_at),
         "is_current_corpus_version": True,
+        "projection_id": PROJECTION_ID,
+        "projection_version": PROJECTION_VERSION,
+        "provider_calls_for_bind": 0,
+        "yield_eligible": sum(int(item["admissions_n"]) for item in cumulative),
+        "yield_missing": 0,
+        "dataset_terminal": "IMPORTED_VALID",
+        "yield_semantics": "ADMISSIONS_DENOMINATOR_NOT_OBSERVED_YIELD",
     }
     _publish_bytes(
         manifests / f"{dataset.dataset_manifest_id}.labels.json",
         json.dumps(labels, sort_keys=True, separators=(",", ":")).encode("utf-8"),
+    )
+    _publish_bytes(
+        manifests / f"{dataset.dataset_manifest_id}.published",
+        json.dumps(
+            {
+                "dataset_manifest_id": dataset.dataset_manifest_id,
+                "dataset_fingerprint": dataset.dataset_fingerprint,
+                "published_at": render_utc(imported_at),
+                "metadata_clock_at": render_utc(imported_at),
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8"),
     )
     lineage_out = {
         "corpus_dataset_id": LOGICAL_DATASET_ID,
