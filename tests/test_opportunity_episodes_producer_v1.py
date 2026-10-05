@@ -237,6 +237,98 @@ class ProducerCrashTests(ScenarioCase):
         self.assertEqual(list((sc.data_root / "datasets" / "publication_jobs" / "open").glob("*.json")), [])
 
 
+class StopIntakeDrainTests(ScenarioCase):
+    """Safe operator stop-intake: no new episodes, committed obligations finish."""
+
+    def _two_rounds(self, sc, first: str, second: str) -> None:
+        mints = {"A": synth_mint(first), "B": synth_mint(second)}
+        nominate(sc.market, S, {"toporganicscore": [obj(mints["A"])], "toptraded": [], "toptrending": []})
+        nominate(sc.market, S + timedelta(minutes=15), {"toporganicscore": [obj(mints["B"])], "toptraded": [], "toptrending": []})
+        for mint in mints.values():
+            sc.market.series[mint] = steady(mint)
+
+    def test_drain_before_scheduled_stop_closes_intake_and_finishes_obligations(self) -> None:
+        sc = self.scenario(stops=S + timedelta(hours=6))
+        self._two_rounds(sc, "DrainA", "DrainB")
+        sc.tick(S + timedelta(seconds=5))
+        episode = sc.admissions()[0]["episode_id"]
+        sc.tick(S + timedelta(minutes=10, seconds=5))
+        drained = sc.operator(S + timedelta(minutes=11), "stop-intake")
+        self.assertEqual((drained["terminal"], drained["state"], drained["_exit_code"]), ("STOP_INTAKE_COMMITTED", "DRAINING", 0))
+        self.assertEqual(sc.activation_state(), "DRAINING")
+        # The scheduled boundary is hours away: this is the operator's early boundary.
+        later = sc.tick(S + timedelta(minutes=15, seconds=5))
+        self.assertEqual(len(sc.admissions()), 1)
+        self.assertEqual([c for c in later["_calls"] if c["kind"] == "category"], [])
+        self.assertEqual(later["activation_state"], "DRAINING")
+        # Committed obligations keep running and publishing.
+        sc.tick(S + timedelta(minutes=35, seconds=5))
+        self.assertEqual(sc.slot_states(episode)["E1800"][0], "OBSERVED")
+        final = sc.tick(S + timedelta(hours=75))
+        self.assertEqual(len(sc.admissions()), 1)
+        self.assertEqual(final["activation_state"], "COMPLETE", final)
+        self.assertEqual(sc.activation_state(), "COMPLETE")
+        self.assertEqual(sc.unpublished(), 0)
+        self.assertFalse({state for state, _ in sc.slot_states(episode).values()} & {"PENDING", "DUE", "CLAIMED"})
+
+    def test_repeat_is_idempotent_and_never_reopens_intake(self) -> None:
+        sc = self.scenario(stops=S + timedelta(hours=6))
+        self._two_rounds(sc, "RepA", "RepB")
+        sc.tick(S + timedelta(seconds=5))
+        first = sc.operator(S + timedelta(minutes=11), "stop-intake")
+        again = sc.operator(S + timedelta(minutes=12), "stop-intake")
+        self.assertEqual((first["terminal"], again["terminal"]), ("STOP_INTAKE_COMMITTED", "STOP_INTAKE_REPLAY"))
+        self.assertEqual(first["transition_event_id"], again["transition_event_id"])
+        sc.tick(S + timedelta(minutes=15, seconds=5))
+        self.assertEqual(len(sc.admissions()), 1)
+        self.assertEqual(sc.activation_state(), "DRAINING")
+
+    def test_crash_between_transition_and_evidence_does_not_reopen_and_repeat_repairs(self) -> None:
+        from unittest import mock
+
+        from solana_alpha_lab.factory import observation_schedule_lifecycle as lifecycle
+
+        sc = self.scenario(stops=S + timedelta(hours=6))
+        self._two_rounds(sc, "CrashA", "CrashB")
+        sc.tick(S + timedelta(seconds=5))
+        with mock.patch.object(lifecycle, "_append_or_replay", side_effect=RuntimeError("SIMULATED_CRASH")):
+            with self.assertRaises(RuntimeError):
+                sc.operator(S + timedelta(minutes=11), "stop-intake")
+        # The committed transition already closed intake.
+        self.assertEqual(sc.activation_state(), "DRAINING")
+        sc.tick(S + timedelta(minutes=15, seconds=5))
+        self.assertEqual(len(sc.admissions()), 1)
+        # Without the evidence event completion is refused, never guessed.
+        early = sc.tick(S + timedelta(hours=75))
+        self.assertNotEqual(early["activation_state"], "COMPLETE")
+        repaired = sc.operator(S + timedelta(hours=76), "stop-intake")
+        self.assertEqual(repaired["terminal"], "STOP_INTAKE_REPLAY")
+        final = sc.tick(S + timedelta(hours=77))
+        self.assertEqual(final["activation_state"], "COMPLETE", final)
+        self.assertEqual(len(sc.admissions()), 1)
+
+    def test_pause_semantics_unchanged_and_paused_activation_cannot_be_drained(self) -> None:
+        sc = self.scenario(stops=S + timedelta(hours=6))
+        self._two_rounds(sc, "PauseA", "PauseB")
+        sc.tick(S + timedelta(seconds=5))
+        paused = sc.operator(S + timedelta(minutes=11), "pause")
+        self.assertEqual((paused["state"], sc.activation_state()), ("PAUSED_OPERATOR", "PAUSED_OPERATOR"))
+        refused = sc.operator(S + timedelta(minutes=12), "stop-intake")
+        self.assertEqual((refused["terminal"], refused["_exit_code"]), ("ACTIVATION_NOT_ACTIVE", 2))
+        self.assertEqual(sc.activation_state(), "PAUSED_OPERATOR")
+
+    def test_only_episode_schedules_can_use_stop_intake(self) -> None:
+        sc = self.scenario(stops=S + timedelta(hours=6))
+        from tests.test_opportunity_episodes_harness_v1 import cli_command
+
+        refused = cli_command(
+            sc.data_root, S + timedelta(minutes=1), "stop-intake",
+            "--schedule-sha256", "0" * 64, "--activation-id", sc.activation_id,
+        )
+        self.assertEqual((refused["terminal"], refused["_exit_code"]), ("STOP_INTAKE_EPISODE_SCHEDULE_ONLY", 2))
+        self.assertEqual(sc.activation_state(), "ACTIVE")
+
+
 class ProducerGapTests(ScenarioCase):
     def test_decline_and_gap_states_stay_explicit(self) -> None:
         sc = self.scenario(observation_overrides={"availability_grace_seconds": 60})

@@ -34,6 +34,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (  # noqa: E
     abort_schedule,
     authorize_schedule,
     pause_schedule,
+    stop_episode_intake,
     register_schedule,
     resolve_late_recovery_proof,
     resume_schedule,
@@ -152,6 +153,7 @@ def main(
         "authorize",
         "activate",
         "pause",
+        "stop-intake",
         "abort",
         "resume",
         "rollover",
@@ -165,7 +167,7 @@ def main(
         cmd.add_argument("--data-root")
         if name == "authorize":
             cmd.add_argument("--phrase", required=True)
-        if name in {"activate", "pause", "abort", "resume", "snapshot"}:
+        if name in {"activate", "pause", "stop-intake", "abort", "resume", "snapshot"}:
             cmd.add_argument("--activation-id", required=True)
         if name == "abort":
             cmd.add_argument("--reason", required=True)
@@ -175,7 +177,7 @@ def main(
             cmd.add_argument("--successor-schedule-sha256", required=True)
             cmd.add_argument("--successor-activation-id", required=True)
             cmd.add_argument("--cutover-at", required=True)
-        if name in {"authorize", "activate", "pause", "abort", "resume", "snapshot", "status"}:
+        if name in {"authorize", "activate", "pause", "stop-intake", "abort", "resume", "snapshot", "status"}:
             cmd.add_argument("--schedule-sha256")
         if name == "status":
             cmd.add_argument("--activation-id")
@@ -267,6 +269,21 @@ def main(
             if not digest:
                 return _emit({"terminal": "SCHEDULE_SHA256_REQUIRED"}, 2)
             result = pause_schedule(
+                data_root=data_root,
+                store=store,
+                schedule_sha256=digest,
+                activation_id=args.activation_id,
+                now=now,
+                producer_git_sha=producer,
+            )
+            return _emit(result, 0)
+        if args.command == "stop-intake":
+            digest = args.schedule_sha256 or config.get("schedule_sha256")
+            if not digest and args.schedule:
+                digest = load_observation_schedule(ROOT, args.schedule)["schedule_sha256"]
+            if not digest:
+                return _emit({"terminal": "SCHEDULE_SHA256_REQUIRED"}, 2)
+            result = stop_episode_intake(
                 data_root=data_root,
                 store=store,
                 schedule_sha256=digest,

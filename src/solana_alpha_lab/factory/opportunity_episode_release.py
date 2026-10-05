@@ -35,6 +35,7 @@ from solana_alpha_lab.factory.observation_schedule import (
 )
 from solana_alpha_lab.factory.opportunity_episodes import (
     ANCHOR_KIND,
+    assignment_document_sha256,
     COLLECTION,
     LOGICAL_DATASET_ID,
     POPULATION,
@@ -403,6 +404,74 @@ def export_dir_rel(receipt: Mapping[str, Any]) -> str:
     )
 
 
+def pinned_protection_sources(sources: object) -> list[dict[str, str]]:
+    """The protection sources frozen into the schedule: id + semantic sha, unique, non-empty."""
+
+    _require(isinstance(sources, (list, tuple)) and len(sources) > 0, "FROZEN_PROTECTION_SOURCES_EMPTY")
+    pinned: dict[str, str] = {}
+    for item in sources:
+        _require(isinstance(item, Mapping), "FROZEN_PROTECTION_PIN_INVALID")
+        assignment_id = str(item.get("assignment_id") or "")
+        sha = str(item.get("sha256") or "")
+        _require(
+            bool(assignment_id) and not any(ch in assignment_id for ch in "/\\:") and ".." not in assignment_id
+            and len(sha) == 64 and all(ch in "0123456789abcdef" for ch in sha),
+            "FROZEN_PROTECTION_PIN_INVALID",
+        )
+        _require(assignment_id not in pinned, "FROZEN_PROTECTION_PIN_DUPLICATE")
+        pinned[assignment_id] = sha
+    return [{"assignment_id": key, "sha256": pinned[key]} for key in sorted(pinned)]
+
+
+def load_pinned_assignment(directory: Path, source: Mapping[str, str]) -> tuple[Mapping[str, Any], bytes]:
+    """One frozen assignment: exists, regular file, readable, exact semantic identity.
+
+    A current file never stands in for the admission-time policy: its semantic
+    hash must equal the pin frozen in the schedule.
+    """
+
+    assignment_id = str(source["assignment_id"])
+    path = Path(directory) / f"{assignment_id}.json"
+    _require(path.is_file() and not path.is_symlink(), f"FROZEN_PROTECTION_MISSING:{assignment_id}")
+    try:
+        raw = path.read_bytes()
+        document = json.loads(raw.decode("utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise EpisodeReleaseError(f"FROZEN_PROTECTION_UNREADABLE:{assignment_id}") from exc
+    _require(isinstance(document, Mapping), f"FROZEN_PROTECTION_UNREADABLE:{assignment_id}")
+    _require(str(document.get("assignment_id") or "") == assignment_id, f"FROZEN_PROTECTION_IDENTITY_MISMATCH:{assignment_id}")
+    _require(assignment_document_sha256(document) == str(source["sha256"]), f"FROZEN_PROTECTION_HASH_MISMATCH:{assignment_id}")
+    return document, raw
+
+
+def frozen_protection_from_release(root: Path, *, listed: Mapping[str, Any] | None = None) -> list[Mapping[str, Any]]:
+    """Independently confirm the release carries exactly the pinned assignments.
+
+    The pins come from the schedule artifact and must equal the closure's; the
+    protection directory (and the manifest listing when given) holds exactly
+    those files, each with its pinned semantics.
+    """
+
+    root = Path(root)
+    closure = json.loads((root / CLOSURE_NAME).read_text(encoding="utf-8"))
+    try:
+        schedule_document = decode_schedule_artifact(
+            (root / OBSERVATION_SCHEDULE_ARTIFACT_NAME).read_bytes(),
+            wanted_sha=str(closure.get("schedule_sha256") or ""),
+        )
+    except ValueError as exc:
+        raise EpisodeReleaseError(str(exc)) from exc
+    pinned = pinned_protection_sources((schedule_document.get("protection") or {}).get("assignment_sources"))
+    _require(pinned == pinned_protection_sources(closure.get("protection_sources")), "FROZEN_PROTECTION_CLOSURE_MISMATCH")
+    expected = {f"{PROTECTION_DIR}/{item['assignment_id']}.json" for item in pinned}
+    if listed is not None:
+        _require({rel for rel in listed if rel.startswith(PROTECTION_DIR + "/")} == expected, "FROZEN_PROTECTION_SET_MISMATCH")
+    directory = root / PROTECTION_DIR
+    present = {f"{PROTECTION_DIR}/{path.name}" for path in directory.iterdir()} if directory.is_dir() else set()
+    _require(present == expected, "FROZEN_PROTECTION_SET_MISMATCH")
+    return [load_pinned_assignment(directory, item)[0] for item in pinned]
+
+
 def write_episode_export(*, observation_rdp: Path, ops_store: Path, receipt: Mapping[str, Any]) -> dict[str, Any]:
     """Capture-produced bundle: receipt, schedule artifact, frames, protection."""
 
@@ -427,6 +496,12 @@ def write_episode_export(*, observation_rdp: Path, ops_store: Path, receipt: Map
     _validated, artifact_bytes, artifact_sha = encode_schedule_artifact(
         document, wanted_sha=str(receipt["schedule_sha256"])
     )
+    # Admission-time policy only: the schedule's frozen pins, read from the
+    # registered assignment files, before any export byte exists.
+    pinned = pinned_protection_sources((document.get("protection") or {}).get("assignment_sources"))
+    _require(pinned == pinned_protection_sources(receipt.get("protection_sources")), "FROZEN_PROTECTION_RECEIPT_MISMATCH")
+    assignment_dir = _contained(root, "protection/assignments")
+    frozen_assignments = [(item, *load_pinned_assignment(assignment_dir, item)) for item in pinned]
     base.mkdir(parents=True, exist_ok=True)
     _write_json(base / CLOSURE_NAME, receipt)
     schedule_path = base / OBSERVATION_SCHEDULE_ARTIFACT_NAME
@@ -437,13 +512,10 @@ def write_episode_export(*, observation_rdp: Path, ops_store: Path, receipt: Map
         for item in rounds
     ]
     _write_json(base / FRAMES_NAME, frames)
-    for source in receipt.get("protection_sources") or []:
-        assignment_id = str(source["assignment_id"])
-        src = _contained(root, f"protection/assignments/{assignment_id}.json")
-        if src.is_file() and not src.is_symlink():
-            dest = base / PROTECTION_DIR / f"{assignment_id}.json"
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            _publish_bytes(dest, src.read_bytes())
+    for item, _document, raw in frozen_assignments:
+        dest = base / PROTECTION_DIR / f"{item['assignment_id']}.json"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        _publish_bytes(dest, raw)
     return {"export_rel": export_dir_rel(receipt), "schedule_artifact_sha256": artifact_sha}
 
 
@@ -818,11 +890,18 @@ def seal_episode_cohort(
     for name in (CLOSURE_NAME, FRAMES_NAME):
         _publish_bytes(root / name, (export_root / name).read_bytes())
         add(name, root / name)
-    for source_path in sorted((export_root / PROTECTION_DIR).glob("*.json")):
-        rel = f"{PROTECTION_DIR}/{source_path.name}"
+    sealed_schedule = decode_schedule_artifact(schedule_bytes, wanted_sha=str(receipt["schedule_sha256"]))
+    pinned = pinned_protection_sources((sealed_schedule.get("protection") or {}).get("assignment_sources"))
+    _require(pinned == pinned_protection_sources(receipt.get("protection_sources")), "FROZEN_PROTECTION_CLOSURE_MISMATCH")
+    export_protection = export_root / PROTECTION_DIR
+    exported = {path.name for path in export_protection.iterdir()} if export_protection.is_dir() else set()
+    _require(exported == {f"{item['assignment_id']}.json" for item in pinned}, "FROZEN_PROTECTION_SET_MISMATCH")
+    for item in pinned:
+        _document, raw = load_pinned_assignment(export_protection, item)
+        rel = f"{PROTECTION_DIR}/{item['assignment_id']}.json"
         dest = root / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
-        _publish_bytes(dest, source_path.read_bytes())
+        _publish_bytes(dest, raw)
         add(rel, dest)
     raw_needed = sorted(
         {str(obs.get("raw_body_rel")) for obs in source["observations"] if obs.get("raw_body_rel")}
@@ -919,6 +998,7 @@ def verify_episode_release(release_root: Path) -> dict[str, Any]:
     closure = json.loads((root / CLOSURE_NAME).read_text(encoding="utf-8"))
     assert_episode_closure_ready(closure)
     _require(closure.get("closure_receipt_sha256") == manifest.get("closure_receipt_sha256"), "CLOSURE_BINDING_MISMATCH")
+    frozen_protection_from_release(root, listed=listed)
     census = pq.read_table(root / CENSUS_NAME, columns=["schedule_sha256", "episode_id", "release_id"]).to_pylist()
     _require({row["schedule_sha256"] for row in census} == {manifest["schedule_sha256"]}, "CENSUS_SCHEDULE_SHA_MISMATCH")
     _require({row["release_id"] for row in census} == {manifest["release_id"]}, "IDENTITY_CONFLICT")

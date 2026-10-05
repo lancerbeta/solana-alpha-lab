@@ -347,6 +347,84 @@ class QueryGuardTests(unittest.TestCase):
             execute_temporal_discovery(census, rows, episode_spec(), [first, second])
 
 
+class FrozenProtectionPinTests(unittest.TestCase):
+    """The admission-time assignment is the only policy a release may carry."""
+
+    def setUp(self) -> None:
+        import os
+
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.pin = write_assignment(self.root, [])
+        self.directory = self.root / oe.ASSIGNMENT_DIR
+        self.path = self.directory / f"{self.pin['assignment_id']}.json"
+        self.original = self.path.read_bytes()
+        self.os = os
+
+    def load(self):
+        from solana_alpha_lab.factory.opportunity_episode_release import load_pinned_assignment
+
+        return load_pinned_assignment(self.directory, self.pin)
+
+    def refused(self, code: str) -> None:
+        from solana_alpha_lab.factory.opportunity_episode_release import EpisodeReleaseError
+
+        with self.assertRaisesRegex(EpisodeReleaseError, code):
+            self.load()
+
+    def test_exact_pin_loads_its_exact_bytes(self) -> None:
+        document, raw = self.load()
+        self.assertEqual(raw, self.original)
+        self.assertEqual(oe.assignment_document_sha256(document), self.pin["sha256"])
+
+    def test_missing_is_refused(self) -> None:
+        self.path.unlink()
+        self.refused("FROZEN_PROTECTION_MISSING")
+
+    def test_symlink_is_refused(self) -> None:
+        target = self.root / "elsewhere.json"
+        target.write_bytes(self.original)
+        self.path.unlink()
+        try:
+            self.os.symlink(target, self.path)
+        except (OSError, NotImplementedError):
+            self.skipTest("symlinks unavailable")
+        self.refused("FROZEN_PROTECTION_MISSING")
+
+    def test_unreadable_is_refused(self) -> None:
+        self.path.write_bytes(b"{not json")
+        self.refused("FROZEN_PROTECTION_UNREADABLE")
+
+    def test_substituted_valid_assignment_is_refused(self) -> None:
+        # A different but schema-valid, complete assignment under the same id.
+        replacement = json.loads(self.original)
+        replacement["entries"] = [
+            {"identity_kind": "MINT", "identity": synth_mint("Late"), "role": "SPLIT_MEMBER", "scope": {"kind": "ALL_TIME"}}
+        ]
+        self.path.write_bytes(json.dumps(replacement, sort_keys=True).encode("utf-8"))
+        self.refused("FROZEN_PROTECTION_HASH_MISMATCH")
+
+    def test_wrong_identity_is_refused(self) -> None:
+        other = json.loads(self.original)
+        other["assignment_id"] = "ASSIGNMENT-OTHER"
+        self.path.write_bytes(json.dumps(other, sort_keys=True).encode("utf-8"))
+        self.pin = {"assignment_id": self.pin["assignment_id"], "sha256": oe.assignment_document_sha256(other)}
+        self.refused("FROZEN_PROTECTION_IDENTITY_MISMATCH")
+
+    def test_pins_must_be_non_empty_unique_and_well_formed(self) -> None:
+        from solana_alpha_lab.factory.opportunity_episode_release import (
+            EpisodeReleaseError,
+            pinned_protection_sources,
+        )
+
+        good = {"assignment_id": "A", "sha256": "a" * 64}
+        self.assertEqual(pinned_protection_sources([good]), [good])
+        for bad in ([], [good, good], [{"assignment_id": "../A", "sha256": "a" * 64}], [{"assignment_id": "A", "sha256": "short"}]):
+            with self.assertRaises(EpisodeReleaseError):
+                pinned_protection_sources(bad)
+
+
 class ProtectionAndFrameTests(unittest.TestCase):
     def setUp(self) -> None:
         self.tmp = tempfile.TemporaryDirectory()

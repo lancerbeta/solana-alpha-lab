@@ -187,6 +187,8 @@ def resolve_published_episode_binding(data_root: Path) -> dict[str, Any]:
     from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
     from solana_alpha_lab.factory.opportunity_episode_release import (
         REQUIRED_EPISODE_LABELS,
+        EpisodeReleaseError,
+        frozen_protection_from_release,
         load_episode_lineage,
     )
     from solana_alpha_lab.factory.opportunity_episodes import (
@@ -244,12 +246,11 @@ def resolve_published_episode_binding(data_root: Path) -> dict[str, Any]:
             if sha256_file_streaming(path) != expected:
                 raise GroundedDiscoveryError("BINDING_HASH_MISMATCH")
         release_dir = root / str(item.get("release_dir_rel") or "")
-        frozen_documents = [
-            json.loads(path.read_text(encoding="utf-8"))
-            for path in sorted((release_dir / "protection").glob("*.json"))
-        ]
-        if not frozen_documents:
-            raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED")
+        try:
+            # Exactly the pinned admission-time assignments; nothing else binds.
+            frozen_documents = frozen_protection_from_release(release_dir)
+        except (EpisodeReleaseError, OSError, ValueError):
+            raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED") from None
         inventory = inventory_from_documents([*frozen_documents, *current_documents])
         start, end = cohort_day_bounds(str(item["cohort_id"]))
         mints = pq.read_table(root / census_rel, columns=["mint"]).column("mint").to_pylist()

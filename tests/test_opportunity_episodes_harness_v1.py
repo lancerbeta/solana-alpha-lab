@@ -284,6 +284,23 @@ def cli_tick(data_root: Path, market: SyntheticMarket, at: datetime, *, env_faul
     return payload
 
 
+def cli_command(data_root: Path, at: datetime, *argv: str) -> dict[str, Any]:
+    """A non-tick operator command through the production entry (clock only is synthetic)."""
+
+    from scripts.observation_schedule import main as cli_main
+
+    buf = StringIO()
+    with redirect_stdout(buf):
+        code = cli_main(
+            [*argv, "--runtime-config", DEFAULT_RUNTIME_RELATIVE, "--data-root", str(data_root)],
+            physical_overrides=TickPhysicalOverrides(now=at, opener=object(), pacing_clock=object()),
+        )
+    text = buf.getvalue().strip().splitlines()
+    payload = json.loads(text[-1]) if text else {}
+    payload["_exit_code"] = code
+    return payload
+
+
 class EpisodeScenario:
     """One isolated producer root driven only through the production entry."""
 
@@ -325,6 +342,15 @@ class EpisodeScenario:
         result = cli_tick(self.data_root, self.market, at, env_fault=fault)
         self.ticks.append(result)
         return result
+
+    def operator(self, at: datetime, command: str) -> dict[str, Any]:
+        return cli_command(
+            self.data_root, at, command,
+            "--schedule-sha256", self.schedule["schedule_sha256"], "--activation-id", self.activation_id,
+        )
+
+    def activation_state(self) -> str:
+        return str(self.query("SELECT state FROM schedule_activations")[0][0])
 
     def query(self, sql: str, params: tuple = ()) -> list[tuple]:
         import sqlite3

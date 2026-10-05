@@ -201,6 +201,38 @@ def phase_p1(work: Path) -> dict[str, Any]:
         if result.get("_exit_code") != 0:
             raise AssertionError(f"tick failed at {at}: {result}")
     tick_wall = time.perf_counter() - started
+    # P1-A adversarial: admission-time assignment replaced, removed or damaged
+    # before closure must fail the export closed and write nothing.
+    assignment_path = data_root / "protection" / "assignments" / f"{assignment['assignment_id']}.json"
+    original_assignment = assignment_path.read_bytes()
+    refusals: dict[str, str] = {}
+
+    def attempt(label: str) -> None:
+        try:
+            capture_freeze_export(
+                observation_rdp=data_root,
+                ops_store=data_root / "observation_schedule_state.sqlite",
+                imported_cohort_ids=set(),
+                as_of=AS_OF,
+                collection="OPPORTUNITY_EPISODES",
+            )
+        except Exception as exc:  # the refusal code is the evidence
+            refusals[label] = str(exc).split(":")[0]
+        else:
+            refusals[label] = "NOT_REFUSED"
+
+    substituted = json.loads(original_assignment)
+    substituted["entries"] = [
+        {"identity_kind": "MINT", "identity": "SynthLateProtected" + "1" * 26, "role": "SPLIT_MEMBER", "scope": {"kind": "ALL_TIME"}}
+    ]
+    assignment_path.write_bytes(json.dumps(substituted, sort_keys=True).encode("utf-8"))
+    attempt("substituted")
+    assignment_path.unlink()
+    attempt("deleted")
+    assignment_path.write_bytes(b"{not json")
+    attempt("unreadable")
+    refusals["export_bytes_after_refusals"] = str(tree_bytes(data_root / "exports"))
+    assignment_path.write_bytes(original_assignment)
     imported: set[str] = set()
     packets = []
     for _index in range(3):
@@ -238,6 +270,7 @@ def phase_p1(work: Path) -> dict[str, Any]:
         "slot_states": states,
         "admissions": [{key: item[key] for key in ("episode_id", "mint", "t0", "cohort_id", "cycle_start")} for item in admissions],
         "activation_state": activation_state,
+        "frozen_protection_refusals": refusals,
         "outbox": {"rows": outbox[0], "retained_row_bytes": outbox[1], "unpublished": outbox[2]},
         "packets": packets,
         "storage": {
@@ -332,6 +365,74 @@ def null_spec(query_id: str) -> dict[str, Any]:
         {"feature": "elapsed", "op": "gt", "value": 0},
     ]
     return spec
+
+
+def _frozen_protection_verify_refusals(mirror: Path, scratch: Path) -> dict[str, str]:
+    """Release verify requires the pinned assignments as dependencies, independently of the manifest."""
+
+    import hashlib
+
+    from solana_alpha_lab.factory.live_cohort_discovery_release import verify_live_cohort
+
+    releases = sorted(path.parent for path in (mirror / "sealed_releases").rglob("release_manifest.json"))
+    results: dict[str, str] = {}
+
+    def variant(label: str, mutate) -> None:
+        copy = scratch / f"frozen-{label}"
+        shutil.rmtree(copy, ignore_errors=True)
+        shutil.copytree(releases[0], copy)
+        try:
+            mutate(copy)
+            try:
+                verify_live_cohort(copy)
+            except Exception as exc:
+                results[label] = str(exc).split(":")[0]
+            else:
+                results[label] = "NOT_REFUSED"
+        finally:
+            shutil.rmtree(copy, ignore_errors=True)
+
+    def manifest_of(root: Path) -> tuple[Path, dict[str, Any]]:
+        path = root / "release_manifest.json"
+        return path, json.loads(path.read_text(encoding="utf-8"))
+
+    def drop_pinned(root: Path) -> None:
+        # Delete the file and its manifest listing: a self-consistent release without the policy.
+        path, manifest = manifest_of(root)
+        victims = [item for item in manifest["files"] if item["path"].startswith("protection/")]
+        manifest["files"] = [item for item in manifest["files"] if not item["path"].startswith("protection/")]
+        for item in victims:
+            (root / item["path"]).unlink()
+        path.write_text(json.dumps(manifest, sort_keys=True), encoding="utf-8")
+
+    def substitute_pinned(root: Path) -> None:
+        # Replace the policy with a different valid assignment and re-list its bytes.
+        path, manifest = manifest_of(root)
+        for item in manifest["files"]:
+            if item["path"].startswith("protection/"):
+                target = root / item["path"]
+                document = json.loads(target.read_text(encoding="utf-8"))
+                document["entries"] = []
+                raw = json.dumps(document, sort_keys=True).encode("utf-8")
+                document["owner"] = "SUBSTITUTED_AFTER_ADMISSION"
+                raw = json.dumps(document, sort_keys=True).encode("utf-8")
+                target.write_bytes(raw)
+                item["sha256"] = hashlib.sha256(raw).hexdigest()
+                item["bytes"] = len(raw)
+        path.write_text(json.dumps(manifest, sort_keys=True), encoding="utf-8")
+
+    def extra_policy(root: Path) -> None:
+        path, manifest = manifest_of(root)
+        raw = b"{}"
+        (root / "protection" / "EXTRA.json").write_bytes(raw)
+        manifest["files"].append({"path": "protection/EXTRA.json", "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)})
+        path.write_text(json.dumps(manifest, sort_keys=True), encoding="utf-8")
+
+    variant("dropped", drop_pinned)
+    variant("substituted", substitute_pinned)
+    variant("extra", extra_policy)
+    variant("exact_pinned_unchanged", lambda root: None)
+    return results
 
 
 def _tampered_release_refused(mirror: Path, scratch: Path) -> dict[str, Any]:
@@ -444,6 +545,7 @@ def phase_p2(work: Path) -> dict[str, Any]:
     replay_import = _consume(packets[:1], source=source, mirror=mirror, plane=plane)
     report["consume_repeat"] = replay_import
     report["tampered_release"] = _tampered_release_refused(mirror, p2)
+    report["frozen_protection_verify"] = _frozen_protection_verify_refusals(mirror, p2)
     from tests.test_hfic_cli import run_cli
 
     no_policy = run_cli("preflight", "--discovery-contract", "--collection", "OPPORTUNITY_EPISODES",
@@ -620,6 +722,15 @@ def phase_p3(work: Path) -> dict[str, Any]:
     report["e259200_states"] = sorted({str(row.get("state")) for row in long_rows})
     report["e259200_observed_n"] = len({row.get("episode_id") for row in long_rows if row.get("state") == "OBSERVED"})
     report["verified_releases"] = [verify_live_cohort(cold / item["release_dir_rel"])["release_id"] for item in lineage["cohorts"]]
+    from solana_alpha_lab.factory.opportunity_episode_release import frozen_protection_from_release
+    from solana_alpha_lab.factory.opportunity_episodes import assignment_document_sha256
+
+    report["cold_frozen_protection"] = [
+        {"cohort": item["cohort_id"],
+         "pinned": [assignment_document_sha256(doc) for doc in frozen_protection_from_release(cold / item["release_dir_rel"])],
+         "schedule_binding_sources": [source["sha256"] for source in item["schedule_binding"].get("protection_sources", [])]}
+        for item in lineage["cohorts"]
+    ]
     before = ResearchStore(cold).diagnostics().committed_inventory_sha256
 
     def saved_readback(focus: str) -> dict[str, Any]:
@@ -703,6 +814,12 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         self.assertIn("DISAPPEARED", p1["slot_states"])
         self.assertIn("CENSORED", p1["slot_states"])
         # D11: the ops store keeps no copy of published rows.
+        # P1-A: a substituted, removed or damaged assignment refuses the export and writes nothing.
+        self.assertEqual(
+            p1["frozen_protection_refusals"],
+            {"substituted": "FROZEN_PROTECTION_HASH_MISMATCH", "deleted": "FROZEN_PROTECTION_MISSING",
+             "unreadable": "FROZEN_PROTECTION_UNREADABLE", "export_bytes_after_refusals": "0"},
+        )
         self.assertEqual(p1["outbox"]["unpublished"], 0)
         self.assertEqual((p1["outbox"]["rows"], p1["outbox"]["retained_row_bytes"]), (0, 0))
         p2 = spawn("P2", work)
@@ -713,6 +830,12 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         self.assertEqual(p2["consume_repeat"]["result"]["cohorts"][0]["import_status"], "PASS_ALREADY_PRESENT_EXACT")
         self.assertEqual(p2["consume_repeat"]["result"]["cohorts"][0]["transferred_files"], 0)
         self.assertTrue(p2["tampered_release"]["refused"], p2["tampered_release"])
+        # P1-A: verify needs exactly the pinned assignments, whatever the manifest lists.
+        self.assertEqual(
+            p2["frozen_protection_verify"],
+            {"dropped": "FROZEN_PROTECTION_SET_MISMATCH", "substituted": "FROZEN_PROTECTION_HASH_MISMATCH",
+             "extra": "FROZEN_PROTECTION_SET_MISMATCH", "exact_pinned_unchanged": "NOT_REFUSED"},
+        )
         # D5: torn import is fail-closed and repaired by the same command.
         self.assertTrue(p2["torn_import"]["died"])
         self.assertTrue(p2["torn_import"]["lineage_unchanged"])
@@ -766,6 +889,9 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         p3 = spawn("P3", work)
         self.assertEqual(p3["original_root_probe"], "BLOCKED")
         self.assertEqual(len(p3["verified_releases"]), 3)
+        self.assertEqual(len(p3["cold_frozen_protection"]), 3)
+        self.assertTrue(all(len(item["pinned"]) == 1 for item in p3["cold_frozen_protection"]))
+        self.assertEqual(len({tuple(item["pinned"]) for item in p3["cold_frozen_protection"]}), 1)
         self.assertIn("START_BASE", p3["readback_superseded"]["blocking_reason_codes"])
         self.assertEqual(p3["readback"]["owner_final"], "OPERATION_PAUSED_SEARCH_OPEN")
         self.assertEqual(p3["readback"]["market_evidence_epoch_sha256"], p2["preflight_2"]["market_evidence_epoch_sha256"])
