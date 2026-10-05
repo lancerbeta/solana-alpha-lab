@@ -37,6 +37,7 @@ managed_write_set:
 - docs/tasks/OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1.md
 - scripts/discovery_evidence_release.py
 - scripts/hypothesis_forge.py
+- scripts/observation_schedule.py
 - src/solana_alpha_lab/factory/forge_input_receipt.py
 - src/solana_alpha_lab/factory/hfic_evidence_identity.py
 - src/solana_alpha_lab/factory/hfic_grounded_discovery.py

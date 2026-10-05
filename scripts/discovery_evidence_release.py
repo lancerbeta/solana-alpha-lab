@@ -303,6 +303,21 @@ EPISODE_FAIL_NEXT = {
     "CLOSURE_COHORT_MISMATCH": "STOP_DO_NOT_IMPORT",
     "RELEASE_HASH_MISMATCH": "STOP_DO_NOT_IMPORT",
     "CANONICAL_TARGET_CONFLICT": "STOP_DO_NOT_OVERWRITE_CANONICAL_TARGET",
+    **{
+        code: "STOP_RESTORE_PINNED_PROTECTION_ASSIGNMENT"
+        for code in (
+            "FROZEN_PROTECTION_MISSING",
+            "FROZEN_PROTECTION_UNREADABLE",
+            "FROZEN_PROTECTION_HASH_MISMATCH",
+            "FROZEN_PROTECTION_IDENTITY_MISMATCH",
+            "FROZEN_PROTECTION_SET_MISMATCH",
+            "FROZEN_PROTECTION_CLOSURE_MISMATCH",
+            "FROZEN_PROTECTION_RECEIPT_MISMATCH",
+            "FROZEN_PROTECTION_SOURCES_EMPTY",
+            "FROZEN_PROTECTION_PIN_INVALID",
+            "FROZEN_PROTECTION_PIN_DUPLICATE",
+        )
+    },
 }
 
 
@@ -789,7 +804,10 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     except (DiscoveryReleaseError, LiveCohortReleaseError, LiveCohortToForgeError, DataRootError) as exc:
         code = str(exc)
-        next_action = FAIL_OWNER_NEXT.get(code, "STOP_INSPECT_FAIL_CODE")
+        if getattr(args, "collection", None) == EPISODE_COLLECTION:
+            next_action = _episode_next(code)
+        else:
+            next_action = FAIL_OWNER_NEXT.get(code, "STOP_INSPECT_FAIL_CODE")
         if args.command in {"import-live", "publish-live-cohort"}:
             terminal = owner_import_terminal(code)
             if terminal == STOP_IDENTITY_CONFLICT:

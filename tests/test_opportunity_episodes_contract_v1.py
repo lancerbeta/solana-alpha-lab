@@ -412,6 +412,13 @@ class FrozenProtectionPinTests(unittest.TestCase):
         self.pin = {"assignment_id": self.pin["assignment_id"], "sha256": oe.assignment_document_sha256(other)}
         self.refused("FROZEN_PROTECTION_IDENTITY_MISMATCH")
 
+    def test_export_cli_gives_an_actionable_next_only_on_the_episode_path(self) -> None:
+        import scripts.discovery_evidence_release as cli
+
+        self.assertEqual(cli._episode_next("FROZEN_PROTECTION_HASH_MISMATCH:ASSIGN-1"), "STOP_RESTORE_PINNED_PROTECTION_ASSIGNMENT")
+        self.assertEqual(cli._episode_next("SOMETHING_UNKNOWN"), "STOP_INSPECT_FAIL_CODE")
+        self.assertNotIn("FROZEN_PROTECTION_MISSING", cli.FAIL_OWNER_NEXT)
+
     def test_pins_must_be_non_empty_unique_and_well_formed(self) -> None:
         from solana_alpha_lab.factory.opportunity_episode_release import (
             EpisodeReleaseError,

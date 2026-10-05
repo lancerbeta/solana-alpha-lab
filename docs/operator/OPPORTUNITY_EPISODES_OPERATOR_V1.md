@@ -22,8 +22,18 @@ protection source is a deliberate placeholder, so admissions stay
 `UNRESOLVED_SCOPE` until commissioning registers real assignment documents under
 `<data_root>/protection/assignments/`.
 
-* Stop intake: let `stops_admitting_at` pass or pause the activation; admitted
-  obligations continue while DRAINING and complete when every slot is terminal.
+* Stop intake early (safe drain), without waiting for `stops_admitting_at`:
+
+```text
+uv run --locked --managed-python python -B scripts/observation_schedule.py stop-intake --schedule-sha256 <sha> --activation-id <id> --runtime-config <runtime-config> --data-root <rdp>
+```
+
+  It closes new admissions at that instant through the same ACTIVE → DRAINING
+  transition the natural boundary uses. Already committed episodes keep
+  collecting and publishing, and the activation completes once every obligation
+  is terminal. Rerun the same command after a crash: it is idempotent and
+  repairs a missing evidence event. A paused activation must be resumed first.
+  `pause` is not a stop-intake: it also stops the committed obligations.
 * Recovery: the next tick republishes the outbox, recovers completed calls from
   the call ledger and turns intent-without-result into
   `ATTEMPT_OUTCOME_UNKNOWN`; it never re-requests a past slot.
@@ -78,6 +88,7 @@ values; registered replay recomputes from the frozen recipe and release files.
 | `RELEASE_HASH_MISMATCH`, `MIRROR_CONFLICT`, `CLOSURE_COHORT_MISMATCH` | bytes differ from the sealed or captured identity | stop; do not import |
 | `COLLECTION_PACKET_MISMATCH` | packet from another collection | use an OPPORTUNITY_EPISODES capture packet |
 | `CAPTURE_PACKET_REQUIRES_SOURCE_AND_MIRROR_RDP` | packet given without its transport roots | add `--source-rdp` and `--mirror-rdp` |
+| `FROZEN_PROTECTION_*` (missing, unreadable, hash/identity/set mismatch) at export, seal or verify | the protection assignment frozen at admission is absent, damaged or differs from its pin | stop; restore the exact registered assignment file (never regenerate it) and rerun |
 | `FOCUS_POPULATION_MISMATCH` | question population differs from the focus collection | use `population=OPPORTUNITY_EPISODES` with an episode focus |
 
 ## Not here

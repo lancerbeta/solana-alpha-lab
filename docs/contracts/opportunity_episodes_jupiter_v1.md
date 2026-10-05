@@ -185,3 +185,22 @@ records real evidence; the episode authority profile does not grant activation.
 - Registered replay recomputes the frozen recipe from the release bytes in a
   separate process; it is a determinism check, with literal oracle values
   asserted alongside, not an independent implementation.
+
+## 10. Frozen protection provenance and stop-intake
+
+- The protection sources frozen in the schedule (assignment id + semantic sha)
+  are the only admission-time policy. Capture export reads each registered
+  assignment file and fails closed, before writing anything, when it is
+  missing, a symlink, unreadable, of another identity or of another semantic
+  hash. The release carries exactly those assignments as mandatory
+  dependencies; `verify_episode_release` re-derives the pins from the schedule
+  artifact, requires them to equal the closure's, and refuses a missing, extra
+  or substituted file even when the manifest agrees with it. The Forge reader
+  binds only these frozen assignments (plus any current stricter ones).
+- Operator stop-intake (`scripts/observation_schedule.py stop-intake`) is an
+  early ACTIVE → DRAINING on the existing lifecycle owner and ResearchEvent
+  evidence (`operator_stop_intake`); it exists for the episode lane only,
+  closes admission at its committed instant and leaves committed obligations,
+  publication and completion to the ordinary drain. It is idempotent, never
+  reopens intake after a crash, and does not change `pause`, which still stops
+  all obligations.

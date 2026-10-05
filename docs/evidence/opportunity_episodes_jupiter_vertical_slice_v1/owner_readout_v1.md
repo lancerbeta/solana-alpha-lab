@@ -46,10 +46,16 @@ reproduce command are in `vertical_proof_summary_v1.json`.
   (every other obligation terminalises as an explicit gap); 25 admissions over
   three UTC days; one mint admitted in two weekly cycles as two episodes; a
   one-episode Sunday cohort; activation `COMPLETE`; the ops store keeps no
-  published outbox rows.
+  published outbox rows. Before the first capture, the admission-time protection
+  assignment is substituted, deleted and damaged in turn: each refuses the
+  export (`FROZEN_PROTECTION_HASH_MISMATCH` / `_MISSING` / `_UNREADABLE`) and
+  writes nothing; the exact pinned file then exports normally.
 - **P2 workstation.** Legacy newborn import alongside; genuine consume; exact
   repeat `PASS_ALREADY_PRESENT_EXACT` with 0 transferred files; tampered sealed
-  release refused (`RELEASE_HASH_MISMATCH`); import worker killed after labels
+  release refused (`RELEASE_HASH_MISMATCH`); a sealed release whose manifest was
+  made self-consistent without its pinned assignment, with a substituted one or
+  with an extra one is refused by verify (`FROZEN_PROTECTION_SET_MISMATCH` /
+  `_HASH_MISMATCH`), the exact pinned release passes; import worker killed after labels
   and before lineage → preflight fails closed, the same command repaired it with
   a different `--as-of`; mixed PRICE+LIQUIDITY+HOLDERS+TIME question equals the
   literal oracle (12/12/6/5, mean 0.10, baseline 0.2/11) with target attrition
@@ -60,7 +66,8 @@ reproduce command are in `vertical_proof_summary_v1.json`.
   the next question spends one normal look (25/24/12/11, 24 distinct mints,
   1 repeated).
 - **P3 cold relocated root.** Original roots and network blocked by an audit
-  hook; 3 releases verified from the copy; a 72 h point (E259200) present in the
+  hook; 3 releases verified from the copy, each carrying exactly the pinned
+  assignment bytes and semantics; a 72 h point (E259200) present in the
   cold corpus for the 4 episodes whose hourly slot was ticked; saved readback
   loads no values and leaves the store unchanged; registered replay equals the
   saved result and the literal counts and baseline. Replay is a determinism
@@ -70,11 +77,23 @@ The Critic result is produced by the test at the model boundary
 (`SCRIPTED_CRITIC_MECHANICAL`) and the candidate card text is test-authored;
 the lifecycle, packet, refusal paths and persistence are the real ones.
 
+## Operator stop-intake (safe drain)
+
+`scripts/observation_schedule.py stop-intake` closes new admissions early
+through the existing ACTIVE → DRAINING owner (producer tests through the
+production entry): with a committed episode and the scheduled boundary hours
+away, intake is 0 after the command, the committed trajectory keeps observing
+and publishing, and the activation reaches `COMPLETE`; the drained cohort
+exports as an ordinary mature cohort. A repeat is idempotent; a crash between
+the committed transition and its evidence event leaves intake closed (completion
+is refused rather than guessed) and the same command repairs it; `pause`
+semantics are unchanged and a paused activation cannot be drained.
+
 ## D1–D12
 
 | Row | Status | Evidence | Not exercised |
 | --- | --- | --- | --- |
-| D1 Protection | PASS | producer: protected/unknown never admitted or published, including every raw body a published row names; contract: inventory fail-closed, no value projection | — |
+| D1 Protection | PASS | producer: protected/unknown never admitted or published, including every raw body a published row names; contract: inventory fail-closed, no value projection; frozen assignment pins enforced at export, seal, verify and the Forge reader (substituted/deleted/damaged/extra all refused; vertical + contract tests) | symlinked assignment verified only on platforms that allow symlinks (skipped on Windows) |
 | D2 Frame/sample | PASS | producer frame tests; contract tickets/quotas | no explicit "no backfill of a dropped admitted mint" assertion |
 | D3 Admission crash | PARTIAL | producer: before/after commit, before publish, after publish before mark, call start/complete | crash at a UTC day, weekly cycle or profile boundary |
 | D4 Time/core | PARTIAL | contract literal clocks, E0 witness, >8 points refused; vertical E300/E1800/E14400/E21600 through import, reader and evaluator; E259200 in the cold corpus | different batch receipts for one point; E259200 inside a query |
@@ -84,7 +103,7 @@ the lifecycle, packet, refusal paths and persistence are the real ones.
 | D8 Mixed numerical + lifecycle | PASS | vertical oracle signal + controlled null; invalid/missing Critic; finalize; forge-run; contract wrong anchor / future feature | wrong anchor and future feature checked by the validator, not in the vertical run |
 | D9 Cold and next run | PASS | P3 + exact repeat 0 values / 0 look + next-run budget | — |
 | D10 Legacy | PARTIAL | legacy hash pins; grounded BASE_X refuses E-points and episode bindings; 128 consumer modules re-run (see below) | old scoped negative vs the new population; release 1.0/1.1 byte preservation relies on the suite run |
-| D11 Resource/recovery | PARTIAL | budgets per tick/day, active cap, stop intake, obligations survive, measured RSS/wall/bytes, outbox bounded | restart at budget boundary, host envelope, low reserve, aged history, non-empty restore, live shared burst |
+| D11 Resource/recovery | PARTIAL | budgets per tick/day, active cap, operator stop-intake → drain → COMPLETE (idempotent, crash-safe), obligations survive, measured RSS/wall/bytes, outbox bounded | restart at budget boundary, host envelope, low reserve, aged history, non-empty restore, live shared burst |
 | D12 Semantic/owner path | PASS | gold route queries RU/EN; runbook via asset search | runbook is not a route root (size bound) |
 
 Legacy suite: 2126 tests in 128 consumer modules; two failures reproduce

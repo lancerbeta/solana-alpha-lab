@@ -270,6 +270,18 @@ class StopIntakeDrainTests(ScenarioCase):
         self.assertEqual(sc.activation_state(), "COMPLETE")
         self.assertEqual(sc.unpublished(), 0)
         self.assertFalse({state for state, _ in sc.slot_states(episode).values()} & {"PENDING", "DUE", "CLAIMED"})
+        # The early-drained cohort is an ordinary mature cohort for capture export.
+        from solana_alpha_lab.factory.live_cohort_vanilla_path import capture_freeze_export
+
+        packet = capture_freeze_export(
+            observation_rdp=sc.data_root,
+            ops_store=sc.ops_path,
+            imported_cohort_ids=set(),
+            as_of=S + timedelta(hours=80),
+            collection="OPPORTUNITY_EPISODES",
+        )
+        self.assertEqual(packet["closure_receipt"]["admissions_n"], 1)
+        self.assertTrue(packet["closure_receipt"]["closure_ready"])
 
     def test_repeat_is_idempotent_and_never_reopens_intake(self) -> None:
         sc = self.scenario(stops=S + timedelta(hours=6))
