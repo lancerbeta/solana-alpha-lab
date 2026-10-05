@@ -29,7 +29,7 @@
     "independent_review": {
       "path": "docs/evidence/opportunity_episodes_bounded_operability_v1/a1_delivery_independent_review_v1.json",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
@@ -38,7 +38,7 @@
       "PASS_EXACT_CODE_COLD_1_7_30_60_EQUIVALENT",
       "PASS_R1_R4_SYNTHETIC_OWNER_REHEARSALS",
       "PASS_FROZEN_WRITER_ROLLBACK",
-      "AWAITING_ISOLATED_REVIEW_AND_CANONICAL_SYNC"
+      "PASS_FOUR_ISOLATED_REQUIRED_REVIEWS_AND_CANONICAL_SYNC"
     ]
   },
   "non_claims": [

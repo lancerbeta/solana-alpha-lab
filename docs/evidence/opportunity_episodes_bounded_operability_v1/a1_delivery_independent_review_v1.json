@@ -15,38 +15,144 @@
   "reviews": [
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_FINAL_ISOLATED_EXACT_CONTENT_REVIEW"
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_f7f2c5f012721da072bb91f96fdf103397177c4a",
+        "PACKET_FINGERPRINT_54db0909b12de6e3f2cf3eae755c7e22317cfd191e4356b3bc3e6c4d0e1fcd98",
+        "RESIDUAL_P0_P1_P2_NONE",
+        "SEMANTIC_PREMISE_PASS_PACKET_INFORMATION_PATH_MODEL_DIVERSITY_UNPROVEN",
+        "CANONICAL_MANIFEST_PARQUET_OWNERS_PIT_FULL_READERS_PRESERVED",
+        "UNVERIFIED_SCOPE_UNKNOWN_PENDING_SOURCE_AND_FROZEN_TIMESTAMP_TYPED",
+        "LINUX_POWER_LOSS_ACTUAL_ASSIGNMENT_ACCOUNT_FACTORY_STORAGE_REMAIN_GATED"
       ]
     },
     {
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_FINAL_ISOLATED_EXACT_CONTENT_REVIEW"
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_f7f2c5f012721da072bb91f96fdf103397177c4a",
+        "PACKET_FINGERPRINT_54db0909b12de6e3f2cf3eae755c7e22317cfd191e4356b3bc3e6c4d0e1fcd98",
+        "RESIDUAL_P0_P1_P2_NONE",
+        "EXACT_FROZEN_DIFF_AND_TWELVE_SOURCE_HASHES_MATCH",
+        "PUBLIC_RECOVERY_IO_TIMESTAMP_REFUSALS_PRESERVE_EVIDENCE",
+        "FINAL_DELTA_REVIEW_SUCCESS_PROOF_APPLICABILITY_CONFIRMED"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_FINAL_ISOLATED_EXACT_CONTENT_REVIEW"
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_f7f2c5f012721da072bb91f96fdf103397177c4a",
+        "PACKET_FINGERPRINT_54db0909b12de6e3f2cf3eae755c7e22317cfd191e4356b3bc3e6c4d0e1fcd98",
+        "RESIDUAL_P0_P1_P2_NONE",
+        "EXACT_OUTCOME_R1_R4_LOCAL_SYNTHETIC_PROOF_APPLICABLE",
+        "EIGHT_DURABLE_OWNERS_EIGHTEEN_RAW_REFS_TWELVE_COLD_PROCESSES_VERIFIED",
+        "FACT_MODEL_UNKNOWN_PRESERVED_COMMISSIONING_NOT_READY_TO_RUN"
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "AWAITING_FINAL_ISOLATED_EXACT_CONTENT_REVIEW"
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_f7f2c5f012721da072bb91f96fdf103397177c4a",
+        "PACKET_FINGERPRINT_54db0909b12de6e3f2cf3eae755c7e22317cfd191e4356b3bc3e6c4d0e1fcd98",
+        "RESIDUAL_P0_P1_P2_NONE",
+        "FROZEN_UNREADABLE_NEXT_PRESERVES_BYTES_AND_REQUIRES_EXACT_BACKUP_ON_COPY",
+        "COMMISSIONING_EIGHT_OWNER_BINDINGS_VERIFIED",
+        "ONE_CURRENT_MERGE_GATE_FUTURE_OPERATE_NOT_READY"
       ]
     }
   ],
-  "verdict": "NOT_READY",
+  "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "NO_ALPHA",
     "NO_LIVE_ACCEPTANCE",
-    "NO_MERGE"
+    "NO_MERGE",
+    "NO_MODEL_DIVERSITY_ATTESTATION",
+    "PACKET_INFORMATION_PATH_ONLY",
+    "NO_LIVE_LAUNCH_IDENTITY_ATTESTATION"
+  ],
+  "remediation_history": [
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Real operational packet episode projection and storage-history ownership corrected",
+      "observed_head": "83c6a6009af447226a455ed15e0e8bcae247f361",
+      "resolved_by_head": "1c96671503a2dc3a465f8896e27df015f2937a66"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Mixed legacy missing metadata preserves global UNKNOWN instead of a known subset zero",
+      "observed_head": "83c6a6009af447226a455ed15e0e8bcae247f361",
+      "resolved_by_head": "1c96671503a2dc3a465f8896e27df015f2937a66"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Unsupported same-day fragment terminal NEXT documented",
+      "observed_head": "83c6a6009af447226a455ed15e0e8bcae247f361",
+      "resolved_by_head": "1c96671503a2dc3a465f8896e27df015f2937a66"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Legacy missingness scope and Linux immediate-parent fsync limits made explicit",
+      "observed_head": "83c6a6009af447226a455ed15e0e8bcae247f361",
+      "resolved_by_head": "1c96671503a2dc3a465f8896e27df015f2937a66"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Request-day gate and debit unified after credential and STARTED drift",
+      "observed_head": "1c96671503a2dc3a465f8896e27df015f2937a66",
+      "resolved_by_head": "26fa1399fd0ac3658a9ff7442f66d4dae4455a12"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Deep lookup JSON and reused-node IO denial share bounded typed decoding",
+      "observed_head": "1c96671503a2dc3a465f8896e27df015f2937a66",
+      "resolved_by_head": "26fa1399fd0ac3658a9ff7442f66d4dae4455a12"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Frozen-unreadable terminal NEXT preserves immutable evidence and requires exact verified recovery",
+      "observed_head": "3b44db24e4994a527545fb26598141f9dc144e1b",
+      "resolved_by_head": "f7f2c5f012721da072bb91f96fdf103397177c4a"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Unverified scope no longer becomes a positive legacy collection label",
+      "observed_head": "3b44db24e4994a527545fb26598141f9dc144e1b",
+      "resolved_by_head": "f7f2c5f012721da072bb91f96fdf103397177c4a"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Invalid frozen timestamp is converted before export without evidence rewrite",
+      "observed_head": "3b44db24e4994a527545fb26598141f9dc144e1b",
+      "resolved_by_head": "f7f2c5f012721da072bb91f96fdf103397177c4a"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Canonical pending recovery source IO refusal is typed before staging",
+      "observed_head": "3b44db24e4994a527545fb26598141f9dc144e1b",
+      "resolved_by_head": "f7f2c5f012721da072bb91f96fdf103397177c4a"
+    }
   ]
 }
