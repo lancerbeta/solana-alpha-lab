@@ -3,13 +3,13 @@
   "schema_version": "1.0",
   "task_id": "OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1",
   "as_of": "2026-10-05",
-  "measured_at_head": "74594bda3dfb4afd14e8bd17acf145a4547a4540",
+  "measured_at_head": "32eef76be4fd46e43de412bae1ed09b519473b9d",
   "evidence_class": "SYNTHETIC_LOCAL_WORKSTATION",
   "reproduce": "OEP_VERTICAL_WORK=<empty-scratch-dir> uv run --locked --managed-python python -B -m unittest tests.test_opportunity_episodes_vertical_v1",
   "report_sha256": {
-    "p1": "737ffa972183aff050460ad5a06094250f260cb5c48853bf6e94ca3fc9f62965",
-    "p2": "d785cebfc8535d21333c387234eb0af8987372b778803a69cc4b10396469be92",
-    "p3": "b3a439157fa2df0e5c7efa728f671d0096c2103f4be5f710c83ce98376e2c7d0"
+    "p1": "663a159a8f7ec6c102ed657d7be3d77a59c87b29746227ee58f031f9c25cc007",
+    "p2": "c29bb94307b264c04d623bd53674d77bacaa1c70c3c9287aebc1e756622e1f20",
+    "p3": "10c6c9705c6afa16c71910b4885929aee0bdddbba2b464f8345ece01181d7a2a"
   },
   "processes": {
     "P1_capture_host": {
@@ -36,9 +36,9 @@
         "unpublished": 0
       },
       "capture_packets": 3,
-      "wall_seconds": 183.46,
-      "tick_wall_mean_seconds": 1.475,
-      "peak_rss_bytes": 120946688,
+      "wall_seconds": 198.43,
+      "tick_wall_mean_seconds": 1.598,
+      "peak_rss_bytes": 123199488,
       "storage_bytes": {
         "export_bytes": 122717,
         "manifest_bytes": 318849,
@@ -48,6 +48,12 @@
         "raw_plane_bytes": 284992,
         "rdp_total_bytes": 15772636,
         "research_store_bytes": 2264135
+      },
+      "frozen_protection_refusals": {
+        "deleted": "FROZEN_PROTECTION_MISSING",
+        "export_bytes_after_refusals": "0",
+        "substituted": "FROZEN_PROTECTION_HASH_MISMATCH",
+        "unreadable": "FROZEN_PROTECTION_UNREADABLE"
       }
     },
     "P2_workstation": {
@@ -64,6 +70,12 @@
       "tampered_release": {
         "code": "RELEASE_HASH_MISMATCH",
         "refused": true
+      },
+      "frozen_protection_verify_variants": {
+        "dropped": "FROZEN_PROTECTION_SET_MISMATCH",
+        "exact_pinned_unchanged": "NOT_REFUSED",
+        "extra": "FROZEN_PROTECTION_SET_MISMATCH",
+        "substituted": "FROZEN_PROTECTION_HASH_MISMATCH"
       },
       "torn_import": {
         "died": true,
@@ -226,12 +238,12 @@
         }
       },
       "consume_wall_seconds": [
-        4.15,
-        2.82,
-        4.37
+        4.26,
+        2.96,
+        4.48
       ],
-      "wall_seconds": 91.78,
-      "peak_rss_bytes": 486346752,
+      "wall_seconds": 96.08,
+      "peak_rss_bytes": 488112128,
       "storage_bytes": {
         "episode_corpus_bytes": 496034,
         "mirror_bytes": 5433334,
@@ -244,6 +256,7 @@
       "blocked_events_during_cold": [],
       "verified_releases": 3,
       "e259200_observed_episodes_in_cold_corpus": 4,
+      "cold_pinned_assignment_equals_producer_pin": true,
       "saved_readback_current": {
         "blocking_reason_codes": [
           "START_BASE"
@@ -283,9 +296,25 @@
           "observed_target_n": 5
         }
       },
-      "wall_seconds": 11.01,
-      "peak_rss_bytes": 272273408
+      "wall_seconds": 11.45,
+      "peak_rss_bytes": 272916480
     }
+  },
+  "stop_intake_drain": {
+    "proven_in": "tests/test_opportunity_episodes_producer_v1.py::StopIntakeDrainTests (production entry; clock and transport synthetic)",
+    "not_a_step_of_the_three_process_vertical": true,
+    "covers": [
+      "early drain closes intake",
+      "committed trajectory continues and publishes",
+      "COMPLETE",
+      "mature cohort exports",
+      "idempotent repeat",
+      "crash between transition and evidence does not reopen intake; repeat repairs",
+      "pause unchanged and paused cannot be drained",
+      "episode schedules only",
+      "backdated clock refused",
+      "pending rollover refused"
+    ]
   },
   "independent_oracle": {
     "authored_market": "signal = even admission index; holders 60->75 and price 1.00->1.02 at E1800, 1.122 at E14400; non-signal 0.98 then 0.931; tiny mint vanishes after 15 min; A2 E14400 tick withheld",

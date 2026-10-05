@@ -111,8 +111,13 @@ existing admission.
 
 Legacy suite: 2126 tests in 128 consumer modules; two failures reproduce
 identically on base `de20465e` (`test_forge_input_truth_and_visibility_v1`,
-`test_forge_representation_ladder_v1`). The final head re-run is recorded in the
-completion evidence.
+`test_forge_representation_ladder_v1`). After the protection-pin and stop-intake
+repair, 83 modules that import the changed owners ran in four parallel groups at
+`9be8c470`: three groups OK; the fourth had 4 `ModuleNotFoundError` errors in
+`test_factory_operability_live_resource_gate_repair_v1`, which reproduce
+identically on base `de20465e` (a scripts module not importable under plain
+unittest here; CI runs that module in its execution lane). The three-process
+vertical was re-run at `32eef76b`; its code equals the evidence-bound head.
 
 ## Resource model (MODEL, not a host envelope)
 
