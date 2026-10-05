@@ -40159,7 +40159,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_opportunity_episodes_contract_v1.py', repository_path: tests/test_opportunity_episodes_contract_v1.py}
-  integrity: {kind: sha256, sha256: 57eff15e61445322f1c689b68b007f311a3d31e22c91378db7bd089fb61e6919}
+  integrity: {kind: sha256, sha256: a4ba8af61849391fbb4daefb40efe0d23164a32f688002acb6ab3ee25618cc9b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
@@ -40197,7 +40197,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_opportunity_episodes_vertical_v1.py', repository_path: tests/test_opportunity_episodes_vertical_v1.py}
-  integrity: {kind: sha256, sha256: f5930df4de47c7ab8afd45ca9ed2c26e166f1b0156f2aa235547ddcf2b9e5eef}
+  integrity: {kind: sha256, sha256: 4b3f50d9bb704f42e47fbf9646b562f415794872a765ccfde8a8efec41342739}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}

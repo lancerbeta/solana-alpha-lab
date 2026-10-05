@@ -323,6 +323,30 @@ class QueryGuardTests(unittest.TestCase):
             execute_temporal_discovery(census, rows, episode_spec(), [binding_item(), legacy_binding])
 
 
+    def test_focus_population_guard_both_directions(self) -> None:
+        from solana_alpha_lab.factory.hfic_ordinary_operation import (
+            OrdinaryOperationError,
+            require_focus_population,
+        )
+
+        episode = episode_spec()
+        legacy = {**episode, "population": "BASE_X"}
+        require_focus_population("OPPORTUNITY_EPISODES:Q", episode)
+        require_focus_population("AUTO", legacy)
+        for focus, spec in (("AUTO", episode), ("OPPORTUNITY_EPISODES:Q", legacy)):
+            with self.assertRaisesRegex(OrdinaryOperationError, "FOCUS_POPULATION_MISMATCH"):
+                require_focus_population(focus, spec)
+
+    def test_mixed_schedule_clocks_refused_in_evaluator(self) -> None:
+        census, rows = prd_vector()
+        first = binding_item()
+        second = copy.deepcopy(first)
+        second["cohort_id"] = "REL-20261012T000000Z-20261013T000000Z"
+        second["schedule_binding"] = {**second["schedule_binding"], "availability_grace_seconds": 600}
+        with self.assertRaisesRegex(GroundedDiscoveryError, "SCHEDULE_CLOCK_MIXED"):
+            execute_temporal_discovery(census, rows, episode_spec(), [first, second])
+
+
 class ProtectionAndFrameTests(unittest.TestCase):
     def setUp(self) -> None:
         self.tmp = tempfile.TemporaryDirectory()

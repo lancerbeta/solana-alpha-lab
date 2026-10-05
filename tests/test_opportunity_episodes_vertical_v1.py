@@ -742,6 +742,9 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         self.assertEqual(p2["preflight_without_policy"]["universe_policy_state"], "ABSENT")
         attrition = p2["run1"]["result"]["episode_target_attrition"]
         self.assertEqual((sum(attrition["matched"].values()), sum(attrition["decision_baseline"].values())), (1, 1))
+        # The reason is carried for the baseline too (never "unspecified").
+        self.assertEqual(attrition["matched"], attrition["decision_baseline"])
+        self.assertNotIn("TARGET_MISSING_UNSPECIFIED", attrition["decision_baseline"])
         self.assertEqual(p2["frozen"]["grounding"], "GROUNDED")
         self.assertNotEqual(p2["critic_invalid"]["exit"], 0)
         self.assertNotEqual(p2["critic_missing"]["exit"], 0)
