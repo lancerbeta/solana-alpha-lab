@@ -571,6 +571,19 @@ def stop_episode_intake(
         stored = existing.get("payload") if isinstance(existing.get("payload"), Mapping) else {}
         if stored.get("operator_stop_intake") is not True:
             return {**base, "terminal": "STOP_INTAKE_ALREADY_DRAINING", "state": "DRAINING"}
+    else:
+        # The natural drain defers while a rollover cutover is pending; so does the operator.
+        if any(
+            str(item["predecessor_schedule_sha256"]) == schedule_sha256
+            and str(item["predecessor_activation_id"]) == activation_id
+            for item in store.list_rollovers()
+        ):
+            raise ObservationLifecycleError("STOP_INTAKE_ROLLOVER_PENDING")
+        # A backdated clock must not commit an admission-closed instant earlier
+        # than an admission that already exists.
+        admissions = store.list_episode_admissions(schedule_sha256=schedule_sha256, activation_id=activation_id)
+        if admissions and now < max(parse_utc(str(item["t0"])) for item in admissions):
+            raise ObservationLifecycleError("STOP_INTAKE_CLOCK_BEFORE_LAST_ADMISSION")
     transition = store.transition_activation(
         schedule_sha256=schedule_sha256,
         activation_id=activation_id,

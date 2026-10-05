@@ -204,3 +204,7 @@ records real evidence; the episode authority profile does not grant activation.
   publication and completion to the ordinary drain. It is idempotent, never
   reopens intake after a crash, and does not change `pause`, which still stops
   all obligations.
+- Residual, stated: the drain proof reads `operator_stop_intake` from the
+  immutable ResearchEvent written by the episode-only command; it does not
+  additionally re-resolve the schedule kind. A late holdout inside a running
+  activation needs a new schedule (the pinned assignment may not change).

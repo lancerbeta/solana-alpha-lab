@@ -441,10 +441,20 @@ def load_pinned_assignment(directory: Path, source: Mapping[str, str]) -> tuple[
     _require(isinstance(document, Mapping), f"FROZEN_PROTECTION_UNREADABLE:{assignment_id}")
     _require(str(document.get("assignment_id") or "") == assignment_id, f"FROZEN_PROTECTION_IDENTITY_MISMATCH:{assignment_id}")
     _require(assignment_document_sha256(document) == str(source["sha256"]), f"FROZEN_PROTECTION_HASH_MISMATCH:{assignment_id}")
+    completeness = document.get("completeness")
+    _require(
+        isinstance(completeness, Mapping) and completeness.get("complete") is True,
+        f"FROZEN_PROTECTION_INCOMPLETE:{assignment_id}",
+    )
     return document, raw
 
 
-def frozen_protection_from_release(root: Path, *, listed: Mapping[str, Any] | None = None) -> list[Mapping[str, Any]]:
+def frozen_protection_from_release(
+    root: Path,
+    *,
+    listed: Mapping[str, Any] | None = None,
+    expected_schedule_sha256: str | None = None,
+) -> list[Mapping[str, Any]]:
     """Independently confirm the release carries exactly the pinned assignments.
 
     The pins come from the schedule artifact and must equal the closure's; the
@@ -454,6 +464,10 @@ def frozen_protection_from_release(root: Path, *, listed: Mapping[str, Any] | No
 
     root = Path(root)
     closure = json.loads((root / CLOSURE_NAME).read_text(encoding="utf-8"))
+    if expected_schedule_sha256 is not None:
+        # The schedule this release was sealed and imported under, not whichever
+        # closure sits in the directory.
+        _require(str(closure.get("schedule_sha256") or "") == str(expected_schedule_sha256), "FROZEN_PROTECTION_SCHEDULE_MISMATCH")
     try:
         schedule_document = decode_schedule_artifact(
             (root / OBSERVATION_SCHEDULE_ARTIFACT_NAME).read_bytes(),
@@ -998,7 +1012,7 @@ def verify_episode_release(release_root: Path) -> dict[str, Any]:
     closure = json.loads((root / CLOSURE_NAME).read_text(encoding="utf-8"))
     assert_episode_closure_ready(closure)
     _require(closure.get("closure_receipt_sha256") == manifest.get("closure_receipt_sha256"), "CLOSURE_BINDING_MISMATCH")
-    frozen_protection_from_release(root, listed=listed)
+    frozen_protection_from_release(root, listed=listed, expected_schedule_sha256=str(manifest.get("schedule_sha256") or ""))
     census = pq.read_table(root / CENSUS_NAME, columns=["schedule_sha256", "episode_id", "release_id"]).to_pylist()
     _require({row["schedule_sha256"] for row in census} == {manifest["schedule_sha256"]}, "CENSUS_SCHEDULE_SHA_MISMATCH")
     _require({row["release_id"] for row in census} == {manifest["release_id"]}, "IDENTITY_CONFLICT")

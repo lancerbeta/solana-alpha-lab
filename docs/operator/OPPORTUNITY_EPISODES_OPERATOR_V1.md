@@ -33,7 +33,9 @@ uv run --locked --managed-python python -B scripts/observation_schedule.py stop-
   collecting and publishing, and the activation completes once every obligation
   is terminal. Rerun the same command after a crash: it is idempotent and
   repairs a missing evidence event. A paused activation must be resumed first.
-  `pause` is not a stop-intake: it also stops the committed obligations.
+  `pause` is not a stop-intake: it also stops the committed obligations. The
+  schedule sha and activation id come from `observation_schedule.py status`;
+  if a tick holds the writer lease the command answers `WRITER_BUSY`: retry.
 * Recovery: the next tick republishes the outbox, recovers completed calls from
   the call ledger and turns intent-without-result into
   `ATTEMPT_OUTCOME_UNKNOWN`; it never re-requests a past slot.
@@ -89,6 +91,10 @@ values; registered replay recomputes from the frozen recipe and release files.
 | `COLLECTION_PACKET_MISMATCH` | packet from another collection | use an OPPORTUNITY_EPISODES capture packet |
 | `CAPTURE_PACKET_REQUIRES_SOURCE_AND_MIRROR_RDP` | packet given without its transport roots | add `--source-rdp` and `--mirror-rdp` |
 | `FROZEN_PROTECTION_*` (missing, unreadable, hash/identity/set mismatch) at export, seal or verify | the protection assignment frozen at admission is absent, damaged or differs from its pin | stop; restore the exact registered assignment file (never regenerate it) and rerun |
+| `ACTIVATION_NOT_ACTIVE` at stop-intake | the activation is paused (run `observation_schedule.py resume` with the same ids, then repeat stop-intake) or aborted (nothing to stop) | see meaning |
+| `STOP_INTAKE_ALREADY_DRAINING` / `STOP_INTAKE_COMPLETE_REPLAY` | intake is already closed | no action |
+| `STOP_INTAKE_EPISODE_SCHEDULE_ONLY` | the ids point at a non-episode schedule | check `--schedule-sha256` |
+| `STOP_INTAKE_CLOCK_BEFORE_LAST_ADMISSION` / `STOP_INTAKE_ROLLOVER_PENDING` | the clock is earlier than an existing admission, or a rollover cutover is pending | fix the clock / wait for the cutover, then repeat |
 | `FOCUS_POPULATION_MISMATCH` | question population differs from the focus collection | use `population=OPPORTUNITY_EPISODES` with an episode focus |
 
 ## Not here

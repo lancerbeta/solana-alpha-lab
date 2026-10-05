@@ -405,6 +405,13 @@ class FrozenProtectionPinTests(unittest.TestCase):
         self.path.write_bytes(json.dumps(replacement, sort_keys=True).encode("utf-8"))
         self.refused("FROZEN_PROTECTION_HASH_MISMATCH")
 
+    def test_incomplete_assignment_is_refused_even_when_pinned(self) -> None:
+        incomplete = json.loads(self.original)
+        incomplete["completeness"] = {"complete": False, "proof": "SYNTHETIC"}
+        self.path.write_bytes(json.dumps(incomplete, sort_keys=True).encode("utf-8"))
+        self.pin = {"assignment_id": self.pin["assignment_id"], "sha256": oe.assignment_document_sha256(incomplete)}
+        self.refused("FROZEN_PROTECTION_INCOMPLETE")
+
     def test_wrong_identity_is_refused(self) -> None:
         other = json.loads(self.original)
         other["assignment_id"] = "ASSIGNMENT-OTHER"

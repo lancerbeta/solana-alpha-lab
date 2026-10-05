@@ -271,6 +271,7 @@ def phase_p1(work: Path) -> dict[str, Any]:
         "admissions": [{key: item[key] for key in ("episode_id", "mint", "t0", "cohort_id", "cycle_start")} for item in admissions],
         "activation_state": activation_state,
         "frozen_protection_refusals": refusals,
+        "assignment_sha256": assignment["sha256"],
         "outbox": {"rows": outbox[0], "retained_row_bytes": outbox[1], "unpublished": outbox[2]},
         "packets": packets,
         "storage": {
@@ -412,8 +413,6 @@ def _frozen_protection_verify_refusals(mirror: Path, scratch: Path) -> dict[str,
             if item["path"].startswith("protection/"):
                 target = root / item["path"]
                 document = json.loads(target.read_text(encoding="utf-8"))
-                document["entries"] = []
-                raw = json.dumps(document, sort_keys=True).encode("utf-8")
                 document["owner"] = "SUBSTITUTED_AFTER_ADMISSION"
                 raw = json.dumps(document, sort_keys=True).encode("utf-8")
                 target.write_bytes(raw)
@@ -681,6 +680,7 @@ def phase_p3(work: Path) -> dict[str, Any]:
     cold = cold_parent / "relocated" / "plane"
     shutil.copytree(original_plane, cold)
     # Saved evidence is read before the cold boundary is installed.
+    p1_assignment_sha = json.loads((work / "p1-report.json").read_text(encoding="utf-8"))["assignment_sha256"]
     p2 = json.loads((work / "p2-report.json").read_text(encoding="utf-8"))
     run1 = json.loads((work / "p2" / "run1-evidence.json").read_text(encoding="utf-8"))
     forbidden = [str((work / "p1").resolve()).lower(), str((work / "p2").resolve()).lower()]
@@ -725,10 +725,15 @@ def phase_p3(work: Path) -> dict[str, Any]:
     from solana_alpha_lab.factory.opportunity_episode_release import frozen_protection_from_release
     from solana_alpha_lab.factory.opportunity_episodes import assignment_document_sha256
 
+    report["producer_assignment_sha256"] = p1_assignment_sha
     report["cold_frozen_protection"] = [
         {"cohort": item["cohort_id"],
-         "pinned": [assignment_document_sha256(doc) for doc in frozen_protection_from_release(cold / item["release_dir_rel"])],
-         "schedule_binding_sources": [source["sha256"] for source in item["schedule_binding"].get("protection_sources", [])]}
+         "pinned": [
+             assignment_document_sha256(doc)
+             for doc in frozen_protection_from_release(
+                 cold / item["release_dir_rel"], expected_schedule_sha256=item["schedule_sha256"]
+             )
+         ]}
         for item in lineage["cohorts"]
     ]
     before = ResearchStore(cold).diagnostics().committed_inventory_sha256
@@ -891,7 +896,8 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         self.assertEqual(len(p3["verified_releases"]), 3)
         self.assertEqual(len(p3["cold_frozen_protection"]), 3)
         self.assertTrue(all(len(item["pinned"]) == 1 for item in p3["cold_frozen_protection"]))
-        self.assertEqual(len({tuple(item["pinned"]) for item in p3["cold_frozen_protection"]}), 1)
+        # The cold copies carry exactly the assignment the producer pinned at admission.
+        self.assertTrue(all(item["pinned"] == [p3["producer_assignment_sha256"]] for item in p3["cold_frozen_protection"]))
         self.assertIn("START_BASE", p3["readback_superseded"]["blocking_reason_codes"])
         self.assertEqual(p3["readback"]["owner_final"], "OPERATION_PAUSED_SEARCH_OPEN")
         self.assertEqual(p3["readback"]["market_evidence_epoch_sha256"], p2["preflight_2"]["market_evidence_epoch_sha256"])

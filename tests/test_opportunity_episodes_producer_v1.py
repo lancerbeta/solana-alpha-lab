@@ -329,6 +329,24 @@ class StopIntakeDrainTests(ScenarioCase):
         self.assertEqual((refused["terminal"], refused["_exit_code"]), ("ACTIVATION_NOT_ACTIVE", 2))
         self.assertEqual(sc.activation_state(), "PAUSED_OPERATOR")
 
+    def test_backdated_clock_cannot_close_intake_before_an_existing_admission(self) -> None:
+        sc = self.scenario(stops=S + timedelta(hours=6))
+        self._two_rounds(sc, "BackA", "BackB")
+        sc.tick(S + timedelta(seconds=5))
+        refused = sc.operator(S - timedelta(hours=1), "stop-intake")
+        self.assertEqual((refused["terminal"], refused["_exit_code"]), ("STOP_INTAKE_CLOCK_BEFORE_LAST_ADMISSION", 2))
+        self.assertEqual(sc.activation_state(), "ACTIVE")
+
+    def test_pending_rollover_defers_operator_stop_like_the_natural_drain(self) -> None:
+        from unittest import mock
+
+        sc = self.scenario(stops=S + timedelta(hours=6))
+        pending = [{"predecessor_schedule_sha256": sc.schedule["schedule_sha256"], "predecessor_activation_id": sc.activation_id}]
+        with mock.patch.object(ObservationScheduleStore, "list_rollovers", return_value=pending):
+            refused = sc.operator(S + timedelta(minutes=1), "stop-intake")
+        self.assertEqual((refused["terminal"], refused["_exit_code"]), ("STOP_INTAKE_ROLLOVER_PENDING", 2))
+        self.assertEqual(sc.activation_state(), "ACTIVE")
+
     def test_only_episode_schedules_can_use_stop_intake(self) -> None:
         sc = self.scenario(stops=S + timedelta(hours=6))
         from tests.test_opportunity_episodes_harness_v1 import cli_command

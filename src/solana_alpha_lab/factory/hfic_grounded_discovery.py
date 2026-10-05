@@ -248,7 +248,9 @@ def resolve_published_episode_binding(data_root: Path) -> dict[str, Any]:
         release_dir = root / str(item.get("release_dir_rel") or "")
         try:
             # Exactly the pinned admission-time assignments; nothing else binds.
-            frozen_documents = frozen_protection_from_release(release_dir)
+            frozen_documents = frozen_protection_from_release(
+                release_dir, expected_schedule_sha256=str(item.get("schedule_sha256") or "")
+            )
         except (EpisodeReleaseError, OSError, ValueError):
             raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED") from None
         inventory = inventory_from_documents([*frozen_documents, *current_documents])

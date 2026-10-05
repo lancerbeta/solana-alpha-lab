@@ -87,13 +87,16 @@ and publishing, and the activation reaches `COMPLETE`; the drained cohort
 exports as an ordinary mature cohort. A repeat is idempotent; a crash between
 the committed transition and its evidence event leaves intake closed (completion
 is refused rather than guessed) and the same command repairs it; `pause`
-semantics are unchanged and a paused activation cannot be drained.
+semantics are unchanged and a paused activation cannot be drained. The drain is
+proven in producer tests through the production entry, not as a step of the
+three-process vertical. It refuses a pending rollover and a clock earlier than an
+existing admission.
 
 ## D1–D12
 
 | Row | Status | Evidence | Not exercised |
 | --- | --- | --- | --- |
-| D1 Protection | PASS | producer: protected/unknown never admitted or published, including every raw body a published row names; contract: inventory fail-closed, no value projection; frozen assignment pins enforced at export, seal, verify and the Forge reader (substituted/deleted/damaged/extra all refused; vertical + contract tests) | symlinked assignment verified only on platforms that allow symlinks (skipped on Windows) |
+| D1 Protection | PASS | producer: protected/unknown never admitted or published, including every raw body a published row names; contract: inventory fail-closed, no value projection; frozen assignment pins enforced at export, seal, verify and the Forge reader (substituted/deleted/damaged/extra all refused; vertical + contract tests) | symlinked assignment verified only on platforms that allow symlinks (skipped on Windows); no seal-time refusal test of its own (the seal check is exercised through verify variants and the consume flow) |
 | D2 Frame/sample | PASS | producer frame tests; contract tickets/quotas | no explicit "no backfill of a dropped admitted mint" assertion |
 | D3 Admission crash | PARTIAL | producer: before/after commit, before publish, after publish before mark, call start/complete | crash at a UTC day, weekly cycle or profile boundary |
 | D4 Time/core | PARTIAL | contract literal clocks, E0 witness, >8 points refused; vertical E300/E1800/E14400/E21600 through import, reader and evaluator; E259200 in the cold corpus | different batch receipts for one point; E259200 inside a query |
@@ -140,6 +143,15 @@ publication transaction.
 3. Category 5m routes remain `PROVIDER_ROUTE_REGISTRY_GAP`; the protection
    source is a placeholder, so every admission stays `UNRESOLVED_SCOPE` until
    real assignment documents exist.
+
+## Accepted limits of the protection pin and the drain flag
+
+- A protection assignment edited on the capture host after registration makes
+  both admission and export refuse (fail closed); adding a late holdout inside a
+  running activation needs a new schedule or a workstation-current assignment.
+- The drain proof honours `operator_stop_intake` from the immutable committed
+  event; it is written only by the episode-only command and is not additionally
+  schedule-scoped in the proof function.
 
 ## Owner decisions left open
 
