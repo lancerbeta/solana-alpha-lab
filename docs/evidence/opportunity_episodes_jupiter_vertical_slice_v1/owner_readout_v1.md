@@ -81,6 +81,15 @@ Template profile: 100 admissions/UTC day × 138 obligations, 672 modeled
 provider calls/day. Per-unit costs measured in P1/P2 and 30/97/365-day
 projections are in `vertical_proof_summary_v1.json`.
 
+| Horizon | Admissions | Modeled calls | Ops SQLite | Publication parquet | Workstation corpus | Workstation mirror |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 30 d | 3 000 | 20 160 | ≈ 1.0 GB | ≈ 0.5 GB | ≈ 55 MB | ≈ 0.6 GB |
+| 97 d | 9 700 | 65 184 | ≈ 3.2 GB | ≈ 1.6 GB | ≈ 177 MB | ≈ 2.0 GB |
+| 365 d | 36 500 | 245 280 | ≈ 12.0 GB | ≈ 5.9 GB | ≈ 665 MB | ≈ 7.4 GB |
+
+Measured peaks on this workstation: P1 RSS ≈ 120 MB, P2 ≈ 490 MB, P3 ≈ 266 MB;
+consume of one cohort 3–4 s; cold readback + replay ≈ 10 s.
+
 Found and fixed: the ops store kept a full copy of every published row
 (about 8.8 KB per obligation, ~120 MB/day at the template rate). Published rows
 are now deleted in the publication transaction.
