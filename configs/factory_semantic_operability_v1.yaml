@@ -252,6 +252,7 @@ routes:
       - Does Forge see one cumulative current dataset?
       - Where did my imported cohort land?
       - как live evidence попадает в Forge
+      - How do opportunity episodes reach Forge? / как эпизоды попадают в Forge
     search_terms:
       - live evidence
       - LIVE CORPUS
@@ -266,9 +267,12 @@ routes:
       - live rdp
       - forge-input
       - FORGE INPUT
+      - OPPORTUNITY_EPISODES
+      - opportunity episodes
+      - NOMINATION_T0
     consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, FACTORY-001]
     root_binding_ids: [ACTIVE-LIVE-LIFECYCLE-EVIDENCE]
-    root_asset_ids: [MODULE-LIVE-COHORT-TO-FORGE-001]
+    root_asset_ids: [MODULE-LIVE-COHORT-TO-FORGE-001, DOC-OPPORTUNITY-EPISODES-OPERATOR-001, DOC-OPPORTUNITY-EPISODES-CONTRACT-001]
     query_recipe_ids: []
     status_plane: MIXED
     runtime_resolution: {mode: NONE, operator_asset_ids: []}

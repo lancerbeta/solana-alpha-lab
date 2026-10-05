@@ -34541,7 +34541,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: 2ca0f6b64fa3a11d670cb5f2f283aa915f1bd7a23144397f75043ea5e64ebe73}
+  integrity: {kind: sha256, sha256: 2b77248db771989827eeb18c4e54888fb5849ac46c1eaec99637df5a918bc99f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34651,7 +34651,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/FACTORY_SEMANTIC_MAP.md', repository_path: docs/FACTORY_SEMANTIC_MAP.md}
-  integrity: {kind: sha256, sha256: 302b2a57761a8b46310ec6fca1a0c2781956f7643a524555328630ce68f08c5d}
+  integrity: {kind: sha256, sha256: 4c58ea3690553802a04c6522bb623534cf3f0af9f7e1cd617b23539861c1003e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -39996,4 +39996,232 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
   evidence: []
   search_terms: [FORGE_COMPOSITE_FEATURE_RECIPES_V1, holder growth, mixed hypothesis, raw holder availability]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: 'Exact task contract for the OPPORTUNITY_EPISODES Jupiter vertical slice (live lane disabled).'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-05'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1.md', repository_path: docs/tasks/OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1.md}
+  integrity: {kind: sha256, sha256: 3772b4503b80905f632604239670c37d1d012c2ee1e01623496a2da04abf3c8a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: DOC-OPPORTUNITY-EPISODES-CONTRACT-001}
+  - {relation_type: validated_by, target_asset_id: TEST-OPPORTUNITY-EPISODES-VERTICAL-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1, opportunity episodes, JUPITER_CORE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: DOC-OPPORTUNITY-EPISODES-CONTRACT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: 'Semantic contract: NOMINATION_T0 anchor, identities, 139-point schedule resolver, protection gate, release 1.2, query 1.1.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-05'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/opportunity_episodes_jupiter_v1.md', repository_path: docs/contracts/opportunity_episodes_jupiter_v1.md}
+  integrity: {kind: sha256, sha256: de877479dddde1713913ff35a7e2d8acbff9cbc9e90edd89e95521827031795f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [OPPORTUNITY_EPISODES, NOMINATION_T0, episode T0, OPPORTUNITY_EPISODE_SCHEDULE_V1, episode schedule, admission commit]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: DOC-OPPORTUNITY-EPISODES-OPERATOR-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: 'Operator runbook: capture-freeze-export, unpack-next-live-cohort --collection OPPORTUNITY_EPISODES, preflight --collection, stop-intake/drain, cold replay.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-05'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md', repository_path: docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md}
+  integrity: {kind: sha256, sha256: 96d30dd83257f4d5772455885f8f03ecc0aad23df5489775fdbdd78b0d318f69}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
+  - {relation_type: depends_on, target_asset_id: DOC-OPPORTUNITY-EPISODES-CONTRACT-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [OPPORTUNITY_EPISODES runbook, unpack-next-live-cohort --collection, capture-freeze-export, episode consume, stop intake]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-OPPORTUNITY-EPISODES-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: 'Episode domain owner: schedule document, point/clock resolver, protection gate, closed frame, tickets, quotas, admission identity.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-05'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/opportunity_episodes.py', repository_path: src/solana_alpha_lab/factory/opportunity_episodes.py}
+  integrity: {kind: sha256, sha256: a86e77e1f2bbedc5766b72d9b7ee9ebf8faa739fe3e402e1b69c1713843fbbee}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-TOKENS-V2-TYPED-PROJECTION-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [opportunity_episodes, resolve_point, protection_decision, build_frame, episode_id]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-OPPORTUNITY-EPISODE-TICK-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: 'OPPORTUNITY_EPISODES branch of the one ObservationSchedule tick: slots, nomination round, atomic admission, outbox publication.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-05'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/opportunity_episode_tick.py', repository_path: src/solana_alpha_lab/factory/opportunity_episode_tick.py}
+  integrity: {kind: sha256, sha256: aa992bd84b0d369b1df17c097a34547182fb1a0fa7ab2fc3867802393bed0fdf}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OPPORTUNITY-EPISODES-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULER-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [episode tick, ATTEMPT_OUTCOME_UNKNOWN, SLOT_NOT_EXECUTED, admission outbox]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-OPPORTUNITY-EPISODE-RELEASE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: 'OPPORTUNITY_EPISODES collection strategy: closure by obligations, bounded export, release 1.2, episode corpus import, population card.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-05'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/opportunity_episode_release.py', repository_path: src/solana_alpha_lab/factory/opportunity_episode_release.py}
+  integrity: {kind: sha256, sha256: 5025302c98cbb9762b769d1660c7b19b17c269502a5f5a3ae348b609ddc6f414}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OPPORTUNITY-EPISODES-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [episode release, release 1.2, episode corpus, population card, DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-OPPORTUNITY-EPISODE-SCHEDULE-V1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: 'Closed smial.opportunity-episode-schedule 1.0 schema.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-05'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/opportunity_episode_schedule_v1.schema.json', repository_path: catalog/schemas/opportunity_episode_schedule_v1.schema.json}
+  integrity: {kind: sha256, sha256: 6cb2feac2b0e3bbe08b5d738435a52ce8ea6d0f388acde5f7b1ad3ff03ab1aea}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [smial.opportunity-episode-schedule, episode schedule schema]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-OPPORTUNITY-EPISODES-JUPITER-CORE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: 'JUPITER_CORE collection profile template; not an activation; protection source is a commissioning placeholder.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-05'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/opportunity_episodes_jupiter_core_v1.yaml', repository_path: configs/opportunity_episodes_jupiter_core_v1.yaml}
+  integrity: {kind: sha256, sha256: dc586aa402cfb0c422e2c0a36352f6f5f02c6ad3d8c3762ee0cc81fad7be9fb0}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-OPPORTUNITY-EPISODE-SCHEDULE-V1-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [JUPITER_CORE profile, capture floor, toporganicscore, toptraded, toptrending]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-OPPORTUNITY-EPISODES-CONTRACT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: 'Contract proofs: resolver literals, guards, protection, frame, tickets, legacy pins.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-05'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_opportunity_episodes_contract_v1.py', repository_path: tests/test_opportunity_episodes_contract_v1.py}
+  integrity: {kind: sha256, sha256: 91f01255c3e51bcff42907d36162e571c2f9c5d6cbaa88564c7b1feaf98822f1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OPPORTUNITY-EPISODES-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [OPPORTUNITY_EPISODES, TESTS, CONTRACT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-OPPORTUNITY-EPISODES-PRODUCER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: 'Producer proofs through the production tick: protection, frame, crash recovery, gaps, resource gates.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-05'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_opportunity_episodes_producer_v1.py', repository_path: tests/test_opportunity_episodes_producer_v1.py}
+  integrity: {kind: sha256, sha256: 66d99b73d1aff97c0bcc5d7f006187df27c0a34820ee1b5823cfbbea36bedf36}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OPPORTUNITY-EPISODES-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [OPPORTUNITY_EPISODES, TESTS, PRODUCER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-OPPORTUNITY-EPISODES-VERTICAL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: 'Three-process producer -> consume -> ordinary Forge -> cold replay proof.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-05'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_opportunity_episodes_vertical_v1.py', repository_path: tests/test_opportunity_episodes_vertical_v1.py}
+  integrity: {kind: sha256, sha256: cd687bdd1a20a54372462171f6391f0d425bfa97ab5da914722854b2dd14ff30}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OPPORTUNITY-EPISODES-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [OPPORTUNITY_EPISODES, TESTS, VERTICAL]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-OPPORTUNITY-EPISODES-HARNESS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: 'Test-owned physical boundary (transport, clock, authored vendor bytes).'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-05'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_opportunity_episodes_harness_v1.py', repository_path: tests/test_opportunity_episodes_harness_v1.py}
+  integrity: {kind: sha256, sha256: 47fa28b18cc7428e84fbb38425037b8132aa1e08c4c27ac3786d8da4c03e8218}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OPPORTUNITY-EPISODES-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [OPPORTUNITY_EPISODES, TESTS, HARNESS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

@@ -74,8 +74,7 @@ managed_write_set:
 - docs/PROJECT_MAP.md
 - docs/OPERATOR_NAVIGATION.md
 - docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md
-- docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
-- .agents/skills/hypothesis-forge/SKILL.md
+- docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md
 - tests/test_opportunity_episodes_*.py
 - tests/fixtures/opportunity_episodes_v1/**
 - tests/test_observation_primitive_registry*.py

@@ -998,6 +998,16 @@
       "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
     },
     {
+      "source_asset_id": "CONFIG-OPPORTUNITY-EPISODES-JUPITER-CORE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-OPPORTUNITY-EPISODE-SCHEDULE-V1-001"
+    },
+    {
+      "source_asset_id": "CONFIG-OPPORTUNITY-EPISODES-JUPITER-CORE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001"
+    },
+    {
       "source_asset_id": "CONFIG-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",
       "relation": "depends_on",
       "target_asset_id": "CTRL-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001"
@@ -4188,6 +4198,16 @@
       "target_asset_id": "MODULE-OBSERVATION-SCHEDULE-RUNTIME-001"
     },
     {
+      "source_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-OPPORTUNITY-EPISODES-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-OPPORTUNITY-EPISODES-VERTICAL-001"
+    },
+    {
       "source_asset_id": "CTRL-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",
       "relation": "governed_by",
       "target_asset_id": "ARCH-INTENT-005"
@@ -6026,6 +6046,21 @@
       "source_asset_id": "DOC-MARKET-DATA-AWARENESS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-MARKET-DATA-AWARENESS-001"
+    },
+    {
+      "source_asset_id": "DOC-OPPORTUNITY-EPISODES-CONTRACT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001"
+    },
+    {
+      "source_asset_id": "DOC-OPPORTUNITY-EPISODES-OPERATOR-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-OPPORTUNITY-EPISODES-CONTRACT-001"
+    },
+    {
+      "source_asset_id": "DOC-OPPORTUNITY-EPISODES-OPERATOR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001"
     },
     {
       "source_asset_id": "DOC-OWNER-ATTENTION-AND-CHANGE-FEED-001",
@@ -12053,6 +12088,46 @@
       "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
     },
     {
+      "source_asset_id": "MODULE-OPPORTUNITY-EPISODE-RELEASE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001"
+    },
+    {
+      "source_asset_id": "MODULE-OPPORTUNITY-EPISODE-RELEASE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OPPORTUNITY-EPISODES-001"
+    },
+    {
+      "source_asset_id": "MODULE-OPPORTUNITY-EPISODE-RELEASE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001"
+    },
+    {
+      "source_asset_id": "MODULE-OPPORTUNITY-EPISODE-TICK-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OBSERVATION-SCHEDULER-001"
+    },
+    {
+      "source_asset_id": "MODULE-OPPORTUNITY-EPISODE-TICK-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OPPORTUNITY-EPISODES-001"
+    },
+    {
+      "source_asset_id": "MODULE-OPPORTUNITY-EPISODE-TICK-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001"
+    },
+    {
+      "source_asset_id": "MODULE-OPPORTUNITY-EPISODES-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-TOKENS-V2-TYPED-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "MODULE-OPPORTUNITY-EPISODES-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001"
+    },
+    {
       "source_asset_id": "MODULE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001"
@@ -14841,6 +14916,11 @@
       "source_asset_id": "SCHEMA-OBSERVATION-SCHEDULE-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-OPPORTUNITY-EPISODE-SCHEDULE-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001"
     },
     {
       "source_asset_id": "SCHEMA-OWNER-AUTHORITY-PACKET-001",
@@ -17726,6 +17806,46 @@
       "source_asset_id": "TEST-OBSERVATION-SCHEDULE-SCHEMAS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "TEST-OPPORTUNITY-EPISODES-CONTRACT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OPPORTUNITY-EPISODES-001"
+    },
+    {
+      "source_asset_id": "TEST-OPPORTUNITY-EPISODES-CONTRACT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001"
+    },
+    {
+      "source_asset_id": "TEST-OPPORTUNITY-EPISODES-HARNESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OPPORTUNITY-EPISODES-001"
+    },
+    {
+      "source_asset_id": "TEST-OPPORTUNITY-EPISODES-HARNESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001"
+    },
+    {
+      "source_asset_id": "TEST-OPPORTUNITY-EPISODES-PRODUCER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OPPORTUNITY-EPISODES-001"
+    },
+    {
+      "source_asset_id": "TEST-OPPORTUNITY-EPISODES-PRODUCER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001"
+    },
+    {
+      "source_asset_id": "TEST-OPPORTUNITY-EPISODES-VERTICAL-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OPPORTUNITY-EPISODES-001"
+    },
+    {
+      "source_asset_id": "TEST-OPPORTUNITY-EPISODES-VERTICAL-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001"
     },
     {
       "source_asset_id": "TEST-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",
