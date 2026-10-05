@@ -132,7 +132,8 @@ def _append_or_replay(data_root: Path, event: ResearchEvent) -> None:
     try:
         store.append([event], transaction_id=event.transaction_id)
     except Exception:
-        existing = list(store.iter_committed_records())
+        exact = store.find_record(event.record_id)
+        existing = [exact] if exact is not None else []
         match = next((item for item in existing if item.record_id == event.record_id), None)
         if match is None:
             raise
@@ -1058,6 +1059,7 @@ def _draining_transition_evidence(
             records = research._verify_partition(manifest) if manifest is not None else ()
         else:
             records, _telemetry = research.iter_lifecycle_records_bounded(
+                state_only=True,
                 include_member_predecessor=False,
                 schedule_sha256=schedule_sha256,
                 activation_id=activation_id,
@@ -1278,6 +1280,7 @@ def rollover_research_event_proven(
         records, _telemetry = ResearchStore(
             data_root, create_if_missing=False
         ).iter_lifecycle_records_bounded(
+            state_only=True,
             include_member_predecessor=False,
             schedule_sha256=predecessor_schedule,
             activation_id=predecessor_activation,
@@ -1362,6 +1365,7 @@ def rollover_research_event_proven(
         successor_records, _telemetry = ResearchStore(
             data_root, create_if_missing=False
         ).iter_lifecycle_records_bounded(
+            state_only=True,
             include_member_predecessor=False,
             schedule_sha256=successor_schedule,
             activation_id=successor_activation,
@@ -1573,6 +1577,7 @@ def activation_transition_research_event_proven(
         records, _telemetry = ResearchStore(
             data_root, create_if_missing=False
         ).iter_lifecycle_records_bounded(
+            state_only=True,
             include_member_predecessor=False,
             schedule_sha256=schedule_sha256,
             activation_id=activation_id,
@@ -1668,6 +1673,7 @@ def _prior_active_transition_research_event_proven(
         records, _telemetry = ResearchStore(
             data_root, create_if_missing=False
         ).iter_lifecycle_records_bounded(
+            state_only=True,
             include_member_predecessor=False,
             schedule_sha256=schedule_sha256,
             activation_id=activation_id,

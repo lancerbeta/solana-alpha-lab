@@ -659,3 +659,14 @@ watch/pulse против роста ledger; source clocks и RDP progression п�
 due; backup/archive verification; очередной same-family rollover; факт
 доставки daily и incident/recovery. Это контроль после commissioning, а не
 новая ежедневная ручная процедура или новая automation.
+# Episode preparation boundary
+
+Episode commissioning also requires `docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md`
+and `docs/contracts/research_write_lookup_v1.md`. The existing metadata-only host
+recipes do not authorize recursive RDP scans, prepared-index work, backup,
+status/doctor schema paths, deploy or timer changes on production. Those remain
+separate OPERATE actions. Explicit preparation is measured on a verified copy;
+restore/code rollback preserve canonical history and need a fresh preparation
+before returning to new writer code. Windows process proof is not Linux unit
+or power-loss acceptance. Notification freshness is not proof of off-host
+delivery; an absent receiver remains NOT_CONFIGURED.

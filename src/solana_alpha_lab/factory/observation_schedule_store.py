@@ -3410,6 +3410,55 @@ class ObservationScheduleStore:
         ).fetchone()
         return int(row["n"]) if row is not None else 0
 
+    def episode_operability_projection(self, *, schedule_sha256: str,
+                                       activation_id: str, now: datetime) -> dict[str, Any]:
+        """Metadata-only operator facts; no frame, raw or research payload reads."""
+        scope = (schedule_sha256, activation_id)
+        slots = {str(row[0]): int(row[1]) for row in self._conn.execute(
+            "SELECT state, COUNT(*) FROM due_observations WHERE schedule_sha256=? AND activation_id=? GROUP BY state", scope)}
+        admitted = int(self._conn.execute(
+            "SELECT COUNT(*) FROM episode_admissions WHERE schedule_sha256=? AND activation_id=?", scope).fetchone()[0])
+        open_n = int(self._conn.execute(
+            "SELECT COUNT(DISTINCT entity_id) FROM due_observations WHERE schedule_sha256=? AND activation_id=? "
+            "AND state IN ('PENDING','DUE','CLAIMED')", scope).fetchone()[0])
+        frame = self._conn.execute(
+            "SELECT round_started_at FROM episode_rounds WHERE schedule_sha256=? AND activation_id=? "
+            "AND state='CLOSED' ORDER BY round_started_at DESC LIMIT 1", scope).fetchone()
+        outbox = self._conn.execute(
+            "SELECT COUNT(*), MIN(created_at) FROM episode_outbox WHERE schedule_sha256=? AND activation_id=? "
+            "AND published_content_sha256 IS NULL", scope).fetchone()
+        publication = self._conn.execute(
+            "SELECT MAX(created_at) FROM episode_publications WHERE schedule_sha256=? AND activation_id=?", scope).fetchone()[0]
+        maturity = self._conn.execute(
+            "SELECT cohort_id, MAX(final_deadline_at) AS maturity FROM episode_admissions "
+            "WHERE schedule_sha256=? AND activation_id=? GROUP BY cohort_id "
+            "HAVING MAX(final_deadline_at)>? ORDER BY maturity LIMIT 1", (*scope, render_utc(now))).fetchone()
+        activation = self.get_activation(*scope)
+        execution = self._conn.execute(
+            "SELECT SUM(json_extract(payload_json,'$.attempt_class')='NO_REQUEST'), "
+            "SUM(json_extract(payload_json,'$.attempt_class')='ATTEMPTED'), "
+            "SUM(json_extract(payload_json,'$.attempt_class')='UNKNOWN'), "
+            "SUM(json_extract(payload_json,'$.field_value_missing_count')), "
+            "SUM(state NOT IN ('PENDING','DUE','CLAIMED') AND json_extract(payload_json,'$.attempt_class') IS NULL) FROM due_observations "
+            "WHERE schedule_sha256=? AND activation_id=?", scope).fetchone()
+        return {"collection": "OPPORTUNITY_EPISODES", "intake_enabled": bool(activation and activation["state"] == "ACTIVE"
+                and now < parse_utc(str(activation["stops_admitting_at"]))),
+                "last_completed_nomination_frame_at": frame[0] if frame else None,
+                "admitted_obligations": admitted, "open_obligations": open_n,
+                "terminal_obligations": admitted - open_n, "slot_states": slots,
+                "execution_metadata_status": "UNKNOWN_LEGACY_METADATA" if execution[4] else "EXACT",
+                "no_request_slots": None if execution[4] else int(execution[0] or 0),
+                "attempted_slots": None if execution[4] else int(execution[1] or 0),
+                "ambiguous_attempt_slots": None if execution[4] else int(execution[2] or 0),
+                "field_values_missing": int(execution[3]) if execution[3] is not None else None,
+                "late_slots": slots.get("CENSORED_LATE", 0),
+                "unpublished_backlog": int(outbox[0]),
+                "oldest_unpublished_age_seconds": max(0, int((now - parse_utc(outbox[1])).total_seconds())) if outbox[1] else 0,
+                "last_successful_publication_at": publication,
+                "next_cohort_maturity": dict(maturity) if maturity else None,
+                "drain_headroom": {"status": "UNKNOWN", "reason": "FRESH_TICK_DISK_MODEL_OR_COMMISSIONING_REQUIRED"},
+                "account_envelope": {"status": "UNKNOWN", "reason": "APPROVED_SHARED_ACCOUNT_BINDING_REQUIRED"}}
+
     def episode_slot_state_counts(
         self,
         *,

@@ -549,6 +549,10 @@ def build_collector_read_model(
     digest = str((selected or {}).get("schedule_sha256") or schedule_sha256 or "")
     act_id = str((selected or {}).get("activation_id") or activation_id or "")
     activation_state = str((selected or {}).get("state") or "NONE")
+    registered = store.get_registered_schedule(digest) if digest else None
+    from solana_alpha_lab.factory.opportunity_episodes import is_episode_schedule
+    episode_lane = bool(registered and is_episode_schedule(registered["document"]))
+    episode_readback = store.episode_operability_projection(schedule_sha256=digest, activation_id=act_id, now=now) if episode_lane else None
 
     due_counts = store.due_counts()
     due_pressure = build_due_pressure_projection(
@@ -672,6 +676,8 @@ def build_collector_read_model(
         health_flags.append("PROVIDER_RATE_LIMITED")
     if current_provider["provider_current_failed"]:
         health_flags.append("PROVIDER_FAILED")
+    if episode_lane:
+        coverage = "NOT_APPLICABLE_EPISODE_NOMINATION"
     if coverage == "GAP_CONFIRMED":
         health_flags.append("DISCOVERY_GAP")
     elif coverage == "GAP_SUSPECTED":
@@ -698,6 +704,8 @@ def build_collector_read_model(
                 members_24h += 1
 
     return {
+        "collection": "OPPORTUNITY_EPISODES" if episode_lane else "LIFECYCLE",
+        "episode_operability": episode_readback,
         "deploy_git_sha": deploy_git_sha,
         "schedule_sha256": digest or None,
         "activation_id": act_id or None,

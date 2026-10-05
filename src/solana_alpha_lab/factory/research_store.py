@@ -41,6 +41,7 @@ from solana_alpha_lab.factory.run_passport import (
     RunPassportError,
     validate_run_passport,
 )
+from solana_alpha_lab.factory.research_write_lookup import WriteLookup, WriteLookupError
 
 
 _lifecycle_read_cache: ContextVar[dict[tuple[str, str], Any] | None] = ContextVar(
@@ -1169,6 +1170,112 @@ class ResearchStore:
         self._root = _validated_data_root(data_root, create=create_if_missing)
         self._parquet_compression = parquet_compression
 
+    def _write_lookup(self, *, recover: bool = False) -> WriteLookup | None:
+        lookup = WriteLookup(self._root, _target_path)
+        if not lookup.exists():
+            return None  # uncommissioned legacy mode retains full verification
+        try:
+            lookup.load(recover=self._recover_write_lookup if recover else None)
+        except WriteLookupError as exc:
+            raise ResearchStoreError(exc.code) from exc
+        return lookup
+
+    def _recover_write_lookup(self, pending: dict[str, Any]) -> str:
+        lookup = WriteLookup(self._root, _target_path)
+        manifest_path = _target_path(self._root, pending["manifest_rel"], create_parents=False)
+        if not manifest_path.exists():
+            if lookup.stamp() != pending["previous"]["source_stamp"]:
+                raise ResearchStoreError("WRITE_LOOKUP_PENDING_RECONCILIATION_REQUIRED")
+            return "previous"
+        manifest = self._read_manifest(manifest_path)
+        if (manifest.partition_manifest_id != pending["manifest_id"]
+                or manifest.partition_id != pending["transaction_id"]):
+            raise ResearchStoreError("WRITE_LOOKUP_IDENTITY_CONFLICT")
+        self._verify_partition(manifest)
+        # A predecessor writer can ignore this optional index after rollback.
+        # Do not bless an unknown change of the source directory after a crash.
+        if lookup.stamp() != pending.get("published_stamp"):
+            state_path = self._root / "research/write_lookup_v1/state.json"
+            if not state_path.is_file():
+                raise ResearchStoreError("WRITE_LOOKUP_PENDING_RECONCILIATION_REQUIRED")
+            state = lookup._verify_signed(lookup._read("state.json"))
+            if (state.get("source_stamp") != lookup.stamp()
+                    or state.get("records") != pending["next"]["records"]
+                    or state.get("transactions") != pending["next"]["transactions"]):
+                raise ResearchStoreError("WRITE_LOOKUP_PENDING_RECONCILIATION_REQUIRED")
+        return "next"
+
+    def prepare_write_lookup(self) -> dict[str, Any]:
+        """Explicit one-time full audit on a commissioning copy, under fencing."""
+        with self.writer_lease():
+            lookup = WriteLookup(self._root, _target_path)
+            _target_path(self._root, "research/manifests/partitions/unused", create_parents=True)
+            lookup.initialize()
+            source_stamp = lookup.stamp()
+            count = 0
+            transactions: dict[str, dict] = {}
+            identities: dict[str, dict] = {}
+            states: dict[str, dict] = {}
+            try:
+                for manifest in self._committed_manifests(fresh=True):
+                    records = self._verify_partition(manifest)
+                    pointer = {"manifest_id": manifest.partition_manifest_id,
+                               "transaction_id": manifest.partition_id}
+                    if manifest.partition_id in transactions:
+                        raise ResearchStoreError("DUPLICATE_TRANSACTION_ID")
+                    transactions[manifest.partition_id] = pointer
+                    for record in records:
+                        if record.record_id in identities:
+                            raise ResearchStoreError("DUPLICATE_RECORD_ID")
+                        identities[record.record_id] = pointer
+                        if str(record.record_kind) == "OBSERVATION_SCHEDULE_STATE":
+                            states.setdefault(record.entity_id, {})[record.record_id] = pointer
+                    count += len(records)
+                lookup.state["transactions"] = lookup.build_tree(transactions)
+                lookup.state["records"] = lookup.build_tree(identities)
+                lookup.state["states"] = lookup.build_tree({
+                    entity: {"root": lookup.build_tree(entries)} for entity, entries in states.items()})
+                if source_stamp != lookup.stamp():
+                    raise ResearchStoreError("WRITE_LOOKUP_SOURCE_CHANGED")
+                lookup.finish()
+            except WriteLookupError as exc:
+                raise ResearchStoreError(exc.code) from exc
+            return {"status": "PREPARED", "record_count": count,
+                    "records_root_sha256": lookup.state["records"],
+                    "transactions_root_sha256": lookup.state["transactions"]}
+
+    def _lookup_manifest(self, pointer: Mapping[str, Any]) -> PartitionManifest:
+        manifest = self._read_manifest(_target_path(
+            self._root,
+            f"research/manifests/partitions/{pointer['manifest_id']}.json",
+            create_parents=False,
+        ))
+        if (manifest.partition_manifest_id != pointer["manifest_id"]
+                or manifest.partition_id != pointer["transaction_id"]):
+            raise ResearchStoreError("WRITE_LOOKUP_IDENTITY_CONFLICT")
+        return manifest
+
+    def find_record(self, record_id: str) -> ResearchEvent | None:
+        """Exact identity lookup; every hit verifies canonical bytes, never index values."""
+        _safe_identifier("RECORD_ID", record_id)
+        lookup = self._write_lookup()
+        if lookup is None:
+            match = None
+            for item in self.iter_committed_records():
+                if item.record_id == record_id:
+                    match = item
+            return match
+        try:
+            pointer = lookup.get("records", record_id)
+        except WriteLookupError as exc:
+            raise ResearchStoreError(exc.code) from exc
+        if pointer is None:
+            return None
+        for record in self._verify_partition(self._lookup_manifest(pointer)):
+            if record.record_id == record_id:
+                return record
+        raise ResearchStoreError("WRITE_LOOKUP_IDENTITY_CONFLICT")
+
     @contextmanager
     def writer_lease(self) -> Iterator[None]:
         lock_path = _target_path(
@@ -1361,8 +1468,8 @@ class ResearchStore:
             raise ResearchStoreError("PARTITION_MANIFEST_INVALID")
         return manifest
 
-    def _committed_manifests(self) -> tuple[PartitionManifest, ...]:
-        scope = _lifecycle_read_cache.get()
+    def _committed_manifests(self, *, fresh: bool = False) -> tuple[PartitionManifest, ...]:
+        scope = None if fresh else _lifecycle_read_cache.get()
         key = (str(self._root), "manifests")
         if scope is not None and key in scope:
             return scope[key]
@@ -1443,6 +1550,13 @@ class ResearchStore:
         self,
         transaction_id: str,
     ) -> PartitionManifest | None:
+        lookup = self._write_lookup()
+        if lookup is not None:
+            try:
+                pointer = lookup.get("transactions", transaction_id)
+            except WriteLookupError as exc:
+                raise ResearchStoreError(exc.code) from exc
+            return self._lookup_manifest(pointer) if pointer is not None else None
         matches = [
             manifest
             for manifest in self._committed_manifests()
@@ -1477,6 +1591,7 @@ class ResearchStore:
         with self.writer_lease():
             if before_commit is not None:
                 before_commit()
+            lookup = self._write_lookup(recover=True)
             prepared = _prepare_records(
                 records,
                 transaction_id=transaction_id,
@@ -1502,12 +1617,16 @@ class ResearchStore:
                     )
                 raise ResearchStoreError("TRANSACTION_CONFLICT")
 
-            committed_ids = {
-                record.record_id for record in self.iter_committed_records()
-            }
-            if committed_ids.intersection(
-                record.record_id for record in prepared
-            ):
+            if lookup is None:
+                duplicate = {record.record_id for record in self.iter_committed_records()}.intersection(
+                    record.record_id for record in prepared)
+            else:
+                try:
+                    duplicate = [record.record_id for record in prepared
+                                 if lookup.get("records", record.record_id) is not None]
+                except WriteLookupError as exc:
+                    raise ResearchStoreError(exc.code) from exc
+            if duplicate:
                 raise ResearchStoreError("DUPLICATE_RECORD_ID")
 
             parquet_path = _target_path(
@@ -1535,10 +1654,21 @@ class ResearchStore:
                 manifest_location,
                 create_parents=True,
             )
+            if lookup is not None:
+                try:
+                    lookup.begin(manifest, prepared)
+                except WriteLookupError as exc:
+                    raise ResearchStoreError(exc.code) from exc
             manifest_disposition = _publish_immutable(
                 manifest_path,
                 canonical_manifest_bytes(manifest),
             )
+            if lookup is not None:
+                try:
+                    lookup.published()
+                    lookup.finish()
+                except WriteLookupError as exc:
+                    raise ResearchStoreError(exc.code) from exc
             disposition = (
                 CommitDisposition.REPLAY_IDENTICAL
                 if parquet_disposition is _PublishDisposition.REPLAY_IDENTICAL
@@ -1566,6 +1696,7 @@ class ResearchStore:
         closure_cutoff: datetime | None = None,
         schedule_only: bool = False,
         include_member_predecessor: bool = True,
+        state_only: bool = False,
     ) -> tuple[tuple[ResearchEvent, ...], "ResearchStoreBoundTelemetry"]:
         """Open only temporally relevant observation-lifecycle partitions.
 
@@ -1577,7 +1708,16 @@ class ResearchStore:
         scientific truth owner.
         """
 
-        manifests = self._committed_manifests()
+        lookup = self._write_lookup() if state_only else None
+        if lookup is not None:
+            try:
+                pointers = lookup.state_pointers(schedule_sha256)
+            except WriteLookupError as exc:
+                raise ResearchStoreError(exc.code) from exc
+            manifests = tuple(self._lookup_manifest(pointer) for pointer in
+                              {item["manifest_id"]: item for item in pointers}.values())
+        else:
+            manifests = self._committed_manifests()
         headers_scanned = len(manifests)
         opened = 0
         decoded = 0

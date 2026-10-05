@@ -666,6 +666,8 @@ def append_storage_history(
     path.parent.mkdir(parents=True, exist_ok=True)
     row = {
         "observed_at": observed_at,
+        "collection": base.get("collection") or "UNKNOWN",
+        "episode_operability": base.get("episode_operability"),
         "disk_used_pct": disk_used_pct,
         "sqlite_bytes": sqlite_bytes,
         "rdp_bytes": rdp_bytes,

@@ -8,6 +8,28 @@ TARGET_BYTES = 40 * 1024 ** 3
 HARD_BYTES = 50 * 1024 ** 3
 HORIZON_DAYS = 97
 
+# Frozen conservative LOCAL_MODEL, not a measured compression guarantee.
+# Producer, publication, export/staging, backup and workstation copies plus
+# one spare copy; commissioning must also approve the whole Factory scope.
+EPISODE_RESERVE_COPIES = 6
+EPISODE_SAFETY_BYTES = 256 * 1024 ** 2
+
+
+def episode_drain_reserve(*, remaining_slots: int, prospective_slots: int,
+                          response_cap_bytes: int, free_bytes: int | None) -> dict[str, Any]:
+    if min(remaining_slots, prospective_slots, response_cap_bytes) < 0:
+        raise ValueError("DRAIN_RESERVE_INPUT_INVALID")
+    committed = remaining_slots * response_cap_bytes * EPISODE_RESERVE_COPIES
+    prospective = prospective_slots * response_cap_bytes * EPISODE_RESERVE_COPIES
+    required = committed + prospective + EPISODE_SAFETY_BYTES
+    status = "UNKNOWN" if free_bytes is None else ("STOP_NEW_INTAKE" if free_bytes < required else "MODEL_HEADROOM")
+    return {"status": status, "evidence_class": "MODEL", "free_bytes": free_bytes,
+            "remaining_slots": remaining_slots, "committed_drain_reserve_bytes": committed,
+            "prospective_reserve_bytes": prospective, "publication_export_backup_copy_factor": EPISODE_RESERVE_COPIES,
+            "safety_margin_bytes": EPISODE_SAFETY_BYTES, "required_free_bytes": required,
+            "factory_scope_policy": "UNKNOWN_REQUIRES_COMMISSIONING",
+            "sampling_auto_reduce": False}
+
 
 def project_storage_runway(
     *,

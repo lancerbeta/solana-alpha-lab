@@ -157,6 +157,36 @@ records real evidence; the episode authority profile does not grant activation.
 
 ## 9. Accepted limits and open owner decisions
 
+Bounded operability uses the shared ResearchStore's optional explicitly prepared
+identity lookup (`docs/contracts/research_write_lookup_v1.md`). It changes writer
+work, not canonical episode bytes, timing, population, protection or readers.
+Fresh capture with a later as-of revalidates closure content, then retains an
+already frozen closure/release identity. Regressed as-of or changed closed
+content is refused. Multiple activation/profile fragments of one UTC-day cohort
+are explicitly `EPISODE_COHORT_FRAGMENTED_UNSUPPORTED` before partial export;
+the canary uses one profile with no intraday switch.
+
+Episode calls reserve budget before durable STARTED/send; ambiguous outcomes
+keep that debit. A UTC rollover during STARTED persistence conservatively
+charges the request_started_at day too, with no refund of the earlier debit.
+Completion adds bytes/pacing without a second ordinary debit. This affects
+episode accounting only; legacy calls keep the previous completion policy.
+Counter debits are conservative reservations, not evidence of HTTP attempts.
+
+Before nomination the storage admission owner projects committed slots plus
+the next round at the frozen response cap, six possible copies and 256MiB
+margin. Insufficient/unknown filesystem free bytes commits ordinary stop-intake
+and DRAINING; no admissions or committed obligations are deleted. This is a
+conservative local MODEL, not an approved shared-account/whole-Factory budget
+or a proven compression guarantee. TARGET <=40GiB/HARD <=50GiB still require
+the existing whole-Factory commissioning envelope. Other consumers, unrelated
+resident bytes and backup peaks remain separate gates, never inferred absent.
+
+Metadata readback distinguishes intake, frames, obligations, attempted/no-request/
+ambiguous execution, missing values, publication backlog and next maturity.
+Legacy rows lacking new diagnostic metadata return UNKNOWN, without backfill.
+Episode nomination does not inherit birth/recent source-poll coverage semantics.
+
 - Protection reaches raw evidence too: the published E0 dependency is a
   content-addressed witness extract holding only the admitted object and the
   hash of its source response. A nomination response stays on the capture host.

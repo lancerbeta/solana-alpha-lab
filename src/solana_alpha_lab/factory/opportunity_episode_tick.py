@@ -10,6 +10,7 @@ publisher. Order inside one tick: publication recovery, admitted slots
 from __future__ import annotations
 
 import json
+import shutil
 from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -510,6 +511,11 @@ class _EpisodeTick:
         if blocked:
             return blocked, None
         self._credential()
+        # Reserve before durable STARTED/send. A death with unknown outcome
+        # keeps its debit across restart; completion adds bytes, not a second call.
+        self.accounts.note(raw_bytes=0,
+            credits=max(1, int(self.accounts.credit_costs.get(primitive_id, 1))),
+            completed_at=self.provider_ctx.now())
         attempt_id = f"ATT-{uuid4().hex[:12].upper()}"
         started = self.store.start_call(
             request_sha256=request_digest,
@@ -523,13 +529,37 @@ class _EpisodeTick:
             return ATTEMPT_OUTCOME_UNKNOWN, None
         if self.fault_after == "EPISODE_AFTER_CALL_START":
             raise EpisodeTickError("FAULT_INJECTED:EPISODE_AFTER_CALL_START")
+        reserved_day = self.accounts.utc_day
+        clock_fn = self.provider_ctx.clock()
+        first_clock = True
+        def request_clock():
+            nonlocal first_clock, reserved_day
+            if not first_clock:
+                return clock_fn()
+            # Durable STARTED persistence can cross UTC midnight. Keep the old
+            # debit (unknown sends are never refunded) and reserve the day named
+            # by the production request_started_at before transport is invoked.
+            for _ in range(2):
+                reference = clock_fn()
+                if reference.strftime("%Y-%m-%d") == reserved_day:
+                    first_clock = False
+                    return reference
+                blocked = self.provider_ctx.wait_for_provider_slot(self.accounts,
+                    extra_credits=max(1, int(self.accounts.credit_costs.get(primitive_id, 1))))
+                if blocked:
+                    raise EpisodeTickError(blocked)
+                reference = clock_fn()
+                self.accounts.note(raw_bytes=0,
+                    credits=max(1, int(self.accounts.credit_costs.get(primitive_id, 1))), completed_at=reference)
+                reserved_day = self.accounts.utc_day
+            raise EpisodeTickError("CALL_RESERVATION_CLOCK_UNSTABLE")
         result = execute_primitive(
             primitive_id=primitive_id,
             primitive_version="1.0",
             method="GET",
             url=url,
             opener=self.opener,
-            clock=self.provider_ctx.clock(),
+            clock=request_clock,
             redact_with=self.holder,
             expected_entities=list(expected_entities) if expected_entities else None,
             # An empty category list is a valid frame source; the closed frame
@@ -556,6 +586,7 @@ class _EpisodeTick:
             raw_bytes=max(1, raw_len),
             credits=max(1, int(self.accounts.credit_costs.get(primitive_id, 1))),
             completed_at=completion,
+            reserved=True,
         )
         raw_rel = _store_raw(self.data_root, result=result, occurrence=occurrence, primitive_id=primitive_id)
         result["raw_body_rel"] = raw_rel
@@ -606,7 +637,10 @@ class _EpisodeTick:
             state=state,
             request_sha256=(timing or {}).get("request_sha256"),
             call_occurrence_id=(timing or {}).get("call_occurrence_id"),
-            payload={"missing_reason": missing_reason, "terminal_reason": missing_reason or state},
+            payload={"missing_reason": missing_reason, "terminal_reason": missing_reason or state,
+                     "attempt_class": "UNKNOWN" if missing_reason == ATTEMPT_OUTCOME_UNKNOWN else (
+                         "ATTEMPTED" if (timing or {}).get("request_started_at") else "NO_REQUEST"),
+                     "field_value_missing_count": sum(value.get("state") != "OBSERVED" for value in obs["field_values"])},
             outbox_row={
                 "outbox_id": f"OBS:{claim['entity_id']}:{int(str(claim['point_id'])[1:]):07d}",
                 "schedule_sha256": self.digest,
@@ -1124,7 +1158,27 @@ class _EpisodeTick:
         self._prime_account_pace()
         self.process_slots()
         if admission_open and self.report["stop_reason"] is None:
-            self.nomination_round()
+            from solana_alpha_lab.factory.hot90_storage_admission import episode_drain_reserve
+            from solana_alpha_lab.factory.observation_schedule_lifecycle import stop_episode_intake
+            remaining = self.store.count_due_in_states(
+                ("PENDING", "DUE", "CLAIMED"), schedule_sha256=self.digest,
+                activation_id=self.activation_id)
+            quota = round_quota(int(self.schedule["sampling"]["daily_normal_ceiling"]), round_index(self.now))
+            try:
+                free = shutil.disk_usage(self.data_root).free
+            except OSError:
+                free = None
+            reserve = episode_drain_reserve(remaining_slots=remaining,
+                prospective_slots=quota * len(episode_point_ids()),
+                response_cap_bytes=int(self.schedule["budgets"]["response_decoded_bytes_max"]), free_bytes=free)
+            self.report["drain_headroom"] = reserve
+            if reserve["status"] in {"UNKNOWN", "STOP_NEW_INTAKE"}:
+                stop_episode_intake(data_root=self.data_root, store=self.store,
+                    schedule_sha256=self.digest, activation_id=self.activation_id,
+                    now=self.provider_ctx.now(), producer_git_sha=self.producer)
+                self.report["stop_reason"] = "DRAIN_RESERVE_UNKNOWN" if free is None else "DRAIN_RESERVE_PRESSURE"
+            else:
+                self.nomination_round()
         self.publish_outbox()
         self.report["provider_calls"] = self.accounts.tick_calls
         self.report["credential_reads"] = self.credential_reads
@@ -1189,6 +1243,7 @@ def tick_episode_schedule(
             redact_with=redact_with,
         )
         report = tick.run(admission_open=admission_open)
+        state = str(store.get_activation(str(schedule["schedule_sha256"]), activation_id)["state"])
         report["activation_state"] = state
         if state == "DRAINING":
             completion = complete_draining_schedule(

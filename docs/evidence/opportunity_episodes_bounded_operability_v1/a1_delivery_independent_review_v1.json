@@ -1,0 +1,52 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-REVIEW-001",
+  "as_of": "2026-10-06",
+  "task_id": "OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "AWAITING_FINAL_ISOLATED_EXACT_CONTENT_REVIEW"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY",
+      "findings": [
+        "AWAITING_FINAL_ISOLATED_EXACT_CONTENT_REVIEW"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "AWAITING_FINAL_ISOLATED_EXACT_CONTENT_REVIEW"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "AWAITING_FINAL_ISOLATED_EXACT_CONTENT_REVIEW"
+      ]
+    }
+  ],
+  "verdict": "NOT_READY",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_LIVE_ACCEPTANCE",
+    "NO_MERGE"
+  ]
+}

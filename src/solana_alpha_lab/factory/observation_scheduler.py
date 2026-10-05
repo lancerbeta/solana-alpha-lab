@@ -355,16 +355,19 @@ class _Accounting:
         raw_bytes: int = 1,
         credits: int = 1,
         completed_at: datetime | None = None,
+        consume_call: bool = True,
     ) -> None:
         completed = (completed_at or self.now).astimezone(UTC)
         self._refresh_day(completed)
         self.now = completed
-        self.tick_calls += 1
-        self.day["provider_calls"] = int(self.day["provider_calls"]) + 1
-        self.day["modeled_credits"] = int(self.day["modeled_credits"]) + credits
+        if consume_call:
+            self.tick_calls += 1
+            self.day["provider_calls"] = int(self.day["provider_calls"]) + 1
+            self.day["modeled_credits"] = int(self.day["modeled_credits"]) + credits
         self.day["raw_bytes"] = int(self.day["raw_bytes"]) + raw_bytes
         self.day["last_provider_call_at"] = render_utc(completed)
-        self.life["provider_calls"] = int(self.life["provider_calls"]) + 1
+        if consume_call:
+            self.life["provider_calls"] = int(self.life["provider_calls"]) + 1
         self.life["canonical_bytes"] = int(self.life["canonical_bytes"]) + raw_bytes
         self.store.save_accounting(
             schedule_sha256=self.digest,

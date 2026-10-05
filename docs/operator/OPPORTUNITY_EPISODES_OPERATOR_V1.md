@@ -102,3 +102,47 @@ values; registered replay recomputes from the frozen recipe and release files.
 No provider smoke, deploy, live activation, real science, retention/eviction or
 volume features. Category 5m routes are a `PROVIDER_ROUTE_REGISTRY_GAP` until
 commissioning records evidence.
+# Bounded operability commissioning
+
+Для нового campaign сначала нужен отдельный OPERATE gate. Локальный PR не
+разрешает deploy, timer/settings changes, вызовы Jupiter, actual protection
+installation, production import или науку. Commissioning packet находится вне
+Git; runtime timestamps и host state не становятся постоянной product truth.
+
+На проверенной изолированной копии явно выполнить `scripts/prepare_research_write_lookup.py
+--data-root <absolute-copy> --isolated-copy`, сохранив wall/RSS и canonical
+inventory до/после. Сверить результат с
+`docs/contracts/research_write_lookup_v1.md`. Deploy не должен незаметно запускать
+подготовку на production. После restore/revert старые records остаются readable;
+перед новыми writes необходим повторный audit/index preparation на копии.
+
+Рекомендуемый canary — один immutable profile: ceiling 24/UTC day, 48h intake,
+72h tail плюс grid rounding/grace, cap 48 admissions за два полных UTC дня.
+Это cap, yield неизвестен. Calendar window, SHA, authority expiry на весь drain,
+approved account allocation, Factory/disk/drain reserve и assignments фиксируют
+непосредственно перед commissioning. Normal population/caps не снижаются для
+получения PASS. Existing legacy intake сначала штатно завершается либо отдельно
+останавливается с разрешением владельца; старые obligations и datasets остаются.
+Перед canary дождаться полного legacy COMPLETE: default tick при нескольких
+ACTIVE/DRAINING scopes требует exact selection, поэтому одно только закрытие
+старого intake не доказывает пригодность обычного runtime entry. Не создавать
+параллельный постоянный collector для обхода этой границы.
+
+Protection sources создаются только как metadata projection полного известного
+canonical assignment inventory: owner/scope/role/identity, source fingerprint,
+completeness provenance и UNKNOWN при пробеле. Не загружать protected values.
+Пустой actual список с выдуманным complete запрещён. Synthetic fixtures явно
+называют synthetic inventory; они не доказывают actual completeness. Новая
+версия не перезаписывает старый pin; frozen export несёт прежние dependencies.
+
+При `DRAIN_RESERVE_PRESSURE`/`DRAIN_RESERVE_UNKNOWN` intake уже закрыт штатным
+переходом DRAINING. Повторить status, сохранить ledger и frozen dependencies,
+довести obligations; pause/resume для DRAINING отказываются. Не обходить отказ,
+не backfill прошлые slots и не удалять evidence. `MODEL_HEADROOM` не означает
+HOST_PASS. При `WRITE_LOOKUP_*` сначала сохранить canonical evidence и проверить
+копию; автоматический expensive rebuild и повтор неизвестной отправки запрещены.
+
+После mature closure повтор обычного capture с новым as-of сохраняет frozen
+identity. При fragmented cohort — явный отказ до partial export; V1 canary
+без intraday profile switches. Public import точного release не расходует новый
+look; real first question/MAIN budget фиксируются отдельно после canary.
