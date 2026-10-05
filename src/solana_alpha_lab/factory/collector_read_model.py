@@ -704,7 +704,8 @@ def build_collector_read_model(
                 members_24h += 1
 
     return {
-        "collection": "OPPORTUNITY_EPISODES" if episode_lane else "LIFECYCLE",
+        "collection": ("OPPORTUNITY_EPISODES" if episode_lane else
+                       "LIFECYCLE" if registered is not None else "UNKNOWN"),
         "episode_operability": episode_readback,
         "deploy_git_sha": deploy_git_sha,
         "schedule_sha256": digest or None,

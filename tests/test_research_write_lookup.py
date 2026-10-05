@@ -107,6 +107,25 @@ class WriteLookupTests(unittest.TestCase):
         self.store.prepare_write_lookup()
         self.assertEqual(self.store.find_record("B").record_id, "B")
 
+    def test_pending_canonical_source_unreadable_is_typed_and_preserved(self):
+        with patch.object(WriteLookup, "finish", side_effect=RuntimeError("CRASH_AFTER_STAMP")):
+            with self.assertRaisesRegex(RuntimeError, "CRASH_AFTER_STAMP"):
+                self.append()
+        pending = self.root / RELATIVE / "pending.json"
+        saved = pending.read_bytes()
+        manifest = next((self.root / "research/manifests/partitions").glob("*.json"))
+        canonical = manifest.read_bytes()
+        original_lstat = Path.lstat
+        def denied(path, *args, **kwargs):
+            if path == manifest:
+                raise PermissionError("SYNTHETIC_PENDING_SOURCE_DENIED")
+            return original_lstat(path, *args, **kwargs)
+        with patch.object(Path, "lstat", denied):
+            with self.assertRaisesRegex(ResearchStoreError, "WRITE_LOOKUP_SOURCE_UNREADABLE"):
+                self.append()
+        self.assertEqual(pending.read_bytes(), saved)
+        self.assertEqual(manifest.read_bytes(), canonical)
+
     def test_missing_state_never_triggers_a_hidden_rebuild(self):
         self.append()
         (self.root / RELATIVE / "state.json").unlink()

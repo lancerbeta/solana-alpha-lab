@@ -62,12 +62,31 @@ class EpisodeOperabilityTests(unittest.TestCase):
         self.capture(sc)
         paths = list(sc.data_root.rglob(CLOSURE_NAME))
         self.assertEqual(len(paths), 1)
-        for malformed in (b"[]", b'{"x":' + b'[' * 30000 + b'0' + b']' * 30000 + b'}'):
+        from solana_alpha_lab.factory.observation_schedule import canonical_sha256
+        invalid_time = json.loads(paths[0].read_bytes())
+        invalid_time.pop("closure_receipt_sha256")
+        invalid_time["as_of"] = "INVALID_TIMESTAMP"
+        invalid_time["closure_receipt_sha256"] = canonical_sha256(invalid_time)
+        for malformed in (b"[]", b'{"x":' + b'[' * 30000 + b'0' + b']' * 30000 + b'}',
+                          json.dumps(invalid_time).encode()):
             paths[0].write_bytes(malformed)
             with self.assertRaises(EpisodeReleaseError) as caught:
                 self.capture(sc, 81)
             self.assertEqual(caught.exception.code, "CLOSURE_FROZEN_UNREADABLE")
             self.assertEqual(paths[0].read_bytes(), malformed)
+
+    def test_unverified_schedule_scope_keeps_collection_unknown(self):
+        from solana_alpha_lab.factory.collector_read_model import build_collector_read_model
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        sc = self.scenario()
+        with closing(ObservationScheduleStore(sc.ops_path)) as store:
+            params = dict(store=store, now=START, schedule_sha256=sc.schedule["schedule_sha256"],
+                          activation_id=sc.activation_id)
+            self.assertEqual(build_collector_read_model(**params)["collection"], "OPPORTUNITY_EPISODES")
+            with patch.object(store, "get_registered_schedule", return_value=None):
+                unknown = build_collector_read_model(**params)
+            self.assertEqual(unknown["collection"], "UNKNOWN")
+            self.assertIsNone(unknown["episode_operability"])
 
     def test_two_real_activations_same_day_refuse_before_partial_capture(self):
         from tests.test_opportunity_episodes_harness_v1 import build_schedule, register_authorize_activate

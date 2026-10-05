@@ -32009,7 +32009,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_store.py', repository_path: src/solana_alpha_lab/factory/research_store.py}
-  integrity: {kind: sha256, sha256: 0431fc4e3f5bf59ad02bb798a49aa331ef0fb166b9a622abcea64890c079ee8a}
+  integrity: {kind: sha256, sha256: 679b54419b13f2d52232033db9a1807d57311ba4ddd2d4f1b00b6b728941a356}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -33956,7 +33956,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_read_model.py', repository_path: src/solana_alpha_lab/factory/collector_read_model.py}
-  integrity: {kind: sha256, sha256: 20bcdc2a9ba7c23eabbb287b24194cc029626399f9f6d13e489cd696fb4a56bb}
+  integrity: {kind: sha256, sha256: ab483b65b049af5ef5872f6f502c271834189da18668a7eada45a0596efecb4e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001}
@@ -40044,7 +40044,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md', repository_path: docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 6007ca75d4e18e78d4e3a4e44e5b1758b93d82108be7e41e7dfe64502ff503ab}
+  integrity: {kind: sha256, sha256: 39691a4ab7677c5661b33b7879b5d45c1eb34c7eab67be845abbed0b2ddcb854}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
@@ -40102,7 +40102,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/opportunity_episode_release.py', repository_path: src/solana_alpha_lab/factory/opportunity_episode_release.py}
-  integrity: {kind: sha256, sha256: 049e894348c74d1827cb5ab48bf036bef57bb86f08b5333052fc65556da7de5a}
+  integrity: {kind: sha256, sha256: fd6d703d8f49a60d9cb94280ae9b37458ae8719adf3ff062a83de6635a740f82}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
@@ -40309,7 +40309,7 @@ records:
   as_of: '2026-10-06'
   truth_owner: OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/opportunity_episodes_bounded_operability_v1/owner_readout_v1.md', repository_path: docs/evidence/opportunity_episodes_bounded_operability_v1/owner_readout_v1.md}
-  integrity: {kind: sha256, sha256: c8e4641e4a7e59d166f1c4ab9da2631e253bd6589aca376868b459cedccc537b}
+  integrity: {kind: sha256, sha256: 6f72c9648b83a42c54e1ea032fc8a852293aee5233d8d139e37f8cdcccdd9b70}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-001}

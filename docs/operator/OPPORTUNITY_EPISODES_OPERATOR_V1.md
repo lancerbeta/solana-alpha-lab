@@ -153,3 +153,10 @@ canonical RDP и уже frozen dependencies. Прекратить capture/import
 отдельный owner gate на поддерживаемую границу cohort/export; не менять cohort ID,
 не исключать одну часть и не удалять evidence. Общий CLI NEXT
 `STOP_INSPECT_FAIL_CODE` для этого кода означает именно этот terminal stop.
+
+При `CLOSURE_FROZEN_UNREADABLE` сохранить frozen closure, canonical evidence и
+dependencies; прекратить capture/import retry. На изолированной копии проверить
+точный closure из verified backup с прежними hash/dependencies. Изменение
+canonical producer требует отдельного repair gate. Не удалять и не
+регенерировать closure ради обхода отказа; ожидание maturity повреждённые bytes
+не исправляет. Общий `STOP_INSPECT_FAIL_CODE` означает этот terminal stop.

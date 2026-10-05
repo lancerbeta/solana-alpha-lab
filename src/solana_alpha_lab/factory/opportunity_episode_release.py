@@ -29,6 +29,7 @@ from solana_alpha_lab.factory.live_cohort_schedule_artifact import (
 )
 from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
 from solana_alpha_lab.factory.observation_schedule import (
+    ObservationScheduleError,
     canonical_sha256,
     parse_utc,
     render_utc,
@@ -658,22 +659,22 @@ def capture_freeze_export_episodes(
     )
     assert_episode_closure_ready(receipt)
     closure_path = _contained(Path(observation_rdp), export_dir_rel(receipt)) / CLOSURE_NAME
-    if closure_path.exists():
-        _require(not closure_path.is_symlink() and closure_path.is_file(), "CLOSURE_FROZEN_UNSAFE")
-        try:
+    try:
+        if closure_path.exists():
+            _require(not closure_path.is_symlink() and closure_path.is_file(), "CLOSURE_FROZEN_UNSAFE")
             frozen = json.loads(closure_path.read_bytes())
             _require(isinstance(frozen, dict), "CLOSURE_FROZEN_UNREADABLE")
             assert_episode_closure_ready(frozen)
-        except EpisodeReleaseError:
-            raise
-        except (OSError, TypeError, ValueError, RecursionError) as exc:
-            raise EpisodeReleaseError("CLOSURE_FROZEN_UNREADABLE") from exc
-        identity_keys = set(receipt) - {"as_of", "closure_receipt_sha256"}
-        _require(set(frozen) == set(receipt)
-                 and all(frozen.get(key) == receipt[key] for key in identity_keys),
-                 "CLOSURE_FROZEN_STATE_CONFLICT")
-        _require(parse_utc(str(frozen["as_of"])) <= as_of, "CLOSURE_AS_OF_REGRESSION")
-        receipt = frozen
+            identity_keys = set(receipt) - {"as_of", "closure_receipt_sha256"}
+            _require(set(frozen) == set(receipt)
+                     and all(frozen.get(key) == receipt[key] for key in identity_keys),
+                     "CLOSURE_FROZEN_STATE_CONFLICT")
+            _require(parse_utc(str(frozen["as_of"])) <= as_of, "CLOSURE_AS_OF_REGRESSION")
+            receipt = frozen
+    except EpisodeReleaseError:
+        raise
+    except (OSError, TypeError, ValueError, RecursionError, ObservationScheduleError) as exc:
+        raise EpisodeReleaseError("CLOSURE_FROZEN_UNREADABLE") from exc
     export = write_episode_export(observation_rdp=Path(observation_rdp), ops_store=Path(ops_store), receipt=receipt)
     manifest = collect_episode_transfer_manifest(observation_rdp=Path(observation_rdp), receipt=receipt)
     return {

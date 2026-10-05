@@ -1179,11 +1179,13 @@ class ResearchStore:
             return lookup
         except WriteLookupError as exc:
             raise ResearchStoreError(exc.code) from exc
+        except OSError as exc:
+            raise ResearchStoreError("WRITE_LOOKUP_SOURCE_UNREADABLE") from exc
 
     def _recover_write_lookup(self, pending: dict[str, Any]) -> str:
         lookup = WriteLookup(self._root, _target_path)
         manifest_path = _target_path(self._root, pending["manifest_rel"], create_parents=False)
-        if not manifest_path.exists():
+        if not lookup._exists(manifest_path):
             if lookup.stamp() != pending["previous"]["source_stamp"]:
                 raise ResearchStoreError("WRITE_LOOKUP_PENDING_RECONCILIATION_REQUIRED")
             return "previous"
@@ -1196,7 +1198,7 @@ class ResearchStore:
         # Do not bless an unknown change of the source directory after a crash.
         if lookup.stamp() != pending.get("published_stamp"):
             state_path = self._root / "research/write_lookup_v1/state.json"
-            if not state_path.is_file():
+            if not lookup._exists(state_path):
                 raise ResearchStoreError("WRITE_LOOKUP_PENDING_RECONCILIATION_REQUIRED")
             state = lookup._verify_signed(lookup._read("state.json"))
             if (state.get("source_stamp") != lookup.stamp()
@@ -1243,6 +1245,8 @@ class ResearchStore:
                         "transactions_root_sha256": lookup.state["transactions"]}
             except WriteLookupError as exc:
                 raise ResearchStoreError(exc.code) from exc
+            except OSError as exc:
+                raise ResearchStoreError("WRITE_LOOKUP_SOURCE_UNREADABLE") from exc
 
     def _lookup_manifest(self, pointer: Mapping[str, Any]) -> PartitionManifest:
         manifest = self._read_manifest(_target_path(

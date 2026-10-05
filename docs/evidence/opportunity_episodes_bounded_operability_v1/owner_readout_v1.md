@@ -37,13 +37,13 @@ Model cadence: 288 publication slots/day × 3 ResearchStore transactions =
 
 | Equivalent days | Transactions | Final cold normal wall | RSS bytes | Canonical opens / bytes | Full inventory |
 |---|---:|---:|---:|---:|---:|
-| 1 | 864 | 0.670s | 92,045,312 | 7 / 81,460 | 0 |
-| 7 | 6048 | 0.660s | 91,795,456 | 7 / 81,460 | 0 |
-| 30 | 25920 | 0.654s | 91,754,496 | 7 / 81,460 | 0 |
-| 60 | 51840 | 0.709s | 91,226,112 | 7 / 81,460 | 0 |
+| 1 | 864 | 0.632s | 91,766,784 | 7 / 81,460 | 0 |
+| 7 | 6048 | 0.664s | 91,848,704 | 7 / 81,460 | 0 |
+| 30 | 25920 | 0.630s | 91,926,528 | 7 / 81,460 | 0 |
+| 60 | 51840 | 0.717s | 92,024,832 | 7 / 81,460 | 0 |
 
 Каждый normal tick публикует один batch. При doubles history растёт bounded trie
-route work (path bytes 481,902→489,591), а не payload scan. Final fresh restart:
+route work (path bytes 482,546→487,852), а не payload scan. Final fresh restart:
 один canonical partition, 8,142 bytes, no provider attempt; status: zero
 canonical payload reads. После critic repairs повторены 12 fresh-process
 normal/restart/status runs на тех же aged roots, с новым normal work. Ceiling был frozen до final proof: tick wall<30s,
@@ -188,3 +188,13 @@ refusal; frozen closure deep JSON также отказывает typed и со�
 Финальный cold phase — 50m search (1 synthetic attempt), предыдущий 45m
 nomination+search phase (4 attempts) также сохранён; оба дают один batch,
 3 appends и 7 canonical partitions. Paired before/after 0/32/128 неизменён.
+
+Final owner boundary: pending recovery converts canonical source IO denial;
+frozen capture converts invalid self-hashed timestamp without replacing bytes.
+Unverified schedule scope stays UNKNOWN. 66 owner tests (1 Windows symlink
+skip) and 29 lookup/capture tests PASS; groups overlap and are not summed.
+12 fresh processes repeated normal/restart/status on final sources at 55m:
+7 canonical partitions / 81,460 bytes, full inventory 0. Prior 45m/50m
+phases remain evidence; successful producer/scientific paths are unchanged.
+Frozen-unreadable recovery NEXT preserves bytes and requires exact verified
+backup on an isolated copy; maturity wait or regenerated closure is not repair.

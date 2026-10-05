@@ -25,7 +25,7 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_211_FOCUSED_2_SKIPS_PLUS_1_EXTRA_TEST_AND_1_VERTICAL_THEN_63_OWNER_1_SKIP_AND_27_LOOKUP_CAPTURE_ERROR_BOUNDARY_TESTS",
+    "targeted": "PASS_211_FOCUSED_2_SKIPS_PLUS_1_EXTRA_AND_1_VERTICAL_THEN_FINAL66_OWNER_1_SKIP_AND29_LOOKUP_CAPTURE_OVERLAPPING_GROUPS",
     "independent_review": {
       "path": "docs/evidence/opportunity_episodes_bounded_operability_v1/a1_delivery_independent_review_v1.json",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
