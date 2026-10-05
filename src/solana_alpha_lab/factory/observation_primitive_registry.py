@@ -132,8 +132,40 @@ class ObservationPrimitiveRegistry:
             self.require_parser("MODULE-OBSERVATION-PRIMITIVES-001")
 
 
+_REGISTRY_CACHE: dict[tuple[str, str, str, str], ObservationPrimitiveRegistry] = {}
+_REGISTRY_CACHE_MAX = 8
+
+
+def _bytes_sha256(path: Path) -> str:
+    try:
+        return __import__("hashlib").sha256(path.read_bytes()).hexdigest()
+    except OSError:
+        return ""
+
+
 def load_observation_primitive_registry(root: Path) -> ObservationPrimitiveRegistry:
-    return ObservationPrimitiveRegistry(root)
+    """Validated registry, memoized by exact registry and schema bytes.
+
+    A changed registry or schema file always re-validates. Implementation
+    hashes are still re-read from disk by ``verify_implementation_hashes``.
+    """
+
+    key = (
+        str(Path(root).resolve()),
+        _bytes_sha256(Path(root) / REGISTRY_RELATIVE),
+        _bytes_sha256(Path(root) / REGISTRY_SCHEMA_RELATIVE),
+        _bytes_sha256(Path(root) / DESCRIPTOR_SCHEMA_RELATIVE),
+    )
+    cached = _REGISTRY_CACHE.get(key) if all(key[1:]) else None
+    if cached is not None:
+        # Callers own their copy; a mutation never leaks into another caller.
+        return __import__("copy").deepcopy(cached)
+    registry = ObservationPrimitiveRegistry(root)
+    if all(key[1:]):
+        if len(_REGISTRY_CACHE) >= _REGISTRY_CACHE_MAX:
+            _REGISTRY_CACHE.clear()
+        _REGISTRY_CACHE[key] = __import__("copy").deepcopy(registry)
+    return registry
 
 
 __all__ = [

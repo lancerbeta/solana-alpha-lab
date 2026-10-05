@@ -1141,6 +1141,28 @@ def tick_once(
         )
     except ObservationLifecycleError as exc:
         raise ObservationSchedulerError(str(exc)) from exc
+    if schedule.get("schema") == "smial.opportunity-episode-schedule":
+        # Additive OPPORTUNITY_EPISODES producer; the legacy X/Y body below
+        # never runs for this document kind.
+        from solana_alpha_lab.factory.opportunity_episode_tick import (
+            tick_episode_schedule,
+        )
+
+        return tick_episode_schedule(
+            root=root,
+            data_root=data_root,
+            store=store,
+            schedule=schedule,
+            activation_id=activation_id,
+            now=now,
+            opener=opener,
+            credential_loader=credential_loader,
+            producer_git_sha=producer_git_sha,
+            clock=clock,
+            fault_after=fault_after,
+            provider_call_wall_seconds=provider_call_wall_seconds,
+            redact_with=redact_with,
+        )
     lease_token = store.acquire_lease(f"{OWNER}-{uuid4().hex[:12]}", clock=now)
     if not lease_token:
         raise ObservationSchedulerError("WRITER_BUSY")

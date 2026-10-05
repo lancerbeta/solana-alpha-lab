@@ -145,6 +145,19 @@ def _used_provider_route_ids(
     document: Mapping[str, Any],
 ) -> tuple[list[str], list[str]]:
     registry = load_observation_primitive_registry(root)
+    if document.get("schema") == "smial.opportunity-episode-schedule":
+        from solana_alpha_lab.factory.opportunity_episodes import (
+            episode_provider_primitives,
+        )
+
+        episode_primitives = episode_provider_primitives(document)
+        return episode_primitives, sorted(
+            {
+                str(route)
+                for primitive_id in episode_primitives
+                for route in registry.require_primitive(primitive_id)["provider_route_ids"]
+            }
+        )
     primitive_ids = [str(document["source_poll"]["primitive_id"])]
     for point in [document["x_point"], *list(document["y_points"])]:
         for bundle_id in point["bundle_ids"]:
@@ -207,6 +220,10 @@ def _authority_policy(
 
 
 def _minimum_expiry(document: Mapping[str, Any]) -> datetime:
+    if document.get("schema") == "smial.opportunity-episode-schedule":
+        from solana_alpha_lab.factory.opportunity_episodes import episode_minimum_expiry
+
+        return episode_minimum_expiry(document)
     points = [document["x_point"], *list(document["y_points"])]
     horizon = max(
         int(point["due_offset_seconds"]) + int(point["allowed_lateness_seconds"])
@@ -852,6 +869,12 @@ def _require_live_authority(
 
 def cohort_family_key(document: Mapping[str, Any]) -> str:
     """Identity of the scientific cohort, independent of Y horizon / schedule_key."""
+    if document.get("schema") == "smial.opportunity-episode-schedule":
+        from solana_alpha_lab.factory.opportunity_episodes import (
+            episode_cohort_family_key,
+        )
+
+        return episode_cohort_family_key(document)
     population = document["population"]
     return canonical_sha256(
         {

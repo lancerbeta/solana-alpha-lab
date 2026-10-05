@@ -1,0 +1,434 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "smial.opportunity-episode-schedule.v1",
+  "title": "OPPORTUNITY_EPISODES schedule document 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "schedule_key",
+    "collection_kind",
+    "population",
+    "activation",
+    "nomination",
+    "capture_floor",
+    "asset_exclusion",
+    "sampling",
+    "observation_schedule",
+    "protection",
+    "budgets",
+    "retention",
+    "authority",
+    "outputs"
+  ],
+  "properties": {
+    "schema": {
+      "const": "smial.opportunity-episode-schedule"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "schedule_key": {
+      "type": "string",
+      "pattern": "^[A-Z0-9][A-Z0-9-]{3,127}$"
+    },
+    "schedule_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "collection_kind": {
+      "const": "JUPITER_CORE_OPPORTUNITY_EPISODES_V1"
+    },
+    "population": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "population",
+        "population_contract",
+        "anchor_kind",
+        "logical_dataset_id"
+      ],
+      "properties": {
+        "population": {
+          "const": "OPPORTUNITY_EPISODES"
+        },
+        "population_contract": {
+          "const": "OPPORTUNITY_EPISODES_V1"
+        },
+        "anchor_kind": {
+          "const": "NOMINATION_T0"
+        },
+        "logical_dataset_id": {
+          "const": "DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001"
+        }
+      }
+    },
+    "activation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "starts_at",
+        "stops_admitting_at"
+      ],
+      "properties": {
+        "starts_at": {
+          "type": "string",
+          "pattern": "Z$"
+        },
+        "stops_admitting_at": {
+          "type": "string",
+          "pattern": "Z$"
+        }
+      }
+    },
+    "nomination": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primitive_id",
+        "sources",
+        "round_period_seconds",
+        "round_slack_seconds",
+        "witness_max_age_seconds"
+      ],
+      "properties": {
+        "primitive_id": {
+          "const": "PRIM-JUPITER-TOKENS-V2-CATEGORY-NOMINATION-001"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source_id",
+              "category",
+              "interval",
+              "limit"
+            ],
+            "properties": {
+              "source_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9_]{3,64}$"
+              },
+              "category": {
+                "enum": [
+                  "toporganicscore",
+                  "toptraded",
+                  "toptrending"
+                ]
+              },
+              "interval": {
+                "const": "5m"
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              }
+            }
+          }
+        },
+        "round_period_seconds": {
+          "const": 900
+        },
+        "round_slack_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 899
+        },
+        "witness_max_age_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 900
+        }
+      }
+    },
+    "capture_floor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "holders_min",
+        "liquidity_usd_min",
+        "liquidity_usd_max",
+        "price_usd_positive"
+      ],
+      "properties": {
+        "holders_min": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "liquidity_usd_min": {
+          "type": "string",
+          "pattern": "^[0-9]+(\\.[0-9]+)?$"
+        },
+        "liquidity_usd_max": {
+          "type": "string",
+          "pattern": "^[0-9]+(\\.[0-9]+)?$"
+        },
+        "price_usd_positive": {
+          "const": true
+        }
+      }
+    },
+    "asset_exclusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy_id",
+        "excluded_tags",
+        "excluded_mints"
+      ],
+      "properties": {
+        "policy_id": {
+          "type": "string",
+          "minLength": 3
+        },
+        "excluded_tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "excluded_mints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 44
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "sampling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "seed",
+        "cycle",
+        "daily_normal_ceiling",
+        "rolling_24h_max",
+        "max_episodes_per_mint_per_cycle",
+        "max_active_per_mint",
+        "active_episode_cap"
+      ],
+      "properties": {
+        "seed": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 128
+        },
+        "cycle": {
+          "const": "WEEKLY_MONDAY_UTC"
+        },
+        "daily_normal_ceiling": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "rolling_24h_max": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "max_episodes_per_mint_per_cycle": {
+          "const": 1
+        },
+        "max_active_per_mint": {
+          "const": 1
+        },
+        "active_episode_cap": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 400
+        }
+      }
+    },
+    "observation_schedule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schedule_contract",
+        "primitive_id",
+        "dense_step_seconds",
+        "dense_until_seconds",
+        "hourly_step_seconds",
+        "horizon_seconds",
+        "dispatch_window_seconds",
+        "availability_grace_seconds",
+        "max_batch_size"
+      ],
+      "properties": {
+        "schedule_contract": {
+          "const": "OPPORTUNITY_EPISODE_SCHEDULE_V1"
+        },
+        "primitive_id": {
+          "const": "PRIM-JUPITER-TOKENS-V2-SEARCH-001"
+        },
+        "dense_step_seconds": {
+          "const": 300
+        },
+        "dense_until_seconds": {
+          "const": 21600
+        },
+        "hourly_step_seconds": {
+          "const": 3600
+        },
+        "horizon_seconds": {
+          "const": 259200
+        },
+        "dispatch_window_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 300
+        },
+        "availability_grace_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 300
+        },
+        "max_batch_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      }
+    },
+    "protection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "assignment_sources"
+      ],
+      "properties": {
+        "assignment_sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "assignment_id",
+              "sha256"
+            ],
+            "properties": {
+              "assignment_id": {
+                "type": "string",
+                "pattern": "^[A-Z0-9][A-Z0-9-]{3,127}$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_calls_per_tick_max",
+        "provider_calls_per_utc_day_max",
+        "provider_calls_lifetime_max",
+        "modeled_provider_credits_per_utc_day_max",
+        "min_provider_pace_seconds",
+        "raw_bytes_per_utc_day_max",
+        "canonical_bytes_lifetime_max",
+        "response_decoded_bytes_max",
+        "cash_usd_max",
+        "retry",
+        "fallback"
+      ],
+      "properties": {
+        "provider_calls_per_tick_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "provider_calls_per_utc_day_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "provider_calls_lifetime_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "modeled_provider_credits_per_utc_day_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "min_provider_pace_seconds": {
+          "type": "integer",
+          "minimum": 3
+        },
+        "response_decoded_bytes_max": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 33554432
+        },
+        "cash_usd_max": {
+          "const": "0"
+        },
+        "retry": {
+          "const": false
+        },
+        "fallback": {
+          "const": false
+        },
+        "raw_bytes_per_utc_day_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "canonical_bytes_lifetime_max": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "retention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "raw_retention_days"
+      ],
+      "properties": {
+        "raw_retention_days": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_id"
+      ],
+      "properties": {
+        "profile_id": {
+          "type": "string",
+          "minLength": 3
+        }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "logical_dataset_id"
+      ],
+      "properties": {
+        "logical_dataset_id": {
+          "const": "DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001"
+        }
+      }
+    }
+  }
+}

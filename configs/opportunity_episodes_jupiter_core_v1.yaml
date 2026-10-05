@@ -1,0 +1,81 @@
+# OPPORTUNITY_EPISODES Jupiter core collection profile V1 (template).
+# Contract: docs/contracts/opportunity_episodes_jupiter_v1.md
+# This template is NOT an activation. Live use requires OPERATE commissioning:
+# real protection assignment sources, provider route registry evidence for the
+# category 5m routes, an exact authority phrase and a measured host envelope.
+# The protection source below intentionally does not exist, so the admission
+# gate stays UNRESOLVED_SCOPE (no admissions) until commissioning replaces it.
+schema: smial.opportunity-episode-schedule
+schema_version: '1.0'
+schedule_key: OBS-OPPORTUNITY-EPISODES-JUPITER-CORE-V1
+collection_kind: JUPITER_CORE_OPPORTUNITY_EPISODES_V1
+population:
+  population: OPPORTUNITY_EPISODES
+  population_contract: OPPORTUNITY_EPISODES_V1
+  anchor_kind: NOMINATION_T0
+  logical_dataset_id: DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001
+activation:
+  starts_at: '2099-01-05T00:00:00Z'
+  stops_admitting_at: '2099-01-12T00:00:00Z'
+nomination:
+  primitive_id: PRIM-JUPITER-TOKENS-V2-CATEGORY-NOMINATION-001
+  sources:
+  - {source_id: toporganicscore_5m, category: toporganicscore, interval: 5m, limit: 100}
+  - {source_id: toptraded_5m, category: toptraded, interval: 5m, limit: 100}
+  - {source_id: toptrending_5m, category: toptrending, interval: 5m, limit: 100}
+  round_period_seconds: 900
+  round_slack_seconds: 120
+  witness_max_age_seconds: 120
+capture_floor:
+  holders_min: 50
+  liquidity_usd_min: '5000'
+  liquidity_usd_max: '1000000'
+  price_usd_positive: true
+asset_exclusion:
+  policy_id: JUPITER-CORE-ASSET-EXCLUSION-V1
+  excluded_tags: [stablecoin, lst, tokenized-stock, rwa]
+  excluded_mints:
+  - So11111111111111111111111111111111111111112
+  - EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+  - Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB
+  - J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn
+  - mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So
+sampling:
+  seed: OPPORTUNITY-EPISODES-JUPITER-CORE-SEED-V1
+  cycle: WEEKLY_MONDAY_UTC
+  daily_normal_ceiling: 100
+  rolling_24h_max: 100
+  max_episodes_per_mint_per_cycle: 1
+  max_active_per_mint: 1
+  active_episode_cap: 400
+observation_schedule:
+  schedule_contract: OPPORTUNITY_EPISODE_SCHEDULE_V1
+  primitive_id: PRIM-JUPITER-TOKENS-V2-SEARCH-001
+  dense_step_seconds: 300
+  dense_until_seconds: 21600
+  hourly_step_seconds: 3600
+  horizon_seconds: 259200
+  dispatch_window_seconds: 60
+  availability_grace_seconds: 300
+  max_batch_size: 100
+protection:
+  assignment_sources:
+  - {assignment_id: COMMISSIONING-REQUIRED-PROTECTION-SOURCE, sha256: '0000000000000000000000000000000000000000000000000000000000000000'}
+budgets:
+  provider_calls_per_tick_max: 20
+  provider_calls_per_utc_day_max: 1200
+  provider_calls_lifetime_max: 2000000
+  modeled_provider_credits_per_utc_day_max: 1200
+  min_provider_pace_seconds: 3
+  response_decoded_bytes_max: 8388608
+  raw_bytes_per_utc_day_max: 2147483648
+  canonical_bytes_lifetime_max: 549755813888
+  cash_usd_max: '0'
+  retry: false
+  fallback: false
+retention:
+  raw_retention_days: 11
+authority:
+  profile_id: AUTH-PROVIDER-READONLY-ZERO-CASH-EPISODE-SCHEDULE-V1
+outputs:
+  logical_dataset_id: DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001

@@ -3041,8 +3041,31 @@ def seal_live_cohort(
     return manifest
 
 
+def _release_collection(root: Path) -> str | None:
+    path = Path(root) / RELEASE_MANIFEST_NAME
+    if not path.is_file() or path.is_symlink():
+        return None
+    try:
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    if isinstance(loaded, Mapping) and loaded.get("schema_version") == "1.2":
+        return str(loaded.get("collection") or "")
+    return None
+
+
 def verify_live_cohort(release_root: Path) -> dict[str, Any]:
     root = Path(release_root)
+    if _release_collection(root) == "OPPORTUNITY_EPISODES":
+        from solana_alpha_lab.factory.opportunity_episode_release import (
+            EpisodeReleaseError,
+            verify_episode_release,
+        )
+
+        try:
+            return verify_episode_release(root)
+        except EpisodeReleaseError as exc:
+            raise LiveCohortReleaseError(str(exc)) from exc
     manifest_path = root / RELEASE_MANIFEST_NAME
     _require(
         manifest_path.is_file() and not manifest_path.is_symlink(),
@@ -3215,7 +3238,25 @@ def import_live_cohort(
     import_time: datetime | None = None,
     fault_before_visibility=None,
 ) -> dict[str, Any]:
-    """Import verified live cohort into cumulative LIVE CORPUS (idempotent)."""
+    """Import verified live cohort into cumulative LIVE CORPUS (idempotent).
+
+    A release 1.2 OPPORTUNITY_EPISODES cohort imports into its own corpus via
+    the collection strategy; legacy 1.0/1.1 releases keep the canonical path.
+    """
+    if _release_collection(Path(release_root)) == "OPPORTUNITY_EPISODES":
+        from solana_alpha_lab.factory.opportunity_episode_release import (
+            EpisodeReleaseError,
+            import_episode_release,
+        )
+
+        try:
+            return import_episode_release(
+                release_root=Path(release_root),
+                data_root=Path(data_root),
+                import_time=import_time,
+            )
+        except EpisodeReleaseError as exc:
+            raise LiveCohortReleaseError(str(exc)) from exc
     from solana_alpha_lab.factory.live_corpus_manifest_publish import (
         import_live_cohort_canonical,
     )

@@ -32,6 +32,11 @@ from solana_alpha_lab.factory.hfic_grounded_discovery import (
 
 TEMPORAL_SCHEMA = "smial.hfic-temporal-query"
 TEMPORAL_SCHEMA_VERSION = "1.0"
+# Additive OPPORTUNITY_EPISODES query version. 1.0/BASE_X identity is unchanged.
+TEMPORAL_SCHEMA_VERSION_EPISODES = "1.1"
+EPISODE_POPULATION = "OPPORTUNITY_EPISODES"
+EPISODE_ANCHOR_KIND = "NOMINATION_T0"
+EPISODE_TIME_FEATURE_CLOCK = "FIRST_RELIABLE_AVAILABLE_AT"
 TEMPORAL_CALCULATION_VERSION_V1 = "HFIC_TEMPORAL_DISCOVERY_CALC_V1"
 TEMPORAL_CALCULATION_VERSION_V2 = "HFIC_TEMPORAL_DISCOVERY_CALC_V2"
 TEMPORAL_CALCULATION_VERSION_V3 = "HFIC_TEMPORAL_DISCOVERY_CALC_V3"
@@ -40,8 +45,11 @@ TEMPORAL_CALCULATION_VERSION_V4 = "HFIC_TEMPORAL_DISCOVERY_CALC_V4"
 # V5 adds a fixed descriptive downside readout to the same admitted sample.
 TEMPORAL_CALCULATION_VERSION_V5 = "HFIC_TEMPORAL_DISCOVERY_CALC_V5"
 TEMPORAL_CALCULATION_VERSION = TEMPORAL_CALCULATION_VERSION_V5
+# V5 arithmetic read through the episode point/clock resolver binding.
+TEMPORAL_CALCULATION_VERSION_EPISODES_V1 = "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V1"
 TEMPORAL_CALCULATION_VERSIONS_READABLE = frozenset(
     {
+        TEMPORAL_CALCULATION_VERSION_EPISODES_V1,
         TEMPORAL_CALCULATION_VERSION_V1,
         TEMPORAL_CALCULATION_VERSION_V2,
         TEMPORAL_CALCULATION_VERSION_V3,
@@ -168,7 +176,14 @@ def default_assumption_stress_profile() -> dict[str, Any]:
     }
 
 
-def _canonical_feature(feature: Mapping[str, Any]) -> dict[str, Any]:
+def _canonical_feature(
+    feature: Mapping[str, Any],
+    *,
+    point_fn: Any = None,
+    offset_fn: Any = None,
+) -> dict[str, Any]:
+    _point_of = point_fn or _point
+    _offset_of = offset_fn or (lambda item: POINT_OFFSET[item])
     name = feature.get("name")
     op = feature.get("op")
     if not isinstance(name, str) or not name.strip() or name in {"cohort_id", "mint"}:
@@ -189,28 +204,28 @@ def _canonical_feature(feature: Mapping[str, Any]) -> dict[str, Any]:
                 raise GroundedDiscoveryError("FEATURE_OP_UNSUPPORTED")
             body["field_id"] = _field(feature.get("field_id"))
     if op == "point_value":
-        body["point"] = _point(feature.get("point"))
+        body["point"] = _point_of(feature.get("point"))
     elif op == "ratio":
-        body["numerator"] = _point(feature.get("numerator"))
-        body["denominator"] = _point(feature.get("denominator"))
+        body["numerator"] = _point_of(feature.get("numerator"))
+        body["denominator"] = _point_of(feature.get("denominator"))
     elif op in {"delta", "return_ratio"}:
-        body["start"] = _point(feature.get("start"))
-        body["end"] = _point(feature.get("end"))
-        if body["field_id"] == HOLDER_COUNT and POINT_OFFSET[body["start"]] >= POINT_OFFSET[body["end"]]:
+        body["start"] = _point_of(feature.get("start"))
+        body["end"] = _point_of(feature.get("end"))
+        if body["field_id"] == HOLDER_COUNT and _offset_of(body["start"]) >= _offset_of(body["end"]):
             raise GroundedDiscoveryError("FEATURE_WINDOW_INVALID")
     elif op in {"drawdown_from_grid_max", "rebound_from_grid_min"}:
         points = feature.get("points")
         if not isinstance(points, list) or not points:
             raise GroundedDiscoveryError("FEATURE_INVALID")
-        body["points"] = [_point(item) for item in points]
-        body["at"] = _point(feature.get("at"))
+        body["points"] = [_point_of(item) for item in points]
+        body["at"] = _point_of(feature.get("at"))
         if body["at"] not in body["points"]:
             raise GroundedDiscoveryError("FEATURE_INVALID")
     elif op == "elapsed_seconds":
-        body["start"] = _point(feature.get("start"))
-        body["end"] = _point(feature.get("end"))
+        body["start"] = _point_of(feature.get("start"))
+        body["end"] = _point_of(feature.get("end"))
     elif op == "utc_hour":
-        body["point"] = _point(feature.get("point"))
+        body["point"] = _point_of(feature.get("point"))
     return body
 
 
@@ -289,11 +304,177 @@ def _collect_points(features: Sequence[Mapping[str, Any]], decision: str, target
     return points
 
 
+def _episode_point(value: object) -> str:
+    from solana_alpha_lab.factory.opportunity_episodes import (
+        OpportunityEpisodeError,
+        point_offset,
+    )
+
+    if not isinstance(value, str):
+        raise GroundedDiscoveryError("POINT_NOT_IN_ALLOWLIST")
+    try:
+        point_offset(value)
+    except OpportunityEpisodeError as exc:
+        raise GroundedDiscoveryError("POINT_NOT_IN_ALLOWLIST") from exc
+    return value
+
+
+def _episode_offset(point: str) -> int:
+    from solana_alpha_lab.factory.opportunity_episodes import point_offset
+
+    return point_offset(point)
+
+
+def _episode_scientific_body(spec: Mapping[str, Any]) -> dict[str, Any]:
+    """OPPORTUNITY_EPISODES question identity (query 1.1). Never BASE_X."""
+
+    from solana_alpha_lab.factory.opportunity_episodes import (
+        SCHEDULE_CONTRACT,
+        V1_DENSE_STEP,
+        V1_DENSE_UNTIL,
+        V1_HOURLY_STEP,
+    )
+
+    if spec.get("any") is not None:
+        raise GroundedDiscoveryError("OR_NOT_A_PREDICATE")
+    if spec.get("population") != EPISODE_POPULATION:
+        raise GroundedDiscoveryError("POPULATION_CONTRACT_UNKNOWN")
+    if spec.get("anchor_kind") != EPISODE_ANCHOR_KIND:
+        raise GroundedDiscoveryError("ANCHOR_KIND_UNKNOWN")
+    time_contract = _require_mapping(spec.get("time_contract"), "TIME_CONTRACT_INVALID")
+    if (
+        time_contract.get("schedule_contract") != SCHEDULE_CONTRACT
+        or time_contract.get("time_feature_clock") != EPISODE_TIME_FEATURE_CLOCK
+        or set(time_contract) != {"schedule_contract", "time_feature_clock"}
+    ):
+        raise GroundedDiscoveryError("TIME_CONTRACT_INVALID")
+    tier = spec.get("search_tier")
+    if tier not in TIERS:
+        raise GroundedDiscoveryError("SEARCH_TIER_INVALID")
+    query_id = spec.get("query_id")
+    if not isinstance(query_id, str) or not query_id.strip():
+        raise GroundedDiscoveryError("QUERY_ID_REQUIRED")
+    decision = _require_mapping(spec.get("decision"), "DECISION_INVALID")
+    decision_point = _episode_point(decision.get("point_id"))
+    if decision.get("time_policy") not in (None, "RESOLVER_AVAILABILITY_CUTOFF"):
+        raise GroundedDiscoveryError("DECISION_INVALID")
+    schedule = _require_mapping(spec.get("schedule") or {}, "SCHEDULE_INVALID")
+    if set(schedule) - {"observation_clock_policy"}:
+        raise GroundedDiscoveryError("SCHEDULE_INVALID")
+    clock_policy = (
+        schedule.get("observation_clock_policy")
+        or OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
+    )
+    if clock_policy != OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1:
+        raise GroundedDiscoveryError("OBSERVATION_CLOCK_POLICY_INVALID")
+    features_in = spec.get("features")
+    predicates_in = spec.get("all")
+    if not isinstance(features_in, list) or not features_in or len(features_in) > MAX_FEATURES:
+        raise GroundedDiscoveryError("FEATURE_INVALID")
+    if not isinstance(predicates_in, list) or not predicates_in or len(predicates_in) > MAX_PREDICATES:
+        raise GroundedDiscoveryError("PREDICATE_INVALID")
+    features = [
+        _canonical_feature(
+            _require_mapping(item, "FEATURE_INVALID"),
+            point_fn=_episode_point,
+            offset_fn=_episode_offset,
+        )
+        for item in features_in
+    ]
+    names = [item["name"] for item in features]
+    if len(names) != len(set(names)) or any(
+        name in {"episode_id", "cohort_id", "mint"} for name in names
+    ):
+        raise GroundedDiscoveryError("FEATURE_INVALID")
+    predicates = [
+        _canonical_predicate(_require_mapping(item, "PREDICATE_INVALID")) for item in predicates_in
+    ]
+    if any(item["feature"] not in set(names) for item in predicates):
+        raise GroundedDiscoveryError("PREDICATE_INVALID")
+    target = _require_mapping(spec.get("target"), "TARGET_INVALID")
+    if target.get("kind") != "PRICE_RELATIVE_PROXY":
+        raise GroundedDiscoveryError("UNSUPPORTED_REQUIREMENT")
+    reference = _episode_point(target.get("reference_point"))
+    exit_point = _episode_point(target.get("exit_point"))
+    if _field(target.get("field_id")) != PRICE:
+        raise GroundedDiscoveryError("TARGET_INVALID")
+    entry = _require_mapping(spec.get("entry_model"), "ENTRY_MODEL_INVALID")
+    if entry.get("kind") != "LAST_AVAILABLE_MARK_WITH_HAIRCUT":
+        raise GroundedDiscoveryError("UNSUPPORTED_REQUIREMENT")
+    latency = entry.get("assumed_latency_seconds")
+    if isinstance(latency, bool) or not isinstance(latency, int) or latency < 0:
+        raise GroundedDiscoveryError("ENTRY_MODEL_INVALID")
+    decision_offset = _episode_offset(decision_point)
+    if _episode_offset(reference) > decision_offset:
+        raise GroundedDiscoveryError("TARGET_NOT_AFTER_DECISION")
+    # The assigned exit must lie strictly after the decision cutoff for every
+    # admission instant: worst cutoff = T0 + decision + grid step + grace.
+    decision_step = V1_DENSE_STEP if decision_offset <= V1_DENSE_UNTIL else V1_HOURLY_STEP
+    if _episode_offset(exit_point) <= decision_offset + decision_step + 300 + int(latency):
+        raise GroundedDiscoveryError("TARGET_NOT_AFTER_DECISION_CUTOFF")
+    for feature in features:
+        used = [
+            feature[key]
+            for key in ("point", "start", "end", "numerator", "denominator", "at")
+            if key in feature
+        ]
+        used.extend(feature.get("points") or [])
+        if any(_episode_offset(str(point)) > decision_offset for point in used):
+            raise GroundedDiscoveryError("FEATURE_AFTER_DECISION")
+    target_body = {
+        "kind": "PRICE_RELATIVE_PROXY",
+        "reference_point": reference,
+        "exit_point": exit_point,
+        "field_id": PRICE,
+    }
+    if len(_collect_points(features, decision_point, target_body)) > MAX_SCHEDULE_POINTS:
+        raise GroundedDiscoveryError("QUERY_TOO_WIDE")
+    evaluation = spec.get("evaluation") or {}
+    if not isinstance(evaluation, Mapping):
+        raise GroundedDiscoveryError("EVALUATION_INVALID")
+    allocation = spec.get("budget_allocation") or "AUTO"
+    if allocation not in {"AUTO", "COMPOUND_FIRST"}:
+        raise GroundedDiscoveryError("BUDGET_ALLOCATION_INVALID")
+    return {
+        "population": EPISODE_POPULATION,
+        "anchor_kind": EPISODE_ANCHOR_KIND,
+        "time_contract": {
+            "schedule_contract": SCHEDULE_CONTRACT,
+            "time_feature_clock": EPISODE_TIME_FEATURE_CLOCK,
+        },
+        "decision_point": decision_point,
+        "observation_clock_policy": OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
+        "features": sorted(features, key=lambda item: str(item["name"])),
+        "predicates": sorted(predicates, key=_canonical),
+        "target": target_body,
+        "entry_model": {
+            "kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT",
+            "assumed_latency_seconds": latency,
+        },
+        "cost_profile": _canonical_cost(spec.get("cost_profile")),
+        "evaluation": {
+            "baseline": str(evaluation.get("baseline") or "SAME_DECISION_ELIGIBLE"),
+            "ablations": str(evaluation.get("ablations") or "DROP_ONE_CONDITION"),
+            "calendar_block": str(evaluation.get("calendar_block") or "UTC_DAY_OF_DECISION"),
+        },
+        "query_id": query_id,
+        "search_tier": tier,
+        "budget_allocation": allocation,
+        "adaptation_of": spec.get("adaptation_of") if isinstance(spec.get("adaptation_of"), str) else None,
+    }
+
+
+def is_episode_body(body: Mapping[str, Any] | object) -> bool:
+    return isinstance(body, Mapping) and body.get("population") == EPISODE_POPULATION
+
+
 def scientific_body(spec: Mapping[str, Any]) -> dict[str, Any]:
     """Question identity. Display id, tier and predicate order are not part of it."""
 
     if not is_temporal_query(spec):
         raise GroundedDiscoveryError("QUERY_SPEC_INVALID")
+    if spec.get("schema_version") == TEMPORAL_SCHEMA_VERSION_EPISODES:
+        return _episode_scientific_body(spec)
     if spec.get("schema_version") != TEMPORAL_SCHEMA_VERSION:
         raise GroundedDiscoveryError("QUERY_SPEC_INVALID")
     if spec.get("any") is not None:
@@ -398,8 +579,43 @@ def scientific_body(spec: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _validate_episode_temporal_query(body: Mapping[str, Any]) -> dict[str, Any]:
+    identity = {
+        key: body[key]
+        for key in body
+        if key not in {"query_id", "search_tier", "budget_allocation", "adaptation_of"}
+    }
+    identity["schema_version"] = TEMPORAL_SCHEMA_VERSION_EPISODES
+    digest = _sha256(identity)
+    runtime_body = {key: value for key, value in identity.items() if key != "schema_version"}
+    return {
+        "query_id": body["query_id"],
+        "schema_version": TEMPORAL_SCHEMA_VERSION_EPISODES,
+        "decision_points": [body["decision_point"]],
+        "decision_fields": [PRICE, LIQUIDITY] + (
+            [HOLDER_COUNT] if any(f.get("field_id") == HOLDER_COUNT for f in body["features"]) else []
+        ),
+        "target_point": body["target"]["exit_point"],
+        "target_field": PRICE,
+        "explanatory": [],
+        "population": EPISODE_POPULATION,
+        "spec_sha256": digest,
+        "target_label": (
+            f"PRICE_RELATIVE_PROXY:{runtime_body['target']['reference_point']}:"
+            f"{runtime_body['target']['exit_point']}:{runtime_body['target']['field_id']}"
+        ),
+        "search_tier": body["search_tier"],
+        "budget_allocation": body["budget_allocation"],
+        "adaptation_of": body["adaptation_of"],
+        "scientific_body": runtime_body,
+        "display": dict(body),
+    }
+
+
 def validate_temporal_query(spec: Mapping[str, Any]) -> dict[str, Any]:
     body = scientific_body(spec)
+    if is_episode_body(body):
+        return _validate_episode_temporal_query(body)
     identity = {
         key: body[key]
         for key in body
@@ -451,7 +667,7 @@ def canonical_temporal_spec(spec: Mapping[str, Any]) -> dict[str, Any]:
     bound = validate_temporal_query(spec)
     return {
         "schema": TEMPORAL_SCHEMA,
-        "schema_version": TEMPORAL_SCHEMA_VERSION,
+        "schema_version": bound.get("schema_version", TEMPORAL_SCHEMA_VERSION),
         "query_id": bound["query_id"],
         "search_tier": bound["search_tier"],
         "spec_sha256": bound["spec_sha256"],
@@ -792,8 +1008,16 @@ def _feature_value_with_lineage(
     lateness_for: Any = None,
     snapshot_policy: str | None = None,
     detail: dict[str, Any] | None = None,
+    point_window: Any = None,
+    time_clock: str | None = None,
 ) -> tuple[float | None, str | None]:
-    """Return (value, lineage_blocker). Lineage blockers stay visible for fitness."""
+    """Return (value, lineage_blocker). Lineage blockers stay visible for fitness.
+
+    ``point_window(point) -> (request_not_before, availability_deadline)`` is
+    the OPPORTUNITY_EPISODES resolver binding; ``time_clock`` set to
+    ``FIRST_RELIABLE_AVAILABLE_AT`` reads time features from the actual
+    availability of the selected PRICE cells. Both default to legacy meaning.
+    """
 
     lineage: str | None = None
 
@@ -809,15 +1033,18 @@ def _feature_value_with_lineage(
 
     def read(point: str, field: str) -> dict[str, Any]:
         nonlocal lineage
-        due = offset(point)
-        point_deadline = _deadline_for(
-            anchor, point, point_lateness(point), due_offset=due
-        )
+        if point_window is not None:
+            point_due_at, point_deadline = point_window(point)
+        else:
+            due = offset(point)
+            point_deadline = _deadline_for(
+                anchor, point, point_lateness(point), due_offset=due
+            )
+            point_due_at = _due_moment(anchor, int(due)) if due is not None else None
         if point_deadline is None or decision_deadline is None or point_deadline > decision_deadline:
             if detail is not None:
                 detail.setdefault("reason", "ABSENT")
             return {"status": "ABSENT"}
-        point_due_at = _due_moment(anchor, int(due)) if due is not None else None
         cell = _cell(
             grouped,
             (cohort, release, mint, point, field),
@@ -840,6 +1067,27 @@ def _feature_value_with_lineage(
         if cell.get("status") != "OBSERVED":
             return None, lineage
         return float(cell["value"]), lineage
+    if time_clock == "FIRST_RELIABLE_AVAILABLE_AT" and op in {"utc_hour", "elapsed_seconds"}:
+        # Episode interpretation: actual availability of the selected PRICE
+        # cells, never the nominal or assigned schedule instant.
+        if op == "utc_hour":
+            cell = read(str(feature["point"]), PRICE)
+            available = _parse_time(cell.get("available_at"))
+            if cell.get("status") != "OBSERVED" or available is None:
+                return None, lineage
+            return float(available.hour), lineage
+        start_cell = read(str(feature["start"]), PRICE)
+        end_cell = read(str(feature["end"]), PRICE)
+        start_at = _parse_time(start_cell.get("available_at"))
+        end_at = _parse_time(end_cell.get("available_at"))
+        if (
+            start_cell.get("status") != "OBSERVED"
+            or end_cell.get("status") != "OBSERVED"
+            or start_at is None
+            or end_at is None
+        ):
+            return None, lineage
+        return float((end_at - start_at).total_seconds()), lineage
     if op == "utc_hour":
         moment = _deadline_for(
             anchor, str(feature["point"]), 0, due_offset=offset(str(feature["point"]))
@@ -1790,7 +2038,10 @@ def temporal_result_coherence(summary: Mapping[str, Any]) -> dict[str, Any]:
                     "actual": sums["observed_target_n"],
                 }
             )
-    if summary.get("calculation_version") == TEMPORAL_CALCULATION_VERSION_V5:
+    if summary.get("calculation_version") in {
+        TEMPORAL_CALCULATION_VERSION_V5,
+        TEMPORAL_CALCULATION_VERSION_EPISODES_V1,
+    }:
         issues.extend(
             _downside_issues(
                 "summary", summary,
@@ -2333,6 +2584,14 @@ def temporal_frozen_input(binding: Sequence[Mapping[str, Any]]) -> list[dict[str
             "schedule_lateness_seconds": item.get("schedule_lateness_seconds"),
             "schedule_point_lateness": item.get("schedule_point_lateness"),
             "schedule_point_due_offset_seconds": item.get("schedule_point_due_offset_seconds"),
+            **(
+                {
+                    "population": item.get("population"),
+                    "schedule_binding": item.get("schedule_binding"),
+                }
+                if item.get("population") == EPISODE_POPULATION
+                else {}
+            ),
         }
         for item in binding
     ]
@@ -2345,8 +2604,12 @@ def _feature_dependencies(feature: Mapping[str, Any]) -> list[tuple[str, str]]:
     return list(dict.fromkeys((p, field) for p in points))
 
 
-def _target_projection(grouped, body, item, *, cohort, release, mint, anchor, decision_deadline, matched=True, source_detail=None):
-    """One target selector for evaluation and cross-delivery integrity; never used by preview."""
+def _target_projection(grouped, body, item, *, cohort, release, mint, anchor, decision_deadline, matched=True, source_detail=None, point_window=None):
+    """One target selector for evaluation and cross-delivery integrity; never used by preview.
+
+    ``point_window`` is the OPPORTUNITY_EPISODES resolver binding; legacy
+    bindings keep the schedule point clocks.
+    """
     target_value, target_observed, target_exclusion = None, False, None
     selected_source_event = "UNKNOWN"
     clock_policy = body.get("observation_clock_policy")
@@ -2357,11 +2620,14 @@ def _target_projection(grouped, body, item, *, cohort, release, mint, anchor, de
         seconds=int(body["entry_model"]["assumed_latency_seconds"])
     )
     exit_point = str(body["target"]["exit_point"])
-    exit_due, exit_late = _due_late(cohort, release, exit_point)
-    exit_deadline = _deadline_for(anchor, exit_point, exit_late, due_offset=exit_due)
+    if point_window is not None:
+        exit_due_at, exit_deadline = point_window(exit_point)
+    else:
+        exit_due, exit_late = _due_late(cohort, release, exit_point)
+        exit_deadline = _deadline_for(anchor, exit_point, exit_late, due_offset=exit_due)
+        exit_due_at = _due_moment(anchor, exit_due)
     exit_rows = grouped.get((cohort, release, mint, exit_point, PRICE), ())
     if clock_policy == OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1:
-        exit_due_at = _due_moment(anchor, exit_due)
         selected, target_exclusion = _select_snapshot_exit(
             exit_rows,
             entry_at=entry_at,
@@ -2376,10 +2642,14 @@ def _target_projection(grouped, body, item, *, cohort, release, mint, anchor, de
             exit_deadline=exit_deadline,
         )
     reference_point = str(body["target"]["reference_point"])
-    reference_due, reference_late = _due_late(cohort, release, reference_point)
-    reference_deadline = _deadline_for(
-        anchor, reference_point, reference_late, due_offset=reference_due
-    )
+    if point_window is not None:
+        reference_due_at, reference_deadline = point_window(reference_point)
+    else:
+        reference_due, reference_late = _due_late(cohort, release, reference_point)
+        reference_deadline = _deadline_for(
+            anchor, reference_point, reference_late, due_offset=reference_due
+        )
+        reference_due_at = _due_moment(anchor, reference_due)
     # Snapshot policy: reference must also meet its own point deadline.
     # EVENT_TIME keeps decision_deadline-only cutoff for V1/V2 replay parity.
     use_strict_reference = (
@@ -2399,7 +2669,7 @@ def _target_projection(grouped, body, item, *, cohort, release, mint, anchor, de
         (cohort, release, mint, reference_point, PRICE),
         ref_cutoff,
         snapshot_policy=snapshot_policy,
-        point_due_at=_due_moment(anchor, reference_due) if snapshot_policy else None,
+        point_due_at=reference_due_at if snapshot_policy else None,
     )
     if source_detail is not None:
         # Preserve selected lawful source cells before ratio arithmetic erases
@@ -2788,6 +3058,250 @@ def _project_temporal_members(
     return members, cohort_membership, seen, duplicate_count, integrity_conflicts
 
 
+def _episode_point_window(item: Mapping[str, Any], t0: Any) -> Any:
+    """Bind the frozen episode schedule to one admission instant."""
+
+    from solana_alpha_lab.factory.opportunity_episodes import (
+        OpportunityEpisodeError,
+        require_binding,
+        resolve_point,
+    )
+
+    schedule_binding = item.get("schedule_binding")
+    try:
+        require_binding(schedule_binding)
+    except OpportunityEpisodeError as exc:
+        raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND") from exc
+
+    def window(point: str) -> tuple[Any, Any]:
+        try:
+            resolved = resolve_point(schedule_binding, t0, str(point))
+        except OpportunityEpisodeError as exc:
+            raise GroundedDiscoveryError("POINT_NOT_IN_ALLOWLIST") from exc
+        return resolved.request_not_before, resolved.availability_deadline
+
+    return window
+
+
+def _episode_signature(rows: Sequence[Mapping[str, Any]]) -> tuple:
+    return tuple(
+        sorted(
+            (
+                str(row.get("point_id") or ""),
+                str(row.get("field_id") or ""),
+                str(row.get("first_reliable_available_at") or ""),
+                str(row.get("request_started_at") or ""),
+                str(row.get("response_received_at") or ""),
+                str(row.get("state") or ""),
+                str(row.get("typed_value")),
+            )
+            for row in rows
+        )
+    )
+
+
+def _project_episode_members(
+    census, observations, body, binding, *, universe_policy=None, prefix_only=False,
+):
+    """OPPORTUNITY_EPISODES membership and features. Base = every admission.
+
+    Cells are keyed by episode identity; the true mint stays a census field.
+    Clocks come from the one episode resolver; values reuse the shared cell,
+    feature, predicate and target owners.
+    """
+
+    admitted = admit_discovery_binding(binding)
+    admitted_pairs = {
+        (str(item["cohort_id"]), str(item["release_id"])) for item in admitted["cohorts"]
+    }
+    binding_by = {(str(i.get("cohort_id")), str(i.get("release_id"))): i for i in binding}
+    grouped: dict[tuple[str, str, str, str, str], list[Mapping[str, Any]]] = defaultdict(list)
+    by_episode: dict[tuple[str, str, str], list[Mapping[str, Any]]] = defaultdict(list)
+    for row in observations:
+        key = (
+            str(row.get("cohort_id") or ""),
+            str(row.get("release_id") or ""),
+            str(row.get("episode_id") or ""),
+        )
+        grouped[(*key, str(row.get("point_id") or ""), str(row.get("field_id") or ""))].append(row)
+        by_episode[key].append(row)
+    decision_point = str(body["decision_point"])
+    snapshot_policy = OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1
+    prefix_mode = prefix_only or any(
+        f.get("field_id") == HOLDER_COUNT and f["op"] in {"delta", "return_ratio"}
+        for f in body["features"]
+    )
+    features = list(body["features"])
+    predicates = list(body["predicates"])
+    seen: set[tuple[str, str]] = set()
+    signatures: dict[tuple[str, str], tuple] = {}
+    members: list[dict[str, Any]] = []
+    cohort_membership: dict[str, dict[tuple, dict[str, Any]]] = {}
+    duplicate_count = 0
+    integrity_conflicts = 0
+    episode_mints: dict[str, str] = {}
+    for row in census:
+        episode = str(row.get("episode_id") or "")
+        mint = str(row.get("mint") or "")
+        if not episode or not mint:
+            continue
+        cohort = str(row.get("cohort_id") or "")
+        release = str(row.get("release_id") or "")
+        t0 = _parse_time(row.get("t0"))
+        if (cohort, release) not in admitted_pairs or t0 is None:
+            members.append(
+                {
+                    "identity": (episode, "UNBOUND"),
+                    "in_base": False,
+                    "decision_eligible": False,
+                    "feature_values": {},
+                    "feature_unknown": False,
+                    "matched": False,
+                    "target": None,
+                    "target_is_observed": False,
+                    "block": "UNANCHORED",
+                    "exclusion": "BINDING_COHORT_MISMATCH",
+                }
+            )
+            continue
+        item = binding_by[(cohort, release)]
+        window = _episode_point_window(item, t0)
+        decision_due_at, decision_deadline = window(decision_point)
+        identity = (episode, decision_deadline.strftime("%Y-%m-%dT%H:%M:%SZ"))
+        block = decision_deadline.date().isoformat()
+        signature = _episode_signature(by_episode.get((cohort, release, episode), ()))
+        if identity in seen:
+            duplicate_count += 1
+            if signatures.get(identity) == signature:
+                continue
+            integrity_conflicts += 1
+            for member in members:
+                if member.get("identity") == identity:
+                    member.update(
+                        integrity_excluded=True,
+                        in_base=False,
+                        decision_eligible=False,
+                        feature_unknown=False,
+                        matched=False,
+                        target_is_observed=False,
+                        target=None,
+                        exclusion="INTEGRITY_CONFLICT",
+                    )
+            _exclude_shared_identity(cohort_membership, identity)
+            continue
+        seen.add(identity)
+        signatures[identity] = signature
+        episode_mints[episode] = mint
+        exclusion = None
+        feature_values: dict[str, float | None] = {}
+        feature_reasons: dict[str, str] = {}
+        universe_status = None
+        universe_reasons: list[str] = []
+        search_base = True
+        if universe_policy is not None:
+            from solana_alpha_lab.factory.hfic_research_universe_policy import (
+                classify_universe_cells,
+            )
+
+            holder_cell = _cell(
+                grouped,
+                (cohort, release, episode, decision_point, HOLDER_COUNT),
+                decision_deadline,
+                snapshot_policy=snapshot_policy,
+                point_due_at=decision_due_at,
+            )
+            liquidity_cell = _cell(
+                grouped,
+                (cohort, release, episode, decision_point, LIQUIDITY),
+                decision_deadline,
+                snapshot_policy=snapshot_policy,
+                point_due_at=decision_due_at,
+            )
+            verdict = classify_universe_cells(holder_cell, liquidity_cell, universe_policy)
+            universe_status = str(verdict["status"])
+            universe_reasons = list(verdict["reasons"])
+            search_base = universe_status == "PASS"
+        decision_eligible = False
+        if search_base:
+            decision_price = _cell(
+                grouped,
+                (cohort, release, episode, decision_point, PRICE),
+                decision_deadline,
+                snapshot_policy=snapshot_policy,
+                point_due_at=decision_due_at,
+            )
+            decision_status = str(decision_price.get("status") or "")
+            decision_eligible = decision_status == "OBSERVED"
+            if not decision_eligible:
+                exclusion = decision_status or "DECISION_PRICE_ABSENT"
+            else:
+                for feature in features:
+                    detail: dict[str, Any] = {}
+                    value, feature_lineage = _feature_value_with_lineage(
+                        grouped,
+                        cohort=cohort,
+                        release=release,
+                        mint=episode,
+                        anchor=t0,
+                        feature=feature,
+                        lateness=0,
+                        decision_deadline=decision_deadline,
+                        snapshot_policy=snapshot_policy,
+                        detail=detail if prefix_mode else None,
+                        point_window=window,
+                        time_clock=EPISODE_TIME_FEATURE_CLOCK,
+                    )
+                    if prefix_mode and value is None:
+                        feature_reasons[feature["name"]] = detail.get("reason") or "FEATURE_UNAVAILABLE"
+                    feature_values[str(feature["name"])] = value
+                    if feature_lineage in SNAPSHOT_LINEAGE_BLOCKERS and exclusion not in SNAPSHOT_LINEAGE_BLOCKERS:
+                        exclusion = feature_lineage
+        else:
+            exclusion = "UNIVERSE_" + str(universe_status or "UNKNOWN")
+        hits = [
+            _predicate_holds(feature_values.get(str(item_p["feature"])), item_p) for item_p in predicates
+        ] if decision_eligible else []
+        feature_unknown = decision_eligible and any(hit is None for hit in hits)
+        matched = decision_eligible and not feature_unknown and all(hit is True for hit in hits)
+        target_value = None
+        target_observed = False
+        target_exclusion = None
+        selected_source_event = "UNKNOWN"
+        if not prefix_only and search_base:
+            target_value, target_observed, target_exclusion, selected_source_event = _target_projection(
+                grouped, body, item, cohort=cohort, release=release, mint=episode, anchor=t0,
+                decision_deadline=decision_deadline, matched=matched, point_window=window)
+        publish_target_exclusion = None
+        if matched and not target_observed and isinstance(target_exclusion, str) and target_exclusion:
+            publish_target_exclusion = target_exclusion
+        members.append(
+            {
+                "identity": identity,
+                "episode_id": episode,
+                "mint": mint,
+                "in_base": True,
+                "decision_eligible": decision_eligible,
+                "feature_values": feature_values,
+                **({"feature_reasons": feature_reasons, "cohort_id": cohort, "release_id": release} if prefix_mode else {}),
+                "feature_unknown": feature_unknown,
+                "matched": matched,
+                "target": target_value,
+                "target_is_observed": target_observed,
+                "target_exclusion": publish_target_exclusion,
+                "source_price_event_time": selected_source_event,
+                "block": block,
+                "exclusion": exclusion,
+                **(
+                    {"universe_status": universe_status, "universe_reasons": universe_reasons}
+                    if universe_policy is not None
+                    else {}
+                ),
+            }
+        )
+        _note_cohort_membership(cohort_membership, cohort, identity, members[-1])
+    return members, cohort_membership, seen, duplicate_count, integrity_conflicts, episode_mints
+
+
 def execute_temporal_discovery(
     census: Sequence[Mapping[str, Any]],
     observations: Sequence[Mapping[str, Any]],
@@ -2807,21 +3321,24 @@ def execute_temporal_discovery(
     frozen_source = temporal_frozen_input(binding)
     bound = validate_temporal_query(spec)
     body = bound["scientific_body"]
-    lateness = int(body["schedule_lateness_seconds"])
-    _require_bound_schedule(binding, body, lateness)
-    decision_point = str(body["decision_point"])
-    binding_by = {
-        (str(item.get("cohort_id")), str(item.get("release_id"))): item for item in binding
-    }
-
-    def _due_late(cohort_id: str, release_id: str, point: str) -> tuple[int, int]:
-        item = binding_by.get((cohort_id, release_id))
-        if item is None:
-            raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
-        return _clock(item, point, lateness)
-
-    members, cohort_membership, seen, duplicate_count, integrity_conflicts = _project_temporal_members(
-        census, observations, body, binding, universe_policy=universe_policy)
+    episode_population = is_episode_body(body)
+    if episode_population != (admitted.get("population") == EPISODE_POPULATION):
+        raise GroundedDiscoveryError("POPULATION_BINDING_MISMATCH")
+    episode_mints: dict[str, str] = {}
+    if episode_population:
+        (
+            members,
+            cohort_membership,
+            seen,
+            duplicate_count,
+            integrity_conflicts,
+            episode_mints,
+        ) = _project_episode_members(census, observations, body, binding, universe_policy=universe_policy)
+    else:
+        lateness = int(body["schedule_lateness_seconds"])
+        _require_bound_schedule(binding, body, lateness)
+        members, cohort_membership, seen, duplicate_count, integrity_conflicts = _project_temporal_members(
+            census, observations, body, binding, universe_policy=universe_policy)
     features, predicates = list(body["features"]), list(body["predicates"])
     cohort_ids = [str(item["cohort_id"]) for item in admitted["cohorts"]]
     base_members = [item for item in members if item["in_base"]]
@@ -2904,11 +3421,15 @@ def execute_temporal_discovery(
     )
     summary = {
         "contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
-        "calculation_version": TEMPORAL_CALCULATION_VERSION,
+        "calculation_version": (
+            TEMPORAL_CALCULATION_VERSION_EPISODES_V1
+            if episode_population
+            else TEMPORAL_CALCULATION_VERSION
+        ),
         "schema": TEMPORAL_SCHEMA,
         "query_id": bound["query_id"],
         "spec_sha256": bound["spec_sha256"],
-        "population": "BASE_X",
+        "population": EPISODE_POPULATION if episode_population else "BASE_X",
         "search_tier": bound["search_tier"],
         "observation_clock_policy": clock_policy,
         "target_kind": "PRICE_RELATIVE_PROXY",
@@ -2930,7 +3451,11 @@ def execute_temporal_discovery(
         "duplicate_delivery_count": duplicate_count,
         "integrity_conflict_count": integrity_conflicts,
         "observation_index_passes": 1,
-        "unique_mint_n": len({mint for mint, _decision in seen}),
+        "unique_mint_n": (
+            len(set(episode_mints.values()))
+            if episode_population
+            else len({mint for mint, _decision in seen})
+        ),
         "unique_decision_n": len(seen),
         "block_count": len({item["block"] for item in observed}),
         "independence": "UNKNOWN",
@@ -3022,7 +3547,7 @@ def execute_temporal_discovery(
         "experiment_recipe": {
             "capability_id": TEMPORAL_CAPABILITY_ID,
             "schema": TEMPORAL_SCHEMA,
-            "schema_version": TEMPORAL_SCHEMA_VERSION,
+            "schema_version": bound.get("schema_version", TEMPORAL_SCHEMA_VERSION),
             "scientific_identity": bound["spec_sha256"],
             "observation_clock_policy": clock_policy,
             "target_kind": "PRICE_RELATIVE_PROXY",
@@ -3062,6 +3587,21 @@ def execute_temporal_discovery(
             "n_unknown": counts["UNKNOWN"],
         }
         summary["experiment_recipe"]["universe_policy"] = bound_policy
+    if episode_population:
+        decision_members_all = [item for item in members if item.get("in_base") and item.get("decision_eligible")]
+        summary["anchor_kind"] = EPISODE_ANCHOR_KIND
+        summary["time_feature_clock"] = EPISODE_TIME_FEATURE_CLOCK
+        summary["episode_counts"] = {
+            "n_admitted": len(base_members),
+            "n_decision_eligible": len(decision_members_all),
+            "n_joint_feature_supported": sum(1 for item in decision_members_all if not item.get("feature_unknown")),
+            "n_matched": len(matched_members),
+            "n_target_available": len(observed),
+            "unique_episode_n": len(seen),
+            "unique_mint_n": len(set(episode_mints.values())),
+            "repeated_mint_n": len(episode_mints) - len(set(episode_mints.values())),
+        }
+        summary["non_claims"] = list(summary["non_claims"]) + ["NO_IID_CLAIM", "NOT_NEWBORN_BIRTH_POPULATION"]
     stop = snapshot_input_technical_stop(summary)
     if stop is not None:
         summary["technical_stop"] = stop
@@ -3614,6 +4154,33 @@ def _public_query_from_recipe(recipe: Mapping[str, Any]) -> dict[str, Any]:
     body = query.get("scientific_body")
     if not isinstance(body, Mapping):
         raise GroundedDiscoveryError("EXPERIMENT_RECIPE_INVALID")
+    if is_episode_body(body):
+        if query.get("schema_version") != TEMPORAL_SCHEMA_VERSION_EPISODES:
+            raise GroundedDiscoveryError("EXPERIMENT_RECIPE_INVALID")
+        public_episode = {
+            "schema": TEMPORAL_SCHEMA,
+            "schema_version": TEMPORAL_SCHEMA_VERSION_EPISODES,
+            "query_id": query.get("query_id") or "frozen-recipe",
+            "population": EPISODE_POPULATION,
+            "anchor_kind": body["anchor_kind"],
+            "time_contract": dict(body["time_contract"]),
+            "search_tier": query.get("search_tier") or "COMPOUND_SCREEN",
+            "budget_allocation": query.get("budget_allocation") or "AUTO",
+            "decision": {
+                "point_id": body["decision_point"],
+                "time_policy": "RESOLVER_AVAILABILITY_CUTOFF",
+            },
+            "schedule": {"observation_clock_policy": body["observation_clock_policy"]},
+            "features": body["features"],
+            "all": body["predicates"],
+            "target": body["target"],
+            "entry_model": body["entry_model"],
+            "cost_profile": body.get("cost_profile"),
+            "evaluation": body.get("evaluation") or {},
+        }
+        if query.get("adaptation_of") is not None:
+            public_episode["adaptation_of"] = query["adaptation_of"]
+        return public_episode
     schedule: dict[str, Any] = {"lateness_seconds": body["schedule_lateness_seconds"]}
     # Preserve non-default clock policy so recipe replay keeps snapshot
     # semantics and scientific identity. EVENT_TIME_V1 stays omitted.

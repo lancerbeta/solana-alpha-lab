@@ -852,6 +852,10 @@ def publish_observation_batch(
         )
         if max_available > created_at:
             created_at = max_available
+        # A partition is reliable no earlier than its creation. For rows from
+        # the same tick this equals max_available (legacy bytes unchanged); a
+        # later outbox/recovery publication becomes reliable at creation.
+        reliable_at = max(max_available, created_at)
         parquet_rel = str(
             job.get("parquet_rel") or f"datasets/parquet/{dataset_manifest_id}/observations.parquet"
         )
@@ -947,7 +951,7 @@ def publish_observation_batch(
             max_event_time=max_event,
             min_available_to_strategy_at=min_available,
             max_available_to_strategy_at=max_available,
-            first_reliable_available_at=max_available,
+            first_reliable_available_at=reliable_at,
             created_at=created_at,
         )
         member_partition = build_partition_manifest(
@@ -962,7 +966,7 @@ def publish_observation_batch(
             max_event_time=max_event,
             min_available_to_strategy_at=min_available,
             max_available_to_strategy_at=max_available,
-            first_reliable_available_at=max_available,
+            first_reliable_available_at=reliable_at,
             created_at=created_at,
         )
 
@@ -1027,7 +1031,7 @@ def publish_observation_batch(
             generation_task_id="DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-V1",
             generation_run_id=activation_id,
             validation_receipt_sha256=content,
-            first_reliable_available_at=max_available,
+            first_reliable_available_at=reliable_at,
             created_at=created_at,
             partitions=[partition, member_partition],
         )
