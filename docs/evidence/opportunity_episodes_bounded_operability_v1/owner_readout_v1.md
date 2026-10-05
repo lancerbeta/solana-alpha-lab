@@ -37,13 +37,13 @@ Model cadence: 288 publication slots/day × 3 ResearchStore transactions =
 
 | Equivalent days | Transactions | Final cold normal wall | RSS bytes | Canonical opens / bytes | Full inventory |
 |---|---:|---:|---:|---:|---:|
-| 1 | 864 | 0.695s | 92,221,440 | 7 / 81,460 | 0 |
-| 7 | 6048 | 0.692s | 92,807,168 | 7 / 81,460 | 0 |
-| 30 | 25920 | 0.640s | 91,967,488 | 7 / 81,460 | 0 |
-| 60 | 51840 | 0.720s | 92,377,088 | 7 / 81,460 | 0 |
+| 1 | 864 | 0.670s | 92,045,312 | 7 / 81,460 | 0 |
+| 7 | 6048 | 0.660s | 91,795,456 | 7 / 81,460 | 0 |
+| 30 | 25920 | 0.654s | 91,754,496 | 7 / 81,460 | 0 |
+| 60 | 51840 | 0.709s | 91,226,112 | 7 / 81,460 | 0 |
 
 Каждый normal tick публикует один batch. При doubles history растёт bounded trie
-route work (path bytes 484,162→493,408), а не payload scan. Final fresh restart:
+route work (path bytes 481,902→489,591), а не payload scan. Final fresh restart:
 один canonical partition, 8,142 bytes, no provider attempt; status: zero
 canonical payload reads. После critic repairs повторены 12 fresh-process
 normal/restart/status runs на тех же aged roots, с новым normal work. Ceiling был frozen до final proof: tick wall<30s,
@@ -178,3 +178,13 @@ transport; старый неизвестный debit не возвращаетс
 На этой версии: 211 focused tests (2 Windows symlink skips), один дополнительный
 exhausted-STARTED test и повтор полного R3–R4 vertical PASS. Новые 12 cold runs
 считают bounded lookup reads вместе с canonical/Path operations.
+
+Final public adapter: existence/init/stamp входят целиком в ResearchStore
+error conversion. Public lookup и preparation CLI возвращают canonical typed
+refusal; frozen closure deep JSON также отказывает typed и сохраняет bytes.
+63 owner tests (1 symlink skip) и 27 lookup/capture tests PASS после этого
+узкого error-path repair. Последний полный R2–R4 предшествует только этому
+исправлению обработки ошибок; успешные операции и научные bytes не менялись.
+Финальный cold phase — 50m search (1 synthetic attempt), предыдущий 45m
+nomination+search phase (4 attempts) также сохранён; оба дают один batch,
+3 appends и 7 canonical partitions. Paired before/after 0/32/128 неизменён.

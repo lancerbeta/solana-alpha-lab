@@ -69,16 +69,20 @@
     {
       "logical_ref": "local/episodes_operability/r3r4-reservation-boundary-final/p3-report.json",
       "sha256": "8c2d0b295d082112a6340c221d74c3f651b2f1ac97fd007e538cfed95f7511d5"
+    },
+    {
+      "logical_ref": "local/episodes_operability/public_adapter_cold_report.json",
+      "sha256": "7fc23073bd1f349f5bb54c4adc96977309584c8d070ef591c99e93f080889262"
     }
   ],
   "code_sha256": {
-    "research_store": "a12d5dd5db661c873d567d8244d8f843e8fd9fe28e424cdd2e8f409803b88458",
+    "research_store": "0431fc4e3f5bf59ad02bb798a49aa331ef0fb166b9a622abcea64890c079ee8a",
     "research_write_lookup": "f6e370a406e4598acb5cfa52d08de9dd9590f4cb9d857a234938e07872160a80",
     "observation_panel_publisher": "d1fc04e65f2c2fbbfe191781fc90990daac04d388fc5eb4932cf2d160964f4d3",
     "observation_schedule_lifecycle": "5c00323b5283ab09002db24ea39cb4d07caae95b0b2e720e0e55badca604f995",
     "observation_schedule_store": "a0a78ac465d80d41efbf6b287d1402d99123cdd653a566f2540c5f4c524b42d6",
     "opportunity_episode_tick": "92e0566884b34da8a919f785d83e8d82398c04da0a68742b1e14e7996d73eef4",
-    "opportunity_episode_release": "1120b5e6799c556d451d88746bb554e42fa61eeaad5ebb1c6e916312e482655e",
+    "opportunity_episode_release": "049e894348c74d1827cb5ab48bf036bef57bb86f08b5333052fc65556da7de5a",
     "observation_scheduler": "7ce439b8e990cc18ebd1c7473eab08a9b797e8b34b7248c07909f22ff49aa084",
     "observation_provider_pacing": "4b20e8102b101503d487e900a1dce161990c1706bda5772e164c996c9d45ccd3",
     "collector_read_model": "20bcdc2a9ba7c23eabbb287b24194cc029626399f9f6d13e489cd696fb4a56bb",
@@ -809,6 +813,290 @@
     ],
     "exact_code_cold_recheck": [
       {
+        "append_seconds": 0.22448399999848334,
+        "appends": 3,
+        "duplicate_lookup_seconds": 0.035330100003193365,
+        "inventory_seconds": 0.0,
+        "lock_seconds": 0.20699930000046152,
+        "manifest_headers": 5,
+        "mode": "normal",
+        "partition_bytes": 81460,
+        "partition_opens": 7,
+        "path_bytes": 466477,
+        "path_reads": 99,
+        "peak_rss_bytes": 92045312,
+        "publications": 1,
+        "records_decoded": 7,
+        "synthetic_provider_attempts": 1,
+        "terminal": "TICK_COMPLETE",
+        "wall_seconds": 0.6696567999970284,
+        "history_transactions": 864
+      },
+      {
+        "append_seconds": 0.0,
+        "appends": 0,
+        "duplicate_lookup_seconds": 0.0,
+        "inventory_seconds": 0.0,
+        "lock_seconds": 0.0,
+        "manifest_headers": 1,
+        "mode": "restart",
+        "partition_bytes": 8142,
+        "partition_opens": 1,
+        "path_bytes": 264501,
+        "path_reads": 24,
+        "peak_rss_bytes": 86315008,
+        "publications": 0,
+        "records_decoded": 1,
+        "synthetic_provider_attempts": 0,
+        "terminal": "TICK_COMPLETE",
+        "wall_seconds": 0.28804200000013225,
+        "history_transactions": 864
+      },
+      {
+        "append_seconds": 0.0,
+        "appends": 0,
+        "duplicate_lookup_seconds": 0.0,
+        "inventory_seconds": 0.0,
+        "lock_seconds": 0.0,
+        "manifest_headers": 0,
+        "mode": "status",
+        "partition_bytes": 0,
+        "partition_opens": 0,
+        "path_bytes": 0,
+        "path_reads": 0,
+        "peak_rss_bytes": 79736832,
+        "publications": 0,
+        "records_decoded": 0,
+        "synthetic_provider_attempts": 0,
+        "terminal": "STATUS",
+        "wall_seconds": 0.08033570000043255,
+        "history_transactions": 864
+      },
+      {
+        "append_seconds": 0.2382417999979225,
+        "appends": 3,
+        "duplicate_lookup_seconds": 0.044514799999888055,
+        "inventory_seconds": 0.0,
+        "lock_seconds": 0.22030049999739276,
+        "manifest_headers": 5,
+        "mode": "normal",
+        "partition_bytes": 81460,
+        "partition_opens": 7,
+        "path_bytes": 472753,
+        "path_reads": 106,
+        "peak_rss_bytes": 91795456,
+        "publications": 1,
+        "records_decoded": 7,
+        "synthetic_provider_attempts": 1,
+        "terminal": "TICK_COMPLETE",
+        "wall_seconds": 0.6600481000023137,
+        "history_transactions": 6048
+      },
+      {
+        "append_seconds": 0.0,
+        "appends": 0,
+        "duplicate_lookup_seconds": 0.0,
+        "inventory_seconds": 0.0,
+        "lock_seconds": 0.0,
+        "manifest_headers": 1,
+        "mode": "restart",
+        "partition_bytes": 8142,
+        "partition_opens": 1,
+        "path_bytes": 264501,
+        "path_reads": 24,
+        "peak_rss_bytes": 86810624,
+        "publications": 0,
+        "records_decoded": 1,
+        "synthetic_provider_attempts": 0,
+        "terminal": "TICK_COMPLETE",
+        "wall_seconds": 0.25183769999785,
+        "history_transactions": 6048
+      },
+      {
+        "append_seconds": 0.0,
+        "appends": 0,
+        "duplicate_lookup_seconds": 0.0,
+        "inventory_seconds": 0.0,
+        "lock_seconds": 0.0,
+        "manifest_headers": 0,
+        "mode": "status",
+        "partition_bytes": 0,
+        "partition_opens": 0,
+        "path_bytes": 0,
+        "path_reads": 0,
+        "peak_rss_bytes": 79896576,
+        "publications": 0,
+        "records_decoded": 0,
+        "synthetic_provider_attempts": 0,
+        "terminal": "STATUS",
+        "wall_seconds": 0.07476369999858434,
+        "history_transactions": 6048
+      },
+      {
+        "append_seconds": 0.20935909999752766,
+        "appends": 3,
+        "duplicate_lookup_seconds": 0.02980329999991227,
+        "inventory_seconds": 0.0,
+        "lock_seconds": 0.19150929999887012,
+        "manifest_headers": 5,
+        "mode": "normal",
+        "partition_bytes": 81460,
+        "partition_opens": 7,
+        "path_bytes": 481902,
+        "path_reads": 109,
+        "peak_rss_bytes": 91754496,
+        "publications": 1,
+        "records_decoded": 7,
+        "synthetic_provider_attempts": 1,
+        "terminal": "TICK_COMPLETE",
+        "wall_seconds": 0.6542399999998452,
+        "history_transactions": 25920
+      },
+      {
+        "append_seconds": 0.0,
+        "appends": 0,
+        "duplicate_lookup_seconds": 0.0,
+        "inventory_seconds": 0.0,
+        "lock_seconds": 0.0,
+        "manifest_headers": 1,
+        "mode": "restart",
+        "partition_bytes": 8142,
+        "partition_opens": 1,
+        "path_bytes": 264501,
+        "path_reads": 24,
+        "peak_rss_bytes": 86220800,
+        "publications": 0,
+        "records_decoded": 1,
+        "synthetic_provider_attempts": 0,
+        "terminal": "TICK_COMPLETE",
+        "wall_seconds": 0.25316469999961555,
+        "history_transactions": 25920
+      },
+      {
+        "append_seconds": 0.0,
+        "appends": 0,
+        "duplicate_lookup_seconds": 0.0,
+        "inventory_seconds": 0.0,
+        "lock_seconds": 0.0,
+        "manifest_headers": 0,
+        "mode": "status",
+        "partition_bytes": 0,
+        "partition_opens": 0,
+        "path_bytes": 0,
+        "path_reads": 0,
+        "peak_rss_bytes": 79441920,
+        "publications": 0,
+        "records_decoded": 0,
+        "synthetic_provider_attempts": 0,
+        "terminal": "STATUS",
+        "wall_seconds": 0.0762142000021413,
+        "history_transactions": 25920
+      },
+      {
+        "append_seconds": 0.2851442999999563,
+        "appends": 3,
+        "duplicate_lookup_seconds": 0.04666910000014468,
+        "inventory_seconds": 0.0,
+        "lock_seconds": 0.26724239999748534,
+        "manifest_headers": 5,
+        "mode": "normal",
+        "partition_bytes": 81460,
+        "partition_opens": 7,
+        "path_bytes": 489591,
+        "path_reads": 110,
+        "peak_rss_bytes": 91226112,
+        "publications": 1,
+        "records_decoded": 7,
+        "synthetic_provider_attempts": 1,
+        "terminal": "TICK_COMPLETE",
+        "wall_seconds": 0.7091456999987713,
+        "history_transactions": 51840
+      },
+      {
+        "append_seconds": 0.0,
+        "appends": 0,
+        "duplicate_lookup_seconds": 0.0,
+        "inventory_seconds": 0.0,
+        "lock_seconds": 0.0,
+        "manifest_headers": 1,
+        "mode": "restart",
+        "partition_bytes": 8142,
+        "partition_opens": 1,
+        "path_bytes": 264501,
+        "path_reads": 24,
+        "peak_rss_bytes": 86134784,
+        "publications": 0,
+        "records_decoded": 1,
+        "synthetic_provider_attempts": 0,
+        "terminal": "TICK_COMPLETE",
+        "wall_seconds": 0.25770729999931064,
+        "history_transactions": 51840
+      },
+      {
+        "append_seconds": 0.0,
+        "appends": 0,
+        "duplicate_lookup_seconds": 0.0,
+        "inventory_seconds": 0.0,
+        "lock_seconds": 0.0,
+        "manifest_headers": 0,
+        "mode": "status",
+        "partition_bytes": 0,
+        "partition_opens": 0,
+        "path_bytes": 0,
+        "path_reads": 0,
+        "peak_rss_bytes": 79691776,
+        "publications": 0,
+        "records_decoded": 0,
+        "synthetic_provider_attempts": 0,
+        "terminal": "STATUS",
+        "wall_seconds": 0.07205969999995432,
+        "history_transactions": 51840
+      }
+    ],
+    "limits": {
+      "tick_wall_seconds_lt": 30,
+      "tick_rss_bytes_lt": 536870912,
+      "fixed_work_partition_opens_lte": 7,
+      "full_manifest_inventory": 0
+    },
+    "preparation": [
+      {
+        "history_transactions": 864,
+        "setup_seconds": 17.19908249999935,
+        "preparation_seconds": 4.819449000000532,
+        "preparation_peak_rss_bytes": 90767360
+      },
+      {
+        "history_transactions": 6048,
+        "setup_seconds": 116.95869719999973,
+        "preparation_seconds": 44.340961800000514,
+        "preparation_peak_rss_bytes": 114954240
+      },
+      {
+        "history_transactions": 25920,
+        "setup_seconds": 515.4883747999993,
+        "preparation_seconds": 93.96040279999943,
+        "preparation_peak_rss_bytes": 214089728
+      },
+      {
+        "history_transactions": 51840,
+        "setup_seconds": 1103.3305223000007,
+        "preparation_seconds": 377.8542085000008,
+        "preparation_peak_rss_bytes": 335155200
+      }
+    ],
+    "preparation_peak_note": "bulk setup/preparation shared process high-water is an upper bound; separate CLI copy preparation measured independently",
+    "explicit_30d_copy_preparation": {
+      "process_peak_rss_bytes": 186085376,
+      "record_count": 25929,
+      "records_root_sha256": "ac746ae55150b42301e452f128b4e2b2930c1e07fdb9031f954c0b516ac595c6",
+      "status": "PREPARED",
+      "transactions_root_sha256": "b4e5a9d5971d3117d73fb3b6646d0b8ff79d8a75c4e754cc5d61ce88ce1c1ebb",
+      "wall_seconds": 394.7263471999977
+    },
+    "platform": "Windows CPython 3.13; Linux oneshot/power-loss acceptance UNVERIFIED",
+    "reservation_boundary_cold_recheck": [
+      {
         "append_seconds": 0.21302009999999427,
         "appends": 3,
         "duplicate_lookup_seconds": 0.040841699999873526,
@@ -1049,48 +1337,7 @@
         "history_transactions": 51840
       }
     ],
-    "limits": {
-      "tick_wall_seconds_lt": 30,
-      "tick_rss_bytes_lt": 536870912,
-      "fixed_work_partition_opens_lte": 7,
-      "full_manifest_inventory": 0
-    },
-    "preparation": [
-      {
-        "history_transactions": 864,
-        "setup_seconds": 17.19908249999935,
-        "preparation_seconds": 4.819449000000532,
-        "preparation_peak_rss_bytes": 90767360
-      },
-      {
-        "history_transactions": 6048,
-        "setup_seconds": 116.95869719999973,
-        "preparation_seconds": 44.340961800000514,
-        "preparation_peak_rss_bytes": 114954240
-      },
-      {
-        "history_transactions": 25920,
-        "setup_seconds": 515.4883747999993,
-        "preparation_seconds": 93.96040279999943,
-        "preparation_peak_rss_bytes": 214089728
-      },
-      {
-        "history_transactions": 51840,
-        "setup_seconds": 1103.3305223000007,
-        "preparation_seconds": 377.8542085000008,
-        "preparation_peak_rss_bytes": 335155200
-      }
-    ],
-    "preparation_peak_note": "bulk setup/preparation shared process high-water is an upper bound; separate CLI copy preparation measured independently",
-    "explicit_30d_copy_preparation": {
-      "process_peak_rss_bytes": 186085376,
-      "record_count": 25929,
-      "records_root_sha256": "ac746ae55150b42301e452f128b4e2b2930c1e07fdb9031f954c0b516ac595c6",
-      "status": "PREPARED",
-      "transactions_root_sha256": "b4e5a9d5971d3117d73fb3b6646d0b8ff79d8a75c4e754cc5d61ce88ce1c1ebb",
-      "wall_seconds": 394.7263471999977
-    },
-    "platform": "Windows CPython 3.13; Linux oneshot/power-loss acceptance UNVERIFIED"
+    "work_phase_note": "previous45m nomination+search 4 synthetic attempts; final50m search1 attempt; both one publication/3 appends/7 canonical partitions; paired0/32/128 before-after proof unchanged"
   },
   "R2": {
     "rehearsal": "R2",
@@ -1862,7 +2109,13 @@
       "LINUX_CANONICAL_DIRECTORY_POWER_LOSS_DURABILITY_UNVERIFIED"
     ],
     "post_reservation_extra_test": 1,
-    "typed_lookup_regressions": "PASS_DEEP_JSON_IO_DENIAL_AND_OVERSIZED_REUSED_NODE"
+    "typed_lookup_regressions": "PASS_DEEP_JSON_IO_DENIAL_AND_OVERSIZED_REUSED_NODE",
+    "public_adapter_owner_tests": 63,
+    "public_adapter_owner_symlink_skips": 1,
+    "final_lookup_and_capture_tests": 27,
+    "public_adapter_boundary": "PASS_EXISTS_INIT_STAMP_MAP_TO_RESEARCH_STORE_ERROR_AND_CLI_JSON_REFUSED",
+    "frozen_closure_deep_json": "PASS_TYPED_REFUSAL_PRESERVES_BYTES",
+    "unchanged_success_path_applicability": "R2_R3_R4_latest_full_reports_precede_error_adapter_only_repair; successful operations and scientific bytes unchanged; direct63and27regressions pass"
   },
   "FACT": [
     "real public entry and real canonical filesystem/lease/publication owners",

@@ -181,6 +181,26 @@ class WriteLookupTests(unittest.TestCase):
             with self.assertRaisesRegex(WriteLookupError, "WRITE_LOOKUP_CORRUPT"):
                 lookup._save_node({"leaf": {}})
 
+    def test_public_lookup_existence_and_preparation_initialization_are_typed(self):
+        with patch.object(Path, "lstat", side_effect=PermissionError("SYNTHETIC_LOOKUP_STAT_DENIED")):
+            with self.assertRaisesRegex(ResearchStoreError, "WRITE_LOOKUP_CORRUPT"):
+                self.store.find_record("ABSENT")
+        with patch.object(WriteLookup, "stamp", side_effect=WriteLookupError("WRITE_LOOKUP_SOURCE_UNREADABLE")):
+            with self.assertRaisesRegex(ResearchStoreError, "WRITE_LOOKUP_SOURCE_UNREADABLE"):
+                self.store.prepare_write_lookup()
+
+    def test_preparation_cli_initialization_failure_is_json_refused(self):
+        import io
+        from contextlib import redirect_stdout
+        from scripts.prepare_research_write_lookup import main
+        output=io.StringIO()
+        with patch("sys.argv", ["prepare_research_write_lookup.py", "--data-root", str(self.root.resolve()), "--isolated-copy"]):
+            with patch.object(WriteLookup, "stamp", side_effect=WriteLookupError("WRITE_LOOKUP_SOURCE_UNREADABLE")):
+                with redirect_stdout(output):
+                    self.assertEqual(main(), 2)
+        self.assertEqual(json.loads(output.getvalue()),
+            {"status":"REFUSED", "reason":"WRITE_LOOKUP_SOURCE_UNREADABLE"})
+
     def test_preparation_cannot_bless_a_stale_packet_inventory(self):
         from solana_alpha_lab.factory.research_store import _lifecycle_read_cache
         self.append("A")

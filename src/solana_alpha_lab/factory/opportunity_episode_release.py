@@ -663,9 +663,11 @@ def capture_freeze_export_episodes(
         try:
             frozen = json.loads(closure_path.read_bytes())
             _require(isinstance(frozen, dict), "CLOSURE_FROZEN_UNREADABLE")
-        except (OSError, ValueError) as exc:
+            assert_episode_closure_ready(frozen)
+        except EpisodeReleaseError:
+            raise
+        except (OSError, TypeError, ValueError, RecursionError) as exc:
             raise EpisodeReleaseError("CLOSURE_FROZEN_UNREADABLE") from exc
-        assert_episode_closure_ready(frozen)
         identity_keys = set(receipt) - {"as_of", "closure_receipt_sha256"}
         _require(set(frozen) == set(receipt)
                  and all(frozen.get(key) == receipt[key] for key in identity_keys),

@@ -62,11 +62,12 @@ class EpisodeOperabilityTests(unittest.TestCase):
         self.capture(sc)
         paths = list(sc.data_root.rglob(CLOSURE_NAME))
         self.assertEqual(len(paths), 1)
-        paths[0].write_bytes(b"[]")
-        with self.assertRaises(EpisodeReleaseError) as caught:
-            self.capture(sc, 81)
-        self.assertEqual(caught.exception.code, "CLOSURE_FROZEN_UNREADABLE")
-        self.assertEqual(paths[0].read_bytes(), b"[]")
+        for malformed in (b"[]", b'{"x":' + b'[' * 30000 + b'0' + b']' * 30000 + b'}'):
+            paths[0].write_bytes(malformed)
+            with self.assertRaises(EpisodeReleaseError) as caught:
+                self.capture(sc, 81)
+            self.assertEqual(caught.exception.code, "CLOSURE_FROZEN_UNREADABLE")
+            self.assertEqual(paths[0].read_bytes(), malformed)
 
     def test_two_real_activations_same_day_refuse_before_partial_capture(self):
         from tests.test_opportunity_episodes_harness_v1 import build_schedule, register_authorize_activate

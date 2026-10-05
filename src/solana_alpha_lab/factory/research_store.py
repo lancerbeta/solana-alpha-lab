@@ -1171,14 +1171,14 @@ class ResearchStore:
         self._parquet_compression = parquet_compression
 
     def _write_lookup(self, *, recover: bool = False) -> WriteLookup | None:
-        lookup = WriteLookup(self._root, _target_path)
-        if not lookup.exists():
-            return None  # uncommissioned legacy mode retains full verification
         try:
+            lookup = WriteLookup(self._root, _target_path)
+            if not lookup.exists():
+                return None  # uncommissioned legacy mode retains full verification
             lookup.load(recover=self._recover_write_lookup if recover else None)
+            return lookup
         except WriteLookupError as exc:
             raise ResearchStoreError(exc.code) from exc
-        return lookup
 
     def _recover_write_lookup(self, pending: dict[str, Any]) -> str:
         lookup = WriteLookup(self._root, _target_path)
@@ -1208,15 +1208,15 @@ class ResearchStore:
     def prepare_write_lookup(self) -> dict[str, Any]:
         """Explicit one-time full audit on a commissioning copy, under fencing."""
         with self.writer_lease():
-            lookup = WriteLookup(self._root, _target_path)
-            _target_path(self._root, "research/manifests/partitions/unused", create_parents=True)
-            lookup.initialize()
-            source_stamp = lookup.stamp()
-            count = 0
-            transactions: dict[str, dict] = {}
-            identities: dict[str, dict] = {}
-            states: dict[str, dict] = {}
             try:
+                lookup = WriteLookup(self._root, _target_path)
+                _target_path(self._root, "research/manifests/partitions/unused", create_parents=True)
+                lookup.initialize()
+                source_stamp = lookup.stamp()
+                count = 0
+                transactions: dict[str, dict] = {}
+                identities: dict[str, dict] = {}
+                states: dict[str, dict] = {}
                 for manifest in self._committed_manifests(fresh=True):
                     records = self._verify_partition(manifest)
                     pointer = {"manifest_id": manifest.partition_manifest_id,
@@ -1238,11 +1238,11 @@ class ResearchStore:
                 if source_stamp != lookup.stamp():
                     raise ResearchStoreError("WRITE_LOOKUP_SOURCE_CHANGED")
                 lookup.finish()
+                return {"status": "PREPARED", "record_count": count,
+                        "records_root_sha256": lookup.state["records"],
+                        "transactions_root_sha256": lookup.state["transactions"]}
             except WriteLookupError as exc:
                 raise ResearchStoreError(exc.code) from exc
-            return {"status": "PREPARED", "record_count": count,
-                    "records_root_sha256": lookup.state["records"],
-                    "transactions_root_sha256": lookup.state["transactions"]}
 
     def _lookup_manifest(self, pointer: Mapping[str, Any]) -> PartitionManifest:
         manifest = self._read_manifest(_target_path(
