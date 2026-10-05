@@ -738,6 +738,8 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         self.assertEqual(result["universe_policy"]["n_pass"], 12)
         self.assertEqual(p2["run1_repeat"]["values_loaded"], False)
         self.assertEqual(p2["run1_repeat"]["scientific_look_delta"], {"main": 0, "adaptive": 0})
+        # Without a universe policy the ordinary preflight reports it absent (no hidden default).
+        self.assertEqual(p2["preflight_without_policy"]["universe_policy_state"], "ABSENT")
         attrition = p2["run1"]["result"]["episode_target_attrition"]
         self.assertEqual((sum(attrition["matched"].values()), sum(attrition["decision_baseline"].values())), (1, 1))
         self.assertEqual(p2["frozen"]["grounding"], "GROUNDED")
@@ -772,7 +774,9 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         self.assertEqual((counts3["n_admitted"], counts3["n_decision_eligible"], counts3["n_matched"], counts3["n_target_available"]), (12, 12, 6, 5))
         self.assertAlmostEqual(p3["replay"]["baseline_mean_target"], (5 * 0.10 + 6 * (0.931 / 0.98 - 1)) / 11, places=9)
         # D4: a 72 h point reaches the cold corpus through the ordinary import.
-        self.assertEqual(p3["e259200_observed_n"], 1)
+        # Hourly grid: E259200 of the four day-A episodes admitted before 01:00 is
+        # assigned to 01:00 three days later, the one tick placed there.
+        self.assertEqual(p3["e259200_observed_n"], 4)
         self.assertEqual(p3["blocked_events_during_cold"], [])
 
 
