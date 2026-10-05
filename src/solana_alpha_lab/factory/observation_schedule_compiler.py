@@ -460,7 +460,89 @@ def compile_observation_request(
         return _deny("CHANGE_LANE_SAFETY_CONTRACT_GAP", code)
 
 
+def _compile_episode_schedule_document(
+    document: Mapping[str, Any], *, root
+) -> CompilerResult:
+    """OPPORTUNITY_EPISODES document kind; legacy X/Y compilation never applies."""
+
+    from solana_alpha_lab.factory.opportunity_episodes import (
+        V1_DENSE_STEP,
+        V1_HOURLY_STEP,
+        episode_provider_primitives,
+    )
+
+    try:
+        validated = validate_observation_schedule(document, root=Path(root))
+        registry = load_observation_primitive_registry(Path(root))
+        authority_profile = registry.require_authority_profile(
+            str(validated["authority"]["profile_id"])
+        )
+        used_routes = {
+            str(route)
+            for primitive_id in episode_provider_primitives(validated)
+            for route in registry.require_primitive(primitive_id)["provider_route_ids"]
+        }
+        allowed = {str(route) for route in authority_profile.get("allowed_route_ids") or []}
+        if not used_routes.issubset(allowed):
+            raise ObservationScheduleError("BLOCKED_AUTHORITY")
+    except PrimitiveRegistryError as exc:
+        return _deny(str(exc) if str(exc) else "CHANGE_LANE_PRIMITIVE_GAP")
+    except ObservationScheduleError as exc:
+        code = str(exc)
+        if code in {"BLOCKED_AUTHORITY", "BLOCKED_BUDGET", "DENY_UNSAFE_RUNTIME_CODE"}:
+            return _deny(code)
+        return _deny("CHANGE_LANE_SAFETY_CONTRACT_GAP", code)
+    sampling = validated["sampling"]
+    batch = int(validated["observation_schedule"]["max_batch_size"])
+    dense_active = min(int(sampling["rolling_24h_max"]), int(sampling["active_episode_cap"]))
+    calls_per_day = (
+        len(validated["nomination"]["sources"]) * 96
+        + (86400 // V1_DENSE_STEP) * math.ceil(dense_active / batch)
+        + (86400 // V1_HOURLY_STEP) * math.ceil(int(sampling["active_episode_cap"]) / batch)
+    )
+    declared = validated["budgets"]
+    if int(declared["provider_calls_per_utc_day_max"]) < calls_per_day or int(
+        declared["modeled_provider_credits_per_utc_day_max"]
+    ) < calls_per_day:
+        return _deny("BLOCKED_BUDGET")
+    envelope = BudgetEnvelope(
+        discovery_calls=len(validated["nomination"]["sources"]) * 96,
+        batch_snapshot_calls=calls_per_day - len(validated["nomination"]["sources"]) * 96,
+        x_point_calls=0,
+        y_point_calls=0,
+        provider_calls_per_tick_max=int(declared["provider_calls_per_tick_max"]),
+        provider_calls_per_utc_day_max=calls_per_day,
+        provider_calls_lifetime_max=int(declared["provider_calls_lifetime_max"]),
+        modeled_credits_per_utc_day_max=calls_per_day,
+        raw_bytes_per_utc_day_max=0,
+        canonical_bytes_lifetime_max=0,
+        min_raw_retention_days=int(validated["retention"]["raw_retention_days"]),
+        max_members_per_utc_day=int(sampling["daily_normal_ceiling"]),
+        latest_final_due_offset_seconds=int(
+            validated["observation_schedule"]["horizon_seconds"]
+        ),
+    )
+    return _compiler_result(
+        terminal="SCHEDULE_ACTIVATION_REQUIRED",
+        reason_codes=("SCHEDULE_ACTIVATION_REQUIRED",),
+        schedule=validated,
+        schedule_sha256=str(validated["schedule_sha256"]),
+        covering_schedule_sha256=None,
+        snapshot_sha256=None,
+        evidence_role="EXPLORATORY_REUSE",
+        budget=envelope,
+        next_action="REGISTER_AUTHORIZE_ACTIVATE",
+        hypothesis_registered_at=None,
+        experiment_as_of=None,
+        classifier_evaluated_at=None,
+    )
+
+
 def compile_schedule_document(document: Mapping[str, Any], *, root) -> CompilerResult:
+    if isinstance(document, Mapping) and document.get("schema") == (
+        "smial.opportunity-episode-schedule"
+    ):
+        return _compile_episode_schedule_document(document, root=root)
     spec = {
         "observation_request": {
             **dict(document),

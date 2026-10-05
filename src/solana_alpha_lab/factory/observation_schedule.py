@@ -224,6 +224,13 @@ def validate_observation_schedule(
 ) -> dict[str, Any]:
     if not isinstance(document, Mapping):
         raise ObservationScheduleError("OBSERVATION_SCHEDULE_INVALID")
+    if document.get("schema") == "smial.opportunity-episode-schedule":
+        # Additive document kind; the legacy X/Y parser below never sees it.
+        from solana_alpha_lab.factory.opportunity_episodes import (
+            validate_episode_schedule,
+        )
+
+        return validate_episode_schedule(document, root=root)
     try:
         jsonschema.validate(dict(document), _load_schema(root))
     except jsonschema.ValidationError as exc:

@@ -74,6 +74,12 @@ queries:
 - query_id: SGQ-LIVE-EVIDENCE-IMPORT-LANDING-EN
   query: where did my imported cohort land
   required_top_route: SEM-LIVE-EVIDENCE-TO-FORGE
+- query_id: SGQ-OPPORTUNITY-EPISODES-CONSUME-RU
+  query: как забрать когорту OPPORTUNITY_EPISODES и спросить Forge
+  required_top_route: SEM-LIVE-EVIDENCE-TO-FORGE
+- query_id: SGQ-OPPORTUNITY-EPISODES-T0-EN
+  query: episode T0 nomination schedule
+  required_top_route: SEM-LIVE-EVIDENCE-TO-FORGE
 - query_id: SGQ-REMOTE-OPS-EN
   query: backup / restore / remote Factory VPS
   required_top_route: SEM-REMOTE-OPS-RECOVERY

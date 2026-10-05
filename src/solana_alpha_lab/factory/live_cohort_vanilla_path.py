@@ -118,6 +118,45 @@ def _add_file(entries: dict[str, dict[str, Any]], root: Path, relative: str, sou
     }
 
 
+def add_member_location_entries(
+    entries: dict[str, dict[str, Any]], root: Path, location: str
+) -> None:
+    """Every file one member publication needs: plain file or unit + prefix."""
+
+    info = inspect_member_target(root, location)
+    unit = info.get("unit") if isinstance(info.get("unit"), Mapping) else None
+    seq = info.get("seq")
+    if unit is None or seq is None:
+        _add_file(entries, root, location, "member_location")
+        return
+    unit_rel = str(info.get("unit_rel") or "")
+    if unit_rel:
+        _add_file(entries, root, unit_rel, "member_unit")
+    for publication in unit.get("publications") or []:
+        if not isinstance(publication, Mapping):
+            continue
+        try:
+            pub_seq = int(publication.get("seq"))
+        except (TypeError, ValueError):
+            continue
+        if pub_seq > int(seq):
+            continue
+        rel = str(publication.get("rel") or "")
+        if rel:
+            _add_file(entries, root, rel, "member_prefix")
+            layout = str(Path(rel).with_name("members.layout.json").as_posix())
+            if (root / layout).is_file():
+                _add_file(entries, root, layout, "member_layout")
+        mid = str(publication.get("dataset_manifest_id") or "")
+        if mid:
+            manifest_rel = f"datasets/manifests/{mid}.json"
+            if (root / manifest_rel).is_file():
+                _add_file(entries, root, manifest_rel, "dataset_manifest")
+            published = f"datasets/manifests/{mid}.published"
+            if (root / published).is_file():
+                _add_file(entries, root, published, "dataset_published")
+
+
 def collect_bounded_transfer_manifest(
     *,
     observation_rdp: Path,
@@ -170,38 +209,7 @@ def collect_bounded_transfer_manifest(
         location = str(payload.get("member_location") or "")
         if not location:
             continue
-        info = inspect_member_target(root, location)
-        unit = info.get("unit") if isinstance(info.get("unit"), Mapping) else None
-        seq = info.get("seq")
-        if unit is None or seq is None:
-            _add_file(entries, root, location, "member_location")
-            continue
-        unit_rel = str(info.get("unit_rel") or "")
-        if unit_rel:
-            _add_file(entries, root, unit_rel, "member_unit")
-        for publication in unit.get("publications") or []:
-            if not isinstance(publication, Mapping):
-                continue
-            try:
-                pub_seq = int(publication.get("seq"))
-            except (TypeError, ValueError):
-                continue
-            if pub_seq > int(seq):
-                continue
-            rel = str(publication.get("rel") or "")
-            if rel:
-                _add_file(entries, root, rel, "member_prefix")
-                layout = str(Path(rel).with_name("members.layout.json").as_posix())
-                if (root / layout).is_file():
-                    _add_file(entries, root, layout, "member_layout")
-            mid = str(publication.get("dataset_manifest_id") or "")
-            if mid:
-                manifest_rel = f"datasets/manifests/{mid}.json"
-                if (root / manifest_rel).is_file():
-                    _add_file(entries, root, manifest_rel, "dataset_manifest")
-                published = f"datasets/manifests/{mid}.published"
-                if (root / published).is_file():
-                    _add_file(entries, root, published, "dataset_published")
+        add_member_location_entries(entries, root, location)
     for row in selected_obs:
         payload = row.get("payload") if isinstance(row.get("payload"), Mapping) else {}
         _path, location = resolve_observation_panel_location(root, payload, partition_index=None)
@@ -319,11 +327,28 @@ def capture_freeze_export(
     ops_store: Path,
     imported_cohort_ids: set[str],
     as_of: datetime,
+    collection: str | None = None,
 ) -> dict[str, Any]:
     """VPS capture phase: resolve, freeze a closure receipt, list dependencies.
 
-    This function has no materialization, seal, or import call.
+    This function has no materialization, seal, or import call. The default
+    collection is the legacy newborn lane; ``OPPORTUNITY_EPISODES`` dispatches
+    to its collection strategy with the same no-materialization guarantee.
     """
+
+    if collection == "OPPORTUNITY_EPISODES":
+        from solana_alpha_lab.factory.opportunity_episode_release import (
+            capture_freeze_export_episodes,
+        )
+
+        return capture_freeze_export_episodes(
+            observation_rdp=Path(observation_rdp),
+            ops_store=Path(ops_store),
+            imported_cohort_ids=set(imported_cohort_ids),
+            as_of=as_of,
+        )
+    if collection not in (None, "LIVE_LIFECYCLE"):
+        raise LiveCohortReleaseError("COLLECTION_UNKNOWN")
 
     from solana_alpha_lab.factory.live_cohort_to_forge import build_closure_receipt
     from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
@@ -398,6 +423,25 @@ def run_owner_live_cohort(
         or int(after["verified_paths_total"]) != int(after["unique_paths_total"])
     ):
         raise LiveCohortReleaseError("MIRROR_INCOMPLETE")
+    if packet.get("collection") == "OPPORTUNITY_EPISODES":
+        from solana_alpha_lab.factory.opportunity_episode_release import (
+            unpack_next_episode_cohort,
+        )
+
+        result = unpack_next_episode_cohort(
+            mirror_root=Path(mirror_root),
+            data_root=Path(data_root),
+            repo_root=Path(repo_root),
+            closure_receipt=packet["closure_receipt"],
+            manifest=manifest,
+            as_of=as_of,
+            release_builder_git_sha=release_builder_git_sha,
+        )
+        result["unique_paths_total"] = before["unique_paths_total"]
+        result["verified_paths_total"] = after["verified_paths_total"]
+        result["transferred_files"] = int(before["missing_files"])
+        result["reused_files"] = int(before["reused_files"])
+        return result
     result = unpack_next_live_cohort(
         observation_rdp=Path(mirror_root),
         data_root=Path(data_root),
@@ -415,7 +459,13 @@ def run_owner_live_cohort(
     return result
 
 
-def imported_cohort_ids(data_root: Path) -> set[str]:
+def imported_cohort_ids(data_root: Path, collection: str | None = None) -> set[str]:
+    if collection == "OPPORTUNITY_EPISODES":
+        from solana_alpha_lab.factory.opportunity_episode_release import (
+            imported_episode_cohort_ids,
+        )
+
+        return imported_episode_cohort_ids(Path(data_root))
     path = Path(data_root) / "datasets" / "live_lifecycle_corpus" / "lineage.json"
     if not path.is_file():
         return set()

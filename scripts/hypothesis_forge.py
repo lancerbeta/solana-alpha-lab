@@ -330,20 +330,30 @@ def _new_research_universe_blocker(store: Any) -> dict[str, Any] | None:
 def _published_gate_cohorts(
     data_root: Path,
     binding_doc: object,
+    population: object = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
-    """Published cohorts for the gate. A disagreeing --binding writes nothing."""
+    """Published cohorts for the gate. A disagreeing --binding writes nothing.
+
+    ``population=OPPORTUNITY_EPISODES`` reads the separate episode corpus.
+    """
 
     from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        EPISODE_POPULATION,
         GroundedDiscoveryError,
         resolve_published_discovery_binding,
+        resolve_published_episode_binding,
     )
 
-    lineage = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+    episode = population == EPISODE_POPULATION
+    lineage = data_root / "datasets" / (
+        "opportunity_episodes_corpus" if episode else "live_lifecycle_corpus"
+    ) / "lineage.json"
     if not lineage.is_file():
         supplied = binding_doc.get("cohorts") if isinstance(binding_doc, dict) else []
         return (list(supplied) if isinstance(supplied, list) else []), None
+    resolver = resolve_published_episode_binding if episode else resolve_published_discovery_binding
     try:
-        published = list(resolve_published_discovery_binding(data_root).get("cohorts") or [])
+        published = list(resolver(data_root).get("cohorts") or [])
     except GroundedDiscoveryError as exc:
         body = {
             "reason_code": exc.code,
@@ -1525,7 +1535,9 @@ def _cmd_discovery_execute(
                     return emit(refusal, exit_code=2)
             cohorts: list[dict[str, Any]] = []
             if explicit_data_root is not None:
-                cohorts, refusal = _published_gate_cohorts(explicit_data_root, binding_doc)
+                cohorts, refusal = _published_gate_cohorts(
+                    explicit_data_root, binding_doc, spec.get("population")
+                )
                 if refusal is not None:
                     return emit(refusal, exit_code=2)
             elif isinstance(binding_doc, dict):
@@ -1617,6 +1629,7 @@ def _cmd_discovery_execute(
             partitions=cohort_partitions,
             census_path=census_path,
             observations_path=observations_path,
+            population=spec.get("population"),
         )
     except GroundedDiscoveryError as exc:
         return emit_error(exc.code)
@@ -3555,6 +3568,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     preflight = subparsers.add_parser("preflight")
     preflight.add_argument("--owner-focus", default="AUTO")
+    preflight.add_argument(
+        "--collection",
+        choices=("LIVE_LIFECYCLE", "OPPORTUNITY_EPISODES"),
+        default=None,
+        help="Evidence collection; OPPORTUNITY_EPISODES scopes the focus to that corpus",
+    )
     preflight.add_argument("--format", choices=("json",), default="json")
     preflight.add_argument("--no-auto-commission", action="store_true")
     preflight.add_argument(
@@ -3586,6 +3605,9 @@ def build_parser() -> argparse.ArgumentParser:
     forge_input.add_argument("--format", choices=("json",), default="json")
     forge_input.add_argument("--owner-focus", default="AUTO")
     forge_input.add_argument(
+        "--collection", choices=("LIVE_LIFECYCLE", "OPPORTUNITY_EPISODES"), default=None
+    )
+    forge_input.add_argument(
         "--no-write",
         action="store_true",
         default=True,
@@ -3598,6 +3620,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     forge_run.add_argument("--format", choices=("json",), default="json")
     forge_run.add_argument("--owner-focus", default="AUTO")
+    forge_run.add_argument(
+        "--collection", choices=("LIVE_LIFECYCLE", "OPPORTUNITY_EPISODES"), default=None
+    )
     forge_run.add_argument(
         "--no-write",
         action="store_true",
@@ -4057,11 +4082,26 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _collection_focus(args: argparse.Namespace) -> None:
+    """Scope the owner focus to the requested collection (same stored focus)."""
+
+    collection = getattr(args, "collection", None)
+    if collection != "OPPORTUNITY_EPISODES":
+        return
+    if bool(getattr(args, "control_current_representation", False)):
+        raise HficCliError("CONTROL_COLLECTION_UNSUPPORTED")
+    from solana_alpha_lab.factory.opportunity_episodes import episode_focus
+
+    args.owner_focus = episode_focus(str(getattr(args, "owner_focus", "AUTO") or "AUTO"))
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     repo_root = args.root.resolve()
     try:
+        if args.command in {"preflight", "forge-input", "forge-run"}:
+            _collection_focus(args)
         if args.command == "preflight":
             return cmd_preflight(
                 repo_root,

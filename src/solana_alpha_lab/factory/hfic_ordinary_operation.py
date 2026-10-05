@@ -660,7 +660,7 @@ def _fresh_temporal_warnings(
 
     try:
         if binding_cohorts is not None:
-            _require_bound_schedule(binding_cohorts, validated["scientific_body"], validated["scientific_body"]["schedule_lateness_seconds"])
+            _require_bound_schedule(binding_cohorts, validated["scientific_body"], validated["scientific_body"].get("schedule_lateness_seconds"))
         return universe_question_guard(validated["scientific_body"], effective_policy(store)["definition"])
     except GroundedDiscoveryError as exc:
         raise OrdinaryOperationError(exc.code) from exc
@@ -766,6 +766,21 @@ def authorize_temporal_attempt(
     )
 
 
+def require_focus_population(owner_focus: object, spec: Mapping[str, Any]) -> None:
+    """The focus owns the collection (receipt, packet, card, look budget); the
+    query population must name that same corpus before any value is read."""
+
+    from solana_alpha_lab.factory.opportunity_episodes import (
+        COLLECTION as EPISODE_COLLECTION,
+        POPULATION as EPISODE_POPULATION,
+        collection_for_focus,
+    )
+
+    focus_is_episode = collection_for_focus(str(owner_focus or "")) == EPISODE_COLLECTION
+    if focus_is_episode != (isinstance(spec, Mapping) and spec.get("population") == EPISODE_POPULATION):
+        raise OrdinaryOperationError("FOCUS_POPULATION_MISMATCH")
+
+
 def gate_before_values(
     store: Any,
     *,
@@ -795,6 +810,7 @@ def gate_before_values(
         raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_UNVERIFIED")
     if verified_market != operation.get("market_evidence_epoch_sha256"):
         raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
+    require_focus_population(operation.get("owner_focus"), spec)
     if repo_root is not None and data_root is not None:
         _assert_preflight_journal(
             store, operation, journal_scope, repo_root=repo_root, data_root=data_root

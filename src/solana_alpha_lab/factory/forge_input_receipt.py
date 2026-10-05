@@ -189,6 +189,18 @@ def _load_readback(data_root: Path) -> dict[str, Any] | None:
     return build_cohort_import_readback(Path(data_root), lineage=lineage)
 
 
+def _load_episode_readback(data_root: Path) -> dict[str, Any] | None:
+    """Active evidence set of the OPPORTUNITY_EPISODES corpus (metadata only)."""
+
+    from solana_alpha_lab.factory.opportunity_episode_release import load_episode_lineage
+
+    try:
+        lineage = load_episode_lineage(Path(data_root))
+    except Exception:
+        return None
+    return build_cohort_import_readback(Path(data_root), lineage=lineage)
+
+
 def _historical_calibration(
     data_root: Path, *, repo_root: Path
 ) -> tuple[list[dict[str, Any]], str | None]:
@@ -265,9 +277,24 @@ def build_forge_input_receipt(
         select_current_datasets_for_forge,
     )
 
+    from solana_alpha_lab.factory.opportunity_episodes import (
+        COLLECTION as EPISODE_COLLECTION,
+        LOGICAL_DATASET_ID as EPISODE_DATASET_ID,
+        collection_for_focus,
+    )
+
+    collection = collection_for_focus(owner_focus)
     blocking: list[str] = []
     owner_class = OWNER_CLASS_READY
-    readback = _load_readback(Path(data_root))
+    # The market epoch is one data-root value for every focus (see
+    # market_identity_readback); the active evidence set follows the focus.
+    readback = (
+        _load_episode_readback(Path(data_root))
+        if collection == EPISODE_COLLECTION
+        else _load_readback(Path(data_root))
+    )
+    if readback is not None and collection == EPISODE_COLLECTION and not readback.get("visible_cohorts"):
+        readback = None
     visible_ids: list[str] = []
     current_mid = None
     corpus_version = None
@@ -312,13 +339,21 @@ def build_forge_input_receipt(
         # Default callers, including fixtures that mock the historical
         # one-argument enumerate, must keep that signature.
         datasets, _warnings = enumerate_rdp_datasets(Path(data_root))
-    selected, trunc = select_forge_packet_datasets(datasets)
+    def _is_collection_corpus(item: Mapping[str, Any]) -> bool:
+        if collection == EPISODE_COLLECTION:
+            return str(item.get("dataset_id") or "") == EPISODE_DATASET_ID
+        return is_live_corpus_dataset(item)
+
+    selected, trunc = select_forge_packet_datasets(
+        datasets,
+        protected=_is_collection_corpus if collection == EPISODE_COLLECTION else None,
+    )
     current_datasets = list(select_current_datasets_for_forge(datasets))
     live_in_packet = bool(trunc.get("live_corpus_in_packet"))
-    current_live = [item for item in current_datasets if is_live_corpus_dataset(item)]
+    current_live = [item for item in current_datasets if _is_collection_corpus(item)]
     chosen = None
     for item in selected:
-        if is_live_corpus_dataset(item):
+        if _is_collection_corpus(item):
             chosen = item
             break
     if chosen is None and current_live:
@@ -386,7 +421,9 @@ def build_forge_input_receipt(
     if chosen is not None:
         labels = dict(chosen.get("labels") or {})
         live_corpus = {
-            "dataset_id": CORPUS_DATASET_ID,
+            "dataset_id": (
+                EPISODE_DATASET_ID if collection == EPISODE_COLLECTION else CORPUS_DATASET_ID
+            ),
             "dataset_manifest_id": chosen.get("dataset_manifest_id"),
             "dataset_version": chosen.get("dataset_version") or labels.get("dataset_version"),
             "corpus_version": labels.get("corpus_version", corpus_version),
@@ -408,25 +445,43 @@ def build_forge_input_receipt(
         require_complete_market_enumeration,
     )
 
+    from solana_alpha_lab.factory.hfic_evidence_identity import market_identity_readback
+
+    verified_ids = {
+        str(item.get("dataset_manifest_id") or "")
+        for item in datasets
+        if isinstance(item, Mapping) and item.get("dataset_manifest_id")
+    }
+    market_identity = market_identity_readback(
+        Path(data_root), verified_dataset_manifest_ids=verified_ids
+    )
+    market_readback = market_identity["readback"]
+    market_visible = [
+        str(item.get("cohort_id"))
+        for item in ((market_readback or {}).get("visible_cohorts") or [])
+        if isinstance(item, Mapping) and item.get("cohort_id")
+    ]
+    raw_market_mid = (market_readback or {}).get("current_dataset_manifest_id")
+    market_mid = str(raw_market_mid) if isinstance(raw_market_mid, str) and raw_market_mid else None
+    market_version = (market_readback or {}).get("corpus_version")
+    market_lineage_ok = str((market_readback or {}).get("lineage_integrity") or "") == "PASS"
     market_basis = build_market_evidence_basis(
         # Packet membership remains bounded; market identity covers every
         # current logical dataset so an out-of-packet decision-bearing source
         # cannot change without changing the admission epoch.
         datasets=current_datasets,
-        visible_cohort_ids=visible_ids,
-        current_dataset_manifest_id=current_mid,
-        corpus_version=corpus_version,
-        lineage_bindings=lineage_cohort_bindings(
-            Path(data_root),
-            verified_dataset_manifest_ids={
-                str(item.get("dataset_manifest_id") or "")
-                for item in datasets
-                if isinstance(item, Mapping) and item.get("dataset_manifest_id")
-            },
-        ),
+        visible_cohort_ids=market_visible,
+        current_dataset_manifest_id=market_mid,
+        corpus_version=market_version,
+        lineage_bindings=market_identity["bindings"],
     )
     market_epoch: str | None = None
-    if lineage_ok and readback is not None:
+    if (
+        lineage_ok
+        and readback is not None
+        and market_lineage_ok
+        and market_readback is not None
+    ):
         try:
             require_complete_market_enumeration(_warnings)
             market_epoch = _hash_market_basis(market_basis)
@@ -484,6 +539,7 @@ def build_forge_input_receipt(
             ),
         },
         "live_corpus": live_corpus,
+        **({"collection": EPISODE_COLLECTION} if collection == EPISODE_COLLECTION else {}),
         "evidence_surface_mode": evidence_surface_mode,
         "forge_runnable": forge_runnable,
         "blocking_reason_codes": list(dict.fromkeys(blocking)),

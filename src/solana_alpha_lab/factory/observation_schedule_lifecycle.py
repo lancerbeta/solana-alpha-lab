@@ -145,6 +145,19 @@ def _used_provider_route_ids(
     document: Mapping[str, Any],
 ) -> tuple[list[str], list[str]]:
     registry = load_observation_primitive_registry(root)
+    if document.get("schema") == "smial.opportunity-episode-schedule":
+        from solana_alpha_lab.factory.opportunity_episodes import (
+            episode_provider_primitives,
+        )
+
+        episode_primitives = episode_provider_primitives(document)
+        return episode_primitives, sorted(
+            {
+                str(route)
+                for primitive_id in episode_primitives
+                for route in registry.require_primitive(primitive_id)["provider_route_ids"]
+            }
+        )
     primitive_ids = [str(document["source_poll"]["primitive_id"])]
     for point in [document["x_point"], *list(document["y_points"])]:
         for bundle_id in point["bundle_ids"]:
@@ -207,6 +220,10 @@ def _authority_policy(
 
 
 def _minimum_expiry(document: Mapping[str, Any]) -> datetime:
+    if document.get("schema") == "smial.opportunity-episode-schedule":
+        from solana_alpha_lab.factory.opportunity_episodes import episode_minimum_expiry
+
+        return episode_minimum_expiry(document)
     points = [document["x_point"], *list(document["y_points"])]
     horizon = max(
         int(point["due_offset_seconds"]) + int(point["allowed_lateness_seconds"])
@@ -513,6 +530,100 @@ def drain_expired_admission(
         "activation_id": activation_id,
         "schedule_sha256": schedule_sha256,
         "transition_event_id": transition["event_id"],
+    }
+
+
+def stop_episode_intake(
+    *,
+    data_root: Path,
+    store: ObservationScheduleStore,
+    schedule_sha256: str,
+    activation_id: str,
+    now: datetime,
+    producer_git_sha: str,
+) -> dict[str, Any]:
+    """Operator early ACTIVE -> DRAINING for an OPPORTUNITY_EPISODES activation.
+
+    Same lifecycle owner, transition and ResearchEvent evidence as the natural
+    ``drain_expired_admission``; only the boundary is the operator's instant
+    instead of ``stops_admitting_at``. Already-committed obligations continue
+    and the activation completes through ``complete_draining_schedule``.
+    Pause semantics are untouched. Re-running the command is idempotent and
+    repairs a missing ResearchEvent after a crash.
+    """
+
+    from solana_alpha_lab.factory.opportunity_episodes import is_episode_schedule
+
+    registered = store.get_registered_schedule(schedule_sha256)
+    if registered is None or not is_episode_schedule(registered["document"]):
+        raise ObservationLifecycleError("STOP_INTAKE_EPISODE_SCHEDULE_ONLY")
+    existing = store.get_activation(schedule_sha256, activation_id)
+    if existing is None:
+        raise ObservationLifecycleError("ACTIVATION_MISSING")
+    state = str(existing["state"])
+    base = {"activation_id": activation_id, "schedule_sha256": schedule_sha256}
+    if state == "COMPLETE":
+        return {**base, "terminal": "STOP_INTAKE_COMPLETE_REPLAY", "state": "COMPLETE"}
+    if state not in {"ACTIVE", "DRAINING"}:
+        # PAUSED_OPERATOR must be resumed first; an aborted activation never drains.
+        raise ObservationLifecycleError("ACTIVATION_NOT_ACTIVE")
+    if state == "DRAINING":
+        stored = existing.get("payload") if isinstance(existing.get("payload"), Mapping) else {}
+        if stored.get("operator_stop_intake") is not True:
+            return {**base, "terminal": "STOP_INTAKE_ALREADY_DRAINING", "state": "DRAINING"}
+    else:
+        # The natural drain defers while a rollover cutover is pending; so does the operator.
+        if any(
+            str(item["predecessor_schedule_sha256"]) == schedule_sha256
+            and str(item["predecessor_activation_id"]) == activation_id
+            for item in store.list_rollovers()
+        ):
+            raise ObservationLifecycleError("STOP_INTAKE_ROLLOVER_PENDING")
+        # A backdated clock must not commit an admission-closed instant earlier
+        # than an admission that already exists.
+        admissions = store.list_episode_admissions(schedule_sha256=schedule_sha256, activation_id=activation_id)
+        if admissions and now < max(parse_utc(str(item["t0"])) for item in admissions):
+            raise ObservationLifecycleError("STOP_INTAKE_CLOCK_BEFORE_LAST_ADMISSION")
+    transition = store.transition_activation(
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
+        new_state="DRAINING",
+        authority_receipt_sha256=existing.get("authority_receipt_sha256"),
+        effective_at=render_utc(now),
+        payload={"admission_window_closed": True, "operator_stop_intake": True},
+        clock=now,
+    )
+    # The event carries the committed transition instant, so a repeat after a
+    # crash rebuilds the same event identity instead of a later one.
+    effective = parse_utc(str(transition["payload"]["transition_effective_at"]))
+    event = _research_event(
+        record_id=str(transition["event_id"]),
+        record_kind=RecordKind.OBSERVATION_SCHEDULE_STATE,
+        entity_id=schedule_sha256,
+        payload={
+            "state_event_id": transition["event_id"],
+            "activation_id": activation_id,
+            "state": "DRAINING",
+            "schedule_sha256": schedule_sha256,
+            "prior_state": transition["payload"]["prior_state"],
+            "transition_sequence": transition["transition_sequence"],
+            "authority_receipt_sha256": existing.get("authority_receipt_sha256"),
+            "admission_window_closed": True,
+            "operator_stop_intake": True,
+        },
+        now=max(now, effective),
+        effective_at=effective,
+        producer_git_sha=producer_git_sha,
+        run_id=activation_id,
+        transaction_id=f"RESEARCH-TXN-{transition['event_id'].upper()}",
+    )
+    _append_or_replay(data_root, event)
+    return {
+        **base,
+        "terminal": "STOP_INTAKE_REPLAY" if transition.get("replayed") else "STOP_INTAKE_COMMITTED",
+        "state": "DRAINING",
+        "transition_event_id": transition["event_id"],
+        "next_action": "TICK_UNTIL_ACTIVATION_COMPLETE",
     }
 
 
@@ -852,6 +963,12 @@ def _require_live_authority(
 
 def cohort_family_key(document: Mapping[str, Any]) -> str:
     """Identity of the scientific cohort, independent of Y horizon / schedule_key."""
+    if document.get("schema") == "smial.opportunity-episode-schedule":
+        from solana_alpha_lab.factory.opportunity_episodes import (
+            episode_cohort_family_key,
+        )
+
+        return episode_cohort_family_key(document)
     population = document["population"]
     return canonical_sha256(
         {
@@ -1067,7 +1184,11 @@ def _draining_transition_evidence(
             admission_closed = False
         else:
             return None
-        if admission_closed and effective < stops:
+        # An operator stop-intake (episode lane) closes admission at its own
+        # committed instant, before the scheduled boundary; every other closure
+        # still proves nothing earlier than stops_admitting_at.
+        operator_early_close = payload.get("operator_stop_intake") is True
+        if admission_closed and effective < stops and not operator_early_close:
             return None
         return effective, admission_closed
     return None

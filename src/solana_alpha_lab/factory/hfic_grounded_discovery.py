@@ -132,11 +132,183 @@ def validate_query_spec(spec: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+EPISODE_DATASET_ID = "DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001"
+EPISODE_POPULATION = "OPPORTUNITY_EPISODES"
+
+
+def _admit_episode_binding(cohorts: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """OPPORTUNITY_EPISODES metadata gate; never a BASE_X disguise."""
+
+    admitted = []
+    for item in cohorts:
+        if (
+            item.get("evidence_role") != LIVE_EVIDENCE_ROLE
+            or item.get("dataset_id") != EPISODE_DATASET_ID
+            or item.get("population") != EPISODE_POPULATION
+        ):
+            raise GroundedDiscoveryError("DISCOVERY_ROLE_AMBIGUOUS")
+        for key in ("cohort_id", "release_id", "census_sha256", "observations_sha256"):
+            value = item.get(key)
+            if not isinstance(value, str) or not value:
+                raise GroundedDiscoveryError("DISCOVERY_BINDING_INCOMPLETE")
+        if not isinstance(item.get("schedule_binding"), Mapping):
+            raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND")
+        if item.get("holdout") is not False:
+            raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED")
+        admitted.append(
+            {
+                "cohort_id": item["cohort_id"],
+                "release_id": item["release_id"],
+                "census_sha256": item["census_sha256"],
+                "observations_sha256": item["observations_sha256"],
+                "evidence_role": LIVE_EVIDENCE_ROLE,
+            }
+        )
+    return {
+        "contract_version": DISCOVERY_CONTRACT_VERSION,
+        "population": EPISODE_POPULATION,
+        "not_all_census_rows": False,
+        "allowed_fields": sorted(ALLOWED_FIELDS | {"FIELD-HOLDER-COUNT-001"}),
+        "cohorts": admitted,
+        "holdouts_not_touched": ["UNTOUCHED_FORWARD_HOLDOUT"],
+    }
+
+
+def resolve_published_episode_binding(data_root: Path) -> dict[str, Any]:
+    """Episode corpus binding from metadata only; protection precedes values.
+
+    Each run re-reads the frozen release protection sources and every current
+    registered assignment in this data root. DENY is ``HOLDOUT_PROTECTED``;
+    an unproven scope is ``HOLDOUT_UNRESOLVED``. No value column is read.
+    """
+
+    import pyarrow.parquet as pq
+
+    from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
+    from solana_alpha_lab.factory.opportunity_episode_release import (
+        REQUIRED_EPISODE_LABELS,
+        EpisodeReleaseError,
+        frozen_protection_from_release,
+        load_episode_lineage,
+    )
+    from solana_alpha_lab.factory.opportunity_episodes import (
+        ALLOW,
+        ASSIGNMENT_DIR,
+        DENY_PROTECTED,
+        cohort_day_bounds,
+        inventory_from_documents,
+        protection_decision,
+    )
+
+    root = Path(data_root)
+    try:
+        lineage = load_episode_lineage(root)
+    except Exception as exc:
+        raise GroundedDiscoveryError("DISCOVERY_IDENTITY_MISMATCH") from exc
+    manifest_id = lineage.get("current_dataset_manifest_id")
+    if not isinstance(manifest_id, str) or not manifest_id:
+        raise GroundedDiscoveryError("DISCOVERY_ARTIFACT_MISSING")
+    labels_path = root / "datasets" / "manifests" / f"{manifest_id}.labels.json"
+    if not labels_path.is_file() or labels_path.is_symlink():
+        raise GroundedDiscoveryError("DISCOVERY_ARTIFACT_MISSING")
+    labels = json.loads(labels_path.read_text(encoding="utf-8"))
+    if not isinstance(labels, Mapping) or any(
+        labels.get(key) != value for key, value in REQUIRED_EPISODE_LABELS.items()
+    ):
+        raise GroundedDiscoveryError("DISCOVERY_AUTHORITY_ABSENT")
+    # Only the lineage-current version binds; a torn import never reads values.
+    if labels.get("is_current_corpus_version") is not True or labels.get("corpus_version") != lineage.get(
+        "current_corpus_version"
+    ):
+        raise GroundedDiscoveryError("DISCOVERY_IDENTITY_MISMATCH")
+    raw_cohorts = [item for item in lineage.get("cohorts") or [] if isinstance(item, Mapping)]
+    if not raw_cohorts:
+        raise GroundedDiscoveryError("DISCOVERY_BINDING_EMPTY")
+    if {str(item.get("cohort_id")) for item in raw_cohorts} != {
+        str(item) for item in labels.get("cohort_lineage") or []
+    }:
+        raise GroundedDiscoveryError("DISCOVERY_SCOPE_UNSUPPORTED")
+    current_documents = []
+    assignment_dir = root / ASSIGNMENT_DIR
+    if assignment_dir.is_dir():
+        for path in sorted(assignment_dir.glob("*.json")):
+            if path.is_symlink():
+                raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED")
+            current_documents.append(json.loads(path.read_text(encoding="utf-8")))
+    bound: list[dict[str, Any]] = []
+    for item in sorted(raw_cohorts, key=lambda row: int(row.get("corpus_version") or 0)):
+        census_rel = str(item.get("census_rel") or "")
+        obs_rel = str(item.get("obs_rel") or "")
+        for rel, expected in ((census_rel, item.get("census_sha256")), (obs_rel, item.get("observations_sha256"))):
+            path = root / rel
+            if not rel or path.is_symlink() or not path.is_file():
+                raise GroundedDiscoveryError("DISCOVERY_ARTIFACT_MISSING")
+            if sha256_file_streaming(path) != expected:
+                raise GroundedDiscoveryError("BINDING_HASH_MISMATCH")
+        release_dir = root / str(item.get("release_dir_rel") or "")
+        try:
+            # Exactly the pinned admission-time assignments; nothing else binds.
+            frozen_documents = frozen_protection_from_release(
+                release_dir, expected_schedule_sha256=str(item.get("schedule_sha256") or "")
+            )
+        except (EpisodeReleaseError, OSError, ValueError):
+            raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED") from None
+        inventory = inventory_from_documents([*frozen_documents, *current_documents])
+        start, end = cohort_day_bounds(str(item["cohort_id"]))
+        mints = pq.read_table(root / census_rel, columns=["mint"]).column("mint").to_pylist()
+        for mint in mints:
+            decision, _reason = protection_decision(
+                inventory,
+                str(mint),
+                interval_start=start - timedelta(days=1),
+                interval_end=end + timedelta(days=4),
+            )
+            if decision == DENY_PROTECTED:
+                raise GroundedDiscoveryError("HOLDOUT_PROTECTED")
+            if decision != ALLOW:
+                raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED")
+        bound.append(
+            {
+                "dataset_id": EPISODE_DATASET_ID,
+                "dataset_manifest_id": manifest_id,
+                "dataset_version": str(labels.get("dataset_version") or ""),
+                "evidence_role": LIVE_EVIDENCE_ROLE,
+                "holdout": False,
+                "population": EPISODE_POPULATION,
+                "cohort_id": item["cohort_id"],
+                "release_id": item["release_id"],
+                "census_sha256": item["census_sha256"],
+                "observations_sha256": item["observations_sha256"],
+                "census_rel": census_rel,
+                "observations_rel": obs_rel,
+                "schedule_sha256": item.get("schedule_sha256"),
+                "schedule_binding": dict(item.get("schedule_binding") or {}),
+            }
+        )
+    admitted = admit_discovery_binding(bound)
+    return {
+        **admitted,
+        "authority_source": "PUBLISHED_EPISODE_LABELS_V1",
+        "holdout_derived_from_discovery_contract": True,
+        "protected_holdout_assignment": False,
+        "dataset_manifest_id": manifest_id,
+        "dataset_version": str(labels.get("dataset_version") or ""),
+        "cohorts": bound,
+    }
+
+
 def admit_discovery_binding(cohorts: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     """Metadata gate. Ambiguous role stops before value read and before a slot."""
 
     if not cohorts:
         raise GroundedDiscoveryError("DISCOVERY_BINDING_EMPTY")
+    episode_flags = {
+        item.get("dataset_id") == EPISODE_DATASET_ID for item in cohorts if isinstance(item, Mapping)
+    }
+    if len(episode_flags) != 1:
+        raise GroundedDiscoveryError("DISCOVERY_ROLE_AMBIGUOUS")
+    if episode_flags == {True}:
+        return _admit_episode_binding(cohorts)
     admitted = []
     for item in cohorts:
         role = item.get("evidence_role")
@@ -527,24 +699,48 @@ def load_admitted_partition_rows(
     census_path: Path | None,
     observations_path: Path | None,
     observation_filters: list[tuple[str, str, Any]] | None = None,
+    population: str | None = None,
 ) -> dict[str, Any]:
-    """Admit, then hash-check, then load. Authority failures do not call the loader."""
+    """Admit, then hash-check, then load. Authority failures do not call the loader.
+
+    ``population=OPPORTUNITY_EPISODES`` resolves the separate episode corpus;
+    the default keeps the legacy LIVE corpus resolution unchanged.
+    """
 
     from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
 
+    episode_scope = population == EPISODE_POPULATION or (
+        isinstance(binding_doc, Mapping)
+        and any(
+            isinstance(item, Mapping) and item.get("dataset_id") == EPISODE_DATASET_ID
+            for item in binding_doc.get("cohorts") or []
+        )
+    )
     if binding_doc is None:
         if data_root is None:
             raise GroundedDiscoveryError("DISCOVERY_AUTHORITY_ABSENT")
-        binding_doc = resolve_published_discovery_binding(data_root)
+        binding_doc = (
+            resolve_published_episode_binding(data_root)
+            if episode_scope
+            else resolve_published_discovery_binding(data_root)
+        )
     if not isinstance(binding_doc, Mapping):
         raise GroundedDiscoveryError("DISCOVERY_INPUT_INVALID")
     cohorts = binding_doc.get("cohorts")
     if not isinstance(cohorts, list):
         raise GroundedDiscoveryError("DISCOVERY_INPUT_INVALID")
     if binding_doc is not None and data_root is not None:
-        lineage_path = Path(data_root) / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+        lineage_path = Path(data_root) / (
+            "datasets/opportunity_episodes_corpus/lineage.json"
+            if episode_scope
+            else "datasets/live_lifecycle_corpus/lineage.json"
+        )
         if lineage_path.is_file() and not lineage_path.is_symlink():
-            published = resolve_published_discovery_binding(data_root)
+            published = (
+                resolve_published_episode_binding(data_root)
+                if episode_scope
+                else resolve_published_discovery_binding(data_root)
+            )
             published_pairs = {
                 (
                     str(item.get("cohort_id")),
@@ -1009,7 +1205,20 @@ def _last_decision_point(points: Sequence[str]) -> str:
     latest point in the spec, so an earlier label is a different question.
     """
 
-    return max((str(point) for point in points), key=_point_offset)
+    return max((str(point) for point in points), key=_scope_point_offset)
+
+
+def _scope_point_offset(point_id: object) -> int:
+    """Ordering for candidate scope labels only; the evaluators keep their own allowlists."""
+
+    if isinstance(point_id, str) and point_id.startswith("E"):
+        from solana_alpha_lab.factory.opportunity_episodes import OpportunityEpisodeError, point_offset
+
+        try:
+            return point_offset(point_id)
+        except OpportunityEpisodeError as exc:
+            raise GroundedDiscoveryError("POINT_NOT_IN_ALLOWLIST") from exc
+    return _point_offset(point_id)
 
 
 def measured_target_label(spec: Mapping[str, Any]) -> str:
@@ -1400,6 +1609,10 @@ def execute_discovery_from_rows(
         if "evidence_role" not in item:
             raise GroundedDiscoveryError("DISCOVERY_ROLE_AMBIGUOUS")
     admitted = admit_discovery_binding(binding)
+    # The grounded BASE_X evaluator never reads an episode corpus; episode
+    # questions run through temporal query 1.1 only.
+    if admitted.get("population") == EPISODE_POPULATION:
+        raise GroundedDiscoveryError("POPULATION_BINDING_MISMATCH")
     rules = spec.get("explanatory_rules") or []
     if not isinstance(rules, list):
         raise GroundedDiscoveryError("EXPLANATORY_INVALID")

@@ -169,6 +169,69 @@ def lineage_cohort_bindings(
     return rows
 
 
+def market_identity_readback(
+    data_root: Path | None,
+    *,
+    verified_dataset_manifest_ids: set[str] | None = None,
+) -> dict[str, Any]:
+    """Data-root lineage input of the market epoch; independent of focus.
+
+    A data root with LIVE cohorts keeps the exact LIVE readback/bindings.
+    Only when no LIVE cohort is visible does a published OPPORTUNITY_EPISODES
+    corpus supply the current manifest, visible cohorts and verified bindings.
+    """
+
+    from solana_alpha_lab.factory.cohort_import_readback import (
+        build_cohort_import_readback,
+    )
+
+    if data_root is None:
+        return {"source": "LIVE", "readback": None, "bindings": []}
+    try:
+        legacy = build_cohort_import_readback(Path(data_root))
+    except Exception:
+        legacy = None
+    legacy_bindings = lineage_cohort_bindings(
+        data_root,
+        verified_dataset_manifest_ids=verified_dataset_manifest_ids,
+    )
+    if legacy is None or legacy.get("visible_cohorts"):
+        return {"source": "LIVE", "readback": legacy, "bindings": legacy_bindings}
+    try:
+        from solana_alpha_lab.factory.opportunity_episode_release import (
+            load_episode_lineage,
+        )
+
+        lineage = load_episode_lineage(Path(data_root))
+    except Exception:
+        return {"source": "LIVE", "readback": legacy, "bindings": legacy_bindings}
+    cohorts = [item for item in lineage.get("cohorts") or [] if isinstance(item, Mapping)]
+    if not cohorts:
+        return {"source": "LIVE", "readback": legacy, "bindings": legacy_bindings}
+    readback = build_cohort_import_readback(Path(data_root), lineage=lineage)
+    current_mid = str(lineage.get("current_dataset_manifest_id") or "")
+    rows: list[dict[str, str]] = []
+    for item in cohorts:
+        cohort_id = str(item.get("cohort_id") or "")
+        release_id = str(item.get("release_id") or "")
+        source_sha = str(item.get("source_sha256") or "")
+        if not re.fullmatch(r"[0-9a-f]{64}", source_sha):
+            continue
+        if verified_dataset_manifest_ids is not None and current_mid not in verified_dataset_manifest_ids:
+            continue
+        if not _composition_binds_release(
+            Path(data_root),
+            current_mid,
+            cohort_id=cohort_id,
+            release_id=release_id,
+            source_sha=source_sha,
+        ):
+            continue
+        rows.append({"cohort_id": cohort_id, "release_id": release_id, "source_sha256": source_sha})
+    rows.sort(key=lambda row: row["cohort_id"])
+    return {"source": "OPPORTUNITY_EPISODES", "readback": readback, "bindings": rows}
+
+
 def _verify_lineage_release_binding(
     data_root: Path,
     item: Mapping[str, Any],
@@ -464,6 +527,29 @@ def require_live_scientific_labels(dataset_id: Any, labels: Any) -> None:
     from solana_alpha_lab.factory.live_cohort_discovery_release import (
         CORPUS_DATASET_ID, LIVE_EVIDENCE_ROLE, REQUIRED_LABELS,
     )
+    if dataset_id == "DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001" or (
+        isinstance(labels, Mapping)
+        and labels.get("logical_dataset_id") == "DATASET-OPPORTUNITY-EPISODES-DISCOVERY-CORPUS-001"
+    ):
+        # Additive OPPORTUNITY_EPISODES corpus contract; the LIVE branch below
+        # keeps its exact requirements.
+        from solana_alpha_lab.factory.opportunity_episode_release import (
+            REQUIRED_EPISODE_LABELS,
+        )
+
+        if not isinstance(labels, Mapping) or any(
+            key not in labels or type(labels[key]) is not type(value) or labels[key] != value
+            for key, value in REQUIRED_EPISODE_LABELS.items()
+        ):
+            raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        if (
+            type(labels.get("corpus_version")) is not int
+            or labels["corpus_version"] < 1
+            or type(labels.get("is_current_corpus_version")) is not bool
+            or not isinstance(labels.get("feature_families"), list)
+        ):
+            raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        return
     is_live = dataset_id == CORPUS_DATASET_ID or (
         isinstance(labels, Mapping) and labels.get("evidence_role") == LIVE_EVIDENCE_ROLE
     )
@@ -1585,14 +1671,11 @@ def compute_market_epoch_for_data_root(
             and item.get("parquet_verified", True) is not False
         }
         datasets = list(select_current_datasets_for_forge(enumerated))
-        try:
-            from solana_alpha_lab.factory.cohort_import_readback import (
-                build_cohort_import_readback,
-            )
-
-            readback = build_cohort_import_readback(Path(data_root))
-        except Exception:
-            readback = None
+        identity = market_identity_readback(
+            Path(data_root),
+            verified_dataset_manifest_ids=verified_dataset_manifest_ids,
+        )
+        readback = identity["readback"]
         if isinstance(readback, Mapping):
             if str(readback.get("lineage_integrity") or "") != "PASS":
                 raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
@@ -1608,9 +1691,16 @@ def compute_market_epoch_for_data_root(
                     mid = str(raw_mid) if isinstance(raw_mid, str) and raw_mid else None
                 if version is None:
                     version = readback.get("corpus_version")
-    bindings = lineage_cohort_bindings(
-        data_root,
-        verified_dataset_manifest_ids=verified_dataset_manifest_ids,
+    bindings = (
+        market_identity_readback(
+            Path(data_root),
+            verified_dataset_manifest_ids=verified_dataset_manifest_ids,
+        )["bindings"]
+        if data_root is not None
+        else lineage_cohort_bindings(
+            data_root,
+            verified_dataset_manifest_ids=verified_dataset_manifest_ids,
+        )
     )
     basis = build_market_evidence_basis(
         datasets=datasets,

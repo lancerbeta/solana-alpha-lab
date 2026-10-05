@@ -337,6 +337,74 @@ class ObservationScheduleStore:
                 payload_json TEXT NOT NULL,
                 updated_at TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS episode_admissions (
+                episode_id TEXT PRIMARY KEY,
+                schedule_sha256 TEXT NOT NULL,
+                activation_id TEXT NOT NULL,
+                lineage_id TEXT NOT NULL,
+                cycle_start TEXT NOT NULL,
+                mint TEXT NOT NULL,
+                t0 TEXT NOT NULL,
+                cohort_id TEXT NOT NULL,
+                final_deadline_at TEXT NOT NULL,
+                content_sha256 TEXT NOT NULL,
+                record_json TEXT NOT NULL,
+                round_id TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_episode_admissions_round
+                ON episode_admissions(round_id);
+            CREATE INDEX IF NOT EXISTS idx_episode_admissions_lineage_t0
+                ON episode_admissions(lineage_id, t0);
+            CREATE INDEX IF NOT EXISTS idx_episode_admissions_cohort
+                ON episode_admissions(schedule_sha256, activation_id, cohort_id);
+            CREATE INDEX IF NOT EXISTS idx_episode_admissions_lineage_mint
+                ON episode_admissions(lineage_id, mint, final_deadline_at);
+            CREATE TABLE IF NOT EXISTS episode_rounds (
+                round_id TEXT PRIMARY KEY,
+                schedule_sha256 TEXT NOT NULL,
+                activation_id TEXT NOT NULL,
+                lineage_id TEXT NOT NULL,
+                round_started_at TEXT NOT NULL,
+                state TEXT NOT NULL,
+                frame_json TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS episode_outbox (
+                outbox_id TEXT PRIMARY KEY,
+                schedule_sha256 TEXT NOT NULL,
+                activation_id TEXT NOT NULL,
+                kind TEXT NOT NULL,
+                episode_id TEXT NOT NULL,
+                point_id TEXT,
+                cohort_id TEXT NOT NULL,
+                row_json TEXT NOT NULL,
+                -- Published rows are deleted with their publication record, so
+                -- this stays NULL; kept as the explicit pending predicate.
+                published_content_sha256 TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_episode_outbox_pending
+                ON episode_outbox(schedule_sha256, activation_id, published_content_sha256);
+            CREATE TABLE IF NOT EXISTS episode_publications (
+                content_sha256 TEXT PRIMARY KEY,
+                schedule_sha256 TEXT NOT NULL,
+                activation_id TEXT NOT NULL,
+                dataset_manifest_id TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS episode_publication_cohorts (
+                content_sha256 TEXT NOT NULL,
+                schedule_sha256 TEXT NOT NULL,
+                activation_id TEXT NOT NULL,
+                cohort_id TEXT NOT NULL,
+                PRIMARY KEY (content_sha256, cohort_id)
+            );
+            CREATE INDEX IF NOT EXISTS idx_episode_publication_cohorts
+                ON episode_publication_cohorts(schedule_sha256, activation_id, cohort_id);
             """
         )
         self._ensure_column(
@@ -2850,6 +2918,537 @@ class ObservationScheduleStore:
             (content_sha256, stage, json.dumps(dict(payload), sort_keys=True), now),
         )
         self._conn.commit()
+
+    # ------------------------------------------------------------------
+    # OPPORTUNITY_EPISODES operational records (additive; not research truth)
+
+    def commit_episode_admission(
+        self,
+        *,
+        record: Mapping[str, Any],
+        content_sha256: str,
+        final_deadline_at: str,
+        due_rows: Sequence[Mapping[str, Any]],
+        outbox_rows: Sequence[Mapping[str, Any]],
+        clock: datetime | None = None,
+    ) -> str:
+        """One transaction: admission, all future slots and the outbox.
+
+        The same admission key with the same content is a replay. Different
+        content under an existing key is a conflict, never an overwrite.
+        """
+
+        self._require_write_lease(clock)
+        now = _now(clock)
+        episode_id = str(record["episode_id"])
+        try:
+            self._conn.execute("BEGIN IMMEDIATE")
+            existing = self._conn.execute(
+                "SELECT content_sha256 FROM episode_admissions WHERE episode_id = ?",
+                (episode_id,),
+            ).fetchone()
+            if existing is not None:
+                self._conn.rollback()
+                if str(existing["content_sha256"]) == str(content_sha256):
+                    return "REPLAY"
+                raise ObservationScheduleStoreError("EPISODE_ADMISSION_CONFLICT")
+            self._conn.execute(
+                """
+                INSERT INTO episode_admissions(
+                    episode_id, schedule_sha256, activation_id, lineage_id,
+                    cycle_start, mint, t0, cohort_id, final_deadline_at,
+                    content_sha256, record_json, round_id, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    episode_id,
+                    str(record["schedule_sha256"]),
+                    str(record["activation_id"]),
+                    str(record["collection_lineage_id"]),
+                    str(record["cycle_start"]),
+                    str(record["mint"]),
+                    str(record["t0"]),
+                    str(record["cohort_id"]),
+                    str(final_deadline_at),
+                    str(content_sha256),
+                    json.dumps(dict(record), sort_keys=True),
+                    str(record["round_id"]),
+                    now,
+                ),
+            )
+            for row in due_rows:
+                self._conn.execute(
+                    """
+                    INSERT INTO due_observations(
+                        schedule_sha256, activation_id, entity_id, point_id,
+                        primitive_id, state, due_at, deadline_at, request_sha256,
+                        payload_json, created_at, updated_at, call_occurrence_id
+                    ) VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?, NULL, ?, ?, ?, NULL)
+                    """,
+                    (
+                        str(row["schedule_sha256"]),
+                        str(row["activation_id"]),
+                        str(row["entity_id"]),
+                        str(row["point_id"]),
+                        str(row["primitive_id"]),
+                        str(row["due_at"]),
+                        str(row["deadline_at"]),
+                        json.dumps(dict(row.get("payload") or {}), sort_keys=True),
+                        now,
+                        now,
+                    ),
+                )
+            for row in outbox_rows:
+                self._insert_episode_outbox(row, now=now)
+            self._conn.commit()
+            return "COMMITTED"
+        except sqlite3.IntegrityError as exc:
+            self._conn.rollback()
+            raise ObservationScheduleStoreError("EPISODE_ADMISSION_CONFLICT") from exc
+        except ObservationScheduleStoreError:
+            raise
+        except Exception:
+            self._conn.rollback()
+            raise
+
+    def _insert_episode_outbox(self, row: Mapping[str, Any], *, now: str) -> None:
+        self._conn.execute(
+            """
+            INSERT INTO episode_outbox(
+                outbox_id, schedule_sha256, activation_id, kind, episode_id,
+                point_id, cohort_id, row_json, published_content_sha256,
+                created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)
+            """,
+            (
+                str(row["outbox_id"]),
+                str(row["schedule_sha256"]),
+                str(row["activation_id"]),
+                str(row["kind"]),
+                str(row["episode_id"]),
+                row.get("point_id"),
+                str(row["cohort_id"]),
+                json.dumps(dict(row["row"]), sort_keys=True),
+                now,
+                now,
+            ),
+        )
+
+    def _decode_episode_admission(self, row: sqlite3.Row) -> dict[str, Any]:
+        payload = dict(row)
+        payload["record"] = json.loads(payload.pop("record_json"))
+        return payload
+
+    def get_episode_admission(self, episode_id: str) -> dict[str, Any] | None:
+        row = self._conn.execute(
+            "SELECT * FROM episode_admissions WHERE episode_id = ?",
+            (str(episode_id),),
+        ).fetchone()
+        return None if row is None else self._decode_episode_admission(row)
+
+    def list_episode_admissions(
+        self,
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+        cohort_id: str | None = None,
+    ) -> list[dict[str, Any]]:
+        predicates = ["schedule_sha256 = ?", "activation_id = ?"]
+        params: list[Any] = [schedule_sha256, activation_id]
+        if cohort_id is not None:
+            predicates.append("cohort_id = ?")
+            params.append(cohort_id)
+        rows = self._conn.execute(
+            "SELECT * FROM episode_admissions WHERE "
+            + " AND ".join(predicates)
+            + " ORDER BY t0 ASC, episode_id ASC",
+            params,
+        ).fetchall()
+        return [self._decode_episode_admission(row) for row in rows]
+
+    def episode_admission_count(
+        self,
+        *,
+        lineage_id: str,
+        window_start: datetime,
+        window_end: datetime,
+    ) -> int:
+        row = self._conn.execute(
+            """
+            SELECT COUNT(*) AS n FROM episode_admissions
+            WHERE lineage_id = ? AND t0 >= ? AND t0 < ?
+            """,
+            (lineage_id, render_utc(window_start), render_utc(window_end)),
+        ).fetchone()
+        return int(row["n"]) if row is not None else 0
+
+    def episode_admissions_in_round(self, round_id: str) -> int:
+        row = self._conn.execute(
+            "SELECT COUNT(*) AS n FROM episode_admissions WHERE round_id = ?",
+            (str(round_id),),
+        ).fetchone()
+        return int(row["n"]) if row is not None else 0
+
+    def episode_blocked_mints(
+        self,
+        *,
+        lineage_id: str,
+        cycle_start: str,
+        now: datetime,
+    ) -> set[str]:
+        """Mints admitted this cycle or still with an active trajectory."""
+
+        rows = self._conn.execute(
+            """
+            SELECT mint FROM episode_admissions
+            WHERE lineage_id = ? AND (cycle_start = ? OR final_deadline_at > ?)
+            """,
+            (lineage_id, cycle_start, render_utc(now)),
+        ).fetchall()
+        return {str(row["mint"]) for row in rows}
+
+    def count_active_episodes(self, *, lineage_id: str, now: datetime) -> int:
+        row = self._conn.execute(
+            """
+            SELECT COUNT(*) AS n FROM episode_admissions
+            WHERE lineage_id = ? AND final_deadline_at > ?
+            """,
+            (lineage_id, render_utc(now)),
+        ).fetchone()
+        return int(row["n"]) if row is not None else 0
+
+    def record_episode_round(
+        self,
+        *,
+        round_id: str,
+        schedule_sha256: str,
+        activation_id: str,
+        lineage_id: str,
+        round_started_at: str,
+        state: str,
+        frame: Mapping[str, Any],
+        clock: datetime | None = None,
+    ) -> str:
+        self._require_write_lease(clock)
+        now = _now(clock)
+        encoded = json.dumps(dict(frame), sort_keys=True)
+        # Check-then-write in one immediate transaction, like the other episode writers.
+        self._conn.execute("BEGIN IMMEDIATE")
+        try:
+            existing = self._conn.execute(
+                "SELECT state, frame_json FROM episode_rounds WHERE round_id = ?",
+                (round_id,),
+            ).fetchone()
+            if existing is not None:
+                if str(existing["state"]) != "STARTED":
+                    if str(existing["state"]) == state and str(existing["frame_json"]) == encoded:
+                        self._conn.rollback()
+                        return "REPLAY"
+                    raise ObservationScheduleStoreError("EPISODE_ROUND_CONFLICT")
+                self._conn.execute(
+                    """
+                    UPDATE episode_rounds SET state = ?, frame_json = ?, updated_at = ?
+                    WHERE round_id = ? AND state = 'STARTED'
+                    """,
+                    (state, encoded, now, round_id),
+                )
+                self._conn.commit()
+                return "UPDATED"
+            self._conn.execute(
+                """
+                INSERT INTO episode_rounds(
+                    round_id, schedule_sha256, activation_id, lineage_id,
+                    round_started_at, state, frame_json, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    round_id,
+                    schedule_sha256,
+                    activation_id,
+                    lineage_id,
+                    round_started_at,
+                    state,
+                    encoded,
+                    now,
+                    now,
+                ),
+            )
+            self._conn.commit()
+            return "INSERTED"
+        except Exception:
+            if self._conn.in_transaction:
+                self._conn.rollback()
+            raise
+
+    def get_episode_round(self, round_id: str) -> dict[str, Any] | None:
+        row = self._conn.execute(
+            "SELECT * FROM episode_rounds WHERE round_id = ?", (round_id,)
+        ).fetchone()
+        if row is None:
+            return None
+        payload = dict(row)
+        payload["frame"] = json.loads(payload.pop("frame_json"))
+        return payload
+
+    def list_episode_rounds(
+        self,
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+        started_from: datetime,
+        started_before: datetime,
+    ) -> list[dict[str, Any]]:
+        rows = self._conn.execute(
+            """
+            SELECT * FROM episode_rounds
+            WHERE schedule_sha256 = ? AND activation_id = ?
+              AND round_started_at >= ? AND round_started_at < ?
+            ORDER BY round_started_at ASC
+            """,
+            (
+                schedule_sha256,
+                activation_id,
+                render_utc(started_from),
+                render_utc(started_before),
+            ),
+        ).fetchall()
+        decoded = []
+        for row in rows:
+            payload = dict(row)
+            payload["frame"] = json.loads(payload.pop("frame_json"))
+            decoded.append(payload)
+        return decoded
+
+    def terminalize_episode_slot(
+        self,
+        *,
+        due_row: Mapping[str, Any],
+        state: str,
+        request_sha256: str | None,
+        call_occurrence_id: str | None,
+        payload: Mapping[str, Any],
+        outbox_row: Mapping[str, Any],
+        clock: datetime | None = None,
+    ) -> str:
+        """Terminal slot state and its publication outbox row, atomically."""
+
+        if state not in _TERMINAL_DUE_STATES:
+            raise ObservationScheduleStoreError("EPISODE_SLOT_STATE_INVALID")
+        self._require_write_lease(clock)
+        now = _now(clock)
+        key = (
+            str(due_row["schedule_sha256"]),
+            str(due_row["activation_id"]),
+            str(due_row["entity_id"]),
+            str(due_row["point_id"]),
+            str(due_row["primitive_id"]),
+        )
+        try:
+            self._conn.execute("BEGIN IMMEDIATE")
+            current = self._conn.execute(
+                """
+                SELECT state, payload_json FROM due_observations
+                WHERE schedule_sha256 = ? AND activation_id = ? AND entity_id = ?
+                  AND point_id = ? AND primitive_id = ?
+                """,
+                key,
+            ).fetchone()
+            if current is None:
+                self._conn.rollback()
+                raise ObservationScheduleStoreError("EPISODE_SLOT_MISSING")
+            if str(current["state"]) in _TERMINAL_DUE_STATES:
+                self._conn.rollback()
+                return "ALREADY_TERMINAL"
+            merged = json.loads(str(current["payload_json"]))
+            merged.update(dict(payload))
+            self._conn.execute(
+                """
+                UPDATE due_observations
+                SET state = ?, request_sha256 = COALESCE(?, request_sha256),
+                    call_occurrence_id = COALESCE(?, call_occurrence_id),
+                    payload_json = ?, updated_at = ?
+                WHERE schedule_sha256 = ? AND activation_id = ? AND entity_id = ?
+                  AND point_id = ? AND primitive_id = ?
+                """,
+                (
+                    state,
+                    request_sha256,
+                    call_occurrence_id,
+                    json.dumps(merged, sort_keys=True),
+                    now,
+                    *key,
+                ),
+            )
+            self._insert_episode_outbox(outbox_row, now=now)
+            self._conn.commit()
+            return "TERMINALIZED"
+        except ObservationScheduleStoreError:
+            raise
+        except Exception:
+            self._conn.rollback()
+            raise
+
+    def pending_episode_outbox(
+        self,
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+    ) -> list[dict[str, Any]]:
+        rows = self._conn.execute(
+            """
+            SELECT * FROM episode_outbox
+            WHERE schedule_sha256 = ? AND activation_id = ?
+              AND published_content_sha256 IS NULL
+            ORDER BY outbox_id ASC
+            """,
+            (schedule_sha256, activation_id),
+        ).fetchall()
+        decoded = []
+        for row in rows:
+            payload = dict(row)
+            payload["row"] = json.loads(payload.pop("row_json"))
+            decoded.append(payload)
+        return decoded
+
+    def mark_episode_outbox_published(
+        self,
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+        outbox_ids: Sequence[str],
+        content_sha256: str,
+        dataset_manifest_id: str,
+        cohort_ids: Sequence[str],
+        publication: Mapping[str, Any],
+        clock: datetime | None = None,
+    ) -> None:
+        self._require_write_lease(clock)
+        now = _now(clock)
+        try:
+            self._conn.execute("BEGIN IMMEDIATE")
+            self._conn.execute(
+                """
+                INSERT OR IGNORE INTO episode_publications(
+                    content_sha256, schedule_sha256, activation_id,
+                    dataset_manifest_id, payload_json, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    content_sha256,
+                    schedule_sha256,
+                    activation_id,
+                    dataset_manifest_id,
+                    json.dumps(dict(publication), sort_keys=True),
+                    now,
+                ),
+            )
+            for cohort_id in sorted(set(cohort_ids)):
+                self._conn.execute(
+                    """
+                    INSERT OR IGNORE INTO episode_publication_cohorts(
+                        content_sha256, schedule_sha256, activation_id, cohort_id
+                    ) VALUES (?, ?, ?, ?)
+                    """,
+                    (content_sha256, schedule_sha256, activation_id, cohort_id),
+                )
+            # A published row lives in the publication named by content_sha256
+            # (cohort membership in episode_publication_cohorts); only unpublished
+            # rows are ever replayed, so the ops store keeps the backlog alone.
+            for outbox_id in outbox_ids:
+                self._conn.execute(
+                    "DELETE FROM episode_outbox WHERE outbox_id = ? AND published_content_sha256 IS NULL",
+                    (str(outbox_id),),
+                )
+            self._conn.commit()
+        except Exception:
+            self._conn.rollback()
+            raise
+
+    def episode_publications_for_cohort(
+        self,
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+        cohort_id: str,
+    ) -> list[dict[str, Any]]:
+        rows = self._conn.execute(
+            """
+            SELECT p.* FROM episode_publications AS p
+            JOIN episode_publication_cohorts AS c
+              ON c.content_sha256 = p.content_sha256
+            WHERE c.schedule_sha256 = ? AND c.activation_id = ? AND c.cohort_id = ?
+            ORDER BY p.created_at ASC, p.content_sha256 ASC
+            """,
+            (schedule_sha256, activation_id, cohort_id),
+        ).fetchall()
+        decoded = []
+        for row in rows:
+            payload = dict(row)
+            payload["publication"] = json.loads(payload.pop("payload_json"))
+            decoded.append(payload)
+        return decoded
+
+    def episode_unpublished_count(
+        self,
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+        cohort_id: str | None = None,
+    ) -> int:
+        predicates = [
+            "schedule_sha256 = ?",
+            "activation_id = ?",
+            "published_content_sha256 IS NULL",
+        ]
+        params: list[Any] = [schedule_sha256, activation_id]
+        if cohort_id is not None:
+            predicates.append("cohort_id = ?")
+            params.append(cohort_id)
+        row = self._conn.execute(
+            "SELECT COUNT(*) AS n FROM episode_outbox WHERE " + " AND ".join(predicates),
+            params,
+        ).fetchone()
+        return int(row["n"]) if row is not None else 0
+
+    def episode_slot_state_counts(
+        self,
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+        episode_ids: Sequence[str],
+    ) -> dict[str, int]:
+        counts: dict[str, int] = {}
+        ids = [str(item) for item in episode_ids]
+        for index in range(0, len(ids), 500):
+            chunk = ids[index : index + 500]
+            placeholders = ",".join("?" for _ in chunk)
+            query = (
+                "SELECT state, COUNT(*) AS n FROM due_observations "
+                "WHERE schedule_sha256 = ? AND activation_id = ? "
+                f"AND entity_id IN ({placeholders}) GROUP BY state"
+            )
+            for row in self._conn.execute(
+                query, (schedule_sha256, activation_id, *chunk)
+            ).fetchall():
+                counts[str(row["state"])] = counts.get(str(row["state"]), 0) + int(row["n"])
+        return counts
+
+    def latest_provider_call_any(self) -> str | None:
+        """Account-level last provider completion across every lane."""
+
+        rows = self._conn.execute(
+            """
+            SELECT last_provider_call_at FROM accounting_counters
+            WHERE last_provider_call_at IS NOT NULL
+            """
+        ).fetchall()
+        stamps = [str(row["last_provider_call_at"]) for row in rows]
+        if not stamps:
+            return None
+        try:
+            return max(stamps, key=parse_utc)
+        except Exception:
+            return max(stamps)
 
     def backup_to(self, dest: Path) -> None:
         self._require_writable()

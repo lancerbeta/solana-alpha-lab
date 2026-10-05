@@ -41,11 +41,20 @@ JUPITER_NOTIONAL_NO_ROUTE_CODES = frozenset(
     {"ROUTE_PLAN_DOES_NOT_CONSUME_ALL_THE_AMOUNT"}
 )
 JUPITER_ERROR_BODY_MAX_KEYS = 8
+# OPPORTUNITY_EPISODES nomination categories (closed set, 5m interval only).
+CATEGORY_NOMINATION_CATEGORIES = ("toporganicscore", "toptraded", "toptrending")
+CATEGORY_NOMINATION_INTERVALS = ("5m",)
+CATEGORY_NOMINATION_LIMIT_MAX = 100
 ALLOWED_PATHS = frozenset(
     {
         "/tokens/v2/recent",
         "/tokens/v2/search",
         "/swap/v2/order",
+        *(
+            f"/tokens/v2/{category}/{interval}"
+            for category in CATEGORY_NOMINATION_CATEGORIES
+            for interval in CATEGORY_NOMINATION_INTERVALS
+        ),
     }
 )
 RECENT_URL = "https://api.jup.ag/tokens/v2/recent"
@@ -202,6 +211,21 @@ def search_url(mints: Sequence[str]) -> str:
     ordered = sorted({str(item) for item in mints if str(item)})
     query = ",".join(ordered)
     return f"https://api.jup.ag/tokens/v2/search?{urlencode({'query': query})}"
+
+
+def category_url(*, category: str, interval: str, limit: int) -> str:
+    """Closed category nomination route; never a free-form path."""
+
+    if category not in CATEGORY_NOMINATION_CATEGORIES:
+        raise ObservationPrimitiveError("ENDPOINT_PATH_DRIFT")
+    if interval not in CATEGORY_NOMINATION_INTERVALS:
+        raise ObservationPrimitiveError("ENDPOINT_PATH_DRIFT")
+    if isinstance(limit, bool) or not 1 <= int(limit) <= CATEGORY_NOMINATION_LIMIT_MAX:
+        raise ObservationPrimitiveError("ENDPOINT_PATH_DRIFT")
+    return (
+        f"https://api.jup.ag/tokens/v2/{category}/{interval}?"
+        + urlencode({"limit": str(int(limit))})
+    )
 
 
 def quote_url(*, input_mint: str, output_mint: str, amount: str) -> str:
@@ -455,6 +479,7 @@ __all__ = [
     "RECENT_URL",
     "SOL_MINT",
     "call_occurrence_id",
+    "category_url",
     "classify_http_transport",
     "execute_primitive",
     "parse_anchor",

@@ -255,7 +255,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
+      MODULE-OBSERVATION-PRIMITIVES-001: "9591f44f1e6c793976eb15eb1cf45af5cf8777b462939209921a4b9465665204"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -297,7 +297,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
+      MODULE-OBSERVATION-PRIMITIVES-001: "9591f44f1e6c793976eb15eb1cf45af5cf8777b462939209921a4b9465665204"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -349,7 +349,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
+      MODULE-OBSERVATION-PRIMITIVES-001: "9591f44f1e6c793976eb15eb1cf45af5cf8777b462939209921a4b9465665204"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -395,7 +395,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
+      MODULE-OBSERVATION-PRIMITIVES-001: "9591f44f1e6c793976eb15eb1cf45af5cf8777b462939209921a4b9465665204"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -441,7 +441,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
+      MODULE-OBSERVATION-PRIMITIVES-001: "9591f44f1e6c793976eb15eb1cf45af5cf8777b462939209921a4b9465665204"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -489,7 +489,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
+      MODULE-OBSERVATION-PRIMITIVES-001: "9591f44f1e6c793976eb15eb1cf45af5cf8777b462939209921a4b9465665204"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -537,7 +537,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
+      MODULE-OBSERVATION-PRIMITIVES-001: "9591f44f1e6c793976eb15eb1cf45af5cf8777b462939209921a4b9465665204"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -583,7 +583,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
+      MODULE-OBSERVATION-PRIMITIVES-001: "9591f44f1e6c793976eb15eb1cf45af5cf8777b462939209921a4b9465665204"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -629,7 +629,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
+      MODULE-OBSERVATION-PRIMITIVES-001: "9591f44f1e6c793976eb15eb1cf45af5cf8777b462939209921a4b9465665204"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -677,7 +677,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
+      MODULE-OBSERVATION-PRIMITIVES-001: "9591f44f1e6c793976eb15eb1cf45af5cf8777b462939209921a4b9465665204"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -715,6 +715,59 @@ primitives:
     data_zone: DATA_ROOT_ONLY
     raw_retention_class: RAW_BOUNDED
     redaction_profile: NO_SECRETS_NO_CREDENTIAL_HEADERS
+  - primitive_id: PRIM-JUPITER-TOKENS-V2-CATEGORY-NOMINATION-001
+    version: '1.0'
+    status: ACCEPTED
+    kind: DISCOVERY
+    observation_clock_policy: PROVIDER_REPORTED_SNAPSHOT_V1
+    provider_route_ids:
+      - JUPITER-SOLANA-TOKENS-V2-CATEGORY-5M-FREE-API-KEY-001
+    access_class: LOCAL_ENV_CREDENTIAL
+    implementation_asset_ids:
+      - MODULE-OBSERVATION-PRIMITIVES-001
+    implementation_git_hashes:
+      MODULE-OBSERVATION-PRIMITIVES-001: "9591f44f1e6c793976eb15eb1cf45af5cf8777b462939209921a4b9465665204"
+    parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
+    output_schema_asset_id: SCHEMA-OPPORTUNITY-EPISODE-SCHEDULE-V1-001
+    output_field_ids:
+      - FIELD-TOKEN-MINT-001
+      - FIELD-USD-PRICE-001
+      - FIELD-LIQUIDITY-USD-001
+      - FIELD-MARKET-CAP-USD-001
+      - FIELD-HOLDER-COUNT-001
+      - FIELD-STATS5M-BUY-VOLUME-001
+      - FIELD-STATS5M-SELL-VOLUME-001
+      - FIELD-STATS5M-TAKER-VOLUME-001
+      - FIELD-STATS5M-NUM-BUYS-001
+      - FIELD-STATS5M-NUM-SELLS-001
+      - FIELD-STATS5M-NUM-TRADERS-001
+      - FIELD-STATS5M-NUM-NET-BUYERS-001
+      - FIELD-R0-TAKER-VOLUME-MIX-001
+      - FIELD-FIRST-POOL-CREATED-AT-001
+      - FIELD-FIRST-POOL-SOURCE-001
+      - FIELD-LAUNCHPAD-001
+    pit_support: true
+    authoritative_clock_field_ids:
+      - FIELD-FIRST-POOL-CREATED-AT-001
+    request_cardinality: ONE
+    max_batch_size: 1
+    call_cost:
+      model_id: COST-HTTP-CALL-001
+      calls_per_request: 1
+    modeled_credit_cost:
+      model_id: CREDIT-JUPITER-TOKENS-CATEGORY-V1
+      credits_per_request: 1
+      status: ACCEPTED
+    dependency_contract: null
+    terminal_classes: [OBSERVED, MISSING_TYPED, EXCLUDED_AMBIGUOUS]
+    missing_classes: [FIELD_ABSENT, NON_FINITE, FDV_NOT_MARKET_CAP, AMBIGUOUS_PRICE_ALIAS, TAKER_VOLUME_NOT_INFERRED_FROM_BUY_SELL, RESPONSE_BODY_TOO_LARGE, RESPONSE_JSON_INVALID]
+    error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
+    retry: false
+    fallback: false
+    idempotency_policy: EXACT_REQUEST_HASH
+    data_zone: DATA_ROOT_ONLY
+    raw_retention_class: RAW_BOUNDED
+    redaction_profile: NO_SECRETS_NO_CREDENTIAL_HEADERS
 authority_profiles:
   - profile_id: AUTH-PROVIDER-READONLY-ZERO-CASH-SCHEDULE-V1
     cash_usd_max: '0'
@@ -725,3 +778,11 @@ authority_profiles:
       - JUPITER-SOLANA-TOKENS-V2-RECENT-FREE-API-KEY-001
       - JUPITER-SOLANA-TOKENS-V2-SEARCH-FREE-API-KEY-001
       - JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001
+  - profile_id: AUTH-PROVIDER-READONLY-ZERO-CASH-EPISODE-SCHEDULE-V1
+    cash_usd_max: '0'
+    retry: false
+    fallback: false
+    build_execute_wallet_signer_transaction: false
+    allowed_route_ids:
+      - JUPITER-SOLANA-TOKENS-V2-CATEGORY-5M-FREE-API-KEY-001
+      - JUPITER-SOLANA-TOKENS-V2-SEARCH-FREE-API-KEY-001
