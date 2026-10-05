@@ -292,6 +292,54 @@ def _ledger_payload(result: Mapping[str, Any], *, raw_body_rel: str | None, enti
     }
 
 
+def admission_quota(
+    store: ObservationScheduleStore,
+    *,
+    lineage_id: str,
+    sampling: Mapping[str, Any],
+    round_started_at: datetime,
+    round_period_seconds: int,
+    round_id_value: str,
+    now: datetime,
+) -> dict[str, int]:
+    """Round quota k_j bounded by the UTC day, rolling 24h and active caps.
+
+    A resumed round keeps its own quota: earlier commits of the same round
+    count against k_j, so a crash never admits more than the round allows.
+    """
+
+    ceiling = int(sampling["daily_normal_ceiling"])
+    index = round_index(round_started_at, round_period_seconds)
+    day_start = datetime(round_started_at.year, round_started_at.month, round_started_at.day, tzinfo=UTC)
+    day_used = store.episode_admission_count(
+        lineage_id=lineage_id, window_start=day_start, window_end=day_start + timedelta(days=1)
+    )
+    rolling_used = store.episode_admission_count(
+        lineage_id=lineage_id,
+        window_start=now - timedelta(hours=24),
+        window_end=now + timedelta(seconds=1),
+    )
+    active = store.count_active_episodes(lineage_id=lineage_id, now=now)
+    committed_in_round = store.episode_admissions_in_round(round_id_value)
+    quota = max(
+        0,
+        min(
+            round_quota(ceiling, index) - committed_in_round,
+            ceiling - day_used,
+            int(sampling["rolling_24h_max"]) - rolling_used,
+            int(sampling["active_episode_cap"]) - active,
+        ),
+    )
+    return {
+        "quota": quota,
+        "round_quota": round_quota(ceiling, index),
+        "day_used": day_used,
+        "rolling_used": rolling_used,
+        "active": active,
+        "committed_in_round": committed_in_round,
+    }
+
+
 class _EpisodeTick:
     def __init__(
         self,
@@ -440,7 +488,9 @@ class _EpisodeTick:
             clock=self.provider_ctx.clock(),
             redact_with=self.holder,
             expected_entities=list(expected_entities) if expected_entities else None,
-            schema_required_keys=SCHEMA_REQUIRED_KEYS,
+            # An empty category list is a valid frame source; the closed frame
+            # owns row shape (non-list body, rows without identity).
+            schema_required_keys=SCHEMA_REQUIRED_KEYS if expected_entities else None,
         )
         if result.get("request_sha256") != request_digest:
             raise EpisodeTickError("REQUEST_HASH_MISMATCH")
@@ -792,30 +842,21 @@ class _EpisodeTick:
             self.report["round"] = {"round_id": rid, "state": "INCOMPLETE", "frame_sha256": receipt["frame_sha256"]}
             return
         sampling = self.schedule["sampling"]
-        ceiling = int(sampling["daily_normal_ceiling"])
-        index = round_index(started, int(nomination["round_period_seconds"]))
-        day_start = datetime(started.year, started.month, started.day, tzinfo=UTC)
         commit_now = self.provider_ctx.now()
-        day_used = self.store.episode_admission_count(
-            lineage_id=self.lineage, window_start=day_start, window_end=day_start + timedelta(days=1)
-        )
-        rolling_used = self.store.episode_admission_count(
+        quota_state = admission_quota(
+            self.store,
             lineage_id=self.lineage,
-            window_start=commit_now - timedelta(hours=24),
-            window_end=commit_now + timedelta(seconds=1),
+            sampling=sampling,
+            round_started_at=started,
+            round_period_seconds=int(nomination["round_period_seconds"]),
+            round_id_value=rid,
+            now=commit_now,
         )
-        active = self.store.count_active_episodes(lineage_id=self.lineage, now=commit_now)
-        # A resumed round keeps its own quota: earlier commits of this round count.
-        committed_in_round = self.store.episode_admissions_in_round(rid)
-        quota = max(
-            0,
-            min(
-                round_quota(ceiling, index) - committed_in_round,
-                ceiling - day_used,
-                int(sampling["rolling_24h_max"]) - rolling_used,
-                int(sampling["active_episode_cap"]) - active,
-            ),
-        )
+        quota = quota_state["quota"]
+        day_used = quota_state["day_used"]
+        rolling_used = quota_state["rolling_used"]
+        active = quota_state["active"]
+        committed_in_round = quota_state["committed_in_round"]
         cycle = cycle_start(started)
         blocked = self.store.episode_blocked_mints(lineage_id=self.lineage, cycle_start=render_utc(cycle), now=commit_now)
         selection = select_admissions(

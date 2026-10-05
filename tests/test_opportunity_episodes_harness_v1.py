@@ -192,6 +192,7 @@ def build_schedule(
     active_cap: int = 400,
     schedule_key: str = "OBS-OPPORTUNITY-EPISODES-SYNTH-V1",
     budgets: dict[str, Any] | None = None,
+    observation_overrides: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     document = yaml.safe_load(TEMPLATE.read_text(encoding="utf-8"))
     document["schedule_key"] = schedule_key
@@ -202,6 +203,8 @@ def build_schedule(
     document["sampling"]["active_episode_cap"] = active_cap
     if budgets:
         document["budgets"].update(budgets)
+    if observation_overrides:
+        document["observation_schedule"].update(observation_overrides)
     return validate_observation_schedule(document, root=ROOT)
 
 
@@ -279,6 +282,92 @@ def cli_tick(data_root: Path, market: SyntheticMarket, at: datetime, *, env_faul
     payload["_exit_code"] = code
     payload["_calls"] = opener.calls
     return payload
+
+
+class EpisodeScenario:
+    """One isolated producer root driven only through the production entry."""
+
+    def __init__(
+        self,
+        root: Path,
+        *,
+        start: datetime,
+        stops: datetime,
+        assignment_entries: list[dict[str, Any]] | None = None,
+        daily_ceiling: int = 96,
+        active_cap: int = 400,
+        budgets: dict[str, Any] | None = None,
+        schedule_key: str = "OBS-OPPORTUNITY-EPISODES-SYNTH-V1",
+        observation_overrides: dict[str, Any] | None = None,
+    ) -> None:
+        self.data_root = Path(root)
+        self.data_root.mkdir(parents=True, exist_ok=True)
+        self.assignment = write_assignment(self.data_root, list(assignment_entries or []))
+        self.schedule = build_schedule(
+            starts_at=start,
+            stops_at=stops,
+            assignment=self.assignment,
+            daily_ceiling=daily_ceiling,
+            active_cap=active_cap,
+            budgets=budgets,
+            schedule_key=schedule_key,
+            observation_overrides=observation_overrides,
+        )
+        self.activation_id = register_authorize_activate(self.data_root, self.schedule, now=start)
+        self.market = SyntheticMarket()
+        self.ticks: list[dict[str, Any]] = []
+
+    @property
+    def ops_path(self) -> Path:
+        return self.data_root / "observation_schedule_state.sqlite"
+
+    def tick(self, at: datetime, *, fault: str | None = None) -> dict[str, Any]:
+        result = cli_tick(self.data_root, self.market, at, env_fault=fault)
+        self.ticks.append(result)
+        return result
+
+    def query(self, sql: str, params: tuple = ()) -> list[tuple]:
+        import sqlite3
+
+        connection = sqlite3.connect(f"file:{self.ops_path.as_posix()}?mode=ro", uri=True)
+        try:
+            return list(connection.execute(sql, params).fetchall())
+        finally:
+            connection.close()
+
+    def admissions(self) -> list[dict[str, Any]]:
+        rows = self.query("SELECT record_json FROM episode_admissions ORDER BY t0, episode_id")
+        return [json.loads(row[0]) for row in rows]
+
+    def slot_states(self, episode_id: str) -> dict[str, tuple[str, str | None]]:
+        rows = self.query(
+            "SELECT point_id, state, payload_json FROM due_observations WHERE entity_id = ?",
+            (episode_id,),
+        )
+        return {row[0]: (row[1], json.loads(row[2]).get("missing_reason")) for row in rows}
+
+    def unpublished(self) -> int:
+        return int(self.query("SELECT COUNT(*) FROM episode_outbox WHERE published_content_sha256 IS NULL")[0][0])
+
+    def rounds(self) -> list[dict[str, Any]]:
+        rows = self.query("SELECT round_id, state, frame_json FROM episode_rounds ORDER BY round_started_at")
+        return [{"round_id": r[0], "state": r[1], "frame": json.loads(r[2])} for r in rows]
+
+    def published_text(self) -> str:
+        """Concatenated published member/observation bytes as text (search only)."""
+
+        import pyarrow.parquet as pq
+
+        chunks: list[str] = []
+        for path in sorted((self.data_root / "datasets").rglob("*.parquet")):
+            if "raw_evidence" in path.parts:
+                continue
+            chunks.append(json.dumps(pq.read_table(path).to_pylist(), default=str))
+        return "\n".join(chunks)
+
+
+def nominate(market: SyntheticMarket, at: datetime, mapping: dict[str, list[dict[str, Any]]]) -> None:
+    market.nominations[market.round_for(at)] = {key: list(value) for key, value in mapping.items()}
 
 
 class HarnessSelfTests(unittest.TestCase):

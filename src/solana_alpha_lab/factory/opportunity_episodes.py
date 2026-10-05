@@ -766,7 +766,6 @@ def build_frame(
             overlap.setdefault(mint, [])
             if source_id not in overlap[mint]:
                 overlap[mint].append(source_id)
-    frame["overlap"] = {key: overlap[key] for key in sorted(overlap)}
     asset_policy = document.get("asset_exclusion") or {}
     floor = document["capture_floor"]
     candidates: list[dict[str, Any]] = []
@@ -822,6 +821,10 @@ def build_frame(
             }
         )
     frame["candidates"] = candidates
+    # Overlap edges only for identities that passed protection: protected or
+    # unresolved identities appear as counts, never as named evidence.
+    allowed = {item["mint"] for item in candidates}
+    frame["overlap"] = {key: overlap[key] for key in sorted(overlap) if key in allowed}
     frame["terminal"] = "FRAME_CLOSED"
     return frame
 
