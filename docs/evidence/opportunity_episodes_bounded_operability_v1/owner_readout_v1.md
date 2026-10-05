@@ -37,13 +37,13 @@ Model cadence: 288 publication slots/day × 3 ResearchStore transactions =
 
 | Equivalent days | Transactions | Final cold normal wall | RSS bytes | Canonical opens / bytes | Full inventory |
 |---|---:|---:|---:|---:|---:|
-| 1 | 864 | 0.732s | 91,488,256 | 7 / 81,460 | 0 |
-| 7 | 6048 | 0.761s | 92,127,232 | 7 / 81,460 | 0 |
-| 30 | 25920 | 0.670s | 92,557,312 | 7 / 81,460 | 0 |
-| 60 | 51840 | 0.926s | 92,508,160 | 7 / 81,460 | 0 |
+| 1 | 864 | 0.695s | 92,221,440 | 7 / 81,460 | 0 |
+| 7 | 6048 | 0.692s | 92,807,168 | 7 / 81,460 | 0 |
+| 30 | 25920 | 0.640s | 91,967,488 | 7 / 81,460 | 0 |
+| 60 | 51840 | 0.720s | 92,377,088 | 7 / 81,460 | 0 |
 
 Каждый normal tick публикует один batch. При doubles history растёт bounded trie
-route work (path bytes 484,020→491,794), а не payload scan. Final fresh restart:
+route work (path bytes 484,162→493,408), а не payload scan. Final fresh restart:
 один canonical partition, 8,142 bytes, no provider attempt; status: zero
 canonical payload reads. После critic repairs повторены 12 fresh-process
 normal/restart/status runs на тех же aged roots, с новым normal work. Ceiling был frozen до final proof: tick wall<30s,
@@ -90,7 +90,7 @@ PROCESS_OK не является provider/data PASS. Account/drain значен�
 Producer создал 25 admissions /24 mints /3 UTC cohorts, 3450 due slots:
 OBSERVED923, CENSORED2516, DISAPPEARED11. Sparse/gap vertical fixture проверяет
 lifecycle; он не используется как нормальный footprint. 121 production ticks,
-sum tick wall66.80s, producer peak120,225,792 bytes; consumer peak493,277,184.
+sum tick wall59.14s, producer peak120,999,936 bytes; consumer peak496,422,912.
 
 Workstation условно OFF до maturation. Public capture/freeze/transfer/build/
 seal/import догнал history без backfill. Torn import до lineage commit был
@@ -168,3 +168,12 @@ Post-review regression: 21 focused direct-consumer tests PASS, включая р
 metadata сохраняет null общего missing-count; известная часть не выдаётся за
 полный ноль. Linux fsync claim ограничен lookup files и immediate parent,
 canonical/ancestor directory power-loss durability остаётся UNVERIFIED.
+
+Accounting boundary replan: существующий owner теперь проверяет gate и
+списывает один captured request-day timestamp после credential work. Два
+exhausted-new-day regressions (до reservation и после STARTED) запрещают
+transport; старый неизвестный debit не возвращается. Lookup decoder/reuse
+имеют bounded byte read и общий typed error boundary для deep JSON и IO.
+На этой версии: 211 focused tests (2 Windows symlink skips), один дополнительный
+exhausted-STARTED test и повтор полного R3–R4 vertical PASS. Новые 12 cold runs
+считают bounded lookup reads вместе с canonical/Path operations.

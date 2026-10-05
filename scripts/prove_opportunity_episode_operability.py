@@ -122,6 +122,19 @@ def measure_tick(root: Path, mode: str, work_minute: int = 10) -> dict:
     original_inventory = ResearchStore._committed_manifests
     original_lookup = ResearchStore._existing_transaction
     original_lease = ResearchStore.writer_lease
+    try:
+        from solana_alpha_lab.factory.research_write_lookup import WriteLookup
+        original_bounded_read = getattr(WriteLookup, "_read_bytes", None)
+    except ModuleNotFoundError as exc:
+        if exc.name != "solana_alpha_lab.factory.research_write_lookup":
+            raise
+        WriteLookup = None  # frozen predecessor has no prepared lookup
+
+    def bounded_read(lookup, name):
+        result = original_bounded_read(lookup, name)
+        counters["path_reads"] += 1
+        counters["path_bytes"] += len(result)
+        return result
 
     def read(path):
         result = original_read(path)
@@ -157,6 +170,8 @@ def measure_tick(root: Path, mode: str, work_minute: int = 10) -> dict:
                 counters["lock_seconds"] += time.perf_counter() - before
 
     with contextlib.ExitStack() as stack:
+        if WriteLookup is not None and original_bounded_read is not None:
+            stack.enter_context(patch.object(WriteLookup, "_read_bytes", bounded_read))
         for owner, name, replacement in (
             (Path, "read_bytes", read), (ResearchStore, "_read_manifest", manifest),
             (ResearchStore, "_verify_partition", verify),

@@ -147,6 +147,40 @@ class WriteLookupTests(unittest.TestCase):
             with self.assertRaisesRegex(WriteLookupError, "WRITE_LOOKUP_WRITE_FAILED"):
                 lookup._atomic("probe.json", {})
 
+    def test_deep_json_and_unreadable_reused_node_are_typed_and_preserved(self):
+        from solana_alpha_lab.factory.research_store import _target_path
+        self.append()
+        state = self.root / RELATIVE / "state.json"
+        original = state.read_bytes()
+        malformed = b'{"x":' + b'[' * 30000 + b'0' + b']' * 30000 + b'}'
+        state.write_bytes(malformed)
+        with self.assertRaisesRegex(ResearchStoreError, "WRITE_LOOKUP_CORRUPT"):
+            self.store.find_record("ABSENT")
+        self.assertEqual(state.read_bytes(), malformed)
+        state.write_bytes(original)
+        lookup = WriteLookup(self.root, _target_path)
+        node = {"leaf": {}}
+        lookup._save_node(node)
+        original_open = Path.open
+        def unreadable(path, *args, **kwargs):
+            if "nodes" in path.parts and args and args[0] == "rb":
+                raise PermissionError("SYNTHETIC_UNREADABLE_NODE")
+            return original_open(path, *args, **kwargs)
+        with patch.object(Path, "open", unreadable):
+            with self.assertRaisesRegex(WriteLookupError, "WRITE_LOOKUP_CORRUPT"):
+                lookup._save_node(node)
+
+    def test_oversized_reused_node_is_refused_before_payload_read(self):
+        from solana_alpha_lab.factory.research_store import _target_path
+        from solana_alpha_lab.factory.research_write_lookup import MAX_NODE_BYTES
+        lookup = WriteLookup(self.root, _target_path)
+        sha = lookup._save_node({"leaf": {}})
+        node = self.root / RELATIVE / f"nodes/{sha[:2]}/{sha}.json"
+        node.write_bytes(b'x' * (MAX_NODE_BYTES + 1))
+        with patch.object(Path, "open", side_effect=AssertionError("UNBOUNDED_READ")):
+            with self.assertRaisesRegex(WriteLookupError, "WRITE_LOOKUP_CORRUPT"):
+                lookup._save_node({"leaf": {}})
+
     def test_preparation_cannot_bless_a_stale_packet_inventory(self):
         from solana_alpha_lab.factory.research_store import _lifecycle_read_cache
         self.append("A")

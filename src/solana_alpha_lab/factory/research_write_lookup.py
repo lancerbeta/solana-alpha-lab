@@ -25,7 +25,10 @@ class WriteLookupError(RuntimeError):
 
 
 def canonical(value: Any) -> bytes:
-    return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+    try:
+        return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+    except (TypeError, ValueError, RecursionError) as exc:
+        raise WriteLookupError("WRITE_LOOKUP_CORRUPT") from exc
 
 
 def digest(raw: bytes) -> str:
@@ -42,38 +45,61 @@ class WriteLookup:
         return self.safe_path(self.root, f"{RELATIVE}/{name}", create_parents=create)
 
     def exists(self) -> bool:
-        return (self.root / RELATIVE).exists()
+        return self._exists(self.root / RELATIVE)
+
+    @staticmethod
+    def _exists(path: Path) -> bool:
+        try:
+            path.lstat()
+            return True
+        except FileNotFoundError:
+            return False
+        except OSError as exc:
+            raise WriteLookupError("WRITE_LOOKUP_CORRUPT") from exc
 
     def stamp(self) -> list[int] | None:
         directory = self.root / "research/manifests/partitions"
-        if not directory.exists():
+        try:
+            value = directory.stat()
+            if directory.is_symlink() or not directory.is_dir():
+                raise WriteLookupError("WRITE_LOOKUP_SOURCE_UNSAFE")
+        except FileNotFoundError:
             return None
-        if directory.is_symlink() or not directory.is_dir():
-            raise WriteLookupError("WRITE_LOOKUP_SOURCE_UNSAFE")
-        value = directory.stat()
+        except OSError as exc:
+            raise WriteLookupError("WRITE_LOOKUP_SOURCE_UNREADABLE") from exc
         return [value.st_dev, value.st_ino, value.st_mtime_ns, value.st_ctime_ns]
 
-    def _read(self, name: str) -> dict:
+    def _read_bytes(self, name: str) -> bytes:
         try:
             path = self.path(name)
             if path.stat().st_size > MAX_NODE_BYTES:
                 raise WriteLookupError("WRITE_LOOKUP_CORRUPT")
-            raw = path.read_bytes()
+            with path.open("rb") as handle:
+                raw = handle.read(MAX_NODE_BYTES + 1)
+            if len(raw) > MAX_NODE_BYTES:
+                raise WriteLookupError("WRITE_LOOKUP_CORRUPT")
+            return raw
+        except OSError as exc:
+            raise WriteLookupError("WRITE_LOOKUP_CORRUPT") from exc
+
+    def _read(self, name: str) -> dict:
+        try:
+            raw = self._read_bytes(name)
             value = json.loads(raw)
             if not isinstance(value, dict):
                 raise ValueError()
             return value
-        except (OSError, ValueError) as exc:
+        except (ValueError, RecursionError) as exc:
             raise WriteLookupError("WRITE_LOOKUP_CORRUPT") from exc
 
     def _atomic(self, name: str, value: dict) -> None:
-        path = self.path(name, create=True)
-        temporary = self.path(name + ".tmp", create=True)
         raw = canonical(value)
         flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC
         if hasattr(os, "O_BINARY"):
             flags |= os.O_BINARY
         try:
+            path = self.path(name, create=True)
+            temporary = self.path(name + ".tmp", create=True)
             fd = os.open(temporary, flags, 0o644)
             with os.fdopen(fd, "wb") as handle:
                 handle.write(raw)
@@ -145,12 +171,16 @@ class WriteLookup:
         if len(raw) > MAX_NODE_BYTES:
             raise WriteLookupError("WRITE_LOOKUP_NODE_LIMIT")
         sha = digest(raw)
-        path = self.path(f"nodes/{sha[:2]}/{sha}.json", create=True)
-        if path.exists():
-            if path.read_bytes() != raw:
-                raise WriteLookupError("WRITE_LOOKUP_CORRUPT")
-        else:
-            self._atomic(f"nodes/{sha[:2]}/{sha}.json", node)
+        name = f"nodes/{sha[:2]}/{sha}.json"
+        try:
+            path = self.path(name, create=True)
+            if self._exists(path):
+                if self._read_bytes(name) != raw:
+                    raise WriteLookupError("WRITE_LOOKUP_CORRUPT")
+            else:
+                self._atomic(name, node)
+        except OSError as exc:
+            raise WriteLookupError("WRITE_LOOKUP_WRITE_FAILED") from exc
         self.nodes[sha] = node
         return sha
 
@@ -321,7 +351,7 @@ class WriteLookup:
 
     def load(self, *, recover: Callable[[dict], str] | None = None) -> None:
         pending_path = self.root / RELATIVE / "pending.json"
-        if pending_path.exists():
+        if self._exists(pending_path):
             if recover is None:
                 raise WriteLookupError("WRITE_LOOKUP_PENDING")
             pending = self._verify_signed(self._read("pending.json"))

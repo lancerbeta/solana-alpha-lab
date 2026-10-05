@@ -25,7 +25,7 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_164_DIRECT_TESTS_2_WINDOWS_SYMLINK_SKIPS_AND_1_VERTICAL",
+    "targeted": "PASS_211_DIRECT_TESTS_2_WINDOWS_SYMLINK_SKIPS_PLUS_1_EXHAUSTED_STARTED_TEST_AND_1_VERTICAL",
     "independent_review": {
       "path": "docs/evidence/opportunity_episodes_bounded_operability_v1/a1_delivery_independent_review_v1.json",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",

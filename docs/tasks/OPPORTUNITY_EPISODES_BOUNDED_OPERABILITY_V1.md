@@ -1,6 +1,6 @@
 ---
 task_id: OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1
-task_version: '1.0'
+task_version: '1.1'
 status: IN_PROGRESS
 as_of: '2026-10-06'
 owner: GOAL_OWNER
@@ -137,3 +137,14 @@ WATCH=separate single-lane canary after exact-host/account envelope proof.
 Required reviews: isolated code, goal/DoD, architecture and owner UX. Architecture
 must name passing tests that could still break research validity. No self-review
 PASS. Generated sync and evidence binding use the frozen expected base.
+
+IN_ATOM_REPLAN: repeated UTC/reservation seam moved into existing _Accounting
+owner: reserve_call gates and debits the same captured timestamp under the writer
+lease, after credential work and again after STARTED day drift. No new quota
+service or suffix atom. Repeated malformed-artifact seam now uses one bounded
+lookup byte reader and centralized JSON canonicalization error translation;
+unknown IO/JSON never becomes false absence. Public tick proof instrumentation
+counts the new bounded reader as well as canonical partition operations.
+Exhausted-new-day credential delay, STARTED delay, deeply nested JSON, unreadable
+and oversized reused node are explicit regression obligations. Local ceilings,
+scientific meaning, review roles, write set and external authority stay frozen.

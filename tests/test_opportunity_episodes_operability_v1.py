@@ -288,6 +288,79 @@ class EpisodeOperabilityTests(unittest.TestCase):
                          [("2026-10-11", 1), ("2026-10-12", 1)])
         store.release_lease(lease)
 
+    def test_credential_delay_to_exhausted_new_day_blocks_before_transport_and_start(self):
+        from tests.test_opportunity_episodes_harness_v1 import ROOT
+        from solana_alpha_lab.factory.observation_provider_pacing import AdvancingClock
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        from solana_alpha_lab.factory.opportunity_episode_tick import _EpisodeTick, SEARCH_PRIMITIVE
+        from solana_alpha_lab.factory.observation_primitives import search_url
+        start = datetime(2026, 10, 11, 23, 45, tzinfo=UTC)
+        sc = self.scenario(start=start)
+        with closing(ObservationScheduleStore(sc.ops_path)) as store:
+            lease = store.acquire_lease("credential-midnight-budget-unit", clock=start)
+            limit = sc.schedule["budgets"]["provider_calls_per_utc_day_max"]
+            store.save_accounting(schedule_sha256=sc.schedule["schedule_sha256"], activation_id=sc.activation_id,
+                utc_day="2026-10-12", values={"provider_calls":limit,"modeled_credits":limit,
+                    "raw_bytes":limit,"canonical_bytes":limit,"candidates":0,"members":0,
+                    "last_provider_call_at":None}, clock=start)
+            store.release_lease(lease)
+        at = start + timedelta(minutes=14, seconds=59)
+        clock = AdvancingClock(at)
+        opener = SyntheticJupiter(sc.market, clock)
+        with closing(ObservationScheduleStore(sc.ops_path)) as store:
+            lease = store.acquire_lease("credential-midnight-call-unit", clock=at)
+            tick = _EpisodeTick(root=ROOT, data_root=sc.data_root, store=store, schedule=sc.schedule,
+                activation=store.get_activation(sc.schedule["schedule_sha256"], sc.activation_id),
+                now=at, opener=opener, credential_loader=None, producer_git_sha="a"*40,
+                clock=clock, fault_after=None, provider_call_wall_seconds=None, redact_with=None)
+            with patch.object(tick, "_credential", side_effect=lambda: clock.sleep(2)):
+                terminal, result = tick._call(primitive_id=SEARCH_PRIMITIVE,
+                    url=search_url([synth_mint("CredentialMidnight")]), occurrence="CREDENTIAL-MIDNIGHT-UNIT",
+                    expected_entities=None, claim_identity=[])
+            self.assertEqual((terminal, result), ("BLOCKED_BUDGET", None))
+            self.assertEqual(opener.calls, [])
+            store.release_lease(lease)
+        self.assertEqual(sc.query("SELECT COUNT(*) FROM call_ledger"), [(0,)])
+        self.assertEqual(sc.query("SELECT utc_day,provider_calls FROM accounting_counters"),
+                         [("2026-10-12", limit)])
+
+    def test_started_delay_to_exhausted_new_day_preserves_old_debit_without_transport(self):
+        from tests.test_opportunity_episodes_harness_v1 import ROOT
+        from solana_alpha_lab.factory.observation_provider_pacing import AdvancingClock
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        from solana_alpha_lab.factory.opportunity_episode_tick import _EpisodeTick, SEARCH_PRIMITIVE, EpisodeTickError
+        from solana_alpha_lab.factory.observation_primitives import search_url
+        start = datetime(2026, 10, 11, 23, 45, tzinfo=UTC)
+        sc = self.scenario(start=start)
+        at = start + timedelta(minutes=14, seconds=59)
+        clock = AdvancingClock(at)
+        opener = SyntheticJupiter(sc.market, clock)
+        with closing(ObservationScheduleStore(sc.ops_path)) as store:
+            lease = store.acquire_lease("started-midnight-exhausted-unit", clock=at)
+            limit = sc.schedule["budgets"]["provider_calls_per_utc_day_max"]
+            store.save_accounting(schedule_sha256=sc.schedule["schedule_sha256"], activation_id=sc.activation_id,
+                utc_day="2026-10-12", values={"provider_calls":limit,"modeled_credits":limit,
+                    "raw_bytes":limit,"canonical_bytes":limit,"candidates":0,"members":0,
+                    "last_provider_call_at":None}, clock=at)
+            tick = _EpisodeTick(root=ROOT, data_root=sc.data_root, store=store, schedule=sc.schedule,
+                activation=store.get_activation(sc.schedule["schedule_sha256"], sc.activation_id), now=at,
+                opener=opener, credential_loader=None, producer_git_sha="a"*40, clock=clock,
+                fault_after=None, provider_call_wall_seconds=None, redact_with=None)
+            original = store.start_call
+            def durable_delay(**kwargs):
+                result = original(**kwargs)
+                clock.sleep(2)
+                return result
+            with patch.object(store, "start_call", side_effect=durable_delay):
+                with self.assertRaisesRegex(EpisodeTickError, "BLOCKED_BUDGET"):
+                    tick._call(primitive_id=SEARCH_PRIMITIVE, url=search_url([synth_mint("StartedExhausted")]),
+                        occurrence="STARTED-MIDNIGHT-EXHAUSTED", expected_entities=None, claim_identity=[])
+            self.assertEqual(store.call_state("STARTED-MIDNIGHT-EXHAUSTED"), "STARTED")
+            self.assertEqual(opener.calls, [])
+            store.release_lease(lease)
+        self.assertEqual(sc.query("SELECT utc_day,provider_calls FROM accounting_counters ORDER BY utc_day"),
+                         [("2026-10-11", 1), ("2026-10-12", limit)])
+
 
 if __name__ == "__main__":
     unittest.main()

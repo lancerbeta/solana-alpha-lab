@@ -513,9 +513,11 @@ class _EpisodeTick:
         self._credential()
         # Reserve before durable STARTED/send. A death with unknown outcome
         # keeps its debit across restart; completion adds bytes, not a second call.
-        self.accounts.note(raw_bytes=0,
+        blocked = self.accounts.reserve_call(
             credits=max(1, int(self.accounts.credit_costs.get(primitive_id, 1))),
-            completed_at=self.provider_ctx.now())
+            now=self.provider_ctx.now())
+        if blocked:
+            return blocked, None
         attempt_id = f"ATT-{uuid4().hex[:12].upper()}"
         started = self.store.start_call(
             request_sha256=request_digest,
@@ -549,8 +551,10 @@ class _EpisodeTick:
                 if blocked:
                     raise EpisodeTickError(blocked)
                 reference = clock_fn()
-                self.accounts.note(raw_bytes=0,
-                    credits=max(1, int(self.accounts.credit_costs.get(primitive_id, 1))), completed_at=reference)
+                blocked = self.accounts.reserve_call(
+                    credits=max(1, int(self.accounts.credit_costs.get(primitive_id, 1))), now=reference)
+                if blocked:
+                    raise EpisodeTickError(blocked)
                 reserved_day = self.accounts.utc_day
             raise EpisodeTickError("CALL_RESERVATION_CLOCK_UNSTABLE")
         result = execute_primitive(

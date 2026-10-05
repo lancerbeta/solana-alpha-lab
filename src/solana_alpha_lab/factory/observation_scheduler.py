@@ -349,6 +349,15 @@ class _Accounting:
                 return "PACE_WAIT"
         return None
 
+    def reserve_call(self, *, credits: int, now: datetime) -> str | None:
+        """Gate and durably debit one captured request day under the writer lease."""
+        reference = now.astimezone(UTC)
+        blocked = self.gate(extra_credits=credits, now=reference)
+        if blocked:
+            return blocked
+        self.note(raw_bytes=0, credits=credits, completed_at=reference)
+        return None
+
     def note(
         self,
         *,
