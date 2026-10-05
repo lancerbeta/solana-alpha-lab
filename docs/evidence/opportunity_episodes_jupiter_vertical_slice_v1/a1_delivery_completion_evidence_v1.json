@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-COMPLETION-001",
+  "as_of": "2026-10-05",
+  "task_id": "OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1",
+  "state_change": "OPPORTUNITY_EPISODES_LOCAL_VERTICAL_SLICE_SYNTHETIC_PROVEN_LIVE_NOT_RUN",
+  "base_main": "0000000000000000000000000000000000000000",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/opportunity_episodes_jupiter_vertical_slice_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_EPISODE_CONTRACT_PRODUCER_AND_THREE_PROCESS_VERTICAL",
+    "independent_review": {
+      "path": "docs/evidence/opportunity_episodes_jupiter_vertical_slice_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_CATALOG_SYNC",
+      "PASS_EPISODE_CONTRACT_PRODUCER_TESTS",
+      "PASS_THREE_PROCESS_VERTICAL_PROOF",
+      "PASS_LEGACY_CONSUMER_MODULES_SEQUENTIAL_WITH_2_PRE_EXISTING_BASE_FAILURES",
+      "PASS_ISOLATED_QUADRUPLE_REVIEW"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE_COLLECTION_OR_ACTIVATION",
+    "NO_RESOURCE_HOST_ENVELOPE",
+    "NO_REAL_SCIENCE_OR_PROMOTION",
+    "SYNTHETIC_EVIDENCE_ONLY",
+    "NO_NEW_IMPORTER_EVALUATOR_DB_OR_SERVICE",
+    "MARKET_EPOCH_SCOPE_AND_TARGET_ATTRITION_ARE_OPEN_OWNER_DECISIONS",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "network_calls": 0,
+    "local_writes": 1,
+    "external_actions": 0
+  }
+}

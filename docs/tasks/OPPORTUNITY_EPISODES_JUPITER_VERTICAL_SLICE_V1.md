@@ -106,7 +106,10 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
     - docs/contracts/opportunity_episodes_jupiter_v1.md
     - src/solana_alpha_lab/factory/opportunity_episodes.py
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/opportunity_episodes_jupiter_vertical_slice_v1/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/opportunity_episodes_jupiter_vertical_slice_v1/a1_delivery_independent_review_v1.json
+    - docs/evidence/opportunity_episodes_jupiter_vertical_slice_v1/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

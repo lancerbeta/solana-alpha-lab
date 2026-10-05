@@ -3,13 +3,13 @@
   "schema_version": "1.0",
   "task_id": "OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1",
   "as_of": "2026-10-05",
-  "measured_at_head": "8a72ebcbe3dafa1112e0014a21a422135488278a",
+  "measured_at_head": "74594bda3dfb4afd14e8bd17acf145a4547a4540",
   "evidence_class": "SYNTHETIC_LOCAL_WORKSTATION",
   "reproduce": "OEP_VERTICAL_WORK=<empty-scratch-dir> uv run --locked --managed-python python -B -m unittest tests.test_opportunity_episodes_vertical_v1",
   "report_sha256": {
-    "p1": "86903358f5ca88ad19a15feb3c39f3cfe9fadd71e7448b1aefde9d4b6eb37467",
-    "p2": "5264dc2d6954facbc0fab0b4ddb4bfa582f7b9d16df9e1bf492cddbe96a59b58",
-    "p3": "956db08b2d4d67a585cba5e85120c72fa486fabf70bec981469140a1ce420ebb"
+    "p1": "737ffa972183aff050460ad5a06094250f260cb5c48853bf6e94ca3fc9f62965",
+    "p2": "d785cebfc8535d21333c387234eb0af8987372b778803a69cc4b10396469be92",
+    "p3": "b3a439157fa2df0e5c7efa728f671d0096c2103f4be5f710c83ce98376e2c7d0"
   },
   "processes": {
     "P1_capture_host": {
@@ -36,9 +36,9 @@
         "unpublished": 0
       },
       "capture_packets": 3,
-      "wall_seconds": 181.19,
-      "tick_wall_mean_seconds": 1.466,
-      "peak_rss_bytes": 119287808,
+      "wall_seconds": 183.46,
+      "tick_wall_mean_seconds": 1.475,
+      "peak_rss_bytes": 120946688,
       "storage_bytes": {
         "export_bytes": 122717,
         "manifest_bytes": 318849,
@@ -226,12 +226,12 @@
         }
       },
       "consume_wall_seconds": [
-        4.14,
-        2.78,
-        4.35
+        4.15,
+        2.82,
+        4.37
       ],
-      "wall_seconds": 91.05,
-      "peak_rss_bytes": 510267392,
+      "wall_seconds": 91.78,
+      "peak_rss_bytes": 486346752,
       "storage_bytes": {
         "episode_corpus_bytes": 496034,
         "mirror_bytes": 5433334,
@@ -283,8 +283,8 @@
           "observed_target_n": 5
         }
       },
-      "wall_seconds": 10.76,
-      "peak_rss_bytes": 277032960
+      "wall_seconds": 11.01,
+      "peak_rss_bytes": 272273408
     }
   },
   "independent_oracle": {

@@ -1,0 +1,127 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-10-05",
+  "task_id": "OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CLOSED_RAW_NOMINATION_BODY_WITH_PROTECTED_VALUES_REPLACED_BY_WITNESS_EXTRACT",
+        "CLOSED_FOCUS_POPULATION_BINDING_FAIL_CLOSED",
+        "CLOSED_LEGACY_GROUNDED_POINT_ALLOWLIST_RESTORED",
+        "CLOSED_CORPUS_CURRENTNESS_REQUIRED_AT_BINDING",
+        "CLOSED_MIXED_SCHEDULE_CLOCKS_REFUSED",
+        "RESIDUAL_MARKET_EPOCH_DATA_ROOT_GLOBAL_OPEN_OWNER_DECISION",
+        "RESIDUAL_TARGET_ATTRITION_REPORTED_NOT_ADJUSTED_OPEN_OWNER_DECISION",
+        "RESIDUAL_REPEATED_MINT_DEPENDENCE_AND_LENGTH_BIASED_SAMPLING_STATED_NON_CLAIMS",
+        "RESIDUAL_CAPTURE_HOST_RAW_HOLDS_PROTECTED_VALUES_INSIDE_HOST_RETENTION"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_ADMISSION_ATOMIC",
+        "PASS_PUBLISH_MARK_REPLAY_IDEMPOTENT",
+        "PASS_OUTBOX_DELETE_NO_DEPENDENTS",
+        "CLOSED_TORN_IMPORT_RETRY_DETERMINISTIC_VIA_IMPORT_INTENT",
+        "CLOSED_LEGACY_PUBLISHER_RELIABLE_AT_SCOPED_TO_EPISODES",
+        "CLOSED_ROUND_WRITE_IMMEDIATE_TRANSACTION",
+        "CLOSED_SHARED_FAIL_NEXT_MAP_SPLIT_LEGACY_UNCHANGED",
+        "CLOSED_BATCH_LOOP_CATCHES_DISCOVERY_RELEASE_ERROR",
+        "RESIDUAL_NO_LEGACY_RECOVERY_ONLY_BATCH_PIN_TEST"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CLOSED_READOUT_STATUS_HONEST_PARTIAL_ROWS_WITH_NOT_EXERCISED_COLUMN",
+        "CLOSED_D9_EXACT_REPEAT_LOOK_DELTA_ASSERTED",
+        "CLOSED_D4_E21600_THROUGH_IMPORT_READER_EVALUATOR",
+        "CLOSED_D8_SCRIPTED_CRITIC_DISCLOSED",
+        "RESIDUAL_D3_BOUNDARY_CRASH_D6_COLLISION_D7_NATIVE_GATE_D10_SCOPED_NEGATIVE_LABELLED_PARTIAL"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CLOSED_EPISODE_CODES_HAVE_ACTIONABLE_NEXT",
+        "CLOSED_NOTHING_MATURE_IS_PASS_NOT_ALARM",
+        "CLOSED_RUNBOOK_FAILURE_TABLE_AND_EXACT_FORGE_RUN_COMMAND",
+        "CLOSED_POPULATION_CARD_SELECTION_WINDOW_DENOMINATOR_TEXT",
+        "CLOSED_RUSSIAN_DISCOVERY_VIA_ASSET_SEARCH_AND_ROUTE_TERM",
+        "RESIDUAL_RUNBOOK_NOT_A_ROUTE_ROOT_ROUTE_OVERVIEW_AT_16KIB_BOUND"
+      ]
+    }
+  ],
+  "remediation_history": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "Nomination response bodies holding protected or unresolved identities and values were published as E0 raw dependency and transferred into releases and the corpus",
+      "observed_head": "9872ca0cb6713d38e4669db2b511f08f0e47a1c9",
+      "resolved_by_head": "f0db223074e7e6d100d06d0380f3b30f3fca027c"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Legacy grounded point allowlist widened to E-points and episode binding not refused for BASE_X specs; focus collection and query population unbound",
+      "observed_head": "9872ca0cb6713d38e4669db2b511f08f0e47a1c9",
+      "resolved_by_head": "f0db223074e7e6d100d06d0380f3b30f3fca027c"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Torn import retry conflicts with its own partial output unless the original as-of is reused; test masked it with a fixed as-of",
+      "observed_head": "9872ca0cb6713d38e4669db2b511f08f0e47a1c9",
+      "resolved_by_head": "f0db223074e7e6d100d06d0380f3b30f3fca027c"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Shared publisher first_reliable_available_at change altered legacy recovery-batch bytes without a declaration",
+      "observed_head": "9872ca0cb6713d38e4669db2b511f08f0e47a1c9",
+      "resolved_by_head": "f0db223074e7e6d100d06d0380f3b30f3fca027c"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Readout marked D3, D4, D6, D7, D10 PASS although sub-items were not exercised; 72h proof used hand-stamped rows; exact repeat look delta unasserted",
+      "observed_head": "9872ca0cb6713d38e4669db2b511f08f0e47a1c9",
+      "resolved_by_head": "588a040ea8d6ebc16f0f86185e5830875f367fb2"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Episode consume failures had no actionable next step and nothing-mature looked like a failure; runbook not discoverable in Russian",
+      "observed_head": "9872ca0cb6713d38e4669db2b511f08f0e47a1c9",
+      "resolved_by_head": "f0db223074e7e6d100d06d0380f3b30f3fca027c"
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_LIVE_ACCEPTANCE",
+    "NO_MERGE"
+  ]
+}
