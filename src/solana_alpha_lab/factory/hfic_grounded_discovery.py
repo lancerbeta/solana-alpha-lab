@@ -71,18 +71,6 @@ def query_spec_sha256(spec: Mapping[str, Any]) -> str:
 
 
 def _point_offset(point_id: object) -> int:
-    if isinstance(point_id, str) and point_id.startswith("E"):
-        # OPPORTUNITY_EPISODES grid (disjoint E-namespace); POINT_OFFSET is
-        # never extended or aliased.
-        from solana_alpha_lab.factory.opportunity_episodes import (
-            OpportunityEpisodeError,
-            point_offset,
-        )
-
-        try:
-            return point_offset(point_id)
-        except OpportunityEpisodeError as exc:
-            raise GroundedDiscoveryError("POINT_NOT_IN_ALLOWLIST") from exc
     if not isinstance(point_id, str) or point_id not in POINT_OFFSET:
         raise GroundedDiscoveryError("POINT_NOT_IN_ALLOWLIST")
     return POINT_OFFSET[point_id]
@@ -226,6 +214,11 @@ def resolve_published_episode_binding(data_root: Path) -> dict[str, Any]:
         labels.get(key) != value for key, value in REQUIRED_EPISODE_LABELS.items()
     ):
         raise GroundedDiscoveryError("DISCOVERY_AUTHORITY_ABSENT")
+    # Only the lineage-current version binds; a torn import never reads values.
+    if labels.get("is_current_corpus_version") is not True or labels.get("corpus_version") != lineage.get(
+        "current_corpus_version"
+    ):
+        raise GroundedDiscoveryError("DISCOVERY_IDENTITY_MISMATCH")
     raw_cohorts = [item for item in lineage.get("cohorts") or [] if isinstance(item, Mapping)]
     if not raw_cohorts:
         raise GroundedDiscoveryError("DISCOVERY_BINDING_EMPTY")
@@ -1600,6 +1593,10 @@ def execute_discovery_from_rows(
         if "evidence_role" not in item:
             raise GroundedDiscoveryError("DISCOVERY_ROLE_AMBIGUOUS")
     admitted = admit_discovery_binding(binding)
+    # The grounded BASE_X evaluator never reads an episode corpus; episode
+    # questions run through temporal query 1.1 only.
+    if admitted.get("population") == EPISODE_POPULATION:
+        raise GroundedDiscoveryError("POPULATION_BINDING_MISMATCH")
     rules = spec.get("explanatory_rules") or []
     if not isinstance(rules, list):
         raise GroundedDiscoveryError("EXPLANATORY_INVALID")

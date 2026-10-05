@@ -380,6 +380,8 @@ class ObservationScheduleStore:
                 point_id TEXT,
                 cohort_id TEXT NOT NULL,
                 row_json TEXT NOT NULL,
+                -- Published rows are deleted with their publication record, so
+                -- this stays NULL; kept as the explicit pending predicate.
                 published_content_sha256 TEXT,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL
@@ -3129,46 +3131,54 @@ class ObservationScheduleStore:
     ) -> str:
         self._require_write_lease(clock)
         now = _now(clock)
-        existing = self._conn.execute(
-            "SELECT state, frame_json FROM episode_rounds WHERE round_id = ?",
-            (round_id,),
-        ).fetchone()
         encoded = json.dumps(dict(frame), sort_keys=True)
-        if existing is not None:
-            if str(existing["state"]) != "STARTED":
-                if str(existing["state"]) == state and str(existing["frame_json"]) == encoded:
-                    return "REPLAY"
-                raise ObservationScheduleStoreError("EPISODE_ROUND_CONFLICT")
+        # Check-then-write in one immediate transaction, like the other episode writers.
+        self._conn.execute("BEGIN IMMEDIATE")
+        try:
+            existing = self._conn.execute(
+                "SELECT state, frame_json FROM episode_rounds WHERE round_id = ?",
+                (round_id,),
+            ).fetchone()
+            if existing is not None:
+                if str(existing["state"]) != "STARTED":
+                    if str(existing["state"]) == state and str(existing["frame_json"]) == encoded:
+                        self._conn.rollback()
+                        return "REPLAY"
+                    raise ObservationScheduleStoreError("EPISODE_ROUND_CONFLICT")
+                self._conn.execute(
+                    """
+                    UPDATE episode_rounds SET state = ?, frame_json = ?, updated_at = ?
+                    WHERE round_id = ? AND state = 'STARTED'
+                    """,
+                    (state, encoded, now, round_id),
+                )
+                self._conn.commit()
+                return "UPDATED"
             self._conn.execute(
                 """
-                UPDATE episode_rounds SET state = ?, frame_json = ?, updated_at = ?
-                WHERE round_id = ? AND state = 'STARTED'
+                INSERT INTO episode_rounds(
+                    round_id, schedule_sha256, activation_id, lineage_id,
+                    round_started_at, state, frame_json, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                (state, encoded, now, round_id),
+                (
+                    round_id,
+                    schedule_sha256,
+                    activation_id,
+                    lineage_id,
+                    round_started_at,
+                    state,
+                    encoded,
+                    now,
+                    now,
+                ),
             )
             self._conn.commit()
-            return "UPDATED"
-        self._conn.execute(
-            """
-            INSERT INTO episode_rounds(
-                round_id, schedule_sha256, activation_id, lineage_id,
-                round_started_at, state, frame_json, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                round_id,
-                schedule_sha256,
-                activation_id,
-                lineage_id,
-                round_started_at,
-                state,
-                encoded,
-                now,
-                now,
-            ),
-        )
-        self._conn.commit()
-        return "INSERTED"
+            return "INSERTED"
+        except Exception:
+            if self._conn.in_transaction:
+                self._conn.rollback()
+            raise
 
     def get_episode_round(self, round_id: str) -> dict[str, Any] | None:
         row = self._conn.execute(

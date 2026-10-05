@@ -154,3 +154,34 @@ new evaluator/importer/DB/service, trading or lowered scientific floors. The
 category 5m routes are a `PROVIDER_ROUTE_REGISTRY_GAP` in
 `CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010` until OPERATE commissioning
 records real evidence; the episode authority profile does not grant activation.
+
+## 9. Accepted limits and open owner decisions
+
+- Protection reaches raw evidence too: the published E0 dependency is a
+  content-addressed witness extract holding only the admitted object and the
+  hash of its source response. A nomination response stays on the capture host.
+- The focus owns the collection. A query whose `population` differs from the
+  focus collection stops before values with `FOCUS_POPULATION_MISMATCH`; the
+  grounded BASE_X evaluator refuses an episode binding and keeps its X/Y point
+  allowlist.
+- The base is every admission for counts and decision eligibility. Effect means
+  use target-available episodes only; `episode_target_attrition` reports missing
+  targets by reason for the matched set and the decision baseline, with no
+  adjustment (`TARGET_ATTRITION_NOT_ADJUSTED`). A vanished mint at exit can be
+  outcome-linked. Any imputation or sensitivity rule is an owner estimand
+  decision.
+- The market evidence epoch stays data-root global, as before this slice: any
+  current dataset publication, an episode import included, rotates it and with
+  it per-epoch session and focus budgets. A per-collection epoch is an open
+  owner decision.
+- One question never mixes clock semantics across cohorts
+  (`SCHEDULE_CLOCK_MIXED`). Only the lineage-current corpus version binds.
+- `asset_class` UNKNOWN (no tags) is admitted and remains a census field; the
+  stable/LST exclusion list applies only to explicit identities and tags.
+- Repeated mints across cycles and same-day episodes are not independent
+  (`NO_IID_CLAIM`); the estimand is admitted episodes, not random nominated
+  mint-rounds. `elapsed_seconds` and `utc_hour` under
+  `FIRST_RELIABLE_AVAILABLE_AT` include collector latency and grid phase.
+- Registered replay recomputes the frozen recipe from the release bytes in a
+  separate process; it is a determinism check, with literal oracle values
+  asserted alongside, not an independent implementation.

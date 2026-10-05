@@ -80,6 +80,8 @@ class ProducerProtectionTests(ScenarioCase):
         self.assertNotIn(protected, published)
         self.assertNotIn(unknown, published)
         self.assertNotIn("999999", published)
+        # The E0 dependency is the admitted object's extract, not the nomination body.
+        self.assertTrue(any("/witness/" in rel for rel in sc.named_raw_bodies), sc.named_raw_bodies)
         admission = sc.admissions()[0]
         self.assertEqual(admission["anchor_kind"], "NOMINATION_T0")
         self.assertEqual(admission["population"], "OPPORTUNITY_EPISODES")

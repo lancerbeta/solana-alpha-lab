@@ -354,15 +354,27 @@ class EpisodeScenario:
         return [{"round_id": r[0], "state": r[1], "frame": json.loads(r[2])} for r in rows]
 
     def published_text(self) -> str:
-        """Concatenated published member/observation bytes as text (search only)."""
+        """Published member/observation rows plus every raw body they name."""
 
         import pyarrow.parquet as pq
 
         chunks: list[str] = []
+        raw_rels: set[str] = set()
         for path in sorted((self.data_root / "datasets").rglob("*.parquet")):
             if "raw_evidence" in path.parts:
                 continue
-            chunks.append(json.dumps(pq.read_table(path).to_pylist(), default=str))
+            rows = pq.read_table(path).to_pylist()
+            chunks.append(json.dumps(rows, default=str))
+            # Raw bodies named by published rows are what capture export transfers.
+            for row in rows:
+                for key in ("raw_body_rel", "witness_raw_body_rel"):
+                    if isinstance(row.get(key), str) and row[key]:
+                        raw_rels.add(row[key])
+        for rel in sorted(raw_rels):
+            path = self.data_root / rel
+            if path.is_file():
+                chunks.append(path.read_bytes().decode("utf-8", errors="replace"))
+        self.named_raw_bodies = sorted(raw_rels)
         return "\n".join(chunks)
 
 

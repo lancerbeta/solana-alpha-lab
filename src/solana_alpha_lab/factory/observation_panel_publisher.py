@@ -852,10 +852,12 @@ def publish_observation_batch(
         )
         if max_available > created_at:
             created_at = max_available
-        # A partition is reliable no earlier than its creation. For rows from
-        # the same tick this equals max_available (legacy bytes unchanged); a
-        # later outbox/recovery publication becomes reliable at creation.
-        reliable_at = max(max_available, created_at)
+        # Episode outbox publications are reliable no earlier than their
+        # creation (a later outbox replay must not backdate availability).
+        # Legacy schedules keep max_available, so their bytes are unchanged.
+        from solana_alpha_lab.factory.opportunity_episodes import is_episode_schedule
+
+        reliable_at = max(max_available, created_at) if is_episode_schedule(schedule) else max_available
         parquet_rel = str(
             job.get("parquet_rel") or f"datasets/parquet/{dataset_manifest_id}/observations.parquet"
         )

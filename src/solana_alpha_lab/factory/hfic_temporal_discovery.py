@@ -1429,13 +1429,23 @@ def _require_bound_schedule(binding: Sequence[Mapping[str, Any]], body: Mapping[
             require_binding,
         )
 
+        clocks: set[tuple] = set()
         for item in binding:
             if item.get("population") != EPISODE_POPULATION:
                 raise GroundedDiscoveryError("POPULATION_BINDING_MISMATCH")
             try:
-                require_binding(item.get("schedule_binding"))
+                bound = require_binding(item.get("schedule_binding"))
             except OpportunityEpisodeError as exc:
                 raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND") from exc
+            clocks.add(
+                tuple(
+                    bound.get(key)
+                    for key in ("dispatch_window_seconds", "availability_grace_seconds", "witness_max_age_seconds")
+                )
+            )
+        # One question never mixes clock semantics across cohorts.
+        if len(clocks) > 1:
+            raise GroundedDiscoveryError("SCHEDULE_CLOCK_MIXED")
         return
     for item in binding:
         for point in _query_points(body):
@@ -3159,6 +3169,8 @@ def _project_episode_members(
         episode = str(row.get("episode_id") or "")
         mint = str(row.get("mint") or "")
         if not episode or not mint:
+            # An admission without identity cannot leave the base silently.
+            integrity_conflicts += 1
             continue
         cohort = str(row.get("cohort_id") or "")
         release = str(row.get("release_id") or "")
@@ -3616,7 +3628,27 @@ def execute_temporal_discovery(
             "unique_mint_n": len(set(episode_mints.values())),
             "repeated_mint_n": len(episode_mints) - len(set(episode_mints.values())),
         }
-        summary["non_claims"] = list(summary["non_claims"]) + ["NO_IID_CLAIM", "NOT_NEWBORN_BIRTH_POPULATION"]
+
+        def _missing_by_reason(group: Sequence[Mapping[str, Any]]) -> dict[str, int]:
+            reasons: dict[str, int] = defaultdict(int)
+            for item in group:
+                if not item.get("target_is_observed"):
+                    reasons[str(item.get("target_exclusion") or "TARGET_MISSING_UNSPECIFIED")] += 1
+            return dict(sorted(reasons.items()))
+
+        # Effect means use target-available episodes only. A vanished mint at
+        # exit can be outcome-linked, so attrition is reported per group and
+        # never imputed or treated as neutral evidence.
+        summary["episode_target_attrition"] = {
+            "matched": _missing_by_reason(matched_members),
+            "decision_baseline": _missing_by_reason(decision_members_all),
+            "adjustment": "NONE_REPORTED_ONLY",
+        }
+        summary["non_claims"] = list(summary["non_claims"]) + [
+            "NO_IID_CLAIM",
+            "NOT_NEWBORN_BIRTH_POPULATION",
+            "TARGET_ATTRITION_NOT_ADJUSTED",
+        ]
     stop = snapshot_input_technical_stop(summary)
     if stop is not None:
         summary["technical_stop"] = stop

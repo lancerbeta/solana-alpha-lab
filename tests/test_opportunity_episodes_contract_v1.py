@@ -495,6 +495,30 @@ class TicketAndQuotaTests(unittest.TestCase):
 class LegacyInvariantTests(unittest.TestCase):
     """Pins computed on base de20465e. Episode additions change none of them."""
 
+    def test_grounded_base_x_refuses_episode_points_and_episode_binding(self) -> None:
+        from solana_alpha_lab.factory import hfic_grounded_discovery as grounded
+
+        spec = {
+            "query_id": "LEGACY_PIN",
+            "decision_points": ["X300"],
+            "decision_fields": ["FIELD-USD-PRICE-001"],
+            "target_point": "Y1800",
+            "target_field": "FIELD-USD-PRICE-001",
+            "explanatory": [],
+            "population": "BASE_X",
+        }
+        grounded.validate_query_spec(spec)
+        for change in ({"decision_points": ["E300"]}, {"target_point": "E14400"}):
+            with self.assertRaisesRegex(grounded.GroundedDiscoveryError, "POINT_NOT_IN_ALLOWLIST"):
+                grounded.validate_query_spec({**spec, **change})
+        episode_binding = [{
+            "dataset_id": grounded.EPISODE_DATASET_ID, "population": grounded.EPISODE_POPULATION,
+            "evidence_role": grounded.LIVE_EVIDENCE_ROLE, "holdout": False, "cohort_id": "C",
+            "release_id": "R", "census_sha256": "a", "observations_sha256": "b", "schedule_binding": {},
+        }]
+        with self.assertRaisesRegex(grounded.GroundedDiscoveryError, "POPULATION_BINDING_MISMATCH"):
+            grounded.execute_discovery_from_rows([], [], spec, episode_binding)
+
     def test_legacy_query_identity_and_point_grid_unchanged(self) -> None:
         import hashlib
 

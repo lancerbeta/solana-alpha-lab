@@ -13,7 +13,7 @@ not birth or pool creation. Each episode has a frozen 139-point schedule
 (`E0` witness, 5-minute grid to 6 h, hourly to 72 h). Every committed
 admission stays in the denominator; gaps stay explicit and never become zero.
 
-## Capture host (producer)
+## Capture host (producer) — OPERATE commissioning gate only, not an owner step in this slice
 
 The schedule kind `smial.opportunity-episode-schedule` runs inside the ordinary
 `scripts/observation_schedule.py tick --once` lane after register / authorize /
@@ -53,12 +53,32 @@ command never starts Forge; it prints the generated population card.
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <data-root> preflight --collection OPPORTUNITY_EPISODES --owner-focus <FOCUS>
 ```
 
-The focus becomes `OPPORTUNITY_EPISODES:<FOCUS>`; use that stored focus for
-`forge-run`. Questions use `smial.hfic-temporal-query` 1.1 with
+The focus becomes `OPPORTUNITY_EPISODES:<FOCUS>` (`--owner-focus
+OPPORTUNITY_EPISODES:<FOCUS>` without `--collection` is equivalent; the default
+focus is `AUTO`). Then:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <data-root> forge-run --collection OPPORTUNITY_EPISODES --owner-focus <FOCUS>
+```
+
+A query whose `population` differs from the focus collection stops before any
+value with `FOCUS_POPULATION_MISMATCH`. Questions use `smial.hfic-temporal-query` 1.1 with
 `population=OPPORTUNITY_EPISODES`, E-points, at most 8 points, the universe
 policy owner for holders/liquidity minima and `lte` predicates for ceilings.
 CONTROL mode is not supported for this collection. Saved readback loads no
 values; registered replay recomputes from the frozen recipe and release files.
+
+## If a command fails
+
+| Code | Meaning | Next |
+| --- | --- | --- |
+| `EPISODE_BATCH_NOTHING_MATURE` (PASS) | no mature unimported cohort yet | wait for the next UTC day |
+| `MIRROR_INCOMPLETE` | transfer interrupted | rerun the same command |
+| `MARKET_EVIDENCE_BASIS_INCOMPLETE` at preflight | an import was interrupted after labels, before lineage | rerun the same unpack command; it reuses the recorded import instant |
+| `RELEASE_HASH_MISMATCH`, `MIRROR_CONFLICT`, `CLOSURE_COHORT_MISMATCH` | bytes differ from the sealed or captured identity | stop; do not import |
+| `COLLECTION_PACKET_MISMATCH` | packet from another collection | use an OPPORTUNITY_EPISODES capture packet |
+| `CAPTURE_PACKET_REQUIRES_SOURCE_AND_MIRROR_RDP` | packet given without its transport roots | add `--source-rdp` and `--mirror-rdp` |
+| `FOCUS_POPULATION_MISMATCH` | question population differs from the focus collection | use `population=OPPORTUNITY_EPISODES` with an episode focus |
 
 ## Not here
 

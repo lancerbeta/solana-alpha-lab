@@ -114,6 +114,10 @@ def tick_times() -> list[datetime]:
         times.add(start + timedelta(seconds=5))
         for offset in (300, 1800, 14400):
             times.add(start + timedelta(seconds=offset + 300 + 5))
+        if _key[0] == "A":
+            times.add(start + timedelta(seconds=21600 + 300 + 5))
+    # E259200 of the first episode: hourly grid, one hour after the nominal instant.
+    times.add(DAY_A + timedelta(seconds=259200 + 3600 + 5))
     cursor = DAY_A + timedelta(hours=12, seconds=5)
     while cursor < END:
         times.add(cursor)
@@ -322,6 +326,7 @@ def null_spec(query_id: str) -> dict[str, Any]:
     """Controlled null: every admission passes, so matched must equal the baseline."""
 
     spec = vertical_spec(query_id)
+    spec["target"] = dict(spec["target"], exit_point="E21600")
     spec["all"] = [
         {"feature": "liq", "op": "lte", "value": 1000000},
         {"feature": "elapsed", "op": "gt", "value": 0},
@@ -402,7 +407,8 @@ def _consume_torn(packet: str, *, source: Path, mirror: Path, plane: Path) -> di
 
     argv = ["unpack-next-live-cohort", "--collection", "OPPORTUNITY_EPISODES", "--max-cohorts", "1",
             "--source-rdp", str(source), "--mirror-rdp", str(mirror), "--data-root", str(plane),
-            "--as-of", AS_OF.strftime("%Y-%m-%dT%H:%M:%SZ"), "--release-builder-git-sha", "b" * 40, "--capture-packet", packet]
+            # A different instant than the repair run: the repeat must not depend on --as-of.
+            "--as-of", (AS_OF - timedelta(minutes=30)).strftime("%Y-%m-%dT%H:%M:%SZ"), "--release-builder-git-sha", "b" * 40, "--capture-packet", packet]
     lineage = plane / "datasets" / "opportunity_episodes_corpus" / "lineage.json"
     before = lineage.read_bytes()
     died = False
@@ -438,6 +444,18 @@ def phase_p2(work: Path) -> dict[str, Any]:
     replay_import = _consume(packets[:1], source=source, mirror=mirror, plane=plane)
     report["consume_repeat"] = replay_import
     report["tampered_release"] = _tampered_release_refused(mirror, p2)
+    from tests.test_hfic_cli import run_cli
+
+    no_policy = run_cli("preflight", "--discovery-contract", "--collection", "OPPORTUNITY_EPISODES",
+                        "--owner-focus", "VERTICAL_SYNTH_NO_POLICY", "--format", "json", data_root=plane)
+    no_policy_body = json.loads(no_policy.stdout.strip().splitlines()[-1]) if no_policy.stdout.strip() else {}
+    report["preflight_without_policy"] = {
+        "exit": no_policy.returncode,
+        "terminal": no_policy_body.get("terminal"),
+        "action": no_policy_body.get("action"),
+        "next_action": no_policy_body.get("next_action"),
+        "universe_policy_state": (no_policy_body.get("universe_policy") or {}).get("state"),
+    }
     store = ResearchStore(plane)
     proposal = preview_universe_policy(store, min_holders=50, min_liquidity_usd=5000)["proposal"]
     apply_universe_policy(store, repo_root=ROOT, proposal=proposal, confirm_append_only=True)
@@ -595,6 +613,12 @@ def phase_p3(work: Path) -> dict[str, Any]:
 
     report: dict[str, Any] = {"original_root_probe": probe}
     lineage = load_episode_lineage(cold)
+    import pyarrow.parquet as pq
+
+    first = lineage["cohorts"][0]
+    long_rows = [row for row in pq.read_table(cold / first["obs_rel"]).to_pylist() if row.get("point_id") == "E259200"]
+    report["e259200_states"] = sorted({str(row.get("state")) for row in long_rows})
+    report["e259200_observed_n"] = len({row.get("episode_id") for row in long_rows if row.get("state") == "OBSERVED"})
     report["verified_releases"] = [verify_live_cohort(cold / item["release_dir_rel"])["release_id"] for item in lineage["cohorts"]]
     before = ResearchStore(cold).diagnostics().committed_inventory_sha256
 
@@ -628,6 +652,7 @@ def phase_p3(work: Path) -> dict[str, Any]:
             data_root=cold,
         )
     report["replay"] = {"evaluator_calls": calls["evaluator"], "equal_to_saved": replay["summary"] == run1["result"],
+                        "baseline_mean_target": replay["summary"]["baseline"]["mean_target"],
                         "summary": {k: replay["summary"][k] for k in ("matched_n", "observed_target_n", "mean_target", "episode_counts")}}
     report["blocked_events_during_cold"] = sorted(set(blocked))
     report["peak_rss_bytes"] = peak_rss_bytes()
@@ -712,6 +737,9 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         self.assertAlmostEqual(result["matched_feature_means"]["elapsed"], 1500.0, places=9)
         self.assertEqual(result["universe_policy"]["n_pass"], 12)
         self.assertEqual(p2["run1_repeat"]["values_loaded"], False)
+        self.assertEqual(p2["run1_repeat"]["scientific_look_delta"], {"main": 0, "adaptive": 0})
+        attrition = p2["run1"]["result"]["episode_target_attrition"]
+        self.assertEqual((sum(attrition["matched"].values()), sum(attrition["decision_baseline"].values())), (1, 1))
         self.assertEqual(p2["frozen"]["grounding"], "GROUNDED")
         self.assertNotEqual(p2["critic_invalid"]["exit"], 0)
         self.assertNotEqual(p2["critic_missing"]["exit"], 0)
@@ -720,8 +748,9 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         # D8 controlled null: matched equals the decision baseline exactly.
         null = p2["null"]
         self.assertEqual(null["exit"], 0)
-        self.assertEqual((null["episode_counts"]["n_matched"], null["episode_counts"]["n_target_available"]), (12, 11))
-        self.assertAlmostEqual(null["mean_target"], (5 * 0.10 + 6 * (0.931 / 0.98 - 1)) / 11, places=9)
+        # Exit E21600: every day-A episode observed at six hours (independent literal).
+        self.assertEqual((null["episode_counts"]["n_matched"], null["episode_counts"]["n_target_available"]), (12, 12))
+        self.assertAlmostEqual(null["mean_target"], (6 * 0.10 + 6 * (0.931 / 0.98 - 1)) / 12, places=9)
         self.assertAlmostEqual(null["mean_target"], null["baseline_mean_target"], places=12)
         # D9: next run on new evidence is a normal new look; exact repeat spent none.
         self.assertNotEqual(p2["preflight_1"]["market_evidence_epoch_sha256"], p2["preflight_2"]["market_evidence_epoch_sha256"])
@@ -739,6 +768,11 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         self.assertEqual(p3["replay"]["evaluator_calls"], 1)
         self.assertTrue(p3["replay"]["equal_to_saved"])
         self.assertAlmostEqual(p3["replay"]["summary"]["mean_target"], 0.10, places=9)
+        counts3 = p3["replay"]["summary"]["episode_counts"]
+        self.assertEqual((counts3["n_admitted"], counts3["n_decision_eligible"], counts3["n_matched"], counts3["n_target_available"]), (12, 12, 6, 5))
+        self.assertAlmostEqual(p3["replay"]["baseline_mean_target"], (5 * 0.10 + 6 * (0.931 / 0.98 - 1)) / 11, places=9)
+        # D4: a 72 h point reaches the cold corpus through the ordinary import.
+        self.assertEqual(p3["e259200_observed_n"], 1)
         self.assertEqual(p3["blocked_events_during_cold"], [])
 
 

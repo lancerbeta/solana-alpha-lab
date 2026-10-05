@@ -61,6 +61,16 @@ from solana_alpha_lab.factory.data_root import DataRootError, resolve_data_root
 
 FAIL_OWNER_NEXT = {
     "NOT_MATURE": "WAIT_UNTIL_COHORT_MATURE",
+    "NO_MATURE_UNIMPORTED_COHORT": "WAIT_UNTIL_COHORT_MATURE",
+    "MAX_COHORTS_OUT_OF_RANGE": "RERUN_WITH_MAX_COHORTS_1_TO_7",
+    "COLLECTION_PACKET_MISMATCH": "STOP_USE_OPPORTUNITY_EPISODES_CAPTURE_PACKET",
+    "COLLECTION_OPTION_REQUIRES_OPPORTUNITY_EPISODES": "RERUN_WITH_COLLECTION_OPPORTUNITY_EPISODES",
+    "CAPTURE_PACKET_REQUIRES_SOURCE_AND_MIRROR_RDP": "RERUN_WITH_SOURCE_RDP_AND_MIRROR_RDP",
+    "MIRROR_INCOMPLETE": "RERUN_SAME_COMMAND",
+    "MIRROR_CONFLICT": "STOP_DO_NOT_IMPORT",
+    "CLOSURE_COHORT_MISMATCH": "STOP_DO_NOT_IMPORT",
+    "RELEASE_HASH_MISMATCH": "STOP_DO_NOT_IMPORT",
+    "MARKET_EVIDENCE_BASIS_INCOMPLETE": "RERUN_SAME_COMMAND",
     "COHORT_DUE_OPEN": "WAIT_UNTIL_COHORT_DUES_CLOSED",
     "PUBLICATION_OPEN": "WAIT_UNTIL_PUBLICATION_JOBS_CLOSED",
     "IDENTITY_CONFLICT": "STOP_DO_NOT_RESEAL",
@@ -322,7 +332,7 @@ def _unpack_episode_cohorts(args: argparse.Namespace, *, data_root: Path, repo_r
     packets = list(args.capture_packet or [])
     if packets:
         if args.source_rdp is None or args.mirror_rdp is None:
-            raise LiveCohortReleaseError("COHORT_RESOLUTION_MISSING")
+            raise LiveCohortReleaseError("CAPTURE_PACKET_REQUIRES_SOURCE_AND_MIRROR_RDP")
         source_root = _path(args.source_rdp)
         mirror_root = _path(args.mirror_rdp)
         mirror_root.mkdir(parents=True, exist_ok=True)
@@ -341,7 +351,9 @@ def _unpack_episode_cohorts(args: argparse.Namespace, *, data_root: Path, repo_r
                     release_builder_git_sha=args.release_builder_git_sha,
                 )
             except LiveCohortReleaseError as exc:
-                results.append({"cohort_id": packet.get("cohort_id"), "terminal": "FAIL", "code": str(exc)})
+                code = str(exc)
+                results.append({"cohort_id": packet.get("cohort_id"), "terminal": "FAIL", "code": code,
+                                "next": FAIL_OWNER_NEXT.get(code.split(":")[0], "STOP_INSPECT_FAIL_CODE")})
                 break
             results.append(result)
     else:
@@ -356,24 +368,30 @@ def _unpack_episode_cohorts(args: argparse.Namespace, *, data_root: Path, repo_r
                     collection=EPISODE_COLLECTION,
                 )
             except LiveCohortReleaseError as exc:
-                if str(exc) != "NO_MATURE_UNIMPORTED_COHORT" or not results:
-                    results.append({"terminal": "FAIL", "code": str(exc)})
+                code = str(exc)
+                if code == "NO_MATURE_UNIMPORTED_COHORT":
+                    # Nothing mature yet is the ordinary daily state, not a failure.
+                    break
+                results.append({"terminal": "FAIL", "code": code,
+                                "next": FAIL_OWNER_NEXT.get(code.split(":")[0], "STOP_INSPECT_FAIL_CODE")})
                 break
             results.append(result)
             if args.plan_only:
                 break
     imported = [item for item in results if item.get("import_status") in {"IMPORTED", "PASS_ALREADY_PRESENT_EXACT"}]
     failed = [item for item in results if item.get("terminal") == "FAIL"]
+    if failed:
+        terminal, next_action = "EPISODE_BATCH_PARTIAL", str(failed[-1].get("next") or "STOP_INSPECT_FAIL_CODE")
+    elif not results:
+        terminal, next_action = "EPISODE_BATCH_NOTHING_MATURE", "WAIT_UNTIL_COHORT_MATURE"
+    else:
+        terminal, next_action = "EPISODE_BATCH_COMPLETE", "ORDINARY_FORGE_PREFLIGHT_COLLECTION_OPPORTUNITY_EPISODES"
     return {
         "collection": EPISODE_COLLECTION,
-        "terminal": "EPISODE_BATCH_PARTIAL" if failed else "EPISODE_BATCH_COMPLETE",
+        "terminal": terminal,
         "cohorts": results,
         "imported_n": len(imported),
-        "next": (
-            "STOP_INSPECT_FAIL_CODE"
-            if failed
-            else "ORDINARY_FORGE_PREFLIGHT_COLLECTION_OPPORTUNITY_EPISODES"
-        ),
+        "next": next_action,
         "forge_run_started": False,
     }
 
@@ -512,7 +530,10 @@ def main(argv: list[str] | None = None) -> int:
         "--collection",
         choices=("LIVE_LIFECYCLE", EPISODE_COLLECTION),
         default=None,
-        help="Default keeps the legacy LIVE_LIFECYCLE path",
+        help=(
+            "Default keeps the legacy LIVE_LIFECYCLE path; OPPORTUNITY_EPISODES enables "
+            "--max-cohorts and --capture-packet (with --source-rdp/--mirror-rdp)"
+        ),
     )
     unpack.add_argument(
         "--max-cohorts",
@@ -683,8 +704,9 @@ def main(argv: list[str] | None = None) -> int:
                 repo_root=ROOT if args.repo_root is None else _path(args.repo_root),
                 as_of=_parse_utc(args.as_of) or datetime.now().astimezone(),
             )
-            print(json.dumps({"status": "PASS" if result["terminal"] == "EPISODE_BATCH_COMPLETE" else "FAIL", "result": result}, sort_keys=True, default=str))
-            return 0 if result["terminal"] == "EPISODE_BATCH_COMPLETE" else 2
+            ok = result["terminal"] in {"EPISODE_BATCH_COMPLETE", "EPISODE_BATCH_NOTHING_MATURE"}
+            print(json.dumps({"status": "PASS" if ok else "FAIL", "result": result}, sort_keys=True, default=str))
+            return 0 if ok else 2
         elif args.command == "unpack-next-live-cohort":
             if args.max_cohorts not in (None, 1) or args.capture_packet:
                 raise LiveCohortReleaseError("COLLECTION_OPTION_REQUIRES_OPPORTUNITY_EPISODES")

@@ -267,6 +267,50 @@ def _store_raw(
     return str(stored["occurrence"]["body_rel"])
 
 
+WITNESS_EXTRACT_SCHEMA = "smial.opportunity-episode-witness-extract"
+
+
+def _store_witness_extract(data_root: Path, candidate: Mapping[str, Any]) -> str | None:
+    """The E0 raw dependency: only the admitted object, hash-linked to its source.
+
+    A nomination response also lists protected or unresolved identities with
+    their values; it stays on the capture host and no published row names it.
+    """
+
+    obj = candidate.get("object")
+    available = candidate.get("selected_first_reliable_available_at")
+    if not isinstance(obj, Mapping) or not available:
+        return None
+    body = json.dumps(
+        {
+            "schema": WITNESS_EXTRACT_SCHEMA,
+            "schema_version": "1.0",
+            "mint": candidate.get("mint"),
+            "object": dict(obj),
+            "object_sha256": candidate.get("selected_object_sha256"),
+            "source_id": candidate.get("selected_source_id"),
+            "source_rank": candidate.get("selected_rank"),
+            "source_call_occurrence_id": candidate.get("selected_call_occurrence_id"),
+            "source_response_sha256": candidate.get("selected_response_sha256"),
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    digest = __import__("hashlib").sha256(body).hexdigest()
+    day = parse_utc(str(available)).strftime("%Y%m%d")
+    rel = f"datasets/raw_evidence/{day}/witness/{digest}.json"
+    path = Path(data_root) / rel
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.is_file():
+        if path.read_bytes() != body:
+            raise EpisodeTickError("WITNESS_EXTRACT_CONFLICT")
+        return rel
+    tmp = path.with_name(f".{path.name}.{uuid4().hex}.tmp")
+    tmp.write_bytes(body)
+    tmp.replace(path)
+    return rel
+
+
 def _load_raw_body(data_root: Path, body_rel: str | None) -> object | None:
     if not isinstance(body_rel, str) or not body_rel:
         return None
@@ -870,6 +914,11 @@ class _EpisodeTick:
         witness_stale: list[str] = []
         for winner in selection["winners"]:
             t0 = self.provider_ctx.now()
+            # The published E0 dependency is the admitted object only.
+            winner["candidate"] = {
+                **winner["candidate"],
+                "selected_raw_body_rel": _store_witness_extract(self.data_root, winner["candidate"]),
+            }
             record = admission_record(
                 document=self.schedule,
                 activation_id=self.activation_id,
