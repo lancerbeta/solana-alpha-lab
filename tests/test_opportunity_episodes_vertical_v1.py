@@ -219,6 +219,10 @@ def phase_p1(work: Path) -> dict[str, Any]:
         states = dict(connection.execute("SELECT state, COUNT(*) FROM due_observations GROUP BY state").fetchall())
         admissions = [json.loads(row[0]) for row in connection.execute("SELECT record_json FROM episode_admissions ORDER BY t0")]
         activation_state = connection.execute("SELECT state FROM schedule_activations").fetchone()[0]
+        outbox = connection.execute(
+            "SELECT COUNT(*), COALESCE(SUM(LENGTH(row_json)), 0), "
+            "SUM(CASE WHEN published_content_sha256 IS NULL THEN 1 ELSE 0 END) FROM episode_outbox"
+        ).fetchone()
     finally:
         connection.close()
     return {
@@ -230,6 +234,7 @@ def phase_p1(work: Path) -> dict[str, Any]:
         "slot_states": states,
         "admissions": [{key: item[key] for key in ("episode_id", "mint", "t0", "cohort_id", "cycle_start")} for item in admissions],
         "activation_state": activation_state,
+        "outbox": {"rows": outbox[0], "retained_row_bytes": outbox[1], "unpublished": outbox[2]},
         "packets": packets,
         "storage": {
             "ops_sqlite_bytes": ops.stat().st_size,
@@ -672,6 +677,9 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         self.assertFalse(set(p1["slot_states"]) & {"PENDING", "DUE", "CLAIMED"})
         self.assertIn("DISAPPEARED", p1["slot_states"])
         self.assertIn("CENSORED", p1["slot_states"])
+        # D11: the ops store keeps no copy of published rows.
+        self.assertEqual(p1["outbox"]["unpublished"], 0)
+        self.assertEqual(p1["outbox"]["retained_row_bytes"], 2 * p1["outbox"]["rows"])
         p2 = spawn("P2", work)
         # D6: genuine consume, exact repeat, legacy alongside.
         self.assertEqual(p2["legacy_import"]["status"], "IMPORTED")
