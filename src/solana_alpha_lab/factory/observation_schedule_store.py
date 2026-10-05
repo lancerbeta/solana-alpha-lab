@@ -3341,17 +3341,13 @@ class ObservationScheduleStore:
                     """,
                     (content_sha256, schedule_sha256, activation_id, cohort_id),
                 )
-            # A published row lives in the publication named by content_sha256;
-            # only unpublished rows are replayed, so the local copy is released
-            # to keep the ops store bounded by the unpublished backlog.
+            # A published row lives in the publication named by content_sha256
+            # (cohort membership in episode_publication_cohorts); only unpublished
+            # rows are ever replayed, so the ops store keeps the backlog alone.
             for outbox_id in outbox_ids:
                 self._conn.execute(
-                    """
-                    UPDATE episode_outbox
-                    SET published_content_sha256 = ?, row_json = '{}', updated_at = ?
-                    WHERE outbox_id = ? AND published_content_sha256 IS NULL
-                    """,
-                    (content_sha256, now, str(outbox_id)),
+                    "DELETE FROM episode_outbox WHERE outbox_id = ? AND published_content_sha256 IS NULL",
+                    (str(outbox_id),),
                 )
             self._conn.commit()
         except Exception:

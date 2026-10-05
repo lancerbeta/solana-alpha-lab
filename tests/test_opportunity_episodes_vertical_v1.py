@@ -221,7 +221,7 @@ def phase_p1(work: Path) -> dict[str, Any]:
         activation_state = connection.execute("SELECT state FROM schedule_activations").fetchone()[0]
         outbox = connection.execute(
             "SELECT COUNT(*), COALESCE(SUM(LENGTH(row_json)), 0), "
-            "SUM(CASE WHEN published_content_sha256 IS NULL THEN 1 ELSE 0 END) FROM episode_outbox"
+            "COALESCE(SUM(CASE WHEN published_content_sha256 IS NULL THEN 1 ELSE 0 END), 0) FROM episode_outbox"
         ).fetchone()
     finally:
         connection.close()
@@ -679,7 +679,7 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         self.assertIn("CENSORED", p1["slot_states"])
         # D11: the ops store keeps no copy of published rows.
         self.assertEqual(p1["outbox"]["unpublished"], 0)
-        self.assertEqual(p1["outbox"]["retained_row_bytes"], 2 * p1["outbox"]["rows"])
+        self.assertEqual((p1["outbox"]["rows"], p1["outbox"]["retained_row_bytes"]), (0, 0))
         p2 = spawn("P2", work)
         # D6: genuine consume, exact repeat, legacy alongside.
         self.assertEqual(p2["legacy_import"]["status"], "IMPORTED")
