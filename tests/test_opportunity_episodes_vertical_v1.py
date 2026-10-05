@@ -44,8 +44,8 @@ FOCUS = "OPPORTUNITY_EPISODES:VERTICAL_SYNTH_FOCUS"
 def mints() -> dict[str, list[str]]:
     from tests.test_opportunity_episodes_harness_v1 import synth_mint
 
-    a = [synth_mint(f"VA{i}") for i in range(12)]
-    b = [a[0]] + [synth_mint(f"VB{i}") for i in range(1, 12)]
+    a = [synth_mint(f"VA{i}x") for i in range(12)]
+    b = [a[0]] + [synth_mint(f"VB{i}x") for i in range(1, 12)]
     return {"A": a, "B": b, "T": [synth_mint("VTiny")]}
 
 
@@ -102,18 +102,24 @@ def build_market():
 
 
 def tick_times() -> list[datetime]:
-    times: list[datetime] = []
-    for day, hours in ((DAY_A, 9), (DAY_T, 6.5), (DAY_B, 9)):
-        cursor = day + timedelta(seconds=5)
-        while cursor <= day + timedelta(hours=hours):
-            times.append(cursor)
-            cursor += timedelta(minutes=5)
-    cursor = DAY_A + timedelta(hours=10, seconds=5)
-    while cursor <= END:
-        times.append(cursor)
-        cursor += timedelta(hours=1)
-    unique = sorted(set(times))
-    return [item for item in unique if item != SKIPPED_TICK]
+    """Only the instants the proof needs; every other slot terminalizes as an explicit gap.
+
+    A round at grid instant s commits T0 a few seconds later, so point offset o is
+    assigned to the next 5-minute grid instant s + o + 300 and dispatched by the
+    tick five seconds after it. The sparse tail lets every 72 h obligation expire.
+    """
+
+    times: set[datetime] = set()
+    for _key, (_mint, start) in admission_rounds().items():
+        times.add(start + timedelta(seconds=5))
+        for offset in (300, 1800, 14400):
+            times.add(start + timedelta(seconds=offset + 300 + 5))
+    cursor = DAY_A + timedelta(hours=12, seconds=5)
+    while cursor < END:
+        times.add(cursor)
+        cursor += timedelta(hours=12)
+    times.add(END)
+    return [item for item in sorted(times) if item != SKIPPED_TICK]
 
 
 def peak_rss_bytes() -> int | None:
@@ -140,8 +146,10 @@ def peak_rss_bytes() -> int | None:
 
             counters = Counters()
             counters.cb = ctypes.sizeof(Counters)
-            handle = ctypes.windll.kernel32.GetCurrentProcess()
-            if ctypes.windll.psapi.GetProcessMemoryInfo(handle, ctypes.byref(counters), counters.cb):
+            kernel = ctypes.windll.kernel32
+            kernel.GetCurrentProcess.restype = wintypes.HANDLE
+            kernel.K32GetProcessMemoryInfo.argtypes = [wintypes.HANDLE, ctypes.c_void_p, wintypes.DWORD]
+            if kernel.K32GetProcessMemoryInfo(kernel.GetCurrentProcess(), ctypes.byref(counters), counters.cb):
                 return int(counters.PeakWorkingSetSize)
             return None
         for line in Path("/proc/self/status").read_text().splitlines():
@@ -177,11 +185,15 @@ def phase_p1(work: Path) -> dict[str, Any]:
     register_authorize_activate(data_root, schedule, now=DAY_A)
     market = build_market()
     terminals: dict[str, int] = {}
+    completed_before = None
     started = time.perf_counter()
     times = tick_times()
     for at in times:
         result = cli_tick(data_root, market, at)
         terminals[str(result.get("terminal"))] = terminals.get(str(result.get("terminal")), 0) + 1
+        if result.get("terminal") == "TICK_REFUSED_NO_LIVE_DEFAULT":
+            completed_before = at  # every obligation is terminal; the activation is COMPLETE
+            break
         if result.get("_exit_code") != 0:
             raise AssertionError(f"tick failed at {at}: {result}")
     tick_wall = time.perf_counter() - started
@@ -210,10 +222,11 @@ def phase_p1(work: Path) -> dict[str, Any]:
     finally:
         connection.close()
     return {
-        "ticks": len(times),
+        "ticks": sum(terminals.values()),
+        "completed_before": completed_before,
         "tick_terminals": terminals,
         "tick_wall_seconds": round(tick_wall, 2),
-        "tick_wall_mean_seconds": round(tick_wall / max(1, len(times)), 3),
+        "tick_wall_mean_seconds": round(tick_wall / max(1, sum(terminals.values())), 3),
         "slot_states": states,
         "admissions": [{key: item[key] for key in ("episode_id", "mint", "t0", "cohort_id", "cycle_start")} for item in admissions],
         "activation_state": activation_state,
@@ -447,6 +460,7 @@ def phase_p2(work: Path) -> dict[str, Any]:
     }
     report["peak_rss_bytes"] = peak_rss_bytes()
     report["focus"] = pre["owner_focus"]
+    report["focus_next"] = pre2["owner_focus"]
     return report
 
 
@@ -459,6 +473,9 @@ def phase_p3(work: Path) -> dict[str, Any]:
     cold_parent = Path(tempfile.mkdtemp(prefix="oep-cold-"))
     cold = cold_parent / "relocated" / "plane"
     shutil.copytree(original_plane, cold)
+    # Saved evidence is read before the cold boundary is installed.
+    p2 = json.loads((work / "p2-report.json").read_text(encoding="utf-8"))
+    run1 = json.loads((work / "p2" / "run1-evidence.json").read_text(encoding="utf-8"))
     forbidden = [str((work / "p1").resolve()).lower(), str((work / "p2").resolve()).lower()]
     blocked: list[str] = []
 
@@ -492,17 +509,23 @@ def phase_p3(work: Path) -> dict[str, Any]:
     report: dict[str, Any] = {"original_root_probe": probe}
     lineage = load_episode_lineage(cold)
     report["verified_releases"] = [verify_live_cohort(cold / item["release_dir_rel"])["release_id"] for item in lineage["cohorts"]]
-    p2 = json.loads((work / "p2-report.json").read_text(encoding="utf-8"))
-    run1 = json.loads((work / "p2" / "run1-evidence.json").read_text(encoding="utf-8"))
     before = ResearchStore(cold).diagnostics().committed_inventory_sha256
-    out = io.StringIO()
-    with mock.patch("solana_alpha_lab.factory.hfic_grounded_discovery.load_admitted_partition_rows", side_effect=AssertionError("cold readback loaded values")), \
-            mock.patch.object(temporal, "execute_temporal_discovery", side_effect=AssertionError("cold readback evaluated")), \
-            contextlib.redirect_stdout(out):
-        code = _forge().main(["--root", str(ROOT), "--data-root", str(cold), "forge-run", "--owner-focus", p2["focus"], "--format", "json", "--no-write"])
-    readback = json.loads(out.getvalue().strip().splitlines()[-1])
-    report["readback"] = {"exit": code, "effective_state": (readback.get("ordinary_operation") or {}).get("effective_state"),
-                          "store_unchanged": ResearchStore(cold).diagnostics().committed_inventory_sha256 == before}
+
+    def saved_readback(focus: str) -> dict[str, Any]:
+        out = io.StringIO()
+        with mock.patch("solana_alpha_lab.factory.hfic_grounded_discovery.load_admitted_partition_rows", side_effect=AssertionError("cold readback loaded values")), \
+                mock.patch.object(temporal, "execute_temporal_discovery", side_effect=AssertionError("cold readback evaluated")), \
+                contextlib.redirect_stdout(out):
+            code = _forge().main(["--root", str(ROOT), "--data-root", str(cold), "forge-run", "--owner-focus", focus, "--format", "json", "--no-write"])
+        body = json.loads([line for line in out.getvalue().strip().splitlines() if line.startswith("{")][-1])
+        return {"exit": code, "owner_class": body.get("owner_class"), "owner_final": body.get("owner_final"),
+                "blocking_reason_codes": body.get("blocking_reason_codes"), "market_evidence_epoch_sha256": body.get("market_evidence_epoch_sha256")}
+
+    # The first focus completed on the previous epoch: new evidence must not
+    # carry that completion forward. The next focus reads its saved result.
+    report["readback_superseded"] = saved_readback(p2["focus"])
+    report["readback"] = saved_readback(p2["focus_next"])
+    report["readback"]["store_unchanged"] = ResearchStore(cold).diagnostics().committed_inventory_sha256 == before
     calls = {"evaluator": 0}
     real = temporal.execute_temporal_discovery
 
@@ -590,7 +613,7 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         self.assertAlmostEqual(result["mean_target"], 0.10, places=9)
         self.assertAlmostEqual(result["baseline"]["mean_target"], (5 * 0.10 + 6 * (0.931 / 0.98 - 1)) / 11, places=9)
         self.assertAlmostEqual(result["matched_feature_means"]["d_holders"], 15.0, places=9)
-        self.assertGreater(result["matched_feature_means"]["elapsed"], 1500.0)
+        self.assertAlmostEqual(result["matched_feature_means"]["elapsed"], 1500.0, places=9)
         self.assertEqual(result["universe_policy"]["n_pass"], 12)
         self.assertEqual(p2["run1_repeat"]["values_loaded"], False)
         self.assertEqual(p2["frozen"]["grounding"], "GROUNDED")
@@ -607,7 +630,9 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         p3 = spawn("P3", work)
         self.assertEqual(p3["original_root_probe"], "BLOCKED")
         self.assertEqual(len(p3["verified_releases"]), 3)
-        self.assertEqual(p3["readback"]["effective_state"], "COMPLETED")
+        self.assertIn("START_BASE", p3["readback_superseded"]["blocking_reason_codes"])
+        self.assertEqual(p3["readback"]["owner_final"], "OPERATION_PAUSED_SEARCH_OPEN")
+        self.assertEqual(p3["readback"]["market_evidence_epoch_sha256"], p2["preflight_2"]["market_evidence_epoch_sha256"])
         self.assertTrue(p3["readback"]["store_unchanged"])
         self.assertEqual(p3["replay"]["evaluator_calls"], 1)
         self.assertTrue(p3["replay"]["equal_to_saved"])

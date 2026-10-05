@@ -1122,6 +1122,26 @@ def import_episode_release(
         manifests / f"{dataset.dataset_manifest_id}.labels.json",
         json.dumps(labels, sort_keys=True, separators=(",", ":")).encode("utf-8"),
     )
+    # Currentness is derived from the lineage pointer, as for the LIVE corpus:
+    # earlier versions lose the administrative flag before lineage moves, so a
+    # torn import is a fail-closed manifest mismatch, never a silent choice.
+    current_labels_path = manifests / f"{dataset.dataset_manifest_id}.labels.json"
+    for previous_path in sorted(manifests.glob("*.labels.json")):
+        if previous_path == current_labels_path:
+            continue
+        try:
+            previous = json.loads(previous_path.read_bytes())
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            continue
+        if (
+            isinstance(previous, dict)
+            and previous.get("logical_dataset_id") == LOGICAL_DATASET_ID
+            and previous.get("is_current_corpus_version") is not False
+        ):
+            previous["is_current_corpus_version"] = False
+            tmp_previous = previous_path.with_name(f"{previous_path.name}.tmp")
+            tmp_previous.write_bytes(json.dumps(previous, sort_keys=True, separators=(",", ":")).encode("utf-8"))
+            tmp_previous.replace(previous_path)
     _publish_bytes(
         manifests / f"{dataset.dataset_manifest_id}.published",
         json.dumps(
