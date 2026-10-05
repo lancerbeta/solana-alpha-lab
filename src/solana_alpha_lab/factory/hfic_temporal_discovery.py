@@ -4004,6 +4004,44 @@ def recipe_capabilities() -> dict[str, Any]:
                             "SUPPORT_IS_NOT_ALPHA", "EXACT_RECIPE_NO_SWEEP"]}
 
 
+def episode_query_capabilities() -> dict[str, Any]:
+    """OPPORTUNITY_EPISODES query 1.1 vocabulary from the same validator owner."""
+
+    from solana_alpha_lab.factory.opportunity_episodes import (
+        SCHEDULE_CONTRACT,
+        V1_DENSE_STEP,
+        V1_DENSE_UNTIL,
+        V1_HORIZON,
+        V1_HOURLY_STEP,
+    )
+
+    return {
+        "schema": TEMPORAL_SCHEMA,
+        "schema_version": TEMPORAL_SCHEMA_VERSION_EPISODES,
+        "population": EPISODE_POPULATION,
+        "anchor_kind": EPISODE_ANCHOR_KIND,
+        "time_contract": {
+            "schedule_contract": SCHEDULE_CONTRACT,
+            "time_feature_clock": EPISODE_TIME_FEATURE_CLOCK,
+        },
+        "points": {
+            "witness": "E0",
+            "dense": f"E{V1_DENSE_STEP}..E{V1_DENSE_UNTIL} step {V1_DENSE_STEP}s",
+            "hourly": f"E{V1_DENSE_UNTIL + V1_HOURLY_STEP}..E{V1_HORIZON} step {V1_HOURLY_STEP}s",
+        },
+        "max_query_points": MAX_SCHEDULE_POINTS,
+        "operators": recipe_capabilities(),
+        "rules": [
+            "FEATURE_POINTS_LE_DECISION",
+            "EXIT_AFTER_WORST_DECISION_CUTOFF",
+            "ELAPSED_AND_UTC_HOUR_FROM_ACTUAL_AVAILABILITY",
+            "BASE_IS_ALL_COMMITTED_ADMISSIONS",
+            "NO_INTERPOLATION_NO_NEAREST_NO_BACKFILL",
+            "VOLUME_TAGS_AUDIT_UNSUPPORTED_NUMERIC",
+        ],
+    }
+
+
 def universe_question_guard(body: Mapping[str, Any], definition: Mapping[str, Any]) -> list[dict[str, Any]]:
     """Prove only direct same-decision-cell dominance. Never edits the recipe."""
     if not isinstance(definition, Mapping):

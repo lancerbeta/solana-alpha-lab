@@ -1900,8 +1900,19 @@ def build_forge_context_packet(
             }
         ]
     else:
+        from solana_alpha_lab.factory.opportunity_episodes import (
+            LOGICAL_DATASET_ID as EPISODE_DATASET_ID,
+            collection_for_focus,
+        )
+
         datasets, ds_trunc = select_forge_packet_datasets(
-            datasets, evidence_surface_mode=evidence_surface_mode
+            datasets,
+            evidence_surface_mode=evidence_surface_mode,
+            protected=(
+                (lambda item: str(item.get("dataset_id") or "") == EPISODE_DATASET_ID)
+                if collection_for_focus(owner_focus)
+                else None
+            ),
         )
     assert_capability_registry_v2_superset(repo_root)
     capabilities = enumerate_accepted_capabilities(repo_root)
@@ -2260,8 +2271,21 @@ def build_forge_context_packet(
         if control_packet_has_raw_sequences(packet):
             raise HficPreflightError("CONTROL_RAW_SEQUENCE_FORBIDDEN")
     else:
-        from solana_alpha_lab.factory.hfic_temporal_discovery import recipe_capabilities
+        from solana_alpha_lab.factory.hfic_temporal_discovery import (
+            episode_query_capabilities,
+            recipe_capabilities,
+        )
+        from solana_alpha_lab.factory.opportunity_episodes import collection_for_focus
+
         packet["temporal_recipe_capabilities"] = recipe_capabilities()
+        if collection_for_focus(owner_focus):
+            from solana_alpha_lab.factory.opportunity_episode_release import (
+                build_population_card,
+            )
+
+            # Generated from the import readback (metadata only, no values).
+            packet["population_card"] = build_population_card(Path(data_root))
+            packet["episode_query_capabilities"] = episode_query_capabilities()
     from solana_alpha_lab.factory.hfic_vision_integrity import (
         FORGE_VISION_INTEGRITY_BLOCKED,
         compact_feature_grounding_entries,

@@ -186,6 +186,7 @@ def _owner_unpack_over_ssh(
     as_of: datetime,
     release_builder_git_sha: str | None,
     plan_only: bool,
+    collection: str | None = None,
 ) -> dict:
     """One owner operation. Capture SSH only freezes; materialization stays local."""
 
@@ -213,7 +214,7 @@ def _owner_unpack_over_ssh(
         remote,
     ]
     deploy = str(host["paths"]["deploy_root"])
-    imported = sorted(imported_cohort_ids(data_root))
+    imported = sorted(imported_cohort_ids(data_root, collection))
     remote_py = f"""
 import json, sys
 from datetime import datetime, timezone
@@ -224,8 +225,9 @@ packet = capture_freeze_export(
     ops_store=__import__("pathlib").Path({deploy!r}) / "local/factory_v1/observation_schedule_state.sqlite",
     imported_cohort_ids=set({imported!r}),
     as_of=datetime.fromisoformat({as_of.isoformat()!r}),
+    collection={collection!r},
 )
-json.dump(packet, sys.stdout)
+json.dump(packet, sys.stdout, default=str)
 """
     proc = subprocess.run(
         ssh
@@ -286,6 +288,94 @@ json.dump(packet, sys.stdout)
         as_of=as_of,
         release_builder_git_sha=release_builder_git_sha,
     )
+
+
+EPISODE_COLLECTION = "OPPORTUNITY_EPISODES"
+EPISODE_MAX_COHORTS = 7
+
+
+def _filesystem_transfer(source_root: Path, mirror_root: Path):
+    """Native transport boundary on one filesystem: copy only missing paths."""
+
+    import shutil
+
+    def _transfer(manifest: dict, missing: list[str]) -> None:
+        del manifest
+        for relative in missing:
+            src = source_root / relative
+            dest = mirror_root / relative
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(src, dest)
+
+    return _transfer
+
+
+def _unpack_episode_cohorts(args: argparse.Namespace, *, data_root: Path, repo_root: Path, as_of: datetime) -> dict:
+    """OPPORTUNITY_EPISODES consume: bounded batch, per-cohort terminals."""
+
+    from solana_alpha_lab.factory.live_cohort_vanilla_path import run_owner_live_cohort
+
+    max_cohorts = 1 if args.max_cohorts is None else int(args.max_cohorts)
+    if not 1 <= max_cohorts <= EPISODE_MAX_COHORTS:
+        raise LiveCohortReleaseError("MAX_COHORTS_OUT_OF_RANGE")
+    results: list[dict] = []
+    packets = list(args.capture_packet or [])
+    if packets:
+        if args.source_rdp is None or args.mirror_rdp is None:
+            raise LiveCohortReleaseError("COHORT_RESOLUTION_MISSING")
+        source_root = _path(args.source_rdp)
+        mirror_root = _path(args.mirror_rdp)
+        mirror_root.mkdir(parents=True, exist_ok=True)
+        for packet_path in packets[:max_cohorts]:
+            packet = json.loads(_path(packet_path).read_text(encoding="utf-8"))
+            if packet.get("collection") != EPISODE_COLLECTION:
+                raise LiveCohortReleaseError("COLLECTION_PACKET_MISMATCH")
+            try:
+                result = run_owner_live_cohort(
+                    capture=lambda packet=packet: packet,
+                    transfer=_filesystem_transfer(source_root, mirror_root),
+                    mirror_root=mirror_root,
+                    data_root=data_root,
+                    repo_root=repo_root,
+                    as_of=as_of,
+                    release_builder_git_sha=args.release_builder_git_sha,
+                )
+            except LiveCohortReleaseError as exc:
+                results.append({"cohort_id": packet.get("cohort_id"), "terminal": "FAIL", "code": str(exc)})
+                break
+            results.append(result)
+    else:
+        for _index in range(max_cohorts):
+            try:
+                result = _owner_unpack_over_ssh(
+                    data_root=data_root,
+                    repo_root=repo_root,
+                    as_of=as_of,
+                    release_builder_git_sha=args.release_builder_git_sha,
+                    plan_only=bool(args.plan_only),
+                    collection=EPISODE_COLLECTION,
+                )
+            except LiveCohortReleaseError as exc:
+                if str(exc) != "NO_MATURE_UNIMPORTED_COHORT" or not results:
+                    results.append({"terminal": "FAIL", "code": str(exc)})
+                break
+            results.append(result)
+            if args.plan_only:
+                break
+    imported = [item for item in results if item.get("import_status") in {"IMPORTED", "PASS_ALREADY_PRESENT_EXACT"}]
+    failed = [item for item in results if item.get("terminal") == "FAIL"]
+    return {
+        "collection": EPISODE_COLLECTION,
+        "terminal": "EPISODE_BATCH_PARTIAL" if failed else "EPISODE_BATCH_COMPLETE",
+        "cohorts": results,
+        "imported_n": len(imported),
+        "next": (
+            "STOP_INSPECT_FAIL_CODE"
+            if failed
+            else "ORDINARY_FORGE_PREFLIGHT_COLLECTION_OPPORTUNITY_EPISODES"
+        ),
+        "forge_run_started": False,
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -418,6 +508,35 @@ def main(argv: list[str] | None = None) -> int:
     unpack.add_argument("--release-builder-git-sha", default=None)
     unpack.add_argument("--manifest-out", type=Path, default=None)
     unpack.add_argument("--plan-only", action="store_true")
+    unpack.add_argument(
+        "--collection",
+        choices=("LIVE_LIFECYCLE", EPISODE_COLLECTION),
+        default=None,
+        help="Default keeps the legacy LIVE_LIFECYCLE path",
+    )
+    unpack.add_argument(
+        "--max-cohorts",
+        type=int,
+        default=None,
+        help="OPPORTUNITY_EPISODES bounded batch 1..7 (default 1)",
+    )
+    unpack.add_argument(
+        "--capture-packet",
+        type=Path,
+        action="append",
+        default=None,
+        help="Capture-host packet JSON (episode collection, filesystem transport)",
+    )
+
+    capture_export = sub.add_parser(
+        "capture-freeze-export",
+        help="Capture host: freeze one mature cohort and list its bounded files. No build.",
+    )
+    capture_export.add_argument("--collection", choices=(EPISODE_COLLECTION,), required=True)
+    capture_export.add_argument("--observation-rdp", type=Path, required=True)
+    capture_export.add_argument("--ops-store", type=Path, required=True)
+    capture_export.add_argument("--imported-cohort-id", action="append", default=None)
+    capture_export.add_argument("--as-of", type=str, default=None)
 
     forge_ready = sub.add_parser(
         "forge-control-ready",
@@ -547,7 +666,28 @@ def main(argv: list[str] | None = None) -> int:
             )
             _print_import_success(result, data_root)
             return 0
+        elif args.command == "capture-freeze-export":
+            from solana_alpha_lab.factory.live_cohort_vanilla_path import capture_freeze_export
+
+            result = capture_freeze_export(
+                observation_rdp=_path(args.observation_rdp),
+                ops_store=_path(args.ops_store),
+                imported_cohort_ids=set(args.imported_cohort_id or []),
+                as_of=_parse_utc(args.as_of) or datetime.now().astimezone(),
+                collection=args.collection,
+            )
+        elif args.command == "unpack-next-live-cohort" and args.collection == EPISODE_COLLECTION:
+            result = _unpack_episode_cohorts(
+                args,
+                data_root=_resolved_data_root(args.data_root),
+                repo_root=ROOT if args.repo_root is None else _path(args.repo_root),
+                as_of=_parse_utc(args.as_of) or datetime.now().astimezone(),
+            )
+            print(json.dumps({"status": "PASS" if result["terminal"] == "EPISODE_BATCH_COMPLETE" else "FAIL", "result": result}, sort_keys=True, default=str))
+            return 0 if result["terminal"] == "EPISODE_BATCH_COMPLETE" else 2
         elif args.command == "unpack-next-live-cohort":
+            if args.max_cohorts not in (None, 1) or args.capture_packet:
+                raise LiveCohortReleaseError("COLLECTION_OPTION_REQUIRES_OPPORTUNITY_EPISODES")
             data_root = _resolved_data_root(args.data_root)
             repo_root = ROOT if args.repo_root is None else _path(args.repo_root)
             as_of = _parse_utc(args.as_of) or datetime.now().astimezone()

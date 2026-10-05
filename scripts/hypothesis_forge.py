@@ -3568,6 +3568,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     preflight = subparsers.add_parser("preflight")
     preflight.add_argument("--owner-focus", default="AUTO")
+    preflight.add_argument(
+        "--collection",
+        choices=("LIVE_LIFECYCLE", "OPPORTUNITY_EPISODES"),
+        default=None,
+        help="Evidence collection; OPPORTUNITY_EPISODES scopes the focus to that corpus",
+    )
     preflight.add_argument("--format", choices=("json",), default="json")
     preflight.add_argument("--no-auto-commission", action="store_true")
     preflight.add_argument(
@@ -3599,6 +3605,9 @@ def build_parser() -> argparse.ArgumentParser:
     forge_input.add_argument("--format", choices=("json",), default="json")
     forge_input.add_argument("--owner-focus", default="AUTO")
     forge_input.add_argument(
+        "--collection", choices=("LIVE_LIFECYCLE", "OPPORTUNITY_EPISODES"), default=None
+    )
+    forge_input.add_argument(
         "--no-write",
         action="store_true",
         default=True,
@@ -3611,6 +3620,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     forge_run.add_argument("--format", choices=("json",), default="json")
     forge_run.add_argument("--owner-focus", default="AUTO")
+    forge_run.add_argument(
+        "--collection", choices=("LIVE_LIFECYCLE", "OPPORTUNITY_EPISODES"), default=None
+    )
     forge_run.add_argument(
         "--no-write",
         action="store_true",
@@ -4070,11 +4082,26 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _collection_focus(args: argparse.Namespace) -> None:
+    """Scope the owner focus to the requested collection (same stored focus)."""
+
+    collection = getattr(args, "collection", None)
+    if collection != "OPPORTUNITY_EPISODES":
+        return
+    if bool(getattr(args, "control_current_representation", False)):
+        raise HficCliError("CONTROL_COLLECTION_UNSUPPORTED")
+    from solana_alpha_lab.factory.opportunity_episodes import episode_focus
+
+    args.owner_focus = episode_focus(str(getattr(args, "owner_focus", "AUTO") or "AUTO"))
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     repo_root = args.root.resolve()
     try:
+        if args.command in {"preflight", "forge-input", "forge-run"}:
+            _collection_focus(args)
         if args.command == "preflight":
             return cmd_preflight(
                 repo_root,
