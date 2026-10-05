@@ -1202,7 +1202,20 @@ def _last_decision_point(points: Sequence[str]) -> str:
     latest point in the spec, so an earlier label is a different question.
     """
 
-    return max((str(point) for point in points), key=_point_offset)
+    return max((str(point) for point in points), key=_scope_point_offset)
+
+
+def _scope_point_offset(point_id: object) -> int:
+    """Ordering for candidate scope labels only; the evaluators keep their own allowlists."""
+
+    if isinstance(point_id, str) and point_id.startswith("E"):
+        from solana_alpha_lab.factory.opportunity_episodes import OpportunityEpisodeError, point_offset
+
+        try:
+            return point_offset(point_id)
+        except OpportunityEpisodeError as exc:
+            raise GroundedDiscoveryError("POINT_NOT_IN_ALLOWLIST") from exc
+    return _point_offset(point_id)
 
 
 def measured_target_label(spec: Mapping[str, Any]) -> str:
