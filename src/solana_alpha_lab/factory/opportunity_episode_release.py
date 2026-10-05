@@ -1034,7 +1034,10 @@ def import_episode_release(
     if intent_path.is_file():
         intent = json.loads(intent_path.read_bytes())
         _require(
-            intent.get("release_id") == release_id and intent.get("cohort_id") == cohort_id,
+            isinstance(intent, dict)
+            and intent.get("release_id") == release_id
+            and intent.get("cohort_id") == cohort_id
+            and isinstance(intent.get("imported_at"), str),
             "CANONICAL_TARGET_CONFLICT",
         )
         imported_at = parse_utc(str(intent["imported_at"]))

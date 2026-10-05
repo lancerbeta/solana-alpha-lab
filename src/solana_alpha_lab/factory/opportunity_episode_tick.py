@@ -914,11 +914,6 @@ class _EpisodeTick:
         witness_stale: list[str] = []
         for winner in selection["winners"]:
             t0 = self.provider_ctx.now()
-            # The published E0 dependency is the admitted object only.
-            winner["candidate"] = {
-                **winner["candidate"],
-                "selected_raw_body_rel": _store_witness_extract(self.data_root, winner["candidate"]),
-            }
             record = admission_record(
                 document=self.schedule,
                 activation_id=self.activation_id,
@@ -935,6 +930,12 @@ class _EpisodeTick:
             if not witness_age_ok(record, self.binding):
                 witness_stale.append(str(winner["mint"]))
                 continue
+            # The published E0 dependency is the admitted object only.
+            winner["candidate"] = {
+                **winner["candidate"],
+                "selected_raw_body_rel": _store_witness_extract(self.data_root, winner["candidate"]),
+            }
+            record = {**record, "witness_raw_body_rel": winner["candidate"]["selected_raw_body_rel"]}
             self._commit_admission(record, winner["candidate"], t0)
             admitted.append(str(record["episode_id"]))
         summary = {

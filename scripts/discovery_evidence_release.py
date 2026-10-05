@@ -61,16 +61,6 @@ from solana_alpha_lab.factory.data_root import DataRootError, resolve_data_root
 
 FAIL_OWNER_NEXT = {
     "NOT_MATURE": "WAIT_UNTIL_COHORT_MATURE",
-    "NO_MATURE_UNIMPORTED_COHORT": "WAIT_UNTIL_COHORT_MATURE",
-    "MAX_COHORTS_OUT_OF_RANGE": "RERUN_WITH_MAX_COHORTS_1_TO_7",
-    "COLLECTION_PACKET_MISMATCH": "STOP_USE_OPPORTUNITY_EPISODES_CAPTURE_PACKET",
-    "COLLECTION_OPTION_REQUIRES_OPPORTUNITY_EPISODES": "RERUN_WITH_COLLECTION_OPPORTUNITY_EPISODES",
-    "CAPTURE_PACKET_REQUIRES_SOURCE_AND_MIRROR_RDP": "RERUN_WITH_SOURCE_RDP_AND_MIRROR_RDP",
-    "MIRROR_INCOMPLETE": "RERUN_SAME_COMMAND",
-    "MIRROR_CONFLICT": "STOP_DO_NOT_IMPORT",
-    "CLOSURE_COHORT_MISMATCH": "STOP_DO_NOT_IMPORT",
-    "RELEASE_HASH_MISMATCH": "STOP_DO_NOT_IMPORT",
-    "MARKET_EVIDENCE_BASIS_INCOMPLETE": "RERUN_SAME_COMMAND",
     "COHORT_DUE_OPEN": "WAIT_UNTIL_COHORT_DUES_CLOSED",
     "PUBLICATION_OPEN": "WAIT_UNTIL_PUBLICATION_JOBS_CLOSED",
     "IDENTITY_CONFLICT": "STOP_DO_NOT_RESEAL",
@@ -302,6 +292,23 @@ json.dump(packet, sys.stdout, default=str)
 
 EPISODE_COLLECTION = "OPPORTUNITY_EPISODES"
 EPISODE_MAX_COHORTS = 7
+# Episode batch next actions; the legacy FAIL_OWNER_NEXT map stays unchanged.
+EPISODE_FAIL_NEXT = {
+    "NO_MATURE_UNIMPORTED_COHORT": "WAIT_UNTIL_COHORT_MATURE",
+    "MAX_COHORTS_OUT_OF_RANGE": "RERUN_WITH_MAX_COHORTS_1_TO_7",
+    "COLLECTION_PACKET_MISMATCH": "STOP_USE_OPPORTUNITY_EPISODES_CAPTURE_PACKET",
+    "CAPTURE_PACKET_REQUIRES_SOURCE_AND_MIRROR_RDP": "RERUN_WITH_SOURCE_RDP_AND_MIRROR_RDP",
+    "MIRROR_INCOMPLETE": "RERUN_UNPACK_SAME_COMMAND",
+    "MIRROR_CONFLICT": "STOP_DO_NOT_IMPORT",
+    "CLOSURE_COHORT_MISMATCH": "STOP_DO_NOT_IMPORT",
+    "RELEASE_HASH_MISMATCH": "STOP_DO_NOT_IMPORT",
+    "CANONICAL_TARGET_CONFLICT": "STOP_DO_NOT_OVERWRITE_CANONICAL_TARGET",
+}
+
+
+def _episode_next(code: str) -> str:
+    base = code.split(":")[0]
+    return EPISODE_FAIL_NEXT.get(base) or FAIL_OWNER_NEXT.get(base, "STOP_INSPECT_FAIL_CODE")
 
 
 def _filesystem_transfer(source_root: Path, mirror_root: Path):
@@ -350,10 +357,10 @@ def _unpack_episode_cohorts(args: argparse.Namespace, *, data_root: Path, repo_r
                     as_of=as_of,
                     release_builder_git_sha=args.release_builder_git_sha,
                 )
-            except LiveCohortReleaseError as exc:
+            except (LiveCohortReleaseError, DiscoveryReleaseError) as exc:
                 code = str(exc)
                 results.append({"cohort_id": packet.get("cohort_id"), "terminal": "FAIL", "code": code,
-                                "next": FAIL_OWNER_NEXT.get(code.split(":")[0], "STOP_INSPECT_FAIL_CODE")})
+                                "next": _episode_next(code)})
                 break
             results.append(result)
     else:
@@ -367,13 +374,12 @@ def _unpack_episode_cohorts(args: argparse.Namespace, *, data_root: Path, repo_r
                     plan_only=bool(args.plan_only),
                     collection=EPISODE_COLLECTION,
                 )
-            except LiveCohortReleaseError as exc:
+            except (LiveCohortReleaseError, DiscoveryReleaseError) as exc:
                 code = str(exc)
                 if code == "NO_MATURE_UNIMPORTED_COHORT":
                     # Nothing mature yet is the ordinary daily state, not a failure.
                     break
-                results.append({"terminal": "FAIL", "code": code,
-                                "next": FAIL_OWNER_NEXT.get(code.split(":")[0], "STOP_INSPECT_FAIL_CODE")})
+                results.append({"terminal": "FAIL", "code": code, "next": _episode_next(code)})
                 break
             results.append(result)
             if args.plan_only:

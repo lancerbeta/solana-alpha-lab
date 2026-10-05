@@ -1419,6 +1419,36 @@ def _select_event_time_exit(
     return selected, None
 
 
+def require_episode_binding_rows(binding: Sequence[Mapping[str, Any]]) -> Sequence[Mapping[str, Any]]:
+    """Evaluator and replay apply the same binding clock check as the operation gate."""
+
+    require_episode_clock_uniform(binding)
+    return binding
+
+
+def require_episode_clock_uniform(binding: Sequence[Mapping[str, Any]]) -> None:
+    """Episode binding: every cohort bound, and one question never mixes clock semantics."""
+
+    from solana_alpha_lab.factory.opportunity_episodes import OpportunityEpisodeError, require_binding
+
+    clocks: set[tuple] = set()
+    for item in binding:
+        if item.get("population") != EPISODE_POPULATION:
+            raise GroundedDiscoveryError("POPULATION_BINDING_MISMATCH")
+        try:
+            bound = require_binding(item.get("schedule_binding"))
+        except OpportunityEpisodeError as exc:
+            raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND") from exc
+        clocks.add(
+            tuple(
+                bound.get(key)
+                for key in ("dispatch_window_seconds", "availability_grace_seconds", "witness_max_age_seconds")
+            )
+        )
+    if len(clocks) > 1:
+        raise GroundedDiscoveryError("SCHEDULE_CLOCK_MIXED")
+
+
 def _require_bound_schedule(binding: Sequence[Mapping[str, Any]], body: Mapping[str, Any], lateness: int | None) -> None:
     """Preview and evaluation share the verified point clocks. A missing field does not skip the check."""
 
@@ -1429,23 +1459,7 @@ def _require_bound_schedule(binding: Sequence[Mapping[str, Any]], body: Mapping[
             require_binding,
         )
 
-        clocks: set[tuple] = set()
-        for item in binding:
-            if item.get("population") != EPISODE_POPULATION:
-                raise GroundedDiscoveryError("POPULATION_BINDING_MISMATCH")
-            try:
-                bound = require_binding(item.get("schedule_binding"))
-            except OpportunityEpisodeError as exc:
-                raise GroundedDiscoveryError("SCHEDULE_CONTEXT_UNBOUND") from exc
-            clocks.add(
-                tuple(
-                    bound.get(key)
-                    for key in ("dispatch_window_seconds", "availability_grace_seconds", "witness_max_age_seconds")
-                )
-            )
-        # One question never mixes clock semantics across cohorts.
-        if len(clocks) > 1:
-            raise GroundedDiscoveryError("SCHEDULE_CLOCK_MIXED")
+        require_episode_clock_uniform(binding)
         return
     for item in binding:
         for point in _query_points(body):
@@ -3315,6 +3329,8 @@ def _project_episode_members(
                 "target": target_value,
                 "target_is_observed": target_observed,
                 "target_exclusion": publish_target_exclusion,
+                # Raw reason for every decision-eligible member (attrition tally only).
+                "target_missing_reason": None if target_observed else target_exclusion,
                 "source_price_event_time": selected_source_event,
                 "block": block,
                 "exclusion": exclusion,
@@ -3360,7 +3376,7 @@ def execute_temporal_discovery(
             duplicate_count,
             integrity_conflicts,
             episode_mints,
-        ) = _project_episode_members(census, observations, body, binding, universe_policy=universe_policy)
+        ) = _project_episode_members(census, observations, body, require_episode_binding_rows(binding), universe_policy=universe_policy)
     else:
         lateness = int(body["schedule_lateness_seconds"])
         _require_bound_schedule(binding, body, lateness)
@@ -3633,7 +3649,7 @@ def execute_temporal_discovery(
             reasons: dict[str, int] = defaultdict(int)
             for item in group:
                 if not item.get("target_is_observed"):
-                    reasons[str(item.get("target_exclusion") or "TARGET_MISSING_UNSPECIFIED")] += 1
+                    reasons[str(item.get("target_missing_reason") or "TARGET_MISSING_UNSPECIFIED")] += 1
             return dict(sorted(reasons.items()))
 
         # Effect means use target-available episodes only. A vanished mint at
