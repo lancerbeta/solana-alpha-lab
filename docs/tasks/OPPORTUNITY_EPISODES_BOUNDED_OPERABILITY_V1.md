@@ -1,6 +1,6 @@
 ---
 task_id: OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1
-task_version: '1.1'
+task_version: '1.2'
 status: IN_PROGRESS
 as_of: '2026-10-06'
 owner: GOAL_OWNER
@@ -80,7 +80,10 @@ context_requirements:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: [docs/contracts/opportunity_episodes_jupiter_v1.md]
-    DELIVERY_EVIDENCE: [docs/evidence/opportunity_episodes_bounded_operability_v1/a1_delivery_completion_evidence_v1.json]
+    DELIVERY_EVIDENCE:
+    - docs/evidence/opportunity_episodes_bounded_operability_v1/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/opportunity_episodes_bounded_operability_v1/a1_delivery_independent_review_v1.json
+    - docs/evidence/opportunity_episodes_bounded_operability_v1/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
