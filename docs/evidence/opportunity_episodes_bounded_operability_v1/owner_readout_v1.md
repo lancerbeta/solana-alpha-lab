@@ -13,6 +13,8 @@ P1-A: isolated-copy preparation supported; filesystem-bound lookup не пере
 на production. Explicit --production-commissioning готовит canonical root in place
 после отдельного OPERATE, verified backup, measured copy rehearsal и quiesced
 writers/timer. CLI требует attestation refs и exact existing producer OPS store.
+OPERATE-ref validation проверяет формат и допускает literal UNKNOWN; approved
+authority и receipts подтверждает оператор отдельно. Structural PASS не выдаёт OPERATE.
 OPS write transaction и ResearchStore lease держат оба fences весь audit, включая
 фазу за TTL. CLI не выдаёт authority и не проверяет backup самостоятельно.
 Deploy/tick/startup не готовят lookup. Ordinary writer использует prepared lookup;

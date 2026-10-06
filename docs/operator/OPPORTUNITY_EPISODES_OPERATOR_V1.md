@@ -185,7 +185,10 @@ per-slot bound. UNKNOWN topology блокирует commissioning до ACTIVE. �
 Дополнительные поля запрещены. Device/inode — целые >= 0, byte limits — целые
 от 1 до 2^63−1, не bool. Четыре proof hashes и envelope hash — 64 lowercase hex;
 schedule SHA и activation ID должны точно совпадать с выбранным schedule/activation.
-OPERATE ref соответствует `[A-Za-z0-9_.-]{1,128}` и указывает на отдельное разрешение.
+Формат OPERATE ref проверяется по `[A-Za-z0-9_.-]{1,128}`. Эта проверка допускает
+literal `UNKNOWN`; она не устанавливает, что ссылка указывает на approved authority.
+В lookup preparation и storage envelope оператор заменяет такой placeholder реальной
+проверенной ссылкой на отдельное OPERATE. Structural PASS не подтверждает разрешение.
 Self-hash — `canonical_sha256` всего объекта без `envelope_sha256`, с теми же правилами
 canonical JSON, что у schedule owner. Эти проверки не верифицируют содержимое receipts
 и не выдают authority: оператор сначала проверяет их и утверждает byte limits.
