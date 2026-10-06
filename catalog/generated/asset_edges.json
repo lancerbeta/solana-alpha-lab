@@ -1188,6 +1188,11 @@
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009"
     },
     {
+      "source_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011",
+      "relation": "derived_from",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
+    },
+    {
       "source_asset_id": "CONFIG-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
@@ -12503,6 +12508,11 @@
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
     },
     {
+      "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011"
+    },
+    {
       "source_asset_id": "MODULE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
@@ -15041,6 +15051,11 @@
       "source_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
+    },
+    {
+      "source_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011"
     },
     {
       "source_asset_id": "SCHEMA-RESEARCH-EVENT-ENVELOPE-V1-001",
@@ -18291,6 +18306,11 @@
       "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
+    },
+    {
+      "source_asset_id": "TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011"
     },
     {
       "source_asset_id": "TEST-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",

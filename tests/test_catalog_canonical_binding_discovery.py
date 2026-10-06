@@ -519,7 +519,7 @@ class LiveCatalogDiscoveryTests(unittest.TestCase):
         )
         self.assertEqual(
             self.bindings["ACTIVE-PROVIDER-ROUTE-CAPABILITY-REGISTRY"]["target_asset_id"],
-            "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010",
+            "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011",
         )
         self.assertIn("ACTIVE-MARKET-DATA-AWARENESS", self.bindings)
         self.assertEqual(

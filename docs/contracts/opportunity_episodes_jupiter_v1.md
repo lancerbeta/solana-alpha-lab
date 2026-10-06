@@ -186,9 +186,11 @@ arithmetic. Saved readback loads zero values; registered replay recomputes.
 
 No live activation, provider calls, Birdeye, volume numeric features, backfill,
 new evaluator/importer/DB/service, trading or lowered scientific floors. The
-category 5m routes are a `PROVIDER_ROUTE_REGISTRY_GAP` in
-`CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010` until OPERATE commissioning
-records real evidence; the episode authority profile does not grant activation.
+category 5m routes were a `PROVIDER_ROUTE_REGISTRY_GAP` in
+`CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010`; registry 011 now records their
+parser/route qualification (not shared-account pace discipline, not the
+batch-of-100, memecoin-mix or absent/missing-mint search shapes). The episode authority profile does not grant
+activation.
 
 ## 9. Accepted limits and open owner decisions
 

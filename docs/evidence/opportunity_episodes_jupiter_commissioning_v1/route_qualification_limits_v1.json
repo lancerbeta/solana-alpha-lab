@@ -1,0 +1,22 @@
+{
+  "account_pace_discipline": "UNPROVEN_FAILED_OVERLAP_WITH_LEGACY",
+  "account_pace_discipline_note": "Calls shared the account key with the running legacy collector and no common pace; the first legacy request after an episode call followed in 1 s against an accepted pause of 3 s. The receipt itself is not corrected and is not repeated for a cleaner history.",
+  "account_pace_discipline_source": "EXECUTOR_REPORT_NOT_REVERIFIED_BY_RECEIPT",
+  "applies_to_receipt_sha256": "880b2ce75e383444733753e36f1015ad7395d6fabaeefe7f710a07430d13c381",
+  "as_of": "2026-10-06",
+  "authority_granted": false,
+  "contains_secrets": false,
+  "kind": "JUPITER_ROUTE_QUALIFICATION_LIMITS_V1",
+  "parser_route_qualification": "PASS",
+  "parser_route_qualification_scope": "four sequential HTTP 200 responses parsed by the episode nomination/search parser; 3 category 5m routes with 100 typed rows each, one single-object SEARCH",
+  "provider_calls_authorized_by_this_record": 0,
+  "runtime_client_and_preflight": "NOT_RECORDED_IN_RECEIPT",
+  "search_shape_coverage": "SINGLE_OBJECT_USDC_PUBLIC_MINT_ONLY",
+  "search_shape_not_covered": [
+    "batch of 100 mints",
+    "memecoin mix",
+    "absent or missing mint mix"
+  ],
+  "search_shape_receipt_shows": "one row and a request hash only; the mint and request shape are not in the receipt",
+  "search_shape_source": "EXECUTOR_REPORT_NOT_SHOWN_BY_RECEIPT"
+}

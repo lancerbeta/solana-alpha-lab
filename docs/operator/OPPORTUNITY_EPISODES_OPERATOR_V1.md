@@ -2,8 +2,19 @@
 
 Contract: `docs/contracts/opportunity_episodes_jupiter_v1.md`.
 Live lane: **DISABLED**. Nothing below activates collection; that is a separate
-OPERATE commissioning decision (route registry evidence for the category 5m
-routes, real protection assignment inventory, host envelope, canary budget).
+OPERATE commissioning decision (real protection assignment inventory pinned in
+the schedule, host envelope, canary budget). Program and phase order:
+`docs/design/SMIAL_JUPITER_OPERATING_BLUEPRINT_RUNBOOK_V1.md`; it grants no
+authority for any later phase. Canary, deploy, provider calls, retention and
+cleanup authority stay separate OPERATE decisions.
+
+Route evidence: `CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011` records the
+parser/route qualification of the three category 5m routes and the single-object
+search. It does not prove shared-account pace discipline, the batch-of-100
+search shape, a memecoin mix or the absent/missing-mint path, and it grants no
+call. Every observed route carries the pace overlap as a `known_failures` entry. The V1 validator and schema cap the
+admission ceiling at 100 per UTC day; a higher ceiling is a future capacity
+extension, not a supported profile.
 
 ## What it is
 
@@ -105,8 +116,9 @@ values; registered replay recomputes from the frozen recipe and release files.
 ## Not here
 
 No provider smoke, deploy, live activation, real science, retention/eviction or
-volume features. Category 5m routes are a `PROVIDER_ROUTE_REGISTRY_GAP` until
-commissioning records evidence.
+volume features. The category 5m routes carry parser qualification only in
+registry 011; account pace discipline stays `UNPROVEN_FAILED_OVERLAP_WITH_LEGACY`
+until a later exclusive-lane observation.
 # Bounded operability commissioning
 
 Для нового campaign сначала нужен отдельный OPERATE gate. Локальный PR не
@@ -138,12 +150,54 @@ OPS write-lock действует весь audit, включая фазу дли
 Это cap, yield неизвестен. Calendar window, SHA, authority expiry на весь drain,
 approved account allocation, Factory/disk/drain reserve и assignments фиксируют
 непосредственно перед commissioning. Normal population/caps не снижаются для
-получения PASS. Existing legacy intake сначала штатно завершается либо отдельно
+получения PASS. Canary DoD включает реальные первые SEARCH batches: bulk, absent и
+missing-mint путь, которых single-object USDC probe не доказывает; без них
+search-путь остаётся `UNPROVEN`, а pace дисциплина проверяется на эксклюзивной lane. Existing legacy intake сначала штатно завершается либо отдельно
 останавливается с разрешением владельца; старые obligations и datasets остаются.
-Перед canary дождаться полного legacy COMPLETE: default tick при нескольких
-ACTIVE/DRAINING scopes требует exact selection, поэтому одно только закрытие
-старого intake не доказывает пригодность обычного runtime entry. Не создавать
-параллельный постоянный collector для обхода этой границы.
+Перед canary нужны две вещи, а не COMPLETE всей истории: (1) эксклюзивная
+provider/workload lane — legacy collector и его same-envelope renewal не
+запускаются, а exact legacy activation исполнено поставлена на `PAUSED_OPERATOR`
+(или завершена; `DRAINING` legacy-scope пока не пауза и не завершение, его сначала
+доводят до `COMPLETE`); (2) подтверждённая quiescence, не один случайный
+`lease free`: exact schedule SHA и activation ID из `mode=ro` readback,
+`factory-observation-schedule.timer` и `factory-same-envelope-renewal.timer`
+отключены штатным systemd и не активны, ни один observation/renewal worker не
+работает, а повторный readback не раньше чем через три collector tick (минимум 3 мин) показывает
+`PAUSED_OPERATOR`, неизменные counters и ни одного нового admission, call или
+publication этой activation.
+Эксклюзивность относится к аккаунтному ключу, а не к одной activation: до включения lane
+не существует другого `ACTIVE`/`DRAINING` scope, ни один другой процесс, timer, quote-capture
+campaign или ручной probe не использует Jupiter-ключ в течение canary, а legacy не
+возобновляется, пока lane включена. Pace дисциплина считается доказанной только по
+request-логам всех caller'ов этого ключа: зазор между любыми двумя запросами не меньше
+принятой паузы (3 s); без логов callers вне хоста (ПК, скрипты, usage-вид провайдера)
+или до этого `account_pace_discipline` остаётся `UNPROVEN`, даже если все host-проверки пройдены.
+Поле `operation: FREE_API_KEY_BULK_TOKEN_SEARCH` — ярлык v10, а не область наблюдения.
+Исторические `PAUSED_OPERATOR`/`ABORTED` строки не требуют COMPLETE, repair или
+resume и не входят в новую научную популяцию. Default tick при нескольких
+ACTIVE/DRAINING scopes требует exact selection, поэтому остановленный legacy
+обязан быть `PAUSED_OPERATOR` или `COMPLETE` до включения новой lane. Не создавать параллельный
+постоянный collector для обхода этой границы.
+
+Осознанная остановка legacy оставляет recorded gaps: ещё не снятые obligations
+остаются `PENDING` без backfill и не выдаются за COMPLETE или за scientific
+SUCCESS. Потерянные слоты не восстанавливаются через resume: пауза обратима как
+control, потеря будущих observations — нет.
+
+Bootstrap protection для canary и первого обычного batch (до отдельного решения
+владельца) — `EXPLORATORY_REUSE`: новый holdout ими не объявляется, существующие protected
+assignments других гипотез не отменяются. Исполнитель сначала читает metadata
+канонических owners (ResearchStore и split/assignment records, Git registries и
+experiment specs, dataset labels, `protection/assignments` в producer root) без
+outcomes и protected values. Найденные scopes входят в один frozen document;
+доказанно пустой inventory допустим с перечнем проверенных owners и границей
+completeness; неразрешимая полнота возвращает один `PROTECTION_SCOPE_UNRESOLVED`
+с точным missing owner и держит широкую exploratory exposure и activation закрытыми.
+Нечитаемый owner — не пустой owner: список проверяемых owners берётся из Git/Catalog, а не
+выбирается исполнителем. Экспозиция прежних probes фиксируется; при существенности holdout
+уже не untouched, а `EXPLORATORY_REUSE` cohorts не объявляются задним числом holdout или
+confirmatory. Владелец не вспоминает mint-адреса вручную. Новая версия
+документа не перезаписывает прежний pin.
 
 Protection sources создаются только как metadata projection полного известного
 canonical assignment inventory: owner/scope/role/identity, source fingerprint,
