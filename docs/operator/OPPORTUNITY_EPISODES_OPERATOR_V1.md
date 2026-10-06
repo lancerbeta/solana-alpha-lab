@@ -89,7 +89,7 @@ values; registered replay recomputes from the frozen recipe and release files.
 | Code | Meaning | Next |
 | --- | --- | --- |
 | `EPISODE_BATCH_NOTHING_MATURE` (PASS) | no mature unimported cohort yet | wait for the next UTC day |
-| `ROUND_STARTED_UNRESOLVED`, `ROUND_PARTIAL_ADMISSION`, `ROUND_RECOVERY_REFUSED` in the blocking reasons of `EPISODE_BATCH_NOTHING_MATURE` | a nomination round crashed: still unreconciled, partially admitted, or its durable evidence is invalid | run an ordinary tick (it reconciles); a partial or refused round stays blocked: do not capture, report the `reason_code` from `episode_rounds` |
+| `ROUND_STARTED_UNRESOLVED`, `ROUND_PARTIAL_ADMISSION`, `ROUND_RECOVERY_REFUSED`, `ROUND_FRAME_CORRUPT`, `ROUND_ROW_MISSING` in the blocking reasons of `EPISODE_BATCH_NOTHING_MATURE` | a nomination round crashed: still unreconciled, partially admitted, or its durable evidence is invalid, unreadable or missing | while the activation is active an ordinary tick reconciles an unresolved round (a paused/aborted/completed activation does not); a partial, refused, corrupt or missing round stays blocked: do not capture, report the `reason_code` from `episode_rounds` |
 | `MIRROR_INCOMPLETE` | transfer interrupted | rerun the same command |
 | `MARKET_EVIDENCE_BASIS_INCOMPLETE` at preflight | an import was interrupted after labels, before lineage | rerun the same unpack command (not preflight); it reuses the recorded import instant |
 | `RELEASE_HASH_MISMATCH`, `MIRROR_CONFLICT`, `CLOSURE_COHORT_MISMATCH` | bytes differ from the sealed or captured identity | stop; do not import |

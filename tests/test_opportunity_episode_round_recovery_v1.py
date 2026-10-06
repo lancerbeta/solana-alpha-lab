@@ -136,6 +136,8 @@ class RoundPlanBeforeAdmissionTests(RoundRecoveryCase):
         frame = row["frame"]
         self.assertEqual(len(frame["selection"]["admitted_episode_ids"]), 2)
         self.assertEqual(frame["selection"]["committed_in_round_before"], 0)
+        self.assertEqual(frame["selection"]["dropped_planned"], [])
+        self.assertEqual(frame["selection"]["committed_episode_ids"], frame["selection"]["admitted_episode_ids"])
         self.assertFalse(frame["recovery"]["resumed"])
         self.assertEqual(frame["recovery"]["planned_episode_ids"], frame["selection"]["admitted_episode_ids"])
         self.assertNotIn("recovery_plan", frame)
@@ -159,9 +161,53 @@ class RestartInsideSlackTests(RoundRecoveryCase):
         self.assertEqual(row["frame"]["recovery"]["plan_sha256"], plan["plan_sha256"])
         self.assertTrue(row["frame"]["recovery"]["resumed"])
         self.assertEqual(row["frame"]["selection"]["committed_in_round_before"], 1)
-        self.assertEqual(len(row["frame"]["selection"]["admitted_episode_ids"]), 1)
+        self.assertEqual(len(row["frame"]["selection"]["admitted_episode_ids"]), 1)  # this run's commits
+        self.assertEqual(
+            row["frame"]["selection"]["committed_episode_ids"], [item["episode_id"] for item in plan["winners"]]
+        )
+        self.assertEqual(row["frame"]["selection"]["dropped_planned"], [])
         self.drain_slots(sc)
         self.assertTrue(self.cohort_status(sc)["mature"])
+
+    def test_resume_from_a_durable_plan_with_no_committed_admission_completes_it(self) -> None:
+        sc = self.scenario()
+        sc.tick(R + timedelta(seconds=5), fault="EPISODE_BEFORE_ADMISSION_COMMIT")
+        plan = self.round_row(sc)["frame"]["recovery_plan"]
+        resumed = sc.tick(R + timedelta(seconds=40))
+        self.assertEqual(category_calls(resumed), [])
+        row = self.round_row(sc)
+        self.assertEqual(row["state"], "CLOSED")
+        self.assertEqual(
+            sorted(item["episode_id"] for item in sc.admissions()), sorted(item["episode_id"] for item in plan["winners"])
+        )
+        self.assertEqual(row["frame"]["selection"]["committed_in_round_before"], 0)
+
+    def test_resume_that_drops_a_planned_winner_is_a_partial_admission_with_the_reason(self) -> None:
+        sc = self.scenario()
+        plan = self.crash_after_first_admission(sc)
+        first = sc.admissions()[0]
+        dropped = next(item for item in plan["winners"] if item["episode_id"] != first["episode_id"])
+        # Another round already holds the second planned mint this cycle: the commit refuses it.
+        self.write(
+            sc,
+            "INSERT INTO episode_admissions SELECT 'EP-OTHER', schedule_sha256, activation_id, lineage_id, cycle_start, ?, "
+            "t0, cohort_id, final_deadline_at, ?, record_json, 'OTHER-ROUND', created_at FROM episode_admissions WHERE episode_id = ?",
+            (dropped["mint"], "9" * 64, first["episode_id"]),
+        )
+        sc.tick(R + timedelta(seconds=40))
+        row = self.round_row(sc)
+        self.assertEqual((row["state"], row["frame"]["terminal"]), ("INCOMPLETE", "ROUND_RECOVERY_PARTIAL_ADMISSION"))
+        self.assertEqual(
+            row["frame"]["recovery"]["dropped_planned"],
+            [{"episode_id": dropped["episode_id"], "mint": dropped["mint"], "reason": "MINT_BLOCKED"}],
+        )
+        self.assertEqual(
+            [r[0] for r in sc.query("SELECT episode_id FROM episode_admissions WHERE round_id = ?", (self.rid(sc),))],
+            [first["episode_id"]],
+        )
+        self.drain_slots(sc)
+        status = self.cohort_status(sc, first["cohort_id"])
+        self.assertIn("ROUND_PARTIAL_ADMISSION", status["blocking_reasons"])
 
     def test_resume_follows_the_plan_even_when_the_market_would_choose_differently(self) -> None:
         sc = self.scenario()
@@ -287,7 +333,9 @@ class RestartAfterSlackTests(RoundRecoveryCase):
         self.assertEqual((recovery["outcome"], recovery["reconciled_after_slack"]), ("CLOSED", True))
         self.assertEqual(recovery["plan_sha256"], plan["plan_sha256"])
         self.assertEqual(row["frame"]["frame_sha256"], plan["frame_sha256"])
-        self.assertEqual(row["frame"]["selection"]["admitted_episode_ids"], [committed["episode_id"]])
+        self.assertEqual(row["frame"]["selection"]["admitted_episode_ids"], [])
+        self.assertEqual(row["frame"]["selection"]["committed_episode_ids"], [committed["episode_id"]])
+        self.assertEqual(row["frame"]["recovery"]["basis"], plan["basis"])
         self.drain_slots(sc)
         self.assertTrue(self.cohort_status(sc)["mature"])
 
@@ -384,6 +432,56 @@ class RefusedEvidenceTests(RoundRecoveryCase):
         self.assertEqual(sc.admissions(), [])
         row = self.round_row(sc)
         self.assertEqual((row["state"], row["frame"]["recovery"]["reason_code"]), ("INCOMPLETE", "ROUND_PLAN_HASH_MISMATCH"))
+
+
+class UnreadableOwnerEvidenceTests(RoundRecoveryCase):
+    def test_corrupt_terminal_round_frame_blocks_the_cohort_and_closure(self) -> None:
+        for terminal_setup in ("CLOSED", "PARTIAL"):
+            with self.subTest(terminal_setup):
+                sc = self.scenario()
+                if terminal_setup == "CLOSED":
+                    sc.tick(R + timedelta(seconds=5))
+                else:
+                    self.crash_after_first_admission(sc)
+                    sc.tick(AFTER_SLACK)
+                self.write(sc, "UPDATE episode_rounds SET frame_json = ? WHERE round_id = ?", ("{not json", self.rid(sc)))
+                self.drain_slots(sc)
+                status = self.cohort_status(sc)
+                self.assertFalse(status["mature"])
+                self.assertIn("ROUND_FRAME_CORRUPT", status["blocking_reasons"])
+                receipt = build_episode_closure_receipt(
+                    ops_store=sc.ops_path, observation_rdp=sc.data_root, schedule_sha256=sc.schedule["schedule_sha256"],
+                    activation_id=sc.activation_id, cohort_id=sc.admissions()[0]["cohort_id"], as_of=S + timedelta(days=2),
+                )
+                self.assertFalse(receipt["closure_ready"])
+
+    def test_admission_without_its_round_owner_row_blocks_the_cohort(self) -> None:
+        sc = self.scenario()
+        sc.tick(R + timedelta(seconds=5))
+        self.write(sc, "DELETE FROM episode_rounds WHERE round_id = ?", (self.rid(sc),))
+        self.drain_slots(sc)
+        status = self.cohort_status(sc)
+        self.assertFalse(status["mature"])
+        self.assertEqual(status["blocking_reasons"], ["ROUND_ROW_MISSING"])
+
+    def test_missing_call_evidence_inside_slack_is_refused_before_any_admission(self) -> None:
+        sc = self.scenario()
+        sc.tick(R + timedelta(seconds=5), fault="EPISODE_BEFORE_ADMISSION_COMMIT")
+        plan = self.round_row(sc)["frame"]["recovery_plan"]
+        self.write(sc, "DELETE FROM call_ledger WHERE call_occurrence_id = ?", (plan["frame_receipt"]["sources"][0]["call_occurrence_id"],))
+        resumed = sc.tick(R + timedelta(seconds=40))
+        self.assertEqual((category_calls(resumed), sc.admissions()), ([], []))
+        row = self.round_row(sc)
+        self.assertEqual(row["frame"]["recovery"]["reason_code"], "ROUND_CALL_EVIDENCE_MISSING")
+
+    def test_unreadable_call_ledger_payload_is_a_typed_refusal_not_a_tick_abort(self) -> None:
+        sc = self.scenario()
+        plan = self.crash_after_first_admission(sc)
+        occurrence = plan["frame_receipt"]["sources"][0]["call_occurrence_id"]
+        self.write(sc, "UPDATE call_ledger SET payload_json = ? WHERE call_occurrence_id = ?", ("{not json", occurrence))
+        late = sc.tick(AFTER_SLACK)
+        self.assertEqual(late["_exit_code"], 0)
+        self.assertEqual(self.round_row(sc)["frame"]["recovery"]["reason_code"], "ROUND_CALL_EVIDENCE_MISSING")
 
 
 class StoreOwnerGuardTests(RoundRecoveryCase):

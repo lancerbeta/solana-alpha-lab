@@ -935,7 +935,8 @@ class _EpisodeTick:
             or str(receipt["frame_sha256"]) != str(resume_plan["frame_sha256"])
             or str(frame["protection_fingerprint"]) != str(resume_plan["protection_fingerprint"])
         ):
-            assert existing is not None
+            if existing is None:
+                raise EpisodeTickError("ROUND_RESUME_ROW_MISSING")
             verdict, resume_plan = self._classify_round(existing, force_reason="ROUND_PLAN_FRAME_IDENTITY_MISMATCH")
             self._terminalize_round(existing, verdict, resume_plan)
             return
@@ -961,7 +962,8 @@ class _EpisodeTick:
                 str(item["mint"]) not in by_mint or by_mint[str(item["mint"])].get("status") != FRAME_PASS
                 for item in plan["winners"]
             ):
-                assert existing is not None
+                if existing is None:
+                    raise EpisodeTickError("ROUND_RESUME_ROW_MISSING")
                 verdict, plan = self._classify_round(existing, force_reason="ROUND_PLAN_FRAME_IDENTITY_MISMATCH")
                 self._terminalize_round(existing, verdict, plan)
                 return
@@ -1022,6 +1024,7 @@ class _EpisodeTick:
         }
         admitted: list[str] = []
         witness_stale: list[str] = []
+        refused: dict[str, str] = {}
         for winner, planned in zip(selection["winners"], plan["winners"], strict=True):
             if str(planned["episode_id"]) in committed_before:
                 continue
@@ -1048,12 +1051,31 @@ class _EpisodeTick:
             )
             if not witness_age_ok(record, self.binding):
                 witness_stale.append(str(winner["mint"]))
+                refused[str(winner["mint"])] = "WITNESS_STALE"
                 continue
             status = self._commit_admission(record, winner["candidate"], round_started_at=started)
             if status == "COMMITTED":
                 admitted.append(str(record["episode_id"]))
-            elif status == "WITNESS_STALE":
-                witness_stale.append(str(winner["mint"]))
+            else:
+                refused[str(winner["mint"])] = status
+                if status == "WITNESS_STALE":
+                    witness_stale.append(str(winner["mint"]))
+        committed_now = self.store.list_episode_admissions_in_round(rid)
+        committed_now_ids = {str(item["episode_id"]) for item in committed_now}
+        # Planned winners that did not commit, with the recorded reason; an
+        # unattempted winner stopped at the intake cutoff.
+        dropped = [
+            {"episode_id": item["episode_id"], "mint": item["mint"], "reason": refused.get(str(item["mint"]), "INTAKE_CLOSED")}
+            for item in plan["winners"]
+            if str(item["episode_id"]) not in committed_now_ids
+        ]
+        if resume_plan is not None and dropped:
+            # A crash plus resume must not turn a planned subset into a normal
+            # round: the same strict subset after slack is a partial admission.
+            if existing is None:
+                raise EpisodeTickError("ROUND_RESUME_ROW_MISSING")
+            self._terminalize_round(existing, classify_round_recovery(plan=plan, committed=committed_now), plan, dropped=dropped)
+            return
         summary = {
             **receipt,
             "selection": {
@@ -1063,6 +1085,8 @@ class _EpisodeTick:
                 "not_selected": selection["not_selected"],
                 "witness_stale": witness_stale,
                 "admitted_episode_ids": admitted,
+                "committed_episode_ids": [str(item["episode_id"]) for item in plan["winners"] if str(item["episode_id"]) in committed_now_ids],
+                "dropped_planned": dropped,
                 "day_used_before": basis["day_used"],
                 "rolling_used_before": basis["rolling_used"],
                 "active_before": basis["active"],
@@ -1071,6 +1095,7 @@ class _EpisodeTick:
             "recovery": {
                 "recovery_version": ROUND_RECOVERY_VERSION,
                 "plan_sha256": plan["plan_sha256"],
+                "basis": basis,
                 "planned_episode_ids": [str(item["episode_id"]) for item in plan["winners"]],
                 "resumed": resume_plan is not None,
             },
@@ -1102,7 +1127,10 @@ class _EpisodeTick:
             occurrence = source.get("call_occurrence_id")
             if not occurrence or self.store.call_state(str(occurrence)) != "COMPLETED":
                 return False
-            payload = self.store.call_payload(str(occurrence)) or {}
+            try:
+                payload = self.store.call_payload(str(occurrence)) or {}
+            except ValueError:
+                return False  # unreadable ledger payload is missing evidence, never a tick abort
             if source.get("response_sha256") and payload.get("response_sha256") != source.get("response_sha256"):
                 return False
         return True
@@ -1141,7 +1169,12 @@ class _EpisodeTick:
         return verdict, plan
 
     def _terminalize_round(
-        self, row: Mapping[str, Any], verdict: Mapping[str, Any], plan: Mapping[str, Any] | None
+        self,
+        row: Mapping[str, Any],
+        verdict: Mapping[str, Any],
+        plan: Mapping[str, Any] | None,
+        *,
+        dropped: Sequence[Mapping[str, Any]] | None = None,
     ) -> None:
         """Write the one durable terminal for an unresolved round."""
 
@@ -1156,6 +1189,8 @@ class _EpisodeTick:
             "committed_episode_ids": list(verdict["committed_episode_ids"]),
             "missing_episode_ids": list(verdict["missing_episode_ids"]),
         }
+        if dropped:
+            recovery["dropped_planned"] = [dict(item) for item in dropped]
         if outcome == "CLOSED":
             assert plan is not None
             basis = plan["basis"]
@@ -1168,13 +1203,15 @@ class _EpisodeTick:
                     "winners": [item["mint"] for item in plan["winners"]],
                     "not_selected": list(plan["not_selected"]),
                     "witness_stale": [],
-                    "admitted_episode_ids": sorted(recovery["committed_episode_ids"], key=order.__getitem__),
+                    "admitted_episode_ids": [],  # nothing was admitted by the reconciliation itself
+                    "committed_episode_ids": sorted(recovery["committed_episode_ids"], key=order.__getitem__),
+                    "dropped_planned": [],
                     "day_used_before": basis["day_used"],
                     "rolling_used_before": basis["rolling_used"],
                     "active_before": basis["active"],
                     "committed_in_round_before": basis["committed_in_round"],
                 },
-                "recovery": {**recovery, "resumed": True, "reconciled_after_slack": True},
+                "recovery": {**recovery, "basis": basis, "resumed": True, "reconciled_after_slack": True},
             }
             state = "CLOSED"
         else:
@@ -1240,7 +1277,10 @@ class _EpisodeTick:
                 round_started_at=round_started_at, round_period_seconds=int(self.schedule["nomination"]["round_period_seconds"]),
                 round_id_value=str(record["round_id"]), now=now)
             blocked = self.store.episode_blocked_mints(lineage_id=self.lineage, cycle_start=str(record["cycle_start"]), now=now)
-            if quota["quota"] <= 0 or str(record["mint"]) in blocked:
+            if str(record["mint"]) in blocked:
+                refusal = "MINT_BLOCKED"
+                return None
+            if quota["quota"] <= 0:
                 return None
             return self._admission_payload(fresh, candidate, now)
         if self.fault_after == "EPISODE_BEFORE_ADMISSION_COMMIT":

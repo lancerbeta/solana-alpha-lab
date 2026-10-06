@@ -119,7 +119,8 @@ Risks: a legitimate in-flight round blocked by the gate (any `STARTED` relevant
 round at maturity time is past its slack by construction); a stuck `STARTED`
 round when no tick runs again blocks its cohort (fail-closed, honest).
 Rollback: owner-gated code revert; plan-bearing rows stay readable as ordinary
-frame JSON; legacy rows without a plan are unchanged.
+frame JSON; legacy terminal rows without a plan are unchanged (a legacy plan-less
+STARTED round that already has admissions is refused, not healed).
 STOP: merge boundary; never merge in this atom.
 NEXT: exact-head CI, merge-readiness, owner phrase.
 REPLAN_TRIGGER: the plan cannot be expressed in `episode_rounds.frame_json`, a
