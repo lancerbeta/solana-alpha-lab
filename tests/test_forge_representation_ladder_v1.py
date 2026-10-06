@@ -1418,7 +1418,36 @@ class RegistryLoadTests(unittest.TestCase):
     def test_default_registry_known_handlers(self) -> None:
         registry = load_ladder_registry()
         ids = [row["id"] for row in registry["representations"]]
-        self.assertEqual(ids, ["BASE", "NORMALIZED_TRAJECTORY_V1"])
+        self.assertEqual(ids, ["BASE", "NORMALIZED_TRAJECTORY_V1", "NORMALIZED_TRAJECTORY_EPISODES_V1"])
+        # Population decides which representations a run may reach; the newborn ladder is unchanged.
+        from solana_alpha_lab.factory.hfic_representation_ladder import eligible_representation_ids
+
+        self.assertEqual(eligible_representation_ids(registry), ["BASE", "NORMALIZED_TRAJECTORY_V1"])
+        self.assertEqual(
+            eligible_representation_ids(registry, "OPPORTUNITY_EPISODES"),
+            ["BASE", "NORMALIZED_TRAJECTORY_EPISODES_V1"],
+        )
+
+    def test_episode_branch_is_population_gated(self) -> None:
+        registry = load_ladder_registry()
+        base = {
+            "representation_id": "BASE", "execution_status": EXEC_EXECUTED, "effective_terminal": "NO_WORTHY_HYPOTHESIS",
+            "session_state": "SYNTHESIS_COMPLETE", "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+            "stage_ref_sha256": "aa" * 32,
+        }
+        episodes = resolve_next_action([base], registry=registry, population="OPPORTUNITY_EPISODES")
+        self.assertEqual(episodes["next_action"], "START_NORMALIZED_TRAJECTORY_EPISODES_V1")
+        # the same BASE result never starts the episode profile for a newborn run, nor legacy NT for episodes
+        newborn = resolve_next_action([base], registry=registry)
+        self.assertNotEqual(newborn["next_action"], "START_NORMALIZED_TRAJECTORY_EPISODES_V1")
+        self.assertNotEqual(episodes["next_action"], "START_V1")
+        # completed episode profile is not restarted
+        done = resolve_next_action(
+            [base, {"representation_id": "NORMALIZED_TRAJECTORY_EPISODES_V1", "execution_status": EXEC_EXECUTED,
+                    "effective_terminal": "NO_WORTHY_HYPOTHESIS", "stage_ref_sha256": "bb" * 32, "session_state": "SYNTHESIS_COMPLETE"}],
+            registry=registry, population="OPPORTUNITY_EPISODES",
+        )
+        self.assertEqual(done["next_action"], ACTION_SEARCH_EXHAUSTED)
 
 
 class SkillContractTests(unittest.TestCase):

@@ -52,6 +52,7 @@ _SCOPE_FIELDS = (
     "explanatory_condition",
     "evidence_surface_mode",
     "representation_scope",
+    "research_scope_rule_sha256",
 )
 
 

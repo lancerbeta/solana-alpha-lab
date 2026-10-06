@@ -1127,6 +1127,8 @@ _SEMANTIC_LOOK_AXES = (
     "estimand",
     "explanatory_condition",
     "representation_scope",
+    # A different list scope is a different question: priors and cards relate by it.
+    "research_scope_rule_sha256",
 )
 _LOOK_CLAIM_AXES = _MACHINE_LOOK_AXES + _SEMANTIC_LOOK_AXES
 
@@ -1258,6 +1260,11 @@ def scope_bound_to_spec(
         for key, value in declared.items()
         if _axis_text(value) and key not in {"target", "population", "decision_timestamp"}
     }
+    scientific_body = validated.get("scientific_body")
+    if isinstance(scientific_body, Mapping) and "research_scope" in scientific_body:
+        from solana_alpha_lab.factory.hfic_research_scope import rule_sha256_of_body
+
+        bound["research_scope_rule_sha256"] = rule_sha256_of_body(scientific_body)
     bound["population"] = spec_population
     bound["decision_timestamp"] = last_decision
     bound["target"] = (
@@ -2353,11 +2360,24 @@ def run_recorded_discovery_query(
         )
 
         prevalidated = validate_temporal_query(spec)
+        selected_cohorts = None
+        if "research_scope" in prevalidated["scientific_body"]:
+            from solana_alpha_lab.factory.hfic_research_scope import selected_cohort_ids
+
+            selected_cohorts = selected_cohort_ids(prevalidated["scientific_body"]["research_scope"])
+        if selected_cohorts is not None:
+            # A declared covered subset is part of the question, fixed before any outcome is read.
+            present = {str(item.get("cohort_id")) for item in binding}
+            if not set(selected_cohorts) <= present:
+                raise GroundedDiscoveryError("SCOPE_COHORT_NOT_IN_BINDING")
+            wanted = set(selected_cohorts)
+            binding = [item for item in binding if str(item.get("cohort_id")) in wanted]
+            census = [row for row in census if str(row.get("cohort_id")) in wanted]
+            observations = [row for row in observations if str(row.get("cohort_id")) in wanted]
         bare_admitted = admit_discovery_binding(binding)
         bare_binding_sha = data_binding_sha256(bare_admitted, census, observations)
         admitted_meta = admitted_with_policy(bare_admitted, policy_definition)
         pre_binding_sha = data_binding_sha256(admitted_meta, census, observations)
-        research_scope = None
         if "research_scope" in prevalidated["scientific_body"]:
             # Masks come only from verified release files + registered snapshots; a changed
             # list evidence is a different applied input, never a stale same-question replay.

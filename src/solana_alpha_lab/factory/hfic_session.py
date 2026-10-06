@@ -1110,6 +1110,7 @@ def _hypothesis_scope_fields(
             "explanatory_condition",
             "representation_scope",
             "evidence_surface_mode",
+            "research_scope_rule_sha256",
         ):
             if key in out:
                 continue

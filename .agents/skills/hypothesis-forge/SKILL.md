@@ -118,6 +118,38 @@ a new dynamics recipe; renaming an exact old question does not reopen it.
 Preserve exposure, prior applicability and resource permission separately.
 The atom's synthetic evidence grants no real MAIN/adaptive or live mutations.
 
+## List-aware questions (episodes)
+
+Owner contract: `docs/contracts/forge_list_aware_research_scope_v1.md`. For
+`OPPORTUNITY_EPISODES` read `forge_context_packet.list_dimension_context` before
+choosing a candidate: it names the lists, their `TRUE/FALSE/UNKNOWN` coverage, the
+overlap counts and the selector grammar. Lists are a research dimension with three
+roles: the universe a mechanism is studied in, a signal of their own, or a fixed
+diagnostic slice. `witness_source_id` is not membership.
+
+- A list-only idea is first class: `hypothesis_kind=LIST_CONTRAST`, `list_condition`
+  and no numeric predicate (query 1.2). Never add a fake price predicate to satisfy a
+  validator. `NUMERIC_IN_SCOPE` studies a numeric mechanism inside a list universe;
+  `MIXED_LIST_NUMERIC` combines both.
+- Resolve names with `hypothesis_forge.py research-scope-resolve --spec <draft>`
+  (reads no market value). It returns the canonical query, its rule digest and the
+  coverage counts. `UNKNOWN` membership is never `FALSE`: the run refuses before
+  values unless a covered scope (`evidence_selection.cohort_ids`) is declared first.
+- Say `exactly two` or `at least two` for "two of three"; never use "all lists" in a
+  frozen recipe; one membership claim never proves interaction or causality.
+- The candidate card must echo `research_scope_rule_sha256` and
+  `research_scope_statement` from `temporal_holder_claim_identity`; the Critic judges
+  the card against that machine statement and the per-side support and attrition.
+- Own lists: `hypothesis_forge.py list-snapshot-register --snapshot <json>`; a list
+  registered today is not historically known before today.
+- Episode normalized view: after a BASE `NO_WORTHY_HYPOTHESIS` (or an explicit owner
+  request) `forge-run` may return `START/RESUME_NORMALIZED_TRAJECTORY_EPISODES_V1`.
+  Build it with `hypothesis_forge.py episode-normalized-view --spec <draft>
+  --parent-session-id <BASE session>`; it reads prefix points only and returns the
+  `ladder_freeze_preflight` for `persist-draft --representation-id
+  NORMALIZED_TRAJECTORY_EPISODES_V1`. The legacy `NORMALIZED_TRAJECTORY_V1` is not an
+  episode representation and episodes have no CONTROL surface.
+
 ## Authority
 
 Read `configs/hypothesis_forge_independent_critic_v1.yaml` and the operator pack at

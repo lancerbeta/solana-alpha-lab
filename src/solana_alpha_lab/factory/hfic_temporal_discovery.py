@@ -3421,6 +3421,10 @@ def _group_stats(group: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     }
 
 
+def resolved_slices(resolved: Any) -> list[Mapping[str, Any]]:
+    return list(resolved.slices)
+
+
 def scope_selector_hash(selector: Mapping[str, Any]) -> str:
     from solana_alpha_lab.factory import hfic_research_scope as scope_owner
 
@@ -3763,6 +3767,16 @@ def execute_temporal_discovery(
     }
     if scoped_body:
         summary["research_scope"] = _scope_result(research_scope, body, members, decision_members, matched_members)
+        # Every comparison this one registration discloses is named; none is hidden behind "one question".
+        disclosed = [{"id": "PRIMARY", "kind": body["hypothesis_kind"]}]
+        if body.get("contrast") is not None:
+            disclosed.append({"id": "CONTRAST", "kind": body["contrast"]})
+        disclosed.extend({"id": f"SLICE:{item['slice_id']}", "kind": "DIAGNOSTIC_SLICE"} for item in resolved_slices(research_scope))
+        summary["research_scope"]["disclosed_comparisons"] = disclosed
+        summary["research_scope"]["disclosed_comparison_n"] = len(disclosed)
+        summary["viewed_variants"] = list(summary["viewed_variants"]) + [
+            f"SLICE_{item['slice_id']}" for item in resolved_slices(research_scope)
+        ]
         summary["experiment_recipe"]["research_scope_rule_sha256"] = research_scope.rule_sha256
         summary["experiment_recipe"]["research_scope_evidence"] = {
             "evidence_sha256": research_scope.evidence_sha256,
@@ -4502,9 +4516,7 @@ def temporal_holder_claim_identity(result: Mapping[str, Any]) -> dict[str, str]:
             raise GroundedDiscoveryError("GROUNDED_RESULT_MISMATCH")
         # The card must name the exact rule that was computed; text cannot widen it.
         scope_labels = {
-            "research_scope_rule_sha256": scope_owner.sha256_of(
-                {"scope": body["research_scope"], "list_condition": body.get("list_condition"), "slices": body.get("diagnostic_slices") or []}
-            ),
+            "research_scope_rule_sha256": scope_owner.rule_sha256_of_body(body),
             "research_scope_statement": scope_owner.scope_statement(body),
         }
     if not any(f.get("field_id") == HOLDER_COUNT for f in body.get("features", []) if isinstance(f, Mapping)):

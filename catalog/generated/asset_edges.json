@@ -5988,6 +5988,21 @@
       "target_asset_id": "CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001"
     },
     {
+      "source_asset_id": "DOC-FORGE-LIST-AWARE-RESEARCH-SCOPE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-RESEARCH-SCOPE-001"
+    },
+    {
+      "source_asset_id": "DOC-FORGE-LIST-AWARE-RESEARCH-SCOPE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-TEMPORAL-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "DOC-FORGE-LIST-AWARE-RESEARCH-SCOPE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-NORMALIZED-TRAJECTORY-EPISODES-V1-001"
+    },
+    {
       "source_asset_id": "DOC-FORGE-TEMPORAL-HOLDER-POINT-FEATURE-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001"
@@ -11868,6 +11883,16 @@
       "target_asset_id": "TEST-HFIC-REPRESENTATION-PROBE-001"
     },
     {
+      "source_asset_id": "MODULE-HFIC-RESEARCH-SCOPE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-TEMPORAL-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-RESEARCH-SCOPE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001"
+    },
+    {
       "source_asset_id": "MODULE-HFIC-SELECTION-ROBUSTNESS-GATE-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-HFIC-SELECTION-ROBUSTNESS-GATE-V1-001"
@@ -12031,6 +12056,16 @@
       "source_asset_id": "MODULE-MARKET-EVIDENCE-001",
       "relation": "governed_by",
       "target_asset_id": "DOC-MARKET-DATA-AWARENESS-001"
+    },
+    {
+      "source_asset_id": "MODULE-NORMALIZED-TRAJECTORY-EPISODES-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-RESEARCH-SCOPE-001"
+    },
+    {
+      "source_asset_id": "MODULE-NORMALIZED-TRAJECTORY-EPISODES-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-TEMPORAL-DISCOVERY-001"
     },
     {
       "source_asset_id": "MODULE-NORMALIZED-TRAJECTORY-V1-001",

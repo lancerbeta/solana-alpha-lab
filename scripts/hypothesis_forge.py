@@ -2101,11 +2101,12 @@ def cmd_research_scope_resolve(repo_root: Path, explicit_data_root: Path | None,
         query = scope_owner.canonicalize_query_scope(draft, evidence)
         bound = validate_temporal_query(query)
         body = bound["scientific_body"]
+        chosen = scope_owner.selected_cohort_ids(body["research_scope"])
         resolved = scope_owner.ResolvedScope(
             scope=body["research_scope"],
             list_condition=body.get("list_condition"),
             evidence=evidence,
-            episode_ids=sorted(evidence.t0),
+            episode_ids=sorted(e for e in evidence.t0 if chosen is None or evidence.cohort_of.get(e) in chosen),
             slices=body.get("diagnostic_slices") or [],
         )
         coverage = resolved.coverage()
@@ -2203,6 +2204,14 @@ def cmd_episode_normalized_view(
             data_root=data_root, binding_doc=None, partitions=None, census_path=None, observations_path=None,
             population="OPPORTUNITY_EPISODES",
         )
+        chosen = scope_owner.selected_cohort_ids(body["research_scope"])
+        if chosen is not None:
+            wanted = set(chosen)
+            loaded = {
+                "census": [r for r in loaded["census"] if str(r.get("cohort_id")) in wanted],
+                "observations": [r for r in loaded["observations"] if str(r.get("cohort_id")) in wanted],
+                "cohorts": [c for c in loaded["cohorts"] if str(c.get("cohort_id")) in wanted],
+            }
         resolved = resolve_research_scope(body, data_root, loaded["census"], loaded["cohorts"])
         policy = effective_policy(store).get("definition")
         payload = build_episode_normalized_profile(

@@ -161,5 +161,48 @@ class LocalSnapshotTests(unittest.TestCase):
             self.assertEqual(evidence.state("new_out", "OWNER:D"), rs.FALSE)
 
 
+class CandidateIdentityTests(unittest.TestCase):
+    CARD = {
+        "claim": "Membership may separate a later mark",
+        "mechanism": "Attention flows around ranked tokens",
+        "actor_counterparty": "Participants",
+        "population": "OPPORTUNITY_EPISODES",
+        "decision_timestamp": "E1800",
+        "primary_x_family": "KIND=LIST_CONTRAST; UNIVERSE=(ALL)",
+        "primary_y": "PRICE_RELATIVE_PROXY E1800 -> E14400",
+        "horizon_notional": "E1800 -> E14400",
+        "negative_control": "Eligible complement",
+        "cheapest_falsifier": "One frozen contrast",
+    }
+
+    def test_scope_is_part_of_identity_and_legacy_cards_are_unchanged(self) -> None:
+        from solana_alpha_lab.factory.hfic_identity import (
+            HficIdentityError,
+            assign_portfolio_ids,
+            candidate_identity,
+            canonical_candidate_definition,
+        )
+
+        legacy = canonical_candidate_definition(self.CARD)
+        self.assertNotIn("research_scope_rule_sha256", legacy)
+        one = {**self.CARD, "research_scope_rule_sha256": "a" * 64}
+        two = {**self.CARD, "research_scope_rule_sha256": "b" * 64}
+        self.assertNotEqual(candidate_identity(one).full_sha256, candidate_identity(two).full_sha256)
+        self.assertNotEqual(candidate_identity(one).full_sha256, candidate_identity(self.CARD).full_sha256)
+        # identical wording, different scope: a valid two-candidate portfolio (primary and runner-up keep their own scope)
+        ids = assign_portfolio_ids([{**one, "display_ordinal": 1, "label": "p"}, {**two, "display_ordinal": 2, "label": "r"}])
+        self.assertEqual(len({item.candidate_id for item in ids}), 2)
+        with self.assertRaises(HficIdentityError):
+            candidate_identity({**self.CARD, "research_scope_rule_sha256": "short"})
+
+
+class StatementTests(unittest.TestCase):
+    def test_statement_is_rendered_from_the_machine_body(self) -> None:
+        resolver = _resolver
+        selector = rs.canonical_selector({"clauses": [{"all_of": ["A", "C"], "none_of": ["B"]}, {"count": {"of": ["D", "E"], "min": 1, "max": 2}}]}, resolver)
+        text = rs.render_selector(selector)
+        self.assertEqual(text, "(L:A AND L:C AND NOT L:B) OR (COUNT[1..2] OF (L:D, L:E))")
+
+
 if __name__ == "__main__":
     unittest.main()
