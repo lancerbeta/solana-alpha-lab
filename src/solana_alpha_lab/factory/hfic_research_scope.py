@@ -276,6 +276,12 @@ def _snapshot_body(document: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def registration_sha256(snapshot_sha: str, registered_at: str, reliable_available_at: str) -> str:
+    """Availability is evidence: registration time and the derived availability are hashed with the body."""
+
+    return sha256_of({"snapshot_sha256": snapshot_sha, "registered_at": registered_at, "reliable_available_at": reliable_available_at})
+
+
 def register_local_snapshot(data_root: Path, source: Path, *, registered_at: datetime) -> dict[str, Any]:
     """The one public registration path: content-addressed, exact-repeat safe.
 
@@ -301,7 +307,13 @@ def register_local_snapshot(data_root: Path, source: Path, *, registered_at: dat
         if same_list and overlaps:
             _require(existing["definition"]["definition_sha256"] == body["definition"]["definition_sha256"], "SNAPSHOT_DEFINITION_CONFLICT")
             raise ResearchScopeError("SNAPSHOT_INTERVAL_CONFLICT")
-    stored_doc = {**body, "snapshot_sha256": content_sha, "registered_at": render_utc(registered_at), "reliable_available_at": render_utc(reliable)}
+    stored_doc = {
+        **body,
+        "snapshot_sha256": content_sha,
+        "registered_at": render_utc(registered_at),
+        "reliable_available_at": render_utc(reliable),
+        "registration_sha256": registration_sha256(content_sha, render_utc(registered_at), render_utc(reliable)),
+    }
     directory.mkdir(parents=True, exist_ok=True)
     tmp = target.with_name(target.name + ".tmp")
     tmp.write_bytes(canonical_json(stored_doc).encode("utf-8"))
@@ -321,6 +333,12 @@ def _stored_snapshots(data_root: Path) -> list[dict[str, Any]]:
             raise ResearchScopeError("SNAPSHOT_STORE_CORRUPT") from exc
         body = {key: stored[key] for key in _snapshot_body(stored)}
         _require(sha256_of(body) == stored.get("snapshot_sha256") == path.stem, "SNAPSHOT_STORE_CORRUPT")
+        recomputed = max(parse_utc(body["available_at"]), parse_utc(stored.get("registered_at")))
+        _require(
+            render_utc(recomputed) == stored.get("reliable_available_at")
+            and registration_sha256(stored["snapshot_sha256"], stored["registered_at"], stored["reliable_available_at"]) == stored.get("registration_sha256"),
+            "SNAPSHOT_STORE_CORRUPT",
+        )
         snapshots.append(stored)
     return snapshots
 
@@ -496,6 +514,7 @@ def add_local_snapshots(
                 "adapter": LOCAL_ADAPTER,
                 "list_id": stored["definition"]["list_id"],
                 "snapshot_sha256": stored["snapshot_sha256"],
+                "registration_sha256": stored["registration_sha256"],
                 "definition_sha256": stored["definition"]["definition_sha256"],
             }
         )
@@ -604,6 +623,7 @@ class ResolvedScope:
         self.slices = [dict(item) for item in slices]
         self.evidence_sha256 = evidence.evidence_sha256()
         self.evidence_bindings = [dict(item) for item in evidence.bindings]
+        self.cohort_of = {episode: evidence.cohort_of[episode] for episode in episode_ids if episode in evidence.cohort_of}
         self.universe: dict[str, str] = {}
         self.signal: dict[str, str] = {}
         self.slice_states: dict[str, dict[str, str]] = {item["slice_id"]: {} for item in self.slices}
@@ -640,6 +660,10 @@ class ResolvedScope:
         if self.list_condition is not None:
             for state in (TRUE, FALSE, UNKNOWN, INVALID):
                 out[f"signal_{state.lower()}_n"] = sum(1 for v in self.signal.values() if v == state)
+        for slice_id, states in self.slice_states.items():
+            # A slice never turns an unobserved list into "not in the slice".
+            out[f"slice_{slice_id}_unknown_n"] = sum(1 for v in states.values() if v == UNKNOWN)
+            out[f"slice_{slice_id}_invalid_n"] = sum(1 for v in states.values() if v == INVALID)
         return out
 
     def require_covered(self) -> None:
@@ -647,9 +671,24 @@ class ResolvedScope:
 
         cov = self.coverage()
         bad = cov["universe_unknown_n"] + cov["universe_invalid_n"] + cov.get("signal_unknown_n", 0) + cov.get("signal_invalid_n", 0)
+        bad_invalid = cov["universe_invalid_n"] + cov.get("signal_invalid_n", 0)
+        for key, value in cov.items():
+            if key.startswith("slice_") and value:
+                bad += value
+                bad_invalid += value if key.endswith("_invalid_n") else 0
         if bad:
-            code = "SCOPE_EVIDENCE_INVALID" if cov["universe_invalid_n"] + cov.get("signal_invalid_n", 0) else "SCOPE_COVERAGE_UNRESOLVED"
-            raise ResearchScopeError(code, cov)
+            code = "SCOPE_EVIDENCE_INVALID" if bad_invalid else "SCOPE_COVERAGE_UNRESOLVED"
+            detail = dict(cov)
+            covered = covered_cohorts(self)
+            detail["next_action"] = (
+                "DECLARE_COVERED_SCOPE: set research_scope.evidence_selection.cohort_ids to cohorts whose referenced lists are all observed, "
+                "before reading any outcome"
+                if code == "SCOPE_COVERAGE_UNRESOLVED"
+                else "BLOCKED: membership evidence conflicts; restore the exact release or snapshot"
+            )
+            if covered is not None:
+                detail["covered_cohort_ids"] = covered
+            raise ResearchScopeError(code, detail)
 
 
 # --------------------------------------------------------------------------
@@ -897,6 +936,25 @@ def rule_sha256_of_body(body: Mapping[str, Any]) -> str:
     return sha256_of(
         {"scope": body["research_scope"], "list_condition": body.get("list_condition"), "slices": list(body.get("diagnostic_slices") or [])}
     )
+
+
+def covered_cohorts(resolved: "ResolvedScope") -> list[str] | None:
+    """Cohorts whose referenced lists are all observed (hint for a declared covered scope)."""
+
+    cohort_of = getattr(resolved, "cohort_of", None)
+    if not cohort_of:
+        return None
+    bad: dict[str, int] = {}
+    seen: set[str] = set()
+    for episode, cohort in cohort_of.items():
+        seen.add(cohort)
+        states = [resolved.universe.get(episode)]
+        if resolved.list_condition is not None:
+            states.append(resolved.signal.get(episode))
+        states.extend(slice_states.get(episode) for slice_states in resolved.slice_states.values())
+        if any(state in (UNKNOWN, INVALID) for state in states):
+            bad[cohort] = bad.get(cohort, 0) + 1
+    return sorted(seen - set(bad))
 
 
 def referenced_list_ids(body: Mapping[str, Any]) -> list[str]:

@@ -32,6 +32,10 @@ from tests.test_opportunity_episodes_vertical_v1 import (  # noqa: E402
     _forge_call,
 )
 
+import os
+
+os.environ.setdefault("SMIAL_ALLOW_TEST_CLOCK", "1")  # synthetic registration clock; the CLI refuses it otherwise
+
 PRICE, LIQ, HOLD = "FIELD-USD-PRICE-001", "FIELD-LIQUIDITY-USD-001", "FIELD-HOLDER-COUNT-001"
 CATEGORY = {"A": "toporganicscore", "B": "toptraded", "C": "toptrending"}
 LIST_ID = {"A": "JUPITER:toporganicscore:5m", "B": "JUPITER:toptraded:5m", "C": "JUPITER:toptrending:5m"}

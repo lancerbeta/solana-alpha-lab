@@ -421,7 +421,7 @@ def build_forge_input_receipt(
             {
                 "representation_id": TRAJECTORY_REPRESENTATION,
                 "status": "UNSUPPORTED_POPULATION",
-                "reason_code": "LEGACY_NEWBORN_X_Y_ONLY_NOT_EPISODE_COMPATIBLE",
+                "reason_code": "LEGACY_NEWBORN_X_Y_ONLY_NOT_EPISODE_COMPATIBLE_USE_NORMALIZED_TRAJECTORY_EPISODES_V1",
             },
             {
                 "representation_id": EPISODE_PROFILE_ID,

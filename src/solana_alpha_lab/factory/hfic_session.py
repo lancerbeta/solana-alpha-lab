@@ -1198,10 +1198,10 @@ def _selected_candidate_block(
     }
     if packet_version == CRITIC_PACKET_VERSION_CURRENT:
         block.update(_freeze_owned_grounding_fields(card))
-        # A list-scoped candidate carries its machine rule and statement; text cannot widen it.
-        if card.get("research_scope_rule_sha256") is not None:
-            block["research_scope_rule_sha256"] = str(card["research_scope_rule_sha256"])
-            block["research_scope_statement"] = str(card.get("research_scope_statement") or "")
+    # A list-scoped candidate carries its machine rule and statement on every packet version; text cannot widen it.
+    if card.get("research_scope_rule_sha256") is not None:
+        block["research_scope_rule_sha256"] = str(card["research_scope_rule_sha256"])
+        block["research_scope_statement"] = str(card.get("research_scope_statement") or "")
     return block
 
 
@@ -2032,6 +2032,18 @@ def freeze_draft(
             and isinstance(forge_packet.get("normalized_trajectory_episodes_v1"), Mapping)
         ):
             # The episode profile is context for the Critic: scope-bound, anonymous, prefix only.
+            from solana_alpha_lab.factory.normalized_trajectory_episodes_v1 import (
+                EpisodeProfileError,
+                validate_episode_payload,
+            )
+
+            try:
+                validate_episode_payload(
+                    forge_packet["normalized_trajectory_episodes_v1"],
+                    expected_rule_sha256=selected_block.get("research_scope_rule_sha256"),
+                )
+            except EpisodeProfileError as exc:
+                raise HficSessionError(exc.code) from exc
             packet["ladder_representation_id"] = "NORMALIZED_TRAJECTORY_EPISODES_V1"
             packet["normalized_trajectory_episodes_v1"] = dict(forge_packet["normalized_trajectory_episodes_v1"])
             packet["representation_payload_sha256"] = str(forge_packet.get("representation_payload_sha256") or "")

@@ -706,11 +706,15 @@ def prepare_ladder_freeze_preflight(
             or not isinstance(payload.get("scope_applied_sha256"), str)
         ):
             raise LadderError("LADDER_FREEZE_EPISODE_PAYLOAD_INVALID")
-        body = {key: value for key, value in payload.items() if key != "representation_payload_sha256"}
-        from solana_alpha_lab.factory.hfic_research_scope import sha256_of
+        from solana_alpha_lab.factory.normalized_trajectory_episodes_v1 import (
+            EpisodeProfileError,
+            validate_episode_payload,
+        )
 
-        if sha256_of(body) != payload_sha:
-            raise LadderError("LADDER_FREEZE_EPISODE_PAYLOAD_HASH_MISMATCH")
+        try:
+            validate_episode_payload(payload, expected_rule_sha256=payload.get("research_scope_rule_sha256"))
+        except EpisodeProfileError as exc:
+            raise LadderError(f"LADDER_FREEZE_{exc.code}") from exc
         packet["normalized_trajectory_episodes_v1"] = payload
         packet["representation_payload_sha256"] = payload_sha
         packet["research_scope_rule_sha256"] = payload["research_scope_rule_sha256"]

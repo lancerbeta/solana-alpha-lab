@@ -2130,7 +2130,7 @@ def cmd_research_scope_resolve(repo_root: Path, explicit_data_root: Path | None,
         resolved.require_covered()
     except scope_owner.ResearchScopeError as exc:
         # Unknown membership is reported before any value; a covered scope must be declared first.
-        payload.update(reason_code=exc.code, covered_scope_required=True)
+        payload.update(reason_code=exc.code, covered_scope_required=True, **{k: v for k, v in exc.detail.items() if k in {"next_action", "covered_cohort_ids"}})
         return emit(payload, exit_code=2)
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     return emit(payload)
@@ -2196,7 +2196,16 @@ def cmd_episode_normalized_view(
         )
         if not explicit_request and terminal not in row["trigger_terminals"]:
             # Bounded progression: the profile follows an insufficient BASE, or an explicit owner request.
-            return emit({"reason_code": "EPISODE_PROFILE_TRIGGER_NOT_MET", "parent_terminal": terminal, "writes": False}, exit_code=2)
+            return emit(
+            {
+                "reason_code": "EPISODE_PROFILE_TRIGGER_NOT_MET",
+                "parent_terminal": terminal,
+                "qualifying_terminals": row["trigger_terminals"],
+                "next_action": "Use --explicit-request to ask for the episode profile after another BASE result.",
+                "writes": False,
+            },
+            exit_code=2,
+        )
         evidence = scope_owner.load_corpus_membership(data_root)
         query = scope_owner.canonicalize_query_scope(draft, evidence)
         body = validate_temporal_query(query)["scientific_body"]
@@ -2255,6 +2264,11 @@ def cmd_list_snapshot_register(
         return emit_error(str(exc))
     from datetime import UTC, datetime
 
+    import os
+
+    if registered_at and os.environ.get("SMIAL_ALLOW_TEST_CLOCK") != "1":
+        # A caller-chosen registration time would make a list "historically known"; wall clock only.
+        return emit({"reason_code": "REGISTERED_AT_OVERRIDE_FORBIDDEN", "writes": False}, exit_code=2)
     when = parse_utc(registered_at) if registered_at else datetime.now(tz=UTC)
     try:
         receipt = scope_owner.register_local_snapshot(data_root, snapshot_path, registered_at=when)
@@ -2262,7 +2276,13 @@ def cmd_list_snapshot_register(
         return emit({"reason_code": exc.code, "writes": False}, exit_code=2)
     except ValueError:
         return emit({"reason_code": "SNAPSHOT_INVALID", "writes": False}, exit_code=2)
-    return emit({**receipt, "adapter": scope_owner.LOCAL_ADAPTER})
+    return emit(
+        {
+            **receipt,
+            "adapter": scope_owner.LOCAL_ADAPTER,
+            "note": "A registered list is known only from reliable_available_at on; episodes with an earlier T0 stay UNKNOWN for it.",
+        }
+    )
 
 
 def cmd_discovery_coverage(repo_root: Path, explicit_data_root: Path | None) -> int:

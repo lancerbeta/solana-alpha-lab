@@ -32352,7 +32352,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 860174cd04f2ccee8f58e35e7e1ff761786f127a8598ff8c9d755a9fbb2e634b}
+  integrity: {kind: sha256, sha256: 09af77b6c23ae80f273e7a238b033a2cba54e800606ccf4982941ab7d43124fa}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32374,7 +32374,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: bbc6d52617dd8deb9838477b1a698261c4cbbb3520aa5c58e03d595001685180}
+  integrity: {kind: sha256, sha256: 7cb75ad5f03f4751d735234f1ed41283dca89c1d1aec6a6add3123e6f529e4cd}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -38377,7 +38377,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_INPUT_TRUTH_AND_VISIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/forge_input_receipt.py', repository_path: src/solana_alpha_lab/factory/forge_input_receipt.py}
-  integrity: {kind: sha256, sha256: 77733054a373555bfe1095a11d250f435acc9751f78c79c3cfbf01094afa4829}
+  integrity: {kind: sha256, sha256: f5af311536c1a462ea32bbb2ab9368f4675ce0541116308aec0380237bf57acb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001}
@@ -38471,7 +38471,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_REPRESENTATION_LADDER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_ladder.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_ladder.py}
-  integrity: {kind: sha256, sha256: aaba7ed4ca218e018a547b29f79ead1776f1d1fd7db51cbd2e0eb42c7945c045}
+  integrity: {kind: sha256, sha256: c82c2ffafbf2dfc14f4d46241c4d91416e77f1eb1f4e71253809e27faec087bf}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}
@@ -40413,7 +40413,7 @@ records:
   as_of: '2026-10-07'
   truth_owner: FORGE_LIST_AWARE_RESEARCH_SCOPE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_research_scope.py', repository_path: src/solana_alpha_lab/factory/hfic_research_scope.py}
-  integrity: {kind: sha256, sha256: 10da056f0d9a93d9f8e623eea6e04e1fc4fe0dabc635051abf3a5a275abe9523}
+  integrity: {kind: sha256, sha256: 84460069fd8281b13b622da8b153060dff4755add68ad0086de058b29f869477}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-TEMPORAL-DISCOVERY-001}
@@ -40431,7 +40431,7 @@ records:
   as_of: '2026-10-07'
   truth_owner: FORGE_LIST_AWARE_RESEARCH_SCOPE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/normalized_trajectory_episodes_v1.py', repository_path: src/solana_alpha_lab/factory/normalized_trajectory_episodes_v1.py}
-  integrity: {kind: sha256, sha256: e3343d47dc2c4857f40ef4e4c5ecd2206a93c2c280a20061292cd304301753f9}
+  integrity: {kind: sha256, sha256: b32661045e8032bc04eb916705c457e2546b794b688c9f1d65e380967f7bf4da}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-RESEARCH-SCOPE-001}

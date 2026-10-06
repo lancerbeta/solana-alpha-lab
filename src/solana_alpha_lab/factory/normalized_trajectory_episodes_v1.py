@@ -16,6 +16,7 @@ executable feature.
 from __future__ import annotations
 
 import math
+import re
 from collections import Counter
 from collections.abc import Mapping, Sequence
 from typing import Any
@@ -205,3 +206,43 @@ def build_episode_normalized_profile(
     }
     payload["representation_payload_sha256"] = sha256_of(payload)
     return payload
+
+
+_MOTIF_RE = re.compile(r"^P:[UDFM]{2}\|L:[UDFM]{2}\|H:[UDFM]{2}$")
+_PAYLOAD_KEYS = frozenset(
+    {
+        "schema", "representation_id", "representation_version", "population", "anchor_kind", "decision_point", "prefix_points",
+        "channels", "symbols", "motif_format", "normalization", "values_exposed", "research_scope_rule_sha256", "scope_applied_sha256",
+        "scope_evidence_sha256", "scope_counts", "panels", "motif_is_executable_feature", "non_claims", "representation_payload_sha256",
+    }
+)
+_PANEL_KEYS = frozenset({"members_n", "motifs", "omitted_motif_n", "omitted_member_n", "missing_heavy_member_n", "missing_heavy_motifs_in_top_n"})
+
+
+def validate_episode_payload(payload: object, *, expected_rule_sha256: object) -> None:
+    """Closed-schema check of an accepted profile: re-hash, scope rule, only motif counts.
+
+    The builder is clean by construction; this makes the accepted bytes clean too.
+    """
+
+    from solana_alpha_lab.factory.hfic_research_scope import sha256_of
+
+    def need(condition: bool, code: str) -> None:
+        if not condition:
+            raise EpisodeProfileError(code)
+
+    need(isinstance(payload, Mapping) and set(payload) == _PAYLOAD_KEYS, "EPISODE_PAYLOAD_INVALID")
+    need(payload["representation_id"] == REPRESENTATION_ID and payload["schema"] == SCHEMA, "EPISODE_PAYLOAD_INVALID")
+    body = {key: value for key, value in payload.items() if key != "representation_payload_sha256"}
+    need(sha256_of(body) == payload["representation_payload_sha256"], "EPISODE_PAYLOAD_HASH_MISMATCH")
+    need(payload["motif_is_executable_feature"] is False, "EPISODE_PAYLOAD_INVALID")
+    panels = payload["panels"]
+    need(isinstance(panels, Mapping) and "BASE" in panels and set(panels) <= {"BASE", "SIGNAL", "COMPARATOR"}, "EPISODE_PAYLOAD_INVALID")
+    for panel in panels.values():
+        need(isinstance(panel, Mapping) and set(panel) == _PANEL_KEYS, "EPISODE_PAYLOAD_INVALID")
+        need(isinstance(panel["motifs"], list) and len(panel["motifs"]) <= MAX_MOTIFS, "EPISODE_PAYLOAD_INVALID")
+        for item in panel["motifs"]:
+            need(isinstance(item, Mapping) and set(item) == {"motif", "n"} and isinstance(item["motif"], str) and _MOTIF_RE.match(item["motif"]) is not None, "EPISODE_PAYLOAD_INVALID")
+        need(sum(item["n"] for item in panel["motifs"]) + panel["omitted_member_n"] == panel["members_n"], "EPISODE_PROFILE_COUNT_MISMATCH")
+    # A profile belongs to exactly the candidate scope it was built for (None = an unscoped candidate: refused).
+    need(payload["research_scope_rule_sha256"] == expected_rule_sha256, "EPISODE_PAYLOAD_SCOPE_MISMATCH")
