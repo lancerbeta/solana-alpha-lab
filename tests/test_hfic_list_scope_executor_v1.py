@@ -1,0 +1,265 @@
+"""Query 1.2 list scope on the temporal executor (D10/D11/D12/D16, direct level).
+
+Literal oracle from the PRD fixture (section 17.1); the production-shaped
+multi-process proof lives in test_hfic_list_aware_vertical_v1.
+"""
+
+from __future__ import annotations
+
+import copy
+import sys
+import unittest
+from datetime import UTC, datetime
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+for entry in (ROOT, ROOT / "src"):
+    if str(entry) not in sys.path:
+        sys.path.insert(0, str(entry))
+
+from solana_alpha_lab.factory import hfic_research_scope as rs  # noqa: E402
+from solana_alpha_lab.factory.hfic_grounded_discovery import GroundedDiscoveryError  # noqa: E402
+from solana_alpha_lab.factory.hfic_temporal_discovery import (  # noqa: E402
+    execute_temporal_discovery,
+    validate_temporal_query,
+)
+from tests.test_opportunity_episodes_contract_v1 import (  # noqa: E402
+    COHORT,
+    HOLD,
+    LIQ,
+    PRICE,
+    RELEASE,
+    binding_item,
+    obs_row,
+)
+
+SCHEDULE = {
+    "nomination": {
+        "primitive_id": "PRIM-JUPITER-TOKENS-V2-CATEGORY-NOMINATION-001",
+        "sources": [
+            {"source_id": "toporganicscore_5m", "category": "toporganicscore", "interval": "5m", "limit": 100},
+            {"source_id": "toptraded_5m", "category": "toptraded", "interval": "5m", "limit": 100},
+            {"source_id": "toptrending_5m", "category": "toptrending", "interval": "5m", "limit": 100},
+        ],
+    }
+}
+A, B, C = "JUPITER:toporganicscore:5m", "JUPITER:toptraded:5m", "JUPITER:toptrending:5m"
+# episode -> (lists, numeric signal, target return or None)
+FIXTURE = {
+    "e1": ("A", True, 0.10),
+    "e2": ("B", False, -0.20),
+    "e3": ("C", True, 0.30),
+    "e4": ("AB", True, 0.40),
+    "e5": ("AC", False, -0.10),
+    "e6": ("BC", True, None),
+    "e7": ("ABC", True, 0.20),
+}
+T0 = "2026-10-05T00:02:10Z"
+LIST_OF = {"A": A, "B": B, "C": C}
+
+
+def corpus():
+    census, rows = [], []
+    for episode, (_lists, signal, target) in FIXTURE.items():
+        mint = f"Mint{episode}".ljust(40, "x")
+        census.append({"cohort_id": COHORT, "release_id": RELEASE, "episode_id": episode, "mint": mint, "t0": T0})
+        holders300, holders1800 = (60, 75) if signal else (60, 55)
+        for point, available, price, holders in (
+            ("E300", "2026-10-05T00:10:04Z", 1.0, holders300),
+            ("E1800", "2026-10-05T00:35:09Z", 1.0, holders1800),
+            ("E14400", "2026-10-05T04:05:08Z", None if target is None else 1.0 + target, 80),
+        ):
+            for field, value in ((PRICE, price), (HOLD, holders), (LIQ, 12000)):
+                if point == "E14400" and target is None:
+                    rows.append(obs_row(episode, mint, point, field, None, available="2026-10-05T04:10:00Z", state="CENSORED"))
+                else:
+                    rows.append(obs_row(episode, mint, point, field, value, available=available))
+    return census, rows
+
+
+def evidence(unknown: dict[str, str] | None = None):
+    ev = rs.MembershipEvidence()
+    for definition in rs.jupiter_definitions(SCHEDULE).values():
+        ev.add_definition(definition)
+    for episode, (lists, _s, _t) in FIXTURE.items():
+        ev.states[episode] = {LIST_OF[x]: (rs.TRUE if x in lists else rs.FALSE) for x in "ABC"}
+        ev.t0[episode] = datetime(2026, 10, 5, 0, 2, 10, tzinfo=UTC)
+    for episode, letter in (unknown or {}).items():
+        ev.states[episode][LIST_OF[letter]] = rs.UNKNOWN
+    ev.bindings.append({"adapter": "TEST", "note": "direct-level fixture"})
+    return ev
+
+
+def spec(kind, **parts):
+    base = {
+        "schema": "smial.hfic-temporal-query",
+        "schema_version": "1.2",
+        "query_id": "Q",
+        "population": "OPPORTUNITY_EPISODES",
+        "anchor_kind": "NOMINATION_T0",
+        "time_contract": {"schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1", "time_feature_clock": "FIRST_RELIABLE_AVAILABLE_AT"},
+        "search_tier": "COMPOUND_SCREEN",
+        "budget_allocation": "COMPOUND_FIRST",
+        "decision": {"point_id": "E1800"},
+        "features": [],
+        "all": [],
+        "target": {"kind": "PRICE_RELATIVE_PROXY", "reference_point": "E1800", "exit_point": "E14400", "field_id": PRICE},
+        "entry_model": {"kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT", "assumed_latency_seconds": 0},
+        "hypothesis_kind": kind,
+        "research_scope": {},
+    }
+    base.update(parts)
+    return base
+
+
+NUMERIC = {
+    "features": [{"name": "d_holders", "op": "delta", "field_id": HOLD, "start": "E300", "end": "E1800"}],
+    "all": [{"feature": "d_holders", "op": "gt", "value": 0}],
+}
+AC = {"clauses": [{"all_of": ["A", "C"]}]}
+ALIASES = {"A": A, "B": B, "C": C}
+
+
+def run(draft, ev=None, *, resolved_override=None):
+    ev = ev or evidence()
+    draft = dict(draft, list_aliases=ALIASES)
+    query = rs.canonicalize_query_scope(draft, ev)
+    bound = validate_temporal_query(query)["scientific_body"]
+    census, rows = corpus()
+    resolved = rs.ResolvedScope(
+        scope=bound["research_scope"],
+        list_condition=bound.get("list_condition"),
+        evidence=ev,
+        episode_ids=[row["episode_id"] for row in census],
+        slices=bound.get("diagnostic_slices") or [],
+    )
+    return execute_temporal_discovery(
+        census, rows, query, [binding_item()], research_scope=resolved_override or resolved
+    )["summary"]
+
+
+class ScopedExecutorTests(unittest.TestCase):
+    def test_list_only_contrast_literal(self) -> None:
+        out = run(spec("LIST_CONTRAST", list_condition=AC))
+        scope = out["research_scope"]
+        self.assertEqual(out["research_scope"]["hypothesis_kind"], "LIST_CONTRAST")
+        self.assertEqual(scope["base_admitted_n"], 7)
+        self.assertEqual(scope["matched"]["n"], 2)
+        self.assertEqual(scope["matched"]["target_observed_n"], 2)
+        self.assertAlmostEqual(scope["matched"]["mean_target"], 0.05, places=9)
+        comp = scope["contrast"]["comparator"]
+        self.assertEqual((comp["n"], comp["target_observed_n"], comp["target_missing_n"]), (5, 4, 1))
+        self.assertAlmostEqual(comp["mean_target"], 0.15, places=9)
+        self.assertEqual(scope["contrast"]["status"], "EVALUATED")
+        self.assertAlmostEqual(scope["contrast"]["observed_target_difference"], -0.10, places=9)
+        self.assertEqual(out["feature_unknown_n"], 0)
+
+    def test_numeric_mechanism_inside_scope_literal(self) -> None:
+        draft = spec("NUMERIC_IN_SCOPE", research_scope={"universe_selector": AC}, **NUMERIC)
+        out = run(draft)
+        scope = out["research_scope"]
+        self.assertEqual(scope["universe_pass_n"], 2)
+        self.assertEqual(out["decision_eligible_n"], 2)
+        self.assertEqual(out["matched_n"], 1)
+        self.assertAlmostEqual(out["mean_target"], 0.20, places=9)
+        self.assertAlmostEqual(out["baseline"]["mean_target"], 0.05, places=9)
+        self.assertNotIn("contrast", scope)
+
+    def test_mixed_list_numeric(self) -> None:
+        out = run(spec("MIXED_LIST_NUMERIC", list_condition=AC, **NUMERIC))
+        scope = out["research_scope"]
+        # A&C with a rising holder count: only e7 (e5 has falling holders)
+        self.assertEqual(scope["matched"]["n"], 1)
+        self.assertAlmostEqual(scope["matched"]["mean_target"], 0.20, places=9)
+        self.assertEqual(scope["contrast"]["comparator"]["n"], 7)
+
+    def test_intersection_minus_b_and_pooled_control(self) -> None:
+        out = run(spec("LIST_CONTRAST", list_condition={"clauses": [{"all_of": ["A", "C"], "none_of": ["B"]}]}))
+        self.assertEqual(out["research_scope"]["matched"]["n"], 1)  # e5 only
+        # missing e6 stays in the comparator denominator
+        self.assertEqual(out["research_scope"]["contrast"]["comparator"]["n"], 6)
+
+    def test_slices_are_overlapping_and_reported(self) -> None:
+        slices = [
+            {"slice_id": "A", "selector": {"clauses": [{"all_of": ["A"]}]}},
+            {"slice_id": "two_plus", "selector": {"clauses": [{"count": {"of": ["A", "B", "C"], "min": 2, "max": 3}}]}},
+        ]
+        out = run(spec("LIST_CONTRAST", list_condition=AC, diagnostic_slices=slices))
+        by = {item["slice_id"]: item for item in out["research_scope"]["diagnostic_slices"]}
+        self.assertEqual(by["A"]["decision_eligible"]["n"], 4)
+        self.assertEqual(by["two_plus"]["decision_eligible"]["n"], 4)
+        self.assertEqual(by["two_plus"]["decision_eligible"]["target_missing_n"], 1)
+        self.assertTrue(out["research_scope"]["slices_overlap_not_additive"])
+
+    def test_degenerate_groups_are_typed_not_alpha(self) -> None:
+        empty = run(spec("LIST_CONTRAST", list_condition={"clauses": [{"all_of": ["A", "B", "C"], "none_of": []}, ]}), evidence())
+        self.assertEqual(empty["research_scope"]["matched"]["n"], 1)
+        every = run(spec("LIST_CONTRAST", list_condition={"clauses": [{"count": {"of": ["A", "B", "C"], "min": 0, "max": 3}}]}))
+        self.assertEqual(every["research_scope"]["contrast"]["status"], "EMPTY_COMPARATOR")
+        self.assertIsNone(every["research_scope"]["contrast"]["observed_target_difference"])
+
+    def test_unknown_membership_refuses_before_values(self) -> None:
+        with self.assertRaises(GroundedDiscoveryError) as caught:
+            run(spec("LIST_CONTRAST", list_condition=AC), evidence({"e3": "A"}))
+        self.assertEqual(caught.exception.code, "SCOPE_COVERAGE_UNRESOLVED")
+
+    def test_identical_universe_and_signal_is_non_discriminating(self) -> None:
+        with self.assertRaises(GroundedDiscoveryError) as caught:
+            run(spec("LIST_CONTRAST", research_scope={"universe_selector": AC}, list_condition=AC))
+        self.assertEqual(caught.exception.code, "NON_DISCRIMINATING_CONDITION")
+
+    def test_scope_cannot_be_dropped_or_swapped(self) -> None:
+        ev = evidence()
+        draft = spec("LIST_CONTRAST", list_condition=AC, list_aliases=ALIASES)
+        query = rs.canonicalize_query_scope(draft, ev)
+        census, rows = corpus()
+        # legacy 1.1 cannot carry scope fields
+        legacy = copy.deepcopy(query)
+        legacy["schema_version"] = "1.1"
+        with self.assertRaises(GroundedDiscoveryError) as caught:
+            validate_temporal_query(legacy)
+        self.assertEqual(caught.exception.code, "SCOPE_FIELDS_REQUIRE_QUERY_1_2")
+        # 1.2 without a scope
+        missing = {k: v for k, v in query.items() if k != "research_scope"}
+        with self.assertRaises(GroundedDiscoveryError):
+            validate_temporal_query(missing)
+        # executor without masks / with masks of another rule
+        with self.assertRaises(GroundedDiscoveryError) as caught:
+            execute_temporal_discovery(census, rows, query, [binding_item()])
+        self.assertEqual(caught.exception.code, "RESEARCH_SCOPE_BINDING_MISMATCH")
+        other = rs.canonicalize_query_scope(spec("LIST_CONTRAST", list_condition={"clauses": [{"all_of": ["A"]}]}, list_aliases=ALIASES), ev)
+        body = validate_temporal_query(other)["scientific_body"]
+        wrong = rs.ResolvedScope(scope=body["research_scope"], list_condition=body["list_condition"], evidence=ev, episode_ids=[r["episode_id"] for r in census])
+        with self.assertRaises(GroundedDiscoveryError) as caught:
+            execute_temporal_discovery(census, rows, query, [binding_item()], research_scope=wrong)
+        self.assertEqual(caught.exception.code, "RESEARCH_SCOPE_BINDING_MISMATCH")
+        # legacy unscoped query refuses injected masks
+        legacy_query = {k: v for k, v in query.items() if k not in rs_fields()}
+        legacy_query["schema_version"] = "1.1"
+        legacy_query.update(NUMERIC)
+        with self.assertRaises(GroundedDiscoveryError) as caught:
+            execute_temporal_discovery(census, rows, legacy_query, [binding_item()], research_scope=wrong)
+        self.assertEqual(caught.exception.code, "RESEARCH_SCOPE_BINDING_MISMATCH")
+
+    def test_identity_depends_on_rule_not_on_aliases_or_evidence(self) -> None:
+        ev = evidence()
+        one = validate_temporal_query(rs.canonicalize_query_scope(spec("LIST_CONTRAST", list_condition=AC, list_aliases=ALIASES), ev))
+        renamed = {"X": A, "Y": B, "Z": C}
+        two = validate_temporal_query(
+            rs.canonicalize_query_scope(
+                spec("LIST_CONTRAST", list_condition={"clauses": [{"all_of": ["Z", "X"]}]}, list_aliases=renamed), ev
+            )
+        )
+        self.assertEqual(one["spec_sha256"], two["spec_sha256"])
+        scope_only = validate_temporal_query(
+            rs.canonicalize_query_scope(spec("LIST_CONTRAST", list_condition={"clauses": [{"all_of": ["A", "B"]}]}, list_aliases=ALIASES), ev)
+        )
+        self.assertNotEqual(one["spec_sha256"], scope_only["spec_sha256"])
+
+
+def rs_fields():
+    return {"research_scope", "list_condition", "hypothesis_kind", "contrast", "diagnostic_slices"}
+
+
+if __name__ == "__main__":
+    unittest.main()

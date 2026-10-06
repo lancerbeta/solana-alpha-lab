@@ -34,6 +34,17 @@ TEMPORAL_SCHEMA = "smial.hfic-temporal-query"
 TEMPORAL_SCHEMA_VERSION = "1.0"
 # Additive OPPORTUNITY_EPISODES query version. 1.0/BASE_X identity is unchanged.
 TEMPORAL_SCHEMA_VERSION_EPISODES = "1.1"
+# Query 1.2 = 1.1 + a mandatory shared ResearchScope (lists as universe/signal/slices).
+TEMPORAL_SCHEMA_VERSION_EPISODES_SCOPED = "1.2"
+SCOPE_QUERY_FIELDS = frozenset({"research_scope", "list_condition", "hypothesis_kind", "contrast", "diagnostic_slices"})
+SCOPED_QUERY_KEYS = frozenset(
+    {
+        "schema", "schema_version", "query_id", "population", "anchor_kind", "time_contract",
+        "search_tier", "decision", "schedule", "features", "all", "target", "entry_model",
+        "cost_profile", "evaluation", "budget_allocation", "adaptation_of",
+    }
+) | SCOPE_QUERY_FIELDS
+MAX_DIAGNOSTIC_SLICES = 8
 EPISODE_POPULATION = "OPPORTUNITY_EPISODES"
 EPISODE_ANCHOR_KIND = "NOMINATION_T0"
 EPISODE_TIME_FEATURE_CLOCK = "FIRST_RELIABLE_AVAILABLE_AT"
@@ -325,6 +336,17 @@ def _episode_offset(point: str) -> int:
     return point_offset(point)
 
 
+def _scoped_part(spec: Mapping[str, Any]) -> dict[str, Any]:
+    """Query 1.2 scope fields in canonical form (already alias-resolved)."""
+
+    from solana_alpha_lab.factory import hfic_research_scope as scope_owner
+
+    try:
+        return scope_owner.validate_query_scope_fields(spec, max_slices=MAX_DIAGNOSTIC_SLICES)
+    except scope_owner.ResearchScopeError as exc:
+        raise GroundedDiscoveryError(exc.code) from exc
+
+
 def _episode_scientific_body(spec: Mapping[str, Any]) -> dict[str, Any]:
     """OPPORTUNITY_EPISODES question identity (query 1.1). Never BASE_X."""
 
@@ -337,6 +359,13 @@ def _episode_scientific_body(spec: Mapping[str, Any]) -> dict[str, Any]:
 
     if spec.get("any") is not None:
         raise GroundedDiscoveryError("OR_NOT_A_PREDICATE")
+    scoped = spec.get("schema_version") == TEMPORAL_SCHEMA_VERSION_EPISODES_SCOPED
+    if not scoped and SCOPE_QUERY_FIELDS & set(spec):
+        # Never discard a scope silently: only query 1.2 carries one.
+        raise GroundedDiscoveryError("SCOPE_FIELDS_REQUIRE_QUERY_1_2")
+    if scoped and set(spec) - SCOPED_QUERY_KEYS:
+        raise GroundedDiscoveryError("QUERY_UNKNOWN_FIELD")
+    scope_part = _scoped_part(spec) if scoped else None
     if spec.get("population") != EPISODE_POPULATION:
         raise GroundedDiscoveryError("POPULATION_CONTRACT_UNKNOWN")
     if spec.get("anchor_kind") != EPISODE_ANCHOR_KIND:
@@ -369,10 +398,14 @@ def _episode_scientific_body(spec: Mapping[str, Any]) -> dict[str, Any]:
         raise GroundedDiscoveryError("OBSERVATION_CLOCK_POLICY_INVALID")
     features_in = spec.get("features")
     predicates_in = spec.get("all")
-    if not isinstance(features_in, list) or not features_in or len(features_in) > MAX_FEATURES:
+    list_only = scope_part is not None and scope_part["hypothesis_kind"] == "LIST_CONTRAST"
+    if not isinstance(features_in, list) or (not features_in and not list_only) or len(features_in) > MAX_FEATURES:
         raise GroundedDiscoveryError("FEATURE_INVALID")
-    if not isinstance(predicates_in, list) or not predicates_in or len(predicates_in) > MAX_PREDICATES:
+    if not isinstance(predicates_in, list) or (not predicates_in and not list_only) or len(predicates_in) > MAX_PREDICATES:
         raise GroundedDiscoveryError("PREDICATE_INVALID")
+    if list_only and predicates_in:
+        # A list-only hypothesis carries no numeric condition; a fake predicate would hide the question.
+        raise GroundedDiscoveryError("LIST_CONTRAST_FORBIDS_NUMERIC_CONDITION")
     features = [
         _canonical_feature(
             _require_mapping(item, "FEATURE_INVALID"),
@@ -442,6 +475,7 @@ def _episode_scientific_body(spec: Mapping[str, Any]) -> dict[str, Any]:
             "schedule_contract": SCHEDULE_CONTRACT,
             "time_feature_clock": EPISODE_TIME_FEATURE_CLOCK,
         },
+        **(scope_part or {}),
         "decision_point": decision_point,
         "observation_clock_policy": OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
         "features": sorted(features, key=lambda item: str(item["name"])),
@@ -473,7 +507,7 @@ def scientific_body(spec: Mapping[str, Any]) -> dict[str, Any]:
 
     if not is_temporal_query(spec):
         raise GroundedDiscoveryError("QUERY_SPEC_INVALID")
-    if spec.get("schema_version") == TEMPORAL_SCHEMA_VERSION_EPISODES:
+    if spec.get("schema_version") in (TEMPORAL_SCHEMA_VERSION_EPISODES, TEMPORAL_SCHEMA_VERSION_EPISODES_SCOPED):
         return _episode_scientific_body(spec)
     if spec.get("schema_version") != TEMPORAL_SCHEMA_VERSION:
         raise GroundedDiscoveryError("QUERY_SPEC_INVALID")
@@ -585,12 +619,13 @@ def _validate_episode_temporal_query(body: Mapping[str, Any]) -> dict[str, Any]:
         for key in body
         if key not in {"query_id", "search_tier", "budget_allocation", "adaptation_of"}
     }
-    identity["schema_version"] = TEMPORAL_SCHEMA_VERSION_EPISODES
+    version = TEMPORAL_SCHEMA_VERSION_EPISODES_SCOPED if "research_scope" in body else TEMPORAL_SCHEMA_VERSION_EPISODES
+    identity["schema_version"] = version
     digest = _sha256(identity)
     runtime_body = {key: value for key, value in identity.items() if key != "schema_version"}
     return {
         "query_id": body["query_id"],
-        "schema_version": TEMPORAL_SCHEMA_VERSION_EPISODES,
+        "schema_version": version,
         "decision_points": [body["decision_point"]],
         "decision_fields": [PRICE, LIQUIDITY] + (
             [HOLDER_COUNT] if any(f.get("field_id") == HOLDER_COUNT for f in body["features"]) else []
@@ -3140,7 +3175,7 @@ def _episode_signature(rows: Sequence[Mapping[str, Any]]) -> tuple:
 
 
 def _project_episode_members(
-    census, observations, body, binding, *, universe_policy=None, prefix_only=False,
+    census, observations, body, binding, *, universe_policy=None, prefix_only=False, scope=None,
 ):
     """OPPORTUNITY_EPISODES membership and features. Base = every admission.
 
@@ -3262,6 +3297,11 @@ def _project_episode_members(
             universe_status = str(verdict["status"])
             universe_reasons = list(verdict["reasons"])
             search_base = universe_status == "PASS"
+        scope_exclusion = None
+        if scope is not None and scope.universe.get(episode) != "TRUE":
+            # Universe membership is decided before any market value is read for this episode.
+            search_base = False
+            scope_exclusion = "SCOPE_UNIVERSE_" + str(scope.universe.get(episode) or "UNKNOWN")
         decision_eligible = False
         if search_base:
             decision_price = _cell(
@@ -3298,12 +3338,15 @@ def _project_episode_members(
                     if feature_lineage in SNAPSHOT_LINEAGE_BLOCKERS and exclusion not in SNAPSHOT_LINEAGE_BLOCKERS:
                         exclusion = feature_lineage
         else:
-            exclusion = "UNIVERSE_" + str(universe_status or "UNKNOWN")
+            exclusion = scope_exclusion or "UNIVERSE_" + str(universe_status or "UNKNOWN")
         hits = [
             _predicate_holds(feature_values.get(str(item_p["feature"])), item_p) for item_p in predicates
         ] if decision_eligible else []
         feature_unknown = decision_eligible and any(hit is None for hit in hits)
-        matched = decision_eligible and not feature_unknown and all(hit is True for hit in hits)
+        signal_hit = True
+        if scope is not None and scope.list_condition is not None:
+            signal_hit = scope.signal.get(episode) == "TRUE"
+        matched = decision_eligible and not feature_unknown and all(hit is True for hit in hits) and signal_hit
         target_value = None
         target_observed = False
         target_exclusion = None
@@ -3326,6 +3369,7 @@ def _project_episode_members(
                 **({"feature_reasons": feature_reasons, "cohort_id": cohort, "release_id": release} if prefix_mode else {}),
                 "feature_unknown": feature_unknown,
                 "matched": matched,
+                "scope_signal": signal_hit if scope is not None else None,
                 "target": target_value,
                 "target_is_observed": target_observed,
                 "target_exclusion": publish_target_exclusion,
@@ -3345,6 +3389,105 @@ def _project_episode_members(
     return members, cohort_membership, seen, duplicate_count, integrity_conflicts, episode_mints
 
 
+def _bind_scope_to_body(resolved: Any, body: Mapping[str, Any], census: Sequence[Mapping[str, Any]]) -> None:
+    """The applied masks must be the frozen rule, over exactly the admitted episodes."""
+
+    from solana_alpha_lab.factory import hfic_research_scope as scope_owner
+
+    if (
+        resolved.scope != body["research_scope"]
+        or resolved.list_condition != body.get("list_condition")
+        or resolved.slices != list(body.get("diagnostic_slices") or [])
+    ):
+        raise GroundedDiscoveryError("RESEARCH_SCOPE_BINDING_MISMATCH")
+    episodes = {str(row.get("episode_id") or "") for row in census}
+    if not episodes <= set(resolved.universe):
+        raise GroundedDiscoveryError("RESEARCH_SCOPE_BINDING_MISMATCH")
+    try:
+        resolved.require_covered()
+    except scope_owner.ResearchScopeError as exc:
+        raise GroundedDiscoveryError(exc.code) from exc
+
+
+def _group_stats(group: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    observed = [float(item["target"]) for item in group if item["target_is_observed"] and item["target"] is not None]
+    return {
+        "n": len(group),
+        "target_observed_n": len(observed),
+        "target_missing_n": len(group) - len(observed),
+        "mean_target": _mean(observed),
+        "distinct_mint_n": len({str(item.get("mint")) for item in group}),
+        "distinct_day_n": len({str(item.get("block")) for item in group}),
+    }
+
+
+def scope_selector_hash(selector: Mapping[str, Any]) -> str:
+    from solana_alpha_lab.factory import hfic_research_scope as scope_owner
+
+    return scope_owner.sha256_of(selector)
+
+
+def _scope_result(resolved, body, members, decision_members, matched_members) -> dict[str, Any]:
+    kind = body["hypothesis_kind"]
+    in_universe = [item for item in members if item.get("in_base") and resolved.universe.get(item.get("episode_id")) == "TRUE"]
+    matched_ids = {id(item) for item in matched_members}
+    result: dict[str, Any] = {
+        "schema": "smial.research-scope-result",
+        "schema_version": "1.0",
+        "hypothesis_kind": kind,
+        "rule_sha256": resolved.rule_sha256,
+        "scope_sha256": resolved.scope_sha256,
+        "evidence_sha256": resolved.evidence_sha256,
+        "applied_sha256": resolved.applied_sha256,
+        "membership_time_basis": body["research_scope"]["membership_time_basis"],
+        "coverage": resolved.coverage(),
+        "base_admitted_n": len([item for item in members if item.get("in_base")]),
+        "universe_pass_n": len(in_universe),
+        "decision_eligible_n": len(decision_members),
+        "matched": _group_stats(matched_members),
+    }
+    contrast_kind = body.get("contrast")
+    if contrast_kind is not None:
+        if contrast_kind == "MATCHED_VS_ELIGIBLE_COMPLEMENT":
+            comparator = [item for item in decision_members if id(item) not in matched_ids]
+        else:
+            comparator = list(decision_members)
+        stats = _group_stats(comparator)
+        matched_stats = result["matched"]
+        status = "EVALUATED"
+        if matched_stats["n"] == 0:
+            status = "EMPTY_SIGNAL_GROUP"
+        elif stats["n"] == 0:
+            status = "EMPTY_COMPARATOR"
+        elif matched_stats["n"] == len(decision_members) and contrast_kind == "MATCHED_VS_DECISION_ELIGIBLE":
+            status = "NON_DISCRIMINATING_CONDITION"
+        difference = None
+        if status == "EVALUATED" and matched_stats["mean_target"] is not None and stats["mean_target"] is not None:
+            difference = matched_stats["mean_target"] - stats["mean_target"]
+        result["contrast"] = {
+            "kind": contrast_kind,
+            "status": status,
+            "comparator": stats,
+            "observed_target_difference": difference,
+            "kind_of_claim": "OBSERVATIONAL_ASSOCIATION",
+        }
+    slices = []
+    for item in resolved.slices:
+        states = resolved.slice_states[item["slice_id"]]
+        in_slice = [m for m in decision_members if states.get(m.get("episode_id")) == "TRUE"]
+        slices.append(
+            {
+                "slice_id": item["slice_id"],
+                "selector_sha256": scope_selector_hash(item["selector"]),
+                "decision_eligible": _group_stats(in_slice),
+                "matched": _group_stats([m for m in in_slice if id(m) in matched_ids]),
+            }
+        )
+    result["diagnostic_slices"] = slices
+    result["slices_overlap_not_additive"] = bool(slices)
+    return result
+
+
 def execute_temporal_discovery(
     census: Sequence[Mapping[str, Any]],
     observations: Sequence[Mapping[str, Any]],
@@ -3352,6 +3495,7 @@ def execute_temporal_discovery(
     binding: Sequence[Mapping[str, Any]],
     *,
     universe_policy: Mapping[str, Any] | None = None,
+    research_scope: Any = None,
 ) -> dict[str, Any]:
     """Compute one temporal query. Binding is admitted before any value read."""
 
@@ -3368,6 +3512,12 @@ def execute_temporal_discovery(
     if episode_population != (admitted.get("population") == EPISODE_POPULATION):
         raise GroundedDiscoveryError("POPULATION_BINDING_MISMATCH")
     episode_mints: dict[str, str] = {}
+    scoped_body = "research_scope" in body
+    if scoped_body != (research_scope is not None):
+        # A scoped query without verified masks (or masks without a scoped query) never degrades to pooled.
+        raise GroundedDiscoveryError("RESEARCH_SCOPE_BINDING_MISMATCH")
+    if scoped_body:
+        _bind_scope_to_body(research_scope, body, census)
     if episode_population:
         (
             members,
@@ -3376,7 +3526,7 @@ def execute_temporal_discovery(
             duplicate_count,
             integrity_conflicts,
             episode_mints,
-        ) = _project_episode_members(census, observations, body, require_episode_binding_rows(binding), universe_policy=universe_policy)
+        ) = _project_episode_members(census, observations, body, require_episode_binding_rows(binding), universe_policy=universe_policy, scope=research_scope)
     else:
         lateness = int(body["schedule_lateness_seconds"])
         _require_bound_schedule(binding, body, lateness)
@@ -3611,6 +3761,14 @@ def execute_temporal_discovery(
             ),
         ],
     }
+    if scoped_body:
+        summary["research_scope"] = _scope_result(research_scope, body, members, decision_members, matched_members)
+        summary["experiment_recipe"]["research_scope_rule_sha256"] = research_scope.rule_sha256
+        summary["experiment_recipe"]["research_scope_evidence"] = {
+            "evidence_sha256": research_scope.evidence_sha256,
+            "bindings": research_scope.evidence_bindings,
+        }
+        summary["non_claims"] = list(summary["non_claims"]) + ["MEMBERSHIP_IS_OBSERVATIONAL_NOT_CAUSAL"]
     if universe_policy is not None:
         from solana_alpha_lab.factory.hfic_research_universe_policy import snapshot
 
@@ -4256,11 +4414,13 @@ def _public_query_from_recipe(recipe: Mapping[str, Any]) -> dict[str, Any]:
     if not isinstance(body, Mapping):
         raise GroundedDiscoveryError("EXPERIMENT_RECIPE_INVALID")
     if is_episode_body(body):
-        if query.get("schema_version") != TEMPORAL_SCHEMA_VERSION_EPISODES:
+        scoped = "research_scope" in body
+        expected_version = TEMPORAL_SCHEMA_VERSION_EPISODES_SCOPED if scoped else TEMPORAL_SCHEMA_VERSION_EPISODES
+        if query.get("schema_version") != expected_version:
             raise GroundedDiscoveryError("EXPERIMENT_RECIPE_INVALID")
         public_episode = {
             "schema": TEMPORAL_SCHEMA,
-            "schema_version": TEMPORAL_SCHEMA_VERSION_EPISODES,
+            "schema_version": expected_version,
             "query_id": query.get("query_id") or "frozen-recipe",
             "population": EPISODE_POPULATION,
             "anchor_kind": body["anchor_kind"],
@@ -4279,6 +4439,10 @@ def _public_query_from_recipe(recipe: Mapping[str, Any]) -> dict[str, Any]:
             "cost_profile": body.get("cost_profile"),
             "evaluation": body.get("evaluation") or {},
         }
+        if scoped:
+            for key in sorted(SCOPE_QUERY_FIELDS):
+                if key in body:
+                    public_episode[key] = body[key]
         if query.get("adaptation_of") is not None:
             public_episode["adaptation_of"] = query["adaptation_of"]
         return public_episode
@@ -4466,12 +4630,22 @@ def run_temporal_fixed_time_from_spec(
         frozen_policy = recipe_policy(recipe)
     except UniversePolicyError as exc:
         raise GroundedDiscoveryError(exc.code) from exc
+    research_scope = None
+    if pre["scientific_body"].get("research_scope") is not None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import resolve_research_scope
+
+        # Masks are rebuilt from the frozen releases' own verified files, never from a saved mask.
+        research_scope = resolve_research_scope(
+            pre["scientific_body"], data_root, loaded["census"], loaded["cohorts"],
+            frozen_evidence=recipe.get("research_scope_evidence"),
+        )
     computed = execute_temporal_discovery(
         loaded["census"],
         loaded["observations"],
         public,
         loaded["cohorts"],
         universe_policy=frozen_policy,
+        research_scope=research_scope,
     )
     summary = computed["summary"]
     return {

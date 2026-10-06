@@ -1589,6 +1589,7 @@ def execute_discovery_from_rows(
     binding: Sequence[Mapping[str, Any]],
     *,
     universe_policy: Mapping[str, Any] | None = None,
+    research_scope: Any = None,
 ) -> dict[str, Any]:
     """Compute BASE_X, PIT features and a later target from production-shaped rows.
 
@@ -1600,7 +1601,7 @@ def execute_discovery_from_rows(
         from solana_alpha_lab.factory.hfic_temporal_discovery import execute_temporal_discovery
 
         return execute_temporal_discovery(
-            census, observations, spec, binding, universe_policy=universe_policy
+            census, observations, spec, binding, universe_policy=universe_policy, research_scope=research_scope
         )
     bound_spec = validate_query_spec(spec)
     for item in binding:
@@ -2180,6 +2181,56 @@ def _append_temporal_intent(
     store.append([event], transaction_id=event.transaction_id)
 
 
+def resolve_research_scope(
+    body: Mapping[str, Any], data_root: Path | None, census, binding, *, frozen_evidence: Mapping[str, Any] | None = None
+) -> Any:
+    """ResolvedScope for one scoped query over the admitted cohorts of this binding.
+
+    `frozen_evidence` (a saved recipe's closure) pins the exact local snapshots and the evidence
+    digest; the live registry is not consulted beyond them.
+    """
+
+    from solana_alpha_lab.factory import hfic_research_scope as scope_owner
+
+    if data_root is None:
+        raise GroundedDiscoveryError("RESEARCH_SCOPE_DATA_ROOT_REQUIRED")
+    releases = {str(item.get("release_id")) for item in binding}
+    try:
+        frozen_shas = None
+        if frozen_evidence is not None:
+            frozen_shas = [
+                str(item["snapshot_sha256"])
+                for item in frozen_evidence.get("bindings") or []
+                if item.get("adapter") == scope_owner.LOCAL_ADAPTER
+            ]
+        evidence = scope_owner.load_corpus_membership(
+            Path(data_root),
+            only_release_ids=releases,
+            local_list_ids=scope_owner.referenced_list_ids(body),
+            local_snapshot_shas=frozen_shas,
+        )
+        resolved = scope_owner.ResolvedScope(
+            scope=body["research_scope"],
+            list_condition=body.get("list_condition"),
+            evidence=evidence,
+            episode_ids=sorted({str(row.get("episode_id") or "") for row in census}),
+            slices=body.get("diagnostic_slices") or [],
+        )
+        if frozen_evidence is not None and resolved.evidence_sha256 != frozen_evidence.get("evidence_sha256"):
+            raise GroundedDiscoveryError("RESEARCH_SCOPE_EVIDENCE_DRIFT")
+        return resolved
+    except scope_owner.ResearchScopeError as exc:
+        raise GroundedDiscoveryError(exc.code) from exc
+    except (OSError, ValueError, KeyError) as exc:
+        raise GroundedDiscoveryError("RESEARCH_SCOPE_EVIDENCE_UNREADABLE") from exc
+
+
+def _scoped_binding_sha(binding_sha: str, resolved: Any) -> str:
+    from solana_alpha_lab.factory import hfic_research_scope as scope_owner
+
+    return scope_owner.sha256_of({"data_binding_sha256": binding_sha, "research_scope_applied_sha256": resolved.applied_sha256})
+
+
 def run_recorded_discovery_query(
     store: Any,
     *,
@@ -2284,6 +2335,7 @@ def run_recorded_discovery_query(
             policy_head = {"definition": None}
     policy_definition = policy_head.get("definition")
     revising_legacy = False
+    research_scope = None
     if _is_temporal_query(spec):
         from solana_alpha_lab.factory.hfic_temporal_discovery import (
             TEMPORAL_CALCULATION_VERSION,
@@ -2300,6 +2352,13 @@ def run_recorded_discovery_query(
         bare_binding_sha = data_binding_sha256(bare_admitted, census, observations)
         admitted_meta = admitted_with_policy(bare_admitted, policy_definition)
         pre_binding_sha = data_binding_sha256(admitted_meta, census, observations)
+        research_scope = None
+        if "research_scope" in prevalidated["scientific_body"]:
+            # Masks come only from verified release files + registered snapshots; a changed
+            # list evidence is a different applied input, never a stale same-question replay.
+            research_scope = resolve_research_scope(prevalidated["scientific_body"], data_root, census, binding)
+            bare_binding_sha = _scoped_binding_sha(bare_binding_sha, research_scope)
+            pre_binding_sha = _scoped_binding_sha(pre_binding_sha, research_scope)
 
         def _same_question_binding(item: Mapping[str, Any]) -> bool:
             stored_sha = item.get("data_binding_sha256")
@@ -2421,6 +2480,7 @@ def run_recorded_discovery_query(
             spec,
             binding,
             universe_policy=None if revising_legacy else policy_definition,
+            research_scope=research_scope,
         )
         if source_look is not None:
             recipe = computed["summary"].get("experiment_recipe") or {}

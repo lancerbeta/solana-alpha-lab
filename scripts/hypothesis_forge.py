@@ -2079,6 +2079,86 @@ def _cmd_discovery_preview(
     return emit(payload)
 
 
+def cmd_research_scope_resolve(repo_root: Path, explicit_data_root: Path | None, *, spec_path: Path) -> int:
+    """Resolve aliases of a draft query 1.2 into its canonical form. Reads no market value."""
+
+    from solana_alpha_lab.factory import hfic_research_scope as scope_owner
+    from solana_alpha_lab.factory.hfic_grounded_discovery import GroundedDiscoveryError
+    from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+
+    git_before = repository_git_snapshot(repo_root)
+    try:
+        data_root = _existing_data_root(repo_root, explicit_data_root)
+        draft = json.loads(spec_path.read_text(encoding="utf-8"))
+    except HficCliError as exc:
+        return emit_error(str(exc))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return emit_error("DISCOVERY_INPUT_INVALID")
+    if not isinstance(draft, dict) or draft.get("schema_version") != "1.2":
+        return emit_error("RESEARCH_SCOPE_QUERY_1_2_REQUIRED")
+    try:
+        evidence = scope_owner.load_corpus_membership(data_root)
+        query = scope_owner.canonicalize_query_scope(draft, evidence)
+        bound = validate_temporal_query(query)
+        body = bound["scientific_body"]
+        resolved = scope_owner.ResolvedScope(
+            scope=body["research_scope"],
+            list_condition=body.get("list_condition"),
+            evidence=evidence,
+            episode_ids=sorted(evidence.t0),
+            slices=body.get("diagnostic_slices") or [],
+        )
+        coverage = resolved.coverage()
+    except scope_owner.ResearchScopeError as exc:
+        return emit({"reason_code": exc.code, "detail": exc.detail, "values_loaded": False, "writes": False}, exit_code=2)
+    except GroundedDiscoveryError as exc:
+        return emit({"reason_code": exc.code, "values_loaded": False, "writes": False}, exit_code=2)
+    except (OSError, ValueError, KeyError):
+        return emit({"reason_code": "RESEARCH_SCOPE_EVIDENCE_UNREADABLE", "values_loaded": False, "writes": False}, exit_code=2)
+    if not git_before.unchanged(repository_git_snapshot(repo_root)):
+        return emit_error("GIT_MUTATION_DETECTED")
+    payload: dict[str, Any] = {
+        "canonical_query": query,
+        "spec_sha256": bound["spec_sha256"],
+        "rule_sha256": resolved.rule_sha256,
+        "coverage": coverage,
+        "values_loaded": False,
+        "writes": False,
+    }
+    try:
+        resolved.require_covered()
+    except scope_owner.ResearchScopeError as exc:
+        # Unknown membership is reported before any value; a covered scope must be declared first.
+        payload.update(reason_code=exc.code, covered_scope_required=True)
+        return emit(payload, exit_code=2)
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_list_snapshot_register(
+    repo_root: Path, explicit_data_root: Path | None, *, snapshot_path: Path, registered_at: str | None
+) -> int:
+    """Register one local membership snapshot (LOCAL_MEMBERSHIP_SNAPSHOT_V1)."""
+
+    from solana_alpha_lab.factory import hfic_research_scope as scope_owner
+    from solana_alpha_lab.factory.observation_schedule import parse_utc
+
+    try:
+        data_root = _existing_data_root(repo_root, explicit_data_root)
+    except HficCliError as exc:
+        return emit_error(str(exc))
+    from datetime import UTC, datetime
+
+    when = parse_utc(registered_at) if registered_at else datetime.now(tz=UTC)
+    try:
+        receipt = scope_owner.register_local_snapshot(data_root, snapshot_path, registered_at=when)
+    except scope_owner.ResearchScopeError as exc:
+        return emit({"reason_code": exc.code, "writes": False}, exit_code=2)
+    except ValueError:
+        return emit({"reason_code": "SNAPSHOT_INVALID", "writes": False}, exit_code=2)
+    return emit({**receipt, "adapter": scope_owner.LOCAL_ADAPTER})
+
+
 def cmd_discovery_coverage(repo_root: Path, explicit_data_root: Path | None) -> int:
     """State-only joint coverage. Writes nothing and does not reserve a slot."""
 
@@ -3695,6 +3775,19 @@ def build_parser() -> argparse.ArgumentParser:
         help="No-write state-only joint coverage. Never selects typed_value.",
     )
     discovery_coverage.add_argument("--format", choices=("json",), default="json")
+    scope_resolve = subparsers.add_parser(
+        "research-scope-resolve",
+        help="Resolve list aliases of a draft query 1.2 to its canonical scope; reads no market value.",
+    )
+    scope_resolve.add_argument("--spec", type=Path, required=True)
+    scope_resolve.add_argument("--format", choices=("json",), default="json")
+    snapshot_register = subparsers.add_parser(
+        "list-snapshot-register",
+        help="Register one local membership snapshot; a manual list is never available before registration.",
+    )
+    snapshot_register.add_argument("--snapshot", type=Path, required=True)
+    snapshot_register.add_argument("--registered-at", default=None)
+    snapshot_register.add_argument("--format", choices=("json",), default="json")
     discovery_binding = subparsers.add_parser(
         "discovery-binding",
         help=(
@@ -4155,6 +4248,12 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.command == "discovery-coverage":
             return cmd_discovery_coverage(repo_root, args.data_root)
+        if args.command == "research-scope-resolve":
+            return cmd_research_scope_resolve(repo_root, args.data_root, spec_path=args.spec)
+        if args.command == "list-snapshot-register":
+            return cmd_list_snapshot_register(
+                repo_root, args.data_root, snapshot_path=args.snapshot, registered_at=args.registered_at
+            )
         if args.command == "discovery-binding":
             return cmd_discovery_binding(repo_root, args.data_root)
         if args.command == "discovery-preview":

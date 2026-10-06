@@ -32352,7 +32352,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 05db976b900fb9689d6e96ea9faef15644b1b4153d827872299ff0c104906a72}
+  integrity: {kind: sha256, sha256: c93040a1b82513795f8bf65c124c5786d25782b38b1f10a5409fc81006949ec2}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37993,7 +37993,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: 10b8c037ca692b8941385058a71bd4b81442f30abb139f4df5e635a8e6f6db4a}
+  integrity: {kind: sha256, sha256: 49a2463465f1b2a5bf3d5e858f3c63f8148b2afa62d708c1d9eb9e169759076b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -38570,7 +38570,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_preflight.py', repository_path: src/solana_alpha_lab/factory/hfic_preflight.py}
-  integrity: {kind: sha256, sha256: b2a523125fe90e7e95d9c80b0b7e2aba54e0e6cbfccd0793c6d26c47f6b2043c}
+  integrity: {kind: sha256, sha256: 5f20cd08dc8f3e68bbfcfb5c1c1991256b08acc035f4dcce32abd3b7e6b71e1d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
