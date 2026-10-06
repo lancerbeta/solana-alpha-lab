@@ -845,3 +845,37 @@ def referenced_list_ids(body: Mapping[str, Any]) -> list[str]:
     for item in body.get("diagnostic_slices") or []:
         ids.update(item["selector"]["required_observed_lists"])
     return sorted(ids)
+
+
+# --------------------------------------------------------------------------
+# Machine-rendered statement: the human claim is checked against this, never the reverse
+
+
+def render_selector(selector: Mapping[str, Any]) -> str:
+    parts = []
+    for clause in selector["clauses"]:
+        terms = [*clause["all_of"]]
+        if clause["any_of"]:
+            terms.append("(" + " OR ".join(clause["any_of"]) + ")")
+        terms.extend(f"NOT {ref}" for ref in clause["none_of"])
+        count = clause["count"]
+        if count is not None:
+            terms.append(f"COUNT[{count['min']}..{count['max']}] OF ({', '.join(count['of'])})")
+        parts.append("(" + (" AND ".join(terms) if terms else "ALL") + ")")
+    return " OR ".join(parts)
+
+
+def scope_statement(body: Mapping[str, Any]) -> str:
+    """Deterministic one-line statement of a scoped query body."""
+
+    condition = body.get("list_condition")
+    slices = ",".join(item["slice_id"] for item in body.get("diagnostic_slices") or []) or "NONE"
+    numeric = "NONE" if not body.get("predicates") else f"{len(body['predicates'])}_PREDICATES"
+    return (
+        f"KIND={body['hypothesis_kind']}; "
+        f"UNIVERSE={render_selector(body['research_scope']['universe_selector'])}; "
+        f"SIGNAL={'NONE' if condition is None else render_selector(condition)}; "
+        f"NUMERIC={numeric}; CONTRAST={body.get('contrast') or 'SAME_DECISION_ELIGIBLE_BASELINE'}; "
+        f"SLICES={slices}; BASIS={body['research_scope']['membership_time_basis']}; "
+        f"COVERAGE={body['research_scope']['coverage_policy']}"
+    )

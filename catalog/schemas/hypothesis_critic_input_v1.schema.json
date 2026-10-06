@@ -98,6 +98,8 @@
         "decision_unlocked": {"type": "string", "minLength": 1},
         "estimand": {"type": "string"},
         "state_transition": {"type": ["string", "null"]},
+        "research_scope_rule_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "research_scope_statement": {"type": "string", "minLength": 1},
         "required_feature_ids": {
           "type": "array",
           "items": {"type": "string"}

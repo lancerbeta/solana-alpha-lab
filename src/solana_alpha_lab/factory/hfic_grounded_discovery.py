@@ -2010,9 +2010,12 @@ def descriptive_return_readout(result: Mapping[str, Any], *, detail_limit: int =
         truncation[key] = {"total": len(rows), "included": min(len(rows), detail_limit), "truncated": len(rows) > detail_limit}
     from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_holder_claim_identity
     identity = temporal_holder_claim_identity(result)
+    scope_block = result.get("research_scope")
     return {
         "status": "DESCRIPTIVE_PROXY",
         **({"scientific_identity": identity} if identity else {}),
+        # List scope, support and attrition of both sides travel with the readout (bounded by the 8 slices cap).
+        **({"research_scope": dict(scope_block)} if isinstance(scope_block, Mapping) else {}),
         "matched": view(result, matched=True),
         "baseline": view(result.get("baseline") or {}),
         "details": details,

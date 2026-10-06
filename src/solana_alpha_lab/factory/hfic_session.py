@@ -1197,6 +1197,10 @@ def _selected_candidate_block(
     }
     if packet_version == CRITIC_PACKET_VERSION_CURRENT:
         block.update(_freeze_owned_grounding_fields(card))
+        # A list-scoped candidate carries its machine rule and statement; text cannot widen it.
+        if card.get("research_scope_rule_sha256") is not None:
+            block["research_scope_rule_sha256"] = str(card["research_scope_rule_sha256"])
+            block["research_scope_statement"] = str(card.get("research_scope_statement") or "")
     return block
 
 
@@ -6986,6 +6990,12 @@ def apply_revision(
         ):
             if key in original_selected:
                 rebuilt_selected[key] = copy.deepcopy(original_selected[key])
+        for key in ("research_scope_rule_sha256", "research_scope_statement"):
+            if key in original_selected or selected_card.get(key) is not None:
+                rebuilt_selected[key] = str(selected_card.get(key) or "")
+                if original_selected.get(key) != rebuilt_selected[key]:
+                    # Changing the list scope is a scientific adaptation, never a wording revision.
+                    raise HficSessionError("REVISION_MECHANISM_CHANGED")
     if not isinstance(packet_in, Mapping):
         raise HficSessionError("CRITIC_INPUT_ARTIFACT_MISSING")
     for field in (
@@ -7202,6 +7212,27 @@ def apply_revision(
     return updated
 
 
+def _recipe_scope_rule(experiment_spec_packet: Mapping[str, Any]) -> str | None:
+    parameters = experiment_spec_packet.get("parameters")
+    recipe = parameters.get("temporal_recipe") if isinstance(parameters, Mapping) else None
+    if not isinstance(recipe, Mapping):
+        recipe = experiment_spec_packet.get("experiment_recipe")
+    rule = recipe.get("research_scope_rule_sha256") if isinstance(recipe, Mapping) else None
+    return str(rule) if rule else None
+
+
+def _require_recipe_preserves_research_scope(
+    view: Mapping[str, Any], experiment_spec_packet: Mapping[str, Any]
+) -> None:
+    """Classification never turns a list-scoped hypothesis into a pooled (or other) experiment."""
+
+    packet = view.get("critic_input_packet")
+    selected = packet.get("selected_candidate") if isinstance(packet, Mapping) else None
+    frozen_rule = selected.get("research_scope_rule_sha256") if isinstance(selected, Mapping) else None
+    if _recipe_scope_rule(experiment_spec_packet) != (str(frozen_rule) if frozen_rule else None):
+        raise HficSessionError("RESEARCH_SCOPE_RECIPE_MISMATCH")
+
+
 def apply_classification(
     frozen: Mapping[str, Any],
     experiment_spec_packet: Mapping[str, Any],
@@ -7221,6 +7252,7 @@ def apply_classification(
     critic_result = dict(existing.get("critic_result") or {})
     critic_result["experiment_spec_packet"] = dict(experiment_spec_packet)
     view = _classifier_frozen_view(existing, critic_result)
+    _require_recipe_preserves_research_scope(view, experiment_spec_packet)
     receipt = validate_live_classifier_receipt(
         critic_result,
         view,

@@ -4490,8 +4490,25 @@ def temporal_holder_claim_identity(result: Mapping[str, Any]) -> dict[str, str]:
         return {}
     saved = recipe.get("spec")
     body = saved.get("scientific_body") if isinstance(saved, Mapping) else None
-    if not isinstance(body, Mapping) or not any(f.get("field_id") == HOLDER_COUNT for f in body.get("features", []) if isinstance(f, Mapping)):
+    if not isinstance(body, Mapping):
         return {}
+    scope_labels: dict[str, str] = {}
+    if "research_scope" in body:
+        from solana_alpha_lab.factory import hfic_research_scope as scope_owner
+
+        public_scoped = _public_query_from_recipe(recipe)
+        bound_scoped = validate_temporal_query(public_scoped)
+        if bound_scoped["spec_sha256"] != result.get("spec_sha256") or bound_scoped["spec_sha256"] != recipe.get("scientific_identity"):
+            raise GroundedDiscoveryError("GROUNDED_RESULT_MISMATCH")
+        # The card must name the exact rule that was computed; text cannot widen it.
+        scope_labels = {
+            "research_scope_rule_sha256": scope_owner.sha256_of(
+                {"scope": body["research_scope"], "list_condition": body.get("list_condition"), "slices": body.get("diagnostic_slices") or []}
+            ),
+            "research_scope_statement": scope_owner.scope_statement(body),
+        }
+    if not any(f.get("field_id") == HOLDER_COUNT for f in body.get("features", []) if isinstance(f, Mapping)):
+        return scope_labels
     public = _public_query_from_recipe(recipe)
     bound = validate_temporal_query(public)
     if bound["spec_sha256"] != result.get("spec_sha256") or bound["spec_sha256"] != recipe.get("scientific_identity"):
@@ -4508,7 +4525,7 @@ def temporal_holder_claim_identity(result: Mapping[str, Any]) -> dict[str, str]:
     horizon = f"{target['reference_point']} -> {target['exit_point']}"
     return {"primary_x_family": x, "primary_y": f"{target['kind']} {horizon}",
             "horizon_notional": f"{horizon}; {target['kind']}; no executable notional",
-            "decision_timestamp": body["decision_point"], "target": temporal_target_label(public)}
+            "decision_timestamp": body["decision_point"], "target": temporal_target_label(public), **scope_labels}
 
 
 def _require_manifest_and_cutoff(
@@ -4633,6 +4650,10 @@ def run_temporal_fixed_time_from_spec(
     research_scope = None
     if pre["scientific_body"].get("research_scope") is not None:
         from solana_alpha_lab.factory.hfic_grounded_discovery import resolve_research_scope
+
+        if not isinstance(recipe.get("research_scope_evidence"), Mapping):
+            # A scoped recipe always freezes its evidence closure; never fall back to the live registry.
+            raise GroundedDiscoveryError("EXPERIMENT_RECIPE_INVALID")
 
         # Masks are rebuilt from the frozen releases' own verified files, never from a saved mask.
         research_scope = resolve_research_scope(

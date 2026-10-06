@@ -35,20 +35,22 @@ def critic_result_from_packet_only(
     from solana_alpha_lab.factory.hfic_session import _canonical_json_hash
 
     selected = packet["selected_candidate"]
-    identity = candidate_identity(
-        {
-            "claim": selected["claim"],
-            "mechanism": selected["mechanism"],
-            "actor_counterparty": selected["actor_counterparty"],
-            "population": selected["population"],
-            "decision_timestamp": selected["decision_timestamp"],
-            "primary_x_family": selected["primary_x"],
-            "primary_y": selected["primary_y"],
-            "horizon_notional": selected["horizon_notional"],
-            "negative_control": selected["negative_control"],
-            "cheapest_falsifier": selected["cheapest_falsifier"],
-        }
-    )
+    card = {
+        "claim": selected["claim"],
+        "mechanism": selected["mechanism"],
+        "actor_counterparty": selected["actor_counterparty"],
+        "population": selected["population"],
+        "decision_timestamp": selected["decision_timestamp"],
+        "primary_x_family": selected["primary_x"],
+        "primary_y": selected["primary_y"],
+        "horizon_notional": selected["horizon_notional"],
+        "negative_control": selected["negative_control"],
+        "cheapest_falsifier": selected["cheapest_falsifier"],
+    }
+    if "research_scope_rule_sha256" in selected:
+        # Same rule as the independent Critic skill: scoped identity includes the packet's rule hash.
+        card["research_scope_rule_sha256"] = selected["research_scope_rule_sha256"]
+    identity = candidate_identity(card)
     return {
         "schema": "smial.hypothesis-critic-result",
         "schema_version": "1.1",
