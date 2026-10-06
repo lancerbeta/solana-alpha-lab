@@ -10,7 +10,16 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "13fc14c5f0d65840beae43c043f231f7db7d4900c20e546d871a3679ea2352ba",
+    "docs/evidence/episode_activation_before_start_proof_v1/a1_semantic_premise_packet_v1.json": "ee3a15b45f589229629162e0b2f5f392948d60623f2aaa73018823eac849e8c9",
+    "docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md": "10a4d90b66f1750880ff6c1d9c8ca4039fde34197c0ec498738ee1e93e17999d",
+    "docs/tasks/EPISODE_ACTIVATION_BEFORE_START_PROOF_V1.md": "c08712f32134c93064512d59461f082f48299449270f9f59fa694d7595dbcf49",
+    "scripts/observation_schedule.py": "d8205cff11a3e14175080e81759d62ac5560452951032945a22250af58319b68",
+    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "90bec509a1fe636c7792ab9fc1d2cc5f1c228947e12d6cc1ba4a4617abe4826c",
+    "tests/test_episode_activation_before_start_v1.py": "9a28c77903901ec4ad577f89843ee56bf4e8494d6b80b25c8cf00674604f7952",
+    "tests/test_opportunity_episodes_harness_v1.py": "14aecd74d09b9ee2b57611cee18c7330e0b3fa534e304ade787a010b675b31a3"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +30,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/episode_activation_before_start_proof_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "58bcd3f5172944cb442991c6c62ea89f61f528789ae14d39d1958a9f0939afc7",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_7_NEW_PRE_START_TESTS_2_RED_ON_BASE;PASS_227_SCHEDULER_LIFECYCLE_STORE_REMOTE_OPS_EPISODE_PRODUCER_OPERABILITY_VERTICAL_PRODUCTION_LINE_1_PRE_EXISTING_SKIP",
     "independent_review": {
       "path": "docs/evidence/episode_activation_before_start_proof_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "f3706589d2e6c3f3ccc73b3fad3c5d6054824c0e1886bf34fffab0e9229877a0",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
