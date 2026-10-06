@@ -301,6 +301,30 @@
     {
       "logical_ref": "local/episodes_operability/admission_owner_final/test_mixed_boundary_degradation_budget_restart_and_drain/report.json",
       "sha256": "9edd0d3a94c22fc643ff33fa0c8bc31f2da397d829d1cc1ed97af78009f226c3"
+    },
+    {
+      "logical_ref": "local/episodes_operability/admission_owner_vertical/p1-report.json",
+      "sha256": "5157fef7495c1a535053de00a4237ee719bbd9f75b160890dafef0fac2da5b87"
+    },
+    {
+      "logical_ref": "local/episodes_operability/admission_owner_vertical/p2-report.json",
+      "sha256": "c20ad3016c53eb61e5416a359867cfc02b635212935cb1432ece2acbdec568d0"
+    },
+    {
+      "logical_ref": "local/episodes_operability/admission_owner_vertical/p3-report.json",
+      "sha256": "a9980a16d7df07af6acea6b028efcddf45caa570404f8a4a7586744b7da756e2"
+    },
+    {
+      "logical_ref": "local/episodes_operability/admission_owner_vertical.log",
+      "sha256": "2eb2c72728f9f4e804032cd3a550e83cd8d0ea40336a638ef323c0acfa535a60"
+    },
+    {
+      "logical_ref": "local/episodes_operability/admission_owner_semantic.log",
+      "sha256": "10d33fdb8e1221b5eac4bd1daba655bca8535f0f2123c81b9abc2e56f3b20ba7"
+    },
+    {
+      "logical_ref": "local/episodes_operability/admission_owner_semantic_final.log",
+      "sha256": "a62d9dd81e83afefa1adb7ed594dd8f0585d21e743dd24228e37e2bb45535163"
     }
   ],
   "code_sha256": {
@@ -2793,9 +2817,9 @@
         "DISAPPEARED": 11,
         "OBSERVED": 923
       },
-      "wall_seconds": 65.82,
-      "peak_rss_bytes": 119713792,
-      "tick_wall_seconds": 60.81,
+      "wall_seconds": 64.14,
+      "peak_rss_bytes": 119791616,
+      "tick_wall_seconds": 59.23,
       "ticks": 121,
       "storage": {
         "export_bytes": 123176,
@@ -2815,12 +2839,12 @@
       }
     },
     "owner_patch_consumer": {
-      "wall_seconds": 100.59,
-      "peak_rss_bytes": 490311680,
+      "wall_seconds": 99.36,
+      "peak_rss_bytes": 491032576,
       "storage": {
         "episode_corpus_bytes": 496521,
         "mirror_bytes": 5433563,
-        "plane_total_bytes": 5486901,
+        "plane_total_bytes": 5483926,
         "sealed_release_bytes": 490371
       },
       "fresh_capture_retry": {
@@ -2867,14 +2891,14 @@
     "network_or_original_access_during_cold": [],
     "owner_patch_restore": {
       "backup": {
-        "bytes": 24742883,
-        "inventory_sha256": "f9330a7fdb1b784464901174372085506da78034a284879e3753a35333f80f1d",
-        "sha256": "c5e2d5fde8693f9c47a3816122437e5081514aef5e24d278d20783b77c1b115c"
+        "bytes": 24739889,
+        "inventory_sha256": "b57a73c211b617bf3c4d0696f83dd5df7d98291460b7dc38f16b19f57b550f88",
+        "sha256": "aa0724c92fe097eefe8a60082e060c7c28771b92bb58c0d354ac39c10206cb7d"
       },
       "restored_entries": 2986,
       "original_root_probe": "BLOCKED",
-      "wall_seconds": 34.78,
-      "peak_rss_bytes": 276361216,
+      "wall_seconds": 33.49,
+      "peak_rss_bytes": 279117824,
       "cold_dependency_refusals": {
         "corrupt": "RELEASE_HASH_MISMATCH",
         "missing": "RELEASE_DEPENDENCY_MISSING"
@@ -3439,7 +3463,7 @@
     "final_lookup_and_capture_tests": 29,
     "public_adapter_boundary": "PASS_EXISTS_INIT_STAMP_MAP_TO_RESEARCH_STORE_ERROR_AND_CLI_JSON_REFUSED",
     "frozen_closure_deep_json": "PASS_TYPED_REFUSAL_PRESERVES_BYTES",
-    "unchanged_success_path_applicability": "Latest full R2_R3_R4 reports precede narrow error conversion and unverified-scope label repair; successful producer/scientific bytes unchanged; final66owner and29lookup_capture regressions pass; 12fresh cold processes bind all12current sources",
+    "unchanged_success_path_applicability": "SUPERSEDED_HISTORICAL_INTERMEDIATE_DELTA; use final_delta_applicability and current code_sha256/raw refs",
     "final_owner_tests": 66,
     "final_owner_symlink_skips": 1,
     "final_refusal_and_scope": "PASS_PENDING_CANONICAL_SOURCE_IO_AND_FROZEN_TIMESTAMP_TYPED_PRESERVED_UNVERIFIED_SCOPE_UNKNOWN",
@@ -3457,7 +3481,7 @@
       "applicability": "Full R3-R4 repeated after commissioning/local-control/count changes; its first producer process precedes only the final identical-schema no-cast fix. Final 67 owner tests and the 48-episode late-tail pressure proof cover that fix; no scientific value/schema/coercion policy changed."
     },
     "postreview_targeted": "PASS_80_TARGETED_NO_SKIPS_INCLUDE_FULL_CANARY_R2_PARTIAL_ROUND_PACING_CAPTURE_CUTOFF_ADMISSION_WITNESS_SQL_LEASE_OLD_GROUPS_OVERLAP",
-    "final_delta_applicability": "Current paired/cold R1 and full targeted80 match all twelve runtime hashes. New committed-Git R3/R4 and four final changed-runtime reviews required; earlier runs remain historical evidence.",
+    "final_delta_applicability": "Current paired/cold R1, full targeted80 and committed-Git three-process R3/R4 all match twelve runtime hashes. Intermediate GIT_MUTATION refusal retained; no machine gate bypass.",
     "final_temporal_vertical": "PASS_THREE_PROCESSES_ONE_VERTICAL_TEST_NO_SKIPS_CURRENT_RUNTIME_COMMITTED_GIT_UNCHANGED",
     "semantic_direct_consumer": {
       "status": "PASS",
@@ -3476,7 +3500,9 @@
         "limit_bytes": 16384
       },
       "repair": "Remove incidental oom substring from new headroom alias; operator runbook is navigation hub for lookup; compact collection purpose. Existing gold queries, limits and search engine unchanged.",
-      "runtime_proof_applicability": "All12 runtime hashes unchanged; R1-R4/targeted76 current; no runtime/scientific/Forge projection implementation change"
+      "runtime_proof_applicability": "Semantic config/search engine/gold unchanged; final runtime evidence is current admission-owner R1/targeted80/R3/R4, not the historical targeted76",
+      "current_repeat": "PASS_15_NO_SKIPS_AFTER_CURRENT_RUNTIME_AND_CANONICAL_SYNC",
+      "intermediate_refusal": "PRE_SYNC_CATALOG_READOUT_HASH_REFUSAL; canonical sync then15PASS, no gate bypass"
     }
   },
   "FACT": [
@@ -3951,7 +3977,8 @@
       "science": "NO_REAL_SCIENTIFIC_LOOK",
       "sampling_caps": "UNCHANGED",
       "limits": "Logical admission transaction timestamp and pre-commit guards; no claim of exact fsync completion clock or Linux power-loss proof",
-      "R3_R4": "AWAITING_COMMITTED_UNCHANGED_GIT_REPEAT"
+      "R3_R4": "PASS_CURRENT_RUNTIME_COMMITTED_UNCHANGED_GIT",
+      "vertical_rehearsal_content_head": "ccc4441d40a7bb0744807a460587e3b5b699f907"
     }
   },
   "reproduce": [
@@ -3970,7 +3997,9 @@
         "uv run --locked --managed-python python -B scripts/prove_opportunity_episode_operability.py --root <fresh-aged-root> --counts 864,6048,25920,51840 --payload-size 4096 --prepared --enforce-limits"
       ],
       "existing_80m_receipt": "local/episodes_operability/owner_patch_cold_postreview_report.json",
-      "80m_note": "Existing preserved roots have processed 80m already: replay cannot reproduce new normal work. Fresh active-aged command reproduces bounded-work invariants; 80m raw receipt remains immutable measured evidence."
+      "80m_note": "Existing preserved roots have processed 80m already: replay cannot reproduce new normal work. Fresh active-aged command reproduces bounded-work invariants; 80m raw receipt remains immutable measured evidence.",
+      "existing_95m_receipt": "local/episodes_operability/admission_owner_cold_report.json",
+      "95m_note": "Preserved roots processed through95m; replay at95m repeats no new work. Fresh roots/active-aged command reproduces bounded-work invariants. Setup/preparation excluded; current cold95m proof matches all12 runtime hashes."
     },
     {
       "scope": "R2 + canary storage pressure + round boundary + legacy option refusal",
@@ -3991,6 +4020,14 @@
     {
       "scope": "Targeted adversarial/recovery tests",
       "command": "uv run --locked --managed-python python -B -m unittest tests.test_opportunity_episodes_operability_v1 tests.test_research_write_lookup tests.test_observation_schedule_lifecycle tests.test_opportunity_episodes_producer_v1 -v"
+    },
+    {
+      "scope": "Admission transaction witness IO/SQL delay/expired lease temporal regressions",
+      "environment": {
+        "OEP_OPERABILITY_WORK": "<fresh-retained-local-proof-root>"
+      },
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_opportunity_episodes_operability_v1.EpisodeOperabilityTests.test_witness_io_crosses_cutoff_without_admission_rows tests.test_opportunity_episodes_operability_v1.EpisodeOperabilityTests.test_witness_io_selects_fresh_transaction_t0_and_slots tests.test_opportunity_episodes_operability_v1.EpisodeOperabilityTests.test_witness_io_expired_lease_never_commits tests.test_opportunity_episodes_operability_v1.EpisodeOperabilityTests.test_sql_delay_crosses_cutoff_rolls_back_all_admission_rows -v",
+      "authority": "SYNTHETIC_LOCAL_ONLY"
     }
   ],
   "local_artifacts": {
