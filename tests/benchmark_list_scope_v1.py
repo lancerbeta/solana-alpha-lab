@@ -42,27 +42,9 @@ AVAILABLE = {"E300": "2026-10-05T00:10:04Z", "E1800": "2026-10-05T00:35:09Z", "E
 
 
 def peak_rss_bytes() -> int | None:
-    try:
-        import ctypes
-        from ctypes import wintypes
+    from tests.test_opportunity_episodes_vertical_v1 import peak_rss_bytes as measure
 
-        class Counters(ctypes.Structure):
-            _fields_ = [("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD), ("PeakWorkingSetSize", ctypes.c_size_t)] + [
-                (name, ctypes.c_size_t) for name in ("WorkingSetSize", "QuotaPeakPagedPoolUsage", "QuotaPagedPoolUsage", "QuotaPeakNonPagedPoolUsage", "QuotaNonPagedPoolUsage", "PagefileUsage", "PeakPagefileUsage")
-            ]
-
-        counters = Counters()
-        counters.cb = ctypes.sizeof(Counters)
-        handle = ctypes.windll.kernel32.GetCurrentProcess()
-        ctypes.windll.psapi.GetProcessMemoryInfo(handle, ctypes.byref(counters), counters.cb)
-        return int(counters.PeakWorkingSetSize)
-    except Exception:  # noqa: BLE001 - measurement only
-        try:
-            import resource
-
-            return int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss) * 1024
-        except Exception:  # noqa: BLE001
-            return None
+    return measure()
 
 
 def corpus(n: int, seed: int = 7):
@@ -155,16 +137,17 @@ def run(n: int, slices: int, *, scoped: bool):
 def main() -> None:
     results = [
         run(10_000, 0, scoped=False),
+        run(10_000, 4, scoped=True),
+        run(20_000, 4, scoped=True),
         run(10_000, 8, scoped=True),
-        run(20_000, 8, scoped=True),
-        run(10_000, 16, scoped=True),
     ]
-    base = results[0]["evaluate_s"] or 1e-9
+    total = [item["evaluate_s"] + item["resolve_s"] for item in results]
     summary = {
         "results": results,
-        "scope_overhead_ratio_vs_unscoped": round((results[1]["evaluate_s"] + results[1]["resolve_s"]) / base, 3),
-        "double_episodes_ratio": round((results[2]["evaluate_s"] + results[2]["resolve_s"]) / max(1e-9, results[1]["evaluate_s"] + results[1]["resolve_s"]), 3),
-        "double_slices_ratio": round((results[3]["evaluate_s"] + results[3]["resolve_s"]) / max(1e-9, results[1]["evaluate_s"] + results[1]["resolve_s"]), 3),
+        "scope_overhead_ratio_vs_unscoped": round(total[1] / max(1e-9, total[0]), 3),
+        "double_episodes_ratio": round(total[2] / max(1e-9, total[1]), 3),
+        "double_slices_ratio": round(total[3] / max(1e-9, total[1]), 3),
+        "note": "ratios near 2.0 for episodes and near 1.0 for slices mean no hidden quadratic repeat; slices are capped at 8 by the validator",
     }
     print(json.dumps(summary, indent=1, sort_keys=True))
 

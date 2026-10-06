@@ -653,7 +653,7 @@ class ListAwareVerticalTests(unittest.TestCase):
         context = rs.build_list_dimension_context(rs.load_corpus_membership(self.plane))
         self.assertNotIn(protected, json.dumps(context))
         frames = json.loads((release_dir / release.FRAMES_NAME).read_text(encoding="utf-8"))
-        protected_counts = sum(int(item["frame"]["counts"].get("protected", 0)) for item in frames if item.get("frame"))
+        protected_counts = sum(int((item["frame"].get("counts") or {}).get("protected", 0)) for item in frames if item.get("frame"))
         self.assertGreaterEqual(protected_counts, 1)  # counted, never named
 
         # One parse of frames.json per release and pass.
@@ -690,12 +690,12 @@ class ListAwareVerticalTests(unittest.TestCase):
         def drop_c(frames_doc):  # overlap edited after the frame hash was fixed
             for item in frames_doc:
                 frame = item.get("frame")
-                if frame:
+                if frame and frame.get("overlap"):
                     frame["overlap"] = {mint: [s for s in sources if s != "toptrending_5m"] for mint, sources in frame["overlap"].items()}
 
         def incomplete(frames_doc):
             for item in frames_doc:
-                if item.get("frame"):
+                if item.get("frame") and item["frame"].get("overlap"):
                     item["frame"]["complete"] = False
 
         def recovered_extras(frames_doc):  # recovery/selection fields added after closure do not change the hash

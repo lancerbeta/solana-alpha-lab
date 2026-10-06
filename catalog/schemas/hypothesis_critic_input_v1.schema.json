@@ -327,6 +327,7 @@
               "explanatory_condition": {"type": ["string", "null"]},
               "evidence_surface_mode": {"type": ["string", "null"]},
               "representation_scope": {"type": ["string", "null"]},
+              "research_scope_rule_sha256": {"type": ["string", "null"]},
               "legacy_definition": {
                 "type": ["object", "null"],
                 "additionalProperties": true

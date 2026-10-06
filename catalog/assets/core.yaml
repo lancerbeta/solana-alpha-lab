@@ -34733,7 +34733,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/semantic_route_gold_queries_v1.yaml', repository_path: catalog/fixtures/semantic_route_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: 664b24f85f8de11d0b4846af9c1e3dee9e22e176f4796b0a66fe8f515ef16cc2}
+  integrity: {kind: sha256, sha256: f2e44a61fbd83031c5875f8b98d9adfad21c5eb5a1f6679166e72eacab427a8c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
