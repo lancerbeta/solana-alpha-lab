@@ -205,14 +205,6 @@
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "prior_verdict": "PASS",
-      "severity": "MINOR",
-      "finding": "OPERATE-reference syntax accepts UNKNOWN; operator authority verification is explicit, structural PASS is not authority",
-      "observed_head": "79d183241fe87ee97f9e68fe50c4e066903eac6d",
-      "resolved_by_head": "3422e91dbcd48201ad122dfef39eced3cb8880f7"
-    },
-    {
-      "role": "ARCHITECTURE_CRITIC",
       "prior_verdict": "NOT_READY",
       "severity": "MAJOR",
       "finding": "Witness IO before fresh admission transaction T0; fresh quota/age/lease/cutoff after SQL lock and pre-commit SQL-delay rollback prevent stale admissions; transactional lease renewal never commits independently",
@@ -224,14 +216,6 @@
       "prior_verdict": "NOT_READY",
       "severity": "MAJOR",
       "finding": "Recoverable pending no longer blocks public lifecycle gate before fenced append; exact verified previous/next pointers resolve read-only, while ambiguous pre-stamp and namespace drift remain refused",
-      "observed_head": "c7b1d68179621c09547a260245be04279225697a",
-      "resolved_by_head": "1ec7429b4319fccd529b37205b88f630805a6437"
-    },
-    {
-      "role": "ARCHITECTURE_CRITIC",
-      "prior_verdict": "PASS",
-      "severity": "MINOR",
-      "finding": "Mandatory operator reprepare after every move/restore is distinct from automatic detection limited to changed stat/identity bindings; same-volume rename may preserve them",
       "observed_head": "c7b1d68179621c09547a260245be04279225697a",
       "resolved_by_head": "1ec7429b4319fccd529b37205b88f630805a6437"
     },
