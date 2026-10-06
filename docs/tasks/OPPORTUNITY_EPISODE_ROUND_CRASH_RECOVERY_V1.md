@@ -128,7 +128,7 @@ STOP: merge boundary; never merge in this atom.
 NEXT: exact-head CI, merge-readiness, owner phrase.
 REPLAN_TRIGGER: the plan cannot be expressed in `episode_rounds.frame_json`, a
 second blocker repeats, or scope reaches a stop condition.
-FACTORY_FIT_REVIEW: PROPORTIONAL. PRODUCT_HORIZON_RADAR NOW=NONE.
+FACTORY_FIT_REVIEW: FULL_REVIEW. PRODUCT_HORIZON_RADAR NOW=NONE.
 
 Required reviews: isolated code, goal/DoD and architecture. Architecture must
 answer: can process timing still change the scientific-ready sample without
