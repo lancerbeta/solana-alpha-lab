@@ -118,6 +118,10 @@ def _tick_candidates_as_of(
     return sorted(candidates)
 
 
+# A tick before ``starts_at`` makes no provider call and is an honest idle, not a failure.
+_IDLE_OK_TICK_TERMINALS = frozenset({"TICK_COMPLETE", "NOT_YET_ACTIVE"})
+
+
 def _bind_runtime(
     args: argparse.Namespace, *, config: dict | None = None
 ) -> tuple[dict, Path, ObservationScheduleStore]:
@@ -865,18 +869,18 @@ def main(
                 result = results[0]
                 return _emit(
                     result,
-                    0 if result.get("terminal") == "TICK_COMPLETE" else 2,
+                    0 if result.get("terminal") in _IDLE_OK_TICK_TERMINALS else 2,
                 )
             return _emit(
                 {
                     "terminal": "TICK_COMPLETE"
-                    if all(item.get("terminal") == "TICK_COMPLETE" for item in results)
+                    if all(item.get("terminal") in _IDLE_OK_TICK_TERMINALS for item in results)
                     else "TICK_PARTIAL",
                     "activations": results,
                     "provider_calls": sum(int(item.get("provider_calls", 0)) for item in results),
                     "credential_reads": sum(int(item.get("credential_reads", 0)) for item in results),
                 },
-                0 if all(item.get("terminal") == "TICK_COMPLETE" for item in results) else 2,
+                0 if all(item.get("terminal") in _IDLE_OK_TICK_TERMINALS for item in results) else 2,
             )
         return _emit({"terminal": "COMMAND_UNKNOWN"}, 2)
     except (

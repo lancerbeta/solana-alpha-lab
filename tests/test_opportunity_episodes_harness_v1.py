@@ -335,6 +335,7 @@ class EpisodeScenario:
         budgets: dict[str, Any] | None = None,
         schedule_key: str = "OBS-OPPORTUNITY-EPISODES-SYNTH-V1",
         observation_overrides: dict[str, Any] | None = None,
+        activated_at: datetime | None = None,
     ) -> None:
         self.data_root = Path(root)
         self.data_root.mkdir(parents=True, exist_ok=True)
@@ -349,7 +350,7 @@ class EpisodeScenario:
             schedule_key=schedule_key,
             observation_overrides=observation_overrides,
         )
-        self.activation_id = register_authorize_activate(self.data_root, self.schedule, now=start)
+        self.activation_id = register_authorize_activate(self.data_root, self.schedule, now=activated_at or start)
         self.market = SyntheticMarket()
         self.ticks: list[dict[str, Any]] = []
 

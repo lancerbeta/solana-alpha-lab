@@ -47,6 +47,12 @@ uv run --locked --managed-python python -B scripts/observation_schedule.py stop-
   `pause` is not a stop-intake: it also stops the committed obligations. The
   schedule sha and activation id come from `observation_schedule.py status`;
   if a tick holds the writer lease the command answers `WRITER_BUSY`: retry.
+* Activation ahead of `starts_at`: authorize and activate may precede the window and
+  the ordinary observation timer may run meanwhile. Until `starts_at` every tick returns
+  `NOT_YET_ACTIVE` (exit 0, zero provider calls, zero credential reads, no admission);
+  the ACTIVE transition proof stays reachable and the first tick at or after the boundary
+  proceeds with no pause/resume. `TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE` still
+  means the committed transition event is missing, foreign or unreadable.
 * Recovery: the next tick republishes the outbox, recovers completed calls from
   the call ledger and turns intent-without-result into
   `ATTEMPT_OUTCOME_UNKNOWN`; it never re-requests a past slot.

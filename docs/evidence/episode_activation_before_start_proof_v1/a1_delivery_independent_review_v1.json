@@ -1,0 +1,27 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "EPISODE-ACTIVATION-BEFORE-START-PROOF-REVIEW-001",
+  "as_of": "2026-10-06",
+  "task_id": "EPISODE_ACTIVATION_BEFORE_START_PROOF_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [],
+  "verdict": "NOT_READY",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_LIVE_ACCEPTANCE",
+    "NO_MERGE",
+    "NO_MODEL_DIVERSITY_ATTESTATION",
+    "PACKET_INFORMATION_PATH_ONLY",
+    "NO_LIVE_LAUNCH_IDENTITY_ATTESTATION"
+  ],
+  "remediation_history": []
+}
