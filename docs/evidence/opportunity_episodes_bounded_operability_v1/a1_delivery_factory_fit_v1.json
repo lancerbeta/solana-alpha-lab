@@ -4,8 +4,8 @@
   "review_id": "OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-FACTORY-FIT-001",
   "as_of": "2026-10-06",
   "task_id": "OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1",
-  "reviewed_bindings_sha256": "6e87a7870c08587e3f0675710c7669ec152930c413ab84665679085e90f3691f",
-  "reviewed_inventory_sha256": "aa2c1e40175af9255689f2a6d9e93e6bac290921346d518bf279708b3f982ad7",
+  "reviewed_bindings_sha256": "4484ef0ee7b37ab56b0c54506af408fb9f9b83445404540657e6743e4fdd853b",
+  "reviewed_inventory_sha256": "6816e5a15ffa7d53ba6b68102d87d9b78f177c123ec5a6b018a31d03434a8590",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
