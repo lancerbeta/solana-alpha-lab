@@ -41,6 +41,66 @@ class EpisodeOperabilityTests(unittest.TestCase):
             self.assertEqual(result["_exit_code"], 0, result)
             self.assertFalse((sc.data_root / "research/write_lookup_v1").exists())
 
+    def pending_publication(self, fault_method):
+        from solana_alpha_lab.factory.research_store import ResearchStoreError
+        from solana_alpha_lab.factory.research_write_lookup import WriteLookup
+        sc = self.scenario()
+        row = token_object(synth_mint(self._testMethodName), price=1, liquidity=10000, holders=60)
+        nominate(sc.market, START, {"toporganicscore": [row], "toptraded": [], "toptrending": []})
+        original = getattr(WriteLookup, fault_method)
+        failed = False
+        def crash(lookup):
+            nonlocal failed
+            if not failed:
+                failed = True
+                raise RuntimeError("SYNTHETIC_PENDING_PUBLICATION")
+            return original(lookup)
+        with patch.object(WriteLookup, fault_method, crash):
+            with self.assertRaises(ResearchStoreError):
+                sc.tick(START + timedelta(seconds=5))
+        self.assertTrue(failed)
+        return sc
+
+    def test_pending_lifecycle_read_preserves_bytes_and_tick_recovers(self):
+        from solana_alpha_lab.factory.observation_schedule_lifecycle import activation_transition_research_event_proven
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        from solana_alpha_lab.factory.research_write_lookup import RELATIVE
+        sc = self.pending_publication("finish")
+        pending = sc.data_root / RELATIVE / "pending.json"
+        state = sc.data_root / RELATIVE / "state.json"
+        saved = (pending.read_bytes(), state.read_bytes())
+        with closing(ObservationScheduleStore(sc.ops_path, readonly=True)) as store:
+            activation = store.get_activation(sc.schedule["schedule_sha256"], sc.activation_id)
+        with patch.object(ResearchStore, "_committed_manifests", side_effect=AssertionError("FULL_SCAN")), \
+             patch.object(ResearchStore, "prepare_write_lookup", side_effect=AssertionError("AUTO_PREPARATION")):
+            proof = activation_transition_research_event_proven(sc.data_root, activation, now=START+timedelta(seconds=40))
+            unchanged = (pending.read_bytes(), state.read_bytes()) == saved
+            restart = sc.tick(START + timedelta(seconds=40))
+        report = {"state_proof": proof, "read_bytes_unchanged": unchanged, "restart": restart,
+                  "pending_after": pending.exists(), "admissions": len(sc.admissions()), "unpublished": sc.unpublished()}
+        (sc.data_root.parent / "report.json").write_bytes((json.dumps(report, indent=2)+"\n").encode())
+        self.assertTrue(proof)
+        self.assertTrue(unchanged)
+        self.assertEqual(restart["_exit_code"], 0, restart)
+        self.assertEqual(restart["terminal"], "TICK_COMPLETE")
+        self.assertFalse(pending.exists())
+        self.assertEqual(len(sc.admissions()), 1)
+        self.assertEqual(sc.unpublished(), 0)
+
+    def test_pending_before_stamp_keeps_tick_fail_closed(self):
+        from solana_alpha_lab.factory.research_write_lookup import RELATIVE
+        sc = self.pending_publication("published")
+        pending = sc.data_root / RELATIVE / "pending.json"
+        state = sc.data_root / RELATIVE / "state.json"
+        saved = (pending.read_bytes(), state.read_bytes())
+        restart = sc.tick(START + timedelta(seconds=40))
+        unchanged = (pending.read_bytes(), state.read_bytes()) == saved
+        (sc.data_root.parent / "report.json").write_bytes((json.dumps({"restart": restart,
+            "read_bytes_unchanged": unchanged, "admissions": len(sc.admissions())}, indent=2)+"\n").encode())
+        self.assertEqual(restart["terminal"], "TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE")
+        self.assertEqual(restart["_calls"], [])
+        self.assertTrue(unchanged)
+
     def mature(self, sc):
         mint = synth_mint("MatureOperability")
         row = token_object(mint, price=1, liquidity=10000, holders=60)

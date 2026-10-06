@@ -107,6 +107,23 @@ class WriteLookupTests(unittest.TestCase):
         self.store.prepare_write_lookup()
         self.assertEqual(self.store.find_record("B").record_id, "B")
 
+    def test_pending_lifecycle_read_is_pure_and_namespace_change_refuses(self):
+        with patch.object(WriteLookup, "finish", side_effect=RuntimeError("CRASH_AFTER_STAMP")):
+            with self.assertRaisesRegex(RuntimeError, "CRASH_AFTER_STAMP"):
+                self.append()
+        pending = self.root / RELATIVE / "pending.json"
+        state = self.root / RELATIVE / "state.json"
+        saved = (pending.read_bytes(), state.read_bytes())
+        with patch.object(ResearchStore, "_committed_manifests", side_effect=AssertionError("FULL_SCAN")):
+            records, _ = self.store.iter_lifecycle_records_bounded(schedule_sha256="aa" * 32, state_only=True)
+        self.assertEqual(records, ())
+        self.assertEqual((pending.read_bytes(), state.read_bytes()), saved)
+        with patch.object(ResearchStore, "_write_lookup", return_value=None):
+            self.append("LEGACY")
+        with self.assertRaisesRegex(ResearchStoreError, "WRITE_LOOKUP_PENDING_RECONCILIATION_REQUIRED"):
+            self.store.iter_lifecycle_records_bounded(schedule_sha256="aa" * 32, state_only=True)
+        self.assertEqual((pending.read_bytes(), state.read_bytes()), saved)
+
     def test_pending_canonical_source_unreadable_is_typed_and_preserved(self):
         with patch.object(WriteLookup, "finish", side_effect=RuntimeError("CRASH_AFTER_STAMP")):
             with self.assertRaisesRegex(RuntimeError, "CRASH_AFTER_STAMP"):

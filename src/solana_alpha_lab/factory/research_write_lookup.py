@@ -349,18 +349,24 @@ class WriteLookup:
         pending["published_stamp"] = self.stamp()
         self._atomic("pending.json", self._signed(pending))
 
-    def load(self, *, recover: Callable[[dict], str] | None = None) -> None:
+    def load(self, *, recover: Callable[[dict], str] | None = None, read_only_pending: bool = False) -> None:
         pending_path = self.root / RELATIVE / "pending.json"
         if self._exists(pending_path):
             if recover is None:
                 raise WriteLookupError("WRITE_LOOKUP_PENDING")
             pending = self._verify_signed(self._read("pending.json"))
             self._validate_pending(pending)
+            verified_stamp = self.stamp()
             recovered = recover(pending)
             if recovered not in {"previous", "next"}:
                 raise WriteLookupError("WRITE_LOOKUP_CORRUPT")
-            self.state = pending[recovered]
-            self.finish()
+            self.state = dict(pending[recovered])
+            if read_only_pending:
+                # The verifier proves one previous/next canonical namespace.
+                # Readers resolve pointers only; the fenced writer owns journal completion.
+                self.state["source_stamp"] = verified_stamp
+            else:
+                self.finish()
         else:
             self.state = self._verify_signed(self._read("state.json"))
         self._validate_state(self.state)

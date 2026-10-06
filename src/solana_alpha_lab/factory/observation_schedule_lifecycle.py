@@ -1055,7 +1055,7 @@ def _draining_transition_evidence(
             # Completion names one transaction. Reuse the store's committed
             # transaction lookup and full partition verifier, with no MEM/OBS
             # payload walk or new persistent index/truth owner.
-            manifest = research._existing_transaction(f"RESEARCH-TXN-{event_id.upper()}")
+            manifest = research._existing_transaction(f"RESEARCH-TXN-{event_id.upper()}", read_only_pending=True)
             records = research._verify_partition(manifest) if manifest is not None else ()
         else:
             records, _telemetry = research.iter_lifecycle_records_bounded(

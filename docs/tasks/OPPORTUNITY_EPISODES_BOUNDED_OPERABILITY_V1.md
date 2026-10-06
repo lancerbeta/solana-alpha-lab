@@ -188,3 +188,10 @@ Fresh clock binds T0/cohort/slots and rechecks quota, witness age, lease and
 cutoff; final pre-commit cutoff guard rolls back all rows after SQL delay.
 Lease renewal inside the transaction does not commit independently. No new
 clock service, schema, sampling/cap or scientific contract; no fsync-clock claim.
+
+IN_ATOM_REPLAN: recoverable pending must not block lifecycle proof before its
+fenced append recovery. Existing canonical partition/namespace verifier resolves
+previous/next state-only pointers read-only; root/journal bytes stay untouched.
+The writer completes recovery. Ambiguous pre-stamp/corrupt/changed namespace
+stays fail-closed, with no full scan or auto-preparation. Move/restore remains an
+operator reprepare obligation; automatic detection is bounded by changed bindings.

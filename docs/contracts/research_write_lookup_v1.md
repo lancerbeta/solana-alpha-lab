@@ -37,6 +37,9 @@ Copy preparation remains supported. The lookup binds filesystem identity/stat:
 never copy its prepared artifact onto production. Prepare production explicitly
 in place, then the ordinary writer uses it. A moved/restored root needs its own
 explicit preparation before returning to the new writer.
+This is an operator obligation after every move/restore. Machine refusal is
+bound to a changed filesystem identity/stat stamp; a same-volume rename that
+preserves those bindings may remain readable and is not proof of move detection.
 
 Transactions and records use persistent SHA256 radix tries, leaf limit 16,
 node limit 64KiB. A lookup verifies hashes on its bounded route; a hit loads
@@ -78,7 +81,14 @@ Write/recovery order:
 
 Pending before manifest: a fenced writer verifies the unchanged source stamp
 and restores the prior root. Pending after durable published stamp: it verifies
-the exact canonical partition and installs the next root. A crash between
+the exact canonical partition and installs the next root.
+State-only lifecycle proof can resolve the verified previous/next pointers
+without writing the root or journal, using that same canonical partition and
+namespace verifier. This lets ordinary tick reach the fenced append recovery;
+it never prepares or scans history. An ambiguous pre-stamp crash, corrupt
+artifact or changed namespace still refuses. Default identity/scientific
+readers retain their existing checks.
+A crash between
 manifest and stamp is `WRITE_LOOKUP_PENDING_RECONCILIATION_REQUIRED`, with all
 canonical bytes readable. Preserve those bytes and first verify a measured copy.
 Returning the canonical writer requires explicit in-place full audit/repreparation

@@ -19,10 +19,16 @@ OPS write transaction и ResearchStore lease держат оба fences весь
 фазу за TTL. CLI не выдаёт authority и не проверяет backup самостоятельно.
 Deploy/tick/startup не готовят lookup. Ordinary writer использует prepared lookup;
 old-writer append и moved/restored root требуют explicit target-root reprepare.
-21 lookup tests PASS: copy/canonical modes, concurrent OPS/canonical writer refusal,
+22 lookup tests PASS: copy/canonical modes, concurrent OPS/canonical writer refusal,
 fence beyond TTL, bounded append/read, moved-root refusal/reprepare. Реальный
 frozen-base writer append/read повторён: stale refusal и explicit reprepare PASS.
 Real CLI tick с запрещённым prepare подтверждает отсутствие auto-preparation.
+Frozen c7 pending после published stamp блокировал lifecycle gate до recovery.
+State-only proof теперь проверяет exact partition/namespace и разрешает pointers
+в памяти, не меняя journal/root bytes; subsequent fenced append завершает recovery.
+Public CLI restart PASS без full scan/auto-prepare. Crash до stamp и changed
+namespace сохраняют отказ. Move/restore всегда требует operator reprepare;
+машина гарантирует refusal только при changed binding, не любом same-volume rename.
 Canonical VPS preparation здесь не выполнялась.
 
 P1-B: remaining/prospective slots ×8MiB×6 +margin больше не runtime kill-switch.
@@ -69,7 +75,7 @@ publisher/lease/filesystem. При0/32/128 valid distinct retired transactions:
 Current paired fresh-process normal work:7 partitions/81,950 bytes при всех
 размерах, inventory0. Дополнительные490 bytes — commissioning metadata binding.
 На864/6048/25920/51840 transactions12 fresh normal/restart/status процессов:
-fixed95m due tail6 partitions/73,318 bytes, wall0.60–0.65s, RSS<90MB, inventory0.
+fixed100m due tail6 partitions/73,318 bytes, wall0.59–0.64s, RSS<90MB, inventory0.
 Cutoff60m имеет дополнительный lifecycle append и измерен отдельно от fixed work.
 Pre-upgrade local fixtures получают synthetic binding через public OPS owner;
 production migration не заявлена. Setup/preparation вне timing; warm cache не proof.
@@ -94,18 +100,18 @@ activation. Changed root identity блокирует intake; canonical recovery/
 Новый envelope — новая supported activation/cohort boundary, без intraday fragments.
 R4 не доказывает ACTIVE producer restart на root с изменённой identity.
 
-Validation:80 targeted tests PASS без skips (lookup/lifecycle/producer/operability);
+Validation:83 targeted tests PASS без skips (lookup/lifecycle/producer/operability);
 Current suite включает полный canary/R2, temporal cutoff guards и4 admission
 transaction regressions: witness delay/cutoff, fresh T0/slots, expired lease, SQL rollback.
-R3/R4 three-process repeat PASS на committed unchanged Git; intermediate
-GIT_MUTATION refusal сохранён, gate не обходился.
+R3/R4 повторяется на committed unchanged Git после pending recovery repair;
+intermediate GIT_MUTATION refusal сохранён, gate не обходится.
 Groups overlap, не суммируются. R1 paired и aged fresh-process proofs повторены
 после последнего implementation delta. Все12 source hashes совпадают с code.
 Direct semantic consumer:15 tests PASS без skips. Предыдущий Actions shard4
 выявил new alias headroom→OOM и overview16,457>16,384 bytes. Navigation config
 исправлен: VPS OOM→SEM-REMOTE-OPS-RECOVERY, overview16,368 bytes; gold queries/
 лимиты/engine сохранены. Lookup доступен через operator runbook. Semantic config/engine не изменились после consumer repair;
-R1–R4 повторены на новом runtime перед final binding.
+R1/R2 повторены на новом runtime; current R3/R4 повторяется перед final binding.
 Four isolated review verdicts и reviewed content head находятся в bound independent-review receipt.
 
 WATCH без optimization:60-day root21,927 node files/19,455,681 bytes;

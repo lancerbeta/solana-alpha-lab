@@ -1170,12 +1170,13 @@ class ResearchStore:
         self._root = _validated_data_root(data_root, create=create_if_missing)
         self._parquet_compression = parquet_compression
 
-    def _write_lookup(self, *, recover: bool = False) -> WriteLookup | None:
+    def _write_lookup(self, *, recover: bool = False, read_only_pending: bool = False) -> WriteLookup | None:
         try:
             lookup = WriteLookup(self._root, _target_path)
             if not lookup.exists():
                 return None  # uncommissioned legacy mode retains full verification
-            lookup.load(recover=self._recover_write_lookup if recover else None)
+            lookup.load(recover=self._recover_write_lookup if recover or read_only_pending else None,
+                        read_only_pending=read_only_pending)
             return lookup
         except WriteLookupError as exc:
             raise ResearchStoreError(exc.code) from exc
@@ -1553,8 +1554,10 @@ class ResearchStore:
     def _existing_transaction(
         self,
         transaction_id: str,
+        *,
+        read_only_pending: bool = False,
     ) -> PartitionManifest | None:
-        lookup = self._write_lookup()
+        lookup = self._write_lookup(read_only_pending=read_only_pending)
         if lookup is not None:
             try:
                 pointer = lookup.get("transactions", transaction_id)
@@ -1712,7 +1715,7 @@ class ResearchStore:
         scientific truth owner.
         """
 
-        lookup = self._write_lookup() if state_only else None
+        lookup = self._write_lookup(read_only_pending=True) if state_only else None
         if lookup is not None:
             try:
                 pointers = lookup.state_pointers(schedule_sha256)
