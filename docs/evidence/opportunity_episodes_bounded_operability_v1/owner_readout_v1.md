@@ -76,8 +76,8 @@ repeat. Native card/PIT/protection provenance и synthetic numeric oracle сох
 Real scientific MAIN/ADAPTIVE looks0.
 R4: existing backup owner, nonempty detached restore, original/network BLOCKED,
 saved readback без write, numerical replay equality, duplicate import и typed
-corrupt/missing refusals. New archive24,743,915 bytes, SHA
-4e92bfbda95bd6fee48358b3597af01b80816f90f508a3239d6030c212d3b32c.
+corrupt/missing refusals. New archive24,742,883 bytes, SHA
+c5e2d5fde8693f9c47a3816122437e5081514aef5e24d278d20783b77c1b115c.
 Windows process proof не устанавливает Linux unit/power-loss acceptance.
 Lookup reprepare на target root не перепривязывает immutable envelope старой
 activation. Changed root identity блокирует intake; canonical recovery/tail —
@@ -87,14 +87,15 @@ R4 не доказывает ACTIVE producer restart на root с изменён
 
 Validation:76 targeted tests PASS без skips (lookup/lifecycle/producer/operability);
 Current suite включает полный canary/R2 и три temporal cutoff regressions.
-R3/R4 повторяется после committed content; intermediate GIT_MUTATION guard сохранён.
+R3/R4 three-process repeat PASS на committed unchanged Git; intermediate
+GIT_MUTATION refusal сохранён, gate не обходился.
 Groups overlap, не суммируются. R1 paired и aged fresh-process proofs повторены
 после последнего implementation delta. Все12 source hashes совпадают с code.
 Four isolated reviews повторяются на exact final content перед binding.
 
-WATCH без optimization:60-day root21,894 node files/19,413,278 bytes;
-один measured tail tick +16 files/+22,060 bytes. Packet при138 actual due rows
-0.25/1.31/3.65/8.27s на1/7/30/60-day histories; canary6,624 rows —0.50s.
+WATCH без optimization:60-day root21,910 node files/19,434,842 bytes;
+один measured tail tick +17 files/+20,839 bytes. Packet при138 actual due rows
+0.34/1.87/5.16/11.74s на1/7/30/60-day histories; canary6,624 rows —0.50s.
 Это разные histories, не функция только due count. Linux inode allocation/growth
 UNKNOWN; Windows file-count proxy — MODEL. GC/retention/engine redesign/packet
 optimization отсутствуют.

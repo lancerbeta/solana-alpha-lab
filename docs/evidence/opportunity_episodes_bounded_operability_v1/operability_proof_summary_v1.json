@@ -209,6 +209,22 @@
     {
       "logical_ref": "local/episodes_operability/final_temporal_vertical.log",
       "sha256": "54b3d258a9777fcb9671a05508927ce992e3967295078cbe5ee6c6dce1215d51"
+    },
+    {
+      "logical_ref": "local/episodes_operability/temporal_bound_vertical/p1-report.json",
+      "sha256": "68296f403738fba5665b2484c054aebf27fa7e1d42af5a5e2f11e6b0999d6e4b"
+    },
+    {
+      "logical_ref": "local/episodes_operability/temporal_bound_vertical/p2-report.json",
+      "sha256": "ec40877ee1485da38bb0dfffaf9f0aac9d1c3ae7f5d2b58a0cbd1bb9b2098ca0"
+    },
+    {
+      "logical_ref": "local/episodes_operability/temporal_bound_vertical/p3-report.json",
+      "sha256": "12391f80ffe2c431f122c407a0659e32f61e64a47cd2464ab4b177964c838db7"
+    },
+    {
+      "logical_ref": "local/episodes_operability/temporal_bound_vertical.log",
+      "sha256": "01b09c75281f634c881f36ada045158bf0a5ab5c4a1229bbb25660d03d015849"
     }
   ],
   "code_sha256": {
@@ -2701,9 +2717,9 @@
         "DISAPPEARED": 11,
         "OBSERVED": 923
       },
-      "wall_seconds": 68.14,
-      "peak_rss_bytes": 120762368,
-      "tick_wall_seconds": 61.86,
+      "wall_seconds": 65.82,
+      "peak_rss_bytes": 119713792,
+      "tick_wall_seconds": 60.81,
       "ticks": 121,
       "storage": {
         "export_bytes": 123176,
@@ -2712,8 +2728,8 @@
         "ops_wal_bytes": 0,
         "publication_parquet_bytes": 4347308,
         "raw_plane_bytes": 284983,
-        "rdp_total_bytes": 17244604,
-        "research_store_bytes": 3543705
+        "rdp_total_bytes": 17244605,
+        "research_store_bytes": 3543706
       },
       "assignment_sha256": "754d3550eaf51c78b979f6db3d8243b0347e88ae4f012a34d5a25fc03c4b24bc",
       "outbox": {
@@ -2723,12 +2739,12 @@
       }
     },
     "owner_patch_consumer": {
-      "wall_seconds": 117.4,
-      "peak_rss_bytes": 515284992,
+      "wall_seconds": 100.59,
+      "peak_rss_bytes": 490311680,
       "storage": {
         "episode_corpus_bytes": 496521,
         "mirror_bytes": 5433563,
-        "plane_total_bytes": 5487932,
+        "plane_total_bytes": 5486901,
         "sealed_release_bytes": 490371
       },
       "fresh_capture_retry": {
@@ -2775,14 +2791,14 @@
     "network_or_original_access_during_cold": [],
     "owner_patch_restore": {
       "backup": {
-        "bytes": 24743915,
-        "inventory_sha256": "90b45d867ca7e44a5f8bff08d7953a4b70c7420d2c9af65d55c3aee200ed9a01",
-        "sha256": "4e92bfbda95bd6fee48358b3597af01b80816f90f508a3239d6030c212d3b32c"
+        "bytes": 24742883,
+        "inventory_sha256": "f9330a7fdb1b784464901174372085506da78034a284879e3753a35333f80f1d",
+        "sha256": "c5e2d5fde8693f9c47a3816122437e5081514aef5e24d278d20783b77c1b115c"
       },
       "restored_entries": 2986,
       "original_root_probe": "BLOCKED",
-      "wall_seconds": 37.51,
-      "peak_rss_bytes": 276807680,
+      "wall_seconds": 34.78,
+      "peak_rss_bytes": 276361216,
       "cold_dependency_refusals": {
         "corrupt": "RELEASE_HASH_MISMATCH",
         "missing": "RELEASE_DEPENDENCY_MISSING"
@@ -3365,7 +3381,8 @@
       "applicability": "Full R3-R4 repeated after commissioning/local-control/count changes; its first producer process precedes only the final identical-schema no-cast fix. Final 67 owner tests and the 48-episode late-tail pressure proof cover that fix; no scientific value/schema/coercion policy changed."
     },
     "postreview_targeted": "PASS_76_TARGETED_NO_SKIPS_INCLUDE_FULL_CANARY_R2_PARTIAL_ROUND_PACING_CAPTURE_CUTOFF_OLD_GROUPS_OVERLAP",
-    "final_delta_applicability": "Current paired/cold R1 and full targeted76 match all twelve runtime hashes. R3/R4 repeat after committed content is required; intermediate Git mutation refusal is preserved, no gate bypass."
+    "final_delta_applicability": "Current paired/cold R1, full targeted76 and committed-Git three-process R3/R4 all match twelve runtime hashes. Intermediate GIT_MUTATION refusal retained; no machine gate bypass.",
+    "final_temporal_vertical": "PASS_THREE_PROCESSES_ONE_VERTICAL_TEST_NO_SKIPS_CURRENT_RUNTIME_COMMITTED_GIT_UNCHANGED"
   },
   "FACT": [
     "real public entry and real canonical filesystem/lease/publication owners",
@@ -3718,9 +3735,10 @@
       },
       "cutoff_clock_guards": "Current post-pacing clock closes nomination at cutoff; completed funded capture/each T0 cannot admit after cutoff; ordinary drain uses final clock",
       "current_targeted_tests": 76,
-      "intermediate_R3_refusal": "GIT_MUTATION_DETECTED_WHILE_TASK_DOCUMENT_CHANGED_REHEARSAL_WILL_REPEAT_ON_COMMITTED_CONTENT",
+      "intermediate_R3_refusal": "GIT_MUTATION_DETECTED_WHILE_TASK_DOCUMENT_CHANGED; final committed unchanged-Git repeat PASS",
       "science": "NO_REAL_SCIENTIFIC_LOOK",
-      "sampling_caps": "UNCHANGED"
+      "sampling_caps": "UNCHANGED",
+      "vertical_rehearsal_content_head": "f5036e481302c21a09b908dd8b1c9c3b60e39e77"
     }
   },
   "reproduce": [
