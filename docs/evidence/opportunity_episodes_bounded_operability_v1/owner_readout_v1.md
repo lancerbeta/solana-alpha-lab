@@ -91,8 +91,8 @@ repeat. Native card/PIT/protection provenance и synthetic numeric oracle сох
 Real scientific MAIN/ADAPTIVE looks0.
 R4: existing backup owner, nonempty detached restore, original/network BLOCKED,
 saved readback без write, numerical replay equality, duplicate import и typed
-corrupt/missing refusals. New archive24,739,889 bytes, SHA
-aa0724c92fe097eefe8a60082e060c7c28771b92bb58c0d354ac39c10206cb7d.
+corrupt/missing refusals. New archive24,740,995 bytes, SHA
+eb74da89ca7e1877680329244a9ddf059291ea3b61a0e345f7adad1a6afe6bad.
 Windows process proof не устанавливает Linux unit/power-loss acceptance.
 Lookup reprepare на target root не перепривязывает immutable envelope старой
 activation. Changed root identity блокирует intake; canonical recovery/tail —
@@ -103,20 +103,20 @@ R4 не доказывает ACTIVE producer restart на root с изменён
 Validation:83 targeted tests PASS без skips (lookup/lifecycle/producer/operability);
 Current suite включает полный canary/R2, temporal cutoff guards и4 admission
 transaction regressions: witness delay/cutoff, fresh T0/slots, expired lease, SQL rollback.
-R3/R4 повторяется на committed unchanged Git после pending recovery repair;
-intermediate GIT_MUTATION refusal сохранён, gate не обходится.
+R3/R4 three-process repeat PASS на committed unchanged Git; intermediate
+GIT_MUTATION refusal сохранён, gate не обходился.
 Groups overlap, не суммируются. R1 paired и aged fresh-process proofs повторены
 после последнего implementation delta. Все12 source hashes совпадают с code.
 Direct semantic consumer:15 tests PASS без skips. Предыдущий Actions shard4
 выявил new alias headroom→OOM и overview16,457>16,384 bytes. Navigation config
 исправлен: VPS OOM→SEM-REMOTE-OPS-RECOVERY, overview16,368 bytes; gold queries/
 лимиты/engine сохранены. Lookup доступен через operator runbook. Semantic config/engine не изменились после consumer repair;
-R1/R2 повторены на новом runtime; current R3/R4 повторяется перед final binding.
+R1–R4 повторены на новом runtime перед final binding.
 Four isolated review verdicts и reviewed content head находятся в bound independent-review receipt.
 
-WATCH без optimization:60-day root21,927 node files/19,455,681 bytes;
-один measured tail tick +17 files/+21,965 bytes. Packet при138 actual due rows
-0.33/1.75/5.09/11.42s на1/7/30/60-day histories; canary6,624 rows —0.50s.
+WATCH без optimization:60-day root21,944 node files/19,477,646 bytes;
+один measured tail tick +16 files/+22,369 bytes. Packet при138 actual due rows
+0.37/1.80/5.02/11.45s на1/7/30/60-day histories; canary6,624 rows —0.52s.
 Это разные histories, не функция только due count. Linux inode allocation/growth
 UNKNOWN; Windows file-count proxy — MODEL. GC/retention/engine redesign/packet
 optimization отсутствуют.

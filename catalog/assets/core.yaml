@@ -40309,7 +40309,7 @@ records:
   as_of: '2026-10-06'
   truth_owner: OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/opportunity_episodes_bounded_operability_v1/owner_readout_v1.md', repository_path: docs/evidence/opportunity_episodes_bounded_operability_v1/owner_readout_v1.md}
-  integrity: {kind: sha256, sha256: 7d137fa75782c10eaa76fb9c33e0073c2c67920c72a10dab73a97852f00c20dd}
+  integrity: {kind: sha256, sha256: 470cd2788c48f97a5f3c53d1154f9dd4716da788438a11ee63c47d42e2c629da}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-001}

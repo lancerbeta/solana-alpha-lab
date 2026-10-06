@@ -385,6 +385,34 @@
     {
       "logical_ref": "local/episodes_operability/pending_owner_final/test_sql_delay_crosses_cutoff_rolls_back_all_admission_rows/report.json",
       "sha256": "28a1971a2fab03790242be2a2a2a659ed1732e21219bdd33e3318cddd71c713d"
+    },
+    {
+      "logical_ref": "local/episodes_operability/pending_owner_vertical/p1-report.json",
+      "sha256": "8408e9187bbab4a586370cd8fa384ac959a7048dbee57f05779e7c59ad38fe5a"
+    },
+    {
+      "logical_ref": "local/episodes_operability/pending_owner_vertical/p2-report.json",
+      "sha256": "10b6e94c6628df77ea556e87df3e4f9b97728044668e1045ae9a6a655e6a31a8"
+    },
+    {
+      "logical_ref": "local/episodes_operability/pending_owner_vertical/p3-report.json",
+      "sha256": "6ef305d1557267595cc068c70b54b0ef118b4786aa6b52d766c0e103b32a7064"
+    },
+    {
+      "logical_ref": "local/episodes_operability/pending_owner_vertical.log",
+      "sha256": "053dad6956d3bbff591460f5ad336ef6bb6f8010fb54d6227a4365fe6f1dabfa"
+    },
+    {
+      "logical_ref": "local/episodes_operability/pending_owner_rollback_report.json",
+      "sha256": "61d874dd991b6ac8a8c133cb9b636d8c1d6db417f78ec48e0371ae0f2367f764"
+    },
+    {
+      "logical_ref": "local/episodes_operability/pending_owner_canary_watch.json",
+      "sha256": "1ef6349af0cfb8f100b2425d26d3ea9aa4dbadc84d5bf537b04acf0dd432a5ae"
+    },
+    {
+      "logical_ref": "local/episodes_operability/pending_owner_semantic.log",
+      "sha256": "52b98873c9403dd3bc1f9659216de9e837e3183a9c90ce216c08e1ade6a997d0"
     }
   ],
   "code_sha256": {
@@ -2877,9 +2905,9 @@
         "DISAPPEARED": 11,
         "OBSERVED": 923
       },
-      "wall_seconds": 64.14,
-      "peak_rss_bytes": 119791616,
-      "tick_wall_seconds": 59.23,
+      "wall_seconds": 63.66,
+      "peak_rss_bytes": 122109952,
+      "tick_wall_seconds": 58.72,
       "ticks": 121,
       "storage": {
         "export_bytes": 123176,
@@ -2888,8 +2916,8 @@
         "ops_wal_bytes": 0,
         "publication_parquet_bytes": 4347308,
         "raw_plane_bytes": 284983,
-        "rdp_total_bytes": 17244605,
-        "research_store_bytes": 3543706
+        "rdp_total_bytes": 17244607,
+        "research_store_bytes": 3543708
       },
       "assignment_sha256": "754d3550eaf51c78b979f6db3d8243b0347e88ae4f012a34d5a25fc03c4b24bc",
       "outbox": {
@@ -2899,12 +2927,12 @@
       }
     },
     "owner_patch_consumer": {
-      "wall_seconds": 99.36,
-      "peak_rss_bytes": 491032576,
+      "wall_seconds": 99.14,
+      "peak_rss_bytes": 500531200,
       "storage": {
         "episode_corpus_bytes": 496521,
         "mirror_bytes": 5433563,
-        "plane_total_bytes": 5483926,
+        "plane_total_bytes": 5485027,
         "sealed_release_bytes": 490371
       },
       "fresh_capture_retry": {
@@ -2951,14 +2979,14 @@
     "network_or_original_access_during_cold": [],
     "owner_patch_restore": {
       "backup": {
-        "bytes": 24739889,
-        "inventory_sha256": "b57a73c211b617bf3c4d0696f83dd5df7d98291460b7dc38f16b19f57b550f88",
-        "sha256": "aa0724c92fe097eefe8a60082e060c7c28771b92bb58c0d354ac39c10206cb7d"
+        "bytes": 24740995,
+        "inventory_sha256": "5b911d8e682a2d225d94a6ab1a531cc5cc719f34872c6333228ce02db590c7d7",
+        "sha256": "eb74da89ca7e1877680329244a9ddf059291ea3b61a0e345f7adad1a6afe6bad"
       },
       "restored_entries": 2986,
       "original_root_probe": "BLOCKED",
-      "wall_seconds": 33.49,
-      "peak_rss_bytes": 279117824,
+      "wall_seconds": 34.09,
+      "peak_rss_bytes": 276242432,
       "cold_dependency_refusals": {
         "corrupt": "RELEASE_HASH_MISMATCH",
         "missing": "RELEASE_DEPENDENCY_MISSING"
@@ -3541,7 +3569,7 @@
       "applicability": "Full R3-R4 repeated after commissioning/local-control/count changes; its first producer process precedes only the final identical-schema no-cast fix. Final 67 owner tests and the 48-episode late-tail pressure proof cover that fix; no scientific value/schema/coercion policy changed."
     },
     "postreview_targeted": "PASS_83_TARGETED_NO_SKIPS_INCLUDE_FULL_CANARY_R2_TEMPORAL_ADMISSION_FENCES_PENDING_PURE_READ_TICK_RECOVERY_PRESTAMP_NAMESPACE_REFUSAL_GROUPS_OVERLAP",
-    "final_delta_applicability": "Current paired/coldR1 and full targeted83 match all12 runtime hashes; committed-Git R3/R4 and final four changed-runtime reviews to repeat. Prior evidence is historical.",
+    "final_delta_applicability": "Current paired/cold R1, full targeted83 and committed-Git three-process R3/R4 all match twelve runtime hashes. Intermediate GIT_MUTATION refusal retained; no machine gate bypass.",
     "final_temporal_vertical": "PASS_THREE_PROCESSES_ONE_VERTICAL_TEST_NO_SKIPS_CURRENT_RUNTIME_COMMITTED_GIT_UNCHANGED",
     "semantic_direct_consumer": {
       "status": "PASS",
@@ -3560,8 +3588,8 @@
         "limit_bytes": 16384
       },
       "repair": "Remove incidental oom substring from new headroom alias; operator runbook is navigation hub for lookup; compact collection purpose. Existing gold queries, limits and search engine unchanged.",
-      "runtime_proof_applicability": "Semantic config/search engine/gold unchanged; final runtime evidence is current admission-owner R1/targeted80/R3/R4, not the historical targeted76",
-      "current_repeat": "PASS_15_NO_SKIPS_AFTER_CURRENT_RUNTIME_AND_CANONICAL_SYNC",
+      "runtime_proof_applicability": "Semantic config/search engine/gold unchanged; final runtime evidence is current admission-owner R1/targeted83/R3/R4, not the historical targeted76",
+      "current_repeat": "PASS_15_NO_SKIPS_AFTER_PENDING_OWNER_RUNTIME_AND_CANONICAL_SYNC",
       "intermediate_refusal": "PRE_SYNC_CATALOG_READOUT_HASH_REFUSAL; canonical sync then15PASS, no gate bypass"
     }
   },
@@ -3655,6 +3683,16 @@
         "src/solana_alpha_lab/factory/research_store.py": "837d2bdc97fe9cb783a8ff5b84cd3097882763261343e7b4cfce84e7837fef52",
         "src/solana_alpha_lab/factory/observation_schedule_store.py": "9cda2d7d8c1cef1865691e4f7e538328aeba483fe39f497bebd015a153d5e873",
         "tests/test_research_write_lookup.py": "67dc49198a2a874b69c54fce21c7c8cd8b62c7c9ee830d4296c9f9a8136af2ea"
+      },
+      "current_lookup_tests": 22,
+      "current_frozen_writer_rollback": {
+        "frozen_base": "576e8c54715bb8af6b84877b91678ae659a42f88",
+        "writer_blob_sha256": "4a7d215f2dc430c401fdf81e5fef5e6c9441ccf57cfd077fdd64c527be0fbd86",
+        "old_writer_append": "PASS",
+        "old_readable_records": 2,
+        "new_stale_refusal": "WRITE_LOOKUP_STALE_PREPARATION_REQUIRED",
+        "explicit_reprepare": "PASS",
+        "current_source_sha256": "81c8d4ce7723d6c9dc2eb823d3cd699736c67ab540f49e5d0277929c363d4405"
       }
     },
     "P1_B": {
@@ -3815,7 +3853,7 @@
     "watch_canary": {
       "status": "MEASURED_WATCH_ONLY",
       "due_rows": 6624,
-      "operational_packet_wall_seconds": 0.50428760000068,
+      "operational_packet_wall_seconds": 0.5207567999968887,
       "node_files": 2285,
       "node_bytes": 2107675,
       "actual_linux_inode_growth": "UNKNOWN",
@@ -4125,8 +4163,9 @@
       "owner_boundary": "State-only lifecycle and exact draining proof can resolve verified previous/next pending pointers in memory; exact canonical partition and unchanged namespace verifier reused; journal/root bytes unchanged. Later fenced append finishes journal; no full prepare/history scan/default identity or scientific-reader change.",
       "move_restore_semantics": "Operator must reprepare after every move/restore; automatic refusal is only promised for changed stat/identity binding, not every same-volume rename",
       "current_targeted_tests": 83,
-      "R3_R4": "AWAITING_COMMITTED_UNCHANGED_GIT_REPEAT",
-      "science": "NO_REAL_SCIENTIFIC_LOOK"
+      "R3_R4": "PASS_CURRENT_RUNTIME_COMMITTED_UNCHANGED_GIT",
+      "science": "NO_REAL_SCIENTIFIC_LOOK",
+      "vertical_rehearsal_content_head": "5b377af9c182a030b40b7a559bd49e28dd39ecdf"
     }
   },
   "reproduce": [
@@ -4147,7 +4186,9 @@
       "existing_80m_receipt": "local/episodes_operability/owner_patch_cold_postreview_report.json",
       "80m_note": "Existing preserved roots have processed 80m already: replay cannot reproduce new normal work. Fresh active-aged command reproduces bounded-work invariants; 80m raw receipt remains immutable measured evidence.",
       "existing_95m_receipt": "local/episodes_operability/admission_owner_cold_report.json",
-      "95m_note": "Preserved roots processed through95m; replay at95m repeats no new work. Fresh roots/active-aged command reproduces bounded-work invariants. Setup/preparation excluded; current cold95m proof matches all12 runtime hashes."
+      "95m_note": "Preserved roots processed through95m; replay at95m repeats no new work. Fresh roots/active-aged command reproduces bounded-work invariants. Setup/preparation excluded; current cold95m proof matches all12 runtime hashes.",
+      "existing_100m_receipt": "local/episodes_operability/pending_owner_cold_report.json",
+      "100m_note": "Preserved roots processed through100m; replay at100m repeats no new work. Fresh roots/active-aged command reproduces bounded-work invariants. Setup/preparation excluded; current cold100m proof matches all12 runtime hashes."
     },
     {
       "scope": "R2 + canary storage pressure + round boundary + legacy option refusal",
@@ -4175,6 +4216,14 @@
         "OEP_OPERABILITY_WORK": "<fresh-retained-local-proof-root>"
       },
       "command": "uv run --locked --managed-python python -B -m unittest tests.test_opportunity_episodes_operability_v1.EpisodeOperabilityTests.test_witness_io_crosses_cutoff_without_admission_rows tests.test_opportunity_episodes_operability_v1.EpisodeOperabilityTests.test_witness_io_selects_fresh_transaction_t0_and_slots tests.test_opportunity_episodes_operability_v1.EpisodeOperabilityTests.test_witness_io_expired_lease_never_commits tests.test_opportunity_episodes_operability_v1.EpisodeOperabilityTests.test_sql_delay_crosses_cutoff_rolls_back_all_admission_rows -v",
+      "authority": "SYNTHETIC_LOCAL_ONLY"
+    },
+    {
+      "scope": "Pending lifecycle proof pure read and ordinary tick recovery regressions",
+      "environment": {
+        "OEP_OPERABILITY_WORK": "<fresh-retained-local-proof-root>"
+      },
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_opportunity_episodes_operability_v1.EpisodeOperabilityTests.test_pending_lifecycle_read_preserves_bytes_and_tick_recovers tests.test_opportunity_episodes_operability_v1.EpisodeOperabilityTests.test_pending_before_stamp_keeps_tick_fail_closed tests.test_research_write_lookup.WriteLookupTests.test_pending_lifecycle_read_is_pure_and_namespace_change_refuses -v",
       "authority": "SYNTHETIC_LOCAL_ONLY"
     }
   ],
