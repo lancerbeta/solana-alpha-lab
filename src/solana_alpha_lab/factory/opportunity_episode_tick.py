@@ -822,9 +822,10 @@ class _EpisodeTick:
             self._terminalize(claim, state="OBSERVED", missing_reason=None, row=row, timing=timing)
 
     # ------------------------------------------------------------------
-    def nomination_round(self) -> None:
+    def nomination_round(self, *, decision_now: datetime) -> None:
         nomination = self.schedule["nomination"]
-        now = self.provider_ctx.now()
+        # Bind selection to the same round whose obligations were reserved.
+        now = decision_now
         started = round_start(now, int(nomination["round_period_seconds"]))
         rid = round_id(self.activation_id, started)
         slack = int(nomination["round_slack_seconds"])
@@ -1181,11 +1182,14 @@ class _EpisodeTick:
             remaining = self.store.episode_remaining_call_groups(
                 schedule_sha256=self.digest, activation_id=self.activation_id,
                 batch_size=int(self.schedule["observation_schedule"]["max_batch_size"]))
-            quota = round_quota(int(self.schedule["sampling"]["daily_normal_ceiling"]), round_index(self.now))
+            # Slot processing and account pacing may cross a round boundary.
+            # Capture once here; nomination must not select a different round.
+            decision_now = self.provider_ctx.now()
+            quota = round_quota(int(self.schedule["sampling"]["daily_normal_ceiling"]), round_index(decision_now))
             # T0 is known only after capture; do not presume prospective batching.
             prospective = quota * (len(episode_point_ids()) - 1)
             period = int(self.schedule["nomination"]["round_period_seconds"])
-            seconds = max(0, (parse_utc(str(self.activation["stops_admitting_at"])) - self.now).total_seconds())
+            seconds = max(0, (parse_utc(str(self.activation["stops_admitting_at"])) - decision_now).total_seconds())
             future_nomination_calls = int((seconds + period - 1) // period) * len(self.schedule["nomination"]["sources"])
             try:
                 free = shutil.disk_usage(self.data_root).free
@@ -1195,13 +1199,15 @@ class _EpisodeTick:
                 prospective_slots=prospective, prospective_call_groups=prospective,
                 remaining_nomination_calls=future_nomination_calls, local_envelope=envelope, free_bytes=free)
             self.report["drain_headroom"] = reserve
+            self.report["drain_headroom"]["decision_at"] = render_utc(decision_now)
+            self.report["drain_headroom"]["round_started_at"] = render_utc(round_start(decision_now, period))
             if reserve["status"] in {"UNKNOWN_LOCAL_FREE_SPACE", "STOP_NEW_INTAKE"}:
                 stop_episode_intake(data_root=self.data_root, store=self.store,
                     schedule_sha256=self.digest, activation_id=self.activation_id,
                     now=self.provider_ctx.now(), producer_git_sha=self.producer)
                 self.report["stop_reason"] = "DRAIN_RESERVE_UNKNOWN" if free is None else "DRAIN_RESERVE_PRESSURE"
             else:
-                self.nomination_round()
+                self.nomination_round(decision_now=decision_now)
         self.publish_outbox()
         self.report["provider_calls"] = self.accounts.tick_calls
         self.report["credential_reads"] = self.credential_reads

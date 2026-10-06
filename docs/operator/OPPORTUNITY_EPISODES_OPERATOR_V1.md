@@ -156,6 +156,83 @@ manifest/lookup effects должны входить в per-call bound; terminal 
 per-slot bound. UNKNOWN topology блокирует commissioning до ACTIVE. Прогноз шести
 копий — отдельный whole-Factory MODEL, не runtime kill-switch на producer free space.
 
+Точный шаблон ниже намеренно невалиден до commissioning: каждый UNKNOWN заменяется
+проверенным значением отдельного OPERATE packet. Не подставлять synthetic test limits
+как approved envelope. `factory_storage_gate` становится PASS только после проверки
+реальной topology/footprint на всех actual volumes, backup и measured copy rehearsal.
+
+```json
+{
+  "kind": "EPISODE_PRODUCER_STORAGE_COMMISSIONING_V1",
+  "schedule_sha256": "UNKNOWN",
+  "activation_id": "UNKNOWN",
+  "producer_root_identity": {"device": "UNKNOWN", "inode": "UNKNOWN"},
+  "factory_storage_gate": "UNKNOWN",
+  "verified_backup_sha256": "UNKNOWN",
+  "copy_rehearsal_sha256": "UNKNOWN",
+  "factory_storage_receipt_sha256": "UNKNOWN",
+  "volume_bindings_sha256": "UNKNOWN",
+  "operate_authority_ref": "UNKNOWN",
+  "search_call_local_bytes_max": "UNKNOWN",
+  "nomination_call_local_bytes_max": "UNKNOWN",
+  "slot_metadata_local_bytes_max": "UNKNOWN",
+  "fixed_local_reserve_bytes": "UNKNOWN",
+  "local_safety_bytes": "UNKNOWN",
+  "envelope_sha256": "UNKNOWN"
+}
+```
+
+Дополнительные поля запрещены. Device/inode — целые >= 0, byte limits — целые
+от 1 до 2^63−1, не bool. Четыре proof hashes и envelope hash — 64 lowercase hex;
+schedule SHA и activation ID должны точно совпадать с выбранным schedule/activation.
+OPERATE ref соответствует `[A-Za-z0-9_.-]{1,128}` и указывает на отдельное разрешение.
+Self-hash — `canonical_sha256` всего объекта без `envelope_sha256`, с теми же правилами
+canonical JSON, что у schedule owner. Эти проверки не верифицируют содержимое receipts
+и не выдают authority: оператор сначала проверяет их и утверждает byte limits.
+
+Offline recipe: сохраните этот фрагмент локально, запустите repository Python с пятью
+аргументами: exact canonical data root, заполненный approved JSON, exact schedule SHA,
+activation ID и новый output JSON вне data root. Он читает только stat указанного root
+и локальный JSON; записывает новый локальный файл, не открывает OPS или provider.
+Root identity и self-hash вычисляются здесь; остальные поля уже должны быть утверждены.
+После restore/move нельзя переносить старый envelope: нужен explicit reprepare и новый
+commissioning binding для target root, с прежними prerequisites и отдельной authority.
+
+```text
+uv run --locked --managed-python python -B <local-preflight.py> <absolute-canonical-root> <approved-body.json> <exact-schedule-sha256> <activation-id> <new-output-json-outside-data-root>
+```
+
+```python
+import json
+import sys
+from pathlib import Path
+from solana_alpha_lab.factory.observation_schedule import canonical_sha256
+from solana_alpha_lab.factory.hot90_storage_admission import (
+    producer_root_identity, validate_episode_storage_commissioning,
+)
+
+data_root = Path(sys.argv[1]).resolve(strict=True)
+body = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
+body.pop("envelope_sha256", None)
+body["producer_root_identity"] = producer_root_identity(data_root)
+body["envelope_sha256"] = canonical_sha256(body)
+validate_episode_storage_commissioning(
+    body, data_root=data_root, schedule_sha256=sys.argv[3], activation_id=sys.argv[4],
+)
+destination = Path(sys.argv[5]).resolve()
+if destination.is_relative_to(data_root):
+    raise ValueError("OUTPUT_MUST_BE_OUTSIDE_CANONICAL_ROOT")
+with destination.open("x", encoding="utf-8") as output:
+    output.write(json.dumps(body, indent=2) + "\n")
+print("VALIDATED_STRUCTURE_ONLY_NOT_OPERATE_AUTHORITY")
+```
+
+На текущем PREPARE gate эти поля остаются UNKNOWN, activation запрещена. При
+неподходящем legacy schedule параметр отказывает `EPISODE_STORAGE_SCHEDULE_ONLY`
+до ACTIVE и canonical state append. Обычный tick связывает reserve и nomination
+одним current decision instant после pacing; смена round не добавляет обязательства,
+для которых не проверен локальный запас. `slot_states` остаётся источником backlog.
+
 При `DRAIN_RESERVE_PRESSURE`/`DRAIN_RESERVE_UNKNOWN` из bound LOCAL control intake уже закрыт штатным
 переходом DRAINING. Повторить status, сохранить ledger и frozen dependencies,
 довести obligations; pause/resume для DRAINING отказываются. Не обходить отказ,

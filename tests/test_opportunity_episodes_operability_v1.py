@@ -237,6 +237,65 @@ class EpisodeOperabilityTests(unittest.TestCase):
         self.assertEqual(final["activation_state"], "COMPLETE")
         self.assertEqual(sc.unpublished(), 0)
 
+    def test_pacing_round_boundary_reserves_the_actual_nomination_round(self):
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        sc = self.scenario(daily_ceiling=24, active_cap=48)
+        at = START + timedelta(minutes=44, seconds=59)
+        with closing(ObservationScheduleStore(sc.ops_path)) as store:
+            lease = store.acquire_lease("known-legacy-round-boundary-fixture", clock=at)
+            self.assertIsNotNone(lease)
+            store.save_accounting(schedule_sha256="ee" * 32, activation_id="ACT-KNOWN-LEGACY-TAIL",
+                utc_day="2026-10-05", values={"provider_calls": 1, "modeled_credits": 1,
+                "candidates": 0, "members": 0, "raw_bytes": 1, "canonical_bytes": 1,
+                "last_provider_call_at": "2026-10-05T00:44:58Z"}, clock=at)
+            store.release_lease(lease)
+        row = token_object(synth_mint("RoundBoundaryReserve"), price=1, liquidity=10000, holders=60)
+        nominate(sc.market, START + timedelta(minutes=45),
+            {"toporganicscore": [row], "toptraded": [], "toptrending": []})
+        free = 3 * 1024**3
+        disk = namedtuple("disk", "total used free")(100 * 1024**3, 97 * 1024**3, free)
+        with patch("solana_alpha_lab.factory.opportunity_episode_tick.shutil.disk_usage", return_value=disk):
+            result = sc.tick(at)
+        reserve = result["drain_headroom"]
+        self.assertEqual(result["_exit_code"], 2, result)  # TICK_PARTIAL: reserve refuses intake
+        self.assertEqual(reserve["decision_at"], "2026-10-05T00:45:01Z")
+        self.assertEqual(reserve["round_started_at"], "2026-10-05T00:45:00Z")
+        self.assertEqual(reserve["prospective_reserve_bytes"], 138 * (32 * 1024**2 + 128 * 1024))
+        self.assertGreater(reserve["required_free_bytes"], free)
+        self.assertEqual(result["stop_reason"], "DRAIN_RESERVE_PRESSURE")
+        self.assertEqual(result["activation_state"], "COMPLETE")  # empty tail drains immediately
+        self.assertEqual(sc.admissions(), [])
+        self.assertEqual(result["_calls"], [])
+        (sc.data_root.parent / "report.json").write_bytes((json.dumps({"status": "PASS",
+            "initial_tick_at": "2026-10-05T00:44:59Z", "drain_headroom": reserve,
+            "activation_state": result["activation_state"], "admissions": 0,
+            "synthetic_provider_attempts": 0}, indent=2) + "\n").encode())
+
+    def test_legacy_episode_storage_option_refuses_before_any_activation_write(self):
+        from tests.test_observation_schedule_lifecycle import ROOT, NOW, GIT, _phrase
+        from solana_alpha_lab.factory.observation_schedule import load_observation_schedule
+        from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+            register_schedule, authorize_schedule, activate_schedule, ObservationLifecycleError)
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder) / "rdp"
+            root.mkdir()
+            document = load_observation_schedule(ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml")
+            with closing(ObservationScheduleStore(root / "ops.sqlite")) as store:
+                common = dict(root=ROOT, data_root=root, store=store, now=NOW, producer_git_sha=GIT)
+                registered = register_schedule(document=document, **common)
+                digest = registered["schedule_sha256"]
+                authorize_schedule(schedule_sha256=digest, phrase=_phrase(document), **common)
+                before = {p.relative_to(root).as_posix(): p.read_bytes()
+                          for p in (root / "research").rglob("*") if p.is_file()}
+                with self.assertRaisesRegex(ObservationLifecycleError, "EPISODE_STORAGE_SCHEDULE_ONLY"):
+                    activate_schedule(schedule_sha256=digest, activation_id="ACT-LEGACY-BAD-OPTION",
+                                      storage_commissioning={}, **common)
+                self.assertIsNone(store.get_activation(digest, "ACT-LEGACY-BAD-OPTION"))
+                after = {p.relative_to(root).as_posix(): p.read_bytes()
+                         for p in (root / "research").rglob("*") if p.is_file()}
+                self.assertEqual(before, after)
+
     def test_factory_topology_unknown_refuses_before_activation(self):
         from tests.test_opportunity_episodes_harness_v1 import (
             ROOT, PRODUCER, authority_phrase, build_schedule, write_assignment, storage_commissioning_fixture)

@@ -1832,6 +1832,8 @@ def activate_schedule(
         ),
     )
     from solana_alpha_lab.factory.opportunity_episodes import is_episode_schedule
+    if not is_episode_schedule(document) and storage_commissioning is not None:
+        raise ObservationLifecycleError("EPISODE_STORAGE_SCHEDULE_ONLY")
     if is_episode_schedule(document):
         from solana_alpha_lab.factory.hot90_storage_admission import (
             EpisodeStorageError, validate_episode_storage_commissioning,

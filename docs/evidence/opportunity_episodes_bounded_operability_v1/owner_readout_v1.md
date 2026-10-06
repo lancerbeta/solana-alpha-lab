@@ -26,6 +26,10 @@ Whole-Factory six-copy forecast — отдельный MODEL/advisory по actua
 UNKNOWN topology блокирует activation до ACTIVE. Runtime использует immutable
 EPISODE_PRODUCER_STORAGE_COMMISSIONING_V1: exact root/schedule/activation,
 OPERATE/backup/copy/volume/Factory receipt refs и approved producer-local limits.
+Reserve и nomination связаны одним current decision instant после pacing.
+Граница00:44:59→00:45:01 с3GiB отказывает до HTTP/admission; пустой tail
+сразу COMPLETE. Legacy episode-only option получает typed refusal до ACTIVE
+и canonical append. Точный16-field JSON template/offline hash recipe проверен.
 Reserve покрывает все committed assigned-time/chunk calls/due slots, будущие
 nominations, каждую prospective next-round obligation и fixed/safety headroom.
 Raw/OPS/WAL/publications/research/manifests/lookup входят в per-call bound;
@@ -50,7 +54,7 @@ publisher/lease/filesystem. При0/32/128 valid distinct retired transactions:
 Current paired fresh-process normal work:7 partitions/81,950 bytes при всех
 размерах, inventory0. Дополнительные490 bytes — commissioning metadata binding.
 На864/6048/25920/51840 transactions12 fresh normal/restart/status процессов:
-fixed75m due tail6 partitions/73,318 bytes, wall0.59–0.72s, RSS<90MB, inventory0.
+fixed80m due tail6 partitions/73,318 bytes, wall0.60–0.65s, RSS<90MB, inventory0.
 Cutoff60m имеет дополнительный lifecycle append и измерен отдельно от fixed work.
 Pre-upgrade local fixtures получают synthetic binding через public OPS owner;
 production migration не заявлена. Setup/preparation вне timing; warm cache не proof.
@@ -66,21 +70,19 @@ repeat. Native card/PIT/protection provenance и synthetic numeric oracle сох
 Real scientific MAIN/ADAPTIVE looks0.
 R4: existing backup owner, nonempty detached restore, original/network BLOCKED,
 saved readback без write, numerical replay equality, duplicate import и typed
-corrupt/missing refusals. New archive24,742,743 bytes, SHA
-4c88df7cfbe87993a54d821b11a58c276b2123c15f8c67f21782bc26a03c213e.
+corrupt/missing refusals. New archive24,743,915 bytes, SHA
+4e92bfbda95bd6fee48358b3597af01b80816f90f508a3239d6030c212d3b32c.
 Windows process proof не устанавливает Linux unit/power-loss acceptance.
 
-Validation:67 owner tests PASS (1 Windows symlink skip),15 operability PASS,
-21 lookup PASS, full vertical1 PASS(218.986s), final canary comparison1 PASS.
-Groups overlap, не суммируются. R3 producer предшествует только final identical-
-schema no-cast fix; final owner tests и48-episode late-tail покрывают этот fix.
-Scientific value/schema/coercion policy прежние. Local full gate не запускался;
-он reserved для guarded-merge owner. Новые четыре isolated reviews и binding
-требуются на changed implementation; старые head/CI/reviews patch не принимают.
+Validation:73 targeted tests PASS без skips (lookup/lifecycle/producer/operability);
+4 retained boundary/canary/R2 tests PASS; full three-process vertical1 PASS.
+Groups overlap, не суммируются. R1 paired и aged fresh-process proofs повторены
+после последнего implementation delta. Все12 source hashes совпадают с code.
+Four isolated reviews повторяются на exact final content перед binding.
 
-WATCH без optimization:60-day root21,878 node files/19,391,218 bytes;
-один measured tail tick +34 files/+25,203 bytes. Packet при138 actual due rows
-0.26/1.65/4.35/10.80s на1/7/30/60-day histories; canary6,624 rows —0.50s.
+WATCH без optimization:60-day root21,894 node files/19,413,278 bytes;
+один measured tail tick +16 files/+22,060 bytes. Packet при138 actual due rows
+0.25/1.31/3.65/8.27s на1/7/30/60-day histories; canary6,624 rows —0.50s.
 Это разные histories, не функция только due count. Linux inode allocation/growth
 UNKNOWN; Windows file-count proxy — MODEL. GC/retention/engine redesign/packet
 optimization отсутствуют.

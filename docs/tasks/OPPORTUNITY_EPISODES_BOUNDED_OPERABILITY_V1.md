@@ -161,6 +161,11 @@ exact producer-local storage control from whole-Factory pre-activation planning,
 and P2 episode count naming. No deployment or production preparation is granted
 here. Required prerequisites remain verified backup, measured isolated-copy
 rehearsal and quiesced writers/timer; normal tick/startup/deploy never prepare.
+IN_ATOM_REPLAN: reserve and nomination now bind one decision instant after slot
+processing/account pacing, so crossing the 15-minute boundary cannot select an
+unreserved round. Legacy schedules refuse the episode-only storage option before
+activation mutation. The operator path includes the exact JSON body and offline
+self-hash/identity validation recipe; UNKNOWN placeholders never grant activation.
 Runtime reserve covers every committed assigned-time call group and due slot,
 future nominations, next-round prospective obligations and fixed/safety reserve.
 Whole-Factory UNKNOWN refuses activation; its six-copy MODEL does not control a

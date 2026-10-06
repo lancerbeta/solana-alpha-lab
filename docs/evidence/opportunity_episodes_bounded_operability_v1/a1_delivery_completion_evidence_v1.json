@@ -25,7 +25,7 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_FINAL67_OWNER_1_SKIP_15_OPERABILITY_21_LOOKUP_1_VERTICAL_PLUS1_FINAL_CANARY_COMPARISON_OVERLAPPING_GROUPS",
+    "targeted": "PASS_73_NO_SKIPS_PLUS4_RETAINED_REHEARSALS_PLUS1_THREE_PROCESS_VERTICAL_GROUPS_OVERLAP",
     "independent_review": {
       "path": "docs/evidence/opportunity_episodes_bounded_operability_v1/a1_delivery_independent_review_v1.json",
       "sha256": "e9ba48261b4668eb2af4d6f99a0d2902f59a57b30e4155d46883532cbfe83cb9",
