@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -552,13 +552,15 @@ class ObservationScheduleStore:
         if getattr(self, "readonly", False):
             raise ObservationScheduleStoreError("SOURCE_READONLY")
 
-    def _require_write_lease(self, clock: datetime | None = None) -> None:
+    def _require_write_lease(self, clock: datetime | None = None, *, within_transaction: bool = False) -> None:
         """Fence mutations after another process replaces or expires our lease.
 
         While this process holds the token, every write renews expires_at so a
         long tick cannot lose the fence mid-mutation against the 60s timer.
         """
         self._require_writable()
+        if within_transaction and not self._conn.in_transaction:
+            raise ObservationScheduleStoreError("WRITE_TRANSACTION_REQUIRED")
         now_text = _now(clock)
         if self._lease_token is None:
             active = self._conn.execute(
@@ -597,7 +599,8 @@ class ObservationScheduleStore:
             """,
             (expires, GLOBAL_LEASE_ID, self._lease_token),
         )
-        self._conn.commit()
+        if not within_transaction:
+            self._conn.commit()
 
     def record_event(self, kind: str, payload: Mapping[str, Any], *, clock: datetime | None = None) -> None:
         self._require_write_lease(clock)
@@ -2963,12 +2966,14 @@ class ObservationScheduleStore:
     def commit_episode_admission(
         self,
         *,
-        record: Mapping[str, Any],
-        content_sha256: str,
-        final_deadline_at: str,
-        due_rows: Sequence[Mapping[str, Any]],
-        outbox_rows: Sequence[Mapping[str, Any]],
+        record: Mapping[str, Any] | None = None,
+        content_sha256: str | None = None,
+        final_deadline_at: str | None = None,
+        due_rows: Sequence[Mapping[str, Any]] = (),
+        outbox_rows: Sequence[Mapping[str, Any]] = (),
         clock: datetime | None = None,
+        clock_now: Callable[[], datetime] | None = None,
+        prepare_at_commit: Callable[[datetime], Mapping[str, Any] | None] | None = None,
     ) -> str:
         """One transaction: admission, all future slots and the outbox.
 
@@ -2976,11 +2981,33 @@ class ObservationScheduleStore:
         content under an existing key is a conflict, never an overwrite.
         """
 
-        self._require_write_lease(clock)
-        now = _now(clock)
-        episode_id = str(record["episode_id"])
+        live = prepare_at_commit is not None
+        if live != (clock_now is not None):
+            raise ObservationScheduleStoreError("EPISODE_ADMISSION_INPUT_INVALID")
+        self._require_write_lease(clock_now() if clock_now is not None else clock)
         try:
             self._conn.execute("BEGIN IMMEDIATE")
+            if live:
+                assert clock_now is not None and prepare_at_commit is not None
+                clock = clock_now()  # after blocking dependencies and SQL lock acquisition
+                self._require_write_lease(clock, within_transaction=True)
+                payload = prepare_at_commit(clock)
+                if payload is None:
+                    self._conn.rollback()
+                    return "REFUSED"
+                record = payload["record"]
+                content_sha256 = payload["content_sha256"]
+                final_deadline_at = payload["final_deadline_at"]
+                due_rows = payload["due_rows"]
+                outbox_rows = payload["outbox_rows"]
+                activation = self.get_activation(str(record["schedule_sha256"]), str(record["activation_id"]))
+                if activation is None or activation["state"] != "ACTIVE" or clock >= parse_utc(str(activation["stops_admitting_at"])):
+                    self._conn.rollback()
+                    return "INTAKE_CLOSED"
+            if record is None or content_sha256 is None or final_deadline_at is None:
+                raise ObservationScheduleStoreError("EPISODE_ADMISSION_INPUT_INVALID")
+            now = _now(clock)
+            episode_id = str(record["episode_id"])
             existing = self._conn.execute(
                 "SELECT content_sha256 FROM episode_admissions WHERE episode_id = ?",
                 (episode_id,),
@@ -3038,12 +3065,19 @@ class ObservationScheduleStore:
                 )
             for row in outbox_rows:
                 self._insert_episode_outbox(row, now=now)
+            if live:
+                final_clock = clock_now()
+                self._require_write_lease(final_clock, within_transaction=True)
+                if final_clock >= parse_utc(str(activation["stops_admitting_at"])):
+                    self._conn.rollback()
+                    return "INTAKE_CLOSED"
             self._conn.commit()
             return "COMMITTED"
         except sqlite3.IntegrityError as exc:
             self._conn.rollback()
             raise ObservationScheduleStoreError("EPISODE_ADMISSION_CONFLICT") from exc
         except ObservationScheduleStoreError:
+            self._conn.rollback()
             raise
         except Exception:
             self._conn.rollback()

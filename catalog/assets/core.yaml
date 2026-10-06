@@ -40082,7 +40082,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/opportunity_episode_tick.py', repository_path: src/solana_alpha_lab/factory/opportunity_episode_tick.py}
-  integrity: {kind: sha256, sha256: 2cad43806fa4ce55c86f27c56be89b6e8c85a8acb4e00fa1b22a86f66c67ebda}
+  integrity: {kind: sha256, sha256: 85163ddd4f3e8753bec14f9b1fa0fc1e05b1c996e033e2d54fe507af5bfd6703}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
@@ -40235,7 +40235,7 @@ records:
   as_of: '2026-10-06'
   truth_owner: OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1.md', repository_path: docs/tasks/OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1.md}
-  integrity: {kind: sha256, sha256: 861a453130bd5ed03dae264722a2ad382a4472ba168f6b3a2ea0d5765bc825ee}
+  integrity: {kind: sha256, sha256: 7013f28713a1ee9c4038b88b236b706a14d403f43ca6d090f3412e12ddc2a73a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RESEARCH-STORE-001}
@@ -40309,7 +40309,7 @@ records:
   as_of: '2026-10-06'
   truth_owner: OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/opportunity_episodes_bounded_operability_v1/owner_readout_v1.md', repository_path: docs/evidence/opportunity_episodes_bounded_operability_v1/owner_readout_v1.md}
-  integrity: {kind: sha256, sha256: af48d1b2668140943edae24649e77943a26a90eb04248b689fea7b4caa6b1bbf}
+  integrity: {kind: sha256, sha256: b115cf24144023b2d39b8f48a18e2d71b6cd9cef0261c90714a42ad7cdd0107b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-001}

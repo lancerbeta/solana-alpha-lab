@@ -181,3 +181,10 @@ no new DB, service, timer or runtime cap is introduced. Direct CLI/test consumer
 above are the owner's authorized patch write set. WATCH only: derived node count,
 bytes/inode growth and operational-packet wall versus actual due rows. No lookup
 GC, retention, storage engine redesign, epoch/attrition or provider research.
+
+IN_ATOM_REPLAN: the residual admission T0 seam moves into the existing OPS
+admission transaction after witness filesystem IO and SQL lock acquisition.
+Fresh clock binds T0/cohort/slots and rechecks quota, witness age, lease and
+cutoff; final pre-commit cutoff guard rolls back all rows after SQL delay.
+Lease renewal inside the transaction does not commit independently. No new
+clock service, schema, sampling/cap or scientific contract; no fsync-clock claim.

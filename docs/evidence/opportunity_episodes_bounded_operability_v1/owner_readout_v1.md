@@ -38,6 +38,13 @@ Partial cutoff00:45:10 при tick00:30:20 на frozen headf5f155cb создав
 1 admission с3 unfunded nomination calls (100,663,296 bytes). Round-start ceil
 теперь покрывает последний eligible round; отказ до HTTP/admission. Fresh pacing/
 capture clock также запрещает late T0 и ведёт штатный natural drain.
+Admission temporal owner: frozen3422 public CLI при cutoff13s/witness delay2s
+сохранял T0=12s на clock14s и138 due rows; expired lease и SQL delay также
+не закрывали запись. Witness FS dependency теперь завершается до fresh T0
+в существующем SQL admission transaction после lock. Там повторяются quota,
+witness age, lease и cutoff; admission/all slots/outbox атомарны. Final cutoff
+guard откатывает все rows при SQL delay; lease renewal не коммитит transaction.
+Logical transaction T0 не заявляется как exact fsync completion clock.
 Reserve покрывает все committed assigned-time/chunk calls/due slots, будущие
 nominations, каждую prospective next-round obligation и fixed/safety headroom.
 Raw/OPS/WAL/publications/research/manifests/lookup входят в per-call bound;
@@ -62,7 +69,7 @@ publisher/lease/filesystem. При0/32/128 valid distinct retired transactions:
 Current paired fresh-process normal work:7 partitions/81,950 bytes при всех
 размерах, inventory0. Дополнительные490 bytes — commissioning metadata binding.
 На864/6048/25920/51840 transactions12 fresh normal/restart/status процессов:
-fixed90m due tail6 partitions/73,318 bytes, wall0.61–0.65s, RSS<90MB, inventory0.
+fixed95m due tail6 partitions/73,318 bytes, wall0.60–0.65s, RSS<90MB, inventory0.
 Cutoff60m имеет дополнительный lifecycle append и измерен отдельно от fixed work.
 Pre-upgrade local fixtures получают synthetic binding через public OPS owner;
 production migration не заявлена. Setup/preparation вне timing; warm cache не proof.
@@ -87,17 +94,18 @@ activation. Changed root identity блокирует intake; canonical recovery/
 Новый envelope — новая supported activation/cohort boundary, без intraday fragments.
 R4 не доказывает ACTIVE producer restart на root с изменённой identity.
 
-Validation:76 targeted tests PASS без skips (lookup/lifecycle/producer/operability);
-Current suite включает полный canary/R2 и три temporal cutoff regressions.
-R3/R4 three-process repeat PASS на committed unchanged Git; intermediate
-GIT_MUTATION refusal сохранён, gate не обходился.
+Validation:80 targeted tests PASS без skips (lookup/lifecycle/producer/operability);
+Current suite включает полный canary/R2, temporal cutoff guards и4 admission
+transaction regressions: witness delay/cutoff, fresh T0/slots, expired lease, SQL rollback.
+R3/R4 повторяется на committed unchanged Git после admission transaction repair;
+intermediate GIT_MUTATION refusal сохранён, gate не обходится.
 Groups overlap, не суммируются. R1 paired и aged fresh-process proofs повторены
 после последнего implementation delta. Все12 source hashes совпадают с code.
 Direct semantic consumer:15 tests PASS без skips. Предыдущий Actions shard4
 выявил new alias headroom→OOM и overview16,457>16,384 bytes. Navigation config
 исправлен: VPS OOM→SEM-REMOTE-OPS-RECOVERY, overview16,368 bytes; gold queries/
-лимиты/engine сохранены. Lookup доступен через operator runbook. Runtime hashes
-не изменились; R1–R4 evidence остаётся применимым.
+лимиты/engine сохранены. Lookup доступен через operator runbook. Semantic config/engine не изменились после consumer repair;
+R1/R2 повторены на новом runtime, R3/R4 повторяется перед final binding.
 Four isolated reviews повторяются на exact final content перед binding.
 
 WATCH без optimization:60-day root21,910 node files/19,434,842 bytes;

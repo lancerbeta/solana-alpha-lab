@@ -63,6 +63,7 @@ from solana_alpha_lab.factory.opportunity_episodes import (
     admission_record,
     build_frame,
     collection_lineage_id,
+    cohort_id_for_admission,
     cycle_start,
     episode_point_ids,
     final_availability_deadline,
@@ -953,6 +954,11 @@ class _EpisodeTick:
         admitted: list[str] = []
         witness_stale: list[str] = []
         for winner in selection["winners"]:
+            # Finish the witness dependency before the admission owner samples T0.
+            winner["candidate"] = {
+                **winner["candidate"],
+                "selected_raw_body_rel": _store_witness_extract(self.data_root, winner["candidate"]),
+            }
             t0 = self.provider_ctx.now()
             if t0 >= parse_utc(str(self.activation["stops_admitting_at"])):
                 break
@@ -972,14 +978,11 @@ class _EpisodeTick:
             if not witness_age_ok(record, self.binding):
                 witness_stale.append(str(winner["mint"]))
                 continue
-            # The published E0 dependency is the admitted object only.
-            winner["candidate"] = {
-                **winner["candidate"],
-                "selected_raw_body_rel": _store_witness_extract(self.data_root, winner["candidate"]),
-            }
-            record = {**record, "witness_raw_body_rel": winner["candidate"]["selected_raw_body_rel"]}
-            self._commit_admission(record, winner["candidate"], t0)
-            admitted.append(str(record["episode_id"]))
+            status = self._commit_admission(record, winner["candidate"], round_started_at=started)
+            if status == "COMMITTED":
+                admitted.append(str(record["episode_id"]))
+            elif status == "WITNESS_STALE":
+                witness_stale.append(str(winner["mint"]))
         summary = {
             **receipt,
             "selection": {
@@ -1014,7 +1017,29 @@ class _EpisodeTick:
         }
         self.report["admissions"].extend(admitted)
 
-    def _commit_admission(self, record: Mapping[str, Any], candidate: Mapping[str, Any], t0: datetime) -> None:
+    def _commit_admission(self, record: Mapping[str, Any], candidate: Mapping[str, Any], *, round_started_at: datetime) -> str:
+        refusal = "QUOTA_CLOSED"
+        def prepare(now: datetime) -> Mapping[str, Any] | None:
+            nonlocal refusal
+            fresh = {**record, "t0": render_utc(now), "cohort_id": cohort_id_for_admission(now)}
+            if not witness_age_ok(fresh, self.binding):
+                refusal = "WITNESS_STALE"
+                return None
+            quota = admission_quota(self.store, lineage_id=self.lineage, sampling=self.schedule["sampling"],
+                round_started_at=round_started_at, round_period_seconds=int(self.schedule["nomination"]["round_period_seconds"]),
+                round_id_value=str(record["round_id"]), now=now)
+            blocked = self.store.episode_blocked_mints(lineage_id=self.lineage, cycle_start=str(record["cycle_start"]), now=now)
+            if quota["quota"] <= 0 or str(record["mint"]) in blocked:
+                return None
+            return self._admission_payload(fresh, candidate, now)
+        if self.fault_after == "EPISODE_BEFORE_ADMISSION_COMMIT":
+            raise EpisodeTickError("FAULT_INJECTED:EPISODE_BEFORE_ADMISSION_COMMIT")
+        status = self.store.commit_episode_admission(prepare_at_commit=prepare, clock_now=self.provider_ctx.now)
+        if status == "COMMITTED" and self.fault_after == "EPISODE_AFTER_ADMISSION_COMMIT":
+            raise EpisodeTickError("FAULT_INJECTED:EPISODE_AFTER_ADMISSION_COMMIT")
+        return refusal if status == "REFUSED" else status
+
+    def _admission_payload(self, record: Mapping[str, Any], candidate: Mapping[str, Any], t0: datetime) -> Mapping[str, Any]:
         content = admission_content_sha256(record)
         final_deadline = final_availability_deadline(self.binding, t0)
         due_rows = []
@@ -1086,18 +1111,8 @@ class _EpisodeTick:
                 "row": witness,
             },
         ]
-        if self.fault_after == "EPISODE_BEFORE_ADMISSION_COMMIT":
-            raise EpisodeTickError("FAULT_INJECTED:EPISODE_BEFORE_ADMISSION_COMMIT")
-        self.store.commit_episode_admission(
-            record=record,
-            content_sha256=content,
-            final_deadline_at=render_utc(final_deadline),
-            due_rows=due_rows,
-            outbox_rows=outbox,
-            clock=t0,
-        )
-        if self.fault_after == "EPISODE_AFTER_ADMISSION_COMMIT":
-            raise EpisodeTickError("FAULT_INJECTED:EPISODE_AFTER_ADMISSION_COMMIT")
+        return {"record":record,"content_sha256":content,"final_deadline_at":render_utc(final_deadline),
+                "due_rows":due_rows,"outbox_rows":outbox}
 
     # ------------------------------------------------------------------
     def publish_outbox(self) -> None:

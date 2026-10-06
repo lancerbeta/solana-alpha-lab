@@ -324,6 +324,62 @@ class EpisodeOperabilityTests(unittest.TestCase):
         self.assertEqual(result["round"]["quota"], 0)
         self.assertEqual(result["activation_state"], "COMPLETE")
 
+    def delayed_admission(self, *, delay, cutoff, in_transaction=False):
+        from solana_alpha_lab.factory.observation_provider_pacing import AdvancingClock
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        from solana_alpha_lab.factory import opportunity_episode_tick as owner
+        sc = self.scenario(daily_ceiling=100, stops=START+timedelta(seconds=cutoff))
+        row = token_object(synth_mint(self._testMethodName),price=1,liquidity=10000,holders=60)
+        nominate(sc.market, START, {"toporganicscore":[row],"toptraded":[],"toptrending":[]})
+        at=START+timedelta(seconds=3); clock=AdvancingClock(at)
+        original = ObservationScheduleStore._insert_episode_outbox if in_transaction else owner._store_witness_extract
+        delayed=False
+        def slow(*args, **kwargs):
+            nonlocal delayed
+            value=original(*args, **kwargs)
+            if not delayed:
+                delayed=True; clock.sleep(delay)
+            return value
+        target="solana_alpha_lab.factory.observation_schedule_store.ObservationScheduleStore._insert_episode_outbox" if in_transaction else "solana_alpha_lab.factory.opportunity_episode_tick._store_witness_extract"
+        with patch("tests.test_opportunity_episodes_harness_v1.AdvancingClock",return_value=clock), patch(target,side_effect=slow,autospec=True):
+            result=sc.tick(at)
+        proof={"clock":clock.now().isoformat(),"delay_seconds":delay,"inside_transaction":in_transaction,
+               "admissions":sc.admissions(),"due_rows":sc.query("SELECT COUNT(*) FROM due_observations")[0][0],
+               "outbox_rows":sc.query("SELECT COUNT(*) FROM episode_outbox")[0][0],"result":result}
+        (sc.data_root.parent/"report.json").write_bytes((json.dumps(proof,indent=2)+"\n").encode())
+        self.assertTrue(delayed)
+        return sc,clock,result
+
+    def test_witness_io_crosses_cutoff_without_admission_rows(self):
+        sc,clock,result=self.delayed_admission(delay=2,cutoff=13)
+        self.assertGreaterEqual(clock.now(),START+timedelta(seconds=13))
+        self.assertEqual(sc.admissions(),[])
+        self.assertEqual(sc.query("SELECT COUNT(*) FROM due_observations")[0][0],0)
+        self.assertEqual(sc.query("SELECT COUNT(*) FROM episode_outbox")[0][0],0)
+        self.assertEqual(result["activation_state"],"COMPLETE")
+
+    def test_witness_io_selects_fresh_transaction_t0_and_slots(self):
+        sc,clock,result=self.delayed_admission(delay=2,cutoff=7200)
+        self.assertEqual(len(sc.admissions()),1)
+        record=sc.admissions()[0]
+        from solana_alpha_lab.factory.observation_schedule import render_utc
+        self.assertEqual(record["t0"],render_utc(clock.now()))
+        rows=sc.query("SELECT payload_json FROM due_observations")
+        self.assertTrue(all(json.loads(row[0])["t0"]==record["t0"] for row in rows))
+
+    def test_witness_io_expired_lease_never_commits(self):
+        sc,clock,result=self.delayed_admission(delay=301,cutoff=7200)
+        self.assertEqual(sc.admissions(),[])
+        self.assertEqual(sc.query("SELECT COUNT(*) FROM due_observations")[0][0],0)
+        self.assertEqual(sc.query("SELECT COUNT(*) FROM episode_outbox")[0][0],0)
+
+    def test_sql_delay_crosses_cutoff_rolls_back_all_admission_rows(self):
+        sc,clock,result=self.delayed_admission(delay=2,cutoff=13,in_transaction=True)
+        self.assertEqual(sc.admissions(),[])
+        self.assertEqual(sc.query("SELECT COUNT(*) FROM due_observations")[0][0],0)
+        self.assertEqual(sc.query("SELECT COUNT(*) FROM episode_outbox")[0][0],0)
+        self.assertEqual(result["activation_state"],"COMPLETE")
+
     def test_legacy_episode_storage_option_refuses_before_any_activation_write(self):
         from tests.test_observation_schedule_lifecycle import ROOT, NOW, GIT, _phrase
         from solana_alpha_lab.factory.observation_schedule import load_observation_schedule

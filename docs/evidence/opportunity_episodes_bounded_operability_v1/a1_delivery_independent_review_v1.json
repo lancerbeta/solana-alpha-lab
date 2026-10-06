@@ -17,28 +17,28 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "NOT_READY",
       "findings": [
-        "FINAL_TEMPORAL_OWNER_REPAIR_REQUIRES_NEW_EXACT_CONTENT_REVIEW"
+        "FINAL_ADMISSION_OWNER_REPAIR_REQUIRES_NEW_EXACT_CONTENT_REVIEW"
       ]
     },
     {
       "role": "CODE_REVIEWER",
       "verdict": "NOT_READY",
       "findings": [
-        "FINAL_TEMPORAL_OWNER_REPAIR_REQUIRES_NEW_EXACT_CONTENT_REVIEW"
+        "FINAL_ADMISSION_OWNER_REPAIR_REQUIRES_NEW_EXACT_CONTENT_REVIEW"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "NOT_READY",
       "findings": [
-        "FINAL_TEMPORAL_OWNER_REPAIR_REQUIRES_NEW_EXACT_CONTENT_REVIEW"
+        "FINAL_ADMISSION_OWNER_REPAIR_REQUIRES_NEW_EXACT_CONTENT_REVIEW"
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "NOT_READY",
       "findings": [
-        "FINAL_TEMPORAL_OWNER_REPAIR_REQUIRES_NEW_EXACT_CONTENT_REVIEW"
+        "FINAL_ADMISSION_OWNER_REPAIR_REQUIRES_NEW_EXACT_CONTENT_REVIEW"
       ]
     }
   ],
