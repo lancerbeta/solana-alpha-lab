@@ -676,3 +676,12 @@ returning to new writer code. Whole-Factory storage UNKNOWN blocks activation;
 runtime reserve uses the exact commissioned producer-local envelope. Windows process proof is not Linux unit
 or power-loss acceptance. Notification freshness is not proof of off-host
 delivery; an absent receiver remains NOT_CONFIGURED.
+
+Episode tick `TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE` with NEXT
+`RECONCILE_ACTIVE_TRANSITION_PROOF` has the diagnostic/recovery route in
+`OPPORTUNITY_EPISODES_OPERATOR_V1.md`. Preserve activation IDs, ledger, journal
+and canonical bytes; diagnose on a verified isolated copy. The generic terminal
+does not authorize reprepare: confirmed lookup reconciliation uses the existing
+separate OPERATE commissioning prerequisites/fences; missing evidence or an
+unresolved cause requires a repair gate. Do not bypass the proof gate or copy a
+prepared lookup to production.

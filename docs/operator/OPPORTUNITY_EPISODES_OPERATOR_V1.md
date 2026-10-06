@@ -257,6 +257,18 @@ state не меняется по unbound MODEL; нужен exact commissioning b
 При `WRITE_LOOKUP_*` сначала сохранить canonical evidence и проверить
 копию; автоматический expensive rebuild и повтор неизвестной отправки запрещены.
 
+При `TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE` / NEXT
+`RECONCILE_ACTIVE_TRANSITION_PROOF` сначала сохранить исходные activation IDs,
+ledger, lookup journal/root и canonical evidence; прекратить ручные retry и обход
+proof gate. Этот общий terminal не устанавливает причину и сам по себе не разрешает
+reprepare. На verified isolated copy различить missing lifecycle evidence и
+pending/corrupt/changed-binding lookup. Только подтверждённый lookup pending
+reconciliation вести через существующий `--production-commissioning`: отдельный
+OPERATE, verified backup, measured copy rehearsal, quiesced writers/timer и оба
+fences. Copy lookup на canonical root не переносить; immutable activation storage
+envelope не перепривязывать. Missing evidence или unresolved reason остаётся
+BLOCKED до отдельного repair gate; восстановленный proof без evidence не объявлять.
+
 После mature closure повтор обычного capture с новым as-of сохраняет frozen
 identity. При fragmented cohort — явный отказ до partial export; V1 canary
 без intraday profile switches. Public import точного release не расходует новый

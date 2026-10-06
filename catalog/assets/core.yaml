@@ -36445,7 +36445,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_UNATTENDED_OPERABILITY.md', repository_path: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md}
-  integrity: {kind: sha256, sha256: 4259fce859a74f2cd3454c4d5abec5d43055d2bc0dcbeba859ef3a489ae8d81e}
+  integrity: {kind: sha256, sha256: 62f6bbbf11009a0f14afdd9ad82ff50b1e4850c4a85da11652756c879fa1689b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
@@ -40044,7 +40044,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md', repository_path: docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 44e6d475722ae7d6f8f989573f19d95c4c5c4c71b00f16f123ec94f923a7522f}
+  integrity: {kind: sha256, sha256: ba8d48b8d194e170502ec291d909b8ce717f4733900ab38ddb3594017548f6bc}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}

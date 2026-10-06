@@ -3591,7 +3591,8 @@
       "runtime_proof_applicability": "Semantic config/search engine/gold unchanged; final runtime evidence is current admission-owner R1/targeted83/R3/R4, not the historical targeted76",
       "current_repeat": "PASS_15_NO_SKIPS_AFTER_PENDING_OWNER_RUNTIME_AND_CANONICAL_SYNC",
       "intermediate_refusal": "PRE_SYNC_CATALOG_READOUT_HASH_REFUSAL; canonical sync then15PASS, no gate bypass"
-    }
+    },
+    "postproof_doc_only_delta": "Actual ACTIVE_TRANSITION_PROOF refusal/NEXT routes diagnostics on verified copy; generic terminal never grants reprepare; confirmed lookup reconciliation uses existing OPERATE/fences. Runtime12hashes/tests/semanticconfig/gold unchanged; R1-R4/83+15 proofs remain applicable."
   },
   "FACT": [
     "real public entry and real canonical filesystem/lease/publication owners",
