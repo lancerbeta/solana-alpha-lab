@@ -10,7 +10,27 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "d7a54b1c25f20028eac3a069532a6a10721c6305d644fc4ea53f0c7d57f30867",
+    "catalog/assets/lifecycle.yaml": "f7c77f7a2ad76552ac6182289992365df97ebd99d7e5cde5144ec00bb93b4dd1",
+    "catalog/catalog_manifest.yaml": "3562f3fbf6b984cfbe7dc3184a1c5f17b8236c08344fba3392677fe53a1e863e",
+    "catalog/fixtures/discovery_gold_queries_v1.yaml": "4db7c872ac61a30a8cb3d8449d2572b8f441d8d86a6dc1d2586366070d26b4b1",
+    "catalog/generated/asset_edges.json": "6b04728a99f10474339c2714fc8335cf82a19cb4a9381e274f769f6e6c890d3b",
+    "catalog/schemas/provider_route_capability_registry_v11.schema.json": "70b5b1496d598ac6f36ebc01ada5cdeff502181d857d9047f8ff15361978fb05",
+    "configs/provider_route_capability_registry_v11.yaml": "527baaad75de6c35d04b4f97ad528cacdac03981e2ec05a9da96b9becf039b34",
+    "docs/FACTORY_SEMANTIC_MAP.md": "2fbf4e7edce8c53b83ccec0f837ff49eef706d72448b9fe89ea8e4ab11ae35a6",
+    "docs/OPERATOR_NAVIGATION.md": "9584107e7e5392390973da28f55670aa5e07aa02cd4069266f6d27d184194098",
+    "docs/PROJECT_MAP.md": "900bceb370c0b94c11293e781f77597dbdfac40c1d1162576c057f15d6c3d79e",
+    "docs/contracts/opportunity_episodes_jupiter_v1.md": "d6a01595ad28bcae33f71489cc703b2b26eeee7b98a94e021911b7d8e9cf5780",
+    "docs/design/SMIAL_JUPITER_OPERATING_BLUEPRINT_RUNBOOK_V1.md": "c7d7235d3eaadbf2b72db0b90e75a4e2aaae1aa4d8bfc682ceca09688587bf31",
+    "docs/evidence/opportunity_episodes_jupiter_commissioning_v1/jupiter_qualification_receipt_v1.json": "880b2ce75e383444733753e36f1015ad7395d6fabaeefe7f710a07430d13c381",
+    "docs/evidence/opportunity_episodes_jupiter_commissioning_v1/route_qualification_limits_v1.json": "475e03b4d6955cff69f6c280bcc5b4ef5fc8acafabf2ede46832320e4ea34839",
+    "docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md": "9bfe3adb22a33d511207a88538488baf550b9d820ebd2a02e42bb949eaba2d95",
+    "docs/tasks/OPPORTUNITY_EPISODES_JUPITER_SWITCH_AND_BIND_V1.md": "2c9409c978946c33c5044175e8f18178aaf1fcb01c4201de4f2ca4164e5c41be",
+    "src/solana_alpha_lab/provider_route_capability_registry_v11.py": "036bcc84aa4b8dee20b849cd3d6b89d813da215335d624a776f33f6df37baea3",
+    "tests/test_catalog_canonical_binding_discovery.py": "44564c856791ff0454ead0607a978d76e009c1e5436cbc7e51a6c1fc378ff6cc",
+    "tests/test_provider_route_capability_registry_v11.py": "15a23dc950db5fb71c09f1d29bc5360b759f0ca47ae87bc0df793722130dbe14"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +41,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/opportunity_episodes_jupiter_switch_and_bind_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "78260fe46c51f08e0c46dae21cf54428327d4ed0466c8523dcb825601fea7773",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_103_REGISTRY_V10_V11_CATALOG_BINDING_SEARCH_NAVIGATION_CI_PARTITION_TESTS",
     "independent_review": {
       "path": "docs/evidence/opportunity_episodes_jupiter_switch_and_bind_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "939bd6fea312ccd7229a3082df10486835d7013519596deaa2fb6119dcb95ccf",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
