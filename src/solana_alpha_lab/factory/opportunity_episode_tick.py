@@ -10,6 +10,7 @@ publisher. Order inside one tick: publication recovery, admitted slots
 from __future__ import annotations
 
 import json
+import math
 import shutil
 from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime, timedelta
@@ -935,7 +936,7 @@ class _EpisodeTick:
             round_id_value=rid,
             now=commit_now,
         )
-        quota = quota_state["quota"]
+        quota = quota_state["quota"] if commit_now < parse_utc(str(self.activation["stops_admitting_at"])) else 0
         day_used = quota_state["day_used"]
         rolling_used = quota_state["rolling_used"]
         active = quota_state["active"]
@@ -953,6 +954,8 @@ class _EpisodeTick:
         witness_stale: list[str] = []
         for winner in selection["winners"]:
             t0 = self.provider_ctx.now()
+            if t0 >= parse_utc(str(self.activation["stops_admitting_at"])):
+                break
             record = admission_record(
                 document=self.schedule,
                 activation_id=self.activation_id,
@@ -1162,6 +1165,8 @@ class _EpisodeTick:
         self.publish_outbox()
         self._prime_account_pace()
         self.process_slots()
+        decision_now = self.provider_ctx.now()
+        admission_open = admission_open and decision_now < parse_utc(str(self.activation["stops_admitting_at"]))
         if admission_open and self.report["stop_reason"] is None:
             from solana_alpha_lab.factory.hot90_storage_admission import (
                 episode_drain_reserve, validate_episode_storage_commissioning,
@@ -1184,13 +1189,13 @@ class _EpisodeTick:
                 batch_size=int(self.schedule["observation_schedule"]["max_batch_size"]))
             # Slot processing and account pacing may cross a round boundary.
             # Capture once here; nomination must not select a different round.
-            decision_now = self.provider_ctx.now()
             quota = round_quota(int(self.schedule["sampling"]["daily_normal_ceiling"]), round_index(decision_now))
             # T0 is known only after capture; do not presume prospective batching.
             prospective = quota * (len(episode_point_ids()) - 1)
             period = int(self.schedule["nomination"]["round_period_seconds"])
-            seconds = max(0, (parse_utc(str(self.activation["stops_admitting_at"])) - decision_now).total_seconds())
-            future_nomination_calls = int((seconds + period - 1) // period) * len(self.schedule["nomination"]["sources"])
+            # Include every still-eligible round, including a partial last round.
+            seconds = max(0, (parse_utc(str(self.activation["stops_admitting_at"])) - round_start(decision_now, period)).total_seconds())
+            future_nomination_calls = math.ceil(seconds / period) * len(self.schedule["nomination"]["sources"])
             try:
                 free = shutil.disk_usage(self.data_root).free
             except OSError:
@@ -1272,6 +1277,9 @@ def tick_episode_schedule(
             redact_with=redact_with,
         )
         report = tick.run(admission_open=admission_open)
+        drain_expired_admission(data_root=Path(data_root), store=store,
+            schedule_sha256=str(schedule["schedule_sha256"]), activation_id=activation_id,
+            now=tick.provider_ctx.now(), producer_git_sha=producer_git_sha)
         state = str(store.get_activation(str(schedule["schedule_sha256"]), activation_id)["state"])
         report["activation_state"] = state
         if state == "DRAINING":

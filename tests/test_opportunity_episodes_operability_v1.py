@@ -271,6 +271,59 @@ class EpisodeOperabilityTests(unittest.TestCase):
             "activation_state": result["activation_state"], "admissions": 0,
             "synthetic_provider_attempts": 0}, indent=2) + "\n").encode())
 
+    def test_partial_cutoff_reserves_the_last_eligible_nomination_round(self):
+        sc = self.scenario(daily_ceiling=100, active_cap=48,
+                           stops=START + timedelta(minutes=45, seconds=10))
+        row = token_object(synth_mint("PartialCutoffReserve"), price=1, liquidity=10000, holders=60)
+        nominate(sc.market, START + timedelta(minutes=30),
+            {"toporganicscore": [row], "toptraded": [], "toptrending": []})
+        # Old now-relative count funded only three calls; both 00:30 and 00:45
+        # are eligible before 00:45:10, even when this tick starts at 00:30:20.
+        prospective = 138 * (32 * 1024**2 + 128 * 1024)
+        free = 2 * 1024**3 + prospective + 3 * 32 * 1024**2 + 1
+        disk = namedtuple("disk", "total used free")(100 * 1024**3, 100 * 1024**3 - free, free)
+        with patch("solana_alpha_lab.factory.opportunity_episode_tick.shutil.disk_usage", return_value=disk):
+            result = sc.tick(START + timedelta(minutes=30, seconds=20))
+        reserve = result["drain_headroom"]
+        self.assertEqual(reserve["future_nomination_reserve_bytes"], 6 * 32 * 1024**2)
+        self.assertGreater(reserve["required_free_bytes"], free)
+        self.assertEqual(result["stop_reason"], "DRAIN_RESERVE_PRESSURE")
+        self.assertEqual(result["_calls"], [])
+        self.assertEqual(sc.admissions(), [])
+        (sc.data_root.parent / "report.json").write_bytes((json.dumps({"status":"PASS",
+            "stops_admitting_at":"2026-10-05T00:45:10Z", "tick_at":"2026-10-05T00:30:20Z",
+            "drain_headroom":reserve,"admissions":0,"synthetic_provider_attempts":0},indent=2)+"\n").encode())
+
+    def test_pacing_crosses_intake_cutoff_without_new_nomination(self):
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        sc = self.scenario(daily_ceiling=100, stops=START + timedelta(minutes=45))
+        at = START + timedelta(minutes=44, seconds=59)
+        with closing(ObservationScheduleStore(sc.ops_path)) as store:
+            lease = store.acquire_lease("known-legacy-cutoff-fixture", clock=at)
+            store.save_accounting(schedule_sha256="ee" * 32, activation_id="ACT-KNOWN-LEGACY-TAIL",
+                utc_day="2026-10-05", values={"provider_calls":1,"modeled_credits":1,
+                "candidates":0,"members":0,"raw_bytes":1,"canonical_bytes":1,
+                "last_provider_call_at":"2026-10-05T00:44:58Z"}, clock=at)
+            store.release_lease(lease)
+        row = token_object(synth_mint("PacingCutoff"),price=1,liquidity=10000,holders=60)
+        nominate(sc.market, START+timedelta(minutes=45),
+            {"toporganicscore":[row],"toptraded":[],"toptrending":[]})
+        result = sc.tick(at)
+        self.assertEqual(result["_calls"], [])
+        self.assertEqual(sc.admissions(), [])
+        self.assertEqual(result["activation_state"], "COMPLETE")
+
+    def test_nomination_capture_crosses_cutoff_without_late_admission(self):
+        sc = self.scenario(daily_ceiling=100, stops=START+timedelta(seconds=10))
+        row = token_object(synth_mint("CaptureCutoff"),price=1,liquidity=10000,holders=60)
+        nominate(sc.market, START, {"toporganicscore":[row],"toptraded":[],"toptrending":[]})
+        sc.market.latency = lambda kind, now: 3
+        result = sc.tick(START+timedelta(seconds=5))
+        self.assertEqual(len(result["_calls"]), 3)  # the started round was funded
+        self.assertEqual(sc.admissions(), [])
+        self.assertEqual(result["round"]["quota"], 0)
+        self.assertEqual(result["activation_state"], "COMPLETE")
+
     def test_legacy_episode_storage_option_refuses_before_any_activation_write(self):
         from tests.test_observation_schedule_lifecycle import ROOT, NOW, GIT, _phrase
         from solana_alpha_lab.factory.observation_schedule import load_observation_schedule

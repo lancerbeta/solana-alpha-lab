@@ -166,6 +166,12 @@ processing/account pacing, so crossing the 15-minute boundary cannot select an
 unreserved round. Legacy schedules refuse the episode-only storage option before
 activation mutation. The operator path includes the exact JSON body and offline
 self-hash/identity validation recipe; UNKNOWN placeholders never grant activation.
+The same owner counts future nomination rounds from that captured round start
+through the intake cutoff, using ceil for a partial last round. A public-CLI
+frozen-head falsifier at 00:30:20/cutoff00:45:10 exposed three unfunded calls;
+the regression must refuse before HTTP/admission. No separate atom or cap change.
+Pacing and funded capture must also respect the same intake cutoff: no new round
+after it, no late admission/T0, and ordinary natural drain on the final clock.
 Runtime reserve covers every committed assigned-time call group and due slot,
 future nominations, next-round prospective obligations and fixed/safety reserve.
 Whole-Factory UNKNOWN refuses activation; its six-copy MODEL does not control a

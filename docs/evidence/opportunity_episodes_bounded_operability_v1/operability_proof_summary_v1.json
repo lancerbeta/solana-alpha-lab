@@ -173,6 +173,42 @@
     {
       "logical_ref": "local/episodes_operability/postreview_rehearsals.log",
       "sha256": "bcd59a980fadcb93c9a11efe758df6f3a86da6f635ed04cd4b058c5f83aa5239"
+    },
+    {
+      "logical_ref": "local/episodes_operability/temporal_bound_cold_report.json",
+      "sha256": "399d7549ae749a89980d1e034ef000e4714aa77e6015d0a8df76bf825b6d56a7"
+    },
+    {
+      "logical_ref": "local/episodes_operability/temporal_bound_paired/report.json",
+      "sha256": "f4b8510b7d8964bd42ecbc177e331297d17f33f7751ef41fc5d94b9773fabc3e"
+    },
+    {
+      "logical_ref": "local/episodes_operability/temporal_bound_targeted.log",
+      "sha256": "df8fee636658500bb65fb3ed2bb311fdb62a1faa966889cd09149cb42d099cbd"
+    },
+    {
+      "logical_ref": "local/episodes_operability/partial_cutoff_frozen/report.json",
+      "sha256": "3b3809d4b5ed761c130cf50fd41b204295864a0eac98b1fc3dd8d0e717421b90"
+    },
+    {
+      "logical_ref": "local/episodes_operability/temporal_bound_final/test_partial_cutoff_reserves_the_last_eligible_nomination_round/report.json",
+      "sha256": "05823d7c06df0ae1d3b6433b249996bbe6aa121697fd7381f57eeabdc67f24e6"
+    },
+    {
+      "logical_ref": "local/episodes_operability/temporal_bound_final/test_canary_24_per_day_48h_local_envelope_survives_model_proxy_and_unsafe_drains/report.json",
+      "sha256": "1ffbd6595bbe2c2f284766688a328fb0a3a7d37cfc7a9fd511c96738a74dc253"
+    },
+    {
+      "logical_ref": "local/episodes_operability/temporal_bound_final/test_mixed_boundary_degradation_budget_restart_and_drain/report.json",
+      "sha256": "3670445f9925295c1bfb6645a4f6f88b65813b403985c69431f4cfa3e59d3c4f"
+    },
+    {
+      "logical_ref": "local/episodes_operability/temporal_bound_final/test_pacing_round_boundary_reserves_the_actual_nomination_round/report.json",
+      "sha256": "2a49d33c98df4a93002ab4eec56b716d903e75f27ec9678f666859062865ae96"
+    },
+    {
+      "logical_ref": "local/episodes_operability/final_temporal_vertical.log",
+      "sha256": "54b3d258a9777fcb9671a05508927ce992e3967295078cbe5ee6c6dce1215d51"
     }
   ],
   "code_sha256": {
@@ -181,7 +217,7 @@
     "observation_panel_publisher": "f7c529bae484b6a5224e9b926e9850002246c230330230c599c7132991d53ce6",
     "observation_schedule_lifecycle": "9ab9131988df91af89167d8eb1350b788f1969c8cf8a4863c02df4971a91d054",
     "observation_schedule_store": "9cda2d7d8c1cef1865691e4f7e538328aeba483fe39f497bebd015a153d5e873",
-    "opportunity_episode_tick": "9270d23c548b138d54ee00f789f9c8942dfc9cbfd28a57e5a75835a3d77cb73c",
+    "opportunity_episode_tick": "2cad43806fa4ce55c86f27c56be89b6e8c85a8acb4e00fa1b22a86f66c67ebda",
     "opportunity_episode_release": "fd6d703d8f49a60d9cb94280ae9b37458ae8719adf3ff062a83de6635a740f82",
     "observation_scheduler": "7ce439b8e990cc18ebd1c7473eab08a9b797e8b34b7248c07909f22ff49aa084",
     "observation_provider_pacing": "4b20e8102b101503d487e900a1dce161990c1706bda5772e164c996c9d45ccd3",
@@ -1682,70 +1718,70 @@
     ],
     "owner_patch_paired": [
       {
-        "append_seconds": 0.1441954000001715,
+        "append_seconds": 0.14926570000170614,
         "appends": 3,
-        "duplicate_lookup_seconds": 0.012722600000415696,
+        "duplicate_lookup_seconds": 0.013076899998850422,
         "inventory_seconds": 0.0,
-        "lock_seconds": 0.126256800002011,
+        "lock_seconds": 0.13113140000132262,
         "manifest_headers": 5,
         "mode": "admit",
         "partition_bytes": 81950,
         "partition_opens": 7,
         "path_bytes": 443629,
         "path_reads": 80,
-        "peak_rss_bytes": 90562560,
+        "peak_rss_bytes": 91181056,
         "publications": 1,
         "records_decoded": 7,
         "synthetic_provider_attempts": 3,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.5880834000017785,
-        "setup_seconds": 0.010772300000098767,
-        "setup_peak_rss_bytes": 82845696,
+        "wall_seconds": 0.5989292000012938,
+        "setup_seconds": 0.011102500000561122,
+        "setup_peak_rss_bytes": 82669568,
         "history_transactions": 0,
         "payload_size": 4096,
         "validated": true,
         "preparation": {
           "status": "PREPARED",
           "record_count": 3,
-          "records_root_sha256": "5f1e8c4cc2447fe6b969f0c44a43995ecfbf20d0bafad7aae9962d6378b0db2a",
-          "transactions_root_sha256": "bb8c07a1c4754cdfd451557d813e1ae2a6261dcfc2b7d974661804884f875daa"
+          "records_root_sha256": "9924579e9b0d0a67cf4192a4f89c2c544c38a8c07a0aa3d04ac23407773df36e",
+          "transactions_root_sha256": "05a407fec7486a7e0165a0f65da555b00a90929062d7f36b944d1683460e05fd"
         },
-        "preparation_seconds": 0.035550600001442945,
-        "preparation_peak_rss_bytes": 82882560,
-        "process_seconds": 1.164196699999593
+        "preparation_seconds": 0.034108700001524994,
+        "preparation_peak_rss_bytes": 82722816,
+        "process_seconds": 1.1231770000013057
       },
       {
-        "append_seconds": 0.14314850000300794,
+        "append_seconds": 0.19316719999915222,
         "appends": 3,
-        "duplicate_lookup_seconds": 0.012231400000018766,
+        "duplicate_lookup_seconds": 0.012663900000916328,
         "inventory_seconds": 0.0,
-        "lock_seconds": 0.1254598999985319,
+        "lock_seconds": 0.17574260000037611,
         "manifest_headers": 5,
         "mode": "normal",
         "partition_bytes": 81950,
         "partition_opens": 7,
         "path_bytes": 450517,
         "path_reads": 79,
-        "peak_rss_bytes": 90714112,
+        "peak_rss_bytes": 90554368,
         "publications": 1,
         "records_decoded": 7,
         "synthetic_provider_attempts": 1,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.5252041000021563,
-        "setup_seconds": 0.010772300000098767,
-        "setup_peak_rss_bytes": 82845696,
+        "wall_seconds": 0.5739625999995042,
+        "setup_seconds": 0.011102500000561122,
+        "setup_peak_rss_bytes": 82669568,
         "history_transactions": 0,
         "payload_size": 4096,
         "validated": true,
         "preparation": {
           "status": "PREPARED",
           "record_count": 3,
-          "records_root_sha256": "5f1e8c4cc2447fe6b969f0c44a43995ecfbf20d0bafad7aae9962d6378b0db2a",
-          "transactions_root_sha256": "bb8c07a1c4754cdfd451557d813e1ae2a6261dcfc2b7d974661804884f875daa"
+          "records_root_sha256": "9924579e9b0d0a67cf4192a4f89c2c544c38a8c07a0aa3d04ac23407773df36e",
+          "transactions_root_sha256": "05a407fec7486a7e0165a0f65da555b00a90929062d7f36b944d1683460e05fd"
         },
-        "preparation_seconds": 0.035550600001442945,
-        "preparation_peak_rss_bytes": 82882560,
-        "process_seconds": 1.077129999997851
+        "preparation_seconds": 0.034108700001524994,
+        "preparation_peak_rss_bytes": 82722816,
+        "process_seconds": 1.1271064000029583
       },
       {
         "append_seconds": 0.0,
@@ -1759,26 +1795,26 @@
         "partition_opens": 1,
         "path_bytes": 265382,
         "path_reads": 24,
-        "peak_rss_bytes": 86380544,
+        "peak_rss_bytes": 86814720,
         "publications": 0,
         "records_decoded": 1,
         "synthetic_provider_attempts": 0,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.22214100000201142,
-        "setup_seconds": 0.010772300000098767,
-        "setup_peak_rss_bytes": 82845696,
+        "wall_seconds": 0.21918580000055954,
+        "setup_seconds": 0.011102500000561122,
+        "setup_peak_rss_bytes": 82669568,
         "history_transactions": 0,
         "payload_size": 4096,
         "validated": true,
         "preparation": {
           "status": "PREPARED",
           "record_count": 3,
-          "records_root_sha256": "5f1e8c4cc2447fe6b969f0c44a43995ecfbf20d0bafad7aae9962d6378b0db2a",
-          "transactions_root_sha256": "bb8c07a1c4754cdfd451557d813e1ae2a6261dcfc2b7d974661804884f875daa"
+          "records_root_sha256": "9924579e9b0d0a67cf4192a4f89c2c544c38a8c07a0aa3d04ac23407773df36e",
+          "transactions_root_sha256": "05a407fec7486a7e0165a0f65da555b00a90929062d7f36b944d1683460e05fd"
         },
-        "preparation_seconds": 0.035550600001442945,
-        "preparation_peak_rss_bytes": 82882560,
-        "process_seconds": 0.7786630000009609
+        "preparation_seconds": 0.034108700001524994,
+        "preparation_peak_rss_bytes": 82722816,
+        "process_seconds": 0.7281393000012031
       },
       {
         "append_seconds": 0.0,
@@ -1792,92 +1828,92 @@
         "partition_opens": 0,
         "path_bytes": 0,
         "path_reads": 0,
-        "peak_rss_bytes": 74747904,
+        "peak_rss_bytes": 74743808,
         "publications": 0,
         "records_decoded": 0,
         "synthetic_provider_attempts": 0,
         "terminal": "STATUS",
-        "wall_seconds": 0.05328449999797158,
-        "setup_seconds": 0.010772300000098767,
-        "setup_peak_rss_bytes": 82845696,
+        "wall_seconds": 0.0526839000012842,
+        "setup_seconds": 0.011102500000561122,
+        "setup_peak_rss_bytes": 82669568,
         "history_transactions": 0,
         "payload_size": 4096,
         "validated": true,
         "preparation": {
           "status": "PREPARED",
           "record_count": 3,
-          "records_root_sha256": "5f1e8c4cc2447fe6b969f0c44a43995ecfbf20d0bafad7aae9962d6378b0db2a",
-          "transactions_root_sha256": "bb8c07a1c4754cdfd451557d813e1ae2a6261dcfc2b7d974661804884f875daa"
+          "records_root_sha256": "9924579e9b0d0a67cf4192a4f89c2c544c38a8c07a0aa3d04ac23407773df36e",
+          "transactions_root_sha256": "05a407fec7486a7e0165a0f65da555b00a90929062d7f36b944d1683460e05fd"
         },
-        "preparation_seconds": 0.035550600001442945,
-        "preparation_peak_rss_bytes": 82882560,
-        "process_seconds": 0.5828942000007373
+        "preparation_seconds": 0.034108700001524994,
+        "preparation_peak_rss_bytes": 82722816,
+        "process_seconds": 0.5707435999975132
       },
       {
-        "append_seconds": 0.184180500000366,
+        "append_seconds": 0.2034456000001228,
         "appends": 3,
-        "duplicate_lookup_seconds": 0.027233199998590862,
+        "duplicate_lookup_seconds": 0.028244499997526873,
         "inventory_seconds": 0.0,
-        "lock_seconds": 0.16668199999912758,
+        "lock_seconds": 0.18509960000301362,
         "manifest_headers": 5,
         "mode": "admit",
         "partition_bytes": 81950,
         "partition_opens": 7,
         "path_bytes": 452715,
         "path_reads": 90,
-        "peak_rss_bytes": 91095040,
+        "peak_rss_bytes": 90841088,
         "publications": 1,
         "records_decoded": 7,
         "synthetic_provider_attempts": 3,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.6347724000006565,
-        "setup_seconds": 0.685470999997051,
-        "setup_peak_rss_bytes": 83656704,
+        "wall_seconds": 0.6387744999992719,
+        "setup_seconds": 0.6416587000021536,
+        "setup_peak_rss_bytes": 83447808,
         "history_transactions": 32,
         "payload_size": 4096,
         "validated": true,
         "preparation": {
           "status": "PREPARED",
           "record_count": 35,
-          "records_root_sha256": "e3063a41dcfea423515c6bd4b56996f2e1e45e1a6fbd41be8e913452e838bdd0",
-          "transactions_root_sha256": "1f62a0709acfec0c293542e7ea846a91f54f40e292c83736fe2c184566d98cb1"
+          "records_root_sha256": "309b829366fe854d7457bbfbc1021daaca2ebf1b0a86783a510f5fbd68a94313",
+          "transactions_root_sha256": "3c987555f061850f271f0991d9860b58f6224e4c85410d6ee1db2488f6528662"
         },
-        "preparation_seconds": 0.27345340000101714,
-        "preparation_peak_rss_bytes": 83677184,
-        "process_seconds": 1.1881563999995706
+        "preparation_seconds": 0.27714089999790303,
+        "preparation_peak_rss_bytes": 83460096,
+        "process_seconds": 1.1738958999994793
       },
       {
-        "append_seconds": 0.1782445999997435,
+        "append_seconds": 0.17954500000269036,
         "appends": 3,
-        "duplicate_lookup_seconds": 0.02446830000189948,
+        "duplicate_lookup_seconds": 0.02699639999991632,
         "inventory_seconds": 0.0,
-        "lock_seconds": 0.16042479999669013,
+        "lock_seconds": 0.16121660000135307,
         "manifest_headers": 5,
         "mode": "normal",
         "partition_bytes": 81950,
         "partition_opens": 7,
         "path_bytes": 453665,
         "path_reads": 89,
-        "peak_rss_bytes": 90398720,
+        "peak_rss_bytes": 91111424,
         "publications": 1,
         "records_decoded": 7,
         "synthetic_provider_attempts": 1,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.5674696000023687,
-        "setup_seconds": 0.685470999997051,
-        "setup_peak_rss_bytes": 83656704,
+        "wall_seconds": 0.553809299999557,
+        "setup_seconds": 0.6416587000021536,
+        "setup_peak_rss_bytes": 83447808,
         "history_transactions": 32,
         "payload_size": 4096,
         "validated": true,
         "preparation": {
           "status": "PREPARED",
           "record_count": 35,
-          "records_root_sha256": "e3063a41dcfea423515c6bd4b56996f2e1e45e1a6fbd41be8e913452e838bdd0",
-          "transactions_root_sha256": "1f62a0709acfec0c293542e7ea846a91f54f40e292c83736fe2c184566d98cb1"
+          "records_root_sha256": "309b829366fe854d7457bbfbc1021daaca2ebf1b0a86783a510f5fbd68a94313",
+          "transactions_root_sha256": "3c987555f061850f271f0991d9860b58f6224e4c85410d6ee1db2488f6528662"
         },
-        "preparation_seconds": 0.27345340000101714,
-        "preparation_peak_rss_bytes": 83677184,
-        "process_seconds": 1.1360825000010664
+        "preparation_seconds": 0.27714089999790303,
+        "preparation_peak_rss_bytes": 83460096,
+        "process_seconds": 1.0952346999984002
       },
       {
         "append_seconds": 0.0,
@@ -1891,26 +1927,26 @@
         "partition_opens": 1,
         "path_bytes": 264778,
         "path_reads": 24,
-        "peak_rss_bytes": 86319104,
+        "peak_rss_bytes": 86347776,
         "publications": 0,
         "records_decoded": 1,
         "synthetic_provider_attempts": 0,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.2259267000008549,
-        "setup_seconds": 0.685470999997051,
-        "setup_peak_rss_bytes": 83656704,
+        "wall_seconds": 0.23489680000056978,
+        "setup_seconds": 0.6416587000021536,
+        "setup_peak_rss_bytes": 83447808,
         "history_transactions": 32,
         "payload_size": 4096,
         "validated": true,
         "preparation": {
           "status": "PREPARED",
           "record_count": 35,
-          "records_root_sha256": "e3063a41dcfea423515c6bd4b56996f2e1e45e1a6fbd41be8e913452e838bdd0",
-          "transactions_root_sha256": "1f62a0709acfec0c293542e7ea846a91f54f40e292c83736fe2c184566d98cb1"
+          "records_root_sha256": "309b829366fe854d7457bbfbc1021daaca2ebf1b0a86783a510f5fbd68a94313",
+          "transactions_root_sha256": "3c987555f061850f271f0991d9860b58f6224e4c85410d6ee1db2488f6528662"
         },
-        "preparation_seconds": 0.27345340000101714,
-        "preparation_peak_rss_bytes": 83677184,
-        "process_seconds": 0.744240300002275
+        "preparation_seconds": 0.27714089999790303,
+        "preparation_peak_rss_bytes": 83460096,
+        "process_seconds": 0.7626314999979513
       },
       {
         "append_seconds": 0.0,
@@ -1924,92 +1960,92 @@
         "partition_opens": 0,
         "path_bytes": 0,
         "path_reads": 0,
-        "peak_rss_bytes": 75272192,
+        "peak_rss_bytes": 74973184,
         "publications": 0,
         "records_decoded": 0,
         "synthetic_provider_attempts": 0,
         "terminal": "STATUS",
-        "wall_seconds": 0.05317949999880511,
-        "setup_seconds": 0.685470999997051,
-        "setup_peak_rss_bytes": 83656704,
+        "wall_seconds": 0.06902999999874737,
+        "setup_seconds": 0.6416587000021536,
+        "setup_peak_rss_bytes": 83447808,
         "history_transactions": 32,
         "payload_size": 4096,
         "validated": true,
         "preparation": {
           "status": "PREPARED",
           "record_count": 35,
-          "records_root_sha256": "e3063a41dcfea423515c6bd4b56996f2e1e45e1a6fbd41be8e913452e838bdd0",
-          "transactions_root_sha256": "1f62a0709acfec0c293542e7ea846a91f54f40e292c83736fe2c184566d98cb1"
+          "records_root_sha256": "309b829366fe854d7457bbfbc1021daaca2ebf1b0a86783a510f5fbd68a94313",
+          "transactions_root_sha256": "3c987555f061850f271f0991d9860b58f6224e4c85410d6ee1db2488f6528662"
         },
-        "preparation_seconds": 0.27345340000101714,
-        "preparation_peak_rss_bytes": 83677184,
-        "process_seconds": 0.5741970999988553
+        "preparation_seconds": 0.27714089999790303,
+        "preparation_peak_rss_bytes": 83460096,
+        "process_seconds": 0.6029205999984697
       },
       {
-        "append_seconds": 0.18819710000389023,
+        "append_seconds": 0.1833708000012848,
         "appends": 3,
-        "duplicate_lookup_seconds": 0.02844589999949676,
+        "duplicate_lookup_seconds": 0.022972599996137433,
         "inventory_seconds": 0.0,
-        "lock_seconds": 0.16958770000201184,
+        "lock_seconds": 0.16623420000178157,
         "manifest_headers": 5,
         "mode": "admit",
         "partition_bytes": 81950,
         "partition_opens": 7,
         "path_bytes": 466949,
         "path_reads": 90,
-        "peak_rss_bytes": 91291648,
+        "peak_rss_bytes": 91602944,
         "publications": 1,
         "records_decoded": 7,
         "synthetic_provider_attempts": 3,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.6310216999991098,
-        "setup_seconds": 2.5587769000012486,
-        "setup_peak_rss_bytes": 84471808,
+        "wall_seconds": 0.6236012999979721,
+        "setup_seconds": 2.561489999996411,
+        "setup_peak_rss_bytes": 84197376,
         "history_transactions": 128,
         "payload_size": 4096,
         "validated": true,
         "preparation": {
           "status": "PREPARED",
           "record_count": 131,
-          "records_root_sha256": "5bea28dc3cfc9af6b77c9eb5c68e77fd2e106203cf3cc8e6a48f4063e729193f",
-          "transactions_root_sha256": "325202193755a8d021f29623627beac3f3836a43e1b4ecf041276ff453330808"
+          "records_root_sha256": "59d38ad8312d7088f52ea654c80d040884e07bb62d6164a952f0c876bbc1a907",
+          "transactions_root_sha256": "bfe394946dac164f53792548acb5875bfbb0a4aa9c0b31029d2385843576fb2d"
         },
-        "preparation_seconds": 0.5076260999994702,
-        "preparation_peak_rss_bytes": 84533248,
-        "process_seconds": 1.1581240999985312
+        "preparation_seconds": 0.5036365000014484,
+        "preparation_peak_rss_bytes": 84254720,
+        "process_seconds": 1.148895900001662
       },
       {
-        "append_seconds": 0.16824519999499898,
+        "append_seconds": 0.17700070000137202,
         "appends": 3,
-        "duplicate_lookup_seconds": 0.022713499995006714,
+        "duplicate_lookup_seconds": 0.025090400005865376,
         "inventory_seconds": 0.0,
-        "lock_seconds": 0.15164480000021285,
+        "lock_seconds": 0.15975560000151745,
         "manifest_headers": 5,
         "mode": "normal",
         "partition_bytes": 81950,
         "partition_opens": 7,
         "path_bytes": 465541,
         "path_reads": 89,
-        "peak_rss_bytes": 90583040,
+        "peak_rss_bytes": 90451968,
         "publications": 1,
         "records_decoded": 7,
         "synthetic_provider_attempts": 1,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.5505052000007709,
-        "setup_seconds": 2.5587769000012486,
-        "setup_peak_rss_bytes": 84471808,
+        "wall_seconds": 0.5619346999992558,
+        "setup_seconds": 2.561489999996411,
+        "setup_peak_rss_bytes": 84197376,
         "history_transactions": 128,
         "payload_size": 4096,
         "validated": true,
         "preparation": {
           "status": "PREPARED",
           "record_count": 131,
-          "records_root_sha256": "5bea28dc3cfc9af6b77c9eb5c68e77fd2e106203cf3cc8e6a48f4063e729193f",
-          "transactions_root_sha256": "325202193755a8d021f29623627beac3f3836a43e1b4ecf041276ff453330808"
+          "records_root_sha256": "59d38ad8312d7088f52ea654c80d040884e07bb62d6164a952f0c876bbc1a907",
+          "transactions_root_sha256": "bfe394946dac164f53792548acb5875bfbb0a4aa9c0b31029d2385843576fb2d"
         },
-        "preparation_seconds": 0.5076260999994702,
-        "preparation_peak_rss_bytes": 84533248,
-        "process_seconds": 1.0846910000000207
+        "preparation_seconds": 0.5036365000014484,
+        "preparation_peak_rss_bytes": 84254720,
+        "process_seconds": 1.1082690999974147
       },
       {
         "append_seconds": 0.0,
@@ -2023,26 +2059,26 @@
         "partition_opens": 1,
         "path_bytes": 264991,
         "path_reads": 24,
-        "peak_rss_bytes": 86392832,
+        "peak_rss_bytes": 85962752,
         "publications": 0,
         "records_decoded": 1,
         "synthetic_provider_attempts": 0,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.23825349999970058,
-        "setup_seconds": 2.5587769000012486,
-        "setup_peak_rss_bytes": 84471808,
+        "wall_seconds": 0.2735982999984117,
+        "setup_seconds": 2.561489999996411,
+        "setup_peak_rss_bytes": 84197376,
         "history_transactions": 128,
         "payload_size": 4096,
         "validated": true,
         "preparation": {
           "status": "PREPARED",
           "record_count": 131,
-          "records_root_sha256": "5bea28dc3cfc9af6b77c9eb5c68e77fd2e106203cf3cc8e6a48f4063e729193f",
-          "transactions_root_sha256": "325202193755a8d021f29623627beac3f3836a43e1b4ecf041276ff453330808"
+          "records_root_sha256": "59d38ad8312d7088f52ea654c80d040884e07bb62d6164a952f0c876bbc1a907",
+          "transactions_root_sha256": "bfe394946dac164f53792548acb5875bfbb0a4aa9c0b31029d2385843576fb2d"
         },
-        "preparation_seconds": 0.5076260999994702,
-        "preparation_peak_rss_bytes": 84533248,
-        "process_seconds": 0.7622527000021364
+        "preparation_seconds": 0.5036365000014484,
+        "preparation_peak_rss_bytes": 84254720,
+        "process_seconds": 0.8333769000018947
       },
       {
         "append_seconds": 0.0,
@@ -2056,47 +2092,47 @@
         "partition_opens": 0,
         "path_bytes": 0,
         "path_reads": 0,
-        "peak_rss_bytes": 74788864,
+        "peak_rss_bytes": 74915840,
         "publications": 0,
         "records_decoded": 0,
         "synthetic_provider_attempts": 0,
         "terminal": "STATUS",
-        "wall_seconds": 0.05216790000122273,
-        "setup_seconds": 2.5587769000012486,
-        "setup_peak_rss_bytes": 84471808,
+        "wall_seconds": 0.05243989999871701,
+        "setup_seconds": 2.561489999996411,
+        "setup_peak_rss_bytes": 84197376,
         "history_transactions": 128,
         "payload_size": 4096,
         "validated": true,
         "preparation": {
           "status": "PREPARED",
           "record_count": 131,
-          "records_root_sha256": "5bea28dc3cfc9af6b77c9eb5c68e77fd2e106203cf3cc8e6a48f4063e729193f",
-          "transactions_root_sha256": "325202193755a8d021f29623627beac3f3836a43e1b4ecf041276ff453330808"
+          "records_root_sha256": "59d38ad8312d7088f52ea654c80d040884e07bb62d6164a952f0c876bbc1a907",
+          "transactions_root_sha256": "bfe394946dac164f53792548acb5875bfbb0a4aa9c0b31029d2385843576fb2d"
         },
-        "preparation_seconds": 0.5076260999994702,
-        "preparation_peak_rss_bytes": 84533248,
-        "process_seconds": 0.5565233999986958
+        "preparation_seconds": 0.5036365000014484,
+        "preparation_peak_rss_bytes": 84254720,
+        "process_seconds": 0.5649620000003779
       }
     ],
     "owner_patch_exact_cold_recheck": [
       {
-        "append_seconds": 0.2167606999973941,
+        "append_seconds": 0.22129310000309488,
         "appends": 3,
-        "duplicate_lookup_seconds": 0.03517139999894425,
+        "duplicate_lookup_seconds": 0.03581829999893671,
         "inventory_seconds": 0.0,
-        "lock_seconds": 0.19919370000206982,
+        "lock_seconds": 0.20367349999651196,
         "manifest_headers": 4,
         "mode": "normal",
         "partition_bytes": 73318,
         "partition_opens": 6,
-        "path_bytes": 453451,
-        "path_reads": 92,
-        "peak_rss_bytes": 89559040,
+        "path_bytes": 454146,
+        "path_reads": 93,
+        "peak_rss_bytes": 89337856,
         "publications": 1,
         "records_decoded": 6,
         "synthetic_provider_attempts": 1,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.618031099998916,
+        "wall_seconds": 0.6213926999989781,
         "history_transactions": 864
       },
       {
@@ -2111,12 +2147,12 @@
         "partition_opens": 0,
         "path_bytes": 252209,
         "path_reads": 17,
-        "peak_rss_bytes": 76369920,
+        "peak_rss_bytes": 75788288,
         "publications": 0,
         "records_decoded": 0,
         "synthetic_provider_attempts": 0,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.21448760000203038,
+        "wall_seconds": 0.18318989999897894,
         "history_transactions": 864
       },
       {
@@ -2131,32 +2167,32 @@
         "partition_opens": 0,
         "path_bytes": 0,
         "path_reads": 0,
-        "peak_rss_bytes": 74969088,
+        "peak_rss_bytes": 74829824,
         "publications": 0,
         "records_decoded": 0,
         "synthetic_provider_attempts": 0,
         "terminal": "STATUS",
-        "wall_seconds": 0.05165010000200709,
+        "wall_seconds": 0.05446440000014263,
         "history_transactions": 864
       },
       {
-        "append_seconds": 0.31810350000159815,
+        "append_seconds": 0.234092700000474,
         "appends": 3,
-        "duplicate_lookup_seconds": 0.04221019999749842,
+        "duplicate_lookup_seconds": 0.04380010000022594,
         "inventory_seconds": 0.0,
-        "lock_seconds": 0.29949480000141193,
+        "lock_seconds": 0.216678700002376,
         "manifest_headers": 4,
         "mode": "normal",
         "partition_bytes": 73318,
         "partition_opens": 6,
-        "path_bytes": 465306,
-        "path_reads": 98,
-        "peak_rss_bytes": 89231360,
+        "path_bytes": 463001,
+        "path_reads": 100,
+        "peak_rss_bytes": 89321472,
         "publications": 1,
         "records_decoded": 6,
         "synthetic_provider_attempts": 1,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.7121574000011606,
+        "wall_seconds": 0.6385030999990704,
         "history_transactions": 6048
       },
       {
@@ -2171,12 +2207,12 @@
         "partition_opens": 0,
         "path_bytes": 252209,
         "path_reads": 17,
-        "peak_rss_bytes": 75923456,
+        "peak_rss_bytes": 75862016,
         "publications": 0,
         "records_decoded": 0,
         "synthetic_provider_attempts": 0,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.18312560000049416,
+        "wall_seconds": 0.18345480000061798,
         "history_transactions": 6048
       },
       {
@@ -2191,32 +2227,32 @@
         "partition_opens": 0,
         "path_bytes": 0,
         "path_reads": 0,
-        "peak_rss_bytes": 74121216,
+        "peak_rss_bytes": 74850304,
         "publications": 0,
         "records_decoded": 0,
         "synthetic_provider_attempts": 0,
         "terminal": "STATUS",
-        "wall_seconds": 0.05955069999981788,
+        "wall_seconds": 0.0537506000000576,
         "history_transactions": 6048
       },
       {
-        "append_seconds": 0.2046109000038996,
+        "append_seconds": 0.21515269999872544,
         "appends": 3,
-        "duplicate_lookup_seconds": 0.025751100005436456,
+        "duplicate_lookup_seconds": 0.030886100001225714,
         "inventory_seconds": 0.0,
-        "lock_seconds": 0.18689230000018142,
+        "lock_seconds": 0.19915870000477298,
         "manifest_headers": 4,
         "mode": "normal",
         "partition_bytes": 73318,
         "partition_opens": 6,
-        "path_bytes": 468940,
-        "path_reads": 102,
-        "peak_rss_bytes": 89419776,
+        "path_bytes": 471492,
+        "path_reads": 103,
+        "peak_rss_bytes": 89591808,
         "publications": 1,
         "records_decoded": 6,
         "synthetic_provider_attempts": 1,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.5996190000005299,
+        "wall_seconds": 0.615690499998891,
         "history_transactions": 25920
       },
       {
@@ -2231,12 +2267,12 @@
         "partition_opens": 0,
         "path_bytes": 252209,
         "path_reads": 17,
-        "peak_rss_bytes": 75845632,
+        "peak_rss_bytes": 75898880,
         "publications": 0,
         "records_decoded": 0,
         "synthetic_provider_attempts": 0,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.19223860000056447,
+        "wall_seconds": 0.1869144000011147,
         "history_transactions": 25920
       },
       {
@@ -2251,32 +2287,32 @@
         "partition_opens": 0,
         "path_bytes": 0,
         "path_reads": 0,
-        "peak_rss_bytes": 74620928,
+        "peak_rss_bytes": 74964992,
         "publications": 0,
         "records_decoded": 0,
         "synthetic_provider_attempts": 0,
         "terminal": "STATUS",
-        "wall_seconds": 0.052383199999894714,
+        "wall_seconds": 0.05399369999940973,
         "history_transactions": 25920
       },
       {
-        "append_seconds": 0.24551689999861992,
+        "append_seconds": 0.257504200002586,
         "appends": 3,
-        "duplicate_lookup_seconds": 0.04883949999930337,
+        "duplicate_lookup_seconds": 0.04629470000145375,
         "inventory_seconds": 0.0,
-        "lock_seconds": 0.2277364999972633,
+        "lock_seconds": 0.24033350000172504,
         "manifest_headers": 4,
         "mode": "normal",
         "partition_bytes": 73318,
         "partition_opens": 6,
-        "path_bytes": 478648,
-        "path_reads": 102,
-        "peak_rss_bytes": 89559040,
+        "path_bytes": 476475,
+        "path_reads": 104,
+        "peak_rss_bytes": 89214976,
         "publications": 1,
         "records_decoded": 6,
         "synthetic_provider_attempts": 1,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.6518133000026864,
+        "wall_seconds": 0.6431838999997126,
         "history_transactions": 51840
       },
       {
@@ -2291,12 +2327,12 @@
         "partition_opens": 0,
         "path_bytes": 252209,
         "path_reads": 17,
-        "peak_rss_bytes": 76132352,
+        "peak_rss_bytes": 75948032,
         "publications": 0,
         "records_decoded": 0,
         "synthetic_provider_attempts": 0,
         "terminal": "TICK_COMPLETE",
-        "wall_seconds": 0.18132500000137952,
+        "wall_seconds": 0.1816023999999743,
         "history_transactions": 51840
       },
       {
@@ -2311,16 +2347,16 @@
         "partition_opens": 0,
         "path_bytes": 0,
         "path_reads": 0,
-        "peak_rss_bytes": 74936320,
+        "peak_rss_bytes": 75280384,
         "publications": 0,
         "records_decoded": 0,
         "synthetic_provider_attempts": 0,
         "terminal": "STATUS",
-        "wall_seconds": 0.052792099999351194,
+        "wall_seconds": 0.052179899998009205,
         "history_transactions": 51840
       }
     ],
-    "owner_patch_phase": "80m fixed due tail after explicit cutoff; 60m cutoff append is separately measured setup. Active paired 0/32/128 also rerun after round-binding repair. Pre-upgrade synthetic OPS binding is not production migration."
+    "owner_patch_phase": "90m fixed due tail after explicit cutoff; current active paired 0/32/128 also rerun after full temporal boundary repair. Synthetic pre-upgrade fixture binding is not production migration."
   },
   "R2": {
     "rehearsal": "R2",
@@ -2467,7 +2503,7 @@
     "owner_patch_repeat": {
       "rehearsal": "R2",
       "entry": "observation_schedule.py tick --once",
-      "wall_seconds": 5.007924699999421,
+      "wall_seconds": 4.690164899999218,
       "admissions": 1,
       "account_counters": [
         [
@@ -2576,7 +2612,7 @@
         "terminal_episodes": 0,
         "unpublished_backlog": 0
       },
-      "peak_rss_bytes": 276439040,
+      "peak_rss_bytes": 277843968,
       "boundary_slot_states": {
         "E300": [
           "OBSERVED",
@@ -3328,8 +3364,8 @@
       "no_local_full_gate": "PROJECT_PRIMARY_OR_FALLBACK_RESERVED_FOR_GUARDED_MERGE",
       "applicability": "Full R3-R4 repeated after commissioning/local-control/count changes; its first producer process precedes only the final identical-schema no-cast fix. Final 67 owner tests and the 48-episode late-tail pressure proof cover that fix; no scientific value/schema/coercion policy changed."
     },
-    "postreview_targeted": "PASS_73_NO_SKIPS_PLUS4_RETAINED_REHEARSALS_PLUS1_THREE_PROCESS_VERTICAL_GROUPS_OVERLAP",
-    "final_delta_applicability": "Current postreview R2/R3/R4 and paired/aged R1 run all match the twelve runtime hashes; later delta changes documentation only. Older counters/receipts retained as historical snapshots; overlapping groups are not summed."
+    "postreview_targeted": "PASS_76_TARGETED_NO_SKIPS_INCLUDE_FULL_CANARY_R2_PARTIAL_ROUND_PACING_CAPTURE_CUTOFF_OLD_GROUPS_OVERLAP",
+    "final_delta_applicability": "Current paired/cold R1 and full targeted76 match all twelve runtime hashes. R3/R4 repeat after committed content is required; intermediate Git mutation refusal is preserved, no gate bypass."
   },
   "FACT": [
     "real public entry and real canonical filesystem/lease/publication owners",
@@ -3339,7 +3375,8 @@
     "48 admissions/6624 due rows survive local reserve and complete unsafe-pressure drain",
     "lookup node count/bytes and packet wall measured as WATCH without optimization",
     "Reserve and nomination bind one post-pacing round; 00:44:59 to 00:45:01 unsafe prospective admission refuses before HTTP",
-    "Legacy episode-only storage option refuses before ACTIVE/canonical append; exact operator JSON template and offline validation exercised"
+    "Legacy episode-only storage option refuses before ACTIVE/canonical append; exact operator JSON template and offline validation exercised",
+    "Frozen public-CLI partial-cutoff falsifier admits one episode with three unfunded nominations; final owner reserves every eligible round and stops before HTTP/admission. Pacing/capture cutoff guards preserve intake policy."
   ],
   "MODEL": [
     "calendar history equivalents",
@@ -3431,7 +3468,7 @@
       "unsafe_pressure": {
         "committed_drain_reserve_bytes": 5004853248,
         "decision_at": "2026-10-06T23:50:01Z",
-        "envelope_sha256": "5b09971a19720a0696f1cf2e13ee67870e2b5dd5f6ddc7aa09162fa07a4ad207",
+        "envelope_sha256": "5bed2fc571e34be4f3ea8891d60ef294e754a463d50cec0607305dd898531c92",
         "evidence_class": "COMMISSIONING_BOUND_LOCAL_CONTROL",
         "factory_scope_policy": "SEPARATE_PRE_ACTIVATION_GATE",
         "fixed_local_reserve_bytes": 1073741824,
@@ -3497,81 +3534,81 @@
       {
         "history_transactions": 864,
         "node_before": {
-          "node_files": 671,
-          "node_bytes": 470943,
-          "file_inode_proxy": 671,
+          "node_files": 695,
+          "node_bytes": 495265,
+          "file_inode_proxy": 695,
           "actual_linux_inode_allocation": "UNKNOWN"
         },
         "node_after": {
-          "node_files": 683,
-          "node_bytes": 482740,
-          "file_inode_proxy": 683,
+          "node_files": 707,
+          "node_bytes": 507149,
+          "file_inode_proxy": 707,
           "actual_linux_inode_allocation": "UNKNOWN"
         },
         "node_file_growth": 12,
-        "node_byte_growth": 11797,
+        "node_byte_growth": 11884,
         "packet_due_rows": 138,
-        "operational_packet_wall_seconds": 0.24591789999976754,
+        "operational_packet_wall_seconds": 0.3448770999966655,
         "optimization": "NONE_WATCH_ONLY"
       },
       {
         "history_transactions": 6048,
         "node_before": {
-          "node_files": 6590,
-          "node_bytes": 2725052,
-          "file_inode_proxy": 6590,
+          "node_files": 6637,
+          "node_bytes": 2759633,
+          "file_inode_proxy": 6637,
           "actual_linux_inode_allocation": "UNKNOWN"
         },
         "node_after": {
-          "node_files": 6622,
-          "node_bytes": 2743980,
-          "file_inode_proxy": 6622,
+          "node_files": 6652,
+          "node_bytes": 2774672,
+          "file_inode_proxy": 6652,
           "actual_linux_inode_allocation": "UNKNOWN"
         },
-        "node_file_growth": 32,
-        "node_byte_growth": 18928,
+        "node_file_growth": 15,
+        "node_byte_growth": 15039,
         "packet_due_rows": 138,
-        "operational_packet_wall_seconds": 1.3130330000021786,
+        "operational_packet_wall_seconds": 1.8674879999998666,
         "optimization": "NONE_WATCH_ONLY"
       },
       {
         "history_transactions": 25920,
         "node_before": {
-          "node_files": 8966,
-          "node_bytes": 9617877,
-          "file_inode_proxy": 8966,
+          "node_files": 8998,
+          "node_bytes": 9653983,
+          "file_inode_proxy": 8998,
           "actual_linux_inode_allocation": "UNKNOWN"
         },
         "node_after": {
-          "node_files": 8982,
-          "node_bytes": 9635956,
-          "file_inode_proxy": 8982,
+          "node_files": 9014,
+          "node_bytes": 9673163,
+          "file_inode_proxy": 9014,
           "actual_linux_inode_allocation": "UNKNOWN"
         },
         "node_file_growth": 16,
-        "node_byte_growth": 18079,
+        "node_byte_growth": 19180,
         "packet_due_rows": 138,
-        "operational_packet_wall_seconds": 3.6477938999996695,
+        "operational_packet_wall_seconds": 5.161230599998817,
         "optimization": "NONE_WATCH_ONLY"
       },
       {
         "history_transactions": 51840,
         "node_before": {
-          "node_files": 21878,
-          "node_bytes": 19391218,
-          "file_inode_proxy": 21878,
+          "node_files": 21910,
+          "node_bytes": 19434842,
+          "file_inode_proxy": 21910,
           "actual_linux_inode_allocation": "UNKNOWN"
         },
         "node_after": {
-          "node_files": 21894,
-          "node_bytes": 19413278,
-          "file_inode_proxy": 21894,
+          "node_files": 21927,
+          "node_bytes": 19455681,
+          "file_inode_proxy": 21927,
           "actual_linux_inode_allocation": "UNKNOWN"
         },
-        "node_file_growth": 16,
-        "node_byte_growth": 22060,
+        "node_file_growth": 17,
+        "node_byte_growth": 20839,
         "packet_due_rows": 138,
-        "operational_packet_wall_seconds": 8.27458530000149,
+        "operational_packet_wall_seconds": 11.736576900002547,
         "optimization": "NONE_WATCH_ONLY"
       }
     ],
@@ -3645,6 +3682,45 @@
         "result": "PASS",
         "log_ref": "local/episodes_operability/postreview_targeted.log"
       }
+    },
+    "temporal_owner_replan": {
+      "falsifier_head": "f5f155cb1c090eebbc677df1ade0be5f4d86ad16",
+      "falsifier_runtime_sha256": "9270d23c548b138d54ee00f789f9c8942dfc9cbfd28a57e5a75835a3d77cb73c",
+      "public_cli_before": {
+        "admissions": 1,
+        "reserved_nomination_bytes": 100663296,
+        "missing_nomination_reserve_bytes": 100663296
+      },
+      "public_cli_after": {
+        "status": "PASS",
+        "stops_admitting_at": "2026-10-05T00:45:10Z",
+        "tick_at": "2026-10-05T00:30:20Z",
+        "drain_headroom": {
+          "committed_drain_reserve_bytes": 0,
+          "decision_at": "2026-10-05T00:30:20Z",
+          "envelope_sha256": "e413c0791f16c29ab5f8c6196d9c2b6f5d9a59840ffd2dcfa885db791c45f88b",
+          "evidence_class": "COMMISSIONING_BOUND_LOCAL_CONTROL",
+          "factory_scope_policy": "SEPARATE_PRE_ACTIVATION_GATE",
+          "fixed_local_reserve_bytes": 1073741824,
+          "free_bytes": 6896746497,
+          "future_nomination_reserve_bytes": 201326592,
+          "prospective_reserve_bytes": 4648599552,
+          "remaining_call_groups": 0,
+          "remaining_slots": 0,
+          "required_free_bytes": 6997409792,
+          "round_started_at": "2026-10-05T00:30:00Z",
+          "safety_margin_bytes": 1073741824,
+          "sampling_auto_reduce": false,
+          "status": "STOP_NEW_INTAKE"
+        },
+        "admissions": 0,
+        "synthetic_provider_attempts": 0
+      },
+      "cutoff_clock_guards": "Current post-pacing clock closes nomination at cutoff; completed funded capture/each T0 cannot admit after cutoff; ordinary drain uses final clock",
+      "current_targeted_tests": 76,
+      "intermediate_R3_refusal": "GIT_MUTATION_DETECTED_WHILE_TASK_DOCUMENT_CHANGED_REHEARSAL_WILL_REPEAT_ON_COMMITTED_CONTENT",
+      "science": "NO_REAL_SCIENTIFIC_LOOK",
+      "sampling_caps": "UNCHANGED"
     }
   },
   "reproduce": [

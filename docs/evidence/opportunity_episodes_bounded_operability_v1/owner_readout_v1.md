@@ -32,6 +32,10 @@ Reserve и nomination связаны одним current decision instant пос�
 Граница00:44:59→00:45:01 с3GiB отказывает до HTTP/admission; пустой tail
 сразу COMPLETE. Legacy episode-only option получает typed refusal до ACTIVE
 и canonical append. Точный16-field JSON template/offline hash recipe проверен.
+Partial cutoff00:45:10 при tick00:30:20 на frozen headf5f155cb создавал
+1 admission с3 unfunded nomination calls (100,663,296 bytes). Round-start ceil
+теперь покрывает последний eligible round; отказ до HTTP/admission. Fresh pacing/
+capture clock также запрещает late T0 и ведёт штатный natural drain.
 Reserve покрывает все committed assigned-time/chunk calls/due slots, будущие
 nominations, каждую prospective next-round obligation и fixed/safety headroom.
 Raw/OPS/WAL/publications/research/manifests/lookup входят в per-call bound;
@@ -56,7 +60,7 @@ publisher/lease/filesystem. При0/32/128 valid distinct retired transactions:
 Current paired fresh-process normal work:7 partitions/81,950 bytes при всех
 размерах, inventory0. Дополнительные490 bytes — commissioning metadata binding.
 На864/6048/25920/51840 transactions12 fresh normal/restart/status процессов:
-fixed80m due tail6 partitions/73,318 bytes, wall0.60–0.72s, RSS<90MB, inventory0.
+fixed90m due tail6 partitions/73,318 bytes, wall0.61–0.65s, RSS<90MB, inventory0.
 Cutoff60m имеет дополнительный lifecycle append и измерен отдельно от fixed work.
 Pre-upgrade local fixtures получают synthetic binding через public OPS owner;
 production migration не заявлена. Setup/preparation вне timing; warm cache не proof.
@@ -81,8 +85,9 @@ activation. Changed root identity блокирует intake; canonical recovery/
 Новый envelope — новая supported activation/cohort boundary, без intraday fragments.
 R4 не доказывает ACTIVE producer restart на root с изменённой identity.
 
-Validation:73 targeted tests PASS без skips (lookup/lifecycle/producer/operability);
-4 retained boundary/canary/R2 tests PASS; full three-process vertical1 PASS.
+Validation:76 targeted tests PASS без skips (lookup/lifecycle/producer/operability);
+Current suite включает полный canary/R2 и три temporal cutoff regressions.
+R3/R4 повторяется после committed content; intermediate GIT_MUTATION guard сохранён.
 Groups overlap, не суммируются. R1 paired и aged fresh-process proofs повторены
 после последнего implementation delta. Все12 source hashes совпадают с code.
 Four isolated reviews повторяются на exact final content перед binding.
