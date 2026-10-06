@@ -39,6 +39,10 @@ uv run --locked --managed-python python -B scripts/observation_schedule.py stop-
 * Recovery: the next tick republishes the outbox, recovers completed calls from
   the call ledger and turns intent-without-result into
   `ATTEMPT_OUTCOME_UNKNOWN`; it never re-requests a past slot.
+* Round crash recovery: a nomination round that died after its slack is
+  reconciled by the next tick from durable evidence only (no provider call, no
+  late admission). A partial round keeps what was committed and blocks its
+  cohort from capture; a round with no admission is an honest gap.
 * Freeze one mature cohort (UTC admission day, all slots terminal, outbox
   published):
 
@@ -85,6 +89,7 @@ values; registered replay recomputes from the frozen recipe and release files.
 | Code | Meaning | Next |
 | --- | --- | --- |
 | `EPISODE_BATCH_NOTHING_MATURE` (PASS) | no mature unimported cohort yet | wait for the next UTC day |
+| `ROUND_STARTED_UNRESOLVED`, `ROUND_PARTIAL_ADMISSION`, `ROUND_RECOVERY_REFUSED`, `ROUND_FRAME_CORRUPT`, `ROUND_ROW_MISSING` in the blocking reasons of `EPISODE_BATCH_NOTHING_MATURE` | a nomination round crashed: still unreconciled, partially admitted, or its durable evidence is invalid, unreadable or missing | while the activation is active an ordinary tick reconciles an unresolved round (a paused/aborted/completed activation does not); a partial, refused, corrupt or missing round stays blocked: do not capture, report the `reason_code` from `episode_rounds` |
 | `MIRROR_INCOMPLETE` | transfer interrupted | rerun the same command |
 | `MARKET_EVIDENCE_BASIS_INCOMPLETE` at preflight | an import was interrupted after labels, before lineage | rerun the same unpack command (not preflight); it reuses the recorded import instant |
 | `RELEASE_HASH_MISMATCH`, `MIRROR_CONFLICT`, `CLOSURE_COHORT_MISMATCH` | bytes differ from the sealed or captured identity | stop; do not import |

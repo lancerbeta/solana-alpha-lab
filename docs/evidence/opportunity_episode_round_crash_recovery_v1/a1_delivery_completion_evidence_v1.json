@@ -1,0 +1,73 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "OPPORTUNITY-EPISODE-ROUND-CRASH-RECOVERY-COMPLETION-001",
+  "as_of": "2026-10-06",
+  "task_id": "OPPORTUNITY_EPISODE_ROUND_CRASH_RECOVERY_V1",
+  "state_change": "ROUND_SELECTION_DURABLE_BEFORE_FIRST_ADMISSION_AFTER_SLACK_RECONCILE_FAIL_CLOSED_COHORT_MATURITY",
+  "base_main": "5a9d937fc6b9e57c7e157a5862fbcb459efbb1e1",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "efcaa8f23b72cd7dba41cd6073c947d132a8739772df3a3b54d81b44f25a244b",
+    "docs/contracts/opportunity_episodes_jupiter_v1.md": "a50afe6e0f799b86eaee49ac5ec385a4b17edadc6dd1305933297898f9256a37",
+    "docs/evidence/opportunity_episode_round_crash_recovery_v1/a1_semantic_premise_packet_v1.json": "9d406ddffa422d9cd0a1325acac024ab023ba237c365e24d5814870b37e23558",
+    "docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md": "f20da3bd02eef776aa122bf4f0f14738fea5dbe94910ca1d07fc292d2ed093f3",
+    "docs/tasks/OPPORTUNITY_EPISODE_ROUND_CRASH_RECOVERY_V1.md": "10f1420acb63d7522b51b9e19384b9756256e94c6536c31bd7854e7f458414bd",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "09ab61f808692daeedde169e40db0b46d0f44d78cfb234e91115927f3579c02f",
+    "src/solana_alpha_lab/factory/opportunity_episode_release.py": "c764d5a138a4359ba60b1e9333576c92524ae6ebc7a21541fd67f9abd61f9039",
+    "src/solana_alpha_lab/factory/opportunity_episode_tick.py": "6331a6235e0e5318d798be76dcb2ca6dfc2187885ebcb451207d24019009b68b",
+    "src/solana_alpha_lab/factory/opportunity_episodes.py": "3565d1dff50b3b4be630ec1ee737c81e4259b247dde702c2327f976cfae837cc",
+    "tests/test_opportunity_episode_round_recovery_v1.py": "d3b31fdcbb6f120a176c1ee1b9b4b38c63f79ae0dd7c7d2c779f2118c4c3bdc7"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/opportunity_episode_round_crash_recovery_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "ebe420b8778479b87703534446bf62f0d540ea0da11bd571798270c1d47f7ea9",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_90_EPISODE_RECOVERY_PRODUCER_CONTRACT_HARNESS_1_PRE_EXISTING_SKIP;PASS_27_OPERABILITY_VERTICAL_RELEASE_CONSUMERS_NO_SKIPS",
+    "independent_review": {
+      "path": "docs/evidence/opportunity_episode_round_crash_recovery_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "150fa29a033460b2137626e41d15b6109a0676d905ae47a8ecfb2bd2dfe6d02d",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FROZEN_MAIN_FALSIFIER_BEFORE_STARTED_ROUND_MATURE_AFTER_INCOMPLETE_PARTIAL_BLOCKED",
+      "PASS_FACTORY_STATIC",
+      "PASS_FOUR_ISOLATED_CONTENT_REVIEWS_SEMANTIC_PREMISE_ARCHITECTURE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE_ACCEPTANCE",
+    "SYNTHETIC_ONLY",
+    "NO_PROVIDER_CALLS",
+    "NO_PRODUCTION_DATA",
+    "NO_REAL_SCIENTIFIC_LOOK",
+    "NO_DEPLOY_SETTINGS_TIMER_CHANGE",
+    "NO_MERGE",
+    "NO_RETROACTIVE_GATING_OF_IMPORTED_COHORTS",
+    "NO_OWNER_OVERRIDE_FOR_BLOCKED_COHORT",
+    "NO_ITEMIZATION_OF_NON_BLOCKING_GAPS_IN_CLOSURE_RECEIPT"
+  ],
+  "side_effects": {
+    "network_calls": "UNKNOWN_TOTAL_DELIVERY_TRANSPORT",
+    "bounded_metadata_probe_attempts": 0,
+    "provider_calls": 0,
+    "local_writes": 1,
+    "external_actions": 0
+  }
+}

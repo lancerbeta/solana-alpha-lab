@@ -105,6 +105,40 @@ outbox row. T0 = commit clock. Crash before commit: no member, orphan raw is
 harmless, no backdating. Crash after commit: same episode recovered and the
 outbox is republished; no new lottery or replacement.
 
+Round recovery plan (`OPPORTUNITY_EPISODE_ROUND_RECOVERY_PLAN_V1`): after a
+complete frame and the deterministic selection, and before the first admission,
+the round owner row (`episode_rounds.frame_json`, still `STARTED`) durably holds
+the plan: the bounded frame receipt (`frame_sha256`), protection fingerprint,
+quota basis (round quota, day/rolling/active use, committed-in-round, blocked
+candidates), the exact ordered winners with their episode identities and the
+not-selected set, self-hashed. The store refuses an admission whose round is
+terminal, plan-less or does not name the episode, and refuses to replace or drop
+a written plan. Inside the slack a resume follows the plan and never recomputes
+the selection from the current market, quota or clock; a resume that still
+cannot commit a planned winner (blocked mint, quota, stale witness, intake
+cutoff) records it in `dropped_planned` with the reason and terminalizes the
+round exactly like the after-slack partial case, so restart timing never decides
+whether the same subset is gated. A normal non-crash round keeps its ordinary
+`CLOSED` summary (now also listing `committed_episode_ids` and
+`dropped_planned`). After
+`round_start + slack` every tick first reconciles each still-`STARTED` round
+from durable evidence only (zero provider calls, zero new admissions, no
+recomputation): no planned winner committed, or no plan written → `INCOMPLETE`
+`ROUND_RECOVERY_NO_ADMISSION` (honest gap); every planned winner committed →
+`CLOSED` (`recovery.reconciled_after_slack`); a strict subset committed →
+`INCOMPLETE` `ROUND_RECOVERY_PARTIAL_ADMISSION` (committed admissions are kept,
+never rewritten); a corrupt/missing/conflicting plan, frame, call evidence or
+admission → `INCOMPLETE` `ROUND_RECOVERY_REFUSED` with a typed `reason_code`, no
+healing. Cohort maturity additionally refuses a relevant round that is still
+`STARTED` (`ROUND_STARTED_UNRESOLVED`), partial (`ROUND_PARTIAL_ADMISSION`) or
+refused (`ROUND_RECOVERY_REFUSED`), whose owner frame is unreadable in any state
+(`ROUND_FRAME_CORRUPT`), or that an admission references without an owner row
+(`ROUND_ROW_MISSING`); a zero-admission honest gap and an ordinary `CLOSED`
+round do not block. Reconciliation runs only while the activation ticks: a
+paused, aborted or completed activation keeps an unresolved round (and its
+cohort) blocked. A legacy plan-less `STARTED` round that already has admissions
+is refused (`ROUND_PLAN_MISSING_WITH_ADMISSIONS`), not healed.
+
 Protection gate (`ALLOW | DENY_PROTECTED | UNRESOLVED_SCOPE`): metadata-only
 over registered assignment sources named by the schedule; a missing source or
 missing completeness proof is `UNRESOLVED_SCOPE` (never blanket ALLOW). Denied
@@ -128,7 +162,8 @@ declines, disappearance or bad outcomes never remove an admission.
 ## 6. Release, import and closure
 
 Cohort maturity: admission day closed, every admitted episode's 138 slots
-terminal, every outbox row published, publication jobs complete. A timer is
+terminal, every outbox row published, publication jobs complete, and no relevant
+round `STARTED`, partial-admission or recovery-refused (section 4). A timer is
 not a closure proof. Release 1.2 (collection strategy inside the current
 release owner) carries census (one row per admission), observations, the
 schedule artifact (byte hash separate from semantic hash), selection/frame

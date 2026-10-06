@@ -211,6 +211,52 @@ def episode_activations(store) -> list[dict[str, Any]]:
     return found
 
 
+# A round that is neither CLOSED nor an honest zero-admission gap leaves the
+# sample's selection basis unproven; the cohort must not look mature.
+ROUND_GAP_REASONS = {
+    "ROUND_RECOVERY_PARTIAL_ADMISSION": "ROUND_PARTIAL_ADMISSION",
+    "ROUND_RECOVERY_REFUSED": "ROUND_RECOVERY_REFUSED",
+}
+
+
+def _round_integrity_gaps(
+    store, *, schedule_sha256: str, activation_id: str, admissions: Sequence[Mapping[str, Any]],
+    window: tuple[datetime, datetime],
+) -> list[dict[str, Any]]:
+    rounds = {
+        str(item["round_id"]): item
+        for item in store.list_episode_rounds(
+            schedule_sha256=schedule_sha256, activation_id=activation_id,
+            started_from=window[0], started_before=window[1],
+        )
+    }
+    gaps = []
+    for round_id in sorted({str(item["round_id"]) for item in admissions}):
+        found = store.get_episode_round(round_id)
+        if found is None:
+            # An admission whose round owner row is gone cannot prove its selection basis.
+            gaps.append({"round_id": round_id, "state": None, "reason": "ROUND_ROW_MISSING", "reason_code": None})
+        else:
+            rounds.setdefault(round_id, found)
+    for round_id, item in sorted(rounds.items()):
+        frame = item.get("frame") or {}
+        if frame.get("frame_corrupt"):
+            reason = "ROUND_FRAME_CORRUPT"  # unreadable owner evidence is never a clean round
+        elif str(item["state"]) == "STARTED":
+            reason = "ROUND_STARTED_UNRESOLVED"
+        elif str(item["state"]) == "INCOMPLETE" and frame.get("terminal") in ROUND_GAP_REASONS:
+            reason = ROUND_GAP_REASONS[str(frame["terminal"])]
+        else:
+            continue
+        gaps.append({
+            "round_id": round_id,
+            "state": str(item["state"]),
+            "reason": reason,
+            "reason_code": (frame.get("recovery") or {}).get("reason_code"),
+        })
+    return gaps
+
+
 def _cohort_status(store, *, data_root: Path, schedule_sha256: str, activation_id: str, cohort_id: str, as_of: datetime) -> dict[str, Any]:
     from solana_alpha_lab.factory.observation_panel_publisher import has_open_publication_jobs
 
@@ -240,7 +286,13 @@ def _cohort_status(store, *, data_root: Path, schedule_sha256: str, activation_i
         reasons.append("PUBLICATION_JOB_OPEN")
     if not admissions:
         reasons.append("COHORT_EMPTY")
+    round_gaps = _round_integrity_gaps(
+        store, schedule_sha256=schedule_sha256, activation_id=activation_id,
+        admissions=admissions, window=(_start, end),
+    )
+    reasons.extend(sorted({gap["reason"] for gap in round_gaps}))
     return {
+        "round_gaps": round_gaps,
         "admissions": admissions,
         "slot_state_counts": dict(sorted(slot_counts.items())),
         "open_slots": open_slots,

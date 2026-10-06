@@ -1,0 +1,116 @@
+{
+  "candidate": {
+    "base": "5a9d937fc6b9e57c7e157a5862fbcb459efbb1e1",
+    "diff_sha256": "468620a9676bd7a50ca9cf60b07237c9653e5cf7c9409498fffbfe3ff4d7ae99",
+    "head": "8a6d41d11327fd45944eaa9e30597b927b890c92"
+  },
+  "evidence": [
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/opportunity_episodes.py",
+      "sha256_or_fingerprint": "3565d1dff50b3b4be630ec1ee737c81e4259b247dde702c2327f976cfae837cc"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/opportunity_episode_tick.py",
+      "sha256_or_fingerprint": "6331a6235e0e5318d798be76dcb2ca6dfc2187885ebcb451207d24019009b68b"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/opportunity_episode_release.py",
+      "sha256_or_fingerprint": "c764d5a138a4359ba60b1e9333576c92524ae6ebc7a21541fd67f9abd61f9039"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/observation_schedule_store.py",
+      "sha256_or_fingerprint": "09ab61f808692daeedde169e40db0b46d0f44d78cfb234e91115927f3579c02f"
+    },
+    {
+      "logical_ref": "repo://tests/test_opportunity_episode_round_recovery_v1.py",
+      "sha256_or_fingerprint": "d3b31fdcbb6f120a176c1ee1b9b4b38c63f79ae0dd7c7d2c779f2118c4c3bdc7"
+    },
+    {
+      "logical_ref": "repo://docs/contracts/opportunity_episodes_jupiter_v1.md",
+      "sha256_or_fingerprint": "a50afe6e0f799b86eaee49ac5ec385a4b17edadc6dd1305933297898f9256a37"
+    }
+  ],
+  "independence": {
+    "claim_scope": "PACKET_INFORMATION_PATH",
+    "context_isolated": true,
+    "implementation_transcript_seen": false,
+    "launch_isolation": "PROCESS_OBLIGATION",
+    "model_diversity": "UNPROVEN",
+    "model_diversity_identity": null,
+    "packet_bound": true,
+    "readonly": true
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE_ACCEPTANCE",
+    "NO_PROVIDER_CALLS",
+    "NO_PRODUCTION_DATA",
+    "NO_REAL_SCIENTIFIC_LOOK",
+    "NO_DEPLOY_SETTINGS_TIMER_CHANGE",
+    "NO_MERGE",
+    "NO_BLOCKING_OF_NORMAL_ROUND_DROPS",
+    "NO_RECONCILIATION_IN_NON_TICKING_ACTIVATION"
+  ],
+  "packet_fingerprint_sha256": "93947c74a66297d8a1890ea8dcf3a3ecb393fad8f1aae7c558b65a0205c81fcb",
+  "questions": [
+    "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
+    "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
+    "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL",
+    "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE",
+    "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY",
+    "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING",
+    "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER",
+    "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE",
+    "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM",
+    "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS"
+  ],
+  "review": {
+    "architecture_owner": "ARCHITECTURE_CRITIC",
+    "profile": "SEMANTIC_PREMISE",
+    "risk_dimensions": [
+      "UNKNOWN_VS_NEGATIVE_EVIDENCE",
+      "PIT_OR_AVAILABILITY_SEMANTICS",
+      "RESEARCH_TRUTH_OWNERSHIP",
+      "EVIDENCE_ADMISSIBILITY",
+      "DURABLE_SCIENCE_SCHEMA"
+    ]
+  },
+  "schema": "smial.semantic-premise-review-packet",
+  "schema_version": "1.0",
+  "semantic_claims": [
+    {
+      "claim": "After a complete frame and the deterministic selection, and before the first admission, the exact ordered winners, the not-selected set, the quota basis (round quota, day/rolling/active use, committed-in-round, blocked candidates) and the frame identity are durable in the existing round owner row as a self-hashed recovery plan",
+      "claim_id": "C1",
+      "scope": "round_selection"
+    },
+    {
+      "claim": "A restart inside the slack follows the durable plan and never recomputes the selection; a resumed round that still cannot commit a planned winner is recorded with a reason and terminalized as a partial admission, like the after-slack case",
+      "claim_id": "C2",
+      "scope": "in_slack_resume"
+    },
+    {
+      "claim": "After round_start+slack every tick reconciles each STARTED round from durable evidence only with zero provider calls and zero new admissions: none committed or no plan is an honest no-admission gap; all planned committed closes the exact round; a strict subset is a partial admission that keeps the committed admissions; missing/corrupt/conflicting plan, frame, call evidence or admission is a typed refusal without healing",
+      "claim_id": "C3",
+      "scope": "after_slack_reconcile"
+    },
+    {
+      "claim": "Cohort maturity refuses a relevant round that is STARTED, partial, recovery-refused, has an unreadable frame, or is referenced by an admission without an owner row; an ordinary CLOSED round and a zero-admission honest gap do not block",
+      "claim_id": "C4",
+      "scope": "cohort_maturity"
+    },
+    {
+      "claim": "The store refuses an admission whose round is terminal, plan-less or does not name the episode, and refuses to replace or drop a written plan; rounds without an owner row (direct store use) are not gated",
+      "claim_id": "C5",
+      "scope": "store_owner"
+    },
+    {
+      "claim": "T0 is still the admission commit clock; quota, rolling-24h, active-cap, accounting, protection, stop-intake, population and the 139-point grid are unchanged; a normal non-crash round that drops a planned winner still closes CLOSED with the drop now recorded",
+      "claim_id": "C6",
+      "scope": "unchanged_semantics"
+    }
+  ],
+  "task": {
+    "task_contract_sha256": "226aabdfd91f2f5ab5ae083f48aba4dd99e5783f960fa0e707e831b429ab259e",
+    "task_id": "OPPORTUNITY_EPISODE_ROUND_CRASH_RECOVERY_V1"
+  }
+}

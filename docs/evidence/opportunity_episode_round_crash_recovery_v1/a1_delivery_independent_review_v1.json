@@ -1,0 +1,78 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "OPPORTUNITY-EPISODE-ROUND-CRASH-RECOVERY-REVIEW-001",
+  "as_of": "2026-10-06",
+  "task_id": "OPPORTUNITY_EPISODE_ROUND_CRASH_RECOVERY_V1",
+  "reviewed_bindings_sha256": "0a0f041a16a32e6ada320a9d0df7b82099b88af511cf3bfa51d7ce128e5f05fe",
+  "reviewed_inventory_sha256": "a8b27c86db5f985d79bdaaf26e321c77fef2fced3059606f7472172f60ebe7c0",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_8a6d41d11327fd45944eaa9e30597b927b890c92",
+        "packet_fingerprint_sha256=93947c74a66297d8a1890ea8dcf3a3ecb393fad8f1aae7c558b65a0205c81fcb",
+        "RESIDUAL_P0_P1_NONE",
+        "SEMANTIC_PREMISE_PACKET_INFORMATION_PATH_PROCESS_OBLIGATION_MODEL_DIVERSITY_UNPROVEN",
+        "PROCESS_TIMING_CANNOT_CHANGE_READY_SAMPLE_WITHOUT_DURABLE_EVIDENCE_PLAN_BEFORE_FIRST_ADMISSION_STORE_ENFORCED",
+        "RESIDUAL_P2_NON_BLOCKING_DROPS_AND_NO_ADMISSION_GAPS_NOT_ITEMIZED_IN_CLOSURE_RECEIPT_NO_RETROACTIVE_GATING_NO_OWNER_OVERRIDE_COMPLETE_DRAINING_WINDOW"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_8a6d41d11327fd45944eaa9e30597b927b890c92",
+        "packet_fingerprint_sha256=93947c74a66297d8a1890ea8dcf3a3ecb393fad8f1aae7c558b65a0205c81fcb",
+        "RESIDUAL_P0_P1_NONE",
+        "PLAN_RESUME_RECONCILE_STORE_TRANSACTION_RELEASE_GAPS_TRACED_90_TESTS_OK",
+        "RESIDUAL_P2_LEDGER_PAYLOAD_NON_OBJECT_AND_ADMISSION_ROW_JSON_DECODE_ABORT_NOT_REGRESSIONS_RESUME_TEST_WORDING"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_8a6d41d11327fd45944eaa9e30597b927b890c92",
+        "packet_fingerprint_sha256=93947c74a66297d8a1890ea8dcf3a3ecb393fad8f1aae7c558b65a0205c81fcb",
+        "RESIDUAL_P0_P1_NONE",
+        "OWNER_CASES_A_B_C_D_AND_EIGHT_ADVERSARIAL_PROOFS_MAPPED_TO_FAILING_CAPABLE_TESTS_90_TESTS_OK",
+        "RESIDUAL_P2_QUOTA2_ALL_COMMITTED_AFTER_SLACK_E2E_INTAKE_CLOSED_REASON_AND_SLOT_SEARCH_CALLS_NOT_ASSERTED"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_LIVE_ACCEPTANCE",
+    "NO_MERGE",
+    "NO_MODEL_DIVERSITY_ATTESTATION",
+    "PACKET_INFORMATION_PATH_ONLY",
+    "NO_LIVE_LAUNCH_IDENTITY_ATTESTATION"
+  ],
+  "remediation_history": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Corrupt terminal round frame and admission without owner row no longer pass cohort maturity or closure",
+      "observed_head": "165c68d549d49a06d69e242995c38da0c66dc44f",
+      "resolved_by_head": "8a6d41d11327fd45944eaa9e30597b927b890c92"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Resumed round that drops a planned winner records dropped_planned and terminalizes as partial admission like the after-slack case; committed_episode_ids is authoritative",
+      "observed_head": "165c68d549d49a06d69e242995c38da0c66dc44f",
+      "resolved_by_head": "8a6d41d11327fd45944eaa9e30597b927b890c92"
+    }
+  ]
+}
