@@ -4,8 +4,8 @@
   "review_id": "OPPORTUNITY-EPISODE-ROUND-CRASH-RECOVERY-FACTORY-FIT-001",
   "as_of": "2026-10-06",
   "task_id": "OPPORTUNITY_EPISODE_ROUND_CRASH_RECOVERY_V1",
-  "reviewed_bindings_sha256": "6a2f80175f6dfdb0ae96f8b7bf461452adf041866c1bd0cea69f4a5dfc2e45ad",
-  "reviewed_inventory_sha256": "885cd08460b054718a060c72095cc1f6be2861fe8f117e506061af2c0876ce9a",
+  "reviewed_bindings_sha256": "0a0f041a16a32e6ada320a9d0df7b82099b88af511cf3bfa51d7ce128e5f05fe",
+  "reviewed_inventory_sha256": "a8b27c86db5f985d79bdaaf26e321c77fef2fced3059606f7472172f60ebe7c0",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
