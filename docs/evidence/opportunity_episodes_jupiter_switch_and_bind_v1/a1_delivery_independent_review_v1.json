@@ -1,0 +1,78 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "OPPORTUNITY-EPISODES-JUPITER-SWITCH-AND-BIND-REVIEW-001",
+  "as_of": "2026-10-06",
+  "task_id": "OPPORTUNITY_EPISODES_JUPITER_SWITCH_AND_BIND_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_372eac0c5f9132cdc12089bb45c835be7afccc0c",
+        "RESIDUAL_P0_P1_NONE",
+        "POST_REVIEW_SEMANTIC_NOOP_DEDUPE_OF_DUPLICATED_BLOCKS_AND_ONE_OPERATOR_SENTENCE_HEAD_fb6fbaa08c0840bcddec4948286eafd00d594e2f_TESTS_103_OK",
+        "THREE_ROUNDS_ROUND1_PASS_ROUND2_NOT_READY_THREE_P1_FIXED_ROUND3_PASS",
+        "RESIDUAL_P2_OPERATION_LABEL_FREE_API_KEY_BULK_TOKEN_SEARCH_IS_A_V10_LABEL_NOTED_IN_RUNBOOK",
+        "RESIDUAL_P2_PACE_PROOF_NEEDS_LOGS_OF_ALL_CALLERS_RUNBOOK_STATES_UNPROVEN_WITHOUT_THEM"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_372eac0c5f9132cdc12089bb45c835be7afccc0c",
+        "RESIDUAL_P0_P1_NONE",
+        "POST_REVIEW_SEMANTIC_NOOP_DEDUPE_OF_DUPLICATED_BLOCKS_AND_ONE_OPERATOR_SENTENCE_HEAD_fb6fbaa08c0840bcddec4948286eafd00d594e2f_TESTS_103_OK",
+        "VALIDATOR_PINS_PER_ROUTE_SHA_BYTES_ROWS_TIME_EXACT_KEY_SETS_NON_CLAIMS_FAILURES_AND_CANONICAL_PRESERVED_ROUTES",
+        "RESIDUAL_P2_JSON_SCHEMA_DOES_NOT_CONSTRAIN_OBSERVED_ROUTE_CONTENT_PYTHON_VALIDATOR_DOES"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_372eac0c5f9132cdc12089bb45c835be7afccc0c",
+        "RESIDUAL_P0_P1_NONE",
+        "POST_REVIEW_SEMANTIC_NOOP_DEDUPE_OF_DUPLICATED_BLOCKS_AND_ONE_OPERATOR_SENTENCE_HEAD_fb6fbaa08c0840bcddec4948286eafd00d594e2f_TESTS_103_OK",
+        "OWNER_REQUIREMENTS_MAPPED_TO_REGISTRY_TESTS_AND_RUNBOOK_TEXT",
+        "RESIDUAL_P2_BLUEPRINT_VERBATIM_MENTIONS_200_PER_DAY_AS_CONDITIONAL_RECOMMENDATION_NOT_SUPPORTED_PROFILE"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_LIVE_ACCEPTANCE",
+    "NO_MERGE",
+    "NO_MODEL_DIVERSITY_ATTESTATION",
+    "PACKET_INFORMATION_PATH_ONLY",
+    "NO_LIVE_LAUNCH_IDENTITY_ATTESTATION"
+  ],
+  "remediation_history": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Unattested single-object search shape, key-wide exclusivity undefined, pace overlap absent from known_failures",
+      "observed_head": "a70d1906fce5fee03fbe4fa5b191252c2face33c",
+      "resolved_by_head": "372eac0c5f9132cdc12089bb45c835be7afccc0c"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Validator did not pin per-route receipt facts, non_claims, key sets or runtime/preflight claims",
+      "observed_head": "b83f4eecdb9f4808147789a70135086e51a590f4",
+      "resolved_by_head": "867fe3a0dc4d135738db27a429986b5231dc32a4"
+    }
+  ]
+}
