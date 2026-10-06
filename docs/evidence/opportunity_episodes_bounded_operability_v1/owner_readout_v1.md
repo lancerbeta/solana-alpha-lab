@@ -91,6 +91,11 @@ R3/R4 three-process repeat PASS на committed unchanged Git; intermediate
 GIT_MUTATION refusal сохранён, gate не обходился.
 Groups overlap, не суммируются. R1 paired и aged fresh-process proofs повторены
 после последнего implementation delta. Все12 source hashes совпадают с code.
+Direct semantic consumer:15 tests PASS без skips. Предыдущий Actions shard4
+выявил new alias headroom→OOM и overview16,457>16,384 bytes. Navigation config
+исправлен: VPS OOM→SEM-REMOTE-OPS-RECOVERY, overview16,368 bytes; gold queries/
+лимиты/engine сохранены. Lookup доступен через operator runbook. Runtime hashes
+не изменились; R1–R4 evidence остаётся применимым.
 Four isolated reviews повторяются на exact final content перед binding.
 
 WATCH без optimization:60-day root21,910 node files/19,434,842 bytes;

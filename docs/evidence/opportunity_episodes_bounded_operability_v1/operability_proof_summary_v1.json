@@ -225,6 +225,14 @@
     {
       "logical_ref": "local/episodes_operability/temporal_bound_vertical.log",
       "sha256": "01b09c75281f634c881f36ada045158bf0a5ab5c4a1229bbb25660d03d015849"
+    },
+    {
+      "logical_ref": "local/episodes_operability/previous_ci_shard4.log",
+      "sha256": "5ebe821ee46fd9d5947832d2106022fa32d14cfb4981dcde47f6655cadb318bc"
+    },
+    {
+      "logical_ref": "local/episodes_operability/final_semantic_consumer.log",
+      "sha256": "7607031acacd391d3799a7776818832b3dbe6ab3bf6c6c6c7e60e8be75ec16ad"
     }
   ],
   "code_sha256": {
@@ -3382,7 +3390,26 @@
     },
     "postreview_targeted": "PASS_76_TARGETED_NO_SKIPS_INCLUDE_FULL_CANARY_R2_PARTIAL_ROUND_PACING_CAPTURE_CUTOFF_OLD_GROUPS_OVERLAP",
     "final_delta_applicability": "Current paired/cold R1, full targeted76 and committed-Git three-process R3/R4 all match twelve runtime hashes. Intermediate GIT_MUTATION refusal retained; no machine gate bypass.",
-    "final_temporal_vertical": "PASS_THREE_PROCESSES_ONE_VERTICAL_TEST_NO_SKIPS_CURRENT_RUNTIME_COMMITTED_GIT_UNCHANGED"
+    "final_temporal_vertical": "PASS_THREE_PROCESSES_ONE_VERTICAL_TEST_NO_SKIPS_CURRENT_RUNTIME_COMMITTED_GIT_UNCHANGED",
+    "semantic_direct_consumer": {
+      "status": "PASS",
+      "tests": 15,
+      "skips": 0,
+      "old_run": 37399688402,
+      "old_run_head": "f5f155cb1c090eebbc677df1ade0be5f4d86ad16",
+      "before": {
+        "oom_top_route": "SEM-LIVE-COLLECTION",
+        "overview_bytes": 16457,
+        "limit_bytes": 16384
+      },
+      "after": {
+        "oom_top_route": "SEM-REMOTE-OPS-RECOVERY",
+        "overview_bytes": 16368,
+        "limit_bytes": 16384
+      },
+      "repair": "Remove incidental oom substring from new headroom alias; operator runbook is navigation hub for lookup; compact collection purpose. Existing gold queries, limits and search engine unchanged.",
+      "runtime_proof_applicability": "All12 runtime hashes unchanged; R1-R4/targeted76 current; no runtime/scientific/Forge projection implementation change"
+    }
   },
   "FACT": [
     "real public entry and real canonical filesystem/lease/publication owners",

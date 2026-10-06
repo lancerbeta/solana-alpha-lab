@@ -212,7 +212,7 @@ routes:
     related_route_ids: [SEM-AUTHORITY-BOUNDARIES, SEM-EXPERIMENT-CAPABILITIES]
 
   - semantic_route_id: SEM-LIVE-COLLECTION
-    purpose: Lifecycle collector operator entry and ObservationSchedule config root; runtime state requires gated readback.
+    purpose: Collector/episode runbooks; runtime needs gated readback.
     owner_questions:
       - Is lifecycle collection running / where do I inspect it?
       - How is lifecycle data collected?
@@ -235,7 +235,7 @@ routes:
       - запись collector
       - opportunity episodes cold tick
       - индекс ResearchStore
-      - episode intake and drain headroom
+      - episode intake drain reserve
     consumers: [GOAL-OWNER, FACTORY-001]
     root_binding_ids: [ACTIVE-LIFECYCLE-COLLECTOR]
     root_asset_ids: [CONFIG-OBSERVATION-SCHEDULE-RUNTIME-V1-001]
@@ -243,7 +243,7 @@ routes:
     status_plane: MIXED
     runtime_resolution:
       mode: EXTERNAL_GATED_READBACK
-      operator_asset_ids: [DOC-FACTORY-LIFECYCLE-COLLECTOR-001, DOC-OPPORTUNITY-EPISODES-OPERATOR-001, DOC-RESEARCH-WRITE-LOOKUP-V1-001]
+      operator_asset_ids: [DOC-FACTORY-LIFECYCLE-COLLECTOR-001, DOC-OPPORTUNITY-EPISODES-OPERATOR-001]
     forge_visibility: EXCLUDE
     related_route_ids: [SEM-LIVE-EVIDENCE-TO-FORGE, SEM-REMOTE-OPS-RECOVERY]
 
