@@ -2025,6 +2025,15 @@ def freeze_draft(
             )
 
             stamp_verified_v1_fields_onto_mapping(packet, forge_packet)
+        elif (
+            isinstance(forge_packet, Mapping)
+            and forge_packet.get("ladder_representation_id") == "NORMALIZED_TRAJECTORY_EPISODES_V1"
+            and isinstance(forge_packet.get("normalized_trajectory_episodes_v1"), Mapping)
+        ):
+            # The episode profile is context for the Critic: scope-bound, anonymous, prefix only.
+            packet["ladder_representation_id"] = "NORMALIZED_TRAJECTORY_EPISODES_V1"
+            packet["normalized_trajectory_episodes_v1"] = dict(forge_packet["normalized_trajectory_episodes_v1"])
+            packet["representation_payload_sha256"] = str(forge_packet.get("representation_payload_sha256") or "")
     owner_focus = str(draft.get("owner_focus") or "AUTO")
     epoch = ""
     focus_key = ""
@@ -5367,7 +5376,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
 
 
 _LADDER_REPRESENTATION_IDS = frozenset(
-    {"NORMALIZED_TRAJECTORY_V1", "SYNTHETIC_LATER_V2"}
+    {"NORMALIZED_TRAJECTORY_V1", "SYNTHETIC_LATER_V2", "NORMALIZED_TRAJECTORY_EPISODES_V1"}
 )
 
 

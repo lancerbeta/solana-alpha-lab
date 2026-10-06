@@ -146,14 +146,27 @@ def record_operation(
             raise OrdinaryOperationError("ORDINARY_OPERATION_STOPPED")
         if prior.get("journal_scope") != journal or prior.get("owner_focus") != focus:
             raise OrdinaryOperationError("ORDINARY_OPERATION_CONTINUATION_MISMATCH")
+    representation = request.get("representation")
+    if representation is not None:
+        # A later representation owns its own slot and journal; BASE stays untouched.
+        if (
+            not isinstance(representation, Mapping)
+            or set(representation)
+            != {"representation_id", "representation_semantic_version", "parent_session_id", "representation_payload_sha256", "scope_applied_sha256"}
+            or any(not isinstance(value, str) or not value for value in representation.values())
+            or len(str(representation["representation_payload_sha256"])) != 64
+            or len(str(representation["scope_applied_sha256"])) != 64
+        ):
+            raise OrdinaryOperationError("ORDINARY_OPERATION_REPRESENTATION_INVALID")
+        representation = {key: str(value) for key, value in representation.items()}
     slot = str(request.get("scientific_slot_sha256") or "")
     if len(slot) != 64:
         from solana_alpha_lab.factory.hfic_evidence_identity import scientific_slot_sha256
 
         slot = scientific_slot_sha256(
             market_evidence_epoch_sha256=market,
-            representation_id="BASE",
-            representation_semantic_version="HFIC-V1.2",
+            representation_id="BASE" if representation is None else representation["representation_id"],
+            representation_semantic_version="HFIC-V1.2" if representation is None else representation["representation_semantic_version"],
             owner_focus=focus,
         )
     identity_body = {
@@ -168,6 +181,8 @@ def record_operation(
         "requested_completion": completion,
         "parent_operation_sha256": parent,
     }
+    if representation is not None:
+        identity_body["representation"] = representation
     digest = _sha(identity_body)
     for existing in list_operations(store):
         if existing.get("operation_sha256") == digest:
@@ -470,6 +485,21 @@ def _assert_preflight_journal(
         memory or None,
         None,
     )
+    representation = operation.get("representation")
+    if isinstance(representation, Mapping):
+        from solana_alpha_lab.factory.normalized_trajectory_episodes_v1 import (
+            REPRESENTATION_ID,
+            representation_search_key,
+        )
+
+        if representation.get("representation_id") != REPRESENTATION_ID:
+            raise OrdinaryOperationError("ORDINARY_OPERATION_REPRESENTATION_INVALID")
+        expected = representation_search_key(
+            expected,
+            str(representation.get("parent_session_id") or ""),
+            str(representation.get("representation_payload_sha256") or ""),
+            str(representation.get("scope_applied_sha256") or ""),
+        )
     if journal_scope != expected:
         raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_NOT_CANONICAL")
 
@@ -607,8 +637,10 @@ def _admit(store: Any, operation: Mapping[str, Any], *, repo_root: Any = None, d
         sessions,
         market_evidence_epoch=str(operation.get("market_evidence_epoch_sha256") or ""),
         market_evidence_basis=market_basis,
-        representation_id="BASE",
-        representation_semantic_version="HFIC-V1.2",
+        representation_id=str((operation.get("representation") or {}).get("representation_id") or "BASE"),
+        representation_semantic_version=str(
+            (operation.get("representation") or {}).get("representation_semantic_version") or "HFIC-V1.2"
+        ),
         owner_focus=str(operation.get("owner_focus") or ""),
         auto_sessions_per_market=AUTO_SESSIONS_PER_EPOCH,
         max_distinct_focuses=MAX_DISTINCT_FOCUSES_PER_EPOCH,

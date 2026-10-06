@@ -32352,7 +32352,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: c93040a1b82513795f8bf65c124c5786d25782b38b1f10a5409fc81006949ec2}
+  integrity: {kind: sha256, sha256: 54fca1789ae075990c9669052478c4ee41bf4b947f2a601e10213b35a340e1f9}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32374,7 +32374,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 090992407608d60257358e137abb2a94f744c003149fcb50678d94051354ee00}
+  integrity: {kind: sha256, sha256: b33f2bb2e1652f8293f729eaa83ff6c8a28f8c3d7e86d98b9c232f3bb64258a5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -38377,7 +38377,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_INPUT_TRUTH_AND_VISIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/forge_input_receipt.py', repository_path: src/solana_alpha_lab/factory/forge_input_receipt.py}
-  integrity: {kind: sha256, sha256: c0cec737603708f660ebde2c4d81ee1552f28e84318f922767b14c0a61bf22a4}
+  integrity: {kind: sha256, sha256: 77733054a373555bfe1095a11d250f435acc9751f78c79c3cfbf01094afa4829}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001}
@@ -38396,7 +38396,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_INPUT_TRUTH_AND_VISIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/forge_input_receipt_v1.schema.json', repository_path: catalog/schemas/forge_input_receipt_v1.schema.json}
-  integrity: {kind: sha256, sha256: d892d3cc2ac60940af2870903448dffd65b8b6c8c0858761585157e5ce29c993}
+  integrity: {kind: sha256, sha256: ff7d73575223230550fa7aa9130d3903f4316af16fcb7fc8a4d7720e6a5f42a1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001}
@@ -38453,7 +38453,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_REPRESENTATION_LADDER_V1
   location: {kind: git_path, logical_uri: 'repo://configs/hfic_representation_ladder_v1.yaml', repository_path: configs/hfic_representation_ladder_v1.yaml}
-  integrity: {kind: sha256, sha256: 402d89a9235f6195a2e05727d041f185b5409fa1e53fa9364c611e97fbb1429e}
+  integrity: {kind: sha256, sha256: 165f3b7d48c5e89f54d25211e9f50188a62abb8237fca69478e98d2eafd4e8ce}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}
@@ -38471,7 +38471,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_REPRESENTATION_LADDER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_ladder.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_ladder.py}
-  integrity: {kind: sha256, sha256: 70430f5fd76b39aae56959b41eed106284efaf75a194f648a5d54dbd6875b83a}
+  integrity: {kind: sha256, sha256: aaba7ed4ca218e018a547b29f79ead1776f1d1fd7db51cbd2e0eb42c7945c045}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}

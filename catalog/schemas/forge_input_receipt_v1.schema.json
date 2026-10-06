@@ -125,7 +125,9 @@
         "required": ["representation_id", "status"],
         "properties": {
           "representation_id": {"type": "string"},
-          "status": {"type": "string"}
+          "status": {"type": "string"},
+          "reason_code": {"type": "string"},
+          "scope_binding": {"type": "string"}
         }
       }
     },

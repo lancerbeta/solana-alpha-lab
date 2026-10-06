@@ -226,7 +226,12 @@
     },
     "ladder_representation_id": {
       "type": "string",
-      "enum": ["NORMALIZED_TRAJECTORY_V1"]
+      "enum": ["NORMALIZED_TRAJECTORY_V1", "NORMALIZED_TRAJECTORY_EPISODES_V1"]
+    },
+    "normalized_trajectory_episodes_v1": {
+      "type": "object",
+      "description": "Optional scope-bound episode prefix profile (anonymous motif counts, no target); CONTEXT_ONLY for Critic.",
+      "additionalProperties": true
     },
     "market_evidence_epoch_sha256": {
       "type": "string",

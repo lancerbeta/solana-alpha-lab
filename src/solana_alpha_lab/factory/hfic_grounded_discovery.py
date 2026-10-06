@@ -2224,6 +2224,8 @@ def resolve_research_scope(
         return resolved
     except scope_owner.ResearchScopeError as exc:
         raise GroundedDiscoveryError(exc.code) from exc
+    except GroundedDiscoveryError:
+        raise
     except (OSError, ValueError, KeyError) as exc:
         raise GroundedDiscoveryError("RESEARCH_SCOPE_EVIDENCE_UNREADABLE") from exc
 

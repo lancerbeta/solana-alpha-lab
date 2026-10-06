@@ -72,15 +72,19 @@ def market_row(mint: str, now: datetime, start: datetime, signal: bool, target: 
     from tests.test_opportunity_episodes_harness_v1 import token_object
 
     offset = (now - start).total_seconds()
-    if offset < 1500:
+    liquidity = 12000
+    if offset < 1100:  # E300 sample
         price, holders = 1.0, 60
-    elif offset < 10000:
+    elif offset < 1500:  # E900 sample
+        price, holders = (0.99, 68) if signal else (1.01, 57)
+    elif offset < 10000:  # E1800 sample: the decision price is 1.0 for everyone
         price, holders = 1.0, (75 if signal else 55)
+        liquidity = 13000 if signal else 12000
     else:
         if target is None:
             return None  # the mint vanishes before the exit: a gap, never a zero
         price, holders = 1.0 + target, 80
-    return token_object(mint, price=price, liquidity=12000, holders=holders)
+    return token_object(mint, price=price, liquidity=liquidity, holders=holders)
 
 
 def build_market():
@@ -113,7 +117,7 @@ def tick_times() -> list[datetime]:
     times: set[datetime] = set()
     for _cohort, _label, start, _spec in rounds():
         times.add(start + timedelta(seconds=5))
-        for offset in (300, 1800, 14400):
+        for offset in (300, 900, 1800, 14400):
             times.add(start + timedelta(seconds=offset + 300 + 5))
     cursor = DAY_A + timedelta(hours=12, seconds=5)
     while cursor < END:
@@ -124,6 +128,23 @@ def tick_times() -> list[datetime]:
 
 
 def capture(work: Path) -> tuple[Path, list[str]]:
+    """Capture through production owners; LAV_CACHE_DIR reuses a previous capture (local iteration only)."""
+
+    import os
+    import shutil
+
+    cache = os.environ.get("LAV_CACHE_DIR")
+    if cache and (Path(cache) / "capture").is_dir():
+        shutil.copytree(Path(cache) / "capture", work / "capture")
+        packets = sorted(str(item) for item in (work / "capture").glob("packet-*.json"))
+        return work / "capture" / "rdp", packets
+    result = _capture_fresh(work)
+    if cache:
+        shutil.copytree(work / "capture", Path(cache) / "capture", dirs_exist_ok=True)
+    return result
+
+
+def _capture_fresh(work: Path) -> tuple[Path, list[str]]:
     from solana_alpha_lab.factory.live_cohort_vanilla_path import capture_freeze_export
     from tests.test_opportunity_episodes_harness_v1 import (
         build_schedule,
@@ -454,6 +475,149 @@ class ListAwareVerticalTests(unittest.TestCase):
             _require_recipe_preserves_research_scope(scoped_view, {"parameters": {"temporal_recipe": {k: v for k, v in recipe.items() if k != "research_scope_rule_sha256"}}})
         with self.assertRaises(HficSessionError):
             _require_recipe_preserves_research_scope({"critic_input_packet": {"selected_candidate": {}}}, {"parameters": {"temporal_recipe": recipe}})
+
+    def test_d_episode_profile_through_the_dispatcher_and_ordinary_lifecycle(self) -> None:
+        """D13: a real episode profile, scope-bound, through ladder -> freeze -> Critic, no CONTROL."""
+
+        from solana_alpha_lab.factory import hfic_temporal_discovery as temporal
+        from tests.test_hfic_cli import bind_draft, critic_result_from_packet_only, run_cli
+        from tests.test_hfic_ordinary_operation_acceptance_v1 import _operation
+
+        # The legacy newborn representation is explicitly unsupported for episodes (no fake CONTROL).
+        control = run_cli("preflight", "--control-current-representation", "--collection", "OPPORTUNITY_EPISODES", "--owner-focus", "LAV_CTRL", "--format", "json", data_root=self.plane)
+        self.assertNotEqual(control.returncode, 0)
+        self.assertIn("CONTROL_COLLECTION_UNSUPPORTED", control.stdout + control.stderr)
+        forge_input = _forge_call("forge-input", "--collection", "OPPORTUNITY_EPISODES", "--owner-focus", "LAV_NW", data_root=self.plane)
+        reps = {item["representation_id"]: item for item in forge_input["representations"]}
+        self.assertEqual(reps["NORMALIZED_TRAJECTORY_V1"]["status"], "UNSUPPORTED_POPULATION")
+        self.assertEqual(reps["NORMALIZED_TRAJECTORY_EPISODES_V1"]["status"], "READY")
+
+        # BASE finishes NO_WORTHY with a real scoped look as its evidence.
+        base = self._run("nw", draft("LIST_CONTRAST", list_condition=AC), focus="LAV_NW")
+        self.assertEqual(base["_exit_code"], 0, base)
+        pre = base["_preflight"]
+        template = json.loads((ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1_2.json").read_text(encoding="utf-8"))
+        template["candidates"] = []
+        for key in ("runner_up_candidate_ref", "strongest_rejected_alternative", "selected_candidate_ref"):
+            template.pop(key, None)
+        fresh = _forge_call("preflight", "--discovery-contract", "--owner-focus", pre["owner_focus"], data_root=self.plane)
+        base_draft = bind_draft({**template, "owner_focus": pre["owner_focus"]}, fresh)
+        base_draft["grounded_evidence"] = base
+        draft_path, receipt_path = self.work / "nw-draft.json", self.work / "nw-receipt.json"
+        draft_path.write_text(json.dumps(base_draft), encoding="utf-8")
+        receipt_path.write_text(json.dumps(fresh), encoding="utf-8")
+        _forge_call("persist-draft", "--draft", str(draft_path), "--preflight-receipt", str(receipt_path), "--representation-id", "BASE", data_root=self.plane)
+        resume = _forge_call("preflight", "--discovery-contract", "--owner-focus", pre["owner_focus"], data_root=self.plane)
+        receipt_path.write_text(json.dumps(resume), encoding="utf-8")
+        frozen_base = _forge_call("freeze", "--draft", str(draft_path), "--preflight-receipt", str(receipt_path), data_root=self.plane)
+
+        # The existing dispatcher now routes episodes to the episode profile, never to legacy NT.
+        run = _forge_call("forge-run", "--owner-focus", pre["owner_focus"], "--no-write", data_root=self.plane)
+        self.assertIn(run["next_action"], {"START_NORMALIZED_TRAJECTORY_EPISODES_V1", "RESUME_NORMALIZED_TRAJECTORY_EPISODES_V1"})
+        self.assertEqual(run["frozen_representation_ids"], ["BASE", "NORMALIZED_TRAJECTORY_EPISODES_V1"])
+
+        # The view: literal motifs from real episode points, scope applied before aggregation.
+        spec_path = self.work / "view-spec.json"
+        spec_path.write_text(json.dumps(draft("LIST_CONTRAST", list_condition=AC)), encoding="utf-8")
+        view = _forge_call("episode-normalized-view", "--spec", str(spec_path), "--parent-session-id", frozen_base["session_id"], data_root=self.plane)
+        payload = view["representation_payload"]
+        panels = {name: {item["motif"]: item["n"] for item in panel["motifs"]} for name, panel in payload["panels"].items()}
+        du, ud = "P:DU|L:FU|H:UU", "P:UD|L:FF|H:DD"
+        self.assertEqual(panels["BASE"], {du: 5, ud: 2})
+        self.assertEqual(panels["SIGNAL"], {du: 1, ud: 1})  # A and C = e7 (motif DU) and e5 (motif UD)
+        self.assertEqual(panels["COMPARATOR"], {du: 4, ud: 1})
+        self.assertEqual(payload["scope_counts"]["admitted_in_scope_n"], 7)
+        self.assertFalse(view["target_values_loaded"])
+        text = json.dumps(view)
+        self.assertNotIn(mint_of("e7"), text)
+        ladder = view["ladder_freeze_preflight"]
+        self.assertEqual(ladder["ladder_representation_id"], "NORMALIZED_TRAJECTORY_EPISODES_V1")
+        self.assertEqual(ladder["control_session_id"], frozen_base["session_id"])
+
+        # Same ordinary lifecycle: its own slot/journal, a scoped look, freeze, Critic, finalize.
+        canonical = self._resolve("ep", draft("LIST_CONTRAST", list_condition=AC))["canonical_query"]
+        scope = {
+            "population": "OPPORTUNITY_EPISODES",
+            "decision_timestamp": "E1800",
+            "target": temporal.temporal_target_label(canonical),
+            "estimand": "price_relative_proxy",
+            "explanatory_condition": canonical["hypothesis_kind"],
+            "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+        }
+        operation = _operation(
+            canonical,
+            focus=ladder["owner_focus"],
+            journal=ladder["search_key_sha256"],
+            market=ladder["market_evidence_epoch_sha256"],
+            text="episode profile stage",
+            cap={"main": 1, "adaptive": 0, "preview": 0},
+            completion="LIMITED_RESULT",
+        )
+        operation["representation"] = {
+            "representation_id": "NORMALIZED_TRAJECTORY_EPISODES_V1",
+            "representation_semantic_version": "1.0",
+            "parent_session_id": frozen_base["session_id"],
+            "representation_payload_sha256": payload["representation_payload_sha256"],
+            "scope_applied_sha256": payload["scope_applied_sha256"],
+        }
+        evidence = _discovery(self.plane, self.work, tag="epstage", spec=canonical, scope=scope, operation=operation)
+        self.assertEqual(evidence["_exit_code"], 0, evidence)
+        # A foreign journal is refused: the stage cannot borrow BASE's budget or key.
+        foreign = dict(operation, journal_scope=pre["search_key_sha256"])
+        refused = _discovery(self.plane, self.work, tag="epforeign", spec=canonical, scope=scope, operation=foreign)
+        self.assertNotEqual(refused["_exit_code"], 0)
+
+        identity = temporal.temporal_holder_claim_identity(evidence["result"])
+        card_template = json.loads((ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(encoding="utf-8"))
+        card = {
+            **card_template["candidates"][0],
+            **scope,
+            **identity,
+            "label": "LAV_EP_PROFILE",
+            "claim_form": "PREDICTIVE",
+            "novelty_class": "NEW_MEASUREMENT",
+            "claim": "A shared prefix motif of price, liquidity and holders may accompany a later E14400 proxy difference for the listed-in-both group; synthetic acceptance only.",
+            "mechanism": "Co-moving participation and liquidity after a price dip may precede drift; confounders remain and causality is UNKNOWN.",
+            "mundane_alternative": "Activity alone produces the same motif.",
+            "actor_counterparty": "Participants around ranked tokens; no causal identification.",
+            "state_transition": "prefix motif at E1800 -> fixed E14400 mark",
+            "proposed_method": "One frozen list-scoped recipe; the motif only guides which scope to test.",
+            "negative_control": "Eligible complement of the same decision base.",
+            "confounders": ["activity"],
+            "required_capability_ids": [temporal.TEMPORAL_CAPABILITY_ID],
+            "required_feature_ids": [],
+            "primary_x_family": identity["research_scope_statement"],
+            "primary_y": "PRICE_RELATIVE_PROXY E1800 -> E14400",
+            "horizon_notional": "E1800 -> E14400; PRICE_RELATIVE_PROXY; no executable notional",
+            "cheapest_falsifier": "One frozen contrast against the eligible complement.",
+            "disconfirming_prediction": "No supported contrast.",
+            "decision_unlocked": "Whether to authorise a separate validation; none is granted.",
+            "kill_if": ["PIT lineage fails"],
+            "prior_work_refs": [],
+            "material_difference_from_prior": "Episode profile stage.",
+            "unresolved_requirements": [],
+        }
+        stage_draft = bind_draft({**card_template, "owner_focus": ladder["owner_focus"], "candidates": [card]}, ladder)
+        stage_draft.pop("runner_up_candidate_ref", None)
+        stage_draft.pop("strongest_rejected_alternative", None)
+        stage_draft["selected_candidate_ref"] = card["label"]
+        stage_draft["grounded_evidence"] = evidence
+        sd, sr = self.work / "ep-draft.json", self.work / "ep-receipt.json"
+        sd.write_text(json.dumps(stage_draft), encoding="utf-8")
+        sr.write_text(json.dumps(ladder), encoding="utf-8")
+        _forge_call("persist-draft", "--draft", str(sd), "--preflight-receipt", str(sr), "--representation-id", "NORMALIZED_TRAJECTORY_EPISODES_V1", data_root=self.plane)
+        frozen = _forge_call("freeze", "--draft", str(sd), "--preflight-receipt", str(sr), data_root=self.plane)
+        packet = frozen["critic_input_packet"]
+        self.assertEqual(packet["ladder_representation_id"], "NORMALIZED_TRAJECTORY_EPISODES_V1")
+        self.assertEqual(packet["normalized_trajectory_episodes_v1"]["research_scope_rule_sha256"], identity["research_scope_rule_sha256"])
+        self.assertEqual(packet["selected_candidate"]["research_scope_rule_sha256"], identity["research_scope_rule_sha256"])
+        critic = critic_result_from_packet_only(packet, terminal="KILL_STATISTICALLY_UNIDENTIFIABLE")
+        critic["non_claims"].append("SCRIPTED_CRITIC_MECHANICAL")
+        critic_path = self.work / "ep-critic.json"
+        critic_path.write_text(json.dumps(critic), encoding="utf-8")
+        finished = _forge_call("finalize", "--session-id", frozen["session_id"], "--critic-result", str(critic_path), data_root=self.plane)
+        self.assertEqual(finished["session_state"], "SYNTHESIS_COMPLETE")
+        _forge_call("forge-run", "--owner-focus", ladder["owner_focus"], "--persist", data_root=self.plane)
 
     def test_z_next_period_same_rule_new_memberships(self) -> None:
         # D21: the next weekly cycle, same rule, new memberships; e1 does not inherit A.
