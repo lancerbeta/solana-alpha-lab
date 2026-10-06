@@ -4,8 +4,10 @@ VERDICT: PARTIAL_WITH_EXACT_GATE. Local R1–R4 и owner patch PASS; live commis
 NOT_RUN. Base/current observed main: 576e8c54715bb8af6b84877b91678ae659a42f88.
 Owner review PR377 head01f22cb4865ea27677e1ccddc8796a0ad70b4d08:
 PATCH_BEFORE_MERGE, P0 none. P1-A/P1-B/P2 закрываются в том же atom.
-Exact delivered bytes задают harness bindings. Raw receipts/commissioning packet
-вне Git; logical refs/hashes в operability_proof_summary_v1.json.
+Exact delivered bytes задают harness bindings. Raw proof receipts вне Git;
+их logical refs/hashes и reproduce recipes — в operability_proof_summary_v1.json.
+Commissioning packet: local/episodes_operability/commissioning_packet_v1.json;
+final head/hash фиксирует local commissioning_packet_receipt_v1.json, без hash cycle.
 
 P1-A: isolated-copy preparation supported; filesystem-bound lookup не переносится
 на production. Explicit --production-commissioning готовит canonical root in place
@@ -54,7 +56,7 @@ publisher/lease/filesystem. При0/32/128 valid distinct retired transactions:
 Current paired fresh-process normal work:7 partitions/81,950 bytes при всех
 размерах, inventory0. Дополнительные490 bytes — commissioning metadata binding.
 На864/6048/25920/51840 transactions12 fresh normal/restart/status процессов:
-fixed80m due tail6 partitions/73,318 bytes, wall0.60–0.65s, RSS<90MB, inventory0.
+fixed80m due tail6 partitions/73,318 bytes, wall0.60–0.72s, RSS<90MB, inventory0.
 Cutoff60m имеет дополнительный lifecycle append и измерен отдельно от fixed work.
 Pre-upgrade local fixtures получают synthetic binding через public OPS owner;
 production migration не заявлена. Setup/preparation вне timing; warm cache не proof.
@@ -73,6 +75,11 @@ saved readback без write, numerical replay equality, duplicate import и type
 corrupt/missing refusals. New archive24,743,915 bytes, SHA
 4e92bfbda95bd6fee48358b3597af01b80816f90f508a3239d6030c212d3b32c.
 Windows process proof не устанавливает Linux unit/power-loss acceptance.
+Lookup reprepare на target root не перепривязывает immutable envelope старой
+activation. Changed root identity блокирует intake; canonical recovery/tail —
+отдельный OPERATE/repair gate с target-volume headroom до COMPLETE/backlog0.
+Новый envelope — новая supported activation/cohort boundary, без intraday fragments.
+R4 не доказывает ACTIVE producer restart на root с изменённой identity.
 
 Validation:73 targeted tests PASS без skips (lookup/lifecycle/producer/operability);
 4 retained boundary/canary/R2 tests PASS; full three-process vertical1 PASS.

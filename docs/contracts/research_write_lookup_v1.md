@@ -80,8 +80,13 @@ Pending before manifest: a fenced writer verifies the unchanged source stamp
 and restores the prior root. Pending after durable published stamp: it verifies
 the exact canonical partition and installs the next root. A crash between
 manifest and stamp is `WRITE_LOOKUP_PENDING_RECONCILIATION_REQUIRED`, with all
-canonical bytes readable. It requires explicit full audit/repreparation on a
-copy; no guess, hidden scan, retry/provider send or false absence occurs.
+canonical bytes readable. Preserve those bytes and first verify a measured copy.
+Returning the canonical writer requires explicit in-place full audit/repreparation
+with `--production-commissioning`, separate OPERATE authority, verified backup,
+measured copy rehearsal and quiesced writers/timer, under both existing fences.
+A copy-prepared lookup cannot transfer to production. Repreparation repairs only
+the lookup; it does not rebind an immutable activation storage envelope. No guess,
+hidden scan, retry/provider send or false absence occurs.
 Missing/stale/corrupt prepared state, nodes or pointer shapes refuse with typed
 `WRITE_LOOKUP_*` errors. Absence of the entire artifact means uncommissioned
 legacy mode with the original full verification cost.

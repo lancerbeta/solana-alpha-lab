@@ -193,8 +193,15 @@ runtime never substitutes 8MiB times six copies. Unsafe/unknown LOCAL free space
 commits stop-intake and DRAINING while preserving the committed tail. A missing or
 invalid local binding refuses new intake with `PRODUCER_LOCAL_ENVELOPE_REQUIRED`
 and preserves lifecycle; it does not turn an unbound MODEL into permanent DRAINING.
-The bound envelope cannot be changed retrospectively. Restore/moved root requires
-explicit commissioning again, with no automatic cap or sampling reductions.
+The bound envelope cannot be changed retrospectively. Lookup reprepare after
+restore/move does not rebind an existing activation. Changed root identity refuses
+its new intake; a changed envelope returns EPISODE_STORAGE_REPLAY_CONFLICT.
+Preserve original IDs/envelope/ledger/canonical evidence. Any canonical recovery
+or continued tail needs a separate OPERATE/repair gate and verified target-volume
+headroom; authorized stop-intake/drain ends at COMPLETE/unpublished_backlog=0.
+A new envelope belongs to a new activation on an approved supported profile/UTC
+cohort boundary, without intraday fragments or automatic cap/sampling reductions.
+R4 detached read/replay/import is not ACTIVE producer restart acceptance.
 
 Metadata readback distinguishes intake, frames, episodes, attempted/no-request/
 ambiguous execution, missing values, publication backlog and next maturity.

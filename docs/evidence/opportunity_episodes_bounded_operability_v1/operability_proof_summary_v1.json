@@ -3328,7 +3328,8 @@
       "no_local_full_gate": "PROJECT_PRIMARY_OR_FALLBACK_RESERVED_FOR_GUARDED_MERGE",
       "applicability": "Full R3-R4 repeated after commissioning/local-control/count changes; its first producer process precedes only the final identical-schema no-cast fix. Final 67 owner tests and the 48-episode late-tail pressure proof cover that fix; no scientific value/schema/coercion policy changed."
     },
-    "postreview_targeted": "PASS_73_NO_SKIPS_PLUS4_RETAINED_REHEARSALS_PLUS1_THREE_PROCESS_VERTICAL_GROUPS_OVERLAP"
+    "postreview_targeted": "PASS_73_NO_SKIPS_PLUS4_RETAINED_REHEARSALS_PLUS1_THREE_PROCESS_VERTICAL_GROUPS_OVERLAP",
+    "final_delta_applicability": "Current postreview R2/R3/R4 and paired/aged R1 run all match the twelve runtime hashes; later delta changes documentation only. Older counters/receipts retained as historical snapshots; overlapping groups are not summed."
   },
   "FACT": [
     "real public entry and real canonical filesystem/lease/publication owners",
@@ -3645,5 +3646,50 @@
         "log_ref": "local/episodes_operability/postreview_targeted.log"
       }
     }
+  },
+  "reproduce": [
+    {
+      "scope": "R1 frozen-base falsifier",
+      "runtime_base": "576e8c54715bb8af6b84877b91678ae659a42f88",
+      "prerequisite": "Isolated frozen-base checkout; candidate proof script and test harness only as explicit fixture scaffolding, never candidate runtime. Fresh nonexisting local proof root. No production data or provider access.",
+      "command": "uv run --locked --managed-python python -B scripts/prove_opportunity_episode_operability.py --root <fresh-frozen-proof-root> --counts 0,32,128 --payload-size 4096",
+      "raw_ref": "local/episodes_operability/frozen_base_v4/report.json"
+    },
+    {
+      "scope": "R1 current real CLI/fresh-process active paired + materialized aged history",
+      "prerequisite": "Exact candidate runtime; fresh nonexisting local roots; setup/preparation separately timed. Calendar ages are cadence MODEL.",
+      "commands": [
+        "uv run --locked --managed-python python -B scripts/prove_opportunity_episode_operability.py --root <fresh-paired-root> --counts 0,32,128 --payload-size 4096 --prepared --enforce-limits",
+        "uv run --locked --managed-python python -B scripts/prove_opportunity_episode_operability.py --root <fresh-aged-root> --counts 864,6048,25920,51840 --payload-size 4096 --prepared --enforce-limits"
+      ],
+      "existing_80m_receipt": "local/episodes_operability/owner_patch_cold_postreview_report.json",
+      "80m_note": "Existing preserved roots have processed 80m already: replay cannot reproduce new normal work. Fresh active-aged command reproduces bounded-work invariants; 80m raw receipt remains immutable measured evidence."
+    },
+    {
+      "scope": "R2 + canary storage pressure + round boundary + legacy option refusal",
+      "environment": {
+        "OEP_OPERABILITY_WORK": "<fresh-retained-local-proof-root>"
+      },
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_opportunity_episodes_operability_v1.EpisodeOperabilityTests.test_canary_24_per_day_48h_local_envelope_survives_model_proxy_and_unsafe_drains tests.test_opportunity_episodes_operability_v1.EpisodeOperabilityTests.test_mixed_boundary_degradation_budget_restart_and_drain tests.test_opportunity_episodes_operability_v1.EpisodeOperabilityTests.test_pacing_round_boundary_reserves_the_actual_nomination_round tests.test_opportunity_episodes_operability_v1.EpisodeOperabilityTests.test_legacy_episode_storage_option_refuses_before_any_activation_write -v",
+      "authority": "SYNTHETIC_LOCAL_ONLY"
+    },
+    {
+      "scope": "R3 + R4 full three-process capture/import/native Forge/backup/detached replay",
+      "environment": {
+        "OEP_VERTICAL_WORK": "<fresh-retained-local-proof-root>"
+      },
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_opportunity_episodes_vertical_v1.ThreeProcessVerticalTests.test_producer_to_ordinary_forge_to_cold_replay -v",
+      "authority": "SYNTHETIC_ORDINARY_OWNERS_NO_REAL_SCIENTIFIC_LOOK"
+    },
+    {
+      "scope": "Targeted adversarial/recovery tests",
+      "command": "uv run --locked --managed-python python -B -m unittest tests.test_opportunity_episodes_operability_v1 tests.test_research_write_lookup tests.test_observation_schedule_lifecycle tests.test_opportunity_episodes_producer_v1 -v"
+    }
+  ],
+  "local_artifacts": {
+    "commissioning_packet": "local/episodes_operability/commissioning_packet_v1.json",
+    "packet_hash_owner": "local/episodes_operability/commissioning_packet_receipt_v1.json",
+    "hash_direction": "Packet binds proof-summary; separate final local receipt binds packet/head/context. No packet self-reference or Git cycle.",
+    "status": "PREPARED_WITH_EXACT_GATES_NOT_READY_TO_RUN"
   }
 }

@@ -195,8 +195,19 @@ Offline recipe: сохраните этот фрагмент локально, �
 activation ID и новый output JSON вне data root. Он читает только stat указанного root
 и локальный JSON; записывает новый локальный файл, не открывает OPS или provider.
 Root identity и self-hash вычисляются здесь; остальные поля уже должны быть утверждены.
-После restore/move нельзя переносить старый envelope: нужен explicit reprepare и новый
-commissioning binding для target root, с прежними prerequisites и отдельной authority.
+После restore/move lookup требует explicit target-root reprepare с прежними
+prerequisites и отдельной OPERATE authority. Это восстанавливает lookup, а не
+перепривязывает storage envelope существующей activation. При изменившейся root
+identity её intake остаётся закрыт для новых nominations; changed envelope получает
+`EPISODE_STORAGE_REPLAY_CONFLICT`. Сохранить original IDs, frozen envelope, ledger и
+canonical evidence; не повторять activate и не править OPS вручную.
+
+Canonical recovery/продолжение committed tail требует отдельного OPERATE/repair gate
+с проверенным запасом на target volume. Если оно разрешено, штатно закрыть intake
+через stop-intake и довести существующий tail до COMPLETE/unpublished_backlog=0.
+Новый envelope относится к новой activation на отдельно утверждённой поддерживаемой
+profile/UTC cohort boundary; не создавать intraday fragments. R4 доказывает detached
+read/replay/import, а не возобновление ACTIVE intake на root с изменённой identity.
 
 ```text
 uv run --locked --managed-python python -B <local-preflight.py> <absolute-canonical-root> <approved-body.json> <exact-schedule-sha256> <activation-id> <new-output-json-outside-data-root>
