@@ -56,12 +56,17 @@ from solana_alpha_lab.factory.observation_schedule_store import (
     ObservationScheduleStoreError,
 )
 from solana_alpha_lab.factory.opportunity_episodes import (
+    FRAME_PASS,
     NOMINATION_PRIMITIVE,
+    ROUND_RECOVERY_VERSION,
     SEARCH_PRIMITIVE,
     WITNESS_POINT,
+    RoundRecoveryError,
     admission_content_sha256,
     admission_record,
     build_frame,
+    build_round_recovery_plan,
+    classify_round_recovery,
     collection_lineage_id,
     cohort_id_for_admission,
     cycle_start,
@@ -76,6 +81,7 @@ from solana_alpha_lab.factory.opportunity_episodes import (
     round_start,
     schedule_binding,
     select_admissions,
+    verify_round_recovery_plan,
     witness_age_ok,
 )
 from solana_alpha_lab.factory.raw_evidence_plane import (
@@ -460,6 +466,7 @@ class _EpisodeTick:
             "slots_terminalized": {},
             "admissions": [],
             "round": None,
+            "round_recoveries": [],
             "publications": [],
             "stop_reason": None,
         }
@@ -847,8 +854,18 @@ class _EpisodeTick:
                     frame={"round_id": rid, "terminal": "MISSED_NO_REQUEST"},
                     clock=now,
                 )
-            self.report["round"] = {"round_id": rid, "state": "MISSED_NO_REQUEST"}
+                self.report["round"] = {"round_id": rid, "state": "MISSED_NO_REQUEST"}
+            else:
+                self._reconcile_round(existing)
             return
+        resume_plan: Mapping[str, Any] | None = None
+        if existing is not None:
+            # Inside slack a durable plan is followed, never recomputed; invalid
+            # durable evidence is refused here, before any call or admission.
+            verdict, resume_plan = self._classify_round(existing)
+            if verdict["outcome"] == "REFUSED":
+                self._terminalize_round(existing, verdict, resume_plan)
+                return
         if existing is None:
             self.store.record_episode_round(
                 round_id=rid,
@@ -913,6 +930,15 @@ class _EpisodeTick:
             inventory=inventory,
         )
         receipt = frame_receipt(frame)
+        if resume_plan is not None and (
+            not frame.get("complete")
+            or str(receipt["frame_sha256"]) != str(resume_plan["frame_sha256"])
+            or str(frame["protection_fingerprint"]) != str(resume_plan["protection_fingerprint"])
+        ):
+            assert existing is not None
+            verdict, resume_plan = self._classify_round(existing, force_reason="ROUND_PLAN_FRAME_IDENTITY_MISMATCH")
+            self._terminalize_round(existing, verdict, resume_plan)
+            return
         if not frame.get("complete"):
             self.store.record_episode_round(
                 round_id=rid,
@@ -927,33 +953,78 @@ class _EpisodeTick:
             self.report["round"] = {"round_id": rid, "state": "INCOMPLETE", "frame_sha256": receipt["frame_sha256"]}
             return
         sampling = self.schedule["sampling"]
-        commit_now = self.provider_ctx.now()
-        quota_state = admission_quota(
-            self.store,
-            lineage_id=self.lineage,
-            sampling=sampling,
-            round_started_at=started,
-            round_period_seconds=int(nomination["round_period_seconds"]),
-            round_id_value=rid,
-            now=commit_now,
-        )
-        quota = quota_state["quota"] if commit_now < parse_utc(str(self.activation["stops_admitting_at"])) else 0
-        day_used = quota_state["day_used"]
-        rolling_used = quota_state["rolling_used"]
-        active = quota_state["active"]
-        committed_in_round = quota_state["committed_in_round"]
         cycle = cycle_start(started)
-        blocked = self.store.episode_blocked_mints(lineage_id=self.lineage, cycle_start=render_utc(cycle), now=commit_now)
-        selection = select_admissions(
-            frame=frame,
-            seed=str(sampling["seed"]),
-            cycle=cycle,
-            quota=quota,
-            blocked_mints=blocked,
-        )
+        if resume_plan is not None:
+            plan = dict(resume_plan)
+            by_mint = {str(item["mint"]): item for item in frame["candidates"]}
+            if any(
+                str(item["mint"]) not in by_mint or by_mint[str(item["mint"])].get("status") != FRAME_PASS
+                for item in plan["winners"]
+            ):
+                assert existing is not None
+                verdict, plan = self._classify_round(existing, force_reason="ROUND_PLAN_FRAME_IDENTITY_MISMATCH")
+                self._terminalize_round(existing, verdict, plan)
+                return
+            selection = {
+                "quota": int(plan["basis"]["quota"]),
+                "eligible_pending": int(plan["basis"]["eligible_pending"]),
+                "winners": [
+                    {"mint": item["mint"], "ticket_priority": item["ticket_priority"], "candidate": by_mint[str(item["mint"])]}
+                    for item in plan["winners"]
+                ],
+                "not_selected": list(plan["not_selected"]),
+            }
+        else:
+            commit_now = self.provider_ctx.now()
+            quota_state = admission_quota(
+                self.store,
+                lineage_id=self.lineage,
+                sampling=sampling,
+                round_started_at=started,
+                round_period_seconds=int(nomination["round_period_seconds"]),
+                round_id_value=rid,
+                now=commit_now,
+            )
+            quota = quota_state["quota"] if commit_now < parse_utc(str(self.activation["stops_admitting_at"])) else 0
+            blocked = self.store.episode_blocked_mints(lineage_id=self.lineage, cycle_start=render_utc(cycle), now=commit_now)
+            selection = select_admissions(
+                frame=frame,
+                seed=str(sampling["seed"]),
+                cycle=cycle,
+                quota=quota,
+                blocked_mints=blocked,
+            )
+            plan = build_round_recovery_plan(
+                round_id_value=rid,
+                activation_id=self.activation_id,
+                lineage_id=self.lineage,
+                cycle=cycle,
+                receipt=receipt,
+                selection=selection,
+                basis={key: quota_state[key] for key in ("round_quota", "day_used", "rolling_used", "active", "committed_in_round")},
+                blocked_mints=blocked,
+            )
+            # The selection is durable before the first admission: a crash can
+            # never let timing choose which winners were admitted.
+            self.store.record_episode_round(
+                round_id=rid,
+                schedule_sha256=self.digest,
+                activation_id=self.activation_id,
+                lineage_id=self.lineage,
+                round_started_at=render_utc(started),
+                state="STARTED",
+                frame={"round_id": rid, "recovery_plan": plan},
+                clock=self.provider_ctx.now(),
+            )
+        basis = plan["basis"]
+        committed_before = {
+            str(item["episode_id"]) for item in self.store.list_episode_admissions_in_round(rid)
+        }
         admitted: list[str] = []
         witness_stale: list[str] = []
-        for winner in selection["winners"]:
+        for winner, planned in zip(selection["winners"], plan["winners"], strict=True):
+            if str(planned["episode_id"]) in committed_before:
+                continue
             # Finish the witness dependency before the admission owner samples T0.
             winner["candidate"] = {
                 **winner["candidate"],
@@ -992,10 +1063,16 @@ class _EpisodeTick:
                 "not_selected": selection["not_selected"],
                 "witness_stale": witness_stale,
                 "admitted_episode_ids": admitted,
-                "day_used_before": day_used,
-                "rolling_used_before": rolling_used,
-                "active_before": active,
-                "committed_in_round_before": committed_in_round,
+                "day_used_before": basis["day_used"],
+                "rolling_used_before": basis["rolling_used"],
+                "active_before": basis["active"],
+                "committed_in_round_before": len(committed_before),
+            },
+            "recovery": {
+                "recovery_version": ROUND_RECOVERY_VERSION,
+                "plan_sha256": plan["plan_sha256"],
+                "planned_episode_ids": [str(item["episode_id"]) for item in plan["winners"]],
+                "resumed": resume_plan is not None,
             },
         }
         self.store.record_episode_round(
@@ -1016,6 +1093,140 @@ class _EpisodeTick:
             "admitted": len(admitted),
         }
         self.report["admissions"].extend(admitted)
+
+    # ------------------------------------------------------------------
+    # Round crash recovery: durable evidence only, no calls, no admissions.
+
+    def _plan_call_evidence_present(self, plan: Mapping[str, Any]) -> bool:
+        for source in plan["frame_receipt"]["sources"]:
+            occurrence = source.get("call_occurrence_id")
+            if not occurrence or self.store.call_state(str(occurrence)) != "COMPLETED":
+                return False
+            payload = self.store.call_payload(str(occurrence)) or {}
+            if source.get("response_sha256") and payload.get("response_sha256") != source.get("response_sha256"):
+                return False
+        return True
+
+    def _classify_round(
+        self, row: Mapping[str, Any], *, force_reason: str | None = None
+    ) -> tuple[dict[str, Any], Mapping[str, Any] | None]:
+        """Classify an unresolved round; returns (verdict, verified plan or None)."""
+
+        rid = str(row["round_id"])
+        cycle = cycle_start(parse_utc(str(row["round_started_at"])))
+        frame_state = row["frame"]
+        committed = self.store.list_episode_admissions_in_round(rid)
+        plan: Mapping[str, Any] | None = None
+        plan_error = force_reason
+        if frame_state.get("frame_corrupt"):
+            plan_error = plan_error or "ROUND_FRAME_CORRUPT"
+        elif frame_state.get("recovery_plan") is not None:
+            try:
+                plan = verify_round_recovery_plan(
+                    frame_state["recovery_plan"],
+                    round_id_value=rid,
+                    activation_id=self.activation_id,
+                    lineage_id=self.lineage,
+                    cycle=cycle,
+                    seed=str(self.schedule["sampling"]["seed"]),
+                )
+            except RoundRecoveryError as exc:
+                plan_error = plan_error or exc.code
+        verdict = classify_round_recovery(
+            plan=plan,
+            committed=committed,
+            plan_error=plan_error,
+            call_evidence_missing=plan is not None and not self._plan_call_evidence_present(plan),
+        )
+        return verdict, plan
+
+    def _terminalize_round(
+        self, row: Mapping[str, Any], verdict: Mapping[str, Any], plan: Mapping[str, Any] | None
+    ) -> None:
+        """Write the one durable terminal for an unresolved round."""
+
+        rid = str(row["round_id"])
+        outcome = str(verdict["outcome"])
+        recovery = {
+            "recovery_version": ROUND_RECOVERY_VERSION,
+            "outcome": outcome,
+            "reason_code": verdict["reason_code"],
+            "plan_sha256": None if plan is None else plan["plan_sha256"],
+            "planned_episode_ids": list(verdict["planned_episode_ids"]),
+            "committed_episode_ids": list(verdict["committed_episode_ids"]),
+            "missing_episode_ids": list(verdict["missing_episode_ids"]),
+        }
+        if outcome == "CLOSED":
+            assert plan is not None
+            basis = plan["basis"]
+            order = {episode: index for index, episode in enumerate(recovery["planned_episode_ids"])}
+            frame: dict[str, Any] = {
+                **plan["frame_receipt"],
+                "selection": {
+                    "quota": int(basis["quota"]),
+                    "eligible_pending": int(basis["eligible_pending"]),
+                    "winners": [item["mint"] for item in plan["winners"]],
+                    "not_selected": list(plan["not_selected"]),
+                    "witness_stale": [],
+                    "admitted_episode_ids": sorted(recovery["committed_episode_ids"], key=order.__getitem__),
+                    "day_used_before": basis["day_used"],
+                    "rolling_used_before": basis["rolling_used"],
+                    "active_before": basis["active"],
+                    "committed_in_round_before": basis["committed_in_round"],
+                },
+                "recovery": {**recovery, "resumed": True, "reconciled_after_slack": True},
+            }
+            state = "CLOSED"
+        else:
+            terminal = {
+                "NO_ADMISSION": "ROUND_RECOVERY_NO_ADMISSION",
+                "PARTIAL_ADMISSION": "ROUND_RECOVERY_PARTIAL_ADMISSION",
+            }.get(outcome, "ROUND_RECOVERY_REFUSED")
+            raw_plan = row["frame"].get("recovery_plan")
+            frame = {
+                "round_id": rid,
+                "terminal": terminal,
+                "frame_sha256": None if plan is None else plan["frame_sha256"],
+                "recovery": recovery,
+            }
+            if raw_plan is not None:
+                frame["recovery_plan"] = raw_plan  # never dropped, even when refused
+            if row["frame"].get("frame_corrupt"):
+                frame["prior_frame_json_sha256"] = row["frame"].get("frame_json_sha256")
+            state = "INCOMPLETE"
+        self.store.record_episode_round(
+            round_id=rid,
+            schedule_sha256=self.digest,
+            activation_id=self.activation_id,
+            lineage_id=self.lineage,
+            round_started_at=str(row["round_started_at"]),
+            state=state,
+            frame=frame,
+            clock=self.provider_ctx.now(),
+        )
+        entry = {
+            "round_id": rid,
+            "state": state,
+            "outcome": outcome,
+            "reason_code": verdict["reason_code"],
+            "planned": len(recovery["planned_episode_ids"]),
+            "committed": len(recovery["committed_episode_ids"]),
+        }
+        self.report["round_recoveries"].append(entry)
+        self.report["round"] = {**entry, "recovered": True}
+
+    def _reconcile_round(self, row: Mapping[str, Any]) -> None:
+        verdict, plan = self._classify_round(row)
+        self._terminalize_round(row, verdict, plan)
+
+    def recover_unresolved_rounds(self) -> None:
+        """Resolve every STARTED round whose slack has expired. Zero calls."""
+
+        slack = timedelta(seconds=int(self.schedule["nomination"]["round_slack_seconds"]))
+        now = self.provider_ctx.now()
+        for row in self.store.list_started_episode_rounds(schedule_sha256=self.digest, activation_id=self.activation_id):
+            if now > parse_utc(str(row["round_started_at"])) + slack:
+                self._reconcile_round(row)
 
     def _commit_admission(self, record: Mapping[str, Any], candidate: Mapping[str, Any], *, round_started_at: datetime) -> str:
         refusal = "QUOTA_CLOSED"
@@ -1178,6 +1389,7 @@ class _EpisodeTick:
             fault_after=self.fault_after,
         )
         self.publish_outbox()
+        self.recover_unresolved_rounds()
         self._prime_account_pace()
         self.process_slots()
         decision_now = self.provider_ctx.now()

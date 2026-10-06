@@ -3017,6 +3017,7 @@ class ObservationScheduleStore:
                 if str(existing["content_sha256"]) == str(content_sha256):
                     return "REPLAY"
                 raise ObservationScheduleStoreError("EPISODE_ADMISSION_CONFLICT")
+            self._require_round_plan_admits(record)
             self._conn.execute(
                 """
                 INSERT INTO episode_admissions(
@@ -3082,6 +3083,30 @@ class ObservationScheduleStore:
         except Exception:
             self._conn.rollback()
             raise
+
+    def _require_round_plan_admits(self, record: Mapping[str, Any]) -> None:
+        """An admission belongs to an open round and to its pre-written plan.
+
+        Rounds without an owner row (direct store use) are not gated. A round
+        row that is terminal, plan-less or does not name the episode refuses:
+        no late, unplanned or plan-less admission can change the sample.
+        """
+
+        row = self._conn.execute(
+            "SELECT state, frame_json FROM episode_rounds WHERE round_id = ?",
+            (str(record["round_id"]),),
+        ).fetchone()
+        if row is None:
+            return
+        if str(row["state"]) != "STARTED":
+            raise ObservationScheduleStoreError("EPISODE_ADMISSION_ROUND_NOT_OPEN")
+        try:
+            plan = json.loads(row["frame_json"]).get("recovery_plan")
+            planned = {str(item["episode_id"]) for item in plan["winners"]}
+        except (ValueError, TypeError, KeyError, AttributeError):
+            raise ObservationScheduleStoreError("EPISODE_ADMISSION_ROUND_PLAN_MISSING") from None
+        if str(record["episode_id"]) not in planned:
+            raise ObservationScheduleStoreError("EPISODE_ADMISSION_NOT_PLANNED")
 
     def _insert_episode_outbox(self, row: Mapping[str, Any], *, now: str) -> None:
         self._conn.execute(
@@ -3217,6 +3242,7 @@ class ObservationScheduleStore:
                         self._conn.rollback()
                         return "REPLAY"
                     raise ObservationScheduleStoreError("EPISODE_ROUND_CONFLICT")
+                self._require_round_plan_retained(str(existing["frame_json"]), frame)
                 self._conn.execute(
                     """
                     UPDATE episode_rounds SET state = ?, frame_json = ?, updated_at = ?
@@ -3252,15 +3278,60 @@ class ObservationScheduleStore:
                 self._conn.rollback()
             raise
 
+    @staticmethod
+    def _require_round_plan_retained(prior_frame_json: str, frame: Mapping[str, Any]) -> None:
+        """Once written, a round's recovery plan is never replaced or dropped."""
+
+        try:
+            prior = json.loads(prior_frame_json).get("recovery_plan")
+        except (ValueError, AttributeError):
+            return  # corrupt prior frame: terminalization must stay possible
+        if prior is None:
+            return
+        retained = frame.get("recovery_plan") == prior or (
+            isinstance(prior, Mapping)
+            and prior.get("plan_sha256") is not None
+            and (frame.get("recovery") or {}).get("plan_sha256") == prior.get("plan_sha256")
+        )
+        if not retained:
+            raise ObservationScheduleStoreError("EPISODE_ROUND_PLAN_IMMUTABLE")
+
+    @staticmethod
+    def _decode_episode_round(row: sqlite3.Row) -> dict[str, Any]:
+        payload = dict(row)
+        raw = payload.pop("frame_json")
+        try:
+            frame = json.loads(raw)
+            if not isinstance(frame, dict):
+                raise ValueError("frame is not an object")
+            payload["frame"] = frame
+        except ValueError:
+            payload["frame"] = {"frame_corrupt": True, "frame_json_sha256": hashlib.sha256(str(raw).encode("utf-8")).hexdigest()}
+        return payload
+
+    def list_started_episode_rounds(self, *, schedule_sha256: str, activation_id: str) -> list[dict[str, Any]]:
+        rows = self._conn.execute(
+            """
+            SELECT * FROM episode_rounds
+            WHERE schedule_sha256 = ? AND activation_id = ? AND state = 'STARTED'
+            ORDER BY round_started_at ASC
+            """,
+            (schedule_sha256, activation_id),
+        ).fetchall()
+        return [self._decode_episode_round(row) for row in rows]
+
+    def list_episode_admissions_in_round(self, round_id: str) -> list[dict[str, Any]]:
+        rows = self._conn.execute(
+            "SELECT * FROM episode_admissions WHERE round_id = ? ORDER BY t0 ASC, episode_id ASC",
+            (str(round_id),),
+        ).fetchall()
+        return [self._decode_episode_admission(row) for row in rows]
+
     def get_episode_round(self, round_id: str) -> dict[str, Any] | None:
         row = self._conn.execute(
             "SELECT * FROM episode_rounds WHERE round_id = ?", (round_id,)
         ).fetchone()
-        if row is None:
-            return None
-        payload = dict(row)
-        payload["frame"] = json.loads(payload.pop("frame_json"))
-        return payload
+        return None if row is None else self._decode_episode_round(row)
 
     def list_episode_rounds(
         self,
@@ -3284,12 +3355,7 @@ class ObservationScheduleStore:
                 render_utc(started_before),
             ),
         ).fetchall()
-        decoded = []
-        for row in rows:
-            payload = dict(row)
-            payload["frame"] = json.loads(payload.pop("frame_json"))
-            decoded.append(payload)
-        return decoded
+        return [self._decode_episode_round(row) for row in rows]
 
     def terminalize_episode_slot(
         self,

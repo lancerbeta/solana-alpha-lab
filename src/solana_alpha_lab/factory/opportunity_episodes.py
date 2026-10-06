@@ -50,6 +50,8 @@ TICKET_VERSION = "OPPORTUNITY_EPISODE_TICKET_V1"
 EPISODE_ID_VERSION = "OPPORTUNITY_EPISODE_ID_V1"
 LINEAGE_VERSION = "OPPORTUNITY_EPISODE_LINEAGE_V1"
 FRAME_VERSION = "OPPORTUNITY_EPISODE_FRAME_V1"
+ROUND_RECOVERY_PLAN_VERSION = "OPPORTUNITY_EPISODE_ROUND_RECOVERY_PLAN_V1"
+ROUND_RECOVERY_VERSION = "OPPORTUNITY_EPISODE_ROUND_RECOVERY_V1"
 PROTECTION_VERSION = "OPPORTUNITY_EPISODE_PROTECTION_V1"
 ASSIGNMENT_SCHEMA = "smial.protected-identity-assignment"
 ASSIGNMENT_DIR = "protection/assignments"
@@ -902,6 +904,182 @@ def select_admissions(
         ],
         "not_selected": [mint for _priority, mint, _item in pending[len(winners):]],
     }
+
+
+# --------------------------------------------------------------------------
+# Round recovery plan: the selection fixed before the first admission
+
+
+class RoundRecoveryError(OpportunityEpisodeError):
+    """Typed refusal: durable round evidence is missing, corrupt or in conflict."""
+
+    def __init__(self, code: str) -> None:
+        super().__init__(code)
+        self.code = code
+
+
+def build_round_recovery_plan(
+    *,
+    round_id_value: str,
+    activation_id: str,
+    lineage_id: str,
+    cycle: datetime,
+    receipt: Mapping[str, Any],
+    selection: Mapping[str, Any],
+    basis: Mapping[str, Any],
+    blocked_mints: Iterable[str],
+) -> dict[str, Any]:
+    """Immutable plan written to the round owner before any admission.
+
+    Carries the bounded frame receipt (never provider values beyond it), the
+    quota basis and the exact ordered winners so a crash can be reconciled
+    from durable evidence only.
+    """
+
+    passing = {str(item["mint"]) for item in receipt.get("candidates") or [] if item.get("status") == FRAME_PASS}
+    plan = {
+        "plan_version": ROUND_RECOVERY_PLAN_VERSION,
+        "round_id": round_id_value,
+        "activation_id": activation_id,
+        "lineage_id": lineage_id,
+        "cycle_start": render_utc(cycle),
+        "frame_sha256": str(receipt["frame_sha256"]),
+        "protection_fingerprint": str(receipt["protection_fingerprint"]),
+        "frame_receipt": dict(receipt),
+        "basis": {**{key: int(value) for key, value in basis.items()},
+                  "eligible_pending": int(selection["eligible_pending"]),
+                  "quota": int(selection["quota"]),
+                  "blocked_candidate_mints": sorted({str(item) for item in blocked_mints} & passing)},
+        "winners": [
+            {
+                "mint": str(item["mint"]),
+                "ticket_priority": str(item["ticket_priority"]),
+                "episode_id": episode_id_for(lineage_id=lineage_id, cycle=cycle, mint=str(item["mint"])),
+            }
+            for item in selection["winners"]
+        ],
+        "not_selected": [str(item) for item in selection["not_selected"]],
+    }
+    plan["plan_sha256"] = canonical_sha256(plan)
+    return plan
+
+
+def verify_round_recovery_plan(
+    plan: object,
+    *,
+    round_id_value: str,
+    activation_id: str,
+    lineage_id: str,
+    cycle: datetime,
+    seed: str,
+) -> dict[str, Any]:
+    """Recompute everything the plan claims; any gap is a typed refusal."""
+
+    if not isinstance(plan, Mapping) or plan.get("plan_version") != ROUND_RECOVERY_PLAN_VERSION:
+        raise RoundRecoveryError("ROUND_PLAN_INVALID")
+    try:
+        body = {key: value for key, value in plan.items() if key != "plan_sha256"}
+        if canonical_sha256(body) != plan.get("plan_sha256"):
+            raise RoundRecoveryError("ROUND_PLAN_HASH_MISMATCH")
+        receipt = plan["frame_receipt"]
+        receipt_body = {key: value for key, value in receipt.items() if key != "frame_sha256"}
+        if (
+            canonical_sha256(receipt_body) != receipt.get("frame_sha256")
+            or plan["frame_sha256"] != receipt["frame_sha256"]
+            or plan["protection_fingerprint"] != receipt.get("protection_fingerprint")
+            or receipt.get("complete") is not True
+            or receipt.get("terminal") != "FRAME_CLOSED"
+        ):
+            raise RoundRecoveryError("ROUND_PLAN_FRAME_IDENTITY_MISMATCH")
+        if (
+            plan["round_id"] != round_id_value
+            or receipt.get("round_id") != round_id_value
+            or plan["activation_id"] != activation_id
+            or plan["lineage_id"] != lineage_id
+            or plan["cycle_start"] != render_utc(cycle)
+        ):
+            raise RoundRecoveryError("ROUND_PLAN_SCOPE_MISMATCH")
+        basis = plan["basis"]
+        replay = select_admissions(
+            frame=receipt, seed=seed, cycle=cycle, quota=int(basis["quota"]),
+            blocked_mints=basis["blocked_candidate_mints"],
+        )
+        planned = [
+            {
+                "mint": item["mint"],
+                "ticket_priority": item["ticket_priority"],
+                "episode_id": episode_id_for(lineage_id=lineage_id, cycle=cycle, mint=item["mint"]),
+            }
+            for item in replay["winners"]
+        ]
+        if (
+            planned != plan["winners"]
+            or replay["not_selected"] != plan["not_selected"]
+            or replay["eligible_pending"] != int(basis["eligible_pending"])
+        ):
+            raise RoundRecoveryError("ROUND_PLAN_SELECTION_MISMATCH")
+    except RoundRecoveryError:
+        raise
+    except (KeyError, TypeError, ValueError, AttributeError) as exc:
+        raise RoundRecoveryError("ROUND_PLAN_INVALID") from exc
+    return dict(plan)
+
+
+def classify_round_recovery(
+    *,
+    plan: Mapping[str, Any] | None,
+    committed: Sequence[Mapping[str, Any]],
+    plan_error: str | None = None,
+    call_evidence_missing: bool = False,
+) -> dict[str, Any]:
+    """Pure reconciliation of one unresolved round from durable evidence.
+
+    ``committed`` are the admission records already durable for the round.
+    Outcomes: CLOSED (every planned winner committed), NO_ADMISSION (honest
+    gap), PARTIAL_ADMISSION (strict subset) and REFUSED (evidence invalid).
+    """
+
+    committed_ids = [str(item["episode_id"]) for item in committed]
+    # ``plan`` is passed only after verify_round_recovery_plan accepted it.
+    planned = {str(item["episode_id"]): item for item in (plan or {}).get("winners") or []}
+    planned_ids = list(planned)
+
+    def result(kind: str, reason: str | None) -> dict[str, Any]:
+        return {
+            "outcome": kind,
+            "reason_code": reason,
+            "planned_episode_ids": planned_ids,
+            "committed_episode_ids": sorted(committed_ids),
+            "missing_episode_ids": [item for item in planned_ids if item not in committed_ids],
+        }
+
+    if plan_error is not None:
+        return result("REFUSED", plan_error)
+    if plan is None:
+        # Admissions cannot exist without a plan: the store refuses them.
+        if committed_ids:
+            return result("REFUSED", "ROUND_PLAN_MISSING_WITH_ADMISSIONS")
+        return result("NO_ADMISSION", "ROUND_PLAN_NOT_WRITTEN")
+    if call_evidence_missing:
+        return result("REFUSED", "ROUND_CALL_EVIDENCE_MISSING")
+    for item in committed:
+        wanted = planned.get(str(item["episode_id"]))
+        if wanted is None:
+            return result("REFUSED", "ROUND_ADMISSION_NOT_PLANNED")
+        record = item.get("record") or {}
+        if (
+            record.get("mint") != wanted["mint"]
+            or record.get("ticket_priority") != wanted["ticket_priority"]
+            or record.get("frame_sha256") != plan["frame_sha256"]
+            or record.get("protection_fingerprint") != plan["protection_fingerprint"]
+            or record.get("round_id") != plan["round_id"]
+        ):
+            return result("REFUSED", "ROUND_ADMISSION_PLAN_CONFLICT")
+    if not committed_ids:
+        return result("NO_ADMISSION", "ROUND_CRASH_BEFORE_ADMISSION")
+    if set(committed_ids) == set(planned_ids):
+        return result("CLOSED", None)
+    return result("PARTIAL_ADMISSION", "ROUND_PARTIAL_ADMISSION")
 
 
 def admission_record(
