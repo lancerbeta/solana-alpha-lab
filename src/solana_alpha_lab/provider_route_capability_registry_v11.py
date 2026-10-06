@@ -38,12 +38,16 @@ LIMITS_SHA256 = "41ef9fba09cee6be7e5bde22c59b3c6f073aa4804461c6d70309d462700f197
 EVIDENCE_ID = "EVIDENCE-JUPITER-CORE-COMMISSIONING-ROUTE-QUALIFICATION-20261006"
 PACE_DISCIPLINE = "UNPROVEN_FAILED_OVERLAP_WITH_LEGACY"
 UNRECORDED = "UNRECORDED_IN_RECEIPT"
+SUPERSEDES_KEYS = frozenset(
+    {"registry_id", "path", "sha256", "preserved_route_semantic_sha256", "transitioned_route_semantic_sha256"}
+)
 PACE_FAILURE = {
     "fingerprint": "SHARED_ACCOUNT_PACE_OVERLAP_UNPROVEN",
     "layer": "ACCOUNT_PACE",
     "interpretation": (
         "The qualification calls shared the account key with the running legacy collector "
-        "without a common pace; parser/route qualification is not account-safety evidence."
+        "without a common pace (executor report, not shown by the receipt); parser/route "
+        "qualification is not account-safety evidence."
     ),
 }
 # Per-route observation pinned from the committed receipt: (observed_at, bytes, sha256, rows).
@@ -182,6 +186,7 @@ def _validate_observed_route(
         _require(runtime.get(key) == UNRECORDED, "OBSERVED_RUNTIME_CLAIM_DRIFT")
     preflight = _mapping(route.get("preflight"), "OBSERVED_PREFLIGHT_INVALID")
     _require(set(preflight) == PREFLIGHT_KEYS, "OBSERVED_PREFLIGHT_KEYS_DRIFT")
+    _require(preflight.get("kind") == "DNS_TCP_TLS", "OBSERVED_PREFLIGHT_KIND_DRIFT")
     _require(preflight.get("steps") == ["DNS", "TCP_443", "TLS_HANDSHAKE"], "OBSERVED_PREFLIGHT_STEPS_DRIFT")
     _require(preflight.get("consumes_credential") is False, "OBSERVED_PREFLIGHT_CREDENTIAL_DRIFT")
     _require(preflight.get("consumes_attempt") is False, "OBSERVED_PREFLIGHT_ATTEMPT_DRIFT")
@@ -269,6 +274,7 @@ def validate_provider_route_capability_registry_v11(
     _require(predecessor_sha256 == V10_SHA256, "V10_BYTES_DRIFT")
     _require(predecessor.get("registry_id") == "PROVIDER-ROUTE-CAPABILITY-REGISTRY-010", "PREDECESSOR_ID_DRIFT")
     supersedes = _mapping(registry.get("supersedes"), "SUPERSEDES_INVALID")
+    _require(set(supersedes) == SUPERSEDES_KEYS, "SUPERSEDES_KEYS_DRIFT")
     _require(supersedes.get("registry_id") == "PROVIDER-ROUTE-CAPABILITY-REGISTRY-010", "SUPERSEDES_ID_DRIFT")
     _require(supersedes.get("path") == V10_PATH, "SUPERSEDES_PATH_DRIFT")
     _require(supersedes.get("sha256") == V10_SHA256, "SUPERSEDES_SHA_DRIFT")
@@ -281,7 +287,7 @@ def validate_provider_route_capability_registry_v11(
     _require(len(preserved) == 12, "PRESERVED_HASH_COUNT_DRIFT")
     for index, prior in enumerate(predecessor_routes[:12]):
         current = _mapping(routes[index], "ROUTE_INVALID")
-        _require(current == prior, "PRESERVED_ROUTE_DRIFT")
+        _require(_canonical(current) == _canonical(prior), "PRESERVED_ROUTE_DRIFT")
         _require(preserved.get(str(prior.get("route_id"))) == _semantic_sha256(prior), "PRESERVED_ROUTE_HASH_DRIFT")
     # The one transition: the v10 placeholder search route gains its first observation.
     placeholder = _mapping(predecessor_routes[12], "TRANSITION_PREDECESSOR_INVALID")

@@ -769,8 +769,8 @@ routes:
   - fingerprint: SHARED_ACCOUNT_PACE_OVERLAP_UNPROVEN
     layer: ACCOUNT_PACE
     interpretation: The qualification calls shared the account key with the running
-      legacy collector without a common pace; parser/route qualification is not account-safety
-      evidence.
+      legacy collector without a common pace (executor report, not shown by the receipt);
+      parser/route qualification is not account-safety evidence.
   execution_policy:
     retry: false
     fallback: false
@@ -857,8 +857,8 @@ routes:
   - fingerprint: SHARED_ACCOUNT_PACE_OVERLAP_UNPROVEN
     layer: ACCOUNT_PACE
     interpretation: The qualification calls shared the account key with the running
-      legacy collector without a common pace; parser/route qualification is not account-safety
-      evidence.
+      legacy collector without a common pace (executor report, not shown by the receipt);
+      parser/route qualification is not account-safety evidence.
   execution_policy:
     retry: false
     fallback: false
@@ -939,8 +939,8 @@ routes:
   - fingerprint: SHARED_ACCOUNT_PACE_OVERLAP_UNPROVEN
     layer: ACCOUNT_PACE
     interpretation: The qualification calls shared the account key with the running
-      legacy collector without a common pace; parser/route qualification is not account-safety
-      evidence.
+      legacy collector without a common pace (executor report, not shown by the receipt);
+      parser/route qualification is not account-safety evidence.
   execution_policy:
     retry: false
     fallback: false
@@ -1021,8 +1021,8 @@ routes:
   - fingerprint: SHARED_ACCOUNT_PACE_OVERLAP_UNPROVEN
     layer: ACCOUNT_PACE
     interpretation: The qualification calls shared the account key with the running
-      legacy collector without a common pace; parser/route qualification is not account-safety
-      evidence.
+      legacy collector without a common pace (executor report, not shown by the receipt);
+      parser/route qualification is not account-safety evidence.
   execution_policy:
     retry: false
     fallback: false

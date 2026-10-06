@@ -162,13 +162,13 @@ provider/workload lane — legacy collector и его same-envelope renewal не
 `lease free`: exact schedule SHA и activation ID из `mode=ro` readback,
 `factory-observation-schedule.timer` и `factory-same-envelope-renewal.timer`
 отключены штатным systemd и не активны, ни один observation/renewal worker не
-работает, а повторный readback после обычного collector interval показывает
+работает, а повторный readback не раньше чем через три collector tick (минимум 3 мин) показывает
 `PAUSED_OPERATOR`, неизменные counters и ни одного нового admission, call или
 publication этой activation.
 Исторические `PAUSED_OPERATOR`/`ABORTED` строки не требуют COMPLETE, repair или
 resume и не входят в новую научную популяцию. Default tick при нескольких
 ACTIVE/DRAINING scopes требует exact selection, поэтому остановленный legacy
-обязан быть `PAUSED_OPERATOR` до включения новой lane. Не создавать параллельный
+обязан быть `PAUSED_OPERATOR` или `COMPLETE` до включения новой lane. Не создавать параллельный
 постоянный collector для обхода этой границы.
 
 Осознанная остановка legacy оставляет recorded gaps: ещё не снятые obligations
@@ -176,15 +176,16 @@ ACTIVE/DRAINING scopes требует exact selection, поэтому остан
 SUCCESS. Потерянные слоты не восстанавливаются через resume: пауза обратима как
 control, потеря будущих observations — нет.
 
-Bootstrap protection для canary и первого рабочего discovery-периода —
-`EXPLORATORY_REUSE`: новый holdout ими не объявляется, существующие protected
+Bootstrap protection для canary и первого обычного batch (до отдельного решения
+владельца) — `EXPLORATORY_REUSE`: новый holdout ими не объявляется, существующие protected
 assignments других гипотез не отменяются. Исполнитель сначала читает metadata
 канонических owners (ResearchStore и split/assignment records, Git registries и
 experiment specs, dataset labels, `protection/assignments` в producer root) без
 outcomes и protected values. Найденные scopes входят в один frozen document;
 доказанно пустой inventory допустим с перечнем проверенных owners и границей
 completeness; неразрешимая полнота возвращает один `PROTECTION_SCOPE_UNRESOLVED`
-с точным missing owner. Владелец не вспоминает mint-адреса вручную. Новая версия
+с точным missing owner и держит широкую exploratory exposure и activation закрытыми.
+Владелец не вспоминает mint-адреса вручную. Новая версия
 документа не перезаписывает прежний pin.
 
 Protection sources создаются только как metadata projection полного известного
