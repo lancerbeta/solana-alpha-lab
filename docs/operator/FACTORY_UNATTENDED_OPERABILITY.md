@@ -666,7 +666,13 @@ and `docs/contracts/research_write_lookup_v1.md`. The existing metadata-only hos
 recipes do not authorize recursive RDP scans, prepared-index work, backup,
 status/doctor schema paths, deploy or timer changes on production. Those remain
 separate OPERATE actions. Explicit preparation is measured on a verified copy;
-restore/code rollback preserve canonical history and need a fresh preparation
-before returning to new writer code. Windows process proof is not Linux unit
+its filesystem-bound lookup cannot be transferred onto production. Under separate
+OPERATE, verified backup, measured copy rehearsal and quiesced writers/timer,
+`prepare_research_write_lookup.py --production-commissioning` prepares the canonical
+root in place with the exact producer OPS store and both writer fences. Ordinary
+deploy/tick/startup never prepare it. Restore/moved-root/code rollback preserve
+canonical history and require explicit preparation on the target root before
+returning to new writer code. Whole-Factory storage UNKNOWN blocks activation;
+runtime reserve uses the exact commissioned producer-local envelope. Windows process proof is not Linux unit
 or power-loss acceptance. Notification freshness is not proof of off-host
 delivery; an absent receiver remains NOT_CONFIGURED.

@@ -1811,6 +1811,7 @@ def activate_schedule(
     activation_id: str,
     now: datetime,
     producer_git_sha: str,
+    storage_commissioning: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     registered = store.get_registered_schedule(schedule_sha256)
     if registered is None:
@@ -1830,6 +1831,22 @@ def activate_schedule(
             else None
         ),
     )
+    from solana_alpha_lab.factory.opportunity_episodes import is_episode_schedule
+    if is_episode_schedule(document):
+        from solana_alpha_lab.factory.hot90_storage_admission import (
+            EpisodeStorageError, validate_episode_storage_commissioning,
+        )
+        frozen_storage = dict((existing or {}).get("payload") or {}).get("storage_commissioning")
+        if existing is not None and frozen_storage is None:
+            raise ObservationLifecycleError("EPISODE_STORAGE_COMMISSIONING_REQUIRED")
+        if storage_commissioning is not None and frozen_storage is not None and storage_commissioning != frozen_storage:
+            raise ObservationLifecycleError("EPISODE_STORAGE_REPLAY_CONFLICT")
+        try:
+            storage_commissioning = validate_episode_storage_commissioning(
+                storage_commissioning if storage_commissioning is not None else frozen_storage,
+                data_root=data_root, schedule_sha256=schedule_sha256, activation_id=activation_id)
+        except EpisodeStorageError as exc:
+            raise ObservationLifecycleError(exc.code) from exc
     if existing is None:
         siblings = [
             row
@@ -1878,7 +1895,8 @@ def activate_schedule(
         starts_at=document["activation"]["starts_at"],
         stops_admitting_at=document["activation"]["stops_admitting_at"],
         schedule_key=str(document["schedule_key"]),
-        payload={"receipt_sha256": receipt["receipt_sha256"]},
+        payload={"receipt_sha256": receipt["receipt_sha256"],
+                 **({"storage_commissioning": storage_commissioning} if storage_commissioning is not None else {})},
         clock=now,
     )
     event = _research_event(
@@ -1893,6 +1911,8 @@ def activate_schedule(
             "prior_state": transition["prior_state"],
             "transition_sequence": transition["transition_sequence"],
             "authority_receipt_sha256": receipt["receipt_sha256"],
+            **({"storage_commissioning_sha256": storage_commissioning["envelope_sha256"]}
+               if storage_commissioning is not None else {}),
         },
         now=now,
         producer_git_sha=producer_git_sha,

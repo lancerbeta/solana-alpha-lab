@@ -112,9 +112,21 @@ Git; runtime timestamps и host state не становятся постоянн
 На проверенной изолированной копии явно выполнить `scripts/prepare_research_write_lookup.py
 --data-root <absolute-copy> --isolated-copy`, сохранив wall/RSS и canonical
 inventory до/после. Сверить результат с
-`docs/contracts/research_write_lookup_v1.md`. Deploy не должен незаметно запускать
-подготовку на production. После restore/revert старые records остаются readable;
-перед новыми writes необходим повторный audit/index preparation на копии.
+`docs/contracts/research_write_lookup_v1.md`. Prepared lookup с копии не переносится:
+он привязан к filesystem identity/stat. После отдельного OPERATE разрешения,
+verified backup, measured copy rehearsal и подтверждённой остановки всех writers/
+timer выполнить подготовку прямо на canonical root:
+
+```text
+uv run --locked --managed-python python -B scripts/prepare_research_write_lookup.py --data-root <absolute-canonical-root> --production-commissioning --ops-store <exact-existing-producer-ops.sqlite> --operate-authority-ref <approved-OPERATE-ref> --verified-backup-sha256 <verified-backup-sha256> --copy-rehearsal-sha256 <measured-copy-rehearsal-sha256> --quiesced-writers
+```
+
+Флаги подтверждают утверждённые prerequisites; сама команда не выдаёт OPERATE и
+не доказывает backup. OPS и ResearchStore fences отказывают concurrent writer;
+OPS write-lock действует весь audit, включая фазу длиннее TTL lease. После
+успешной подготовки ordinary writer использует lookup. Deploy/tick/startup
+автоматически его не создают. Restore/moved root и возврат после old-writer append
+требуют explicit reprepare на целевом root под соответствующей authority.
 
 Рекомендуемый canary — один immutable profile: ceiling 24/UTC day, 48h intake,
 72h tail плюс grid rounding/grace, cap 48 admissions за два полных UTC дня.
@@ -135,11 +147,23 @@ completeness provenance и UNKNOWN при пробеле. Не загружат�
 называют synthetic inventory; они не доказывают actual completeness. Новая
 версия не перезаписывает старый pin; frozen export несёт прежние dependencies.
 
-При `DRAIN_RESERVE_PRESSURE`/`DRAIN_RESERVE_UNKNOWN` intake уже закрыт штатным
+До activation нужен exact `EPISODE_PRODUCER_STORAGE_COMMISSIONING_V1` JSON:
+root device/inode, schedule SHA/activation ID, OPERATE ref, verified backup/copy
+hashes, actual volume bindings/whole-Factory PASS receipt и утверждённые producer-local
+byte limits. Передать `activate --episode-storage-commissioning <json>`. Поля и
+canonical self-hash описаны в контракте. Все local raw/OPS/WAL/publication/research/
+manifest/lookup effects должны входить в per-call bound; terminal metadata — в
+per-slot bound. UNKNOWN topology блокирует commissioning до ACTIVE. Прогноз шести
+копий — отдельный whole-Factory MODEL, не runtime kill-switch на producer free space.
+
+При `DRAIN_RESERVE_PRESSURE`/`DRAIN_RESERVE_UNKNOWN` из bound LOCAL control intake уже закрыт штатным
 переходом DRAINING. Повторить status, сохранить ledger и frozen dependencies,
 довести obligations; pause/resume для DRAINING отказываются. Не обходить отказ,
-не backfill прошлые slots и не удалять evidence. `MODEL_HEADROOM` не означает
-HOST_PASS. При `WRITE_LOOKUP_*` сначала сохранить canonical evidence и проверить
+не backfill прошлые slots и не удалять evidence. `LOCAL_HEADROOM` означает только
+headroom утверждённого producer envelope, не HOST_PASS всей Factory. При
+`PRODUCER_LOCAL_ENVELOPE_REQUIRED` новые nominations заблокированы, tail сохраняется,
+state не меняется по unbound MODEL; нужен exact commissioning binding до activation.
+При `WRITE_LOOKUP_*` сначала сохранить canonical evidence и проверить
 копию; автоматический expensive rebuild и повтор неизвестной отправки запрещены.
 
 После mature closure повтор обычного capture с новым as-of сохраняет frozen
@@ -160,3 +184,8 @@ dependencies; прекратить capture/import retry. На изолирова
 canonical producer требует отдельного repair gate. Не удалять и не
 регенерировать closure ради обхода отказа; ожидание maturity повреждённые bytes
 не исправляет. Общий `STOP_INSPECT_FAIL_CODE` означает этот terminal stop.
+
+Owner counters `admitted_episodes`, `open_episodes`, `terminal_episodes` считают
+episodes; due-slot backlog читается из `slot_states`. WATCH commissioning: число/
+bytes lookup node files и inode growth, wall operational packet против фактических
+due rows. Это измерение; lookup GC/retention и оптимизация здесь не разрешены.

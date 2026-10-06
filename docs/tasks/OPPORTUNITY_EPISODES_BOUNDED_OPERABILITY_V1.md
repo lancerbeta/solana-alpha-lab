@@ -1,6 +1,6 @@
 ---
 task_id: OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1
-task_version: '1.2'
+task_version: '1.3'
 status: IN_PROGRESS
 as_of: '2026-10-06'
 owner: GOAL_OWNER
@@ -35,8 +35,10 @@ managed_write_set:
 - src/solana_alpha_lab/factory/live_cohort_vanilla_path.py
 - scripts/prove_opportunity_episode_operability.py
 - scripts/prepare_research_write_lookup.py
+- scripts/observation_schedule.py
 - scripts/prove_opportunity_episode_rehearsals.py
 - tests/test_research_write_lookup.py
+- tests/test_opportunity_episodes_harness_v1.py
 - tests/test_opportunity_episodes_operability_v1.py
 - tests/test_opportunity_episodes_vertical_v1.py
 - docs/tasks/OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1.md
@@ -151,3 +153,20 @@ counts the new bounded reader as well as canonical partition operations.
 Exhausted-new-day credential delay, STARTED delay, deeply nested JSON, unreadable
 and oversized reused node are explicit regression obligations. Local ceilings,
 scientific meaning, review roles, write set and external authority stay frozen.
+
+OWNER_PATCH_IN_SAME_ATOM: owner review of PR 377 head
+01f22cb4865ea27677e1ccddc8796a0ad70b4d08 requires P1-A explicit canonical-root
+lookup commissioning under separate OPERATE authority, P1-B separation of an
+exact producer-local storage control from whole-Factory pre-activation planning,
+and P2 episode count naming. No deployment or production preparation is granted
+here. Required prerequisites remain verified backup, measured isolated-copy
+rehearsal and quiesced writers/timer; normal tick/startup/deploy never prepare.
+Runtime reserve covers every committed assigned-time call group and due slot,
+future nominations, next-round prospective obligations and fixed/safety reserve.
+Whole-Factory UNKNOWN refuses activation; its six-copy MODEL does not control a
+running canary. Local envelope is immutable and bound to root/schedule/activation.
+The existing OPS transaction fence covers explicit preparation beyond lease TTL;
+no new DB, service, timer or runtime cap is introduced. Direct CLI/test consumers
+above are the owner's authorized patch write set. WATCH only: derived node count,
+bytes/inode growth and operational-packet wall versus actual due rows. No lookup
+GC, retention, storage engine redesign, epoch/attrition or provider research.

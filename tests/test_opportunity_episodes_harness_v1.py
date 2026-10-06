@@ -223,6 +223,20 @@ def authority_phrase(document: dict[str, Any]) -> str:
     )
 
 
+def storage_commissioning_fixture(data_root: Path, schedule: dict[str, Any], activation_id: str) -> dict[str, Any]:
+    """Synthetic approved topology/local bounds; never actual OPERATE authority."""
+    from solana_alpha_lab.factory.hot90_storage_admission import EPISODE_STORAGE_KIND, producer_root_identity
+    body = {"kind": EPISODE_STORAGE_KIND, "schedule_sha256": schedule["schedule_sha256"],
+            "activation_id": activation_id, "producer_root_identity": producer_root_identity(data_root),
+            "factory_storage_gate": "PASS", "verified_backup_sha256": "1" * 64,
+            "copy_rehearsal_sha256": "2" * 64, "factory_storage_receipt_sha256": "3" * 64,
+            "volume_bindings_sha256": "4" * 64, "operate_authority_ref": "OPERATE-SYNTHETIC-FIXTURE-NO-LIVE-GRANT",
+            "search_call_local_bytes_max": 32 * 1024**2, "nomination_call_local_bytes_max": 32 * 1024**2,
+            "slot_metadata_local_bytes_max": 128 * 1024, "fixed_local_reserve_bytes": 1024**3,
+            "local_safety_bytes": 1024**3}
+    return {**body, "envelope_sha256": canonical_sha256(body)}
+
+
 def register_authorize_activate(data_root: Path, schedule: dict[str, Any], *, now: datetime, activation_id: str = ACTIVATION_ID) -> str:
     store = ObservationScheduleStore(Path(data_root) / "observation_schedule_state.sqlite")
     try:
@@ -237,6 +251,10 @@ def register_authorize_activate(data_root: Path, schedule: dict[str, Any], *, no
             now=now,
             producer_git_sha=PRODUCER,
         )
+        # Frozen predecessor tests still use their original activation signature.
+        import inspect
+        storage = ({"storage_commissioning": storage_commissioning_fixture(data_root, schedule, activation_id)}
+                   if "storage_commissioning" in inspect.signature(activate_schedule).parameters else {})
         activated = activate_schedule(
             root=ROOT,
             data_root=data_root,
@@ -245,6 +263,7 @@ def register_authorize_activate(data_root: Path, schedule: dict[str, Any], *, no
             activation_id=activation_id,
             now=now,
             producer_git_sha=PRODUCER,
+            **storage,
         )
         assert activated["terminal"] in {"ACTIVATED", "ACTIVATE_REPLAY"}, activated
     finally:

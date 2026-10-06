@@ -1208,7 +1208,7 @@ class ResearchStore:
         return "next"
 
     def prepare_write_lookup(self) -> dict[str, Any]:
-        """Explicit one-time full audit on a commissioning copy, under fencing."""
+        """Explicit full audit of this root under fencing; never an implicit rebuild."""
         with self.writer_lease():
             try:
                 lookup = WriteLookup(self._root, _target_path)

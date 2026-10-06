@@ -220,6 +220,87 @@ class WriteLookupTests(unittest.TestCase):
         self.assertEqual(json.loads(output.getvalue()),
             {"status":"REFUSED", "reason":"WRITE_LOOKUP_SOURCE_UNREADABLE"})
 
+    def prepare_cli(self, root, *mode):
+        import io
+        from contextlib import redirect_stdout
+        from scripts.prepare_research_write_lookup import main
+        output = io.StringIO()
+        with patch("sys.argv", ["prepare_research_write_lookup.py", "--data-root", str(root.resolve()), *mode]):
+            with redirect_stdout(output):
+                code = main()
+        return code, json.loads(output.getvalue())
+
+    def production_args(self, ops_path):
+        return ("--production-commissioning", "--operate-authority-ref", "OPERATE-SYNTHETIC-LOCAL-TEST",
+                "--verified-backup-sha256", "1" * 64, "--copy-rehearsal-sha256", "2" * 64,
+                "--quiesced-writers", "--ops-store", str(ops_path.resolve()))
+
+    def test_explicit_copy_and_canonical_commissioning_and_moved_restore(self):
+        import shutil
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        self.append()
+        canonical_before = {p.relative_to(self.root).as_posix(): p.read_bytes()
+                            for p in (self.root / "research/manifests/partitions").glob("*.json")}
+        ops_path = self.root / "observation_schedule_state.sqlite"
+        ObservationScheduleStore(ops_path).close()
+        copy_root = Path(self.tmp.name) / "isolated-copy"
+        shutil.copytree(self.root, copy_root)
+        code, result = self.prepare_cli(copy_root, "--isolated-copy")
+        self.assertEqual((code, result["mode"]), (0, "ISOLATED_COPY"))
+        self.assertEqual(ResearchStore(copy_root).find_record("A").record_id, "A")
+        code, result = self.prepare_cli(self.root, *self.production_args(ops_path))
+        self.assertEqual((code, result["mode"]), (0, "PRODUCTION_COMMISSIONING"))
+        self.assertEqual(canonical_before, {p.relative_to(self.root).as_posix(): p.read_bytes()
+                                          for p in (self.root / "research/manifests/partitions").glob("*.json")})
+        with patch.object(ResearchStore, "_committed_manifests", side_effect=AssertionError("FULL_SCAN")):
+            self.assertEqual(ResearchStore(self.root).find_record("A").record_id, "A")
+            self.append("B")
+            self.assertEqual(ResearchStore(self.root).find_record("B").record_id, "B")
+        moved = Path(self.tmp.name) / "detached-restored-root"
+        shutil.copytree(self.root, moved)
+        with self.assertRaisesRegex(ResearchStoreError, "WRITE_LOOKUP_STALE_PREPARATION_REQUIRED"):
+            ResearchStore(moved).find_record("A")
+        code, result = self.prepare_cli(moved, *self.production_args(moved / ops_path.name))
+        self.assertEqual(code, 0, result)
+        self.assertEqual(ResearchStore(moved).find_record("A").record_id, "A")
+
+    def test_production_preparation_requires_attestations_and_fences_both_writers(self):
+        from datetime import UTC, datetime
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        ops_path = self.root / "observation_schedule_state.sqlite"
+        ops = ObservationScheduleStore(ops_path)
+        self.addCleanup(ops.close)
+        code, result = self.prepare_cli(self.root, "--production-commissioning")
+        self.assertEqual((code, result["reason"]), (2, "COMMISSIONING_ATTESTATIONS_REQUIRED"))
+        lease = ops.acquire_lease("synthetic-concurrent-tick", clock=datetime.now(UTC))
+        try:
+            code, result = self.prepare_cli(self.root, *self.production_args(ops_path))
+            self.assertEqual((code, result["reason"]), (2, "WRITER_BUSY"))
+        finally:
+            ops.release_lease(lease)
+        with self.store.writer_lease():
+            code, result = self.prepare_cli(self.root, *self.production_args(ops_path))
+        self.assertEqual((code, result["reason"]), (2, "WRITER_BUSY"))
+
+    def test_long_commissioning_fence_survives_global_lease_ttl(self):
+        from datetime import UTC, datetime, timedelta
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore, LEASE_SECONDS
+        ops_path = self.root / "observation_schedule_state.sqlite"
+        owner, other = ObservationScheduleStore(ops_path), ObservationScheduleStore(ops_path)
+        self.addCleanup(owner.close)
+        self.addCleanup(other.close)
+        # Shorten only this test connection's busy wait; production settings stay intact.
+        other._conn.execute("PRAGMA busy_timeout=1")
+        now = datetime.now(UTC)
+        token = owner.acquire_lease("explicit-local-commissioning", clock=now)
+        with owner.fenced_maintenance():
+            self.assertIsNone(other.acquire_lease("concurrent-tick", clock=now + timedelta(seconds=LEASE_SECONDS + 10)))
+            self.store.prepare_write_lookup()
+        owner.release_lease(token)
+        token = other.acquire_lease("ordinary-after-maintenance", clock=now + timedelta(seconds=LEASE_SECONDS + 11))
+        self.assertIsNotNone(token)
+        other.release_lease(token)
+
     def test_preparation_cannot_bless_a_stale_packet_inventory(self):
         from solana_alpha_lab.factory.research_store import _lifecycle_read_cache
         self.append("A")

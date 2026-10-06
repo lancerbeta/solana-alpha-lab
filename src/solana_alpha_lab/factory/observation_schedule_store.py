@@ -6,6 +6,7 @@ import hashlib
 import json
 import sqlite3
 from collections.abc import Iterator, Mapping, Sequence
+from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -652,6 +653,32 @@ class ObservationScheduleStore:
             raise ObservationScheduleStoreError("LEASE_NOT_HELD")
         self._require_write_lease(clock)
 
+    @contextmanager
+    def fenced_maintenance(self):
+        """Hold the existing OPS write fence through a long explicit audit.
+
+        The transaction blocks competing lease acquisition even after the
+        lease TTL. Its body must not call OPS mutators, which commit.
+        """
+        if self._lease_token is None:
+            raise ObservationScheduleStoreError("LEASE_NOT_HELD")
+        self._require_write_lease()
+        try:
+            self._conn.execute("BEGIN IMMEDIATE")
+        except sqlite3.OperationalError as exc:
+            raise ObservationScheduleStoreError("WRITER_BUSY") from exc
+        try:
+            row = self._conn.execute(
+                "SELECT lease_token, expires_at FROM scheduler_leases WHERE lease_id = ?",
+                (GLOBAL_LEASE_ID,),
+            ).fetchone()
+            if (row is None or row["lease_token"] != self._lease_token
+                    or row["expires_at"] <= _now(None)):
+                raise ObservationScheduleStoreError("LEASE_FENCED")
+            yield
+        finally:
+            self._conn.rollback()
+
     def release_lease(self, lease_token: str) -> None:
         cursor = self._conn.execute(
             "DELETE FROM scheduler_leases WHERE lease_id = ? AND lease_token = ?",
@@ -681,6 +708,12 @@ class ObservationScheduleStore:
         if existing is not None:
             created_at = str(existing["created_at"])
             updated_at = str(existing["updated_at"])
+            previous_payload = json.loads(str(existing["payload_json"]))
+            if "storage_commissioning" in previous_payload:
+                if ("storage_commissioning" in payload
+                        and payload["storage_commissioning"] != previous_payload["storage_commissioning"]):
+                    raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
+                payload["storage_commissioning"] = previous_payload["storage_commissioning"]
         else:
             created_at = now
             updated_at = now
@@ -698,6 +731,7 @@ class ObservationScheduleStore:
                     raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
             existing_payload = json.loads(str(existing["payload_json"]))
             immutable_payload_keys = (
+                "storage_commissioning",
                 "admission_window_closed",
                 "transition_effective_at",
                 "transition_event_id",
@@ -856,6 +890,10 @@ class ObservationScheduleStore:
                 authority_receipt_sha256=authority_receipt_sha256 or "",
             )
             transition_payload = dict(previous_payload)
+            if ("storage_commissioning" in previous_payload and payload is not None
+                    and "storage_commissioning" in payload
+                    and payload["storage_commissioning"] != previous_payload["storage_commissioning"]):
+                raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
             transition_payload.update(dict(payload or {}))
             transition_payload.update(
                 {
@@ -3410,6 +3448,18 @@ class ObservationScheduleStore:
         ).fetchone()
         return int(row["n"]) if row is not None else 0
 
+    def episode_remaining_call_groups(self, *, schedule_sha256: str,
+                                      activation_id: str, batch_size: int) -> dict[str, int]:
+        """Same assigned-time/chunk boundary as process_slots; no payload reads."""
+        if type(batch_size) is not int or batch_size <= 0:
+            raise ObservationScheduleStoreError("BATCH_SIZE_INVALID")
+        counts = self._conn.execute(
+            "SELECT COUNT(*) FROM due_observations WHERE schedule_sha256=? AND activation_id=? "
+            "AND state IN ('PENDING','DUE','CLAIMED') GROUP BY due_at",
+            (schedule_sha256, activation_id)).fetchall()
+        return {"remaining_slots": sum(int(row[0]) for row in counts),
+                "remaining_call_groups": sum((int(row[0]) + batch_size - 1) // batch_size for row in counts)}
+
     def episode_operability_projection(self, *, schedule_sha256: str,
                                        activation_id: str, now: datetime) -> dict[str, Any]:
         """Metadata-only operator facts; no frame, raw or research payload reads."""
@@ -3445,8 +3495,8 @@ class ObservationScheduleStore:
         return {"collection": "OPPORTUNITY_EPISODES", "intake_enabled": bool(activation and activation["state"] == "ACTIVE"
                 and now < parse_utc(str(activation["stops_admitting_at"]))),
                 "last_completed_nomination_frame_at": frame[0] if frame else None,
-                "admitted_obligations": admitted, "open_obligations": open_n,
-                "terminal_obligations": admitted - open_n, "slot_states": slots,
+                "admitted_episodes": admitted, "open_episodes": open_n,
+                "terminal_episodes": admitted - open_n, "slot_states": slots,
                 "execution_metadata_status": "UNKNOWN_LEGACY_METADATA" if execution[4] or execution[5] else "EXACT",
                 "no_request_slots": None if execution[4] else int(execution[0] or 0),
                 "attempted_slots": None if execution[4] else int(execution[1] or 0),
@@ -3457,7 +3507,7 @@ class ObservationScheduleStore:
                 "oldest_unpublished_age_seconds": max(0, int((now - parse_utc(outbox[1])).total_seconds())) if outbox[1] else 0,
                 "last_successful_publication_at": publication,
                 "next_cohort_maturity": dict(maturity) if maturity else None,
-                "drain_headroom": {"status": "UNKNOWN", "reason": "FRESH_TICK_DISK_MODEL_OR_COMMISSIONING_REQUIRED"},
+                "drain_headroom": {"status": "UNKNOWN", "reason": "FRESH_LOCAL_FREE_SPACE_AND_BOUND_ENVELOPE_REQUIRED"},
                 "account_envelope": {"status": "UNKNOWN", "reason": "APPROVED_SHARED_ACCOUNT_BINDING_REQUIRED"}}
 
     def episode_slot_state_counts(

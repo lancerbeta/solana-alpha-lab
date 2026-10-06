@@ -124,7 +124,7 @@ def _write_parquet_batches(
                 if compression == "zstd":
                     kwargs = {"compression": "zstd", "compression_level": 3}
                 writer = pq.ParquetWriter(tmp, schema, **kwargs)
-            else:
+            elif not table.schema.equals(schema):
                 table = table.cast(schema)
             assert writer is not None
             writer.write_table(table)

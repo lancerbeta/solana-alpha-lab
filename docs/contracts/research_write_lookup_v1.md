@@ -18,10 +18,25 @@ reads every current manifest and verifies every partition, transaction and
 global record identity. It writes the final content-addressed trie nodes and
 publishes a self-hashed root only after a stable canonical namespace stamp.
 Preparation is O(history), separately measured, and never happens implicitly
-inside a normal tick. The CLI requires an existing absolute root and an
-explicit `--isolated-copy` declaration. That declaration is an operator
-attestation, not proof that a directory is safe to mutate. Production use is a
-separate commissioning action after a verified backup and copy audit.
+inside a normal tick, startup or deploy. The CLI requires an existing absolute
+root and exactly one mode: `--isolated-copy` for a measured rehearsal, or
+`--production-commissioning` directly on the canonical root under separately
+approved OPERATE authority. Production mode requires `--operate-authority-ref`,
+`--verified-backup-sha256`, `--copy-rehearsal-sha256`, `--quiesced-writers` and
+`--ops-store` naming the exact existing producer OPS database. These are operator
+attestations/references, not a new authority grant or independent backup verifier.
+The owner must verify backup, measured copy rehearsal and writer/timer quiescence
+before this command. Do not point it at an unrelated OPS database.
+
+Production mode acquires the existing global OPS lease and holds an OPS write
+transaction through the full audit, then takes the ResearchStore writer lease.
+A competing OPS writer cannot acquire the lease even after its ordinary TTL;
+a competing canonical writer is refused by ResearchStore. Both fences release
+after preparation/refusal. No schema, lease TTL or timer settings change.
+Copy preparation remains supported. The lookup binds filesystem identity/stat:
+never copy its prepared artifact onto production. Prepare production explicitly
+in place, then the ordinary writer uses it. A moved/restored root needs its own
+explicit preparation before returning to the new writer.
 
 Transactions and records use persistent SHA256 radix tries, leaf limit 16,
 node limit 64KiB. A lookup verifies hashes on its bounded route; a hit loads
@@ -78,3 +93,6 @@ explicit full audit/repreparation. Moving/restoring a root also requires this
 operation before new writes; read-only canonical replay needs no index.
 Nodes are immutable and obsolete nodes are retained; the physical model must
 include their growth. There is no eviction or destructive cleanup in V1.
+Commissioning WATCH records node-file count, bytes and inode growth. This is an
+explicit measurement, never an extra inventory in a normal tick; no optimization
+or retention policy follows without measured evidence.

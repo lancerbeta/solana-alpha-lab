@@ -173,19 +173,36 @@ Completion adds bytes/pacing without a second ordinary debit. This affects
 episode accounting only; legacy calls keep the previous completion policy.
 Counter debits are conservative reservations, not evidence of HTTP attempts.
 
-Before nomination the storage admission owner projects committed slots plus
-the next round at the frozen response cap, six possible copies and 256MiB
-margin. Insufficient/unknown filesystem free bytes commits ordinary stop-intake
-and DRAINING; no admissions or committed obligations are deleted. This is a
-conservative local MODEL, not an approved shared-account/whole-Factory budget
-or a proven compression guarantee. TARGET <=40GiB/HARD <=50GiB still require
-the existing whole-Factory commissioning envelope. Other consumers, unrelated
-resident bytes and backup peaks remain separate gates, never inferred absent.
+Before activation, the operator supplies `EPISODE_PRODUCER_STORAGE_COMMISSIONING_V1`
+via `activate --episode-storage-commissioning <json>`. It binds the exact root
+device/inode, schedule SHA and activation ID, separate OPERATE reference, verified
+backup/copy rehearsal hashes, actual volume bindings and whole-Factory PASS receipt,
+plus approved producer-local byte bounds and a canonical self-hash. These are
+attested bindings, not independently authenticated authority or backup proofs.
+Missing/UNKNOWN whole-Factory topology refuses before ACTIVE. TARGET <=40GiB/
+HARD <=50GiB, actual volumes, unrelated residents and backup/staging peaks remain
+whole-Factory gates. The six-copy response-cap forecast is MODEL/advisory only.
 
-Metadata readback distinguishes intake, frames, obligations, attempted/no-request/
+Before nomination, runtime local control reserves all committed PENDING/DUE/CLAIMED
+slots and assigned-time/chunk call groups, each prospective next-round slot/call,
+all remaining nominations and fixed/safety headroom. The local per-call bound must
+cover raw capture, OPS/WAL, publication, canonical records/manifests and derived
+lookup on the producer filesystem; per-slot metadata covers non-call terminal work.
+Preparation binds those limits from copy measurements and approved local envelope;
+runtime never substitutes 8MiB times six copies. Unsafe/unknown LOCAL free space
+commits stop-intake and DRAINING while preserving the committed tail. A missing or
+invalid local binding refuses new intake with `PRODUCER_LOCAL_ENVELOPE_REQUIRED`
+and preserves lifecycle; it does not turn an unbound MODEL into permanent DRAINING.
+The bound envelope cannot be changed retrospectively. Restore/moved root requires
+explicit commissioning again, with no automatic cap or sampling reductions.
+
+Metadata readback distinguishes intake, frames, episodes, attempted/no-request/
 ambiguous execution, missing values, publication backlog and next maturity.
 Legacy rows lacking new diagnostic metadata return UNKNOWN, without backfill.
 Episode nomination does not inherit birth/recent source-poll coverage semantics.
+`admitted_episodes`, `open_episodes` and `terminal_episodes` count admissions/entities.
+`slot_states` is authoritative for due-slot backlog; episode counts are not slot
+counts. WATCH measures operational-packet wall against actual due-row count.
 
 - Protection reaches raw evidence too: the published E0 dependency is a
   content-addressed witness extract holding only the admitted object and the

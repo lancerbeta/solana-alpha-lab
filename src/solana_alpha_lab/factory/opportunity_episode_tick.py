@@ -1162,21 +1162,40 @@ class _EpisodeTick:
         self._prime_account_pace()
         self.process_slots()
         if admission_open and self.report["stop_reason"] is None:
-            from solana_alpha_lab.factory.hot90_storage_admission import episode_drain_reserve
+            from solana_alpha_lab.factory.hot90_storage_admission import (
+                episode_drain_reserve, validate_episode_storage_commissioning,
+            )
             from solana_alpha_lab.factory.observation_schedule_lifecycle import stop_episode_intake
-            remaining = self.store.count_due_in_states(
-                ("PENDING", "DUE", "CLAIMED"), schedule_sha256=self.digest,
-                activation_id=self.activation_id)
+            try:
+                envelope = validate_episode_storage_commissioning(
+                    dict(self.activation.get("payload") or {}).get("storage_commissioning"),
+                    data_root=self.data_root, schedule_sha256=self.digest, activation_id=self.activation_id)
+            except (ValueError, TypeError, OSError, RecursionError):
+                self.report["drain_headroom"] = {"status": "COMMISSIONING_REQUIRED"}
+                self.report["stop_reason"] = "PRODUCER_LOCAL_ENVELOPE_REQUIRED"
+                self.report["terminal"] = "TICK_PARTIAL"
+                self.publish_outbox()
+                self.report["provider_calls"] = self.accounts.tick_calls
+                self.report["credential_reads"] = self.credential_reads
+                return self.report
+            remaining = self.store.episode_remaining_call_groups(
+                schedule_sha256=self.digest, activation_id=self.activation_id,
+                batch_size=int(self.schedule["observation_schedule"]["max_batch_size"]))
             quota = round_quota(int(self.schedule["sampling"]["daily_normal_ceiling"]), round_index(self.now))
+            # T0 is known only after capture; do not presume prospective batching.
+            prospective = quota * (len(episode_point_ids()) - 1)
+            period = int(self.schedule["nomination"]["round_period_seconds"])
+            seconds = max(0, (parse_utc(str(self.activation["stops_admitting_at"])) - self.now).total_seconds())
+            future_nomination_calls = int((seconds + period - 1) // period) * len(self.schedule["nomination"]["sources"])
             try:
                 free = shutil.disk_usage(self.data_root).free
             except OSError:
                 free = None
-            reserve = episode_drain_reserve(remaining_slots=remaining,
-                prospective_slots=quota * len(episode_point_ids()),
-                response_cap_bytes=int(self.schedule["budgets"]["response_decoded_bytes_max"]), free_bytes=free)
+            reserve = episode_drain_reserve(**remaining,
+                prospective_slots=prospective, prospective_call_groups=prospective,
+                remaining_nomination_calls=future_nomination_calls, local_envelope=envelope, free_bytes=free)
             self.report["drain_headroom"] = reserve
-            if reserve["status"] in {"UNKNOWN", "STOP_NEW_INTAKE"}:
+            if reserve["status"] in {"UNKNOWN_LOCAL_FREE_SPACE", "STOP_NEW_INTAKE"}:
                 stop_episode_intake(data_root=self.data_root, store=self.store,
                     schedule_sha256=self.digest, activation_id=self.activation_id,
                     now=self.provider_ctx.now(), producer_git_sha=self.producer)

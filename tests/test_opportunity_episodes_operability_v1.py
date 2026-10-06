@@ -30,7 +30,16 @@ class EpisodeOperabilityTests(unittest.TestCase):
             root = Path(temporary.name) / "rdp"
         ResearchStore(root).prepare_write_lookup()
         start = kwargs.pop("start", START)
-        return EpisodeScenario(root, start=start, stops=start + timedelta(hours=2), **kwargs)
+        stops = kwargs.pop("stops", start + timedelta(hours=2))
+        return EpisodeScenario(root, start=start, stops=stops, **kwargs)
+
+    def test_tick_never_prepares_lookup_implicitly_even_in_legacy_mode(self):
+        with tempfile.TemporaryDirectory() as folder:
+            sc = EpisodeScenario(Path(folder) / "rdp", start=START, stops=START + timedelta(hours=2))
+            with patch.object(ResearchStore, "prepare_write_lookup", side_effect=AssertionError("AUTO_PREPARATION")):
+                result = sc.tick(START + timedelta(seconds=5))
+            self.assertEqual(result["_exit_code"], 0, result)
+            self.assertFalse((sc.data_root / "research/write_lookup_v1").exists())
 
     def mature(self, sc):
         mint = synth_mint("MatureOperability")
@@ -228,6 +237,128 @@ class EpisodeOperabilityTests(unittest.TestCase):
         self.assertEqual(final["activation_state"], "COMPLETE")
         self.assertEqual(sc.unpublished(), 0)
 
+    def test_factory_topology_unknown_refuses_before_activation(self):
+        from tests.test_opportunity_episodes_harness_v1 import (
+            ROOT, PRODUCER, authority_phrase, build_schedule, write_assignment, storage_commissioning_fixture)
+        from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+            register_schedule, authorize_schedule, activate_schedule, ObservationLifecycleError)
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        from solana_alpha_lab.factory.observation_schedule import canonical_sha256
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder) / "rdp"
+            ResearchStore(root).prepare_write_lookup()
+            schedule = build_schedule(starts_at=START, stops_at=START + timedelta(hours=48),
+                                      assignment=write_assignment(root, []), daily_ceiling=24, active_cap=48)
+            with closing(ObservationScheduleStore(root / "observation_schedule_state.sqlite")) as store:
+                common = dict(root=ROOT, data_root=root, store=store, now=START, producer_git_sha=PRODUCER)
+                register_schedule(document=schedule, **common)
+                authorize_schedule(schedule_sha256=schedule["schedule_sha256"], phrase=authority_phrase(schedule), **common)
+                scope = dict(schedule_sha256=schedule["schedule_sha256"], activation_id="ACT-STORAGE-GATE", **common)
+                with self.assertRaisesRegex(ObservationLifecycleError, "EPISODE_STORAGE_COMMISSIONING_REQUIRED"):
+                    activate_schedule(**scope)
+                envelope = storage_commissioning_fixture(root, schedule, scope["activation_id"])
+                envelope.pop("envelope_sha256")
+                envelope["factory_storage_gate"] = "UNKNOWN"
+                envelope["envelope_sha256"] = canonical_sha256(envelope)
+                with self.assertRaisesRegex(ObservationLifecycleError, "FACTORY_STORAGE_COMMISSIONING_REQUIRED"):
+                    activate_schedule(storage_commissioning=envelope, **scope)
+                self.assertIsNone(store.get_activation(schedule["schedule_sha256"], scope["activation_id"]))
+
+    def test_commissioned_storage_binding_is_immutable_and_unknown_does_not_drain(self):
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore, ObservationScheduleStoreError
+        from solana_alpha_lab.factory.observation_schedule_lifecycle import activate_schedule, ObservationLifecycleError
+        from tests.test_opportunity_episodes_harness_v1 import ROOT, PRODUCER
+        sc = self.scenario()
+        with closing(ObservationScheduleStore(sc.ops_path)) as store:
+            row = store.get_activation(sc.schedule["schedule_sha256"], sc.activation_id)
+            changed = dict(row["payload"]["storage_commissioning"])
+            changed["fixed_local_reserve_bytes"] += 1
+            with self.assertRaisesRegex(ObservationScheduleStoreError, "DENY_RETROACTIVE_MUTATION"):
+                store.upsert_activation({**row, "payload": {**row["payload"], "storage_commissioning": changed}}, clock=START)
+            with self.assertRaisesRegex(ObservationScheduleStoreError, "DENY_RETROACTIVE_MUTATION"):
+                store.transition_activation(schedule_sha256=sc.schedule["schedule_sha256"], activation_id=sc.activation_id,
+                    new_state="PAUSED_OPERATOR", payload={"storage_commissioning": changed}, clock=START)
+            with self.assertRaisesRegex(ObservationLifecycleError, "EPISODE_STORAGE_REPLAY_CONFLICT"):
+                activate_schedule(root=ROOT, data_root=sc.data_root, store=store, schedule_sha256=sc.schedule["schedule_sha256"],
+                    activation_id=sc.activation_id, now=START, producer_git_sha=PRODUCER, storage_commissioning=changed)
+            replay = activate_schedule(root=ROOT, data_root=sc.data_root, store=store, schedule_sha256=sc.schedule["schedule_sha256"],
+                    activation_id=sc.activation_id, now=START, producer_git_sha=PRODUCER)
+            self.assertEqual(replay["terminal"], "ACTIVATE_REPLAY")
+            # Simulate a pre-upgrade activation without a bound local envelope.
+            # Direct fixture SQL is neither a supported commissioning migration nor production work.
+            payload = dict(row["payload"])
+            payload.pop("storage_commissioning")
+            store._conn.execute("UPDATE schedule_activations SET payload_json=? WHERE schedule_sha256=? AND activation_id=?",
+                (json.dumps(payload), sc.schedule["schedule_sha256"], sc.activation_id))
+            store._conn.commit()
+        result = sc.tick(START + timedelta(seconds=5))
+        self.assertEqual(result["stop_reason"], "PRODUCER_LOCAL_ENVELOPE_REQUIRED")
+        self.assertEqual(result["drain_headroom"]["status"], "COMMISSIONING_REQUIRED")
+        self.assertEqual(sc.activation_state(), "ACTIVE")
+        self.assertEqual(len(sc.admissions()), 0)
+        self.assertFalse(result["_calls"])
+
+    def test_canary_24_per_day_48h_local_envelope_survives_model_proxy_and_unsafe_drains(self):
+        from solana_alpha_lab.factory.hot90_storage_admission import episode_factory_storage_forecast
+        from solana_alpha_lab.factory.opportunity_episodes import round_quota
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        from solana_alpha_lab.factory.observation_schedule import parse_utc
+        sc = self.scenario(daily_ceiling=24, active_cap=48, stops=START + timedelta(hours=48))
+        free = 78_746_222_592
+        disk = namedtuple("disk", "total used free")(102_888_095_744, 102_888_095_744 - free, free)
+        checkpoints = []
+        mints = [synth_mint(f"Canary{index}Z") for index in range(192)]
+        self.assertEqual(len(set(mints)), 192)
+        with patch("solana_alpha_lab.factory.opportunity_episode_tick.shutil.disk_usage", return_value=disk):
+            for index in range(192):
+                at = START + timedelta(minutes=15 * index)
+                mint = mints[index]
+                row = token_object(mint, price=1, liquidity=10000, holders=60)
+                nominate(sc.market, at, {"toporganicscore": [row] if round_quota(24, index % 96) else [],
+                                         "toptraded": [], "toptrending": []})
+                sc.market.series[mint] = lambda now, value=row: value
+                # Day-two start stays inside the ordinary round/grace window,
+                # after day-one call completion, so rolling-24h does not hold
+                # an otherwise available ticket for a few seconds of IO jitter.
+                result = sc.tick(at + timedelta(seconds=5 + 30 * (index // 96)))
+                self.assertEqual(result["_exit_code"], 0, result)
+                self.assertEqual(sc.activation_state(), "ACTIVE")
+                reserve = result["drain_headroom"]
+                self.assertEqual(reserve["status"], "LOCAL_HEADROOM")
+                forecast = episode_factory_storage_forecast(
+                    remaining_slots=reserve["remaining_slots"], prospective_slots=round_quota(24, index % 96) * 138,
+                    response_cap_bytes=sc.schedule["budgets"]["response_decoded_bytes_max"], free_bytes=free)
+                checkpoints.append({"round": index, "admitted_episodes": len(sc.admissions()),
+                                    "local": reserve, "six_copy_advisory_status": forecast["status"]})
+                if index == 95:
+                    self.assertEqual(len(sc.admissions()), 24)
+        self.assertEqual(len(sc.admissions()), 48)
+        self.assertTrue(any(item["six_copy_advisory_status"] == "STOP_NEW_INTAKE" for item in checkpoints))
+        unsafe = disk._replace(free=1)
+        with patch("solana_alpha_lab.factory.opportunity_episode_tick.shutil.disk_usage", return_value=unsafe):
+            pressure = sc.tick(START + timedelta(hours=47, minutes=50))
+        self.assertEqual(pressure["activation_state"], "DRAINING")
+        self.assertEqual(pressure["stop_reason"], "DRAIN_RESERVE_PRESSURE")
+        self.assertEqual(len(sc.admissions()), 48)
+        self.assertFalse(any(call["kind"] == "category" for call in pressure["_calls"]))
+        deadline = sc.query("SELECT MAX(deadline_at) FROM due_observations")[0][0]
+        tail = sc.tick(parse_utc(deadline) + timedelta(seconds=1))
+        self.assertEqual(tail["activation_state"], "COMPLETE")
+        self.assertEqual(sc.unpublished(), 0)
+        with closing(ObservationScheduleStore(sc.ops_path)) as store:
+            projection = store.episode_operability_projection(schedule_sha256=sc.schedule["schedule_sha256"],
+                activation_id=sc.activation_id, now=parse_utc(deadline) + timedelta(seconds=1))
+        self.assertEqual((projection["admitted_episodes"], projection["open_episodes"], projection["terminal_episodes"]), (48, 0, 48))
+        self.assertEqual(sum(projection["slot_states"].values()), 48 * 138)
+        self.assertFalse(any(key.endswith("_obligations") for key in projection))
+        report = {"status": "PASS", "evidence_class": "SYNTHETIC_LOCAL_CONTROL", "canary_days": 2,
+                  "daily_ceiling": 24, "active_cap": 48, "free_bytes_order": free,
+                  "response_cap_unchanged": sc.schedule["budgets"]["response_decoded_bytes_max"],
+                  "checkpoints": checkpoints, "unsafe_pressure": pressure["drain_headroom"],
+                  "tail": tail["activation_state"], "unpublished": sc.unpublished(), "operator": projection,
+                  "factory_actual_topology": "UNKNOWN_NOT_LIVE_COMMISSIONING"}
+        (sc.data_root.parent / "report.json").write_bytes((json.dumps(report, indent=2) + "\n").encode('utf-8'))
+
     def test_operational_packet_preserves_episode_scope_and_storage_history_writes(self):
         from solana_alpha_lab.factory.collector_operational_packet import (
             append_storage_history, build_collector_operational_packet)
@@ -240,7 +371,7 @@ class EpisodeOperabilityTests(unittest.TestCase):
                 observation_rdp=sc.data_root, schedule_sha256=sc.schedule["schedule_sha256"],
                 activation_id=sc.activation_id, remote_config={}, environ={})
         self.assertEqual(packet["collection"], "OPPORTUNITY_EPISODES")
-        self.assertEqual(packet["episode_operability"]["open_obligations"], 0)
+        self.assertEqual(packet["episode_operability"]["open_episodes"], 0)
         self.assertEqual(packet["episode_operability"]["unpublished_backlog"], 0)
         path = append_storage_history(sc.data_root.parent, observed_at=packet["observed_at"],
             disk_used_pct=40, sqlite_bytes=123, rdp_bytes=456)

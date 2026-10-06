@@ -4,8 +4,8 @@
   "review_id": "OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-FACTORY-FIT-001",
   "as_of": "2026-10-06",
   "task_id": "OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1",
-  "reviewed_bindings_sha256": "af9e5c5947a8c02c73d855cfe355d18b9ee0ae704b3aa1778c478fe13520fd66",
-  "reviewed_inventory_sha256": "d14ebbb72550c10f0edc708239d08669ec4c6c9a4e50b84599cdcb7d10af92bb",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
@@ -13,7 +13,7 @@
     "flexibility_and_history": "PASS_OPTIONAL_DERIVED_IDENTITY_POINTERS_CANONICAL_SOURCE_LEGACY_READER_AND_FROZEN_WRITER_ROLLBACK_PRESERVED",
     "context_efficiency": "PASS_EXISTING_RUNBOOK_CONTRACT_CATALOG_ROUTE_NO_NEW_OPERATION_STACK",
     "research_truth": "PASS_INVOLVED_CANONICAL_HASHES_GLOBAL_IDENTITY_FENCING_PIT_READERS_NONEMPTY_PROTECTION_PINS_NO_REAL_LOOKS_ARBITRARY_FULL_AUDIT_SEPARATE",
-    "owner_operability": "PASS_GAPS_ATTEMPTS_MISSING_VALUES_NO_REQUEST_DRAIN_RETRY_FRAGMENT_REFUSALS_EXPLICIT_UNKNOWN",
+    "owner_operability": "PASS_HONEST_COPY_CANONICAL_MODES_SEPARATE_OPERATE_LOCAL_CONTROL_FACTORY_PREACTIVATION_GATE_EPISODE_VS_SLOT_COUNTS",
     "execution_to_cashflow": "NOT_APPLICABLE_NO_EXECUTION_OR_CASHFLOW",
     "monitoring_and_recovery": "PASS_COLD_RESTART_PENDING_REFUSAL_EXPLICIT_REPREPARE_EXISTING_BACKUP_DETACHED_RESTORE_NO_NOTIFY_PASS_CLAIM",
     "build_vs_buy": "PASS_EXISTING_STORAGE_PUBLISHER_CALL_LEDGER_RELEASE_IMPORT_FORGE_BACKUP_WRAPPED_NO_ENGINE_DB_SERVICE_DEPENDENCY",
@@ -22,9 +22,9 @@
   },
   "capability_radar": {
     "now": "NONE",
-    "watch": "SEPARATE_SINGLE_ACTIVATION_CANARY_AFTER_EXACT_LINUX_ACCOUNT_ROUTE_ASSIGNMENT_STORAGE_PROOF"
+    "watch": "SEPARATE_SINGLE_ACTIVATION_CANARY_AFTER_EXACT_LINUX_ACCOUNT_ROUTE_ASSIGNMENT_STORAGE_PROOF; LOOKUP_NODE_COUNT_BYTES_INODE_GROWTH_AND_OPERATIONAL_PACKET_WALL_VS_DUE_ROWS_NO_OPTIMIZATION"
   },
-  "recovery": "Owner-gated code revert preserves canonical data and obligations; frozen old writer reads/appends, new writer refuses stale index until explicit full audit/preparation on copy. No runtime mutation in this atom.",
+  "recovery": "Preserve canonical data/obligations; frozen old writer invalidates lookup; new writer requires explicit target-root preparation under backup/copy rehearsal/quiescence and separate OPERATE. No production runtime mutation in this atom.",
   "limits": [
     "NO_ALPHA",
     "NO_LIVE_ACCEPTANCE",
