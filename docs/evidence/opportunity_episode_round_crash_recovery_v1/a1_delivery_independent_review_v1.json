@@ -63,16 +63,16 @@
       "prior_verdict": "NOT_READY",
       "severity": "MAJOR",
       "finding": "Corrupt terminal round frame and admission without owner row no longer pass cohort maturity or closure",
-      "observed_head": "165c68d5",
-      "resolved_by_head": "8a6d41d1"
+      "observed_head": "165c68d549d49a06d69e242995c38da0c66dc44f",
+      "resolved_by_head": "8a6d41d11327fd45944eaa9e30597b927b890c92"
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "prior_verdict": "NOT_READY",
       "severity": "MAJOR",
       "finding": "Resumed round that drops a planned winner records dropped_planned and terminalizes as partial admission like the after-slack case; committed_episode_ids is authoritative",
-      "observed_head": "165c68d5",
-      "resolved_by_head": "8a6d41d1"
+      "observed_head": "165c68d549d49a06d69e242995c38da0c66dc44f",
+      "resolved_by_head": "8a6d41d11327fd45944eaa9e30597b927b890c92"
     }
   ]
 }
