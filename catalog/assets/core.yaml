@@ -17787,7 +17787,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-34A
   location: {kind: git_path, logical_uri: 'repo://docs/OPERATOR_NAVIGATION.md', repository_path: docs/OPERATOR_NAVIGATION.md}
-  integrity: {kind: sha256, sha256: a896bed012b0d9b98531215292e4e69ee4dea9351fbecaa526c2472c06278a26}
+  integrity: {kind: sha256, sha256: 9584107e7e5392390973da28f55670aa5e07aa02cd4069266f6d27d184194098}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: SCRIPT-T34A-CONTEXT-001}
@@ -28305,7 +28305,7 @@ records:
   relations: [{relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-009}]
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
-  search_terms: [PROVIDER_ROUTE, REGISTRY_V10, JUPITER, TOKENS_V2, SEARCH, current provider route registry, актуальный реестр маршрутов провайдеров]
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V10, JUPITER, TOKENS_V2, SEARCH]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
   record_version: '1.0'
@@ -28354,6 +28354,70 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [PROVIDER_ROUTE, REGISTRY_V10, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Append-only v11 provider-route registry recording the Jupiter core parser/route qualification (three category 5m routes and the single-object search) while preserving 12 v10 route objects and the shared-account pace limitation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-06'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_CORE_SWITCH_AND_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/provider_route_capability_registry_v11.yaml', repository_path: configs/provider_route_capability_registry_v11.yaml}
+  integrity: {kind: sha256, sha256: ce3a81b50616cd039bc2164ea9d9a4966b51f2d6f6fd708cf3051537b81d1030}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010}]
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V11, JUPITER, TOKENS_V2, SEARCH, CATEGORY_5M, current provider route registry, актуальный реестр маршрутов провайдеров]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Closed root schema for the v11 append-only provider-route registry.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-06'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_CORE_SWITCH_AND_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/provider_route_capability_registry_v11.schema.json', repository_path: catalog/schemas/provider_route_capability_registry_v11.schema.json}
+  integrity: {kind: sha256, sha256: 70b5b1496d598ac6f36ebc01ada5cdeff502181d857d9047f8ff15361978fb05}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: governed_by, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V11, SCHEMA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fail-closed append-only v11 validator and resolver preserving 12 v10 route objects, the one recorded search-route transition and the receipt-bound observed routes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-06'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_CORE_SWITCH_AND_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/provider_route_capability_registry_v11.py', repository_path: src/solana_alpha_lab/provider_route_capability_registry_v11.py}
+  integrity: {kind: sha256, sha256: 15b7d49190bcf0a48e22c8c9085eaf30179cf9826921fbc8f6970a47a6ca7374}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V11, VALIDATOR]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011
+  record_version: '1.0'
+  asset_type: script
+  purpose: Tests v10 byte preservation, v11 schema binding, receipt/limits byte pins, receipt-to-route parity, resolver behavior and fail-closed tamper detection.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-06'
+  truth_owner: OPPORTUNITY_EPISODES_JUPITER_CORE_SWITCH_AND_BIND_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_provider_route_capability_registry_v11.py', repository_path: tests/test_provider_route_capability_registry_v11.py}
+  integrity: {kind: sha256, sha256: 4a4f5896a1f21d2eec91949398ba14bf316d39b73b6f67b26a086dbcf4920252}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011}]
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PROVIDER_ROUTE, REGISTRY_V11, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001
   record_version: '1.0'
@@ -31623,7 +31687,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/discovery_gold_queries_v1.yaml', repository_path: catalog/fixtures/discovery_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: ccde522a4d8613f19781cbce4ff7ec5922a9cc901ae455f2b1ba1b80543fd37b}
+  integrity: {kind: sha256, sha256: 4db7c872ac61a30a8cb3d8449d2572b8f441d8d86a6dc1d2586366070d26b4b1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-KCDN-ATOM-A-001}
@@ -31641,7 +31705,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_catalog_canonical_binding_discovery.py', repository_path: tests/test_catalog_canonical_binding_discovery.py}
-  integrity: {kind: sha256, sha256: c67a8bb3b34d2b65cc02dbdd6619630fd992f85e57ca2d99112d366e55dd3380}
+  integrity: {kind: sha256, sha256: 44564c856791ff0454ead0607a978d76e009c1e5436cbc7e51a6c1fc378ff6cc}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-CATALOG-DISCOVERY-001}
@@ -34651,7 +34715,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/FACTORY_SEMANTIC_MAP.md', repository_path: docs/FACTORY_SEMANTIC_MAP.md}
-  integrity: {kind: sha256, sha256: 3510f3e02b20b84ba647b6bf2fc0f7dd93ee6ffe05333dcd96bd616930ce930a}
+  integrity: {kind: sha256, sha256: 2fbf4e7edce8c53b83ccec0f837ff49eef706d72448b9fe89ea8e4ab11ae35a6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -40026,7 +40090,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/opportunity_episodes_jupiter_v1.md', repository_path: docs/contracts/opportunity_episodes_jupiter_v1.md}
-  integrity: {kind: sha256, sha256: a50afe6e0f799b86eaee49ac5ec385a4b17edadc6dd1305933297898f9256a37}
+  integrity: {kind: sha256, sha256: efcec66dfb8c4005b2acdfa67ed6cc6847a789eb02702ee83000c1e9d614a73f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
@@ -40044,7 +40108,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md', repository_path: docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: f20da3bd02eef776aa122bf4f0f14738fea5dbe94910ca1d07fc292d2ed093f3}
+  integrity: {kind: sha256, sha256: c4f18ccae08b1a689bc3949756338f83c3b718cf0e67e562a3e68f0b5d02005c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}

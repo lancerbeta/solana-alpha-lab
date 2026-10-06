@@ -6,17 +6,17 @@ queries:
   command: search-assets
   query: current provider route registry
   required_top_5:
-  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011
   forbidden_above:
-    CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+    CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011
   rationale: Generic current English lookup must prefer the explicit binding
 - query_id: GQ-CURRENT-PROVIDER-REGISTRY-RU
   command: search-assets
   query: актуальный реестр маршрутов провайдеров
   required_top_5:
-  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011
   forbidden_above:
-    CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+    CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011
   rationale: Generic current Russian lookup must prefer the explicit binding
 - query_id: GQ-EXACT-PROVIDER-REGISTRY-V3-ID
   command: search-assets
@@ -130,9 +130,9 @@ queries:
   command: search-assets
   query: provider route capability registry
   required_top_5:
-  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011
   forbidden_above:
-    CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+    CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-003: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011
   rationale: Ambiguous registry wording still ranks the bound current target first
 - query_id: GQ-AMBIGUOUS-FACTORY
   command: search-assets
@@ -151,7 +151,7 @@ queries:
   query: "provider\u2010route registry"
   match: any
   required_top_5:
-  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011
   rationale: Unicode hyphen NFKC-normalizes into the provider-route phrase
 - query_id: GQ-STATUS-FILTER
   command: search-assets
@@ -168,7 +168,7 @@ queries:
     consumer: FACTORY-001
     relation: derived_from
   required_top_5:
-  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
+  - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011
   rationale: Consumer and relation filters apply before rank
 - query_id: GQ-VISUAL-OPERATING-SYSTEM-EN
   command: search-assets
