@@ -34,7 +34,7 @@ EVIDENCE_DIR = "docs/evidence/opportunity_episodes_jupiter_commissioning_v1"
 RECEIPT_PATH = f"{EVIDENCE_DIR}/jupiter_qualification_receipt_v1.json"
 RECEIPT_SHA256 = "880b2ce75e383444733753e36f1015ad7395d6fabaeefe7f710a07430d13c381"
 LIMITS_PATH = f"{EVIDENCE_DIR}/route_qualification_limits_v1.json"
-LIMITS_SHA256 = "41ef9fba09cee6be7e5bde22c59b3c6f073aa4804461c6d70309d462700f197f"
+LIMITS_SHA256 = "475e03b4d6955cff69f6c280bcc5b4ef5fc8acafabf2ede46832320e4ea34839"
 EVIDENCE_ID = "EVIDENCE-JUPITER-CORE-COMMISSIONING-ROUTE-QUALIFICATION-20261006"
 PACE_DISCIPLINE = "UNPROVEN_FAILED_OVERLAP_WITH_LEGACY"
 UNRECORDED = "UNRECORDED_IN_RECEIPT"
@@ -87,6 +87,22 @@ NON_CLAIM_KEYS = (
 )
 SEARCH_EXTRA_NON_CLAIM_KEYS = ("batch_of_100_search", "memecoin_or_missing_mix_search")
 SEARCH_SHAPE_NOT_COVERED = ["BATCH_OF_100_MINTS", "MEMECOIN_MIX", "ABSENT_OR_MISSING_MINT_MIX"]
+SEARCH_SHAPE_FAILURE = {
+    "fingerprint": "SEARCH_BATCH_SHAPE_UNOBSERVED",
+    "layer": "REQUEST_SHAPE",
+    "interpretation": (
+        "Only a single-object public-mint search is reported (executor report, request shape not shown by "
+        "the receipt); batch of 100, memecoin mix and absent or missing mints were not observed."
+    ),
+}
+SEARCH_SHAPE_FAILURE = {
+    "fingerprint": "SEARCH_BATCH_SHAPE_UNOBSERVED",
+    "layer": "REQUEST_SHAPE",
+    "interpretation": (
+        "Only a single-object public-mint search is reported (executor report, request shape not shown by "
+        "the receipt); batch of 100, memecoin mix and absent or missing mints were not observed."
+    ),
+}
 ROUTE_KEYS = frozenset(
     {
         "route_id", "provider", "endpoint_family", "network", "access_class", "operation",
@@ -114,7 +130,11 @@ COMMON_EVIDENCE_KEYS = frozenset(
         "http_status_counts", "account_pace_discipline", "parser_route_qualification",
     }
 )
-SEARCH_EVIDENCE_KEYS = COMMON_EVIDENCE_KEYS | {"search_shape_coverage", "search_shape_not_covered"}
+SEARCH_EVIDENCE_KEYS = COMMON_EVIDENCE_KEYS | {
+    "search_shape_coverage",
+    "search_shape_not_covered",
+    "search_shape_source",
+}
 CATEGORY_EVIDENCE_KEYS = COMMON_EVIDENCE_KEYS | {"rows_typed_by_parser"}
 ROOT_FIELDS = frozenset(
     {
@@ -220,7 +240,8 @@ def _validate_observed_route(
     _require(last_success.get("response_sha256") == response_sha, "OBSERVED_RESPONSE_SHA_DRIFT")
     for key in ("rows", "rows_with_valid_identity", "rows_core_fields_typed"):
         _require(_is_int(last_success.get(key)) and last_success[key] == rows, "OBSERVED_ROWS_DRIFT")
-    _require(route.get("known_failures") == [PACE_FAILURE], "OBSERVED_FAILURES_DRIFT")
+    expected_failures = [PACE_FAILURE, SEARCH_SHAPE_FAILURE] if is_search else [PACE_FAILURE]
+    _require(route.get("known_failures") == expected_failures, "OBSERVED_FAILURES_DRIFT")
     execution = _mapping(route.get("execution_policy"), "OBSERVED_POLICY_INVALID")
     _require(set(execution) == EXECUTION_KEYS, "OBSERVED_POLICY_KEYS_DRIFT")
     for key in EXECUTION_KEYS:
@@ -248,6 +269,14 @@ def _validate_observed_route(
             "SEARCH_SHAPE_CLAIM_DRIFT",
         )
         _require(evidence.get("search_shape_not_covered") == SEARCH_SHAPE_NOT_COVERED, "SEARCH_SHAPE_LIMITS_DRIFT")
+        _require(
+            evidence.get("search_shape_source") == "EXECUTOR_REPORT_NOT_SHOWN_BY_RECEIPT",
+            "SEARCH_SHAPE_SOURCE_DRIFT",
+        )
+        _require(
+            evidence.get("search_shape_source") == "EXECUTOR_REPORT_NOT_SHOWN_BY_RECEIPT",
+            "SEARCH_SHAPE_SOURCE_DRIFT",
+        )
     else:
         _require(
             _is_int(evidence.get("rows_typed_by_parser")) and evidence["rows_typed_by_parser"] == rows,

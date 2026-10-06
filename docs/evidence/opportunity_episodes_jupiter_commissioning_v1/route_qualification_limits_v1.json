@@ -16,5 +16,7 @@
     "batch of 100 mints",
     "memecoin mix",
     "absent or missing mint mix"
-  ]
+  ],
+  "search_shape_receipt_shows": "one row and a request hash only; the mint and request shape are not in the receipt",
+  "search_shape_source": "EXECUTOR_REPORT_NOT_SHOWN_BY_RECEIPT"
 }

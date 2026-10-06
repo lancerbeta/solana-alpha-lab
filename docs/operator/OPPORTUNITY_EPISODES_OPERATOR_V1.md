@@ -165,6 +165,12 @@ provider/workload lane — legacy collector и его same-envelope renewal не
 работает, а повторный readback не раньше чем через три collector tick (минимум 3 мин) показывает
 `PAUSED_OPERATOR`, неизменные counters и ни одного нового admission, call или
 publication этой activation.
+Эксклюзивность относится к аккаунтному ключу, а не к одной activation: до включения lane
+не существует другого `ACTIVE`/`DRAINING` scope, ни один другой процесс, timer, quote-capture
+campaign или ручной probe не использует Jupiter-ключ в течение canary, а legacy не
+возобновляется, пока lane включена. Pace дисциплина считается доказанной только по
+request-логам всех caller'ов этого ключа: зазор между любыми двумя запросами не меньше
+принятой паузы (3 s); до этого `account_pace_discipline` остаётся `UNPROVEN`.
 Исторические `PAUSED_OPERATOR`/`ABORTED` строки не требуют COMPLETE, repair или
 resume и не входят в новую научную популяцию. Default tick при нескольких
 ACTIVE/DRAINING scopes требует exact selection, поэтому остановленный legacy
@@ -185,7 +191,10 @@ outcomes и protected values. Найденные scopes входят в один
 доказанно пустой inventory допустим с перечнем проверенных owners и границей
 completeness; неразрешимая полнота возвращает один `PROTECTION_SCOPE_UNRESOLVED`
 с точным missing owner и держит широкую exploratory exposure и activation закрытыми.
-Владелец не вспоминает mint-адреса вручную. Новая версия
+Нечитаемый owner — не пустой owner: список проверяемых owners берётся из Git/Catalog, а не
+выбирается исполнителем. Экспозиция прежних probes фиксируется; при существенности holdout
+уже не untouched, а `EXPLORATORY_REUSE` cohorts не объявляются задним числом holdout или
+confirmatory. Владелец не вспоминает mint-адреса вручную. Новая версия
 документа не перезаписывает прежний pin.
 
 Protection sources создаются только как metadata projection полного известного

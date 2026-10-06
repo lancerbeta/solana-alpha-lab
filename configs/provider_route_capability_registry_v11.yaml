@@ -771,6 +771,11 @@ routes:
     interpretation: The qualification calls shared the account key with the running
       legacy collector without a common pace (executor report, not shown by the receipt);
       parser/route qualification is not account-safety evidence.
+  - fingerprint: SEARCH_BATCH_SHAPE_UNOBSERVED
+    layer: REQUEST_SHAPE
+    interpretation: Only a single-object public-mint search is reported (executor
+      report, request shape not shown by the receipt); batch of 100, memecoin mix
+      and absent or missing mints were not observed.
   execution_policy:
     retry: false
     fallback: false
@@ -780,7 +785,7 @@ routes:
     last_observation_receipt: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/jupiter_qualification_receipt_v1.json
     last_observation_receipt_sha256: 880b2ce75e383444733753e36f1015ad7395d6fabaeefe7f710a07430d13c381
     qualification_limits: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/route_qualification_limits_v1.json
-    qualification_limits_sha256: 41ef9fba09cee6be7e5bde22c59b3c6f073aa4804461c6d70309d462700f197f
+    qualification_limits_sha256: 475e03b4d6955cff69f6c280bcc5b4ef5fc8acafabf2ede46832320e4ea34839
     raw_retention: A4_OUTSIDE_GIT
     observed_request_count: 1
     http_status_counts:
@@ -792,6 +797,7 @@ routes:
     - BATCH_OF_100_MINTS
     - MEMECOIN_MIX
     - ABSENT_OR_MISSING_MINT_MIX
+    search_shape_source: EXECUTOR_REPORT_NOT_SHOWN_BY_RECEIPT
   non_claims:
     provider_reliability: false
     data_completeness: false
@@ -868,7 +874,7 @@ routes:
     last_observation_receipt: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/jupiter_qualification_receipt_v1.json
     last_observation_receipt_sha256: 880b2ce75e383444733753e36f1015ad7395d6fabaeefe7f710a07430d13c381
     qualification_limits: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/route_qualification_limits_v1.json
-    qualification_limits_sha256: 41ef9fba09cee6be7e5bde22c59b3c6f073aa4804461c6d70309d462700f197f
+    qualification_limits_sha256: 475e03b4d6955cff69f6c280bcc5b4ef5fc8acafabf2ede46832320e4ea34839
     raw_retention: A4_OUTSIDE_GIT
     observed_request_count: 1
     http_status_counts:
@@ -950,7 +956,7 @@ routes:
     last_observation_receipt: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/jupiter_qualification_receipt_v1.json
     last_observation_receipt_sha256: 880b2ce75e383444733753e36f1015ad7395d6fabaeefe7f710a07430d13c381
     qualification_limits: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/route_qualification_limits_v1.json
-    qualification_limits_sha256: 41ef9fba09cee6be7e5bde22c59b3c6f073aa4804461c6d70309d462700f197f
+    qualification_limits_sha256: 475e03b4d6955cff69f6c280bcc5b4ef5fc8acafabf2ede46832320e4ea34839
     raw_retention: A4_OUTSIDE_GIT
     observed_request_count: 1
     http_status_counts:
@@ -1032,7 +1038,7 @@ routes:
     last_observation_receipt: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/jupiter_qualification_receipt_v1.json
     last_observation_receipt_sha256: 880b2ce75e383444733753e36f1015ad7395d6fabaeefe7f710a07430d13c381
     qualification_limits: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/route_qualification_limits_v1.json
-    qualification_limits_sha256: 41ef9fba09cee6be7e5bde22c59b3c6f073aa4804461c6d70309d462700f197f
+    qualification_limits_sha256: 475e03b4d6955cff69f6c280bcc5b4ef5fc8acafabf2ede46832320e4ea34839
     raw_retention: A4_OUTSIDE_GIT
     observed_request_count: 1
     http_status_counts:

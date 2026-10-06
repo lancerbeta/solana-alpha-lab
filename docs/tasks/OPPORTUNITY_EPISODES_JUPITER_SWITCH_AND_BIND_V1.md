@@ -112,6 +112,9 @@ Required invariants:
 - Precedent note: v9 appended new route IDs for new observations; v11 is the first
   same-route-ID transition (placeholder to observed), legitimate because the
   placeholder had no `last_success` and its object hash is recorded.
+- Accepted limits: the Catalog binding evidence for 011 is its own validator module (no live
+  runtime consumer yet; frozen experiments keep exact v10 pins); the v10 and v11 search route
+  share one route ID, so a receipt citing it must also cite registry ID and sha.
 - No route grants a call, a credential, a retry, a fallback or a selection.
 - The V1 ceiling of 100 admissions per UTC day is documented, not raised.
 
@@ -133,7 +136,9 @@ Risks: moving the Catalog binding changes current-registry lookups and gold
 queries; frozen experiments keep their exact v10 pins.
 Rollback: owner-gated revert of this commit; v10 is untouched.
 STOP: merge boundary; never merge in this atom.
-NEXT: exact-head CI, merge-readiness, owner phrase.
+NEXT: exact-head CI, merge-readiness, owner phrase. Follow-up atoms (separate): the stale
+provider-registry pin in `delivery-harness/policies/solana-alpha-lab.md` (control surface) and
+`tests/test_delivery_harness_adapters.py`; the exclusive-lane SEARCH batch observation.
 REPLAN_TRIGGER: the transition cannot be expressed append-only, or scope reaches
 a scheduler/lifecycle/provider runtime change.
 FACTORY_FIT_REVIEW: FULL_REVIEW. PRODUCT_HORIZON_RADAR NOW=NONE.
