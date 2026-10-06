@@ -659,3 +659,29 @@ watch/pulse против роста ledger; source clocks и RDP progression п�
 due; backup/archive verification; очередной same-family rollover; факт
 доставки daily и incident/recovery. Это контроль после commissioning, а не
 новая ежедневная ручная процедура или новая automation.
+# Episode preparation boundary
+
+Episode commissioning also requires `docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md`
+and `docs/contracts/research_write_lookup_v1.md`. The existing metadata-only host
+recipes do not authorize recursive RDP scans, prepared-index work, backup,
+status/doctor schema paths, deploy or timer changes on production. Those remain
+separate OPERATE actions. Explicit preparation is measured on a verified copy;
+its filesystem-bound lookup cannot be transferred onto production. Under separate
+OPERATE, verified backup, measured copy rehearsal and quiesced writers/timer,
+`prepare_research_write_lookup.py --production-commissioning` prepares the canonical
+root in place with the exact producer OPS store and both writer fences. Ordinary
+deploy/tick/startup never prepare it. Restore/moved-root/code rollback preserve
+canonical history and require explicit preparation on the target root before
+returning to new writer code. Whole-Factory storage UNKNOWN blocks activation;
+runtime reserve uses the exact commissioned producer-local envelope. Windows process proof is not Linux unit
+or power-loss acceptance. Notification freshness is not proof of off-host
+delivery; an absent receiver remains NOT_CONFIGURED.
+
+Episode tick `TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE` with NEXT
+`RECONCILE_ACTIVE_TRANSITION_PROOF` has the diagnostic/recovery route in
+`OPPORTUNITY_EPISODES_OPERATOR_V1.md`. Preserve activation IDs, ledger, journal
+and canonical bytes; diagnose on a verified isolated copy. The generic terminal
+does not authorize reprepare: confirmed lookup reconciliation uses the existing
+separate OPERATE commissioning prerequisites/fences; missing evidence or an
+unresolved cause requires a repair gate. Do not bypass the proof gate or copy a
+prepared lookup to production.

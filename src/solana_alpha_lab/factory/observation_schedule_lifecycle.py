@@ -132,7 +132,8 @@ def _append_or_replay(data_root: Path, event: ResearchEvent) -> None:
     try:
         store.append([event], transaction_id=event.transaction_id)
     except Exception:
-        existing = list(store.iter_committed_records())
+        exact = store.find_record(event.record_id)
+        existing = [exact] if exact is not None else []
         match = next((item for item in existing if item.record_id == event.record_id), None)
         if match is None:
             raise
@@ -1054,10 +1055,11 @@ def _draining_transition_evidence(
             # Completion names one transaction. Reuse the store's committed
             # transaction lookup and full partition verifier, with no MEM/OBS
             # payload walk or new persistent index/truth owner.
-            manifest = research._existing_transaction(f"RESEARCH-TXN-{event_id.upper()}")
+            manifest = research._existing_transaction(f"RESEARCH-TXN-{event_id.upper()}", read_only_pending=True)
             records = research._verify_partition(manifest) if manifest is not None else ()
         else:
             records, _telemetry = research.iter_lifecycle_records_bounded(
+                state_only=True,
                 include_member_predecessor=False,
                 schedule_sha256=schedule_sha256,
                 activation_id=activation_id,
@@ -1278,6 +1280,7 @@ def rollover_research_event_proven(
         records, _telemetry = ResearchStore(
             data_root, create_if_missing=False
         ).iter_lifecycle_records_bounded(
+            state_only=True,
             include_member_predecessor=False,
             schedule_sha256=predecessor_schedule,
             activation_id=predecessor_activation,
@@ -1362,6 +1365,7 @@ def rollover_research_event_proven(
         successor_records, _telemetry = ResearchStore(
             data_root, create_if_missing=False
         ).iter_lifecycle_records_bounded(
+            state_only=True,
             include_member_predecessor=False,
             schedule_sha256=successor_schedule,
             activation_id=successor_activation,
@@ -1573,6 +1577,7 @@ def activation_transition_research_event_proven(
         records, _telemetry = ResearchStore(
             data_root, create_if_missing=False
         ).iter_lifecycle_records_bounded(
+            state_only=True,
             include_member_predecessor=False,
             schedule_sha256=schedule_sha256,
             activation_id=activation_id,
@@ -1668,6 +1673,7 @@ def _prior_active_transition_research_event_proven(
         records, _telemetry = ResearchStore(
             data_root, create_if_missing=False
         ).iter_lifecycle_records_bounded(
+            state_only=True,
             include_member_predecessor=False,
             schedule_sha256=schedule_sha256,
             activation_id=activation_id,
@@ -1805,6 +1811,7 @@ def activate_schedule(
     activation_id: str,
     now: datetime,
     producer_git_sha: str,
+    storage_commissioning: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     registered = store.get_registered_schedule(schedule_sha256)
     if registered is None:
@@ -1824,6 +1831,24 @@ def activate_schedule(
             else None
         ),
     )
+    from solana_alpha_lab.factory.opportunity_episodes import is_episode_schedule
+    if not is_episode_schedule(document) and storage_commissioning is not None:
+        raise ObservationLifecycleError("EPISODE_STORAGE_SCHEDULE_ONLY")
+    if is_episode_schedule(document):
+        from solana_alpha_lab.factory.hot90_storage_admission import (
+            EpisodeStorageError, validate_episode_storage_commissioning,
+        )
+        frozen_storage = dict((existing or {}).get("payload") or {}).get("storage_commissioning")
+        if existing is not None and frozen_storage is None:
+            raise ObservationLifecycleError("EPISODE_STORAGE_COMMISSIONING_REQUIRED")
+        if storage_commissioning is not None and frozen_storage is not None and storage_commissioning != frozen_storage:
+            raise ObservationLifecycleError("EPISODE_STORAGE_REPLAY_CONFLICT")
+        try:
+            storage_commissioning = validate_episode_storage_commissioning(
+                storage_commissioning if storage_commissioning is not None else frozen_storage,
+                data_root=data_root, schedule_sha256=schedule_sha256, activation_id=activation_id)
+        except EpisodeStorageError as exc:
+            raise ObservationLifecycleError(exc.code) from exc
     if existing is None:
         siblings = [
             row
@@ -1872,7 +1897,8 @@ def activate_schedule(
         starts_at=document["activation"]["starts_at"],
         stops_admitting_at=document["activation"]["stops_admitting_at"],
         schedule_key=str(document["schedule_key"]),
-        payload={"receipt_sha256": receipt["receipt_sha256"]},
+        payload={"receipt_sha256": receipt["receipt_sha256"],
+                 **({"storage_commissioning": storage_commissioning} if storage_commissioning is not None else {})},
         clock=now,
     )
     event = _research_event(
@@ -1887,6 +1913,8 @@ def activate_schedule(
             "prior_state": transition["prior_state"],
             "transition_sequence": transition["transition_sequence"],
             "authority_receipt_sha256": receipt["receipt_sha256"],
+            **({"storage_commissioning_sha256": storage_commissioning["envelope_sha256"]}
+               if storage_commissioning is not None else {}),
         },
         now=now,
         producer_git_sha=producer_git_sha,

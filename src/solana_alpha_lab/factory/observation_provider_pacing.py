@@ -36,6 +36,7 @@ class _AccountingGate(Protocol):
         raw_bytes: int = 1,
         credits: int = 1,
         completed_at: datetime | None = None,
+        consume_call: bool = True,
     ) -> None: ...
 
 
@@ -214,9 +215,13 @@ class ProviderTickContext:
         raw_bytes: int = 1,
         credits: int = 1,
         completed_at: datetime | None = None,
+        reserved: bool = False,
     ) -> None:
         completion = (completed_at or self.now()).astimezone(UTC)
-        accounts.note(raw_bytes=raw_bytes, credits=credits, completed_at=completion)
+        if reserved:
+            accounts.note(raw_bytes=raw_bytes, credits=credits, completed_at=completion, consume_call=False)
+        else:
+            accounts.note(raw_bytes=raw_bytes, credits=credits, completed_at=completion)
         self.provider_completions += 1
         if self._injectable is None:
             self._logical_offset = max(

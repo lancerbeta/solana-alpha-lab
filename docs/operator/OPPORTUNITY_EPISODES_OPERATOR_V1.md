@@ -102,3 +102,193 @@ values; registered replay recomputes from the frozen recipe and release files.
 No provider smoke, deploy, live activation, real science, retention/eviction or
 volume features. Category 5m routes are a `PROVIDER_ROUTE_REGISTRY_GAP` until
 commissioning records evidence.
+# Bounded operability commissioning
+
+Для нового campaign сначала нужен отдельный OPERATE gate. Локальный PR не
+разрешает deploy, timer/settings changes, вызовы Jupiter, actual protection
+installation, production import или науку. Commissioning packet находится вне
+Git; runtime timestamps и host state не становятся постоянной product truth.
+
+На проверенной изолированной копии явно выполнить `scripts/prepare_research_write_lookup.py
+--data-root <absolute-copy> --isolated-copy`, сохранив wall/RSS и canonical
+inventory до/после. Сверить результат с
+`docs/contracts/research_write_lookup_v1.md`. Prepared lookup с копии не переносится:
+он привязан к filesystem identity/stat. После отдельного OPERATE разрешения,
+verified backup, measured copy rehearsal и подтверждённой остановки всех writers/
+timer выполнить подготовку прямо на canonical root:
+
+```text
+uv run --locked --managed-python python -B scripts/prepare_research_write_lookup.py --data-root <absolute-canonical-root> --production-commissioning --ops-store <exact-existing-producer-ops.sqlite> --operate-authority-ref <approved-OPERATE-ref> --verified-backup-sha256 <verified-backup-sha256> --copy-rehearsal-sha256 <measured-copy-rehearsal-sha256> --quiesced-writers
+```
+
+Флаги подтверждают утверждённые prerequisites; сама команда не выдаёт OPERATE и
+не доказывает backup. OPS и ResearchStore fences отказывают concurrent writer;
+OPS write-lock действует весь audit, включая фазу длиннее TTL lease. После
+успешной подготовки ordinary writer использует lookup. Deploy/tick/startup
+автоматически его не создают. Restore/moved root и возврат после old-writer append
+требуют explicit reprepare на целевом root под соответствующей authority.
+
+Рекомендуемый canary — один immutable profile: ceiling 24/UTC day, 48h intake,
+72h tail плюс grid rounding/grace, cap 48 admissions за два полных UTC дня.
+Это cap, yield неизвестен. Calendar window, SHA, authority expiry на весь drain,
+approved account allocation, Factory/disk/drain reserve и assignments фиксируют
+непосредственно перед commissioning. Normal population/caps не снижаются для
+получения PASS. Existing legacy intake сначала штатно завершается либо отдельно
+останавливается с разрешением владельца; старые obligations и datasets остаются.
+Перед canary дождаться полного legacy COMPLETE: default tick при нескольких
+ACTIVE/DRAINING scopes требует exact selection, поэтому одно только закрытие
+старого intake не доказывает пригодность обычного runtime entry. Не создавать
+параллельный постоянный collector для обхода этой границы.
+
+Protection sources создаются только как metadata projection полного известного
+canonical assignment inventory: owner/scope/role/identity, source fingerprint,
+completeness provenance и UNKNOWN при пробеле. Не загружать protected values.
+Пустой actual список с выдуманным complete запрещён. Synthetic fixtures явно
+называют synthetic inventory; они не доказывают actual completeness. Новая
+версия не перезаписывает старый pin; frozen export несёт прежние dependencies.
+
+До activation нужен exact `EPISODE_PRODUCER_STORAGE_COMMISSIONING_V1` JSON:
+root device/inode, schedule SHA/activation ID, OPERATE ref, verified backup/copy
+hashes, actual volume bindings/whole-Factory PASS receipt и утверждённые producer-local
+byte limits. Передать `activate --episode-storage-commissioning <json>`. Поля и
+canonical self-hash описаны в контракте. Все local raw/OPS/WAL/publication/research/
+manifest/lookup effects должны входить в per-call bound; terminal metadata — в
+per-slot bound. UNKNOWN topology блокирует commissioning до ACTIVE. Прогноз шести
+копий — отдельный whole-Factory MODEL, не runtime kill-switch на producer free space.
+
+Точный шаблон ниже намеренно невалиден до commissioning: каждый UNKNOWN заменяется
+проверенным значением отдельного OPERATE packet. Не подставлять synthetic test limits
+как approved envelope. `factory_storage_gate` становится PASS только после проверки
+реальной topology/footprint на всех actual volumes, backup и measured copy rehearsal.
+
+```json
+{
+  "kind": "EPISODE_PRODUCER_STORAGE_COMMISSIONING_V1",
+  "schedule_sha256": "UNKNOWN",
+  "activation_id": "UNKNOWN",
+  "producer_root_identity": {"device": "UNKNOWN", "inode": "UNKNOWN"},
+  "factory_storage_gate": "UNKNOWN",
+  "verified_backup_sha256": "UNKNOWN",
+  "copy_rehearsal_sha256": "UNKNOWN",
+  "factory_storage_receipt_sha256": "UNKNOWN",
+  "volume_bindings_sha256": "UNKNOWN",
+  "operate_authority_ref": "UNKNOWN",
+  "search_call_local_bytes_max": "UNKNOWN",
+  "nomination_call_local_bytes_max": "UNKNOWN",
+  "slot_metadata_local_bytes_max": "UNKNOWN",
+  "fixed_local_reserve_bytes": "UNKNOWN",
+  "local_safety_bytes": "UNKNOWN",
+  "envelope_sha256": "UNKNOWN"
+}
+```
+
+Дополнительные поля запрещены. Device/inode — целые >= 0, byte limits — целые
+от 1 до 2^63−1, не bool. Четыре proof hashes и envelope hash — 64 lowercase hex;
+schedule SHA и activation ID должны точно совпадать с выбранным schedule/activation.
+Формат OPERATE ref проверяется по `[A-Za-z0-9_.-]{1,128}`. Эта проверка допускает
+literal `UNKNOWN`; она не устанавливает, что ссылка указывает на approved authority.
+В lookup preparation и storage envelope оператор заменяет такой placeholder реальной
+проверенной ссылкой на отдельное OPERATE. Structural PASS не подтверждает разрешение.
+Self-hash — `canonical_sha256` всего объекта без `envelope_sha256`, с теми же правилами
+canonical JSON, что у schedule owner. Эти проверки не верифицируют содержимое receipts
+и не выдают authority: оператор сначала проверяет их и утверждает byte limits.
+
+Offline recipe: сохраните этот фрагмент локально, запустите repository Python с пятью
+аргументами: exact canonical data root, заполненный approved JSON, exact schedule SHA,
+activation ID и новый output JSON вне data root. Он читает только stat указанного root
+и локальный JSON; записывает новый локальный файл, не открывает OPS или provider.
+Root identity и self-hash вычисляются здесь; остальные поля уже должны быть утверждены.
+После restore/move lookup требует explicit target-root reprepare с прежними
+prerequisites и отдельной OPERATE authority. Это восстанавливает lookup, а не
+перепривязывает storage envelope существующей activation. При изменившейся root
+identity её intake остаётся закрыт для новых nominations; changed envelope получает
+`EPISODE_STORAGE_REPLAY_CONFLICT`. Сохранить original IDs, frozen envelope, ledger и
+canonical evidence; не повторять activate и не править OPS вручную.
+
+Canonical recovery/продолжение committed tail требует отдельного OPERATE/repair gate
+с проверенным запасом на target volume. Если оно разрешено, штатно закрыть intake
+через stop-intake и довести существующий tail до COMPLETE/unpublished_backlog=0.
+Новый envelope относится к новой activation на отдельно утверждённой поддерживаемой
+profile/UTC cohort boundary; не создавать intraday fragments. R4 доказывает detached
+read/replay/import, а не возобновление ACTIVE intake на root с изменённой identity.
+
+```text
+uv run --locked --managed-python python -B <local-preflight.py> <absolute-canonical-root> <approved-body.json> <exact-schedule-sha256> <activation-id> <new-output-json-outside-data-root>
+```
+
+```python
+import json
+import sys
+from pathlib import Path
+from solana_alpha_lab.factory.observation_schedule import canonical_sha256
+from solana_alpha_lab.factory.hot90_storage_admission import (
+    producer_root_identity, validate_episode_storage_commissioning,
+)
+
+data_root = Path(sys.argv[1]).resolve(strict=True)
+body = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
+body.pop("envelope_sha256", None)
+body["producer_root_identity"] = producer_root_identity(data_root)
+body["envelope_sha256"] = canonical_sha256(body)
+validate_episode_storage_commissioning(
+    body, data_root=data_root, schedule_sha256=sys.argv[3], activation_id=sys.argv[4],
+)
+destination = Path(sys.argv[5]).resolve()
+if destination.is_relative_to(data_root):
+    raise ValueError("OUTPUT_MUST_BE_OUTSIDE_CANONICAL_ROOT")
+with destination.open("x", encoding="utf-8") as output:
+    output.write(json.dumps(body, indent=2) + "\n")
+print("VALIDATED_STRUCTURE_ONLY_NOT_OPERATE_AUTHORITY")
+```
+
+На текущем PREPARE gate эти поля остаются UNKNOWN, activation запрещена. При
+неподходящем legacy schedule параметр отказывает `EPISODE_STORAGE_SCHEDULE_ONLY`
+до ACTIVE и canonical state append. Обычный tick связывает reserve и nomination
+одним current decision instant после pacing; смена round не добавляет обязательства,
+для которых не проверен локальный запас. `slot_states` остаётся источником backlog.
+
+При `DRAIN_RESERVE_PRESSURE`/`DRAIN_RESERVE_UNKNOWN` из bound LOCAL control intake уже закрыт штатным
+переходом DRAINING. Повторить status, сохранить ledger и frozen dependencies,
+довести obligations; pause/resume для DRAINING отказываются. Не обходить отказ,
+не backfill прошлые slots и не удалять evidence. `LOCAL_HEADROOM` означает только
+headroom утверждённого producer envelope, не HOST_PASS всей Factory. При
+`PRODUCER_LOCAL_ENVELOPE_REQUIRED` новые nominations заблокированы, tail сохраняется,
+state не меняется по unbound MODEL; нужен exact commissioning binding до activation.
+При `WRITE_LOOKUP_*` сначала сохранить canonical evidence и проверить
+копию; автоматический expensive rebuild и повтор неизвестной отправки запрещены.
+
+При `TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE` / NEXT
+`RECONCILE_ACTIVE_TRANSITION_PROOF` сначала сохранить исходные activation IDs,
+ledger, lookup journal/root и canonical evidence; прекратить ручные retry и обход
+proof gate. Этот общий terminal не устанавливает причину и сам по себе не разрешает
+reprepare. На verified isolated copy различить missing lifecycle evidence и
+pending/corrupt/changed-binding lookup. Только подтверждённый lookup pending
+reconciliation вести через существующий `--production-commissioning`: отдельный
+OPERATE, verified backup, measured copy rehearsal, quiesced writers/timer и оба
+fences. Copy lookup на canonical root не переносить; immutable activation storage
+envelope не перепривязывать. Missing evidence или unresolved reason остаётся
+BLOCKED до отдельного repair gate; восстановленный proof без evidence не объявлять.
+
+После mature closure повтор обычного capture с новым as-of сохраняет frozen
+identity. При fragmented cohort — явный отказ до partial export; V1 canary
+без intraday profile switches. Public import точного release не расходует новый
+look; real first question/MAIN budget фиксируются отдельно после canary.
+
+При `EPISODE_COHORT_FRAGMENTED_UNSUPPORTED` сохранить оба activation ledger,
+canonical RDP и уже frozen dependencies. Прекратить capture/import retry:
+ожидание maturity не объединит два activation/profile в один cohort. Нужен
+отдельный owner gate на поддерживаемую границу cohort/export; не менять cohort ID,
+не исключать одну часть и не удалять evidence. Общий CLI NEXT
+`STOP_INSPECT_FAIL_CODE` для этого кода означает именно этот terminal stop.
+
+При `CLOSURE_FROZEN_UNREADABLE` сохранить frozen closure, canonical evidence и
+dependencies; прекратить capture/import retry. На изолированной копии проверить
+точный closure из verified backup с прежними hash/dependencies. Изменение
+canonical producer требует отдельного repair gate. Не удалять и не
+регенерировать closure ради обхода отказа; ожидание maturity повреждённые bytes
+не исправляет. Общий `STOP_INSPECT_FAIL_CODE` означает этот terminal stop.
+
+Owner counters `admitted_episodes`, `open_episodes`, `terminal_episodes` считают
+episodes; due-slot backlog читается из `slot_states`. WATCH commissioning: число/
+bytes lookup node files и inode growth, wall operational packet против фактических
+due rows. Это измерение; lookup GC/retention и оптимизация здесь не разрешены.

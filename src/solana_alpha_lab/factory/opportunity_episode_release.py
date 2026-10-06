@@ -29,6 +29,7 @@ from solana_alpha_lab.factory.live_cohort_schedule_artifact import (
 )
 from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
 from solana_alpha_lab.factory.observation_schedule import (
+    ObservationScheduleError,
     canonical_sha256,
     parse_utc,
     render_utc,
@@ -265,6 +266,7 @@ def select_next_mature_episode_cohort(
     try:
         candidates = []
         pending = []
+        cohort_scopes: dict[str, set[tuple[str, str]]] = {}
         for activation in episode_activations(store):
             digest = str(activation["schedule_sha256"])
             activation_id = str(activation["activation_id"])
@@ -272,6 +274,7 @@ def select_next_mature_episode_cohort(
                 {str(item["cohort_id"]) for item in store.list_episode_admissions(schedule_sha256=digest, activation_id=activation_id)}
             )
             for cohort_id in cohort_ids:
+                cohort_scopes.setdefault(cohort_id, set()).add((digest, activation_id))
                 if cohort_id in imported:
                     continue
                 status = _cohort_status(
@@ -290,6 +293,8 @@ def select_next_mature_episode_cohort(
                     "blocking_reasons": status["blocking_reasons"],
                 }
                 (candidates if status["mature"] else pending).append(item)
+        _require(all(len(scopes) == 1 for scopes in cohort_scopes.values()),
+                 "EPISODE_COHORT_FRAGMENTED_UNSUPPORTED")
         candidates.sort(key=lambda item: (item["cohort_id"], item["schedule_sha256"], item["activation_id"]))
         if not candidates:
             return {"terminal": "NO_MATURE_UNIMPORTED_COHORT", "pending": pending} if pending else None
@@ -317,6 +322,11 @@ def build_episode_closure_receipt(
     try:
         registered = store.get_registered_schedule(schedule_sha256)
         _require(registered is not None and is_episode_schedule(registered["document"]), "EPISODE_SCHEDULE_UNREGISTERED")
+        scopes = {(str(item["schedule_sha256"]), str(item["activation_id"]))
+                  for item in episode_activations(store)
+                  if any(str(row["cohort_id"]) == cohort_id for row in store.list_episode_admissions(
+                      schedule_sha256=str(item["schedule_sha256"]), activation_id=str(item["activation_id"])))}
+        _require(scopes == {(schedule_sha256, activation_id)}, "EPISODE_COHORT_FRAGMENTED_UNSUPPORTED")
         status = _cohort_status(
             store,
             data_root=Path(observation_rdp),
@@ -648,6 +658,23 @@ def capture_freeze_export_episodes(
         as_of=as_of,
     )
     assert_episode_closure_ready(receipt)
+    closure_path = _contained(Path(observation_rdp), export_dir_rel(receipt)) / CLOSURE_NAME
+    try:
+        if closure_path.exists():
+            _require(not closure_path.is_symlink() and closure_path.is_file(), "CLOSURE_FROZEN_UNSAFE")
+            frozen = json.loads(closure_path.read_bytes())
+            _require(isinstance(frozen, dict), "CLOSURE_FROZEN_UNREADABLE")
+            assert_episode_closure_ready(frozen)
+            identity_keys = set(receipt) - {"as_of", "closure_receipt_sha256"}
+            _require(set(frozen) == set(receipt)
+                     and all(frozen.get(key) == receipt[key] for key in identity_keys),
+                     "CLOSURE_FROZEN_STATE_CONFLICT")
+            _require(parse_utc(str(frozen["as_of"])) <= as_of, "CLOSURE_AS_OF_REGRESSION")
+            receipt = frozen
+    except EpisodeReleaseError:
+        raise
+    except (OSError, TypeError, ValueError, RecursionError, ObservationScheduleError) as exc:
+        raise EpisodeReleaseError("CLOSURE_FROZEN_UNREADABLE") from exc
     export = write_episode_export(observation_rdp=Path(observation_rdp), ops_store=Path(ops_store), receipt=receipt)
     manifest = collect_episode_transfer_manifest(observation_rdp=Path(observation_rdp), receipt=receipt)
     return {

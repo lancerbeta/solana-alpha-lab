@@ -10,6 +10,8 @@ publisher. Order inside one tick: publication recovery, admitted slots
 from __future__ import annotations
 
 import json
+import math
+import shutil
 from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -61,6 +63,7 @@ from solana_alpha_lab.factory.opportunity_episodes import (
     admission_record,
     build_frame,
     collection_lineage_id,
+    cohort_id_for_admission,
     cycle_start,
     episode_point_ids,
     final_availability_deadline,
@@ -510,6 +513,13 @@ class _EpisodeTick:
         if blocked:
             return blocked, None
         self._credential()
+        # Reserve before durable STARTED/send. A death with unknown outcome
+        # keeps its debit across restart; completion adds bytes, not a second call.
+        blocked = self.accounts.reserve_call(
+            credits=max(1, int(self.accounts.credit_costs.get(primitive_id, 1))),
+            now=self.provider_ctx.now())
+        if blocked:
+            return blocked, None
         attempt_id = f"ATT-{uuid4().hex[:12].upper()}"
         started = self.store.start_call(
             request_sha256=request_digest,
@@ -523,13 +533,39 @@ class _EpisodeTick:
             return ATTEMPT_OUTCOME_UNKNOWN, None
         if self.fault_after == "EPISODE_AFTER_CALL_START":
             raise EpisodeTickError("FAULT_INJECTED:EPISODE_AFTER_CALL_START")
+        reserved_day = self.accounts.utc_day
+        clock_fn = self.provider_ctx.clock()
+        first_clock = True
+        def request_clock():
+            nonlocal first_clock, reserved_day
+            if not first_clock:
+                return clock_fn()
+            # Durable STARTED persistence can cross UTC midnight. Keep the old
+            # debit (unknown sends are never refunded) and reserve the day named
+            # by the production request_started_at before transport is invoked.
+            for _ in range(2):
+                reference = clock_fn()
+                if reference.strftime("%Y-%m-%d") == reserved_day:
+                    first_clock = False
+                    return reference
+                blocked = self.provider_ctx.wait_for_provider_slot(self.accounts,
+                    extra_credits=max(1, int(self.accounts.credit_costs.get(primitive_id, 1))))
+                if blocked:
+                    raise EpisodeTickError(blocked)
+                reference = clock_fn()
+                blocked = self.accounts.reserve_call(
+                    credits=max(1, int(self.accounts.credit_costs.get(primitive_id, 1))), now=reference)
+                if blocked:
+                    raise EpisodeTickError(blocked)
+                reserved_day = self.accounts.utc_day
+            raise EpisodeTickError("CALL_RESERVATION_CLOCK_UNSTABLE")
         result = execute_primitive(
             primitive_id=primitive_id,
             primitive_version="1.0",
             method="GET",
             url=url,
             opener=self.opener,
-            clock=self.provider_ctx.clock(),
+            clock=request_clock,
             redact_with=self.holder,
             expected_entities=list(expected_entities) if expected_entities else None,
             # An empty category list is a valid frame source; the closed frame
@@ -556,6 +592,7 @@ class _EpisodeTick:
             raw_bytes=max(1, raw_len),
             credits=max(1, int(self.accounts.credit_costs.get(primitive_id, 1))),
             completed_at=completion,
+            reserved=True,
         )
         raw_rel = _store_raw(self.data_root, result=result, occurrence=occurrence, primitive_id=primitive_id)
         result["raw_body_rel"] = raw_rel
@@ -606,7 +643,10 @@ class _EpisodeTick:
             state=state,
             request_sha256=(timing or {}).get("request_sha256"),
             call_occurrence_id=(timing or {}).get("call_occurrence_id"),
-            payload={"missing_reason": missing_reason, "terminal_reason": missing_reason or state},
+            payload={"missing_reason": missing_reason, "terminal_reason": missing_reason or state,
+                     "attempt_class": "UNKNOWN" if missing_reason == ATTEMPT_OUTCOME_UNKNOWN else (
+                         "ATTEMPTED" if (timing or {}).get("request_started_at") else "NO_REQUEST"),
+                     "field_value_missing_count": sum(value.get("state") != "OBSERVED" for value in obs["field_values"])},
             outbox_row={
                 "outbox_id": f"OBS:{claim['entity_id']}:{int(str(claim['point_id'])[1:]):07d}",
                 "schedule_sha256": self.digest,
@@ -784,9 +824,10 @@ class _EpisodeTick:
             self._terminalize(claim, state="OBSERVED", missing_reason=None, row=row, timing=timing)
 
     # ------------------------------------------------------------------
-    def nomination_round(self) -> None:
+    def nomination_round(self, *, decision_now: datetime) -> None:
         nomination = self.schedule["nomination"]
-        now = self.provider_ctx.now()
+        # Bind selection to the same round whose obligations were reserved.
+        now = decision_now
         started = round_start(now, int(nomination["round_period_seconds"]))
         rid = round_id(self.activation_id, started)
         slack = int(nomination["round_slack_seconds"])
@@ -896,7 +937,7 @@ class _EpisodeTick:
             round_id_value=rid,
             now=commit_now,
         )
-        quota = quota_state["quota"]
+        quota = quota_state["quota"] if commit_now < parse_utc(str(self.activation["stops_admitting_at"])) else 0
         day_used = quota_state["day_used"]
         rolling_used = quota_state["rolling_used"]
         active = quota_state["active"]
@@ -913,7 +954,14 @@ class _EpisodeTick:
         admitted: list[str] = []
         witness_stale: list[str] = []
         for winner in selection["winners"]:
+            # Finish the witness dependency before the admission owner samples T0.
+            winner["candidate"] = {
+                **winner["candidate"],
+                "selected_raw_body_rel": _store_witness_extract(self.data_root, winner["candidate"]),
+            }
             t0 = self.provider_ctx.now()
+            if t0 >= parse_utc(str(self.activation["stops_admitting_at"])):
+                break
             record = admission_record(
                 document=self.schedule,
                 activation_id=self.activation_id,
@@ -930,14 +978,11 @@ class _EpisodeTick:
             if not witness_age_ok(record, self.binding):
                 witness_stale.append(str(winner["mint"]))
                 continue
-            # The published E0 dependency is the admitted object only.
-            winner["candidate"] = {
-                **winner["candidate"],
-                "selected_raw_body_rel": _store_witness_extract(self.data_root, winner["candidate"]),
-            }
-            record = {**record, "witness_raw_body_rel": winner["candidate"]["selected_raw_body_rel"]}
-            self._commit_admission(record, winner["candidate"], t0)
-            admitted.append(str(record["episode_id"]))
+            status = self._commit_admission(record, winner["candidate"], round_started_at=started)
+            if status == "COMMITTED":
+                admitted.append(str(record["episode_id"]))
+            elif status == "WITNESS_STALE":
+                witness_stale.append(str(winner["mint"]))
         summary = {
             **receipt,
             "selection": {
@@ -972,7 +1017,29 @@ class _EpisodeTick:
         }
         self.report["admissions"].extend(admitted)
 
-    def _commit_admission(self, record: Mapping[str, Any], candidate: Mapping[str, Any], t0: datetime) -> None:
+    def _commit_admission(self, record: Mapping[str, Any], candidate: Mapping[str, Any], *, round_started_at: datetime) -> str:
+        refusal = "QUOTA_CLOSED"
+        def prepare(now: datetime) -> Mapping[str, Any] | None:
+            nonlocal refusal
+            fresh = {**record, "t0": render_utc(now), "cohort_id": cohort_id_for_admission(now)}
+            if not witness_age_ok(fresh, self.binding):
+                refusal = "WITNESS_STALE"
+                return None
+            quota = admission_quota(self.store, lineage_id=self.lineage, sampling=self.schedule["sampling"],
+                round_started_at=round_started_at, round_period_seconds=int(self.schedule["nomination"]["round_period_seconds"]),
+                round_id_value=str(record["round_id"]), now=now)
+            blocked = self.store.episode_blocked_mints(lineage_id=self.lineage, cycle_start=str(record["cycle_start"]), now=now)
+            if quota["quota"] <= 0 or str(record["mint"]) in blocked:
+                return None
+            return self._admission_payload(fresh, candidate, now)
+        if self.fault_after == "EPISODE_BEFORE_ADMISSION_COMMIT":
+            raise EpisodeTickError("FAULT_INJECTED:EPISODE_BEFORE_ADMISSION_COMMIT")
+        status = self.store.commit_episode_admission(prepare_at_commit=prepare, clock_now=self.provider_ctx.now)
+        if status == "COMMITTED" and self.fault_after == "EPISODE_AFTER_ADMISSION_COMMIT":
+            raise EpisodeTickError("FAULT_INJECTED:EPISODE_AFTER_ADMISSION_COMMIT")
+        return refusal if status == "REFUSED" else status
+
+    def _admission_payload(self, record: Mapping[str, Any], candidate: Mapping[str, Any], t0: datetime) -> Mapping[str, Any]:
         content = admission_content_sha256(record)
         final_deadline = final_availability_deadline(self.binding, t0)
         due_rows = []
@@ -1044,18 +1111,8 @@ class _EpisodeTick:
                 "row": witness,
             },
         ]
-        if self.fault_after == "EPISODE_BEFORE_ADMISSION_COMMIT":
-            raise EpisodeTickError("FAULT_INJECTED:EPISODE_BEFORE_ADMISSION_COMMIT")
-        self.store.commit_episode_admission(
-            record=record,
-            content_sha256=content,
-            final_deadline_at=render_utc(final_deadline),
-            due_rows=due_rows,
-            outbox_rows=outbox,
-            clock=t0,
-        )
-        if self.fault_after == "EPISODE_AFTER_ADMISSION_COMMIT":
-            raise EpisodeTickError("FAULT_INJECTED:EPISODE_AFTER_ADMISSION_COMMIT")
+        return {"record":record,"content_sha256":content,"final_deadline_at":render_utc(final_deadline),
+                "due_rows":due_rows,"outbox_rows":outbox}
 
     # ------------------------------------------------------------------
     def publish_outbox(self) -> None:
@@ -1123,8 +1180,54 @@ class _EpisodeTick:
         self.publish_outbox()
         self._prime_account_pace()
         self.process_slots()
+        decision_now = self.provider_ctx.now()
+        admission_open = admission_open and decision_now < parse_utc(str(self.activation["stops_admitting_at"]))
         if admission_open and self.report["stop_reason"] is None:
-            self.nomination_round()
+            from solana_alpha_lab.factory.hot90_storage_admission import (
+                episode_drain_reserve, validate_episode_storage_commissioning,
+            )
+            from solana_alpha_lab.factory.observation_schedule_lifecycle import stop_episode_intake
+            try:
+                envelope = validate_episode_storage_commissioning(
+                    dict(self.activation.get("payload") or {}).get("storage_commissioning"),
+                    data_root=self.data_root, schedule_sha256=self.digest, activation_id=self.activation_id)
+            except (ValueError, TypeError, OSError, RecursionError):
+                self.report["drain_headroom"] = {"status": "COMMISSIONING_REQUIRED"}
+                self.report["stop_reason"] = "PRODUCER_LOCAL_ENVELOPE_REQUIRED"
+                self.report["terminal"] = "TICK_PARTIAL"
+                self.publish_outbox()
+                self.report["provider_calls"] = self.accounts.tick_calls
+                self.report["credential_reads"] = self.credential_reads
+                return self.report
+            remaining = self.store.episode_remaining_call_groups(
+                schedule_sha256=self.digest, activation_id=self.activation_id,
+                batch_size=int(self.schedule["observation_schedule"]["max_batch_size"]))
+            # Slot processing and account pacing may cross a round boundary.
+            # Capture once here; nomination must not select a different round.
+            quota = round_quota(int(self.schedule["sampling"]["daily_normal_ceiling"]), round_index(decision_now))
+            # T0 is known only after capture; do not presume prospective batching.
+            prospective = quota * (len(episode_point_ids()) - 1)
+            period = int(self.schedule["nomination"]["round_period_seconds"])
+            # Include every still-eligible round, including a partial last round.
+            seconds = max(0, (parse_utc(str(self.activation["stops_admitting_at"])) - round_start(decision_now, period)).total_seconds())
+            future_nomination_calls = math.ceil(seconds / period) * len(self.schedule["nomination"]["sources"])
+            try:
+                free = shutil.disk_usage(self.data_root).free
+            except OSError:
+                free = None
+            reserve = episode_drain_reserve(**remaining,
+                prospective_slots=prospective, prospective_call_groups=prospective,
+                remaining_nomination_calls=future_nomination_calls, local_envelope=envelope, free_bytes=free)
+            self.report["drain_headroom"] = reserve
+            self.report["drain_headroom"]["decision_at"] = render_utc(decision_now)
+            self.report["drain_headroom"]["round_started_at"] = render_utc(round_start(decision_now, period))
+            if reserve["status"] in {"UNKNOWN_LOCAL_FREE_SPACE", "STOP_NEW_INTAKE"}:
+                stop_episode_intake(data_root=self.data_root, store=self.store,
+                    schedule_sha256=self.digest, activation_id=self.activation_id,
+                    now=self.provider_ctx.now(), producer_git_sha=self.producer)
+                self.report["stop_reason"] = "DRAIN_RESERVE_UNKNOWN" if free is None else "DRAIN_RESERVE_PRESSURE"
+            else:
+                self.nomination_round(decision_now=decision_now)
         self.publish_outbox()
         self.report["provider_calls"] = self.accounts.tick_calls
         self.report["credential_reads"] = self.credential_reads
@@ -1189,6 +1292,10 @@ def tick_episode_schedule(
             redact_with=redact_with,
         )
         report = tick.run(admission_open=admission_open)
+        drain_expired_admission(data_root=Path(data_root), store=store,
+            schedule_sha256=str(schedule["schedule_sha256"]), activation_id=activation_id,
+            now=tick.provider_ctx.now(), producer_git_sha=producer_git_sha)
+        state = str(store.get_activation(str(schedule["schedule_sha256"]), activation_id)["state"])
         report["activation_state"] = state
         if state == "DRAINING":
             completion = complete_draining_schedule(

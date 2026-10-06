@@ -1374,6 +1374,8 @@ def build_collector_operational_packet(
         "schema": "smial.collector-operational-packet",
         "schema_version": "1.0",
         "observed_at": observed_at,
+        "collection": base.get("collection") or "UNKNOWN",
+        "episode_operability": base.get("episode_operability"),
         "period_seconds": period_seconds,
         # IDENTITY
         "deploy_git_sha": base.get("deploy_git_sha") or UNKNOWN,

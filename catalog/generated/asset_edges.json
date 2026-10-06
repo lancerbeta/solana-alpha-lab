@@ -4198,6 +4198,11 @@
       "target_asset_id": "MODULE-OBSERVATION-SCHEDULE-RUNTIME-001"
     },
     {
+      "source_asset_id": "CTRL-OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
+    },
+    {
       "source_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001",
       "relation": "contains",
       "target_asset_id": "DOC-OPPORTUNITY-EPISODES-CONTRACT-001"
@@ -6048,6 +6053,16 @@
       "target_asset_id": "CTRL-MARKET-DATA-AWARENESS-001"
     },
     {
+      "source_asset_id": "DOC-OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-RESEARCH-WRITE-LOOKUP-V1-001"
+    },
+    {
+      "source_asset_id": "DOC-OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-001"
+    },
+    {
       "source_asset_id": "DOC-OPPORTUNITY-EPISODES-CONTRACT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001"
@@ -6131,6 +6146,11 @@
       "source_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-SMIAL-VISUAL-OPERATING-SYSTEM-001"
+    },
+    {
+      "source_asset_id": "DOC-RESEARCH-WRITE-LOOKUP-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-001"
     },
     {
       "source_asset_id": "DOC-RISK-AND-ECONOMICS-001",
@@ -7181,6 +7201,16 @@
       "source_asset_id": "EVIDENCE-KCDN-ATOM-B-DELIVERY-INDEPENDENT-REVIEW-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-KCDN-ATOM-B-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-001"
     },
     {
       "source_asset_id": "EVIDENCE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-ACCEPTANCE-001",
@@ -12613,6 +12643,16 @@
       "target_asset_id": "CTRL-RESEARCH-LIFECYCLE-WORKBENCH-001"
     },
     {
+      "source_asset_id": "MODULE-RESEARCH-WRITE-LOOKUP-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
+    },
+    {
+      "source_asset_id": "MODULE-RESEARCH-WRITE-LOOKUP-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-RESEARCH-WRITE-LOOKUP-V1-001"
+    },
+    {
       "source_asset_id": "MODULE-RISK-AND-ECONOMICS-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
@@ -16006,6 +16046,16 @@
       "source_asset_id": "SCRIPT-PMF-QUOTE-STAY-OVERLAY-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PMF-QUOTE-STAY-OVERLAY-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-PREPARE-RESEARCH-WRITE-LOOKUP-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-RESEARCH-WRITE-LOOKUP-V1-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-PREPARE-RESEARCH-WRITE-LOOKUP-001",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-RESEARCH-WRITE-LOOKUP-V1-001"
     },
     {
       "source_asset_id": "SCRIPT-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001",

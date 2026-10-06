@@ -184,9 +184,13 @@ def phase_p1(work: Path) -> dict[str, Any]:
 
     data_root = work / "p1" / "rdp"
     data_root.mkdir(parents=True)
-    assignment = write_assignment(data_root, [])
+    from tests.test_opportunity_episodes_harness_v1 import synth_mint
+    assignment = write_assignment(data_root, [{"identity_kind": "MINT", "identity": synth_mint("KnownProtected"),
+        "role": "UNTOUCHED_FORWARD_HOLDOUT", "scope": {"kind": "ALL_TIME"}}])
     schedule = build_schedule(starts_at=DAY_A, stops_at=STOPS, assignment=assignment)
     register_authorize_activate(data_root, schedule, now=DAY_A)
+    from solana_alpha_lab.factory.research_store import ResearchStore
+    ResearchStore(data_root).prepare_write_lookup()
     market = build_market()
     terminals: dict[str, int] = {}
     completed_before = None
@@ -536,6 +540,7 @@ def phase_p2(work: Path) -> dict[str, Any]:
     p2 = work / "p2"
     plane, mirror = p2 / "plane", p2 / "mirror"
     plane.mkdir(parents=True)
+    ResearchStore(plane).prepare_write_lookup()
     report: dict[str, Any] = {}
     report["legacy_import"] = _import_legacy(plane, p2)
     packets = p1["packets"]
@@ -645,8 +650,27 @@ def phase_p2(work: Path) -> dict[str, Any]:
     torn_body = json.loads(torn_pre.stdout.strip().splitlines()[-1]) if torn_pre.stdout.strip() else {}
     report["torn_import"]["preflight_exit"] = torn_pre.returncode
     report["torn_import"]["preflight_terminal"] = torn_body.get("terminal")
+    # The workstation returns after >72h; a NEW capture invocation at a new
+    # as-of, followed by the public consume command, must retain frozen bytes.
+    from solana_alpha_lab.factory.live_cohort_vanilla_path import capture_freeze_export
+    fresh_paths = []
+    imported = {json.loads(Path(packets[0]).read_text(encoding="utf-8"))["cohort_id"]}
+    for index, prior in enumerate(packets[1:]):
+        fresh = capture_freeze_export(observation_rdp=source,
+                                     ops_store=source / "observation_schedule_state.sqlite",
+                                     imported_cohort_ids=imported, as_of=AS_OF + timedelta(hours=1),
+                                     collection="OPPORTUNITY_EPISODES")
+        old = json.loads(Path(prior).read_text(encoding="utf-8"))
+        assert fresh["closure_receipt"] == old["closure_receipt"]
+        assert fresh["transfer_manifest"] == old["transfer_manifest"]
+        path = p2 / f"recapture-{index}.json"
+        path.write_text(json.dumps(fresh), encoding="utf-8")
+        fresh_paths.append(str(path))
+        imported.add(fresh["cohort_id"])
+    report["fresh_capture_retry"] = {"new_as_of": (AS_OF + timedelta(hours=1)).isoformat(),
+                                     "invocations": len(fresh_paths), "frozen_identity_equal": True}
     # Next run: two more cohorts (tiny incomplete + next cycle) via the same command.
-    report["consume_next"] = _consume(packets[1:], source=source, mirror=mirror, plane=plane)
+    report["consume_next"] = _consume(fresh_paths, source=source, mirror=mirror, plane=plane)
     pre2 = _forge_call("preflight", "--discovery-contract", "--collection", "OPPORTUNITY_EPISODES", "--owner-focus", "VERTICAL_SYNTH_FOCUS_NEXT", data_root=plane)
     report["preflight_2"] = {k: pre2.get(k) for k in ("action", "market_evidence_epoch_sha256", "search_key_sha256")}
     report["packet_card_2"] = pre2["forge_context_packet"].get("population_card")
@@ -676,14 +700,22 @@ def phase_p2(work: Path) -> dict[str, Any]:
 
 def phase_p3(work: Path) -> dict[str, Any]:
     original_plane = work / "p2" / "plane"
-    cold_parent = Path(tempfile.mkdtemp(prefix="oep-cold-"))
-    cold = cold_parent / "relocated" / "plane"
-    shutil.copytree(original_plane, cold)
+    from tests.test_factory_offhost_backup import _seed_tree
+    from solana_alpha_lab.factory.remote_ops import load_config_v1_1, package_backup, restore_backup_isolated
+    backup_source = _seed_tree(work / "backup-source")
+    payload = backup_source / "local/factory_v1/observation_rdp"
+    shutil.copytree(original_plane, payload / "workstation")
+    shutil.copytree(work / "p1" / "rdp", payload / "producer")
+    packed = package_backup(backup_source, config=load_config_v1_1(backup_source),
+                            sink_override=work / "independent-backup", prune_superseded=False)
+    restored = restore_backup_isolated(bundle=Path(packed["sink"]) / packed["bundle"],
+                                        dest_root=(work / "cold-restored").resolve())
+    cold = work / "cold-restored/local/factory_v1/observation_rdp/workstation"
     # Saved evidence is read before the cold boundary is installed.
     p1_assignment_sha = json.loads((work / "p1-report.json").read_text(encoding="utf-8"))["assignment_sha256"]
     p2 = json.loads((work / "p2-report.json").read_text(encoding="utf-8"))
     run1 = json.loads((work / "p2" / "run1-evidence.json").read_text(encoding="utf-8"))
-    forbidden = [str((work / "p1").resolve()).lower(), str((work / "p2").resolve()).lower()]
+    forbidden = [str((work / p).resolve()).lower() for p in ("p1", "p2", "backup-source")]
     blocked: list[str] = []
 
     def hook(event: str, args: tuple) -> None:
@@ -713,7 +745,9 @@ def phase_p3(work: Path) -> dict[str, Any]:
     from solana_alpha_lab.factory.research_store import ResearchStore
     from tests.test_hfic_ordinary_operation_acceptance_v1 import _forge
 
-    report: dict[str, Any] = {"original_root_probe": probe}
+    report: dict[str, Any] = {"original_root_probe": probe,
+                              "backup": {k: packed[k] for k in ("sha256", "bytes", "inventory_sha256")},
+                              "restored_entries": len(restored.get("restored", []))}
     lineage = load_episode_lineage(cold)
     import pyarrow.parquet as pq
 
@@ -737,6 +771,32 @@ def phase_p3(work: Path) -> dict[str, Any]:
         for item in lineage["cohorts"]
     ]
     before = ResearchStore(cold).diagnostics().committed_inventory_sha256
+    from solana_alpha_lab.factory.opportunity_episode_release import import_episode_release, verify_episode_release
+    duplicate = import_episode_release(release_root=cold / first["release_dir_rel"], data_root=cold,
+                                       import_time=AS_OF + timedelta(hours=2))
+    report["cold_duplicate_import"] = {"status": duplicate["status"],
+        "history_unchanged": ResearchStore(cold).diagnostics().committed_inventory_sha256 == before}
+    damaged = cold.parent / "damaged-release-copy"
+    shutil.copytree(cold / first["release_dir_rel"], damaged)
+    dependency = next((damaged / "protection").glob("*.json"))
+    dependency_bytes = dependency.read_bytes()
+    refusals = {}
+    for label, content in (("corrupt", b"{}"), ("missing", None)):
+        if content is None:
+            dependency.unlink()
+        else:
+            dependency.write_bytes(content)
+        try:
+            verify_episode_release(damaged)
+        except Exception as exc:
+            refusals[label] = str(exc).split(":")[0]
+        else:
+            raise AssertionError("COLD_DEPENDENCY_NOT_REFUSED")
+        dependency.write_bytes(dependency_bytes)
+    report["cold_dependency_refusals"] = refusals
+    from solana_alpha_lab.factory.live_cohort_discovery_release import load_live_corpus_lineage
+    legacy = load_live_corpus_lineage(cold)
+    report["legacy_readable"] = bool(legacy.get("cohorts"))
 
     def saved_readback(focus: str) -> dict[str, Any]:
         out = io.StringIO()
@@ -772,7 +832,7 @@ def phase_p3(work: Path) -> dict[str, Any]:
                         "summary": {k: replay["summary"][k] for k in ("matched_n", "observed_target_n", "mean_target", "episode_counts")}}
     report["blocked_events_during_cold"] = sorted(set(blocked))
     report["peak_rss_bytes"] = peak_rss_bytes()
-    shutil.rmtree(cold_parent, ignore_errors=True)
+    # Keep the isolated recovery evidence. Never remove the sole copy.
     return report
 
 
@@ -799,7 +859,7 @@ def spawn(name: str, work: Path) -> dict[str, Any]:
 class ThreeProcessVerticalTests(unittest.TestCase):
     def test_producer_to_ordinary_forge_to_cold_replay(self) -> None:
         keep = os.environ.get("OEP_VERTICAL_WORK")
-        work = Path(keep) if keep else Path(tempfile.mkdtemp(prefix="oep-vertical-"))
+        work = Path(keep).resolve() if keep else Path(tempfile.mkdtemp(prefix="oep-vertical-"))
         work.mkdir(parents=True, exist_ok=True)
         if not keep:
             self.addCleanup(lambda: shutil.rmtree(work, ignore_errors=True))
@@ -894,6 +954,10 @@ class ThreeProcessVerticalTests(unittest.TestCase):
         p3 = spawn("P3", work)
         self.assertEqual(p3["original_root_probe"], "BLOCKED")
         self.assertEqual(len(p3["verified_releases"]), 3)
+        self.assertEqual(p3["cold_duplicate_import"]["status"], "PASS_ALREADY_PRESENT_EXACT")
+        self.assertTrue(p3["cold_duplicate_import"]["history_unchanged"])
+        self.assertTrue(p3["legacy_readable"])
+        self.assertEqual(set(p3["cold_dependency_refusals"]), {"corrupt", "missing"})
         self.assertEqual(len(p3["cold_frozen_protection"]), 3)
         self.assertTrue(all(len(item["pinned"]) == 1 for item in p3["cold_frozen_protection"]))
         # The cold copies carry exactly the assignment the producer pinned at admission.

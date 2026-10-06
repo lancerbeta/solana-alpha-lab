@@ -5,7 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
+from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -551,13 +552,15 @@ class ObservationScheduleStore:
         if getattr(self, "readonly", False):
             raise ObservationScheduleStoreError("SOURCE_READONLY")
 
-    def _require_write_lease(self, clock: datetime | None = None) -> None:
+    def _require_write_lease(self, clock: datetime | None = None, *, within_transaction: bool = False) -> None:
         """Fence mutations after another process replaces or expires our lease.
 
         While this process holds the token, every write renews expires_at so a
         long tick cannot lose the fence mid-mutation against the 60s timer.
         """
         self._require_writable()
+        if within_transaction and not self._conn.in_transaction:
+            raise ObservationScheduleStoreError("WRITE_TRANSACTION_REQUIRED")
         now_text = _now(clock)
         if self._lease_token is None:
             active = self._conn.execute(
@@ -596,7 +599,8 @@ class ObservationScheduleStore:
             """,
             (expires, GLOBAL_LEASE_ID, self._lease_token),
         )
-        self._conn.commit()
+        if not within_transaction:
+            self._conn.commit()
 
     def record_event(self, kind: str, payload: Mapping[str, Any], *, clock: datetime | None = None) -> None:
         self._require_write_lease(clock)
@@ -652,6 +656,32 @@ class ObservationScheduleStore:
             raise ObservationScheduleStoreError("LEASE_NOT_HELD")
         self._require_write_lease(clock)
 
+    @contextmanager
+    def fenced_maintenance(self):
+        """Hold the existing OPS write fence through a long explicit audit.
+
+        The transaction blocks competing lease acquisition even after the
+        lease TTL. Its body must not call OPS mutators, which commit.
+        """
+        if self._lease_token is None:
+            raise ObservationScheduleStoreError("LEASE_NOT_HELD")
+        self._require_write_lease()
+        try:
+            self._conn.execute("BEGIN IMMEDIATE")
+        except sqlite3.OperationalError as exc:
+            raise ObservationScheduleStoreError("WRITER_BUSY") from exc
+        try:
+            row = self._conn.execute(
+                "SELECT lease_token, expires_at FROM scheduler_leases WHERE lease_id = ?",
+                (GLOBAL_LEASE_ID,),
+            ).fetchone()
+            if (row is None or row["lease_token"] != self._lease_token
+                    or row["expires_at"] <= _now(None)):
+                raise ObservationScheduleStoreError("LEASE_FENCED")
+            yield
+        finally:
+            self._conn.rollback()
+
     def release_lease(self, lease_token: str) -> None:
         cursor = self._conn.execute(
             "DELETE FROM scheduler_leases WHERE lease_id = ? AND lease_token = ?",
@@ -681,6 +711,12 @@ class ObservationScheduleStore:
         if existing is not None:
             created_at = str(existing["created_at"])
             updated_at = str(existing["updated_at"])
+            previous_payload = json.loads(str(existing["payload_json"]))
+            if "storage_commissioning" in previous_payload:
+                if ("storage_commissioning" in payload
+                        and payload["storage_commissioning"] != previous_payload["storage_commissioning"]):
+                    raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
+                payload["storage_commissioning"] = previous_payload["storage_commissioning"]
         else:
             created_at = now
             updated_at = now
@@ -698,6 +734,7 @@ class ObservationScheduleStore:
                     raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
             existing_payload = json.loads(str(existing["payload_json"]))
             immutable_payload_keys = (
+                "storage_commissioning",
                 "admission_window_closed",
                 "transition_effective_at",
                 "transition_event_id",
@@ -856,6 +893,10 @@ class ObservationScheduleStore:
                 authority_receipt_sha256=authority_receipt_sha256 or "",
             )
             transition_payload = dict(previous_payload)
+            if ("storage_commissioning" in previous_payload and payload is not None
+                    and "storage_commissioning" in payload
+                    and payload["storage_commissioning"] != previous_payload["storage_commissioning"]):
+                raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
             transition_payload.update(dict(payload or {}))
             transition_payload.update(
                 {
@@ -2925,12 +2966,14 @@ class ObservationScheduleStore:
     def commit_episode_admission(
         self,
         *,
-        record: Mapping[str, Any],
-        content_sha256: str,
-        final_deadline_at: str,
-        due_rows: Sequence[Mapping[str, Any]],
-        outbox_rows: Sequence[Mapping[str, Any]],
+        record: Mapping[str, Any] | None = None,
+        content_sha256: str | None = None,
+        final_deadline_at: str | None = None,
+        due_rows: Sequence[Mapping[str, Any]] = (),
+        outbox_rows: Sequence[Mapping[str, Any]] = (),
         clock: datetime | None = None,
+        clock_now: Callable[[], datetime] | None = None,
+        prepare_at_commit: Callable[[datetime], Mapping[str, Any] | None] | None = None,
     ) -> str:
         """One transaction: admission, all future slots and the outbox.
 
@@ -2938,11 +2981,33 @@ class ObservationScheduleStore:
         content under an existing key is a conflict, never an overwrite.
         """
 
-        self._require_write_lease(clock)
-        now = _now(clock)
-        episode_id = str(record["episode_id"])
+        live = prepare_at_commit is not None
+        if live != (clock_now is not None):
+            raise ObservationScheduleStoreError("EPISODE_ADMISSION_INPUT_INVALID")
+        self._require_write_lease(clock_now() if clock_now is not None else clock)
         try:
             self._conn.execute("BEGIN IMMEDIATE")
+            if live:
+                assert clock_now is not None and prepare_at_commit is not None
+                clock = clock_now()  # after blocking dependencies and SQL lock acquisition
+                self._require_write_lease(clock, within_transaction=True)
+                payload = prepare_at_commit(clock)
+                if payload is None:
+                    self._conn.rollback()
+                    return "REFUSED"
+                record = payload["record"]
+                content_sha256 = payload["content_sha256"]
+                final_deadline_at = payload["final_deadline_at"]
+                due_rows = payload["due_rows"]
+                outbox_rows = payload["outbox_rows"]
+                activation = self.get_activation(str(record["schedule_sha256"]), str(record["activation_id"]))
+                if activation is None or activation["state"] != "ACTIVE" or clock >= parse_utc(str(activation["stops_admitting_at"])):
+                    self._conn.rollback()
+                    return "INTAKE_CLOSED"
+            if record is None or content_sha256 is None or final_deadline_at is None:
+                raise ObservationScheduleStoreError("EPISODE_ADMISSION_INPUT_INVALID")
+            now = _now(clock)
+            episode_id = str(record["episode_id"])
             existing = self._conn.execute(
                 "SELECT content_sha256 FROM episode_admissions WHERE episode_id = ?",
                 (episode_id,),
@@ -3000,12 +3065,19 @@ class ObservationScheduleStore:
                 )
             for row in outbox_rows:
                 self._insert_episode_outbox(row, now=now)
+            if live:
+                final_clock = clock_now()
+                self._require_write_lease(final_clock, within_transaction=True)
+                if final_clock >= parse_utc(str(activation["stops_admitting_at"])):
+                    self._conn.rollback()
+                    return "INTAKE_CLOSED"
             self._conn.commit()
             return "COMMITTED"
         except sqlite3.IntegrityError as exc:
             self._conn.rollback()
             raise ObservationScheduleStoreError("EPISODE_ADMISSION_CONFLICT") from exc
         except ObservationScheduleStoreError:
+            self._conn.rollback()
             raise
         except Exception:
             self._conn.rollback()
@@ -3409,6 +3481,68 @@ class ObservationScheduleStore:
             params,
         ).fetchone()
         return int(row["n"]) if row is not None else 0
+
+    def episode_remaining_call_groups(self, *, schedule_sha256: str,
+                                      activation_id: str, batch_size: int) -> dict[str, int]:
+        """Same assigned-time/chunk boundary as process_slots; no payload reads."""
+        if type(batch_size) is not int or batch_size <= 0:
+            raise ObservationScheduleStoreError("BATCH_SIZE_INVALID")
+        counts = self._conn.execute(
+            "SELECT COUNT(*) FROM due_observations WHERE schedule_sha256=? AND activation_id=? "
+            "AND state IN ('PENDING','DUE','CLAIMED') GROUP BY due_at",
+            (schedule_sha256, activation_id)).fetchall()
+        return {"remaining_slots": sum(int(row[0]) for row in counts),
+                "remaining_call_groups": sum((int(row[0]) + batch_size - 1) // batch_size for row in counts)}
+
+    def episode_operability_projection(self, *, schedule_sha256: str,
+                                       activation_id: str, now: datetime) -> dict[str, Any]:
+        """Metadata-only operator facts; no frame, raw or research payload reads."""
+        scope = (schedule_sha256, activation_id)
+        slots = {str(row[0]): int(row[1]) for row in self._conn.execute(
+            "SELECT state, COUNT(*) FROM due_observations WHERE schedule_sha256=? AND activation_id=? GROUP BY state", scope)}
+        admitted = int(self._conn.execute(
+            "SELECT COUNT(*) FROM episode_admissions WHERE schedule_sha256=? AND activation_id=?", scope).fetchone()[0])
+        open_n = int(self._conn.execute(
+            "SELECT COUNT(DISTINCT entity_id) FROM due_observations WHERE schedule_sha256=? AND activation_id=? "
+            "AND state IN ('PENDING','DUE','CLAIMED')", scope).fetchone()[0])
+        frame = self._conn.execute(
+            "SELECT round_started_at FROM episode_rounds WHERE schedule_sha256=? AND activation_id=? "
+            "AND state='CLOSED' ORDER BY round_started_at DESC LIMIT 1", scope).fetchone()
+        outbox = self._conn.execute(
+            "SELECT COUNT(*), MIN(created_at) FROM episode_outbox WHERE schedule_sha256=? AND activation_id=? "
+            "AND published_content_sha256 IS NULL", scope).fetchone()
+        publication = self._conn.execute(
+            "SELECT MAX(created_at) FROM episode_publications WHERE schedule_sha256=? AND activation_id=?", scope).fetchone()[0]
+        maturity = self._conn.execute(
+            "SELECT cohort_id, MAX(final_deadline_at) AS maturity FROM episode_admissions "
+            "WHERE schedule_sha256=? AND activation_id=? GROUP BY cohort_id "
+            "HAVING MAX(final_deadline_at)>? ORDER BY maturity LIMIT 1", (*scope, render_utc(now))).fetchone()
+        activation = self.get_activation(*scope)
+        execution = self._conn.execute(
+            "SELECT SUM(json_extract(payload_json,'$.attempt_class')='NO_REQUEST'), "
+            "SUM(json_extract(payload_json,'$.attempt_class')='ATTEMPTED'), "
+            "SUM(json_extract(payload_json,'$.attempt_class')='UNKNOWN'), "
+            "SUM(json_extract(payload_json,'$.field_value_missing_count')), "
+            "SUM(state NOT IN ('PENDING','DUE','CLAIMED') AND json_extract(payload_json,'$.attempt_class') IS NULL), "
+            "SUM(state NOT IN ('PENDING','DUE','CLAIMED') AND json_extract(payload_json,'$.field_value_missing_count') IS NULL) FROM due_observations "
+            "WHERE schedule_sha256=? AND activation_id=?", scope).fetchone()
+        return {"collection": "OPPORTUNITY_EPISODES", "intake_enabled": bool(activation and activation["state"] == "ACTIVE"
+                and now < parse_utc(str(activation["stops_admitting_at"]))),
+                "last_completed_nomination_frame_at": frame[0] if frame else None,
+                "admitted_episodes": admitted, "open_episodes": open_n,
+                "terminal_episodes": admitted - open_n, "slot_states": slots,
+                "execution_metadata_status": "UNKNOWN_LEGACY_METADATA" if execution[4] or execution[5] else "EXACT",
+                "no_request_slots": None if execution[4] else int(execution[0] or 0),
+                "attempted_slots": None if execution[4] else int(execution[1] or 0),
+                "ambiguous_attempt_slots": None if execution[4] else int(execution[2] or 0),
+                "field_values_missing": int(execution[3]) if not execution[5] and execution[3] is not None else None,
+                "late_slots": slots.get("CENSORED_LATE", 0),
+                "unpublished_backlog": int(outbox[0]),
+                "oldest_unpublished_age_seconds": max(0, int((now - parse_utc(outbox[1])).total_seconds())) if outbox[1] else 0,
+                "last_successful_publication_at": publication,
+                "next_cohort_maturity": dict(maturity) if maturity else None,
+                "drain_headroom": {"status": "UNKNOWN", "reason": "FRESH_LOCAL_FREE_SPACE_AND_BOUND_ENVELOPE_REQUIRED"},
+                "account_envelope": {"status": "UNKNOWN", "reason": "APPROVED_SHARED_ACCOUNT_BINDING_REQUIRED"}}
 
     def episode_slot_state_counts(
         self,

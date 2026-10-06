@@ -124,7 +124,7 @@ def _write_parquet_batches(
                 if compression == "zstd":
                     kwargs = {"compression": "zstd", "compression_level": 3}
                 writer = pq.ParquetWriter(tmp, schema, **kwargs)
-            else:
+            elif not table.schema.equals(schema):
                 table = table.cast(schema)
             assert writer is not None
             writer.write_table(table)
@@ -406,7 +406,8 @@ def persist_observation_schedule(
     try:
         store.append([event], transaction_id=txn)
     except Exception:
-        existing = list(store.iter_committed_records())
+        exact = store.find_record(event.record_id)
+        existing = [exact] if exact is not None else []
         if any(
             item.record_id == event.record_id
             and item.payload_sha256 == event.payload_sha256
@@ -495,7 +496,8 @@ def persist_panel_snapshot_binding(
     store = ResearchStore(data_root)
     try:
         existing_by_id = {
-            item.record_id: item for item in store.iter_committed_records()
+            event.record_id: item for event in events
+            if (item := store.find_record(event.record_id)) is not None
         }
         missing: list[ResearchEvent] = []
         for event in events:
@@ -511,7 +513,8 @@ def persist_panel_snapshot_binding(
         raise
     except Exception:
         existing_by_id = {
-            item.record_id: item for item in store.iter_committed_records()
+            event.record_id: item for event in events
+            if (item := store.find_record(event.record_id)) is not None
         }
         if all(
             event.record_id in existing_by_id
@@ -573,7 +576,8 @@ def persist_pending_observation_binding(
         store.append([event], transaction_id=txn)
         return {"terminal": "PENDING_BOUND", "pending_binding_sha256": digest}
     except Exception:
-        existing = list(store.iter_committed_records())
+        exact = store.find_record(event.record_id)
+        existing = [exact] if exact is not None else []
         match = next((item for item in existing if item.record_id == event.record_id), None)
         if match is not None and match.payload_sha256 == event.payload_sha256:
             return {"terminal": "PENDING_REPLAY", "pending_binding_sha256": digest}
@@ -632,7 +636,8 @@ def satisfy_pending_observation_binding(
             "snapshot_sha256": snapshot_sha256,
         }
     except Exception:
-        existing = list(store.iter_committed_records())
+        exact = store.find_record(event.record_id)
+        existing = [exact] if exact is not None else []
         match = next((item for item in existing if item.record_id == event.record_id), None)
         if match is not None and match.payload_sha256 == event.payload_sha256:
             return {
@@ -697,13 +702,12 @@ def _complete_job(
 
 def _rdp_has(data_root: Path, record_id: str, payload_sha256: str | None = None) -> bool:
     store = ResearchStore(data_root)
-    for item in store.iter_committed_records():
-        if item.record_id != record_id:
-            continue
-        if payload_sha256 is not None and item.payload_sha256 != payload_sha256:
-            raise ObservationPanelPublisherError("CANONICAL_TARGET_CONFLICT")
-        return True
-    return False
+    item = store.find_record(record_id)
+    if item is None:
+        return False
+    if payload_sha256 is not None and item.payload_sha256 != payload_sha256:
+        raise ObservationPanelPublisherError("CANONICAL_TARGET_CONFLICT")
+    return True
 
 
 def _append_event(data_root: Path, event: ResearchEvent) -> None:

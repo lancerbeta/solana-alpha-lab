@@ -157,6 +157,60 @@ records real evidence; the episode authority profile does not grant activation.
 
 ## 9. Accepted limits and open owner decisions
 
+Bounded operability uses the shared ResearchStore's optional explicitly prepared
+identity lookup (`docs/contracts/research_write_lookup_v1.md`). It changes writer
+work, not canonical episode bytes, timing, population, protection or readers.
+Fresh capture with a later as-of revalidates closure content, then retains an
+already frozen closure/release identity. Regressed as-of or changed closed
+content is refused. Multiple activation/profile fragments of one UTC-day cohort
+are explicitly `EPISODE_COHORT_FRAGMENTED_UNSUPPORTED` before partial export;
+the canary uses one profile with no intraday switch.
+
+Episode calls reserve budget before durable STARTED/send; ambiguous outcomes
+keep that debit. A UTC rollover during STARTED persistence conservatively
+charges the request_started_at day too, with no refund of the earlier debit.
+Completion adds bytes/pacing without a second ordinary debit. This affects
+episode accounting only; legacy calls keep the previous completion policy.
+Counter debits are conservative reservations, not evidence of HTTP attempts.
+
+Before activation, the operator supplies `EPISODE_PRODUCER_STORAGE_COMMISSIONING_V1`
+via `activate --episode-storage-commissioning <json>`. It binds the exact root
+device/inode, schedule SHA and activation ID, separate OPERATE reference, verified
+backup/copy rehearsal hashes, actual volume bindings and whole-Factory PASS receipt,
+plus approved producer-local byte bounds and a canonical self-hash. These are
+attested bindings, not independently authenticated authority or backup proofs.
+Missing/UNKNOWN whole-Factory topology refuses before ACTIVE. TARGET <=40GiB/
+HARD <=50GiB, actual volumes, unrelated residents and backup/staging peaks remain
+whole-Factory gates. The six-copy response-cap forecast is MODEL/advisory only.
+
+Before nomination, runtime local control reserves all committed PENDING/DUE/CLAIMED
+slots and assigned-time/chunk call groups, each prospective next-round slot/call,
+all remaining nominations and fixed/safety headroom. The local per-call bound must
+cover raw capture, OPS/WAL, publication, canonical records/manifests and derived
+lookup on the producer filesystem; per-slot metadata covers non-call terminal work.
+Preparation binds those limits from copy measurements and approved local envelope;
+runtime never substitutes 8MiB times six copies. Unsafe/unknown LOCAL free space
+commits stop-intake and DRAINING while preserving the committed tail. A missing or
+invalid local binding refuses new intake with `PRODUCER_LOCAL_ENVELOPE_REQUIRED`
+and preserves lifecycle; it does not turn an unbound MODEL into permanent DRAINING.
+The bound envelope cannot be changed retrospectively. Lookup reprepare after
+restore/move does not rebind an existing activation. Changed root identity refuses
+its new intake; a changed envelope returns EPISODE_STORAGE_REPLAY_CONFLICT.
+Preserve original IDs/envelope/ledger/canonical evidence. Any canonical recovery
+or continued tail needs a separate OPERATE/repair gate and verified target-volume
+headroom; authorized stop-intake/drain ends at COMPLETE/unpublished_backlog=0.
+A new envelope belongs to a new activation on an approved supported profile/UTC
+cohort boundary, without intraday fragments or automatic cap/sampling reductions.
+R4 detached read/replay/import is not ACTIVE producer restart acceptance.
+
+Metadata readback distinguishes intake, frames, episodes, attempted/no-request/
+ambiguous execution, missing values, publication backlog and next maturity.
+Legacy rows lacking new diagnostic metadata return UNKNOWN, without backfill.
+Episode nomination does not inherit birth/recent source-poll coverage semantics.
+`admitted_episodes`, `open_episodes` and `terminal_episodes` count admissions/entities.
+`slot_states` is authoritative for due-slot backlog; episode counts are not slot
+counts. WATCH measures operational-packet wall against actual due-row count.
+
 - Protection reaches raw evidence too: the published E0 dependency is a
   content-addressed witness extract holding only the admitted object and the
   hash of its source response. A nomination response stays on the capture host.

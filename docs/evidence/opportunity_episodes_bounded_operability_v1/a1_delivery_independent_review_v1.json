@@ -1,0 +1,231 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "OPPORTUNITY-EPISODES-BOUNDED-OPERABILITY-REVIEW-001",
+  "as_of": "2026-10-06",
+  "task_id": "OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1",
+  "reviewed_bindings_sha256": "4484ef0ee7b37ab56b0c54506af408fb9f9b83445404540657e6743e4fdd853b",
+  "reviewed_inventory_sha256": "6816e5a15ffa7d53ba6b68102d87d9b78f177c123ec5a6b018a31d03434a8590",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_1ec7429b4319fccd529b37205b88f630805a6437",
+        "packet_fingerprint_sha256=881ee29d2bdc4b4ce5200f68b5040ce098de5ae3c78271a9009dfc4720080410",
+        "RESIDUAL_P0_P1_P2_NONE",
+        "SEMANTIC_PREMISE_PACKET_INFORMATION_PATH_PROCESS_OBLIGATION_MODEL_DIVERSITY_UNPROVEN",
+        "CANONICAL_TRUTH_PIT_READERS_FENCES_IMMUTABLE_ROOT_BOUNDARY_PURE_PENDING_READ_VERIFIER_AND_OPERATOR_MOVE_REPREPARE",
+        "PARTIAL_ROUND_POST_PACING_CAPTURE_CUTOFF_FRESH_ADMISSION_TRANSACTION_AFTER_WITNESS_SQL_LOCK_FINAL_CUTOFF_ROLLBACK",
+        "OPERATE_REF_SYNTAX_CAN_ACCEPT_UNKNOWN_OPERATOR_MUST_VERIFY_APPROVED_AUTHORITY",
+        "SYNTHETIC_ENVELOPE_COMPLETE_NAMESPACE_STAMP_WINDOWS_CRASH_DO_NOT_PROVE_LIVE_SCIENCE_HISTORY_AUDIT_LINUX_DURABILITY"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_1ec7429b4319fccd529b37205b88f630805a6437",
+        "packet_fingerprint_sha256=881ee29d2bdc4b4ce5200f68b5040ce098de5ae3c78271a9009dfc4720080410",
+        "RESIDUAL_P0_P1_P2_NONE",
+        "CANONICAL_COMMISSIONING_FENCES_NO_AUTO_ROLLBACK_RESTORE",
+        "COMMITTED_LOCAL_RESERVE_PARTIAL_ROUND_PACING_CAPTURE_CUTOFF_FRESH_ADMISSION_TRANSACTION_LEASE_ROLLBACK",
+        "DIRECT_COUNTS_CURRENT_SOURCE_PROOFS_PURE_PENDING_STATE_READ_FENCED_APPEND_RECOVERY_AMBIGUOUS_REFUSAL"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_1ec7429b4319fccd529b37205b88f630805a6437",
+        "packet_fingerprint_sha256=881ee29d2bdc4b4ce5200f68b5040ce098de5ae3c78271a9009dfc4720080410",
+        "RESIDUAL_P0_P1_P2_NONE",
+        "R1_REAL_CLI_FRESH_PROCESSES_R2_R4_NAMED_OWNER_REPEATS",
+        "FULL_CANARY_UNSAFE_DRAIN_AND_TEMPORAL_FALSIFIER",
+        "FACT_MODEL_UNKNOWN_COMMISSIONING_NOT_LIVE_ACCEPTANCE"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_1ec7429b4319fccd529b37205b88f630805a6437",
+        "packet_fingerprint_sha256=881ee29d2bdc4b4ce5200f68b5040ce098de5ae3c78271a9009dfc4720080410",
+        "RESIDUAL_P0_P1_P2_NONE",
+        "HONEST_COPY_CANONICAL_PRODUCTION_OPERATE_PREREQUISITES",
+        "EXACT_ENVELOPE_TEMPLATE_UNKNOWN_GATE_AND_RESTORE_BOUNDARY",
+        "EPISODE_VS_SLOT_COUNTS_WATCH_NO_OPTIMIZATION"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_LIVE_ACCEPTANCE",
+    "NO_MERGE",
+    "NO_MODEL_DIVERSITY_ATTESTATION",
+    "PACKET_INFORMATION_PATH_ONLY",
+    "NO_LIVE_LAUNCH_IDENTITY_ATTESTATION"
+  ],
+  "remediation_history": [
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Real operational packet episode projection and storage-history ownership corrected",
+      "observed_head": "83c6a6009af447226a455ed15e0e8bcae247f361",
+      "resolved_by_head": "1c96671503a2dc3a465f8896e27df015f2937a66"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Mixed legacy missing metadata preserves global UNKNOWN instead of a known subset zero",
+      "observed_head": "83c6a6009af447226a455ed15e0e8bcae247f361",
+      "resolved_by_head": "1c96671503a2dc3a465f8896e27df015f2937a66"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Unsupported same-day fragment terminal NEXT documented",
+      "observed_head": "83c6a6009af447226a455ed15e0e8bcae247f361",
+      "resolved_by_head": "1c96671503a2dc3a465f8896e27df015f2937a66"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Linux immediate-parent fsync limits made explicit without claiming canonical or ancestor power-loss durability",
+      "observed_head": "83c6a6009af447226a455ed15e0e8bcae247f361",
+      "resolved_by_head": "1c96671503a2dc3a465f8896e27df015f2937a66"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Request-day gate and debit unified after credential and STARTED drift",
+      "observed_head": "1c96671503a2dc3a465f8896e27df015f2937a66",
+      "resolved_by_head": "26fa1399fd0ac3658a9ff7442f66d4dae4455a12"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Deep lookup JSON and reused-node IO denial share bounded typed decoding",
+      "observed_head": "1c96671503a2dc3a465f8896e27df015f2937a66",
+      "resolved_by_head": "26fa1399fd0ac3658a9ff7442f66d4dae4455a12"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Frozen-unreadable terminal NEXT preserves immutable evidence and requires exact verified recovery",
+      "observed_head": "3b44db24e4994a527545fb26598141f9dc144e1b",
+      "resolved_by_head": "f7f2c5f012721da072bb91f96fdf103397177c4a"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Unverified scope no longer becomes a positive legacy collection label",
+      "observed_head": "3b44db24e4994a527545fb26598141f9dc144e1b",
+      "resolved_by_head": "f7f2c5f012721da072bb91f96fdf103397177c4a"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Invalid frozen timestamp is converted before export without evidence rewrite",
+      "observed_head": "3b44db24e4994a527545fb26598141f9dc144e1b",
+      "resolved_by_head": "f7f2c5f012721da072bb91f96fdf103397177c4a"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Canonical pending recovery source IO refusal is typed before staging",
+      "observed_head": "3b44db24e4994a527545fb26598141f9dc144e1b",
+      "resolved_by_head": "f7f2c5f012721da072bb91f96fdf103397177c4a"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Reserve and nomination bind one post-pacing decision instant and round; crossing boundary cannot admit unreserved obligations",
+      "observed_head": "4835c6c3a1802f23888efc1fbff20635125e7d2a",
+      "resolved_by_head": "1615cac421311387e10f1f7d172d4d478b92bdf6"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Legacy episode-only storage option refuses before ACTIVE or canonical state append",
+      "observed_head": "4835c6c3a1802f23888efc1fbff20635125e7d2a",
+      "resolved_by_head": "1615cac421311387e10f1f7d172d4d478b92bdf6"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Exact commissioning JSON template and offline identity/self-hash validation recipe provided",
+      "observed_head": "4835c6c3a1802f23888efc1fbff20635125e7d2a",
+      "resolved_by_head": "1615cac421311387e10f1f7d172d4d478b92bdf6"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Changed-root lookup recovery does not promise unavailable existing-activation envelope rebind; supported NEXT explicit",
+      "observed_head": "1615cac421311387e10f1f7d172d4d478b92bdf6",
+      "resolved_by_head": "75342c9d01e40663011752c264197a264783799d"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Pending reconciliation no longer copy-only dead-end; canonical in-place preparation uses separate OPERATE prerequisites and fences",
+      "observed_head": "1615cac421311387e10f1f7d172d4d478b92bdf6",
+      "resolved_by_head": "75342c9d01e40663011752c264197a264783799d"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Synthetic reproduce recipes and final outside packet hash owner/location avoid a circular binding",
+      "observed_head": "1615cac421311387e10f1f7d172d4d478b92bdf6",
+      "resolved_by_head": "75342c9d01e40663011752c264197a264783799d"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Witness IO before fresh admission transaction T0; fresh quota/age/lease/cutoff after SQL lock and pre-commit SQL-delay rollback prevent stale admissions; transactional lease renewal never commits independently",
+      "observed_head": "3422e91dbcd48201ad122dfef39eced3cb8880f7",
+      "resolved_by_head": "1ec7429b4319fccd529b37205b88f630805a6437"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Recoverable pending no longer blocks public lifecycle gate before fenced append; exact verified previous/next pointers resolve read-only, while ambiguous pre-stamp and namespace drift remain refused",
+      "observed_head": "c7b1d68179621c09547a260245be04279225697a",
+      "resolved_by_head": "1ec7429b4319fccd529b37205b88f630805a6437"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Actual ACTIVE_TRANSITION_PROOF refusal and NEXT route preserve IDs/evidence, diagnose exact cause on verified isolated copy, and distinguish confirmed lookup OPERATE reconciliation from unresolved repair gate; generic terminal grants no reprepare",
+      "observed_head": "dcaaf1eef9e7965da1f41771895f6c8e0c50da28",
+      "resolved_by_head": "1ec7429b4319fccd529b37205b88f630805a6437"
+    }
+  ]
+}

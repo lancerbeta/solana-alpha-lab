@@ -167,6 +167,8 @@ def main(
         cmd.add_argument("--data-root")
         if name == "authorize":
             cmd.add_argument("--phrase", required=True)
+        if name == "activate":
+            cmd.add_argument("--episode-storage-commissioning", type=Path)
         if name in {"activate", "pause", "stop-intake", "abort", "resume", "snapshot"}:
             cmd.add_argument("--activation-id", required=True)
         if name == "abort":
@@ -251,6 +253,19 @@ def main(
                 digest = load_observation_schedule(ROOT, args.schedule)["schedule_sha256"]
             if not digest:
                 return _emit({"terminal": "SCHEDULE_SHA256_REQUIRED"}, 2)
+            storage_commissioning = None
+            if args.episode_storage_commissioning is not None:
+                try:
+                    path = args.episode_storage_commissioning
+                    if path.stat().st_size > 65536 or path.is_symlink():
+                        raise ValueError()
+                    with path.open("rb") as handle:
+                        raw = handle.read(65537)
+                    if len(raw) > 65536:
+                        raise ValueError()
+                    storage_commissioning = json.loads(raw)
+                except (OSError, ValueError, RecursionError):
+                    return _emit({"terminal": "EPISODE_STORAGE_BINDING_INVALID"}, 2)
             result = activate_schedule(
                 root=ROOT,
                 data_root=data_root,
@@ -259,6 +274,7 @@ def main(
                 activation_id=args.activation_id,
                 now=now,
                 producer_git_sha=producer,
+                storage_commissioning=storage_commissioning,
             )
             code = 0 if result.get("terminal") in {"ACTIVATED", "ACTIVATE_REPLAY"} else 2
             return _emit(result, code)
