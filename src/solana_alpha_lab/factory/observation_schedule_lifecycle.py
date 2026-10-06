@@ -1495,6 +1495,20 @@ def _activation_window_matches_registered(
         return False
 
 
+def _activation_proof_window_start(row: Mapping[str, Any], starts: datetime) -> datetime:
+    """Earliest instant that can hold this activation's own committed transitions.
+
+    An activation committed before ``starts_at`` appends its ACTIVE event before the
+    admission window opens. The bounded lifecycle read must still reach that event,
+    so the proof window opens at the activation row's creation when it is earlier.
+    """
+
+    try:
+        return min(starts, parse_utc(str(row["created_at"])))
+    except (KeyError, TypeError, ValueError):
+        return starts
+
+
 def activation_transition_research_event_proven(
     data_root: Path | None,
     row: Mapping[str, Any],
@@ -1581,7 +1595,7 @@ def activation_transition_research_event_proven(
             include_member_predecessor=False,
             schedule_sha256=schedule_sha256,
             activation_id=activation_id,
-            window_start=starts,
+            window_start=_activation_proof_window_start(row, starts),
             closure_cutoff=max(now, stops),
         )
     except ResearchStoreError:

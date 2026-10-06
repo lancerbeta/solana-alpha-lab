@@ -1,0 +1,98 @@
+{
+  "candidate": {
+    "base": "e0ceceeb1bed1b56714386181e1a3b220f632b06",
+    "diff_sha256": "4be86920cf04fff83b556858e5cdeef044a7fce05a928fbb4d02d7458d350994",
+    "head": "7920277a25af5227346b567e42ce65b2bde799cd"
+  },
+  "evidence": [
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/observation_schedule_lifecycle.py",
+      "sha256_or_fingerprint": "90bec509a1fe636c7792ab9fc1d2cc5f1c228947e12d6cc1ba4a4617abe4826c"
+    },
+    {
+      "logical_ref": "repo://scripts/observation_schedule.py",
+      "sha256_or_fingerprint": "d8205cff11a3e14175080e81759d62ac5560452951032945a22250af58319b68"
+    },
+    {
+      "logical_ref": "repo://tests/test_episode_activation_before_start_v1.py",
+      "sha256_or_fingerprint": "9a28c77903901ec4ad577f89843ee56bf4e8494d6b80b25c8cf00674604f7952"
+    },
+    {
+      "logical_ref": "repo://tests/test_opportunity_episodes_harness_v1.py",
+      "sha256_or_fingerprint": "14aecd74d09b9ee2b57611cee18c7330e0b3fa534e304ade787a010b675b31a3"
+    },
+    {
+      "logical_ref": "repo://docs/tasks/EPISODE_ACTIVATION_BEFORE_START_PROOF_V1.md",
+      "sha256_or_fingerprint": "c08712f32134c93064512d59461f082f48299449270f9f59fa694d7595dbcf49"
+    },
+    {
+      "logical_ref": "repo://docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md",
+      "sha256_or_fingerprint": "10a4d90b66f1750880ff6c1d9c8ca4039fde34197c0ec498738ee1e93e17999d"
+    }
+  ],
+  "independence": {
+    "claim_scope": "PACKET_INFORMATION_PATH",
+    "context_isolated": true,
+    "implementation_transcript_seen": false,
+    "launch_isolation": "PROCESS_OBLIGATION",
+    "model_diversity": "UNPROVEN",
+    "model_diversity_identity": null,
+    "packet_bound": true,
+    "readonly": true
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE_ACCEPTANCE",
+    "NO_PROVIDER_CALLS",
+    "NO_PRODUCTION_DATA",
+    "NO_DEPLOY_SETTINGS_TIMER_CHANGE",
+    "NO_MERGE",
+    "NO_CHANGE_TO_ADMISSION_T0_POPULATION_FLOORS_GRID_CAPS_STORAGE_OR_PROTECTION",
+    "NO_FIX_OF_ROLLOVER_PRIOR_ACTIVE_READ_WINDOW"
+  ],
+  "packet_fingerprint_sha256": "78fdcf6fdf9d789dc4ea58c1490ab9ba7d4f4be9aff9950c3e233276b08dca3a",
+  "questions": [
+    "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
+    "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
+    "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL",
+    "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE",
+    "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY",
+    "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING",
+    "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER",
+    "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE",
+    "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM",
+    "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS"
+  ],
+  "review": {
+    "architecture_owner": "ARCHITECTURE_CRITIC",
+    "profile": "SEMANTIC_PREMISE",
+    "risk_dimensions": [
+      "PIT_OR_AVAILABILITY_SEMANTICS",
+      "EVIDENCE_ADMISSIBILITY",
+      "OWNER_AUTHORITY_SEMANTICS"
+    ]
+  },
+  "schema": "smial.semantic-premise-review-packet",
+  "schema_version": "1.0",
+  "semantic_claims": [
+    {
+      "claim": "An activation committed before its starts_at keeps a reachable ACTIVE transition proof: the bounded lifecycle read now opens at min(starts_at, the activation row created_at), so the activation's own committed ACTIVE event is found. The proof still requires the exact committed OBSERVATION_SCHEDULE_STATE event (recomputed event id, authority receipt, producer capability, availability not after now, activation and schedule identity, and no later conflicting transition); only the read window's lower bound changes.",
+      "claim_id": "C1",
+      "scope": "transition_proof"
+    },
+    {
+      "claim": "Before starts_at the ordinary tick makes zero provider calls, zero credential reads and zero admissions and returns the existing NOT_YET_ACTIVE terminal, now with exit code 0 instead of 2; every other terminal other than TICK_COMPLETE keeps exit code 2. After starts_at the first ordinary tick proceeds with no pause/resume.",
+      "claim_id": "C2",
+      "scope": "pre_start_idle"
+    },
+    {
+      "claim": "Missing, foreign or tampered transition events still refuse closed; pause, resume, operator stop-intake, activation exactly at starts_at and the DRAINING evidence read behave as before; the rollover predecessor/successor and prior-ACTIVE reads are not changed.",
+      "claim_id": "C3",
+      "scope": "unchanged_boundaries"
+    }
+  ],
+  "task": {
+    "task_contract_sha256": "c08712f32134c93064512d59461f082f48299449270f9f59fa694d7595dbcf49",
+    "task_id": "EPISODE_ACTIVATION_BEFORE_START_PROOF_V1"
+  }
+}
