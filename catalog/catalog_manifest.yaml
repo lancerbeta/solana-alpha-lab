@@ -15,10 +15,9 @@ canonical_bindings:
     target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011
     expected_asset_type: configuration
     semantics: CURRENT_AT_COMMIT
-    rationale: Current used provider route capability lineage head; target status preserved
+    rationale: Current provider route capability lineage head; v11 is the bound head with no live runtime consumer yet (frozen experiments keep exact v10 pins); target status preserved
     current_use_evidence_asset_ids:
     - MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011
-    - CONFIG-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001
   ACTIVE-FACTORY-MARKET-FEATURE-SURFACE:
     target_asset_id: CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001
     expected_asset_type: configuration

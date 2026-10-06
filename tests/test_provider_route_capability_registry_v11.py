@@ -33,6 +33,12 @@ V11_PATH = ROOT / "configs/provider_route_capability_registry_v11.yaml"
 SCHEMA_PATH = ROOT / "catalog/schemas/provider_route_capability_registry_v11.schema.json"
 
 
+def _both(registry: dict[str, object], index: int, **changes: object) -> None:
+    route = registry["routes"][index]
+    route["last_success"].update(changes)
+    route["last_observation"] = dict(route["last_success"])
+
+
 class ProviderRouteRegistryV11Tests(unittest.TestCase):
     def setUp(self) -> None:
         self.v10 = yaml.safe_load(V10_PATH.read_text(encoding="utf-8"))
@@ -109,23 +115,38 @@ class ProviderRouteRegistryV11Tests(unittest.TestCase):
             )
 
     def test_overlap_failure_cannot_be_dropped_or_upgraded(self) -> None:
-        for mutation in ("PROVEN", None):
+        for mutation, code in (("PROVEN", "OBSERVED_PACE_CLAIM_DRIFT"), (None, "OBSERVED_EVIDENCE_KEYS_DRIFT")):
             tampered = copy.deepcopy(self.v11)
             if mutation is None:
                 del tampered["routes"][13]["evidence"]["account_pace_discipline"]
             else:
                 tampered["routes"][13]["evidence"]["account_pace_discipline"] = mutation
-            with self.assertRaisesRegex(Exception, "OBSERVED_PACE_CLAIM_DRIFT"):
+            with self.assertRaisesRegex(Exception, code):
                 self._validate(tampered)
 
     def test_tampering_fails_closed(self) -> None:
         cases = (
             ("PRESERVED_ROUTE_DRIFT", lambda r: r["routes"][0].__setitem__("provider", "OTHER")),
             ("TRANSITIONED_HASH_DRIFT", lambda r: r["supersedes"]["transitioned_route_semantic_sha256"].update({SEARCH_ROUTE_ID: "0" * 64})),
-            ("OBSERVED_AUTHORITY_DRIFT", lambda r: r["routes"][14]["execution_policy"].__setitem__("authority_granted", True)),
+            ("OBSERVED_POLICY_DRIFT", lambda r: r["routes"][14]["execution_policy"].__setitem__("authority_granted", True)),
             ("OBSERVED_RECEIPT_SHA_DRIFT", lambda r: r["routes"][15]["evidence"].__setitem__("last_observation_receipt_sha256", "1" * 64)),
             ("SEARCH_SHAPE_CLAIM_DRIFT", lambda r: r["routes"][12]["evidence"].__setitem__("search_shape_coverage", "BATCH100")),
             ("ROUTE_COUNT_DRIFT", lambda r: r["routes"].pop()),
+            ("OBSERVED_RESPONSE_SHA_DRIFT", lambda r: _both(r, 13, response_sha256="0" * 64)),
+            ("OBSERVED_ROWS_DRIFT", lambda r: _both(r, 14, rows=5000)),
+            ("OBSERVED_AT_DRIFT", lambda r: _both(r, 15, observed_at="2026-10-06T00:00:00Z")),
+            ("OBSERVED_BYTES_DRIFT", lambda r: _both(r, 13, response_bytes=1)),
+            ("OBSERVED_NON_CLAIM_DRIFT", lambda r: r["routes"][13]["non_claims"].update(provider_reliability=True)),
+            ("OBSERVED_NON_CLAIM_DRIFT", lambda r: r["routes"][12]["non_claims"].update(batch_of_100_search=True)),
+            ("ROOT_NON_CLAIM_DRIFT", lambda r: r["non_claims"].update(alpha=True)),
+            ("OBSERVED_POLICY_KEYS_DRIFT", lambda r: r["routes"][14]["execution_policy"].update(fallback_route="X")),
+            ("OBSERVED_EVIDENCE_KEYS_DRIFT", lambda r: r["routes"][12]["evidence"].update(max_batch_size=100)),
+            ("SEARCH_SHAPE_LIMITS_DRIFT", lambda r: r["routes"][12]["evidence"].update(search_shape_not_covered=[])),
+            ("OBSERVED_FAILURES_DRIFT", lambda r: r["routes"][15].update(known_failures=[])),
+            ("OBSERVED_RUNTIME_CLAIM_DRIFT", lambda r: r["routes"][13]["runtime"].update(client="PYTHON_STDLIB_URLLIB")),
+            ("OBSERVED_PREFLIGHT_CLAIM_DRIFT", lambda r: r["routes"][13]["preflight"].update(observed_in_receipt=True)),
+            ("OBSERVED_REQUEST_COUNT_DRIFT", lambda r: r["routes"][14]["evidence"].update(observed_request_count=True)),
+            ("OBSERVED_ROWS_DRIFT", lambda r: _both(r, 12, rows_with_valid_identity=True)),
         )
         for code, mutate in cases:
             tampered = copy.deepcopy(self.v11)

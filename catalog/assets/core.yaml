@@ -28364,7 +28364,7 @@ records:
   as_of: '2026-10-06'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_CORE_SWITCH_AND_BIND_V1
   location: {kind: git_path, logical_uri: 'repo://configs/provider_route_capability_registry_v11.yaml', repository_path: configs/provider_route_capability_registry_v11.yaml}
-  integrity: {kind: sha256, sha256: ce3a81b50616cd039bc2164ea9d9a4966b51f2d6f6fd708cf3051537b81d1030}
+  integrity: {kind: sha256, sha256: 5cb3b219838fa74bfe108ec3380f3eadbb226541cf4225e065cf3c4b8861c426}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -28396,7 +28396,7 @@ records:
   as_of: '2026-10-06'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_CORE_SWITCH_AND_BIND_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/provider_route_capability_registry_v11.py', repository_path: src/solana_alpha_lab/provider_route_capability_registry_v11.py}
-  integrity: {kind: sha256, sha256: 15b7d49190bcf0a48e22c8c9085eaf30179cf9826921fbc8f6970a47a6ca7374}
+  integrity: {kind: sha256, sha256: 7cba3f2b4338e2016aca9e67746553b6ab626ce9bc37bca39ae3c7054459c193}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011}]
   consumers: [FACTORY-001]
@@ -28412,7 +28412,7 @@ records:
   as_of: '2026-10-06'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_CORE_SWITCH_AND_BIND_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_provider_route_capability_registry_v11.py', repository_path: tests/test_provider_route_capability_registry_v11.py}
-  integrity: {kind: sha256, sha256: 4a4f5896a1f21d2eec91949398ba14bf316d39b73b6f67b26a086dbcf4920252}
+  integrity: {kind: sha256, sha256: e429c8030c641b3dc2a1b8068531141d2678f43934cd284c3db9da783d9b1a40}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: depends_on, target_asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011}]
   consumers: [FACTORY-001]
@@ -40090,7 +40090,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/opportunity_episodes_jupiter_v1.md', repository_path: docs/contracts/opportunity_episodes_jupiter_v1.md}
-  integrity: {kind: sha256, sha256: efcec66dfb8c4005b2acdfa67ed6cc6847a789eb02702ee83000c1e9d614a73f}
+  integrity: {kind: sha256, sha256: d6a01595ad28bcae33f71489cc703b2b26eeee7b98a94e021911b7d8e9cf5780}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}
@@ -40108,7 +40108,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md', repository_path: docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: c4f18ccae08b1a689bc3949756338f83c3b718cf0e67e562a3e68f0b5d02005c}
+  integrity: {kind: sha256, sha256: 22caebb5e8790e2aec8c6ff1548349a75156d4e5912f8f856cf3cd9b66df624b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}

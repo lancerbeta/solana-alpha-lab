@@ -721,10 +721,10 @@ routes:
   operation: FREE_API_KEY_BULK_TOKEN_SEARCH
   protocol: HTTPS_GET
   runtime:
-    client: PYTHON_STDLIB_URLLIB
+    client: UNRECORDED_IN_RECEIPT
     client_recorded_in_receipt: false
-    version_source: CODEX_WORKSPACE_DEPENDENCY
-    tls_engine: OPENSSL
+    version_source: UNRECORDED_IN_RECEIPT
+    tls_engine: UNRECORDED_IN_RECEIPT
     observed_result: HTTP_200_FREE_KEY_OBSERVED
   preflight:
     kind: DNS_TCP_TLS
@@ -734,6 +734,7 @@ routes:
     - TLS_HANDSHAKE
     consumes_credential: false
     consumes_attempt: false
+    observed_in_receipt: false
   last_success:
     observed_at: '2026-10-06T12:46:42.882361Z'
     observed_at_semantics: RECEIPT_RESPONSE_RECEIVED_AT_UTC
@@ -764,7 +765,12 @@ routes:
     parser_compatible: true
     error_fingerprint: null
     evidence_id: EVIDENCE-JUPITER-CORE-COMMISSIONING-ROUTE-QUALIFICATION-20261006
-  known_failures: []
+  known_failures:
+  - fingerprint: SHARED_ACCOUNT_PACE_OVERLAP_UNPROVEN
+    layer: ACCOUNT_PACE
+    interpretation: The qualification calls shared the account key with the running
+      legacy collector without a common pace; parser/route qualification is not account-safety
+      evidence.
   execution_policy:
     retry: false
     fallback: false
@@ -774,7 +780,7 @@ routes:
     last_observation_receipt: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/jupiter_qualification_receipt_v1.json
     last_observation_receipt_sha256: 880b2ce75e383444733753e36f1015ad7395d6fabaeefe7f710a07430d13c381
     qualification_limits: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/route_qualification_limits_v1.json
-    qualification_limits_sha256: f3aa0f38400003ab004c93844b78f85891fb43be25d6e608b0fe11dbdcb6b569
+    qualification_limits_sha256: 41ef9fba09cee6be7e5bde22c59b3c6f073aa4804461c6d70309d462700f197f
     raw_retention: A4_OUTSIDE_GIT
     observed_request_count: 1
     http_status_counts:
@@ -782,6 +788,10 @@ routes:
     account_pace_discipline: UNPROVEN_FAILED_OVERLAP_WITH_LEGACY
     parser_route_qualification: PASS
     search_shape_coverage: SINGLE_OBJECT_USDC_PUBLIC_MINT_ONLY
+    search_shape_not_covered:
+    - BATCH_OF_100_MINTS
+    - MEMECOIN_MIX
+    - ABSENT_OR_MISSING_MINT_MIX
   non_claims:
     provider_reliability: false
     data_completeness: false
@@ -789,6 +799,8 @@ routes:
     task30_trial: false
     alpha: false
     numeric_netreturn: false
+    batch_of_100_search: false
+    memecoin_or_missing_mix_search: false
 - route_id: JUPITER-SOLANA-TOKENS-V2-TOPORGANICSCORE-5M-FREE-API-KEY-001
   provider: JUPITER
   endpoint_family: tokens/v2/toporganicscore/5m
@@ -797,10 +809,10 @@ routes:
   operation: FREE_API_KEY_TOPORGANICSCORE_5M_TOKEN_LIST
   protocol: HTTPS_GET
   runtime:
-    client: PYTHON_STDLIB_URLLIB
+    client: UNRECORDED_IN_RECEIPT
     client_recorded_in_receipt: false
-    version_source: CODEX_WORKSPACE_DEPENDENCY
-    tls_engine: OPENSSL
+    version_source: UNRECORDED_IN_RECEIPT
+    tls_engine: UNRECORDED_IN_RECEIPT
     observed_result: HTTP_200_FREE_KEY_OBSERVED
   preflight:
     kind: DNS_TCP_TLS
@@ -810,6 +822,7 @@ routes:
     - TLS_HANDSHAKE
     consumes_credential: false
     consumes_attempt: false
+    observed_in_receipt: false
   last_success:
     observed_at: '2026-10-06T12:46:33.233457Z'
     observed_at_semantics: RECEIPT_RESPONSE_RECEIVED_AT_UTC
@@ -840,7 +853,12 @@ routes:
     parser_compatible: true
     error_fingerprint: null
     evidence_id: EVIDENCE-JUPITER-CORE-COMMISSIONING-ROUTE-QUALIFICATION-20261006
-  known_failures: []
+  known_failures:
+  - fingerprint: SHARED_ACCOUNT_PACE_OVERLAP_UNPROVEN
+    layer: ACCOUNT_PACE
+    interpretation: The qualification calls shared the account key with the running
+      legacy collector without a common pace; parser/route qualification is not account-safety
+      evidence.
   execution_policy:
     retry: false
     fallback: false
@@ -850,7 +868,7 @@ routes:
     last_observation_receipt: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/jupiter_qualification_receipt_v1.json
     last_observation_receipt_sha256: 880b2ce75e383444733753e36f1015ad7395d6fabaeefe7f710a07430d13c381
     qualification_limits: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/route_qualification_limits_v1.json
-    qualification_limits_sha256: f3aa0f38400003ab004c93844b78f85891fb43be25d6e608b0fe11dbdcb6b569
+    qualification_limits_sha256: 41ef9fba09cee6be7e5bde22c59b3c6f073aa4804461c6d70309d462700f197f
     raw_retention: A4_OUTSIDE_GIT
     observed_request_count: 1
     http_status_counts:
@@ -873,10 +891,10 @@ routes:
   operation: FREE_API_KEY_TOPTRADED_5M_TOKEN_LIST
   protocol: HTTPS_GET
   runtime:
-    client: PYTHON_STDLIB_URLLIB
+    client: UNRECORDED_IN_RECEIPT
     client_recorded_in_receipt: false
-    version_source: CODEX_WORKSPACE_DEPENDENCY
-    tls_engine: OPENSSL
+    version_source: UNRECORDED_IN_RECEIPT
+    tls_engine: UNRECORDED_IN_RECEIPT
     observed_result: HTTP_200_FREE_KEY_OBSERVED
   preflight:
     kind: DNS_TCP_TLS
@@ -886,6 +904,7 @@ routes:
     - TLS_HANDSHAKE
     consumes_credential: false
     consumes_attempt: false
+    observed_in_receipt: false
   last_success:
     observed_at: '2026-10-06T12:46:36.493427Z'
     observed_at_semantics: RECEIPT_RESPONSE_RECEIVED_AT_UTC
@@ -916,7 +935,12 @@ routes:
     parser_compatible: true
     error_fingerprint: null
     evidence_id: EVIDENCE-JUPITER-CORE-COMMISSIONING-ROUTE-QUALIFICATION-20261006
-  known_failures: []
+  known_failures:
+  - fingerprint: SHARED_ACCOUNT_PACE_OVERLAP_UNPROVEN
+    layer: ACCOUNT_PACE
+    interpretation: The qualification calls shared the account key with the running
+      legacy collector without a common pace; parser/route qualification is not account-safety
+      evidence.
   execution_policy:
     retry: false
     fallback: false
@@ -926,7 +950,7 @@ routes:
     last_observation_receipt: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/jupiter_qualification_receipt_v1.json
     last_observation_receipt_sha256: 880b2ce75e383444733753e36f1015ad7395d6fabaeefe7f710a07430d13c381
     qualification_limits: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/route_qualification_limits_v1.json
-    qualification_limits_sha256: f3aa0f38400003ab004c93844b78f85891fb43be25d6e608b0fe11dbdcb6b569
+    qualification_limits_sha256: 41ef9fba09cee6be7e5bde22c59b3c6f073aa4804461c6d70309d462700f197f
     raw_retention: A4_OUTSIDE_GIT
     observed_request_count: 1
     http_status_counts:
@@ -949,10 +973,10 @@ routes:
   operation: FREE_API_KEY_TOPTRENDING_5M_TOKEN_LIST
   protocol: HTTPS_GET
   runtime:
-    client: PYTHON_STDLIB_URLLIB
+    client: UNRECORDED_IN_RECEIPT
     client_recorded_in_receipt: false
-    version_source: CODEX_WORKSPACE_DEPENDENCY
-    tls_engine: OPENSSL
+    version_source: UNRECORDED_IN_RECEIPT
+    tls_engine: UNRECORDED_IN_RECEIPT
     observed_result: HTTP_200_FREE_KEY_OBSERVED
   preflight:
     kind: DNS_TCP_TLS
@@ -962,6 +986,7 @@ routes:
     - TLS_HANDSHAKE
     consumes_credential: false
     consumes_attempt: false
+    observed_in_receipt: false
   last_success:
     observed_at: '2026-10-06T12:46:39.728956Z'
     observed_at_semantics: RECEIPT_RESPONSE_RECEIVED_AT_UTC
@@ -992,7 +1017,12 @@ routes:
     parser_compatible: true
     error_fingerprint: null
     evidence_id: EVIDENCE-JUPITER-CORE-COMMISSIONING-ROUTE-QUALIFICATION-20261006
-  known_failures: []
+  known_failures:
+  - fingerprint: SHARED_ACCOUNT_PACE_OVERLAP_UNPROVEN
+    layer: ACCOUNT_PACE
+    interpretation: The qualification calls shared the account key with the running
+      legacy collector without a common pace; parser/route qualification is not account-safety
+      evidence.
   execution_policy:
     retry: false
     fallback: false
@@ -1002,7 +1032,7 @@ routes:
     last_observation_receipt: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/jupiter_qualification_receipt_v1.json
     last_observation_receipt_sha256: 880b2ce75e383444733753e36f1015ad7395d6fabaeefe7f710a07430d13c381
     qualification_limits: docs/evidence/opportunity_episodes_jupiter_commissioning_v1/route_qualification_limits_v1.json
-    qualification_limits_sha256: f3aa0f38400003ab004c93844b78f85891fb43be25d6e608b0fe11dbdcb6b569
+    qualification_limits_sha256: 41ef9fba09cee6be7e5bde22c59b3c6f073aa4804461c6d70309d462700f197f
     raw_retention: A4_OUTSIDE_GIT
     observed_request_count: 1
     http_status_counts:

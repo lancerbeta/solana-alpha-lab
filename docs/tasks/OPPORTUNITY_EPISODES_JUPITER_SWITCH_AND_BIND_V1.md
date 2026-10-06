@@ -109,6 +109,9 @@ Required invariants:
   collector is a separate `account_pace_discipline` field and the receipt is
   neither corrected nor re-run.
 - The search observation claims only the single-object public-mint shape.
+- Precedent note: v9 appended new route IDs for new observations; v11 is the first
+  same-route-ID transition (placeholder to observed), legitimate because the
+  placeholder had no `last_success` and its object hash is recorded.
 - No route grants a call, a credential, a retry, a fallback or a selection.
 - The V1 ceiling of 100 admissions per UTC day is documented, not raised.
 

@@ -10,8 +10,9 @@ cleanup authority stay separate OPERATE decisions.
 
 Route evidence: `CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011` records the
 parser/route qualification of the three category 5m routes and the single-object
-search. It does not prove shared-account pace discipline or the batch-of-100
-search shape, and it grants no call. The V1 validator and schema cap the
+search. It does not prove shared-account pace discipline, the batch-of-100
+search shape, a memecoin mix or the absent/missing-mint path, and it grants no
+call. Every observed route carries the pace overlap as a `known_failures` entry. The V1 validator and schema cap the
 admission ceiling at 100 per UTC day; a higher ceiling is a future capacity
 extension, not a supported profile.
 
@@ -149,12 +150,21 @@ OPS write-lock действует весь audit, включая фазу дли
 Это cap, yield неизвестен. Calendar window, SHA, authority expiry на весь drain,
 approved account allocation, Factory/disk/drain reserve и assignments фиксируют
 непосредственно перед commissioning. Normal population/caps не снижаются для
-получения PASS. Existing legacy intake сначала штатно завершается либо отдельно
+получения PASS. Canary DoD включает реальные первые SEARCH batches: bulk, absent и
+missing-mint путь, которых single-object USDC probe не доказывает; без них
+search-путь остаётся `UNPROVEN`, а pace дисциплина проверяется на эксклюзивной lane. Existing legacy intake сначала штатно завершается либо отдельно
 останавливается с разрешением владельца; старые obligations и datasets остаются.
 Перед canary нужны две вещи, а не COMPLETE всей истории: (1) эксклюзивная
 provider/workload lane — legacy collector и его same-envelope renewal не
 запускаются, а exact legacy activation исполнено поставлена на `PAUSED_OPERATOR`
-(или завершена); (2) подтверждённая quiescence, не один случайный `lease free`.
+(или завершена; `DRAINING` legacy-scope пока не пауза и не завершение, его сначала
+доводят до `COMPLETE`); (2) подтверждённая quiescence, не один случайный
+`lease free`: exact schedule SHA и activation ID из `mode=ro` readback,
+`factory-observation-schedule.timer` и `factory-same-envelope-renewal.timer`
+отключены штатным systemd и не активны, ни один observation/renewal worker не
+работает, а повторный readback после обычного collector interval показывает
+`PAUSED_OPERATOR`, неизменные counters и ни одного нового admission, call или
+publication этой activation.
 Исторические `PAUSED_OPERATOR`/`ABORTED` строки не требуют COMPLETE, repair или
 resume и не входят в новую научную популяцию. Default tick при нескольких
 ACTIVE/DRAINING scopes требует exact selection, поэтому остановленный legacy

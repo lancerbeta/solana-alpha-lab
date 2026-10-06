@@ -1,3 +1,10 @@
+> Repo note (2026-10-06, SWITCH_AND_BIND): stored verbatim from the owner-provided file
+> (trailing whitespace stripped). `NEXT_EXECUTOR_PROMPT_RU.md` is an operational command, not
+> in Git. The runbook correction in section 2/G5 is now in
+> `docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md`; the route qualification is in
+> `CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011` (parser PASS, pace UNPROVEN). This file
+> grants no authority for any later phase.
+
 # SMIAL — от запуска Jupiter до полезного исследовательского решения
 ## Operating Blueprint + Runbook V1 · 6 октября 2026
 
