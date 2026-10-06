@@ -28396,7 +28396,7 @@ records:
   as_of: '2026-10-06'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_CORE_SWITCH_AND_BIND_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/provider_route_capability_registry_v11.py', repository_path: src/solana_alpha_lab/provider_route_capability_registry_v11.py}
-  integrity: {kind: sha256, sha256: 8281a69c204771c7081f4603cd7f1547804d7bdbab4695e7963f2047eec6e26c}
+  integrity: {kind: sha256, sha256: 036bcc84aa4b8dee20b849cd3d6b89d813da215335d624a776f33f6df37baea3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: depends_on, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011}]
   consumers: [FACTORY-001]
@@ -28412,7 +28412,7 @@ records:
   as_of: '2026-10-06'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_CORE_SWITCH_AND_BIND_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_provider_route_capability_registry_v11.py', repository_path: tests/test_provider_route_capability_registry_v11.py}
-  integrity: {kind: sha256, sha256: 7fe503f31c4439d13e7cc59abbd08628b399fb5c8a74bbb331e4fe7d1ee7785c}
+  integrity: {kind: sha256, sha256: 15a23dc950db5fb71c09f1d29bc5360b759f0ca47ae87bc0df793722130dbe14}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: depends_on, target_asset_id: MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011}]
   consumers: [FACTORY-001]
@@ -40108,7 +40108,7 @@ records:
   as_of: '2026-10-05'
   truth_owner: OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md', repository_path: docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: fcc19d53fa1f81c5374387f80fafa15c9a7c7bbf7e9d88f87c83980e09f0f9bb}
+  integrity: {kind: sha256, sha256: 9bfe3adb22a33d511207a88538488baf550b9d820ebd2a02e42bb949eaba2d95}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OPPORTUNITY-EPISODES-JUPITER-VERTICAL-SLICE-001}

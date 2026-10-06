@@ -95,14 +95,6 @@ SEARCH_SHAPE_FAILURE = {
         "the receipt); batch of 100, memecoin mix and absent or missing mints were not observed."
     ),
 }
-SEARCH_SHAPE_FAILURE = {
-    "fingerprint": "SEARCH_BATCH_SHAPE_UNOBSERVED",
-    "layer": "REQUEST_SHAPE",
-    "interpretation": (
-        "Only a single-object public-mint search is reported (executor report, request shape not shown by "
-        "the receipt); batch of 100, memecoin mix and absent or missing mints were not observed."
-    ),
-}
 ROUTE_KEYS = frozenset(
     {
         "route_id", "provider", "endpoint_family", "network", "access_class", "operation",
@@ -269,10 +261,6 @@ def _validate_observed_route(
             "SEARCH_SHAPE_CLAIM_DRIFT",
         )
         _require(evidence.get("search_shape_not_covered") == SEARCH_SHAPE_NOT_COVERED, "SEARCH_SHAPE_LIMITS_DRIFT")
-        _require(
-            evidence.get("search_shape_source") == "EXECUTOR_REPORT_NOT_SHOWN_BY_RECEIPT",
-            "SEARCH_SHAPE_SOURCE_DRIFT",
-        )
         _require(
             evidence.get("search_shape_source") == "EXECUTOR_REPORT_NOT_SHOWN_BY_RECEIPT",
             "SEARCH_SHAPE_SOURCE_DRIFT",

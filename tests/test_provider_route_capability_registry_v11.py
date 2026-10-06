@@ -148,8 +148,6 @@ class ProviderRouteRegistryV11Tests(unittest.TestCase):
             ("OBSERVED_FAILURES_DRIFT", lambda r: r["routes"][15].update(known_failures=[])),
             ("OBSERVED_FAILURES_DRIFT", lambda r: r["routes"][12]["known_failures"].pop()),
             ("SEARCH_SHAPE_SOURCE_DRIFT", lambda r: r["routes"][12]["evidence"].update(search_shape_source="RECEIPT")),
-            ("OBSERVED_FAILURES_DRIFT", lambda r: r["routes"][12]["known_failures"].pop()),
-            ("SEARCH_SHAPE_SOURCE_DRIFT", lambda r: r["routes"][12]["evidence"].update(search_shape_source="RECEIPT")),
             ("OBSERVED_RUNTIME_CLAIM_DRIFT", lambda r: r["routes"][13]["runtime"].update(client="PYTHON_STDLIB_URLLIB")),
             ("OBSERVED_PREFLIGHT_CLAIM_DRIFT", lambda r: r["routes"][13]["preflight"].update(observed_in_receipt=True)),
             ("OBSERVED_REQUEST_COUNT_DRIFT", lambda r: r["routes"][14]["evidence"].update(observed_request_count=True)),

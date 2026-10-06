@@ -170,7 +170,9 @@ publication этой activation.
 campaign или ручной probe не использует Jupiter-ключ в течение canary, а legacy не
 возобновляется, пока lane включена. Pace дисциплина считается доказанной только по
 request-логам всех caller'ов этого ключа: зазор между любыми двумя запросами не меньше
-принятой паузы (3 s); до этого `account_pace_discipline` остаётся `UNPROVEN`.
+принятой паузы (3 s); без логов callers вне хоста (ПК, скрипты, usage-вид провайдера)
+или до этого `account_pace_discipline` остаётся `UNPROVEN`, даже если все host-проверки пройдены.
+Поле `operation: FREE_API_KEY_BULK_TOKEN_SEARCH` — ярлык v10, а не область наблюдения.
 Исторические `PAUSED_OPERATOR`/`ABORTED` строки не требуют COMPLETE, repair или
 resume и не входят в новую научную популяцию. Default tick при нескольких
 ACTIVE/DRAINING scopes требует exact selection, поэтому остановленный legacy
