@@ -4,8 +4,8 @@
   "review_id": "FORGE-RESEARCH-POLICY-RUNTIME-REVIEW-001",
   "as_of": "2026-10-07",
   "task_id": "FORGE_RESEARCH_POLICY_RUNTIME_V1",
-  "reviewed_bindings_sha256": "04ac08269547cea519ea8a9ff460054a932de3d14ef0b663d0b58eea38d5f3b9",
-  "reviewed_inventory_sha256": "c1b309151bdfe8a84edd99f892612d234059d324e05a49ecd41dae1a51493939",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -17,9 +17,9 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_27b6b9409b6be49b038d8ad6e6f423d5c7c45470",
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_43426c374df371a4777dc8a4544bb9d84155de55",
         "RESIDUAL_P0_P1_NONE",
-        "packet_fingerprint_sha256=74c1915a9e4bc1d3de8dd89ba366ad5b1aa631c2920f805340f1d97b5702a2cd",
+        "packet_fingerprint_sha256=4c9aa59d1880830fe572abab62638c4ba49b10d023a6c4dd02098452644047b2",
         "SEMANTIC_PREMISE_PACKET_INFORMATION_PATH_PROCESS_OBLIGATION_MODEL_DIVERSITY_UNPROVEN",
         "ROUND1_M1_M2_M3_RESOLVED_OR_HONESTLY_DOCUMENTED_RESIDUALS"
       ]
@@ -28,7 +28,7 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_27b6b9409b6be49b038d8ad6e6f423d5c7c45470",
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_43426c374df371a4777dc8a4544bb9d84155de55",
         "RESIDUAL_P0_P1_NONE",
         "ROUND1_MAJOR_LEGACY_SCOPE_EXTENSION_FIXED_AND_VERIFIED",
         "MINORS_DUPLICATE_SCOPE_IN_HAND_BUILT_BATCH_AND_EPOCH_HISTORY_HELPER_DOCUMENTED_NOT_FIXED"
@@ -38,7 +38,7 @@
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_27b6b9409b6be49b038d8ad6e6f423d5c7c45470",
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_43426c374df371a4777dc8a4544bb9d84155de55",
         "RESIDUAL_P0_P1_NONE",
         "DOD_PROVEN_EXCEPT_DISTINCT_FOCUS_RAISE_AND_PENDING_RESERVATION_APPLY_TEST_STRENGTH_RESIDUAL",
         "ADAPTIVE_PREVIEW_RESOLUTION_REACHES_GATE_OCCUPANCY"
@@ -48,7 +48,7 @@
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_27b6b9409b6be49b038d8ad6e6f423d5c7c45470",
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_43426c374df371a4777dc8a4544bb9d84155de55",
         "RESIDUAL_P0_P1_NONE",
         "FIVE_ROUND1_DOC_FINDINGS_FIXED",
         "ALL_DOCUMENTED_FLAGS_EXIST_IN_ARGPARSE"
@@ -67,12 +67,28 @@
   ],
   "remediation_history": [
     {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "accounting_root was not self-verifying on the record_operation path and could be forged to borrow or poison a budget",
+      "observed_head": "07137252668f1e5719a41ec2dd6ebac48fe5099a",
+      "resolved_by_head": "43426c374df371a4777dc8a4544bb9d84155de55"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "The episode child of a cycle-2 BASE parent was keyed from the cycle-1 key and was not operable; the fix then had to bind the parent's focus, BASE status and derivable key",
+      "observed_head": "07137252668f1e5719a41ec2dd6ebac48fe5099a",
+      "resolved_by_head": "43426c374df371a4777dc8a4544bb9d84155de55"
+    },
+    {
       "role": "CODE_REVIEWER",
       "prior_verdict": "NOT_READY",
       "severity": "MAJOR",
       "finding": "A legacy market epoch or journal could never be frozen so it could never be extended",
       "observed_head": "33e66400daf93d342cdfed417f36ca099b599b62",
-      "resolved_by_head": "27b6b9409b6be49b038d8ad6e6f423d5c7c45470"
+      "resolved_by_head": "43426c374df371a4777dc8a4544bb9d84155de55"
     },
     {
       "role": "ARCHITECTURE_CRITIC",
@@ -80,7 +96,7 @@
       "severity": "MAJOR",
       "finding": "The formulation packet and the draft validators read different limits for a journal not yet frozen",
       "observed_head": "33e66400daf93d342cdfed417f36ca099b599b62",
-      "resolved_by_head": "27b6b9409b6be49b038d8ad6e6f423d5c7c45470"
+      "resolved_by_head": "43426c374df371a4777dc8a4544bb9d84155de55"
     },
     {
       "role": "ARCHITECTURE_CRITIC",
@@ -88,7 +104,7 @@
       "severity": "MAJOR",
       "finding": "Policy apply re-checked nothing against the live store and a multi-scope apply could be partial",
       "observed_head": "33e66400daf93d342cdfed417f36ca099b599b62",
-      "resolved_by_head": "27b6b9409b6be49b038d8ad6e6f423d5c7c45470"
+      "resolved_by_head": "43426c374df371a4777dc8a4544bb9d84155de55"
     }
   ]
 }

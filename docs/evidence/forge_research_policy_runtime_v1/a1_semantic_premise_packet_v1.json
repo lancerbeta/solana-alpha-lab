@@ -1,25 +1,25 @@
 {
   "candidate": {
     "base": "04ec8e0286a3dce5999d0687784717ee90fc5dca",
-    "diff_sha256": "c6237a0e22bdf35cf0c39d84961fed32ae5e3fef56ae6878fcf11bbb5824bcb2",
-    "head": "27b6b9409b6be49b038d8ad6e6f423d5c7c45470"
+    "diff_sha256": "3b88524b77585c9876fe32b99ddf142f69a594fdd6855e25eb56d99cee955d03",
+    "head": "43426c374df371a4777dc8a4544bb9d84155de55"
   },
   "evidence": [
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_research_policy.py",
-      "sha256_or_fingerprint": "d2d1377622ea531330b7a30a1539fffd5200484df39bd3ad00a25a00ec92dac5"
+      "sha256_or_fingerprint": "896715154ddce8a2054090491141ecb7852ef8a75d27c177de84b94ec395d6a2"
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_ordinary_operation.py",
-      "sha256_or_fingerprint": "fefb83e0457be4340b5d1b907866673e0469c33f665e0250632f77d36ff4b1d8"
+      "sha256_or_fingerprint": "f25dd0ccfd9554b0d76a69e7df90fb456e643a650a378d3d7cfa9876b0f50174"
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_preflight.py",
-      "sha256_or_fingerprint": "589a24792acf7013232aa3d0cab2ebe05c08514c1fea8b439179a9682ef8ce39"
+      "sha256_or_fingerprint": "5fdc3b5cb20101e92269ce73c960e0c3ff41d078cef44cb5caf55e91a0f8720e"
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_session.py",
-      "sha256_or_fingerprint": "a597c5260e15bbec04012df3913b63ae9e0b5a30c77e5eef4600b4a289d35d53"
+      "sha256_or_fingerprint": "47fcf21279175481325689653e5e925ba8d1e7ed0658e4a8b630b2e42ad2ec0b"
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_evidence_identity.py",
@@ -39,7 +39,7 @@
     },
     {
       "logical_ref": "repo://scripts/hypothesis_forge.py",
-      "sha256_or_fingerprint": "8acbc47e6a14ee83337f2d9e85d9f349265454307e8940b2f4b94a8c2be45db6"
+      "sha256_or_fingerprint": "60be13f2f202798779985c0c0414720d96b550118733ae12eb7e1a5bcc644881"
     },
     {
       "logical_ref": "repo://tests/test_hfic_research_policy_v1.py",
@@ -47,11 +47,15 @@
     },
     {
       "logical_ref": "repo://tests/test_hfic_research_policy_vertical_v1.py",
-      "sha256_or_fingerprint": "7015c2e832047935998d4ec6e0bf352bd47a5fa1a50f747d26d962054ce30a64"
+      "sha256_or_fingerprint": "cde5b459dd743870e1046989e54e9399ecc68623fda4af6e7f0cbf53190445f6"
+    },
+    {
+      "logical_ref": "repo://tests/test_hfic_research_policy_closure_v1.py",
+      "sha256_or_fingerprint": "31098270921b86e3cf67f591f6693439f1ffaf1841d322ae94eec515daf546d0"
     },
     {
       "logical_ref": "repo://docs/contracts/forge_research_policy_runtime_v1.md",
-      "sha256_or_fingerprint": "d693ee01a5f2631bba4d9406adfc28cbe723772bd89a88f0bf1c093b18af081f"
+      "sha256_or_fingerprint": "603981e105a2eda3c4d968bbb2d97922419b0212ef6f3c5e13341f8dae796a89"
     }
   ],
   "independence": {
@@ -75,7 +79,7 @@
     "NO_PR_A_LIST_AWARE_SCOPE_REOPENED",
     "NO_NEW_COLLECTOR_EVALUATOR_DATABASE_OR_SERVICE"
   ],
-  "packet_fingerprint_sha256": "74c1915a9e4bc1d3de8dd89ba366ad5b1aa631c2920f805340f1d97b5702a2cd",
+  "packet_fingerprint_sha256": "4c9aa59d1880830fe572abab62638c4ba49b10d023a6c4dd02098452644047b2",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
@@ -126,9 +130,29 @@
       "scope": "legacy_call_compatibility"
     },
     {
-      "claim": "The AUTO counter counts real cycles from stored rows; a plain preflight never starts a cycle; cycle 2 needs both an epoch-pool extension and the explicit --additional-cycle, gets its own slot hash, search key and budget; the third is denied.",
+      "claim": "The AUTO counter counts real cycles from stored rows; a plain preflight never starts a cycle; cycle 2 needs both an epoch-pool extension and the explicit --additional-cycle and gets its own slot hash and search key (execution identity); the third is denied.",
       "claim_id": "C6",
       "scope": "auto_cycle_truth"
+    },
+    {
+      "claim": "A later AUTO cycle spends its lineage root's MAIN/ADAPTIVE/PREVIEW budget: limits are the root's snapshot plus extensions, spend is the union of completed looks and pending reservations over the lineage journals, an exact saved query is a replay, a new cycle/payload/preset alone never opens fresh budget; the cycle-2 operation must name the accounting root (cycle-1 key before the cycle suffix) and a live parent of the same market, focus and representation (stopped or pending parents are refused, a completed parent may be continued); representations remain their own accounting domains.",
+      "claim_id": "C10",
+      "scope": "continuation_accounting"
+    },
+    {
+      "claim": "The extensions of one apply file commit in a single ResearchStore commit with live parent/pending/scope-head/CAS re-checks under the writer lease: all or nothing, truthful writes, mixed or duplicate-scope sets refused before any write, exact repeat idempotent.",
+      "claim_id": "C11",
+      "scope": "atomic_apply"
+    },
+    {
+      "claim": "A reserved-but-unlanded PREVIEW is RESUME (spends nothing new, lands the payload on the same reservation), not a completed REPEAT; a pending preview of another operation is not adopted.",
+      "claim_id": "C12",
+      "scope": "preview_resume"
+    },
+    {
+      "claim": "A negative terminal (no selected candidate) with more than 6 cards persists, freezes, finalizes and reads back with all identities through additive wide receipt and next-action schemas; historical schemas are unchanged.",
+      "claim_id": "C13",
+      "scope": "wide_negative_terminal"
     },
     {
       "claim": "Draft packet_version 1.3, receipt v1_4 and the optional receipt cycle_index (integer>=2) are additive; existing packets and receipts validate unchanged.",
@@ -147,7 +171,7 @@
     }
   ],
   "task": {
-    "task_contract_sha256": "d539681cf6eeca8896a4f7b7504dd1c1aaf412b4b6cc7832dcb5106947cd258c",
+    "task_contract_sha256": "b46373872a0a7f9c9e0a080441ee2937956b0c45ec3f4016eb4c00197428b161",
     "task_id": "FORGE_RESEARCH_POLICY_RUNTIME_V1"
   }
 }
