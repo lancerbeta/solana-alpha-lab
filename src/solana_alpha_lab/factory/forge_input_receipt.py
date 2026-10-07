@@ -410,13 +410,34 @@ def build_forge_input_receipt(
         blocking.append(FORGE_VISION_INTEGRITY_BLOCKED)
         owner_class = OWNER_CLASS_OBSERVABILITY_BLOCKED
 
-    representations = [
-        {"representation_id": BASE_REPRESENTATION, "status": READY_STATUS},
-        {
-            "representation_id": TRAJECTORY_REPRESENTATION,
-            "status": TRAJECTORY_STATUS if probe_ok else "PROBE_CONTRACT_MISSING",
-        },
-    ]
+    if collection == EPISODE_COLLECTION:
+        # Support is decided per population/anchor/scope, never by "a contract file exists".
+        from solana_alpha_lab.factory.normalized_trajectory_episodes_v1 import (
+            REPRESENTATION_ID as EPISODE_PROFILE_ID,
+        )
+
+        representations = [
+            {"representation_id": BASE_REPRESENTATION, "status": READY_STATUS, "scope_binding": "RESEARCH_SCOPE_V2"},
+            {
+                "representation_id": TRAJECTORY_REPRESENTATION,
+                "status": "UNSUPPORTED_POPULATION",
+                "reason_code": "LEGACY_NEWBORN_X_Y_ONLY_NOT_EPISODE_COMPATIBLE_USE_NORMALIZED_TRAJECTORY_EPISODES_V1",
+            },
+            {
+                "representation_id": EPISODE_PROFILE_ID,
+                "status": READY_STATUS,
+                "scope_binding": "RESEARCH_SCOPE_V2",
+                "reason_code": "EPISODE_PREFIX_PROFILE_PRICE_LIQUIDITY_HOLDERS",
+            },
+        ]
+    else:
+        representations = [
+            {"representation_id": BASE_REPRESENTATION, "status": READY_STATUS},
+            {
+                "representation_id": TRAJECTORY_REPRESENTATION,
+                "status": TRAJECTORY_STATUS if probe_ok else "PROBE_CONTRACT_MISSING",
+            },
+        ]
     live_corpus = None
     if chosen is not None:
         labels = dict(chosen.get("labels") or {})

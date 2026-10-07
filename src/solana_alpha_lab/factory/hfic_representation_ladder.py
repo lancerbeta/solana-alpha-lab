@@ -88,11 +88,16 @@ CANONICAL_HFIC_CLI = (
 HANDLER_BASE_HFIC = "BASE_HFIC"
 HANDLER_NORMALIZED_TRAJECTORY_V1 = "NORMALIZED_TRAJECTORY_V1"
 HANDLER_SYNTHETIC_LATER_V2 = "SYNTHETIC_LATER_V2"
+# Additive episode profile: a new representation, never the frozen newborn V1 under a new name.
+HANDLER_EPISODES_V1 = "NORMALIZED_TRAJECTORY_EPISODES_V1"
+POPULATION_LIVE_COHORT = "LIVE_COHORT"
+POPULATION_EPISODES = "OPPORTUNITY_EPISODES"
 KNOWN_HANDLERS = frozenset(
     {
         HANDLER_BASE_HFIC,
         HANDLER_NORMALIZED_TRAJECTORY_V1,
         HANDLER_SYNTHETIC_LATER_V2,
+        HANDLER_EPISODES_V1,
     }
 )
 
@@ -190,6 +195,9 @@ def load_ladder_registry(path: Path | None = None) -> dict[str, Any]:
             not isinstance(code, str) or not code for code in triggers
         ):
             raise LadderError("LADDER_REGISTRY_TRIGGER_INVALID")
+        populations = item.get("populations") or [POPULATION_LIVE_COHORT]
+        if not isinstance(populations, list) or any(not isinstance(code, str) or not code for code in populations):
+            raise LadderError("LADDER_REGISTRY_POPULATION_INVALID")
         ordered.append(
             {
                 "id": rep_id,
@@ -199,6 +207,7 @@ def load_ladder_registry(path: Path | None = None) -> dict[str, Any]:
                 "reuse_class": str(item.get("reuse_class") or ""),
                 "handler": handler,
                 "trigger_terminals": [str(code) for code in triggers],
+                "populations": [str(code) for code in populations],
             }
         )
     ordered.sort(key=lambda row: (row["order"], row["id"]))
@@ -211,11 +220,17 @@ def load_ladder_registry(path: Path | None = None) -> dict[str, Any]:
     }
 
 
-def eligible_representation_ids(registry: Mapping[str, Any]) -> list[str]:
+def _serves(row: Mapping[str, Any], population: str) -> bool:
+    return population in (row.get("populations") or [POPULATION_LIVE_COHORT])
+
+
+def eligible_representation_ids(
+    registry: Mapping[str, Any], population: str = POPULATION_LIVE_COHORT
+) -> list[str]:
     return [
         str(row["id"])
         for row in registry.get("representations") or []
-        if str(row.get("status") or "") == "ACTIVE"
+        if str(row.get("status") or "") == "ACTIVE" and _serves(row, population)
     ]
 
 
@@ -262,6 +277,7 @@ def _consume_representation_chain(
     stage_map: Mapping[str, Mapping[str, Any]],
     start_id: str,
     saved_draft_sha256: str | None,
+    population: str = POPULATION_LIVE_COHORT,
 ) -> dict[str, Any]:
     current_id = start_id
     while current_id:
@@ -327,7 +343,7 @@ def _consume_representation_chain(
                 "owner_final": ACTION_OBSERVABILITY_BLOCKED,
                 "reason_code": missing,
             }
-        next_rep = _next_active_after(registry, current_id, str(terminal or ""))
+        next_rep = _next_active_after(registry, current_id, str(terminal or ""), population)
         if next_rep is not None:
             current_id = next_rep
             continue
@@ -365,6 +381,7 @@ def resolve_next_action(
     input_owner_class: str | None = None,
     existing_completed: bool = False,
     saved_draft_sha256: str | None = None,
+    population: str = POPULATION_LIVE_COHORT,
 ) -> dict[str, Any]:
     """Pure transition: one next action or owner-final from stage receipts."""
 
@@ -467,9 +484,28 @@ def resolve_next_action(
             "reason_code": base_terminal,
         }
 
+    episode_row = by_id.get(HANDLER_EPISODES_V1)
+    if (
+        population == POPULATION_EPISODES
+        and episode_row
+        and episode_row["status"] == "ACTIVE"
+        and _serves(episode_row, POPULATION_EPISODES)
+        and isinstance(base_terminal, str)
+        and base_terminal in set(episode_row["trigger_terminals"])
+        and control_probe_permitted(base_terminal)
+    ):
+        # Episodes have no CONTROL protocol: the BASE packet, its scope and epoch pins carry the view.
+        return _consume_representation_chain(
+            registry=active,
+            stage_map=stage_map,
+            start_id=HANDLER_EPISODES_V1,
+            saved_draft_sha256=saved_draft_sha256,
+            population=population,
+        )
     v1_row = by_id.get("NORMALIZED_TRAJECTORY_V1")
     if (
-        v1_row
+        population == POPULATION_LIVE_COHORT
+        and v1_row
         and v1_row["status"] == "ACTIVE"
         and isinstance(base_terminal, str)
         and base_terminal in set(v1_row["trigger_terminals"])
@@ -600,8 +636,13 @@ def prepare_ladder_freeze_preflight(
     control_receipt: Mapping[str, Any] | None = None,
     model_provenance_sha256: str | None = None,
     action: str = "START_NEW_SESSION",
+    representation_payload: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Copy CONTROL preflight into a freeze receipt that cannot collide with BASE.
+
+    For NORMALIZED_TRAJECTORY_EPISODES_V1 the parent is the BASE session of the same
+    ordinary preflight (no CONTROL exists for episodes); ``representation_payload`` is the
+    scope-bound prefix profile and is pinned into the packet and the search key.
 
     For NORMALIZED_TRAJECTORY_V1, ``challenger`` and ``control_receipt`` are
     required: marker/parent alone do not prove representation input. Embed
@@ -609,7 +650,11 @@ def prepare_ladder_freeze_preflight(
     challenger. Scientific bind checks always run against the exact CONTROL.
     """
 
-    if representation_id not in {HANDLER_NORMALIZED_TRAJECTORY_V1, HANDLER_SYNTHETIC_LATER_V2}:
+    if representation_id not in {
+        HANDLER_NORMALIZED_TRAJECTORY_V1,
+        HANDLER_SYNTHETIC_LATER_V2,
+        HANDLER_EPISODES_V1,
+    }:
         raise LadderError("LADDER_FREEZE_PREFLIGHT_REPRESENTATION_INVALID")
     if not isinstance(control_session_id, str) or not control_session_id:
         raise LadderError("LADDER_FREEZE_PREFLIGHT_CONTROL_REQUIRED")
@@ -650,6 +695,46 @@ def prepare_ladder_freeze_preflight(
             raise LadderError("LADDER_FREEZE_CHALLENGER_SEARCH_KEY_MISSING")
         receipt["search_key_sha256"] = search
         packet["search_key_sha256"] = search
+    elif representation_id == HANDLER_EPISODES_V1:
+        payload = dict(representation_payload or {})
+        payload_sha = payload.get("representation_payload_sha256")
+        if (
+            payload.get("representation_id") != HANDLER_EPISODES_V1
+            or not isinstance(payload_sha, str)
+            or len(payload_sha) != 64
+            or not isinstance(payload.get("research_scope_rule_sha256"), str)
+            or not isinstance(payload.get("scope_applied_sha256"), str)
+        ):
+            raise LadderError("LADDER_FREEZE_EPISODE_PAYLOAD_INVALID")
+        from solana_alpha_lab.factory.normalized_trajectory_episodes_v1 import (
+            EpisodeProfileError,
+            validate_episode_payload,
+        )
+
+        try:
+            validate_episode_payload(payload, expected_rule_sha256=payload.get("research_scope_rule_sha256"))
+        except EpisodeProfileError as exc:
+            raise LadderError(f"LADDER_FREEZE_{exc.code}") from exc
+        packet["normalized_trajectory_episodes_v1"] = payload
+        packet["representation_payload_sha256"] = payload_sha
+        packet["research_scope_rule_sha256"] = payload["research_scope_rule_sha256"]
+        packet["scope_applied_sha256"] = payload["scope_applied_sha256"]
+        packet["representation_semantic_version"] = str(payload.get("representation_version") or "")
+        receipt["representation_semantic_version"] = packet["representation_semantic_version"]
+        # The episode stage is an ordinary grounded-discovery stage (no CONTROL surface).
+        from solana_alpha_lab.factory.hfic_grounded_discovery import DISCOVERY_CONTRACT_VERSION
+
+        receipt["discovery_contract_version"] = DISCOVERY_CONTRACT_VERSION
+        packet["discovery_contract_version"] = DISCOVERY_CONTRACT_VERSION
+        from solana_alpha_lab.factory.normalized_trajectory_episodes_v1 import representation_search_key
+
+        receipt["search_key_sha256"] = representation_search_key(
+            str(receipt.get("search_key_sha256") or ""),
+            control_session_id,
+            payload_sha,
+            str(payload["scope_applied_sha256"]),
+        )
+        packet["search_key_sha256"] = receipt["search_key_sha256"]
     else:
         base_key = str(receipt.get("search_key_sha256") or "")
         receipt["search_key_sha256"] = hashlib.sha256(
@@ -939,7 +1024,7 @@ def control_preflight_from_bundle(
 
 
 def _next_active_after(
-    registry: Mapping[str, Any], current_id: str, terminal: str
+    registry: Mapping[str, Any], current_id: str, terminal: str, population: str = POPULATION_LIVE_COHORT
 ) -> str | None:
     rows = list(registry.get("representations") or [])
     passed = False
@@ -949,7 +1034,7 @@ def _next_active_after(
             continue
         if not passed:
             continue
-        if str(row.get("status") or "") != "ACTIVE":
+        if str(row.get("status") or "") != "ACTIVE" or not _serves(row, population):
             continue
         triggers = set(row.get("trigger_terminals") or [])
         if terminal in triggers and str(row.get("handler") or "") in KNOWN_HANDLERS:
@@ -1940,7 +2025,7 @@ def _ladder_representation_id(
     sources.append(bundle)
     for source in sources:
         rid = source.get(LADDER_REPRESENTATION_PACKET_KEY) or source.get("representation_id")
-        if rid in {"NORMALIZED_TRAJECTORY_V1", "SYNTHETIC_LATER_V2"}:
+        if rid in {"NORMALIZED_TRAJECTORY_V1", "SYNTHETIC_LATER_V2", HANDLER_EPISODES_V1}:
             return str(rid)
         if source.get("normalized_trajectory_v1"):
             return "NORMALIZED_TRAJECTORY_V1"
@@ -2846,7 +2931,10 @@ def evaluate_forge_run(
         if registry is not None
         else load_ladder_registry(Path(repo_root) / LADDER_CONFIG_RELATIVE)
     )
-    frozen_ids = eligible_representation_ids(registry_doc)
+    from solana_alpha_lab.factory.opportunity_episodes import collection_for_focus
+
+    run_population = POPULATION_EPISODES if collection_for_focus(owner_focus) else POPULATION_LIVE_COHORT
+    frozen_ids = eligible_representation_ids(registry_doc, run_population)
     input_receipt = build_forge_input_receipt(
         Path(data_root), repo_root=Path(repo_root), owner_focus=owner_focus
     )
@@ -3104,6 +3192,7 @@ def evaluate_forge_run(
         } else None,
         existing_completed=existing_completed or existing_owner_final,
         saved_draft_sha256=saved_draft_sha256,
+        population=run_population,
     )
 
     owner_final = decision.get("owner_final")

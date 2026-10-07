@@ -44,7 +44,13 @@ Copy/bind exactly:
 - `selected_candidate_id` ← `selected_candidate.candidate_id`
 - `critic_input_packet_sha256` ← canonical SHA256 of the exact packet bytes
 - `selected_definition_sha256` ← canonical selected-candidate identity hash
-  from packet fields via repo identity algorithm, as applicable
+  from packet fields via repo identity algorithm, as applicable. When the
+  packet's `selected_candidate` carries `research_scope_rule_sha256`, that value
+  is part of the identity definition (a different list scope is a different
+  hypothesis). Judge `research_scope_statement` against the packet's
+  `grounded_evidence.descriptive_readout.research_scope` (universe, signal,
+  comparator, coverage and per-side target attrition); never accept a claim
+  wider or narrower than that machine statement.
 
 A `packet_version=1.1`, `1.2`, `1.3`, or `1.4` packet without `session_id` is
 incomplete. A current `packet_version=1.3` or `1.4` packet without `prior_memory` is

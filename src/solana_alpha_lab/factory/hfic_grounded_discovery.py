@@ -1127,6 +1127,8 @@ _SEMANTIC_LOOK_AXES = (
     "estimand",
     "explanatory_condition",
     "representation_scope",
+    # A different list scope is a different question: priors and cards relate by it.
+    "research_scope_rule_sha256",
 )
 _LOOK_CLAIM_AXES = _MACHINE_LOOK_AXES + _SEMANTIC_LOOK_AXES
 
@@ -1258,6 +1260,11 @@ def scope_bound_to_spec(
         for key, value in declared.items()
         if _axis_text(value) and key not in {"target", "population", "decision_timestamp"}
     }
+    scientific_body = validated.get("scientific_body")
+    if isinstance(scientific_body, Mapping) and "research_scope" in scientific_body:
+        from solana_alpha_lab.factory.hfic_research_scope import rule_sha256_of_body
+
+        bound["research_scope_rule_sha256"] = rule_sha256_of_body(scientific_body)
     bound["population"] = spec_population
     bound["decision_timestamp"] = last_decision
     bound["target"] = (
@@ -1589,6 +1596,7 @@ def execute_discovery_from_rows(
     binding: Sequence[Mapping[str, Any]],
     *,
     universe_policy: Mapping[str, Any] | None = None,
+    research_scope: Any = None,
 ) -> dict[str, Any]:
     """Compute BASE_X, PIT features and a later target from production-shaped rows.
 
@@ -1600,7 +1608,7 @@ def execute_discovery_from_rows(
         from solana_alpha_lab.factory.hfic_temporal_discovery import execute_temporal_discovery
 
         return execute_temporal_discovery(
-            census, observations, spec, binding, universe_policy=universe_policy
+            census, observations, spec, binding, universe_policy=universe_policy, research_scope=research_scope
         )
     bound_spec = validate_query_spec(spec)
     for item in binding:
@@ -1841,12 +1849,23 @@ def same_rows_under_policy(
     census: Sequence[Mapping[str, Any]],
     observations: Sequence[Mapping[str, Any]],
     policy_sha: str,
+    scope_applied_sha256: str | None = None,
 ) -> bool:
-    """True when this look's binding is the current rows stamped with ``policy_sha``."""
+    """True when this look's binding is the current rows stamped with ``policy_sha``.
+
+    A scoped look is bound to rows + applied list masks: the comparison uses the CURRENT
+    applied masks, so changed list evidence is never mistaken for a pure policy change, and
+    without current masks a scoped look cannot be proven "same rows".
+    """
 
     stamped = dict(admitted)
     stamped["universe_policy_semantic_sha256"] = policy_sha
-    return look.get("data_binding_sha256") == data_binding_sha256(stamped, census, observations)
+    expected = data_binding_sha256(stamped, census, observations)
+    if isinstance((look.get("result") or {}).get("research_scope"), Mapping):
+        if not scope_applied_sha256:
+            return False
+        expected = scoped_binding_sha256(expected, scope_applied_sha256)
+    return look.get("data_binding_sha256") == expected
 
 
 def _look_identity(
@@ -2009,9 +2028,12 @@ def descriptive_return_readout(result: Mapping[str, Any], *, detail_limit: int =
         truncation[key] = {"total": len(rows), "included": min(len(rows), detail_limit), "truncated": len(rows) > detail_limit}
     from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_holder_claim_identity
     identity = temporal_holder_claim_identity(result)
+    scope_block = result.get("research_scope")
     return {
         "status": "DESCRIPTIVE_PROXY",
         **({"scientific_identity": identity} if identity else {}),
+        # List scope, support and attrition of both sides travel with the readout (bounded by the 8 slices cap).
+        **({"research_scope": dict(scope_block)} if isinstance(scope_block, Mapping) else {}),
         "matched": view(result, matched=True),
         "baseline": view(result.get("baseline") or {}),
         "details": details,
@@ -2180,6 +2202,104 @@ def _append_temporal_intent(
     store.append([event], transaction_id=event.transaction_id)
 
 
+def resolve_research_scope(
+    body: Mapping[str, Any], data_root: Path | None, census, binding, *, frozen_evidence: Mapping[str, Any] | None = None
+) -> Any:
+    """ResolvedScope for one scoped query over the admitted cohorts of this binding.
+
+    `frozen_evidence` (a saved recipe's closure) pins the exact local snapshots and the evidence
+    digest; the live registry is not consulted beyond them.
+    """
+
+    from solana_alpha_lab.factory import hfic_research_scope as scope_owner
+
+    if data_root is None:
+        raise GroundedDiscoveryError("RESEARCH_SCOPE_DATA_ROOT_REQUIRED")
+    releases = {str(item.get("release_id")) for item in binding}
+    try:
+        frozen_shas = None
+        if frozen_evidence is not None:
+            frozen_shas = [
+                str(item["snapshot_sha256"])
+                for item in frozen_evidence.get("bindings") or []
+                if item.get("adapter") == scope_owner.LOCAL_ADAPTER
+            ]
+        evidence = scope_owner.load_corpus_membership(
+            Path(data_root),
+            only_release_ids=releases,
+            local_list_ids=scope_owner.referenced_list_ids(body),
+            local_snapshot_shas=frozen_shas,
+        )
+        resolved = scope_owner.ResolvedScope(
+            scope=body["research_scope"],
+            list_condition=body.get("list_condition"),
+            evidence=evidence,
+            episode_ids=sorted({str(row.get("episode_id") or "") for row in census}),
+            slices=body.get("diagnostic_slices") or [],
+        )
+        if frozen_evidence is not None and resolved.evidence_sha256 != frozen_evidence.get("evidence_sha256"):
+            raise GroundedDiscoveryError("RESEARCH_SCOPE_EVIDENCE_DRIFT")
+        return resolved
+    except scope_owner.ResearchScopeError as exc:
+        raise GroundedDiscoveryError(exc.code) from exc
+    except GroundedDiscoveryError:
+        raise
+    except (OSError, ValueError, KeyError) as exc:
+        raise GroundedDiscoveryError("RESEARCH_SCOPE_EVIDENCE_UNREADABLE") from exc
+
+
+def scoped_binding_sha256(binding_sha: str, applied_sha256: str) -> str:
+    """The one durable binding of a scoped look: rows + applied list masks."""
+
+    from solana_alpha_lab.factory import hfic_research_scope as scope_owner
+
+    return scope_owner.sha256_of({"data_binding_sha256": binding_sha, "research_scope_applied_sha256": applied_sha256})
+
+
+def _apply_cohort_selection(spec: Mapping[str, Any], census, observations, binding):
+    """Rows of the declared covered cohorts only (unscoped or undeclared: unchanged)."""
+
+    from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+
+    body = validate_temporal_query(spec)["scientific_body"]
+    if "research_scope" not in body:
+        return census, observations, binding
+    from solana_alpha_lab.factory.hfic_research_scope import selected_cohort_ids
+
+    wanted = selected_cohort_ids(body["research_scope"])
+    if wanted is None:
+        return census, observations, binding
+    if not set(wanted) <= {str(item.get("cohort_id")) for item in binding}:
+        raise GroundedDiscoveryError("SCOPE_COHORT_NOT_IN_BINDING")
+    keep = set(wanted)
+    return (
+        [row for row in census if str(row.get("cohort_id")) in keep],
+        [row for row in observations if str(row.get("cohort_id")) in keep],
+        [item for item in binding if str(item.get("cohort_id")) in keep],
+    )
+
+
+def _early_scope_applied_sha256(spec: Mapping[str, Any], data_root: Path | None, census, binding) -> str | None:
+    """Current applied masks of a scoped query for the pre-values gate (None for unscoped)."""
+
+    from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+
+    body = validate_temporal_query(spec)["scientific_body"]
+    if "research_scope" not in body or data_root is None:
+        return None
+    from solana_alpha_lab.factory.hfic_research_scope import selected_cohort_ids
+
+    wanted = selected_cohort_ids(body["research_scope"])
+    if wanted is not None:
+        census = [row for row in census if str(row.get("cohort_id")) in set(wanted)]
+        binding = [item for item in binding if str(item.get("cohort_id")) in set(wanted)]
+    return resolve_research_scope(body, data_root, census, binding).applied_sha256
+
+
+def _scoped_binding_sha(binding_sha: str, resolved: Any) -> str:
+    return scoped_binding_sha256(binding_sha, resolved.applied_sha256)
+
+
 def run_recorded_discovery_query(
     store: Any,
     *,
@@ -2248,13 +2368,18 @@ def run_recorded_discovery_query(
                 raise GroundedDiscoveryError(
                     policy_error.code if policy_error is not None else "UNIVERSE_POLICY_REQUIRED"
                 )
+        # A declared covered subset is applied before the gate, so gate, intent and look see the same rows.
+        full_binding = list(binding)  # the operation fingerprint is stamped over the published cohorts
+        census, observations, binding = _apply_cohort_selection(spec, census, observations, binding)
+        gate_scope_applied = _early_scope_applied_sha256(spec, data_root, census, binding)
         try:
             gate_before_values(
                 store,
                 operation_sha256=operation_sha256,
                 spec=spec,
                 journal_scope=journal_scope,
-                binding_cohorts=list(binding),
+                scope_applied_sha256=gate_scope_applied,
+                binding_cohorts=full_binding,
                 verified_market=verified_market,
                 correction=correction,
                 repo_root=repo_root,
@@ -2284,6 +2409,7 @@ def run_recorded_discovery_query(
             policy_head = {"definition": None}
     policy_definition = policy_head.get("definition")
     revising_legacy = False
+    research_scope = None
     if _is_temporal_query(spec):
         from solana_alpha_lab.factory.hfic_temporal_discovery import (
             TEMPORAL_CALCULATION_VERSION,
@@ -2296,10 +2422,30 @@ def run_recorded_discovery_query(
         )
 
         prevalidated = validate_temporal_query(spec)
+        selected_cohorts = None
+        if "research_scope" in prevalidated["scientific_body"]:
+            from solana_alpha_lab.factory.hfic_research_scope import selected_cohort_ids
+
+            selected_cohorts = selected_cohort_ids(prevalidated["scientific_body"]["research_scope"])
+        if selected_cohorts is not None:
+            # A declared covered subset is part of the question, fixed before any outcome is read.
+            present = {str(item.get("cohort_id")) for item in binding}
+            if not set(selected_cohorts) <= present:
+                raise GroundedDiscoveryError("SCOPE_COHORT_NOT_IN_BINDING")
+            wanted = set(selected_cohorts)
+            binding = [item for item in binding if str(item.get("cohort_id")) in wanted]
+            census = [row for row in census if str(row.get("cohort_id")) in wanted]
+            observations = [row for row in observations if str(row.get("cohort_id")) in wanted]
         bare_admitted = admit_discovery_binding(binding)
         bare_binding_sha = data_binding_sha256(bare_admitted, census, observations)
         admitted_meta = admitted_with_policy(bare_admitted, policy_definition)
         pre_binding_sha = data_binding_sha256(admitted_meta, census, observations)
+        if "research_scope" in prevalidated["scientific_body"]:
+            # Masks come only from verified release files + registered snapshots; a changed
+            # list evidence is a different applied input, never a stale same-question replay.
+            research_scope = resolve_research_scope(prevalidated["scientific_body"], data_root, census, binding)
+            bare_binding_sha = _scoped_binding_sha(bare_binding_sha, research_scope)
+            pre_binding_sha = _scoped_binding_sha(pre_binding_sha, research_scope)
 
         def _same_question_binding(item: Mapping[str, Any]) -> bool:
             stored_sha = item.get("data_binding_sha256")
@@ -2421,6 +2567,7 @@ def run_recorded_discovery_query(
             spec,
             binding,
             universe_policy=None if revising_legacy else policy_definition,
+            research_scope=research_scope,
         )
         if source_look is not None:
             recipe = computed["summary"].get("experiment_recipe") or {}
@@ -2451,6 +2598,9 @@ def run_recorded_discovery_query(
     calc_version = str(summary.get("calculation_version") or CALCULATION_VERSION)
     temporal = summary.get("schema") == "smial.hfic-temporal-query"
     binding_sha = data_binding_sha256(computed["admitted"], census, observations)
+    if research_scope is not None:
+        # One identity owner end to end: the durable look keeps the applied list masks, as the intent did.
+        binding_sha = _scoped_binding_sha(binding_sha, research_scope)
     digest = result_sha256(summary)
     identity = _look_identity(
         summary["spec_sha256"],
@@ -2495,6 +2645,7 @@ def run_recorded_discovery_query(
                 census=census,
                 observations=observations,
                 policy_sha=str(prior_policy),
+                scope_applied_sha256=research_scope.applied_sha256 if research_scope is not None else None,
             )
         )
         if policy_only:

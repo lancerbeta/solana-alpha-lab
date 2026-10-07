@@ -1,0 +1,129 @@
+{
+  "candidate": {
+    "base": "4378c5b82f2dc309ccd629b267affd5d19b34995",
+    "diff_sha256": "c5201705ae1e4e21ba32934549d9cb8823024c37a923d2cc603081cab2e76e2f",
+    "head": "5b8aa15c1c238c007899f2fce44d513e34520ccf"
+  },
+  "evidence": [
+    {
+      "logical_ref": "repo://docs/contracts/forge_list_aware_research_scope_v1.md",
+      "sha256_or_fingerprint": "f03ce1a4c50aa2525003ddf9441f61700a8a6e69d248449289bf86416d8ca84f"
+    },
+    {
+      "logical_ref": "repo://tests/test_hfic_list_aware_vertical_v1.py",
+      "sha256_or_fingerprint": "57c76da6ed63f38090ef9d94ee957d54eefe76e83b4ef2e60b40cd0da60d1422"
+    },
+    {
+      "logical_ref": "repo://tests/test_hfic_list_scope_executor_v1.py",
+      "sha256_or_fingerprint": "48d53378f7041afe446f79cfb19656ee2aed9c89f2e0ee97d50aa08801fba0e3"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_research_scope.py",
+      "sha256_or_fingerprint": "84460069fd8281b13b622da8b153060dff4755add68ad0086de058b29f869477"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_grounded_discovery.py",
+      "sha256_or_fingerprint": "19ad7487d00776e92d3cccc8230ede49dc10670f259ea436f64534e75f1b3379"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
+      "sha256_or_fingerprint": "53e8d231993a9fbf237e3da132dec7ff48c840ba36c371d6ba6ae7db5edb6004"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_ordinary_operation.py",
+      "sha256_or_fingerprint": "a2426cd1ff6f73fae19434610d56612212302a16fccefa20b2330e4e2ba407a2"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/opportunity_episode_tick.py",
+      "sha256_or_fingerprint": "faeaab70ef11748709fc082bf20f2a9e072cd53e8b4e42e8c297b34c97f6d52f"
+    }
+  ],
+  "independence": {
+    "claim_scope": "PACKET_INFORMATION_PATH",
+    "context_isolated": true,
+    "implementation_transcript_seen": false,
+    "launch_isolation": "PROCESS_OBLIGATION",
+    "model_diversity": "UNPROVEN",
+    "model_diversity_identity": null,
+    "packet_bound": true,
+    "readonly": true
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CAUSAL_OR_INTERACTION_CLAIM",
+    "SYNTHETIC_ONLY",
+    "NO_PROVIDER_CALLS",
+    "NO_PRODUCTION_DATA",
+    "NO_VPS_OR_LIVE_CHANGE",
+    "NO_MERGE",
+    "NO_PR_B_BUDGET_POLICY"
+  ],
+  "packet_fingerprint_sha256": "aa541ed6d6c2871fa411a27d8c890754405e242ebde4639664d38013a360c8b1",
+  "questions": [
+    "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
+    "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
+    "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL",
+    "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE",
+    "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY",
+    "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING",
+    "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER",
+    "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE",
+    "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM",
+    "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS"
+  ],
+  "review": {
+    "architecture_owner": "ARCHITECTURE_CRITIC",
+    "profile": "SEMANTIC_PREMISE",
+    "risk_dimensions": [
+      "HYPOTHESIS_OR_FAMILY_CLOSURE"
+    ]
+  },
+  "schema": "smial.semantic-premise-review-packet",
+  "schema_version": "1.0",
+  "semantic_claims": [
+    {
+      "claim": "Lists are a research dimension; UNKNOWN membership is never FALSE and refuses before values",
+      "claim_id": "C1",
+      "scope": "membership_semantics"
+    },
+    {
+      "claim": "A list scope rule is hashed by definitions, not names or realized members; legacy unscoped paths and hashes are unchanged",
+      "claim_id": "C2",
+      "scope": "identity"
+    },
+    {
+      "claim": "Query 1.2 binds one rule digest through result, claim identity, candidate identity, Critic packet, classification, frozen recipe and prior axes",
+      "claim_id": "C3",
+      "scope": "propagation"
+    },
+    {
+      "claim": "NORMALIZED_TRAJECTORY_EPISODES_V1 is a new additive representation; the frozen newborn NORMALIZED_TRAJECTORY_V1 is not reused for episodes",
+      "claim_id": "C4",
+      "scope": "representation"
+    },
+    {
+      "claim": "Local list snapshots are future-only: availability is max(declared, registered)",
+      "claim_id": "C5",
+      "scope": "availability"
+    },
+    {
+      "claim": "The durable look binding of a query 1.2 result carries the applied scope digest, so an exact repeat reuses it and another applied scope is never the same data binding",
+      "claim_id": "C6",
+      "scope": "durable_identity"
+    },
+    {
+      "claim": "A numeric DROP_ONE ablation of a mixed list+numeric hypothesis keeps the list condition; result coherence refuses a widened ablation",
+      "claim_id": "C7",
+      "scope": "ablation_estimand"
+    },
+    {
+      "claim": "The rebase onto main (post PR #382 dispatch-window repair) changes no byte of the list-aware feature code or tests; the two P1 remediations and the F1 follow-up remain exactly as previously reviewed",
+      "claim_id": "C8",
+      "scope": "rebase_identity"
+    }
+  ],
+  "task": {
+    "task_contract_sha256": "7278f42c6f92133e3177f5dd5b1b1c62aa60057aafd2c7c3349d3bd09043287c",
+    "task_id": "FORGE_LIST_AWARE_RESEARCH_VERTICAL_V1"
+  }
+}

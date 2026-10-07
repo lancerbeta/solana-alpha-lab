@@ -2079,6 +2079,219 @@ def _cmd_discovery_preview(
     return emit(payload)
 
 
+def cmd_research_scope_resolve(repo_root: Path, explicit_data_root: Path | None, *, spec_path: Path) -> int:
+    """Resolve aliases of a draft query 1.2 into its canonical form. Reads no market value."""
+
+    from solana_alpha_lab.factory import hfic_research_scope as scope_owner
+    from solana_alpha_lab.factory.hfic_grounded_discovery import GroundedDiscoveryError
+    from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+
+    git_before = repository_git_snapshot(repo_root)
+    try:
+        data_root = _existing_data_root(repo_root, explicit_data_root)
+        draft = json.loads(spec_path.read_text(encoding="utf-8"))
+    except HficCliError as exc:
+        return emit_error(str(exc))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return emit_error("DISCOVERY_INPUT_INVALID")
+    if not isinstance(draft, dict) or draft.get("schema_version") != "1.2":
+        return emit_error("RESEARCH_SCOPE_QUERY_1_2_REQUIRED")
+    try:
+        evidence = scope_owner.load_corpus_membership(data_root)
+        query = scope_owner.canonicalize_query_scope(draft, evidence)
+        bound = validate_temporal_query(query)
+        body = bound["scientific_body"]
+        chosen = scope_owner.selected_cohort_ids(body["research_scope"])
+        resolved = scope_owner.ResolvedScope(
+            scope=body["research_scope"],
+            list_condition=body.get("list_condition"),
+            evidence=evidence,
+            episode_ids=sorted(e for e in evidence.t0 if chosen is None or evidence.cohort_of.get(e) in chosen),
+            slices=body.get("diagnostic_slices") or [],
+        )
+        coverage = resolved.coverage()
+    except scope_owner.ResearchScopeError as exc:
+        return emit({"reason_code": exc.code, "detail": exc.detail, "values_loaded": False, "writes": False}, exit_code=2)
+    except GroundedDiscoveryError as exc:
+        return emit({"reason_code": exc.code, "values_loaded": False, "writes": False}, exit_code=2)
+    except (OSError, ValueError, KeyError):
+        return emit({"reason_code": "RESEARCH_SCOPE_EVIDENCE_UNREADABLE", "values_loaded": False, "writes": False}, exit_code=2)
+    if not git_before.unchanged(repository_git_snapshot(repo_root)):
+        return emit_error("GIT_MUTATION_DETECTED")
+    warnings = []
+    for side in ("universe_true_n", "signal_true_n", "signal_false_n"):
+        if side in coverage and coverage[side] < 5:
+            # Membership counts only (no outcome): a tiny group is visible before any look is spent.
+            warnings.append({"reason_code": "SMALL_GROUP", "group": side, "episodes_n": coverage[side]})
+    payload: dict[str, Any] = {
+        "canonical_query": query,
+        "spec_sha256": bound["spec_sha256"],
+        "rule_sha256": resolved.rule_sha256,
+        "coverage": coverage,
+        "warnings": warnings,
+        "non_claims": ["MEMBERSHIP_IS_OBSERVATIONAL_NOT_CAUSAL", "NO_INTERACTION_CLAIM"],
+        "values_loaded": False,
+        "writes": False,
+    }
+    try:
+        resolved.require_covered()
+    except scope_owner.ResearchScopeError as exc:
+        # Unknown membership is reported before any value; a covered scope must be declared first.
+        payload.update(reason_code=exc.code, covered_scope_required=True, **{k: v for k, v in exc.detail.items() if k in {"next_action", "covered_cohort_ids"}})
+        return emit(payload, exit_code=2)
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_episode_normalized_view(
+    repo_root: Path,
+    explicit_data_root: Path | None,
+    *,
+    spec_path: Path,
+    parent_session_id: str,
+    explicit_request: bool,
+) -> int:
+    """Scope-bound NORMALIZED_TRAJECTORY_EPISODES_V1 view + ladder freeze receipt for a BASE parent.
+
+    Reads prefix points (at or before the decision point) only; never a target. No write.
+    """
+
+    from solana_alpha_lab.factory import hfic_research_scope as scope_owner
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError,
+        load_admitted_partition_rows,
+        resolve_research_scope,
+    )
+    from solana_alpha_lab.factory.hfic_representation_ladder import (
+        HANDLER_EPISODES_V1,
+        LadderError,
+        _packet_for_bundle,
+        control_preflight_from_bundle,
+        load_ladder_registry,
+        prepare_ladder_freeze_preflight,
+    )
+    from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
+    from solana_alpha_lab.factory.hfic_session import load_session_bundle
+    from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+    from solana_alpha_lab.factory.normalized_trajectory_episodes_v1 import (
+        EpisodeProfileError,
+        build_episode_normalized_profile,
+    )
+
+    git_before = repository_git_snapshot(repo_root)
+    try:
+        data_root = _existing_data_root(repo_root, explicit_data_root)
+        draft = json.loads(spec_path.read_text(encoding="utf-8"))
+    except HficCliError as exc:
+        return emit_error(str(exc))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return emit_error("DISCOVERY_INPUT_INVALID")
+    if not isinstance(draft, dict) or draft.get("schema_version") != "1.2":
+        return emit_error("RESEARCH_SCOPE_QUERY_1_2_REQUIRED")
+    store = ResearchStore(data_root)
+    try:
+        bundle = load_session_bundle(store, parent_session_id)
+        if bundle is None:
+            return emit({"reason_code": "PARENT_SESSION_NOT_FOUND", "writes": False}, exit_code=2)
+        from solana_alpha_lab.factory.hfic_representation_ladder import effective_control_terminal
+
+        session_receipt = bundle.get("session_receipt") if isinstance(bundle.get("session_receipt"), dict) else {}
+        terminal = str(effective_control_terminal(session_receipt) or effective_control_terminal(bundle) or "")
+        row = next(
+            item for item in load_ladder_registry(repo_root / "configs" / "hfic_representation_ladder_v1.yaml")["representations"]
+            if item["id"] == HANDLER_EPISODES_V1
+        )
+        if not explicit_request and terminal not in row["trigger_terminals"]:
+            # Bounded progression: the profile follows an insufficient BASE, or an explicit owner request.
+            return emit(
+            {
+                "reason_code": "EPISODE_PROFILE_TRIGGER_NOT_MET",
+                "parent_terminal": terminal,
+                "qualifying_terminals": row["trigger_terminals"],
+                "next_action": "Use --explicit-request to ask for the episode profile after another BASE result.",
+                "writes": False,
+            },
+            exit_code=2,
+        )
+        evidence = scope_owner.load_corpus_membership(data_root)
+        query = scope_owner.canonicalize_query_scope(draft, evidence)
+        body = validate_temporal_query(query)["scientific_body"]
+        loaded = load_admitted_partition_rows(
+            data_root=data_root, binding_doc=None, partitions=None, census_path=None, observations_path=None,
+            population="OPPORTUNITY_EPISODES",
+        )
+        chosen = scope_owner.selected_cohort_ids(body["research_scope"])
+        if chosen is not None:
+            wanted = set(chosen)
+            loaded = {
+                "census": [r for r in loaded["census"] if str(r.get("cohort_id")) in wanted],
+                "observations": [r for r in loaded["observations"] if str(r.get("cohort_id")) in wanted],
+                "cohorts": [c for c in loaded["cohorts"] if str(c.get("cohort_id")) in wanted],
+            }
+        resolved = resolve_research_scope(body, data_root, loaded["census"], loaded["cohorts"])
+        policy = effective_policy(store).get("definition")
+        payload = build_episode_normalized_profile(
+            loaded["census"], loaded["observations"], loaded["cohorts"], resolved, universe_policy=policy
+        )
+        packet = _packet_for_bundle(data_root, bundle, store)
+        receipt = prepare_ladder_freeze_preflight(
+            control_preflight_from_bundle(bundle, packet),
+            representation_id=HANDLER_EPISODES_V1,
+            control_session_id=parent_session_id,
+            representation_payload=payload,
+        )
+    except scope_owner.ResearchScopeError as exc:
+        return emit({"reason_code": exc.code, "detail": exc.detail, "values_loaded": False, "writes": False}, exit_code=2)
+    except (GroundedDiscoveryError, EpisodeProfileError, LadderError) as exc:
+        return emit({"reason_code": getattr(exc, "code", str(exc)), "writes": False}, exit_code=2)
+    if not git_before.unchanged(repository_git_snapshot(repo_root)):
+        return emit_error("GIT_MUTATION_DETECTED")
+    result = {
+        "representation_id": HANDLER_EPISODES_V1,
+        "representation_payload": payload,
+        "ladder_freeze_preflight": receipt,
+        "target_values_loaded": False,
+        "writes": False,
+    }
+    _assert_no_path_leak(result, str(data_root), str(repo_root))
+    return emit(result)
+
+
+def cmd_list_snapshot_register(
+    repo_root: Path, explicit_data_root: Path | None, *, snapshot_path: Path, registered_at: str | None
+) -> int:
+    """Register one local membership snapshot (LOCAL_MEMBERSHIP_SNAPSHOT_V1)."""
+
+    from solana_alpha_lab.factory import hfic_research_scope as scope_owner
+    from solana_alpha_lab.factory.observation_schedule import parse_utc
+
+    try:
+        data_root = _existing_data_root(repo_root, explicit_data_root)
+    except HficCliError as exc:
+        return emit_error(str(exc))
+    from datetime import UTC, datetime
+
+    import os
+
+    if registered_at and os.environ.get("SMIAL_ALLOW_TEST_CLOCK") != "1":
+        # A caller-chosen registration time would make a list "historically known"; wall clock only.
+        return emit({"reason_code": "REGISTERED_AT_OVERRIDE_FORBIDDEN", "writes": False}, exit_code=2)
+    when = parse_utc(registered_at) if registered_at else datetime.now(tz=UTC)
+    try:
+        receipt = scope_owner.register_local_snapshot(data_root, snapshot_path, registered_at=when)
+    except scope_owner.ResearchScopeError as exc:
+        return emit({"reason_code": exc.code, "writes": False}, exit_code=2)
+    except ValueError:
+        return emit({"reason_code": "SNAPSHOT_INVALID", "writes": False}, exit_code=2)
+    return emit(
+        {
+            **receipt,
+            "adapter": scope_owner.LOCAL_ADAPTER,
+            "note": "A registered list is known only from reliable_available_at on; episodes with an earlier T0 stay UNKNOWN for it.",
+        }
+    )
+
+
 def cmd_discovery_coverage(repo_root: Path, explicit_data_root: Path | None) -> int:
     """State-only joint coverage. Writes nothing and does not reserve a slot."""
 
@@ -3695,6 +3908,27 @@ def build_parser() -> argparse.ArgumentParser:
         help="No-write state-only joint coverage. Never selects typed_value.",
     )
     discovery_coverage.add_argument("--format", choices=("json",), default="json")
+    scope_resolve = subparsers.add_parser(
+        "research-scope-resolve",
+        help="Resolve list aliases of a draft query 1.2 to its canonical scope; reads no market value.",
+    )
+    scope_resolve.add_argument("--spec", type=Path, required=True)
+    scope_resolve.add_argument("--format", choices=("json",), default="json")
+    episode_view = subparsers.add_parser(
+        "episode-normalized-view",
+        help="Scope-bound NORMALIZED_TRAJECTORY_EPISODES_V1 prefix view for an existing BASE session; reads no target.",
+    )
+    episode_view.add_argument("--spec", type=Path, required=True)
+    episode_view.add_argument("--parent-session-id", required=True)
+    episode_view.add_argument("--explicit-request", action="store_true")
+    episode_view.add_argument("--format", choices=("json",), default="json")
+    snapshot_register = subparsers.add_parser(
+        "list-snapshot-register",
+        help="Register one local membership snapshot; a manual list is never available before registration.",
+    )
+    snapshot_register.add_argument("--snapshot", type=Path, required=True)
+    snapshot_register.add_argument("--registered-at", default=None)
+    snapshot_register.add_argument("--format", choices=("json",), default="json")
     discovery_binding = subparsers.add_parser(
         "discovery-binding",
         help=(
@@ -4155,6 +4389,17 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.command == "discovery-coverage":
             return cmd_discovery_coverage(repo_root, args.data_root)
+        if args.command == "research-scope-resolve":
+            return cmd_research_scope_resolve(repo_root, args.data_root, spec_path=args.spec)
+        if args.command == "episode-normalized-view":
+            return cmd_episode_normalized_view(
+                repo_root, args.data_root, spec_path=args.spec,
+                parent_session_id=args.parent_session_id, explicit_request=bool(args.explicit_request),
+            )
+        if args.command == "list-snapshot-register":
+            return cmd_list_snapshot_register(
+                repo_root, args.data_root, snapshot_path=args.snapshot, registered_at=args.registered_at
+            )
         if args.command == "discovery-binding":
             return cmd_discovery_binding(repo_root, args.data_root)
         if args.command == "discovery-preview":

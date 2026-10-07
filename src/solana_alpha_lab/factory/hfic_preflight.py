@@ -2286,6 +2286,23 @@ def build_forge_context_packet(
             # Generated from the import readback (metadata only, no values).
             packet["population_card"] = build_population_card(Path(data_root))
             packet["episode_query_capabilities"] = episode_query_capabilities()
+            from solana_alpha_lab.factory.hfic_research_scope import (
+                ResearchScopeError,
+                build_list_dimension_context,
+                load_corpus_membership,
+            )
+
+            try:
+                packet["list_dimension_context"] = build_list_dimension_context(
+                    load_corpus_membership(Path(data_root))
+                )
+            except (ResearchScopeError, OSError, ValueError) as exc:
+                # Typed blocker, never silently absent: the model must know the axis is unavailable.
+                packet["list_dimension_context"] = {
+                    "schema": "smial.list-dimension-context",
+                    "state": "UNAVAILABLE",
+                    "reason_code": getattr(exc, "code", "LIST_EVIDENCE_UNREADABLE"),
+                }
     from solana_alpha_lab.factory.hfic_vision_integrity import (
         FORGE_VISION_INTEGRITY_BLOCKED,
         compact_feature_grounding_entries,

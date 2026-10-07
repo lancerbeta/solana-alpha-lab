@@ -98,6 +98,8 @@
         "decision_unlocked": {"type": "string", "minLength": 1},
         "estimand": {"type": "string"},
         "state_transition": {"type": ["string", "null"]},
+        "research_scope_rule_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "research_scope_statement": {"type": "string", "minLength": 1},
         "required_feature_ids": {
           "type": "array",
           "items": {"type": "string"}
@@ -224,7 +226,12 @@
     },
     "ladder_representation_id": {
       "type": "string",
-      "enum": ["NORMALIZED_TRAJECTORY_V1"]
+      "enum": ["NORMALIZED_TRAJECTORY_V1", "NORMALIZED_TRAJECTORY_EPISODES_V1"]
+    },
+    "normalized_trajectory_episodes_v1": {
+      "type": "object",
+      "description": "Optional scope-bound episode prefix profile (anonymous motif counts, no target); CONTEXT_ONLY for Critic.",
+      "additionalProperties": true
     },
     "market_evidence_epoch_sha256": {
       "type": "string",
@@ -320,6 +327,7 @@
               "explanatory_condition": {"type": ["string", "null"]},
               "evidence_surface_mode": {"type": ["string", "null"]},
               "representation_scope": {"type": ["string", "null"]},
+              "research_scope_rule_sha256": {"type": ["string", "null"]},
               "legacy_definition": {
                 "type": ["object", "null"],
                 "additionalProperties": true

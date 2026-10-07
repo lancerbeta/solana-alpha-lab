@@ -77,6 +77,12 @@ def canonical_candidate_definition(card: Mapping[str, Any]) -> dict[str, str]:
         definition[field] = normalize_text(raw)
     if any(not definition[field] for field in IDENTITY_FIELDS if field not in optional):
         raise HficIdentityError("CANDIDATE_DEFINITION_INCOMPLETE")
+    scope_rule = card.get("research_scope_rule_sha256")
+    if scope_rule is not None:
+        # A different list scope is a different hypothesis even when the wording is identical.
+        if not isinstance(scope_rule, str) or len(scope_rule) != 64:
+            raise HficIdentityError("CANDIDATE_DEFINITION_INCOMPLETE")
+        definition["research_scope_rule_sha256"] = scope_rule
     return definition
 
 

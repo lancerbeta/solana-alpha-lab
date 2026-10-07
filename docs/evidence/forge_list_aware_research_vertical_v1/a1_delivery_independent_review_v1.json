@@ -1,0 +1,143 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-LIST-AWARE-RESEARCH-VERTICAL-REVIEW-001",
+  "as_of": "2026-10-07",
+  "task_id": "FORGE_LIST_AWARE_RESEARCH_VERTICAL_V1",
+  "reviewed_bindings_sha256": "67783a56ec756f660159e6e3bb38e447e1c682567f1c7cc1dd3a766ec8143b43",
+  "reviewed_inventory_sha256": "4796892902e03b54328c4365f45b1aea6dc33ce53fc1c91ba966d02847631067",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_5b8aa15c1c238c007899f2fce44d513e34520ccf",
+        "RESIDUAL_P0_P1_NONE",
+        "packet_fingerprint_sha256=aa541ed6d6c2871fa411a27d8c890754405e242ebde4639664d38013a360c8b1",
+        "SEMANTIC_PREMISE_PACKET_INFORMATION_PATH_PROCESS_OBLIGATION_MODEL_DIVERSITY_UNPROVEN",
+        "C8_REBASE_ONTO_MAIN_AFTER_PR382_IS_BYTE_IDENTICAL_FOR_LIST_AWARE_FEATURE_FILES",
+        "NO_SEMANTIC_COUPLING_WITH_PR382_DISPATCH_WINDOW_REPAIR_HFIC_MODULES_NEVER_IMPORT_OPPORTUNITY_EPISODE_TICK"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_5b8aa15c1c238c007899f2fce44d513e34520ccf",
+        "RESIDUAL_P0_P1_NONE",
+        "REBASE_DELTA_9567FAD8_TO_5B8AA15C_TOUCHES_ONLY_PR382_OWN_FILES_PLUS_TWO_METADATA_REBIND_FILES",
+        "STANDALONE_RERUN_OF_FLAKY_PARALLEL_FAILURE_TEST_FORGE_RUNTIME_DISCOVERY_BINDING_V1_CONFIRMED_OK"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_5b8aa15c1c238c007899f2fce44d513e34520ccf",
+        "RESIDUAL_P0_P1_NONE",
+        "LEGITIMATE_MECHANICAL_REBIND_NOT_A_REDESIGN",
+        "PRIOR_DOD_PROOFS_ON_9567FAD8_APPLY_UNCHANGED_GIVEN_BYTE_IDENTICAL_FEATURE_CODE",
+        "FRESH_RERUN_VERTICAL_10_EXECUTOR_SCOPE_PROFILE_39_BENCHMARK_BOUNDS_ALL_OK"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_5b8aa15c1c238c007899f2fce44d513e34520ccf",
+        "RESIDUAL_P0_P1_NONE",
+        "NO_OWNER_OPERABLE_SURFACE_CHANGED_BY_THE_REBASE"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_LIVE_ACCEPTANCE",
+    "NO_MERGE",
+    "NO_MODEL_DIVERSITY_ATTESTATION",
+    "PACKET_INFORMATION_PATH_ONLY",
+    "NO_LIVE_LAUNCH_IDENTITY_ATTESTATION"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Diagnostic-slice UNKNOWN/INVALID membership was counted as not-in-slice",
+      "observed_head": "9e6a0c48ab1e2c5fda11be21fe272313b7ec121b",
+      "resolved_by_head": "05a4a07a70ce9502e8e0612e46fa49b79da1e143"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "list-snapshot-register --registered-at allowed backdated availability",
+      "observed_head": "9e6a0c48ab1e2c5fda11be21fe272313b7ec121b",
+      "resolved_by_head": "05a4a07a70ce9502e8e0612e46fa49b79da1e143"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Snapshot registration time and availability were outside the hashed and bound evidence",
+      "observed_head": "9e6a0c48ab1e2c5fda11be21fe272313b7ec121b",
+      "resolved_by_head": "05a4a07a70ce9502e8e0612e46fa49b79da1e143"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Episode profile payload was self-asserted at freeze without re-validation or candidate rule match",
+      "observed_head": "9e6a0c48ab1e2c5fda11be21fe272313b7ec121b",
+      "resolved_by_head": "05a4a07a70ce9502e8e0612e46fa49b79da1e143"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "No proof that the list axis reaches the formulation instructions",
+      "observed_head": "9e6a0c48ab1e2c5fda11be21fe272313b7ec121b",
+      "resolved_by_head": "05a4a07a70ce9502e8e0612e46fa49b79da1e143"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "No scoped prior-memory test, no cold replay from a moved root, no legacy 1.1 golden",
+      "observed_head": "9e6a0c48ab1e2c5fda11be21fe272313b7ec121b",
+      "resolved_by_head": "05a4a07a70ce9502e8e0612e46fa49b79da1e143"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "Independent validator P1-A: the durable look binding of a scoped query lost the applied scope digest after execution",
+      "observed_head": "f9db1fbaf18512ee897fce98d258b576c08b5ba7",
+      "resolved_by_head": "ad51d9ef6e8d691f5025ee3f7b918766f5437b73"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "Independent validator P1-B: DROP_ONE ablation of MIXED_LIST_NUMERIC dropped the list condition and coherence did not catch it",
+      "observed_head": "f9db1fbaf18512ee897fce98d258b576c08b5ba7",
+      "resolved_by_head": "ad51d9ef6e8d691f5025ee3f7b918766f5437b73"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "F1: same_rows_under_policy compared scoped looks with an unscoped binding, so a scoped re-look after a pure policy change became MAIN",
+      "observed_head": "ad51d9ef6e8d691f5025ee3f7b918766f5437b73",
+      "resolved_by_head": "3ee2da2baf92a3377153ea6a91f1f4279844babb"
+    }
+  ]
+}
