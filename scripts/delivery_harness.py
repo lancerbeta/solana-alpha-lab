@@ -593,21 +593,23 @@ def _preflight_shadow_pin_problems(
     scan_root = evidence_root if evidence_root is not None else (root / "docs" / "evidence")
     aggregates = harness_owned_aggregate_paths()
     reasons: list[str] = []
+    # Commit-bound archives are required inputs, not optional scan results.
+    # Check them before discovery so deletion/root loss cannot bypass the fence.
+    for rel, frozen_commit in sorted(FROZEN_SEMANTICS_EVIDENCE_COMMITS.items()):
+        if rel not in exempt:
+            continue
+        try:
+            frozen_bytes = git_bytes(root, "show", f"{frozen_commit}:{rel}")
+            if (root / rel).read_bytes() != frozen_bytes:
+                reasons.append(f"FROZEN_PIN_EVIDENCE_DRIFT:{rel}")
+        except (OSError, ValueError):
+            reasons.append(f"FROZEN_PIN_EVIDENCE_UNAVAILABLE:{rel}")
     if not scan_root.is_dir():
-        return []
+        return sorted(set(reasons))
     for evidence_path in sorted(scan_root.rglob("*.json")):
         try:
             rel = evidence_path.resolve().relative_to(root.resolve()).as_posix()
         except ValueError:
-            continue
-        frozen_commit = FROZEN_SEMANTICS_EVIDENCE_COMMITS.get(rel) if rel in exempt else None
-        if frozen_commit is not None:
-            try:
-                frozen_bytes = git_bytes(root, "show", f"{frozen_commit}:{rel}")
-                if evidence_path.read_bytes() != frozen_bytes:
-                    reasons.append(f"FROZEN_PIN_EVIDENCE_DRIFT:{rel}")
-            except (OSError, ValueError):
-                reasons.append(f"FROZEN_PIN_EVIDENCE_UNAVAILABLE:{rel}")
             continue
         if rel in changed or rel in exempt:
             continue

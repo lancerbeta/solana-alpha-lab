@@ -73,11 +73,11 @@
     },
     {
       "path": "scripts/delivery_harness.py",
-      "sha256": "a9bd8414979bcac7d94d2a0dae422575e2a6d111e70a2462fab7df906daaf4c4"
+      "sha256": "c44173c6ec2697ceefb29de120cab7497ba0061bffd3fbdb981d7c490083eab1"
     },
     {
       "path": "tests/test_preflight_shadow_pin_drift.py",
-      "sha256": "53524016c2d0440ab4a6fe75011cc2f18cc5c879212cce2369d7c035609517c2"
+      "sha256": "1c79f3f4c63c4f8c9953226448bacf689708ba631d3119cda123b586965710c8"
     }
   ],
   "targeted_validation": {
@@ -89,12 +89,12 @@
     "ci": "NOT_RUN",
     "final_code_log": "validator-bundle/evidence/h09-final-identity-targeted.log",
     "delivery_boundary_tests": {
-      "tests": 73,
+      "tests": 76,
       "skipped": 0,
-      "elapsed_seconds": 10.376,
+      "elapsed_seconds": 9.676,
       "result": "OK",
-      "log": "validator-bundle/evidence/h09-frozen-pin-final-green.log",
-      "scope": "shadow-pin discriminator, Harness contract, risk routing, deterministic finish"
+      "log": "validator-bundle/evidence/h09-frozen-absence-final-green.log",
+      "scope": "shadow-pin discriminator (20 tests), Harness contract, risk routing, deterministic finish"
     }
   },
   "deterministic_original_public": {
@@ -976,6 +976,21 @@
       "logical_ref": "validator-bundle/evidence/h09-frozen-pin-final-green.log",
       "size": 178,
       "sha256": "cc44d7159c9d855ed4ba72104611cb058b343d621854b1def0debc9e54e889d9"
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-frozen-absence-red.log",
+      "size": 3619,
+      "sha256": "ce782f7e01ff8635119ccbf3adae29f2639f2bd0ccc2bd604cb0afc33b428458"
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-frozen-absence-unit-green.log",
+      "size": 124,
+      "sha256": "7c967077cf7675134fd624e45e44af3663b3ff22968edbf492c04fa2773bef19"
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-frozen-absence-final-green.log",
+      "size": 180,
+      "sha256": "f2b3120e70a4254e8152a0e9edbcc5b0eac499db81998e1323087626826dde9b"
     }
   ],
   "accepted_intermediate_checkpoint": "8a3e9d8e1c848395ac7cee99bc2cf75637417543",
@@ -1316,9 +1331,10 @@
     "historical_receipt_bytes_unchanged": true,
     "historical_owner_pins_match_accepted_base": true,
     "earlier_presearch_execution_producer_pin_match": "NOT_ATTESTED",
-    "guard": "Full historical receipt bytes checked against accepted Git blob; drift/unavailable DENY even co-moved",
+    "guard": "Commit-bound registry paths verified against accepted Git blob before JSON discovery; drift, missing receipt, missing root or unavailable Git blob DENY, even co-moved",
     "other_separate_drift": "DENY_UNCHANGED",
     "authority_or_control_write_prefix_widening": false,
-    "unit_validation": "17 guard tests PASS; 73 affected delivery tests PASS after current-owner pin and Catalog propagation"
+    "unit_validation": "20 guard tests PASS; 76 affected delivery tests PASS",
+    "absence_review_finding": "CLOSED_RED_TO_GREEN; previous architecture NOT_READY preserved under review history"
   }
 }

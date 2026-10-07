@@ -110,3 +110,5 @@ pin match NOT_ATTESTED; старую self-report attestation не перепис
 связываются отдельной final-head chain. Никакого нового scientific look.
 
 Final delivery-boundary validation: 73 affected tests PASS (10.376s, no skips), including frozen accepted-BASE receipt identity, tamper DENY, other shadow-pin discriminator rules, risk-role resolution and deterministic finish. Earlier failed propagation attempts remain raw engineering evidence; no scientific replay or lifecycle was repeated. Live CI/readiness are bound separately after PR.
+
+Architecture absence falsifier: preceding 73-test checkpoint missed absent registered receipt/evidence root and JSON discovery omission. Required review returned NOT_READY (P2 semantic claim failure); retained as historical evidence. Existing guard now checks required commit-bound paths before discovery. Three genuine RED subcases became GREEN; 20 guard tests and 76 affected delivery tests PASS, no skips. This strengthens availability DENY without changing historical bytes, other SEPARATE rules or scientific lineage. Prior 17/73 results are historical, not validation of this final guard.

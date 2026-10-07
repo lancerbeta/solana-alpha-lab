@@ -94,7 +94,7 @@ class ShadowPinDiscriminatorTests(unittest.TestCase):
             },
             changed={"AGENTS.md"},
             blobs={"AGENTS.md": SHA_B},
-            frozen=self.module.FROZEN_SEMANTICS_EVIDENCE_FILES,
+            frozen=frozenset({"docs/evidence/task21/durable_resume_router_binding_acceptance_v1.json"}),
         )
         self.assertEqual(reasons, [])
 
@@ -236,6 +236,28 @@ class ShadowPinDiscriminatorTests(unittest.TestCase):
             reasons = self._scan({relative: altered}, changed={relative}, blobs={},
                                  frozen=self.module.FROZEN_SEMANTICS_EVIDENCE_FILES)
         self.assertEqual(reasons, [f"FROZEN_PIN_EVIDENCE_DRIFT:{relative}"])
+
+    def test_commit_bound_receipt_absence_denies_with_and_without_evidence_root(self) -> None:
+        relative = "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json"
+        for files in ({}, {"docs/evidence/other/receipt.json": {}}):
+            with self.subTest(evidence_root_exists=bool(files)):
+                with patch.object(self.module, "git_bytes", return_value=b"accepted receipt"):
+                    reasons = self._scan(files, changed={relative}, blobs={}, frozen=frozenset({relative}))
+                self.assertEqual(reasons, [f"FROZEN_PIN_EVIDENCE_UNAVAILABLE:{relative}"])
+
+    def test_commit_bound_receipt_guard_does_not_depend_on_json_discovery(self) -> None:
+        relative = "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json"
+        with patch.object(Path, "rglob", return_value=iter(())):
+            with patch.object(self.module, "git_bytes", return_value=b"accepted receipt"):
+                reasons = self._scan({relative: {"tampered": True}}, changed={relative}, blobs={},
+                                     frozen=frozenset({relative}))
+        self.assertEqual(reasons, [f"FROZEN_PIN_EVIDENCE_DRIFT:{relative}"])
+
+    def test_commit_bound_receipt_unavailable_git_blob_denies(self) -> None:
+        relative = "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json"
+        with patch.object(self.module, "git_bytes", side_effect=ValueError("unavailable")):
+            reasons = self._scan({relative: {}}, changed={relative}, blobs={}, frozen=frozenset({relative}))
+        self.assertEqual(reasons, [f"FROZEN_PIN_EVIDENCE_UNAVAILABLE:{relative}"])
 
 
 class WorktreeCommittedDivergenceTests(unittest.TestCase):
