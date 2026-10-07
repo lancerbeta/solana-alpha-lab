@@ -7,6 +7,7 @@ import tempfile
 import unittest
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -99,6 +100,26 @@ def _c1_shape() -> tuple[list[dict[str, str]], list[dict[str, str]]]:
 
 
 class ScientificEligibilityProjectionTests(unittest.TestCase):
+    def test_frozen_cross_release_mint_collision_cannot_substitute_y(self) -> None:
+        spec = {"schema_version": "1.3", "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+                "observation_request": {"collection_mode": "REUSE_ONLY"},
+                "parameters": {"temporal_recipe": {"scientific_identity": "a" * 64}}}
+        frozen = [{"schedule_sha256": "b" * 64}, {"schedule_sha256": "b" * 64}]
+        partitions = [("cohort-A", Path("a"), Path("ay")), ("cohort-B", Path("b"), Path("by"))]
+        for first, second in (("OBSERVED", "MISSING_TYPED"), ("MISSING_TYPED", "OBSERVED")):
+            with self.subTest(first=first), patch(
+                "solana_alpha_lab.factory.data_resolver.resolve_evidence_bindings"), patch(
+                "solana_alpha_lab.factory.hfic_temporal_discovery.bind_frozen_fixed_time_inputs",
+                return_value=({}, {"spec_sha256": "a" * 64}, partitions, frozen)), patch(
+                "solana_alpha_lab.factory.scientific_eligibility_projection.load_hashed_schedule_document"), patch(
+                "solana_alpha_lab.factory.scientific_eligibility_projection.load_projection_tables",
+                side_effect=[([_census("same", "observed")], [_x300("same"), _y("same", "Y7200", X_FIELD_ID, first)]),
+                             ([_census("same", "observed")], [_x300("same"), _y("same", "Y7200", X_FIELD_ID, second)])]), patch(
+                "solana_alpha_lab.factory.scientific_eligibility_projection.project_scientific_eligibility") as projector:
+                with self.assertRaisesRegex(ScientificEligibilityError, "FROZEN_CROSS_RELEASE_ENTITY_UNRESOLVED"):
+                    try_project_scientific_eligibility_from_data_root(Path("synthetic"), repo_root=ROOT, spec=spec)
+                projector.assert_not_called()
+
     def test_c1_shape_base_x_is_denominator(self) -> None:
         census, obs = _c1_shape()
         projected = project_scientific_eligibility(census, obs)

@@ -718,8 +718,16 @@ def try_project_scientific_eligibility_from_data_root(
                 raise ScientificEligibilityError(CANONICAL_SCHEDULE_UNBOUND)
             canonical_schedule = load_hashed_schedule_document(Path(data_root), next(iter(schedules)))
             census_rows, observation_rows = [], []
+            seen_release_mints: set[str] = set()
             for _cohort, census_path, observations_path in partitions:
                 census, observations = load_projection_tables(census_path, observations_path)
+                release_mints = {_mint(row) for row in census if _mint(row)}
+                # The existing C1 projector keys seats/cells by mint. It cannot
+                # prove multiple frozen decisions for one mint without losing
+                # their identity; refuse before another release's Y can heal it.
+                if seen_release_mints & release_mints:
+                    raise ScientificEligibilityError("FROZEN_CROSS_RELEASE_ENTITY_UNRESOLVED")
+                seen_release_mints.update(release_mints)
                 census_rows.extend(census)
                 observation_rows.extend(observations)
             return project_scientific_eligibility(

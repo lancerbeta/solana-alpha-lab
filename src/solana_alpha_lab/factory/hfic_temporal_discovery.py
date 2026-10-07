@@ -4646,11 +4646,23 @@ def bind_frozen_fixed_time_inputs(
         for path in (census_path, obs_path):
             if path.is_symlink() or not path.resolve().is_relative_to(data_root.resolve()):
                 raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH")
-        if (
-            sha256_file_streaming(census_path) != item.get("census_sha256")
-            or sha256_file_streaming(obs_path) != item.get("observations_sha256")
-        ):
+        try:
+            hashes_match = (sha256_file_streaming(census_path) == item.get("census_sha256")
+                            and sha256_file_streaming(obs_path) == item.get("observations_sha256"))
+        except OSError as exc:
+            raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH") from exc
+        if not hashes_match:
             raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH")
+        if (spec.get("schema_version") == "1.3"
+                and (spec.get("observation_request") or {}).get("collection_mode") == "REUSE_ONLY"):
+            from solana_alpha_lab.factory.hfic_grounded_discovery import schedule_projection_for_census
+
+            actual_schedule = schedule_projection_for_census(data_root, census_path)
+            if actual_schedule.get("schedule_context_gap"):
+                raise GroundedDiscoveryError(str(actual_schedule["schedule_context_gap"]))
+            if any(item.get(key) != actual_schedule.get(key) for key in
+                   ("schedule_sha256", "schedule_point_due_offset_seconds", "schedule_point_lateness")):
+                raise GroundedDiscoveryError("FROZEN_INPUT_SCHEDULE_MISMATCH")
         partitions.append((str(item.get("cohort_id")), census_path, obs_path))
         binding_cohorts.append(dict(item))
     return public, pre, partitions, binding_cohorts

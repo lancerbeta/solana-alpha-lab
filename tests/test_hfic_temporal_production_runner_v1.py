@@ -313,7 +313,7 @@ class TemporalVerticalTests(unittest.TestCase):
             self.assertEqual(validated_projection_readiness(experiment, projection), "COMPLETE")
             self.assertEqual(projection["release_binding"]["frozen_input"], recipe["frozen_input"])
             self.assertTrue(projection["invariants"]["no_y_typed_value_read"])
-            for mutation in ("identity", "file_hash", "path", "cutoff", "manifest"):
+            for mutation in ("identity", "file_hash", "path", "cutoff", "manifest", "schedule_hash", "schedule_points"):
                 invalid = copy.deepcopy(experiment)
                 frozen = invalid["parameters"]["temporal_recipe"]
                 if mutation == "identity":
@@ -324,13 +324,22 @@ class TemporalVerticalTests(unittest.TestCase):
                     frozen["frozen_input"][0]["census_rel"] = "../foreign.parquet"
                 elif mutation == "cutoff":
                     invalid["availability_cutoff"] = "2020-01-01T00:00:00Z"
-                else:
+                elif mutation == "manifest":
                     frozen["frozen_input"][0]["dataset_manifest_id"] = "dataset-" + "0" * 64
+                elif mutation == "schedule_hash":
+                    frozen["frozen_input"][0]["schedule_sha256"] = "0" * 64
+                else:
+                    frozen["frozen_input"][0]["schedule_point_due_offset_seconds"]["Y7200"] += 300
                 with self.subTest(mutation=mutation), patch(
                     "solana_alpha_lab.factory.hfic_temporal_discovery.execute_temporal_discovery",
                     side_effect=AssertionError("invalid input must not evaluate")), self.assertRaises(ScientificEligibilityError):
                     try_project_scientific_eligibility_from_data_root(
                         data_root, repo_root=ROOT, spec=invalid, schedule=_schedule())
+            from solana_alpha_lab.factory.hfic_temporal_discovery import bind_frozen_fixed_time_inputs
+            missing = copy.deepcopy(experiment)
+            missing["parameters"]["temporal_recipe"]["frozen_input"][0]["census_rel"] = "datasets/missing-source.parquet"
+            with self.assertRaisesRegex(GroundedDiscoveryError, "FROZEN_INPUT_MISMATCH"):
+                bind_frozen_fixed_time_inputs(missing, data_root=data_root)
 
     def test_published_journal_reaches_document_runner_readback(self) -> None:
         spec = _spec(cost_profile=None, schedule={"lateness_seconds": DOCUMENT_LATENESS})

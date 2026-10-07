@@ -88,3 +88,10 @@ verdict and single existing look reference are retained in result and passport;
 the passport trial reference is that existing look. This technical replay creates
 no new hypothesis card, scientific metric, discovery look or holdout consumption.
 Its calculation terminal does not supersede the source Critic verdict.
+The Spec 1.3 pre-value binder checks schedule SHA and point clocks against the
+verified census's own canonical schedule. Authored binding text cannot replace
+that source identity. The existing mint-keyed eligibility projector cannot prove
+multiple releases with repeated mint identities: this route returns
+`FROZEN_CROSS_RELEASE_ENTITY_UNRESOLVED` before projection, preserving unknown
+missingness instead of substituting Y or shrinking the denominator. No new
+multi-decision eligibility subsystem is introduced in this atom.
