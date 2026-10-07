@@ -1780,7 +1780,12 @@ def downside_descriptive(values: Sequence[float], *, missing_n: int) -> dict[str
 def classify_temporal_look(
     previous: Sequence[Mapping[str, Any]],
     spec: Mapping[str, Any],
+    *,
+    limits: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
+    simple_before_compound = SIMPLE_MAIN_RESERVE if limits is None else int(limits["simple_before_compound"])
+    main_total = MAX_MAIN_QUERY_SPECS if limits is None else int(limits["main_total"])
+    adaptive_total = MAX_ADAPTIVE_REFINEMENTS if limits is None else int(limits["adaptive_total"])
     bound = validate_temporal_query(spec)
     digest = bound["spec_sha256"]
     tier = str(bound["search_tier"])
@@ -1820,13 +1825,13 @@ def classify_temporal_look(
         look_class == "MAIN"
         and tier == "SIMPLE_SCREEN"
         and bound["budget_allocation"] != "COMPOUND_FIRST"
-        and len(simple_mains) >= SIMPLE_MAIN_RESERVE
+        and len(simple_mains) >= simple_before_compound
         and len(compound_mains) == 0
     ):
         raise GroundedDiscoveryError("SIMPLE_BUDGET_RESERVED_FOR_COMPOUND")
-    if look_class == "MAIN" and len(mains) >= MAX_MAIN_QUERY_SPECS:
+    if look_class == "MAIN" and len(mains) >= main_total:
         raise GroundedDiscoveryError("QUERY_MAIN_BUDGET_EXHAUSTED")
-    if look_class == "ADAPTIVE" and len(adaptive) >= MAX_ADAPTIVE_REFINEMENTS:
+    if look_class == "ADAPTIVE" and len(adaptive) >= adaptive_total:
         raise GroundedDiscoveryError("QUERY_ADAPTIVE_BUDGET_EXHAUSTED")
     return {
         "query_id": bound["query_id"],

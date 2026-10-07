@@ -15,14 +15,12 @@ from datetime import datetime, timezone
 from typing import Any
 
 from solana_alpha_lab.factory.hfic_grounded_discovery import (
-    MAX_ADAPTIVE_REFINEMENTS,
-    MAX_MAIN_QUERY_SPECS,
     POINT_OFFSET,
     GroundedDiscoveryError,
     _canonical,
     list_discovery_looks,
 )
-from solana_alpha_lab.factory.hfic_temporal_discovery import MAX_PREVIEW_SPECS
+from solana_alpha_lab.factory.hfic_research_policy import ensure_run_snapshot, limits_for_frozen_run
 
 OPERATION_KIND = "ORDINARY_OPERATION_V1"
 RESERVATION_KIND = "ORDINARY_LOOK_RESERVATION_V1"
@@ -116,6 +114,7 @@ def record_operation(
     market = str(request.get("market_evidence_epoch_sha256") or "").strip()
     if len(journal) != 64 or not focus or len(market) != 64:
         raise OrdinaryOperationError("ORDINARY_OPERATION_BINDING_INCOMPLETE")
+    ensure_run_snapshot(store, journal)
     completion = str(request.get("requested_completion") or LIMITED_RESULT)
     if completion not in {LIMITED_RESULT, SCIENTIFIC_TERMINAL}:
         raise OrdinaryOperationError("ORDINARY_OPERATION_COMPLETION_INVALID")
@@ -513,6 +512,7 @@ def _protocol_remaining(
     *,
     journal: str,
 ) -> int:
+    limits = limits_for_frozen_run(store, journal)
     if kind == "preview":
         used = {
             str(item.get("preview_sha256") or "")
@@ -531,7 +531,7 @@ def _protocol_remaining(
             and item.get("look_class") == "PREVIEW"
             and str(item.get("spec_sha256") or "") not in landed_specs
         }
-        return max(0, MAX_PREVIEW_SPECS - len(used) - len(pending))
+        return max(0, limits["preview_total"] - len(used) - len(pending))
     completed = {
         str(item.get("spec_sha256") or "")
         for item in looks
@@ -546,7 +546,7 @@ def _protocol_remaining(
         and item.get("look_class") == ("ADAPTIVE" if kind == "adaptive" else "MAIN")
         and str(item.get("spec_sha256") or "") not in completed
     }
-    limit = MAX_ADAPTIVE_REFINEMENTS if kind == "adaptive" else MAX_MAIN_QUERY_SPECS
+    limit = limits["adaptive_total"] if kind == "adaptive" else limits["main_total"]
     return max(0, limit - len(completed) - len(in_flight))
 
 
@@ -612,16 +612,13 @@ def owner_allowance(store: Any, operation: Mapping[str, Any], kind: str) -> int:
 
 def _admit(store: Any, operation: Mapping[str, Any], *, repo_root: Any = None, data_root: Any = None) -> dict[str, Any]:
     from solana_alpha_lab.factory.hfic_evidence_identity import resolve_scientific_admission
-    from solana_alpha_lab.factory.hfic_preflight import (
-        AUTO_SESSIONS_PER_EPOCH,
-        MAX_DISTINCT_FOCUSES_PER_EPOCH,
-    )
     from solana_alpha_lab.factory.hfic_repair_continuation import (
         list_repair_continuation_dispositions,
     )
     from solana_alpha_lab.factory.hfic_session import list_hfic_sessions
 
     sessions = list_hfic_sessions(store)
+    limits = limits_for_frozen_run(store, str(operation.get("journal_scope") or ""))
     market_basis = None
     if repo_root is not None and data_root is not None:
         from pathlib import Path
@@ -644,8 +641,8 @@ def _admit(store: Any, operation: Mapping[str, Any], *, repo_root: Any = None, d
             (operation.get("representation") or {}).get("representation_semantic_version") or "HFIC-V1.2"
         ),
         owner_focus=str(operation.get("owner_focus") or ""),
-        auto_sessions_per_market=AUTO_SESSIONS_PER_EPOCH,
-        max_distinct_focuses=MAX_DISTINCT_FOCUSES_PER_EPOCH,
+        auto_sessions_per_market=limits["auto_cycles_per_market"],
+        max_distinct_focuses=limits["distinct_focuses_per_market"],
         repair_continuations=list_repair_continuation_dispositions(store),
     )
 
@@ -1055,7 +1052,9 @@ def gate_before_values(
         if policy_shift:
             classify_spec = dict(spec)
             classify_spec["adaptation_of"] = validated["spec_sha256"]
-        classified = classify_temporal_look(classify_looks, classify_spec)
+        classified = classify_temporal_look(
+            classify_looks, classify_spec, limits=limits_for_frozen_run(store, journal_scope)
+        )
     except Exception as exc:
         code = getattr(exc, "code", None) or "QUERY_SPEC_INVALID"
         raise OrdinaryOperationError(str(code)) from exc

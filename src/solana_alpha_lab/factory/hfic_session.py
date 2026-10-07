@@ -50,6 +50,10 @@ CRITIC_PACKET_VERSION_CURRENT = "1.4"
 DRAFT_SCHEMA_BY_PACKET_VERSION = {
     "1.1": "catalog/schemas/hypothesis_forge_draft_v1.schema.json",
     "1.2": "catalog/schemas/hypothesis_forge_draft_v1_2.schema.json",
+    # Additive: same HFIC-V1.2 grounding and prompt, a wider structural
+    # candidate-count ceiling for a journal whose research policy raised
+    # candidates.max_generated above the shipped default of 6.
+    "1.3": "catalog/schemas/hypothesis_forge_draft_v1_3.schema.json",
 }
 SESSION_RECEIPT_SCHEMA_BY_PROMPT = {
     PROMPT_VERSION_V1_1: "catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json",
@@ -62,6 +66,16 @@ RUNNER_UP_AWAITING_CRITIC = "RUNNER_UP_AWAITING_CRITIC"
 RUNNER_UP_REVISION_REQUIRED = "RUNNER_UP_REVISION_REQUIRED"
 MIN_CANDIDATES = 0
 MAX_CANDIDATES = 6
+
+
+def _max_candidates_for(store: Any, journal_scope: object) -> int:
+    """The shipped ceiling, or a journal's own frozen raise. Never below shipped."""
+
+    if store is None or not isinstance(journal_scope, str) or len(journal_scope) != 64:
+        return MAX_CANDIDATES
+    from solana_alpha_lab.factory.hfic_research_policy import limits_for_frozen_run
+
+    return int(limits_for_frozen_run(store, journal_scope)["max_generated"])
 PHASE_RANK = {
     "SYNTHESIS_COMPLETE": 0,
     "LEGACY_PARTIAL": 0,
@@ -923,7 +937,7 @@ def _reject_stale_fresh_session_draft(
         return
     packet_version = str(draft.get("packet_version") or "")
     declared = str(draft.get("generator_prompt_version") or "")
-    if packet_version == "1.2" and declared == PROMPT_VERSION:
+    if packet_version in ("1.2", "1.3") and declared == PROMPT_VERSION:
         return
     raise HficSessionError("FRESH_SESSION_DRAFT_VERSION_MISMATCH")
 
@@ -938,7 +952,7 @@ def _draft_packet_version(draft: Mapping[str, Any]) -> str:
 def _draft_prompt_version(draft: Mapping[str, Any]) -> str:
     packet_version = _draft_packet_version(draft)
     declared = str(draft.get("generator_prompt_version") or "")
-    expected = PROMPT_VERSION if packet_version == "1.2" else PROMPT_VERSION_V1_1
+    expected = PROMPT_VERSION if packet_version in ("1.2", "1.3") else PROMPT_VERSION_V1_1
     if declared and declared != expected:
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
     return expected
@@ -948,9 +962,11 @@ def _critic_packet_version(draft_packet_version: str) -> str:
     """Map Forge draft version to Critic transport version.
 
     Fresh HFIC-V1.2 freeze emits critic packet 1.4. Historical draft 1.1 stays
-    critic 1.1. Do not mint an HFIC-V1.3 or HFIC-V1.4 Prompt A.
+    critic 1.1. Do not mint an HFIC-V1.3 or HFIC-V1.4 Prompt A: draft
+    packet_version 1.3 is a wider candidate-count transport for the same
+    HFIC-V1.2 prompt, not a new prompt, and also emits critic packet 1.4.
     """
-    if draft_packet_version == "1.2":
+    if draft_packet_version in ("1.2", "1.3"):
         return CRITIC_PACKET_VERSION_CURRENT
     return CRITIC_PACKET_VERSION_V11
 
@@ -1843,7 +1859,9 @@ def freeze_draft(
         _validate_json_schema(draft, _draft_schema_path(repo_root, draft))
     candidates = draft.get("candidates")
     floor = 0 if _ordinary_discovery_requested(draft, preflight_receipt) else 4
-    if not isinstance(candidates, list) or not (floor <= len(candidates) <= MAX_CANDIDATES):
+    journal_for_cap = (preflight_receipt or {}).get("search_key_sha256")
+    ceiling = _max_candidates_for(store, journal_for_cap)
+    if not isinstance(candidates, list) or not (floor <= len(candidates) <= ceiling):
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
     try:
         identities = assign_portfolio_ids(candidates)
@@ -1856,7 +1874,7 @@ def freeze_draft(
         store=store,
     )
     grounded_candidates: list[dict[str, Any]] | None = None
-    if packet_version == "1.2":
+    if packet_version in ("1.2", "1.3"):
         if repo_root is None:
             raise HficSessionError("HFIC_PROTOCOL_INVALID")
         grounded_candidates = _ground_v12_candidates(
@@ -4444,7 +4462,7 @@ def persist_generated_draft(
     _draft_prompt_version(draft)
     candidates = draft.get("candidates")
     if not isinstance(candidates, list) or not (
-        MIN_CANDIDATES <= len(candidates) <= MAX_CANDIDATES
+        MIN_CANDIDATES <= len(candidates) <= _max_candidates_for(store, receipt.get("search_key_sha256"))
     ):
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
     try:
@@ -6895,7 +6913,9 @@ def apply_revision(
     _validate_revision_context_lock(existing, revised_draft)
     candidates = revised_draft.get("candidates")
     if not isinstance(candidates, list) or not (
-        MIN_CANDIDATES <= len(candidates) <= MAX_CANDIDATES
+        MIN_CANDIDATES
+        <= len(candidates)
+        <= _max_candidates_for(store, existing.get("search_key_sha256"))
     ):
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
     try:

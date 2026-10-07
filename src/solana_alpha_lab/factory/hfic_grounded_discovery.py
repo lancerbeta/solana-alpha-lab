@@ -1073,13 +1073,17 @@ def summarize_discovery_query(
 def classify_query_look(
     previous: Sequence[Mapping[str, Any]],
     spec: Mapping[str, Any],
+    *,
+    limits: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Cost budget. Same bytes are a retry. A changed question is a new variant."""
 
     if _is_temporal_query(spec):
         from solana_alpha_lab.factory.hfic_temporal_discovery import classify_temporal_look
 
-        return classify_temporal_look(previous, spec)
+        return classify_temporal_look(previous, spec, limits=limits)
+    main_total = MAX_MAIN_QUERY_SPECS if limits is None else int(limits["main_total"])
+    adaptive_total = MAX_ADAPTIVE_REFINEMENTS if limits is None else int(limits["adaptive_total"])
     bound = validate_query_spec(spec)
     digest = bound["spec_sha256"]
     mains = [
@@ -1104,9 +1108,9 @@ def classify_query_look(
         item for item in previous if item.get("query_id") == bound["query_id"] and item.get("new_look") is True
     ]
     look_class = "ADAPTIVE" if same_family else "MAIN"
-    if look_class == "MAIN" and len(mains) >= MAX_MAIN_QUERY_SPECS:
+    if look_class == "MAIN" and len(mains) >= main_total:
         raise GroundedDiscoveryError("QUERY_MAIN_BUDGET_EXHAUSTED")
-    if look_class == "ADAPTIVE" and len(adaptive) >= MAX_ADAPTIVE_REFINEMENTS:
+    if look_class == "ADAPTIVE" and len(adaptive) >= adaptive_total:
         raise GroundedDiscoveryError("QUERY_ADAPTIVE_BUDGET_EXHAUSTED")
     return {
         "query_id": bound["query_id"],
@@ -2549,9 +2553,14 @@ def run_recorded_discovery_query(
         if policy_definition is None and not revising_legacy:
             raise GroundedDiscoveryError("UNIVERSE_POLICY_REQUIRED")
         if _is_temporal_query(spec):
+            from solana_alpha_lab.factory.hfic_research_policy import limits_for_frozen_run
             from solana_alpha_lab.factory.hfic_temporal_discovery import classify_temporal_look
 
-            classify_temporal_look(list_discovery_looks(store, journal_scope), spec)
+            classify_temporal_look(
+                list_discovery_looks(store, journal_scope),
+                spec,
+                limits=limits_for_frozen_run(store, journal_scope),
+            )
             if source_look is None:
                 _append_temporal_intent(
                     store,
@@ -2659,7 +2668,11 @@ def run_recorded_discovery_query(
     if policy_shift and _is_temporal_query(spec):
         classify_spec = dict(spec)
         classify_spec["adaptation_of"] = summary["spec_sha256"]
-    look = classify_query_look(budget_history, classify_spec)
+    from solana_alpha_lab.factory.hfic_research_policy import limits_for_frozen_run
+
+    look = classify_query_look(
+        budget_history, classify_spec, limits=limits_for_frozen_run(store, journal_scope)
+    )
     revision_of: dict[str, Any] | None = None
     if source_look is not None:
         from solana_alpha_lab.factory.hfic_temporal_discovery import (

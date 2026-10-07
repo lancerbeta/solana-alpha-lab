@@ -2388,6 +2388,181 @@ def cmd_memory_policy_apply(
     return emit(payload)
 
 
+_RESEARCH_POLICY_LIMIT_FLAGS = (
+    "auto_cycles_per_market",
+    "distinct_focuses_per_market",
+    "main_total",
+    "adaptive_total",
+    "preview_total",
+    "simple_before_compound",
+    "max_generated",
+    "max_diagnostic_slices",
+)
+
+
+def _research_policy_delta(args: Any) -> dict[str, int]:
+    delta: dict[str, int] = {}
+    for field in _RESEARCH_POLICY_LIMIT_FLAGS:
+        value = getattr(args, field, None)
+        if value is not None:
+            delta[field] = int(value)
+    return delta
+
+
+def cmd_research_policy_status(
+    repo_root: Path, explicit_data_root: Path | None, *, journal_scope: str | None
+) -> int:
+    from solana_alpha_lab.factory.hfic_research_policy import (
+        effective_policy,
+        limits_for_frozen_run,
+        read_run_extensions,
+        read_run_snapshot,
+    )
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    head = effective_policy(store)
+    payload: dict[str, Any] = {
+        "action": "RESEARCH_POLICY_STATUS",
+        "state": head["state"],
+        "limits": head["limits"],
+        "presets": head["presets"],
+        "semantic_sha256": head["semantic_sha256"],
+        "policy_head_sha256": head["policy_head_sha256"],
+        "policy_sequence": head["policy_sequence"],
+        "next_action": head["next_action"],
+        "shipped_defaults": {
+            "auto_cycles_per_market": 1,
+            "distinct_focuses_per_market": 3,
+            "main_total": 6,
+            "adaptive_total": 2,
+            "preview_total": 2,
+            "simple_before_compound": 3,
+            "max_generated": 6,
+            "max_diagnostic_slices": 8,
+        },
+        "claim_boundary": "A budget ceiling for new runs. Not a scientific look and not strategy promotion.",
+        "authority": {"git_mutation": 0, "experiment_execution": 0, "provider_api_rpc_wss_calls": 0},
+        "writes": {"research_store": 0},
+    }
+    if journal_scope:
+        snapshot = read_run_snapshot(store, journal_scope)
+        payload["journal"] = {
+            "journal_scope": journal_scope,
+            "frozen": snapshot is not None,
+            "effective_limits": limits_for_frozen_run(store, journal_scope),
+            "extension_count": len(read_run_extensions(store, journal_scope)),
+        }
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_research_policy_preview(repo_root: Path, explicit_data_root: Path | None, args: Any) -> int:
+    from solana_alpha_lab.factory.hfic_research_policy import (
+        ResearchPolicyError,
+        preview_policy_change,
+    )
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    try:
+        payload = preview_policy_change(
+            store,
+            limits_delta=_research_policy_delta(args) or None,
+            preset_name=args.preset,
+        )
+    except ResearchPolicyError as exc:
+        body = {"reason_code": exc.code, "next_action": "READ_RESEARCH_POLICY_STATUS", "writes": {"research_store": 0}}
+        _assert_no_path_leak(body, str(data_root), str(repo_root))
+        return emit(body, exit_code=2)
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_research_policy_apply(
+    repo_root: Path, *, explicit_data_root: Path | None, proposal_path: Path, confirm_append_only: bool
+) -> int:
+    from solana_alpha_lab.factory.hfic_research_policy import (
+        ResearchPolicyError,
+        apply_policy_change,
+    )
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    proposal = _load_json_file(proposal_path)
+    nested = proposal.get("proposal")
+    body = nested if isinstance(nested, dict) else proposal
+    try:
+        payload = apply_policy_change(store, proposal=body, confirm_append_only=confirm_append_only)
+    except ResearchPolicyError as exc:
+        next_action = {
+            "RESEARCH_POLICY_PREVIEW_STALE": "REPEAT_PREVIEW",
+            "RESEARCH_POLICY_CONFIRM_REQUIRED": "RETRY_APPLY_WITH_CONFIRM_APPEND_ONLY",
+        }.get(exc.code, "READ_RESEARCH_POLICY_STATUS")
+        error_body = {"reason_code": exc.code, "next_action": next_action, "writes": {"research_store": 0}}
+        _assert_no_path_leak(error_body, str(data_root), str(repo_root))
+        return emit(error_body, exit_code=2)
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_research_policy_extension_preview(
+    repo_root: Path,
+    explicit_data_root: Path | None,
+    *,
+    journal_scope: str,
+    parent_operation_sha256: str,
+    args: Any,
+) -> int:
+    from solana_alpha_lab.factory.hfic_research_policy import (
+        ResearchPolicyError,
+        propose_run_extension,
+    )
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    try:
+        payload = propose_run_extension(
+            store,
+            journal_scope=journal_scope,
+            parent_operation_sha256=parent_operation_sha256,
+            limits_delta=_research_policy_delta(args),
+        )
+    except ResearchPolicyError as exc:
+        body = {"reason_code": exc.code, "next_action": "READ_RESEARCH_POLICY_STATUS", "writes": {"research_store": 0}}
+        _assert_no_path_leak(body, str(data_root), str(repo_root))
+        return emit(body, exit_code=2)
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit({"action": "RESEARCH_POLICY_EXTENSION_PREVIEW", "proposal": payload})
+
+
+def cmd_research_policy_extension_apply(
+    repo_root: Path, *, explicit_data_root: Path | None, proposal_path: Path, confirm_append_only: bool
+) -> int:
+    from solana_alpha_lab.factory.hfic_research_policy import (
+        ResearchPolicyError,
+        apply_run_extension,
+    )
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    proposal = _load_json_file(proposal_path)
+    nested = proposal.get("proposal")
+    body = nested if isinstance(nested, dict) else proposal
+    try:
+        payload = apply_run_extension(store, proposal=body, confirm_append_only=confirm_append_only)
+    except ResearchPolicyError as exc:
+        next_action = {
+            "RESEARCH_POLICY_EXTENSION_STALE": "REPEAT_EXTENSION_PREVIEW",
+            "RESEARCH_POLICY_CONFIRM_REQUIRED": "RETRY_APPLY_WITH_CONFIRM_APPEND_ONLY",
+        }.get(exc.code, "READ_RESEARCH_POLICY_STATUS")
+        error_body = {"reason_code": exc.code, "next_action": next_action, "writes": {"research_store": 0}}
+        _assert_no_path_leak(error_body, str(data_root), str(repo_root))
+        return emit(error_body, exit_code=2)
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
 def cmd_universe_policy_status(repo_root: Path, explicit_data_root: Path | None) -> int:
     from solana_alpha_lab.factory.hfic_research_universe_policy import status_payload
 
@@ -4170,6 +4345,45 @@ def build_parser() -> argparse.ArgumentParser:
         help="required; appends policy only; never rewrites historical RDP bytes",
     )
     apply_cmd.add_argument("--format", choices=("json",), default="json")
+    def _add_research_policy_limit_flags(parser: Any) -> None:
+        for field in _RESEARCH_POLICY_LIMIT_FLAGS:
+            parser.add_argument(f"--{field.replace('_', '-')}", type=int, default=None)
+
+    research_policy_status = subparsers.add_parser(
+        "research-policy-status",
+        help="read the active Forge research-policy runtime, optionally for one journal",
+    )
+    research_policy_status.add_argument("--journal-scope", default=None)
+    research_policy_status.add_argument("--format", choices=("json",), default="json")
+    research_policy_preview = subparsers.add_parser(
+        "research-policy-preview",
+        help="preview a research-policy limits change; reads no market values",
+    )
+    _add_research_policy_limit_flags(research_policy_preview)
+    research_policy_preview.add_argument("--preset", default=None)
+    research_policy_preview.add_argument("--format", choices=("json",), default="json")
+    research_policy_apply = subparsers.add_parser(
+        "research-policy-apply",
+        help="append one authorized research-policy change for new runs",
+    )
+    research_policy_apply.add_argument("--proposal", type=Path, required=True)
+    research_policy_apply.add_argument("--confirm-append-only", action="store_true")
+    research_policy_apply.add_argument("--format", choices=("json",), default="json")
+    research_policy_ext_preview = subparsers.add_parser(
+        "research-policy-extension-preview",
+        help="preview an explicit limits extension for one exact open journal; never resets spend",
+    )
+    research_policy_ext_preview.add_argument("--journal-scope", required=True)
+    research_policy_ext_preview.add_argument("--parent-operation-sha256", required=True)
+    _add_research_policy_limit_flags(research_policy_ext_preview)
+    research_policy_ext_preview.add_argument("--format", choices=("json",), default="json")
+    research_policy_ext_apply = subparsers.add_parser(
+        "research-policy-extension-apply",
+        help="append one authorized limits extension for one exact journal",
+    )
+    research_policy_ext_apply.add_argument("--proposal", type=Path, required=True)
+    research_policy_ext_apply.add_argument("--confirm-append-only", action="store_true")
+    research_policy_ext_apply.add_argument("--format", choices=("json",), default="json")
     universe_status = subparsers.add_parser(
         "universe-policy-status",
         help="read the active Forge research-universe profile from ResearchStore",
@@ -4576,6 +4790,32 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.command == "operation-stop":
             return cmd_operation_stop(
+                repo_root,
+                explicit_data_root=args.data_root,
+                proposal_path=args.proposal,
+                confirm_append_only=bool(args.confirm_append_only),
+            )
+        if args.command == "research-policy-status":
+            return cmd_research_policy_status(repo_root, args.data_root, journal_scope=args.journal_scope)
+        if args.command == "research-policy-preview":
+            return cmd_research_policy_preview(repo_root, args.data_root, args)
+        if args.command == "research-policy-apply":
+            return cmd_research_policy_apply(
+                repo_root,
+                explicit_data_root=args.data_root,
+                proposal_path=args.proposal,
+                confirm_append_only=bool(args.confirm_append_only),
+            )
+        if args.command == "research-policy-extension-preview":
+            return cmd_research_policy_extension_preview(
+                repo_root,
+                args.data_root,
+                journal_scope=args.journal_scope,
+                parent_operation_sha256=args.parent_operation_sha256,
+                args=args,
+            )
+        if args.command == "research-policy-extension-apply":
+            return cmd_research_policy_extension_apply(
                 repo_root,
                 explicit_data_root=args.data_root,
                 proposal_path=args.proposal,
