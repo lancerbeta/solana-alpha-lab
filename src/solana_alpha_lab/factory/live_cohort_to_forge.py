@@ -856,6 +856,11 @@ def forge_control_ready(
                 owner_focus=focus,
             ),
         )
+    _preflight_limits = None
+    if store is not None:
+        from solana_alpha_lab.factory.hfic_research_policy import limits_for_frozen_run
+
+        _preflight_limits = limits_for_frozen_run(store, search_key)
     action, _bound = decide_preflight_action(
         sessions,
         search_key=search_key,
@@ -874,6 +879,14 @@ def forge_control_ready(
             "capability_epoch_sha256": capability_epoch,
         },
         repo_root=Path(repo_root),
+        **(
+            {
+                "auto_sessions_per_market": _preflight_limits["auto_cycles_per_market"],
+                "max_distinct_focuses": _preflight_limits["distinct_focuses_per_market"],
+            }
+            if _preflight_limits is not None
+            else {}
+        ),
     )
     if action == "STOP":
         _require(False, str(_bound or "SEARCH_BUDGET_EXHAUSTED"))

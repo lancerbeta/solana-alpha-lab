@@ -589,6 +589,8 @@ def decide_preflight_action(
     repo_root: Path | None = None,
     repair_continuations: Sequence[Mapping[str, Any]] | None = None,
     market_evidence_basis: Mapping[str, Any] | None = None,
+    auto_sessions_per_market: int = AUTO_SESSIONS_PER_EPOCH,
+    max_distinct_focuses: int = MAX_DISTINCT_FOCUSES_PER_EPOCH,
 ) -> tuple[str, str | None]:
     from solana_alpha_lab.factory.hfic_control_integrity import (
         session_evidence_surface_mode,
@@ -624,8 +626,8 @@ def decide_preflight_action(
             memory_eligibility_sha256=memory_eligibility_sha256,
             evidence_surface_mode=evidence_surface_mode,
             repo_root=repo_root,
-            auto_sessions_per_market=AUTO_SESSIONS_PER_EPOCH,
-            max_distinct_focuses=MAX_DISTINCT_FOCUSES_PER_EPOCH,
+            auto_sessions_per_market=auto_sessions_per_market,
+            max_distinct_focuses=max_distinct_focuses,
             repair_continuations=repair_continuations,
             market_evidence_basis=market_evidence_basis,
         )
@@ -755,13 +757,14 @@ def decide_preflight_action(
         sessions_for_market_budget(sessions, market_evidence_epoch=evidence_epoch, market_evidence_basis=market_evidence_basis)
     )
     if _is_auto_focus(owner_focus):
-        auto_count = int(
-            any(
-                _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
-                for item in same_epoch_for_budget
-            )
-        )
-        if auto_count >= AUTO_SESSIONS_PER_EPOCH:
+        distinct_auto_search_keys = {
+            str(item.get("search_key_sha256") or "")
+            for item in same_epoch_for_budget
+            if _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
+            and item.get("search_key_sha256")
+        }
+        auto_count = len(distinct_auto_search_keys)
+        if auto_count >= auto_sessions_per_market:
             return ("STOP", "SEARCH_BUDGET_EXHAUSTED")
         return ("START_NEW_SESSION", None)
 
@@ -770,7 +773,7 @@ def decide_preflight_action(
         for item in same_epoch_for_budget
         if item.get("focus_key_sha256")
     }
-    if focus_key not in distinct and len(distinct) >= MAX_DISTINCT_FOCUSES_PER_EPOCH:
+    if focus_key not in distinct and len(distinct) >= max_distinct_focuses:
         return ("STOP", "SEARCH_BUDGET_EXHAUSTED")
     return ("START_NEW_SESSION", None)
 
@@ -781,6 +784,8 @@ def epoch_search_budget_usage(
     evidence_epoch: str,
     reservations: Sequence[Mapping[str, Any]] | None = None,
     market_evidence_basis: Mapping[str, Any] | None = None,
+    auto_sessions_per_market: int = AUTO_SESSIONS_PER_EPOCH,
+    max_distinct_focuses: int = MAX_DISTINCT_FOCUSES_PER_EPOCH,
 ) -> dict[str, Any]:
     """Market-epoch-scoped AUTO / distinct-focus usage (A5; not capability/Git)."""
     from solana_alpha_lab.factory.hfic_evidence_identity import (
@@ -815,12 +820,15 @@ def epoch_search_budget_usage(
         deduped_epoch.append(item)
     same_epoch = deduped_epoch
     # AUTO=1 is a market-scoped search admission; child representation rows
-    # must not consume another AUTO budget unit.
-    auto_used = int(
-        any(
-            _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
+    # (same search_key, a different ladder representation) must not consume
+    # another AUTO budget unit, so this counts distinct search keys, not rows.
+    auto_used = len(
+        {
+            str(item.get("search_key_sha256") or "")
             for item in same_epoch
-        )
+            if _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
+            and item.get("search_key_sha256")
+        }
     )
     distinct = {
         str(item.get("focus_key_sha256") or "")
@@ -851,11 +859,11 @@ def epoch_search_budget_usage(
     return {
         "evidence_epoch_sha256": evidence_epoch,
         "auto_sessions_used": auto_used,
-        "auto_sessions_per_evidence_epoch": AUTO_SESSIONS_PER_EPOCH,
+        "auto_sessions_per_evidence_epoch": auto_sessions_per_market,
         "distinct_focus_used": len(distinct),
-        "distinct_focus_sessions_per_evidence_epoch": MAX_DISTINCT_FOCUSES_PER_EPOCH,
+        "distinct_focus_sessions_per_evidence_epoch": max_distinct_focuses,
         "distinct_focus_remaining": max(
-            0, MAX_DISTINCT_FOCUSES_PER_EPOCH - len(distinct)
+            0, max_distinct_focuses - len(distinct)
         ),
         "focus_key_sha256_set": sorted(distinct),
         "representation_slots": list(representation_slots.values()),
@@ -3072,6 +3080,9 @@ def run_preflight(
         execution_context["capability_epoch_sha256"] = capability_epoch
     if model_provenance_sha256 is not None:
         execution_context["model_provenance_sha256"] = model_provenance_sha256
+    from solana_alpha_lab.factory.hfic_research_policy import ensure_run_snapshot
+
+    _preflight_limits = ensure_run_snapshot(store, search_key)["limits"]
     action, bound_session = decide_preflight_action(
         sessions,
         search_key=search_key,
@@ -3089,6 +3100,8 @@ def run_preflight(
         repo_root=Path(repo_root),
         repair_continuations=repair_continuations,
         market_evidence_basis=forge_input.get("market_evidence_basis") if market_admission_ready else None,
+        auto_sessions_per_market=_preflight_limits["auto_cycles_per_market"],
+        max_distinct_focuses=_preflight_limits["distinct_focuses_per_market"],
     )
     if (
         not market_admission_ready
@@ -3180,6 +3193,8 @@ def run_preflight(
         search_budget = epoch_search_budget_usage(
             sessions, evidence_epoch=epoch, reservations=reservations,
             market_evidence_basis=forge_input.get("market_evidence_basis") if market_admission_ready else None,
+            auto_sessions_per_market=_preflight_limits["auto_cycles_per_market"],
+            max_distinct_focuses=_preflight_limits["distinct_focuses_per_market"],
         )
     except ValueError as exc:
         if str(exc) != "MARKET_EPOCH_CONTINUITY_UNRESOLVED":

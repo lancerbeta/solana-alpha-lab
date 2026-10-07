@@ -487,6 +487,9 @@ def preview_control_reconsideration(
                 for item in (readback.get("visible_cohorts") or [])
                 if isinstance(item, Mapping) and item.get("cohort_id")
             ]
+    from solana_alpha_lab.factory.hfic_research_policy import ensure_run_snapshot
+
+    _preflight_limits = ensure_run_snapshot(store, planned_search_key)["limits"]
     action, _bound = decide_preflight_action(
         sessions,
         search_key=planned_search_key,
@@ -504,6 +507,8 @@ def preview_control_reconsideration(
             "capability_epoch_sha256": current_capability_epoch,
         },
         repo_root=Path(repo_root),
+        auto_sessions_per_market=_preflight_limits["auto_cycles_per_market"],
+        max_distinct_focuses=_preflight_limits["distinct_focuses_per_market"],
     )
     live_present = any(
         str(item.get("dataset_id") or "") == CORPUS_DATASET_ID

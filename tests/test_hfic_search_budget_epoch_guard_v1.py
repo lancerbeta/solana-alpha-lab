@@ -249,5 +249,86 @@ class HficSearchBudgetEpochGuardTests(unittest.TestCase):
         self.assertEqual(usage["distinct_focus_used"], 0)
 
 
+class ResearchPolicyRaisedAutoBudgetTests(unittest.TestCase):
+    """The research-policy runtime, not a hardcoded constant, now governs AUTO 1->2."""
+
+    def test_second_auto_is_denied_at_the_shipped_default_then_admitted_after_an_explicit_raise(self) -> None:
+        import tempfile
+        from pathlib import Path
+
+        from solana_alpha_lab.factory import hfic_research_policy as rp
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        first = [
+            _session(
+                session_id="HFIC-SESS-AUTO1",
+                epoch=EPOCH_A,
+                owner_focus="AUTO",
+                memory_eligibility=MEM_Q1,
+            )
+        ]
+        second_search_key = search_key_sha256(EPOCH_A, "AUTO", PROMPT_VERSION, MEM_Q2)
+        with tempfile.TemporaryDirectory() as raw:
+            store = ResearchStore(Path(raw))
+            # The first real touch of this journal (the same call the
+            # production preflight path makes) freezes its limits at the
+            # shipped default: still denied.
+            first_touch_limits = rp.ensure_run_snapshot(store, second_search_key)["limits"]
+            self.assertEqual(first_touch_limits["auto_cycles_per_market"], AUTO_SESSIONS_PER_EPOCH)
+            action, terminal = decide_preflight_action(
+                first,
+                search_key=second_search_key,
+                evidence_epoch=EPOCH_A,
+                focus_key=focus_key_sha256("AUTO"),
+                owner_focus="AUTO",
+                memory_eligibility_sha256=MEM_Q2,
+                auto_sessions_per_market=first_touch_limits["auto_cycles_per_market"],
+                max_distinct_focuses=first_touch_limits["distinct_focuses_per_market"],
+            )
+            self.assertEqual(action, "STOP")
+            self.assertEqual(terminal, "SEARCH_BUDGET_EXHAUSTED")
+
+            # A bare active-policy raise does not move an already-frozen
+            # journal: only an explicit extension of this exact journal does.
+            preview = rp.preview_policy_change(store, limits_delta={"auto_cycles_per_market": 2})
+            applied = rp.apply_policy_change(store, proposal=preview["proposal"], confirm_append_only=True)
+            self.assertEqual(applied["status"], "APPENDED")
+            unmoved_limits = rp.limits_for_frozen_run(store, second_search_key)
+            self.assertEqual(unmoved_limits["auto_cycles_per_market"], 1)
+
+            ext_proposal = rp.propose_run_extension(
+                store,
+                journal_scope=second_search_key,
+                parent_operation_sha256="7" * 64,
+                limits_delta={"auto_cycles_per_market": 2},
+            )
+            ext_applied = rp.apply_run_extension(store, proposal=ext_proposal, confirm_append_only=True)
+            self.assertEqual(ext_applied["status"], "APPENDED")
+            raised_limits = rp.limits_for_frozen_run(store, second_search_key)
+            self.assertEqual(raised_limits["auto_cycles_per_market"], 2)
+
+            action2, terminal2 = decide_preflight_action(
+                first,
+                search_key=second_search_key,
+                evidence_epoch=EPOCH_A,
+                focus_key=focus_key_sha256("AUTO"),
+                owner_focus="AUTO",
+                memory_eligibility_sha256=MEM_Q2,
+                auto_sessions_per_market=raised_limits["auto_cycles_per_market"],
+                max_distinct_focuses=raised_limits["distinct_focuses_per_market"],
+            )
+            self.assertEqual(action2, "START_NEW_SESSION")
+            self.assertIsNone(terminal2)
+
+            # The first journal, never touched by this owner, still reads
+            # the shipped defaults unchanged.
+            first_search_key = search_key_sha256(EPOCH_A, "AUTO", PROMPT_VERSION, MEM_Q1)
+            self.assertEqual(
+                rp.limits_for_frozen_run(store, first_search_key),
+                rp.DEFAULT_LIMITS,
+            )
+            self.assertIsNone(rp.read_run_snapshot(store, first_search_key))
+
+
 if __name__ == "__main__":
     unittest.main()
