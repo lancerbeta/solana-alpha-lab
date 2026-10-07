@@ -44,6 +44,15 @@ persisted draft, typed `temporal_recipe.frozen_input`, ExperimentSpec 1.3
 An orphan generated draft may resume only through the existing verified
 `prefreeze_capability_repair`, retaining its original slot/reservation/accounting.
 
+Supported Spec 1.3 frozen temporal replay consumes its own admitted source
+release closure, never an alias or fabricated binding to the expected C1.
+The same pre-value recipe/file/manifest/cutoff binder feeds the runner and
+metadata-only outcome projection. Factory X300 geometry, required outcomes,
+typed missingness and the complete base denominator remain fail-closed.
+A proved stored covering panel has zero future collection cost; only a route
+that will collect computes and enforces the authored collection envelope.
+The frozen schedule and its limits are never rewritten to obtain reuse.
+
 Before a fresh generated draft, frozen session or zero-candidate terminal can
 write, the inline context/digest must agree and the exact context blob and
 committed artifact must exist under that ResearchStore root. Existing

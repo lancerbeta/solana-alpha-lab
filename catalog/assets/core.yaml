@@ -33250,7 +33250,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_compiler.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_compiler.py}
-  integrity: {kind: sha256, sha256: f81160d5b46d0875be3daea5fe5e97259a45cd18fcabe1802ea0bb82f04fc00a}
+  integrity: {kind: sha256, sha256: 75cce90f7bd3b274d6648bc50cb8a2ebdeb4479e13622ac06f08e4f31708656c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -37993,7 +37993,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: ef8b5e93ced80bdfc3a8424bb24e5393b981e6a5465a2c371a7d08deb2edf8de}
+  integrity: {kind: sha256, sha256: 09bd2276f590f3d1c69169f9eea30acabcd03258d86ef1abbec04ce6e54cf145}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -38156,7 +38156,7 @@ records:
   as_of: '2026-09-18'
   truth_owner: HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/scientific_eligibility_projection.py', repository_path: src/solana_alpha_lab/factory/scientific_eligibility_projection.py}
-  integrity: {kind: sha256, sha256: d2623fb5dccd2ebc9066a6af7e792fbdce9e450b0f1959be7dd234a9f094d746}
+  integrity: {kind: sha256, sha256: a084c1e8d25a2f42b71804079dd7f48d85ab8b010ff8fd7170d103b757cc8321}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001}
@@ -40469,7 +40469,7 @@ records:
   as_of: '2026-10-07'
   truth_owner: FORGE_GROUNDED_HANDOFF_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_grounded_handoff_closure_v1.md', repository_path: docs/contracts/forge_grounded_handoff_closure_v1.md}
-  integrity: {kind: sha256, sha256: 3b5a63314db82b1449c69c220dfbc6e8abf6f77736fc3774fb84c23cf0360fc6}
+  integrity: {kind: sha256, sha256: 0de6a8ce30d77024e779972d9cb85a1f4394136e7bf829cffa202cc9dce4d7f6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-RESEARCH-SCOPE-001}

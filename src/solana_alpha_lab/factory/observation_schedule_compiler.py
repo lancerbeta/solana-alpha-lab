@@ -296,9 +296,6 @@ def compile_observation_request(
         registry.verify_implementation_hashes()
         validated = validate_observation_schedule(document, root=root)
         _resolve_registered(validated, registry)
-        envelope = _compute_budget(validated, registry)
-        if not _budget_fits(validated["budgets"], envelope):
-            return _deny("BLOCKED_BUDGET")
         digest = str(validated["schedule_sha256"])
         mode = str(request["collection_mode"])
         cutoff = parse_utc(spec["availability_cutoff"])
@@ -367,6 +364,17 @@ def compile_observation_request(
             y_availability_proven=y_proven if snapshot_record is not None else True,
         )
         if snapshot_record is not None and mode in {"REUSE_ONLY", "REUSE_OR_SCHEDULE"}:
+            # A proved stored panel requires no future collection. Preserve the
+            # authored schedule and limits; report the reuse cost separately.
+            envelope = BudgetEnvelope(
+                discovery_calls=0, batch_snapshot_calls=0, x_point_calls=0, y_point_calls=0,
+                provider_calls_per_tick_max=0, provider_calls_per_utc_day_max=0,
+                provider_calls_lifetime_max=0, modeled_credits_per_utc_day_max=0,
+                raw_bytes_per_utc_day_max=0, canonical_bytes_lifetime_max=0,
+                min_raw_retention_days=0,
+                max_members_per_utc_day=int(validated["sampling"]["max_members_per_utc_day"]),
+                latest_final_due_offset_seconds=int(validated["y_points"][-1]["due_offset_seconds"]),
+            )
             covering_digest = str(
                 snapshot_record["schedule"].get("schedule_sha256")
                 or schedule_sha256(snapshot_record["schedule"])
@@ -387,6 +395,9 @@ def compile_observation_request(
             )
         if mode == "REUSE_ONLY":
             return _deny("BLOCKED_BUDGET", "NO_COVERING_SNAPSHOT")
+        envelope = _compute_budget(validated, registry)
+        if not _budget_fits(validated["budgets"], envelope):
+            return _deny("BLOCKED_BUDGET")
         active = index.covering_active_schedule(validated, now=classifier_evaluated_at)
         if active is not None:
             return _compiler_result(

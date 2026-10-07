@@ -285,6 +285,33 @@ def _bind_experiment(recipe: dict, data_root: Path) -> dict:
 
 
 class TemporalVerticalTests(unittest.TestCase):
+    def test_spec13_frozen_release_projection_reads_metadata_without_evaluation(self) -> None:
+        from solana_alpha_lab.factory.scientific_eligibility_projection import (
+            try_project_scientific_eligibility_from_data_root, validated_projection_readiness,
+        )
+        with tempfile.TemporaryDirectory() as temporary:
+            workspace = Path(temporary)
+            data_root = workspace / "data"
+            _publish(data_root, workspace)
+            loaded = load_admitted_partition_rows(data_root=data_root, binding_doc=None,
+                                                  partitions=None, census_path=None, observations_path=None)
+            query = _spec(cost_profile=None, schedule={"lateness_seconds": DOCUMENT_LATENESS})
+            result = execute_discovery_from_rows(loaded["census"], loaded["observations"],
+                                                 query, loaded["cohorts"])
+            recipe = result["summary"]["experiment_recipe"]
+            experiment = _bind_experiment(recipe, data_root)
+            experiment.update(schema_version="1.3", observation_request={**_schedule(),
+                "collection_mode": "REUSE_ONLY", "requested_evidence_role": "EXPLORATORY_REUSE"},
+                required_outcomes=[{"point_id": "Y7200", "field_ids": [PRICE], "role": "PRIMARY"}])
+            with patch("solana_alpha_lab.factory.hfic_temporal_discovery.execute_temporal_discovery",
+                       side_effect=AssertionError("projection must not evaluate")):
+                projection = try_project_scientific_eligibility_from_data_root(
+                    data_root, repo_root=ROOT, spec=experiment, schedule=_schedule())
+            self.assertIsNotNone(projection)
+            self.assertEqual(validated_projection_readiness(experiment, projection), "COMPLETE")
+            self.assertEqual(projection["release_binding"]["frozen_input"], recipe["frozen_input"])
+            self.assertTrue(projection["invariants"]["no_y_typed_value_read"])
+
     def test_published_journal_reaches_document_runner_readback(self) -> None:
         spec = _spec(cost_profile=None, schedule={"lateness_seconds": DOCUMENT_LATENESS})
         simple = _spec(

@@ -28,6 +28,20 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hfic_research_scope.py
 - src/solana_alpha_lab/factory/hfic_temporal_discovery.py
 - scripts/hypothesis_forge.py
+- src/solana_alpha_lab/factory/observation_schedule_compiler.py
+- src/solana_alpha_lab/factory/observation_panel_coverage.py
+- src/solana_alpha_lab/factory/observation_panel_publisher.py
+- src/solana_alpha_lab/factory/observation_schedule_capability.py
+- src/solana_alpha_lab/factory/scientific_eligibility_projection.py
+- src/solana_alpha_lab/factory/document_runner.py
+- src/solana_alpha_lab/factory/lane_classifier.py
+- src/solana_alpha_lab/factory/experiment_spec.py
+- src/solana_alpha_lab/factory/run_passport.py
+- catalog/schemas/experiment_spec_v1_3.schema.json
+- tests/test_observation_schedule_compiler.py
+- tests/test_scientific_eligibility_projection_v1.py
+- tests/test_fast_lane_runner.py
+- tests/test_hfic_temporal_production_runner_v1.py
 - catalog/schemas/hypothesis_forge_draft_v1_2.schema.json
 - catalog/schemas/hypothesis_critic_input_v1.schema.json
 - .agents/skills/hypothesis-forge/SKILL.md
@@ -95,6 +109,25 @@ no draft rewrite, refund, reroll or softened data/schema semantics. Push/PR/merg
 are forbidden before the complete checkpoint. A cheap existing chronological
 consumer may consume only an already frozen later/sign-reversed branch; absent
 consumer/input is a named gap, not permission to build a new subsystem.
+
+H09 continuation authority: the owner explicitly expanded this same bounded
+atom through existing compiler/coverage/canonical-release/replay/ExperimentSpec/
+DocumentRunner owners and direct validators/consumers. Routine write-set,
+schema/helper/test/contract and generated propagation changes are authorized;
+ordinary commits, non-force push/PR, exact-head CI and merge-readiness are
+authorized after truthful H09 evidence. Disposable synthetic snapshot/binding
+materialization must derive from the existing frozen source lineage and pass
+the production contract; it cannot fabricate coverage or release identity.
+H08 is retained, not rerun. Same candidate/definition/recipe/source bindings,
+slot/reservation/look/accounting and KILL_LOW_INFORMATION_VALUE are immutable.
+No new MAIN/ADAPTIVE/PREVIEW/holdout, budget increase or outcome-informed
+selection. New evaluator/service/database/dependency, changed scientific
+meaning/recipe, live provider/production/VPS/credentials/settings/money or
+destructive history remain stops. Existing-owner mismatches are routine repair,
+not owner gates. Stop after exact-head CI and machine merge-readiness at the
+machine-rendered exact owner phrase; no merge without that separate phrase.
+If no lawful existing replay capability can execute the exact recipe, return
+H09_UNEXECUTABLE_WITH_CURRENT_CAPABILITY with the proved earliest root cause.
 
 ENTRY_DECISION: START_WITH_PATCH. SPEC_ROUTE: BOTH. MODEL_EFFORT: SOL_XHIGH.
 Consumer: ordinary Forge generator, independent Critic and existing experiment
