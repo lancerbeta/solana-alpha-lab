@@ -145,7 +145,9 @@ def record_operation(
     cycle_probe = request.get("cycle_index")
     accounting_root = None
     if isinstance(cycle_probe, int) and not isinstance(cycle_probe, bool) and cycle_probe > 1:
-        accounting_root = _validated_lineage_link(store, request, journal=journal, focus=focus, market=market)
+        accounting_root = _validated_lineage_link(
+            store, request, journal=journal, focus=focus, market=market, cycle_index=int(cycle_probe)
+        )
     elif isinstance(parent, str):
         prior = get_operation(store, parent)
         if prior.get("status") == "STOPPED":
@@ -226,7 +228,7 @@ def record_operation(
 
 
 def _validated_lineage_link(
-    store: Any, request: Mapping[str, Any], *, journal: str, focus: str, market: str
+    store: Any, request: Mapping[str, Any], *, journal: str, focus: str, market: str, cycle_index: int
 ) -> str:
     """A later AUTO cycle is a linked segment of one search: same market, focus and representation.
 
@@ -238,10 +240,15 @@ def _validated_lineage_link(
     parent = request.get("parent_operation_sha256")
     if len(root) != 64 or root == journal or not isinstance(parent, str) or len(parent) != 64:
         raise OrdinaryOperationError("ORDINARY_OPERATION_ACCOUNTING_ROOT_REQUIRED")
+    from solana_alpha_lab.factory.hfic_memory_policy import cycle_search_key
+
+    if journal != cycle_search_key(root, cycle_index):
+        # Pure hash check, independent of any data root: the journal must be this root's cycle key.
+        raise OrdinaryOperationError("ORDINARY_OPERATION_ACCOUNTING_ROOT_MISMATCH")
     lineage = [
         item
         for item in list_operations(store)
-        if item.get("journal_scope") == root or item.get("accounting_root") == root
+        if item.get("journal_scope") == root or (item.get("accounting_root") == root and _canonical_lineage_row(item))
     ]
     base = [item for item in lineage if item.get("journal_scope") == root and not item.get("accounting_root")]
     if not base:
@@ -384,11 +391,26 @@ def _refuse_closed(store: Any, operation: Mapping[str, Any]) -> None:
             raise OrdinaryOperationError("ORDINARY_OPERATION_COMPLETED")
 
 
+def _canonical_lineage_row(item: Mapping[str, Any]) -> bool:
+    """A row links a cycle to its root only when its journal IS cycle_search_key(root, cycle_index).
+
+    Nothing else may borrow or poison a budget: an operation naming a wrong root is not a lineage member.
+    """
+
+    root = item.get("accounting_root")
+    cycle = item.get("cycle_index")
+    if not isinstance(root, str) or len(root) != 64 or isinstance(cycle, bool) or not isinstance(cycle, int) or cycle < 2:
+        return False
+    from solana_alpha_lab.factory.hfic_memory_policy import cycle_search_key
+
+    return item.get("journal_scope") == cycle_search_key(root, cycle)
+
+
 def accounting_root_of(store: Any, journal: str) -> str:
     """The journal whose budget this journal spends. A cycle-1 or standalone journal is its own root."""
 
     for item in list_operations(store):
-        if item.get("journal_scope") == journal and item.get("accounting_root"):
+        if item.get("journal_scope") == journal and _canonical_lineage_row(item):
             return str(item["accounting_root"])
     return journal
 
@@ -399,7 +421,7 @@ def lineage_journals(store: Any, root: str) -> list[str]:
     journals = [root]
     for item in list_operations(store):
         scope = str(item.get("journal_scope") or "")
-        if item.get("accounting_root") == root and scope and scope not in journals:
+        if item.get("accounting_root") == root and _canonical_lineage_row(item) and scope and scope not in journals:
             journals.append(scope)
     return journals
 
@@ -608,8 +630,26 @@ def _assert_preflight_journal(
 
         if representation.get("representation_id") != REPRESENTATION_ID:
             raise OrdinaryOperationError("ORDINARY_OPERATION_REPRESENTATION_INVALID")
+        # The ladder keys a child from the receipt of the exact BASE parent it climbs from. For an
+        # additional AUTO cycle that parent's own search key is the cycle key, not the cycle-1 key.
+        base_key = expected
+        parent_id = str(representation.get("parent_session_id") or "")
+        if parent_id:
+            from solana_alpha_lab.factory.hfic_session import HficSessionError, load_session_bundle
+
+            try:
+                parent_bundle = load_session_bundle(store, parent_id)
+            except HficSessionError:
+                parent_bundle = None
+            if isinstance(parent_bundle, Mapping):
+                parent_market = parent_bundle.get("market_evidence_epoch_sha256")
+                if isinstance(parent_market, str) and parent_market and parent_market != epoch:
+                    raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
+                stored_key = parent_bundle.get("search_key_sha256")
+                if isinstance(stored_key, str) and len(stored_key) == 64:
+                    base_key = stored_key
         expected = representation_search_key(
-            expected,
+            base_key,
             str(representation.get("parent_session_id") or ""),
             str(representation.get("representation_payload_sha256") or ""),
             str(representation.get("scope_applied_sha256") or ""),

@@ -32352,7 +32352,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 8ff0a4372ec410a4bed099888c801bf940a70caa22a8c1bd533e2bf9753ac89d}
+  integrity: {kind: sha256, sha256: 60be13f2f202798779985c0c0414720d96b550118733ae12eb7e1a5bcc644881}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34658,7 +34658,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: f896178607fd7d2691038e936ab7f90226a5a4254075ecec92225df1a7dc50cb}
+  integrity: {kind: sha256, sha256: fe37cf0b85b7ffc82cac6dda604b73d71c9a6f8ff96405fbf1217866f052e66c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -40486,7 +40486,7 @@ records:
   as_of: '2026-10-07'
   truth_owner: FORGE_RESEARCH_POLICY_RUNTIME_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_research_policy_runtime_v1.md', repository_path: docs/contracts/forge_research_policy_runtime_v1.md}
-  integrity: {kind: sha256, sha256: cf6f550672fb8031f184a07df3c85994db22c53eb935bb8bf57b9fecdfc6269c}
+  integrity: {kind: sha256, sha256: 603981e105a2eda3c4d968bbb2d97922419b0212ef6f3c5e13341f8dae796a89}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-RESEARCH-POLICY-001}

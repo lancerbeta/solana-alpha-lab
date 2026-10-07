@@ -580,6 +580,43 @@ class ResearchPolicyAutoCycleVerticalTests(unittest.TestCase):
             self.assertEqual(done2["final"].get("session_state"), "SYNTHESIS_COMPLETE")
             self.assertNotEqual(str(done2["frozen"]["session_id"]), session1)
 
+            # The episode representation of the cycle-2 BASE session climbs the ordinary ladder: its journal is keyed
+            # from that parent's own search key, it is its own accounting domain and it is not an AUTO cycle.
+            from solana_alpha_lab.factory import hfic_ordinary_operation as oo
+            from solana_alpha_lab.factory.hfic_representation_ladder import load_ladder_registry
+            from solana_alpha_lab.factory.normalized_trajectory_episodes_v1 import REPRESENTATION_ID, representation_search_key
+
+            version = next(
+                row["version"] for row in load_ladder_registry(ROOT / "configs" / "hfic_representation_ladder_v1.yaml")["representations"]
+                if row["id"] == REPRESENTATION_ID
+            )
+            live = ResearchStore(data_root, create_if_missing=False)
+            payload_sha, scope_sha = "ab" * 32, "cd" * 32
+            for parent_session, parent_key in ((session1, journal1), (str(done2["frozen"]["session_id"]), journal2)):
+                child_journal = representation_search_key(parent_key, parent_session, payload_sha, scope_sha)
+                child = oo.record_operation(
+                    live,
+                    {
+                        "owner_request_text": f"episode profile of {parent_session}",
+                        "owner_focus": focus,
+                        "journal_scope": child_journal,
+                        "market_evidence_epoch_sha256": market,
+                        "owner_cap": {"main": None, "adaptive": None, "preview": None},
+                        "requested_completion": oo.LIMITED_RESULT,
+                        "representation": {
+                            "representation_id": REPRESENTATION_ID,
+                            "representation_semantic_version": str(version),
+                            "parent_session_id": parent_session,
+                            "representation_payload_sha256": payload_sha,
+                            "scope_applied_sha256": scope_sha,
+                        },
+                    },
+                )
+                oo._assert_preflight_journal(live, child, child_journal, repo_root=ROOT, data_root=data_root)
+                self.assertEqual(oo.accounting_root_of(live, child_journal), child_journal)  # its own domain
+                self.assertEqual(oo.journal_occupancy(live, child_journal)["main"]["completed"], 0)
+            self.assertEqual(oo.journal_occupancy(live, journal2)["main"]["completed"], 2)  # BASE lineage untouched
+
             # The third attempt is denied; the saved first cycle is untouched.
             third = _preflight(data_root, focus, "--additional-cycle")
             self.assertEqual((third["action"], third["terminal"]), ("STOP", "SEARCH_BUDGET_EXHAUSTED"))

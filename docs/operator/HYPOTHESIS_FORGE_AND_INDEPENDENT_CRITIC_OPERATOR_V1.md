@@ -293,13 +293,18 @@ used all 6 MAIN, cycle 2 starts with none, and allowing AUTO 2 opens nothing.
 To give the whole search more, extend the lineage explicitly
 (`research-policy-preview --for-operation <operation_sha256> --main-total 10`).
 The cycle-2 receipt prints `cycle_index` and `accounting_root`; put both, and
-the cycle-1 `parent_operation_sha256`, into the cycle-2 operation request. An
+the cycle-1 `parent_operation_sha256`, as fields of the operation JSON you pass
+to `discovery-execute --operation <file>` for cycle 2 (the same file that
+already carries `journal_scope`, `owner_focus` and `owner_cap`). A wrong or
+missing value is refused with a typed `next_action`. An
 exact query already saved in cycle 1 replays and costs nothing. Cycle 2 must
 nominate materially different candidates.
 
 A value-bearing `episode-normalized-view` is a PREVIEW. Pass
 `--operation-sha256 <operation_sha256>`; the request is reserved before any
-value is read and the identical request again spends nothing.
+value is read and the identical request again spends nothing. If an earlier
+attempt crashed after the reservation, the same command reports disposition
+`RESUME`: it finishes that attempt and spends nothing new.
 
 If a preview exits non-zero, open `proposal.json`: it holds the refusal and its
 `next_action`, not a proposal.

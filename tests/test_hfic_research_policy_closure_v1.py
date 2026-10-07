@@ -17,6 +17,7 @@ if str(SRC) not in sys.path:
 
 from solana_alpha_lab.factory import hfic_ordinary_operation as oo  # noqa: E402
 from solana_alpha_lab.factory import hfic_research_policy as rp  # noqa: E402
+from solana_alpha_lab.factory.hfic_memory_policy import cycle_search_key  # noqa: E402
 from solana_alpha_lab.factory.research_store import ResearchStore  # noqa: E402
 
 JOURNAL = "a1" * 32
@@ -100,7 +101,6 @@ def _guard(store: ResearchStore):
     def _check(checked: dict) -> None:
         parent = oo.extension_parent(store, str(checked["parent_operation_sha256"]))
         allowed = {
-            str(parent["journal_scope"]),
             str(parent.get("accounting_root") or parent["journal_scope"]),
             rp.epoch_scope_key(str(parent["market_evidence_epoch_sha256"])),
         }
@@ -208,7 +208,7 @@ class AtomicExtensionSetTests(unittest.TestCase):
             self.assertEqual(rp.limits_for_frozen_run(store, legacy)["main_total"], 9)
 
 ROOT_JOURNAL = "a1" * 32  # cycle 1's search key
-CYCLE_JOURNAL = "f7" * 32  # cycle 2's own execution key (cycle_search_key of the root)
+CYCLE_JOURNAL = cycle_search_key(ROOT_JOURNAL, 2)  # cycle 2's own execution key
 
 
 def _spend_main(store: ResearchStore, operation: dict, journal: str, count: int, *, prefix: str = "q") -> None:
@@ -325,7 +325,7 @@ class ContinuationAccountingTests(unittest.TestCase):
             self.assertEqual(missing.exception.code, "ORDINARY_OPERATION_ACCOUNTING_ROOT_REQUIRED")
             with self.assertRaises(oo.OrdinaryOperationError) as unknown:
                 _operation(
-                    store, journal=CYCLE_JOURNAL, text="unknown root", cycle_index=2, accounting_root="99" * 32,
+                    store, journal=cycle_search_key("99" * 32, 2), text="unknown root", cycle_index=2, accounting_root="99" * 32,
                     parent_operation_sha256=str(first["operation_sha256"]),
                 )
             self.assertEqual(unknown.exception.code, "ORDINARY_OPERATION_ACCOUNTING_ROOT_UNKNOWN")
@@ -348,6 +348,26 @@ class ContinuationAccountingTests(unittest.TestCase):
             with self.assertRaises(oo.OrdinaryOperationError) as stopped:
                 _cycle_two(store, first)
             self.assertEqual(stopped.exception.code, "ORDINARY_OPERATION_STOPPED")
+
+    def test_a_forged_root_can_neither_borrow_nor_poison_a_budget(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            store, first = self._lineage(raw)
+            other_root = "5a" * 32
+            other_first = _operation(store, journal=other_root, text="another search")
+            _spend_main(store, other_first, other_root, 1, prefix="z")
+            # The journal is cycle 2 of ROOT, but the request names another valid root: refused, nothing stored.
+            with self.assertRaises(oo.OrdinaryOperationError) as forged:
+                _operation(
+                    store, journal=CYCLE_JOURNAL, text="forged", cycle_index=2, accounting_root=other_root,
+                    parent_operation_sha256=str(other_first["operation_sha256"]),
+                )
+            self.assertEqual(forged.exception.code, "ORDINARY_OPERATION_ACCOUNTING_ROOT_MISMATCH")
+            self.assertEqual(oo.accounting_root_of(store, CYCLE_JOURNAL), CYCLE_JOURNAL)  # nothing poisoned
+            second = _cycle_two(store, first)
+            self.assertEqual(oo.accounting_root_of(store, CYCLE_JOURNAL), ROOT_JOURNAL)
+            self.assertEqual(oo.journal_occupancy(store, CYCLE_JOURNAL)["main"]["completed"], 6)
+            self.assertEqual(oo.journal_occupancy(store, other_root)["main"]["completed"], 1)  # no escape, no leak
+            self.assertEqual(second["accounting_root"], ROOT_JOURNAL)
 
     def test_cycle_one_digests_are_unchanged_by_the_lineage_fields(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
