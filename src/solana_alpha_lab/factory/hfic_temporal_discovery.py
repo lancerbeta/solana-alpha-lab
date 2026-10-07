@@ -4655,7 +4655,11 @@ def bind_frozen_fixed_time_inputs(
             raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH")
         if (spec.get("schema_version") == "1.3"
                 and (spec.get("observation_request") or {}).get("collection_mode") == "REUSE_ONLY"):
-            from solana_alpha_lab.factory.hfic_grounded_discovery import schedule_projection_for_census
+            from solana_alpha_lab.factory.hfic_grounded_discovery import (
+                schedule_projection_for_census, verify_frozen_discovery_source_metadata,
+            )
+
+            verify_frozen_discovery_source_metadata(data_root, item, census_path, obs_path)
 
             actual_schedule = schedule_projection_for_census(data_root, census_path)
             if actual_schedule.get("schedule_context_gap"):

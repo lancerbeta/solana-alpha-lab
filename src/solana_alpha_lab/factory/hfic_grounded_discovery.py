@@ -379,6 +379,58 @@ def _explicit_holdout_or_raise(sources: Sequence[Mapping[str, Any]]) -> None:
             raise GroundedDiscoveryError("HOLDOUT_UNRESOLVED")
 
 
+def verify_frozen_discovery_source_metadata(
+    data_root: Path, binding: Mapping[str, Any], census_path: Path, observations_path: Path,
+) -> None:
+    """Verify pinned LIVE release identity/authority, without values or current lineage."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    if binding.get("dataset_id") != LIVE_DATASET_ID:
+        raise GroundedDiscoveryError("FROZEN_SOURCE_AUTHORITY_UNSUPPORTED")
+    admit_discovery_binding([binding])
+    manifest_id = str(binding.get("dataset_manifest_id") or "")
+    documents = []
+    for suffix in (".json", ".labels.json"):
+        path = data_root / "datasets" / "manifests" / f"{manifest_id}{suffix}"
+        if path.is_symlink() or not path.resolve().is_relative_to(data_root.resolve()):
+            raise GroundedDiscoveryError("FROZEN_SOURCE_IDENTITY_MISMATCH")
+        try:
+            document = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, ValueError) as exc:
+            raise GroundedDiscoveryError("FROZEN_SOURCE_IDENTITY_MISMATCH") from exc
+        if not isinstance(document, Mapping):
+            raise GroundedDiscoveryError("FROZEN_SOURCE_IDENTITY_MISMATCH")
+        documents.append(document)
+    manifest, labels = documents
+    if (manifest.get("dataset_manifest_id") != manifest_id
+            or manifest.get("dataset_id") != binding["dataset_id"]
+            or labels.get("logical_dataset_id") != binding["dataset_id"]
+            or not isinstance(labels.get("cohort_lineage"), list)
+            or binding["cohort_id"] not in labels["cohort_lineage"]):
+        raise GroundedDiscoveryError("FROZEN_SOURCE_IDENTITY_MISMATCH")
+    _labels_authority_or_raise(labels)
+    _explicit_holdout_or_raise([labels])
+    # Identity/role columns are inside the recipe-hashed immutable parquet bytes.
+    # Historical replay never consults today's mutable corpus lineage/assignments.
+    for path in (census_path, observations_path):
+        columns = ["cohort_id", "release_id", "evidence_role"]
+        if path == observations_path:
+            columns.append("confirmatory_reuse_forbidden")
+        try:
+            parquet = pq.ParquetFile(path)
+            if not set(columns).issubset(parquet.schema_arrow.names):
+                raise GroundedDiscoveryError("FROZEN_SOURCE_IDENTITY_MISMATCH")
+            for batch in parquet.iter_batches(columns=columns):
+                for row in batch.to_pylist():
+                    if any(row[key] != binding[key] for key in ("cohort_id", "release_id", "evidence_role")):
+                        raise GroundedDiscoveryError("FROZEN_SOURCE_IDENTITY_MISMATCH")
+                    if path == observations_path and row["confirmatory_reuse_forbidden"] is not True:
+                        raise GroundedDiscoveryError("DISCOVERY_AUTHORITY_ABSENT")
+        except (OSError, pa.ArrowException) as exc:
+            raise GroundedDiscoveryError("FROZEN_SOURCE_IDENTITY_MISMATCH") from exc
+
+
 def schedule_projection_for_census(data_root: Path, census_path: Path) -> dict[str, Any]:
     """Project point clocks from the verified schedule. Does not write parquet or run a look."""
 

@@ -1403,6 +1403,8 @@ OWNER_DECISION_REQUIRED
 | `BLOCKED_DATA` + `OUTCOME_MISSINGNESS_UNRESOLVED` | `PASS_DATA_OPTION_REQUIRED` — coverage report на `base_x`, не заказ новой collection. NEXT=`REPORT_OUTCOME_COVERAGE_KEEP_BASE_X` |
 | `BLOCKED_DATA` + `SELECTION_RECEIPT_INTEGRITY_INVALID` | `PASS_DATA_OPTION_REQUIRED` — сломан/mismatched historical receipt. NEXT=`REBIND_SELECTION_RECEIPT_IDENTITY`. Это integrity STOP, не selection veto и не collection. |
 | `BLOCKED_DATA` + `CANONICAL_SCHEDULE_UNBOUND` / `CANONICAL_X300_SCHEDULE_INCOMPATIBLE` / `CANONICAL_RELEASE_IDENTITY_UNBOUND` / `CANONICAL_RELEASE_BIND_FAILED` | `PASS_DATA_OPTION_REQUIRED` — consume-time identity/geometry. NEXT=`RESOLVE_IMMUTABLE_DATA_BINDINGS`. Не collection и не stamped N. |
+| `BLOCKED_DATA` + `FROZEN_CROSS_RELEASE_ENTITY_UNRESOLVED` | `PASS_DATA_OPTION_REQUIRED` — existing projector не различает несколько frozen decisions одного mint. STOP текущего run; сохранить recipe и полный N. NEXT: отдельно ограниченный capability repair; collection, dedupe, замена Y и новый look не исправляют этот отказ. |
+| `BLOCKED_DATA` + `FROZEN_SOURCE_IDENTITY_MISMATCH` / `FROZEN_INPUT_MISMATCH` / `FROZEN_INPUT_SCHEDULE_MISMATCH` / `FROZEN_SOURCE_AUTHORITY_UNSUPPORTED` | `PASS_DATA_OPTION_REQUIRED` — frozen source identity/authority не доказана. STOP; сверить exact pinned files, manifest/labels и clocks. Не repin на current registry и не переписывать recipe ради PASS. |
 | Spec incoherent/invalid | соответствующий `KILL_*` либо один `REVISE_ONCE` |
 | Promotion requested | `OWNER_DECISION_REQUIRED`; promotion не выполнять |
 
@@ -1460,6 +1462,15 @@ Post-merge path back to no-Git Fast Lane
   верни coverage report на `base_x.n`. N не сжимать. Не заказывай collection.
 - `SELECTION_RECEIPT_INTEGRITY_INVALID` / `REBIND_SELECTION_RECEIPT_IDENTITY`:
   пересобери identity/binding исторического receipt. Это не selection veto.
+- `FROZEN_CROSS_RELEASE_ENTITY_UNRESOLVED`:
+  STOP текущего run: projector не различает несколько frozen decisions одного
+  mint. Сохрани recipe, все identities и полный N. NEXT — отдельно ограниченный
+  capability repair. Не заказывай collection, не удаляй повторные mint, не
+  подставляй Y из другой release и не начинай новый scientific look.
+- `FROZEN_SOURCE_IDENTITY_MISMATCH` / `FROZEN_INPUT_MISMATCH` /
+  `FROZEN_INPUT_SCHEDULE_MISMATCH` / `FROZEN_SOURCE_AUTHORITY_UNSUPPORTED`:
+  STOP; восстанови или проверь exact сохранённую source closure и authority.
+  Current registry не заменяет исторические bindings; recipe не переписывать.
 - `CANONICAL_SCHEDULE_UNBOUND` / `CANONICAL_X300_SCHEDULE_INCOMPATIBLE` /
   `CANONICAL_RELEASE_IDENTITY_UNBOUND` / `CANONICAL_RELEASE_BIND_FAILED` /
   `RESOLVE_IMMUTABLE_DATA_BINDINGS`:

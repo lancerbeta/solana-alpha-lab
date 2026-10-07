@@ -313,7 +313,15 @@ class TemporalVerticalTests(unittest.TestCase):
             self.assertEqual(validated_projection_readiness(experiment, projection), "COMPLETE")
             self.assertEqual(projection["release_binding"]["frozen_input"], recipe["frozen_input"])
             self.assertTrue(projection["invariants"]["no_y_typed_value_read"])
-            for mutation in ("identity", "file_hash", "path", "cutoff", "manifest", "schedule_hash", "schedule_points"):
+            with patch("solana_alpha_lab.factory.hfic_grounded_discovery.resolve_published_discovery_binding",
+                       side_effect=AssertionError("frozen history must not consult current registry")), patch(
+                       "solana_alpha_lab.factory.hfic_grounded_discovery.load_admitted_partition_rows",
+                       side_effect=AssertionError("metadata projection must not load values")):
+                historical = try_project_scientific_eligibility_from_data_root(
+                    data_root, repo_root=ROOT, spec=experiment, schedule=_schedule())
+            self.assertEqual(historical["release_binding"], projection["release_binding"])
+            for mutation in ("identity", "file_hash", "path", "cutoff", "manifest", "schedule_hash", "schedule_points",
+                             "release_id", "cohort_id", "evidence_role", "holdout"):
                 invalid = copy.deepcopy(experiment)
                 frozen = invalid["parameters"]["temporal_recipe"]
                 if mutation == "identity":
@@ -328,13 +336,25 @@ class TemporalVerticalTests(unittest.TestCase):
                     frozen["frozen_input"][0]["dataset_manifest_id"] = "dataset-" + "0" * 64
                 elif mutation == "schedule_hash":
                     frozen["frozen_input"][0]["schedule_sha256"] = "0" * 64
-                else:
+                elif mutation == "schedule_points":
                     frozen["frozen_input"][0]["schedule_point_due_offset_seconds"]["Y7200"] += 300
+                elif mutation in {"release_id", "cohort_id"}:
+                    frozen["frozen_input"][0][mutation] = "FROZEN-UNRELATED-IDENTITY"
+                elif mutation == "evidence_role":
+                    frozen["frozen_input"][0]["evidence_role"] = "CONFIRMATORY"
+                else:
+                    frozen["frozen_input"][0]["holdout"] = True
                 with self.subTest(mutation=mutation), patch(
                     "solana_alpha_lab.factory.hfic_temporal_discovery.execute_temporal_discovery",
                     side_effect=AssertionError("invalid input must not evaluate")), self.assertRaises(ScientificEligibilityError):
                     try_project_scientific_eligibility_from_data_root(
                         data_root, repo_root=ROOT, spec=invalid, schedule=_schedule())
+                if mutation in {"release_id", "cohort_id", "evidence_role", "holdout"}:
+                    from solana_alpha_lab.factory.hfic_temporal_discovery import run_temporal_fixed_time_from_spec
+                    with self.subTest(runner_mutation=mutation), patch(
+                        "solana_alpha_lab.factory.hfic_grounded_discovery.load_admitted_partition_rows",
+                        side_effect=AssertionError("invalid source must not read values")), self.assertRaises(GroundedDiscoveryError):
+                        run_temporal_fixed_time_from_spec(invalid, root=ROOT, capture_hooks={"data_root": data_root})
             from solana_alpha_lab.factory.hfic_temporal_discovery import bind_frozen_fixed_time_inputs
             missing = copy.deepcopy(experiment)
             missing["parameters"]["temporal_recipe"]["frozen_input"][0]["census_rel"] = "datasets/missing-source.parquet"
