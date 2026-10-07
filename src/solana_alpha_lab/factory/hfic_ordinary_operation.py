@@ -645,9 +645,26 @@ def _assert_preflight_journal(
                 parent_market = parent_bundle.get("market_evidence_epoch_sha256")
                 if isinstance(parent_market, str) and parent_market and parent_market != epoch:
                     raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
-                stored_key = parent_bundle.get("search_key_sha256")
-                if isinstance(stored_key, str) and len(stored_key) == 64:
-                    base_key = stored_key
+                if str(parent_bundle.get("owner_focus") or "") != str(operation.get("owner_focus") or ""):
+                    raise OrdinaryOperationError("ORDINARY_OPERATION_PARENT_FOCUS_MISMATCH")
+                if parent_bundle.get("ladder_representation_id") not in (None, "", "BASE") or parent_bundle.get("control_session_id"):
+                    raise OrdinaryOperationError("ORDINARY_OPERATION_PARENT_NOT_BASE")
+                # Only the key the parent's own identity derives is inherited (its memory policy, and its
+                # cycle key for an additional AUTO cycle); anything else keeps the strict current derivation.
+                parent_derived = search_key_sha256(
+                    epoch,
+                    str(operation.get("owner_focus") or ""),
+                    PROMPT_VERSION,
+                    str(parent_bundle.get("memory_eligibility_sha256") or "") or None,
+                    None,
+                )
+                parent_cycle = parent_bundle.get("cycle_index")
+                if isinstance(parent_cycle, int) and not isinstance(parent_cycle, bool) and parent_cycle > 1:
+                    from solana_alpha_lab.factory.hfic_memory_policy import cycle_search_key
+
+                    parent_derived = cycle_search_key(parent_derived, parent_cycle)
+                if parent_bundle.get("search_key_sha256") == parent_derived:
+                    base_key = parent_derived
         expected = representation_search_key(
             base_key,
             str(representation.get("parent_session_id") or ""),

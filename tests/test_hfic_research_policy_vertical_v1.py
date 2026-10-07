@@ -617,6 +617,29 @@ class ResearchPolicyAutoCycleVerticalTests(unittest.TestCase):
                 self.assertEqual(oo.journal_occupancy(live, child_journal)["main"]["completed"], 0)
             self.assertEqual(oo.journal_occupancy(live, journal2)["main"]["completed"], 2)  # BASE lineage untouched
 
+            # A parent of another focus, or a child posing as a BASE parent, cannot anchor an episode journal.
+            wrong = oo.record_operation(
+                live,
+                {
+                    "owner_request_text": "episode profile of a foreign-focus parent",
+                    "owner_focus": "SOME_OTHER_FOCUS",
+                    "journal_scope": representation_search_key(journal2, str(done2["frozen"]["session_id"]), payload_sha, scope_sha),
+                    "market_evidence_epoch_sha256": market,
+                    "owner_cap": {"main": None, "adaptive": None, "preview": None},
+                    "requested_completion": oo.LIMITED_RESULT,
+                    "representation": {
+                        "representation_id": REPRESENTATION_ID,
+                        "representation_semantic_version": str(version),
+                        "parent_session_id": str(done2["frozen"]["session_id"]),
+                        "representation_payload_sha256": payload_sha,
+                        "scope_applied_sha256": scope_sha,
+                    },
+                },
+            )
+            with self.assertRaises(oo.OrdinaryOperationError) as foreign:
+                oo._assert_preflight_journal(live, wrong, str(wrong["journal_scope"]), repo_root=ROOT, data_root=data_root)
+            self.assertEqual(foreign.exception.code, "ORDINARY_OPERATION_PARENT_FOCUS_MISMATCH")
+
             # The third attempt is denied; the saved first cycle is untouched.
             third = _preflight(data_root, focus, "--additional-cycle")
             self.assertEqual((third["action"], third["terminal"]), ("STOP", "SEARCH_BUDGET_EXHAUSTED"))
