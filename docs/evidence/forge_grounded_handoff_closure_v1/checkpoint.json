@@ -17,7 +17,7 @@
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_session.py",
-      "sha256": "59e516c760e17ecb713a0e82eba19d6b42d2e15ba94c0a984e525526c3293b3e"
+      "sha256": "1aeafd6a9d7d50405f8d4a4d0199208f112158109cf0ae58d042a1efdecff5a0"
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_research_scope.py",
@@ -33,13 +33,13 @@
     },
     {
       "path": "tests/test_forge_grounded_handoff_closure_v1.py",
-      "sha256": "82a5de22e10722ab4ecd654d65bb0f421cbe1323ab6303a3575d5c1eca7d82a8"
+      "sha256": "efcbbfacf399cbc44b461a4c01e1604c73561ba2bd746e791345777da22c1eb6"
     }
   ],
   "targeted_validation": {
-    "tests": 145,
+    "tests": 146,
     "skipped": 1,
-    "elapsed_seconds": 273.789,
+    "elapsed_seconds": 281.584,
     "result": "OK",
     "local_full_gate": "NOT_RUN",
     "ci": "NOT_RUN"
@@ -58,6 +58,12 @@
   "final_review_counterexamples": {
     "red_head": "5b00a75a75db1ade116330ad9ce6f10149a3a14a",
     "cases": 3,
+    "red_repetitions": 2,
+    "green_repetitions": 2
+  },
+  "pending_recovery_counterexample": {
+    "red_head": "c9814c7368080ba3a6225dd87e9d6b961dc8a29b",
+    "cases": 1,
     "red_repetitions": 2,
     "green_repetitions": 2
   },
@@ -223,6 +229,31 @@
       "logical_ref": "validator-bundle/evidence/targeted-checkpoint-final.log",
       "sha256": "e41da7fbcec7dd083a4b4244883ad8adaa2313b5684425adf6777e455f971590",
       "size": 264
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/targeted-recovery-final.log",
+      "sha256": "35e7e70de4731484308c1177a34ea93a80d916fd590a82db9b076e1b02f6793d",
+      "size": 265
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/recovery-counterexample-red-1.json",
+      "sha256": "27de25c54023fa5a68cad31b804225b8b3ad5a75a354a1a7880cae6982b24203",
+      "size": 3200
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/recovery-counterexample-red-2.json",
+      "sha256": "29e6a124be43ed9a8482a92a3b06f372961806fd45acc82270591a898ce301aa",
+      "size": 3200
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/recovery-counterexample-green-1.json",
+      "sha256": "e5d8696d249b5ebdb734f98ff5592a503a6121ff07bf4d9c1fdcb1a54e6f5238",
+      "size": 435
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/recovery-counterexample-green-2.json",
+      "sha256": "b9597b96168efb8bba80331ab069d81c4ee0dbac00111c764b2d192f4138221c",
+      "size": 435
     },
     {
       "logical_ref": "validator-bundle/evidence/final-counterexamples-red-1.json",

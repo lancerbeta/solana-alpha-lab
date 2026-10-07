@@ -38,7 +38,7 @@ after correction: foreign confirmation flags and context failure at the final
 write boundary. The latter verifies zero committed slot/session changes,
 restoration of the exact dependency and idempotent retry of the same slot.
 
-The final targeted selection ran **145 tests in 273.789 seconds, OK, one
+The final targeted selection ran **146 tests in 281.584 seconds, OK, one
 skip**, covering the changed owners, direct consumers and existing prefreeze
 recovery. No local full gate was run. A saved scripted F0 session was read in
 two fresh OS processes: IDs/result hashes matched, committed inventory stayed
@@ -52,6 +52,14 @@ context refs after a second detach, and exact field/type diagnostics. Replay
 now retains the whole committed transaction when its reservation belongs to
 that transaction; a separate prefreeze reservation is not rewritten. These
 are scripted interleaving tests, not a newly claimed OS race certificate.
+
+A subsequent architecture review on `c9814c7368080ba3a6225dd87e9d6b961dc8a29b`
+found one recovery regression: an already-published orphan reservation with a
+pending derived lookup journal could fail before append's normal recovery.
+It failed twice on that head and passed twice after repair. Exact lookup uses
+verified canonical records only when the existing lookup reports pending;
+the read does not heal the journal. Existing append recovers it under the
+writer lease, preserving the original reservation transaction and accounting.
 
 Raw logs and disposable synthetic stores remain outside tracked Git. Compact
 locators and hashes are in `docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json`.

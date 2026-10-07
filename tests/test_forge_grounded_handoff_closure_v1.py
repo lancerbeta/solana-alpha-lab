@@ -234,6 +234,49 @@ class RevisionScopeTests(unittest.TestCase):
 
 
 class ContextDependencyTests(unittest.TestCase):
+    def test_published_orphan_reservation_with_pending_lookup_recovers_in_append(self):
+        import hashlib
+        from datetime import datetime, timezone
+        from solana_alpha_lab.factory import hfic_preflight as preflight
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from solana_alpha_lab.factory.research_write_lookup import WriteLookup
+        from tests.test_hfic_session import _preflight_receipt
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            store = ResearchStore(root)
+            store.prepare_write_lookup()
+            binding = {**_preflight_receipt(), "session_id": "HFIC-SESS-ORPHAN-RECOVERY"}
+            binding["forge_context_packet_sha256"] = preflight.persist_forge_context_packet(
+                root, binding["forge_context_packet"], store=store, repo_root=ROOT)
+            now = datetime(2026, 8, 27, 12, tzinfo=timezone.utc)
+            _, admission = session._build_scientific_slot_admission_event(binding, repo_root=ROOT,
+                transaction_id="RESEARCH-TXN-ORPHAN-SLOT", stage_time=now)
+            with patch.object(WriteLookup, "finish", side_effect=RuntimeError("injected post-publication crash")):
+                with self.assertRaises(RuntimeError):
+                    store.append([admission], transaction_id=admission.transaction_id)
+            pending = list(root.rglob("pending.json"))
+            self.assertEqual(len(pending), 1)
+            pending_bytes = pending[0].read_bytes()
+            cold = ResearchStore(root)
+            self.assertIsNone(session.load_session_bundle(cold, binding["session_id"]))
+            self.assertEqual(len(session.list_scientific_slot_admissions(cold)), 1)
+            self.assertEqual(pending[0].read_bytes(), pending_bytes)
+            record_id = "HFIC-ART-ORPHAN-RECOVERY-LIFECYCLE"
+            payload = json.dumps({"research_artifact_id": record_id,
+                                  "artifact_kind": "SCRIPTED_RECOVERY_TEST"}, sort_keys=True, separators=(",", ":"))
+            tx = "RESEARCH-TXN-ORPHAN-RECOVERY-LIFECYCLE"
+            lifecycle = admission.model_copy(update={"record_id": record_id, "entity_id": record_id,
+                "transaction_id": tx, "payload_json": payload,
+                "payload_sha256": hashlib.sha256(payload.encode()).hexdigest()})
+            session._append_session_records_with_slot(cold, [lifecycle], transaction_id=tx,
+                binding=binding, repo_root=ROOT, stage_time=now,
+                representation_registry=None, reserve_slot=True)
+            self.assertFalse(pending[0].exists())
+            self.assertEqual(len(session.list_scientific_slot_admissions(cold)), 1)
+            self.assertEqual(cold.find_record(admission.record_id).transaction_id, admission.transaction_id)
+            self.assertEqual(cold.find_record(record_id).transaction_id, tx)
+
     def test_identical_concurrent_session_transaction_replays_whole_record_set(self):
         from datetime import datetime, timezone
         from solana_alpha_lab.factory import hfic_preflight as preflight

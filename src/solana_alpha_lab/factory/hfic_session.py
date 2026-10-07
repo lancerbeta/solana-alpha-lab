@@ -3536,7 +3536,17 @@ def _append_session_records_with_slot(
     append_records = list(records)
 
     def reservation_belongs_to_this_transaction() -> bool:
-        saved = store.find_record(admission_event.record_id)
+        try:
+            saved = store.find_record(admission_event.record_id)
+        except Exception as exc:
+            if getattr(exc, "code", None) != "WRITE_LOOKUP_PENDING":
+                raise
+            # A published reservation is canonical even when its derived
+            # lookup journal still awaits append's recovery under the lease.
+            # This exceptional read must neither heal the index nor hide
+            # other integrity errors.
+            saved = next((item for item in store.iter_committed_records()
+                          if item.record_id == admission_event.record_id), None)
         if saved is None:
             raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
         return saved.transaction_id == transaction_id
