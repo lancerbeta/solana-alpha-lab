@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE_GROUNDED_HANDOFF_CLOSURE_V1-FIT",
+  "as_of": "2026-10-07",
+  "task_id": "FORGE_GROUNDED_HANDOFF_CLOSURE_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_SAME_NATIVE_CANDIDATE_CONSUMER_REPAIR",
+    "flexibility_and_history": "PASS_IMMUTABLE_DRAFT_RECIPE_RECORDS_RESERVATION_LOOK_LEGACY",
+    "context_efficiency": "PASS_EXACT_CONTRACT_ONE_ROOT_AFFECTED_SUITE",
+    "research_truth": "PASS_NATIVE_KILL_DISTINCT_TECHNICAL_REPLAY_NO_NEW_LOOK_PIT_METADATA_ONLY",
+    "owner_operability": "PASS_SCOPE_CONTRACT_TYPED_FAILURE_RECOVERY_PORTABLE_CHECKPOINT_P2_DISCLOSED",
+    "execution_to_cashflow": "NOT_APPLICABLE_PRICE_PROXY_NO_EXECUTABLE_ECONOMICS",
+    "monitoring_and_recovery": "PASS_COLD_REPLAY_NO_LIVE_ACTIVATION",
+    "build_vs_buy": "PASS_WRAP_REPAIR_EXISTING_OWNERS_NO_NEW_DEPENDENCY",
+    "security": "PASS_DATA_ROOT_ONLY_ZERO_PROVIDER_NO_CREDENTIALS",
+    "red_team": "PASS_SOURCE_IDENTITY_PATH_HASH_CUTOFF_MANIFEST_FALSEY_SCOPE_CONTEXT_LEGACY_DENOMINATOR"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Frozen chronological input plus separate scientific authority needed for accepted consumer"
+  },
+  "recovery": "Ordinary authorized revert; immutable native history retained; no live migration.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_OOS",
+    "NO_STRATEGY_HANDOFF",
+    "GLOBAL_FORGE_AUDIT_INCOMPLETE",
+    "NO_DEPLOY",
+    "EXACT_HEAD_CI_AND_OWNER_PHRASE_REQUIRED"
+  ]
+}
