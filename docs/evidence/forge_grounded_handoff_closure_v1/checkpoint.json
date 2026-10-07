@@ -21,7 +21,7 @@
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_grounded_discovery.py",
-      "sha256": "7bc9f1495ddd6ac28f0ac0cffd4c85a0cf765d45778efe57ff086b254459d017"
+      "sha256": "3100b03e6badb9eb45c9d8c257391d94e443de586e984b8bb2b44525748ca002"
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_research_scope.py",
@@ -33,7 +33,7 @@
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
-      "sha256": "89fea12aba4b69d130e424696dd6298c96cc933433bf0b1017cac6972f98fef5"
+      "sha256": "2283801d38a6bd14c7b1a0ad7cd823ea14e920d45f2a07190d1fc7ba28894e6e"
     },
     {
       "path": "src/solana_alpha_lab/factory/observation_schedule_compiler.py",
@@ -61,7 +61,7 @@
     },
     {
       "path": "tests/test_hfic_temporal_production_runner_v1.py",
-      "sha256": "8b7f1f9f02e3cfff18b10258e1f234d7b91038ff5ecb06142d557afa9f2e705b"
+      "sha256": "2374ffaa6e0b62321ce71749c5b9af44b6ecda15a82da3be2ea185c7a1203992"
     },
     {
       "path": "tests/test_observation_schedule_compiler.py",
@@ -75,11 +75,11 @@
   "targeted_validation": {
     "tests": 137,
     "skipped": 0,
-    "elapsed_seconds": 279.997,
+    "elapsed_seconds": 315.42,
     "result": "OK",
     "local_full_gate": "NOT_RUN",
     "ci": "NOT_RUN",
-    "final_code_log": "validator-bundle/evidence/h09-post-review-clean-targeted.log"
+    "final_code_log": "validator-bundle/evidence/h09-final-identity-targeted.log"
   },
   "deterministic_original_public": {
     "red_repetitions": 2,
@@ -687,8 +687,8 @@
     },
     {
       "logical_ref": "validator-bundle/evidence/finish_h09_checkpoint.py",
-      "sha256": "b1906147ed6d8daf796192f317a0caf2940c55cdb5f3bac8d94f1efbe43d6b9c",
-      "size": 13944
+      "sha256": "a206563cf51198d106dc74cdba7c6b0eed5ae476d8525590ce824bebffcedb42",
+      "size": 14480
     },
     {
       "logical_ref": "validator-bundle/evidence/native-v2/h09/adverse-source-classification-proof.json",
@@ -829,6 +829,101 @@
       "logical_ref": "validator-bundle/evidence/h09-semantic-route.log",
       "sha256": "70a1b7a2a358890c57eee9615550a39e67e0d21bb86035fb6dde6cd663822041",
       "size": 824
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/adverse-identity-classification-proof.json",
+      "sha256": "ca5eb234904cf61534709931282396d2d92adb05ab59264a26cae2b84fa244e8",
+      "size": 2426
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green6-command.json",
+      "sha256": "9f81fc925503714cdd44b1dfb3b27ad2a23b6cff3ad9e92c40d8a7b136db5f35",
+      "size": 35991
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green6-document-result.json",
+      "sha256": "5e421a3c9c9abdc3381580525841647f14816a112626db4b6ba4f56367188f3e",
+      "size": 33719
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green6-lane.json",
+      "sha256": "3035722746c1c40b42a2dcb8e4e37476275600e3ea451a53e24a6e9b2155c4ad",
+      "size": 241
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green6-oracle-proof.json",
+      "sha256": "70fdda57a4d7dd3ffaee1ed795e80416316bce59543d06f4666d26a763b79007",
+      "size": 1179
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green6-result-artifact.json",
+      "sha256": "5f2c68f07ee21d70b54088c3f9c79742fbbb0c7c706a3cda2511d8a28610eb01",
+      "size": 30001
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green6_readback-command.json",
+      "sha256": "174226d6c1664064360ef5e8676395e06f4bd72abf8e37944b3b186da038f706",
+      "size": 4933
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green6_readback-document-result.json",
+      "sha256": "84ec344b57b12cd5bf55181de948009e573aa15f40fc662e4c3fb95453086829",
+      "size": 4049
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green6_readback-lane.json",
+      "sha256": "3544f77e8b2e6e3468b2b233b6242f270c4aec76d18ef1168752e3f510ac5b1a",
+      "size": 300
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green6_readback-oracle-proof.json",
+      "sha256": "70fdda57a4d7dd3ffaee1ed795e80416316bce59543d06f4666d26a763b79007",
+      "size": 1179
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green6_readback-result-artifact.json",
+      "sha256": "5f2c68f07ee21d70b54088c3f9c79742fbbb0c7c706a3cda2511d8a28610eb01",
+      "size": 30001
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-final-content-sync.log",
+      "sha256": "06a4fec6e4a4733cf6308215dd095ac401d805867235bf96e0c6c52fad92a488",
+      "size": 1953
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-final-identity-adverse.log",
+      "sha256": "b3264e89f404d95a83e14fd3461578d503002889781b27e271cd9d85467c2a96",
+      "size": 1605
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-final-identity-cold.log",
+      "sha256": "7db2b2d05c5e250e074028da38c03ad93275b705ac5222d5791551e35240a6b1",
+      "size": 186
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-final-identity-production.log",
+      "sha256": "599d9d6eba670fde35f9c6e411ff9533920b8b96fa78782e9578e90a620b2fc4",
+      "size": 132
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-final-identity-targeted.log",
+      "sha256": "e1496e0aebf03463809de08f3142df5e99086a5838e4c098dc66aafb03d029ed",
+      "size": 25231
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-review-fixed-build.log",
+      "sha256": "3452add391bcea8f2460bb15110e156b9d1ad2158e8c05e2c3790829a444430c",
+      "size": 42
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-source-identity-green.log",
+      "sha256": "8962e534417d3c85b8e09a9260de878333d3a3c4bb7b0859a57c2595a6001006",
+      "size": 103
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-source-identity-red.log",
+      "sha256": "2f2a62a3e52e93682b17ce752596b8af9b4f70438e65969ebd256a339fe294b8",
+      "size": 10993
     }
   ],
   "accepted_intermediate_checkpoint": "8a3e9d8e1c848395ac7cee99bc2cf75637417543",
@@ -848,11 +943,11 @@
     "hypothesis_version_alias": "HYP-HFIC-CAND-64D4823415CB",
     "recipe_scientific_identity": "7083054ca076cda722d1527616a0f7b3ec5c53c1b6f3e4e2eba5132a88e3520f",
     "runner_classification": "PANEL_REUSE_READY",
-    "run_id": "RUN-5B98FAC4075934A676BE9B8C",
-    "result_artifact_id": "RESULT-ARTIFACT-5B98FAC4075934A676BE9B8C",
+    "run_id": "RUN-F7EF38B80BC0B7B5B3B2E2B1",
+    "result_artifact_id": "RESULT-ARTIFACT-F7EF38B80BC0B7B5B3B2E2B1",
     "oracle_comparison": "MATCH_WITHIN_1E_MINUS_9",
-    "run_key_sha256": "5b98fac4075934a676be9b8cf5138d0b2c71f6111cc1d6164b33c58126df5981",
-    "result_artifact_sha256": "2161b22f162eaaf62a563e892394aceb88d417ac0d77facea0281743c1d4f8d7",
+    "run_key_sha256": "f7ef38b80bc0b7b5b3b2e2b15fb63e4385bbe0305c3f2bc2768050f43ff2a173",
+    "result_artifact_sha256": "5f2c68f07ee21d70b54088c3f9c79742fbbb0c7c706a3cda2511d8a28610eb01",
     "result_digest_sha256": "e4c351a3e6107c1ebbc2179efbc130a9ba26f131854e5d55c4847b5e8569de24",
     "technical_run_terminal": "INCONCLUSIVE",
     "source_scientific_terminal": "KILL_LOW_INFORMATION_VALUE",
@@ -1024,14 +1119,14 @@
     "persisted_payload_unchanged": true,
     "accounting_unchanged": true
   },
-  "h09_execution_head": "679b387a9cc65a2243c8ef4fd35d3f2ae2b8f912",
+  "h09_execution_head": "3719dffa09a9ed0332274fbd6175da2f67de87ae",
   "independent_oracle": {
     "candidate_id": "HFIC-CAND-64D4823415CB",
     "definition_sha256": "64d4823415cb0e630034e0640ca23d16adb69a60ede7bcb9b5a889f5f058b20a",
     "experiment_spec_sha256": "790c1c329b583a9405ae34d78e4828644b3b6dcccbfab36982763d2fbc3cb084",
-    "run_id": "RUN-5B98FAC4075934A676BE9B8C",
+    "run_id": "RUN-F7EF38B80BC0B7B5B3B2E2B1",
     "recipe_scientific_identity": "7083054ca076cda722d1527616a0f7b3ec5c53c1b6f3e4e2eba5132a88e3520f",
-    "result_artifact_sha256": "2161b22f162eaaf62a563e892394aceb88d417ac0d77facea0281743c1d4f8d7",
+    "result_artifact_sha256": "5f2c68f07ee21d70b54088c3f9c79742fbbb0c7c706a3cda2511d8a28610eb01",
     "independent_preregistered_oracle": {
       "n": 64,
       "matched_n": 32,
@@ -1099,6 +1194,13 @@
     ]
   },
   "red_green_boundaries": [
+    {
+      "owner": "Pinned frozen source metadata",
+      "red": "authored release/cohort identity and authority accepted independently of genuine hashed source",
+      "repair": "verify pinned manifest/labels and parquet identity/role columns before projection or values; no current registry repin",
+      "red_log": "h09-source-identity-red.log",
+      "green_log": "h09-source-identity-green.log"
+    },
     {
       "owner": "Frozen multi-release projection",
       "red": "same mint collapses decisions and allows cross-release Y substitution",

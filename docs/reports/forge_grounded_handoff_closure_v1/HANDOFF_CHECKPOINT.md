@@ -7,7 +7,7 @@ owner phrase после CI и machine readiness; DONE/alpha/OOS/strategy не з
 
 BASE: `04ec8e0286a3dce5999d0687784717ee90fc5dca`. Ветка: `codex/forge-grounded-handoff-v1`.
 H08 execution head: `d3103600fb95cc138fc0bfbf735241b3d4475ac3`.
-H09 computation head: `679b387a9cc65a2243c8ef4fd35d3f2ae2b8f912`. Final delivery head и PR
+H09 computation head: `3719dffa09a9ed0332274fbd6175da2f67de87ae`. Final delivery head и PR
 выдаются машинным gate и BINDING.json пакета; этот документ не угадывает их.
 
 | Проверка | Результат |
@@ -37,7 +37,7 @@ Lineage: `HFIC-CAND-64D4823415CB` → definition
 `93b18943cf262ee568ac4b0dfc089cf071ddee42ca13582ae8fe7b4e9004a8ba` → KILL_LOW_INFORMATION_VALUE →
 SYNTHESIS_COMPLETE / classification NOT_APPLICABLE_AFTER_SCIENTIFIC_KILL →
 Spec `790c1c329b583a9405ae34d78e4828644b3b6dcccbfab36982763d2fbc3cb084` → PANEL_REUSE_READY → run
-`RUN-5B98FAC4075934A676BE9B8C` → result digest `e4c351a3e6107c1ebbc2179efbc130a9ba26f131854e5d55c4847b5e8569de24`.
+`RUN-F7EF38B80BC0B7B5B3B2E2B1` → result digest `e4c351a3e6107c1ebbc2179efbc130a9ba26f131854e5d55c4847b5e8569de24`.
 Полная field-by-field source closure, snapshot и артефактные SHA — в checkpoint.
 
 Oracle до native агента: n=64, matched=32, mean=0.20, baseline=0.05;
@@ -60,14 +60,16 @@ draft bytes, market/slot/reservation и look accounting сохранены. Outp
 Failed engineering attempts и serialization/oracle-reader errors сохранены;
 они не выданы за научные отрицания и не refund.
 
-После isolated reviews закрыты P1 cross-release Y substitution и authored
-schedule spoof. Shared pre-value binder сверяет census-bound SHA и point maps;
+После isolated reviews закрыты P1 cross-release Y substitution, authored
+schedule spoof и source release/cohort identity spoof. Shared pre-value binder
+сверяет pinned manifest/labels, identity/role внутри хешированных parquet,
+census-bound SHA и point maps; current registry не repins frozen history;
 неподдерживаемые повторные mint получают typed refusal до projection. Missing
 source тоже возвращает typed FROZEN_INPUT_MISMATCH. Catalog blocked-description
 обновлён, generated view создан sync. Исторические NOT_READY receipts сохранены.
 
 Targeted validation: 137 affected post-review tests, OK, skipped=0,
-279.997s; raw h09-post-review-clean-targeted.log; ранее 246 tests / one skip.
+315.42s; raw h09-final-identity-targeted.log; ранее 246 tests / one skip.
 Предыдущий post-review запуск застал незакоммиченный Catalog и получил
 IMPLEMENTATION_HASH_MISMATCH; он сохранён FAILED и не принят как PASS evidence.
 Холодный отдельный процесс получил
