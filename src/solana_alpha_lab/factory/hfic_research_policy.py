@@ -264,7 +264,13 @@ def read_active_policy(store: Any) -> dict[str, Any]:
     return effective_policy(store)
 
 
-def _resolved_delta(head: Mapping[str, Any], *, limits_delta: Mapping[str, Any] | None, preset_name: str | None) -> dict[str, int]:
+def _resolved_delta(
+    head: Mapping[str, Any],
+    *,
+    limits_delta: Mapping[str, Any] | None,
+    preset_name: str | None,
+    presets_delta: Mapping[str, Any] | None,
+) -> dict[str, int]:
     delta: dict[str, int] = {}
     if preset_name is not None:
         presets = dict(head.get("presets") or {})
@@ -273,7 +279,7 @@ def _resolved_delta(head: Mapping[str, Any], *, limits_delta: Mapping[str, Any] 
         delta.update(presets[preset_name])
     if limits_delta:
         delta.update(_validate_delta_fields(limits_delta))
-    if not delta:
+    if not delta and not presets_delta:
         raise ResearchPolicyError("RESEARCH_POLICY_CHANGE_EMPTY")
     return delta
 
@@ -286,7 +292,9 @@ def preview_policy_change(
     preset_name: str | None = None,
 ) -> dict[str, Any]:
     head = effective_policy(store)
-    delta = _resolved_delta(head, limits_delta=limits_delta, preset_name=preset_name)
+    delta = _resolved_delta(
+        head, limits_delta=limits_delta, preset_name=preset_name, presets_delta=presets_delta
+    )
     limits = validate_limits({**head["limits"], **delta})
     presets = dict(head["presets"])
     if presets_delta is not None:
