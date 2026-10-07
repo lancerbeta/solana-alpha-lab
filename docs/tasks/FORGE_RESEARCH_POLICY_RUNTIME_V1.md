@@ -27,7 +27,10 @@ objective: >-
 managed_write_set:
 - .agents/skills/hypothesis-forge/SKILL.md
 - catalog/assets/core.yaml
+- catalog/assets/lifecycle.yaml
 - catalog/catalog_manifest.yaml
+- catalog/generated/asset_edges.json
+- docs/PROJECT_MAP.md
 - catalog/schemas/hypothesis_forge_draft_v1_3.schema.json
 - catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json
 - catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json
