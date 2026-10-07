@@ -33,7 +33,7 @@
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
-      "sha256": "09bd2276f590f3d1c69169f9eea30acabcd03258d86ef1abbec04ce6e54cf145"
+      "sha256": "89fea12aba4b69d130e424696dd6298c96cc933433bf0b1017cac6972f98fef5"
     },
     {
       "path": "src/solana_alpha_lab/factory/observation_schedule_compiler.py",
@@ -41,7 +41,7 @@
     },
     {
       "path": "src/solana_alpha_lab/factory/scientific_eligibility_projection.py",
-      "sha256": "a084c1e8d25a2f42b71804079dd7f48d85ab8b010ff8fd7170d103b757cc8321"
+      "sha256": "ce4ee5b56f6528cfb2e0b3ce49c7ee1736bf0854fd4a724e8d37172d75eaa91b"
     },
     {
       "path": "tests/fixtures/forge_grounded_handoff_closure_v1/flat_card.json",
@@ -61,21 +61,25 @@
     },
     {
       "path": "tests/test_hfic_temporal_production_runner_v1.py",
-      "sha256": "10e9ed26a100bb8cbc721c4587ce833b8abbe50fb24c63fe103d107ca74eda3b"
+      "sha256": "8b7f1f9f02e3cfff18b10258e1f234d7b91038ff5ecb06142d557afa9f2e705b"
     },
     {
       "path": "tests/test_observation_schedule_compiler.py",
       "sha256": "bd6d415fca4aa105ffe23e62932d5cd1a9cddd09d74b3e670fd5d7c8d67cf4ea"
+    },
+    {
+      "path": "tests/test_scientific_eligibility_projection_v1.py",
+      "sha256": "4adebcbabe26e81049b6fd1b27578344ac274aa7cd65dc0376d82dccd1274a76"
     }
   ],
   "targeted_validation": {
-    "tests": 246,
-    "skipped": 1,
-    "elapsed_seconds": 553.659,
+    "tests": 137,
+    "skipped": 0,
+    "elapsed_seconds": 279.997,
     "result": "OK",
     "local_full_gate": "NOT_RUN",
     "ci": "NOT_RUN",
-    "final_code_log": "validator-bundle/evidence/h09-final-targeted.log"
+    "final_code_log": "validator-bundle/evidence/h09-post-review-clean-targeted.log"
   },
   "deterministic_original_public": {
     "red_repetitions": 2,
@@ -683,8 +687,148 @@
     },
     {
       "logical_ref": "validator-bundle/evidence/finish_h09_checkpoint.py",
-      "sha256": "6f9ed469b5974a663f53c62087d11b3f2e2078dc26f97c67058391cf22f0751d",
-      "size": 11779
+      "sha256": "b1906147ed6d8daf796192f317a0caf2940c55cdb5f3bac8d94f1efbe43d6b9c",
+      "size": 13944
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/adverse-source-classification-proof.json",
+      "sha256": "c0eea9c4364403fe09b2bcb3798bc462ecca4f95abd405c2f4021ceefa8121b5",
+      "size": 891
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green5-command.json",
+      "sha256": "1f67989d62d1bf01250257a64ba78872b1f078dd153bfc97e24c31f160889754",
+      "size": 35991
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green5-document-result.json",
+      "sha256": "b432c67cb35173dee6790305bcad7ff4072d2796233ddceabff29296eec8caab",
+      "size": 33719
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green5-lane.json",
+      "sha256": "f5c25a1a99b52451e802c864f3069dfead1ff08f0974cce0dd2667dd2260d766",
+      "size": 241
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green5-oracle-proof.json",
+      "sha256": "227fb7189aa171fecb2fea09be852966823560d17e1e3168dbad1f77ff456fcc",
+      "size": 1179
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green5-result-artifact.json",
+      "sha256": "2161b22f162eaaf62a563e892394aceb88d417ac0d77facea0281743c1d4f8d7",
+      "size": 30001
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green5_readback-command.json",
+      "sha256": "5a9171186f6ad013d8ed5e7cd2ecd3627da9dc0d36aa767ca3b02c55aed2440d",
+      "size": 4933
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green5_readback-document-result.json",
+      "sha256": "c5bea730cf14c730682fcb0d43cc09aaf932534472225bc7af4415758e53b64a",
+      "size": 4049
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green5_readback-lane.json",
+      "sha256": "f2de8bbe7ba19e8ad01068474ef2d869cd88497eca07689b89c73291d85fb817",
+      "size": 300
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green5_readback-oracle-proof.json",
+      "sha256": "227fb7189aa171fecb2fea09be852966823560d17e1e3168dbad1f77ff456fcc",
+      "size": 1179
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/h09/green5_readback-result-artifact.json",
+      "sha256": "2161b22f162eaaf62a563e892394aceb88d417ac0d77facea0281743c1d4f8d7",
+      "size": 30001
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-adverse-source-classification.log",
+      "sha256": "8abdc4ea1da9c7bd712f31e7f22d87283ee72edf42e9d31ce738136bbcf5d023",
+      "size": 542
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-content-sync.log",
+      "sha256": "345227ffbdb51065fa083b249f26bc6e4d81cca20518ca2a72907b30db279e3d",
+      "size": 1896
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-cross-release-green.log",
+      "sha256": "294f86ea0b044a2bd6ad9ba4a7e97ea183001f8459d1e2d8c743960c320a8f9e",
+      "size": 6365
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-cross-release-red.log",
+      "sha256": "ac834cde72fcb4e467d08ac8d1f3b97e15d135f9f90f537f0563172bc7d83d4c",
+      "size": 2562
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-patch-verification.log",
+      "sha256": "ea2ac365c259416d86119969328760931221d2995dfb5ad9a39bfae0158dd61e",
+      "size": 578
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-post-review-clean-targeted.log",
+      "sha256": "2962e1aeb4b41d2a99d21fcd9989df27d58e928f65e71a413e1fa5c2768f2d5c",
+      "size": 25231
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-post-review-targeted.log",
+      "sha256": "9dbf13bda8a25aaf0b58d31a2cfd48569832099a660e45f187f700335d802d96",
+      "size": 26124
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-review-build.log",
+      "sha256": "cc8c3cda96cb8c104a77cb7d6be34e7e63dcf25c5fc2415cbc4bf703af7430b7",
+      "size": 42
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-review-fix-final-sync.log",
+      "sha256": "8e83becd374a6798a553a7c71d5245b9e3ebefe3be0a7202b6d8c46e271a50f0",
+      "size": 1798
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-review-fix-sync.log",
+      "sha256": "b16bd6a1dad7d3d1f5f6f86c06717f8554b640f51a9bf74dcbf45c3610c844bd",
+      "size": 2275
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-review-fixed-cold.log",
+      "sha256": "7db2b2d05c5e250e074028da38c03ad93275b705ac5222d5791551e35240a6b1",
+      "size": 186
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-review-fixed-production.log",
+      "sha256": "599d9d6eba670fde35f9c6e411ff9533920b8b96fa78782e9578e90a620b2fc4",
+      "size": 132
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-schedule-green.log",
+      "sha256": "17e925bbc3ac75d74a1094435af7343ccd7a8418e869cf32afccca9d9e89d048",
+      "size": 324
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-schedule-red.log",
+      "sha256": "a7f53f0b9d81d52b512574f72c1c58a22d5ffaade441deaea29dfe51f3c0237f",
+      "size": 1511
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-secret-scan.log",
+      "sha256": "9be2b949c7bba253c30d51a33bd905e99dad4607b0d051b53245776e78d72ec0",
+      "size": 48
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-semantic-green.log",
+      "sha256": "de4f2b64c01888b2f724c980b3101696f650d884c6a5fff84efd5d29166e9afe",
+      "size": 2653
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-semantic-route.log",
+      "sha256": "70a1b7a2a358890c57eee9615550a39e67e0d21bb86035fb6dde6cd663822041",
+      "size": 824
     }
   ],
   "accepted_intermediate_checkpoint": "8a3e9d8e1c848395ac7cee99bc2cf75637417543",
@@ -704,11 +848,11 @@
     "hypothesis_version_alias": "HYP-HFIC-CAND-64D4823415CB",
     "recipe_scientific_identity": "7083054ca076cda722d1527616a0f7b3ec5c53c1b6f3e4e2eba5132a88e3520f",
     "runner_classification": "PANEL_REUSE_READY",
-    "run_id": "RUN-DBB9F802D4500C5BCAAC5866",
-    "result_artifact_id": "RESULT-ARTIFACT-DBB9F802D4500C5BCAAC5866",
+    "run_id": "RUN-5B98FAC4075934A676BE9B8C",
+    "result_artifact_id": "RESULT-ARTIFACT-5B98FAC4075934A676BE9B8C",
     "oracle_comparison": "MATCH_WITHIN_1E_MINUS_9",
-    "run_key_sha256": "dbb9f802d4500c5bcaac58664992927dd91baa5ce46dc18f50c6547a7ddb1991",
-    "result_artifact_sha256": "a568cb72c17510be3ab2a5c21fb2ad85aa52cc3d30b05d4c2cbb667dfa372d0e",
+    "run_key_sha256": "5b98fac4075934a676be9b8cf5138d0b2c71f6111cc1d6164b33c58126df5981",
+    "result_artifact_sha256": "2161b22f162eaaf62a563e892394aceb88d417ac0d77facea0281743c1d4f8d7",
     "result_digest_sha256": "e4c351a3e6107c1ebbc2179efbc130a9ba26f131854e5d55c4847b5e8569de24",
     "technical_run_terminal": "INCONCLUSIVE",
     "source_scientific_terminal": "KILL_LOW_INFORMATION_VALUE",
@@ -880,14 +1024,14 @@
     "persisted_payload_unchanged": true,
     "accounting_unchanged": true
   },
-  "h09_execution_head": "f6a14165311b421357a76c2fc077f67545e7831e",
+  "h09_execution_head": "679b387a9cc65a2243c8ef4fd35d3f2ae2b8f912",
   "independent_oracle": {
     "candidate_id": "HFIC-CAND-64D4823415CB",
     "definition_sha256": "64d4823415cb0e630034e0640ca23d16adb69a60ede7bcb9b5a889f5f058b20a",
     "experiment_spec_sha256": "790c1c329b583a9405ae34d78e4828644b3b6dcccbfab36982763d2fbc3cb084",
-    "run_id": "RUN-DBB9F802D4500C5BCAAC5866",
+    "run_id": "RUN-5B98FAC4075934A676BE9B8C",
     "recipe_scientific_identity": "7083054ca076cda722d1527616a0f7b3ec5c53c1b6f3e4e2eba5132a88e3520f",
-    "result_artifact_sha256": "a568cb72c17510be3ab2a5c21fb2ad85aa52cc3d30b05d4c2cbb667dfa372d0e",
+    "result_artifact_sha256": "2161b22f162eaaf62a563e892394aceb88d417ac0d77facea0281743c1d4f8d7",
     "independent_preregistered_oracle": {
       "n": 64,
       "matched_n": 32,
@@ -956,6 +1100,20 @@
   },
   "red_green_boundaries": [
     {
+      "owner": "Frozen multi-release projection",
+      "red": "same mint collapses decisions and allows cross-release Y substitution",
+      "repair": "typed FROZEN_CROSS_RELEASE_ENTITY_UNRESOLVED before mint-keyed projection",
+      "red_log": "h09-cross-release-red.log",
+      "green_log": "h09-cross-release-green.log"
+    },
+    {
+      "owner": "Shared frozen source binder",
+      "red": "authored binding schedule/point clocks can replace verified census schedule",
+      "repair": "verify actual census schedule SHA and point maps before projection or values",
+      "red_log": "h09-schedule-red.log",
+      "green_log": "h09-schedule-green.log"
+    },
+    {
       "owner": "observation_schedule_compiler",
       "red": "reuse charged 129545 future calls against unchanged 3200",
       "repair": "prove stored covering snapshot before charging new collection; reuse costs zero",
@@ -983,5 +1141,18 @@
       "red_log": "h09-json-red.log",
       "green_log": "h09-json-green.log"
     }
-  ]
+  ],
+  "pre_review_validation": {
+    "tests": 246,
+    "skipped": 1,
+    "result": "OK",
+    "elapsed_seconds": 553.659,
+    "log": "validator-bundle/evidence/h09-final-targeted.log"
+  },
+  "discarded_validation_attempt": {
+    "log": "validator-bundle/evidence/h09-post-review-targeted.log",
+    "result": "FAILED_IMPLEMENTATION_HASH_MISMATCH_BEFORE_CATALOG_COMMIT",
+    "consequence": "NOT_PASS_EVIDENCE; rerun affected suite on clean immutable code head"
+  },
+  "residual_capability_gap": "FROZEN_CROSS_RELEASE_ENTITY_UNRESOLVED: repeated-mint multi-decision eligibility cannot be proven by existing mint-keyed projector; fail closed. Native 64 unique mints supported."
 }
