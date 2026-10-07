@@ -32203,7 +32203,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_fast_lane_runner.py', repository_path: tests/test_fast_lane_runner.py}
-  integrity: {kind: sha256, sha256: b5b3512f5a66d70dd72072e194282daf4fb8a3983efed09c4d91ae8a3998239d}
+  integrity: {kind: sha256, sha256: 4afaaf137281af98d2eb123071bc50656574ad36615cd8b77facef9dcf0ee0bc}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -40469,7 +40469,7 @@ records:
   as_of: '2026-10-07'
   truth_owner: FORGE_GROUNDED_HANDOFF_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_grounded_handoff_closure_v1.md', repository_path: docs/contracts/forge_grounded_handoff_closure_v1.md}
-  integrity: {kind: sha256, sha256: 0de6a8ce30d77024e779972d9cb85a1f4394136e7bf829cffa202cc9dce4d7f6}
+  integrity: {kind: sha256, sha256: 5e53e0ce9fcec03a1bb653418bafe93508f96c3d150e5caa4a394fe79c59c357}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-RESEARCH-SCOPE-001}

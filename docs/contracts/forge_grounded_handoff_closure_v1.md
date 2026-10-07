@@ -77,3 +77,14 @@ proves a frozen technical replay, not chronological confirmation, alpha,
 scientific acceptance, StrategyVersion activation or trading authority.
 Run research on a stable code checkout; update/rebase after its lifecycle.
 The Git write fence and scientific/owner budgets are unchanged.
+# Source-bound technical replay
+
+For ExperimentSpec 1.3, REUSE_ONLY and the registered fixed-time temporal
+capability, DocumentRunner first binds a genuine covering panel, then executes
+the requested offline capability. An HFIC candidate alias requires
+`parameters.hfic_replay_session_id`. The durable completed session must match
+the candidate, definition and exact frozen recipe before evaluation. Its Critic
+verdict and single existing look reference are retained in result and passport;
+the passport trial reference is that existing look. This technical replay creates
+no new hypothesis card, scientific metric, discovery look or holdout consumption.
+Its calculation terminal does not supersede the source Critic verdict.

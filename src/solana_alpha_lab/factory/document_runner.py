@@ -39,6 +39,7 @@ from solana_alpha_lab.factory.git_write_fence import (
     repository_status_bytes,
 )
 from solana_alpha_lab.factory.lane_classifier import Lane, LaneDecision
+from solana_alpha_lab.factory.hfic_grounded_discovery import GroundedDiscoveryError
 from solana_alpha_lab.factory.research_store import (
     RecordKind,
     ResearchEvent,
@@ -177,6 +178,61 @@ def _event_time(spec: Mapping[str, Any]) -> datetime:
     return datetime.fromisoformat(raw.replace("Z", "+00:00")).astimezone(UTC)
 
 
+def _frozen_hfic_replay_lineage(
+    spec: Mapping[str, Any], context: RunContext,
+) -> dict[str, Any] | None:
+    """Bind a technical replay to the durable native decision before execution."""
+    parameters = spec.get("parameters") or {}
+    session_id = parameters.get("hfic_replay_session_id")
+    native_alias = str(spec.get("hypothesis_version", "")).startswith("HYP-HFIC-CAND-")
+    is_reuse = (spec.get("schema_version") == "1.3"
+                and (spec.get("observation_request") or {}).get("collection_mode") == "REUSE_ONLY")
+    if session_id is None and not (native_alias and is_reuse):
+        return None
+    if (
+        not isinstance(session_id, str)
+        or spec.get("schema_version") != "1.3"
+        or spec.get("capability_id") != "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+        or (spec.get("observation_request") or {}).get("collection_mode") != "REUSE_ONLY"
+    ):
+        raise CapabilityError("HFIC_FROZEN_REPLAY_LINEAGE_REQUIRED")
+    from solana_alpha_lab.factory.hfic_session import HficSessionError, load_session_bundle
+
+    try:
+        bundle = load_session_bundle(ResearchStore(context.data_root), session_id)
+    except HficSessionError as exc:
+        raise CapabilityError("HFIC_FROZEN_REPLAY_LINEAGE_INVALID") from exc
+    if not isinstance(bundle, Mapping):
+        raise CapabilityError("HFIC_FROZEN_REPLAY_LINEAGE_INVALID")
+    packet = bundle.get("critic_input_packet") or {}
+    grounded = packet.get("grounded_evidence") or {}
+    source_result = grounded.get("result") or {}
+    refs = bundle.get("grounded_result_refs") or []
+    if (
+        bundle.get("session_state") != "SYNTHESIS_COMPLETE"
+        or spec.get("hypothesis_version") != "HYP-" + str(bundle.get("selected_candidate_id"))
+        or context.hypothesis_definition_sha256 != bundle.get("selected_definition_sha256")
+        or parameters.get("temporal_recipe") != source_result.get("experiment_recipe")
+        or len(refs) != 1
+        or not bundle.get("critic_result_sha256")
+        or not bundle.get("critic_terminal")
+    ):
+        raise CapabilityError("HFIC_FROZEN_REPLAY_LINEAGE_INVALID")
+    return {
+        "execution_kind": "FROZEN_EVIDENCE_REPLAY",
+        "session_id": session_id,
+        "candidate_id": bundle["selected_candidate_id"],
+        "definition_sha256": bundle["selected_definition_sha256"],
+        "critic_input_packet_sha256": bundle["critic_input_packet_sha256"],
+        "critic_result_sha256": bundle["critic_result_sha256"],
+        "scientific_terminal": bundle["critic_terminal"],
+        "market_evidence_epoch_sha256": bundle["market_evidence_epoch_sha256"],
+        "grounded_result_sha256": bundle["grounded_result_sha256"],
+        "existing_look_ref": refs[0],
+        "new_scientific_look": False,
+    }
+
+
 class DocumentRunner(ExperimentRunner):
     def start_document(
         self,
@@ -300,11 +356,12 @@ class DocumentRunner(ExperimentRunner):
                 else producer_git_sha
             )
         try:
+            replay_lineage = _frozen_hfic_replay_lineage(spec, run_context)
             if observation_routing is not None:
                 capability_ids = list(spec.get("capabilities") or [])
                 if (
                     len(capability_ids) != 1
-                    or str(capability_ids[0]) != CAP_OBSERVATION_SCHEDULE_COMPILE_BIND
+                    or str(capability_ids[0]) != str(spec.get("capability_id"))
                 ):
                     raise CapabilityError("CAPABILITY_SET_NOT_SINGLE")
                 if int(spec["evidence_budget"]["provider_api_rpc_wss_calls"]) != 0:
@@ -326,6 +383,21 @@ class DocumentRunner(ExperimentRunner):
                     run_key_sha256=hooks.get("run_key_sha256"),
                     authority_phrase=authority_phrase,
                 )
+                if str(capability_ids[0]) != CAP_OBSERVATION_SCHEDULE_COMPILE_BIND:
+                    if (
+                        lane.terminal != "PANEL_REUSE_READY"
+                        or capability_result.get("status") != "COMPLETE"
+                        or capability_result.get("terminal") != "PANEL_REUSE_READY"
+                        or (spec.get("observation_request") or {}).get("collection_mode") != "REUSE_ONLY"
+                        or str(capability_ids[0]) != "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+                    ):
+                        raise CapabilityError("CAPABILITY_OBSERVATION_ROUTE_NOT_EXECUTABLE")
+                    bindings = capability_result["passport_bindings"]
+                    capability_result = execute_capability(
+                        spec, root=self.root, authority_phrase=authority_phrase,
+                        capture_hooks=hooks,
+                    )
+                    capability_result["passport_bindings"] = bindings
             else:
                 hooks.setdefault("data_root", run_context.data_root)
                 capability_result = execute_capability(
@@ -334,7 +406,9 @@ class DocumentRunner(ExperimentRunner):
                     authority_phrase=authority_phrase,
                     capture_hooks=hooks,
                 )
-        except (CapabilityError, ObservationLifecycleError) as exc:
+            if replay_lineage is not None:
+                capability_result["source_lineage"] = replay_lineage
+        except (CapabilityError, ObservationLifecycleError, GroundedDiscoveryError) as exc:
             return _document_response(
                 lane_decision=lane,
                 execution_status="FAILED_INFRA",
@@ -512,7 +586,8 @@ class DocumentRunner(ExperimentRunner):
         passport_payload: dict[str, Any] = {
             "run_id": run_id,
             "run_key_sha256": lane.run_key_sha256,
-            "trial_id": f"TRIAL-{run_id.removeprefix('RUN-')}",
+            "trial_id": (replay_lineage["existing_look_ref"] if replay_lineage is not None
+                         else f"TRIAL-{run_id.removeprefix('RUN-')}"),
             "hypothesis_version_id": str(spec["hypothesis_version"]),
             "hypothesis_definition_sha256": run_context.hypothesis_definition_sha256,
             "experiment_spec_sha256": spec_sha256,
@@ -567,6 +642,9 @@ class DocumentRunner(ExperimentRunner):
             "limitations": [],
             "non_claims": ["NO_ALPHA", "NO_NETRETURN"],
         }
+        if replay_lineage is not None:
+            passport_payload["source_lineage"] = replay_lineage
+            passport_payload["non_claims"].append("NO_NEW_SCIENTIFIC_LOOK")
         try:
             if (
                 observation_routing is not None
@@ -613,7 +691,7 @@ class DocumentRunner(ExperimentRunner):
             )
             for item in store.iter_committed_records()
         )
-        if not hypothesis_already_registered:
+        if not hypothesis_already_registered and replay_lineage is None:
             records.append(
                 _research_event(
                     record_id=f"HYPOTHESIS-VERSION-{transaction_id[-16:]}",
@@ -678,7 +756,8 @@ class DocumentRunner(ExperimentRunner):
             ]
         )
         metric_id = f"METRIC-TERMINAL-MATCH-{transaction_id[-8:]}"
-        records.append(
+        if replay_lineage is None:
+            records.append(
             _research_event(
                 record_id=metric_id,
                 record_kind=RecordKind.EXPERIMENT_METRIC,
@@ -702,7 +781,7 @@ class DocumentRunner(ExperimentRunner):
                 producer_capability_id=capability_id,
                 producer_git_sha=producer_git_sha,
             )
-        )
+            )
         records.append(
             _research_event(
                 record_id=result_artifact_id,

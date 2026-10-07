@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import copy
 import sys
 import tempfile
 import unittest
@@ -288,6 +289,7 @@ class TemporalVerticalTests(unittest.TestCase):
     def test_spec13_frozen_release_projection_reads_metadata_without_evaluation(self) -> None:
         from solana_alpha_lab.factory.scientific_eligibility_projection import (
             try_project_scientific_eligibility_from_data_root, validated_projection_readiness,
+            ScientificEligibilityError,
         )
         with tempfile.TemporaryDirectory() as temporary:
             workspace = Path(temporary)
@@ -311,6 +313,24 @@ class TemporalVerticalTests(unittest.TestCase):
             self.assertEqual(validated_projection_readiness(experiment, projection), "COMPLETE")
             self.assertEqual(projection["release_binding"]["frozen_input"], recipe["frozen_input"])
             self.assertTrue(projection["invariants"]["no_y_typed_value_read"])
+            for mutation in ("identity", "file_hash", "path", "cutoff", "manifest"):
+                invalid = copy.deepcopy(experiment)
+                frozen = invalid["parameters"]["temporal_recipe"]
+                if mutation == "identity":
+                    frozen["scientific_identity"] = "0" * 64
+                elif mutation == "file_hash":
+                    frozen["frozen_input"][0]["census_sha256"] = "0" * 64
+                elif mutation == "path":
+                    frozen["frozen_input"][0]["census_rel"] = "../foreign.parquet"
+                elif mutation == "cutoff":
+                    invalid["availability_cutoff"] = "2020-01-01T00:00:00Z"
+                else:
+                    frozen["frozen_input"][0]["dataset_manifest_id"] = "dataset-" + "0" * 64
+                with self.subTest(mutation=mutation), patch(
+                    "solana_alpha_lab.factory.hfic_temporal_discovery.execute_temporal_discovery",
+                    side_effect=AssertionError("invalid input must not evaluate")), self.assertRaises(ScientificEligibilityError):
+                    try_project_scientific_eligibility_from_data_root(
+                        data_root, repo_root=ROOT, spec=invalid, schedule=_schedule())
 
     def test_published_journal_reaches_document_runner_readback(self) -> None:
         spec = _spec(cost_profile=None, schedule={"lateness_seconds": DOCUMENT_LATENESS})

@@ -87,7 +87,9 @@ context_requirements:
     - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
     - src/solana_alpha_lab/factory/hfic_research_scope.py
     - src/solana_alpha_lab/factory/hfic_session.py
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json
+    - docs/reports/forge_grounded_handoff_closure_v1/HANDOFF_CHECKPOINT.md
     HISTORICAL_CONTEXT: []
 ---
 
