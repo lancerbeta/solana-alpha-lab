@@ -7,7 +7,7 @@ owner phrase после CI и machine readiness; DONE/alpha/OOS/strategy не з
 
 BASE: `04ec8e0286a3dce5999d0687784717ee90fc5dca`. Ветка: `codex/forge-grounded-handoff-v1`.
 H08 execution head: `d3103600fb95cc138fc0bfbf735241b3d4475ac3`.
-H09 computation head: `3719dffa09a9ed0332274fbd6175da2f67de87ae`. Final delivery head и PR
+H09 computation head: `2aa12c7cbb1bcbb561c71cfdd880d957886a8ca9`. Final delivery head и PR
 выдаются машинным gate и BINDING.json пакета; этот документ не угадывает их.
 
 | Проверка | Результат |
@@ -37,7 +37,7 @@ Lineage: `HFIC-CAND-64D4823415CB` → definition
 `93b18943cf262ee568ac4b0dfc089cf071ddee42ca13582ae8fe7b4e9004a8ba` → KILL_LOW_INFORMATION_VALUE →
 SYNTHESIS_COMPLETE / classification NOT_APPLICABLE_AFTER_SCIENTIFIC_KILL →
 Spec `790c1c329b583a9405ae34d78e4828644b3b6dcccbfab36982763d2fbc3cb084` → PANEL_REUSE_READY → run
-`RUN-F7EF38B80BC0B7B5B3B2E2B1` → result digest `e4c351a3e6107c1ebbc2179efbc130a9ba26f131854e5d55c4847b5e8569de24`.
+`RUN-891C93F02C358D27E7E0C932` → result digest `e4c351a3e6107c1ebbc2179efbc130a9ba26f131854e5d55c4847b5e8569de24`.
 Полная field-by-field source closure, snapshot и артефактные SHA — в checkpoint.
 
 Oracle до native агента: n=64, matched=32, mean=0.20, baseline=0.05;
@@ -106,11 +106,13 @@ pin match NOT_ATTESTED; старую self-report attestation не перепис
 использовали как H08/H09 acceptance. Existing frozen-pin registry теперь проверяет
 всю archival receipt против accepted blob: drift/unavailable даёт DENY, в том
 числе при co-move. Остальные SEPARATE pins и authority/control prefixes не ослаблены.
-17 focused boundary tests PASS; affected delivery checks и final preflight/CI
-связываются отдельной final-head chain. Никакого нового scientific look.
-
-Final delivery-boundary validation: 73 affected tests PASS (10.376s, no skips), including frozen accepted-BASE receipt identity, tamper DENY, other shadow-pin discriminator rules, risk-role resolution and deterministic finish. Earlier failed propagation attempts remain raw engineering evidence; no scientific replay or lifecycle was repeated. Live CI/readiness are bound separately after PR.
-
-Architecture absence falsifier: preceding 73-test checkpoint missed absent registered receipt/evidence root and JSON discovery omission. Required review returned NOT_READY (P2 semantic claim failure); retained as historical evidence. Existing guard now checks required commit-bound paths before discovery. Three genuine RED subcases became GREEN; 20 guard tests and 76 affected delivery tests PASS, no skips. This strengthens availability DENY without changing historical bytes, other SEPARATE rules or scientific lineage. Prior 17/73 results are historical, not validation of this final guard.
+Current guard: 20 focused tests and 76 affected delivery-boundary tests PASS.
+Required registered paths are compared with their accepted Git blobs before
+JSON discovery; missing receipt/root/blob and co-moved tamper receive DENY.
+Three genuine absence RED cases became GREEN. Earlier 17/73 results and the
+73d76b23 architecture NOT_READY remain historical evidence, not current PASS.
+Live exact-head CI and readiness are bound separately after PR.
 
 CI direct-consumer repair: previous exact head 9ec1c4a92717784cb742991dd5784f48577a7d39 failed run 37694804452 on 12 cases. Raw four shard logs retained. Legacy fixtures now explicitly provision context through its existing persistent owner, wording revision retains the look and semantic target changes remain denied; session/stage timestamp assertions are unchanged. A real P1 in NO_WORTHY admitted repair paired historical digest with fresh inline packet. Existing owner now verifies both coherent dependencies before and under its writer lease, retains the parent digest and rejects corrupt/missing/tampered context without records. Genuine RED→GREEN and adversarial checks retained. Initial 135-case direct selection: 134 passed, one fixture import error (1087.450s); raw FAILED is not suite PASS. Only that fixture import/hash call changed, and its whole episode scenario rerun passed (105.176s). Exact final-head CI must rerun the selection and remains mandatory. H08 is immutable, not rerun. New reviews/bindings remain required; previous local PASS does not override CI FAILURE.
+
+CI-repair same-Spec revalidation: actual production head 2aa12c7cbb1bcbb561c71cfdd880d957886a8ca9; same unchanged candidate/definition/Spec/recipe/source bindings and existing trial. Result RUN-891C93F02C358D27E7E0C932, artifact SHA256 0fcdbb11f854c32299555cea5e8677be428f0c8998f8964d992dfad74e84b8cb; independent preregistered oracle MATCH in 1e-9. Fresh OS process returns EXACT_DUPLICATE_COMPLETED, same run/result. Original 27 native records, persisted bytes, look/accounting and scientific KILL unchanged; zero provider calls/new scientific looks. Earlier green6 execution evidence retained. This is technical replay only.
