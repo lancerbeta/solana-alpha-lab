@@ -39,6 +39,7 @@ managed_write_set:
 - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
 - docs/tasks/FORGE_LIST_AWARE_RESEARCH_VERTICAL_V1.md
 - docs/evidence/forge_list_aware_research_vertical_v1/**
+- docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json
 - scripts/hypothesis_forge.py
 - src/solana_alpha_lab/factory/forge_input_receipt.py
 - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
