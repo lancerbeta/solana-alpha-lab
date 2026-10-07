@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from collections.abc import Mapping
 from typing import Any
 
@@ -385,17 +386,27 @@ def apply_policy_change(
         if effective_policy(store)["policy_head_sha256"] != head["policy_head_sha256"]:
             raise ResearchPolicyError("RESEARCH_POLICY_PREVIEW_STALE")
 
-    try:
-        artifact = _append_artifact(
-            store,
-            kind=ARTIFACT_KIND,
-            body=body,
-            record_prefix="HFIC-ART-RPOL",
-            before_commit=_still_current,
-            clock=clock,
-        )
-    except ResearchStoreError as exc:
-        raise ResearchPolicyError(str(exc)) from exc
+    artifact = None
+    for attempt in range(40):
+        try:
+            artifact = _append_artifact(
+                store,
+                kind=ARTIFACT_KIND,
+                body=body,
+                record_prefix="HFIC-ART-RPOL",
+                before_commit=_still_current,
+                clock=clock,
+            )
+            break
+        except ResearchPolicyError:
+            raise
+        except ResearchStoreError as exc:
+            if getattr(exc, "code", str(exc)) != "WRITER_BUSY":
+                raise ResearchPolicyError(str(exc)) from exc
+            _still_current()
+            if attempt >= 39:
+                raise ResearchPolicyError(str(exc)) from exc
+            time.sleep(0.05)
     return {
         "action": "RESEARCH_POLICY_APPLY",
         "status": APPENDED,
@@ -453,7 +464,7 @@ def ensure_run_snapshot(store: Any, journal_scope: str, *, clock: Clock | None =
         if read_run_snapshot(store, journal_scope) is not None:
             raise ResearchPolicyError("RESEARCH_POLICY_RUN_SNAPSHOT_RACE_LOST")
 
-    for _attempt in range(8):
+    for attempt in range(40):
         try:
             return _append_artifact(
                 store,
@@ -469,10 +480,14 @@ def ensure_run_snapshot(store: Any, journal_scope: str, *, clock: Clock | None =
             winner = read_run_snapshot(store, journal_scope)
             if winner is not None:
                 return winner
-        except ResearchStoreError:
+        except ResearchStoreError as exc:
+            if getattr(exc, "code", str(exc)) != "WRITER_BUSY":
+                raise
             winner = read_run_snapshot(store, journal_scope)
             if winner is not None:
                 return winner
+        if attempt < 39:
+            time.sleep(0.05)
     raise ResearchPolicyError("RESEARCH_POLICY_RUN_SNAPSHOT_RACE_UNRESOLVED")
 
 
@@ -571,17 +586,27 @@ def apply_run_extension(
         if len(read_run_extensions(store, journal_scope)) != len(extensions):
             raise ResearchPolicyError("RESEARCH_POLICY_EXTENSION_STALE")
 
-    try:
-        artifact = _append_artifact(
-            store,
-            kind=EXTENSION_KIND,
-            body=body,
-            record_prefix="HFIC-ART-RPEXT",
-            before_commit=_check,
-            clock=clock,
-        )
-    except ResearchStoreError as exc:
-        raise ResearchPolicyError(str(exc)) from exc
+    artifact = None
+    for attempt in range(40):
+        try:
+            artifact = _append_artifact(
+                store,
+                kind=EXTENSION_KIND,
+                body=body,
+                record_prefix="HFIC-ART-RPEXT",
+                before_commit=_check,
+                clock=clock,
+            )
+            break
+        except ResearchPolicyError:
+            raise
+        except ResearchStoreError as exc:
+            if getattr(exc, "code", str(exc)) != "WRITER_BUSY":
+                raise ResearchPolicyError(str(exc)) from exc
+            _check()
+            if attempt >= 39:
+                raise ResearchPolicyError(str(exc)) from exc
+            time.sleep(0.05)
     return {
         "action": "RESEARCH_POLICY_EXTENSION_APPLY",
         "status": APPENDED,

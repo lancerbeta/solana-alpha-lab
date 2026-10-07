@@ -290,5 +290,67 @@ class RunExtensionTests(unittest.TestCase):
             self.assertEqual(limits["adaptive_total"], 5)
 
 
+class ConcurrencyTests(unittest.TestCase):
+    """Two OS-thread-equivalent writers racing the same journal's last slot."""
+
+    def test_two_concurrent_first_touches_converge_on_one_snapshot(self) -> None:
+        import threading
+
+        with tempfile.TemporaryDirectory() as raw:
+            store = _store(Path(raw))
+            journal = "a1" * 32
+            results: list[dict] = [None, None]  # type: ignore[list-item]
+            barrier = threading.Barrier(2)
+
+            def _touch(index: int) -> None:
+                barrier.wait()
+                results[index] = rp.ensure_run_snapshot(store, journal)
+
+            threads = [threading.Thread(target=_touch, args=(i,)) for i in range(2)]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+
+            self.assertEqual(results[0]["policy_artifact_sha256"], results[1]["policy_artifact_sha256"])
+            self.assertEqual(len(rp._iter_artifacts(store, rp.SNAPSHOT_KIND)), 1)
+
+    def test_two_concurrent_extensions_only_one_wins_the_last_sequence_slot(self) -> None:
+        import threading
+
+        with tempfile.TemporaryDirectory() as raw:
+            store = _store(Path(raw))
+            journal = "b2" * 32
+            rp.ensure_run_snapshot(store, journal)
+            proposal_a = rp.propose_run_extension(
+                store, journal_scope=journal, parent_operation_sha256="c" * 64, limits_delta={"main_total": 8}
+            )
+            proposal_b = rp.propose_run_extension(
+                store, journal_scope=journal, parent_operation_sha256="d" * 64, limits_delta={"adaptive_total": 5}
+            )
+            outcomes: list[object] = [None, None]
+            barrier = threading.Barrier(2)
+
+            def _apply(index: int, proposal: dict) -> None:
+                barrier.wait()
+                try:
+                    outcomes[index] = rp.apply_run_extension(store, proposal=proposal, confirm_append_only=True)
+                except rp.ResearchPolicyError as exc:
+                    outcomes[index] = exc.code
+
+            threads = [
+                threading.Thread(target=_apply, args=(0, proposal_a)),
+                threading.Thread(target=_apply, args=(1, proposal_b)),
+            ]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+
+            statuses = [item.get("status") if isinstance(item, dict) else item for item in outcomes]
+            self.assertEqual(sorted(statuses), sorted(["APPENDED", "RESEARCH_POLICY_EXTENSION_STALE"]))
+            self.assertEqual(len(rp.read_run_extensions(store, journal)), 1)
+
+
 if __name__ == "__main__":
     unittest.main()
