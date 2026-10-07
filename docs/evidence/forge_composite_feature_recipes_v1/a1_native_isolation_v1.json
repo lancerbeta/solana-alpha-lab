@@ -22,7 +22,7 @@
           "path": "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md",
           "purpose": "Attack matrix, terminal policy and B7 format; heading locator exposed titles/references outside B but no Prompt A/C body",
           "raw_file_bytes": 127347,
-          "raw_file_sha256": "ef0077faa8e5b185509b4c4da5d415808abfbcae75700bd446f02317519820b1",
+          "raw_file_sha256": "fe37cf0b85b7ffc82cac6dda604b73d71c9a6f8ff96405fbf1217866f052e66c",
           "semantic_content_scope": "PROMPT_B_1144_1491_AND_HEADING_LOCATOR_ONLY",
           "whole_file_hashing_only_beyond_semantic_scope": true
         },
@@ -351,11 +351,11 @@
         },
         {
           "path": ".agents/skills/hypothesis-forge/SKILL.md",
-          "sha256": "75a7f877811e4695ee3a352bafa7ab1eef6df562089c602368d87178c5025b6e"
+          "sha256": "eaae58729556a4fa3b257dca18054814f89c52cc32e72c87f9d5266b370d0aaf"
         },
         {
           "path": "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md",
-          "sha256": "ef0077faa8e5b185509b4c4da5d415808abfbcae75700bd446f02317519820b1"
+          "sha256": "fe37cf0b85b7ffc82cac6dda604b73d71c9a6f8ff96405fbf1217866f052e66c"
         }
       ],
       "authored_queries": [
@@ -479,9 +479,9 @@
     "agent_task": "p1_presearch_agent",
     "input_execution_commit": "66abc2bb41db2e7f4cb2704980f74f4aafd0da7b",
     "input_file_logical_ref": "local/forge_composite_p1_native_v4/native-presearch-packet.json",
-    "input_operator_sha256": "ef0077faa8e5b185509b4c4da5d415808abfbcae75700bd446f02317519820b1",
+    "input_operator_sha256": "fe37cf0b85b7ffc82cac6dda604b73d71c9a6f8ff96405fbf1217866f052e66c",
     "input_packet_sha256": "294d6ad4345ca2a5a7611fae8fb6d44d5b09f09568472824d8998457fb68fd34",
-    "input_skill_sha256": "75a7f877811e4695ee3a352bafa7ab1eef6df562089c602368d87178c5025b6e",
+    "input_skill_sha256": "eaae58729556a4fa3b257dca18054814f89c52cc32e72c87f9d5266b370d0aaf",
     "query_spec_sha256": [
       "2d5c7caafbc094a642a38da5719cf58982422fc53b64cf87a55bc151b3f702b3",
       "ba7f707790e42a58c186ef092ad90fc04dc838b15623615a5aae6bf6a9f186da"
