@@ -24,7 +24,7 @@
     "docs/PROJECT_MAP.md": "489b6e4acce0a587fc80c4db8d3341f33778a5b65a1b873cbc34ef510af36c9c",
     "docs/contracts/forge_list_aware_research_scope_v1.md": "f03ce1a4c50aa2525003ddf9441f61700a8a6e69d248449289bf86416d8ca84f",
     "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json": "2cca8a172e157d2d33ccfae20a7673f2ba17a757248d3a07724917d69d4b04d5",
-    "docs/evidence/forge_list_aware_research_vertical_v1/a1_semantic_premise_packet_v1.json": "a6052491a41cc2f633a5c01abde6b1cf9139b6378f84b24b40afb7dc92a866b6",
+    "docs/evidence/forge_list_aware_research_vertical_v1/a1_semantic_premise_packet_v1.json": "e008f59e3678385ee03791eb4477568529ede27055a6b47875101ca1a66c6a71",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "408250d653cd9d002084175a530030b125ce82c4814e4932f715940b7c8f17b0",
     "docs/tasks/FORGE_LIST_AWARE_RESEARCH_VERTICAL_V1.md": "7278f42c6f92133e3177f5dd5b1b1c62aa60057aafd2c7c3349d3bd09043287c",
     "scripts/hypothesis_forge.py": "c0603d180900bd735d61dfad88169d803cefaf8e8b891930086787e38e46792c",
@@ -57,14 +57,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_list_aware_research_vertical_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "af01d3f207bdc9f32ba06a6edaec20845432b865d63b10b286f011af55b5e123",
+    "sha256": "4046d6f9402f59a8ab0878243c52215d9975be318bb85c41c224bba19a061395",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_VERTICAL_10_PRODUCTION_SHAPED_CAPTURE_TO_RUNNER_COLD_REPLAY_SCOPED_REPLAY_POLICY_SHIFT_NEXT_PERIOD;PASS_41_DIRECT_SCOPE_EXECUTOR_PROFILE_GOLDEN_ABLATION;V0_RED_ON_BASE;VALIDATOR_P1_A_P1_B_RED_ON_PRIOR_HEAD_GREEN_NOW;BENCHMARK_10K_5_LISTS_SCOPE_OVERHEAD_1_0X_BOUNDED;PASS_REBASED_ONTO_MAIN_4378C5B8_PR382_BYTE_IDENTICAL_FEATURE_CODE_FRESH_VERTICAL_10_EXECUTOR_39_RERUN",
     "independent_review": {
       "path": "docs/evidence/forge_list_aware_research_vertical_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "d68eabebf0dd72b5fb93387ad30cf25fd5d9b8f8f020f2795921ac4297975c82",
+      "sha256": "733e33831f5134bc382978cd860cc3834079ddb7b4a62b95c786bca77758d4ff",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

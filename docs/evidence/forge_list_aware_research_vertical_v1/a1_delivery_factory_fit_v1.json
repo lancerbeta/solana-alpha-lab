@@ -4,8 +4,8 @@
   "review_id": "FORGE-LIST-AWARE-RESEARCH-VERTICAL-FACTORY-FIT-001",
   "as_of": "2026-10-07",
   "task_id": "FORGE_LIST_AWARE_RESEARCH_VERTICAL_V1",
-  "reviewed_bindings_sha256": "842ea872fd79921b8087ea3eaa56a4b442f9bc00c872bb7f76e2cbb149f34852",
-  "reviewed_inventory_sha256": "e1b101eafda4a51241d512f7aa18bfb957a59c03d50f7276b409a6c3d332327f",
+  "reviewed_bindings_sha256": "67783a56ec756f660159e6e3bb38e447e1c682567f1c7cc1dd3a766ec8143b43",
+  "reviewed_inventory_sha256": "4796892902e03b54328c4365f45b1aea6dc33ce53fc1c91ba966d02847631067",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
