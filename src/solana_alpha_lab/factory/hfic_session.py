@@ -62,6 +62,11 @@ SESSION_RECEIPT_SCHEMA_BY_PROMPT = {
 SESSION_RECEIPT_SCHEMA_V1_3 = (
     "catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json"
 )
+# Additive: same v1_3 receipt shape, a wider candidate_ids ceiling for a
+# journal whose research policy raised candidates.max_generated above 6.
+SESSION_RECEIPT_SCHEMA_V1_4_WIDE = (
+    "catalog/schemas/hypothesis_forge_session_receipt_v1_4.schema.json"
+)
 RUNNER_UP_AWAITING_CRITIC = "RUNNER_UP_AWAITING_CRITIC"
 RUNNER_UP_REVISION_REQUIRED = "RUNNER_UP_REVISION_REQUIRED"
 MIN_CANDIDATES = 0
@@ -980,8 +985,11 @@ def _session_receipt_schema_path(
     prompt_version: str,
     *,
     selected_path: bool = True,
+    wide_candidates: bool = False,
 ) -> Path:
     if selected_path and prompt_version == PROMPT_VERSION:
+        if wide_candidates:
+            return Path(repo_root) / SESSION_RECEIPT_SCHEMA_V1_4_WIDE
         return Path(repo_root) / SESSION_RECEIPT_SCHEMA_V1_3
     relative = SESSION_RECEIPT_SCHEMA_BY_PROMPT.get(prompt_version)
     if relative is None:
@@ -8019,7 +8027,11 @@ def finalize_session(
         _verify_failover_receipt_identity(receipt)
         _validate_json_schema(
             receipt,
-            _session_receipt_schema_path(repo_root, prompt_version),
+            _session_receipt_schema_path(
+                repo_root,
+                prompt_version,
+                wide_candidates=len(receipt.get("candidate_ids") or []) > MAX_CANDIDATES,
+            ),
         )
     receipt_bytes = _canonical_bytes(receipt)
     complete_cycle = {
