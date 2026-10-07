@@ -97,7 +97,8 @@ class FastLaneRunnerTests(unittest.TestCase):
                                 "hfic_replay_session_id": "HFIC-SESS-ABC"})
         bundle = {"session_state": "SYNTHESIS_COMPLETE", "selected_candidate_id": "HFIC-CAND-ABC",
                   "selected_definition_sha256": HYPOTHESIS_DEFINITION_SHA256,
-                  "critic_input_packet": {"grounded_evidence": {"result": {
+                  "critic_input_packet": {"grounded_evidence": {
+                      "result_refs": ["HFIC-ART-DISCOVERY-ABC"], "result_sha256": "d" * 64, "result": {
                       "experiment_recipe": spec["parameters"]["temporal_recipe"]}}},
                   "grounded_result_refs": ["HFIC-ART-DISCOVERY-ABC"],
                   "critic_input_packet_sha256": "a" * 64, "critic_result_sha256": "b" * 64,

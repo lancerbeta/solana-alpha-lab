@@ -207,7 +207,7 @@ def _frozen_hfic_replay_lineage(
     packet = bundle.get("critic_input_packet") or {}
     grounded = packet.get("grounded_evidence") or {}
     source_result = grounded.get("result") or {}
-    refs = bundle.get("grounded_result_refs") or []
+    refs = grounded.get("result_refs") or []
     if (
         bundle.get("session_state") != "SYNTHESIS_COMPLETE"
         or spec.get("hypothesis_version") != "HYP-" + str(bundle.get("selected_candidate_id"))
@@ -227,7 +227,7 @@ def _frozen_hfic_replay_lineage(
         "critic_result_sha256": bundle["critic_result_sha256"],
         "scientific_terminal": bundle["critic_terminal"],
         "market_evidence_epoch_sha256": bundle["market_evidence_epoch_sha256"],
-        "grounded_result_sha256": bundle["grounded_result_sha256"],
+        "grounded_result_sha256": grounded["result_sha256"],
         "existing_look_ref": refs[0],
         "new_scientific_look": False,
     }
