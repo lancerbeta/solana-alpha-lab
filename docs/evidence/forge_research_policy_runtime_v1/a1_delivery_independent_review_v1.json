@@ -4,8 +4,8 @@
   "review_id": "FORGE-RESEARCH-POLICY-RUNTIME-REVIEW-001",
   "as_of": "2026-10-07",
   "task_id": "FORGE_RESEARCH_POLICY_RUNTIME_V1",
-  "reviewed_bindings_sha256": "a28aef59bd92d05e0662ad2bb4e28956b7df76498b34805999162387f592076d",
-  "reviewed_inventory_sha256": "d68bd8d531ae076662bd7b1b0c89832e6b73701b8624d9ef8fa4374a77f9f068",
+  "reviewed_bindings_sha256": "93bbc1c1cbccc8a6f6c02e5400a9ff096e0007ca396d24af8c8968be5e54cd00",
+  "reviewed_inventory_sha256": "bec7585ea85beee7e8aa7c0fd9ae82f656641eba1f95a2a5e1cfde9d8a28bcc4",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

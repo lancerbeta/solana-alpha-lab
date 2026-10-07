@@ -24,7 +24,7 @@
     "catalog/schemas/hypothesis_forge_session_receipt_v1_4.schema.json": "0db867b2a93423a55b79210f9ce7d7f02d15885234f69328142193dafc9b1e1e",
     "docs/PROJECT_MAP.md": "9f757ef482b8523c74d92f24c8375ef13380bca841aab6ead8b5296f4e2aadfc",
     "docs/contracts/forge_research_policy_runtime_v1.md": "603981e105a2eda3c4d968bbb2d97922419b0212ef6f3c5e13341f8dae796a89",
-    "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json": "38578cdef3ca5753d30ac646ae1775c3cdbf37e10af6474f6ea0b6efe9b511b9",
+    "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json": "df7c0db5e36790c8e8ed3f6d2fe926ad49e0b2547c87b15167d66be1afea9753",
     "docs/evidence/forge_research_policy_runtime_v1/a1_semantic_premise_packet_v1.json": "f78f1f5e9828879c4589b5f12a2a85ce8e244bdde5b0d21939e4dae90db1993a",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "fe37cf0b85b7ffc82cac6dda604b73d71c9a6f8ff96405fbf1217866f052e66c",
     "docs/tasks/FORGE_RESEARCH_POLICY_RUNTIME_V1.md": "b46373872a0a7f9c9e0a080441ee2937956b0c45ec3f4016eb4c00197428b161",
@@ -56,14 +56,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_research_policy_runtime_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "5f7db08899cac3f9befa79d760b8cffb6ea983bdfb5334fdde57e8c8723cd955",
+    "sha256": "47f95eea8dadab6028c876a2f08f924ff58020949f206e7f06b5fbf673a0aecf",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_MICRO_VERTICAL_PRD15_THROUGH_PUBLIC_CLI;PASS_AUTO_CYCLE_1_TO_2_THIRD_DENIED;PASS_TWO_PROCESS_LAST_SLOT_RACE;PASS_PREVIEW_GATE_EPISODE_VIEW;PASS_10_CANDIDATES_PRIMARY_9_RUNNER_UP_10_TO_SYNTHESIS_COMPLETE;PASS_OWNER_P1_A_LINEAGE_ACCOUNTING;PASS_OWNER_P1_B_ATOMIC_EXTENSION_SET;PASS_OWNER_P1_C_PREVIEW_RESUME;PASS_OWNER_P1_D_WIDE_NEGATIVE_TERMINAL;RED_ON_E447DC55_AND_ON_07137252_GREEN_NOW;PASS_REGRESSION_AFFECTED_SUITES",
     "independent_review": {
       "path": "docs/evidence/forge_research_policy_runtime_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "ce4c7a4883e259bbfcad11d5e239daccd5ce60d5e24d492aa2069a53c8a16813",
+      "sha256": "8e3bd4c3950de98bb77bbf45e795bdbaa88fde693ea44c41875f22e7bb406425",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
