@@ -848,6 +848,12 @@ class _EpisodeTick:
         request_digest = str(dict(claims[0].get("payload") or {}).get("request_sha256") or "")
         if state == "COMPLETED":
             payload = self.store.call_payload(occurrence) or {}
+            if payload.get("status") == "NO_REQUEST":
+                self._apply_batch_result(
+                    claims, str(payload.get("missing_reason") or "DISPATCH_WINDOW_CLOSED"), None,
+                    request_digest=request_digest, occurrence=occurrence,
+                )
+                return
             result = dict(payload)
             result["body"] = _load_raw_body(self.data_root, payload.get("raw_body_rel"))
             if result.get("status") == "OBSERVED" and result.get("body") is None:

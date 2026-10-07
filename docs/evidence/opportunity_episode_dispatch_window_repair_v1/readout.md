@@ -21,7 +21,7 @@ Reproduce offline: `uv run --locked --managed-python python -B
 docs/evidence/opportunity_episode_dispatch_window_repair_v1/red_replay.py`.
 
 GREEN: same trace dispatches exactly one SEARCH in-window, publishes OBSERVED,
-and the historical next late wake sends zero requests. Dedicated 15-test suite
+and the historical next late wake sends zero requests. Dedicated 16-test suite
 also covers canonical timer-driven worst phase, exact deadline equality,
 early/late no-send, no backfill, nomination-phase crossing, max-batch splitting,
 durable STARTED and COMPLETED crash recovery, absent mint/HTTP500/TIMEOUT,
@@ -33,7 +33,11 @@ from four production nomination rounds, all sharing a later assigned grid:
 first checkpoint T+31; SEARCH starts T+31/39/47/55; each gets 4s allowance,
 3s pace plus 1s local bookkeeping; first three responses TIMEOUT, last HTTP200
 and OBSERVED. All four ledger completions/publication are durable; next wake
-sends zero. No inserted slot/admission fixture bypassed production.
+sends zero. No inserted slot/admission fixture bypassed production. A review P2 recovery
+divergence was also reproduced through the CLI on reviewed head66b9eae:
+crash after COMPLETED/NO_REQUEST changed the published reason. Recovery now
+uses the same no-request terminalization path; the production crash/restart
+test proves byte-identical published observations and zero sends on both paths.
 
 Chosen invariant (conditional on finite ordinary runtime, never unbounded OS
 latency): idle checkpoint gap `15s idle +1s accuracy +3*5s local=31s <60s`;
@@ -68,9 +72,12 @@ code SHA is lineage metadata, not activation identity. Deploy onto existing
 ACT-2BFB07B6862365DF is compatible, but exact timer bytes must also be installed
 and reloaded. Prior real E300 gap remains immutable; no backfill.
 
-Validation: dedicated 15-test suite passed in 29.760s, including both review
-falsifiers. Final 96 directly affected production/episode/recovery/pre-start/
-remote-ops/memory-collision tests passed in 73.407s after the last fix.
+Validation: 96 directly affected production/episode/recovery/pre-start/
+remote-ops/memory-collision tests passed in 73.407s after the capacity fix.
+After the final no-request recovery normalization, the dedicated 16-test
+vertical plus 29 round recovery tests passed (45 tests, 47.126s), including
+the new byte-equality crash/restart regression.
+No full local gate is claimed; exact-head CI owns the full suite.
 Reproduce: `uv run --locked --managed-python python -B -m unittest
 tests.test_opportunity_episode_dispatch_window_repair_v1
 tests.test_opportunity_episodes_producer_v1

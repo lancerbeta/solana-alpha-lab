@@ -178,6 +178,42 @@ class DispatchWindowTests(ScenarioCase):
         self.assertEqual(json.loads(rows[0][1])["status"], "NO_REQUEST")
         self.assertEqual(search_calls(sc.tick(assigned + timedelta(seconds=65))), [])
 
+    def test_no_request_completion_crash_preserves_published_gap_bytes(self):
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        import pyarrow.parquet as pq
+        published = []
+        for crash in (False, True):
+            sc, episode, assigned = self.admitted()
+            entry = assigned + timedelta(seconds=2)
+            clock = AdvancingClock(entry)
+            guard_open = owner._WindowGuardedOpener.open
+            complete = ObservationScheduleStore.complete_call
+            def delayed(inner, url):
+                clock.sleep(58)
+                return guard_open(inner, url)
+            def physical_crash(store, **kwargs):
+                result = complete(store, **kwargs)
+                if crash and kwargs['payload'].get('status') == 'NO_REQUEST':
+                    raise owner.EpisodeTickError('FAULT_INJECTED:AFTER_NO_REQUEST_COMPLETE')
+                return result
+            with patch.object(owner._WindowGuardedOpener, 'open', delayed), \
+                 patch.object(ObservationScheduleStore, 'complete_call', physical_crash):
+                result = cli_tick(sc.data_root, sc.market, entry, pacing_clock=clock)
+            self.assertEqual(search_calls(result), [])
+            if crash:
+                self.assertEqual(sc.slot_states(episode)['E300'][0], 'CLAIMED')
+            restarted = sc.tick(assigned + timedelta(seconds=65))
+            self.assertEqual(search_calls(restarted), [])
+            self.assertEqual(sc.slot_states(episode)['E300'], ('CENSORED', 'SLOT_NOT_EXECUTED:DISPATCH_WINDOW_CLOSED'))
+            self.assertEqual(sc.unpublished(), 0)
+            rows = [row for path in (sc.data_root/'datasets').rglob('*.parquet')
+                    for row in pq.read_table(path).to_pylist()
+                    if row.get('point_id') == 'E300']
+            self.assertEqual(len(rows), 1)
+            published.append(rows[0])
+            self.assertEqual(search_calls(sc.tick(assigned + timedelta(seconds=80))), [])
+        self.assertEqual(published[0], published[1])
+
     def test_same_assigned_slots_follow_configured_batching(self):
         for batch_size, count in ((1, 2), (100, 1)):
             with self.subTest(batch_size=batch_size):
