@@ -80,24 +80,52 @@
   ],
   "remediation_history": [
     {
-      "head": "9e6a0c48ab1e2c5fda11be21fe272313b7ec121b",
-      "verdicts": {
-        "CODE_REVIEWER": "NOT_READY",
-        "GOAL_DOD_CRITIC": "NOT_READY",
-        "ARCHITECTURE_CRITIC": "NOT_READY",
-        "OWNER_UX_CRITIC": "PASS"
-      },
-      "fixed": [
-        "SLICE_UNKNOWN_GATED",
-        "REGISTERED_AT_OVERRIDE_REFUSED",
-        "REGISTRATION_INTEGRITY_HASHED",
-        "EPISODE_PAYLOAD_VALIDATED_AT_FREEZE",
-        "COLD_REPLAY_TEST",
-        "LEGACY_GOLDEN",
-        "SCOPED_PRIOR_TEST",
-        "BENCHMARK_BOUNDS",
-        "UX_NEXT_ACTIONS"
-      ]
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Diagnostic-slice UNKNOWN/INVALID membership was counted as not-in-slice",
+      "observed_head": "9e6a0c48ab1e2c5fda11be21fe272313b7ec121b",
+      "resolved_by_head": "05a4a07a70ce9502e8e0612e46fa49b79da1e143"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "list-snapshot-register --registered-at allowed backdated availability",
+      "observed_head": "9e6a0c48ab1e2c5fda11be21fe272313b7ec121b",
+      "resolved_by_head": "05a4a07a70ce9502e8e0612e46fa49b79da1e143"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Snapshot registration time and availability were outside the hashed and bound evidence",
+      "observed_head": "9e6a0c48ab1e2c5fda11be21fe272313b7ec121b",
+      "resolved_by_head": "05a4a07a70ce9502e8e0612e46fa49b79da1e143"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Episode profile payload was self-asserted at freeze without re-validation or candidate rule match",
+      "observed_head": "9e6a0c48ab1e2c5fda11be21fe272313b7ec121b",
+      "resolved_by_head": "05a4a07a70ce9502e8e0612e46fa49b79da1e143"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "No proof that the list axis reaches the formulation instructions",
+      "observed_head": "9e6a0c48ab1e2c5fda11be21fe272313b7ec121b",
+      "resolved_by_head": "05a4a07a70ce9502e8e0612e46fa49b79da1e143"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "No scoped prior-memory test, no cold replay from a moved root, no legacy 1.1 golden",
+      "observed_head": "9e6a0c48ab1e2c5fda11be21fe272313b7ec121b",
+      "resolved_by_head": "05a4a07a70ce9502e8e0612e46fa49b79da1e143"
     }
   ]
 }
