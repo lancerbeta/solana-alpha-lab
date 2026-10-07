@@ -87,7 +87,15 @@
     "result": "OK",
     "local_full_gate": "NOT_RUN",
     "ci": "NOT_RUN",
-    "final_code_log": "validator-bundle/evidence/h09-final-identity-targeted.log"
+    "final_code_log": "validator-bundle/evidence/h09-final-identity-targeted.log",
+    "delivery_boundary_tests": {
+      "tests": 73,
+      "skipped": 0,
+      "elapsed_seconds": 10.376,
+      "result": "OK",
+      "log": "validator-bundle/evidence/h09-frozen-pin-final-green.log",
+      "scope": "shadow-pin discriminator, Harness contract, risk routing, deterministic finish"
+    }
   },
   "deterministic_original_public": {
     "red_repetitions": 2,
@@ -963,6 +971,11 @@
       "logical_ref": "validator-bundle/evidence/verify_historical_pins.py",
       "sha256": "99ad260ad0d7bf2c43e29636b7e15cb3dc55375008dbc6ed52f295fa73a783ec",
       "size": 976
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-frozen-pin-final-green.log",
+      "size": 178,
+      "sha256": "cc44d7159c9d855ed4ba72104611cb058b343d621854b1def0debc9e54e889d9"
     }
   ],
   "accepted_intermediate_checkpoint": "8a3e9d8e1c848395ac7cee99bc2cf75637417543",
@@ -1306,6 +1319,6 @@
     "guard": "Full historical receipt bytes checked against accepted Git blob; drift/unavailable DENY even co-moved",
     "other_separate_drift": "DENY_UNCHANGED",
     "authority_or_control_write_prefix_widening": false,
-    "unit_validation": "17 tests PASS; final affected delivery suite follows Catalog propagation"
+    "unit_validation": "17 guard tests PASS; 73 affected delivery tests PASS after current-owner pin and Catalog propagation"
   }
 }

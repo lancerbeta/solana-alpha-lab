@@ -108,3 +108,5 @@ pin match NOT_ATTESTED; старую self-report attestation не перепис
 числе при co-move. Остальные SEPARATE pins и authority/control prefixes не ослаблены.
 17 focused boundary tests PASS; affected delivery checks и final preflight/CI
 связываются отдельной final-head chain. Никакого нового scientific look.
+
+Final delivery-boundary validation: 73 affected tests PASS (10.376s, no skips), including frozen accepted-BASE receipt identity, tamper DENY, other shadow-pin discriminator rules, risk-role resolution and deterministic finish. Earlier failed propagation attempts remain raw engineering evidence; no scientific replay or lifecycle was repeated. Live CI/readiness are bound separately after PR.

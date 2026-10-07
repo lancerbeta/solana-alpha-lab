@@ -40521,7 +40521,7 @@ records:
   location: {kind: git_path, logical_uri: 'repo://docs/reports/forge_grounded_handoff_closure_v1/HANDOFF_CHECKPOINT.md', repository_path: docs/reports/forge_grounded_handoff_closure_v1/HANDOFF_CHECKPOINT.md}
   integrity:
     kind: sha256
-    sha256: 05fe9b39d3474570d4ac0891e859cd6a1b1a6c84248cca694a0a786dca301301
+    sha256: a81cf7b8d65a5c82cedb9e97f28df0690519b9257cb15e2cb28490b4ff2f5bbc
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-GROUNDED-HANDOFF-CLOSURE-001}
