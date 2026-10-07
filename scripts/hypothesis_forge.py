@@ -2309,7 +2309,7 @@ def cmd_episode_normalized_view(
         payload = build_episode_normalized_profile(
             loaded["census"], loaded["observations"], loaded["cohorts"], resolved, universe_policy=policy
         )
-        if gate["disposition"] == "EXECUTE":
+        if gate["disposition"] in ("EXECUTE", "RESUME"):
             from solana_alpha_lab.factory.run_passport import canonical_sha256 as _payload_sha
 
             land_episode_view(
@@ -2345,7 +2345,7 @@ def cmd_episode_normalized_view(
             "request_descriptor_sha256": descriptor,
             "note": "A repeat of the same request spends nothing; a changed scope rule or applied evidence is a new PREVIEW.",
         },
-        "writes": gate["disposition"] == "EXECUTE",
+        "writes": gate["disposition"] in ("EXECUTE", "RESUME"),
     }
     _assert_no_path_leak(result, str(data_root), str(repo_root))
     return emit(result)
@@ -2506,6 +2506,8 @@ _RESEARCH_POLICY_NEXT = {
     "RESEARCH_POLICY_PRESET_CONFLICT": "REMOVE_THE_CONFLICTING_EXPLICIT_FIELD_OR_CHOOSE_ANOTHER_PRESET",
     "RESEARCH_POLICY_CHAIN_CORRUPT": "STOP_AND_RESTORE_THE_RESEARCH_STORE_THERE_IS_NO_DEFAULT_FALLBACK",
     "RESEARCH_POLICY_INVALID": "REPEAT_research-policy-preview_AND_APPLY_THE_UNEDITED_PROPOSAL",
+    "RESEARCH_POLICY_MIXED_SET_UNSUPPORTED": "APPLY_THE_ACTIVE_POLICY_PROPOSAL_AND_THE_EXTENSION_PROPOSALS_IN_SEPARATE_FILES",
+    "RESEARCH_POLICY_EXTENSION_SET_DUPLICATE_SCOPE": "KEEP_ONE_PROPOSAL_PER_SCOPE_REPEAT_research-policy-preview",
     "RESEARCH_POLICY_EXTENSION_BINDING_INVALID": "REPEAT_research-policy-preview_WITH_--for-operation_AND_APPLY_THE_UNEDITED_PROPOSAL",
     "ORDINARY_OPERATION_NOT_FOUND": "COPY_THE_EXACT_operation_sha256_FROM_research-policy-status_open_operations",
     "ORDINARY_OPERATION_STOPPED": "A_STOPPED_RUN_IS_NOT_REOPENED_START_A_NEW_OPERATION",
@@ -2665,7 +2667,7 @@ def cmd_research_policy_preview(repo_root: Path, explicit_data_root: Path | None
         if not delta:
             raise ResearchPolicyError("RESEARCH_POLICY_CHANGE_EMPTY")
         for scope_key, scope_delta in (
-            (str(operation["journal_scope"]), journal_delta),
+            (str(operation.get("accounting_root") or operation["journal_scope"]), journal_delta),
             (epoch_scope_key(str(operation["market_evidence_epoch_sha256"])), epoch_delta),
         ):
             if scope_delta:
@@ -2720,7 +2722,7 @@ def cmd_research_policy_apply(
         SCHEMA,
         ResearchPolicyError,
         apply_policy_change,
-        apply_run_extension,
+        apply_run_extension_set,
         epoch_scope_key,
     )
     from solana_alpha_lab.factory.hfic_ordinary_operation import OrdinaryOperationError
@@ -2736,31 +2738,49 @@ def cmd_research_policy_apply(
         bodies = [document]
     results: list[dict[str, Any]] = []
     try:
-        # All-or-nothing: every proposal is checked against the live store (parent run still open,
-        # scope belongs to it, not stale) before the first append.
-        from solana_alpha_lab.factory.hfic_ordinary_operation import extension_parent
-        from solana_alpha_lab.factory.hfic_research_policy import check_run_extension
+        if not bodies:
+            raise ResearchPolicyError("RESEARCH_POLICY_CHANGE_EMPTY")
+        schemas = [body.get("schema") if isinstance(body, dict) else None for body in bodies]
+        if any(schema not in (SCHEMA, EXTENSION_SCHEMA) for schema in schemas):
+            raise ResearchPolicyError("RESEARCH_POLICY_INVALID", field="schema")
+        if len(bodies) > 1 and len(set(schemas)) > 1:
+            # An active-policy change is its own commit; it is never mixed with extensions.
+            raise ResearchPolicyError("RESEARCH_POLICY_MIXED_SET_UNSUPPORTED")
+        if schemas[0] == SCHEMA:
+            if len(bodies) > 1:
+                raise ResearchPolicyError("RESEARCH_POLICY_MIXED_SET_UNSUPPORTED")
+            results.append(apply_policy_change(store, proposal=bodies[0], confirm_append_only=confirm_append_only))
+        else:
+            from solana_alpha_lab.factory.hfic_ordinary_operation import extension_parent
 
-        for body in bodies:
-            if isinstance(body, dict) and body.get("schema") == EXTENSION_SCHEMA:
-                checked = check_run_extension(store, proposal=body)
+            def _parent_guard(checked: dict[str, Any]) -> None:
+                # Runs under the writer lease: the run must still be open and without a pending
+                # reservation, and the scope must belong to it, at the moment of the commit.
                 parent = extension_parent(store, str(checked.get("parent_operation_sha256") or ""))
-                allowed_scopes = {str(parent["journal_scope"]), epoch_scope_key(str(parent["market_evidence_epoch_sha256"]))}
-                if str(checked.get("scope_key")) not in allowed_scopes:
+                allowed = {
+                    str(parent["journal_scope"]),
+                    str(parent.get("accounting_root") or parent["journal_scope"]),
+                    epoch_scope_key(str(parent["market_evidence_epoch_sha256"])),
+                }
+                if str(checked.get("scope_key")) not in allowed:
                     raise ResearchPolicyError("RESEARCH_POLICY_EXTENSION_BINDING_INVALID", field="scope_key")
-        for body in bodies:
-            schema = body.get("schema") if isinstance(body, dict) else None
-            if schema == SCHEMA:
-                results.append(apply_policy_change(store, proposal=body, confirm_append_only=confirm_append_only))
-            elif schema == EXTENSION_SCHEMA:
-                results.append(apply_run_extension(store, proposal=body, confirm_append_only=confirm_append_only))
-            else:
-                raise ResearchPolicyError("RESEARCH_POLICY_INVALID", field="schema")
+
+            results.extend(
+                apply_run_extension_set(
+                    store, proposals=bodies, confirm_append_only=confirm_append_only, parent_guard=_parent_guard
+                )
+            )
     except (ResearchPolicyError, OrdinaryOperationError) as exc:
-        refusal = {"applied_before_refusal": [item.get("action") for item in results]} if results else {}
-        exc.detail.update(refusal)
         return _research_policy_refusal(exc, data_root, repo_root)
-    payload = results[0] if len(results) == 1 else {"action": "RESEARCH_POLICY_APPLY_SET", "results": results}
+    payload = (
+        results[0]
+        if len(results) == 1
+        else {
+            "action": "RESEARCH_POLICY_APPLY_SET",
+            "results": results,
+            "writes": {"research_store": sum(int((item.get("writes") or {}).get("research_store") or 0) for item in results)},
+        }
+    )
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     return emit(payload)
 

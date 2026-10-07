@@ -54,8 +54,11 @@ already frozen; raise exactly one open run with `research-policy-preview
 proposal, which never resets what that run has already spent. AUTO cycle 2
 needs both an epoch-pool extension (`--auto-cycles-per-market 2` with
 `--for-operation`) and the explicit `preflight --additional-cycle`; a plain
-preflight never starts a cycle, and cycle 2 must bring materially different
-candidates. A value-bearing `episode-normalized-view` needs
+preflight never starts a cycle. Cycle 2 has its own identity but spends the
+same lineage MAIN/ADAPTIVE/PREVIEW budget as cycle 1 (its operation carries the
+receipt's `accounting_root` and the cycle-1 `parent_operation_sha256`; only an
+explicit `--for-operation --main-total N` raise adds more), and it must bring
+materially different candidates. A value-bearing `episode-normalized-view` needs
 `--operation-sha256` and spends one PREVIEW; the identical request again
 spends nothing. Contract: `docs/contracts/forge_research_policy_runtime_v1.md`.
 This delivery never raises a shipped default itself.

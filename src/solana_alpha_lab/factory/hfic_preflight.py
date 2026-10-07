@@ -1857,7 +1857,9 @@ def _packet_active_universe(store: Any) -> dict[str, Any]:
     }
 
 
-def build_research_policy_context(store: Any, *, market_epoch: str, search_key: str) -> dict[str, Any]:
+def build_research_policy_context(
+    store: Any, *, market_epoch: str, search_key: str, accounting_root: str | None = None
+) -> dict[str, Any]:
     """Effective research limits and what is left, for the formulation packet. Metadata only."""
 
     from solana_alpha_lab.factory.hfic_evidence_identity import _auto_cycles
@@ -1872,7 +1874,9 @@ def build_research_policy_context(store: Any, *, market_epoch: str, search_key: 
     from solana_alpha_lab.factory.hfic_session import list_hfic_sessions
 
     active = effective_policy(store)
-    journal_state = resolve_scope_limits(store, search_key, has_history=journal_has_history(store, search_key))
+    # A later AUTO cycle spends its lineage root's budget: show the root's limits and what is left of them.
+    budget_key = accounting_root or search_key
+    journal_state = resolve_scope_limits(store, budget_key, has_history=journal_has_history(store, budget_key))
     context: dict[str, Any] = {
         "schema": "smial.research-policy-context",
         "schema_version": "1.0",
@@ -1883,7 +1887,7 @@ def build_research_policy_context(store: Any, *, market_epoch: str, search_key: 
         "this_search": {
             "frozen": journal_state["frozen"],
             "limits": journal_state["limits"],
-            "remaining": {kind: row["remaining"] for kind, row in journal_occupancy(store, search_key).items()},
+            "remaining": {kind: row["remaining"] for kind, row in journal_occupancy(store, budget_key).items()},
         },
         "presets": [
             {
@@ -1896,7 +1900,7 @@ def build_research_policy_context(store: Any, *, market_epoch: str, search_key: 
         "instruction": (
             "Nominate at most this_search.limits.max_generated cards. A limit is a ceiling, not a target: "
             "do not pad weak ideas, and do not spend MAIN on questions formed after seeing results (those are ADAPTIVE). "
-            "Looks of a later AUTO cycle on the same market are a new forking path: total looks per market = cycles x main_total."
+            "A later AUTO cycle on the same market spends this same budget: it never opens a fresh MAIN allowance by itself."
         ),
         "claim_boundary": "Budget ceilings only; not a scientific result.",
     }
@@ -1936,6 +1940,7 @@ def build_forge_context_packet(
     persist: bool = True,
     search_payloads: Sequence[Mapping[str, Any]] | None = None,
     selection_caveat: Mapping[str, Any] | None = None,
+    accounting_root: str | None = None,
 ) -> tuple[dict[str, Any], str]:
     packet_bound = forge_context_packet_max_bytes(evidence_surface_mode)
     datasets, warnings = enumerate_rdp_datasets(
@@ -2374,7 +2379,7 @@ def build_forge_context_packet(
             if store is not None:
                 try:
                     packet["research_policy_context"] = build_research_policy_context(
-                        store, market_epoch=evidence_epoch, search_key=search_key
+                        store, market_epoch=evidence_epoch, search_key=search_key, accounting_root=accounting_root
                     )
                 except ResearchPolicyError as exc:
                     # Present-invalid policy state is a typed blocker, never a silent default.
@@ -3244,9 +3249,11 @@ def run_preflight(
         )
         if isinstance(resumed, Mapping) and isinstance(resumed.get("cycle_index"), int):
             cycle_index = max(1, int(resumed["cycle_index"]))
+    accounting_root = None
     if cycle_index > 1:
         from solana_alpha_lab.factory.hfic_memory_policy import cycle_search_key
 
+        accounting_root = search_key
         search_key = cycle_search_key(search_key, cycle_index)
     if (
         not market_admission_ready
@@ -3495,6 +3502,7 @@ def run_preflight(
         receipt_body["model_provenance_sha256"] = model_provenance_sha256
     if cycle_index > 1:
         receipt_body["cycle_index"] = cycle_index
+        receipt_body["accounting_root"] = accounting_root
     if action == "STOP" and bound_session == "SEARCH_BUDGET_EXHAUSTED":
         receipt_body["terminal"] = "SEARCH_BUDGET_EXHAUSTED"
         receipt_body["session_id"] = None
@@ -3512,6 +3520,7 @@ def run_preflight(
         evidence_surface_mode=control_mode,
         persist=persist_context_packet,
         selection_caveat=selection_caveat,
+        accounting_root=accounting_root,
     )
     receipt_body["forge_context_packet"] = packet
     receipt_body["forge_context_packet_sha256"] = packet_digest

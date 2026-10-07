@@ -142,7 +142,11 @@ def record_operation(
     parent = request.get("parent_operation_sha256")
     if parent is not None and (not isinstance(parent, str) or len(parent) != 64):
         raise OrdinaryOperationError("ORDINARY_OPERATION_PARENT_INVALID")
-    if isinstance(parent, str):
+    cycle_probe = request.get("cycle_index")
+    accounting_root = None
+    if isinstance(cycle_probe, int) and not isinstance(cycle_probe, bool) and cycle_probe > 1:
+        accounting_root = _validated_lineage_link(store, request, journal=journal, focus=focus, market=market)
+    elif isinstance(parent, str):
         prior = get_operation(store, parent)
         if prior.get("status") == "STOPPED":
             raise OrdinaryOperationError("ORDINARY_OPERATION_STOPPED")
@@ -194,6 +198,7 @@ def record_operation(
     if cycle_index:
         # Only an explicitly authorized additional AUTO cycle is marked; cycle 1 digests are unchanged.
         identity_body["cycle_index"] = cycle_index
+        identity_body["accounting_root"] = accounting_root
     digest = _sha(identity_body)
     for existing in list_operations(store):
         if existing.get("operation_sha256") == digest:
@@ -212,10 +217,52 @@ def record_operation(
     # The frozen accounting snapshot is stamped only on genuine creation. A
     # journal that already carries operations or looks pre-dates this runtime
     # and freezes at the shipped defaults, never at today's raised policy.
-    ensure_run_snapshot(store, journal, has_history=journal_has_history(store, journal))
+    if accounting_root is None:
+        ensure_run_snapshot(store, journal, has_history=journal_has_history(store, journal))
+    # A linked later cycle never freezes its own budget: it spends its lineage root's.
     _append(store, kind=OPERATION_KIND, body=stored, record_prefix="HFIC-ART-OP")
     stored["record_id"] = f"HFIC-ART-OP-{digest[:40].upper()}"
     return stored
+
+
+def _validated_lineage_link(
+    store: Any, request: Mapping[str, Any], *, journal: str, focus: str, market: str
+) -> str:
+    """A later AUTO cycle is a linked segment of one search: same market, focus and representation.
+
+    The parent is an earlier operation of the same lineage. It may be completed (that is how the
+    search continues), never stopped, and never with an unresolved reservation.
+    """
+
+    root = str(request.get("accounting_root") or "")
+    parent = request.get("parent_operation_sha256")
+    if len(root) != 64 or root == journal or not isinstance(parent, str) or len(parent) != 64:
+        raise OrdinaryOperationError("ORDINARY_OPERATION_ACCOUNTING_ROOT_REQUIRED")
+    lineage = [
+        item
+        for item in list_operations(store)
+        if item.get("journal_scope") == root or item.get("accounting_root") == root
+    ]
+    base = [item for item in lineage if item.get("journal_scope") == root and not item.get("accounting_root")]
+    if not base:
+        raise OrdinaryOperationError("ORDINARY_OPERATION_ACCOUNTING_ROOT_UNKNOWN")
+    wanted_rep = request.get("representation")
+    for item in base:
+        if (
+            item.get("owner_focus") != focus
+            or item.get("market_evidence_epoch_sha256") != market
+            or item.get("representation") != wanted_rep
+        ):
+            raise OrdinaryOperationError("ORDINARY_OPERATION_LINEAGE_MISMATCH")
+    prior = next((item for item in lineage if item.get("operation_sha256") == parent), None)
+    if prior is None:
+        raise OrdinaryOperationError("ORDINARY_OPERATION_CONTINUATION_MISMATCH")
+    prior = get_operation(store, parent)
+    if prior.get("status") == STATUS_STOPPED:
+        raise OrdinaryOperationError("ORDINARY_OPERATION_STOPPED")
+    if _unresolved_reservations(store, prior):
+        raise OrdinaryOperationError("EXTENSION_PARENT_HAS_PENDING_RESERVATION")
+    return root
 
 
 def journal_has_history(store: Any, journal_scope: str) -> bool:
@@ -337,8 +384,38 @@ def _refuse_closed(store: Any, operation: Mapping[str, Any]) -> None:
             raise OrdinaryOperationError("ORDINARY_OPERATION_COMPLETED")
 
 
+def accounting_root_of(store: Any, journal: str) -> str:
+    """The journal whose budget this journal spends. A cycle-1 or standalone journal is its own root."""
+
+    for item in list_operations(store):
+        if item.get("journal_scope") == journal and item.get("accounting_root"):
+            return str(item["accounting_root"])
+    return journal
+
+
+def lineage_journals(store: Any, root: str) -> list[str]:
+    """The root and every explicitly linked later-cycle journal. Execution identities stay separate."""
+
+    journals = [root]
+    for item in list_operations(store):
+        scope = str(item.get("journal_scope") or "")
+        if item.get("accounting_root") == root and scope and scope not in journals:
+            journals.append(scope)
+    return journals
+
+
 def _looks(store: Any, journal: str) -> list[dict[str, Any]]:
-    return list_discovery_looks(store, journal)
+    """Saved looks of the whole accounting lineage this journal belongs to."""
+
+    journals = lineage_journals(store, accounting_root_of(store, journal))
+    if journal not in journals:
+        journals.append(journal)
+    if len(journals) == 1:
+        return list_discovery_looks(store, journal)
+    combined: list[dict[str, Any]] = []
+    for scope in journals:
+        combined.extend(list_discovery_looks(store, scope))
+    return combined
 
 
 def _operation_result(
@@ -479,10 +556,11 @@ def binding_fingerprint(cohorts: Sequence[Mapping[str, Any]] | None) -> str | No
 
 
 def _feature_previews(store: Any, journal: str) -> list[dict[str, Any]]:
+    journals = set(lineage_journals(store, accounting_root_of(store, journal))) | {journal}
     return [
         item
         for item in _iter_kind(store, "DISCOVERY_FEATURE_PREVIEW")
-        if item.get("journal_scope") == journal
+        if item.get("journal_scope") in journals
     ]
 
 
@@ -539,6 +617,9 @@ def _assert_preflight_journal(
     if isinstance(operation.get("cycle_index"), int):
         from solana_alpha_lab.factory.hfic_memory_policy import cycle_search_key
 
+        if operation.get("accounting_root") != expected:
+            # The additional cycle spends the lineage root's budget; the root is the key before the cycle suffix.
+            raise OrdinaryOperationError("ORDINARY_OPERATION_ACCOUNTING_ROOT_MISMATCH")
         expected = cycle_search_key(expected, int(operation["cycle_index"]))
     if journal_scope != expected:
         raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_NOT_CANONICAL")
@@ -554,6 +635,7 @@ def _occupancy(
     """One arithmetic for every surface: occupied = completed + outstanding reservations."""
 
     limits = limits_or_defaults(store, journal)
+    journals = set(lineage_journals(store, accounting_root_of(store, journal))) | {journal}
     if kind == "preview":
         previews = _feature_previews(store, journal)
         used = {
@@ -569,7 +651,7 @@ def _occupancy(
         pending = {
             str(item.get("spec_sha256") or "")
             for item in _iter_kind(store, RESERVATION_KIND)
-            if item.get("journal_scope") == journal
+            if item.get("journal_scope") in journals
             and item.get("look_class") == "PREVIEW"
             and str(item.get("spec_sha256") or "") not in landed_specs
         }
@@ -586,7 +668,7 @@ def _occupancy(
         in_flight = {
             str(item.get("spec_sha256") or "")
             for item in _iter_kind(store, RESERVATION_KIND)
-            if item.get("journal_scope") == journal
+            if item.get("journal_scope") in journals
             and item.get("look_class") == look_class
             and str(item.get("spec_sha256") or "") not in completed
         }
@@ -965,17 +1047,32 @@ def authorize_episode_view(
         raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
     if repo_root is not None and data_root is not None:
         _assert_preflight_journal(store, operation, journal_scope, repo_root=repo_root, data_root=data_root)
-    known = {
-        str(item.get("spec_sha256") or "")
-        for item in _iter_kind(store, RESERVATION_KIND)
-        if item.get("journal_scope") == journal_scope and item.get("look_class") == "PREVIEW"
-    } | {str(item.get("spec_sha256") or "") for item in _feature_previews(store, journal_scope)}
-    if descriptor_sha256 in known:
-        # Exactly the same question is not a new exposure. It is a rebuild of a disclosed view.
+    landed = {str(item.get("spec_sha256") or "") for item in _feature_previews(store, journal_scope)}
+    if descriptor_sha256 in landed:
+        # Exactly the same question, already landed, is not a new exposure. It is a rebuild of a disclosed view.
         return {
             "disposition": "REPEAT",
             "values_loaded": False,
             "writes": False,
+            "operation": operation,
+            "descriptor_sha256": descriptor_sha256,
+        }
+    reserved_by = {
+        str(item.get("operation_sha256") or "")
+        for item in _iter_kind(store, RESERVATION_KIND)
+        if item.get("journal_scope") == journal_scope
+        and item.get("look_class") == "PREVIEW"
+        and str(item.get("spec_sha256") or "") == descriptor_sha256
+    }
+    if reserved_by:
+        # Reserved but never landed (a crash after the reservation): finish it. It spends nothing new.
+        if str(operation.get("operation_sha256") or "") not in reserved_by:
+            raise OrdinaryOperationError("EPISODE_VIEW_PENDING_IN_OTHER_OPERATION")
+        _refuse_closed(store, operation)
+        return {
+            "disposition": "RESUME",
+            "values_loaded": False,
+            "writes": True,
             "operation": operation,
             "descriptor_sha256": descriptor_sha256,
         }

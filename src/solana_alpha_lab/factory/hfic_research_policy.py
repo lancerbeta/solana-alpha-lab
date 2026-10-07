@@ -36,7 +36,7 @@ import copy
 import json
 import re
 import time
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from solana_alpha_lab.factory.hfic_clock import (
@@ -366,6 +366,47 @@ def _append_artifact(
     return _public(artifact)
 
 
+def _build_artifact_event(
+    *, kind: str, body: Mapping[str, Any], record_prefix: str, clock: Clock | None = None, transaction_id: str | None = None
+) -> tuple[Any, dict[str, Any]]:
+    """One artifact event without appending it, so several can share one ResearchStore commit."""
+
+    try:
+        now = capture_stage_time(clock)
+        created_at = render_canonical_utc(now)
+    except HficClockError as exc:
+        raise ResearchPolicyError(str(exc)) from exc
+    unsigned = {**dict(body), "created_at": created_at}
+    identity = canonical_sha256(unsigned)
+    artifact = {"artifact_kind": kind, **unsigned, "policy_artifact_sha256": identity}
+    canonical_text = json.dumps(artifact, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    payload = {
+        "artifact_kind": kind,
+        "payload_canonical": canonical_text,
+        "payload_sha256": canonical_sha256(artifact),
+    }
+    payload_json = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    record_id = f"{record_prefix}-{identity[:40].upper()}"
+    event = ResearchEvent(
+        record_id=record_id,
+        record_kind=RecordKind.RESEARCH_ARTIFACT,
+        entity_id=record_id,
+        hypothesis_version_id=None,
+        run_id=None,
+        transaction_id=transaction_id or f"RESEARCH-TXN-{record_prefix}-{identity[:24].upper()}",
+        effective_at=now,
+        first_reliable_available_at=now,
+        supersedes_record_id=None,
+        payload_json=payload_json,
+        payload_sha256=canonical_sha256(payload),
+        schema_version="1.0",
+        producer_capability_id=PRODUCER,
+        producer_git_sha="0" * 40,
+        created_at=now,
+    )
+    return event, _public(artifact)
+
+
 def _append_with_busy_retry(store: Any, *, recheck: Any, **kwargs: Any) -> dict[str, Any]:
     """Retry only transient writer-lease contention; re-check the real CAS each time."""
 
@@ -667,6 +708,11 @@ def limits_or_defaults(store: Any, scope_key: object) -> dict[str, int]:
         kind = scope_kind(scope_key)
     except ResearchPolicyError:
         return dict(DEFAULT_LIMITS)
+    if kind == SCOPE_JOURNAL:
+        # A linked later cycle spends its lineage root's budget, so its limits are the root's.
+        from solana_alpha_lab.factory.hfic_ordinary_operation import accounting_root_of
+
+        scope_key = accounting_root_of(store, scope_key)
     if kind == SCOPE_JOURNAL and read_scope_snapshot(store, scope_key) is None:
         # Same answer the formulation packet shows: the limits a first touch would freeze.
         from solana_alpha_lab.factory.hfic_ordinary_operation import journal_has_history
@@ -744,6 +790,27 @@ def snapshot_for_new_run(store: Any) -> dict[str, Any]:
     return {"limits": head["limits"], "policy_head_sha256": head["policy_head_sha256"], "policy_semantic_sha256": head["semantic_sha256"]}
 
 
+def _snapshot_body(store: Any, scope_key: str, *, has_history: bool) -> dict[str, Any]:
+    kind = scope_kind(scope_key)
+    active = effective_policy(store)
+    if has_history:
+        limits, source, basis = dict(DEFAULT_LIMITS), SOURCE_LEGACY, BASIS_LEGACY_DEFAULTS
+    else:
+        limits, source, basis = dict(active["limits"]), active["source"], BASIS_ACTIVE_POLICY
+    return {
+        "schema": SNAPSHOT_SCHEMA,
+        "schema_version": "1.0",
+        "scope_key": scope_key,
+        "scope_kind": kind,
+        "source": source,
+        "freeze_basis": basis,
+        "limits": limits,
+        "presets": active["presets"],
+        "policy_head_sha256": active["policy_head_sha256"],
+        "policy_semantic_sha256": active["semantic_sha256"],
+    }
+
+
 def ensure_scope_snapshot(
     store: Any, scope_key: str, *, has_history: bool = False, clock: Clock | None = None
 ) -> dict[str, Any]:
@@ -758,23 +825,7 @@ def ensure_scope_snapshot(
     existing = read_scope_snapshot(store, scope_key)
     if existing is not None:
         return existing
-    active = effective_policy(store)
-    if has_history:
-        limits, source, basis = dict(DEFAULT_LIMITS), SOURCE_LEGACY, BASIS_LEGACY_DEFAULTS
-    else:
-        limits, source, basis = dict(active["limits"]), active["source"], BASIS_ACTIVE_POLICY
-    body = {
-        "schema": SNAPSHOT_SCHEMA,
-        "schema_version": "1.0",
-        "scope_key": scope_key,
-        "scope_kind": kind,
-        "source": source,
-        "freeze_basis": basis,
-        "limits": limits,
-        "presets": active["presets"],
-        "policy_head_sha256": active["policy_head_sha256"],
-        "policy_semantic_sha256": active["semantic_sha256"],
-    }
+    body = _snapshot_body(store, scope_key, has_history=has_history)
 
     def _check() -> None:
         if read_scope_snapshot(store, scope_key) is not None:
@@ -866,30 +917,170 @@ def propose_run_extension(
     return proposal
 
 
-def check_run_extension(store: Any, *, proposal: Mapping[str, Any]) -> dict[str, Any]:
-    """Read-only: would this extension apply right now? Raises the typed refusal that apply would."""
+class _ReplanExtensionSet(Exception):
+    """Internal: the scopes moved between planning and commit."""
+
+
+def _extension_plan(store: Any, proposal: Mapping[str, Any]) -> dict[str, Any]:
+    """Read-only: what applying this one proposal would do right now, or the typed refusal."""
 
     checked = _verify_proposal(proposal, reason=REASON_OWNER_EXTENSION)
     scope_key = str(checked.get("scope_key") or "")
     scope_kind(scope_key)
     snapshot = read_scope_snapshot(store, scope_key)
+    freeze_legacy = False
     if snapshot is None:
         if checked.get("freeze_legacy_defaults") is not True or checked.get("before_limits") != dict(DEFAULT_LIMITS):
             raise ResearchPolicyError("RESEARCH_POLICY_RUN_SNAPSHOT_MISSING", scope_key=scope_key)
+        freeze_legacy = True
         extensions: list[dict[str, Any]] = []
         before = dict(DEFAULT_LIMITS)
     else:
         extensions = read_scope_extensions(store, scope_key)
         before = _limits_of(snapshot, extensions)
-    if any(item.get("proposal_sha256") == checked["proposal_sha256"] for item in extensions):
-        return checked
+    for extension in extensions:
+        if extension.get("proposal_sha256") == checked["proposal_sha256"]:
+            return {"checked": checked, "already": extension, "scope_key": scope_key}
     base_sequence = checked.get("base_extension_sequence")
     if isinstance(base_sequence, bool) or not isinstance(base_sequence, int) or base_sequence != len(extensions):
         raise ResearchPolicyError("RESEARCH_POLICY_EXTENSION_STALE", current_extension_sequence=len(extensions))
     cleaned = validate_delta(checked.get("limits_delta") or {}, allowed=scope_fields(scope_key))
-    if validate_limits({**before, **cleaned}) != checked.get("resulting_limits") or before != checked.get("before_limits"):
+    resulting = validate_limits({**before, **cleaned})
+    if resulting != checked.get("resulting_limits") or before != checked.get("before_limits"):
         raise ResearchPolicyError("RESEARCH_POLICY_INVALID", field="resulting_limits")
-    return checked
+    return {
+        "checked": checked,
+        "already": None,
+        "scope_key": scope_key,
+        "freeze_legacy": freeze_legacy,
+        "sequence": len(extensions) + 1,
+        "before": before,
+        "resulting": resulting,
+    }
+
+
+def check_run_extension(store: Any, *, proposal: Mapping[str, Any]) -> dict[str, Any]:
+    """Read-only: would this extension apply right now? Raises the typed refusal apply would."""
+
+    return _extension_plan(store, proposal)["checked"]
+
+
+def _extension_receipt(plan: Mapping[str, Any], *, created_at: str | None, written: int) -> dict[str, Any]:
+    already = plan.get("already")
+    if isinstance(already, Mapping):
+        return {
+            "action": "RESEARCH_POLICY_EXTENSION_APPLY",
+            "status": ALREADY_APPLIED,
+            "scope_key": plan["scope_key"],
+            "extension_sequence": int(already["extension_sequence"]),
+            "resulting_limits": already["resulting_limits"],
+            **_claim_boundary("EXTENSION"),
+            "writes": {"research_store": 0},
+        }
+    return {
+        "action": "RESEARCH_POLICY_EXTENSION_APPLY",
+        "status": APPENDED,
+        "scope_key": plan["scope_key"],
+        "extension_sequence": plan["sequence"],
+        "before_limits": plan["before"],
+        "resulting_limits": plan["resulting"],
+        "created_at": created_at,
+        **_claim_boundary("EXTENSION"),
+        "writes": {"research_store": written},
+    }
+
+
+def apply_run_extension_set(
+    store: Any,
+    *,
+    proposals: Sequence[Mapping[str, Any]],
+    confirm_append_only: bool,
+    parent_guard: Any = None,
+    clock: Clock | None = None,
+) -> list[dict[str, Any]]:
+    """Apply every extension of one owner request in ONE ResearchStore commit, or none.
+
+    The whole set is re-planned under the writer lease (sequence, stale, legacy
+    freeze) and the caller's ``parent_guard`` runs there too, so a run stopped,
+    completed or given a pending reservation after preview refuses the whole set
+    and leaves nothing partial. A repeat of an applied set is idempotent.
+    """
+
+    if not confirm_append_only:
+        raise ResearchPolicyError("RESEARCH_POLICY_CONFIRM_REQUIRED")
+    if not proposals:
+        raise ResearchPolicyError("RESEARCH_POLICY_CHANGE_EMPTY")
+    scopes: list[str] = []
+    for proposal in proposals:
+        scopes.append(str(proposal.get("scope_key") or ""))
+    if len(set(scopes)) != len(scopes):
+        raise ResearchPolicyError("RESEARCH_POLICY_EXTENSION_SET_DUPLICATE_SCOPE")
+
+    def _plans() -> list[dict[str, Any]]:
+        plans = [_extension_plan(store, proposal) for proposal in proposals]
+        if parent_guard is not None:
+            for plan in plans:
+                if plan.get("already") is None:
+                    parent_guard(plan["checked"])
+        return plans
+
+    def _signature(plans: Sequence[Mapping[str, Any]]) -> list[Any]:
+        return [(plan["scope_key"], plan.get("already") is None, plan.get("freeze_legacy"), plan.get("sequence")) for plan in plans]
+
+    for attempt in range(40):
+        plans = _plans()
+        planned = _signature(plans)
+
+        def _check() -> None:
+            if _signature(_plans()) != planned:
+                # Another writer moved a scope between planning and commit: plan again, never write a stale set.
+                raise _ReplanExtensionSet()
+
+        pending = [plan for plan in plans if plan.get("already") is None]
+        if not pending:
+            return [_extension_receipt(plan, created_at=None, written=0) for plan in plans]
+        events: list[Any] = []
+        created: dict[str, str] = {}
+        transaction_id = "RESEARCH-TXN-RPEXT-SET-" + canonical_sha256(
+            sorted(str(plan["checked"]["proposal_sha256"]) for plan in pending)
+        )[:24].upper()
+        for plan in pending:
+            if plan.get("freeze_legacy"):
+                snapshot_event, _ = _build_artifact_event(
+                    kind=SNAPSHOT_KIND,
+                    body=_snapshot_body(store, plan["scope_key"], has_history=True),
+                    record_prefix="HFIC-ART-RPSNAP",
+                    clock=clock,
+                    transaction_id=transaction_id,
+                )
+                events.append(snapshot_event)
+            body = {key: value for key, value in plan["checked"].items()}
+            body["extension_sequence"] = plan["sequence"]
+            event, artifact = _build_artifact_event(
+                kind=EXTENSION_KIND, body=body, record_prefix="HFIC-ART-RPEXT", clock=clock, transaction_id=transaction_id
+            )
+            events.append(event)
+            created[plan["scope_key"]] = str(artifact.get("created_at"))
+        try:
+            store.append(events, transaction_id=transaction_id, before_commit=_check)
+        except _ReplanExtensionSet:
+            continue
+        except ResearchPolicyError:
+            raise
+        except ResearchStoreError as exc:
+            if getattr(exc, "code", str(exc)) != "WRITER_BUSY":
+                raise ResearchPolicyError(str(getattr(exc, "code", exc))) from exc
+            if attempt >= 39:
+                raise ResearchPolicyError("WRITER_BUSY") from exc
+            time.sleep(0.05)
+            continue
+        return [
+            _extension_receipt(plan, created_at=created.get(plan["scope_key"]), written=2 if plan.get("freeze_legacy") else 1)
+            if plan.get("already") is None
+            else _extension_receipt(plan, created_at=None, written=0)
+            for plan in plans
+        ]
+    raise ResearchPolicyError("WRITER_BUSY")
 
 
 def apply_run_extension(
@@ -897,59 +1088,12 @@ def apply_run_extension(
     *,
     proposal: Mapping[str, Any],
     confirm_append_only: bool,
+    parent_guard: Any = None,
     clock: Clock | None = None,
 ) -> dict[str, Any]:
-    if not confirm_append_only:
-        raise ResearchPolicyError("RESEARCH_POLICY_CONFIRM_REQUIRED")
-    checked = _verify_proposal(proposal, reason=REASON_OWNER_EXTENSION)
-    scope_key = str(checked.get("scope_key") or "")
-    scope_kind(scope_key)
-    snapshot = read_scope_snapshot(store, scope_key)
-    if snapshot is None:
-        if checked.get("freeze_legacy_defaults") is not True or checked.get("before_limits") != dict(DEFAULT_LIMITS):
-            raise ResearchPolicyError("RESEARCH_POLICY_RUN_SNAPSHOT_MISSING", scope_key=scope_key)
-        snapshot = ensure_scope_snapshot(store, scope_key, has_history=True, clock=clock)
-    extensions = read_scope_extensions(store, scope_key)
-    for extension in extensions:
-        if extension.get("proposal_sha256") == checked["proposal_sha256"]:
-            return {
-                "action": "RESEARCH_POLICY_EXTENSION_APPLY",
-                "status": ALREADY_APPLIED,
-                "scope_key": scope_key,
-                "extension_sequence": int(extension["extension_sequence"]),
-                "resulting_limits": extension["resulting_limits"],
-                **_claim_boundary("EXTENSION"),
-                "writes": {"research_store": 0},
-            }
-    base_sequence = checked.get("base_extension_sequence")
-    if isinstance(base_sequence, bool) or not isinstance(base_sequence, int) or base_sequence != len(extensions):
-        raise ResearchPolicyError("RESEARCH_POLICY_EXTENSION_STALE", current_extension_sequence=len(extensions))
-    before = _limits_of(snapshot, extensions)
-    cleaned = validate_delta(checked.get("limits_delta") or {}, allowed=scope_fields(scope_key))
-    resulting = validate_limits({**before, **cleaned})
-    if resulting != checked.get("resulting_limits") or before != checked.get("before_limits"):
-        raise ResearchPolicyError("RESEARCH_POLICY_INVALID", field="resulting_limits")
-    sequence = len(extensions) + 1
-    body = {**{key: value for key, value in checked.items()}, "extension_sequence": sequence}
-
-    def _check() -> None:
-        if len(read_scope_extensions(store, scope_key)) != len(extensions):
-            raise ResearchPolicyError("RESEARCH_POLICY_EXTENSION_STALE")
-
-    artifact = _append_with_busy_retry(
-        store, recheck=_check, kind=EXTENSION_KIND, body=body, record_prefix="HFIC-ART-RPEXT", clock=clock
-    )
-    return {
-        "action": "RESEARCH_POLICY_EXTENSION_APPLY",
-        "status": APPENDED,
-        "scope_key": scope_key,
-        "extension_sequence": sequence,
-        "before_limits": before,
-        "resulting_limits": resulting,
-        "created_at": artifact["created_at"],
-        **_claim_boundary("EXTENSION"),
-        "writes": {"research_store": 1},
-    }
+    return apply_run_extension_set(
+        store, proposals=[proposal], confirm_append_only=confirm_append_only, parent_guard=parent_guard, clock=clock
+    )[0]
 
 
 # --------------------------------------------------------------------------

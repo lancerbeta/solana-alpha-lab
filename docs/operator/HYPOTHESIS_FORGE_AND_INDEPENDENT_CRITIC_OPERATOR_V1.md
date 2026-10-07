@@ -287,8 +287,15 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-
 Then start it with
 `preflight --discovery-contract --owner-focus AUTO --additional-cycle`. A plain
 preflight returns the saved session and never starts a cycle; a third cycle is
-refused with `SEARCH_BUDGET_EXHAUSTED` (raise to 3 the same way, with `--auto-cycles-per-market 3`). Cycle 2 has its own search key and
-budget and must nominate materially different candidates.
+refused with `SEARCH_BUDGET_EXHAUSTED` (raise to 3 the same way, with `--auto-cycles-per-market 3`). Cycle 2 has its own search
+key but spends the **same** MAIN/ADAPTIVE/PREVIEW budget as cycle 1: if cycle 1
+used all 6 MAIN, cycle 2 starts with none, and allowing AUTO 2 opens nothing.
+To give the whole search more, extend the lineage explicitly
+(`research-policy-preview --for-operation <operation_sha256> --main-total 10`).
+The cycle-2 receipt prints `cycle_index` and `accounting_root`; put both, and
+the cycle-1 `parent_operation_sha256`, into the cycle-2 operation request. An
+exact query already saved in cycle 1 replays and costs nothing. Cycle 2 must
+nominate materially different candidates.
 
 A value-bearing `episode-normalized-view` is a PREVIEW. Pass
 `--operation-sha256 <operation_sha256>`; the request is reserved before any

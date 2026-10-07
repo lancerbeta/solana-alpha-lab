@@ -19,6 +19,9 @@ NEXT_ACTION_DRAFT_SCHEMA_RELATIVE = Path(
     "catalog/schemas/hfic_next_epistemic_action_draft_v1.schema.json"
 )
 NEXT_ACTION_SCHEMA_RELATIVE = Path("catalog/schemas/hfic_next_epistemic_action_v1.schema.json")
+# Same shape, wider candidate_ids ceiling: the stored next action of a negative terminal whose draft carried more than 6 cards.
+NEXT_ACTION_WIDE_SCHEMA_RELATIVE = Path("catalog/schemas/hfic_next_epistemic_action_v1_wide.schema.json")
+NEXT_ACTION_NARROW_MAX_CANDIDATES = 6
 ALLOWED_TRIGGERS = frozenset(
     {
         "OWNER_DISCOVERY_REFRAME",
@@ -75,6 +78,7 @@ class HficProspectError(ValueError):
 _PORTFOLIO_VALIDATOR: Draft202012Validator | None = None
 _DRAFT_VALIDATOR: Draft202012Validator | None = None
 _STORED_VALIDATOR: Draft202012Validator | None = None
+_STORED_WIDE_VALIDATOR: Draft202012Validator | None = None
 
 
 def _validator(cache_name: str, schema_path: Path) -> Draft202012Validator:
@@ -237,8 +241,16 @@ def validate_stored_next_action(
 ) -> dict[str, Any]:
     if not isinstance(action, Mapping):
         raise HficProspectError("HFIC_NEXT_ACTION_INVALID")
-    schema_path = Path(repo_root) / NEXT_ACTION_SCHEMA_RELATIVE
-    validator = _STORED_VALIDATOR or _validator("stored", schema_path)
+    global _STORED_WIDE_VALIDATOR
+    wide = len(action.get("candidate_ids") or []) > NEXT_ACTION_NARROW_MAX_CANDIDATES
+    if wide:
+        if _STORED_WIDE_VALIDATOR is None:
+            schema = json.loads((Path(repo_root) / NEXT_ACTION_WIDE_SCHEMA_RELATIVE).read_text(encoding="utf-8"))
+            _STORED_WIDE_VALIDATOR = Draft202012Validator(schema)
+        validator = _STORED_WIDE_VALIDATOR
+    else:
+        schema_path = Path(repo_root) / NEXT_ACTION_SCHEMA_RELATIVE
+        validator = _STORED_VALIDATOR or _validator("stored", schema_path)
     errors = list(validator.iter_errors(action))
     if errors:
         raise HficProspectError("HFIC_NEXT_ACTION_INVALID")

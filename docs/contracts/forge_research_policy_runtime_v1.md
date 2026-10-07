@@ -80,17 +80,34 @@ enters the scientific identity, and a display name is never an identity.
 
 Cycle 1 is unchanged and keeps `SCIENTIFIC_SLOT_V1`. An explicit additional
 cycle (`cycle_index` ≥ 2) adds `cycle_index` to the slot hash and uses
-`cycle_search_key(search_key, cycle_index)` as its own journal, so it has its
-own MAIN/ADAPTIVE/PREVIEW budget. Cycle 2 is admitted only when (a) the
+`cycle_search_key(search_key, cycle_index)` as its own **execution** identity
+(slot, search key, session, operation). Cycle 2 is admitted only when (a) the
 market epoch's frozen pool allows it and (b) the owner passed
 `--additional-cycle`. The pool is raised only by an explicit epoch-scope
 extension; a bare raise of the active defaults does not widen a pool that is
-already frozen. The third cycle is refused with
-`SEARCH_BUDGET_EXHAUSTED`. A pending cycle resumes under the same flag. The
-real cycle count comes from the stored cycle rows (`_auto_cycles`); child
-representation rows are not counted. A second cycle must bring materially
-different candidates: identical definitions are already recorded hypotheses
-of cycle 1 and are refused as duplicates.
+already frozen. The third cycle is refused with `SEARCH_BUDGET_EXHAUSTED`. A
+pending cycle resumes under the same flag. The real cycle count comes from the
+stored cycle rows (`_auto_cycles`); child representation rows are not counted.
+
+**Accounting lineage.** Execution identity and accounting identity are
+separate. A later cycle's operation carries `accounting_root` (the cycle-1
+search key, printed in the cycle-2 preflight receipt) and a
+`parent_operation_sha256` of an operation of the same lineage. It spends the
+root's MAIN/ADAPTIVE/PREVIEW budget: limits are the root's frozen snapshot plus
+its extensions, completed and pending spend are the union over the lineage, and
+an exact query already saved in any journal of the lineage replays instead of
+being a new attempt. So:
+
+- cycle 1 used MAIN 6 of 6 → cycle 2 starts with 0 left, even after AUTO 2 is allowed;
+- an explicit shared total (`research-policy-preview --for-operation <cycle-2 operation> --main-total 10`) raises the root, leaving 4;
+- a cycle-2 operation is created only against the same market, focus and representation; the parent may be completed (that is how the search continues), never stopped and never with an unresolved reservation; a linked cycle freezes no budget of its own.
+
+A representation (for example `NORMALIZED_TRAJECTORY_EPISODES_V1`) of a cycle-2
+BASE session is its own accounting domain, keyed by its parent session, exactly
+like a cycle-1 representation: it is not merged with BASE, not merged across
+cycles, and not an AUTO cycle. A second cycle must bring materially different
+candidates: identical definitions are already recorded hypotheses of cycle 1
+and are refused as duplicates.
 
 ## Identity and integrity
 
@@ -111,6 +128,8 @@ scope rule or a market-evidence basis: this is execution provenance.
 | `RESEARCH_POLICY_CHANGE_EMPTY` | no limit flag and no proposal input | give at least one change |
 | `RESEARCH_POLICY_PREVIEW_STALE` / `RESEARCH_POLICY_EXTENSION_STALE` | the policy or the scope moved since the preview | repeat the preview |
 | `RESEARCH_POLICY_RUN_SNAPSHOT_MISSING` | the scope is not frozen yet | run preflight or create the operation, then preview again |
+| `RESEARCH_POLICY_MIXED_SET_UNSUPPORTED` / `RESEARCH_POLICY_EXTENSION_SET_DUPLICATE_SCOPE` | a file mixes an active-policy change with extensions, or repeats a scope | apply the policy change and the extensions in separate files, one proposal per scope |
+| `ORDINARY_OPERATION_ACCOUNTING_ROOT_REQUIRED` / `_UNKNOWN` / `ORDINARY_OPERATION_LINEAGE_MISMATCH` | a cycle-2 operation lacks, or names a wrong, accounting root or parent | copy `accounting_root` from the cycle-2 preflight receipt and the cycle-1 operation hash as parent |
 | `RESEARCH_POLICY_CONFIRM_REQUIRED` | apply without `--confirm-append-only` | retry with the flag |
 | `RESEARCH_POLICY_PRESET_NOT_FOUND` / `RESEARCH_POLICY_PRESET_CONFLICT` | unknown preset, or an explicit field contradicts it | define the preset first or drop the conflicting field |
 | `RESEARCH_POLICY_CHAIN_CORRUPT` | present-invalid policy state | stop and restore the store; there is no default fallback |
@@ -122,28 +141,29 @@ scope rule or a market-evidence basis: this is execution provenance.
 
 `research-policy-apply` is an owner-invoked CLI call, not a separate
 authorization artifact: the proposal self-hash proves it was not edited after
-preview, `--confirm-append-only` proves an explicit call. At apply, every
-extension proposal is re-checked against the live store before the first
-append (parent run still open and without a pending reservation, the scope
-belongs to that run, not stale); a refusal anywhere applies nothing. A hand-written
+preview, `--confirm-append-only` proves an explicit call. The extensions of one
+file are applied in **one ResearchStore commit**: under the writer lease every
+proposal is re-planned (sequence, stale, legacy freeze) and the live parent
+guard runs again (run not stopped, no unresolved reservation, scope belongs to
+the run). Either the whole supported set is committed or nothing is, and a
+refusal reports `writes: 0` truthfully. An active-policy change is its own
+commit; a file that mixes it with extensions, or repeats a scope, is refused
+before any write. A repeat of an applied set is idempotent. A hand-written
 proposal can still be applied by whoever runs the CLI, as with
 `universe-policy-apply`.
 
 ## Multiple testing
 
-A limit is a ceiling, not a target. Looks per market are
-cycles × `main_total`; a later AUTO cycle's looks are made after cycle 1's
-results exist. The packet states this; an epoch-level aggregate of looks is
-not computed by this delivery.
+A limit is a ceiling, not a target. A later AUTO cycle is a linked segment of
+the same search and spends the same lineage budget, so a new cycle never opens a
+fresh MAIN allowance by itself; only an explicit, owner-previewed raise of the
+root does. The packet shows the root's limits and what is left of them.
 
 ## Known limits of this delivery
 
-- A cycle-2 journal does not share cycle 1's MAIN spend; it has its own budget by design.
-- Child representation of an additional cycle is not supported.
-- A NO_WORTHY receipt for more than 6 candidates is still capped at 6.
+- A representation of a cycle-2 BASE session is covered at the admission boundary (not an AUTO cycle, own slot), not by a full episode-ladder run on a cycle-2 parent.
 - An unparseable policy row is `RESEARCH_POLICY_CHAIN_CORRUPT`; a present-but-invalid `cycle_index` on a stored row still reads as cycle 1.
-- A failure after the PREVIEW reservation of an episode view leaves that reservation pending; the identical retry reads as REPEAT.
-- Apply pre-checks extension proposals only: two proposals for the same scope, or a policy change mixed with extensions, in one hand-built file can apply partially (the refusal lists `applied_before_refusal`); preview never emits such a file.
+- A failure after the PREVIEW reservation of an episode view leaves that reservation pending; the identical retry resumes it (RESUME), spends nothing new and lands the payload.
 - The epoch history used by preflight includes reservations while the packet and status readouts count sessions only, so a pre-runtime epoch with reservations but no session can display a raised `would freeze` limit while preflight enforces the legacy defaults.
 - Two distinct preview request descriptors with a byte-identical payload count as one landed PREVIEW.
 - Test strength: raising `distinct_focuses_per_market`, and applying a change while an operation holds a pending reservation, are covered structurally, not by a dedicated end-to-end test.

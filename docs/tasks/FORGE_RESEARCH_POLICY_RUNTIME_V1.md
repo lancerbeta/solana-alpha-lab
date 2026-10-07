@@ -32,7 +32,9 @@ managed_write_set:
 - catalog/generated/asset_edges.json
 - docs/PROJECT_MAP.md
 - catalog/schemas/hypothesis_forge_draft_v1_3.schema.json
+- catalog/schemas/hfic_next_epistemic_action_v1_wide.schema.json
 - catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json
+- catalog/schemas/hypothesis_forge_session_receipt_v1_2_wide.schema.json
 - catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json
 - catalog/schemas/hypothesis_forge_session_receipt_v1_4.schema.json
 - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
@@ -46,12 +48,14 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hfic_memory_policy.py
 - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
 - src/solana_alpha_lab/factory/hfic_preflight.py
+- src/solana_alpha_lab/factory/hfic_prospects.py
 - src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py
 - src/solana_alpha_lab/factory/hfic_research_policy.py
 - src/solana_alpha_lab/factory/hfic_session.py
 - src/solana_alpha_lab/factory/hfic_temporal_discovery.py
 - src/solana_alpha_lab/factory/live_cohort_to_forge.py
 - tests/test_hfic_list_aware_vertical_v1.py
+- tests/test_hfic_research_policy_closure_v1.py
 - tests/test_hfic_research_policy_v1.py
 - tests/test_hfic_research_policy_vertical_v1.py
 - tests/test_hfic_search_budget_epoch_guard_v1.py
@@ -157,7 +161,8 @@ epoch); explicit extension of exact scopes that never resets spend; a
 value-bearing episode view charged to PREVIEW before any value loads; a real 7th-10th MAIN executing through the
 production gate once raised, with the 11th denied before any value load; a
 fresh ResearchStore handle and a moved root both reading durable state, not
-anything held in process memory; a real AUTO 1→2 cycle, not a fake
+anything held in process memory; a real AUTO 1→2 cycle that continues the same accounting lineage (it
+never opens a fresh MAIN allowance), not a fake
 saturating increment; 10 real candidates (primary ordinal 9, runner-up
 ordinal 10) through persist/freeze/two-stage-Critic/finalize to
 `SYNTHESIS_COMPLETE`; a malformed policy delta refused before any write; a

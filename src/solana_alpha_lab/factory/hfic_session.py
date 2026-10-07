@@ -59,6 +59,11 @@ SESSION_RECEIPT_SCHEMA_BY_PROMPT = {
     PROMPT_VERSION_V1_1: "catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json",
     PROMPT_VERSION: "catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json",
 }
+# Same shape as the historical v1_2 receipt, a wider candidate_ids ceiling: the receipt of a
+# negative terminal (no selected candidate) whose draft carried more than the shipped 6.
+SESSION_RECEIPT_SCHEMA_V1_2_WIDE = (
+    "catalog/schemas/hypothesis_forge_session_receipt_v1_2_wide.schema.json"
+)
 SESSION_RECEIPT_SCHEMA_V1_3 = (
     "catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json"
 )
@@ -1006,6 +1011,8 @@ def _session_receipt_schema_path(
         if wide_candidates:
             return Path(repo_root) / SESSION_RECEIPT_SCHEMA_V1_4_WIDE
         return Path(repo_root) / SESSION_RECEIPT_SCHEMA_V1_3
+    if wide_candidates and not selected_path and prompt_version == PROMPT_VERSION:
+        return Path(repo_root) / SESSION_RECEIPT_SCHEMA_V1_2_WIDE
     relative = SESSION_RECEIPT_SCHEMA_BY_PROMPT.get(prompt_version)
     if relative is None:
         relative = SESSION_RECEIPT_SCHEMA_BY_PROMPT[PROMPT_VERSION_V1_1]
@@ -3159,7 +3166,10 @@ def persist_no_worthy_session(
         _validate_json_schema(
             receipt,
             _session_receipt_schema_path(
-                repo_root, prompt_version, selected_path=False
+                repo_root,
+                prompt_version,
+                selected_path=False,
+                wide_candidates=len(receipt.get("candidate_ids") or []) > MAX_CANDIDATES,
             ),
         )
     receipt_bytes = _canonical_bytes(receipt)

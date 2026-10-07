@@ -342,6 +342,33 @@ class ResearchPolicyRaisedAutoBudgetTests(unittest.TestCase):
         self.assertEqual(admission["action"], "START_NEW_SESSION")
         self.assertEqual(admission["cycle_index"], 2)
 
+    def test_an_episode_representation_of_cycle_two_climbs_the_ladder_and_is_not_a_third_auto(self) -> None:
+        from pathlib import Path
+
+        from solana_alpha_lab.factory.hfic_evidence_identity import resolve_scientific_admission
+        from solana_alpha_lab.factory.hfic_representation_ladder import load_ladder_registry
+
+        root = Path(__file__).resolve().parents[1]
+        episodes = next(
+            row for row in load_ladder_registry(root / "configs" / "hfic_representation_ladder_v1.yaml")["representations"]
+            if row["id"] == "NORMALIZED_TRAJECTORY_EPISODES_V1"
+        )
+        base = [self._row("S1"), self._row("S2", cycle=2)]
+        episode = resolve_scientific_admission(
+            base,
+            market_evidence_epoch=EPOCH_A,
+            representation_id="NORMALIZED_TRAJECTORY_EPISODES_V1",
+            representation_semantic_version=str(episodes["version"]),
+            owner_focus="AUTO",
+            auto_sessions_per_market=2,
+            repo_root=root,
+        )
+        self.assertEqual(episode["action"], "START_NEW_SESSION", episode)
+        self.assertNotEqual(episode.get("reason_code"), "SEARCH_BUDGET_EXHAUSTED")
+        # Its slot is its own: neither BASE cycle's slot, and not an AUTO cycle of its own.
+        self.assertNotIn(episode["scientific_slot_sha256"], {row["scientific_slot_sha256"] for row in base})
+        self.assertEqual(self._admit(base, auto_sessions_per_market=2, additional_cycle=True)["reason_code"], "SEARCH_BUDGET_EXHAUSTED")
+
     def test_an_additional_cycle_without_a_prior_cycle_is_refused(self) -> None:
         admission = self._admit([], auto_sessions_per_market=8, requested_cycle_index=2)
         self.assertEqual(admission["reason_code"], "ADDITIONAL_CYCLE_WITHOUT_PRIOR_CYCLE")

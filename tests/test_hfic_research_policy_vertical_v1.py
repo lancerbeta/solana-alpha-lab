@@ -55,6 +55,8 @@ def _attempt(
     *,
     cap_main: int = 10,
     cycle_index: int | None = None,
+    accounting_root: str | None = None,
+    parent_operation_sha256: str | None = None,
     tag: str = "rpv",
 ) -> tuple[int, dict]:
     spec = _compound_spec(
@@ -94,6 +96,8 @@ def _attempt(
     )
     if cycle_index:
         operation["cycle_index"] = cycle_index
+        operation["accounting_root"] = accounting_root
+        operation["parent_operation_sha256"] = parent_operation_sha256
     op_path.write_text(json.dumps(operation), encoding="utf-8")
     done = run_cli(
         "discovery-execute",
@@ -439,6 +443,58 @@ class ResearchPolicyBranchTests(unittest.TestCase):
             self.assertEqual((main["completed"], main["pending"], main["remaining"]), (6, 0, 0))
 
 
+class ResearchPolicyWideNoWorthyTests(unittest.TestCase):
+    """P1-D: 10 candidates and no selected one end as NO_WORTHY with all 10 identities preserved."""
+
+    def test_ten_cards_without_a_selection_finish_negative_and_read_back_fresh(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            focus = "RPV_WIDE_NO_WORTHY"
+            data_root, receipt0 = _publish_focus(workspace, focus)
+            journal = str(receipt0["search_key_sha256"])
+            market = str(receipt0["market_evidence_epoch_sha256"])
+            store = ResearchStore(data_root, create_if_missing=False)
+            raised = _json(run_cli("research-policy-preview", "--max-generated", "10", "--format", "json", data_root=data_root))
+            raised_file = workspace / "nw-policy.json"
+            raised_file.write_text(json.dumps(raised), encoding="utf-8")
+            self.assertEqual(_json(run_cli("research-policy-apply", "--proposal", str(raised_file), "--confirm-append-only", "--format", "json", data_root=data_root))["status"], "APPENDED")
+            code, look = _attempt(0, workspace, focus, journal, market, data_root, cap_main=1, tag="nw")
+            self.assertEqual(code, 0, look)
+            cards = [_card(n, f"Negative-portfolio claim {n}.") for n in range(1, 11)]
+            resume = _preflight(data_root, focus)
+            draft = _draft(resume, cards, "RPV-C9", "RPV-C10", "RPV-C1", look)
+            draft.pop("selected_candidate_ref")
+            draft["non_claims"] = ["NO_ALPHA", "NO_WORTHY_HYPOTHESIS"]
+            draft_path = workspace / "nw-draft.json"
+            receipt_path = workspace / "nw-receipt.json"
+            draft_path.write_text(json.dumps(draft), encoding="utf-8")
+            receipt_path.write_text(json.dumps(resume), encoding="utf-8")
+            persisted = run_cli("persist-draft", "--draft", str(draft_path), "--preflight-receipt", str(receipt_path), "--representation-id", "BASE", "--format", "json", data_root=data_root)
+            self.assertEqual(persisted.returncode, 0, persisted.stderr + persisted.stdout)
+            again = _preflight(data_root, focus)
+            receipt_path.write_text(json.dumps(again), encoding="utf-8")
+            frozen_run = run_cli("freeze", "--draft", str(draft_path), "--preflight-receipt", str(receipt_path), "--format", "json", data_root=data_root)
+            self.assertEqual(frozen_run.returncode, 0, frozen_run.stderr + frozen_run.stdout)
+            frozen = json.loads(frozen_run.stdout)
+            self.assertEqual(frozen["critic_terminal"], "NO_WORTHY_HYPOTHESIS")
+            self.assertIsNone(frozen["selected_candidate_id"])
+            self.assertEqual(len(frozen["candidate_ids"]), 10)
+
+            # A fresh process reads the negative terminal back with every identity and no invented selection.
+            shown = run_cli("show-session", "--session-id", str(frozen["session_id"]), "--format", "json", data_root=data_root)
+            self.assertEqual(shown.returncode, 0, shown.stderr + shown.stdout)
+            body = json.loads(shown.stdout)
+            session = body.get("session", body)
+            self.assertEqual(session["critic_terminal"], "NO_WORTHY_HYPOTHESIS")
+            self.assertIsNone(session.get("selected_candidate_id"))
+            self.assertEqual(session["candidate_ids"], frozen["candidate_ids"])
+            from solana_alpha_lab.factory.hfic_session import load_session_bundle
+
+            bundle = load_session_bundle(ResearchStore(data_root, create_if_missing=False), str(frozen["session_id"]))
+            self.assertEqual(len(bundle["candidate_ids"]), 10)
+            self.assertEqual(bundle["critic_terminal"], "NO_WORTHY_HYPOTHESIS")
+
+
 class ResearchPolicyAutoCycleVerticalTests(unittest.TestCase):
     """B08: AUTO 1 -> 2 through the production preflight/freeze path; the third is denied."""
 
@@ -501,8 +557,21 @@ class ResearchPolicyAutoCycleVerticalTests(unittest.TestCase):
             # A second cycle must bring materially different candidates: identical definitions are
             # already recorded hypotheses of cycle 1 and are refused as duplicates.
             cards2 = [_card(n, f"Cycle two claim for candidate {n}, a different question.") for n in range(1, 4)]
-            code2, second = _attempt(0, workspace, focus, journal2, market, data_root, cycle_index=2, tag="c2")
+            self.assertEqual(start["accounting_root"], journal1)  # the lineage root travels in the receipt
+            lineage = dict(cycle_index=2, accounting_root=journal1, parent_operation_sha256=operation)
+            code2, second = _attempt(1, workspace, focus, journal2, market, data_root, tag="c2", **lineage)
             self.assertEqual(code2, 0, second)
+            from solana_alpha_lab.factory.hfic_ordinary_operation import journal_occupancy
+
+            shared = journal_occupancy(ResearchStore(data_root, create_if_missing=False), journal2)["main"]
+            self.assertEqual((shared["limit"], shared["completed"]), (6, 2))  # cycle 1's look plus cycle 2's, one budget
+            # The exact query cycle 1 already saved is a replay, never a new attempt in cycle 2.
+            code_r, replay = _attempt(0, workspace, focus, journal2, market, data_root, tag="c1", **lineage)
+            self.assertEqual(code_r, 0, replay)
+            self.assertFalse(replay.get("values_loaded", False))
+            self.assertEqual(
+                journal_occupancy(ResearchStore(data_root, create_if_missing=False), journal2)["main"]["completed"], 2
+            )
             done2 = _freeze_and_finalize(
                 workspace, data_root, focus,
                 lambda resume: _draft(resume, cards2, "RPV-C1", "RPV-C2", "RPV-C3", second),
