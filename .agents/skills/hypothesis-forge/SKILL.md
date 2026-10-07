@@ -45,16 +45,20 @@ remainder, not a silent cap of one. Coverage without values stays
 
 MAIN/ADAPTIVE/PREVIEW totals, AUTO-cycle and distinct-focus caps, and the
 candidate/diagnostic-slice ceilings are a runtime policy, not a Git constant:
-`research-policy-status` (optionally `--journal-scope`), then
-`research-policy-preview --main-total N ...` and `research-policy-apply
---confirm-append-only` to raise the active policy for *new* runs. A bare
-active-policy raise never moves a journal already frozen at first touch;
-raise that exact journal with `research-policy-extension-preview
---journal-scope <key> --parent-operation-sha256 <op>` then
-`research-policy-extension-apply --confirm-append-only`, which never resets
-what that journal has already spent. Contract:
-`docs/contracts/forge_research_policy_runtime_v1.md`. This delivery never
-raises a shipped default itself.
+`research-policy-status` (optionally `--for-operation`, `--journal-scope` or
+`--epoch-scope`), then `research-policy-preview --main-total N ...` and
+`research-policy-apply --proposal <file> --confirm-append-only` to change the
+active policy for *new* runs. A bare active-policy change never moves a scope
+already frozen; raise exactly one open run with `research-policy-preview
+--for-operation <operation_sha256> --main-total N` and apply the unedited
+proposal, which never resets what that run has already spent. AUTO cycle 2
+needs both an epoch-pool extension (`--auto-cycles-per-market 2` with
+`--for-operation`) and the explicit `preflight --additional-cycle`; a plain
+preflight never starts a cycle, and cycle 2 must bring materially different
+candidates. A value-bearing `episode-normalized-view` needs
+`--operation-sha256` and spends one PREVIEW; the identical request again
+spends nothing. Contract: `docs/contracts/forge_research_policy_runtime_v1.md`.
+This delivery never raises a shipped default itself.
 `next_action=CORRECT_CALCULATION_REVISION` means the saved temporal result is
 internally inconsistent. It is a technical stop, not a request for more
 looks. Revise that exact result with `discovery-execute ... --correct-result-ref

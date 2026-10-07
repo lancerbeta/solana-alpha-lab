@@ -3196,13 +3196,11 @@ def run_preflight(
         pool_scope = None
     if pool_scope is None:
         _preflight_limits = dict(DEFAULT_LIMITS)
-    elif persist:
-        pool_frozen_now = read_scope_snapshot(store, pool_scope) is None
-        ensure_scope_snapshot(store, pool_scope, has_history=epoch_has_history)
+    elif read_scope_snapshot(store, pool_scope) is not None:
         # Effective pool = the frozen scope plus its own explicit extensions.
         _preflight_limits = limits_for_frozen_run(store, pool_scope)
-        pre_context_store_writes += int(pool_frozen_now)
     else:
+        # Not frozen yet: report what would be frozen; a blocked or read-only preflight writes nothing.
         _preflight_limits = resolve_scope_limits(store, pool_scope, has_history=epoch_has_history)["limits"]
     admission_sink: dict[str, Any] = {}
     action, bound_session = decide_preflight_action(
@@ -3227,6 +3225,10 @@ def run_preflight(
         additional_cycle=additional_cycle,
         admission_sink=admission_sink,
     )
+    if persist and pool_scope is not None and action == "START_NEW_SESSION" and read_scope_snapshot(store, pool_scope) is None:
+        # The pool freezes only when a session genuinely starts, never on a STOP or a read.
+        ensure_scope_snapshot(store, pool_scope, has_history=epoch_has_history)
+        pre_context_store_writes += 1
     cycle_index = 1
     if action == "START_NEW_SESSION":
         cycle_index = int(admission_sink.get("cycle_index") or 1)

@@ -249,33 +249,48 @@ Only then invoke `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
 
 **Research-policy runtime.** MAIN/ADAPTIVE/PREVIEW totals, AUTO-cycle and
 distinct-focus caps, and the candidate/diagnostic-slice ceilings live in
-ResearchStore, not in Git. Status (optionally scoped to one journal):
+ResearchStore, not in Git. Status (reads no market value, writes nothing;
+optionally scoped to one open operation, journal or market epoch):
 
 ```
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-status --journal-scope <search_key_sha256>
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-status --for-operation <operation_sha256>
 ```
 
-Preview and apply a change to the active policy (governs *new* journals
-only; never moves one already frozen):
+Preview and apply a change to the active policy (governs *new* runs only;
+never moves a scope already frozen). Save the preview output as the proposal
+file and apply it unedited:
 
 ```
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-preview --main-total 10 --max-generated 10
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-preview --main-total 10 --max-generated 10 --format json > proposal.json
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-apply --proposal proposal.json --confirm-append-only
 ```
 
-To raise one exact journal that already has a frozen snapshot, without
-resetting what it has already spent, extend it explicitly instead:
+To raise one exact open run without resetting what it has already spent,
+preview with `--for-operation`; the proposal names that run's journal scope and
+its market-epoch pool scope (the AUTO and distinct-focus fields belong to the
+epoch pool):
 
 ```
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-extension-preview --journal-scope <search_key_sha256> --parent-operation-sha256 <operation_sha256> --main-total 10
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-extension-apply --proposal proposal.json --confirm-append-only
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-preview --for-operation <operation_sha256> --main-total 10 --format json > proposal.json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-apply --proposal proposal.json --confirm-append-only
 ```
 
-Without `--confirm-append-only` both apply commands exit
-`RESEARCH_POLICY_CONFIRM_REQUIRED`. If the active policy moved since preview,
-apply exits `RESEARCH_POLICY_PREVIEW_STALE`; if another extension landed on
-that journal first, extension-apply exits `RESEARCH_POLICY_EXTENSION_STALE`.
-Re-run the matching preview and save a new `proposal.json`. Contract:
+AUTO cycle 2 is explicit. After an epoch-pool extension to
+`--auto-cycles-per-market 2`, start it with
+`preflight --discovery-contract --owner-focus AUTO --additional-cycle`. A plain
+preflight returns the saved session and never starts a cycle; a third cycle is
+refused with `SEARCH_BUDGET_EXHAUSTED`. Cycle 2 has its own search key and
+budget and must nominate materially different candidates.
+
+A value-bearing `episode-normalized-view` is a PREVIEW. Pass
+`--operation-sha256 <operation_sha256>`; the request is reserved before any
+value is read and the identical request again spends nothing.
+
+Without `--confirm-append-only` apply exits `RESEARCH_POLICY_CONFIRM_REQUIRED`.
+If the policy or the scope moved since preview, apply exits
+`RESEARCH_POLICY_PREVIEW_STALE` or `RESEARCH_POLICY_EXTENSION_STALE`; re-run
+the preview and save a new `proposal.json`. Applying the same proposal twice
+returns `ALREADY_APPLIED`. Contract:
 `docs/contracts/forge_research_policy_runtime_v1.md`.
 
 ---

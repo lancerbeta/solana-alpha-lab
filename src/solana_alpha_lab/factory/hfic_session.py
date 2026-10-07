@@ -2434,6 +2434,13 @@ def freeze_draft(
             or None,
             ladder_representation_id=slot_rep,
             control_session_id=slot_parent,
+            # An explicitly authorized additional cycle is its own slot; cycle 1 is unchanged.
+            scientific_slot_sha256=(
+                str(result.get("scientific_slot_sha256") or "") or None
+                if int(result.get("cycle_index") or 1) > 1
+                else None
+            ),
+            cycle_index=int(result.get("cycle_index") or 1),
         )
         if existing is not None and (
             not isinstance(preflight_receipt, Mapping)
@@ -5311,6 +5318,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                     "execution_binding_sha256"
                 ),
                 "model_provenance_sha256": payload.get("model_provenance_sha256"),
+                "cycle_index": payload.get("cycle_index"),
                 "critic_terminal": payload.get("critic_terminal"),
                 "final_session_terminal": payload.get("final_session_terminal"),
                 "selected_candidate_id": payload.get("selected_candidate_id"),
@@ -5335,6 +5343,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                 "scientific_slot_sha256",
                 "execution_binding_sha256",
                 "model_provenance_sha256",
+                "cycle_index",
             )
             if key in payload
         }
@@ -5368,6 +5377,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
         "scientific_slot_sha256",
         "execution_binding_sha256",
         "model_provenance_sha256",
+        "cycle_index",
     )
     for sid, rows in by_session_cycles.items():
         head = latest.get(sid)
@@ -8617,6 +8627,18 @@ def load_session_bundle(
         bundle.pop("grounded_candidates", None)
     if "closed_or_suppressed_collision_count" not in cycle:
         bundle.pop("closed_or_suppressed_collision_count", None)
+    stamped_cycles = {
+        int(row["cycle_index"])
+        for row in cycles
+        if isinstance(row.get("cycle_index"), int)
+        and not isinstance(row.get("cycle_index"), bool)
+        and row["cycle_index"] > 1
+    }
+    if len(stamped_cycles) == 1:
+        # Only an explicitly authorized additional cycle is marked; cycle 1 stays unmarked.
+        bundle["cycle_index"] = next(iter(stamped_cycles))
+    elif len(stamped_cycles) > 1:
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
     expected_action_sha = None
     if isinstance(session_receipt, Mapping):
         maybe_sha = session_receipt.get("next_action_artifact_sha256")

@@ -498,11 +498,14 @@ class ResearchPolicyAutoCycleVerticalTests(unittest.TestCase):
             self.assertEqual(start["cycle_index"], 2)
             journal2 = str(start["search_key_sha256"])
             self.assertNotEqual(journal2, journal1)
+            # A second cycle must bring materially different candidates: identical definitions are
+            # already recorded hypotheses of cycle 1 and are refused as duplicates.
+            cards2 = [_card(n, f"Cycle two claim for candidate {n}, a different question.") for n in range(1, 4)]
             code2, second = _attempt(0, workspace, focus, journal2, market, data_root, cycle_index=2, tag="c2")
             self.assertEqual(code2, 0, second)
             done2 = _freeze_and_finalize(
                 workspace, data_root, focus,
-                lambda resume: _draft(resume, cards, "RPV-C1", "RPV-C2", "RPV-C3", second),
+                lambda resume: _draft(resume, cards2, "RPV-C1", "RPV-C2", "RPV-C3", second),
                 store, "--additional-cycle", tag="cycle2",
             )
             self.assertEqual(done2["final"].get("session_state"), "SYNTHESIS_COMPLETE")

@@ -25,15 +25,21 @@ objective: >-
   lifecycle — without raising any shipped default and without touching VPS,
   canary, deploy, provider routing or real science.
 managed_write_set:
+- .agents/skills/hypothesis-forge/SKILL.md
 - catalog/assets/core.yaml
 - catalog/catalog_manifest.yaml
 - catalog/schemas/hypothesis_forge_draft_v1_3.schema.json
+- catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json
+- catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json
 - catalog/schemas/hypothesis_forge_session_receipt_v1_4.schema.json
+- docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
 - docs/contracts/forge_research_policy_runtime_v1.md
 - docs/tasks/FORGE_RESEARCH_POLICY_RUNTIME_V1.md
 - docs/evidence/forge_research_policy_runtime_v1/**
 - scripts/hypothesis_forge.py
+- src/solana_alpha_lab/factory/hfic_evidence_identity.py
 - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
+- src/solana_alpha_lab/factory/hfic_memory_policy.py
 - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
 - src/solana_alpha_lab/factory/hfic_preflight.py
 - src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py
@@ -41,6 +47,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hfic_session.py
 - src/solana_alpha_lab/factory/hfic_temporal_discovery.py
 - src/solana_alpha_lab/factory/live_cohort_to_forge.py
+- tests/test_hfic_list_aware_vertical_v1.py
 - tests/test_hfic_research_policy_v1.py
 - tests/test_hfic_research_policy_vertical_v1.py
 - tests/test_hfic_search_budget_epoch_guard_v1.py
@@ -106,10 +113,14 @@ at one effective-limits resolver without changing any shipped behavior for a
 journal that never touches the new owner; and whether the AUTO admission
 counter was a real per-epoch count or a saturating `int(any(...))` that could
 never produce a genuine 1→2 raise.
-CAPABILITY_OR_EVIDENCE: `hfic_research_policy` (one owner, three CAS
-surfaces), the `research-policy` CLI (`show/preview/apply/extension-preview/
-extension-apply`), the additive draft `packet_version "1.3"` and session-
-receipt `v1_4` schemas, and a production-shaped micro-vertical.
+CAPABILITY_OR_EVIDENCE: `hfic_research_policy` (three owners: Git defaults,
+ResearchStore active policy, frozen scope snapshots plus explicit
+extensions; JOURNAL and market-EPOCH scopes), the `research-policy-status/
+-preview/-apply` CLI (`--for-operation` extends exact scopes), `preflight
+--additional-cycle`, `episode-normalized-view --operation-sha256` (PREVIEW
+gate), the additive draft `packet_version "1.3"` and session-receipt
+`v1_4` schemas, an optional `cycle_index` on the session receipt, and a
+production-shaped micro-vertical.
 Cheapest falsifier (exact base, before any change; `V0`): a 7th real
 synthetic MAIN query is denied (`QUERY_MAIN_BUDGET_EXHAUSTED`) even with
 `owner_cap.main=10`; the draft schema rejects a 10-candidate packet
@@ -137,8 +148,9 @@ bare pure-function caller of `classify_temporal_look`/`classify_query_look`/
 DoD: PRD B01-B09 as relevant to PR-B: owner-settable MAIN/ADAPTIVE/PREVIEW/
 AUTO/distinct-focus/candidate/diagnostic-slice limits with hard fuses;
 CAS-protected active-policy apply never blocked by an open operation;
-per-journal frozen snapshot on first touch; explicit per-journal extension
-that never resets spend; a real 7th-10th MAIN executing through the
+per-scope frozen snapshot on first genuine operation (journal or market
+epoch); explicit extension of exact scopes that never resets spend; a
+value-bearing episode view charged to PREVIEW before any value loads; a real 7th-10th MAIN executing through the
 production gate once raised, with the 11th denied before any value load; a
 fresh ResearchStore handle and a moved root both reading durable state, not
 anything held in process memory; a real AUTO 1→2 cycle, not a fake
