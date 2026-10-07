@@ -84,6 +84,18 @@ SMIAL_FORGE_GROUNDED_HANDOFF_CLOSURE_V1_PRD_SSD_2026-10-07.md specification.
 The document is the bounded implementation specification; its diagnostic
 claims must be reproduced, and it grants no merge or production authority.
 
+Continuation authorization: the owner accepted checkpoint
+`8a3e9d8e1c848395ac7cee99bc2cf75637417543` as intermediate evidence, then
+explicitly requested H08/H09 closure in the same repair atom. Repair only the
+shared Critic transport losslessly; reuse the exact persisted native draft,
+candidate, market, slot, reservation, look, accounting and typed recipe. Use
+existing prefreeze capability recovery, isolated actual Critic and supported
+ExperimentSpec 1.3 / DocumentRunner. No new formulation, candidate or look;
+no draft rewrite, refund, reroll or softened data/schema semantics. Push/PR/merge
+are forbidden before the complete checkpoint. A cheap existing chronological
+consumer may consume only an already frozen later/sign-reversed branch; absent
+consumer/input is a named gap, not permission to build a new subsystem.
+
 ENTRY_DECISION: START_WITH_PATCH. SPEC_ROUTE: BOTH. MODEL_EFFORT: SOL_XHIGH.
 Consumer: ordinary Forge generator, independent Critic and existing experiment
 consumer. Tool need: delivery-harness, hypothesis-forge/independent Critic,

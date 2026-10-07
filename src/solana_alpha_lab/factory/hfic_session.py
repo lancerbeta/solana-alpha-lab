@@ -1163,6 +1163,14 @@ def _selected_candidate_block(
         required_caps = []
     decision_unlocked = str(card.get("decision_unlocked") or "NOT_DECLARED_IN_DRAFT")
     disconfirming = str(card.get("disconfirming_prediction") or "NOT_DECLARED_IN_DRAFT")
+    bindings = card.get("available_data_bindings") or []
+    if isinstance(bindings, list):
+        # Critic strings are narrative transport, never typed resolver input.
+        # Encode authored objects reversibly; retain legacy strings verbatim.
+        bindings = [
+            _canonical_bytes(item).decode("utf-8") if isinstance(item, Mapping) else item
+            for item in bindings
+        ]
     block: dict[str, Any] = {
         "candidate_id": identity.candidate_id,
         "claim": str(card.get("claim") or ""),
@@ -1188,7 +1196,7 @@ def _selected_candidate_block(
         or ["NOT_DECLARED_IN_DRAFT"],
         "execution_capacity_risks": card.get("execution_capacity_risks")
         or ["NOT_DECLARED_IN_DRAFT"],
-        "available_data_bindings": card.get("available_data_bindings") or [],
+        "available_data_bindings": bindings,
         "missing_or_forward_only_data": card.get("missing_or_forward_only_data") or [],
         "proposed_method": str(card.get("proposed_method") or "NOT_DECLARED_IN_DRAFT"),
         "cheapest_falsifier": str(card.get("cheapest_falsifier") or ""),
