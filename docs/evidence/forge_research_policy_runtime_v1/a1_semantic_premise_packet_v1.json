@@ -1,0 +1,153 @@
+{
+  "candidate": {
+    "base": "04ec8e0286a3dce5999d0687784717ee90fc5dca",
+    "diff_sha256": "c6237a0e22bdf35cf0c39d84961fed32ae5e3fef56ae6878fcf11bbb5824bcb2",
+    "head": "27b6b9409b6be49b038d8ad6e6f423d5c7c45470"
+  },
+  "evidence": [
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_research_policy.py",
+      "sha256_or_fingerprint": "d2d1377622ea531330b7a30a1539fffd5200484df39bd3ad00a25a00ec92dac5"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_ordinary_operation.py",
+      "sha256_or_fingerprint": "fefb83e0457be4340b5d1b907866673e0469c33f665e0250632f77d36ff4b1d8"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_preflight.py",
+      "sha256_or_fingerprint": "589a24792acf7013232aa3d0cab2ebe05c08514c1fea8b439179a9682ef8ce39"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_session.py",
+      "sha256_or_fingerprint": "a597c5260e15bbec04012df3913b63ae9e0b5a30c77e5eef4600b4a289d35d53"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_evidence_identity.py",
+      "sha256_or_fingerprint": "aaa697b73007b8789a5e5be68c45748ca4648f285da5f3ace977e834b38acdd0"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_memory_policy.py",
+      "sha256_or_fingerprint": "fe25732d82649af10612da1d85bf341ec2e814c88ea945b2800ff17e9114bcc7"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
+      "sha256_or_fingerprint": "6371621588abdeed3cacfb0ee4d30e3560d9c278b399128ea97593a5ab1f4624"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_grounded_discovery.py",
+      "sha256_or_fingerprint": "0abd10d8659d0b7047d8c094badd37ccdc8b75325d9fe17283a63e6bdc52db45"
+    },
+    {
+      "logical_ref": "repo://scripts/hypothesis_forge.py",
+      "sha256_or_fingerprint": "8acbc47e6a14ee83337f2d9e85d9f349265454307e8940b2f4b94a8c2be45db6"
+    },
+    {
+      "logical_ref": "repo://tests/test_hfic_research_policy_v1.py",
+      "sha256_or_fingerprint": "87c53cd0577744697f3e808240ae2cb47093ac842a9dc83da3b4e67a4ba5bfae"
+    },
+    {
+      "logical_ref": "repo://tests/test_hfic_research_policy_vertical_v1.py",
+      "sha256_or_fingerprint": "7015c2e832047935998d4ec6e0bf352bd47a5fa1a50f747d26d962054ce30a64"
+    },
+    {
+      "logical_ref": "repo://docs/contracts/forge_research_policy_runtime_v1.md",
+      "sha256_or_fingerprint": "d693ee01a5f2631bba4d9406adfc28cbe723772bd89a88f0bf1c093b18af081f"
+    }
+  ],
+  "independence": {
+    "claim_scope": "PACKET_INFORMATION_PATH",
+    "context_isolated": true,
+    "implementation_transcript_seen": false,
+    "launch_isolation": "PROCESS_OBLIGATION",
+    "model_diversity": "UNPROVEN",
+    "model_diversity_identity": null,
+    "packet_bound": true,
+    "readonly": true
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CAUSAL_OR_INTERACTION_CLAIM",
+    "NO_PROVIDER_CALLS",
+    "NO_PRODUCTION_DATA",
+    "NO_VPS_OR_LIVE_CHANGE",
+    "NO_MERGE",
+    "NO_SHIPPED_DEFAULT_RAISED_FOR_PRODUCTION",
+    "NO_PR_A_LIST_AWARE_SCOPE_REOPENED",
+    "NO_NEW_COLLECTOR_EVALUATOR_DATABASE_OR_SERVICE"
+  ],
+  "packet_fingerprint_sha256": "74c1915a9e4bc1d3de8dd89ba366ad5b1aa631c2920f805340f1d97b5702a2cd",
+  "questions": [
+    "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
+    "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
+    "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL",
+    "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE",
+    "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY",
+    "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING",
+    "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER",
+    "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE",
+    "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM",
+    "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS"
+  ],
+  "review": {
+    "architecture_owner": "ARCHITECTURE_CRITIC",
+    "profile": "SEMANTIC_PREMISE",
+    "risk_dimensions": [
+      "OWNER_AUTHORITY_SEMANTICS",
+      "EXECUTION_TRUTH_SEMANTICS",
+      "DURABLE_SCIENCE_SCHEMA"
+    ]
+  },
+  "schema": "smial.semantic-premise-review-packet",
+  "schema_version": "1.0",
+  "semantic_claims": [
+    {
+      "claim": "A change of the active policy never moves a scope that is already frozen; only an explicit, owner-previewed extension of exactly that journal and market-epoch scope raises it.",
+      "claim_id": "C1",
+      "scope": "policy_separation"
+    },
+    {
+      "claim": "An extension never resets spend: spend is owned by hfic_ordinary_operation.py and computed from completed looks plus pending reservations, not by the policy module.",
+      "claim_id": "C2",
+      "scope": "spend_accounting"
+    },
+    {
+      "claim": "A scope with pre-existing history and no snapshot freezes at the shipped defaults (LEGACY_DEFAULTS_V1); read-only paths never write a policy artifact.",
+      "claim_id": "C3",
+      "scope": "legacy_identity"
+    },
+    {
+      "claim": "No field exceeds its hard fuse via preset, extension or active change; max_diagnostic_slices may only be lowered; present-invalid policy state is a typed refusal, never a silent default.",
+      "claim_id": "C4",
+      "scope": "hard_fuse"
+    },
+    {
+      "claim": "Bare callers of classify_temporal_look, classify_query_look, decide_preflight_action, epoch_search_budget_usage and resolve_scientific_admission that omit the new kwargs keep shipped behavior; cycle 1 identity/hashes are byte-identical.",
+      "claim_id": "C5",
+      "scope": "legacy_call_compatibility"
+    },
+    {
+      "claim": "The AUTO counter counts real cycles from stored rows; a plain preflight never starts a cycle; cycle 2 needs both an epoch-pool extension and the explicit --additional-cycle, gets its own slot hash, search key and budget; the third is denied.",
+      "claim_id": "C6",
+      "scope": "auto_cycle_truth"
+    },
+    {
+      "claim": "Draft packet_version 1.3, receipt v1_4 and the optional receipt cycle_index (integer>=2) are additive; existing packets and receipts validate unchanged.",
+      "claim_id": "C7",
+      "scope": "additive_schema"
+    },
+    {
+      "claim": "A value-bearing episode-normalized-view is reserved against the exact operation's PREVIEW budget by request descriptor before any value loads; the identical request spends nothing; metadata-only paths spend nothing.",
+      "claim_id": "C8",
+      "scope": "preview_gate"
+    },
+    {
+      "claim": "Policy apply and extension are CAS-protected with idempotent re-apply and bounded WRITER_BUSY retry; a last-slot race has exactly one winner.",
+      "claim_id": "C9",
+      "scope": "concurrency"
+    }
+  ],
+  "task": {
+    "task_contract_sha256": "d539681cf6eeca8896a4f7b7504dd1c1aaf412b4b6cc7832dcb5106947cd258c",
+    "task_id": "FORGE_RESEARCH_POLICY_RUNTIME_V1"
+  }
+}

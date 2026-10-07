@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-RESEARCH-POLICY-RUNTIME-COMPLETION-001",
+  "as_of": "2026-10-07",
+  "task_id": "FORGE_RESEARCH_POLICY_RUNTIME_V1",
+  "state_change": "OWNER_CONFIGURABLE_FORGE_RESEARCH_POLICY_IN_RESEARCHSTORE_ONE_RESOLVER_FROZEN_SCOPES_EXPLICIT_EXTENSIONS_AUTO_CYCLE_2_AND_PREVIEW_GATE_WITH_SHIPPED_DEFAULTS_UNCHANGED",
+  "base_main": "04ec8e0286a3dce5999d0687784717ee90fc5dca",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_research_policy_runtime_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_MICRO_VERTICAL_PRD15_THROUGH_PUBLIC_CLI;PASS_AUTO_CYCLE_1_TO_2_THIRD_DENIED;PASS_TWO_PROCESS_LAST_SLOT_RACE;PASS_PREVIEW_GATE_EPISODE_VIEW;PASS_10_CANDIDATES_PRIMARY_9_RUNNER_UP_10_TO_SYNTHESIS_COMPLETE;PASS_REGRESSION_16_AFFECTED_SUITES;ONE_UNREPRODUCED_VERTICAL_FLAKE_5_CLEAN_RERUNS",
+    "independent_review": {
+      "path": "docs/evidence/forge_research_policy_runtime_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_HARNESS_SYNC",
+      "PASS_FOUR_ISOLATED_CONTENT_REVIEWS_CODE_GOAL_DOD_ARCHITECTURE_SEMANTIC_PREMISE_OWNER_UX_TWO_ROUNDS",
+      "PASS_SHIPPED_DEFAULTS_NOT_RAISED"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CAUSAL_OR_INTERACTION_CLAIM",
+    "SYNTHETIC_ONLY",
+    "NO_PROVIDER_CALLS",
+    "NO_PRODUCTION_DATA",
+    "NO_VPS_DEPLOY_SETTINGS_TIMER_CHANGE",
+    "NO_MERGE",
+    "NO_SHIPPED_DEFAULT_RAISED_FOR_PRODUCTION",
+    "NO_EPOCH_LEVEL_LOOK_AGGREGATE",
+    "NO_SEPARATE_OWNER_AUTHORIZATION_ARTIFACT"
+  ],
+  "side_effects": {
+    "network_calls": "UNKNOWN_TOTAL_DELIVERY_TRANSPORT",
+    "bounded_metadata_probe_attempts": 0,
+    "provider_calls": 0,
+    "local_writes": 1,
+    "external_actions": 0
+  }
+}

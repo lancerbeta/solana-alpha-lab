@@ -1,0 +1,94 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-RESEARCH-POLICY-RUNTIME-REVIEW-001",
+  "as_of": "2026-10-07",
+  "task_id": "FORGE_RESEARCH_POLICY_RUNTIME_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_27b6b9409b6be49b038d8ad6e6f423d5c7c45470",
+        "RESIDUAL_P0_P1_NONE",
+        "packet_fingerprint_sha256=74c1915a9e4bc1d3de8dd89ba366ad5b1aa631c2920f805340f1d97b5702a2cd",
+        "SEMANTIC_PREMISE_PACKET_INFORMATION_PATH_PROCESS_OBLIGATION_MODEL_DIVERSITY_UNPROVEN",
+        "ROUND1_M1_M2_M3_RESOLVED_OR_HONESTLY_DOCUMENTED_RESIDUALS"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_27b6b9409b6be49b038d8ad6e6f423d5c7c45470",
+        "RESIDUAL_P0_P1_NONE",
+        "ROUND1_MAJOR_LEGACY_SCOPE_EXTENSION_FIXED_AND_VERIFIED",
+        "MINORS_DUPLICATE_SCOPE_IN_HAND_BUILT_BATCH_AND_EPOCH_HISTORY_HELPER_DOCUMENTED_NOT_FIXED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_27b6b9409b6be49b038d8ad6e6f423d5c7c45470",
+        "RESIDUAL_P0_P1_NONE",
+        "DOD_PROVEN_EXCEPT_DISTINCT_FOCUS_RAISE_AND_PENDING_RESERVATION_APPLY_TEST_STRENGTH_RESIDUAL",
+        "ADAPTIVE_PREVIEW_RESOLUTION_REACHES_GATE_OCCUPANCY"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_27b6b9409b6be49b038d8ad6e6f423d5c7c45470",
+        "RESIDUAL_P0_P1_NONE",
+        "FIVE_ROUND1_DOC_FINDINGS_FIXED",
+        "ALL_DOCUMENTED_FLAGS_EXIST_IN_ARGPARSE"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_LIVE_ACCEPTANCE",
+    "NO_MERGE",
+    "NO_MODEL_DIVERSITY_ATTESTATION",
+    "PACKET_INFORMATION_PATH_ONLY",
+    "NO_LIVE_LAUNCH_IDENTITY_ATTESTATION"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "A legacy market epoch or journal could never be frozen so it could never be extended",
+      "observed_head": "33e66400daf93d342cdfed417f36ca099b599b62",
+      "resolved_by_head": "27b6b9409b6be49b038d8ad6e6f423d5c7c45470"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "The formulation packet and the draft validators read different limits for a journal not yet frozen",
+      "observed_head": "33e66400daf93d342cdfed417f36ca099b599b62",
+      "resolved_by_head": "27b6b9409b6be49b038d8ad6e6f423d5c7c45470"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Policy apply re-checked nothing against the live store and a multi-scope apply could be partial",
+      "observed_head": "33e66400daf93d342cdfed417f36ca099b599b62",
+      "resolved_by_head": "27b6b9409b6be49b038d8ad6e6f423d5c7c45470"
+    }
+  ]
+}

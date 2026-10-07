@@ -143,6 +143,10 @@ not computed by this delivery.
 - A NO_WORTHY receipt for more than 6 candidates is still capped at 6.
 - An unparseable policy row is `RESEARCH_POLICY_CHAIN_CORRUPT`; a present-but-invalid `cycle_index` on a stored row still reads as cycle 1.
 - A failure after the PREVIEW reservation of an episode view leaves that reservation pending; the identical retry reads as REPEAT.
+- Apply pre-checks extension proposals only: two proposals for the same scope, or a policy change mixed with extensions, in one hand-built file can apply partially (the refusal lists `applied_before_refusal`); preview never emits such a file.
+- The epoch history used by preflight includes reservations while the packet and status readouts count sessions only, so a pre-runtime epoch with reservations but no session can display a raised `would freeze` limit while preflight enforces the legacy defaults.
+- Two distinct preview request descriptors with a byte-identical payload count as one landed PREVIEW.
+- Test strength: raising `distinct_focuses_per_market`, and applying a change while an operation holds a pending reservation, are covered structurally, not by a dedicated end-to-end test.
 - `max_generated` below 4 conflicts with the non-ordinary floor of 4 candidates; ordinary drafts use the policy value.
 - Numerical replay of a prefix view is covered by the PR-A cold test, not repeated here.
 - `repository_git_snapshot` hashes the whole worktree and all refs; external refs created during a run can fail a vertical test.
