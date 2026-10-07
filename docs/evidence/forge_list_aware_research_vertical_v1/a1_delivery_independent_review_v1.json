@@ -4,8 +4,8 @@
   "review_id": "FORGE-LIST-AWARE-RESEARCH-VERTICAL-REVIEW-001",
   "as_of": "2026-10-07",
   "task_id": "FORGE_LIST_AWARE_RESEARCH_VERTICAL_V1",
-  "reviewed_bindings_sha256": "2d17ad40756f9b8926554dcdd37034c6a17288529e3041c01d4491292d1df883",
-  "reviewed_inventory_sha256": "f7681928d89c2b589bddc33690df47f2e090317e1a71c31cf50c8cbd4940bb60",
+  "reviewed_bindings_sha256": "d5b72a8c7d9a00ea1005cc45763f6a310fcf13300b61f87882e4067da8369b9e",
+  "reviewed_inventory_sha256": "f7be5ce2ad36cb42b69041eae2fdf7a0ec3f1ebfd7bdeb54f195e4dfb76c1962",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
