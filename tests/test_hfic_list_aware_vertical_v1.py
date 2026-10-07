@@ -557,6 +557,23 @@ class ListAwareVerticalTests(unittest.TestCase):
         self.assertNotEqual(looks[0]["data_binding_sha256"], other_looks[0]["data_binding_sha256"])
         self.assertEqual(first.get("data_binding_sha256", looks[0]["data_binding_sha256"]), looks[0]["data_binding_sha256"])
 
+    def test_c_zzz_scoped_relook_after_a_pure_policy_change_is_adaptive(self) -> None:
+        """F1: same scoped question, same rows, only the universe policy changed -> ADAPTIVE re-look, not a fresh MAIN."""
+
+        from solana_alpha_lab.factory.hfic_research_universe_policy import apply_universe_policy, preview_universe_policy
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        first = self._run("policy-1", draft("LIST_CONTRAST", list_condition=AC), focus="LAV_POLICY")
+        self.assertEqual(first["_exit_code"], 0, first)
+        self.assertEqual(first["queries"][0]["look_class"], "MAIN")
+        store = ResearchStore(self.plane)
+        proposal = preview_universe_policy(store, min_holders=40, min_liquidity_usd=4000)["proposal"]
+        apply_universe_policy(store, repo_root=ROOT, proposal=proposal, confirm_append_only=True)
+        second = self._run("policy-2", draft("LIST_CONTRAST", list_condition=AC), focus="LAV_POLICY")
+        self.assertEqual(second["_exit_code"], 0, second)
+        self.assertEqual(second["queries"][0]["look_class"], "ADAPTIVE", second["queries"][0])
+        self.assertEqual(second["result"]["research_scope"]["applied_sha256"], first["result"]["research_scope"]["applied_sha256"])
+
     def test_d_episode_profile_through_the_dispatcher_and_ordinary_lifecycle(self) -> None:
         """D13: a real episode profile, scope-bound, through ladder -> freeze -> Critic, no CONTROL."""
 

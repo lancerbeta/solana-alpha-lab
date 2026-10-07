@@ -344,6 +344,7 @@ def _same_active_profile_look(
     census: Sequence[Mapping[str, Any]] | None = None,
     observations: Sequence[Mapping[str, Any]] | None = None,
     admitted: Mapping[str, Any] | None = None,
+    scope_applied_sha256: str | None = None,
 ) -> Mapping[str, Any] | None:
     """A saved look of this spec, profile and rows. A new operation may read it."""
 
@@ -372,6 +373,7 @@ def _same_active_profile_look(
                 census=census,
                 observations=observations,
                 policy_sha=str(prior),
+                scope_applied_sha256=scope_applied_sha256,
             ):
                 continue
         else:
@@ -827,6 +829,7 @@ def gate_before_values(
     census: Sequence[Mapping[str, Any]] | None = None,
     observations: Sequence[Mapping[str, Any]] | None = None,
     admitted: Mapping[str, Any] | None = None,
+    scope_applied_sha256: str | None = None,
 ) -> dict[str, Any]:
     """Metadata, admission and cap. Does not load outcome rows.
 
@@ -889,6 +892,7 @@ def gate_before_values(
             census=census,
             observations=observations,
             admitted=admitted,
+            scope_applied_sha256=scope_applied_sha256,
         )
     target_version = TEMPORAL_CALCULATION_VERSION
     if correction is not None:
@@ -1036,6 +1040,7 @@ def gate_before_values(
                     census=census,
                     observations=observations,
                     policy_sha=str(prior_policy),
+                    scope_applied_sha256=scope_applied_sha256,
                 )
             else:
                 prior_operation = item.get("operation_sha256")

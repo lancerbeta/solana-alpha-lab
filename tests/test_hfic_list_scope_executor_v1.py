@@ -334,5 +334,28 @@ class MixedAblationTests(unittest.TestCase):
         self.assertEqual(out["ablations"], [])
 
 
+class ScopedPolicyShiftBindingTests(unittest.TestCase):
+    """F1: a scoped look is "the same rows" only under the CURRENT applied masks."""
+
+    def test_same_rows_under_policy_is_scope_aware(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            data_binding_sha256,
+            same_rows_under_policy,
+            scoped_binding_sha256,
+        )
+
+        census, rows = corpus()
+        admitted = {"population": "OPPORTUNITY_EPISODES", "cohorts": [COHORT]}
+        stamped = dict(admitted, universe_policy_semantic_sha256="p" * 64)
+        raw = data_binding_sha256(stamped, census, rows)
+        scoped_look = {"data_binding_sha256": scoped_binding_sha256(raw, "a" * 64), "result": {"research_scope": {"hypothesis_kind": "LIST_CONTRAST"}}}
+        legacy_look = {"data_binding_sha256": raw, "result": {}}
+        kwargs = dict(admitted=admitted, census=census, observations=rows, policy_sha="p" * 64)
+        self.assertTrue(same_rows_under_policy(scoped_look, scope_applied_sha256="a" * 64, **kwargs))
+        self.assertFalse(same_rows_under_policy(scoped_look, scope_applied_sha256="b" * 64, **kwargs))  # changed list evidence
+        self.assertFalse(same_rows_under_policy(scoped_look, **kwargs))  # no current masks: not provable
+        self.assertTrue(same_rows_under_policy(legacy_look, **kwargs))  # unscoped behaviour unchanged
+
+
 if __name__ == "__main__":
     unittest.main()

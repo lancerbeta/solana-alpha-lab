@@ -1849,12 +1849,23 @@ def same_rows_under_policy(
     census: Sequence[Mapping[str, Any]],
     observations: Sequence[Mapping[str, Any]],
     policy_sha: str,
+    scope_applied_sha256: str | None = None,
 ) -> bool:
-    """True when this look's binding is the current rows stamped with ``policy_sha``."""
+    """True when this look's binding is the current rows stamped with ``policy_sha``.
+
+    A scoped look is bound to rows + applied list masks: the comparison uses the CURRENT
+    applied masks, so changed list evidence is never mistaken for a pure policy change, and
+    without current masks a scoped look cannot be proven "same rows".
+    """
 
     stamped = dict(admitted)
     stamped["universe_policy_semantic_sha256"] = policy_sha
-    return look.get("data_binding_sha256") == data_binding_sha256(stamped, census, observations)
+    expected = data_binding_sha256(stamped, census, observations)
+    if isinstance((look.get("result") or {}).get("research_scope"), Mapping):
+        if not scope_applied_sha256:
+            return False
+        expected = scoped_binding_sha256(expected, scope_applied_sha256)
+    return look.get("data_binding_sha256") == expected
 
 
 def _look_identity(
@@ -2237,10 +2248,56 @@ def resolve_research_scope(
         raise GroundedDiscoveryError("RESEARCH_SCOPE_EVIDENCE_UNREADABLE") from exc
 
 
-def _scoped_binding_sha(binding_sha: str, resolved: Any) -> str:
+def scoped_binding_sha256(binding_sha: str, applied_sha256: str) -> str:
+    """The one durable binding of a scoped look: rows + applied list masks."""
+
     from solana_alpha_lab.factory import hfic_research_scope as scope_owner
 
-    return scope_owner.sha256_of({"data_binding_sha256": binding_sha, "research_scope_applied_sha256": resolved.applied_sha256})
+    return scope_owner.sha256_of({"data_binding_sha256": binding_sha, "research_scope_applied_sha256": applied_sha256})
+
+
+def _apply_cohort_selection(spec: Mapping[str, Any], census, observations, binding):
+    """Rows of the declared covered cohorts only (unscoped or undeclared: unchanged)."""
+
+    from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+
+    body = validate_temporal_query(spec)["scientific_body"]
+    if "research_scope" not in body:
+        return census, observations, binding
+    from solana_alpha_lab.factory.hfic_research_scope import selected_cohort_ids
+
+    wanted = selected_cohort_ids(body["research_scope"])
+    if wanted is None:
+        return census, observations, binding
+    if not set(wanted) <= {str(item.get("cohort_id")) for item in binding}:
+        raise GroundedDiscoveryError("SCOPE_COHORT_NOT_IN_BINDING")
+    keep = set(wanted)
+    return (
+        [row for row in census if str(row.get("cohort_id")) in keep],
+        [row for row in observations if str(row.get("cohort_id")) in keep],
+        [item for item in binding if str(item.get("cohort_id")) in keep],
+    )
+
+
+def _early_scope_applied_sha256(spec: Mapping[str, Any], data_root: Path | None, census, binding) -> str | None:
+    """Current applied masks of a scoped query for the pre-values gate (None for unscoped)."""
+
+    from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+
+    body = validate_temporal_query(spec)["scientific_body"]
+    if "research_scope" not in body or data_root is None:
+        return None
+    from solana_alpha_lab.factory.hfic_research_scope import selected_cohort_ids
+
+    wanted = selected_cohort_ids(body["research_scope"])
+    if wanted is not None:
+        census = [row for row in census if str(row.get("cohort_id")) in set(wanted)]
+        binding = [item for item in binding if str(item.get("cohort_id")) in set(wanted)]
+    return resolve_research_scope(body, data_root, census, binding).applied_sha256
+
+
+def _scoped_binding_sha(binding_sha: str, resolved: Any) -> str:
+    return scoped_binding_sha256(binding_sha, resolved.applied_sha256)
 
 
 def run_recorded_discovery_query(
@@ -2311,12 +2368,16 @@ def run_recorded_discovery_query(
                 raise GroundedDiscoveryError(
                     policy_error.code if policy_error is not None else "UNIVERSE_POLICY_REQUIRED"
                 )
+        # A declared covered subset is applied before the gate, so gate, intent and look see the same rows.
+        census, observations, binding = _apply_cohort_selection(spec, census, observations, binding)
+        gate_scope_applied = _early_scope_applied_sha256(spec, data_root, census, binding)
         try:
             gate_before_values(
                 store,
                 operation_sha256=operation_sha256,
                 spec=spec,
                 journal_scope=journal_scope,
+                scope_applied_sha256=gate_scope_applied,
                 binding_cohorts=list(binding),
                 verified_market=verified_market,
                 correction=correction,
@@ -2583,6 +2644,7 @@ def run_recorded_discovery_query(
                 census=census,
                 observations=observations,
                 policy_sha=str(prior_policy),
+                scope_applied_sha256=research_scope.applied_sha256 if research_scope is not None else None,
             )
         )
         if policy_only:
