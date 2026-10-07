@@ -40404,6 +40404,24 @@ records:
   evidence: []
   search_terms: [OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1, delivery evidence, merge boundary]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-HFIC-RESEARCH-POLICY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: One owner of the Forge research-policy runtime, owner-settable MAIN/ADAPTIVE/PREVIEW/AUTO/distinct-focus/candidate/diagnostic-slice limits, CAS-protected active-policy apply, per-journal frozen snapshots and append-only extensions that never reset spend.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-07'
+  truth_owner: FORGE_RESEARCH_POLICY_RUNTIME_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_research_policy.py', repository_path: src/solana_alpha_lab/factory/hfic_research_policy.py}
+  integrity: {kind: sha256, sha256: c6c5174a7bfe9acc4cc375dc24d03ed10306c99e50122643b669e84f5ad99fdc}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-TEMPORAL-DISCOVERY-001}
+  - {relation_type: governed_by, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [SEM-HYPOTHESIS-FORGE, research policy, budget runtime, MAIN ADAPTIVE PREVIEW limits, AUTO cycles, candidate ceiling, frozen snapshot, run extension]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: MODULE-HFIC-RESEARCH-SCOPE-001
   record_version: '1.0'
   asset_type: script
@@ -40458,4 +40476,23 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
   evidence: []
   search_terms: [SEM-HYPOTHESIS-FORGE, SEM-LIVE-EVIDENCE-TO-FORGE, SEM-MARKET-DATA-FEATURES, SEM-PRIOR-WORK, list-aware, lists as research dimension, list-only hypothesis, source lists A and C, query 1.2]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-FORGE-RESEARCH-POLICY-RUNTIME-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: 'Contract of the Forge research-policy runtime: owner-settable budget limits, the three-owner separation of active policy, frozen per-journal snapshot and explicit extension, and the full consumer-wiring list.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-07'
+  truth_owner: FORGE_RESEARCH_POLICY_RUNTIME_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_research_policy_runtime_v1.md', repository_path: docs/contracts/forge_research_policy_runtime_v1.md}
+  integrity: {kind: sha256, sha256: 02b879241ea37ffc6207ddcb5d43f3902ca95bee9ecba48a96b55bc9b9bd481b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-RESEARCH-POLICY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-TEMPORAL-DISCOVERY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-PREFLIGHT-ADMISSION-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [SEM-HYPOTHESIS-FORGE, research policy, budget runtime, MAIN ADAPTIVE PREVIEW limits, AUTO cycles, candidate ceiling, frozen snapshot, run extension]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

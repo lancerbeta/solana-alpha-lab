@@ -256,7 +256,9 @@ class MalformedPolicyTests(unittest.TestCase):
 
 
 class LegacyGoldenUnchangedTests(unittest.TestCase):
-    def test_a_journal_never_touched_by_research_policy_still_sees_6_2_2(self) -> None:
+    def test_an_ordinary_journal_freezes_at_exactly_the_shipped_6_2_2(self) -> None:
+        # preflight is a real first touch: the journal gets a snapshot, but
+        # it is frozen at exactly the shipped defaults, unraised.
         with tempfile.TemporaryDirectory() as raw:
             workspace = Path(raw)
             data_root, receipt = _publish_focus(workspace, "RPV_LEGACY_GOLDEN")
@@ -268,7 +270,20 @@ class LegacyGoldenUnchangedTests(unittest.TestCase):
             self.assertEqual(limits["preview_total"], 2)
             self.assertEqual(limits["simple_before_compound"], 3)
             self.assertEqual(limits["max_generated"], 6)
-            self.assertIsNone(rp.read_run_snapshot(store, journal))
+            self.assertIsNotNone(rp.read_run_snapshot(store, journal))
+
+    def test_a_journal_this_owner_has_never_touched_at_all_still_reads_6_2_2_and_writes_nothing(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            workspace = Path(raw)
+            data_root, _receipt = _publish_focus(workspace, "RPV_LEGACY_GOLDEN_UNTOUCHED")
+            store = ResearchStore(data_root, create_if_missing=False)
+            never_touched_journal = "f" * 64
+            before = store.diagnostics().committed_inventory_sha256
+            limits = rp.limits_for_frozen_run(store, never_touched_journal)
+            after = store.diagnostics().committed_inventory_sha256
+            self.assertEqual(limits, rp.DEFAULT_LIMITS)
+            self.assertIsNone(rp.read_run_snapshot(store, never_touched_journal))
+            self.assertEqual(before, after)
 
 
 if __name__ == "__main__":
