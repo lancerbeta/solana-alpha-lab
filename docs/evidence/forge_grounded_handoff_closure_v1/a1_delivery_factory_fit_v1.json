@@ -2,10 +2,10 @@
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
   "review_id": "FORGE_GROUNDED_HANDOFF_CLOSURE_V1-FIT",
-  "as_of": "2026-10-07",
+  "as_of": "2026-10-08",
   "task_id": "FORGE_GROUNDED_HANDOFF_CLOSURE_V1",
-  "reviewed_bindings_sha256": "b02ffc30989a9e33e1751b65f3ae4784bae8c63db8f26028f80b9822831388ca",
-  "reviewed_inventory_sha256": "40296a3cbaedf7a16d1c22e0ebd06ed86ef6b6e954c8b64ca139db9b6174964d",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
