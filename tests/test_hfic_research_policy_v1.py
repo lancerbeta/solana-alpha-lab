@@ -352,5 +352,39 @@ class ConcurrencyTests(unittest.TestCase):
             self.assertEqual(len(rp.read_run_extensions(store, journal)), 1)
 
 
+class MovedRootColdReadTests(unittest.TestCase):
+    """A moved root and a brand-new process handle still see durable state.
+
+    hfic_research_policy.py makes no provider/network call of any kind; its
+    only truth is the local ResearchStore. The risk this proof targets is a
+    cached-in-memory value masquerading as durable state, not a network read.
+    """
+
+    def test_active_policy_and_extension_survive_a_moved_root_in_a_fresh_store_handle(self) -> None:
+        import shutil
+        import tempfile
+
+        journal = "9" * 64
+        with tempfile.TemporaryDirectory() as raw:
+            original = Path(raw) / "original"
+            store = _store(original)
+            rp.ensure_run_snapshot(store, journal)
+            preview = rp.preview_policy_change(store, limits_delta={"main_total": 9})
+            rp.apply_policy_change(store, proposal=preview["proposal"], confirm_append_only=True)
+            ext_proposal = rp.propose_run_extension(
+                store, journal_scope=journal, parent_operation_sha256="8" * 64, limits_delta={"main_total": 9}
+            )
+            rp.apply_run_extension(store, proposal=ext_proposal, confirm_append_only=True)
+
+            moved = Path(raw) / "moved"
+            shutil.move(str(original), str(moved))
+            del store  # the original handle and its root are both gone
+
+            fresh_store = _store(moved)
+            self.assertEqual(rp.effective_policy(fresh_store)["limits"]["main_total"], 9)
+            self.assertEqual(rp.limits_for_frozen_run(fresh_store, journal)["main_total"], 9)
+            self.assertEqual(len(rp.read_run_extensions(fresh_store, journal)), 1)
+
+
 if __name__ == "__main__":
     unittest.main()
