@@ -8,9 +8,9 @@ allowed_routes: [DIRECT_CLAUDE_CODE_DELIVERY]
 required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 77eb427afbc9bb687c6a1fe3a7f3ca4ad2cf3417
+  expected_base: 4378c5b82f2dc309ccd629b267affd5d19b34995
   expected_upstream: origin/main
-  expected_upstream_oid: 77eb427afbc9bb687c6a1fe3a7f3ca4ad2cf3417
+  expected_upstream_oid: 4378c5b82f2dc309ccd629b267affd5d19b34995
   expected_branch: claude/forge-list-aware-research-vertical-v1
   dirty_mode: ALLOW_REPORTED
 objective: >-
@@ -104,7 +104,9 @@ statement 2.0). SPEC_ROUTE: BOTH (owner PRD+SSD V2 plus the contract
 DIRECT_CLAUDE_CODE_DELIVERY, actor CLAUDE_CODE. MODEL_EFFORT_RECOMMENDATION:
 SOL_XHIGH (owner-selected for the chain). Authority: the owner's explicit
 2026-10-07 instruction naming this atom; expected base `77eb427a` (design anchor
-equals current `origin/main`, re-verified at Entry).
+equals `origin/main` at Entry). Rebound 2026-10-07 to exact base `4378c5b8`
+(owner-explicit rebase instruction) after PR #382 landed; the two independent-
+validator P1 remediations already on head `9567fad8` are preserved unchanged.
 
 DECISION_DELTA: the owner can ask the Forge about a source-list group (membership
 as universe, as the whole signal, or as a fixed slice) and receive a computed,
