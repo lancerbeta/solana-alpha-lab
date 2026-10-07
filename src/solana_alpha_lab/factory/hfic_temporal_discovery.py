@@ -2158,6 +2158,14 @@ def temporal_result_coherence(summary: Mapping[str, Any]) -> dict[str, Any]:
             )
             if block_missing != summary.get("missing_target_n"):
                 issues.append({"view": "by_calendar_block", "field": "downside.missing_n_sum", "expected": summary.get("missing_target_n"), "actual": block_missing})
+    scope_block = summary.get("research_scope")
+    if isinstance(scope_block, Mapping) and scope_block.get("hypothesis_kind") == "MIXED_LIST_NUMERIC":
+        # A numeric ablation of a mixed hypothesis never widens the list signal back to all eligible episodes.
+        for row in summary.get("ablations") or []:
+            if isinstance(row, Mapping) and row.get("list_condition_preserved") is not True:
+                issues.append({"view": str(row.get("view")), "field": "list_condition_preserved", "expected": True, "actual": row.get("list_condition_preserved")})
+    if isinstance(scope_block, Mapping) and scope_block.get("hypothesis_kind") == "LIST_CONTRAST" and summary.get("ablations"):
+        issues.append({"view": "ablations", "field": "list_contrast_has_no_numeric_ablation", "expected": [], "actual": len(summary["ablations"])})
     return {
         "status": "INCOHERENT" if issues else "COHERENT",
         # COHERENT means no stored view contradicts another; absent fields are not checked.
@@ -3561,7 +3569,8 @@ def execute_temporal_discovery(
                     _predicate_holds(member["feature_values"].get(str(item["feature"])), item)
                     for item in kept
                 ]
-                if all(hit is True for hit in hits):
+                # Drop exactly one numeric component: a list signal (MIXED) stays frozen in every ablation.
+                if all(hit is True for hit in hits) and member.get("scope_signal") is not False:
                     subset_members.append(member)
             subset = [
                 float(member["target"])
@@ -3577,6 +3586,11 @@ def execute_temporal_discovery(
                     "median_target": _median(subset),
                     "mean_target_kind": "PRICE_RELATIVE_PROXY",
                     "selection_relevant": True,
+                    **(
+                        {"list_condition_preserved": all(member.get("scope_signal") is True for member in subset_members)}
+                        if research_scope is not None and research_scope.list_condition is not None
+                        else {}
+                    ),
                     "downside": downside_descriptive(
                         subset, missing_n=len(subset_members) - len(subset)
                     ),

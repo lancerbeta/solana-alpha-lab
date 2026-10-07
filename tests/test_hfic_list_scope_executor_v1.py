@@ -303,5 +303,36 @@ class SliceCoverageTests(unittest.TestCase):
         self.assertIn("next_action", refused.exception.detail)
 
 
+class MixedAblationTests(unittest.TestCase):
+    """P1-B: dropping the numeric condition of A∩C + holders↑ yields A∩C, never all decision-eligible episodes."""
+
+    def test_numeric_ablation_keeps_the_list_signal(self) -> None:
+        out = run(spec("MIXED_LIST_NUMERIC", list_condition=AC, **NUMERIC))
+        self.assertEqual(out["research_scope"]["matched"]["n"], 1)  # e7
+        (ablation,) = out["ablations"]
+        # A∩C = e5 (-0.10) and e7 (+0.20); the widened (wrong) set would be 6 observed with mean 7/60.
+        self.assertEqual(ablation["observed_n"], 2)
+        self.assertAlmostEqual(ablation["mean_target"], 0.05, places=9)
+        self.assertTrue(ablation["list_condition_preserved"])
+
+    def test_widened_ablation_is_incoherent(self) -> None:
+        import copy
+
+        from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_result_coherence
+
+        out = run(spec("MIXED_LIST_NUMERIC", list_condition=AC, **NUMERIC))
+        self.assertEqual(temporal_result_coherence(out)["status"], "COHERENT")
+        widened = copy.deepcopy(out)
+        widened["ablations"][0]["list_condition_preserved"] = False
+        self.assertEqual(temporal_result_coherence(widened)["status"], "INCOHERENT")
+        dropped = copy.deepcopy(out)
+        dropped["ablations"][0].pop("list_condition_preserved")
+        self.assertEqual(temporal_result_coherence(dropped)["status"], "INCOHERENT")
+
+    def test_list_only_has_no_numeric_ablation(self) -> None:
+        out = run(spec("LIST_CONTRAST", list_condition=AC))
+        self.assertEqual(out["ablations"], [])
+
+
 if __name__ == "__main__":
     unittest.main()

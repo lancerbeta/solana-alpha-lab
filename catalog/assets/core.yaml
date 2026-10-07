@@ -37993,7 +37993,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: c0ac957b42bf5d9a755accaae93f3763b9f4a5ae7e27bc4e855d33b7ebef6b57}
+  integrity: {kind: sha256, sha256: 53e8d231993a9fbf237e3da132dec7ff48c840ba36c371d6ba6ae7db5edb6004}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}

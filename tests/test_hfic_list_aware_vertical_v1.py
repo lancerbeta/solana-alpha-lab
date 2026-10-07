@@ -534,6 +534,29 @@ class ListAwareVerticalTests(unittest.TestCase):
         self.assertAlmostEqual(cold["contrast"]["observed_target_difference"], -0.10, places=6)
         self.assertEqual(cold["contrast"]["comparator"]["target_missing_n"], 1)
 
+    def test_c_zz_exact_scoped_replay_and_scoped_durable_binding(self) -> None:
+        """P1-A: the durable look keeps the applied scope; an exact repeat reuses it without a new read."""
+
+        from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        first = self._run("replay-1", draft("LIST_CONTRAST", list_condition=AC), focus="LAV_REPLAY")
+        self.assertEqual(first["_exit_code"], 0, first)
+        again = self._run("replay-1", draft("LIST_CONTRAST", list_condition=AC), focus="LAV_REPLAY")
+        self.assertEqual(again["_exit_code"], 0, again)
+        self.assertIs(again.get("values_loaded"), False)
+        self.assertEqual((again.get("scientific_look_delta") or {}).get("main", 0), 0)
+        self.assertEqual(again["result"]["research_scope"]["applied_sha256"], first["result"]["research_scope"]["applied_sha256"])
+        journal = first["_preflight"]["search_key_sha256"]
+        looks = [item for item in list_discovery_looks(ResearchStore(self.plane), journal) if isinstance(item.get("result"), dict)]
+        self.assertEqual(len({item["record_id"] for item in looks}), 1)  # no second look
+        # Another applied scope on the same data is not the same data binding.
+        other = self._run("replay-2", draft("LIST_CONTRAST", list_condition={"clauses": [{"all_of": ["A"]}]}), focus="LAV_REPLAY_OTHER")
+        self.assertEqual(other["_exit_code"], 0, other)
+        other_looks = [item for item in list_discovery_looks(ResearchStore(self.plane), other["_preflight"]["search_key_sha256"]) if isinstance(item.get("result"), dict)]
+        self.assertNotEqual(looks[0]["data_binding_sha256"], other_looks[0]["data_binding_sha256"])
+        self.assertEqual(first.get("data_binding_sha256", looks[0]["data_binding_sha256"]), looks[0]["data_binding_sha256"])
+
     def test_d_episode_profile_through_the_dispatcher_and_ordinary_lifecycle(self) -> None:
         """D13: a real episode profile, scope-bound, through ladder -> freeze -> Critic, no CONTROL."""
 

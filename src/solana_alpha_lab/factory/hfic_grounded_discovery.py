@@ -2536,6 +2536,9 @@ def run_recorded_discovery_query(
     calc_version = str(summary.get("calculation_version") or CALCULATION_VERSION)
     temporal = summary.get("schema") == "smial.hfic-temporal-query"
     binding_sha = data_binding_sha256(computed["admitted"], census, observations)
+    if research_scope is not None:
+        # One identity owner end to end: the durable look keeps the applied list masks, as the intent did.
+        binding_sha = _scoped_binding_sha(binding_sha, research_scope)
     digest = result_sha256(summary)
     identity = _look_identity(
         summary["spec_sha256"],
