@@ -1,8 +1,8 @@
 {
   "candidate": {
     "base": "77eb427afbc9bb687c6a1fe3a7f3ca4ad2cf3417",
-    "diff_sha256": "c9080d65b3ea6d8d0d2e87ad3b4d7f3099b78542f7f123dd2986d4bef056b5b9",
-    "head": "05a4a07a70ce9502e8e0612e46fa49b79da1e143"
+    "diff_sha256": "86a27a7341b095f2a404c3276e7f87b49a744bf0ee657ba49e09660482619320",
+    "head": "3ee2da2baf92a3377153ea6a91f1f4279844babb"
   },
   "evidence": [
     {
@@ -11,15 +11,27 @@
     },
     {
       "logical_ref": "repo://tests/test_hfic_list_aware_vertical_v1.py",
-      "sha256_or_fingerprint": "1d3dfd636826b34a45c8ac9555651a7d7a26e481fda79ca7cb07808c0d720c6e"
+      "sha256_or_fingerprint": "57c76da6ed63f38090ef9d94ee957d54eefe76e83b4ef2e60b40cd0da60d1422"
+    },
+    {
+      "logical_ref": "repo://tests/test_hfic_list_scope_executor_v1.py",
+      "sha256_or_fingerprint": "48d53378f7041afe446f79cfb19656ee2aed9c89f2e0ee97d50aa08801fba0e3"
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_research_scope.py",
       "sha256_or_fingerprint": "84460069fd8281b13b622da8b153060dff4755add68ad0086de058b29f869477"
     },
     {
-      "logical_ref": "repo://src/solana_alpha_lab/factory/normalized_trajectory_episodes_v1.py",
-      "sha256_or_fingerprint": "b32661045e8032bc04eb916705c457e2546b794b688c9f1d65e380967f7bf4da"
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_grounded_discovery.py",
+      "sha256_or_fingerprint": "19ad7487d00776e92d3cccc8230ede49dc10670f259ea436f64534e75f1b3379"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
+      "sha256_or_fingerprint": "53e8d231993a9fbf237e3da132dec7ff48c840ba36c371d6ba6ae7db5edb6004"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_ordinary_operation.py",
+      "sha256_or_fingerprint": "a2426cd1ff6f73fae19434610d56612212302a16fccefa20b2330e4e2ba407a2"
     }
   ],
   "independence": {
@@ -42,7 +54,7 @@
     "NO_MERGE",
     "NO_PR_B_BUDGET_POLICY"
   ],
-  "packet_fingerprint_sha256": "47423bfcaa94f5dd853a6753ef5a4348600964acdc30cf470e0982153c4e856e",
+  "packet_fingerprint_sha256": "c41a872d2fb537c3cf6aaf2ed38fdad34b7dd3ff15a6a3517a93b46a6090b467",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
@@ -89,10 +101,20 @@
       "claim": "Local list snapshots are future-only: availability is max(declared, registered)",
       "claim_id": "C5",
       "scope": "availability"
+    },
+    {
+      "claim": "The durable look binding of a query 1.2 result carries the applied scope digest, so an exact repeat reuses it and another applied scope is never the same data binding",
+      "claim_id": "C6",
+      "scope": "durable_identity"
+    },
+    {
+      "claim": "A numeric DROP_ONE ablation of a mixed list+numeric hypothesis keeps the list condition; result coherence refuses a widened ablation",
+      "claim_id": "C7",
+      "scope": "ablation_estimand"
     }
   ],
   "task": {
-    "task_contract_sha256": "0efdc8d6823d6fb51f4f541bbc25998f842cca76c3c4d52c499d0eadcdad1a52",
+    "task_contract_sha256": "29000f84bd6194c618de8abb2a7f47588938b97d7dfae017240f7d20386d6c7f",
     "task_id": "FORGE_LIST_AWARE_RESEARCH_VERTICAL_V1"
   }
 }
