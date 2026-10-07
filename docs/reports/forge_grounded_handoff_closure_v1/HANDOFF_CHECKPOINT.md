@@ -1,118 +1,169 @@
-# FORGE_GROUNDED_HANDOFF_CLOSURE_V1 — verified patch checkpoint
+# FORGE_GROUNDED_HANDOFF_CLOSURE_V1 — native continuation checkpoint
 
-Status: **HANDOFF_REPAIR_BLOCKED**. The implementation repairs are tested;
-the required native downstream owner outcome is not complete. This is not
-delivery-completion evidence, exact-head CI or merge readiness.
+VERDICT: **HANDOFF_REPAIR_BLOCKED**. H08 is closed with an actual scientific
+negative; H09 has a newly proved material consumer/authority boundary.
+The accepted intermediate checkpoint is `8a3e9d8e1c848395ac7cee99bc2cf75637417543`.
+This continues the same repair atom; no DONE, CI, merge readiness or whole-Forge
+health is claimed. GLOBAL_FORGE_AUDIT=INCOMPLETE_UNLESS_SEPARATELY_PROVEN.
 
-Accepted base: `04ec8e0286a3dce5999d0687784717ee90fc5dca`.
-Branch: `codex/forge-grounded-handoff-v1`. The original dirty PR-B checkout
-was preserved; no PR was found for its exact branch at Entry. The elected
-checkout has independent Git refs. Runtime: project-pinned CPython 3.13.14.
+Accepted BASE: `04ec8e0286a3dce5999d0687784717ee90fc5dca`.
+Branch: `codex/forge-grounded-handoff-v1`. Native execution HEAD:
+`d3103600fb95cc138fc0bfbf735241b3d4475ac3` (stable throughout its lifecycle).
+Final delivery HEAD is bound by the validator bundle BINDING.json and required
+independent reviews. Original dirty PR-B checkout remains untouched. Its exact
+branch had no accepted PR implementation at Entry; no policy overlay was borrowed.
+Read-only remote main readback still equals BASE. Runtime: pinned CPython 3.13.14.
 
-## Implemented behavior
+## Change and earliest boundaries
 
-- Fresh grounded cards declare scope at the top level. Missing, nested-only
-  and conflicting fields fail before candidate/session/slot writes. Literal
-  placement of already-authored fields preserves candidate definition identity.
-- Shared primary/runner-up/revision projections preserve authored scope and
-  claim form. A foreign runner-up look drops numbers and positive confirmation,
-  retaining its refs only as contextual provenance. Revision locks semantic
-  axes separately from the existing candidate hash.
-- Canonical queries enter the existing strict canonical grammar: definition
-  pins and required coverage are verified before values, without raw fallback
-  or repinning. Unknown membership remains unknown.
-- Fresh writers require the actual committed context artifact, matching blob,
-  digest, root and relevant inline input. New slot reservation and frozen or
-  zero-candidate lifecycle records use one existing ResearchStore transaction;
-  the context and admission are checked under its writer lease. Existing
-  reservations and append-only recovery are preserved.
-- The emitted `freeze_worthy_semantics` explicitly identifies a caller routing
-  hint. Numerical criteria and scientific classification thresholds are unchanged.
+The existing `_selected_candidate_block` was the earliest H08 failure: it copied
+authored typed `available_data_bindings` into a Critic string-array. The shared
+primary/runner-up/revision projection now encodes each object as canonical JSON
+text, retaining all fields and values and legacy strings. Invalid outer shapes
+and unsupported scalar items stay invalid. Actual schemas and typed resolver
+input were not weakened. Draft/recipe/source bytes are not rewritten.
 
-## Evidence and limits
+The same public preflight resumed the exact generated draft through the existing
+`prefreeze_capability_repair`, retaining market, slot, reservation, saved look,
+memory and accounting. Public freeze succeeded; schema-valid actual packet and
+every available binding field were compared with the persisted card. All original
+committed record hashes remained equal. There is one current-plane discovery look.
 
-The initial public CLI RED/GREEN proves each original deterministic seam twice.
-Two independent review counterexamples were subsequently reproduced twice on
-interim commit `0179e0d07dcc640749c39bf72d7c819bae22c94e` and passed twice
-after correction: foreign confirmation flags and context failure at the final
-write boundary. The latter verifies zero committed slot/session changes,
-restoration of the exact dependency and idempotent retry of the same slot.
+An isolated Critic received packet + Prompt B + read-only Git truth, with no
+generator transcript, oracle, outer envelope or ResearchStore archaeology. Its
+actual verdict was `KILL_LOW_INFORMATION_VALUE`: same-data synthetic replay tests
+implementation determinism but cannot distinguish predictive information from
+construction of the synthetic values. It did not kill on `freeze_worthy=false`
+or transport shape. Public finalize produced `SYNTHESIS_COMPLETE`. A KILL branch
+does not execute B5/classify; no classifier PASS was fabricated.
 
-The final targeted selection ran **146 tests in 281.584 seconds, OK, one
-skip**, covering the changed owners, direct consumers and existing prefreeze
-recovery. No local full gate was run. A saved scripted F0 session was read in
-two fresh OS processes: IDs/result hashes matched, committed inventory stayed
-unchanged and evaluator/value-loader spies observed zero calls. This is saved
-readback evidence, not native finalization or a general PIT access certificate.
+H09 used a separate engineering replay submission for the same candidate and
+definition, exact frozen recipe and typed source bindings. ExperimentSpec 1.3
+validated against the actual schema; its format alias `HYP-<candidate_id>` is
+bound by the original definition hash in the production classifier submission.
+It introduces no formulation/definition. The actual live eligibility projection
+returned null; no COMPLETE readiness is claimed.
 
-Final review on interim `5b00a75a75db1ade116330ad9ce6f10149a3a14a` identified
-three additional edge cases. Each failed twice before repair and passed twice
-after it: deterministic interleaving of identical transaction callers, retained
-context refs after a second detach, and exact field/type diagnostics. Replay
-now retains the whole committed transaction when its reservation belongs to
-that transaction; a separate prefreeze reservation is not rewritten. These
-are scripted interleaving tests, not a newly claimed OS race certificate.
+Actual `classify_lane` returned `BLOCKED_BUDGET`; production DocumentRunner
+returned `INVALID_EVIDENCE`, run_id=null, provider calls=0, Git writes=0.
+No capability execution or oracle comparison occurred. Earliest owner:
+`observation_schedule_compiler.compile_observation_request`, budget guard at
+line 300. Before the `REUSE_ONLY` snapshot branch, the compiler models collection
+lifetime calls=129545 against the unchanged schedule limit=3200. Request schedule
+hash equals every frozen source schedule hash:
+`bc9320ec2176061a0bb85e16e6dcd3702f258e0fdf84e19413e51efa1f3f21bc`.
+This is not a malformed request or permission to raise that limit.
 
-A subsequent architecture review on `c9814c7368080ba3a6225dd87e9d6b961dc8a29b`
-found one recovery regression: an already-published orphan reservation with a
-pending derived lookup journal could fail before append's normal recovery.
-It failed twice on that head and passed twice after repair. Exact lookup uses
-verified canonical records only when the existing lookup reports pending;
-the read does not heal the journal. Existing append recovers it under the
-writer lease, preserving the original reservation transaction and accounting.
+A separate read-only secondary probe of the existing coverage owner found no
+covering `OBSERVATION_PANEL_SNAPSHOT`. It is not the actual first refusal and
+was not obtained by overriding the budget. Correcting only budget ordering
+therefore does not yet prove the supported consume path. A second read-only
+binding probe reported `CANONICAL_RELEASE_IDENTITY_UNBOUND`; that is why live
+eligibility projection is null. The imported discovery corpus/typed recipe is
+not silently promoted into a canonical scientific release.
 
-Raw logs and disposable synthetic stores remain outside tracked Git. Compact
-locators and hashes are in `docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json`.
-The validator bundle contains a portable diff, changed files, compact evidence,
-native input/output and reproduction scripts, without a full repository/store dump.
+Named gap: `FROZEN_TEMPORAL_RECIPE_SPEC13_REUSE_ADAPTER`. The existing temporal
+recipe is source-bound, while the Spec 1.3 path additionally demands canonical
+release admission, a budgeted collection schedule and a covering panel. A
+lawful supported consume/admission contract at these existing consumers requires
+an owner-approved write-set/meaning decision; a routing fix alone is insufficient.
+No publisher, forced panel snapshot, budget override or new subsystem was built.
+OWNER_ATTENTION_GATE_V2 returned OWNER_ATTENTION_REQUIRED/MATERIAL_OWNER_DECISION.
 
-| DoD | Checkpoint disposition |
+## Exact lineage
+
+| Boundary | Identity / actual state |
 | --- | --- |
-| H01 | PASS: accepted base, isolated refs, original dirty inventory, runtime and PR-B boundary recorded |
-| H02 | PASS: public early scope refusals and zero durable delta; direct regression coverage |
-| H03 | PASS for the scripted flat control; exact original result/ref/descriptive scope preserved |
-| H04 | PASS for deterministic primary/runner/revision projections and scope locks |
-| H05 | PASS for raw/canonical roundtrip, pins/coverage and pre-value-loader corruption refusal |
-| H06 | PASS for missing/bad/foreign context; writer-lease failure and same-slot retry |
-| H07 | PARTIAL: actual emitted semantics and generator output; no native Critic interpretation |
-| H08 | BLOCKED: generated native card persisted, Critic packet freeze refused |
-| H09 | NOT_RUN: same-candidate ExperimentSpec 1.3 / DocumentRunner endpoint not reached |
-| H10 | PARTIAL: scripted cold saved reads and retry; native terminal retry not reached |
-| H11 | PARTIAL: selected legacy/numerical/list/PIT regression tests; exhaustive value-access/resource proof not run; PR-B 9/10 case not applicable to unmerged base |
-| H12 | PARTIAL: affected contract, example, schemas, skills and Catalog updated; complete native recipe still blocked |
+| Candidate | `HFIC-CAND-64D4823415CB` |
+| Definition | `64d4823415cb0e630034e0640ca23d16adb69a60ede7bcb9b5a889f5f058b20a` |
+| Generated draft canonical payload | `835cd6b0ec9c9328e95da6f5f5dd644912dbde5fbd26637c2e32882441a669f3`; unchanged |
+| Saved native draft file | `bd2a5c6850f2ec88a84ea6fbc820662acd480af1bf5aeaf473692d39ba1d26ef`; unchanged |
+| Session | `HFIC-SESS-036AD06BD264B440` |
+| Original look/result | `HFIC-ART-DISCOVERY-F031A7936F1A2735A93EFF68C46E1809D28EFA5E` / `be4e504d464fd4aa360898c718eeabf30c9ed639c18945c55484a7e71be44409` |
+| Critic input packet | `b9101f402b5b7ffba4283f54724bcfc06c73944fd38f79ccbaef3dbbc51397fe`; actual schema-valid |
+| Critic result | `93b18943cf262ee568ac4b0dfc089cf071ddee42ca13582ae8fe7b4e9004a8ba`; `KILL_LOW_INFORMATION_VALUE` |
+| HFIC classification | NOT_APPLICABLE_AFTER_SCIENTIFIC_KILL; B5 forbidden on KILL |
+| Machine lifecycle | `SYNTHESIS_COMPLETE`; same candidate/definition/slot |
+| Typed ExperimentSpec 1.3 | `EXP-HFIC-CAND-64D4823415CB-FROZEN-REPLAY` / `72b5d3e021a39e915d8ea17f231ff9db06d1b961870808826db5c5cdff540a3c` |
+| Runner classification | `BLOCKED_BUDGET`; no artificial FAST_LANE_READY |
+| Run/result/oracle comparison | null / absent / NOT_RUN |
 
-## Exact native blocker and next stage
+The hypothesis-version alias is a schema representation in the engineering
+submission, not a new native hypothesis or a reopening of scientific KILL.
+No runner hypothesis/run record was created on this denied path.
 
-The preregistered synthetic stage uses four weekly support blocks, 64 episodes,
-32 matched observations and a same-data price-relative proxy. The oracle was
-fixed before the generator and withheld from it. This proves no OOS, independent
-trial count, alpha, execution profit or strategy promotion.
+## H01–H12 and verification
 
-One substantive isolated generator output was produced. Its source-bound
-`available_data_bindings` contains four frozen-input objects. The draft schema
-accepts them, and public `persist-draft` succeeds. Public `freeze` then returns
-`HFIC_PROTOCOL_INVALID`: Critic packet transport requires string items. This
-is a technical transport failure, not scientific KILL. No frozen native packet,
-Critic result, classification, finalization or experiment result is claimed.
+| DoD | Current disposition / evidence |
+| --- | --- |
+| H01 | PASS: accepted base, isolated refs, original dirty inventory, pinned runtime and PR-B boundary |
+| H02 | PASS: original public early scope refusal and zero durable delta; direct regression tests |
+| H03 | PASS_SCRIPTED_CONTROL: exact original result/ref/descriptive scope retained |
+| H04 | PASS_DETERMINISTIC: common primary/runner/revision scope/form and semantic locks |
+| H05 | PASS: strict raw/canonical roundtrip, pins/coverage and pre-loader corruption refusal |
+| H06 | PASS: actual context closure, atomic slot/lifecycle, identical transaction and pending-journal recovery |
+| H07 | PASS_ACTUAL_CRITIC: actual native Critic judged information value rather than routing hint |
+| H08 | PASS_SCIENTIFIC_KILL_MACHINE_ENDPOINT: unchanged native draft -> actual packet -> isolated Critic -> public finalize |
+| H09 | BLOCKED_COMPILER_BUDGET: valid typed Spec 1.3 -> actual classifier refusal -> DocumentRunner refusal; no result |
+| H10 | PASS for identical native finalize retry and two fresh-process saved reads; broad OS-crash certificate not claimed |
+| H11 | PARTIAL: 153 affected regression tests; exhaustive PIT/resource/science and unmerged PR-B overlay not proved |
+| H12 | PARTIAL: affected contract/example/schema/skill/Catalog updated; runnable Spec 1.3 recipe remains blocked |
 
-The persisted draft must remain byte-identical. Existing resume checks the exact
-generated draft hash; editing objects into strings would violate that binding.
-The next bounded stage can repair the existing selected-candidate projection
-losslessly, then use the existing `prefreeze_capability_repair` route with the
-same saved draft, market, slot, reservation and look. Critic narrative transport
-does not replace the strict typed `temporal_recipe.frozen_input` and ExperimentSpec
-`data_bindings` required by the actual runner and data resolver. If unchanged-byte
-recovery refuses, preserve its exact reason and checkpoint; do not reroll, rewrite
-history, refund a look or weaken the Git fence.
+Affected suite: **153 tests in 528.299 seconds, OK, one skip**. It includes the
+previous nine direct-consumer modules plus the production temporal runner module.
+Two new regressions prove lossless typed-object transport and reject malformed
+outer shapes. The scalar/schema RED is recorded before the repair. Earlier
+original public RED2/GREEN2, review counterexamples and pending-recovery proofs
+remain in the bundle with their actual historical heads; they are not rebadged.
+No local full project gate or broad audit was repeated.
 
-Native output budget used: 1 of 6. The initial setup with missing Y3600 holders
-spent one synthetic setup look before any generator output; the corrected,
-preregistered setup spent one look in its separate test plane. Both setups are
-retained and labeled; no counter reset or discarded scientific rejection is claimed.
+Identical public native finalize retry wrote no new committed records. Two fresh
+OS processes read the finalized packet and KILL: saved view hashes equal,
+inventory unchanged, evaluator/value-loader spies=0. Original candidate records,
+generated payload, reservation and look/accounting remain immutable. Derived
+Catalog state is propagated only by harness_sync; final reviews bind exact Git
+head/diff separately and do not turn code PASS into full DoD.
 
-Current stage stops at this verified checkpoint under the owner's staged-work
-rule. Next model-effort recommendation: SOL_XHIGH for the remaining transport,
-unchanged-byte recovery and native same-candidate endpoint. No push, PR, CI,
-merge-readiness request, merge, provider call or production mutation was performed.
-`GLOBAL_FORGE_AUDIT=INCOMPLETE`. Rollback is an ordinary code revert; synthetic
-append-only records are not deleted or reinterpreted.
+Native substantive outputs used: 2/6 (one generator, one actual isolated Critic).
+No revision, reroll, new candidate or new discovery look. Initial invalid setup's
+one look and corrected plane's one look remain recorded separately; no refund or
+counter reset. Model diversity UNPROVEN. Provider/VPS/credentials/deploy/strategy,
+push/PR/CI/merge: none.
+
+## Chronological and audit consequence
+
+No accepted chronological frozen-later-branch consumer was resolved in the exact
+capability registry/semantic route. This native preregistration binds the current
+four exploratory blocks and has no already frozen later/sign-reversed branch.
+Named gaps: `CHRONOLOGICAL_FROZEN_BRANCH_CONSUMER_NOT_BOUND` and
+`PREREGISTERED_LATER_SIGN_REVERSED_INPUT_ABSENT`. No new branch/consumer is built
+inside this repair. Chronological validation, OOS, alpha and strategy: NOT_RUN.
+
+Original audit denominators remain O12/P8/R8/J5. Its historical metric ledger
+is supplied unchanged; no new health percentage is computed. This continuation
+closes the narrower native H08 technical lifecycle, with honest scientific KILL.
+H09/result remains open; original broader prior matrix, chronological and
+resource/interruption gaps are not retroactively closed.
+
+## Evidence, next decision and rollback
+
+Machine checkpoint: `docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json`.
+Raw locators are relative to the validator ZIP: `evidence/native-v2/closure/`
+contains resume, freeze, field-by-field proof, actual Critic/readout, lifecycle,
+valid Spec, live eligibility, lane refusal, DocumentRunner response and compiler
+diagnosis. `evidence/logs/closure-*.json` has raw public command/exit/stdout/stderr.
+`evidence/closure-targeted.log` and `evidence/document-execution.log` preserve
+the actual suite/runtime output. Reproduction scripts carry commands; raw
+machine-local paths remain outside tracked receipts.
+
+Decision needed: authorize a narrowly scoped Spec 1.3 frozen-recipe consume/
+admission contract repair at existing observation compiler/coverage/canonical
+release consumers, preserving typed refs/required outcomes/UNKNOWN, budgets and KILL;
+or accept H09 as this named blocked capability. This is not permission to
+override BLOCKED_BUDGET. The compiler/coverage owners are outside the current
+managed write set. Stop at this new material boundary; no push/PR/merge.
+Factory Fit: checkpoint-compatible existing owners, no second truth state,
+full owner outcome NOT_READY. Product Horizon NOW: named H09 consume gap;
+WATCH: original science/audit gaps. Capability radar: NONE. No adoption.
+Rollback is an ordinary code revert; append-only synthetic history is retained.
+Next model-effort recommendation: SOL_XHIGH for that contract decision/repair.

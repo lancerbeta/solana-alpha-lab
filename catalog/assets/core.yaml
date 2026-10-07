@@ -40469,7 +40469,7 @@ records:
   as_of: '2026-10-07'
   truth_owner: FORGE_GROUNDED_HANDOFF_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_grounded_handoff_closure_v1.md', repository_path: docs/contracts/forge_grounded_handoff_closure_v1.md}
-  integrity: {kind: sha256, sha256: 913f156b8fdb63016c2e396b3c6622f32020b739979f5336c60e891301f77230}
+  integrity: {kind: sha256, sha256: 2fe75a37b812916d2284f1c60c023f7840a3e5e71cf3042e2afc488aabf18b55}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-RESEARCH-SCOPE-001}
@@ -40519,7 +40519,9 @@ records:
   as_of: '2026-10-07'
   truth_owner: FORGE_GROUNDED_HANDOFF_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/reports/forge_grounded_handoff_closure_v1/HANDOFF_CHECKPOINT.md', repository_path: docs/reports/forge_grounded_handoff_closure_v1/HANDOFF_CHECKPOINT.md}
-  integrity: {kind: sha256, sha256: 29698cb1abca643e1f4b6ba67cbdca1c77d0a6a14f26d4acf42c98f137233950}
+  integrity:
+    kind: sha256
+    sha256: 416d46594fb0d11f5b893fa1034c091644dbc3aeef5e18c1fca9ca6c7e834fb4
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-GROUNDED-HANDOFF-CLOSURE-001}

@@ -17,7 +17,7 @@
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_session.py",
-      "sha256": "1aeafd6a9d7d50405f8d4a4d0199208f112158109cf0ae58d042a1efdecff5a0"
+      "sha256": "1ee37f300265c2ac12051942f3731bb3c5976e9d6dea957c48a2a02714680a34"
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_research_scope.py",
@@ -33,13 +33,13 @@
     },
     {
       "path": "tests/test_forge_grounded_handoff_closure_v1.py",
-      "sha256": "efcbbfacf399cbc44b461a4c01e1604c73561ba2bd746e791345777da22c1eb6"
+      "sha256": "bda9121950861eb534315a0c863fcf36124d59d78e3d38a7ecf1f95ff10df241"
     }
   ],
   "targeted_validation": {
-    "tests": 146,
+    "tests": 153,
     "skipped": 1,
-    "elapsed_seconds": 281.584,
+    "elapsed_seconds": 528.299,
     "result": "OK",
     "local_full_gate": "NOT_RUN",
     "ci": "NOT_RUN"
@@ -75,31 +75,34 @@
     "unchanged_inventory": true
   },
   "native": {
-    "substantive_outputs": 1,
+    "substantive_outputs": 2,
     "output_limit": 6,
-    "frozen_packet": "BLOCKED",
-    "reason_code": "HFIC_PROTOCOL_INVALID",
-    "schema_path": "selected_candidate.available_data_bindings[0..3]",
-    "actual_type": "object",
-    "expected_type": "string",
-    "critic": "NOT_RUN",
-    "classification": "NOT_RUN",
-    "finalization": "NOT_RUN",
-    "experiment_spec_v1_3": "NOT_RUN",
-    "document_runner": "NOT_RUN",
+    "frozen_packet": "PASS",
+    "reason_code": "NATIVE_H08_CLOSED_H09_COMPILER_BUDGET_BLOCKED",
+    "critic": "KILL_LOW_INFORMATION_VALUE",
+    "classification": "NOT_APPLICABLE_AFTER_SCIENTIFIC_KILL",
+    "finalization": "SYNTHESIS_COMPLETE",
+    "experiment_spec_v1_3": "SCHEMA_VALID",
+    "document_runner": "INVALID_EVIDENCE_BLOCKED_BUDGET",
     "current_plane_main_looks": 1,
     "initial_invalid_setup_main_looks": 1,
     "persisted_draft_rewrite": false,
     "budget_refund": false,
-    "scientific_negative": false
+    "scientific_negative": true,
+    "prefreeze_capability_repair": true,
+    "source_binding_field_checks": 56,
+    "persisted_draft_file_sha256": "bd2a5c6850f2ec88a84ea6fbc820662acd480af1bf5aeaf473692d39ba1d26ef",
+    "persisted_draft_canonical_sha256": "835cd6b0ec9c9328e95da6f5f5dd644912dbde5fbd26637c2e32882441a669f3",
+    "new_scientific_looks": 0,
+    "scientific_negative_reason": "ACTUAL_ISOLATED_CRITIC_LOW_INFORMATION_VALUE_NOT_TRANSPORT_REFUSAL"
   },
   "stages": {
     "discovery": "RECORDED_SYNTHETIC_LOOK",
     "generated": "PERSISTED",
-    "classified": "NOT_RUN",
-    "frozen_same_data_replay": "NOT_RUN",
+    "classified": "NOT_APPLICABLE_AFTER_SCIENTIFIC_KILL",
+    "frozen_same_data_replay": "BLOCKED_BEFORE_RUN",
     "chronological_check": "NOT_RUN",
-    "scientific_decision": "NOT_RUN",
+    "scientific_decision": "KILL_LOW_INFORMATION_VALUE",
     "strategy": "NOT_RUN"
   },
   "external_actions": {
@@ -116,24 +119,35 @@
     "H04": "PASS_DETERMINISTIC",
     "H05": "PASS",
     "H06": "PASS",
-    "H07": "PARTIAL",
-    "H08": "BLOCKED",
-    "H09": "NOT_RUN",
-    "H10": "PARTIAL",
+    "H07": "PASS_ACTUAL_CRITIC_ROUTING_INTERPRETATION",
+    "H08": "PASS_SCIENTIFIC_KILL_MACHINE_ENDPOINT",
+    "H09": "BLOCKED_COMPILER_BUDGET",
+    "H10": "PASS_NATIVE_IDENTICAL_RETRY_AND_COLD_READS",
     "H11": "PARTIAL",
     "H12": "PARTIAL"
   },
   "non_claims": [
     "NO_ALPHA",
     "NO_OOS",
-    "NO_NATIVE_ENDPOINT",
     "NO_COMPLETE_DOD",
     "NO_MERGE_READINESS",
     "NO_EXHAUSTIVE_PIT_VALUE_ACCESS_PROOF",
     "NO_RESOURCE_SCALING_PROOF",
-    "NO_HISTORY_REPAIR"
+    "NO_HISTORY_REPAIR",
+    "NO_NATIVE_POSITIVE_SCIENTIFIC_PASS",
+    "NO_H09_RESULT_OR_ORACLE_MATCH",
+    "NO_OBSERVATION_COMPILER_REPAIR_AUTHORITY",
+    "NO_NATIVE_POSITIVE_SCIENTIFIC_PASS",
+    "NO_H09_RESULT_OR_ORACLE_MATCH",
+    "NO_OBSERVATION_COMPILER_REPAIR_AUTHORITY",
+    "NO_NATIVE_POSITIVE_SCIENTIFIC_PASS",
+    "NO_H09_RESULT_OR_ORACLE_MATCH",
+    "NO_OBSERVATION_COMPILER_REPAIR_AUTHORITY",
+    "NO_NATIVE_POSITIVE_SCIENTIFIC_PASS",
+    "NO_H09_RESULT_OR_ORACLE_MATCH",
+    "NO_OBSERVATION_COMPILER_REPAIR_AUTHORITY"
   ],
-  "next_stage": "Repair existing Critic projection losslessly; unchanged-byte prefreeze capability recovery; same-candidate native and typed ExperimentSpec1.3 runner.",
+  "next_stage": "Owner decision on bounded Spec1.3 frozen-recipe consume/admission contract and write-set extension; no budget raise/override, no new candidate/look/draft bytes, no reinterpretation of scientific KILL.",
   "evidence": [
     {
       "logical_ref": "validator-bundle/evidence/red-final-1-summary.json",
@@ -274,6 +288,243 @@
       "logical_ref": "validator-bundle/evidence/final-counterexamples-green-2.json",
       "sha256": "c588c873cc53a3d3f706514c8c3ee6916df5e3a874bcca6d1889d2d2ec9c1fe3",
       "size": 893
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/closure-targeted.log",
+      "sha256": "daf1e0e441d20d4e462f9ceeab2bdc36993d7c91c668589bf9faced20fb2f995",
+      "size": 272
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/document-execution.log",
+      "sha256": "22f4bbf5005bb3a9d6855d786018a922f50c2174d0e7d8407aa539bbc4f4afbb",
+      "size": 677
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/logs/closure-finalize-identical-retry.json",
+      "sha256": "f72b7216dbcea9ea5ac73d75c2eb9c68a5df436d5d640e6929cd259be79cf5d5",
+      "size": 147918
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/logs/closure-finalize.json",
+      "sha256": "a8b2c07cc8e0429fdb0bd6c14ca3d7a5a1aa0741494f98dc50381650ae65be9b",
+      "size": 4562
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/logs/closure-freeze.json",
+      "sha256": "899d8b1e2521dc6c0e939b271686a4b9a5806467e17e5607d42863cd0e30fbdd",
+      "size": 112026
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/logs/closure-resume.json",
+      "sha256": "a332f738ffddd4d3b01c9347ef419bffea867ec1fc5a44236186ee98a320435f",
+      "size": 32636
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/before.json",
+      "sha256": "4055ad83d6b98eea117499279f3f04cedde288c5aef4c9fe8c57c744d51f0027",
+      "size": 37177
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/critic-packet.json",
+      "sha256": "066090df730aa2dd3e7ae37c00f108d18080992e8f648fd0f3406a19771df88c",
+      "size": 60481
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/critic-readout.md",
+      "sha256": "2994c3e438f6136a63b1ab6fae76b79d62fde91823b600ea65105dfa59d73666",
+      "size": 11275
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/critic-result.json",
+      "sha256": "5826e145215c2a561cfacc5e3fb73cd883e073dbadc465d6e9f96770788df51b",
+      "size": 8753
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/document-boundary.json",
+      "sha256": "3b379e7e01cff346a6feffb5153dcf4a66f85eb8e98b4a4b542180f01d164870",
+      "size": 1896
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/document-result.json",
+      "sha256": "84b1890c991c6717640cccebcd851956c93de764b852ca36d38ffa7b4017e569",
+      "size": 323
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/finalized.json",
+      "sha256": "6c30be3e3c26791b14a9f30621b98910857e245c6084f9c1e422bf36652fcd78",
+      "size": 4092
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/freeze-proof.json",
+      "sha256": "1364450ebc7ee3bc4bdc0d6220935c3f27f0efcabc09c29b2f220e9dfe95cbe0",
+      "size": 6406
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/frozen.json",
+      "sha256": "230f4523f35e9d2f42968c532c431f3b552143bc19f7b5d534afbb261942b65c",
+      "size": 116797
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/git.json",
+      "sha256": "15c91620c10eef7444cc3e5292740b179988e14b415dccaaa4b4599f08aaaa56",
+      "size": 498
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/lifecycle-proof.json",
+      "sha256": "ccffa13e4f41e91c129402a193fa376fe91ac0bb55f65f7c839ea60000fa4347",
+      "size": 594
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/native-cold-retry-proof.json",
+      "sha256": "a5729834b4b8cbda5b56b8b84e6dd5ff210424408ba73d861bee6ee5f9f47514",
+      "size": 1391
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/owner-attention-request.json",
+      "sha256": "1b48876420e63804673240fc949321def4b69d0c21cdca51b8e2d5532413790e",
+      "size": 543
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/owner-attention-result.json",
+      "sha256": "46868a924234cf00b03443aa8076981b46c8202f8e4bf223cafbad81e04863e1",
+      "size": 176
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/resume.json",
+      "sha256": "fa36d16d3ab2a2da914af26d204a6370f61e8dd7b3d670eede794b3e1e8504ef",
+      "size": 40333
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/runner-lane.json",
+      "sha256": "a48798b78a0c432c22bcc22f90e8dfb2c13ff080c2e7ec9857b3b3fa27d7bf0b",
+      "size": 200
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/runner-live-eligibility.json",
+      "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "size": 4
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/technical-experiment-spec.json",
+      "sha256": "b343ca5ea8f51d5e277b618aaa7d0d687b63bf67bc0f6082a3f2f951c7b514b2",
+      "size": 14796
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/transport-green.log",
+      "sha256": "3e988a68fd963e921ef77bbfc9452b1e0765aa382416cf72d4b6b93a194675df",
+      "size": 116
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/transport-red.log",
+      "sha256": "d8ab01fa668e71b81a2a5a4f3e45ddacd081f5e4ee8ba412c4e656ddbe72794e",
+      "size": 966
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/transport-sync.log",
+      "sha256": "39f6a5c4405b3edd0c9852b03e2ec001406e706e2cb0c044ee0c38356863d9b5",
+      "size": 1793
     }
-  ]
+  ],
+  "accepted_intermediate_checkpoint": "8a3e9d8e1c848395ac7cee99bc2cf75637417543",
+  "native_execution_head": "d3103600fb95cc138fc0bfbf735241b3d4475ac3",
+  "lineage": {
+    "session_id": "HFIC-SESS-036AD06BD264B440",
+    "selected_candidate_id": "HFIC-CAND-64D4823415CB",
+    "definition_sha256": "64d4823415cb0e630034e0640ca23d16adb69a60ede7bcb9b5a889f5f058b20a",
+    "critic_input_packet_sha256": "b9101f402b5b7ffba4283f54724bcfc06c73944fd38f79ccbaef3dbbc51397fe",
+    "critic_result_sha256": "93b18943cf262ee568ac4b0dfc089cf071ddee42ca13582ae8fe7b4e9004a8ba",
+    "critic_terminal": "KILL_LOW_INFORMATION_VALUE",
+    "session_state": "SYNTHESIS_COMPLETE",
+    "classification": "NOT_APPLICABLE_AFTER_SCIENTIFIC_KILL",
+    "authoritative_lane_classifier_run": false,
+    "experiment_id": "EXP-HFIC-CAND-64D4823415CB-FROZEN-REPLAY",
+    "experiment_spec_sha256": "72b5d3e021a39e915d8ea17f231ff9db06d1b961870808826db5c5cdff540a3c",
+    "hypothesis_version_alias": "HYP-HFIC-CAND-64D4823415CB",
+    "recipe_scientific_identity": "7083054ca076cda722d1527616a0f7b3ec5c53c1b6f3e4e2eba5132a88e3520f",
+    "runner_classification": "BLOCKED_BUDGET",
+    "run_id": null,
+    "result_artifact_id": null,
+    "oracle_comparison": "NOT_RUN_NO_COMPUTED_RESULT"
+  },
+  "material_blocker": {
+    "earliest_owner": "observation_schedule_compiler.compile_observation_request",
+    "owner_path": "src/solana_alpha_lab/factory/observation_schedule_compiler.py",
+    "first_guard_line": 300,
+    "collection_mode": "REUSE_ONLY",
+    "declared": {
+      "canonical_bytes_lifetime_max": 5368709120,
+      "cash_usd_max": "0",
+      "fallback": false,
+      "min_provider_pace_seconds": 3,
+      "modeled_provider_credits_per_utc_day_max": 10000,
+      "provider_calls_lifetime_max": 3200,
+      "provider_calls_per_tick_max": 60,
+      "provider_calls_per_utc_day_max": 3200,
+      "raw_bytes_per_utc_day_max": 1073741824,
+      "retry": false
+    },
+    "modeled_envelope": {
+      "discovery_calls": 1440,
+      "batch_snapshot_calls": 1,
+      "x_point_calls": 20,
+      "y_point_calls": 80,
+      "provider_calls_per_tick_max": 60,
+      "provider_calls_per_utc_day_max": 1541,
+      "provider_calls_lifetime_max": 129545,
+      "modeled_credits_per_utc_day_max": 1541,
+      "raw_bytes_per_utc_day_max": 1073741824,
+      "canonical_bytes_lifetime_max": 5368709120,
+      "min_raw_retention_days": 8,
+      "max_members_per_utc_day": 20,
+      "latest_final_due_offset_seconds": 7200
+    },
+    "budget_fits": false,
+    "request_schedule_sha256": "bc9320ec2176061a0bb85e16e6dcd3702f258e0fdf84e19413e51efa1f3f21bc",
+    "frozen_source_schedule_sha256": [
+      "bc9320ec2176061a0bb85e16e6dcd3702f258e0fdf84e19413e51efa1f3f21bc"
+    ],
+    "source_bindings_unchanged": true,
+    "new_looks": 0,
+    "budget_mutated": false,
+    "recovery_or_compiler_override": false,
+    "readonly_secondary_panel_probe": {
+      "covers_exact_request": false,
+      "note": "Not reached by actual compiler; diagnostic only, no budget bypass or panel publication"
+    },
+    "readonly_secondary_canonical_release_probe": {
+      "bound": false,
+      "reason_code": "CANONICAL_RELEASE_IDENTITY_UNBOUND",
+      "live_eligibility_projection": null
+    }
+  },
+  "owner_attention_gate": {
+    "decision": "OWNER_ATTENTION_REQUIRED",
+    "reasons": [
+      "MATERIAL_OWNER_DECISION"
+    ],
+    "schema": "smial.owner-attention-decision",
+    "schema_version": "2.0"
+  },
+  "audit_consequence": {
+    "original_denominators": {
+      "O": 12,
+      "P": 8,
+      "R": 8,
+      "J": 5
+    },
+    "global_verdict": "INCOMPLETE_UNLESS_SEPARATELY_PROVEN",
+    "old_audit_metrics_recomputed": false,
+    "newly_closed_subset": "H08 native same-candidate honest scientific-negative lifecycle",
+    "still_open": [
+      "H09_SAME_CANDIDATE_SUPPORTED_SPEC_1_3_RESULT",
+      "CHRONOLOGICAL_FROZEN_LATER_BRANCH_CONSUMER_NOT_BOUND"
+    ]
+  },
+  "retained_history": {
+    "all_original_records_unchanged": true,
+    "look_count": 1,
+    "reservation_record_id": "HFIC-ART-SLOT-ADMISSION-E9494039486996D5AA5461154EE2737276518E31FFF3E89EDC2C55A9E1D51AA4",
+    "persisted_payload_unchanged": true,
+    "accounting_unchanged": true
+  }
 }

@@ -31,6 +31,17 @@ and locks every bound semantic axis and predictive/causal form, separately
 from the definition hash. Historical bytes and terminal judgements are never
 rewritten. Unsupported advancement returns a technical gap.
 
+Authored `available_data_bindings` may contain typed frozen-input objects.
+The shared selected-candidate builder encodes each such object as canonical
+JSON in the Critic's existing string-array narrative transport. Decoding must
+recover every field and value; existing strings remain byte-identical. A
+malformed outer shape or unsupported scalar remains schema-invalid. This
+projection does not turn narrative strings into resolver bindings. The
+persisted draft, typed `temporal_recipe.frozen_input`, ExperimentSpec 1.3
+`data_bindings`, candidate definition and scientific look remain unchanged.
+An orphan generated draft may resume only through the existing verified
+`prefreeze_capability_repair`, retaining its original slot/reservation/accounting.
+
 Before a fresh generated draft, frozen session or zero-candidate terminal can
 write, the inline context/digest must agree and the exact context blob and
 committed artifact must exist under that ResearchStore root. Existing
