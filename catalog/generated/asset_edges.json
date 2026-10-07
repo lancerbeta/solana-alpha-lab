@@ -14443,6 +14443,11 @@
       "target_asset_id": "EVIDENCE-FORGE-COMPOSITE-FEATURE-RECIPES-001"
     },
     {
+      "source_asset_id": "REPORT-FORGE-GROUNDED-HANDOFF-CHECKPOINT-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FORGE-GROUNDED-HANDOFF-CLOSURE-001"
+    },
+    {
       "source_asset_id": "REPORT-FRESH-OOS-FRICTION-VETO-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FRESH-OOS-FRICTION-VETO-ACCEPTANCE-001"

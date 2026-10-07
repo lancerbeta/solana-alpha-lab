@@ -1,0 +1,217 @@
+{
+  "schema": "smial.forge-grounded-handoff-checkpoint",
+  "schema_version": "1.0",
+  "task_id": "FORGE_GROUNDED_HANDOFF_CLOSURE_V1",
+  "status": "HANDOFF_REPAIR_BLOCKED",
+  "expected_base": "04ec8e0286a3dce5999d0687784717ee90fc5dca",
+  "branch": "codex/forge-grounded-handoff-v1",
+  "completed_owner_outcome": false,
+  "canonical_done": false,
+  "merge_ready": false,
+  "delivery_completion_evidence": false,
+  "global_forge_audit": "INCOMPLETE",
+  "implementation_bindings": [
+    {
+      "path": "src/solana_alpha_lab/factory/hfic_grounded_discovery.py",
+      "sha256": "a5d1c7bd21bd7de5bfa2eeb5635fd93bc87b5034d3ba2a638a9b87d36cb8accc"
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/hfic_session.py",
+      "sha256": "f99df4198a2f2031b14164e28004f487ed2810f8a845536716c89c04e2c62589"
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/hfic_research_scope.py",
+      "sha256": "83941e8cfe93159ae2405eb0399354118d3681a6fbbc450a8d0d327e537aa895"
+    },
+    {
+      "path": "src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
+      "sha256": "ef8b5e93ced80bdfc3a8424bb24e5393b981e6a5465a2c371a7d08deb2edf8de"
+    },
+    {
+      "path": "scripts/hypothesis_forge.py",
+      "sha256": "1ed8cf1de4a2cc5bec04104364392747f6f27363e0bf935a2180420f2941ba95"
+    },
+    {
+      "path": "tests/test_forge_grounded_handoff_closure_v1.py",
+      "sha256": "31a080e365c52108a41e378628908ac63d7b1e60e20b90022575354ffca1771e"
+    }
+  ],
+  "targeted_validation": {
+    "tests": 142,
+    "skipped": 1,
+    "elapsed_seconds": 269.09,
+    "result": "OK",
+    "local_full_gate": "NOT_RUN",
+    "ci": "NOT_RUN"
+  },
+  "deterministic_original_public": {
+    "red_repetitions": 2,
+    "green_repetitions": 2,
+    "scope": "Initial seam implementation; subsequent changes validated by targeted selection"
+  },
+  "architecture_counterexamples": {
+    "red_head": "0179e0d07dcc640749c39bf72d7c819bae22c94e",
+    "cases": 2,
+    "red_repetitions": 2,
+    "green_repetitions": 2
+  },
+  "cold_readback": {
+    "scope": "SCRIPTED_F0_SAVED_SESSION",
+    "fresh_processes": 2,
+    "evaluation_calls": 0,
+    "value_loader_calls": 0,
+    "unchanged_inventory": true
+  },
+  "native": {
+    "substantive_outputs": 1,
+    "output_limit": 6,
+    "frozen_packet": "BLOCKED",
+    "reason_code": "HFIC_PROTOCOL_INVALID",
+    "schema_path": "selected_candidate.available_data_bindings[0..3]",
+    "actual_type": "object",
+    "expected_type": "string",
+    "critic": "NOT_RUN",
+    "classification": "NOT_RUN",
+    "finalization": "NOT_RUN",
+    "experiment_spec_v1_3": "NOT_RUN",
+    "document_runner": "NOT_RUN",
+    "current_plane_main_looks": 1,
+    "initial_invalid_setup_main_looks": 1,
+    "persisted_draft_rewrite": false,
+    "budget_refund": false,
+    "scientific_negative": false
+  },
+  "stages": {
+    "discovery": "RECORDED_SYNTHETIC_LOOK",
+    "generated": "PERSISTED",
+    "classified": "NOT_RUN",
+    "frozen_same_data_replay": "NOT_RUN",
+    "chronological_check": "NOT_RUN",
+    "scientific_decision": "NOT_RUN",
+    "strategy": "NOT_RUN"
+  },
+  "external_actions": {
+    "provider_calls": 0,
+    "deployment": false,
+    "push": false,
+    "pull_request": false,
+    "merge": false
+  },
+  "dod": {
+    "H01": "PASS",
+    "H02": "PASS",
+    "H03": "PASS_SCRIPTED_CONTROL",
+    "H04": "PASS_DETERMINISTIC",
+    "H05": "PASS",
+    "H06": "PASS",
+    "H07": "PARTIAL",
+    "H08": "BLOCKED",
+    "H09": "NOT_RUN",
+    "H10": "PARTIAL",
+    "H11": "PARTIAL",
+    "H12": "PARTIAL"
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_OOS",
+    "NO_NATIVE_ENDPOINT",
+    "NO_COMPLETE_DOD",
+    "NO_MERGE_READINESS",
+    "NO_EXHAUSTIVE_PIT_VALUE_ACCESS_PROOF",
+    "NO_RESOURCE_SCALING_PROOF",
+    "NO_HISTORY_REPAIR"
+  ],
+  "next_stage": "Repair existing Critic projection losslessly; unchanged-byte prefreeze capability recovery; same-candidate native and typed ExperimentSpec1.3 runner.",
+  "evidence": [
+    {
+      "logical_ref": "validator-bundle/evidence/red-final-1-summary.json",
+      "sha256": "a169d5ada6159bc7f7b6e3932e0aeb885557f7054cdb79a4cdcb8674a8f7f8b2",
+      "size": 131078
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/red-final-2-summary.json",
+      "sha256": "d38185845f4fe2cc677c73867badf483ec3da3970467e6f37d013d11f9fa09d5",
+      "size": 131078
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/green-1-summary.json",
+      "sha256": "c74ae604e05e9574aba0b302af73f6754b6d514462b851b3a2323d333caf032c",
+      "size": 114042
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/green-2-summary.json",
+      "sha256": "5b9c83d5d6a0d8ece4d4351e12f6d4be680c45b5cd4126d211063d3caff7ec4b",
+      "size": 114042
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/targeted-review-fixes.log",
+      "sha256": "19c39c735206a2e630ea992ebd5c88300d56b634bf6e9ab1c06dfa144d311821",
+      "size": 261
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/cold-saved-readback.json",
+      "sha256": "3fa97081654c82fae075a72832be55a2ab9fbc20d006c4eab54db448238babf6",
+      "size": 1235
+    },
+    {
+      "logical_ref": "validator-bundle/reviews/architecture-review.md",
+      "sha256": "75ed7eb715f9e7fd8db6141f7ffe34cbffb60a5257974a860c4a04136e299059",
+      "size": 15051
+    },
+    {
+      "logical_ref": "validator-bundle/reviews/goal-review.md",
+      "sha256": "01bd2a11d1389ba1648516a60877f8f33e566df986381bf6e3d45e46ac09e3e7",
+      "size": 14494
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/review-counterexamples-red-1.json",
+      "sha256": "b23c6da409434d89b2008e08601fabcd2f1a4f54880993fee000c1082129ed1d",
+      "size": 2666
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/review-counterexamples-red-2.json",
+      "sha256": "8302bad6868d375e0c18ffece7a864a86b6a2daa403ea6c7fc36b3c4f7e55460",
+      "size": 2667
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/review-counterexamples-green-1.json",
+      "sha256": "73af97f9787361bbf36d1081d2fa03642fbef6e497d9c0f6bd77dcdabd516dd7",
+      "size": 890
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/review-counterexamples-green-2.json",
+      "sha256": "f63fc5c135cdd16829cf34f6c2c729df3b2fdbf88d7c3abbb2aac6e2dca3e561",
+      "size": 889
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/generator-draft.json",
+      "sha256": "b8382584b4f4450739ce07644c8a2ab550c63bdf4458892dd48fa55c993eb878",
+      "size": 65272
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/transport-bound-draft.json",
+      "sha256": "bd2a5c6850f2ec88a84ea6fbc820662acd480af1bf5aeaf473692d39ba1d26ef",
+      "size": 65270
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/query.json",
+      "sha256": "c38a14d4fef06706909daa8bfff732a343205238243c264247af057ffa03bdf8",
+      "size": 1086
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/native-v2/preregistered.json",
+      "sha256": "44f8b562883aec521e3511030f755cf5038b8538ce2af8ab9128b5b7a7691367",
+      "size": 1540
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/logs/native-persist.json",
+      "sha256": "671d39fb8c7f43aae4aedda1aea8ecb6b9fa8cec021052512f12fd580ba3159e",
+      "size": 71598
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/logs/native-freeze.json",
+      "sha256": "30776004d902ef716b346beae22b8007ac615f4851b617bf2c42645b47b2ec55",
+      "size": 832
+    }
+  ]
+}

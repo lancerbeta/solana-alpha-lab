@@ -99,12 +99,18 @@ class FreshCardTests(unittest.TestCase):
         runner = {**card(), "research_scope_rule_sha256": "b" * 64,
                   "research_scope_statement": "different rule", "evidence_surface_mode": primary_scope["evidence_surface_mode"]}
         packet = {"grounded_evidence": {"candidate_scope": primary_scope, "result": {"n": 3},
-                                       "result_sha256": "c" * 64, "result_refs": ["primary-result"]}}
+                                       "result_sha256": "c" * 64, "result_refs": ["primary-result"],
+                                       "look_confirms_selected": True, "look_scope_relation": "LOOK_SCOPE_MATCH"}}
         session._rebind_runner_up_grounded_evidence(packet, runner)
         evidence = packet["grounded_evidence"]
         self.assertNotIn("result", evidence)
         self.assertNotIn("result_refs", evidence)
         self.assertEqual(evidence["candidate_scope"]["research_scope_rule_sha256"], "b" * 64)
+        self.assertFalse(evidence["look_confirms_selected"])
+        self.assertEqual(evidence["look_scope_relation"], "LOOK_SCOPE_NARROWER")
+        self.assertEqual(evidence["look_context_result_refs"], ["primary-result"])
+        self.assertTrue(session._foreign_look_blocks_scientific_terminal(
+            {"critic_input_packet": packet}, {}))
 
 
 class CanonicalIngressTests(unittest.TestCase):
@@ -210,6 +216,51 @@ class RevisionScopeTests(unittest.TestCase):
 
 
 class ContextDependencyTests(unittest.TestCase):
+    def test_context_failure_at_session_commit_never_leaves_a_new_slot(self):
+        from solana_alpha_lab.factory import hfic_preflight as preflight
+        from solana_alpha_lab.factory.hfic_identity import assign_portfolio_ids
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from tests.test_hfic_session import valid_draft, _preflight_receipt
+
+        with tempfile.TemporaryDirectory() as temporary:
+            store = ResearchStore(Path(temporary))
+            store.prepare_write_lookup()
+            draft = valid_draft()
+            frozen = session.freeze_draft(draft, preflight_receipt=_preflight_receipt())
+            context = _preflight_receipt()["forge_context_packet"]
+            digest = preflight.persist_forge_context_packet(store._root, context, store=store, repo_root=ROOT)
+            frozen["forge_context_packet_sha256"] = digest
+            expected_slot = session._execution_identity_fields(frozen)["scientific_slot_sha256"]
+            identities = assign_portfolio_ids(draft["candidates"])
+            blob = preflight._forge_context_blob_path(store._root, digest)
+            original_bytes = blob.read_bytes()
+            original_append = store.append
+            before = store.diagnostics().committed_inventory_sha256
+
+            def fail_at_lifecycle_commit(records, *, transaction_id, before_commit=None):
+                def hook():
+                    if any(not item.record_id.startswith("HFIC-ART-SLOT-ADMISSION-") for item in records):
+                        blob.write_text('{"corrupted":true}', encoding="utf-8")
+                    if before_commit is not None:
+                        before_commit()
+                return original_append(records, transaction_id=transaction_id, before_commit=hook)
+
+            with patch.object(session, "_assert_scientific_admission", return_value={}), \
+                 patch.object(store, "append", side_effect=fail_at_lifecycle_commit):
+                with self.assertRaises(session.HficSessionError) as caught:
+                    session.persist_frozen_session(store, frozen, repo_root=ROOT, identities=identities, draft=draft)
+            self.assertEqual(caught.exception.code, "FORGE_CONTEXT_HASH_MISMATCH")
+            self.assertEqual(store.diagnostics().committed_inventory_sha256, before)
+            self.assertEqual(session.list_scientific_slot_admissions(store), [])
+            blob.write_bytes(original_bytes)
+            with patch.object(session, "_assert_scientific_admission", return_value={}):
+                session.persist_frozen_session(store, frozen, repo_root=ROOT, identities=identities, draft=draft)
+                after = store.diagnostics().committed_inventory_sha256
+                session.persist_frozen_session(store, frozen, repo_root=ROOT, identities=identities, draft=draft)
+                self.assertEqual(store.diagnostics().committed_inventory_sha256, after)
+            self.assertEqual(len(session.list_scientific_slot_admissions(store)), 1)
+            self.assertEqual(session.list_scientific_slot_admissions(store)[0]["scientific_slot_sha256"], expected_slot)
+
     def test_existing_owner_checks_blob_committed_record_inline_and_root(self):
         from solana_alpha_lab.factory import hfic_preflight as preflight
         from solana_alpha_lab.factory.research_store import ResearchStore

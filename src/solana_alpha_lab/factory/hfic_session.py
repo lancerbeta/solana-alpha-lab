@@ -1312,6 +1312,12 @@ def _rebind_runner_up_grounded_evidence(
     if not same_look:
         drop.update(_COMPUTED_LOOK_KEYS)
     body = {key: value for key, value in grounded.items() if key not in drop}
+    if not same_look:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import relate_look_scope
+
+        body["look_confirms_selected"] = False
+        body["look_scope_relation"] = relate_look_scope(executed_scope, proven)
+        body["look_context_result_refs"] = list(grounded.get("result_refs") or [])
     from solana_alpha_lab.factory.hfic_grounded_discovery import _scope_missing
 
     if not _scope_missing(proven, prefix=""):
@@ -3008,14 +3014,6 @@ def persist_no_worthy_session(
         repair_disposition = repair_admission.get(
             "repair_continuation_disposition_sha256"
         )
-    if not (isinstance(repair_disposition, str) and repair_disposition):
-        persist_scientific_slot_admission(
-            store,
-            frozen,
-            repo_root=repo_root,
-            stage_time=stage_time,
-            representation_registry=representation_registry,
-        )
     action_bytes = _canonical_bytes(action)
     action_sha = hashlib.sha256(action_bytes).hexdigest()
     prompt_version = str(frozen.get("prompt_version") or PROMPT_VERSION)
@@ -3283,8 +3281,12 @@ def persist_no_worthy_session(
                 },
             )
         )
-    store.append(records, transaction_id=transaction_id,
-                 before_commit=lambda: _verify_required_context_dependency(store, bind_input))
+    _append_session_records_with_slot(
+        store, records, transaction_id=transaction_id, binding=bind_input,
+        repo_root=repo_root, stage_time=now,
+        representation_registry=representation_registry,
+        reserve_slot=not bool(repair_disposition),
+    )
     if isinstance(frozen, dict):
         frozen["next"] = action["action_type"]
         frozen["next_action"] = action
@@ -3507,6 +3509,63 @@ def _build_scientific_slot_admission_event(
         created_at=now,
     )
     return body, event
+
+
+def _append_session_records_with_slot(
+    store: Any,
+    records: Sequence[Any],
+    *,
+    transaction_id: str,
+    binding: Mapping[str, Any],
+    repo_root: Any,
+    stage_time: datetime,
+    representation_registry: Mapping[str, Any] | None,
+    reserve_slot: bool,
+) -> None:
+    """Commit a new reservation and its lifecycle in one existing store lease."""
+
+    slot = _execution_identity_fields(binding).get("scientific_slot_sha256")
+    admission_event = None
+    if reserve_slot and isinstance(slot, str) and len(slot) == 64:
+        _, admission_event = _build_scientific_slot_admission_event(
+            binding, repo_root=repo_root, transaction_id=transaction_id,
+            stage_time=stage_time,
+        )
+    append_records = list(records)
+    if admission_event is not None and _existing_scientific_slot_admission(store, slot) is None:
+        append_records.insert(0, admission_event)
+
+    def recheck() -> None:
+        _verify_required_context_dependency(store, binding)
+        if admission_event is None:
+            return
+        observed = _existing_scientific_slot_admission(store, slot)
+        if observed is not None:
+            if str(observed.get("session_id") or "") != str(binding.get("session_id") or ""):
+                raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED")
+            if not _scientific_slot_admission_matches_binding(observed, binding):
+                raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING")
+            if any(item.record_id == admission_event.record_id for item in append_records):
+                raise HficSessionError("SESSION_RESERVATION_APPEARED")
+            return
+        _assert_scientific_admission(
+            store, binding, repo_root=repo_root,
+            representation_registry=representation_registry,
+        )
+
+    for attempt in range(4):
+        try:
+            store.append(append_records, transaction_id=transaction_id, before_commit=recheck)
+            return
+        except Exception as exc:
+            if getattr(exc, "code", None) == "SESSION_RESERVATION_APPEARED":
+                append_records = list(records)
+                continue
+            if getattr(exc, "code", None) == "WRITER_BUSY" and attempt < 3:
+                time.sleep(0.05 * (attempt + 1))
+                continue
+            raise
+    raise HficSessionError("WRITER_BUSY")
 
 
 def list_scientific_slot_admissions(store: Any) -> list[dict[str, Any]]:
@@ -4828,14 +4887,6 @@ def persist_frozen_session(
         )
     # Authorized repair keeps the parent slot reservation; a new capability /
     # execution binding must not rewrite or collide with the reserved digest.
-    if not (isinstance(repair_disposition, str) and repair_disposition):
-        persist_scientific_slot_admission(
-            store,
-            frozen,
-            repo_root=repo_root,
-            stage_time=stage_time,
-            representation_registry=representation_registry,
-        )
     git = repository_git_snapshot(Path(repo_root))
     now = (
         _stage_datetime(lambda: stage_time)
@@ -5106,8 +5157,12 @@ def persist_frozen_session(
                 },
             )
         )
-    store.append(records, transaction_id=transaction_id,
-                 before_commit=lambda: _verify_required_context_dependency(store, context_binding))
+    _append_session_records_with_slot(
+        store, records, transaction_id=transaction_id, binding=context_binding,
+        repo_root=repo_root, stage_time=now,
+        representation_registry=representation_registry,
+        reserve_slot=not bool(repair_disposition),
+    )
 
 
 def persist_legacy_session(
