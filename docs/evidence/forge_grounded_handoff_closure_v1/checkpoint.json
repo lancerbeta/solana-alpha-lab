@@ -13,11 +13,11 @@
   "implementation_bindings": [
     {
       "path": "src/solana_alpha_lab/factory/hfic_grounded_discovery.py",
-      "sha256": "a5d1c7bd21bd7de5bfa2eeb5635fd93bc87b5034d3ba2a638a9b87d36cb8accc"
+      "sha256": "7bc9f1495ddd6ac28f0ac0cffd4c85a0cf765d45778efe57ff086b254459d017"
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_session.py",
-      "sha256": "f99df4198a2f2031b14164e28004f487ed2810f8a845536716c89c04e2c62589"
+      "sha256": "59e516c760e17ecb713a0e82eba19d6b42d2e15ba94c0a984e525526c3293b3e"
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_research_scope.py",
@@ -29,17 +29,17 @@
     },
     {
       "path": "scripts/hypothesis_forge.py",
-      "sha256": "1ed8cf1de4a2cc5bec04104364392747f6f27363e0bf935a2180420f2941ba95"
+      "sha256": "ef40a61b5ad7455923f75c6dceedb841b07db7cf4c34ae7a5be17480c7bfe500"
     },
     {
       "path": "tests/test_forge_grounded_handoff_closure_v1.py",
-      "sha256": "31a080e365c52108a41e378628908ac63d7b1e60e20b90022575354ffca1771e"
+      "sha256": "82a5de22e10722ab4ecd654d65bb0f421cbe1323ab6303a3575d5c1eca7d82a8"
     }
   ],
   "targeted_validation": {
-    "tests": 142,
+    "tests": 145,
     "skipped": 1,
-    "elapsed_seconds": 269.09,
+    "elapsed_seconds": 273.789,
     "result": "OK",
     "local_full_gate": "NOT_RUN",
     "ci": "NOT_RUN"
@@ -52,6 +52,12 @@
   "architecture_counterexamples": {
     "red_head": "0179e0d07dcc640749c39bf72d7c819bae22c94e",
     "cases": 2,
+    "red_repetitions": 2,
+    "green_repetitions": 2
+  },
+  "final_review_counterexamples": {
+    "red_head": "5b00a75a75db1ade116330ad9ce6f10149a3a14a",
+    "cases": 3,
     "red_repetitions": 2,
     "green_repetitions": 2
   },
@@ -212,6 +218,31 @@
       "logical_ref": "validator-bundle/evidence/logs/native-freeze.json",
       "sha256": "30776004d902ef716b346beae22b8007ac615f4851b617bf2c42645b47b2ec55",
       "size": 832
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/targeted-checkpoint-final.log",
+      "sha256": "e41da7fbcec7dd083a4b4244883ad8adaa2313b5684425adf6777e455f971590",
+      "size": 264
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/final-counterexamples-red-1.json",
+      "sha256": "bc50b649ecea3ff4e54d3bac94ab0ff42ac55f223755919e60b63d9b041ef05f",
+      "size": 6353
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/final-counterexamples-red-2.json",
+      "sha256": "10af7106768083f60e14b35483ddc4a502745cbf42693ba4c3d90cd6b1601331",
+      "size": 6353
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/final-counterexamples-green-1.json",
+      "sha256": "899fac36ce2e4edaefecb9030f7e53a4415daaf4f82ffb2d33293e274a898914",
+      "size": 894
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/final-counterexamples-green-2.json",
+      "sha256": "c588c873cc53a3d3f706514c8c3ee6916df5e3a874bcca6d1889d2d2ec9c1fe3",
+      "size": 893
     }
   ]
 }

@@ -1317,7 +1317,9 @@ def _rebind_runner_up_grounded_evidence(
 
         body["look_confirms_selected"] = False
         body["look_scope_relation"] = relate_look_scope(executed_scope, proven)
-        body["look_context_result_refs"] = list(grounded.get("result_refs") or [])
+        body["look_context_result_refs"] = list(
+            grounded.get("result_refs") or grounded.get("look_context_result_refs") or []
+        )
     from solana_alpha_lab.factory.hfic_grounded_discovery import _scope_missing
 
     if not _scope_missing(proven, prefix=""):
@@ -3532,8 +3534,17 @@ def _append_session_records_with_slot(
             stage_time=stage_time,
         )
     append_records = list(records)
-    if admission_event is not None and _existing_scientific_slot_admission(store, slot) is None:
-        append_records.insert(0, admission_event)
+
+    def reservation_belongs_to_this_transaction() -> bool:
+        saved = store.find_record(admission_event.record_id)
+        if saved is None:
+            raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+        return saved.transaction_id == transaction_id
+
+    if admission_event is not None:
+        observed = _existing_scientific_slot_admission(store, slot)
+        if observed is None or reservation_belongs_to_this_transaction():
+            append_records.insert(0, admission_event)
 
     def recheck() -> None:
         _verify_required_context_dependency(store, binding)
@@ -3545,7 +3556,8 @@ def _append_session_records_with_slot(
                 raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED")
             if not _scientific_slot_admission_matches_binding(observed, binding):
                 raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING")
-            if any(item.record_id == admission_event.record_id for item in append_records):
+            has_admission = any(item.record_id == admission_event.record_id for item in append_records)
+            if has_admission != reservation_belongs_to_this_transaction():
                 raise HficSessionError("SESSION_RESERVATION_APPEARED")
             return
         _assert_scientific_admission(

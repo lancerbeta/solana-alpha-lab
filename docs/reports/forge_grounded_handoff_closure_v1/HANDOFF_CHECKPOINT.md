@@ -38,12 +38,20 @@ after correction: foreign confirmation flags and context failure at the final
 write boundary. The latter verifies zero committed slot/session changes,
 restoration of the exact dependency and idempotent retry of the same slot.
 
-The final targeted selection ran **142 tests in 269.090 seconds, OK, one
+The final targeted selection ran **145 tests in 273.789 seconds, OK, one
 skip**, covering the changed owners, direct consumers and existing prefreeze
 recovery. No local full gate was run. A saved scripted F0 session was read in
 two fresh OS processes: IDs/result hashes matched, committed inventory stayed
 unchanged and evaluator/value-loader spies observed zero calls. This is saved
 readback evidence, not native finalization or a general PIT access certificate.
+
+Final review on interim `5b00a75a75db1ade116330ad9ce6f10149a3a14a` identified
+three additional edge cases. Each failed twice before repair and passed twice
+after it: deterministic interleaving of identical transaction callers, retained
+context refs after a second detach, and exact field/type diagnostics. Replay
+now retains the whole committed transaction when its reservation belongs to
+that transaction; a separate prefreeze reservation is not rewritten. These
+are scripted interleaving tests, not a newly claimed OS race certificate.
 
 Raw logs and disposable synthetic stores remain outside tracked Git. Compact
 locators and hashes are in `docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json`.

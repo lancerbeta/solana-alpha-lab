@@ -1298,18 +1298,33 @@ def validate_fresh_card_scope(
     nested = card.get("candidate_scope")
     declared_keys = _LOOK_CLAIM_AXES + ("research_scope_statement", "evidence_surface_mode")
     if "candidate_scope" in card:
-        if not isinstance(nested, Mapping) or any(
-            key in nested and not _axis_text(nested[key]) for key in declared_keys
-        ):
-            raise GroundedDiscoveryError("CANDIDATE_SCOPE_INVALID")
+        if not isinstance(nested, Mapping):
+            raise GroundedDiscoveryError("CANDIDATE_SCOPE_INVALID", {
+                "invalid_fields": ["candidate_scope"], "expected_type": "object",
+                "next_action": "CORRECT_DECLARED_FIELD_TYPES_REUSE_SAVED_LOOK",
+            })
+        invalid = ["candidate_scope." + key for key in declared_keys
+                   if key in nested and not _axis_text(nested[key])]
+        if invalid:
+            raise GroundedDiscoveryError("CANDIDATE_SCOPE_INVALID", {
+                "invalid_fields": invalid, "expected_type": "non_empty_string",
+                "next_action": "CORRECT_DECLARED_FIELD_TYPES_REUSE_SAVED_LOOK",
+            })
         conflicts = [
             key for key in declared_keys
             if key in nested and key in card and _axis_text(nested[key]) != _axis_text(card[key])
         ]
         if conflicts:
-            raise GroundedDiscoveryError("CANDIDATE_SCOPE_FIELDS_CONFLICT", {"conflicting_fields": conflicts})
-    if any(key in card and not _axis_text(card[key]) for key in _LOOK_CLAIM_AXES):
-        raise GroundedDiscoveryError("CANDIDATE_SCOPE_INVALID")
+            raise GroundedDiscoveryError("CANDIDATE_SCOPE_FIELDS_CONFLICT", {
+                "conflicting_fields": conflicts,
+                "next_action": "RESOLVE_DECLARED_SCOPE_CONFLICT_REUSE_SAVED_LOOK",
+            })
+    invalid = [key for key in declared_keys if key in card and not _axis_text(card[key])]
+    if invalid:
+        raise GroundedDiscoveryError("CANDIDATE_SCOPE_INVALID", {
+            "invalid_fields": invalid, "expected_type": "non_empty_string",
+            "next_action": "CORRECT_DECLARED_FIELD_TYPES_REUSE_SAVED_LOOK",
+        })
     required = list(_CONTENT_AXES) if require_look_axes or bool(nested) else []
     look = look_scope if isinstance(look_scope, Mapping) else {}
     for key in ("representation_scope", "research_scope_rule_sha256"):

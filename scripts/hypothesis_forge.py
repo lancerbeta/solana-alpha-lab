@@ -4673,7 +4673,8 @@ def main(argv: list[str] | None = None) -> int:
             print(code, file=sys.stderr)
             return emit({"reason_code": code, "detail": exc.detail,
                          "scientific_negative": False, "writes": False,
-                         "next_action": "CORRECT_DECLARED_FIELD_PLACEMENT_REUSE_SAVED_LOOK"}, exit_code=2)
+                         "next_action": exc.detail.get("next_action") or
+                         "CORRECT_DECLARED_FIELD_PLACEMENT_REUSE_SAVED_LOOK"}, exit_code=2)
         if isinstance(exc, HficSessionError) and code.startswith("FORGE_CONTEXT_"):
             print(code, file=sys.stderr)
             next_action = ("RUN_PERSISTENT_PREFLIGHT_REUSE_SAVED_LOOK"

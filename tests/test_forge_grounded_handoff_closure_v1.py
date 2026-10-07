@@ -76,6 +76,24 @@ class FreshCardTests(unittest.TestCase):
         self.assertEqual(caught.exception.detail["missing_top_level"],
                          ["representation_scope", "research_scope_rule_sha256", "research_scope_statement"])
 
+    def test_invalid_scope_types_name_exact_fields_and_recovery(self):
+        cases = (({"candidate_scope": []}, ["candidate_scope"], "object"),
+                 ({"candidate_scope": {"target": 7}}, ["candidate_scope.target"], "non_empty_string"),
+                 ({"target": 7}, ["target"], "non_empty_string"))
+        for extra, fields, expected in cases:
+            with self.subTest(fields=fields), self.assertRaises(gd.GroundedDiscoveryError) as caught:
+                gd.validate_fresh_card_scope({**card(), **extra})
+            self.assertEqual(caught.exception.detail["invalid_fields"], fields)
+            self.assertEqual(caught.exception.detail["expected_type"], expected)
+            self.assertEqual(caught.exception.detail["next_action"], "CORRECT_DECLARED_FIELD_TYPES_REUSE_SAVED_LOOK")
+
+    def test_already_detached_runner_keeps_original_contextual_refs(self):
+        packet = {"grounded_evidence": {"candidate_scope": SCOPE,
+                  "look_confirms_selected": False, "look_context_result_refs": ["HFIC-LOOK-ORIGINAL"]}}
+        session._rebind_runner_up_grounded_evidence(packet, {**card(), "target": "other"})
+        self.assertEqual(packet["grounded_evidence"]["look_context_result_refs"], ["HFIC-LOOK-ORIGINAL"])
+        self.assertFalse(packet["grounded_evidence"]["look_confirms_selected"])
+
     def test_complete_but_narrower_claim_and_unmeasured_idea_remain_distinct(self):
         narrower = {**card(), "target": "different-supported-target"}
         gd.validate_fresh_card_scope(narrower, look_scope=SCOPE, require_look_axes=True)
@@ -216,6 +234,52 @@ class RevisionScopeTests(unittest.TestCase):
 
 
 class ContextDependencyTests(unittest.TestCase):
+    def test_identical_concurrent_session_transaction_replays_whole_record_set(self):
+        from datetime import datetime, timezone
+        from solana_alpha_lab.factory import hfic_preflight as preflight
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from tests.test_hfic_session import _preflight_receipt
+
+        with tempfile.TemporaryDirectory() as temporary:
+            store = ResearchStore(Path(temporary))
+            store.prepare_write_lookup()
+            binding = {**_preflight_receipt(), "session_id": "HFIC-SESS-CONCURRENT"}
+            binding["forge_context_packet_sha256"] = preflight.persist_forge_context_packet(
+                store._root, binding["forge_context_packet"], store=store, repo_root=ROOT)
+            now = datetime(2026, 8, 27, 12, tzinfo=timezone.utc)
+            tx = "RESEARCH-TXN-CONCURRENT-SESSION"
+            _, template = session._build_scientific_slot_admission_event(
+                binding, repo_root=ROOT, transaction_id=tx, stage_time=now)
+            lifecycle_id = "HFIC-ART-CONCURRENT-LIFECYCLE"
+            payload = json.dumps({"research_artifact_id": lifecycle_id,
+                                  "artifact_kind": "SCRIPTED_REPLAY_TEST"}, sort_keys=True, separators=(",", ":"))
+            import hashlib
+            lifecycle = template.model_copy(update={
+                "record_id": lifecycle_id, "entity_id": lifecycle_id,
+                "payload_json": payload, "payload_sha256": hashlib.sha256(payload.encode()).hexdigest(),
+            })
+            records_to_commit = [lifecycle]
+            original_append = store.append
+            receipts = []
+
+            def competitor_commits_first(records, *, transaction_id, before_commit):
+                # Another identical caller commits after our outside-lease read.
+                with patch.object(store, "append", side_effect=original_append):
+                    session._append_session_records_with_slot(store, records_to_commit, transaction_id=tx,
+                        binding=binding, repo_root=ROOT, stage_time=now,
+                        representation_registry=None, reserve_slot=True)
+                receipts.append(store.diagnostics().committed_inventory_sha256)
+                return original_append(records, transaction_id=transaction_id, before_commit=before_commit)
+
+            with patch.object(session, "_assert_scientific_admission", return_value={}), \
+                 patch.object(store, "append", side_effect=competitor_commits_first):
+                session._append_session_records_with_slot(store, records_to_commit, transaction_id=tx,
+                    binding=binding, repo_root=ROOT, stage_time=now,
+                    representation_registry=None, reserve_slot=True)
+            self.assertEqual(len(receipts), 1)
+            self.assertEqual(store.diagnostics().committed_inventory_sha256, receipts[0])
+            self.assertEqual(len(session.list_scientific_slot_admissions(store)), 1)
+
     def test_context_failure_at_session_commit_never_leaves_a_new_slot(self):
         from solana_alpha_lab.factory import hfic_preflight as preflight
         from solana_alpha_lab.factory.hfic_identity import assign_portfolio_ids
