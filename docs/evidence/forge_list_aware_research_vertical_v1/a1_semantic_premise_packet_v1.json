@@ -1,8 +1,8 @@
 {
   "candidate": {
-    "base": "77eb427afbc9bb687c6a1fe3a7f3ca4ad2cf3417",
-    "diff_sha256": "86a27a7341b095f2a404c3276e7f87b49a744bf0ee657ba49e09660482619320",
-    "head": "3ee2da2baf92a3377153ea6a91f1f4279844babb"
+    "base": "4378c5b82f2dc309ccd629b267affd5d19b34995",
+    "diff_sha256": "c5201705ae1e4e21ba32934549d9cb8823024c37a923d2cc603081cab2e76e2f",
+    "head": "5b8aa15c1c238c007899f2fce44d513e34520ccf"
   },
   "evidence": [
     {
@@ -32,6 +32,10 @@
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_ordinary_operation.py",
       "sha256_or_fingerprint": "a2426cd1ff6f73fae19434610d56612212302a16fccefa20b2330e4e2ba407a2"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/opportunity_episode_tick.py",
+      "sha256_or_fingerprint": "faeaab70ef11748709fc082bf20f2a9e072cd53e8b4e42e8c297b34c97f6d52f"
     }
   ],
   "independence": {
@@ -54,7 +58,7 @@
     "NO_MERGE",
     "NO_PR_B_BUDGET_POLICY"
   ],
-  "packet_fingerprint_sha256": "c41a872d2fb537c3cf6aaf2ed38fdad34b7dd3ff15a6a3517a93b46a6090b467",
+  "packet_fingerprint_sha256": "aa541ed6d6c2871fa411a27d8c890754405e242ebde4639664d38013a360c8b1",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
@@ -111,10 +115,15 @@
       "claim": "A numeric DROP_ONE ablation of a mixed list+numeric hypothesis keeps the list condition; result coherence refuses a widened ablation",
       "claim_id": "C7",
       "scope": "ablation_estimand"
+    },
+    {
+      "claim": "The rebase onto main (post PR #382 dispatch-window repair) changes no byte of the list-aware feature code or tests; the two P1 remediations and the F1 follow-up remain exactly as previously reviewed",
+      "claim_id": "C8",
+      "scope": "rebase_identity"
     }
   ],
   "task": {
-    "task_contract_sha256": "29000f84bd6194c618de8abb2a7f47588938b97d7dfae017240f7d20386d6c7f",
+    "task_contract_sha256": "7278f42c6f92133e3177f5dd5b1b1c62aa60057aafd2c7c3349d3bd09043287c",
     "task_id": "FORGE_LIST_AWARE_RESEARCH_VERTICAL_V1"
   }
 }
