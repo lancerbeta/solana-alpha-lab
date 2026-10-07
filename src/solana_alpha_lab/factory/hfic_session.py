@@ -2990,14 +2990,18 @@ def persist_no_worthy_session(
             created_at=now,
         )
 
+    repair_context = (
+        isinstance(repair_admission, Mapping)
+        and repair_admission.get("action") == "RESUME_REPAIR_CONTINUATION"
+    )
+    packet = (
+        preflight_receipt.get("forge_context_packet")
+        if isinstance(preflight_receipt, Mapping) else None
+    )
     context_digest = frozen.get("forge_context_packet_sha256")
-    context_bytes = None
-    if isinstance(preflight_receipt, Mapping):
-        packet = preflight_receipt.get("forge_context_packet")
-        if isinstance(packet, Mapping):
-            context_bytes = _canonical_bytes(packet)
-            if not isinstance(context_digest, str) or len(context_digest) != 64:
-                context_digest = hashlib.sha256(context_bytes).hexdigest()
+    if not repair_context and isinstance(packet, Mapping):
+        if not isinstance(context_digest, str) or len(context_digest) != 64:
+            context_digest = hashlib.sha256(_canonical_bytes(packet)).hexdigest()
     created_at = render_canonical_utc(now)
     started_at = str(frozen.get("session_started_at") or created_at)
     if not isinstance(context_digest, str) or len(context_digest) != 64:
@@ -3007,9 +3011,21 @@ def persist_no_worthy_session(
         "forge_context_packet_sha256": context_digest,
         "session_started_at": started_at,
     }
-    _verify_required_context_dependency(store, {**bind_input, "forge_context_packet": packet}
-                                        if isinstance(preflight_receipt, Mapping) and isinstance(packet, Mapping)
-                                        else bind_input)
+    context_dependencies = ()
+    if repair_context:
+        # The admitted repair receipt describes current context, while the
+        # parent next-action remains bound to its original saved dependency.
+        # Validate both coherent pairs; never splice a fresh inline packet
+        # onto the historical digest or rewrite the parent binding.
+        fresh_context = dict(preflight_receipt or {})
+        _verify_required_context_dependency(store, fresh_context)
+        _verify_required_context_dependency(store, bind_input)
+        context_dependencies = (fresh_context,)
+    else:
+        _verify_required_context_dependency(
+            store, {**bind_input, "forge_context_packet": packet}
+            if isinstance(packet, Mapping) else bind_input,
+        )
     if isinstance(draft, Mapping):
         _validate_fresh_draft_scopes(draft, store=store, identities=identities)
     action = bind_next_epistemic_action(
@@ -3296,6 +3312,7 @@ def persist_no_worthy_session(
         repo_root=repo_root, stage_time=now,
         representation_registry=representation_registry,
         reserve_slot=not bool(repair_disposition),
+        context_dependencies=context_dependencies,
     )
     if isinstance(frozen, dict):
         frozen["next"] = action["action_type"]
@@ -3531,6 +3548,7 @@ def _append_session_records_with_slot(
     stage_time: datetime,
     representation_registry: Mapping[str, Any] | None,
     reserve_slot: bool,
+    context_dependencies: Sequence[Mapping[str, Any]] = (),
 ) -> None:
     """Commit a new reservation and its lifecycle in one existing store lease."""
 
@@ -3566,6 +3584,8 @@ def _append_session_records_with_slot(
 
     def recheck() -> None:
         _verify_required_context_dependency(store, binding)
+        for dependency in context_dependencies:
+            _verify_required_context_dependency(store, dependency)
         if admission_event is None:
             return
         observed = _existing_scientific_slot_admission(store, slot)

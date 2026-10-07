@@ -5,41 +5,7 @@
   "as_of": "2026-10-08",
   "task_id": "FORGE_GROUNDED_HANDOFF_CLOSURE_V1",
   "state_change": "SAME_CANDIDATE_NATIVE_KILL_ENDPOINT_SOURCE_BOUND_SPEC_1_3_PRODUCTION_REPLAY_ORACLE_MATCH",
-  "implementation_bindings": {
-    ".agents/skills/hypothesis-forge/SKILL.md": "11952ccb7c8e3ad395c26522be2cb6e22134c05733c961b89f7b4d46cb0c571f",
-    ".agents/skills/independent-hypothesis-critic/SKILL.md": "6659f28f416d85110fd4c502183d07b12c4a981708396373fbca47894ba2d077",
-    "catalog/assets/core.yaml": "083938db61c2a73cba6ebf63cd37bd5dbfa5f98de243c45cb5df18a11a098d2f",
-    "catalog/assets/lifecycle.yaml": "9c141d3ceb72321f47d5710df96dffd82cb2a37ecea4e347d85e028f0fd24763",
-    "catalog/catalog_manifest.yaml": "9ab2fc77f459b27b5565c176918cb79f57d732b0a36526f0da703d9329417894",
-    "catalog/generated/asset_edges.json": "7750bc6df2e3cee4b04ac0a8dda17cd983f6a0e402cc4d175b612c1987aa8d5c",
-    "catalog/schemas/hypothesis_critic_input_v1.schema.json": "a2b9e2eebc97ca8df4ef71ac418d4bcf124cc8de745c0b0927174076e8650e2b",
-    "catalog/schemas/hypothesis_forge_draft_v1_2.schema.json": "c7bbc4636acfc6f1525cf94cbce4ebbd9323fe01bb50d531f343228d542111ed",
-    "docs/PROJECT_MAP.md": "56dce139db924457cab35ddb9af4fec72161aa39bce9f68ad92e3f2a0b64cc89",
-    "docs/contracts/forge_grounded_handoff_closure_v1.md": "f2836c0677673b6455f5d7c2e24a756a1ed16e42df02fbe832705a29b45670d1",
-    "docs/contracts/forge_list_aware_research_scope_v1.md": "4d51867df1e7bf1436d34ee706a9468ed381deecf970a45ac7d7a85c76003d3d",
-    "docs/evidence/control/delivery_harness_acceptance_v1.json": "3e6b1a5dcaf66a80115573dcc80b909dafa4803fc4673b4733ca6102eedf3d31",
-    "docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json": "0c0abc8c8abd96e84edf6bbc4fa7e8c69b58cf39ac1a1695092649383c78a2cc",
-    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "0eb5f120921a5251156ae8da8f57caf900166fffd3cdd38bb1d89a4146c1d2c8",
-    "docs/reports/forge_grounded_handoff_closure_v1/HANDOFF_CHECKPOINT.md": "3069421f0c75ab2ba4ff2783554cfe2aac051d4fb771301be96a0b628b630b56",
-    "docs/tasks/FORGE_GROUNDED_HANDOFF_CLOSURE_V1.md": "e87d1933defd759b6169f1f34599596393d51c1c4bccc9b3a01088578bb1edad",
-    "scripts/delivery_harness.py": "c44173c6ec2697ceefb29de120cab7497ba0061bffd3fbdb981d7c490083eab1",
-    "scripts/hypothesis_forge.py": "ef40a61b5ad7455923f75c6dceedb841b07db7cf4c34ae7a5be17480c7bfe500",
-    "src/solana_alpha_lab/factory/document_runner.py": "1f9bb9e90f792a5feebcac47cb25979960db77c8b437e5125b00d6a27a0e1a6d",
-    "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "3100b03e6badb9eb45c9d8c257391d94e443de586e984b8bb2b44525748ca002",
-    "src/solana_alpha_lab/factory/hfic_research_scope.py": "83941e8cfe93159ae2405eb0399354118d3681a6fbbc450a8d0d327e537aa895",
-    "src/solana_alpha_lab/factory/hfic_session.py": "ee8b1d4ea5860e59238440a2aa1225996128221a830a98d6ae5786e8ce353552",
-    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "2283801d38a6bd14c7b1a0ad7cd823ea14e920d45f2a07190d1fc7ba28894e6e",
-    "src/solana_alpha_lab/factory/observation_schedule_compiler.py": "75cce90f7bd3b274d6648bc50cb8a2ebdeb4479e13622ac06f08e4f31708656c",
-    "src/solana_alpha_lab/factory/scientific_eligibility_projection.py": "ce4ee5b56f6528cfb2e0b3ce49c7ee1736bf0854fd4a724e8d37172d75eaa91b",
-    "tests/fixtures/forge_grounded_handoff_closure_v1/flat_card.json": "b89a4688fd97147809236d0c2a6b6aedaee56370d3838b88de8efbc57a52210d",
-    "tests/test_fast_lane_runner.py": "0ca834d7585e40113b1149c7fc3f8a0df7380ffb100de686e074f1143d55dc40",
-    "tests/test_forge_grounded_handoff_closure_v1.py": "fb4a76a87622f18f96398800d81e37ad5bfbf7e98bee556679621db84201c743",
-    "tests/test_hfic_session.py": "13f70163a745c8c97319cb04d193b0cdd701c1f086b61c7336456c1b18fbc060",
-    "tests/test_hfic_temporal_production_runner_v1.py": "2374ffaa6e0b62321ce71749c5b9af44b6ecda15a82da3be2ea185c7a1203992",
-    "tests/test_observation_schedule_compiler.py": "bd6d415fca4aa105ffe23e62932d5cd1a9cddd09d74b3e670fd5d7c8d67cf4ea",
-    "tests/test_preflight_shadow_pin_drift.py": "1c79f3f4c63c4f8c9953226448bacf689708ba631d3119cda123b586965710c8",
-    "tests/test_scientific_eligibility_projection_v1.py": "4adebcbabe26e81049b6fd1b27578344ac274aa7cd65dc0376d82dccd1274a76"
-  },
+  "implementation_bindings": {},
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -50,15 +16,15 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_grounded_handoff_closure_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "d35c9a25b5d344864dc1efa83ce95dab9a283f2399d86a400780d7825085be65",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_AFFECTED_SUITE_H08_RETAINED_H09_PRODUCTION_ORACLE",
+    "targeted": "PENDING",
     "independent_review": {
       "path": "docs/evidence/forge_grounded_handoff_closure_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "24775dc132b027ca5be7cafb4325a6668055e6e297768f10ee15f72ca2f6a4d9",
-      "verdict": "PASS"
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "NOT_READY"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
@@ -79,6 +45,5 @@
     "network_calls": 0,
     "scope": "PRODUCT_DOMAIN_EXCLUDING_AUTHORIZED_ROUTINE_GIT_GITHUB_DELIVERY_TRANSPORT"
   },
-  "capability_radar_now": "NONE",
-  "base_main": "04ec8e0286a3dce5999d0687784717ee90fc5dca"
+  "capability_radar_now": "NONE"
 }

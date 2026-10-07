@@ -32374,7 +32374,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: ee8b1d4ea5860e59238440a2aa1225996128221a830a98d6ae5786e8ce353552}
+  integrity: {kind: sha256, sha256: 164955dbb7c75d6f5302da7b14ffbf75474a02c7a9b0df6068bd395888ca5c8b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -40469,7 +40469,7 @@ records:
   as_of: '2026-10-07'
   truth_owner: FORGE_GROUNDED_HANDOFF_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_grounded_handoff_closure_v1.md', repository_path: docs/contracts/forge_grounded_handoff_closure_v1.md}
-  integrity: {kind: sha256, sha256: f2836c0677673b6455f5d7c2e24a756a1ed16e42df02fbe832705a29b45670d1}
+  integrity: {kind: sha256, sha256: fae15d85b56d79edb460ef662f949ec6132e883642543b981101d230291b0840}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-RESEARCH-SCOPE-001}
@@ -40521,7 +40521,7 @@ records:
   location: {kind: git_path, logical_uri: 'repo://docs/reports/forge_grounded_handoff_closure_v1/HANDOFF_CHECKPOINT.md', repository_path: docs/reports/forge_grounded_handoff_closure_v1/HANDOFF_CHECKPOINT.md}
   integrity:
     kind: sha256
-    sha256: 3069421f0c75ab2ba4ff2783554cfe2aac051d4fb771301be96a0b628b630b56
+    sha256: da67d304acaaf430dc46d650a343c301b6dcfe74854653855d7071703cf9eb70
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-GROUNDED-HANDOFF-CLOSURE-001}

@@ -64,6 +64,13 @@ For a new input, run normal persistent preflight and bind its new verified
 receipt to the same saved question/look. For historical readback, restore the
 exact saved dependency; a new preflight does not repair old history.
 
+An independently admitted `RESUME_REPAIR_CONTINUATION` may have a fresh
+context packet different from its historical parent. The existing zero-candidate
+terminal owner verifies the fresh receipt's own inline/digest/blob/committed
+artifact and the parent's saved dependency separately, including both under
+the writer lease. Its next-action retains the parent digest. This does not
+replace a missing historical dependency or change reservation/look accounting.
+
 New tier progress carries
 `freeze_worthy_semantics=CALLER_ROUTING_HINT_NOT_SCIENTIFIC_VERDICT` beside the
 unchanged boolean/action. `false` is not a standalone KILL reason;

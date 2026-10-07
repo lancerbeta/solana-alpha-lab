@@ -52,6 +52,11 @@ managed_write_set:
 - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
 - tests/test_forge_grounded_handoff_closure_v1.py
 - tests/test_hfic_session.py
+- tests/test_hfic_legacy_readback_honesty_v1.py
+- tests/test_hfic_provenance_clock.py
+- tests/test_forge_runtime_discovery_binding_v1.py
+- tests/test_hfic_list_aware_vertical_v1.py
+- tests/test_hfic_legacy_parent_continuation_compat_v1.py
 - tests/fixtures/forge_grounded_handoff_closure_v1/**
 - docs/evidence/forge_grounded_handoff_closure_v1/**
 - docs/reports/forge_grounded_handoff_closure_v1/**

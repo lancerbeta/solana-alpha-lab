@@ -62,6 +62,19 @@ STAGE_TEXT = "2026-08-27T13:15:00Z"
 RECEIPT_SCHEMA = ROOT / "catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json"
 
 
+def _bind_fixture_context(store: ResearchStore, receipt: dict) -> None:
+    packet = {
+        "schema": "smial.forge-context-packet",
+        "owner_focus": receipt["owner_focus"],
+        "evidence_epoch_sha256": receipt["evidence_epoch_sha256"],
+        "market_evidence_epoch_sha256": receipt["market_evidence_epoch_sha256"],
+    }
+    receipt["forge_context_packet"] = packet
+    receipt["forge_context_packet_sha256"] = persist_forge_context_packet(
+        store._root, packet, store=store, repo_root=ROOT, clock=FrozenClock(STARTED),
+    )
+
+
 def _git() -> dict[str, str]:
     snap = repository_git_snapshot(ROOT)
     return {"head_sha": snap.head_sha, "composite_sha256": snap.composite_sha256}
@@ -249,6 +262,7 @@ class HficPersistBoundTimeTests(unittest.TestCase):
                     "store_inventory_digest": "ee" * 32,
                 }
             }
+            _bind_fixture_context(store, receipt)
             selected = freeze_draft(valid_draft(), preflight_receipt=receipt)
             persist_frozen_session(
                 store,
@@ -263,9 +277,9 @@ class HficPersistBoundTimeTests(unittest.TestCase):
                 "market_evidence_epoch_sha256": "11" * 32,
                 "focus_key_sha256": "22" * 32,
                 "search_key_sha256": "33" * 32,
-                "forge_context_packet_sha256": "dd" * 32,
             }
             no_worthy_draft = json.loads(NO_WORTHY.read_text(encoding="utf-8"))
+            _bind_fixture_context(store, no_worthy_receipt)
             no_worthy = freeze_draft(no_worthy_draft, preflight_receipt=no_worthy_receipt)
             persist_no_worthy_session(
                 store,
@@ -344,6 +358,7 @@ class HficPersistBoundTimeTests(unittest.TestCase):
                 "live_git_head": repository_git_snapshot(ROOT).head_sha.lower(),
                 "git_composite_sha256": repository_git_snapshot(ROOT).composite_sha256,
             }
+            _bind_fixture_context(store, receipt)
             frozen = freeze_draft(draft, preflight_receipt=receipt)
             persist_frozen_session(
                 store,
@@ -389,6 +404,7 @@ class HficPersistBoundTimeTests(unittest.TestCase):
                 "live_git_head": repository_git_snapshot(ROOT).head_sha.lower(),
                 "git_composite_sha256": repository_git_snapshot(ROOT).composite_sha256,
             }
+            _bind_fixture_context(store, receipt)
             frozen = freeze_draft(draft, preflight_receipt=receipt)
             identities = assign_portfolio_ids(draft["candidates"])
             persist_frozen_session(
@@ -810,6 +826,7 @@ class HficProvenanceCorrectionTests(unittest.TestCase):
                 "live_git_head": repository_git_snapshot(ROOT).head_sha.lower(),
                 "git_composite_sha256": repository_git_snapshot(ROOT).composite_sha256,
             }
+            _bind_fixture_context(store, receipt)
             frozen = freeze_draft(draft, preflight_receipt=receipt)
             persist_frozen_session(
                 store,

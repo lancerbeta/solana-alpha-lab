@@ -1769,8 +1769,8 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
         )
         self.assertEqual(omitted, "LOOK_SCOPE_NARROWER")
 
-    def test_revision_rebinds_when_the_card_scope_changes(self) -> None:
-        from solana_alpha_lab.factory.hfic_session import apply_revision, finalize_session
+    def test_revision_locks_target_and_preserves_look_for_wording(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import HficSessionError, apply_revision, finalize_session
         from tests.test_hfic_cli import critic_result_from_packet_only
 
         with tempfile.TemporaryDirectory() as raw:
@@ -1797,16 +1797,22 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             for card in draft["candidates"]:
                 if card["label"] == "HFIC-V12-A-LOOK":
                     card["target"] = "target_REVISED"
-            revised = apply_revision(
-                pending,
-                draft,
-                store=store,
-                repo_root=ROOT,
-            )
+            before = [(row.record_id, row.payload_sha256) for row in store.iter_committed_records()]
+            with self.assertRaisesRegex(HficSessionError, "^REVISION_MECHANISM_CHANGED$"):
+                apply_revision(pending, draft, store=store, repo_root=ROOT)
+            self.assertEqual(before, [(row.record_id, row.payload_sha256) for row in store.iter_committed_records()])
+            self.assertEqual(pending["session_state"], "REVISION_REQUIRED")
+            # A wording revision retains the scientific question and its saved look.
+            wording = json.loads((workspace / "draft.json").read_text(encoding="utf-8"))
+            for card in wording["candidates"]:
+                if card["label"] == "HFIC-V12-A-LOOK":
+                    card["claim"] += " (editorial clarification)"
+            revised = apply_revision(pending, wording, store=store, repo_root=ROOT)
             evidence = revised["critic_input_packet"]["grounded_evidence"]
-            self.assertFalse(evidence.get("look_confirms_selected"))
-            self.assertNotIn("result", evidence)
-            self.assertNotIn("result_sha256", evidence)
+            self.assertTrue(evidence.get("look_confirms_selected"))
+            original = frozen["critic_input_packet"]["grounded_evidence"]
+            self.assertEqual(evidence["result_refs"], original["result_refs"])
+            self.assertEqual(evidence["result_sha256"], original["result_sha256"])
 
     def test_same_scope_runner_up_keeps_ordinary_classification(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
