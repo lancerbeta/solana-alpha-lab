@@ -1,9 +1,11 @@
 [Unit]
-Description=Factory ObservationSchedule tick every 60 seconds
+Description=Factory ObservationSchedule dispatch checkpoint within 15 seconds of idle
 
 [Timer]
 OnBootSec=15s
-OnUnitActiveSec=60s
+OnUnitInactiveSec=15s
+AccuracySec=1s
+RandomizedDelaySec=0
 Persistent=true
 Unit=factory-observation-schedule.service
 

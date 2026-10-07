@@ -167,6 +167,17 @@ What is never automatically deleted: sealed live releases/corpus, candidate/memb
 
 ## Host / runtime
 
+Ordinary observation dispatch: canonical `factory-observation-schedule.timer`
+uses `OnUnitInactiveSec=15s`, `AccuracySec=1s`, `RandomizedDelaySec=0`.
+For episode-window coverage, deploy the timer bytes as well as the code;
+archive installation alone does not install `/etc/systemd/system` templates.
+Under the separately granted repair deploy authority, install this exact timer,
+daemon-reload and re-arm only the ordinary observation timer. Preserve its
+enabled state, the existing activation, disabled renewal and backup timers.
+See `OPPORTUNITY_EPISODES_OPERATOR_V1.md` for the finite runtime coverage model,
+checkpoint-gap readout and genuine stall/budget exceptions. No manual provider
+probe is part of this acceptance path.
+
 Host identity: `docs/operator/FACTORY_REMOTE_HOST.md` +
 `docs/operator/factory_remote_host_v1.yaml` only.
 

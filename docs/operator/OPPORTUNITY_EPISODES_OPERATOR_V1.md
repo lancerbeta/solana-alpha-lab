@@ -56,6 +56,48 @@ uv run --locked --managed-python python -B scripts/observation_schedule.py stop-
 * Recovery: the next tick republishes the outbox, recovers completed calls from
   the call ledger and turns intent-without-result into
   `ATTEMPT_OUTCOME_UNKNOWN`; it never re-requests a past slot.
+* Scheduled dispatch uses the live clock at each due checkpoint, including
+  checkpoints around publication/recovery and each category call. The canonical
+  ordinary timer runs 15s after service exit, with `AccuracySec=1s` and zero
+  randomized delay; changing code alone while keeping the old 60s unit does not
+  commission this repair. No overlapping worker is required.
+  Supported coverage assumes a stable UTC clock, one account lane, local
+  cleanup/preflight/prelude each <=5s and batch bookkeeping <=1s. The maximum
+  idle checkpoint gap is `15+1+3*5=31s`; during category work it is at most
+  `15+3+5=23s`. Both are strictly less than the frozen 60s dispatch window.
+  Episode calls use at most 15s of the existing bounded-response waiter;
+  SEARCH shares remaining window time across remaining same-assigned batches,
+  reserving their 3s account pace and local bookkeeping. Coverage is proved for
+  canonical max_batch_size=100 and active cap <=400 (at most four batches);
+  a smaller batch profile needs its own capacity proof. An insufficient reserved
+  allowance never means the real window is closed: positive remaining time gives
+  a bounded best-effort allowance, with the actual deadline guard still decisive.
+  This is a conditional
+  runtime guarantee: the waiter cannot preempt a host/GIL stall, and exhausted
+  account/pace budgets are real typed failures. Reported
+  `max_dispatch_checkpoint_gap_seconds` measures only gaps within one tick;
+  it resets at process entry and cannot prove the idle/wake interval. Check
+  the installed unit bytes and use journal service exit -> next start times
+  to prove the ordinary idle gap <=16s (15s plus 1s accuracy), along with
+  preflight/prelude/cleanup each <=5s. Use actual request timestamps, not only
+  stored ledger intent, to prove in-window dispatch. Excessive actual work is
+  visible inside the tick;
+  a recurring >=60s gap is a material runtime blocker, not a clean tick proof.
+  A final worker-side guard forbids early/late sends. A refusal after durable
+  STARTED is completed as `NO_REQUEST` with no transport timestamp; a process
+  death keeps the existing conservative unknown-attempt recovery. Reservations
+  are not refunded. No retry, late catch-up, gap backfill or activation change.
+  After a separately authorized deploy, record a naturally future PENDING slot
+  and ledger max rowid before its window; observe ordinary SEARCH, typed state,
+  outbox/publication, >=3s previous account-call gap and no duplicate occurrence.
+  Prefer two consecutive slots within a 20-minute bound. `REPAIR_LIVE_PROVEN`
+  requires exact merged/deployed SHA, installed timer/model evidence and at
+  least one successful HTTP SEARCH parsed through normal batch publication.
+  If no eligible window occurs in that bound, return
+  `REPAIR_DEPLOYED_AWAITING_LIVE_SLOT` and leave the existing lane running.
+  A recurrence, unresolved recovery or incompatible required action is
+  `MATERIAL_BLOCKER`. Neither a provider's typed missing result nor a process
+  exit alone is operational/scientific acceptance.
 * Round crash recovery: a nomination round that died after its slack is
   reconciled by the next tick from durable evidence only (no provider call, no
   late admission). A partial round keeps what was committed and blocks its

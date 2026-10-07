@@ -41,6 +41,7 @@ from solana_alpha_lab.factory.observation_provider_pacing import (
 )
 from solana_alpha_lab.factory.observation_provider_wall_deadline import (
     DEFAULT_PROVIDER_CALL_WALL_SECONDS,
+    WallDeadlineOpener,
     wrap_opener_with_wall_deadline,
 )
 from solana_alpha_lab.factory.observation_schedule import (
@@ -393,6 +394,31 @@ def admission_quota(
     }
 
 
+# Supported ordinary model: <=5s local work between checkpoints, <=1s
+# batch bookkeeping, stable UTC and one account lane. These are runtime
+# preconditions, not a promise against host stalls or unavailable budget.
+EPISODE_CALL_WALL_SECONDS = 15
+DISPATCH_LOCAL_MARGIN_SECONDS = 1
+
+
+class _DispatchWindowClosed(Exception):
+    pass
+
+
+class _WindowGuardedOpener:
+    """Check in the waiter worker, immediately before the actual transport."""
+
+    def __init__(self, inner, clock, not_before, deadline):
+        self.inner, self.clock = inner, clock
+        self.not_before, self.deadline = not_before, deadline
+
+    def open(self, url):
+        now = self.clock()
+        if now < self.not_before or now >= self.deadline:
+            raise _DispatchWindowClosed()
+        return self.inner.open(url)
+
+
 class _EpisodeTick:
     def __init__(
         self,
@@ -442,9 +468,15 @@ class _EpisodeTick:
         )
         if wall <= 0 or wall >= LEASE_SECONDS:
             raise EpisodeTickError("PROVIDER_CALL_WALL_SECONDS_MUST_BE_BELOW_LEASE")
+        # A category call must not occupy an entire dispatch window. Reuse the
+        # bounded-response waiter; its GIL/host-stall limitations remain explicit.
+        self.call_wall_seconds = min(wall, EPISODE_CALL_WALL_SECONDS)
+        self.inner_opener = opener.inner if isinstance(opener, WallDeadlineOpener) else opener
+        if isinstance(opener, WallDeadlineOpener):
+            self.call_wall_seconds = min(self.call_wall_seconds, opener.wall_seconds)
         self.opener = wrap_opener_with_wall_deadline(
-            opener,
-            wall_seconds=wall,
+            self.inner_opener,
+            wall_seconds=self.call_wall_seconds,
             heartbeat=lambda: store.renew_held_lease(clock=self.provider_ctx.now()),
         )
         self.has_opener = opener is not None
@@ -469,7 +501,9 @@ class _EpisodeTick:
             "round_recoveries": [],
             "publications": [],
             "stop_reason": None,
+            "max_dispatch_checkpoint_gap_seconds": 0.0,
         }
+        self.last_dispatch_checkpoint = now
 
     # ------------------------------------------------------------------
     def _prime_account_pace(self) -> None:
@@ -498,6 +532,9 @@ class _EpisodeTick:
         occurrence: str,
         expected_entities: Sequence[str] | None,
         claim_identity: Sequence[str],
+        not_before: datetime | None = None,
+        dispatch_deadline: datetime | None = None,
+        remaining_batches: int = 1,
     ) -> tuple[str, dict[str, Any] | None]:
         """One durable call-ledger occurrence. Returns (terminal, result)."""
 
@@ -519,6 +556,10 @@ class _EpisodeTick:
         )
         if blocked:
             return blocked, None
+        if dispatch_deadline is not None and (
+            self.provider_ctx.now() < not_before or self.provider_ctx.now() >= dispatch_deadline
+        ):
+            return "DISPATCH_WINDOW_CLOSED", None
         self._credential()
         # Reserve before durable STARTED/send. A death with unknown outcome
         # keeps its debit across restart; completion adds bytes, not a second call.
@@ -552,6 +593,8 @@ class _EpisodeTick:
             # by the production request_started_at before transport is invoked.
             for _ in range(2):
                 reference = clock_fn()
+                if dispatch_deadline is not None and (reference < not_before or reference >= dispatch_deadline):
+                    raise _DispatchWindowClosed()
                 if reference.strftime("%Y-%m-%d") == reserved_day:
                     first_clock = False
                     return reference
@@ -566,19 +609,49 @@ class _EpisodeTick:
                     raise EpisodeTickError(blocked)
                 reserved_day = self.accounts.utc_day
             raise EpisodeTickError("CALL_RESERVATION_CLOCK_UNSTABLE")
-        result = execute_primitive(
-            primitive_id=primitive_id,
-            primitive_version="1.0",
-            method="GET",
-            url=url,
-            opener=self.opener,
-            clock=request_clock,
-            redact_with=self.holder,
-            expected_entities=list(expected_entities) if expected_entities else None,
-            # An empty category list is a valid frame source; the closed frame
-            # owns row shape (non-list body, rows without identity).
-            schema_required_keys=SCHEMA_REQUIRED_KEYS if expected_entities else None,
-        )
+        try:
+            call_opener = self.opener
+            if dispatch_deadline is not None:
+                available = (dispatch_deadline - self.provider_ctx.now()).total_seconds()
+                # Allocate time fairly to all batches, including pace and local
+                # persistence. A slow first response cannot consume their window.
+                allowance = (available - remaining_batches * DISPATCH_LOCAL_MARGIN_SECONDS
+                             - (remaining_batches - 1) * self.provider_ctx.pace_seconds) / remaining_batches
+                if available <= 0:
+                    raise _DispatchWindowClosed()
+                if allowance <= 0:
+                    # The capacity estimate is not evidence of window closure.
+                    # Fast responses can still fit; keep a bounded opportunity
+                    # and let the live send guard own actual deadline truth.
+                    allowance = available / remaining_batches
+                call_opener = wrap_opener_with_wall_deadline(
+                    _WindowGuardedOpener(self.inner_opener, self.provider_ctx.now, not_before, dispatch_deadline),
+                    wall_seconds=min(self.call_wall_seconds, allowance),
+                    heartbeat=lambda: self.store.renew_held_lease(clock=self.provider_ctx.now()),
+                )
+            result = execute_primitive(
+                primitive_id=primitive_id,
+                primitive_version="1.0",
+                method="GET",
+                url=url,
+                opener=call_opener,
+                clock=request_clock,
+                redact_with=self.holder,
+                expected_entities=list(expected_entities) if expected_entities else None,
+                # Empty category lists are valid sources; the frame owns shape.
+                schema_required_keys=SCHEMA_REQUIRED_KEYS if expected_entities else None,
+            )
+        except _DispatchWindowClosed:
+            # The worker refused before delegate.open, hence proven no-request.
+            # Persist closure so it is not confused with a crash/unknown send.
+            self.store.complete_call(
+                request_sha256=request_digest, call_occurrence_id=occurrence,
+                attempt_id=attempt_id,
+                payload={"status": "NO_REQUEST", "missing_reason": "DISPATCH_WINDOW_CLOSED",
+                         "call_occurrence_id": occurrence, "request_sha256": request_digest},
+                clock=self.provider_ctx.now(),
+            )
+            return "DISPATCH_WINDOW_CLOSED", None
         if result.get("request_sha256") != request_digest:
             raise EpisodeTickError("REQUEST_HASH_MISMATCH")
         body_limit = int(self.schedule["budgets"]["response_decoded_bytes_max"])
@@ -674,19 +747,29 @@ class _EpisodeTick:
     def process_slots(self) -> None:
         """Admitted obligations before new intake. No catch-up for past slots."""
 
+        # Assigned episode grid is whole UTC seconds. SQLite's TEXT comparator
+        # orders `...00Z` after `...00.178825Z`; use the current whole-second
+        # cutoff, never a future/rounded-up timestamp. Send guards stay exact.
+        live_now = self.provider_ctx.now()
+        self.report["max_dispatch_checkpoint_gap_seconds"] = max(
+            self.report["max_dispatch_checkpoint_gap_seconds"],
+            max(0.0, (live_now - self.last_dispatch_checkpoint).total_seconds()),
+        )
+        self.last_dispatch_checkpoint = live_now
+        claim_now = live_now.replace(microsecond=0)
         claimed: list[dict[str, Any]] = []
         for page in self.store.iter_due_in_states_pages(
             ("CLAIMED",),
             schedule_sha256=self.digest,
             activation_id=self.activation_id,
-            due_at_max=self.now,
+            due_at_max=claim_now,
             page_size=256,
         ):
             claimed.extend(dict(item) for item in page)
         claimed.extend(
             self.store.claim_due(
                 limit=100000,
-                now=self.now,
+                now=claim_now,
                 owner=OWNER,
                 schedule_sha256=self.digest,
                 activation_id=self.activation_id,
@@ -712,9 +795,10 @@ class _EpisodeTick:
         for assigned in sorted(by_assigned):
             claims = sorted(by_assigned[assigned], key=lambda item: (str(item["payload"]["mint"]), str(item["entity_id"])))
             for index in range(0, len(claims), batch_size):
-                self._process_batch(assigned, claims[index : index + batch_size])
+                self._process_batch(assigned, claims[index : index + batch_size],
+                                    remaining_batches=math.ceil((len(claims) - index) / batch_size))
 
-    def _process_batch(self, assigned: str, claims: Sequence[Mapping[str, Any]]) -> None:
+    def _process_batch(self, assigned: str, claims: Sequence[Mapping[str, Any]], *, remaining_batches: int = 1) -> None:
         live = []
         for claim in claims:
             payload = dict(claim.get("payload") or {})
@@ -728,6 +812,10 @@ class _EpisodeTick:
         url = search_url(mints)
         request_digest = request_sha256(method="GET", url=url, body=None, primitive_version="1.0")
         identity = [f"{item['entity_id']}:{item['point_id']}" for item in live]
+        not_before = max(parse_utc(str(item["payload"]["request_not_before"])) for item in live)
+        deadline = min(parse_utc(str(item["payload"]["dispatch_deadline"])) for item in live)
+        if self.provider_ctx.now() < not_before:
+            return  # CLAIMED, no intent: discoverable at a later due pass.
         occurrence = call_occurrence_id(
             schedule_sha256=self.digest,
             activation_id=self.activation_id,
@@ -749,6 +837,9 @@ class _EpisodeTick:
             occurrence=occurrence,
             expected_entities=mints,
             claim_identity=identity,
+            not_before=not_before,
+            dispatch_deadline=deadline,
+            remaining_batches=remaining_batches,
         )
         self._apply_batch_result(live, terminal, result, request_digest=request_digest, occurrence=occurrence)
 
@@ -757,6 +848,12 @@ class _EpisodeTick:
         request_digest = str(dict(claims[0].get("payload") or {}).get("request_sha256") or "")
         if state == "COMPLETED":
             payload = self.store.call_payload(occurrence) or {}
+            if payload.get("status") == "NO_REQUEST":
+                self._apply_batch_result(
+                    claims, str(payload.get("missing_reason") or "DISPATCH_WINDOW_CLOSED"), None,
+                    request_digest=request_digest, occurrence=occurrence,
+                )
+                return
             result = dict(payload)
             result["body"] = _load_raw_body(self.data_root, payload.get("raw_body_rel"))
             if result.get("status") == "OBSERVED" and result.get("body") is None:
@@ -879,6 +976,7 @@ class _EpisodeTick:
             )
         source_results: list[dict[str, Any]] = []
         for source in nomination["sources"]:
+            self.process_slots()
             url = category_url(category=str(source["category"]), interval=str(source["interval"]), limit=int(source["limit"]))
             request_digest = request_sha256(method="GET", url=url, body=None, primitive_version="1.0")
             occurrence = call_occurrence_id(
@@ -897,6 +995,7 @@ class _EpisodeTick:
                 expected_entities=None,
                 claim_identity=[rid],
             )
+            self.process_slots()
             if result is None:
                 source_results.append({"source_id": source["source_id"], "status": terminal, "missing_reason": terminal, "call_occurrence_id": occurrence})
                 if terminal in {"BLOCKED_BUDGET", "PACE_WAIT"}:
@@ -1419,6 +1518,8 @@ class _EpisodeTick:
 
     # ------------------------------------------------------------------
     def run(self, *, admission_open: bool) -> dict[str, Any]:
+        self._prime_account_pace()
+        self.process_slots()
         repair_open_publication_jobs(
             data_root=self.data_root,
             root=self.root,
@@ -1428,9 +1529,10 @@ class _EpisodeTick:
             producer_git_sha=self.producer,
             fault_after=self.fault_after,
         )
+        self.process_slots()
         self.publish_outbox()
+        self.process_slots()
         self.recover_unresolved_rounds()
-        self._prime_account_pace()
         self.process_slots()
         decision_now = self.provider_ctx.now()
         admission_open = admission_open and decision_now < parse_utc(str(self.activation["stops_admitting_at"]))
@@ -1480,6 +1582,9 @@ class _EpisodeTick:
                 self.report["stop_reason"] = "DRAIN_RESERVE_UNKNOWN" if free is None else "DRAIN_RESERVE_PRESSURE"
             else:
                 self.nomination_round(decision_now=decision_now)
+        self.process_slots()
+        self.publish_outbox()
+        self.process_slots()
         self.publish_outbox()
         self.report["provider_calls"] = self.accounts.tick_calls
         self.report["credential_reads"] = self.credential_reads

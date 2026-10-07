@@ -1,0 +1,129 @@
+{
+  "schema": "smial.semantic-premise-review-packet",
+  "schema_version": "1.0",
+  "task": {
+    "task_id": "OPPORTUNITY_EPISODE_DISPATCH_WINDOW_REPAIR_V1",
+    "task_contract_sha256": "95da248ecd11ab59adbb1c67590e56ee5a178c9ed77fbafe67133920139e188e"
+  },
+  "candidate": {
+    "base": "77eb427afbc9bb687c6a1fe3a7f3ca4ad2cf3417",
+    "head": "0069d60b4865df8bfdd057d9ce91abf4b0903217",
+    "diff_sha256": "e27c663be1949d84bf6801382b9f5c4b5a6792552b274d7756ee4c669cef645a"
+  },
+  "review": {
+    "profile": "SEMANTIC_PREMISE",
+    "risk_dimensions": [
+      "SCIENTIFIC_ESTIMAND",
+      "FALSIFIER_OR_ENDPOINT",
+      "EVIDENCE_ADMISSIBILITY",
+      "PIT_OR_AVAILABILITY_SEMANTICS",
+      "RESEARCH_TRUTH_OWNERSHIP",
+      "HYPOTHESIS_OR_FAMILY_CLOSURE",
+      "PROMOTION_OR_SUPPRESSION_AUTHORITY",
+      "UNKNOWN_VS_NEGATIVE_EVIDENCE",
+      "EXECUTION_TRUTH_SEMANTICS",
+      "DURABLE_SCIENCE_SCHEMA",
+      "OWNER_AUTHORITY_SEMANTICS",
+      "HARNESS_PREMISE_OR_MERGE_AUTHORITY"
+    ],
+    "architecture_owner": "ARCHITECTURE_CRITIC"
+  },
+  "semantic_claims": [
+    {
+      "claim_id": "C1",
+      "scope": "conditional_dispatch_coverage",
+      "claim": "Live whole-second grid claims and checkpoints around blocking phases, canonical 15s idle timer/1s accuracy, 15s episode waiter cover immutable60s windows under stableUTC/oneaccount/localcleanup-preflight-prelude each<=5s/batchbookkeeping<=1s/sufficientbudgets. Coverage proof is for canonical maxbatch100 and activecap<=400, at most4 sameassigned batches; smaller batch profiles require separate capacity proof. Real4batch vertical at firstcheckpointT31 sendsT31/39/47/55 with3timeouts+HTTP200. No unlimited OS/GIL latency or arbitrary batch-count guarantee."
+    },
+    {
+      "claim_id": "C2",
+      "scope": "send_recovery",
+      "claim": "Exact not-before/deadline guards after pace and in transport worker forbid early/late sends. Durable intent never duplicates after crash. Proven worker refusal is NO_REQUEST; crash remains unknown. Negative conservative capacity allowance cannot prove windowclosed: positive remaining time gives bounded besteffort opportunity. Real9fastbatch/maxbatch1 falsifier sendsall9 insidewindow and publishesOBSERVED withoutduplicates."
+    },
+    {
+      "claim_id": "C3",
+      "scope": "unchanged_rules",
+      "claim": "Populationrules/grid/T0/caps/protection/activation and oldE300gap remain immutable. Operational timeout deliberately60to15s, SEARCH mayallocate less. Slowresponses remain typedTIMEOUT, noretries/fallback. Categoryoccurrences/15mnomination/admission/E0 rules unchanged; shorter timeouts may change sourceavailability and actualadmittedset. No scientific acceptance."
+    }
+  ],
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE_ACCEPTANCE_YET",
+    "NO_MANUAL_PROVIDER_CALLS",
+    "NO_HISTORY_BACKFILL",
+    "NO_NEW_ACTIVATION",
+    "NO_UNBOUNDED_RUNTIME_OR_ARBITRARY_CAPACITY_GUARANTEE"
+  ],
+  "evidence": [
+    {
+      "logical_ref": "repo://configs/factory_remote_ops/factory-observation-schedule.timer",
+      "sha256_or_fingerprint": "a738a240badcabe03eefce58d696bee20a2551b0482e2a55b36b17b88908dfc1"
+    },
+    {
+      "logical_ref": "repo://docs/contracts/opportunity_episodes_jupiter_v1.md",
+      "sha256_or_fingerprint": "0ad14c1e311159708826e205465d5e969407491d2bc60a3f1037a067913ef926"
+    },
+    {
+      "logical_ref": "repo://docs/evidence/opportunity_episode_dispatch_window_repair_v1/readout.md",
+      "sha256_or_fingerprint": "c01b3624194faa323ff6b5da68c15f732361614f3114f319c33087025191a850"
+    },
+    {
+      "logical_ref": "repo://docs/evidence/opportunity_episode_dispatch_window_repair_v1/red_replay.py",
+      "sha256_or_fingerprint": "26e4fd9663a8d4631d0f86652c4cd28ce739eb4f17ab96b869a7250ca7592740"
+    },
+    {
+      "logical_ref": "repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md",
+      "sha256_or_fingerprint": "66b9cd48189dc8fd5b95227ad9ea431da9d67367f43338b9ce3ae7e9101caf19"
+    },
+    {
+      "logical_ref": "repo://docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md",
+      "sha256_or_fingerprint": "9a4d2444b85691f89e4c24b1780bfb32588f2edf999c93ce404ea766ea2f60d6"
+    },
+    {
+      "logical_ref": "repo://docs/tasks/OPPORTUNITY_EPISODE_DISPATCH_WINDOW_REPAIR_V1.md",
+      "sha256_or_fingerprint": "95da248ecd11ab59adbb1c67590e56ee5a178c9ed77fbafe67133920139e188e"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/opportunity_episode_tick.py",
+      "sha256_or_fingerprint": "faeaab70ef11748709fc082bf20f2a9e072cd53e8b4e42e8c297b34c97f6d52f"
+    },
+    {
+      "logical_ref": "repo://tests/test_factory_operability_memory_collision_repair_v1.py",
+      "sha256_or_fingerprint": "735dfd70877c09a4af05c9a9929857daee7e66f9d0c815323c41ef90a5aeda86"
+    },
+    {
+      "logical_ref": "repo://tests/test_observation_schedule_remote_ops.py",
+      "sha256_or_fingerprint": "48372284c25642b40d971100faa67820c63f50fe3da11e572eab760371372e99"
+    },
+    {
+      "logical_ref": "repo://tests/test_opportunity_episode_dispatch_window_repair_v1.py",
+      "sha256_or_fingerprint": "18e446b59dcecae81ce75cb528c3ba38f878ac1436e63aac34cf023defe508ef"
+    },
+    {
+      "logical_ref": "repo://tests/test_opportunity_episodes_harness_v1.py",
+      "sha256_or_fingerprint": "6e0c974dc1dde8072e076d0d64c7f544a592ff4c78828448eb606ad06e778dfd"
+    }
+  ],
+  "questions": [
+    "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
+    "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
+    "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL",
+    "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE",
+    "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY",
+    "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING",
+    "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER",
+    "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE",
+    "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM",
+    "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS"
+  ],
+  "independence": {
+    "claim_scope": "PACKET_INFORMATION_PATH",
+    "context_isolated": true,
+    "implementation_transcript_seen": false,
+    "packet_bound": true,
+    "readonly": true,
+    "launch_isolation": "PROCESS_OBLIGATION",
+    "model_diversity": "UNPROVEN",
+    "model_diversity_identity": null
+  },
+  "packet_fingerprint_sha256": "bc5e37e6f594cd2245429f82f1c9971f442218c630ef872dfbeb53716682500c"
+}
