@@ -1163,7 +1163,7 @@ def _selected_candidate_block(
         required_caps = []
     decision_unlocked = str(card.get("decision_unlocked") or "NOT_DECLARED_IN_DRAFT")
     disconfirming = str(card.get("disconfirming_prediction") or "NOT_DECLARED_IN_DRAFT")
-    bindings = card.get("available_data_bindings") or []
+    bindings = card.get("available_data_bindings", [])
     if isinstance(bindings, list):
         # Critic strings are narrative transport, never typed resolver input.
         # Encode authored objects reversibly; retain legacy strings verbatim.

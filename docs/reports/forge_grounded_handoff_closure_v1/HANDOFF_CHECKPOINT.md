@@ -22,6 +22,12 @@ primary/runner-up/revision projection now encodes each object as canonical JSON
 text, retaining all fields and values and legacy strings. Invalid outer shapes
 and unsupported scalar items stay invalid. Actual schemas and typed resolver
 input were not weakened. Draft/recipe/source bytes are not rewritten.
+Final isolated reviews exposed present falsey malformed outer values being
+normalized by the legacy default. The default now applies only when the key is
+absent; empty string/object, zero, false and null remain invalid. Their RED/GREEN
+counterexamples use the actual Critic binding schema. Read-only final projection
+equals the already frozen native packet field-for-field; the lifecycle was not
+reopened and its persisted draft hash is unchanged.
 
 The same public preflight resumed the exact generated draft through the existing
 `prefreeze_capability_repair`, retaining market, slot, reservation, saved look,
@@ -109,7 +115,7 @@ No runner hypothesis/run record was created on this denied path.
 | H11 | PARTIAL: 153 affected regression tests; exhaustive PIT/resource/science and unmerged PR-B overlay not proved |
 | H12 | PARTIAL: affected contract/example/schema/skill/Catalog updated; runnable Spec 1.3 recipe remains blocked |
 
-Affected suite: **153 tests in 528.299 seconds, OK, one skip**. It includes the
+Affected final-code suite: **153 tests in 479.96 seconds, OK, one skip**. It includes the
 previous nine direct-consumer modules plus the production temporal runner module.
 Two new regressions prove lossless typed-object transport and reject malformed
 outer shapes. The scalar/schema RED is recorded before the repair. Earlier
@@ -152,7 +158,7 @@ Raw locators are relative to the validator ZIP: `evidence/native-v2/closure/`
 contains resume, freeze, field-by-field proof, actual Critic/readout, lifecycle,
 valid Spec, live eligibility, lane refusal, DocumentRunner response and compiler
 diagnosis. `evidence/logs/closure-*.json` has raw public command/exit/stdout/stderr.
-`evidence/closure-targeted.log` and `evidence/document-execution.log` preserve
+`evidence/closure-final-targeted.log` and `evidence/document-execution.log` preserve
 the actual suite/runtime output. Reproduction scripts carry commands; raw
 machine-local paths remain outside tracked receipts.
 

@@ -36,6 +36,8 @@ The shared selected-candidate builder encodes each such object as canonical
 JSON in the Critic's existing string-array narrative transport. Decoding must
 recover every field and value; existing strings remain byte-identical. A
 malformed outer shape or unsupported scalar remains schema-invalid. This
+includes present null, false, zero, empty string or object; the legacy empty
+list default applies only to an absent field. This
 projection does not turn narrative strings into resolver bindings. The
 persisted draft, typed `temporal_recipe.frozen_input`, ExperimentSpec 1.3
 `data_bindings`, candidate definition and scientific look remain unchanged.

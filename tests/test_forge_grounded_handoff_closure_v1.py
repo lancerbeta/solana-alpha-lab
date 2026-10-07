@@ -130,11 +130,23 @@ class FreshCardTests(unittest.TestCase):
         self.assertEqual(candidate_identity(authored).full_sha256, identity.full_sha256)
 
     def test_critic_binding_transport_keeps_malformed_outer_shape_invalid(self):
-        for malformed in ("not-an-array", {"dataset_manifest_id": "not-an-array"}, [42]):
+        from jsonschema import Draft202012Validator
+
+        schema = json.loads((ROOT / "catalog/schemas/hypothesis_critic_input_v1.schema.json").read_text(encoding="utf-8"))
+        binding_schema = schema["properties"]["selected_candidate"]["properties"]["available_data_bindings"]
+        for malformed in ("not-an-array", {"dataset_manifest_id": "not-an-array"}, [42],
+                          "", {}, 0, False, None):
             with self.subTest(malformed=malformed):
                 authored = {**card(), "available_data_bindings": malformed}
                 block = session._selected_candidate_block(candidate_identity(authored), authored)
                 self.assertEqual(block["available_data_bindings"], malformed)
+                self.assertTrue(list(Draft202012Validator(binding_schema).iter_errors(
+                    block["available_data_bindings"])))
+
+        authored = card()
+        authored.pop("available_data_bindings", None)
+        self.assertEqual(session._selected_candidate_block(candidate_identity(authored), authored)
+                         ["available_data_bindings"], [])
 
     def test_runner_up_own_scope_does_not_inherit_foreign_list_evidence(self):
         primary_scope = {**SCOPE, "research_scope_rule_sha256": "a" * 64,

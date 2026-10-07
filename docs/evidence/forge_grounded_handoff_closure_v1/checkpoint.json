@@ -17,7 +17,7 @@
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_session.py",
-      "sha256": "1ee37f300265c2ac12051942f3731bb3c5976e9d6dea957c48a2a02714680a34"
+      "sha256": "ee8b1d4ea5860e59238440a2aa1225996128221a830a98d6ae5786e8ce353552"
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_research_scope.py",
@@ -33,16 +33,17 @@
     },
     {
       "path": "tests/test_forge_grounded_handoff_closure_v1.py",
-      "sha256": "bda9121950861eb534315a0c863fcf36124d59d78e3d38a7ecf1f95ff10df241"
+      "sha256": "fb4a76a87622f18f96398800d81e37ad5bfbf7e98bee556679621db84201c743"
     }
   ],
   "targeted_validation": {
     "tests": 153,
     "skipped": 1,
-    "elapsed_seconds": 528.299,
+    "elapsed_seconds": 479.96,
     "result": "OK",
     "local_full_gate": "NOT_RUN",
-    "ci": "NOT_RUN"
+    "ci": "NOT_RUN",
+    "final_code_log": "validator-bundle/evidence/closure-final-targeted.log"
   },
   "deterministic_original_public": {
     "red_repetitions": 2,
@@ -134,15 +135,6 @@
     "NO_EXHAUSTIVE_PIT_VALUE_ACCESS_PROOF",
     "NO_RESOURCE_SCALING_PROOF",
     "NO_HISTORY_REPAIR",
-    "NO_NATIVE_POSITIVE_SCIENTIFIC_PASS",
-    "NO_H09_RESULT_OR_ORACLE_MATCH",
-    "NO_OBSERVATION_COMPILER_REPAIR_AUTHORITY",
-    "NO_NATIVE_POSITIVE_SCIENTIFIC_PASS",
-    "NO_H09_RESULT_OR_ORACLE_MATCH",
-    "NO_OBSERVATION_COMPILER_REPAIR_AUTHORITY",
-    "NO_NATIVE_POSITIVE_SCIENTIFIC_PASS",
-    "NO_H09_RESULT_OR_ORACLE_MATCH",
-    "NO_OBSERVATION_COMPILER_REPAIR_AUTHORITY",
     "NO_NATIVE_POSITIVE_SCIENTIFIC_PASS",
     "NO_H09_RESULT_OR_ORACLE_MATCH",
     "NO_OBSERVATION_COMPILER_REPAIR_AUTHORITY"
@@ -290,6 +282,11 @@
       "size": 893
     },
     {
+      "logical_ref": "validator-bundle/evidence/closure-final-targeted.log",
+      "sha256": "167defb2dede9830f227223d5df20f6da527a4d8cdaf377288fa5a60c60e5c3f",
+      "size": 26667
+    },
+    {
       "logical_ref": "validator-bundle/evidence/closure-targeted.log",
       "sha256": "daf1e0e441d20d4e462f9ceeab2bdc36993d7c91c668589bf9faced20fb2f995",
       "size": 272
@@ -350,6 +347,11 @@
       "size": 323
     },
     {
+      "logical_ref": "validator-bundle/evidence/native-v2/closure/final-transport-projection.json",
+      "sha256": "4beb0db8a3171aacbcdfbf8acd054f22c12fefe7eb1b2d42bb4be2dd67e708c9",
+      "size": 5746
+    },
+    {
       "logical_ref": "validator-bundle/evidence/native-v2/closure/finalized.json",
       "sha256": "6c30be3e3c26791b14a9f30621b98910857e245c6084f9c1e422bf36652fcd78",
       "size": 4092
@@ -408,6 +410,16 @@
       "logical_ref": "validator-bundle/evidence/native-v2/closure/technical-experiment-spec.json",
       "sha256": "b343ca5ea8f51d5e277b618aaa7d0d687b63bf67bc0f6082a3f2f951c7b514b2",
       "size": 14796
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/transport-falsey-green.log",
+      "sha256": "349a49db5e6b716c7463a754ba1515a330b0932218c900e1d9b51a2f10e9c6ed",
+      "size": 2508
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/transport-falsey-red.log",
+      "sha256": "ee7f9122ff21c7fc63e0279f3f8e763e71abd6ddb26a3fdc6ea0459826fab008",
+      "size": 5186
     },
     {
       "logical_ref": "validator-bundle/evidence/transport-green.log",
