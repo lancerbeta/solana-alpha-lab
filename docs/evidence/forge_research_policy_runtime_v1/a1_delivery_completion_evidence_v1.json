@@ -22,9 +22,10 @@
     "catalog/schemas/hypothesis_forge_session_receipt_v1_4.schema.json": "0db867b2a93423a55b79210f9ce7d7f02d15885234f69328142193dafc9b1e1e",
     "docs/PROJECT_MAP.md": "9f757ef482b8523c74d92f24c8375ef13380bca841aab6ead8b5296f4e2aadfc",
     "docs/contracts/forge_research_policy_runtime_v1.md": "6a8d8d4276c323ac4197687dc7756a5e20af9c17cc220dbde9cf5363c731a9bb",
+    "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json": "38578cdef3ca5753d30ac646ae1775c3cdbf37e10af6474f6ea0b6efe9b511b9",
     "docs/evidence/forge_research_policy_runtime_v1/a1_semantic_premise_packet_v1.json": "14e230242eb6f08a2ae877a1bd5394244d4ee321dce54e857ee083e879756ad3",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "ef0077faa8e5b185509b4c4da5d415808abfbcae75700bd446f02317519820b1",
-    "docs/tasks/FORGE_RESEARCH_POLICY_RUNTIME_V1.md": "9397040284a4f77c95d3fb1e8863f87ca1b2494c023fb74ab239d8964e9e3925",
+    "docs/tasks/FORGE_RESEARCH_POLICY_RUNTIME_V1.md": "0beb86bfb42fa9676dde00ee18174db1403bc68fef6df6427c699d9ab2fe4ccc",
     "scripts/hypothesis_forge.py": "8acbc47e6a14ee83337f2d9e85d9f349265454307e8940b2f4b94a8c2be45db6",
     "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "aaa697b73007b8789a5e5be68c45748ca4648f285da5f3ace977e834b38acdd0",
     "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "0abd10d8659d0b7047d8c094badd37ccdc8b75325d9fe17283a63e6bdc52db45",
@@ -51,14 +52,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_research_policy_runtime_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "c00078aa255f3571d631c8f9e04b1c3f366c10a8620b6f62819b700b42263241",
+    "sha256": "e6bc6d60a5693c6a2ef0a19a387c39046cf811a5e19471ba5f103794e09d52b3",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_MICRO_VERTICAL_PRD15_THROUGH_PUBLIC_CLI;PASS_AUTO_CYCLE_1_TO_2_THIRD_DENIED;PASS_TWO_PROCESS_LAST_SLOT_RACE;PASS_PREVIEW_GATE_EPISODE_VIEW;PASS_10_CANDIDATES_PRIMARY_9_RUNNER_UP_10_TO_SYNTHESIS_COMPLETE;PASS_REGRESSION_16_AFFECTED_SUITES;ONE_UNREPRODUCED_VERTICAL_FLAKE_5_CLEAN_RERUNS",
     "independent_review": {
       "path": "docs/evidence/forge_research_policy_runtime_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "39c0e22aa842c29945fa8e7562057ccb745769408116d0708f3a9d424cb7561a",
+      "sha256": "427e56691333bb77db4bbc8ba38f7ca7b8ee06d9f213a9eda3f8774ca4862bed",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
