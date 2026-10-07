@@ -30,6 +30,7 @@ managed_write_set:
 - scripts/hypothesis_forge.py
 - scripts/delivery_harness.py
 - tests/test_preflight_shadow_pin_drift.py
+- docs/evidence/control/delivery_harness_acceptance_v1.json
 - src/solana_alpha_lab/factory/observation_schedule_compiler.py
 - src/solana_alpha_lab/factory/observation_panel_coverage.py
 - src/solana_alpha_lab/factory/observation_panel_publisher.py

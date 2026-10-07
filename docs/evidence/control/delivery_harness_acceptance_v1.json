@@ -61,7 +61,7 @@
     "docs/superpowers/plans/2026-08-13-delivery-harness-v1.md": "a0525254db20214bdf3834512a8ab92962f4164e2f98d47b139ff26a1b8827e8",
     "docs/superpowers/specs/2026-08-13-delivery-harness-design.md": "e8d053e95a0f9a42a668e769ef80ad95d45269af9a7ed63a14603ce39d536540",
     "docs/tasks/CTRL-DELIVERY-HARNESS-V1.md": "e6b14b15982d305d5a7a7567dd15b8de7b1c61c51020abc76d01ce6567ccea28",
-    "scripts/delivery_harness.py": "c764025cf76c0019b139e30bda2c482cfc166ac76fa555a67776dcde8055abf0",
+    "scripts/delivery_harness.py": "a9bd8414979bcac7d94d2a0dae422575e2a6d111e70a2462fab7df906daaf4c4",
     "scripts/owner_attention_gate.py": "91a2ef21e4340cf5c8a404faa72fd61a878c81fb724a96b05873fc8ae07ebfc9",
     "scripts/validate_baton.py": "f8c59f75a956cfb2304ab435257e442a01e212362b4fb953e1cb0ecb24880e6a",
     "scripts/validate_task04.py": "c8ab8c3f7116050f20cdbc6cf5aa708de4a3c6e01912670970c167087020c06b",
