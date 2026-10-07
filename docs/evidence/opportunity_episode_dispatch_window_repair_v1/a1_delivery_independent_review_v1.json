@@ -70,20 +70,20 @@
   ],
   "remediation_history": [
     {
-      "finding": "ARCH_P1_CONSERVATIVE_CAPACITY_ESTIMATE_FALSE_WINDOW_CLOSURE",
-      "resolution": "REAL_NINE_ADMISSION_RED_FIVE_SENDS_GREEN_NINE_SENDS_OPEN_WINDOW_BOUNDED_OPPORTUNITY"
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "CONSERVATIVE_CAPACITY_ESTIMATE_FALSE_OPEN_WINDOW_CLOSURE_REAL_NINE_ADMISSION_RED_TO_GREEN",
+      "observed_head": "5811d2392a3d3bb04807346458f07ff6b5b15da7",
+      "resolved_by_head": "66b9eaebb0c43201dda5b234ff4d9924ab495a74"
     },
     {
-      "finding": "GOAL_P2_FOUR_BATCH_PRODUCTION_COVERAGE",
-      "resolution": "REAL_FOUR_ADMISSION_SLOW_WORST_PHASE_PRODUCTION_VERTICAL"
-    },
-    {
-      "finding": "UX_P2_IDLE_GAP_PROOF",
-      "resolution": "JOURNAL_IDLE_TIMING_AND_INSTALLED_TIMER_CRITERION_EXPLICIT"
-    },
-    {
-      "finding": "ARCH_CODE_P2_NO_REQUEST_CRASH_REASON_DRIFT",
-      "resolution": "NORMALIZED_RECOVERY_PRODUCTION_CRASH_PUBLISHED_BYTES_EQUAL"
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "NO_REQUEST_CRASH_RECOVERY_REASON_DRIFT_PRODUCTION_PUBLISHED_BYTES_EQUAL_AFTER_NORMALIZATION",
+      "observed_head": "66b9eaebb0c43201dda5b234ff4d9924ab495a74",
+      "resolved_by_head": "0069d60b4865df8bfdd057d9ce91abf4b0903217"
     }
   ]
 }
