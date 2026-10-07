@@ -204,5 +204,69 @@ class StatementTests(unittest.TestCase):
         self.assertEqual(text, "(L:A AND L:C AND NOT L:B) OR (COUNT[1..2] OF (L:D, L:E))")
 
 
+class RegistrationIntegrityTests(unittest.TestCase):
+    def test_edited_availability_is_store_corruption(self) -> None:
+        import json
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = root / "snap.json"
+            path.write_text(json.dumps(_snapshot(["m1"])), encoding="utf-8")
+            receipt = rs.register_local_snapshot(root, path, registered_at=datetime(2026, 10, 10, tzinfo=UTC))
+            stored_path = root / rs.LISTS_DIR / "snapshots" / f"{receipt['snapshot_sha256']}.json"
+            stored = json.loads(stored_path.read_text(encoding="utf-8"))
+            stored["reliable_available_at"] = "2026-09-01T00:00:00Z"  # silently backdated on disk
+            stored_path.write_text(json.dumps(stored), encoding="utf-8")
+            evidence = rs.MembershipEvidence()
+            evidence.t0 = {"x": datetime(2026, 10, 5, tzinfo=UTC)}
+            evidence.mints = {"x": "m1"}
+            with self.assertRaises(rs.ResearchScopeError) as caught:
+                rs.add_local_snapshots(evidence, root)
+            self.assertEqual(caught.exception.code, "SNAPSHOT_STORE_CORRUPT")
+
+
+class ScopedPriorMemoryTests(unittest.TestCase):
+    """D22: a scoped negative keeps its scope; it never collapses into an unscoped or another scope's capsule."""
+
+    def test_capsules_carry_the_rule_and_stay_distinct(self) -> None:
+        from solana_alpha_lab.factory.hfic_prior_memory import compact_forge_prior_entry
+
+        base = {"claim": "membership separates a later mark", "mechanism": "attention", "primary_x_family": "KIND=LIST_CONTRAST",
+                "primary_y": "PRICE_RELATIVE_PROXY", "population": "OPPORTUNITY_EPISODES", "decision_timestamp": "E1800",
+                "definition_sha256": "d" * 64, "session_id": "S"}
+        decision = {"decision_kind": "REJECT", "reason_code": "KILL_STATISTICALLY_UNIDENTIFIABLE"}
+        a = compact_forge_prior_entry("H-A", {**base, "research_scope_rule_sha256": "a" * 64}, decision)
+        c = compact_forge_prior_entry("H-C", {**base, "research_scope_rule_sha256": "c" * 64}, decision)
+        legacy = compact_forge_prior_entry("H-L", base, decision)
+        self.assertEqual(a["research_scope_rule_sha256"], "a" * 64)
+        self.assertEqual(c["research_scope_rule_sha256"], "c" * 64)
+        self.assertNotIn("research_scope_rule_sha256", legacy)
+
+    def test_look_scope_relation_separates_scopes(self) -> None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import relate_look_scope
+
+        look = {"population": "OPPORTUNITY_EPISODES", "decision_timestamp": "E1800", "target": "T", "research_scope_rule_sha256": "a" * 64}
+        same = dict(look)
+        other = dict(look, research_scope_rule_sha256="c" * 64)
+        unscoped = {k: v for k, v in look.items() if k != "research_scope_rule_sha256"}
+        self.assertEqual(relate_look_scope(look, same), "LOOK_SCOPE_MATCH")
+        self.assertEqual(relate_look_scope(look, other), "LOOK_SCOPE_NARROWER")
+        self.assertEqual(relate_look_scope(look, unscoped), "LOOK_SCOPE_NARROWER")
+
+
+class FormulationVisibilityTests(unittest.TestCase):
+    """D09: the formulation instructions name the axis the packet carries."""
+
+    def test_prompt_and_skill_point_at_the_list_context(self) -> None:
+        operator = (ROOT / "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md").read_text(encoding="utf-8")
+        prompt_a = operator[operator.index("## BEGIN PROMPT A"):]
+        skill = (ROOT / ".agents/skills/hypothesis-forge/SKILL.md").read_text(encoding="utf-8")
+        for text in (prompt_a, skill):
+            self.assertIn("list_dimension_context", text)
+            self.assertIn("LIST_CONTRAST", text)
+            self.assertIn("research-scope-resolve", text)
+            self.assertIn("UNKNOWN", text)
+
+
 if __name__ == "__main__":
     unittest.main()

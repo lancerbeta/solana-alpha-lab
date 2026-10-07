@@ -32352,7 +32352,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 09af77b6c23ae80f273e7a238b033a2cba54e800606ccf4982941ab7d43124fa}
+  integrity: {kind: sha256, sha256: c0603d180900bd735d61dfad88169d803cefaf8e8b891930086787e38e46792c}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -40449,7 +40449,7 @@ records:
   as_of: '2026-10-07'
   truth_owner: FORGE_LIST_AWARE_RESEARCH_SCOPE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_list_aware_research_scope_v1.md', repository_path: docs/contracts/forge_list_aware_research_scope_v1.md}
-  integrity: {kind: sha256, sha256: cf751e74d1bb59d26fc6d2ff045dcdab514a19692257701f75d8f378d553e80a}
+  integrity: {kind: sha256, sha256: f03ce1a4c50aa2525003ddf9441f61700a8a6e69d248449289bf86416d8ca84f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-RESEARCH-SCOPE-001}

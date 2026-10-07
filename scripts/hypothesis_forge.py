@@ -2118,11 +2118,18 @@ def cmd_research_scope_resolve(repo_root: Path, explicit_data_root: Path | None,
         return emit({"reason_code": "RESEARCH_SCOPE_EVIDENCE_UNREADABLE", "values_loaded": False, "writes": False}, exit_code=2)
     if not git_before.unchanged(repository_git_snapshot(repo_root)):
         return emit_error("GIT_MUTATION_DETECTED")
+    warnings = []
+    for side in ("universe_true_n", "signal_true_n", "signal_false_n"):
+        if side in coverage and coverage[side] < 5:
+            # Membership counts only (no outcome): a tiny group is visible before any look is spent.
+            warnings.append({"reason_code": "SMALL_GROUP", "group": side, "episodes_n": coverage[side]})
     payload: dict[str, Any] = {
         "canonical_query": query,
         "spec_sha256": bound["spec_sha256"],
         "rule_sha256": resolved.rule_sha256,
         "coverage": coverage,
+        "warnings": warnings,
+        "non_claims": ["MEMBERSHIP_IS_OBSERVATIONAL_NOT_CAUSAL", "NO_INTERACTION_CLAIM"],
         "values_loaded": False,
         "writes": False,
     }

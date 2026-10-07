@@ -261,5 +261,47 @@ def rs_fields():
     return {"research_scope", "list_condition", "hypothesis_kind", "contrast", "diagnostic_slices"}
 
 
+class LegacyGoldenTests(unittest.TestCase):
+    """D28: the unscoped 1.1 path is byte-identical to base 77eb427a (values pinned on base)."""
+
+    def test_unscoped_query_and_result_are_unchanged(self) -> None:
+        import hashlib
+        import json
+
+        from solana_alpha_lab.factory.hfic_temporal_discovery import canonical_temporal_spec
+        from tests.test_opportunity_episodes_contract_v1 import episode_spec, prd_vector
+
+        self.assertEqual(validate_temporal_query(episode_spec())["spec_sha256"], "d552ad67a882557915222aaac5b25692c368eae4e3dbd69cbf5d76515499b002")
+        canonical = json.dumps(canonical_temporal_spec(episode_spec()), sort_keys=True).encode()
+        self.assertEqual(hashlib.sha256(canonical).hexdigest(), "d6d9bf1cc1067b1af61f1be511bf5c75b8c9053c7570bac33fef4023e91602b0")
+        census, rows = prd_vector()
+        summary = execute_temporal_discovery(census, rows, episode_spec(), [binding_item()])["summary"]
+        digest = hashlib.sha256(json.dumps(summary, sort_keys=True, default=str).encode()).hexdigest()
+        self.assertEqual(digest, "ea362e98ea083068408c6dad94671e04a9a91e2a121331a8ee539dc557a4461d")
+        self.assertNotIn("research_scope", summary)
+
+
+class SliceCoverageTests(unittest.TestCase):
+    def test_unknown_membership_in_a_slice_is_not_out_of_the_slice(self) -> None:
+        ev = evidence()
+        for definition in [{"list_id": "OWNER:D", "definition_version": "1", "provider_or_owner": "OWNER", "kind": "MANUAL_SET", "semantics": {}, "adapter": rs.LOCAL_ADAPTER}]:
+            ev.add_definition({**definition, "aliases": [], "definition_sha256": rs.sha256_of(definition)})
+        for episode in FIXTURE:
+            ev.states[episode]["OWNER:D"] = rs.TRUE if episode in {"e1", "e2"} else rs.UNKNOWN
+        draft = spec("LIST_CONTRAST", list_condition=AC, diagnostic_slices=[{"slice_id": "D", "selector": {"clauses": [{"all_of": ["D"]}]}}])
+        query = rs.canonicalize_query_scope(dict(draft, list_aliases={**ALIASES, "D": "OWNER:D"}), ev)
+        body = validate_temporal_query(query)["scientific_body"]
+        resolved = rs.ResolvedScope(scope=body["research_scope"], list_condition=body["list_condition"], evidence=ev,
+                                    episode_ids=list(FIXTURE), slices=body["diagnostic_slices"])
+        census, rows = corpus()
+        with self.assertRaises(GroundedDiscoveryError) as caught:
+            execute_temporal_discovery(census, rows, query, [binding_item()], research_scope=resolved)
+        self.assertEqual(caught.exception.code, "SCOPE_COVERAGE_UNRESOLVED")
+        self.assertEqual(resolved.coverage()["slice_D_unknown_n"], 5)
+        with self.assertRaises(rs.ResearchScopeError) as refused:
+            resolved.require_covered()
+        self.assertIn("next_action", refused.exception.detail)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -150,6 +150,12 @@ def main() -> None:
         "note": "ratios near 2.0 for episodes and near 1.0 for slices mean no hidden quadratic repeat; slices are capped at 8 by the validator",
     }
     print(json.dumps(summary, indent=1, sort_keys=True))
+    # Bounds fixed before the run on this workstation baseline: the list scope may not add a material
+    # cost to the evaluator, and neither more episodes nor more slices may repeat a full pass.
+    bounds = {"scope_overhead_ratio_vs_unscoped": 1.5, "double_episodes_ratio": 3.0, "double_slices_ratio": 2.0}
+    breached = {key: summary[key] for key, limit in bounds.items() if summary[key] > limit}
+    if breached:
+        raise SystemExit(f"BENCHMARK_BOUND_BREACHED {breached}")
 
 
 if __name__ == "__main__":

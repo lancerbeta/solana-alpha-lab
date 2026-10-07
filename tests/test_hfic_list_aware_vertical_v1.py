@@ -433,6 +433,7 @@ class ListAwareVerticalTests(unittest.TestCase):
         self.assertEqual(len(recipe["research_scope_rule_sha256"]), 64)
         experiment = _bind_experiment(recipe, self.plane)
         experiment["as_of"] = experiment["availability_cutoff"] = "2026-10-16T00:00:00Z"
+        (self.work / "experiment.json").write_text(json.dumps(experiment), encoding="utf-8")
         as_of = datetime(2026, 10, 16, tzinfo=UTC)
         decision = classify_lane(
             {"experiment_spec": experiment, "hypothesis_definition_sha256": HYPOTHESIS_DEFINITION_SHA256},
@@ -459,6 +460,7 @@ class ListAwareVerticalTests(unittest.TestCase):
         artifact = self.plane / "research" / "artifacts" / "results" / f"RESULT-ARTIFACT-{run_id.removeprefix('RUN-')}.json"
         saved = json.loads(artifact.read_text(encoding="utf-8"))["capability_result"]["summary"]
         saved_scope = saved["research_scope"]
+        (self.work / "runner-summary.json").write_text(json.dumps(saved), encoding="utf-8")
         original = evidence["result"]["research_scope"]
         self.assertEqual(saved_scope["applied_sha256"], original["applied_sha256"])
         self.assertAlmostEqual(saved_scope["contrast"]["observed_target_difference"], -0.10, places=6)
@@ -494,6 +496,43 @@ class ListAwareVerticalTests(unittest.TestCase):
             _require_recipe_preserves_research_scope(scoped_view, {"parameters": {"temporal_recipe": {k: v for k, v in recipe.items() if k != "research_scope_rule_sha256"}}})
         with self.assertRaises(HficSessionError):
             _require_recipe_preserves_research_scope({"critic_input_packet": {"selected_candidate": {}}}, {"parameters": {"temporal_recipe": recipe}})
+
+    def test_c_zcold_replay_from_a_moved_root_without_network(self) -> None:
+        """D20: a fresh process on a moved root, original root absent, network blocked, reproduces the frozen result."""
+
+        import shutil
+        import subprocess
+
+        experiment_path = self.work / "experiment.json"
+        self.assertTrue(experiment_path.is_file(), "test_c must run first")
+        saved = json.loads((self.work / "runner-summary.json").read_text(encoding="utf-8"))
+        moved = self.work / "moved-root"
+        shutil.copytree(self.plane, moved)
+        hidden = self.work / "plane-hidden"
+        self.plane.rename(hidden)
+        script = self.work / "cold.py"
+        script.write_text(
+            "import json, socket, sys\n"
+            "def _blocked(*a, **k):\n    raise OSError('NETWORK_BLOCKED')\n"
+            "socket.socket = _blocked\nsocket.create_connection = _blocked\n"
+            f"sys.path[:0] = [{str(ROOT)!r}, {str(ROOT / 'src')!r}]\n"
+            "from pathlib import Path\n"
+            "from solana_alpha_lab.factory.hfic_temporal_discovery import run_temporal_fixed_time_from_spec\n"
+            "spec = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))\n"
+            "out = run_temporal_fixed_time_from_spec(spec, root=Path('.'), capture_hooks={'data_root': Path(sys.argv[2])})\n"
+            "print(json.dumps(out['summary']['research_scope']))\n",
+            encoding="utf-8",
+        )
+        try:
+            done = subprocess.run([sys.executable, "-B", str(script), str(experiment_path), str(moved)], capture_output=True, text=True, timeout=600)
+        finally:
+            hidden.rename(self.plane)
+        self.assertEqual(done.returncode, 0, done.stderr[-1500:])
+        cold = json.loads(done.stdout.strip().splitlines()[-1])
+        self.assertEqual(cold["applied_sha256"], saved["research_scope"]["applied_sha256"])
+        self.assertEqual(cold["rule_sha256"], saved["research_scope"]["rule_sha256"])
+        self.assertAlmostEqual(cold["contrast"]["observed_target_difference"], -0.10, places=6)
+        self.assertEqual(cold["contrast"]["comparator"]["target_missing_n"], 1)
 
     def test_d_episode_profile_through_the_dispatcher_and_ordinary_lifecycle(self) -> None:
         """D13: a real episode profile, scope-bound, through ladder -> freeze -> Critic, no CONTROL."""
@@ -793,6 +832,14 @@ class ListAwareVerticalTests(unittest.TestCase):
             path.write_text(json.dumps(document), encoding="utf-8")
             return _forge_call("list-snapshot-register", "--snapshot", str(path), "--registered-at", registered_at, data_root=self.plane)
 
+        from tests.test_hfic_cli import run_cli
+
+        clockless = self.work / "clock.snapshot.json"
+        clockless.write_text(json.dumps(snapshot("OWNER:Z", [mint_of("n1")], available="2026-10-01T00:00:00Z")), encoding="utf-8")
+        refused_clock = run_cli("list-snapshot-register", "--snapshot", str(clockless), "--registered-at", "2026-10-01T00:00:00Z",
+                                "--format", "json", data_root=self.plane, env={"SMIAL_ALLOW_TEST_CLOCK": "0"})
+        self.assertNotEqual(refused_clock.returncode, 0)
+        self.assertIn("REGISTERED_AT_OVERRIDE_FORBIDDEN", refused_clock.stdout)
         first = register("d", snapshot("OWNER:D", [mint_of("n1"), mint_of("e1")], available="2026-10-11T00:00:00Z"), "2026-10-11T00:00:00Z")
         self.assertEqual(first["status"], "REGISTERED")
         self.assertEqual(register("d", snapshot("OWNER:D", [mint_of("e1"), mint_of("n1")], available="2026-10-11T00:00:00Z"), "2026-10-14T00:00:00Z")["status"], "PASS_ALREADY_PRESENT_EXACT")

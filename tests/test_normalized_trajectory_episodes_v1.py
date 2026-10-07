@@ -162,5 +162,44 @@ class ProfileTests(unittest.TestCase):
         self.assertEqual(caught.exception.code, "RESEARCH_SCOPE_REQUIRED")
 
 
+class AcceptedPayloadTests(unittest.TestCase):
+    """The accepted bytes, not only the builder, are motif counts for the candidate's own scope."""
+
+    def _payload(self):
+        census, rows = corpus()
+        return nt.build_episode_normalized_profile(census, rows, [binding_item()], scope_for())
+
+    def test_valid_payload_and_every_tamper_is_refused(self) -> None:
+        import copy
+
+        payload = self._payload()
+        rule = payload["research_scope_rule_sha256"]
+        nt.validate_episode_payload(payload, expected_rule_sha256=rule)
+
+        def rehash(doc):
+            body = {k: v for k, v in doc.items() if k != "representation_payload_sha256"}
+            doc["representation_payload_sha256"] = rs.sha256_of(body)
+            return doc
+
+        cases = {}
+        leaked = copy.deepcopy(payload)
+        leaked["target_values"] = [0.1]
+        cases["EPISODE_PAYLOAD_INVALID"] = rehash(leaked)
+        identity = copy.deepcopy(payload)
+        identity["panels"]["BASE"]["motifs"][0]["motif"] = "MintAbc"
+        cases["EPISODE_PAYLOAD_INVALID_MOTIF"] = rehash(identity)
+        unhashed = copy.deepcopy(payload)
+        unhashed["panels"]["BASE"]["members_n"] += 1
+        cases["EPISODE_PAYLOAD_HASH_MISMATCH"] = unhashed
+        for label, doc in cases.items():
+            with self.subTest(label), self.assertRaises(nt.EpisodeProfileError):
+                nt.validate_episode_payload(doc, expected_rule_sha256=rule)
+        with self.assertRaises(nt.EpisodeProfileError) as caught:
+            nt.validate_episode_payload(payload, expected_rule_sha256="0" * 64)
+        self.assertEqual(caught.exception.code, "EPISODE_PAYLOAD_SCOPE_MISMATCH")
+        with self.assertRaises(nt.EpisodeProfileError):
+            nt.validate_episode_payload(payload, expected_rule_sha256=None)  # an unscoped candidate cannot carry a scoped profile
+
+
 if __name__ == "__main__":
     unittest.main()

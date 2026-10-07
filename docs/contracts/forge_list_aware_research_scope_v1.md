@@ -105,6 +105,23 @@ It enters the existing ladder as an episode-only representation (registry
 `populations`), is pinned by its own payload hash and journal
 (`representation_search_key`), and keeps the ordinary freeze/Critic lifecycle.
 
+## Refusals an operator sees
+
+| Code | Meaning | Next step |
+|---|---|---|
+| `SCOPE_COVERAGE_UNRESOLVED` | a referenced list is UNKNOWN for some episodes (universe, signal or slice) | declare `evidence_selection.cohort_ids` from `covered_cohort_ids` before any outcome, or wait for coverage |
+| `SCOPE_EVIDENCE_INVALID` | frame/snapshot evidence conflicts | restore the exact release or snapshot; never heal |
+| `RESEARCH_SCOPE_BINDING_MISMATCH` | masks do not belong to this exact rule or episode set | rebuild through `research-scope-resolve`; never inject masks |
+| `LOOK_SCOPE_CONTRADICTION` | the card does not echo the computed rule/statement | copy them from `temporal_holder_claim_identity` |
+| `RESEARCH_SCOPE_RECIPE_MISMATCH` | classification got an experiment of another (or no) scope | classify the frozen recipe of the same look |
+| `RESEARCH_SCOPE_EVIDENCE_DRIFT` | replay evidence differs from the frozen closure | restore the frozen releases/snapshots |
+| `EPISODE_PAYLOAD_SCOPE_MISMATCH` | the episode profile was built for another scope | rebuild the view with the candidate's rule |
+| `REGISTERED_AT_OVERRIDE_FORBIDDEN` | a caller-chosen registration time | register now; availability is never backdated |
+
+A result on a declared covered subset (`cohort_ids`) is a local result for those
+cohorts, not a statement about the list in general. A `NO_WORTHY` on the episode
+profile is a scoped stage outcome; it does not close the list family.
+
 ## Non-goals
 
 No new collector, evaluator, database, service or dependency; no change to the
