@@ -829,7 +829,7 @@ class DocumentRunner(ExperimentRunner):
         store.rebuild_projection()
 
         extra: dict[str, Any] = {
-            "passport": passport.payload,
+            "passport": passport.model_dump(mode="json"),
             "capability_result": capability_result,
         }
         if observation_routing is not None:

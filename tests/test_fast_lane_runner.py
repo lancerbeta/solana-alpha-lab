@@ -301,6 +301,7 @@ class FastLaneRunnerTests(unittest.TestCase):
             passport = store.find_completed_run(str(result["run_key_sha256"]))
             self.assertIsNotNone(passport)
             self.assertEqual(passport.run_id, result["run_id_or_null"])  # type: ignore[union-attr]
+            self.assertIsInstance(json.loads(json.dumps(result))["passport"], dict)
 
     def test_legacy_start_path_still_works(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
