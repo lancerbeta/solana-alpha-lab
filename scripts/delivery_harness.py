@@ -151,8 +151,15 @@ FROZEN_SEMANTICS_EVIDENCE_FILES = frozenset(
     {
         "docs/evidence/task21/durable_resume_router_binding_acceptance_v1.json",
         "docs/evidence/task21/task21_artifact_index_v1.json",
+        # Final accepted owner-view pins at 04ec8e0; regression verifies both
+        # pins and unchanged receipt bytes, without retagging execution history.
+        "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json",
     }
 )
+FROZEN_SEMANTICS_EVIDENCE_COMMITS = {
+    "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json":
+        "04ec8e0286a3dce5999d0687784717ee90fc5dca",
+}
 
 
 def harness_owned_aggregate_paths() -> frozenset[str]:
@@ -592,6 +599,15 @@ def _preflight_shadow_pin_problems(
         try:
             rel = evidence_path.resolve().relative_to(root.resolve()).as_posix()
         except ValueError:
+            continue
+        frozen_commit = FROZEN_SEMANTICS_EVIDENCE_COMMITS.get(rel) if rel in exempt else None
+        if frozen_commit is not None:
+            try:
+                frozen_bytes = git_bytes(root, "show", f"{frozen_commit}:{rel}")
+                if evidence_path.read_bytes() != frozen_bytes:
+                    reasons.append(f"FROZEN_PIN_EVIDENCE_DRIFT:{rel}")
+            except (OSError, ValueError):
+                reasons.append(f"FROZEN_PIN_EVIDENCE_UNAVAILABLE:{rel}")
             continue
         if rel in changed or rel in exempt:
             continue

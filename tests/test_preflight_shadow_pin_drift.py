@@ -5,6 +5,7 @@ import importlib.util
 import json
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 from types import ModuleType
 
@@ -198,11 +199,43 @@ class ShadowPinDiscriminatorTests(unittest.TestCase):
                 {
                     "docs/evidence/task21/durable_resume_router_binding_acceptance_v1.json",
                     "docs/evidence/task21/task21_artifact_index_v1.json",
+                    "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json",
                 }
             ),
         )
         for relative in self.module.FROZEN_SEMANTICS_EVIDENCE_FILES:
             self.assertTrue((ROOT / relative).is_file(), relative)
+
+    def test_composite_isolation_pins_are_frozen_accepted_base_bytes(self) -> None:
+        relative = "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json"
+        raw = (ROOT / relative).read_bytes()
+        self.assertEqual(raw, self.module.git_bytes(ROOT, "show", f"04ec8e0286a3dce5999d0687784717ee90fc5dca:{relative}"))
+        receipt = json.loads(raw)
+        # The accepted receipt pins its final owner view, not the earlier
+        # execution producer. Do not retroactively attest producer bytes.
+        frozen = "04ec8e0286a3dce5999d0687784717ee90fc5dca"
+        self.assertEqual(receipt["presearch_agent"]["input_execution_commit"],
+                         "66abc2bb41db2e7f4cb2704980f74f4aafd0da7b")
+        tracked = [row for row in receipt["presearch_agent"]["actual_attestation"]["actual_read_set"]
+                   if not row["path"].startswith("local/")]
+        self.assertEqual({row["path"] for row in tracked}, {
+            ".agents/skills/hypothesis-forge/SKILL.md",
+            "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md",
+        })
+        for row in tracked:
+            self.assertEqual(row["sha256"], hashlib.sha256(
+                self.module.git_bytes(ROOT, "show", f"{frozen}:{row['path']}" )).hexdigest())
+        with patch.object(self.module, "git_bytes", return_value=json.dumps(receipt).encode("utf-8")):
+            reasons = self._scan({relative: receipt}, changed={row["path"] for row in tracked},
+                                 blobs={row["path"]: SHA_B for row in tracked},
+                                 frozen=self.module.FROZEN_SEMANTICS_EVIDENCE_FILES)
+        self.assertEqual(reasons, [])
+        altered = json.loads(raw)
+        altered["presearch_agent"]["actual_attestation"]["actual_read_set"][1]["sha256"] = SHA_B
+        with patch.object(self.module, "git_bytes", return_value=json.dumps(receipt).encode("utf-8")):
+            reasons = self._scan({relative: altered}, changed={relative}, blobs={},
+                                 frozen=self.module.FROZEN_SEMANTICS_EVIDENCE_FILES)
+        self.assertEqual(reasons, [f"FROZEN_PIN_EVIDENCE_DRIFT:{relative}"])
 
 
 class WorktreeCommittedDivergenceTests(unittest.TestCase):

@@ -98,3 +98,13 @@ run affected suite. Isolated-index patch reconstruction must match final tree.
 Native lifecycle scripts are historical evidence, not authority to re-formulate
 or rerun H08. Raw commands/evidence and frozen synthetic files accompany ZIP.
 Rollback: ordinary authorized revert, retain immutable history; no migration.
+
+Delivery propagation: prior composite native-isolation receipt остаётся byte-for-byte
+неизменной. Её final owner-view pins подтверждены Git blobs accepted BASE 04ec8e0;
+это не проверка source bytes более раннего producer 66abc2bb. Historical producer
+pin match NOT_ATTESTED; старую self-report attestation не переписывали и не
+использовали как H08/H09 acceptance. Existing frozen-pin registry теперь проверяет
+всю archival receipt против accepted blob: drift/unavailable даёт DENY, в том
+числе при co-move. Остальные SEPARATE pins и authority/control prefixes не ослаблены.
+17 focused boundary tests PASS; affected delivery checks и final preflight/CI
+связываются отдельной final-head chain. Никакого нового scientific look.

@@ -28,6 +28,8 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hfic_research_scope.py
 - src/solana_alpha_lab/factory/hfic_temporal_discovery.py
 - scripts/hypothesis_forge.py
+- scripts/delivery_harness.py
+- tests/test_preflight_shadow_pin_drift.py
 - src/solana_alpha_lab/factory/observation_schedule_compiler.py
 - src/solana_alpha_lab/factory/observation_panel_coverage.py
 - src/solana_alpha_lab/factory/observation_panel_publisher.py
@@ -131,6 +133,13 @@ not owner gates. Stop after exact-head CI and machine merge-readiness at the
 machine-rendered exact owner phrase; no merge without that separate phrase.
 If no lawful existing replay capability can execute the exact recipe, return
 H09_UNEXECUTABLE_WITH_CURRENT_CAPABILITY with the proved earliest root cause.
+
+Ordinary delivery propagation includes the existing frozen-semantics pin
+registry: the prior composite native receipt and its owner-view pins remain
+byte-bound to accepted BASE, verified against Git blobs by a targeted test.
+Do not rewrite/re-pin that historical attestation to current owners or claim
+those pins reconstruct its earlier execution producer. Other SEPARATE drift
+remains DENY; no authority route or control write prefixes are widened.
 
 ENTRY_DECISION: START_WITH_PATCH. SPEC_ROUTE: BOTH. MODEL_EFFORT: SOL_XHIGH.
 Consumer: ordinary Forge generator, independent Critic and existing experiment

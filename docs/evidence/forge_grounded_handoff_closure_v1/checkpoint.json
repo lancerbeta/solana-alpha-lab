@@ -70,6 +70,14 @@
     {
       "path": "tests/test_scientific_eligibility_projection_v1.py",
       "sha256": "4adebcbabe26e81049b6fd1b27578344ac274aa7cd65dc0376d82dccd1274a76"
+    },
+    {
+      "path": "scripts/delivery_harness.py",
+      "sha256": "a9bd8414979bcac7d94d2a0dae422575e2a6d111e70a2462fab7df906daaf4c4"
+    },
+    {
+      "path": "tests/test_preflight_shadow_pin_drift.py",
+      "sha256": "53524016c2d0440ab4a6fe75011cc2f18cc5c879212cce2369d7c035609517c2"
     }
   ],
   "targeted_validation": {
@@ -176,7 +184,8 @@
     "NO_NATIVE_POSITIVE_SCIENTIFIC_PASS",
     "NO_NEW_SCIENTIFIC_LOOK",
     "NO_SCIENTIFIC_PASS",
-    "NO_DEPLOY"
+    "NO_DEPLOY",
+    "NO_LEGACY_PRESEARCH_PRODUCER_PIN_ATTESTATION"
   ],
   "next_stage": "Ordinary delivery, exact-head CI and machine merge readiness; stop at exact owner merge phrase.",
   "evidence": [
@@ -924,6 +933,36 @@
       "logical_ref": "validator-bundle/evidence/h09-source-identity-red.log",
       "sha256": "2f2a62a3e52e93682b17ce752596b8af9b4f70438e65969ebd256a339fe294b8",
       "size": 10993
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-historical-pin-source-proof.json",
+      "sha256": "f3472b8e59f32929fee27c73cd4f5ffd611bbed21600ec6af58a480b007e9e2b",
+      "size": 2592
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-frozen-pin-red.log",
+      "sha256": "a42befb5c460b304dd8d1ffb20279e76c08b6ff04f1d592e6c3836b2a306752d",
+      "size": 1239
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-frozen-accepted-pin-red.log",
+      "sha256": "dd0b2d6a5bf749b83a08e6cb85a9adf5630de4c5125ddde3265d32ecad91de56",
+      "size": 1376
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-frozen-pin-before-sync.log",
+      "sha256": "b1b4f7abe2a69b2ff070e7fd0b323011bae4e00e421887cf981d251643ca9392",
+      "size": 2330
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/h09-frozen-pin-unit-green.log",
+      "sha256": "ebf398c33f011bb8f214619e509f30ef3c7104bd8ab192ab84c1028613d92910",
+      "size": 121
+    },
+    {
+      "logical_ref": "validator-bundle/evidence/verify_historical_pins.py",
+      "sha256": "99ad260ad0d7bf2c43e29636b7e15cb3dc55375008dbc6ed52f295fa73a783ec",
+      "size": 976
     }
   ],
   "accepted_intermediate_checkpoint": "8a3e9d8e1c848395ac7cee99bc2cf75637417543",
@@ -1256,5 +1295,17 @@
     "result": "FAILED_IMPLEMENTATION_HASH_MISMATCH_BEFORE_CATALOG_COMMIT",
     "consequence": "NOT_PASS_EVIDENCE; rerun affected suite on clean immutable code head"
   },
-  "residual_capability_gap": "FROZEN_CROSS_RELEASE_ENTITY_UNRESOLVED: repeated-mint multi-decision eligibility cannot be proven by existing mint-keyed projector; fail closed. Native 64 unique mints supported."
+  "residual_capability_gap": "FROZEN_CROSS_RELEASE_ENTITY_UNRESOLVED: repeated-mint multi-decision eligibility cannot be proven by existing mint-keyed projector; fail closed. Native 64 unique mints supported.",
+  "delivery_boundary_repair": {
+    "owner": "Existing frozen-semantics pin registry",
+    "accepted_snapshot_commit": "04ec8e0286a3dce5999d0687784717ee90fc5dca",
+    "historical_receipt": "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json",
+    "historical_receipt_bytes_unchanged": true,
+    "historical_owner_pins_match_accepted_base": true,
+    "earlier_presearch_execution_producer_pin_match": "NOT_ATTESTED",
+    "guard": "Full historical receipt bytes checked against accepted Git blob; drift/unavailable DENY even co-moved",
+    "other_separate_drift": "DENY_UNCHANGED",
+    "authority_or_control_write_prefix_widening": false,
+    "unit_validation": "17 tests PASS; final affected delivery suite follows Catalog propagation"
+  }
 }

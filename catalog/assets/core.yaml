@@ -19821,7 +19821,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/delivery_harness.py', repository_path: scripts/delivery_harness.py}
-  integrity: {kind: sha256, sha256: c764025cf76c0019b139e30bda2c482cfc166ac76fa555a67776dcde8055abf0}
+  integrity: {kind: sha256, sha256: a9bd8414979bcac7d94d2a0dae422575e2a6d111e70a2462fab7df906daaf4c4}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-DELIVERY-HARNESS-001}
@@ -40521,7 +40521,7 @@ records:
   location: {kind: git_path, logical_uri: 'repo://docs/reports/forge_grounded_handoff_closure_v1/HANDOFF_CHECKPOINT.md', repository_path: docs/reports/forge_grounded_handoff_closure_v1/HANDOFF_CHECKPOINT.md}
   integrity:
     kind: sha256
-    sha256: 708d53d600fd23c1983c38add28b8c63b0ad6f66bbdcad4c2763ede1126c9f44
+    sha256: 05fe9b39d3474570d4ac0891e859cd6a1b1a6c84248cca694a0a786dca301301
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-GROUNDED-HANDOFF-CLOSURE-001}
