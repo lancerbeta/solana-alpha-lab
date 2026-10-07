@@ -2514,6 +2514,7 @@ def assess_tier_progress(
     *,
     freeze_worthy: bool,
     compound_applicable: bool = True,
+    main_total: int = MAX_MAIN_QUERY_SPECS,
 ) -> dict[str, Any]:
     """Pre-freeze tier state. A skipped compound tier is not an executed search.
 
@@ -2580,7 +2581,7 @@ def assess_tier_progress(
             for item in looks
             if item.get("look_class") == "MAIN" and item.get("new_look") is True
         ]
-        if len(mains) >= MAX_MAIN_QUERY_SPECS:
+        if len(mains) >= main_total:
             status = "SKIPPED_BUDGET"
             action = "STOP_BUDGET"
         else:
@@ -3994,13 +3995,15 @@ def build_feature_preview(
     *,
     prior_preview_hashes: Sequence[str] = (),
     universe_policy: Mapping[str, Any] | None = None,
+    preview_total: int = MAX_PREVIEW_SPECS,
 ) -> dict[str, Any]:
     """Feature-only preview. Target and survival labels are not computed."""
 
     checked = validate_feature_preview_spec(spec)
     if any(f.get("field_id") == HOLDER_COUNT and f["op"] in {"delta", "return_ratio"} for f in checked["features"]):
         return _build_recipe_preview(census, observations, spec, binding,
-                                     prior_preview_hashes=prior_preview_hashes, universe_policy=universe_policy)
+                                     prior_preview_hashes=prior_preview_hashes, universe_policy=universe_policy,
+                                     preview_total=preview_total)
     admitted = admit_discovery_binding(binding)
     decision_point, lateness = checked["decision_point"], checked["lateness"]
     point_ids, features = checked["point_ids"], checked["features"]
@@ -4027,7 +4030,7 @@ def build_feature_preview(
         }
     )
     prior = [str(item) for item in prior_preview_hashes]
-    if identity not in prior and len(set(prior)) >= MAX_PREVIEW_SPECS:
+    if identity not in prior and len(set(prior)) >= preview_total:
         raise GroundedDiscoveryError("PREVIEW_ENVELOPE_EXHAUSTED")
     grouped = _grouped_cells(observations)
     preview_binding = {
@@ -4169,7 +4172,7 @@ def build_feature_preview(
     return payload
 
 
-def _build_recipe_preview(census, observations, spec, binding, *, prior_preview_hashes, universe_policy):
+def _build_recipe_preview(census, observations, spec, binding, *, prior_preview_hashes, universe_policy, preview_total=MAX_PREVIEW_SPECS):
     checked = validate_feature_preview_spec(spec)
     body = {"decision_point": checked["decision_point"], "schedule_lateness_seconds": checked["lateness"],
             "observation_clock_policy": checked["clock_policy"], "features": checked["features"], "predicates": []}
@@ -4181,7 +4184,7 @@ def _build_recipe_preview(census, observations, spec, binding, *, prior_preview_
               "schedule": {"points": checked["point_ids"], "lateness_seconds": checked["lateness"],
                            "observation_clock_policy": checked["clock_policy"]}}
     identity = _sha256({"recipe": recipe, "seed": checked["seed"], "input": frozen, "policy": policy})
-    if identity not in prior_preview_hashes and len(set(prior_preview_hashes)) >= MAX_PREVIEW_SPECS:
+    if identity not in prior_preview_hashes and len(set(prior_preview_hashes)) >= preview_total:
         raise GroundedDiscoveryError("PREVIEW_ENVELOPE_EXHAUSTED")
     members, cohorts, _seen, duplicates, conflicts = _project_temporal_members(
         census, observations, body, binding, universe_policy=universe_policy, prefix_only=True)

@@ -487,9 +487,10 @@ def preview_control_reconsideration(
                 for item in (readback.get("visible_cohorts") or [])
                 if isinstance(item, Mapping) and item.get("cohort_id")
             ]
-    from solana_alpha_lab.factory.hfic_research_policy import ensure_run_snapshot
+    from solana_alpha_lab.factory.hfic_research_policy import pool_limits_read_only
 
-    _preflight_limits = ensure_run_snapshot(store, planned_search_key)["limits"]
+    # A preview never freezes a scope: it reports the pool a first touch would use.
+    _preflight_limits = pool_limits_read_only(store, current_market_epoch, sessions)
     action, _bound = decide_preflight_action(
         sessions,
         search_key=planned_search_key,

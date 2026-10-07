@@ -858,9 +858,9 @@ def forge_control_ready(
         )
     _preflight_limits = None
     if store is not None:
-        from solana_alpha_lab.factory.hfic_research_policy import limits_for_frozen_run
+        from solana_alpha_lab.factory.hfic_research_policy import pool_limits_read_only
 
-        _preflight_limits = limits_for_frozen_run(store, search_key)
+        _preflight_limits = pool_limits_read_only(store, market_epoch, sessions)
     action, _bound = decide_preflight_action(
         sessions,
         search_key=search_key,

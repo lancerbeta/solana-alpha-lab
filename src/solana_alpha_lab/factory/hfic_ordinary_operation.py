@@ -20,7 +20,11 @@ from solana_alpha_lab.factory.hfic_grounded_discovery import (
     _canonical,
     list_discovery_looks,
 )
-from solana_alpha_lab.factory.hfic_research_policy import ensure_run_snapshot, limits_for_frozen_run
+from solana_alpha_lab.factory.hfic_research_policy import (
+    ensure_run_snapshot,
+    epoch_limits,
+    limits_or_defaults,
+)
 
 OPERATION_KIND = "ORDINARY_OPERATION_V1"
 RESERVATION_KIND = "ORDINARY_LOOK_RESERVATION_V1"
@@ -114,7 +118,6 @@ def record_operation(
     market = str(request.get("market_evidence_epoch_sha256") or "").strip()
     if len(journal) != 64 or not focus or len(market) != 64:
         raise OrdinaryOperationError("ORDINARY_OPERATION_BINDING_INCOMPLETE")
-    ensure_run_snapshot(store, journal)
     completion = str(request.get("requested_completion") or LIMITED_RESULT)
     if completion not in {LIMITED_RESULT, SCIENTIFIC_TERMINAL}:
         raise OrdinaryOperationError("ORDINARY_OPERATION_COMPLETION_INVALID")
@@ -158,6 +161,11 @@ def record_operation(
         ):
             raise OrdinaryOperationError("ORDINARY_OPERATION_REPRESENTATION_INVALID")
         representation = {key: str(value) for key, value in representation.items()}
+    cycle_index = request.get("cycle_index")
+    if cycle_index is not None and (
+        isinstance(cycle_index, bool) or not isinstance(cycle_index, int) or not 2 <= cycle_index <= 8
+    ):
+        raise OrdinaryOperationError("ORDINARY_OPERATION_CYCLE_INVALID")
     slot = str(request.get("scientific_slot_sha256") or "")
     if len(slot) != 64:
         from solana_alpha_lab.factory.hfic_evidence_identity import scientific_slot_sha256
@@ -167,6 +175,7 @@ def record_operation(
             representation_id="BASE" if representation is None else representation["representation_id"],
             representation_semantic_version="HFIC-V1.2" if representation is None else representation["representation_semantic_version"],
             owner_focus=focus,
+            cycle_index=cycle_index or 1,
         )
     identity_body = {
         "artifact_kind": OPERATION_KIND,
@@ -182,6 +191,9 @@ def record_operation(
     }
     if representation is not None:
         identity_body["representation"] = representation
+    if cycle_index:
+        # Only an explicitly authorized additional AUTO cycle is marked; cycle 1 digests are unchanged.
+        identity_body["cycle_index"] = cycle_index
     digest = _sha(identity_body)
     for existing in list_operations(store):
         if existing.get("operation_sha256") == digest:
@@ -197,9 +209,21 @@ def record_operation(
         "schema": "smial.hfic-ordinary-operation",
         "schema_version": "1.0",
     }
+    # The frozen accounting snapshot is stamped only on genuine creation. A
+    # journal that already carries operations or looks pre-dates this runtime
+    # and freezes at the shipped defaults, never at today's raised policy.
+    ensure_run_snapshot(store, journal, has_history=journal_has_history(store, journal))
     _append(store, kind=OPERATION_KIND, body=stored, record_prefix="HFIC-ART-OP")
     stored["record_id"] = f"HFIC-ART-OP-{digest[:40].upper()}"
     return stored
+
+
+def journal_has_history(store: Any, journal_scope: str) -> bool:
+    """True when this journal already spent or reserved something."""
+
+    if any(item.get("journal_scope") == journal_scope for item in list_operations(store)):
+        return True
+    return bool(list_discovery_looks(store, journal_scope))
 
 
 def _append(
@@ -238,7 +262,18 @@ def _append(
         producer_git_sha="0" * 40,
         created_at=now,
     )
-    store.append([event], transaction_id=event.transaction_id, before_commit=before_commit)
+    from solana_alpha_lab.factory.research_store import ResearchStoreError
+
+    # Writer-lease contention is transient: retry a bounded number of times and
+    # let the real compare-before-append rule decide (never a silent skip).
+    for attempt in range(40):
+        try:
+            store.append([event], transaction_id=event.transaction_id, before_commit=before_commit)
+            return
+        except ResearchStoreError as exc:
+            if getattr(exc, "code", str(exc)) != "WRITER_BUSY" or attempt >= 39:
+                raise
+            time.sleep(0.05)
 
 
 def _append_transition(store: Any, updated: Mapping[str, Any], *, based_on_record_id: str) -> None:
@@ -501,27 +536,34 @@ def _assert_preflight_journal(
             str(representation.get("representation_payload_sha256") or ""),
             str(representation.get("scope_applied_sha256") or ""),
         )
+    if isinstance(operation.get("cycle_index"), int):
+        from solana_alpha_lab.factory.hfic_memory_policy import cycle_search_key
+
+        expected = cycle_search_key(expected, int(operation["cycle_index"]))
     if journal_scope != expected:
         raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_NOT_CANONICAL")
 
 
-def _protocol_remaining(
+def _occupancy(
     store: Any,
     looks: Sequence[Mapping[str, Any]],
     kind: str,
     *,
     journal: str,
-) -> int:
-    limits = limits_for_frozen_run(store, journal)
+) -> dict[str, int]:
+    """One arithmetic for every surface: occupied = completed + outstanding reservations."""
+
+    limits = limits_or_defaults(store, journal)
     if kind == "preview":
+        previews = _feature_previews(store, journal)
         used = {
             str(item.get("preview_sha256") or "")
-            for item in _feature_previews(store, journal)
+            for item in previews
             if item.get("preview_sha256")
         }
         landed_specs = {
             str(item.get("spec_sha256") or "")
-            for item in _feature_previews(store, journal)
+            for item in previews
             if item.get("spec_sha256")
         }
         pending = {
@@ -531,23 +573,70 @@ def _protocol_remaining(
             and item.get("look_class") == "PREVIEW"
             and str(item.get("spec_sha256") or "") not in landed_specs
         }
-        return max(0, limits["preview_total"] - len(used) - len(pending))
-    completed = {
-        str(item.get("spec_sha256") or "")
-        for item in looks
-        if item.get("look_class") == ("ADAPTIVE" if kind == "adaptive" else "MAIN")
-        and item.get("new_look") is True
-        and isinstance(item.get("result"), Mapping)
+        completed_n, pending_n, limit = len(used), len(pending), limits["preview_total"]
+    else:
+        look_class = "ADAPTIVE" if kind == "adaptive" else "MAIN"
+        completed = {
+            str(item.get("spec_sha256") or "")
+            for item in looks
+            if item.get("look_class") == look_class
+            and item.get("new_look") is True
+            and isinstance(item.get("result"), Mapping)
+        }
+        in_flight = {
+            str(item.get("spec_sha256") or "")
+            for item in _iter_kind(store, RESERVATION_KIND)
+            if item.get("journal_scope") == journal
+            and item.get("look_class") == look_class
+            and str(item.get("spec_sha256") or "") not in completed
+        }
+        completed_n, pending_n = len(completed), len(in_flight)
+        limit = limits["adaptive_total"] if kind == "adaptive" else limits["main_total"]
+    occupied = completed_n + pending_n
+    return {
+        "limit": limit,
+        "completed": completed_n,
+        "pending": pending_n,
+        "occupied": occupied,
+        "remaining": max(0, limit - occupied),
+        "deficit": max(0, occupied - limit),
     }
-    in_flight = {
-        str(item.get("spec_sha256") or "")
-        for item in _iter_kind(store, RESERVATION_KIND)
-        if item.get("journal_scope") == journal
-        and item.get("look_class") == ("ADAPTIVE" if kind == "adaptive" else "MAIN")
-        and str(item.get("spec_sha256") or "") not in completed
-    }
-    limit = limits["adaptive_total"] if kind == "adaptive" else limits["main_total"]
-    return max(0, limit - len(completed) - len(in_flight))
+
+
+def journal_occupancy(store: Any, journal: str) -> dict[str, dict[str, int]]:
+    """Owner readout: limit, completed, pending, remaining and deficit per budget kind."""
+
+    looks = _looks(store, journal)
+    return {kind: _occupancy(store, looks, kind, journal=journal) for kind in ("main", "adaptive", "preview")}
+
+
+def _protocol_remaining(
+    store: Any,
+    looks: Sequence[Mapping[str, Any]],
+    kind: str,
+    *,
+    journal: str,
+) -> int:
+    return _occupancy(store, looks, kind, journal=journal)["remaining"]
+
+
+def extension_parent(store: Any, operation_sha256: str) -> dict[str, Any]:
+    """The exact operation a scope extension may continue, or a typed refusal.
+
+    A stopped run is never reopened by an extension, a completed run is not
+    continued by it, and an unresolved reservation must be resumed first so a
+    larger ceiling can never be used to abandon and replace pending work.
+    """
+
+    operation = get_operation(store, operation_sha256)
+    if operation.get("status") == STATUS_STOPPED:
+        raise OrdinaryOperationError("ORDINARY_OPERATION_STOPPED")
+    lifecycle = operation_lifecycle(store, operation)
+    if lifecycle.get("effective_state") == STATE_COMPLETED:
+        raise OrdinaryOperationError("EXTENSION_PARENT_COMPLETED")
+    if _unresolved_reservations(store, operation):
+        raise OrdinaryOperationError("EXTENSION_PARENT_HAS_PENDING_RESERVATION")
+    return operation
 
 
 def _reservations(store: Any, operation_sha256: str) -> list[dict[str, Any]]:
@@ -618,7 +707,9 @@ def _admit(store: Any, operation: Mapping[str, Any], *, repo_root: Any = None, d
     from solana_alpha_lab.factory.hfic_session import list_hfic_sessions
 
     sessions = list_hfic_sessions(store)
-    limits = limits_for_frozen_run(store, str(operation.get("journal_scope") or ""))
+    # AUTO and distinct-focus are a pool shared by the whole market epoch, so
+    # their cap comes from the epoch's own frozen scope, never from one journal.
+    pool = epoch_limits(store, str(operation.get("market_evidence_epoch_sha256") or ""))
     market_basis = None
     if repo_root is not None and data_root is not None:
         from pathlib import Path
@@ -641,13 +732,16 @@ def _admit(store: Any, operation: Mapping[str, Any], *, repo_root: Any = None, d
             (operation.get("representation") or {}).get("representation_semantic_version") or "HFIC-V1.2"
         ),
         owner_focus=str(operation.get("owner_focus") or ""),
-        auto_sessions_per_market=limits["auto_cycles_per_market"],
-        max_distinct_focuses=limits["distinct_focuses_per_market"],
+        requested_cycle_index=int(operation.get("cycle_index") or 1),
+        auto_sessions_per_market=pool["auto_cycles_per_market"],
+        max_distinct_focuses=pool["distinct_focuses_per_market"],
         repair_continuations=list_repair_continuation_dispositions(store),
     )
 
 
-def _search_terminal_conflict(operation: Mapping[str, Any], looks: Sequence[Mapping[str, Any]], spec: Mapping[str, Any]) -> None:
+def _search_terminal_conflict(
+    operation: Mapping[str, Any], looks: Sequence[Mapping[str, Any]], spec: Mapping[str, Any], *, main_total: int
+) -> None:
     if operation.get("requested_completion") != SCIENTIFIC_TERMINAL:
         return
     from solana_alpha_lab.factory.hfic_temporal_discovery import (
@@ -656,7 +750,7 @@ def _search_terminal_conflict(operation: Mapping[str, Any], looks: Sequence[Mapp
     )
 
     validated = validate_temporal_query(spec)
-    progress = assess_tier_progress(looks, freeze_worthy=False, compound_applicable=True)
+    progress = assess_tier_progress(looks, freeze_worthy=False, compound_applicable=True, main_total=main_total)
     explicit_main = (operation.get("owner_cap") or {}).get("main")
     if (
         validated.get("search_tier") == "SIMPLE_SCREEN"
@@ -812,6 +906,116 @@ def require_focus_population(owner_focus: object, spec: Mapping[str, Any]) -> No
         raise OrdinaryOperationError("FOCUS_POPULATION_MISMATCH")
 
 
+EPISODE_VIEW_SCHEMA = "smial.episode-normalized-view-request"
+
+
+def episode_view_descriptor_sha256(
+    *,
+    representation_id: str,
+    representation_semantic_version: str,
+    prefix_points: Sequence[str],
+    scope_rule_sha256: str,
+    scope_applied_sha256: str,
+    parent_session_id: str,
+    parent_search_key: str,
+) -> str:
+    """Identity of a prefix-view request, known before any value exists.
+
+    A policy number, a preset display name or the form of the result never
+    enters it; a changed scope rule, applied evidence or representation does.
+    """
+
+    return _sha(
+        {
+            "schema": EPISODE_VIEW_SCHEMA,
+            "representation_id": representation_id,
+            "representation_semantic_version": representation_semantic_version,
+            "prefix_points": list(prefix_points),
+            "scope_rule_sha256": scope_rule_sha256,
+            "scope_applied_sha256": scope_applied_sha256,
+            "parent_session_id": parent_session_id,
+            "parent_search_key": parent_search_key,
+        }
+    )
+
+
+def authorize_episode_view(
+    store: Any,
+    *,
+    operation_sha256: str,
+    journal_scope: str,
+    descriptor_sha256: str,
+    verified_market: str | None,
+    repo_root: Any = None,
+    data_root: Any = None,
+) -> dict[str, Any]:
+    """PREVIEW gate of a value-bearing prefix view. Runs before any value is read.
+
+    The reservation is the request descriptor, so a result that does not exist
+    yet is never needed to decide. The same descriptor again is a repeat: no
+    new spend. Metadata-only scope counts and policy previews never come here.
+    """
+
+    operation = get_operation(store, operation_sha256)
+    if str(operation.get("journal_scope") or "") != journal_scope:
+        raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_MISMATCH")
+    if not isinstance(verified_market, str) or len(verified_market) != 64:
+        raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_UNVERIFIED")
+    if verified_market != operation.get("market_evidence_epoch_sha256"):
+        raise OrdinaryOperationError("ORDINARY_OPERATION_MARKET_MISMATCH")
+    if repo_root is not None and data_root is not None:
+        _assert_preflight_journal(store, operation, journal_scope, repo_root=repo_root, data_root=data_root)
+    known = {
+        str(item.get("spec_sha256") or "")
+        for item in _iter_kind(store, RESERVATION_KIND)
+        if item.get("journal_scope") == journal_scope and item.get("look_class") == "PREVIEW"
+    } | {str(item.get("spec_sha256") or "") for item in _feature_previews(store, journal_scope)}
+    if descriptor_sha256 in known:
+        # Exactly the same question is not a new exposure. It is a rebuild of a disclosed view.
+        return {
+            "disposition": "REPEAT",
+            "values_loaded": False,
+            "writes": False,
+            "operation": operation,
+            "descriptor_sha256": descriptor_sha256,
+        }
+    _refuse_closed(store, operation)
+    if owner_allowance(store, operation, "preview") < 1:
+        raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
+    _reserve(store, operation, spec_sha256=descriptor_sha256, look_class="preview")
+    return {
+        "disposition": "EXECUTE",
+        "values_loaded": False,
+        "writes": True,
+        "operation": operation,
+        "descriptor_sha256": descriptor_sha256,
+    }
+
+
+def land_episode_view(
+    store: Any,
+    *,
+    operation_sha256: str,
+    journal_scope: str,
+    descriptor_sha256: str,
+    payload_sha256: str,
+    git_sha: str,
+) -> None:
+    """Bind the computed payload hash to the reservation made from its request descriptor."""
+
+    from solana_alpha_lab.factory.hfic_temporal_discovery import persist_feature_preview
+
+    persist_feature_preview(
+        store,
+        journal_scope=journal_scope,
+        preview={"preview_sha256": payload_sha256},
+        git_sha=git_sha,
+        input_sha256=descriptor_sha256,
+        operation_sha256=operation_sha256,
+        spec_sha256=descriptor_sha256,
+    )
+
+
 def gate_before_values(
     store: Any,
     *,
@@ -866,7 +1070,9 @@ def gate_before_values(
     if fingerprint and stamped and fingerprint != stamped:
         raise OrdinaryOperationError("ORDINARY_OPERATION_BINDING_MISMATCH")
     looks = _looks(store, journal_scope)
-    _search_terminal_conflict(operation, looks, spec)
+    _search_terminal_conflict(
+        operation, looks, spec, main_total=limits_or_defaults(store, journal_scope)["main_total"]
+    )
     from solana_alpha_lab.factory.hfic_session import list_hfic_sessions
 
     admission = _admit(store, operation, repo_root=repo_root, data_root=data_root)
@@ -1053,7 +1259,7 @@ def gate_before_values(
             classify_spec = dict(spec)
             classify_spec["adaptation_of"] = validated["spec_sha256"]
         classified = classify_temporal_look(
-            classify_looks, classify_spec, limits=limits_for_frozen_run(store, journal_scope)
+            classify_looks, classify_spec, limits=limits_or_defaults(store, journal_scope)
         )
     except Exception as exc:
         code = getattr(exc, "code", None) or "QUERY_SPEC_INVALID"
@@ -1065,6 +1271,12 @@ def gate_before_values(
     if look_class not in {"MAIN", "ADAPTIVE"}:
         look_class = "ADAPTIVE" if validated.get("adaptation_of") else "MAIN"
     kind = "adaptive" if look_class == "ADAPTIVE" else "main"
+    # A lowered slice ceiling refuses a NEW look before any value is read; a saved
+    # result above replays regardless of what the policy says today.
+    planned_slices = len(validated.get("scientific_body", {}).get("diagnostic_slices") or [])
+    slice_ceiling = limits_or_defaults(store, journal_scope)["max_diagnostic_slices"]
+    if planned_slices > slice_ceiling:
+        raise OrdinaryOperationError("DIAGNOSTIC_SLICES_EXCEED_POLICY")
     if owner_allowance(store, operation, kind) < 1:
         raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
     if fingerprint and not stamped:
@@ -1654,7 +1866,12 @@ def project_ordinary_operation(
     looks = _looks(store, journal)
     from solana_alpha_lab.factory.hfic_temporal_discovery import assess_tier_progress, validate_temporal_query
 
-    progress = assess_tier_progress(looks, freeze_worthy=False, compound_applicable=True)
+    progress = assess_tier_progress(
+        looks,
+        freeze_worthy=False,
+        compound_applicable=True,
+        main_total=limits_or_defaults(store, journal)["main_total"],
+    )
     spec = json.loads(str(current.get("spec_canonical") or "{}"))
     validated = validate_temporal_query(spec) if spec else {}
     decision = str((validated.get("scientific_body") or {}).get("decision_point") or "")

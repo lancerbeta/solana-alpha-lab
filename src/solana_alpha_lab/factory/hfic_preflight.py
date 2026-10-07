@@ -591,6 +591,8 @@ def decide_preflight_action(
     market_evidence_basis: Mapping[str, Any] | None = None,
     auto_sessions_per_market: int = AUTO_SESSIONS_PER_EPOCH,
     max_distinct_focuses: int = MAX_DISTINCT_FOCUSES_PER_EPOCH,
+    additional_cycle: bool = False,
+    admission_sink: dict[str, Any] | None = None,
 ) -> tuple[str, str | None]:
     from solana_alpha_lab.factory.hfic_control_integrity import (
         session_evidence_surface_mode,
@@ -630,7 +632,10 @@ def decide_preflight_action(
             max_distinct_focuses=max_distinct_focuses,
             repair_continuations=repair_continuations,
             market_evidence_basis=market_evidence_basis,
+            additional_cycle=additional_cycle,
         )
+        if admission_sink is not None:
+            admission_sink.update(admission)
         if admission.get("action") == "STOP":
             if (
                 admission.get("reason_code") == "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING"
@@ -757,13 +762,9 @@ def decide_preflight_action(
         sessions_for_market_budget(sessions, market_evidence_epoch=evidence_epoch, market_evidence_basis=market_evidence_basis)
     )
     if _is_auto_focus(owner_focus):
-        distinct_auto_search_keys = {
-            str(item.get("search_key_sha256") or "")
-            for item in same_epoch_for_budget
-            if _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
-            and item.get("search_key_sha256")
-        }
-        auto_count = len(distinct_auto_search_keys)
+        from solana_alpha_lab.factory.hfic_evidence_identity import _auto_cycles
+
+        auto_count = len(_auto_cycles(same_epoch_for_budget))
         if auto_count >= auto_sessions_per_market:
             return ("STOP", "SEARCH_BUDGET_EXHAUSTED")
         return ("START_NEW_SESSION", None)
@@ -819,17 +820,11 @@ def epoch_search_budget_usage(
             seen_slots.add(identity)
         deduped_epoch.append(item)
     same_epoch = deduped_epoch
-    # AUTO=1 is a market-scoped search admission; child representation rows
-    # (same search_key, a different ladder representation) must not consume
-    # another AUTO budget unit, so this counts distinct search keys, not rows.
-    auto_used = len(
-        {
-            str(item.get("search_key_sha256") or "")
-            for item in same_epoch
-            if _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
-            and item.get("search_key_sha256")
-        }
-    )
+    # AUTO is a market-scoped pool of real logical cycles; a BASE session and its
+    # child representation rows are one cycle, never two.
+    from solana_alpha_lab.factory.hfic_evidence_identity import _auto_cycles
+
+    auto_used = len(_auto_cycles(same_epoch))
     distinct = {
         str(item.get("focus_key_sha256") or "")
         for item in same_epoch
@@ -1862,6 +1857,68 @@ def _packet_active_universe(store: Any) -> dict[str, Any]:
     }
 
 
+def build_research_policy_context(store: Any, *, market_epoch: str, search_key: str) -> dict[str, Any]:
+    """Effective research limits and what is left, for the formulation packet. Metadata only."""
+
+    from solana_alpha_lab.factory.hfic_evidence_identity import _auto_cycles
+    from solana_alpha_lab.factory.hfic_ordinary_operation import journal_has_history, journal_occupancy
+    from solana_alpha_lab.factory.hfic_research_policy import (
+        PRESET_MAX_COUNT,
+        ResearchPolicyError,
+        effective_policy,
+        epoch_scope_key,
+        resolve_scope_limits,
+    )
+    from solana_alpha_lab.factory.hfic_session import list_hfic_sessions
+
+    active = effective_policy(store)
+    journal_state = resolve_scope_limits(store, search_key, has_history=journal_has_history(store, search_key))
+    context: dict[str, Any] = {
+        "schema": "smial.research-policy-context",
+        "schema_version": "1.0",
+        "state": "READY",
+        "source": active["source"],
+        "policy_semantic_sha256": active["semantic_sha256"],
+        "new_run_limits": active["limits"],
+        "this_search": {
+            "frozen": journal_state["frozen"],
+            "limits": journal_state["limits"],
+            "remaining": {kind: row["remaining"] for kind, row in journal_occupancy(store, search_key).items()},
+        },
+        "presets": [
+            {
+                "preset_id": preset_id,
+                "hypothesis_kind": body.get("hypothesis_kind"),
+                "representation_id": body.get("representation_id"),
+            }
+            for preset_id, body in sorted(active["presets"].items())[:PRESET_MAX_COUNT]
+        ],
+        "instruction": (
+            "Nominate at most this_search.limits.max_generated cards. A limit is a ceiling, not a target: "
+            "do not pad weak ideas, and do not spend MAIN on questions formed after seeing results (those are ADAPTIVE)."
+        ),
+        "claim_boundary": "Budget ceilings only; not a scientific result.",
+    }
+    try:
+        pool_key = epoch_scope_key(str(market_epoch))
+    except ResearchPolicyError:
+        return context
+    sessions = list_hfic_sessions(store)
+    epoch_rows = [
+        row
+        for row in sessions
+        if isinstance(row, Mapping) and market_epoch in (row.get("market_evidence_epoch_sha256"), row.get("evidence_epoch_sha256"))
+    ]
+    pool = resolve_scope_limits(store, pool_key, has_history=bool(epoch_rows))
+    context["market_epoch_pool"] = {
+        "frozen": pool["frozen"],
+        "auto_cycles_per_market": pool["limits"]["auto_cycles_per_market"],
+        "auto_cycles_used": len(_auto_cycles(epoch_rows)),
+        "distinct_focuses_per_market": pool["limits"]["distinct_focuses_per_market"],
+    }
+    return context
+
+
 def build_forge_context_packet(
     repo_root: Path,
     data_root: Path,
@@ -2311,6 +2368,20 @@ def build_forge_context_packet(
                     "state": "UNAVAILABLE",
                     "reason_code": getattr(exc, "code", "LIST_EVIDENCE_UNREADABLE"),
                 }
+            from solana_alpha_lab.factory.hfic_research_policy import ResearchPolicyError
+
+            if store is not None:
+                try:
+                    packet["research_policy_context"] = build_research_policy_context(
+                        store, market_epoch=evidence_epoch, search_key=search_key
+                    )
+                except ResearchPolicyError as exc:
+                    # Present-invalid policy state is a typed blocker, never a silent default.
+                    packet["research_policy_context"] = {
+                        "schema": "smial.research-policy-context",
+                        "state": "UNAVAILABLE",
+                        "reason_code": exc.code,
+                    }
     from solana_alpha_lab.factory.hfic_vision_integrity import (
         FORGE_VISION_INTEGRITY_BLOCKED,
         compact_feature_grounding_entries,
@@ -2775,6 +2846,7 @@ def run_preflight(
     evidence_surface_mode: str | None = None,
     model_provenance_sha256: str | None = None,
     persist: bool = True,
+    additional_cycle: bool = False,
 ) -> dict[str, Any]:
     from solana_alpha_lab.factory.forge_input_receipt import (
         build_forge_input_receipt,
@@ -3061,11 +3133,26 @@ def run_preflight(
     )
     generated_draft = None
     if isinstance(market_epoch, str) and len(market_epoch) == 64:
+        draft_cycle = 1
+        if additional_cycle and focus.strip().casefold() == AUTO_FOCUS.casefold():
+            from solana_alpha_lab.factory.hfic_evidence_identity import _auto_cycles
+
+            # An explicit additional cycle resumes the latest cycle's own pre-freeze draft.
+            known_cycles = _auto_cycles(
+                [
+                    item
+                    for item in [*sessions, *reservations]
+                    if isinstance(item, Mapping)
+                    and market_epoch in (item.get("market_evidence_epoch_sha256"), item.get("evidence_epoch_sha256"))
+                ]
+            )
+            draft_cycle = max(known_cycles) if known_cycles else 1
         draft_slot = scientific_slot_sha256(
             market_evidence_epoch_sha256=market_epoch,
             representation_id="BASE",
             representation_semantic_version="HFIC-V1.2",
             owner_focus=focus,
+            cycle_index=draft_cycle,
         )
         generated_draft = find_generated_draft(
             store,
@@ -3080,9 +3167,44 @@ def run_preflight(
         execution_context["capability_epoch_sha256"] = capability_epoch
     if model_provenance_sha256 is not None:
         execution_context["model_provenance_sha256"] = model_provenance_sha256
-    from solana_alpha_lab.factory.hfic_research_policy import ensure_run_snapshot
+    from solana_alpha_lab.factory.hfic_research_policy import (
+        DEFAULT_LIMITS,
+        ResearchPolicyError,
+        ensure_scope_snapshot,
+        epoch_scope_key,
+        limits_for_frozen_run,
+        read_scope_snapshot,
+        resolve_scope_limits,
+    )
 
-    _preflight_limits = ensure_run_snapshot(store, search_key)["limits"]
+    # AUTO and distinct-focus are a pool shared by the whole market epoch, so
+    # their cap is frozen per epoch (never per journal) and only a persisting
+    # preflight writes that freeze; a read-only preflight reports what it would freeze.
+    pool_epoch = (
+        market_epoch
+        if isinstance(market_epoch, str) and len(market_epoch) == 64
+        else epoch
+    )
+    epoch_has_history = any(
+        isinstance(item, Mapping)
+        and pool_epoch in (item.get("market_evidence_epoch_sha256"), item.get("evidence_epoch_sha256"))
+        for item in [*sessions, *reservations]
+    )
+    try:
+        pool_scope = epoch_scope_key(str(pool_epoch))
+    except ResearchPolicyError:
+        pool_scope = None
+    if pool_scope is None:
+        _preflight_limits = dict(DEFAULT_LIMITS)
+    elif persist:
+        pool_frozen_now = read_scope_snapshot(store, pool_scope) is None
+        ensure_scope_snapshot(store, pool_scope, has_history=epoch_has_history)
+        # Effective pool = the frozen scope plus its own explicit extensions.
+        _preflight_limits = limits_for_frozen_run(store, pool_scope)
+        pre_context_store_writes += int(pool_frozen_now)
+    else:
+        _preflight_limits = resolve_scope_limits(store, pool_scope, has_history=epoch_has_history)["limits"]
+    admission_sink: dict[str, Any] = {}
     action, bound_session = decide_preflight_action(
         sessions,
         search_key=search_key,
@@ -3102,7 +3224,27 @@ def run_preflight(
         market_evidence_basis=forge_input.get("market_evidence_basis") if market_admission_ready else None,
         auto_sessions_per_market=_preflight_limits["auto_cycles_per_market"],
         max_distinct_focuses=_preflight_limits["distinct_focuses_per_market"],
+        additional_cycle=additional_cycle,
+        admission_sink=admission_sink,
     )
+    cycle_index = 1
+    if action == "START_NEW_SESSION":
+        cycle_index = int(admission_sink.get("cycle_index") or 1)
+    elif bound_session and additional_cycle:
+        resumed = next(
+            (
+                item
+                for item in [*sessions, *reservations]
+                if isinstance(item, Mapping) and str(item.get("session_id") or "") == bound_session
+            ),
+            None,
+        )
+        if isinstance(resumed, Mapping) and isinstance(resumed.get("cycle_index"), int):
+            cycle_index = max(1, int(resumed["cycle_index"]))
+    if cycle_index > 1:
+        from solana_alpha_lab.factory.hfic_memory_policy import cycle_search_key
+
+        search_key = cycle_search_key(search_key, cycle_index)
     if (
         not market_admission_ready
         and not has_current_surface
@@ -3348,6 +3490,8 @@ def run_preflight(
         receipt_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
     if model_provenance_sha256 is not None:
         receipt_body["model_provenance_sha256"] = model_provenance_sha256
+    if cycle_index > 1:
+        receipt_body["cycle_index"] = cycle_index
     if action == "STOP" and bound_session == "SEARCH_BUDGET_EXHAUSTED":
         receipt_body["terminal"] = "SEARCH_BUDGET_EXHAUSTED"
         receipt_body["session_id"] = None

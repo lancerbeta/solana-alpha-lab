@@ -114,6 +114,18 @@ def search_identity_sha256(
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def cycle_search_key(search_key: str, cycle_index: int = 1) -> str:
+    """Search identity of an explicitly authorized additional cycle of the same slot.
+
+    Cycle 1 (and anything not above 1) is the unchanged base key, so every
+    existing identity, journal and hash is byte-identical.
+    """
+
+    if isinstance(cycle_index, bool) or not isinstance(cycle_index, int) or cycle_index <= 1:
+        return search_key
+    return hashlib.sha256(f"{search_key}:CYCLE:{cycle_index}".encode("utf-8")).hexdigest()
+
+
 def session_memory_eligibility(item: Mapping[str, Any] | None) -> str:
     if not isinstance(item, Mapping):
         return GENESIS_MEMORY_ELIGIBILITY_SHA256

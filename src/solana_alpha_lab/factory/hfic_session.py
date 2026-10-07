@@ -74,13 +74,13 @@ MAX_CANDIDATES = 6
 
 
 def _max_candidates_for(store: Any, journal_scope: object) -> int:
-    """The shipped ceiling, or a journal's own frozen raise. Never below shipped."""
+    """The journal's frozen candidate ceiling; the shipped 6 for a journal never frozen."""
 
-    if store is None or not isinstance(journal_scope, str) or len(journal_scope) != 64:
-        return MAX_CANDIDATES
-    from solana_alpha_lab.factory.hfic_research_policy import limits_for_frozen_run
+    from solana_alpha_lab.factory.hfic_research_policy import limits_or_defaults
 
-    return int(limits_for_frozen_run(store, journal_scope)["max_generated"])
+    return int(limits_or_defaults(store, journal_scope)["max_generated"])
+
+
 PHASE_RANK = {
     "SYNTHESIS_COMPLETE": 0,
     "LEGACY_PARTIAL": 0,
@@ -441,6 +441,20 @@ def _execution_identity_fields(
     stored_binding, binding_unknown = _consistent_hash_state(
         expanded, "execution_binding_sha256"
     )
+    cycles = {
+        source.get("cycle_index")
+        for source in expanded
+        if isinstance(source, Mapping)
+        and isinstance(source.get("cycle_index"), int)
+        and not isinstance(source.get("cycle_index"), bool)
+        and source.get("cycle_index") > 1
+    }
+    if len(cycles) > 1:
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+    cycle_index = next(iter(cycles)) if cycles else 1
+    if cycle_index > 1:
+        # Only an explicitly authorized additional cycle carries an index; cycle 1 is unmarked.
+        fields["cycle_index"] = cycle_index
     if market and semantic_version:
         from solana_alpha_lab.factory.hfic_evidence_identity import (
             execution_binding_sha256,
@@ -452,6 +466,7 @@ def _execution_identity_fields(
             representation_id=representation,
             representation_semantic_version=semantic_version,
             owner_focus=owner_focus,
+            cycle_index=cycle_index,
         )
         fields["scientific_slot_sha256"] = slot
         # A binding digest is provenance for an actual execution context.  A
@@ -2462,10 +2477,13 @@ def _assert_temporal_search_closed(draft: Mapping[str, Any], store: Any) -> None
     journal = str(evidence.get("journal_scope") or "")
     decision = str(evidence.get("tier_decision") or "")
     try:
+        from solana_alpha_lab.factory.hfic_research_policy import limits_or_defaults
+
         progress = assess_tier_progress(
             list_discovery_looks(store, journal),
             freeze_worthy=decision == "WORTHY_SIMPLE",
             compound_applicable=decision != "COMPOUND_INAPPLICABLE",
+            main_total=int(limits_or_defaults(store, journal)["main_total"]),
         )
         assert_search_exhaustion_claim(progress, claim_search_exhausted=True)
     except GroundedDiscoveryError as exc:
@@ -3519,6 +3537,7 @@ def _build_scientific_slot_admission_event(
         "model_provenance_sha256": fields.get("model_provenance_sha256"),
         "execution_binding_sha256": fields.get("execution_binding_sha256"),
         "admission_state": "RESERVED",
+        **({"cycle_index": fields["cycle_index"]} if fields.get("cycle_index") else {}),
     }
     canonical = _canonical_bytes(body)
     digest = hashlib.sha256(canonical).hexdigest()
@@ -3739,6 +3758,10 @@ def _assert_scientific_admission(
             if isinstance(active_set, Mapping)
             else None
         )
+    from solana_alpha_lab.factory.hfic_research_policy import epoch_limits
+
+    # The AUTO/focus pool is the market epoch's own frozen scope, never a journal's.
+    pool = epoch_limits(store, market)
     admission = resolve_scientific_admission(
         list_hfic_sessions(store),
         reservations=list_scientific_slot_admissions(store),
@@ -3774,6 +3797,9 @@ def _assert_scientific_admission(
             if isinstance(fields.get(key) or binding.get(key), str)
         },
         repair_continuations=list_repair_continuation_dispositions(store),
+        auto_sessions_per_market=pool["auto_cycles_per_market"],
+        max_distinct_focuses=pool["distinct_focuses_per_market"],
+        requested_cycle_index=int(fields.get("cycle_index") or 1),
     )
     action = str(admission.get("action") or "")
     if action == "STOP" and str(admission.get("reason_code") or "") == (
@@ -3935,6 +3961,7 @@ def persist_scientific_slot_admission(
         "model_provenance_sha256": fields.get("model_provenance_sha256"),
         "execution_binding_sha256": fields.get("execution_binding_sha256"),
         "admission_state": "RESERVED",
+        **({"cycle_index": fields["cycle_index"]} if fields.get("cycle_index") else {}),
     }
     canonical = _canonical_bytes(body)
     digest = hashlib.sha256(canonical).hexdigest()
@@ -5601,6 +5628,7 @@ def _lookup_existing_freeze_session(
         control_session_id=_preflight_ladder_slot(preflight_receipt)[1],
         representation_semantic_version=identity.get("representation_semantic_version"),
         scientific_slot_sha256=identity.get("scientific_slot_sha256"),
+        cycle_index=int(identity.get("cycle_index") or 1),
     )
     existing = find_session_by_epoch_focus(
         store,
@@ -5905,6 +5933,7 @@ def find_session_by_epoch_focus(
     execution_context: Mapping[str, Any] | None = None,
     ignore_memory_eligibility: bool = False,
     ignore_evidence_surface_mode: bool = False,
+    cycle_index: int = 1,
 ) -> dict[str, Any] | None:
     from solana_alpha_lab.factory.hfic_control_integrity import (
         session_evidence_surface_mode,
@@ -5987,8 +6016,10 @@ def find_session_by_epoch_focus(
         ):
             # Split-era BASE rows may predate the explicit slot stamp. They
             # remain a known occupied market look and must not be duplicated.
+            # An explicitly authorized additional cycle never inherits an unstamped cycle-1 row.
             if not (
                 wanted_rep == "BASE"
+                and cycle_index <= 1
                 and not bundle.get("scientific_slot_sha256")
                 and item.get("market_evidence_epoch_sha256") == epoch
             ):
