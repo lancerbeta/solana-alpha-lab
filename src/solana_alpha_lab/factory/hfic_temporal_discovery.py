@@ -2590,6 +2590,7 @@ def assess_tier_progress(
         "evidence_revision_required": revision_required,
         "search_exhausted_allowed": exhausted_allowed,
         "freeze_worthy": freeze_worthy,
+        "freeze_worthy_semantics": "CALLER_ROUTING_HINT_NOT_SCIENTIFIC_VERDICT",
     }
 
 

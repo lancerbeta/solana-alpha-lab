@@ -56,8 +56,9 @@ _REL_RE = re.compile(
 
 
 class GroundedDiscoveryError(ValueError):
-    def __init__(self, code: str) -> None:
+    def __init__(self, code: str, detail: Mapping[str, Any] | None = None) -> None:
         self.code = code
+        self.detail = dict(detail or {})
         super().__init__(code)
 
 
@@ -1284,6 +1285,47 @@ def card_claim_scope(card: Mapping[str, Any] | None) -> dict[str, str]:
         if value:
             kept[key] = value
     return kept
+
+
+def validate_fresh_card_scope(
+    card: Mapping[str, Any],
+    *,
+    look_scope: Mapping[str, Any] | None = None,
+    require_look_axes: bool = False,
+) -> dict[str, str]:
+    """Check declared fresh transport, never infer intent or repair saved bytes."""
+
+    nested = card.get("candidate_scope")
+    declared_keys = _LOOK_CLAIM_AXES + ("research_scope_statement", "evidence_surface_mode")
+    if "candidate_scope" in card:
+        if not isinstance(nested, Mapping) or any(
+            key in nested and not _axis_text(nested[key]) for key in declared_keys
+        ):
+            raise GroundedDiscoveryError("CANDIDATE_SCOPE_INVALID")
+        conflicts = [
+            key for key in declared_keys
+            if key in nested and key in card and _axis_text(nested[key]) != _axis_text(card[key])
+        ]
+        if conflicts:
+            raise GroundedDiscoveryError("CANDIDATE_SCOPE_FIELDS_CONFLICT", {"conflicting_fields": conflicts})
+    if any(key in card and not _axis_text(card[key]) for key in _LOOK_CLAIM_AXES):
+        raise GroundedDiscoveryError("CANDIDATE_SCOPE_INVALID")
+    required = list(_CONTENT_AXES) if require_look_axes or bool(nested) else []
+    look = look_scope if isinstance(look_scope, Mapping) else {}
+    for key in ("representation_scope", "research_scope_rule_sha256"):
+        if (require_look_axes and _axis_text(look.get(key))) or (isinstance(nested, Mapping) and key in nested):
+            required.append(key)
+    if "research_scope_rule_sha256" in required or card.get("research_scope_rule_sha256") is not None:
+        required.append("research_scope_statement")
+    missing = [key for key in required if not _axis_text(card.get(key))]
+    if missing:
+        raise GroundedDiscoveryError("CANDIDATE_SCOPE_FIELDS_REQUIRED", {
+            "missing_top_level": missing,
+            "nested_scope_present": "candidate_scope" in card,
+            "scientific_result_created": False,
+            "next_action": "CORRECT_DECLARED_FIELD_PLACEMENT_REUSE_SAVED_LOOK",
+        })
+    return card_claim_scope(card)
 
 
 def _scope_missing(scope: Mapping[str, Any], *, prefix: str) -> list[str]:

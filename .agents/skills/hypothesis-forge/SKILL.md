@@ -17,6 +17,18 @@ and read-only `diagnostics --last N` (1..20).
 
 ## Ordinary operation
 
+Fresh grounded handoff contract:
+`docs/contracts/forge_grounded_handoff_closure_v1.md`; working flat card:
+`tests/fixtures/forge_grounded_handoff_closure_v1/flat_card.json`.
+Declare `target` and `explanatory_condition` at top level with population,
+decision_timestamp and estimand; also declare bound representation/list axes.
+Use `proposed_method`, not an unparsed prose synonym. On a typed scope refusal,
+correct only already-authored field placement before persist and reuse the
+saved look. Do not infer intent or open another look. Persistent preflight
+must supply the durable context dependency; no-auto remains read-only.
+In emitted tier progress, `freeze_worthy` is a caller routing hint, not a
+scientific verdict: false alone is not KILL, READY_TO_FREEZE alone is not PASS.
+
 A short owner request is an `ORDINARY_OPERATION_V1` row in the ResearchStore,
 not a new journal and not a repair continuation. Read state with ordinary
 `forge-run --no-write` for that focus. `PAUSED_CAP` means the question was

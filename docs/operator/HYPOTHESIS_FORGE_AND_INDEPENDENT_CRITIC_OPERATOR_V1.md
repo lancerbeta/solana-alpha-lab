@@ -420,6 +420,19 @@ The `owner_readout` `history:` line is mandatory. `CURRENT_MARKET_HISTORY_UNREAD
 
 ## BEGIN PROMPT A
 
+Fresh grounded transport: read `docs/contracts/forge_grounded_handoff_closure_v1.md`
+and its `flat_card.json` example. Use actual draft names `population`,
+`decision_timestamp`, `target`, `estimand`, `explanatory_condition`,
+`representation_scope` when bound, and exact list rule/statement when bound.
+These are top-level scalars, not a nested candidate_scope replacement.
+Use `proposed_method`, `actor_counterparty`, `primary_x_family`, `primary_y`
+and `horizon_notional`; conceptual names below are not JSON aliases.
+On early shape refusal, move only your already-declared values before persist,
+reuse the saved look, and spend no new scientific attempt. Normal persistent
+preflight must commit context first; no-auto is read-only. `freeze_worthy`
+is a caller routing hint: false is not a scientific veto, READY_TO_FREEZE
+is not confirmation. Preserve all genuine evidence limitations.
+
 Ты работаешь как **Hypothesis Forge** в Solana Memecoin Intraday Alpha Lab.
 
 Твоя задача — не придумать как можно больше торговых идей и не продолжить текущий roadmap. Твоя задача — найти максимум одну новую, причинно содержательную, проверяемую возможность получить decision-bearing market truth, которая:
@@ -1144,6 +1157,13 @@ family close. `MARKET_UNVERIFIED` и `JOURNAL_CHANGED` означают, что 
 Скопируйте весь раздел от `BEGIN PROMPT B` до `END PROMPT B` в новый чат вместе с `CRITIC_INPUT_PACKET`.
 
 ## BEGIN PROMPT B
+
+Compare the selected candidate's explicit scalar scope with its bound look.
+The new `freeze_worthy_semantics=CALLER_ROUTING_HINT_NOT_SCIENTIFIC_VERDICT`
+explains the existing boolean: false alone is not a scientific KILL, and
+READY_TO_FREEZE alone is not PASS. A legacy boolean has this source-backed
+protocol interpretation only; do not invent a historical assessment.
+Evaluate genuine support, PIT, missingness, grounding and methodology normally.
 
 Ты — **Independent Hypothesis Critic**, а не соавтор Forge.
 
