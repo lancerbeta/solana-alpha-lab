@@ -23,9 +23,10 @@
     "configs/hfic_representation_ladder_v1.yaml": "165f3b7d48c5e89f54d25211e9f50188a62abb8237fca69478e98d2eafd4e8ce",
     "docs/PROJECT_MAP.md": "489b6e4acce0a587fc80c4db8d3341f33778a5b65a1b873cbc34ef510af36c9c",
     "docs/contracts/forge_list_aware_research_scope_v1.md": "f03ce1a4c50aa2525003ddf9441f61700a8a6e69d248449289bf86416d8ca84f",
+    "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json": "2cca8a172e157d2d33ccfae20a7673f2ba17a757248d3a07724917d69d4b04d5",
     "docs/evidence/forge_list_aware_research_vertical_v1/a1_semantic_premise_packet_v1.json": "8ac9d2d214b4c858350bfc33f7b1e974efab3fb3b3be47630d4a01cb3fba4976",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "408250d653cd9d002084175a530030b125ce82c4814e4932f715940b7c8f17b0",
-    "docs/tasks/FORGE_LIST_AWARE_RESEARCH_VERTICAL_V1.md": "0efdc8d6823d6fb51f4f541bbc25998f842cca76c3c4d52c499d0eadcdad1a52",
+    "docs/tasks/FORGE_LIST_AWARE_RESEARCH_VERTICAL_V1.md": "29000f84bd6194c618de8abb2a7f47588938b97d7dfae017240f7d20386d6c7f",
     "scripts/hypothesis_forge.py": "c0603d180900bd735d61dfad88169d803cefaf8e8b891930086787e38e46792c",
     "src/solana_alpha_lab/factory/forge_input_receipt.py": "f5af311536c1a462ea32bbb2ab9368f4675ce0541116308aec0380237bf57acb",
     "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "4dacb286e3f1abd7eaec75a28f454175b13dbc771fae085316cb0ced03bb4b01",
@@ -56,14 +57,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_list_aware_research_vertical_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "43b324d3f74bc79253d27336a6fec12a67a4eab5bae292be1c6ac2419cd1ee26",
+    "sha256": "9a2a0b88ab09a530a0805430e6265d5b8692909bc0fc74b3ad8fcd0672b7f98e",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_VERTICAL_8_PRODUCTION_SHAPED_CAPTURE_TO_RUNNER_COLD_REPLAY_NEXT_PERIOD;PASS_35_DIRECT_SCOPE_EXECUTOR_PROFILE_GOLDEN;V0_RED_ON_BASE_SCOPE_DROPPED_LIST_ONLY_REFUSED_OVERLAP_UNREAD_NO_EPISODE_NT;BENCHMARK_10K_5_LISTS_SCOPE_OVERHEAD_1_0X_BOUNDED",
     "independent_review": {
       "path": "docs/evidence/forge_list_aware_research_vertical_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "c6682cab655bd65e99651777aa2991533e90b29a3c72dfd3afb32b4f44e06131",
+      "sha256": "ac97abbc138b2560c75d36d45e4a1ebd1936b5b18ab0e8689b451df2feab5119",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
