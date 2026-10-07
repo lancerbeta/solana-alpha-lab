@@ -263,7 +263,7 @@ class ListAwareVerticalTests(unittest.TestCase):
         path.write_text(json.dumps(query), encoding="utf-8")
         return _forge_call("research-scope-resolve", "--spec", str(path), data_root=self.plane)
 
-    def _run(self, tag: str, query: dict[str, Any], *, focus: str) -> dict[str, Any]:
+    def _run(self, tag: str, query: dict[str, Any], *, focus: str, cap: dict[str, int] | None = None) -> dict[str, Any]:
         from solana_alpha_lab.factory import hfic_temporal_discovery as temporal
         from tests.test_hfic_ordinary_operation_acceptance_v1 import _operation
 
@@ -283,7 +283,7 @@ class ListAwareVerticalTests(unittest.TestCase):
             journal=pre["search_key_sha256"],
             market=pre["market_evidence_epoch_sha256"],
             text=f"List-aware vertical {tag}",
-            cap={"main": 1, "adaptive": 0, "preview": 0},
+            cap=cap or {"main": 1, "adaptive": 0, "preview": 0},
             completion="LIMITED_RESULT",
         )
         evidence = _discovery(self.plane, self.work, tag=tag, spec=canonical, scope=scope, operation=operation)
@@ -569,7 +569,8 @@ class ListAwareVerticalTests(unittest.TestCase):
         store = ResearchStore(self.plane)
         proposal = preview_universe_policy(store, min_holders=40, min_liquidity_usd=4000)["proposal"]
         apply_universe_policy(store, repo_root=ROOT, proposal=proposal, confirm_append_only=True)
-        second = self._run("policy-2", draft("LIST_CONTRAST", list_condition=AC), focus="LAV_POLICY")
+        # The re-look is an adaptation: the owner cap must allow one adaptive look (a MAIN would be refused differently).
+        second = self._run("policy-2", draft("LIST_CONTRAST", list_condition=AC), focus="LAV_POLICY", cap={"main": 0, "adaptive": 1, "preview": 0})
         self.assertEqual(second["_exit_code"], 0, second)
         self.assertEqual(second["queries"][0]["look_class"], "ADAPTIVE", second["queries"][0])
         self.assertEqual(second["result"]["research_scope"]["applied_sha256"], first["result"]["research_scope"]["applied_sha256"])

@@ -2369,6 +2369,7 @@ def run_recorded_discovery_query(
                     policy_error.code if policy_error is not None else "UNIVERSE_POLICY_REQUIRED"
                 )
         # A declared covered subset is applied before the gate, so gate, intent and look see the same rows.
+        full_binding = list(binding)  # the operation fingerprint is stamped over the published cohorts
         census, observations, binding = _apply_cohort_selection(spec, census, observations, binding)
         gate_scope_applied = _early_scope_applied_sha256(spec, data_root, census, binding)
         try:
@@ -2378,7 +2379,7 @@ def run_recorded_discovery_query(
                 spec=spec,
                 journal_scope=journal_scope,
                 scope_applied_sha256=gate_scope_applied,
-                binding_cohorts=list(binding),
+                binding_cohorts=full_binding,
                 verified_market=verified_market,
                 correction=correction,
                 repo_root=repo_root,
