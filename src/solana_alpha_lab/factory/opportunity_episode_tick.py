@@ -617,8 +617,13 @@ class _EpisodeTick:
                 # persistence. A slow first response cannot consume their window.
                 allowance = (available - remaining_batches * DISPATCH_LOCAL_MARGIN_SECONDS
                              - (remaining_batches - 1) * self.provider_ctx.pace_seconds) / remaining_batches
-                if allowance <= 0:
+                if available <= 0:
                     raise _DispatchWindowClosed()
+                if allowance <= 0:
+                    # The capacity estimate is not evidence of window closure.
+                    # Fast responses can still fit; keep a bounded opportunity
+                    # and let the live send guard own actual deadline truth.
+                    allowance = available / remaining_batches
                 call_opener = wrap_opener_with_wall_deadline(
                     _WindowGuardedOpener(self.inner_opener, self.provider_ctx.now, not_before, dispatch_deadline),
                     wall_seconds=min(self.call_wall_seconds, allowance),

@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 from urllib.parse import urlsplit, parse_qs
 
-from tests.test_opportunity_episodes_harness_v1 import cli_tick, nominate, synth_mint
+from tests.test_opportunity_episodes_harness_v1 import cli_tick, nominate, synth_mint, SyntheticJupiter
 from solana_alpha_lab.factory.observation_provider_pacing import AdvancingClock
 from solana_alpha_lab.factory.observation_schedule import parse_utc
 from solana_alpha_lab.factory import opportunity_episode_tick as owner
@@ -243,6 +243,90 @@ class DispatchWindowTests(ScenarioCase):
         self.assertEqual(search_calls(result), [])
         self.assertGreaterEqual(result["max_dispatch_checkpoint_gap_seconds"], 60)
         self.assertEqual(sc.slot_states(episode)["E300"], ("CENSORED", "SLOT_NOT_EXECUTED"))
+
+    def test_four_real_admissions_worst_phase_slow_batches_get_four_fair_sends(self):
+        # Four reachable admissions through four ordinary nomination rounds;
+        # no inserted/rewritten slot rows. Different E-points share the grid.
+        sc = self.scenario(observation_overrides={"max_batch_size": 1},
+                           budgets={"provider_calls_per_utc_day_max": 100000,
+                                    "modeled_provider_credits_per_utc_day_max": 100000})
+        for i in range(4):
+            at = S + timedelta(minutes=15*i)
+            mint = synth_mint(f"Four{i}")
+            nominate(sc.market, at, {"toporganicscore": [obj(mint)], "toptraded": [], "toptrending": []})
+            sc.market.series[mint] = steady(mint)
+            sc.tick(at + timedelta(seconds=5))
+        self.assertEqual(len(sc.admissions()), 4)
+        assigned = S + timedelta(minutes=55)
+        entry = assigned + timedelta(seconds=21)
+        clock = EntryCrossingClock(entry, assigned + timedelta(seconds=31))
+        allowance = [15.0]
+        offered = []
+        real_wrap = owner.wrap_opener_with_wall_deadline
+        def physical_waiter(opener, *, wall_seconds, heartbeat=None):
+            if isinstance(opener, owner._WindowGuardedOpener):
+                allowance[0] = wall_seconds
+                offered.append(wall_seconds)
+            return real_wrap(opener, wall_seconds=wall_seconds, heartbeat=heartbeat)
+        # Transport-authored slow responses consume the real allowance passed
+        # by production. First three report TIMEOUT, final one returns HTTP200.
+        sc.market.latency = lambda kind, now: allowance[0] if kind == "search" else 1
+        original_open = SyntheticJupiter.open
+        def physical_response(transport, url):
+            if urlsplit(url).path == "/tokens/v2/search" and len(offered) < 4:
+                transport.market.search_failures[assigned] = "TIMEOUT"
+            else:
+                transport.market.search_failures.pop(assigned, None)
+            return original_open(transport, url)
+        from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+        complete = ObservationScheduleStore.complete_call
+        def bookkeeping(store, **kwargs):
+            result = complete(store, **kwargs)
+            clock.sleep(1)  # full supported local bookkeeping bound
+            return result
+        with patch.object(owner, "wrap_opener_with_wall_deadline", physical_waiter), \
+             patch.object(SyntheticJupiter, "open", physical_response), \
+             patch.object(ObservationScheduleStore, "complete_call", bookkeeping):
+            result = cli_tick(sc.data_root, sc.market, entry, pacing_clock=clock)
+        calls = search_calls(result)
+        self.assertEqual(len(calls), 4, result)
+        starts = [(parse_utc(c["at"])-assigned).total_seconds() for c in calls]
+        self.assertEqual(starts, [31, 39, 47, 55])
+        self.assertTrue(all(0 <= at < 60 for at in starts))
+        self.assertTrue(all(b-a >= 3 for a,b in zip(starts, starts[1:])))
+        self.assertEqual(offered, [4, 4, 4, 4])
+        self.assertEqual([c["status"] for c in calls], ["TIMEOUT"]*3 + [200])
+        self.assertEqual(sc.unpublished(), 0)
+        terminal = sc.query("SELECT state FROM due_observations WHERE due_at=?",
+                            (assigned.isoformat().replace("+00:00", "Z"),))
+        self.assertEqual(sorted(r[0] for r in terminal), ["CENSORED"]*3 + ["OBSERVED"])
+        self.assertEqual(sc.query("SELECT COUNT(*) FROM call_ledger WHERE primitive_id=? AND state='COMPLETED' AND created_at>=?", (owner.SEARCH_PRIMITIVE, assigned.isoformat().replace("+00:00", "Z")))[0][0], 4)
+        self.assertEqual(search_calls(sc.tick(assigned + timedelta(seconds=76))), [])
+
+    def test_conservative_capacity_estimate_never_closes_an_open_fast_batch(self):
+        sc = self.scenario(stops=S + timedelta(hours=4),
+                           observation_overrides={"max_batch_size": 1},
+                           budgets={"provider_calls_per_utc_day_max": 100000,
+                                    "modeled_provider_credits_per_utc_day_max": 100000})
+        for i in range(9):
+            at = S + timedelta(minutes=15*i)
+            mint = synth_mint(f"FastNine{i}")
+            nominate(sc.market, at, {"toporganicscore": [obj(mint)], "toptraded": [], "toptrending": []})
+            sc.market.series[mint] = steady(mint)
+            sc.tick(at + timedelta(seconds=5))
+        self.assertEqual(len(sc.admissions()), 9)
+        assigned = S + timedelta(minutes=130)
+        entry = assigned + timedelta(seconds=21)
+        clock = EntryCrossingClock(entry, assigned + timedelta(seconds=30.999))
+        sc.market.latency = lambda kind, now: 0.1
+        result = cli_tick(sc.data_root, sc.market, entry, pacing_clock=clock)
+        calls = search_calls(result)
+        self.assertEqual(len(calls), 9, result)
+        self.assertTrue(all(assigned <= parse_utc(c["at"]) < assigned + timedelta(seconds=60) for c in calls))
+        states = sc.query("SELECT state FROM due_observations WHERE due_at=?", (assigned.isoformat().replace("+00:00", "Z"),))
+        self.assertEqual([row[0] for row in states], ["OBSERVED"]*9)
+        self.assertEqual(sc.unpublished(), 0)
+        self.assertEqual(search_calls(sc.tick(assigned + timedelta(seconds=80))), [])
 
 
 class SchedulerModelTests(unittest.TestCase):
