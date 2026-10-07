@@ -514,7 +514,7 @@ class ListAwareVerticalTests(unittest.TestCase):
         script.write_text(
             "import json, socket, sys\n"
             "def _blocked(*a, **k):\n    raise OSError('NETWORK_BLOCKED')\n"
-            "socket.socket = _blocked\nsocket.create_connection = _blocked\n"
+            "socket.socket.connect = _blocked\nsocket.socket.connect_ex = _blocked\nsocket.create_connection = _blocked\n"
             f"sys.path[:0] = [{str(ROOT)!r}, {str(ROOT / 'src')!r}]\n"
             "from pathlib import Path\n"
             "from solana_alpha_lab.factory.hfic_temporal_discovery import run_temporal_fixed_time_from_spec\n"
