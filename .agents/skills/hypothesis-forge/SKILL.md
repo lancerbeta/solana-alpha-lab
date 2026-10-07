@@ -42,6 +42,19 @@ is not a scientific result and returns no quota. Contract:
 `docs/contracts/forge_ordinary_operation_lifecycle_v1.md`. A null owner cap is the protocol
 remainder, not a silent cap of one. Coverage without values stays
 `discovery-coverage`.
+
+MAIN/ADAPTIVE/PREVIEW totals, AUTO-cycle and distinct-focus caps, and the
+candidate/diagnostic-slice ceilings are a runtime policy, not a Git constant:
+`research-policy-status` (optionally `--journal-scope`), then
+`research-policy-preview --main-total N ...` and `research-policy-apply
+--confirm-append-only` to raise the active policy for *new* runs. A bare
+active-policy raise never moves a journal already frozen at first touch;
+raise that exact journal with `research-policy-extension-preview
+--journal-scope <key> --parent-operation-sha256 <op>` then
+`research-policy-extension-apply --confirm-append-only`, which never resets
+what that journal has already spent. Contract:
+`docs/contracts/forge_research_policy_runtime_v1.md`. This delivery never
+raises a shipped default itself.
 `next_action=CORRECT_CALCULATION_REVISION` means the saved temporal result is
 internally inconsistent. It is a technical stop, not a request for more
 looks. Revise that exact result with `discovery-execute ... --correct-result-ref

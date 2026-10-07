@@ -247,6 +247,37 @@ Re-run the read-only preview. Expected terminal
 `CONTROL_RECONSIDERATION_NOT_READY`, follow `BLOCKER_NEXT` in the JSON.
 Only then invoke `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
 
+**Research-policy runtime.** MAIN/ADAPTIVE/PREVIEW totals, AUTO-cycle and
+distinct-focus caps, and the candidate/diagnostic-slice ceilings live in
+ResearchStore, not in Git. Status (optionally scoped to one journal):
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-status --journal-scope <search_key_sha256>
+```
+
+Preview and apply a change to the active policy (governs *new* journals
+only; never moves one already frozen):
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-preview --main-total 10 --max-generated 10
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-apply --proposal proposal.json --confirm-append-only
+```
+
+To raise one exact journal that already has a frozen snapshot, without
+resetting what it has already spent, extend it explicitly instead:
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-extension-preview --journal-scope <search_key_sha256> --parent-operation-sha256 <operation_sha256> --main-total 10
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-extension-apply --proposal proposal.json --confirm-append-only
+```
+
+Without `--confirm-append-only` both apply commands exit
+`RESEARCH_POLICY_CONFIRM_REQUIRED`. If the active policy moved since preview,
+apply exits `RESEARCH_POLICY_PREVIEW_STALE`; if another extension landed on
+that journal first, extension-apply exits `RESEARCH_POLICY_EXTENSION_STALE`.
+Re-run the matching preview and save a new `proposal.json`. Contract:
+`docs/contracts/forge_research_policy_runtime_v1.md`.
+
 ---
 
 ## 1. Простая модель
