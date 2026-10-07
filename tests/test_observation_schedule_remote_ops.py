@@ -53,7 +53,9 @@ class ObservationScheduleRemoteOpsTests(unittest.TestCase):
             ROOT / "configs/factory_remote_ops/factory-observation-schedule.timer"
         ).read_text(encoding="utf-8")
         self.assertIn("tick --once", service)
-        self.assertIn("OnUnitActiveSec=60s", timer)
+        self.assertIn("OnUnitInactiveSec=15s", timer)
+        self.assertIn("AccuracySec=1s", timer)
+        self.assertIn("RandomizedDelaySec=0", timer)
         self.assertIn("Persistent=true", timer)
         self.assertIn("MemoryHigh=768M", service)
         self.assertIn("MemoryMax=1G", service)

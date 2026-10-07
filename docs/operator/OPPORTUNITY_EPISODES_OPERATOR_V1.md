@@ -56,6 +56,26 @@ uv run --locked --managed-python python -B scripts/observation_schedule.py stop-
 * Recovery: the next tick republishes the outbox, recovers completed calls from
   the call ledger and turns intent-without-result into
   `ATTEMPT_OUTCOME_UNKNOWN`; it never re-requests a past slot.
+* Scheduled dispatch uses the live clock at each due checkpoint, including
+  checkpoints around publication/recovery and each category call. The canonical
+  ordinary timer runs 15s after service exit, with `AccuracySec=1s` and zero
+  randomized delay; changing code alone while keeping the old 60s unit does not
+  commission this repair. No overlapping worker is required.
+  Supported coverage assumes a stable UTC clock, one account lane, local
+  cleanup/preflight/prelude each <=5s and batch bookkeeping <=1s. The maximum
+  idle checkpoint gap is `15+1+3*5=31s`; during category work it is at most
+  `15+3+5=23s`. Both are strictly less than the frozen 60s dispatch window.
+  Episode calls use at most 15s of the existing bounded-response waiter;
+  SEARCH shares remaining window time across remaining same-assigned batches,
+  reserving their 3s account pace and local bookkeeping. This is a conditional
+  runtime guarantee: the waiter cannot preempt a host/GIL stall, and exhausted
+  account/pace budgets are real typed failures. Reported
+  `max_dispatch_checkpoint_gap_seconds` makes excessive actual work visible;
+  a recurring >=60s gap is a material runtime blocker, not a clean tick proof.
+  A final worker-side guard forbids early/late sends. A refusal after durable
+  STARTED is completed as `NO_REQUEST` with no transport timestamp; a process
+  death keeps the existing conservative unknown-attempt recovery. Reservations
+  are not refunded. No retry, late catch-up, gap backfill or activation change.
 * Round crash recovery: a nomination round that died after its slack is
   reconciled by the next tick from durable evidence only (no provider call, no
   late admission). A partial round keeps what was committed and blocks its

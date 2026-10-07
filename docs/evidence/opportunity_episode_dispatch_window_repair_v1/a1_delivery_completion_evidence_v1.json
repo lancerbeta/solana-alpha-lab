@@ -1,0 +1,58 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "OPPORTUNITY-EPISODE-DISPATCH-COMPLETION_EVIDENCE",
+  "as_of": "2026-10-07",
+  "task_id": "OPPORTUNITY_EPISODE_DISPATCH_WINDOW_REPAIR_V1",
+  "state_change": "DISPATCH_WINDOW_COVERAGE_REPAIRED_PENDING_REVIEW_CI",
+  "base_main": "77eb427afbc9bb687c6a1fe3a7f3ca4ad2cf3417",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/opportunity_episode_dispatch_window_repair_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "PENDING",
+    "verdict": "PENDING"
+  },
+  "validation": {
+    "targeted": "PASS_81_FOCUSED_AND_13_DEDICATED_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/opportunity_episode_dispatch_window_repair_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "PENDING",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_RED_ON_EXACT_PRE_START_CLI_OWNER_PATH_BEFORE_THE_FIX",
+      "PASS_HARNESS_SYNC_FULL_CHECK",
+      "PASS_FOUR_ISOLATED_CONTENT_REVIEWS_CODE_GOAL_DOD_ARCHITECTURE_SEMANTIC_PREMISE_OWNER_UX"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE_ACCEPTANCE",
+    "SYNTHETIC_TESTS_ONLY",
+    "NO_MANUAL_PROVIDER_CALLS",
+    "NO_PRODUCTION_DATA_REPAIR",
+    "NO_NEW_ACTIVATION",
+    "NO_MERGE_OR_DEPLOY_YET"
+  ],
+  "side_effects": {
+    "network_calls": "UNKNOWN_TOTAL_DELIVERY_TRANSPORT",
+    "bounded_metadata_probe_attempts": 0,
+    "provider_calls": 0,
+    "local_writes": 1,
+    "external_actions": 0
+  }
+}

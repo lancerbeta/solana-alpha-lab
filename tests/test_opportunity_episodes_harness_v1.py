@@ -113,7 +113,7 @@ class SyntheticMarket:
     # category failures: (round_start, category) -> http status
     category_failures: dict[tuple[datetime, str], int] = field(default_factory=dict)
     # search failures by assigned slot time -> http status
-    search_failures: dict[datetime, int] = field(default_factory=dict)
+    search_failures: dict[datetime, int | str] = field(default_factory=dict)
     # per-call latency seconds (default 1)
     latency: Callable[[str, datetime], float] = lambda _kind, _now: 1.0
 
@@ -162,6 +162,8 @@ class SyntheticJupiter:
             raise AssertionError(f"UNEXPECTED_PROVIDER_PATH:{parsed.path}")
         self.clock.sleep(float(self.market.latency(kind, now)))
         self.calls.append({"kind": kind, "at": render_utc(now), "url": url, "status": status or 200})
+        if status == "TIMEOUT":
+            raise TimeoutError("SYNTHETIC_TIMEOUT")
         if status is not None:
             return {"http_status": int(status), "body": {"error": "synthetic failure"}, "url_has_api_key": False}
         return {"http_status": 200, "body": body, "url_has_api_key": False}
@@ -271,14 +273,15 @@ def register_authorize_activate(data_root: Path, schedule: dict[str, Any], *, no
     return activation_id
 
 
-def cli_tick(data_root: Path, market: SyntheticMarket, at: datetime, *, env_fault: str | None = None) -> dict[str, Any]:
+def cli_tick(data_root: Path, market: SyntheticMarket, at: datetime, *, env_fault: str | None = None,
+             pacing_clock: AdvancingClock | None = None) -> dict[str, Any]:
     """The production entry with complete process-local physical overrides."""
 
     import os
 
     from scripts.observation_schedule import main as cli_main
 
-    clock = AdvancingClock(at)
+    clock = pacing_clock if pacing_clock is not None else AdvancingClock(at)
     opener = SyntheticJupiter(market, clock)
     buf = StringIO()
     previous = os.environ.get("OBSERVATION_SCHEDULE_PUBLISH_FAULT")

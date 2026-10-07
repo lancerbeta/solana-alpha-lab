@@ -398,7 +398,7 @@ class SemanticsPreservedTests(unittest.TestCase):
             self.assertTrue((root / STORAGE_HISTORY_RELATIVE).is_file())
             store.close()
 
-    def test_r8_pulse_offset_from_watch_observation_timer_unchanged(self) -> None:
+    def test_r8_pulse_offset_from_watch_observation_timer_is_ordinary(self) -> None:
         self.assertEqual(DAILY_PULSE_ON_CALENDAR, "*-*-* 06:20:00 UTC")
         self.assertNotEqual(DAILY_PULSE_ON_CALENDAR, "*-*-* 06:15:00 UTC")
         self.assertEqual(WATCH_ON_CALENDAR, "*-*-* *:0/15:00 UTC")
@@ -414,7 +414,8 @@ class SemanticsPreservedTests(unittest.TestCase):
         self.assertIn("OnCalendar=*-*-* 06:20:00 UTC", pulse_timer)
         self.assertNotIn("OnCalendar=*-*-* 06:15:00 UTC", pulse_timer)
         self.assertIn("OnCalendar=*-*-* *:0/15:00 UTC", watch_timer)
-        self.assertIn("OnUnitActiveSec=60s", obs_timer)
+        self.assertIn("OnUnitInactiveSec=15s", obs_timer)
+        self.assertIn("AccuracySec=1s", obs_timer)
         self.assertNotIn("06:20", watch_timer)
         self.assertNotIn("06:15", obs_timer)
 

@@ -4,6 +4,15 @@ Status: ACTIVE software capability, live lane DISABLED by default.
 Owner task: `docs/tasks/OPPORTUNITY_EPISODES_JUPITER_VERTICAL_SLICE_V1.md`.
 Domain owner: `src/solana_alpha_lab/factory/opportunity_episodes.py`.
 
+Dispatch runtime repair: live due checkpoints and the canonical 15s idle timer
+cover the existing immutable 60s windows under the finite ordinary runtime
+model in `docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md`. The episode
+provider waiter ceiling is 15s (previously 60s); same-assigned SEARCH batches
+share remaining window time fairly. This deliberately changes operational
+timeout availability, not population, grid, T0, cap or the meaning of a prior
+observation. Stalls, budget/pace exhaustion and provider missingness remain
+typed gaps. No gap may be rewritten when the producer version changes.
+
 This contract is additive. Legacy newborn `BASE_X` collection, its
 `smial.observation-schedule` 1.0 documents, X/Y point parser and hashes,
 release schemas 1.0/1.1, `DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001`,
