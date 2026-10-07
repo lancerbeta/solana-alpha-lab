@@ -10,7 +10,22 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "1f87311ec9aaac72ac114dd354ba5a5ed0fef7954699a096eef5b799e59cd4cf",
+    "configs/factory_remote_ops/factory-observation-schedule.timer": "a738a240badcabe03eefce58d696bee20a2551b0482e2a55b36b17b88908dfc1",
+    "docs/contracts/opportunity_episodes_jupiter_v1.md": "0ad14c1e311159708826e205465d5e969407491d2bc60a3f1037a067913ef926",
+    "docs/evidence/opportunity_episode_dispatch_window_repair_v1/a1_semantic_premise_packet_v1.json": "300280463feb9152bd69fb4e6af405d4c3de3e5fda8bddc2514bf70ec3c3a860",
+    "docs/evidence/opportunity_episode_dispatch_window_repair_v1/readout.md": "c01b3624194faa323ff6b5da68c15f732361614f3114f319c33087025191a850",
+    "docs/evidence/opportunity_episode_dispatch_window_repair_v1/red_replay.py": "26e4fd9663a8d4631d0f86652c4cd28ce739eb4f17ab96b869a7250ca7592740",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "66b9cd48189dc8fd5b95227ad9ea431da9d67367f43338b9ce3ae7e9101caf19",
+    "docs/operator/OPPORTUNITY_EPISODES_OPERATOR_V1.md": "9a4d2444b85691f89e4c24b1780bfb32588f2edf999c93ce404ea766ea2f60d6",
+    "docs/tasks/OPPORTUNITY_EPISODE_DISPATCH_WINDOW_REPAIR_V1.md": "95da248ecd11ab59adbb1c67590e56ee5a178c9ed77fbafe67133920139e188e",
+    "src/solana_alpha_lab/factory/opportunity_episode_tick.py": "faeaab70ef11748709fc082bf20f2a9e072cd53e8b4e42e8c297b34c97f6d52f",
+    "tests/test_factory_operability_memory_collision_repair_v1.py": "735dfd70877c09a4af05c9a9929857daee7e66f9d0c815323c41ef90a5aeda86",
+    "tests/test_observation_schedule_remote_ops.py": "48372284c25642b40d971100faa67820c63f50fe3da11e572eab760371372e99",
+    "tests/test_opportunity_episode_dispatch_window_repair_v1.py": "18e446b59dcecae81ce75cb528c3ba38f878ac1436e63aac34cf023defe508ef",
+    "tests/test_opportunity_episodes_harness_v1.py": "6e0c974dc1dde8072e076d0d64c7f544a592ff4c78828448eb606ad06e778dfd"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/opportunity_episode_dispatch_window_repair_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "PENDING",
+    "sha256": "5c37ed173c057691047b3ad5f42ff8f29e90ddcd131290eab5c9efd24a2c74e1",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_96_FOCUSED_AFTER_CAPACITY_FIX_AND_FINAL_45_DISPATCH_ROUND_RECOVERY_TESTS",
     "independent_review": {
       "path": "docs/evidence/opportunity_episode_dispatch_window_repair_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "PENDING",
+      "sha256": "32756c1a1474e5e4eecdbffe966d503d43626a780e4b716463572c60e2f6df16",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

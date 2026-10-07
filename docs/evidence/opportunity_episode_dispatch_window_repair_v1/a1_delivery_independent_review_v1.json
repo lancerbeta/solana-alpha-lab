@@ -4,8 +4,8 @@
   "review_id": "OPPORTUNITY-EPISODE-DISPATCH-INDEPENDENT_REVIEW",
   "as_of": "2026-10-07",
   "task_id": "OPPORTUNITY_EPISODE_DISPATCH_WINDOW_REPAIR_V1",
-  "reviewed_bindings_sha256": "PENDING",
-  "reviewed_inventory_sha256": "PENDING",
+  "reviewed_bindings_sha256": "696e5a9ce84d43fde9ea5b590039a37cc5d4b0b14e6a73b060d7d8af1d7d87a1",
+  "reviewed_inventory_sha256": "71ed5e503da62faa19bcdcd94dd027a930c79812db8a24a66d67a7109bbc9d11",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
