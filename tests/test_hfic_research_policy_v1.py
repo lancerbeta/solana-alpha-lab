@@ -483,6 +483,61 @@ class ScopeExtensionTests(unittest.TestCase):
             self.assertEqual(raised.exception.code, "RESEARCH_POLICY_EXTENSION_STALE")
 
 
+class LegacyScopeAndResolverTests(unittest.TestCase):
+    """Critic round 1: a pre-runtime scope can be extended, and packet and draft read one resolver."""
+
+    def test_a_legacy_scope_is_frozen_at_defaults_by_its_first_extension(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            store = _store(Path(raw))
+            _apply(store, limits_delta={"main_total": 3})
+            proposal = rp.propose_run_extension(
+                store, scope_key=J1, parent_operation_sha256="5" * 64, limits_delta={"main_total": 9}, has_history=True
+            )
+            self.assertTrue(proposal["freeze_legacy_defaults"])
+            self.assertEqual(proposal["before_limits"]["main_total"], 6)
+            self.assertIsNone(rp.read_scope_snapshot(store, J1))
+            rp.check_run_extension(store, proposal=proposal)
+            applied = rp.apply_run_extension(store, proposal=proposal, confirm_append_only=True)
+            self.assertEqual(applied["status"], rp.APPENDED)
+            self.assertEqual(rp.read_scope_snapshot(store, J1)["source"], rp.SOURCE_LEGACY)
+            self.assertEqual(rp.limits_for_frozen_run(store, J1)["main_total"], 9)
+            again = rp.apply_run_extension(store, proposal=proposal, confirm_append_only=True)
+            self.assertEqual(again["status"], rp.ALREADY_APPLIED)
+
+    def test_a_scope_without_history_or_snapshot_is_still_refused(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            with self.assertRaises(rp.ResearchPolicyError) as raised:
+                rp.propose_run_extension(
+                    _store(Path(raw)), scope_key=J2, parent_operation_sha256="6" * 64,
+                    limits_delta={"main_total": 9}, has_history=False,
+                )
+            self.assertEqual(raised.exception.code, "RESEARCH_POLICY_RUN_SNAPSHOT_MISSING")
+
+    def test_an_unfrozen_journal_reads_what_a_first_touch_would_freeze_everywhere(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            store = _store(Path(raw))
+            _apply(store, limits_delta={"max_generated": 10, "adaptive_total": 4, "preview_total": 5})
+            seen = rp.limits_or_defaults(store, J1)
+            self.assertEqual(seen["max_generated"], 10)
+            self.assertEqual(seen, rp.resolve_scope_limits(store, J1)["limits"])
+            snapshot = rp.ensure_scope_snapshot(store, J1)
+            self.assertEqual(rp.limits_or_defaults(store, J1), snapshot["limits"])
+
+    def test_raised_adaptive_and_preview_reach_the_gate_occupancy(self) -> None:
+        from solana_alpha_lab.factory.hfic_ordinary_operation import journal_occupancy
+
+        with tempfile.TemporaryDirectory() as raw:
+            store = _store(Path(raw))
+            _apply(store, limits_delta={"adaptive_total": 4, "preview_total": 5, "main_total": 8})
+            rp.ensure_scope_snapshot(store, J1)
+            occupancy = journal_occupancy(store, J1)
+            self.assertEqual(occupancy["adaptive"]["limit"], 4)
+            self.assertEqual(occupancy["preview"]["limit"], 5)
+            self.assertEqual(occupancy["main"]["limit"], 8)
+            legacy = journal_occupancy(store, J2)
+            self.assertEqual(legacy["adaptive"]["limit"], 4)
+
+
 class ConcurrencyTests(unittest.TestCase):
     """Two writers racing the same scope's last slot."""
 

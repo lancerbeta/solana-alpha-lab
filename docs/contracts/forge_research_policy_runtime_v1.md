@@ -24,7 +24,12 @@ independently, from completed looks and pending reservations, by the
 ordinary-operation owner (`hfic_ordinary_operation.py`), not by the policy
 module. A scope with history that predates this runtime freezes at the shipped
 defaults (`LEGACY_DEFAULTS_V1`) and writes no policy artifact on a read-only
-path.
+path. Its first explicit extension freezes it there (the proposal carries
+`freeze_legacy_defaults`), so an already-used market epoch or journal can be
+raised; a scope with neither history nor snapshot is refused
+(`RESEARCH_POLICY_RUN_SNAPSHOT_MISSING`). The formulation packet, the draft
+validators and the gate read one resolver: an unfrozen journal reads exactly
+what its first touch would freeze.
 
 ## Scopes
 
@@ -113,11 +118,31 @@ scope rule or a market-evidence basis: this is execution provenance.
 | `EXTENSION_PARENT_COMPLETED` | the run already completed | request a new segment with its final receipt |
 | `EXTENSION_PARENT_HAS_PENDING_RESERVATION` | an action is pending | resume that exact action first |
 
+## Owner authority of apply
+
+`research-policy-apply` is an owner-invoked CLI call, not a separate
+authorization artifact: the proposal self-hash proves it was not edited after
+preview, `--confirm-append-only` proves an explicit call. At apply, every
+extension proposal is re-checked against the live store before the first
+append (parent run still open and without a pending reservation, the scope
+belongs to that run, not stale); a refusal anywhere applies nothing. A hand-written
+proposal can still be applied by whoever runs the CLI, as with
+`universe-policy-apply`.
+
+## Multiple testing
+
+A limit is a ceiling, not a target. Looks per market are
+cycles × `main_total`; a later AUTO cycle's looks are made after cycle 1's
+results exist. The packet states this; an epoch-level aggregate of looks is
+not computed by this delivery.
+
 ## Known limits of this delivery
 
 - A cycle-2 journal does not share cycle 1's MAIN spend; it has its own budget by design.
 - Child representation of an additional cycle is not supported.
 - A NO_WORTHY receipt for more than 6 candidates is still capped at 6.
+- An unparseable policy row is `RESEARCH_POLICY_CHAIN_CORRUPT`; a present-but-invalid `cycle_index` on a stored row still reads as cycle 1.
+- A failure after the PREVIEW reservation of an episode view leaves that reservation pending; the identical retry reads as REPEAT.
 - `max_generated` below 4 conflicts with the non-ordinary floor of 4 candidates; ordinary drafts use the policy value.
 - Numerical replay of a prefix view is covered by the PR-A cold test, not repeated here.
 - `repository_git_snapshot` hashes the whole worktree and all refs; external refs created during a run can fail a vertical test.

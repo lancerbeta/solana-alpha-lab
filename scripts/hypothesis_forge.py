@@ -2506,6 +2506,7 @@ _RESEARCH_POLICY_NEXT = {
     "RESEARCH_POLICY_PRESET_CONFLICT": "REMOVE_THE_CONFLICTING_EXPLICIT_FIELD_OR_CHOOSE_ANOTHER_PRESET",
     "RESEARCH_POLICY_CHAIN_CORRUPT": "STOP_AND_RESTORE_THE_RESEARCH_STORE_THERE_IS_NO_DEFAULT_FALLBACK",
     "RESEARCH_POLICY_INVALID": "REPEAT_research-policy-preview_AND_APPLY_THE_UNEDITED_PROPOSAL",
+    "RESEARCH_POLICY_EXTENSION_BINDING_INVALID": "REPEAT_research-policy-preview_WITH_--for-operation_AND_APPLY_THE_UNEDITED_PROPOSAL",
     "ORDINARY_OPERATION_NOT_FOUND": "COPY_THE_EXACT_operation_sha256_FROM_research-policy-status_open_operations",
     "ORDINARY_OPERATION_STOPPED": "A_STOPPED_RUN_IS_NOT_REOPENED_START_A_NEW_OPERATION",
     "EXTENSION_PARENT_COMPLETED": "A_COMPLETED_RUN_IS_NOT_CONTINUED_HERE_REQUEST_A_NEW_SEGMENT_WITH_ITS_FINAL_RECEIPT",
@@ -2673,6 +2674,7 @@ def cmd_research_policy_preview(repo_root: Path, explicit_data_root: Path | None
                     scope_key=scope_key,
                     parent_operation_sha256=str(operation["operation_sha256"]),
                     limits_delta=scope_delta,
+                    has_history=_research_policy_scope_history(store, scope_key),
                 )
                 proposals.append(
                     {
@@ -2719,7 +2721,9 @@ def cmd_research_policy_apply(
         ResearchPolicyError,
         apply_policy_change,
         apply_run_extension,
+        epoch_scope_key,
     )
+    from solana_alpha_lab.factory.hfic_ordinary_operation import OrdinaryOperationError
 
     data_root = _existing_data_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root, create_if_missing=False)
@@ -2732,6 +2736,18 @@ def cmd_research_policy_apply(
         bodies = [document]
     results: list[dict[str, Any]] = []
     try:
+        # All-or-nothing: every proposal is checked against the live store (parent run still open,
+        # scope belongs to it, not stale) before the first append.
+        from solana_alpha_lab.factory.hfic_ordinary_operation import extension_parent
+        from solana_alpha_lab.factory.hfic_research_policy import check_run_extension
+
+        for body in bodies:
+            if isinstance(body, dict) and body.get("schema") == EXTENSION_SCHEMA:
+                checked = check_run_extension(store, proposal=body)
+                parent = extension_parent(store, str(checked.get("parent_operation_sha256") or ""))
+                allowed_scopes = {str(parent["journal_scope"]), epoch_scope_key(str(parent["market_evidence_epoch_sha256"]))}
+                if str(checked.get("scope_key")) not in allowed_scopes:
+                    raise ResearchPolicyError("RESEARCH_POLICY_EXTENSION_BINDING_INVALID", field="scope_key")
         for body in bodies:
             schema = body.get("schema") if isinstance(body, dict) else None
             if schema == SCHEMA:
@@ -2740,7 +2756,7 @@ def cmd_research_policy_apply(
                 results.append(apply_run_extension(store, proposal=body, confirm_append_only=confirm_append_only))
             else:
                 raise ResearchPolicyError("RESEARCH_POLICY_INVALID", field="schema")
-    except ResearchPolicyError as exc:
+    except (ResearchPolicyError, OrdinaryOperationError) as exc:
         refusal = {"applied_before_refusal": [item.get("action") for item in results]} if results else {}
         exc.detail.update(refusal)
         return _research_policy_refusal(exc, data_root, repo_root)

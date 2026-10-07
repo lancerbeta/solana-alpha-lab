@@ -1895,7 +1895,8 @@ def build_research_policy_context(store: Any, *, market_epoch: str, search_key: 
         ],
         "instruction": (
             "Nominate at most this_search.limits.max_generated cards. A limit is a ceiling, not a target: "
-            "do not pad weak ideas, and do not spend MAIN on questions formed after seeing results (those are ADAPTIVE)."
+            "do not pad weak ideas, and do not spend MAIN on questions formed after seeing results (those are ADAPTIVE). "
+            "Looks of a later AUTO cycle on the same market are a new forking path: total looks per market = cycles x main_total."
         ),
         "claim_boundary": "Budget ceilings only; not a scientific result.",
     }

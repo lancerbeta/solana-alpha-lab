@@ -250,7 +250,8 @@ Only then invoke `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
 **Research-policy runtime.** MAIN/ADAPTIVE/PREVIEW totals, AUTO-cycle and
 distinct-focus caps, and the candidate/diagnostic-slice ceilings live in
 ResearchStore, not in Git. Status (reads no market value, writes nothing;
-optionally scoped to one open operation, journal or market epoch):
+optionally scoped to one open operation, journal or market epoch). Copy
+`<operation_sha256>` from `open_operations` in its output:
 
 ```
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-status --for-operation <operation_sha256>
@@ -275,16 +276,26 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-apply --proposal proposal.json --confirm-append-only
 ```
 
-AUTO cycle 2 is explicit. After an epoch-pool extension to
-`--auto-cycles-per-market 2`, start it with
+AUTO cycle 2 is explicit. First extend this market's pool (without
+`--for-operation` the same flag only changes defaults for new markets):
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-preview --for-operation <operation_sha256> --auto-cycles-per-market 2 --format json > proposal.json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-apply --proposal proposal.json --confirm-append-only
+```
+
+Then start it with
 `preflight --discovery-contract --owner-focus AUTO --additional-cycle`. A plain
 preflight returns the saved session and never starts a cycle; a third cycle is
-refused with `SEARCH_BUDGET_EXHAUSTED`. Cycle 2 has its own search key and
+refused with `SEARCH_BUDGET_EXHAUSTED` (raise to 3 the same way, with `--auto-cycles-per-market 3`). Cycle 2 has its own search key and
 budget and must nominate materially different candidates.
 
 A value-bearing `episode-normalized-view` is a PREVIEW. Pass
 `--operation-sha256 <operation_sha256>`; the request is reserved before any
 value is read and the identical request again spends nothing.
+
+If a preview exits non-zero, open `proposal.json`: it holds the refusal and its
+`next_action`, not a proposal.
 
 Without `--confirm-append-only` apply exits `RESEARCH_POLICY_CONFIRM_REQUIRED`.
 If the policy or the scope moved since preview, apply exits

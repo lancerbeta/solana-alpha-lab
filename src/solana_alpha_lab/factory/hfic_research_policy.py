@@ -281,6 +281,17 @@ def _artifact_body(record: Any) -> dict[str, Any] | None:
     return body if isinstance(body, dict) else None
 
 
+def _wrapper_kind(record: Any) -> str:
+    raw = getattr(record, "payload_json", "") or ""
+    if isinstance(raw, bytes):
+        raw = raw.decode("utf-8", errors="replace")
+    try:
+        wrapper = json.loads(raw)
+    except (TypeError, ValueError):
+        return ""
+    return str(wrapper.get("artifact_kind") or "") if isinstance(wrapper, dict) else ""
+
+
 def _verified(body: dict[str, Any]) -> dict[str, Any]:
     unsigned = {key: value for key, value in body.items() if key not in _NON_IDENTITY_KEYS}
     if canonical_sha256(unsigned) != body.get("policy_artifact_sha256"):
@@ -295,6 +306,8 @@ def _iter_artifacts(store: Any, kind: str) -> list[dict[str, Any]]:
         if record_kind != RecordKind.RESEARCH_ARTIFACT.value:
             continue
         body = _artifact_body(record)
+        if body is None and _wrapper_kind(record) == kind:
+            raise ResearchPolicyError("RESEARCH_POLICY_CHAIN_CORRUPT", kind=kind)
         if not isinstance(body, dict) or body.get("artifact_kind") != kind:
             continue
         recorded = getattr(record, "created_at", None)
@@ -651,9 +664,14 @@ def limits_or_defaults(store: Any, scope_key: object) -> dict[str, int]:
     if store is None or not isinstance(scope_key, str):
         return dict(DEFAULT_LIMITS)
     try:
-        scope_kind(scope_key)
+        kind = scope_kind(scope_key)
     except ResearchPolicyError:
         return dict(DEFAULT_LIMITS)
+    if kind == SCOPE_JOURNAL and read_scope_snapshot(store, scope_key) is None:
+        # Same answer the formulation packet shows: the limits a first touch would freeze.
+        from solana_alpha_lab.factory.hfic_ordinary_operation import journal_has_history
+
+        return dict(resolve_scope_limits(store, scope_key, has_history=journal_has_history(store, scope_key))["limits"])
     return limits_for_frozen_run(store, scope_key)
 
 
@@ -811,15 +829,23 @@ def propose_run_extension(
     scope_key: str,
     parent_operation_sha256: str,
     limits_delta: Mapping[str, Any],
+    has_history: bool = False,
 ) -> dict[str, Any]:
     kind = scope_kind(scope_key)
     if not isinstance(parent_operation_sha256, str) or not _SHA64_RE.match(parent_operation_sha256):
         raise ResearchPolicyError("RESEARCH_POLICY_EXTENSION_BINDING_INVALID", field="parent_operation_sha256")
     snapshot = read_scope_snapshot(store, scope_key)
+    freeze_legacy = False
     if snapshot is None:
-        raise ResearchPolicyError("RESEARCH_POLICY_RUN_SNAPSHOT_MISSING", scope_key=scope_key)
-    extensions = read_scope_extensions(store, scope_key)
-    before = _limits_of(snapshot, extensions)
+        if not has_history:
+            raise ResearchPolicyError("RESEARCH_POLICY_RUN_SNAPSHOT_MISSING", scope_key=scope_key)
+        # A scope that pre-dates this runtime reads the shipped defaults; apply freezes it there first.
+        freeze_legacy = True
+        extensions = []
+        before = dict(DEFAULT_LIMITS)
+    else:
+        extensions = read_scope_extensions(store, scope_key)
+        before = _limits_of(snapshot, extensions)
     cleaned = validate_delta(limits_delta, allowed=scope_fields(scope_key))
     resulting = validate_limits({**before, **cleaned})
     proposal = {
@@ -834,8 +860,36 @@ def propose_run_extension(
         "resulting_limits": resulting,
         "reason_code": REASON_OWNER_EXTENSION,
     }
+    if freeze_legacy:
+        proposal["freeze_legacy_defaults"] = True
     proposal["proposal_sha256"] = canonical_sha256(proposal)
     return proposal
+
+
+def check_run_extension(store: Any, *, proposal: Mapping[str, Any]) -> dict[str, Any]:
+    """Read-only: would this extension apply right now? Raises the typed refusal that apply would."""
+
+    checked = _verify_proposal(proposal, reason=REASON_OWNER_EXTENSION)
+    scope_key = str(checked.get("scope_key") or "")
+    scope_kind(scope_key)
+    snapshot = read_scope_snapshot(store, scope_key)
+    if snapshot is None:
+        if checked.get("freeze_legacy_defaults") is not True or checked.get("before_limits") != dict(DEFAULT_LIMITS):
+            raise ResearchPolicyError("RESEARCH_POLICY_RUN_SNAPSHOT_MISSING", scope_key=scope_key)
+        extensions: list[dict[str, Any]] = []
+        before = dict(DEFAULT_LIMITS)
+    else:
+        extensions = read_scope_extensions(store, scope_key)
+        before = _limits_of(snapshot, extensions)
+    if any(item.get("proposal_sha256") == checked["proposal_sha256"] for item in extensions):
+        return checked
+    base_sequence = checked.get("base_extension_sequence")
+    if isinstance(base_sequence, bool) or not isinstance(base_sequence, int) or base_sequence != len(extensions):
+        raise ResearchPolicyError("RESEARCH_POLICY_EXTENSION_STALE", current_extension_sequence=len(extensions))
+    cleaned = validate_delta(checked.get("limits_delta") or {}, allowed=scope_fields(scope_key))
+    if validate_limits({**before, **cleaned}) != checked.get("resulting_limits") or before != checked.get("before_limits"):
+        raise ResearchPolicyError("RESEARCH_POLICY_INVALID", field="resulting_limits")
+    return checked
 
 
 def apply_run_extension(
@@ -852,7 +906,9 @@ def apply_run_extension(
     scope_kind(scope_key)
     snapshot = read_scope_snapshot(store, scope_key)
     if snapshot is None:
-        raise ResearchPolicyError("RESEARCH_POLICY_RUN_SNAPSHOT_MISSING", scope_key=scope_key)
+        if checked.get("freeze_legacy_defaults") is not True or checked.get("before_limits") != dict(DEFAULT_LIMITS):
+            raise ResearchPolicyError("RESEARCH_POLICY_RUN_SNAPSHOT_MISSING", scope_key=scope_key)
+        snapshot = ensure_scope_snapshot(store, scope_key, has_history=True, clock=clock)
     extensions = read_scope_extensions(store, scope_key)
     for extension in extensions:
         if extension.get("proposal_sha256") == checked["proposal_sha256"]:
