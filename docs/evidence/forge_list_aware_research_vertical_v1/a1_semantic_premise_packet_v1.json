@@ -1,0 +1,98 @@
+{
+  "candidate": {
+    "base": "77eb427afbc9bb687c6a1fe3a7f3ca4ad2cf3417",
+    "diff_sha256": "c9080d65b3ea6d8d0d2e87ad3b4d7f3099b78542f7f123dd2986d4bef056b5b9",
+    "head": "05a4a07a70ce9502e8e0612e46fa49b79da1e143"
+  },
+  "evidence": [
+    {
+      "logical_ref": "repo://docs/contracts/forge_list_aware_research_scope_v1.md",
+      "sha256_or_fingerprint": "f03ce1a4c50aa2525003ddf9441f61700a8a6e69d248449289bf86416d8ca84f"
+    },
+    {
+      "logical_ref": "repo://tests/test_hfic_list_aware_vertical_v1.py",
+      "sha256_or_fingerprint": "1d3dfd636826b34a45c8ac9555651a7d7a26e481fda79ca7cb07808c0d720c6e"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_research_scope.py",
+      "sha256_or_fingerprint": "84460069fd8281b13b622da8b153060dff4755add68ad0086de058b29f869477"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/normalized_trajectory_episodes_v1.py",
+      "sha256_or_fingerprint": "b32661045e8032bc04eb916705c457e2546b794b688c9f1d65e380967f7bf4da"
+    }
+  ],
+  "independence": {
+    "claim_scope": "PACKET_INFORMATION_PATH",
+    "context_isolated": true,
+    "implementation_transcript_seen": false,
+    "launch_isolation": "PROCESS_OBLIGATION",
+    "model_diversity": "UNPROVEN",
+    "model_diversity_identity": null,
+    "packet_bound": true,
+    "readonly": true
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CAUSAL_OR_INTERACTION_CLAIM",
+    "SYNTHETIC_ONLY",
+    "NO_PROVIDER_CALLS",
+    "NO_PRODUCTION_DATA",
+    "NO_VPS_OR_LIVE_CHANGE",
+    "NO_MERGE",
+    "NO_PR_B_BUDGET_POLICY"
+  ],
+  "packet_fingerprint_sha256": "47423bfcaa94f5dd853a6753ef5a4348600964acdc30cf470e0982153c4e856e",
+  "questions": [
+    "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
+    "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
+    "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL",
+    "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE",
+    "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY",
+    "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING",
+    "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER",
+    "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE",
+    "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM",
+    "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS"
+  ],
+  "review": {
+    "architecture_owner": "ARCHITECTURE_CRITIC",
+    "profile": "SEMANTIC_PREMISE",
+    "risk_dimensions": [
+      "HYPOTHESIS_OR_FAMILY_CLOSURE"
+    ]
+  },
+  "schema": "smial.semantic-premise-review-packet",
+  "schema_version": "1.0",
+  "semantic_claims": [
+    {
+      "claim": "Lists are a research dimension; UNKNOWN membership is never FALSE and refuses before values",
+      "claim_id": "C1",
+      "scope": "membership_semantics"
+    },
+    {
+      "claim": "A list scope rule is hashed by definitions, not names or realized members; legacy unscoped paths and hashes are unchanged",
+      "claim_id": "C2",
+      "scope": "identity"
+    },
+    {
+      "claim": "Query 1.2 binds one rule digest through result, claim identity, candidate identity, Critic packet, classification, frozen recipe and prior axes",
+      "claim_id": "C3",
+      "scope": "propagation"
+    },
+    {
+      "claim": "NORMALIZED_TRAJECTORY_EPISODES_V1 is a new additive representation; the frozen newborn NORMALIZED_TRAJECTORY_V1 is not reused for episodes",
+      "claim_id": "C4",
+      "scope": "representation"
+    },
+    {
+      "claim": "Local list snapshots are future-only: availability is max(declared, registered)",
+      "claim_id": "C5",
+      "scope": "availability"
+    }
+  ],
+  "task": {
+    "task_contract_sha256": "0efdc8d6823d6fb51f4f541bbc25998f842cca76c3c4d52c499d0eadcdad1a52",
+    "task_id": "FORGE_LIST_AWARE_RESEARCH_VERTICAL_V1"
+  }
+}

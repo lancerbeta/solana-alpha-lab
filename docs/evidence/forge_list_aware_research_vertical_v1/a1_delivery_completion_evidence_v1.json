@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-LIST-AWARE-RESEARCH-VERTICAL-COMPLETION-001",
+  "as_of": "2026-10-07",
+  "task_id": "FORGE_LIST_AWARE_RESEARCH_VERTICAL_V1",
+  "state_change": "SOURCE_LISTS_ARE_A_FIRST_CLASS_FORGE_RESEARCH_DIMENSION_LIST_ONLY_NUMERIC_IN_SCOPE_AND_MIXED_QUESTIONS_SCOPE_BOUND_THROUGH_FREEZE_CRITIC_CLASSIFY_RUNNER_REPLAY_AND_EPISODE_PROFILE",
+  "base_main": "77eb427afbc9bb687c6a1fe3a7f3ca4ad2cf3417",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_list_aware_research_vertical_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_VERTICAL_8_PRODUCTION_SHAPED_CAPTURE_TO_RUNNER_COLD_REPLAY_NEXT_PERIOD;PASS_35_DIRECT_SCOPE_EXECUTOR_PROFILE_GOLDEN;V0_RED_ON_BASE_SCOPE_DROPPED_LIST_ONLY_REFUSED_OVERLAP_UNREAD_NO_EPISODE_NT;BENCHMARK_10K_5_LISTS_SCOPE_OVERHEAD_1_0X_BOUNDED",
+    "independent_review": {
+      "path": "docs/evidence/forge_list_aware_research_vertical_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_RED_ON_EXACT_BASE_V0_FALSIFIER",
+      "PASS_HARNESS_SYNC",
+      "PASS_FOUR_ISOLATED_CONTENT_REVIEWS_CODE_GOAL_DOD_ARCHITECTURE_SEMANTIC_PREMISE_OWNER_UX",
+      "PASS_LEGACY_1_1_BYTE_GOLDEN_COMPUTED_ON_BASE",
+      "PRE_EXISTING_BASE_FAILURES_ONLY_LADDER_CONTROL_AUTO_ADVANCE_AND_FORGE_INPUT_COMMISSIONED_READY_LOCAL_PLANE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CAUSAL_OR_INTERACTION_CLAIM",
+    "SYNTHETIC_ONLY",
+    "NO_PROVIDER_CALLS",
+    "NO_PRODUCTION_DATA",
+    "NO_VPS_DEPLOY_SETTINGS_TIMER_CHANGE",
+    "NO_MERGE",
+    "NO_LLM_FORMULATION_QUALITY_PROOF",
+    "NO_PR_B_BUDGET_POLICY"
+  ],
+  "side_effects": {
+    "network_calls": "UNKNOWN_TOTAL_DELIVERY_TRANSPORT",
+    "bounded_metadata_probe_attempts": 0,
+    "provider_calls": 0,
+    "local_writes": 1,
+    "external_actions": 0
+  }
+}
