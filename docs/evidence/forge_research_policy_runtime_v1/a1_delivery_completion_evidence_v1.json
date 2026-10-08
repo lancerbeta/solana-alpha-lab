@@ -24,10 +24,10 @@
     "catalog/schemas/hypothesis_forge_session_receipt_v1_4.schema.json": "0db867b2a93423a55b79210f9ce7d7f02d15885234f69328142193dafc9b1e1e",
     "docs/PROJECT_MAP.md": "88fcae15eec32a0a3b8e47429492567a2192969817e0a6c23de0d575a62ec39f",
     "docs/contracts/forge_research_policy_runtime_v1.md": "394646b7725efb5fbd8a16c944f83794bee702f8ba8fe52b11740bb50be1a550",
-    "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json": "37069937b5f863312c166cb335c6eaeb89304e26d51efaa22c7242bdf50fd9cb",
+    "docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json": "6f727f8bd672fdee433f1295f7c3e70e06deb8d35aa91edd65649ed3a0218ed9",
     "docs/evidence/forge_research_policy_runtime_v1/a1_semantic_premise_packet_v1.json": "a0a44671c8922fbac2a73e1277ab04b579d5b4c2a0e958a3b295365b51d162b7",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "ba6d87c72a7ed038643154f521514fa18e124c0d89fa6cea07f2cf2be9766a55",
-    "docs/tasks/FORGE_RESEARCH_POLICY_RUNTIME_V1.md": "3b1b97c2c9108e9ce3953d5dd3ecbf94289738056cc3cfcf9b0d9c02d67cbf0b",
+    "docs/tasks/FORGE_RESEARCH_POLICY_RUNTIME_V1.md": "f640e0e681f22fc4008b110df953cbdf0e28df0876467d254609f56108176e89",
     "scripts/hypothesis_forge.py": "73cbf682364a640d0ed4aa51077483f4734d2eaa1c789af21fbc906478767694",
     "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "0700bd1264142f6fc3ec1f629a244908d70a0ae7d1d3156a3ab394491fe02262",
     "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "c4b6263adb32ee96962903e56091ba91d80100c30fbb2418005f0079322b0709",
@@ -58,14 +58,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_research_policy_runtime_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "a30b3d7f607e4a4e7628e7344f292b55b14f42d55a979a84e40eac9a8105370a",
+    "sha256": "f1cf8a73e1a172d8a89c43f4e66ca687dcde75e5012558a84edc203c8f5789ec",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_MICRO_VERTICAL_PRD15_THROUGH_PUBLIC_CLI;PASS_AUTO_CYCLE_1_TO_2_THIRD_DENIED;PASS_TWO_PROCESS_LAST_SLOT_RACE;PASS_PREVIEW_GATE_EPISODE_VIEW;PASS_10_CANDIDATES_PRIMARY_9_RUNNER_UP_10_TO_SYNTHESIS_COMPLETE;PASS_OWNER_P1_A_LINEAGE_ACCOUNTING;PASS_OWNER_P1_B_ATOMIC_EXTENSION_SET;PASS_OWNER_P1_C_PREVIEW_RESUME;PASS_OWNER_P1_D_WIDE_NEGATIVE_TERMINAL;RED_ON_E447DC55_07137252_3AB3B96E_GREEN_NOW;PASS_CYCLE_TWO_NORMALIZED_VERTICAL_REAL_EPISODE_FIXTURE;PASS_CAPABILITY_FINGERPRINT_NEW_SCHEMAS_METAMORPHIC;PASS_MIXED_ABLATION_EXISTING_CLASS;CI_IS_THE_FULL_GATE;PASS_REGRESSION_AFFECTED_SUITES",
     "independent_review": {
       "path": "docs/evidence/forge_research_policy_runtime_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "8a8e5b45917b6348ff421f73a1a67e9619ae1542301daa705044aac14a2dbd99",
+      "sha256": "f95c6b76b7e0cc23c2b51c53200d2c6f490659572c9536786923df8f713cd6f4",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
