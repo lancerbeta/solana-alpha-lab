@@ -3140,7 +3140,9 @@ def run_preflight(
     generated_draft = None
     if isinstance(market_epoch, str) and len(market_epoch) == 64:
         draft_cycle = 1
-        if additional_cycle and focus.strip().casefold() == AUTO_FOCUS.casefold():
+        from solana_alpha_lab.factory.hfic_evidence_identity import is_cycle_focus
+
+        if additional_cycle and is_cycle_focus(focus):
             from solana_alpha_lab.factory.hfic_evidence_identity import _auto_cycles
 
             # An explicit additional cycle resumes the latest cycle's own pre-freeze draft.
@@ -3150,7 +3152,8 @@ def run_preflight(
                     for item in [*sessions, *reservations]
                     if isinstance(item, Mapping)
                     and market_epoch in (item.get("market_evidence_epoch_sha256"), item.get("evidence_epoch_sha256"))
-                ]
+                ],
+                focus,
             )
             draft_cycle = max(known_cycles) if known_cycles else 1
         draft_slot = scientific_slot_sha256(

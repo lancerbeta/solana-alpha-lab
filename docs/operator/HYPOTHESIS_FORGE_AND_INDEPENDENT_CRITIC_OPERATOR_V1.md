@@ -298,7 +298,15 @@ to `discovery-execute --operation <file>` for cycle 2 (the same file that
 already carries `journal_scope`, `owner_focus` and `owner_cap`). A wrong or
 missing value is refused with a typed `next_action`. An
 exact query already saved in cycle 1 replays and costs nothing. Cycle 2 must
-nominate materially different candidates.
+nominate materially different candidates. For the episode collection use
+`--collection OPPORTUNITY_EPISODES --owner-focus AUTO` (the focus is
+`OPPORTUNITY_EPISODES:AUTO`). Its normalized child of cycle 2 is created the
+usual way (`episode-normalized-view --parent-session-id <cycle-2 session>
+--operation-sha256 <cycle-2 BASE operation>`, then the child operation with the
+view's `representation`); the system links it to the cycle-1 normalized child
+itself: what that representation already spent is already counted, and an
+explicit normalized raise uses `research-policy-preview --for-operation
+<normalized child operation> --main-total N`.
 
 A value-bearing `episode-normalized-view` is a PREVIEW. Pass
 `--operation-sha256 <operation_sha256>`; the request is reserved before any

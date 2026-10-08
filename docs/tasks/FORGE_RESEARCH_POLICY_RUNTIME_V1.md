@@ -48,6 +48,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hfic_memory_policy.py
 - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
 - src/solana_alpha_lab/factory/hfic_preflight.py
+- src/solana_alpha_lab/factory/hfic_representation_ladder.py
 - src/solana_alpha_lab/factory/hfic_prospects.py
 - src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py
 - src/solana_alpha_lab/factory/hfic_research_policy.py
@@ -55,6 +56,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hfic_temporal_discovery.py
 - src/solana_alpha_lab/factory/live_cohort_to_forge.py
 - tests/test_hfic_list_aware_vertical_v1.py
+- tests/test_hfic_market_evidence_epoch_decision_basis_v2.py
 - tests/test_hfic_research_policy_closure_v1.py
 - tests/test_hfic_research_policy_v1.py
 - tests/test_hfic_research_policy_vertical_v1.py
@@ -162,7 +164,10 @@ value-bearing episode view charged to PREVIEW before any value loads; a real 7th
 production gate once raised, with the 11th denied before any value load; a
 fresh ResearchStore handle and a moved root both reading durable state, not
 anything held in process memory; a real AUTO 1→2 cycle that continues the same accounting lineage (it
-never opens a fresh MAIN allowance), not a fake
+never opens a fresh MAIN allowance) for BASE and, separately, for its
+episode-normalized child (cycle 1 normalized 2 of 6 → cycle 2 sees 4; an
+explicit total 10 → 8), through the real view, evaluator, freeze, Critic and
+final; the new PR-B schemas part of the capability fingerprint; not a fake
 saturating increment; 10 real candidates (primary ordinal 9, runner-up
 ordinal 10) through persist/freeze/two-stage-Critic/finalize to
 `SYNTHESIS_COMPLETE`; a malformed policy delta refused before any write; a

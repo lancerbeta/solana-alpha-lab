@@ -58,6 +58,9 @@ TEMPORAL_CALCULATION_VERSION_V5 = "HFIC_TEMPORAL_DISCOVERY_CALC_V5"
 TEMPORAL_CALCULATION_VERSION = TEMPORAL_CALCULATION_VERSION_V5
 # V5 arithmetic read through the episode point/clock resolver binding.
 TEMPORAL_CALCULATION_VERSION_EPISODES_V1 = "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V1"
+# The episode collection has exactly one calculation version, so it is current for episode looks: an exact
+# repeat of an episode query in another operation or cycle is a replay, never a calculation revision.
+TEMPORAL_CURRENT_CALCULATION_VERSIONS = frozenset({TEMPORAL_CALCULATION_VERSION_V5, TEMPORAL_CALCULATION_VERSION_EPISODES_V1})
 TEMPORAL_CALCULATION_VERSIONS_READABLE = frozenset(
     {
         TEMPORAL_CALCULATION_VERSION_EPISODES_V1,
@@ -1796,7 +1799,7 @@ def classify_temporal_look(
     simple_mains = [item for item in mains if item.get("search_tier") == "SIMPLE_SCREEN"]
     compound_mains = [item for item in mains if item.get("search_tier") == "COMPOUND_SCREEN"]
     same_question = [item for item in previous if item.get("spec_sha256") == digest]
-    if any(item.get("calculation_version") == TEMPORAL_CALCULATION_VERSION for item in same_question):
+    if any(item.get("calculation_version") in TEMPORAL_CURRENT_CALCULATION_VERSIONS for item in same_question):
         return {
             "query_id": bound["query_id"],
             "spec_sha256": digest,

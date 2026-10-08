@@ -29,6 +29,7 @@ from solana_alpha_lab.factory.hfic_research_policy import (
 OPERATION_KIND = "ORDINARY_OPERATION_V1"
 RESERVATION_KIND = "ORDINARY_LOOK_RESERVATION_V1"
 LIMITED_RESULT = "LIMITED_RESULT"
+REPRESENTATION_CONTINUATION = "REPRESENTATION_CONTINUATION"
 SCIENTIFIC_TERMINAL = "SCIENTIFIC_TERMINAL"
 
 # Persisted operation statuses. COMPLETED is never written: it is derived
@@ -144,6 +145,8 @@ def record_operation(
         raise OrdinaryOperationError("ORDINARY_OPERATION_PARENT_INVALID")
     cycle_probe = request.get("cycle_index")
     accounting_root = None
+    lineage_kind = None
+    continuation_blocker = None
     if isinstance(cycle_probe, int) and not isinstance(cycle_probe, bool) and cycle_probe > 1:
         accounting_root = _validated_lineage_link(
             store, request, journal=journal, focus=focus, market=market, cycle_index=int(cycle_probe)
@@ -201,12 +204,24 @@ def record_operation(
         # Only an explicitly authorized additional AUTO cycle is marked; cycle 1 digests are unchanged.
         identity_body["cycle_index"] = cycle_index
         identity_body["accounting_root"] = accounting_root
+    elif representation is not None:
+        # A representation of an additional-cycle parent continues the representation's earlier spend.
+        continuation, continuation_blocker = _representation_continuation_root(
+            store, representation=representation, focus=focus, market=market, journal=journal
+        )
+        if continuation is not None:
+            accounting_root, lineage_kind = continuation, REPRESENTATION_CONTINUATION
+            identity_body["accounting_root"] = accounting_root
+            identity_body["lineage_kind"] = lineage_kind
     digest = _sha(identity_body)
     for existing in list_operations(store):
         if existing.get("operation_sha256") == digest:
             return existing
     if not create_if_missing:
         raise OrdinaryOperationError("CALCULATION_REVISION_EXISTING_OPERATION_REQUIRED")
+    if lineage_kind and continuation_blocker:
+        # A new segment never bypasses a stopped or unresolved member of its representation lineage.
+        raise OrdinaryOperationError(continuation_blocker)
     stored = {
         **identity_body,
         "spec_sha256": None if not exact or validated is None else validated["spec_sha256"],
@@ -270,6 +285,66 @@ def _validated_lineage_link(
     if _unresolved_reservations(store, prior):
         raise OrdinaryOperationError("EXTENSION_PARENT_HAS_PENDING_RESERVATION")
     return root
+
+
+def _representation_continuation_root(
+    store: Any, *, representation: Mapping[str, Any], focus: str, market: str, journal: str
+) -> tuple[str | None, str | None]:
+    """(root journal, blocker) of the representation lineage an additional-cycle representation continues.
+
+    The root is the earliest root operation of the SAME representation, focus and market whose BASE parent
+    belongs to an EARLIER cycle of the same (market, focus). Execution identity (parent session, payload,
+    scope) stays the operation's own; only the budget is shared. BASE and other representations,
+    focuses and markets are never merged. A stopped lineage member or an unresolved reservation refuses.
+    """
+
+    from solana_alpha_lab.factory.hfic_session import HficSessionError, load_session_bundle
+
+    def _bundle(session_id: object) -> Mapping[str, Any] | None:
+        if not isinstance(session_id, str) or not session_id:
+            return None
+        try:
+            found = load_session_bundle(store, session_id)
+        except HficSessionError:
+            return None
+        return found if isinstance(found, Mapping) else None
+
+    def _cycle(bundle: Mapping[str, Any]) -> int:
+        value = bundle.get("cycle_index")
+        return value if isinstance(value, int) and not isinstance(value, bool) and value > 1 else 1
+
+    parent = _bundle(representation.get("parent_session_id"))
+    if parent is None or _cycle(parent) <= 1:
+        return None, None
+    members: list[Mapping[str, Any]] = []
+    roots: list[Mapping[str, Any]] = []
+    for item in list_operations(store):
+        rep = item.get("representation")
+        if (
+            not isinstance(rep, Mapping)
+            or rep.get("representation_id") != representation.get("representation_id")
+            or item.get("owner_focus") != focus
+            or item.get("market_evidence_epoch_sha256") != market
+            or item.get("journal_scope") == journal
+        ):
+            continue
+        other = _bundle(rep.get("parent_session_id"))
+        if other is None or str(other.get("owner_focus") or "") != focus:
+            continue
+        members.append(item)
+        if not item.get("accounting_root") and _cycle(other) < _cycle(parent):
+            roots.append(item)
+    if not roots:
+        return None, None
+    root = min(roots, key=lambda row: str(row.get("_recorded_at") or ""))
+    blocker = None
+    for item in members:
+        if item.get("status") == STATUS_STOPPED:
+            blocker = "ORDINARY_OPERATION_STOPPED"
+            break
+        if _unresolved_reservations(store, item):
+            blocker = "EXTENSION_PARENT_HAS_PENDING_RESERVATION"
+    return str(root["journal_scope"]), blocker
 
 
 def journal_has_history(store: Any, journal_scope: str) -> bool:
@@ -399,6 +474,16 @@ def _canonical_lineage_row(item: Mapping[str, Any]) -> bool:
 
     root = item.get("accounting_root")
     cycle = item.get("cycle_index")
+    if (
+        item.get("lineage_kind") == REPRESENTATION_CONTINUATION
+        and isinstance(item.get("representation"), Mapping)
+        and isinstance(root, str)
+        and len(root) == 64
+        and root != item.get("journal_scope")
+    ):
+        # A representation continuation is validated against the store when it is recorded; its journal is
+        # the representation's own key (parent session, payload, scope), so there is no pure hash to recheck.
+        return True
     if not isinstance(root, str) or len(root) != 64 or isinstance(cycle, bool) or not isinstance(cycle, int) or cycle < 2:
         return False
     from solana_alpha_lab.factory.hfic_memory_policy import cycle_search_key
@@ -482,7 +567,7 @@ def _same_active_profile_look(
     """A saved look of this spec, profile and rows. A new operation may read it."""
 
     from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy
-    from solana_alpha_lab.factory.hfic_temporal_discovery import TEMPORAL_CALCULATION_VERSION
+    from solana_alpha_lab.factory.hfic_temporal_discovery import TEMPORAL_CURRENT_CALCULATION_VERSIONS
 
     active = effective_policy(store).get("semantic_sha256")
     if not isinstance(active, str) or not active:
@@ -521,7 +606,7 @@ def _same_active_profile_look(
     # An older saved version must fall through to classify_temporal_look so
     # CALCULATION_REVISION still requires an explicit correction (never a
     # silent spendable MAIN / free REPLAY of stale arithmetic).
-    current = [item for item in matched if item.get("calculation_version") == TEMPORAL_CALCULATION_VERSION]
+    current = [item for item in matched if item.get("calculation_version") in TEMPORAL_CURRENT_CALCULATION_VERSIONS]
     return current[-1] if current else None
 
 

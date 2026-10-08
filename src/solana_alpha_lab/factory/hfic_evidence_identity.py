@@ -40,6 +40,12 @@ _CAPABILITY_PROTOCOL_FILES = (
     "catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json",
     "catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json",
     "catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json",
+    # Admission rules the runtime really enforces for a raised candidate ceiling and a wide negative
+    # terminal: a change of any of them is a different capability, never a silent compatibility.
+    "catalog/schemas/hypothesis_forge_draft_v1_3.schema.json",
+    "catalog/schemas/hypothesis_forge_session_receipt_v1_4.schema.json",
+    "catalog/schemas/hypothesis_forge_session_receipt_v1_2_wide.schema.json",
+    "catalog/schemas/hfic_next_epistemic_action_v1_wide.schema.json",
     "schemas/research_memory_projection_v1.sql",
     "catalog/query_recipes.yaml",
     "docs/contracts/normalized_trajectory_v1_capability_contract.md",
@@ -1204,7 +1210,24 @@ _ADMISSION_PENDING_STATES = frozenset(
 )
 
 
-def _auto_cycles(rows: Sequence[Mapping[str, Any]]) -> dict[int, list[Mapping[str, Any]]]:
+_EPISODE_FOCUS_PREFIX = "OPPORTUNITY_EPISODES:"
+
+
+def _focus_text(owner_focus: object) -> str:
+    return str(owner_focus or "AUTO").strip().casefold()
+
+
+def is_cycle_focus(owner_focus: object) -> bool:
+    """AUTO, or the AUTO focus of the episode collection: the only focuses that can run an additional cycle."""
+
+    text = _focus_text(owner_focus)
+    if text == "auto":
+        return True
+    prefix = _EPISODE_FOCUS_PREFIX.casefold()
+    return text.startswith(prefix) and text[len(prefix):].strip() == "auto"
+
+
+def _auto_cycles(rows: Sequence[Mapping[str, Any]], focus: object = "AUTO") -> dict[int, list[Mapping[str, Any]]]:
     """Real logical AUTO cycles of a market, keyed by cycle index.
 
     Only BASE rows count: a BASE session and its child representation rows are
@@ -1216,7 +1239,9 @@ def _auto_cycles(rows: Sequence[Mapping[str, Any]]) -> dict[int, list[Mapping[st
     for item in rows:
         if not isinstance(item, Mapping):
             continue
-        if str(item.get("owner_focus") or "AUTO").strip().casefold() != "auto":
+        # Each cycle-capable focus owns its own pool: plain AUTO is unchanged and the episode
+        # collection's AUTO never borrows from, or consumes, the legacy AUTO allowance.
+        if not is_cycle_focus(item.get("owner_focus")) or _focus_text(item.get("owner_focus")) != _focus_text(focus):
             continue
         representation, _version = representation_identity_from_session(item)
         if representation not in (None, "", BASE_REPRESENTATION_ID):
@@ -1449,11 +1474,8 @@ def resolve_scientific_admission(
             market_evidence_basis=market_evidence_basis,
         )
     )
-    auto_requested = (
-        representation == BASE_REPRESENTATION_ID
-        and str(owner_focus or "").strip().casefold() == "auto"
-    )
-    cycles = _auto_cycles(market_rows) if auto_requested else {}
+    auto_requested = representation == BASE_REPRESENTATION_ID and is_cycle_focus(owner_focus)
+    cycles = _auto_cycles(market_rows, owner_focus) if auto_requested else {}
     target_cycle = requested_cycle_index if isinstance(requested_cycle_index, int) and requested_cycle_index > 1 else 1
     if additional_cycle and auto_requested and cycles:
         latest = max(cycles)
@@ -1470,7 +1492,24 @@ def resolve_scientific_admission(
             target_cycle = latest
         else:
             target_cycle = latest + 1
-    if target_cycle > 1:
+    if target_cycle > 1 and not auto_requested and representation != BASE_REPRESENTATION_ID and is_cycle_focus(owner_focus):
+        # A representation of an additional cycle climbs from that cycle's own BASE session.
+        if target_cycle not in _auto_cycles(market_rows, owner_focus):
+            return {
+                "action": "STOP",
+                "reason_code": "ADDITIONAL_CYCLE_WITHOUT_PRIOR_CYCLE",
+                "session_id": None,
+                "scientific_slot_sha256": target_slot,
+                "occupancy": "UNRESOLVED_BINDING",
+            }
+        target_slot = scientific_slot_sha256(
+            market_evidence_epoch_sha256=market_evidence_epoch,
+            representation_id=representation,
+            representation_semantic_version=version,
+            owner_focus=owner_focus,
+            cycle_index=target_cycle,
+        )
+    elif target_cycle > 1:
         if not auto_requested:
             return {
                 "action": "STOP",
@@ -1661,6 +1700,7 @@ def resolve_scientific_admission(
         item
         for item in market_rows
         if representation_identity_from_session(item) == (representation, version)
+        and _cycle_index_of(item) == target_cycle
     ]
     if representation != BASE_REPRESENTATION_ID and matching_representation:
         return {
@@ -1679,7 +1719,9 @@ def resolve_scientific_admission(
         # market, not whether any AUTO exists. BASE rows only; child rows share
         # their parent cycle.
         auto_count = len(cycles)
-        if str(owner_focus or "").strip().casefold() == "auto":
+        # Plain AUTO is capped by its pool from the first session; the episode collection's AUTO keeps its
+        # distinct-focus admission for the first session and is capped by the same pool once it has cycles.
+        if _focus_text(owner_focus) == "auto" or (auto_requested and cycles):
             if auto_count >= auto_sessions_per_market:
                 return {
                     "action": "STOP",

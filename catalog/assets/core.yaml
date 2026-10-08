@@ -34658,7 +34658,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: fe37cf0b85b7ffc82cac6dda604b73d71c9a6f8ff96405fbf1217866f052e66c}
+  integrity: {kind: sha256, sha256: 9dd5aef02ca1441270438ec029a7b79dfda8f862d300c9b6e3104689c1a0223d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -37993,7 +37993,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: 6371621588abdeed3cacfb0ee4d30e3560d9c278b399128ea97593a5ab1f4624}
+  integrity: {kind: sha256, sha256: dd96b58714e32a93ebe75bc7236ea6af52189b50d10b1720a3684326aae2a694}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -38471,7 +38471,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_REPRESENTATION_LADDER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_ladder.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_ladder.py}
-  integrity: {kind: sha256, sha256: c82c2ffafbf2dfc14f4d46241c4d91416e77f1eb1f4e71253809e27faec087bf}
+  integrity: {kind: sha256, sha256: 90ee76c5fde590f4661a98dd108395d36bce38b9c04478da0232ee796b02281a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}
@@ -38551,7 +38551,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_evidence_identity.py', repository_path: src/solana_alpha_lab/factory/hfic_evidence_identity.py}
-  integrity: {kind: sha256, sha256: aaa697b73007b8789a5e5be68c45748ca4648f285da5f3ace977e834b38acdd0}
+  integrity: {kind: sha256, sha256: 26030cedd0c2561956f5556eeb7a4f3e2e3737e33342ad2952bf9e717ed3384d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
@@ -38570,7 +38570,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_preflight.py', repository_path: src/solana_alpha_lab/factory/hfic_preflight.py}
-  integrity: {kind: sha256, sha256: 5fdc3b5cb20101e92269ce73c960e0c3ff41d078cef44cb5caf55e91a0f8720e}
+  integrity: {kind: sha256, sha256: 8f88b75c4d5c5f9081f9d6d693d44504522e4f51401f5d2ad982cec4271feb09}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
@@ -38858,7 +38858,7 @@ records:
     repository_path: tests/test_hfic_market_evidence_epoch_decision_basis_v2.py
   integrity:
     kind: sha256
-    sha256: 1fe1f98be7a09cb2fe05a7a3340975e60b45a836a642e3143823adf21e1e858e
+    sha256: 6816dfdfc4f201bd8693506953fd0707b6573100eccf3fe1dc1d86dd8bafdc47
   access:
     mode: read_only
     method: file
@@ -40486,7 +40486,7 @@ records:
   as_of: '2026-10-07'
   truth_owner: FORGE_RESEARCH_POLICY_RUNTIME_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_research_policy_runtime_v1.md', repository_path: docs/contracts/forge_research_policy_runtime_v1.md}
-  integrity: {kind: sha256, sha256: 603981e105a2eda3c4d968bbb2d97922419b0212ef6f3c5e13341f8dae796a89}
+  integrity: {kind: sha256, sha256: e6891b4b159524511c6568083ee9223d34a4d200f479aac35caffce5317e7bf9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-RESEARCH-POLICY-001}

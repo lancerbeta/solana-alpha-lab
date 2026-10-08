@@ -102,13 +102,25 @@ being a new attempt. So:
 - an explicit shared total (`research-policy-preview --for-operation <cycle-2 operation> --main-total 10`) raises the root, leaving 4;
 - a cycle-2 operation is created only against the same market, focus and representation; the parent may be completed (that is how the search continues), never stopped and never with an unresolved reservation; a linked cycle freezes no budget of its own.
 
-A representation (for example `NORMALIZED_TRAJECTORY_EPISODES_V1`) of a cycle-2
-BASE session is its own accounting domain, exactly like a cycle-1 representation:
-its journal is keyed from the exact parent session's own stored search key (the
-cycle key for a cycle-2 parent), it is not merged with BASE, not merged across
-cycles, and not an AUTO cycle. A lineage row counts only when its journal is
+BASE and each representation (for example `NORMALIZED_TRAJECTORY_EPISODES_V1`)
+keep separate budgets, and neither is merged with another focus, market or
+population. Within one representation the continuation is the same search:
+the episode child of a cycle-2 BASE session keeps its own execution identity
+(journal keyed from the exact parent session's stored search key, its own
+payload, scope and cycle slot) but its operation is linked at creation to the
+earliest root operation of the same representation, focus and market whose
+BASE parent is an earlier cycle (`lineage_kind: REPRESENTATION_CONTINUATION`,
+`accounting_root` = that child's journal). It spends that root's budget: if the
+cycle-1 normalized child used 2 of 6, the cycle-2 child sees 4 left, not a new 6;
+an explicit normalized total of 10 (`--for-operation <child>`) leaves 8; BASE
+is untouched. A new cycle, payload or selector never opens fresh budget by
+itself. A stopped member of the lineage or an unresolved reservation refuses a
+new segment. The child of a cycle-2 parent is not an AUTO cycle, so the AUTO
+count stays at the pool. A BASE lineage row counts only when its journal is
 `cycle_search_key(accounting_root, cycle_index)`: a request naming another root
-is refused and can neither borrow nor poison any budget. A second cycle must bring materially different
+is refused and can neither borrow nor poison any budget. An exact episode query
+already saved anywhere in the lineage is a replay (the episode collection's
+single calculation version is current), never a calculation revision. A second cycle must bring materially different
 candidates: identical definitions are already recorded hypotheses of cycle 1
 and are refused as duplicates.
 
@@ -164,9 +176,11 @@ root does. The packet shows the root's limits and what is left of them.
 
 ## Known limits of this delivery
 
-- A representation of a cycle-2 BASE session is proven at the admission boundary and at the canonical-journal and accounting boundary on a real cycle-2 session; the episode evaluator itself is not run on a cycle-2 parent (the heavy list-aware fixture has no AUTO cycle 2).
+- Several cycle-1 variants of one representation (different payload or scope under the same cycle-1 parent) keep their own historical budgets; only the continuation into a later cycle is linked, to the earliest root.
+- Cycle capability for the episode collection covers its AUTO focus (`OPPORTUNITY_EPISODES:AUTO`); other named episode focuses have no additional cycle.
 - Each lineage-aware budget read scans the ResearchStore several times; this is paid until the store grows large and is not memoized.
-- `_CAPABILITY_PROTOCOL_FILES` does not list the new additive schemas, so a later edit of them does not move the capability epoch.
+- The four additive schemas are part of the capability fingerprint; `hfic_research_policy.py` and `hfic_ordinary_operation.py` are runtime owners outside it.
+- The single unreproduced failure seen once in `research_policy_vertical` during the first regression is not explained; five clean reruns followed. The original trace was not captured by the runner.
 - An unparseable policy row is `RESEARCH_POLICY_CHAIN_CORRUPT`; a present-but-invalid `cycle_index` on a stored row still reads as cycle 1.
 - A failure after the PREVIEW reservation of an episode view leaves that reservation pending; the identical retry resumes it (RESUME), spends nothing new and lands the payload.
 - The epoch history used by preflight includes reservations while the packet and status readouts count sessions only, so a pre-runtime epoch with reservations but no session can display a raised `would freeze` limit while preflight enforces the legacy defaults.
