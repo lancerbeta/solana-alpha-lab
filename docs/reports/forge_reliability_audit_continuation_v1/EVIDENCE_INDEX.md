@@ -86,7 +86,7 @@ Protected sentinel исключён producer-ом из public census/context; co
 | [os-crash-race.json](../../../docs/evidence/forge_reliability_audit_continuation_v1/results/os-crash-race.json) | Actual OS process termination and two process race attempts. Reservation creation helper is a synthetic control, not complete research journey. |
 | [future-prefix.json](../../../docs/evidence/forge_reliability_audit_continuation_v1/results/future-prefix.json) | FILTERED_HELPER_CONTROL output, loaded points и actual public discovery target metrics. Штатный consumer data access UNTRACED. |
 | [negative-seams.json](../../../docs/evidence/forge_reliability_audit_continuation_v1/results/negative-seams.json) | Invalid stored cycle controls and copied executable-owner fingerprint omission. Production defaults never edited. |
-| [resources.json](../../../docs/evidence/forge_reliability_audit_continuation_v1/results/resources.json) | Valid unrelated operations10/100, records40/400, scans51, scanned rows2040/20400, packet298B, no value scans. |
+| [resources.json](../../../docs/evidence/forge_reliability_audit_continuation_v1/results/resources.json) | Valid unrelated operations10/100, records40/400, scans51, scanned rows2040/20400, serialized occupancy JSON298B, no value scans. Raw instrumentation key packet_bytes относится только к occupancy, не Forge/context packet. |
 
 Resource method: ordinary `record_operation → authorize_episode_view →
 land_episode_view` creates each of10/100 independent market/journal operations
@@ -94,7 +94,9 @@ with owner preview cap1 and unique descriptor. A fresh OS child executes
 `get_operation + journal_occupancy + owner_allowance`; instrumentation counts
 `iter_committed_records` yields. Windows GetProcessMemoryInfo measures
 `PeakWorkingSetSize`: 77,307,904 / 81,604,608 bytes; wall4.0466 /38.1738s.
-This is **WINDOWS_PEAK_WORKING_SET_NOT_LINUX_RSS**, not replacement of #385.
+Size298B измерен как `len(json.dumps(occupancy).encode())`; emitted
+Forge/context packet size этим не измерен. Near-bound context проверен отдельным
+test_y, без связи с298B. This is **WINDOWS_PEAK_WORKING_SET_NOT_LINUX_RSS**, not replacement of #385.
 The disposable script is not shipped as a new harness; these finite numerical
 measurements remain directly available. Fixture creation time not in readout time.
 
