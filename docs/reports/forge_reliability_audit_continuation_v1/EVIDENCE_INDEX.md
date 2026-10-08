@@ -191,9 +191,20 @@ so five historical passes do not explain it. **No full-scope healthy claim.**
 ## Fit, horizon, stop
 
 Repair is reversible code change in the existing owner; no new producer,
-schema, database, service, budget, scientific rule, provider, credential or
+schema, database, service, product budget, scientific rule, provider, credential or
 external activation. Legacy records remain byte-identical, charged; a code
 revert needs exact owner authority and would restore the documented bypass.
 Product horizon NOW=NONE; WATCH=owner elects frozen-later-cohort consumer after
 defining scientific validation semantics. No second repair or automatic BUILD.
-Exact merge phrase is requested only after current-head CI and machine readiness.
+The owner explicitly delegated substitution of the machine-rendered merge phrase
+only after current-head green CI and machine readiness; guarded merge and exact
+post-merge readback remain required.
+
+Delivery CI attempt 1 on head `341768770e20e0495b310d4f9467f12037060dab`
+was cancelled: shard 4 exceeded its 30-minute maximum while tests continued to
+finish; other executed jobs passed. The failed result is retained in
+[Actions attempt 1](https://github.com/lancerbeta/solana-alpha-lab/actions/runs/37784967070/attempts/1).
+The owner authorized a 60-minute allowance for PR 386 / pull_request / shard 4
+only. All other events, PRs and shards retain 30 minutes; the existing generator,
+exact workflow validator and regression checks enforce the bounded expression.
+This delivery allowance does not change audit statuses or product/RSS limits.

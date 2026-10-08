@@ -38,6 +38,11 @@ DELIVERY_PREFLIGHT_SCHEMA = (
 # Tracked-only delivery preflight keeps its separate local full-gate cap.
 GITHUB_VALIDATE_TIMEOUT_MINUTES = 25
 GITHUB_VALIDATE_TESTS_TIMEOUT_MINUTES = 30
+# Owner-authorized one-PR allowance; push/main and every other PR keep 30m.
+GITHUB_VALIDATE_TESTS_TIMEOUT_EXPRESSION = (
+    "${{ github.event_name == 'pull_request' && github.event.number == 386 "
+    "&& matrix.shard == 4 && 60 || 30 }}"
+)
 GITHUB_AGGREGATOR_TIMEOUT_MINUTES = 5
 # General test shard count range the workflow contract admits. This validator is
 # a trusted validation path; scripts/ci_test_partition.py keeps the planner's own
@@ -737,7 +742,7 @@ def expected_workflow() -> dict[str, Any]:
             },
             "validate-tests": {
                 "runs-on": "ubuntu-24.04",
-                "timeout-minutes": str(GITHUB_VALIDATE_TESTS_TIMEOUT_MINUTES),
+                "timeout-minutes": GITHUB_VALIDATE_TESTS_TIMEOUT_EXPRESSION,
                 "env": {
                     "UV_NO_ENV_FILE": "1",
                     "PYTHONDONTWRITEBYTECODE": "1",

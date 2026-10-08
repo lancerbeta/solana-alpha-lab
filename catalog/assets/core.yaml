@@ -897,7 +897,7 @@ records:
     repository_path: .github/workflows/ci.yml
   integrity:
     kind: sha256
-    sha256: a83e3dfbb4905e7d901eba05f55db16e10fb4b2b1dbf0cdefb284458d48b26ed
+    sha256: 874d6d4a02204ca88dfd7398043aafbd93d3410492d462fe6702dab1ca573c61
   access:
     mode: read_only
     method: file
@@ -936,7 +936,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 5cabc0da817371608667f82a205c06ed86180dab1a2734bdf0022a826c499519
+    sha256: 4d4d4e1fa81522a78f146dca44f193d69e8f854816adeaeefcec1ca91aa5fb2c
   access:
     mode: read_only
     method: command

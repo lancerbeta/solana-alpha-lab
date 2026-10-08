@@ -25,6 +25,10 @@ managed_write_set:
 - docs/reports/forge_reliability_audit_continuation_v1/**
 - docs/evidence/forge_reliability_audit_continuation_v1/**
 - tests/test_forge_reliability_audit_continuation_v1.py
+- tests/test_ci.py
+- scripts/validate_ci.py
+- scripts/render_ci_workflow.py
+- .github/workflows/ci.yml
 - tests/fixtures/forge_reliability_audit_continuation_v1/**
 - src/solana_alpha_lab/factory/hfic_ordinary_operation.py
 - docs/contracts/forge_research_policy_runtime_v1.md
@@ -128,3 +132,20 @@ incompatibility and chronological-consumer absence remain separate findings.
 OWNER_UX_CRITIC is added for changed occupancy/readout semantics. Catalog writes
 are generated propagation only. The final user steering forbids a permanent
 audit harness and large logs in Git; retain a minimal reproducer and key evidence.
+
+## Owner-authorized delivery allowance after CI timeout
+
+The owner explicitly authorized a one-off generous CI timeout and delegated
+substitution of the machine-rendered merge phrase after green exact-head CI and
+merge-readiness. This supplements the original merge stop; it does not bypass
+readiness, failed evidence, guarded merge or post-merge readback.
+
+CI run 37784967070, attempt 1, exact head
+341768770e20e0495b310d4f9467f12037060dab: shard 4 was cancelled after 30 minutes;
+GitHub annotation: `The job has exceeded the maximum execution time of 30m0s`.
+All other executed jobs passed. Preserve this failed attempt in Actions.
+Authorize only an exact workflow/validator timeout expression: PR 386,
+pull_request event, shard 4 receives 60 minutes. Every other event, PR and shard
+retains 30 minutes. This is a delivery allowance, not a second product repair;
+PREVIEW remains the sole product repair. Tests, aggregator, pins, commands,
+scientific/default/RSS limits, owner gate and profile bindings are unchanged.
