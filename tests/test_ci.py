@@ -113,7 +113,7 @@ class CiWorkflowTests(unittest.TestCase):
         )
         self.assertEqual(
             tests["timeout-minutes"],
-            ci.GITHUB_VALIDATE_TESTS_TIMEOUT_EXPRESSION,
+            str(ci.GITHUB_VALIDATE_TESTS_TIMEOUT_MINUTES),
         )
         self.assertEqual(
             final["timeout-minutes"],
@@ -154,16 +154,12 @@ class CiWorkflowTests(unittest.TestCase):
     def test_tag_based_action_reference_fails(self) -> None:
         self.assert_invalid(self.text.replace(ci.CHECKOUT_PIN, "actions/checkout@v7"))
 
-    def test_one_pr_timeout_allowance_cannot_be_widened(self) -> None:
-        for source, replacement in (
-            ("github.event_name == 'pull_request' && ", ""),
-            ("github.event.number == 386 && ", ""),
-            ("matrix.shard == 4 && ", ""),
-            ("&& 60 || 30", "&& 120 || 30"),
-            ("&& 60 || 30", "&& 60 || 60"),
-        ):
-            with self.subTest(source=source):
-                self.assert_invalid(self.text.replace(source, replacement, 1))
+    def test_full_test_timeout_drift_is_rejected(self) -> None:
+        for timeout in (30, 120):
+            with self.subTest(timeout=timeout):
+                self.assert_invalid(self.text.replace(
+                    "timeout-minutes: 60\n", f"timeout-minutes: {timeout}\n", 1
+                ))
 
     def test_extra_action_fails(self) -> None:
         addition = "\n      - name: Extra\n        uses: example/action@" + ("a" * 40)

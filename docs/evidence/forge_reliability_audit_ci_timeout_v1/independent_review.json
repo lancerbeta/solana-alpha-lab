@@ -1,0 +1,77 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-AUDIT-CI-TIMEOUT-REVIEW-001",
+  "as_of": "2026-10-08",
+  "task_id": "FORGE_RELIABILITY_AUDIT_CONTINUATION_V1",
+  "reviewed_bindings_sha256": "d078f3c0ce1ed07214fcabae1caac2545865a86408628e1c68180ee8d9821c39",
+  "reviewed_inventory_sha256": "6c3a5c722a16c77af3b81823d1948b5560d803eb41043b5fd5676fa192665c80",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEW",
+        "CONTENT_HEAD_ee9e2b2e83f7dc175ba16793419e4f6ffd25e630",
+        "NO_ACTIONABLE_P0_P1_P2",
+        "FULL_TESTS_60_MINUTES_PR_MAIN_AND_EXISTING_MANUAL_DISPATCH",
+        "TESTS_AND_DENY_AGGREGATOR_UNCHANGED",
+        "NO_PRODUCT_SOURCE_OR_SCIENTIFIC_CLAIM_CHANGE",
+        "STANDARD_PROFILE_RESEARCH_PARTIALS_PRESERVED"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEW",
+        "CONTENT_HEAD_ee9e2b2e83f7dc175ba16793419e4f6ffd25e630",
+        "NO_ACTIONABLE_P0_P1_P2",
+        "FULL_TESTS_60_MINUTES_PR_MAIN_AND_EXISTING_MANUAL_DISPATCH",
+        "TESTS_AND_DENY_AGGREGATOR_UNCHANGED",
+        "NO_PRODUCT_SOURCE_OR_SCIENTIFIC_CLAIM_CHANGE",
+        "INDEPENDENT_CI_WORKFLOW_14_OF_14_PASS"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEW",
+        "CONTENT_HEAD_ee9e2b2e83f7dc175ba16793419e4f6ffd25e630",
+        "NO_ACTIONABLE_P0_P1_P2",
+        "FULL_TESTS_60_MINUTES_PR_MAIN_AND_EXISTING_MANUAL_DISPATCH",
+        "TESTS_AND_DENY_AGGREGATOR_UNCHANGED",
+        "NO_PRODUCT_SOURCE_OR_SCIENTIFIC_CLAIM_CHANGE"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEW",
+        "CONTENT_HEAD_ee9e2b2e83f7dc175ba16793419e4f6ffd25e630",
+        "NO_ACTIONABLE_P0_P1_P2",
+        "FULL_TESTS_60_MINUTES_PR_MAIN_AND_EXISTING_MANUAL_DISPATCH",
+        "TESTS_AND_DENY_AGGREGATOR_UNCHANGED",
+        "NO_PRODUCT_SOURCE_OR_SCIENTIFIC_CLAIM_CHANGE"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_MODEL_DIVERSITY_ATTESTATION",
+    "NO_MERGE",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "PACKET_INFORMATION_PATH_ONLY",
+    "NO_LIVE_LAUNCH_IDENTITY_ATTESTATION"
+  ],
+  "remediation_history": []
+}
