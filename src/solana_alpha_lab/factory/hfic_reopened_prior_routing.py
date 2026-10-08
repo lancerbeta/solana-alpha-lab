@@ -38,6 +38,7 @@ from solana_alpha_lab.factory.hfic_prior_memory import (
     compact_prior_entry,
     latest_hypothesis_decisions,
     prior_memory_bounds,
+    session_identity,
 )
 from solana_alpha_lab.factory.hfic_provenance import is_hfic_record
 from solana_alpha_lab.factory.hfic_session import (
@@ -220,10 +221,7 @@ def ranked_prior_entries_for_ids(
                 if isinstance(decision, Mapping)
             }
         )
-    if store is not None:
-        # Same canonical DECISION_EVENT walker as Critic prior-memory.
-        for hyp_id, decision in latest_hypothesis_decisions(store).items():
-            resolved.setdefault(str(hyp_id), decision)
+    store_decisions = latest_hypothesis_decisions(store) if store is not None else {}
     session_scope: dict[str, dict[str, Any]] = {}
     if store is not None:
         from solana_alpha_lab.factory.hfic_prior_memory import (
@@ -243,7 +241,12 @@ def ranked_prior_entries_for_ids(
         # outcomes as RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE.
         if session_scope:
             payload = recover_scope_payload(payload, session_scope)
-        decision = resolved.get(str(hyp_id))
+        identity = session_identity(payload)
+        explicit = resolved.get(str(hyp_id))
+        decision = (
+            explicit if explicit is not None and session_identity(explicit) == identity
+            else store_decisions.get((str(hyp_id), identity))
+        )
         entry = compact_forge_prior_entry(str(hyp_id), payload, decision)
         if str(entry.get("hypothesis_version_id") or "") != str(hyp_id):
             raise ReopenedPriorRoutingError(BODY_INCOMPLETE)

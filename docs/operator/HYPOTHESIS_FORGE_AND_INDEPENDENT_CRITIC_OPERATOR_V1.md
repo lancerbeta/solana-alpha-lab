@@ -619,6 +619,10 @@ persist `--saved-draft-sha256` before freeze.
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write --format json --owner-focus AUTO
 ```
 
+Если saved context отсутствует или повреждён (`FORGE_CONTEXT_*`, exit 2), это `BLOCKED`: возьмите `detail.relative_locator` и `detail.required_context_sha256` из ответа, восстановите **исходные** байты в `<data-root>/<relative_locator>`, сверьте SHA-256 и повторите тот же no-write readback. Если исходных байтов нет, остановитесь; новый context и look не создавайте. `RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY` — машинное имя этого шага.
+
+Если `EXACT_PRIOR_SCOPE_MATCH` отказал в повторном look, передайте исходную карточку в `prior --candidate <canonical-candidate-json>` на том же `--data-root`, возьмите `session_id` точного совпадения и прочитайте `show-session --session-id <session_id>`; сохранённый результат заменяет повторный look. Новый вопрос требует новой области доказательства и отдельного основания.
+
 Authorized persist (same slash, after READY):
 
 ```
@@ -1730,8 +1734,10 @@ Catalog/prior resolution
 
 Внутри одного ordinary `/hypothesis-forge`, до persist/freeze, простой экран
 может перейти в составной. Это не новая сессия и не `NORMALIZED_TRAJECTORY_V1`.
-Общий бюджет: 6 main + 2 adaptive. AUTO оставляет 3 main для compound, пока
-compound не использован. Неназывайте непройденный tier выполненным.
+Поставляемые значения по умолчанию: 6 MAIN + 2 ADAPTIVE; AUTO оставляет 3 MAIN
+для compound, пока compound не использован. Для конкретного run действует
+замороженный `research_policy_context.this_search` (limits и remaining), а не
+эти значения по умолчанию. Не называйте непройденный tier выполненным.
 `PRICE_RELATIVE_PROXY` — относительная цена. `ESTIMATED_NET_PROXY` — модельная
 оценка. Ни один из них не является фактическим `NetReturn`.
 Один temporal-вопрос пишет в тот же result три среза: `pooled`, `by_cohort`

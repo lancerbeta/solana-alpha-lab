@@ -27,6 +27,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hfic_representation_ladder.py
 - src/solana_alpha_lab/factory/hfic_control_integrity.py
 - src/solana_alpha_lab/factory/hfic_prior_memory.py
+- src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py
 - src/solana_alpha_lab/factory/hfic_suppression_semantics.py
 - src/solana_alpha_lab/factory/hfic_memory_policy.py
 - src/solana_alpha_lab/factory/hfic_ordinary_operation.py

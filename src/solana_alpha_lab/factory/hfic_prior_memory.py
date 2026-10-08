@@ -187,7 +187,9 @@ def build_prior_memory_snapshot(
         hyp_id = str(payload.get("hypothesis_version_id") or "")
         if not hyp_id:
             raise PriorMemoryUnidentifiedError()
-        capsule = _capsule_from_payload(hyp_id, payload, decisions.get(hyp_id))
+        capsule = _capsule_from_payload(
+            hyp_id, payload, decisions.get((hyp_id, session_identity(payload)))
+        )
         _fill_scope_from_session(capsule, payload, session_scope)
         capsules_by_id[hyp_id] = capsule
     capsules = [capsules_by_id[item] for item in sorted(capsules_by_id)]
@@ -242,13 +244,19 @@ def _payload_mapping(record: Any) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
-def latest_hypothesis_decisions(store: Any) -> dict[str, dict[str, str]]:
-    """Latest DECISION_EVENT disposition per hypothesis_version_id.
+def session_identity(payload: Mapping[str, Any]) -> str | None:
+    """Treat absent and empty session IDs as legacy; preserve known IDs exactly."""
+    value = payload.get("session_id")
+    return value if isinstance(value, str) and value else None
+
+
+def latest_hypothesis_decisions(store: Any) -> dict[tuple[str, str | None], dict[str, str]]:
+    """Latest DECISION_EVENT disposition per hypothesis and session.
 
     Shared read-only resolver for Critic prior-memory capsules and Forge
     Prompt-A ranked-prior projection. Do not fork a second decision walker.
     """
-    latest: dict[str, tuple[tuple[str, str], str, str, str]] = {}
+    latest: dict[tuple[str, str | None], tuple[tuple[str, str], str, str]] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
         if kind != "DECISION_EVENT":
@@ -264,21 +272,21 @@ def latest_hypothesis_decisions(store: Any) -> dict[str, dict[str, str]]:
         record_id = str(getattr(record, "record_id", "") or "")
         effective = str(getattr(record, "effective_at", "") or "")
         key = (effective, record_id)
-        previous = latest.get(hyp_id)
+        identity = (hyp_id, session_identity(payload))
+        previous = latest.get(identity)
         if previous is None or key >= previous[0]:
-            latest[hyp_id] = (
+            latest[identity] = (
                 key,
                 str(payload.get("decision_kind") or ""),
                 str(payload.get("reason_code") or ""),
-                str(payload.get("session_id") or ""),
             )
     return {
-        hyp_id: {"decision_kind": kind, "reason_code": reason, **({"session_id": session} if session else {})}
-        for hyp_id, (_key, kind, reason, session) in latest.items()
+        identity: {"decision_kind": kind, "reason_code": reason, **({"session_id": identity[1]} if identity[1] else {})}
+        for identity, (_key, kind, reason) in latest.items()
     }
 
 
-def _latest_decisions(store: Any) -> dict[str, dict[str, str]]:
+def _latest_decisions(store: Any) -> dict[tuple[str, str | None], dict[str, str]]:
     """Compatibility alias; prefer :func:`latest_hypothesis_decisions`."""
     return latest_hypothesis_decisions(store)
 
@@ -452,7 +460,7 @@ def _capsule_from_payload(
     decision: Mapping[str, str] | None,
 ) -> dict[str, Any]:
     # Known and missing sessions are distinct; only both missing retain legacy coupling.
-    if decision and payload.get("session_id") != decision.get("session_id"):
+    if decision and session_identity(payload) != session_identity(decision):
         decision = None
     protocol = payload.get("hfic_protocol")
     protocol_text = str(protocol) if isinstance(protocol, str) and protocol else None

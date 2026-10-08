@@ -1376,6 +1376,12 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             explanation = interpret_critic_terminal(critic_term)
             lines.append("  applicability: " + explanation["prior_applicability"] +
                          "; class=" + explanation["outcome_class"] + "; family_suppression_authority=false")
+            if explanation["prior_applicability"] == "CANDIDATE_AND_BOUND_EVIDENCE":
+                lines.append("  смысл: отказ относится к этому кандидату и связанной с ним evidence; семейство не закрыто, переносимость на другие условия неизвестна")
+            elif explanation["prior_applicability"] == "UNKNOWN":
+                lines.append("  смысл: область применимости вердикта неизвестна; семейство не закрыто")
+            else:
+                lines.append("  смысл: этот терминал сам по себе не закрывает гипотезу или семейство")
         if selected or mechanism:
             lines.append(
                 "  candidate: {cid} mechanism={mech}".format(

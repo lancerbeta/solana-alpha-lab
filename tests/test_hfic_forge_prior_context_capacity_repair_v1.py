@@ -587,7 +587,7 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
             # Shared resolver matches Critic.
             decisions = latest_hypothesis_decisions(store)
             self.assertEqual(
-                decisions["HFIC-CAND-FAT0001DEADBEEF"]["reason_code"],
+                decisions[("HFIC-CAND-FAT0001DEADBEEF", CONTROL_SESSION)]["reason_code"],
                 "KILL_STATISTICALLY_UNIDENTIFIABLE",
             )
 

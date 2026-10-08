@@ -5197,6 +5197,7 @@ def main(argv: list[str] | None = None) -> int:
             print(code, file=sys.stderr)
             return emit({"reason_code": code, "scientific_negative": False,
                          "writes": False,
+                         "owner_readout": "Точное предыдущее исследование уже сохранено. Выполните prior --candidate с текущей карточкой, возьмите session_id совпадения и откройте show-session --session-id. Новый look не открывайте.",
                          "next_action": "READ_EXACT_PRIOR_REUSE_SAVED_RESULT"}, exit_code=2)
         if isinstance(exc, HficSessionError) and code == "CLOSED_FAMILY_REOPEN":
             print(code, file=sys.stderr)
@@ -5209,8 +5210,16 @@ def main(argv: list[str] | None = None) -> int:
                 "RUN_PERSISTENT_PREFLIGHT_REUSE_SAVED_LOOK"
                 if args.command in {"persist-draft", "freeze"}
                 else "RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY")
+            locator = exc.detail.get("relative_locator")
+            digest = exc.detail.get("required_context_sha256")
+            owner_readout = (
+                f"Исходный контекст недоступен. Восстановите исходные байты по <data-root>/{locator}, сверьте SHA-256 {digest} и повторите тот же readback. Если исходных байтов нет — BLOCKED; замену не генерируйте."
+                if locator and digest else
+                "Связь с исходным контекстом нарушена. Проверьте detail и исходные байты; если их нельзя восстановить и сверить — BLOCKED. Новый context и look не создавайте."
+            )
             return emit({"reason_code": code, "detail": exc.detail,
-                         "scientific_negative": False, "writes": False,
+                         "scientific_negative": False, "writes": False, "status": "BLOCKED",
+                         "owner_readout": owner_readout,
                          "next_action": next_action}, exit_code=2)
         return emit_error(code)
     except (OSError, ValueError, json.JSONDecodeError):

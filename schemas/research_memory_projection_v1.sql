@@ -48,6 +48,8 @@ SELECT
             SELECT json_extract_string(origin.payload_json, '$.origin_kind')
             FROM _research_events AS origin
             WHERE origin.record_kind = 'HYPOTHESIS_ORIGIN'
+              AND json_extract_string(origin.payload_json, '$.session_id')
+                  IS NOT DISTINCT FROM json_extract_string(hypothesis.payload_json, '$.session_id')
               AND (
                   origin.hypothesis_version_id = hypothesis.stable_id
                   OR origin.stable_id = json_extract_string(
@@ -244,6 +246,8 @@ SELECT
             SELECT json_extract_string(origin.payload_json, '$.origin_kind')
             FROM _research_events AS origin
             WHERE origin.record_kind = 'HYPOTHESIS_ORIGIN'
+              AND json_extract_string(origin.payload_json, '$.session_id')
+                  IS NOT DISTINCT FROM json_extract_string(hypothesis.payload_json, '$.session_id')
               AND (
                   origin.hypothesis_version_id = hypothesis.stable_id
                   OR origin.stable_id = json_extract_string(
