@@ -55,6 +55,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hfic_session.py
 - src/solana_alpha_lab/factory/hfic_temporal_discovery.py
 - src/solana_alpha_lab/factory/live_cohort_to_forge.py
+- tests/test_hfic_cycle_two_normalized_vertical_v1.py
 - tests/test_hfic_list_aware_vertical_v1.py
 - tests/test_hfic_market_evidence_epoch_decision_basis_v2.py
 - tests/test_hfic_research_policy_closure_v1.py
