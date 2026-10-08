@@ -1211,6 +1211,7 @@ _ADMISSION_PENDING_STATES = frozenset(
 
 
 _EPISODE_FOCUS_PREFIX = "OPPORTUNITY_EPISODES:"
+_EPISODES_REPRESENTATION_ID = "NORMALIZED_TRAJECTORY_EPISODES_V1"
 
 
 def _focus_text(owner_focus: object) -> str:
@@ -1701,6 +1702,11 @@ def resolve_scientific_admission(
         for item in market_rows
         if representation_identity_from_session(item) == (representation, version)
         and _cycle_index_of(item) == target_cycle
+        # The episode collection's children are per focus: another focus's child is not this focus's occupancy.
+        and (
+            representation != _EPISODES_REPRESENTATION_ID
+            or _focus_text(item.get("owner_focus")) == _focus_text(owner_focus)
+        )
     ]
     if representation != BASE_REPRESENTATION_ID and matching_representation:
         return {

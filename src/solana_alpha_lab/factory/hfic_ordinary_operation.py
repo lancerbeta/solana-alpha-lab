@@ -318,7 +318,7 @@ def _representation_continuation_root(
     if parent is None:
         return None, None
     members: list[Mapping[str, Any]] = []
-    roots: list[Mapping[str, Any]] = []
+    roots: list[tuple[int, Mapping[str, Any]]] = []
     later_cycle_member = False
     for item in list_operations(store):
         rep = item.get("representation")
@@ -338,14 +338,18 @@ def _representation_continuation_root(
             later_cycle_member = True
         if not item.get("accounting_root") and _cycle(other) < _cycle(parent):
             roots.append((_cycle(other), item))
-    if later_cycle_member:
+    # The would-be root is always computed, so an idempotent re-request of an existing continuation child
+    # keeps its stored digest even after a later cycle's child exists.
+    root_journal = None
+    if _cycle(parent) > 1 and roots:
+        # The earliest cycle wins; within a cycle the earliest recorded. A missing timestamp sorts last.
+        root_journal = str(min(roots, key=lambda pair: (pair[0], str(pair[1].get("_recorded_at") or "~")))[1]["journal_scope"])
+    if later_cycle_member and root_journal is None:
         # An earlier cycle's child may not arrive after a later cycle's: that would give one
         # representation two independent budgets. The continuation runs forward in cycle order.
         return None, "ORDINARY_OPERATION_LINEAGE_OUT_OF_ORDER"
-    if _cycle(parent) <= 1 or not roots:
+    if root_journal is None:
         return None, None
-    # The earliest cycle wins; within a cycle the earliest recorded. A missing timestamp sorts last.
-    root = min(roots, key=lambda pair: (pair[0], str(pair[1].get("_recorded_at") or "~")))[1]
     blocker = None
     for item in members:
         if item.get("status") == STATUS_STOPPED:
@@ -353,7 +357,7 @@ def _representation_continuation_root(
             break
         if _unresolved_reservations(store, item):
             blocker = "EXTENSION_PARENT_HAS_PENDING_RESERVATION"
-    return str(root["journal_scope"]), blocker
+    return root_journal, blocker
 
 
 def journal_has_history(store: Any, journal_scope: str) -> bool:

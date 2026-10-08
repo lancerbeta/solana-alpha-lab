@@ -179,6 +179,7 @@ root does. The packet shows the root's limits and what is left of them.
 ## Known limits of this delivery
 
 - Several cycle-1 variants of one representation (different payload or scope under the same cycle-1 parent) keep their own historical budgets; only the continuation into a later cycle is linked, to the earliest root.
+- Occupancy of the episode representation is per focus and per cycle: another focus's child no longer blocks this focus's child (the legacy NT representation keeps its per-market occupancy).
 - Cycle capability for the episode collection covers its AUTO focus (`OPPORTUNITY_EPISODES:AUTO`); other named episode focuses have no additional cycle.
 - Each lineage-aware budget read scans the ResearchStore several times; this is paid until the store grows large and is not memoized.
 - The four additive schemas are part of the capability fingerprint; `hfic_research_policy.py` and `hfic_ordinary_operation.py` are runtime owners outside it.

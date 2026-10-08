@@ -378,5 +378,51 @@ class ContinuationAccountingTests(unittest.TestCase):
             self.assertEqual(oo.accounting_root_of(store, ROOT_JOURNAL), ROOT_JOURNAL)
 
 
+class RepresentationContinuationOrderTests(unittest.TestCase):
+    """Round 7: the derived root is stable for an idempotent re-request, and order cannot mint a second budget."""
+
+    def test_the_root_is_stable_after_a_later_cycle_child_and_an_earlier_one_is_refused(self) -> None:
+        from unittest import mock
+
+        from solana_alpha_lab.factory import hfic_session
+
+        focus, market = "OPPORTUNITY_EPISODES:AUTO", MARKET
+        rep_id = "NORMALIZED_TRAJECTORY_EPISODES_V1"
+
+        def row(journal: str, parent: str, recorded: str, **extra) -> dict:
+            return {
+                "journal_scope": journal, "owner_focus": focus, "market_evidence_epoch_sha256": market,
+                "representation": {"representation_id": rep_id, "parent_session_id": parent},
+                "_recorded_at": recorded, "status": "OPEN", **extra,
+            }
+
+        bundles = {
+            "S1": {"owner_focus": focus}, "S2": {"owner_focus": focus, "cycle_index": 2},
+            "S3": {"owner_focus": focus, "cycle_index": 3},
+        }
+        c1 = row("11" * 32, "S1", "2026-10-07T01:00:00")
+        c2 = row("22" * 32, "S2", "2026-10-07T02:00:00", accounting_root="11" * 32, lineage_kind=oo.REPRESENTATION_CONTINUATION)
+        c3 = row("33" * 32, "S3", "2026-10-07T03:00:00", accounting_root="11" * 32, lineage_kind=oo.REPRESENTATION_CONTINUATION)
+
+        def derive(parent: str, journal: str, existing: list) -> tuple:
+            with mock.patch.object(oo, "list_operations", return_value=existing), mock.patch.object(
+                hfic_session, "load_session_bundle", side_effect=lambda store, sid: bundles.get(sid)
+            ), mock.patch.object(oo, "_unresolved_reservations", return_value=[]):
+                return oo._representation_continuation_root(
+                    object(), representation={"representation_id": rep_id, "parent_session_id": parent},
+                    focus=focus, market=market, journal=journal,
+                )
+
+        # Cycle 2 continues cycle 1; after cycle 3 exists a re-request of cycle 2 derives the SAME root.
+        self.assertEqual(derive("S2", c2["journal_scope"], [c1]), ("11" * 32, None))
+        self.assertEqual(derive("S2", c2["journal_scope"], [c1, c2, c3]), ("11" * 32, None))
+        # Cycle 3 with only a cycle-2 root continues it; the earliest cycle wins once cycle 1 exists.
+        self.assertEqual(derive("S3", c3["journal_scope"], [c2, c1]), ("11" * 32, None))
+        # A cycle-1 child arriving after a later cycle's child is refused (one representation, one budget) ...
+        self.assertEqual(derive("S1", "44" * 32, [c2]), (None, "ORDINARY_OPERATION_LINEAGE_OUT_OF_ORDER"))
+        # ... and a re-request of the cycle-1 root itself, which has no root, still derives (None, blocker) only for a NEW journal.
+        self.assertEqual(derive("S1", c1["journal_scope"], [c1, c2]), (None, "ORDINARY_OPERATION_LINEAGE_OUT_OF_ORDER"))
+
+
 if __name__ == "__main__":
     unittest.main()
