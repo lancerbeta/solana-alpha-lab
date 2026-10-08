@@ -143,7 +143,9 @@ readiness, failed evidence, guarded merge or post-merge readback.
 CI run 37784967070, attempt 1, exact head
 341768770e20e0495b310d4f9467f12037060dab: shard 4 was cancelled after 30 minutes;
 GitHub annotation: `The job has exceeded the maximum execution time of 30m0s`.
-All other executed jobs passed. Preserve this failed attempt in Actions.
+The other substantive test/validation/resource jobs succeeded; the mandatory
+`validate` aggregator failed because shard 4 was cancelled. The whole run
+conclusion was CANCELLED. Preserve this failed attempt in Actions.
 Authorize only an exact workflow/validator timeout expression: PR 386,
 pull_request event, shard 4 receives 60 minutes. Every other event, PR and shard
 retains 30 minutes. This is a delivery allowance, not a second product repair;

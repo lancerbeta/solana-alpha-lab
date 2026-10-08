@@ -202,7 +202,9 @@ post-merge readback remain required.
 
 Delivery CI attempt 1 on head `341768770e20e0495b310d4f9467f12037060dab`
 was cancelled: shard 4 exceeded its 30-minute maximum while tests continued to
-finish; other executed jobs passed. The failed result is retained in
+finish. Other substantive jobs passed, but the mandatory `validate` aggregator
+failed on the cancelled dependency; the whole run conclusion was CANCELLED.
+The failed result is retained in
 [Actions attempt 1](https://github.com/lancerbeta/solana-alpha-lab/actions/runs/37784967070/attempts/1).
 The owner authorized a 60-minute allowance for PR 386 / pull_request / shard 4
 only. All other events, PRs and shards retain 30 minutes; the existing generator,
