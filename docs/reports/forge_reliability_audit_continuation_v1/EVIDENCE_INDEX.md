@@ -29,7 +29,9 @@ repair; audit завершён с явными residual gaps. Это offline syn
 Общие команды ниже используют `<PYTHON>` existing locked interpreter,
 `<CHECKOUT>` elected clone и `<SYNTHETIC_ROOT>` отдельную disposable fixture.
 Абсолютные локальные пути удалены из командных receipts; identity-bearing
-native JSON сохранены byte-for-byte. Полные regenerable CLI логи не помещены
+native JSON сохранены без изменения содержимого. Git нормализует CRLF→LF;
+file hashes относятся к delivered LF bytes, научные canonical hashes не меняются.
+Полные regenerable CLI логи не помещены
 в Git: [public-cli-excerpts.json](../../../docs/evidence/forge_reliability_audit_continuation_v1/checks/public-cli-excerpts.json)
 содержит 147 command/exit/wall/hash/excerpts; это excerpts, не доступные полные
 логи. Saved numerical/native evidence ниже достаточно для конкретных claims.
