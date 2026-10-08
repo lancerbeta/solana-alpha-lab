@@ -115,8 +115,25 @@ def _attempt(
     return done.returncode, body
 
 
+def _scope_axes() -> dict:
+    """The declared look scope every card must restate at top level (the grounded handoff contract)."""
+
+    spec = _compound_spec(
+        query_id="rpv-axes",
+        schedule={"lateness_seconds": DOCUMENT_LATENESS},
+        all=[{"feature": "impulse", "op": "between", "lower": 0.25, "upper": 2.0, "closed": "left"}],
+    )
+    return {
+        "target": temporal_target_label(spec),
+        "explanatory_condition": "compound",
+        "representation_scope": "TEMPORAL_PRICE_LIQUIDITY",
+        "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+    }
+
+
 def _card(ordinal: int, claim: str) -> dict:
     return {
+        **_scope_axes(),
         "display_ordinal": ordinal,
         "label": f"RPV-C{ordinal}",
         "claim": claim,
@@ -592,6 +609,7 @@ class ResearchPolicyAutoCycleVerticalTests(unittest.TestCase):
             )
             live = ResearchStore(data_root, create_if_missing=False)
             payload_sha, scope_sha = "ab" * 32, "cd" * 32
+            first_child_journal = None
             for parent_session, parent_key in ((session1, journal1), (str(done2["frozen"]["session_id"]), journal2)):
                 child_journal = representation_search_key(parent_key, parent_session, payload_sha, scope_sha)
                 child = oo.record_operation(
@@ -613,7 +631,9 @@ class ResearchPolicyAutoCycleVerticalTests(unittest.TestCase):
                     },
                 )
                 oo._assert_preflight_journal(live, child, child_journal, repo_root=ROOT, data_root=data_root)
-                self.assertEqual(oo.accounting_root_of(live, child_journal), child_journal)  # its own domain
+                # Cycle 1's child is its own root; cycle 2's child keeps its own identity but continues that root's spend.
+                self.assertEqual(oo.accounting_root_of(live, child_journal), first_child_journal or child_journal)
+                first_child_journal = first_child_journal or child_journal
                 self.assertEqual(oo.journal_occupancy(live, child_journal)["main"]["completed"], 0)
             self.assertEqual(oo.journal_occupancy(live, journal2)["main"]["completed"], 2)  # BASE lineage untouched
 

@@ -824,6 +824,17 @@ class ListAwareVerticalTests(unittest.TestCase):
         card_template = json.loads((ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(encoding="utf-8"))
         scope = evidence["_scope"]
         identity = temporal.temporal_holder_claim_identity(evidence["result"])
+        # The view is read-only; explicitly commit its derived context before writers (the grounded handoff contract).
+        from solana_alpha_lab.factory.hfic_preflight import persist_forge_context_packet
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from solana_alpha_lab.factory.run_passport import canonical_sha256
+
+        ladder = dict(ladder)
+        ladder["forge_context_packet_sha256"] = persist_forge_context_packet(
+            self.plane, ladder["forge_context_packet"], store=ResearchStore(self.plane), repo_root=ROOT,
+        )
+        ladder.pop("preflight_receipt_sha256", None)
+        ladder["preflight_receipt_sha256"] = canonical_sha256(ladder)
         card = {
             **card_template["candidates"][0],
             **scope,
