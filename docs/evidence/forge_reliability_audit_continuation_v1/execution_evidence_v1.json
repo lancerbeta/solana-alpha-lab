@@ -74,8 +74,8 @@
   "inventory": [
     {
       "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/context-controls.log",
-      "sha256": "b2c82d86568d32a44c846f8e9dda4836470615438ea2a5ae064a663dd7f5c422",
-      "bytes": 1628
+      "sha256": "737d695c93fd7993e84af40928f4bc965c7bed4866d73b312c66bf7678142d47",
+      "bytes": 1618
     },
     {
       "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/current-base-checks.json",
@@ -84,23 +84,23 @@
     },
     {
       "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/episode-controls.log",
-      "sha256": "22872aaeb384023bf0b26647c110ea277ccbc27b761541f666f9bfd259b54f44",
-      "bytes": 2641
+      "sha256": "a5d40df745eaac5705b06b315b33a9f5b4d39726559224b6085ffe8823e26ec9",
+      "bytes": 2624
     },
     {
       "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/final-base-controls.log",
-      "sha256": "47891bd1c19d02a3d6f3e0ee333cd0c6cee5438dde9437b0f0de06a719657ed6",
-      "bytes": 2099
+      "sha256": "6ee02e295eeeba312b72970aa672091fa3fad6c6c971a90ce183177046b3db08",
+      "bytes": 2087
     },
     {
       "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/memory-controls.log",
-      "sha256": "3f525723e7b6211bbe99ffc2e3847f2a6f8e4d825a213c16826defe3d48993fe",
-      "bytes": 1847
+      "sha256": "1cdae8a922ad35e8a78febb922138ebd5fafd87c7cd2ad3550891066be368821",
+      "bytes": 1836
     },
     {
       "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/policy-controls.log",
-      "sha256": "4139b1c4004661a4a278b2c8da43cda74ab11acf60c1171cf44839a2511cd57b",
-      "bytes": 1428
+      "sha256": "bea922363c888c0e332062c7f840c5f970f92d29803153ca90fa306e5082b20d",
+      "bytes": 1417
     },
     {
       "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/public-cli-excerpts.json",
@@ -109,18 +109,18 @@
     },
     {
       "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/repair-green-final.log",
-      "sha256": "5e220a57428f633e66aea94b9c39051d83180fe6fbd050a3cf55a588b3670615",
-      "bytes": 1204
+      "sha256": "8be6740d06b8e86c2c2dfc002d6a0d6dd5ba8524a32114a025506772f48d0d55",
+      "bytes": 1194
     },
     {
       "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/repair-green.log",
-      "sha256": "e339402bdab71f85e0e7accfcf7ee18ae57c9b1fe36f9bb18b113a3e23f118f1",
-      "bytes": 6233
+      "sha256": "abe0eb170e9ec73e9c3c3a01394fe14498ee2be5f874d97b6de65af8eb45ca82",
+      "bytes": 6189
     },
     {
       "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/repair-red.log",
-      "sha256": "1452980ca81f6a15f90e9ae8891a0da7e66af759886ae8adc0b1fb7eb01a8db7",
-      "bytes": 5022
+      "sha256": "d3873136f8ae96deaf60fbb6f666d4ed75f1a5cfe72086f182058a495d450026",
+      "bytes": 4938
     },
     {
       "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/attempt-accounting.json",
