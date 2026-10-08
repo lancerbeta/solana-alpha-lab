@@ -304,6 +304,16 @@ class ListAwareVerticalTests(unittest.TestCase):
         self.assertEqual(signatures[tuple(sorted((ix[LIST_ID["A"]], ix[LIST_ID["B"]], ix[LIST_ID["C"]])))], 1)
         self.assertEqual(signatures[tuple(sorted((ix[LIST_ID["A"]], ix[LIST_ID["C"]])))], 1)
         self.assertNotIn("mean_target", json.dumps(context))
+        # B12: the emitted formulation packet shows the effective research policy and what is left, before any card exists.
+        policy_context = pre["forge_context_packet"]["research_policy_context"]
+        self.assertEqual(policy_context["state"], "READY")
+        self.assertEqual(policy_context["new_run_limits"]["main_total"], 6)
+        self.assertEqual(policy_context["this_search"]["limits"]["max_generated"], 6)
+        self.assertEqual(policy_context["this_search"]["remaining"], {"main": 6, "adaptive": 2, "preview": 2})
+        self.assertEqual(policy_context["market_epoch_pool"]["auto_cycles_per_market"], 1)
+        self.assertIn("ceiling, not a target", policy_context["instruction"])
+        self.assertLess(len(json.dumps(policy_context, sort_keys=True).encode("utf-8")), 3000)
+        self.assertLess(len(json.dumps(pre["forge_context_packet"], sort_keys=True).encode("utf-8")), 65536)
         (self.work / "emitted-context.json").write_text(json.dumps(context, indent=1), encoding="utf-8")
         import os
 
@@ -592,7 +602,7 @@ class ListAwareVerticalTests(unittest.TestCase):
         self.assertEqual(reps["NORMALIZED_TRAJECTORY_EPISODES_V1"]["status"], "READY")
 
         # BASE finishes NO_WORTHY with a real scoped look as its evidence.
-        base = self._run("nw", draft("LIST_CONTRAST", list_condition=AC), focus="LAV_NW")
+        base = self._run("nw", draft("LIST_CONTRAST", list_condition=AC), focus="LAV_NW", cap={"main": 1, "adaptive": 0, "preview": 2})
         self.assertEqual(base["_exit_code"], 0, base)
         pre = base["_preflight"]
         template = json.loads((ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1_2.json").read_text(encoding="utf-8"))
@@ -618,7 +628,21 @@ class ListAwareVerticalTests(unittest.TestCase):
         # The view: literal motifs from real episode points, scope applied before aggregation.
         spec_path = self.work / "view-spec.json"
         spec_path.write_text(json.dumps(draft("LIST_CONTRAST", list_condition=AC)), encoding="utf-8")
-        view = _forge_call("episode-normalized-view", "--spec", str(spec_path), "--parent-session-id", frozen_base["session_id"], data_root=self.plane)
+        # The value-bearing prefix view spends the exact operation's PREVIEW budget, reserved by request descriptor
+        # before any value is read. Without an operation it is refused with zero values loaded.
+        no_operation = run_cli("episode-normalized-view", "--spec", str(spec_path), "--parent-session-id", frozen_base["session_id"], data_root=self.plane)
+        self.assertNotEqual(no_operation.returncode, 0)
+        self.assertEqual(json.loads(no_operation.stdout)["reason_code"], "EPISODE_VIEW_OPERATION_REQUIRED")
+        self.assertFalse(json.loads(no_operation.stdout)["values_loaded"])
+        operation_sha = str(base["operation_sha256"])
+        view_args = ("--parent-session-id", frozen_base["session_id"], "--operation-sha256", operation_sha)
+        view = _forge_call("episode-normalized-view", "--spec", str(spec_path), *view_args, data_root=self.plane)
+        self.assertEqual(view["preview_accounting"]["disposition"], "EXECUTE")
+        self.assertTrue(view["prefix_values_loaded"])
+        again = _forge_call("episode-normalized-view", "--spec", str(spec_path), *view_args, data_root=self.plane)
+        self.assertEqual(again["preview_accounting"]["disposition"], "REPEAT")
+        self.assertFalse(again["writes"])
+        self.assertEqual(again["representation_payload"], view["representation_payload"])
         payload = view["representation_payload"]
         panels = {name: {item["motif"]: item["n"] for item in panel["motifs"]} for name, panel in payload["panels"].items()}
         du, ud = "P:DU|L:FU|H:UU", "P:UD|L:FF|H:DD"
@@ -641,6 +665,27 @@ class ListAwareVerticalTests(unittest.TestCase):
         )
         ladder.pop("preflight_receipt_sha256", None)
         ladder["preflight_receipt_sha256"] = canonical_sha256(ladder)
+
+        # A changed scope is a new accounted PREVIEW; the next one finds the operation's PREVIEW budget spent.
+        from solana_alpha_lab.factory.hfic_ordinary_operation import journal_occupancy
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        store = ResearchStore(self.plane)
+        self.assertEqual(journal_occupancy(store, pre["search_key_sha256"])["preview"]["completed"], 1)
+        for tag, clause in (("a", ["A"]), ("c", ["C"])):
+            other_path = self.work / f"view-spec-{tag}.json"
+            other_path.write_text(json.dumps(draft("LIST_CONTRAST", list_condition={"clauses": [{"all_of": clause}]})), encoding="utf-8")
+            outcome = run_cli("episode-normalized-view", "--spec", str(other_path), *view_args, data_root=self.plane)
+            if tag == "a":
+                self.assertEqual(outcome.returncode, 0, outcome.stderr + outcome.stdout)
+                self.assertEqual(json.loads(outcome.stdout)["preview_accounting"]["disposition"], "EXECUTE")
+            else:
+                self.assertNotEqual(outcome.returncode, 0)
+                refusal = json.loads(outcome.stdout)
+                self.assertEqual(refusal["reason_code"], "OWNER_CAP_EXHAUSTED")
+                self.assertFalse(refusal["values_loaded"])
+        preview = journal_occupancy(ResearchStore(self.plane), pre["search_key_sha256"])["preview"]
+        self.assertEqual((preview["completed"], preview["pending"], preview["remaining"]), (2, 0, 0))
 
         # Same ordinary lifecycle: its own slot/journal, a scoped look, freeze, Critic, finalize.
         canonical = self._resolve("ep", draft("LIST_CONTRAST", list_condition=AC))["canonical_query"]

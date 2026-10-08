@@ -50,18 +50,42 @@ CRITIC_PACKET_VERSION_CURRENT = "1.4"
 DRAFT_SCHEMA_BY_PACKET_VERSION = {
     "1.1": "catalog/schemas/hypothesis_forge_draft_v1.schema.json",
     "1.2": "catalog/schemas/hypothesis_forge_draft_v1_2.schema.json",
+    # Additive: same HFIC-V1.2 grounding and prompt, a wider structural
+    # candidate-count ceiling for a journal whose research policy raised
+    # candidates.max_generated above the shipped default of 6.
+    "1.3": "catalog/schemas/hypothesis_forge_draft_v1_3.schema.json",
 }
 SESSION_RECEIPT_SCHEMA_BY_PROMPT = {
     PROMPT_VERSION_V1_1: "catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json",
     PROMPT_VERSION: "catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json",
 }
+# Same shape as the historical v1_2 receipt, a wider candidate_ids ceiling: the receipt of a
+# negative terminal (no selected candidate) whose draft carried more than the shipped 6.
+SESSION_RECEIPT_SCHEMA_V1_2_WIDE = (
+    "catalog/schemas/hypothesis_forge_session_receipt_v1_2_wide.schema.json"
+)
 SESSION_RECEIPT_SCHEMA_V1_3 = (
     "catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json"
+)
+# Additive: same v1_3 receipt shape, a wider candidate_ids ceiling for a
+# journal whose research policy raised candidates.max_generated above 6.
+SESSION_RECEIPT_SCHEMA_V1_4_WIDE = (
+    "catalog/schemas/hypothesis_forge_session_receipt_v1_4.schema.json"
 )
 RUNNER_UP_AWAITING_CRITIC = "RUNNER_UP_AWAITING_CRITIC"
 RUNNER_UP_REVISION_REQUIRED = "RUNNER_UP_REVISION_REQUIRED"
 MIN_CANDIDATES = 0
 MAX_CANDIDATES = 6
+
+
+def _max_candidates_for(store: Any, journal_scope: object) -> int:
+    """The journal's frozen candidate ceiling; the shipped 6 for a journal never frozen."""
+
+    from solana_alpha_lab.factory.hfic_research_policy import limits_or_defaults
+
+    return int(limits_or_defaults(store, journal_scope)["max_generated"])
+
+
 PHASE_RANK = {
     "SYNTHESIS_COMPLETE": 0,
     "LEGACY_PARTIAL": 0,
@@ -424,6 +448,20 @@ def _execution_identity_fields(
     stored_binding, binding_unknown = _consistent_hash_state(
         expanded, "execution_binding_sha256"
     )
+    cycles = {
+        source.get("cycle_index")
+        for source in expanded
+        if isinstance(source, Mapping)
+        and isinstance(source.get("cycle_index"), int)
+        and not isinstance(source.get("cycle_index"), bool)
+        and source.get("cycle_index") > 1
+    }
+    if len(cycles) > 1:
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+    cycle_index = next(iter(cycles)) if cycles else 1
+    if cycle_index > 1:
+        # Only an explicitly authorized additional cycle carries an index; cycle 1 is unmarked.
+        fields["cycle_index"] = cycle_index
     if market and semantic_version:
         from solana_alpha_lab.factory.hfic_evidence_identity import (
             execution_binding_sha256,
@@ -435,6 +473,7 @@ def _execution_identity_fields(
             representation_id=representation,
             representation_semantic_version=semantic_version,
             owner_focus=owner_focus,
+            cycle_index=cycle_index,
         )
         fields["scientific_slot_sha256"] = slot
         # A binding digest is provenance for an actual execution context.  A
@@ -925,7 +964,7 @@ def _reject_stale_fresh_session_draft(
         return
     packet_version = str(draft.get("packet_version") or "")
     declared = str(draft.get("generator_prompt_version") or "")
-    if packet_version == "1.2" and declared == PROMPT_VERSION:
+    if packet_version in ("1.2", "1.3") and declared == PROMPT_VERSION:
         return
     raise HficSessionError("FRESH_SESSION_DRAFT_VERSION_MISMATCH")
 
@@ -940,7 +979,7 @@ def _draft_packet_version(draft: Mapping[str, Any]) -> str:
 def _draft_prompt_version(draft: Mapping[str, Any]) -> str:
     packet_version = _draft_packet_version(draft)
     declared = str(draft.get("generator_prompt_version") or "")
-    expected = PROMPT_VERSION if packet_version == "1.2" else PROMPT_VERSION_V1_1
+    expected = PROMPT_VERSION if packet_version in ("1.2", "1.3") else PROMPT_VERSION_V1_1
     if declared and declared != expected:
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
     return expected
@@ -950,9 +989,11 @@ def _critic_packet_version(draft_packet_version: str) -> str:
     """Map Forge draft version to Critic transport version.
 
     Fresh HFIC-V1.2 freeze emits critic packet 1.4. Historical draft 1.1 stays
-    critic 1.1. Do not mint an HFIC-V1.3 or HFIC-V1.4 Prompt A.
+    critic 1.1. Do not mint an HFIC-V1.3 or HFIC-V1.4 Prompt A: draft
+    packet_version 1.3 is a wider candidate-count transport for the same
+    HFIC-V1.2 prompt, not a new prompt, and also emits critic packet 1.4.
     """
-    if draft_packet_version == "1.2":
+    if draft_packet_version in ("1.2", "1.3"):
         return CRITIC_PACKET_VERSION_CURRENT
     return CRITIC_PACKET_VERSION_V11
 
@@ -966,9 +1007,14 @@ def _session_receipt_schema_path(
     prompt_version: str,
     *,
     selected_path: bool = True,
+    wide_candidates: bool = False,
 ) -> Path:
     if selected_path and prompt_version == PROMPT_VERSION:
+        if wide_candidates:
+            return Path(repo_root) / SESSION_RECEIPT_SCHEMA_V1_4_WIDE
         return Path(repo_root) / SESSION_RECEIPT_SCHEMA_V1_3
+    if wide_candidates and not selected_path and prompt_version == PROMPT_VERSION:
+        return Path(repo_root) / SESSION_RECEIPT_SCHEMA_V1_2_WIDE
     relative = SESSION_RECEIPT_SCHEMA_BY_PROMPT.get(prompt_version)
     if relative is None:
         relative = SESSION_RECEIPT_SCHEMA_BY_PROMPT[PROMPT_VERSION_V1_1]
@@ -1832,7 +1878,9 @@ def freeze_draft(
         _validate_json_schema(draft, _draft_schema_path(repo_root, draft))
     candidates = draft.get("candidates")
     floor = 0 if _ordinary_discovery_requested(draft, preflight_receipt) else 4
-    if not isinstance(candidates, list) or not (floor <= len(candidates) <= MAX_CANDIDATES):
+    journal_for_cap = (preflight_receipt or {}).get("search_key_sha256")
+    ceiling = _max_candidates_for(store, journal_for_cap)
+    if not isinstance(candidates, list) or not (floor <= len(candidates) <= ceiling):
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
     try:
         identities = assign_portfolio_ids(candidates)
@@ -1846,7 +1894,7 @@ def freeze_draft(
     )
     _validate_fresh_draft_scopes(draft, store=store, identities=identities)
     grounded_candidates: list[dict[str, Any]] | None = None
-    if packet_version == "1.2":
+    if packet_version in ("1.2", "1.3"):
         if repo_root is None:
             raise HficSessionError("HFIC_PROTOCOL_INVALID")
         grounded_candidates = _ground_v12_candidates(
@@ -2383,6 +2431,13 @@ def freeze_draft(
             or None,
             ladder_representation_id=slot_rep,
             control_session_id=slot_parent,
+            # An explicitly authorized additional cycle is its own slot; cycle 1 is unchanged.
+            scientific_slot_sha256=(
+                str(result.get("scientific_slot_sha256") or "") or None
+                if int(result.get("cycle_index") or 1) > 1
+                else None
+            ),
+            cycle_index=int(result.get("cycle_index") or 1),
         )
         if existing is not None and (
             not isinstance(preflight_receipt, Mapping)
@@ -2427,10 +2482,13 @@ def _assert_temporal_search_closed(draft: Mapping[str, Any], store: Any) -> None
     journal = str(evidence.get("journal_scope") or "")
     decision = str(evidence.get("tier_decision") or "")
     try:
+        from solana_alpha_lab.factory.hfic_research_policy import limits_or_defaults
+
         progress = assess_tier_progress(
             list_discovery_looks(store, journal),
             freeze_worthy=decision == "WORTHY_SIMPLE",
             compound_applicable=decision != "COMPOUND_INAPPLICABLE",
+            main_total=int(limits_or_defaults(store, journal)["main_total"]),
         )
         assert_search_exhaustion_claim(progress, claim_search_exhausted=True)
     except GroundedDiscoveryError as exc:
@@ -3112,7 +3170,10 @@ def persist_no_worthy_session(
         _validate_json_schema(
             receipt,
             _session_receipt_schema_path(
-                repo_root, prompt_version, selected_path=False
+                repo_root,
+                prompt_version,
+                selected_path=False,
+                wide_candidates=len(receipt.get("candidate_ids") or []) > MAX_CANDIDATES,
             ),
         )
     receipt_bytes = _canonical_bytes(receipt)
@@ -3503,6 +3564,7 @@ def _build_scientific_slot_admission_event(
         "model_provenance_sha256": fields.get("model_provenance_sha256"),
         "execution_binding_sha256": fields.get("execution_binding_sha256"),
         "admission_state": "RESERVED",
+        **({"cycle_index": fields["cycle_index"]} if fields.get("cycle_index") else {}),
     }
     canonical = _canonical_bytes(body)
     digest = hashlib.sha256(canonical).hexdigest()
@@ -3803,6 +3865,10 @@ def _assert_scientific_admission(
             if isinstance(active_set, Mapping)
             else None
         )
+    from solana_alpha_lab.factory.hfic_research_policy import epoch_limits
+
+    # The AUTO/focus pool is the market epoch's own frozen scope, never a journal's.
+    pool = epoch_limits(store, market)
     admission = resolve_scientific_admission(
         list_hfic_sessions(store),
         reservations=list_scientific_slot_admissions(store),
@@ -3838,6 +3904,9 @@ def _assert_scientific_admission(
             if isinstance(fields.get(key) or binding.get(key), str)
         },
         repair_continuations=list_repair_continuation_dispositions(store),
+        auto_sessions_per_market=pool["auto_cycles_per_market"],
+        max_distinct_focuses=pool["distinct_focuses_per_market"],
+        requested_cycle_index=int(fields.get("cycle_index") or 1),
     )
     action = str(admission.get("action") or "")
     if action == "STOP" and str(admission.get("reason_code") or "") == (
@@ -3999,6 +4068,7 @@ def persist_scientific_slot_admission(
         "model_provenance_sha256": fields.get("model_provenance_sha256"),
         "execution_binding_sha256": fields.get("execution_binding_sha256"),
         "admission_state": "RESERVED",
+        **({"cycle_index": fields["cycle_index"]} if fields.get("cycle_index") else {}),
     }
     canonical = _canonical_bytes(body)
     digest = hashlib.sha256(canonical).hexdigest()
@@ -4536,7 +4606,7 @@ def persist_generated_draft(
     _draft_prompt_version(draft)
     candidates = draft.get("candidates")
     if not isinstance(candidates, list) or not (
-        MIN_CANDIDATES <= len(candidates) <= MAX_CANDIDATES
+        MIN_CANDIDATES <= len(candidates) <= _max_candidates_for(store, receipt.get("search_key_sha256"))
     ):
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
     try:
@@ -5374,6 +5444,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                     "execution_binding_sha256"
                 ),
                 "model_provenance_sha256": payload.get("model_provenance_sha256"),
+                "cycle_index": payload.get("cycle_index"),
                 "critic_terminal": payload.get("critic_terminal"),
                 "final_session_terminal": payload.get("final_session_terminal"),
                 "selected_candidate_id": payload.get("selected_candidate_id"),
@@ -5398,6 +5469,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                 "scientific_slot_sha256",
                 "execution_binding_sha256",
                 "model_provenance_sha256",
+                "cycle_index",
             )
             if key in payload
         }
@@ -5431,6 +5503,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
         "scientific_slot_sha256",
         "execution_binding_sha256",
         "model_provenance_sha256",
+        "cycle_index",
     )
     for sid, rows in by_session_cycles.items():
         head = latest.get(sid)
@@ -5691,6 +5764,7 @@ def _lookup_existing_freeze_session(
         control_session_id=_preflight_ladder_slot(preflight_receipt)[1],
         representation_semantic_version=identity.get("representation_semantic_version"),
         scientific_slot_sha256=identity.get("scientific_slot_sha256"),
+        cycle_index=int(identity.get("cycle_index") or 1),
     )
     existing = find_session_by_epoch_focus(
         store,
@@ -5995,6 +6069,7 @@ def find_session_by_epoch_focus(
     execution_context: Mapping[str, Any] | None = None,
     ignore_memory_eligibility: bool = False,
     ignore_evidence_surface_mode: bool = False,
+    cycle_index: int = 1,
 ) -> dict[str, Any] | None:
     from solana_alpha_lab.factory.hfic_control_integrity import (
         session_evidence_surface_mode,
@@ -6077,8 +6152,10 @@ def find_session_by_epoch_focus(
         ):
             # Split-era BASE rows may predate the explicit slot stamp. They
             # remain a known occupied market look and must not be duplicated.
+            # An explicitly authorized additional cycle never inherits an unstamped cycle-1 row.
             if not (
                 wanted_rep == "BASE"
+                and cycle_index <= 1
                 and not bundle.get("scientific_slot_sha256")
                 and item.get("market_evidence_epoch_sha256") == epoch
             ):
@@ -7041,7 +7118,9 @@ def apply_revision(
     _validate_revision_context_lock(existing, revised_draft)
     candidates = revised_draft.get("candidates")
     if not isinstance(candidates, list) or not (
-        MIN_CANDIDATES <= len(candidates) <= MAX_CANDIDATES
+        MIN_CANDIDATES
+        <= len(candidates)
+        <= _max_candidates_for(store, existing.get("search_key_sha256"))
     ):
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
     try:
@@ -8117,7 +8196,11 @@ def finalize_session(
         _verify_failover_receipt_identity(receipt)
         _validate_json_schema(
             receipt,
-            _session_receipt_schema_path(repo_root, prompt_version),
+            _session_receipt_schema_path(
+                repo_root,
+                prompt_version,
+                wide_candidates=len(receipt.get("candidate_ids") or []) > MAX_CANDIDATES,
+            ),
         )
     receipt_bytes = _canonical_bytes(receipt)
     complete_cycle = {
@@ -8672,6 +8755,18 @@ def load_session_bundle(
         bundle.pop("grounded_candidates", None)
     if "closed_or_suppressed_collision_count" not in cycle:
         bundle.pop("closed_or_suppressed_collision_count", None)
+    stamped_cycles = {
+        int(row["cycle_index"])
+        for row in cycles
+        if isinstance(row.get("cycle_index"), int)
+        and not isinstance(row.get("cycle_index"), bool)
+        and row["cycle_index"] > 1
+    }
+    if len(stamped_cycles) == 1:
+        # Only an explicitly authorized additional cycle is marked; cycle 1 stays unmarked.
+        bundle["cycle_index"] = next(iter(stamped_cycles))
+    elif len(stamped_cycles) > 1:
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
     expected_action_sha = None
     if isinstance(session_receipt, Mapping):
         maybe_sha = session_receipt.get("next_action_artifact_sha256")

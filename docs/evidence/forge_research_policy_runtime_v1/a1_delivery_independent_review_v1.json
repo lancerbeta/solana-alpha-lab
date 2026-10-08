@@ -1,0 +1,142 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-RESEARCH-POLICY-RUNTIME-REVIEW-001",
+  "as_of": "2026-10-07",
+  "task_id": "FORGE_RESEARCH_POLICY_RUNTIME_V1",
+  "reviewed_bindings_sha256": "f09150f1f4926ebd05097feb69581724e7aaea93bb160d3255ab6fd266a2a091",
+  "reviewed_inventory_sha256": "96501089c456bfa4cba5f0c3cf65832a0770d63752eb36fd1d660243c2fe40e1",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_6b2020ee77d475f1cb2c1f248567425eeac82918",
+        "RESIDUAL_P0_P1_NONE",
+        "packet_fingerprint_sha256=fd29d9b6403aad4d670c599942801aa6c0a406c15b4a422a588df63292e26c11",
+        "SEMANTIC_PREMISE_PACKET_INFORMATION_PATH_PROCESS_OBLIGATION_MODEL_DIVERSITY_UNPROVEN",
+        "ROUND1_M1_M2_M3_RESOLVED_OR_HONESTLY_DOCUMENTED_RESIDUALS"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_6b2020ee77d475f1cb2c1f248567425eeac82918",
+        "RESIDUAL_P0_P1_NONE",
+        "ROUND1_MAJOR_LEGACY_SCOPE_EXTENSION_FIXED_AND_VERIFIED",
+        "MINORS_DUPLICATE_SCOPE_IN_HAND_BUILT_BATCH_AND_EPOCH_HISTORY_HELPER_DOCUMENTED_NOT_FIXED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_6b2020ee77d475f1cb2c1f248567425eeac82918",
+        "RESIDUAL_P0_P1_NONE",
+        "DOD_PROVEN_EXCEPT_DISTINCT_FOCUS_RAISE_AND_PENDING_RESERVATION_APPLY_TEST_STRENGTH_RESIDUAL",
+        "ADAPTIVE_PREVIEW_RESOLUTION_REACHES_GATE_OCCUPANCY"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEWED_CONTENT_HEAD_6b2020ee77d475f1cb2c1f248567425eeac82918",
+        "RESIDUAL_P0_P1_NONE",
+        "FIVE_ROUND1_DOC_FINDINGS_FIXED",
+        "ALL_DOCUMENTED_FLAGS_EXIST_IN_ARGPARSE"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_LIVE_ACCEPTANCE",
+    "NO_MERGE",
+    "NO_MODEL_DIVERSITY_ATTESTATION",
+    "PACKET_INFORMATION_PATH_ONLY",
+    "NO_LIVE_LAUNCH_IDENTITY_ATTESTATION"
+  ],
+  "remediation_history": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "VALIDATOR_ROUND_4: the representation accounting root was decided before the operation commit without a recheck under the writer lease, so two concurrent first variants could hold two budgets",
+      "observed_head": "6b2020ee77d475f1cb2c1f248567425eeac82918",
+      "resolved_by_head": "6b2020ee77d475f1cb2c1f248567425eeac82918"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "VALIDATOR_ROUND_3: the public episode-normalized-view did not publish its committed context, so the vertical hand-built the binding; and a new payload or selector of the same cycle received a fresh budget instead of the research line's",
+      "observed_head": "af48fa064914eb0ca8996d72ab29243649f3643c",
+      "resolved_by_head": "6b2020ee77d475f1cb2c1f248567425eeac82918"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "VALIDATOR_ROUND: the episode-normalized child of an additional AUTO cycle got an independent fresh budget and the real lifecycle blocked it (episode AUTO cycles unsupported, representation slot cycle-blind, cross-operation episode replay was a calculation revision)",
+      "observed_head": "3ab3b96e3f8905d61c7ec1fa557b7107037570ae",
+      "resolved_by_head": "6b2020ee77d475f1cb2c1f248567425eeac82918"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Out-of-order representation children could hold two independent budgets and a re-request after a later cycle changed the derived digest",
+      "observed_head": "2182a26225951022cf8b51afd93702655656a3d7",
+      "resolved_by_head": "6b2020ee77d475f1cb2c1f248567425eeac82918"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "accounting_root was not self-verifying on the record_operation path and could be forged to borrow or poison a budget",
+      "observed_head": "07137252668f1e5719a41ec2dd6ebac48fe5099a",
+      "resolved_by_head": "6b2020ee77d475f1cb2c1f248567425eeac82918"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "The episode child of a cycle-2 BASE parent was keyed from the cycle-1 key and was not operable; the fix then had to bind the parent's focus, BASE status and derivable key",
+      "observed_head": "07137252668f1e5719a41ec2dd6ebac48fe5099a",
+      "resolved_by_head": "6b2020ee77d475f1cb2c1f248567425eeac82918"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "A legacy market epoch or journal could never be frozen so it could never be extended",
+      "observed_head": "33e66400daf93d342cdfed417f36ca099b599b62",
+      "resolved_by_head": "6b2020ee77d475f1cb2c1f248567425eeac82918"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "The formulation packet and the draft validators read different limits for a journal not yet frozen",
+      "observed_head": "33e66400daf93d342cdfed417f36ca099b599b62",
+      "resolved_by_head": "6b2020ee77d475f1cb2c1f248567425eeac82918"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Policy apply re-checked nothing against the live store and a multi-scope apply could be partial",
+      "observed_head": "33e66400daf93d342cdfed417f36ca099b599b62",
+      "resolved_by_head": "6b2020ee77d475f1cb2c1f248567425eeac82918"
+    }
+  ]
+}

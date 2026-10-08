@@ -1007,6 +1007,10 @@ def control_preflight_from_bundle(
         value = bundle.get(key) or receipt.get(key)
         if isinstance(value, str) and len(value) == 64:
             body[key] = value
+    cycle = bundle.get("cycle_index")
+    if isinstance(cycle, int) and not isinstance(cycle, bool) and cycle > 1:
+        # A representation of an additional AUTO cycle is that cycle's own slot, never cycle 1's.
+        body["cycle_index"] = cycle
     basis = bundle.get("market_evidence_basis") or receipt.get(
         "market_evidence_basis"
     )

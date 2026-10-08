@@ -17,7 +17,7 @@
     },
     {
       "path": "scripts/hypothesis_forge.py",
-      "sha256": "ef40a61b5ad7455923f75c6dceedb841b07db7cf4c34ae7a5be17480c7bfe500"
+      "sha256": "0f481d8ac5f32629630f39119b39ae561afb18ac629d6f7f6fbe0025c6fba7a5"
     },
     {
       "path": "src/solana_alpha_lab/factory/document_runner.py",
@@ -25,7 +25,7 @@
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_grounded_discovery.py",
-      "sha256": "3100b03e6badb9eb45c9d8c257391d94e443de586e984b8bb2b44525748ca002"
+      "sha256": "c4b6263adb32ee96962903e56091ba91d80100c30fbb2418005f0079322b0709"
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_research_scope.py",
@@ -33,11 +33,11 @@
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_session.py",
-      "sha256": "164955dbb7c75d6f5302da7b14ffbf75474a02c7a9b0df6068bd395888ca5c8b"
+      "sha256": "a1298b87b2a0ad5401ad91dc9aef4557fcbf4992271003e637750dc1dc64abc7"
     },
     {
       "path": "src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
-      "sha256": "2283801d38a6bd14c7b1a0ad7cd823ea14e920d45f2a07190d1fc7ba28894e6e"
+      "sha256": "b610e0bf27de6a129330270fe5cbf48cb05d5d0dd1f67b00587ac5fd59c3f42a"
     },
     {
       "path": "src/solana_alpha_lab/factory/observation_schedule_compiler.py",
@@ -73,7 +73,7 @@
     },
     {
       "path": "tests/test_hfic_list_aware_vertical_v1.py",
-      "sha256": "93ddbd53bc271775162c07b09a5c8bfc9bab14139c417f646bf1b98f7ce9419e"
+      "sha256": "5d7504502563c229dff4fb16a18eef17284ee4413f83bb076ffd7d73e719c848"
     },
     {
       "path": "tests/test_hfic_provenance_clock.py",

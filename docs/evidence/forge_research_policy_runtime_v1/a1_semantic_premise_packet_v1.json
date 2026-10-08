@@ -1,0 +1,195 @@
+{
+  "candidate": {
+    "base": "04ec8e0286a3dce5999d0687784717ee90fc5dca",
+    "diff_sha256": "2c7120291d243358a63f7414b47dffbbb196bd700035e500e4b92543253b4a07",
+    "head": "6b2020ee77d475f1cb2c1f248567425eeac82918"
+  },
+  "evidence": [
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_research_policy.py",
+      "sha256_or_fingerprint": "896715154ddce8a2054090491141ecb7852ef8a75d27c177de84b94ec395d6a2"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_ordinary_operation.py",
+      "sha256_or_fingerprint": "07862aca185267b4aa6b5e99d04927cedbae48533615e98a8e4bd81487c17b58"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_preflight.py",
+      "sha256_or_fingerprint": "8f88b75c4d5c5f9081f9d6d693d44504522e4f51401f5d2ad982cec4271feb09"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_session.py",
+      "sha256_or_fingerprint": "a1298b87b2a0ad5401ad91dc9aef4557fcbf4992271003e637750dc1dc64abc7"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_evidence_identity.py",
+      "sha256_or_fingerprint": "0700bd1264142f6fc3ec1f629a244908d70a0ae7d1d3156a3ab394491fe02262"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_memory_policy.py",
+      "sha256_or_fingerprint": "fe25732d82649af10612da1d85bf341ec2e814c88ea945b2800ff17e9114bcc7"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
+      "sha256_or_fingerprint": "b610e0bf27de6a129330270fe5cbf48cb05d5d0dd1f67b00587ac5fd59c3f42a"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_grounded_discovery.py",
+      "sha256_or_fingerprint": "c4b6263adb32ee96962903e56091ba91d80100c30fbb2418005f0079322b0709"
+    },
+    {
+      "logical_ref": "repo://scripts/hypothesis_forge.py",
+      "sha256_or_fingerprint": "0f481d8ac5f32629630f39119b39ae561afb18ac629d6f7f6fbe0025c6fba7a5"
+    },
+    {
+      "logical_ref": "repo://tests/test_hfic_research_policy_v1.py",
+      "sha256_or_fingerprint": "87c53cd0577744697f3e808240ae2cb47093ac842a9dc83da3b4e67a4ba5bfae"
+    },
+    {
+      "logical_ref": "repo://tests/test_hfic_research_policy_vertical_v1.py",
+      "sha256_or_fingerprint": "243327656f9f308cd35a3e2398e125c128f32f42d7b70fe52e92485ee81e1493"
+    },
+    {
+      "logical_ref": "repo://tests/test_hfic_research_policy_closure_v1.py",
+      "sha256_or_fingerprint": "59df0aefd03e9d2a4b36f2db4ae22564bbf2c12d52424c5ef66ca7fee7356682"
+    },
+    {
+      "logical_ref": "repo://tests/test_hfic_list_aware_vertical_v1.py",
+      "sha256_or_fingerprint": "5d7504502563c229dff4fb16a18eef17284ee4413f83bb076ffd7d73e719c848"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_representation_ladder.py",
+      "sha256_or_fingerprint": "90ee76c5fde590f4661a98dd108395d36bce38b9c04478da0232ee796b02281a"
+    },
+    {
+      "logical_ref": "repo://docs/contracts/forge_research_policy_runtime_v1.md",
+      "sha256_or_fingerprint": "207849a0ffab0e69914f807006d7ad0e5a2c5442040a36812c75d67ee9d52c88"
+    }
+  ],
+  "independence": {
+    "claim_scope": "PACKET_INFORMATION_PATH",
+    "context_isolated": true,
+    "implementation_transcript_seen": false,
+    "launch_isolation": "PROCESS_OBLIGATION",
+    "model_diversity": "UNPROVEN",
+    "model_diversity_identity": null,
+    "packet_bound": true,
+    "readonly": true
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CAUSAL_OR_INTERACTION_CLAIM",
+    "NO_PROVIDER_CALLS",
+    "NO_PRODUCTION_DATA",
+    "NO_VPS_OR_LIVE_CHANGE",
+    "NO_MERGE",
+    "NO_SHIPPED_DEFAULT_RAISED_FOR_PRODUCTION",
+    "NO_PR_A_LIST_AWARE_SCOPE_REOPENED",
+    "NO_NEW_COLLECTOR_EVALUATOR_DATABASE_OR_SERVICE"
+  ],
+  "packet_fingerprint_sha256": "fd29d9b6403aad4d670c599942801aa6c0a406c15b4a422a588df63292e26c11",
+  "questions": [
+    "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
+    "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
+    "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL",
+    "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE",
+    "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY",
+    "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING",
+    "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER",
+    "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE",
+    "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM",
+    "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS"
+  ],
+  "review": {
+    "architecture_owner": "ARCHITECTURE_CRITIC",
+    "profile": "SEMANTIC_PREMISE",
+    "risk_dimensions": [
+      "OWNER_AUTHORITY_SEMANTICS",
+      "EXECUTION_TRUTH_SEMANTICS",
+      "DURABLE_SCIENCE_SCHEMA"
+    ]
+  },
+  "schema": "smial.semantic-premise-review-packet",
+  "schema_version": "1.0",
+  "semantic_claims": [
+    {
+      "claim": "A change of the active policy never moves a scope that is already frozen; only an explicit, owner-previewed extension of exactly that journal and market-epoch scope raises it.",
+      "claim_id": "C1",
+      "scope": "policy_separation"
+    },
+    {
+      "claim": "An extension never resets spend: spend is owned by hfic_ordinary_operation.py and computed from completed looks plus pending reservations, not by the policy module.",
+      "claim_id": "C2",
+      "scope": "spend_accounting"
+    },
+    {
+      "claim": "A scope with pre-existing history and no snapshot freezes at the shipped defaults (LEGACY_DEFAULTS_V1); read-only paths never write a policy artifact.",
+      "claim_id": "C3",
+      "scope": "legacy_identity"
+    },
+    {
+      "claim": "No field exceeds its hard fuse via preset, extension or active change; max_diagnostic_slices may only be lowered; present-invalid policy state is a typed refusal, never a silent default.",
+      "claim_id": "C4",
+      "scope": "hard_fuse"
+    },
+    {
+      "claim": "Bare callers of classify_temporal_look, classify_query_look, decide_preflight_action, epoch_search_budget_usage and resolve_scientific_admission that omit the new kwargs keep shipped behavior; cycle 1 identity/hashes are byte-identical.",
+      "claim_id": "C5",
+      "scope": "legacy_call_compatibility"
+    },
+    {
+      "claim": "The AUTO counter counts real cycles from stored rows; a plain preflight never starts a cycle; cycle 2 needs both an epoch-pool extension and the explicit --additional-cycle and gets its own slot hash and search key (execution identity); the third is denied.",
+      "claim_id": "C6",
+      "scope": "auto_cycle_truth"
+    },
+    {
+      "claim": "A later AUTO cycle spends its lineage root's MAIN/ADAPTIVE/PREVIEW budget: limits are the root's snapshot plus extensions, spend is the union of completed looks and pending reservations over the lineage journals, an exact saved query is a replay, a new cycle/payload/preset alone never opens fresh budget; the cycle-2 operation must name the accounting root (cycle-1 key before the cycle suffix) and a live parent of the same market, focus and representation (stopped or pending parents are refused, a completed parent may be continued); representations remain their own accounting domains.",
+      "claim_id": "C10",
+      "scope": "continuation_accounting"
+    },
+    {
+      "claim": "The extensions of one apply file commit in a single ResearchStore commit with live parent/pending/scope-head/CAS re-checks under the writer lease: all or nothing, truthful writes, mixed or duplicate-scope sets refused before any write, exact repeat idempotent.",
+      "claim_id": "C11",
+      "scope": "atomic_apply"
+    },
+    {
+      "claim": "A reserved-but-unlanded PREVIEW is RESUME (spends nothing new, lands the payload on the same reservation), not a completed REPEAT; a pending preview of another operation is not adopted.",
+      "claim_id": "C12",
+      "scope": "preview_resume"
+    },
+    {
+      "claim": "A negative terminal (no selected candidate) with more than 6 cards persists, freezes, finalizes and reads back with all identities through additive wide receipt and next-action schemas; historical schemas are unchanged.",
+      "claim_id": "C13",
+      "scope": "wide_negative_terminal"
+    },
+    {
+      "claim": "The episode-normalized child of an additional AUTO cycle keeps its own execution identity (parent session, payload, scope, cycle slot, journal) but is linked at creation to the earliest root operation of the same representation/focus/market whose BASE parent is an earlier cycle (REPRESENTATION_CONTINUATION) and spends that root's budget; BASE and normalized stay separate budgets; a new cycle/payload/selector never opens fresh budget; stopped or pending lineage members refuse a new segment; exact saved episode queries replay across operations (episode calculation version is current); the child is not a third AUTO.",
+      "claim_id": "C14",
+      "scope": "normalized_continuation"
+    },
+    {
+      "claim": "The four additive PR-B schemas are part of the capability fingerprint: changing a runtime rule changes capability identity and nothing else (market identity, scientific query identity and spent budget unchanged); a missing schema is a typed CAPABILITY_PROTOCOL_SURFACE_INCOMPLETE refusal.",
+      "claim_id": "C15",
+      "scope": "capability_identity"
+    },
+    {
+      "claim": "Draft packet_version 1.3, receipt v1_4 and the optional receipt cycle_index (integer>=2) are additive; existing packets and receipts validate unchanged.",
+      "claim_id": "C7",
+      "scope": "additive_schema"
+    },
+    {
+      "claim": "A value-bearing episode-normalized-view is reserved against the exact operation's PREVIEW budget by request descriptor before any value loads; the identical request spends nothing; metadata-only paths spend nothing.",
+      "claim_id": "C8",
+      "scope": "preview_gate"
+    },
+    {
+      "claim": "Policy apply and extension are CAS-protected with idempotent re-apply and bounded WRITER_BUSY retry; a last-slot race has exactly one winner.",
+      "claim_id": "C9",
+      "scope": "concurrency"
+    }
+  ],
+  "task": {
+    "task_contract_sha256": "e9503d6dc574d79ace172f54559b114f2a8295cf6214c1dbb8a424a199966773",
+    "task_id": "FORGE_RESEARCH_POLICY_RUNTIME_V1"
+  }
+}

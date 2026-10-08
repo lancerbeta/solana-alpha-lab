@@ -54,6 +54,26 @@ is not a scientific result and returns no quota. Contract:
 `docs/contracts/forge_ordinary_operation_lifecycle_v1.md`. A null owner cap is the protocol
 remainder, not a silent cap of one. Coverage without values stays
 `discovery-coverage`.
+
+MAIN/ADAPTIVE/PREVIEW totals, AUTO-cycle and distinct-focus caps, and the
+candidate/diagnostic-slice ceilings are a runtime policy, not a Git constant:
+`research-policy-status` (optionally `--for-operation`, `--journal-scope` or
+`--epoch-scope`), then `research-policy-preview --main-total N ...` and
+`research-policy-apply --proposal <file> --confirm-append-only` to change the
+active policy for *new* runs. A bare active-policy change never moves a scope
+already frozen; raise exactly one open run with `research-policy-preview
+--for-operation <operation_sha256> --main-total N` and apply the unedited
+proposal, which never resets what that run has already spent. AUTO cycle 2
+needs both an epoch-pool extension (`--auto-cycles-per-market 2` with
+`--for-operation`) and the explicit `preflight --additional-cycle`; a plain
+preflight never starts a cycle. Cycle 2 has its own identity but spends the
+same lineage MAIN/ADAPTIVE/PREVIEW budget as cycle 1 (its operation carries the
+receipt's `accounting_root` and the cycle-1 `parent_operation_sha256`; only an
+explicit `--for-operation --main-total N` raise adds more), and it must bring
+materially different candidates. A value-bearing `episode-normalized-view` needs
+`--operation-sha256` and spends one PREVIEW; the identical request again
+spends nothing. Contract: `docs/contracts/forge_research_policy_runtime_v1.md`.
+This delivery never raises a shipped default itself.
 `next_action=CORRECT_CALCULATION_REVISION` means the saved temporal result is
 internally inconsistent. It is a technical stop, not a request for more
 looks. Revise that exact result with `discovery-execute ... --correct-result-ref

@@ -531,5 +531,41 @@ class ScientificMarketV2Tests(unittest.TestCase):
         self.assertEqual(epoch, self.current()[0])
 
 
+    def test_new_forge_policy_schemas_move_capability_identity_but_not_market_or_budget(self):
+        """Owner review: a changed rule of a runtime-used PR-B schema is a different capability, nothing else moves."""
+
+        new_schemas = (
+            "catalog/schemas/hypothesis_forge_draft_v1_3.schema.json",
+            "catalog/schemas/hypothesis_forge_session_receipt_v1_4.schema.json",
+            "catalog/schemas/hypothesis_forge_session_receipt_v1_2_wide.schema.json",
+            "catalog/schemas/hfic_next_epistemic_action_v1_wide.schema.json",
+        )
+        for name in new_schemas:
+            self.assertIn(name, _CAPABILITY_PROTOCOL_FILES)
+        epoch_before, basis_before = self.current()
+        cap_before, _ = compute_capability_epoch_for_repo(ROOT)
+        for name in new_schemas:
+            with tempfile.TemporaryDirectory() as tmp:
+                repo = Path(tmp)
+                for item in (*_CAPABILITY_PROTOCOL_FILES, _OPERATOR_PACK):
+                    destination = repo / item
+                    destination.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copyfile(ROOT / item, destination)
+                shutil.copytree(ROOT / "catalog", repo / "catalog", dirs_exist_ok=True)
+                shutil.copyfile(ROOT / "configs/factory_semantic_operability_v1.yaml", repo / "configs/factory_semantic_operability_v1.yaml")
+                same, _ = compute_capability_epoch_for_repo(repo)
+                self.assertEqual(same, cap_before)  # the isolated copy is faithful
+                target = repo / name
+                target.write_text(target.read_text(encoding="utf-8").replace('"maxItems": 16', '"maxItems": 15', 1), encoding="utf-8")
+                changed, _ = compute_capability_epoch_for_repo(repo)
+                self.assertNotEqual(changed, cap_before, name)
+                # An absent required schema is a typed refusal, never an incomplete successful identity.
+                target.unlink()
+                with self.assertRaisesRegex(EvidenceIdentityError, "CAPABILITY_PROTOCOL_SURFACE_INCOMPLETE"):
+                    compute_capability_epoch_for_repo(repo)
+        # Market identity (and so every spent-attempt key derived from it) is untouched by capability changes.
+        self.assertEqual((epoch_before, basis_before), self.current())
+
+
 if __name__ == "__main__":
     unittest.main()

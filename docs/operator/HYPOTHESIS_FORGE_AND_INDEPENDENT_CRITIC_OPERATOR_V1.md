@@ -247,6 +247,83 @@ Re-run the read-only preview. Expected terminal
 `CONTROL_RECONSIDERATION_NOT_READY`, follow `BLOCKER_NEXT` in the JSON.
 Only then invoke `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
 
+**Research-policy runtime.** MAIN/ADAPTIVE/PREVIEW totals, AUTO-cycle and
+distinct-focus caps, and the candidate/diagnostic-slice ceilings live in
+ResearchStore, not in Git. Status (reads no market value, writes nothing;
+optionally scoped to one open operation, journal or market epoch). Copy
+`<operation_sha256>` from `open_operations` in its output:
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-status --for-operation <operation_sha256>
+```
+
+Preview and apply a change to the active policy (governs *new* runs only;
+never moves a scope already frozen). Save the preview output as the proposal
+file and apply it unedited:
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-preview --main-total 10 --max-generated 10 --format json > proposal.json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-apply --proposal proposal.json --confirm-append-only
+```
+
+To raise one exact open run without resetting what it has already spent,
+preview with `--for-operation`; the proposal names that run's journal scope and
+its market-epoch pool scope (the AUTO and distinct-focus fields belong to the
+epoch pool):
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-preview --for-operation <operation_sha256> --main-total 10 --format json > proposal.json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-apply --proposal proposal.json --confirm-append-only
+```
+
+AUTO cycle 2 is explicit. First extend this market's pool (without
+`--for-operation` the same flag only changes defaults for new markets):
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-preview --for-operation <operation_sha256> --auto-cycles-per-market 2 --format json > proposal.json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py research-policy-apply --proposal proposal.json --confirm-append-only
+```
+
+Then start it with
+`preflight --discovery-contract --owner-focus AUTO --additional-cycle`. A plain
+preflight returns the saved session and never starts a cycle; a third cycle is
+refused with `SEARCH_BUDGET_EXHAUSTED` (raise to 3 the same way, with `--auto-cycles-per-market 3`). Cycle 2 has its own search
+key but spends the **same** MAIN/ADAPTIVE/PREVIEW budget as cycle 1: if cycle 1
+used all 6 MAIN, cycle 2 starts with none, and allowing AUTO 2 opens nothing.
+To give the whole search more, extend the lineage explicitly
+(`research-policy-preview --for-operation <operation_sha256> --main-total 10`).
+The cycle-2 receipt prints `cycle_index` and `accounting_root`; put both, and
+the cycle-1 `parent_operation_sha256`, as fields of the operation JSON you pass
+to `discovery-execute --operation <file>` for cycle 2 (the same file that
+already carries `journal_scope`, `owner_focus` and `owner_cap`). A wrong or
+missing value is refused with a typed `next_action`. An
+exact query already saved in cycle 1 replays and costs nothing. Cycle 2 must
+nominate materially different candidates. For the episode collection use
+`--collection OPPORTUNITY_EPISODES --owner-focus AUTO` (the focus is
+`OPPORTUNITY_EPISODES:AUTO`). Its normalized child of cycle 2 is created the
+usual way (`episode-normalized-view --parent-session-id <cycle-2 session>
+--operation-sha256 <cycle-2 BASE operation>`, then the child operation with the
+view's `representation`); the system links it to the cycle-1 normalized child
+itself: what that representation already spent is already counted, and an
+explicit normalized raise uses `research-policy-preview --for-operation
+<normalized child operation> --main-total N`.
+
+A value-bearing `episode-normalized-view` is a PREVIEW. Pass
+`--operation-sha256 <operation_sha256>`; the request is reserved before any
+value is read and the identical request again spends nothing. If an earlier
+attempt crashed after the reservation, the same command reports disposition
+`RESUME`: it finishes that attempt and spends nothing new.
+
+If a preview exits non-zero, open `proposal.json`: it holds the refusal and its
+`next_action`, not a proposal.
+
+Without `--confirm-append-only` apply exits `RESEARCH_POLICY_CONFIRM_REQUIRED`.
+If the policy or the scope moved since preview, apply exits
+`RESEARCH_POLICY_PREVIEW_STALE` or `RESEARCH_POLICY_EXTENSION_STALE`; re-run
+the preview and save a new `proposal.json`. Applying the same proposal twice
+returns `ALREADY_APPLIED`. Contract:
+`docs/contracts/forge_research_policy_runtime_v1.md`.
+
 ---
 
 ## 1. Простая модель

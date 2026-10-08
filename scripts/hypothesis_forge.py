@@ -694,6 +694,7 @@ def cmd_preflight(
     explicit_data_root: Path | None,
     control_current_representation: bool = False,
     model_provenance_sha256: str | None = None,
+    additional_cycle: bool = False,
 ) -> int:
     _assert_no_path_leak(
         {
@@ -748,6 +749,7 @@ def cmd_preflight(
             ),
             model_provenance_sha256=model_provenance_sha256,
             persist=auto_commission,
+            additional_cycle=additional_cycle,
         )
     except HficPreflightError as exc:
         payload = {
@@ -2028,6 +2030,11 @@ def _cmd_discovery_preview(
                 },
                 exit_code=2,
             )
+        from solana_alpha_lab.factory.hfic_research_policy import limits_or_defaults
+
+        preview_limits = limits_or_defaults(
+            ResearchStore(store_root) if store_root is not None else None, journal_scope or None
+        )
         payload = build_feature_preview(
             loaded["census"],
             loaded["observations"],
@@ -2035,6 +2042,7 @@ def _cmd_discovery_preview(
             loaded["cohorts"],
             prior_preview_hashes=remembered,
             universe_policy=policy_definition,
+            preview_total=preview_limits["preview_total"],
         )
         if preview_store is not None and preview_gate.get("query_warnings"):
             payload["query_warnings"] = preview_gate["query_warnings"]
@@ -2150,10 +2158,14 @@ def cmd_episode_normalized_view(
     spec_path: Path,
     parent_session_id: str,
     explicit_request: bool,
+    operation_sha256: str | None = None,
 ) -> int:
     """Scope-bound NORMALIZED_TRAJECTORY_EPISODES_V1 view + ladder freeze receipt for a BASE parent.
 
-    Reads prefix points (at or before the decision point) only; never a target. No write.
+    Reads prefix points (at or before the decision point) only; never a target. The view is a
+    value-bearing preview: a request descriptor known before any value is reserved against the
+    exact operation's PREVIEW budget first, and the computed payload hash lands on that same
+    reservation. The same request again is a repeat and spends nothing.
     """
 
     from solana_alpha_lab.factory import hfic_research_scope as scope_owner
@@ -2216,23 +2228,98 @@ def cmd_episode_normalized_view(
         evidence = scope_owner.load_corpus_membership(data_root)
         query = scope_owner.canonicalize_query_scope(draft, evidence)
         body = validate_temporal_query(query)["scientific_body"]
-        loaded = load_admitted_partition_rows(
-            data_root=data_root, binding_doc=None, partitions=None, census_path=None, observations_path=None,
-            population="OPPORTUNITY_EPISODES",
-        )
+        if not operation_sha256:
+            return emit(
+                {
+                    "reason_code": "EPISODE_VIEW_OPERATION_REQUIRED",
+                    "values_loaded": False,
+                    "writes": False,
+                    "next_action": "PASS_--operation-sha256_OF_AN_OPEN_OPERATION_OF_THE_PARENT_JOURNAL_SEE_research-policy-status_open_operations",
+                },
+                exit_code=2,
+            )
         chosen = scope_owner.selected_cohort_ids(body["research_scope"])
-        if chosen is not None:
+
+        def _selected(rows: dict) -> dict:
+            if chosen is None:
+                return rows
             wanted = set(chosen)
-            loaded = {
-                "census": [r for r in loaded["census"] if str(r.get("cohort_id")) in wanted],
-                "observations": [r for r in loaded["observations"] if str(r.get("cohort_id")) in wanted],
-                "cohorts": [c for c in loaded["cohorts"] if str(c.get("cohort_id")) in wanted],
+            return {
+                "census": [r for r in rows["census"] if str(r.get("cohort_id")) in wanted],
+                "observations": [r for r in rows["observations"] if str(r.get("cohort_id")) in wanted],
+                "cohorts": [c for c in rows["cohorts"] if str(c.get("cohort_id")) in wanted],
             }
-        resolved = resolve_research_scope(body, data_root, loaded["census"], loaded["cohorts"])
+
+        # Metadata first: census, cohorts and applied scope evidence need no observation value.
+        metadata = _selected(
+            load_admitted_partition_rows(
+                data_root=data_root, binding_doc=None, partitions=None, census_path=None, observations_path=None,
+                population="OPPORTUNITY_EPISODES", observation_filters=[("point_id", "in", ["NO_SUCH_POINT_METADATA_ONLY"])],
+            )
+        )
+        if metadata["observations"]:
+            return emit({"reason_code": "EPISODE_VIEW_METADATA_LOAD_READ_VALUES", "values_loaded": True, "writes": False}, exit_code=2)
+        resolved = resolve_research_scope(body, data_root, metadata["census"], metadata["cohorts"])
+        from solana_alpha_lab.factory.hfic_evidence_identity import compute_market_epoch_for_data_root
+        from solana_alpha_lab.factory.hfic_ordinary_operation import (
+            OrdinaryOperationError,
+            authorize_episode_view,
+            episode_view_descriptor_sha256,
+            land_episode_view,
+        )
+        from solana_alpha_lab.factory.normalized_trajectory_episodes_v1 import PREFIX_POINTS
+
+        descriptor = episode_view_descriptor_sha256(
+            representation_id=HANDLER_EPISODES_V1,
+            representation_semantic_version=str(row.get("version") or ""),
+            prefix_points=PREFIX_POINTS,
+            scope_rule_sha256=str(resolved.rule_sha256),
+            scope_applied_sha256=str(resolved.applied_sha256),
+            parent_session_id=parent_session_id,
+            parent_search_key=str(bundle.get("search_key_sha256") or ""),
+        )
+        parent_market, _market_basis = compute_market_epoch_for_data_root(repo_root, data_root)
+        try:
+            gate = authorize_episode_view(
+                store,
+                operation_sha256=str(operation_sha256),
+                journal_scope=str(bundle.get("search_key_sha256") or ""),
+                descriptor_sha256=descriptor,
+                verified_market=parent_market,
+                repo_root=repo_root,
+                data_root=data_root,
+            )
+        except OrdinaryOperationError as exc:
+            return emit(
+                {
+                    "reason_code": exc.code,
+                    "values_loaded": False,
+                    "writes": False,
+                    "next_action": _RESEARCH_POLICY_NEXT.get(exc.code, "READ_research-policy-status"),
+                },
+                exit_code=2,
+            )
+        loaded = _selected(
+            load_admitted_partition_rows(
+                data_root=data_root, binding_doc=None, partitions=None, census_path=None, observations_path=None,
+                population="OPPORTUNITY_EPISODES",
+            )
+        )
         policy = effective_policy(store).get("definition")
         payload = build_episode_normalized_profile(
             loaded["census"], loaded["observations"], loaded["cohorts"], resolved, universe_policy=policy
         )
+        if gate["disposition"] in ("EXECUTE", "RESUME"):
+            from solana_alpha_lab.factory.run_passport import canonical_sha256 as _payload_sha
+
+            land_episode_view(
+                store,
+                operation_sha256=str(operation_sha256),
+                journal_scope=str(bundle.get("search_key_sha256") or ""),
+                descriptor_sha256=descriptor,
+                payload_sha256=_payload_sha(payload),
+                git_sha=git_before.head_sha,
+            )
         packet = _packet_for_bundle(data_root, bundle, store)
         receipt = prepare_ladder_freeze_preflight(
             control_preflight_from_bundle(bundle, packet),
@@ -2240,6 +2327,32 @@ def cmd_episode_normalized_view(
             control_session_id=parent_session_id,
             representation_payload=payload,
         )
+        # The next writer (persist-draft) needs the derived context committed and bound into the receipt.
+        # Publish it through the existing context owner here; a repeat is idempotent and a missing or
+        # conflicting artifact still refuses the lifecycle write downstream.
+        from solana_alpha_lab.factory.hfic_preflight import (
+            HficPreflightError,
+            _lookup_forge_context_artifact,
+            persist_forge_context_packet,
+        )
+        from solana_alpha_lab.factory.run_passport import canonical_sha256 as _receipt_sha
+
+        context_digest = _receipt_sha(receipt["forge_context_packet"])
+        context_was_new = _lookup_forge_context_artifact(store, context_digest) is None
+        try:
+            receipt["forge_context_packet_sha256"] = persist_forge_context_packet(
+                data_root, receipt["forge_context_packet"], store=store, repo_root=repo_root
+            )
+        except HficPreflightError as exc:
+            return emit(
+                {
+                    "reason_code": exc.args[0] if exc.args else "FORGE_CONTEXT_ARTIFACT_INVALID",
+                    "writes": gate["disposition"] in ("EXECUTE", "RESUME"),
+                },
+                exit_code=2,
+            )
+        receipt.pop("preflight_receipt_sha256", None)
+        receipt["preflight_receipt_sha256"] = _receipt_sha(receipt)
     except scope_owner.ResearchScopeError as exc:
         return emit({"reason_code": exc.code, "detail": exc.detail, "values_loaded": False, "writes": False}, exit_code=2)
     except (GroundedDiscoveryError, EpisodeProfileError, LadderError) as exc:
@@ -2251,7 +2364,14 @@ def cmd_episode_normalized_view(
         "representation_payload": payload,
         "ladder_freeze_preflight": receipt,
         "target_values_loaded": False,
-        "writes": False,
+        "prefix_values_loaded": True,
+        "preview_accounting": {
+            "disposition": gate["disposition"],
+            "operation_sha256": str(operation_sha256),
+            "request_descriptor_sha256": descriptor,
+            "note": "A repeat of the same request spends nothing; a changed scope rule or applied evidence is a new PREVIEW.",
+        },
+        "writes": gate["disposition"] in ("EXECUTE", "RESUME") or context_was_new,
     }
     _assert_no_path_leak(result, str(data_root), str(repo_root))
     return emit(result)
@@ -2383,6 +2503,313 @@ def cmd_memory_policy_apply(
         repo_root=repo_root,
         proposal=body,
         confirm_append_only=confirm_append_only,
+    )
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+_RESEARCH_POLICY_FIELD_HELP = {
+    "auto_cycles_per_market": "AUTO research cycles per market epoch (a pool shared by the whole epoch)",
+    "distinct_focuses_per_market": "distinct owner focuses per market epoch (a pool shared by the whole epoch)",
+    "main_total": "MAIN looks of one journal; a total ceiling, not an extra allowance",
+    "adaptive_total": "ADAPTIVE looks of one journal",
+    "preview_total": "value-bearing prefix previews of one journal",
+    "simple_before_compound": "SIMPLE MAIN looks allowed before the first COMPOUND (at most main-total)",
+    "max_generated": "candidate cards one draft may carry",
+    "max_diagnostic_slices": "named diagnostic slices of one query (may only be lowered)",
+}
+
+_RESEARCH_POLICY_NEXT = {
+    "RESEARCH_POLICY_LIMIT_OUT_OF_RANGE": "USE_A_VALUE_INSIDE_THE_RANGE_NAMED_IN_THIS_REFUSAL",
+    "RESEARCH_POLICY_ALLOCATION_EXCEEDS_MAIN_TOTAL": "LOWER_simple-before-compound_OR_RAISE_main-total_IN_THE_SAME_PREVIEW",
+    "RESEARCH_POLICY_PREVIEW_STALE": "REPEAT_research-policy-preview",
+    "RESEARCH_POLICY_EXTENSION_STALE": "REPEAT_research-policy-preview_WITH_--for-operation",
+    "RESEARCH_POLICY_RUN_SNAPSHOT_MISSING": "THE_SCOPE_IS_NOT_FROZEN_YET_RUN_preflight_OR_CREATE_THE_OPERATION_THEN_REPEAT_research-policy-preview",
+    "RESEARCH_POLICY_CONFIRM_REQUIRED": "RETRY_research-policy-apply_WITH_--confirm-append-only",
+    "RESEARCH_POLICY_CHANGE_EMPTY": "GIVE_AT_LEAST_ONE_LIMIT_FLAG_OR_--proposal-input",
+    "RESEARCH_POLICY_FIELD_NOT_IN_SCOPE": "AUTO_AND_FOCUS_ARE_EPOCH_POOL_FIELDS_THE_REST_ARE_JOURNAL_FIELDS_SEE_allowed",
+    "RESEARCH_POLICY_PRESET_NOT_FOUND": "DEFINE_THE_PRESET_FIRST_WITH_--proposal-input",
+    "RESEARCH_POLICY_PRESET_CONFLICT": "REMOVE_THE_CONFLICTING_EXPLICIT_FIELD_OR_CHOOSE_ANOTHER_PRESET",
+    "RESEARCH_POLICY_CHAIN_CORRUPT": "STOP_AND_RESTORE_THE_RESEARCH_STORE_THERE_IS_NO_DEFAULT_FALLBACK",
+    "RESEARCH_POLICY_INVALID": "REPEAT_research-policy-preview_AND_APPLY_THE_UNEDITED_PROPOSAL",
+    "ORDINARY_OPERATION_ACCOUNTING_ROOT_REQUIRED": "COPY_cycle_index_AND_accounting_root_FROM_THE_CYCLE_2_PREFLIGHT_RECEIPT_AND_THE_CYCLE_1_OPERATION_SHA256_AS_parent_operation_sha256",
+    "ORDINARY_OPERATION_ACCOUNTING_ROOT_UNKNOWN": "THE_ACCOUNTING_ROOT_MUST_BE_THE_CYCLE_1_SEARCH_KEY_OF_AN_EXISTING_OPERATION_TAKE_IT_FROM_THE_CYCLE_2_PREFLIGHT_RECEIPT",
+    "ORDINARY_OPERATION_ACCOUNTING_ROOT_MISMATCH": "THE_JOURNAL_MUST_BE_THE_CYCLE_KEY_OF_THE_ACCOUNTING_ROOT_TAKE_BOTH_FROM_THE_CYCLE_2_PREFLIGHT_RECEIPT",
+    "ORDINARY_OPERATION_LINEAGE_MISMATCH": "A_LINKED_CYCLE_KEEPS_THE_SAME_MARKET_FOCUS_AND_REPRESENTATION_AS_ITS_ROOT",
+    "EPISODE_VIEW_PENDING_IN_OTHER_OPERATION": "REPEAT_WITH_THE_OPERATION_SHA256_THAT_HOLDS_THE_PENDING_RESERVATION",
+    "RESEARCH_POLICY_MIXED_SET_UNSUPPORTED": "APPLY_THE_ACTIVE_POLICY_PROPOSAL_AND_THE_EXTENSION_PROPOSALS_IN_SEPARATE_FILES",
+    "RESEARCH_POLICY_EXTENSION_SET_DUPLICATE_SCOPE": "KEEP_ONE_PROPOSAL_PER_SCOPE_REPEAT_research-policy-preview",
+    "RESEARCH_POLICY_EXTENSION_BINDING_INVALID": "REPEAT_research-policy-preview_WITH_--for-operation_AND_APPLY_THE_UNEDITED_PROPOSAL",
+    "ORDINARY_OPERATION_NOT_FOUND": "COPY_THE_EXACT_operation_sha256_FROM_research-policy-status_open_operations",
+    "ORDINARY_OPERATION_STOPPED": "A_STOPPED_RUN_IS_NOT_REOPENED_START_A_NEW_OPERATION",
+    "EXTENSION_PARENT_COMPLETED": "A_COMPLETED_RUN_IS_NOT_CONTINUED_HERE_REQUEST_A_NEW_SEGMENT_WITH_ITS_FINAL_RECEIPT",
+    "EXTENSION_PARENT_HAS_PENDING_RESERVATION": "RESUME_THE_EXACT_PENDING_ACTION_FIRST_THEN_REPEAT_research-policy-preview",
+}
+
+
+def _research_policy_limit_fields() -> tuple[str, ...]:
+    from solana_alpha_lab.factory.hfic_research_policy import LIMIT_FIELDS
+
+    return LIMIT_FIELDS
+
+
+def _research_policy_delta(args: Any) -> dict[str, int]:
+    delta: dict[str, int] = {}
+    for field in _research_policy_limit_fields():
+        value = getattr(args, field, None)
+        if value is not None:
+            delta[field] = int(value)
+    return delta
+
+
+def _research_policy_refusal(exc: Exception, data_root: Path, repo_root: Path) -> int:
+    code = str(getattr(exc, "code", exc))
+    body: dict[str, Any] = {"reason_code": code}
+    detail = getattr(exc, "detail", None)
+    if isinstance(detail, dict):
+        body.update({key: value for key, value in detail.items() if key not in body})
+    body["next_action"] = _RESEARCH_POLICY_NEXT.get(code, "READ_research-policy-status")
+    body["writes"] = {"research_store": 0}
+    _assert_no_path_leak(body, str(data_root), str(repo_root))
+    return emit(body, exit_code=2)
+
+
+def _research_policy_scope_history(store: Any, scope_key: str) -> bool:
+    from solana_alpha_lab.factory.hfic_ordinary_operation import journal_has_history
+    from solana_alpha_lab.factory.hfic_research_policy import EPOCH_PREFIX, SCOPE_EPOCH, scope_kind
+    from solana_alpha_lab.factory.hfic_session import list_hfic_sessions
+
+    if scope_kind(scope_key) != SCOPE_EPOCH:
+        return journal_has_history(store, scope_key)
+    epoch = scope_key[len(EPOCH_PREFIX):]
+    return any(
+        epoch in (row.get("market_evidence_epoch_sha256"), row.get("evidence_epoch_sha256"))
+        for row in list_hfic_sessions(store)
+    )
+
+
+def cmd_research_policy_status(
+    repo_root: Path,
+    explicit_data_root: Path | None,
+    *,
+    operation_sha256: str | None,
+    journal_scope: str | None,
+    epoch_scope: str | None,
+) -> int:
+    from solana_alpha_lab.factory.hfic_ordinary_operation import (
+        OrdinaryOperationError,
+        effective_open_operations,
+        get_operation,
+        journal_occupancy,
+    )
+    from solana_alpha_lab.factory.hfic_research_policy import (
+        SCOPE_JOURNAL,
+        ResearchPolicyError,
+        epoch_scope_key,
+        policy_readout,
+        scope_kind,
+    )
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    try:
+        scopes: list[str] = []
+        if operation_sha256:
+            operation = get_operation(store, operation_sha256)
+            scopes += [
+                str(operation["journal_scope"]),
+                epoch_scope_key(str(operation["market_evidence_epoch_sha256"])),
+            ]
+        if journal_scope:
+            scopes.append(journal_scope)
+        if epoch_scope:
+            scopes.append(epoch_scope_key(epoch_scope))
+        scopes = list(dict.fromkeys(scopes))
+        history = {key: _research_policy_scope_history(store, key) for key in scopes}
+        readout = policy_readout(store, scope_keys=scopes, has_history=history)
+        open_rows = effective_open_operations(store)
+        payload: dict[str, Any] = {
+            "action": "RESEARCH_POLICY_STATUS",
+            **readout,
+            "open_operations": [
+                {
+                    "operation_sha256": row.get("operation_sha256"),
+                    "journal_scope": row.get("journal_scope"),
+                    "epoch_scope": row.get("market_evidence_epoch_sha256"),
+                    "owner_focus": row.get("owner_focus"),
+                }
+                for row in open_rows[:20]
+            ],
+            "open_operation_count": len(open_rows),
+            "occupancy": {
+                key: journal_occupancy(store, key) for key in scopes if scope_kind(key) == SCOPE_JOURNAL
+            },
+            "claim_boundary": "Budget ceilings only. Not a scientific look and not strategy promotion. No values were read and nothing was written.",
+            "how_to_raise_an_open_run": "research-policy-preview --for-operation <operation_sha256> --main-total N",
+            "authority": {"git_mutation": 0, "experiment_execution": 0, "provider_api_rpc_wss_calls": 0},
+            "writes": {"research_store": 0},
+            "market_values_read": 0,
+        }
+    except (ResearchPolicyError, OrdinaryOperationError) as exc:
+        return _research_policy_refusal(exc, data_root, repo_root)
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_research_policy_preview(repo_root: Path, explicit_data_root: Path | None, args: Any) -> int:
+    from solana_alpha_lab.factory.hfic_ordinary_operation import OrdinaryOperationError, extension_parent
+    from solana_alpha_lab.factory.hfic_research_policy import (
+        EPOCH_FIELDS,
+        JOURNAL_FIELDS,
+        ResearchPolicyError,
+        effective_policy,
+        epoch_scope_key,
+        preview_policy_change,
+        propose_run_extension,
+    )
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    try:
+        delta = _research_policy_delta(args)
+        presets_delta: dict[str, Any] = {}
+        presets_remove: list[str] = []
+        if args.proposal_input is not None:
+            loaded = _load_json_file(args.proposal_input)
+            delta.update(loaded.get("limits") or {})
+            presets_delta = dict(loaded.get("presets") or {})
+            presets_remove = [str(item) for item in loaded.get("remove_presets") or []]
+        if not args.for_operation:
+            payload = preview_policy_change(
+                store, limits_delta=delta or None, presets_delta=presets_delta or None, presets_remove=presets_remove or None
+            )
+            payload["active_policy_for_new_runs"] = {
+                "source": effective_policy(store)["source"],
+                "limits": effective_policy(store)["limits"],
+            }
+            _assert_no_path_leak(payload, str(data_root), str(repo_root))
+            return emit(payload)
+        if presets_delta or presets_remove:
+            raise ResearchPolicyError("RESEARCH_POLICY_INVALID", field="presets_with_for_operation")
+        operation = extension_parent(store, str(args.for_operation))
+        proposals = []
+        journal_delta = {key: value for key, value in delta.items() if key in JOURNAL_FIELDS}
+        epoch_delta = {key: value for key, value in delta.items() if key in EPOCH_FIELDS}
+        if not delta:
+            raise ResearchPolicyError("RESEARCH_POLICY_CHANGE_EMPTY")
+        for scope_key, scope_delta in (
+            (str(operation.get("accounting_root") or operation["journal_scope"]), journal_delta),
+            (epoch_scope_key(str(operation["market_evidence_epoch_sha256"])), epoch_delta),
+        ):
+            if scope_delta:
+                proposal = propose_run_extension(
+                    store,
+                    scope_key=scope_key,
+                    parent_operation_sha256=str(operation["operation_sha256"]),
+                    limits_delta=scope_delta,
+                    has_history=_research_policy_scope_history(store, scope_key),
+                )
+                proposals.append(
+                    {
+                        "scope_key": scope_key,
+                        "scope_kind": proposal["scope_kind"],
+                        "before": proposal["before_limits"],
+                        "after": proposal["resulting_limits"],
+                        "proposal": proposal,
+                        "proposal_sha256": proposal["proposal_sha256"],
+                    }
+                )
+        warnings = []
+        if (operation.get("owner_cap") or {}).get("main") == 1 and operation.get("spec_sha256"):
+            warnings.append("EXACT_SPEC_LOCK_NOT_LIFTED: this run is bound to one exact spec; a larger ceiling does not widen the authorized question")
+        payload = {
+            "action": "RESEARCH_POLICY_EXTENSION_PREVIEW",
+            "status": "PROPOSED",
+            "for_operation": str(operation["operation_sha256"]),
+            "applies_to": "THESE_SCOPES_ONLY",
+            "proposals": proposals,
+            "warnings": warnings,
+            "claim_boundary": "Raises the ceiling of these exact scopes only. A total is the whole ceiling of the scope, not an extra allowance; spend is not reset. No research was run.",
+            "unchanged": [
+                "the active policy for new runs",
+                "what these scopes have already spent or reserved",
+                "every other journal and market epoch",
+            ],
+            "next_action": "AUTHORIZED_APPLY",
+            "writes": {"research_store": 0},
+            "market_values_read": 0,
+        }
+    except (ResearchPolicyError, OrdinaryOperationError) as exc:
+        return _research_policy_refusal(exc, data_root, repo_root)
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_research_policy_apply(
+    repo_root: Path, *, explicit_data_root: Path | None, proposal_path: Path, confirm_append_only: bool
+) -> int:
+    from solana_alpha_lab.factory.hfic_research_policy import (
+        EXTENSION_SCHEMA,
+        SCHEMA,
+        ResearchPolicyError,
+        apply_policy_change,
+        apply_run_extension_set,
+        epoch_scope_key,
+    )
+    from solana_alpha_lab.factory.hfic_ordinary_operation import OrdinaryOperationError
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    document = _load_json_file(proposal_path)
+    if isinstance(document.get("proposals"), list):
+        bodies = [item.get("proposal") if isinstance(item, dict) and "proposal" in item else item for item in document["proposals"]]
+    elif isinstance(document.get("proposal"), dict):
+        bodies = [document["proposal"]]
+    else:
+        bodies = [document]
+    results: list[dict[str, Any]] = []
+    try:
+        if not bodies:
+            raise ResearchPolicyError("RESEARCH_POLICY_CHANGE_EMPTY")
+        schemas = [body.get("schema") if isinstance(body, dict) else None for body in bodies]
+        if any(schema not in (SCHEMA, EXTENSION_SCHEMA) for schema in schemas):
+            raise ResearchPolicyError("RESEARCH_POLICY_INVALID", field="schema")
+        if len(bodies) > 1 and len(set(schemas)) > 1:
+            # An active-policy change is its own commit; it is never mixed with extensions.
+            raise ResearchPolicyError("RESEARCH_POLICY_MIXED_SET_UNSUPPORTED")
+        if schemas[0] == SCHEMA:
+            if len(bodies) > 1:
+                raise ResearchPolicyError("RESEARCH_POLICY_MIXED_SET_UNSUPPORTED")
+            results.append(apply_policy_change(store, proposal=bodies[0], confirm_append_only=confirm_append_only))
+        else:
+            from solana_alpha_lab.factory.hfic_ordinary_operation import extension_parent
+
+            def _parent_guard(checked: dict[str, Any]) -> None:
+                # Runs under the writer lease: the run must still be open and without a pending
+                # reservation, and the scope must belong to it, at the moment of the commit.
+                parent = extension_parent(store, str(checked.get("parent_operation_sha256") or ""))
+                allowed = {
+                    str(parent.get("accounting_root") or parent["journal_scope"]),
+                    epoch_scope_key(str(parent["market_evidence_epoch_sha256"])),
+                }
+                if str(checked.get("scope_key")) not in allowed:
+                    raise ResearchPolicyError("RESEARCH_POLICY_EXTENSION_BINDING_INVALID", field="scope_key")
+
+            results.extend(
+                apply_run_extension_set(
+                    store, proposals=bodies, confirm_append_only=confirm_append_only, parent_guard=_parent_guard
+                )
+            )
+    except (ResearchPolicyError, OrdinaryOperationError) as exc:
+        return _research_policy_refusal(exc, data_root, repo_root)
+    payload = (
+        results[0]
+        if len(results) == 1
+        else {
+            "action": "RESEARCH_POLICY_APPLY_SET",
+            "results": results,
+            "writes": {"research_store": sum(int((item.get("writes") or {}).get("research_store") or 0) for item in results)},
+        }
     )
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     return emit(payload)
@@ -3790,6 +4217,15 @@ def build_parser() -> argparse.ArgumentParser:
     preflight.add_argument("--format", choices=("json",), default="json")
     preflight.add_argument("--no-auto-commission", action="store_true")
     preflight.add_argument(
+        "--additional-cycle",
+        action="store_true",
+        help=(
+            "Explicitly request the NEXT AUTO research cycle of this market, or resume the pending one. "
+            "Without it a repeat returns the saved session. It starts a cycle only while the market epoch's "
+            "frozen AUTO pool allows it (see research-policy-status)"
+        ),
+    )
+    preflight.add_argument(
         "--control-current-representation",
         action="store_true",
         help="CURRENT_REPRESENTATION_CONTROL_V1 evidence-surface mode",
@@ -3921,6 +4357,11 @@ def build_parser() -> argparse.ArgumentParser:
     episode_view.add_argument("--spec", type=Path, required=True)
     episode_view.add_argument("--parent-session-id", required=True)
     episode_view.add_argument("--explicit-request", action="store_true")
+    episode_view.add_argument(
+        "--operation-sha256",
+        default=None,
+        help="open operation of the parent journal whose PREVIEW budget this value-bearing view spends",
+    )
     episode_view.add_argument("--format", choices=("json",), default="json")
     snapshot_register = subparsers.add_parser(
         "list-snapshot-register",
@@ -4170,6 +4611,59 @@ def build_parser() -> argparse.ArgumentParser:
         help="required; appends policy only; never rewrites historical RDP bytes",
     )
     apply_cmd.add_argument("--format", choices=("json",), default="json")
+    def _add_research_policy_limit_flags(parser: Any) -> None:
+        from solana_alpha_lab.factory.hfic_research_policy import (
+            DEFAULT_LIMITS,
+            EPOCH_FIELDS,
+            FIELD_RANGES,
+            LIMIT_FIELDS,
+        )
+
+        for field in LIMIT_FIELDS:
+            low, high = FIELD_RANGES[field]
+            scope = "market-epoch pool" if field in EPOCH_FIELDS else "journal"
+            parser.add_argument(
+                f"--{field.replace('_', '-')}",
+                dest=field,
+                type=int,
+                default=None,
+                metavar="N",
+                help=f"{_RESEARCH_POLICY_FIELD_HELP[field]} [{scope}; shipped default {DEFAULT_LIMITS[field]}; range {low}-{high}]",
+            )
+
+    research_policy_status = subparsers.add_parser(
+        "research-policy-status",
+        help="show the active research policy for new runs, and what a given run or scope is frozen at; reads no market values and writes nothing",
+    )
+    research_policy_status.add_argument("--for-operation", dest="operation_sha256", default=None, metavar="OPERATION_SHA256")
+    research_policy_status.add_argument("--journal-scope", default=None)
+    research_policy_status.add_argument("--epoch-scope", default=None, metavar="MARKET_EVIDENCE_EPOCH_SHA256")
+    research_policy_status.add_argument("--format", choices=("json",), default="json")
+    research_policy_preview = subparsers.add_parser(
+        "research-policy-preview",
+        help="preview a change of the active defaults for new runs; with --for-operation preview raising that exact run's scopes instead. Reads no market values",
+    )
+    _add_research_policy_limit_flags(research_policy_preview)
+    research_policy_preview.add_argument(
+        "--proposal-input",
+        type=Path,
+        default=None,
+        help='JSON {"limits": {...}, "presets": {id: expanded body}, "remove_presets": [id]}; only for the active defaults',
+    )
+    research_policy_preview.add_argument(
+        "--for-operation",
+        default=None,
+        metavar="OPERATION_SHA256",
+        help="raise this exact open operation's journal and market-epoch scopes without changing the active defaults",
+    )
+    research_policy_preview.add_argument("--format", choices=("json",), default="json")
+    research_policy_apply = subparsers.add_parser(
+        "research-policy-apply",
+        help="append one previewed change: either new active defaults or the extension of exact scopes (the receipt says which). Save the preview output as the proposal file",
+    )
+    research_policy_apply.add_argument("--proposal", type=Path, required=True)
+    research_policy_apply.add_argument("--confirm-append-only", action="store_true")
+    research_policy_apply.add_argument("--format", choices=("json",), default="json")
     universe_status = subparsers.add_parser(
         "universe-policy-status",
         help="read the active Forge research-universe profile from ResearchStore",
@@ -4348,6 +4842,7 @@ def main(argv: list[str] | None = None) -> int:
                 model_provenance_sha256=getattr(
                     args, "model_provenance_sha256", None
                 ),
+                additional_cycle=bool(getattr(args, "additional_cycle", False)),
             )
         if args.command == "forge-input":
             return cmd_forge_input(
@@ -4395,6 +4890,7 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_episode_normalized_view(
                 repo_root, args.data_root, spec_path=args.spec,
                 parent_session_id=args.parent_session_id, explicit_request=bool(args.explicit_request),
+                operation_sha256=args.operation_sha256,
             )
         if args.command == "list-snapshot-register":
             return cmd_list_snapshot_register(
@@ -4576,6 +5072,23 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.command == "operation-stop":
             return cmd_operation_stop(
+                repo_root,
+                explicit_data_root=args.data_root,
+                proposal_path=args.proposal,
+                confirm_append_only=bool(args.confirm_append_only),
+            )
+        if args.command == "research-policy-status":
+            return cmd_research_policy_status(
+                repo_root,
+                args.data_root,
+                operation_sha256=args.operation_sha256,
+                journal_scope=args.journal_scope,
+                epoch_scope=args.epoch_scope,
+            )
+        if args.command == "research-policy-preview":
+            return cmd_research_policy_preview(repo_root, args.data_root, args)
+        if args.command == "research-policy-apply":
+            return cmd_research_policy_apply(
                 repo_root,
                 explicit_data_root=args.data_root,
                 proposal_path=args.proposal,

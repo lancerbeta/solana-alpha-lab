@@ -45,6 +45,10 @@
       "type": ["string", "null"],
       "pattern": "^[0-9a-f]{64}$"
     },
+    "cycle_index": {
+      "type": "integer",
+      "minimum": 2
+    },
     "scientific_slot_sha256": {
       "type": ["string", "null"],
       "pattern": "^[0-9a-f]{64}$"

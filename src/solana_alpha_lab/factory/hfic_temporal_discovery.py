@@ -58,6 +58,9 @@ TEMPORAL_CALCULATION_VERSION_V5 = "HFIC_TEMPORAL_DISCOVERY_CALC_V5"
 TEMPORAL_CALCULATION_VERSION = TEMPORAL_CALCULATION_VERSION_V5
 # V5 arithmetic read through the episode point/clock resolver binding.
 TEMPORAL_CALCULATION_VERSION_EPISODES_V1 = "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V1"
+# The episode collection has exactly one calculation version, so it is current for episode looks: an exact
+# repeat of an episode query in another operation or cycle is a replay, never a calculation revision.
+TEMPORAL_CURRENT_CALCULATION_VERSIONS = frozenset({TEMPORAL_CALCULATION_VERSION_V5, TEMPORAL_CALCULATION_VERSION_EPISODES_V1})
 TEMPORAL_CALCULATION_VERSIONS_READABLE = frozenset(
     {
         TEMPORAL_CALCULATION_VERSION_EPISODES_V1,
@@ -1780,7 +1783,12 @@ def downside_descriptive(values: Sequence[float], *, missing_n: int) -> dict[str
 def classify_temporal_look(
     previous: Sequence[Mapping[str, Any]],
     spec: Mapping[str, Any],
+    *,
+    limits: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
+    simple_before_compound = SIMPLE_MAIN_RESERVE if limits is None else int(limits["simple_before_compound"])
+    main_total = MAX_MAIN_QUERY_SPECS if limits is None else int(limits["main_total"])
+    adaptive_total = MAX_ADAPTIVE_REFINEMENTS if limits is None else int(limits["adaptive_total"])
     bound = validate_temporal_query(spec)
     digest = bound["spec_sha256"]
     tier = str(bound["search_tier"])
@@ -1791,7 +1799,7 @@ def classify_temporal_look(
     simple_mains = [item for item in mains if item.get("search_tier") == "SIMPLE_SCREEN"]
     compound_mains = [item for item in mains if item.get("search_tier") == "COMPOUND_SCREEN"]
     same_question = [item for item in previous if item.get("spec_sha256") == digest]
-    if any(item.get("calculation_version") == TEMPORAL_CALCULATION_VERSION for item in same_question):
+    if any(item.get("calculation_version") in TEMPORAL_CURRENT_CALCULATION_VERSIONS for item in same_question):
         return {
             "query_id": bound["query_id"],
             "spec_sha256": digest,
@@ -1820,13 +1828,13 @@ def classify_temporal_look(
         look_class == "MAIN"
         and tier == "SIMPLE_SCREEN"
         and bound["budget_allocation"] != "COMPOUND_FIRST"
-        and len(simple_mains) >= SIMPLE_MAIN_RESERVE
+        and len(simple_mains) >= simple_before_compound
         and len(compound_mains) == 0
     ):
         raise GroundedDiscoveryError("SIMPLE_BUDGET_RESERVED_FOR_COMPOUND")
-    if look_class == "MAIN" and len(mains) >= MAX_MAIN_QUERY_SPECS:
+    if look_class == "MAIN" and len(mains) >= main_total:
         raise GroundedDiscoveryError("QUERY_MAIN_BUDGET_EXHAUSTED")
-    if look_class == "ADAPTIVE" and len(adaptive) >= MAX_ADAPTIVE_REFINEMENTS:
+    if look_class == "ADAPTIVE" and len(adaptive) >= adaptive_total:
         raise GroundedDiscoveryError("QUERY_ADAPTIVE_BUDGET_EXHAUSTED")
     return {
         "query_id": bound["query_id"],
@@ -2509,6 +2517,7 @@ def assess_tier_progress(
     *,
     freeze_worthy: bool,
     compound_applicable: bool = True,
+    main_total: int = MAX_MAIN_QUERY_SPECS,
 ) -> dict[str, Any]:
     """Pre-freeze tier state. A skipped compound tier is not an executed search.
 
@@ -2575,7 +2584,7 @@ def assess_tier_progress(
             for item in looks
             if item.get("look_class") == "MAIN" and item.get("new_look") is True
         ]
-        if len(mains) >= MAX_MAIN_QUERY_SPECS:
+        if len(mains) >= main_total:
             status = "SKIPPED_BUDGET"
             action = "STOP_BUDGET"
         else:
@@ -3990,13 +3999,15 @@ def build_feature_preview(
     *,
     prior_preview_hashes: Sequence[str] = (),
     universe_policy: Mapping[str, Any] | None = None,
+    preview_total: int = MAX_PREVIEW_SPECS,
 ) -> dict[str, Any]:
     """Feature-only preview. Target and survival labels are not computed."""
 
     checked = validate_feature_preview_spec(spec)
     if any(f.get("field_id") == HOLDER_COUNT and f["op"] in {"delta", "return_ratio"} for f in checked["features"]):
         return _build_recipe_preview(census, observations, spec, binding,
-                                     prior_preview_hashes=prior_preview_hashes, universe_policy=universe_policy)
+                                     prior_preview_hashes=prior_preview_hashes, universe_policy=universe_policy,
+                                     preview_total=preview_total)
     admitted = admit_discovery_binding(binding)
     decision_point, lateness = checked["decision_point"], checked["lateness"]
     point_ids, features = checked["point_ids"], checked["features"]
@@ -4023,7 +4034,7 @@ def build_feature_preview(
         }
     )
     prior = [str(item) for item in prior_preview_hashes]
-    if identity not in prior and len(set(prior)) >= MAX_PREVIEW_SPECS:
+    if identity not in prior and len(set(prior)) >= preview_total:
         raise GroundedDiscoveryError("PREVIEW_ENVELOPE_EXHAUSTED")
     grouped = _grouped_cells(observations)
     preview_binding = {
@@ -4165,7 +4176,7 @@ def build_feature_preview(
     return payload
 
 
-def _build_recipe_preview(census, observations, spec, binding, *, prior_preview_hashes, universe_policy):
+def _build_recipe_preview(census, observations, spec, binding, *, prior_preview_hashes, universe_policy, preview_total=MAX_PREVIEW_SPECS):
     checked = validate_feature_preview_spec(spec)
     body = {"decision_point": checked["decision_point"], "schedule_lateness_seconds": checked["lateness"],
             "observation_clock_policy": checked["clock_policy"], "features": checked["features"], "predicates": []}
@@ -4177,7 +4188,7 @@ def _build_recipe_preview(census, observations, spec, binding, *, prior_preview_
               "schedule": {"points": checked["point_ids"], "lateness_seconds": checked["lateness"],
                            "observation_clock_policy": checked["clock_policy"]}}
     identity = _sha256({"recipe": recipe, "seed": checked["seed"], "input": frozen, "policy": policy})
-    if identity not in prior_preview_hashes and len(set(prior_preview_hashes)) >= MAX_PREVIEW_SPECS:
+    if identity not in prior_preview_hashes and len(set(prior_preview_hashes)) >= preview_total:
         raise GroundedDiscoveryError("PREVIEW_ENVELOPE_EXHAUSTED")
     members, cohorts, _seen, duplicates, conflicts = _project_temporal_members(
         census, observations, body, binding, universe_policy=universe_policy, prefix_only=True)

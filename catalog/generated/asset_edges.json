@@ -6028,6 +6028,21 @@
       "target_asset_id": "MODULE-NORMALIZED-TRAJECTORY-EPISODES-V1-001"
     },
     {
+      "source_asset_id": "DOC-FORGE-RESEARCH-POLICY-RUNTIME-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-PREFLIGHT-ADMISSION-001"
+    },
+    {
+      "source_asset_id": "DOC-FORGE-RESEARCH-POLICY-RUNTIME-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-RESEARCH-POLICY-001"
+    },
+    {
+      "source_asset_id": "DOC-FORGE-RESEARCH-POLICY-RUNTIME-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-TEMPORAL-DISCOVERY-001"
+    },
+    {
       "source_asset_id": "DOC-FORGE-TEMPORAL-HOLDER-POINT-FEATURE-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001"
@@ -11906,6 +11921,16 @@
       "source_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-HFIC-REPRESENTATION-PROBE-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-RESEARCH-POLICY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-TEMPORAL-DISCOVERY-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-RESEARCH-POLICY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001"
     },
     {
       "source_asset_id": "MODULE-HFIC-RESEARCH-SCOPE-001",
