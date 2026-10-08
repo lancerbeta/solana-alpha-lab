@@ -85,5 +85,8 @@
     "scope": "PRODUCT_DOMAIN_EXCLUDING_AUTHORIZED_ROUTINE_GIT_GITHUB_DELIVERY_TRANSPORT"
   },
   "capability_radar_now": "NONE",
-  "base_main": "04ec8e0286a3dce5999d0687784717ee90fc5dca"
+  "base_main": "04ec8e0286a3dce5999d0687784717ee90fc5dca",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false
 }
