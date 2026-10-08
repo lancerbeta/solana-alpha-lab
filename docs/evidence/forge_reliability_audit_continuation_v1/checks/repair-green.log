@@ -1,0 +1,44 @@
+test_completed_and_pending_requests_do_not_double_charge_on_landing (tests.test_forge_reliability_audit_continuation_v1.PreviewRequestAccountingTests.test_completed_and_pending_requests_do_not_double_charge_on_landing) ... ok
+test_distinct_requests_same_payload_exhaust_protocol_and_preserve_repeat (tests.test_forge_reliability_audit_continuation_v1.PreviewRequestAccountingTests.test_distinct_requests_same_payload_exhaust_protocol_and_preserve_repeat) ... ok
+test_explicit_owner_cap_uses_request_identity_too (tests.test_forge_reliability_audit_continuation_v1.PreviewRequestAccountingTests.test_explicit_owner_cap_uses_request_identity_too) ... ok
+test_legacy_unkeyed_preview_keeps_its_charge_without_rewriting_history (tests.test_forge_reliability_audit_continuation_v1.PreviewRequestAccountingTests.test_legacy_unkeyed_preview_keeps_its_charge_without_rewriting_history) ... FAIL
+test_main_five_completed_plus_two_pending_leave_three_of_ten (tests.test_forge_reliability_audit_continuation_v1.PreviewRequestAccountingTests.test_main_five_completed_plus_two_pending_leave_three_of_ten) ... ok
+test_a_legacy_scope_freeze_and_its_extension_share_one_commit (tests.test_hfic_research_policy_closure_v1.AtomicExtensionSetTests.test_a_legacy_scope_freeze_and_its_extension_share_one_commit) ... ok
+test_a_pending_reservation_after_preview_refuses_the_whole_set (tests.test_hfic_research_policy_closure_v1.AtomicExtensionSetTests.test_a_pending_reservation_after_preview_refuses_the_whole_set) ... ok
+test_exact_repeat_after_reply_loss_is_idempotent_and_duplicates_are_refused (tests.test_hfic_research_policy_closure_v1.AtomicExtensionSetTests.test_exact_repeat_after_reply_loss_is_idempotent_and_duplicates_are_refused) ... ok
+test_legal_journal_and_epoch_set_with_a_conflict_on_the_second_scope (tests.test_hfic_research_policy_closure_v1.AtomicExtensionSetTests.test_legal_journal_and_epoch_set_with_a_conflict_on_the_second_scope) ... ok
+test_stopped_after_preview_refuses_the_whole_set (tests.test_hfic_research_policy_closure_v1.AtomicExtensionSetTests.test_stopped_after_preview_refuses_the_whole_set) ... ok
+test_valid_first_and_invalid_second_commit_nothing (tests.test_hfic_research_policy_closure_v1.AtomicExtensionSetTests.test_valid_first_and_invalid_second_commit_nothing) ... ok
+test_a_continuation_needs_its_root_a_live_parent_and_the_same_focus (tests.test_hfic_research_policy_closure_v1.ContinuationAccountingTests.test_a_continuation_needs_its_root_a_live_parent_and_the_same_focus) ... ok
+test_a_forged_root_can_neither_borrow_nor_poison_a_budget (tests.test_hfic_research_policy_closure_v1.ContinuationAccountingTests.test_a_forged_root_can_neither_borrow_nor_poison_a_budget) ... ok
+test_allowing_a_second_auto_cycle_alone_opens_no_new_main_budget (tests.test_hfic_research_policy_closure_v1.ContinuationAccountingTests.test_allowing_a_second_auto_cycle_alone_opens_no_new_main_budget) ... ok
+test_an_explicit_shared_total_of_10_leaves_4_for_the_second_cycle (tests.test_hfic_research_policy_closure_v1.ContinuationAccountingTests.test_an_explicit_shared_total_of_10_leaves_4_for_the_second_cycle) ... ok
+test_cycle_one_digests_are_unchanged_by_the_lineage_fields (tests.test_hfic_research_policy_closure_v1.ContinuationAccountingTests.test_cycle_one_digests_are_unchanged_by_the_lineage_fields) ... ok
+test_cycle_one_spent_main_6_of_6_so_cycle_two_starts_with_none_left (tests.test_hfic_research_policy_closure_v1.ContinuationAccountingTests.test_cycle_one_spent_main_6_of_6_so_cycle_two_starts_with_none_left) ... ok
+test_stopped_and_pending_parents_are_not_bypassed (tests.test_hfic_research_policy_closure_v1.ContinuationAccountingTests.test_stopped_and_pending_parents_are_not_bypassed) ... ok
+test_the_same_spec_in_both_cycles_is_one_look_not_two (tests.test_hfic_research_policy_closure_v1.ContinuationAccountingTests.test_the_same_spec_in_both_cycles_is_one_look_not_two) ... ok
+test_a_stop_between_the_root_decision_and_the_commit_refuses_the_new_segment (tests.test_hfic_research_policy_closure_v1.LineageRaceUnderLeaseTests.test_a_stop_between_the_root_decision_and_the_commit_refuses_the_new_segment) ... ok
+test_two_first_variants_racing_leave_exactly_one_root (tests.test_hfic_research_policy_closure_v1.LineageRaceUnderLeaseTests.test_two_first_variants_racing_leave_exactly_one_root) ... ok
+test_the_root_is_stable_after_a_later_cycle_child_and_an_earlier_one_is_refused (tests.test_hfic_research_policy_closure_v1.RepresentationContinuationOrderTests.test_the_root_is_stable_after_a_later_cycle_child_and_an_earlier_one_is_refused) ... ok
+test_a_pending_preview_of_another_operation_is_not_adopted (tests.test_hfic_research_policy_closure_v1.ReservedPreviewResumeTests.test_a_pending_preview_of_another_operation_is_not_adopted) ... ok
+test_reserve_then_crash_then_retry_lands_the_same_reservation (tests.test_hfic_research_policy_closure_v1.ReservedPreviewResumeTests.test_reserve_then_crash_then_retry_lands_the_same_reservation) ... ok
+
+======================================================================
+FAIL: test_legacy_unkeyed_preview_keeps_its_charge_without_rewriting_history (tests.test_forge_reliability_audit_continuation_v1.PreviewRequestAccountingTests.test_legacy_unkeyed_preview_keeps_its_charge_without_rewriting_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>\tests\test_forge_reliability_audit_continuation_v1.py", line 98, in test_legacy_unkeyed_preview_keeps_its_charge_without_rewriting_history
+    self.assertEqual(new[:len(old)], old)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['{"a[2134 chars]nd":"ORDINARY_LOOK_RESERVATION_V1","payload_ca[541 chars]7"}'] != ['{"a[2134 chars]nd":"DISCOVERY_FEATURE_PREVIEW","payload_canon[403 chars]2"}']
+
+First differing element 2:
+'{"artifact_kind":"ORDINARY_LOOK_RESERVATION_V1","payload_ca[540 chars]37"}'
+'{"artifact_kind":"DISCOVERY_FEATURE_PREVIEW","payload_canon[402 chars]72"}'
+
+Diff is 3224 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 24 tests in 25.738s
+
+FAILED (failures=1)

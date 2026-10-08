@@ -1,0 +1,10 @@
+test_import_epoch_preflight_context_no_worthy_and_fail_closed (tests.test_hfic_forge_context_and_no_worthy.TempBindAndContextE2ETests.test_import_epoch_preflight_context_no_worthy_and_fail_closed) ... ok
+test_deleted_context_artifact_breaks_prove_runtime_no_worthy (tests.test_hfic_forge_context_and_no_worthy.TempBindAndContextE2ETests.test_deleted_context_artifact_breaks_prove_runtime_no_worthy) ... ok
+test_selected_path_resolves_context_and_fails_closed_on_corrupt_blob (tests.test_hfic_forge_context_and_no_worthy.TempBindAndContextE2ETests.test_selected_path_resolves_context_and_fails_closed_on_corrupt_blob) ... ok
+test_public_normalized_consumer_refuses_corrupt_pin_before_value_loader (tests.test_forge_grounded_handoff_closure_v1.CanonicalIngressTests.test_public_normalized_consumer_refuses_corrupt_pin_before_value_loader) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 69.727s
+
+OK
+{"names": ["tests.test_hfic_forge_context_and_no_worthy.TempBindAndContextE2ETests.test_import_epoch_preflight_context_no_worthy_and_fail_closed", "tests.test_hfic_forge_context_and_no_worthy.TempBindAndContextE2ETests.test_deleted_context_artifact_breaks_prove_runtime_no_worthy", "tests.test_hfic_forge_context_and_no_worthy.TempBindAndContextE2ETests.test_selected_path_resolves_context_and_fails_closed_on_corrupt_blob", "tests.test_forge_grounded_handoff_closure_v1.CanonicalIngressTests.test_public_normalized_consumer_refuses_corrupt_pin_before_value_loader"], "run": 4, "failures": 0, "errors": 0, "skipped": 0, "wall_seconds": 69.7268827999942, "raw_cli_calls": 12}
