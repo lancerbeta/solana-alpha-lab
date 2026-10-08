@@ -291,12 +291,14 @@ def _validated_lineage_link(
 def _representation_continuation_root(
     store: Any, *, representation: Mapping[str, Any], focus: str, market: str, journal: str
 ) -> tuple[str | None, str | None]:
-    """(root journal, blocker) of the representation lineage an additional-cycle representation continues.
+    """(root journal, blocker) of the representation lineage a new representation operation continues.
 
-    The root is the earliest root operation of the SAME representation, focus and market whose BASE parent
-    belongs to an EARLIER cycle of the same (market, focus). Execution identity (parent session, payload,
-    scope) stays the operation's own; only the budget is shared. BASE and other representations,
-    focuses and markets are never merged. A stopped lineage member or an unresolved reservation refuses.
+    One research line is (market, focus, representation): a new payload, selector or cycle inside it is the
+    same search and spends the same budget. The root is the single unlinked root operation of that line whose
+    BASE parent is in the same or an earlier cycle. Execution identity (parent session, payload, scope, slot)
+    stays the operation's own; only the budget is shared. BASE and other representations, focuses and markets
+    are never merged. Two historical unlinked roots are an ambiguous line: refused, never a fresh budget.
+    A stopped member or an unresolved reservation refuses a new segment.
     """
 
     from solana_alpha_lab.factory.hfic_session import HficSessionError, load_session_bundle
@@ -314,41 +316,52 @@ def _representation_continuation_root(
         value = bundle.get("cycle_index")
         return value if isinstance(value, int) and not isinstance(value, bool) and value > 1 else 1
 
+    operations = list_operations(store)
+    existing_journal = False
+    existing_root: str | None = None
+    for item in operations:
+        # A journal already carrying an operation keeps the budget identity it was created with, so a
+        # repeated request (or another request text on that journal) can never re-derive a different root.
+        if item.get("journal_scope") == journal and isinstance(item.get("representation"), Mapping):
+            existing_journal = True
+            existing_root = str(item["accounting_root"]) if item.get("accounting_root") else existing_root
     parent = _bundle(representation.get("parent_session_id"))
     if parent is None:
         return None, None
     members: list[Mapping[str, Any]] = []
-    roots: list[tuple[int, Mapping[str, Any]]] = []
+    roots: list[Mapping[str, Any]] = []
     later_cycle_member = False
-    for item in list_operations(store):
+    for item in operations:
         rep = item.get("representation")
         if (
             not isinstance(rep, Mapping)
             or rep.get("representation_id") != representation.get("representation_id")
             or item.get("owner_focus") != focus
             or item.get("market_evidence_epoch_sha256") != market
-            or item.get("journal_scope") == journal
         ):
             continue
         other = _bundle(rep.get("parent_session_id"))
         if other is None or str(other.get("owner_focus") or "") != focus:
             continue
         members.append(item)
+        if item.get("journal_scope") == journal:
+            continue
         if _cycle(other) > _cycle(parent):
             later_cycle_member = True
-        if not item.get("accounting_root") and _cycle(other) < _cycle(parent):
-            roots.append((_cycle(other), item))
-    # The would-be root is always computed, so an idempotent re-request of an existing continuation child
-    # keeps its stored digest even after a later cycle's child exists.
-    root_journal = None
-    if _cycle(parent) > 1 and roots:
-        # The earliest cycle wins; within a cycle the earliest recorded. A missing timestamp sorts last.
-        root_journal = str(min(roots, key=lambda pair: (pair[0], str(pair[1].get("_recorded_at") or "~")))[1]["journal_scope"])
-    if later_cycle_member and root_journal is None:
-        # An earlier cycle's child may not arrive after a later cycle's: that would give one
-        # representation two independent budgets. The continuation runs forward in cycle order.
-        return None, "ORDINARY_OPERATION_LINEAGE_OUT_OF_ORDER"
-    if root_journal is None:
+        elif not item.get("accounting_root"):
+            roots.append(item)
+    journals = {str(item.get("journal_scope")) for item in roots}
+    if existing_journal:
+        # Selection is already made for this journal; a NEW request on it still may not bypass a stop or a pending reservation.
+        journals = {existing_root} if existing_root else set()
+    elif len(journals) > 1:
+        earliest = min(roots, key=lambda row: str(row.get("_recorded_at") or "~"))
+        return str(earliest["journal_scope"]), "ORDINARY_OPERATION_LINEAGE_AMBIGUOUS"
+    if not journals:
+        if later_cycle_member and not existing_journal:
+            # An earlier cycle's first child may not arrive after a later cycle's: that would give one
+            # representation two independent budgets. The continuation runs forward in cycle order.
+            return None, "ORDINARY_OPERATION_LINEAGE_OUT_OF_ORDER"
         return None, None
     blocker = None
     for item in members:
@@ -357,7 +370,7 @@ def _representation_continuation_root(
             break
         if _unresolved_reservations(store, item):
             blocker = "EXTENSION_PARENT_HAS_PENDING_RESERVATION"
-    return root_journal, blocker
+    return next(iter(journals)), blocker
 
 
 def journal_has_history(store: Any, journal_scope: str) -> bool:

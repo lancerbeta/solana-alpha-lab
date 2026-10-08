@@ -397,7 +397,7 @@ class RepresentationContinuationOrderTests(unittest.TestCase):
             }
 
         bundles = {
-            "S1": {"owner_focus": focus}, "S2": {"owner_focus": focus, "cycle_index": 2},
+            "S1": {"owner_focus": focus}, "S1b": {"owner_focus": focus}, "S9": {"owner_focus": "OPPORTUNITY_EPISODES:OTHER"}, "S2": {"owner_focus": focus, "cycle_index": 2},
             "S3": {"owner_focus": focus, "cycle_index": 3},
         }
         c1 = row("11" * 32, "S1", "2026-10-07T01:00:00")
@@ -416,12 +416,22 @@ class RepresentationContinuationOrderTests(unittest.TestCase):
         # Cycle 2 continues cycle 1; after cycle 3 exists a re-request of cycle 2 derives the SAME root.
         self.assertEqual(derive("S2", c2["journal_scope"], [c1]), ("11" * 32, None))
         self.assertEqual(derive("S2", c2["journal_scope"], [c1, c2, c3]), ("11" * 32, None))
-        # Cycle 3 with only a cycle-2 root continues it; the earliest cycle wins once cycle 1 exists.
+        # Cycle 3 with only a cycle-2 child plus the root continues the one root.
         self.assertEqual(derive("S3", c3["journal_scope"], [c2, c1]), ("11" * 32, None))
-        # A cycle-1 child arriving after a later cycle's child is refused (one representation, one budget) ...
+        # A SAME-cycle variant (another payload or selector under the cycle-1 parent) continues the same root.
+        self.assertEqual(derive("S1", "55" * 32, [c1]), ("11" * 32, None))
+        self.assertEqual(derive("S1", "55" * 32, [c1, c2]), ("11" * 32, None))
+        # A cycle-1 child with no root at all arriving after a later cycle's child is refused (one budget).
         self.assertEqual(derive("S1", "44" * 32, [c2]), (None, "ORDINARY_OPERATION_LINEAGE_OUT_OF_ORDER"))
-        # ... and a re-request of the cycle-1 root itself, which has no root, still derives (None, blocker) only for a NEW journal.
-        self.assertEqual(derive("S1", c1["journal_scope"], [c1, c2]), (None, "ORDINARY_OPERATION_LINEAGE_OUT_OF_ORDER"))
+        # A journal that already carries an operation keeps the identity it was created with.
+        self.assertEqual(derive("S1", c1["journal_scope"], [c1, c2]), (None, None))
+        # Two historical unlinked roots are an ambiguous line: refused, never a fresh budget.
+        c1b = row("77" * 32, "S1b", "2026-10-07T01:30:00")
+        self.assertEqual(derive("S1", "66" * 32, [c1, c1b])[1], "ORDINARY_OPERATION_LINEAGE_AMBIGUOUS")
+        # Another focus never joins the line.
+        other_focus = row("88" * 32, "S9", "2026-10-07T00:30:00")
+        other_focus["owner_focus"] = "OPPORTUNITY_EPISODES:OTHER"
+        self.assertEqual(derive("S1", "99" * 32, [other_focus]), (None, None))
 
 
 if __name__ == "__main__":

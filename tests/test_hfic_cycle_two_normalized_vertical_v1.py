@@ -60,7 +60,7 @@ class CycleTwoNormalizedVerticalTests(unittest.TestCase):
         evidence["_canonical"] = canonical
         return evidence
 
-    def _negative_base(self, tag: str, evidence: dict[str, Any], receipt: dict[str, Any], *flags: str) -> dict[str, Any]:
+    def _negative_base(self, tag: str, evidence: dict[str, Any], receipt: dict[str, Any], *flags: str, focus: str = "AUTO") -> dict[str, Any]:
         """BASE terminal NO_WORTHY with a real scoped look as its evidence (the existing production shape)."""
 
         from tests.test_hfic_cli import bind_draft
@@ -69,14 +69,14 @@ class CycleTwoNormalizedVerticalTests(unittest.TestCase):
         template["candidates"] = []
         for key in ("runner_up_candidate_ref", "strongest_rejected_alternative", "selected_candidate_ref"):
             template.pop(key, None)
-        fresh = _forge_call("preflight", "--discovery-contract", "--collection", "OPPORTUNITY_EPISODES", "--owner-focus", "AUTO", *flags, data_root=self.plane)
+        fresh = _forge_call("preflight", "--discovery-contract", "--collection", "OPPORTUNITY_EPISODES", "--owner-focus", focus, *flags, data_root=self.plane)
         body = bind_draft({**template, "owner_focus": fresh["owner_focus"]}, fresh)
         body["grounded_evidence"] = {key: value for key, value in evidence.items() if not key.startswith("_")}
         draft_path, receipt_path = self.work / f"{tag}-nw-draft.json", self.work / f"{tag}-nw-receipt.json"
         draft_path.write_text(json.dumps(body), encoding="utf-8")
         receipt_path.write_text(json.dumps(fresh), encoding="utf-8")
         _forge_call("persist-draft", "--draft", str(draft_path), "--preflight-receipt", str(receipt_path), "--representation-id", "BASE", data_root=self.plane)
-        resume = _forge_call("preflight", "--discovery-contract", "--collection", "OPPORTUNITY_EPISODES", "--owner-focus", "AUTO", *flags, data_root=self.plane)
+        resume = _forge_call("preflight", "--discovery-contract", "--collection", "OPPORTUNITY_EPISODES", "--owner-focus", focus, *flags, data_root=self.plane)
         receipt_path.write_text(json.dumps(resume), encoding="utf-8")
         return _forge_call("freeze", "--draft", str(draft_path), "--preflight-receipt", str(receipt_path), data_root=self.plane)
 
@@ -89,17 +89,6 @@ class CycleTwoNormalizedVerticalTests(unittest.TestCase):
         card_template = json.loads((ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(encoding="utf-8"))
         scope = evidence["_scope"]
         identity = temporal.temporal_holder_claim_identity(evidence["result"])
-        # The view is read-only; explicitly commit its derived context before writers (the grounded handoff contract).
-        from solana_alpha_lab.factory.hfic_preflight import persist_forge_context_packet
-        from solana_alpha_lab.factory.research_store import ResearchStore
-        from solana_alpha_lab.factory.run_passport import canonical_sha256
-
-        ladder = dict(ladder)
-        ladder["forge_context_packet_sha256"] = persist_forge_context_packet(
-            self.plane, ladder["forge_context_packet"], store=ResearchStore(self.plane), repo_root=ROOT,
-        )
-        ladder.pop("preflight_receipt_sha256", None)
-        ladder["preflight_receipt_sha256"] = canonical_sha256(ladder)
         card = {
             **card_template["candidates"][0],
             **scope,
@@ -308,7 +297,7 @@ class CycleTwoNormalizedVerticalTests(unittest.TestCase):
         for key in ("critic_terminal", "session_state", "selected_candidate_id"):
             self.assertEqual(child1_after.get(key), child1_before.get(key), key)
 
-        # An earlier cycle's child cannot arrive after a later cycle's (that would be a second, independent budget).
+        # A late variant of the cycle-1 parent (another selector) is the same search: it joins the same budget.
         more_preview = _forge_call("research-policy-preview", "--for-operation", str(base2["operation_sha256"]), "--preview-total", "4", data_root=plane)
         more_file = self.work / "c2-preview4.json"
         more_file.write_text(json.dumps(more_preview), encoding="utf-8")
@@ -319,9 +308,13 @@ class CycleTwoNormalizedVerticalTests(unittest.TestCase):
             "episode-normalized-view", "--spec", str(spec_early), "--parent-session-id", frozen1["session_id"],
             "--operation-sha256", str(base1["operation_sha256"]), data_root=plane,
         )
-        late = self._attempt("c1child-late", self._list_query([["C"]]), self._child_operation(view_early, "late cycle-1 child", child_cap))
-        self.assertNotEqual(late["_exit_code"], 0, late)
-        self.assertEqual(late.get("reason_code"), "ORDINARY_OPERATION_LINEAGE_OUT_OF_ORDER", late)
+        late = self._attempt("c1child-late", self._list_query([["C"]]), self._child_operation(view_early, "late cycle-1 variant", child_cap))
+        self.assertEqual(late["_exit_code"], 0, late)
+        late_journal = view_early["ladder_freeze_preflight"]["search_key_sha256"]
+        store = ResearchStore(plane, create_if_missing=False)
+        self.assertEqual(accounting_root_of(store, late_journal), child1_journal)
+        shared = occupancy(late_journal)
+        self.assertEqual((shared["limit"], shared["completed"]), (10, 4))  # one representation, one budget
 
         # A stopped member of the lineage cannot be bypassed by a new segment.
         from solana_alpha_lab.factory.hfic_ordinary_operation import apply_operation_stop, preview_operation_stop
@@ -352,6 +345,66 @@ class CycleTwoNormalizedVerticalTests(unittest.TestCase):
 
         rows = [row for row in list_operations(ResearchStore(self.plane, create_if_missing=False)) if row.get("journal_scope") == journal]
         return str(rows[0]["operation_sha256"])
+
+    def test_same_cycle_normalized_variants_share_the_representation_budget(self) -> None:
+        """Owner review P1-2, on the public query path BEFORE any freeze: another payload/selector of the same
+        representation, focus and market in the same cycle is the same search, not a fresh budget."""
+
+        from solana_alpha_lab.factory.hfic_ordinary_operation import accounting_root_of, journal_occupancy
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        plane = self.plane
+        focus = "LAV_VAR"
+        base = self._run("v-base", self._list_query([["A", "C"]]), focus=focus, cap={"main": 1, "adaptive": 0, "preview": 2})
+        self.assertEqual(base["_exit_code"], 0, base)
+        frozen = self._negative_base("v", base, base["_preflight"], focus=focus)
+        views = []
+        for tag, clauses in (("a", [["A", "C"]]), ("b", [["B"]])):
+            spec = self.work / f"v-view-{tag}.json"
+            spec.write_text(json.dumps(self._list_query(clauses)), encoding="utf-8")
+            views.append(
+                _forge_call(
+                    "episode-normalized-view", "--spec", str(spec), "--parent-session-id", frozen["session_id"],
+                    "--operation-sha256", str(base["operation_sha256"]), data_root=plane,
+                )
+            )
+        cap = {"main": 6, "adaptive": 0, "preview": 0}
+        op_a = self._child_operation(views[0], "variant A", cap)
+        op_b = self._child_operation(views[1], "variant B", cap)
+        self.assertNotEqual(op_a["journal_scope"], op_b["journal_scope"])  # two payloads, two execution identities
+
+        def occupancy(journal: str) -> dict[str, Any]:
+            return journal_occupancy(ResearchStore(plane, create_if_missing=False), journal)["main"]
+
+        first = self._attempt("v-a1", self._list_query([["A", "C"]]), op_a)
+        second = self._attempt("v-a2", self._list_query([["A"]]), op_a)
+        self.assertEqual((first["_exit_code"], second["_exit_code"]), (0, 0))
+        spent = occupancy(op_a["journal_scope"])
+        self.assertEqual((spent["limit"], spent["completed"], spent["remaining"]), (6, 2, 4))
+
+        # Variant B, before any freeze: sees the same 4 left, not a new 6.
+        replay = self._attempt("v-b-replay", self._list_query([["A", "C"]]), op_b)
+        self.assertEqual(replay["_exit_code"], 0, replay)
+        self.assertFalse(replay.get("new_look", False))  # the exact saved query is a replay
+        store = ResearchStore(plane, create_if_missing=False)
+        self.assertEqual(accounting_root_of(store, op_b["journal_scope"]), op_a["journal_scope"])
+        carried = occupancy(op_b["journal_scope"])
+        self.assertEqual((carried["limit"], carried["completed"], carried["remaining"]), (6, 2, 4))
+        # A new query is counted once, for the one shared line.
+        fresh = self._attempt("v-b-new", self._list_query([["C"]]), op_b)
+        self.assertEqual(fresh["_exit_code"], 0, fresh)
+        for journal in (op_a["journal_scope"], op_b["journal_scope"]):
+            counted = occupancy(journal)
+            self.assertEqual((counted["completed"], counted["remaining"]), (3, 3))
+        # BASE is a different budget: untouched by the normalized spend.
+        self.assertEqual(occupancy(base["_preflight"]["search_key_sha256"])["completed"], 1)
+
+        from solana_alpha_lab.factory.hfic_ordinary_operation import apply_operation_stop, get_operation, list_operations, preview_operation_stop
+
+        for digest in sorted({str(row["operation_sha256"]) for row in list_operations(store) if row.get("owner_focus") == "OPPORTUNITY_EPISODES:" + focus}):
+            if get_operation(store, digest).get("status") != "STOPPED":
+                closing = preview_operation_stop(store, operation_sha256=digest, owner_request_text="close the variants vertical")
+                apply_operation_stop(store, proposal=closing["proposal"], confirm_append_only=True)
 
 
 if __name__ == "__main__":

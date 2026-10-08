@@ -108,9 +108,11 @@ population. Within one representation the continuation is the same search:
 the episode child of a cycle-2 BASE session keeps its own execution identity
 (journal keyed from the exact parent session's stored search key, its own
 payload, scope and cycle slot) but its operation is linked at creation to the
-earliest root operation of the same representation, focus and market whose
-BASE parent is an earlier cycle (`lineage_kind: REPRESENTATION_CONTINUATION`,
-`accounting_root` = that child's journal). It spends that root's budget: if the
+single root operation of the same research line, which is (market, focus,
+representation) with a BASE parent in the same or an earlier cycle
+(`lineage_kind: REPRESENTATION_CONTINUATION`, `accounting_root` = that
+child's journal). Another payload or selector in the same cycle is therefore
+the same search too, not a fresh budget. It spends that root's budget: if the
 cycle-1 normalized child used 2 of 6, the cycle-2 child sees 4 left, not a new 6;
 an explicit normalized total of 10 (`--for-operation <child>`) leaves 8; BASE
 is untouched. A new cycle, payload or selector never opens fresh budget by
@@ -146,6 +148,7 @@ scope rule or a market-evidence basis: this is execution provenance.
 | `RESEARCH_POLICY_PREVIEW_STALE` / `RESEARCH_POLICY_EXTENSION_STALE` | the policy or the scope moved since the preview | repeat the preview |
 | `RESEARCH_POLICY_RUN_SNAPSHOT_MISSING` | the scope is not frozen yet | run preflight or create the operation, then preview again |
 | `RESEARCH_POLICY_MIXED_SET_UNSUPPORTED` / `RESEARCH_POLICY_EXTENSION_SET_DUPLICATE_SCOPE` | a file mixes an active-policy change with extensions, or repeats a scope | apply the policy change and the extensions in separate files, one proposal per scope |
+| `ORDINARY_OPERATION_LINEAGE_AMBIGUOUS` / `ORDINARY_OPERATION_LINEAGE_OUT_OF_ORDER` | a research line holds several historical roots, or a first child of an earlier cycle arrives after a later cycle's | owner decision on the surviving root; record children in cycle order |
 | `ORDINARY_OPERATION_ACCOUNTING_ROOT_REQUIRED` / `_UNKNOWN` / `ORDINARY_OPERATION_LINEAGE_MISMATCH` | a cycle-2 operation lacks, or names a wrong, accounting root or parent | copy `accounting_root` from the cycle-2 preflight receipt and the cycle-1 operation hash as parent |
 | `RESEARCH_POLICY_CONFIRM_REQUIRED` | apply without `--confirm-append-only` | retry with the flag |
 | `RESEARCH_POLICY_PRESET_NOT_FOUND` / `RESEARCH_POLICY_PRESET_CONFLICT` | unknown preset, or an explicit field contradicts it | define the preset first or drop the conflicting field |
@@ -178,7 +181,8 @@ root does. The packet shows the root's limits and what is left of them.
 
 ## Known limits of this delivery
 
-- Several cycle-1 variants of one representation (different payload or scope under the same cycle-1 parent) keep their own historical budgets; only the continuation into a later cycle is linked, to the earliest root.
+- Records created before this closure may hold several unlinked roots for one research line (separate budgets, never rewritten). A new operation on such an ambiguous line is refused (`ORDINARY_OPERATION_LINEAGE_AMBIGUOUS`), never given a fresh budget; an owner decision is needed to pick the surviving root.
+- `episode-normalized-view` now publishes its derived context through the existing context owner (idempotent), so the next writer receives a usable receipt; a conflicting or corrupt context artifact still refuses the lifecycle write.
 - Occupancy of the episode representation is per focus and per cycle: another focus's child no longer blocks this focus's child (the legacy NT representation keeps its per-market occupancy).
 - Cycle capability for the episode collection covers its AUTO focus (`OPPORTUNITY_EPISODES:AUTO`); other named episode focuses have no additional cycle.
 - Each lineage-aware budget read scans the ResearchStore several times; this is paid until the store grows large and is not memoized.

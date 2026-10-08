@@ -2327,6 +2327,26 @@ def cmd_episode_normalized_view(
             control_session_id=parent_session_id,
             representation_payload=payload,
         )
+        # The next writer (persist-draft) needs the derived context committed and bound into the receipt.
+        # Publish it through the existing context owner here; a repeat is idempotent and a missing or
+        # conflicting artifact still refuses the lifecycle write downstream.
+        from solana_alpha_lab.factory.hfic_preflight import (
+            HficPreflightError,
+            _lookup_forge_context_artifact,
+            persist_forge_context_packet,
+        )
+        from solana_alpha_lab.factory.run_passport import canonical_sha256 as _receipt_sha
+
+        context_digest = _receipt_sha(receipt["forge_context_packet"])
+        context_was_new = _lookup_forge_context_artifact(store, context_digest) is None
+        try:
+            receipt["forge_context_packet_sha256"] = persist_forge_context_packet(
+                data_root, receipt["forge_context_packet"], store=store, repo_root=repo_root
+            )
+        except HficPreflightError as exc:
+            return emit({"reason_code": exc.args[0] if exc.args else "FORGE_CONTEXT_ARTIFACT_INVALID", "writes": False}, exit_code=2)
+        receipt.pop("preflight_receipt_sha256", None)
+        receipt["preflight_receipt_sha256"] = _receipt_sha(receipt)
     except scope_owner.ResearchScopeError as exc:
         return emit({"reason_code": exc.code, "detail": exc.detail, "values_loaded": False, "writes": False}, exit_code=2)
     except (GroundedDiscoveryError, EpisodeProfileError, LadderError) as exc:
@@ -2345,7 +2365,7 @@ def cmd_episode_normalized_view(
             "request_descriptor_sha256": descriptor,
             "note": "A repeat of the same request spends nothing; a changed scope rule or applied evidence is a new PREVIEW.",
         },
-        "writes": gate["disposition"] in ("EXECUTE", "RESUME"),
+        "writes": gate["disposition"] in ("EXECUTE", "RESUME") or context_was_new,
     }
     _assert_no_path_leak(result, str(data_root), str(repo_root))
     return emit(result)
