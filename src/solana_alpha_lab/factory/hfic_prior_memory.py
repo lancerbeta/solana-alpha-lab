@@ -124,11 +124,14 @@ def classify_memory_status(
         return MEMORY_TECHNICAL_STOP
     if reason.startswith("PARK_") or reason == "OWNER_PRIORITY_PARK" or kind == "PARK":
         return MEMORY_PARK
-    if (
-        reason.startswith("KILL_")
-        or reason.startswith("CLOSE_")
-        or (kind == "REJECT" and reason not in {"", MEMORY_NOT_SELECTED})
-    ):
+    from solana_alpha_lab.factory.hfic_suppression_semantics import interpret_critic_terminal
+
+    outcome = interpret_critic_terminal(reason)["outcome_class"]
+    if outcome in {"REVIEW_REJECTION", "REVIEW_REJECTION_UNKNOWN_APPLICABILITY"}:
+        # A rejection of one bound question stays visible; it grants no family closure.
+        return MEMORY_HISTORICAL
+    if reason.startswith("CLOSE_"):
+        # Compatibility label only; the existing typed suppression ledger owns authority.
         return MEMORY_HARD_CLOSE
     if not kind and not reason:
         if hfic_protocol:
@@ -379,6 +382,8 @@ def compact_forge_prior_entry(
         value = full.get(key)
         if value not in (None, "", [], {}):
             out[key] = value
+    if "outcome_semantics" in full:
+        out["outcome_semantics"] = full["outcome_semantics"]
     if out.get("memory_status") == MEMORY_TECHNICAL_STOP:
         out["technical_stop_note"] = (
             "Технический отказ не является отрицательным рыночным результатом."
@@ -463,6 +468,11 @@ def _capsule_from_payload(
         "decision_kind": decision_kind or None,
         "reason_code": reason_code or None,
     }
+    from solana_alpha_lab.factory.hfic_suppression_semantics import interpret_critic_terminal
+    if reason_code:
+        outcome = interpret_critic_terminal(reason_code)
+        if outcome["outcome_class"] != "UNMAPPED_OUTCOME":
+            capsule["outcome_semantics"] = outcome
     for field in _CAPSULE_FIELDS:
         if field == "cheapest_falsifier":
             value = str(falsifier or "")

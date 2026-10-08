@@ -22,6 +22,9 @@ session_memory:
   append_only: true
   persist_all_candidates: true
   resume_incomplete: true
+# Legacy/shipped defaults below are not frozen per-run ceilings. Ordinary runs
+# use research_policy_context.this_search.limits (including max_generated);
+# candidate_authoring_contract names the consumer fields. No default is raised.
 candidate_policy:
   min_candidates: 0
   max_candidates: 6

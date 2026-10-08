@@ -807,3 +807,36 @@ def persist_science_memory_rebase(
         "evidence_epoch_after": evidence_epoch_after,
         "created_at": render_canonical_utc(now),
     }
+
+# Source Critic verdict, routing class and suppression authority are distinct.
+# This exhaustive finite map belongs here, beside the existing typed authority owner.
+_CRITIC_OUTCOME_CLASSES = {
+    "PASS_TO_CLASSIFICATION": "PENDING_CLASSIFICATION",
+    "PASS_FAST_LANE_READY": "MACHINE_READY_NOT_SCIENCE",
+    "PASS_CHANGE_LANE_REQUIRED": "CAPABILITY_GAP",
+    "PASS_DATA_OPTION_REQUIRED": "DATA_OPTION_GAP",
+    "REVISE_ONCE": "PENDING_REVISION",
+    "NO_WORTHY_HYPOTHESIS": "ZERO_CANDIDATE_STAGE",
+    "OWNER_DECISION_REQUIRED": "AUTHORITY_BOUNDARY",
+    "KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED": "REVIEW_REJECTION",
+    "KILL_MECHANISM": "REVIEW_REJECTION",
+    "KILL_PIT_OR_LEAKAGE": "REVIEW_REJECTION",
+    "KILL_EXECUTION_OR_ECONOMICS": "REVIEW_REJECTION",
+    "KILL_DATA_INFEASIBLE": "REVIEW_REJECTION_UNKNOWN_APPLICABILITY",
+    "KILL_STATISTICALLY_UNIDENTIFIABLE": "REVIEW_REJECTION",
+    "KILL_LOW_INFORMATION_VALUE": "REVIEW_REJECTION",
+    "KILL_PREPARATORY_LOOP": "REVIEW_REJECTION",
+    "KILL_UNBOUND_EVIDENCE": "TECHNICAL_REFUSAL",
+}
+
+def interpret_critic_terminal(terminal: object) -> dict[str, Any]:
+    """Derived explanation, never a new verdict, transition or family-close grant."""
+    source = terminal if isinstance(terminal, str) else None
+    outcome = _CRITIC_OUTCOME_CLASSES.get(source, "UNMAPPED_OUTCOME")
+    applicability = (
+        "CANDIDATE_AND_BOUND_EVIDENCE" if outcome == "REVIEW_REJECTION"
+        else "UNKNOWN" if outcome in {"UNMAPPED_OUTCOME", "REVIEW_REJECTION_UNKNOWN_APPLICABILITY"}
+        else "NONE"
+    )
+    return {"source_verdict": source, "outcome_class": outcome,
+            "prior_applicability": applicability, "family_suppression_authority": False}

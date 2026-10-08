@@ -36,6 +36,7 @@ from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
 )
 from solana_alpha_lab.factory.hfic_prior_memory import (  # noqa: E402
     MEMORY_HARD_CLOSE,
+    MEMORY_HISTORICAL,
     MEMORY_NOT_SELECTED,
     MEMORY_PARK,
     build_prior_memory_snapshot,
@@ -568,7 +569,7 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
             )
             self.assertEqual(
                 by_id["HFIC-CAND-FAT0001DEADBEEF"]["memory_status"],
-                MEMORY_HARD_CLOSE,
+                MEMORY_HISTORICAL,
             )
             self.assertEqual(
                 by_id["HFIC-CAND-FAT0002DEADBEEF"]["reason_code"],
@@ -589,7 +590,7 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
                 "KILL_STATISTICALLY_UNIDENTIFIABLE",
             )
 
-    def test_hard_close_retains_scope_axes_for_anti_rediscovery(self) -> None:
+    def test_review_rejection_retains_scope_axes_without_family_closure(self) -> None:
         shared_mech = "same mechanism text for both scoped variants"
         shared_x = "SAME_X_FAMILY"
         shared_y = "SAME_Y"
@@ -630,7 +631,7 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
         forge_b = compact_forge_prior_entry(
             "HFIC-CAND-SCOPE-B", payload_b, decision
         )
-        self.assertEqual(forge_a["memory_status"], MEMORY_HARD_CLOSE)
+        self.assertEqual(forge_a["memory_status"], MEMORY_HISTORICAL)
         self.assertEqual(forge_a["population"], pop_a)
         self.assertEqual(forge_a["horizon_notional"], horizon_a)
         self.assertEqual(forge_a["negative_control"], "control-A")

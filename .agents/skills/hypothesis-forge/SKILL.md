@@ -15,6 +15,16 @@ V1.2 adds deterministic feature grounding, typed unresolved requirements,
 diagnostics-only `structural_signature_v1_sha256` (not HFIC-CAND identity),
 and read-only `diagnostics --last N` (1..20).
 
+Canonical authoring contract: `docs/contracts/forge_research_flow_reliability_v1.md`.
+Read actual `candidate_authoring_contract` and frozen `research_policy_context`
+before writing a card. Use canonical consumer names; all four material risks
+accept exact string/list transport. Invalid shapes refuse before persist. A
+PREDICTIVE/list-only card needs no invented actor, causal mechanism or numeric
+predicate. Scientific KILL is retained on the bound candidate/evidence; only
+existing typed suppression authority can close a family. Missing applicability
+stays UNKNOWN. This explicit synthetic reliability task authorizes its native
+mechanical passage; it grants no real-data, provider or experiment authority.
+
 ## Ordinary operation
 
 Fresh grounded handoff contract:
@@ -481,7 +491,7 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
    Pass `--journal-scope` as the preflight `search_key_sha256`. Copy the
    whole returned evidence object onto the draft as `grounded_evidence`.
    Do not copy only `result_refs` and do not hand-write the summary.
-   A stamped ordinary receipt requires that evidence object for 0, 1, 4, and 6 candidates.
+   A stamped ordinary receipt requires that evidence object for every permitted candidate count.
    Ordinary preflight carries `discovery_contract_version` for every
    non-CONTROL receipt. `--discovery-contract` is accepted and does not
    decide the stamp. Do not hand-write that field.
@@ -723,7 +733,8 @@ non-minimal Forge search context after allowed semantic/feature-grounding
 compaction.
 
 `MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND` means Prompt A already carries the
-disposition-gated scientific minimum (HARD_CLOSE/PARK with scope axes from
+disposition-gated scientific minimum (typed close/PARK and known candidate review
+rejections with scope axes from
 shared `latest_hypothesis_decisions`) and the packet still cannot fit without
 stripping material feature grounding. Do not quarantine, drop ranked priors,
 or raise the packet limit inside a slash — return to owner.

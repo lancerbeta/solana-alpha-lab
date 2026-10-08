@@ -531,17 +531,19 @@ evidence, a mundane alternative, a counterexample or disconfirming observation,
 practical relevance and a cheap falsifier. It does not need a proven actor
 story or literature novelty. A causal claim keeps the stricter identification
 bar. Do not invent a mechanism to fill a schema field. Zero grounded sketches
-are allowed. Do not force four candidates. At most six sketches. One
+are allowed. Do not force four candidates. Use the frozen `max_generated` ceiling for sketches. One
 selected candidate is persisted without a second card or a runner-up. When
 two or more sketches exist, name one runner-up and the strongest rejected
 alternative. Cohort id is not a trading feature.
-Discovery queries use `BASE_X` only, price/liquidity fields, and a target point
-strictly after the decision points. Missing outcomes are not zeros. A scoped
+For legacy LIVE_CORPUS, ordinary queries use `BASE_X`; episodes use
+`OPPORTUNITY_EPISODES` and their E points. Use only emitted supported recipes
+and a target point strictly after decision. Missing outcomes are not zeros. A scoped
 CONTROL negative does not hard-close an unseen richer ordinary question.
 Renaming `question_id` does not lift a valid close. Missing scope axes are
 `UNKNOWN_SCOPE_NEEDS_RESOLUTION`, not a match and not a free pass. An exact
-content match on the same surface still blocks a duplicate. Query budget is at most six main specifications
-and two adaptive refinements. Identical spec bytes are a retry, not a new look.
+content match on the same surface still blocks a duplicate. MAIN/ADAPTIVE/PREVIEW permissions and spend come from the exact frozen
+`research_policy_context.this_search` limits/remaining, including any authorized
+operation cap; prompt defaults do not override them. Identical spec bytes are a retry, not a new look.
 Re-check joint state coverage without a scientific look:
 
 ```text
@@ -550,7 +552,7 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
 
 List-aware questions (`OPPORTUNITY_EPISODES`). Если packet содержит `list_dimension_context`, прочитай его до выбора кандидата: списки — общее измерение исследования, а не подпись токена. Роли: universe (где изучается механизм), собственный сигнал (`LIST_CONTRAST`, без числового predicate и без фиктивного `price>0`) или заранее заданный diagnostic slice. Membership — состояние эпизода на `T0` (`TRUE/FALSE/UNKNOWN/INVALID`); `UNKNOWN` никогда не `FALSE`, `witness_source_id` не membership. Имена списков резолвятся командой `research-scope-resolve` (значения рынка не читает); карточка обязана повторить `research_scope_rule_sha256` и `research_scope_statement` из результата. «Два из трёх» уточняй: ровно два либо не менее двух. Различие групп — наблюдательное, не причинное и не доказательство взаимодействия. Контракт: `docs/contracts/forge_list_aware_research_scope_v1.md`. Episode normalized view (`NORMALIZED_TRAJECTORY_EPISODES_V1`) — отдельное представление prefix E300/E900/E1800, а не legacy `NORMALIZED_TRAJECTORY_V1`.
 
-Ordinary numeric recipe. `discovery-binding` does not load parquet values. It admits only when published labels match `REQUIRED_LABELS` and no protected holdout is assigned. Stop codes before row reads: `DISCOVERY_ROLE_UNKNOWN`, `DISCOVERY_ROLE_FORBIDDEN`, `DISCOVERY_ROLE_CONFLICT`, `DISCOVERY_AUTHORITY_ABSENT`, `HOLDOUT_PROTECTED`, `HOLDOUT_UNRESOLVED`, `DISCOVERY_IDENTITY_MISMATCH`, `BINDING_HASH_MISMATCH`, `DISCOVERY_ARTIFACT_MISSING`, `DISCOVERY_SCOPE_UNSUPPORTED`. Do not hand-write role or holdout. On an authorized ordinary slash, `--data-root` and `--store` are both the canonical data root, because freeze checks the look there. `--journal-scope` is the preflight `search_key_sha256`. Temporal execute/preview also require `--operation` (or `--operation-sha256`) naming an explicit owner request; omitting it does not spend a look. Copy the whole returned object onto the draft as `grounded_evidence`. Each cohort keeps its own published partition. An exact repeated `--cohort-partition` is eliminated; a conflicting repeat stops. Ordinary non-CONTROL preflight always stamps the discovery contract; `--discovery-contract` does not toggle it. That receipt requires the evidence object for 0, 1, 4, and 6 candidates. One selected candidate is persisted without a runner-up. After persist, take a fresh `--discovery-contract` preflight before freeze so the receipt digest matches the store. Do not hand-write the contract field:
+Ordinary numeric recipe. `discovery-binding` does not load parquet values. It admits only when published labels match `REQUIRED_LABELS` and no protected holdout is assigned. Stop codes before row reads: `DISCOVERY_ROLE_UNKNOWN`, `DISCOVERY_ROLE_FORBIDDEN`, `DISCOVERY_ROLE_CONFLICT`, `DISCOVERY_AUTHORITY_ABSENT`, `HOLDOUT_PROTECTED`, `HOLDOUT_UNRESOLVED`, `DISCOVERY_IDENTITY_MISMATCH`, `BINDING_HASH_MISMATCH`, `DISCOVERY_ARTIFACT_MISSING`, `DISCOVERY_SCOPE_UNSUPPORTED`. Do not hand-write role or holdout. On an authorized ordinary slash, `--data-root` and `--store` are both the canonical data root, because freeze checks the look there. `--journal-scope` is the preflight `search_key_sha256`. Temporal execute/preview also require `--operation` (or `--operation-sha256`) naming an explicit owner request; omitting it does not spend a look. Copy the whole returned object onto the draft as `grounded_evidence`. Each cohort keeps its own published partition. An exact repeated `--cohort-partition` is eliminated; a conflicting repeat stops. Ordinary non-CONTROL preflight always stamps the discovery contract; `--discovery-contract` does not toggle it. That receipt requires the evidence object for every permitted candidate count. One selected candidate is persisted without a runner-up. After persist, take a fresh `--discovery-contract` preflight before freeze so the receipt digest matches the store. Do not hand-write the contract field:
 
 ```text
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-binding --format json
@@ -761,7 +763,7 @@ decision-useful body cannot be resolved one-to-one.
 `FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED` is the typed STOP when bodies are
 complete but a non-minimal Forge search context still cannot fit after allowed
 semantic/feature-grounding compaction under the **operational hard cap**.
-`MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND` is the typed STOP when HARD_CLOSE/PARK
+`MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND` is the typed STOP when typed close/PARK or known candidate review rejection
 Forge priors already carry disposition-gated scope axes and fitting would
 require stripping material feature grounding under that same operational cap.
 Do not quarantine valid HFIC
@@ -886,38 +888,35 @@ whether resolving it changes a real decision
 
 Для каждого кандидата заполни:
 
+Authoritative flow/card contract: `docs/contracts/forge_research_flow_reliability_v1.md`.
+Use the emitted `candidate_authoring_contract`; candidate count is bounded by
+`research_policy_context.this_search.limits.max_generated`, not a prompt constant.
+New cards use these consumer names:
+
 ```text
-display_ordinal (display-only; freeze assigns HFIC-CAND-*)
-label
-one_sentence_claim
-novelty_class: NEW_MECHANISM | NEW_STATE_INTERACTION | NEW_MEASUREMENT | REFORMULATION | DUPLICATE
-nearest_prior_hypotheses_and_terminals
-material_difference_from_prior
-actor_and_counterparty (required for CAUSAL; omit for PREDICTIVE rather than inventing one)
-mechanism (required for CAUSAL; omit for PREDICTIVE rather than inventing one)
-why_not_arbitraged
-point_in_time_population
-decision_timestamp
-primary_X
-primary_Y: Touch | Fillable | RealizedVWAP | NetReturn | PathRisk
-horizon_and_notional
-expected_sign_or_distribution_change
-heterogeneity_prediction
-disconfirming_prediction
-negative_control
-strongest_alternative_world
-confounders
-PIT_and_leakage_risk
-survivorship_and_dependency_risk
-execution_and_capacity_risk
-data_already_available
-forward_only_or_missing_data
-candidate_method_family
-cheapest_credible_falsifier
-kill_terminal
-capability_or_data_delta_if_any
-decision_unlocked
+display_ordinal, label, claim, claim_form: PREDICTIVE | CAUSAL
+novelty_class, material_difference_from_prior, prior_work_refs
+actor_counterparty, mechanism (required only for CAUSAL)
+population, decision_timestamp, target, estimand, explanatory_condition
+primary_x_family, primary_y, horizon_notional
+required_feature_ids, required_capability_ids, unresolved_requirements
+research_scope_rule_sha256, research_scope_statement (copy machine list scope)
+state_transition (may be null for PREDICTIVE), why_not_arbitraged
+disconfirming_prediction, negative_control, alternative_world, mundane_alternative
+confounders, pit_leakage_survivorship_risks
+execution_capacity_risks, missing_or_forward_only_data
+available_data_bindings, proposed_method, cheapest_falsifier
+pass_fail_inconclusive_semantics, kill_if, decision_unlocked
 ```
+
+Four material risk fields accept a string or list of strings. A string becomes
+one exact element; a list retains order, duplicates and punctuation. Missing is explicit `NOT_DECLARED_IN_DRAFT` (unknown); `[]` stays empty. Null, false, numbers, objects and mixed
+lists refuse before persist with the field path. Use explicit `UNKNOWN` for
+unknown text. Typed binding objects retain their resolver identity; prose does
+not become a binding. `primary_y` is identity text; `target` is the bound scope.
+`mundane_alternative` remains separate from `alternative_world`. Legacy aliases
+are finite and checked for conflicts; see the canonical field map.
+
 
 Не выдумывай значения, sample size, power, expected return или вероятность успеха. Если данных недостаточно, укажи `UNKNOWN` и объясни, меняет ли неизвестное решение.
 
@@ -1145,7 +1144,7 @@ decision after collection
 1. `EXECUTIVE RESULT` — selected terminal и одна фраза почему.
 2. `REALITY_RECEIPT`.
 3. `OPPORTUNITY_MAP` — 3–7 tension records.
-4. `CANDIDATE_PORTFOLIO` — 0–6 Candidate Cards for ordinary predictive grounded search. Do not invent cards to reach four. A causal portfolio still keeps the A4 identification bar. If nothing is selected, write `NO_WORTHY_HYPOTHESIS` and do not fabricate a runner-up.
+4. `CANDIDATE_PORTFOLIO` — 0 through the frozen `max_generated` ceiling Candidate Cards for ordinary predictive grounded search. Do not invent cards to reach four. A causal portfolio still keeps the A4 identification bar. If nothing is selected, write `NO_WORTHY_HYPOTHESIS` and do not fabricate a runner-up.
 5. `PRIOR_AND_NOVELTY_AUDIT`.
 6. `HARD_VETO_RESULTS`.
 7. `PARETO_SELECTION` — finalists, winner, strongest rejected alternative. Если selected одна карточка, напиши `NONE` и не создавай вторую.

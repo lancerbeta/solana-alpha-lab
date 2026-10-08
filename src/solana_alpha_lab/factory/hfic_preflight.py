@@ -149,6 +149,7 @@ def _ranked_priors_carry_minimal_scientific_scope(packet: Mapping[str, Any]) -> 
     from solana_alpha_lab.factory.hfic_prior_memory import (
         MEMORY_HARD_CLOSE,
         MEMORY_PARK,
+        _forge_requires_scope_axes,
     )
 
     scope_keys = (
@@ -161,7 +162,7 @@ def _ranked_priors_carry_minimal_scientific_scope(packet: Mapping[str, Any]) -> 
         if not isinstance(entry, Mapping):
             continue
         status = str(entry.get("memory_status") or "")
-        if status not in {MEMORY_HARD_CLOSE, MEMORY_PARK}:
+        if not _forge_requires_scope_axes(memory_status=status, reason_code=entry.get("reason_code")):
             continue
         if any(entry.get(key) not in (None, "", [], {}) for key in scope_keys):
             return True
@@ -2348,6 +2349,9 @@ def build_forge_context_packet(
         )
         from solana_alpha_lab.factory.opportunity_episodes import collection_for_focus
 
+        from solana_alpha_lab.factory.hfic_card_projection import authoring_contract
+
+        packet["candidate_authoring_contract"] = authoring_contract()
         packet["temporal_recipe_capabilities"] = recipe_capabilities()
         if collection_for_focus(owner_focus):
             from solana_alpha_lab.factory.opportunity_episode_release import (

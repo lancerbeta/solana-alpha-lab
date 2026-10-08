@@ -1204,6 +1204,12 @@ def _selected_candidate_block(
     *,
     packet_version: str | None = None,
 ) -> dict[str, Any]:
+    from solana_alpha_lab.factory.hfic_card_projection import CardProjectionError, project_material_card
+
+    try:
+        card = project_material_card(card)
+    except CardProjectionError as exc:
+        raise HficSessionError(exc.code, detail=exc.detail) from exc
     required_caps = card.get("required_capability_ids") or []
     if not isinstance(required_caps, list):
         required_caps = []
@@ -1237,13 +1243,11 @@ def _selected_candidate_block(
         "disconfirming_prediction": disconfirming,
         "negative_control": str(card.get("negative_control") or ""),
         "alternative_world": str(card.get("alternative_world") or "NOT_DECLARED_IN_DRAFT"),
-        "confounders": card.get("confounders") or ["NOT_DECLARED_IN_DRAFT"],
-        "pit_leakage_survivorship_risks": card.get("pit_leakage_survivorship_risks")
-        or ["NOT_DECLARED_IN_DRAFT"],
-        "execution_capacity_risks": card.get("execution_capacity_risks")
-        or ["NOT_DECLARED_IN_DRAFT"],
+        "confounders": card["confounders"],
+        "pit_leakage_survivorship_risks": card["pit_leakage_survivorship_risks"],
+        "execution_capacity_risks": card["execution_capacity_risks"],
         "available_data_bindings": bindings,
-        "missing_or_forward_only_data": card.get("missing_or_forward_only_data") or [],
+        "missing_or_forward_only_data": card["missing_or_forward_only_data"],
         "proposed_method": str(card.get("proposed_method") or "NOT_DECLARED_IN_DRAFT"),
         "cheapest_falsifier": str(card.get("cheapest_falsifier") or ""),
         "pass_fail_inconclusive_semantics": str(
@@ -1252,6 +1256,8 @@ def _selected_candidate_block(
         "decision_unlocked": decision_unlocked,
         "_required_capability_ids": [str(item) for item in required_caps],
     }
+    if "mundane_alternative" in card:
+        block["mundane_alternative"] = card["mundane_alternative"]
     if packet_version == CRITIC_PACKET_VERSION_CURRENT:
         block.update(_freeze_owned_grounding_fields(card))
     from solana_alpha_lab.factory.hfic_grounded_discovery import card_claim_scope
@@ -1860,6 +1866,27 @@ def _no_worthy_grounded_evidence(draft: Mapping[str, Any]) -> dict[str, Any] | N
     return no_worthy_scope_record(evidence)
 
 
+def _project_draft_cards(draft: Mapping[str, Any]) -> list[dict[str, Any]]:
+    from solana_alpha_lab.factory.hfic_card_projection import CardProjectionError, project_material_card
+
+    cards = draft.get("candidates")
+    if not isinstance(cards, list):
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    projected = []
+    for index, card in enumerate(cards):
+        if not isinstance(card, Mapping):
+            raise HficSessionError("HFIC_PROTOCOL_INVALID")
+        try:
+            projected.append(project_material_card(card))
+        except CardProjectionError as exc:
+            detail = {**exc.detail, "candidate_ordinal": index + 1,
+                      "candidate_label": card.get("label") if isinstance(card.get("label"), str) else None}
+            if "field_path" in detail:
+                detail["field_path"] = f"candidates[{index}].{detail['field_path']}"
+            raise HficSessionError(exc.code, detail=detail) from exc
+    return projected
+
+
 def freeze_draft(
     draft: Mapping[str, Any],
     *,
@@ -1868,6 +1895,7 @@ def freeze_draft(
     repo_root: Any = None,
     next_action_draft: Mapping[str, Any] | None = None,
     verify_current_market_identity: bool = False,
+    persist: bool = True,
 ) -> dict[str, Any]:
     if not isinstance(draft, Mapping):
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
@@ -1876,7 +1904,7 @@ def freeze_draft(
     prompt_version = _draft_prompt_version(draft)
     if repo_root is not None:
         _validate_json_schema(draft, _draft_schema_path(repo_root, draft))
-    candidates = draft.get("candidates")
+    candidates = _project_draft_cards(draft)
     floor = 0 if _ordinary_discovery_requested(draft, preflight_receipt) else 4
     journal_for_cap = (preflight_receipt or {}).get("search_key_sha256")
     ceiling = _max_candidates_for(store, journal_for_cap)
@@ -1917,6 +1945,7 @@ def freeze_draft(
             prompt_version=prompt_version,
             packet_version=packet_version,
             verify_current_market_identity=verify_current_market_identity,
+            persist=persist,
         )
 
     if next_action_draft is not None:
@@ -2403,7 +2432,7 @@ def freeze_draft(
         result["closed_or_suppressed_collision_count"] = (
             closed_or_suppressed_collision_count
         )
-    if store is not None and repo_root is not None:
+    if persist and store is not None and repo_root is not None:
         if not epoch or not search_key or not focus_key:
             raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
         slot_rep, slot_parent = _preflight_ladder_slot(
@@ -2507,6 +2536,7 @@ def _freeze_no_worthy(
     prompt_version: str = PROMPT_VERSION_V1_1,
     packet_version: str = "1.1",
     verify_current_market_identity: bool = False,
+    persist: bool = True,
 ) -> dict[str, Any]:
     _assert_vision_integrity_for_surface(
         preflight_receipt, prompt_version=prompt_version
@@ -2709,7 +2739,7 @@ def _freeze_no_worthy(
         result["closed_or_suppressed_collision_count"] = (
             closed_or_suppressed_collision_count
         )
-    if store is not None and repo_root is not None:
+    if persist and store is not None and repo_root is not None:
         if not epoch or not search_key or not focus_key:
             raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
         persist_no_worthy_session(
@@ -2724,7 +2754,7 @@ def _freeze_no_worthy(
         )
         store.rebuild_projection()
         result["store_inventory_digest"] = store.diagnostics().committed_inventory_sha256
-    elif repo_root is not None:
+    elif persist and repo_root is not None:
         action = bind_next_epistemic_action(
             next_action_draft,
             frozen_no_worthy=result,
@@ -4604,7 +4634,7 @@ def persist_generated_draft(
     _reject_stale_fresh_session_draft(draft, receipt)
     _validate_json_schema(draft, _draft_schema_path(repo_root, draft))
     _draft_prompt_version(draft)
-    candidates = draft.get("candidates")
+    candidates = _project_draft_cards(draft)
     if not isinstance(candidates, list) or not (
         MIN_CANDIDATES <= len(candidates) <= _max_candidates_for(store, receipt.get("search_key_sha256"))
     ):
@@ -4748,6 +4778,8 @@ def persist_generated_draft(
         ):
             return existing
         raise HficSessionError("GENERATED_DRAFT_CONFLICT")
+    freeze_draft(draft, preflight_receipt=preflight_receipt, store=store, repo_root=repo_root,
+                 verify_current_market_identity=True, persist=False)
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
@@ -6635,7 +6667,7 @@ def _validate_fresh_draft_scopes(draft: Mapping[str, Any], *, store: Any,
     selected_ref = draft.get("selected_candidate_ref")
     selected = _resolve_ref(selected_ref, identities) if selected_ref else -1
     look = stored_look_scope(store, evidence) if store is not None and isinstance(evidence, Mapping) else None
-    for index, card in enumerate(draft.get("candidates") or []):
+    for index, card in enumerate(_project_draft_cards(draft)):
         if not isinstance(card, Mapping):
             raise HficSessionError("HFIC_PROTOCOL_INVALID")
         try:
@@ -7116,7 +7148,7 @@ def apply_revision(
             _draft_schema_path(repo_root, revised_draft),
         )
     _validate_revision_context_lock(existing, revised_draft)
-    candidates = revised_draft.get("candidates")
+    candidates = _project_draft_cards(revised_draft)
     if not isinstance(candidates, list) or not (
         MIN_CANDIDATES
         <= len(candidates)
@@ -7154,27 +7186,29 @@ def apply_revision(
     }
     id_to_draft = {item.candidate_id: item for item in draft_identities}
     packet_in = existing.get("critic_input_packet")
-    runner_up_index = _resolve_ref(
-        revised_draft.get("runner_up_candidate_ref"),
-        draft_identities,
-    )
-    if runner_up_index < 0:
-        raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
-    runner_up_id = draft_identities[runner_up_index].candidate_id
-    if runner_up_id != existing.get("runner_up_candidate_id"):
-        raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
-    rejected_index = _resolve_ref(
-        revised_draft.get("strongest_rejected_alternative"),
-        draft_identities,
-    )
-    if rejected_index < 0:
-        raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
-    rejected_id = draft_identities[rejected_index].candidate_id
+    runner_up_id = None
+    runner_up_ref = revised_draft.get("runner_up_candidate_ref")
+    if existing.get("runner_up_candidate_id") is not None or runner_up_ref is not None:
+        runner_up_index = _resolve_ref(runner_up_ref, draft_identities)
+        if runner_up_index < 0:
+            raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
+        runner_up_id = draft_identities[runner_up_index].candidate_id
+        if runner_up_id != existing.get("runner_up_candidate_id"):
+            raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
     rejected_id_existing = existing.get("rejected_alternative_id")
     if not rejected_id_existing and isinstance(packet_in, Mapping):
         rejected_id_existing = packet_in.get("strongest_rejected_alternative")
-    if rejected_id != rejected_id_existing:
-        raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
+    if rejected_id_existing == "NONE" and len(existing.get("candidate_ids") or []) == 1:
+        rejected_id_existing = None
+    rejected_id = None
+    rejected_ref = revised_draft.get("strongest_rejected_alternative")
+    if rejected_id_existing is not None or rejected_ref is not None:
+        rejected_index = _resolve_ref(rejected_ref, draft_identities)
+        if rejected_index < 0:
+            raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
+        rejected_id = draft_identities[rejected_index].candidate_id
+        if rejected_id != rejected_id_existing:
+            raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
     original_selected: dict[str, Any] = {}
     if isinstance(packet_in, Mapping):
         selected_card = packet_in.get("selected_candidate")
@@ -7249,7 +7283,7 @@ def apply_revision(
             raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
     packet = dict(packet_in)
     packet["selected_candidate"] = rebuilt_selected
-    packet["strongest_rejected_alternative"] = rejected_id
+    packet["strongest_rejected_alternative"] = "NONE" if rejected_id is None else rejected_id
     source_evidence = packet.get("grounded_evidence")
     if isinstance(source_evidence, Mapping) and source_evidence.get("result_refs"):
         rebound = _bind_selected_look(
@@ -7346,7 +7380,7 @@ def apply_revision(
     _stamp_market_evidence_basis(revision_cycle, existing, frozen)
     if prompt_version == PROMPT_VERSION and repo_root is not None:
         grounded_candidates = _ground_v12_candidates(
-            revised_draft.get("candidates") or [],
+            candidates,
             draft_identities,
             repo_root=repo_root,
             preflight_receipt={
@@ -7432,6 +7466,9 @@ def apply_revision(
 
 
 def _recipe_scope_rule(experiment_spec_packet: Mapping[str, Any]) -> str | None:
+    nested = experiment_spec_packet.get("experiment_spec")
+    if isinstance(nested, Mapping):
+        experiment_spec_packet = nested
     parameters = experiment_spec_packet.get("parameters")
     recipe = parameters.get("temporal_recipe") if isinstance(parameters, Mapping) else None
     if not isinstance(recipe, Mapping):
@@ -8343,6 +8380,8 @@ def finalize_session(
 
 
 def _validate_json_schema(document: Mapping[str, Any], schema_path: Path) -> None:
+    if schema_path.name.startswith("hypothesis_forge_draft_"):
+        document = {**document, "candidates": _project_draft_cards(document)}
     key = str(schema_path)
     validator = _SCHEMA_VALIDATORS.get(key)
     if validator is None:

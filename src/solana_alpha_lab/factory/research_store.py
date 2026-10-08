@@ -56,6 +56,8 @@ def reuse_lifecycle_reads_within_packet(func: Callable[..., Any]) -> Callable[..
     """
     @wraps(func)
     def wrapped(*args: Any, **kwargs: Any) -> Any:
+        if _lifecycle_read_cache.get() is not None:
+            return func(*args, **kwargs)
         token = _lifecycle_read_cache.set({})
         try:
             return func(*args, **kwargs)
@@ -1283,6 +1285,21 @@ class ResearchStore:
 
     @contextmanager
     def writer_lease(self) -> Iterator[None]:
+        # Admission/CAS must observe current committed bytes, never a read snapshot.
+        snapshot = _lifecycle_read_cache.get()
+        read_token = _lifecycle_read_cache.set(None)
+        try:
+            with self._writer_lease_uncached():
+                yield
+        finally:
+            if snapshot is not None:
+                generation = snapshot.get(("", "generation"), 0)
+                snapshot.clear()
+                snapshot[("", "generation")] = generation + 1
+            _lifecycle_read_cache.reset(read_token)
+
+    @contextmanager
+    def _writer_lease_uncached(self) -> Iterator[None]:
         lock_path = _target_path(
             self._root,
             _WRITER_LOCK_LOCATION,
@@ -1686,13 +1703,24 @@ class ResearchStore:
             return self._receipt(manifest, disposition)
 
     def iter_committed_records(self) -> Iterator[ResearchEvent]:
+        cache = _lifecycle_read_cache.get()
+        key = (str(self._root.resolve()), "verified_history")
+        generation = cache.get(("", "generation"), 0) if cache is not None else None
+        if cache is not None and key in cache:
+            yield from cache[key]
+            return
         seen: set[str] = set()
+        verified: list[ResearchEvent] = []
         for manifest in self._committed_manifests():
             for record in self._verify_partition(manifest):
                 if record.record_id in seen:
                     raise ResearchStoreError("DUPLICATE_RECORD_ID")
                 seen.add(record.record_id)
+                verified.append(record)
                 yield record
+        # Only an exhaustively verified enumeration is reusable within this call.
+        if cache is not None and cache.get(("", "generation"), 0) == generation:
+            cache[key] = tuple(verified)
 
     def iter_lifecycle_records_bounded(
         self,

@@ -535,7 +535,10 @@ def resolve_next_action(
     if base_terminal not in known_base:
         # Completed process/technical KILL not listed in CASE_C still stops
         # non-scientifically. Do not launder it into OBSERVABILITY_BLOCKED.
-        if base_terminal.startswith("KILL_"):
+        from solana_alpha_lab.factory.hfic_suppression_semantics import interpret_critic_terminal
+        if interpret_critic_terminal(base_terminal)["outcome_class"] in {
+            "REVIEW_REJECTION", "REVIEW_REJECTION_UNKNOWN_APPLICABILITY", "TECHNICAL_REFUSAL"
+        }:
             return {
                 "next_action": ACTION_NON_SCIENTIFIC_STOP,
                 "owner_final": ACTION_NON_SCIENTIFIC_STOP,
@@ -1368,6 +1371,11 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         identity = stage.get("critic_identity")
         critic_term = stage.get("critic_terminal")
         critic_reason = stage.get("critic_decisive_reason")
+        if isinstance(critic_term, str):
+            from solana_alpha_lab.factory.hfic_suppression_semantics import interpret_critic_terminal
+            explanation = interpret_critic_terminal(critic_term)
+            lines.append("  applicability: " + explanation["prior_applicability"] +
+                         "; class=" + explanation["outcome_class"] + "; family_closed=false")
         if selected or mechanism:
             lines.append(
                 "  candidate: {cid} mechanism={mech}".format(

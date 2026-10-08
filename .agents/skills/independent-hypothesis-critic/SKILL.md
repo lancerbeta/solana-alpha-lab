@@ -30,6 +30,13 @@ estimand, not a FEAT, not probe execution evidence. Return
 `hypothesis_critic_result_v1`. The critic does not persist; `finalize` owns
 Research Data Plane writes.
 
+Interpret `prior_memory.capsules[].outcome_semantics` when present. Raw Critic
+verdict is unchanged; a candidate rejection is not family-close authority.
+Related populations/recipes, technical stops and PARK remain distinguishable.
+Do not infer missing applicability. Typed family suppression stays owned by its
+existing receipt, independent of Critic wording. Canonical flow contract:
+`docs/contracts/forge_research_flow_reliability_v1.md`.
+
 ## Copied identity — never generated
 
 Every required identity field of `hypothesis_critic_result_v1` is
@@ -44,7 +51,8 @@ Copy/bind exactly:
 - `selected_candidate_id` ← `selected_candidate.candidate_id`
 - `critic_input_packet_sha256` ← canonical SHA256 of the exact packet bytes
 - `selected_definition_sha256` ← canonical selected-candidate identity hash
-  from packet fields via repo identity algorithm, as applicable. When the
+  from packet fields via repo identity algorithm, including claim_form=PREDICTIVE
+  when actor/mechanism are absent, as applicable. When the
   packet's `selected_candidate` carries `research_scope_rule_sha256`, that value
   is part of the identity definition (a different list scope is a different
   hypothesis). Judge `research_scope_statement` against the packet's
@@ -171,7 +179,8 @@ identification bar. `prior_scope_relations` of `SCOPED_CONTROL_DOES_NOT_BLOCK`
 is not `KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED`. `EXACT_SCOPE_MATCH` and
 `EXACT_VALID_CLOSE` still are. A renamed `question_id` is not a scientific
 difference. `UNKNOWN_SCOPE_NEEDS_RESOLUTION` is not a pass. Predictive
-sketches are 0–6 and do not need three mechanism classes.
+sketches use the frozen research_policy_context.this_search.limits.max_generated
+ceiling and do not need three mechanism classes.
 Missing outcomes are not zeros and not alpha. The engine field
 `engine_emits_alpha=false` is not a positive result.
 

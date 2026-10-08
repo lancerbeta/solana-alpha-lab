@@ -324,12 +324,12 @@ class PriorMemoryUnitTests(unittest.TestCase):
                 item["hypothesis_version_id"]: item["memory_status"]
                 for item in snapshot["capsules"]
             }
-            self.assertEqual(by_id[HARD_CLOSE_ID], MEMORY_HARD_CLOSE)
+            self.assertEqual(by_id[HARD_CLOSE_ID], MEMORY_HISTORICAL)
             self.assertEqual(by_id[PARK_ID], MEMORY_PARK)
             self.assertEqual(by_id[NOT_SELECTED_ID], MEMORY_NOT_SELECTED)
             self.assertEqual(by_id[AMBIGUOUS_ID], MEMORY_AMBIGUOUS)
             self.assertEqual(by_id[HISTORICAL_ID], MEMORY_HISTORICAL)
-            self.assertEqual(len(set(by_id.values())), 5)
+            self.assertEqual(len(set(by_id.values())), 4)
 
     def test_unidentified_hypothesis_version_fail_closed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

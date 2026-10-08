@@ -2303,6 +2303,7 @@ def cmd_episode_normalized_view(
             load_admitted_partition_rows(
                 data_root=data_root, binding_doc=None, partitions=None, census_path=None, observations_path=None,
                 population="OPPORTUNITY_EPISODES",
+                observation_filters=[("point_id", "in", list(PREFIX_POINTS))],
             )
         )
         policy = effective_policy(store).get("definition")
@@ -4823,6 +4824,10 @@ def _collection_focus(args: argparse.Namespace) -> None:
     args.owner_focus = episode_focus(str(getattr(args, "owner_focus", "AUTO") or "AUTO"))
 
 
+from solana_alpha_lab.factory.research_store import reuse_lifecycle_reads_within_packet
+
+
+@reuse_lifecycle_reads_within_packet
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -5182,7 +5187,7 @@ def main(argv: list[str] | None = None) -> int:
         code = str(exc)
         if str(getattr(args, "command", "") or "").startswith("repair-continuation"):
             return emit_repair_blocked(code)
-        if isinstance(exc, HficSessionError) and code.startswith("CANDIDATE_SCOPE_"):
+        if isinstance(exc, HficSessionError) and code.startswith(("CANDIDATE_SCOPE_", "CARD_TRANSPORT_", "CARD_ALIAS_")):
             print(code, file=sys.stderr)
             return emit({"reason_code": code, "detail": exc.detail,
                          "scientific_negative": False, "writes": False,
