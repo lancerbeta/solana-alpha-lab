@@ -4,8 +4,8 @@
   "review_id": "FORGE-RELIABILITY-AUDIT-FACTORY-FIT-001",
   "as_of": "2026-10-08",
   "task_id": "FORGE_RELIABILITY_AUDIT_CONTINUATION_V1",
-  "reviewed_bindings_sha256": "278df91add00affd156ca45ff67de42b2b2e4ecc026c3baaf356c46754fe9093",
-  "reviewed_inventory_sha256": "92f711ae4015d5b16935b20b0e24a4ba62b13981e43294783fd11f7907f38deb",
+  "reviewed_bindings_sha256": "404e0912b8635a3805f1e640f7e6bb5fa6f8402bfcc59541063545595092864a",
+  "reviewed_inventory_sha256": "59cae5f8ff24dd039641215f02a053574e7b01c474c52a7bb23031de9d9b4f9f",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

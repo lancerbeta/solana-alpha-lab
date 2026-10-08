@@ -11,7 +11,8 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "75aa243b53e11fc65799201daca17756f6c659f32b7128a993ec51ac69eb5acb",
+    ".github/workflows/ci.yml": "874d6d4a02204ca88dfd7398043aafbd93d3410492d462fe6702dab1ca573c61",
+    "catalog/assets/core.yaml": "1f71a93e11b19331478098aab8772df6d2d5f43e4239ce6b4d4ddeb95c3d2bfd",
     "docs/contracts/forge_research_policy_runtime_v1.md": "57cf7123b5c7db63ebb1aa9649bae4fd9f27d908fe79cdd3ae30eb7fa83e29f6",
     "docs/evidence/forge_reliability_audit_continuation_v1/checks/context-controls.log": "737d695c93fd7993e84af40928f4bc965c7bed4866d73b312c66bf7678142d47",
     "docs/evidence/forge_reliability_audit_continuation_v1/checks/current-base-checks.json": "ed782d3f2c1618e76cd6f37a5fb108082a10890e66c829ff146a37683aacebf9",
@@ -54,12 +55,15 @@
     "docs/evidence/forge_reliability_audit_continuation_v1/results/os-crash-race.json": "ec8c9709965a4389d4f3743d66dc8a88481e42ecd884cdfb7f97d376ac600202",
     "docs/evidence/forge_reliability_audit_continuation_v1/results/post-repair-source.json": "05ebf064b053410affe12e4ac569ea0a827128451a06d1c231513b133f39cc40",
     "docs/evidence/forge_reliability_audit_continuation_v1/results/resources.json": "4c7820891b5287800978fdf4b68e05d64e7a684ab26da053fd24ec3591b6cd10",
-    "docs/evidence/forge_reliability_audit_continuation_v1/semantic_packet.json": "1c3bb88ad6b4abefc7322d9f63132df2c514ba1be0e65ca7f9accd8fc7c7f57c",
-    "docs/reports/forge_reliability_audit_continuation_v1/EVIDENCE_INDEX.md": "34c860683d7682b1e4fc20d0a7b81e6c43f951537940f86a5d3fc5a5f5a9e6dc",
-    "docs/reports/forge_reliability_audit_continuation_v1/OWNER_VERDICT.md": "60c7478a081120feb17def77b39a1b6bf2a8f30b2f9308dca8a2522a01496c6b",
+    "docs/evidence/forge_reliability_audit_continuation_v1/semantic_packet.json": "d3ee4302ecef1a03f25c198523f87fd95d16ae279fc145574e40e95ec78167dd",
+    "docs/reports/forge_reliability_audit_continuation_v1/EVIDENCE_INDEX.md": "b8faa386f591e1fccfdac3987e39a0dc804cd875433f322a921cc2c2be1ecc37",
+    "docs/reports/forge_reliability_audit_continuation_v1/OWNER_VERDICT.md": "a9e37cdf9cf63c5a8d5362b83937ed801bfd99c3d8bbb5d692a3b116bf421042",
     "docs/reports/forge_reliability_audit_continuation_v1/PROBE_PLAN.md": "57f234e339f7e5638a72ec073d6683dee7a35bcc8439826ac0ecc694ea3bc4c4",
-    "docs/tasks/FORGE_RELIABILITY_AUDIT_CONTINUATION_V1.md": "a16d8ebae4df2c8d5a20911212c46988eb2f3fa6426af879c431777d28a02fbd",
+    "docs/tasks/FORGE_RELIABILITY_AUDIT_CONTINUATION_V1.md": "3247019405e5d38f5cfe562f6f10835076f2a4d26778096fc3eb938465ec2ecb",
+    "scripts/render_ci_workflow.py": "8e73cf9229fb29ea7b6ef65a4d0d4cceff1943a3d220a79b0d1587a3655f2726",
+    "scripts/validate_ci.py": "4d4d4e1fa81522a78f146dca44f193d69e8f854816adeaeefcec1ca91aa5fb2c",
     "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "d20cfcf47b3182b8b6a2ed26fa3ababe59b03593796460892c326cf598fd5d4e",
+    "tests/test_ci.py": "fa650cccc1a040fe40ba87409b3b7fc4a093639e465972e5c6d4eb8c6ea1f06c",
     "tests/test_forge_reliability_audit_continuation_v1.py": "ea6909a07b06608144001d643c5fb366550cf2a1c96fafabffd29035b02e446d"
   },
   "active_stop_conditions": [],
@@ -72,14 +76,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_reliability_audit_continuation_v1/factory_fit.json",
-    "sha256": "0ea63d28a6bbd7b9595ab9e0c8edf404c3cfa162adbd283765525384aac4ec31",
+    "sha256": "2ddc274264fdc62d43f0606d80e41030a2c3a40a24524a9b5eb7defafefd2e23",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_29_BASE_CHECKS_24_DIRECT_CONSUMER_REGRESSIONS_COLLISION_BASE_RED_2_OF_2_POST_REPAIR_GREEN_2_OF_2_CI_WORKFLOW_14_OF_14",
     "independent_review": {
       "path": "docs/evidence/forge_reliability_audit_continuation_v1/independent_review.json",
-      "sha256": "aa3d07a5360fbdef8741af6ac1b67b85a5fb469ace468c09d0e55a813172b115",
+      "sha256": "598de855316eeee8a05faf728b8247d1ce569a1aa1c49c23ae76f9fdf7c498d6",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
