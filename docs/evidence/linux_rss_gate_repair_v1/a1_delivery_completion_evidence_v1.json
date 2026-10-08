@@ -10,7 +10,17 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
-    "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "278d4ac80c28c67f3c5bd2fdee2a5ef435b97d676f6f859824a3399cdcdcffce"
+    "catalog/assets/core.yaml": "2d84cf68b3d480b37582e05913a4d8cd8e9e71bae39ee8ed7a7e9f795472164b",
+    "catalog/assets/lifecycle.yaml": "d121feb88221597be769f6d69df62fec8d6d0ea2155332c2bd30dc3be67c4ad5",
+    "docs/PROJECT_MAP.md": "fa31b438416cb1e52cacca911bd60b65ffe398eaab938fc2baa4927e6409a929",
+    "docs/contracts/linux_rss_measurement_v1.md": "3d0d256f66acf184fd23df228233560f1ef020fd4cc888ddb5f4694892e35b6b",
+    "docs/evidence/linux_rss_gate_repair_v1/after_repair.json": "7a065e0b9bb78f007d65e26fb6bf5b441dce1c95ed1af98b19dda08ced000ac4",
+    "docs/evidence/linux_rss_gate_repair_v1/before_repair.json": "470131d007045c298332c1bfcecff4c725b01764d4e026404ab5f33edab142bf",
+    "docs/evidence/linux_rss_gate_repair_v1/result.json": "99ab2c3937b94d370244782bc5a0586e6c44a2e79e67c530ade25eb8a8a9b1d7",
+    "docs/tasks/LINUX_RSS_GATE_REPAIR_V1.md": "8a132d928d30d7e48d633a508ab97e6a648f1049f18eea279b49a1cd4bb3b44b",
+    "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "e5ad47d9401de1857ebb15b2f30b8e0c84b744b155c8cf5ff045f80f27a11699",
+    "tests/test_legacy_fat_open_bounded_artifacts_resume_v1.py": "eaed00e2f4a56eb1106e822c93c8a2f4cafcbd77f8e9794900c34ee7e7ddfd81",
+    "tests/test_linux_rss_gate_v1.py": "ce57011cf8286de1f5407f30c7e567dfb939a22ab620a4faa21b591b10cf48bd"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -22,14 +32,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/linux_rss_gate_repair_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "77e3160908589e503ba78694ddc7fdd6933ab60f3161f2ee06819216f97b2b33",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LINUX_24_PRODUCER_EDC544BB_WINDOWS_22_FINAL_STRICT_LABEL_BOUNDARY",
     "independent_review": {
       "path": "docs/evidence/linux_rss_gate_repair_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "8040795261b1767933b269c1f233cc2f44c9da814d34ee1cc2e808b971212b46",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

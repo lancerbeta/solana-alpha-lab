@@ -4,8 +4,8 @@
   "review_id": "LINUX_RSS_GATE_REPAIR_V1-REVIEW",
   "as_of": "2026-10-08",
   "task_id": "LINUX_RSS_GATE_REPAIR_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "f57ec4edcceebf7edadc8cbbe93303c1fadc6c07517174a5f68682d41530f2c4",
+  "reviewed_inventory_sha256": "11577b6fe2f92c2c923527f887bc2249c806e0aa4a4a40482b60b84f7e276585",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
