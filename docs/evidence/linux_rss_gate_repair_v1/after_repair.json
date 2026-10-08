@@ -1,0 +1,123 @@
+{
+  "phase": "AFTER_REPAIR",
+  "actions": {
+    "databaseId": 37714704552,
+    "headSha": "edc544bb3de42ed4f5dd9848dbf4a1655cb9c2da",
+    "event": "workflow_dispatch",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/37714704552"
+  },
+  "job_id": 113108434890,
+  "report": {
+    "anchor": "20294a7677f14e93f8bb5dd6b4d339f2e15302d5",
+    "cases": [
+      {
+        "child": {
+          "max_rss_bytes": 167870464,
+          "provider_calls": 0,
+          "rss_diagnostic": {
+            "after_import": {
+              "ru_maxrss_bytes": 132190208,
+              "vmhwm_bytes": 132190208,
+              "vmrss_bytes": 130834432
+            },
+            "after_workload": {
+              "ru_maxrss_bytes": 167870464,
+              "vmhwm_bytes": 167870464,
+              "vmrss_bytes": 166264832
+            },
+            "at_entry": {
+              "ru_maxrss_bytes": 22466560,
+              "vmhwm_bytes": 22536192,
+              "vmrss_bytes": 22536192
+            }
+          },
+          "source_size": 16778922,
+          "terminal": "FAT_ARTIFACTS_RESUME_COMPLETED"
+        },
+        "child_hwm_comfortable_assertion_pass": true,
+        "original_comfortable_assertion_pass": true,
+        "parent": {
+          "ru_maxrss_bytes": 142450688,
+          "vmhwm_bytes": 21970944,
+          "vmrss_bytes": 21970944
+        },
+        "parent_allocation_mib": 0
+      },
+      {
+        "child": {
+          "max_rss_bytes": 167784448,
+          "provider_calls": 0,
+          "rss_diagnostic": {
+            "after_import": {
+              "ru_maxrss_bytes": 650993664,
+              "vmhwm_bytes": 132046848,
+              "vmrss_bytes": 130793472
+            },
+            "after_workload": {
+              "ru_maxrss_bytes": 650993664,
+              "vmhwm_bytes": 167784448,
+              "vmrss_bytes": 166211584
+            },
+            "at_entry": {
+              "ru_maxrss_bytes": 650993664,
+              "vmhwm_bytes": 22548480,
+              "vmrss_bytes": 22548480
+            }
+          },
+          "source_size": 16778922,
+          "terminal": "FAT_ARTIFACTS_RESUME_COMPLETED"
+        },
+        "child_hwm_comfortable_assertion_pass": true,
+        "original_comfortable_assertion_pass": true,
+        "parent": {
+          "ru_maxrss_bytes": 650993664,
+          "vmhwm_bytes": 651382784,
+          "vmrss_bytes": 651382784
+        },
+        "parent_allocation_mib": 600
+      }
+    ],
+    "current_image_metric_proven": true,
+    "historical_ci": 37709815254,
+    "historical_ci_conclusion": "FAILURE",
+    "historical_failed_child_hwm": "UNKNOWN_NOT_RECORDED_IN_RUN37709815254",
+    "hypothesis_confirmed_for_controlled_ci_workload": true,
+    "kind": "TARGETED_AFTER_REPAIR_PROOF",
+    "limits": {
+      "comfortable_bytes": 536870912,
+      "soft_bytes": 805306368
+    },
+    "producer_sha": "edc544bb3de42ed4f5dd9848dbf4a1655cb9c2da",
+    "source_pins": {
+      "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "278d4ac80c28c67f3c5bd2fdee2a5ef435b97d676f6f859824a3399cdcdcffce",
+      "src/solana_alpha_lab/factory/observation_panel_publisher.py": "f7c529bae484b6a5224e9b926e9850002246c230330230c599c7132991d53ce6",
+      "tests/test_legacy_fat_open_bounded_artifacts_resume_v1.py": "eaed00e2f4a56eb1106e822c93c8a2f4cafcbd77f8e9794900c34ee7e7ddfd81"
+    }
+  },
+  "real_linux_regressions": [
+    {
+      "allocation_mib": 600,
+      "initial_hwm_bytes": 85184512,
+      "measured_bytes": 714092544,
+      "oracle_after_bytes": 714092544,
+      "oracle_before_bytes": 714092544,
+      "ru_maxrss_bytes": 714092544
+    },
+    {
+      "allocation_mib": 0,
+      "initial_hwm_bytes": 85909504,
+      "measured_bytes": 85975040,
+      "oracle_after_bytes": 85975040,
+      "oracle_before_bytes": 85975040,
+      "ru_maxrss_bytes": 672837632
+    }
+  ],
+  "targeted_cases": 24,
+  "skipped": 0,
+  "claims": [
+    "TARGETED_LINUX_PROOF_PASS",
+    "NOT_ACCEPTANCE_CI"
+  ]
+}

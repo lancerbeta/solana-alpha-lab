@@ -1,0 +1,59 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "LINUX_RSS_GATE_REPAIR_V1-REVIEW",
+  "as_of": "2026-10-08",
+  "task_id": "LINUX_RSS_GATE_REPAIR_V1",
+  "reviewed_bindings_sha256": "f57ec4edcceebf7edadc8cbbe93303c1fadc6c07517174a5f68682d41530f2c4",
+  "reviewed_inventory_sha256": "11577b6fe2f92c2c923527f887bc2249c806e0aa4a4a40482b60b84f7e276585",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Actual isolated /root/rss_code_review verdict PASS on content HEAD=e84f9eceb7521e9bea97d74b04bd9d7614e1999a; packet_fingerprint_sha256=5cdafa6004ea04328813149eec424b305d58dbb555ae0b784ddc4cc19dfe6aa5",
+        "Previous P2 remediated: exact VmHWM: label required. Independent malformed inputs now return conservative665600000 bytes; canonical input returns1024 bytes. Two subcases present. Catalog pin and packet refs match.512/768 MiB and Windows/macOS preserved.",
+        "Targeted Linux proof belongs to produceredc544bb; final exact-head Linux CI remains separate. Read-only code review, no full suite or GitHub mutations."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Actual isolated /root/rss_goal_review verdict PASS on content HEAD=e84f9eceb7521e9bea97d74b04bd9d7614e1999a; packet_fingerprint_sha256=5cdafa6004ea04328813149eec424b305d58dbb555ae0b784ddc4cc19dfe6aa5",
+        "Exact diff and evidence pins verified; five boundary tests independently PASS including malformed-label subcases. Limits, original workload, receipts, workflow and H08/H09 preserved. Real released-child overshoot714092544 bytes retained in producer-specific proof.",
+        "Historical child HWM UNKNOWN. Final exact-head Linux CI, aggregate binding, readiness/readback separately gated. No delivery-complete or scientific acceptance claim."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Actual isolated /root/rss_arch_review ARCHITECTURE_CRITIC PASS; SEMANTIC_PREMISE PASS on content HEAD=e84f9eceb7521e9bea97d74b04bd9d7614e1999a; packet_fingerprint_sha256=5cdafa6004ea04328813149eec424b305d58dbb555ae0b784ddc4cc19dfe6aa5",
+        "Exact positive canonical VmHWM converts KiB to bytes; malformed/missing/duplicate retains getrusage, nonpositive fallback raises. Existing durable manifest/Parquet/schedule lineage preserved; no new private imports/dependency/schema/lifecycle change. Kernel RSS approximation documented; ordinary revert sufficient.",
+        "What tests can pass yet break research validity: interpreting resource PASS as PIT, source availability, process-tree memory, H08/H09 or scientific family acceptance. Explicit non-claims forbid this. Packet independence PACKET_INFORMATION_PATH; launch PROCESS_OBLIGATION; model diversity UNPROVEN. No CI/merge authority from review."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SCIENTIFIC_ACCEPTANCE"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "P2 malformed VmHWM label accepted as1024 bytes; exact label guard plus two RED-to-GREEN regression subcases added",
+      "observed_head": "99fc229f872a2db4fdeed8d9b1c7a3758d87160f",
+      "resolved_by_head": "e84f9eceb7521e9bea97d74b04bd9d7614e1999a"
+    }
+  ]
+}
