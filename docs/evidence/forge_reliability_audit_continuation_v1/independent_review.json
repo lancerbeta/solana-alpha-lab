@@ -118,10 +118,11 @@
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "initial_head": "6cdc1e57e533e8dcbced7030d81537365164e4f0",
-      "initial_verdict": "NOT_READY",
-      "finding": "CI_TIMEOUT_PROSE_OMITTED_FAILED_MANDATORY_AGGREGATOR",
-      "resolution": "RUN_CANCELLED_SHARD_CANCELLED_AGGREGATOR_FAILURE_OTHER_SUBSTANTIVE_JOBS_SUCCESS_EXPLICIT"
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "CI_TIMEOUT_PROSE_OMITTED_FAILED_MANDATORY_AGGREGATOR; RESOLUTION=RUN_CANCELLED_SHARD_CANCELLED_AGGREGATOR_FAILURE_OTHER_SUBSTANTIVE_JOBS_SUCCESS_EXPLICIT",
+      "observed_head": "6cdc1e57e533e8dcbced7030d81537365164e4f0",
+      "resolved_by_head": "8c867081eed88c161f09accc3d5254aa7785ded0"
     }
   ]
 }
