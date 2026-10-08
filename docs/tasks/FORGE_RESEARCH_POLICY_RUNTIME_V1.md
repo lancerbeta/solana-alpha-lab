@@ -40,7 +40,7 @@ managed_write_set:
 - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
 - docs/contracts/forge_research_policy_runtime_v1.md
 - docs/tasks/FORGE_RESEARCH_POLICY_RUNTIME_V1.md
-- docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json
+- docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json
 - docs/evidence/forge_research_policy_runtime_v1/**
 - scripts/hypothesis_forge.py
 - src/solana_alpha_lab/factory/hfic_evidence_identity.py
