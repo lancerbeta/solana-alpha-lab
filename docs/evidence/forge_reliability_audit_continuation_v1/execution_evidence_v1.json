@@ -1,0 +1,302 @@
+{
+  "schema": "EXECUTION_EVIDENCE_V1",
+  "task_id": "FORGE_RELIABILITY_AUDIT_CONTINUATION_V1",
+  "audit_sha": "0dbe4d4bb5ce9703332a0620987a47eac05c4cdc",
+  "baseline_native_source": "b29d011994f5e4cf328175dc1a4929d28957e25a",
+  "verdict": "LIMITED_RELIABILITY_FULL_SCOPE_NOT_HEALTHY",
+  "product_repairs": 1,
+  "repair": "PREVIEW_FROZEN_REQUEST_ACCOUNTING",
+  "probes": [
+    {
+      "id": "K1",
+      "status": "PARTIAL",
+      "baseline": "PARTIAL",
+      "diagnosis": null
+    },
+    {
+      "id": "K2",
+      "status": "PARTIAL",
+      "baseline": "PARTIAL",
+      "diagnosis": null
+    },
+    {
+      "id": "K3",
+      "status": "PARTIAL",
+      "baseline": "FAIL",
+      "diagnosis": null
+    },
+    {
+      "id": "K4",
+      "status": "PARTIAL",
+      "baseline": "PARTIAL",
+      "diagnosis": null
+    },
+    {
+      "id": "K5",
+      "status": "PARTIAL",
+      "baseline": "PARTIAL",
+      "diagnosis": null
+    },
+    {
+      "id": "K6",
+      "status": "PARTIAL",
+      "baseline": "PARTIAL",
+      "diagnosis": "CONFIRMED_CAPABILITY_GAP"
+    }
+  ],
+  "metrics": {
+    "COC": {
+      "numerator": 6,
+      "denominator": 12
+    },
+    "PEF_original": {
+      "credit": 4.5,
+      "denominator": 8
+    },
+    "PEF_continuation": {
+      "credit": 3.5,
+      "denominator": 6
+    },
+    "DER": {
+      "direct_material_claims": 4,
+      "material_claims": 8,
+      "ledger": "EVIDENCE_INDEX.md M1-M8"
+    },
+    "ARC": {
+      "attacked": 8,
+      "denominator": 8
+    },
+    "RJC": {
+      "complete_supported_journeys": 2,
+      "denominator": 5
+    },
+    "meaning": "COVERAGE_NOT_HEALTH"
+  },
+  "inventory": [
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/context-controls.log",
+      "sha256": "737d695c93fd7993e84af40928f4bc965c7bed4866d73b312c66bf7678142d47",
+      "bytes": 1618
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/current-base-checks.json",
+      "sha256": "ed782d3f2c1618e76cd6f37a5fb108082a10890e66c829ff146a37683aacebf9",
+      "bytes": 4837
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/episode-controls.log",
+      "sha256": "a5d40df745eaac5705b06b315b33a9f5b4d39726559224b6085ffe8823e26ec9",
+      "bytes": 2624
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/final-base-controls.log",
+      "sha256": "6ee02e295eeeba312b72970aa672091fa3fad6c6c971a90ce183177046b3db08",
+      "bytes": 2087
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/memory-controls.log",
+      "sha256": "1cdae8a922ad35e8a78febb922138ebd5fafd87c7cd2ad3550891066be368821",
+      "bytes": 1836
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/policy-controls.log",
+      "sha256": "bea922363c888c0e332062c7f840c5f970f92d29803153ca90fa306e5082b20d",
+      "bytes": 1417
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/public-cli-excerpts.json",
+      "sha256": "57dff94c0a5ca2f168f699b1c1c84892ff60d28de7ccf16894d7b641477046ed",
+      "bytes": 166111
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/repair-green-final.log",
+      "sha256": "8be6740d06b8e86c2c2dfc002d6a0d6dd5ba8524a32114a025506772f48d0d55",
+      "bytes": 1194
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/repair-green.log",
+      "sha256": "abe0eb170e9ec73e9c3c3a01394fe14498ee2be5f874d97b6de65af8eb45ca82",
+      "bytes": 6189
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/checks/repair-red.log",
+      "sha256": "d3873136f8ae96deaf60fbb6f666d4ed75f1a5cfe72086f182058a495d450026",
+      "bytes": 4938
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/attempt-accounting.json",
+      "sha256": "7a6dab2a24507146216aef31371ed79bf8de99dfddd92ebcc684e6ab0b982ef4",
+      "bytes": 782
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/authored-card.json",
+      "sha256": "85f0930af5b99d9514031ed8b5ca70ed770d1edddd105c77d39d0c4f7a7c5909",
+      "bytes": 18020
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/command-index.json",
+      "sha256": "edc110a7d4a4894062e703172d132bb3289ad1228541621113630f027b0f64da",
+      "bytes": 11995
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/critic-input-packet.json",
+      "sha256": "3e71680fe8bedb252d5bf26f89c2033dafb058948f471478b3abdcbe926b284d",
+      "bytes": 44534
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/critic-report.md",
+      "sha256": "88809bf9ad3d29aef4fae3b38bace46bfd1006fc784b86ee78e297d914d9461f",
+      "bytes": 8117
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/critic-result.json",
+      "sha256": "0952b9a5f3fb1a7fdd06276639aee3367f7be7c1bfca94560ff89e29d1ecbc13",
+      "bytes": 9228
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/draft.json",
+      "sha256": "6f63702e82bd7d3f268aee9031dd2e7edfe478181baaac67d01b6fec4fa99257",
+      "bytes": 51522
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/finalize-result.json",
+      "sha256": "f152d72bac44ef9470ab958b0d65cc66e397fd07d3746b1f39c377deabdffe4c",
+      "bytes": 4047
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/formulation-report.md",
+      "sha256": "3e969f50f5db566e19f1f6ece3af5db097e423f9563a1b65848a9658e7ac0a7e",
+      "bytes": 4595
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/frozen.json",
+      "sha256": "3d6d621edd7f709399495a4de047fceab64055af7df058d2bac33fd63766ecdb",
+      "bytes": 95166
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/grounded-evidence.json",
+      "sha256": "8612bb4ce80526c48b411ad83c8b105f4b97763f8ae7cbaba424bd0609c1f6c8",
+      "bytes": 29527
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/initial-authored-card.json",
+      "sha256": "85f0930af5b99d9514031ed8b5ca70ed770d1edddd105c77d39d0c4f7a7c5909",
+      "bytes": 18020
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/initial-draft.json",
+      "sha256": "94228cabfed85b009657362b63d41df81dfacca87add18e535507b1e292cacda",
+      "bytes": 51522
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/initial-freeze-failure.json",
+      "sha256": "a009cb02e07deb439ddbbb99ba8b999457e63298e69bd3b9c8877169af90fb42",
+      "bytes": 708
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/initial-persist-result.json",
+      "sha256": "8a24b67e18cf186626eccaeef282e95756731b93389b56efc281d7da7c3ee98e",
+      "bytes": 41504
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/owner-final.json",
+      "sha256": "01551899469ef1c631ae15f90392c33dcb0afb27412baa9b72aea8823a84ad2d",
+      "bytes": 18549
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/persist-result.json",
+      "sha256": "9981fb0dc26600c7ecb68e014f306cae8cf9c77de2d28e5f71d5274126665b31",
+      "bytes": 41505
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/preflight-before-values.json",
+      "sha256": "2820a09861b9340edab58631bc1b5cef24a1174881995c1e2ac8d131519973ae",
+      "bytes": 29428
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/preflight-for-formulation.json",
+      "sha256": "d1e7d4bbe8ceb4b1ed2cb584cde3b30e30f93c4515e52af3dab92e8bd4bd99d8",
+      "bytes": 33215
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/registered-question.json",
+      "sha256": "336abfe600e949017826124b06f3f7042fb3c753058a55d8395da04c228c97fa",
+      "bytes": 373
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/resumed-preflight.json",
+      "sha256": "4e1922e2283a1c2abf65145297f0c4ec419c16662f7cb7efddf1c7bd2331044e",
+      "bytes": 34058
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/show-session.json",
+      "sha256": "99d52e37dbfbcbce8fa57304ce1c9831b1fc8eacc8443f16159db75c8cf71fc9",
+      "bytes": 54123
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/results/collision-base.json",
+      "sha256": "ef39bf930ad2018923cfee88745dc880c7db759560af26e11ee3927d6dcb53f4",
+      "bytes": 2458
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/results/collision-post.json",
+      "sha256": "2ae8a6b02b586e8aed8ecf7d2a7a0d09d4f5b0ff3c1d24a3525bc9e0165b51fc",
+      "bytes": 2112
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/results/future-prefix.json",
+      "sha256": "495d13c23574df83fd34bd52c4d0b0de4998eda03b5fb4dd4c42670ee375743b",
+      "bytes": 2730
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/results/future-preregistered.json",
+      "sha256": "0133c8104624f39e50af95725b47b6f97145c46101e6d2d812b4b1694cdafa50",
+      "bytes": 220
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/results/negative-seams.json",
+      "sha256": "ad232c7d68f4ccc0670e44a15467c10ca4df82fe20414fde7c94712015bbfdcb",
+      "bytes": 1391
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/results/os-crash-race.json",
+      "sha256": "ec8c9709965a4389d4f3743d66dc8a88481e42ecd884cdfb7f97d376ac600202",
+      "bytes": 5585
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/results/post-repair-source.json",
+      "sha256": "05ebf064b053410affe12e4ac569ea0a827128451a06d1c231513b133f39cc40",
+      "bytes": 407
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/results/resources.json",
+      "sha256": "4c7820891b5287800978fdf4b68e05d64e7a684ab26da053fd24ec3591b6cd10",
+      "bytes": 1867
+    }
+  ],
+  "claims_and_commands": "docs/reports/forge_reliability_audit_continuation_v1/EVIDENCE_INDEX.md",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_OOS_CONFIRMATION",
+    "NO_SCIENTIFIC_PASS",
+    "NO_STRATEGY_PROMOTION",
+    "NO_LIVE_OR_LINUX_OPERABILITY",
+    "NO_MERGE"
+  ],
+  "external_side_effects": {
+    "provider_calls": 0,
+    "real_value_exposures": 0,
+    "deployments": 0,
+    "signing_or_money_actions": 0,
+    "github_transport": "AUTHORIZED_COUNT_UNKNOWN"
+  },
+  "remaining_gaps": [
+    "CONFOUNDERS_DRAFT_CRITIC_SHAPE_INCOMPATIBILITY",
+    "CHRONOLOGICAL_FROZEN_LATER_BRANCH_CONSUMER_NOT_BOUND",
+    "PRIOR_NEW_COHORT_FULL_JOURNEY_NOT_EXECUTED",
+    "LEGACY_RESERVATION_ONLY_READOUT_NOT_FULLY_PROBED",
+    "CROSS_RELEASE_ATTACK_AND_EVERY_CONSUMER_FUTURE_READ_PROOF_NOT_EXECUTED",
+    "COMPLETE_RECOVERY_NEW_EVIDENCE_JOURNEY_AND_LINUX_LIVE_COST_UNKNOWN",
+    "HISTORICAL_UNREPRODUCED_VERTICAL_TRACE_UNAVAILABLE"
+  ]
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "actions": [
+      {
+        "descriptor": "2e98b8d9a9e255dede0393584b5388ea568d1efea29a9706854b1c68ccc095f5",
+        "disposition": "EXECUTE",
+        "i": 0,
+        "occupancy": {
+          "completed": 1,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 1,
+          "pending": 0,
+          "remaining": 1
+        }
+      },
+      {
+        "descriptor": "687b93af76f5765a3069470a835b08b5b0be08f0344f5d9af66d501395c20b2c",
+        "disposition": "EXECUTE",
+        "i": 1,
+        "occupancy": {
+          "completed": 2,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 2,
+          "pending": 0,
+          "remaining": 0
+        }
+      },
+      {
+        "denied": "OWNER_CAP_EXHAUSTED",
+        "descriptor": "8fdf4046d88c0374cce34163406f93387d7132737724f97c52071040e7ea5e42",
+        "i": 2
+      }
+    ],
+    "attempt": 0,
+    "control": "DISTINCT_FROZEN_REQUEST_SAME_PAYLOAD",
+    "expected_max": 2,
+    "source_head": "b29d011994f5e4cf328175dc1a4929d28957e25a",
+    "unique_reservations": 2
+  },
+  {
+    "actions": [
+      {
+        "descriptor": "2e98b8d9a9e255dede0393584b5388ea568d1efea29a9706854b1c68ccc095f5",
+        "disposition": "EXECUTE",
+        "i": 0,
+        "occupancy": {
+          "completed": 1,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 1,
+          "pending": 0,
+          "remaining": 1
+        }
+      },
+      {
+        "descriptor": "687b93af76f5765a3069470a835b08b5b0be08f0344f5d9af66d501395c20b2c",
+        "disposition": "EXECUTE",
+        "i": 1,
+        "occupancy": {
+          "completed": 2,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 2,
+          "pending": 0,
+          "remaining": 0
+        }
+      },
+      {
+        "denied": "OWNER_CAP_EXHAUSTED",
+        "descriptor": "8fdf4046d88c0374cce34163406f93387d7132737724f97c52071040e7ea5e42",
+        "i": 2
+      }
+    ],
+    "attempt": 1,
+    "control": "DISTINCT_FROZEN_REQUEST_SAME_PAYLOAD",
+    "expected_max": 2,
+    "source_head": "b29d011994f5e4cf328175dc1a4929d28957e25a",
+    "unique_reservations": 2
+  }
+]

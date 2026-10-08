@@ -1,0 +1,17 @@
+test_a_context_and_literal_results (tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_a_context_and_literal_results) ... ok
+test_c_real_experiment_spec_and_document_runner (tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_c_real_experiment_spec_and_document_runner) ... ok
+test_c_zcold_replay_from_a_moved_root_without_network (tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_c_zcold_replay_from_a_moved_root_without_network)
+D20: a fresh process on a moved root, original root absent, network blocked, reproduces the frozen result. ... ok
+test_d_episode_profile_through_the_dispatcher_and_ordinary_lifecycle (tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_d_episode_profile_through_the_dispatcher_and_ordinary_lifecycle)
+D13: a real episode profile, scope-bound, through ladder -> freeze -> Critic, no CONTROL. ... ok
+test_e_membership_integrity_protection_and_single_parse (tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_e_membership_integrity_protection_and_single_parse)
+D06/D07/D08/D24: tampered or partial frames are INVALID, protected identity never leaks, one parse per release. ... ok
+test_y_context_capacity_and_untrusted_labels (tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_y_context_capacity_and_untrusted_labels)
+D23: 3/5/32 definitions keep the required semantics inside the bound; labels are data. ... ok
+test_z_next_period_same_rule_new_memberships (tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_z_next_period_same_rule_new_memberships) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 653.663s
+
+OK
+{"names": ["tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_a_context_and_literal_results", "tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_c_real_experiment_spec_and_document_runner", "tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_c_zcold_replay_from_a_moved_root_without_network", "tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_d_episode_profile_through_the_dispatcher_and_ordinary_lifecycle", "tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_e_membership_integrity_protection_and_single_parse", "tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_y_context_capacity_and_untrusted_labels", "tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_z_next_period_same_rule_new_memberships"], "run": 7, "failures": 0, "errors": 0, "skipped": 0, "wall_seconds": 653.6628577999945, "raw_cli_calls": 42}

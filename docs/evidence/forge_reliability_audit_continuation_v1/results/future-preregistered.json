@@ -1,0 +1,18 @@
+{
+  "exits": [
+    "1.44",
+    "0.96"
+  ],
+  "expected_matched": 1,
+  "expected_returns": [
+    0.2,
+    -0.2
+  ],
+  "forbidden_point": "Y7200",
+  "prefix_points": [
+    "X300",
+    "Y900",
+    "Y1800",
+    "Y3600"
+  ]
+}

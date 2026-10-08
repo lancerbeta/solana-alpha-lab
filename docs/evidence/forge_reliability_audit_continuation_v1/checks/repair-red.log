@@ -1,0 +1,84 @@
+test_completed_and_pending_requests_do_not_double_charge_on_landing (tests.test_forge_reliability_audit_continuation_v1.PreviewRequestAccountingTests.test_completed_and_pending_requests_do_not_double_charge_on_landing) ... FAIL
+test_distinct_requests_same_payload_exhaust_protocol_and_preserve_repeat (tests.test_forge_reliability_audit_continuation_v1.PreviewRequestAccountingTests.test_distinct_requests_same_payload_exhaust_protocol_and_preserve_repeat) ... FAIL
+test_explicit_owner_cap_uses_request_identity_too (tests.test_forge_reliability_audit_continuation_v1.PreviewRequestAccountingTests.test_explicit_owner_cap_uses_request_identity_too) ... FAIL
+test_legacy_unkeyed_preview_keeps_its_charge_without_rewriting_history (tests.test_forge_reliability_audit_continuation_v1.PreviewRequestAccountingTests.test_legacy_unkeyed_preview_keeps_its_charge_without_rewriting_history) ... FAIL
+test_main_five_completed_plus_two_pending_leave_three_of_ten (tests.test_forge_reliability_audit_continuation_v1.PreviewRequestAccountingTests.test_main_five_completed_plus_two_pending_leave_three_of_ten) ... ok
+
+======================================================================
+FAIL: test_completed_and_pending_requests_do_not_double_charge_on_landing (tests.test_forge_reliability_audit_continuation_v1.PreviewRequestAccountingTests.test_completed_and_pending_requests_do_not_double_charge_on_landing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>\tests\test_forge_reliability_audit_continuation_v1.py", line 86, in test_completed_and_pending_requests_do_not_double_charge_on_landing
+    self.assertEqual((after["completed"], after["pending"], after["occupied"]), (2, 0, 2))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (1, 0, 1) != (2, 0, 2)
+
+First differing element 0:
+1
+2
+
+- (1, 0, 1)
+?  ^     ^
+
++ (2, 0, 2)
+?  ^     ^
+
+
+======================================================================
+FAIL: test_distinct_requests_same_payload_exhaust_protocol_and_preserve_repeat (tests.test_forge_reliability_audit_continuation_v1.PreviewRequestAccountingTests.test_distinct_requests_same_payload_exhaust_protocol_and_preserve_repeat)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>\tests\test_forge_reliability_audit_continuation_v1.py", line 44, in test_distinct_requests_same_payload_exhaust_protocol_and_preserve_repeat
+    self.assertEqual(oo.journal_occupancy(fresh, JOURNAL)["preview"], {
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "limit": 2, "completed": 2, "pending": 0, "occupied": 2,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "remaining": 0, "deficit": 0,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    })
+    ^^
+AssertionError: {'lim[16 chars]ed': 1, 'pending': 0, 'occupied': 1, 'remainin[15 chars]': 0} != {'lim[16 chars]ed': 2, 'pending': 0, 'occupied': 2, 'remainin[15 chars]': 0}
+- {'completed': 1,
+?               ^
+
++ {'completed': 2,
+?               ^
+
+   'deficit': 0,
+   'limit': 2,
+-  'occupied': 1,
+?              ^
+
++  'occupied': 2,
+?              ^
+
+   'pending': 0,
+-  'remaining': 1}
+?               ^
+
++  'remaining': 0}
+?               ^
+
+
+======================================================================
+FAIL: test_explicit_owner_cap_uses_request_identity_too (tests.test_forge_reliability_audit_continuation_v1.PreviewRequestAccountingTests.test_explicit_owner_cap_uses_request_identity_too)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>\tests\test_forge_reliability_audit_continuation_v1.py", line 66, in test_explicit_owner_cap_uses_request_identity_too
+    self.assertEqual(oo.journal_occupancy(store, JOURNAL)["preview"]["remaining"], 1)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 1
+
+======================================================================
+FAIL: test_legacy_unkeyed_preview_keeps_its_charge_without_rewriting_history (tests.test_forge_reliability_audit_continuation_v1.PreviewRequestAccountingTests.test_legacy_unkeyed_preview_keeps_its_charge_without_rewriting_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>\tests\test_forge_reliability_audit_continuation_v1.py", line 96, in test_legacy_unkeyed_preview_keeps_its_charge_without_rewriting_history
+    self.assertEqual(oo.journal_occupancy(store, JOURNAL)["preview"]["completed"], 2)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 2
+
+----------------------------------------------------------------------
+Ran 5 tests in 7.060s
+
+FAILED (failures=4)

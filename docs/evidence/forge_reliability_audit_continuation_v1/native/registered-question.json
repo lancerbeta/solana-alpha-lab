@@ -1,0 +1,14 @@
+{
+  "change_after_outcomes": false,
+  "oracle": {
+    "matched_n": 1,
+    "mean_target": 0.2
+  },
+  "query": "native-main-0",
+  "scope": {
+    "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+    "explanatory_condition": "compound",
+    "representation_scope": "TEMPORAL_PRICE_LIQUIDITY",
+    "target": "PRICE_RELATIVE_PROXY:Y3600:Y7200:FIELD-USD-PRICE-001"
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "schema": "smial.hypothesis-critic-result",
+  "schema_version": "1.1",
+  "session_id": "HFIC-SESS-D9BE18323A4E3D2F",
+  "critic_input_packet_sha256": "205fa97b62051416e9b1260d2a8bc7fd885eb70f78b2dd63f1863fca5fca68ac",
+  "selected_candidate_id": "HFIC-CAND-74F21482B494",
+  "selected_definition_sha256": "74f21482b4944ecb571e17f8e3e9729adfdecd243836bbe479fc2c2572b8af17",
+  "critic_prompt_version": "HFIC-V1.1",
+  "isolated_context_attestation": "NEW_CONTEXT_REQUIRED",
+  "critic_terminal": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+  "next": "STOP",
+  "attack_matrix": {
+    "novelty_memory": {
+      "status": "UNKNOWN",
+      "evidence": "Единственная capsule HYP-QUOTE-NATIVE-FRICTION-H900-V1 имеет memory_status=HISTORICAL и mechanism=classify_audition_terminal; claim, actor_counterparty, population, decision_timestamp, primary_x_family, primary_y, horizon_notional и negative_control отсутствуют. grounded_evidence.prior_scope_relations=UNKNOWN_SCOPE_NEEDS_RESOLUTION.",
+      "finding": "Сравнение по каждому доступному семантическому axis выполнено. Видимый механизм описывает классификацию terminal, а candidate — predictive compound price/liquidity; сходство или научно значимое отличие на остальных axes установить нельзя. Duplicate/HARD_CLOSE не доказаны; novelty также не доказана. Новые prior queries не выполнялись."
+    },
+    "mechanism_counterparty": {
+      "status": "UNKNOWN",
+      "evidence": "claim_form=PREDICTIVE; actor_counterparty, mechanism и why_not_arbitraged явно UNKNOWN. Features описывают impulse, pullback и liquidity retention до/на Y3600.",
+      "finding": "Неизвестная actor story сама по себе не убивает predictive claim. Обычный общий price path объясняет единственное наблюдение без особого механизма compound; предоставленный материал эти миры не различает."
+    },
+    "estimand_universe_pit": {
+      "status": "UNKNOWN",
+      "evidence": "Scalar axes совпадают с candidate_scope и frozen recipe: BASE_X, Y3600, price_relative_proxy, TEMPORAL_PRICE_LIQUIDITY, target Y3600:Y7200. Packet сообщает unique_mint_n=5, exclusion_reasons.NOT_X_ELIGIBLE=4, base_x_n=1, decision_eligible_n=1, eligibility_uses_target=false; source_price_event_time=UNKNOWN.",
+      "finding": "Внутренняя геометрия recipe согласована, но EVENT_TIME_V1 и fixed schedule не доказывают available_to_strategy_at. Сохранность исходных dead/no-route/failed cases и clocks независимо не подтверждена: parquet/ResearchStore не открывались. Дополнительный n=4 не превращён в control или observed outcomes. Leakage не доказана и не опровергнута."
+    },
+    "execution_economics": {
+      "status": "UNKNOWN",
+      "evidence": "Y=PRICE_RELATIVE_PROXY; labeled_net_return=false; source_status=ASSUMPTION_NOT_CALIBRATED. Estimated net proxies LOW=0.164, BASE=0.026, STRESS=-0.300; decision_sensitivity=FRAGILE. Source excludes OBSERVED_FILL and LIVE_FEE_SCHEDULE; executable notional UNKNOWN.",
+      "finding": "Это ценовой proxy и sensitivity model, не исполнимый net return. Ни преимущество после costs/latency/landing, ни break-even economic viability не установлены. Отрицательный STRESS — модельный сценарий, не наблюдённая потеря и не самостоятельный empirical kill."
+    },
+    "statistics_multiplicity": {
+      "status": "FAIL",
+      "evidence": "matched_n=baseline.observed_n=base_x_n=decision_eligible_n=1; все три DROP_ONE_CONDITION имеют observed_n=1 и тот же mean_target=0.2. Один calendar block/cohort; independence=UNKNOWN, independent_replication=null, winner_share_of_positive=1. ES10 mass=0.1 от одного наблюдения; missing_target_n=0; MAIN=1, ADAPTIVE=0, viewed_variants=10.",
+      "finding": "Matched равен всему admissible baseline: отсутствует unmatched complement и variation, которая могла бы идентифицировать incremental predictive contrast. Ablations на том же singleton не отделяют contribution условий. Precision, effective replication и decision-relevant effect size не определены. Равенство медиан не использовано как доказательство нулевого эффекта; tails на fractional mass=0.1 не дают независимого support. Это структурная неидентифицируемость текущего bounded материала."
+    },
+    "alternative_world_falsifiability": {
+      "status": "FAIL",
+      "evidence": "alternative_world=NOT_DECLARED_IN_DRAFT; cheapest_falsifier допускает только readback уже сохранённого native-main-0. Disconfirming prediction требует independently sufficient заранее фиксированного материала, которого пакет не содержит и authority не разрешает получать.",
+      "finding": "Readback hashes/axes/eligibility может опровергнуть transport или computation binding, но не различает compound predictive signal и обычное движение того же единственного price path. Сформулированное будущее disconfirmation здесь недостижимо. Добавлять данные, новый look, features или иной population для спасения кандидата нельзя."
+    },
+    "information_value_opportunity_cost": {
+      "status": "FAIL",
+      "evidence": "decision_unlocked ограничен offline audit scalar-card transport. pass_fail_inconclusive_semantics=NOT_DECLARED_IN_DRAFT; отдельное достаточное preregistered design названо unresolved requirement.",
+      "finding": "Schema/identity transport проверяем и уже проверен, но не становится consumer predictive hypothesis. Научные PASS/FAIL/INCONCLUSIVE не привязаны к decision-relevant effect size или разрешённому sufficient design. STOP даёт честный audit terminal без дополнительных подготовительных работ и нового исследования."
+    },
+    "capability_data_delta": {
+      "status": "PASS",
+      "evidence": "Packet grounding содержит CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001 accepted=true, authority_granted=false, GROUNDED_WITH_GAPS. Frozen repository registry независимо подтверждает ACCEPTED, OFFLINE_READ_ONLY, max_provider_calls=0, promotion_authority=NONE. Три указанных QUERY-HFIC recipes существуют; они не исполнялись.",
+      "finding": "Capability не отсутствует; infrastructure delta не требуется и не авторизована. PASS этой атаки означает отсутствие оснований строить capability, а не научный PASS. Freeze-owned unresolved requirements сохранены; availability внешних pinned data bytes независимо не установлена."
+    }
+  },
+  "material_defects": [
+    "INDEPENDENT_CONTRAST_UNAVAILABLE: compound, baseline и все ablations представлены одним и тем же единственным admissible observation; increment над baseline не идентифицируется в разрешённом материале.",
+    "INFORMATION_SUFFICIENCY_DESIGN_REQUIRED: один calendar block/cohort, independence UNKNOWN, нет sufficient precision design, decision-relevant effect size и operational PASS/FAIL/INCONCLUSIVE semantics.",
+    "FALSIFIER_NOT_EXECUTABLE_IN_BOUND_SCOPE: разрешённый cheapest readback проверяет binding, но не predictive conjecture; достаточный независимый falsifier потребовал бы нового material/look вне authority."
+  ],
+  "revision_receipt": null,
+  "classifier_receipt": null,
+  "experiment_spec": null,
+  "experiment_spec_packet": null,
+  "authority": {
+    "git_mutation": 0,
+    "experiment_execution": 0,
+    "provider_api_rpc_wss_calls": 0
+  },
+  "non_claims": [
+    "SYNTHETIC_OFFLINE_AUDIT_ONLY",
+    "NO_ALPHA",
+    "NO_NET_RETURN",
+    "NO_CAUSAL_IDENTIFICATION",
+    "NO_OBSERVED_EXECUTION_ECONOMICS",
+    "NO_PROVEN_NULL_EFFECT",
+    "NO_PROVEN_DUPLICATE_OR_HARD_CLOSE",
+    "NO_REAL_RESEARCH_ACCEPTANCE",
+    "NO_NEW_LOOK_OR_OUTCOMES",
+    "NO_HOLDOUT_ACCESS",
+    "NO_CLASSIFIER_PASS_CLAIM",
+    "NO_COLLECTION_OR_CAPABILITY_AUTHORITY",
+    "NO_EXPERIMENT_OR_PROMOTION"
+  ]
+}

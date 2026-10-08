@@ -1,0 +1,11 @@
+test_prd_15_micro_vertical (tests.test_hfic_research_policy_vertical_v1.ResearchPolicyMicroVerticalTests.test_prd_15_micro_vertical) ... ok
+test_cycle_two_normalized_child_continues_the_representation_spend (tests.test_hfic_cycle_two_normalized_vertical_v1.CycleTwoNormalizedVerticalTests.test_cycle_two_normalized_child_continues_the_representation_spend)
+Owner review P1-A: a second AUTO cycle and its real episode-normalized child keep spending the ... ok
+test_same_cycle_normalized_variants_share_the_representation_budget (tests.test_hfic_cycle_two_normalized_vertical_v1.CycleTwoNormalizedVerticalTests.test_same_cycle_normalized_variants_share_the_representation_budget)
+Owner review P1-2, on the public query path BEFORE any freeze: another payload/selector of the same ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 1215.640s
+
+OK
+{"names": ["tests.test_hfic_research_policy_vertical_v1.ResearchPolicyMicroVerticalTests.test_prd_15_micro_vertical", "tests.test_hfic_cycle_two_normalized_vertical_v1.CycleTwoNormalizedVerticalTests.test_cycle_two_normalized_child_continues_the_representation_spend", "tests.test_hfic_cycle_two_normalized_vertical_v1.CycleTwoNormalizedVerticalTests.test_same_cycle_normalized_variants_share_the_representation_budget"], "run": 3, "failures": 0, "errors": 0, "skipped": 0, "wall_seconds": 1215.6398400000035, "raw_cli_calls": 85}

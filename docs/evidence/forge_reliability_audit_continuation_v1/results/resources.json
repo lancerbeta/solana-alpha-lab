@@ -1,0 +1,82 @@
+[
+  {
+    "committed_records": 40,
+    "measurement": {
+      "allowance": 0,
+      "occupancy": {
+        "adaptive": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 0,
+          "pending": 0,
+          "remaining": 2
+        },
+        "main": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 6,
+          "occupied": 0,
+          "pending": 0,
+          "remaining": 6
+        },
+        "preview": {
+          "completed": 1,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 1,
+          "pending": 0,
+          "remaining": 1
+        }
+      },
+      "packet_bytes": 298,
+      "peak_working_set_bytes": 77307904,
+      "rows_scanned": 2040,
+      "rss_measurement": "WINDOWS_PEAK_WORKING_SET_NOT_LINUX_RSS",
+      "store_scans": 51,
+      "values_loaded": 0,
+      "wall_seconds": 4.04658749999362
+    },
+    "valid_operations": 10
+  },
+  {
+    "committed_records": 400,
+    "measurement": {
+      "allowance": 0,
+      "occupancy": {
+        "adaptive": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 0,
+          "pending": 0,
+          "remaining": 2
+        },
+        "main": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 6,
+          "occupied": 0,
+          "pending": 0,
+          "remaining": 6
+        },
+        "preview": {
+          "completed": 1,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 1,
+          "pending": 0,
+          "remaining": 1
+        }
+      },
+      "packet_bytes": 298,
+      "peak_working_set_bytes": 81604608,
+      "rows_scanned": 20400,
+      "rss_measurement": "WINDOWS_PEAK_WORKING_SET_NOT_LINUX_RSS",
+      "store_scans": 51,
+      "values_loaded": 0,
+      "wall_seconds": 38.173780400000396
+    },
+    "valid_operations": 100
+  }
+]

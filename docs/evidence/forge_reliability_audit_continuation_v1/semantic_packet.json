@@ -1,0 +1,140 @@
+{
+  "candidate": {
+    "base": "0dbe4d4bb5ce9703332a0620987a47eac05c4cdc",
+    "diff_sha256": "d216424501334db04edee16ba1ec2e4811dd51cf69595098fcbd39d94e5f1f29",
+    "head": "8fc2f945ba9cf7fed2bedaa1ac083d855c7fb8a1"
+  },
+  "evidence": [
+    {
+      "logical_ref": "repo://docs/evidence/forge_reliability_audit_continuation_v1/results/collision-post.json",
+      "sha256_or_fingerprint": "2ae8a6b02b586e8aed8ecf7d2a7a0d09d4f5b0ff3c1d24a3525bc9e0165b51fc"
+    },
+    {
+      "logical_ref": "repo://tests/test_forge_reliability_audit_continuation_v1.py",
+      "sha256_or_fingerprint": "ea6909a07b06608144001d643c5fb366550cf2a1c96fafabffd29035b02e446d"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_ordinary_operation.py",
+      "sha256_or_fingerprint": "d20cfcf47b3182b8b6a2ed26fa3ababe59b03593796460892c326cf598fd5d4e"
+    },
+    {
+      "logical_ref": "repo://docs/evidence/forge_reliability_audit_continuation_v1/native/critic-result.json",
+      "sha256_or_fingerprint": "0952b9a5f3fb1a7fdd06276639aee3367f7be7c1bfca94560ff89e29d1ecbc13"
+    },
+    {
+      "logical_ref": "repo://docs/reports/forge_reliability_audit_continuation_v1/EVIDENCE_INDEX.md",
+      "sha256_or_fingerprint": "b8faa386f591e1fccfdac3987e39a0dc804cd875433f322a921cc2c2be1ecc37"
+    },
+    {
+      "logical_ref": "repo://configs/experiment_capability_registry_v2.yaml",
+      "sha256_or_fingerprint": "49edf7b770d37db38edb89a49dcb66f73b6212d62642cda2faa14880456e4430"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/document_runner.py",
+      "sha256_or_fingerprint": "1f9bb9e90f792a5feebcac47cb25979960db77c8b437e5125b00d6a27a0e1a6d"
+    },
+    {
+      "logical_ref": "repo://.github/workflows/ci.yml",
+      "sha256_or_fingerprint": "874d6d4a02204ca88dfd7398043aafbd93d3410492d462fe6702dab1ca573c61"
+    },
+    {
+      "logical_ref": "repo://scripts/validate_ci.py",
+      "sha256_or_fingerprint": "4d4d4e1fa81522a78f146dca44f193d69e8f854816adeaeefcec1ca91aa5fb2c"
+    },
+    {
+      "logical_ref": "repo://scripts/render_ci_workflow.py",
+      "sha256_or_fingerprint": "8e73cf9229fb29ea7b6ef65a4d0d4cceff1943a3d220a79b0d1587a3655f2726"
+    },
+    {
+      "logical_ref": "repo://tests/test_ci.py",
+      "sha256_or_fingerprint": "fa650cccc1a040fe40ba87409b3b7fc4a093639e465972e5c6d4eb8c6ea1f06c"
+    },
+    {
+      "logical_ref": "repo://docs/tasks/FORGE_RELIABILITY_AUDIT_CONTINUATION_V1.md",
+      "sha256_or_fingerprint": "3247019405e5d38f5cfe562f6f10835076f2a4d26778096fc3eb938465ec2ecb"
+    }
+  ],
+  "independence": {
+    "claim_scope": "PACKET_INFORMATION_PATH",
+    "context_isolated": true,
+    "implementation_transcript_seen": false,
+    "launch_isolation": "PROCESS_OBLIGATION",
+    "model_diversity": "UNPROVEN",
+    "model_diversity_identity": null,
+    "packet_bound": true,
+    "readonly": true
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NEW_SCIENTIFIC_SEMANTICS",
+    "NO_NEW_CONSUMER",
+    "NO_REAL_DATA",
+    "NO_HISTORICAL_RECEIPT_REWRITE",
+    "NO_FULL_SCOPE_HEALTH",
+    "NO_MODEL_DIVERSITY_ATTESTATION"
+  ],
+  "packet_fingerprint_sha256": "636445abc2ca012962b16262b92bb6f0fdeed9963939682b1302d90cd64fb4a6",
+  "questions": [
+    "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
+    "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
+    "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL",
+    "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE",
+    "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY",
+    "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING",
+    "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER",
+    "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE",
+    "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM",
+    "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS"
+  ],
+  "review": {
+    "architecture_owner": "ARCHITECTURE_CRITIC",
+    "profile": "SEMANTIC_PREMISE",
+    "risk_dimensions": [
+      "SCIENTIFIC_ESTIMAND",
+      "FALSIFIER_OR_ENDPOINT",
+      "EVIDENCE_ADMISSIBILITY",
+      "PIT_OR_AVAILABILITY_SEMANTICS",
+      "RESEARCH_TRUTH_OWNERSHIP",
+      "HYPOTHESIS_OR_FAMILY_CLOSURE",
+      "PROMOTION_OR_SUPPRESSION_AUTHORITY",
+      "UNKNOWN_VS_NEGATIVE_EVIDENCE",
+      "EXECUTION_TRUTH_SEMANTICS",
+      "DURABLE_SCIENCE_SCHEMA",
+      "OWNER_AUTHORITY_SEMANTICS",
+      "HARNESS_PREMISE_OR_MERGE_AUTHORITY"
+    ]
+  },
+  "schema": "smial.semantic-premise-review-packet",
+  "schema_version": "1.0",
+  "semantic_claims": [
+    {
+      "claim": "Two distinct frozen PREVIEW request descriptors consume two slots despite equal landed payload; repeat and pending landing remain one charge.",
+      "claim_id": "C1",
+      "scope": "BOUNDED_OFFLINE_AUDIT_AND_PREVIEW_REPAIR"
+    },
+    {
+      "claim": "Legacy unkeyed previews retain payload-based charges without rewriting history; shipped product limits and scientific meaning are unchanged.",
+      "claim_id": "C2",
+      "scope": "BOUNDED_OFFLINE_AUDIT_AND_PREVIEW_REPAIR"
+    },
+    {
+      "claim": "The audit gives LIMITED_RELIABILITY, not full health, alpha or chronological confirmation; native KILL is a negative endpoint with a disclosed shape retry.",
+      "claim_id": "C3",
+      "scope": "BOUNDED_OFFLINE_AUDIT_AND_PREVIEW_REPAIR"
+    },
+    {
+      "claim": "Registry and public frozen replay entry lack an accepted frozen-later-cohort consumer. Safe refusal and same-data replay do not close that positive endpoint.",
+      "claim_id": "C4",
+      "scope": "BOUNDED_OFFLINE_AUDIT_AND_PREVIEW_REPAIR"
+    },
+    {
+      "claim": "Only PR 386 pull_request shard 4 receives 60 minutes; every other event, PR and shard retains 30 minutes. Tests and the aggregator remain mandatory; merge phrase substitution is owner-authorized only after green exact-head CI and readiness.",
+      "claim_id": "C5",
+      "scope": "OWNER_AUTHORIZED_ONE_PR_CI_ALLOWANCE"
+    }
+  ],
+  "task": {
+    "task_contract_sha256": "3247019405e5d38f5cfe562f6f10835076f2a4d26778096fc3eb938465ec2ecb",
+    "task_id": "FORGE_RELIABILITY_AUDIT_CONTINUATION_V1"
+  }
+}

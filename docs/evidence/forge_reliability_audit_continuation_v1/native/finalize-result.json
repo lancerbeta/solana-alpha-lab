@@ -1,0 +1,88 @@
+{
+  "authority": {
+    "experiment_execution": 0,
+    "git_mutation": 0,
+    "provider_api_rpc_wss_calls": 0
+  },
+  "candidate_ids": [
+    "HFIC-CAND-74F21482B494"
+  ],
+  "capability_epoch_sha256": "476253a08d054e50607eab5a327af63f8090fee91603e8ff3b1dedc7cf4b3276",
+  "created_at": "2026-10-08T10:19:09Z",
+  "critic_input_packet_sha256": "205fa97b62051416e9b1260d2a8bc7fd885eb70f78b2dd63f1863fca5fca68ac",
+  "critic_result_sha256": "dab1c32462e8489b78297f40d5696ca52e2701f8bc90e6523ac98a1d1ec7b30b",
+  "critic_screen_count": 1,
+  "critic_terminal": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+  "decision_event_ids": [
+    "HFIC-DEC-HFIC-CAND-74F21482B494"
+  ],
+  "decisions": {
+    "HFIC-CAND-74F21482B494": {
+      "decision_kind": "REJECT",
+      "reason_code": "KILL_STATISTICALLY_UNIDENTIFIABLE"
+    }
+  },
+  "diagnostics": {
+    "candidate_count": 1,
+    "candidate_with_forward_only_dependency_count": 0,
+    "candidate_with_historical_only_dependency_count": 0,
+    "candidate_with_known_prior_ref_count": 1,
+    "candidate_with_missing_dependency_count": 0,
+    "candidate_with_pit_ready_dependency_count": 0,
+    "candidate_with_unresolved_requirement_count": 1,
+    "closed_or_suppressed_collision_count": 0,
+    "critic_terminal": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+    "known_capability_reference_count": 1,
+    "known_feature_reference_count": 0,
+    "lane_classifier_terminal": null,
+    "next_action_type_if_any": null,
+    "no_worthy_hypothesis": false,
+    "selected_candidate_present": true,
+    "structural_repetition_count": 0,
+    "structural_repetition_ratio": 0.0,
+    "unique_actor_counterparty_count": 1,
+    "unique_horizon_notional_count": 1,
+    "unique_mechanism_count": 1,
+    "unique_primary_x_family_count": 1,
+    "unique_state_transition_count": 1,
+    "unique_structural_signature_count": 1,
+    "unresolved_requirement_count": 5
+  },
+  "effective_control_terminal": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+  "evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+  "execution_binding_sha256": null,
+  "final_session_terminal": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+  "final_survivor_candidate_id": null,
+  "focus_key_sha256": "10cbbfb05c6607680d33855a80657fa8363bf5c08fa9dcf70123586e421d7449",
+  "ladder_representation_id": "BASE",
+  "lane_classifier_terminal": null,
+  "live_git_head": "b29d011994f5e4cf328175dc1a4929d28957e25a",
+  "market_evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+  "next": "STOP",
+  "no_git_fence_receipt": {
+    "final_git_composite_sha256": "236a19f9ed39e8699588e70834032a881f1ac6b2349ee470c0b9bce657673f3d",
+    "final_live_git_head": "b29d011994f5e4cf328175dc1a4929d28957e25a",
+    "git_composite_unchanged": true,
+    "preflight_git_composite_sha256": "236a19f9ed39e8699588e70834032a881f1ac6b2349ee470c0b9bce657673f3d",
+    "preflight_live_git_head": "b29d011994f5e4cf328175dc1a4929d28957e25a",
+    "provider_calls_actual": 0
+  },
+  "primary_critic_input_packet_sha256": "205fa97b62051416e9b1260d2a8bc7fd885eb70f78b2dd63f1863fca5fca68ac",
+  "primary_critic_result_sha256": "dab1c32462e8489b78297f40d5696ca52e2701f8bc90e6523ac98a1d1ec7b30b",
+  "primary_critic_terminal": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+  "primary_selected_candidate_id": "HFIC-CAND-74F21482B494",
+  "prompt_version": "HFIC-V1.2",
+  "receipt_schema_version": "1.3",
+  "representation_semantic_version": "HFIC-V1.2",
+  "runner_up_candidate_id": null,
+  "runner_up_critic_input_packet_sha256": null,
+  "runner_up_critic_result_sha256": null,
+  "runner_up_critic_terminal": null,
+  "runner_up_failover_used": false,
+  "scientific_slot_sha256": "9219181b02c6f324481d8a1ffdc1ffee62a309f8a5710e859c4bfa1478bd18f0",
+  "search_key_sha256": "d9be18323a4e3d2fdb7c7a702ca558c0b8781b78db84bbd00d98c5fd7c6201ef",
+  "selected_candidate_id": "HFIC-CAND-74F21482B494",
+  "session_id": "HFIC-SESS-D9BE18323A4E3D2F",
+  "session_state": "SYNTHESIS_COMPLETE",
+  "store_inventory_digest": "db33a987ce3e2934ffdefc6400fdcd51ac0a9237eb201d43484f74c0aa7220e5"
+}

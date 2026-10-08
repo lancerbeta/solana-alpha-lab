@@ -92,7 +92,7 @@ jobs:
 
   validate-tests:
     runs-on: ubuntu-24.04
-    timeout-minutes: {ci.GITHUB_VALIDATE_TESTS_TIMEOUT_MINUTES}
+    timeout-minutes: {ci.GITHUB_VALIDATE_TESTS_TIMEOUT_EXPRESSION}
     env:
       UV_NO_ENV_FILE: "1"
       PYTHONDONTWRITEBYTECODE: "1"

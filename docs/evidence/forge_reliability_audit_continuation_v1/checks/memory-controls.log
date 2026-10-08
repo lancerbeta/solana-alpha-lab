@@ -1,0 +1,11 @@
+test_schema_republish_preserves_science_and_budget (tests.test_hfic_market_evidence_epoch_decision_basis_v2.ScientificMarketV2Tests.test_schema_republish_preserves_science_and_budget) ... ok
+test_capability_only_change_does_not_change_market (tests.test_hfic_market_evidence_epoch_decision_basis_v2.ScientificMarketV2Tests.test_capability_only_change_does_not_change_market) ... ok
+test_three_distinct_focuses_across_eligibility_exhaust_epoch (tests.test_hfic_search_budget_epoch_guard_v1.HficSearchBudgetEpochGuardTests.test_three_distinct_focuses_across_eligibility_exhaust_epoch) ... ok
+test_a_plain_repeat_never_starts_a_second_cycle_at_any_cap (tests.test_hfic_search_budget_epoch_guard_v1.ResearchPolicyRaisedAutoBudgetTests.test_a_plain_repeat_never_starts_a_second_cycle_at_any_cap) ... ok
+test_t6_memory_statuses_remain_distinct (tests.test_hfic_critic_prior_memory_closure_v1.PriorMemoryUnitTests.test_t6_memory_statuses_remain_distinct) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 1.923s
+
+OK
+{"names": ["tests.test_hfic_market_evidence_epoch_decision_basis_v2.ScientificMarketV2Tests.test_schema_republish_preserves_science_and_budget", "tests.test_hfic_market_evidence_epoch_decision_basis_v2.ScientificMarketV2Tests.test_capability_only_change_does_not_change_market", "tests.test_hfic_search_budget_epoch_guard_v1.HficSearchBudgetEpochGuardTests.test_three_distinct_focuses_across_eligibility_exhaust_epoch", "tests.test_hfic_search_budget_epoch_guard_v1.ResearchPolicyRaisedAutoBudgetTests.test_a_plain_repeat_never_starts_a_second_cycle_at_any_cap", "tests.test_hfic_critic_prior_memory_closure_v1.PriorMemoryUnitTests.test_t6_memory_statuses_remain_distinct"], "run": 5, "failures": 0, "errors": 0, "skipped": 0, "wall_seconds": 1.9233520999987377, "raw_cli_calls": 0}

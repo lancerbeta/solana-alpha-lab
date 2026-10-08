@@ -1,0 +1,111 @@
+{
+  "prefix_field_differences": [],
+  "results": [
+    {
+      "exit": "1.44",
+      "filter": [
+        [
+          "point_id",
+          "in",
+          [
+            "X300",
+            "Y900",
+            "Y1800",
+            "Y3600"
+          ]
+        ]
+      ],
+      "loaded_points": [
+        "X300",
+        "Y1800",
+        "Y3600",
+        "Y900"
+      ],
+      "matched": 1,
+      "mean": 0.19999999999999996,
+      "prefix": {
+        "decision_point": "Y3600",
+        "examples": [
+          {
+            "anonymous_id": "f383f145e1f70ab5",
+            "liquidity_absolute": 10000.0,
+            "missing_mask": {
+              "X300": "OBSERVED",
+              "Y1800": "OBSERVED",
+              "Y3600": "OBSERVED",
+              "Y900": "OBSERVED"
+            },
+            "price_relative": {
+              "X300": 0.0,
+              "Y1800": 0.5,
+              "Y3600": 0.19999999999999996,
+              "Y900": 0.19999999999999996
+            }
+          }
+        ],
+        "preview_sha256": "93fedcfea6d67e7a32ded09968a43a3dc6fe4f88a912c1ea11ee74be07a06428",
+        "sampling_rule": "HASH_MEMBERSHIP_SEED",
+        "schema": "smial.hfic-temporal-preview",
+        "schema_version": "1.0",
+        "selected_count": 1,
+        "silent_truncation": false,
+        "target_included": false,
+        "total_count": 1
+      },
+      "target_rows_loaded": 0
+    },
+    {
+      "exit": "0.96",
+      "filter": [
+        [
+          "point_id",
+          "in",
+          [
+            "X300",
+            "Y900",
+            "Y1800",
+            "Y3600"
+          ]
+        ]
+      ],
+      "loaded_points": [
+        "X300",
+        "Y1800",
+        "Y3600",
+        "Y900"
+      ],
+      "matched": 1,
+      "mean": -0.19999999999999996,
+      "prefix": {
+        "decision_point": "Y3600",
+        "examples": [
+          {
+            "anonymous_id": "f383f145e1f70ab5",
+            "liquidity_absolute": 10000.0,
+            "missing_mask": {
+              "X300": "OBSERVED",
+              "Y1800": "OBSERVED",
+              "Y3600": "OBSERVED",
+              "Y900": "OBSERVED"
+            },
+            "price_relative": {
+              "X300": 0.0,
+              "Y1800": 0.5,
+              "Y3600": 0.19999999999999996,
+              "Y900": 0.19999999999999996
+            }
+          }
+        ],
+        "preview_sha256": "93fedcfea6d67e7a32ded09968a43a3dc6fe4f88a912c1ea11ee74be07a06428",
+        "sampling_rule": "HASH_MEMBERSHIP_SEED",
+        "schema": "smial.hfic-temporal-preview",
+        "schema_version": "1.0",
+        "selected_count": 1,
+        "silent_truncation": false,
+        "target_included": false,
+        "total_count": 1
+      },
+      "target_rows_loaded": 0
+    }
+  ]
+}

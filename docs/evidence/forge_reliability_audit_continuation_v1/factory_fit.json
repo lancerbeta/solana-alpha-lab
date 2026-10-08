@@ -1,0 +1,34 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-RELIABILITY-AUDIT-FACTORY-FIT-001",
+  "as_of": "2026-10-08",
+  "task_id": "FORGE_RELIABILITY_AUDIT_CONTINUATION_V1",
+  "reviewed_bindings_sha256": "404e0912b8635a3805f1e640f7e6bb5fa6f8402bfcc59541063545595092864a",
+  "reviewed_inventory_sha256": "59cae5f8ff24dd039641215f02a053574e7b01c474c52a7bb23031de9d9b4f9f",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_BOUNDED_EXISTING_PATH_AUDIT_NOT_PLATFORM",
+    "flexibility_and_history": "PASS_REQUEST_IDENTITIES_LEGACY_CHARGES_AND_IMMUTABLE_HISTORY",
+    "context_efficiency": "PASS_ONE_EXISTING_OWNER_NO_AUDIT_HARNESS_OR_DEPENDENCY",
+    "research_truth": "PASS_LIMITED_VERDICT_GAPS_KILL_REPLAY_NO_ALPHA",
+    "owner_operability": "PASS_OCCUPANCY_AND_OWNER_CAP_REQUESTS_MATCH",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_EXECUTION_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_SAME_PENDING_REQUEST_RESUME_NO_REFUND",
+    "build_vs_buy": "PASS_WRAP_EXISTING_RESEARCHSTORE_AND_CLI",
+    "security": "PASS_SYNTHETIC_OFFLINE_NO_CREDENTIAL_OR_PROVIDER",
+    "red_team": "PASS_PAYLOAD_COLLISION_LEGACY_PENDING_TWO_PROCESS_RACE"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "OWNER_ELECTS_FROZEN_LATER_COHORT_VALIDATION_CONTRACT"
+  },
+  "recovery": "Owner-gated code revert preserves all ResearchStore records and limits; revert restores known payload collision bypass.",
+  "limits": [
+    "FULL_SCOPE_NOT_HEALTHY",
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_LIVE_ACCEPTANCE",
+    "NO_MERGE"
+  ]
+}

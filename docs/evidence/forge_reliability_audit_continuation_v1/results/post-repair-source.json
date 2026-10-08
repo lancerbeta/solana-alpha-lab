@@ -1,0 +1,8 @@
+{
+  "state": "POST_REPAIR_WORKTREE",
+  "commit": "b29d011994f5e4cf328175dc1a4929d28957e25a",
+  "product_worktree_diff": true,
+  "owner": "src/solana_alpha_lab/factory/hfic_ordinary_operation.py",
+  "owner_sha256": "d20cfcf47b3182b8b6a2ed26fa3ababe59b03593796460892c326cf598fd5d4e",
+  "note": "collision-post source_head alone is the pre-repair Git commit; the dirty owner hash binds the executed repair."
+}

@@ -1,0 +1,12 @@
+test_a1_hfic_self_memory_does_not_advance_epoch (tests.test_hfic_epistemic_memory_semantics.EpistemicMemorySemanticsTests.test_a1_hfic_self_memory_does_not_advance_epoch) ... ok
+test_a3_typed_rdp_decision_enters_closed_family_ledger (tests.test_hfic_epistemic_memory_semantics.EpistemicMemorySemanticsTests.test_a3_typed_rdp_decision_enters_closed_family_ledger) ... ok
+test_a5_frozen_packet_preserves_closed_family_and_rejects_reopen (tests.test_hfic_epistemic_memory_semantics.EpistemicMemorySemanticsTests.test_a5_frozen_packet_preserves_closed_family_and_rejects_reopen) ... ok
+test_scope_limited_close_remains_scoped (tests.test_hfic_reopened_prior_search_routing_v1.ReopenedInventoryTests.test_scope_limited_close_remains_scoped) ... ok
+test_pit_missing_zero_late_and_price_present_holder_absent (tests.test_forge_temporal_holder_point_feature_v1.HolderPolicyTests.test_pit_missing_zero_late_and_price_present_holder_absent) ... ok
+test_forbidden_holder_queries_never_touch_rows (tests.test_forge_temporal_holder_point_feature_v1.HolderPolicyTests.test_forbidden_holder_queries_never_touch_rows) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 57.043s
+
+OK
+{"names": ["tests.test_hfic_epistemic_memory_semantics.EpistemicMemorySemanticsTests.test_a1_hfic_self_memory_does_not_advance_epoch", "tests.test_hfic_epistemic_memory_semantics.EpistemicMemorySemanticsTests.test_a3_typed_rdp_decision_enters_closed_family_ledger", "tests.test_hfic_epistemic_memory_semantics.EpistemicMemorySemanticsTests.test_a5_frozen_packet_preserves_closed_family_and_rejects_reopen", "tests.test_hfic_reopened_prior_search_routing_v1.ReopenedInventoryTests.test_scope_limited_close_remains_scoped", "tests.test_forge_temporal_holder_point_feature_v1.HolderPolicyTests.test_pit_missing_zero_late_and_price_present_holder_absent", "tests.test_forge_temporal_holder_point_feature_v1.HolderPolicyTests.test_forbidden_holder_queries_never_touch_rows"], "run": 6, "failures": 0, "errors": 0, "skipped": 0, "wall_seconds": 57.042972099996405, "raw_cli_calls": 8}
