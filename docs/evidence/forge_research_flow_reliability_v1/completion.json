@@ -1,0 +1,53 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "as_of": "2026-10-08",
+  "task_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1",
+  "acceptance_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1-COMPLETION",
+  "state_change": "ORDINARY_FLOW_ENGINEERING_D01_D18_NATIVE_SOURCE_KILL_MECHANICAL_POSITIVE_RECOVERY_BOUNDED_READS",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_research_flow_reliability_v1/factory-fit.json",
+    "sha256": "",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_D01_D18_DIRECT_PROOFS_WITH_INITIAL_FAILURES_REPAIRED_SKIPS_RETAINED",
+    "independent_review": {
+      "path": "docs/evidence/forge_research_flow_reliability_v1/independent-review.json",
+      "sha256": "",
+      "verdict": "NOT_READY"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": []
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_OOS",
+    "NO_STRATEGY_PROMOTION",
+    "NO_NEW_REAL_SCIENTIFIC_LOOK",
+    "NO_LIVE",
+    "NO_DEPLOY",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "external_actions": 0,
+    "local_writes": 1,
+    "network_calls": 0,
+    "scope": "PRODUCT_DOMAIN_EXCLUDING_AUTHORIZED_ROUTINE_GIT_GITHUB_DELIVERY_TRANSPORT"
+  },
+  "capability_radar_now": "NONE",
+  "base_main": "44eda5d72dccd569e9766a74046ce8b2ec47f417",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false
+}

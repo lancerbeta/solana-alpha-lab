@@ -77,7 +77,10 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
     - docs/agent/DELIVERY_HARNESS_PROTOCOL.md
     - delivery-harness/policies/solana-alpha-lab.md
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/forge_research_flow_reliability_v1/completion.json
+    - docs/evidence/forge_research_flow_reliability_v1/independent-review.json
+    - docs/evidence/forge_research_flow_reliability_v1/factory-fit.json
     HISTORICAL_CONTEXT: []
 ---
 
@@ -109,17 +112,17 @@ Early mechanical entry typos are corrected before packaging evidence.
 
 ## Implementation and verification plan
 
-- [ ] V1 / D01-D06: parameterized material projector RED -> source fix -> real
+- [x] V1 / D01-D06: parameterized material projector RED -> source fix -> real
   schema/public persist controls; same historical draft recovery; 0/1/10 cards,
   selected9/runner10/revision; canonical prompt/example and effective ceilings.
-- [ ] V2 / D07-D10: schema-enum terminal oracle; typed suppression/applicability;
+- [x] V2 / D07-D10: schema-enum terminal oracle; typed suppression/applicability;
   persisted exact/related/PARK/technical/family/new-evidence fixture and public
   BASE/normalized transition with unchanged frozen policy and attempts.
-- [ ] V3 / D11,D14-D17: production episode fixture/literal numerical oracle;
+- [x] V3 / D11,D14-D17: production episode fixture/literal numerical oracle;
   passive prefix poison traces; OS interruption/fresh process/moved root;
   corrupt/stale/race controls; paired 40/400 cold read counts/three medians;
   bounded capability mutation and historical repair regression.
-- [ ] V4 / D12,D13,D15,D18: actual emitted episode packet -> isolated native
+- [x] V4 / D12,D13,D15,D18: actual emitted episode packet -> isolated native
   generator -> unchanged authored draft -> persist/freeze -> isolated Critic ->
   truthful machine endpoint; separate scripted-Critic classify/final/replay;
   packet-only adversarial read; compact evidence index, affected tests, four
@@ -146,3 +149,9 @@ Critic KILL from typed family-close authority; source verdict and scope stay bou
 Direct generated consumers: Catalog generated navigation/PROJECT_MAP follow
 harness_sync. The existing Forge config now states frozen-policy precedence
 without changing shipped values.
+
+Executed: native3 outputs, lawful KILL retained; positive scripted boundary
+with actual classifier/Runner; OS recovery; both reserved intent/result
+publication contention repaired using existing retry budget. D15 context
+locator is additive refusal detail. All local scoped results are in evidence;
+exact CI/readiness/phrase remain delivery gates, not preasserted PASS.

@@ -679,5 +679,83 @@ class VerifiedReadScopeTests(unittest.TestCase):
                 self.assertEqual(len(oo.list_operations(store)),2)
             interleave()
 
+class ReservedLandingTests(unittest.TestCase):
+    def test_reserved_intent_and_result_publish_after_brief_other_process_lease(self):
+        import os,subprocess,tempfile
+        from datetime import datetime,UTC
+        from tests.test_hfic_research_policy_closure_v1 import _operation,GIT
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from solana_alpha_lab.factory import hfic_ordinary_operation as oo
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            _append_temporal_intent,_append_discovery_look,list_discovery_looks,
+        )
+        with tempfile.TemporaryDirectory() as raw:
+            plane=Path(raw);store=ResearchStore(plane);journal='19'*32;digest='29'*32
+            op=_operation(store,journal=journal,owner_cap={'main':2,'adaptive':0,'preview':0})
+            oo._reserve(store,op,spec_sha256=digest)
+            self.assertEqual(oo.journal_occupancy(store,journal)['main']['pending'],1)
+            code="""import sys,time
+from pathlib import Path
+from solana_alpha_lab.factory.research_store import ResearchStore
+with ResearchStore(Path(sys.argv[1])).writer_lease():
+ print('LOCKED',flush=True);time.sleep(.35)
+"""
+            kwargs={'record_id':'HFIC-ART-DISCOVERY-'+('A'*32),'journal_scope':journal,
+                    'spec':{},'spec_sha256':digest,'binding_sha':'39'*32,'data_refs':[],
+                    'digest':'49'*32,'identity':'59'*32,
+                    'summary':{'query_id':'OS_RESERVED_LANDING','value':.2},
+                    'look':{'look_class':'MAIN','new_look':True},'git_sha':GIT,
+                    'clock':datetime(2026,10,8,tzinfo=UTC),
+                    'operation_sha256':op['operation_sha256']}
+            for phase in ('intent','result'):
+                with self.subTest(phase=phase):
+                    worker=subprocess.Popen([sys.executable,'-B','-c',code,str(plane)],
+                        cwd=ROOT,env={**os.environ,'PYTHONPATH':str(ROOT/'src'),'PYTHONUTF8':'1'},
+                        stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,encoding='utf-8')
+                    try:
+                        self.assertEqual(worker.stdout.readline().strip(),'LOCKED')
+                        if phase=='intent':
+                            _append_temporal_intent(store,journal_scope=journal,spec_sha256=digest,
+                                binding_sha='39'*32,search_tier='SIMPLE_SCREEN',git_sha=GIT)
+                        else:
+                            _append_discovery_look(store,**kwargs)
+                    finally:
+                        worker.wait(timeout=10);worker.stdout.close();worker.stderr.close()
+            after=store.diagnostics().committed_inventory_sha256
+            _append_discovery_look(store,**kwargs)
+            self.assertEqual(store.diagnostics().committed_inventory_sha256,after)
+            looks=list_discovery_looks(store,journal)
+            self.assertEqual(len(looks),1);self.assertEqual(looks[0]['result_sha256'],'49'*32)
+            occupancy=oo.journal_occupancy(store,journal)['main']
+            self.assertEqual((occupancy['completed'],occupancy['pending']),(1,0))
+
+    def test_integrity_failure_is_not_retried_or_swallowed(self):
+        from unittest.mock import Mock
+        from solana_alpha_lab.factory.research_store import ResearchStoreError
+        from solana_alpha_lab.factory.hfic_grounded_discovery import _append_reserved_discovery_event
+        store=SimpleNamespace(append=Mock(side_effect=ResearchStoreError('PARTITION_HASH_MISMATCH')))
+        with self.assertRaises(ResearchStoreError):
+            _append_reserved_discovery_event(store,SimpleNamespace(transaction_id='FIXED_TXN'))
+        self.assertEqual(store.append.call_count,1)
+
+
+class ContextLocatorTests(unittest.TestCase):
+    def test_missing_saved_context_names_exact_relative_dependency_without_writes(self):
+        import tempfile
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from solana_alpha_lab.factory.hfic_session import _verify_forge_context_artifact
+        with tempfile.TemporaryDirectory() as raw:
+            store=ResearchStore(Path(raw))
+            before=store.diagnostics().committed_inventory_sha256
+            digest='93'*32
+            with self.assertRaises(HficSessionError) as caught:
+                _verify_forge_context_artifact(store,digest)
+            self.assertEqual(caught.exception.code,'FORGE_CONTEXT_ARTIFACT_MISSING')
+            self.assertEqual(caught.exception.detail['required_context_sha256'],digest)
+            self.assertEqual(caught.exception.detail['relative_locator'],'research/artifacts/forge_context/'+digest+'.json')
+            self.assertEqual(caught.exception.detail['next_action'],'RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY')
+            self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
+
+
 if __name__ == "__main__":
     unittest.main()

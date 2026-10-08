@@ -6637,6 +6637,7 @@ def _verify_store_reference_resolution(
 def _verify_forge_context_artifact(store: Any, digest: str) -> None:
     from solana_alpha_lab.factory.hfic_preflight import (
         HficPreflightError,
+        FORGE_CONTEXT_ARTIFACT_DIR,
         verify_forge_context_packet,
     )
 
@@ -6644,7 +6645,13 @@ def _verify_forge_context_artifact(store: Any, digest: str) -> None:
     try:
         verify_forge_context_packet(data_root, digest)
     except HficPreflightError as exc:
-        raise HficSessionError(str(exc)) from exc
+        safe_digest = digest if re.fullmatch(r"[0-9a-f]{64}", digest) else None
+        raise HficSessionError(str(exc), detail={
+            "stage": "SAVED_CONTEXT_DEPENDENCY",
+            "required_context_sha256": safe_digest,
+            "relative_locator": f"{FORGE_CONTEXT_ARTIFACT_DIR}/{safe_digest}.json" if safe_digest else None,
+            "next_action": "RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY",
+        }) from exc
 
 
 def _verify_required_context_dependency(store: Any, binding: Mapping[str, Any]) -> None:
