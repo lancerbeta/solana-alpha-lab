@@ -17,7 +17,7 @@
     },
     {
       "path": "scripts/hypothesis_forge.py",
-      "sha256": "73cbf682364a640d0ed4aa51077483f4734d2eaa1c789af21fbc906478767694"
+      "sha256": "080fb97c84c347afb11530bdb982b336e771614759ec81a476c628c18766e8a1"
     },
     {
       "path": "src/solana_alpha_lab/factory/document_runner.py",
