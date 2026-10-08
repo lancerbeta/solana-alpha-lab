@@ -73,7 +73,7 @@
     },
     {
       "path": "tests/test_hfic_list_aware_vertical_v1.py",
-      "sha256": "8f709e4b25b8f466b7a2437e586bc042813f24b96b38a22ebf37274fb8a5dead"
+      "sha256": "c65e1e16ec06ddb108310029e05da16d9af16fa044a9566c7257d9b362e6ecfd"
     },
     {
       "path": "tests/test_hfic_provenance_clock.py",
