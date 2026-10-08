@@ -4,8 +4,8 @@
   "review_id": "FORGE-AUDIT-CI-TIMEOUT-REVIEW-001",
   "as_of": "2026-10-08",
   "task_id": "FORGE_RELIABILITY_AUDIT_CONTINUATION_V1",
-  "reviewed_bindings_sha256": "",
-  "reviewed_inventory_sha256": "",
+  "reviewed_bindings_sha256": "d078f3c0ce1ed07214fcabae1caac2545865a86408628e1c68180ee8d9821c39",
+  "reviewed_inventory_sha256": "6c3a5c722a16c77af3b81823d1948b5560d803eb41043b5fd5676fa192665c80",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

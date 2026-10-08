@@ -10,7 +10,16 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".github/workflows/ci.yml": "3b36a8f301a9217c9a44f6d1b7d593889ae940dbf2dd1d61049a8bffb8b07689",
+    "catalog/assets/core.yaml": "406b1ac5621d5749017916a501708ba17f294e8c9729ef03bae899f95ded74ce",
+    "docs/evidence/forge_reliability_audit_ci_timeout_v1/OWNER_READOUT.md": "2f7a09ddad08cec93acb609a0e245b5c70c8a2bd693e5444479a90b466448e36",
+    "docs/evidence/forge_reliability_audit_ci_timeout_v1/ci-timeout-evidence.json": "1bbf6362fa37489e0ffb21eedefc84d8099f4e3fbd21261f77913fe3b47ead42",
+    "docs/tasks/FORGE_RELIABILITY_AUDIT_CONTINUATION_V1.md": "36aa4c8afa5da16fa76132dc1f9902e6bde2740b280a0d23e2525605ad195b9e",
+    "scripts/render_ci_workflow.py": "e448f47c8d1fb642fc230be47f13fbad7a54e08e1e85b0cc52b3e283b1b6c066",
+    "scripts/validate_ci.py": "26bf6844f6c6cacb398095b1fea3c5107156968c8c9743e84a6568b48e2d131f",
+    "tests/test_ci.py": "1d8e6cfeadfef0166d24fdc5e6d6ca712240f31f7da40a4a8cbed3710242213f"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +30,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_reliability_audit_ci_timeout_v1/factory_fit.json",
-    "sha256": "",
+    "sha256": "dea230a1e027af557ed46e08b0141d763cb18f4a126059974d8770e39bce9fad",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_CI_WORKFLOW_14_OF_14_NO_PRODUCT_SOURCE_CHANGES",
     "independent_review": {
       "path": "docs/evidence/forge_reliability_audit_ci_timeout_v1/independent_review.json",
-      "sha256": "",
+      "sha256": "e85eea70a715756d898fec676e5c79de14e09bd5a3bdd2813bce6cf0fc5d8a59",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
