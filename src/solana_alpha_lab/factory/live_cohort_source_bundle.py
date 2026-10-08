@@ -175,6 +175,24 @@ def parquet_row_count(path: Path) -> int:
 
 
 def peak_rss_bytes() -> int:
+    """Peak resident memory of this executable image, in bytes.
+
+    Linux getrusage can retain the parent's pre-exec peak. VmHWM belongs to
+    the current image; unavailable proc data falls back conservatively.
+    """
+    if sys.platform == "linux":
+        try:
+            rows = [
+                line.split()
+                for line in Path("/proc/self/status").read_text(encoding="ascii").splitlines()
+                if line.startswith("VmHWM:")
+            ]
+            if len(rows) == 1:
+                _key, value, unit = rows[0]
+                if unit == "kB" and value.isdecimal() and int(value) > 0:
+                    return int(value) * 1024
+        except (OSError, UnicodeError, ValueError):
+            pass
     if sys.platform == "win32":
         import ctypes
         from ctypes import wintypes
@@ -209,6 +227,8 @@ def peak_rss_bytes() -> int:
     import resource
 
     rss = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+    if sys.platform == "linux" and rss <= 0:
+        raise RuntimeError("PEAK_RSS_UNAVAILABLE")
     if sys.platform == "darwin":
         return rss
     return rss * 1024

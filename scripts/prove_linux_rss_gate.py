@@ -43,6 +43,7 @@ def run() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--child', nargs=2, type=Path)
     parser.add_argument('--output', type=Path, default=Path('local/linux-rss-probe.json'))
+    parser.add_argument('--after-repair', action='store_true')
     args = parser.parse_args()
     if args.child:
         child(*args.child)
@@ -51,9 +52,10 @@ def run() -> None:
     for relative in OWNERS:
         raw = (ROOT / relative).read_bytes()
         original = subprocess.check_output(['git', 'show', f'{ANCHOR}:{relative}'], cwd=ROOT)
-        assert raw == original, f'Workload owner changed: {relative}'
+        if not args.after_repair or relative.endswith('observation_panel_publisher.py'):
+            assert raw == original, f'Workload owner changed: {relative}'
         pins[relative] = hashlib.sha256(raw).hexdigest()
-    report = {'kind': 'UNCHANGED_WORKLOAD_DIAGNOSTIC_NOT_ACCEPTANCE',
+    report = {'kind': 'TARGETED_AFTER_REPAIR_PROOF' if args.after_repair else 'UNCHANGED_WORKLOAD_DIAGNOSTIC_NOT_ACCEPTANCE',
               'producer_sha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'anchor': ANCHOR, 'source_pins': pins, 'limits': {'comfortable_bytes': 512*MIB, 'soft_bytes': 768*MIB},
               'historical_ci': 37709815254, 'historical_ci_conclusion': 'FAILURE', 'cases': []}
@@ -78,15 +80,22 @@ def run() -> None:
                                 'child_hwm_comfortable_assertion_pass': body['rss_diagnostic']['after_workload']['vmhwm_bytes'] <= 512*MIB})
     high = report['cases'][1]
     report['hypothesis_confirmed_for_controlled_ci_workload'] = (
-        high['child']['max_rss_bytes'] > 512*MIB
+        high['child']['rss_diagnostic']['after_workload']['ru_maxrss_bytes'] > 512*MIB
         and high['child']['rss_diagnostic']['after_workload']['vmhwm_bytes'] < 512*MIB
         and high['child']['rss_diagnostic']['at_entry']['ru_maxrss_bytes'] >= 600*MIB)
     report['historical_failed_child_hwm'] = 'UNKNOWN_NOT_RECORDED_IN_RUN37709815254'
+    report['current_image_metric_proven'] = all(
+        case['child']['rss_diagnostic']['after_import']['vmhwm_bytes']
+        <= case['child']['max_rss_bytes']
+        <= case['child']['rss_diagnostic']['after_workload']['vmhwm_bytes']
+        for case in report['cases'])
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')
     print(json.dumps(report, sort_keys=True), flush=True)
     assert all(case['child_hwm_comfortable_assertion_pass'] for case in report['cases']), 'REAL_CHILD_RSS_OVER512MIB'
     assert report['hypothesis_confirmed_for_controlled_ci_workload'], 'INHERITED_PEAK_HYPOTHESIS_NOT_CONFIRMED'
+    if args.after_repair:
+        assert report['current_image_metric_proven'], 'METRIC_DOES_NOT_MATCH_CHILD_HWM'
 
 if __name__ == '__main__':
     run()
