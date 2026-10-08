@@ -29,14 +29,15 @@
     "independent_review": {
       "path": "docs/evidence/forge_reliability_audit_continuation_v1/independent_review.json",
       "sha256": "",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": [
       "PASS_CATALOG_INCREMENTAL_SOURCE_REHASH",
       "PASS_LOCKED_RUNTIME",
-      "NO_SHIPPED_LIMIT_CHANGE"
+      "NO_SHIPPED_LIMIT_CHANGE",
+      "PASS_FOUR_ISOLATED_ROLES_AND_INDEPENDENT_NATIVE_EVIDENCE_REVIEW"
     ]
   },
   "non_claims": [
