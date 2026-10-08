@@ -423,6 +423,10 @@ class RepresentationContinuationOrderTests(unittest.TestCase):
         self.assertEqual(derive("S1", "55" * 32, [c1, c2]), ("11" * 32, None))
         # A cycle-1 child with no root at all arriving after a later cycle's child is refused (one budget).
         self.assertEqual(derive("S1", "44" * 32, [c2]), (None, "ORDINARY_OPERATION_LINEAGE_OUT_OF_ORDER"))
+        # An UNLINKED later-cycle root (its cycle-2 child was recorded first, normal order is cycle 1 first) is never
+        # taken as the root of a cycle-1 child: that child is refused, not given the later journal as its budget.
+        c2_alone = row("22" * 32, "S2", "2026-10-07T02:00:00")
+        self.assertEqual(derive("S1", "44" * 32, [c2_alone]), (None, "ORDINARY_OPERATION_LINEAGE_OUT_OF_ORDER"))
         # A journal that already carries an operation keeps the identity it was created with.
         self.assertEqual(derive("S1", c1["journal_scope"], [c1, c2]), (None, None))
         # Two historical unlinked roots are an ambiguous line: refused, never a fresh budget.

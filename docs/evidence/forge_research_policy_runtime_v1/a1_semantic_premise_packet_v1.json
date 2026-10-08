@@ -1,8 +1,8 @@
 {
   "candidate": {
     "base": "04ec8e0286a3dce5999d0687784717ee90fc5dca",
-    "diff_sha256": "fe51b59f2d709f726f4e0a55db957c56dfa22e4feb1324ce323b7d5af6f2d269",
-    "head": "5fb0341cffa60e4bf9d956fa40c3683a2cffb0db"
+    "diff_sha256": "9be1c3254242c85df609912034a8e7eee5b8333e003e1c9c9c779da0c074d3a8",
+    "head": "637dcc8bfe0a366a776c4c76a2e13feffef4836f"
   },
   "evidence": [
     {
@@ -11,7 +11,7 @@
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_ordinary_operation.py",
-      "sha256_or_fingerprint": "892af84c36eb28d45022c29e8008c89b6b9c7317fda80ccc2c3181a9a734b677"
+      "sha256_or_fingerprint": "07862aca185267b4aa6b5e99d04927cedbae48533615e98a8e4bd81487c17b58"
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_preflight.py",
@@ -19,7 +19,7 @@
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_session.py",
-      "sha256_or_fingerprint": "47fcf21279175481325689653e5e925ba8d1e7ed0658e4a8b630b2e42ad2ec0b"
+      "sha256_or_fingerprint": "a1298b87b2a0ad5401ad91dc9aef4557fcbf4992271003e637750dc1dc64abc7"
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_evidence_identity.py",
@@ -31,15 +31,15 @@
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
-      "sha256_or_fingerprint": "dd96b58714e32a93ebe75bc7236ea6af52189b50d10b1720a3684326aae2a694"
+      "sha256_or_fingerprint": "b610e0bf27de6a129330270fe5cbf48cb05d5d0dd1f67b00587ac5fd59c3f42a"
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_grounded_discovery.py",
-      "sha256_or_fingerprint": "0abd10d8659d0b7047d8c094badd37ccdc8b75325d9fe17283a63e6bdc52db45"
+      "sha256_or_fingerprint": "c4b6263adb32ee96962903e56091ba91d80100c30fbb2418005f0079322b0709"
     },
     {
       "logical_ref": "repo://scripts/hypothesis_forge.py",
-      "sha256_or_fingerprint": "60be13f2f202798779985c0c0414720d96b550118733ae12eb7e1a5bcc644881"
+      "sha256_or_fingerprint": "080fb97c84c347afb11530bdb982b336e771614759ec81a476c628c18766e8a1"
     },
     {
       "logical_ref": "repo://tests/test_hfic_research_policy_v1.py",
@@ -47,15 +47,15 @@
     },
     {
       "logical_ref": "repo://tests/test_hfic_research_policy_vertical_v1.py",
-      "sha256_or_fingerprint": "cde5b459dd743870e1046989e54e9399ecc68623fda4af6e7f0cbf53190445f6"
+      "sha256_or_fingerprint": "243327656f9f308cd35a3e2398e125c128f32f42d7b70fe52e92485ee81e1493"
     },
     {
       "logical_ref": "repo://tests/test_hfic_research_policy_closure_v1.py",
-      "sha256_or_fingerprint": "31e0be4eb57af256a9ef72542e542ab8b702fd38fad22440c282ad203c2640d7"
+      "sha256_or_fingerprint": "6dfef24417d708a1f80be86e2cdc1976af0b301a48c2a942a1745a3aaca1c746"
     },
     {
       "logical_ref": "repo://tests/test_hfic_list_aware_vertical_v1.py",
-      "sha256_or_fingerprint": "501207fa3ade50b13f2bf97bcd105ff6af51e8846515ac0e16b8ff40017b04a2"
+      "sha256_or_fingerprint": "5d7504502563c229dff4fb16a18eef17284ee4413f83bb076ffd7d73e719c848"
     },
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/hfic_representation_ladder.py",
@@ -63,7 +63,7 @@
     },
     {
       "logical_ref": "repo://docs/contracts/forge_research_policy_runtime_v1.md",
-      "sha256_or_fingerprint": "394646b7725efb5fbd8a16c944f83794bee702f8ba8fe52b11740bb50be1a550"
+      "sha256_or_fingerprint": "207849a0ffab0e69914f807006d7ad0e5a2c5442040a36812c75d67ee9d52c88"
     }
   ],
   "independence": {
@@ -87,7 +87,7 @@
     "NO_PR_A_LIST_AWARE_SCOPE_REOPENED",
     "NO_NEW_COLLECTOR_EVALUATOR_DATABASE_OR_SERVICE"
   ],
-  "packet_fingerprint_sha256": "1669455fee1182afb0ad69fb1b6006f75a2a7c888f3b075ada68a861e2ae5811",
+  "packet_fingerprint_sha256": "91aa0d95681d75cf35b6ba3d679c1c9b5e69027e763e07c83312d3a592b10de9",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
@@ -189,7 +189,7 @@
     }
   ],
   "task": {
-    "task_contract_sha256": "f43984affd8dab7ecc6ed280aa01ff69806559da202724a2526be2c0387ab221",
+    "task_contract_sha256": "e9503d6dc574d79ace172f54559b114f2a8295cf6214c1dbb8a424a199966773",
     "task_id": "FORGE_RESEARCH_POLICY_RUNTIME_V1"
   }
 }

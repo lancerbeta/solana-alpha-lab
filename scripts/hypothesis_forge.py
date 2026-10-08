@@ -2344,7 +2344,13 @@ def cmd_episode_normalized_view(
                 data_root, receipt["forge_context_packet"], store=store, repo_root=repo_root
             )
         except HficPreflightError as exc:
-            return emit({"reason_code": exc.args[0] if exc.args else "FORGE_CONTEXT_ARTIFACT_INVALID", "writes": False}, exit_code=2)
+            return emit(
+                {
+                    "reason_code": exc.args[0] if exc.args else "FORGE_CONTEXT_ARTIFACT_INVALID",
+                    "writes": gate["disposition"] in ("EXECUTE", "RESUME"),
+                },
+                exit_code=2,
+            )
         receipt.pop("preflight_receipt_sha256", None)
         receipt["preflight_receipt_sha256"] = _receipt_sha(receipt)
     except scope_owner.ResearchScopeError as exc:
