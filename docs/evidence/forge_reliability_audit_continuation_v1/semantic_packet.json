@@ -1,8 +1,8 @@
 {
   "candidate": {
     "base": "0dbe4d4bb5ce9703332a0620987a47eac05c4cdc",
-    "diff_sha256": "a8bcc4a48bd983ab8b398ee7004f765e33fe61fc327a1f3374953af8f8b5e89c",
-    "head": "3b93f58656a2042642257e56c3cb91b8df5be9c1"
+    "diff_sha256": "d216424501334db04edee16ba1ec2e4811dd51cf69595098fcbd39d94e5f1f29",
+    "head": "8fc2f945ba9cf7fed2bedaa1ac083d855c7fb8a1"
   },
   "evidence": [
     {
@@ -23,7 +23,7 @@
     },
     {
       "logical_ref": "repo://docs/reports/forge_reliability_audit_continuation_v1/EVIDENCE_INDEX.md",
-      "sha256_or_fingerprint": "3d83ef42a08997f0be422782aa6e226c2f298b9079f9d46df2bec200bb80b835"
+      "sha256_or_fingerprint": "b8faa386f591e1fccfdac3987e39a0dc804cd875433f322a921cc2c2be1ecc37"
     },
     {
       "logical_ref": "repo://configs/experiment_capability_registry_v2.yaml",
@@ -51,7 +51,7 @@
     },
     {
       "logical_ref": "repo://docs/tasks/FORGE_RELIABILITY_AUDIT_CONTINUATION_V1.md",
-      "sha256_or_fingerprint": "2cb083185c1d038a99f307b032c696f0da3f92bb5ace33815af6aae17ab1bdf3"
+      "sha256_or_fingerprint": "3247019405e5d38f5cfe562f6f10835076f2a4d26778096fc3eb938465ec2ecb"
     }
   ],
   "independence": {
@@ -73,7 +73,7 @@
     "NO_FULL_SCOPE_HEALTH",
     "NO_MODEL_DIVERSITY_ATTESTATION"
   ],
-  "packet_fingerprint_sha256": "92f284b44a189b6c4351312d696a33c5ac5695f7dc0c8d7b31d8671ecee18368",
+  "packet_fingerprint_sha256": "636445abc2ca012962b16262b92bb6f0fdeed9963939682b1302d90cd64fb4a6",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
@@ -134,7 +134,7 @@
     }
   ],
   "task": {
-    "task_contract_sha256": "2cb083185c1d038a99f307b032c696f0da3f92bb5ace33815af6aae17ab1bdf3",
+    "task_contract_sha256": "3247019405e5d38f5cfe562f6f10835076f2a4d26778096fc3eb938465ec2ecb",
     "task_id": "FORGE_RELIABILITY_AUDIT_CONTINUATION_V1"
   }
 }
