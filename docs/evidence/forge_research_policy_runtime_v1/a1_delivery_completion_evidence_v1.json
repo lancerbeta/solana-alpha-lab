@@ -24,7 +24,7 @@
     "catalog/schemas/hypothesis_forge_session_receipt_v1_4.schema.json": "0db867b2a93423a55b79210f9ce7d7f02d15885234f69328142193dafc9b1e1e",
     "docs/PROJECT_MAP.md": "449418f561acd7adc8717c4f978e9c96a5f4ed55465e90d795a42aa97acc69fc",
     "docs/contracts/forge_research_policy_runtime_v1.md": "394646b7725efb5fbd8a16c944f83794bee702f8ba8fe52b11740bb50be1a550",
-    "docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json": "6f727f8bd672fdee433f1295f7c3e70e06deb8d35aa91edd65649ed3a0218ed9",
+    "docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json": "e1df8b2b3c3e982ba51aaba0d4003643d61c6003c06b927dc470dd2ad1495372",
     "docs/evidence/forge_research_policy_runtime_v1/a1_semantic_premise_packet_v1.json": "a0a44671c8922fbac2a73e1277ab04b579d5b4c2a0e958a3b295365b51d162b7",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "ba6d87c72a7ed038643154f521514fa18e124c0d89fa6cea07f2cf2be9766a55",
     "docs/tasks/FORGE_RESEARCH_POLICY_RUNTIME_V1.md": "01ac1b1f7f6401467e571e0b53210c1619ed0fd760f7f48aad39002b8e8d30f8",
@@ -41,7 +41,7 @@
     "src/solana_alpha_lab/factory/hfic_session.py": "a1298b87b2a0ad5401ad91dc9aef4557fcbf4992271003e637750dc1dc64abc7",
     "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "b610e0bf27de6a129330270fe5cbf48cb05d5d0dd1f67b00587ac5fd59c3f42a",
     "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "46d79033e655c67caafcc456d5aaba653cd851014163491bbe3deb23a0866a8c",
-    "tests/test_hfic_list_aware_vertical_v1.py": "8f709e4b25b8f466b7a2437e586bc042813f24b96b38a22ebf37274fb8a5dead",
+    "tests/test_hfic_list_aware_vertical_v1.py": "c65e1e16ec06ddb108310029e05da16d9af16fa044a9566c7257d9b362e6ecfd",
     "tests/test_hfic_market_evidence_epoch_decision_basis_v2.py": "6816dfdfc4f201bd8693506953fd0707b6573100eccf3fe1dc1d86dd8bafdc47",
     "tests/test_hfic_research_policy_closure_v1.py": "31e0be4eb57af256a9ef72542e542ab8b702fd38fad22440c282ad203c2640d7",
     "tests/test_hfic_research_policy_v1.py": "87c53cd0577744697f3e808240ae2cb47093ac842a9dc83da3b4e67a4ba5bfae",
@@ -58,14 +58,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_research_policy_runtime_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "beceb678e7c3c8187e31bf43ad330dee4e40bc850b8245216cdf1a6a84232788",
+    "sha256": "a100cd539c9bbb10ba4707f23dcb77117e85ecefe55132c1eaff17fff0d0cea8",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_MICRO_VERTICAL_PRD15_THROUGH_PUBLIC_CLI;PASS_AUTO_CYCLE_1_TO_2_THIRD_DENIED;PASS_TWO_PROCESS_LAST_SLOT_RACE;PASS_PREVIEW_GATE_EPISODE_VIEW;PASS_10_CANDIDATES_PRIMARY_9_RUNNER_UP_10_TO_SYNTHESIS_COMPLETE;PASS_OWNER_P1_A_LINEAGE_ACCOUNTING;PASS_OWNER_P1_B_ATOMIC_EXTENSION_SET;PASS_OWNER_P1_C_PREVIEW_RESUME;PASS_OWNER_P1_D_WIDE_NEGATIVE_TERMINAL;RED_ON_E447DC55_07137252_3AB3B96E_GREEN_NOW;PASS_CYCLE_TWO_NORMALIZED_VERTICAL_REAL_EPISODE_FIXTURE;PASS_CAPABILITY_FINGERPRINT_NEW_SCHEMAS_METAMORPHIC;PASS_MIXED_ABLATION_EXISTING_CLASS;CI_IS_THE_FULL_GATE;PASS_REGRESSION_AFFECTED_SUITES",
     "independent_review": {
       "path": "docs/evidence/forge_research_policy_runtime_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "ea63b86aece3bfc62a3b1550cf0898abee928e17ada00d3ecd8e6b3490676df2",
+      "sha256": "9ed598c5b86d0e0b1841e91a4896ea86f2e84282fe75ce579f4a159279046bf8",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
