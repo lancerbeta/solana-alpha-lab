@@ -1159,6 +1159,29 @@ def _completed_run_passport(
     return passport
 
 
+def _assert_stable_id_lineage(related: Sequence[ResearchEvent]) -> None:
+    """The same stable identity may evolve only along one explicit record chain."""
+    by_id = {record.record_id: record for record in related}
+    ancestors: dict[str, set[str]] = {}
+    for record in related:
+        seen: set[str] = set()
+        parent = record.supersedes_record_id
+        while parent in by_id:
+            if parent == record.record_id or parent in seen:
+                raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
+            seen.add(parent)
+            parent = by_id[parent].supersedes_record_id
+        ancestors[record.record_id] = seen
+    for index, record in enumerate(related):
+        for previous in related[:index]:
+            if (
+                previous.payload_sha256 != record.payload_sha256
+                and previous.record_id not in ancestors[record.record_id]
+                and record.record_id not in ancestors[previous.record_id]
+            ):
+                raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
+
+
 class ResearchStore:
     """One-writer immutable research log rooted outside Git."""
 
@@ -1653,6 +1676,31 @@ class ResearchStore:
             if duplicate:
                 raise ResearchStoreError("DUPLICATE_RECORD_ID")
 
+            # A candidate's predecessor can change between packet construction
+            # and writer admission. Validate while holding the lease, before
+            # publishing the partition; a stale branch leaves no durable row.
+            new_hypotheses = [record for record in prepared
+                              if record.record_kind == RecordKind.HYPOTHESIS_VERSION]
+            if new_hypotheses:
+                selected_ids = {
+                    _projection_stable_id(record, _payload_object(record))
+                    for record in new_hypotheses
+                }
+                related: dict[str, list[ResearchEvent]] = {
+                    stable_id: [] for stable_id in selected_ids
+                }
+                for record in self.iter_committed_records():
+                    if record.record_kind != RecordKind.HYPOTHESIS_VERSION:
+                        continue
+                    stable_id = _projection_stable_id(record, _payload_object(record))
+                    if stable_id in related:
+                        related[stable_id].append(record)
+                for record in new_hypotheses:
+                    stable_id = _projection_stable_id(record, _payload_object(record))
+                    related[stable_id].append(record)
+                for lineage in related.values():
+                    _assert_stable_id_lineage(lineage)
+
             parquet_path = _target_path(
                 self._root,
                 manifest.logical_location,
@@ -1948,25 +1996,7 @@ class ResearchStore:
             key = (str(record.record_kind), stable_id)
             stable_ids.setdefault(key, []).append(record)
         for related in stable_ids.values():
-            by_id = {record.record_id: record for record in related}
-            ancestors: dict[str, set[str]] = {}
-            for record in related:
-                seen: set[str] = set()
-                parent = record.supersedes_record_id
-                while parent in by_id:
-                    if parent == record.record_id or parent in seen:
-                        raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
-                    seen.add(parent)
-                    parent = by_id[parent].supersedes_record_id
-                ancestors[record.record_id] = seen
-            for index, record in enumerate(related):
-                for previous in related[:index]:
-                    if (
-                        previous.payload_sha256 != record.payload_sha256
-                        and previous.record_id not in ancestors[record.record_id]
-                        and record.record_id not in ancestors[previous.record_id]
-                    ):
-                        raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
+            _assert_stable_id_lineage(related)
 
         projection_path = _target_path(
             self._root,

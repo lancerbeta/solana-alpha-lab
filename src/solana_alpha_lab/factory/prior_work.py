@@ -302,9 +302,15 @@ def _eligible_rows(
     )
 
 
+def _same_session(row: Mapping[str, Any], session_id: str | None) -> bool:
+    """Legacy unbound records match legacy cards; known sessions stay separate."""
+    return row.get("session_id") == session_id
+
+
 def _derived_state(
     hypothesis_version_id: str,
     *,
+    session_id: str | None = None,
     decisions: Sequence[Mapping[str, Any]],
     runs: Sequence[Mapping[str, Any]],
 ) -> str:
@@ -312,6 +318,7 @@ def _derived_state(
         row
         for row in decisions
         if row.get("hypothesis_version_id") == hypothesis_version_id
+        and _same_session(row, session_id)
         and row.get("decision_kind") in STATE_BY_DECISION
     ]
     if eligible_decisions:
@@ -328,6 +335,7 @@ def _derived_state(
         row
         for row in runs
         if row.get("hypothesis_version_id") == hypothesis_version_id
+        and _same_session(row, session_id)
         and row.get("scientific_terminal")
         and row.get("run_event_kind") in {"RUN_COMPLETED", "RUN_INVALID"}
     ]
@@ -382,6 +390,7 @@ def query_hypotheses(
             ),
             "derived_state": _derived_state(
                 row["hypothesis_version_id"],
+                session_id=row.get("session_id"),
                 decisions=decisions,
                 runs=runs,
             ),
@@ -445,20 +454,25 @@ def query_data_plane_prior_work(
     results: list[dict[str, Any]] = []
     for hypothesis in hypotheses:
         version_id = hypothesis["hypothesis_version_id"]
+        session_id = hypothesis.get("session_id")
         related_runs = [
             row for row in runs if row["hypothesis_version_id"] == version_id
+            and _same_session(row, session_id)
         ]
         related_events = [
             row for row in events if row["hypothesis_version_id"] == version_id
+            and _same_session(row, session_id)
         ]
         related_evidence = [
             row
             for row in evidence
-            if row["hypothesis_version_id"] == version_id
-            or any(row["run_id"] == run["run_id"] for run in related_runs)
+            if _same_session(row, session_id)
+            and (row["hypothesis_version_id"] == version_id
+                 or any(row["run_id"] == run["run_id"] for run in related_runs))
         ]
         related_gaps = [
             row for row in gaps if row["hypothesis_version_id"] == version_id
+            and _same_session(row, session_id)
         ]
         candidate = {
             **hypothesis,
@@ -512,6 +526,7 @@ def query_data_plane_prior_work(
         results.append(
             {
                 "hypothesis_version_id": version_id,
+                "session_id": session_id,
                 "family_id": hypothesis.get("family_id"),
                 "definition_sha256": hypothesis.get("definition_sha256"),
                 "score": score,
@@ -542,6 +557,7 @@ def query_data_plane_prior_work(
                 ),
                 "current_state_as_of": _derived_state(
                     version_id,
+                    session_id=session_id,
                     decisions=related_events,
                     runs=related_runs,
                 ),

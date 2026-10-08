@@ -67,6 +67,7 @@ _CAPABILITY_PROTOCOL_FILES = (
     "src/solana_alpha_lab/factory/hfic_representation_probe.py",
     "src/solana_alpha_lab/factory/hfic_memory_policy.py",
     "src/solana_alpha_lab/factory/research_store.py",
+    "src/solana_alpha_lab/factory/prior_work.py",
     "src/solana_alpha_lab/factory/live_cohort_to_forge.py",
     "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py",
     "src/solana_alpha_lab/factory/hfic_scientific_disposition.py",

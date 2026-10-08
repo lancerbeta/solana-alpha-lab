@@ -204,17 +204,15 @@ class SessionHistoryTests(unittest.TestCase):
 
     def test_branching_history_remains_a_stable_identity_conflict(self):
         from solana_alpha_lab.factory.research_store import ResearchStoreError
-        store=self._store_chain(fork=True)
         with self.assertRaisesRegex(ResearchStoreError,'DUPLICATE_STABLE_ID_CONFLICT'):
-            store.rebuild_projection()
+            self._store_chain(fork=True)
 
     def test_missing_and_cyclic_predecessors_cannot_legalize_history(self):
         from solana_alpha_lab.factory.research_store import ResearchStoreError
         for parent in ('ABSENT-PREDECESSOR','HYP-ROW-2'):
             with self.subTest(parent=parent):
-                store=self._store_chain(last_parent=parent)
                 with self.assertRaisesRegex(ResearchStoreError,'DUPLICATE_STABLE_ID_CONFLICT'):
-                    store.rebuild_projection()
+                    self._store_chain(last_parent=parent)
 
     def test_changed_definition_cannot_reuse_same_candidate_history(self):
         from solana_alpha_lab.factory.hfic_session import _session_hypothesis_supersedes,HficSessionError
@@ -224,6 +222,52 @@ class SessionHistoryTests(unittest.TestCase):
             _session_hypothesis_supersedes(store,'HYP-SAME','b'*64)
         self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
         self.assertEqual(_session_hypothesis_supersedes(store,'HYP-SAME','a'*64),'HYP-ROW-2')
+
+    def test_pending_new_session_does_not_inherit_old_projection_or_prior_status(self):
+        from datetime import timedelta
+        from tests.test_research_store import event_fixture, canonical_payload, NOW
+        from solana_alpha_lab.factory.prior_work import query_hypotheses, query_data_plane_prior_work
+        store=self._store_chain()
+        def decision(record_id, session, kind, second):
+            payload={'decision_event_id':record_id,'hypothesis_version_id':'HYP-SAME','session_id':session,'decision_kind':kind,'reason_code':'SYNTHETIC_FIXTURE_ONLY'}
+            body,digest=canonical_payload(payload)
+            return event_fixture(record_id=record_id,record_kind='DECISION_EVENT',transaction_id='RESEARCH-TXN-'+record_id,payload=payload).model_copy(update={'hypothesis_version_id':'HYP-SAME','run_id':None,'payload_json':body,'payload_sha256':digest,'effective_at':NOW+timedelta(seconds=second)})
+        run_payload={'run_id':'RUN-OLD','session_id':'SESS-0','scientific_terminal':'RETAINED'}
+        run_body,run_digest=canonical_payload(run_payload)
+        old_run=event_fixture(record_id='RUN-OLD-ROW',record_kind='RUN_COMPLETED',transaction_id='RESEARCH-TXN-RUN-OLD',payload=run_payload).model_copy(update={'run_id':'RUN-OLD','hypothesis_version_id':'HYP-SAME','payload_json':run_body,'payload_sha256':run_digest,'effective_at':NOW+timedelta(seconds=3)})
+        store.append([old_run],transaction_id=old_run.transaction_id)
+        projection=Path(self.tmp.name)/'projections'/'research_memory.duckdb'
+        store.rebuild_projection()
+        run_only=query_hypotheses(projection,'2026-08-25T12:30:10Z')
+        self.assertEqual({row['session_id']:row['derived_state'] for row in run_only},{'SESS-0':'RETAINED','SESS-1':'NO_DECISION','SESS-2':'NO_DECISION'})
+        old=decision('DEC-OLD','SESS-0','REJECT',4)
+        store.append([old],transaction_id=old.transaction_id)
+        store.rebuild_projection()
+        def assert_states(expected):
+            rows=query_hypotheses(projection,'2026-08-25T12:30:10Z')
+            self.assertEqual({row['session_id']:row['derived_state'] for row in rows},expected)
+            query={'query_id':'SESSION-BOUND-PRIOR-001','as_of':'2026-08-25T12:30:10Z','max_results':3,'predicates':{'hypothesis_version_ids':['HYP-SAME']}}
+            result=query_data_plane_prior_work(projection,query)
+            self.assertEqual(result['result_count'],3)
+            self.assertEqual({row['session_id']:row['current_state_as_of'] for row in result['results']},expected)
+            self.assertEqual({row['session_id']:row['decision_kinds'] for row in result['results']},{s:(['REJECT'] if state=='REJECTED' else ['PAUSE'] if state=='PAUSED' else []) for s,state in expected.items()})
+        assert_states({'SESS-0':'REJECTED','SESS-1':'NO_DECISION','SESS-2':'NO_DECISION'})
+        current=decision('DEC-NEW','SESS-2','PAUSE',4)
+        store.append([current],transaction_id=current.transaction_id)
+        store.rebuild_projection()
+        assert_states({'SESS-0':'REJECTED','SESS-1':'NO_DECISION','SESS-2':'PAUSED'})
+
+    def test_stale_hypothesis_predecessor_refuses_before_durable_append(self):
+        from tests.test_research_store import event_fixture, NOW
+        from datetime import timedelta
+        from solana_alpha_lab.factory.research_store import ResearchStoreError
+        store=self._store_chain()
+        before=store.diagnostics().committed_inventory_sha256
+        stale=event_fixture(record_id='HYP-ROW-STALE',record_kind='HYPOTHESIS_VERSION',transaction_id='RESEARCH-TXN-HYP-STALE',payload={'hypothesis_version_id':'HYP-SAME','session_id':'SESS-STALE','definition_sha256':'a'*64}).model_copy(update={'run_id':None,'effective_at':NOW+timedelta(seconds=5),'supersedes_record_id':'HYP-ROW-1'})
+        with self.assertRaisesRegex(ResearchStoreError,'DUPLICATE_STABLE_ID_CONFLICT'):
+            store.append([stale],transaction_id=stale.transaction_id)
+        self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
+        self.assertEqual(len(list(store.iter_committed_records())),3)
 
     def test_other_session_decision_does_not_become_current_card_outcome(self):
         from solana_alpha_lab.factory.hfic_prior_memory import compact_prior_entry
@@ -239,7 +283,7 @@ class SessionHistoryTests(unittest.TestCase):
 class CapabilityBindingTests(unittest.TestCase):
     def test_changed_direct_owners_are_part_of_capability_provenance(self):
         from solana_alpha_lab.factory.hfic_evidence_identity import _CAPABILITY_PROTOCOL_FILES
-        for owner in ('hfic_research_policy.py','hfic_ordinary_operation.py','hfic_card_projection.py','hfic_prior_memory.py','hfic_suppression_semantics.py'):
+        for owner in ('hfic_research_policy.py','hfic_ordinary_operation.py','hfic_card_projection.py','hfic_prior_memory.py','hfic_suppression_semantics.py','prior_work.py'):
             self.assertIn('src/solana_alpha_lab/factory/'+owner,_CAPABILITY_PROTOCOL_FILES)
 
 

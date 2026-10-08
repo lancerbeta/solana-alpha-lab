@@ -33,6 +33,8 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hfic_research_policy.py
 - src/solana_alpha_lab/factory/hfic_evidence_identity.py
 - src/solana_alpha_lab/factory/research_store.py
+- src/solana_alpha_lab/factory/prior_work.py
+- schemas/research_memory_projection_v1.sql
 - scripts/hypothesis_forge.py
 - scripts/delivery_harness.py
 - tests/test_preflight_shadow_pin_drift.py
@@ -174,3 +176,10 @@ new evidence: session-scoped record IDs, existing explicit record supersession
 and transitive linear projection validation, source DEC readback on failover,
 and no known-other-session verdict attribution. Candidate/definition identity,
 raw old outcomes, budget/admission/family-close authority remain bound.
+
+Direct history read consumers: schemas/research_memory_projection_v1.sql and
+src/solana_alpha_lab/factory/prior_work.py bind HYP/DEC/RUN/related prior work
+by known session; legacy unbound matches only legacy unbound. Writer lease
+checks HYP lineage before immutable publication, so a raced stale predecessor
+refuses with zero durable writes. These paths are included to close the same
+D10 finding, not to widen the research or evidence authority.

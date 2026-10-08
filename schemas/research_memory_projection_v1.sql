@@ -37,6 +37,7 @@ CREATE TABLE _projection_metadata (
 CREATE VIEW hypotheses AS
 SELECT
     stable_id AS hypothesis_version_id,
+    json_extract_string(payload_json, '$.session_id') AS session_id,
     json_extract_string(payload_json, '$.family_id') AS family_id,
     TRY_CAST(json_extract_string(payload_json, '$.version_ordinal') AS INTEGER)
         AS version_ordinal,
@@ -87,6 +88,8 @@ SELECT
             FROM _research_events AS decision
             WHERE decision.record_kind = 'DECISION_EVENT'
               AND decision.hypothesis_version_id = hypothesis.stable_id
+              AND json_extract_string(decision.payload_json, '$.session_id')
+                  IS NOT DISTINCT FROM json_extract_string(hypothesis.payload_json, '$.session_id')
             ORDER BY
                 decision.effective_at DESC,
                 decision.first_reliable_available_at DESC,
@@ -98,6 +101,8 @@ SELECT
             FROM _research_events AS run
             WHERE run.record_kind IN ('RUN_COMPLETED', 'RUN_INVALID')
               AND run.hypothesis_version_id = hypothesis.stable_id
+              AND json_extract_string(run.payload_json, '$.session_id')
+                  IS NOT DISTINCT FROM json_extract_string(hypothesis.payload_json, '$.session_id')
             ORDER BY
                 run.effective_at DESC,
                 run.first_reliable_available_at DESC,
@@ -115,6 +120,7 @@ SELECT
     record_kind AS event_kind,
     stable_id,
     hypothesis_version_id,
+    json_extract_string(payload_json, '$.session_id') AS session_id,
     json_extract_string(payload_json, '$.decision_kind') AS decision_kind,
     json_extract_string(payload_json, '$.derivation_kind') AS derivation_kind,
     json_extract_string(payload_json, '$.activation_epoch_id')
@@ -135,6 +141,7 @@ CREATE VIEW experiment_runs AS
 SELECT
     stable_id AS run_id,
     hypothesis_version_id,
+    json_extract_string(payload_json, '$.session_id') AS session_id,
     record_kind AS run_event_kind,
     run_key_sha256,
     json_extract_string(payload_json, '$.trial_id') AS trial_id,
@@ -189,6 +196,7 @@ SELECT
     stable_id AS evidence_binding_id,
     run_id,
     hypothesis_version_id,
+    json_extract_string(payload_json, '$.session_id') AS session_id,
     json_extract_string(payload_json, '$.binding_kind') AS binding_kind,
     json_extract_string(payload_json, '$.content_sha256') AS content_sha256,
     json_extract_string(payload_json, '$.logical_uri') AS logical_uri,
@@ -223,6 +231,7 @@ WHERE record_kind = 'PROMOTION_CANDIDATE';
 CREATE VIEW prior_work AS
 SELECT
     stable_id AS hypothesis_version_id,
+    json_extract_string(payload_json, '$.session_id') AS session_id,
     json_extract_string(payload_json, '$.family_id') AS family_id,
     definition_sha256,
     json_extract_string(payload_json, '$.statement') AS statement,
@@ -261,6 +270,7 @@ CREATE VIEW capability_gaps AS
 SELECT
     stable_id AS capability_gap_id,
     hypothesis_version_id,
+    json_extract_string(payload_json, '$.session_id') AS session_id,
     run_id,
     json_extract_string(payload_json, '$.capability_id') AS capability_id,
     json_extract_string(payload_json, '$.reason_code') AS reason_code,
