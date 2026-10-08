@@ -61,6 +61,7 @@ class RssKernelBoundaryTests(unittest.TestCase):
         cases = [FileNotFoundError(), PermissionError(), UnicodeError(), '',
                  'VmHWM: 0 kB\n', 'VmHWM: -1 kB\n', 'VmHWM: 1 MB\n',
                  'VmHWM: 1.5 kB\n', 'VmHWM: 123 kB extra\n',
+                 'VmHWM:garbage 1 kB\n', 'VmHWM:\x00 1 kB\n',
                  'VmHWM: 123 kB\nVmHWM: 456 kB\n']
         for proc in cases:
             with self.subTest(proc=str(proc)):

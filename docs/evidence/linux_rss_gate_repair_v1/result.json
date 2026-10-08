@@ -34,7 +34,8 @@
   "tdd": [
     "INHERITED_PEAK_AND_TRUE_PEAK_UNIT_RED_BEFORE_REPAIR",
     "MISSING_METRIC_ZERO_FILL_RED_BEFORE_GUARD",
-    "GREEN_AFTER_REPAIR"
+    "GREEN_AFTER_REPAIR",
+    "MALFORMED_KEY_TWO_SUBCASES_RED_THEN_GREEN_WITH_EXACT_VMHWM_LABEL_GUARD"
   ],
   "adverse_real_child_after_free": {
     "allocation_mib": 600,
@@ -58,15 +59,16 @@
   "final_workflow": "BYTE_IDENTICAL_TO_ANCHOR_NO_DIAGNOSTIC_WORKFLOW_OR_SCRIPT_ON_MAIN",
   "forge_h08_h09": "RETAINED_NOT_RERUN",
   "production_data_vps_provider_deploy": "NOT_TOUCHED",
-  "source_pins": {
-    "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "278d4ac80c28c67f3c5bd2fdee2a5ef435b97d676f6f859824a3399cdcdcffce",
-    "src/solana_alpha_lab/factory/observation_panel_publisher.py": "f7c529bae484b6a5224e9b926e9850002246c230330230c599c7132991d53ce6",
-    "tests/test_legacy_fat_open_bounded_artifacts_resume_v1.py": "eaed00e2f4a56eb1106e822c93c8a2f4cafcbd77f8e9794900c34ee7e7ddfd81"
-  },
   "references": [
     "https://docs.kernel.org/filesystems/proc.html",
     "https://www.man7.org/linux/man-pages/man2/getrusage.2.html"
   ],
   "delivery": "PENDING_REVIEWS_EXACT_HEAD_CI_AND_GUARDED_MERGE",
-  "canonical_done_or_alpha": false
+  "canonical_done_or_alpha": false,
+  "targeted_proof_source_pins": {
+    "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "278d4ac80c28c67f3c5bd2fdee2a5ef435b97d676f6f859824a3399cdcdcffce",
+    "src/solana_alpha_lab/factory/observation_panel_publisher.py": "f7c529bae484b6a5224e9b926e9850002246c230330230c599c7132991d53ce6",
+    "tests/test_legacy_fat_open_bounded_artifacts_resume_v1.py": "eaed00e2f4a56eb1106e822c93c8a2f4cafcbd77f8e9794900c34ee7e7ddfd81"
+  },
+  "targeted_proof_scope": "Producer edc544bb3de42ed4f5dd9848dbf4a1655cb9c2da; final strict VmHWM label guard is additional review remediation, final exact-head Linux CI pending"
 }

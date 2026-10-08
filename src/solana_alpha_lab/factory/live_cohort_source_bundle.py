@@ -188,8 +188,8 @@ def peak_rss_bytes() -> int:
                 if line.startswith("VmHWM:")
             ]
             if len(rows) == 1:
-                _key, value, unit = rows[0]
-                if unit == "kB" and value.isdecimal() and int(value) > 0:
+                key, value, unit = rows[0]
+                if key == "VmHWM:" and unit == "kB" and value.isdecimal() and int(value) > 0:
                     return int(value) * 1024
         except (OSError, UnicodeError, ValueError):
             pass
