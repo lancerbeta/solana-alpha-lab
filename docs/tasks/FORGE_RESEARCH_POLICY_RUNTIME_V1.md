@@ -8,9 +8,9 @@ allowed_routes: [DIRECT_CLAUDE_CODE_DELIVERY]
 required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 04ec8e0286a3dce5999d0687784717ee90fc5dca
+  expected_base: 20294a7677f14e93f8bb5dd6b4d339f2e15302d5
   expected_upstream: origin/main
-  expected_upstream_oid: 04ec8e0286a3dce5999d0687784717ee90fc5dca
+  expected_upstream_oid: 20294a7677f14e93f8bb5dd6b4d339f2e15302d5
   expected_branch: claude/forge-research-policy-runtime-v1
   dirty_mode: ALLOW_REPORTED
 objective: >-

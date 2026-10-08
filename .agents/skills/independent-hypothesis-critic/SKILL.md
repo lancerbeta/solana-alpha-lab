@@ -153,6 +153,17 @@ the required isolated context.
 
 ## Grounded evidence
 
+The selected card declares its machine scope in top-level scalar axes.
+Compare those axes with the bound look, including representation/list rule;
+do not recover missing authored intent through prose or RDP archaeology.
+Fresh malformed transport should refuse before persistence; an incomplete
+historical packet stays incomplete. `tier_progress.freeze_worthy` is a caller
+routing hint (`CALLER_ROUTING_HINT_NOT_SCIENTIFIC_VERDICT` on new outputs).
+False alone is not evidence insufficiency and not a standalone KILL reason;
+READY_TO_FREEZE alone is not scientific PASS. Actual support, PIT, missingness,
+grounding and test design still require independent assessment. A legacy hint
+has the known protocol interpretation, not a reconstructed historical verdict.
+
 When `grounded_evidence` is present, judge that computation: denominators,
 missingness, query refs, and temporal support. A `PREDICTIVE` claim does not
 need a proven actor story. Do not invent one. A `CAUSAL` claim keeps the

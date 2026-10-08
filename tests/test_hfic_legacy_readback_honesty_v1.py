@@ -33,7 +33,7 @@ from solana_alpha_lab.factory.observation_schedule_compiler import compile_obser
 from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, ResearchStore
 from tests.test_hfic_cli import run_cli, seed_minimal_market_basis
 from tests.test_hfic_provenance_clock import _placeholder_event
-from tests.test_hfic_session import _critic_result, finalize_kill_complete, valid_draft
+from tests.test_hfic_session import _critic_result, _persist_frozen_portfolio, finalize_kill_complete, valid_draft
 from tests.test_observation_fast_lane_routing_closure import AS_OF_START, v1_2_spec
 
 FIXTURES = ROOT / "tests/fixtures/hypothesis_forge/legacy_shapes"
@@ -102,13 +102,7 @@ def _fresh_completed(store: ResearchStore) -> str:
         "git_composite_sha256": snap.composite_sha256,
     }
     frozen = freeze_draft(draft, preflight_receipt=receipt)
-    persist_frozen_session(
-        store,
-        frozen,
-        repo_root=ROOT,
-        identities=assign_portfolio_ids(draft["candidates"]),
-        draft=draft,
-    )
+    _persist_frozen_portfolio(store, frozen, draft)
     finalize_kill_complete(
         frozen,
         _critic_result(frozen, "KILL_PREPARATORY_LOOP"),

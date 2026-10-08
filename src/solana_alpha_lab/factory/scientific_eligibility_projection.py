@@ -697,6 +697,48 @@ def try_project_scientific_eligibility_from_data_root(
     error instead of silently applying factory 300+300.
     """
 
+    # A frozen temporal replay is bound to its own admitted release files, not
+    # to the unrelated expected C1 corpus. Keep the existing C1 route intact.
+    if (isinstance(spec, Mapping) and spec.get("schema_version") == "1.3"
+            and spec.get("capability_id") == "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001"
+            and isinstance(spec.get("observation_request"), Mapping)
+            and spec["observation_request"].get("collection_mode") == "REUSE_ONLY"):
+        from solana_alpha_lab.factory.hfic_temporal_discovery import bind_frozen_fixed_time_inputs
+        from solana_alpha_lab.factory.data_resolver import resolve_evidence_bindings, EvidenceResolutionError
+        from solana_alpha_lab.factory.hfic_grounded_discovery import GroundedDiscoveryError
+
+        try:
+            resolve_evidence_bindings(spec, root=repo_root, data_root=data_root)
+            _public, bound, partitions, frozen = bind_frozen_fixed_time_inputs(spec, data_root=Path(data_root))
+            recipe = spec["parameters"]["temporal_recipe"]
+            if recipe.get("scientific_identity") != bound["spec_sha256"]:
+                raise ScientificEligibilityError("EXPERIMENT_RECIPE_IDENTITY_MISMATCH")
+            schedules = {str(item.get("schedule_sha256") or "") for item in frozen}
+            if len(schedules) != 1:
+                raise ScientificEligibilityError(CANONICAL_SCHEDULE_UNBOUND)
+            canonical_schedule = load_hashed_schedule_document(Path(data_root), next(iter(schedules)))
+            census_rows, observation_rows = [], []
+            seen_release_mints: set[str] = set()
+            for _cohort, census_path, observations_path in partitions:
+                census, observations = load_projection_tables(census_path, observations_path)
+                release_mints = {_mint(row) for row in census if _mint(row)}
+                # The existing C1 projector keys seats/cells by mint. It cannot
+                # prove multiple frozen decisions for one mint without losing
+                # their identity; refuse before another release's Y can heal it.
+                if seen_release_mints & release_mints:
+                    raise ScientificEligibilityError("FROZEN_CROSS_RELEASE_ENTITY_UNRESOLVED")
+                seen_release_mints.update(release_mints)
+                census_rows.extend(census)
+                observation_rows.extend(observations)
+            return project_scientific_eligibility(
+                census_rows, observation_rows, spec=spec, schedule=schedule,
+                canonical_schedule=canonical_schedule, require_canonical_schedule=True,
+                release_binding={"source_kind": "FROZEN_TEMPORAL_RECIPE",
+                                 "scientific_identity": bound["spec_sha256"], "frozen_input": frozen},
+            )
+        except (GroundedDiscoveryError, EvidenceResolutionError) as exc:
+            raise ScientificEligibilityError(str(exc.code)) from exc
+
     try:
         pins = lineage_canonical_corpus_pins(
             Path(data_root), repo_root=Path(repo_root)

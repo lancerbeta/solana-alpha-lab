@@ -19821,7 +19821,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/delivery_harness.py', repository_path: scripts/delivery_harness.py}
-  integrity: {kind: sha256, sha256: c764025cf76c0019b139e30bda2c482cfc166ac76fa555a67776dcde8055abf0}
+  integrity: {kind: sha256, sha256: c44173c6ec2697ceefb29de120cab7497ba0061bffd3fbdb981d7c490083eab1}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-DELIVERY-HARNESS-001}
@@ -32203,7 +32203,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_fast_lane_runner.py', repository_path: tests/test_fast_lane_runner.py}
-  integrity: {kind: sha256, sha256: b5b3512f5a66d70dd72072e194282daf4fb8a3983efed09c4d91ae8a3998239d}
+  integrity: {kind: sha256, sha256: 0ca834d7585e40113b1149c7fc3f8a0df7380ffb100de686e074f1143d55dc40}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32352,7 +32352,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 60be13f2f202798779985c0c0414720d96b550118733ae12eb7e1a5bcc644881}
+  integrity: {kind: sha256, sha256: 73cbf682364a640d0ed4aa51077483f4734d2eaa1c789af21fbc906478767694}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32374,7 +32374,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 47fcf21279175481325689653e5e925ba8d1e7ed0658e4a8b630b2e42ad2ec0b}
+  integrity: {kind: sha256, sha256: a1298b87b2a0ad5401ad91dc9aef4557fcbf4992271003e637750dc1dc64abc7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -33250,7 +33250,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_compiler.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_compiler.py}
-  integrity: {kind: sha256, sha256: f81160d5b46d0875be3daea5fe5e97259a45cd18fcabe1802ea0bb82f04fc00a}
+  integrity: {kind: sha256, sha256: 75cce90f7bd3b274d6648bc50cb8a2ebdeb4479e13622ac06f08e4f31708656c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -34658,7 +34658,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 9dd5aef02ca1441270438ec029a7b79dfda8f862d300c9b6e3104689c1a0223d}
+  integrity: {kind: sha256, sha256: ba6d87c72a7ed038643154f521514fa18e124c0d89fa6cea07f2cf2be9766a55}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -34678,7 +34678,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: eaae58729556a4fa3b257dca18054814f89c52cc32e72c87f9d5266b370d0aaf}
+  integrity: {kind: sha256, sha256: 2ee5d94ff03bff3230245a42364c446fa947dc5db070c036404b79aeecb3e49d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37993,7 +37993,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: dd96b58714e32a93ebe75bc7236ea6af52189b50d10b1720a3684326aae2a694}
+  integrity: {kind: sha256, sha256: b610e0bf27de6a129330270fe5cbf48cb05d5d0dd1f67b00587ac5fd59c3f42a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -38156,7 +38156,7 @@ records:
   as_of: '2026-09-18'
   truth_owner: HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/scientific_eligibility_projection.py', repository_path: src/solana_alpha_lab/factory/scientific_eligibility_projection.py}
-  integrity: {kind: sha256, sha256: d2623fb5dccd2ebc9066a6af7e792fbdce9e450b0f1959be7dd234a9f094d746}
+  integrity: {kind: sha256, sha256: ce4ee5b56f6528cfb2e0b3ce49c7ee1736bf0854fd4a724e8d37172d75eaa91b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001}
@@ -38175,7 +38175,7 @@ records:
   as_of: '2026-09-18'
   truth_owner: HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_scientific_eligibility_projection_v1.py', repository_path: tests/test_scientific_eligibility_projection_v1.py}
-  integrity: {kind: sha256, sha256: 82698e9c13f3ed29bff8e9346d8ce1b793a057ee767204acb7b670343d3f9b77}
+  integrity: {kind: sha256, sha256: 4adebcbabe26e81049b6fd1b27578344ac274aa7cd65dc0376d82dccd1274a76}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001}
@@ -40404,24 +40404,6 @@ records:
   evidence: []
   search_terms: [OPPORTUNITY_EPISODES_BOUNDED_OPERABILITY_V1, delivery evidence, merge boundary]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
-- asset_id: MODULE-HFIC-RESEARCH-POLICY-001
-  record_version: '1.0'
-  asset_type: script
-  purpose: One owner of the Forge research-policy runtime, owner-settable MAIN/ADAPTIVE/PREVIEW/AUTO/distinct-focus/candidate/diagnostic-slice limits, CAS-protected active-policy apply, per-journal frozen snapshots and append-only extensions that never reset spend.
-  status: IMPLEMENTED_UNVERIFIED
-  origin: REPOSITORY
-  as_of: '2026-10-07'
-  truth_owner: FORGE_RESEARCH_POLICY_RUNTIME_V1
-  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_research_policy.py', repository_path: src/solana_alpha_lab/factory/hfic_research_policy.py}
-  integrity: {kind: sha256, sha256: 896715154ddce8a2054090491141ecb7852ef8a75d27c177de84b94ec395d6a2}
-  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
-  relations:
-  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-TEMPORAL-DISCOVERY-001}
-  - {relation_type: governed_by, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}
-  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
-  evidence: []
-  search_terms: [SEM-HYPOTHESIS-FORGE, research policy, budget runtime, MAIN ADAPTIVE PREVIEW limits, AUTO cycles, candidate ceiling, frozen snapshot, run extension]
-  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: MODULE-HFIC-RESEARCH-SCOPE-001
   record_version: '1.0'
   asset_type: script
@@ -40431,7 +40413,7 @@ records:
   as_of: '2026-10-07'
   truth_owner: FORGE_LIST_AWARE_RESEARCH_SCOPE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_research_scope.py', repository_path: src/solana_alpha_lab/factory/hfic_research_scope.py}
-  integrity: {kind: sha256, sha256: 84460069fd8281b13b622da8b153060dff4755add68ad0086de058b29f869477}
+  integrity: {kind: sha256, sha256: 83941e8cfe93159ae2405eb0399354118d3681a6fbbc450a8d0d327e537aa895}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-TEMPORAL-DISCOVERY-001}
@@ -40467,15 +40449,54 @@ records:
   as_of: '2026-10-07'
   truth_owner: FORGE_LIST_AWARE_RESEARCH_SCOPE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_list_aware_research_scope_v1.md', repository_path: docs/contracts/forge_list_aware_research_scope_v1.md}
-  integrity: {kind: sha256, sha256: f03ce1a4c50aa2525003ddf9441f61700a8a6e69d248449289bf86416d8ca84f}
+  integrity: {kind: sha256, sha256: 4d51867df1e7bf1436d34ee706a9468ed381deecf970a45ac7d7a85c76003d3d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-RESEARCH-SCOPE-001}
   - {relation_type: depends_on, target_asset_id: MODULE-NORMALIZED-TRAJECTORY-EPISODES-V1-001}
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-TEMPORAL-DISCOVERY-001}
+  - {relation_type: depends_on, target_asset_id: DOC-FORGE-GROUNDED-HANDOFF-CLOSURE-001}
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
   evidence: []
   search_terms: [SEM-HYPOTHESIS-FORGE, SEM-LIVE-EVIDENCE-TO-FORGE, SEM-MARKET-DATA-FEATURES, SEM-PRIOR-WORK, list-aware, lists as research dimension, list-only hypothesis, source lists A and C, query 1.2]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-FORGE-GROUNDED-HANDOFF-CLOSURE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Fresh flat card scope, canonical ingress and committed context prerequisites for the existing grounded Forge handoff.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-07'
+  truth_owner: FORGE_GROUNDED_HANDOFF_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_grounded_handoff_closure_v1.md', repository_path: docs/contracts/forge_grounded_handoff_closure_v1.md}
+  integrity: {kind: sha256, sha256: fae15d85b56d79edb460ef662f949ec6132e883642543b981101d230291b0840}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-RESEARCH-SCOPE-001}
+  - {relation_type: depends_on, target_asset_id: DOC-HYPOTHESIS-FORGE-OPERATOR-001}
+  - {relation_type: validated_by, target_asset_id: TEST-FORGE-GROUNDED-HANDOFF-CLOSURE-001}
+  - {relation_type: depends_on, target_asset_id: FIXTURE-FORGE-FLAT-SCOPE-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [SEM-HYPOTHESIS-FORGE, grounded handoff, flat candidate scope, canonical roundtrip, context dependency, routing hint]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-HFIC-RESEARCH-POLICY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: One owner of the Forge research-policy runtime, owner-settable MAIN/ADAPTIVE/PREVIEW/AUTO/distinct-focus/candidate/diagnostic-slice limits, CAS-protected active-policy apply, per-journal frozen snapshots and append-only extensions that never reset spend.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-07'
+  truth_owner: FORGE_RESEARCH_POLICY_RUNTIME_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_research_policy.py', repository_path: src/solana_alpha_lab/factory/hfic_research_policy.py}
+  integrity: {kind: sha256, sha256: 896715154ddce8a2054090491141ecb7852ef8a75d27c177de84b94ec395d6a2}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-TEMPORAL-DISCOVERY-001}
+  - {relation_type: governed_by, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [SEM-HYPOTHESIS-FORGE, research policy, budget runtime, MAIN ADAPTIVE PREVIEW limits, AUTO cycles, candidate ceiling, frozen snapshot, run extension]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: DOC-FORGE-RESEARCH-POLICY-RUNTIME-001
   record_version: '1.0'
@@ -40495,4 +40516,53 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
   evidence: []
   search_terms: [SEM-HYPOTHESIS-FORGE, research policy, budget runtime, MAIN ADAPTIVE PREVIEW limits, AUTO cycles, candidate ceiling, frozen snapshot, run extension]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-FORGE-GROUNDED-HANDOFF-CLOSURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Targeted scope, revision, canonical pin and durable dependency regressions at the existing owners.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-07'
+  truth_owner: FORGE_GROUNDED_HANDOFF_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_forge_grounded_handoff_closure_v1.py', repository_path: tests/test_forge_grounded_handoff_closure_v1.py}
+  integrity: {kind: sha256, sha256: fb4a76a87622f18f96398800d81e37ad5bfbf7e98bee556679621db84201c743}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: []
+  consumers: [FACTORY-001, HYPOTHESIS-FORGE]
+  evidence: []
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: FIXTURE-FORGE-FLAT-SCOPE-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Schema-valid authored flat list card example without a result or scientific authority.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-07'
+  truth_owner: FORGE_GROUNDED_HANDOFF_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/fixtures/forge_grounded_handoff_closure_v1/flat_card.json', repository_path: tests/fixtures/forge_grounded_handoff_closure_v1/flat_card.json}
+  integrity: {kind: sha256, sha256: b89a4688fd97147809236d0c2a6b6aedaee56370d3838b88de8efbc57a52210d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: []
+  consumers: [HYPOTHESIS-FORGE]
+  evidence: []
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-FORGE-GROUNDED-HANDOFF-CHECKPOINT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Source-bound native KILL endpoint and supported Spec 1.3 production replay with independent oracle; separate CI and merge authority gates.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-07'
+  truth_owner: FORGE_GROUNDED_HANDOFF_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/forge_grounded_handoff_closure_v1/HANDOFF_CHECKPOINT.md', repository_path: docs/reports/forge_grounded_handoff_closure_v1/HANDOFF_CHECKPOINT.md}
+  integrity:
+    kind: sha256
+    sha256: 832ec85632f509cb518f2673e061d064f1fdd57b401fa845e1b52635ee91c9b4
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: DOC-FORGE-GROUNDED-HANDOFF-CLOSURE-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [SEM-HYPOTHESIS-FORGE, BOUNDED_REPAIR_ENGINEERING_PROVEN, native handoff checkpoint, source-bound frozen replay, unchanged draft recovery]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
