@@ -1,0 +1,103 @@
+{
+  "phase": "BEFORE_REPAIR",
+  "actions": {
+    "databaseId": 37714107620,
+    "headSha": "592a5ff813f3b7f5c24a086264d51d239787aaf5",
+    "event": "workflow_dispatch",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/37714107620"
+  },
+  "job_id": 113106525737,
+  "report": {
+    "anchor": "20294a7677f14e93f8bb5dd6b4d339f2e15302d5",
+    "cases": [
+      {
+        "child": {
+          "max_rss_bytes": 168022016,
+          "provider_calls": 0,
+          "rss_diagnostic": {
+            "after_import": {
+              "ru_maxrss_bytes": 132141056,
+              "vmhwm_bytes": 132141056,
+              "vmrss_bytes": 131260416
+            },
+            "after_workload": {
+              "ru_maxrss_bytes": 168022016,
+              "vmhwm_bytes": 168022016,
+              "vmrss_bytes": 166363136
+            },
+            "at_entry": {
+              "ru_maxrss_bytes": 22589440,
+              "vmhwm_bytes": 22089728,
+              "vmrss_bytes": 21889024
+            }
+          },
+          "source_size": 16778922,
+          "terminal": "FAT_ARTIFACTS_RESUME_COMPLETED"
+        },
+        "child_hwm_comfortable_assertion_pass": true,
+        "original_comfortable_assertion_pass": true,
+        "parent": {
+          "ru_maxrss_bytes": 139542528,
+          "vmhwm_bytes": 22458368,
+          "vmrss_bytes": 22458368
+        },
+        "parent_allocation_mib": 0
+      },
+      {
+        "child": {
+          "max_rss_bytes": 651808768,
+          "provider_calls": 0,
+          "rss_diagnostic": {
+            "after_import": {
+              "ru_maxrss_bytes": 651808768,
+              "vmhwm_bytes": 132104192,
+              "vmrss_bytes": 130772992
+            },
+            "after_workload": {
+              "ru_maxrss_bytes": 651808768,
+              "vmhwm_bytes": 168120320,
+              "vmrss_bytes": 166289408
+            },
+            "at_entry": {
+              "ru_maxrss_bytes": 651808768,
+              "vmhwm_bytes": 22056960,
+              "vmrss_bytes": 21815296
+            }
+          },
+          "source_size": 16778922,
+          "terminal": "FAT_ARTIFACTS_RESUME_COMPLETED"
+        },
+        "child_hwm_comfortable_assertion_pass": true,
+        "original_comfortable_assertion_pass": false,
+        "parent": {
+          "ru_maxrss_bytes": 651808768,
+          "vmhwm_bytes": 651870208,
+          "vmrss_bytes": 651870208
+        },
+        "parent_allocation_mib": 600
+      }
+    ],
+    "historical_ci": 37709815254,
+    "historical_ci_conclusion": "FAILURE",
+    "historical_failed_child_hwm": "UNKNOWN_NOT_RECORDED_IN_RUN37709815254",
+    "hypothesis_confirmed_for_controlled_ci_workload": true,
+    "kind": "UNCHANGED_WORKLOAD_DIAGNOSTIC_NOT_ACCEPTANCE",
+    "limits": {
+      "comfortable_bytes": 536870912,
+      "soft_bytes": 805306368
+    },
+    "producer_sha": "592a5ff813f3b7f5c24a086264d51d239787aaf5",
+    "source_pins": {
+      "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "6c9b418190226ada55702a1569480a05232d1190115447ef8a66ebf2f5488ca9",
+      "src/solana_alpha_lab/factory/observation_panel_publisher.py": "f7c529bae484b6a5224e9b926e9850002246c230330230c599c7132991d53ce6",
+      "tests/test_legacy_fat_open_bounded_artifacts_resume_v1.py": "07eec34d8a05c4198785edf9e34856458bd3bf17e2d8b6f652dfa9ef5735c182"
+    }
+  },
+  "claims": [
+    "CONTROLLED_UNCHANGED_WORKLOAD_CAUSE_CONFIRMED",
+    "HISTORICAL_FAILED_CHILD_HWM_UNKNOWN",
+    "NOT_ACCEPTANCE_CI"
+  ]
+}

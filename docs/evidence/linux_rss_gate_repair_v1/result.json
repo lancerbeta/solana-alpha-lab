@@ -1,0 +1,74 @@
+{
+  "task_id": "LINUX_RSS_GATE_REPAIR_V1",
+  "anchor": "20294a7677f14e93f8bb5dd6b4d339f2e15302d5",
+  "root_cause": "INHERITED_PRE_EXEC_RUSAGE_PEAK_CONFIRMED_ON_UNCHANGED_LINUX_WORKLOAD",
+  "owner": "src/solana_alpha_lab/factory/live_cohort_source_bundle.py:peak_rss_bytes",
+  "repair": "CURRENT_IMAGE_VMHWM_KIB_TO_BYTES_WITH_CONSERVATIVE_RESOURCE_FALLBACK",
+  "before_actions": {
+    "databaseId": 37714107620,
+    "headSha": "592a5ff813f3b7f5c24a086264d51d239787aaf5",
+    "event": "workflow_dispatch",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/37714107620"
+  },
+  "after_actions": {
+    "databaseId": 37714704552,
+    "headSha": "edc544bb3de42ed4f5dd9848dbf4a1655cb9c2da",
+    "event": "workflow_dispatch",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/37714704552"
+  },
+  "linux_targeted": {
+    "cases": 24,
+    "skipped": 0,
+    "verdict": "PASS"
+  },
+  "local_windows": {
+    "kernel_boundary_cases": 5,
+    "real_linux_cases": "NOT_APPLICABLE_WINDOWS_NOT_LINUX_PROOF",
+    "legacy_cases": 17,
+    "verdict": "PASS"
+  },
+  "tdd": [
+    "INHERITED_PEAK_AND_TRUE_PEAK_UNIT_RED_BEFORE_REPAIR",
+    "MISSING_METRIC_ZERO_FILL_RED_BEFORE_GUARD",
+    "GREEN_AFTER_REPAIR",
+    "MALFORMED_KEY_TWO_SUBCASES_RED_THEN_GREEN_WITH_EXACT_VMHWM_LABEL_GUARD"
+  ],
+  "adverse_real_child_after_free": {
+    "allocation_mib": 600,
+    "initial_hwm_bytes": 85184512,
+    "measured_bytes": 714092544,
+    "oracle_after_bytes": 714092544,
+    "oracle_before_bytes": 714092544,
+    "ru_maxrss_bytes": 714092544
+  },
+  "resource_limits": {
+    "comfortable_bytes": 536870912,
+    "soft_bytes": 805306368,
+    "changed": false
+  },
+  "historical_run_37709815254": {
+    "conclusion": "FAILURE",
+    "child_vmhwm": "UNKNOWN_NOT_RECORDED",
+    "relabelled": false,
+    "retried": false
+  },
+  "final_workflow": "BYTE_IDENTICAL_TO_ANCHOR_NO_DIAGNOSTIC_WORKFLOW_OR_SCRIPT_ON_MAIN",
+  "forge_h08_h09": "RETAINED_NOT_RERUN",
+  "production_data_vps_provider_deploy": "NOT_TOUCHED",
+  "references": [
+    "https://docs.kernel.org/filesystems/proc.html",
+    "https://www.man7.org/linux/man-pages/man2/getrusage.2.html"
+  ],
+  "delivery": "PENDING_REVIEWS_EXACT_HEAD_CI_AND_GUARDED_MERGE",
+  "canonical_done_or_alpha": false,
+  "targeted_proof_source_pins": {
+    "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "278d4ac80c28c67f3c5bd2fdee2a5ef435b97d676f6f859824a3399cdcdcffce",
+    "src/solana_alpha_lab/factory/observation_panel_publisher.py": "f7c529bae484b6a5224e9b926e9850002246c230330230c599c7132991d53ce6",
+    "tests/test_legacy_fat_open_bounded_artifacts_resume_v1.py": "eaed00e2f4a56eb1106e822c93c8a2f4cafcbd77f8e9794900c34ee7e7ddfd81"
+  },
+  "targeted_proof_scope": "Producer edc544bb3de42ed4f5dd9848dbf4a1655cb9c2da; final strict VmHWM label guard is additional review remediation, final exact-head Linux CI pending"
+}

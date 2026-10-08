@@ -947,6 +947,7 @@ class LegacyFatOpenBoundedArtifactsResumeTests(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
+            parent_at_launch = _linux_rss_diagnostic() if sys.platform == "linux" else None
             completed = subprocess.run(
                 [
                     sys.executable,
@@ -963,13 +964,30 @@ class LegacyFatOpenBoundedArtifactsResumeTests(unittest.TestCase):
             )
             self.assertEqual(completed.returncode, 0, completed.stderr)
             body = json.loads(result.read_text(encoding="utf-8"))
+            if sys.platform == "linux":
+                print("LINUX_RSS_MEMORY_WORKLOAD=" + json.dumps({
+                    "parent_at_launch": parent_at_launch,
+                    "child": body["rss_diagnostic"],
+                    "measured_bytes": body["max_rss_bytes"],
+                    "source_size": body["source_size"],
+                }, sort_keys=True), flush=True)
             self.assertEqual(body["terminal"], FAT_ARTIFACTS_RESUME_COMPLETED)
             self.assertGreater(int(body["source_size"]), ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES)
             self.assertLessEqual(int(body["max_rss_bytes"]), SOFT_RSS)
             self.assertLessEqual(int(body["max_rss_bytes"]), COMFORTABLE_RSS)
 
 
+def _linux_rss_diagnostic() -> dict:
+    import resource
+
+    fields = {line.split()[0].rstrip(":"): int(line.split()[1]) * 1024
+              for line in Path("/proc/self/status").read_text(encoding="ascii").splitlines()
+              if line.startswith(("VmHWM:", "VmRSS:"))}
+    return {**fields, "ru_maxrss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024}
+
+
 def _memory_child(payload_path: str, result_path: str) -> None:
+    entry = _linux_rss_diagnostic() if sys.platform == "linux" else None
     payload = json.loads(Path(payload_path).read_text(encoding="utf-8"))
     schedule = load_observation_schedule(ROOT, payload["schedule_rel"])
     data_root = Path(payload["tmp"]) / "rdp"
@@ -1008,6 +1026,8 @@ def _memory_child(payload_path: str, result_path: str) -> None:
                 "source_size": source_size,
                 "max_rss_bytes": peak_rss_bytes(),
                 "provider_calls": recovered.get("provider_calls", 0),
+                **({"rss_diagnostic": {"entry": entry, "after_workload": _linux_rss_diagnostic()}}
+                   if sys.platform == "linux" else {}),
             }
         ),
         encoding="utf-8",
