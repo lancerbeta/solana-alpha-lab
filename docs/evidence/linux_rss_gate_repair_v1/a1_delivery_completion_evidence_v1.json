@@ -26,16 +26,17 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_LINUX_24_WINDOWS_22_AFFECTED_RESOURCE_REGRESSION",
+    "targeted": "PASS_LINUX_24_PRODUCER_EDC544BB_WINDOWS_22_FINAL_STRICT_LABEL_BOUNDARY",
     "independent_review": {
       "path": "docs/evidence/linux_rss_gate_repair_v1/a1_delivery_independent_review_v1.json",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "verdict": "PENDING"
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": [
-      "PASS_FACTORY_STATIC"
+      "PASS_FACTORY_STATIC",
+      "PASS_SECRET_SCAN_SELF_TEST_AND_REPOSITORY"
     ]
   },
   "non_claims": [
