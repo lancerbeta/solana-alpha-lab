@@ -1,0 +1,141 @@
+{
+  "budget_after_readback": {
+    "adaptive": {
+      "completed": 0,
+      "deficit": 0,
+      "limit": 2,
+      "occupied": 0,
+      "pending": 0,
+      "remaining": 2
+    },
+    "main": {
+      "completed": 2,
+      "deficit": 0,
+      "limit": 6,
+      "occupied": 2,
+      "pending": 0,
+      "remaining": 4
+    },
+    "preview": {
+      "completed": 0,
+      "deficit": 0,
+      "limit": 2,
+      "occupied": 0,
+      "pending": 0,
+      "remaining": 2
+    }
+  },
+  "budget_before_final": {
+    "adaptive": {
+      "completed": 0,
+      "deficit": 0,
+      "limit": 2,
+      "occupied": 0,
+      "pending": 0,
+      "remaining": 2
+    },
+    "main": {
+      "completed": 2,
+      "deficit": 0,
+      "limit": 6,
+      "occupied": 2,
+      "pending": 0,
+      "remaining": 4
+    },
+    "preview": {
+      "completed": 0,
+      "deficit": 0,
+      "limit": 2,
+      "occupied": 0,
+      "pending": 0,
+      "remaining": 2
+    }
+  },
+  "current_question_prior_relations": null,
+  "distinct_scope": {
+    "decision_timestamp": "E1800",
+    "estimand": "price_relative_proxy",
+    "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+    "explanatory_condition": "MIXED_LIST_NUMERIC",
+    "population": "OPPORTUNITY_EPISODES",
+    "target": "PRICE_RELATIVE_PROXY:E1800:E14400:FIELD-USD-PRICE-001"
+  },
+  "exact_refusal": {
+    "next_action": "READ_EXACT_PRIOR_REUSE_SAVED_RESULT",
+    "reason_code": "EXACT_PRIOR_SCOPE_MATCH",
+    "scientific_negative": false,
+    "writes": false
+  },
+  "historical_payload_hashes": {
+    "DEC-HYP-FLOW-MATRIX-EXACT": "05477717fa4f8e16157b16a04c4fe86962fdd6f379c0aa2661d9092f1dd649a8",
+    "DEC-HYP-FLOW-MATRIX-PARK": "10634c96d532ce8db801b6b53b9d4efdeb48536241224f54086d03bb1e53add8",
+    "DEC-HYP-FLOW-MATRIX-RELATED": "e3537bcc0fa4cbdcadbdb3e146f45f208aa5876fe2e84e50efe38ac5782f7259",
+    "DEC-HYP-FLOW-MATRIX-TECHNICAL": "d8fad64add2f7f3a9b75c83ad9f9c0220f6525947b5835cfc9d51c334c0d49a0",
+    "REC-HYP-FLOW-MATRIX-EXACT": "e4ad8b6ffaa2e992a74f8c34baef8eac0e47ef9641af2fad928e5a7c5e8c3898",
+    "REC-HYP-FLOW-MATRIX-PARK": "833d2351fe9c47544f6e156efebc9987f5ec4d9593c04c6285af1c89a504d39d",
+    "REC-HYP-FLOW-MATRIX-RELATED": "462155fc30114ec0a1aa5787400e696822176645802baf2760d24d3899930239",
+    "REC-HYP-FLOW-MATRIX-TECHNICAL": "ea9e3edc4021adfc9a136f67c7eaa34651782ffb1dfb572eba3cf300009bca6d"
+  },
+  "history_and_typed_receipt_unchanged": true,
+  "mode": "SYNTHETIC_MECHANICAL_NO_NATIVE_REROLL",
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NEW_REAL_SCIENTIFIC_LOOK",
+    "NO_FAMILY_CLOSE_FROM_CRITIC",
+    "NO_DEFAULT_QUOTA_CHANGE"
+  ],
+  "original_scope": {
+    "decision_timestamp": "E1800",
+    "estimand": "price_relative_proxy",
+    "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+    "explanatory_condition": "LIST_CONTRAST",
+    "population": "OPPORTUNITY_EPISODES",
+    "target": "PRICE_RELATIVE_PROXY:E1800:E14400:FIELD-USD-PRICE-001"
+  },
+  "prior_states": {
+    "HYP-FLOW-MATRIX-EXACT": {
+      "memory_status": "HISTORICAL",
+      "source_verdict": "KILL_STATISTICALLY_UNIDENTIFIABLE"
+    },
+    "HYP-FLOW-MATRIX-PARK": {
+      "memory_status": "PARK",
+      "source_verdict": "PARK_UNTIL_EVIDENCE"
+    },
+    "HYP-FLOW-MATRIX-RELATED": {
+      "memory_status": "HISTORICAL",
+      "source_verdict": "KILL_LOW_INFORMATION_VALUE"
+    },
+    "HYP-FLOW-MATRIX-TECHNICAL": {
+      "memory_status": "TECHNICAL_STOP",
+      "source_verdict": "KILL_UNBOUND_EVIDENCE"
+    }
+  },
+  "readback_inventory_unchanged": true,
+  "renamed_family_refusal": {
+    "detail": {
+      "next_action": "KEEP_TYPED_CLOSE_SELECT_AUTHORIZED_DISTINCT_SCOPE",
+      "source_terminal": "CLOSE_FLOW_BOUND_LIST_CONTRAST_FAMILY",
+      "stage": "CANDIDATE_SUPPRESSION"
+    },
+    "next_action": "KEEP_TYPED_CLOSE_SELECT_AUTHORIZED_DISTINCT_SCOPE",
+    "reason_code": "CLOSED_FAMILY_REOPEN",
+    "scientific_negative": false,
+    "writes": false
+  },
+  "run_next_action": "NON_SCIENTIFIC_STOP",
+  "run_owner_final": "NON_SCIENTIFIC_STOP",
+  "schema": "smial.forge-flow-prior-matrix-proof",
+  "schema_version": "1.0",
+  "selected_candidate_id": "HFIC-CAND-FFB8BCA42497",
+  "technical_source_terminal": "KILL_UNBOUND_EVIDENCE",
+  "test": "EpisodeFlowTests.test_persisted_prior_matrix_reaches_public_context_candidate_and_run",
+  "typed_close": {
+    "reopen_forbidden": true,
+    "scope_id": "FLOW_BOUND_LIST_CONTRAST",
+    "scope_kind": "FAMILY",
+    "source_receipt": "datasets/manifests/dataset-b8fdb83fca63bced135535e8fa128d86fdb99f02c51d03d9e14cf162a58dc7fb.decision.json",
+    "suppression_class": "SCIENTIFIC_CLOSE_VALID",
+    "terminal": "CLOSE_FLOW_BOUND_LIST_CONTRAST_FAMILY",
+    "visible_as_prior_work": true
+  }
+}

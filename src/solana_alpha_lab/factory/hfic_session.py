@@ -1994,7 +1994,10 @@ def freeze_draft(
             hit = candidate_matches_hard_close(card, closed_family_ledger)
             if hit is not None:
                 closed_or_suppressed_collision_count += 1
-                raise HficSessionError("CLOSED_FAMILY_REOPEN")
+                raise HficSessionError("CLOSED_FAMILY_REOPEN", detail={
+                    "stage": "CANDIDATE_SUPPRESSION", "source_terminal": hit,
+                    "next_action": "KEEP_TYPED_CLOSE_SELECT_AUTHORIZED_DISTINCT_SCOPE",
+                })
     elif store is not None:
         closed_or_suppressed_collision_count = 0
     truth_roots = _nonempty_str_list(
@@ -2578,7 +2581,10 @@ def _freeze_no_worthy(
             hit = candidate_matches_hard_close(card, closed_family_ledger)
             if hit is not None:
                 closed_or_suppressed_collision_count += 1
-                raise HficSessionError("CLOSED_FAMILY_REOPEN")
+                raise HficSessionError("CLOSED_FAMILY_REOPEN", detail={
+                    "stage": "CANDIDATE_SUPPRESSION", "source_terminal": hit,
+                    "next_action": "KEEP_TYPED_CLOSE_SELECT_AUTHORIZED_DISTINCT_SCOPE",
+                })
     elif store is not None:
         closed_or_suppressed_collision_count = 0
     bound: dict[str, Any] | None = None

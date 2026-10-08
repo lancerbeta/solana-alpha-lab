@@ -1375,7 +1375,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             from solana_alpha_lab.factory.hfic_suppression_semantics import interpret_critic_terminal
             explanation = interpret_critic_terminal(critic_term)
             lines.append("  applicability: " + explanation["prior_applicability"] +
-                         "; class=" + explanation["outcome_class"] + "; family_closed=false")
+                         "; class=" + explanation["outcome_class"] + "; family_suppression_authority=false")
         if selected or mechanism:
             lines.append(
                 "  candidate: {cid} mechanism={mech}".format(
@@ -2579,6 +2579,14 @@ def _discover_ladder_stages(
         try:
             bundle = load_session_bundle(store, sid)
         except HficSessionError as exc:
+            if (
+                exc.detail.get("next_action") == "RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY"
+                and current_market_epoch
+                and item.get("market_evidence_epoch_sha256") == current_market_epoch
+            ):
+                # The current saved dependency is actionable, not a generic history gap.
+                # Preserve its verified relative locator through the ordinary CLI refusal.
+                raise
             suffix = sid.removeprefix("HFIC-SESS-")
             skipped.append({"session_suffix": suffix, "code": str(exc)})
             _note_market_skip(item, str(exc))

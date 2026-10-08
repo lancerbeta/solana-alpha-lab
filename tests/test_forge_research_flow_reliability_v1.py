@@ -174,6 +174,13 @@ class ExplicitOutcomeTests(unittest.TestCase):
         self.assertEqual(body['reason_code'],'BASE_TERMINAL_UNMATCHED')
         self.assertEqual(body['next_action'],'OBSERVABILITY_BLOCKED')
 
+    def test_readout_reports_verdict_authority_without_asserting_ledger_state(self):
+        from solana_alpha_lab.factory.hfic_representation_ladder import format_forge_run_owner_readout
+        for terminal in ('KILL_DATA_INFEASIBLE','KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED','KILL_FUTURE_UNKNOWN'):
+            text=format_forge_run_owner_readout({'stages':[{'critic_terminal':terminal}]})
+            self.assertIn('family_suppression_authority=false',text)
+            self.assertNotIn('family_closed=',text)
+
 class CapabilityBindingTests(unittest.TestCase):
     def test_changed_direct_owners_are_part_of_capability_provenance(self):
         from solana_alpha_lab.factory.hfic_evidence_identity import _CAPABILITY_PROTOCOL_FILES
@@ -253,8 +260,8 @@ class EpisodeFlowTests(unittest.TestCase):
         exact=temporal_holder_claim_identity(evidence['result'])
         card={**scope,**exact,'display_ordinal':1,'label':'FLOW-1','claim':'List A membership separates the fixed E14400 price-relative proxy; synthetic engineering fixture only.',
               'novelty_class':'NEW_MEASUREMENT','claim_form':'PREDICTIVE','mundane_alternative':'Vendor selection and repeated template structure explain an apparent contrast.',
-              'state_transition':None,'primary_x_family':exact['research_scope_statement'],'primary_y':'PRICE_RELATIVE_PROXY E1800 -> E14400',
-              'horizon_notional':'E1800 -> E14400; no executable notional','required_feature_ids':[],'required_capability_ids':[TEMPORAL_CAPABILITY_ID],
+              'state_transition':None,'primary_x_family':exact.get('primary_x_family',exact['research_scope_statement']),'primary_y':exact.get('primary_y','PRICE_RELATIVE_PROXY E1800 -> E14400'),
+              'horizon_notional':exact.get('horizon_notional','E1800 -> E14400; no executable notional'),'required_feature_ids':[],'required_capability_ids':[TEMPORAL_CAPABILITY_ID],
               'unresolved_requirements':[],'prior_work_refs':[],'material_difference_from_prior':'First bound question on this synthetic corpus.',
               'disconfirming_prediction':'No supported contrast against the eligible complement.','negative_control':'Eligible complement on the same evidence.',
               'cheapest_falsifier':'One fixed contrast; no retuning.','kill_if':['PIT failure','Insufficient independent observations'],
@@ -306,6 +313,121 @@ class EpisodeFlowTests(unittest.TestCase):
         killed=critic_result_from_packet_only(revised['critic_input_packet'],terminal='KILL_STATISTICALLY_UNIDENTIFIABLE')
         final=self.cli('finalize','--session-id',frozen['session_id'],'--critic-result',self.write('revised-kill.json',killed))
         self.assertEqual(final['session_state'],'SYNTHESIS_COMPLETE')
+
+    def test_public_missing_saved_context_identifies_dependency_in_ordinary_forge_run(self):
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        evidence,scope,query,initial=self.look('FLOW_ORDINARY_CONTEXT')
+        body,pre=self.authored_draft(evidence,scope,initial['owner_focus'])
+        generated,frozen=self.persist_and_freeze(body,pre)
+        digest=pre['forge_context_packet_sha256']
+        relative='research/artifacts/forge_context/'+digest+'.json'
+        (self.plane/relative).unlink()  # disposable exact-dependency loss only
+        before=ResearchStore(self.plane).diagnostics().committed_inventory_sha256
+        code,refused=public_cli(self.plane,'forge-run','--collection','OPPORTUNITY_EPISODES','--owner-focus',pre['owner_focus'],'--saved-draft-sha256',generated['payload_sha256'],'--no-write','--format','json')
+        self.assertEqual(code,2,refused)
+        self.assertEqual(refused['reason_code'],'FORGE_CONTEXT_ARTIFACT_MISSING')
+        self.assertEqual(refused['next_action'],'RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY')
+        self.assertEqual(refused['detail']['required_context_sha256'],digest)
+        self.assertEqual(refused['detail']['relative_locator'],relative)
+        self.assertEqual(ResearchStore(self.plane).diagnostics().committed_inventory_sha256,before)
+
+    def test_persisted_prior_matrix_reaches_public_context_candidate_and_run(self):
+        from datetime import UTC,datetime
+        from tests.test_hfic_cli import critic_result_from_packet_only
+        from tests.test_hfic_critic_prior_memory_closure_v1 import _event
+        from solana_alpha_lab.factory.hfic_card_projection import project_material_card
+        from solana_alpha_lab.factory.hfic_identity import candidate_identity
+        from solana_alpha_lab.factory.hfic_preflight import enumerate_rdp_datasets
+        from solana_alpha_lab.factory.hfic_ordinary_operation import journal_occupancy
+        from solana_alpha_lab.factory.research_store import ResearchStore,RecordKind
+        store=ResearchStore(self.plane)
+        datasets,_=enumerate_rdp_datasets(self.plane)
+        dataset=datasets[0]
+        terminal='CLOSE_FLOW_BOUND_LIST_CONTRAST_FAMILY'
+        decision={'schema':'smial.flow-prior-matrix.runtime-receipt','schema_version':'1.0','atom_id':'FLOW_BOUND_LIST_CONTRAST','scientific_terminal':terminal,'outcome_consumed':True,'dataset_fingerprint':dataset['dataset_fingerprint'],'score':{'terminal':terminal}}
+        decision_path=self.plane/'datasets/manifests'/(dataset['dataset_manifest_id']+'.decision.json')
+        decision_path.write_text(json.dumps(decision),encoding='utf-8')
+        decision_bytes=decision_path.read_bytes()
+        evidence,scope,query,initial=self.look('FLOW_PRIOR_MATRIX',cap={'main':2,'adaptive':0,'preview':2})
+        body,pre=self.authored_draft(evidence,scope,initial['owner_focus'])
+        card=project_material_card(body['candidates'][0])
+        old_evidence,old_scope=evidence,scope
+        from tests.test_hfic_list_aware_vertical_v1 import draft,NUMERIC
+        numeric=draft('MIXED_LIST_NUMERIC',list_condition={'clauses':[{'all_of':['A']}]},**NUMERIC)
+        evidence,scope,query,_=self.look('FLOW_PRIOR_MATRIX',numeric,cap={'main':2,'adaptive':0,'preview':2})
+        new_body,_=self.authored_draft(evidence,scope,initial['owner_focus'])
+        current_card=project_material_card(new_body['candidates'][0])
+        records=[]; expected={}
+        variants=(('EXACT','KILL_STATISTICALLY_UNIDENTIFIABLE','HISTORICAL'),('RELATED','KILL_LOW_INFORMATION_VALUE','HISTORICAL'),('PARK','PARK_UNTIL_EVIDENCE','PARK'),('TECHNICAL','KILL_UNBOUND_EVIDENCE','TECHNICAL_STOP'))
+        for label,reason,status in variants:
+            prior=copy.deepcopy(card if label in {'EXACT','RELATED'} else current_card)
+            if label=='RELATED':
+                prior['primary_y']='Explicit distinct historical target E7200'
+                prior['target']='Explicit distinct historical target E7200'
+            elif label!='EXACT':
+                prior['claim']+=' Historical '+label+' question.'
+            identity=candidate_identity(prior);hyp_id='HYP-FLOW-MATRIX-'+label
+            payload={**prior,'hypothesis_version_id':hyp_id,'definition_sha256':identity.full_sha256,'hfic_protocol':'HFIC-V1.2'}
+            now=datetime(2026,10,16,tzinfo=UTC)
+            records.append(_event(record_id='REC-'+hyp_id,kind=RecordKind.HYPOTHESIS_VERSION,entity_id=hyp_id,hypothesis_version_id=hyp_id,payload=payload,created=now))
+            records.append(_event(record_id='DEC-'+hyp_id,kind=RecordKind.DECISION_EVENT,entity_id='DEC-'+hyp_id,hypothesis_version_id=hyp_id,payload={'hypothesis_version_id':hyp_id,'decision_kind':'PARK' if label=='PARK' else 'REJECT','reason_code':reason},created=now))
+            expected[hyp_id]=(reason,status)
+        store.append(records,transaction_id='RESEARCH-TXN-PRIOR-MEM-001')
+        historical={r.record_id:r.payload_sha256 for r in records}
+        body,pre=self.authored_draft(evidence,scope,initial['owner_focus'])
+        context=pre['forge_context_packet']
+        rows={row['hypothesis_version_id']:row for row in context['ranked_prior_entries']}
+        for hyp_id,(reason,status) in expected.items():
+            self.assertEqual(rows[hyp_id]['reason_code'],reason)
+            self.assertEqual(rows[hyp_id]['memory_status'],status)
+            if status!='PARK':
+                self.assertFalse(rows[hyp_id]['outcome_semantics']['family_suppression_authority'])
+        related=rows['HYP-FLOW-MATRIX-RELATED']
+        self.assertNotEqual(related['target'],body['candidates'][0]['target'])
+        closed=[row for row in context['closed_family_ledger'] if row['terminal']==terminal]
+        self.assertEqual(len(closed),1)
+        self.assertEqual((closed[0]['suppression_class'],closed[0]['scope_kind'],closed[0]['reopen_forbidden']),('SCIENTIFIC_CLOSE_VALID','FAMILY',True))
+        lookup=self.cli('prior','--candidate',json.dumps(card))
+        matches={row.get('candidate_id'):row for row in lookup['matches']}
+        self.assertEqual(matches['HYP-FLOW-MATRIX-EXACT']['match_kind'],'EXACT')
+        self.assertEqual(matches['HYP-FLOW-MATRIX-RELATED']['match_kind'],'RELATED_PRIOR')
+        budget=journal_occupancy(store,pre['search_key_sha256'])
+        before=store.diagnostics().committed_inventory_sha256
+        exact_body,exact_pre=self.authored_draft(old_evidence,old_scope,initial['owner_focus'])
+        exact_denied=self.cli('persist-draft','--draft',self.write('exact.json',exact_body),'--preflight-receipt',self.write('exact-pre.json',exact_pre),ok=False)
+        self.assertEqual(exact_denied['reason_code'],'EXACT_PRIOR_SCOPE_MATCH',exact_denied)
+        self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
+        blocked=copy.deepcopy(body)
+        blocked['candidates'][0]['claim']+=' FLOW_BOUND_LIST_CONTRAST; renamed label cannot reopen.'
+        blocked['candidates'][0]['label']='RENAMED-QUESTION';blocked['selected_candidate_ref']='RENAMED-QUESTION'
+        denied=self.cli('persist-draft','--draft',self.write('closed.json',blocked),'--preflight-receipt',self.write('pre.json',pre),ok=False)
+        self.assertEqual(denied['reason_code'],'CLOSED_FAMILY_REOPEN',denied)
+        self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
+        generated,frozen=self.persist_and_freeze(body,pre)
+        capsules={row['hypothesis_version_id']:row for row in frozen['critic_input_packet']['prior_memory']['capsules']}
+        for hyp_id,(reason,status) in expected.items():
+            self.assertEqual((capsules[hyp_id]['reason_code'],capsules[hyp_id]['memory_status']),(reason,status))
+        critic=critic_result_from_packet_only(frozen['critic_input_packet'],terminal='KILL_UNBOUND_EVIDENCE')
+        self.cli('finalize','--session-id',frozen['session_id'],'--critic-result',self.write('technical.json',critic))
+        run=self.cli('forge-run','--owner-focus',pre['owner_focus'],'--persist')
+        self.assertEqual(run['next_action'],'NON_SCIENTIFIC_STOP')
+        self.assertEqual(run['owner_final'],'NON_SCIENTIFIC_STOP')
+        self.assertTrue(any(stage.get('critic_terminal')=='KILL_UNBOUND_EVIDENCE' for stage in run['stages']))
+        self.assertIn('class=TECHNICAL_REFUSAL',run['owner_readout'])
+        self.assertIn('family_suppression_authority=false',run['owner_readout'])
+        before=store.diagnostics().committed_inventory_sha256
+        saved=self.cli('forge-run','--owner-focus',pre['owner_focus'],'--no-write')
+        self.assertEqual(saved['owner_final'],'NON_SCIENTIFIC_STOP')
+        self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
+        self.assertEqual(journal_occupancy(store,pre['search_key_sha256']),budget)
+        current={r.record_id:r.payload_sha256 for r in store.iter_committed_records() if r.record_id in historical}
+        self.assertEqual(current,historical)
+        self.assertEqual(decision_path.read_bytes(),decision_bytes)
+        import os
+        capture=os.environ.get('FLOW_CAPTURE_MATRIX_PROOF')
+        if capture:
+            proof={'schema':'smial.forge-flow-prior-matrix-proof','schema_version':'1.0','mode':'SYNTHETIC_MECHANICAL_NO_NATIVE_REROLL','test':'EpisodeFlowTests.test_persisted_prior_matrix_reaches_public_context_candidate_and_run','original_scope':old_scope,'distinct_scope':scope,'prior_states':{k:{'source_verdict':v[0],'memory_status':v[1]} for k,v in expected.items()},'typed_close':closed[0],'exact_refusal':exact_denied,'renamed_family_refusal':denied,'selected_candidate_id':frozen['selected_candidate_id'],'technical_source_terminal':'KILL_UNBOUND_EVIDENCE','run_next_action':run['next_action'],'run_owner_final':run['owner_final'],'current_question_prior_relations':frozen['critic_input_packet']['selected_candidate'].get('grounding',{}).get('prior_scope_relations'),'budget_before_final':budget,'budget_after_readback':journal_occupancy(store,pre['search_key_sha256']),'readback_inventory_unchanged':True,'historical_payload_hashes':historical,'history_and_typed_receipt_unchanged':True,'non_claims':['NO_ALPHA','NO_NEW_REAL_SCIENTIFIC_LOOK','NO_FAMILY_CLOSE_FROM_CRITIC','NO_DEFAULT_QUOTA_CHANGE']}
+            Path(capture).write_text(json.dumps(proof,ensure_ascii=False,sort_keys=True,indent=2)+'\n',encoding='utf-8')
 
     def test_direct_owner_mutation_changes_only_capability_not_market_or_charges(self):
         import subprocess,shutil

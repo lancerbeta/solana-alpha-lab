@@ -80,13 +80,38 @@
       "tests": 1,
       "result": "PASS",
       "seconds": 35.38
+    },
+    {
+      "selection": "single whole new30 frozen review inventory",
+      "producer_head": "519356db8cc81688ce73f84cef1b03d22bd0dca5",
+      "tests": 30,
+      "passed": 30,
+      "result": "PASS",
+      "seconds": 541.358
+    },
+    {
+      "selection": "final review direct consumers: outcome/shadow pins/merge guard/ladder plus2 public cases",
+      "tests": 112,
+      "passed": 111,
+      "failed": 1,
+      "result": "TEST_SELECTOR_FIELD_ERROR_NOT_RUNTIME_DEFECT",
+      "seconds": 108.923,
+      "remaining": "prior matrix asserted absent top-level reason_code; corrected to actual source Critic stage"
+    },
+    {
+      "selection": "complete persisted public prior matrix after faithful fixture and real stage key",
+      "tests": 1,
+      "passed": 1,
+      "result": "PASS",
+      "seconds": 72.967,
+      "test": "EpisodeFlowTests.test_persisted_prior_matrix_reaches_public_context_candidate_and_run"
     }
   ],
   "skips": [
     "test_research_store: OS symlink creation not permitted",
     "test_forge_representation_ladder_v1: canonical data plane absent/uncommissioned; this task uses disposable synthetic roots"
   ],
-  "new_module_result": "NO_SINGLE_FINAL_WHOLE_MODULE_PASS_CLAIM; repaired failed case and added cases have direct GREEN; exact-head CI remains mandatory",
+  "new_module_result": "WHOLE30_PASS_ON519356D; FINAL_ADDED3_AND_DIRECT_REVIEW_CONSUMERS_GREEN; NO_SINGLE_WHOLE33_FINAL_PASS_CLAIM; EXACT_HEAD_CI_MANDATORY",
   "mechanical_positive": {
     "test": "T.EpisodeFlowTests.test_scripted_positive_boundary_runs_real_classify_final_runner_replay",
     "critic_boundary": "SCRIPTED_CRITIC_MECHANICAL",
@@ -108,5 +133,19 @@
   "full_local_gate": "NOT_RUN_RESERVED_FOR_GUARDED_MERGE",
   "CI": "REQUIRED_EXACT_PR_HEAD_NOT_PREASSERTED",
   "reproduce": "uv run --locked --managed-python python -B -m unittest tests.test_forge_research_flow_reliability_v1; resource/materializer commands in READOUT.md",
-  "logs": "Regeneratable full logs remain local; numeric and exact native evidence committed; no inaccessible log hash is offered as standalone proof"
+  "logs": "Regeneratable full logs remain local; numeric and exact native evidence committed; no inaccessible log hash is offered as standalone proof",
+  "review_remediation": {
+    "family_state_literal": "RED_formatter_family_closed_false_to_GREEN_verdict_family_suppression_authority_false",
+    "ordinary_context": "RED_public_forge_run_lost_dependency_detail_to_GREEN_exact_relative_locator_exit2_zero_writes",
+    "prior_matrix": "PUBLIC_PERSISTED_EXACT_RELATED_PARK_TECHNICAL_TYPED_FAMILY_TO_FREEZE_RUN_READBACK_PASS",
+    "historical_checkpoint": "ALL22_IMPLEMENTATION_PINS_AND_RECEIPT_BYTES_MATCH_ACCEPTED44EDA5D; COMMIT_BOUND_DRIFT_MISSING_OR_UNAVAILABLE_DENY",
+    "test_only_mechanical_errors": [
+      "wrong generated output key",
+      "wrong numeric query argument/kind",
+      "synthetic snapshot serialization mismatch",
+      "fixture overwrote saved numeric identity labels",
+      "expected OBSERVABILITY_BLOCKED instead of existing NON_SCIENTIFIC_STOP",
+      "top-level reason key rather than actual stage verdict"
+    ]
+  }
 }

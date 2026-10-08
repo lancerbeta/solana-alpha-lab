@@ -154,11 +154,15 @@ FROZEN_SEMANTICS_EVIDENCE_FILES = frozenset(
         # Final accepted owner-view pins at 04ec8e0; regression verifies both
         # pins and unchanged receipt bytes, without retagging execution history.
         "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json",
+        # Accepted implementation snapshot; native execution producer pins stay original.
+        "docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json",
     }
 )
 FROZEN_SEMANTICS_EVIDENCE_COMMITS = {
     "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json":
         "04ec8e0286a3dce5999d0687784717ee90fc5dca",
+    "docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json":
+        "44eda5d72dccd569e9766a74046ce8b2ec47f417",
 }
 
 

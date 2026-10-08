@@ -34,6 +34,8 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hfic_evidence_identity.py
 - src/solana_alpha_lab/factory/research_store.py
 - scripts/hypothesis_forge.py
+- scripts/delivery_harness.py
+- tests/test_preflight_shadow_pin_drift.py
 - catalog/schemas/hypothesis_forge_draft_v1*.schema.json
 - catalog/schemas/hypothesis_critic_input_v1.schema.json
 - catalog/schemas/forge_input_receipt_v1.schema.json
@@ -155,3 +157,14 @@ with actual classifier/Runner; OS recovery; both reserved intent/result
 publication contention repaired using existing retry budget. D15 context
 locator is additive refusal detail. All local scoped results are in evidence;
 exact CI/readiness/phrase remain delivery gates, not preasserted PASS.
+
+Direct delivery consumers: scripts/delivery_harness.py and its existing shadow-pin
+regression register the unchanged grounded-handoff checkpoint as an accepted
+44eda5d snapshot. All22 original implementation hashes match that Git snapshot;
+byte drift, missing checkpoint/root or unavailable Git blob still DENY. This
+uses the existing commit-bound archive owner, preserves native producer IDs and
+all historical bytes, and does not widen authority/control prefixes or gates.
+Final review remediation also distinguishes verdict authority from ledger state
+and preserves saved-context SHA/relative locator through ordinary forge-run.
+D09 now has one persisted public exact/related/PARK/technical/typed family-close
+matrix, with no helper substitution for candidate/run or historical rewrite.

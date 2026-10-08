@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import copy
 import importlib.util
 import json
 import tempfile
@@ -200,11 +201,31 @@ class ShadowPinDiscriminatorTests(unittest.TestCase):
                     "docs/evidence/task21/durable_resume_router_binding_acceptance_v1.json",
                     "docs/evidence/task21/task21_artifact_index_v1.json",
                     "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json",
+                    "docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json",
                 }
             ),
         )
         for relative in self.module.FROZEN_SEMANTICS_EVIDENCE_FILES:
             self.assertTrue((ROOT / relative).is_file(), relative)
+
+    def test_grounded_checkpoint_pins_and_bytes_match_accepted_snapshot(self) -> None:
+        relative="docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json"
+        frozen="44eda5d72dccd569e9766a74046ce8b2ec47f417"
+        self.assertEqual(self.module.FROZEN_SEMANTICS_EVIDENCE_COMMITS[relative],frozen)
+        raw=(ROOT/relative).read_bytes()
+        self.assertEqual(raw,self.module.git_bytes(ROOT,"show",f"{frozen}:{relative}"))
+        receipt=json.loads(raw)
+        for row in receipt['implementation_bindings']:
+            self.assertEqual(row['sha256'],hashlib.sha256(self.module.git_bytes(ROOT,"show",f"{frozen}:{row['path']}" )).hexdigest())
+        # Snapshot ownership does not relabel original native producer commits.
+        self.assertEqual(receipt['h09_execution_head'],'2aa12c7cbb1bcbb561c71cfdd880d957886a8ca9')
+        with patch.object(self.module,"git_bytes",return_value=json.dumps(receipt).encode("utf-8")):
+            self.assertEqual(self._scan({relative:receipt},changed={r['path'] for r in receipt['implementation_bindings']},blobs={},frozen=frozenset({relative})),[])
+            altered=copy.deepcopy(receipt);altered['implementation_bindings'][0]['sha256']=SHA_B
+            self.assertEqual(self._scan({relative:altered},changed={relative},blobs={},frozen=frozenset({relative})),[f"FROZEN_PIN_EVIDENCE_DRIFT:{relative}"])
+            self.assertEqual(self._scan({},changed={relative},blobs={},frozen=frozenset({relative})),[f"FROZEN_PIN_EVIDENCE_UNAVAILABLE:{relative}"])
+        with patch.object(self.module,"git_bytes",side_effect=ValueError('unavailable')):
+            self.assertEqual(self._scan({relative:receipt},changed={relative},blobs={},frozen=frozenset({relative})),[f"FROZEN_PIN_EVIDENCE_UNAVAILABLE:{relative}"])
 
     def test_composite_isolation_pins_are_frozen_accepted_base_bytes(self) -> None:
         relative = "docs/evidence/forge_composite_feature_recipes_v1/a1_native_isolation_v1.json"
@@ -228,13 +249,13 @@ class ShadowPinDiscriminatorTests(unittest.TestCase):
         with patch.object(self.module, "git_bytes", return_value=json.dumps(receipt).encode("utf-8")):
             reasons = self._scan({relative: receipt}, changed={row["path"] for row in tracked},
                                  blobs={row["path"]: SHA_B for row in tracked},
-                                 frozen=self.module.FROZEN_SEMANTICS_EVIDENCE_FILES)
+                                 frozen=frozenset({relative}))
         self.assertEqual(reasons, [])
         altered = json.loads(raw)
         altered["presearch_agent"]["actual_attestation"]["actual_read_set"][1]["sha256"] = SHA_B
         with patch.object(self.module, "git_bytes", return_value=json.dumps(receipt).encode("utf-8")):
             reasons = self._scan({relative: altered}, changed={relative}, blobs={},
-                                 frozen=self.module.FROZEN_SEMANTICS_EVIDENCE_FILES)
+                                 frozen=frozenset({relative}))
         self.assertEqual(reasons, [f"FROZEN_PIN_EVIDENCE_DRIFT:{relative}"])
 
     def test_commit_bound_receipt_absence_denies_with_and_without_evidence_root(self) -> None:

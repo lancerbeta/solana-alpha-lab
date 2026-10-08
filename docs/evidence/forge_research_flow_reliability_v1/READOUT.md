@@ -2,7 +2,7 @@
 
 Инженерный проход закрывает transport, routing, recovery и стоимость ordinary OPPORTUNITY_EPISODES. Native результат — KILL_LOW_INFORMATION_VALUE, SYNTHESIS_COMPLETE, NON_SCIENTIFIC_STOP; исходная карточка/вердикт сохранены. Отдельный SCRIPTED_CRITIC_MECHANICAL контроль проходит настоящие classify/final/DocumentRunner/replay. Научное принятие, alpha, OOS, strategy/live readiness не заявлены.
 
-BASE: 44eda5d72dccd569e9766a74046ce8b2ec47f417. Native producer: cc7836aa79f5e5535dc51d02115b0f301a09179d. Design anchor fd00836ea6066b2c47216e89b0187d1a096f8643 — ancestor; последующее BASE изменение только CI timeout. Producer фиксировался на весь native lifecycle; final engineering inventory связан completion receipt. Source после native добавляет bounded busy retry и context locator, не меняет authored card/scope/scientific meaning.
+BASE: 44eda5d72dccd569e9766a74046ce8b2ec47f417. Native producer: cc7836aa79f5e5535dc51d02115b0f301a09179d. Design anchor fd00836ea6066b2c47216e89b0187d1a096f8643 — ancestor; последующее BASE изменение только CI timeout. Producer фиксировался на весь native lifecycle; final engineering inventory связан completion receipt. Final fixes: busy intent/result retry, exact ordinary context locator, verdict-authority wording and strict historical snapshot binding; native bytes/scientific meaning unchanged.
 
 ## Результат D01–D18
 
@@ -10,21 +10,21 @@ T = tests/test_forge_research_flow_reliability_v1.py. Остальные про�
 
 | ID | Verdict | Проверенный результат / falsifier |
 |---|---|---|
-| D01 | PASS | Canonical field map в flow contract, active packet authoring_contract и Prompt A/B. Frozen runtime max_generated имеет приоритет; default6 не повышен. Actual native draft1.3 содержит одну PREDICTIVE карточку. |
+| D01 | PASS | Field map/active authoring_contract/Prompt A/B agree; frozen max_generated wins, default6 unchanged. Native draft1.3: one PREDICTIVE card. |
 | D02 | PASS | T.CardTransportTests: четыре risk fields string/list/absent/empty/false/0/object/mixed/null; actual Critic schema, unique PIT+dependency markers, aliases/conflicts, typed bindings, обе alternative оговорки. |
 | D03 | PASS | Public invalid selected/runner shape отказывается до generated/session records; precise candidates[i].field, ordinal/type/next; inventory/counters equal. |
 | D04 | PASS | Actual BASE persist legacy string draft → BASE freeze HFIC_PROTOCOL_INVALID → patched saved resume/freeze; source bytes, payload/IDs/look/accounting unchanged. No rewrite/new root to repair. |
-| D05 | PASS | Actual 0/1/10 portfolio; primary9/runner10, wrong runner pre-persist deny, primary KILL → runner Critic → REVISE pause. Остальные8 NOT_SELECTED; one-card revision same bound look. |
+| D05 | PASS | Actual 0/1/10 cards; primary9/runner10, invalid runner pre-persist refusal, KILL → runner REVISE pause; other8 NOT_SELECTED; one-card revision same look. |
 | D06 | PASS | Actual PREDICTIVE no actor/mechanism, LIST_CONTRAST no artificial numeric predicate. Unsupported EMA explicit gap, no invented capability. |
 | D07 | PASS | All16 schema Critic enums table-tested; unknown future KILL stays UNMAPPED/OBSERVABILITY_BLOCKED. Raw source unchanged; candidate review rejection is not family authority. |
 | D08 | PASS | Public BASE NO_WORTHY → dispatcher eligible NORMALIZED_TRAJECTORY_EPISODES_V1 → real prefix/query/freeze/terminal. Legacy ladder tests retain advance/resume/pause guards. |
-| D09 | PASS | Persisted exact/related/PARK/technical/family-positive-authority controls retained; known review KILL emitted HISTORICAL plus explicit outcome_semantics, minimum scope axes retained. No guessed applicability. |
+| D09 | PASS | T persisted public prior matrix: EXACT old question refuses, distinct actual mixed question retains RELATED/PARK/TECHNICAL; renamed typed family-close refuses pre-persist. Freeze contains all4 capsules, raw technical Critic → NON_SCIENTIFIC_STOP; readback/history/budget unchanged. prior-matrix-proof.json. |
 | D10 | PASS | Actual two-cohort import/readback: identical first republish no new epoch/budget; second admitted cohort →10episodes/new market/search/result. Historical KILL/source remains. |
 | D11 | PASS | Passive actual loader trace requests E300/E900/E1800 only; produced future poison leaves prefix/panels/scope counts equal while authorized target numeric changes. Existing protected/late/unavailable controls pass. |
 | D12 | PASS | Actual emitted packet → isolated native Generator → original draft → public persist/freeze → fresh-context Critic → finalize/forge-run. Native3/6, no reroll/manual JSON repair. |
 | D13 | PASS | Only Critic PASS boundary scripted. Public classify accepts existing Spec1.1 wrapper correctly, final completes, production Runner arithmetic matches literal oracle, actual classifier REPLAY_AVAILABLE returns old runid/no writes. |
 | D14 | PASS | OS persist then os._exit(73), lost reply, moved root + fresh processes resume same original draft/hash/charge; corrupt/parent guards. Controlled OS lease and public final-slot race verify bounded same-event publication. |
-| D15 | PASS | Typed field errors and saved-context SHA + relative locator + one restoration next. Native owner readout below names object/scope/reason/next; packet-only adversarial check refuses science/zero-fill/EMA. |
+| D15 | PASS | Public ordinary forge-run missing context: exact SHA/relative locator + RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY, exit2/no writes. Exact-scope/typed-close refusals name one legal next. Native 7lines/adversarial retain gaps. |
 | D16 | PASS | Disposable independent repo mutations of projector/policy/operation/prior/outcome owners alter capability only; market/inventory/counters unchanged. Existing strict saved repair readback remains. |
 | D17 | PASS | Same verified40/400 roots, three fresh process samples, identical result SHA; physical verify 2040→40 and20400→400. 51 logical traversals honestly retained; writer invalidates snapshot+generation. |
 | D18 | PASS | One bounded product change; compact native packet/result evidence, no full audit/store dump, no dependencies/provider/live/science mutation. Four-role review/binding and exact-head CI/readiness remain enforced delivery gates. |
@@ -53,7 +53,7 @@ Literal table задана до reads в T.TABLE/LITERAL_ORACLE: N8, observed7, 
 
 resource-proof.json: 40-record median3.7985704→.1220622s (31.12x); 400-record38.7618921→.8603608s (45.05x); result/state/counter SHA92047421693b14668c7f531db1891e60662806329a4d115504758680d700c5d6 во всех12samples. Physical integrity work -98.04%, logical51calls unchanged. Probe `resource_probe.py generate`, затем40/400 baseline|scoped each3 fresh processes; passive counters do not replace integrity readers or filters. One bounded snapshot per command, no cross-process/permanent cache; writer admission uncached, exception/lease exit invalidate; suspended old iterator cannot repopulate current generation.
 
-failure-proof.json содержит cheapest BASE/string/outcome/cache and reserved-publication REDs плюс GREEN links. Busy retry constructs immutable event once, retries only WRITER_BUSY (40×50ms), no re-reserve/evaluator/model. Другие integrity/conflict errors остаются refusal. Exact old public race error site without stack is UNKNOWN; controlled failing site and instrumented process evidence separate. context-locator-proof.json preserves missing dependency refusal; a fresh context cannot repair historical bytes.
+failure-proof.json содержит cheapest BASE/string/outcome/cache and reserved-publication REDs плюс GREEN links. Busy retry: same immutable event, only WRITER_BUSY,40×50ms; no re-reservation/evaluator/model; other integrity errors refuse. Old unstamped race site UNKNOWN; controlled traces separate. Context locator refuses fresh substitution. Historical grounded-handoff checkpoint remains byte-identical to44eda5d; all22 source pins match that accepted snapshot, original native producer IDs unchanged; archive loss/drift/unavailable Git DENY.
 
 ## Ограничения и delivery
 
