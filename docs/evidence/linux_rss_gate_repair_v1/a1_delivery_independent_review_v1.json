@@ -1,0 +1,43 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "LINUX_RSS_GATE_REPAIR_V1-REVIEW",
+  "as_of": "2026-10-08",
+  "task_id": "LINUX_RSS_GATE_REPAIR_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_ACTUAL_ISOLATED_REVIEW"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_ACTUAL_ISOLATED_REVIEW"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_ACTUAL_ISOLATED_REVIEW"
+      ]
+    }
+  ],
+  "verdict": "PENDING",
+  "non_claims": [
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SCIENTIFIC_ACCEPTANCE"
+  ]
+}

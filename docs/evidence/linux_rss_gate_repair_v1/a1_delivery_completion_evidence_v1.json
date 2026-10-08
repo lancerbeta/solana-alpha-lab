@@ -1,0 +1,56 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LINUX_RSS_GATE_REPAIR_V1-COMPLETION",
+  "as_of": "2026-10-08",
+  "task_id": "LINUX_RSS_GATE_REPAIR_V1",
+  "state_change": "LINUX_CURRENT_IMAGE_PEAK_RSS_PROVEN_TRUE_OVERSHOOT_RETAINED",
+  "base_main": "20294a7677f14e93f8bb5dd6b4d339f2e15302d5",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "278d4ac80c28c67f3c5bd2fdee2a5ef435b97d676f6f859824a3399cdcdcffce"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/linux_rss_gate_repair_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_LINUX_24_WINDOWS_22_AFFECTED_RESOURCE_REGRESSION",
+    "independent_review": {
+      "path": "docs/evidence/linux_rss_gate_repair_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NEW_LOOK",
+    "NO_H08_H09_REOPEN",
+    "NO_LIMIT_INCREASE",
+    "NO_DEPLOY",
+    "NO_MERGE_AT_CANDIDATE"
+  ],
+  "side_effects": {
+    "external_actions": 0,
+    "local_writes": 1,
+    "network_calls": 0,
+    "scope": "EXCLUDES_AUTHORIZED_ROUTINE_GIT_GITHUB_TRANSPORT_AND_ACTIONS"
+  },
+  "capability_radar_now": "NONE"
+}

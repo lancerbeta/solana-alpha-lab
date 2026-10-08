@@ -22,11 +22,10 @@ managed_write_set:
 - src/solana_alpha_lab/factory/live_cohort_source_bundle.py
 - tests/test_legacy_fat_open_bounded_artifacts_resume_v1.py
 - tests/test_linux_rss_gate_v1.py
-- scripts/prove_linux_rss_gate.py
-- .github/workflows/ci.yml
 - docs/evidence/linux_rss_gate_repair_v1/**
 - docs/contracts/linux_rss_measurement_v1.md
 - catalog/assets/core.yaml
+- catalog/assets/lifecycle.yaml
 - catalog/catalog_manifest.yaml
 - catalog/generated/asset_edges.json
 - docs/PROJECT_MAP.md
@@ -48,14 +47,17 @@ stop_conditions:
 - MERGE_WITHOUT_EXACT_OWNER_PHRASE
 context_requirements:
   catalog_asset_ids: [MODULE-LIVE-COHORT-SOURCE-BUNDLE-001]
-  l2_roles: [ARCHITECTURE_DECISIONS]
+  l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: [docs/contracts/linux_rss_measurement_v1.md]
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/linux_rss_gate_repair_v1/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/linux_rss_gate_repair_v1/a1_delivery_independent_review_v1.json
+    - docs/evidence/linux_rss_gate_repair_v1/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
@@ -67,43 +69,28 @@ PR383 and subsequent Forge checks are separately sequenced work, not this atom.
 
 ENTRY_DECISION: START_AS_WRITTEN. SPEC_ROUTE: DESIGN_SPEC (one narrow measurement
 contract). Route DIRECT_CODEX_DELIVERY, actor CODEX. MODEL_EFFORT: SOL_XHIGH.
-Existing skill: delivery-harness, systematic-debugging, test-driven-development.
-New tool/plugin/connector/dependency/automation: NONE. Reuse existing Actions
-ubuntu24.04, pinned uv/Python3.13.14 and locked dependencies; no install adoption.
-GitHub transport, draft diagnostic uploads and bounded Actions execution are
-the routine Git/GitHub exception to external_caps, explicitly requested here.
-
-DECISION_DELTA: allow resource gate recovery based on process-local evidence,
-not a raised cap or a blind CI retry. UNCERTAINTY_REMOVED: whether the unchanged
-worker exceeds512 MiB or only ru_maxrss carries pre-exec parent memory.
-CAPABILITY_OR_EVIDENCE: authoritative current-image peak RSS, true-over-limit
-adverse regression and durable GitHub proof. Consumers: existing memory-child
-resource tests and source builder. No operator UI changes; no owner-UX review.
-
-Cheapest falsifier: same baseline memory-child workload under small and600 MiB
-resident parents on the existing Linux Actions runtime, recording VmHWM,
-VmRSS, ru_maxrss before/after and original gate result. No workload replacement.
-Before repair, upload diagnostic-only source on a preserved non-candidate
-codex/linux-rss-gate-probe-v1 branch. Existing ci.yml manual dispatch gets a
-strict probe-only mode; diagnostic success is NEVER exact PR/main acceptance.
-The final candidate restores the original workflow bytes and retains Actions
-links and producer SHA. This is one atom's diagnostic phase, not a new task or
-an owner merge candidate. No merge claim or CI acceptance claim for that branch.
-Final task-branch push requires full harness evidence/preflight and reviews.
-
-DoD: Linux unchanged workload evidence; proven minimal owner fix; regression
-rejects genuinely high child memory and distinguishes inherited parent memory;
-512/768 MiB constants unchanged; affected consumers pass; isolated code/goal/
-architecture reviews, Catalog propagation, PR exact-head CI and readiness.
-H08/H09 source receipts, recipe, definition/look/accounting remain frozen.
-STOP: material root-cause/contract decision or exact machine owner merge phrase.
-NEXT: owner-approved guarded merge/readback, then separately PR383 review/merge.
-REPLAN_TRIGGER: actual worker VmHWM over512 MiB requiring another existing
-workload owner; proof cannot run; conflicting memory semantics; budget overrun.
-Evidence budget: one before-repair diagnostic, one targeted final Linux proof,
-affected tests only locally, one full exact-head PR CI per final fingerprint.
-If actual local probe fails before the workload, fix the mechanical cause before
-rerunning. Do not retry historical CI37709815254. No wide Forge audit.
-PRODUCT_HORIZON_RADAR: NOW NONE; WATCH another current-image RSS consumer mismatch.
-Rollback: an ordinary owner-gated revert restores the prior metric, preserving
-all data/history. A missing/unreadable Linux HWM must fail safely, never zero-fill.
+Entry tools: existing harness/debugging/TDD skills and pinned Linux Actions;
+new dependency/plugin/service/automation NONE. Routine GitHub transport and
+bounded diagnostic upload/execution are explicitly authorized external exceptions.
+DECISION_DELTA: restore a truthful memory gate. UNCERTAINTY_REMOVED: inherited
+pre-exec ru_maxrss versus actual worker HWM. CAPABILITY_OR_EVIDENCE: current-image
+RSS and a real released-memory overshoot regression for existing resource tests.
+Cheapest falsifier: unchanged workload under0/600 MiB parents. Before-repair
+Actions37714107620 reproduced the false failure; after-repair37714704552 passed
+24 targeted cases, including an actual child peak over512 MiB being rejected.
+The preserved codex/linux-rss-gate-probe-v1 branch is diagnostic-only, never a
+merge candidate. Its temporary workflow/script are absent from the final diff;
+main/PR full CI retain original bytes. No historical failed CI retry or relabel.
+DoD: minimal owner fix, unchanged512/768 MiB limits, affected regression, three
+isolated reviews, generated propagation, exact-head PR CI/readiness/readback.
+H08/H09 and all science/data/accounting stay frozen; owner UI unchanged.
+Additional direct owner authorization: "мержи сам, после получения мерж фразы,
+разрешаю". After successful exact-head readiness renders the exact phrase, this
+bounded repair may guarded-merge autonomously; record this conditional grant
+truthfully, never claim the owner pasted a future hash-bound phrase.
+STOP: material boundary or machine DENY; fix routine causes within this scope.
+NEXT: safe merge/readback; PR383 remains separate. REPLAN_TRIGGER: actual worker
+over512 MiB needing another owner or materially conflicting resource semantics.
+Budget: one before/one after targeted Linux proof; affected local tests; final
+full CI once per fingerprint. PRODUCT_HORIZON_RADAR: NOW NONE, WATCH NONE.
+Rollback: ordinary authorized revert, immutable source/history; no zero-filled RSS.

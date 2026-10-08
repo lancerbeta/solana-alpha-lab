@@ -34305,15 +34305,15 @@ records:
   search_terms: [LIVE_COHORT, SOURCE_BUNDLE, MEMORY_BOUNDED, SOURCE_BUILD_RESOURCE_LIMIT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: MODULE-LIVE-COHORT-SOURCE-BUNDLE-001
-  record_version: '1.0'
+  record_version: '1.1'
   asset_type: script
-  purpose: Memory-bounded live source bundle IO, streaming hashes, crash-safe staging, and build process resource envelope.
+  purpose: Memory-bounded source IO, streaming hashes, crash-safe staging, resource envelope and current-image peak RSS (Linux VmHWM with conservative fallback).
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-09-11'
+  as_of: '2026-10-08'
   truth_owner: LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_source_bundle.py', repository_path: src/solana_alpha_lab/factory/live_cohort_source_bundle.py}
-  integrity: {kind: sha256, sha256: 6c9b418190226ada55702a1569480a05232d1190115447ef8a66ebf2f5488ca9}
+  integrity: {kind: sha256, sha256: 278d4ac80c28c67f3c5bd2fdee2a5ef435b97d676f6f859824a3399cdcdcffce}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-001}
