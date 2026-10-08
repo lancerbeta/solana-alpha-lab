@@ -427,7 +427,7 @@ class EpisodeFlowTests(unittest.TestCase):
         capture=os.environ.get('FLOW_CAPTURE_MATRIX_PROOF')
         if capture:
             proof={'schema':'smial.forge-flow-prior-matrix-proof','schema_version':'1.0','mode':'SYNTHETIC_MECHANICAL_NO_NATIVE_REROLL','test':'EpisodeFlowTests.test_persisted_prior_matrix_reaches_public_context_candidate_and_run','original_scope':old_scope,'distinct_scope':scope,'prior_states':{k:{'source_verdict':v[0],'memory_status':v[1]} for k,v in expected.items()},'typed_close':closed[0],'exact_refusal':exact_denied,'renamed_family_refusal':denied,'selected_candidate_id':frozen['selected_candidate_id'],'technical_source_terminal':'KILL_UNBOUND_EVIDENCE','run_next_action':run['next_action'],'run_owner_final':run['owner_final'],'current_question_prior_relations':frozen['critic_input_packet']['selected_candidate'].get('grounding',{}).get('prior_scope_relations'),'budget_before_final':budget,'budget_after_readback':journal_occupancy(store,pre['search_key_sha256']),'readback_inventory_unchanged':True,'historical_payload_hashes':historical,'history_and_typed_receipt_unchanged':True,'non_claims':['NO_ALPHA','NO_NEW_REAL_SCIENTIFIC_LOOK','NO_FAMILY_CLOSE_FROM_CRITIC','NO_DEFAULT_QUOTA_CHANGE']}
-            Path(capture).write_text(json.dumps(proof,ensure_ascii=False,sort_keys=True,indent=2)+'\n',encoding='utf-8')
+            Path(capture).write_text(json.dumps(proof,ensure_ascii=False,sort_keys=True,indent=2)+'\n',encoding='utf-8',newline='\n')
 
     def test_direct_owner_mutation_changes_only_capability_not_market_or_charges(self):
         import subprocess,shutil
