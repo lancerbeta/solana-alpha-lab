@@ -181,6 +181,61 @@ class ExplicitOutcomeTests(unittest.TestCase):
             self.assertIn('family_suppression_authority=false',text)
             self.assertNotIn('family_closed=',text)
 
+class SessionHistoryTests(unittest.TestCase):
+    def _store_chain(self, *, fork=False, last_parent=None):
+        import tempfile
+        from datetime import timedelta
+        from tests.test_research_store import event_fixture, NOW
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
+        store=ResearchStore(Path(self.tmp.name))
+        for i in range(3):
+            event=event_fixture(record_id=f'HYP-ROW-{i}',record_kind='HYPOTHESIS_VERSION',transaction_id=f'RESEARCH-TXN-HYP-{i}',payload={'hypothesis_version_id':'HYP-SAME','session_id':f'SESS-{i}','definition_sha256':'a'*64})
+            event=event.model_copy(update={'run_id':None,'effective_at':NOW+timedelta(seconds=i),'supersedes_record_id':None if i==0 else f'HYP-ROW-{0 if fork else i-1}'})
+            if i==2 and last_parent is not None:
+                event=event.model_copy(update={'supersedes_record_id':last_parent})
+            store.append([event],transaction_id=event.transaction_id)
+        return store
+
+    def test_three_session_history_is_one_explicit_append_only_chain(self):
+        store=self._store_chain()
+        store.rebuild_projection()
+        self.assertEqual(len(list(store.iter_committed_records())),3)
+
+    def test_branching_history_remains_a_stable_identity_conflict(self):
+        from solana_alpha_lab.factory.research_store import ResearchStoreError
+        store=self._store_chain(fork=True)
+        with self.assertRaisesRegex(ResearchStoreError,'DUPLICATE_STABLE_ID_CONFLICT'):
+            store.rebuild_projection()
+
+    def test_missing_and_cyclic_predecessors_cannot_legalize_history(self):
+        from solana_alpha_lab.factory.research_store import ResearchStoreError
+        for parent in ('ABSENT-PREDECESSOR','HYP-ROW-2'):
+            with self.subTest(parent=parent):
+                store=self._store_chain(last_parent=parent)
+                with self.assertRaisesRegex(ResearchStoreError,'DUPLICATE_STABLE_ID_CONFLICT'):
+                    store.rebuild_projection()
+
+    def test_changed_definition_cannot_reuse_same_candidate_history(self):
+        from solana_alpha_lab.factory.hfic_session import _session_hypothesis_supersedes,HficSessionError
+        store=self._store_chain()
+        before=store.diagnostics().committed_inventory_sha256
+        with self.assertRaisesRegex(HficSessionError,'HFIC_HYPOTHESIS_HISTORY_IDENTITY_UNBOUND'):
+            _session_hypothesis_supersedes(store,'HYP-SAME','b'*64)
+        self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
+        self.assertEqual(_session_hypothesis_supersedes(store,'HYP-SAME','a'*64),'HYP-ROW-2')
+
+    def test_other_session_decision_does_not_become_current_card_outcome(self):
+        from solana_alpha_lab.factory.hfic_prior_memory import compact_prior_entry
+        body={'hypothesis_version_id':'HYP-SAME','session_id':'SESS-NEW','hfic_protocol':'HFIC-V1.2','definition_sha256':'a'*64}
+        decision={'session_id':'SESS-OLD','decision_kind':'REJECT','reason_code':'KILL_LOW_INFORMATION_VALUE'}
+        capsule=compact_prior_entry('HYP-SAME',body,decision)
+        self.assertIsNone(capsule['reason_code'])
+        self.assertIsNone(capsule['decision_kind'])
+        self.assertNotIn('outcome_semantics',capsule)
+        same=compact_prior_entry('HYP-SAME',body,{**decision,'session_id':'SESS-NEW'})
+        self.assertEqual(same['reason_code'],'KILL_LOW_INFORMATION_VALUE')
+
 class CapabilityBindingTests(unittest.TestCase):
     def test_changed_direct_owners_are_part_of_capability_provenance(self):
         from solana_alpha_lab.factory.hfic_evidence_identity import _CAPABILITY_PROTOCOL_FILES
@@ -523,9 +578,34 @@ class EpisodeFlowTests(unittest.TestCase):
         self.assertTrue(chosen)
         self.assertEqual(chosen[0]['reason_code'],'KILL_STATISTICALLY_UNIDENTIFIABLE')
         self.assertFalse(chosen[0]['outcome_semantics']['family_suppression_authority'])
-        fresh,_,_,_=self.look('FLOW_NEW_DATA')
+        old_records={r.record_id:r.payload_sha256 for r in ResearchStore(self.plane).iter_committed_records()}
+        fresh,fresh_scope,_,_=self.look('FLOW_NEW_DATA')
         self.assertNotEqual(fresh['result_sha256'],evidence['result_sha256'])
         self.assertEqual(fresh['result']['research_scope']['base_admitted_n'],10)
+        fresh_body,fresh_pre=self.authored_draft(fresh,fresh_scope,pre['owner_focus'])
+        fresh_generated,fresh_frozen=self.persist_and_freeze(fresh_body,fresh_pre)
+        self.assertEqual(fresh_frozen['selected_candidate_id'],frozen['selected_candidate_id'])
+        self.assertNotEqual(fresh_frozen['session_id'],frozen['session_id'])
+        self.assertEqual(fresh_frozen['market_evidence_epoch_sha256'],after['market_evidence_epoch_sha256'])
+        from solana_alpha_lab.factory.hfic_ordinary_operation import journal_occupancy
+        occupancy=journal_occupancy(ResearchStore(self.plane),fresh_pre['search_key_sha256'])
+        inventory=ResearchStore(self.plane).diagnostics().committed_inventory_sha256
+        replay_frozen=self.cli('freeze','--draft',self.write('fresh-replay.json',fresh_body),'--preflight-receipt',str(self.work/'resume.json'),'--format','json')
+        self.assertEqual(replay_frozen['session_id'],fresh_frozen['session_id'])
+        self.assertEqual(ResearchStore(self.plane).diagnostics().committed_inventory_sha256,inventory)
+        self.assertEqual(journal_occupancy(ResearchStore(self.plane),fresh_pre['search_key_sha256']),occupancy)
+        fresh_critic=critic_result_from_packet_only(fresh_frozen['critic_input_packet'],terminal='KILL_LOW_INFORMATION_VALUE')
+        self.cli('finalize','--session-id',fresh_frozen['session_id'],'--critic-result',self.write('fresh-kill.json',fresh_critic))
+        current=self.cli('forge-run','--owner-focus',pre['owner_focus'],'--persist')
+        self.assertEqual(current['stages'][0]['session_id'],fresh_frozen['session_id'])
+        final_records=list(ResearchStore(self.plane).iter_committed_records())
+        self.assertEqual({r.record_id:r.payload_sha256 for r in final_records if r.record_id in old_records},old_records)
+        hypotheses=[json.loads(r.payload_json) for r in final_records if str(getattr(r.record_kind,'value',r.record_kind))=='HYPOTHESIS_VERSION' and r.hypothesis_version_id==frozen['selected_candidate_id']]
+        self.assertEqual({row['session_id'] for row in hypotheses},{frozen['session_id'],fresh_frozen['session_id']})
+        import os
+        if os.environ.get('FLOW_D10_PROOF'):
+            proof={'schema':'smial.forge-flow-new-data-proof.v1','synthetic_mechanical_only':True,'old_market_evidence_epoch_sha256':before['market_evidence_epoch_sha256'],'new_market_evidence_epoch_sha256':after['market_evidence_epoch_sha256'],'identical_import_changes_epoch':False,'old_session_id':frozen['session_id'],'new_session_id':fresh_frozen['session_id'],'same_semantic_candidate_id':frozen['selected_candidate_id'],'fresh_generated_draft_sha256':fresh_generated['payload_sha256'],'old_verdict':'KILL_STATISTICALLY_UNIDENTIFIABLE','new_verdict':'KILL_LOW_INFORMATION_VALUE','admitted_n':10,'historical_records_unchanged_n':len(old_records),'same_session_replay_writes':0,'same_session_replay_extra_looks':0,'ordinary_current_session_id':current['stages'][0]['session_id'],'alpha_or_scientific_acceptance':False}
+            Path(os.environ['FLOW_D10_PROOF']).write_text(json.dumps(proof,ensure_ascii=False,sort_keys=True,indent=2)+'\n',encoding='utf-8',newline='\n')
 
     def test_ten_cards_primary_nine_runner_ten_and_bad_runner_are_bound(self):
         from tests.test_hfic_cli import critic_result_from_packet_only

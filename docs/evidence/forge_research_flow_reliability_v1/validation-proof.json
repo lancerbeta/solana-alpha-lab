@@ -105,13 +105,35 @@
       "result": "PASS",
       "seconds": 72.967,
       "test": "EpisodeFlowTests.test_persisted_prior_matrix_reaches_public_context_candidate_and_run"
+    },
+    {
+      "selection": "D10 history, finalize, revision references, double-kill failover",
+      "tests": 6,
+      "passed": 6,
+      "result": "PASS",
+      "seconds": 8.704
+    },
+    {
+      "selection": "D10 linear chain, fork/dangling/cycle refusal, definition conflict, cross-session attribution",
+      "tests": 5,
+      "passed": 5,
+      "result": "PASS",
+      "seconds": 0.666
+    },
+    {
+      "selection": "complete D10 new admitted data through fresh persist/freeze/final/ordinary readback and identical command replay",
+      "tests": 1,
+      "passed": 1,
+      "result": "PASS",
+      "seconds": 126.389,
+      "test": "EpisodeFlowTests.test_new_admitted_cohort_changes_evidence_while_identical_import_does_not"
     }
   ],
   "skips": [
     "test_research_store: OS symlink creation not permitted",
     "test_forge_representation_ladder_v1: canonical data plane absent/uncommissioned; this task uses disposable synthetic roots"
   ],
-  "new_module_result": "WHOLE30_PASS_ON519356D; FINAL_ADDED3_AND_DIRECT_REVIEW_CONSUMERS_GREEN; NO_SINGLE_WHOLE33_FINAL_PASS_CLAIM; EXACT_HEAD_CI_MANDATORY",
+  "new_module_result": "WHOLE30_PASS_ON519356D; FINAL_ADDED8_AND_DIRECT_REVIEW_CONSUMERS_GREEN; D09_D10_COMPLETE_PUBLIC_FLOW_PASS; NO_SINGLE_WHOLE38_FINAL_PASS_CLAIM; EXACT_HEAD_CI_MANDATORY",
   "mechanical_positive": {
     "test": "T.EpisodeFlowTests.test_scripted_positive_boundary_runs_real_classify_final_runner_replay",
     "critic_boundary": "SCRIPTED_CRITIC_MECHANICAL",
@@ -145,7 +167,9 @@
       "synthetic snapshot serialization mismatch",
       "fixture overwrote saved numeric identity labels",
       "expected OBSERVABILITY_BLOCKED instead of existing NON_SCIENTIFIC_STOP",
-      "top-level reason key rather than actual stage verdict"
-    ]
+      "top-level reason key rather than actual stage verdict",
+      "new preflight WAIT action was incorrectly used for exact freeze replay; replay now reuses original signed receipt"
+    ],
+    "new_data": "RED_INDEPENDENT_E939_D10_DUPLICATE_RECORD_ID; RECORD_ONLY_FIX_DUPLICATE_STABLE_ID_CONFLICT; GREEN_EXPLICIT_SESSION_RECORD_IDS_SUPERSESSION_LINEAR_CHAIN_AND_SOURCE_DECISION_READBACK"
   }
 }

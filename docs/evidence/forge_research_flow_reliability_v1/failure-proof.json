@@ -175,5 +175,15 @@
     "Initial uninstrumented race error site UNKNOWN; later independent exception-only trace proves intent boundary",
     "Mechanical setup/import/patch-script errors are not product defects",
     "No source records reset/deletion/refund"
-  ]
+  ],
+  "new_data_review_falsifier": {
+    "reviewed_head": "e939477181e6a8b5acbcc7d1177e6e111d5e205d",
+    "independent_red": "fresh persist succeeds; fresh freeze DUPLICATE_RECORD_ID",
+    "record_only_red": "new scoped record append then projection DUPLICATE_STABLE_ID_CONFLICT",
+    "direct_consumer_red": "trimmed bundle decision lacked actual record id; DECISION_REFERENCE_UNRESOLVED",
+    "green": "same semantic candidate; session-scoped HYP/DEC records; existing explicit supersession; linear acyclic same-stable-key chain; persisted DEC readback",
+    "proof": "new-data-proof.json",
+    "historical_bytes_unchanged": true,
+    "family_close_or_science_authority_added": false
+  }
 }

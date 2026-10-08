@@ -1,0 +1,19 @@
+{
+  "admitted_n": 10,
+  "alpha_or_scientific_acceptance": false,
+  "fresh_generated_draft_sha256": "c693378f80a09abe024b9b1be6520be75a0c02d3fa781b9db6fb9939398ecd2d",
+  "historical_records_unchanged_n": 32,
+  "identical_import_changes_epoch": false,
+  "new_market_evidence_epoch_sha256": "009e1e18797bd77e2306aa3cd07c5a64e25b9aff9dc75f3c9ed25cebb4104a6a",
+  "new_session_id": "HFIC-SESS-11EB8629C0FC8E10",
+  "new_verdict": "KILL_LOW_INFORMATION_VALUE",
+  "old_market_evidence_epoch_sha256": "33647fc0ce463fe473202b64cd152b28643e775d3627f758b56a14d7aa09e152",
+  "old_session_id": "HFIC-SESS-F6D5B2229071D2C2",
+  "old_verdict": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+  "ordinary_current_session_id": "HFIC-SESS-11EB8629C0FC8E10",
+  "same_semantic_candidate_id": "HFIC-CAND-E8B09968FD73",
+  "same_session_replay_extra_looks": 0,
+  "same_session_replay_writes": 0,
+  "schema": "smial.forge-flow-new-data-proof.v1",
+  "synthetic_mechanical_only": true
+}

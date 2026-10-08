@@ -248,7 +248,7 @@ def latest_hypothesis_decisions(store: Any) -> dict[str, dict[str, str]]:
     Shared read-only resolver for Critic prior-memory capsules and Forge
     Prompt-A ranked-prior projection. Do not fork a second decision walker.
     """
-    latest: dict[str, tuple[tuple[str, str], str, str]] = {}
+    latest: dict[str, tuple[tuple[str, str], str, str, str]] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
         if kind != "DECISION_EVENT":
@@ -270,10 +270,11 @@ def latest_hypothesis_decisions(store: Any) -> dict[str, dict[str, str]]:
                 key,
                 str(payload.get("decision_kind") or ""),
                 str(payload.get("reason_code") or ""),
+                str(payload.get("session_id") or ""),
             )
     return {
-        hyp_id: {"decision_kind": kind, "reason_code": reason}
-        for hyp_id, (_key, kind, reason) in latest.items()
+        hyp_id: {"decision_kind": kind, "reason_code": reason, **({"session_id": session} if session else {})}
+        for hyp_id, (_key, kind, reason, session) in latest.items()
     }
 
 
@@ -450,6 +451,10 @@ def _capsule_from_payload(
     payload: Mapping[str, Any],
     decision: Mapping[str, str] | None,
 ) -> dict[str, Any]:
+    # A pending new session must not inherit another session's terminal.
+    # Legacy decisions without a session retain their existing compatibility.
+    if decision and payload.get("session_id") and decision.get("session_id") and payload["session_id"] != decision["session_id"]:
+        decision = None
     protocol = payload.get("hfic_protocol")
     protocol_text = str(protocol) if isinstance(protocol, str) and protocol else None
     decision_kind = decision.get("decision_kind") if decision else None

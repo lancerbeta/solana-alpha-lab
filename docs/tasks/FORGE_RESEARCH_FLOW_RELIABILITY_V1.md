@@ -168,3 +168,9 @@ Final review remediation also distinguishes verdict authority from ledger state
 and preserves saved-context SHA/relative locator through ordinary forge-run.
 D09 now has one persisted public exact/related/PARK/technical/typed family-close
 matrix, with no helper substitution for candidate/run or historical rewrite.
+
+D10 complete-path review also repairs repeated semantic candidates on admitted
+new evidence: session-scoped record IDs, existing explicit record supersession
+and transitive linear projection validation, source DEC readback on failover,
+and no known-other-session verdict attribution. Candidate/definition identity,
+raw old outcomes, budget/admission/family-close authority remain bound.

@@ -1946,15 +1946,27 @@ class ResearchStore:
             payload = _payload_object(record)
             stable_id = _projection_stable_id(record, payload)
             key = (str(record.record_kind), stable_id)
-            related = stable_ids.setdefault(key, [])
-            for previous in related:
-                if (
-                    previous.payload_sha256 != record.payload_sha256
-                    and previous.supersedes_record_id != record.record_id
-                    and record.supersedes_record_id != previous.record_id
-                ):
-                    raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
-            related.append(record)
+            stable_ids.setdefault(key, []).append(record)
+        for related in stable_ids.values():
+            by_id = {record.record_id: record for record in related}
+            ancestors: dict[str, set[str]] = {}
+            for record in related:
+                seen: set[str] = set()
+                parent = record.supersedes_record_id
+                while parent in by_id:
+                    if parent == record.record_id or parent in seen:
+                        raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
+                    seen.add(parent)
+                    parent = by_id[parent].supersedes_record_id
+                ancestors[record.record_id] = seen
+            for index, record in enumerate(related):
+                for previous in related[:index]:
+                    if (
+                        previous.payload_sha256 != record.payload_sha256
+                        and previous.record_id not in ancestors[record.record_id]
+                        and record.record_id not in ancestors[previous.record_id]
+                    ):
+                        raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
 
         projection_path = _target_path(
             self._root,

@@ -3058,6 +3058,7 @@ def persist_no_worthy_session(
         entity_id: str,
         payload: dict[str, Any],
         hypothesis_version_id: str | None = None,
+        supersedes_record_id: str | None = None,
     ) -> ResearchEvent:
         payload_json = json.dumps(
             payload,
@@ -3075,7 +3076,7 @@ def persist_no_worthy_session(
             transaction_id=transaction_id,
             effective_at=now,
             first_reliable_available_at=now,
-            supersedes_record_id=None,
+            supersedes_record_id=supersedes_record_id,
             payload_json=payload_json,
             payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
             schema_version="1.0",
@@ -3353,10 +3354,11 @@ def persist_no_worthy_session(
         for identity, card in zip(identities, cards, strict=True):
             records.append(
                 event(
-                    record_id=f"HFIC-HYP-{identity.candidate_id}",
+                    record_id=_session_hypothesis_record_id(identity.candidate_id, session_id),
                     kind=RecordKind.HYPOTHESIS_VERSION,
                     entity_id=identity.candidate_id,
                     hypothesis_version_id=identity.candidate_id,
+                supersedes_record_id=_session_hypothesis_supersedes(store, identity.candidate_id, identity.full_sha256),
                     payload={
                         "hypothesis_version_id": identity.candidate_id,
                         "session_id": session_id,
@@ -4966,6 +4968,57 @@ def persist_generated_draft(
     return payload
 
 
+def _session_hypothesis_record_id(candidate_id: str, session_id: str) -> str:
+    """A semantic candidate can have immutable cards in several evidence sessions.
+
+    Keep candidate identity stable; scope only the append-only record identity.
+    Historical unsuffixed records remain readable without migration.
+    """
+    return f"HFIC-HYP-{candidate_id}-{session_id}"
+
+
+def _session_hypothesis_supersedes(store: Any, candidate_id: str, definition_sha256: str) -> str | None:
+    """Link the same definition's new evidence binding to its immutable history."""
+    prior = []
+    for record in store.iter_committed_records():
+        if str(getattr(record.record_kind, "value", record.record_kind)) != "HYPOTHESIS_VERSION":
+            continue
+        payload = json.loads(record.payload_json)
+        if str(payload.get("hypothesis_version_id") or record.entity_id) != candidate_id:
+            continue
+        if payload.get("definition_sha256") != definition_sha256:
+            raise HficSessionError("HFIC_HYPOTHESIS_HISTORY_IDENTITY_UNBOUND")
+        prior.append(record)
+    if not prior:
+        return None
+    superseded = {row.supersedes_record_id for row in prior}
+    heads = [row for row in prior if row.record_id not in superseded]
+    if len(heads) != 1:
+        raise HficSessionError("HFIC_HYPOTHESIS_HISTORY_IDENTITY_UNBOUND")
+    return heads[0].record_id
+
+
+def _persisted_session_rejection_id(store: Any, session_id: str, candidate_id: str, prior: Mapping[str, Any]) -> str:
+    matches = []
+    for record in store.iter_committed_records():
+        if str(getattr(record.record_kind, "value", record.record_kind)) != "DECISION_EVENT":
+            continue
+        payload = json.loads(record.payload_json)
+        if (payload.get("session_id") == session_id
+            and payload.get("hypothesis_version_id") == candidate_id
+            and payload.get("decision_kind") == "REJECT"
+            and payload.get("reason_code") == prior.get("reason_code")
+            and payload.get("decision_event_id") == record.record_id):
+            matches.append(record.record_id)
+    if len(matches) != 1:
+        raise HficSessionError("DECISION_REFERENCE_UNRESOLVED")
+    return matches[0]
+
+
+def _session_decision_record_id(candidate_id: str, session_id: str) -> str:
+    return f"HFIC-DEC-{candidate_id}-{session_id}"
+
+
 def persist_frozen_session(
     store: Any,
     frozen: Mapping[str, Any],
@@ -5066,6 +5119,7 @@ def persist_frozen_session(
         entity_id: str,
         payload: dict[str, Any],
         hypothesis_version_id: str | None = None,
+        supersedes_record_id: str | None = None,
     ) -> ResearchEvent:
         payload_json = json.dumps(
             payload,
@@ -5083,7 +5137,7 @@ def persist_frozen_session(
             transaction_id=transaction_id,
             effective_at=now,
             first_reliable_available_at=now,
-            supersedes_record_id=None,
+            supersedes_record_id=supersedes_record_id,
             payload_json=payload_json,
             payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
             schema_version="1.0",
@@ -5184,9 +5238,9 @@ def persist_frozen_session(
     cards = _cards_for_identities(identities, frozen, draft)
     for identity, card in zip(identities, cards, strict=True):
         hyp_id = (
-            f"HFIC-HYP-{identity.candidate_id}-REPAIR-{repair_disp[:12].upper()}"
+            f"{_session_hypothesis_record_id(identity.candidate_id, session_id)}-REPAIR-{repair_disp[:12].upper()}"
             if isinstance(repair_disp, str) and repair_disp
-            else f"HFIC-HYP-{identity.candidate_id}"
+            else _session_hypothesis_record_id(identity.candidate_id, session_id)
         )
         records.append(
             event(
@@ -5194,6 +5248,7 @@ def persist_frozen_session(
                 kind=RecordKind.HYPOTHESIS_VERSION,
                 entity_id=identity.candidate_id,
                 hypothesis_version_id=identity.candidate_id,
+                supersedes_record_id=_session_hypothesis_supersedes(store, identity.candidate_id, identity.full_sha256),
                 payload={
                     "hypothesis_version_id": identity.candidate_id,
                     "session_id": session_id,
@@ -6263,6 +6318,7 @@ def _make_event_factory(
         entity_id: str,
         payload: dict[str, Any],
         hypothesis_version_id: str | None = None,
+        supersedes_record_id: str | None = None,
         transaction_id: str,
     ) -> ResearchEvent:
         payload_json = json.dumps(
@@ -6281,7 +6337,7 @@ def _make_event_factory(
             transaction_id=transaction_id,
             effective_at=now,
             first_reliable_available_at=now,
-            supersedes_record_id=None,
+            supersedes_record_id=supersedes_record_id,
             payload_json=payload_json,
             payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
             schema_version="1.0",
@@ -7440,10 +7496,11 @@ def apply_revision(
     if selected_identity.candidate_id != original_selected_id:
         records.append(
             event(
-                record_id=f"HFIC-HYP-{selected_identity.candidate_id}",
+                record_id=_session_hypothesis_record_id(selected_identity.candidate_id, session_id),
                 kind=RecordKind.HYPOTHESIS_VERSION,
                 entity_id=selected_identity.candidate_id,
                 hypothesis_version_id=selected_identity.candidate_id,
+                supersedes_record_id=_session_hypothesis_supersedes(store, selected_identity.candidate_id, selected_identity.full_sha256),
                 payload={
                     "hypothesis_version_id": selected_identity.candidate_id,
                     "session_id": session_id,
@@ -7700,12 +7757,12 @@ def persist_primary_kill_awaiting_runner_up(
             transaction_id=transaction_id,
         ),
         event(
-            record_id=f"HFIC-DEC-{primary_id}",
+            record_id=_session_decision_record_id(primary_id, session_id),
             kind=RecordKind.DECISION_EVENT,
-            entity_id=f"HFIC-DEC-{primary_id}",
+            entity_id=_session_decision_record_id(primary_id, session_id),
             hypothesis_version_id=primary_id,
             payload={
-                "decision_event_id": f"HFIC-DEC-{primary_id}",
+                "decision_event_id": _session_decision_record_id(primary_id, session_id),
                 "session_id": session_id,
                 "hfic_protocol": prompt_version,
                 "decision_kind": "REJECT",
@@ -8021,13 +8078,13 @@ def finalize_session(
     for candidate_id in frozen["candidate_ids"]:
         prior = ((existing or {}).get("decisions") or {}).get(str(candidate_id))
         if isinstance(prior, Mapping) and prior.get("decision_kind") == "REJECT":
-            decision_ids.append(f"HFIC-DEC-{candidate_id}")
+            decision_ids.append(_persisted_session_rejection_id(store, session_id, str(candidate_id), prior))
             continue
         if candidate_id == selected_id:
             kind, code = decision_kind, reason
         else:
             kind, code = "PAUSE", "NOT_SELECTED_IN_SESSION"
-        decision_id = f"HFIC-DEC-{candidate_id}"
+        decision_id = _session_decision_record_id(str(candidate_id), session_id)
         decision_ids.append(decision_id)
         records.append(
             event(
