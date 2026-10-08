@@ -1,8 +1,8 @@
 {
   "candidate": {
     "base": "0dbe4d4bb5ce9703332a0620987a47eac05c4cdc",
-    "diff_sha256": "67979c70dce15c984c37686b9ed1ba843018ad668d119d98800d282b0b92c10f",
-    "head": "541ea7cf434462ee060f4fc050fe15779433fcd5"
+    "diff_sha256": "a8bcc4a48bd983ab8b398ee7004f765e33fe61fc327a1f3374953af8f8b5e89c",
+    "head": "3b93f58656a2042642257e56c3cb91b8df5be9c1"
   },
   "evidence": [
     {
@@ -23,7 +23,7 @@
     },
     {
       "logical_ref": "repo://docs/reports/forge_reliability_audit_continuation_v1/EVIDENCE_INDEX.md",
-      "sha256_or_fingerprint": "34c860683d7682b1e4fc20d0a7b81e6c43f951537940f86a5d3fc5a5f5a9e6dc"
+      "sha256_or_fingerprint": "3d83ef42a08997f0be422782aa6e226c2f298b9079f9d46df2bec200bb80b835"
     },
     {
       "logical_ref": "repo://configs/experiment_capability_registry_v2.yaml",
@@ -32,6 +32,26 @@
     {
       "logical_ref": "repo://src/solana_alpha_lab/factory/document_runner.py",
       "sha256_or_fingerprint": "1f9bb9e90f792a5feebcac47cb25979960db77c8b437e5125b00d6a27a0e1a6d"
+    },
+    {
+      "logical_ref": "repo://.github/workflows/ci.yml",
+      "sha256_or_fingerprint": "874d6d4a02204ca88dfd7398043aafbd93d3410492d462fe6702dab1ca573c61"
+    },
+    {
+      "logical_ref": "repo://scripts/validate_ci.py",
+      "sha256_or_fingerprint": "4d4d4e1fa81522a78f146dca44f193d69e8f854816adeaeefcec1ca91aa5fb2c"
+    },
+    {
+      "logical_ref": "repo://scripts/render_ci_workflow.py",
+      "sha256_or_fingerprint": "8e73cf9229fb29ea7b6ef65a4d0d4cceff1943a3d220a79b0d1587a3655f2726"
+    },
+    {
+      "logical_ref": "repo://tests/test_ci.py",
+      "sha256_or_fingerprint": "fa650cccc1a040fe40ba87409b3b7fc4a093639e465972e5c6d4eb8c6ea1f06c"
+    },
+    {
+      "logical_ref": "repo://docs/tasks/FORGE_RELIABILITY_AUDIT_CONTINUATION_V1.md",
+      "sha256_or_fingerprint": "2cb083185c1d038a99f307b032c696f0da3f92bb5ace33815af6aae17ab1bdf3"
     }
   ],
   "independence": {
@@ -53,7 +73,7 @@
     "NO_FULL_SCOPE_HEALTH",
     "NO_MODEL_DIVERSITY_ATTESTATION"
   ],
-  "packet_fingerprint_sha256": "9cb258c86f516aa2e2153cde2524f5f6c57b862007c27d4b59eff8d801a4d238",
+  "packet_fingerprint_sha256": "92f284b44a189b6c4351312d696a33c5ac5695f7dc0c8d7b31d8671ecee18368",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
@@ -93,7 +113,7 @@
       "scope": "BOUNDED_OFFLINE_AUDIT_AND_PREVIEW_REPAIR"
     },
     {
-      "claim": "Legacy unkeyed previews retain payload-based charges without rewriting history; shipped limits and scientific meaning are unchanged.",
+      "claim": "Legacy unkeyed previews retain payload-based charges without rewriting history; shipped product limits and scientific meaning are unchanged.",
       "claim_id": "C2",
       "scope": "BOUNDED_OFFLINE_AUDIT_AND_PREVIEW_REPAIR"
     },
@@ -106,10 +126,15 @@
       "claim": "Registry and public frozen replay entry lack an accepted frozen-later-cohort consumer. Safe refusal and same-data replay do not close that positive endpoint.",
       "claim_id": "C4",
       "scope": "BOUNDED_OFFLINE_AUDIT_AND_PREVIEW_REPAIR"
+    },
+    {
+      "claim": "Only PR 386 pull_request shard 4 receives 60 minutes; every other event, PR and shard retains 30 minutes. Tests and the aggregator remain mandatory; merge phrase substitution is owner-authorized only after green exact-head CI and readiness.",
+      "claim_id": "C5",
+      "scope": "OWNER_AUTHORIZED_ONE_PR_CI_ALLOWANCE"
     }
   ],
   "task": {
-    "task_contract_sha256": "a16d8ebae4df2c8d5a20911212c46988eb2f3fa6426af879c431777d28a02fbd",
+    "task_contract_sha256": "2cb083185c1d038a99f307b032c696f0da3f92bb5ace33815af6aae17ab1bdf3",
     "task_id": "FORGE_RELIABILITY_AUDIT_CONTINUATION_V1"
   }
 }
