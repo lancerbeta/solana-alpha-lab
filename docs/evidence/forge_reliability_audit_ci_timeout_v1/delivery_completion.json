@@ -29,13 +29,14 @@
     "independent_review": {
       "path": "docs/evidence/forge_reliability_audit_ci_timeout_v1/independent_review.json",
       "sha256": "",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": [
       "PASS_CI_RENDERER_EXACT_VALIDATOR",
-      "PASS_TEST_COMMANDS_AND_AGGREGATOR_UNCHANGED"
+      "PASS_TEST_COMMANDS_AND_AGGREGATOR_UNCHANGED",
+      "PASS_FOUR_ISOLATED_ROLES"
     ]
   },
   "non_claims": [

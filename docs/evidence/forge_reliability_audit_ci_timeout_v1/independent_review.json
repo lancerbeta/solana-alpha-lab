@@ -12,8 +12,59 @@
     "GOAL_DOD_CRITIC",
     "OWNER_UX_CRITIC"
   ],
-  "reviews": [],
-  "verdict": "NOT_READY",
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEW",
+        "CONTENT_HEAD_ee9e2b2e83f7dc175ba16793419e4f6ffd25e630",
+        "NO_ACTIONABLE_P0_P1_P2",
+        "FULL_TESTS_60_MINUTES_PR_MAIN_AND_EXISTING_MANUAL_DISPATCH",
+        "TESTS_AND_DENY_AGGREGATOR_UNCHANGED",
+        "NO_PRODUCT_SOURCE_OR_SCIENTIFIC_CLAIM_CHANGE",
+        "STANDARD_PROFILE_RESEARCH_PARTIALS_PRESERVED"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEW",
+        "CONTENT_HEAD_ee9e2b2e83f7dc175ba16793419e4f6ffd25e630",
+        "NO_ACTIONABLE_P0_P1_P2",
+        "FULL_TESTS_60_MINUTES_PR_MAIN_AND_EXISTING_MANUAL_DISPATCH",
+        "TESTS_AND_DENY_AGGREGATOR_UNCHANGED",
+        "NO_PRODUCT_SOURCE_OR_SCIENTIFIC_CLAIM_CHANGE",
+        "INDEPENDENT_CI_WORKFLOW_14_OF_14_PASS"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEW",
+        "CONTENT_HEAD_ee9e2b2e83f7dc175ba16793419e4f6ffd25e630",
+        "NO_ACTIONABLE_P0_P1_P2",
+        "FULL_TESTS_60_MINUTES_PR_MAIN_AND_EXISTING_MANUAL_DISPATCH",
+        "TESTS_AND_DENY_AGGREGATOR_UNCHANGED",
+        "NO_PRODUCT_SOURCE_OR_SCIENTIFIC_CLAIM_CHANGE"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ISOLATED_READONLY_REVIEW",
+        "CONTENT_HEAD_ee9e2b2e83f7dc175ba16793419e4f6ffd25e630",
+        "NO_ACTIONABLE_P0_P1_P2",
+        "FULL_TESTS_60_MINUTES_PR_MAIN_AND_EXISTING_MANUAL_DISPATCH",
+        "TESTS_AND_DENY_AGGREGATOR_UNCHANGED",
+        "NO_PRODUCT_SOURCE_OR_SCIENTIFIC_CLAIM_CHANGE"
+      ]
+    }
+  ],
+  "verdict": "PASS",
   "non_claims": [
     "NO_SCIENTIFIC_ACCEPTANCE",
     "NO_MODEL_DIVERSITY_ATTESTATION",
