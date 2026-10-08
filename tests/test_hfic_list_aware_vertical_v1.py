@@ -1070,6 +1070,17 @@ class ListAwareVerticalTests(unittest.TestCase):
         self.assertNotEqual(bypass["_exit_code"], 0, bypass)
         self.assertEqual(bypass.get("reason_code"), "ORDINARY_OPERATION_STOPPED", bypass)
 
+        # Leave the shared plane clean for the later tests of this class: no open operation of this flow remains.
+        from solana_alpha_lab.factory.hfic_ordinary_operation import list_operations
+
+        from solana_alpha_lab.factory.hfic_ordinary_operation import get_operation
+
+        for digest in sorted({str(row["operation_sha256"]) for row in list_operations(reopened) if row.get("owner_focus") == "OPPORTUNITY_EPISODES:AUTO"}):
+            if get_operation(reopened, digest).get("status") == "STOPPED":
+                continue
+            closing = preview_operation_stop(reopened, operation_sha256=digest, owner_request_text="close the cycle-two vertical")
+            apply_operation_stop(reopened, proposal=closing["proposal"], confirm_append_only=True)
+
     def _operation_sha(self, journal: str) -> str:
         from solana_alpha_lab.factory.hfic_ordinary_operation import list_operations
         from solana_alpha_lab.factory.research_store import ResearchStore
