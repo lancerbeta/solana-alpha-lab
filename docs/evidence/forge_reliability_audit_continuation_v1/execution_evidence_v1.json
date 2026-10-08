@@ -58,8 +58,9 @@
       "denominator": 6
     },
     "DER": {
-      "direct_full_outcomes": 6,
-      "denominator": 12
+      "direct_material_claims": 4,
+      "material_claims": 8,
+      "ledger": "EVIDENCE_INDEX.md M1-M8"
     },
     "ARC": {
       "attacked": 8,
@@ -186,6 +187,16 @@
       "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/initial-draft.json",
       "sha256": "94228cabfed85b009657362b63d41df81dfacca87add18e535507b1e292cacda",
       "bytes": 51522
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/initial-freeze-failure.json",
+      "sha256": "a009cb02e07deb439ddbbb99ba8b999457e63298e69bd3b9c8877169af90fb42",
+      "bytes": 708
+    },
+    {
+      "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/initial-persist-result.json",
+      "sha256": "8a24b67e18cf186626eccaeef282e95756731b93389b56efc281d7da7c3ee98e",
+      "bytes": 41504
     },
     {
       "path": "docs/evidence/forge_reliability_audit_continuation_v1/native/owner-final.json",

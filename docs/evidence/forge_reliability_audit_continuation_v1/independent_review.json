@@ -1,0 +1,22 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-RELIABILITY-AUDIT-REVIEW-001",
+  "as_of": "2026-10-08",
+  "task_id": "FORGE_RELIABILITY_AUDIT_CONTINUATION_V1",
+  "reviewed_bindings_sha256": "",
+  "reviewed_inventory_sha256": "",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [],
+  "verdict": "NOT_READY",
+  "non_claims": [
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_MODEL_DIVERSITY_ATTESTATION",
+    "NO_MERGE"
+  ]
+}

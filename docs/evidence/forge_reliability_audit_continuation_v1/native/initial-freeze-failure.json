@@ -1,0 +1,9 @@
+{
+  "source_trace_sha256": "7a04fdbc898e635d8131fec941dcd96bc8151d35ffb616e9c12765d64e19e643",
+  "evidence_form": "BOUNDED_RAW_SCHEMA_ERROR_EXCERPT",
+  "raw_excerpt": "AUDIT_SCHEMA_ERROR catalog/schemas/hypothesis_critic_input_v1.schema.json ['selected_candidate', 'confounders'] <synthetic string value omitted> is not of type 'array'",
+  "public_stderr": "HFIC_PROTOCOL_INVALID",
+  "origin": "hfic_session.py:8354 and hfic_session.py:2220",
+  "persisted_payload_sha256": "df3fbf233589659c1f38d39e8de792ccc8a7dfd0d96238e2fa3027f458e8374e",
+  "preserved_initial_draft_role": "initial-draft.json is post-correction conflict input; first persisted bytes are in initial-persist-result.json payload_canonical"
+}

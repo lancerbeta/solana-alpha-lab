@@ -61,9 +61,9 @@ context_requirements:
     - docs/contracts/forge_list_aware_research_scope_v1.md
     - docs/contracts/experiment_evidence_decision_v1.md
     DELIVERY_EVIDENCE:
-    - docs/reports/forge_reliability_audit_continuation_v1/EVIDENCE_INDEX.md
-    - docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json
-    - docs/evidence/forge_research_policy_runtime_v1/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/forge_reliability_audit_continuation_v1/delivery_completion.json
+    - docs/evidence/forge_reliability_audit_continuation_v1/independent_review.json
+    - docs/evidence/forge_reliability_audit_continuation_v1/factory_fit.json
     HISTORICAL_CONTEXT: []
 ---
 
