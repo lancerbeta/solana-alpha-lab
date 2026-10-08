@@ -89,7 +89,10 @@ may be reused by all pure readers. No persistent/cross-process cache exists.
 Entering a writer lease disables that snapshot before CAS/admission; leaving it
 clears the enclosing snapshot and advances its generation even on failure.
 A suspended iterator from an older generation cannot republish stale history. A subsequent read verifies again.
-No lease is held through generator/Critic/evaluator latency. Integrity failures
+No lease is held through generator/Critic/evaluator latency. Reserved query
+intent and result publish the already-built event with the existing 40x50ms
+WRITER_BUSY-only budget; reservation/evaluator is never repeated. Other integrity
+or conflict errors remain terminal. Integrity failures
 cannot populate a reusable verified history. Resource probe compares identical
 40/400-record roots in three fresh processes and hashes result/state/counters.
 

@@ -122,7 +122,7 @@ Early mechanical entry typos are corrected before packaging evidence.
   passive prefix poison traces; OS interruption/fresh process/moved root;
   corrupt/stale/race controls; paired 40/400 cold read counts/three medians;
   bounded capability mutation and historical repair regression.
-- [x] V4 / D12,D13,D15,D18: actual emitted episode packet -> isolated native
+- [ ] V4 / D12,D13,D15,D18: actual emitted episode packet -> isolated native
   generator -> unchanged authored draft -> persist/freeze -> isolated Critic ->
   truthful machine endpoint; separate scripted-Critic classify/final/replay;
   packet-only adversarial read; compact evidence index, affected tests, four
