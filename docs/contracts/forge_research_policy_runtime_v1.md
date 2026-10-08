@@ -120,7 +120,11 @@ itself. A stopped member of the lineage or an unresolved reservation refuses a
 new segment, and an earlier cycle's child may not be recorded after a later
 cycle's (`ORDINARY_OPERATION_LINEAGE_OUT_OF_ORDER`): the continuation runs
 forward, so one representation never holds two independent budgets. The child of a cycle-2 parent is not an AUTO cycle, so the AUTO
-count stays at the pool. A BASE lineage row counts only when its journal is
+count stays at the pool. The root decision is serialized by the ResearchStore writer lease: the operation commit re-derives the
+representation line under the lease, so two concurrent first variants leave exactly one root, and a stop,
+a pending reservation or a competing commit between the decision and the commit refuses or replans the
+new segment (no orphan budget can be spent from: spend resolves through the line's root).
+A BASE lineage row counts only when its journal is
 `cycle_search_key(accounting_root, cycle_index)`: a request naming another root
 is refused and can neither borrow nor poison any budget. An exact episode query
 already saved anywhere in the lineage is a replay (the episode collection's

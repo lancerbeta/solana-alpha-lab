@@ -438,5 +438,77 @@ class RepresentationContinuationOrderTests(unittest.TestCase):
         self.assertEqual(derive("S1", "99" * 32, [other_focus]), (None, None))
 
 
+class LineageRaceUnderLeaseTests(unittest.TestCase):
+    """Validator P1: the representation root is decided again under the ResearchStore writer lease."""
+
+    FOCUS = "OPPORTUNITY_EPISODES:AUTO"
+    REP = "NORMALIZED_TRAJECTORY_EPISODES_V1"
+
+    def _request(self, journal: str, parent: str, text: str) -> dict:
+        return {
+            "owner_request_text": text, "owner_focus": self.FOCUS, "journal_scope": journal,
+            "market_evidence_epoch_sha256": MARKET, "owner_cap": {"main": None, "adaptive": None, "preview": None},
+            "requested_completion": oo.LIMITED_RESULT,
+            "representation": {
+                "representation_id": self.REP, "representation_semantic_version": "1.0", "parent_session_id": parent,
+                "representation_payload_sha256": journal, "scope_applied_sha256": "ee" * 32,
+            },
+        }
+
+    def _bundles(self):
+        from unittest import mock
+
+        from solana_alpha_lab.factory import hfic_session
+
+        return mock.patch.object(hfic_session, "load_session_bundle", side_effect=lambda store, sid: {"owner_focus": self.FOCUS})
+
+    def test_two_first_variants_racing_leave_exactly_one_root(self) -> None:
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as raw, self._bundles():
+            store = ResearchStore(Path(raw))
+            first, second = "a7" * 32, "b8" * 32
+            real_append = oo._append
+            injected = {"done": False}
+
+            def interleave(*args, **kwargs):
+                # Process B has read "no root yet" and is about to commit; process A commits first.
+                if not injected["done"] and kwargs.get("kind") == oo.OPERATION_KIND:
+                    injected["done"] = True
+                    oo.record_operation(store, self._request(first, "S1", "variant A"))
+                return real_append(*args, **kwargs)
+
+            with mock.patch.object(oo, "_append", side_effect=interleave):
+                b = oo.record_operation(store, self._request(second, "S1", "variant B"))
+            roots = [row for row in oo.list_operations(store) if isinstance(row.get("representation"), dict) and not row.get("accounting_root")]
+            self.assertEqual([row["journal_scope"] for row in roots], [first])  # exactly one root
+            self.assertEqual(b["accounting_root"], first)  # B was planned again and joined A's line
+            self.assertEqual(oo.accounting_root_of(store, second), first)
+            self.assertEqual(oo.journal_occupancy(store, second)["main"]["limit"], oo.journal_occupancy(store, first)["main"]["limit"])
+
+    def test_a_stop_between_the_root_decision_and_the_commit_refuses_the_new_segment(self) -> None:
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as raw, self._bundles():
+            store = ResearchStore(Path(raw))
+            first, second = "a7" * 32, "b8" * 32
+            a = oo.record_operation(store, self._request(first, "S1", "variant A"))
+            real_append = oo._append
+            injected = {"done": False}
+
+            def interleave(*args, **kwargs):
+                if not injected["done"] and kwargs.get("kind") == oo.OPERATION_KIND:
+                    injected["done"] = True
+                    stop = oo.preview_operation_stop(store, operation_sha256=str(a["operation_sha256"]), owner_request_text="stop A")
+                    oo.apply_operation_stop(store, proposal=stop["proposal"], confirm_append_only=True)
+                return real_append(*args, **kwargs)
+
+            with mock.patch.object(oo, "_append", side_effect=interleave):
+                with self.assertRaises(oo.OrdinaryOperationError) as refused:
+                    oo.record_operation(store, self._request(second, "S1", "variant B"))
+            self.assertEqual(refused.exception.code, "ORDINARY_OPERATION_STOPPED")
+            self.assertFalse([row for row in oo.list_operations(store) if row.get("journal_scope") == second])
+
+
 if __name__ == "__main__":
     unittest.main()

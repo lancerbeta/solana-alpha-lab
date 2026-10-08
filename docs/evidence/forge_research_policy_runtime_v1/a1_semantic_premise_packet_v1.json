@@ -1,8 +1,8 @@
 {
   "candidate": {
     "base": "04ec8e0286a3dce5999d0687784717ee90fc5dca",
-    "diff_sha256": "9be1c3254242c85df609912034a8e7eee5b8333e003e1c9c9c779da0c074d3a8",
-    "head": "637dcc8bfe0a366a776c4c76a2e13feffef4836f"
+    "diff_sha256": "2c7120291d243358a63f7414b47dffbbb196bd700035e500e4b92543253b4a07",
+    "head": "6b2020ee77d475f1cb2c1f248567425eeac82918"
   },
   "evidence": [
     {
@@ -39,7 +39,7 @@
     },
     {
       "logical_ref": "repo://scripts/hypothesis_forge.py",
-      "sha256_or_fingerprint": "080fb97c84c347afb11530bdb982b336e771614759ec81a476c628c18766e8a1"
+      "sha256_or_fingerprint": "0f481d8ac5f32629630f39119b39ae561afb18ac629d6f7f6fbe0025c6fba7a5"
     },
     {
       "logical_ref": "repo://tests/test_hfic_research_policy_v1.py",
@@ -51,7 +51,7 @@
     },
     {
       "logical_ref": "repo://tests/test_hfic_research_policy_closure_v1.py",
-      "sha256_or_fingerprint": "6dfef24417d708a1f80be86e2cdc1976af0b301a48c2a942a1745a3aaca1c746"
+      "sha256_or_fingerprint": "59df0aefd03e9d2a4b36f2db4ae22564bbf2c12d52424c5ef66ca7fee7356682"
     },
     {
       "logical_ref": "repo://tests/test_hfic_list_aware_vertical_v1.py",
@@ -87,7 +87,7 @@
     "NO_PR_A_LIST_AWARE_SCOPE_REOPENED",
     "NO_NEW_COLLECTOR_EVALUATOR_DATABASE_OR_SERVICE"
   ],
-  "packet_fingerprint_sha256": "91aa0d95681d75cf35b6ba3d679c1c9b5e69027e763e07c83312d3a592b10de9",
+  "packet_fingerprint_sha256": "fd29d9b6403aad4d670c599942801aa6c0a406c15b4a422a588df63292e26c11",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",

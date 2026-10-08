@@ -105,8 +105,12 @@ def _cap_field(value: object) -> int | None:
     return value
 
 
+class _LineageMoved(Exception):
+    """Internal: the representation line changed between planning and commit; plan again."""
+
+
 def record_operation(
-    store: Any, request: Mapping[str, Any], *, create_if_missing: bool = True
+    store: Any, request: Mapping[str, Any], *, create_if_missing: bool = True, _attempt: int = 0
 ) -> dict[str, Any]:
     """Persist one explicit owner request. The same bytes return the same row."""
 
@@ -237,8 +241,31 @@ def record_operation(
     # and freezes at the shipped defaults, never at today's raised policy.
     if accounting_root is None:
         ensure_run_snapshot(store, journal, has_history=journal_has_history(store, journal))
+
+    def _recheck_under_lease() -> None:
+        # The root decision above was read before this commit. Under the ResearchStore writer lease it is
+        # decided again: if another writer created the same row, moved the research line, or stopped a member
+        # in between, this commit does not happen (no orphan budget) and the request is planned again.
+        if any(item.get("operation_sha256") == digest for item in list_operations(store)):
+            raise _LineageMoved()
+        if cycle_index:
+            _validated_lineage_link(store, request, journal=journal, focus=focus, market=market, cycle_index=int(cycle_index))
+        if representation is not None and not cycle_index:
+            root_now, blocker_now = _representation_continuation_root(
+                store, representation=representation, focus=focus, market=market, journal=journal
+            )
+            if blocker_now:
+                raise OrdinaryOperationError(blocker_now)
+            if root_now != accounting_root:
+                raise _LineageMoved()
+
     # A linked later cycle never freezes its own budget: it spends its lineage root's.
-    _append(store, kind=OPERATION_KIND, body=stored, record_prefix="HFIC-ART-OP")
+    try:
+        _append(store, kind=OPERATION_KIND, body=stored, record_prefix="HFIC-ART-OP", before_commit=_recheck_under_lease)
+    except _LineageMoved:
+        if _attempt >= 8:
+            raise OrdinaryOperationError("ORDINARY_OPERATION_LINEAGE_UNSTABLE") from None
+        return record_operation(store, request, create_if_missing=create_if_missing, _attempt=_attempt + 1)
     stored["record_id"] = f"HFIC-ART-OP-{digest[:40].upper()}"
     return stored
 
