@@ -39,7 +39,11 @@ jobs:
       - name: Configure local hooks
         run: git config --local core.hooksPath .githooks
       - name: Unchanged RSS workload diagnostic ONLY
-        run: uv run --locked --managed-python python -B scripts/prove_linux_rss_gate.py
+        run: uv run --locked --managed-python python -B scripts/prove_linux_rss_gate.py --after-repair
+      - name: Real inherited and released-child RSS regressions
+        run: uv run --locked --managed-python python -B -m unittest discover -s tests -p test_linux_rss_gate_v1.py -v
+      - name: Existing legacy memory workload and recovery cases
+        run: uv run --locked --managed-python python -B -m unittest discover -s tests -p test_legacy_fat_open_bounded_artifacts_resume_v1.py -v
 
   validate-execution:
     if: ${{ false }}
