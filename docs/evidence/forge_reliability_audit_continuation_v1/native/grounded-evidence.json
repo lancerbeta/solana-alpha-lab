@@ -1,0 +1,882 @@
+{
+  "authority_source": "PUBLISHED_DISCOVERY_LABELS_V1",
+  "budget": {
+    "adaptive_count": 0,
+    "adaptive_limit": 2,
+    "compound_main_count": 1,
+    "main_count": 1,
+    "main_limit": 6,
+    "simple_main_count": 0,
+    "viewed_variants": [
+      "MATCHED_OBSERVED",
+      "BASELINE_DECISION_ELIGIBLE",
+      "ABLATION_DROP_impulse",
+      "ABLATION_DROP_pullback",
+      "ABLATION_DROP_retention",
+      "COST_LOW",
+      "COST_BASE",
+      "COST_STRESS",
+      "MISSING_STRESS_MODEL",
+      "DOWNSIDE_DESCRIPTIVE_V1"
+    ]
+  },
+  "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V5",
+  "candidate_scope": {
+    "decision_timestamp": "Y3600",
+    "estimand": "price_relative_proxy",
+    "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+    "explanatory_condition": "compound",
+    "population": "BASE_X",
+    "representation_scope": "TEMPORAL_PRICE_LIQUIDITY",
+    "target": "PRICE_RELATIVE_PROXY:Y3600:Y7200:FIELD-USD-PRICE-001"
+  },
+  "contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
+  "data_binding_sha256": "e5d64ff3c3048a60a988b6e7b86a43e2b17462507a76cdbf5bf561fa1fe481e1",
+  "descriptive_readout": {
+    "assessment": "DESCRIPTIVE_ONLY_NO_AUTOMATIC_VERDICT",
+    "baseline": {
+      "downside": {
+        "es10_return": 0.19999999999999996,
+        "es10_tail_mass_n": 0.1,
+        "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+        "le_minus_20_n": 0,
+        "le_minus_20_rate": 0.0,
+        "le_minus_50_n": 0,
+        "le_minus_50_rate": 0.0,
+        "missing_n": 0,
+        "negative_mass": 0,
+        "negative_n": 0,
+        "observed_n": 1,
+        "p05": 0.19999999999999996,
+        "p10": 0.19999999999999996,
+        "p25": 0.19999999999999996,
+        "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+        "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+        "status": "OBSERVED",
+        "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+        "worst_negative_share": null,
+        "zero_n": 0
+      },
+      "eligible_n": 1,
+      "mean_target": 0.19999999999999996,
+      "median_target": 0.19999999999999996,
+      "view": "BASELINE_DECISION_ELIGIBLE"
+    },
+    "baseline_may_include_matched": true,
+    "detail_truncation": {
+      "ablations": {
+        "included": 3,
+        "total": 3,
+        "truncated": false
+      },
+      "by_calendar_block": {
+        "included": 1,
+        "total": 1,
+        "truncated": false
+      },
+      "by_cohort": {
+        "included": 1,
+        "total": 1,
+        "truncated": false
+      }
+    },
+    "details": {
+      "ablations": [
+        {
+          "downside": {
+            "es10_return": 0.19999999999999996,
+            "es10_tail_mass_n": 0.1,
+            "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+            "le_minus_20_n": 0,
+            "le_minus_20_rate": 0.0,
+            "le_minus_50_n": 0,
+            "le_minus_50_rate": 0.0,
+            "missing_n": 0,
+            "negative_mass": 0,
+            "negative_n": 0,
+            "observed_n": 1,
+            "p05": 0.19999999999999996,
+            "p10": 0.19999999999999996,
+            "p25": 0.19999999999999996,
+            "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+            "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+            "status": "OBSERVED",
+            "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+            "worst_negative_share": null,
+            "zero_n": 0
+          },
+          "eligible_n": 1,
+          "mean_target": 0.19999999999999996,
+          "median_target": 0.19999999999999996,
+          "view": "ABLATION_DROP_impulse"
+        },
+        {
+          "downside": {
+            "es10_return": 0.19999999999999996,
+            "es10_tail_mass_n": 0.1,
+            "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+            "le_minus_20_n": 0,
+            "le_minus_20_rate": 0.0,
+            "le_minus_50_n": 0,
+            "le_minus_50_rate": 0.0,
+            "missing_n": 0,
+            "negative_mass": 0,
+            "negative_n": 0,
+            "observed_n": 1,
+            "p05": 0.19999999999999996,
+            "p10": 0.19999999999999996,
+            "p25": 0.19999999999999996,
+            "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+            "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+            "status": "OBSERVED",
+            "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+            "worst_negative_share": null,
+            "zero_n": 0
+          },
+          "eligible_n": 1,
+          "mean_target": 0.19999999999999996,
+          "median_target": 0.19999999999999996,
+          "view": "ABLATION_DROP_pullback"
+        },
+        {
+          "downside": {
+            "es10_return": 0.19999999999999996,
+            "es10_tail_mass_n": 0.1,
+            "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+            "le_minus_20_n": 0,
+            "le_minus_20_rate": 0.0,
+            "le_minus_50_n": 0,
+            "le_minus_50_rate": 0.0,
+            "missing_n": 0,
+            "negative_mass": 0,
+            "negative_n": 0,
+            "observed_n": 1,
+            "p05": 0.19999999999999996,
+            "p10": 0.19999999999999996,
+            "p25": 0.19999999999999996,
+            "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+            "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+            "status": "OBSERVED",
+            "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+            "worst_negative_share": null,
+            "zero_n": 0
+          },
+          "eligible_n": 1,
+          "mean_target": 0.19999999999999996,
+          "median_target": 0.19999999999999996,
+          "view": "ABLATION_DROP_retention"
+        }
+      ],
+      "by_calendar_block": [
+        {
+          "downside": {
+            "es10_return": 0.19999999999999996,
+            "es10_tail_mass_n": 0.1,
+            "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+            "le_minus_20_n": 0,
+            "le_minus_20_rate": 0.0,
+            "le_minus_50_n": 0,
+            "le_minus_50_rate": 0.0,
+            "missing_n": 0,
+            "negative_mass": 0,
+            "negative_n": 0,
+            "observed_n": 1,
+            "p05": 0.19999999999999996,
+            "p10": 0.19999999999999996,
+            "p25": 0.19999999999999996,
+            "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+            "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+            "status": "OBSERVED",
+            "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+            "worst_negative_share": null,
+            "zero_n": 0
+          },
+          "eligible_n": 1,
+          "mean_target": 0.19999999999999996,
+          "median_target": 0.19999999999999996,
+          "view": "2026-01-05"
+        }
+      ],
+      "by_cohort": [
+        {
+          "downside": {
+            "es10_return": 0.19999999999999996,
+            "es10_tail_mass_n": 0.1,
+            "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+            "le_minus_20_n": 0,
+            "le_minus_20_rate": 0.0,
+            "le_minus_50_n": 0,
+            "le_minus_50_rate": 0.0,
+            "missing_n": 0,
+            "negative_mass": 0,
+            "negative_n": 0,
+            "observed_n": 1,
+            "p05": 0.19999999999999996,
+            "p10": 0.19999999999999996,
+            "p25": 0.19999999999999996,
+            "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+            "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+            "status": "OBSERVED",
+            "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+            "worst_negative_share": null,
+            "zero_n": 0
+          },
+          "eligible_n": 1,
+          "mean_target": 0.19999999999999996,
+          "median_target": 0.19999999999999996,
+          "view": "REL-20260105T120000Z-20260112T120000Z"
+        }
+      ]
+    },
+    "matched": {
+      "downside": {
+        "es10_return": 0.19999999999999996,
+        "es10_tail_mass_n": 0.1,
+        "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+        "le_minus_20_n": 0,
+        "le_minus_20_rate": 0.0,
+        "le_minus_50_n": 0,
+        "le_minus_50_rate": 0.0,
+        "missing_n": 0,
+        "negative_mass": 0,
+        "negative_n": 0,
+        "observed_n": 1,
+        "p05": 0.19999999999999996,
+        "p10": 0.19999999999999996,
+        "p25": 0.19999999999999996,
+        "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+        "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+        "status": "OBSERVED",
+        "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+        "worst_negative_share": null,
+        "zero_n": 0
+      },
+      "eligible_n": 1,
+      "mean_target": 0.19999999999999996,
+      "median_target": 0.19999999999999996,
+      "view": "MATCHED_OBSERVED"
+    },
+    "missingness": "OBSERVED_DENOMINATOR_ONLY_NO_MAR_ASSUMPTION",
+    "selection_policy": "CANONICAL_ORDER_PREFIX",
+    "status": "DESCRIPTIVE_PROXY",
+    "tail_support": "DESCRIPTIVE_ESTIMATE_NOT_CONFIDENCE_INTERVAL"
+  },
+  "duplicate_partitions_eliminated": 0,
+  "journal_scope": "d9be18323a4e3d2fdb7c7a702ca558c0b8781b78db84bbd00d98c5fd7c6201ef",
+  "live_store_selected": false,
+  "look_scope_relation": "LOOK_SCOPE_MATCH",
+  "operation_sha256": "76d0264ab8b900e2d5e0c027f785ad9415976a6e83bf3cd9c2e5ad638af2d276",
+  "ordinary_operation": "PAUSED_CAP",
+  "priors": [],
+  "queries": [
+    {
+      "look_class": "MAIN",
+      "new_look": true,
+      "query_id": "native-main-0",
+      "record_id": "HFIC-ART-DISCOVERY-1B7BDBF7C350EFB65AFC8F2E0F48E42DEFF00D8E",
+      "search_tier": "COMPOUND_SCREEN",
+      "spec_sha256": "140a1c08a720e18a128da1b4b5f6dc48c5950470429f87f7e5f657617d61c0ae"
+    }
+  ],
+  "record_delta": {
+    "discovery_look_records": 1
+  },
+  "result": {
+    "ablations": [
+      {
+        "downside": {
+          "es10_return": 0.19999999999999996,
+          "es10_tail_mass_n": 0.1,
+          "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": 0.0,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": 0.0,
+          "missing_n": 0,
+          "negative_mass": 0,
+          "negative_n": 0,
+          "observed_n": 1,
+          "p05": 0.19999999999999996,
+          "p10": 0.19999999999999996,
+          "p25": 0.19999999999999996,
+          "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+          "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+          "status": "OBSERVED",
+          "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+          "worst_negative_share": null,
+          "zero_n": 0
+        },
+        "dropped_feature": "impulse",
+        "mean_target": 0.19999999999999996,
+        "mean_target_kind": "PRICE_RELATIVE_PROXY",
+        "median_target": 0.19999999999999996,
+        "observed_n": 1,
+        "selection_relevant": true,
+        "view": "ABLATION_DROP_impulse"
+      },
+      {
+        "downside": {
+          "es10_return": 0.19999999999999996,
+          "es10_tail_mass_n": 0.1,
+          "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": 0.0,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": 0.0,
+          "missing_n": 0,
+          "negative_mass": 0,
+          "negative_n": 0,
+          "observed_n": 1,
+          "p05": 0.19999999999999996,
+          "p10": 0.19999999999999996,
+          "p25": 0.19999999999999996,
+          "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+          "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+          "status": "OBSERVED",
+          "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+          "worst_negative_share": null,
+          "zero_n": 0
+        },
+        "dropped_feature": "pullback",
+        "mean_target": 0.19999999999999996,
+        "mean_target_kind": "PRICE_RELATIVE_PROXY",
+        "median_target": 0.19999999999999996,
+        "observed_n": 1,
+        "selection_relevant": true,
+        "view": "ABLATION_DROP_pullback"
+      },
+      {
+        "downside": {
+          "es10_return": 0.19999999999999996,
+          "es10_tail_mass_n": 0.1,
+          "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": 0.0,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": 0.0,
+          "missing_n": 0,
+          "negative_mass": 0,
+          "negative_n": 0,
+          "observed_n": 1,
+          "p05": 0.19999999999999996,
+          "p10": 0.19999999999999996,
+          "p25": 0.19999999999999996,
+          "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+          "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+          "status": "OBSERVED",
+          "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+          "worst_negative_share": null,
+          "zero_n": 0
+        },
+        "dropped_feature": "retention",
+        "mean_target": 0.19999999999999996,
+        "mean_target_kind": "PRICE_RELATIVE_PROXY",
+        "median_target": 0.19999999999999996,
+        "observed_n": 1,
+        "selection_relevant": true,
+        "view": "ABLATION_DROP_retention"
+      }
+    ],
+    "base_x_n": 1,
+    "baseline": {
+      "downside": {
+        "es10_return": 0.19999999999999996,
+        "es10_tail_mass_n": 0.1,
+        "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+        "le_minus_20_n": 0,
+        "le_minus_20_rate": 0.0,
+        "le_minus_50_n": 0,
+        "le_minus_50_rate": 0.0,
+        "missing_n": 0,
+        "negative_mass": 0,
+        "negative_n": 0,
+        "observed_n": 1,
+        "p05": 0.19999999999999996,
+        "p10": 0.19999999999999996,
+        "p25": 0.19999999999999996,
+        "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+        "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+        "status": "OBSERVED",
+        "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+        "worst_negative_share": null,
+        "zero_n": 0
+      },
+      "mean_target": 0.19999999999999996,
+      "mean_target_kind": "PRICE_RELATIVE_PROXY",
+      "median_target": 0.19999999999999996,
+      "observed_n": 1,
+      "view": "BASELINE_DECISION_ELIGIBLE"
+    },
+    "block_count": 1,
+    "by_calendar_block": [
+      {
+        "downside": {
+          "es10_return": 0.19999999999999996,
+          "es10_tail_mass_n": 0.1,
+          "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": 0.0,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": 0.0,
+          "missing_n": 0,
+          "negative_mass": 0,
+          "negative_n": 0,
+          "observed_n": 1,
+          "p05": 0.19999999999999996,
+          "p10": 0.19999999999999996,
+          "p25": 0.19999999999999996,
+          "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+          "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+          "status": "OBSERVED",
+          "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+          "worst_negative_share": null,
+          "zero_n": 0
+        },
+        "mean_target": 0.19999999999999996,
+        "mean_target_kind": "PRICE_RELATIVE_PROXY",
+        "median_target": 0.19999999999999996,
+        "observed_n": 1,
+        "view": "2026-01-05"
+      }
+    ],
+    "by_cohort": [
+      {
+        "base_x_n": 1,
+        "cohort_id": "REL-20260105T120000Z-20260112T120000Z",
+        "decision_eligible_n": 1,
+        "denominator_base_x": 1,
+        "downside": {
+          "es10_return": 0.19999999999999996,
+          "es10_tail_mass_n": 0.1,
+          "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+          "le_minus_20_n": 0,
+          "le_minus_20_rate": 0.0,
+          "le_minus_50_n": 0,
+          "le_minus_50_rate": 0.0,
+          "missing_n": 0,
+          "negative_mass": 0,
+          "negative_n": 0,
+          "observed_n": 1,
+          "p05": 0.19999999999999996,
+          "p10": 0.19999999999999996,
+          "p25": 0.19999999999999996,
+          "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+          "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+          "status": "OBSERVED",
+          "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+          "worst_negative_share": null,
+          "zero_n": 0
+        },
+        "exclusion_reasons": {
+          "NOT_X_ELIGIBLE": 4
+        },
+        "feature_admissible": 1,
+        "feature_unknown_n": 0,
+        "independent_replication": false,
+        "matched_n": 1,
+        "mean_target": 0.19999999999999996,
+        "mean_target_kind": "PRICE_RELATIVE_PROXY",
+        "median_target": 0.19999999999999996,
+        "membership": "DESCRIPTIVE_NOT_INDEPENDENT",
+        "missing_target_n": 0,
+        "observed_target_n": 1,
+        "population_n": 1,
+        "shared_decision_n": 0,
+        "target_exclusion_reasons": {},
+        "target_observed_after_decision": 1,
+        "view": "REL-20260105T120000Z-20260112T120000Z"
+      }
+    ],
+    "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V5",
+    "claim_level": "EXPLORATORY_PROXY",
+    "cohort_independent_replication": false,
+    "cohort_slices_are_descriptive": true,
+    "contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
+    "cost": {
+      "decision_sensitivity": "FRAGILE",
+      "excluded_components": [
+        "INFRASTRUCTURE_OVERHEAD",
+        "LIVE_FEE_SCHEDULE",
+        "OBSERVED_FILL"
+      ],
+      "haircut_basis": "MARK_NOT_QUOTE",
+      "included_components": [
+        "EXIT_FAILURE_STRESS",
+        "ROUND_TRIP_HAIRCUT",
+        "SEPARATE_CASH_F"
+      ],
+      "labeled_net_return": false,
+      "scenarios": {
+        "BASE": {
+          "basis": "OBSERVED_CASE_MEAN",
+          "estimated_net_proxy": 0.026000000000000065,
+          "h_break_even": 0.12280701754385959,
+          "h_break_even_applicable": true,
+          "h_break_even_inside_unit_interval": true,
+          "label": "ESTIMATED_NET_PROXY",
+          "r_success": 0.08000000000000007
+        },
+        "LOW": {
+          "basis": "OBSERVED_CASE_MEAN",
+          "estimated_net_proxy": 0.16399999999999992,
+          "h_break_even": 0.16666666666666663,
+          "h_break_even_applicable": true,
+          "h_break_even_inside_unit_interval": true,
+          "label": "ESTIMATED_NET_PROXY",
+          "r_success": 0.16399999999999992
+        },
+        "STRESS": {
+          "basis": "OBSERVED_CASE_MEAN",
+          "estimated_net_proxy": -0.3000000000000001,
+          "h_break_even": -0.0625,
+          "h_break_even_applicable": true,
+          "h_break_even_inside_unit_interval": false,
+          "label": "ESTIMATED_NET_PROXY",
+          "r_success": -0.10000000000000009
+        }
+      },
+      "source_status": "ASSUMPTION_NOT_CALIBRATED",
+      "status": "EVALUATED"
+    },
+    "decision_eligible_n": 1,
+    "downside": {
+      "es10_return": 0.19999999999999996,
+      "es10_tail_mass_n": 0.1,
+      "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+      "le_minus_20_n": 0,
+      "le_minus_20_rate": 0.0,
+      "le_minus_50_n": 0,
+      "le_minus_50_rate": 0.0,
+      "missing_n": 0,
+      "negative_mass": 0,
+      "negative_n": 0,
+      "observed_n": 1,
+      "p05": 0.19999999999999996,
+      "p10": 0.19999999999999996,
+      "p25": 0.19999999999999996,
+      "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+      "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+      "status": "OBSERVED",
+      "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+      "worst_negative_share": null,
+      "zero_n": 0
+    },
+    "downside_readout_exposure": {
+      "fixed_metrics": [
+        "p05",
+        "p10",
+        "p25",
+        "le_minus_20_rate",
+        "le_minus_50_rate",
+        "es10_return",
+        "negative_mass",
+        "worst_negative_share"
+      ],
+      "new_threshold_trials": false,
+      "profile": "DOWNSIDE_DESCRIPTIVE_V1"
+    },
+    "duplicate_delivery_count": 0,
+    "eligibility_uses_target": false,
+    "engine_emits_alpha": false,
+    "exclusion_reasons": {
+      "NOT_X_ELIGIBLE": 4
+    },
+    "experiment_recipe": {
+      "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+      "cost_label": "ESTIMATED_NET_PROXY",
+      "frozen_input": [
+        {
+          "census_rel": "datasets/partitions/date=2026-01-15/PARTITION-LIVE-COHORT-REL-20260105T120000Z-20260112T120000Z-CENSUS-7182a270de9cbf2b.parquet",
+          "census_sha256": "60dee27102580693ab24b4d0876f8bb66630e97c90a3ff8746989541b007deaf",
+          "cohort_id": "REL-20260105T120000Z-20260112T120000Z",
+          "dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+          "dataset_manifest_id": "dataset-5a050d652f6084287d75079cbd5ad20a4d807123a114ac46d2d4b75d9553edb5",
+          "evidence_role": "EXPLORATORY_REUSE",
+          "holdout": false,
+          "observations_rel": "datasets/partitions/date=2026-01-15/PARTITION-LIVE-COHORT-REL-20260105T120000Z-20260112T120000Z-OBS-7182a270de9cbf2b.parquet",
+          "observations_sha256": "1289caec27c9be6bbaac30230dc65e27593d8d03738d46bf1159a19aa38734d7",
+          "release_id": "7182a270de9cbf2bd9df16bcb5e5051989bd51049b98e9155a5751428fd70be7",
+          "schedule_lateness_seconds": null,
+          "schedule_point_due_offset_seconds": {
+            "X300": 300,
+            "Y1800": 1800,
+            "Y3600": 3600,
+            "Y7200": 7200,
+            "Y900": 900
+          },
+          "schedule_point_lateness": {
+            "X300": 300,
+            "Y1800": 300,
+            "Y3600": 300,
+            "Y7200": 300,
+            "Y900": 300
+          },
+          "schedule_sha256": "bc9320ec2176061a0bb85e16e6dcd3702f258e0fdf84e19413e51efa1f3f21bc"
+        }
+      ],
+      "labeled_net_return": false,
+      "observation_clock_policy": "EVENT_TIME_V1",
+      "schema": "smial.hfic-temporal-query",
+      "schema_version": "1.0",
+      "scientific_identity": "140a1c08a720e18a128da1b4b5f6dc48c5950470429f87f7e5f657617d61c0ae",
+      "spec": {
+        "adaptation_of": null,
+        "budget_allocation": "AUTO",
+        "query_id": "native-main-0",
+        "schema": "smial.hfic-temporal-query",
+        "schema_version": "1.0",
+        "scientific_body": {
+          "cost_profile": {
+            "excluded_components": [
+              "INFRASTRUCTURE_OVERHEAD",
+              "LIVE_FEE_SCHEDULE",
+              "OBSERVED_FILL"
+            ],
+            "haircut_basis": "MARK_NOT_QUOTE",
+            "included_components": [
+              "EXIT_FAILURE_STRESS",
+              "ROUND_TRIP_HAIRCUT",
+              "SEPARATE_CASH_F"
+            ],
+            "kind": "ASSUMPTION_STRESS_ONLY",
+            "scenarios": {
+              "BASE": {
+                "f": 0.0,
+                "h": 0.1,
+                "q": 0.05,
+                "r_fail": -1.0
+              },
+              "LOW": {
+                "f": 0.0,
+                "h": 0.03,
+                "q": 0.0,
+                "r_fail": -1.0
+              },
+              "STRESS": {
+                "f": 0.02,
+                "h": 0.25,
+                "q": 0.2,
+                "r_fail": -1.0
+              }
+            },
+            "source_status": "ASSUMPTION_NOT_CALIBRATED"
+          },
+          "decision_point": "Y3600",
+          "entry_model": {
+            "assumed_latency_seconds": 30,
+            "kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT"
+          },
+          "evaluation": {
+            "ablations": "DROP_ONE_CONDITION",
+            "baseline": "SAME_DECISION_ELIGIBLE",
+            "calendar_block": "UTC_DAY_OF_DECISION"
+          },
+          "features": [
+            {
+              "end": "Y1800",
+              "field_id": "FIELD-USD-PRICE-001",
+              "name": "impulse",
+              "op": "return_ratio",
+              "start": "X300"
+            },
+            {
+              "at": "Y3600",
+              "field_id": "FIELD-USD-PRICE-001",
+              "name": "pullback",
+              "op": "drawdown_from_grid_max",
+              "points": [
+                "X300",
+                "Y900",
+                "Y1800",
+                "Y3600"
+              ]
+            },
+            {
+              "denominator": "Y1800",
+              "field_id": "FIELD-LIQUIDITY-USD-001",
+              "name": "retention",
+              "numerator": "Y3600",
+              "op": "ratio"
+            }
+          ],
+          "observation_clock_policy": "EVENT_TIME_V1",
+          "population": "BASE_X",
+          "predicates": [
+            {
+              "closed": "left",
+              "feature": "impulse",
+              "lower": 0.25,
+              "op": "between",
+              "upper": 2.0
+            },
+            {
+              "closed": "left",
+              "feature": "pullback",
+              "lower": -0.4,
+              "op": "between",
+              "upper": -0.1
+            },
+            {
+              "feature": "retention",
+              "op": "gte",
+              "value": 0.1
+            }
+          ],
+          "schedule_lateness_seconds": 300,
+          "target": {
+            "exit_point": "Y7200",
+            "field_id": "FIELD-USD-PRICE-001",
+            "kind": "PRICE_RELATIVE_PROXY",
+            "reference_point": "Y3600"
+          }
+        },
+        "search_tier": "COMPOUND_SCREEN",
+        "spec_sha256": "140a1c08a720e18a128da1b4b5f6dc48c5950470429f87f7e5f657617d61c0ae"
+      },
+      "target_kind": "PRICE_RELATIVE_PROXY",
+      "universe_policy": {
+        "holder_field_id": "FIELD-HOLDER-COUNT-001",
+        "liquidity_field_id": "FIELD-LIQUIDITY-USD-001",
+        "min_holders": "0",
+        "min_liquidity_usd": "0",
+        "rule": "ALL_OF_AT_DECISION_TIME",
+        "semantic_sha256": "4da0d78dc920e56a3691ec469ce69c521bc751d11856449e20cc52e2052438fa"
+      }
+    },
+    "feature_admissible_n": 1,
+    "feature_unknown_n": 0,
+    "independence": "UNKNOWN",
+    "independent_replication": null,
+    "integrity_conflict_count": 0,
+    "labeled_net_return": false,
+    "later_target_observed_n": 1,
+    "main_question_count_includes_variants": false,
+    "matched_feature_means": {
+      "impulse": 0.5,
+      "pullback": -0.20000000000000007,
+      "retention": 0.9
+    },
+    "matched_n": 1,
+    "mean_target": 0.19999999999999996,
+    "mean_target_kind": "PRICE_RELATIVE_PROXY",
+    "mean_target_units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+    "median_target": 0.19999999999999996,
+    "missing_is_not_zero": true,
+    "missing_stress_model": {
+      "label": "MODEL",
+      "mean_target": 0.19999999999999996,
+      "stress_return": -1.0,
+      "writes_raw_history": false
+    },
+    "missing_target_mean_to_zero": null,
+    "missing_target_n": 0,
+    "non_claims": [
+      "NO_ALPHA",
+      "NO_NET_RETURN",
+      "NO_INTRABAR_STOP",
+      "NO_CAUSAL_IDENTIFICATION",
+      "NO_SOURCE_PRICE_EVENT_TIME"
+    ],
+    "observation_clock_policy": "EVENT_TIME_V1",
+    "observation_index_passes": 1,
+    "observed_target_n": 1,
+    "pooled": {
+      "denominator_base_x": 1,
+      "downside": {
+        "es10_return": 0.19999999999999996,
+        "es10_tail_mass_n": 0.1,
+        "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+        "le_minus_20_n": 0,
+        "le_minus_20_rate": 0.0,
+        "le_minus_50_n": 0,
+        "le_minus_50_rate": 0.0,
+        "missing_n": 0,
+        "negative_mass": 0,
+        "negative_n": 0,
+        "observed_n": 1,
+        "p05": 0.19999999999999996,
+        "p10": 0.19999999999999996,
+        "p25": 0.19999999999999996,
+        "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+        "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+        "status": "OBSERVED",
+        "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+        "worst_negative_share": null,
+        "zero_n": 0
+      },
+      "feature_admissible": 1,
+      "independent_replication": null,
+      "mean_target": 0.19999999999999996,
+      "mean_target_kind": "PRICE_RELATIVE_PROXY",
+      "median_target": 0.19999999999999996,
+      "target_observed_after_decision": 1,
+      "view": "pooled"
+    },
+    "population": "BASE_X",
+    "population_n": 1,
+    "query_id": "native-main-0",
+    "required_cohorts": [
+      "REL-20260105T120000Z-20260112T120000Z"
+    ],
+    "schema": "smial.hfic-temporal-query",
+    "search_tier": "COMPOUND_SCREEN",
+    "source_price_event_time": "UNKNOWN",
+    "spec_sha256": "140a1c08a720e18a128da1b4b5f6dc48c5950470429f87f7e5f657617d61c0ae",
+    "target_exclusion_reasons": {
+      "by_cohort": {
+        "REL-20260105T120000Z-20260112T120000Z": {}
+      },
+      "pooled": {}
+    },
+    "target_kind": "PRICE_RELATIVE_PROXY",
+    "unique_decision_n": 5,
+    "unique_mint_n": 5,
+    "universe_policy": {
+      "holder_field_id": "FIELD-HOLDER-COUNT-001",
+      "liquidity_field_id": "FIELD-LIQUIDITY-USD-001",
+      "min_holders": "0",
+      "min_liquidity_usd": "0",
+      "n_base": 1,
+      "n_fail": 0,
+      "n_pass": 1,
+      "n_unknown": 0,
+      "rule": "ALL_OF_AT_DECISION_TIME",
+      "semantic_sha256": "4da0d78dc920e56a3691ec469ce69c521bc751d11856449e20cc52e2052438fa"
+    },
+    "viewed_variants": [
+      "MATCHED_OBSERVED",
+      "BASELINE_DECISION_ELIGIBLE",
+      "ABLATION_DROP_impulse",
+      "ABLATION_DROP_pullback",
+      "ABLATION_DROP_retention",
+      "COST_LOW",
+      "COST_BASE",
+      "COST_STRESS",
+      "MISSING_STRESS_MODEL",
+      "DOWNSIDE_DESCRIPTIVE_V1"
+    ],
+    "winner_share_of_positive": 1.0
+  },
+  "result_refs": [
+    "HFIC-ART-DISCOVERY-1B7BDBF7C350EFB65AFC8F2E0F48E42DEFF00D8E"
+  ],
+  "result_sha256": "55a182c49cf7c2fbeee3dd01d780d8845487304d5cb16001aa874551785240dc",
+  "scientific_look_delta": {
+    "adaptive": 0,
+    "main": 1
+  },
+  "scientific_slot_reserved": false,
+  "scientific_writes": 0,
+  "tier_progress": {
+    "action": "READY_TO_FREEZE",
+    "compound_executed": true,
+    "compound_status": "EXECUTED",
+    "evidence_revision_required": false,
+    "freeze_worthy": false,
+    "freeze_worthy_semantics": "CALLER_ROUTING_HINT_NOT_SCIENTIFIC_VERDICT",
+    "search_exhausted_allowed": true,
+    "simple_executed": false
+  },
+  "values_loaded": true,
+  "writes": true
+}

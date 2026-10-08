@@ -1,0 +1,5082 @@
+[
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "preflight",
+      "--discovery-contract",
+      "--owner-focus",
+      "RPV_MICRO_VERTICAL",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 10.470381100007216,
+    "raw_stdout_sha256": "15a424dba79a859f210ef29416a3da5e332857ad5bd11b7467f90bf223478f8b",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+      "search_key_sha256": "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 3,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "research-policy-status",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 1.0702212000032887,
+    "raw_stdout_sha256": "b9a0a45ca06790340407e79bff848ddd5df2a91c8e32a64658fb2c072b3b75aa",
+    "raw_excerpt": {
+      "writes": {
+        "research_store": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "discovery-execute",
+      "--store",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-spec-0.json",
+      "--candidate-scope",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-scope-0.json",
+      "--journal-scope",
+      "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "--operation",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-op-0.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 5.237390100010089,
+    "raw_stdout_sha256": "73d84aebf296718b25fbb8168d7ed754089cfd9b01dd4db629fd389207584be3",
+    "raw_excerpt": {
+      "writes": true,
+      "values_loaded": true,
+      "budget": {
+        "adaptive_count": 0,
+        "adaptive_limit": 2,
+        "compound_main_count": 1,
+        "main_count": 1,
+        "main_limit": 6,
+        "simple_main_count": 0,
+        "viewed_variants": [
+          "MATCHED_OBSERVED",
+          "BASELINE_DECISION_ELIGIBLE",
+          "ABLATION_DROP_impulse",
+          "ABLATION_DROP_pullback",
+          "ABLATION_DROP_retention",
+          "COST_LOW",
+          "COST_BASE",
+          "COST_STRESS",
+          "MISSING_STRESS_MODEL",
+          "DOWNSIDE_DESCRIPTIVE_V1"
+        ]
+      },
+      "ordinary_operation": "OPEN"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "discovery-execute",
+      "--store",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-spec-1.json",
+      "--candidate-scope",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-scope-1.json",
+      "--journal-scope",
+      "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "--operation",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-op-1.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 6.550248200001079,
+    "raw_stdout_sha256": "07090f3f3cbdcfa3cc09d3f5adead89a9122b2c28631a06f4a0ab6aa634ca03c",
+    "raw_excerpt": {
+      "writes": true,
+      "values_loaded": true,
+      "budget": {
+        "adaptive_count": 0,
+        "adaptive_limit": 2,
+        "compound_main_count": 2,
+        "main_count": 2,
+        "main_limit": 6,
+        "simple_main_count": 0,
+        "viewed_variants": [
+          "MATCHED_OBSERVED",
+          "BASELINE_DECISION_ELIGIBLE",
+          "ABLATION_DROP_impulse",
+          "ABLATION_DROP_pullback",
+          "ABLATION_DROP_retention",
+          "COST_LOW",
+          "COST_BASE",
+          "COST_STRESS",
+          "MISSING_STRESS_MODEL",
+          "DOWNSIDE_DESCRIPTIVE_V1"
+        ]
+      },
+      "ordinary_operation": "OPEN"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "discovery-execute",
+      "--store",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-spec-2.json",
+      "--candidate-scope",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-scope-2.json",
+      "--journal-scope",
+      "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "--operation",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-op-2.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 7.682014400008484,
+    "raw_stdout_sha256": "fef7c237947f23239f19d6e9719eebc288c7be1ce7fe217216501cf1d2bc252b",
+    "raw_excerpt": {
+      "writes": true,
+      "values_loaded": true,
+      "budget": {
+        "adaptive_count": 0,
+        "adaptive_limit": 2,
+        "compound_main_count": 3,
+        "main_count": 3,
+        "main_limit": 6,
+        "simple_main_count": 0,
+        "viewed_variants": [
+          "MATCHED_OBSERVED",
+          "BASELINE_DECISION_ELIGIBLE",
+          "ABLATION_DROP_impulse",
+          "ABLATION_DROP_pullback",
+          "ABLATION_DROP_retention",
+          "COST_LOW",
+          "COST_BASE",
+          "COST_STRESS",
+          "MISSING_STRESS_MODEL",
+          "DOWNSIDE_DESCRIPTIVE_V1"
+        ]
+      },
+      "ordinary_operation": "OPEN"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "discovery-execute",
+      "--store",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-spec-3.json",
+      "--candidate-scope",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-scope-3.json",
+      "--journal-scope",
+      "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "--operation",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-op-3.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 8.934556000007433,
+    "raw_stdout_sha256": "f8ba2aaa0003c956c884878906d6d04b3234210f3a72b7e6bad81ddc941858bf",
+    "raw_excerpt": {
+      "writes": true,
+      "values_loaded": true,
+      "budget": {
+        "adaptive_count": 0,
+        "adaptive_limit": 2,
+        "compound_main_count": 4,
+        "main_count": 4,
+        "main_limit": 6,
+        "simple_main_count": 0,
+        "viewed_variants": [
+          "MATCHED_OBSERVED",
+          "BASELINE_DECISION_ELIGIBLE",
+          "ABLATION_DROP_impulse",
+          "ABLATION_DROP_pullback",
+          "ABLATION_DROP_retention",
+          "COST_LOW",
+          "COST_BASE",
+          "COST_STRESS",
+          "MISSING_STRESS_MODEL",
+          "DOWNSIDE_DESCRIPTIVE_V1"
+        ]
+      },
+      "ordinary_operation": "OPEN"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "discovery-execute",
+      "--store",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-spec-4.json",
+      "--candidate-scope",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-scope-4.json",
+      "--journal-scope",
+      "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "--operation",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-op-4.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 10.391430100004072,
+    "raw_stdout_sha256": "30e49a159b4beae7e1647bd8ec178b64bb3abafd14edcdcbda3f8f3919a80364",
+    "raw_excerpt": {
+      "writes": true,
+      "values_loaded": true,
+      "budget": {
+        "adaptive_count": 0,
+        "adaptive_limit": 2,
+        "compound_main_count": 5,
+        "main_count": 5,
+        "main_limit": 6,
+        "simple_main_count": 0,
+        "viewed_variants": [
+          "MATCHED_OBSERVED",
+          "BASELINE_DECISION_ELIGIBLE",
+          "ABLATION_DROP_impulse",
+          "ABLATION_DROP_pullback",
+          "ABLATION_DROP_retention",
+          "COST_LOW",
+          "COST_BASE",
+          "COST_STRESS",
+          "MISSING_STRESS_MODEL",
+          "DOWNSIDE_DESCRIPTIVE_V1"
+        ]
+      },
+      "ordinary_operation": "OPEN"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "research-policy-status",
+      "--for-operation",
+      "4e1c2020f89ab8e4fdeaf10aad780cc0618e3228d02b046308e6a4dd6c6d4cab",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 3.5644482000061544,
+    "raw_stdout_sha256": "18919d81cee2e451d12168b11aa698ab4ed4233a7c30a0fb0175cf09316ad34e",
+    "raw_excerpt": {
+      "writes": {
+        "research_store": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "research-policy-preview",
+      "--main-total",
+      "10",
+      "--max-generated",
+      "10",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 1.3647595000074944,
+    "raw_stdout_sha256": "03c64125b4a85a9e8a21cb1045853cf4f5391d306805fe70ed83e2b30deb874c",
+    "raw_excerpt": {
+      "next_action": "AUTHORIZED_APPLY",
+      "status": "PROPOSED",
+      "writes": {
+        "research_store": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "research-policy-apply",
+      "--proposal",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\active.json",
+      "--confirm-append-only",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 1.3509845999942627,
+    "raw_stdout_sha256": "025df9fa8e86aff1d1645794b345c7df353bfedd6dfadbdec583b5f3334a3a53",
+    "raw_excerpt": {
+      "next_action": "TO_RAISE_AN_OPEN_JOURNAL_OR_EPOCH_USE_research-policy-extension-preview",
+      "status": "APPENDED",
+      "writes": {
+        "research_store": 1
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "research-policy-status",
+      "--for-operation",
+      "4e1c2020f89ab8e4fdeaf10aad780cc0618e3228d02b046308e6a4dd6c6d4cab",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 3.6072490000078687,
+    "raw_stdout_sha256": "c2eb5fe3e4cf1cc78232830911c3f3083d6464a543f07134e46a184ef28fa8d8",
+    "raw_excerpt": {
+      "writes": {
+        "research_store": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "research-policy-preview",
+      "--for-operation",
+      "4e1c2020f89ab8e4fdeaf10aad780cc0618e3228d02b046308e6a4dd6c6d4cab",
+      "--main-total",
+      "10",
+      "--max-generated",
+      "10",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 1.768449299997883,
+    "raw_stdout_sha256": "05af59bb9deb14f9d6590a66ce088a54f4e2401267b9c08d42bdec1ac90d1df0",
+    "raw_excerpt": {
+      "next_action": "AUTHORIZED_APPLY",
+      "status": "PROPOSED",
+      "writes": {
+        "research_store": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "research-policy-apply",
+      "--proposal",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\ext.json",
+      "--confirm-append-only",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.4457608999946387,
+    "raw_stdout_sha256": "6bcc6f0260e08365efa03d5705c12302def0cd6a3ba10bc6f1f3ecbd27a999d6",
+    "raw_excerpt": {
+      "next_action": "RUN_THE_NEXT_AUTHORIZED_LOOK_OR_CYCLE",
+      "status": "APPENDED",
+      "writes": {
+        "research_store": 1
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "research-policy-apply",
+      "--proposal",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\ext.json",
+      "--confirm-append-only",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 1.1946762000006856,
+    "raw_stdout_sha256": "f644622074b5921e33832adf040ba843add7a85a943a6247f622ff666fe7d7e7",
+    "raw_excerpt": {
+      "next_action": "RUN_THE_NEXT_AUTHORIZED_LOOK_OR_CYCLE",
+      "status": "ALREADY_APPLIED",
+      "writes": {
+        "research_store": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "research-policy-status",
+      "--for-operation",
+      "4e1c2020f89ab8e4fdeaf10aad780cc0618e3228d02b046308e6a4dd6c6d4cab",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 3.8424932999914745,
+    "raw_stdout_sha256": "dac6f42e4426e5b3a00722237a0dca70961f5a7e92837061d466c3b54500a19e",
+    "raw_excerpt": {
+      "writes": {
+        "research_store": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "discovery-execute",
+      "--store",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-spec-0.json",
+      "--candidate-scope",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-scope-0.json",
+      "--journal-scope",
+      "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "--operation",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-op-0.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 7.352059299999382,
+    "raw_stdout_sha256": "6d673e72740e83c2c95451bfcf1bb65d97de9842e64476f2b776a993553d0ee2",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false,
+      "ordinary_operation": "OPEN"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "discovery-execute",
+      "--store",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-spec-5.json",
+      "--candidate-scope",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-scope-5.json",
+      "--journal-scope",
+      "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "--operation",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-op-5.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 12.316858099991805,
+    "raw_stdout_sha256": "c37fbfbe5e72ecb8d0684c4eeeebbe36f2552288765a496eae29370634116e20",
+    "raw_excerpt": {
+      "writes": true,
+      "values_loaded": true,
+      "budget": {
+        "adaptive_count": 0,
+        "adaptive_limit": 2,
+        "compound_main_count": 6,
+        "main_count": 6,
+        "main_limit": 10,
+        "simple_main_count": 0,
+        "viewed_variants": [
+          "MATCHED_OBSERVED",
+          "BASELINE_DECISION_ELIGIBLE",
+          "ABLATION_DROP_impulse",
+          "ABLATION_DROP_pullback",
+          "ABLATION_DROP_retention",
+          "COST_LOW",
+          "COST_BASE",
+          "COST_STRESS",
+          "MISSING_STRESS_MODEL",
+          "DOWNSIDE_DESCRIPTIVE_V1"
+        ]
+      },
+      "ordinary_operation": "OPEN"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "LAV_CONTEXT",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 11.078743699996267,
+    "raw_stdout_sha256": "11cc89fc91d4252bb3df2defbbcc7b21d794c90970ff27bca0739a0864ee3e5e",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "544fed63c38677c2e3ed55d1130b58566ccd6a512fee78e4343da29debd89425",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 3,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\contrast-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.1098050000000512,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "LAV_CONTRAST",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 6.842133199999807,
+    "raw_stdout_sha256": "f76e1b95d9c05bdd8690e46bd2b48911f4c002a4a801a8f4478e05d8c7bcf9ef",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "2a4b23d301ba1d402bd9bb77322da465b28bcd1c52ba996932bd4209a7de9aed",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "discovery-execute",
+      "--store",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-spec-6.json",
+      "--candidate-scope",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-scope-6.json",
+      "--journal-scope",
+      "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "--operation",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-op-6.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 13.500989000007394,
+    "raw_stdout_sha256": "d49faf935229ed12bdda7bfaa1733980a67de7c89d704ba32315068bd490aeb2",
+    "raw_excerpt": {
+      "writes": true,
+      "values_loaded": true,
+      "budget": {
+        "adaptive_count": 0,
+        "adaptive_limit": 2,
+        "compound_main_count": 7,
+        "main_count": 7,
+        "main_limit": 10,
+        "simple_main_count": 0,
+        "viewed_variants": [
+          "MATCHED_OBSERVED",
+          "BASELINE_DECISION_ELIGIBLE",
+          "ABLATION_DROP_impulse",
+          "ABLATION_DROP_pullback",
+          "ABLATION_DROP_retention",
+          "COST_LOW",
+          "COST_BASE",
+          "COST_STRESS",
+          "MISSING_STRESS_MODEL",
+          "DOWNSIDE_DESCRIPTIVE_V1"
+        ]
+      },
+      "ordinary_operation": "OPEN"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\numeric-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.1219909000064945,
+    "raw_stdout_sha256": "72f509f6efff1f2f18a9d01f3f01603623d7a3c4857a216e9a9e31d942b50d1e",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "discovery-execute",
+      "--store",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-spec-7.json",
+      "--candidate-scope",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-scope-7.json",
+      "--journal-scope",
+      "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "--operation",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-op-7.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 14.955977499994333,
+    "raw_stdout_sha256": "fcbec12395aee6119a4330a7e18f67af973157c8ce1e9e36e043b1a4f1281297",
+    "raw_excerpt": {
+      "writes": true,
+      "values_loaded": true,
+      "budget": {
+        "adaptive_count": 0,
+        "adaptive_limit": 2,
+        "compound_main_count": 8,
+        "main_count": 8,
+        "main_limit": 10,
+        "simple_main_count": 0,
+        "viewed_variants": [
+          "MATCHED_OBSERVED",
+          "BASELINE_DECISION_ELIGIBLE",
+          "ABLATION_DROP_impulse",
+          "ABLATION_DROP_pullback",
+          "ABLATION_DROP_retention",
+          "COST_LOW",
+          "COST_BASE",
+          "COST_STRESS",
+          "MISSING_STRESS_MODEL",
+          "DOWNSIDE_DESCRIPTIVE_V1"
+        ]
+      },
+      "ordinary_operation": "OPEN"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "LAV_NUMERIC",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 10.455078400002094,
+    "raw_stdout_sha256": "66917e7cc0e89c2398d128e36ccc743071bb162fb957691838a3074c189a7393",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "a16be986a027984f68d752007c5cf407adf98bb75864249ce398b5a2f5bd35c1",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\unknown-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 2,
+    "wall_seconds": 1.6573581999982707,
+    "raw_stdout_sha256": "02bb521660cc73d14c0bea2d22049795fd86353cef10ba354300294f92840139",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\runner-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.0974429000052623,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "discovery-execute",
+      "--store",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-spec-8.json",
+      "--candidate-scope",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-scope-8.json",
+      "--journal-scope",
+      "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "--operation",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-op-8.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 16.22286300000269,
+    "raw_stdout_sha256": "6a083b1e947155b86437becaf513ca9392cf5b7fc1bdf44f0c30c54d6445f311",
+    "raw_excerpt": {
+      "writes": true,
+      "values_loaded": true,
+      "budget": {
+        "adaptive_count": 0,
+        "adaptive_limit": 2,
+        "compound_main_count": 9,
+        "main_count": 9,
+        "main_limit": 10,
+        "simple_main_count": 0,
+        "viewed_variants": [
+          "MATCHED_OBSERVED",
+          "BASELINE_DECISION_ELIGIBLE",
+          "ABLATION_DROP_impulse",
+          "ABLATION_DROP_pullback",
+          "ABLATION_DROP_retention",
+          "COST_LOW",
+          "COST_BASE",
+          "COST_STRESS",
+          "MISSING_STRESS_MODEL",
+          "DOWNSIDE_DESCRIPTIVE_V1"
+        ]
+      },
+      "ordinary_operation": "OPEN"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "LAV_RUNNER",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 14.210009900009027,
+    "raw_stdout_sha256": "106d9da7055e7fb1302741699d69137f0b28544ed857ddfc0aeceb7753936815",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "130c14dff3ebe34a476c79d0dca8696016c6d27cf1a13aa719acc65d8c02f652",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "discovery-execute",
+      "--store",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-spec-9.json",
+      "--candidate-scope",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-scope-9.json",
+      "--journal-scope",
+      "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "--operation",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-op-9.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 17.992417599991313,
+    "raw_stdout_sha256": "835cbf8b080aa3fe38e11bb561381b171130679b1742138bcf33851ce24bd75e",
+    "raw_excerpt": {
+      "writes": true,
+      "values_loaded": true,
+      "budget": {
+        "adaptive_count": 0,
+        "adaptive_limit": 2,
+        "compound_main_count": 10,
+        "main_count": 10,
+        "main_limit": 10,
+        "simple_main_count": 0,
+        "viewed_variants": [
+          "MATCHED_OBSERVED",
+          "BASELINE_DECISION_ELIGIBLE",
+          "ABLATION_DROP_impulse",
+          "ABLATION_DROP_pullback",
+          "ABLATION_DROP_retention",
+          "COST_LOW",
+          "COST_BASE",
+          "COST_STRESS",
+          "MISSING_STRESS_MODEL",
+          "DOWNSIDE_DESCRIPTIVE_V1"
+        ]
+      },
+      "ordinary_operation": "PAUSED_CAP"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "preflight",
+      "--control-current-representation",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "LAV_CTRL",
+      "--format",
+      "json"
+    ],
+    "exit": 1,
+    "wall_seconds": 1.0056151000026148,
+    "raw_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "raw_excerpt": {},
+    "stderr": "CONTROL_COLLECTION_UNSUPPORTED\n",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "discovery-execute",
+      "--store",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-spec-10.json",
+      "--candidate-scope",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-scope-10.json",
+      "--journal-scope",
+      "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "--operation",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-op-10.json",
+      "--format",
+      "json"
+    ],
+    "exit": 2,
+    "wall_seconds": 6.3436992000060854,
+    "raw_stdout_sha256": "c8faaacd7fb66ebbbdbd6e72efb70fbcd75673678447cc47a2c36e00d8725001",
+    "raw_excerpt": {
+      "writes": true,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "forge-input",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "LAV_NW",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 6.51745579999988,
+    "raw_stdout_sha256": "7526e36c0ec422c4f00d60c530053ed7c6d722561628c4a8b86b1e3b1eb7a67c",
+    "raw_excerpt": {
+      "blocking_reason_codes": [],
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "no_write": true,
+      "writes": {
+        "forge_context": 0,
+        "research_store": 0,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\nw-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.058373699997901,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "LAV_NW",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 18.120210599998245,
+    "raw_stdout_sha256": "1933b49e5195978cb7b193479cd943a59a17450f89362126f22928ab15ce65d2",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "1a5355149ff92c14600006a80951ee0e63fb02d7c3373b213ce2d03ac2eee63e",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "preflight",
+      "--discovery-contract",
+      "--owner-focus",
+      "RPV_MICRO_VERTICAL",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 49.356375500006834,
+    "raw_stdout_sha256": "07777b70588c6ecfa34888b2618623af4a15cca4df12aa347a0e7def49fdf12f",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+      "search_key_sha256": "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--owner-focus",
+      "OPPORTUNITY_EPISODES:LAV_NW",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 19.80315759999212,
+    "raw_stdout_sha256": "c7fbc004bc5f4277b3e430cb0ae8ce8785ecede4ef411bcb88a69a79735c5cdf",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "1a5355149ff92c14600006a80951ee0e63fb02d7c3373b213ce2d03ac2eee63e",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "persist-draft",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\micro-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\micro-receipt.json",
+      "--representation-id",
+      "BASE",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 5.207638800013228,
+    "raw_stdout_sha256": "1a0b8046b7d05f8f73733c7e84727c5185bde448592a2c29c0d0d0076aa781c5",
+    "raw_excerpt": {
+      "session_id": "HFIC-SESS-330DA4F751E700DF",
+      "control_session_id": null,
+      "market_evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+      "writes": {
+        "forge_context": 0,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "persist-draft",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\nw-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\nw-receipt.json",
+      "--representation-id",
+      "BASE",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 4.487453800000367,
+    "raw_stdout_sha256": "737d4d538c7fcdefd45e0275a4a0ac5a5bfaf87055b37994eea6e6a32788c785",
+    "raw_excerpt": {
+      "session_id": "HFIC-SESS-1A5355149FF92C14",
+      "control_session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "writes": {
+        "forge_context": 0,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--owner-focus",
+      "OPPORTUNITY_EPISODES:LAV_NW",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 19.991494000001694,
+    "raw_stdout_sha256": "a4119837d2277585e4cd7b7bb99a9b97fd26f3ea3bc2ecb57308e18488c01d6e",
+    "raw_excerpt": {
+      "session_id": "HFIC-SESS-1A5355149FF92C14",
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "1a5355149ff92c14600006a80951ee0e63fb02d7c3373b213ce2d03ac2eee63e",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "freeze",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\nw-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\nw-receipt.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 7.195111699998961,
+    "raw_stdout_sha256": "d739d4553786662557183c176ae05b01945b4764b4d48f83f13b35ced25f0e70",
+    "raw_excerpt": {
+      "next_action": {
+        "action_id": "HFIC-NEXT-7512393E22668182",
+        "action_payload": {
+          "wake_on": [
+            "EVIDENCE_EPOCH_CHANGED"
+          ]
+        },
+        "action_type": "WAIT_FOR_NEW_EVIDENCE",
+        "authority": {
+          "cash_spend_usd_cents": 0,
+          "credential_reads": 0,
+          "experiment_execution": 0,
+          "git_mutation": 0,
+          "provider_api_rpc_wss_calls": 0,
+          "rdp_mutation_outside_freeze": 0,
+          "wallet_signer_transaction_actions": 0
+        },
+        "basis_candidate_refs": [],
+        "candidate_ids": [],
+        "created_at": "2026-10-08T10:02:44Z",
+        "evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+        "evidence_gap": "No validated next-action draft was supplied after NO_WORTHY_HYPOTHESIS.",
+        "focus_key_sha256": "403441a4e6762982026e083498b50c394f81dee5ff5e1a6150067c2283f37a1a",
+        "forge_context_packet_sha256": "a6af6d1325d28dc3cb3f1918be43bd61f7e14925a16049708bed2c9c4a0eeaf4",
+        "generation_mode": "DETERMINISTIC_SAFE_FALLBACK",
+        "hfic_protocol": "HFIC-V1.2",
+        "named_consumer": "HFIC-POST-NO-WORTHY-ROUTER",
+        "non_claims": [
+          "NO_ALPHA",
+          "NO_AUTONOMOUS_GENERATOR",
+          "NO_DISCOVERY_RANKER_TRIGGER_PROVEN",
+          "NO_ARCH_INTENT_006_FULL_IMPLEMENTATION",
+          "NO_QUALITY_DIVERSITY_ENGINE",
+          "NO_VOI_SCHEDULER",
+          "NO_SEQUENTIAL_INFERENCE_ENGINE",
+          "NO_PROVIDER_OR_EXPERIMENT_AUTHORITY"
+        ],
+        "owner_gate": {
+          "phrase_status": "NONE",
+          "required": false
+        },
+        "packet_schema": "smial.hfic-next-epistemic-action",
+        "packet_version": "1.0",
+        "prompt_version": "HFIC-NEXT-V1.0",
+        "prospect_ids": [],
+        "reason_code": "NEXT_ACTION_GENERATION_FALLBACK",
+        "search_key_sha256": "1a5355149ff92c14600006a80951ee0e63fb02d7c3373b213ce2d03ac2eee63e",
+        "session_id": "HFIC-SESS-1A5355149FF92C14",
+        "source_terminal": "NO_WORTHY_HYPOTHESIS",
+        "why_cheaper_option_is_insufficient": "WAIT is the cheapest honest option when the draft is missing or unrepaired.",
+        "why_now": "Deterministic safe wait preserves replay identity without inventing a spend or capability atom."
+      },
+      "session_state": "SYNTHESIS_COMPLETE",
+      "session_id": "HFIC-SESS-1A5355149FF92C14",
+      "selected_candidate_id": null,
+      "selected_definition_sha256": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "1a5355149ff92c14600006a80951ee0e63fb02d7c3373b213ce2d03ac2eee63e"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "forge-run",
+      "--owner-focus",
+      "OPPORTUNITY_EPISODES:LAV_NW",
+      "--no-write",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 12.650575799998478,
+    "raw_stdout_sha256": "d2f6a958acf7417872b5ce6cc3acdafef6d2bb90a55bd6d20f3e19e4d9d83ee5",
+    "raw_excerpt": {
+      "next_action": "RESUME_NORMALIZED_TRAJECTORY_EPISODES_V1",
+      "blocking_reason_codes": [
+        "SAVED_DRAFT_PRESENT"
+      ],
+      "session_id": null,
+      "run_id": "FORGE-RUN-B71A6B3157C69F61",
+      "control_session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "no_write": true,
+      "writes": {
+        "forge_run": 0,
+        "research_store": 0,
+        "session": 0
+      },
+      "ordinary_operation": {
+        "candidate_ready": false,
+        "claim_boundary": "PRICE_RELATIVE_PROXY is not net return; cohorts are not independent replications",
+        "completed": {
+          "look": true,
+          "operation": true,
+          "scientific_search": false
+        },
+        "completion_gap": null,
+        "compound_status": "EXECUTED",
+        "decision_age_seconds": null,
+        "decision_point": "E1800",
+        "effective_state": "PAUSED_CAP",
+        "exit_point": "E14400",
+        "hold_seconds": null,
+        "journal_result_refs": [
+          "HFIC-ART-DISCOVERY-3DD1B1BC577F127530152BF12CEBB8CDE27DC237"
+        ],
+        "journal_scope": "1a5355149ff92c14600006a80951ee0e63fb02d7c3373b213ce2d03ac2eee63e",
+        "lifecycle_basis": {
+          "kind": "OWNER_CAP"
+        },
+        "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+        "next_action": "RESUME_NORMALIZED_TRAJECTORY_EPISODES_V1",
+        "next_needs_new_authority": false,
+        "next_needs_new_values": true,
+        "operation_sha256": "0954eae5f7c4c5f62ab0ffaf3e7c2ccf0adb154e6732786ee66af2def5ae9eda",
+        "owner_main_remaining": 0,
+        "protocol_main_remaining": 5,
+        "protocol_main_used": 1,
+        "question_text": "List-aware vertical nw",
+        "requested_completion": "LIMITED_RESULT",
+        "reserved_main": 1,
+        "result_refs": [
+          "HFIC-ART-DISCOVERY-3DD1B1BC577F127530152BF12CEBB8CDE27DC237"
+        ],
+        "result_sha256": "81fa0f062824c258cf65f160a549b945cdff88a31459ed67a085677b94e2aa95",
+        "search_open": false,
+        "status": "PAUSED_CAP"
+      }
+    },
+    "stderr": "FORGE RUN\nstatus: IN_PROGRESS вЂ” follow next_action; evening not complete\nrun_id: FORGE-RUN-B71A6B3157C69F61\nrun_identity_sha256: b71a6b3157c69f61351adda4ec7c6f58d8aff0a4f2791e6ab1a28d18ad4e6473\ncontrol_session_id: NONE\nowner_class: FORGE_RUN_IN_PROGRESS\nvisible_cohorts: REL-20261008T000000Z-20261009T000000Z\nused_cohorts: NONE\nmarket_epoch: 9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a  # admission/budget key\ncapability_epoch: 476253a08d054e50607eab5a327af63f8090fee91603e8ff3b1dedc7cf4b3276  # protocol; does not free market budget\nscientific_slot: e03d668c59c5059769cdde09fe98cf9695d9959022b0d3923bd14cbf0c8b70de  # market+representation+focus\nlegacy_epoch: NONE\nfrozen_versions: BASE@HFIC-V1.2, NORMALIZED_TRAJECTORY_EPISODES_V1@1.0\nexecution_binding: UNKNOWN\nexecution_provenance: NOT_APPLICABLE\nexecution_scope: NOT_SCIENTIFIC_EXECUTION  # provenance binding only; no market Forge\nexecution_provenance_note: historical readback is UNKNOWN; this is not a readiness receipt and not permission to rerun\nstage BASE@HFIC-V1.2: REUSED_VALID terminal=NO_WORTHY_HYPOTHESIS scope=ORDINARY_BASE session_id=HFIC-SESS-1A5355149FF92C14 stage_ref_sha256=f375ea6cdbbeb4e68a2bb3d91fc48b2",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "episode-normalized-view",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\view-spec.json",
+      "--parent-session-id",
+      "HFIC-SESS-1A5355149FF92C14"
+    ],
+    "exit": 2,
+    "wall_seconds": 1.9819944000046235,
+    "raw_stdout_sha256": "4e9ad24ce5a1d1f965892a57792f536d669a09393475a95b41f4aa70fd0905c0",
+    "raw_excerpt": {
+      "next_action": "PASS_--operation-sha256_OF_AN_OPEN_OPERATION_OF_THE_PARENT_JOURNAL_SEE_research-policy-status_open_operations",
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "preflight",
+      "--discovery-contract",
+      "--owner-focus",
+      "RPV_MICRO_VERTICAL",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 49.31674589999602,
+    "raw_stdout_sha256": "e891bcc39a8062f4be7b300a53f4e3d92377e56ca3f336d12e680c519ace288a",
+    "raw_excerpt": {
+      "session_id": "HFIC-SESS-330DA4F751E700DF",
+      "market_evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+      "search_key_sha256": "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "episode-normalized-view",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\view-spec.json",
+      "--parent-session-id",
+      "HFIC-SESS-1A5355149FF92C14",
+      "--operation-sha256",
+      "0954eae5f7c4c5f62ab0ffaf3e7c2ccf0adb154e6732786ee66af2def5ae9eda",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 9.342862999998033,
+    "raw_stdout_sha256": "d30af49ee652640855f972df341035e34cd9f5e03f363029e8675c82ba406209",
+    "raw_excerpt": {
+      "representation_id": "NORMALIZED_TRAJECTORY_EPISODES_V1",
+      "writes": true
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rdp",
+      "freeze",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\micro-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\micro-receipt2.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 9.326469499996165,
+    "raw_stdout_sha256": "804317612344cc780355c52e387c3ace1dfd9ceb49bec54c9789ba09f58b1cec",
+    "raw_excerpt": {
+      "session_state": "FROZEN_AWAITING_CRITIC",
+      "session_id": "HFIC-SESS-330DA4F751E700DF",
+      "selected_candidate_id": "HFIC-CAND-CF91FAF436F3",
+      "selected_definition_sha256": "cf91faf436f36d56df29e1a1ea92ca71b3acf0ce98dcffffc2af9e8f9f967804",
+      "market_evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+      "search_key_sha256": "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "episode-normalized-view",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\view-spec.json",
+      "--parent-session-id",
+      "HFIC-SESS-1A5355149FF92C14",
+      "--operation-sha256",
+      "0954eae5f7c4c5f62ab0ffaf3e7c2ccf0adb154e6732786ee66af2def5ae9eda",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 4.332651199991233,
+    "raw_stdout_sha256": "ceecb738fe27f6503e7e31c2d9fcd3ed1e431e1b6ca50fbe9ddef6544c7c61ca",
+    "raw_excerpt": {
+      "representation_id": "NORMALIZED_TRAJECTORY_EPISODES_V1",
+      "writes": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\moved\\rdp",
+      "research-policy-preview",
+      "--main-total",
+      "3",
+      "--simple-before-compound",
+      "3",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 1.798370899996371,
+    "raw_stdout_sha256": "84deb29cfc23253f5ecc9b524bee05ff4a9af990d8bffd83b7ab3cc16e82517d",
+    "raw_excerpt": {
+      "next_action": "AUTHORIZED_APPLY",
+      "status": "PROPOSED",
+      "writes": {
+        "research_store": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\moved\\rdp",
+      "research-policy-apply",
+      "--proposal",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\other.json",
+      "--confirm-append-only",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 1.6621815000107745,
+    "raw_stdout_sha256": "647d627198366f59a6896f929a05bd5c14974e5b339a1211a4d359cc261c8699",
+    "raw_excerpt": {
+      "next_action": "TO_RAISE_AN_OPEN_JOURNAL_OR_EPOCH_USE_research-policy-extension-preview",
+      "status": "APPENDED",
+      "writes": {
+        "research_store": 1
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "episode-normalized-view",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\view-spec-a.json",
+      "--parent-session-id",
+      "HFIC-SESS-1A5355149FF92C14",
+      "--operation-sha256",
+      "0954eae5f7c4c5f62ab0ffaf3e7c2ccf0adb154e6732786ee66af2def5ae9eda"
+    ],
+    "exit": 0,
+    "wall_seconds": 10.372119899999234,
+    "raw_stdout_sha256": "4c06b596169cccef2d9fe6311168196282f06874d892b5eb1ecad6ae22fb5250",
+    "raw_excerpt": {
+      "representation_id": "NORMALIZED_TRAJECTORY_EPISODES_V1",
+      "writes": true
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\moved\\rdp",
+      "discovery-execute",
+      "--store",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\moved\\rdp",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-spec-0.json",
+      "--candidate-scope",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-scope-0.json",
+      "--journal-scope",
+      "330da4f751e700dfc2a97e769f559c3e382c6d80707c5db2d2a3f9b6f4685b21",
+      "--operation",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\rpv-op-0.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 12.10500840000168,
+    "raw_stdout_sha256": "7c90eaffa342c57530741131a319956ea0ddb1a441b60538499d95c5aa9ce815",
+    "raw_excerpt": {
+      "writes": true,
+      "values_loaded": false,
+      "ordinary_operation": "PAUSED_CAP"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "episode-normalized-view",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\view-spec-c.json",
+      "--parent-session-id",
+      "HFIC-SESS-1A5355149FF92C14",
+      "--operation-sha256",
+      "0954eae5f7c4c5f62ab0ffaf3e7c2ccf0adb154e6732786ee66af2def5ae9eda"
+    ],
+    "exit": 2,
+    "wall_seconds": 5.984746799993445,
+    "raw_stdout_sha256": "20c38baa584ae4d72cf7af68e58bdcce441d54b6dcb9ad94e011c8842c0034ce",
+    "raw_excerpt": {
+      "next_action": "READ_research-policy-status",
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\ep-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.093395400006557,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpjzbg3p8x\\moved\\rdp",
+      "research-policy-status",
+      "--for-operation",
+      "4e1c2020f89ab8e4fdeaf10aad780cc0618e3228d02b046308e6a4dd6c6d4cab",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 6.120108200004324,
+    "raw_stdout_sha256": "ffeae02ec253b0083816842126e00bc3e7b96f42f22f9d851c00dcb7cc9c6847",
+    "raw_excerpt": {
+      "writes": {
+        "research_store": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c1base-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.1514613999897847,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "persist-draft",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\ep-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\ep-receipt.json",
+      "--representation-id",
+      "NORMALIZED_TRAJECTORY_EPISODES_V1",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 5.135756099989521,
+    "raw_stdout_sha256": "b512cad16f90b4f84237b1a19d8ec792cf0cc14c00a8e20a30f31201ff055c8d",
+    "raw_excerpt": {
+      "session_id": "HFIC-SESS-626C7D0E4EBBD876",
+      "control_session_id": "HFIC-SESS-1A5355149FF92C14",
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "writes": {
+        "forge_context": 0,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "freeze",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\ep-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\ep-receipt.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 8.300318300010986,
+    "raw_stdout_sha256": "32ffd1fd5e68091199c7068895aa19cbfa9e0ca264f6475e6d0d3c89bb8b3e08",
+    "raw_excerpt": {
+      "session_state": "FROZEN_AWAITING_CRITIC",
+      "session_id": "HFIC-SESS-626C7D0E4EBBD876",
+      "selected_candidate_id": "HFIC-CAND-A85F4D4AC126",
+      "selected_definition_sha256": "a85f4d4ac126bf5c59991788d501beeb34d28a8d6206233ffc12b48092495418",
+      "control_session_id": "HFIC-SESS-1A5355149FF92C14",
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "626c7d0e4ebbd876524aa1d5691aad88d2eb9b0b34976c7d8021cd2780597791"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "AUTO",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 11.332474299997557,
+    "raw_stdout_sha256": "6b81150a4d57848c7cf3b21a76f891c3071ff81f252fc5fcae7c44e157c30a6c",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "65987d76f0cd105991e5ca3725c4ab96e948d44be42ca94d19553bc88151a9dc",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 3,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "finalize",
+      "--session-id",
+      "HFIC-SESS-626C7D0E4EBBD876",
+      "--critic-result",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\ep-critic.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 3.957947500006412,
+    "raw_stdout_sha256": "71c6aa2cd710cf9456489e139ad2cebcec82fc90bde60a9fe4fc4d414ebdb2df",
+    "raw_excerpt": {
+      "session_state": "SYNTHESIS_COMPLETE",
+      "session_id": "HFIC-SESS-626C7D0E4EBBD876",
+      "selected_candidate_id": "HFIC-CAND-A85F4D4AC126",
+      "control_session_id": "HFIC-SESS-1A5355149FF92C14",
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "626c7d0e4ebbd876524aa1d5691aad88d2eb9b0b34976c7d8021cd2780597791"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "AUTO",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 9.220888900003047,
+    "raw_stdout_sha256": "4a4ca057b3fdf4c0947c26e0651d7ed24e43d0c3f10c045fdb0cb207a29540c8",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "65987d76f0cd105991e5ca3725c4ab96e948d44be42ca94d19553bc88151a9dc",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "persist-draft",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c1-nw-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c1-nw-receipt.json",
+      "--representation-id",
+      "BASE",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 3.5492828999995254,
+    "raw_stdout_sha256": "07c460e73a48266b95786ef5d659cd3eee36e150d08b1ced66c2e816dbd07efd",
+    "raw_excerpt": {
+      "session_id": "HFIC-SESS-65987D76F0CD1059",
+      "control_session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "writes": {
+        "forge_context": 0,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "AUTO",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 9.701537799992366,
+    "raw_stdout_sha256": "21c83677ffd884c57bec20bc5ab93f1ef5b61591712543ccf6992f72d98f4662",
+    "raw_excerpt": {
+      "session_id": "HFIC-SESS-65987D76F0CD1059",
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "65987d76f0cd105991e5ca3725c4ab96e948d44be42ca94d19553bc88151a9dc",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "freeze",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c1-nw-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c1-nw-receipt.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 5.25582679999934,
+    "raw_stdout_sha256": "e83f87ba291bbe19401b2d509559ff105929aa05ebda090a8ec1b3ee8a237c82",
+    "raw_excerpt": {
+      "next_action": {
+        "action_id": "HFIC-NEXT-2A121D5FAC62C6AE",
+        "action_payload": {
+          "wake_on": [
+            "EVIDENCE_EPOCH_CHANGED"
+          ]
+        },
+        "action_type": "WAIT_FOR_NEW_EVIDENCE",
+        "authority": {
+          "cash_spend_usd_cents": 0,
+          "credential_reads": 0,
+          "experiment_execution": 0,
+          "git_mutation": 0,
+          "provider_api_rpc_wss_calls": 0,
+          "rdp_mutation_outside_freeze": 0,
+          "wallet_signer_transaction_actions": 0
+        },
+        "basis_candidate_refs": [],
+        "candidate_ids": [],
+        "created_at": "2026-10-08T10:05:03Z",
+        "evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+        "evidence_gap": "No validated next-action draft was supplied after NO_WORTHY_HYPOTHESIS.",
+        "focus_key_sha256": "baef8c04cf009d9649e36d06f8599fd08f38ab5fabfaf144d83518b4114d1a81",
+        "forge_context_packet_sha256": "46afa571fc999528d216bde0c3485b29d95186fd47250332947913693ff09224",
+        "generation_mode": "DETERMINISTIC_SAFE_FALLBACK",
+        "hfic_protocol": "HFIC-V1.2",
+        "named_consumer": "HFIC-POST-NO-WORTHY-ROUTER",
+        "non_claims": [
+          "NO_ALPHA",
+          "NO_AUTONOMOUS_GENERATOR",
+          "NO_DISCOVERY_RANKER_TRIGGER_PROVEN",
+          "NO_ARCH_INTENT_006_FULL_IMPLEMENTATION",
+          "NO_QUALITY_DIVERSITY_ENGINE",
+          "NO_VOI_SCHEDULER",
+          "NO_SEQUENTIAL_INFERENCE_ENGINE",
+          "NO_PROVIDER_OR_EXPERIMENT_AUTHORITY"
+        ],
+        "owner_gate": {
+          "phrase_status": "NONE",
+          "required": false
+        },
+        "packet_schema": "smial.hfic-next-epistemic-action",
+        "packet_version": "1.0",
+        "prompt_version": "HFIC-NEXT-V1.0",
+        "prospect_ids": [],
+        "reason_code": "NEXT_ACTION_GENERATION_FALLBACK",
+        "search_key_sha256": "65987d76f0cd105991e5ca3725c4ab96e948d44be42ca94d19553bc88151a9dc",
+        "session_id": "HFIC-SESS-65987D76F0CD1059",
+        "source_terminal": "NO_WORTHY_HYPOTHESIS",
+        "why_cheaper_option_is_insufficient": "WAIT is the cheapest honest option when the draft is missing or unrepaired.",
+        "why_now": "Deterministic safe wait preserves replay identity without inventing a spend or capability atom."
+      },
+      "session_state": "SYNTHESIS_COMPLETE",
+      "session_id": "HFIC-SESS-65987D76F0CD1059",
+      "selected_candidate_id": null,
+      "selected_definition_sha256": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "65987d76f0cd105991e5ca3725c4ab96e948d44be42ca94d19553bc88151a9dc"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "forge-run",
+      "--owner-focus",
+      "OPPORTUNITY_EPISODES:LAV_NW",
+      "--persist",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 32.232587499995134,
+    "raw_stdout_sha256": "c1516b25a2f6455e7f2e4793116189a8114f58a7701a0d6303386d241fefceea",
+    "raw_excerpt": {
+      "next_action": "RESUME_NORMALIZED_TRAJECTORY_EPISODES_V1",
+      "blocking_reason_codes": [
+        "SAVED_DRAFT_PRESENT"
+      ],
+      "session_id": null,
+      "run_id": "FORGE-RUN-B71A6B3157C69F61",
+      "control_session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "no_write": false,
+      "writes": {
+        "forge_run": 1,
+        "research_store": 1,
+        "session": 0
+      },
+      "ordinary_operation": {
+        "candidate_ready": false,
+        "claim_boundary": "PRICE_RELATIVE_PROXY is not net return; cohorts are not independent replications",
+        "completed": {
+          "look": false,
+          "operation": false,
+          "scientific_search": false
+        },
+        "completion_gap": "LIMITED_RESULT_OPEN",
+        "compound_status": "EXECUTED",
+        "decision_age_seconds": null,
+        "decision_point": "E1800",
+        "effective_state": "OPEN",
+        "exit_point": "E14400",
+        "hold_seconds": null,
+        "journal_result_refs": [
+          "HFIC-ART-DISCOVERY-71DF1E5C27C8E411DB16874E1520931351A1C8EC",
+          "HFIC-ART-DISCOVERY-3DD1B1BC577F127530152BF12CEBB8CDE27DC237"
+        ],
+        "journal_scope": "1a5355149ff92c14600006a80951ee0e63fb02d7c3373b213ce2d03ac2eee63e",
+        "lifecycle_basis": null,
+        "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+        "next_action": "RESUME_NORMALIZED_TRAJECTORY_EPISODES_V1",
+        "next_needs_new_authority": false,
+        "next_needs_new_values": true,
+        "operation_sha256": "d754da1b9f05290ab189153b6fff8121090424264d6915fce542a28f1496d074",
+        "owner_main_remaining": 1,
+        "protocol_main_remaining": 5,
+        "protocol_main_used": 2,
+        "question_text": "episode profile stage",
+        "requested_completion": "LIMITED_RESULT",
+        "reserved_main": 0,
+        "result_refs": [],
+        "result_sha256": null,
+        "search_open": false,
+        "status": "OPEN"
+      }
+    },
+    "stderr": "FORGE RUN\nstatus: IN_PROGRESS вЂ” follow next_action; evening not complete\nrun_id: FORGE-RUN-B71A6B3157C69F61\nrun_identity_sha256: b71a6b3157c69f61351adda4ec7c6f58d8aff0a4f2791e6ab1a28d18ad4e6473\ncontrol_session_id: NONE\nowner_class: FORGE_RUN_IN_PROGRESS\nvisible_cohorts: REL-20261008T000000Z-20261009T000000Z\nused_cohorts: NONE\nmarket_epoch: 9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a  # admission/budget key\ncapability_epoch: 476253a08d054e50607eab5a327af63f8090fee91603e8ff3b1dedc7cf4b3276  # protocol; does not free market budget\nscientific_slot: e03d668c59c5059769cdde09fe98cf9695d9959022b0d3923bd14cbf0c8b70de  # market+representation+focus\nlegacy_epoch: NONE\nfrozen_versions: BASE@HFIC-V1.2, NORMALIZED_TRAJECTORY_EPISODES_V1@1.0\nexecution_binding: UNKNOWN\nexecution_provenance: NOT_APPLICABLE\nexecution_scope: NOT_SCIENTIFIC_EXECUTION  # provenance binding only; no market Forge\nexecution_provenance_note: historical readback is UNKNOWN; this is not a readiness receipt and not permission to rerun\nstage BASE@HFIC-V1.2: REUSED_VALID terminal=NO_WORTHY_HYPOTHESIS scope=ORDINARY_BASE session_id=HFIC-SESS-1A5355149FF92C14 stage_ref_sha256=f375ea6cdbbeb4e68a2bb3d91fc48b2",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\period1-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.03657050000038,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "episode-normalized-view",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c1-view-spec.json",
+      "--parent-session-id",
+      "HFIC-SESS-65987D76F0CD1059",
+      "--operation-sha256",
+      "ae8be1a08fb00a503971ff2072f3eb56a82d190f12aa05878dd19609a02237c6",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 6.086717700003646,
+    "raw_stdout_sha256": "914e4263a758f9b0d6177578f29f69b32fb3920d815e799897bf78f2a9a68f76",
+    "raw_excerpt": {
+      "representation_id": "NORMALIZED_TRAJECTORY_EPISODES_V1",
+      "writes": true
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\shape-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.0565644999878714,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c1child-a-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.0478597000037553,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c1child-b-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.140479300011066,
+    "raw_stdout_sha256": "9801ebf26e03e59702535dbf0786e0e8c2f11465af5f4399a01ef320b76823b6",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "persist-draft",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c1child-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c1child-receipt.json",
+      "--representation-id",
+      "NORMALIZED_TRAJECTORY_EPISODES_V1",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 4.019074600000749,
+    "raw_stdout_sha256": "8d86b90ec3bfa884b5ef25a1ef8e636b1b0c043a4348e0e5b823c6304ba9a39c",
+    "raw_excerpt": {
+      "session_id": "HFIC-SESS-8DFAA5B6F1302771",
+      "control_session_id": "HFIC-SESS-65987D76F0CD1059",
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "writes": {
+        "forge_context": 0,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "LAV_PERIOD_1",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 36.48531580000417,
+    "raw_stdout_sha256": "766662ad5261edf5dfe8a9a6f841fcaa265ea44da202ed51aad6da314045e68a",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "9a5331eb8ec507c14eef0f6445dc8fcd20956d1bdc826663daa24d48774fc028",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "freeze",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c1child-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c1child-receipt.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 5.936478599993279,
+    "raw_stdout_sha256": "e081041afbe7009edc4b0228469037e5528b252c855aad354ff9e75f39cd0ed7",
+    "raw_excerpt": {
+      "session_state": "FROZEN_AWAITING_CRITIC",
+      "session_id": "HFIC-SESS-8DFAA5B6F1302771",
+      "selected_candidate_id": "HFIC-CAND-F60F5396AD02",
+      "selected_definition_sha256": "f60f5396ad0282f20e5a6a2a003e4580c24df72fb23d45b5a4b26896e15f0ce5",
+      "control_session_id": "HFIC-SESS-65987D76F0CD1059",
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "8dfaa5b6f13027712d9e681d160825a31db6b78cdea67ec2876de1c082866a27"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "finalize",
+      "--session-id",
+      "HFIC-SESS-8DFAA5B6F1302771",
+      "--critic-result",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c1child-critic.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 3.652018599997973,
+    "raw_stdout_sha256": "9613ed299ac3a4d5c0a71ebd980ed13a7e1204b2e7be78eb9243e1c8298df0d5",
+    "raw_excerpt": {
+      "session_state": "SYNTHESIS_COMPLETE",
+      "session_id": "HFIC-SESS-8DFAA5B6F1302771",
+      "selected_candidate_id": "HFIC-CAND-F60F5396AD02",
+      "control_session_id": "HFIC-SESS-65987D76F0CD1059",
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "8dfaa5b6f13027712d9e681d160825a31db6b78cdea67ec2876de1c082866a27"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "AUTO",
+      "--additional-cycle",
+      "--format",
+      "json"
+    ],
+    "exit": 2,
+    "wall_seconds": 18.00093540000671,
+    "raw_stdout_sha256": "eedcffa0c5dc67ac9fb8a639054dbe55ec79a14276e64937e69b08c5b8041155",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "65987d76f0cd105991e5ca3725c4ab96e948d44be42ca94d19553bc88151a9dc",
+      "writes": {
+        "forge_context": 0,
+        "research_store": 0,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-policy-preview",
+      "--for-operation",
+      "ae8be1a08fb00a503971ff2072f3eb56a82d190f12aa05878dd19609a02237c6",
+      "--auto-cycles-per-market",
+      "2",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 1.8351150999951642,
+    "raw_stdout_sha256": "043faa1f33247cc7e35451996c7c48bae98663d70a7431480d284f167f4d27bf",
+    "raw_excerpt": {
+      "next_action": "AUTHORIZED_APPLY",
+      "status": "PROPOSED",
+      "writes": {
+        "research_store": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-policy-apply",
+      "--proposal",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2-pool.json",
+      "--confirm-append-only",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.554460100000142,
+    "raw_stdout_sha256": "c0715b7e8f88145efbc1a7a0b32b3fed10b40fdf1fd44fcef9da4dc3b32cfc1e",
+    "raw_excerpt": {
+      "next_action": "RUN_THE_NEXT_AUTHORIZED_LOOK_OR_CYCLE",
+      "status": "APPENDED",
+      "writes": {
+        "research_store": 1
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "AUTO",
+      "--additional-cycle",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 19.742343499994604,
+    "raw_stdout_sha256": "78989786a56f9b51b204533f98058ebcbf0f4a4808ba90e17093a5ea7532d2de",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "0e4dccb4cdd91773604cafcf6de3410417b4c6d6870cc90dd0b27aebc3a6647b",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2base-shape-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.0248948999942513,
+    "raw_stdout_sha256": "63f63439ef802fe6f867f8bd3c5aded424faab594a179035f8126b61a2beea21",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2base-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.0263954999973066,
+    "raw_stdout_sha256": "63f63439ef802fe6f867f8bd3c5aded424faab594a179035f8126b61a2beea21",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "LAV_NEXT",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 41.50415530000464,
+    "raw_stdout_sha256": "34079307b921997f9db4d40e8bddccce67b20b27f46776bcd28c4416aa0cbc48",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "16cd98660b182eade656a2758799fb2daa5805543f2e11ac0dfb55bcf322ff42",
+      "search_key_sha256": "aa788a267a12a61e8c0512e651aad5639f5bb4f91d039a055407ea645b996069",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 2,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\next-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.152355800004443,
+    "raw_stdout_sha256": "cf4b912c757e7d034d5ac856b62ead18b583b88d0b0c8cbb0ea7af421129a1cd",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "AUTO",
+      "--additional-cycle",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 22.64462999999523,
+    "raw_stdout_sha256": "be95115963e215e7a039e87c31b29b02f6c799b87a99ae8be2e2721852304ff5",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "0e4dccb4cdd91773604cafcf6de3410417b4c6d6870cc90dd0b27aebc3a6647b",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "persist-draft",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2-nw-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2-nw-receipt.json",
+      "--representation-id",
+      "BASE",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 4.416694700004882,
+    "raw_stdout_sha256": "7894ef99a970c4880200bd3dc19f355dfa620354f27303636231f81e4f50a352",
+    "raw_excerpt": {
+      "session_id": "HFIC-SESS-0E4DCCB4CDD91773",
+      "control_session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "writes": {
+        "forge_context": 0,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "LAV_NEXT",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 40.08388710000145,
+    "raw_stdout_sha256": "506c8e3fa803361633fe5eb553720dfb5a5df632c3b2218ff7f3c44ec041ba3d",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "16cd98660b182eade656a2758799fb2daa5805543f2e11ac0dfb55bcf322ff42",
+      "search_key_sha256": "aa788a267a12a61e8c0512e651aad5639f5bb4f91d039a055407ea645b996069",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "AUTO",
+      "--additional-cycle",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 22.94774010000401,
+    "raw_stdout_sha256": "1f2537cb372fa9b252e399194f5a58ac37b5a5d69fdcebc09143a2e3d9df1de5",
+    "raw_excerpt": {
+      "session_id": "HFIC-SESS-0E4DCCB4CDD91773",
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "0e4dccb4cdd91773604cafcf6de3410417b4c6d6870cc90dd0b27aebc3a6647b",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "freeze",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2-nw-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2-nw-receipt.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 8.148022900000797,
+    "raw_stdout_sha256": "333510f009b02806babaa196ca9351657f84cb80f7d558ab9ac41d7caabce7e9",
+    "raw_excerpt": {
+      "next_action": {
+        "action_id": "HFIC-NEXT-58CB11BD69B90615",
+        "action_payload": {
+          "wake_on": [
+            "EVIDENCE_EPOCH_CHANGED"
+          ]
+        },
+        "action_type": "WAIT_FOR_NEW_EVIDENCE",
+        "authority": {
+          "cash_spend_usd_cents": 0,
+          "credential_reads": 0,
+          "experiment_execution": 0,
+          "git_mutation": 0,
+          "provider_api_rpc_wss_calls": 0,
+          "rdp_mutation_outside_freeze": 0,
+          "wallet_signer_transaction_actions": 0
+        },
+        "basis_candidate_refs": [],
+        "candidate_ids": [],
+        "created_at": "2026-10-08T10:07:40Z",
+        "evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+        "evidence_gap": "No validated next-action draft was supplied after NO_WORTHY_HYPOTHESIS.",
+        "focus_key_sha256": "baef8c04cf009d9649e36d06f8599fd08f38ab5fabfaf144d83518b4114d1a81",
+        "forge_context_packet_sha256": "5a858222487284b8e5e69ef7f740d1624de93e67c067be20938830a8e2d430c8",
+        "generation_mode": "DETERMINISTIC_SAFE_FALLBACK",
+        "hfic_protocol": "HFIC-V1.2",
+        "named_consumer": "HFIC-POST-NO-WORTHY-ROUTER",
+        "non_claims": [
+          "NO_ALPHA",
+          "NO_AUTONOMOUS_GENERATOR",
+          "NO_DISCOVERY_RANKER_TRIGGER_PROVEN",
+          "NO_ARCH_INTENT_006_FULL_IMPLEMENTATION",
+          "NO_QUALITY_DIVERSITY_ENGINE",
+          "NO_VOI_SCHEDULER",
+          "NO_SEQUENTIAL_INFERENCE_ENGINE",
+          "NO_PROVIDER_OR_EXPERIMENT_AUTHORITY"
+        ],
+        "owner_gate": {
+          "phrase_status": "NONE",
+          "required": false
+        },
+        "packet_schema": "smial.hfic-next-epistemic-action",
+        "packet_version": "1.0",
+        "prompt_version": "HFIC-NEXT-V1.0",
+        "prospect_ids": [],
+        "reason_code": "NEXT_ACTION_GENERATION_FALLBACK",
+        "search_key_sha256": "0e4dccb4cdd91773604cafcf6de3410417b4c6d6870cc90dd0b27aebc3a6647b",
+        "session_id": "HFIC-SESS-0E4DCCB4CDD91773",
+        "source_terminal": "NO_WORTHY_HYPOTHESIS",
+        "why_cheaper_option_is_insufficient": "WAIT is the cheapest honest option when the draft is missing or unrepaired.",
+        "why_now": "Deterministic safe wait preserves replay identity without inventing a spend or capability atom."
+      },
+      "session_state": "SYNTHESIS_COMPLETE",
+      "session_id": "HFIC-SESS-0E4DCCB4CDD91773",
+      "selected_candidate_id": null,
+      "selected_definition_sha256": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "0e4dccb4cdd91773604cafcf6de3410417b4c6d6870cc90dd0b27aebc3a6647b"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "list-snapshot-register",
+      "--snapshot",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\clock.snapshot.json",
+      "--registered-at",
+      "2026-10-01T00:00:00Z",
+      "--format",
+      "json"
+    ],
+    "exit": 2,
+    "wall_seconds": 1.066412300002412,
+    "raw_stdout_sha256": "d037ae78ef96e831a488ccbeb3223a2fbfd8d72df96d3e628cf5083a58c06f03",
+    "raw_excerpt": {
+      "writes": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "list-snapshot-register",
+      "--snapshot",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\d.snapshot.json",
+      "--registered-at",
+      "2026-10-11T00:00:00Z",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 1.0480246000079205,
+    "raw_stdout_sha256": "c6bbe725c2cc9b85be2fd612b4f2f48bc5e4695e63dd804430145773d1922602",
+    "raw_excerpt": {
+      "status": "REGISTERED"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "list-snapshot-register",
+      "--snapshot",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\d.snapshot.json",
+      "--registered-at",
+      "2026-10-14T00:00:00Z",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 1.0288189999992028,
+    "raw_stdout_sha256": "0b38ae1031de0b517b2eb828c9e224c7a9fceb04bda7f759eec3e02b9992bc73",
+    "raw_excerpt": {
+      "status": "PASS_ALREADY_PRESENT_EXACT"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "list-snapshot-register",
+      "--snapshot",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\e.snapshot.json",
+      "--registered-at",
+      "2026-10-11T00:00:00Z",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 1.035940000001574,
+    "raw_stdout_sha256": "d3e013478b38d9bc6aff9df090b88d3e7bcd2b643941f826e9a4b26c80a58412",
+    "raw_excerpt": {
+      "status": "REGISTERED"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "list-snapshot-register",
+      "--snapshot",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\f.snapshot.json",
+      "--registered-at",
+      "2026-10-13T00:00:00Z",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 1.0243591999897035,
+    "raw_stdout_sha256": "e99d20d80c457eabfa3cb2fa72d6c8cbfede2a8ac0457d1129f1dacee60e5fa4",
+    "raw_excerpt": {
+      "status": "REGISTERED"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "episode-normalized-view",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2-view-spec.json",
+      "--parent-session-id",
+      "HFIC-SESS-0E4DCCB4CDD91773",
+      "--operation-sha256",
+      "94c3a8e2da14294f0f9b88685d57d8e5f08e00ff215bffa8dee75e4e64a314e9",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 10.138818299994455,
+    "raw_stdout_sha256": "daf26c648dbb04fae893db09bf9568df401e597f22d1e6e71b45d162a5260462",
+    "raw_excerpt": {
+      "representation_id": "NORMALIZED_TRAJECTORY_EPISODES_V1",
+      "writes": true
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\shape-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.113178700004937,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2child-replay-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.1323646000091685,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-policy-preview",
+      "--for-operation",
+      "7e977e6a21b74973ed652b2c514cb0755f0a5d7794b6643f90ba374eff4b8930",
+      "--main-total",
+      "10",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.3066793000034522,
+    "raw_stdout_sha256": "26fb6966b628c42dffd2b4e238f4483fa00368a576121b9cc4c19d69f1d7c085",
+    "raw_excerpt": {
+      "next_action": "AUTHORIZED_APPLY",
+      "status": "PROPOSED",
+      "writes": {
+        "research_store": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-policy-apply",
+      "--proposal",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2-total10.json",
+      "--confirm-append-only",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 3.4962181000009878,
+    "raw_stdout_sha256": "5154a8a3df37be31e3a77b684c05700c6360ebb4666d306e2f8a615de8fd03a3",
+    "raw_excerpt": {
+      "next_action": "RUN_THE_NEXT_AUTHORIZED_LOOK_OR_CYCLE",
+      "status": "APPENDED",
+      "writes": {
+        "research_store": 1
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2child-changed-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.141736799996579,
+    "raw_stdout_sha256": "63f63439ef802fe6f867f8bd3c5aded424faab594a179035f8126b61a2beea21",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "LAV_FIVE",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 53.116076899998006,
+    "raw_stdout_sha256": "a416ba6944b8326a50892740a98d08a02cc3599194cebcb89309f78caf15c074",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "16cd98660b182eade656a2758799fb2daa5805543f2e11ac0dfb55bcf322ff42",
+      "search_key_sha256": "8a0dda5bebd27fa64c599a41f8b27ef5fdeaf5406840bb71f9f5c1e7d9e48244",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\five-all-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 2,
+    "wall_seconds": 2.3132227000023704,
+    "raw_stdout_sha256": "097da2355a8e350fb57ca46f61c8f3387134ac009042376067e86d048ea36ec6",
+    "raw_excerpt": {
+      "next_action": "DECLARE_COVERED_SCOPE: set research_scope.evidence_selection.cohort_ids to cohorts whose referenced lists are all observed, before reading any outcome",
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\five-late-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 2,
+    "wall_seconds": 2.393808799999533,
+    "raw_stdout_sha256": "7a3921b7a08b487a4fe74d10ea9c9e0442a0e856227cf97b15bd0e56b1a66f79",
+    "raw_excerpt": {
+      "next_action": "DECLARE_COVERED_SCOPE: set research_scope.evidence_selection.cohort_ids to cohorts whose referenced lists are all observed, before reading any outcome",
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\five-covered-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.3071360000030836,
+    "raw_stdout_sha256": "f82852ce6949f4164ed8d9fbd80a10d516fd4f0907fd7ae6d4f8876cc1e8b5b7",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "persist-draft",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2child-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2child-receipt.json",
+      "--representation-id",
+      "NORMALIZED_TRAJECTORY_EPISODES_V1",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 5.24333640000259,
+    "raw_stdout_sha256": "026142f277520b6b2cd4b2132e13ccb78750490036cfd2a9ef715397e0813049",
+    "raw_excerpt": {
+      "session_id": "HFIC-SESS-411214B69DADCF9F",
+      "control_session_id": "HFIC-SESS-0E4DCCB4CDD91773",
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "writes": {
+        "forge_context": 0,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "freeze",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2child-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2child-receipt.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 9.309272800004692,
+    "raw_stdout_sha256": "74c4cc2935c03fed2fa1c4baf16bf1be172251f12c79566f6df9093a0e5563d9",
+    "raw_excerpt": {
+      "session_state": "FROZEN_AWAITING_CRITIC",
+      "session_id": "HFIC-SESS-411214B69DADCF9F",
+      "selected_candidate_id": "HFIC-CAND-FF92755C0ABB",
+      "selected_definition_sha256": "ff92755c0abbfbf58a2ad99ce5fd0da860f628506477c251c312d40101a628f8",
+      "control_session_id": "HFIC-SESS-0E4DCCB4CDD91773",
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "411214b69dadcf9f503c055ebdd3a85f3fea6b730fc0fa15adf140fe1a31f229"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "finalize",
+      "--session-id",
+      "HFIC-SESS-411214B69DADCF9F",
+      "--critic-result",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2child-critic.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 3.9823749999923166,
+    "raw_stdout_sha256": "a3c625a4ed8bae033f87a3a2b1967e013d748525fbfab3e5fc4a613181b2c3a0",
+    "raw_excerpt": {
+      "session_state": "SYNTHESIS_COMPLETE",
+      "session_id": "HFIC-SESS-411214B69DADCF9F",
+      "selected_candidate_id": "HFIC-CAND-FF92755C0ABB",
+      "control_session_id": "HFIC-SESS-0E4DCCB4CDD91773",
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "411214b69dadcf9f503c055ebdd3a85f3fea6b730fc0fa15adf140fe1a31f229"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpv9_uamqr\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "LAV_FIVE_COVERED",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 49.08194809999259,
+    "raw_stdout_sha256": "2e7a8cfbde2d87ef680ec60ba5d0186d34161e26ba7cab1118f27aa2904ed24b",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "16cd98660b182eade656a2758799fb2daa5805543f2e11ac0dfb55bcf322ff42",
+      "search_key_sha256": "8e739521c398cfeb40c5503d5dedde0ba97a465171f0790ad8cf0f2326e1a942",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "AUTO",
+      "--additional-cycle",
+      "--format",
+      "json"
+    ],
+    "exit": 2,
+    "wall_seconds": 34.416562300000805,
+    "raw_stdout_sha256": "85b7412043bc22b99fe3a64584aff4e76b03def48c9c178d54394a024077bd7b",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "65987d76f0cd105991e5ca3725c4ab96e948d44be42ca94d19553bc88151a9dc",
+      "writes": {
+        "forge_context": 0,
+        "research_store": 0,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "discovery-execute",
+      "--store",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2child-replay-spec.json",
+      "--candidate-scope",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2child-replay-scope.json",
+      "--journal-scope",
+      "411214b69dadcf9f503c055ebdd3a85f3fea6b730fc0fa15adf140fe1a31f229",
+      "--operation",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2child-replay-op.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 22.073791499991785,
+    "raw_stdout_sha256": "663da568d747a8d2bf2af5359e2ef9580543f75b37a8bae9c8a417591f8be3f1",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false,
+      "ordinary_operation": "OPEN"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-policy-preview",
+      "--for-operation",
+      "94c3a8e2da14294f0f9b88685d57d8e5f08e00ff215bffa8dee75e4e64a314e9",
+      "--preview-total",
+      "4",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.351828300001216,
+    "raw_stdout_sha256": "2f48e98da254058e743e467bd9e1dd477a03674dcf8cf7497085a593ff5d11c5",
+    "raw_excerpt": {
+      "next_action": "AUTHORIZED_APPLY",
+      "status": "PROPOSED",
+      "writes": {
+        "research_store": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-policy-apply",
+      "--proposal",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2-preview4.json",
+      "--confirm-append-only",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 3.5479657999967458,
+    "raw_stdout_sha256": "bb776a5082a203eedca2ff760c0034e84339147de3b7dee1988ab234156c3a48",
+    "raw_excerpt": {
+      "next_action": "RUN_THE_NEXT_AUTHORIZED_LOOK_OR_CYCLE",
+      "status": "APPENDED",
+      "writes": {
+        "research_store": 1
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "episode-normalized-view",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c1-view-spec-late.json",
+      "--parent-session-id",
+      "HFIC-SESS-65987D76F0CD1059",
+      "--operation-sha256",
+      "ae8be1a08fb00a503971ff2072f3eb56a82d190f12aa05878dd19609a02237c6",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 11.765992700005881,
+    "raw_stdout_sha256": "a0a57fb7307a85c744b6a21b8be3f879756d86a19e5fa69f8673f45570fc58e6",
+    "raw_excerpt": {
+      "representation_id": "NORMALIZED_TRAJECTORY_EPISODES_V1",
+      "writes": true
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\shape-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.0328277999942657,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c1child-late-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.181803100000252,
+    "raw_stdout_sha256": "347decb49825cf6929a9a1bb6273c7f792b6105640f46375d29bea719910f116",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\shape-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.0485443999932613,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\c2child-bypass-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.0612925000023097,
+    "raw_stdout_sha256": "9801ebf26e03e59702535dbf0786e0e8c2f11465af5f4399a01ef320b76823b6",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\v-base-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.0258707999892067,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "LAV_VAR",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 35.294287800003076,
+    "raw_stdout_sha256": "5bee6eb7de364ea1f190027e001599b44c21fdd3917f44e4e1de1a726b4d6768",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "e9720cf2aa5896b1a327533a7fadb458bf6c7325efab34630a4a48d2dd57a39d",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "LAV_VAR",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 35.67305450000276,
+    "raw_stdout_sha256": "704f74568ed6a77d2251b0814454986def8d6236d3d76fcae6afc9b83af49fe5",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "e9720cf2aa5896b1a327533a7fadb458bf6c7325efab34630a4a48d2dd57a39d",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "persist-draft",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\v-nw-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\v-nw-receipt.json",
+      "--representation-id",
+      "BASE",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 5.894954399991548,
+    "raw_stdout_sha256": "eb27a6783e4a500fc1137d3c407f3b206d452986fc910ec32d295ac0b7cae1ac",
+    "raw_excerpt": {
+      "session_id": "HFIC-SESS-E9720CF2AA5896B1",
+      "control_session_id": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "writes": {
+        "forge_context": 0,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "preflight",
+      "--discovery-contract",
+      "--collection",
+      "OPPORTUNITY_EPISODES",
+      "--owner-focus",
+      "LAV_VAR",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 35.36740489999647,
+    "raw_stdout_sha256": "ff999baafc176bf1a8406b41d89953b9809f42c0298fd1bc3dc502ed4ffcc616",
+    "raw_excerpt": {
+      "session_id": "HFIC-SESS-E9720CF2AA5896B1",
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "e9720cf2aa5896b1a327533a7fadb458bf6c7325efab34630a4a48d2dd57a39d",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "freeze",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\v-nw-draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\v-nw-receipt.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 9.717957399989245,
+    "raw_stdout_sha256": "89ea64a640bfac6e5d37990880668074c0cb30089d040150b8aabac3858212d7",
+    "raw_excerpt": {
+      "next_action": {
+        "action_id": "HFIC-NEXT-7A44C2F1529C7817",
+        "action_payload": {
+          "wake_on": [
+            "EVIDENCE_EPOCH_CHANGED"
+          ]
+        },
+        "action_type": "WAIT_FOR_NEW_EVIDENCE",
+        "authority": {
+          "cash_spend_usd_cents": 0,
+          "credential_reads": 0,
+          "experiment_execution": 0,
+          "git_mutation": 0,
+          "provider_api_rpc_wss_calls": 0,
+          "rdp_mutation_outside_freeze": 0,
+          "wallet_signer_transaction_actions": 0
+        },
+        "basis_candidate_refs": [],
+        "candidate_ids": [],
+        "created_at": "2026-10-08T10:14:50Z",
+        "evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+        "evidence_gap": "No validated next-action draft was supplied after NO_WORTHY_HYPOTHESIS.",
+        "focus_key_sha256": "734fea33a53adecafb287e8cfe88c8c3ed033fa9906d59a3225de0b59deeb61f",
+        "forge_context_packet_sha256": "7aace008bc13239bc12123b15b1a304967f22e70784e79a485a678d013cb3f27",
+        "generation_mode": "DETERMINISTIC_SAFE_FALLBACK",
+        "hfic_protocol": "HFIC-V1.2",
+        "named_consumer": "HFIC-POST-NO-WORTHY-ROUTER",
+        "non_claims": [
+          "NO_ALPHA",
+          "NO_AUTONOMOUS_GENERATOR",
+          "NO_DISCOVERY_RANKER_TRIGGER_PROVEN",
+          "NO_ARCH_INTENT_006_FULL_IMPLEMENTATION",
+          "NO_QUALITY_DIVERSITY_ENGINE",
+          "NO_VOI_SCHEDULER",
+          "NO_SEQUENTIAL_INFERENCE_ENGINE",
+          "NO_PROVIDER_OR_EXPERIMENT_AUTHORITY"
+        ],
+        "owner_gate": {
+          "phrase_status": "NONE",
+          "required": false
+        },
+        "packet_schema": "smial.hfic-next-epistemic-action",
+        "packet_version": "1.0",
+        "prompt_version": "HFIC-NEXT-V1.0",
+        "prospect_ids": [],
+        "reason_code": "NEXT_ACTION_GENERATION_FALLBACK",
+        "search_key_sha256": "e9720cf2aa5896b1a327533a7fadb458bf6c7325efab34630a4a48d2dd57a39d",
+        "session_id": "HFIC-SESS-E9720CF2AA5896B1",
+        "source_terminal": "NO_WORTHY_HYPOTHESIS",
+        "why_cheaper_option_is_insufficient": "WAIT is the cheapest honest option when the draft is missing or unrepaired.",
+        "why_now": "Deterministic safe wait preserves replay identity without inventing a spend or capability atom."
+      },
+      "session_state": "SYNTHESIS_COMPLETE",
+      "session_id": "HFIC-SESS-E9720CF2AA5896B1",
+      "selected_candidate_id": null,
+      "selected_definition_sha256": null,
+      "market_evidence_epoch_sha256": "9ca0184b7a6cee08a997606dbe16dae9fde0d3e6e4958e0ba5879f5b5368f12a",
+      "search_key_sha256": "e9720cf2aa5896b1a327533a7fadb458bf6c7325efab34630a4a48d2dd57a39d"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "episode-normalized-view",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\v-view-a.json",
+      "--parent-session-id",
+      "HFIC-SESS-E9720CF2AA5896B1",
+      "--operation-sha256",
+      "8f1f8db7830fb810a3789d9c1584136e858827e6f3f88e95e0655c79a90ff83e",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 14.305576500002644,
+    "raw_stdout_sha256": "c33600ec801e8739343d38e4a6149357feaf9679e830f0c70810932a9a48af85",
+    "raw_excerpt": {
+      "representation_id": "NORMALIZED_TRAJECTORY_EPISODES_V1",
+      "writes": true
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "episode-normalized-view",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\v-view-b.json",
+      "--parent-session-id",
+      "HFIC-SESS-E9720CF2AA5896B1",
+      "--operation-sha256",
+      "8f1f8db7830fb810a3789d9c1584136e858827e6f3f88e95e0655c79a90ff83e",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 15.803805200004717,
+    "raw_stdout_sha256": "b7cb3b1d3daa7c1bc9731eaf70021b7a1b4f6cde3be5445474c63560d22c3b5b",
+    "raw_excerpt": {
+      "representation_id": "NORMALIZED_TRAJECTORY_EPISODES_V1",
+      "writes": true
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\shape-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.1098973999905866,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\shape-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.0634830000053626,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\v-a1-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.0820175999979256,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\v-a2-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.239553399995202,
+    "raw_stdout_sha256": "63f63439ef802fe6f867f8bd3c5aded424faab594a179035f8126b61a2beea21",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\v-b-replay-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.0618169000081252,
+    "raw_stdout_sha256": "8f6e0361e9389c1668b694ad5b5dcde1524d8c9ba857d5a783013c4568b70cb3",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\plane",
+      "research-scope-resolve",
+      "--spec",
+      "<DISPOSABLE>\\fixtures\\tmp28jx2o5q\\v-b-new-draft.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.045185399998445,
+    "raw_stdout_sha256": "347decb49825cf6929a9a1bb6273c7f792b6105640f46375d29bea719910f116",
+    "raw_excerpt": {
+      "writes": false,
+      "values_loaded": false
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpmlvn_y_j\\rdp",
+      "preflight",
+      "--owner-focus",
+      "AUTO",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 10.710752899991348,
+    "raw_stdout_sha256": "ebe1e77289c8a21ce8a4b5b3df17700f2b99cfbd07284c4b6178fa9a422c7fec",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "ab027494787262c81df78a7535332573c3727d686c776e028efc6aa37b13861b",
+      "search_key_sha256": "f0af120a7dd5fef45e7362137a6c19486933366134a35c660f844c458e3ae47f",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 3,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpmlvn_y_j\\rdp",
+      "preflight",
+      "--owner-focus",
+      "AUTO",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 5.758146800013492,
+    "raw_stdout_sha256": "38acfad454187be6aa1faabad4897e1bfb11b8d213c4fbc2e48e70111335a003",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "c38d5d0849f3ac1bcb8819ac6cbee4f59cafd626e5fa5a1515022bccba0ff8f1",
+      "search_key_sha256": "864c5a618b967055ff2a2224a9b9fadc9dc4b42ebd727a760bffe116ac21c90c",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 2,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpmlvn_y_j\\rdp",
+      "freeze",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmpmlvn_y_j\\no_worthy.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmpmlvn_y_j\\preflight.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 4.701817900000606,
+    "raw_stdout_sha256": "cb50a9569764f9b21e00f26efd6476772415cb198cb2f0a234d695eba70f2024",
+    "raw_excerpt": {
+      "next_action": {
+        "action_id": "HFIC-NEXT-D60AF65A2BEB09C8",
+        "action_payload": {
+          "wake_on": [
+            "EVIDENCE_EPOCH_CHANGED"
+          ]
+        },
+        "action_type": "WAIT_FOR_NEW_EVIDENCE",
+        "authority": {
+          "cash_spend_usd_cents": 0,
+          "credential_reads": 0,
+          "experiment_execution": 0,
+          "git_mutation": 0,
+          "provider_api_rpc_wss_calls": 0,
+          "rdp_mutation_outside_freeze": 0,
+          "wallet_signer_transaction_actions": 0
+        },
+        "basis_candidate_refs": [],
+        "candidate_ids": [
+          "HFIC-CAND-9F748C549587",
+          "HFIC-CAND-F33414FA991F",
+          "HFIC-CAND-33C8B76642DE",
+          "HFIC-CAND-82743AB37ED4"
+        ],
+        "created_at": "2026-10-08T10:20:27Z",
+        "evidence_epoch_sha256": "c38d5d0849f3ac1bcb8819ac6cbee4f59cafd626e5fa5a1515022bccba0ff8f1",
+        "evidence_gap": "No validated next-action draft was supplied after NO_WORTHY_HYPOTHESIS.",
+        "focus_key_sha256": "929260ad9b9ea9fe0f3553dd964f4ff3deb5792efd031a2b90f573fe91f012bb",
+        "forge_context_packet_sha256": "0e0e24958dea3f44fd3b9b3fa8235e1c4b671a3efa1b1f8eaf89f196c4ce5f4c",
+        "generation_mode": "DETERMINISTIC_SAFE_FALLBACK",
+        "hfic_protocol": "HFIC-V1.2",
+        "named_consumer": "HFIC-POST-NO-WORTHY-ROUTER",
+        "non_claims": [
+          "NO_ALPHA",
+          "NO_AUTONOMOUS_GENERATOR",
+          "NO_DISCOVERY_RANKER_TRIGGER_PROVEN",
+          "NO_ARCH_INTENT_006_FULL_IMPLEMENTATION",
+          "NO_QUALITY_DIVERSITY_ENGINE",
+          "NO_VOI_SCHEDULER",
+          "NO_SEQUENTIAL_INFERENCE_ENGINE",
+          "NO_PROVIDER_OR_EXPERIMENT_AUTHORITY"
+        ],
+        "owner_gate": {
+          "phrase_status": "NONE",
+          "required": false
+        },
+        "packet_schema": "smial.hfic-next-epistemic-action",
+        "packet_version": "1.0",
+        "prompt_version": "HFIC-NEXT-V1.0",
+        "prospect_ids": [],
+        "reason_code": "NEXT_ACTION_GENERATION_FALLBACK",
+        "search_key_sha256": "864c5a618b967055ff2a2224a9b9fadc9dc4b42ebd727a760bffe116ac21c90c",
+        "session_id": "HFIC-SESS-864C5A618B967055",
+        "source_terminal": "NO_WORTHY_HYPOTHESIS",
+        "why_cheaper_option_is_insufficient": "WAIT is the cheapest honest option when the draft is missing or unrepaired.",
+        "why_now": "Deterministic safe wait preserves replay identity without inventing a spend or capability atom."
+      },
+      "session_state": "SYNTHESIS_COMPLETE",
+      "session_id": "HFIC-SESS-864C5A618B967055",
+      "selected_candidate_id": null,
+      "selected_definition_sha256": null,
+      "market_evidence_epoch_sha256": "c38d5d0849f3ac1bcb8819ac6cbee4f59cafd626e5fa5a1515022bccba0ff8f1",
+      "search_key_sha256": "864c5a618b967055ff2a2224a9b9fadc9dc4b42ebd727a760bffe116ac21c90c"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpmlvn_y_j\\rdp",
+      "preflight",
+      "--owner-focus",
+      "AUTO",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 6.4081472999969264,
+    "raw_stdout_sha256": "bee94a1f51789c87876196fbdc184441d7af63079aa0572ab46951010a93f43d",
+    "raw_excerpt": {
+      "session_state": "SYNTHESIS_COMPLETE",
+      "session_id": "HFIC-SESS-864C5A618B967055",
+      "market_evidence_epoch_sha256": "c38d5d0849f3ac1bcb8819ac6cbee4f59cafd626e5fa5a1515022bccba0ff8f1",
+      "search_key_sha256": "864c5a618b967055ff2a2224a9b9fadc9dc4b42ebd727a760bffe116ac21c90c",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpmlvn_y_j\\rdp",
+      "prove-runtime",
+      "--session-id",
+      "HFIC-SESS-864C5A618B967055",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.6762328000040725,
+    "raw_stdout_sha256": "cc9a9c7dfd05b48e6b02db0aa60bdb6d7e3ed37f74f27730a23033040f7e1926",
+    "raw_excerpt": {
+      "next_action": {
+        "action_id": "HFIC-NEXT-D60AF65A2BEB09C8",
+        "action_payload": {
+          "wake_on": [
+            "EVIDENCE_EPOCH_CHANGED"
+          ]
+        },
+        "action_type": "WAIT_FOR_NEW_EVIDENCE",
+        "authority": {
+          "cash_spend_usd_cents": 0,
+          "credential_reads": 0,
+          "experiment_execution": 0,
+          "git_mutation": 0,
+          "provider_api_rpc_wss_calls": 0,
+          "rdp_mutation_outside_freeze": 0,
+          "wallet_signer_transaction_actions": 0
+        },
+        "basis_candidate_refs": [],
+        "candidate_ids": [
+          "HFIC-CAND-9F748C549587",
+          "HFIC-CAND-F33414FA991F",
+          "HFIC-CAND-33C8B76642DE",
+          "HFIC-CAND-82743AB37ED4"
+        ],
+        "created_at": "2026-10-08T10:20:27Z",
+        "evidence_epoch_sha256": "c38d5d0849f3ac1bcb8819ac6cbee4f59cafd626e5fa5a1515022bccba0ff8f1",
+        "evidence_gap": "No validated next-action draft was supplied after NO_WORTHY_HYPOTHESIS.",
+        "focus_key_sha256": "929260ad9b9ea9fe0f3553dd964f4ff3deb5792efd031a2b90f573fe91f012bb",
+        "forge_context_packet_sha256": "0e0e24958dea3f44fd3b9b3fa8235e1c4b671a3efa1b1f8eaf89f196c4ce5f4c",
+        "generation_mode": "DETERMINISTIC_SAFE_FALLBACK",
+        "hfic_protocol": "HFIC-V1.2",
+        "named_consumer": "HFIC-POST-NO-WORTHY-ROUTER",
+        "non_claims": [
+          "NO_ALPHA",
+          "NO_AUTONOMOUS_GENERATOR",
+          "NO_DISCOVERY_RANKER_TRIGGER_PROVEN",
+          "NO_ARCH_INTENT_006_FULL_IMPLEMENTATION",
+          "NO_QUALITY_DIVERSITY_ENGINE",
+          "NO_VOI_SCHEDULER",
+          "NO_SEQUENTIAL_INFERENCE_ENGINE",
+          "NO_PROVIDER_OR_EXPERIMENT_AUTHORITY"
+        ],
+        "owner_gate": {
+          "phrase_status": "NONE",
+          "required": false
+        },
+        "packet_schema": "smial.hfic-next-epistemic-action",
+        "packet_version": "1.0",
+        "prompt_version": "HFIC-NEXT-V1.0",
+        "prospect_ids": [],
+        "reason_code": "NEXT_ACTION_GENERATION_FALLBACK",
+        "search_key_sha256": "864c5a618b967055ff2a2224a9b9fadc9dc4b42ebd727a760bffe116ac21c90c",
+        "session_id": "HFIC-SESS-864C5A618B967055",
+        "source_terminal": "NO_WORTHY_HYPOTHESIS",
+        "why_cheaper_option_is_insufficient": "WAIT is the cheapest honest option when the draft is missing or unrepaired.",
+        "why_now": "Deterministic safe wait preserves replay identity without inventing a spend or capability atom."
+      },
+      "session_state": "SYNTHESIS_COMPLETE",
+      "session_id": "HFIC-SESS-864C5A618B967055",
+      "selected_candidate_id": null,
+      "market_evidence_epoch_sha256": "c38d5d0849f3ac1bcb8819ac6cbee4f59cafd626e5fa5a1515022bccba0ff8f1",
+      "search_key_sha256": "864c5a618b967055ff2a2224a9b9fadc9dc4b42ebd727a760bffe116ac21c90c"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpo_bvsn4g\\rdp",
+      "preflight",
+      "--owner-focus",
+      "AUTO",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 10.663352599993232,
+    "raw_stdout_sha256": "77aa8f2adfb0fa9ad9ce85e58903b5bafe25b4ccec74fe4fe0d2b2bca5fcf96e",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "ab027494787262c81df78a7535332573c3727d686c776e028efc6aa37b13861b",
+      "search_key_sha256": "f0af120a7dd5fef45e7362137a6c19486933366134a35c660f844c458e3ae47f",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 3,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpo_bvsn4g\\rdp",
+      "freeze",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmpo_bvsn4g\\no_worthy.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmpo_bvsn4g\\preflight.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 4.482390600009239,
+    "raw_stdout_sha256": "91ce1047e135bfed6f1ac443e87fd2bad47ca6a8ce88455b9a1aa7e0937a4998",
+    "raw_excerpt": {
+      "next_action": {
+        "action_id": "HFIC-NEXT-3B0406505A23FC5E",
+        "action_payload": {
+          "wake_on": [
+            "EVIDENCE_EPOCH_CHANGED"
+          ]
+        },
+        "action_type": "WAIT_FOR_NEW_EVIDENCE",
+        "authority": {
+          "cash_spend_usd_cents": 0,
+          "credential_reads": 0,
+          "experiment_execution": 0,
+          "git_mutation": 0,
+          "provider_api_rpc_wss_calls": 0,
+          "rdp_mutation_outside_freeze": 0,
+          "wallet_signer_transaction_actions": 0
+        },
+        "basis_candidate_refs": [],
+        "candidate_ids": [
+          "HFIC-CAND-9F748C549587",
+          "HFIC-CAND-F33414FA991F",
+          "HFIC-CAND-33C8B76642DE",
+          "HFIC-CAND-82743AB37ED4"
+        ],
+        "created_at": "2026-10-08T10:20:53Z",
+        "evidence_epoch_sha256": "ab027494787262c81df78a7535332573c3727d686c776e028efc6aa37b13861b",
+        "evidence_gap": "No validated next-action draft was supplied after NO_WORTHY_HYPOTHESIS.",
+        "focus_key_sha256": "929260ad9b9ea9fe0f3553dd964f4ff3deb5792efd031a2b90f573fe91f012bb",
+        "forge_context_packet_sha256": "ebf0d3868fad39aeeb2f659b49ecddd817181cdc6a401370ec36e555fb69f9ef",
+        "generation_mode": "DETERMINISTIC_SAFE_FALLBACK",
+        "hfic_protocol": "HFIC-V1.2",
+        "named_consumer": "HFIC-POST-NO-WORTHY-ROUTER",
+        "non_claims": [
+          "NO_ALPHA",
+          "NO_AUTONOMOUS_GENERATOR",
+          "NO_DISCOVERY_RANKER_TRIGGER_PROVEN",
+          "NO_ARCH_INTENT_006_FULL_IMPLEMENTATION",
+          "NO_QUALITY_DIVERSITY_ENGINE",
+          "NO_VOI_SCHEDULER",
+          "NO_SEQUENTIAL_INFERENCE_ENGINE",
+          "NO_PROVIDER_OR_EXPERIMENT_AUTHORITY"
+        ],
+        "owner_gate": {
+          "phrase_status": "NONE",
+          "required": false
+        },
+        "packet_schema": "smial.hfic-next-epistemic-action",
+        "packet_version": "1.0",
+        "prompt_version": "HFIC-NEXT-V1.0",
+        "prospect_ids": [],
+        "reason_code": "NEXT_ACTION_GENERATION_FALLBACK",
+        "search_key_sha256": "f0af120a7dd5fef45e7362137a6c19486933366134a35c660f844c458e3ae47f",
+        "session_id": "HFIC-SESS-F0AF120A7DD5FEF4",
+        "source_terminal": "NO_WORTHY_HYPOTHESIS",
+        "why_cheaper_option_is_insufficient": "WAIT is the cheapest honest option when the draft is missing or unrepaired.",
+        "why_now": "Deterministic safe wait preserves replay identity without inventing a spend or capability atom."
+      },
+      "session_state": "SYNTHESIS_COMPLETE",
+      "session_id": "HFIC-SESS-F0AF120A7DD5FEF4",
+      "selected_candidate_id": null,
+      "selected_definition_sha256": null,
+      "market_evidence_epoch_sha256": "ab027494787262c81df78a7535332573c3727d686c776e028efc6aa37b13861b",
+      "search_key_sha256": "f0af120a7dd5fef45e7362137a6c19486933366134a35c660f844c458e3ae47f"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpo_bvsn4g\\rdp",
+      "prove-runtime",
+      "--session-id",
+      "HFIC-SESS-F0AF120A7DD5FEF4",
+      "--format",
+      "json"
+    ],
+    "exit": 2,
+    "wall_seconds": 1.5123253000056138,
+    "raw_stdout_sha256": "2380781b73d797747361772b137e8f605b1ba296b2fecaf6acdc1f82ede8f467",
+    "raw_excerpt": {
+      "next_action": "RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY",
+      "writes": false
+    },
+    "stderr": "FORGE_CONTEXT_ARTIFACT_MISSING\n",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpwyjuegb_\\rdp",
+      "preflight",
+      "--owner-focus",
+      "AUTO",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 10.779634999998962,
+    "raw_stdout_sha256": "4f55c5a550118beb8c395eaf11e39c461d841089a8e7f334776b0d3027882370",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "ab027494787262c81df78a7535332573c3727d686c776e028efc6aa37b13861b",
+      "search_key_sha256": "f0af120a7dd5fef45e7362137a6c19486933366134a35c660f844c458e3ae47f",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 3,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpwyjuegb_\\rdp",
+      "freeze",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmpwyjuegb_\\selected.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmpwyjuegb_\\preflight.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 4.594591999994009,
+    "raw_stdout_sha256": "900a04f0aa6a380d5514ec9384460372d290c6d772f72c0623769b4dd4fbcecf",
+    "raw_excerpt": {
+      "session_state": "FROZEN_AWAITING_CRITIC",
+      "session_id": "HFIC-SESS-F0AF120A7DD5FEF4",
+      "selected_candidate_id": "HFIC-CAND-9F748C549587",
+      "selected_definition_sha256": "9f748c54958789b44da75603608c5e97e82ed8f3d024f39dc9ffabf505bf6d83",
+      "market_evidence_epoch_sha256": "ab027494787262c81df78a7535332573c3727d686c776e028efc6aa37b13861b",
+      "search_key_sha256": "f0af120a7dd5fef45e7362137a6c19486933366134a35c660f844c458e3ae47f"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpwyjuegb_\\rdp",
+      "show-session",
+      "--session-id",
+      "HFIC-SESS-F0AF120A7DD5FEF4",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 1.7000671999994665,
+    "raw_stdout_sha256": "5cffcec7a8c82d158357fcd28193db6adf2005c4dd965bbce674b111fad4fcf3",
+    "raw_excerpt": {
+      "next_action": null,
+      "session_state": "FROZEN_AWAITING_CRITIC",
+      "session_id": "HFIC-SESS-F0AF120A7DD5FEF4",
+      "selected_candidate_id": "HFIC-CAND-9F748C549587",
+      "market_evidence_epoch_sha256": "ab027494787262c81df78a7535332573c3727d686c776e028efc6aa37b13861b",
+      "search_key_sha256": "f0af120a7dd5fef45e7362137a6c19486933366134a35c660f844c458e3ae47f"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpwyjuegb_\\rdp",
+      "show-session",
+      "--session-id",
+      "HFIC-SESS-F0AF120A7DD5FEF4",
+      "--format",
+      "json"
+    ],
+    "exit": 2,
+    "wall_seconds": 1.1289561000012327,
+    "raw_stdout_sha256": "508d126806f2a5b67e2c19e2c014c206b511a6ae33db31c39d77af3962873822",
+    "raw_excerpt": {
+      "next_action": "RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY",
+      "writes": false
+    },
+    "stderr": "FORGE_CONTEXT_HASH_MISMATCH\n",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp0h91xl0p\\rdp",
+      "preflight",
+      "--owner-focus",
+      "AUTO",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 10.587175299995579,
+    "raw_stdout_sha256": "31d6639fc68592d9677667cb597b134e8fe8a8008e2e13c6350c8f4a30b00520",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "ab027494787262c81df78a7535332573c3727d686c776e028efc6aa37b13861b",
+      "search_key_sha256": "f0af120a7dd5fef45e7362137a6c19486933366134a35c660f844c458e3ae47f",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 3,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp0h91xl0p\\rdp",
+      "freeze",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmp0h91xl0p\\draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmp0h91xl0p\\preflight.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 4.521433600006276,
+    "raw_stdout_sha256": "a0e7cc1a947d79405529d0669f168cf24829b923a31cb7caafce6baf9e61c3d9",
+    "raw_excerpt": {
+      "session_state": "FROZEN_AWAITING_CRITIC",
+      "session_id": "HFIC-SESS-F0AF120A7DD5FEF4",
+      "selected_candidate_id": "HFIC-CAND-9F748C549587",
+      "selected_definition_sha256": "9f748c54958789b44da75603608c5e97e82ed8f3d024f39dc9ffabf505bf6d83",
+      "market_evidence_epoch_sha256": "ab027494787262c81df78a7535332573c3727d686c776e028efc6aa37b13861b",
+      "search_key_sha256": "f0af120a7dd5fef45e7362137a6c19486933366134a35c660f844c458e3ae47f"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp0h91xl0p\\rdp",
+      "finalize",
+      "--session-id",
+      "HFIC-SESS-F0AF120A7DD5FEF4",
+      "--critic-result",
+      "<DISPOSABLE>\\fixtures\\tmp0h91xl0p\\critic.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 2.668032600005972,
+    "raw_stdout_sha256": "72ff3a1e53b586bd05b769caf72f1b50c67aa02311b6496072a9e75954ffab7e",
+    "raw_excerpt": {
+      "next_action": null,
+      "session_state": "RUNNER_UP_AWAITING_CRITIC",
+      "session_id": "HFIC-SESS-F0AF120A7DD5FEF4",
+      "selected_candidate_id": "HFIC-CAND-9F748C549587",
+      "selected_definition_sha256": "9f748c54958789b44da75603608c5e97e82ed8f3d024f39dc9ffabf505bf6d83",
+      "control_session_id": null,
+      "market_evidence_epoch_sha256": "ab027494787262c81df78a7535332573c3727d686c776e028efc6aa37b13861b",
+      "search_key_sha256": "f0af120a7dd5fef45e7362137a6c19486933366134a35c660f844c458e3ae47f",
+      "critic_result": null
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp0h91xl0p\\rdp",
+      "finalize",
+      "--session-id",
+      "HFIC-SESS-F0AF120A7DD5FEF4",
+      "--critic-result",
+      "<DISPOSABLE>\\fixtures\\tmp0h91xl0p\\critic_c2.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 3.142796100000851,
+    "raw_stdout_sha256": "9e1432d22028daee98af41ba4b86b869b8e9899e57f6f5760d0c8de08d6d090d",
+    "raw_excerpt": {
+      "session_state": "SYNTHESIS_COMPLETE",
+      "session_id": "HFIC-SESS-F0AF120A7DD5FEF4",
+      "selected_candidate_id": "HFIC-CAND-9F748C549587",
+      "market_evidence_epoch_sha256": "ab027494787262c81df78a7535332573c3727d686c776e028efc6aa37b13861b",
+      "search_key_sha256": "f0af120a7dd5fef45e7362137a6c19486933366134a35c660f844c458e3ae47f"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp0h91xl0p\\rdp",
+      "preflight",
+      "--owner-focus",
+      "AUTO",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 6.464408200001344,
+    "raw_stdout_sha256": "e8b52457d8d4bf7ad401878a63f1ee6668098d8e902135c2ed9e161fc53c9fdf",
+    "raw_excerpt": {
+      "session_state": "SYNTHESIS_COMPLETE",
+      "session_id": "HFIC-SESS-F0AF120A7DD5FEF4",
+      "market_evidence_epoch_sha256": "ab027494787262c81df78a7535332573c3727d686c776e028efc6aa37b13861b",
+      "search_key_sha256": "f0af120a7dd5fef45e7362137a6c19486933366134a35c660f844c458e3ae47f",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 1,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmpl907kmf2\\rdp",
+      "preflight",
+      "--owner-focus",
+      "AUTO",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 10.825623199998518,
+    "raw_stdout_sha256": "027159fcd8aaa801c2ad7e69d218f13f22400707dd1ade02bbc95a1cebbd0d7f",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "bb543633e19be6a4db30711c71161b1a804a8790cfa64c07917ba51e24b7d3f4",
+      "search_key_sha256": "0baaf85fa0d82bf7a525e725ed1614d62aaa1c65db5e31a4cab43fcda41c5897",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 3,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp1kpjr07h\\rdp",
+      "preflight",
+      "--owner-focus",
+      "AUTO",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 10.979991100000916,
+    "raw_stdout_sha256": "c54c0f1a87b0923fbe569db9d7ec770e78601169f1e76ed5774bc9d3da778b33",
+    "raw_excerpt": {
+      "session_id": null,
+      "market_evidence_epoch_sha256": "bb543633e19be6a4db30711c71161b1a804a8790cfa64c07917ba51e24b7d3f4",
+      "search_key_sha256": "0baaf85fa0d82bf7a525e725ed1614d62aaa1c65db5e31a4cab43fcda41c5897",
+      "writes": {
+        "forge_context": 1,
+        "research_store": 3,
+        "session": 0
+      }
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  },
+  {
+    "command": [
+      "<CHECKOUT>\\.venv\\Scripts\\python.exe",
+      "-B",
+      "<CHECKOUT>\\scripts\\hypothesis_forge.py",
+      "--root",
+      "<CHECKOUT>",
+      "--data-root",
+      "<DISPOSABLE>\\fixtures\\tmp1kpjr07h\\rdp",
+      "freeze",
+      "--draft",
+      "<DISPOSABLE>\\fixtures\\tmp1kpjr07h\\draft.json",
+      "--preflight-receipt",
+      "<DISPOSABLE>\\fixtures\\tmp1kpjr07h\\preflight.json",
+      "--format",
+      "json"
+    ],
+    "exit": 0,
+    "wall_seconds": 4.447491300001275,
+    "raw_stdout_sha256": "b16595917ec1091a1ca4b39fb295213a61b07e27ff91f717d664c69a718b672d",
+    "raw_excerpt": {
+      "session_state": "FROZEN_AWAITING_CRITIC",
+      "session_id": "HFIC-SESS-0BAAF85FA0D82BF7",
+      "selected_candidate_id": "HFIC-CAND-9F748C549587",
+      "selected_definition_sha256": "9f748c54958789b44da75603608c5e97e82ed8f3d024f39dc9ffabf505bf6d83",
+      "market_evidence_epoch_sha256": "bb543633e19be6a4db30711c71161b1a804a8790cfa64c07917ba51e24b7d3f4",
+      "search_key_sha256": "0baaf85fa0d82bf7a525e725ed1614d62aaa1c65db5e31a4cab43fcda41c5897"
+    },
+    "stderr": "",
+    "evidence_form": "HASHED_OUTPUT_EXCERPT_FULL_SYNTHETIC_OUTPUT_REGENERABLE"
+  }
+]

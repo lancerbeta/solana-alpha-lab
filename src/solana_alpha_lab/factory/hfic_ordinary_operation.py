@@ -820,6 +820,19 @@ def _assert_preflight_journal(
         raise OrdinaryOperationError("ORDINARY_OPERATION_JOURNAL_NOT_CANONICAL")
 
 
+def _preview_charge_identity(item: Mapping[str, Any]) -> str:
+    """A frozen request spends a slot even when another request lands equal bytes.
+
+    Older unkeyed previews retain their payload-based charge; the namespaces
+    keep a legacy payload from cancelling a later request with the same hash.
+    """
+    spec = str(item.get("spec_sha256") or "")
+    if spec:
+        return f"REQUEST:{spec}"
+    payload = str(item.get("preview_sha256") or "")
+    return f"LEGACY_PAYLOAD:{payload}" if payload else ""
+
+
 def _occupancy(
     store: Any,
     looks: Sequence[Mapping[str, Any]],
@@ -834,9 +847,9 @@ def _occupancy(
     if kind == "preview":
         previews = _feature_previews(store, journal)
         used = {
-            str(item.get("preview_sha256") or "")
+            _preview_charge_identity(item)
             for item in previews
-            if item.get("preview_sha256")
+            if _preview_charge_identity(item)
         }
         landed_specs = {
             str(item.get("spec_sha256") or "")
@@ -935,7 +948,7 @@ def _spent_by_operation(store: Any, operation: Mapping[str, Any], kind: str) -> 
     look_class = {"main": "MAIN", "adaptive": "ADAPTIVE", "preview": "PREVIEW"}[kind]
     if kind == "preview":
         done = {
-            str(item.get("preview_sha256") or item.get("spec_sha256") or "")
+            _preview_charge_identity(item)
             for item in _feature_previews(store, journal)
             if item.get("operation_sha256") == digest
         }

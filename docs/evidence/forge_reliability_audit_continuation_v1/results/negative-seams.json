@@ -1,0 +1,42 @@
+{
+  "injected_admission_controls": [
+    {
+      "admission": {
+        "action": "STOP",
+        "occupancy": "UNRESOLVED_BINDING",
+        "reason_code": "SCIENTIFIC_SLOT_IDENTITY_INVALID",
+        "scientific_slot_sha256": "0bf1826f91c3c20864d8f7dc644303560a54cc16c25dd62fb3038c605456b374",
+        "session_id": null
+      },
+      "injected_cycle_index": "2"
+    },
+    {
+      "admission": {
+        "action": "STOP",
+        "occupancy": "UNRESOLVED_BINDING",
+        "reason_code": "SCIENTIFIC_SLOT_IDENTITY_INVALID",
+        "scientific_slot_sha256": "0bf1826f91c3c20864d8f7dc644303560a54cc16c25dd62fb3038c605456b374",
+        "session_id": null
+      },
+      "injected_cycle_index": true
+    },
+    {
+      "admission": {
+        "action": "STOP",
+        "occupancy": "UNRESOLVED_BINDING",
+        "reason_code": "SCIENTIFIC_SLOT_IDENTITY_INVALID",
+        "scientific_slot_sha256": "0bf1826f91c3c20864d8f7dc644303560a54cc16c25dd62fb3038c605456b374",
+        "session_id": null
+      },
+      "injected_cycle_index": -1
+    }
+  ],
+  "runtime_owner_omission": {
+    "capability_after": "476253a08d054e50607eab5a327af63f8090fee91603e8ff3b1dedc7cf4b3276",
+    "capability_before": "476253a08d054e50607eab5a327af63f8090fee91603e8ff3b1dedc7cf4b3276",
+    "git_fence_bypass_proven": false,
+    "mutated_main": 7,
+    "new_scientific_budget_granted": false,
+    "original_main": 6
+  }
+}

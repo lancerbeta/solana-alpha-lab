@@ -1,0 +1,91 @@
+[
+  {
+    "errors": 0,
+    "failures": 0,
+    "names": [
+      "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_direct_vs_related_classification",
+      "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_run_completed_does_not_satisfy_pit",
+      "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_promote_guard_and_strategy_untouched",
+      "tests.test_hfic_research_policy_closure_v1.AtomicExtensionSetTests.test_exact_repeat_after_reply_loss_is_idempotent_and_duplicates_are_refused"
+    ],
+    "raw_cli_calls": 0,
+    "run": 4,
+    "skipped": 0,
+    "wall_seconds": 2.106824599992251
+  },
+  {
+    "errors": 0,
+    "failures": 0,
+    "names": [
+      "tests.test_hfic_market_evidence_epoch_decision_basis_v2.ScientificMarketV2Tests.test_schema_republish_preserves_science_and_budget",
+      "tests.test_hfic_market_evidence_epoch_decision_basis_v2.ScientificMarketV2Tests.test_capability_only_change_does_not_change_market",
+      "tests.test_hfic_search_budget_epoch_guard_v1.HficSearchBudgetEpochGuardTests.test_three_distinct_focuses_across_eligibility_exhaust_epoch",
+      "tests.test_hfic_search_budget_epoch_guard_v1.ResearchPolicyRaisedAutoBudgetTests.test_a_plain_repeat_never_starts_a_second_cycle_at_any_cap",
+      "tests.test_hfic_critic_prior_memory_closure_v1.PriorMemoryUnitTests.test_t6_memory_statuses_remain_distinct"
+    ],
+    "raw_cli_calls": 0,
+    "run": 5,
+    "skipped": 0,
+    "wall_seconds": 1.9233520999987377
+  },
+  {
+    "errors": 0,
+    "failures": 0,
+    "names": [
+      "tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_a_context_and_literal_results",
+      "tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_c_real_experiment_spec_and_document_runner",
+      "tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_c_zcold_replay_from_a_moved_root_without_network",
+      "tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_d_episode_profile_through_the_dispatcher_and_ordinary_lifecycle",
+      "tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_e_membership_integrity_protection_and_single_parse",
+      "tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_y_context_capacity_and_untrusted_labels",
+      "tests.test_hfic_list_aware_vertical_v1.ListAwareVerticalTests.test_z_next_period_same_rule_new_memberships"
+    ],
+    "raw_cli_calls": 42,
+    "run": 7,
+    "skipped": 0,
+    "wall_seconds": 653.6628577999945
+  },
+  {
+    "errors": 0,
+    "failures": 0,
+    "names": [
+      "tests.test_hfic_research_policy_vertical_v1.ResearchPolicyMicroVerticalTests.test_prd_15_micro_vertical",
+      "tests.test_hfic_cycle_two_normalized_vertical_v1.CycleTwoNormalizedVerticalTests.test_cycle_two_normalized_child_continues_the_representation_spend",
+      "tests.test_hfic_cycle_two_normalized_vertical_v1.CycleTwoNormalizedVerticalTests.test_same_cycle_normalized_variants_share_the_representation_budget"
+    ],
+    "raw_cli_calls": 85,
+    "run": 3,
+    "skipped": 0,
+    "wall_seconds": 1215.6398400000035
+  },
+  {
+    "errors": 0,
+    "failures": 0,
+    "names": [
+      "tests.test_hfic_forge_context_and_no_worthy.TempBindAndContextE2ETests.test_import_epoch_preflight_context_no_worthy_and_fail_closed",
+      "tests.test_hfic_forge_context_and_no_worthy.TempBindAndContextE2ETests.test_deleted_context_artifact_breaks_prove_runtime_no_worthy",
+      "tests.test_hfic_forge_context_and_no_worthy.TempBindAndContextE2ETests.test_selected_path_resolves_context_and_fails_closed_on_corrupt_blob",
+      "tests.test_forge_grounded_handoff_closure_v1.CanonicalIngressTests.test_public_normalized_consumer_refuses_corrupt_pin_before_value_loader"
+    ],
+    "raw_cli_calls": 12,
+    "run": 4,
+    "skipped": 0,
+    "wall_seconds": 69.7268827999942
+  },
+  {
+    "errors": 0,
+    "failures": 0,
+    "names": [
+      "tests.test_hfic_epistemic_memory_semantics.EpistemicMemorySemanticsTests.test_a1_hfic_self_memory_does_not_advance_epoch",
+      "tests.test_hfic_epistemic_memory_semantics.EpistemicMemorySemanticsTests.test_a3_typed_rdp_decision_enters_closed_family_ledger",
+      "tests.test_hfic_epistemic_memory_semantics.EpistemicMemorySemanticsTests.test_a5_frozen_packet_preserves_closed_family_and_rejects_reopen",
+      "tests.test_hfic_reopened_prior_search_routing_v1.ReopenedInventoryTests.test_scope_limited_close_remains_scoped",
+      "tests.test_forge_temporal_holder_point_feature_v1.HolderPolicyTests.test_pit_missing_zero_late_and_price_present_holder_absent",
+      "tests.test_forge_temporal_holder_point_feature_v1.HolderPolicyTests.test_forbidden_holder_queries_never_touch_rows"
+    ],
+    "raw_cli_calls": 8,
+    "run": 6,
+    "skipped": 0,
+    "wall_seconds": 57.042972099996405
+  }
+]

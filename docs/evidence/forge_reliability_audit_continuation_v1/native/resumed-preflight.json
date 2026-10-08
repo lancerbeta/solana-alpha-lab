@@ -1,0 +1,864 @@
+{
+  "action": "RESUME_EXISTING_SESSION",
+  "authority": {
+    "experiment_execution": 0,
+    "git_mutation": 0,
+    "provider_api_rpc_wss_calls": 0
+  },
+  "capability_epoch_sha256": "476253a08d054e50607eab5a327af63f8090fee91603e8ff3b1dedc7cf4b3276",
+  "commissioning": {
+    "auto_commissioned": false,
+    "compatibility_repair": {
+      "appended": 0,
+      "status": "NONE"
+    },
+    "git_mutation_count": 0,
+    "provider_calls_actual": 0,
+    "run_id": "RUN-984E75DD68D2AFAD3FC549CC",
+    "status": "NO_GIT_FAST_LANE_PROVEN"
+  },
+  "data_root_fingerprint_sha256": "9da3b25dbb4fcab46b93b2d39562eeec0f991d892a7bf9539df64808ad825bba",
+  "data_root_instance_fingerprint": "80cbb44011cddd95ca6702c3acfce37aa6a91a5aa1f71a0e9b25ba51b622ad97",
+  "discovery_contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
+  "draft_lifecycle": "GENERATED_BEFORE_FREEZE",
+  "duplicate_receipt": false,
+  "evidence_epoch_policy_binding": "UNCHANGED_BY_HFIC_MEMORY_POLICY",
+  "evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+  "focus_key_sha256": "10cbbfb05c6607680d33855a80657fa8363bf5c08fa9dcf70123586e421d7449",
+  "forge_context_packet": {
+    "capability_entries": [
+      {
+        "capability_id": "CAP-FIXTURE-GIT-RECEIPT-WRITER-001",
+        "effect_class": "OFFLINE_DATA_PLANE_WRITE",
+        "max_provider_calls": 0,
+        "supports_pit": true
+      },
+      {
+        "capability_id": "CAP-FIXTURE-PROVIDER-READ-ONLY-001",
+        "effect_class": "PROVIDER_READ_ONLY_BOUNDED",
+        "max_provider_calls": 1,
+        "supports_pit": true
+      },
+      {
+        "capability_id": "CAP-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001",
+        "effect_class": "OFFLINE_READ_ONLY",
+        "max_provider_calls": 0,
+        "supports_pit": true
+      },
+      {
+        "capability_id": "CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001",
+        "effect_class": "OFFLINE_READ_ONLY",
+        "max_provider_calls": 0,
+        "supports_pit": true
+      },
+      {
+        "capability_id": "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+        "effect_class": "OFFLINE_READ_ONLY",
+        "max_provider_calls": 0,
+        "supports_pit": true
+      },
+      {
+        "capability_id": "CAP-JUPITER-FREE-KEY-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+        "effect_class": "PROVIDER_READ_ONLY_BOUNDED",
+        "max_provider_calls": 60,
+        "supports_pit": true
+      },
+      {
+        "capability_id": "CAP-JUPITER-FREE-KEY-FORWARD-H900-QUOTE-CAPTURE-001",
+        "effect_class": "PROVIDER_READ_ONLY_BOUNDED",
+        "max_provider_calls": 60,
+        "supports_pit": true
+      },
+      {
+        "capability_id": "CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001",
+        "effect_class": "PROVIDER_READ_ONLY_BOUNDED",
+        "max_provider_calls": 60,
+        "supports_pit": true
+      },
+      {
+        "capability_id": "CAP-OBSERVATION-SCHEDULE-COMPILE-BIND-001",
+        "effect_class": "OFFLINE_DATA_PLANE_WRITE",
+        "max_provider_calls": 0,
+        "supports_pit": true
+      },
+      {
+        "capability_id": "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+        "effect_class": "OFFLINE_READ_ONLY",
+        "max_provider_calls": 0,
+        "supports_pit": true
+      }
+    ],
+    "capability_ids": [
+      "CAP-FIXTURE-GIT-RECEIPT-WRITER-001",
+      "CAP-FIXTURE-PROVIDER-READ-ONLY-001",
+      "CAP-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001",
+      "CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001",
+      "CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+      "CAP-JUPITER-FREE-KEY-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "CAP-JUPITER-FREE-KEY-FORWARD-H900-QUOTE-CAPTURE-001",
+      "CAP-JUPITER-FREE-KEY-QUOTE-NATIVE-BOUNDED-CAPTURE-001",
+      "CAP-OBSERVATION-SCHEDULE-COMPILE-BIND-001",
+      "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"
+    ],
+    "closed_family_ledger": [
+      {
+        "reopen_forbidden": true,
+        "scope_id": "ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1",
+        "scope_kind": "CANDIDATE",
+        "source_receipt": "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_acceptance_v1.json",
+        "suppression_class": "SCOPE_LIMITED_CLOSE",
+        "terminal": "CLOSE_EARLY_PATH_CANDIDATE",
+        "visible_as_prior_work": true
+      },
+      {
+        "reopen_forbidden": true,
+        "scope_id": "EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1",
+        "scope_kind": "FAMILY",
+        "source_receipt": "docs/evidence/early_structural_backing_pit_commissioning/a1_family_decision_v1.json",
+        "suppression_class": "SCIENTIFIC_CLOSE_VALID",
+        "terminal": "CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY",
+        "visible_as_prior_work": true
+      },
+      {
+        "reopen_forbidden": true,
+        "scope_id": "FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1",
+        "scope_kind": "FAMILY",
+        "source_receipt": "docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_acceptance_v1.json",
+        "suppression_class": "SCIENTIFIC_CLOSE_VALID",
+        "terminal": "CLOSE_EXACT_FRICTION_VETO_FAMILY",
+        "visible_as_prior_work": true
+      },
+      {
+        "reopen_forbidden": true,
+        "scope_id": "QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1",
+        "scope_kind": "FAMILY",
+        "source_receipt": "docs/evidence/quote_surface_retention_confirmatory/c1_quote_surface_retention_confirmatory_acceptance_v1.json",
+        "suppression_class": "SCIENTIFIC_CLOSE_VALID",
+        "terminal": "CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY",
+        "visible_as_prior_work": true
+      },
+      {
+        "reopen_forbidden": true,
+        "scope_id": "PRIOR_GIT_T0_FRICTION_SCREEN_V1",
+        "scope_kind": "FAMILY",
+        "source_receipt": "docs/evidence/prior_git_t0_friction_screen/a6_prior_git_t0_friction_screen_acceptance_v1.json",
+        "suppression_class": "SCIENTIFIC_CLOSE_VALID",
+        "terminal": "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY",
+        "visible_as_prior_work": true
+      },
+      {
+        "reopen_forbidden": true,
+        "scope_id": "RC002-H11-TASK40-CLOSE-CREATE-AT-GAP-MIGRATION-AT-BOUND-V1",
+        "scope_kind": "ROUTE",
+        "source_receipt": "docs/evidence/rc002_h11_task40_close_create_at_gap_migration_at_bound/a1_task40_close_create_at_gap_migration_at_bound_acceptance_v1.json",
+        "suppression_class": "SCOPE_LIMITED_CLOSE",
+        "terminal": "CLOSE_TASK40_WITH_CREATE_AT_GAP_AND_BOUND_MIGRATION_AT",
+        "visible_as_prior_work": true
+      },
+      {
+        "reopen_forbidden": true,
+        "scope_id": "EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1",
+        "scope_kind": "FAMILY",
+        "source_receipt": "docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_acceptance_v1.json",
+        "suppression_class": "SCIENTIFIC_CLOSE_VALID",
+        "terminal": "CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY",
+        "visible_as_prior_work": true
+      },
+      {
+        "reopen_forbidden": false,
+        "scope_id": "RC002-H11-PARK-FROM-PRIORITY-OFFLINE-V1",
+        "scope_kind": "PRIORITY_PARK",
+        "source_receipt": "docs/evidence/rc002_h11_park_from_priority/a1_h11_park_from_priority_acceptance_v1.json",
+        "suppression_class": "OWNER_PRIORITY_PARK",
+        "terminal": "PARK_H11_FROM_PRIORITY",
+        "visible_as_prior_work": true
+      },
+      {
+        "reopen_forbidden": false,
+        "scope_id": "RC001-H13-PARK-FROM-PRIORITY-OFFLINE-V1",
+        "scope_kind": "PRIORITY_PARK",
+        "source_receipt": "docs/evidence/rc001_h13_park_from_priority/a1_h13_park_from_priority_acceptance_v1.json",
+        "suppression_class": "OWNER_PRIORITY_PARK",
+        "terminal": "PARK_H13_FROM_PRIORITY",
+        "visible_as_prior_work": true
+      }
+    ],
+    "commissioning_status": "NO_GIT_FAST_LANE_PROVEN",
+    "context_warnings": [],
+    "dataset_entries": [
+      {
+        "dataset_fingerprint": "94a78df31a2707dec5cc8a32de429598abfd2f34bb45bc107b77ec85ee6f883c",
+        "dataset_manifest_id": "DATASET-MANIFEST-FAST-LANE-COMMISSIONING-001",
+        "evidence_role": "UNSPECIFIED"
+      },
+      {
+        "dataset_fingerprint": "3e69ed0507bf4c431bb92bfb125cd3204eb96bc97596e22ebf1d8c84fb4501e4",
+        "dataset_manifest_id": "dataset-5a050d652f6084287d75079cbd5ad20a4d807123a114ac46d2d4b75d9553edb5",
+        "evidence_role": "EXPLORATORY_REUSE"
+      }
+    ],
+    "dataset_fingerprints": [
+      "94a78df31a2707dec5cc8a32de429598abfd2f34bb45bc107b77ec85ee6f883c",
+      "3e69ed0507bf4c431bb92bfb125cd3204eb96bc97596e22ebf1d8c84fb4501e4"
+    ],
+    "dataset_manifest_ids": [
+      "DATASET-MANIFEST-FAST-LANE-COMMISSIONING-001",
+      "dataset-5a050d652f6084287d75079cbd5ad20a4d807123a114ac46d2d4b75d9553edb5"
+    ],
+    "evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+    "feature_families": [
+      {
+        "confirmatory_reuse_forbidden": true,
+        "evidence_role": "EXPLORATORY_REUSE",
+        "feature_family": "PRICE_PATH"
+      },
+      {
+        "confirmatory_reuse_forbidden": true,
+        "evidence_role": "EXPLORATORY_REUSE",
+        "feature_family": "LIQUIDITY_PATH"
+      },
+      {
+        "confirmatory_reuse_forbidden": true,
+        "evidence_role": "EXPLORATORY_REUSE",
+        "feature_family": "HOLDER_STATE"
+      },
+      {
+        "confirmatory_reuse_forbidden": true,
+        "evidence_role": "EXPLORATORY_REUSE",
+        "feature_family": "MISSINGNESS_AVAILABILITY"
+      }
+    ],
+    "feature_grounding_entries": [
+      {
+        "availability_class": "FORWARD_ONLY",
+        "available_to_strategy_semantics": "HISTORICAL_CAPTURE_NOT_STRATEGY_AVAILABLE",
+        "entity_scope": "MINT_CAPTURE",
+        "feature_ids": [
+          "FEAT-QUOTE-AVAILABILITY",
+          "FEAT-QUOTED-ROUND-TRIP-FRICTION",
+          "FEAT-ROUTE-STATUS"
+        ]
+      },
+      {
+        "availability_class": "HISTORICAL_RECONSTRUCTIBLE",
+        "available_to_strategy_semantics": "RETROSPECTIVE_ONLY_NOT_PROSPECTIVE_PIT",
+        "entity_scope": "POOL_DAY",
+        "feature_ids": [
+          "FEAT-BUY-SELL-COUNT-RATIO",
+          "FEAT-DRAWDOWN-FROM-RUNNING-PEAK",
+          "FEAT-LIQUIDITY-RETENTION",
+          "FEAT-OBSERVED-TRADE-SLOTS",
+          "FEAT-PEAK-RETURN-SINCE-START",
+          "FEAT-POOL-LIQUIDITY",
+          "FEAT-RETURN-15M",
+          "FEAT-TARGET-TRADE-COUNT",
+          "FEAT-UNKNOWN-COVERAGE-COUNT",
+          "FEAT-VOLUME-15M"
+        ]
+      },
+      {
+        "availability_class": "MISSING",
+        "available_to_strategy_semantics": "NOT_AVAILABLE",
+        "entity_scope": "CREATOR_WALLET",
+        "feature_ids": [
+          "FEAT-CREATOR-DIRECT-SELL-AMOUNT",
+          "FEAT-CREATOR-DIRECT-SHARE"
+        ]
+      },
+      {
+        "availability_class": "MISSING",
+        "available_to_strategy_semantics": "NOT_AVAILABLE",
+        "entity_scope": "POOL_DAY",
+        "feature_ids": [
+          "FEAT-AGE-SINCE-CREATION",
+          "FEAT-MCAP-TO-LIQUIDITY"
+        ]
+      },
+      {
+        "availability_class": "MISSING_CAPABILITY",
+        "available_to_strategy_semantics": "NOT_AVAILABLE",
+        "entity_scope": "CREATOR_CLUSTER",
+        "feature_ids": [
+          "FEAT-CREATOR-CLUSTER-SHARE"
+        ]
+      },
+      {
+        "availability_class": "PIT_READY",
+        "available_to_strategy_semantics": "BOUNDED_PIT_READY_EXPLICIT_SCOPE",
+        "entity_scope": "MINT_DECISION_SNAPSHOT",
+        "feature_ids": [
+          "FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO"
+        ]
+      }
+    ],
+    "feature_grounding_source_digest_sha256": "625d22a4fe1cee8de3cdfb56d728bc7089227d06f3244d5ea6c4e5e1d936247c",
+    "feature_hints": [],
+    "grounded_readouts": [
+      {
+        "assessment_advisory": null,
+        "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V5",
+        "descriptive_readout": {
+          "assessment": "DESCRIPTIVE_ONLY_NO_AUTOMATIC_VERDICT",
+          "baseline": {
+            "downside": {
+              "es10_return": 0.19999999999999996,
+              "es10_tail_mass_n": 0.1,
+              "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+              "le_minus_20_n": 0,
+              "le_minus_20_rate": 0.0,
+              "le_minus_50_n": 0,
+              "le_minus_50_rate": 0.0,
+              "missing_n": 0,
+              "negative_mass": 0,
+              "negative_n": 0,
+              "observed_n": 1,
+              "p05": 0.19999999999999996,
+              "p10": 0.19999999999999996,
+              "p25": 0.19999999999999996,
+              "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+              "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+              "status": "OBSERVED",
+              "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+              "worst_negative_share": null,
+              "zero_n": 0
+            },
+            "eligible_n": 1,
+            "mean_target": 0.19999999999999996,
+            "median_target": 0.19999999999999996,
+            "view": "BASELINE_DECISION_ELIGIBLE"
+          },
+          "baseline_may_include_matched": true,
+          "detail_truncation": {
+            "ablations": {
+              "included": 0,
+              "total": 3,
+              "truncated": true
+            },
+            "by_calendar_block": {
+              "included": 0,
+              "total": 1,
+              "truncated": true
+            },
+            "by_cohort": {
+              "included": 0,
+              "total": 1,
+              "truncated": true
+            }
+          },
+          "details": {
+            "ablations": [],
+            "by_calendar_block": [],
+            "by_cohort": []
+          },
+          "matched": {
+            "downside": {
+              "es10_return": 0.19999999999999996,
+              "es10_tail_mass_n": 0.1,
+              "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+              "le_minus_20_n": 0,
+              "le_minus_20_rate": 0.0,
+              "le_minus_50_n": 0,
+              "le_minus_50_rate": 0.0,
+              "missing_n": 0,
+              "negative_mass": 0,
+              "negative_n": 0,
+              "observed_n": 1,
+              "p05": 0.19999999999999996,
+              "p10": 0.19999999999999996,
+              "p25": 0.19999999999999996,
+              "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+              "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+              "status": "OBSERVED",
+              "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+              "worst_negative_share": null,
+              "zero_n": 0
+            },
+            "eligible_n": 1,
+            "mean_target": 0.19999999999999996,
+            "median_target": 0.19999999999999996,
+            "view": "MATCHED_OBSERVED"
+          },
+          "missingness": "OBSERVED_DENOMINATOR_ONLY_NO_MAR_ASSUMPTION",
+          "selection_policy": "CANONICAL_ORDER_PREFIX",
+          "status": "DESCRIPTIVE_PROXY",
+          "tail_support": "DESCRIPTIVE_ESTIMATE_NOT_CONFIDENCE_INTERVAL"
+        },
+        "result_ref": "HFIC-ART-DISCOVERY-1B7BDBF7C350EFB65AFC8F2E0F48E42DEFF00D8E",
+        "result_sha256": "55a182c49cf7c2fbeee3dd01d780d8845487304d5cb16001aa874551785240dc",
+        "revision_of": null,
+        "spec_sha256": "140a1c08a720e18a128da1b4b5f6dc48c5950470429f87f7e5f657617d61c0ae",
+        "universe_policy": {
+          "min_holders": "0",
+          "min_liquidity_usd": "0",
+          "semantic_sha256": "4da0d78dc920e56a3691ec469ce69c521bc751d11856449e20cc52e2052438fa"
+        }
+      }
+    ],
+    "owner_focus": "AUDIT_CURRENT_NATIVE",
+    "prior_work_receipts": [
+      "QUERY-HFIC-EXACT-RELATED-PRIOR-001",
+      "QUERY-HFIC-SESSION-BY-SEARCH-KEY-001",
+      "QUERY-HFIC-PENDING-SESSION-001"
+    ],
+    "prompt_version": "HFIC-V1.2",
+    "ranked_prior_candidate_ids": [
+      "HYP-QUOTE-NATIVE-FRICTION-H900-V1"
+    ],
+    "ranked_prior_entries": [
+      {
+        "cheapest_falsifier": "Re-derived terminal from the canonical runtime receipt disagrees with the Git-canonical acceptance terminal.",
+        "definition_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "hypothesis_version_id": "HYP-QUOTE-NATIVE-FRICTION-H900-V1",
+        "mechanism": "classify_audition_terminal",
+        "memory_status": "HISTORICAL"
+      }
+    ],
+    "research_memory_as_of": "2026-08-25T00:00:00Z",
+    "search_key_sha256": "d9be18323a4e3d2fdb7c7a702ca558c0b8781b78db84bbd00d98c5fd7c6201ef",
+    "semantic_capability_digest_sha256": "786048fe40bf0e09e54b83434a487726f0fe59467982e215db87525d3bd40d17",
+    "semantic_capability_entries": [
+      {
+        "authority_granted": false,
+        "root_asset_ids": [
+          "CONFIG-EXPERIMENT-CAPABILITY-REGISTRY-V2-001"
+        ],
+        "semantic_route_id": "SEM-EXPERIMENT-CAPABILITIES",
+        "status_plane": "CAPABILITY"
+      },
+      {
+        "authority_granted": false,
+        "root_asset_ids": [
+          "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001",
+          "MODULE-LIVE-COHORT-TO-FORGE-001"
+        ],
+        "semantic_route_id": "SEM-LIVE-EVIDENCE-TO-FORGE",
+        "status_plane": "MIXED"
+      },
+      {
+        "authority_granted": false,
+        "root_asset_ids": [
+          "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001",
+          "CONFIG-MARKET-CONTEXT-DEFINITION-001"
+        ],
+        "semantic_route_id": "SEM-MARKET-DATA-FEATURES",
+        "status_plane": "MIXED"
+      },
+      {
+        "authority_granted": false,
+        "root_asset_ids": [
+          "MODULE-FACTORY-V1-RESEARCH-STORE-001",
+          "REGISTRY-DECISIONS-NEGATIVE-RESULTS-001",
+          "REGISTRY-GLOBAL-TRIAL-LEDGER-001"
+        ],
+        "semantic_route_id": "SEM-PRIOR-WORK",
+        "status_plane": "SCIENTIFIC"
+      },
+      {
+        "authority_granted": false,
+        "root_asset_ids": [
+          "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-011"
+        ],
+        "semantic_route_id": "SEM-PROVIDER-ROUTES",
+        "status_plane": "MIXED"
+      }
+    ],
+    "temporal_recipe_capabilities": {
+      "constraints": [
+        "HOLDER_START_LT_END_LE_DECISION_BOUND_SCHEDULE",
+        "PIT_LINEAGE_REQUIRED",
+        "MISSING_LATE_CONFLICT_UNAVAILABLE",
+        "RETURN_DENOMINATOR_POSITIVE",
+        "NO_EWM_NO_HOLDER_TARGET",
+        "SUPPORT_IS_NOT_ALPHA",
+        "EXACT_RECIPE_NO_SWEEP"
+      ],
+      "fields": {
+        "FIELD-HOLDER-COUNT-001": [
+          "delta",
+          "point_value",
+          "return_ratio"
+        ],
+        "FIELD-LIQUIDITY-USD-001": [
+          "drawdown_from_grid_max",
+          "elapsed_seconds",
+          "point_value",
+          "ratio",
+          "rebound_from_grid_min",
+          "return_ratio",
+          "utc_hour"
+        ],
+        "FIELD-USD-PRICE-001": [
+          "drawdown_from_grid_max",
+          "elapsed_seconds",
+          "point_value",
+          "ratio",
+          "rebound_from_grid_min",
+          "return_ratio",
+          "utc_hour"
+        ]
+      },
+      "parameters": {
+        "delta": [
+          "field_id",
+          "start",
+          "end"
+        ],
+        "drawdown_from_grid_max": [
+          "field_id",
+          "points",
+          "at"
+        ],
+        "elapsed_seconds": [
+          "start",
+          "end"
+        ],
+        "point_value": [
+          "field_id",
+          "point"
+        ],
+        "ratio": [
+          "field_id",
+          "numerator",
+          "denominator"
+        ],
+        "rebound_from_grid_min": [
+          "field_id",
+          "points",
+          "at"
+        ],
+        "return_ratio": [
+          "field_id",
+          "start",
+          "end"
+        ],
+        "utc_hour": [
+          "point"
+        ]
+      },
+      "units": {
+        "holder_delta": "HOLDER_COUNT",
+        "return_ratio": "DIMENSIONLESS_FRACTION"
+      }
+    },
+    "truncation_receipt": {
+      "dropped_feature_count": 0,
+      "dropped_priors": 0,
+      "dropped_semantic_routes": [],
+      "feature_grounding_truncated": false,
+      "growth_warning": false,
+      "growth_warning_bytes": 20480,
+      "kept_priors": 1,
+      "kept_semantic_routes": [
+        "SEM-EXPERIMENT-CAPABILITIES",
+        "SEM-LIVE-EVIDENCE-TO-FORGE",
+        "SEM-MARKET-DATA-FEATURES",
+        "SEM-PRIOR-WORK",
+        "SEM-PROVIDER-ROUTES"
+      ],
+      "live_corpus_in_packet": true,
+      "live_corpus_protected": true,
+      "max_capabilities": 16,
+      "max_closed_families": 8,
+      "max_datasets": 8,
+      "max_feature_families": 8,
+      "max_feature_hints": 8,
+      "max_packet_bytes": 65536,
+      "max_priors": 8,
+      "packet_bytes": 14892,
+      "selection_policy": "control_protect_live_corpus_then_cap",
+      "semantic_projection_truncated": false,
+      "tie_break": "stable_id_asc",
+      "truncated": false
+    },
+    "truth_roots_used": [
+      "catalog/catalog_manifest.yaml",
+      "configs/hypothesis_forge_independent_critic_v1.yaml",
+      "configs/experiment_capability_registry_v2.yaml",
+      "registries/decisions_negative_results.yaml"
+    ],
+    "universe_policy": {
+      "blocker": null,
+      "effective_population": "PASS_AT_DECISION_TIME_INSIDE_BASE_X",
+      "min_holders": "0",
+      "min_liquidity_usd": "0",
+      "semantic_sha256": "4da0d78dc920e56a3691ec469ce69c521bc751d11856449e20cc52e2052438fa",
+      "state": "ACTIVE"
+    },
+    "vision_integrity": {
+      "material_information_loss": 0,
+      "omission_breakdown": {
+        "INTENTIONALLY_OUTSIDE_THIS_REPRESENTATION": 0,
+        "MATERIAL_CANDIDATE_GENERATION_INFORMATION_LOSS": 0,
+        "REDUNDANT_WITH_RETAINED_INFORMATION": 0,
+        "UNKNOWN": 0
+      },
+      "schema": "smial.hfic-vision-integrity",
+      "schema_version": "1.0",
+      "status": "PASS",
+      "unknown_omission": 0
+    }
+  },
+  "forge_context_packet_sha256": "abba0365f00e633e8ccfb82b7ecebaf79c3a307ede91855f928ffac69cfc4b9c",
+  "forge_input_receipt": {
+    "active_evidence_set": {
+      "corpus_version": 1,
+      "current_dataset_manifest_id": "dataset-5a050d652f6084287d75079cbd5ad20a4d807123a114ac46d2d4b75d9553edb5",
+      "evidence_set_sha256": "f9a6fc7fd473e57e862314d2afb53b5cd38b58ab5fd7c4438b956eda82e6130a",
+      "scope": "ACTIVE_EVIDENCE_SET",
+      "visible_cohort_ids": [
+        "REL-20260105T120000Z-20260112T120000Z"
+      ]
+    },
+    "blocking_reason_codes": [],
+    "capability_epoch_sha256": "476253a08d054e50607eab5a327af63f8090fee91603e8ff3b1dedc7cf4b3276",
+    "data_root_instance_fingerprint_sha256": "80cbb44011cddd95ca6702c3acfce37aa6a91a5aa1f71a0e9b25ba51b622ad97",
+    "evidence_surface_mode": null,
+    "experiment_data_scope": {
+      "scope": "EXPERIMENT_DATA_SCOPE",
+      "status": "NOT_STARTED"
+    },
+    "forge_runnable": true,
+    "historical_calibration": [],
+    "live_corpus": {
+      "corpus_version": 1,
+      "dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+      "dataset_manifest_id": "dataset-5a050d652f6084287d75079cbd5ad20a4d807123a114ac46d2d4b75d9553edb5",
+      "dataset_version": "corpus-v1-REL-20260105T120000Z-20260112T120000Z.canonical-v1",
+      "yield_eligible": 2
+    },
+    "market_evidence_basis": {
+      "basis_version": "MARKET_EVIDENCE_BASIS_V2",
+      "corpus_version": 1,
+      "current_dataset_manifest_id": "dataset-5a050d652f6084287d75079cbd5ad20a4d807123a114ac46d2d4b75d9553edb5",
+      "datasets": [
+        {
+          "a3_dataset_label_projection_sha256": "a66be03616910f1598118475f7aa74e9bf0af81c96f752cdd137e0504a8725ae",
+          "a3_pit_availability_validation_sha256": "56a9535430d70e5bef4bcba9f8e1053f651319e19c35eb578889aff594c74659",
+          "dataset_fingerprint": "94a78df31a2707dec5cc8a32de429598abfd2f34bb45bc107b77ec85ee6f883c",
+          "dataset_id": "DATASET-FAST-LANE-COMMISSIONING-001",
+          "dataset_manifest_id": "DATASET-MANIFEST-FAST-LANE-COMMISSIONING-001"
+        },
+        {
+          "a3_dataset_label_projection_sha256": "7f533b1df8d99a2599eed833514ac31abc8c2ea1cc206621c545f75d34dcfd09",
+          "a3_pit_availability_validation_sha256": "6649f62c6afc3f4c25a159de5ec2fdca2a5d0fd99170a6af977439a779d66e6a",
+          "dataset_fingerprint": "3e69ed0507bf4c431bb92bfb125cd3204eb96bc97596e22ebf1d8c84fb4501e4",
+          "dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+          "dataset_manifest_id": "dataset-5a050d652f6084287d75079cbd5ad20a4d807123a114ac46d2d4b75d9553edb5"
+        }
+      ],
+      "lineage_bindings": [
+        {
+          "cohort_id": "REL-20260105T120000Z-20260112T120000Z",
+          "release_id": "7182a270de9cbf2bd9df16bcb5e5051989bd51049b98e9155a5751428fd70be7",
+          "source_sha256": "cdebdf08a50304d5821de32781c37135518dea13062d6379564d89f7be01d695"
+        }
+      ],
+      "scientific_projection": {
+        "basis_version": "MARKET_EVIDENCE_BASIS_V2",
+        "datasets": [
+          {
+            "admissibility": {
+              "accepted_hypothesis_id": null,
+              "confirmatory_reuse_forbidden": false,
+              "discovery_coverage_class": null
+            },
+            "dataset_id": "DATASET-FAST-LANE-COMMISSIONING-001",
+            "derived": {
+              "base_x_population_n": null,
+              "dataset_terminal": "SAMPLE_INVALID",
+              "evidence_role": "UNSPECIFIED",
+              "feature_families": [],
+              "feature_hint": null,
+              "feature_usable": false,
+              "yield_eligible": 0,
+              "yield_missing": 0
+            },
+            "logical_dataset_id": "DATASET-FAST-LANE-COMMISSIONING-001",
+            "partitions": [
+              {
+                "content_sha256": "a1c919f072e361e7b93af9158c1173067ffa6eebb1b2ebc09fd1af99ef5777be",
+                "max_available_to_strategy_at": "2026-08-25T00:00:00Z",
+                "max_event_time": "2026-08-25T00:00:00Z",
+                "min_available_to_strategy_at": "2026-08-25T00:00:00Z",
+                "min_event_time": "2026-08-25T00:00:00Z",
+                "partition_id": "PARTITION-FAST-LANE-COMMISSIONING-001",
+                "row_count": 3
+              }
+            ]
+          },
+          {
+            "admissibility": {
+              "accepted_hypothesis_id": null,
+              "confirmatory_reuse_forbidden": true,
+              "discovery_coverage_class": "EMPIRICAL_OVERLAP_ONLY"
+            },
+            "dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+            "derived": {
+              "base_x_population_n": null,
+              "dataset_terminal": "SAMPLE_VALID",
+              "evidence_role": "EXPLORATORY_REUSE",
+              "feature_families": [
+                "PRICE_PATH",
+                "LIQUIDITY_PATH",
+                "HOLDER_STATE",
+                "MISSINGNESS_AVAILABILITY"
+              ],
+              "feature_hint": null,
+              "feature_usable": false,
+              "yield_eligible": 2,
+              "yield_missing": 1
+            },
+            "logical_dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+            "partitions": [
+              {
+                "content_sha256": "43f3120781146cb72ab01575c954be7c026137d76ed0cc941b22b87e943218ca",
+                "max_available_to_strategy_at": "2026-01-05T12:00:00Z",
+                "max_event_time": null,
+                "min_available_to_strategy_at": "2026-01-05T12:00:00Z",
+                "min_event_time": null,
+                "partition_id": "PARTITION-LIVE-COHORT-REL-20260105T120000Z-20260112T120000Z-CENSUS",
+                "row_count": 5
+              },
+              {
+                "content_sha256": "b95f11c43ae8031fd01d5d449b64b6c975afa39d16efbb300bc340d03127f234",
+                "max_available_to_strategy_at": "2026-01-05T14:05:00Z",
+                "max_event_time": "2026-01-05T14:05:00Z",
+                "min_available_to_strategy_at": "2026-01-05T12:00:00Z",
+                "min_event_time": "2026-01-05T12:00:00Z",
+                "partition_id": "PARTITION-LIVE-COHORT-REL-20260105T120000Z-20260112T120000Z-OBS",
+                "row_count": 13
+              }
+            ]
+          }
+        ],
+        "lineage_bindings": [
+          {
+            "cohort_id": "REL-20260105T120000Z-20260112T120000Z",
+            "release_id": "7182a270de9cbf2bd9df16bcb5e5051989bd51049b98e9155a5751428fd70be7",
+            "source_sha256": "cdebdf08a50304d5821de32781c37135518dea13062d6379564d89f7be01d695"
+          }
+        ],
+        "visible_cohort_ids": [
+          "REL-20260105T120000Z-20260112T120000Z"
+        ]
+      },
+      "visible_cohort_ids": [
+        "REL-20260105T120000Z-20260112T120000Z"
+      ]
+    },
+    "market_evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+    "owner_class": "FORGE_INPUT_READY",
+    "packet": {
+      "bounded_dataset_count": 2,
+      "live_corpus_in_packet": true,
+      "live_corpus_protected": true,
+      "selection_policy": "control_protect_live_corpus_then_cap",
+      "truncated": false
+    },
+    "receipt_sha256": "b97121650a65321506ef3a6c439abccb4c5969fcfcb2e8cb47a43ec289ee8fb2",
+    "representation_input_scope": {
+      "scope": "REPRESENTATION_INPUT_SCOPE",
+      "status": "DECLARED"
+    },
+    "representations": [
+      {
+        "representation_id": "BASE",
+        "status": "READY"
+      },
+      {
+        "representation_id": "NORMALIZED_TRAJECTORY_V1",
+        "status": "RUNTIME_READY_NOT_EXECUTED"
+      }
+    ],
+    "schema": "smial.forge-input-receipt",
+    "schema_version": "1.0",
+    "visibility": {
+      "corpus_binding": "PASS",
+      "feature_grounding": "PASS",
+      "lineage": "PASS",
+      "material_truncation": false,
+      "missingness_visible": "NOT_EVALUATED",
+      "packet_vision": "PASS",
+      "pit_semantics": "NOT_EVALUATED",
+      "prior_memory": "PASS"
+    },
+    "writes": {
+      "forge_context": 0,
+      "research_store": 0,
+      "session": 0
+    }
+  },
+  "generated_draft_sha256": "bb3d2b75b3cca4727aa20a41ebddf11e7746047ac3378bd5d345b0a976e57992",
+  "generated_draft_source_preflight_receipt_id": "HFIC-PREFLIGHT-D9BE18323A4E3D2F",
+  "generated_draft_source_preflight_receipt_sha256": "7dcdc18c13976d61748696a39ad3faaedfb5a23fdec120dd0c444535c237fae3",
+  "git_composite_sha256": "236a19f9ed39e8699588e70834032a881f1ac6b2349ee470c0b9bce657673f3d",
+  "legacy_combined_evidence_epoch_sha256": "e839733e026593d3d17fd3669d8e29bfa09bd36321960d322cadea55d8258580",
+  "live_git_head": "b29d011994f5e4cf328175dc1a4929d28957e25a",
+  "market_evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+  "memory_eligibility_sha256": "d6930b96b4871b498559efa9b9834209b8e509a357d824af15b047a2095d880f",
+  "memory_policy_head_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "next": "RESUME_GENERATED_DRAFT — continue freeze from persisted draft; do not regenerate",
+  "owner_focus": "AUDIT_CURRENT_NATIVE",
+  "owner_forge_input": "FORGE INPUT\nvisible_cohorts: REL-20260105T120000Z-20260112T120000Z\nactive_evidence_set: manifest=dataset-5a050d652f6084287d75079cbd5ad20a4d807123a114ac46d2d4b75d9553edb5 corpus_version=1\nmarket_evidence_epoch: e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f  # admission/budget key\ncapability_epoch: 476253a08d054e50607eab5a327af63f8090fee91603e8ff3b1dedc7cf4b3276  # protocol; does not free market budget\nhistorical_calibration: none\nvisibility: corpus_binding=PASS, lineage=PASS, pit_semantics=NOT_EVALUATED, missingness_visible=NOT_EVALUATED, prior_memory=PASS, feature_grounding=PASS, packet_vision=PASS, material_truncation=False\nrepresentations: BASE READY; NORMALIZED_TRAJECTORY_V1 RUNTIME_READY_NOT_EXECUTED\nforge_runnable: True\nforge_input_readiness: READY — market input admitted; STOP_BEFORE_SYNTHESIS is the phase boundary\nowner_class: FORGE_INPUT_READY\nforge_input_next: STOP_BEFORE_SYNTHESIS\nevidence_surface_mode: ordinary\nwrites: research_store=0 forge_context=0 session=0",
+  "preflight_receipt_sha256": "125f37e0e73c143b8e04ab1acec9e4c34eb26561877cf84b1e08d5c350c4a5f6",
+  "prompt_version": "HFIC-V1.2",
+  "quarantined_session_count": 0,
+  "receipt_id": "HFIC-PREFLIGHT-D9BE18323A4E3D2F",
+  "research_memory_as_of": "2026-08-25T00:00:00Z",
+  "search_budget": {
+    "auto_sessions_per_evidence_epoch": 1,
+    "auto_sessions_used": 0,
+    "distinct_focus_remaining": 2,
+    "distinct_focus_sessions_per_evidence_epoch": 3,
+    "distinct_focus_used": 1,
+    "evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+    "focus_key_sha256_set": [
+      "10cbbfb05c6607680d33855a80657fa8363bf5c08fa9dcf70123586e421d7449"
+    ],
+    "legacy_market_occupancy": 0,
+    "representation_slots": [
+      {
+        "representation_id": "BASE",
+        "representation_semantic_version": "HFIC-V1.2",
+        "scientific_slot_sha256": "9219181b02c6f324481d8a1ffdc1ffee62a309f8a5710e859c4bfa1478bd18f0",
+        "session_ids": [
+          "HFIC-SESS-D9BE18323A4E3D2F"
+        ]
+      }
+    ]
+  },
+  "search_key_sha256": "d9be18323a4e3d2fdb7c7a702ca558c0b8781b78db84bbd00d98c5fd7c6201ef",
+  "selection_reason": "EXPLICIT",
+  "session_id": "HFIC-SESS-D9BE18323A4E3D2F",
+  "session_started_at": "2026-10-08T10:11:35Z",
+  "store_inventory_digest": "9da3b25dbb4fcab46b93b2d39562eeec0f991d892a7bf9539df64808ad825bba",
+  "terminal": "NO_GIT_FAST_LANE_PROVEN",
+  "universe_policy": {
+    "action": "UNIVERSE_POLICY_STATUS",
+    "authority": {
+      "experiment_execution": 0,
+      "git_mutation": 0,
+      "provider_api_rpc_wss_calls": 0
+    },
+    "blocking_operations": [],
+    "claim_boundary": "Thresholds are owner market-scale settings, not a return result and not strategy promotion.",
+    "holder_field_id": "FIELD-HOLDER-COUNT-001",
+    "liquidity_field_id": "FIELD-LIQUIDITY-USD-001",
+    "min_holders": "0",
+    "min_liquidity_usd": "0",
+    "next_action": "NEW_FORGE_RUNS_USE_THIS_PROFILE",
+    "pending_operation": false,
+    "policy_head_sha256": "e2589ee542e4dda4aae63a88d7c716b3947ca824f93a287cdb8dcc7cdb5d8a03",
+    "policy_sequence": 1,
+    "semantic_sha256": "4da0d78dc920e56a3691ec469ce69c521bc751d11856449e20cc52e2052438fa",
+    "state": "ACTIVE",
+    "writes": {
+      "research_store": 0
+    }
+  },
+  "writes": {
+    "forge_context": 1,
+    "research_store": 1,
+    "session": 0
+  }
+}

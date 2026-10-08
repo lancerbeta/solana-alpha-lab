@@ -1,0 +1,386 @@
+{
+  "blocking_reason_codes": [
+    "KILL_STATISTICALLY_UNIDENTIFIABLE"
+  ],
+  "capability_epoch_sha256": "476253a08d054e50607eab5a327af63f8090fee91603e8ff3b1dedc7cf4b3276",
+  "control_session_id": null,
+  "discovery_contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
+  "execution_binding_sha256": null,
+  "execution_provenance_status": "NOT_APPLICABLE",
+  "frozen_representation_ids": [
+    "BASE",
+    "NORMALIZED_TRAJECTORY_V1"
+  ],
+  "frozen_representation_versions": [
+    "BASE@HFIC-V1.2",
+    "NORMALIZED_TRAJECTORY_V1@1.0"
+  ],
+  "input_receipt_sha256": "b97121650a65321506ef3a6c439abccb4c5969fcfcb2e8cb47a43ec289ee8fb2",
+  "legacy_epoch_sha256": null,
+  "market_evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+  "next_action": "NON_SCIENTIFIC_STOP",
+  "no_write": false,
+  "ordinary_operation": {
+    "candidate_ready": false,
+    "claim_boundary": "PRICE_RELATIVE_PROXY is not net return; cohorts are not independent replications",
+    "completed": {
+      "look": true,
+      "operation": true,
+      "scientific_search": false
+    },
+    "completion_gap": null,
+    "compound_status": "EXECUTED",
+    "decision_age_seconds": 3600,
+    "decision_point": "Y3600",
+    "effective_state": "PAUSED_CAP",
+    "exit_point": "Y7200",
+    "hold_seconds": 3600,
+    "journal_result_refs": [
+      "HFIC-ART-DISCOVERY-1B7BDBF7C350EFB65AFC8F2E0F48E42DEFF00D8E"
+    ],
+    "journal_scope": "d9be18323a4e3d2fdb7c7a702ca558c0b8781b78db84bbd00d98c5fd7c6201ef",
+    "lifecycle_basis": {
+      "kind": "OWNER_CAP"
+    },
+    "market_evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+    "next_action": "READ_SAVED_RESULT",
+    "next_needs_new_authority": false,
+    "next_needs_new_values": true,
+    "operation_sha256": "76d0264ab8b900e2d5e0c027f785ad9415976a6e83bf3cd9c2e5ad638af2d276",
+    "owner_main_remaining": 0,
+    "protocol_main_remaining": 5,
+    "protocol_main_used": 1,
+    "question_text": "research-policy vertical native attempt 0",
+    "requested_completion": "LIMITED_RESULT",
+    "reserved_main": 1,
+    "result": {
+      "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V5",
+      "descriptive_readout": {
+        "assessment": "DESCRIPTIVE_ONLY_NO_AUTOMATIC_VERDICT",
+        "baseline": {
+          "downside": {
+            "es10_return": 0.19999999999999996,
+            "es10_tail_mass_n": 0.1,
+            "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+            "le_minus_20_n": 0,
+            "le_minus_20_rate": 0.0,
+            "le_minus_50_n": 0,
+            "le_minus_50_rate": 0.0,
+            "missing_n": 0,
+            "negative_mass": 0,
+            "negative_n": 0,
+            "observed_n": 1,
+            "p05": 0.19999999999999996,
+            "p10": 0.19999999999999996,
+            "p25": 0.19999999999999996,
+            "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+            "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+            "status": "OBSERVED",
+            "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+            "worst_negative_share": null,
+            "zero_n": 0
+          },
+          "eligible_n": 1,
+          "mean_target": 0.19999999999999996,
+          "median_target": 0.19999999999999996,
+          "view": "BASELINE_DECISION_ELIGIBLE"
+        },
+        "baseline_may_include_matched": true,
+        "detail_truncation": {
+          "ablations": {
+            "included": 3,
+            "total": 3,
+            "truncated": false
+          },
+          "by_calendar_block": {
+            "included": 1,
+            "total": 1,
+            "truncated": false
+          },
+          "by_cohort": {
+            "included": 1,
+            "total": 1,
+            "truncated": false
+          }
+        },
+        "details": {
+          "ablations": [
+            {
+              "downside": {
+                "es10_return": 0.19999999999999996,
+                "es10_tail_mass_n": 0.1,
+                "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                "le_minus_20_n": 0,
+                "le_minus_20_rate": 0.0,
+                "le_minus_50_n": 0,
+                "le_minus_50_rate": 0.0,
+                "missing_n": 0,
+                "negative_mass": 0,
+                "negative_n": 0,
+                "observed_n": 1,
+                "p05": 0.19999999999999996,
+                "p10": 0.19999999999999996,
+                "p25": 0.19999999999999996,
+                "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                "status": "OBSERVED",
+                "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                "worst_negative_share": null,
+                "zero_n": 0
+              },
+              "eligible_n": 1,
+              "mean_target": 0.19999999999999996,
+              "median_target": 0.19999999999999996,
+              "view": "ABLATION_DROP_impulse"
+            },
+            {
+              "downside": {
+                "es10_return": 0.19999999999999996,
+                "es10_tail_mass_n": 0.1,
+                "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                "le_minus_20_n": 0,
+                "le_minus_20_rate": 0.0,
+                "le_minus_50_n": 0,
+                "le_minus_50_rate": 0.0,
+                "missing_n": 0,
+                "negative_mass": 0,
+                "negative_n": 0,
+                "observed_n": 1,
+                "p05": 0.19999999999999996,
+                "p10": 0.19999999999999996,
+                "p25": 0.19999999999999996,
+                "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                "status": "OBSERVED",
+                "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                "worst_negative_share": null,
+                "zero_n": 0
+              },
+              "eligible_n": 1,
+              "mean_target": 0.19999999999999996,
+              "median_target": 0.19999999999999996,
+              "view": "ABLATION_DROP_pullback"
+            },
+            {
+              "downside": {
+                "es10_return": 0.19999999999999996,
+                "es10_tail_mass_n": 0.1,
+                "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                "le_minus_20_n": 0,
+                "le_minus_20_rate": 0.0,
+                "le_minus_50_n": 0,
+                "le_minus_50_rate": 0.0,
+                "missing_n": 0,
+                "negative_mass": 0,
+                "negative_n": 0,
+                "observed_n": 1,
+                "p05": 0.19999999999999996,
+                "p10": 0.19999999999999996,
+                "p25": 0.19999999999999996,
+                "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                "status": "OBSERVED",
+                "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                "worst_negative_share": null,
+                "zero_n": 0
+              },
+              "eligible_n": 1,
+              "mean_target": 0.19999999999999996,
+              "median_target": 0.19999999999999996,
+              "view": "ABLATION_DROP_retention"
+            }
+          ],
+          "by_calendar_block": [
+            {
+              "downside": {
+                "es10_return": 0.19999999999999996,
+                "es10_tail_mass_n": 0.1,
+                "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                "le_minus_20_n": 0,
+                "le_minus_20_rate": 0.0,
+                "le_minus_50_n": 0,
+                "le_minus_50_rate": 0.0,
+                "missing_n": 0,
+                "negative_mass": 0,
+                "negative_n": 0,
+                "observed_n": 1,
+                "p05": 0.19999999999999996,
+                "p10": 0.19999999999999996,
+                "p25": 0.19999999999999996,
+                "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                "status": "OBSERVED",
+                "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                "worst_negative_share": null,
+                "zero_n": 0
+              },
+              "eligible_n": 1,
+              "mean_target": 0.19999999999999996,
+              "median_target": 0.19999999999999996,
+              "view": "2026-01-05"
+            }
+          ],
+          "by_cohort": [
+            {
+              "downside": {
+                "es10_return": 0.19999999999999996,
+                "es10_tail_mass_n": 0.1,
+                "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+                "le_minus_20_n": 0,
+                "le_minus_20_rate": 0.0,
+                "le_minus_50_n": 0,
+                "le_minus_50_rate": 0.0,
+                "missing_n": 0,
+                "negative_mass": 0,
+                "negative_n": 0,
+                "observed_n": 1,
+                "p05": 0.19999999999999996,
+                "p10": 0.19999999999999996,
+                "p25": 0.19999999999999996,
+                "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+                "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+                "status": "OBSERVED",
+                "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+                "worst_negative_share": null,
+                "zero_n": 0
+              },
+              "eligible_n": 1,
+              "mean_target": 0.19999999999999996,
+              "median_target": 0.19999999999999996,
+              "view": "REL-20260105T120000Z-20260112T120000Z"
+            }
+          ]
+        },
+        "matched": {
+          "downside": {
+            "es10_return": 0.19999999999999996,
+            "es10_tail_mass_n": 0.1,
+            "es_method": "EMPIRICAL_LOWER_10_FRACTIONAL_MASS",
+            "le_minus_20_n": 0,
+            "le_minus_20_rate": 0.0,
+            "le_minus_50_n": 0,
+            "le_minus_50_rate": 0.0,
+            "missing_n": 0,
+            "negative_mass": 0,
+            "negative_n": 0,
+            "observed_n": 1,
+            "p05": 0.19999999999999996,
+            "p10": 0.19999999999999996,
+            "p25": 0.19999999999999996,
+            "profile": "DOWNSIDE_DESCRIPTIVE_V1",
+            "quantile_method": "HYNDMAN_FAN_TYPE_7_LINEAR",
+            "status": "OBSERVED",
+            "units": "DIMENSIONLESS_PRICE_RATIO_MINUS_ONE",
+            "worst_negative_share": null,
+            "zero_n": 0
+          },
+          "eligible_n": 1,
+          "mean_target": 0.19999999999999996,
+          "median_target": 0.19999999999999996,
+          "view": "MATCHED_OBSERVED"
+        },
+        "missingness": "OBSERVED_DENOMINATOR_ONLY_NO_MAR_ASSUMPTION",
+        "selection_policy": "CANONICAL_ORDER_PREFIX",
+        "status": "DESCRIPTIVE_PROXY",
+        "tail_support": "DESCRIPTIVE_ESTIMATE_NOT_CONFIDENCE_INTERVAL"
+      },
+      "look_class": "MAIN",
+      "new_look": true,
+      "result_coherence": "COHERENT",
+      "result_ref": "HFIC-ART-DISCOVERY-1B7BDBF7C350EFB65AFC8F2E0F48E42DEFF00D8E",
+      "result_sha256": "55a182c49cf7c2fbeee3dd01d780d8845487304d5cb16001aa874551785240dc",
+      "science_ready": true
+    },
+    "result_refs": [
+      "HFIC-ART-DISCOVERY-1B7BDBF7C350EFB65AFC8F2E0F48E42DEFF00D8E"
+    ],
+    "result_sha256": "55a182c49cf7c2fbeee3dd01d780d8845487304d5cb16001aa874551785240dc",
+    "search_open": false,
+    "status": "PAUSED_CAP"
+  },
+  "owner_class": "OWNER_FINAL",
+  "owner_final": "NON_SCIENTIFIC_STOP",
+  "owner_focus": "AUDIT_CURRENT_NATIVE",
+  "owner_readout": "FORGE RUN\nstatus: DONE — bounded-run owner-final; do not continue; execution provenance UNKNOWN — not a readiness receipt\nrun_id: FORGE-RUN-6BC2E09E5087713A\nrun_identity_sha256: 6bc2e09e5087713a1d3eaf7a5c9bee2c6b73d83918c835ffb74537b679587e71\ncontrol_session_id: NONE\nowner_class: OWNER_FINAL\nvisible_cohorts: REL-20260105T120000Z-20260112T120000Z\nused_cohorts: NONE\nmarket_epoch: e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f  # admission/budget key\ncapability_epoch: 476253a08d054e50607eab5a327af63f8090fee91603e8ff3b1dedc7cf4b3276  # protocol; does not free market budget\nscientific_slot: 9219181b02c6f324481d8a1ffdc1ffee62a309f8a5710e859c4bfa1478bd18f0  # market+representation+focus\nlegacy_epoch: NONE\nfrozen_versions: BASE@HFIC-V1.2, NORMALIZED_TRAJECTORY_V1@1.0\nexecution_binding: UNKNOWN\nexecution_provenance: NOT_APPLICABLE\nexecution_scope: NOT_SCIENTIFIC_EXECUTION  # provenance binding only; no market Forge\nexecution_provenance_note: historical readback is UNKNOWN; this is not a readiness receipt and not permission to rerun\nstage BASE@HFIC-V1.2: EXECUTED terminal=KILL_STATISTICALLY_UNIDENTIFIABLE scope=ORDINARY_BASE session_id=HFIC-SESS-D9BE18323A4E3D2F stage_ref_sha256=de28e49b909be7642b989320be07c32af0170542fe87bef85b10488e44b6e6eb used=NONE draft=NONE\n  candidate: HFIC-CAND-74F21482B494 mechanism=UNKNOWN; compound представляет состояние наблюдаемых price/liquidity marks. Карт\n  declined: NONE\n  critic: HFIC-V1.1 terminal=KILL_STATISTICALLY_UNIDENTIFIABLE reason=KILL_STATISTICALLY_UNIDENTIFIABLE\nnext_action: NON_SCIENTIFIC_STOP\nowner_final: NON_SCIENTIFIC_STOP\nblocked_by: KILL_STATISTICALLY_UNIDENTIFIABLE\nwrites: store=1 forge_run=1 session=0 forge_context=0\npersisted: RESEARCH_ARTIFACT FORGE_RUN_RECEIPT\npersisted_receipt: 6ff0e7fb353035ad4354b1a38fc0a351719611567af4ac874efb9acbd1399e7a\nnon_claim: scoped search result on completed representations; not alpha and not proof of generator recall\nhistory: readable 1/1; unresolved 0 (none); skipped 0 (none); provenance: VALID\noperation: 76d0264ab8b900e2d5e0c027f785ad9415976a6e83bf3cd9c2e5ad638af2d276 state=PAUSED_CAP next=READ_SAVED_RESULT\nmatched: observed/eligible/missing=1/1/0, mean=0.19999999999999996, median=0.19999999999999996, <=-20%=0/0.0, <=-50%=0/0.0, ES10=0.19999999999999996, worst_negative_share=None\nbaseline: observed/eligible/missing=1/1/0, mean=0.19999999999999996, median=0.19999999999999996, <=-20%=0/0.0, <=-50%=0/0.0, ES10=0.19999999999999996, worst_negative_share=None\nscientific_context (advisory; not next_action, not authority):\n  NOT_RECORDED QUESTION result=HFIC-ART-DISCOVERY-1B7BDBF7C350EFB65AFC8F2E0F48E42DEFF00D8E sha256=55a182c49cf7c2fbeee3dd01d780d8845487304d5cb16001aa874551785240dc calc=HFIC_TEMPORAL_DISCOVERY_CALC_V5 — calculation saved, assessment missing; write it with disposition-record\n  detail: uv run --locked --managed-python python -B scripts/hypothesis_forge.py disposition-show --owner-focus AUDIT_CURRENT_NATIVE --format json --journal-scope d9be18323a4e3d2fdb7c7a702ca558c0b8781b78db84bbd00d98c5fd7c6201ef\n  note: advice does not open, close or budget a look; search tiers without a recorded assessment: COMPOUND_SCREEN, SIMPLE_SCREEN",
+  "receipt_sha256": "6ff0e7fb353035ad4354b1a38fc0a351719611567af4ac874efb9acbd1399e7a",
+  "run_id": "FORGE-RUN-6BC2E09E5087713A",
+  "run_identity_sha256": "6bc2e09e5087713a1d3eaf7a5c9bee2c6b73d83918c835ffb74537b679587e71",
+  "schema": "smial.forge-run-receipt",
+  "schema_version": "1.0",
+  "scientific_disposition_context": {
+    "advisory_only": true,
+    "assessed_search_tiers": [],
+    "authority_granted": false,
+    "claim_boundary": "authored advice on named scopes; not a look, budget, admission or family close",
+    "detail_query": "uv run --locked --managed-python python -B scripts/hypothesis_forge.py disposition-show --owner-focus AUDIT_CURRENT_NATIVE --format json --journal-scope d9be18323a4e3d2fdb7c7a702ca558c0b8781b78db84bbd00d98c5fd7c6201ef",
+    "entries": [],
+    "focus_resolved": true,
+    "journal_verified": true,
+    "machine_next_action_owner": "ORDINARY_RESOLVER",
+    "market_verified": true,
+    "not_recorded": [
+      {
+        "calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_V5",
+        "question_spec_sha256": "140a1c08a720e18a128da1b4b5f6dc48c5950470429f87f7e5f657617d61c0ae",
+        "result_ref": "HFIC-ART-DISCOVERY-1B7BDBF7C350EFB65AFC8F2E0F48E42DEFF00D8E",
+        "result_sha256": "55a182c49cf7c2fbeee3dd01d780d8845487304d5cb16001aa874551785240dc"
+      }
+    ],
+    "not_recorded_omitted": 0,
+    "omitted": 0,
+    "owner_focus": "AUDIT_CURRENT_NATIVE",
+    "receipt_hash_domain": "EXCLUDED_DERIVED_OVERLAY",
+    "schema": "smial.hfic-scientific-disposition-context",
+    "schema_version": "1.0",
+    "shown": 0,
+    "status_counts": {
+      "NOT_RECORDED": 1
+    },
+    "total_subjects": 0,
+    "unreadable_unscoped_records": 0
+  },
+  "scientific_slot_sha256": "9219181b02c6f324481d8a1ffdc1ffee62a309f8a5710e859c4bfa1478bd18f0",
+  "selection_reason": "EXPLICIT",
+  "session_id": null,
+  "stages": [
+    {
+      "candidate_mechanism": "UNKNOWN; compound представляет состояние наблюдаемых price/liquidity marks. Карточка заявляет предсказательную ассоциацию, без причинной истории.",
+      "capability_epoch_sha256": "476253a08d054e50607eab5a327af63f8090fee91603e8ff3b1dedc7cf4b3276",
+      "control_session_id": null,
+      "critic_decisive_reason": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+      "critic_identity": "HFIC-V1.1",
+      "critic_terminal": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+      "declined_candidate_ids": [],
+      "draft_sha256": null,
+      "effective_terminal": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+      "evidence_surface_mode": null,
+      "execution_binding_sha256": null,
+      "execution_provenance_status": "HISTORICAL_READBACK_UNKNOWN",
+      "execution_status": "EXECUTED",
+      "input_scope": "ORDINARY_BASE",
+      "market_evidence_epoch_sha256": "e679bbb7224daa5d613f4b96be372bcfa9ee612eda23b21d88f7309cd577bd1f",
+      "memory_eligibility_sha256": "d6930b96b4871b498559efa9b9834209b8e509a357d824af15b047a2095d880f",
+      "model_provenance_sha256": null,
+      "reason_code": null,
+      "representation_id": "BASE",
+      "representation_payload_sha256": null,
+      "representation_semantic_version": "HFIC-V1.2",
+      "runner_up_candidate_id": null,
+      "scientific_slot_sha256": "9219181b02c6f324481d8a1ffdc1ffee62a309f8a5710e859c4bfa1478bd18f0",
+      "selected_candidate_id": "HFIC-CAND-74F21482B494",
+      "session_id": "HFIC-SESS-D9BE18323A4E3D2F",
+      "session_state": "SYNTHESIS_COMPLETE",
+      "stage_ref_sha256": "de28e49b909be7642b989320be07c32af0170542fe87bef85b10488e44b6e6eb",
+      "used_cohort_ids": []
+    }
+  ],
+  "used_cohort_ids": [],
+  "visible_cohort_ids": [
+    "REL-20260105T120000Z-20260112T120000Z"
+  ],
+  "writes": {
+    "forge_run": 1,
+    "research_store": 1,
+    "session": 0
+  }
+}

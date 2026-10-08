@@ -5,7 +5,7 @@ status: IN_PROGRESS
 as_of: '2026-10-08'
 owner: GOAL_OWNER
 allowed_routes: [DIRECT_CODEX_DELIVERY]
-required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC]
+required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
   expected_base: 0dbe4d4bb5ce9703332a0620987a47eac05c4cdc
@@ -26,6 +26,13 @@ managed_write_set:
 - docs/evidence/forge_reliability_audit_continuation_v1/**
 - tests/test_forge_reliability_audit_continuation_v1.py
 - tests/fixtures/forge_reliability_audit_continuation_v1/**
+- src/solana_alpha_lab/factory/hfic_ordinary_operation.py
+- docs/contracts/forge_research_policy_runtime_v1.md
+- catalog/assets/core.yaml
+- catalog/assets/lifecycle.yaml
+- catalog/catalog_manifest.yaml
+- catalog/generated/**
+- docs/PROJECT_MAP.md
 external_caps:
   network: false
   credentials: false
@@ -54,6 +61,7 @@ context_requirements:
     - docs/contracts/forge_list_aware_research_scope_v1.md
     - docs/contracts/experiment_evidence_decision_v1.md
     DELIVERY_EVIDENCE:
+    - docs/reports/forge_reliability_audit_continuation_v1/EVIDENCE_INDEX.md
     - docs/evidence/forge_grounded_handoff_closure_v1/checkpoint.json
     - docs/evidence/forge_research_policy_runtime_v1/a1_delivery_completion_evidence_v1.json
     HISTORICAL_CONTEXT: []
@@ -107,3 +115,16 @@ Entry capability radar: NOW=NONE; existing Git/gh, locked runtime, Harness,
 Forge/independent-Critic protocol and native isolated reviewers suffice.
 Product horizon: NOW=NONE pending probes; WATCH=chronological consumer only
 after an evidenced gap and separate exact scientific/product authority.
+
+## Connected repair authorized after BASE evidence
+
+RED: collision-base.json records 2/2 attempts in which three distinct frozen
+PREVIEW descriptors with the same landed payload consume only one of two slots.
+Both journal occupancy and operation allowance deduplicate payload bytes instead
+of chargeable request identity. Repair only these consumers in the existing
+ordinary-operation owner; keep reservation/landing lineage, immutable history,
+legacy unkeyed previews and shipped limits. No second repair: confounders shape
+incompatibility and chronological-consumer absence remain separate findings.
+OWNER_UX_CRITIC is added for changed occupancy/readout semantics. Catalog writes
+are generated propagation only. The final user steering forbids a permanent
+audit harness and large logs in Git; retain a minimal reproducer and key evidence.

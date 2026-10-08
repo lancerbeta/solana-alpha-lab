@@ -1,0 +1,236 @@
+{
+  "crash": {
+    "after": {
+      "adaptive": {
+        "completed": 0,
+        "deficit": 0,
+        "limit": 2,
+        "occupied": 0,
+        "pending": 0,
+        "remaining": 2
+      },
+      "main": {
+        "completed": 0,
+        "deficit": 0,
+        "limit": 6,
+        "occupied": 0,
+        "pending": 0,
+        "remaining": 6
+      },
+      "preview": {
+        "completed": 1,
+        "deficit": 0,
+        "limit": 2,
+        "occupied": 1,
+        "pending": 0,
+        "remaining": 1
+      }
+    },
+    "child_stderr": "",
+    "deny": {
+      "denied": "OWNER_CAP_EXHAUSTED",
+      "pid": 62052
+    },
+    "durable": {
+      "disposition": "EXECUTE",
+      "occupancy": {
+        "adaptive": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 0,
+          "pending": 0,
+          "remaining": 2
+        },
+        "main": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 6,
+          "occupied": 0,
+          "pending": 0,
+          "remaining": 6
+        },
+        "preview": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 1,
+          "pending": 1,
+          "remaining": 1
+        }
+      },
+      "pid": 58112
+    },
+    "killed_exit": 1,
+    "pending": {
+      "adaptive": {
+        "completed": 0,
+        "deficit": 0,
+        "limit": 2,
+        "occupied": 0,
+        "pending": 0,
+        "remaining": 2
+      },
+      "main": {
+        "completed": 0,
+        "deficit": 0,
+        "limit": 6,
+        "occupied": 0,
+        "pending": 0,
+        "remaining": 6
+      },
+      "preview": {
+        "completed": 0,
+        "deficit": 0,
+        "limit": 2,
+        "occupied": 1,
+        "pending": 1,
+        "remaining": 1
+      }
+    },
+    "repeat": {
+      "disposition": "REPEAT",
+      "occupancy": {
+        "adaptive": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 0,
+          "pending": 0,
+          "remaining": 2
+        },
+        "main": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 6,
+          "occupied": 0,
+          "pending": 0,
+          "remaining": 6
+        },
+        "preview": {
+          "completed": 1,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 1,
+          "pending": 0,
+          "remaining": 1
+        }
+      },
+      "pid": 58504
+    },
+    "resume": {
+      "disposition": "RESUME",
+      "occupancy": {
+        "adaptive": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 0,
+          "pending": 0,
+          "remaining": 2
+        },
+        "main": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 6,
+          "occupied": 0,
+          "pending": 0,
+          "remaining": 6
+        },
+        "preview": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 1,
+          "pending": 1,
+          "remaining": 1
+        }
+      },
+      "pid": 51040
+    }
+  },
+  "race": [
+    {
+      "attempt": 0,
+      "occupancy": {
+        "adaptive": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 0,
+          "pending": 0,
+          "remaining": 2
+        },
+        "main": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 6,
+          "occupied": 0,
+          "pending": 0,
+          "remaining": 6
+        },
+        "preview": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 1,
+          "pending": 1,
+          "remaining": 1
+        }
+      },
+      "rows": [
+        {
+          "exit": 0,
+          "stderr": "",
+          "stdout": "{\"denied\": \"OWNER_CAP_EXHAUSTED\", \"pid\": 5788}\n"
+        },
+        {
+          "exit": 0,
+          "stderr": "",
+          "stdout": "{\"disposition\": \"EXECUTE\", \"pid\": 10600, \"occupancy\": {\"main\": {\"limit\": 6, \"completed\": 0, \"pending\": 0, \"occupied\": 0, \"remaining\": 6, \"deficit\": 0}, \"adaptive\": {\"limit\": 2, \"completed\": 0, \"pending\": 0, \"occupied\": 0, \"remaining\": 2, \"deficit\": 0}, \"preview\": {\"limit\": 2, \"completed\": 0, \"pending\": 1, \"occupied\": 1, \"remaining\": 1, \"deficit\": 0}}}\n"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "occupancy": {
+        "adaptive": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 0,
+          "pending": 0,
+          "remaining": 2
+        },
+        "main": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 6,
+          "occupied": 0,
+          "pending": 0,
+          "remaining": 6
+        },
+        "preview": {
+          "completed": 0,
+          "deficit": 0,
+          "limit": 2,
+          "occupied": 1,
+          "pending": 1,
+          "remaining": 1
+        }
+      },
+      "rows": [
+        {
+          "exit": 0,
+          "stderr": "",
+          "stdout": "{\"disposition\": \"EXECUTE\", \"pid\": 57512, \"occupancy\": {\"main\": {\"limit\": 6, \"completed\": 0, \"pending\": 0, \"occupied\": 0, \"remaining\": 6, \"deficit\": 0}, \"adaptive\": {\"limit\": 2, \"completed\": 0, \"pending\": 0, \"occupied\": 0, \"remaining\": 2, \"deficit\": 0}, \"preview\": {\"limit\": 2, \"completed\": 0, \"pending\": 1, \"occupied\": 1, \"remaining\": 1, \"deficit\": 0}}}\n"
+        },
+        {
+          "exit": 0,
+          "stderr": "",
+          "stdout": "{\"denied\": \"OWNER_CAP_EXHAUSTED\", \"pid\": 61564}\n"
+        }
+      ]
+    }
+  ]
+}

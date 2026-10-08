@@ -1,0 +1,16 @@
+{
+  "native_formulations": 1,
+  "native_critic_outputs": 1,
+  "setup_retry_same_authored_card": 1,
+  "conservative_total": 3,
+  "limit": 4,
+  "scientific_axes_changed": false,
+  "old_failed_store_rewritten": false,
+  "failed_branch": "initial confounders string draft persists; freeze refuses HFIC_PROTOCOL_INVALID; re-persist corrected shape refuses GENERATED_DRAFT_CONFLICT",
+  "retry": "isolated synthetic store; identical scientific card; only confounders string wrapped as one array item before persist",
+  "terminal": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+  "owner_next": "NON_SCIENTIFIC_STOP",
+  "positive_experiment_admission": "NOT_PROVEN",
+  "source_commit": "b29d011994f5e4cf328175dc1a4929d28957e25a",
+  "source_product_base": "0dbe4d4bb5ce9703332a0620987a47eac05c4cdc"
+}

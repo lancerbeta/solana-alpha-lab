@@ -195,7 +195,7 @@ root does. The packet shows the root's limits and what is left of them.
 - An unparseable policy row is `RESEARCH_POLICY_CHAIN_CORRUPT`; a present-but-invalid `cycle_index` on a stored row still reads as cycle 1.
 - A failure after the PREVIEW reservation of an episode view leaves that reservation pending; the identical retry resumes it (RESUME), spends nothing new and lands the payload.
 - The epoch history used by preflight includes reservations while the packet and status readouts count sessions only, so a pre-runtime epoch with reservations but no session can display a raised `would freeze` limit while preflight enforces the legacy defaults.
-- Two distinct preview request descriptors with a byte-identical payload count as one landed PREVIEW.
+- PREVIEW accounting repair (`FORGE_RELIABILITY_AUDIT_CONTINUATION_V1`): distinct frozen request descriptors each spend one slot even when their landed payload bytes are identical. Journal occupancy and the explicit operation cap use the same request identity. Identical retries remain one charge; pending becomes completed without a second charge. Legacy previews without a descriptor keep their historical payload-based charge in a separate identity namespace; no records or limits are rewritten. The earlier payload collision defect remains recorded in the immutable PR-B evidence and this audit's BASE finding.
 - Test strength: raising `distinct_focuses_per_market`, and applying a change while an operation holds a pending reservation, are covered structurally, not by a dedicated end-to-end test.
 - `max_generated` below 4 conflicts with the non-ordinary floor of 4 candidates; ordinary drafts use the policy value.
 - Numerical replay of a prefix view is covered by the PR-A cold test, not repeated here.
