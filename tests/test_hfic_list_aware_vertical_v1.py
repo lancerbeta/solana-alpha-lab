@@ -900,7 +900,7 @@ class ListAwareVerticalTests(unittest.TestCase):
             return journal_occupancy(ResearchStore(plane, create_if_missing=False), journal)["main"]
 
         # ---------------- cycle 1: BASE terminal and a real episode child that spends 2 of 6 ----------------
-        one = {"main": 1, "adaptive": 0, "preview": 2}
+        one = {"main": 1, "adaptive": 0, "preview": 4}
         base1 = self._run("c1base", self._list_query([["A", "C"]]), focus="AUTO", cap=one)
         self.assertEqual(base1["_exit_code"], 0, base1)
         pre1 = base1["_preflight"]
@@ -1022,6 +1022,21 @@ class ListAwareVerticalTests(unittest.TestCase):
         child1_after = load_session_bundle(reopened, done1["frozen"]["session_id"])
         for key in ("critic_terminal", "session_state", "selected_candidate_id"):
             self.assertEqual(child1_after.get(key), child1_before.get(key), key)
+
+        # An earlier cycle's child cannot arrive after a later cycle's (that would be a second, independent budget).
+        more_preview = _forge_call("research-policy-preview", "--for-operation", str(base2["operation_sha256"]), "--preview-total", "4", data_root=plane)
+        more_file = self.work / "c2-preview4.json"
+        more_file.write_text(json.dumps(more_preview), encoding="utf-8")
+        self.assertEqual(_forge_call("research-policy-apply", "--proposal", str(more_file), "--confirm-append-only", data_root=plane)["status"], "APPENDED")
+        spec_early = self.work / "c1-view-spec-late.json"
+        spec_early.write_text(json.dumps(self._list_query([["C"]])), encoding="utf-8")
+        view_early = _forge_call(
+            "episode-normalized-view", "--spec", str(spec_early), "--parent-session-id", frozen1["session_id"],
+            "--operation-sha256", str(base1["operation_sha256"]), data_root=plane,
+        )
+        late = self._attempt("c1child-late", self._list_query([["C"]]), self._child_operation(view_early, "late cycle-1 child", child_cap))
+        self.assertNotEqual(late["_exit_code"], 0, late)
+        self.assertEqual(late.get("reason_code"), "ORDINARY_OPERATION_LINEAGE_OUT_OF_ORDER", late)
 
         # A stopped member of the lineage cannot be bypassed by a new segment.
         from solana_alpha_lab.factory.hfic_ordinary_operation import apply_operation_stop, preview_operation_stop

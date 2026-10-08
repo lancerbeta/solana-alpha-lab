@@ -219,8 +219,9 @@ def record_operation(
             return existing
     if not create_if_missing:
         raise OrdinaryOperationError("CALCULATION_REVISION_EXISTING_OPERATION_REQUIRED")
-    if lineage_kind and continuation_blocker:
-        # A new segment never bypasses a stopped or unresolved member of its representation lineage.
+    if continuation_blocker:
+        # A new segment never bypasses a stopped or unresolved member of its representation lineage,
+        # and an earlier cycle never arrives after a later one.
         raise OrdinaryOperationError(continuation_blocker)
     stored = {
         **identity_body,
@@ -314,10 +315,11 @@ def _representation_continuation_root(
         return value if isinstance(value, int) and not isinstance(value, bool) and value > 1 else 1
 
     parent = _bundle(representation.get("parent_session_id"))
-    if parent is None or _cycle(parent) <= 1:
+    if parent is None:
         return None, None
     members: list[Mapping[str, Any]] = []
     roots: list[Mapping[str, Any]] = []
+    later_cycle_member = False
     for item in list_operations(store):
         rep = item.get("representation")
         if (
@@ -332,11 +334,18 @@ def _representation_continuation_root(
         if other is None or str(other.get("owner_focus") or "") != focus:
             continue
         members.append(item)
+        if _cycle(other) > _cycle(parent):
+            later_cycle_member = True
         if not item.get("accounting_root") and _cycle(other) < _cycle(parent):
-            roots.append(item)
-    if not roots:
+            roots.append((_cycle(other), item))
+    if later_cycle_member:
+        # An earlier cycle's child may not arrive after a later cycle's: that would give one
+        # representation two independent budgets. The continuation runs forward in cycle order.
+        return None, "ORDINARY_OPERATION_LINEAGE_OUT_OF_ORDER"
+    if _cycle(parent) <= 1 or not roots:
         return None, None
-    root = min(roots, key=lambda row: str(row.get("_recorded_at") or ""))
+    # The earliest cycle wins; within a cycle the earliest recorded. A missing timestamp sorts last.
+    root = min(roots, key=lambda pair: (pair[0], str(pair[1].get("_recorded_at") or "~")))[1]
     blocker = None
     for item in members:
         if item.get("status") == STATUS_STOPPED:

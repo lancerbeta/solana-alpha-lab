@@ -40486,7 +40486,7 @@ records:
   as_of: '2026-10-07'
   truth_owner: FORGE_RESEARCH_POLICY_RUNTIME_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_research_policy_runtime_v1.md', repository_path: docs/contracts/forge_research_policy_runtime_v1.md}
-  integrity: {kind: sha256, sha256: e6891b4b159524511c6568083ee9223d34a4d200f479aac35caffce5317e7bf9}
+  integrity: {kind: sha256, sha256: 62c76a269f569de848963cc2328940a52f3f2094df95a31c64bb9c27dad4d6df}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-RESEARCH-POLICY-001}

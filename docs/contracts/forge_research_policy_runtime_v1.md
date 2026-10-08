@@ -115,7 +115,9 @@ cycle-1 normalized child used 2 of 6, the cycle-2 child sees 4 left, not a new 6
 an explicit normalized total of 10 (`--for-operation <child>`) leaves 8; BASE
 is untouched. A new cycle, payload or selector never opens fresh budget by
 itself. A stopped member of the lineage or an unresolved reservation refuses a
-new segment. The child of a cycle-2 parent is not an AUTO cycle, so the AUTO
+new segment, and an earlier cycle's child may not be recorded after a later
+cycle's (`ORDINARY_OPERATION_LINEAGE_OUT_OF_ORDER`): the continuation runs
+forward, so one representation never holds two independent budgets. The child of a cycle-2 parent is not an AUTO cycle, so the AUTO
 count stays at the pool. A BASE lineage row counts only when its journal is
 `cycle_search_key(accounting_root, cycle_index)`: a request naming another root
 is refused and can neither borrow nor poison any budget. An exact episode query
