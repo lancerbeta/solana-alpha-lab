@@ -451,9 +451,8 @@ def _capsule_from_payload(
     payload: Mapping[str, Any],
     decision: Mapping[str, str] | None,
 ) -> dict[str, Any]:
-    # A pending new session must not inherit another session's terminal.
-    # Legacy decisions without a session retain their existing compatibility.
-    if decision and payload.get("session_id") and decision.get("session_id") and payload["session_id"] != decision["session_id"]:
+    # Known and missing sessions are distinct; only both missing retain legacy coupling.
+    if decision and payload.get("session_id") != decision.get("session_id"):
         decision = None
     protocol = payload.get("hfic_protocol")
     protocol_text = str(protocol) if isinstance(protocol, str) and protocol else None

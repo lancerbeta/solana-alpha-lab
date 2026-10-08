@@ -491,15 +491,15 @@ class ResearchProjectionTests(unittest.TestCase):
                 },
                 entity_id=HYPOTHESIS_ID,
             )
-            store.append(
-                [first, second],
-                transaction_id="RESEARCH-TXN-PROJECTION-001",
-            )
             with self.assertRaisesRegex(
                 ResearchStoreError,
                 "DUPLICATE_STABLE_ID_CONFLICT",
             ):
-                store.rebuild_projection()
+                store.append(
+                    [first, second],
+                    transaction_id="RESEARCH-TXN-PROJECTION-001",
+                )
+            self.assertEqual(store.rebuild_projection().record_count, 0)
 
     def test_generated_ten_thousand_event_performance_fixture(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

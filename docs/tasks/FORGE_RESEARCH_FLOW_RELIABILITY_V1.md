@@ -38,6 +38,7 @@ managed_write_set:
 - scripts/hypothesis_forge.py
 - scripts/delivery_harness.py
 - tests/test_preflight_shadow_pin_drift.py
+- tests/test_research_projection.py
 - catalog/schemas/hypothesis_forge_draft_v1*.schema.json
 - catalog/schemas/hypothesis_critic_input_v1.schema.json
 - catalog/schemas/forge_input_receipt_v1.schema.json

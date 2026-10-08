@@ -279,6 +279,19 @@ class SessionHistoryTests(unittest.TestCase):
         self.assertNotIn('outcome_semantics',capsule)
         same=compact_prior_entry('HYP-SAME',body,{**decision,'session_id':'SESS-NEW'})
         self.assertEqual(same['reason_code'],'KILL_LOW_INFORMATION_VALUE')
+        from solana_alpha_lab.factory.hfic_prior_memory import compact_forge_prior_entry
+        for card, outcome, retained in (
+            (body, {k:v for k,v in decision.items() if k!='session_id'}, False),
+            ({**body,'session_id':None}, decision, False),
+            ({**body,'session_id':None}, {k:v for k,v in decision.items() if k!='session_id'}, True),
+            (body, {**decision,'session_id':'SESS-NEW'}, True),
+        ):
+            for projection in (compact_prior_entry, compact_forge_prior_entry):
+                with self.subTest(card=card.get('session_id'),decision=outcome.get('session_id'),projection=projection.__name__):
+                    prior=projection('HYP-SAME',card,outcome)
+                    self.assertEqual(prior.get('reason_code'), 'KILL_LOW_INFORMATION_VALUE' if retained else None)
+                    self.assertEqual(prior.get('decision_kind'), 'REJECT' if retained else None)
+                    self.assertEqual('outcome_semantics' in prior,retained)
 
 class CapabilityBindingTests(unittest.TestCase):
     def test_changed_direct_owners_are_part_of_capability_provenance(self):

@@ -155,6 +155,7 @@ def _decision_event(
             "hypothesis_version_id": hyp_id,
             "decision_kind": decision_kind,
             "reason_code": reason_code,
+            "session_id": CONTROL_SESSION,
         },
         transaction_id=transaction_id,
     )
@@ -713,6 +714,7 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
                 {
                     "decision_kind": capsule["decision_kind"],
                     "reason_code": capsule["reason_code"],
+                    "session_id": capsule["session_id"],
                 },
             )
             # Critic remains richer than Forge; Forge still gets kill + scope.

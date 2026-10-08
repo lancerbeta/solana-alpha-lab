@@ -24,11 +24,10 @@ from solana_alpha_lab.factory.hfic_prior_memory import (
     MEMORY_NOT_SELECTED,
     MEMORY_PARK,
     PriorMemoryCapacityError,
-    PriorMemoryUnidentifiedError,
     build_prior_memory_snapshot,
 )
 from solana_alpha_lab.factory.hfic_session import HficSessionError, freeze_draft, lookup_prior
-from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, ResearchStore
+from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, ResearchStore, ResearchStoreError
 from tests.test_hfic_cli import bind_draft, run_cli, seed_minimal_market_basis
 from tests.test_hfic_session import valid_draft
 from tests.test_hypothesis_forge_independent_critic_v1 import CRITIC_PACKET_FIXTURE
@@ -222,6 +221,7 @@ def seed_adversarial_store(store: ResearchStore, created: datetime | None = None
                         "hypothesis_version_id": hyp_id,
                         "decision_kind": kind,
                         "reason_code": reason,
+                        "session_id": "HFIC-SESS-PRIORSEED0001",
                     },
                     created=now,
                     transaction_id="RESEARCH-TXN-PRIOR-MEM-001",
@@ -331,39 +331,35 @@ class PriorMemoryUnitTests(unittest.TestCase):
             self.assertEqual(by_id[HISTORICAL_ID], MEMORY_HISTORICAL)
             self.assertEqual(len(set(by_id.values())), 4)
 
-    def test_unidentified_hypothesis_version_fail_closed(self) -> None:
+    def test_unidentified_hypothesis_version_rejected_before_write(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             store = ResearchStore(Path(tmp))
             now = datetime(2026, 9, 8, 12, 0, tzinfo=UTC)
             payload_json = "[]"
-            store.append(
-                [
-                    ResearchEvent(
-                        record_id="REC-UNIDENTIFIED",
-                        record_kind=RecordKind.HYPOTHESIS_VERSION,
-                        entity_id="HYP-BROKEN-JSON-001",
-                        hypothesis_version_id="HYP-BROKEN-JSON-001",
-                        run_id=None,
-                        transaction_id="RESEARCH-TXN-PRIOR-MEM-001",
-                        effective_at=now,
-                        first_reliable_available_at=now,
-                        supersedes_record_id=None,
-                        payload_json=payload_json,
-                        payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
-                        schema_version="1.0",
-                        producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
-                        producer_git_sha="0" * 40,
-                        created_at=now,
-                    )
-                ],
-                transaction_id="RESEARCH-TXN-PRIOR-MEM-001",
-            )
-            with self.assertRaises(PriorMemoryUnidentifiedError) as raised:
-                build_prior_memory_snapshot(
-                    store,
-                    store_inventory_digest=store.diagnostics().committed_inventory_sha256,
+            with self.assertRaisesRegex(ResearchStoreError, "PAYLOAD_JSON_MUST_BE_OBJECT"):
+                store.append(
+                    [
+                        ResearchEvent(
+                            record_id="REC-UNIDENTIFIED",
+                            record_kind=RecordKind.HYPOTHESIS_VERSION,
+                            entity_id="HYP-BROKEN-JSON-001",
+                            hypothesis_version_id="HYP-BROKEN-JSON-001",
+                            run_id=None,
+                            transaction_id="RESEARCH-TXN-PRIOR-MEM-001",
+                            effective_at=now,
+                            first_reliable_available_at=now,
+                            supersedes_record_id=None,
+                            payload_json=payload_json,
+                            payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+                            schema_version="1.0",
+                            producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+                            producer_git_sha="0" * 40,
+                            created_at=now,
+                        )
+                    ],
+                    transaction_id="RESEARCH-TXN-PRIOR-MEM-001",
                 )
-            self.assertEqual(raised.exception.code, "PRIOR_MEMORY_RECORD_UNIDENTIFIED")
+            self.assertEqual(store.rebuild_projection().record_count, 0)
 
     def test_t7_historical_packets_remain_readable(self) -> None:
         schema = json.loads(CRITIC_SCHEMA.read_text(encoding="utf-8"))
