@@ -29,7 +29,9 @@ from solana_alpha_lab.factory.document_runner import (  # noqa: E402
     DocumentRunner,
     RunContext,
     repository_git_snapshot,
+    _frozen_hfic_replay_lineage,
 )
+from solana_alpha_lab.factory.capabilities import CapabilityError  # noqa: E402
 from solana_alpha_lab.factory.git_write_fence import RepositoryGitSnapshot  # noqa: E402
 from solana_alpha_lab.factory.commissioning_fixture import (  # noqa: E402
     COMMISSIONING_DATASET_MANIFEST_ID,
@@ -86,6 +88,36 @@ def offline_v1_1_spec() -> dict[str, object]:
 
 
 class FastLaneRunnerTests(unittest.TestCase):
+    def test_native_replay_binds_existing_decision_and_rejects_recipe_drift(self) -> None:
+        spec = offline_v1_1_spec()
+        spec.update(schema_version="1.3", hypothesis_version="HYP-HFIC-CAND-ABC",
+                    capability_id="CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001",
+                    observation_request={"collection_mode": "REUSE_ONLY"},
+                    parameters={"temporal_recipe": {"frozen_input": [{"release_id": "original"}]},
+                                "hfic_replay_session_id": "HFIC-SESS-ABC"})
+        bundle = {"session_state": "SYNTHESIS_COMPLETE", "selected_candidate_id": "HFIC-CAND-ABC",
+                  "selected_definition_sha256": HYPOTHESIS_DEFINITION_SHA256,
+                  "critic_input_packet": {"grounded_evidence": {
+                      "result_refs": ["HFIC-ART-DISCOVERY-ABC"], "result_sha256": "d" * 64, "result": {
+                      "experiment_recipe": spec["parameters"]["temporal_recipe"]}}},
+                  "grounded_result_refs": ["HFIC-ART-DISCOVERY-ABC"],
+                  "critic_input_packet_sha256": "a" * 64, "critic_result_sha256": "b" * 64,
+                  "critic_terminal": "KILL_LOW_INFORMATION_VALUE", "market_evidence_epoch_sha256": "c" * 64,
+                  "grounded_result_sha256": "d" * 64}
+        with tempfile.TemporaryDirectory() as tmp:
+            context = RunContext(Path(tmp), HYPOTHESIS_DEFINITION_SHA256, None)
+            with patch("solana_alpha_lab.factory.hfic_session.load_session_bundle", return_value=bundle):
+                bound = _frozen_hfic_replay_lineage(spec, context)
+                self.assertEqual(bound["existing_look_ref"], "HFIC-ART-DISCOVERY-ABC")
+                self.assertEqual(bound["scientific_terminal"], "KILL_LOW_INFORMATION_VALUE")
+                self.assertFalse(bound["new_scientific_look"])
+                spec["parameters"]["temporal_recipe"] = {"frozen_input": [{"release_id": "changed"}]}
+                with self.assertRaisesRegex(CapabilityError, "LINEAGE_INVALID"):
+                    _frozen_hfic_replay_lineage(spec, context)
+                del spec["parameters"]["hfic_replay_session_id"]
+                with self.assertRaisesRegex(CapabilityError, "LINEAGE_REQUIRED"):
+                    _frozen_hfic_replay_lineage(spec, context)
+
     @contextmanager
     def isolated_runner(self, data_root: Path):
         ops = OperationalStore(data_root / "ops" / "operational_state.sqlite")
@@ -269,6 +301,7 @@ class FastLaneRunnerTests(unittest.TestCase):
             passport = store.find_completed_run(str(result["run_key_sha256"]))
             self.assertIsNotNone(passport)
             self.assertEqual(passport.run_id, result["run_id_or_null"])  # type: ignore[union-attr]
+            self.assertIsInstance(json.loads(json.dumps(result))["passport"], dict)
 
     def test_legacy_start_path_still_works(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

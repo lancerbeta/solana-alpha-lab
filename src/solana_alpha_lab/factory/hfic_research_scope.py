@@ -635,12 +635,7 @@ class ResolvedScope:
             for item in self.slices:
                 self.slice_states[item["slice_id"]][episode_id] = evaluate_selector(item["selector"], states)
         # Referenced definitions must still mean what was frozen.
-        all_refs = [scope.get("definition_refs") or {}, (list_condition or {}).get("definition_refs") or {}]
-        all_refs.extend(item["selector"].get("definition_refs") or {} for item in self.slices)
-        for refs in all_refs:
-            for list_id, sha in refs.items():
-                current = evidence.definitions.get(list_id)
-                _require(current is not None and current["definition_sha256"] == sha, "LIST_DEFINITION_DRIFT", list_id=list_id)
+        _verify_scope_definition_bindings(scope, list_condition, self.slices, evidence)
         self.scope_sha256 = sha256_of(self.scope)
         self.rule_sha256 = sha256_of({"scope": self.scope, "list_condition": self.list_condition, "slices": self.slices})
         self.applied_sha256 = sha256_of(
@@ -776,8 +771,40 @@ def validate_query_scope_fields(spec: Mapping[str, Any], *, max_slices: int) -> 
     }
 
 
+def _verify_scope_definition_bindings(scope, condition, slices, evidence: MembershipEvidence) -> None:
+    refs = [scope.get("definition_refs") or {}, (condition or {}).get("definition_refs") or {}]
+    refs.extend(item["selector"].get("definition_refs") or {} for item in slices)
+    for bindings in refs:
+        for list_id, digest in bindings.items():
+            current = evidence.definitions.get(list_id)
+            _require(current is not None and current["definition_sha256"] == digest,
+                     "LIST_DEFINITION_DRIFT", list_id=list_id)
+
+
+def _has_canonical_scope_metadata(spec: Mapping[str, Any]) -> bool:
+    pending = [spec.get("research_scope"), spec.get("list_condition"), spec.get("diagnostic_slices")]
+    while pending:
+        value = pending.pop()
+        if isinstance(value, Mapping):
+            if {"definition_refs", "required_observed_lists"} & value.keys():
+                return True
+            pending.extend(value.values())
+        elif isinstance(value, list):
+            pending.extend(value)
+    return False
+
+
 def canonicalize_query_scope(spec: Mapping[str, Any], evidence: MembershipEvidence) -> dict[str, Any]:
-    """Alias-resolve the scope fields of a draft query 1.2 against verified definitions."""
+    """Resolve raw input, or verify complete canonical pins without rebinding them."""
+
+    if _has_canonical_scope_metadata(spec):
+        from solana_alpha_lab.factory.hfic_temporal_discovery import MAX_DIAGNOSTIC_SLICES
+
+        fields = validate_query_scope_fields(spec, max_slices=MAX_DIAGNOSTIC_SLICES)
+        _verify_scope_definition_bindings(fields["research_scope"], fields["list_condition"],
+                                          fields["diagnostic_slices"], evidence)
+        _require(not spec.get("list_aliases"), "SCOPE_NOT_CANONICAL")
+        return dict(spec)
 
     aliases = dict(spec.get("list_aliases") or {})
     out = {key: value for key, value in spec.items() if key != "list_aliases"}

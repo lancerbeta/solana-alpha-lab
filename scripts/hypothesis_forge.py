@@ -4669,6 +4669,19 @@ def main(argv: list[str] | None = None) -> int:
         code = str(exc)
         if str(getattr(args, "command", "") or "").startswith("repair-continuation"):
             return emit_repair_blocked(code)
+        if isinstance(exc, HficSessionError) and code.startswith("CANDIDATE_SCOPE_"):
+            print(code, file=sys.stderr)
+            return emit({"reason_code": code, "detail": exc.detail,
+                         "scientific_negative": False, "writes": False,
+                         "next_action": exc.detail.get("next_action") or
+                         "CORRECT_DECLARED_FIELD_PLACEMENT_REUSE_SAVED_LOOK"}, exit_code=2)
+        if isinstance(exc, HficSessionError) and code.startswith("FORGE_CONTEXT_"):
+            print(code, file=sys.stderr)
+            next_action = ("RUN_PERSISTENT_PREFLIGHT_REUSE_SAVED_LOOK"
+                           if args.command in {"persist-draft", "freeze"}
+                           else "RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY")
+            return emit({"reason_code": code, "scientific_negative": False, "writes": False,
+                         "next_action": next_action}, exit_code=2)
         return emit_error(code)
     except (OSError, ValueError, json.JSONDecodeError):
         return emit_error("HFIC_PROTOCOL_INVALID")

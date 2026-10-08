@@ -86,6 +86,22 @@ A reader that does not know query 1.2 refuses instead of computing a pooled resu
 
 ## Formulation context
 
+### Raw and canonical public ingress
+
+`research-scope-resolve` and `episode-normalized-view` accept a raw query or
+the complete canonical query emitted by the resolver. Reserved
+`definition_refs`/`required_observed_lists` anywhere in the scope, signal or
+diagnostic slices select strict canonical validation. Mixed or corrupted
+canonical input never falls back to raw re-resolution. Existing structural
+validators check the full nested closure and pins against the verified
+membership definitions before market values. Canonical pins are preserved;
+`N(N(raw)) == N(raw)`, and rule/applied bindings stay identical on the same
+evidence. `none_of` and tautological counts retain observed-list requirements:
+UNKNOWN never becomes FALSE. Frozen replay uses saved closure, not today's
+active definitions. Spelling changes create no second scientific attempt.
+
+Fresh card/context transfer follows `forge_grounded_handoff_closure_v1.md`.
+
 `preflight` adds `list_dimension_context` (metadata only, no outcome): definitions,
 aliases, counts of `TRUE/FALSE/UNKNOWN/INVALID`, overlap signatures (at most 16 plus
 the omitted count), examples, and the representation scope support table. Owner or

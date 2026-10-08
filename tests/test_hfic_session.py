@@ -841,7 +841,14 @@ def _persist_frozen_portfolio(
 ) -> None:
     from solana_alpha_lab.factory.hfic_identity import assign_portfolio_ids
     from solana_alpha_lab.factory.hfic_session import persist_frozen_session
+    from solana_alpha_lab.factory.hfic_preflight import persist_forge_context_packet
 
+    # These tests start with a pure historical builder. Explicitly provision
+    # its original context through the production owner before durable writes.
+    context = _preflight_receipt()["forge_context_packet"]
+    frozen["forge_context_packet_sha256"] = persist_forge_context_packet(
+        store._root, context, store=store, repo_root=ROOT,
+    )
     identities = assign_portfolio_ids(draft["candidates"])
     persist_frozen_session(
         store,

@@ -632,6 +632,15 @@ class ListAwareVerticalTests(unittest.TestCase):
         ladder = view["ladder_freeze_preflight"]
         self.assertEqual(ladder["ladder_representation_id"], "NORMALIZED_TRAJECTORY_EPISODES_V1")
         self.assertEqual(ladder["control_session_id"], frozen_base["session_id"])
+        # The view is read-only; explicitly commit its derived context before writers.
+        from solana_alpha_lab.factory.hfic_preflight import persist_forge_context_packet
+        from solana_alpha_lab.factory.run_passport import canonical_sha256
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        ladder["forge_context_packet_sha256"] = persist_forge_context_packet(
+            self.plane, ladder["forge_context_packet"], store=ResearchStore(self.plane), repo_root=ROOT,
+        )
+        ladder.pop("preflight_receipt_sha256", None)
+        ladder["preflight_receipt_sha256"] = canonical_sha256(ladder)
 
         # Same ordinary lifecycle: its own slot/journal, a scoped look, freeze, Critic, finalize.
         canonical = self._resolve("ep", draft("LIST_CONTRAST", list_condition=AC))["canonical_query"]

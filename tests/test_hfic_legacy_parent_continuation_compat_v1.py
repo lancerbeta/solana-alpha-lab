@@ -470,6 +470,15 @@ class LegacyParentContinuationCompatTests(TestCase):
             selected_receipt["market_evidence_epoch_sha256"] = "11" * 32
             selected_receipt["evidence_epoch_sha256"] = "11" * 32
             selected_receipt["search_key_sha256"] = opened["journal"]
+            selected_receipt["forge_context_packet_sha256"] = persist_forge_context_packet(
+                data_root,
+                selected_receipt["forge_context_packet"],
+                store=opened["store"],
+                repo_root=ROOT,
+                clock=FrozenClock(datetime.fromisoformat(
+                    selected_receipt["session_started_at"].replace("Z", "+00:00")
+                )),
+            )
             selected = freeze_draft(
                 source,
                 preflight_receipt=selected_receipt,
@@ -1519,6 +1528,65 @@ class LegacyParentContinuationCompatTests(TestCase):
             ]
             self._spend_one_main(opened, query_id="legacy-ordinary-3")
             self.assertEqual(len(_mains(opened["store"], opened["journal"])), 3)
+            from copy import deepcopy
+            from solana_alpha_lab.factory.hfic_preflight import _forge_context_blob_path
+
+            store = opened["store"]
+            parent_digest = opened["frozen"]["forge_context_packet_sha256"]
+            fresh_digest = prepared["preflight"]["forge_context_packet_sha256"]
+            self.assertNotEqual(parent_digest, fresh_digest)
+            before_continuation = _payloads(store)
+            # Historical and fresh admission dependencies are separate pairs.
+            # Neither may be replaced with the other merely to make a hash fit.
+            for digest in (parent_digest, fresh_digest):
+                blob = _forge_context_blob_path(data_root, digest)
+                saved_bytes = blob.read_bytes()
+                try:
+                    blob.write_bytes(b'{"tampered":true}')
+                    with self.assertRaises(HficSessionError) as raised:
+                        self._continue_from_preflight(
+                            store, opened["draft"], prepared["preflight"],
+                            frozen=opened["frozen"],
+                        )
+                    self.assertEqual(raised.exception.code, "FORGE_CONTEXT_HASH_MISMATCH")
+                    self.assertEqual(_payloads(store), before_continuation)
+                finally:
+                    blob.write_bytes(saved_bytes)
+            for defect, code in (("missing_digest", "FORGE_CONTEXT_REQUIRED"),
+                                 ("inline_tamper", "FORGE_CONTEXT_HASH_MISMATCH")):
+                with self.subTest(defect=defect):
+                    bad = deepcopy(prepared["preflight"])
+                    if defect == "missing_digest":
+                        bad.pop("forge_context_packet_sha256")
+                    else:
+                        bad["forge_context_packet"] = {"tampered": True}
+                    with self.assertRaises(HficSessionError) as raised:
+                        self._continue_from_preflight(
+                            store, opened["draft"], bad, frozen=opened["frozen"],
+                        )
+                    self.assertEqual(raised.exception.code, code)
+                    self.assertEqual(_payloads(store), before_continuation)
+            fresh_blob = _forge_context_blob_path(data_root, fresh_digest)
+            fresh_bytes = fresh_blob.read_bytes()
+            original_append = store.append
+
+            def corrupt_fresh_under_lease(records, *, transaction_id, before_commit=None):
+                def hook():
+                    fresh_blob.write_bytes(b'{"tampered":true}')
+                    before_commit()
+                return original_append(records, transaction_id=transaction_id, before_commit=hook)
+
+            try:
+                with patch.object(store, "append", side_effect=corrupt_fresh_under_lease):
+                    with self.assertRaises(HficSessionError) as raised:
+                        self._continue_from_preflight(
+                            store, opened["draft"], prepared["preflight"],
+                            frozen=opened["frozen"],
+                        )
+                    self.assertEqual(raised.exception.code, "FORGE_CONTEXT_HASH_MISMATCH")
+                self.assertEqual(_payloads(store), before_continuation)
+            finally:
+                fresh_blob.write_bytes(fresh_bytes)
             continued = self._continue_from_preflight(
                 opened["store"],
                 opened["draft"],
@@ -1526,6 +1594,8 @@ class LegacyParentContinuationCompatTests(TestCase):
                 frozen=opened["frozen"],
             )
             self.assertEqual(continued["session_id"], opened["shown"]["session_id"])
+            self.assertEqual(continued["forge_context_packet_sha256"], parent_digest)
+            self.assertEqual(opened["frozen"]["forge_context_packet_sha256"], parent_digest)
             closed = self._cli_json(
                 CLI.cmd_repair_continuation_close,
                 repo_root=ROOT,

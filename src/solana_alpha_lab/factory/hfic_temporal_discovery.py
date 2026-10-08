@@ -2590,6 +2590,7 @@ def assess_tier_progress(
         "evidence_revision_required": revision_required,
         "search_exhausted_allowed": exhausted_allowed,
         "freeze_worthy": freeze_worthy,
+        "freeze_worthy_semantics": "CALLER_ROUTING_HINT_NOT_SCIENTIFIC_VERDICT",
     }
 
 
@@ -4606,19 +4607,11 @@ def _require_manifest_and_cutoff(
             raise GroundedDiscoveryError("CUTOFF_REJECTED")
 
 
-def run_temporal_fixed_time_from_spec(
-    spec: Mapping[str, Any],
-    *,
-    root: Path,
-    capture_hooks: Mapping[str, Any] | None = None,
-) -> dict[str, Any]:
-    """Production adapter. Identity is checked before the evaluator runs."""
+def bind_frozen_fixed_time_inputs(
+    spec: Mapping[str, Any], *, data_root: Path,
+) -> tuple[dict[str, Any], dict[str, Any], list[tuple[str, Path, Path]], list[dict[str, Any]]]:
+    """Bind the existing recipe files without loading values or evaluating."""
 
-    del root
-    hooks = dict(capture_hooks or {})
-    data_root = hooks.get("data_root")
-    if not isinstance(data_root, Path):
-        raise GroundedDiscoveryError("DATA_ROOT_REQUIRED")
     parameters = spec.get("parameters") if isinstance(spec.get("parameters"), Mapping) else {}
     recipe = parameters.get("temporal_recipe") if isinstance(parameters, Mapping) else None
     if not isinstance(recipe, Mapping):
@@ -4631,11 +4624,8 @@ def run_temporal_fixed_time_from_spec(
     frozen_input = recipe.get("frozen_input")
     if not isinstance(frozen_input, list) or not frozen_input:
         raise GroundedDiscoveryError("FROZEN_INPUT_REQUIRED")
-    from solana_alpha_lab.factory.hfic_grounded_discovery import (
-        load_admitted_partition_rows,
-        result_sha256,
-    )
     from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
+    from solana_alpha_lab.factory.data_resolver import _safe_relative_path, EvidenceResolutionError
 
     if "data_bindings" in spec or "availability_cutoff" in spec:
         _require_manifest_and_cutoff(spec, frozen_input, data_root)
@@ -4648,15 +4638,54 @@ def run_temporal_fixed_time_from_spec(
         obs_rel = item.get("observations_rel")
         if not isinstance(census_rel, str) or not isinstance(obs_rel, str):
             raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH")
-        census_path = data_root / census_rel
-        obs_path = data_root / obs_rel
-        if (
-            sha256_file_streaming(census_path) != item.get("census_sha256")
-            or sha256_file_streaming(obs_path) != item.get("observations_sha256")
-        ):
+        try:
+            census_path = data_root / _safe_relative_path(census_rel)
+            obs_path = data_root / _safe_relative_path(obs_rel)
+        except EvidenceResolutionError as exc:
+            raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH") from exc
+        for path in (census_path, obs_path):
+            if path.is_symlink() or not path.resolve().is_relative_to(data_root.resolve()):
+                raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH")
+        try:
+            hashes_match = (sha256_file_streaming(census_path) == item.get("census_sha256")
+                            and sha256_file_streaming(obs_path) == item.get("observations_sha256"))
+        except OSError as exc:
+            raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH") from exc
+        if not hashes_match:
             raise GroundedDiscoveryError("FROZEN_INPUT_MISMATCH")
+        if (spec.get("schema_version") == "1.3"
+                and (spec.get("observation_request") or {}).get("collection_mode") == "REUSE_ONLY"):
+            from solana_alpha_lab.factory.hfic_grounded_discovery import (
+                schedule_projection_for_census, verify_frozen_discovery_source_metadata,
+            )
+
+            verify_frozen_discovery_source_metadata(data_root, item, census_path, obs_path)
+
+            actual_schedule = schedule_projection_for_census(data_root, census_path)
+            if actual_schedule.get("schedule_context_gap"):
+                raise GroundedDiscoveryError(str(actual_schedule["schedule_context_gap"]))
+            if any(item.get(key) != actual_schedule.get(key) for key in
+                   ("schedule_sha256", "schedule_point_due_offset_seconds", "schedule_point_lateness")):
+                raise GroundedDiscoveryError("FROZEN_INPUT_SCHEDULE_MISMATCH")
         partitions.append((str(item.get("cohort_id")), census_path, obs_path))
         binding_cohorts.append(dict(item))
+    return public, pre, partitions, binding_cohorts
+
+
+def run_temporal_fixed_time_from_spec(
+    spec: Mapping[str, Any], *, root: Path,
+    capture_hooks: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Production adapter. Identity is checked before the evaluator runs."""
+
+    del root
+    data_root = dict(capture_hooks or {}).get("data_root")
+    if not isinstance(data_root, Path):
+        raise GroundedDiscoveryError("DATA_ROOT_REQUIRED")
+    public, pre, partitions, binding_cohorts = bind_frozen_fixed_time_inputs(spec, data_root=data_root)
+    recipe = spec["parameters"]["temporal_recipe"]
+    from solana_alpha_lab.factory.hfic_grounded_discovery import load_admitted_partition_rows, result_sha256
+
     loaded = load_admitted_partition_rows(
         data_root=None,
         binding_doc={"cohorts": binding_cohorts},

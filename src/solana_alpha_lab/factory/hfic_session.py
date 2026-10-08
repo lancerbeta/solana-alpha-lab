@@ -148,9 +148,11 @@ _INTERMEDIATE_CRITIC_TERMINALS = frozenset({"REVISE_ONCE", "PASS_TO_CLASSIFICATI
 class HficSessionError(ValueError):
     """Fail-closed HFIC session/protocol error."""
 
-    def __init__(self, code: str, *, uncovered_count: int | None = None) -> None:
+    def __init__(self, code: str, *, uncovered_count: int | None = None,
+                 detail: Mapping[str, Any] | None = None) -> None:
         self.code = code
         self.uncovered_count = uncovered_count
+        self.detail = dict(detail or {})
         super().__init__(code)
 
 
@@ -1161,6 +1163,14 @@ def _selected_candidate_block(
         required_caps = []
     decision_unlocked = str(card.get("decision_unlocked") or "NOT_DECLARED_IN_DRAFT")
     disconfirming = str(card.get("disconfirming_prediction") or "NOT_DECLARED_IN_DRAFT")
+    bindings = card.get("available_data_bindings", [])
+    if isinstance(bindings, list):
+        # Critic strings are narrative transport, never typed resolver input.
+        # Encode authored objects reversibly; retain legacy strings verbatim.
+        bindings = [
+            _canonical_bytes(item).decode("utf-8") if isinstance(item, Mapping) else item
+            for item in bindings
+        ]
     block: dict[str, Any] = {
         "candidate_id": identity.candidate_id,
         "claim": str(card.get("claim") or ""),
@@ -1186,7 +1196,7 @@ def _selected_candidate_block(
         or ["NOT_DECLARED_IN_DRAFT"],
         "execution_capacity_risks": card.get("execution_capacity_risks")
         or ["NOT_DECLARED_IN_DRAFT"],
-        "available_data_bindings": card.get("available_data_bindings") or [],
+        "available_data_bindings": bindings,
         "missing_or_forward_only_data": card.get("missing_or_forward_only_data") or [],
         "proposed_method": str(card.get("proposed_method") or "NOT_DECLARED_IN_DRAFT"),
         "cheapest_falsifier": str(card.get("cheapest_falsifier") or ""),
@@ -1198,6 +1208,9 @@ def _selected_candidate_block(
     }
     if packet_version == CRITIC_PACKET_VERSION_CURRENT:
         block.update(_freeze_owned_grounding_fields(card))
+    from solana_alpha_lab.factory.hfic_grounded_discovery import card_claim_scope
+
+    block.update(card_claim_scope(card))
     # A list-scoped candidate carries its machine rule and statement on every packet version; text cannot widen it.
     if card.get("research_scope_rule_sha256") is not None:
         block["research_scope_rule_sha256"] = str(card["research_scope_rule_sha256"])
@@ -1237,35 +1250,18 @@ def _build_runner_up_critic_packet(
     return packet
 
 
-_RUNNER_SCOPE_KEYS = (
-    "population",
-    "decision_timestamp",
-    "target",
-    "estimand",
-    "explanatory_condition",
-    "evidence_surface_mode",
-)
-
-
 def _proven_runner_scope(
     card: Mapping[str, Any],
     packet: Mapping[str, Any],
 ) -> dict[str, str]:
     """Scope axes that belong to this runner-up card, not the primary candidate."""
 
-    proven: dict[str, str] = {}
-    for key in (
-        "population",
-        "decision_timestamp",
-        "target",
-        "estimand",
-        "explanatory_condition",
-        "representation_scope",
-        "evidence_surface_mode",
-    ):
-        value = card.get(key)
-        if isinstance(value, str) and value.strip():
-            proven[key] = value
+    from solana_alpha_lab.factory.hfic_grounded_discovery import card_claim_scope
+
+    proven = card_claim_scope(card)
+    mode = card.get("evidence_surface_mode")
+    if isinstance(mode, str) and mode.strip():
+        proven["evidence_surface_mode"] = mode
     if "evidence_surface_mode" not in proven:
         grounded = packet.get("grounded_evidence")
         scope = grounded.get("candidate_scope") if isinstance(grounded, Mapping) else None
@@ -1294,26 +1290,12 @@ def _executed_scope_matches(executed: Mapping[str, Any], proven: Mapping[str, st
     must not keep its result under a runner-up target or estimand it never had.
     """
 
-    compared = False
-    for key in (
-        "population",
-        "decision_timestamp",
-        "target",
-        "estimand",
-        "explanatory_condition",
-        "evidence_surface_mode",
-        "representation_scope",
-    ):
-        raw_executed = executed.get(key)
-        raw_proven = proven.get(key)
-        executed_value = raw_executed.strip() if isinstance(raw_executed, str) else ""
-        proven_value = raw_proven.strip() if isinstance(raw_proven, str) else ""
-        if not executed_value and not proven_value:
-            continue
-        compared = True
-        if executed_value != proven_value:
-            return False
-    return compared
+    from solana_alpha_lab.factory.hfic_grounded_discovery import relate_look_scope
+
+    return relate_look_scope(executed, proven) == "LOOK_SCOPE_MATCH" and (
+        str(executed.get("evidence_surface_mode") or "").strip()
+        == str(proven.get("evidence_surface_mode") or "").strip()
+    )
 
 
 def _rebind_runner_up_grounded_evidence(
@@ -1338,11 +1320,18 @@ def _rebind_runner_up_grounded_evidence(
     if not same_look:
         drop.update(_COMPUTED_LOOK_KEYS)
     body = {key: value for key, value in grounded.items() if key not in drop}
-    if all(proven.get(key) for key in _RUNNER_SCOPE_KEYS):
-        scope = {key: proven[key] for key in _RUNNER_SCOPE_KEYS}
-        if proven.get("representation_scope"):
-            scope["representation_scope"] = proven["representation_scope"]
-        body["candidate_scope"] = scope
+    if not same_look:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import relate_look_scope
+
+        body["look_confirms_selected"] = False
+        body["look_scope_relation"] = relate_look_scope(executed_scope, proven)
+        body["look_context_result_refs"] = list(
+            grounded.get("result_refs") or grounded.get("look_context_result_refs") or []
+        )
+    from solana_alpha_lab.factory.hfic_grounded_discovery import _scope_missing
+
+    if not _scope_missing(proven, prefix=""):
+        body["candidate_scope"] = dict(proven)
         if not same_look:
             body["priors"] = []
         from solana_alpha_lab.factory.hfic_grounded_discovery import (
@@ -1855,6 +1844,7 @@ def freeze_draft(
         preflight_receipt=preflight_receipt,
         store=store,
     )
+    _validate_fresh_draft_scopes(draft, store=store, identities=identities)
     grounded_candidates: list[dict[str, Any]] | None = None
     if packet_version == "1.2":
         if repo_root is None:
@@ -2407,6 +2397,7 @@ def freeze_draft(
             repo_root=repo_root,
             identities=identities,
             draft=draft,
+            preflight_receipt=preflight_receipt,
             stage_time=bound_session_started_at(preflight_receipt),
         )
         store.rebuild_projection()
@@ -2999,14 +2990,18 @@ def persist_no_worthy_session(
             created_at=now,
         )
 
+    repair_context = (
+        isinstance(repair_admission, Mapping)
+        and repair_admission.get("action") == "RESUME_REPAIR_CONTINUATION"
+    )
+    packet = (
+        preflight_receipt.get("forge_context_packet")
+        if isinstance(preflight_receipt, Mapping) else None
+    )
     context_digest = frozen.get("forge_context_packet_sha256")
-    context_bytes = None
-    if isinstance(preflight_receipt, Mapping):
-        packet = preflight_receipt.get("forge_context_packet")
-        if isinstance(packet, Mapping):
-            context_bytes = _canonical_bytes(packet)
-            if not isinstance(context_digest, str) or len(context_digest) != 64:
-                context_digest = hashlib.sha256(context_bytes).hexdigest()
+    if not repair_context and isinstance(packet, Mapping):
+        if not isinstance(context_digest, str) or len(context_digest) != 64:
+            context_digest = hashlib.sha256(_canonical_bytes(packet)).hexdigest()
     created_at = render_canonical_utc(now)
     started_at = str(frozen.get("session_started_at") or created_at)
     if not isinstance(context_digest, str) or len(context_digest) != 64:
@@ -3016,6 +3011,23 @@ def persist_no_worthy_session(
         "forge_context_packet_sha256": context_digest,
         "session_started_at": started_at,
     }
+    context_dependencies = ()
+    if repair_context:
+        # The admitted repair receipt describes current context, while the
+        # parent next-action remains bound to its original saved dependency.
+        # Validate both coherent pairs; never splice a fresh inline packet
+        # onto the historical digest or rewrite the parent binding.
+        fresh_context = dict(preflight_receipt or {})
+        _verify_required_context_dependency(store, fresh_context)
+        _verify_required_context_dependency(store, bind_input)
+        context_dependencies = (fresh_context,)
+    else:
+        _verify_required_context_dependency(
+            store, {**bind_input, "forge_context_packet": packet}
+            if isinstance(packet, Mapping) else bind_input,
+        )
+    if isinstance(draft, Mapping):
+        _validate_fresh_draft_scopes(draft, store=store, identities=identities)
     action = bind_next_epistemic_action(
         next_action_draft,
         frozen_no_worthy=bind_input,
@@ -3027,14 +3039,6 @@ def persist_no_worthy_session(
     if isinstance(repair_admission, Mapping):
         repair_disposition = repair_admission.get(
             "repair_continuation_disposition_sha256"
-        )
-    if not (isinstance(repair_disposition, str) and repair_disposition):
-        persist_scientific_slot_admission(
-            store,
-            frozen,
-            repo_root=repo_root,
-            stage_time=stage_time,
-            representation_registry=representation_registry,
         )
     action_bytes = _canonical_bytes(action)
     action_sha = hashlib.sha256(action_bytes).hexdigest()
@@ -3303,7 +3307,13 @@ def persist_no_worthy_session(
                 },
             )
         )
-    store.append(records, transaction_id=transaction_id)
+    _append_session_records_with_slot(
+        store, records, transaction_id=transaction_id, binding=bind_input,
+        repo_root=repo_root, stage_time=now,
+        representation_registry=representation_registry,
+        reserve_slot=not bool(repair_disposition),
+        context_dependencies=context_dependencies,
+    )
     if isinstance(frozen, dict):
         frozen["next"] = action["action_type"]
         frozen["next_action"] = action
@@ -3526,6 +3536,86 @@ def _build_scientific_slot_admission_event(
         created_at=now,
     )
     return body, event
+
+
+def _append_session_records_with_slot(
+    store: Any,
+    records: Sequence[Any],
+    *,
+    transaction_id: str,
+    binding: Mapping[str, Any],
+    repo_root: Any,
+    stage_time: datetime,
+    representation_registry: Mapping[str, Any] | None,
+    reserve_slot: bool,
+    context_dependencies: Sequence[Mapping[str, Any]] = (),
+) -> None:
+    """Commit a new reservation and its lifecycle in one existing store lease."""
+
+    slot = _execution_identity_fields(binding).get("scientific_slot_sha256")
+    admission_event = None
+    if reserve_slot and isinstance(slot, str) and len(slot) == 64:
+        _, admission_event = _build_scientific_slot_admission_event(
+            binding, repo_root=repo_root, transaction_id=transaction_id,
+            stage_time=stage_time,
+        )
+    append_records = list(records)
+
+    def reservation_belongs_to_this_transaction() -> bool:
+        try:
+            saved = store.find_record(admission_event.record_id)
+        except Exception as exc:
+            if getattr(exc, "code", None) != "WRITE_LOOKUP_PENDING":
+                raise
+            # A published reservation is canonical even when its derived
+            # lookup journal still awaits append's recovery under the lease.
+            # This exceptional read must neither heal the index nor hide
+            # other integrity errors.
+            saved = next((item for item in store.iter_committed_records()
+                          if item.record_id == admission_event.record_id), None)
+        if saved is None:
+            raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+        return saved.transaction_id == transaction_id
+
+    if admission_event is not None:
+        observed = _existing_scientific_slot_admission(store, slot)
+        if observed is None or reservation_belongs_to_this_transaction():
+            append_records.insert(0, admission_event)
+
+    def recheck() -> None:
+        _verify_required_context_dependency(store, binding)
+        for dependency in context_dependencies:
+            _verify_required_context_dependency(store, dependency)
+        if admission_event is None:
+            return
+        observed = _existing_scientific_slot_admission(store, slot)
+        if observed is not None:
+            if str(observed.get("session_id") or "") != str(binding.get("session_id") or ""):
+                raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED")
+            if not _scientific_slot_admission_matches_binding(observed, binding):
+                raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING")
+            has_admission = any(item.record_id == admission_event.record_id for item in append_records)
+            if has_admission != reservation_belongs_to_this_transaction():
+                raise HficSessionError("SESSION_RESERVATION_APPEARED")
+            return
+        _assert_scientific_admission(
+            store, binding, repo_root=repo_root,
+            representation_registry=representation_registry,
+        )
+
+    for attempt in range(4):
+        try:
+            store.append(append_records, transaction_id=transaction_id, before_commit=recheck)
+            return
+        except Exception as exc:
+            if getattr(exc, "code", None) == "SESSION_RESERVATION_APPEARED":
+                append_records = list(records)
+                continue
+            if getattr(exc, "code", None) == "WRITER_BUSY" and attempt < 3:
+                time.sleep(0.05 * (attempt + 1))
+                continue
+            raise
+    raise HficSessionError("WRITER_BUSY")
 
 
 def list_scientific_slot_admissions(store: Any) -> list[dict[str, Any]]:
@@ -3947,6 +4037,8 @@ def persist_scientific_slot_admission(
         # cross-process writer lease is held.  A pre-check outside the lease
         # alone allows two different slots to both observe the same free AUTO
         # budget and then append.
+        if binding.get("forge_context_packet_sha256") is not None:
+            _verify_required_context_dependency(store, binding)
         observed = _existing_scientific_slot_admission(store, slot)
         if observed is not None:
             if str(observed.get("session_id") or "") != session_id:
@@ -4530,6 +4622,8 @@ def persist_generated_draft(
         data_root=Path(data_root),
         require_current_market_identity=True,
     )
+    _validate_fresh_draft_scopes(draft, store=store, identities=identities)
+    _verify_required_context_dependency(store, receipt)
     session_id = "HFIC-SESS-" + search_key[:16].upper()
     binding = {**receipt, **fields, "session_id": session_id}
     draft_bytes = _canonical_bytes(draft)
@@ -4651,6 +4745,7 @@ def persist_generated_draft(
     current_reservation = _existing_scientific_slot_admission(store, slot)
 
     def _recheck_generated_draft_under_writer_lease() -> None:
+        _verify_required_context_dependency(store, receipt)
         observed_draft = find_generated_draft(
             store,
             market_evidence_epoch_sha256=market,
@@ -4770,6 +4865,7 @@ def persist_frozen_session(
     repo_root: Any,
     identities: Sequence[Any],
     draft: Mapping[str, Any] | None = None,
+    preflight_receipt: Mapping[str, Any] | None = None,
     stage_time: datetime | None = None,
     representation_registry: Mapping[str, Any] | None = None,
 ) -> None:
@@ -4811,6 +4907,29 @@ def persist_frozen_session(
             repo_root=repo_root,
             representation_registry=representation_registry,
         )
+    context_binding = dict(frozen)
+    if preflight_receipt is not None:
+        if preflight_receipt.get("forge_context_packet_sha256") != frozen.get("forge_context_packet_sha256"):
+            raise HficSessionError("FORGE_CONTEXT_HASH_MISMATCH")
+        context_binding["forge_context_packet"] = preflight_receipt.get("forge_context_packet")
+    _verify_required_context_dependency(store, context_binding)
+    if isinstance(draft, Mapping):
+        _validate_fresh_draft_scopes(draft, store=store, identities=identities)
+    else:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            GroundedDiscoveryError, stored_look_scope, validate_fresh_card_scope,
+        )
+        for key in ("critic_input_packet", "runner_up_critic_input_packet"):
+            packet = frozen.get(key)
+            if not isinstance(packet, Mapping):
+                continue
+            evidence = packet.get("grounded_evidence")
+            look = stored_look_scope(store, evidence) if isinstance(evidence, Mapping) else None
+            try:
+                validate_fresh_card_scope(packet["selected_candidate"], look_scope=look,
+                                          require_look_axes=bool(look))
+            except GroundedDiscoveryError as exc:
+                raise HficSessionError(exc.code, detail=exc.detail) from exc
     repair_disposition = None
     if isinstance(repair_admission, Mapping):
         repair_disposition = repair_admission.get(
@@ -4818,14 +4937,6 @@ def persist_frozen_session(
         )
     # Authorized repair keeps the parent slot reservation; a new capability /
     # execution binding must not rewrite or collide with the reserved digest.
-    if not (isinstance(repair_disposition, str) and repair_disposition):
-        persist_scientific_slot_admission(
-            store,
-            frozen,
-            repo_root=repo_root,
-            stage_time=stage_time,
-            representation_registry=representation_registry,
-        )
     git = repository_git_snapshot(Path(repo_root))
     now = (
         _stage_datetime(lambda: stage_time)
@@ -5096,7 +5207,12 @@ def persist_frozen_session(
                 },
             )
         )
-    store.append(records, transaction_id=transaction_id)
+    _append_session_records_with_slot(
+        store, records, transaction_id=transaction_id, binding=context_binding,
+        repo_root=repo_root, stage_time=now,
+        representation_registry=representation_registry,
+        reserve_slot=not bool(repair_disposition),
+    )
 
 
 def persist_legacy_session(
@@ -6422,6 +6538,36 @@ def _verify_forge_context_artifact(store: Any, digest: str) -> None:
         raise HficSessionError(str(exc)) from exc
 
 
+def _verify_required_context_dependency(store: Any, binding: Mapping[str, Any]) -> None:
+    digest = binding.get("forge_context_packet_sha256")
+    if not isinstance(digest, str) or re.fullmatch(r"[0-9a-f]{64}", digest) is None:
+        raise HficSessionError("FORGE_CONTEXT_REQUIRED")
+    inline = binding.get("forge_context_packet")
+    if inline is not None and (not isinstance(inline, Mapping) or canonical_sha256(inline) != digest):
+        raise HficSessionError("FORGE_CONTEXT_HASH_MISMATCH")
+    _verify_forge_context_artifact(store, digest)
+
+
+def _validate_fresh_draft_scopes(draft: Mapping[str, Any], *, store: Any,
+                               identities: Sequence[Any]) -> None:
+    from solana_alpha_lab.factory.hfic_grounded_discovery import (
+        GroundedDiscoveryError, stored_look_scope, validate_fresh_card_scope,
+    )
+
+    evidence = draft.get("grounded_evidence")
+    selected_ref = draft.get("selected_candidate_ref")
+    selected = _resolve_ref(selected_ref, identities) if selected_ref else -1
+    look = stored_look_scope(store, evidence) if store is not None and isinstance(evidence, Mapping) else None
+    for index, card in enumerate(draft.get("candidates") or []):
+        if not isinstance(card, Mapping):
+            raise HficSessionError("HFIC_PROTOCOL_INVALID")
+        try:
+            validate_fresh_card_scope(card, look_scope=look,
+                                      require_look_axes=index == selected and bool(look))
+        except GroundedDiscoveryError as exc:
+            raise HficSessionError(exc.code, detail={"candidate_ordinal": index + 1, **exc.detail}) from exc
+
+
 def _effective_cycle_phase(
     phase: object,
     *,
@@ -6956,48 +7102,8 @@ def apply_revision(
         if isinstance(selected_card, Mapping):
             original_selected = dict(selected_card)
     selected_card = candidates[selected_index]
-    rebuilt_selected = {
-        "candidate_id": selected_identity.candidate_id,
-        "claim": str(selected_card.get("claim") or ""),
-        "nearest_prior_and_difference": str(
-            selected_card.get("nearest_prior_and_difference") or "NOT_DECLARED_IN_DRAFT"
-        ),
-        "actor_counterparty": str(selected_card.get("actor_counterparty") or ""),
-        "mechanism": str(selected_card.get("mechanism") or ""),
-        "why_not_arbitraged": str(
-            selected_card.get("why_not_arbitraged") or "NOT_DECLARED_IN_DRAFT"
-        ),
-        "population": str(selected_card.get("population") or ""),
-        "decision_timestamp": str(selected_card.get("decision_timestamp") or ""),
-        "primary_x": str(selected_card.get("primary_x_family") or ""),
-        "primary_y": str(selected_card.get("primary_y") or ""),
-        "horizon_notional": str(selected_card.get("horizon_notional") or ""),
-        "disconfirming_prediction": str(
-            selected_card.get("disconfirming_prediction") or "NOT_DECLARED_IN_DRAFT"
-        ),
-        "negative_control": str(selected_card.get("negative_control") or ""),
-        "alternative_world": str(
-            selected_card.get("alternative_world") or "NOT_DECLARED_IN_DRAFT"
-        ),
-        "confounders": selected_card.get("confounders") or ["NOT_DECLARED_IN_DRAFT"],
-        "pit_leakage_survivorship_risks": selected_card.get(
-            "pit_leakage_survivorship_risks"
-        )
-        or ["NOT_DECLARED_IN_DRAFT"],
-        "execution_capacity_risks": selected_card.get("execution_capacity_risks")
-        or ["NOT_DECLARED_IN_DRAFT"],
-        "available_data_bindings": selected_card.get("available_data_bindings") or [],
-        "missing_or_forward_only_data": selected_card.get("missing_or_forward_only_data")
-        or [],
-        "proposed_method": str(selected_card.get("proposed_method") or "NOT_DECLARED_IN_DRAFT"),
-        "cheapest_falsifier": str(selected_card.get("cheapest_falsifier") or ""),
-        "pass_fail_inconclusive_semantics": str(
-            selected_card.get("pass_fail_inconclusive_semantics") or "NOT_DECLARED_IN_DRAFT"
-        ),
-        "decision_unlocked": str(
-            selected_card.get("decision_unlocked") or "NOT_DECLARED_IN_DRAFT"
-        ),
-    }
+    rebuilt_selected = _selected_candidate_block(selected_identity, selected_card)
+    rebuilt_selected.pop("_required_capability_ids", None)
     if (
         isinstance(packet_in, Mapping)
         and packet_in.get("packet_version") == CRITIC_PACKET_VERSION_CURRENT
@@ -7035,6 +7141,18 @@ def apply_revision(
             raise HficSessionError("REVISION_MECHANISM_CHANGED")
         if normalize_text(left) != normalize_text(right):
             raise HficSessionError("REVISION_MECHANISM_CHANGED")
+    from solana_alpha_lab.factory.hfic_grounded_discovery import card_claim_scope
+
+    locked_scope = card_claim_scope(original_selected)
+    source_evidence = packet_in.get("grounded_evidence")
+    if isinstance(source_evidence, Mapping) and source_evidence.get("look_confirms_selected") is True:
+        # Saved confirming scope supplies locks for older readable projections;
+        # it never supplies a missing fresh declaration or a new result.
+        locked_scope.update(card_claim_scope(source_evidence.get("candidate_scope")))
+    if card_claim_scope(selected_card) != locked_scope or (
+        str(selected_card.get("claim_form") or "CAUSAL") != str(original_selected.get("claim_form") or "CAUSAL")
+    ):
+        raise HficSessionError("REVISION_MECHANISM_CHANGED")
     existing_ids = {
         str(item) for item in (existing.get("candidate_ids") or []) if str(item)
     }

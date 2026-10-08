@@ -35,6 +35,32 @@ def _fixture(name: str) -> dict:
 
 
 class ObservationScheduleCompilerTests(unittest.TestCase):
+    def test_proven_reuse_does_not_charge_future_collection_budget(self) -> None:
+        document = load_observation_schedule(ROOT, "tests/fixtures/observation_schedule/common_panel.yaml")
+        document = copy.deepcopy(document)
+        document["budgets"]["provider_calls_lifetime_max"] = 1
+        index = CoverageIndex()
+        index.add_snapshot(snapshot_sha256="b" * 64, schedule=document,
+                           availability_cutoff=datetime(2026, 9, 1, tzinfo=UTC))
+        for mode, expected in (("REUSE_ONLY", "PANEL_REUSE_READY"),
+                               ("REUSE_OR_SCHEDULE", "PANEL_REUSE_READY"),
+                               ("SCHEDULE_ONLY", "BLOCKED_BUDGET")):
+            with self.subTest(mode=mode):
+                result = compile_observation_request(
+                    {"observation_request": {**document, "collection_mode": mode,
+                     "requested_evidence_role": "EXPLORATORY_REUSE"},
+                     "availability_cutoff": "2026-09-01T12:00:00Z",
+                     "as_of": "2026-09-01T12:00:00Z"}, root=ROOT, coverage=index)
+                self.assertEqual(result.terminal, expected)
+                if expected == "PANEL_REUSE_READY":
+                    self.assertEqual(result.budget.provider_calls_lifetime_max, 0)
+        missing = compile_observation_request(
+            {"observation_request": {**document, "collection_mode": "REUSE_ONLY",
+             "requested_evidence_role": "EXPLORATORY_REUSE"},
+             "availability_cutoff": "2026-09-01T12:00:00Z",
+             "as_of": "2026-09-01T12:00:00Z"}, root=ROOT)
+        self.assertEqual(missing.terminal, "BLOCKED_BUDGET")
+
     def test_common_panel_compiles_to_activation_required(self) -> None:
         result = compile_schedule_document(_fixture("common_panel.yaml"), root=ROOT)
         self.assertEqual(result.terminal, "SCHEDULE_ACTIVATION_REQUIRED")
