@@ -5202,7 +5202,8 @@ def main(argv: list[str] | None = None) -> int:
         if isinstance(exc, HficSessionError) and code == "CLOSED_FAMILY_REOPEN":
             print(code, file=sys.stderr)
             return emit({"reason_code": code, "detail": exc.detail,
-                         "scientific_negative": False, "writes": False,
+                         "scientific_negative": False, "writes": False, "status": "BLOCKED",
+                         "owner_readout": "Эта область уже закрыта отдельным typed family ledger; источник указан в detail.source_terminal. Сохраните закрытие. Новый существенно отличный scope возможен только с отдельным основанием; переименование и повтор той же карточки не подходят.",
                          "next_action": exc.detail["next_action"]}, exit_code=2)
         if isinstance(exc, HficSessionError) and code.startswith("FORGE_CONTEXT_"):
             print(code, file=sys.stderr)
@@ -5213,6 +5214,8 @@ def main(argv: list[str] | None = None) -> int:
             locator = exc.detail.get("relative_locator")
             digest = exc.detail.get("required_context_sha256")
             owner_readout = (
+                "Для сохранённого look нужен новый persistent preflight на том же data root с тем же discovery contract. Повторите preflight и используйте его receipt для persist/freeze; новый look не открывайте."
+                if next_action == "RUN_PERSISTENT_PREFLIGHT_REUSE_SAVED_LOOK" else
                 f"Исходный контекст недоступен. Восстановите исходные байты по <data-root>/{locator}, сверьте SHA-256 {digest} и повторите тот же readback. Если исходных байтов нет — BLOCKED; замену не генерируйте."
                 if locator and digest else
                 "Связь с исходным контекстом нарушена. Проверьте detail и исходные байты; если их нельзя восстановить и сверить — BLOCKED. Новый context и look не создавайте."

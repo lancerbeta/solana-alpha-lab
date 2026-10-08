@@ -181,29 +181,40 @@ class ExplicitOutcomeTests(unittest.TestCase):
             self.assertIn('family_suppression_authority=false',text)
             self.assertNotIn('family_closed=',text)
             self.assertIn('смысл:',text)
+            self.assertNotIn('семейство не закрыто',text)
+            self.assertIn('сам вердикт не закрывает семейство',text)
 
 class SessionHistoryTests(unittest.TestCase):
     def test_origin_fallback_and_search_facet_stay_in_their_session(self):
-        from tests.test_research_store import event_fixture
-        from solana_alpha_lab.factory.prior_work import query_data_plane_prior_work
+        from datetime import timedelta
+        from tests.test_research_store import event_fixture,NOW
+        from solana_alpha_lab.factory.prior_work import query_data_plane_prior_work,query_hypotheses
         import duckdb
         store=self._store_chain()
         for record_id,session,origin_kind in (('ORIGIN-OLD','SESS-0','OLD_ONLY_KIND'),('ORIGIN-UNBOUND',None,'LEGACY_ONLY_KIND')):
             payload={'origin_id':record_id,'origin_kind':origin_kind}
             if session is not None: payload['session_id']=session
             event=event_fixture(record_id=record_id,record_kind='HYPOTHESIS_ORIGIN',transaction_id='RESEARCH-TXN-'+record_id,payload=payload).model_copy(update={'run_id':None,'hypothesis_version_id':'HYP-SAME'})
+            if session is not None:
+                event=event.model_copy(update={'effective_at':NOW+timedelta(seconds=5),'first_reliable_available_at':NOW+timedelta(seconds=5)})
             store.append([event],transaction_id=event.transaction_id)
         legacy=event_fixture(record_id='HYP-LEGACY',record_kind='HYPOTHESIS_VERSION',transaction_id='RESEARCH-TXN-HYP-LEGACY',payload={'hypothesis_version_id':'HYP-LEGACY','definition_sha256':'b'*64,'origin_id':'ORIGIN-LEGACY'}).model_copy(update={'run_id':None,'hypothesis_version_id':'HYP-LEGACY'})
         origin=event_fixture(record_id='ORIGIN-LEGACY',record_kind='HYPOTHESIS_ORIGIN',transaction_id='RESEARCH-TXN-ORIGIN-LEGACY',payload={'origin_id':'ORIGIN-LEGACY','origin_kind':'LEGACY_MATCH'}).model_copy(update={'run_id':None,'hypothesis_version_id':'HYP-LEGACY'})
         for event in (legacy,origin): store.append([event],transaction_id=event.transaction_id)
         store.rebuild_projection()
         projection=Path(self.tmp.name)/'projections'/'research_memory.duckdb'
+        before=query_hypotheses(projection,'2026-08-25T12:30:04Z')
+        self.assertEqual({r['session_id']:r['origin_kind'] for r in before if r['hypothesis_version_id']=='HYP-SAME'},{'SESS-0':None,'SESS-1':None,'SESS-2':None})
+        before_search=query_data_plane_prior_work(projection,{'query_id':'SESSION-ORIGIN-BEFORE','as_of':'2026-08-25T12:30:04Z','max_results':10,'predicates':{'origin_kinds':['OLD_ONLY_KIND']}})
+        self.assertEqual(before_search['result_count'],0)
         with duckdb.connect(str(projection),read_only=True) as db:
             for view in ('hypotheses','prior_work'):
                 rows=db.execute(f'SELECT hypothesis_version_id, session_id, origin_kind FROM {view}').fetchall()
                 self.assertEqual({(h,s):k for h,s,k in rows},{('HYP-SAME','SESS-0'):'OLD_ONLY_KIND',('HYP-SAME','SESS-1'):None,('HYP-SAME','SESS-2'):None,('HYP-LEGACY',None):'LEGACY_MATCH'})
         result=query_data_plane_prior_work(projection,{'query_id':'SESSION-ORIGIN-001','as_of':'2026-08-25T12:30:10Z','max_results':10,'predicates':{'origin_kinds':['OLD_ONLY_KIND']}})
         self.assertEqual([(r['hypothesis_version_id'],r['session_id']) for r in result['results']],[('HYP-SAME','SESS-0')])
+        after=query_hypotheses(projection,'2026-08-25T12:30:10Z')
+        self.assertEqual({r['session_id']:r['origin_kind'] for r in after if r['hypothesis_version_id']=='HYP-SAME'},{'SESS-0':'OLD_ONLY_KIND','SESS-1':None,'SESS-2':None})
 
     def test_late_old_decision_does_not_erase_current_session_outcome(self):
         from datetime import timedelta
@@ -225,6 +236,28 @@ class SessionHistoryTests(unittest.TestCase):
         self.assertEqual(compact_prior_entry(hyp_id,payload,decision[(hyp_id,CONTROL_SESSION)])['reason_code'],'KILL_LOW_INFORMATION_VALUE')
         entry=ranked_prior_entries_for_ids([hyp_id],[payload],store=store)[0]
         self.assertEqual(entry['reason_code'],'KILL_LOW_INFORMATION_VALUE')
+
+    def test_two_session_compact_snapshot_keeps_new_verdict_after_late_old_decision(self):
+        from datetime import timedelta
+        from types import SimpleNamespace
+        from tests.test_research_store import event_fixture,NOW
+        from tests.test_hfic_forge_prior_context_capacity_repair_v1 import _fat_hfic_candidate,CONTROL_SESSION
+        from solana_alpha_lab.factory.hfic_prior_memory import build_prior_memory_snapshot
+        hyp_id='HFIC-CAND-FAT0001DEADBEEF'
+        body=json.loads(_fat_hfic_candidate(1,transaction_id='RESEARCH-TXN-TEST').payload_json)
+        rows=[]
+        for record_id,session,second in (('HYP-OLD','SESS-OLD',0),('HYP-NEW',CONTROL_SESSION,1)):
+            payload={**body,'session_id':session}
+            row=event_fixture(record_id=record_id,record_kind='HYPOTHESIS_VERSION',payload=payload).model_copy(update={'run_id':None,'hypothesis_version_id':hyp_id,'effective_at':NOW+timedelta(seconds=second)})
+            rows.append(row)
+        for record_id,session,reason,second in (('DEC-NEW',CONTROL_SESSION,'KILL_LOW_INFORMATION_VALUE',2),('DEC-LATE-OLD','SESS-OLD','KILL_MECHANISM',3)):
+            payload={'decision_event_id':record_id,'hypothesis_version_id':hyp_id,'session_id':session,'decision_kind':'REJECT','reason_code':reason}
+            rows.append(event_fixture(record_id=record_id,record_kind='DECISION_EVENT',payload=payload).model_copy(update={'run_id':None,'hypothesis_version_id':hyp_id,'effective_at':NOW+timedelta(seconds=second)}))
+        store=SimpleNamespace(iter_committed_records=lambda:iter(rows))
+        snapshot=build_prior_memory_snapshot(store,store_inventory_digest='a'*64,repo_root=ROOT)
+        self.assertEqual(snapshot['emitted_count'],1)
+        self.assertEqual(snapshot['capsules'][0]['session_id'],CONTROL_SESSION)
+        self.assertEqual(snapshot['capsules'][0]['reason_code'],'KILL_LOW_INFORMATION_VALUE')
 
     def _store_chain(self, *, fork=False, last_parent=None):
         import tempfile

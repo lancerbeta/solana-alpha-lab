@@ -619,9 +619,13 @@ persist `--saved-draft-sha256` before freeze.
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write --format json --owner-focus AUTO
 ```
 
-Если saved context отсутствует или повреждён (`FORGE_CONTEXT_*`, exit 2), это `BLOCKED`: возьмите `detail.relative_locator` и `detail.required_context_sha256` из ответа, восстановите **исходные** байты в `<data-root>/<relative_locator>`, сверьте SHA-256 и повторите тот же no-write readback. Если исходных байтов нет, остановитесь; новый context и look не создавайте. `RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY` — машинное имя этого шага.
+Если readback вернул `FORGE_CONTEXT_*` с `RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY` (exit 2), это `BLOCKED`: возьмите `detail.relative_locator` и `detail.required_context_sha256` из ответа, восстановите **исходные** байты в `<data-root>/<relative_locator>`, сверьте SHA-256 и повторите тот же no-write readback. Если исходных байтов нет, остановитесь; новый context и look не создавайте.
+
+Если `persist-draft`/`freeze` вернул `FORGE_CONTEXT_REQUIRED` и `RUN_PERSISTENT_PREFLIGHT_REUSE_SAVED_LOOK`, выполните новый persistent preflight на том же data root с тем же discovery contract и используйте его receipt с уже сохранённым look; исходный context ещё не привязан, восстанавливать файл по locator нечего. Повторный look не открывайте.
 
 Если `EXACT_PRIOR_SCOPE_MATCH` отказал в повторном look, передайте исходную карточку в `prior --candidate <canonical-candidate-json>` на том же `--data-root`, возьмите `session_id` точного совпадения и прочитайте `show-session --session-id <session_id>`; сохранённый результат заменяет повторный look. Новый вопрос требует новой области доказательства и отдельного основания.
+
+Если `CLOSED_FAMILY_REOPEN` вернул `BLOCKED`, `detail.source_terminal` указывает источник отдельного typed family-close. Сохраните закрытие; переименование карточки не создаёт новый scope. Существенно отличный scope допускается только с отдельным основанием и повторной проверкой ledger.
 
 Authorized persist (same slash, after READY):
 

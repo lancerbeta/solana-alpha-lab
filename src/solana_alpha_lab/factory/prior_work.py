@@ -352,6 +352,64 @@ def _derived_state(
     return "NO_DECISION"
 
 
+def _bind_origin_as_of(
+    connection: duckdb.DuckDBPyConnection,
+    hypotheses: list[dict[str, Any]],
+    cutoff: datetime,
+) -> None:
+    """Replace current-view origin with authored or session-bound visible origin."""
+    records = _rows(
+        connection,
+        """
+        SELECT record_id, record_kind, stable_id, hypothesis_version_id,
+               json_extract_string(payload_json, '$.session_id') AS session_id,
+               json_extract_string(payload_json, '$.origin_id') AS origin_id,
+               json_extract_string(payload_json, '$.origin_kind') AS origin_kind,
+               effective_at, first_reliable_available_at
+        FROM _research_events
+        WHERE record_kind IN ('HYPOTHESIS_VERSION', 'HYPOTHESIS_ORIGIN')
+          AND first_reliable_available_at <= ?
+        """,
+        [cutoff.replace(tzinfo=None)],
+    )
+    authored: dict[str, dict[str, Any]] = {}
+    by_hypothesis: dict[tuple[str, str | None], dict[str, Any]] = {}
+    by_origin: dict[tuple[str, str | None], dict[str, Any]] = {}
+
+    def newer(record: Mapping[str, Any]) -> tuple[Any, Any, Any]:
+        return (record["effective_at"], record["first_reliable_available_at"], record["record_id"])
+
+    for record in records:
+        if record["record_kind"] == "HYPOTHESIS_VERSION":
+            authored[record["record_id"]] = record
+            continue
+        for index, stable in (
+            (by_hypothesis, record.get("hypothesis_version_id")),
+            (by_origin, record.get("stable_id")),
+        ):
+            if not stable:
+                continue
+            key = (str(stable), record.get("session_id"))
+            previous = index.get(key)
+            if previous is None or newer(record) > newer(previous):
+                index[key] = record
+    for hypothesis in hypotheses:
+        source = authored.get(hypothesis["record_id"])
+        if source is None:
+            raise PriorWorkError("HYPOTHESIS_SOURCE_UNAVAILABLE")
+        if source.get("origin_kind") is not None:
+            hypothesis["origin_kind"] = source["origin_kind"]
+            continue
+        session = hypothesis.get("session_id")
+        matches = [
+            row for row in (
+                by_hypothesis.get((hypothesis["hypothesis_version_id"], session)),
+                by_origin.get((source.get("origin_id"), session)),
+            ) if row is not None
+        ]
+        hypothesis["origin_kind"] = max(matches, key=newer)["origin_kind"] if matches else None
+
+
 def query_hypotheses(
     projection_path: Path,
     as_of: str,
@@ -365,6 +423,7 @@ def query_hypotheses(
             cutoff,
             order_by="hypothesis_version_id, record_id",
         )
+        _bind_origin_as_of(connection, hypotheses, cutoff)
         runs = _eligible_rows(
             connection,
             "experiment_runs",
@@ -412,6 +471,7 @@ def query_data_plane_prior_work(
             cutoff,
             order_by="hypothesis_version_id, record_id",
         )
+        _bind_origin_as_of(connection, hypotheses, cutoff)
         runs = _eligible_rows(
             connection,
             "experiment_runs",

@@ -1377,9 +1377,9 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             lines.append("  applicability: " + explanation["prior_applicability"] +
                          "; class=" + explanation["outcome_class"] + "; family_suppression_authority=false")
             if explanation["prior_applicability"] == "CANDIDATE_AND_BOUND_EVIDENCE":
-                lines.append("  смысл: отказ относится к этому кандидату и связанной с ним evidence; семейство не закрыто, переносимость на другие условия неизвестна")
+                lines.append("  смысл: отказ относится к этому кандидату и связанной с ним evidence; сам вердикт не закрывает семейство, отдельное закрытие проверяйте по typed ledger; переносимость на другие условия неизвестна")
             elif explanation["prior_applicability"] == "UNKNOWN":
-                lines.append("  смысл: область применимости вердикта неизвестна; семейство не закрыто")
+                lines.append("  смысл: область применимости вердикта неизвестна; сам вердикт не закрывает семейство, отдельное закрытие проверяйте по typed ledger")
             else:
                 lines.append("  смысл: этот терминал сам по себе не закрывает гипотезу или семейство")
         if selected or mechanism:

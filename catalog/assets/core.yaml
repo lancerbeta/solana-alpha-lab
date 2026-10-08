@@ -32110,7 +32110,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/prior_work.py', repository_path: src/solana_alpha_lab/factory/prior_work.py}
-  integrity: {kind: sha256, sha256: 58fb95afa9e872dd6e3964f11546afb5e9e50cb92f765697b029c81d47ae8caf}
+  integrity: {kind: sha256, sha256: 66842a9b46b6e9ea68ca73683ed95e350a8bf95d7e3046a9ee9b16f601f1800c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32352,7 +32352,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 417390c9e0d1350ba795f3d3524abe3f61fece7ca9dbe1a4bced482c05926c0f}
+  integrity: {kind: sha256, sha256: ae38f687f58fc2a35fbb90d906c81d4abfe8dd17011471a9c4c1af9901c3b7d5}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34658,7 +34658,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 78066111c94c3b8f8f6db5ec16cc5a23cf5c9aa0025c706e1eae97c5849c153e}
+  integrity: {kind: sha256, sha256: 2563fb2753d282125f27a25b45b38468d8f7ab48d03db8b5d86d5a5975bc5334}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -38471,7 +38471,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_REPRESENTATION_LADDER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_ladder.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_ladder.py}
-  integrity: {kind: sha256, sha256: 16e2e82264bbfc4f2f9d490ead3699e51f8d4ad36a9592a7a36d7b7c4a3c3433}
+  integrity: {kind: sha256, sha256: ccfb74b62701382cd530edb0cd6680a767571358a2b22084b566f5fa08c2cb4d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}
