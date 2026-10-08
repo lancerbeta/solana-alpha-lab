@@ -4,8 +4,8 @@
   "review_id": "FORGE-RESEARCH-POLICY-RUNTIME-FACTORY-FIT-001",
   "as_of": "2026-10-07",
   "task_id": "FORGE_RESEARCH_POLICY_RUNTIME_V1",
-  "reviewed_bindings_sha256": "650dc0df617332c96c9aff5d37b09553b00bef6e3be82395f562820f7dc6f036",
-  "reviewed_inventory_sha256": "663678e6f1d001902f2b724963c08152d2bfa04a4885c1e4c790f7b87d691d70",
+  "reviewed_bindings_sha256": "e6071ab053f84be9c98a6d9bfcd877d9b53d5440f5ef2d687fc26fdc713375d9",
+  "reviewed_inventory_sha256": "9a37bea89cf88fcbf021492eaed061ca5c90b2c3e087e6d990ed326cc727027d",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
