@@ -1,0 +1,34 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-AUDIT-CI-TIMEOUT-FACTORY-FIT-001",
+  "as_of": "2026-10-08",
+  "task_id": "FORGE_RELIABILITY_AUDIT_CONTINUATION_V1",
+  "reviewed_bindings_sha256": "",
+  "reviewed_inventory_sha256": "",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_CI_ONLY_NO_PRODUCT_OR_SCIENTIFIC_CHANGE",
+    "flexibility_and_history": "PASS_CI_ONLY_NO_PRODUCT_OR_SCIENTIFIC_CHANGE",
+    "context_efficiency": "PASS_CI_ONLY_NO_PRODUCT_OR_SCIENTIFIC_CHANGE",
+    "research_truth": "PASS_CI_ONLY_NO_PRODUCT_OR_SCIENTIFIC_CHANGE",
+    "owner_operability": "PASS_CI_ONLY_NO_PRODUCT_OR_SCIENTIFIC_CHANGE",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_EXECUTION_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_CI_ONLY_NO_PRODUCT_OR_SCIENTIFIC_CHANGE",
+    "build_vs_buy": "PASS_CI_ONLY_NO_PRODUCT_OR_SCIENTIFIC_CHANGE",
+    "security": "PASS_CI_ONLY_NO_PRODUCT_OR_SCIENTIFIC_CHANGE",
+    "red_team": "PASS_CI_ONLY_NO_PRODUCT_OR_SCIENTIFIC_CHANGE"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "Ordinary reviewed Git revert restores the known 30-minute CI timeout; research history is untouched.",
+  "limits": [
+    "NO_ADDITIONAL_PRODUCT_REPAIR",
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_LIVE_ACCEPTANCE",
+    "NO_MERGE"
+  ]
+}

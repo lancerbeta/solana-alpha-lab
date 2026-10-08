@@ -1,42 +1,35 @@
 ---
 task_id: FORGE_RELIABILITY_AUDIT_CONTINUATION_V1
-task_version: '1.0'
+task_version: '1.1'
 status: IN_PROGRESS
 as_of: '2026-10-08'
 owner: GOAL_OWNER
-allowed_routes: [DIRECT_CODEX_DELIVERY]
-required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
+allowed_routes:
+- DIRECT_CODEX_DELIVERY
+required_review_roles:
+- CODE_REVIEWER
+- GOAL_DOD_CRITIC
+- ARCHITECTURE_CRITIC
+- OWNER_UX_CRITIC
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 0dbe4d4bb5ce9703332a0620987a47eac05c4cdc
+  expected_base: fd00836ea6066b2c47216e89b0187d1a096f8643
   expected_upstream: origin/main
-  expected_upstream_oid: 0dbe4d4bb5ce9703332a0620987a47eac05c4cdc
-  expected_branch: codex/forge-reliability-audit-v1
+  expected_upstream_oid: fd00836ea6066b2c47216e89b0187d1a096f8643
+  expected_branch: codex/forge-reliability-audit-ci-timeout
   dirty_mode: ALLOW_REPORTED
-objective: >-
-  Complete the bounded offline continuation of the existing Forge reliability
-  audit through K1-K6, preserving original O01-O12/P01-P08/R1-R8/J1-J5
-  denominators, raw failures and scientific authority; deliver one remotely
-  readable evidence PR and at most one connected repair of a reproduced
-  material defect in an existing owner and its direct consumers.
+objective: Complete delivery of the already merged Forge audit with an owner-authorized
+  60-minute full CI test timeout for both pull_request and push/main. This follow-up
+  changes CI only; PREVIEW remains the sole product repair and all scientific PARTIAL
+  findings remain frozen in PR 386.
 managed_write_set:
-- docs/tasks/FORGE_RELIABILITY_AUDIT_CONTINUATION_V1.md
-- docs/contracts/forge_reliability_audit_continuation_v1.md
-- docs/reports/forge_reliability_audit_continuation_v1/**
-- docs/evidence/forge_reliability_audit_continuation_v1/**
-- tests/test_forge_reliability_audit_continuation_v1.py
-- tests/test_ci.py
+- .github/workflows/ci.yml
 - scripts/validate_ci.py
 - scripts/render_ci_workflow.py
-- .github/workflows/ci.yml
-- tests/fixtures/forge_reliability_audit_continuation_v1/**
-- src/solana_alpha_lab/factory/hfic_ordinary_operation.py
-- docs/contracts/forge_research_policy_runtime_v1.md
+- tests/test_ci.py
 - catalog/assets/core.yaml
-- catalog/assets/lifecycle.yaml
-- catalog/catalog_manifest.yaml
-- catalog/generated/**
-- docs/PROJECT_MAP.md
+- docs/tasks/FORGE_RELIABILITY_AUDIT_CONTINUATION_V1.md
+- docs/evidence/forge_reliability_audit_ci_timeout_v1/**
 external_caps:
   network: false
   credentials: false
@@ -45,31 +38,54 @@ external_caps:
   cash_spend: false
   deployment: false
 stop_conditions:
-- STOP_NEW_EXACT_OWNER_MERGE_PHRASE_AFTER_CI_AND_READINESS
+- STOP_GREEN_CI_AND_READINESS_REQUIRED_BEFORE_OWNER_DELEGATED_MACHINE_PHRASE
 - STOP_LIVE_VPS_REAL_RESEARCH_HOLDOUT_PROVIDER_CREDENTIAL_DEPLOY_MONEY
-- STOP_SECOND_INDEPENDENT_REPAIR_OR_NEW_CAPABILITY
+- STOP_SECOND_PRODUCT_REPAIR_OR_NEW_CAPABILITY
 - STOP_NATIVE_RESEARCH_OUTPUTS_OVER_4
-- STOP_DEFAULT_OR_RSS_LIMIT_INCREASE_SCIENTIFIC_SEMANTICS_CHANGE
+- STOP_PRODUCT_DEFAULT_OR_RSS_LIMIT_INCREASE_SCIENTIFIC_SEMANTICS_CHANGE
 - STOP_MATERIAL_AUTHORITY_OR_TRUTH_CONFLICT
 context_requirements:
-  catalog_asset_ids: [MODULE-HFIC-TEMPORAL-DISCOVERY-001, MODULE-HFIC-PREFLIGHT-ADMISSION-001, CONFIG-EXPERIMENT-CAPABILITY-REGISTRY-V2-001]
-  l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
+  catalog_asset_ids:
+  - CI-VALIDATOR-001
+  - CI-WORKFLOW-001
+  l2_roles:
+  - ARCHITECTURE_DECISIONS
+  - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS:
-    - docs/contracts/forge_grounded_handoff_closure_v1.md
-    - docs/contracts/forge_research_policy_runtime_v1.md
-    - docs/contracts/forge_list_aware_research_scope_v1.md
-    - docs/contracts/experiment_evidence_decision_v1.md
+    - docs/agent/DELIVERY_HARNESS_PROTOCOL.md
+    - delivery-harness/project-profile.yaml
     DELIVERY_EVIDENCE:
-    - docs/evidence/forge_reliability_audit_continuation_v1/delivery_completion.json
-    - docs/evidence/forge_reliability_audit_continuation_v1/independent_review.json
-    - docs/evidence/forge_reliability_audit_continuation_v1/factory_fit.json
+    - docs/evidence/forge_reliability_audit_ci_timeout_v1/delivery_completion.json
+    - docs/evidence/forge_reliability_audit_ci_timeout_v1/independent_review.json
+    - docs/evidence/forge_reliability_audit_ci_timeout_v1/factory_fit.json
     HISTORICAL_CONTEXT: []
 ---
+
+## Active owner replan: CI timeout on PR and main
+
+The Forge audit and sole PREVIEW product repair are already merged in PR #386,
+commit fd00836ea6066b2c47216e89b0187d1a096f8643. The owner then explicitly
+required the same one-hour test limit on main. The earlier text below is the
+historical phase-1 contract, frozen in that commit; only the current frontmatter
+write set applies to this CI-only follow-up.
+
+Set the existing full-test job to 60 minutes for both PR and main; remove the
+one-PR expression. No test commands, assertions, aggregator, hooks, owner gate,
+profile, product defaults, RSS limits, data schemas or research consumers change.
+Owner delegation of the machine-rendered merge phrase after green exact-head CI
+and readiness remains in force. Finish this tiny CI follow-up through guarded
+merge and successful exact-main post-merge readback, without another owner pause.
+
+Entry tools: existing Git/gh, renderer, validator and Harness; NOW=NONE.
+No permanent audit harness, new provider, live/VPS work or scientific output.
+
+## Historical phase 1 (PR #386)
+
 
 # FORGE_RELIABILITY_AUDIT_CONTINUATION_V1
 

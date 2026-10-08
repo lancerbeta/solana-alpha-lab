@@ -1,0 +1,35 @@
+{
+  "schema": "BOUNDED_CI_TIMEOUT_EVIDENCE_V1",
+  "product_repairs": 0,
+  "audit_pr": 386,
+  "audit_merge": "fd00836ea6066b2c47216e89b0187d1a096f8643",
+  "pr_ci": {
+    "run": 37794567203,
+    "head": "4b4f26a7ebcc33d6d93cfb2af1d50531659519be",
+    "conclusion": "success",
+    "shard4_seconds": 1540
+  },
+  "main_attempt1": {
+    "run": 37798838954,
+    "job": 113385317289,
+    "head": "fd00836ea6066b2c47216e89b0187d1a096f8643",
+    "conclusion": "cancelled",
+    "annotation": "The job has exceeded the maximum execution time of 30m0s",
+    "selected_cases": 1154,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 20,
+    "test_elapsed_seconds": 1794.493,
+    "aggregator": "FAILURE_ON_CANCELLED_DEPENDENCY"
+  },
+  "new_timeout_minutes": 60,
+  "scope": "FULL_CI_TEST_JOB_ALL_SHARDS_PR_AND_MAIN",
+  "checks": "python -B -m unittest tests.test_ci.CiWorkflowTests -q",
+  "targeted_cases": 14,
+  "targeted_verdict": "PASS",
+  "non_claims": [
+    "NO_RELIABILITY_SCORE_INCREASE",
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_NEW_PRODUCT_REPAIR"
+  ]
+}
