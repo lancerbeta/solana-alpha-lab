@@ -80,7 +80,7 @@ stop_conditions:
 - STOP_MATERIAL_TRUTH_CONFLICT
 context_requirements:
   catalog_asset_ids: []
-  l2_roles: [ARCHITECTURE_DECISIONS]
+  l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
