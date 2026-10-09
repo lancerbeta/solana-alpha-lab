@@ -60,8 +60,10 @@ for added tests, excess retries/repairs, first-head CI and available verificatio
 time from existing handbacks. Missing telemetry stays UNKNOWN. No instrumentation,
 automation, duplicated real-task execution or live/science experiment is added.
 KEEP only if excess steps disappear and gates/material risks remain covered;
-PATCH a named missed risk; rollback uses an inverse policy patch through owner gate
-and preserves regression evidence. This is an applicability observation, not a
+PATCH a named missed risk; rollback inverses the two policy owners, re-pins only
+the same TASK-30 artifact_bindings.domain_policy.sha256 to restored policy bytes,
+runs scoped Catalog sync and uses the same owner gate. It preserves regression
+evidence and all other TASK-30 values. This is an applicability observation, not a
 statistical causal-effect estimate. Existing merge-readiness and the exact owner
 phrase remain the next delivery gate; the brief itself authorizes no merge.
 
@@ -89,3 +91,7 @@ Captured output SHA256: `700bf3b2ab8e27b1aae0237ad22a74987ad77f7865455ed7b86b8c9
 Source-rehash scope: two existing assets, one registry rewrite, no navigation
 or full fallback; impacted closure idempotency PASS. Reconciled Entry CHECK
 and exact contract CONTEXT PASS. No new or modified test files.
+
+Independent code review identified the missing explicit rollback step for the
+live policy digest. The correction above adds that integrity maintenance step;
+primary policy, test bytes and provider/scientific claims remain unchanged.

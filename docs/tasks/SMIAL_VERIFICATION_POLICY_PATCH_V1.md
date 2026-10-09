@@ -143,5 +143,7 @@ this base before preflight/push. Old-base review is not current readiness.
   not measured defect-rate, development-cost or agent-behavior improvement.
 - Existing checks, bound evidence, exact-head CI and machine readiness pass.
 
-Rollback: an ordinary inverse patch to these two instruction owners, regenerate
-impacted Catalog integrity and use the same owner gate. Keep regression evidence.
+Rollback: an ordinary inverse patch to the two instruction owners, re-pin only
+the same TASK-30 artifact_bindings.domain_policy.sha256 to the restored policy
+bytes, regenerate impacted Catalog integrity with scoped sync and use the same
+owner gate. Keep regression evidence and all other TASK-30 values unchanged.
