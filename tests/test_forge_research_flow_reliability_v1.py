@@ -108,6 +108,53 @@ class CardTransportTests(unittest.TestCase):
         self.assertEqual(block["alternative_world"], "ALT_MARKER")
         self.assertEqual(block["mundane_alternative"], "MUNDANE_MARKER")
 
+
+class CrashReservationRecoveryTests(unittest.TestCase):
+    def test_matching_orphan_reservation_can_save_original_draft(self):
+        import tempfile
+        from unittest.mock import patch
+        from solana_alpha_lab.factory.hfic_session import (
+            persist_generated_draft, persist_scientific_slot_admission,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from tests.test_forge_evidence_identity_and_owner_gold_v1 import (
+            _enumerate_production_fixture, _ordinary_stamped_preflight,
+            _write_lineage,
+        )
+        from tests.test_hfic_cli import bind_draft
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            original = _ordinary_stamped_preflight(
+                data_root, store, model_provenance_sha256="11" * 32
+            )
+            session_id = "HFIC-SESS-" + str(original["search_key_sha256"])[
+                :16
+            ].upper()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_production_fixture,
+            ):
+                persist_scientific_slot_admission(
+                    store, {**original, "session_id": session_id}, repo_root=ROOT
+                )
+            draft = json.loads(
+                (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json")
+                .read_text(encoding="utf-8")
+            )
+            draft = bind_draft(draft, original)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_production_fixture,
+            ):
+                saved = persist_generated_draft(
+                    store, draft, preflight_receipt=original, repo_root=ROOT,
+                    model_provenance_sha256="11" * 32,
+                )
+            self.assertEqual(saved["session_id"], session_id)
+
 # Synthetic input only. Producers, importers, admission, selectors and evaluators remain real.
 TABLE = {
     "r1": ("A", True, .30), "r2": ("A", True, .10),

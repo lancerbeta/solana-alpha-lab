@@ -1672,46 +1672,6 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 store.diagnostics().committed_inventory_sha256, inventory_before
             )
 
-    def test_g6_orphan_reservation_accepts_same_execution_binding(self) -> None:
-        """A crash reservation can complete with its original model bind."""
-
-        with tempfile.TemporaryDirectory() as tmp:
-            data_root = Path(tmp)
-            _write_lineage(data_root)
-            store = ResearchStore(data_root)
-            original = _ordinary_stamped_preflight(
-                data_root, store, model_provenance_sha256="11" * 32
-            )
-            session_id = "HFIC-SESS-" + str(original["search_key_sha256"])[
-                :16
-            ].upper()
-            with patch(
-                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_production_fixture,
-            ):
-                persist_scientific_slot_admission(
-                    store, {**original, "session_id": session_id}, repo_root=ROOT
-                )
-            draft = json.loads(
-                (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json")
-                .read_text(encoding="utf-8")
-            )
-            from tests.test_hfic_cli import bind_draft
-
-            draft = bind_draft(draft, original)
-            with patch(
-                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_production_fixture,
-            ):
-                saved = persist_generated_draft(
-                    store,
-                    draft,
-                    preflight_receipt=original,
-                    repo_root=ROOT,
-                    model_provenance_sha256="11" * 32,
-                )
-            self.assertEqual(saved["session_id"], session_id)
-
     def test_g8_v1_persist_rejects_c1c2_receipt_after_production_c3_import(self) -> None:
         """A saved V1 draft cannot reserve stale C1+C2 after real C3 import."""
 
