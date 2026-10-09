@@ -1,19 +1,48 @@
 {
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
-  "as_of": "2026-10-08",
+  "as_of": "2026-10-09",
   "task_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1",
   "review_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1-REVIEW",
-  "reviewed_bindings_sha256": "",
-  "reviewed_inventory_sha256": "",
+  "reviewed_bindings_sha256": "89fc7faa4713cca664b083aa48812a9659eb35e0914b8fd1c165d9eb9044d020",
+  "reviewed_inventory_sha256": "35adde48cd679e384529277b47ba90dc8ff47f4d351cb2f7879c45178ec9faf5",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
     "ARCHITECTURE_CRITIC",
     "OWNER_UX_CRITIC"
   ],
-  "reviews": [],
-  "verdict": "NOT_READY",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "EXACT_HEAD_CONTENT_AND_D12_RECEIPT_NO_P0_P1"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "D01_D17_CONTENT_D12_INDEPENDENT_CONTEXT_D18_LIVE_BLOCKED"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "LINEAGE_PIT_RECOVERY_D12_MACHINE_EVENT_LINK_NO_P0_P1"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "RECOVERY_AND_NATIVE_KILL_STOP_D18_LIVE_BLOCKED_NO_P0_P1"
+      ]
+    }
+  ],
+  "verdict": "PASS",
   "non_claims": [
     "NO_MODEL_DIVERSITY_PROOF",
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",

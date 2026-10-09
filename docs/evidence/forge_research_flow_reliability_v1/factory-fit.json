@@ -1,11 +1,11 @@
 {
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
-  "as_of": "2026-10-08",
+  "as_of": "2026-10-09",
   "task_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1",
   "review_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1-FIT",
-  "reviewed_bindings_sha256": "",
-  "reviewed_inventory_sha256": "",
+  "reviewed_bindings_sha256": "89fc7faa4713cca664b083aa48812a9659eb35e0914b8fd1c165d9eb9044d020",
+  "reviewed_inventory_sha256": "35adde48cd679e384529277b47ba90dc8ff47f4d351cb2f7879c45178ec9faf5",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
