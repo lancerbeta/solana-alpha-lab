@@ -40,8 +40,8 @@
     "OWNER_UX_CRITIC"
   ],
   "review_id": "FORGE_EVIDENCE_GUIDED_GENERATION_V1-REVIEW",
-  "reviewed_bindings_sha256": "a2c7859651b32dedad69bf2782889e6bcdc0d67e74b6f43c40d52bcc8ea03b47",
-  "reviewed_inventory_sha256": "9b017b61c1f4435f930c9f4851efe0212eba7901a6f35649f1e07d1dab20084c",
+  "reviewed_bindings_sha256": "479862867b8a9f0f4d4fe6a040e34a63e7709417f9f444f2f22a51e918bd9391",
+  "reviewed_inventory_sha256": "6924c20767d466b54242270410891f980dde5653510087089ef36821bb68a5f8",
   "reviews": [
     {
       "findings": [],
@@ -55,11 +55,14 @@
     },
     {
       "findings": [
-        "packet_fingerprint_sha256=eda55814d71c8c83c99cd95511f29e7664a1ef008569db0498bfdbd54a0156ac",
-        "NARROW_DELTA_PASS: old/new frozen.diff match their packet hashes; same29paths; productioncode/schemas/contracts/skills/operator/tests/fixtures/scientificevidence diffsections byte-identical. Semanticclaims/evidencehashes/nonclaims/independence constraints unchanged.",
-        "Delta onlytaskGitbinding/integrationnote and Catalog/nav propagation: generatedhashes/assets1940to1943. No newtruthowner/scientificauthority/UNKNOWN/PIT/recovery semantics. Completed SEMANTIC_PASS applies to newcandidate.",
-        "TechnicalPASScan still yield false/overfit hypotheses; descriptive observations cannot prove conjunction/independence/causality/executableeconomics. Existing guards remain independent of ranking; scientific acceptance stays UNKNOWN.",
-        "Historical nativeepochs retained; formulationPARTIAL, qualitygainnotestablished, modeldiversityUNPROVEN. No blockingchanges; newtests/nativecalls0."
+        "packet_fingerprint_sha256=41cfd297cbd19fcad1ab8a04d41ceb9a7ada7fc8cbe7aface50c91d83aee61e9",
+        "NARROW_CI_REPAIR_PASS: frozen.diff, task и шесть packet evidence hashes совпали; все 32 inventory bindings соответствуют disk bytes, live HEAD соответствует reviewed_head.",
+        "COMPATIBILITY: schema $defs и version allOf структурно совпадают с ранее проверенным candidate. Добавленные standalone capsule branches точно воспроизводят strict legacy/fresh definitions; значения enum и scientific authority не расширены.",
+        "ADMISSION_BOUNDARY: hfic_preflight.py:2731 останавливает episode projection, если market_admission_ready не True. forge_input_receipt.py:408 сохраняет MARKET_EVIDENCE_BASIS_INCOMPLETE как причину STOP; остальные vision failures сохраняют blocker. UNKNOWN/unavailable prerequisite не превращается в scientific negative или permission.",
+        "SAFETY_AND_RECOVERY: generation-context, session, temporal-discovery и evidence-identity Git blobs неизменны. Full-source guards, mandatory closure, cutoff, scientific identity и bound65536B сохраняют прежний PASS. Archived final checks подтверждают torn-import/cold replay, hidden corruption и forced vision refusal; исходный intermediate failure сохранён.",
+        "EVIDENCE: прежние 1493 raw file entries и 1019 objects неизменны; bundle дополнен 14 файлами. Native evidence не перепривязано к новому capability. FORMULATION остаётся PARTIAL, comparative quality gain не установлен, model diversity UNPROVEN.",
+        "RESEARCH_VALIDITY: schema/readiness tests могут PASS при ложной, переобученной или статистически неидентифицируемой гипотезе. Исправленный STOP доказывает admission/recovery behavior; он не доказывает conjunction, независимость, alpha или family closure. При incomplete admission публикация нового look либо обход integrity failure опровергли бы premise; такого обхода в exact delta не найдено.",
+        "REVERSIBILITY_AND_OWNERSHIP: изменения локальны существующим schema/preflight/receipt owners, новых truth owners или cross-TASK private API imports нет. Durable records, charges и восстановление из Parquet/manifests/artifacts не изменены. Блокирующая коррекция не требуется; tests/native/full gates в этом review не запускались."
       ],
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS"
