@@ -639,8 +639,12 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
 `PREFLIGHT_STORE_DIGEST_MISMATCH`, ответ `BLOCKED` содержит
 `detail.scientific_slot_sha256`, ID исходного preflight, исходный и текущий
 inventory digest и сохранённый binding reservation. Сверьте эти hash/ID с
-исходным receipt и immutable slot; выполните только read-only
-`preflight --no-auto-commission` с тем же owner focus. При расхождении
+исходным receipt и immutable slot. Сравните
+`detail.inventory_before_this_call` с `detail.current_store_inventory_digest`:
+при `freeze` context artifact мог сохраниться до отказа, а неизменный inventory
+сам по себе не доказывает отсутствие записи blob. Выполните только read-only
+`preflight --no-auto-commission` с `detail.owner_focus` из исходного receipt.
+При расхождении
 остановитесь до отдельного решения о provenance. Не повторяйте запись, не
 создавайте новый trial и не сбрасывайте budget.
 

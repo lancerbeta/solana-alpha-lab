@@ -3396,6 +3396,7 @@ def _slot_recovery_block(
     store: ResearchStore,
     data_root: Path,
     repo_root: Path,
+    inventory_before: str,
     requested_model_provenance_sha256: str | None = None,
 ) -> int:
     """Report a stopped retry using only bounded immutable slot identities."""
@@ -3415,12 +3416,16 @@ def _slot_recovery_block(
             if row.get("scientific_slot_sha256") == slot
         ), None,
     ) if isinstance(slot, str) else None
+    inventory_after = store.diagnostics().committed_inventory_sha256
     detail = {
         "scientific_slot_sha256": slot if isinstance(slot, str) else None,
         "session_id": session_id,
         "source_preflight_receipt_id": receipt.get("receipt_id"),
+        "owner_focus": receipt.get("owner_focus") if isinstance(receipt.get("owner_focus"), str) else None,
         "preflight_store_inventory_digest": receipt.get("store_inventory_digest"),
-        "current_store_inventory_digest": store.diagnostics().committed_inventory_sha256,
+        "current_store_inventory_digest": inventory_after,
+        "inventory_before_this_call": inventory_before,
+        "inventory_changed_this_call": inventory_after != inventory_before,
         "requested_model_provenance_sha256": (
             requested_model_provenance_sha256
             or receipt.get("model_provenance_sha256")
@@ -3434,14 +3439,17 @@ def _slot_recovery_block(
     }
     payload = {
         "reason_code": str(exc), "status": "BLOCKED",
-        "scientific_negative": False, "writes": False,
+        "scientific_negative": False,
         "detail": detail,
         "next_action": "INSPECT_SAVED_SLOT_AND_PREFLIGHT",
         "owner_readout": (
             "Сверьте detail.scientific_slot_sha256 и source_preflight_receipt_id "
             "с immutable reservation; сравните requested_model_provenance_sha256, "
-            "saved_reservation и два inventory digest. Выполните только read-only "
-            "preflight --no-auto-commission с тем же owner focus. При расхождении "
+            "saved_reservation и inventory digest до/после команды. Freeze мог "
+            "сохранить context до отказа; отсутствие изменения inventory само по "
+            "себе не доказывает отсутствие записи blob. Выполните только read-only "
+            "preflight --no-auto-commission с detail.owner_focus из исходного "
+            "receipt. При расхождении "
             "сохраните BLOCKED до отдельного решения о provenance; не повторяйте "
             "persist-draft/freeze, не создавайте trial и не сбрасывайте budget."
         ),
@@ -3471,6 +3479,7 @@ def cmd_freeze(
         _assert_no_path_leak(next_action_draft, str(repo_root))
     data_root = _store_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root)
+    inventory_before = store.diagnostics().committed_inventory_sha256
     try:
         frozen = freeze_draft(
             draft,
@@ -3492,6 +3501,7 @@ def cmd_freeze(
         return _slot_recovery_block(
             exc, receipt=receipt, store=store,
             data_root=data_root, repo_root=repo_root,
+            inventory_before=inventory_before,
         )
     git_after = repository_git_snapshot(repo_root)
     if not git_before.unchanged(git_after):
@@ -3540,6 +3550,7 @@ def cmd_persist_draft(
         return _slot_recovery_block(
             exc, receipt=receipt, store=store,
             data_root=data_root, repo_root=repo_root,
+            inventory_before=before_digest,
             requested_model_provenance_sha256=model_provenance_sha256,
         )
     git_after = repository_git_snapshot(repo_root)

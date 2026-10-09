@@ -110,6 +110,55 @@ class CardTransportTests(unittest.TestCase):
 
 
 class CrashReservationRecoveryTests(unittest.TestCase):
+    def test_freeze_block_reports_context_inventory_written_before_late_refusal(self):
+        import tempfile
+        from contextlib import redirect_stdout
+        from io import StringIO
+        from unittest.mock import patch
+        from scripts.hypothesis_forge import cmd_freeze
+        from solana_alpha_lab.factory.hfic_preflight import persist_forge_context_packet
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "store"
+            store = ResearchStore(data_root)
+            before = store.diagnostics().committed_inventory_sha256
+            draft_path = Path(tmp) / "draft.json"
+            receipt_path = Path(tmp) / "receipt.json"
+            draft_path.write_text("{}", encoding="utf-8")
+            receipt_path.write_text(json.dumps({
+                "receipt_id": "HFIC-PREFLIGHT-TEST",
+                "search_key_sha256": "a" * 64,
+                "store_inventory_digest": before,
+            }), encoding="utf-8")
+
+            def context_then_refuse(*_args, **_kwargs):
+                persist_forge_context_packet(
+                    data_root, {"test_context": "durable-before-refusal"},
+                    store=store, repo_root=ROOT,
+                )
+                raise HficSessionError(
+                    "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
+                )
+
+            output = StringIO()
+            with patch("scripts.hypothesis_forge.freeze_draft", side_effect=context_then_refuse), redirect_stdout(output):
+                code = cmd_freeze(ROOT, draft_path, receipt_path, data_root)
+            self.assertEqual(code, 2)
+            blocked = json.loads(output.getvalue())
+            self.assertEqual(blocked["status"], "BLOCKED")
+            self.assertNotIn("writes", blocked)
+            self.assertTrue(blocked["detail"]["inventory_changed_this_call"])
+            self.assertEqual(blocked["detail"]["inventory_before_this_call"], before)
+            self.assertEqual(
+                blocked["detail"]["current_store_inventory_digest"],
+                store.diagnostics().committed_inventory_sha256,
+            )
+            self.assertNotEqual(
+                blocked["detail"]["current_store_inventory_digest"], before,
+            )
+            self.assertNotIn(str(data_root), output.getvalue())
+
     def test_matching_orphan_reservation_can_save_original_draft(self):
         import tempfile
         from unittest.mock import patch
@@ -221,6 +270,8 @@ class CrashReservationRecoveryTests(unittest.TestCase):
                 "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
             )
             self.assertEqual(blocked["next_action"], "INSPECT_SAVED_SLOT_AND_PREFLIGHT")
+            self.assertEqual(blocked["detail"]["owner_focus"], drifted["owner_focus"])
+            self.assertFalse(blocked["detail"]["inventory_changed_this_call"])
             self.assertEqual(
                 blocked["detail"]["scientific_slot_sha256"],
                 list_scientific_slot_admissions(store)[0]["scientific_slot_sha256"],
