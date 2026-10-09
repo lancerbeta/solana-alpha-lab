@@ -64,7 +64,7 @@ stop_conditions:
 - STOP_REPEATED_SEAM_FAILURE_MATERIAL_TRUTH_CONFLICT_OR_NATIVE_CAP_28
 context_requirements:
   catalog_asset_ids: []
-  l2_roles: [ARCHITECTURE_DECISIONS]
+  l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
