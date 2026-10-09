@@ -941,7 +941,9 @@ class EpisodeFlowTests(unittest.TestCase):
         else:
             producer=self.work/'base-producer'
             subprocess.run(['git','clone','--quiet','--no-hardlinks','--local',str(ROOT),str(producer)],check=True,capture_output=True)
-            subprocess.run(['git','-C',str(producer),'checkout','--quiet','44eda5d72dccd569e9766a74046ce8b2ec47f417'],check=True,capture_output=True)
+            # Actions checks out PR merges detached. A local clone of that
+            # checkout can have no refs, while BASE's Git fence requires one.
+            subprocess.run(['git','-C',str(producer),'checkout','--quiet','-b','codex/test-historical-base','44eda5d72dccd569e9766a74046ce8b2ec47f417'],check=True,capture_output=True)
         self.producer_root=producer
         evidence,scope,query,initial=self.look('FLOW_HISTORICAL')
         body,pre=self.authored_draft(evidence,scope,initial['owner_focus'])

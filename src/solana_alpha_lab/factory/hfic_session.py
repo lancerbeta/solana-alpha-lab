@@ -812,7 +812,8 @@ def bind_preflight_receipt(
     receipt_digest = receipt.get("store_inventory_digest") or receipt.get(
         "data_root_fingerprint_sha256"
     )
-    if require_current_store_digest and receipt_digest != digest:
+    if (require_current_store_digest and receipt_digest != digest
+            and not _matching_orphan_reservation_only_delta(store, receipt, draft)):
         raise HficSessionError("PREFLIGHT_STORE_DIGEST_MISMATCH")
     from solana_alpha_lab.factory.hfic_memory_policy import (
         effective_policy,
@@ -1225,6 +1226,12 @@ def _selected_candidate_block(
     disconfirming = str(card.get("disconfirming_prediction") or "NOT_DECLARED_IN_DRAFT")
     bindings = card.get("available_data_bindings", [])
     if isinstance(bindings, list):
+        # The direct Critic transport still validates each list item. Only an
+        # invalid outer shape is left intact for the packet schema to reject.
+        try:
+            project_material_card({"available_data_bindings": bindings})
+        except CardProjectionError as exc:
+            raise HficSessionError(exc.code, detail=exc.detail) from exc
         # Critic strings are narrative transport, never typed resolver input.
         # Encode authored objects reversibly; retain legacy strings verbatim.
         bindings = [
@@ -3506,6 +3513,63 @@ def _existing_scientific_slot_admission(
     return None
 
 
+def _matching_orphan_reservation_only_delta(
+    store: Any, receipt: Mapping[str, Any], draft: Mapping[str, Any],
+) -> bool:
+    """Accept a stale preflight digest only for its own sole slot reservation.
+
+    The committed inventory is a hash of sorted partition manifests. Removing
+    exactly the one-record reservation partition must reproduce the preflight
+    digest; any concurrent research write keeps the ordinary stale refusal.
+    """
+
+    if receipt.get("action") != "START_NEW_SESSION":
+        return False
+    search_key = receipt.get("search_key_sha256")
+    receipt_digest = receipt.get("store_inventory_digest")
+    if (not isinstance(search_key, str) or re.fullmatch(r"[0-9a-f]{64}", search_key) is None
+            or not isinstance(receipt_digest, str)
+            or re.fullmatch(r"[0-9a-f]{64}", receipt_digest) is None):
+        return False
+    session_id = "HFIC-SESS-" + search_key[:16].upper()
+    if draft.get("session_id") not in (None, "", session_id):
+        return False
+    try:
+        slot = _execution_identity_fields(receipt).get("scientific_slot_sha256")
+    except HficSessionError:
+        return False
+    if not isinstance(slot, str) or re.fullmatch(r"[0-9a-f]{64}", slot) is None:
+        return False
+    reservation = _existing_scientific_slot_admission(store, slot)
+    if (reservation is None or reservation.get("session_id") != session_id
+            or not _scientific_slot_admission_matches_binding(
+                reservation, {**receipt, "session_id": session_id}
+            )):
+        return False
+    manifest_reader = getattr(store, "_committed_manifests", None)
+    if not callable(manifest_reader):
+        return False
+    manifests = manifest_reader(fresh=True)
+    reservation_txn = f"RESEARCH-TXN-SLOT-{slot.upper()}"
+    reserved = [item for item in manifests if item.partition_id == reservation_txn]
+    if len(reserved) != 1 or reserved[0].row_count != 1:
+        return False
+    prior_inventory = [
+        {
+            "content_sha256": item.content_sha256,
+            "file_sha256": item.file_sha256,
+            "logical_location": item.logical_location,
+            "partition_manifest_id": item.partition_manifest_id,
+        }
+        for item in manifests if item.partition_id != reservation_txn
+    ]
+    encoded = json.dumps(
+        prior_inventory, ensure_ascii=False, sort_keys=True,
+        separators=(",", ":"), allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest() == receipt_digest
+
+
 def _scientific_slot_admission_matches_binding(
     admission: Mapping[str, Any], binding: Mapping[str, Any]
 ) -> bool:
@@ -4804,6 +4868,20 @@ def persist_generated_draft(
         ):
             return existing
         raise HficSessionError("GENERATED_DRAFT_CONFLICT")
+    # A crash may leave only the immutable slot reservation. Check its
+    # execution identity before freeze's ordinary preflight digest check:
+    # the reservation itself advances the store digest, while a different
+    # model bind must retain the specific occupied-slot refusal.
+    current_reservation = _existing_scientific_slot_admission(store, slot)
+    if current_reservation is not None:
+        if current_reservation.get("identity_binding_status") == "CONFLICT":
+            raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+        if str(current_reservation.get("session_id") or "") != session_id:
+            raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED")
+        if not _scientific_slot_admission_matches_binding(current_reservation, binding):
+            raise HficSessionError(
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
+            )
     # Typed family closure is frozen in the preflight receipt and remains an
     # admission gate even when the store has changed through a saved look.
     closed_family_ledger = ledger_from_receipt(receipt)
@@ -4918,8 +4996,6 @@ def persist_generated_draft(
         producer_git_sha=git.head_sha,
         created_at=now,
     )
-    current_reservation = _existing_scientific_slot_admission(store, slot)
-
     def _recheck_generated_draft_under_writer_lease() -> None:
         _verify_required_context_dependency(store, receipt)
         observed_draft = find_generated_draft(
@@ -4986,6 +5062,11 @@ def persist_generated_draft(
                 raise HficSessionError(
                     "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
                 )
+            if (not _ordinary_discovery_requested(draft, receipt)
+                    and not _matching_orphan_reservation_only_delta(
+                        store, receipt, draft
+                    )):
+                raise HficSessionError("PREFLIGHT_STORE_DIGEST_MISMATCH")
             if any(item.record_id == admission_event.record_id for item in append_records):
                 raise HficSessionError("GENERATED_DRAFT_RESERVATION_APPEARED")
             return
