@@ -375,10 +375,14 @@ def _bind_origin_as_of(
         FROM _research_events
         WHERE record_kind IN ('HYPOTHESIS_VERSION', 'HYPOTHESIS_ORIGIN')
           AND first_reliable_available_at <= ?
-          AND effective_at <= ?
         """,
-        [cutoff.replace(tzinfo=None), cutoff.replace(tzinfo=None)],
+        [cutoff.replace(tzinfo=None)],
     )
+    known_hypotheses: dict[str, dict[str, Any]] = {
+        record["record_id"]: record
+        for record in records
+        if record["record_kind"] == "HYPOTHESIS_VERSION"
+    }
     authored: dict[str, dict[str, Any]] = {}
     by_hypothesis: dict[tuple[str, str | None], dict[str, Any]] = {}
     by_origin: dict[tuple[str, str | None], dict[str, Any]] = {}
@@ -387,6 +391,8 @@ def _bind_origin_as_of(
         return (record["effective_at"], record["first_reliable_available_at"], record["record_id"])
 
     for record in records:
+        if record["effective_at"] > cutoff.replace(tzinfo=None):
+            continue  # known future structure may rank lineage, not supply current state
         if record["record_kind"] == "HYPOTHESIS_VERSION":
             authored[record["record_id"]] = record
             continue
@@ -406,11 +412,12 @@ def _bind_origin_as_of(
             raise PriorWorkError("HYPOTHESIS_SOURCE_UNAVAILABLE")
         seen: set[str] = {source["record_id"]}
         parent = source.get("supersedes_record_id")
-        while parent in authored:
-            if parent in seen or authored[parent]["stable_id"] != hypothesis["hypothesis_version_id"]:
+        while parent in known_hypotheses:
+            if (parent in seen
+                    or known_hypotheses[parent]["stable_id"] != hypothesis["hypothesis_version_id"]):
                 raise PriorWorkError("HYPOTHESIS_LINEAGE_INVALID")
             seen.add(parent)
-            parent = authored[parent].get("supersedes_record_id")
+            parent = known_hypotheses[parent].get("supersedes_record_id")
         hypothesis["_lineage_depth"] = len(seen) - 1
         if source.get("origin_kind") is not None:
             hypothesis["origin_kind"] = source["origin_kind"]

@@ -402,6 +402,33 @@ class SessionHistoryTests(unittest.TestCase):
                 with self.assertRaisesRegex(ResearchStoreError,'DUPLICATE_STABLE_ID_CONFLICT'):
                     self._store_chain(last_parent=parent)
 
+    def test_dangling_first_hypothesis_parent_refuses_before_publication(self):
+        import tempfile
+        from tests.test_research_store import event_fixture
+        from solana_alpha_lab.factory.research_store import ResearchStore, ResearchStoreError
+        with tempfile.TemporaryDirectory() as temporary:
+            store=ResearchStore(Path(temporary))
+            root=event_fixture(record_id='HYP-DANGLING-ROOT',record_kind='HYPOTHESIS_VERSION',transaction_id='RESEARCH-TXN-HYP-DANGLING',payload={'hypothesis_version_id':'HYP-SAME','session_id':'SESS-ROOT','definition_sha256':'a'*64}).model_copy(update={'run_id':None,'supersedes_record_id':'HYP-ABSENT'})
+            before=store.diagnostics().committed_inventory_sha256
+            with self.assertRaisesRegex(ResearchStoreError,'DUPLICATE_STABLE_ID_CONFLICT'):
+                store.append([root],transaction_id=root.transaction_id)
+            self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
+
+    def test_foreign_first_hypothesis_parent_refuses_before_publication(self):
+        import tempfile
+        from tests.test_research_store import event_fixture
+        from solana_alpha_lab.factory.research_store import ResearchStore, ResearchStoreError
+        with tempfile.TemporaryDirectory() as temporary:
+            store=ResearchStore(Path(temporary))
+            first=event_fixture(record_id='HYP-FOREIGN-A',record_kind='HYPOTHESIS_VERSION',transaction_id='RESEARCH-TXN-HYP-FOREIGN-A',payload={'hypothesis_version_id':'HYP-A','session_id':'SESS-A','definition_sha256':'a'*64}).model_copy(update={'run_id':None})
+            store.append([first],transaction_id=first.transaction_id)
+            second=event_fixture(record_id='HYP-FOREIGN-B',record_kind='HYPOTHESIS_VERSION',transaction_id='RESEARCH-TXN-HYP-FOREIGN-B',payload={'hypothesis_version_id':'HYP-B','session_id':'SESS-B','definition_sha256':'b'*64}).model_copy(update={'run_id':None,'supersedes_record_id':first.record_id})
+            before=store.diagnostics().committed_inventory_sha256
+            with self.assertRaisesRegex(ResearchStoreError,'DUPLICATE_STABLE_ID_CONFLICT'):
+                store.append([second],transaction_id=second.transaction_id)
+            self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
+            store.rebuild_projection()
+
     def test_changed_definition_cannot_reuse_same_candidate_history(self):
         from solana_alpha_lab.factory.hfic_session import _session_hypothesis_supersedes,HficSessionError
         store=self._store_chain()

@@ -32073,7 +32073,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_store.py', repository_path: src/solana_alpha_lab/factory/research_store.py}
-  integrity: {kind: sha256, sha256: c06b292a5ee88c17ff7586786c1d1e94e5063eae05ab26550f379bf98105f340}
+  integrity: {kind: sha256, sha256: b1a5d71465ecf1ce75d5a2107f773a3009d8e9d25db299328313da45f4ec4326}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32110,7 +32110,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/prior_work.py', repository_path: src/solana_alpha_lab/factory/prior_work.py}
-  integrity: {kind: sha256, sha256: 00891f30708c759bad3e90466cb533b112ebce11bc92e9994d1fd78381abf9a8}
+  integrity: {kind: sha256, sha256: 7e5a9dd0e1a4c6c781209b566fe0a760046c541befc9524d03f84435b236e9e0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32185,7 +32185,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_research_projection.py', repository_path: tests/test_research_projection.py}
-  integrity: {kind: sha256, sha256: 4f953c7f5f54e11e2fb2020858dc5e610f08c9ca15a89321d4a52c7c09ee8f04}
+  integrity: {kind: sha256, sha256: 92b992289b8552d4a97da3d1c0aef01054c17e132c247dbb69a45afd525f5f2d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}

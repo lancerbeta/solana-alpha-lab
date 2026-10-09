@@ -1176,6 +1176,8 @@ def _assert_stable_id_lineage(related: Sequence[ResearchEvent]) -> None:
                 raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
             seen.add(parent)
             parent = by_id[parent].supersedes_record_id
+        if strict_hypothesis and parent is not None:
+            raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
         ancestors[record.record_id] = seen
     for index, record in enumerate(related):
         for previous in related[:index]:

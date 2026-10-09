@@ -594,6 +594,43 @@ class ResearchProjectionTests(unittest.TestCase):
                 self.assertEqual(result["results"][0]["session_id"], "SESS-NEW")
                 self.assertEqual(result["results"][0]["current_state_as_of"], "PAUSED")
 
+    def test_capped_prior_chain_rank_crosses_known_future_effective_middle(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            store = ResearchStore(root)
+            for index, session, parent, effective, available in (
+                (0, "SESS-OLD", None, NOW, NOW),
+                (1, "SESS-MIDDLE", "HYP-ROW-0", NOW + timedelta(seconds=10), NOW + timedelta(seconds=1)),
+                (2, "SESS-NEW", "HYP-ROW-1", NOW - timedelta(seconds=1), NOW + timedelta(seconds=2)),
+            ):
+                row = event(
+                    f"HYP-ROW-{index}", "HYPOTHESIS_VERSION",
+                    {"hypothesis_version_id": HYPOTHESIS_ID, "session_id": session,
+                     "definition_sha256": "a" * 64},
+                    transaction_id=f"RESEARCH-TXN-HYP-ROW-{index}", entity_id=HYPOTHESIS_ID,
+                    effective_at=effective, available_at=available, supersedes_record_id=parent,
+                )
+                store.append([row], transaction_id=row.transaction_id)
+            for index, (session, kind) in enumerate((("SESS-OLD", "REJECT"), ("SESS-NEW", "PAUSE"))):
+                row = event(
+                    f"DEC-ROW-{index}", "DECISION_EVENT",
+                    {"decision_event_id": f"DEC-ROW-{index}", "hypothesis_version_id": HYPOTHESIS_ID,
+                     "session_id": session, "decision_kind": kind},
+                    transaction_id=f"RESEARCH-TXN-DEC-ROW-{index}",
+                    effective_at=NOW + timedelta(seconds=2), available_at=NOW + timedelta(seconds=2),
+                )
+                store.append([row], transaction_id=row.transaction_id)
+            store.rebuild_projection()
+            projection = root / "projections" / "research_memory.duckdb"
+            result = query_data_plane_prior_work(projection, {
+                "query_id": "QUERY-KNOWN-FUTURE-MIDDLE", "as_of": "2026-08-25T12:00:03Z",
+                "max_results": 2, "predicates": {"hypothesis_version_ids": [HYPOTHESIS_ID]},
+            })
+            self.assertEqual(
+                [(row["session_id"], row["current_state_as_of"]) for row in result["results"]],
+                [("SESS-NEW", "PAUSED"), ("SESS-OLD", "REJECTED")],
+            )
+
     def test_generated_ten_thousand_event_performance_fixture(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
