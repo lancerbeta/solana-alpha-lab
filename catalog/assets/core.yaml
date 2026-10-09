@@ -40868,7 +40868,7 @@ records:
     repository_path: docs/tasks/FORGE_NATIVE_LIFECYCLE_CLOSURE_V1.md
   integrity:
     kind: sha256
-    sha256: 8fb30d9d5f4a2c5ed21948648cd8a3adc6a9e21b50bdf02e4577da2e901074d3
+    sha256: 9f7039414c6a9450cbb5d52503f6f66fd9a8dd5a61ffe129b661546dda7c7ded
   access:
     mode: read_only
     method: file

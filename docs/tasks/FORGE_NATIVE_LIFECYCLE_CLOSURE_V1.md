@@ -172,3 +172,9 @@ Risk-review local repairs after native stop do not grant another epoch trial:
 explicit malformed mode typed refusal, actual ordinary ingress oracle, timeout
 partial capture and unresolved historical applicability. Their targeted checks
 are engineering evidence only; original native identities remain unchanged.
+
+REVIEW_LOCAL_REPLAN: during wave2, new read-only wrapper could trust a
+regenerated local snapshot. Pin original head/composite in the wrapper and
+check stored fence, then one bounded CODE_REVIEWER targeted continuation.
+This is not a third full review wave or another native trial. Preserve the
+ec195ddf observations; all required full-DoD verdicts remain NOT_READY.
