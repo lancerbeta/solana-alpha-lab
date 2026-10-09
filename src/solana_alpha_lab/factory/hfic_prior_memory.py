@@ -267,13 +267,20 @@ def latest_hypothesis_decisions(
 
     cutoff = research_memory_cutoff(as_of)
     latest: dict[tuple[str, str | None], tuple[tuple[str, str], str, str]] = {}
+    visible_hyp_sessions: dict[str, set[str | None]] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
-        if kind != "DECISION_EVENT":
+        if kind not in {"DECISION_EVENT", "HYPOTHESIS_VERSION"}:
             continue
         if not research_record_visible_as_of(record, cutoff):
             continue
         payload = _payload_mapping(record)
+        if kind == "HYPOTHESIS_VERSION":
+            hyp_id = str(payload.get("hypothesis_version_id")
+                         or getattr(record, "hypothesis_version_id", None) or "")
+            if hyp_id:
+                visible_hyp_sessions.setdefault(hyp_id, set()).add(session_identity(payload))
+            continue
         hyp_id = str(
             payload.get("hypothesis_version_id")
             or getattr(record, "hypothesis_version_id", None)
@@ -292,10 +299,23 @@ def latest_hypothesis_decisions(
                 str(payload.get("decision_kind") or ""),
                 str(payload.get("reason_code") or ""),
             )
-    return {
+    resolved = {
         identity: {"decision_kind": kind, "reason_code": reason, **({"session_id": identity[1]} if identity[1] else {})}
         for identity, (_key, kind, reason) in latest.items()
     }
+    # An old DEC may omit session_id. Attach it only when the visible HYP
+    # history has exactly one session; a later session never inherits its kill.
+    for (hyp_id, session_id), decision in list(resolved.items()):
+        if session_id is not None:
+            continue
+        sessions = visible_hyp_sessions.get(hyp_id, set())
+        if len(sessions) == 1:
+            only_session = next(iter(sessions))
+            if only_session is not None:
+                resolved.setdefault(
+                    (hyp_id, only_session), {**decision, "session_id": only_session}
+                )
+    return resolved
 
 
 def _latest_decisions(store: Any) -> dict[tuple[str, str | None], dict[str, str]]:

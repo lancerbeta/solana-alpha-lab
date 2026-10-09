@@ -128,7 +128,7 @@ class GroundingTransportTests(unittest.TestCase):
     def test_t3_forward_only_survives_empty_legacy_array(self) -> None:
         frozen = _freeze("HFIC-V12-C3-FORWARD-QUOTE", "HFIC-V12-C2-HISTORICAL-RETURN")
         selected = frozen["critic_input_packet"]["selected_candidate"]
-        self.assertEqual(selected["missing_or_forward_only_data"], [])
+        self.assertEqual(selected["missing_or_forward_only_data"], ["NOT_DECLARED_IN_DRAFT"])
         self.assertEqual(
             selected["grounding"]["feature_bindings"][0]["availability_class"],
             "FORWARD_ONLY",

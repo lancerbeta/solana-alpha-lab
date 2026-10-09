@@ -23,6 +23,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
 - src/solana_alpha_lab/factory/hfic_research_scope.py
 - src/solana_alpha_lab/factory/hfic_preflight.py
+- src/solana_alpha_lab/factory/commissioning_proof.py
 - src/solana_alpha_lab/factory/forge_input_receipt.py
 - src/solana_alpha_lab/factory/hfic_representation_ladder.py
 - src/solana_alpha_lab/factory/hfic_control_integrity.py
@@ -60,6 +61,11 @@ managed_write_set:
 - tests/test_hfic_forge_prior_context_capacity_repair_v1.py
 - tests/fixtures/forge_research_flow_reliability_v1/resource_probe.py
 - tests/test_forge_representation_ladder_v1.py
+- tests/test_delivery_harness_contract.py
+- tests/test_forge_runtime_discovery_binding_v1.py
+- tests/test_hfic_fresh_control_decision_integrity_closure_v1.py
+- tests/test_hfic_preflight.py
+- tests/test_live_cohort_to_forge_operational_closure_v1.py
 external_caps:
   network: false
   credentials: false
@@ -151,6 +157,12 @@ and scientific authority. No strategy/promotion/live/VPS claim; raw KILL stays K
 
 Direct consumers: prior-memory regression oracles now distinguish a retained
 Critic KILL from typed family-close authority; source verdict and scope stay bound.
+CI repair added exact direct-consumer tests for session-bound prior status,
+missing-versus-empty data, legacy commissioning, and frozen harness evidence.
+The commissioning link now names its immutable HYP predecessor; historical
+test fixtures alone simulate BASE's unlinked imports. Production writer lineage
+remains strict and the old acceptance receipt still verifies against its own
+Git commit.
 
 Direct generated consumers: Catalog generated navigation/PROJECT_MAP follow
 harness_sync. The existing Forge config now states frozen-policy precedence

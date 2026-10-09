@@ -1206,10 +1206,18 @@ def _selected_candidate_block(
 ) -> dict[str, Any]:
     from solana_alpha_lab.factory.hfic_card_projection import CardProjectionError, project_material_card
 
+    # Persist validates authored bindings; this direct packet helper keeps a
+    # malformed outer shape intact so the Critic schema can reject it.
+    authored_bindings = card.get("available_data_bindings")
+    has_bindings = "available_data_bindings" in card
+    projection_source = dict(card)
+    projection_source.pop("available_data_bindings", None)
     try:
-        card = project_material_card(card)
+        card = project_material_card(projection_source)
     except CardProjectionError as exc:
         raise HficSessionError(exc.code, detail=exc.detail) from exc
+    if has_bindings:
+        card["available_data_bindings"] = authored_bindings
     required_caps = card.get("required_capability_ids") or []
     if not isinstance(required_caps, list):
         required_caps = []
@@ -4795,8 +4803,44 @@ def persist_generated_draft(
         ):
             return existing
         raise HficSessionError("GENERATED_DRAFT_CONFLICT")
-    freeze_draft(draft, preflight_receipt=preflight_receipt, store=store, repo_root=repo_root,
-                 verify_current_market_identity=True, persist=False)
+    # Typed family closure is frozen in the preflight receipt and remains an
+    # admission gate even when the store has changed through a saved look.
+    closed_family_ledger = ledger_from_receipt(receipt)
+    for card in candidates:
+        hit = candidate_hard_close_entry(card, closed_family_ledger)
+        if hit is not None:
+            raise HficSessionError("CLOSED_FAMILY_REOPEN", detail={
+                "stage": "CANDIDATE_SUPPRESSION", "source_terminal": hit.get("terminal"),
+                "scope_kind": hit.get("scope_kind"), "scope_id": hit.get("scope_id"),
+                "source_receipt": hit.get("source_receipt"),
+                "next_action": "KEEP_TYPED_CLOSE_SELECT_AUTHORIZED_DISTINCT_SCOPE",
+            })
+    # Check exact prior scope before saving, using the current visible history.
+    # A full freeze here would incorrectly compare the pre-look receipt with the
+    # store after its authorized discovery writes.
+    grounded = draft.get("grounded_evidence")
+    if selected_ref not in (None, "") and isinstance(grounded, Mapping):
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            GroundedDiscoveryError, bind_prior_scope_evidence,
+        )
+        from solana_alpha_lab.factory.hfic_memory_policy import HficMemoryPolicyError
+
+        selected_card = candidates[selected_index]
+        grounded = _bind_selected_look(grounded, selected_card, store=store)
+        if grounded.get("look_confirms_selected") is not False:
+            try:
+                prior = build_prior_memory_snapshot(
+                    store,
+                    store_inventory_digest=store.diagnostics().committed_inventory_sha256,
+                    repo_root=repo_root,
+                    as_of=receipt.get("session_started_at"),
+                )
+                bind_prior_scope_evidence(
+                    grounded, canonical_priors=prior["capsules"]
+                )
+            except (GroundedDiscoveryError, PriorMemoryCapacityError,
+                    PriorMemoryUnidentifiedError, HficMemoryPolicyError) as exc:
+                raise HficSessionError(exc.code) from exc
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 

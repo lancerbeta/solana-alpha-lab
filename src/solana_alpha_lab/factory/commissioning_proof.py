@@ -311,6 +311,7 @@ def apply_legacy_commissioning_hypothesis_link(
 
     appended = 0
     existing_ids = {str(record.record_id) for record in store.iter_committed_records()}
+    parent_record_id = source.record_id
     for passport, _completed in missing_link:
         run_id = str(passport["run_id"])
         digest = hashlib.sha256(
@@ -337,7 +338,7 @@ def apply_legacy_commissioning_hypothesis_link(
             transaction_id=transaction_id,
             effective_at=now,
             first_reliable_available_at=now,
-            supersedes_record_id=None,
+            supersedes_record_id=parent_record_id,
             payload_json=source.payload_json,
             payload_sha256=source.payload_sha256,
             schema_version=source.schema_version,
@@ -352,6 +353,7 @@ def apply_legacy_commissioning_hypothesis_link(
                 continue
             raise CommissioningProofError(str(exc)) from exc
         existing_ids.add(record_id)
+        parent_record_id = record_id
         appended += 1
 
     return {

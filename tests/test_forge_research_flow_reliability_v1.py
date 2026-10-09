@@ -638,6 +638,7 @@ def public_cli(plane: Path, *args: str, repo_root: Path=ROOT):
     """Actual unadapted public entry; no historical test output projection."""
     import os, subprocess
     env={**os.environ,'PYTHONUTF8':'1','PYTHONIOENCODING':'utf-8','SMIAL_DATA_ROOT':str(plane)}
+    env['PYTHONPATH']=str(repo_root/'src')+os.pathsep+env.get('PYTHONPATH','')
     done=subprocess.run([sys.executable,'-B',str(repo_root/'scripts/hypothesis_forge.py'),'--root',str(repo_root),'--data-root',str(plane),*args],cwd=repo_root,env=env,capture_output=True,text=True,encoding='utf-8',timeout=180)
     try:
         body=json.loads(done.stdout)
@@ -845,7 +846,7 @@ class EpisodeFlowTests(unittest.TestCase):
         before=store.diagnostics().committed_inventory_sha256
         exact_body,exact_pre=self.authored_draft(old_evidence,old_scope,initial['owner_focus'])
         exact_denied=self.cli('persist-draft','--draft',self.write('exact.json',exact_body),'--preflight-receipt',self.write('exact-pre.json',exact_pre),ok=False)
-        self.assertEqual(exact_denied['reason_code'],'EXACT_PRIOR_SCOPE_MATCH',exact_denied)
+        self.assertEqual(exact_denied.get('reason_code'),'EXACT_PRIOR_SCOPE_MATCH',exact_denied)
         self.assertEqual(exact_denied['status'],'BLOCKED')
         self.assertEqual(exact_denied['next_action'],'READ_EXACT_PRIOR_VERIFY_SESSION_OR_BLOCK')
         self.assertIn('session_id=null',exact_denied['owner_readout'])
@@ -932,7 +933,7 @@ class EpisodeFlowTests(unittest.TestCase):
         generated=self.cli('persist-draft','--draft',draft,'--preflight-receipt',self.write('old-pre.json',pre))
         old_resume=self.preflight(pre['owner_focus'])
         old_resume_path=self.write('old-resume.json',old_resume)
-        failure=subprocess.run([sys.executable,'-B',str(producer/'scripts/hypothesis_forge.py'),'--root',str(producer),'--data-root',str(self.plane),'freeze','--draft',draft,'--preflight-receipt',old_resume_path],env={**os.environ,'PYTHONUTF8':'1'},capture_output=True,text=True,encoding='utf-8',timeout=180)
+        failure=subprocess.run([sys.executable,'-B',str(producer/'scripts/hypothesis_forge.py'),'--root',str(producer),'--data-root',str(self.plane),'freeze','--draft',draft,'--preflight-receipt',old_resume_path],env={**os.environ,'PYTHONUTF8':'1','PYTHONPATH':str(producer/'src')+os.pathsep+os.environ.get('PYTHONPATH','')},capture_output=True,text=True,encoding='utf-8',timeout=180)
         self.assertNotEqual(failure.returncode,0)
         self.assertEqual(failure.stderr.strip(),'HFIC_PROTOCOL_INVALID')
         store=ResearchStore(self.plane)

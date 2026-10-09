@@ -2877,13 +2877,20 @@ def run_preflight(
         if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1
         else None
     )
+    from solana_alpha_lab.factory.hfic_memory_policy import HficMemoryPolicyError
+
     focus = owner_focus if owner_focus.strip() else AUTO_FOCUS
-    forge_input = build_forge_input_receipt(
-        Path(data_root),
-        repo_root=Path(repo_root),
-        evidence_surface_mode=control_mode,
-        owner_focus=focus,
-    )
+    try:
+        forge_input = build_forge_input_receipt(
+            Path(data_root),
+            repo_root=Path(repo_root),
+            evidence_surface_mode=control_mode,
+            owner_focus=focus,
+        )
+    except HficMemoryPolicyError as exc:
+        if exc.code != "HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS":
+            raise
+        raise HficPreflightError("REAL_DATA_MIGRATION_AMBIGUOUS") from exc
     stop_input = _forge_input_requires_preflight_stop(forge_input, control_mode)
     if stop_input:
         focus = owner_focus if owner_focus.strip() else AUTO_FOCUS

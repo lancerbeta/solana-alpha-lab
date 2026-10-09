@@ -19965,7 +19965,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://tests/test_delivery_harness_contract.py', repository_path: tests/test_delivery_harness_contract.py}
-  integrity: {kind: sha256, sha256: 3f931095fa2ba302b013f339babf40adb11660df0b84f83c1538db08378ea94c}
+  integrity: {kind: sha256, sha256: 3029fd13d112d752bc6124c80c3549efc186d628531fc792537a91847715a0e7}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-DELIVERY-HARNESS-001}
@@ -32374,7 +32374,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: b7784bf1324ed9dfeb941a31b0c6636c2dff9f2aafabf3cd8ffaea509bc3b800}
+  integrity: {kind: sha256, sha256: 4178578182a33f340f1493aaf9effaa09a51b99f7553f93bfa439102b05347a0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32514,7 +32514,7 @@ records:
   as_of: '2026-08-29'
   truth_owner: HFIC_ACTIVE_RDP_COMPATIBILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_preflight.py', repository_path: tests/test_hfic_preflight.py}
-  integrity: {kind: sha256, sha256: 1d28cf5c6d242d919dcdfface8d272c815587d1ab6a4032fccd91c2e9cbcd2c5}
+  integrity: {kind: sha256, sha256: 1a6d19d8066df38891f4949cbbea55f8670d3d4ba42a8b51c1d1d8db470752fc}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-ACTIVE-RDP-COMPATIBILITY-CLOSURE-001}
@@ -34276,7 +34276,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_cohort_to_forge_operational_closure_v1.py', repository_path: tests/test_live_cohort_to_forge_operational_closure_v1.py}
-  integrity: {kind: sha256, sha256: 33d543c5d37ca51afdc2170366dfaf43aa134f83a2372b5bd4ede7af5603990a}
+  integrity: {kind: sha256, sha256: 026a4816b5da6e32e4843cb439c0781771443ae62832949471963a1809a4bc7e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001}
@@ -38570,7 +38570,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_preflight.py', repository_path: src/solana_alpha_lab/factory/hfic_preflight.py}
-  integrity: {kind: sha256, sha256: 1e77f56aa44d603451e45431f27bd705c27f8c8ad9e9fc0625096352f9932be9}
+  integrity: {kind: sha256, sha256: 713e2efc9dca8ba7e330282c424c98171f65be767da51d697e8182db4b8dc998}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
