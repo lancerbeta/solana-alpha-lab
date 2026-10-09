@@ -8,7 +8,7 @@
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "776decd2cffadc4135aff7fb5aa2e7c000cec67c8c700c4cab5d5146096857e5",
     ".agents/skills/independent-hypothesis-critic/SKILL.md": "f2ebe852e28415e165ff5079ecbd14640fde091bc95ec0f05144102c68dc8f5b",
-    "catalog/assets/core.yaml": "f775cb196d4b002d7b4d18fae332f262ec171dda4dd5a56c0706b3454757e3d8",
+    "catalog/assets/core.yaml": "3a003e234ee65c7e8f74dc5f84e735207041ae11edc419bb31e0b5fbb45e12c3",
     "catalog/schemas/hypothesis_critic_input_v1.schema.json": "8cec438ff58b94d92800bd39f41bf6cc636bcfefa6b496d63c48bc02cf12094c",
     "configs/hypothesis_forge_independent_critic_v1.yaml": "af4fb5870bec5ca6fe1eb63ccc03d3f1984e154f5b909ab1fff1e52e3e9c4b8e",
     "docs/contracts/forge_research_flow_reliability_v1.md": "94d8f8f1dc26760493387f48fe56b9423d87c1e55e91a0d15fd8722f46e15946",
@@ -37,14 +37,14 @@
     "src/solana_alpha_lab/factory/hfic_prior_memory.py": "405040074c6af8069ce719fd6fa4f1cb8314a24c114878fc257ee10700a3f18b",
     "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py": "a37de24d7f9b6bd89955676e91533ab1c1d974889f6980e3dcc2a0384b628223",
     "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "ccfb74b62701382cd530edb0cd6680a767571358a2b22084b566f5fa08c2cb4d",
-    "src/solana_alpha_lab/factory/hfic_session.py": "dcd827699dea3b8a8f7765dd74ddad4f3428e585b8b8aabfbf307a82daf4b5ea",
+    "src/solana_alpha_lab/factory/hfic_session.py": "49fe9cad23ba421ea96e49c9a4b4d3aa6bcf39c6fab953b9424af6d4f3e50719",
     "src/solana_alpha_lab/factory/hfic_suppression_semantics.py": "f0d78edfa2a73928fd8afcd2cb5865b247698e744d6152e802e0ddf808a83ebf",
     "src/solana_alpha_lab/factory/prior_work.py": "7e5a9dd0e1a4c6c781209b566fe0a760046c541befc9524d03f84435b236e9e0",
     "src/solana_alpha_lab/factory/research_store.py": "38d6c17bea38a4388fa14509dfb401b1f4e6cdda74de7e41cf032debe080ef49",
     "tests/fixtures/forge_research_flow_reliability_v1/materialize_native_evidence.py": "0ea55dea116e4155701bb64e054a84460210cec0c83918c188afeaec8062fb14",
     "tests/fixtures/forge_research_flow_reliability_v1/resource_probe.py": "145fb99f304575b7a56944a03dcad0bdbd206664735b4735736a1adb3e541df9",
     "tests/test_delivery_harness_contract.py": "3029fd13d112d752bc6124c80c3549efc186d628531fc792537a91847715a0e7",
-    "tests/test_forge_research_flow_reliability_v1.py": "ecd79ce77aa55269a21a162098252ecd3b66f82aa1a203333fb982085a16675f",
+    "tests/test_forge_research_flow_reliability_v1.py": "7e51d2e8b2d8c098062c5d2e88189fffa628b7bb6229a92d4e4f11379b85cf33",
     "tests/test_forge_runtime_discovery_binding_v1.py": "1e25e041d354d1ba767db22c518def50a52e8b9ace2dab51b7294afc524d72bb",
     "tests/test_hfic_cli.py": "cfa9a7217dcc9967b861587319eb543960051dc9ca29afed51eb43a0ee73d682",
     "tests/test_hfic_critic_prior_memory_closure_v1.py": "2e4eb4da35dc3796ddb28de7dea1f5509094c4f562e0d3cdbd4e15d79e6c93eb",
@@ -65,14 +65,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_research_flow_reliability_v1/factory-fit.json",
-    "sha256": "000307bb8807f53d80c32e81c7d02a0b2d25188737c63f47aaeb01da4441ca08",
+    "sha256": "d287dfc3264c8b0d9b0e1e87ee607b1c913d9fa72455aff43bc656eebfeb759e",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_D01_D18_DIRECT_PROOFS_WITH_INITIAL_FAILURES_REPAIRED_SKIPS_RETAINED",
     "independent_review": {
       "path": "docs/evidence/forge_research_flow_reliability_v1/independent-review.json",
-      "sha256": "803e90dadc733f893c4a117a426bb65a6d1437c812df11495dd55f7730aa7e46",
+      "sha256": "4d72b633abac7f5e725f599cdf1e67fb71e63e564e8fb5ef81e142e818812075",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
