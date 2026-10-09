@@ -32374,7 +32374,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: dcd827699dea3b8a8f7765dd74ddad4f3428e585b8b8aabfbf307a82daf4b5ea}
+  integrity: {kind: sha256, sha256: 49fe9cad23ba421ea96e49c9a4b4d3aa6bcf39c6fab953b9424af6d4f3e50719}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}

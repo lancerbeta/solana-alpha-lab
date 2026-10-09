@@ -1226,14 +1226,10 @@ def _selected_candidate_block(
     disconfirming = str(card.get("disconfirming_prediction") or "NOT_DECLARED_IN_DRAFT")
     bindings = card.get("available_data_bindings", [])
     if isinstance(bindings, list):
-        # The direct Critic transport still validates each list item. Only an
-        # invalid outer shape is left intact for the packet schema to reject.
-        try:
-            project_material_card({"available_data_bindings": bindings})
-        except CardProjectionError as exc:
-            raise HficSessionError(exc.code, detail=exc.detail) from exc
-        # Critic strings are narrative transport, never typed resolver input.
-        # Encode authored objects reversibly; retain legacy strings verbatim.
+        # Direct Critic transport preserves malformed legacy items for packet
+        # schema rejection. New drafts are shape-checked by _project_draft_cards
+        # before persistence. Encode authored objects reversibly; keep other
+        # items verbatim instead of silently coercing them into valid strings.
         bindings = [
             _canonical_bytes(item).decode("utf-8") if isinstance(item, Mapping) else item
             for item in bindings

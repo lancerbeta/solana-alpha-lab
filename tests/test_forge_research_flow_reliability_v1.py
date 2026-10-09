@@ -85,12 +85,23 @@ class CardTransportTests(unittest.TestCase):
         self.assertEqual(caught.exception.detail["field_paths"], ["claim", "one_sentence_claim"])
 
     def test_typed_data_binding_is_reversible_without_coercing_invalid_item(self):
+        from jsonschema import Draft202012Validator
+        from solana_alpha_lab.factory.hfic_session import _project_draft_cards
         binding = {"field_id": "FIELD-HOLDER-COUNT-001", "point": "E300"}
         block = self.project(available_data_bindings=[binding, "literal"])
         self.assertEqual(json.loads(block["available_data_bindings"][0]), binding)
         self.assertEqual(block["available_data_bindings"][1], "literal")
-        with self.assertRaises(HficSessionError):
-            self.project(available_data_bindings=[False])
+        malformed = self.project(available_data_bindings=[False])
+        self.assertEqual(malformed["available_data_bindings"], [False])
+        schema = json.loads((ROOT / "catalog/schemas/hypothesis_critic_input_v1.schema.json").read_text(encoding="utf-8"))
+        binding_schema = schema["properties"]["selected_candidate"]["properties"]["available_data_bindings"]
+        self.assertTrue(list(Draft202012Validator(binding_schema).iter_errors(malformed["available_data_bindings"])))
+        authored = valid_draft()
+        authored["candidates"][0]["available_data_bindings"] = [False]
+        with self.assertRaises(HficSessionError) as caught:
+            _project_draft_cards(authored)
+        self.assertEqual(caught.exception.code, "CARD_TRANSPORT_SHAPE_INVALID")
+        self.assertEqual(caught.exception.detail["field_path"], "candidates[0].available_data_bindings[0]")
 
     def test_projected_risk_shapes_satisfy_the_actual_critic_selected_schema(self):
         from jsonschema import Draft202012Validator
