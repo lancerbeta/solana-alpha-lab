@@ -40985,7 +40985,7 @@ records:
     repository_path: docs/evidence/forge_native_lifecycle_closure_v1/checkpoint.json
   integrity:
     kind: sha256
-    sha256: 0f2d4bc8a23a70e586b94c20353f133cb7c8a3ed179cfa26fc7722fa86c92811
+    sha256: 085b2a5aea7a4d2fd95420d785091ed071a7e18d626cb3b0d7892d7beff01bd9
   access:
     mode: read_only
     method: file
@@ -41024,7 +41024,7 @@ records:
     repository_path: docs/evidence/forge_native_lifecycle_closure_v1/READOUT.md
   integrity:
     kind: sha256
-    sha256: 740cd42f194ef7eeeb63979c748966249d507238ef8cc7e9fb8682bd19e73305
+    sha256: 2ee676ddd162e84e7ff8bcf887c9ab317f52f497aec79900024376634dfae65b
   access:
     mode: read_only
     method: file

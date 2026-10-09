@@ -1,0 +1,106 @@
+{
+  "schema": "smial.native-lifecycle-checkpoint-independent-reviews",
+  "status": "NOT_READY",
+  "merge_approved": false,
+  "task_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "full_review_waves": 2,
+  "early_architecture_consultation": 1,
+  "bounded_code_continuation_after_wave2_observation": 1,
+  "continuation_local_replan": "Task REVIEW_LOCAL_REPLAN: newly introduced portable reader must pin original execution anchor. Not another full/native campaign.",
+  "review_candidates": {
+    "wave1": "a2e2d3b932ece77878a132083dc513763dc286fd",
+    "wave2": "ec195ddfefe3361a7e1243d6eac5d348b71b17a9",
+    "wave2_code_final_reread": "898461dfaeca093b02074d694ffa8986f7df16a9"
+  },
+  "reviewed_diff_is_not_final_evidence_archive_commit": "Final archive commits contain reports/checkpoint only, no runtime/method/fixture mutation; failed full DoD remains denied and no exact-head merge readiness asserted.",
+  "architecture_packets": [
+    "00c2fbfabd7b1da16acab3d678cb42f408fa5650af066ed100fa56ea14479371",
+    "05891ceabecd6ed68061bba55c6558d7df2ce9fbe7db3ddfe125a30744c1216c"
+  ],
+  "reports": [
+    {
+      "wave": 1,
+      "role": "CODE_REVIEWER",
+      "original_report_file": "code.md",
+      "original_report_sha256": "6058f80edc721a4a91b4dc3c8248f4449da76141a8bdf75285b91349e1c7e0dc",
+      "full_task_verdict": "NOT_READY",
+      "local_findings_wave2": "RETAINED_ORIGINAL_FINDINGS"
+    },
+    {
+      "wave": 1,
+      "role": "GOAL_DOD_CRITIC",
+      "original_report_file": "goal.md",
+      "original_report_sha256": "8621749d7ee72ddf9ba2289daa3f1ca127a2982149ae916d78cc8709d6e90df8",
+      "full_task_verdict": "NOT_READY",
+      "local_findings_wave2": "RETAINED_ORIGINAL_FINDINGS"
+    },
+    {
+      "wave": 1,
+      "role": "ARCHITECTURE_CRITIC",
+      "original_report_file": "architecture.md",
+      "original_report_sha256": "b2d6e92d59b68f013d4b6acf052ab392704de9dd407188b345624475c3127457",
+      "full_task_verdict": "NOT_READY",
+      "local_findings_wave2": "RETAINED_ORIGINAL_FINDINGS"
+    },
+    {
+      "wave": 1,
+      "role": "OWNER_UX_CRITIC",
+      "original_report_file": "owner-ux.md",
+      "original_report_sha256": "3e745044a650b565a5bed6c560a2d85a95742a6f8b6d4edf020ba681d3ff17d6",
+      "full_task_verdict": "NOT_READY",
+      "local_findings_wave2": "RETAINED_ORIGINAL_FINDINGS"
+    },
+    {
+      "wave": 2,
+      "role": "CODE_REVIEWER",
+      "original_report_file": "code.md",
+      "original_report_sha256": "a34c15682a0d31913025ec888ca7dc64c0ea2569040330020491ea19a14d04a5",
+      "full_task_verdict": "NOT_READY",
+      "local_findings_wave2": "RESOLVED_ONLY_BOUNDED_LOCAL_FIXES"
+    },
+    {
+      "wave": 2,
+      "role": "GOAL_DOD_CRITIC",
+      "original_report_file": "goal.md",
+      "original_report_sha256": "0a9ea4da17c960e812dec5530a23d11d5b615bfaf387bd2463f45e908236f115",
+      "full_task_verdict": "NOT_READY",
+      "local_findings_wave2": "RESOLVED_ONLY_BOUNDED_LOCAL_FIXES"
+    },
+    {
+      "wave": 2,
+      "role": "ARCHITECTURE_CRITIC",
+      "original_report_file": "architecture.md",
+      "original_report_sha256": "9f8629e41191c32c75d4abbc67ce678eb32f592eb8460d161893bd3572fc1d3f",
+      "full_task_verdict": "NOT_READY",
+      "local_findings_wave2": "RESOLVED_ONLY_BOUNDED_LOCAL_FIXES"
+    },
+    {
+      "wave": 2,
+      "role": "OWNER_UX_CRITIC",
+      "original_report_file": "owner-ux.md",
+      "original_report_sha256": "463b5441a4cdd1f49aa58129665963003e3a485e076281712a7d8041b3910036",
+      "full_task_verdict": "NOT_READY",
+      "local_findings_wave2": "RESOLVED_ONLY_BOUNDED_LOCAL_FIXES"
+    }
+  ],
+  "bundles": [
+    {
+      "path": "docs/evidence/forge_native_lifecycle_closure_v1/engineering-reviews-wave1-originals.json",
+      "sha256": "4349e32863340ca0e48ab55cbba76cddbf33fc434802093d821140d823ab1b6b"
+    },
+    {
+      "path": "docs/evidence/forge_native_lifecycle_closure_v1/engineering-reviews-wave2-originals.json",
+      "sha256": "a59f5341d9c7e049cee7c1c896fb2f935b05522267f47af433cfa41777ea23f9"
+    }
+  ],
+  "native_full_dod": "FAIL_0_OF_2",
+  "native_generator_count": 4,
+  "native_critic_count": 1,
+  "no_single_agent_review_fallback": true
+}

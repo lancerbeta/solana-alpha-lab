@@ -49,13 +49,14 @@
   },
   "remaining_budget_semantics": "No additional new Generator. Unused REVISE_ONCE slots require an actual frozen revision verdict on same locked question; cannot become new questions or arbitrary authoring retries. Current Critic NEXT=STOP.",
   "verdicts": {
-    "implementation_or_existing_path": "REPAIRED_PARTIAL",
-    "native_primary": "FAIL_TECHNICAL_TERMINAL_NOT_ACCEPTED",
-    "native_transfer": "BLOCKED_BEFORE_PERSIST",
-    "recovery_and_accounting": "PASS_TECHNICAL_TERMINAL_ONLY",
+    "implementation_or_existing_path": "REPAIRED",
+    "native_primary": "FAIL",
+    "native_transfer": "BLOCKED",
+    "recovery_and_accounting": "PASS",
     "overall_scope": "FAIL_DOD",
-    "delivery": "LOCAL_CHECKPOINT_NOT_READY_FOR_MERGE",
-    "alpha_oos_live_comparative_gain": "NOT_EVALUATED"
+    "delivery": "LOCAL_VERIFIED",
+    "alpha_oos_live_comparative_gain": "NOT_EVALUATED",
+    "safety_and_compatibility": "BLOCKED"
   },
   "primary": {
     "session_id": "HFIC-SESS-2949E0B69BDF6189",
@@ -162,14 +163,18 @@
   },
   "next_action": "Owner approves one local replan of the same task: complete authored-scope validation before MAIN plus reconcile incomplete historical prior applicability, then explicitly authorize one fresh final primary/transfer pair on a committed implementation snapshot. No new looks before that budget change.",
   "engineering_review": {
-    "wave1": {
-      "code": "NOT_READY_WITH2_P2",
-      "architecture": "NOT_READY_WITH_MALFORMED_MODE_AND_PRIOR_APPLICABILITY",
-      "goal_dod": "FAIL_FULL_DOD",
-      "owner_ux": "NOT_READY_WITH3_GUIDANCE_GAPS"
-    },
-    "wave2": "PENDING_BOUNDED_FIX_READBACK",
-    "merge_ready": false
+    "full_waves": 2,
+    "bounded_code_continuation": 1,
+    "required_roles": [
+      "CODE_REVIEWER",
+      "GOAL_DOD_CRITIC",
+      "ARCHITECTURE_CRITIC",
+      "OWNER_UX_CRITIC"
+    ],
+    "all_full_dod_verdicts": "NOT_READY",
+    "bounded_local_findings": "RESOLVED",
+    "evidence": "docs/evidence/forge_native_lifecycle_closure_v1/independent-reviews.json",
+    "exact_head_merge_readiness": "NOT_REQUESTED_FAILED_DOD"
   },
   "readout": "docs/evidence/forge_native_lifecycle_closure_v1/READOUT.md",
   "completion_evidence": "NOT_CREATED_FAILED_DOD",
@@ -227,5 +232,13 @@
       "V7": "PRIMARY_TECHNICAL_PASS_TRANSFER_BLOCKED"
     },
     "full_dod": "FAIL"
-  }
+  },
+  "product_method_candidate_head": "898461dfaeca093b02074d694ffa8986f7df16a9",
+  "verdict_scopes": {
+    "implementation": "Mode/descriptor/invalid-label/capture/local-reader only; no full capability acceptance.",
+    "recovery": "Saved technical primary terminal only.",
+    "safety_and_compatibility": "Scoped evidence and prior-epoch reuse; V5/V6 PARTIAL, full native DoD remains failed.",
+    "delivery": "Local committed budget checkpoint only. No PR/push/candidate CI/completion PASS/merge-readiness/owner phrase."
+  },
+  "main_readback_at_2026_10_09_21_42_58_utc": "d2cd1fdf6fb10b5efc3e3b7f7b752bcee574f8dc"
 }

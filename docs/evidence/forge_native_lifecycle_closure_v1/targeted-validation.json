@@ -41,5 +41,23 @@
     "wall_seconds": 0.635,
     "native_reexecution": false,
     "initial_red": "Explicit None reproduced default-to-known bug; test context nesting corrected after first expected failure before all7 subcases were checked."
-  }
+  },
+  "post_review_direct_consumers": {
+    "tests": 9,
+    "status": "PASS",
+    "wall_seconds": 1.121,
+    "scope": "Existing ordinary scope isolation, same bytes not new look, production row recipes after malformed label guard."
+  },
+  "reader_anchor": {
+    "status": "PASS",
+    "scope": "EXACT_READER_EXPRESSION_REJECTS_SIMULATED_MATCHING_DRIFT_AND_REPINNED_LOCAL_JSON",
+    "actual_git_mutations": 0,
+    "native_model_calls": 0,
+    "scientific_looks": 0,
+    "refusal": "ORIGINAL_EXECUTION_ANCHOR_MISMATCH",
+    "original_head": "838753ba29224a4b4cfc5298637b5a03aa4dc930",
+    "original_composite": "a13130ec4dc5ac1b581f3332bf610df7d09c8f3df9b6615dc1019b8660a45557",
+    "positive_actual_reader": "PASS_ORIGINAL_SAVED_TERMINAL_1_0_0"
+  },
+  "setup_sync_failure": "One NAV_GENERATOR_FAILED after task bytes changed during async sync; final quiescent scoped sync idempotent PASS, no hash manual override."
 }
