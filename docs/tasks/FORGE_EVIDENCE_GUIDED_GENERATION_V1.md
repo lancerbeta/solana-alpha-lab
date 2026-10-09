@@ -8,9 +8,9 @@ allowed_routes: [DIRECT_CODEX_DELIVERY]
 required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: fb65d69f6e48c49b26937bb6caf324b3417b094e
+  expected_base: 0f89ffd8018c05fbafaf79ef609c7dadf888807f
   expected_upstream: origin/main
-  expected_upstream_oid: fb65d69f6e48c49b26937bb6caf324b3417b094e
+  expected_upstream_oid: 0f89ffd8018c05fbafaf79ef609c7dadf888807f
   expected_branch: codex/forge-evidence-guided-generation-v1
   dirty_mode: ALLOW_REPORTED
 objective: Add phase-admissible evidence-guided context and bounded source-bound research working memory to ordinary Forge, independently retaining full-scope safety guards, proving R1-R10 and P1-P8 with production-path synthetic and isolated native evidence.
@@ -122,3 +122,5 @@ Market alpha, chronology and live economics: NOT_EVALUATED.
 Entry owner localization: forge_input_receipt._prior_memory_ok also builds the
 legacy full snapshot before ordinary preflight. Its direct source consumer is
 included to remove the same archive-capacity dependency, not to bypass readiness.
+
+Delivery integration: owner confirmed PR389 merged at0f89ffd8018c05fbafaf79ef609c7dadf888807f. Ordinary merge preserves PaperPlane source changes; only shared Catalog/navigation conflicts require generated propagation. Original scientific/native evidence remains bound to its recorded PR388/capability frames. No Forge source rewrite, native reroll or authority expansion.

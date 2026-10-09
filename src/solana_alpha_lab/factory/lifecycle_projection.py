@@ -13,7 +13,7 @@ import yaml
 from jsonschema import Draft202012Validator
 
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
-from solana_alpha_lab.factory.paper_plane import PaperPlaneStore
+from solana_alpha_lab.factory.paper_plane import PaperPlaneError, PaperPlaneStore
 from solana_alpha_lab.factory.strategy_runtime import load_strategy_version
 
 
@@ -1125,14 +1125,15 @@ def _adapt_paper_plane(
                 ],
             )
         try:
-            conn = _sqlite_readonly(path)
+            reader = PaperPlaneStore(path, readonly=True)
             try:
-                bots = [dict(row) for row in conn.execute("SELECT * FROM bot_instances ORDER BY bot_instance_id")]
-                positions = [dict(row) for row in conn.execute("SELECT * FROM positions ORDER BY position_id")]
-                events = [dict(row) for row in conn.execute("SELECT * FROM execution_events ORDER BY rowid")]
+                with reader.read_snapshot():
+                    bots = sorted(reader.bots(), key=lambda row: str(row["bot_instance_id"]))
+                    positions = sorted(reader.positions(), key=lambda row: str(row["position_id"]))
+                    events = reader.execution_events()
             finally:
-                conn.close()
-        except sqlite3.Error as exc:
+                reader.close()
+        except (PaperPlaneError, sqlite3.Error, OSError) as exc:
             source = _source(
                 source_id=source_id,
                 truth_plane="RUNTIME",

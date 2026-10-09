@@ -1,0 +1,203 @@
+{
+  "schema": "smial.paper-plane-read-freshness-acceptance",
+  "schema_version": "1.0",
+  "task_id": "PAPER_PLANE_READ_FRESHNESS_V1",
+  "as_of": "2026-10-09",
+  "scope": "SYNTHETIC_OFFLINE_ONLY",
+  "base_main": "fb65d69f6e48c49b26937bb6caf324b3417b094e",
+  "actual_environment": {
+    "os": "Windows",
+    "python": "3.13.14",
+    "sqlite": "3.53.1",
+    "uv": "0.11.29"
+  },
+  "historical_p6_sha256": "23d3ca241fd93263b17ebae3e47c3e98c2ef55857b1f0e2377128e189bdc02f0",
+  "base_reproduction": {
+    "source_anchor": "fb65d69f6e48c49b26937bb6caf324b3417b094e",
+    "public_reader_position": "OPEN",
+    "committed_position": "UNRESOLVED",
+    "reader_policy_revision": 1,
+    "reader_cap": "30",
+    "committed_policy_revision": 2,
+    "committed_cap": "20",
+    "reader_policy_sha256": "fcf7eb6bcf370ae77bbf8ad50c218942fb0abde92fb826eaaeb475920120e4e5",
+    "committed_policy_sha256": "6874012ff1850814179db8a8b37e1e8e573d50dc1e95dc4445fdd055a23d4aca",
+    "failure_repetitions": 2,
+    "assertion": "OPEN != UNRESOLVED",
+    "run_log_sha256": "8c7685fe7c792abc8fd2e8fe787432ea5568c917b3c83ca3cc9c84afb9c74e58"
+  },
+  "candidate_repetitions": [
+    {
+      "repetition": 1,
+      "position_state": "UNRESOLVED",
+      "policy_revision": 2,
+      "current_cap": "20",
+      "writer_policy_sha256": "6874012ff1850814179db8a8b37e1e8e573d50dc1e95dc4445fdd055a23d4aca",
+      "reader_policy_sha256": "6874012ff1850814179db8a8b37e1e8e573d50dc1e95dc4445fdd055a23d4aca",
+      "frozen_admission": "30",
+      "business_sha256_before_read": "730c1a14fbc045c211a333ee1ec22b5e6b0a64ac19b683d8b6394df97f86530e",
+      "business_sha256_after_read": "730c1a14fbc045c211a333ee1ec22b5e6b0a64ac19b683d8b6394df97f86530e",
+      "business_unchanged": true,
+      "forbidden_created_files": [],
+      "next_read_revision": 3,
+      "next_read_hash": "60eb3dad8f9b881d78fdeeef213ccab7e8a4f6b56e6d70d7cb78c19a39f40838",
+      "writer_open": true,
+      "wal_present": true
+    },
+    {
+      "repetition": 2,
+      "position_state": "UNRESOLVED",
+      "policy_revision": 2,
+      "current_cap": "20",
+      "writer_policy_sha256": "6874012ff1850814179db8a8b37e1e8e573d50dc1e95dc4445fdd055a23d4aca",
+      "reader_policy_sha256": "6874012ff1850814179db8a8b37e1e8e573d50dc1e95dc4445fdd055a23d4aca",
+      "frozen_admission": "30",
+      "business_sha256_before_read": "aa60cce58e3835813f4c707a71503ca1876de30069dd503f1fcd8d4a177c7765",
+      "business_sha256_after_read": "aa60cce58e3835813f4c707a71503ca1876de30069dd503f1fcd8d4a177c7765",
+      "business_unchanged": true,
+      "forbidden_created_files": [],
+      "next_read_revision": 3,
+      "next_read_hash": "60eb3dad8f9b881d78fdeeef213ccab7e8a4f6b56e6d70d7cb78c19a39f40838",
+      "writer_open": true,
+      "wal_present": true
+    }
+  ],
+  "assertion_verdict": "PASS_READ_FRESHNESS_2_OF_2",
+  "snapshot_coherence": "PASS_COMMIT_DURING_READ_VISIBLE_TO_NEXT_REQUEST",
+  "failure_cases": {
+    "missing_root": "NOT_PRESENT_NO_BOOTSTRAP",
+    "missing_db": "NOT_PRESENT_NO_BOOTSTRAP",
+    "corrupt": "UNAVAILABLE",
+    "os_access_denied": "UNAVAILABLE_WINDOWS_EXCLUSIVE_HANDLE_AND_PERMISSIONERROR",
+    "read_error_after_success": "UNAVAILABLE_NO_STALE_FALLBACK",
+    "non_wal": "PASS_DELETE_JOURNAL_READONLY_SQL_WRITE_DENIED",
+    "http_and_lifecycle": "PASS_UNRESOLVED_FROM_SAME_LIVE_OWNER"
+  },
+  "owner_authorization_delta": "2026-10-09 direct owner reply permits native SQLite WAL/SHM sidecars only",
+  "purity": {
+    "allowed_native_sidecars": [
+      "local/factory_v1/paper_plane_state.sqlite-wal",
+      "local/factory_v1/paper_plane_state.sqlite-shm"
+    ],
+    "business_oracle": "SHA256 of complete sqlite iterdump schema and all table rows before/after GET on independent source connection",
+    "no_business_writes": true,
+    "no_data_root_db_tables_bootstrap": true,
+    "no_reader_checkpoint_migration_repair": true,
+    "forbidden_created_files": 0
+  },
+  "validation": {
+    "execution_domain_tests": 187,
+    "expected_existing_skips": 2,
+    "skip_reason": "LOCAL_A4_ABSENT; separate live evidence not authorized",
+    "initial_candidate_failures": [
+      "Catalog hash drift before harness_sync",
+      "closed WAL purity expectation before authorized sidecar amendment"
+    ],
+    "final_targeted_recheck": "PASS_CATALOG_AND_CLOSED_WAL_PURITY",
+    "modules": [
+      "test_factory_strategy_execution_boundary_v1",
+      "test_paper_shadow_accounting_and_control_v1",
+      "test_owner_operations_cockpit_v1",
+      "test_owner_trading_operability_workbench_v1",
+      "test_trading_operations_workbench_v2",
+      "test_trading_runtime_admission_concurrency_v1",
+      "test_trading_runtime_policy_backup_restore_v1",
+      "test_trading_runtime_policy_v1",
+      "test_owner_lifecycle_projection_spine_v1",
+      "test_early_state_to_paper_vertical_slice",
+      "test_factory_unattended_shadow_vertical_slice",
+      "test_factory_v1_owner_cockpit",
+      "test_execution_domain_modularity_and_fast_ci_v1",
+      "test_risk_and_economics_v1",
+      "test_paper_shadow_execution_integrity_vertical_v1"
+    ],
+    "new_a4_tests": 8,
+    "reproduce": "uv run --locked --managed-python python -B -m unittest discover -s tests -p test_paper_shadow_execution_integrity_vertical_v1.py -k ReadFreshnessTests -v",
+    "regression_reproduce": "uv run --locked --managed-python python -B scripts/run_ci_execution_domain.py",
+    "race_iterations_unchanged": 40,
+    "effective_result": {
+      "unique_tests": 187,
+      "passed": 185,
+      "failed": 0,
+      "skipped": 2,
+      "method": "One complete focused execution-domain run after ownership repair"
+    },
+    "post_architecture_regression": "PASS_187_CASES_185_PASS_TWO_EXISTING_SKIPS",
+    "skip_details": [
+      [
+        "test_early_state_to_paper_vertical_slice.FrozenHypothesisTests.test_pinned_replay_matches_committed_receipt",
+        "LOCAL_A4_ABSENT"
+      ],
+      [
+        "test_early_state_to_paper_vertical_slice.RunnerRerunTests.test_commissioning_is_rerunnable_over_reconciled_store",
+        "LOCAL_A4_ABSENT"
+      ]
+    ],
+    "run_log_sha256": "291cb7c4ef41f9c421ef76bcadb21bec7098eaab09e51625fbcbfe8dc9dfb6e6",
+    "ci_first_candidate": {
+      "head": "a966fedc710833930245f74a3dea23c7add31de0",
+      "run_id": 37957205106,
+      "execution_domain": "PASS_187_TESTS_ZERO_FAILURES_TWO_EXISTING_LOCAL_A4_ABSENT_SKIPS",
+      "execution_os": "Linux",
+      "execution_job_id": 113911233534,
+      "failed_shards": [
+        3,
+        5
+      ],
+      "failures": [
+        "SOURCE_DISPOSITION_REQUIRED",
+        "STATIC_APPLICATION_BASE_PIN_MISMATCH"
+      ],
+      "final_ci": "ENFORCED_LIVE_AT_MERGE_READINESS"
+    },
+    "ci_compatibility_recheck": {
+      "tests": 26,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "log_sha256": "b25ae2ab2b034c5ae3cd24889c262786abcda940bcfb8b25afc0ff4f20e0cce9"
+    }
+  },
+  "source_bindings": {
+    "src/solana_alpha_lab/factory/paper_plane.py": "65ef55800b857659445cb6478cd5406eed70a0b4e6227f5672bd3a4f65c84804",
+    "src/solana_alpha_lab/factory/application.py": "73e02402a8f6e0a294a9c580a64c623f3c6bb6fe4f1afd31557edc0cf3ea6fc3",
+    "src/solana_alpha_lab/factory/lifecycle_projection.py": "73e1eae462536f07c0a8ff597ebbea37925eae11864b13fe67c43daca7457820",
+    "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
+    "tests/test_trading_operations_workbench_v2.py": "0764f3652f042d2306e70defc3de3462d3c4ff5606f24bef048d8c34d49e7a32",
+    "tests/test_risk_and_economics_v1.py": "6d0742193f5fd20ec9a660074a826561b9f0b27e443b09efee11c880c9681a2e",
+    "tests/test_factory_ordinary_market_hypothesis.py": "4b61fe4dac3c21cb2696afe7581dc028b36e8f31498c4cf0483bdc0a6837fce9"
+  },
+  "failure_history": [
+    "fixture strategy hash recomputation setup error, corrected before baseline proof",
+    "public immutable baseline stale 2/2",
+    "closed WAL reader creates two sidecars, owner explicitly permits them",
+    "HTTP/lifecycle missing fixture contracts and spec setup corrected",
+    "purity exception initially patched wrong assertion, corrected; missing-source no-file assertion restored; intended closed-WAL case passed",
+    "architecture A4-ARCH-01 shared reader closure across HTTP requests; deterministic overlap exited 0xC0000005 on Windows before ownership repair",
+    "owner UX residual F04 explanation added",
+    "PR CI head a966fedc710833930245f74a3dea23c7add31de0: SOURCE_DISPOSITION_REQUIRED in new acceptance receipt; explicit NO_CHANGE added without release mutation",
+    "PR CI head a966fedc710833930245f74a3dea23c7add31de0: static ordinary-hypothesis application.py base pin mismatched authorized A4 change; only that pin updated and composition regressions preserved"
+  ],
+  "limits": [
+    "NO_ALPHA",
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_LIVE_STORAGE_OR_PROVIDER_CALLS",
+    "NO_MERGE_OR_DEPLOY",
+    "F01_F03_F04_REMAIN_OPEN",
+    "LOW_LEVEL_SIDECAR_BYTE_IMMUTABILITY_NOT_CLAIMED",
+    "LINUX_OS_PERMISSION_TEST_ENFORCED_BY_EXISTING_CI"
+  ],
+  "snapshot_ownership": "PASS_TWO_OVERLAPPING_PUBLIC_HTTP_GETS_SEPARATE_REQUEST_READERS_CLOSED_AFTER_MATERIALIZATION",
+  "overlap_reproduction": {
+    "before_head": "6f0fa0dbf8bbbc36f7b51fd968a7cd719c3169d8",
+    "os": "Windows",
+    "process_exit": "0xC0000005",
+    "red_log_sha256": "cf0774f0797248366fcc5eecd78fc00f2f9383bc26f81f1babe9cc75d0471f63",
+    "after": "PASS_DISTINCT_READERS_BOTH_PRESENT_CLOSED_HANDLES_AND_NEXT_READ_FRESH",
+    "test": "ReadFreshnessTests.test_overlapping_http_gets_do_not_close_each_others_reader"
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT; A4 does not change release registry or cloud payload and requires no activation/smoke."
+  }
+}

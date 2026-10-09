@@ -5,7 +5,9 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+from contextlib import nullcontext
 from pathlib import Path
+from threading import local
 from typing import Any, Mapping
 
 import yaml
@@ -138,6 +140,7 @@ class FactoryApplication:
             else SCHEMA_SOURCE_NOT_PRESENT
         )
         self._paper_plane_store = paper_plane_store
+        self._paper_plane_read_context = local()
         self._paper_plane_readonly = None
         self._paper_plane_source_status = "NOT_PRESENT"
         self._runner: ExperimentRunner | None = None
@@ -203,7 +206,25 @@ class FactoryApplication:
             self._runner = ExperimentRunner(root=self.root, store=self.store)
         return self._runner
 
+    @property
+    def _paper_plane_readonly(self) -> PaperPlaneStore | None:
+        return getattr(self._paper_plane_read_context, "reader", None)
+
+    @_paper_plane_readonly.setter
+    def _paper_plane_readonly(self, reader: PaperPlaneStore | None) -> None:
+        self._paper_plane_read_context.reader = reader
+
+    @property
+    def _paper_plane_source_status(self) -> str:
+        return getattr(self._paper_plane_read_context, "source_status", "NOT_PRESENT")
+
+    @_paper_plane_source_status.setter
+    def _paper_plane_source_status(self, status: str) -> None:
+        self._paper_plane_read_context.source_status = status
+
     def _close_paper_plane_readonly(self) -> None:
+        # ThreadingHTTPServer shares the application; a request may close only
+        # its own discovered reader, never another request's live snapshot.
         cached = self._paper_plane_readonly
         self._paper_plane_readonly = None
         if cached is not None:
@@ -214,12 +235,11 @@ class FactoryApplication:
             self._paper_plane_source_status = "PRESENT"
             return self._paper_plane_store
         path = paper_plane_store_path(self.root)
-        if not path.is_file():
-            self._close_paper_plane_readonly()
-            self._paper_plane_source_status = "NOT_PRESENT"
-            return None
         self._close_paper_plane_readonly()
         try:
+            if not path.is_file():
+                self._paper_plane_source_status = "NOT_PRESENT"
+                return None
             self._paper_plane_readonly = PaperPlaneStore(path, readonly=True)
         except (PaperPlaneError, sqlite3.Error, OSError):
             self._paper_plane_source_status = "UNAVAILABLE"
@@ -247,24 +267,35 @@ class FactoryApplication:
         store = self.existing_paper_plane()
         if store is None:
             raise self._missing_runtime_error()
-        return build_operations_projection(store)
+        try:
+            with store.read_snapshot():
+                return build_operations_projection(store)
+        except (PaperPlaneError, sqlite3.Error, OSError):
+            self._close_paper_plane_readonly()
+            self._paper_plane_source_status = "UNAVAILABLE"
+            raise self._missing_runtime_error() from None
+        finally:
+            self._close_paper_plane_readonly()
 
     def economics_projection(self) -> dict[str, Any]:
         store = self.existing_paper_plane()
-        if store is None:
-            status = self._paper_plane_source_status or "NOT_PRESENT"
-            eco = compose_risk_economics(self.root, None, source_status=status)
-            eco["runtime_envelope"] = {
-                "modes": {},
-                "by_strategy": [],
-                "source_status": status,
-            }
-            return eco
-        eco = compose_risk_economics(self.root, store, source_status="PRESENT")
         from solana_alpha_lab.factory.trading_operations import list_git_strategies
         from solana_alpha_lab.factory.trading_runtime_policy import compose_runtime_envelope
 
-        eco["runtime_envelope"] = compose_runtime_envelope(store, list_git_strategies(self.root))
+        if store is not None:
+            try:
+                with store.read_snapshot():
+                    eco = compose_risk_economics(self.root, store, source_status="PRESENT")
+                    eco["runtime_envelope"] = compose_runtime_envelope(store, list_git_strategies(self.root))
+                    return eco
+            except (PaperPlaneError, sqlite3.Error, OSError):
+                self._close_paper_plane_readonly()
+                self._paper_plane_source_status = "UNAVAILABLE"
+            finally:
+                self._close_paper_plane_readonly()
+        status = self._paper_plane_source_status or "NOT_PRESENT"
+        eco = compose_risk_economics(self.root, None, source_status=status)
+        eco["runtime_envelope"] = {"modes": {}, "by_strategy": [], "source_status": status}
         return eco
 
     def market_projection(self, *, as_of=None) -> dict[str, Any]:
@@ -278,12 +309,20 @@ class FactoryApplication:
         self, *, last_command: Mapping[str, Any] | None = None
     ) -> dict[str, Any]:
         store = self.existing_paper_plane()
-        return compose_trading_operations(
-            self.root,
-            store,
-            last_command=last_command,
-            source_status=self._paper_plane_source_status,
-        )
+        try:
+            with store.read_snapshot() if store is not None else nullcontext():
+                return compose_trading_operations(
+                    self.root, store, last_command=last_command,
+                    source_status=self._paper_plane_source_status,
+                )
+        except (PaperPlaneError, sqlite3.Error, OSError):
+            self._close_paper_plane_readonly()
+            self._paper_plane_source_status = "UNAVAILABLE"
+            return compose_trading_operations(
+                self.root, None, last_command=last_command, source_status="UNAVAILABLE"
+            )
+        finally:
+            self._close_paper_plane_readonly()
 
     def research_discovery(self) -> Any:
         if self._research_discovery is None:
@@ -763,13 +802,7 @@ class FactoryApplication:
             runtime=model.get("runtime") if isinstance(model.get("runtime"), dict) else None,
             pinned_produced_gaps=gaps,
         )
-        paper_store = self.existing_paper_plane()
-        trading = compose_trading_operations(
-            self.root,
-            paper_store,
-            last_command=last_command,
-            source_status=self._paper_plane_source_status,
-        )
+        trading = self.trading_operations_projection(last_command=last_command)
         model["trading_operations"] = trading
         operator_attention = []
         for item in trading.get("attention") or []:
@@ -786,14 +819,12 @@ class FactoryApplication:
             )
         if surface == "OPERATIONS":
             cockpit["attention"] = list(cockpit.get("attention") or []) + operator_attention
-        if paper_store is not None and str(trading.get("source_status")) == "PRESENT":
-            operations = trading.get("operations")
-            if not isinstance(operations, dict):
-                operations = build_operations_projection(paper_store)
+        if str(trading.get("source_status")) == "PRESENT":
+            operations = trading["operations"]
             model["operations"] = operations
-            model["economics"] = compose_risk_economics(
-                self.root, paper_store, source_status="PRESENT", operations=operations
-            )
+            # Reuse the economics computed in the same readonly snapshot as
+            # positions and current policy; do not re-query after its end.
+            model["economics"] = trading["economics"]
             model["economics"]["runtime_envelope"] = trading.get("runtime_envelope") or {}
             model["recent_changes"] = trading.get("recent_changes") or []
             cockpit["terminal"] = "OWNER_OPERATIONS_COCKPIT_PASS"
