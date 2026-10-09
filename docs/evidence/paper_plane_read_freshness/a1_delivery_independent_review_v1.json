@@ -4,8 +4,8 @@
   "review_id": "PAPER-PLANE-READ-FRESHNESS-INDEPENDENT-REVIEW-002",
   "as_of": "2026-10-09",
   "task_id": "PAPER_PLANE_READ_FRESHNESS_V1",
-  "reviewed_bindings_sha256": "f7f46683768e9df92bdecdccdca50afe4c179235c5dfec73104534a250d71d12",
-  "reviewed_inventory_sha256": "6607d1ece19a474d6d50bd49848ae253a3820ddc85c13df3d6c7d830c030179c",
+  "reviewed_bindings_sha256": "248162a998f04d0154638482a63a908714f8cdf6dfd13b02d9f83f49b397acd7",
+  "reviewed_inventory_sha256": "00993576e882d6c819426653ca06d772c95ee1bb1255ef2e6b4409990bd9d22a",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

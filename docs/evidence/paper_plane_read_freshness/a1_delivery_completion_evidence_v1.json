@@ -15,18 +15,19 @@
     "2026-10-09 direct reply permits native SQLite WAL/SHM on readonly GET; no root/database/tables/bootstrap/migration/checkpoint/repair/business writes"
   ],
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "9b1049580758a626d101e71d17407e4b152507b271f4606c636efe5340142947",
+    "catalog/assets/core.yaml": "9cf8bf4246908cdb43c5bed68269494301ad92e7002df6ecf0fd7f48f040c5f1",
     "catalog/assets/lifecycle.yaml": "3f439c4a1c422ba90965576ee671afc176fd45ce3c309d0b154aff072edd51c9",
     "catalog/catalog_manifest.yaml": "e9ece849202c2cd93bffafa5f395f749a412de233cd77b2422a2900558f7d3df",
     "catalog/generated/asset_edges.json": "3f19db053f6619ebbfd76c0c0fdac18740b600ae5c58680610f6bd3b8754945b",
     "docs/PROJECT_MAP.md": "00c5a2a6e24f08f4910f67b6ec271c0ecd5d94bb605c0071d456bf071093f0d0",
     "docs/architecture/PAPER_SHADOW_EXECUTION_INTEGRITY_PRD_SSD_V1.md": "2b1378a69cf63db5b658752c2f9d5237ffd7af6a4c86a58eee6b2b7e93a22602",
-    "docs/evidence/paper_plane_read_freshness/a1_vertical_acceptance_v1.json": "f3c0446d13c1cb171a623d09b67731de050ef765267ebf81c9cd085e7a2411d1",
-    "docs/reports/paper_plane_read_freshness/a1_owner_readout_v1.md": "3934b72babc78ce48213474f3fb19cb832bd308bc2ee057efc536bfe56419df6",
-    "docs/tasks/PAPER_PLANE_READ_FRESHNESS_V1.md": "397722865eaa487929f7fce768120b3552d32af644f3f0a4f23f6ee59e225264",
+    "docs/evidence/paper_plane_read_freshness/a1_vertical_acceptance_v1.json": "067196ef524e2436583a68c472866e6d5fce50ad234bad30a686425375cb2f9d",
+    "docs/reports/paper_plane_read_freshness/a1_owner_readout_v1.md": "7c48f1bed692031f8f77ae36486a36c67afd94144b76d01f3f98d66bed984460",
+    "docs/tasks/PAPER_PLANE_READ_FRESHNESS_V1.md": "148c1d1be27c9f74e8e96f897d173fdd70d54a5e5ef76725d25f7cec2e31b96a",
     "src/solana_alpha_lab/factory/application.py": "73e02402a8f6e0a294a9c580a64c623f3c6bb6fe4f1afd31557edc0cf3ea6fc3",
     "src/solana_alpha_lab/factory/lifecycle_projection.py": "73e1eae462536f07c0a8ff597ebbea37925eae11864b13fe67c43daca7457820",
     "src/solana_alpha_lab/factory/paper_plane.py": "65ef55800b857659445cb6478cd5406eed70a0b4e6227f5672bd3a4f65c84804",
+    "tests/test_factory_ordinary_market_hypothesis.py": "4b61fe4dac3c21cb2696afe7581dc028b36e8f31498c4cf0483bdc0a6837fce9",
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_risk_and_economics_v1.py": "6d0742193f5fd20ec9a660074a826561b9f0b27e443b09efee11c880c9681a2e",
     "tests/test_trading_operations_workbench_v2.py": "0764f3652f042d2306e70defc3de3462d3c4ff5606f24bef048d8c34d49e7a32"
@@ -41,14 +42,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/paper_plane_read_freshness/a1_delivery_factory_fit_v1.json",
-    "sha256": "adc52cb6cb1b9207d20a7d8bb67b5b4e031cd6739be98790271c64532a963e27",
+    "sha256": "326eceeb11aa10b9433f4d8ea28fbf803b049e161dcac6ba836177ea0581ca59",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_185_EXECUTION_DOMAIN_TESTS_TWO_EXISTING_LOCAL_A4_ABSENT_SKIPS_AND_26_COMPATIBILITY_TESTS_ZERO_SKIPS",
     "independent_review": {
       "path": "docs/evidence/paper_plane_read_freshness/a1_delivery_independent_review_v1.json",
-      "sha256": "b9ad9c9500bc7b21dd7461534d118047b488914d1adb7d17dff6a504877f04c3",
+      "sha256": "4f916bfc3f9218773c6e7ed221fee8dd0919d618fb601ed10352b3e44b9ff2cb",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
