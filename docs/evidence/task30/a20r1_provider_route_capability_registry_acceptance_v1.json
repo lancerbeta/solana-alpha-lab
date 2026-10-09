@@ -65,7 +65,7 @@
     },
     "domain_policy": {
       "path": "delivery-harness/policies/solana-alpha-lab.md",
-      "sha256": "a4692be7cf58ee7ad1d5a20f6d96a8bc8902d133e28b2a0483655e15d09b2d23"
+      "sha256": "3621bb2e2f3a27de8c10b904da14b9397789496ca5866674e15873026e017d89"
     }
   },
   "non_claims": {

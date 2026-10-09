@@ -1,0 +1,77 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "SMIAL_VERIFICATION_POLICY_PATCH_V1-DELIVERY",
+  "as_of": "2026-10-09",
+  "task_id": "SMIAL_VERIFICATION_POLICY_PATCH_V1",
+  "state_change": "IMPLEMENTED_UNVERIFIED",
+  "base_main": "45bbdc6d992e2c45d1b1ff2260ee415476dff711",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Git instruction patch only; cloud exports remain optional owner-managed context."
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    ".agents/skills/delivery-harness/SKILL.md": "6ed3830c9cd09726600f017b4c6953c114c0d4dfc7d766f853b0eb925c4b0932",
+    "catalog/assets/core.yaml": "d6c505578fee308556d2a0f2e5f8a46625afd6ea73b4f5b1f751b5cbbb0e701f",
+    "delivery-harness/policies/solana-alpha-lab.md": "3621bb2e2f3a27de8c10b904da14b9397789496ca5866674e15873026e017d89",
+    "docs/evidence/control/smial_verification_policy_patch_v1/readout.md": "3d3d8dae5b998c92118d41e44f5362a8097a8d175d7ee6be262ad93a7d878075",
+    "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "a4714e6e4a3db4dee54d37311a735d7ade2227aaf176324ba7901da26232f6c6",
+    "docs/tasks/SMIAL_VERIFICATION_POLICY_PATCH_V1.md": "80ea7febaaabf26805da000d3d3730c8368bd1d326e357e7880c02d99f58ecf9"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/control/smial_verification_policy_patch_v1/factory_fit.json",
+    "sha256": "16bf8207a6260d819a634bf38665a22a41fc09a31a3b4ac79601449c50fd1811",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_NEW_BASE_EXISTING_TARGETED_AND_REGISTRY_V4_CONSUMER",
+    "independent_review": {
+      "path": "docs/evidence/control/smial_verification_policy_patch_v1/independent_review.json",
+      "sha256": "685b5025629c73c4df00dd2ef8f03a215e13e4a55f7a7bbaeada76f3cb03846a",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_NEW_BASE_HARNESS_CHECK",
+      "PASS_RECONCILED_ENTRY_CONTEXT",
+      "PASS_TARGETED_WITH_DIRECT_LINK_CONSUMER",
+      "PASS_EXACT_RECEIPT_SINGLE_DIGEST_JSON_CHANGE",
+      "PASS_SOURCE_REHASH_IDEMPOTENCY",
+      "PASS_FOUR_SIMULATION_ONLY_APPLICABILITY_CASES",
+      "PASS_FRESH_ISOLATED_CODE_REVIEW",
+      "PASS_FRESH_ISOLATED_GOAL_DOD_REVIEW",
+      "PASS_FRESH_SEMANTIC_PREMISE_ARCHITECTURE_REVIEW",
+      "PASS_FINAL_SEMANTIC_PACKET_LAUNCH",
+      "PASS_SHADOW_PIN_WORKING_PATH",
+      "PASS_ROLLBACK_LINK_REMEDIATION"
+    ]
+  },
+  "non_claims": [
+    "NO_MERGE_AUTHORITY",
+    "NO_SCIENTIFIC_OR_LIVE_AUTHORITY",
+    "NO_MEASURED_QUALITY_OR_COST_GAIN",
+    "SIMULATION_ONLY_NOT_PRODUCT_EXECUTION",
+    "THREE_NATURAL_OBSERVATIONS_NOT_STARTED"
+  ],
+  "side_effects": {
+    "provider_calls": 0,
+    "deployments": 0,
+    "settings_changes": 0,
+    "scientific_trials": 0,
+    "new_test_files": 0,
+    "modified_test_files": 0
+  }
+}

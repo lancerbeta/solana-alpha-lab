@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "SMIAL_VERIFICATION_POLICY_PATCH_V1-FACTORY-FIT",
+  "as_of": "2026-10-09",
+  "task_id": "SMIAL_VERIFICATION_POLICY_PATCH_V1",
+  "reviewed_bindings_sha256": "12eb4925d14972c4c80e9300b0b471bffb7beaf4a125ed4757b2f170f1447cf1",
+  "reviewed_inventory_sha256": "41580f1b42416a3bb9413f20153938b2fc1b14609b9ac87ea55a3da5b7c8229b",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "Risk-sufficient verification supports the elected agent without a cashflow/alpha claim.",
+    "flexibility_and_history": "One legacy acceptance live-policy digest re-pinned under its current-file test contract; all other JSON values and claims unchanged; old bytes retained in Git. Frozen contracts/evidence untouched.",
+    "context_efficiency": "One policy owner; two primary files; one exact existing link repair with ordinary new-base reconciliation. No new framework, registry, schema or metric.",
+    "research_truth": "Independent oracles and real paths remain; receipt JSON comparison proves provider/scientific claims, timestamps, status and authority unchanged.",
+    "owner_operability": "Ordinary bounded autonomy and exact-head owner merge phrase remain unchanged.",
+    "execution_to_cashflow": "NEUTRAL: instruction patch only; no measured economics gain.",
+    "monitoring_and_recovery": "No runtime changes; ordinary inverse policy patch preserves regression evidence.",
+    "build_vs_buy": "Use existing skill, domain policy, checks and sync; no adoption/install needed.",
+    "security": "CI/security/authority gates, production bindings and live/provider/science budgets retained.",
+    "red_team": "Zero new tests is not zero verification; logs/mocks/self-authored happy paths and lucky rerolls cannot replace risk evidence."
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Named missed risk in an ordinary natural low-risk atom; patch that gap without instrumentation."
+  },
+  "recovery": "Ordinary inverse patch of the two instruction owners, re-pin only the same TASK-30 artifact_bindings.domain_policy.sha256 to restored policy bytes, scoped Catalog sync and unchanged owner gate; preserve all other receipt values and regression evidence.",
+  "limits": [
+    "NO_ALPHA_OR_CASHFLOW_CLAIM",
+    "NO_MEASURED_DEFECT_RATE_OR_COST_REDUCTION",
+    "SIMULATION_ONLY_IS_NOT_PRODUCT_EXECUTION",
+    "NATURAL_THREE_ATOM_OBSERVATION_NOT_STARTED",
+    "NO_EXTERNAL_OR_SCIENTIFIC_AUTHORITY"
+  ]
+}

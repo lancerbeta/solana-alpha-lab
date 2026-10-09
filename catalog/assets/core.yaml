@@ -13620,7 +13620,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: a46a4aaed88ffd59b657a69f522572c69e32e615719cdd9558d23aef537bc93a}
+  integrity: {kind: sha256, sha256: a4714e6e4a3db4dee54d37311a735d7ade2227aaf176324ba7901da26232f6c6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
@@ -19875,7 +19875,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/delivery-harness/SKILL.md', repository_path: .agents/skills/delivery-harness/SKILL.md}
-  integrity: {kind: sha256, sha256: 33f6799cb9bf93f1b5f2537e71da55ad3ba9842fec292a075e78c781996e5ad0}
+  integrity: {kind: sha256, sha256: 6ed3830c9cd09726600f017b4c6953c114c0d4dfc7d766f853b0eb925c4b0932}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -40868,7 +40868,7 @@ records:
     repository_path: docs/tasks/FORGE_NATIVE_LIFECYCLE_CLOSURE_V1.md
   integrity:
     kind: sha256
-    sha256: 2997712f3b8f4e0bd35e6195e338a55f2445952d199ec2d2656be67878905688
+    sha256: 7e356ec47a7de571292b99401d4bf0a7eb64d940b74b7b4967864a2db16439d8
   access:
     mode: read_only
     method: file

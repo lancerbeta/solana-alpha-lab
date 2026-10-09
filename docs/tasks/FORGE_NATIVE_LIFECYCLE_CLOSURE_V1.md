@@ -1,6 +1,6 @@
 ---
 task_id: FORGE_NATIVE_LIFECYCLE_CLOSURE_V1
-task_version: '1.0'
+task_version: '1.1'
 status: IN_PROGRESS
 as_of: '2026-10-09'
 owner: GOAL_OWNER
@@ -8,9 +8,9 @@ allowed_routes: [DIRECT_CODEX_DELIVERY]
 required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 45bbdc6d992e2c45d1b1ff2260ee415476dff711
+  expected_base: d2cd1fdf6fb10b5efc3e3b7f7b752bcee574f8dc
   expected_upstream: origin/main
-  expected_upstream_oid: 45bbdc6d992e2c45d1b1ff2260ee415476dff711
+  expected_upstream_oid: d2cd1fdf6fb10b5efc3e3b7f7b752bcee574f8dc
   expected_branch: codex/forge-native-lifecycle-closure-v1
   dirty_mode: ALLOW_REPORTED
 objective: Complete two independently authored offline synthetic ordinary Forge episode lifecycles on one immutable execution snapshot, preserving substantive question fidelity, original native bytes, independent Critic, durable terminal, fresh-process recovery and unchanged scientific accounting.
@@ -140,3 +140,10 @@ existing ordinary mode only when omitted, preserving explicit labels and all
 scientific axes. Retain both original drafts/look charges, no retroactive
 rebind; use the one authorized post-repair final pair on a fresh exact epoch.
 Native denominator so far Generator2, Critic0, MAIN2, PREVIEW2, ADAPTIVE0.
+
+Owner steering: account for changed main. New base d2cd1fdf6fb10b5efc3e3b7f7b752bcee574f8dc
+(PR391 verification economy policy) included by ordinary merge without history
+rewrite. Runtime/outcome/DoD and native budget unchanged. New policy prefers
+existing checks and evidence-based regression; two uncovered public transport
+seams justify the compact durable checks. Current base post-merge CI37988774921
+was in progress at readback; exact successful status must be read later.

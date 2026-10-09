@@ -169,10 +169,42 @@ project-owned truth boundary after the alternatives are evidenced unfit.
 ## VALIDATION_ECONOMY
 
 One exact candidate fingerprint has one full-gate owner. During implementation
-run targeted checks. A failure reruns only after its root cause changes. A pass
-reruns only after candidate bytes, dependencies, runtime or validation policy
-change. Catalog/generated/security/topology checks run when their owner or
-consumer changes.
+run targeted checks. Outside a declared reproducibility, race or flakiness
+probe, a failure reruns only after its root cause changes; a pass reruns only
+after candidate bytes, dependencies, runtime or validation policy change.
+Catalog/generated/security/topology checks run when their owner or consumer
+changes.
+
+Verification follows risk, not a mandatory test-writing sequence. At Entry,
+identify the changed observable behavior, material failure risk, expected-result
+oracle and cheapest adequate check in the existing outcome/DoD text. No new
+receipt fields or verification registry are required.
+
+Prefer existing targeted checks and the real entry point. Add or extend a
+durable test for an uncovered material behavior/risk or a repeatable regression;
+do not duplicate coverage solely because code changed. Unit, integration,
+property, CLI and end-to-end checks are alternatives or complements selected
+for the risk, not a compulsory checklist. Test-first is optional unless an exact
+task contract explicitly requires it. No new tests can be a valid outcome.
+
+For a material defect, obtain a reproducer or trace before claiming a repair,
+then check the same path after the change. Preserve a compact regression where
+recurrence matters. A mock must not replace the boundary under test; tests must
+not manually supply a production binding that the actual path fails to create.
+
+Implementation and self-authored tests may share a mistaken interpretation.
+Use an independent contract, reference, hand-calculated oracle, invariant or
+state readback for the material risk. Logs support diagnosis but a success log
+is not sufficient proof of the resulting state. Do not weaken an oracle to pass;
+a genuinely wrong test requires an evidenced contract correction, not concealment.
+Existing review evaluates this evidence without adding a new critic role.
+
+Do not narrow the agreed product outcome to what self-written tests cover.
+Keep mandatory CI/security/authority checks and exact-candidate validity rules.
+Repeated execution without changes is permitted for a declared reproducibility,
+race or flakiness probe, not as reroll-until-green acceptance. Record failures,
+retries and skips truthfully. Any new evidence applies only to its tested scope.
+This permission does not authorize scientific trial reruns or provider calls.
 
 ## TRACKED_ONLY_DELIVERY_PREFLIGHT
 

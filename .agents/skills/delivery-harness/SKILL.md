@@ -48,8 +48,14 @@ implementation, tests and review are phases, not automatic owner gates.
 
 ## Execute and validate
 
-Use bounded routine autonomy without micro-approval. Apply test-first behavior
-for changed behavior and the smallest targeted checks during implementation.
+Use bounded routine autonomy without micro-approval. Follow VALIDATION_ECONOMY
+in the project-bound domain policy. Choose the cheapest sufficient check for
+the changed behavior and material risks; do not impose TDD or new tests on
+every change. Reuse existing checks first. Test-first is an option when a
+trustworthy failing example helps implementation, or an explicit task contract
+requires it. Zero new test files is acceptable when the evidence is sufficient.
+Preserve the full agreed outcome, not merely the behavior covered by self-written
+tests. Existing exact-candidate CI, security, authority and review gates remain.
 If a leftover space, encoded query, wrong endpoint or shape can still fail the
 atom, probe and fix that on the working path before Catalog, receipts, reviews
 or PR. Do not document a five-second mechanical miss.
@@ -63,6 +69,9 @@ official/maintained solutions before custom construction. Tool research never
 widens provider, dependency, credential, spend or install authority.
 
 ## Review
+
+Assess the verification oracle and uncovered material risks under the same
+VALIDATION_ECONOMY policy; test count or test-first ordering is not acceptance.
 
 Run code review for every delivery. The exact required role-set is frozen by
 the task contract `required_review_roles`: add goal/DoD review for a
