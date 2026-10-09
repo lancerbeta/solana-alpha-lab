@@ -1,0 +1,3183 @@
+{
+  "accounting": {
+    "all_readback_inventory_unchanged": true,
+    "current_focus_journal_totals": {
+      "adaptive": {
+        "completed": 0,
+        "occupied": 0,
+        "pending": 0
+      },
+      "main": {
+        "completed": 8,
+        "occupied": 8,
+        "pending": 0
+      },
+      "preview": {
+        "completed": 1,
+        "occupied": 4,
+        "pending": 3
+      }
+    },
+    "new_looks_during_counter_readback": 0,
+    "p8_added_looks": 0,
+    "readback": {
+      "bytes": 29720,
+      "raw_path": "native/counter-readback.json",
+      "sha256": "6a9026f5d6b643008cc2804a910fb86bb1670001fe13c9c058898f45d673cb35"
+    },
+    "readback_rows": 22,
+    "scope": "CURRENT_NATIVE_FOCUS_ONLY_EXCLUDES_OTHER_SCRIPTED_JOURNALS_AND_P8_CLONED_COUNTS"
+  },
+  "archive_owner_cost": {
+    "largest_selection_median_increment_seconds": 0.20985390001535417,
+    "largest_selection_median_ratio_approximately": 1.98,
+    "measured": {
+      "actual_processes": 18,
+      "candidate_public_whole_path": "growth/summary.json",
+      "immutable_owner_bindings": [
+        {
+          "base_blob_sha256": "405040074c6af8069ce719fd6fa4f1cb8314a24c114878fc257ee10700a3f18b",
+          "current_blob_sha256": "405040074c6af8069ce719fd6fa4f1cb8314a24c114878fc257ee10700a3f18b",
+          "current_disk_sha256": "405040074c6af8069ce719fd6fa4f1cb8314a24c114878fc257ee10700a3f18b",
+          "git_blob_bytes_equal": true,
+          "path": "src/solana_alpha_lab/factory/hfic_prior_memory.py"
+        },
+        {
+          "base_blob_sha256": "82ae91ebcbbd8f640fa7f5138ce09d9c9a0d7738322bb3095f78f7cbf2450197",
+          "current_blob_sha256": "82ae91ebcbbd8f640fa7f5138ce09d9c9a0d7738322bb3095f78f7cbf2450197",
+          "current_disk_sha256": "82ae91ebcbbd8f640fa7f5138ce09d9c9a0d7738322bb3095f78f7cbf2450197",
+          "git_blob_bytes_equal": true,
+          "path": "src/solana_alpha_lab/factory/hfic_memory_policy.py"
+        },
+        {
+          "base_blob_sha256": "38d6c17bea38a4388fa14509dfb401b1f4e6cdda74de7e41cf032debe080ef49",
+          "current_blob_sha256": "38d6c17bea38a4388fa14509dfb401b1f4e6cdda74de7e41cf032debe080ef49",
+          "current_disk_sha256": "38d6c17bea38a4388fa14509dfb401b1f4e6cdda74de7e41cf032debe080ef49",
+          "git_blob_bytes_equal": true,
+          "path": "src/solana_alpha_lab/factory/research_store.py"
+        }
+      ],
+      "limits": [
+        "COLD_PROCESS_NOT_COLD_OS_CACHE",
+        "Source setup/diagnostics/imports excluded from timer",
+        "Legacy owner unchanged from base; candidate owner current; no whole frozen BASE CLI latency claim"
+      ],
+      "model_tokens_cost": "NOT_APPLICABLE_SCRIPTED_READ_ONLY",
+      "not_successful_gt64_baseline": true,
+      "not_whole_baseline_generation_latency": true,
+      "processes_per_arm_and_size": 3,
+      "rows": [
+        {
+          "bytes_hashed": 44485,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 1,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_before": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 160555008,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 41,
+          "pid": 60024,
+          "result": {
+            "eligible": 40,
+            "emitted": 40,
+            "packet_bytes": 23355,
+            "status": "SNAPSHOT"
+          },
+          "same_immutable_root": "growth/source-40",
+          "seconds": 0.014958499989006668,
+          "seeded_heads": 40,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 44485,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 1,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_before": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 160292864,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 41,
+          "pid": 30056,
+          "result": {
+            "eligible": 40,
+            "emitted": 8,
+            "packet_bytes": 10083,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-40",
+          "seconds": 0.012709500006167218,
+          "seeded_heads": 40,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 44485,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 2,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_before": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 159809536,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 41,
+          "pid": 11292,
+          "result": {
+            "eligible": 40,
+            "emitted": 40,
+            "packet_bytes": 23355,
+            "status": "SNAPSHOT"
+          },
+          "same_immutable_root": "growth/source-40",
+          "seconds": 0.014696199999889359,
+          "seeded_heads": 40,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 44485,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 2,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_before": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 160018432,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 41,
+          "pid": 76008,
+          "result": {
+            "eligible": 40,
+            "emitted": 8,
+            "packet_bytes": 10083,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-40",
+          "seconds": 0.01521889999276027,
+          "seeded_heads": 40,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 44485,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 3,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_before": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 160473088,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 41,
+          "pid": 56324,
+          "result": {
+            "eligible": 40,
+            "emitted": 40,
+            "packet_bytes": 23355,
+            "status": "SNAPSHOT"
+          },
+          "same_immutable_root": "growth/source-40",
+          "seconds": 0.015402299992274493,
+          "seeded_heads": 40,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 44485,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 3,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_before": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 160415744,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 41,
+          "pid": 60524,
+          "result": {
+            "eligible": 40,
+            "emitted": 8,
+            "packet_bytes": 10083,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-40",
+          "seconds": 0.013271199975861236,
+          "seeded_heads": 40,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 293654,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 1,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_before": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 162156544,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 401,
+          "pid": 75988,
+          "result": {
+            "eligible": 400,
+            "emitted": 0,
+            "max_bytes": 65536,
+            "max_records": 64,
+            "reason_code": "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED",
+            "status": "REFUSAL"
+          },
+          "same_immutable_root": "growth/source-400",
+          "seconds": 0.03127710000262596,
+          "seeded_heads": 400,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 293654,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 1,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_before": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 162557952,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 401,
+          "pid": 78672,
+          "result": {
+            "eligible": 400,
+            "emitted": 8,
+            "packet_bytes": 10087,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-400",
+          "seconds": 0.05164769999100827,
+          "seeded_heads": 400,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 293654,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 2,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_before": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 160587776,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 401,
+          "pid": 76484,
+          "result": {
+            "eligible": 400,
+            "emitted": 0,
+            "max_bytes": 65536,
+            "max_records": 64,
+            "reason_code": "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED",
+            "status": "REFUSAL"
+          },
+          "same_immutable_root": "growth/source-400",
+          "seconds": 0.032742499985033646,
+          "seeded_heads": 400,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 293654,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 2,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_before": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 162390016,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 401,
+          "pid": 52800,
+          "result": {
+            "eligible": 400,
+            "emitted": 8,
+            "packet_bytes": 10087,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-400",
+          "seconds": 0.05207410000730306,
+          "seeded_heads": 400,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 293654,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 3,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_before": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 161976320,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 401,
+          "pid": 26368,
+          "result": {
+            "eligible": 400,
+            "emitted": 0,
+            "max_bytes": 65536,
+            "max_records": 64,
+            "reason_code": "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED",
+            "status": "REFUSAL"
+          },
+          "same_immutable_root": "growth/source-400",
+          "seconds": 0.030803400004515424,
+          "seeded_heads": 400,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 293654,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 3,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_before": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 162525184,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 401,
+          "pid": 48516,
+          "result": {
+            "eligible": 400,
+            "emitted": 8,
+            "packet_bytes": 10087,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-400",
+          "seconds": 0.05001569999149069,
+          "seeded_heads": 400,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 2789065,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 1,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_before": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 179146752,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 4001,
+          "pid": 13528,
+          "result": {
+            "eligible": 4000,
+            "emitted": 0,
+            "max_bytes": 65536,
+            "max_records": 64,
+            "reason_code": "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED",
+            "status": "REFUSAL"
+          },
+          "same_immutable_root": "growth/source-4000",
+          "seconds": 0.2148874000122305,
+          "seeded_heads": 4000,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 2789065,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 1,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_before": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 179064832,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 4001,
+          "pid": 31040,
+          "result": {
+            "eligible": 4000,
+            "emitted": 8,
+            "packet_bytes": 10091,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-4000",
+          "seconds": 0.4247357999847736,
+          "seeded_heads": 4000,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 2789065,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 2,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_before": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 178106368,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 4001,
+          "pid": 29332,
+          "result": {
+            "eligible": 4000,
+            "emitted": 0,
+            "max_bytes": 65536,
+            "max_records": 64,
+            "reason_code": "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED",
+            "status": "REFUSAL"
+          },
+          "same_immutable_root": "growth/source-4000",
+          "seconds": 0.21418080001603812,
+          "seeded_heads": 4000,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 2789065,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 2,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_before": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 177897472,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 4001,
+          "pid": 75748,
+          "result": {
+            "eligible": 4000,
+            "emitted": 8,
+            "packet_bytes": 10091,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-4000",
+          "seconds": 0.4290757999988273,
+          "seeded_heads": 4000,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 2789065,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 3,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_before": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 176689152,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 4001,
+          "pid": 75468,
+          "result": {
+            "eligible": 4000,
+            "emitted": 0,
+            "max_bytes": 65536,
+            "max_records": 64,
+            "reason_code": "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED",
+            "status": "REFUSAL"
+          },
+          "same_immutable_root": "growth/source-4000",
+          "seconds": 0.21705449998262338,
+          "seeded_heads": 4000,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 2789065,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 3,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_before": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 174141440,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 4001,
+          "pid": 50648,
+          "result": {
+            "eligible": 4000,
+            "emitted": 8,
+            "packet_bytes": 10091,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-4000",
+          "seconds": 0.42411599998013116,
+          "seeded_heads": 4000,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        }
+      ],
+      "schema": "smial.egg-cold-archive-owner-comparison",
+      "source_base_commit": "fb65d69f6e48c49b26937bb6caf324b3417b094e"
+    },
+    "no_whole_frozen_baseline_cli_latency_claim": true,
+    "receipt": {
+      "bytes": 24887,
+      "raw_path": "archive-owner-cost/summary.json",
+      "sha256": "1948b777fc3298b5f3400deede86eab3e82c69e4d49ca784420f6c0939a9551f"
+    }
+  },
+  "as_of": "2026-10-09",
+  "ci_consumer_repair": {
+    "capability_epoch_sha256": "3e9fedd984bddb7bf19cd2ef64fbaa48c26dc157ba94863137b0e259c8f25ca6",
+    "historical_epochs_relabelled": false,
+    "intermediate_tests": {
+      "capability_epoch_sha256": "e4c1c390b5095d01cce9fb315be7d803e146dd22183dec07d8dae1e48203f175",
+      "count": 15,
+      "failed": 1,
+      "failure": "FINAL_RECEIPT_REPLACES_MARKET_PREREQUISITE_WITH_GENERIC_VISION_BLOCKER",
+      "log": {
+        "bytes": 3607,
+        "raw_path": "ci-repair/targeted-tests.log",
+        "sha256": "6428bd824ee1713be04bd667c0197e17a3cb59fb12e33cfcf48053b7f45e0e3e"
+      },
+      "passed": 14,
+      "receipt": {
+        "bytes": 1405,
+        "raw_path": "ci-repair/targeted-tests.json",
+        "sha256": "22ba32ab1fc6f601adb9884f5d676195ce629bf9cbdee6aa4b85a61a8127679c"
+      }
+    },
+    "legacy_and_fresh_strict_snapshot_branches": "UNCHANGED",
+    "native_originals_mutated": false,
+    "new_native_calls": 0,
+    "original_ci": {
+      "bytes": 22509,
+      "raw_path": "ci-repair/first-ci.json",
+      "sha256": "e9b3d48c5cca8fba8e890e187e1aa669e3c0c007bdfbcbaa2fcd5adb86c120b1"
+    },
+    "original_failed_job_logs": [
+      {
+        "bytes": 107930,
+        "raw_path": "ci-repair/job-113945267547.log",
+        "sha256": "18c9ea0acbbf4fb0e8b43dd79aa1904836882947b642913eee5a1b0959624136"
+      },
+      {
+        "bytes": 92492,
+        "raw_path": "ci-repair/job-113945267587.log",
+        "sha256": "0868f84354744f5cda1463b6984cea46b02fba41494892a9d036c85ac4d45479"
+      },
+      {
+        "bytes": 447304,
+        "raw_path": "ci-repair/job-113945267873.log",
+        "sha256": "70d920d4ffc643407b05284103074b7011ee9a9e53e23c1cd354477deebccb4c"
+      }
+    ],
+    "product_head": "c24a70594373b0758fe0cf9017ce4363229c3881",
+    "repairs": [
+      "RESTORE_STANDALONE_LEGACY_AND_FRESH_CAPSULE_SCHEMA_FRAGMENT",
+      "EXPOSE_AUTHORIZED_PACKET_1_5_IN_DIRECT_CONSUMER_EXPECTATION",
+      "REMOVE_TEST_ONLY_PREFLIGHT_COPY_FROM_GROUNDED_LOOK",
+      "MARKET_ADMISSION_PREREQUISITE_PRECEDES_WORKING_MEMORY_PROJECTION"
+    ],
+    "schema": "smial.egg-ci-consumer-repair",
+    "scope": "FOUR_FIRST_CI_FAILURES_AND_DIRECT_SAFETY_COMPATIBILITY_CONSUMERS",
+    "summary": {
+      "bytes": 2514,
+      "raw_path": "ci-repair/summary.json",
+      "sha256": "54e256ac786e7a29a1e688dcbb54ece6ddca7c2354c47c5b9606051798c5fd0b"
+    },
+    "targeted_tests": {
+      "count": 3,
+      "log": {
+        "bytes": 705,
+        "raw_path": "ci-repair/terminal-repair-tests.log",
+        "sha256": "bbb1a247586b9bcffd100d7b54867f34af5f883f0898c794fcda4c5432046dcd"
+      },
+      "receipt": {
+        "bytes": 988,
+        "raw_path": "ci-repair/terminal-repair-tests.json",
+        "sha256": "94300793d3795c27df7c7558948354a750101c0e15b3bb394a208295435b2ab5"
+      }
+    },
+    "whole_packet_bound_bytes": 65536
+  },
+  "critic_paths": [
+    {
+      "kind": "SCRIPTED_FIRST_CYCLE_NATIVE_CRITIC",
+      "native_next_cycle": "SOURCE_BOUND_READ_ONLY_STOP",
+      "packet": {
+        "bytes": 64428,
+        "raw_path": "native/critic-working-view/packet.json",
+        "sha256": "52d2ea1168dacfc30134ea8c80e985c282bfef75c8c731589e6f0be0b15581f1"
+      },
+      "public_finalize": "PASS",
+      "result": {
+        "bytes": 93690,
+        "raw_path": "native/critic-working-view/critic/critic-result.json",
+        "sha256": "1cfa82ace449e5a562c2f609e36eca348eb6264fcc2b2118a3baba06a09cbc8b"
+      },
+      "verdict": "KILL_LOW_INFORMATION_VALUE"
+    },
+    {
+      "dependent_native_launch": false,
+      "kind": "ACTUAL_NATIVE_FIRST_CYCLE_NATIVE_CRITIC",
+      "packet": {
+        "bytes": 38533,
+        "raw_path": "native/critic-native-transfer01/packet.json",
+        "sha256": "abc81346c48b533531363d0634669ed1c6f57d593e0dccbcde22f460bc2fd55e"
+      },
+      "public_finalize": "BLOCKED_GIT_COMPOSITE_CHANGED",
+      "result": {
+        "bytes": 18904,
+        "raw_path": "native/critic-native-transfer01/critic/critic-result.json",
+        "sha256": "278b5228f3c77112f80370974ac81527bfca9e9bd6f0634ab44dc8c8c216fff9"
+      },
+      "saved_critic_terminal": null,
+      "terminal_boundary": {
+        "bytes": 1713,
+        "raw_path": "native/critic-native-transfer01/terminal-boundary.json",
+        "sha256": "dcfd651c46771c743aefef078dceed9f8078c67cdd9a1e5abfb1ef42a887d331"
+      },
+      "verdict": "KILL_UNBOUND_EVIDENCE"
+    }
+  ],
+  "current_implementation_identity": {
+    "capability_epoch_sha256": "3e9fedd984bddb7bf19cd2ef64fbaa48c26dc157ba94863137b0e259c8f25ca6",
+    "delivery_base": "0f89ffd8018c05fbafaf79ef609c7dadf888807f",
+    "historical_identity_and_measurements_preserved": true,
+    "product_commit": "c24a70594373b0758fe0cf9017ce4363229c3881"
+  },
+  "factory_fit": {
+    "capability_radar_now": "NONE",
+    "mode": "FULL_REVIEW",
+    "watch": "Order preserving representation only after measured paired bottleneck; no authority granted"
+  },
+  "fixtures": [
+    {
+      "bytes": 5957,
+      "path": "tests/fixtures/forge_evidence_guided_generation_v1/archive_owner_compare.py",
+      "sha256": "91d164e1ee55a3f937de4f04039c0a2d5bbcbbf57deee109a13ef1449755a28b"
+    },
+    {
+      "bytes": 6715,
+      "path": "tests/fixtures/forge_evidence_guided_generation_v1/growth_probe.py",
+      "sha256": "058a09fb8f3a722dc2c711cab8ae17f26d6a362c05f874ef50f487b27dbca04c"
+    },
+    {
+      "bytes": 3094,
+      "path": "tests/fixtures/forge_evidence_guided_generation_v1/materialize_raw_evidence.py",
+      "sha256": "02be20f4718d34ebf0322855098338d157c51382808b129dc54f3d79d75b97b0"
+    },
+    {
+      "bytes": 13652,
+      "path": "tests/fixtures/forge_evidence_guided_generation_v1/native_setup.py",
+      "sha256": "2846ae548ea60ceae6b7c3b067fae1149c287c2c8ec823cb44caf4d55a2d505f"
+    },
+    {
+      "bytes": 3073,
+      "path": "tests/fixtures/forge_evidence_guided_generation_v1/oracle.json",
+      "sha256": "82bac99aa20e0616804a2e0803ccab4169b5b0548ba8295d9b15f927b222f132"
+    }
+  ],
+  "growth": {
+    "cost": "UNKNOWN",
+    "final_capability_measurements": [
+      {
+        "archive_eligible_count": 4001,
+        "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+        "cold_process": 4,
+        "critic_capsules": 28,
+        "critic_packet_bytes": 64440,
+        "distinct_eligible_heads": 4000,
+        "full_safety_count": 4001,
+        "initial_count": 8,
+        "mode": "SCRIPTED_SYNTHETIC_PUBLIC_CLI",
+        "native_quality_numerator": false,
+        "peak_rss_bytes": 465047552,
+        "pid": 6868,
+        "seconds_total": 63.064357800001744,
+        "stages": [
+          {
+            "command": "research-scope-resolve",
+            "exit_code": 0,
+            "peak_rss_bytes": 121061376,
+            "physical_bytes": 0,
+            "physical_partition_reads": 0,
+            "physical_record_decodes": 0,
+            "reason_code": null,
+            "seconds": 0.9628667999932077,
+            "serialized_output_bytes": 2131
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 412418048,
+            "physical_bytes": 73217745,
+            "physical_partition_reads": 88,
+            "physical_record_decodes": 104212,
+            "reason_code": null,
+            "seconds": 16.311249399994267,
+            "serialized_output_bytes": 51831
+          },
+          {
+            "command": "discovery-execute",
+            "exit_code": 0,
+            "peak_rss_bytes": 435277824,
+            "physical_bytes": 81828444,
+            "physical_partition_reads": 235,
+            "physical_record_decodes": 112375,
+            "reason_code": null,
+            "seconds": 9.916156099992804,
+            "serialized_output_bytes": 20055
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 444555264,
+            "physical_bytes": 53829293,
+            "physical_partition_reads": 214,
+            "physical_record_decodes": 72304,
+            "reason_code": null,
+            "seconds": 9.854560499981744,
+            "serialized_output_bytes": 55970
+          },
+          {
+            "command": "prior",
+            "exit_code": 0,
+            "peak_rss_bytes": 444555264,
+            "physical_bytes": 9004879,
+            "physical_partition_reads": 32,
+            "physical_record_decodes": 12047,
+            "reason_code": null,
+            "seconds": 1.0351970000192523,
+            "serialized_output_bytes": 2904
+          },
+          {
+            "command": "persist-draft",
+            "exit_code": 0,
+            "peak_rss_bytes": 444555264,
+            "physical_bytes": 91074275,
+            "physical_partition_reads": 387,
+            "physical_record_decodes": 120551,
+            "reason_code": null,
+            "seconds": 10.362616999977035,
+            "serialized_output_bytes": 26649
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 451051520,
+            "physical_bytes": 55438559,
+            "physical_partition_reads": 249,
+            "physical_record_decodes": 72356,
+            "reason_code": null,
+            "seconds": 9.167420899990248,
+            "serialized_output_bytes": 56702
+          },
+          {
+            "command": "freeze",
+            "exit_code": 0,
+            "peak_rss_bytes": 465047552,
+            "physical_bytes": 31551379,
+            "physical_partition_reads": 147,
+            "physical_record_decodes": 40217,
+            "reason_code": null,
+            "seconds": 5.33266270000604,
+            "serialized_output_bytes": 118653
+          }
+        ],
+        "terminal": "FROZEN_AWAITING_CRITIC"
+      }
+    ],
+    "final_receipt": {
+      "bytes": 2501,
+      "raw_path": "growth/4000-4-attempt1/metrics_receipt.json",
+      "sha256": "76e2890f098b134dd6191bd47a0b2a5b2b74bf9b97334d52f0cc6f0170079d21"
+    },
+    "historical_measurements": [
+      {
+        "archive_eligible_count": 41,
+        "capability_epoch_sha256": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
+        "cold_process": 1,
+        "critic_capsules": 28,
+        "critic_packet_bytes": 64428,
+        "distinct_eligible_heads": 40,
+        "full_safety_count": 41,
+        "initial_count": 8,
+        "mode": "SCRIPTED_SYNTHETIC_PUBLIC_CLI",
+        "native_quality_numerator": false,
+        "peak_rss_bytes": 349384704,
+        "pid": 45876,
+        "seconds_total": 30.22203649999574,
+        "stages": [
+          {
+            "command": "research-scope-resolve",
+            "exit_code": 0,
+            "peak_rss_bytes": 107884544,
+            "physical_bytes": 0,
+            "physical_partition_reads": 0,
+            "physical_record_decodes": 0,
+            "reason_code": null,
+            "seconds": 1.3598153999773785,
+            "serialized_output_bytes": 2131
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 265404416,
+            "physical_bytes": 1858595,
+            "physical_partition_reads": 88,
+            "physical_record_decodes": 1252,
+            "reason_code": null,
+            "seconds": 10.071119800006272,
+            "serialized_output_bytes": 51815
+          },
+          {
+            "command": "discovery-execute",
+            "exit_code": 0,
+            "peak_rss_bytes": 349384704,
+            "physical_bytes": 4978252,
+            "physical_partition_reads": 235,
+            "physical_record_decodes": 1495,
+            "reason_code": null,
+            "seconds": 4.27428849998978,
+            "serialized_output_bytes": 20055
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 349384704,
+            "physical_bytes": 4425001,
+            "physical_partition_reads": 214,
+            "physical_record_decodes": 1024,
+            "reason_code": null,
+            "seconds": 3.9254418999771588,
+            "serialized_output_bytes": 55954
+          },
+          {
+            "command": "prior",
+            "exit_code": 0,
+            "peak_rss_bytes": 349384704,
+            "physical_bytes": 770875,
+            "physical_partition_reads": 32,
+            "physical_record_decodes": 167,
+            "reason_code": null,
+            "seconds": 0.11991390000912361,
+            "serialized_output_bytes": 2892
+          },
+          {
+            "command": "persist-draft",
+            "exit_code": 0,
+            "peak_rss_bytes": 349384704,
+            "physical_bytes": 8733405,
+            "physical_partition_reads": 387,
+            "physical_record_decodes": 1751,
+            "reason_code": null,
+            "seconds": 3.4644326000125147,
+            "serialized_output_bytes": 26645
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 349384704,
+            "physical_bytes": 5979107,
+            "physical_partition_reads": 248,
+            "physical_record_decodes": 1075,
+            "reason_code": null,
+            "seconds": 3.996350599976722,
+            "serialized_output_bytes": 56686
+          },
+          {
+            "command": "freeze",
+            "exit_code": 0,
+            "peak_rss_bytes": 349384704,
+            "physical_bytes": 4049453,
+            "physical_partition_reads": 146,
+            "physical_record_decodes": 616,
+            "reason_code": null,
+            "seconds": 2.8409069000044838,
+            "serialized_output_bytes": 118625
+          }
+        ],
+        "terminal": "FROZEN_AWAITING_CRITIC"
+      },
+      {
+        "archive_eligible_count": 41,
+        "capability_epoch_sha256": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
+        "cold_process": 2,
+        "critic_capsules": 28,
+        "critic_packet_bytes": 64428,
+        "distinct_eligible_heads": 40,
+        "full_safety_count": 41,
+        "initial_count": 8,
+        "mode": "SCRIPTED_SYNTHETIC_PUBLIC_CLI",
+        "native_quality_numerator": false,
+        "peak_rss_bytes": 352374784,
+        "pid": 66096,
+        "seconds_total": 32.07866739999736,
+        "stages": [
+          {
+            "command": "research-scope-resolve",
+            "exit_code": 0,
+            "peak_rss_bytes": 108167168,
+            "physical_bytes": 0,
+            "physical_partition_reads": 0,
+            "physical_record_decodes": 0,
+            "reason_code": null,
+            "seconds": 0.944119599997066,
+            "serialized_output_bytes": 2131
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 268349440,
+            "physical_bytes": 1858595,
+            "physical_partition_reads": 88,
+            "physical_record_decodes": 1252,
+            "reason_code": null,
+            "seconds": 10.236789399990812,
+            "serialized_output_bytes": 51815
+          },
+          {
+            "command": "discovery-execute",
+            "exit_code": 0,
+            "peak_rss_bytes": 352374784,
+            "physical_bytes": 4978252,
+            "physical_partition_reads": 235,
+            "physical_record_decodes": 1495,
+            "reason_code": null,
+            "seconds": 4.276923199999146,
+            "serialized_output_bytes": 20055
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 352374784,
+            "physical_bytes": 4425001,
+            "physical_partition_reads": 214,
+            "physical_record_decodes": 1024,
+            "reason_code": null,
+            "seconds": 4.836394099984318,
+            "serialized_output_bytes": 55954
+          },
+          {
+            "command": "prior",
+            "exit_code": 0,
+            "peak_rss_bytes": 352374784,
+            "physical_bytes": 770875,
+            "physical_partition_reads": 32,
+            "physical_record_decodes": 167,
+            "reason_code": null,
+            "seconds": 0.15124450001167133,
+            "serialized_output_bytes": 2892
+          },
+          {
+            "command": "persist-draft",
+            "exit_code": 0,
+            "peak_rss_bytes": 352374784,
+            "physical_bytes": 8733405,
+            "physical_partition_reads": 387,
+            "physical_record_decodes": 1751,
+            "reason_code": null,
+            "seconds": 3.7367237000144087,
+            "serialized_output_bytes": 26645
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 352374784,
+            "physical_bytes": 5979107,
+            "physical_partition_reads": 248,
+            "physical_record_decodes": 1075,
+            "reason_code": null,
+            "seconds": 4.700262800004566,
+            "serialized_output_bytes": 56686
+          },
+          {
+            "command": "freeze",
+            "exit_code": 0,
+            "peak_rss_bytes": 352374784,
+            "physical_bytes": 4049453,
+            "physical_partition_reads": 146,
+            "physical_record_decodes": 616,
+            "reason_code": null,
+            "seconds": 3.059994499984896,
+            "serialized_output_bytes": 118625
+          }
+        ],
+        "terminal": "FROZEN_AWAITING_CRITIC"
+      },
+      {
+        "archive_eligible_count": 41,
+        "capability_epoch_sha256": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
+        "cold_process": 3,
+        "critic_capsules": 28,
+        "critic_packet_bytes": 64428,
+        "distinct_eligible_heads": 40,
+        "full_safety_count": 41,
+        "initial_count": 8,
+        "mode": "SCRIPTED_SYNTHETIC_PUBLIC_CLI",
+        "native_quality_numerator": false,
+        "peak_rss_bytes": 335003648,
+        "pid": 37948,
+        "seconds_total": 29.252351600007387,
+        "stages": [
+          {
+            "command": "research-scope-resolve",
+            "exit_code": 0,
+            "peak_rss_bytes": 107868160,
+            "physical_bytes": 0,
+            "physical_partition_reads": 0,
+            "physical_record_decodes": 0,
+            "reason_code": null,
+            "seconds": 0.957428699999582,
+            "serialized_output_bytes": 2131
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 259076096,
+            "physical_bytes": 1858595,
+            "physical_partition_reads": 88,
+            "physical_record_decodes": 1252,
+            "reason_code": null,
+            "seconds": 9.520953700004611,
+            "serialized_output_bytes": 51815
+          },
+          {
+            "command": "discovery-execute",
+            "exit_code": 0,
+            "peak_rss_bytes": 335003648,
+            "physical_bytes": 4978252,
+            "physical_partition_reads": 235,
+            "physical_record_decodes": 1495,
+            "reason_code": null,
+            "seconds": 3.9659596999990754,
+            "serialized_output_bytes": 20055
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 335003648,
+            "physical_bytes": 4374761,
+            "physical_partition_reads": 213,
+            "physical_record_decodes": 1023,
+            "reason_code": null,
+            "seconds": 3.8627883000008296,
+            "serialized_output_bytes": 55954
+          },
+          {
+            "command": "prior",
+            "exit_code": 0,
+            "peak_rss_bytes": 335003648,
+            "physical_bytes": 720635,
+            "physical_partition_reads": 31,
+            "physical_record_decodes": 166,
+            "reason_code": null,
+            "seconds": 0.12583160001668148,
+            "serialized_output_bytes": 2892
+          },
+          {
+            "command": "persist-draft",
+            "exit_code": 0,
+            "peak_rss_bytes": 335003648,
+            "physical_bytes": 8683165,
+            "physical_partition_reads": 386,
+            "physical_record_decodes": 1750,
+            "reason_code": null,
+            "seconds": 3.3981284000037704,
+            "serialized_output_bytes": 26645
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 335003648,
+            "physical_bytes": 6033845,
+            "physical_partition_reads": 249,
+            "physical_record_decodes": 1076,
+            "reason_code": null,
+            "seconds": 4.306412099977024,
+            "serialized_output_bytes": 56686
+          },
+          {
+            "command": "freeze",
+            "exit_code": 0,
+            "peak_rss_bytes": 335003648,
+            "physical_bytes": 4104191,
+            "physical_partition_reads": 147,
+            "physical_record_decodes": 617,
+            "reason_code": null,
+            "seconds": 2.978610699996352,
+            "serialized_output_bytes": 118625
+          }
+        ],
+        "terminal": "FROZEN_AWAITING_CRITIC"
+      },
+      {
+        "archive_eligible_count": 401,
+        "capability_epoch_sha256": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
+        "cold_process": 1,
+        "critic_capsules": 28,
+        "critic_packet_bytes": 64434,
+        "distinct_eligible_heads": 400,
+        "full_safety_count": 401,
+        "initial_count": 8,
+        "mode": "SCRIPTED_SYNTHETIC_PUBLIC_CLI",
+        "native_quality_numerator": false,
+        "peak_rss_bytes": 358920192,
+        "pid": 57420,
+        "seconds_total": 35.902896399988094,
+        "stages": [
+          {
+            "command": "research-scope-resolve",
+            "exit_code": 0,
+            "peak_rss_bytes": 108523520,
+            "physical_bytes": 0,
+            "physical_partition_reads": 0,
+            "physical_record_decodes": 0,
+            "reason_code": null,
+            "seconds": 0.9064252999960445,
+            "serialized_output_bytes": 2131
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 283213824,
+            "physical_bytes": 8337024,
+            "physical_partition_reads": 88,
+            "physical_record_decodes": 10612,
+            "reason_code": null,
+            "seconds": 11.364677999983542,
+            "serialized_output_bytes": 51823
+          },
+          {
+            "command": "discovery-execute",
+            "exit_code": 0,
+            "peak_rss_bytes": 358920192,
+            "physical_bytes": 11955960,
+            "physical_partition_reads": 235,
+            "physical_record_decodes": 11575,
+            "reason_code": null,
+            "seconds": 5.202858899981948,
+            "serialized_output_bytes": 20055
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 358920192,
+            "physical_bytes": 8910969,
+            "physical_partition_reads": 214,
+            "physical_record_decodes": 7504,
+            "reason_code": null,
+            "seconds": 5.284339899983024,
+            "serialized_output_bytes": 55962
+          },
+          {
+            "command": "prior",
+            "exit_code": 0,
+            "peak_rss_bytes": 358920192,
+            "physical_bytes": 1518514,
+            "physical_partition_reads": 32,
+            "physical_record_decodes": 1247,
+            "reason_code": null,
+            "seconds": 0.23708410002291203,
+            "serialized_output_bytes": 2898
+          },
+          {
+            "command": "persist-draft",
+            "exit_code": 0,
+            "peak_rss_bytes": 358920192,
+            "physical_bytes": 16210210,
+            "physical_partition_reads": 387,
+            "physical_record_decodes": 12551,
+            "reason_code": null,
+            "seconds": 4.667998299992178,
+            "serialized_output_bytes": 26647
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 358920192,
+            "physical_bytes": 10415032,
+            "physical_partition_reads": 247,
+            "physical_record_decodes": 7554,
+            "reason_code": null,
+            "seconds": 4.987274800019804,
+            "serialized_output_bytes": 56694
+          },
+          {
+            "command": "freeze",
+            "exit_code": 0,
+            "peak_rss_bytes": 358920192,
+            "physical_bytes": 6491583,
+            "physical_partition_reads": 145,
+            "physical_record_decodes": 4215,
+            "reason_code": null,
+            "seconds": 3.1280632999842055,
+            "serialized_output_bytes": 118639
+          }
+        ],
+        "terminal": "FROZEN_AWAITING_CRITIC"
+      },
+      {
+        "archive_eligible_count": 401,
+        "capability_epoch_sha256": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
+        "cold_process": 2,
+        "critic_capsules": 28,
+        "critic_packet_bytes": 64434,
+        "distinct_eligible_heads": 400,
+        "full_safety_count": 401,
+        "initial_count": 8,
+        "mode": "SCRIPTED_SYNTHETIC_PUBLIC_CLI",
+        "native_quality_numerator": false,
+        "peak_rss_bytes": 342265856,
+        "pid": 67116,
+        "seconds_total": 35.93667660001665,
+        "stages": [
+          {
+            "command": "research-scope-resolve",
+            "exit_code": 0,
+            "peak_rss_bytes": 108339200,
+            "physical_bytes": 0,
+            "physical_partition_reads": 0,
+            "physical_record_decodes": 0,
+            "reason_code": null,
+            "seconds": 0.9541228000016417,
+            "serialized_output_bytes": 2131
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 288043008,
+            "physical_bytes": 8620303,
+            "physical_partition_reads": 89,
+            "physical_record_decodes": 11012,
+            "reason_code": null,
+            "seconds": 11.856442499993136,
+            "serialized_output_bytes": 51823
+          },
+          {
+            "command": "discovery-execute",
+            "exit_code": 0,
+            "peak_rss_bytes": 342265856,
+            "physical_bytes": 11955960,
+            "physical_partition_reads": 235,
+            "physical_record_decodes": 11575,
+            "reason_code": null,
+            "seconds": 5.484835600014776,
+            "serialized_output_bytes": 20055
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 342265856,
+            "physical_bytes": 8910969,
+            "physical_partition_reads": 214,
+            "physical_record_decodes": 7504,
+            "reason_code": null,
+            "seconds": 5.129145899991272,
+            "serialized_output_bytes": 55962
+          },
+          {
+            "command": "prior",
+            "exit_code": 0,
+            "peak_rss_bytes": 342265856,
+            "physical_bytes": 1518514,
+            "physical_partition_reads": 32,
+            "physical_record_decodes": 1247,
+            "reason_code": null,
+            "seconds": 0.2844618000090122,
+            "serialized_output_bytes": 2898
+          },
+          {
+            "command": "persist-draft",
+            "exit_code": 0,
+            "peak_rss_bytes": 342265856,
+            "physical_bytes": 16824526,
+            "physical_partition_reads": 391,
+            "physical_record_decodes": 13353,
+            "reason_code": null,
+            "seconds": 4.339375799987465,
+            "serialized_output_bytes": 26647
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 342265856,
+            "physical_bytes": 10520024,
+            "physical_partition_reads": 249,
+            "physical_record_decodes": 7556,
+            "reason_code": null,
+            "seconds": 4.720536400011042,
+            "serialized_output_bytes": 56694
+          },
+          {
+            "command": "freeze",
+            "exit_code": 0,
+            "peak_rss_bytes": 342265856,
+            "physical_bytes": 6596575,
+            "physical_partition_reads": 147,
+            "physical_record_decodes": 4217,
+            "reason_code": null,
+            "seconds": 3.0431304999801796,
+            "serialized_output_bytes": 118639
+          }
+        ],
+        "terminal": "FROZEN_AWAITING_CRITIC"
+      },
+      {
+        "archive_eligible_count": 401,
+        "capability_epoch_sha256": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
+        "cold_process": 3,
+        "critic_capsules": 28,
+        "critic_packet_bytes": 64434,
+        "distinct_eligible_heads": 400,
+        "full_safety_count": 401,
+        "initial_count": 8,
+        "mode": "SCRIPTED_SYNTHETIC_PUBLIC_CLI",
+        "native_quality_numerator": false,
+        "peak_rss_bytes": 365051904,
+        "pid": 26128,
+        "seconds_total": 31.975776400009636,
+        "stages": [
+          {
+            "command": "research-scope-resolve",
+            "exit_code": 0,
+            "peak_rss_bytes": 109293568,
+            "physical_bytes": 0,
+            "physical_partition_reads": 0,
+            "physical_record_decodes": 0,
+            "reason_code": null,
+            "seconds": 0.988572700007353,
+            "serialized_output_bytes": 2131
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 286588928,
+            "physical_bytes": 8337024,
+            "physical_partition_reads": 88,
+            "physical_record_decodes": 10612,
+            "reason_code": null,
+            "seconds": 10.144364100007806,
+            "serialized_output_bytes": 51823
+          },
+          {
+            "command": "discovery-execute",
+            "exit_code": 0,
+            "peak_rss_bytes": 365051904,
+            "physical_bytes": 11955960,
+            "physical_partition_reads": 235,
+            "physical_record_decodes": 11575,
+            "reason_code": null,
+            "seconds": 4.561500999989221,
+            "serialized_output_bytes": 20055
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 365051904,
+            "physical_bytes": 8860722,
+            "physical_partition_reads": 213,
+            "physical_record_decodes": 7503,
+            "reason_code": null,
+            "seconds": 4.250200199981919,
+            "serialized_output_bytes": 55962
+          },
+          {
+            "command": "prior",
+            "exit_code": 0,
+            "peak_rss_bytes": 365051904,
+            "physical_bytes": 1468267,
+            "physical_partition_reads": 31,
+            "physical_record_decodes": 1246,
+            "reason_code": null,
+            "seconds": 0.20534290000796318,
+            "serialized_output_bytes": 2898
+          },
+          {
+            "command": "persist-draft",
+            "exit_code": 0,
+            "peak_rss_bytes": 365051904,
+            "physical_bytes": 16159963,
+            "physical_partition_reads": 386,
+            "physical_record_decodes": 12550,
+            "reason_code": null,
+            "seconds": 4.24662220000755,
+            "serialized_output_bytes": 26647
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 365051904,
+            "physical_bytes": 10469777,
+            "physical_partition_reads": 248,
+            "physical_record_decodes": 7555,
+            "reason_code": null,
+            "seconds": 4.41661089999252,
+            "serialized_output_bytes": 56694
+          },
+          {
+            "command": "freeze",
+            "exit_code": 0,
+            "peak_rss_bytes": 365051904,
+            "physical_bytes": 6546328,
+            "physical_partition_reads": 146,
+            "physical_record_decodes": 4216,
+            "reason_code": null,
+            "seconds": 3.03876080000191,
+            "serialized_output_bytes": 118639
+          }
+        ],
+        "terminal": "FROZEN_AWAITING_CRITIC"
+      },
+      {
+        "archive_eligible_count": 4001,
+        "capability_epoch_sha256": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
+        "cold_process": 1,
+        "critic_capsules": 28,
+        "critic_packet_bytes": 64440,
+        "distinct_eligible_heads": 4000,
+        "full_safety_count": 4001,
+        "initial_count": 8,
+        "mode": "SCRIPTED_SYNTHETIC_PUBLIC_CLI",
+        "native_quality_numerator": false,
+        "peak_rss_bytes": 480980992,
+        "pid": 45272,
+        "seconds_total": 66.44181069999468,
+        "stages": [
+          {
+            "command": "research-scope-resolve",
+            "exit_code": 0,
+            "peak_rss_bytes": 122261504,
+            "physical_bytes": 0,
+            "physical_partition_reads": 0,
+            "physical_record_decodes": 0,
+            "reason_code": null,
+            "seconds": 0.9179704999842215,
+            "serialized_output_bytes": 2131
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 422662144,
+            "physical_bytes": 73217745,
+            "physical_partition_reads": 88,
+            "physical_record_decodes": 104212,
+            "reason_code": null,
+            "seconds": 15.88221149999299,
+            "serialized_output_bytes": 51831
+          },
+          {
+            "command": "discovery-execute",
+            "exit_code": 0,
+            "peak_rss_bytes": 426762240,
+            "physical_bytes": 81828444,
+            "physical_partition_reads": 235,
+            "physical_record_decodes": 112375,
+            "reason_code": null,
+            "seconds": 9.523743800004013,
+            "serialized_output_bytes": 20055
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 455270400,
+            "physical_bytes": 53829293,
+            "physical_partition_reads": 214,
+            "physical_record_decodes": 72304,
+            "reason_code": null,
+            "seconds": 9.148342500004219,
+            "serialized_output_bytes": 55970
+          },
+          {
+            "command": "prior",
+            "exit_code": 0,
+            "peak_rss_bytes": 455270400,
+            "physical_bytes": 9004879,
+            "physical_partition_reads": 32,
+            "physical_record_decodes": 12047,
+            "reason_code": null,
+            "seconds": 1.3480907000193838,
+            "serialized_output_bytes": 2904
+          },
+          {
+            "command": "persist-draft",
+            "exit_code": 0,
+            "peak_rss_bytes": 455270400,
+            "physical_bytes": 91074275,
+            "physical_partition_reads": 387,
+            "physical_record_decodes": 120551,
+            "reason_code": null,
+            "seconds": 12.531996600009734,
+            "serialized_output_bytes": 26649
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 455270400,
+            "physical_bytes": 55438559,
+            "physical_partition_reads": 249,
+            "physical_record_decodes": 72356,
+            "reason_code": null,
+            "seconds": 10.216772999992827,
+            "serialized_output_bytes": 56702
+          },
+          {
+            "command": "freeze",
+            "exit_code": 0,
+            "peak_rss_bytes": 480980992,
+            "physical_bytes": 31551379,
+            "physical_partition_reads": 147,
+            "physical_record_decodes": 40217,
+            "reason_code": null,
+            "seconds": 6.746570999996038,
+            "serialized_output_bytes": 118653
+          }
+        ],
+        "terminal": "FROZEN_AWAITING_CRITIC"
+      },
+      {
+        "archive_eligible_count": 4001,
+        "capability_epoch_sha256": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
+        "cold_process": 2,
+        "critic_capsules": 28,
+        "critic_packet_bytes": 64440,
+        "distinct_eligible_heads": 4000,
+        "full_safety_count": 4001,
+        "initial_count": 8,
+        "mode": "SCRIPTED_SYNTHETIC_PUBLIC_CLI",
+        "native_quality_numerator": false,
+        "peak_rss_bytes": 455217152,
+        "pid": 35836,
+        "seconds_total": 68.96125329998904,
+        "stages": [
+          {
+            "command": "research-scope-resolve",
+            "exit_code": 0,
+            "peak_rss_bytes": 121307136,
+            "physical_bytes": 0,
+            "physical_partition_reads": 0,
+            "physical_record_decodes": 0,
+            "reason_code": null,
+            "seconds": 1.0572465999866836,
+            "serialized_output_bytes": 2131
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 416227328,
+            "physical_bytes": 73217745,
+            "physical_partition_reads": 88,
+            "physical_record_decodes": 104212,
+            "reason_code": null,
+            "seconds": 16.241049300006125,
+            "serialized_output_bytes": 51831
+          },
+          {
+            "command": "discovery-execute",
+            "exit_code": 0,
+            "peak_rss_bytes": 416227328,
+            "physical_bytes": 81828444,
+            "physical_partition_reads": 235,
+            "physical_record_decodes": 112375,
+            "reason_code": null,
+            "seconds": 11.20034890001989,
+            "serialized_output_bytes": 20055
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 448671744,
+            "physical_bytes": 53779039,
+            "physical_partition_reads": 213,
+            "physical_record_decodes": 72303,
+            "reason_code": null,
+            "seconds": 10.048671099997591,
+            "serialized_output_bytes": 55970
+          },
+          {
+            "command": "prior",
+            "exit_code": 0,
+            "peak_rss_bytes": 448671744,
+            "physical_bytes": 8954625,
+            "physical_partition_reads": 31,
+            "physical_record_decodes": 12046,
+            "reason_code": null,
+            "seconds": 1.5292776999995112,
+            "serialized_output_bytes": 2904
+          },
+          {
+            "command": "persist-draft",
+            "exit_code": 0,
+            "peak_rss_bytes": 448671744,
+            "physical_bytes": 91024021,
+            "physical_partition_reads": 386,
+            "physical_record_decodes": 120550,
+            "reason_code": null,
+            "seconds": 12.644957099983003,
+            "serialized_output_bytes": 26649
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 453472256,
+            "physical_bytes": 55388305,
+            "physical_partition_reads": 248,
+            "physical_record_decodes": 72355,
+            "reason_code": null,
+            "seconds": 10.329439299996011,
+            "serialized_output_bytes": 56702
+          },
+          {
+            "command": "freeze",
+            "exit_code": 0,
+            "peak_rss_bytes": 455217152,
+            "physical_bytes": 31501125,
+            "physical_partition_reads": 146,
+            "physical_record_decodes": 40216,
+            "reason_code": null,
+            "seconds": 5.764207100000931,
+            "serialized_output_bytes": 118653
+          }
+        ],
+        "terminal": "FROZEN_AWAITING_CRITIC"
+      },
+      {
+        "archive_eligible_count": 4001,
+        "capability_epoch_sha256": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
+        "cold_process": 3,
+        "critic_capsules": 28,
+        "critic_packet_bytes": 64440,
+        "distinct_eligible_heads": 4000,
+        "full_safety_count": 4001,
+        "initial_count": 8,
+        "mode": "SCRIPTED_SYNTHETIC_PUBLIC_CLI",
+        "native_quality_numerator": false,
+        "peak_rss_bytes": 482435072,
+        "pid": 28532,
+        "seconds_total": 63.057876600010786,
+        "stages": [
+          {
+            "command": "research-scope-resolve",
+            "exit_code": 0,
+            "peak_rss_bytes": 121069568,
+            "physical_bytes": 0,
+            "physical_partition_reads": 0,
+            "physical_record_decodes": 0,
+            "reason_code": null,
+            "seconds": 0.9383835000044201,
+            "serialized_output_bytes": 2131
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 437915648,
+            "physical_bytes": 73217745,
+            "physical_partition_reads": 88,
+            "physical_record_decodes": 104212,
+            "reason_code": null,
+            "seconds": 16.429462700005388,
+            "serialized_output_bytes": 51831
+          },
+          {
+            "command": "discovery-execute",
+            "exit_code": 0,
+            "peak_rss_bytes": 453255168,
+            "physical_bytes": 81828444,
+            "physical_partition_reads": 235,
+            "physical_record_decodes": 112375,
+            "reason_code": null,
+            "seconds": 9.938366999995196,
+            "serialized_output_bytes": 20055
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 482435072,
+            "physical_bytes": 53829293,
+            "physical_partition_reads": 214,
+            "physical_record_decodes": 72304,
+            "reason_code": null,
+            "seconds": 8.914894699992146,
+            "serialized_output_bytes": 55970
+          },
+          {
+            "command": "prior",
+            "exit_code": 0,
+            "peak_rss_bytes": 482435072,
+            "physical_bytes": 9004879,
+            "physical_partition_reads": 32,
+            "physical_record_decodes": 12047,
+            "reason_code": null,
+            "seconds": 1.0769931999966502,
+            "serialized_output_bytes": 2904
+          },
+          {
+            "command": "persist-draft",
+            "exit_code": 0,
+            "peak_rss_bytes": 482435072,
+            "physical_bytes": 91074275,
+            "physical_partition_reads": 387,
+            "physical_record_decodes": 120551,
+            "reason_code": null,
+            "seconds": 11.086217200005194,
+            "serialized_output_bytes": 26649
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 482435072,
+            "physical_bytes": 55383807,
+            "physical_partition_reads": 248,
+            "physical_record_decodes": 72355,
+            "reason_code": null,
+            "seconds": 9.090608800004702,
+            "serialized_output_bytes": 56702
+          },
+          {
+            "command": "freeze",
+            "exit_code": 0,
+            "peak_rss_bytes": 482435072,
+            "physical_bytes": 31496627,
+            "physical_partition_reads": 146,
+            "physical_record_decodes": 40216,
+            "reason_code": null,
+            "seconds": 5.455305800016504,
+            "serialized_output_bytes": 118653
+          }
+        ],
+        "terminal": "FROZEN_AWAITING_CRITIC"
+      }
+    ],
+    "historical_summary_ref": {
+      "bytes": 30209,
+      "raw_path": "growth/pre-detail-summary.json",
+      "sha256": "8167d4454b0a79e66c718db44d7e63e56a59ef5bab2b651cdd07b41b26cfb0fc"
+    },
+    "native_quality_numerator": false,
+    "peak_method": "Windows PEAK_WORKING_SET_FROM_EXISTING_PROBE",
+    "peak_rss_bytes_max": 482435072,
+    "tokens": "UNKNOWN"
+  },
+  "identity": {
+    "actor": "CODEX",
+    "base": "fb65d69f6e48c49b26937bb6caf324b3417b094e",
+    "historical_growth_capability": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
+    "intermediate_54_test_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
+    "model": "UNKNOWN",
+    "original_native_product_commit": "706e9170c6aaef02b7acdf382cfe8de96aa3d069",
+    "product_commit": "20cdc7f3fe5bdb541d6961fe996b379bec0ddd90",
+    "roots_class": "DISPOSABLE_SYNTHETIC",
+    "route": "DIRECT_CODEX_DELIVERY",
+    "seed": "UNKNOWN",
+    "verified_capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13"
+  },
+  "independent_reviews": {
+    "path": "docs/evidence/forge_evidence_guided_generation_v1/independent-review.json",
+    "required_roles": [
+      "CODE_REVIEWER",
+      "GOAL_DOD_CRITIC",
+      "ARCHITECTURE_CRITIC",
+      "OWNER_UX_CRITIC"
+    ],
+    "status": "RESULT_OWNED_BY_CANONICAL_INDEPENDENT_REVIEW_RECORD"
+  },
+  "live_delivery": {
+    "exact_head_ci": "ENFORCED_LIVE_AFTER_FINAL_HEAD",
+    "merge_readiness": "ENFORCED_LIVE_AFTER_EXACT_HEAD_CI",
+    "owner_phrase": null,
+    "receipt_owner": "OWNER_ATTENTION_GATE_V2"
+  },
+  "native": {
+    "additional_grades": {
+      "bytes": 59119,
+      "raw_path": "native/additional-blind-grades.json",
+      "sha256": "3e41f62d58c33a77b32d1373e6c1f1ddd1928c79b7e0e7fa53b5e9f9176cd318"
+    },
+    "additional_summary": {
+      "generator_handoff_met": 1,
+      "generator_handoff_not_met": 5,
+      "global_comparative_model_gain": "NOT_IDENTIFIABLE_FROM_SINGLE_ANONYMOUS_PACKET",
+      "grounded_discriminator_counts": {
+        "UNKNOWN": 3,
+        "false": 1,
+        "true": 4
+      },
+      "native_first_transport_counts": {
+        "NOT_MET": 7,
+        "UNKNOWN": 1
+      },
+      "opportunity_captured_counts": {
+        "true": 6
+      },
+      "p8_memory_correct_counts": {
+        "true": 2
+      },
+      "positive_question_cases": 6,
+      "read_only_answer_met": 2,
+      "rubric_assessments": 64,
+      "rubric_status_counts": {
+        "MET": 53,
+        "NOT_APPLICABLE": 2,
+        "NOT_MET": 5,
+        "UNKNOWN": 4
+      },
+      "scientific_acceptance_count": 0,
+      "trials": 8
+    },
+    "additional_unblinding": {
+      "bytes": 4468,
+      "raw_path": "native/additional-unblinded.json",
+      "sha256": "b4e17dfffd860a9a273723adcc217e4b1da4a01ec084ab29d944891188025566"
+    },
+    "after_first_persist_card_edits": 0,
+    "allocation": {
+      "bytes": 12642,
+      "raw_path": "native/allocation-before-repair.json",
+      "sha256": "08b9b5c30e370b06247404d7b960356f28907643517df7cbf5da8684486f00b1"
+    },
+    "core": 16,
+    "core_grades": {
+      "bytes": 81607,
+      "raw_path": "native/core-blind-grades.json",
+      "sha256": "2e6dad7f7a60f5b0826907f6aefbe48d30ac91c1d393be66f338ab06b798b2e0"
+    },
+    "core_positive_complete_handoffs": 0,
+    "core_summary": {
+      "baseline": {
+        "end_to_end_met": 0,
+        "grounded_discriminator_true": 4,
+        "negative_count": 3,
+        "negative_met": 1,
+        "positive_captured": 3,
+        "positive_count": 5,
+        "positive_unknown": 2,
+        "trials": 8
+      },
+      "candidate": {
+        "end_to_end_met": 4,
+        "grounded_discriminator_true": 5,
+        "negative_count": 3,
+        "negative_met": 3,
+        "positive_captured": 4,
+        "positive_count": 5,
+        "positive_unknown": 0,
+        "trials": 8
+      }
+    },
+    "core_unblinding": {
+      "bytes": 11415,
+      "raw_path": "native/core-unblinded.json",
+      "sha256": "8d2c5669665c9d3c9eac0d5a1ac3c9a97ed77e3f70d8c4c5f505a09201816d67"
+    },
+    "critics": 2,
+    "factorial_ablation": "NOT_EXECUTED_ALTERNATIVE_TWO_NEXT_CYCLE_TWO_TRANSFER_FROZEN_PER_11_4",
+    "full_native_critic_finalized_paths": 0,
+    "hard_cap": 28,
+    "inputs_outputs": [
+      {
+        "artifacts": [
+          {
+            "bytes": 9399,
+            "raw_path": "native/baseline/case-01/draft.json",
+            "sha256": "32fdabd69471cfab719d6b579d45fe4a107adde397d7eef7bc63b64b53bbea1a"
+          }
+        ],
+        "case_path": "baseline/case-01",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 52648,
+          "raw_path": "native/baseline/case-01/input.json",
+          "sha256": "32d9eeb057aac80c12ef427273864baec9d3bf6ee54bed7b7f77866313fe5fce"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 18002,
+          "raw_path": "native/baseline/case-01/output.json",
+          "sha256": "804cd5004763223af2d9d8aa171387eee75432ddde70bbea1c2c9e7230b013ef"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "BLOCKED_PUBLIC_TRANSPORT"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 9274,
+            "raw_path": "native/baseline/case-02/draft.json",
+            "sha256": "0f4a76fb2d5276c1763e9a112b2905edb37b1c58fdcf6e96d841e9ce7e1400ee"
+          }
+        ],
+        "case_path": "baseline/case-02",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 52648,
+          "raw_path": "native/baseline/case-02/input.json",
+          "sha256": "8607d7095f63a9bde450aace76cd2ea4caa6dad195b69ce3aa56aa13a021c308"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 19601,
+          "raw_path": "native/baseline/case-02/output.json",
+          "sha256": "f44214bd976a56e274512aa4174c4a61314c9f9994e24b18ced953e837e39630"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "BLOCKED_TECHNICAL_QUERY_CONTRACT"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 7361,
+            "raw_path": "native/baseline/case-03/draft.json",
+            "sha256": "24a6ec2f8c49f8e603e0c491edaeed205436987f2bfe0056ff206d592b199388"
+          }
+        ],
+        "case_path": "baseline/case-03",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 53028,
+          "raw_path": "native/baseline/case-03/input.json",
+          "sha256": "9dc3ad0bca9cf1191c5fe7620a2b870c64b8564e49b5fa1b3807fa2798860db0"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 10513,
+          "raw_path": "native/baseline/case-03/output.json",
+          "sha256": "539e6d0b779f1eaac8f94e1f78ad7d497156daabd77091534c6386307de59386"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "TECHNICAL_STOP"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 2232,
+            "raw_path": "native/baseline/case-04/read-set.json",
+            "sha256": "aff8c751972acff47b597a053d1b1e88cf4da00e47641382e2fef9134382219b"
+          },
+          {
+            "bytes": 4797,
+            "raw_path": "native/baseline/case-04/draft.json",
+            "sha256": "57f79fa078c8f49e340831e4cfa79f8db0906b3613f9d5f7aeb8d9e689fa8a4c"
+          }
+        ],
+        "case_path": "baseline/case-04",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 53934,
+          "raw_path": "native/baseline/case-04/input.json",
+          "sha256": "92620e92fb50060d9ea5e24c08acc23465d9a1f16ff5039199486b5277e36f77"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 9006,
+          "raw_path": "native/baseline/case-04/output.json",
+          "sha256": "0dff1e318ab78e955fd5a88379045393477292e07b60bc0d30163455d53076f3"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "TECHNICAL_STOP"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 534,
+            "raw_path": "native/baseline/case-05/hashes.json",
+            "sha256": "695b547d05265c470517f14d5d99ec645a60c8519bf059eaab54299403069305"
+          },
+          {
+            "bytes": 10305,
+            "raw_path": "native/baseline/case-05/draft.json",
+            "sha256": "cc12c7ee2f80429d9ddafee6fc3ca70fb6c33659dbca00073003237993f55d45"
+          }
+        ],
+        "case_path": "baseline/case-05",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 55471,
+          "raw_path": "native/baseline/case-05/input.json",
+          "sha256": "40f43a531a1aaf69065c0450c08bbb9bcbb3659224981cc19e3e3f9896938195"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 48164,
+          "raw_path": "native/baseline/case-05/output.json",
+          "sha256": "3f481fb06ef2ab989ab9a57059db9640babf29d1d3bb0d2aaac4e16f7b707d67"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "TECHNICAL_STOP"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 8331,
+            "raw_path": "native/baseline/case-06/draft.json",
+            "sha256": "02973dde4b1bc04ab3a505f8fcc171419933774a454eb9a1509b509cd321a666"
+          }
+        ],
+        "case_path": "baseline/case-06",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 55471,
+          "raw_path": "native/baseline/case-06/input.json",
+          "sha256": "83c67c2bb0184150abd8b4b9743ee9b0ccc399ab2603cdf7975b7eec91c36ab5"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 8487,
+          "raw_path": "native/baseline/case-06/output.json",
+          "sha256": "75e5b5f9599c931e1df500084b6c6777b5fa6ded89ae3e12762bb710f67f180e"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "TECHNICAL_STOP"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 2176,
+            "raw_path": "native/baseline/case-07/draft.json",
+            "sha256": "580e9879a69d78e57f6d893bc27a4b9fa7da0933808f213314335b7503596237"
+          }
+        ],
+        "case_path": "baseline/case-07",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 51252,
+          "raw_path": "native/baseline/case-07/input.json",
+          "sha256": "56190bef28c58e7daba9a02c5149b1fa666bbbba6d5e084e6a2e65042aa58a6d"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 17875,
+          "raw_path": "native/baseline/case-07/output.json",
+          "sha256": "5c9567871211f41ef12aded349071169f4c58bd0e2af9f8c9ff7246ef31169e3"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "BLOCKED_TECHNICAL"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 8782,
+            "raw_path": "native/baseline/case-08/draft.json",
+            "sha256": "ffcff3b0824b4c2ee24669f57660271f970fb9f56f7033e2ac6db8af5662599d"
+          }
+        ],
+        "case_path": "baseline/case-08",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 51375,
+          "raw_path": "native/baseline/case-08/input.json",
+          "sha256": "cafa2f062967102e8bc0f45debfc617b1fe7b1508f06a62c2b5bb568ca3a1ab8"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 9261,
+          "raw_path": "native/baseline/case-08/output.json",
+          "sha256": "bb1af55fa5f8b0c56fb35cc66746e50fbb2147b631d71e168284e12d244cc42d"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "STOP_TECHNICAL"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 5765,
+            "raw_path": "native/candidate/case-01/read-set.json",
+            "sha256": "1fc912fdd0b30cc8f968d9e3eefbc5c67765264873ca5188aa368cea890ab692"
+          },
+          {
+            "bytes": 2365,
+            "raw_path": "native/candidate/case-01/hashes.json",
+            "sha256": "64461c0ac654fedb651fba70f796d4a656bcea9a98312e23277034a64a809be5"
+          },
+          {
+            "bytes": 9296,
+            "raw_path": "native/candidate/case-01/draft.json",
+            "sha256": "13734c21c5779ec360e0be790902f469b511bc80dedbe3456ba42c4b7c571c78"
+          }
+        ],
+        "case_path": "candidate/case-01",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 63058,
+          "raw_path": "native/candidate/case-01/input.json",
+          "sha256": "2ec7f0c6f0b4c03139a49c84ca4b1a48e7fc2b520becf93330d86094805a0899"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 10625,
+          "raw_path": "native/candidate/case-01/output.json",
+          "sha256": "a7ee90c6aa46fb72d33b878ab9d6628c5a8da3e0a9c72cbd91904d12ca12d726"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "UNKNOWN"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 4153,
+            "raw_path": "native/candidate/case-02/read-set.json",
+            "sha256": "b983ffe9e514bdc3223d1572b7b9a39e2bb5b64a76cce269b51b574da2aadff3"
+          },
+          {
+            "bytes": 699,
+            "raw_path": "native/candidate/case-02/hashes.json",
+            "sha256": "378d3667017539c4706c2d68df75bb0ef8954dc2193dbdae6875f9a00ea9520f"
+          },
+          {
+            "bytes": 45788,
+            "raw_path": "native/candidate/case-02/draft.json",
+            "sha256": "12fe6d4b1f034af23d9418e6d7f5c29f8b9bcf395e5def293645e5f77de14b56"
+          }
+        ],
+        "case_path": "candidate/case-02",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 63058,
+          "raw_path": "native/candidate/case-02/input.json",
+          "sha256": "0a773bb5ce6aad9c9e2945064ecc3320c6c591ba6328bf5f9c700eee51da2f0b"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 43407,
+          "raw_path": "native/candidate/case-02/output.json",
+          "sha256": "6db57d41319be699d96999635c3f24a12315fb16884124080cf67a9f91638560"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "STOP"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 8654,
+            "raw_path": "native/candidate/case-03/read-set.json",
+            "sha256": "ca533a2d90b7e63d3e2c8b05a25c2aad7b642def4e2ea6ec5c8044b547f0020c"
+          },
+          {
+            "bytes": 1240,
+            "raw_path": "native/candidate/case-03/hashes.json",
+            "sha256": "9fd1a9854a7aaae24c205ae9ca6467e67690654accd05055b818c964896e98c0"
+          },
+          {
+            "bytes": 5293,
+            "raw_path": "native/candidate/case-03/draft.json",
+            "sha256": "605da8e9c2feeafb5e7bd32b544f354ac32ae2783c5e3c719288cf9bafd56752"
+          }
+        ],
+        "case_path": "candidate/case-03",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 63721,
+          "raw_path": "native/candidate/case-03/input.json",
+          "sha256": "28a91542f0eaf5bf30ba407b9f8aba68b21e9e79257b54b1bfe497d1ea80ab60"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 14395,
+          "raw_path": "native/candidate/case-03/output.json",
+          "sha256": "e72d75e25036feec6fcba1f32a3f7b29357f8495eaba1fd30ffb5a091159c2d6"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "SCOPED_STOP"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 12559,
+            "raw_path": "native/candidate/case-04/read-set.json",
+            "sha256": "7e05fe27b862eb41b6752bf38432a503cf3b81c113db6be5bc7c377075c51282"
+          },
+          {
+            "bytes": 2174,
+            "raw_path": "native/candidate/case-04/hashes.json",
+            "sha256": "1721501cb3e365bad006b46d2eb841ed5735f6e4430483bbe3c654d8d9cd71fb"
+          },
+          {
+            "bytes": 1978,
+            "raw_path": "native/candidate/case-04/draft.json",
+            "sha256": "3ba36546892f1505e798da507e9c6f38478a3805b6af37cae6a28709ff85c231"
+          }
+        ],
+        "case_path": "candidate/case-04",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 77914,
+          "raw_path": "native/candidate/case-04/input.json",
+          "sha256": "009f6e065fe0201123793db0b35d25a4daff29ca13f4f54dda4613125e2a0d8d"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 14210,
+          "raw_path": "native/candidate/case-04/output.json",
+          "sha256": "9709a1ae7ce51e44332d37fa8c22d17d2b1f38c5127ff09ef936dc194f6608cc"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "SCOPED_STOP"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 9925,
+            "raw_path": "native/candidate/case-05/read-set.json",
+            "sha256": "552fb7aceacf79e16b65730eba3afaffae04dfd190f44df46d703d67981babf1"
+          },
+          {
+            "bytes": 3795,
+            "raw_path": "native/candidate/case-05/hashes.json",
+            "sha256": "c9e1934b4ed8a97f56ad7f59ba9d123449e543e8d950e5b7689d7fec37159530"
+          },
+          {
+            "bytes": 44397,
+            "raw_path": "native/candidate/case-05/draft.json",
+            "sha256": "715e3317e9009a4c1f661cb6763319c6b86ffa6b322abda4d350b619e81a25f0"
+          }
+        ],
+        "case_path": "candidate/case-05",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 94491,
+          "raw_path": "native/candidate/case-05/input.json",
+          "sha256": "551f3457dd23ecef87a44efd2a7fd4f29c63158e968938dc7e22ce6286b13ac5"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 19804,
+          "raw_path": "native/candidate/case-05/output.json",
+          "sha256": "9a0c29fcd3e6126dfb736cf4703c80dfdf48615f1cbfca1b02829c697d834c9e"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "UNKNOWN"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 29401,
+            "raw_path": "native/candidate/case-06/read-set.json",
+            "sha256": "950fea83ad37458a9376a7ea1f6cfe1351a525631d98f7325290a0442c7d047c"
+          },
+          {
+            "bytes": 750,
+            "raw_path": "native/candidate/case-06/hashes.json",
+            "sha256": "6ecb55215fb999ba22578c994fd7dd9166a6cbb0d56e68198998cc99320634d9"
+          },
+          {
+            "bytes": 44894,
+            "raw_path": "native/candidate/case-06/draft.json",
+            "sha256": "f55649ed1325e442669452a6e1f660ed59b0a968e8987ee438a9e9e4a18d8712"
+          }
+        ],
+        "case_path": "candidate/case-06",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 94491,
+          "raw_path": "native/candidate/case-06/input.json",
+          "sha256": "cbf11c3a255e1b0b81a84f68963752ec11c935c87d8ba2622f70005ca54dc894"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 19608,
+          "raw_path": "native/candidate/case-06/output.json",
+          "sha256": "828c113f901ad1939fc79c455e17f145075118f52af491f1e39f41b69df3cc99"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "UNKNOWN"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 2540,
+            "raw_path": "native/candidate/case-07/read-set.json",
+            "sha256": "1d2f6f1435a93253ed8717eaf1dc48558c270473c72a1d65c9f47fc4b9d0a56f"
+          },
+          {
+            "bytes": 2223,
+            "raw_path": "native/candidate/case-07/hashes.json",
+            "sha256": "cff9acdc2fca2d597b3255a48bd5f2e366e63a6f8e63f9253a4d3a070c0f2bf6"
+          },
+          {
+            "bytes": 2535,
+            "raw_path": "native/candidate/case-07/draft.json",
+            "sha256": "4152bb9672a8ce69d76a180bb67a892eab29ad7f5bee66c157e6924a1b20288a"
+          }
+        ],
+        "case_path": "candidate/case-07",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 59064,
+          "raw_path": "native/candidate/case-07/input.json",
+          "sha256": "1b4d5d3b26759e5685199f03d8b92c3edc01e2096049e1ddc978f11cbf74e538"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 4681,
+          "raw_path": "native/candidate/case-07/output.json",
+          "sha256": "6962f0c0d9386a7d11e4cf2698e0bdee9acf8188a639e6ca9caa9c100f951cdf"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "UNKNOWN"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 11260,
+            "raw_path": "native/candidate/case-08/read-set.json",
+            "sha256": "cfc38cc40524dc1d408335a57cac3a84fad52888acd9e16383837ff16ffaffbc"
+          },
+          {
+            "bytes": 6302,
+            "raw_path": "native/candidate/case-08/hashes.json",
+            "sha256": "c4514b66c2a5e8a0d9615f3c180d75d38a1e0dd888ed7bf8391df713b0355865"
+          },
+          {
+            "bytes": 31686,
+            "raw_path": "native/candidate/case-08/draft.json",
+            "sha256": "fb5497a3379c6baaefdb2074a3b6d41f8d016b0dd9d60de10fcd6ac790123bf2"
+          }
+        ],
+        "case_path": "candidate/case-08",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 59187,
+          "raw_path": "native/candidate/case-08/input.json",
+          "sha256": "657666f96d6936f3dc4088b09c93f3d417d08efb1cbf13c2d867dea5331b9035"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 5628,
+          "raw_path": "native/candidate/case-08/output.json",
+          "sha256": "2ca66d0710ab55b393b6fb2e4960c8069a91812d8597a7da28278128b3dc2f76"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "UNKNOWN"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 8978,
+            "raw_path": "native/repair/case-01/read-set.json",
+            "sha256": "bdd146276f5e9e59af0cfb18472edaf0069efac3abd3e3fec506caf1cf11024c"
+          },
+          {
+            "bytes": 1927,
+            "raw_path": "native/repair/case-01/hashes.json",
+            "sha256": "1f7c5ef806d85f059aaea2b173b5d1b917713d2850c79a1b54ebf56f7dac3331"
+          },
+          {
+            "bytes": 6579,
+            "raw_path": "native/repair/case-01/draft.json",
+            "sha256": "4620c2750b2e397695c66975fb3c673523dacbcd53b9495cb195b83072464896"
+          }
+        ],
+        "case_path": "repair/case-01",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 63298,
+          "raw_path": "native/repair/case-01/input.json",
+          "sha256": "7a091887a9cc0cf19047ff0bb2e788e090766bc03600be063106fbf40ef537a9"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 4087,
+          "raw_path": "native/repair/case-01/output.json",
+          "sha256": "ec94d721cb6464af114baa7162ba9cd2cc9592e8e40a81e5f248d89982b406f0"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "BLOCKED_TRANSPORT"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 16273,
+            "raw_path": "native/repair/case-02/read-set.json",
+            "sha256": "4e0c31758aadcd534975b86833c5cfceca0d230930a1068162b928490c33096f"
+          },
+          {
+            "bytes": 2163,
+            "raw_path": "native/repair/case-02/hashes.json",
+            "sha256": "97fadc9219608004a146bc46786c3c107e292e2d3adaf85e75ee94d980ddfa6d"
+          },
+          {
+            "bytes": 34893,
+            "raw_path": "native/repair/case-02/first-draft.json",
+            "sha256": "f6ae99e0ce014c5cd6db5aada09ef9e0cd6d64bac29b19cdc4d86437fa6b5f10"
+          },
+          {
+            "bytes": 34893,
+            "raw_path": "native/repair/case-02/draft.json",
+            "sha256": "f6ae99e0ce014c5cd6db5aada09ef9e0cd6d64bac29b19cdc4d86437fa6b5f10"
+          }
+        ],
+        "case_path": "repair/case-02",
+        "elapsed": {
+          "measured_until": "2026-10-09T14:50:19.603125+00:00",
+          "pre_cli_wall_seconds": "UNKNOWN",
+          "recorded_cli_elapsed_seconds_sum": 21.148914999968838,
+          "wall_seconds_from_first_recorded_cli": 827.040815
+        },
+        "input": {
+          "bytes": 65542,
+          "raw_path": "native/repair/case-02/input.json",
+          "sha256": "71627c23e62bf1fabc4b8c224c6ceb5ce09857235f3265e0be71c57ff9855636"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 6175,
+          "raw_path": "native/repair/case-02/output.json",
+          "sha256": "0dbd5425835b04fe31916eee9fc39d51190bbe0a556e0983c1e23d176f8ffce4"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "STOPPED_AT_FIRST_PERSIST_REFUSAL"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 4271,
+            "raw_path": "native/repair/case-05/read-set.json",
+            "sha256": "e34a9a1ff63ace662840e85434a274003ca4efe13231e79ef753942852f2631c"
+          },
+          {
+            "bytes": 741,
+            "raw_path": "native/repair/case-05/hashes.json",
+            "sha256": "edfa1079e1c5c93ebdc87c05af53d9711aa1766117b281dec344b772b5911e7d"
+          },
+          {
+            "bytes": 6817,
+            "raw_path": "native/repair/case-05/draft.json",
+            "sha256": "ccb5b2f9162e447c8c1fdb08f87b8d6c9e35cc59d0ed3ff70327dc8b873d9fb7"
+          }
+        ],
+        "case_path": "repair/case-05",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 94732,
+          "raw_path": "native/repair/case-05/input.json",
+          "sha256": "2b13a09c1e71a4e8bd779e9da94db397058c49cef9eb5b6ef2397906d7f77422"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 4350,
+          "raw_path": "native/repair/case-05/output.json",
+          "sha256": "eeb5c40caf7798e03cddcdc44d2a78d23fa32268d0eb9fcca70d73428deac902"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "BLOCKED_TRANSPORT_PUBLIC_PREDICATE_GRAMMAR_GAP"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 13590,
+            "raw_path": "native/repair/case-06/read-set.json",
+            "sha256": "ee364d523f3e3f897c89e1defb869bd4072e37566a123d38c77a372f6f4eeb67"
+          },
+          {
+            "bytes": 4411,
+            "raw_path": "native/repair/case-06/hashes.json",
+            "sha256": "3d4400d7427f91af90d2b32f9a7569a2fbc8f698c40b8eefd11db5074a11862a"
+          },
+          {
+            "bytes": 38141,
+            "raw_path": "native/repair/case-06/FIRSTdraft.json",
+            "sha256": "05f0fff0644bc07c14a5119ee30c82fd2302706c610c592b5f27a8b507f8dcce"
+          },
+          {
+            "bytes": 38141,
+            "raw_path": "native/repair/case-06/draft.json",
+            "sha256": "05f0fff0644bc07c14a5119ee30c82fd2302706c610c592b5f27a8b507f8dcce"
+          }
+        ],
+        "case_path": "repair/case-06",
+        "elapsed": {
+          "cli_execution_seconds_sum": 22.446299400005955,
+          "ended_at_utc": "2026-10-09T14:50:03.155647+00:00",
+          "measured_phase_seconds": 676.554021,
+          "scope": "CLI and artifact phase; preceding method reads excluded",
+          "started_at_utc": "2026-10-09T14:38:46.601626+00:00"
+        },
+        "input": {
+          "bytes": 96975,
+          "raw_path": "native/repair/case-06/input.json",
+          "sha256": "40cd19c7e61c2f390cb995699c07bb4bfd99924e013b5e3e7a8ba0af39bfc855"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 6150,
+          "raw_path": "native/repair/case-06/output.json",
+          "sha256": "2067db782806a8428869ae398c0214f707f42f17ee92231501e601118d020096"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "UNKNOWN"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 3746,
+            "raw_path": "native/transfer/candidate/case-01/read-set.json",
+            "sha256": "d6a153dfafebc789ea528fe2c212755953d75d9efca4476d95e21067734deb69"
+          },
+          {
+            "bytes": 9556,
+            "raw_path": "native/transfer/candidate/case-01/hashes.json",
+            "sha256": "81a1d8a8de6a73e76b3187df40db5d7f6d9b2d861427484c45d52ac697d5d397"
+          },
+          {
+            "bytes": 40729,
+            "raw_path": "native/transfer/candidate/case-01/first-draft.json",
+            "sha256": "7c15292143b21d4539c78b30a962051683dd166101629b9e77c760fca7c647be"
+          },
+          {
+            "bytes": 2733,
+            "raw_path": "native/transfer/candidate/case-01/scientific-plan.json",
+            "sha256": "41f67d9a9e4f0a72337e15ab524824937c6bb674123b7827bd2b1ef277ee37e5"
+          },
+          {
+            "bytes": 1315,
+            "raw_path": "native/transfer/candidate/case-01/mechanical-failures.json",
+            "sha256": "65a88a201bfca3b2f13734e651dbb1f7b25f87a0e5ecf2de22eea0e0fd8ea965"
+          }
+        ],
+        "case_path": "transfer/candidate/case-01",
+        "elapsed": {
+          "boundary": "First recorded CLI subprocess start to last recorded CLI subprocess return; excludes initial input/method reads and final report writing",
+          "ended_at_utc": "2026-10-09T15:00:20.272334+00:00",
+          "full_native_invocation_wall_seconds": "UNKNOWN",
+          "started_at_utc": "2026-10-09T14:47:45.190183+00:00",
+          "summed_subprocess_seconds": 38.69463499999256,
+          "wall_seconds": 755.082151
+        },
+        "input": {
+          "bytes": 65569,
+          "raw_path": "native/transfer/candidate/case-01/input.json",
+          "sha256": "b08136194050a593741e9c0ac62e2f120d17c1b5fff8f5cbc97b3c3eb5ae3327"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 26824,
+          "raw_path": "native/transfer/candidate/case-01/output.json",
+          "sha256": "f410bc6279279c27eb200e143dc9efd71eb2de45e7222e35fe2623563e19a139"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "SELECTED_FOR_CRITIC"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 3122,
+            "raw_path": "native/transfer/candidate/case-05/read-set.json",
+            "sha256": "e85c35d4908c76f07516f5b3b33a405b3073fa62f0d19e0612994eea22f61db2"
+          },
+          {
+            "bytes": 7357,
+            "raw_path": "native/transfer/candidate/case-05/hashes.json",
+            "sha256": "71d55ec8e0cf67773c52cf889412bb2ff4412fa0a100d2d1ecbd585753ef8a5d"
+          },
+          {
+            "bytes": 44066,
+            "raw_path": "native/transfer/candidate/case-05/first-draft.json",
+            "sha256": "70a3f7c7afa9f8c601ca11cf5c33419fd73bb2f23d9e22715b5f4a2770b32ca9"
+          },
+          {
+            "bytes": 5365,
+            "raw_path": "native/transfer/candidate/case-05/scientific-plan.json",
+            "sha256": "67a92a9c4ffa74ca3321411b512cd14e5e04df8a8ee4f3842dc98123fbe2f753"
+          }
+        ],
+        "case_path": "transfer/candidate/case-05",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 96998,
+          "raw_path": "native/transfer/candidate/case-05/input.json",
+          "sha256": "04b7c1d467a64d5cdb21c7845078f6624db3bf29e9142811bbd03412a80b317d"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 45686,
+          "raw_path": "native/transfer/candidate/case-05/output.json",
+          "sha256": "bf9c89365e061d9b5fa0acc914e4f7716a1f382d9963cacb7b0fc4dee0ab49fb"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "STOP_FIRST_PERSIST_REFUSAL"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 3663,
+            "raw_path": "native/p8-technical/read-set.json",
+            "sha256": "59acc8f8eac094d1279dc2ba9ed083bfb718f622bccd128b82ebeb158d8e299f"
+          },
+          {
+            "bytes": 18083,
+            "raw_path": "native/p8-technical/hashes.json",
+            "sha256": "a55b1264d111e869af3de7ac5dd506898501c3cb4efe92711b6e2494c741c314"
+          }
+        ],
+        "case_path": "p8-technical",
+        "elapsed": {
+          "boundary": "From first byte-preserving helper read through artifact finalization; includes reasoning and read-only subprocess work; excludes initial tool-only bootstrap read. Command-specific elapsed is in command receipts.",
+          "final_metadata_finished_utc": "2026-10-09T15:19:26.032051+00:00",
+          "tracked_boundary_end_utc": "2026-10-09T15:24:25.332051+00:00",
+          "tracked_boundary_start_utc": "2026-10-09T15:12:47.789987+00:00",
+          "wall_seconds": 697.542064
+        },
+        "input": {
+          "bytes": 74325,
+          "raw_path": "native/p8-technical/input.json",
+          "sha256": "5715e9cf343253f392d791d1ae90305690e89ccea14669d913cc4baf62afd5e4"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 15261,
+          "raw_path": "native/p8-technical/output.json",
+          "sha256": "be0c78d4e121f974c012e979678ef595bb1fce0c2cc9d2f33b9ee2806a8a6985"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "READ_ONLY_MEMORY_ANSWER_COMPLETE"
+      },
+      {
+        "artifacts": [
+          {
+            "bytes": 5920,
+            "raw_path": "native/p8-critic-control/read-set.json",
+            "sha256": "ca1696c331f80bf305bb473ab330775dbb2defa7caed07874576d2bac9a857b1"
+          },
+          {
+            "bytes": 9401,
+            "raw_path": "native/p8-critic-control/hashes.json",
+            "sha256": "7147ad69cdf7e4783cd6b4246eaa4e370230365a3fd06fa08cfdab6a003debb4"
+          }
+        ],
+        "case_path": "p8-critic-control",
+        "elapsed": "UNKNOWN",
+        "input": {
+          "bytes": 90981,
+          "raw_path": "native/p8-critic-control/input.json",
+          "sha256": "5024242894811de25981f4c9369b90c6532929b8c9ec8afb91a45e5a7629c0fd"
+        },
+        "isolation": "FORK_NONE_LOGICAL_ONLY",
+        "model": "UNKNOWN",
+        "output": {
+          "bytes": 17127,
+          "raw_path": "native/p8-critic-control/output.json",
+          "sha256": "31dcd1791debe60ae9270fc20ef0fdce918bf49dc425eed720cf6d03bfc1eaea"
+        },
+        "read_set_attestation": "SELF_ATTESTED_NOT_OS_ENFORCED",
+        "seed": "UNKNOWN",
+        "terminal": "UNKNOWN"
+      }
+    ],
+    "launch_ledger": {
+      "bytes": 3537,
+      "raw_path": "native/launch-ledger.json",
+      "sha256": "d21ddac9b0355fd59be6a88d0de9850ad31a2824a6ee9bdd330ba740d63c6add"
+    },
+    "launched_generators": 24,
+    "next_cycle_read_only": 2,
+    "quality_graders": 2,
+    "repair": 4,
+    "scientific_rerolls": 0,
+    "scripted_first_cycle_native_critic_finalized_paths": 1,
+    "transfer": 2,
+    "transfer_fixture": {
+      "bytes": 715,
+      "raw_path": "native/transfer/fixture-before-outcomes.json",
+      "sha256": "cf35b7bcc54383c8251605c348c7626b25b1a6f25ee5e5a4fbaa330a3d25b290"
+    },
+    "unused_repair_calls": 4
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_OOS",
+    "NO_STRATEGY_PROMOTION",
+    "NO_LIVE_PROVIDER_RDP_HOLDOUT_DEPLOY_CREDENTIAL_MONEY",
+    "NO_FULL_NATIVE_GENERATOR_CAPABILITY",
+    "NO_COMPARATIVE_COGNITIVE_GAIN",
+    "NO_CANONICAL_DONE",
+    "NO_MERGE"
+  ],
+  "probes": {
+    "P1": {
+      "limit": "Native freeze PASS once; native finalize refused immutable Git-composite drift",
+      "raw": [
+        "native/candidate/case-01",
+        "native/candidate/case-02",
+        "native/transfer/candidate/case-01"
+      ],
+      "result": "PARTIAL"
+    },
+    "P2": {
+      "limit": "Scoped technical/scientific distinction, no family closure or new budget",
+      "raw": [
+        "native/candidate/case-03",
+        "native/candidate/case-04"
+      ],
+      "result": "PASS_IN_TESTED_SCOPE"
+    },
+    "P3": {
+      "limit": "Two parents read, first persist/alias failures; incremental joint price effect UNKNOWN",
+      "raw": [
+        "native/candidate/case-05",
+        "native/candidate/case-06",
+        "native/transfer/candidate/case-05"
+      ],
+      "result": "PARTIAL"
+    },
+    "P4": {
+      "limit": "Tiny/null restraint; tail output used wrong short horizon",
+      "raw": [
+        "native/candidate/case-07",
+        "native/candidate/case-08"
+      ],
+      "result": "PARTIAL"
+    },
+    "P5": {
+      "limit": "4001 eligible heads, 9 historical cold public processes plus one final-capability cold public process; 18 same-root owner cost comparisons; finite archive only",
+      "raw": [
+        "post-commit-focused-tests.log",
+        "growth/pre-detail-summary.json",
+        "growth/4000-4-attempt1/metrics_receipt.json",
+        "archive-owner-cost/summary.json"
+      ],
+      "result": "PASS"
+    },
+    "P6": {
+      "limit": "Future/protected/clock/own-session/unknown guards; not exhaustive native injection proof",
+      "raw": [
+        "post-commit-phase-tests.log",
+        "post-commit-producer-tests.log",
+        "post-commit-focused-tests.log"
+      ],
+      "result": "PASS_IN_EXECUTED_MACHINE_SCOPE"
+    },
+    "P7": {
+      "limit": "Renamed/scaled admissible fields; no new provider/units contract",
+      "raw": [
+        "post-commit-producer-tests.log",
+        "native/transfer/fixture-before-outcomes.json"
+      ],
+      "result": "PASS_IN_TESTED_EXISTING_FIELD_SCOPE"
+    },
+    "P8": {
+      "limit": "Saved real Critic control consumed by native next output; first cycle scripted; actual native finalize failed",
+      "raw": [
+        "native/p8-technical",
+        "native/p8-critic-control",
+        "post-commit-compatibility-tests.log"
+      ],
+      "result": "PASS_BOUNDED_MEMORY_RECOVERY_NATIVE_FIRST_CYCLE_PARTIAL"
+    }
+  },
+  "raw_archive": {
+    "lossless_scope": "Files explicitly inventoried; absent tool-only bytes are not recreated",
+    "materializer": "tests/fixtures/forge_evidence_guided_generation_v1/materialize_raw_evidence.py",
+    "path": "docs/evidence/forge_evidence_guided_generation_v1/raw-evidence.json",
+    "proof": {
+      "all_original_hashes_verified": true,
+      "bundle_bytes": 6855101,
+      "bundle_sha256": "e5c7f13310c82abf3662b4f8253ec640143aa3af84c6a3fa548b626dde4d0068",
+      "decompressed_private_prefix_scan": "PASS",
+      "excluded_store_and_capture_binaries": "REPRODUCIBLE_SYNTHETIC_FIXTURE_OWNERS_RETAINED_LOCALLY",
+      "files": 1507,
+      "native_generator_calls_not_modified": true,
+      "normalized_unique_objects": 1033,
+      "original_bytes": 20653083,
+      "private_paths_in_output_only": true,
+      "status": "LOSSLESS_BYTE_HASH_PASS"
+    },
+    "sha256": "e5c7f13310c82abf3662b4f8253ec640143aa3af84c6a3fa548b626dde4d0068"
+  },
+  "requirements": {
+    "R1": [
+      "hfic_preflight.py",
+      "hfic_generation_context.py",
+      "P1",
+      "P3"
+    ],
+    "R10": [
+      "hfic_session.py",
+      "ResearchStore/recovery owners",
+      "P8"
+    ],
+    "R2": [
+      "hfic_generation_context.py",
+      "forge_input_receipt.py",
+      "hfic_session.py",
+      "P5"
+    ],
+    "R3": [
+      "hfic_generation_context.py",
+      "hfic_prior_memory.py",
+      "P2",
+      "P3",
+      "P8"
+    ],
+    "R4": [
+      "hfic_temporal_discovery.py",
+      "hypothesis_forge.py",
+      "P6"
+    ],
+    "R5": [
+      "hypothesis-forge/SKILL.md",
+      "P1",
+      "P3",
+      "P4"
+    ],
+    "R6": [
+      "hfic_temporal_discovery.py",
+      "P1",
+      "P3",
+      "P4"
+    ],
+    "R7": [
+      "hfic_session.py",
+      "hfic_card_projection.py",
+      "P1",
+      "P3",
+      "P5"
+    ],
+    "R8": [
+      "hfic_generation_context.py",
+      "disposition/session owners",
+      "P8"
+    ],
+    "R9": [
+      "hfic_evidence_identity.py",
+      "existing collection owners",
+      "P7"
+    ]
+  },
+  "residuals": [
+    "NATIVE_PARTIAL_FORMULATION",
+    "QUALITY_GAIN_NOT_ESTABLISHED",
+    "REPEATED_PERSIST_PRIOR_SCOPE_AND_ALIAS_SEAMS_CLOSED_FOR_FURTHER_TUNING",
+    "NATIVE_FINALIZE_GIT_COMPOSITE_MISMATCH_IMMUTABLE_FROZEN_SESSION",
+    "SCRIPTED_FIRST_CYCLE_FOR_SUCCESSFUL_P8_CRITIC_SOURCE",
+    "READ_SET_DEVIATIONS_LOGICAL_ISOLATION_ONLY",
+    "MODEL_SEED_TOKENS_DOLLAR_COST_UNKNOWN",
+    "SOME_MECHANICAL_TOOL_ONLY_FAILURE_RAW_BYTES_UNAVAILABLE",
+    "NO_PAIRED_BASELINE_TRANSFER",
+    "FINITE_ARCHIVE_EXISTING_FIELDS_ONLY"
+  ],
+  "rollback": "Disable fresh producer only for new admissible runs; retain 1.5/1.1 readers and original append-only records/charges. Settings/deploy rollback not executed.",
+  "schema": "smial.forge-evidence-guided-generation-evidence",
+  "schema_version": "1.0",
+  "source_request": {
+    "name": "SMIAL_Evidence_Guided_Generator_PRD_SSD_V1_2026-10-09.md",
+    "sha256": "f70e0eda3f3fcb5271248af4aa2660fdd04980d2340d9ec766b3444862a2b616"
+  },
+  "task_id": "FORGE_EVIDENCE_GUIDED_GENERATION_V1",
+  "validation": {
+    "checks": [
+      {
+        "log": {
+          "bytes": 4220,
+          "raw_path": "post-commit-focused-tests.log",
+          "sha256": "5c32a4dca8a379422f3ec9927ba4dd67b749a6cd1d8ef0d1a6f97c6470e42a2a"
+        },
+        "name": "focused",
+        "receipt": {
+          "bytes": 1236,
+          "raw_path": "post-commit-focused-tests.json",
+          "sha256": "48564721fb510bc36c60fef41b271176ead710d99bec00b718d334ead06d292c"
+        },
+        "result": {
+          "after_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
+          "before_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
+          "command": [
+            "python",
+            "-B",
+            "-m",
+            "unittest",
+            "-v",
+            "tests.test_forge_evidence_guided_generation_v1",
+            "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_public_missing_saved_context_identifies_dependency_in_ordinary_forge_run",
+            "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_persisted_prior_matrix_reaches_public_context_candidate_and_run",
+            "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_runner_up_exact_prior_refuses_before_generated_draft",
+            "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_scripted_positive_boundary_runs_real_classify_final_runner_replay",
+            "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_primary_revision_projects_authored_aliases_and_keeps_same_look"
+          ],
+          "exit_code": 0,
+          "log_sha256": "5c32a4dca8a379422f3ec9927ba4dd67b749a6cd1d8ef0d1a6f97c6470e42a2a",
+          "roots_class": "DISPOSABLE_SYNTHETIC",
+          "schema": "smial.egg-focused-validation",
+          "scripted_native_quality_numerator": false,
+          "seconds": 457.7004636999918,
+          "stable_capability": true
+        },
+        "tests": 20
+      },
+      {
+        "log": {
+          "bytes": 6133,
+          "raw_path": "post-commit-compatibility-tests.log",
+          "sha256": "c327a2755976ac66791ee4d3f2327a5b2ae0855a5457b9aba2d3685aacf4faca"
+        },
+        "name": "compatibility",
+        "receipt": {
+          "bytes": 1122,
+          "raw_path": "post-commit-compatibility-tests.json",
+          "sha256": "18f5fcea372bc6ff8799224a16b506b6de9532cebc4883257e5c9a87beb46c26"
+        },
+        "result": {
+          "after_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
+          "before_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
+          "command": [
+            "python",
+            "-B",
+            "-m",
+            "unittest",
+            "-v",
+            "tests.test_hfic_critic_prior_memory_closure_v1",
+            "tests.test_hfic_forge_prior_context_capacity_repair_v1",
+            "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_os_reply_loss_then_moved_root_resume_uses_original_draft_and_charge",
+            "tests.test_forge_research_flow_reliability_v1.SessionHistoryTests.test_empty_and_absent_session_ids_share_only_legacy_attribution",
+            "tests.test_forge_research_flow_reliability_v1.SessionHistoryTests.test_legacy_identical_unlinked_hypotheses_rebuild_and_read_without_new_fork",
+            "tests.test_forge_research_flow_reliability_v1.CrashReservationRecoveryTests"
+          ],
+          "exit_code": 0,
+          "log_sha256": "c327a2755976ac66791ee4d3f2327a5b2ae0855a5457b9aba2d3685aacf4faca",
+          "roots_class": "DISPOSABLE_SYNTHETIC",
+          "schema": "smial.egg-compatibility-validation",
+          "scripted_native_quality_numerator": false,
+          "seconds": 103.8368345000199,
+          "stable_capability": true
+        },
+        "tests": 30
+      },
+      {
+        "log": {
+          "bytes": 552,
+          "raw_path": "post-commit-phase-tests.log",
+          "sha256": "9f83e66580473840e7266b8ce120c20f76d3e3e74f7d5c591a81ca1fd13e911e"
+        },
+        "name": "phase",
+        "receipt": {
+          "bytes": 797,
+          "raw_path": "post-commit-phase-tests.json",
+          "sha256": "36accd45519ac50989db11dbf72a73acd7223bff0f7d152cda64b7ec1dd043c6"
+        },
+        "result": {
+          "after_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
+          "before_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
+          "command": [
+            "python",
+            "-B",
+            "-m",
+            "unittest",
+            "-v",
+            "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_public_prefix_is_invariant_to_produced_future_poison_but_authorized_numeric_changes",
+            "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_real_normalized_prefix_reader_does_not_access_future_values"
+          ],
+          "exit_code": 0,
+          "log_sha256": "9f83e66580473840e7266b8ce120c20f76d3e3e74f7d5c591a81ca1fd13e911e",
+          "roots_class": "DISPOSABLE_SYNTHETIC",
+          "schema": "smial.egg-phase-validation",
+          "scripted_native_quality_numerator": false,
+          "seconds": 182.78857750000316,
+          "stable_capability": true
+        },
+        "tests": 2
+      },
+      {
+        "log": {
+          "bytes": 513,
+          "raw_path": "post-commit-producer-tests.log",
+          "sha256": "cc1ebb9e37bf469b11475a67c37d3fc05b978c18e611ef07b164204f1ca1ba29"
+        },
+        "name": "producer",
+        "receipt": {
+          "bytes": 788,
+          "raw_path": "post-commit-producer-tests.json",
+          "sha256": "974766445d11e904c2ed7b1650e97ac48f452935b4986374bd67548e64d0aee2"
+        },
+        "result": {
+          "after_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
+          "before_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
+          "command": [
+            "python",
+            "-B",
+            "-m",
+            "unittest",
+            "-v",
+            "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_direct_owner_mutation_changes_only_capability_not_market_or_charges",
+            "tests.test_forge_runtime_discovery_binding_v1.PublishedDiscoveryBindingTests.test_protected_unknown_and_hash_stop_before_the_loader"
+          ],
+          "exit_code": 0,
+          "log_sha256": "cc1ebb9e37bf469b11475a67c37d3fc05b978c18e611ef07b164204f1ca1ba29",
+          "roots_class": "DISPOSABLE_SYNTHETIC",
+          "schema": "smial.egg-producer-validation",
+          "scripted_native_quality_numerator": false,
+          "seconds": 30.862256399996113,
+          "stable_capability": true
+        },
+        "tests": 2
+      }
+    ],
+    "epochs_not_relabelled": true,
+    "final_delta_checks": [
+      {
+        "log": {
+          "bytes": 974,
+          "raw_path": "recovery-delta-after.log",
+          "sha256": "2152eac49b2c01dbb254279ee5e7ed5a2d90baa680ff6563c6e0532cfc5656f7"
+        },
+        "name": "final_recovery_and_hidden_corruption",
+        "receipt": {
+          "bytes": 1100,
+          "raw_path": "recovery-delta-after.json",
+          "sha256": "f2fdc03f885de824f35a2ce2ec303b9b7b5bfab4af4f8491d69e10fd7ae9985d"
+        },
+        "result": {
+          "after_capability": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "before_capability": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "command": [
+            "python",
+            "-B",
+            "-m",
+            "unittest",
+            "-v",
+            "tests.test_forge_evidence_guided_generation_v1.OrdinaryWorkingMemoryTests.test_detail_missing_context_preserves_exact_recovery_locator",
+            "tests.test_forge_evidence_guided_generation_v1.OrdinaryWorkingMemoryTests.test_bound_detail_is_read_only_and_writer_invalidates_locator",
+            "tests.test_forge_evidence_guided_generation_v1.OrdinaryWorkingMemoryTests.test_mandatory_overflow_refuses_before_generated_draft_or_slot_write",
+            "tests.test_forge_evidence_guided_generation_v1.OrdinaryWorkingMemoryTests.test_hidden_corrupt_archive_partition_blocks_public_context_without_writes"
+          ],
+          "exit_code": 0,
+          "log_sha256": "2152eac49b2c01dbb254279ee5e7ed5a2d90baa680ff6563c6e0532cfc5656f7",
+          "new_native_calls": 0,
+          "roots_class": "DISPOSABLE_SYNTHETIC",
+          "schema": "smial.egg-recovery-and-hidden-corruption-validation",
+          "seconds": 82.8042165999941,
+          "stable_capability": true,
+          "tests": 4
+        },
+        "tests": 4
+      }
+    ],
+    "final_delta_passed_checks": 4,
+    "full_local_gate_executed": false,
+    "intermediate_passed_checks": 54,
+    "previous_failures_retained_in_raw": true
+  },
+  "verdicts": {
+    "chronology": "NOT_EVALUATED",
+    "comparative_quality": "QUALITY_GAIN_NOT_ESTABLISHED",
+    "delivery": "NOT_MERGED",
+    "formulation_on_synthetic": "PARTIAL_FORMULATION",
+    "implementation": "PASS_IN_EXECUTED_SCOPE_PENDING_INDEPENDENT_REVIEW",
+    "live_economics": "NOT_EVALUATED",
+    "market_alpha": "NOT_EVALUATED",
+    "safety_and_compatibility": "PASS_IN_EXECUTED_MACHINE_SCOPE"
+  }
+}

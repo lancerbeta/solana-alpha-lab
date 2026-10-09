@@ -1,0 +1,89 @@
+{
+  "acceptance_id": "FORGE_EVIDENCE_GUIDED_GENERATION_V1-BOUNDED-IMPLEMENTATION-CHECKPOINT",
+  "active_stop_conditions": [],
+  "as_of": "2026-10-09",
+  "base_main": "0f89ffd8018c05fbafaf79ef609c7dadf888807f",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/forge_evidence_guided_generation_v1/factory-fit.json",
+    "sha256": "8f8becb31e546fba01b31fed7d5e6d4fe3936b72a5a7c3fc1dc9734192a53698",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "c1fedff00897194cc3259502a62b079e26b09e8e0e088853ab17c97209f5dcd5",
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "2045d1074798ef4579e6cc117ba213de0b1d9820d19f1ebfa4e630ec33422cc1",
+    "catalog/assets/core.yaml": "64424ba1277365bd4239ce016aba119edbabb1be3e8f5f56542e22b1458f2b35",
+    "catalog/assets/lifecycle.yaml": "19847ba10d13e56634f5ee0f77eb05cd78fad471095e517e97b08e587c0df2b2",
+    "catalog/catalog_manifest.yaml": "968a1fdfe6dd5a00b56d030859297237a31a8e3070a7b0f6a5660d20fee639d7",
+    "catalog/generated/asset_edges.json": "230753088f9621f813978b93ba69cfe05c39ee9ac4e31408511def2c1c651a93",
+    "catalog/schemas/hypothesis_critic_input_v1.schema.json": "252b3ec151072c41307af2892a6ca342f12784311987f1faae5eb55c61f92998",
+    "configs/hypothesis_forge_independent_critic_v1.yaml": "9dc2ecfaad5b7704290c7e1a718add97f39fd7e949216116997d45ab04cfc0a1",
+    "docs/PROJECT_MAP.md": "d5e715ac7f36c101677a74bc3b2548a6479fd01349eb7fa1227c007a4015ad21",
+    "docs/contracts/forge_evidence_guided_generation_v1.md": "977124fee9c08f9aa997f1b654a0fe00d642a1e4c84bb7d5a76b851528b0ae9b",
+    "docs/evidence/forge_evidence_guided_generation_v1/READOUT.md": "e9e40a3f14932781c01de38bae3bd0f6a203b3be7e7f0b05edb7c04c8b299d5a",
+    "docs/evidence/forge_evidence_guided_generation_v1/manifest.json": "ed765ffcdd6b6dde46fdb3e830313db0e6b5fd217703362b72341d111b1734fa",
+    "docs/evidence/forge_evidence_guided_generation_v1/materialization-proof.json": "6a1a43de1882caab0020341ba6cc933ab2bd3f9ddbb8ce9d920df4c21a3af894",
+    "docs/evidence/forge_evidence_guided_generation_v1/raw-evidence.json": "e5c7f13310c82abf3662b4f8253ec640143aa3af84c6a3fa548b626dde4d0068",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "29f110e9207f853dcd9ecb26124b52b274b606987593a52a8375815afd7ee444",
+    "docs/tasks/FORGE_EVIDENCE_GUIDED_GENERATION_V1.md": "5010e27b1f562608a61a92517dfeec9fb526992b61bf9ff07c38b202230a7aad",
+    "scripts/hypothesis_forge.py": "3c82a17cca2c22a1254b8f879847d2742c5a1324c1e65619cd5d01ee1faeafe0",
+    "src/solana_alpha_lab/factory/forge_input_receipt.py": "5434e06ed9ba9dd4a04adb9f7ef4004752a50d9fb027bd37d26dec949d337b37",
+    "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "4f343925afd7acaa767c64a217d42ab45fd9eb220fb98611600494998a81d2e9",
+    "src/solana_alpha_lab/factory/hfic_generation_context.py": "d347b585770f6f81e19bc6f2ddbe27031059754878a73b022bd8b5c99acde719",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "a4b866b352249e124cba6bb83c07b23e624f43848a7037dfc77ca087203f2d23",
+    "src/solana_alpha_lab/factory/hfic_session.py": "c566a2a01ebca53acb79ab81f037ba991049e9b7cc05ebaff08d64467d7bbfa5",
+    "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "ec0a51974e655ccfb89a48ef5263e2003a2ec152bc12ad072c772fb496bd07c0",
+    "tests/fixtures/forge_evidence_guided_generation_v1/archive_owner_compare.py": "91d164e1ee55a3f937de4f04039c0a2d5bbcbbf57deee109a13ef1449755a28b",
+    "tests/fixtures/forge_evidence_guided_generation_v1/growth_probe.py": "058a09fb8f3a722dc2c711cab8ae17f26d6a362c05f874ef50f487b27dbca04c",
+    "tests/fixtures/forge_evidence_guided_generation_v1/materialize_raw_evidence.py": "02be20f4718d34ebf0322855098338d157c51382808b129dc54f3d79d75b97b0",
+    "tests/fixtures/forge_evidence_guided_generation_v1/native_setup.py": "2846ae548ea60ceae6b7c3b067fae1149c287c2c8ec823cb44caf4d55a2d505f",
+    "tests/fixtures/forge_evidence_guided_generation_v1/oracle.json": "82bac99aa20e0616804a2e0803ccab4169b5b0548ba8295d9b15f927b222f132",
+    "tests/test_forge_evidence_guided_generation_v1.py": "de2c7545e7804d4fa7740bb55a2b1eccdc142a5d66e61124ee1b0f1b479dd069",
+    "tests/test_forge_research_flow_reliability_v1.py": "6c4e25e0951b8e73c93a83874de687c68fd6be352cd62a836ed4d4247e9a3a55",
+    "tests/test_hfic_list_aware_vertical_v1.py": "91c8b7ee89b54e1060b7f01c0662af5ff6d7681fb7cabd94152d8c9988190bc2",
+    "tests/test_hfic_operational_closure_v1.py": "1a8b1b62c7f6cadb32c962310c90d2ea2ef417aa41a5ed52e3055b857a734e04"
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_OOS",
+    "NO_STRATEGY_PROMOTION",
+    "NO_FULL_NATIVE_GENERATOR_CAPABILITY",
+    "NO_COMPARATIVE_COGNITIVE_GAIN",
+    "NO_CANONICAL_DONE",
+    "NO_NEW_REAL_SCIENTIFIC_LOOK",
+    "NO_LIVE",
+    "NO_DEPLOY",
+    "NO_MERGE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "external_actions": 0,
+    "local_writes": 1,
+    "network_calls": 0,
+    "scope": "PRODUCT_DOMAIN_EXCLUDING_AUTHORIZED_ROUTINE_GIT_GITHUB_DELIVERY_TRANSPORT"
+  },
+  "state_change": "BOUNDED_PHASE_SOURCE_CONTEXT_IMPLEMENTED_NATIVE_PARTIAL_NO_COMPARATIVE_GAIN_DELIVERY_PENDING",
+  "task_id": "FORGE_EVIDENCE_GUIDED_GENERATION_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/forge_evidence_guided_generation_v1/independent-review.json",
+      "sha256": "fae6f83b4ec0854f944e20b1dddd67685ca122b681a6142859db2cc9126c26d7",
+      "verdict": "PASS"
+    },
+    "project_checks": [],
+    "targeted": "PASS_54_INTERMEDIATE_PLUS_4_FINAL_DELTA_9_HISTORICAL_PLUS_1_FINAL_COLD_PUBLIC_GROWTH_18_OWNER_COST_PROCESSES_NATIVE_PARTIAL_AND_FAILED_ATTEMPTS_RETAINED_PLUS_14_INTERMEDIATE_CI_REPAIR_PASS_1_FAILED_THEN_3_CURRENT_TERMINAL_AND_SAFETY_PASS"
+  }
+}

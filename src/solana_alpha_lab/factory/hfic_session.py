@@ -47,6 +47,8 @@ SUPPORTED_PROMPT_VERSIONS = frozenset({PROMPT_VERSION_V1_1, PROMPT_VERSION})
 CRITIC_PACKET_VERSION_V11 = "1.1"
 CRITIC_PACKET_VERSION_V13_HISTORICAL = "1.3"
 CRITIC_PACKET_VERSION_CURRENT = "1.4"
+CRITIC_PACKET_VERSION_WORKING = "1.5"
+CRITIC_GROUNDING_PACKET_VERSIONS = frozenset({"1.4", "1.5"})
 DRAFT_SCHEMA_BY_PACKET_VERSION = {
     "1.1": "catalog/schemas/hypothesis_forge_draft_v1.schema.json",
     "1.2": "catalog/schemas/hypothesis_forge_draft_v1_2.schema.json",
@@ -1271,7 +1273,7 @@ def _selected_candidate_block(
         block["pit_component_provenance"] = card["pit_component_provenance"]
     if "mundane_alternative" in card:
         block["mundane_alternative"] = card["mundane_alternative"]
-    if packet_version == CRITIC_PACKET_VERSION_CURRENT:
+    if packet_version in CRITIC_GROUNDING_PACKET_VERSIONS:
         block.update(_freeze_owned_grounding_fields(card))
     from solana_alpha_lab.factory.hfic_grounded_discovery import card_claim_scope
 
@@ -1769,6 +1771,7 @@ def _bind_selected_look(
     *,
     store: Any,
     strict: bool = True,
+    evidence_surface_mode: str | None = None,
 ) -> dict[str, Any]:
     """Keep a confirming look, detach a narrower idea, stop a contradiction.
 
@@ -1798,6 +1801,10 @@ def _bind_selected_look(
         raise HficSessionError("LOOK_SCOPE_CONTRADICTION")
     if relation == "LOOK_SCOPE_MATCH":
         body = dict(grounded)
+        if evidence_surface_mode:
+            if look_scope.get("evidence_surface_mode") not in (None, "", evidence_surface_mode):
+                raise HficSessionError("LOOK_SCOPE_CONTRADICTION")
+            look_scope = {**look_scope, "evidence_surface_mode": evidence_surface_mode}
         body["candidate_scope"] = dict(look_scope)
         body["look_scope_relation"] = relation
         body["look_confirms_selected"] = True
@@ -1909,7 +1916,12 @@ def freeze_draft(
     next_action_draft: Mapping[str, Any] | None = None,
     verify_current_market_identity: bool = False,
     persist: bool = True,
+    _validate_after_saved_look: bool = False,
 ) -> dict[str, Any]:
+    # The generated-draft writer uses the same pure packet/byte validator
+    # after an admitted look advanced inventory. It cannot publish a session.
+    if _validate_after_saved_look and (persist or not _ordinary_discovery_requested(draft, preflight_receipt)):
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
     if not isinstance(draft, Mapping):
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
     _reject_stale_fresh_session_draft(draft, preflight_receipt)
@@ -1958,6 +1970,7 @@ def freeze_draft(
             prompt_version=prompt_version,
             packet_version=packet_version,
             verify_current_market_identity=verify_current_market_identity,
+            validate_after_saved_look=_validate_after_saved_look,
             persist=persist,
         )
 
@@ -2035,6 +2048,7 @@ def freeze_draft(
             repo_root=repo_root,
             memory_as_of=memory_as_of,
             verify_current_market_identity=verify_current_market_identity,
+            validate_after_saved_look=_validate_after_saved_look,
         )
         if existing_ladder is not None:
             return existing_ladder
@@ -2046,6 +2060,9 @@ def freeze_draft(
         if isinstance(maybe_head, str) and len(maybe_head) == 40:
             git_head = maybe_head.lower()
     critic_packet_version = _critic_packet_version(packet_version)
+    if critic_packet_version == CRITIC_PACKET_VERSION_CURRENT and isinstance(preflight_receipt, Mapping):
+        if isinstance((preflight_receipt.get("forge_context_packet") or {}).get("generation_context"), Mapping):
+            critic_packet_version = CRITIC_PACKET_VERSION_WORKING
     selected_transport = (
         grounded_candidates[selected_index]
         if grounded_candidates is not None
@@ -2056,7 +2073,7 @@ def freeze_draft(
         selected_transport,
         packet_version=critic_packet_version,
     )
-    if critic_packet_version == CRITIC_PACKET_VERSION_CURRENT:
+    if critic_packet_version in CRITIC_GROUNDING_PACKET_VERSIONS:
         from solana_alpha_lab.factory.hfic_control_integrity import (
             CRITIC_PACKET_GROUNDING_MISMATCH,
             assert_packet_grounding_consistent,
@@ -2222,6 +2239,8 @@ def freeze_draft(
                 grounded,
                 selected_card if isinstance(selected_card, Mapping) else {},
                 store=store,
+                evidence_surface_mode=(preflight_receipt or {}).get("evidence_surface_mode")
+                    if critic_packet_version == CRITIC_PACKET_VERSION_WORKING else None,
             )
     if isinstance(grounded, Mapping) and grounded.get("look_confirms_selected") is not False:
         from solana_alpha_lab.factory.hfic_grounded_discovery import (
@@ -2240,6 +2259,19 @@ def freeze_draft(
             raise HficSessionError(exc.code) from exc
     elif isinstance(grounded, Mapping):
         packet["grounded_evidence"] = grounded
+    if critic_packet_version == CRITIC_PACKET_VERSION_WORKING:
+        from solana_alpha_lab.factory.hfic_generation_context import candidate_working_view, GenerationContextError
+        try:
+            guarded, memory, brief = candidate_working_view(
+                store, preflight=preflight_receipt, card=selected_card,
+                evidence=packet.get("grounded_evidence") or {},
+                cutoff=bound["session_started_at"] if bound is not None else None,
+                inventory_digest=store_digest or "0"*64, repo_root=repo_root,
+                parent_budget_bytes=65536-len(_canonical_bytes(packet))-4096,
+            )
+        except GenerationContextError as exc:
+            raise HficSessionError(exc.code, detail=exc.detail) from exc
+        packet["grounded_evidence"], packet["prior_memory"], packet["generation_context"] = guarded, memory, brief
     handed = packet.get("grounded_evidence")
     if isinstance(handed, Mapping):
         from solana_alpha_lab.factory.hfic_research_universe_policy import claim_fields
@@ -2266,6 +2298,12 @@ def freeze_draft(
                 for item in list_discovery_looks(store, journal)
             ]
             packet["grounded_evidence"] = {**dict(handed), "viewed_queries": viewed}
+    if critic_packet_version == CRITIC_PACKET_VERSION_WORKING:
+        from solana_alpha_lab.factory.hfic_generation_context import fit_working_packet, GenerationContextError
+        try:
+            packet = fit_working_packet(packet)
+        except GenerationContextError as exc:
+            raise HficSessionError(exc.code, detail=exc.detail) from exc
     if repo_root is not None:
         _validate_json_schema(
             packet,
@@ -2280,7 +2318,7 @@ def freeze_draft(
             if grounded_candidates is not None
             else runner_up_card
         )
-    if runner_up is not None and critic_packet_version == CRITIC_PACKET_VERSION_CURRENT:
+    if runner_up is not None and critic_packet_version in CRITIC_GROUNDING_PACKET_VERSIONS:
         from solana_alpha_lab.factory.hfic_control_integrity import (
             CRITIC_PACKET_GROUNDING_MISMATCH,
             assert_packet_grounding_consistent,
@@ -2348,6 +2386,25 @@ def freeze_draft(
             packet_version=critic_packet_version,
         )
     if runner_up_packet is not None:
+        if critic_packet_version == CRITIC_PACKET_VERSION_WORKING:
+            from solana_alpha_lab.factory.hfic_generation_context import candidate_working_view, GenerationContextError
+            parent = {k:v for k,v in runner_up_packet.items() if k not in {"prior_memory", "generation_context"}}
+            try:
+                guarded, memory, brief = candidate_working_view(
+                    store, preflight=preflight_receipt, card=runner_up_card,
+                    evidence=runner_up_packet.get("grounded_evidence") or {},
+                    cutoff=bound["session_started_at"] if bound is not None else None,
+                    inventory_digest=store_digest or "0"*64, repo_root=repo_root,
+                    parent_budget_bytes=65536-len(_canonical_bytes(parent))-4096,
+                )
+            except GenerationContextError as exc:
+                raise HficSessionError(exc.code, detail=exc.detail) from exc
+            runner_up_packet["grounded_evidence"], runner_up_packet["prior_memory"], runner_up_packet["generation_context"] = guarded, memory, brief
+        if critic_packet_version == CRITIC_PACKET_VERSION_WORKING:
+            try:
+                runner_up_packet = fit_working_packet(runner_up_packet)
+            except GenerationContextError as exc:
+                raise HficSessionError(exc.code, detail=exc.detail) from exc
         _bind_packet_session_id(runner_up_packet, session_id)
         if repo_root is not None:
             _validate_json_schema(
@@ -2368,6 +2425,9 @@ def freeze_draft(
         separators=(",", ":"),
         allow_nan=False,
     )
+    if critic_packet_version == CRITIC_PACKET_VERSION_WORKING:
+        if len(packet_bytes.encode("utf-8")) > 65536 or len(runner_up_packet_bytes.encode("utf-8")) > 65536:
+            raise HficSessionError("GENERATION_MANDATORY_CONTEXT_EXCEEDS_BOUND", detail={"packet_bytes":len(packet_bytes.encode("utf-8")), "runner_up_packet_bytes":len(runner_up_packet_bytes.encode("utf-8")), "max_bytes":65536})
     result = {
         "session_id": session_id,
         "session_state": "FROZEN_AWAITING_CRITIC",
@@ -2503,7 +2563,10 @@ def freeze_draft(
             identities=identities,
             draft=draft,
             preflight_receipt=preflight_receipt,
-            stage_time=bound_session_started_at(preflight_receipt),
+            # Fresh research facts become available when they are persisted.
+            # The frozen session_started_at remains the initial prior cutoff.
+            # Legacy writers retain their recorded clock contract.
+            stage_time=_stage_datetime(None) if critic_packet_version == CRITIC_PACKET_VERSION_WORKING else bound_session_started_at(preflight_receipt),
         )
         store.rebuild_projection()
         result["store_inventory_digest"] = store.diagnostics().committed_inventory_sha256
@@ -2557,6 +2620,7 @@ def _freeze_no_worthy(
     prompt_version: str = PROMPT_VERSION_V1_1,
     packet_version: str = "1.1",
     verify_current_market_identity: bool = False,
+    validate_after_saved_look: bool = False,
     persist: bool = True,
 ) -> dict[str, Any]:
     _assert_vision_integrity_for_surface(
@@ -2618,6 +2682,7 @@ def _freeze_no_worthy(
             repo_root=repo_root,
             memory_as_of=memory_as_of,
             verify_current_market_identity=verify_current_market_identity,
+            validate_after_saved_look=validate_after_saved_look,
         )
         if existing_ladder is not None:
             return existing_ladder
@@ -4901,29 +4966,34 @@ def persist_generated_draft(
         from solana_alpha_lab.factory.hfic_memory_policy import HficMemoryPolicyError
 
         selected_card = candidates[selected_index]
-        selected_grounded = _bind_selected_look(grounded, selected_card, store=store)
+        fresh_working = isinstance((receipt.get("forge_context_packet") or {}).get("generation_context"), Mapping)
+        selected_grounded = _bind_selected_look(grounded, selected_card, store=store,
+            evidence_surface_mode=receipt.get("evidence_surface_mode") if fresh_working else None)
         if selected_grounded.get("look_confirms_selected") is not False or runner_up_index >= 0:
             try:
-                prior = build_prior_memory_snapshot(
-                    store,
-                    store_inventory_digest=store.diagnostics().committed_inventory_sha256,
-                    repo_root=repo_root,
-                    as_of=receipt.get("session_started_at"),
-                )
+                from solana_alpha_lab.factory.hfic_generation_context import collect_verified_priors, GenerationContextError
+                prior = collect_verified_priors(store, as_of=receipt.get("session_started_at"))
                 if selected_grounded.get("look_confirms_selected") is not False:
                     bind_prior_scope_evidence(
                         selected_grounded, canonical_priors=prior["capsules"]
                     )
                 if runner_up_index >= 0:
                     _rebind_runner_up_grounded_evidence(
-                        {"grounded_evidence": dict(grounded),
+                        {"grounded_evidence": dict(selected_grounded),
+                         "evidence_surface_mode": evidence_mode,
                          "prior_memory": {"capsules": prior["capsules"]}},
                         candidates[runner_up_index],
                     )
             except (GroundedDiscoveryError, PriorMemoryCapacityError,
-                    PriorMemoryUnidentifiedError, HficMemoryPolicyError) as exc:
+                    PriorMemoryUnidentifiedError, HficMemoryPolicyError, GenerationContextError) as exc:
                 raise HficSessionError(exc.code) from exc
-    if not _ordinary_discovery_requested(draft, receipt):
+    if _ordinary_discovery_requested(draft, receipt) and isinstance((receipt.get("forge_context_packet") or {}).get("generation_context"), Mapping):
+        freeze_draft(
+            draft, preflight_receipt=preflight_receipt, store=store,
+            repo_root=repo_root, verify_current_market_identity=True, persist=False,
+            _validate_after_saved_look=True,
+        )
+    elif not _ordinary_discovery_requested(draft, receipt):
         freeze_draft(
             draft, preflight_receipt=preflight_receipt, store=store,
             repo_root=repo_root, verify_current_market_identity=True, persist=False,
@@ -4994,6 +5064,12 @@ def persist_generated_draft(
     )
     def _recheck_generated_draft_under_writer_lease() -> None:
         _verify_required_context_dependency(store, receipt)
+        if _ordinary_discovery_requested(draft, receipt) and isinstance((receipt.get("forge_context_packet") or {}).get("generation_context"), Mapping):
+            # Validate the complete mandatory closure on the writer's snapshot,
+            # before either a draft or slot reservation becomes durable.
+            freeze_draft(draft, preflight_receipt=preflight_receipt, store=store,
+                         repo_root=repo_root, verify_current_market_identity=True,
+                         persist=False, _validate_after_saved_look=True)
         observed_draft = find_generated_draft(
             store,
             market_evidence_epoch_sha256=market,
@@ -6203,6 +6279,7 @@ def _bind_store_freeze_preflight(
     repo_root: Any,
     memory_as_of: str,
     verify_current_market_identity: bool = False,
+    validate_after_saved_look: bool = False,
 ) -> tuple[Mapping[str, Any], dict[str, Any] | None, dict[str, Any] | None]:
     """Return (receipt, existing_bundle, bound). Ladder slots skip START_NEW_SESSION."""
 
@@ -6279,7 +6356,7 @@ def _bind_store_freeze_preflight(
         draft,
         store=store,
         repo_root=repo_root,
-        require_current_store_digest=existing is None,
+        require_current_store_digest=existing is None and not validate_after_saved_look,
         require_current_market_identity=verify_current_market_identity,
     )
     if bound["research_memory_as_of"] != memory_as_of:
@@ -7008,7 +7085,7 @@ def run_live_classifier(
     packet_in = frozen.get("critic_input_packet")
     if (
         isinstance(packet_in, Mapping)
-        and packet_in.get("packet_version") == CRITIC_PACKET_VERSION_CURRENT
+        and packet_in.get("packet_version") in CRITIC_GROUNDING_PACKET_VERSIONS
     ):
         from solana_alpha_lab.factory.hfic_control_integrity import (
             assert_experiment_spec_grounding,
@@ -7441,7 +7518,7 @@ def apply_revision(
     rebuilt_selected.pop("_required_capability_ids", None)
     if (
         isinstance(packet_in, Mapping)
-        and packet_in.get("packet_version") == CRITIC_PACKET_VERSION_CURRENT
+        and packet_in.get("packet_version") in CRITIC_GROUNDING_PACKET_VERSIONS
     ):
         for key in (
             "estimand",
@@ -7540,6 +7617,21 @@ def apply_revision(
         revised_draft.get("prior_work_receipts") or revised_draft.get("prior_work_queries"),
         code="PRIOR_WORK_RECEIPTS_REQUIRED",
     )
+    if packet.get("packet_version") == CRITIC_PACKET_VERSION_WORKING:
+        from solana_alpha_lab.factory.hfic_generation_context import candidate_working_view, fit_working_packet, GenerationContextError
+        try:
+            rebound, memory, brief = candidate_working_view(
+                store, preflight={"forge_context_packet":{"prior_memory_working_view":packet_in["prior_memory"]}},
+                card=selected_card, evidence=packet.get("grounded_evidence") or {},
+                cutoff=packet_in["prior_memory"]["research_log_cutoff"],
+                inventory_digest=store.diagnostics().committed_inventory_sha256,
+                repo_root=repo_root,
+                preserve_selected_as_mandatory=False,
+            )
+            packet.update(grounded_evidence=rebound, prior_memory=memory, generation_context=brief)
+            packet = fit_working_packet(packet)
+        except GenerationContextError as exc:
+            raise HficSessionError(exc.code, detail=exc.detail) from exc
     _bind_packet_session_id(packet, str(frozen["session_id"]))
     if repo_root is not None:
         _validate_json_schema(

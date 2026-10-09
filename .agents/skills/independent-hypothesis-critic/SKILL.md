@@ -14,6 +14,18 @@ not continue Forge reasoning.
 
 ## Authority
 
+Fresh episode packet 1.5 inherits every 1.4 grounding/admission floor and also
+requires `generation_context` and prior snapshot 1.1. This is a bounded working
+view: selection completeness and archive completeness differ. The full existing
+guard is represented by its bound safety receipt, not by the number of visible
+capsules. Do not interpret omitted priors as absent history. Mandatory consulted
+sources and material restrictions remain visible; capacity refusal never proves
+a scientific negative. Use source-bound saved findings and their exact scope;
+authored interpretation, technical refusal, review rejection and typed scientific
+close confer different authority. Unknown or unrelated outcome text cannot close
+a family. Do not retrieve stores, raw results or a newer context yourself.
+Historical packets and snapshot 1.0 retain their original meanings.
+
 Read `configs/hypothesis_forge_independent_critic_v1.yaml` and **PROMPT B** in
 `docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md`.
 
@@ -64,9 +76,9 @@ Copy/bind exactly:
   comparator, coverage and per-side target attrition); never accept a claim
   wider or narrower than that machine statement.
 
-A `packet_version=1.1`, `1.2`, `1.3`, or `1.4` packet without `session_id` is
-incomplete. A current `packet_version=1.3` or `1.4` packet without `prior_memory` is
-incomplete. A current `packet_version=1.4` packet without freeze-owned
+A `packet_version=1.1`, `1.2`, `1.3`, `1.4`, or `1.5` packet without `session_id` is
+incomplete. A current `packet_version=1.3`, `1.4`, or `1.5` packet without `prior_memory` is
+incomplete. A current `packet_version=1.4` or `1.5` packet without freeze-owned
 `selected_candidate.grounding` is incomplete. Do **not** emit `hypothesis_critic_result_v1` and do **not** infer
 the missing field. Return `STATUS=INCOMPLETE_CRITIC_INPUT_PACKET` and stop.
 Generator prompt versions `HFIC-V1.1` and `HFIC-V1.2` are both accepted;
@@ -76,16 +88,16 @@ Historical `packet_version=1.0` / `1.1` / `1.2` packets remain readable without
 `prior_memory`. Do not reconstruct or fabricate `prior_memory` for historical
 `1.2`. If a historical `1.2` packet already contains `prior_memory`, compare
 against those capsules; that is packet content, not reconstruction. A current
-`packet_version=1.3` or `1.4` packet without `prior_memory`:
+`packet_version=1.3`, `1.4`, or `1.5` packet without `prior_memory`:
 `OWNER NEXT=RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_PRIOR_MEMORY`.
 Do not invent capsules from ResearchStore.
-Missing `session_id` on `packet_version=1.1`, `1.2`, `1.3`, or `1.4`:
+Missing `session_id` on `packet_version=1.1`, `1.2`, `1.3`, `1.4`, or `1.5`:
 `OWNER NEXT=RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_SESSION_ID`.
-For `packet_version=1.4`, treat `selected_candidate.grounding` as bound machine
+For `packet_version=1.4` or `1.5`, treat `selected_candidate.grounding` as bound machine
 input. Do not reconstruct it through ResearchStore/Catalog archaeology. Do not
 upgrade `HISTORICAL_RECONSTRUCTIBLE` to `PIT_READY` or `FORWARD_ONLY` to
 strategy available. Preserve `MISSING` / `MISSING_CAPABILITY` and unresolved
-requirements. Packet 1.4 grounding is authoritative over prose/default arrays
+requirements. Packet1.4/1.5 grounding is authoritative over prose/default arrays
 such as `available_data_bindings` and `missing_or_forward_only_data`.
 Existing read-only Git/Catalog verification may still run, but verification
 cannot overwrite packet grounding. Historical `1.3` remains readable and is
@@ -105,9 +117,10 @@ Hard boundaries — same as Forge:
 ## Workflow
 
 1. Validate the packet against `catalog/schemas/hypothesis_critic_input_v1.schema.json`.
-2. Independently re-resolve live Git head, Catalog bindings and prior work cited in
-   the packet. Do not trust Forge conclusions without verification.
-   For `packet_version=1.3` or `1.4`, and for any historical `1.2` packet that already
+2. Verify the packet bindings and source-grounded machine facts. Do not trust
+   Forge conclusions without evidence. For1.5 use only frozen packet memory
+   and grounding; missing input is an incomplete-packet STOP.
+   For `packet_version=1.3`, `1.4`, or `1.5`, and for any historical `1.2` packet that already
    contains `prior_memory`, compare `selected_candidate` semantically against
    every `prior_memory.capsules` entry on mechanism/state, actor/counterparty,
    population, decision timestamp, X/Y/horizon, and falsifier/control/economic
@@ -126,7 +139,7 @@ Hard boundaries — same as Forge:
    unit.
 5. On `PASS_TO_CLASSIFICATION` path only: emit schema-valid **ExperimentSpec 1.3**
    with explicit `required_outcomes`. `primary_y` / `horizon_notional` remain
-   identity text, not a parser. Do **not** create `CRITIC_INPUT_PACKET` 1.5.
+   identity text, not a parser. Critic never creates or edits `CRITIC_INPUT_PACKET`; freeze owns it.
    Historical selection receipts stay byte-immutable
    `FULL_LIFECYCLE_COMPLETENESS` caveats; do not globally veto
    `START_NEW_SESSION` and do not auto-veto ExperimentSpec 1.3 from Y-point-set
@@ -154,11 +167,11 @@ Hard boundaries — same as Forge:
 This skill expects **new context** relative to Forge:
 
 - No access to Forge scratchpad or persuasive narrative
-- Packet + operator pack + read-only repository truth only
+- Packet + Prompt B/operator method + public schema validation only
 - No outer frozen envelope, Forge narrative, or hidden session_id channel
 - No ResearchStore / active RDP archaeology for prior recall
-- For `packet_version=1.3` or `1.4`, packet `prior_memory` is the sole research-memory input
-- For `packet_version=1.4`, packet grounding is the sole machine-availability input
+- For `packet_version=1.3`, `1.4`, or `1.5`, packet `prior_memory` is the sole research-memory input
+- For `packet_version=1.4` or `1.5`, packet grounding is the sole machine-availability input
 
 When invoked from Forge auto-handoff via subagent, treat the subagent session as
 the required isolated context.

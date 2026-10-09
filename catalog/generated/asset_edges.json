@@ -950,6 +950,11 @@
     {
       "source_asset_id": "CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001",
       "relation": "depends_on",
+      "target_asset_id": "DOC-FORGE-EVIDENCE-GUIDED-GENERATION-001"
+    },
+    {
+      "source_asset_id": "CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001",
+      "relation": "depends_on",
       "target_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001"
     },
     {
@@ -6018,6 +6023,11 @@
       "target_asset_id": "CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001"
     },
     {
+      "source_asset_id": "DOC-FORGE-EVIDENCE-GUIDED-GENERATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
       "source_asset_id": "DOC-FORGE-GROUNDED-HANDOFF-CLOSURE-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-HYPOTHESIS-FORGE-OPERATOR-001"
@@ -6131,6 +6141,11 @@
       "source_asset_id": "DOC-HYPOTHESIS-FORGE-OPERATOR-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-FORGE-DOWNSIDE-DESCRIPTIVE-001"
+    },
+    {
+      "source_asset_id": "DOC-HYPOTHESIS-FORGE-OPERATOR-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FORGE-EVIDENCE-GUIDED-GENERATION-001"
     },
     {
       "source_asset_id": "DOC-HYPOTHESIS-FORGE-OPERATOR-001",
@@ -11868,6 +11883,11 @@
       "target_asset_id": "CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001"
     },
     {
+      "source_asset_id": "MODULE-HFIC-GENERATION-CONTEXT-001",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-FORGE-EVIDENCE-GUIDED-GENERATION-001"
+    },
+    {
       "source_asset_id": "MODULE-HFIC-PREFLIGHT-ADMISSION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001"
@@ -17411,6 +17431,11 @@
       "source_asset_id": "TEST-FORGE-COMPOSITE-FEATURE-RECIPES-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001"
+    },
+    {
+      "source_asset_id": "TEST-FORGE-EVIDENCE-GUIDED-GENERATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-FORGE-EVIDENCE-GUIDED-GENERATION-001"
     },
     {
       "source_asset_id": "TEST-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001",
