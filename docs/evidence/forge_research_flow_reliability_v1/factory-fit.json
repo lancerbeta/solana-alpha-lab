@@ -4,8 +4,8 @@
   "as_of": "2026-10-09",
   "task_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1",
   "review_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1-FIT",
-  "reviewed_bindings_sha256": "5084efd8f17efe500d79aab7e8ac8995e2f4ab7acacb972ef97d65e84489d2c7",
-  "reviewed_inventory_sha256": "cd5e2407ca183cf0e6827229674577760585a0e6ace3eafc35b5a84dae73fb33",
+  "reviewed_bindings_sha256": "f9b8f90856d35c602c0b8b047490ab9b0c89c6f65203e88c9c0dfd25a1f159de",
+  "reviewed_inventory_sha256": "a7fb3f963bd4a28e7271f49265c027c27083857133f8ad12caa728b3f315687a",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

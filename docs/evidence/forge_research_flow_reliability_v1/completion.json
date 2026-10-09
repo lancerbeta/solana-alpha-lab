@@ -24,7 +24,7 @@
     "docs/evidence/forge_research_flow_reliability_v1/resource-proof.json": "843b168212ec878fc26da9fe0ed19f0f12e08e31f67f2c69caea00d6577f7f4a",
     "docs/evidence/forge_research_flow_reliability_v1/validation-proof.json": "f0430bfb6b549f96cccad6711840de48d6a3102d28f5bad058fd16155420ec38",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "6e97803527ea1103402ddb379ad44861974c27a9e7663613aad7bf50beee5f12",
-    "docs/tasks/FORGE_RESEARCH_FLOW_RELIABILITY_V1.md": "c9d3419be5d92699d561660e3061785e696b8650176494049f5f3e2acc60c929",
+    "docs/tasks/FORGE_RESEARCH_FLOW_RELIABILITY_V1.md": "4a7808e72fa68b512e1a32d6109b1e11b85f28fba4143e27efd2c9b84a5d5bb2",
     "schemas/research_memory_projection_v1.sql": "a8305a94225093228657a4d3a7e2a5d635073aa8e46d7ed8bb32b038aa36ec6f",
     "scripts/delivery_harness.py": "62a3d566fdd513e1ce4296dce45085cee9df6ef5d8e18876126ab29d0f1bad9f",
     "scripts/hypothesis_forge.py": "154f827597433f652abb74508ed0c401b25a55963593252d58936d8acee1b02c",
@@ -65,14 +65,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_research_flow_reliability_v1/factory-fit.json",
-    "sha256": "d287dfc3264c8b0d9b0e1e87ee607b1c913d9fa72455aff43bc656eebfeb759e",
+    "sha256": "da2054b4073c35d95bd89440e359c3f02eca27ff829a7fed550b574a249c4298",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_D01_D18_DIRECT_PROOFS_WITH_INITIAL_FAILURES_REPAIRED_SKIPS_RETAINED",
     "independent_review": {
       "path": "docs/evidence/forge_research_flow_reliability_v1/independent-review.json",
-      "sha256": "4d72b633abac7f5e725f599cdf1e67fb71e63e564e8fb5ef81e142e818812075",
+      "sha256": "a1ac28f9646cffdb8c9a7f1da87cbaebba8216bea901cfd40f561cb0039683db",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

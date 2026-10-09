@@ -4,8 +4,8 @@
   "as_of": "2026-10-09",
   "task_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1",
   "review_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1-REVIEW",
-  "reviewed_bindings_sha256": "5084efd8f17efe500d79aab7e8ac8995e2f4ab7acacb972ef97d65e84489d2c7",
-  "reviewed_inventory_sha256": "cd5e2407ca183cf0e6827229674577760585a0e6ace3eafc35b5a84dae73fb33",
+  "reviewed_bindings_sha256": "f9b8f90856d35c602c0b8b047490ab9b0c89c6f65203e88c9c0dfd25a1f159de",
+  "reviewed_inventory_sha256": "a7fb3f963bd4a28e7271f49265c027c27083857133f8ad12caa728b3f315687a",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -17,7 +17,7 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "EXACT_HEAD_LEGACY_CRITIC_SCHEMA_NEW_DRAFT_REFUSAL_AND_RECOVERY_NO_P0_P1"
+        "EXACT_HEAD_CRITIC_SCHEMA_RECOVERY_AND_DELIVERY_EVIDENCE_ROLE_NO_P0_P1"
       ]
     },
     {
@@ -31,7 +31,7 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "LINEAGE_PIT_SLOT_RESERVATION_LATE_CONTEXT_WRITE_NO_P0_P1"
+        "LINEAGE_PIT_SLOT_RECOVERY_AND_DELIVERY_EVIDENCE_ROLE_NO_P0_P1"
       ]
     },
     {
