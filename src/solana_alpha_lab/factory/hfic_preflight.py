@@ -1948,6 +1948,16 @@ def build_forge_context_packet(
     # Research-log visibility is bound to this preflight, not the market
     # research_memory_as_of carried by the commissioned data proof.
     prior_cutoff = stage_time if stage_time is not None else capture_stage_time(clock)
+    original_memory = None
+    from solana_alpha_lab.factory.opportunity_episodes import collection_for_focus
+    if evidence_surface_mode != "CURRENT_REPRESENTATION_CONTROL_V1" and collection_for_focus(owner_focus):
+        from solana_alpha_lab.factory.hfic_generation_context import original_working_view, GenerationContextError
+        try:
+            original_memory = original_working_view(store, search_key=search_key)
+        except GenerationContextError as exc:
+            raise HficPreflightError(exc.code, locator=exc.detail) from exc
+        if original_memory is not None:
+            prior_cutoff = original_memory["research_log_cutoff"]
     packet_bound = forge_context_packet_max_bytes(evidence_surface_mode)
     datasets, warnings = enumerate_rdp_datasets(
         Path(data_root),
@@ -2399,6 +2409,33 @@ def build_forge_context_packet(
                         "state": "UNAVAILABLE",
                         "reason_code": exc.code,
                     }
+    if evidence_surface_mode != "CURRENT_REPRESENTATION_CONTROL_V1" and collection_for_focus(owner_focus):
+        from solana_alpha_lab.factory.hfic_generation_context import (
+            GenerationContextError, collect_verified_priors, generation_brief,
+            select_working_snapshot, reissue_working_view,
+        )
+        query = {"population": "OPPORTUNITY_EPISODES", "representation_scope": "BASE"}
+        try:
+            archive = collect_verified_priors(store, as_of=prior_cutoff)
+            view = reissue_working_view(original_memory, archive, inventory_digest=store.diagnostics().committed_inventory_sha256) if original_memory is not None else select_working_snapshot(
+                archive, query=query, focus=owner_focus,
+                inventory_digest=store.diagnostics().committed_inventory_sha256,
+                max_records=MAX_RANKED_PRIORS,
+                parent_budget_bytes=packet_bound-len(canonical_json_bytes(packet))-4096,
+            )
+        except GenerationContextError as exc:
+            raise HficPreflightError(exc.code) from exc
+        packet["prior_memory_working_view"] = view
+        packet["generation_context"] = generation_brief(memory=view)
+        ranked = [c["hypothesis_version_id"] for c in view["capsules"]]
+        packet["ranked_prior_candidate_ids"] = ranked
+        packet["ranked_prior_entries"] = ranked_prior_entries_for_ids(
+            ranked, archive["payloads"], store=store, as_of=prior_cutoff,
+        )
+        packet["truncation_receipt"]["kept_priors"] = len(ranked)
+        packet["truncation_receipt"]["dropped_priors"] = len(archive["capsules"])-len(ranked)
+        packet["truncation_receipt"]["tie_break"] = "structural_diversity_then_text_stable_id"
+
     from solana_alpha_lab.factory.hfic_vision_integrity import (
         FORGE_VISION_INTEGRITY_BLOCKED,
         compact_feature_grounding_entries,
@@ -2703,6 +2740,10 @@ def try_packet_bound_vision(
         )
     except (HficPreflightError, ResearchStoreError, OSError, ValueError) as exc:
         code = str(exc) or FORGE_VISION_INTEGRITY_BLOCKED
+        if isinstance(exc, HficPreflightError) and code.startswith(("FORGE_CONTEXT_", "GENERATION_")):
+            # Preserve exact immutable dependencies and source/cutoff failures.
+            # A generic readiness projection cannot recover or replace them.
+            raise
         if code == FORGE_VISION_INTEGRITY_BLOCKED:
             return evaluate_forge_packet_vision(
                 live_corpus_in_packet=False,
@@ -3552,6 +3593,9 @@ def run_preflight(
         accounting_root=accounting_root,
     )
     receipt_body["forge_context_packet"] = packet
+    if packet.get("generation_context"):
+        from solana_alpha_lab.factory.hfic_memory_policy import research_memory_cutoff
+        receipt_body["session_started_at"] = render_canonical_utc(research_memory_cutoff(packet["generation_context"]["research_log_cutoff"]))
     receipt_body["forge_context_packet_sha256"] = packet_digest
     receipt_body["writes"] = {
         "research_store": pre_context_store_writes + int(persist_context_packet),

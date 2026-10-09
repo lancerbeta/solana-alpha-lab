@@ -1028,7 +1028,12 @@ class EpisodeFlowTests(unittest.TestCase):
             expected[hyp_id]=(reason,status)
         store.append(records,transaction_id='RESEARCH-TXN-PRIOR-MEM-001')
         historical={r.record_id:r.payload_sha256 for r in records}
-        body,pre=self.authored_draft(evidence,scope,initial['owner_focus'])
+        # Historical sources exist before this run freezes its research cutoff.
+        focus='FLOW_PRIOR_MATRIX_WITH_HISTORY'
+        # A different journal cannot adopt the earlier question's saved look.
+        # Execute the same fixed scripted query under this admitted journal.
+        evidence,scope,query,initial=self.look(focus,numeric,cap={'main':2,'adaptive':0,'preview':2})
+        body,pre=self.authored_draft(evidence,scope,focus)
         context=pre['forge_context_packet']
         rows={row['hypothesis_version_id']:row for row in context['ranked_prior_entries']}
         for hyp_id,(reason,status) in expected.items():
@@ -1047,8 +1052,8 @@ class EpisodeFlowTests(unittest.TestCase):
         self.assertIsNone(matches['HYP-FLOW-MATRIX-EXACT']['session_id'])
         self.assertEqual(matches['HYP-FLOW-MATRIX-RELATED']['match_kind'],'RELATED_PRIOR')
         budget=journal_occupancy(store,pre['search_key_sha256'])
+        exact_body,exact_pre=self.authored_draft(old_evidence,old_scope,focus)
         before=store.diagnostics().committed_inventory_sha256
-        exact_body,exact_pre=self.authored_draft(old_evidence,old_scope,initial['owner_focus'])
         exact_denied=self.cli('persist-draft','--draft',self.write('exact.json',exact_body),'--preflight-receipt',self.write('exact-pre.json',exact_pre),ok=False)
         self.assertEqual(exact_denied.get('reason_code'),'EXACT_PRIOR_SCOPE_MATCH',exact_denied)
         self.assertEqual(exact_denied['status'],'BLOCKED')
@@ -1240,7 +1245,8 @@ class EpisodeFlowTests(unittest.TestCase):
         prior['hfic_protocol']='HFIC-V1.2'
         store=ResearchStore(self.plane)
         store.append([_event(record_id='HYP-FLOW-RUNNER-EXACT',kind=RecordKind.HYPOTHESIS_VERSION,entity_id=prior['hypothesis_version_id'],hypothesis_version_id=prior['hypothesis_version_id'],payload=prior,created=datetime(2026,10,8,tzinfo=UTC),transaction_id='RESEARCH-TXN-RUNNER-PRIOR')],transaction_id='RESEARCH-TXN-RUNNER-PRIOR')
-        body,pre=self.authored_draft(evidence,scope,initial['owner_focus'],n=2)
+        # New run sees the already saved source; no backdated refresh of a run.
+        body,pre=self.authored_draft(evidence,scope,'FLOW_RUNNER_PRIOR_WITH_HISTORY',n=2)
         body['candidates'][1]['target']='RUNNER_DISTINCT_TARGET'
         body['candidates'][1]['primary_y']='RUNNER_DISTINCT_TARGET'
         before=store.diagnostics().committed_inventory_sha256

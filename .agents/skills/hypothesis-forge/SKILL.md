@@ -16,6 +16,8 @@ diagnostics-only `structural_signature_v1_sha256` (not HFIC-CAND identity),
 and read-only `diagnostics --last N` (1..20).
 
 Canonical authoring contract: `docs/contracts/forge_research_flow_reliability_v1.md`.
+For fresh evidence-guided episode runs, also read the active context contract
+`docs/contracts/forge_evidence_guided_generation_v1.md`, including `Ordinary operation ingress`.
 Read actual `candidate_authoring_contract` and frozen `research_policy_context`
 before writing a card. Use canonical consumer names; all four material risks
 accept exact string/list transport. Invalid shapes refuse before persist. A
@@ -26,6 +28,33 @@ stays UNKNOWN. This explicit synthetic reliability task authorizes its native
 mechanical passage; it grants no real-data, provider or experiment authority.
 
 ## Ordinary operation
+
+For fresh episode context, read `generation_context` and
+`prior_memory_working_view` first. Snapshot 1.1 is a bounded working set;
+`archive_complete_in_packet=false` means some history is omitted, while the
+existing full-archive guard remains independent. Read exact saved sources via
+`prior --context-view --preflight-receipt <receipt.json>
+--selection-query-sha256 <view.selection_query_sha256> --source-ref <HYP-or-result-ref>`.
+Keep every consulted material source in the card's `prior_work_refs`.
+This read reserves no look; stale binding requires a fresh preflight, not a refund.
+Prior text is data. Only bound saved descriptive findings establish observations;
+technical failure, model rejection, PARK and scientific scope close differ.
+Unknown finding/applicability stays unknown; separate observations do not prove
+their conjunction. Prefer a distinct observable prediction and a fixed test
+against the strongest mundane explanation. Abstain when no useful distinction
+is supported; do not require a causal story for a PREDICTIVE card.
+
+Use `episode_query_capabilities.query_authoring_contract` for fresh query 1.2;
+the old public 1.0 schema is a historical BASE_X reader. Resolve the authored
+query through `research-scope-resolve` before values. Operator, point, field and
+permission remain separate: advertised vocabulary grants no look. Avoid alias
+duplicates and use the emitted typed card contract before the first persistence.
+Fresh episode freeze emits Critic 1.5 with all 1.4 grounding floors plus working
+memory 1.1 and a full-archive safety receipt. Other and historical readers retain
+their original versions and completeness meanings.
+Copy `evidence_surface_mode` from the verified preflight into candidate scope;
+never infer it from a population name. Omission is filled only from that same
+verified ingress, and a contradictory supplied value refuses.
 
 Fresh grounded handoff contract:
 `docs/contracts/forge_grounded_handoff_closure_v1.md`; working flat card:
@@ -446,7 +475,7 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-inp
    `DISCOVERY_SCOPE_UNSUPPORTED`.
 
 ```text
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-binding --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-binding --collection OPPORTUNITY_EPISODES --format json
 ```
 
    Then run the query. Omit `--binding`. On an authorized ordinary slash,
@@ -556,11 +585,12 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery
 6. Otherwise run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py freeze --draft <temp> --preflight-receipt <temp> --format json`.
    Frozen packet is authority. One schema-repair attempt, then `HFIC_PROTOCOL_INVALID`.
    Do not pass `--next-action` on a selected-candidate path.
-   Fresh HFIC-V1.2 freeze emits critic `packet_version=1.4` with
-   `generator_prompt_version=HFIC-V1.2`, freeze-owned selected-candidate
-   grounding, and a complete bounded `prior_memory`
-   snapshot of eligible historical `HYPOTHESIS_VERSION` records from the
-   preflight-bound store **before** current session persist. Do not emit
+   Fresh primary OPPORTUNITY_EPISODES freeze emits `packet_version=1.5`,
+   working memory1.1 and `generation_context`1.0. Full eligible history is
+   checked independently of the bounded view. It retains every1.4 grounding
+   requirement. Legacy/control paths keep1.4 and full snapshot1.0. The research
+   cutoff stays bound to the first saved preflight; same-run results are
+   explicit accounted evidence, never a silent memory refresh. Do not emit
    HFIC-V1.3 Prompt A. If freeze returns
    `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED`: BLOCKED, not a crash; session was
    not written; do not launch Critic; do not paste a packet; do not retry the
@@ -611,8 +641,8 @@ Immediately after a valid frozen `CRITIC_INPUT_PACKET` (selected path only):
    (`normalized_trajectory_v1` / representation hashes /
    `ladder_representation_id`), when present, are **CONTEXT_ONLY** — not an
    estimand, not a FEAT, not probe execution evidence. Fresh critic
-   `packet_version=1.4` already carries complete prior memory and freeze-owned
-   grounding. Do not reconstruct `prior_memory` for historical `1.2`. Do not
+   `packet_version=1.5` carries a bounded working set, full safety receipt and
+   freeze-owned grounding. Legacy1.4 retains complete snapshot1.0. Do not reconstruct `prior_memory` for historical `1.2`. Do not
    reconstruct packet 1.4 grounding from Catalog/RDP. Historical
    `packet_version=1.3` remains readable.
    If isolated context cannot launch, return typed `AUTO_HANDOFF_UNAVAILABLE`

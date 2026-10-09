@@ -1314,12 +1314,13 @@ def cmd_disposition_show(
     return emit(payload)
 
 
-def cmd_discovery_binding(repo_root: Path, explicit_data_root: Path | None) -> int:
+def cmd_discovery_binding(repo_root: Path, explicit_data_root: Path | None, *, collection: str | None = None) -> int:
     """No-write admission binding for the published discovery corpus."""
 
     from solana_alpha_lab.factory.hfic_grounded_discovery import (
         GroundedDiscoveryError,
         resolve_published_discovery_binding,
+        resolve_published_episode_binding,
     )
 
     git_before = repository_git_snapshot(repo_root)
@@ -1328,7 +1329,7 @@ def cmd_discovery_binding(repo_root: Path, explicit_data_root: Path | None) -> i
     except HficCliError as exc:
         return emit_error(str(exc))
     try:
-        payload = resolve_published_discovery_binding(data_root)
+        payload = (resolve_published_episode_binding(data_root) if collection == "OPPORTUNITY_EPISODES" else resolve_published_discovery_binding(data_root))
     except GroundedDiscoveryError as exc:
         return emit_error(exc.code)
     git_after = repository_git_snapshot(repo_root)
@@ -1825,7 +1826,7 @@ def _cmd_discovery_preview(
     from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
 
     try:
-        validate_temporal_query(spec)
+        validated_preview_query = validate_temporal_query(spec)
         temporal_preview = True
     except Exception:
         temporal_preview = False
@@ -1896,7 +1897,11 @@ def _cmd_discovery_preview(
                 return emit(refusal, exit_code=2)
         preview_published: list[dict[str, Any]] | None = None
         if explicit_data_root is not None:
-            preview_published, refusal = _published_gate_cohorts(explicit_data_root, binding_doc)
+            preview_published, refusal = _published_gate_cohorts(
+                explicit_data_root, binding_doc,
+                population=(validated_preview_query["scientific_body"].get("population")
+                            if temporal_preview else None),
+            )
             if refusal is not None:
                 return emit(refusal, exit_code=2)
         try:
@@ -1998,25 +2003,41 @@ def _cmd_discovery_preview(
         # A full temporal question authorizes preview, but its target must never
         # enter the value loader or the feature-only preview identity.
         preview_spec = spec
+        episode_preview_body = None
+        episode_preview_scope = None
         if temporal_preview:
-            from solana_alpha_lab.factory.hfic_grounded_discovery import POINT_OFFSET
+            from solana_alpha_lab.factory.hfic_grounded_discovery import POINT_OFFSET, resolve_research_scope
+            from solana_alpha_lab.factory.hfic_temporal_discovery import is_episode_body
             body = validate_temporal_query(spec)["scientific_body"]
             raw_holder_recipe = any(f.get("field_id") == "FIELD-HOLDER-COUNT-001" and f["op"] in {"delta", "return_ratio"} for f in body["features"])
             points = {body["decision_point"]}
             for feature in body["features"]:
                 points.update(feature[key] for key in ("point", "start", "end", "numerator", "denominator", "at") if key in feature)
                 points.update(feature.get("points") or [])
-            preview_spec = {"decision": spec["decision"], "schedule": {**spec["schedule"], "points": sorted(points, key=POINT_OFFSET.get)},
-                            "features": body["features"] if raw_holder_recipe else [f for f in body["features"] if f["op"] == "point_value"], "seed": spec.get("seed") or spec["query_id"]}
-        checked_preview = validate_feature_preview_spec(preview_spec)
-        point_ids = checked_preview["point_ids"]
+            if is_episode_body(body):
+                episode_preview_body = body
+                metadata = load_admitted_partition_rows(
+                    data_root=explicit_data_root, binding_doc=binding_doc, partitions=cohort_partitions,
+                    census_path=census_path, observations_path=observations_path,
+                    population="OPPORTUNITY_EPISODES", observation_filters=[("point_id", "in", ["NO_SUCH_POINT_METADATA_ONLY"])],
+                )
+                if "research_scope" in body:
+                    episode_preview_scope = resolve_research_scope(body, explicit_data_root, metadata["census"], metadata["cohorts"])
+                point_ids = sorted(points)
+            else:
+                preview_spec = {"decision": spec["decision"], "schedule": {**spec["schedule"], "points": sorted(points, key=POINT_OFFSET.get)},
+                                "features": body["features"] if raw_holder_recipe else [f for f in body["features"] if f["op"] == "point_value"], "seed": spec.get("seed") or spec["query_id"]}
+        if episode_preview_body is None:
+            checked_preview = validate_feature_preview_spec(preview_spec)
+            point_ids = checked_preview["point_ids"]
         loaded = load_admitted_partition_rows(
             data_root=explicit_data_root,
             binding_doc=binding_doc,
             partitions=cohort_partitions,
             census_path=census_path,
             observations_path=observations_path,
-            observation_filters=[("point_id", "in", sorted({"X300", *point_ids}))],
+            observation_filters=[("point_id", "in", sorted(set(point_ids) if episode_preview_body else {"X300", *point_ids}))],
+            population="OPPORTUNITY_EPISODES" if episode_preview_body else None,
         )
         if (store_root is None) != (not journal_scope):
             return emit_error("PREVIEW_STORE_SCOPE_REQUIRED")
@@ -2067,7 +2088,17 @@ def _cmd_discovery_preview(
         preview_limits = limits_or_defaults(
             ResearchStore(store_root) if store_root is not None else None, journal_scope or None
         )
-        payload = build_feature_preview(
+        if episode_preview_body is not None:
+            from solana_alpha_lab.factory.hfic_temporal_discovery import build_episode_feature_preview
+            payload = build_episode_feature_preview(
+                loaded["census"], loaded["observations"], episode_preview_body, loaded["cohorts"],
+                scope=episode_preview_scope, prior_preview_hashes=remembered,
+                universe_policy=policy_definition, preview_total=preview_limits["preview_total"],
+                seed=str(spec.get("seed") or spec["query_id"]),
+            )
+            payload["loaded_point_ids"] = sorted({str(row.get("point_id")) for row in loaded["observations"]})
+        else:
+            payload = build_feature_preview(
             loaded["census"],
             loaded["observations"],
             preview_spec,
@@ -2075,7 +2106,7 @@ def _cmd_discovery_preview(
             prior_preview_hashes=remembered,
             universe_policy=policy_definition,
             preview_total=preview_limits["preview_total"],
-        )
+            )
         if preview_store is not None and preview_gate.get("query_warnings"):
             payload["query_warnings"] = preview_gate["query_warnings"]
         if store_root is not None and journal_scope:
@@ -2445,7 +2476,7 @@ def cmd_list_snapshot_register(
     )
 
 
-def cmd_discovery_coverage(repo_root: Path, explicit_data_root: Path | None) -> int:
+def cmd_discovery_coverage(repo_root: Path, explicit_data_root: Path | None, *, collection: str | None = None) -> int:
     """State-only joint coverage. Writes nothing and does not reserve a slot."""
 
     from solana_alpha_lab.factory.hfic_grounded_discovery import (
@@ -2459,7 +2490,13 @@ def cmd_discovery_coverage(repo_root: Path, explicit_data_root: Path | None) -> 
     except HficCliError as exc:
         return emit_error(str(exc))
     try:
-        payload = live_state_only_coverage(data_root)
+        if collection == "OPPORTUNITY_EPISODES":
+            from solana_alpha_lab.factory.opportunity_episode_release import build_population_card
+            from solana_alpha_lab.factory.hfic_grounded_discovery import resolve_published_episode_binding
+            resolve_published_episode_binding(data_root)  # protection before metadata projection
+            payload = {"population_card":build_population_card(data_root),"joint_coverage":"NOT_MEASURED_METADATA_ONLY","values_loaded":False,"scientific_writes":0,"new_look":False}
+        else:
+            payload = live_state_only_coverage(data_root)
     except GroundedDiscoveryError as exc:
         return emit_error(exc.code)
     git_after = repository_git_snapshot(repo_root)
@@ -3745,7 +3782,23 @@ def cmd_prior(
     candidate_raw: str | None,
     query: str | None,
     explicit_data_root: Path | None,
+    context_view: bool = False,
+    preflight_path: Path | None = None,
+    selection_query_sha256: str | None = None,
+    source_ref: str | None = None,
 ) -> int:
+    if context_view:
+        from solana_alpha_lab.factory.hfic_generation_context import read_context_view, GenerationContextError
+        if preflight_path is None or not selection_query_sha256:
+            raise HficCliError("GENERATION_CONTEXT_BINDING_REQUIRED")
+        data_root = _existing_data_root(repo_root, explicit_data_root)
+        try:
+            from solana_alpha_lab.factory.research_store import ExistingResearchStoreReader
+            payload = read_context_view(ExistingResearchStoreReader(data_root), receipt=_load_json_file(preflight_path), query_sha256=selection_query_sha256, source_ref=source_ref)
+        except GenerationContextError as exc:
+            return emit({"status":"BLOCKED","reason_code":exc.code,"writes":False,"new_look":False}, exit_code=2)
+        _assert_no_path_leak(payload, str(data_root), str(repo_root))
+        return emit(payload)
     if not candidate_raw and not query:
         raise HficCliError("HFIC_PROTOCOL_INVALID")
     candidate = None
@@ -4478,6 +4531,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="No-write state-only joint coverage. Never selects typed_value.",
     )
     discovery_coverage.add_argument("--format", choices=("json",), default="json")
+    discovery_coverage.add_argument("--collection", choices=("OPPORTUNITY_EPISODES",), default=None)
     scope_resolve = subparsers.add_parser(
         "research-scope-resolve",
         help="Resolve list aliases of a draft query 1.2 to its canonical scope; reads no market value.",
@@ -4512,6 +4566,7 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     discovery_binding.add_argument("--format", choices=("json",), default="json")
+    discovery_binding.add_argument("--collection", choices=("OPPORTUNITY_EPISODES",), default=None)
     discovery_execute = subparsers.add_parser(
         "discovery-execute",
         help=(
@@ -4625,6 +4680,10 @@ def build_parser() -> argparse.ArgumentParser:
     prior.add_argument("--candidate", default=None)
     prior.add_argument("--query", default=None)
     prior.add_argument("--format", choices=("json",), default="json")
+    prior.add_argument("--context-view", action="store_true")
+    prior.add_argument("--preflight-receipt", type=Path, default=None)
+    prior.add_argument("--selection-query-sha256", default=None)
+    prior.add_argument("--source-ref", default=None)
 
     diagnostics = subparsers.add_parser("diagnostics")
     diagnostics.add_argument("--last", type=int, required=True)
@@ -5021,7 +5080,7 @@ def main(argv: list[str] | None = None) -> int:
                 journal_scope=args.journal_scope,
             )
         if args.command == "discovery-coverage":
-            return cmd_discovery_coverage(repo_root, args.data_root)
+            return cmd_discovery_coverage(repo_root, args.data_root, collection=args.collection)
         if args.command == "research-scope-resolve":
             return cmd_research_scope_resolve(repo_root, args.data_root, spec_path=args.spec)
         if args.command == "episode-normalized-view":
@@ -5035,7 +5094,7 @@ def main(argv: list[str] | None = None) -> int:
                 repo_root, args.data_root, snapshot_path=args.snapshot, registered_at=args.registered_at
             )
         if args.command == "discovery-binding":
-            return cmd_discovery_binding(repo_root, args.data_root)
+            return cmd_discovery_binding(repo_root, args.data_root, collection=args.collection)
         if args.command == "discovery-preview":
             return cmd_discovery_preview(
                 repo_root,
@@ -5146,6 +5205,10 @@ def main(argv: list[str] | None = None) -> int:
                 candidate_raw=args.candidate,
                 query=args.query,
                 explicit_data_root=args.data_root,
+                context_view=args.context_view,
+                preflight_path=args.preflight_receipt,
+                selection_query_sha256=args.selection_query_sha256,
+                source_ref=args.source_ref,
             )
         if args.command == "diagnostics":
             return cmd_diagnostics(
@@ -5320,6 +5383,11 @@ def main(argv: list[str] | None = None) -> int:
         code = str(exc)
         if str(getattr(args, "command", "") or "").startswith("repair-continuation"):
             return emit_repair_blocked(code)
+        if code.startswith("GENERATION_"):
+            return emit({"status":"BLOCKED", "reason_code":code,
+                         "detail":getattr(exc,"detail",{}), "writes":False,
+                         "new_look":False, "scientific_negative":False,
+                         "next_action":"INSPECT_BOUND_CONTEXT_REUSE_SAVED_EVIDENCE"}, exit_code=2)
         if isinstance(exc, HficSessionError) and code.startswith(("CANDIDATE_SCOPE_", "CARD_TRANSPORT_", "CARD_ALIAS_")):
             print(code, file=sys.stderr)
             return emit({"reason_code": code, "detail": exc.detail,
@@ -5338,14 +5406,15 @@ def main(argv: list[str] | None = None) -> int:
                          "scientific_negative": False, "writes": False, "status": "BLOCKED",
                          "owner_readout": "Эта область закрыта typed ledger. Проверьте detail.scope_id и detail.source_receipt вместе с detail.source_terminal; если locator отсутствует, проверьте ledger до нового решения. Сохраните закрытие. Существенно иной scope требует отдельного основания; переименование карточки не подходит.",
                          "next_action": exc.detail["next_action"]}, exit_code=2)
-        if isinstance(exc, HficSessionError) and code.startswith("FORGE_CONTEXT_"):
+        if isinstance(exc, (HficSessionError, HficPreflightError)) and code.startswith("FORGE_CONTEXT_"):
             print(code, file=sys.stderr)
-            next_action = exc.detail.get("next_action") or (
+            context_detail = getattr(exc, "detail", None) or getattr(exc, "locator", None) or {}
+            next_action = context_detail.get("next_action") or (
                 "RUN_PERSISTENT_PREFLIGHT_REUSE_SAVED_LOOK"
                 if args.command in {"persist-draft", "freeze"}
                 else "RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY")
-            locator = exc.detail.get("relative_locator")
-            digest = exc.detail.get("required_context_sha256")
+            locator = context_detail.get("relative_locator")
+            digest = context_detail.get("required_context_sha256")
             owner_readout = (
                 "Для сохранённого look нужен новый persistent preflight на том же data root с тем же discovery contract. Повторите preflight и используйте его receipt для persist/freeze; новый look не открывайте."
                 if next_action == "RUN_PERSISTENT_PREFLIGHT_REUSE_SAVED_LOOK" else
@@ -5353,7 +5422,7 @@ def main(argv: list[str] | None = None) -> int:
                 if locator and digest else
                 "Связь с исходным контекстом нарушена. Проверьте detail и исходные байты; если их нельзя восстановить и сверить — BLOCKED. Новый context и look не создавайте."
             )
-            return emit({"reason_code": code, "detail": exc.detail,
+            return emit({"reason_code": code, "detail": context_detail,
                          "scientific_negative": False, "writes": False, "status": "BLOCKED",
                          "owner_readout": owner_readout,
                          "next_action": next_action}, exit_code=2)

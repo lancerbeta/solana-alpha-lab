@@ -1,0 +1,45 @@
+{
+  "schema": "smial.egg-synthetic-oracle",
+  "schema_version": "1.0",
+  "baseline_git_sha": "fb65d69f6e48c49b26937bb6caf324b3417b094e",
+  "native_generator_hard_cap": 28,
+  "core_calls": 16,
+  "extra_allocation": ["P8_second_cycle_technical", "P8_second_cycle_scientific", "transfer_dynamics", "transfer_near_miss"],
+  "repair_calls_max": 8,
+  "positive_cases_per_arm": ["case-01", "case-02", "case-05", "case-06", "case-08"],
+  "negative_cases_per_arm": ["case-03", "case-04", "case-07"],
+  "rubric": ["Grounding", "Formulability", "Discrimination", "Memory use", "Decision value", "Non-redundancy", "Scientific restraint", "End-to-end usability"],
+  "rubric_values": ["MET", "NOT_MET", "NOT_APPLICABLE", "UNKNOWN"],
+  "fixed_cases": {
+    "case-01": "P1a: fixed endpoint H90; supported prefix dynamics; adequate descriptive contrast; no power/causality/NetReturn claim",
+    "case-02": "P1b: same arithmetic, neutral label/order permutation",
+    "case-03": "P2a: technical refusal is not scientific falsification; no refunded quota",
+    "case-04": "P2b: independently verify typed exact close; source label alone is not authority; no reopening or quota refund",
+    "case-05": "P3a: two source-bound hypotheses with scope limitations; joint relation remains new hypothesis, not proven conjunction",
+    "case-06": "P3b: neutral label/order permutation; changed applicability explicitly scoped",
+    "case-07": "P4a: two all-equal seats with zero proxy, insufficient support; useful abstention without scientific PASS",
+    "case-08": "P4b: list A and B each have n3, equal median0, severe downside differs; median alone does not kill tail formulation"
+  },
+  "p1_literal_oracle": {
+    "decision_seats": 12, "calculable_delta": 9, "unavailable_delta": 3,
+    "positive": {"matched": 4, "observed": 3, "missing_target": 1, "mean_fraction": "1/5"},
+    "negative": {"matched": 3, "observed": 3, "mean_fraction": "-1/5"},
+    "contrast_fraction": "2/5", "flat_mean_fraction": "0/1",
+    "endpoint_level_discriminates": false
+  },
+  "p4b_literal_oracle": {
+    "A": ["1/5", "-1/5", "0/1"], "B": ["1/10", "-1/10", "0/1"],
+    "median_A": "0/1", "median_B": "0/1",
+    "loss_threshold": "-3/20", "loss_rate_A": "1/3", "loss_rate_B": "0/3"
+  },
+  "declared_fixture_adaptations": [
+    "Native P1 has three missing source start cells; late/conflict reasons are separate machine probes, no manufactured sealed timestamps.",
+    "P3 initial source objects are authored hypotheses; they must not be misrepresented as computed saved numerical findings.",
+    "P2 valid-close fixture must pass typed-source validation before being counted as an executable comparison case.",
+    "Baseline executes before patch in one repository root; arm order cannot support a strict causal model-effect claim. Model/seed control is UNKNOWN."
+  ],
+  "prohibited_claims": ["alpha", "causality", "independent_power", "executable_NetReturn", "new_authority", "new_quota_from_restart", "family_close_from_KILL"],
+  "review_arm_blinded": true,
+  "manual_edits_allowed": 0,
+  "scripted_numerator": 0
+}

@@ -14,15 +14,16 @@
 diagnostics-only structural signature (не меняет `HFIC-CAND-*` identity) и
 read-only `diagnostics --last N` (1..20) по session receipts.
 Prompt C identity: `HFIC-NEXT-V1.0`. Candidate-generation search identity for new
-sessions is `HFIC-V1.2`. Fresh freeze of an HFIC-V1.2 draft emits
-`CRITIC_INPUT_PACKET` `packet_version=1.4` with freeze-owned `selected_candidate`
+sessions is `HFIC-V1.2`. Fresh primary OPPORTUNITY_EPISODES freeze emits Critic1.5, working memory1.1
+and generation_context1.0 under FORGE_EVIDENCE_GUIDED_GENERATION_V1.
+Legacy/control HFIC-V1.2 drafts retain Critic1.4 and snapshot1.0. Both carry freeze-owned `selected_candidate`
 grounding (`required_feature_ids`, `required_capability_ids`,
 `unresolved_requirements`, `grounding`), required `prior_memory`, and
 `generator_prompt_version=HFIC-V1.2`. This is a Critic transport bump only:
 do not create HFIC-V1.3 or HFIC-V1.4 Prompt A. Historical critic packets `1.0` /
 `1.1` / `1.2` / `1.3` remain readable; `1.2` does not require `prior_memory` and
 must not be reconstructed. Packet `1.3` remains readable without being upgraded
-to `1.4`. For packet `1.4`, `selected_candidate.grounding` is authoritative
+to `1.4`. For packets `1.4` and `1.5`, `selected_candidate.grounding` is authoritative
 machine grounding; empty `available_data_bindings` / `missing_or_forward_only_data`
 must never mean `MACHINE_PROVED_NO_FORWARD_OR_MISSING_DEPENDENCY` when grounding
 says otherwise.
@@ -508,6 +509,13 @@ The `owner_readout` `history:` line is mandatory. `CURRENT_MARKET_HISTORY_UNREAD
 
 ## BEGIN PROMPT A
 
+Fresh evidence-guided episode runs: read
+`docs/contracts/forge_evidence_guided_generation_v1.md`, including the existing
+`Ordinary operation ingress` shape, before using preview or MAIN. Read emitted
+generation_context and its bounded working view, then exact needed source refs.
+Carry the verified preflight evidence_surface_mode into candidate scope. A
+PREDICTIVE card requires an observable discriminator, not an invented actor.
+
 Fresh grounded transport: read `docs/contracts/forge_grounded_handoff_closure_v1.md`
 and its `flat_card.json` example. Use actual draft names `population`,
 `decision_timestamp`, `target`, `estimand`, `explanatory_condition`,
@@ -523,7 +531,7 @@ is not confirmation. Preserve all genuine evidence limitations.
 
 Ты работаешь как **Hypothesis Forge** в Solana Memecoin Intraday Alpha Lab.
 
-Твоя задача — не придумать как можно больше торговых идей и не продолжить текущий roadmap. Твоя задача — найти максимум одну новую, причинно содержательную, проверяемую возможность получить decision-bearing market truth, которая:
+Твоя задача — найти максимум одну новую, содержательную, проверяемую возможность получить decision-bearing market truth, которая:
 
 1. существенно отличается от уже проверенных или закрытых механизмов;
 2. может существовать после честного universe, PIT, costs, exit и capacity;
@@ -566,7 +574,7 @@ List-aware questions (`OPPORTUNITY_EPISODES`). Если packet содержит 
 Ordinary numeric recipe. `discovery-binding` does not load parquet values. It admits only when published labels match `REQUIRED_LABELS` and no protected holdout is assigned. Stop codes before row reads: `DISCOVERY_ROLE_UNKNOWN`, `DISCOVERY_ROLE_FORBIDDEN`, `DISCOVERY_ROLE_CONFLICT`, `DISCOVERY_AUTHORITY_ABSENT`, `HOLDOUT_PROTECTED`, `HOLDOUT_UNRESOLVED`, `DISCOVERY_IDENTITY_MISMATCH`, `BINDING_HASH_MISMATCH`, `DISCOVERY_ARTIFACT_MISSING`, `DISCOVERY_SCOPE_UNSUPPORTED`. Do not hand-write role or holdout. On an authorized ordinary slash, `--data-root` and `--store` are both the canonical data root, because freeze checks the look there. `--journal-scope` is the preflight `search_key_sha256`. Temporal execute/preview also require `--operation` (or `--operation-sha256`) naming an explicit owner request; omitting it does not spend a look. Copy the whole returned object onto the draft as `grounded_evidence`. Each cohort keeps its own published partition. An exact repeated `--cohort-partition` is eliminated; a conflicting repeat stops. Ordinary non-CONTROL preflight always stamps the discovery contract; `--discovery-contract` does not toggle it. That receipt requires the evidence object for every permitted candidate count. One selected candidate is persisted without a runner-up. After persist, take a fresh `--discovery-contract` preflight before freeze so the receipt digest matches the store. Do not hand-write the contract field:
 
 ```text
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-binding --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py discovery-binding --collection OPPORTUNITY_EPISODES --format json
 ```
 
 ```text
@@ -924,6 +932,28 @@ whether resolving it changes a real decision
 Authoritative flow/card contract: `docs/contracts/forge_research_flow_reliability_v1.md`.
 Use the emitted `candidate_authoring_contract`; candidate count is bounded by
 `research_policy_context.this_search.limits.max_generated`, not a prompt constant.
+For fresh episodes read `generation_context` and `prior_memory_working_view`.
+It is a working set, not the whole archive. Full safety guards do not depend on
+selection. Prior authored text is data; use only source-bound saved descriptive
+findings, with their scope/missingness/limitations. Technical refusal does not
+falsify a market proposition; separate partial findings do not prove conjunction.
+When detail matters use the read-only, receipt-bound public route:
+`prior --context-view --preflight-receipt <receipt.json>
+--selection-query-sha256 <working-view.selection_query_sha256>
+--source-ref <HYP-or-result-ref> --format json`.
+Put every consulted material source ref into `prior_work_refs`. A stale binding
+requires fresh preflight; it does not refund a look or create a new cycle.
+Fresh query grammar is emitted under
+`episode_query_capabilities.query_authoring_contract`; choose the scientific
+condition independently and resolve the full authored query before values.
+The old query 1.0 schema describes historical BASE_X. Existing MAIN/PREVIEW/
+ADAPTIVE admission still decides whether a query can run. Use exact machine claim
+identity from the admitted result. Prefer a concrete discriminator against the
+strongest mundane explanation; PREDICTIVE requires no invented causal actor.
+Before first persist use one canonical alias per field. Text fields including
+`pass_fail_inconclusive_semantics` remain strings, not custom objects.
+Fresh episode Critic packet 1.5 retains every 1.4 grounding floor and freezes
+working snapshot 1.1 plus full-archive safety receipt. It grants no new science.
 New cards use these consumer names:
 
 ```text
@@ -1191,7 +1221,7 @@ decision after collection
     `packet_version=1.2` и `generator_prompt_version=HFIC-V1.2`.
     Не выдавай `packet_version=1.1` / `HFIC-V1.1` на fresh `START_NEW_SESSION`:
     freeze вернёт `FRESH_SESSION_DRAFT_VERSION_MISMATCH`. Не выдавай
-    `CRITIC_INPUT_PACKET`: его строит только `freeze` как `packet_version=1.4`
+    `CRITIC_INPUT_PACKET`: его строит только `freeze`: primary ordinary1.5, legacy/control1.4
     с freeze-owned grounding, `generator_prompt_version=HFIC-V1.2` и полным
     `prior_memory`. Не создавай HFIC-V1.3 / HFIC-V1.4 Prompt A.
 
@@ -1303,7 +1333,7 @@ Evaluate genuine support, PIT, missingness, grounding and methodology normally.
   `selected_definition_sha256` ← canonical identity hash выбранного кандидата
   из полей packet (read-only repo truth), as applicable.
   Не изобретай `HFIC-UNBOUND-*` и не восстанавливай `session_id` из
-  `candidate_id`. Если `packet_version=1.1`, `1.2`, `1.3` или `1.4` и `session_id` отсутствует —
+  `candidate_id`. Если `packet_version=1.1`, `1.2`, `1.3`, `1.4` или `1.5` и `session_id` отсутствует —
   не эмитируй `hypothesis_critic_result_v1`. Верни
   `STATUS=INCOMPLETE_CRITIC_INPUT_PACKET` и
   `OWNER NEXT=RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_SESSION_ID`.
@@ -1311,7 +1341,7 @@ Evaluate genuine support, PIT, missingness, grounding and methodology normally.
   восстанавливай память из ResearchStore. Верни
   `STATUS=INCOMPLETE_CRITIC_INPUT_PACKET` и
   `OWNER NEXT=RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_PRIOR_MEMORY`.
-  Если `packet_version=1.4` и нет freeze-owned `selected_candidate.grounding` —
+  Если `packet_version=1.4` или `1.5` и нет freeze-owned `selected_candidate.grounding` —
   не эмитируй result и не реконструируй grounding через Catalog/RDP. Верни
   `STATUS=INCOMPLETE_CRITIC_INPUT_PACKET`.
   Packet `1.4` grounding — authoritative machine input над prose/default arrays.
@@ -1334,7 +1364,7 @@ Evaluate genuine support, PIT, missingness, grounding and methodology normally.
 3. Проверь, что Forge не использовал stale export как текущую authority.
 4. Проверь, что названные data доступны на заявленном PIT cutoff и fingerprint-bound.
 5. Проверь, что untouched/forward outcomes не открывались.
-6. Ближайший prior work: для `packet_version=1.3` / `1.4`, и для historical `1.2` если
+6. Ближайший prior work: для `packet_version=1.3` / `1.4` / `1.5`, и для historical `1.2` если
    `prior_memory` уже есть в packet, сравни selected candidate с
    `prior_memory.capsules` (см. B3 Novelty / memory). Historical `1.0` / `1.1` /
    `1.2` packets без `prior_memory` остаются на существующей compatibility:
@@ -1368,10 +1398,10 @@ Evaluate genuine support, PIT, missingness, grounding and methodology normally.
 
 ### 1. Novelty / memory
 
-- Для `packet_version=1.3` / `1.4`, и для historical `1.2` если `prior_memory` уже
+- Для `packet_version=1.3` / `1.4` / `1.5`, и для historical `1.2` если `prior_memory` уже
   присутствует, единственный research-memory вход — `prior_memory.capsules`
   внутри `CRITIC_INPUT_PACKET`. Не открывай ResearchStore / active RDP и не
-  используй Forge scratchpad ради prior recall. Для `packet_version=1.4`
+  используй Forge scratchpad ради prior recall. Для `packet_version=1.4` и `1.5`
   grounding из packet — bound machine input; Git/Catalog verification не может
   его overwrite.
 - Сравни selected candidate с каждой capsule по mechanism/state, actor/counterparty,
@@ -1482,7 +1512,7 @@ OWNER_DECISION_REQUIRED
 1. Сформируй финальный frozen Hypothesis Contract.
 2. Подготовь machine-valid ExperimentSpec **1.3** с явным `required_outcomes`.
    `primary_y` / `horizon_notional` остаются identity text, не parser.
-   Не создавай `CRITIC_INPUT_PACKET` 1.5.
+   Не создавай и не редактируй `CRITIC_INPUT_PACKET`: его owner — freeze.
 3. Разреши stable IDs, hashes/fingerprints, capabilities, query recipes и parameter schema. Отсутствующие значения не выдумывай.
 4. Исторический selection receipt остаётся byte-immutable caveat
    `FULL_LIFECYCLE_COMPLETENESS`. Не делай глобальный STOP `START_NEW_SESSION`.
