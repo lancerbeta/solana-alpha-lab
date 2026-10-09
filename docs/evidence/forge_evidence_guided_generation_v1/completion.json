@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/forge_evidence_guided_generation_v1/factory-fit.json",
-    "sha256": "e0b8615e99937736841ac9c385cf850c48516eddddb0131e187e3140a8912617",
+    "sha256": "8f8becb31e546fba01b31fed7d5e6d4fe3936b72a5a7c3fc1dc9734192a53698",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -28,7 +28,7 @@
     "docs/evidence/forge_evidence_guided_generation_v1/materialization-proof.json": "6a1a43de1882caab0020341ba6cc933ab2bd3f9ddbb8ce9d920df4c21a3af894",
     "docs/evidence/forge_evidence_guided_generation_v1/raw-evidence.json": "e5c7f13310c82abf3662b4f8253ec640143aa3af84c6a3fa548b626dde4d0068",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "29f110e9207f853dcd9ecb26124b52b274b606987593a52a8375815afd7ee444",
-    "docs/tasks/FORGE_EVIDENCE_GUIDED_GENERATION_V1.md": "194424b012375c07d70dcf2f310d168494cb8f2924e22f427dbe6c080e61b0aa",
+    "docs/tasks/FORGE_EVIDENCE_GUIDED_GENERATION_V1.md": "5010e27b1f562608a61a92517dfeec9fb526992b61bf9ff07c38b202230a7aad",
     "scripts/hypothesis_forge.py": "3c82a17cca2c22a1254b8f879847d2742c5a1324c1e65619cd5d01ee1faeafe0",
     "src/solana_alpha_lab/factory/forge_input_receipt.py": "5434e06ed9ba9dd4a04adb9f7ef4004752a50d9fb027bd37d26dec949d337b37",
     "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "4f343925afd7acaa767c64a217d42ab45fd9eb220fb98611600494998a81d2e9",
@@ -80,7 +80,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/forge_evidence_guided_generation_v1/independent-review.json",
-      "sha256": "f0b29d37c1f34a4b8ae7d10fa60dcaee57cd2f7593678c84b2caa3426f7c833b",
+      "sha256": "fae6f83b4ec0854f944e20b1dddd67685ca122b681a6142859db2cc9126c26d7",
       "verdict": "PASS"
     },
     "project_checks": [],
