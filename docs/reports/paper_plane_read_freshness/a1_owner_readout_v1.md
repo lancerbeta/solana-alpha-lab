@@ -31,6 +31,9 @@ Baseline повторён адресно на base: два assertion failures `O
 проекция получает один read snapshot и освобождает его до следующего запроса.
 Operations/economics/current policy согласованы внутри него; HTTP использует
 уже вычисленную economics. Lifecycle переиспользует тот же owner.
+Reader и source status принадлежат request thread, reader закрывается после
+materialization. Два пересекающихся GET не закрывают snapshot друг друга;
+HTTP собирает model из готового результата без повторного обращения к cache.
 Commit во время чтения виден следующему чтению, а не обязан попадать в уже
 начатый snapshot. Immutable fallback текущего runtime удалён из design.
 
@@ -51,15 +54,21 @@ inventory проверяется независимо от `total_changes` од�
 `PermissionError`, а не декоративным chmod. Linux использует реальный отказ
 через права файла; этот case входит в execution-domain CI без skip.
 Локальная среда: Python3.13.14 / SQLite3.53.1 / uv0.11.29.
-186 execution-domain tests проверены; два прежних пропуска —
+После исправления ownership повторены 187 execution-domain tests: 185 PASS;
+два прежних пропуска —
 `LOCAL_A4_ABSENT`, отсутствие отдельного live evidence, не пропуск новых A4
 проверок. Первые сбои сохранены: неполная HTTP/lifecycle fixture, SHA drift
 до sync и purity expectation до owner clarification. Они исправлены в scope;
-повторены соответствующие проверки, общий полный local merge gate не запускался.
+первый review дополнительно выявил общий cache reader между GET. Его
+детерминированный overlap reproducer завершил Windows process с
+`0xC0000005` до ownership fix; после fix оба GET проходят и закрывают только
+свои handles. Общий полный local merge gate не запускался.
 
 Recovery: обычный code revert без data migration. Он вернёт прежний stale
 readback и не является решением свежести. Чужая generator branch и её dirty
 работа сохранены в исходном checkout. F01/F03/F04 остаются открыты;
+F04 — несогласованная классификация состояний риска, завершённости и drain:
+A4 обеспечивает свежесть чтения, но не устраняет это расхождение.
 `CAPABILITY_HEALTHY` для Post-Forge / Pre-Trade не заявляется. Нет alpha,
 scientific acceptance, реального look/holdout, provider calls, LIVE или deploy.
 

@@ -25667,7 +25667,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: 615a182695fe9eb2ba1a2398ead05093cd7c89d0622fd8d07c346d37722b74d6}
+  integrity: {kind: sha256, sha256: 73e02402a8f6e0a294a9c580a64c623f3c6bb6fe4f1afd31557edc0cf3ea6fc3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -35085,7 +35085,7 @@ records:
   as_of: '2026-09-26'
   truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/architecture/PAPER_SHADOW_EXECUTION_INTEGRITY_PRD_SSD_V1.md', repository_path: docs/architecture/PAPER_SHADOW_EXECUTION_INTEGRITY_PRD_SSD_V1.md}
-  integrity: {kind: sha256, sha256: ec17dda7307c5821746eeee72b0df3f780a11f06c48ae577566edcc17d794554}
+  integrity: {kind: sha256, sha256: 2b1378a69cf63db5b658752c2f9d5237ffd7af6a4c86a58eee6b2b7e93a22602}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001}
@@ -35102,7 +35102,7 @@ records:
   as_of: '2026-09-26'
   truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_paper_shadow_execution_integrity_vertical_v1.py', repository_path: tests/test_paper_shadow_execution_integrity_vertical_v1.py}
-  integrity: {kind: sha256, sha256: c81ad446d12f3ae621639c9357f51bed301d3a39bf24452da32a84554f84e532}
+  integrity: {kind: sha256, sha256: a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001}
@@ -36611,7 +36611,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: TRADING_OPERATIONS_WORKBENCH_V2
   location: {kind: git_path, logical_uri: 'repo://tests/test_trading_operations_workbench_v2.py', repository_path: tests/test_trading_operations_workbench_v2.py}
-  integrity: {kind: sha256, sha256: effaa35d328818f73edf0b2fa841377b4532b47e2d420b27e466f3148aa37385}
+  integrity: {kind: sha256, sha256: 0764f3652f042d2306e70defc3de3462d3c4ff5606f24bef048d8c34d49e7a32}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-OPERATIONS-WORKBENCH-001}
@@ -40581,7 +40581,7 @@ records:
     repository_path: docs/tasks/PAPER_PLANE_READ_FRESHNESS_V1.md
   integrity:
     kind: sha256
-    sha256: df46a2d47888b8feeefc0deb71ac161174afceabf8aedab0d8a955bd54146100
+    sha256: 397722865eaa487929f7fce768120b3552d32af644f3f0a4f23f6ee59e225264
   access:
     mode: read_only
     method: file
@@ -40627,7 +40627,7 @@ records:
     repository_path: docs/reports/paper_plane_read_freshness/a1_owner_readout_v1.md
   integrity:
     kind: sha256
-    sha256: c9519e3a737eba6b010c4bec352bf7c20d0ec7a361831614c9b7de3b0c2cf876
+    sha256: 3934b72babc78ce48213474f3fb19cb832bd308bc2ee057efc536bfe56419df6
   access:
     mode: read_only
     method: file
@@ -40663,7 +40663,7 @@ records:
     repository_path: docs/evidence/paper_plane_read_freshness/a1_vertical_acceptance_v1.json
   integrity:
     kind: sha256
-    sha256: 2ef2890857c1a20424954e4894fbd10c96e1b52264e5e8aa9dec367523730be7
+    sha256: f3c0446d13c1cb171a623d09b67731de050ef765267ebf81c9cd085e7a2411d1
   access:
     mode: read_only
     method: file

@@ -7,6 +7,7 @@ import json
 import sqlite3
 from contextlib import nullcontext
 from pathlib import Path
+from threading import local
 from typing import Any, Mapping
 
 import yaml
@@ -139,6 +140,7 @@ class FactoryApplication:
             else SCHEMA_SOURCE_NOT_PRESENT
         )
         self._paper_plane_store = paper_plane_store
+        self._paper_plane_read_context = local()
         self._paper_plane_readonly = None
         self._paper_plane_source_status = "NOT_PRESENT"
         self._runner: ExperimentRunner | None = None
@@ -204,7 +206,25 @@ class FactoryApplication:
             self._runner = ExperimentRunner(root=self.root, store=self.store)
         return self._runner
 
+    @property
+    def _paper_plane_readonly(self) -> PaperPlaneStore | None:
+        return getattr(self._paper_plane_read_context, "reader", None)
+
+    @_paper_plane_readonly.setter
+    def _paper_plane_readonly(self, reader: PaperPlaneStore | None) -> None:
+        self._paper_plane_read_context.reader = reader
+
+    @property
+    def _paper_plane_source_status(self) -> str:
+        return getattr(self._paper_plane_read_context, "source_status", "NOT_PRESENT")
+
+    @_paper_plane_source_status.setter
+    def _paper_plane_source_status(self, status: str) -> None:
+        self._paper_plane_read_context.source_status = status
+
     def _close_paper_plane_readonly(self) -> None:
+        # ThreadingHTTPServer shares the application; a request may close only
+        # its own discovered reader, never another request's live snapshot.
         cached = self._paper_plane_readonly
         self._paper_plane_readonly = None
         if cached is not None:
@@ -254,6 +274,8 @@ class FactoryApplication:
             self._close_paper_plane_readonly()
             self._paper_plane_source_status = "UNAVAILABLE"
             raise self._missing_runtime_error() from None
+        finally:
+            self._close_paper_plane_readonly()
 
     def economics_projection(self) -> dict[str, Any]:
         store = self.existing_paper_plane()
@@ -269,6 +291,8 @@ class FactoryApplication:
             except (PaperPlaneError, sqlite3.Error, OSError):
                 self._close_paper_plane_readonly()
                 self._paper_plane_source_status = "UNAVAILABLE"
+            finally:
+                self._close_paper_plane_readonly()
         status = self._paper_plane_source_status or "NOT_PRESENT"
         eco = compose_risk_economics(self.root, None, source_status=status)
         eco["runtime_envelope"] = {"modes": {}, "by_strategy": [], "source_status": status}
@@ -297,6 +321,8 @@ class FactoryApplication:
             return compose_trading_operations(
                 self.root, None, last_command=last_command, source_status="UNAVAILABLE"
             )
+        finally:
+            self._close_paper_plane_readonly()
 
     def research_discovery(self) -> Any:
         if self._research_discovery is None:
@@ -777,7 +803,6 @@ class FactoryApplication:
             pinned_produced_gaps=gaps,
         )
         trading = self.trading_operations_projection(last_command=last_command)
-        paper_store = self._paper_plane_store or self._paper_plane_readonly
         model["trading_operations"] = trading
         operator_attention = []
         for item in trading.get("attention") or []:
@@ -794,10 +819,8 @@ class FactoryApplication:
             )
         if surface == "OPERATIONS":
             cockpit["attention"] = list(cockpit.get("attention") or []) + operator_attention
-        if paper_store is not None and str(trading.get("source_status")) == "PRESENT":
-            operations = trading.get("operations")
-            if not isinstance(operations, dict):
-                operations = build_operations_projection(paper_store)
+        if str(trading.get("source_status")) == "PRESENT":
+            operations = trading["operations"]
             model["operations"] = operations
             # Reuse the economics computed in the same readonly snapshot as
             # positions and current policy; do not re-query after its end.

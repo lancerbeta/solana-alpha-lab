@@ -114,8 +114,9 @@ legacy `run_shadow_tick`. `risk_economics.py` imports `TERMINAL_SETTLED` from `p
 - INV-10 Lineage completeness: a position can be traced by stored columns and events to the strategy
   spec hash, activation epoch, decision fingerprint and evidence refs, admission snapshot, entry and exit
   reasons, and (A5) execution attempts.
-- INV-11 Fresh readonly view: a readonly store sees every committed transaction; steady-state GET creates
-  no file.
+- INV-11 Fresh readonly view: one owner projection sees commits before its read snapshot;
+  the next independent read sees subsequent commits. GET may create/update only owner-approved native
+  SQLite WAL/SHM sidecars; no root/DB/tables, bootstrap, migration/checkpoint/repair or business writes.
 - INV-12 Honest outcomes (A5): each canonical terminal state maps to exactly one truthful lifecycle move
   through public API.
 - INV-13 Single source of state sets: lifecycle state sets are defined once in `paper_plane.py` and imported.
@@ -256,7 +257,7 @@ sets trace blocker `INTENT_CANCELLED`. Workbench needs no change (`CANCELLED` is
 
 `_connect_sqlite(readonly=True)` always uses SQLite `mode=ro` with normal locking/change detection.
 There is no immutable fallback and no correctness inference from absent WAL. Each independent owner
-request opens a fresh readonly store; positions, economics and policy share `read_snapshot()` and release
+request opens a fresh readonly store owned by its request thread; positions, economics and policy share `read_snapshot()` and release
 it on success/failure. Lifecycle uses the same PaperPlaneStore owner. Missing source and unavailable
 source remain distinct; a failed read never bootstraps, migrates, checkpoints, repairs or returns stale
 success. Historical admission stays frozen; current policy is only read.

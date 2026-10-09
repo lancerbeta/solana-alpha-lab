@@ -1,6 +1,6 @@
 ---
 task_id: PAPER_PLANE_READ_FRESHNESS_V1
-task_version: '1.2'
+task_version: '1.3'
 status: IMPLEMENTED_UNVERIFIED
 as_of: '2026-10-09'
 owner: GOAL_OWNER
@@ -145,6 +145,9 @@ implementation in this atom.
 5. Catalog/generated propagation uses harness_sync; required isolated critics
    review the final exact inventory; bound evidence and preflight pass before
    ordinary push, PR, exact-head CI and merge-readiness.
+6. Two overlapping public HTTP GETs own separate readers and source status,
+   both return coherent PRESENT snapshots, close their own handles and allow
+   the next request to see the next commit. HTTP uses materialized results.
 
 ## Risks and recovery
 SQLite's readonly WAL access may need native coordination through sidecars;
@@ -159,3 +162,7 @@ Version 1.2 adds only `tests/test_risk_and_economics_v1.py`: its existing GET
 purity assertion needs the same explicitly approved two-sidecar exception as
 the workbench test. All other file hashes and the database hash remain checked;
 no business oracle, outcome, dependency or authority changes.
+Version 1.3 resolves architecture finding A4-ARCH-01: request-thread ownership
+and bounded concurrent HTTP proof, inside the same application/test/design
+write set. INV-11 and the owner readout now state snapshot/sidecar limits and
+explain residual F04. No new subsystem or writable semantics.

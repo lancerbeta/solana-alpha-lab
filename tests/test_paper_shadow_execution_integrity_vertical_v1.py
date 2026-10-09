@@ -943,7 +943,7 @@ class ReadFreshnessTests(StoreCase):
             current = show_policy(writer, "PAPER")
             next_view = app.trading_operations_projection()
             self.assertEqual(next_view["runtime_envelope"]["modes"]["PAPER"]["policy_sha256"], current["policy_sha256"])
-            self.assertFalse(app._paper_plane_readonly._conn.in_transaction)
+            self.assertIsNone(app._paper_plane_readonly)
         finally:
             app._close_paper_plane_readonly()
 
@@ -1000,6 +1000,69 @@ class ReadFreshnessTests(StoreCase):
             self.assertEqual(app.trading_operations_projection()["source_status"], "PRESENT")
         finally:
             app._close_paper_plane_readonly()
+
+    def test_overlapping_http_gets_do_not_close_each_others_reader(self) -> None:
+        from test_trading_operations_workbench_v2 import isolated_factory_root, _get
+        from solana_alpha_lab.factory import trading_operations
+        root = isolated_factory_root(self.dir / "overlapping-get")
+        writer = PaperPlaneStore(root / "local/factory_v1/paper_plane_state.sqlite")
+        self._stores.append(writer)
+        pid = open_filled(writer, self.strategy, "SIGDEC-OVERLAP")
+        self.policy(writer, 30, "IDEM-OVERLAP-30")
+        writer._conn.execute("PRAGMA wal_autocheckpoint=0")
+        writer._conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        writer.apply_paper_exit_fill(position_id=pid, exit_unit_price_usd=None, mode="PAPER", unresolved=True)
+        current = self.policy(writer, 20, "IDEM-OVERLAP-20")
+        before = self.business_hash(writer)
+        app = FactoryApplication(root=root, research_data_root=root / "empty-rdp")
+        barrier = threading.Barrier(2)
+        first_read_ready = threading.Event()
+        original = trading_operations.build_operations_projection
+        original_public = app.trading_operations_projection
+        observed, bodies, errors, readers = [], [], [], []
+
+        def overlapping_projection(reader: PaperPlaneStore) -> dict[str, Any]:
+            readers.append(reader)
+            first_read_ready.set()
+            barrier.wait(timeout=10)
+            return original(reader)
+
+        def capture_public(**kwargs: Any) -> dict[str, Any]:
+            view = original_public(**kwargs)
+            observed.append(view)
+            return view
+
+        def request(index: int) -> None:
+            try:
+                if index == 1 and not first_read_ready.wait(timeout=10):
+                    raise RuntimeError("FIRST_GET_DID_NOT_ENTER_READ")
+                bodies.append(_get(app, "/operations"))
+            except Exception as exc:
+                errors.append(type(exc).__name__)
+
+        with patch.object(trading_operations, "build_operations_projection", overlapping_projection), \
+             patch.object(app, "trading_operations_projection", capture_public):
+            threads = [threading.Thread(target=request, args=(index,)) for index in range(2)]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join(timeout=15)
+            self.assertTrue(all(not thread.is_alive() for thread in threads))
+        self.assertEqual(errors, [])
+        self.assertEqual(len(observed), 2)
+        self.assertEqual(len({id(reader) for reader in readers}), 2)
+        for reader in readers:
+            with self.assertRaises(sqlite3.ProgrammingError):
+                reader._conn.execute("SELECT 1")
+        self.assertEqual([view["source_status"] for view in observed], ["PRESENT", "PRESENT"])
+        for view in observed:
+            self.assertEqual(view["runtime_envelope"]["modes"]["PAPER"]["policy_sha256"], current["policy_sha256"])
+            self.assertEqual(next(row for row in view["operations"]["position_rows"] if row["position_id"] == pid)["state"], "UNRESOLVED")
+        self.assertTrue(all(pid in body and "UNRESOLVED" in body for body in bodies))
+        self.assertEqual(self.business_hash(writer), before)
+        further = self.policy(writer, 15, "IDEM-OVERLAP-15")
+        self.assertEqual(app.trading_operations_projection()["runtime_envelope"]["modes"]["PAPER"]["policy_sha256"], further["policy_sha256"])
+        app._close_paper_plane_readonly()
 
     def test_non_wal_compatibility_is_readonly_without_business_writes(self) -> None:
         root = self.factory_root("non-wal")

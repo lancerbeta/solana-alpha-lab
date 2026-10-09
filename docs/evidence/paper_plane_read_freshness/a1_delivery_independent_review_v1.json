@@ -1,1 +1,7 @@
-{"task_id": "PAPER_PLANE_READ_FRESHNESS_V1", "status": "PENDING_NOT_EXECUTED", "phase": "ENTRY_PLACEHOLDER_NO_PASS_CLAIM"}
+{
+  "task_id": "PAPER_PLANE_READ_FRESHNESS_V1",
+  "status": "PENDING_NOT_EXECUTED",
+  "phase": "ENTRY_PLACEHOLDER_NO_PASS_CLAIM",
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0"
+}

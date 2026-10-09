@@ -214,7 +214,7 @@ class TradingOperationsWorkbenchV2Tests(unittest.TestCase):
                 {k: v for k, v in after.items() if k not in sidecars},
             )
             self.assertLessEqual(set(after) - set(before), sidecars)
-            self.assertEqual(app._paper_plane_source_status, "PRESENT")
+            self.assertEqual(app.trading_operations_projection()["source_status"], "PRESENT")
 
     def test_b_c_strategy_bot_lineage_and_activation_gap(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
