@@ -3796,7 +3796,7 @@ def cmd_prior(
             from solana_alpha_lab.factory.research_store import ExistingResearchStoreReader
             payload = read_context_view(ExistingResearchStoreReader(data_root), receipt=_load_json_file(preflight_path), query_sha256=selection_query_sha256, source_ref=source_ref)
         except GenerationContextError as exc:
-            return emit({"status":"BLOCKED","reason_code":exc.code,"writes":False,"new_look":False}, exit_code=2)
+            raise HficSessionError(exc.code, detail=exc.detail) from exc
         _assert_no_path_leak(payload, str(data_root), str(repo_root))
         return emit(payload)
     if not candidate_raw and not query:
@@ -5384,10 +5384,27 @@ def main(argv: list[str] | None = None) -> int:
         if str(getattr(args, "command", "") or "").startswith("repair-continuation"):
             return emit_repair_blocked(code)
         if code.startswith("GENERATION_"):
+            detail = getattr(exc, "detail", None) or getattr(exc, "locator", None) or {}
+            action, readout = {
+                "GENERATION_CONTEXT_STALE_STORE_BINDING": (
+                    "RUN_PERSISTENT_PREFLIGHT_REUSE_SAVED_LOOK",
+                    "Повторите persistent preflight на том же data root с тем же owner_focus и discovery contract; используйте новый receipt. Исходный cutoff и просмотренное evidence сохраняются. Новый look не открывайте."),
+                "GENERATION_MANDATORY_CONTEXT_EXCEEDS_BOUND": (
+                    "INSPECT_MANDATORY_SOURCES_REFINE_WITH_EXISTING_AUTHORITY",
+                    "Обязательные источники не помещаются: проверьте detail.mandatory_hypothesis_version_ids, consulted_source_refs и bounds. Читайте каждый источник через prior --context-view с исходным receipt и его selection_query_sha256. Не удаляйте material evidence и не увеличивайте cap. Уточнение scope требует существующего основания; пока BLOCKED."),
+                "GENERATION_CONSULTED_SOURCE_UNAVAILABLE": (
+                    "VERIFY_EXACT_ADMISSIBLE_SOURCE_OR_STOP",
+                    "Источник из detail.source_ref или hypothesis_version_ids отсутствует в допустимой истории этого cutoff. Проверьте точный сохранённый источник и его research clocks; если восстановить и сверить его нельзя — BLOCKED. Поздние сведения не добавляйте задним числом; новый look не открывайте."),
+                "GENERATION_CONTEXT_MATERIAL_SOURCE_CHANGED": (
+                    "STOP_INSPECT_ORIGINAL_SOURCE_INTEGRITY",
+                    "Материальный источник исходного working view изменился. Остановитесь и проверьте его integrity и исходные bytes. Новый receipt не заменяет утраченный источник; новый look не открывайте."),
+            }.get(code, (
+                "INSPECT_BOUND_CONTEXT_REUSE_SAVED_EVIDENCE",
+                "Проверьте reason_code/detail, исходный preflight receipt и его selection_query_sha256. Используйте только допустимые сохранённые источники; при несовпадении binding остаётся BLOCKED. Новый look не открывайте."))
             return emit({"status":"BLOCKED", "reason_code":code,
-                         "detail":getattr(exc,"detail",{}), "writes":False,
+                         "detail":detail, "writes":False,
                          "new_look":False, "scientific_negative":False,
-                         "next_action":"INSPECT_BOUND_CONTEXT_REUSE_SAVED_EVIDENCE"}, exit_code=2)
+                         "owner_readout":readout, "next_action":action}, exit_code=2)
         if isinstance(exc, HficSessionError) and code.startswith(("CANDIDATE_SCOPE_", "CARD_TRANSPORT_", "CARD_ALIAS_")):
             print(code, file=sys.stderr)
             return emit({"reason_code": code, "detail": exc.detail,
@@ -5423,7 +5440,7 @@ def main(argv: list[str] | None = None) -> int:
                 "Связь с исходным контекстом нарушена. Проверьте detail и исходные байты; если их нельзя восстановить и сверить — BLOCKED. Новый context и look не создавайте."
             )
             return emit({"reason_code": code, "detail": context_detail,
-                         "scientific_negative": False, "writes": False, "status": "BLOCKED",
+                         "scientific_negative": False, "writes": False, "new_look": False, "status": "BLOCKED",
                          "owner_readout": owner_readout,
                          "next_action": next_action}, exit_code=2)
         return emit_error(code)

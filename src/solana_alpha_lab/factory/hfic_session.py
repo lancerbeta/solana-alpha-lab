@@ -2398,7 +2398,7 @@ def freeze_draft(
                     parent_budget_bytes=65536-len(_canonical_bytes(parent))-4096,
                 )
             except GenerationContextError as exc:
-                raise HficSessionError(exc.code) from exc
+                raise HficSessionError(exc.code, detail=exc.detail) from exc
             runner_up_packet["grounded_evidence"], runner_up_packet["prior_memory"], runner_up_packet["generation_context"] = guarded, memory, brief
         if critic_packet_version == CRITIC_PACKET_VERSION_WORKING:
             try:

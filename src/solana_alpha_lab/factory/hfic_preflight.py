@@ -2424,7 +2424,7 @@ def build_forge_context_packet(
                 parent_budget_bytes=packet_bound-len(canonical_json_bytes(packet))-4096,
             )
         except GenerationContextError as exc:
-            raise HficPreflightError(exc.code) from exc
+            raise HficPreflightError(exc.code, locator=exc.detail) from exc
         packet["prior_memory_working_view"] = view
         packet["generation_context"] = generation_brief(memory=view)
         ranked = [c["hypothesis_version_id"] for c in view["capsules"]]

@@ -70,7 +70,10 @@ context_requirements:
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS:
     - docs/contracts/forge_research_flow_reliability_v1.md
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/forge_evidence_guided_generation_v1/completion.json
+    - docs/evidence/forge_evidence_guided_generation_v1/independent-review.json
+    - docs/evidence/forge_evidence_guided_generation_v1/factory-fit.json
     HISTORICAL_CONTEXT: []
 ---
 

@@ -64,7 +64,7 @@ freeze carries that mandatory source into Critic memory.
 Metadata reads use `discovery-binding --collection OPPORTUNITY_EPISODES` and
 `discovery-coverage --collection OPPORTUNITY_EPISODES`. Coverage is metadata-only;
 joint support remains NOT_MEASURED_METADATA_ONLY. Current query grammar comes
-from temporal_recipe_capabilities.query_authoring_contract. Canonicalize the
+from `forge_context_packet.episode_query_capabilities.query_authoring_contract`. Canonicalize the
 authored query through `research-scope-resolve --spec query.json` before use.
 Preview and MAIN keep their existing ordinary-operation admission/accounting.
 The emitted query contract includes feature_node and predicate_node grammar.

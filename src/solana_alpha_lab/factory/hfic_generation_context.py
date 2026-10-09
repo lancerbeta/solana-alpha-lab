@@ -313,6 +313,16 @@ def _consulted_hypothesis_ids(by_id: Mapping[str, Mapping[str, Any]],
     return required
 
 
+def _mandatory_bound_error(required: set[str], *, consulted_refs: Sequence[str],
+                           max_records: int, max_bytes: int, **detail: Any) -> GenerationContextError:
+    return GenerationContextError(
+        "GENERATION_MANDATORY_CONTEXT_EXCEEDS_BOUND", mandatory_count=len(required),
+        mandatory_hypothesis_version_ids=sorted(required),
+        consulted_source_refs=sorted(set(consulted_refs)), max_records=max_records,
+        max_bytes=max_bytes, **detail,
+    )
+
+
 def select_working_snapshot(inventory: Mapping[str, Any], *, query: Mapping[str, Any],
                             inventory_digest: str, focus: str = "",
                             consulted_refs: Sequence[str] = (), mandatory_ids: Sequence[str] = (),
@@ -355,7 +365,7 @@ def select_working_snapshot(inventory: Mapping[str, Any], *, query: Mapping[str,
         return _seal(body)
     current = envelope()
     if len(required) > max_records or current["bytes"] > bound:
-        raise GenerationContextError("GENERATION_MANDATORY_CONTEXT_EXCEEDS_BOUND", mandatory_count=len(required), max_records=max_records, max_bytes=bound)
+        raise _mandatory_bound_error(required, consulted_refs=consulted_refs, max_records=max_records, max_bytes=bound)
     for hyp in order:
         if len(selected) == max_records:
             break
@@ -369,7 +379,7 @@ def select_working_snapshot(inventory: Mapping[str, Any], *, query: Mapping[str,
         if len(selected) > max_records or trial["bytes"] > bound:
             selected.pop()
             if hyp in required:
-                raise GenerationContextError("GENERATION_MANDATORY_CONTEXT_EXCEEDS_BOUND", mandatory_count=len(required), max_records=max_records, max_bytes=bound)
+                raise _mandatory_bound_error(required, consulted_refs=consulted_refs, max_records=max_records, max_bytes=bound)
         else:
             current = trial
     return current
@@ -497,7 +507,10 @@ def fit_working_packet(packet: Mapping[str, Any], *, max_bytes: int = 65536) -> 
         capsules = memory["capsules"]
         removable = [i for i,c in enumerate(capsules) if c["selection_reason"] != "MANDATORY_SOURCE_REF"]
         if not removable:
-            raise GenerationContextError("GENERATION_MANDATORY_CONTEXT_EXCEEDS_BOUND", mandatory_count=memory["mandatory_count"], packet_bytes=len(canonical_json_bytes(result)), max_bytes=max_bytes)
+            required = {c["hypothesis_version_id"] for c in capsules if c["selection_reason"] == "MANDATORY_SOURCE_REF"}
+            raise _mandatory_bound_error(required, consulted_refs=memory.get("consulted_source_refs") or [],
+                                         max_records=memory["max_records"], max_bytes=max_bytes,
+                                         packet_bytes=len(canonical_json_bytes(result)))
         capsules.pop(removable[-1])
         memory.update(emitted_count=len(capsules), omitted_count=memory["archive_eligible_count"]-len(capsules), archive_complete_in_packet=False)
         memory["omission_summary"] = {"reason":"OPTIONAL_PARENT_PACKET_BOUND", "count":memory["omitted_count"]}

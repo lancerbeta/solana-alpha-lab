@@ -1,0 +1,53 @@
+{
+  "as_of": "2026-10-09",
+  "non_claims": [
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_FULL_NATIVE_GENERATOR_CAPABILITY",
+    "NO_MERGE"
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "review_id": "FORGE_EVIDENCE_GUIDED_GENERATION_V1-REVIEW",
+  "reviewed_bindings_sha256": "",
+  "reviewed_inventory_sha256": "",
+  "reviews": [
+    {
+      "findings": [
+        "ISOLATED_FINAL_REVIEW_PENDING"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "ISOLATED_FINAL_REVIEW_PENDING"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "ISOLATED_FINAL_REVIEW_PENDING"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY"
+    },
+    {
+      "findings": [
+        "ISOLATED_FINAL_REVIEW_PENDING"
+      ],
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "NOT_READY"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "FORGE_EVIDENCE_GUIDED_GENERATION_V1",
+  "verdict": "NOT_READY"
+}

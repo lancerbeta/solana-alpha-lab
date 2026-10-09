@@ -191,6 +191,11 @@ class OrdinaryWorkingMemoryTests(unittest.TestCase):
         denied=self.cli('persist-draft','--draft',self.write('overflow.json',body),
                         '--preflight-receipt',self.write('overflow-pre.json',pre),ok=False)
         self.assertEqual(denied['reason_code'],'GENERATION_MANDATORY_CONTEXT_EXCEEDS_BOUND',denied)
+        self.assertGreaterEqual(denied['detail']['mandatory_count'], 65)
+        self.assertEqual(len(denied['detail']['mandatory_hypothesis_version_ids']), denied['detail']['mandatory_count'])
+        self.assertTrue(set(body['candidates'][0]['prior_work_refs']).issubset(denied['detail']['mandatory_hypothesis_version_ids']))
+        self.assertEqual(denied['next_action'], 'INSPECT_MANDATORY_SOURCES_REFINE_WITH_EXISTING_AUTHORITY')
+        self.assertFalse(denied['new_look'])
         self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
 
     def test_episode_preview_reads_prefix_only_and_replay_spends_no_second_look(self):
@@ -288,10 +293,18 @@ class OrdinaryWorkingMemoryTests(unittest.TestCase):
         self.assertFalse(detail['new_look'])
         self.assertEqual(detail['view']['capsules'][0]['hypothesis_version_id'],'HYP-EGG-00004')
         self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
+        absent=self.cli('prior','--context-view','--preflight-receipt',receipt,
+                        '--selection-query-sha256',view['selection_query_sha256'],
+                        '--source-ref','HYP-EGG-NOT-IN-THIS-CUTOFF',ok=False)
+        self.assertEqual(absent['detail']['source_ref'], 'HYP-EGG-NOT-IN-THIS-CUTOFF')
+        self.assertFalse(absent['new_look'])
+        self.assertIn('owner_readout', absent)
         record=_event(record_id='HYP-EGG-WRITER',kind=RecordKind.HYPOTHESIS_VERSION,entity_id='HYP-EGG-WRITER',hypothesis_version_id='HYP-EGG-WRITER',payload={'hypothesis_version_id':'HYP-EGG-WRITER','claim':'A distinct append'},created=datetime.now(UTC))
         store.append([record],transaction_id=record.transaction_id)
         denied=self.cli(*args,ok=False)
         self.assertEqual(denied['reason_code'],'GENERATION_CONTEXT_STALE_STORE_BINDING')
+        self.assertEqual(denied['next_action'], 'RUN_PERSISTENT_PREFLIGHT_REUSE_SAVED_LOOK')
+        self.assertIn('owner_readout', denied)
         resumed=self.preflight('EGG_DETAIL_BINDING')
         refreshed=resumed['forge_context_packet']['prior_memory_working_view']
         self.assertEqual(refreshed['research_log_cutoff'],view['research_log_cutoff'])
@@ -331,6 +344,76 @@ class OrdinaryWorkingMemoryTests(unittest.TestCase):
                             for c in detail['view']['capsules']))
         self.assertLessEqual(detail['view']['bytes'], 65536)
         self.assertEqual(store.diagnostics().committed_inventory_sha256, before)
+
+    def test_detail_missing_context_preserves_exact_recovery_locator(self):
+        pre = self.preflight('EGG_DETAIL_MISSING_DEPENDENCY')
+        memory = pre['forge_context_packet']['prior_memory_working_view']
+        digest = pre['forge_context_packet_sha256']
+        relative = 'research/artifacts/forge_context/' + digest + '.json'
+        (self.plane / relative).unlink()  # exact dependency loss in disposable fixture
+        before = ResearchStore(self.plane).diagnostics().committed_inventory_sha256
+        denied = self.cli('prior', '--context-view', '--preflight-receipt',
+                          self.write('missing-detail-pre.json', pre),
+                          '--selection-query-sha256', memory['selection_query_sha256'], ok=False)
+        self.assertEqual(denied['reason_code'], 'FORGE_CONTEXT_ARTIFACT_MISSING')
+        self.assertEqual(denied['detail']['relative_locator'], relative)
+        self.assertEqual(denied['detail']['required_context_sha256'], digest)
+        self.assertEqual(denied['next_action'], 'RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY')
+        self.assertIn(relative, denied['owner_readout'])
+        self.assertFalse(denied['new_look'])
+        self.assertFalse(denied['writes'])
+        self.assertEqual(ResearchStore(self.plane).diagnostics().committed_inventory_sha256, before)
+
+    def test_hidden_corrupt_archive_partition_blocks_public_context_without_writes(self):
+        import hashlib
+        store = ResearchStore(self.plane)
+        # Separate source partitions make a hidden tail attack independent of
+        # partition verification for sources displayed in the top eight.
+        for index in range(65):
+            hyp = f'HYP-EGG-CORRUPT-{index:05d}'
+            record = _event(record_id=hyp, kind=RecordKind.HYPOTHESIS_VERSION,
+                            entity_id=hyp, hypothesis_version_id=hyp,
+                            payload={'hypothesis_version_id': hyp, 'claim': 'Same saved structural source.'},
+                            created=datetime(2026, 10, 8, tzinfo=UTC))
+            transaction = 'RESEARCH-TXN-EGG-CORRUPT-' + str(index)
+            record = record.model_copy(update={'transaction_id': transaction})
+            store.append([record], transaction_id=transaction)
+        pre = self.preflight('EGG_CORRUPT_ARCHIVE')
+        shown = {c['hypothesis_version_id'] for c in pre['forge_context_packet']['prior_memory_working_view']['capsules']}
+        hidden = next(f'HYP-EGG-CORRUPT-{i:05d}' for i in reversed(range(65))
+                      if f'HYP-EGG-CORRUPT-{i:05d}' not in shown)
+        manifests = list((self.plane / 'research/manifests/partitions').glob('*.json'))
+        target = None
+        for path in manifests:
+            manifest = json.loads(path.read_text(encoding='utf-8'))
+            partition = self.plane / manifest['logical_location']
+            if hidden.encode() in partition.read_bytes():
+                target = partition
+                break
+        self.assertIsNotNone(target)
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+        table = pq.read_table(target)
+        values = table.column('payload_json').to_pylist()
+        values[0] = values[0] + ' '
+        field = table.schema.field('payload_json')
+        table = table.set_column(table.schema.get_field_index('payload_json'), field,
+                                 pa.array(values, type=field.type))
+        pq.write_table(table, target)  # readable Parquet with invalid committed hash
+        def inventory():
+            return {p.relative_to(self.plane).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+                    for p in self.plane.rglob('*') if p.is_file()}
+        before = inventory()
+        import subprocess
+        done = subprocess.run([sys.executable, '-B', str(ROOT / 'scripts/hypothesis_forge.py'),
+                               '--root', str(ROOT), '--data-root', str(self.plane),
+                               'preflight', '--discovery-contract', '--collection',
+                               'OPPORTUNITY_EPISODES', '--owner-focus', 'EGG_CORRUPT_ARCHIVE_NEW_READ',
+                               '--format', 'json'], cwd=ROOT, capture_output=True)
+        self.assertNotEqual(done.returncode, 0)
+        reason = done.stderr.decode('utf-8').strip()
+        self.assertIn(reason, {'PARTITION_HASH_MISMATCH', 'PARTITION_PAYLOAD_HASH_MISMATCH', 'MANIFEST_HASH_MISMATCH', 'COMMITTED_PAYLOAD_HASH_MISMATCH', 'COMMITTED_PARQUET_HASH_MISMATCH'})
+        self.assertEqual(inventory(), before)
 
     def test_episode_binding_and_metadata_coverage_use_actual_collection_owner(self):
         before=ResearchStore(self.plane).diagnostics().committed_inventory_sha256
