@@ -21,7 +21,7 @@ T = tests/test_forge_research_flow_reliability_v1.py; прочие cases — в 
 | D09 | PASS | Public EXACT/RELATED/PARK/TECHNICAL matrix, typed-close refusal, four capsules, NON_SCIENTIFIC_STOP; budget stable. |
 | D10 | PASS | Identical import keeps epoch; admitted10 changes it. New-session public lifecycle after legacy HYP replay; old bytes stable, replay writes0. |
 | D11 | PASS | Loader requests E300/E900/E1800; future poison changes no prefix/scope while authorized target changes. |
-| D12 | PASS | Native packet/draft/persist/freeze/KILL/final; fresh isolated packet-only Critic recheck matched KILL with exact input/output hashes and read-set. Original launch UNKNOWN; 5/6 outputs. |
+| D12 | PASS | Native packet/draft/persist/freeze/KILL/final; fresh isolated packet-only Critic recheck matched KILL. Machine launch receipt binds fork_turns:none/child ID to input/output hashes; original launch UNKNOWN; 5/6 outputs. |
 | D13 | PASS | Scripted Critic PASS; real classify/final/Runner/literal oracle; replay old runid/no writes. |
 | D14 | PASS | Lost reply/moved root resumes original draft/hash/charge; corruption and OS race guarded. |
 | D15 | PASS | Missing context gives SHA locator/exit2/no writes; null-session exact prior blocks navigation; typed close names scope/receipt. |
