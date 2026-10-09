@@ -56,6 +56,7 @@ def _risk(field: str, value: Any) -> list[str]:
 def project_material_card(card: Mapping[str, Any]) -> dict[str, Any]:
     """Return a checked view; do not mutate or serialize the source card."""
     out = dict(card)
+    out.pop("pit_component_provenance", None)  # transport-only, never author supplied
     for canonical, aliases in ALIASES.items():
         present = [key for key in (canonical, *aliases) if key in card]
         if not present:
@@ -67,12 +68,17 @@ def project_material_card(card: Mapping[str, Any]) -> dict[str, Any]:
         out[canonical] = values[0]
     components = [key for key in PIT_COMPONENTS if key in card]
     if components:
-        combined = [value for key in components for value in _risk(key, card[key])]
+        provenance = {
+            key: _risk(key, card[key]) if key in card else None
+            for key in PIT_COMPONENTS
+        }
+        combined = [value for key in components for value in provenance[key]]
         canonical = "pit_leakage_survivorship_risks"
         if canonical in card and _risk(canonical, card[canonical]) != combined:
             raise CardProjectionError("CARD_ALIAS_CONFLICT", field_paths=[canonical, *components],
                                       next_action="RESOLVE_AUTHORED_ALIAS_CONFLICT_BEFORE_PERSIST")
         out[canonical] = combined
+        out["pit_component_provenance"] = provenance
     for field in RISK_FIELDS:
         out[field] = _risk(field, out[field]) if field in out else [UNKNOWN]
     for field in TEXT_FIELDS:
@@ -102,7 +108,7 @@ def authoring_contract() -> dict[str, Any]:
         "canonical_fields": ["claim", "population", "primary_x_family", "primary_y", "horizon_notional", "alternative_world", "proposed_method", "cheapest_falsifier", "available_data_bindings"],
         "legacy_aliases": {key: list(values) for key, values in ALIASES.items()},
         "pit_components": list(PIT_COMPONENTS),
-        "pit_transport": "distinct components concatenated in declared order; conflicts refuse",
+        "pit_transport": "distinct components concatenated in declared order; optional provenance preserves each component, null=absent and []=authored empty; conflicts refuse",
         "predictive": "actor_counterparty and mechanism may be absent; do not invent causal identification",
         "bindings": "strings or typed objects; no prose-to-binding inference",
         "non_equivalent": ["primary_y != target", "mundane_alternative != alternative_world", "data_already_available != available_data_bindings", "candidate_method_family != proposed_method"],

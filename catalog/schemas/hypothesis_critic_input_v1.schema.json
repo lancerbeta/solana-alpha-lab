@@ -93,6 +93,15 @@
         "mundane_alternative": {"type": "string", "minLength": 1},
         "confounders": {"type": "array", "items": {"type": "string"}},
         "pit_leakage_survivorship_risks": {"type": "array", "items": {"type": "string"}},
+        "pit_component_provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["PIT_and_leakage_risk", "survivorship_and_dependency_risk"],
+          "properties": {
+            "PIT_and_leakage_risk": {"type": ["array", "null"], "items": {"type": "string"}},
+            "survivorship_and_dependency_risk": {"type": ["array", "null"], "items": {"type": "string"}}
+          }
+        },
         "execution_capacity_risks": {"type": "array", "items": {"type": "string"}},
         "available_data_bindings": {"type": "array", "items": {"type": "string"}},
         "missing_or_forward_only_data": {"type": "array", "items": {"type": "string"}},

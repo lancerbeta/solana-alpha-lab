@@ -296,9 +296,10 @@ def _eligible_rows(
         SELECT *
         FROM "{relation}"
         WHERE first_reliable_available_at <= ?
+          AND effective_at <= ?
         ORDER BY {order_by}
         """,
-        [cutoff.replace(tzinfo=None)],
+        [cutoff.replace(tzinfo=None), cutoff.replace(tzinfo=None)],
     )
 
 
@@ -360,12 +361,13 @@ def _bind_origin_as_of(
     connection: duckdb.DuckDBPyConnection,
     hypotheses: list[dict[str, Any]],
     cutoff: datetime,
-) -> None:
+) -> dict[str, int]:
     """Replace current-view origin with authored or session-bound visible origin."""
     records = _rows(
         connection,
         """
         SELECT record_id, record_kind, stable_id, hypothesis_version_id,
+               supersedes_record_id,
                NULLIF(json_extract_string(payload_json, '$.session_id'), '') AS session_id,
                json_extract_string(payload_json, '$.origin_id') AS origin_id,
                json_extract_string(payload_json, '$.origin_kind') AS origin_kind,
@@ -373,8 +375,9 @@ def _bind_origin_as_of(
         FROM _research_events
         WHERE record_kind IN ('HYPOTHESIS_VERSION', 'HYPOTHESIS_ORIGIN')
           AND first_reliable_available_at <= ?
+          AND effective_at <= ?
         """,
-        [cutoff.replace(tzinfo=None)],
+        [cutoff.replace(tzinfo=None), cutoff.replace(tzinfo=None)],
     )
     authored: dict[str, dict[str, Any]] = {}
     by_hypothesis: dict[tuple[str, str | None], dict[str, Any]] = {}
@@ -401,6 +404,14 @@ def _bind_origin_as_of(
         source = authored.get(hypothesis["record_id"])
         if source is None:
             raise PriorWorkError("HYPOTHESIS_SOURCE_UNAVAILABLE")
+        seen: set[str] = {source["record_id"]}
+        parent = source.get("supersedes_record_id")
+        while parent in authored:
+            if parent in seen or authored[parent]["stable_id"] != hypothesis["hypothesis_version_id"]:
+                raise PriorWorkError("HYPOTHESIS_LINEAGE_INVALID")
+            seen.add(parent)
+            parent = authored[parent].get("supersedes_record_id")
+        hypothesis["_lineage_depth"] = len(seen) - 1
         if source.get("origin_kind") is not None:
             hypothesis["origin_kind"] = source["origin_kind"]
             continue
@@ -412,6 +423,7 @@ def _bind_origin_as_of(
             ) if row is not None
         ]
         hypothesis["origin_kind"] = max(matches, key=newer)["origin_kind"] if matches else None
+    return {row["record_id"]: row.pop("_lineage_depth") for row in hypotheses}
 
 
 def query_hypotheses(
@@ -475,7 +487,7 @@ def query_data_plane_prior_work(
             cutoff,
             order_by="hypothesis_version_id, record_id",
         )
-        _bind_origin_as_of(connection, hypotheses, cutoff)
+        lineage_depth = _bind_origin_as_of(connection, hypotheses, cutoff)
         runs = _eligible_rows(
             connection,
             "experiment_runs",
@@ -590,6 +602,7 @@ def query_data_plane_prior_work(
         results.append(
             {
                 "hypothesis_version_id": version_id,
+                "_lineage_depth": lineage_depth[hypothesis["record_id"]],
                 "session_id": session_id,
                 "family_id": hypothesis.get("family_id"),
                 "definition_sha256": hypothesis.get("definition_sha256"),
@@ -632,8 +645,10 @@ def query_data_plane_prior_work(
         )
     ordered = sorted(
         results,
-        key=lambda row: (-row["score"], row["hypothesis_version_id"]),
+        key=lambda row: (-row["score"], row["hypothesis_version_id"], -row["_lineage_depth"]),
     )[: int(query["max_results"])]
+    for row in ordered:
+        row.pop("_lineage_depth")
     digest = metadata[0]["projection_digest_sha256"] if metadata else None
     return {
         "schema": "smial.prior_work_query_result.v1",

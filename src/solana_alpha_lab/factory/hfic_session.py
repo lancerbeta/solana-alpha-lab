@@ -1256,6 +1256,8 @@ def _selected_candidate_block(
         "decision_unlocked": decision_unlocked,
         "_required_capability_ids": [str(item) for item in required_caps],
     }
+    if "pit_component_provenance" in card:
+        block["pit_component_provenance"] = card["pit_component_provenance"]
     if "mundane_alternative" in card:
         block["mundane_alternative"] = card["mundane_alternative"]
     if packet_version == CRITIC_PACKET_VERSION_CURRENT:

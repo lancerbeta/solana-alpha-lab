@@ -21,6 +21,10 @@ Input must be a structured **CRITIC_INPUT_PACKET** only. The packet may be the
 Forge-selected candidate or the pre-frozen runner-up; both use the same schema
 with `selected_candidate` set to that candidate. Reject free-form Forge
 narrative, pleas to «improve the idea», or requests to generate a new portfolio.
+If `selected_candidate.pit_component_provenance` is present, use it to retain
+the two authored legacy risk boundaries. A null component was not declared;
+an empty array was explicitly authored empty. Neither is a measured negative
+PIT observation. The aggregate risk list preserves the exact authored strings.
 Do not accept C1 Critic reasoning when screening C2. Do not accept the outer frozen envelope, Forge scratchpad, or hidden session
 context alongside the packet. Do **not** walk ResearchStore or active RDP for
 prior recall: the packet is the sole research-memory input. Compact V1

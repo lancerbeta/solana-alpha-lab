@@ -46,6 +46,11 @@ order/duplicates/punctuation; absent -> [NOT_DECLARED_IN_DRAFT] (explicit unknow
 boolean, number, object and mixed list refuse before persist. Unknown text is
 explicit UNKNOWN; an authored empty required text refuses. Binding objects are
 retained for grounding, reversibly JSON-encoded only in Critic narrative fields.
+When either legacy PIT component is authored, optional Critic-only
+`pit_component_provenance` keeps both labeled source arrays: `null` means that
+component was absent, while `[]` means an authored empty list. The aggregate
+risk list still carries the original strings in order; this derived view never
+changes the saved draft or candidate identity.
 
 All candidate views, fresh scope/grounding, primary and runner Critic packets
 are validated before new generated-draft/session records. Pure freeze validation
@@ -67,10 +72,22 @@ Raw verdict/history/definition is unchanged. Prior memory retains it as
 HISTORICAL or TECHNICAL_STOP beside explicit outcome_semantics. Only existing
 typed family-close receipt/ledger grants family suppression. PARK is priority;
 NOT_SELECTED_IN_SESSION is selection history. Related scope is not exact closure.
+Legacy `CLOSE_` may display `memory_status=HARD_CLOSE` for compatibility; this
+label does not attest the typed family ledger or authorize a new suppression.
 Frozen same evidence reuses saved progress; new admitted evidence is a new market
 binding under existing budget. Identical republish/alias cannot mint budget.
 
+Prior-work search is a historical multi-session listing. With equal relevance
+score for the same semantic candidate, a bounded `max_results` ranks the
+visible explicit HYP chain head first; each returned row still carries its own
+session verdict. Search rank never transfers an old verdict to a new session.
+
 ## Recovery, prefix and bounded reads
+
+Python `as_of` prior-work queries show records only after both their first
+reliable availability and their `effective_at`. A known future decision or
+origin is not a current state. Direct SQL projection views are current-state
+readouts and do not implement this historical cutoff.
 
 Existing prefreeze recovery resumes valid historical legacy-shape drafts from
 original source bytes and saved look. Missing/corrupt context, parent or genuine

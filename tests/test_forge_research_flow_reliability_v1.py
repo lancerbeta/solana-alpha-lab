@@ -65,6 +65,19 @@ class CardTransportTests(unittest.TestCase):
         block = self.project(PIT_and_leakage_risk="UNIQUE_PIT", survivorship_and_dependency_risk="UNIQUE_DEPENDENCY")
         self.assertEqual(block["pit_leakage_survivorship_risks"], ["UNIQUE_PIT", "UNIQUE_DEPENDENCY"])
 
+    def test_pit_component_boundary_and_absence_survive_critic_transport(self):
+        import jsonschema
+        first=self.project(PIT_and_leakage_risk=['A','B'],survivorship_and_dependency_risk=['C'])
+        second=self.project(PIT_and_leakage_risk=['A'],survivorship_and_dependency_risk=['B','C'])
+        self.assertEqual(first['pit_leakage_survivorship_risks'],second['pit_leakage_survivorship_risks'])
+        self.assertNotEqual(first['pit_component_provenance'],second['pit_component_provenance'])
+        missing=self.project(PIT_and_leakage_risk=[])
+        self.assertEqual(missing['pit_component_provenance'],{'PIT_and_leakage_risk':[],'survivorship_and_dependency_risk':None})
+        schema=json.loads((ROOT/'catalog/schemas/hypothesis_critic_input_v1.schema.json').read_text(encoding='utf-8'))
+        component_schema=schema['properties']['selected_candidate']['properties']['pit_component_provenance']
+        jsonschema.validate(first['pit_component_provenance'],component_schema)
+        jsonschema.validate(missing['pit_component_provenance'],component_schema)
+
     def test_alias_conflict_is_early_and_names_both_paths(self):
         with self.assertRaises(HficSessionError) as caught:
             self.project(one_sentence_claim="CONFLICTING CLAIM")
@@ -362,6 +375,17 @@ class SessionHistoryTests(unittest.TestCase):
             HficMemoryPolicyError, iter_search_memory_hypothesis_payloads,
         )
         records=[event_fixture(record_id=f'HYP-UNRELATED-{i}',record_kind='HYPOTHESIS_VERSION',payload={'hypothesis_version_id':'HYP-SAME','session_id':f'SESS-{i}'}) for i in range(2)]
+        store=SimpleNamespace(iter_committed_records=lambda:iter(records))
+        with self.assertRaisesRegex(HficMemoryPolicyError,'HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS'):
+            iter_search_memory_hypothesis_payloads(store)
+
+    def test_cyclic_legacy_hypothesis_history_refuses_compaction(self):
+        from types import SimpleNamespace
+        from tests.test_research_store import event_fixture
+        from solana_alpha_lab.factory.hfic_memory_policy import (
+            HficMemoryPolicyError, iter_search_memory_hypothesis_payloads,
+        )
+        records=[event_fixture(record_id=f'HYP-CYCLE-{i}',record_kind='HYPOTHESIS_VERSION',payload={'hypothesis_version_id':'HYP-SAME','session_id':f'SESS-{i}'}).model_copy(update={'supersedes_record_id':f'HYP-CYCLE-{1-i}'}) for i in range(2)]
         store=SimpleNamespace(iter_committed_records=lambda:iter(records))
         with self.assertRaisesRegex(HficMemoryPolicyError,'HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS'):
             iter_search_memory_hypothesis_payloads(store)

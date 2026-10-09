@@ -253,29 +253,28 @@ def iter_search_memory_hypothesis_payloads(store: Any | None) -> list[dict[str, 
 
     selected: dict[str, dict[str, Any]] = {}
     for hyp_id, records in grouped.items():
+        ancestors: dict[str, set[str]] = {}
+        for record_id, (record, _) in records.items():
+            seen: set[str] = set()
+            parent = record.supersedes_record_id
+            while parent is not None:
+                if parent not in records or parent == record_id or parent in seen:
+                    raise HficMemoryPolicyError("HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS")
+                seen.add(parent)
+                parent = records[parent][0].supersedes_record_id
+            ancestors[record_id] = seen
+        record_ids = list(records)
+        for index, record_id in enumerate(record_ids):
+            for previous_id in record_ids[:index]:
+                if (previous_id not in ancestors[record_id]
+                        and record_id not in ancestors[previous_id]):
+                    raise HficMemoryPolicyError("HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS")
+
         eligible = [record_id for record_id, (_, payload) in records.items()
                     if hypothesis_search_eligible(payload, blocked)]
         if not eligible:
             continue
-
-        def descends_from(child_id: str, ancestor_id: str) -> bool:
-            seen: set[str] = set()
-            parent = records[child_id][0].supersedes_record_id
-            while parent in records:
-                if parent == ancestor_id:
-                    return True
-                if parent in seen:
-                    raise HficMemoryPolicyError("HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS")
-                seen.add(parent)
-                parent = records[parent][0].supersedes_record_id
-            return False
-
-        head = eligible[0]
-        for record_id in eligible[1:]:
-            if descends_from(record_id, head):
-                head = record_id
-            elif not descends_from(head, record_id):
-                raise HficMemoryPolicyError("HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS")
+        head = max(eligible, key=lambda record_id: len(ancestors[record_id]))
         selected[hyp_id] = records[head][1]
     return [selected[item] for item in sorted(selected)]
 
