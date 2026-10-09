@@ -146,4 +146,22 @@ Owner steering: account for changed main. New base d2cd1fdf6fb10b5efc3e3b7f7b752
 rewrite. Runtime/outcome/DoD and native budget unchanged. New policy prefers
 existing checks and evidence-based regression; two uncovered public transport
 seams justify the compact durable checks. Current base post-merge CI37988774921
-was in progress at readback; exact successful status must be read later.
+completed SUCCESS at final readback, all10 required jobs.
+
+Budget checkpoint: Generator4/4, revisions0/2, Critic1/6; actual MAIN4,
+PREVIEW3, ADAPTIVE0 across all native attempts. Final primary is durably
+SYNTHESIS_COMPLETE/KILL_UNBOUND_EVIDENCE, explicitly excluded from native
+closure acceptance. Final transfer refused before persist with empty authored
+MAIN scope; no session/packet. Full DoD remains failed, task IN_PROGRESS and
+STOP_NATIVE_BUDGET_OR_REPEATED_SEAM_FAILURE is active. Unused revision slots
+are not new Generator permission. No completion PASS, push, PR, merge-readiness
+or owner phrase. Exact evidence/checkpoint/READOUT is the sole continuation
+owner; existing code commits are a partial repair, not two closed lifecycles.
+
+One recommended local replan of this same task: validate authored scientific
+scope before MAIN and reconcile incomplete unrelated prior interpretation in
+existing owners, then obtain an explicit budget change for one fresh final
+primary/transfer pair. Preserve the four failed attempts and their charges.
+No new runtime mechanism is silently implemented at this stop. Current skill
+corrects preflight-mode source guidance after observed ordinary mode absence;
+this method correction is not claimed as native-proven by the original epoch.

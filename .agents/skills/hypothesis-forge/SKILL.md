@@ -52,9 +52,13 @@ duplicates and use the emitted typed card contract before the first persistence.
 Fresh episode freeze emits Critic 1.5 with all 1.4 grounding floors plus working
 memory 1.1 and a full-archive safety receipt. Other and historical readers retain
 their original versions and completeness meanings.
-Copy `evidence_surface_mode` from the verified preflight into candidate scope;
-never infer it from a population name. Omission is filled only from that same
-verified ingress, and a contradictory supplied value refuses.
+Use `evidence_surface_mode` from verified preflight when that route publishes
+it. Ordinary discovery publishes its bound mode in the saved MAIN
+`candidate_scope`; copy that mode, never infer it from a population name or Y.
+The bound owner fills an omitted ordinary route label; an explicit contradictory
+supplied value refuses. Declare the already-authored `estimand` and
+`explanatory_condition` in MAIN `--candidate-scope` before values. Missing
+authorial intent is unavailable and cannot be repaired from the result.
 
 For a selected candidate bound to a saved look, use the public
 `candidate_authoring_contract.saved_look_bindings` source map. Paths are relative

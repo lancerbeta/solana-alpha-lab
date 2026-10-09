@@ -6078,6 +6078,11 @@
       "target_asset_id": "DOC-FORGE-EVIDENCE-GUIDED-GENERATION-001"
     },
     {
+      "source_asset_id": "DOC-FORGE-NATIVE-LIFECYCLE-READOUT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-NATIVE-LIFECYCLE-CLOSURE-001"
+    },
+    {
       "source_asset_id": "DOC-FORGE-RESEARCH-POLICY-RUNTIME-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-HFIC-PREFLIGHT-ADMISSION-001"
@@ -6416,6 +6421,11 @@
       "source_asset_id": "ENV-WORKSTATION-001",
       "relation": "produces",
       "target_asset_id": "SCM-BASELINE-COMMIT-001"
+    },
+    {
+      "source_asset_id": "EVID-FORGE-NATIVE-LIFECYCLE-CHECKPOINT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-NATIVE-LIFECYCLE-CLOSURE-001"
     },
     {
       "source_asset_id": "EVIDENCE-ATOM3A-RECEIPT-001",

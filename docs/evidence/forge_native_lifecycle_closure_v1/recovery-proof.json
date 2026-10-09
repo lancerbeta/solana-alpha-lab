@@ -1,0 +1,103 @@
+{
+  "status": "PASS",
+  "scope": "RECOVERY_OF_TECHNICAL_TERMINAL_NOT_NATIVE_SEMANTIC_ACCEPTANCE",
+  "session_id": "HFIC-SESS-2949E0B69BDF6189",
+  "critic_terminal": "KILL_UNBOUND_EVIDENCE",
+  "session_state": "SYNTHESIS_COMPLETE",
+  "original_critic_bytes_sha256": "dad5fed85838d9df1736dac08a4d66fdb64308eba86eb91b4c788740df9b3746",
+  "before_state": "FROZEN_AWAITING_CRITIC",
+  "restart_before_finalize": true,
+  "lost_reply_exit": 73,
+  "lost_reply_stdout_bytes": 0,
+  "identical_retry_store_inventory_unchanged": true,
+  "different_result_refusal": "SESSION_CONFLICT",
+  "different_result_store_changes": 0,
+  "original_records_changed": 0,
+  "added_records": {
+    "HFIC-ART-CRITIC-RESULT-HFIC-SESS-2949E0B69BDF6189-BEA9D73C2A87": [
+      "RESEARCH_ARTIFACT",
+      "3ff540fb7e4df6deadbf39e723e3d6711d8aabd1727bc07dbb0af2f72c3dab27"
+    ],
+    "HFIC-ART-SESSION-RECEIPT-HFIC-SESS-2949E0B69BDF6189": [
+      "RESEARCH_ARTIFACT",
+      "2443066e419f4ad2b8408b35ff7e9d4aa7a6e31fa05aa532f2f44a2eea76b425"
+    ],
+    "HFIC-CYCLE-HFIC-SESS-2949E0B69BDF6189-COMPLETE": [
+      "RESEARCH_CYCLE",
+      "452f2280db98d4098d9591600456a39efe161fc6634c1ec56baab687950dfbf9"
+    ],
+    "HFIC-DEC-HFIC-CAND-815D590CB33E-HFIC-SESS-2949E0B69BDF6189": [
+      "DECISION_EVENT",
+      "24b351448ff613f7ef4fd860e59386c764f5994cb35b6fd29cff8b59def57ec0"
+    ]
+  },
+  "terminal_decision_count": 1,
+  "occupancy_before": {
+    "2949e0b69bdf6189b845fa3b9c13306c49ad23617b4aa355e203262f77925aa4": {
+      "adaptive": {
+        "completed": 0,
+        "deficit": 0,
+        "limit": 2,
+        "occupied": 0,
+        "pending": 0,
+        "remaining": 2
+      },
+      "main": {
+        "completed": 1,
+        "deficit": 0,
+        "limit": 6,
+        "occupied": 1,
+        "pending": 0,
+        "remaining": 5
+      },
+      "preview": {
+        "completed": 0,
+        "deficit": 0,
+        "limit": 2,
+        "occupied": 0,
+        "pending": 0,
+        "remaining": 2
+      }
+    }
+  },
+  "occupancy_after": {
+    "2949e0b69bdf6189b845fa3b9c13306c49ad23617b4aa355e203262f77925aa4": {
+      "adaptive": {
+        "completed": 0,
+        "deficit": 0,
+        "limit": 2,
+        "occupied": 0,
+        "pending": 0,
+        "remaining": 2
+      },
+      "main": {
+        "completed": 1,
+        "deficit": 0,
+        "limit": 6,
+        "occupied": 1,
+        "pending": 0,
+        "remaining": 5
+      },
+      "preview": {
+        "completed": 0,
+        "deficit": 0,
+        "limit": 2,
+        "occupied": 0,
+        "pending": 0,
+        "remaining": 2
+      }
+    }
+  },
+  "new_generator": 0,
+  "new_critic": 0,
+  "new_main": 0,
+  "new_preview": 0,
+  "new_adaptive": 0,
+  "same_git_composite": "a13130ec4dc5ac1b581f3332bf610df7d09c8f3df9b6615dc1019b8660a45557",
+  "setup_failures": [
+    "SANDBOX_GIT_OWNERSHIP_RETRIED_SAME_OPERATION_UNSANDBOXED",
+    "COPY_WRITE_LOOKUP_STALE_EXPLICIT_PREPARATION_SAME_COPY",
+    "DRIVER_EXPECTED_JSON_ERROR_REAL_TYPED_STDERR_SESSION_CONFLICT"
+  ],
+  "clone_semantics": "SAME_SAVED_ARTIFACTS_RECOVERY_NOT_INDEPENDENT_SCIENCE"
+}

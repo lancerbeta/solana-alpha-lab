@@ -34680,7 +34680,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: 67cdeaebc36c0d6ec88f154145b282b144057bdfb74be80b82ddc0f76c3f3977}
+  integrity: {kind: sha256, sha256: 9c042329480c43b63650fbd1304f256af48ed74c06640938f1e0632f6ea48e5a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-NATIVE-LIFECYCLE-CLOSURE-001}
@@ -40868,7 +40868,7 @@ records:
     repository_path: docs/tasks/FORGE_NATIVE_LIFECYCLE_CLOSURE_V1.md
   integrity:
     kind: sha256
-    sha256: 7e356ec47a7de571292b99401d4bf0a7eb64d940b74b7b4967864a2db16439d8
+    sha256: aa3b59a621ad0b2209df69c9de043c0054622fc7f8148e22f0090bcc9b792a76
   access:
     mode: read_only
     method: file
@@ -40955,6 +40955,84 @@ records:
   relations:
   - relation_type: governed_by
     target_asset_id: DOC-FORGE-NATIVE-LIFECYCLE-CLOSURE-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  evidence: []
+  search_terms:
+  - FORGE_NATIVE_LIFECYCLE_CLOSURE_V1
+  - SEM-HYPOTHESIS-FORGE
+  - native closure
+  - recovery
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: EVID-FORGE-NATIVE-LIFECYCLE-CHECKPOINT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Failed full native DoD checkpoint, exact original artifacts, fixed budgets
+    and one bounded replan boundary.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-09'
+  truth_owner: FORGE_NATIVE_LIFECYCLE_CLOSURE_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/forge_native_lifecycle_closure_v1/checkpoint.json
+    repository_path: docs/evidence/forge_native_lifecycle_closure_v1/checkpoint.json
+  integrity:
+    kind: sha256
+    sha256: 4945042274394444b2356672cf50a0df0268ac7ca0e602d700ee259039590622
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-FORGE-NATIVE-LIFECYCLE-CLOSURE-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  evidence: []
+  search_terms:
+  - FORGE_NATIVE_LIFECYCLE_CLOSURE_V1
+  - SEM-HYPOTHESIS-FORGE
+  - native closure
+  - recovery
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: DOC-FORGE-NATIVE-LIFECYCLE-READOUT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: 'Owner readout: native0/2, technical terminal recovery, failed budget denominator
+    and unresolved public seams.'
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-09'
+  truth_owner: FORGE_NATIVE_LIFECYCLE_CLOSURE_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/forge_native_lifecycle_closure_v1/READOUT.md
+    repository_path: docs/evidence/forge_native_lifecycle_closure_v1/READOUT.md
+  integrity:
+    kind: sha256
+    sha256: 03696e0947a1f481eb30fb956e0dc63d70234ba43f050a71ddebb23c6d2546a7
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-FORGE-NATIVE-LIFECYCLE-CLOSURE-001
   consumers:
   - FACTORY-001
   - GOAL-OWNER

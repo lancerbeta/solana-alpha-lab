@@ -1,0 +1,170 @@
+{
+  "schema": "smial.native-lifecycle-budget-checkpoint",
+  "schema_version": "1.0",
+  "task_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1",
+  "status": "BLOCKED",
+  "mode": "EXECUTE_STOP_AT_EXPLICIT_NATIVE_BUDGET_BOUNDARY",
+  "base": "d2cd1fdf6fb10b5efc3e3b7f7b752bcee574f8dc",
+  "execution_snapshot": {
+    "head_sha": "838753ba29224a4b4cfc5298637b5a03aa4dc930",
+    "symbolic_ref": "refs/heads/codex/forge-native-lifecycle-final-eval-v1",
+    "porcelain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "index_worktree_sha256": "96a296d224f285c67bee93c30f8a309157f0daa35dc5b87e410b78630a09cfc7",
+    "refs_digest_sha256": "a80962ddaecf23ee1a74d97a86cb654c7b8261cc903b5033445fe4411ed7a75b",
+    "composite_sha256": "a13130ec4dc5ac1b581f3332bf610df7d09c8f3df9b6615dc1019b8660a45557"
+  },
+  "dependency_pr390": "MERGED_READBACK_VERIFIED",
+  "base_ci": {
+    "id": 37988774921,
+    "head": "d2cd1fdf6fb10b5efc3e3b7f7b752bcee574f8dc",
+    "status": "COMPLETED",
+    "conclusion": "SUCCESS",
+    "required_jobs": 10
+  },
+  "native_counts": {
+    "generator_episodes": 4,
+    "generator_limit": 4,
+    "generator_revision_continuations": 0,
+    "revision_limit": 2,
+    "domain_critic": 1,
+    "critic_limit": 6,
+    "extra_quality_grader": 0,
+    "main": 4,
+    "preview": 3,
+    "adaptive": 0,
+    "first_epoch": {
+      "generator": 2,
+      "critic": 0,
+      "main": 2,
+      "preview": 2,
+      "adaptive": 0
+    },
+    "final_epoch": {
+      "generator": 2,
+      "critic": 1,
+      "main": 2,
+      "preview": 1,
+      "adaptive": 0
+    }
+  },
+  "remaining_budget_semantics": "No additional new Generator. Unused REVISE_ONCE slots require an actual frozen revision verdict on same locked question; cannot become new questions or arbitrary authoring retries. Current Critic NEXT=STOP.",
+  "verdicts": {
+    "implementation_or_existing_path": "REPAIRED_PARTIAL",
+    "native_primary": "FAIL_TECHNICAL_TERMINAL_NOT_ACCEPTED",
+    "native_transfer": "BLOCKED_BEFORE_PERSIST",
+    "recovery_and_accounting": "PASS_TECHNICAL_TERMINAL_ONLY",
+    "overall_scope": "FAIL_DOD",
+    "delivery": "LOCAL_CHECKPOINT_NOT_READY_FOR_MERGE",
+    "alpha_oos_live_comparative_gain": "NOT_EVALUATED"
+  },
+  "primary": {
+    "session_id": "HFIC-SESS-2949E0B69BDF6189",
+    "candidate_id": "HFIC-CAND-815D590CB33E",
+    "packet_sha256": "ab940ca0d223e1558c7f93bddb5cbd4ef32759daff5e52fb77902e5486f7bf83",
+    "critic_canonical_sha256": "bea9d73c2a87737cb65b09755eae1edef4ef7a5727735cdc089c98216528f04b",
+    "critic_raw_sha256": "dad5fed85838d9df1736dac08a4d66fdb64308eba86eb91b4c788740df9b3746",
+    "draft_raw_sha256": "3dfd1f0bc9dfc03364605aab1aa673c17d5408136aeccf495436b31a245c84e2",
+    "terminal": "KILL_UNBOUND_EVIDENCE",
+    "operation_sha256": "df3d2362de677dda12b7c3829a4947cb6cc965b4343666206b3b1ef415862564",
+    "main": 1,
+    "preview": 0,
+    "adaptive": 0
+  },
+  "transfer": {
+    "session_id": null,
+    "packet_sha256": null,
+    "draft_raw_sha256": "4d55ad576e8769164daf84ef03700885620aebe63300f252e1f3b59075d8c4b5",
+    "operation_sha256": "9c2ca28f2123f1b3df1a1a4fba1d6168a254aa6971216eff748993511877c837",
+    "result_ref": "HFIC-ART-DISCOVERY-E516CC403E2E10A78DE2454AD4397D776E25C462",
+    "state": "PAUSED_CAP",
+    "first_failure": "UNKNOWN_PRIOR_SCOPE",
+    "submitted_MAIN_candidate_scope": "EMPTY_OBJECT",
+    "missing_at_saved_MAIN": [
+      "estimand",
+      "explanatory_condition"
+    ],
+    "root_cause_evidence": "Authored before-values meanings exist separately but were not supplied to MAIN; scope relation narrows, original result is detached by existing binder; no executor repair. This exact refusal does not identify the offending prior.",
+    "main": 1,
+    "preview": 1,
+    "adaptive": 0
+  },
+  "unresolved_seams": [
+    "Discovery execute accepted empty authored scope before one scientific charge; persistence later refuses meaning attached only after values.",
+    "Frozen primary includes unscoped legacy quote history; public Critic treats UNKNOWN_SCOPE_NEEDS_RESOLUTION as no PASS while runtime archive safety allows unrelated incomplete history. Resolve semantics through existing owner, never invent missing axes or silently erase history."
+  ],
+  "exposure_limitations": [
+    "Native logical contexts isolated; OS sandbox/model diversity UNPROVEN.",
+    "Critic incidentally read unrelated example numbers in allowed public flow contract; recorded in original trace/report, not current oracle.",
+    "Model/effort/seed/token/cost provenance UNKNOWN.",
+    "Synthetic transport and saved proxy outcomes only; missingness/tiny-N explicit."
+  ],
+  "original_bundles": {
+    "native-primary": {
+      "path": "docs/evidence/forge_native_lifecycle_closure_v1/native-primary-originals.json",
+      "sha256": "628c16c236639a6eebbc5e69fd4a1244c9df5c8e3362efc6bcec743298cdfb05",
+      "export_counts": {
+        "files": 56,
+        "lossless_originals": 54,
+        "local_only_hashes": 2,
+        "bundle_sha256": "628c16c236639a6eebbc5e69fd4a1244c9df5c8e3362efc6bcec743298cdfb05"
+      }
+    },
+    "native-transfer": {
+      "path": "docs/evidence/forge_native_lifecycle_closure_v1/native-transfer-originals.json",
+      "sha256": "7b9956e2d654fa469f7fe102884748db9c85592d85cd9b235540dc4c7fec75c2",
+      "export_counts": {
+        "files": 54,
+        "lossless_originals": 45,
+        "local_only_hashes": 9,
+        "bundle_sha256": "7b9956e2d654fa469f7fe102884748db9c85592d85cd9b235540dc4c7fec75c2"
+      }
+    },
+    "native-primary-final": {
+      "path": "docs/evidence/forge_native_lifecycle_closure_v1/native-primary-final-originals.json",
+      "sha256": "79329072978fe00b7f5b285ac32976920f6d4c818ef670447218dce910892489",
+      "export_counts": {
+        "files": 50,
+        "lossless_originals": 44,
+        "local_only_hashes": 6,
+        "bundle_sha256": "79329072978fe00b7f5b285ac32976920f6d4c818ef670447218dce910892489"
+      }
+    },
+    "native-transfer-final": {
+      "path": "docs/evidence/forge_native_lifecycle_closure_v1/native-transfer-final-originals.json",
+      "sha256": "5d965969efc25dc80fab875833fb3100f79be5d06abd7dfc798525e944c4fb98",
+      "export_counts": {
+        "files": 57,
+        "lossless_originals": 48,
+        "local_only_hashes": 9,
+        "bundle_sha256": "5d965969efc25dc80fab875833fb3100f79be5d06abd7dfc798525e944c4fb98"
+      }
+    },
+    "critic-primary-final": {
+      "path": "docs/evidence/forge_native_lifecycle_closure_v1/critic-primary-final-originals.json",
+      "sha256": "4cf582f8810b61679f67c764fe55ce6c2ed34b0fc3d89c9e35bbd2dda9b4124f",
+      "export_counts": {
+        "files": 8,
+        "lossless_originals": 3,
+        "local_only_hashes": 5,
+        "bundle_sha256": "4cf582f8810b61679f67c764fe55ce6c2ed34b0fc3d89c9e35bbd2dda9b4124f"
+      }
+    },
+    "recovery-primary-final": {
+      "path": "docs/evidence/forge_native_lifecycle_closure_v1/recovery-primary-final-originals.json",
+      "sha256": "49cd0034cacff38c9807be65f319fd38c1fc36e291e9974c756c8653ab807d26",
+      "export_counts": {
+        "files": 22,
+        "lossless_originals": 22,
+        "local_only_hashes": 0,
+        "bundle_sha256": "49cd0034cacff38c9807be65f319fd38c1fc36e291e9974c756c8653ab807d26"
+      }
+    }
+  },
+  "next_action": "Owner approves one local replan of the same task: complete authored-scope validation before MAIN plus reconcile incomplete unrelated historical prior interpretation, then explicitly authorize one fresh final primary/transfer pair on a committed implementation snapshot. No new looks before that budget change.",
+  "engineering_review": "PENDING_INDEPENDENT_REQUIRED_ROLES",
+  "readout": "docs/evidence/forge_native_lifecycle_closure_v1/READOUT.md",
+  "completion_evidence": "NOT_CREATED_FAILED_DOD",
+  "merge_readiness": "NOT_REQUESTED_FAILED_DOD",
+  "owner_phrase": null,
+  "method_correction_after_native": "Skill distinguishes ordinary saved MAIN mode from mode absent in preflight; no native proof claimed for that corrected entry method."
+}
