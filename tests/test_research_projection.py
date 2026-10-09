@@ -501,6 +501,21 @@ class ResearchProjectionTests(unittest.TestCase):
                 )
             self.assertEqual(store.rebuild_projection().record_count, 0)
 
+    def test_identical_legacy_artifact_rows_remain_rebuildable(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            store = ResearchStore(Path(temporary))
+            payload = {"research_artifact_id": "ARTIFACT-LEGACY-SAME"}
+            for index in range(2):
+                row = event(
+                    f"ARTIFACT-LEGACY-ROW-{index}",
+                    "RESEARCH_ARTIFACT",
+                    payload,
+                    transaction_id=f"RESEARCH-TXN-ARTIFACT-LEGACY-{index}",
+                    entity_id="ARTIFACT-LEGACY-SAME",
+                )
+                store.append([row], transaction_id=row.transaction_id)
+            self.assertEqual(store.rebuild_projection().record_count, 2)
+
     def test_generated_ten_thousand_event_performance_fixture(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

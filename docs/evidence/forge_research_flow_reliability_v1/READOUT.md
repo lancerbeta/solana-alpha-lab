@@ -21,7 +21,7 @@ T = tests/test_forge_research_flow_reliability_v1.py. Остальные про�
 | D09 | PASS | T persisted public prior matrix: EXACT old question refuses, distinct actual mixed question retains RELATED/PARK/TECHNICAL; renamed typed family-close refuses pre-persist. Freeze contains all4 capsules, raw technical Critic → NON_SCIENTIFIC_STOP; readback/history/budget unchanged. prior-matrix-proof.json. |
 | D10 | PASS | Identical import preserves epoch/search; admitted10 changes them. Complete fresh persist/freeze/final/ordinary readback uses same semantic candidate and a new session; old raw records unchanged, exact freeze replay writes0/looks0 (new-data-proof.json). |
 | D11 | PASS | Passive actual loader trace requests E300/E900/E1800 only; produced future poison leaves prefix/panels/scope counts equal while authorized target numeric changes. Existing protected/late/unavailable controls pass. |
-| D12 | PASS | Actual emitted packet → isolated native Generator → original draft → public persist/freeze → fresh-context Critic → finalize/forge-run. Native3/6, no reroll/manual JSON repair. |
+| D12 | PASS | Native packet → Generator → original draft → persist/freeze → Critic KILL → final/forge-run. Separate packet-only Critic recheck matches; original launch provenance UNKNOWN. Native3/6, no reroll. |
 | D13 | PASS | Only Critic PASS boundary scripted. Public classify accepts existing Spec1.1 wrapper correctly, final completes, production Runner arithmetic matches literal oracle, actual classifier REPLAY_AVAILABLE returns old runid/no writes. |
 | D14 | PASS | OS persist then os._exit(73), lost reply, moved root + fresh processes resume same original draft/hash/charge; corrupt/parent guards. Controlled OS lease and public final-slot race verify bounded same-event publication. |
 | D15 | PASS | Public ordinary forge-run missing context: exact SHA/relative locator + RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY, exit2/no writes. Exact-scope/typed-close refusals name one legal next. Native 7lines/adversarial retain gaps. |
@@ -35,7 +35,7 @@ native-evidence.json — lossless JSON references to repeated objects. Materiali
 
 `uv run --locked --managed-python python -B tests/fixtures/forge_research_flow_reliability_v1/materialize_native_evidence.py docs/evidence/forge_research_flow_reliability_v1/native-evidence.json local/flow-native-readback`
 
-Session HFIC-SESS-7AF2CBC076DD99FD; candidate HFIC-CAND-4CCB3BB855AA. Original file hashes, preflight/look/packet and final proof are inside the bundle. Critic received packet only; no Forge narrative or store archaeology. Model diversity is UNPROVEN; process contexts are separate.
+Session HFIC-SESS-7AF2CBC076DD99FD; candidate HFIC-CAND-4CCB3BB855AA. Original file hashes, preflight/look/packet and final proof are inside the bundle. Separate Critic recheck received packet only and matched KILL (independent-critic-recheck.json). Original Critic launch provenance UNKNOWN; model diversity UNPROVEN.
 
 Owner 7-line readout:
 
@@ -55,7 +55,7 @@ resource-proof.json: 40-record median3.7985704→.1220622s (31.12x); 400-record3
 
 failure-proof.json содержит BASE/string/outcome/cache/publication RED→GREEN. Busy retry: same event, only WRITER_BUSY,40×50ms; other integrity errors refuse. Old unstamped race site UNKNOWN. Locator refuses fresh substitution. Historical checkpoint byte-identical to44eda5d; all22 original pins match; archive drift/loss/unavailable Git DENY.
 
-D10: record IDs bind session, candidate/definition IDs stay stable, and source rows remain append-only. Writer checks explicit linear HYP ancestry under lease before publication, including same-byte records. Compact Critic/Forge memory selects DEC per candidate/session before latest-card compaction; late old DEC cannot erase new. Known and missing IDs differ; empty and absent both mean legacy. SQL joins and Python as-of agree on this identity. Python as-of admits origin only after same-session source availability; direct SQL views show current state. Old/new outcomes remain in raw history. New-data proof is synthetic engineering only.
+D10: record IDs bind session, candidate/definition IDs stay stable, and source rows remain append-only. Writer checks explicit linear HYP ancestry under lease before publication, including same-byte records. Compact Critic/Forge memory selects chain-head HYP regardless of effective_at, then its session DEC; late old DEC cannot erase new. Identical non-HYP rows still rebuild. Known and missing IDs differ; empty and absent both mean legacy. SQL joins and Python as-of agree on this identity. Python as-of admits origin only after same-session source availability; direct SQL views show current state. Old/new outcomes remain in raw history. New-data proof is synthetic engineering only.
 
 ## Ограничения и delivery
 

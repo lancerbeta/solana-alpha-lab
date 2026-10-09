@@ -232,14 +232,12 @@ def iter_search_memory_hypothesis_payloads(store: Any | None) -> list[dict[str, 
     if store is None:
         return []
     blocked = set(quarantined_session_ids(store))
-    latest: dict[str, tuple[tuple[str, str], dict[str, Any]]] = {}
+    grouped: dict[str, dict[str, tuple[ResearchEvent, dict[str, Any]]]] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
         if str(kind) != "HYPOTHESIS_VERSION":
             continue
         payload = _payload(record)
-        if not hypothesis_search_eligible(payload, blocked):
-            continue
         hyp_id = str(
             payload.get("hypothesis_version_id")
             or getattr(record, "hypothesis_version_id", None)
@@ -248,14 +246,38 @@ def iter_search_memory_hypothesis_payloads(store: Any | None) -> list[dict[str, 
         )
         if not hyp_id:
             continue
-        key = (
-            str(getattr(record, "effective_at", "") or ""),
-            str(getattr(record, "record_id", "") or ""),
-        )
-        previous = latest.get(hyp_id)
-        if previous is None or key >= previous[0]:
-            latest[hyp_id] = (key, payload)
-    return [latest[item][1] for item in sorted(latest)]
+        records = grouped.setdefault(hyp_id, {})
+        if record.record_id in records:
+            raise HficMemoryPolicyError("HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS")
+        records[record.record_id] = (record, payload)
+
+    selected: dict[str, dict[str, Any]] = {}
+    for hyp_id, records in grouped.items():
+        eligible = [record_id for record_id, (_, payload) in records.items()
+                    if hypothesis_search_eligible(payload, blocked)]
+        if not eligible:
+            continue
+
+        def descends_from(child_id: str, ancestor_id: str) -> bool:
+            seen: set[str] = set()
+            parent = records[child_id][0].supersedes_record_id
+            while parent in records:
+                if parent == ancestor_id:
+                    return True
+                if parent in seen:
+                    raise HficMemoryPolicyError("HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS")
+                seen.add(parent)
+                parent = records[parent][0].supersedes_record_id
+            return False
+
+        head = eligible[0]
+        for record_id in eligible[1:]:
+            if descends_from(record_id, head):
+                head = record_id
+            elif not descends_from(head, record_id):
+                raise HficMemoryPolicyError("HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS")
+        selected[hyp_id] = records[head][1]
+    return [selected[item] for item in sorted(selected)]
 
 
 def eligible_counts(store: Any | None) -> dict[str, int]:

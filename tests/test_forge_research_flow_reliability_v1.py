@@ -298,7 +298,7 @@ class SessionHistoryTests(unittest.TestCase):
         rows=[]
         for record_id,session,second in (('HYP-OLD','SESS-OLD',0),('HYP-NEW',CONTROL_SESSION,1)):
             payload={**body,'session_id':session}
-            row=event_fixture(record_id=record_id,record_kind='HYPOTHESIS_VERSION',payload=payload).model_copy(update={'run_id':None,'hypothesis_version_id':hyp_id,'effective_at':NOW+timedelta(seconds=second)})
+            row=event_fixture(record_id=record_id,record_kind='HYPOTHESIS_VERSION',payload=payload).model_copy(update={'run_id':None,'hypothesis_version_id':hyp_id,'effective_at':NOW+timedelta(seconds=second),'supersedes_record_id':'HYP-OLD' if record_id=='HYP-NEW' else None})
             rows.append(row)
         for record_id,session,reason,second in (('DEC-NEW',CONTROL_SESSION,'KILL_LOW_INFORMATION_VALUE',2),('DEC-LATE-OLD','SESS-OLD','KILL_MECHANISM',3)):
             payload={'decision_event_id':record_id,'hypothesis_version_id':hyp_id,'session_id':session,'decision_kind':'REJECT','reason_code':reason}
@@ -328,6 +328,43 @@ class SessionHistoryTests(unittest.TestCase):
         store=self._store_chain()
         store.rebuild_projection()
         self.assertEqual(len(list(store.iter_committed_records())),3)
+
+    def test_backdated_successor_is_latest_compact_session_after_rebuild(self):
+        from datetime import timedelta
+        from tests.test_research_store import event_fixture, canonical_payload, NOW
+        from solana_alpha_lab.factory.hfic_memory_policy import iter_search_memory_hypothesis_payloads
+        from solana_alpha_lab.factory.hfic_prior_memory import build_prior_memory_snapshot
+        store=self._store_chain()
+        latest=event_fixture(record_id='HYP-ROW-3',record_kind='HYPOTHESIS_VERSION',transaction_id='RESEARCH-TXN-HYP-3',payload={'hypothesis_version_id':'HYP-SAME','session_id':'SESS-3','definition_sha256':'a'*64})
+        latest=latest.model_copy(update={'run_id':None,'effective_at':NOW-timedelta(seconds=1),'supersedes_record_id':'HYP-ROW-2'})
+        store.append([latest],transaction_id=latest.transaction_id)
+        for session,reason in (('SESS-2','KILL_MECHANISM'),('SESS-3','KILL_LOW_INFORMATION_VALUE')):
+            record_id=f'DEC-{session}'
+            payload={'decision_event_id':record_id,'hypothesis_version_id':'HYP-SAME','session_id':session,'decision_kind':'REJECT','reason_code':reason}
+            body,digest=canonical_payload(payload)
+            row=event_fixture(record_id=record_id,record_kind='DECISION_EVENT',transaction_id=f'RESEARCH-TXN-{record_id}',payload=payload).model_copy(update={'run_id':None,'hypothesis_version_id':'HYP-SAME','payload_json':body,'payload_sha256':digest})
+            store.append([row],transaction_id=row.transaction_id)
+        for stage in ('before','after'):
+            with self.subTest(stage=stage):
+                if stage=='after':
+                    store.rebuild_projection()
+                selected=iter_search_memory_hypothesis_payloads(store)
+                self.assertEqual(len(selected),1)
+                self.assertEqual(selected[0]['session_id'],'SESS-3')
+                snapshot=build_prior_memory_snapshot(store,store_inventory_digest=store.diagnostics().committed_inventory_sha256,repo_root=ROOT)
+                self.assertEqual(snapshot['capsules'][0]['session_id'],'SESS-3')
+                self.assertEqual(snapshot['capsules'][0]['reason_code'],'KILL_LOW_INFORMATION_VALUE')
+
+    def test_ambiguous_hypothesis_memory_history_refuses_compaction(self):
+        from types import SimpleNamespace
+        from tests.test_research_store import event_fixture
+        from solana_alpha_lab.factory.hfic_memory_policy import (
+            HficMemoryPolicyError, iter_search_memory_hypothesis_payloads,
+        )
+        records=[event_fixture(record_id=f'HYP-UNRELATED-{i}',record_kind='HYPOTHESIS_VERSION',payload={'hypothesis_version_id':'HYP-SAME','session_id':f'SESS-{i}'}) for i in range(2)]
+        store=SimpleNamespace(iter_committed_records=lambda:iter(records))
+        with self.assertRaisesRegex(HficMemoryPolicyError,'HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS'):
+            iter_search_memory_hypothesis_payloads(store)
 
     def test_branching_history_remains_a_stable_identity_conflict(self):
         from solana_alpha_lab.factory.research_store import ResearchStoreError
