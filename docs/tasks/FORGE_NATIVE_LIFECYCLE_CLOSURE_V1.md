@@ -233,3 +233,14 @@ scripted mechanics only (extra synthetic control MAIN1/PREVIEW0), excluded
 from native8 envelope/numerator. Original Generator4/Critic1 remain. Next:
 one early architecture/DoD consultation, freeze compatible evaluation epoch,
 then native primary followed by transfer only after substantive closure.
+
+V2 early architecture finding: invalid current request lacked input hashes;
+added hashes of exact parsed raw query/scope bytes to public refusal, focused
+effects regression PASS. Original review NOT_READY retained. Original scripted
+control equality alone was not Q3: original numeric query had a list-oriented
+fixture claim. New separate scripted reference fixes its claim BEFORE values,
+uses minimal two-field authored intent and actual emitted canonical axes;
+query/card/frozen packet saved terminal/fresh reader PASS mechanics. No native
+acceptance inferred. Affected delta verification is part of the one early
+consultation. Native budget remains Generator4/Critic1. Evaluation candidate
+will freeze at <ARTIFACT_HOME>/evaluation-replan-v2 after this delta readback.

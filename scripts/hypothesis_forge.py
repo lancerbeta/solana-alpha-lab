@@ -1418,8 +1418,10 @@ def _cmd_discovery_execute(
 
     git_before = repository_git_snapshot(repo_root)
     try:
-        spec = json.loads(spec_path.read_text(encoding="utf-8"))
-        candidate_scope = json.loads(candidate_scope_path.read_text(encoding="utf-8"))
+        spec_input_bytes = spec_path.read_bytes()
+        scope_input_bytes = candidate_scope_path.read_bytes()
+        spec = json.loads(spec_input_bytes.decode("utf-8"))
+        candidate_scope = json.loads(scope_input_bytes.decode("utf-8"))
         binding_doc = None
         if binding_path is not None:
             binding_doc = json.loads(binding_path.read_text(encoding="utf-8"))
@@ -1496,7 +1498,12 @@ def _cmd_discovery_execute(
                     inventory_digest=scope_store.diagnostics().committed_inventory_sha256)
         except (GroundedDiscoveryError, GenerationContextError) as exc:
             return emit({"reason_code": exc.code, "detail": getattr(exc, "detail", {}),
-                "stage": "REQUEST_ADMISSION_BEFORE_MAIN", "values_loaded": False,
+                "stage": "REQUEST_ADMISSION_BEFORE_MAIN",
+                "source_refs": [
+                    {"input_kind": "QUERY_SPEC", "raw_sha256": hashlib.sha256(spec_input_bytes).hexdigest()},
+                    {"input_kind": "AUTHORED_SCOPE", "raw_sha256": hashlib.sha256(scope_input_bytes).hexdigest()},
+                ],
+                "values_loaded": False,
                 "writes": False, "scientific_negative": False,
                 "scientific_look_delta": {"main": 0, "adaptive": 0}}, exit_code=2)
         except (OSError, UnicodeDecodeError, json.JSONDecodeError):

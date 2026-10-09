@@ -63,8 +63,84 @@
     ],
     "frozen_sha256": "b96eeb5e1bc7e44ae22af74b1ae3d5aa9dde68564bdd37818f6c5d5a39b19533",
     "summary_sha256": "cc4f49f05afcbb5b9dcd5c36062cf8eb6e5f336fbf8aa7f5320d8828bdf32e3c",
-    "reproduce": "uv run --locked --managed-python python -B <ARTIFACT_HOME>/scripted_control.py --root <CODE_ROOT> --source <PRESERVED_BASE_SOURCE> --work <FRESH_DISPOSABLE_WORK>"
+    "reproduce": "uv run --locked --managed-python python -B <ARTIFACT_HOME>/scripted_control.py --root <CODE_ROOT> --source <PRESERVED_BASE_SOURCE> --work <FRESH_DISPOSABLE_WORK>",
+    "scope_match_limit": "EQUALITY_OF_AXES_ONLY_NOT_Q3; original fixture claim List A did not describe numeric query. Original bytes/terminal retained."
   },
   "source_provenance_recovery": "EXACT_SOURCE_LACKS_AXES_AND_SESSION_UNKNOWN_RETAINED",
-  "limits": "SYNTHETIC_ONLY_NO_NEW_NATIVE_ACCEPTANCE_OR_OLD_VERDICT_CHANGE"
+  "limits": "SYNTHETIC_ONLY_NO_NEW_NATIVE_ACCEPTANCE_OR_OLD_VERDICT_CHANGE",
+  "early_review_delta": {
+    "original_head": "398fa895235e26825d87f05e5c7399924f259993",
+    "original_packet_fingerprint": "a245e5b5d6f587893ec18d3832c2b19a9968f4881cefb0ea7c04757d970ba916",
+    "finding_current_input_provenance": "REPAIRED_HASH_EXACT_RAW_PARSED_INPUTS",
+    "focused_validation": {
+      "status": "PASS",
+      "count": 1,
+      "elapsed_s": 0.954
+    },
+    "semantic_reference_control": {
+      "native": false,
+      "session_id": "HFIC-SESS-9FD1F6509A6A57EE",
+      "main": 1,
+      "preview": 0,
+      "adaptive": 0,
+      "claim_fixed_before_values": true,
+      "minimal_authored_intent": {
+        "estimand": "mean PRICE_RELATIVE_PROXY E1800->E14400 in matched versus all same-decision eligible episodes",
+        "explanatory_condition": "delta(FIELD-HOLDER-COUNT-001,E300,E1800)>0"
+      },
+      "emitted_selected_claim": "Among ALL same-decision eligible synthetic episodes, positive holder-count delta E300->E1800 predicts a higher mean PRICE_RELATIVE_PROXY E1800->E14400 than the full eligible baseline; descriptive, non-causal and tiny-N only.",
+      "emitted_scope": {
+        "decision_timestamp": "E1800",
+        "estimand": "mean PRICE_RELATIVE_PROXY E1800->E14400 in matched versus all same-decision eligible episodes",
+        "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+        "explanatory_condition": "delta(FIELD-HOLDER-COUNT-001,E300,E1800)>0",
+        "population": "OPPORTUNITY_EPISODES",
+        "research_scope_rule_sha256": "f8f09a2f20656cbb2c6aa27143c06531df27ff2a2ee54204f9ac9ddc8f5d412b",
+        "research_scope_statement": "KIND=NUMERIC_IN_SCOPE; UNIVERSE=(ALL); SIGNAL=NONE; NUMERIC=1_PREDICATES; CONTRAST=SAME_DECISION_ELIGIBLE_BASELINE; SLICES=NONE; BASIS=EPISODE_T0; COVERAGE=REQUIRE_KNOWN_REFERENCED",
+        "target": "PRICE_RELATIVE_PROXY:E1800:E14400:FIELD-USD-PRICE-001"
+      },
+      "unknown_prior_relations": [
+        {
+          "hypothesis_version_id": "HYP-LC-TECHNICAL-PRIOR-001",
+          "question_id": null,
+          "question_id_is_not_a_scientific_difference": true,
+          "relation": "NON_BLOCKING_PRIOR"
+        },
+        {
+          "active_scope_restriction_established": false,
+          "applicability": "UNKNOWN",
+          "claim_dependency": "REQUIRES_INDEPENDENT_CLAIM_ASSESSMENT",
+          "guard_assessment": "NO_BLOCK_ESTABLISHED_BY_SCOPE_GUARD",
+          "hypothesis_version_id": "HYP-QUOTE-NATIVE-FRICTION-H900-V1",
+          "missing_fields": [
+            "prior.population",
+            "prior.decision_timestamp",
+            "prior.target",
+            "prior.estimand",
+            "prior.explanatory_condition",
+            "prior.evidence_surface_mode"
+          ],
+          "novelty": "UNKNOWN",
+          "question_id": null,
+          "question_id_is_not_a_scientific_difference": true,
+          "relation": "UNKNOWN_SCOPE_NEEDS_RESOLUTION",
+          "source_refs": [
+            {
+              "effective_at": "2026-08-25T00:00:00+00:00",
+              "first_reliable_available_at": "2026-08-25T00:00:00+00:00",
+              "payload_sha256": "7c47d4a2b89caf51d1dc418d560710759acaf008dab9149e8d4b8cb471a32eaf",
+              "record_id": "HYPOTHESIS-VERSION-A35639E5ABC640EB"
+            }
+          ],
+          "unknown_prior_is_evidence": false
+        }
+      ],
+      "frozen_sha256": "e3f551c849aea66d012ad250158e408fa9a32f714d233f3e3e86c51d55e301ef",
+      "question_input_sha256": "e33f6ad6421fcaf27fc12ea3d7a52a284c490911249cf910300a77aaca0da5f0",
+      "summary_sha256": "e1ca05bbc17f8805b8a43b2e86e13906f9b358c0c2c605d1eac8e14d84cebda7",
+      "reproduce": "uv run --locked --managed-python python -B tests/fixtures/forge_native_lifecycle_closure_v1/scripted_control_v2.py --root <CODE_ROOT> --source <PRESERVED_BASE_SOURCE> --work <FRESH_DISPOSABLE_WORK>"
+    },
+    "early_original_verdict": "NOT_READY_P1_ORIGINAL_REPORT_RETAINED",
+    "native_proof": "NONE_GENERATOR4_CRITIC1_UNCHANGED"
+  }
 }

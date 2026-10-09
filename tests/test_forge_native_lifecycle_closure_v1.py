@@ -164,6 +164,10 @@ class ReplanV2AdmissionTests(unittest.TestCase):
                 self.assertEqual(body['reason_code'],'CANDIDATE_SCOPE_FIELDS_REQUIRED')
                 self.assertEqual(body['detail']['stage'],'CURRENT_REQUEST_BEFORE_MAIN')
                 self.assertFalse(body['values_loaded']);self.assertFalse(body['writes'])
+                import hashlib
+                self.assertEqual(body['source_refs'],[
+                    {'input_kind':'QUERY_SPEC','raw_sha256':hashlib.sha256((home/'spec.json').read_bytes()).hexdigest()},
+                    {'input_kind':'AUTHORED_SCOPE','raw_sha256':hashlib.sha256((home/'scope.json').read_bytes()).hexdigest()}])
                 loader.assert_not_called();reserve.assert_not_called()
                 self.assertEqual(ResearchStore(home/'plane').diagnostics().committed_inventory_sha256,before)
                 self.assertEqual(list_operations(store),[]);self.assertEqual(list_discovery_looks(store,'scope-negative'),[])

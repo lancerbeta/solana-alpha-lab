@@ -32352,7 +32352,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: b5eb231ec6fa0d9bb7a716c353b6c0c0bd8aad3822bf3ec93272ee1565719b00}
+  integrity: {kind: sha256, sha256: a26265f73a47c676b09c693e4705b9cc459c0d5f2a64bd2c6d3b246bfca7a480}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -40868,7 +40868,7 @@ records:
     repository_path: docs/tasks/FORGE_NATIVE_LIFECYCLE_CLOSURE_V1.md
   integrity:
     kind: sha256
-    sha256: 75dc84a023c5519395740bf5be817e30319570f728914c7d19c95b818f6120ea
+    sha256: 3dee41dfad7e73b7a05f3726f26fc3fa5bece662701ac6da6af7c992de213515
   access:
     mode: read_only
     method: file
@@ -40946,7 +40946,7 @@ records:
     repository_path: tests/test_forge_native_lifecycle_closure_v1.py
   integrity:
     kind: sha256
-    sha256: 0d1765b276be819545d22043f22eb3f65d190d5c5cc95f9690f9c6a5dd350057
+    sha256: d774446cc35c6e874aaf173f4215a68931ce4b289145ec1c39623f02971c07aa
   access:
     mode: read_only
     method: file
