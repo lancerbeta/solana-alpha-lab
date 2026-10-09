@@ -32352,7 +32352,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: ae38f687f58fc2a35fbb90d906c81d4abfe8dd17011471a9c4c1af9901c3b7d5}
+  integrity: {kind: sha256, sha256: e6fd993c60a21bb2f20c66b6b949675343e75111dbe03a9f8ac092a3b694eb50}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32374,7 +32374,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: b44be0a57ea1f7d85bd784293d1ee388ef4d71ae5df243ff38e3dcb39f815581}
+  integrity: {kind: sha256, sha256: cd507a18712816c2e24c037091942e58a55f08670698d388627fb6a80b5b7a1f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -33413,7 +33413,7 @@ records:
   as_of: '2026-08-30'
   truth_owner: HFIC_LEGACY_SCIENCE_REBASE_AND_SUPPRESSION_SEMANTICS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_suppression_semantics.py', repository_path: src/solana_alpha_lab/factory/hfic_suppression_semantics.py}
-  integrity: {kind: sha256, sha256: 468b7ce47eab3118c0ceacea838882c334c116895a177c223f0b8fac21df0e1d}
+  integrity: {kind: sha256, sha256: f0d78edfa2a73928fd8afcd2cb5865b247698e744d6152e802e0ddf808a83ebf}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-LEGACY-SCIENCE-REBASE-001}
@@ -34658,7 +34658,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 2563fb2753d282125f27a25b45b38468d8f7ab48d03db8b5d86d5a5975bc5334}
+  integrity: {kind: sha256, sha256: 6bab362424d1573fc1d0041a71dc4de797a3164098fa366af3ba2c50341fad18}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -37090,7 +37090,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: HFIC_OPERATIONAL_MEMORY_QUARANTINE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_memory_policy.py', repository_path: src/solana_alpha_lab/factory/hfic_memory_policy.py}
-  integrity: {kind: sha256, sha256: 57e1984b1017f6cdbda6a4f78b947f019ba26448393e6041d66b291237c54195}
+  integrity: {kind: sha256, sha256: 2c1b535d4f62b0f5d81404890fef3455529091912cfcaf5b4552578410ea9a6c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001}
@@ -37752,7 +37752,7 @@ records:
   as_of: '2026-09-15'
   truth_owner: HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py', repository_path: src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py}
-  integrity: {kind: sha256, sha256: 36c6716772c92355f7eb042375be9fe229b39f2d868193d8987c85e1c5c89b22}
+  integrity: {kind: sha256, sha256: a37de24d7f9b6bd89955676e91533ab1c1d974889f6980e3dcc2a0384b628223}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001}
@@ -38570,7 +38570,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_preflight.py', repository_path: src/solana_alpha_lab/factory/hfic_preflight.py}
-  integrity: {kind: sha256, sha256: dacf0a16b2b2d2e11c0c840155d043ccf72f8ee64755c6f688f011f366fdd9d1}
+  integrity: {kind: sha256, sha256: eee82df62964a97ab8a293154f3fac7d0024a5663a9d8c65fe2f7887c49d11cb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}

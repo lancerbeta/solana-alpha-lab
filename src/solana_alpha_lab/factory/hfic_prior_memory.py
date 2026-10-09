@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -155,9 +156,8 @@ def empty_prior_memory_snapshot(
     )
 
 
-# Eligibility is currently every committed HYPOTHESIS_VERSION visible in the
-# exact preflight-bound store. A later append-only quarantine/rebase filter may
-# drop ids before capsule emission without changing capsule schema or ranker.
+# Explicit as_of limits current packet content on both research-time axes.
+# Omitted as_of retains all-committed ledger inspection for legacy callers.
 def build_prior_memory_snapshot(
     store: Any | None,
     *,
@@ -165,6 +165,7 @@ def build_prior_memory_snapshot(
     repo_root: Path | str | None = None,
     max_records: int | None = None,
     max_bytes: int | None = None,
+    as_of: str | datetime | None = None,
 ) -> dict[str, Any]:
     records_bound, bytes_bound = prior_memory_bounds(
         repo_root, max_records=max_records, max_bytes=max_bytes
@@ -178,12 +179,14 @@ def build_prior_memory_snapshot(
         )
     from solana_alpha_lab.factory.hfic_memory_policy import (
         iter_search_memory_hypothesis_payloads,
+        research_memory_cutoff,
     )
 
-    decisions = latest_hypothesis_decisions(store)
-    session_scope = _session_scope_index(store)
+    cutoff = research_memory_cutoff(as_of)
+    decisions = latest_hypothesis_decisions(store, as_of=cutoff)
+    session_scope = _session_scope_index(store, as_of=cutoff)
     capsules_by_id: dict[str, dict[str, Any]] = {}
-    for payload in iter_search_memory_hypothesis_payloads(store):
+    for payload in iter_search_memory_hypothesis_payloads(store, as_of=cutoff):
         hyp_id = str(payload.get("hypothesis_version_id") or "")
         if not hyp_id:
             raise PriorMemoryUnidentifiedError()
@@ -250,16 +253,25 @@ def session_identity(payload: Mapping[str, Any]) -> str | None:
     return value if isinstance(value, str) and value else None
 
 
-def latest_hypothesis_decisions(store: Any) -> dict[tuple[str, str | None], dict[str, str]]:
+def latest_hypothesis_decisions(
+    store: Any, *, as_of: str | datetime | None = None,
+) -> dict[tuple[str, str | None], dict[str, str]]:
     """Latest DECISION_EVENT disposition per hypothesis and session.
 
     Shared read-only resolver for Critic prior-memory capsules and Forge
     Prompt-A ranked-prior projection. Do not fork a second decision walker.
     """
+    from solana_alpha_lab.factory.hfic_memory_policy import (
+        research_memory_cutoff, research_record_visible_as_of,
+    )
+
+    cutoff = research_memory_cutoff(as_of)
     latest: dict[tuple[str, str | None], tuple[tuple[str, str], str, str]] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
         if kind != "DECISION_EVENT":
+            continue
+        if not research_record_visible_as_of(record, cutoff):
             continue
         payload = _payload_mapping(record)
         hyp_id = str(
@@ -514,13 +526,22 @@ def _capsule_from_payload(
     return capsule
 
 
-def _session_scope_index(store: Any) -> dict[str, dict[str, Any]]:
+def _session_scope_index(
+    store: Any, *, as_of: str | datetime | None = None,
+) -> dict[str, dict[str, Any]]:
     """Recover surface and discovery scope from immutable cycle records."""
 
+    from solana_alpha_lab.factory.hfic_memory_policy import (
+        research_memory_cutoff, research_record_visible_as_of,
+    )
+
+    cutoff = research_memory_cutoff(as_of)
     index: dict[str, dict[str, Any]] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
         if kind != "RESEARCH_CYCLE":
+            continue
+        if not research_record_visible_as_of(record, cutoff):
             continue
         payload = _payload_mapping(record)
         session_id = str(payload.get("session_id") or "")

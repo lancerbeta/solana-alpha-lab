@@ -61,9 +61,10 @@
     "target": "PRICE_RELATIVE_PROXY:E1800:E14400:FIELD-USD-PRICE-001"
   },
   "exact_refusal": {
-    "next_action": "READ_EXACT_PRIOR_REUSE_SAVED_RESULT",
+    "next_action": "READ_EXACT_PRIOR_VERIFY_SESSION_OR_BLOCK",
     "reason_code": "EXACT_PRIOR_SCOPE_MATCH",
     "scientific_negative": false,
+    "status": "BLOCKED",
     "writes": false
   },
   "historical_payload_hashes": {

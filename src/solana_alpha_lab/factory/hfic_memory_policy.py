@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Mapping, Sequence
+from datetime import UTC, datetime
 from typing import Any
 
 from solana_alpha_lab.factory.hfic_clock import (
@@ -228,9 +229,37 @@ def hypothesis_search_eligible(
     return session_id not in set(quarantined)
 
 
-def iter_search_memory_hypothesis_payloads(store: Any | None) -> list[dict[str, Any]]:
+def research_memory_cutoff(as_of: str | datetime | None) -> datetime | None:
+    """Resolve an explicit research-time cutoff; None retains ledger inspection."""
+    if as_of is None:
+        return None
+    try:
+        value = datetime.fromisoformat(as_of.replace("Z", "+00:00")) if isinstance(as_of, str) else as_of
+        if not isinstance(value, datetime) or value.tzinfo is None:
+            raise ValueError("timezone required")
+        return value.astimezone(UTC)
+    except ValueError as exc:
+        raise HficMemoryPolicyError("HFIC_MEMORY_AS_OF_INVALID") from exc
+
+
+def research_record_visible_as_of(record: Any, cutoff: datetime | None) -> bool:
+    """A committed row is current only after both valid and availability time."""
+    if cutoff is None:
+        return True
+    effective = getattr(record, "effective_at", None)
+    available = getattr(record, "first_reliable_available_at", None)
+    if (not isinstance(effective, datetime) or effective.tzinfo is None
+            or not isinstance(available, datetime) or available.tzinfo is None):
+        raise HficMemoryPolicyError("HFIC_MEMORY_PIT_UNAVAILABLE")
+    return effective.astimezone(UTC) <= cutoff and available.astimezone(UTC) <= cutoff
+
+
+def iter_search_memory_hypothesis_payloads(
+    store: Any | None, *, as_of: str | datetime | None = None,
+) -> list[dict[str, Any]]:
     if store is None:
         return []
+    cutoff = research_memory_cutoff(as_of)
     blocked = set(quarantined_session_ids(store))
     grouped: dict[str, dict[str, tuple[ResearchEvent, dict[str, Any]]]] = {}
     for record in store.iter_committed_records():
@@ -270,8 +299,9 @@ def iter_search_memory_hypothesis_payloads(store: Any | None) -> list[dict[str, 
                         and record_id not in ancestors[previous_id]):
                     raise HficMemoryPolicyError("HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS")
 
-        eligible = [record_id for record_id, (_, payload) in records.items()
-                    if hypothesis_search_eligible(payload, blocked)]
+        eligible = [record_id for record_id, (record, payload) in records.items()
+                    if hypothesis_search_eligible(payload, blocked)
+                    and research_record_visible_as_of(record, cutoff)]
         if not eligible:
             continue
         head = max(eligible, key=lambda record_id: len(ancestors[record_id]))
@@ -729,6 +759,8 @@ __all__ = [
     "memory_policy_status",
     "preview_memory_policy",
     "quarantined_session_ids",
+    "research_memory_cutoff",
+    "research_record_visible_as_of",
     "search_identity_sha256",
     "session_memory_eligibility",
 ]

@@ -33,7 +33,7 @@ from solana_alpha_lab.factory.hfic_prior_memory import (
     build_prior_memory_snapshot,
 )
 from solana_alpha_lab.factory.hfic_suppression_semantics import (
-    candidate_matches_hard_close,
+    candidate_hard_close_entry,
     family_hard_close_terminals,
     ledger_from_receipt,
 )
@@ -1993,11 +1993,13 @@ def freeze_draft(
     if store is not None and closed_family_ledger:
         closed_or_suppressed_collision_count = 0
         for card in candidates:
-            hit = candidate_matches_hard_close(card, closed_family_ledger)
+            hit = candidate_hard_close_entry(card, closed_family_ledger)
             if hit is not None:
                 closed_or_suppressed_collision_count += 1
                 raise HficSessionError("CLOSED_FAMILY_REOPEN", detail={
-                    "stage": "CANDIDATE_SUPPRESSION", "source_terminal": hit,
+                    "stage": "CANDIDATE_SUPPRESSION", "source_terminal": hit.get("terminal"),
+                    "scope_kind": hit.get("scope_kind"), "scope_id": hit.get("scope_id"),
+                    "source_receipt": hit.get("source_receipt"),
                     "next_action": "KEEP_TYPED_CLOSE_SELECT_AUTHORIZED_DISTINCT_SCOPE",
                 })
     elif store is not None:
@@ -2185,14 +2187,17 @@ def freeze_draft(
         )[:16].upper()
     _bind_packet_session_id(packet, session_id)
     if critic_packet_version == CRITIC_PACKET_VERSION_CURRENT:
+        from solana_alpha_lab.factory.hfic_memory_policy import HficMemoryPolicyError
+
         snapshot_digest = store_digest if isinstance(store_digest, str) else "0" * 64
         try:
             packet["prior_memory"] = build_prior_memory_snapshot(
                 store,
                 store_inventory_digest=snapshot_digest,
                 repo_root=repo_root,
+                as_of=bound["session_started_at"] if bound is not None else None,
             )
-        except (PriorMemoryCapacityError, PriorMemoryUnidentifiedError) as exc:
+        except (PriorMemoryCapacityError, PriorMemoryUnidentifiedError, HficMemoryPolicyError) as exc:
             raise HficSessionError(exc.code) from exc
     grounded = draft.get("grounded_evidence")
     if isinstance(grounded, Mapping):
@@ -2580,11 +2585,13 @@ def _freeze_no_worthy(
         for card in draft_candidates:
             if not isinstance(card, Mapping):
                 continue
-            hit = candidate_matches_hard_close(card, closed_family_ledger)
+            hit = candidate_hard_close_entry(card, closed_family_ledger)
             if hit is not None:
                 closed_or_suppressed_collision_count += 1
                 raise HficSessionError("CLOSED_FAMILY_REOPEN", detail={
-                    "stage": "CANDIDATE_SUPPRESSION", "source_terminal": hit,
+                    "stage": "CANDIDATE_SUPPRESSION", "source_terminal": hit.get("terminal"),
+                    "scope_kind": hit.get("scope_kind"), "scope_id": hit.get("scope_id"),
+                    "source_receipt": hit.get("source_receipt"),
                     "next_action": "KEEP_TYPED_CLOSE_SELECT_AUTHORIZED_DISTINCT_SCOPE",
                 })
     elif store is not None:

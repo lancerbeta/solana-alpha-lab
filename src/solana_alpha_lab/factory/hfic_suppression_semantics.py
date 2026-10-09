@@ -480,10 +480,10 @@ def _family_stems(terminal: str) -> list[str]:
     return stems
 
 
-def candidate_matches_hard_close(
+def candidate_hard_close_entry(
     card: Mapping[str, Any],
     ledger: Sequence[Mapping[str, Any]],
-) -> str | None:
+) -> dict[str, Any] | None:
     blob = _compact(
         " ".join(
             str(card.get(key) or "")
@@ -492,13 +492,18 @@ def candidate_matches_hard_close(
     )
     if not blob:
         return None
-    for terminal in family_hard_close_terminals(ledger):
+    for item in ledger:
+        if not isinstance(item, Mapping) or item.get("reopen_forbidden") is not True:
+            continue
+        if str(item.get("scope_kind") or "") not in {SCOPE_FAMILY, SCOPE_AMBIGUOUS}:
+            continue
+        terminal = str(item.get("terminal") or "")
         for stem in _family_stems(terminal):
             compact = _compact(stem)
             if len(compact) < 12:
                 continue
             if compact in blob:
-                return terminal
+                return dict(item)
     for item in exact_scope_close_entries(ledger):
         terminal = str(item.get("terminal") or "")
         tokens = [terminal]
@@ -510,8 +515,17 @@ def candidate_matches_hard_close(
             if len(compact) < 12:
                 continue
             if compact in blob:
-                return terminal
+                return item
     return None
+
+
+def candidate_matches_hard_close(
+    card: Mapping[str, Any],
+    ledger: Sequence[Mapping[str, Any]],
+) -> str | None:
+    """Compatibility terminal lookup; entry lookup retains its exact locator."""
+    hit = candidate_hard_close_entry(card, ledger)
+    return str(hit.get("terminal")) if hit is not None else None
 
 
 def ledger_from_receipt(receipt: Mapping[str, Any] | None) -> list[dict[str, Any]]:

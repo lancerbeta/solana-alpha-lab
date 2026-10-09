@@ -368,6 +368,51 @@ class SessionHistoryTests(unittest.TestCase):
                 self.assertEqual(snapshot['capsules'][0]['session_id'],'SESS-3')
                 self.assertEqual(snapshot['capsules'][0]['reason_code'],'KILL_LOW_INFORMATION_VALUE')
 
+    def test_compact_forge_and_critic_memory_obey_research_cutoff(self):
+        import tempfile
+        from datetime import timedelta
+        from tests.test_research_store import event_fixture, NOW
+        from tests.test_hfic_forge_prior_context_capacity_repair_v1 import _fat_hfic_candidate
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from solana_alpha_lab.factory.hfic_memory_policy import iter_search_memory_hypothesis_payloads
+        from solana_alpha_lab.factory.hfic_prior_memory import build_prior_memory_snapshot, latest_hypothesis_decisions
+        from solana_alpha_lab.factory.hfic_reopened_prior_routing import ranked_prior_entries_for_ids
+        from solana_alpha_lab.factory.prior_work import query_hypotheses
+        with tempfile.TemporaryDirectory() as temporary:
+            store=ResearchStore(Path(temporary))
+            body=json.loads(_fat_hfic_candidate(1,transaction_id='RESEARCH-TXN-TEMPLATE').payload_json)
+            hyp_id=body['hypothesis_version_id']
+            for record_id,session,parent,effective,available in (
+                ('HYP-CUTOFF-A','SESS-A',None,NOW,NOW),
+                ('HYP-CUTOFF-B','SESS-B','HYP-CUTOFF-A',NOW+timedelta(seconds=3),NOW+timedelta(seconds=1)),
+            ):
+                row=event_fixture(record_id=record_id,record_kind='HYPOTHESIS_VERSION',transaction_id='RESEARCH-TXN-'+record_id,payload={**body,'session_id':session}).model_copy(update={'run_id':None,'hypothesis_version_id':hyp_id,'supersedes_record_id':parent,'effective_at':effective,'first_reliable_available_at':available})
+                store.append([row],transaction_id=row.transaction_id)
+            for record_id,session,reason,effective,available in (
+                ('DEC-CUTOFF-A','SESS-A','KILL_LOW_INFORMATION_VALUE',NOW,NOW),
+                ('DEC-CUTOFF-A-FUTURE','SESS-A','KILL_MECHANISM',NOW+timedelta(seconds=3),NOW+timedelta(seconds=1)),
+                ('DEC-CUTOFF-B','SESS-B','KILL_UNBOUND_EVIDENCE',NOW+timedelta(seconds=3),NOW+timedelta(seconds=1)),
+            ):
+                payload={'decision_event_id':record_id,'hypothesis_version_id':hyp_id,'session_id':session,'decision_kind':'REJECT','reason_code':reason}
+                row=event_fixture(record_id=record_id,record_kind='DECISION_EVENT',transaction_id='RESEARCH-TXN-'+record_id,payload=payload).model_copy(update={'run_id':None,'hypothesis_version_id':hyp_id,'effective_at':effective,'first_reliable_available_at':available})
+                store.append([row],transaction_id=row.transaction_id)
+            store.rebuild_projection()
+            projection=Path(temporary)/'projections'/'research_memory.duckdb'
+            for as_of,session,reason in (
+                ('2026-08-25T12:30:02Z','SESS-A','KILL_LOW_INFORMATION_VALUE'),
+                ('2026-08-25T12:30:04Z','SESS-B','KILL_UNBOUND_EVIDENCE'),
+            ):
+                with self.subTest(as_of=as_of):
+                    visible=iter_search_memory_hypothesis_payloads(store,as_of=as_of)
+                    self.assertEqual(visible[0]['session_id'],session)
+                    self.assertEqual(len(visible),1)
+                    self.assertEqual(latest_hypothesis_decisions(store,as_of=as_of)[(hyp_id,session)]['reason_code'],reason)
+                    snapshot=build_prior_memory_snapshot(store,store_inventory_digest=store.diagnostics().committed_inventory_sha256,repo_root=ROOT,as_of=as_of)
+                    self.assertEqual((snapshot['capsules'][0]['session_id'],snapshot['capsules'][0]['reason_code']),(session,reason))
+                    ranked=ranked_prior_entries_for_ids([hyp_id],visible,store=store,as_of=as_of)
+                    self.assertEqual(ranked[0]['reason_code'],reason)
+                    self.assertEqual(query_hypotheses(projection,as_of)[-1]['session_id'],session)
+
     def test_ambiguous_hypothesis_memory_history_refuses_compaction(self):
         from types import SimpleNamespace
         from tests.test_research_store import event_fixture
@@ -698,7 +743,7 @@ class EpisodeFlowTests(unittest.TestCase):
                 prior['claim']+=' Historical '+label+' question.'
             identity=candidate_identity(prior);hyp_id='HYP-FLOW-MATRIX-'+label
             payload={**prior,'hypothesis_version_id':hyp_id,'definition_sha256':identity.full_sha256,'hfic_protocol':'HFIC-V1.2'}
-            now=datetime(2026,10,16,tzinfo=UTC)
+            now=datetime(2026,10,8,tzinfo=UTC)
             records.append(_event(record_id='REC-'+hyp_id,kind=RecordKind.HYPOTHESIS_VERSION,entity_id=hyp_id,hypothesis_version_id=hyp_id,payload=payload,created=now))
             records.append(_event(record_id='DEC-'+hyp_id,kind=RecordKind.DECISION_EVENT,entity_id='DEC-'+hyp_id,hypothesis_version_id=hyp_id,payload={'hypothesis_version_id':hyp_id,'decision_kind':'PARK' if label=='PARK' else 'REJECT','reason_code':reason},created=now))
             expected[hyp_id]=(reason,status)
@@ -720,18 +765,24 @@ class EpisodeFlowTests(unittest.TestCase):
         lookup=self.cli('prior','--candidate',json.dumps(card))
         matches={row.get('candidate_id'):row for row in lookup['matches']}
         self.assertEqual(matches['HYP-FLOW-MATRIX-EXACT']['match_kind'],'EXACT')
+        self.assertIsNone(matches['HYP-FLOW-MATRIX-EXACT']['session_id'])
         self.assertEqual(matches['HYP-FLOW-MATRIX-RELATED']['match_kind'],'RELATED_PRIOR')
         budget=journal_occupancy(store,pre['search_key_sha256'])
         before=store.diagnostics().committed_inventory_sha256
         exact_body,exact_pre=self.authored_draft(old_evidence,old_scope,initial['owner_focus'])
         exact_denied=self.cli('persist-draft','--draft',self.write('exact.json',exact_body),'--preflight-receipt',self.write('exact-pre.json',exact_pre),ok=False)
         self.assertEqual(exact_denied['reason_code'],'EXACT_PRIOR_SCOPE_MATCH',exact_denied)
+        self.assertEqual(exact_denied['status'],'BLOCKED')
+        self.assertEqual(exact_denied['next_action'],'READ_EXACT_PRIOR_VERIFY_SESSION_OR_BLOCK')
+        self.assertIn('session_id=null',exact_denied['owner_readout'])
         self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
         blocked=copy.deepcopy(body)
         blocked['candidates'][0]['claim']+=' FLOW_BOUND_LIST_CONTRAST; renamed label cannot reopen.'
         blocked['candidates'][0]['label']='RENAMED-QUESTION';blocked['selected_candidate_ref']='RENAMED-QUESTION'
         denied=self.cli('persist-draft','--draft',self.write('closed.json',blocked),'--preflight-receipt',self.write('pre.json',pre),ok=False)
         self.assertEqual(denied['reason_code'],'CLOSED_FAMILY_REOPEN',denied)
+        self.assertEqual(denied['detail']['scope_id'],closed[0]['scope_id'])
+        self.assertEqual(denied['detail']['source_receipt'],closed[0]['source_receipt'])
         self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
         generated,frozen=self.persist_and_freeze(body,pre)
         capsules={row['hypothesis_version_id']:row for row in frozen['critic_input_packet']['prior_memory']['capsules']}

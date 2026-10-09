@@ -878,6 +878,7 @@ def rank_prior_candidate_ids(
     feature_hints: list[str],
     limit: int = MAX_RANKED_PRIORS,
     payloads: Sequence[Mapping[str, Any]] | None = None,
+    as_of: str | datetime | None = None,
 ) -> tuple[list[str], int]:
     from solana_alpha_lab.factory.hfic_memory_policy import (
         iter_search_memory_hypothesis_payloads,
@@ -896,7 +897,7 @@ def rank_prior_candidate_ids(
     source = (
         payloads
         if payloads is not None
-        else iter_search_memory_hypothesis_payloads(store)
+        else iter_search_memory_hypothesis_payloads(store, as_of=as_of)
     )
     for payload in source:
         hyp_id = payload.get("hypothesis_version_id")
@@ -1943,6 +1944,9 @@ def build_forge_context_packet(
     selection_caveat: Mapping[str, Any] | None = None,
     accounting_root: str | None = None,
 ) -> tuple[dict[str, Any], str]:
+    # Research-log visibility is bound to this preflight, not the market
+    # research_memory_as_of carried by the commissioned data proof.
+    prior_cutoff = stage_time if stage_time is not None else capture_stage_time(clock)
     packet_bound = forge_context_packet_max_bytes(evidence_surface_mode)
     datasets, warnings = enumerate_rdp_datasets(
         Path(data_root),
@@ -2059,6 +2063,7 @@ def build_forge_context_packet(
         owner_focus=owner_focus,
         feature_hints=usable_hint_ids,
         payloads=search_payloads,
+        as_of=prior_cutoff,
     )
     from solana_alpha_lab.factory.hfic_reopened_prior_routing import (
         BODY_INCOMPLETE,
@@ -2076,12 +2081,13 @@ def build_forge_context_packet(
             iter_search_memory_hypothesis_payloads as _iter_hv,
         )
 
-        body_source = _iter_hv(store)
+        body_source = _iter_hv(store, as_of=prior_cutoff)
     try:
         ranked_prior_entries = ranked_prior_entries_for_ids(
             ranked,
             body_source,
             store=store,
+            as_of=prior_cutoff,
         )
     except ReopenedPriorRoutingError as exc:
         raise HficPreflightError(str(exc) or BODY_INCOMPLETE) from exc

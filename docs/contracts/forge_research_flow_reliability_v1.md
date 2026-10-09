@@ -89,6 +89,16 @@ reliable availability and their `effective_at`. A known future decision or
 origin is not a current state. Direct SQL projection views are current-state
 readouts and do not implement this historical cutoff.
 
+Compact Forge/Critic prior selection uses the bound preflight
+`session_started_at` as its research-log cutoff. HYP, DEC and recovered session
+scope become current only after both availability and effective time; future
+chain members still participate in structural lineage validation but cannot
+displace the visible card or its own-session verdict. The commissioned
+`research_memory_as_of` dates market evidence, not research-log visibility.
+An exact prior without `session_id` blocks `show-session` and retains its
+`candidate_id` locator; typed family-close refusals expose the matched ledger
+`scope_id` and `source_receipt` when present.
+
 Existing prefreeze recovery resumes valid historical legacy-shape drafts from
 original source bytes and saved look. Missing/corrupt context, parent or genuine
 semantic contradiction remains typed blocker; no root reset or new attempt.

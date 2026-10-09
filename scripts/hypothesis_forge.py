@@ -3190,8 +3190,12 @@ def cmd_vision_acceptance(
         min_usable_yield_eligible=0,
     )
     extras = [item["payload"] for item in resolve_all_reopened_priors(repo_root)]
+    from solana_alpha_lab.factory.hfic_clock import capture_stage_time
+
+    prior_cutoff = capture_stage_time()
     planned = overlay_search_payloads(
-        store, extras, [DEFECTIVE_CONTROL_SESSION_ID]
+        store, extras, [DEFECTIVE_CONTROL_SESSION_ID],
+        as_of=prior_cutoff,
     )
     try:
         ctx_packet, _digest = build_forge_context_packet(
@@ -3207,6 +3211,7 @@ def cmd_vision_acceptance(
                 preview.get("research_memory_as_of") or "2026-09-15T00:00:00Z"
             ),
             store=store,
+            stage_time=prior_cutoff,
             persist=False,
             search_payloads=planned,
             evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
@@ -5196,14 +5201,14 @@ def main(argv: list[str] | None = None) -> int:
         if code == "EXACT_PRIOR_SCOPE_MATCH":
             print(code, file=sys.stderr)
             return emit({"reason_code": code, "scientific_negative": False,
-                         "writes": False,
-                         "owner_readout": "Точное предыдущее исследование уже сохранено. Выполните prior --candidate с текущей карточкой, возьмите session_id совпадения и откройте show-session --session-id. Новый look не открывайте.",
-                         "next_action": "READ_EXACT_PRIOR_REUSE_SAVED_RESULT"}, exit_code=2)
+                         "writes": False, "status": "BLOCKED",
+                         "owner_readout": "Точный prior запрещает повторный look. Выполните prior --candidate с текущей карточкой. Если у точного совпадения есть session_id, откройте show-session --session-id. Если session_id=null, show-session недоступен: сохраните candidate_id как указатель на историческую запись и остановитесь до проверки её результата. Новый look не открывайте.",
+                         "next_action": "READ_EXACT_PRIOR_VERIFY_SESSION_OR_BLOCK"}, exit_code=2)
         if isinstance(exc, HficSessionError) and code == "CLOSED_FAMILY_REOPEN":
             print(code, file=sys.stderr)
             return emit({"reason_code": code, "detail": exc.detail,
                          "scientific_negative": False, "writes": False, "status": "BLOCKED",
-                         "owner_readout": "Эта область уже закрыта отдельным typed family ledger; источник указан в detail.source_terminal. Сохраните закрытие. Новый существенно отличный scope возможен только с отдельным основанием; переименование и повтор той же карточки не подходят.",
+                         "owner_readout": "Эта область закрыта typed ledger. Проверьте detail.scope_id и detail.source_receipt вместе с detail.source_terminal; если locator отсутствует, проверьте ledger до нового решения. Сохраните закрытие. Существенно иной scope требует отдельного основания; переименование карточки не подходит.",
                          "next_action": exc.detail["next_action"]}, exit_code=2)
         if isinstance(exc, HficSessionError) and code.startswith("FORGE_CONTEXT_"):
             print(code, file=sys.stderr)
