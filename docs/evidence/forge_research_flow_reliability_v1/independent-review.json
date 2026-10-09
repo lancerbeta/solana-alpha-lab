@@ -4,8 +4,8 @@
   "as_of": "2026-10-09",
   "task_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1",
   "review_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1-REVIEW",
-  "reviewed_bindings_sha256": "bfe4668b3e6f573321fc13bfc0e50e4c03255372e975662f3c19a1fe7809e907",
-  "reviewed_inventory_sha256": "626fc4cd085583877356963190310aed2688d20c6e8c8f24e3e2613547355711",
+  "reviewed_bindings_sha256": "db38f1039843235e6cc20a7a987b9f621c10ca642b8f1062fd3604cd664cc0be",
+  "reviewed_inventory_sha256": "6561c0a0d826712bafbfdeb008b720374d986e68b85c50292d284a2c658dd3b8",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -17,28 +17,28 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "EXACT_HEAD_CONTENT_AND_D12_RECEIPT_NO_P0_P1"
+        "EXACT_HEAD_CONTENT_ORPHAN_RECOVERY_AND_LATE_FREEZE_RECEIPT_NO_P0_P1"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "D01_D17_CONTENT_D12_INDEPENDENT_CONTEXT_D18_LIVE_BLOCKED"
+        "D01_D17_FALSIFIERS_D15_MEASURED_RECOVERY_D18_LIVE_BLOCKED_NO_P0_P1"
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "LINEAGE_PIT_RECOVERY_D12_MACHINE_EVENT_LINK_NO_P0_P1"
+        "LINEAGE_PIT_SLOT_RESERVATION_LATE_CONTEXT_WRITE_NO_P0_P1"
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "AMBIGUOUS_HYP_HISTORY_OWNER_LOCATOR_AND_NATIVE_KILL_STOP_NO_P0_P1"
+        "SLOT_OWNER_FOCUS_AND_INVENTORY_DELTA_SAFE_RECOVERY_NO_P0_P1"
       ]
     }
   ],
