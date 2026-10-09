@@ -7,6 +7,32 @@
     "NO_FULL_NATIVE_GENERATOR_CAPABILITY",
     "NO_MERGE"
   ],
+  "remediation_history": [
+    {
+      "finding": "SHARED_RESULT_DETAIL_FANOUT_WRONGLY_LIMITED_TO_ONE_SOURCE",
+      "observed_head": "706e9170c6aaef02b7acdf382cfe8de96aa3d069",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "236cf3fea4e4f7bfd8591093851d77fcf2e0c618",
+      "role": "CODE_REVIEWER",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "PUBLIC_CONTEXT_FAILURE_RECOVERY_LOSES_SOURCE_BINDINGS",
+      "observed_head": "236cf3fea4e4f7bfd8591093851d77fcf2e0c618",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "20cdc7f3fe5bdb541d6961fe996b379bec0ddd90",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MINOR"
+    },
+    {
+      "finding": "ACTIVE_CONTRACT_NAMES_ABSENT_QUERY_GRAMMAR_PATH",
+      "observed_head": "236cf3fea4e4f7bfd8591093851d77fcf2e0c618",
+      "prior_verdict": "NOT_READY",
+      "resolved_by_head": "20cdc7f3fe5bdb541d6961fe996b379bec0ddd90",
+      "role": "OWNER_UX_CRITIC",
+      "severity": "MINOR"
+    }
+  ],
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -14,40 +40,45 @@
     "OWNER_UX_CRITIC"
   ],
   "review_id": "FORGE_EVIDENCE_GUIDED_GENERATION_V1-REVIEW",
-  "reviewed_bindings_sha256": "",
-  "reviewed_inventory_sha256": "",
+  "reviewed_bindings_sha256": "3bb2879c5773a05a3bcbe523a27fa4085d62576c735e03e61411a0f783d0eae7",
+  "reviewed_inventory_sha256": "0d4198e0360116783b7fa5be80be7a639ab53f72466af19532f2e9ca2503d0a0",
   "reviews": [
     {
-      "findings": [
-        "ISOLATED_FINAL_REVIEW_PENDING"
-      ],
+      "findings": [],
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     {
-      "findings": [
-        "ISOLATED_FINAL_REVIEW_PENDING"
-      ],
+      "findings": [],
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     {
       "findings": [
-        "ISOLATED_FINAL_REVIEW_PENDING"
+        "packet_fingerprint_sha256=92501c39716a7343965f28c658b799e58edc87dd760eec99af0c0ad9a44c8a84",
+        "SEMANTIC_PASS: frozen.diff/task/six evidence assets match; independently materialized original hashes1493 files verified.",
+        "Full eligible prior-scope guard precedes ranking; mandatory sources retained; selection completeness is separate from archive completeness in packet. Receipt does not establish global novelty.",
+        "UNKNOWN applicability, MODEL_REVIEW_ONLY, NOT_RECORDED, SAVED_DESCRIPTIVE_RESULT_ONLY and family_suppression_authority=false retain meaning; lifecycle/KILL/technical refusal gain no new scientific authority.",
+        "Both availability clocks and verdict own-session retained; original cutoff and durable source bindings enforced; stale details refuse; episode prefix preview excludes target.",
+        "Legacy snapshot1.0/packet1.0-1.4 remain immutable; fresh1.5 inherits1.4 grounding with working1.1; mandatory overflow precedes durable draft/slot; rollback preserves readers and original charges.",
+        "Selector owns projection only. Existing eligibility/closure/admission/calculation/accounting owners remain authoritative. Verified Parquet/manifests/immutable artifacts preserve truth through projection recovery.",
+        "Bounded reuse of existing factory owners and private APIs inside factory package; no new dependency/service or private API import across unrelated task boundaries.",
+        "Native evidence establishes0 core positive complete handoffs, one additional handoff, refused native finalize Git drift. Full native capability/comparative gain remain excluded.",
+        "Technical tests can pass while hypotheses remain false or overfit: descriptive observations cannot prove conjunction/independence/causal effect/executable economics. These remain UNKNOWN or NOT_EVALUATED; technical PASS is not scientific acceptance.",
+        "Falsifiers: persist despite hidden exact close, future finding at original cutoff, durable write on mandatory overflow, hidden partition corruption bypass. Executed archived checks cover these refusals. No blocking defect/premise defect/authority widening found; no required correction.",
+        "Isolated read-only launch without implementation transcript; packet information path does not cryptographically attest live launch, model diversity UNPROVEN; no canonical DONE/merge/full native capability claimed."
       ],
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     },
     {
-      "findings": [
-        "ISOLATED_FINAL_REVIEW_PENDING"
-      ],
+      "findings": [],
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
     }
   ],
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "task_id": "FORGE_EVIDENCE_GUIDED_GENERATION_V1",
-  "verdict": "NOT_READY"
+  "verdict": "PASS"
 }
