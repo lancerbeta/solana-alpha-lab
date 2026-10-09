@@ -296,15 +296,26 @@ def _eligible_rows(
         SELECT *
         FROM "{relation}"
         WHERE first_reliable_available_at <= ?
+          AND effective_at <= ?
         ORDER BY {order_by}
         """,
-        [cutoff.replace(tzinfo=None)],
+        [cutoff.replace(tzinfo=None), cutoff.replace(tzinfo=None)],
     )
+
+
+def _session_identity(value: Any) -> str | None:
+    return value if isinstance(value, str) and value else None
+
+
+def _same_session(row: Mapping[str, Any], session_id: str | None) -> bool:
+    """Legacy unbound records match legacy cards; known sessions stay separate."""
+    return _session_identity(row.get("session_id")) == _session_identity(session_id)
 
 
 def _derived_state(
     hypothesis_version_id: str,
     *,
+    session_id: str | None = None,
     decisions: Sequence[Mapping[str, Any]],
     runs: Sequence[Mapping[str, Any]],
 ) -> str:
@@ -312,6 +323,7 @@ def _derived_state(
         row
         for row in decisions
         if row.get("hypothesis_version_id") == hypothesis_version_id
+        and _same_session(row, session_id)
         and row.get("decision_kind") in STATE_BY_DECISION
     ]
     if eligible_decisions:
@@ -328,6 +340,7 @@ def _derived_state(
         row
         for row in runs
         if row.get("hypothesis_version_id") == hypothesis_version_id
+        and _same_session(row, session_id)
         and row.get("scientific_terminal")
         and row.get("run_event_kind") in {"RUN_COMPLETED", "RUN_INVALID"}
     ]
@@ -344,6 +357,82 @@ def _derived_state(
     return "NO_DECISION"
 
 
+def _bind_origin_as_of(
+    connection: duckdb.DuckDBPyConnection,
+    hypotheses: list[dict[str, Any]],
+    cutoff: datetime,
+) -> dict[str, int]:
+    """Replace current-view origin with authored or session-bound visible origin."""
+    records = _rows(
+        connection,
+        """
+        SELECT record_id, record_kind, stable_id, hypothesis_version_id,
+               supersedes_record_id,
+               NULLIF(json_extract_string(payload_json, '$.session_id'), '') AS session_id,
+               json_extract_string(payload_json, '$.origin_id') AS origin_id,
+               json_extract_string(payload_json, '$.origin_kind') AS origin_kind,
+               effective_at, first_reliable_available_at
+        FROM _research_events
+        WHERE record_kind IN ('HYPOTHESIS_VERSION', 'HYPOTHESIS_ORIGIN')
+          AND first_reliable_available_at <= ?
+        """,
+        [cutoff.replace(tzinfo=None)],
+    )
+    known_hypotheses: dict[str, dict[str, Any]] = {
+        record["record_id"]: record
+        for record in records
+        if record["record_kind"] == "HYPOTHESIS_VERSION"
+    }
+    authored: dict[str, dict[str, Any]] = {}
+    by_hypothesis: dict[tuple[str, str | None], dict[str, Any]] = {}
+    by_origin: dict[tuple[str, str | None], dict[str, Any]] = {}
+
+    def newer(record: Mapping[str, Any]) -> tuple[Any, Any, Any]:
+        return (record["effective_at"], record["first_reliable_available_at"], record["record_id"])
+
+    for record in records:
+        if record["effective_at"] > cutoff.replace(tzinfo=None):
+            continue  # known future structure may rank lineage, not supply current state
+        if record["record_kind"] == "HYPOTHESIS_VERSION":
+            authored[record["record_id"]] = record
+            continue
+        for index, stable in (
+            (by_hypothesis, record.get("hypothesis_version_id")),
+            (by_origin, record.get("stable_id")),
+        ):
+            if not stable:
+                continue
+            key = (str(stable), _session_identity(record.get("session_id")))
+            previous = index.get(key)
+            if previous is None or newer(record) > newer(previous):
+                index[key] = record
+    for hypothesis in hypotheses:
+        source = authored.get(hypothesis["record_id"])
+        if source is None:
+            raise PriorWorkError("HYPOTHESIS_SOURCE_UNAVAILABLE")
+        seen: set[str] = {source["record_id"]}
+        parent = source.get("supersedes_record_id")
+        while parent in known_hypotheses:
+            if (parent in seen
+                    or known_hypotheses[parent]["stable_id"] != hypothesis["hypothesis_version_id"]):
+                raise PriorWorkError("HYPOTHESIS_LINEAGE_INVALID")
+            seen.add(parent)
+            parent = known_hypotheses[parent].get("supersedes_record_id")
+        hypothesis["_lineage_depth"] = len(seen) - 1
+        if source.get("origin_kind") is not None:
+            hypothesis["origin_kind"] = source["origin_kind"]
+            continue
+        session = _session_identity(hypothesis.get("session_id"))
+        matches = [
+            row for row in (
+                by_hypothesis.get((hypothesis["hypothesis_version_id"], session)),
+                by_origin.get((source.get("origin_id"), session)),
+            ) if row is not None
+        ]
+        hypothesis["origin_kind"] = max(matches, key=newer)["origin_kind"] if matches else None
+    return {row["record_id"]: row.pop("_lineage_depth") for row in hypotheses}
+
+
 def query_hypotheses(
     projection_path: Path,
     as_of: str,
@@ -357,6 +446,7 @@ def query_hypotheses(
             cutoff,
             order_by="hypothesis_version_id, record_id",
         )
+        _bind_origin_as_of(connection, hypotheses, cutoff)
         runs = _eligible_rows(
             connection,
             "experiment_runs",
@@ -382,6 +472,7 @@ def query_hypotheses(
             ),
             "derived_state": _derived_state(
                 row["hypothesis_version_id"],
+                session_id=row.get("session_id"),
                 decisions=decisions,
                 runs=runs,
             ),
@@ -403,6 +494,7 @@ def query_data_plane_prior_work(
             cutoff,
             order_by="hypothesis_version_id, record_id",
         )
+        lineage_depth = _bind_origin_as_of(connection, hypotheses, cutoff)
         runs = _eligible_rows(
             connection,
             "experiment_runs",
@@ -445,20 +537,25 @@ def query_data_plane_prior_work(
     results: list[dict[str, Any]] = []
     for hypothesis in hypotheses:
         version_id = hypothesis["hypothesis_version_id"]
+        session_id = hypothesis.get("session_id")
         related_runs = [
             row for row in runs if row["hypothesis_version_id"] == version_id
+            and _same_session(row, session_id)
         ]
         related_events = [
             row for row in events if row["hypothesis_version_id"] == version_id
+            and _same_session(row, session_id)
         ]
         related_evidence = [
             row
             for row in evidence
-            if row["hypothesis_version_id"] == version_id
-            or any(row["run_id"] == run["run_id"] for run in related_runs)
+            if _same_session(row, session_id)
+            and (row["hypothesis_version_id"] == version_id
+                 or any(row["run_id"] == run["run_id"] for run in related_runs))
         ]
         related_gaps = [
             row for row in gaps if row["hypothesis_version_id"] == version_id
+            and _same_session(row, session_id)
         ]
         candidate = {
             **hypothesis,
@@ -512,6 +609,8 @@ def query_data_plane_prior_work(
         results.append(
             {
                 "hypothesis_version_id": version_id,
+                "_lineage_depth": lineage_depth[hypothesis["record_id"]],
+                "session_id": session_id,
                 "family_id": hypothesis.get("family_id"),
                 "definition_sha256": hypothesis.get("definition_sha256"),
                 "score": score,
@@ -542,6 +641,7 @@ def query_data_plane_prior_work(
                 ),
                 "current_state_as_of": _derived_state(
                     version_id,
+                    session_id=session_id,
                     decisions=related_events,
                     runs=related_runs,
                 ),
@@ -552,8 +652,10 @@ def query_data_plane_prior_work(
         )
     ordered = sorted(
         results,
-        key=lambda row: (-row["score"], row["hypothesis_version_id"]),
+        key=lambda row: (-row["score"], row["hypothesis_version_id"], -row["_lineage_depth"]),
     )[: int(query["max_results"])]
+    for row in ordered:
+        row.pop("_lineage_depth")
     digest = metadata[0]["projection_digest_sha256"] if metadata else None
     return {
         "schema": "smial.prior_work_query_result.v1",

@@ -56,6 +56,8 @@ def reuse_lifecycle_reads_within_packet(func: Callable[..., Any]) -> Callable[..
     """
     @wraps(func)
     def wrapped(*args: Any, **kwargs: Any) -> Any:
+        if _lifecycle_read_cache.get() is not None:
+            return func(*args, **kwargs)
         token = _lifecycle_read_cache.set({})
         try:
             return func(*args, **kwargs)
@@ -1157,6 +1159,55 @@ def _completed_run_passport(
     return passport
 
 
+def _assert_stable_id_lineage(
+    related: Sequence[ResearchEvent], *, allow_legacy_identical_hypotheses: bool = False,
+    existing_record_ids: set[str] | None = None,
+) -> None:
+    """HYP identities require a chain; other kinds retain same-payload replay."""
+    strict_hypothesis = bool(related) and (
+        related[0].record_kind == RecordKind.HYPOTHESIS_VERSION
+    )
+    by_id = {record.record_id: record for record in related}
+    if len(by_id) != len(related):
+        raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
+    # BASE accepted same-payload unlinked HYP rows. Existing immutable logs
+    # must remain cold-rebuildable; writer admission keeps the strict chain.
+    roots = [record for record in related if record.supersedes_record_id is None]
+    legacy_roots = (
+        {record.record_id for record in roots}
+        if strict_hypothesis and len(roots) > 1
+        and len({record.payload_sha256 for record in roots}) == 1
+        and (allow_legacy_identical_hypotheses
+             or (existing_record_ids is not None
+                 and all(record.record_id in existing_record_ids for record in roots)))
+        else set()
+    )
+    ancestors: dict[str, set[str]] = {}
+    for record in related:
+        seen: set[str] = set()
+        parent = record.supersedes_record_id
+        while parent in by_id:
+            if parent == record.record_id or parent in seen:
+                raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
+            seen.add(parent)
+            parent = by_id[parent].supersedes_record_id
+        if strict_hypothesis and parent is not None:
+            raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
+        if record.record_id in legacy_roots or seen.intersection(legacy_roots):
+            seen.update(legacy_roots - {record.record_id})
+        ancestors[record.record_id] = seen
+    for index, record in enumerate(related):
+        for previous in related[:index]:
+            if (record.record_id in legacy_roots and previous.record_id in legacy_roots):
+                continue
+            if (
+                (strict_hypothesis or previous.payload_sha256 != record.payload_sha256)
+                and previous.record_id not in ancestors[record.record_id]
+                and record.record_id not in ancestors[previous.record_id]
+            ):
+                raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
+
+
 class ResearchStore:
     """One-writer immutable research log rooted outside Git."""
 
@@ -1283,6 +1334,21 @@ class ResearchStore:
 
     @contextmanager
     def writer_lease(self) -> Iterator[None]:
+        # Admission/CAS must observe current committed bytes, never a read snapshot.
+        snapshot = _lifecycle_read_cache.get()
+        read_token = _lifecycle_read_cache.set(None)
+        try:
+            with self._writer_lease_uncached():
+                yield
+        finally:
+            if snapshot is not None:
+                generation = snapshot.get(("", "generation"), 0)
+                snapshot.clear()
+                snapshot[("", "generation")] = generation + 1
+            _lifecycle_read_cache.reset(read_token)
+
+    @contextmanager
+    def _writer_lease_uncached(self) -> Iterator[None]:
         lock_path = _target_path(
             self._root,
             _WRITER_LOCK_LOCATION,
@@ -1636,6 +1702,36 @@ class ResearchStore:
             if duplicate:
                 raise ResearchStoreError("DUPLICATE_RECORD_ID")
 
+            # A candidate's predecessor can change between packet construction
+            # and writer admission. Validate while holding the lease, before
+            # publishing the partition; a stale branch leaves no durable row.
+            new_hypotheses = [record for record in prepared
+                              if record.record_kind == RecordKind.HYPOTHESIS_VERSION]
+            if new_hypotheses:
+                selected_ids = {
+                    _projection_stable_id(record, _payload_object(record))
+                    for record in new_hypotheses
+                }
+                related: dict[str, list[ResearchEvent]] = {
+                    stable_id: [] for stable_id in selected_ids
+                }
+                for record in self.iter_committed_records():
+                    if record.record_kind != RecordKind.HYPOTHESIS_VERSION:
+                        continue
+                    stable_id = _projection_stable_id(record, _payload_object(record))
+                    if stable_id in related:
+                        related[stable_id].append(record)
+                for record in new_hypotheses:
+                    stable_id = _projection_stable_id(record, _payload_object(record))
+                    related[stable_id].append(record)
+                new_record_ids = {record.record_id for record in new_hypotheses}
+                for lineage in related.values():
+                    _assert_stable_id_lineage(
+                        lineage,
+                        existing_record_ids={record.record_id for record in lineage
+                                             if record.record_id not in new_record_ids},
+                    )
+
             parquet_path = _target_path(
                 self._root,
                 manifest.logical_location,
@@ -1686,13 +1782,24 @@ class ResearchStore:
             return self._receipt(manifest, disposition)
 
     def iter_committed_records(self) -> Iterator[ResearchEvent]:
+        cache = _lifecycle_read_cache.get()
+        key = (str(self._root.resolve()), "verified_history")
+        generation = cache.get(("", "generation"), 0) if cache is not None else None
+        if cache is not None and key in cache:
+            yield from cache[key]
+            return
         seen: set[str] = set()
+        verified: list[ResearchEvent] = []
         for manifest in self._committed_manifests():
             for record in self._verify_partition(manifest):
                 if record.record_id in seen:
                     raise ResearchStoreError("DUPLICATE_RECORD_ID")
                 seen.add(record.record_id)
+                verified.append(record)
                 yield record
+        # Only an exhaustively verified enumeration is reusable within this call.
+        if cache is not None and cache.get(("", "generation"), 0) == generation:
+            cache[key] = tuple(verified)
 
     def iter_lifecycle_records_bounded(
         self,
@@ -1918,15 +2025,9 @@ class ResearchStore:
             payload = _payload_object(record)
             stable_id = _projection_stable_id(record, payload)
             key = (str(record.record_kind), stable_id)
-            related = stable_ids.setdefault(key, [])
-            for previous in related:
-                if (
-                    previous.payload_sha256 != record.payload_sha256
-                    and previous.supersedes_record_id != record.record_id
-                    and record.supersedes_record_id != previous.record_id
-                ):
-                    raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
-            related.append(record)
+            stable_ids.setdefault(key, []).append(record)
+        for related in stable_ids.values():
+            _assert_stable_id_lineage(related, allow_legacy_identical_hypotheses=True)
 
         projection_path = _target_path(
             self._root,

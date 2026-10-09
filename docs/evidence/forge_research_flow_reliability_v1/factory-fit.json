@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "as_of": "2026-10-09",
+  "task_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1",
+  "review_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1-FIT",
+  "reviewed_bindings_sha256": "f9b8f90856d35c602c0b8b047490ab9b0c89c6f65203e88c9c0dfd25a1f159de",
+  "reviewed_inventory_sha256": "a7fb3f963bd4a28e7271f49265c027c27083857133f8ad12caa728b3f315687a",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_WHOLE_ORDINARY_RESEARCH_PASSAGE_D01_D18_ENGINEERING",
+    "flexibility_and_history": "PASS_ORIGINAL_LEGACY_BYTES_SCOPE_LOOKS_CHARGES_KILL_IMMUTABLE",
+    "context_efficiency": "PASS_ONE_ROOT_BOUNDED_PACKET_DEDUP_NATIVE_EVIDENCE",
+    "research_truth": "PASS_NATIVE_KILL_SEPARATE_MECHANICAL_PASS_EXPLICIT_UNKNOWN_SCOPE",
+    "owner_operability": "PASS_TYPED_FIELD_AND_SAVED_CONTEXT_LOCATORS_SINGLE_NEXT",
+    "execution_to_cashflow": "NO_EXECUTABLE_ECONOMICS_PRICE_PROXY_ONLY",
+    "monitoring_and_recovery": "PASS_OS_REPLY_LOSS_COLD_MOVED_ROOT_RACE_CORRUPT_GUARDS",
+    "build_vs_buy": "WRAP_EXISTING_OWNERS_STDLIB_AND_LOCKED_RUNTIME_NO_DEPENDENCY",
+    "security": "PASS_SYNTHETIC_ONLY_ZERO_PROVIDER_CREDENTIAL_MONEY_DEPLOY",
+    "red_team": "PASS_FUTURE_POISON_PROTECTED_LATE_INVALID_TRANSPORT_FAMILY_AUTHORITY_STALE_CACHE_BUSY_INTENT"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Chronological capability and separately authorized science"
+  },
+  "recovery": "Authorized ordinary code revert; append-only research history is never reset. No migration/live action.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_OOS",
+    "NO_STRATEGY_PROMOTION",
+    "NO_LIVE",
+    "WHOLE_FORGE_AUDIT_INCOMPLETE",
+    "EXACT_HEAD_CI_AND_OWNER_PHRASE_REQUIRED"
+  ]
+}

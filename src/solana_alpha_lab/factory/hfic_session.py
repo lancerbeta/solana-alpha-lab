@@ -33,7 +33,7 @@ from solana_alpha_lab.factory.hfic_prior_memory import (
     build_prior_memory_snapshot,
 )
 from solana_alpha_lab.factory.hfic_suppression_semantics import (
-    candidate_matches_hard_close,
+    candidate_hard_close_entry,
     family_hard_close_terminals,
     ledger_from_receipt,
 )
@@ -812,7 +812,8 @@ def bind_preflight_receipt(
     receipt_digest = receipt.get("store_inventory_digest") or receipt.get(
         "data_root_fingerprint_sha256"
     )
-    if require_current_store_digest and receipt_digest != digest:
+    if (require_current_store_digest and receipt_digest != digest
+            and not _matching_orphan_reservation_only_delta(store, receipt, draft)):
         raise HficSessionError("PREFLIGHT_STORE_DIGEST_MISMATCH")
     from solana_alpha_lab.factory.hfic_memory_policy import (
         effective_policy,
@@ -1204,6 +1205,20 @@ def _selected_candidate_block(
     *,
     packet_version: str | None = None,
 ) -> dict[str, Any]:
+    from solana_alpha_lab.factory.hfic_card_projection import CardProjectionError, project_material_card
+
+    # Persist validates authored bindings; this direct packet helper keeps a
+    # malformed outer shape intact so the Critic schema can reject it.
+    authored_bindings = card.get("available_data_bindings")
+    has_bindings = "available_data_bindings" in card
+    projection_source = dict(card)
+    projection_source.pop("available_data_bindings", None)
+    try:
+        card = project_material_card(projection_source)
+    except CardProjectionError as exc:
+        raise HficSessionError(exc.code, detail=exc.detail) from exc
+    if has_bindings:
+        card["available_data_bindings"] = authored_bindings
     required_caps = card.get("required_capability_ids") or []
     if not isinstance(required_caps, list):
         required_caps = []
@@ -1211,8 +1226,10 @@ def _selected_candidate_block(
     disconfirming = str(card.get("disconfirming_prediction") or "NOT_DECLARED_IN_DRAFT")
     bindings = card.get("available_data_bindings", [])
     if isinstance(bindings, list):
-        # Critic strings are narrative transport, never typed resolver input.
-        # Encode authored objects reversibly; retain legacy strings verbatim.
+        # Direct Critic transport preserves malformed legacy items for packet
+        # schema rejection. New drafts are shape-checked by _project_draft_cards
+        # before persistence. Encode authored objects reversibly; keep other
+        # items verbatim instead of silently coercing them into valid strings.
         bindings = [
             _canonical_bytes(item).decode("utf-8") if isinstance(item, Mapping) else item
             for item in bindings
@@ -1237,13 +1254,11 @@ def _selected_candidate_block(
         "disconfirming_prediction": disconfirming,
         "negative_control": str(card.get("negative_control") or ""),
         "alternative_world": str(card.get("alternative_world") or "NOT_DECLARED_IN_DRAFT"),
-        "confounders": card.get("confounders") or ["NOT_DECLARED_IN_DRAFT"],
-        "pit_leakage_survivorship_risks": card.get("pit_leakage_survivorship_risks")
-        or ["NOT_DECLARED_IN_DRAFT"],
-        "execution_capacity_risks": card.get("execution_capacity_risks")
-        or ["NOT_DECLARED_IN_DRAFT"],
+        "confounders": card["confounders"],
+        "pit_leakage_survivorship_risks": card["pit_leakage_survivorship_risks"],
+        "execution_capacity_risks": card["execution_capacity_risks"],
         "available_data_bindings": bindings,
-        "missing_or_forward_only_data": card.get("missing_or_forward_only_data") or [],
+        "missing_or_forward_only_data": card["missing_or_forward_only_data"],
         "proposed_method": str(card.get("proposed_method") or "NOT_DECLARED_IN_DRAFT"),
         "cheapest_falsifier": str(card.get("cheapest_falsifier") or ""),
         "pass_fail_inconclusive_semantics": str(
@@ -1252,6 +1267,10 @@ def _selected_candidate_block(
         "decision_unlocked": decision_unlocked,
         "_required_capability_ids": [str(item) for item in required_caps],
     }
+    if "pit_component_provenance" in card:
+        block["pit_component_provenance"] = card["pit_component_provenance"]
+    if "mundane_alternative" in card:
+        block["mundane_alternative"] = card["mundane_alternative"]
     if packet_version == CRITIC_PACKET_VERSION_CURRENT:
         block.update(_freeze_owned_grounding_fields(card))
     from solana_alpha_lab.factory.hfic_grounded_discovery import card_claim_scope
@@ -1860,6 +1879,27 @@ def _no_worthy_grounded_evidence(draft: Mapping[str, Any]) -> dict[str, Any] | N
     return no_worthy_scope_record(evidence)
 
 
+def _project_draft_cards(draft: Mapping[str, Any]) -> list[dict[str, Any]]:
+    from solana_alpha_lab.factory.hfic_card_projection import CardProjectionError, project_material_card
+
+    cards = draft.get("candidates")
+    if not isinstance(cards, list):
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    projected = []
+    for index, card in enumerate(cards):
+        if not isinstance(card, Mapping):
+            raise HficSessionError("HFIC_PROTOCOL_INVALID")
+        try:
+            projected.append(project_material_card(card))
+        except CardProjectionError as exc:
+            detail = {**exc.detail, "candidate_ordinal": index + 1,
+                      "candidate_label": card.get("label") if isinstance(card.get("label"), str) else None}
+            if "field_path" in detail:
+                detail["field_path"] = f"candidates[{index}].{detail['field_path']}"
+            raise HficSessionError(exc.code, detail=detail) from exc
+    return projected
+
+
 def freeze_draft(
     draft: Mapping[str, Any],
     *,
@@ -1868,6 +1908,7 @@ def freeze_draft(
     repo_root: Any = None,
     next_action_draft: Mapping[str, Any] | None = None,
     verify_current_market_identity: bool = False,
+    persist: bool = True,
 ) -> dict[str, Any]:
     if not isinstance(draft, Mapping):
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
@@ -1876,7 +1917,7 @@ def freeze_draft(
     prompt_version = _draft_prompt_version(draft)
     if repo_root is not None:
         _validate_json_schema(draft, _draft_schema_path(repo_root, draft))
-    candidates = draft.get("candidates")
+    candidates = _project_draft_cards(draft)
     floor = 0 if _ordinary_discovery_requested(draft, preflight_receipt) else 4
     journal_for_cap = (preflight_receipt or {}).get("search_key_sha256")
     ceiling = _max_candidates_for(store, journal_for_cap)
@@ -1917,6 +1958,7 @@ def freeze_draft(
             prompt_version=prompt_version,
             packet_version=packet_version,
             verify_current_market_identity=verify_current_market_identity,
+            persist=persist,
         )
 
     if next_action_draft is not None:
@@ -1962,10 +2004,15 @@ def freeze_draft(
     if store is not None and closed_family_ledger:
         closed_or_suppressed_collision_count = 0
         for card in candidates:
-            hit = candidate_matches_hard_close(card, closed_family_ledger)
+            hit = candidate_hard_close_entry(card, closed_family_ledger)
             if hit is not None:
                 closed_or_suppressed_collision_count += 1
-                raise HficSessionError("CLOSED_FAMILY_REOPEN")
+                raise HficSessionError("CLOSED_FAMILY_REOPEN", detail={
+                    "stage": "CANDIDATE_SUPPRESSION", "source_terminal": hit.get("terminal"),
+                    "scope_kind": hit.get("scope_kind"), "scope_id": hit.get("scope_id"),
+                    "source_receipt": hit.get("source_receipt"),
+                    "next_action": "KEEP_TYPED_CLOSE_SELECT_AUTHORIZED_DISTINCT_SCOPE",
+                })
     elif store is not None:
         closed_or_suppressed_collision_count = 0
     truth_roots = _nonempty_str_list(
@@ -2151,14 +2198,17 @@ def freeze_draft(
         )[:16].upper()
     _bind_packet_session_id(packet, session_id)
     if critic_packet_version == CRITIC_PACKET_VERSION_CURRENT:
+        from solana_alpha_lab.factory.hfic_memory_policy import HficMemoryPolicyError
+
         snapshot_digest = store_digest if isinstance(store_digest, str) else "0" * 64
         try:
             packet["prior_memory"] = build_prior_memory_snapshot(
                 store,
                 store_inventory_digest=snapshot_digest,
                 repo_root=repo_root,
+                as_of=bound["session_started_at"] if bound is not None else None,
             )
-        except (PriorMemoryCapacityError, PriorMemoryUnidentifiedError) as exc:
+        except (PriorMemoryCapacityError, PriorMemoryUnidentifiedError, HficMemoryPolicyError) as exc:
             raise HficSessionError(exc.code) from exc
     grounded = draft.get("grounded_evidence")
     if isinstance(grounded, Mapping):
@@ -2403,7 +2453,7 @@ def freeze_draft(
         result["closed_or_suppressed_collision_count"] = (
             closed_or_suppressed_collision_count
         )
-    if store is not None and repo_root is not None:
+    if persist and store is not None and repo_root is not None:
         if not epoch or not search_key or not focus_key:
             raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
         slot_rep, slot_parent = _preflight_ladder_slot(
@@ -2507,6 +2557,7 @@ def _freeze_no_worthy(
     prompt_version: str = PROMPT_VERSION_V1_1,
     packet_version: str = "1.1",
     verify_current_market_identity: bool = False,
+    persist: bool = True,
 ) -> dict[str, Any]:
     _assert_vision_integrity_for_surface(
         preflight_receipt, prompt_version=prompt_version
@@ -2545,10 +2596,15 @@ def _freeze_no_worthy(
         for card in draft_candidates:
             if not isinstance(card, Mapping):
                 continue
-            hit = candidate_matches_hard_close(card, closed_family_ledger)
+            hit = candidate_hard_close_entry(card, closed_family_ledger)
             if hit is not None:
                 closed_or_suppressed_collision_count += 1
-                raise HficSessionError("CLOSED_FAMILY_REOPEN")
+                raise HficSessionError("CLOSED_FAMILY_REOPEN", detail={
+                    "stage": "CANDIDATE_SUPPRESSION", "source_terminal": hit.get("terminal"),
+                    "scope_kind": hit.get("scope_kind"), "scope_id": hit.get("scope_id"),
+                    "source_receipt": hit.get("source_receipt"),
+                    "next_action": "KEEP_TYPED_CLOSE_SELECT_AUTHORIZED_DISTINCT_SCOPE",
+                })
     elif store is not None:
         closed_or_suppressed_collision_count = 0
     bound: dict[str, Any] | None = None
@@ -2709,7 +2765,7 @@ def _freeze_no_worthy(
         result["closed_or_suppressed_collision_count"] = (
             closed_or_suppressed_collision_count
         )
-    if store is not None and repo_root is not None:
+    if persist and store is not None and repo_root is not None:
         if not epoch or not search_key or not focus_key:
             raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
         persist_no_worthy_session(
@@ -2724,7 +2780,7 @@ def _freeze_no_worthy(
         )
         store.rebuild_projection()
         result["store_inventory_digest"] = store.diagnostics().committed_inventory_sha256
-    elif repo_root is not None:
+    elif persist and repo_root is not None:
         action = bind_next_epistemic_action(
             next_action_draft,
             frozen_no_worthy=result,
@@ -3022,6 +3078,7 @@ def persist_no_worthy_session(
         entity_id: str,
         payload: dict[str, Any],
         hypothesis_version_id: str | None = None,
+        supersedes_record_id: str | None = None,
     ) -> ResearchEvent:
         payload_json = json.dumps(
             payload,
@@ -3039,7 +3096,7 @@ def persist_no_worthy_session(
             transaction_id=transaction_id,
             effective_at=now,
             first_reliable_available_at=now,
-            supersedes_record_id=None,
+            supersedes_record_id=supersedes_record_id,
             payload_json=payload_json,
             payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
             schema_version="1.0",
@@ -3317,10 +3374,11 @@ def persist_no_worthy_session(
         for identity, card in zip(identities, cards, strict=True):
             records.append(
                 event(
-                    record_id=f"HFIC-HYP-{identity.candidate_id}",
+                    record_id=_session_hypothesis_record_id(identity.candidate_id, session_id),
                     kind=RecordKind.HYPOTHESIS_VERSION,
                     entity_id=identity.candidate_id,
                     hypothesis_version_id=identity.candidate_id,
+                supersedes_record_id=_session_hypothesis_supersedes(store, identity.candidate_id, identity.full_sha256),
                     payload={
                         "hypothesis_version_id": identity.candidate_id,
                         "session_id": session_id,
@@ -3449,6 +3507,63 @@ def _existing_scientific_slot_admission(
         if body.get("scientific_slot_sha256") == scientific_slot_sha256:
             return dict(body)
     return None
+
+
+def _matching_orphan_reservation_only_delta(
+    store: Any, receipt: Mapping[str, Any], draft: Mapping[str, Any],
+) -> bool:
+    """Accept a stale preflight digest only for its own sole slot reservation.
+
+    The committed inventory is a hash of sorted partition manifests. Removing
+    exactly the one-record reservation partition must reproduce the preflight
+    digest; any concurrent research write keeps the ordinary stale refusal.
+    """
+
+    if receipt.get("action") != "START_NEW_SESSION":
+        return False
+    search_key = receipt.get("search_key_sha256")
+    receipt_digest = receipt.get("store_inventory_digest")
+    if (not isinstance(search_key, str) or re.fullmatch(r"[0-9a-f]{64}", search_key) is None
+            or not isinstance(receipt_digest, str)
+            or re.fullmatch(r"[0-9a-f]{64}", receipt_digest) is None):
+        return False
+    session_id = "HFIC-SESS-" + search_key[:16].upper()
+    if draft.get("session_id") not in (None, "", session_id):
+        return False
+    try:
+        slot = _execution_identity_fields(receipt).get("scientific_slot_sha256")
+    except HficSessionError:
+        return False
+    if not isinstance(slot, str) or re.fullmatch(r"[0-9a-f]{64}", slot) is None:
+        return False
+    reservation = _existing_scientific_slot_admission(store, slot)
+    if (reservation is None or reservation.get("session_id") != session_id
+            or not _scientific_slot_admission_matches_binding(
+                reservation, {**receipt, "session_id": session_id}
+            )):
+        return False
+    manifest_reader = getattr(store, "_committed_manifests", None)
+    if not callable(manifest_reader):
+        return False
+    manifests = manifest_reader(fresh=True)
+    reservation_txn = f"RESEARCH-TXN-SLOT-{slot.upper()}"
+    reserved = [item for item in manifests if item.partition_id == reservation_txn]
+    if len(reserved) != 1 or reserved[0].row_count != 1:
+        return False
+    prior_inventory = [
+        {
+            "content_sha256": item.content_sha256,
+            "file_sha256": item.file_sha256,
+            "logical_location": item.logical_location,
+            "partition_manifest_id": item.partition_manifest_id,
+        }
+        for item in manifests if item.partition_id != reservation_txn
+    ]
+    encoded = json.dumps(
+        prior_inventory, ensure_ascii=False, sort_keys=True,
+        separators=(",", ":"), allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest() == receipt_digest
 
 
 def _scientific_slot_admission_matches_binding(
@@ -4604,7 +4719,7 @@ def persist_generated_draft(
     _reject_stale_fresh_session_draft(draft, receipt)
     _validate_json_schema(draft, _draft_schema_path(repo_root, draft))
     _draft_prompt_version(draft)
-    candidates = draft.get("candidates")
+    candidates = _project_draft_cards(draft)
     if not isinstance(candidates, list) or not (
         MIN_CANDIDATES <= len(candidates) <= _max_candidates_for(store, receipt.get("search_key_sha256"))
     ):
@@ -4614,6 +4729,7 @@ def persist_generated_draft(
     except HficIdentityError as exc:
         raise HficSessionError(str(exc)) from exc
     selected_ref = draft.get("selected_candidate_ref")
+    runner_up_index = -1
     if selected_ref not in (None, ""):
         selected_index = _resolve_ref(selected_ref, identities)
         optional_single = (
@@ -4748,6 +4864,70 @@ def persist_generated_draft(
         ):
             return existing
         raise HficSessionError("GENERATED_DRAFT_CONFLICT")
+    # A crash may leave only the immutable slot reservation. Check its
+    # execution identity before freeze's ordinary preflight digest check:
+    # the reservation itself advances the store digest, while a different
+    # model bind must retain the specific occupied-slot refusal.
+    current_reservation = _existing_scientific_slot_admission(store, slot)
+    if current_reservation is not None:
+        if current_reservation.get("identity_binding_status") == "CONFLICT":
+            raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+        if str(current_reservation.get("session_id") or "") != session_id:
+            raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED")
+        if not _scientific_slot_admission_matches_binding(current_reservation, binding):
+            raise HficSessionError(
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
+            )
+    # Typed family closure is frozen in the preflight receipt and remains an
+    # admission gate even when the store has changed through a saved look.
+    closed_family_ledger = ledger_from_receipt(receipt)
+    for card in candidates:
+        hit = candidate_hard_close_entry(card, closed_family_ledger)
+        if hit is not None:
+            raise HficSessionError("CLOSED_FAMILY_REOPEN", detail={
+                "stage": "CANDIDATE_SUPPRESSION", "source_terminal": hit.get("terminal"),
+                "scope_kind": hit.get("scope_kind"), "scope_id": hit.get("scope_id"),
+                "source_receipt": hit.get("source_receipt"),
+                "next_action": "KEEP_TYPED_CLOSE_SELECT_AUTHORIZED_DISTINCT_SCOPE",
+            })
+    # Check exact prior scope before saving, using the current visible history.
+    # A full freeze here would incorrectly compare the pre-look receipt with the
+    # store after its authorized discovery writes.
+    grounded = draft.get("grounded_evidence")
+    if selected_ref not in (None, "") and isinstance(grounded, Mapping):
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            GroundedDiscoveryError, bind_prior_scope_evidence,
+        )
+        from solana_alpha_lab.factory.hfic_memory_policy import HficMemoryPolicyError
+
+        selected_card = candidates[selected_index]
+        selected_grounded = _bind_selected_look(grounded, selected_card, store=store)
+        if selected_grounded.get("look_confirms_selected") is not False or runner_up_index >= 0:
+            try:
+                prior = build_prior_memory_snapshot(
+                    store,
+                    store_inventory_digest=store.diagnostics().committed_inventory_sha256,
+                    repo_root=repo_root,
+                    as_of=receipt.get("session_started_at"),
+                )
+                if selected_grounded.get("look_confirms_selected") is not False:
+                    bind_prior_scope_evidence(
+                        selected_grounded, canonical_priors=prior["capsules"]
+                    )
+                if runner_up_index >= 0:
+                    _rebind_runner_up_grounded_evidence(
+                        {"grounded_evidence": dict(grounded),
+                         "prior_memory": {"capsules": prior["capsules"]}},
+                        candidates[runner_up_index],
+                    )
+            except (GroundedDiscoveryError, PriorMemoryCapacityError,
+                    PriorMemoryUnidentifiedError, HficMemoryPolicyError) as exc:
+                raise HficSessionError(exc.code) from exc
+    if not _ordinary_discovery_requested(draft, receipt):
+        freeze_draft(
+            draft, preflight_receipt=preflight_receipt, store=store,
+            repo_root=repo_root, verify_current_market_identity=True, persist=False,
+        )
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
@@ -4812,8 +4992,6 @@ def persist_generated_draft(
         producer_git_sha=git.head_sha,
         created_at=now,
     )
-    current_reservation = _existing_scientific_slot_admission(store, slot)
-
     def _recheck_generated_draft_under_writer_lease() -> None:
         _verify_required_context_dependency(store, receipt)
         observed_draft = find_generated_draft(
@@ -4880,6 +5058,11 @@ def persist_generated_draft(
                 raise HficSessionError(
                     "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
                 )
+            if (not _ordinary_discovery_requested(draft, receipt)
+                    and not _matching_orphan_reservation_only_delta(
+                        store, receipt, draft
+                    )):
+                raise HficSessionError("PREFLIGHT_STORE_DIGEST_MISMATCH")
             if any(item.record_id == admission_event.record_id for item in append_records):
                 raise HficSessionError("GENERATED_DRAFT_RESERVATION_APPEARED")
             return
@@ -4926,6 +5109,67 @@ def persist_generated_draft(
                 continue
             raise
     return payload
+
+
+def _session_hypothesis_record_id(candidate_id: str, session_id: str) -> str:
+    """A semantic candidate can have immutable cards in several evidence sessions.
+
+    Keep candidate identity stable; scope only the append-only record identity.
+    Historical unsuffixed records remain readable without migration.
+    """
+    return f"HFIC-HYP-{candidate_id}-{session_id}"
+
+
+def _session_hypothesis_supersedes(store: Any, candidate_id: str, definition_sha256: str) -> str | None:
+    """Link the same definition's new evidence binding to its immutable history."""
+    prior = []
+    for record in store.iter_committed_records():
+        if str(getattr(record.record_kind, "value", record.record_kind)) != "HYPOTHESIS_VERSION":
+            continue
+        payload = json.loads(record.payload_json)
+        if str(payload.get("hypothesis_version_id") or record.entity_id) != candidate_id:
+            continue
+        if payload.get("definition_sha256") != definition_sha256:
+            raise HficSessionError("HFIC_HYPOTHESIS_HISTORY_IDENTITY_UNBOUND")
+        prior.append(record)
+    if not prior:
+        return None
+    roots = [row for row in prior if row.supersedes_record_id is None]
+    legacy_roots = (
+        {row.record_id for row in roots}
+        if len(roots) > 1 and len({row.payload_sha256 for row in roots}) == 1
+        else set()
+    )
+    superseded = {row.supersedes_record_id for row in prior}
+    if legacy_roots.intersection(superseded):
+        superseded.update(legacy_roots)
+    heads = [row for row in prior if row.record_id not in superseded]
+    if len(heads) > 1 and {row.record_id for row in heads} == legacy_roots:
+        return min(legacy_roots)
+    if len(heads) != 1:
+        raise HficSessionError("HFIC_HYPOTHESIS_HISTORY_IDENTITY_UNBOUND")
+    return heads[0].record_id
+
+
+def _persisted_session_rejection_id(store: Any, session_id: str, candidate_id: str, prior: Mapping[str, Any]) -> str:
+    matches = []
+    for record in store.iter_committed_records():
+        if str(getattr(record.record_kind, "value", record.record_kind)) != "DECISION_EVENT":
+            continue
+        payload = json.loads(record.payload_json)
+        if (payload.get("session_id") == session_id
+            and payload.get("hypothesis_version_id") == candidate_id
+            and payload.get("decision_kind") == "REJECT"
+            and payload.get("reason_code") == prior.get("reason_code")
+            and payload.get("decision_event_id") == record.record_id):
+            matches.append(record.record_id)
+    if len(matches) != 1:
+        raise HficSessionError("DECISION_REFERENCE_UNRESOLVED")
+    return matches[0]
+
+
+def _session_decision_record_id(candidate_id: str, session_id: str) -> str:
+    return f"HFIC-DEC-{candidate_id}-{session_id}"
 
 
 def persist_frozen_session(
@@ -5028,6 +5272,7 @@ def persist_frozen_session(
         entity_id: str,
         payload: dict[str, Any],
         hypothesis_version_id: str | None = None,
+        supersedes_record_id: str | None = None,
     ) -> ResearchEvent:
         payload_json = json.dumps(
             payload,
@@ -5045,7 +5290,7 @@ def persist_frozen_session(
             transaction_id=transaction_id,
             effective_at=now,
             first_reliable_available_at=now,
-            supersedes_record_id=None,
+            supersedes_record_id=supersedes_record_id,
             payload_json=payload_json,
             payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
             schema_version="1.0",
@@ -5146,9 +5391,9 @@ def persist_frozen_session(
     cards = _cards_for_identities(identities, frozen, draft)
     for identity, card in zip(identities, cards, strict=True):
         hyp_id = (
-            f"HFIC-HYP-{identity.candidate_id}-REPAIR-{repair_disp[:12].upper()}"
+            f"{_session_hypothesis_record_id(identity.candidate_id, session_id)}-REPAIR-{repair_disp[:12].upper()}"
             if isinstance(repair_disp, str) and repair_disp
-            else f"HFIC-HYP-{identity.candidate_id}"
+            else _session_hypothesis_record_id(identity.candidate_id, session_id)
         )
         records.append(
             event(
@@ -5156,6 +5401,7 @@ def persist_frozen_session(
                 kind=RecordKind.HYPOTHESIS_VERSION,
                 entity_id=identity.candidate_id,
                 hypothesis_version_id=identity.candidate_id,
+                supersedes_record_id=_session_hypothesis_supersedes(store, identity.candidate_id, identity.full_sha256),
                 payload={
                     "hypothesis_version_id": identity.candidate_id,
                     "session_id": session_id,
@@ -6225,6 +6471,7 @@ def _make_event_factory(
         entity_id: str,
         payload: dict[str, Any],
         hypothesis_version_id: str | None = None,
+        supersedes_record_id: str | None = None,
         transaction_id: str,
     ) -> ResearchEvent:
         payload_json = json.dumps(
@@ -6243,7 +6490,7 @@ def _make_event_factory(
             transaction_id=transaction_id,
             effective_at=now,
             first_reliable_available_at=now,
-            supersedes_record_id=None,
+            supersedes_record_id=supersedes_record_id,
             payload_json=payload_json,
             payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
             schema_version="1.0",
@@ -6605,6 +6852,7 @@ def _verify_store_reference_resolution(
 def _verify_forge_context_artifact(store: Any, digest: str) -> None:
     from solana_alpha_lab.factory.hfic_preflight import (
         HficPreflightError,
+        FORGE_CONTEXT_ARTIFACT_DIR,
         verify_forge_context_packet,
     )
 
@@ -6612,7 +6860,13 @@ def _verify_forge_context_artifact(store: Any, digest: str) -> None:
     try:
         verify_forge_context_packet(data_root, digest)
     except HficPreflightError as exc:
-        raise HficSessionError(str(exc)) from exc
+        safe_digest = digest if re.fullmatch(r"[0-9a-f]{64}", digest) else None
+        raise HficSessionError(str(exc), detail={
+            "stage": "SAVED_CONTEXT_DEPENDENCY",
+            "required_context_sha256": safe_digest,
+            "relative_locator": f"{FORGE_CONTEXT_ARTIFACT_DIR}/{safe_digest}.json" if safe_digest else None,
+            "next_action": "RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY",
+        }) from exc
 
 
 def _verify_required_context_dependency(store: Any, binding: Mapping[str, Any]) -> None:
@@ -6635,7 +6889,7 @@ def _validate_fresh_draft_scopes(draft: Mapping[str, Any], *, store: Any,
     selected_ref = draft.get("selected_candidate_ref")
     selected = _resolve_ref(selected_ref, identities) if selected_ref else -1
     look = stored_look_scope(store, evidence) if store is not None and isinstance(evidence, Mapping) else None
-    for index, card in enumerate(draft.get("candidates") or []):
+    for index, card in enumerate(_project_draft_cards(draft)):
         if not isinstance(card, Mapping):
             raise HficSessionError("HFIC_PROTOCOL_INVALID")
         try:
@@ -7116,7 +7370,7 @@ def apply_revision(
             _draft_schema_path(repo_root, revised_draft),
         )
     _validate_revision_context_lock(existing, revised_draft)
-    candidates = revised_draft.get("candidates")
+    candidates = _project_draft_cards(revised_draft)
     if not isinstance(candidates, list) or not (
         MIN_CANDIDATES
         <= len(candidates)
@@ -7154,27 +7408,29 @@ def apply_revision(
     }
     id_to_draft = {item.candidate_id: item for item in draft_identities}
     packet_in = existing.get("critic_input_packet")
-    runner_up_index = _resolve_ref(
-        revised_draft.get("runner_up_candidate_ref"),
-        draft_identities,
-    )
-    if runner_up_index < 0:
-        raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
-    runner_up_id = draft_identities[runner_up_index].candidate_id
-    if runner_up_id != existing.get("runner_up_candidate_id"):
-        raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
-    rejected_index = _resolve_ref(
-        revised_draft.get("strongest_rejected_alternative"),
-        draft_identities,
-    )
-    if rejected_index < 0:
-        raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
-    rejected_id = draft_identities[rejected_index].candidate_id
+    runner_up_id = None
+    runner_up_ref = revised_draft.get("runner_up_candidate_ref")
+    if existing.get("runner_up_candidate_id") is not None or runner_up_ref is not None:
+        runner_up_index = _resolve_ref(runner_up_ref, draft_identities)
+        if runner_up_index < 0:
+            raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
+        runner_up_id = draft_identities[runner_up_index].candidate_id
+        if runner_up_id != existing.get("runner_up_candidate_id"):
+            raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
     rejected_id_existing = existing.get("rejected_alternative_id")
     if not rejected_id_existing and isinstance(packet_in, Mapping):
         rejected_id_existing = packet_in.get("strongest_rejected_alternative")
-    if rejected_id != rejected_id_existing:
-        raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
+    if rejected_id_existing == "NONE" and len(existing.get("candidate_ids") or []) == 1:
+        rejected_id_existing = None
+    rejected_id = None
+    rejected_ref = revised_draft.get("strongest_rejected_alternative")
+    if rejected_id_existing is not None or rejected_ref is not None:
+        rejected_index = _resolve_ref(rejected_ref, draft_identities)
+        if rejected_index < 0:
+            raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
+        rejected_id = draft_identities[rejected_index].candidate_id
+        if rejected_id != rejected_id_existing:
+            raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
     original_selected: dict[str, Any] = {}
     if isinstance(packet_in, Mapping):
         selected_card = packet_in.get("selected_candidate")
@@ -7249,7 +7505,7 @@ def apply_revision(
             raise HficSessionError("REVISION_PORTFOLIO_CHANGED")
     packet = dict(packet_in)
     packet["selected_candidate"] = rebuilt_selected
-    packet["strongest_rejected_alternative"] = rejected_id
+    packet["strongest_rejected_alternative"] = "NONE" if rejected_id is None else rejected_id
     source_evidence = packet.get("grounded_evidence")
     if isinstance(source_evidence, Mapping) and source_evidence.get("result_refs"):
         rebound = _bind_selected_look(
@@ -7346,7 +7602,7 @@ def apply_revision(
     _stamp_market_evidence_basis(revision_cycle, existing, frozen)
     if prompt_version == PROMPT_VERSION and repo_root is not None:
         grounded_candidates = _ground_v12_candidates(
-            revised_draft.get("candidates") or [],
+            candidates,
             draft_identities,
             repo_root=repo_root,
             preflight_receipt={
@@ -7393,10 +7649,11 @@ def apply_revision(
     if selected_identity.candidate_id != original_selected_id:
         records.append(
             event(
-                record_id=f"HFIC-HYP-{selected_identity.candidate_id}",
+                record_id=_session_hypothesis_record_id(selected_identity.candidate_id, session_id),
                 kind=RecordKind.HYPOTHESIS_VERSION,
                 entity_id=selected_identity.candidate_id,
                 hypothesis_version_id=selected_identity.candidate_id,
+                supersedes_record_id=_session_hypothesis_supersedes(store, selected_identity.candidate_id, selected_identity.full_sha256),
                 payload={
                     "hypothesis_version_id": selected_identity.candidate_id,
                     "session_id": session_id,
@@ -7432,6 +7689,9 @@ def apply_revision(
 
 
 def _recipe_scope_rule(experiment_spec_packet: Mapping[str, Any]) -> str | None:
+    nested = experiment_spec_packet.get("experiment_spec")
+    if isinstance(nested, Mapping):
+        experiment_spec_packet = nested
     parameters = experiment_spec_packet.get("parameters")
     recipe = parameters.get("temporal_recipe") if isinstance(parameters, Mapping) else None
     if not isinstance(recipe, Mapping):
@@ -7650,12 +7910,12 @@ def persist_primary_kill_awaiting_runner_up(
             transaction_id=transaction_id,
         ),
         event(
-            record_id=f"HFIC-DEC-{primary_id}",
+            record_id=_session_decision_record_id(primary_id, session_id),
             kind=RecordKind.DECISION_EVENT,
-            entity_id=f"HFIC-DEC-{primary_id}",
+            entity_id=_session_decision_record_id(primary_id, session_id),
             hypothesis_version_id=primary_id,
             payload={
-                "decision_event_id": f"HFIC-DEC-{primary_id}",
+                "decision_event_id": _session_decision_record_id(primary_id, session_id),
                 "session_id": session_id,
                 "hfic_protocol": prompt_version,
                 "decision_kind": "REJECT",
@@ -7971,13 +8231,13 @@ def finalize_session(
     for candidate_id in frozen["candidate_ids"]:
         prior = ((existing or {}).get("decisions") or {}).get(str(candidate_id))
         if isinstance(prior, Mapping) and prior.get("decision_kind") == "REJECT":
-            decision_ids.append(f"HFIC-DEC-{candidate_id}")
+            decision_ids.append(_persisted_session_rejection_id(store, session_id, str(candidate_id), prior))
             continue
         if candidate_id == selected_id:
             kind, code = decision_kind, reason
         else:
             kind, code = "PAUSE", "NOT_SELECTED_IN_SESSION"
-        decision_id = f"HFIC-DEC-{candidate_id}"
+        decision_id = _session_decision_record_id(str(candidate_id), session_id)
         decision_ids.append(decision_id)
         records.append(
             event(
@@ -8343,6 +8603,8 @@ def finalize_session(
 
 
 def _validate_json_schema(document: Mapping[str, Any], schema_path: Path) -> None:
+    if schema_path.name.startswith("hypothesis_forge_draft_"):
+        document = {**document, "candidates": _project_draft_cards(document)}
     key = str(schema_path)
     validator = _SCHEMA_VALIDATORS.get(key)
     if validator is None:

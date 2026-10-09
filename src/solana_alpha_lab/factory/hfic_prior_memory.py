@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -124,11 +125,14 @@ def classify_memory_status(
         return MEMORY_TECHNICAL_STOP
     if reason.startswith("PARK_") or reason == "OWNER_PRIORITY_PARK" or kind == "PARK":
         return MEMORY_PARK
-    if (
-        reason.startswith("KILL_")
-        or reason.startswith("CLOSE_")
-        or (kind == "REJECT" and reason not in {"", MEMORY_NOT_SELECTED})
-    ):
+    from solana_alpha_lab.factory.hfic_suppression_semantics import interpret_critic_terminal
+
+    outcome = interpret_critic_terminal(reason)["outcome_class"]
+    if outcome in {"REVIEW_REJECTION", "REVIEW_REJECTION_UNKNOWN_APPLICABILITY"}:
+        # A rejection of one bound question stays visible; it grants no family closure.
+        return MEMORY_HISTORICAL
+    if reason.startswith("CLOSE_"):
+        # Compatibility label only; the existing typed suppression ledger owns authority.
         return MEMORY_HARD_CLOSE
     if not kind and not reason:
         if hfic_protocol:
@@ -152,9 +156,8 @@ def empty_prior_memory_snapshot(
     )
 
 
-# Eligibility is currently every committed HYPOTHESIS_VERSION visible in the
-# exact preflight-bound store. A later append-only quarantine/rebase filter may
-# drop ids before capsule emission without changing capsule schema or ranker.
+# Explicit as_of limits current packet content on both research-time axes.
+# Omitted as_of retains all-committed ledger inspection for legacy callers.
 def build_prior_memory_snapshot(
     store: Any | None,
     *,
@@ -162,6 +165,7 @@ def build_prior_memory_snapshot(
     repo_root: Path | str | None = None,
     max_records: int | None = None,
     max_bytes: int | None = None,
+    as_of: str | datetime | None = None,
 ) -> dict[str, Any]:
     records_bound, bytes_bound = prior_memory_bounds(
         repo_root, max_records=max_records, max_bytes=max_bytes
@@ -175,16 +179,20 @@ def build_prior_memory_snapshot(
         )
     from solana_alpha_lab.factory.hfic_memory_policy import (
         iter_search_memory_hypothesis_payloads,
+        research_memory_cutoff,
     )
 
-    decisions = latest_hypothesis_decisions(store)
-    session_scope = _session_scope_index(store)
+    cutoff = research_memory_cutoff(as_of)
+    decisions = latest_hypothesis_decisions(store, as_of=cutoff)
+    session_scope = _session_scope_index(store, as_of=cutoff)
     capsules_by_id: dict[str, dict[str, Any]] = {}
-    for payload in iter_search_memory_hypothesis_payloads(store):
+    for payload in iter_search_memory_hypothesis_payloads(store, as_of=cutoff):
         hyp_id = str(payload.get("hypothesis_version_id") or "")
         if not hyp_id:
             raise PriorMemoryUnidentifiedError()
-        capsule = _capsule_from_payload(hyp_id, payload, decisions.get(hyp_id))
+        capsule = _capsule_from_payload(
+            hyp_id, payload, decisions.get((hyp_id, session_identity(payload)))
+        )
         _fill_scope_from_session(capsule, payload, session_scope)
         capsules_by_id[hyp_id] = capsule
     capsules = [capsules_by_id[item] for item in sorted(capsules_by_id)]
@@ -239,16 +247,31 @@ def _payload_mapping(record: Any) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
-def latest_hypothesis_decisions(store: Any) -> dict[str, dict[str, str]]:
-    """Latest DECISION_EVENT disposition per hypothesis_version_id.
+def session_identity(payload: Mapping[str, Any]) -> str | None:
+    """Treat absent and empty session IDs as legacy; preserve known IDs exactly."""
+    value = payload.get("session_id")
+    return value if isinstance(value, str) and value else None
+
+
+def latest_hypothesis_decisions(
+    store: Any, *, as_of: str | datetime | None = None,
+) -> dict[tuple[str, str | None], dict[str, str]]:
+    """Latest DECISION_EVENT disposition per hypothesis and session.
 
     Shared read-only resolver for Critic prior-memory capsules and Forge
     Prompt-A ranked-prior projection. Do not fork a second decision walker.
     """
-    latest: dict[str, tuple[tuple[str, str], str, str]] = {}
+    from solana_alpha_lab.factory.hfic_memory_policy import (
+        research_memory_cutoff, research_record_visible_as_of,
+    )
+
+    cutoff = research_memory_cutoff(as_of)
+    latest: dict[tuple[str, str | None], tuple[tuple[str, str], str, str]] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
         if kind != "DECISION_EVENT":
+            continue
+        if not research_record_visible_as_of(record, cutoff):
             continue
         payload = _payload_mapping(record)
         hyp_id = str(
@@ -261,20 +284,21 @@ def latest_hypothesis_decisions(store: Any) -> dict[str, dict[str, str]]:
         record_id = str(getattr(record, "record_id", "") or "")
         effective = str(getattr(record, "effective_at", "") or "")
         key = (effective, record_id)
-        previous = latest.get(hyp_id)
+        identity = (hyp_id, session_identity(payload))
+        previous = latest.get(identity)
         if previous is None or key >= previous[0]:
-            latest[hyp_id] = (
+            latest[identity] = (
                 key,
                 str(payload.get("decision_kind") or ""),
                 str(payload.get("reason_code") or ""),
             )
     return {
-        hyp_id: {"decision_kind": kind, "reason_code": reason}
-        for hyp_id, (_key, kind, reason) in latest.items()
+        identity: {"decision_kind": kind, "reason_code": reason, **({"session_id": identity[1]} if identity[1] else {})}
+        for identity, (_key, kind, reason) in latest.items()
     }
 
 
-def _latest_decisions(store: Any) -> dict[str, dict[str, str]]:
+def _latest_decisions(store: Any) -> dict[tuple[str, str | None], dict[str, str]]:
     """Compatibility alias; prefer :func:`latest_hypothesis_decisions`."""
     return latest_hypothesis_decisions(store)
 
@@ -379,6 +403,8 @@ def compact_forge_prior_entry(
         value = full.get(key)
         if value not in (None, "", [], {}):
             out[key] = value
+    if "outcome_semantics" in full:
+        out["outcome_semantics"] = full["outcome_semantics"]
     if out.get("memory_status") == MEMORY_TECHNICAL_STOP:
         out["technical_stop_note"] = (
             "Технический отказ не является отрицательным рыночным результатом."
@@ -445,6 +471,9 @@ def _capsule_from_payload(
     payload: Mapping[str, Any],
     decision: Mapping[str, str] | None,
 ) -> dict[str, Any]:
+    # Known and missing sessions are distinct; only both missing retain legacy coupling.
+    if decision and session_identity(payload) != session_identity(decision):
+        decision = None
     protocol = payload.get("hfic_protocol")
     protocol_text = str(protocol) if isinstance(protocol, str) and protocol else None
     decision_kind = decision.get("decision_kind") if decision else None
@@ -463,6 +492,11 @@ def _capsule_from_payload(
         "decision_kind": decision_kind or None,
         "reason_code": reason_code or None,
     }
+    from solana_alpha_lab.factory.hfic_suppression_semantics import interpret_critic_terminal
+    if reason_code:
+        outcome = interpret_critic_terminal(reason_code)
+        if outcome["outcome_class"] != "UNMAPPED_OUTCOME":
+            capsule["outcome_semantics"] = outcome
     for field in _CAPSULE_FIELDS:
         if field == "cheapest_falsifier":
             value = str(falsifier or "")
@@ -492,13 +526,22 @@ def _capsule_from_payload(
     return capsule
 
 
-def _session_scope_index(store: Any) -> dict[str, dict[str, Any]]:
+def _session_scope_index(
+    store: Any, *, as_of: str | datetime | None = None,
+) -> dict[str, dict[str, Any]]:
     """Recover surface and discovery scope from immutable cycle records."""
 
+    from solana_alpha_lab.factory.hfic_memory_policy import (
+        research_memory_cutoff, research_record_visible_as_of,
+    )
+
+    cutoff = research_memory_cutoff(as_of)
     index: dict[str, dict[str, Any]] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
         if kind != "RESEARCH_CYCLE":
+            continue
+        if not research_record_visible_as_of(record, cutoff):
             continue
         payload = _payload_mapping(record)
         session_id = str(payload.get("session_id") or "")

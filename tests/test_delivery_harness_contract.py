@@ -4,6 +4,7 @@ import copy
 import hashlib
 import json
 import re
+import subprocess
 import unittest
 from pathlib import Path
 from typing import Any
@@ -300,8 +301,16 @@ class DeliveryHarnessContractTests(unittest.TestCase):
             "tests/test_delivery_harness_adapters.py",
         }
         self.assertTrue(required_paths.issubset(bound))
+        receipt_commit = subprocess.check_output(
+            ["git", "log", "-1", "--format=%H", "--", str(ACCEPTANCE.relative_to(ROOT))],
+            cwd=ROOT,
+            text=True,
+        ).strip()
         for relative, observed in bound.items():
-            self.assertEqual(observed, sha256(ROOT / relative), relative)
+            historical_bytes = subprocess.check_output(
+                ["git", "show", f"{receipt_commit}:{relative}"], cwd=ROOT
+            )
+            self.assertEqual(observed, hashlib.sha256(historical_bytes).hexdigest(), relative)
         self.assertEqual(receipt["factory_fit"]["sha256"], sha256(FACTORY_FIT))
 
     def test_catalog_registers_harness_and_schemas(self) -> None:

@@ -38,6 +38,7 @@ from solana_alpha_lab.factory.hfic_prior_memory import (
     compact_prior_entry,
     latest_hypothesis_decisions,
     prior_memory_bounds,
+    session_identity,
 )
 from solana_alpha_lab.factory.hfic_provenance import is_hfic_record
 from solana_alpha_lab.factory.hfic_session import (
@@ -182,10 +183,12 @@ def overlay_search_payloads(
     store: Any,
     extra_payloads: Sequence[Mapping[str, Any]],
     extra_quarantine: Sequence[str],
+    *,
+    as_of: str | datetime | None = None,
 ) -> list[dict[str, Any]]:
     extra_q = {str(item) for item in extra_quarantine if str(item).strip()}
     by_id: dict[str, dict[str, Any]] = {}
-    for payload in iter_search_memory_hypothesis_payloads(store):
+    for payload in iter_search_memory_hypothesis_payloads(store, as_of=as_of):
         session_id = payload.get("session_id")
         if isinstance(session_id, str) and session_id in extra_q:
             continue
@@ -205,6 +208,7 @@ def ranked_prior_entries_for_ids(
     *,
     decisions: Mapping[str, Mapping[str, str]] | None = None,
     store: Any | None = None,
+    as_of: str | datetime | None = None,
 ) -> list[dict[str, Any]]:
     by_id = {
         str(item.get("hypothesis_version_id") or ""): item
@@ -220,10 +224,7 @@ def ranked_prior_entries_for_ids(
                 if isinstance(decision, Mapping)
             }
         )
-    if store is not None:
-        # Same canonical DECISION_EVENT walker as Critic prior-memory.
-        for hyp_id, decision in latest_hypothesis_decisions(store).items():
-            resolved.setdefault(str(hyp_id), decision)
+    store_decisions = latest_hypothesis_decisions(store, as_of=as_of) if store is not None else {}
     session_scope: dict[str, dict[str, Any]] = {}
     if store is not None:
         from solana_alpha_lab.factory.hfic_prior_memory import (
@@ -231,7 +232,7 @@ def ranked_prior_entries_for_ids(
             recover_scope_payload,
         )
 
-        session_scope = _session_scope_index(store)
+        session_scope = _session_scope_index(store, as_of=as_of)
     entries: list[dict[str, Any]] = []
     for hyp_id in ranked_ids:
         payload = by_id.get(str(hyp_id))
@@ -243,7 +244,12 @@ def ranked_prior_entries_for_ids(
         # outcomes as RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE.
         if session_scope:
             payload = recover_scope_payload(payload, session_scope)
-        decision = resolved.get(str(hyp_id))
+        identity = session_identity(payload)
+        explicit = resolved.get(str(hyp_id))
+        decision = (
+            explicit if explicit is not None and session_identity(explicit) == identity
+            else store_decisions.get((str(hyp_id), identity))
+        )
         entry = compact_forge_prior_entry(str(hyp_id), payload, decision)
         if str(entry.get("hypothesis_version_id") or "") != str(hyp_id):
             raise ReopenedPriorRoutingError(BODY_INCOMPLETE)
@@ -333,6 +339,7 @@ def preview_control_reconsideration(
     defective_session_id: str = DEFECTIVE_CONTROL_SESSION_ID,
     owner_focus: str = AUTO_FOCUS,
 ) -> dict[str, Any]:
+    prior_cutoff = capture_stage_time()
     from solana_alpha_lab.factory.early_market_panel_importer import (
         MIN_USABLE_YIELD_ELIGIBLE,
     )
@@ -369,7 +376,7 @@ def preview_control_reconsideration(
         )
     ]
     planned_payloads = overlay_search_payloads(
-        store, extra, [defective_session_id]
+        store, extra, [defective_session_id], as_of=prior_cutoff,
     )
     policy = preview_memory_policy(
         store,
@@ -412,6 +419,7 @@ def preview_control_reconsideration(
         commissioning_status="FAST_LANE_COMMISSIONED",
         research_memory_as_of="2026-09-15T00:00:00Z",
         store=store,
+        stage_time=prior_cutoff,
         persist=False,
         search_payloads=planned_payloads,
         evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,

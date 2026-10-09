@@ -36,6 +36,7 @@ def critic_result_from_packet_only(
 
     selected = packet["selected_candidate"]
     card = {
+        "claim_form": selected.get("claim_form", "CAUSAL"),
         "claim": selected["claim"],
         "mechanism": selected["mechanism"],
         "actor_counterparty": selected["actor_counterparty"],

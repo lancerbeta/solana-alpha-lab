@@ -63,6 +63,7 @@ from solana_alpha_lab.factory.hfic_prospects import (  # noqa: E402
 )
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     HficSessionError,
+    _execution_identity_fields,
     PENDING_STATES,
     apply_classification,
     apply_revision,
@@ -71,6 +72,7 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     find_session_by_search_key,
     freeze_draft,
     list_hfic_sessions,
+    list_scientific_slot_admissions,
     lookup_prior,
     persist_generated_draft,
     prove_runtime,
@@ -640,6 +642,15 @@ def _preflight_owner_readout(body: Mapping[str, Any]) -> str:
             "market/representation/focus readback; не регенерируйте и не "
             "сбрасывайте budget"
         )
+    elif terminal == "REAL_DATA_MIGRATION_AMBIGUOUS" and isinstance(
+        body.get("hypothesis_history_locator"), Mapping
+    ):
+        next_line = (
+            "next: INSPECT_HYPOTHESIS_HISTORY — только read-only сверка "
+            "указанных immutable HYP records и supersedes lineage; "
+            "конфликт provenance требует отдельного решения, не повторяйте "
+            "preflight, не сбрасывайте budget и не создавайте trial"
+        )
     elif terminal == "MARKET_EPOCH_CONTINUITY_UNRESOLVED":
         next_line = (
             "next: PROVE_MARKET_CONTINUITY - compare the saved frozen basis with "
@@ -675,12 +686,21 @@ def _preflight_owner_readout(body: Mapping[str, Any]) -> str:
         if selection_router or selection_caveat
         else ""
     )
+    history_line = (
+        "hypothesis_history_locator: "
+        + json.dumps(body["hypothesis_history_locator"], ensure_ascii=False, sort_keys=True)
+        + "\n"
+        if terminal == "REAL_DATA_MIGRATION_AMBIGUOUS"
+        and isinstance(body.get("hypothesis_history_locator"), Mapping)
+        else ""
+    )
     return (
         "PREFLIGHT\n"
         "status: BLOCKED — preflight не разрешил scientific admission; "
         "это не научный negative\n"
         f"reason: {terminal}\n"
         + selection_line
+        + history_line
         + f"{next_line}; не создавайте trial вручную\n"
         + _preflight_writes_note(body)
     )
@@ -752,19 +772,31 @@ def cmd_preflight(
             additional_cycle=additional_cycle,
         )
     except HficPreflightError as exc:
+        history_locator = (
+            exc.locator
+            if str(exc) == "REAL_DATA_MIGRATION_AMBIGUOUS"
+            and isinstance(exc.locator, dict)
+            else None
+        )
         payload = {
             "action": "STOP",
             "terminal": str(exc),
             "owner_class": _owner_class_for_preflight_stop({"terminal": str(exc)}),
             "owner_focus": owner_focus,
             **active.redacted_receipt(),
-            "next": "RESOLVE_TYPED_PREFLIGHT_BLOCK",
+            "next": (
+                "INSPECT_HYPOTHESIS_HISTORY"
+                if history_locator is not None
+                else "RESOLVE_TYPED_PREFLIGHT_BLOCK"
+            ),
             "writes": {
-                "research_store": int(auto_commission),
+                "research_store": 0 if history_locator is not None else int(auto_commission),
                 "forge_context": 0,
                 "session": 0,
             },
         }
+        if history_locator is not None:
+            payload["hypothesis_history_locator"] = history_locator
         payload["owner_readout"] = _preflight_owner_readout(payload)
         _assert_no_path_leak(payload, str(data_root), str(repo_root))
         return emit(payload, exit_code=2)
@@ -2303,6 +2335,7 @@ def cmd_episode_normalized_view(
             load_admitted_partition_rows(
                 data_root=data_root, binding_doc=None, partitions=None, census_path=None, observations_path=None,
                 population="OPPORTUNITY_EPISODES",
+                observation_filters=[("point_id", "in", list(PREFIX_POINTS))],
             )
         )
         policy = effective_policy(store).get("definition")
@@ -3189,8 +3222,12 @@ def cmd_vision_acceptance(
         min_usable_yield_eligible=0,
     )
     extras = [item["payload"] for item in resolve_all_reopened_priors(repo_root)]
+    from solana_alpha_lab.factory.hfic_clock import capture_stage_time
+
+    prior_cutoff = capture_stage_time()
     planned = overlay_search_payloads(
-        store, extras, [DEFECTIVE_CONTROL_SESSION_ID]
+        store, extras, [DEFECTIVE_CONTROL_SESSION_ID],
+        as_of=prior_cutoff,
     )
     try:
         ctx_packet, _digest = build_forge_context_packet(
@@ -3206,6 +3243,7 @@ def cmd_vision_acceptance(
                 preview.get("research_memory_as_of") or "2026-09-15T00:00:00Z"
             ),
             store=store,
+            stage_time=prior_cutoff,
             persist=False,
             search_payloads=planned,
             evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
@@ -3351,6 +3389,76 @@ def cmd_commission_reopened_priors(
     return emit(payload)
 
 
+def _slot_recovery_block(
+    exc: HficSessionError,
+    *,
+    receipt: Mapping[str, Any],
+    store: ResearchStore,
+    data_root: Path,
+    repo_root: Path,
+    inventory_before: str,
+    requested_model_provenance_sha256: str | None = None,
+) -> int:
+    """Report a stopped retry using only bounded immutable slot identities."""
+
+    try:
+        slot = _execution_identity_fields(receipt).get("scientific_slot_sha256")
+    except HficSessionError:
+        slot = None
+    search_key = receipt.get("search_key_sha256")
+    session_id = (
+        "HFIC-SESS-" + search_key[:16].upper()
+        if isinstance(search_key, str) and len(search_key) == 64 else None
+    )
+    saved = next(
+        (
+            row for row in list_scientific_slot_admissions(store)
+            if row.get("scientific_slot_sha256") == slot
+        ), None,
+    ) if isinstance(slot, str) else None
+    inventory_after = store.diagnostics().committed_inventory_sha256
+    detail = {
+        "scientific_slot_sha256": slot if isinstance(slot, str) else None,
+        "session_id": session_id,
+        "source_preflight_receipt_id": receipt.get("receipt_id"),
+        "owner_focus": receipt.get("owner_focus") if isinstance(receipt.get("owner_focus"), str) else None,
+        "preflight_store_inventory_digest": receipt.get("store_inventory_digest"),
+        "current_store_inventory_digest": inventory_after,
+        "inventory_before_this_call": inventory_before,
+        "inventory_changed_this_call": inventory_after != inventory_before,
+        "requested_model_provenance_sha256": (
+            requested_model_provenance_sha256
+            or receipt.get("model_provenance_sha256")
+        ),
+        "saved_reservation": (
+            {key: saved.get(key) for key in (
+                "session_id", "model_provenance_sha256",
+                "execution_binding_sha256", "capability_epoch_sha256",
+            )} if saved is not None else None
+        ),
+    }
+    payload = {
+        "reason_code": str(exc), "status": "BLOCKED",
+        "scientific_negative": False,
+        "detail": detail,
+        "next_action": "INSPECT_SAVED_SLOT_AND_PREFLIGHT",
+        "owner_readout": (
+            "Сверьте detail.scientific_slot_sha256 и source_preflight_receipt_id "
+            "с immutable reservation; сравните requested_model_provenance_sha256, "
+            "saved_reservation и inventory digest до/после команды. Freeze мог "
+            "сохранить context до отказа; отсутствие изменения inventory само по "
+            "себе не доказывает отсутствие записи blob. Выполните только read-only "
+            "preflight --no-auto-commission с detail.owner_focus из исходного "
+            "receipt. При расхождении "
+            "сохраните BLOCKED до отдельного решения о provenance; не повторяйте "
+            "persist-draft/freeze, не создавайте trial и не сбрасывайте budget."
+        ),
+    }
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    print(str(exc), file=sys.stderr)
+    return emit(payload, exit_code=2)
+
+
 def cmd_freeze(
     repo_root: Path,
     draft_path: Path,
@@ -3371,17 +3479,30 @@ def cmd_freeze(
         _assert_no_path_leak(next_action_draft, str(repo_root))
     data_root = _store_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root)
-    frozen = freeze_draft(
-        draft,
-        preflight_receipt=receipt,
-        store=store,
-        repo_root=repo_root,
-        next_action_draft=next_action_draft,
-        # A production freeze must re-read the current A3 market surface
-        # before writing lifecycle bytes.  Fixture/unit callers retain the
-        # explicit default and do not gain a synthetic market authority.
-        verify_current_market_identity=True,
-    )
+    inventory_before = store.diagnostics().committed_inventory_sha256
+    try:
+        frozen = freeze_draft(
+            draft,
+            preflight_receipt=receipt,
+            store=store,
+            repo_root=repo_root,
+            next_action_draft=next_action_draft,
+            # A production freeze must re-read the current A3 market surface
+            # before writing lifecycle bytes. Fixture/unit callers retain the
+            # explicit default and do not gain a synthetic market authority.
+            verify_current_market_identity=True,
+        )
+    except HficSessionError as exc:
+        if str(exc) not in {
+            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            "PREFLIGHT_STORE_DIGEST_MISMATCH",
+        }:
+            raise
+        return _slot_recovery_block(
+            exc, receipt=receipt, store=store,
+            data_root=data_root, repo_root=repo_root,
+            inventory_before=inventory_before,
+        )
     git_after = repository_git_snapshot(repo_root)
     if not git_before.unchanged(git_after):
         raise HficCliError("GIT_MUTATION_DETECTED")
@@ -3411,14 +3532,27 @@ def cmd_persist_draft(
     data_root = _existing_data_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root, create_if_missing=False)
     before_digest = store.diagnostics().committed_inventory_sha256
-    generated = persist_generated_draft(
-        store,
-        draft,
-        preflight_receipt=receipt,
-        repo_root=repo_root,
-        representation_id=representation_id,
-        model_provenance_sha256=model_provenance_sha256,
-    )
+    try:
+        generated = persist_generated_draft(
+            store,
+            draft,
+            preflight_receipt=receipt,
+            repo_root=repo_root,
+            representation_id=representation_id,
+            model_provenance_sha256=model_provenance_sha256,
+        )
+    except HficSessionError as exc:
+        if str(exc) not in {
+            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            "PREFLIGHT_STORE_DIGEST_MISMATCH",
+        }:
+            raise
+        return _slot_recovery_block(
+            exc, receipt=receipt, store=store,
+            data_root=data_root, repo_root=repo_root,
+            inventory_before=before_digest,
+            requested_model_provenance_sha256=model_provenance_sha256,
+        )
     git_after = repository_git_snapshot(repo_root)
     if not git_before.unchanged(git_after):
         raise HficCliError("GIT_MUTATION_DETECTED")
@@ -4823,6 +4957,10 @@ def _collection_focus(args: argparse.Namespace) -> None:
     args.owner_focus = episode_focus(str(getattr(args, "owner_focus", "AUTO") or "AUTO"))
 
 
+from solana_alpha_lab.factory.research_store import reuse_lifecycle_reads_within_packet
+
+
+@reuse_lifecycle_reads_within_packet
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -5182,18 +5320,42 @@ def main(argv: list[str] | None = None) -> int:
         code = str(exc)
         if str(getattr(args, "command", "") or "").startswith("repair-continuation"):
             return emit_repair_blocked(code)
-        if isinstance(exc, HficSessionError) and code.startswith("CANDIDATE_SCOPE_"):
+        if isinstance(exc, HficSessionError) and code.startswith(("CANDIDATE_SCOPE_", "CARD_TRANSPORT_", "CARD_ALIAS_")):
             print(code, file=sys.stderr)
             return emit({"reason_code": code, "detail": exc.detail,
                          "scientific_negative": False, "writes": False,
                          "next_action": exc.detail.get("next_action") or
                          "CORRECT_DECLARED_FIELD_PLACEMENT_REUSE_SAVED_LOOK"}, exit_code=2)
+        if code == "EXACT_PRIOR_SCOPE_MATCH":
+            print(code, file=sys.stderr)
+            return emit({"reason_code": code, "scientific_negative": False,
+                         "writes": False, "status": "BLOCKED",
+                         "owner_readout": "Точный prior запрещает повторный look. Выполните prior --candidate с текущей карточкой. Если у точного совпадения есть session_id, откройте show-session --session-id. Если session_id=null, show-session недоступен: сохраните candidate_id как указатель на историческую запись и остановитесь до проверки её результата. Новый look не открывайте.",
+                         "next_action": "READ_EXACT_PRIOR_VERIFY_SESSION_OR_BLOCK"}, exit_code=2)
+        if isinstance(exc, HficSessionError) and code == "CLOSED_FAMILY_REOPEN":
+            print(code, file=sys.stderr)
+            return emit({"reason_code": code, "detail": exc.detail,
+                         "scientific_negative": False, "writes": False, "status": "BLOCKED",
+                         "owner_readout": "Эта область закрыта typed ledger. Проверьте detail.scope_id и detail.source_receipt вместе с detail.source_terminal; если locator отсутствует, проверьте ledger до нового решения. Сохраните закрытие. Существенно иной scope требует отдельного основания; переименование карточки не подходит.",
+                         "next_action": exc.detail["next_action"]}, exit_code=2)
         if isinstance(exc, HficSessionError) and code.startswith("FORGE_CONTEXT_"):
             print(code, file=sys.stderr)
-            next_action = ("RUN_PERSISTENT_PREFLIGHT_REUSE_SAVED_LOOK"
-                           if args.command in {"persist-draft", "freeze"}
-                           else "RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY")
-            return emit({"reason_code": code, "scientific_negative": False, "writes": False,
+            next_action = exc.detail.get("next_action") or (
+                "RUN_PERSISTENT_PREFLIGHT_REUSE_SAVED_LOOK"
+                if args.command in {"persist-draft", "freeze"}
+                else "RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY")
+            locator = exc.detail.get("relative_locator")
+            digest = exc.detail.get("required_context_sha256")
+            owner_readout = (
+                "Для сохранённого look нужен новый persistent preflight на том же data root с тем же discovery contract. Повторите preflight и используйте его receipt для persist/freeze; новый look не открывайте."
+                if next_action == "RUN_PERSISTENT_PREFLIGHT_REUSE_SAVED_LOOK" else
+                f"Исходный контекст недоступен. Восстановите исходные байты по <data-root>/{locator}, сверьте SHA-256 {digest} и повторите тот же readback. Если исходных байтов нет — BLOCKED; замену не генерируйте."
+                if locator and digest else
+                "Связь с исходным контекстом нарушена. Проверьте detail и исходные байты; если их нельзя восстановить и сверить — BLOCKED. Новый context и look не создавайте."
+            )
+            return emit({"reason_code": code, "detail": exc.detail,
+                         "scientific_negative": False, "writes": False, "status": "BLOCKED",
+                         "owner_readout": owner_readout,
                          "next_action": next_action}, exit_code=2)
         return emit_error(code)
     except (OSError, ValueError, json.JSONDecodeError):

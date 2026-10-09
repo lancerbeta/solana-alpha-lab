@@ -535,7 +535,10 @@ def resolve_next_action(
     if base_terminal not in known_base:
         # Completed process/technical KILL not listed in CASE_C still stops
         # non-scientifically. Do not launder it into OBSERVABILITY_BLOCKED.
-        if base_terminal.startswith("KILL_"):
+        from solana_alpha_lab.factory.hfic_suppression_semantics import interpret_critic_terminal
+        if interpret_critic_terminal(base_terminal)["outcome_class"] in {
+            "REVIEW_REJECTION", "REVIEW_REJECTION_UNKNOWN_APPLICABILITY", "TECHNICAL_REFUSAL"
+        }:
             return {
                 "next_action": ACTION_NON_SCIENTIFIC_STOP,
                 "owner_final": ACTION_NON_SCIENTIFIC_STOP,
@@ -1368,6 +1371,17 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         identity = stage.get("critic_identity")
         critic_term = stage.get("critic_terminal")
         critic_reason = stage.get("critic_decisive_reason")
+        if isinstance(critic_term, str):
+            from solana_alpha_lab.factory.hfic_suppression_semantics import interpret_critic_terminal
+            explanation = interpret_critic_terminal(critic_term)
+            lines.append("  applicability: " + explanation["prior_applicability"] +
+                         "; class=" + explanation["outcome_class"] + "; family_suppression_authority=false")
+            if explanation["prior_applicability"] == "CANDIDATE_AND_BOUND_EVIDENCE":
+                lines.append("  смысл: отказ относится к этому кандидату и связанной с ним evidence; сам вердикт не закрывает семейство, отдельное закрытие проверяйте по typed ledger; переносимость на другие условия неизвестна")
+            elif explanation["prior_applicability"] == "UNKNOWN":
+                lines.append("  смысл: область применимости вердикта неизвестна; сам вердикт не закрывает семейство, отдельное закрытие проверяйте по typed ledger")
+            else:
+                lines.append("  смысл: этот терминал сам по себе не закрывает гипотезу или семейство")
         if selected or mechanism:
             lines.append(
                 "  candidate: {cid} mechanism={mech}".format(
@@ -2571,6 +2585,14 @@ def _discover_ladder_stages(
         try:
             bundle = load_session_bundle(store, sid)
         except HficSessionError as exc:
+            if (
+                exc.detail.get("next_action") == "RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY"
+                and current_market_epoch
+                and item.get("market_evidence_epoch_sha256") == current_market_epoch
+            ):
+                # The current saved dependency is actionable, not a generic history gap.
+                # Preserve its verified relative locator through the ordinary CLI refusal.
+                raise
             suffix = sid.removeprefix("HFIC-SESS-")
             skipped.append({"session_suffix": suffix, "code": str(exc)})
             _note_market_skip(item, str(exc))

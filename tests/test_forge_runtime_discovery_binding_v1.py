@@ -438,6 +438,7 @@ class PriorScopeTransportTests(unittest.TestCase):
                         "HFIC-DEC-CONTROL",
                         {
                             "hypothesis_version_id": prior["hypothesis_version_id"],
+                            "session_id": prior["session_id"],
                             "decision_kind": "REJECT",
                             "reason_code": "KILL_PREPARATORY_LOOP",
                         },
@@ -454,7 +455,7 @@ class PriorScopeTransportTests(unittest.TestCase):
             self.assertEqual(capsule["evidence_surface_mode"], CURRENT_REPRESENTATION_CONTROL_V1)
             self.assertEqual(capsule["estimand"], "ticket_asymmetry")
             self.assertEqual(capsule["reason_code"], "KILL_PREPARATORY_LOOP")
-            self.assertEqual(capsule["memory_status"], "HARD_CLOSE")
+            self.assertEqual(capsule["memory_status"], "HISTORICAL")
             forge = compact_forge_prior_entry(
                 prior["hypothesis_version_id"],
                 prior,
@@ -1277,7 +1278,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
         self.assertNotIn(relation, {"EXACT_SCOPE_MATCH", "EXACT_VALID_CLOSE"})
         self.assertEqual(done["final_session_terminal"], "KILL_UNBOUND_EVIDENCE")
 
-    def test_recorded_unbound_kill_is_technical_and_mechanism_still_blocks(self) -> None:
+    def test_recorded_unbound_kill_is_technical_and_exact_duplicate_still_blocks(self) -> None:
         unbound_id = "HFIC-CAND-RECORDED-UNBOUND"
         mechanism_id = "HFIC-CAND-RECORDED-MECHANISM"
         axes = {
@@ -1330,6 +1331,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                         "HFIC-DEC-UNBOUND",
                         {
                             "hypothesis_version_id": unbound_id,
+                            "session_id": common["session_id"],
                             "decision_kind": "REJECT",
                             "reason_code": "KILL_UNBOUND_EVIDENCE",
                         },
@@ -1340,6 +1342,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                         "HFIC-DEC-MECHANISM",
                         {
                             "hypothesis_version_id": mechanism_id,
+                            "session_id": common["session_id"],
                             "decision_kind": "REJECT",
                             "reason_code": "KILL_MECHANISM",
                         },
@@ -1356,7 +1359,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             )
             by_id = {item["hypothesis_version_id"]: item for item in snapshot["capsules"]}
             self.assertEqual(by_id[unbound_id]["memory_status"], "TECHNICAL_STOP")
-            self.assertEqual(by_id[mechanism_id]["memory_status"], "HARD_CLOSE")
+            self.assertEqual(by_id[mechanism_id]["memory_status"], "HISTORICAL")
             allowed = bind_prior_scope_evidence(
                 {"candidate_scope": dict(axes), "priors": []},
                 canonical_priors=[by_id[unbound_id]],
@@ -1502,7 +1505,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
             note = compact_forge_prior_entry(
                 frozen["selected_candidate_id"],
                 selected,
-                {"decision_kind": "REJECT", "reason_code": "KILL_UNBOUND_EVIDENCE"},
+                {"session_id": selected["session_id"], "decision_kind": "REJECT", "reason_code": "KILL_UNBOUND_EVIDENCE"},
             )
             self.assertEqual(
                 note["technical_stop_note"],

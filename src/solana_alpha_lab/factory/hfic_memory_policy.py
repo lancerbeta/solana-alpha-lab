@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Mapping, Sequence
+from datetime import UTC, datetime
 from typing import Any
 
 from solana_alpha_lab.factory.hfic_clock import (
@@ -67,8 +68,9 @@ _PENDING_PHASES = frozenset(
 class HficMemoryPolicyError(ValueError):
     """Fail-closed HFIC search-memory policy error."""
 
-    def __init__(self, code: str) -> None:
+    def __init__(self, code: str, *, locator: dict[str, Any] | None = None) -> None:
         self.code = code
+        self.locator = locator
         super().__init__(code)
 
 
@@ -135,8 +137,11 @@ def session_memory_eligibility(item: Mapping[str, Any] | None) -> str:
     return GENESIS_MEMORY_ELIGIBILITY_SHA256
 
 
-def load_policy_records(store: Any) -> list[dict[str, Any]]:
-    found: list[tuple[int, str, dict[str, Any]]] = []
+def load_policy_records(
+    store: Any, *, as_of: str | datetime | None = None,
+) -> list[dict[str, Any]]:
+    cutoff = research_memory_cutoff(as_of)
+    found: list[tuple[int, str, dict[str, Any], Any]] = []
     seen_seq: dict[int, str] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
@@ -152,14 +157,16 @@ def load_policy_records(store: Any) -> list[dict[str, Any]]:
         if previous is not None and previous != sha:
             raise HficMemoryPolicyError("HFIC_MEMORY_POLICY_FORK")
         seen_seq[seq] = sha
-        found.append((seq, str(getattr(record, "record_id", "") or ""), body))
+        found.append((seq, str(getattr(record, "record_id", "") or ""), body, record))
     found.sort(key=lambda item: (item[0], item[1]))
     if not found:
         return []
     expected_previous = GENESIS_POLICY_SHA256
     expected_seq = 1
     chain: list[dict[str, Any]] = []
-    for seq, _record_id, body in found:
+    visible_chain: list[dict[str, Any]] = []
+    invisible_predecessor = False
+    for seq, _record_id, body, record in found:
         if seq != expected_seq:
             raise HficMemoryPolicyError("HFIC_MEMORY_POLICY_INVALID")
         if str(body.get("previous_policy_sha256") or "") != expected_previous:
@@ -173,9 +180,17 @@ def load_policy_records(store: Any) -> list[dict[str, Any]]:
         if expected != str(body.get("memory_eligibility_sha256") or ""):
             raise HficMemoryPolicyError("HFIC_MEMORY_POLICY_INVALID")
         chain.append(body)
+        if cutoff is not None:
+            visible = research_record_visible_as_of(record, cutoff)
+            if visible and invisible_predecessor:
+                raise HficMemoryPolicyError("HFIC_MEMORY_POLICY_PIT_CHAIN_INVALID")
+            if visible:
+                visible_chain.append(body)
+            else:
+                invisible_predecessor = True
         expected_previous = str(body["policy_sha256"])
         expected_seq += 1
-    return chain
+    return visible_chain if cutoff is not None else chain
 
 
 def genesis_policy_head() -> dict[str, Any]:
@@ -202,17 +217,21 @@ def genesis_policy_head() -> dict[str, Any]:
     }
 
 
-def effective_policy(store: Any | None) -> dict[str, Any]:
+def effective_policy(
+    store: Any | None, *, as_of: str | datetime | None = None,
+) -> dict[str, Any]:
     if store is None:
         return genesis_policy_head()
-    chain = load_policy_records(store)
+    chain = load_policy_records(store, as_of=as_of)
     if not chain:
         return genesis_policy_head()
     return dict(chain[-1])
 
 
-def quarantined_session_ids(store: Any | None) -> list[str]:
-    return list(effective_policy(store).get("quarantined_session_ids") or [])
+def quarantined_session_ids(
+    store: Any | None, *, as_of: str | datetime | None = None,
+) -> list[str]:
+    return list(effective_policy(store, as_of=as_of).get("quarantined_session_ids") or [])
 
 
 def hypothesis_search_eligible(
@@ -228,18 +247,44 @@ def hypothesis_search_eligible(
     return session_id not in set(quarantined)
 
 
-def iter_search_memory_hypothesis_payloads(store: Any | None) -> list[dict[str, Any]]:
+def research_memory_cutoff(as_of: str | datetime | None) -> datetime | None:
+    """Resolve an explicit research-time cutoff; None retains ledger inspection."""
+    if as_of is None:
+        return None
+    try:
+        value = datetime.fromisoformat(as_of.replace("Z", "+00:00")) if isinstance(as_of, str) else as_of
+        if not isinstance(value, datetime) or value.tzinfo is None:
+            raise ValueError("timezone required")
+        return value.astimezone(UTC)
+    except ValueError as exc:
+        raise HficMemoryPolicyError("HFIC_MEMORY_AS_OF_INVALID") from exc
+
+
+def research_record_visible_as_of(record: Any, cutoff: datetime | None) -> bool:
+    """A committed row is current only after both valid and availability time."""
+    if cutoff is None:
+        return True
+    effective = getattr(record, "effective_at", None)
+    available = getattr(record, "first_reliable_available_at", None)
+    if (not isinstance(effective, datetime) or effective.tzinfo is None
+            or not isinstance(available, datetime) or available.tzinfo is None):
+        raise HficMemoryPolicyError("HFIC_MEMORY_PIT_UNAVAILABLE")
+    return effective.astimezone(UTC) <= cutoff and available.astimezone(UTC) <= cutoff
+
+
+def iter_search_memory_hypothesis_payloads(
+    store: Any | None, *, as_of: str | datetime | None = None,
+) -> list[dict[str, Any]]:
     if store is None:
         return []
-    blocked = set(quarantined_session_ids(store))
-    latest: dict[str, tuple[tuple[str, str], dict[str, Any]]] = {}
+    cutoff = research_memory_cutoff(as_of)
+    blocked = set(quarantined_session_ids(store, as_of=cutoff))
+    grouped: dict[str, dict[str, tuple[ResearchEvent, dict[str, Any]]]] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
         if str(kind) != "HYPOTHESIS_VERSION":
             continue
         payload = _payload(record)
-        if not hypothesis_search_eligible(payload, blocked):
-            continue
         hyp_id = str(
             payload.get("hypothesis_version_id")
             or getattr(record, "hypothesis_version_id", None)
@@ -248,14 +293,66 @@ def iter_search_memory_hypothesis_payloads(store: Any | None) -> list[dict[str, 
         )
         if not hyp_id:
             continue
-        key = (
-            str(getattr(record, "effective_at", "") or ""),
-            str(getattr(record, "record_id", "") or ""),
+        records = grouped.setdefault(hyp_id, {})
+        if record.record_id in records:
+            raise HficMemoryPolicyError(
+                "HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS",
+                locator={"hypothesis_version_id": hyp_id,
+                         "record_ids": sorted({*records, record.record_id})[:8],
+                         "record_count": len(records) + 1},
+            )
+        records[record.record_id] = (record, payload)
+
+    selected: dict[str, dict[str, Any]] = {}
+    for hyp_id, records in grouped.items():
+        # BASE could publish identical unlinked roots. Treat those immutable
+        # rows as one predecessor even after a new explicit child is appended.
+        roots = [record for record, _ in records.values()
+                 if record.supersedes_record_id is None]
+        legacy_roots = (
+            {record.record_id for record in roots}
+            if len(roots) > 1 and len({record.payload_sha256 for record in roots}) == 1
+            else set()
         )
-        previous = latest.get(hyp_id)
-        if previous is None or key >= previous[0]:
-            latest[hyp_id] = (key, payload)
-    return [latest[item][1] for item in sorted(latest)]
+        ancestors: dict[str, set[str]] = {}
+        for record_id, (record, _) in records.items():
+            seen: set[str] = set()
+            parent = record.supersedes_record_id
+            while parent is not None:
+                if parent not in records or parent == record_id or parent in seen:
+                    raise HficMemoryPolicyError(
+                        "HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS",
+                        locator={"hypothesis_version_id": hyp_id,
+                                 "record_ids": sorted(records)[:8],
+                                 "record_count": len(records)},
+                    )
+                seen.add(parent)
+                parent = records[parent][0].supersedes_record_id
+            if record_id in legacy_roots or seen.intersection(legacy_roots):
+                seen.update(legacy_roots - {record_id})
+            ancestors[record_id] = seen
+        record_ids = list(records)
+        for index, record_id in enumerate(record_ids):
+            for previous_id in record_ids[:index]:
+                if record_id in legacy_roots and previous_id in legacy_roots:
+                    continue
+                if (previous_id not in ancestors[record_id]
+                        and record_id not in ancestors[previous_id]):
+                    raise HficMemoryPolicyError(
+                        "HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS",
+                        locator={"hypothesis_version_id": hyp_id,
+                                 "record_ids": sorted(records)[:8],
+                                 "record_count": len(records)},
+                    )
+
+        eligible = [record_id for record_id, (record, payload) in records.items()
+                    if hypothesis_search_eligible(payload, blocked)
+                    and research_record_visible_as_of(record, cutoff)]
+        if not eligible:
+            continue
+        head = max(eligible, key=lambda record_id: len(ancestors[record_id]))
+        selected[hyp_id] = records[head][1]
+    return [selected[item] for item in sorted(selected)]
 
 
 def eligible_counts(store: Any | None) -> dict[str, int]:
@@ -708,6 +805,8 @@ __all__ = [
     "memory_policy_status",
     "preview_memory_policy",
     "quarantined_session_ids",
+    "research_memory_cutoff",
+    "research_record_visible_as_of",
     "search_identity_sha256",
     "session_memory_eligibility",
 ]

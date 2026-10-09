@@ -37,6 +37,7 @@ CREATE TABLE _projection_metadata (
 CREATE VIEW hypotheses AS
 SELECT
     stable_id AS hypothesis_version_id,
+    NULLIF(json_extract_string(payload_json, '$.session_id'), '') AS session_id,
     json_extract_string(payload_json, '$.family_id') AS family_id,
     TRY_CAST(json_extract_string(payload_json, '$.version_ordinal') AS INTEGER)
         AS version_ordinal,
@@ -47,6 +48,8 @@ SELECT
             SELECT json_extract_string(origin.payload_json, '$.origin_kind')
             FROM _research_events AS origin
             WHERE origin.record_kind = 'HYPOTHESIS_ORIGIN'
+              AND NULLIF(json_extract_string(origin.payload_json, '$.session_id'), '')
+                  IS NOT DISTINCT FROM NULLIF(json_extract_string(hypothesis.payload_json, '$.session_id'), '')
               AND (
                   origin.hypothesis_version_id = hypothesis.stable_id
                   OR origin.stable_id = json_extract_string(
@@ -87,6 +90,8 @@ SELECT
             FROM _research_events AS decision
             WHERE decision.record_kind = 'DECISION_EVENT'
               AND decision.hypothesis_version_id = hypothesis.stable_id
+              AND NULLIF(json_extract_string(decision.payload_json, '$.session_id'), '')
+                  IS NOT DISTINCT FROM NULLIF(json_extract_string(hypothesis.payload_json, '$.session_id'), '')
             ORDER BY
                 decision.effective_at DESC,
                 decision.first_reliable_available_at DESC,
@@ -98,6 +103,8 @@ SELECT
             FROM _research_events AS run
             WHERE run.record_kind IN ('RUN_COMPLETED', 'RUN_INVALID')
               AND run.hypothesis_version_id = hypothesis.stable_id
+              AND NULLIF(json_extract_string(run.payload_json, '$.session_id'), '')
+                  IS NOT DISTINCT FROM NULLIF(json_extract_string(hypothesis.payload_json, '$.session_id'), '')
             ORDER BY
                 run.effective_at DESC,
                 run.first_reliable_available_at DESC,
@@ -115,6 +122,7 @@ SELECT
     record_kind AS event_kind,
     stable_id,
     hypothesis_version_id,
+    NULLIF(json_extract_string(payload_json, '$.session_id'), '') AS session_id,
     json_extract_string(payload_json, '$.decision_kind') AS decision_kind,
     json_extract_string(payload_json, '$.derivation_kind') AS derivation_kind,
     json_extract_string(payload_json, '$.activation_epoch_id')
@@ -135,6 +143,7 @@ CREATE VIEW experiment_runs AS
 SELECT
     stable_id AS run_id,
     hypothesis_version_id,
+    NULLIF(json_extract_string(payload_json, '$.session_id'), '') AS session_id,
     record_kind AS run_event_kind,
     run_key_sha256,
     json_extract_string(payload_json, '$.trial_id') AS trial_id,
@@ -189,6 +198,7 @@ SELECT
     stable_id AS evidence_binding_id,
     run_id,
     hypothesis_version_id,
+    NULLIF(json_extract_string(payload_json, '$.session_id'), '') AS session_id,
     json_extract_string(payload_json, '$.binding_kind') AS binding_kind,
     json_extract_string(payload_json, '$.content_sha256') AS content_sha256,
     json_extract_string(payload_json, '$.logical_uri') AS logical_uri,
@@ -223,6 +233,7 @@ WHERE record_kind = 'PROMOTION_CANDIDATE';
 CREATE VIEW prior_work AS
 SELECT
     stable_id AS hypothesis_version_id,
+    NULLIF(json_extract_string(payload_json, '$.session_id'), '') AS session_id,
     json_extract_string(payload_json, '$.family_id') AS family_id,
     definition_sha256,
     json_extract_string(payload_json, '$.statement') AS statement,
@@ -235,6 +246,8 @@ SELECT
             SELECT json_extract_string(origin.payload_json, '$.origin_kind')
             FROM _research_events AS origin
             WHERE origin.record_kind = 'HYPOTHESIS_ORIGIN'
+              AND NULLIF(json_extract_string(origin.payload_json, '$.session_id'), '')
+                  IS NOT DISTINCT FROM NULLIF(json_extract_string(hypothesis.payload_json, '$.session_id'), '')
               AND (
                   origin.hypothesis_version_id = hypothesis.stable_id
                   OR origin.stable_id = json_extract_string(
@@ -261,6 +274,7 @@ CREATE VIEW capability_gaps AS
 SELECT
     stable_id AS capability_gap_id,
     hypothesis_version_id,
+    NULLIF(json_extract_string(payload_json, '$.session_id'), '') AS session_id,
     run_id,
     json_extract_string(payload_json, '$.capability_id') AS capability_id,
     json_extract_string(payload_json, '$.reason_code') AS reason_code,
@@ -275,20 +289,20 @@ WHERE record_kind = 'CAPABILITY_GAP';
 
 CREATE VIEW hfic_sessions AS
 WITH receipt_sessions AS (
-    SELECT DISTINCT json_extract_string(payload_json, '$.session_id') AS session_id
+    SELECT DISTINCT NULLIF(json_extract_string(payload_json, '$.session_id'), '') AS session_id
     FROM _research_events
     WHERE record_kind = 'RESEARCH_ARTIFACT'
       AND json_extract_string(payload_json, '$.artifact_kind') = 'SESSION_RECEIPT'
 ),
 critic_sessions AS (
-    SELECT DISTINCT json_extract_string(payload_json, '$.session_id') AS session_id
+    SELECT DISTINCT NULLIF(json_extract_string(payload_json, '$.session_id'), '') AS session_id
     FROM _research_events
     WHERE record_kind = 'RESEARCH_ARTIFACT'
       AND json_extract_string(payload_json, '$.artifact_kind') = 'CRITIC_RESULT'
 ),
 scored AS (
     SELECT
-        json_extract_string(cycle.payload_json, '$.session_id') AS session_id,
+        NULLIF(json_extract_string(cycle.payload_json, '$.session_id'), '') AS session_id,
         CASE
             WHEN json_extract_string(cycle.payload_json, '$.phase')
                  = 'SYNTHESIS_COMPLETE'
@@ -369,10 +383,10 @@ scored AS (
     FROM _research_events AS cycle
     LEFT JOIN receipt_sessions AS rec
       ON rec.session_id
-         = json_extract_string(cycle.payload_json, '$.session_id')
+         = NULLIF(json_extract_string(cycle.payload_json, '$.session_id'), '')
     LEFT JOIN critic_sessions AS art
       ON art.session_id
-         = json_extract_string(cycle.payload_json, '$.session_id')
+         = NULLIF(json_extract_string(cycle.payload_json, '$.session_id'), '')
     WHERE cycle.record_kind = 'RESEARCH_CYCLE'
       AND json_extract_string(cycle.payload_json, '$.hfic_protocol') IS NOT NULL
 ),
@@ -412,7 +426,7 @@ SELECT
         WHEN EXISTS (
             SELECT 1
             FROM _research_events AS marker
-            WHERE json_extract_string(marker.payload_json, '$.session_id')
+            WHERE NULLIF(json_extract_string(marker.payload_json, '$.session_id'), '')
                 = ranked.session_id
             AND json_extract_string(marker.payload_json, '$.artifact_kind')
                 IS DISTINCT FROM 'PROVENANCE_TIME_CORRECTION'
@@ -448,7 +462,7 @@ WHERE cycle_rank = 1;
 
 CREATE VIEW hfic_candidates AS
 SELECT
-    json_extract_string(payload_json, '$.session_id') AS session_id,
+    NULLIF(json_extract_string(payload_json, '$.session_id'), '') AS session_id,
     stable_id AS candidate_id,
     definition_sha256,
     json_extract_string(payload_json, '$.statement') AS claim,
@@ -465,7 +479,7 @@ WHERE record_kind = 'HYPOTHESIS_VERSION'
 
 CREATE VIEW hfic_candidate_decisions AS
 SELECT
-    json_extract_string(payload_json, '$.session_id') AS session_id,
+    NULLIF(json_extract_string(payload_json, '$.session_id'), '') AS session_id,
     hypothesis_version_id AS candidate_id,
     json_extract_string(payload_json, '$.decision_kind') AS decision_kind,
     json_extract_string(payload_json, '$.reason_code') AS reason_code,

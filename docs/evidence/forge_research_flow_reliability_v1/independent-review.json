@@ -1,0 +1,52 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "as_of": "2026-10-09",
+  "task_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1",
+  "review_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1-REVIEW",
+  "reviewed_bindings_sha256": "f9b8f90856d35c602c0b8b047490ab9b0c89c6f65203e88c9c0dfd25a1f159de",
+  "reviewed_inventory_sha256": "a7fb3f963bd4a28e7271f49265c027c27083857133f8ad12caa728b3f315687a",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "EXACT_HEAD_CRITIC_SCHEMA_RECOVERY_AND_DELIVERY_EVIDENCE_ROLE_NO_P0_P1"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "D01_D17_FALSIFIERS_D15_MEASURED_RECOVERY_D18_LIVE_BLOCKED_NO_P0_P1"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "LINEAGE_PIT_SLOT_RECOVERY_AND_DELIVERY_EVIDENCE_ROLE_NO_P0_P1"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SLOT_OWNER_FOCUS_AND_INVENTORY_DELTA_SAFE_RECOVERY_NO_P0_P1"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_MODEL_DIVERSITY_PROOF",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SCIENTIFIC_ACCEPTANCE",
+    "NO_MERGE"
+  ]
+}

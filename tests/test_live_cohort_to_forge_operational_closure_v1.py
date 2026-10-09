@@ -29,7 +29,6 @@ from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
     is_live_corpus_dataset,
 )
 from solana_alpha_lab.factory.hfic_prior_memory import (  # noqa: E402
-    MEMORY_HARD_CLOSE,
     MEMORY_NOT_SELECTED,
     MEMORY_PARK,
     build_prior_memory_snapshot,
@@ -454,6 +453,7 @@ def _decision_event(hyp_id: str, kind: str, reason: str, transaction_id: str):
         payload={
             "decision_event_id": f"DEC-{hyp_id}",
             "hypothesis_version_id": hyp_id,
+            "session_id": ELIGIBLE_SESSION,
             "decision_kind": kind,
             "reason_code": reason,
         },
@@ -1762,7 +1762,7 @@ class LiveCohortToForgeOperationalClosureTests(unittest.TestCase):
                 str(blocked.exception), "HFIC_RUNTIME_PYTHON_VERSION_INCOMPATIBLE"
             )
 
-    def test_forge_control_ready_keeps_eligible_hard_close_and_park_priors(self) -> None:
+    def test_forge_control_ready_keeps_eligible_raw_kill_and_park_priors(self) -> None:
         from solana_alpha_lab.factory.hfic_memory_policy import quarantined_session_ids
         from solana_alpha_lab.factory.hfic_preflight import evidence_epoch_material
         from solana_alpha_lab.factory.research_store import ExistingResearchStoreReader
@@ -1799,7 +1799,7 @@ class LiveCohortToForgeOperationalClosureTests(unittest.TestCase):
             hard = by_id[HARD_CLOSE_HV]
             park = by_id[PARK_HV]
             skipped = by_id[NOT_SELECTED_HV]
-            self.assertEqual(hard["memory_status"], MEMORY_HARD_CLOSE)
+            self.assertEqual(hard["memory_status"], "HISTORICAL")
             self.assertEqual(hard.get("decision_kind"), "REJECT")
             self.assertEqual(hard.get("reason_code"), "KILL_DATA_INFEASIBLE")
             self.assertEqual(park["memory_status"], MEMORY_PARK)

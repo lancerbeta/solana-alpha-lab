@@ -336,8 +336,12 @@ def _seed_unbound_hypothesis(
 
 
 def _commission_allow_search_gap(data_root: Path) -> None:
+    # Build a BASE-style unlinked historical HYP fixture. Current writer
+    # admission remains strict; these cases exercise read/repair compatibility.
+    from unittest.mock import patch
     try:
-        _commission(data_root)
+        with patch('solana_alpha_lab.factory.research_store._assert_stable_id_lineage'):
+            _commission(data_root)
     except Exception as exc:
         if str(exc) != "COMMISSION_SEARCH_FAILED":
             raise
@@ -441,7 +445,9 @@ class LegacyCommissioningCompatibilityTests(unittest.TestCase):
                 receipt["commissioning"]["compatibility_repair"]["appended"],
                 1,
             )
-            self.assertEqual(len(_compat_records(ResearchStore(data_root))), 1)
+            compat = _compat_records(ResearchStore(data_root))
+            self.assertEqual(len(compat), 1)
+            self.assertEqual(compat[0].supersedes_record_id, "HYPOTHESIS-VERSION-PRESEED-001")
             prove_fast_lane_commissioned(data_root)
 
     def test_legacy_repair_is_idempotent(self) -> None:
@@ -521,12 +527,14 @@ class LegacyCommissioningCompatibilityTests(unittest.TestCase):
             store = ResearchStore(data_root)
             _seed_unbound_hypothesis(store, statement="payload-a")
             _commission_allow_search_gap(data_root)
-            _seed_unbound_hypothesis(
-                ResearchStore(data_root),
-                statement="payload-b",
-                record_id="HYPOTHESIS-VERSION-PRESEED-002",
-                transaction_id="RESEARCH-TXN-PRESEED-002",
-            )
+            from unittest.mock import patch
+            with patch('solana_alpha_lab.factory.research_store._assert_stable_id_lineage'):
+                _seed_unbound_hypothesis(
+                    ResearchStore(data_root),
+                    statement="payload-b",
+                    record_id="HYPOTHESIS-VERSION-PRESEED-002",
+                    transaction_id="RESEARCH-TXN-PRESEED-002",
+                )
             before_ids = {
                 record.record_id for record in ResearchStore(data_root).iter_committed_records()
             }
@@ -557,6 +565,40 @@ class LegacyCommissioningCompatibilityTests(unittest.TestCase):
                 str(preflight_raised.exception),
                 "REAL_DATA_MIGRATION_AMBIGUOUS",
             )
+            self.assertEqual(
+                preflight_raised.exception.locator,
+                {
+                    "hypothesis_version_id": GOLDEN_HYPOTHESIS_VERSION_ID,
+                    "record_ids": [
+                        "HYPOTHESIS-VERSION-PRESEED-001",
+                        "HYPOTHESIS-VERSION-PRESEED-002",
+                    ],
+                    "record_count": 2,
+                },
+            )
+            from contextlib import redirect_stdout
+            from io import StringIO
+            from scripts.hypothesis_forge import cmd_preflight
+
+            output = StringIO()
+            with redirect_stdout(output):
+                exit_code = cmd_preflight(
+                    ROOT,
+                    owner_focus="AUTO",
+                    auto_commission=True,
+                    explicit_data_root=data_root,
+                )
+            self.assertEqual(exit_code, 2)
+            blocked = json.loads(output.getvalue())
+            self.assertEqual(blocked["terminal"], "REAL_DATA_MIGRATION_AMBIGUOUS")
+            self.assertEqual(blocked["next"], "INSPECT_HYPOTHESIS_HISTORY")
+            self.assertEqual(blocked["writes"]["research_store"], 0)
+            self.assertEqual(
+                blocked["hypothesis_history_locator"],
+                preflight_raised.exception.locator,
+            )
+            self.assertIn("HYPOTHESIS-VERSION-PRESEED-002", blocked["owner_readout"])
+            self.assertNotIn(str(data_root), output.getvalue())
             self.assertEqual(
                 {record.record_id for record in ResearchStore(data_root).iter_committed_records()},
                 before_ids,

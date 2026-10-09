@@ -115,8 +115,9 @@ _EPOCH_FILES = (
 class HficPreflightError(ValueError):
     """Fail-closed preflight / commissioning proof error."""
 
-    def __init__(self, code: str) -> None:
+    def __init__(self, code: str, *, locator: dict[str, Any] | None = None) -> None:
         self.code = code
+        self.locator = locator
         super().__init__(code)
 
 
@@ -149,6 +150,7 @@ def _ranked_priors_carry_minimal_scientific_scope(packet: Mapping[str, Any]) -> 
     from solana_alpha_lab.factory.hfic_prior_memory import (
         MEMORY_HARD_CLOSE,
         MEMORY_PARK,
+        _forge_requires_scope_axes,
     )
 
     scope_keys = (
@@ -161,7 +163,7 @@ def _ranked_priors_carry_minimal_scientific_scope(packet: Mapping[str, Any]) -> 
         if not isinstance(entry, Mapping):
             continue
         status = str(entry.get("memory_status") or "")
-        if status not in {MEMORY_HARD_CLOSE, MEMORY_PARK}:
+        if not _forge_requires_scope_axes(memory_status=status, reason_code=entry.get("reason_code")):
             continue
         if any(entry.get(key) not in (None, "", [], {}) for key in scope_keys):
             return True
@@ -877,6 +879,7 @@ def rank_prior_candidate_ids(
     feature_hints: list[str],
     limit: int = MAX_RANKED_PRIORS,
     payloads: Sequence[Mapping[str, Any]] | None = None,
+    as_of: str | datetime | None = None,
 ) -> tuple[list[str], int]:
     from solana_alpha_lab.factory.hfic_memory_policy import (
         iter_search_memory_hypothesis_payloads,
@@ -895,7 +898,7 @@ def rank_prior_candidate_ids(
     source = (
         payloads
         if payloads is not None
-        else iter_search_memory_hypothesis_payloads(store)
+        else iter_search_memory_hypothesis_payloads(store, as_of=as_of)
     )
     for payload in source:
         hyp_id = payload.get("hypothesis_version_id")
@@ -1942,6 +1945,9 @@ def build_forge_context_packet(
     selection_caveat: Mapping[str, Any] | None = None,
     accounting_root: str | None = None,
 ) -> tuple[dict[str, Any], str]:
+    # Research-log visibility is bound to this preflight, not the market
+    # research_memory_as_of carried by the commissioned data proof.
+    prior_cutoff = stage_time if stage_time is not None else capture_stage_time(clock)
     packet_bound = forge_context_packet_max_bytes(evidence_surface_mode)
     datasets, warnings = enumerate_rdp_datasets(
         Path(data_root),
@@ -2058,6 +2064,7 @@ def build_forge_context_packet(
         owner_focus=owner_focus,
         feature_hints=usable_hint_ids,
         payloads=search_payloads,
+        as_of=prior_cutoff,
     )
     from solana_alpha_lab.factory.hfic_reopened_prior_routing import (
         BODY_INCOMPLETE,
@@ -2075,12 +2082,13 @@ def build_forge_context_packet(
             iter_search_memory_hypothesis_payloads as _iter_hv,
         )
 
-        body_source = _iter_hv(store)
+        body_source = _iter_hv(store, as_of=prior_cutoff)
     try:
         ranked_prior_entries = ranked_prior_entries_for_ids(
             ranked,
             body_source,
             store=store,
+            as_of=prior_cutoff,
         )
     except ReopenedPriorRoutingError as exc:
         raise HficPreflightError(str(exc) or BODY_INCOMPLETE) from exc
@@ -2348,6 +2356,9 @@ def build_forge_context_packet(
         )
         from solana_alpha_lab.factory.opportunity_episodes import collection_for_focus
 
+        from solana_alpha_lab.factory.hfic_card_projection import authoring_contract
+
+        packet["candidate_authoring_contract"] = authoring_contract()
         packet["temporal_recipe_capabilities"] = recipe_capabilities()
         if collection_for_focus(owner_focus):
             from solana_alpha_lab.factory.opportunity_episode_release import (
@@ -2867,13 +2878,22 @@ def run_preflight(
         if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1
         else None
     )
+    from solana_alpha_lab.factory.hfic_memory_policy import HficMemoryPolicyError
+
     focus = owner_focus if owner_focus.strip() else AUTO_FOCUS
-    forge_input = build_forge_input_receipt(
-        Path(data_root),
-        repo_root=Path(repo_root),
-        evidence_surface_mode=control_mode,
-        owner_focus=focus,
-    )
+    try:
+        forge_input = build_forge_input_receipt(
+            Path(data_root),
+            repo_root=Path(repo_root),
+            evidence_surface_mode=control_mode,
+            owner_focus=focus,
+        )
+    except HficMemoryPolicyError as exc:
+        if exc.code != "HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS":
+            raise
+        raise HficPreflightError(
+            "REAL_DATA_MIGRATION_AMBIGUOUS", locator=exc.locator,
+        ) from exc
     stop_input = _forge_input_requires_preflight_stop(forge_input, control_mode)
     if stop_input:
         focus = owner_focus if owner_focus.strip() else AUTO_FOCUS
@@ -3002,6 +3022,12 @@ def run_preflight(
         proof=proof,
         selection_caveat=None,
     )
+    # The search key and the prior packet must use the same policy at the
+    # captured session time. A future-effective policy may be committed already.
+    from solana_alpha_lab.factory.hfic_memory_policy import effective_policy as memory_policy_at
+
+    if memory_policy_at(store, as_of=session_started)["policy_sha256"] != ident["policy_head"]["policy_sha256"]:
+        raise HficPreflightError("HFIC_MEMORY_POLICY_PIT_MISMATCH")
 
     # A legacy combined epoch is search continuity only. Incomplete market
     # cannot mint START_NEW_SESSION. Exact readback of an already-admitted

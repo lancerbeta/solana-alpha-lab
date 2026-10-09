@@ -2239,6 +2239,25 @@ def format_discovery_readout(evidence: Mapping[str, Any]) -> dict[str, Any]:
     return payload
 
 
+def _append_reserved_discovery_event(store: Any, event: Any) -> None:
+    """Publish an exact already-admitted intent/result through brief contention.
+
+    The event/transaction is built once; retry neither evaluates nor reserves.
+    Integrity/conflict failures remain terminal. Same budget as reservation.
+    """
+    import time
+    from solana_alpha_lab.factory.research_store import ResearchStoreError
+
+    for attempt in range(40):
+        try:
+            store.append([event], transaction_id=event.transaction_id)
+            return
+        except ResearchStoreError as exc:
+            if exc.code != "WRITER_BUSY" or attempt == 39:
+                raise
+            time.sleep(0.05)
+
+
 def _append_temporal_intent(
     store: Any,
     *,
@@ -2312,7 +2331,7 @@ def _append_temporal_intent(
         producer_git_sha=git_sha,
         created_at=now,
     )
-    store.append([event], transaction_id=event.transaction_id)
+    _append_reserved_discovery_event(store, event)
 
 
 def resolve_research_scope(
@@ -3009,7 +3028,7 @@ def _append_discovery_look(
         producer_git_sha=git_sha,
         created_at=now,
     )
-    store.append([event], transaction_id=event.transaction_id)
+    _append_reserved_discovery_event(store, event)
 
 
 def load_parquet_rows(path: Path, *, filters: list[tuple[str, str, Any]] | None = None) -> list[dict[str, Any]]:
