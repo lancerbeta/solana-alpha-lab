@@ -40,8 +40,8 @@
     "OWNER_UX_CRITIC"
   ],
   "review_id": "FORGE_EVIDENCE_GUIDED_GENERATION_V1-REVIEW",
-  "reviewed_bindings_sha256": "479862867b8a9f0f4d4fe6a040e34a63e7709417f9f444f2f22a51e918bd9391",
-  "reviewed_inventory_sha256": "6924c20767d466b54242270410891f980dde5653510087089ef36821bb68a5f8",
+  "reviewed_bindings_sha256": "88978beff3a7df55638d53db5da15743e7b42135674bcb64307f4a959fadda93",
+  "reviewed_inventory_sha256": "b029af21c431621d5dc0a4fdf1f3240d77904c5e3be09e212d6869575f3b747d",
   "reviews": [
     {
       "findings": [],
@@ -55,14 +55,9 @@
     },
     {
       "findings": [
-        "packet_fingerprint_sha256=41cfd297cbd19fcad1ab8a04d41ceb9a7ada7fc8cbe7aface50c91d83aee61e9",
-        "NARROW_CI_REPAIR_PASS: frozen.diff, task и шесть packet evidence hashes совпали; все 32 inventory bindings соответствуют disk bytes, live HEAD соответствует reviewed_head.",
-        "COMPATIBILITY: schema $defs и version allOf структурно совпадают с ранее проверенным candidate. Добавленные standalone capsule branches точно воспроизводят strict legacy/fresh definitions; значения enum и scientific authority не расширены.",
-        "ADMISSION_BOUNDARY: hfic_preflight.py:2731 останавливает episode projection, если market_admission_ready не True. forge_input_receipt.py:408 сохраняет MARKET_EVIDENCE_BASIS_INCOMPLETE как причину STOP; остальные vision failures сохраняют blocker. UNKNOWN/unavailable prerequisite не превращается в scientific negative или permission.",
-        "SAFETY_AND_RECOVERY: generation-context, session, temporal-discovery и evidence-identity Git blobs неизменны. Full-source guards, mandatory closure, cutoff, scientific identity и bound65536B сохраняют прежний PASS. Archived final checks подтверждают torn-import/cold replay, hidden corruption и forced vision refusal; исходный intermediate failure сохранён.",
-        "EVIDENCE: прежние 1493 raw file entries и 1019 objects неизменны; bundle дополнен 14 файлами. Native evidence не перепривязано к новому capability. FORMULATION остаётся PARTIAL, comparative quality gain не установлен, model diversity UNPROVEN.",
-        "RESEARCH_VALIDITY: schema/readiness tests могут PASS при ложной, переобученной или статистически неидентифицируемой гипотезе. Исправленный STOP доказывает admission/recovery behavior; он не доказывает conjunction, независимость, alpha или family closure. При incomplete admission публикация нового look либо обход integrity failure опровергли бы premise; такого обхода в exact delta не найдено.",
-        "REVERSIBILITY_AND_OWNERSHIP: изменения локальны существующим schema/preflight/receipt owners, новых truth owners или cross-TASK private API imports нет. Durable records, charges и восстановление из Parquet/manifests/artifacts не изменены. Блокирующая коррекция не требуется; tests/native/full gates в этом review не запускались."
+        "packet_fingerprint_sha256=3b8fbf3518ccfbfe3250353de291aa54eabd84c049eb0cc814896a11b494eb0a",
+        "Единственная содержательная delta добавляет DELIVERY_EVIDENCE в l2_roles для трёх уже указанных exact paths; это context projection без новой authority. Остальные изменения — refresh трёх binding receipts. Product code, schemas, tests и semantic packet claims неизменны; прежний PASS и fail-closed admission/safety сохраняются.",
+        "Technical PASS не доказывает research validity, alpha или family closure. Native formulation остаётся PARTIAL, comparative quality gain не установлен, model diversity UNPROVEN. Frozen diff/task hashes и live HEAD сверены; tests/native calls не запускались."
       ],
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS"
