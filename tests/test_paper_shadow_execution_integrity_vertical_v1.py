@@ -7,11 +7,15 @@ configs/execution_domain_v1.json -> required_fast_test_modules.
 from __future__ import annotations
 
 import os
+import hashlib
+import shutil
+import sqlite3
 import sys
 import tempfile
 import threading
 import time
 import unittest
+from unittest.mock import patch
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterator
@@ -28,6 +32,10 @@ from solana_alpha_lab.factory.paper_plane import (  # noqa: E402
     accept_exit_decision,
     accept_signal_decision,
 )
+from solana_alpha_lab.factory.application import ApplicationError, FactoryApplication  # noqa: E402
+from solana_alpha_lab.factory.strategy_runtime import validate_and_hash_strategy  # noqa: E402
+from solana_alpha_lab.factory.trading_runtime_policy import check_policy  # noqa: E402
+import yaml  # noqa: E402
 from solana_alpha_lab.factory.lifecycle_projection import build_lifecycle_projection  # noqa: E402
 from solana_alpha_lab.factory.paper_shadow_commands import (  # noqa: E402
     apply_operator_command,
@@ -795,6 +803,348 @@ class DecisionIdentityGateTests(StoreCase):
         trace = next(t for t in trading["traces"] if t.get("signal_decision_id") == "SIGDEC-VERT-LINEAGE")
         stages = {item["event_type"]: item["stage"] for item in trace["events"]}
         self.assertEqual(stages["EXIT_DECISION_ACCEPTED"], "POSITION")
+
+
+class ReadFreshnessTests(StoreCase):
+    """A4: public owner reads of mutable SQLite, not injected store fixtures."""
+
+    def factory_root(self, name: str) -> Path:
+        root = self.dir / name
+        for relative in (
+            "catalog/schemas/strategy_version_v1_1.schema.json",
+            "catalog/schemas/signal_decision_v1.schema.json",
+            "catalog/schemas/exit_decision_v1.schema.json",
+            "configs/trading_runtime_policy_v1.yaml",
+        ):
+            target = root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / relative, target)
+        strategy = dict(self.strategy)
+        strategy["notional_policy"] = dict(strategy["notional_policy"], notional_usd=30)
+        strategy.pop("spec_sha256", None)
+        strategy["spec_sha256"] = canonical_spec_sha256(strategy)
+        self.strategy = validate_and_hash_strategy(ROOT, strategy)
+        target = root / "configs/strategies/audit.yaml"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(yaml.safe_dump(self.strategy), encoding="utf-8")
+        return root
+
+    def app(self, root: Path) -> FactoryApplication:
+        return FactoryApplication(root=root, research_data_root=root / "empty-rdp", spec_relative="unused.yaml")
+
+    @staticmethod
+    def policy(store: PaperPlaneStore, cap: int, key: str) -> dict[str, Any]:
+        candidate = {
+            "new_entries_enabled": True, "global_entry_notional_cap_usd": str(cap),
+            "max_total_open_positions": 10, "max_total_open_notional_usd": "300",
+            "default_strategy_max_open_positions": 10,
+            "default_strategy_max_open_notional_usd": "300",
+            "max_open_positions_per_mint": 10, "max_open_notional_per_mint_usd": "300",
+            "strategy_overrides": {},
+        }
+        preview = check_policy(store, mode="PAPER", candidate_raw=candidate)
+        apply_policy(
+            ROOT, store, mode="PAPER", candidate_raw=candidate,
+            expected_current_sha256=preview["expected_current_sha256"], idempotency_key=key,
+            owner_authorization_phrase="AUTHORIZE PAPER SHADOW TRADING RUNTIME POLICY APPLY",
+            reason="DISPOSABLE_SYNTHETIC_AUTHORITY_ONLY",
+        )
+        return show_policy(store, "PAPER")
+
+    @staticmethod
+    def inventory(root: Path) -> dict[str, str]:
+        return {p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+                for p in root.rglob("*") if p.is_file()}
+
+    @staticmethod
+    def business_hash(store: PaperPlaneStore) -> str:
+        # Independent SQL dump covers schema and every business table, not
+        # merely total_changes on the writer or a single position.
+        return hashlib.sha256("\n".join(store._conn.iterdump()).encode()).hexdigest()
+
+    def test_public_live_wal_position_policy_and_next_read_two_repetitions(self) -> None:
+        self.observations: list[dict[str, Any]] = []
+        for index in range(2):
+            with self.subTest(repetition=index + 1):
+                root = self.factory_root(f"public-{index}")
+                db = root / "local/factory_v1/paper_plane_state.sqlite"
+                writer = PaperPlaneStore(db)
+                self._stores.append(writer)
+                writer._conn.execute("PRAGMA wal_autocheckpoint=0")
+                self.policy(writer, 30, f"IDEM-FRESH-{index}-30")
+                pid = open_filled(writer, self.strategy, f"SIGDEC-FRESH-{index}")
+                admitted = dict(writer.get_position(pid))
+                writer._conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+                writer.apply_paper_exit_fill(position_id=pid, exit_unit_price_usd=None, mode="PAPER", unresolved=True)
+                current = self.policy(writer, 20, f"IDEM-FRESH-{index}-20")
+                self.assertFalse(writer._conn.in_transaction)
+                before = self.inventory(root)
+                business_before = [dict(row) for row in writer._conn.execute("SELECT * FROM positions")]
+                business_hash_before = self.business_hash(writer)
+                app = self.app(root)
+                try:
+                    view = app.trading_operations_projection()
+                    row = next(row for row in view["operations"]["position_rows"] if row["position_id"] == pid)
+                    self.assertEqual(row["state"], "UNRESOLVED")
+                    envelope = view["runtime_envelope"]["modes"]["PAPER"]
+                    self.assertEqual(envelope["policy_sha256"], current["policy_sha256"])
+                    self.assertEqual(envelope["revision"], 2)
+                    self.assertEqual(str(envelope["global_entry_notional_cap_usd"]), "20")
+                    after = self.inventory(root)
+                    sidecars = {"local/factory_v1/paper_plane_state.sqlite-wal",
+                                "local/factory_v1/paper_plane_state.sqlite-shm"}
+                    self.assertEqual({k: v for k, v in after.items() if k not in sidecars},
+                                     {k: v for k, v in before.items() if k not in sidecars})
+                    forbidden_created = sorted(set(after) - set(before) - sidecars)
+                    self.assertEqual(forbidden_created, [])
+                    self.assertEqual([dict(row) for row in writer._conn.execute("SELECT * FROM positions")], business_before)
+                    business_hash_after = self.business_hash(writer)
+                    self.assertEqual(business_hash_after, business_hash_before)
+                    self.assertEqual(writer.get_position(pid)["admitted_entry_notional_usd_dec"], admitted["admitted_entry_notional_usd_dec"])
+                    further = self.policy(writer, 15, f"IDEM-FRESH-{index}-15")
+                    next_view = app.trading_operations_projection()
+                    self.assertEqual(next_view["runtime_envelope"]["modes"]["PAPER"]["policy_sha256"], further["policy_sha256"])
+                    self.assertTrue(db.with_name(db.name + "-wal").is_file())
+                    self.observations.append({
+                        "repetition": index + 1, "position_state": row["state"],
+                        "policy_revision": envelope["revision"],
+                        "current_cap": envelope["global_entry_notional_cap_usd"],
+                        "writer_policy_sha256": current["policy_sha256"],
+                        "reader_policy_sha256": envelope["policy_sha256"],
+                        "frozen_admission": writer.get_position(pid)["admitted_entry_notional_usd_dec"],
+                        "business_sha256_before_read": business_hash_before,
+                        "business_sha256_after_read": business_hash_after,
+                        "business_unchanged": True, "forbidden_created_files": forbidden_created,
+                        "next_read_revision": next_view["runtime_envelope"]["modes"]["PAPER"]["revision"],
+                        "next_read_hash": next_view["runtime_envelope"]["modes"]["PAPER"]["policy_sha256"],
+                        "writer_open": True, "wal_present": True,
+                    })
+                finally:
+                    app._close_paper_plane_readonly()
+
+    def test_one_projection_snapshot_and_next_request_freshness(self) -> None:
+        root = self.factory_root("snapshot")
+        writer = PaperPlaneStore(root / "local/factory_v1/paper_plane_state.sqlite")
+        self._stores.append(writer)
+        first = self.policy(writer, 30, "IDEM-SNAPSHOT-30")
+        app = self.app(root)
+        from solana_alpha_lab.factory import trading_operations
+        original = trading_operations.build_operations_projection
+
+        def commit_between_reads(reader: PaperPlaneStore) -> dict[str, Any]:
+            operations = original(reader)  # Establish the read snapshot.
+            self.policy(writer, 20, "IDEM-SNAPSHOT-20")
+            return operations
+
+        try:
+            with patch.object(trading_operations, "build_operations_projection", commit_between_reads):
+                view = app.trading_operations_projection()
+            self.assertEqual(view["runtime_envelope"]["modes"]["PAPER"]["policy_sha256"], first["policy_sha256"])
+            current = show_policy(writer, "PAPER")
+            next_view = app.trading_operations_projection()
+            self.assertEqual(next_view["runtime_envelope"]["modes"]["PAPER"]["policy_sha256"], current["policy_sha256"])
+            self.assertIsNone(app._paper_plane_readonly)
+        finally:
+            app._close_paper_plane_readonly()
+
+    def test_lifecycle_and_http_read_the_same_live_position_owner(self) -> None:
+        from test_trading_operations_workbench_v2 import isolated_factory_root, _get
+        root = isolated_factory_root(self.dir / "public-consumers")
+        for relative in ("configs/owner_lifecycle_projection_v1.yaml",
+                         "catalog/schemas/owner_lifecycle_projection_v1.schema.json"):
+            target = root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / relative, target)
+        db = root / "local/factory_v1/paper_plane_state.sqlite"
+        writer = PaperPlaneStore(db)
+        self._stores.append(writer)
+        pid = open_filled(writer, self.strategy, "SIGDEC-FRESH-CONSUMERS")
+        writer._conn.execute("PRAGMA wal_autocheckpoint=0")
+        writer._conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        writer.apply_paper_exit_fill(position_id=pid, exit_unit_price_usd=None, mode="PAPER", unresolved=True)
+        before_hash = self.business_hash(writer)
+        app = FactoryApplication(root=root, research_data_root=root / "empty-rdp")
+        try:
+            projection = app.lifecycle_projection()
+            position = next(row for row in projection["entities"] if row["entity_id"] == pid)
+            self.assertEqual(position["native_state"], "UNRESOLVED")
+            body = _get(app, "/operations")
+            self.assertIn("UNRESOLVED", body)
+            self.assertIn(pid, body)
+            self.assertEqual(self.business_hash(writer), before_hash)
+        finally:
+            app._close_paper_plane_readonly()
+
+    def test_read_failure_does_not_reuse_success_or_infer_empty_runtime(self) -> None:
+        root = self.factory_root("read-error")
+        writer = PaperPlaneStore(root / "local/factory_v1/paper_plane_state.sqlite")
+        self._stores.append(writer)
+        open_filled(writer, self.strategy, "SIGDEC-READ-ERROR")
+        app = self.app(root)
+        try:
+            self.assertEqual(app.trading_operations_projection()["source_status"], "PRESENT")
+            before = self.inventory(root)
+            with patch.object(PaperPlaneStore, "positions", side_effect=sqlite3.OperationalError("SYNTHETIC_READ_FAILURE")):
+                failed = app.trading_operations_projection()
+                self.assertEqual(failed["source_status"], "UNAVAILABLE")
+                self.assertIsNone(failed["operations"])
+                self.assertEqual(failed["runtime_envelope"]["modes"], {})
+                self.assertIn("RUNTIME_SOURCE_UNAVAILABLE", {row["code"] for row in failed["attention"]})
+                economics = app.economics_projection()
+                self.assertEqual(economics["source_status"], "UNAVAILABLE")
+                self.assertIsNone(economics["reconciled_net_pnl_usd"])
+                with self.assertRaises(ApplicationError) as raised:
+                    app.operations_projection()
+                self.assertEqual(raised.exception.code, "RUNTIME_SOURCE_UNAVAILABLE")
+            self.assertEqual(self.inventory(root), before)
+            self.assertEqual(app.trading_operations_projection()["source_status"], "PRESENT")
+        finally:
+            app._close_paper_plane_readonly()
+
+    def test_overlapping_http_gets_do_not_close_each_others_reader(self) -> None:
+        from test_trading_operations_workbench_v2 import isolated_factory_root, _get
+        from solana_alpha_lab.factory import trading_operations
+        root = isolated_factory_root(self.dir / "overlapping-get")
+        writer = PaperPlaneStore(root / "local/factory_v1/paper_plane_state.sqlite")
+        self._stores.append(writer)
+        pid = open_filled(writer, self.strategy, "SIGDEC-OVERLAP")
+        self.policy(writer, 30, "IDEM-OVERLAP-30")
+        writer._conn.execute("PRAGMA wal_autocheckpoint=0")
+        writer._conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        writer.apply_paper_exit_fill(position_id=pid, exit_unit_price_usd=None, mode="PAPER", unresolved=True)
+        current = self.policy(writer, 20, "IDEM-OVERLAP-20")
+        before = self.business_hash(writer)
+        app = FactoryApplication(root=root, research_data_root=root / "empty-rdp")
+        barrier = threading.Barrier(2)
+        first_read_ready = threading.Event()
+        original = trading_operations.build_operations_projection
+        original_public = app.trading_operations_projection
+        observed, bodies, errors, readers = [], [], [], []
+
+        def overlapping_projection(reader: PaperPlaneStore) -> dict[str, Any]:
+            readers.append(reader)
+            first_read_ready.set()
+            barrier.wait(timeout=10)
+            return original(reader)
+
+        def capture_public(**kwargs: Any) -> dict[str, Any]:
+            view = original_public(**kwargs)
+            observed.append(view)
+            return view
+
+        def request(index: int) -> None:
+            try:
+                if index == 1 and not first_read_ready.wait(timeout=10):
+                    raise RuntimeError("FIRST_GET_DID_NOT_ENTER_READ")
+                bodies.append(_get(app, "/operations"))
+            except Exception as exc:
+                errors.append(type(exc).__name__)
+
+        with patch.object(trading_operations, "build_operations_projection", overlapping_projection), \
+             patch.object(app, "trading_operations_projection", capture_public):
+            threads = [threading.Thread(target=request, args=(index,)) for index in range(2)]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join(timeout=15)
+            self.assertTrue(all(not thread.is_alive() for thread in threads))
+        self.assertEqual(errors, [])
+        self.assertEqual(len(observed), 2)
+        self.assertEqual(len({id(reader) for reader in readers}), 2)
+        for reader in readers:
+            with self.assertRaises(sqlite3.ProgrammingError):
+                reader._conn.execute("SELECT 1")
+        self.assertEqual([view["source_status"] for view in observed], ["PRESENT", "PRESENT"])
+        for view in observed:
+            self.assertEqual(view["runtime_envelope"]["modes"]["PAPER"]["policy_sha256"], current["policy_sha256"])
+            self.assertEqual(next(row for row in view["operations"]["position_rows"] if row["position_id"] == pid)["state"], "UNRESOLVED")
+        self.assertTrue(all(pid in body and "UNRESOLVED" in body for body in bodies))
+        self.assertEqual(self.business_hash(writer), before)
+        further = self.policy(writer, 15, "IDEM-OVERLAP-15")
+        self.assertEqual(app.trading_operations_projection()["runtime_envelope"]["modes"]["PAPER"]["policy_sha256"], further["policy_sha256"])
+        app._close_paper_plane_readonly()
+
+    def test_non_wal_compatibility_is_readonly_without_business_writes(self) -> None:
+        root = self.factory_root("non-wal")
+        db = root / "local/factory_v1/paper_plane_state.sqlite"
+        writer = PaperPlaneStore(db)
+        open_filled(writer, self.strategy, "SIGDEC-NON-WAL")
+        writer._conn.execute("PRAGMA journal_mode=DELETE")  # Fixture preparation, before read.
+        writer.close()
+        before = self.inventory(root)
+        app = self.app(root)
+        try:
+            self.assertEqual(app.trading_operations_projection()["source_status"], "PRESENT")
+            reader = app.existing_paper_plane()
+            with self.assertRaises(sqlite3.OperationalError):
+                reader._conn.execute("CREATE TABLE forbidden_business_write(value)")
+            self.assertEqual(self.inventory(root), before)
+        finally:
+            app._close_paper_plane_readonly()
+
+    def test_os_denies_source_access_without_bootstrap_or_stale_fallback(self) -> None:
+        root = self.factory_root("denied")
+        db = root / "local/factory_v1/paper_plane_state.sqlite"
+        writer = PaperPlaneStore(db)
+        open_filled(writer, self.strategy, "SIGDEC-DENIED")
+        writer._conn.execute("PRAGMA journal_mode=DELETE")
+        writer.close()
+        before = self.inventory(root)
+        app = self.app(root)
+        try:
+            if os.name == "nt":
+                import ctypes
+                from ctypes import wintypes
+                kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+                kernel.CreateFileW.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD,
+                                              wintypes.LPVOID, wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE]
+                kernel.CreateFileW.restype = wintypes.HANDLE
+                kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+                kernel.CloseHandle.restype = wintypes.BOOL
+                handle = kernel.CreateFileW(str(db), 0x80000000, 0, None, 3, 0, None)
+                self.assertNotEqual(handle, wintypes.HANDLE(-1).value, ctypes.get_last_error())
+                try:
+                    with self.assertRaises(PermissionError):
+                        db.read_bytes()
+                    failed = app.trading_operations_projection()
+                finally:
+                    self.assertTrue(kernel.CloseHandle(handle))
+            else:
+                original_mode = db.stat().st_mode
+                db.chmod(0)
+                try:
+                    with self.assertRaises(PermissionError):
+                        db.read_bytes()
+                    failed = app.trading_operations_projection()
+                finally:
+                    db.chmod(original_mode)
+            self.assertEqual(failed["source_status"], "UNAVAILABLE")
+            self.assertIsNone(failed["operations"])
+            self.assertEqual(failed["runtime_envelope"]["modes"], {})
+            self.assertEqual(self.inventory(root), before)
+        finally:
+            app._close_paper_plane_readonly()
+
+    def test_missing_and_corrupt_source_never_bootstraps_or_all_clears(self) -> None:
+        for kind in ("missing-root", "missing-db", "corrupt"):
+            with self.subTest(source=kind):
+                root = self.dir / kind if kind == "missing-root" else self.factory_root(kind)
+                db = root / "local/factory_v1/paper_plane_state.sqlite"
+                if kind == "corrupt":
+                    db.parent.mkdir(parents=True)
+                    db.write_bytes(b"not an sqlite database")
+                before = self.inventory(root)
+                app = self.app(root)
+                try:
+                    view = app.trading_operations_projection()
+                    self.assertEqual(view["source_status"], "UNAVAILABLE" if kind == "corrupt" else "NOT_PRESENT")
+                    self.assertIsNone(view["operations"])
+                    self.assertEqual(view["runtime_envelope"]["modes"], {})
+                    self.assertEqual(self.inventory(root), before)
+                    if kind == "missing-root":
+                        self.assertFalse(root.exists())
+                finally:
+                    app._close_paper_plane_readonly()
 
 
 if __name__ == "__main__":

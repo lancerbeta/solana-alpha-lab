@@ -220,15 +220,24 @@ def _ensure_column(conn: sqlite3.Connection, table: str, column: str, ddl_type: 
 def _connect_sqlite(path: Path, *, readonly: bool) -> sqlite3.Connection:
     if readonly:
         conn = sqlite3.connect(
-            path.resolve().as_uri() + "?mode=ro&immutable=1",
+            path.resolve().as_uri() + "?mode=ro",
             uri=True,
             check_same_thread=False,
         )
+        conn.isolation_level = None
     else:
         conn = sqlite3.connect(path, check_same_thread=False)
         conn.isolation_level = None
         conn.execute("PRAGMA busy_timeout=5000")
     conn.row_factory = sqlite3.Row
+    if readonly:
+        try:
+            # Validate actual source access now, so discovery can report an
+            # unreadable/corrupt source before projecting any runtime values.
+            conn.execute("PRAGMA schema_version").fetchone()
+        except sqlite3.Error:
+            conn.close()
+            raise
     return conn
 
 
@@ -280,6 +289,22 @@ class PaperPlaneStore:
         self._migrate_entry_intent_integrity_v1()
         self._migrate_decision_identity_v1()
         self._commit()
+
+    @contextmanager
+    def read_snapshot(self) -> Iterator[None]:
+        """One readonly projection snapshot; release it before the next read.
+
+        Writable callers retain their existing transaction semantics. Native
+        SQLite WAL/SHM coordination is permitted; SQL/business writes are not.
+        """
+        if not self.readonly or self._conn.in_transaction:
+            yield
+            return
+        self._conn.execute("BEGIN")
+        try:
+            yield
+        finally:
+            self._conn.execute("ROLLBACK")
 
     def _migrate_v1_1_lineage(self) -> None:
         """Idempotent additive columns for v1.1 lineage. Legacy rows may be NULL."""

@@ -25667,7 +25667,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: 0373815dae821687180eeb37f86920c95e02968735819563de91864a177f65ce}
+  integrity: {kind: sha256, sha256: 73e02402a8f6e0a294a9c580a64c623f3c6bb6fe4f1afd31557edc0cf3ea6fc3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -27664,7 +27664,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 01b8d921d55e24ca7afbeb04622448c930492e70b52630df28b5475b9a1ba290}
+  integrity: {kind: sha256, sha256: 4b61fe4dac3c21cb2696afe7581dc028b36e8f31498c4cf0483bdc0a6837fce9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -29670,7 +29670,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
-  integrity: {kind: sha256, sha256: 95c78c4522379e512c29ad63f08c4dd29c45e7fcc951189b3109028dcf0b2e35}
+  integrity: {kind: sha256, sha256: 65ef55800b857659445cb6478cd5406eed70a0b4e6227f5672bd3a4f65c84804}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
@@ -35085,7 +35085,7 @@ records:
   as_of: '2026-09-26'
   truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/architecture/PAPER_SHADOW_EXECUTION_INTEGRITY_PRD_SSD_V1.md', repository_path: docs/architecture/PAPER_SHADOW_EXECUTION_INTEGRITY_PRD_SSD_V1.md}
-  integrity: {kind: sha256, sha256: 11c8e2bf3f2be1499ca502c1d1d04cc7a49db0c6871a83f8936630b7d4413951}
+  integrity: {kind: sha256, sha256: 2b1378a69cf63db5b658752c2f9d5237ffd7af6a4c86a58eee6b2b7e93a22602}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001}
@@ -35102,7 +35102,7 @@ records:
   as_of: '2026-09-26'
   truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_paper_shadow_execution_integrity_vertical_v1.py', repository_path: tests/test_paper_shadow_execution_integrity_vertical_v1.py}
-  integrity: {kind: sha256, sha256: 40f4d25af2f016f5a892fde423d8633d590c5b85a1a5e35fdd6be8629c177535}
+  integrity: {kind: sha256, sha256: a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001}
@@ -36134,7 +36134,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lifecycle_projection.py', repository_path: src/solana_alpha_lab/factory/lifecycle_projection.py}
-  integrity: {kind: sha256, sha256: 1ad24507f38abee632c10ebb3bea9cb54c6b6271545ae6e3b37137c94c928bc1}
+  integrity: {kind: sha256, sha256: 73e1eae462536f07c0a8ff597ebbea37925eae11864b13fe67c43daca7457820}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -36611,7 +36611,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: TRADING_OPERATIONS_WORKBENCH_V2
   location: {kind: git_path, logical_uri: 'repo://tests/test_trading_operations_workbench_v2.py', repository_path: tests/test_trading_operations_workbench_v2.py}
-  integrity: {kind: sha256, sha256: 47961e7ff5007db4aa02e5e866e31424518790cd4f05e89ba9ae5a330a9119db}
+  integrity: {kind: sha256, sha256: 0764f3652f042d2306e70defc3de3462d3c4ff5606f24bef048d8c34d49e7a32}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-OPERATIONS-WORKBENCH-001}
@@ -36891,7 +36891,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: RISK_AND_ECONOMICS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_risk_and_economics_v1.py', repository_path: tests/test_risk_and_economics_v1.py}
-  integrity: {kind: sha256, sha256: a1cbf2db3d4d9320aaeb063db660c6dd1bcb347e1829370e3be767d19435bb46}
+  integrity: {kind: sha256, sha256: 6d0742193f5fd20ec9a660074a826561b9f0b27e443b09efee11c880c9681a2e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RISK-AND-ECONOMICS-001}
@@ -40566,3 +40566,233 @@ records:
   evidence: []
   search_terms: [SEM-HYPOTHESIS-FORGE, BOUNDED_REPAIR_ENGINEERING_PROVEN, native handoff checkpoint, source-bound frozen replay, unchanged draft recovery]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-PAPER-PLANE-READ-FRESHNESS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact bounded A4 contract for truthful fresh readonly PaperPlane owner projections.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-09'
+  truth_owner: PAPER_PLANE_READ_FRESHNESS_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/tasks/PAPER_PLANE_READ_FRESHNESS_V1.md
+    repository_path: docs/tasks/PAPER_PLANE_READ_FRESHNESS_V1.md
+  integrity:
+    kind: sha256
+    sha256: 148c1d1be27c9f74e8e96f897d173fdd70d54a5e5ef76725d25f7cec2e31b96a
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: contains
+    target_asset_id: DOC-PAPER-SHADOW-EXECUTION-INTEGRITY-PRD-SSD-001
+  - relation_type: contains
+    target_asset_id: TEST-PAPER-SHADOW-EXECUTION-INTEGRITY-VERTICAL-001
+  - relation_type: contains
+    target_asset_id: DOC-PAPER-PLANE-READ-FRESHNESS-READOUT-001
+  - relation_type: contains
+    target_asset_id: EVIDENCE-PAPER-PLANE-READ-FRESHNESS-VERTICAL-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-PAPER-PLANE-ENGINE-001
+  - relation_type: depends_on
+    target_asset_id: MODULE-TRADING-OPERATIONS-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - PAPER_PLANE
+  - READ_FRESHNESS
+  - A4
+  - F02
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: DOC-PAPER-PLANE-READ-FRESHNESS-READOUT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Owner readout of A4 freshness repair and one bounded offline F01 NEXT_SCOPE.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-09'
+  truth_owner: PAPER_PLANE_READ_FRESHNESS_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/reports/paper_plane_read_freshness/a1_owner_readout_v1.md
+    repository_path: docs/reports/paper_plane_read_freshness/a1_owner_readout_v1.md
+  integrity:
+    kind: sha256
+    sha256: 7c48f1bed692031f8f77ae36486a36c67afd94144b76d01f3f98d66bed984460
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-PAPER-PLANE-READ-FRESHNESS-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - PAPER_PLANE
+  - READ_FRESHNESS
+  - A4
+  - F02
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-PAPER-PLANE-READ-FRESHNESS-VERTICAL-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Source-bound public P6 baseline and two fresh live-WAL candidate repetitions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-09'
+  truth_owner: PAPER_PLANE_READ_FRESHNESS_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/paper_plane_read_freshness/a1_vertical_acceptance_v1.json
+    repository_path: docs/evidence/paper_plane_read_freshness/a1_vertical_acceptance_v1.json
+  integrity:
+    kind: sha256
+    sha256: 067196ef524e2436583a68c472866e6d5fce50ad234bad30a686425375cb2f9d
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-PAPER-PLANE-READ-FRESHNESS-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - PAPER_PLANE
+  - READ_FRESHNESS
+  - A4
+  - F02
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-PAPER-PLANE-READ-FRESHNESS-COMPLETION-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Exact delivery completion binding for A4 readonly freshness.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-09'
+  truth_owner: PAPER_PLANE_READ_FRESHNESS_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/paper_plane_read_freshness/a1_delivery_completion_evidence_v1.json
+    repository_path: docs/evidence/paper_plane_read_freshness/a1_delivery_completion_evidence_v1.json
+  integrity:
+    kind: none
+    note: Content integrity is owned by the live completion-review-fit hash chain; no self-reference through the reviewed
+      inventory.
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-PAPER-PLANE-READ-FRESHNESS-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - PAPER_PLANE
+  - READ_FRESHNESS
+  - A4
+  - F02
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-PAPER-PLANE-READ-FRESHNESS-REVIEW-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Independent code, goal, architecture and owner-UX review for A4.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-09'
+  truth_owner: PAPER_PLANE_READ_FRESHNESS_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/paper_plane_read_freshness/a1_delivery_independent_review_v1.json
+    repository_path: docs/evidence/paper_plane_read_freshness/a1_delivery_independent_review_v1.json
+  integrity:
+    kind: none
+    note: Content integrity is owned by the live completion-review-fit hash chain; no self-reference through the reviewed
+      inventory.
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-PAPER-PLANE-READ-FRESHNESS-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - PAPER_PLANE
+  - READ_FRESHNESS
+  - A4
+  - F02
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+- asset_id: EVIDENCE-PAPER-PLANE-READ-FRESHNESS-FACTORY-FIT-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Full Factory Fit for bounded readonly freshness repair.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-09'
+  truth_owner: PAPER_PLANE_READ_FRESHNESS_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/paper_plane_read_freshness/a1_delivery_factory_fit_v1.json
+    repository_path: docs/evidence/paper_plane_read_freshness/a1_delivery_factory_fit_v1.json
+  integrity:
+    kind: none
+    note: Content integrity is owned by the live completion-review-fit hash chain; no self-reference through the reviewed
+      inventory.
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-PAPER-PLANE-READ-FRESHNESS-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  evidence: []
+  search_terms:
+  - PAPER_PLANE
+  - READ_FRESHNESS
+  - A4
+  - F02
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
