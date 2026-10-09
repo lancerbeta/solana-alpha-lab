@@ -204,7 +204,614 @@
     "capability_epoch_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "evidence_epoch_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "session_id": {"type": "string", "pattern": "^HFIC-SESS-[A-Z0-9]+$"},
-    "prior_memory": {"oneOf": [{"$ref": "#/$defs/prior_memory_legacy_v1_0"}, {"$ref": "#/$defs/prior_memory_working_v1_1"}]},
+    "prior_memory": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/prior_memory_legacy_v1_0"
+        },
+        {
+          "$ref": "#/$defs/prior_memory_working_v1_1"
+        }
+      ],
+      "type": "object",
+      "properties": {
+        "capsules": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "hypothesis_version_id",
+                  "memory_status",
+                  "claim",
+                  "mechanism",
+                  "actor_counterparty",
+                  "population",
+                  "decision_timestamp",
+                  "primary_x_family",
+                  "primary_y",
+                  "horizon_notional",
+                  "negative_control",
+                  "cheapest_falsifier"
+                ],
+                "properties": {
+                  "hypothesis_version_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "session_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "hfic_protocol": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "definition_sha256": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "memory_status": {
+                    "enum": [
+                      "HARD_CLOSE",
+                      "PARK",
+                      "NOT_SELECTED_IN_SESSION",
+                      "TECHNICAL_STOP",
+                      "AMBIGUOUS",
+                      "HISTORICAL"
+                    ]
+                  },
+                  "decision_kind": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "reason_code": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "outcome_semantics": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "source_verdict",
+                      "outcome_class",
+                      "prior_applicability",
+                      "family_suppression_authority"
+                    ],
+                    "properties": {
+                      "source_verdict": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "outcome_class": {
+                        "type": "string"
+                      },
+                      "prior_applicability": {
+                        "type": "string"
+                      },
+                      "family_suppression_authority": {
+                        "const": false
+                      }
+                    }
+                  },
+                  "claim": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "mechanism": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "actor_counterparty": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "population": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "decision_timestamp": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "primary_x_family": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "primary_y": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "horizon_notional": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "negative_control": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "cheapest_falsifier": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "target": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "estimand": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "explanatory_condition": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "evidence_surface_mode": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "representation_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "research_scope_rule_sha256": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "legacy_definition": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": true
+                  },
+                  "park_status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "hypothesis_version_id",
+                  "memory_status",
+                  "claim",
+                  "mechanism",
+                  "actor_counterparty",
+                  "population",
+                  "decision_timestamp",
+                  "primary_x_family",
+                  "primary_y",
+                  "horizon_notional",
+                  "negative_control",
+                  "cheapest_falsifier",
+                  "source_detail",
+                  "selection_reason"
+                ],
+                "properties": {
+                  "hypothesis_version_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "session_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "hfic_protocol": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "definition_sha256": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "memory_status": {
+                    "enum": [
+                      "HARD_CLOSE",
+                      "PARK",
+                      "NOT_SELECTED_IN_SESSION",
+                      "TECHNICAL_STOP",
+                      "AMBIGUOUS",
+                      "HISTORICAL"
+                    ]
+                  },
+                  "decision_kind": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "reason_code": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "outcome_semantics": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "source_verdict",
+                      "outcome_class",
+                      "prior_applicability",
+                      "family_suppression_authority"
+                    ],
+                    "properties": {
+                      "source_verdict": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "outcome_class": {
+                        "type": "string"
+                      },
+                      "prior_applicability": {
+                        "type": "string"
+                      },
+                      "family_suppression_authority": {
+                        "const": false
+                      }
+                    }
+                  },
+                  "claim": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "mechanism": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "actor_counterparty": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "population": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "decision_timestamp": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "primary_x_family": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "primary_y": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "horizon_notional": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "negative_control": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "cheapest_falsifier": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "target": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "estimand": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "explanatory_condition": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "evidence_surface_mode": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "representation_scope": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "research_scope_rule_sha256": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "legacy_definition": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": true
+                  },
+                  "park_status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "source_detail": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "hypothesis_source_refs",
+                      "source_outcome",
+                      "failure_boundary",
+                      "finding",
+                      "surviving_observation",
+                      "reconsideration_condition",
+                      "authored_text_is_authority"
+                    ],
+                    "properties": {
+                      "hypothesis_source_refs": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "record_id",
+                            "payload_sha256"
+                          ],
+                          "properties": {
+                            "record_id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "payload_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "first_reliable_available_at": {
+                              "type": "string"
+                            },
+                            "effective_at": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "decision_source_refs": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "record_id",
+                            "payload_sha256"
+                          ],
+                          "properties": {
+                            "record_id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "payload_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "first_reliable_available_at": {
+                              "type": "string"
+                            },
+                            "effective_at": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "source_outcome": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "failure_boundary": {
+                        "enum": [
+                          "IMPLEMENTATION",
+                          "DESIGN",
+                          "UNKNOWN"
+                        ]
+                      },
+                      "finding": {
+                        "type": [
+                          "string",
+                          "object"
+                        ]
+                      },
+                      "surviving_observation": {
+                        "type": "string"
+                      },
+                      "reconsideration_condition": {
+                        "type": "string"
+                      },
+                      "authored_text_is_authority": {
+                        "const": false
+                      },
+                      "saved_result_refs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "saved_result_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "source_scope": {
+                        "type": "object"
+                      },
+                      "finding_authority": {
+                        "const": "SAVED_DESCRIPTIVE_RESULT_ONLY"
+                      },
+                      "critic_objections": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "source_ref",
+                            "critic_terminal",
+                            "material_defects",
+                            "finding_authority"
+                          ],
+                          "properties": {
+                            "source_ref": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "record_id",
+                                "payload_sha256"
+                              ],
+                              "properties": {
+                                "record_id": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "payload_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-f]{64}$"
+                                },
+                                "first_reliable_available_at": {
+                                  "type": "string"
+                                },
+                                "effective_at": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "critic_terminal": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "material_defects": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "finding_authority": {
+                              "const": "MODEL_REVIEW_ONLY"
+                            },
+                            "next": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "revision_receipt": {
+                              "type": [
+                                "object",
+                                "null"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "selection_reason": {
+                    "enum": [
+                      "MANDATORY_SOURCE_REF",
+                      "STRUCTURAL_DIVERSITY_THEN_TEXT"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
     "generation_context": {
       "type": "object",
       "required": [

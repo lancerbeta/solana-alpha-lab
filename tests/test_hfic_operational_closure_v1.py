@@ -119,7 +119,7 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         )
         self.assertIn("prior_memory", schema["properties"])
         packet_versions = schema["properties"]["packet_version"]["enum"]
-        self.assertEqual(packet_versions, ["1.0", "1.1", "1.2", "1.3", "1.4"])
+        self.assertEqual(packet_versions, ["1.0", "1.1", "1.2", "1.3", "1.4", "1.5"])
         self.assertFalse(schema.get("additionalProperties", True))
 
     def test_projection_declares_hfic_views(self) -> None:

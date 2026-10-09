@@ -2725,6 +2725,18 @@ def try_packet_bound_vision(
             proof=proof,
             selection_caveat=caveat,
         )
+        from solana_alpha_lab.factory.opportunity_episodes import collection_for_focus
+
+        if (
+            ident.get("market_admission_ready") is not True
+            and collection_for_focus(str(ident["owner_focus"]))
+            and evidence_surface_mode != "CURRENT_REPRESENTATION_CONTROL_V1"
+        ):
+            # Admission owns this prerequisite. Do not resolve saved research
+            # against a torn current import before preflight can return its STOP.
+            return _unknown_packet_vision_blocked(
+                Path(repo_root), reason_code="MARKET_EVIDENCE_BASIS_INCOMPLETE"
+            )
         packet, _digest = build_forge_context_packet(
             Path(repo_root),
             Path(data_root),

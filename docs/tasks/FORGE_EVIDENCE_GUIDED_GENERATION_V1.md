@@ -43,6 +43,8 @@ managed_write_set:
 - tests/test_hfic_forge_prior_context_capacity_repair_v1.py
 - tests/test_forge_research_flow_reliability_v1.py
 - tests/test_hypothesis_forge_independent_critic_v1.py
+- tests/test_hfic_operational_closure_v1.py
+- tests/test_hfic_list_aware_vertical_v1.py
 - catalog/assets/**
 - catalog/catalog_manifest.yaml
 - catalog/generated/**
@@ -124,3 +126,11 @@ legacy full snapshot before ordinary preflight. Its direct source consumer is
 included to remove the same archive-capacity dependency, not to bypass readiness.
 
 Delivery integration: owner confirmed PR389 merged at0f89ffd8018c05fbafaf79ef609c7dadf888807f. Ordinary merge preserves PaperPlane source changes; only shared Catalog/navigation conflicts require generated propagation. Original scientific/native evidence remains bound to its recorded PR388/capability frames. No Forge source rewrite, native reroll or authority expansion.
+
+CI consumer repair: the first complete PR390 run identified the legacy capsule
+schema fragment path, an obsolete packet-version expectation, a test-only
+preflight copy inside grounded evidence, and torn-import readiness ordering.
+The two exact direct-consumer test paths above are added for this bounded DoD
+repair. Preserve strict legacy/fresh branches, the whole-packet bound and typed
+source-integrity failures after successful market admission. Native inputs,
+outputs, counters and measured historical capability frames remain immutable.
