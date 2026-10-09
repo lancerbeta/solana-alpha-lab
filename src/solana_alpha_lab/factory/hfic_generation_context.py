@@ -298,6 +298,21 @@ def _seal(body: Mapping[str, Any]) -> dict[str, Any]:
     return snapshot
 
 
+def _consulted_hypothesis_ids(by_id: Mapping[str, Mapping[str, Any]],
+                              consulted_refs: Sequence[str]) -> set[str]:
+    ref_to_ids: dict[str, set[str]] = {}
+    for hyp, cap in by_id.items():
+        detail = cap["source_detail"]
+        for ref in [r["record_id"] for r in detail["hypothesis_source_refs"]] + list(detail.get("saved_result_refs") or []):
+            ref_to_ids.setdefault(ref, set()).add(hyp)
+    required: set[str] = set()
+    for ref in consulted_refs:
+        if ref in by_id: required.add(ref)
+        elif ref in ref_to_ids: required.update(ref_to_ids[ref])
+        else: raise GenerationContextError("GENERATION_CONSULTED_SOURCE_UNAVAILABLE", source_ref=ref)
+    return required
+
+
 def select_working_snapshot(inventory: Mapping[str, Any], *, query: Mapping[str, Any],
                             inventory_digest: str, focus: str = "",
                             consulted_refs: Sequence[str] = (), mandatory_ids: Sequence[str] = (),
@@ -307,16 +322,7 @@ def select_working_snapshot(inventory: Mapping[str, Any], *, query: Mapping[str,
     payloads = inventory.get("selection_payloads", inventory["payloads"])
     eligible_sha = archive_fingerprint(inventory)
     by_id = {c["hypothesis_version_id"]: c for c in inventory["capsules"]}
-    ref_to_ids: dict[str, set[str]] = {}
-    for hyp, cap in by_id.items():
-        detail = cap["source_detail"]
-        for ref in [r["record_id"] for r in detail["hypothesis_source_refs"]] + list(detail.get("saved_result_refs") or []):
-            ref_to_ids.setdefault(ref, set()).add(hyp)
-    required = set(mandatory_ids)
-    for ref in consulted_refs:
-        if ref in by_id: required.add(ref)
-        elif ref in ref_to_ids: required.update(ref_to_ids[ref])
-        else: raise GenerationContextError("GENERATION_CONSULTED_SOURCE_UNAVAILABLE", source_ref=ref)
+    required = set(mandatory_ids) | _consulted_hypothesis_ids(by_id, consulted_refs)
     missing = required.difference(by_id)
     if missing:
         raise GenerationContextError("GENERATION_CONSULTED_SOURCE_UNAVAILABLE", hypothesis_version_ids=sorted(missing))
@@ -466,8 +472,15 @@ def read_context_view(store: Any, *, receipt: Mapping[str, Any], query_sha256: s
     if archive_fingerprint(archive) != memory.get("eligible_archive_sha256"):
         raise GenerationContextError("GENERATION_CONTEXT_MATERIAL_SOURCE_CHANGED")
     descriptor = memory["selection_query"]
+    detail_bound = 8
+    if source_ref:
+        # A saved result can be cited by several hypotheses. Keep its entire
+        # mandatory source closure, without unrelated optional entries or a
+        # higher global count/byte cap. Oversized closure still fails closed.
+        by_id = {cap["hypothesis_version_id"]: cap for cap in archive["capsules"]}
+        detail_bound = min(64, len(_consulted_hypothesis_ids(by_id, [source_ref])))
     chosen = select_working_snapshot(archive, query=descriptor["query"], focus=descriptor["focus"], inventory_digest=digest,
-                                    consulted_refs=[source_ref] if source_ref else [], max_records=1 if source_ref else 8)
+                                    consulted_refs=[source_ref] if source_ref else [], max_records=detail_bound)
     return {"schema": "smial.generation-context-detail", "status": "READ_ONLY",
             "bound_selection_query_sha256": query_sha256,
             "source_preflight_receipt_sha256": receipt["preflight_receipt_sha256"],

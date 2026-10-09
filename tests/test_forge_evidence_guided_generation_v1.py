@@ -301,6 +301,37 @@ class OrdinaryWorkingMemoryTests(unittest.TestCase):
         read=self.cli('prior','--context-view','--preflight-receipt',self.write('detail-resume.json',resumed),'--selection-query-sha256',refreshed['selection_query_sha256'],'--source-ref','HYP-EGG-00004')
         self.assertEqual(read['status'],'READ_ONLY')
 
+    def test_bound_result_detail_preserves_shared_hypothesis_sources(self):
+        evidence, scope, _query, _initial = self.look('EGG_SHARED_DETAIL_LOOK')
+        store = ResearchStore(self.plane)
+        sources = {'HYP-EGG-SHARED-PRIMARY', 'HYP-EGG-SHARED-RUNNER'}
+        records = []
+        for hyp in sorted(sources):
+            payload = {**scope, 'hypothesis_version_id': hyp,
+                       'session_id': 'SYNTHETIC-SHARED-' + hyp,
+                       'claim': 'Shared saved result, separate hypothesis source.',
+                       'saved_observation_evidence': evidence}
+            record = _event(record_id=hyp, kind=RecordKind.HYPOTHESIS_VERSION,
+                            entity_id=hyp, hypothesis_version_id=hyp,
+                            payload=payload, created=datetime.now(UTC))
+            records.append(record)
+        store.append(records, transaction_id=records[0].transaction_id)
+        pre = self.preflight('EGG_SHARED_DETAIL_READER')
+        memory = pre['forge_context_packet']['prior_memory_working_view']
+        before = store.diagnostics().committed_inventory_sha256
+        detail = self.cli('prior', '--context-view', '--preflight-receipt',
+                          self.write('shared-result-pre.json', pre),
+                          '--selection-query-sha256', memory['selection_query_sha256'],
+                          '--source-ref', evidence['result_refs'][0])
+        self.assertEqual(detail['status'], 'READ_ONLY')
+        self.assertFalse(detail['new_look'])
+        self.assertEqual({c['hypothesis_version_id'] for c in detail['view']['capsules']}, sources)
+        self.assertEqual(detail['view']['mandatory_count'], 2)
+        self.assertTrue(all(c['selection_reason'] == 'MANDATORY_SOURCE_REF'
+                            for c in detail['view']['capsules']))
+        self.assertLessEqual(detail['view']['bytes'], 65536)
+        self.assertEqual(store.diagnostics().committed_inventory_sha256, before)
+
     def test_episode_binding_and_metadata_coverage_use_actual_collection_owner(self):
         before=ResearchStore(self.plane).diagnostics().committed_inventory_sha256
         binding=self.cli('discovery-binding','--collection','OPPORTUNITY_EPISODES')
