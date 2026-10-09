@@ -8,8 +8,10 @@
 Постановка: SMIAL_Evidence_Guided_Generator_PRD_SSD_V1_2026-10-09.md,
 R1–R10, P1–P8, отдельные оси §14. Base:
 `fb65d69f6e48c49b26937bb6caf324b3417b094e` / PR388.
-Проверенная реализация: `706e9170c6aaef02b7acdf382cfe8de96aa3d069`;
-capability `3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72`.
+Финальная реализация: `20cdc7f3fe5bdb541d6961fe996b379bec0ddd90`;
+capability `ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13`.
+Исторические native inputs относятся к исходной реализации706e917; их
+Git/capability bindings сохранены и не переименованы в финальный epoch.
 Последующие evidence/content commits связываются completion/harness отдельно.
 Route `DIRECT_CODEX_DELIVERY`, actor `CODEX`. Только disposable synthetic stores.
 
@@ -56,9 +58,14 @@ feature/predicate nodes. Late consulted details не превращаются з
 
 ## Техническое evidence
 
-На указанном capability прошли53 tests:19 новых/direct consumer,30 legacy/
-recovery,2 future-prefix,2 producer/protected guards. Commands, log hashes,
-before/after capability находятся в manifest и lossless raw bundle.
+На intermediate capability51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1
+прошли54 проверки:20 новых/direct consumer,30 legacy/recovery,2 future-prefix,
+2 producer/protected guards. Последняя узкая правка recovery отдельно проверена
+на финальном capabilityba8d2b:4/4 PASS,82.804s. В них входят exact recovery
+locator, stale detail, mandatory overflow и повреждённый hidden archive вне
+выбранных8 источников: public refusal и unchanged hashes всего store.
+Commands, log hashes, before/after capability находятся в manifest и raw bundle.
+Прежние53 проверки и9 growth processes относятся к historical3dcbe81 epoch.
 Это focused validation; local full gate до PR не запускался.
 
 | Архив: добавлено / фактически eligible | Cold processes | Wall seconds | Initial / Critic capsules | Whole Critic bytes |
@@ -74,6 +81,28 @@ partition reads/bytes/record decodes и Windows peak working set. Token counts
 не измерены; это bytes/RSS/wall measurements. Все growth cards scripted,
 они не входят в native formulation numerator. Старые capability/failed runs
 сохранены отдельными raw locators, не переименованы в final PASS.
+
+После финальной правки отдельно повторён один cold public CLI path на4001
+eligible source:63.064s, initial8 / Critic28, whole packet64440 bytes,
+peak RSS465047552 bytes, полный guard4001, FROZEN_AWAITING_CRITIC. Исходные9
+замеров не выданы за новые. Все cold measurements — fresh process, не cold OS cache.
+
+Стоимость существующего BASE owner и текущего отбора измерена18 отдельными
+cold processes:3 на arm/размер, один неизменённый source root и cutoff на пару.
+Три integrity/scope owners имеют одинаковые Git blob/disk hashes в BASE и
+candidate. Каждая partition проверяется один раз внутри read scope; inventories
+не меняются, writes/new looks0. Это component read/selection timing, без imports,
+setup и process launch; полного successful BASE CLI при архиве>64 нет.
+
+| Добавлено | BASE median seconds | Candidate median seconds | Physical reads / hashed bytes, оба arms |
+|---|---:|---:|---:|
+|40|0.01496|0.01327|2 /44485|
+|400|0.03128|0.05165|2 /293654|
+|4000|0.21489|0.42474|2 /2789065|
+
+На4000 extra selection CPU около0.210s, примерно2x на этом компоненте;
+RSS сопоставим (максимум179146752 bytes). Нет N-кратного повторного чтения;
+это не доказательство ускорения всей ordinary Forge относительно frozen BASE.
 
 ## R1–R10 → P1–P8
 

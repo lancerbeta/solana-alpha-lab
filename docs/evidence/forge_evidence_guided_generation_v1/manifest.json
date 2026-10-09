@@ -28,6 +28,572 @@
     "readback_rows": 22,
     "scope": "CURRENT_NATIVE_FOCUS_ONLY_EXCLUDES_OTHER_SCRIPTED_JOURNALS_AND_P8_CLONED_COUNTS"
   },
+  "archive_owner_cost": {
+    "largest_selection_median_increment_seconds": 0.20985390001535417,
+    "largest_selection_median_ratio_approximately": 1.98,
+    "measured": {
+      "actual_processes": 18,
+      "candidate_public_whole_path": "growth/summary.json",
+      "immutable_owner_bindings": [
+        {
+          "base_blob_sha256": "405040074c6af8069ce719fd6fa4f1cb8314a24c114878fc257ee10700a3f18b",
+          "current_blob_sha256": "405040074c6af8069ce719fd6fa4f1cb8314a24c114878fc257ee10700a3f18b",
+          "current_disk_sha256": "405040074c6af8069ce719fd6fa4f1cb8314a24c114878fc257ee10700a3f18b",
+          "git_blob_bytes_equal": true,
+          "path": "src/solana_alpha_lab/factory/hfic_prior_memory.py"
+        },
+        {
+          "base_blob_sha256": "82ae91ebcbbd8f640fa7f5138ce09d9c9a0d7738322bb3095f78f7cbf2450197",
+          "current_blob_sha256": "82ae91ebcbbd8f640fa7f5138ce09d9c9a0d7738322bb3095f78f7cbf2450197",
+          "current_disk_sha256": "82ae91ebcbbd8f640fa7f5138ce09d9c9a0d7738322bb3095f78f7cbf2450197",
+          "git_blob_bytes_equal": true,
+          "path": "src/solana_alpha_lab/factory/hfic_memory_policy.py"
+        },
+        {
+          "base_blob_sha256": "38d6c17bea38a4388fa14509dfb401b1f4e6cdda74de7e41cf032debe080ef49",
+          "current_blob_sha256": "38d6c17bea38a4388fa14509dfb401b1f4e6cdda74de7e41cf032debe080ef49",
+          "current_disk_sha256": "38d6c17bea38a4388fa14509dfb401b1f4e6cdda74de7e41cf032debe080ef49",
+          "git_blob_bytes_equal": true,
+          "path": "src/solana_alpha_lab/factory/research_store.py"
+        }
+      ],
+      "limits": [
+        "COLD_PROCESS_NOT_COLD_OS_CACHE",
+        "Source setup/diagnostics/imports excluded from timer",
+        "Legacy owner unchanged from base; candidate owner current; no whole frozen BASE CLI latency claim"
+      ],
+      "model_tokens_cost": "NOT_APPLICABLE_SCRIPTED_READ_ONLY",
+      "not_successful_gt64_baseline": true,
+      "not_whole_baseline_generation_latency": true,
+      "processes_per_arm_and_size": 3,
+      "rows": [
+        {
+          "bytes_hashed": 44485,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 1,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_before": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 160555008,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 41,
+          "pid": 60024,
+          "result": {
+            "eligible": 40,
+            "emitted": 40,
+            "packet_bytes": 23355,
+            "status": "SNAPSHOT"
+          },
+          "same_immutable_root": "growth/source-40",
+          "seconds": 0.014958499989006668,
+          "seeded_heads": 40,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 44485,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 1,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_before": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 160292864,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 41,
+          "pid": 30056,
+          "result": {
+            "eligible": 40,
+            "emitted": 8,
+            "packet_bytes": 10083,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-40",
+          "seconds": 0.012709500006167218,
+          "seeded_heads": 40,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 44485,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 2,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_before": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 159809536,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 41,
+          "pid": 11292,
+          "result": {
+            "eligible": 40,
+            "emitted": 40,
+            "packet_bytes": 23355,
+            "status": "SNAPSHOT"
+          },
+          "same_immutable_root": "growth/source-40",
+          "seconds": 0.014696199999889359,
+          "seeded_heads": 40,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 44485,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 2,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_before": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 160018432,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 41,
+          "pid": 76008,
+          "result": {
+            "eligible": 40,
+            "emitted": 8,
+            "packet_bytes": 10083,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-40",
+          "seconds": 0.01521889999276027,
+          "seeded_heads": 40,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 44485,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 3,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_before": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 160473088,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 41,
+          "pid": 56324,
+          "result": {
+            "eligible": 40,
+            "emitted": 40,
+            "packet_bytes": 23355,
+            "status": "SNAPSHOT"
+          },
+          "same_immutable_root": "growth/source-40",
+          "seconds": 0.015402299992274493,
+          "seeded_heads": 40,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 44485,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 3,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_before": "6805a7b4fa1369eb64e522dd55369b2243b4550bceb9bd0c6c17cefafc5e00b7",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 160415744,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 41,
+          "pid": 60524,
+          "result": {
+            "eligible": 40,
+            "emitted": 8,
+            "packet_bytes": 10083,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-40",
+          "seconds": 0.013271199975861236,
+          "seeded_heads": 40,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 293654,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 1,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_before": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 162156544,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 401,
+          "pid": 75988,
+          "result": {
+            "eligible": 400,
+            "emitted": 0,
+            "max_bytes": 65536,
+            "max_records": 64,
+            "reason_code": "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED",
+            "status": "REFUSAL"
+          },
+          "same_immutable_root": "growth/source-400",
+          "seconds": 0.03127710000262596,
+          "seeded_heads": 400,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 293654,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 1,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_before": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 162557952,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 401,
+          "pid": 78672,
+          "result": {
+            "eligible": 400,
+            "emitted": 8,
+            "packet_bytes": 10087,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-400",
+          "seconds": 0.05164769999100827,
+          "seeded_heads": 400,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 293654,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 2,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_before": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 160587776,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 401,
+          "pid": 76484,
+          "result": {
+            "eligible": 400,
+            "emitted": 0,
+            "max_bytes": 65536,
+            "max_records": 64,
+            "reason_code": "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED",
+            "status": "REFUSAL"
+          },
+          "same_immutable_root": "growth/source-400",
+          "seconds": 0.032742499985033646,
+          "seeded_heads": 400,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 293654,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 2,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_before": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 162390016,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 401,
+          "pid": 52800,
+          "result": {
+            "eligible": 400,
+            "emitted": 8,
+            "packet_bytes": 10087,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-400",
+          "seconds": 0.05207410000730306,
+          "seeded_heads": 400,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 293654,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 3,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_before": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 161976320,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 401,
+          "pid": 26368,
+          "result": {
+            "eligible": 400,
+            "emitted": 0,
+            "max_bytes": 65536,
+            "max_records": 64,
+            "reason_code": "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED",
+            "status": "REFUSAL"
+          },
+          "same_immutable_root": "growth/source-400",
+          "seconds": 0.030803400004515424,
+          "seeded_heads": 400,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 293654,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 3,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_before": "fa4f9f05b7c7cab037abeba0054e7f085ead99f851dad40934ce2ba285cafbf4",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 162525184,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 401,
+          "pid": 48516,
+          "result": {
+            "eligible": 400,
+            "emitted": 8,
+            "packet_bytes": 10087,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-400",
+          "seconds": 0.05001569999149069,
+          "seeded_heads": 400,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 2789065,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 1,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_before": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 179146752,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 4001,
+          "pid": 13528,
+          "result": {
+            "eligible": 4000,
+            "emitted": 0,
+            "max_bytes": 65536,
+            "max_records": 64,
+            "reason_code": "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED",
+            "status": "REFUSAL"
+          },
+          "same_immutable_root": "growth/source-4000",
+          "seconds": 0.2148874000122305,
+          "seeded_heads": 4000,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 2789065,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 1,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_before": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 179064832,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 4001,
+          "pid": 31040,
+          "result": {
+            "eligible": 4000,
+            "emitted": 8,
+            "packet_bytes": 10091,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-4000",
+          "seconds": 0.4247357999847736,
+          "seeded_heads": 4000,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 2789065,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 2,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_before": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 178106368,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 4001,
+          "pid": 29332,
+          "result": {
+            "eligible": 4000,
+            "emitted": 0,
+            "max_bytes": 65536,
+            "max_records": 64,
+            "reason_code": "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED",
+            "status": "REFUSAL"
+          },
+          "same_immutable_root": "growth/source-4000",
+          "seconds": 0.21418080001603812,
+          "seeded_heads": 4000,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 2789065,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 2,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_before": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 177897472,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 4001,
+          "pid": 75748,
+          "result": {
+            "eligible": 4000,
+            "emitted": 8,
+            "packet_bytes": 10091,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-4000",
+          "seconds": 0.4290757999988273,
+          "seeded_heads": 4000,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 2789065,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 3,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_before": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "BASE_LEGACY_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 176689152,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 4001,
+          "pid": 75468,
+          "result": {
+            "eligible": 4000,
+            "emitted": 0,
+            "max_bytes": 65536,
+            "max_records": 64,
+            "reason_code": "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED",
+            "status": "REFUSAL"
+          },
+          "same_immutable_root": "growth/source-4000",
+          "seconds": 0.21705449998262338,
+          "seeded_heads": 4000,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        },
+        {
+          "bytes_hashed": 2789065,
+          "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "cold_process": 3,
+          "cutoff": "2026-10-09T16:55:45.964039+00:00",
+          "distinct_physical_partitions": 2,
+          "inventory_after": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_before": "eea31e4430eb477d9a65a3a7e6405c1647a5dbff71b913846cf048185e3365aa",
+          "inventory_unchanged": true,
+          "max_partition_verifications_in_one_scope": 1,
+          "mode": "CANDIDATE_WORKING_OWNER",
+          "new_looks": 0,
+          "peak_rss_bytes": 174141440,
+          "physical_partition_reads": 2,
+          "physical_record_decodes": 4001,
+          "pid": 50648,
+          "result": {
+            "eligible": 4000,
+            "emitted": 8,
+            "packet_bytes": 10091,
+            "status": "BOUNDED_WORKING_VIEW"
+          },
+          "same_immutable_root": "growth/source-4000",
+          "seconds": 0.42411599998013116,
+          "seeded_heads": 4000,
+          "timing_boundary": "One fresh verified-read scope plus production legacy snapshot/refusal or production verified collection/selection; excludes imports, diagnostics and process launch; separate process per arm",
+          "writes": 0
+        }
+      ],
+      "schema": "smial.egg-cold-archive-owner-comparison",
+      "source_base_commit": "fb65d69f6e48c49b26937bb6caf324b3417b094e"
+    },
+    "no_whole_frozen_baseline_cli_latency_claim": true,
+    "receipt": {
+      "bytes": 24887,
+      "raw_path": "archive-owner-cost/summary.json",
+      "sha256": "1948b777fc3298b5f3400deede86eab3e82c69e4d49ca784420f6c0939a9551f"
+    }
+  },
   "as_of": "2026-10-09",
   "critic_paths": [
     {
@@ -76,6 +642,11 @@
   },
   "fixtures": [
     {
+      "bytes": 5957,
+      "path": "tests/fixtures/forge_evidence_guided_generation_v1/archive_owner_compare.py",
+      "sha256": "91d164e1ee55a3f937de4f04039c0a2d5bbcbbf57deee109a13ef1449755a28b"
+    },
+    {
       "bytes": 6715,
       "path": "tests/fixtures/forge_evidence_guided_generation_v1/growth_probe.py",
       "sha256": "058a09fb8f3a722dc2c711cab8ae17f26d6a362c05f874ef50f487b27dbca04c"
@@ -98,7 +669,120 @@
   ],
   "growth": {
     "cost": "UNKNOWN",
-    "measurements": [
+    "final_capability_measurements": [
+      {
+        "archive_eligible_count": 4001,
+        "capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+        "cold_process": 4,
+        "critic_capsules": 28,
+        "critic_packet_bytes": 64440,
+        "distinct_eligible_heads": 4000,
+        "full_safety_count": 4001,
+        "initial_count": 8,
+        "mode": "SCRIPTED_SYNTHETIC_PUBLIC_CLI",
+        "native_quality_numerator": false,
+        "peak_rss_bytes": 465047552,
+        "pid": 6868,
+        "seconds_total": 63.064357800001744,
+        "stages": [
+          {
+            "command": "research-scope-resolve",
+            "exit_code": 0,
+            "peak_rss_bytes": 121061376,
+            "physical_bytes": 0,
+            "physical_partition_reads": 0,
+            "physical_record_decodes": 0,
+            "reason_code": null,
+            "seconds": 0.9628667999932077,
+            "serialized_output_bytes": 2131
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 412418048,
+            "physical_bytes": 73217745,
+            "physical_partition_reads": 88,
+            "physical_record_decodes": 104212,
+            "reason_code": null,
+            "seconds": 16.311249399994267,
+            "serialized_output_bytes": 51831
+          },
+          {
+            "command": "discovery-execute",
+            "exit_code": 0,
+            "peak_rss_bytes": 435277824,
+            "physical_bytes": 81828444,
+            "physical_partition_reads": 235,
+            "physical_record_decodes": 112375,
+            "reason_code": null,
+            "seconds": 9.916156099992804,
+            "serialized_output_bytes": 20055
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 444555264,
+            "physical_bytes": 53829293,
+            "physical_partition_reads": 214,
+            "physical_record_decodes": 72304,
+            "reason_code": null,
+            "seconds": 9.854560499981744,
+            "serialized_output_bytes": 55970
+          },
+          {
+            "command": "prior",
+            "exit_code": 0,
+            "peak_rss_bytes": 444555264,
+            "physical_bytes": 9004879,
+            "physical_partition_reads": 32,
+            "physical_record_decodes": 12047,
+            "reason_code": null,
+            "seconds": 1.0351970000192523,
+            "serialized_output_bytes": 2904
+          },
+          {
+            "command": "persist-draft",
+            "exit_code": 0,
+            "peak_rss_bytes": 444555264,
+            "physical_bytes": 91074275,
+            "physical_partition_reads": 387,
+            "physical_record_decodes": 120551,
+            "reason_code": null,
+            "seconds": 10.362616999977035,
+            "serialized_output_bytes": 26649
+          },
+          {
+            "command": "preflight",
+            "exit_code": 0,
+            "peak_rss_bytes": 451051520,
+            "physical_bytes": 55438559,
+            "physical_partition_reads": 249,
+            "physical_record_decodes": 72356,
+            "reason_code": null,
+            "seconds": 9.167420899990248,
+            "serialized_output_bytes": 56702
+          },
+          {
+            "command": "freeze",
+            "exit_code": 0,
+            "peak_rss_bytes": 465047552,
+            "physical_bytes": 31551379,
+            "physical_partition_reads": 147,
+            "physical_record_decodes": 40217,
+            "reason_code": null,
+            "seconds": 5.33266270000604,
+            "serialized_output_bytes": 118653
+          }
+        ],
+        "terminal": "FROZEN_AWAITING_CRITIC"
+      }
+    ],
+    "final_receipt": {
+      "bytes": 2501,
+      "raw_path": "growth/4000-4-attempt1/metrics_receipt.json",
+      "sha256": "76e2890f098b134dd6191bd47a0b2a5b2b74bf9b97334d52f0cc6f0170079d21"
+    },
+    "historical_measurements": [
       {
         "archive_eligible_count": 41,
         "capability_epoch_sha256": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
@@ -1054,25 +1738,28 @@
         "terminal": "FROZEN_AWAITING_CRITIC"
       }
     ],
+    "historical_summary_ref": {
+      "bytes": 30209,
+      "raw_path": "growth/pre-detail-summary.json",
+      "sha256": "8167d4454b0a79e66c718db44d7e63e56a59ef5bab2b651cdd07b41b26cfb0fc"
+    },
     "native_quality_numerator": false,
     "peak_method": "Windows PEAK_WORKING_SET_FROM_EXISTING_PROBE",
     "peak_rss_bytes_max": 482435072,
-    "summary_ref": {
-      "bytes": 30209,
-      "raw_path": "growth/summary.json",
-      "sha256": "8167d4454b0a79e66c718db44d7e63e56a59ef5bab2b651cdd07b41b26cfb0fc"
-    },
     "tokens": "UNKNOWN"
   },
   "identity": {
     "actor": "CODEX",
     "base": "fb65d69f6e48c49b26937bb6caf324b3417b094e",
+    "historical_growth_capability": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
+    "intermediate_54_test_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
     "model": "UNKNOWN",
-    "product_commit": "706e9170c6aaef02b7acdf382cfe8de96aa3d069",
+    "original_native_product_commit": "706e9170c6aaef02b7acdf382cfe8de96aa3d069",
+    "product_commit": "20cdc7f3fe5bdb541d6961fe996b379bec0ddd90",
     "roots_class": "DISPOSABLE_SYNTHETIC",
     "route": "DIRECT_CODEX_DELIVERY",
     "seed": "UNKNOWN",
-    "verified_capability_epoch_sha256": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72"
+    "verified_capability_epoch_sha256": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13"
   },
   "independent_reviews": {
     "path": "docs/evidence/forge_evidence_guided_generation_v1/independent-review.json",
@@ -2076,10 +2763,12 @@
       "result": "PARTIAL"
     },
     "P5": {
-      "limit": "4001 eligible heads, 9 cold synthetic processes; finite archive only",
+      "limit": "4001 eligible heads, 9 historical cold public processes plus one final-capability cold public process; 18 same-root owner cost comparisons; finite archive only",
       "raw": [
         "post-commit-focused-tests.log",
-        "growth/summary.json"
+        "growth/pre-detail-summary.json",
+        "growth/4000-4-attempt1/metrics_receipt.json",
+        "archive-owner-cost/summary.json"
       ],
       "result": "PASS"
     },
@@ -2116,18 +2805,18 @@
     "path": "docs/evidence/forge_evidence_guided_generation_v1/raw-evidence.json",
     "proof": {
       "all_original_hashes_verified": true,
-      "bundle_bytes": 6617745,
-      "bundle_sha256": "23fbb4929ec5843827c99f8555cf315464c3a8aec1ffecb9659c7ae7a16ed026",
+      "bundle_bytes": 6731700,
+      "bundle_sha256": "687f603996921ce54f2010a34d77c484b0f7bfa0c91e96a47927a790b7913909",
       "decompressed_private_prefix_scan": "PASS",
       "excluded_store_and_capture_binaries": "REPRODUCIBLE_SYNTHETIC_FIXTURE_OWNERS_RETAINED_LOCALLY",
-      "files": 1441,
+      "files": 1493,
       "native_generator_calls_not_modified": true,
-      "normalized_unique_objects": 971,
-      "original_bytes": 19656185,
+      "normalized_unique_objects": 1019,
+      "original_bytes": 19960747,
       "private_paths_in_output_only": true,
       "status": "LOSSLESS_BYTE_HASH_PASS"
     },
-    "sha256": "23fbb4929ec5843827c99f8555cf315464c3a8aec1ffecb9659c7ae7a16ed026"
+    "sha256": "687f603996921ce54f2010a34d77c484b0f7bfa0c91e96a47927a790b7913909"
   },
   "requirements": {
     "R1": [
@@ -2213,19 +2902,19 @@
     "checks": [
       {
         "log": {
-          "bytes": 4015,
+          "bytes": 4220,
           "raw_path": "post-commit-focused-tests.log",
-          "sha256": "8afab61ddada3d4bcc8b1766f4198b2c1a94f7b4023f9b19e262b29d31b5629c"
+          "sha256": "5c32a4dca8a379422f3ec9927ba4dd67b749a6cd1d8ef0d1a6f97c6470e42a2a"
         },
         "name": "focused",
         "receipt": {
           "bytes": 1236,
           "raw_path": "post-commit-focused-tests.json",
-          "sha256": "714e3b7163542fcaba923cdb89df0c933c98a6c178d9f87b8516be1581fb436a"
+          "sha256": "48564721fb510bc36c60fef41b271176ead710d99bec00b718d334ead06d292c"
         },
         "result": {
-          "after_capability": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
-          "before_capability": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
+          "after_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
+          "before_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
           "command": [
             "python",
             "-B",
@@ -2240,30 +2929,30 @@
             "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_primary_revision_projects_authored_aliases_and_keeps_same_look"
           ],
           "exit_code": 0,
-          "log_sha256": "8afab61ddada3d4bcc8b1766f4198b2c1a94f7b4023f9b19e262b29d31b5629c",
+          "log_sha256": "5c32a4dca8a379422f3ec9927ba4dd67b749a6cd1d8ef0d1a6f97c6470e42a2a",
           "roots_class": "DISPOSABLE_SYNTHETIC",
           "schema": "smial.egg-focused-validation",
           "scripted_native_quality_numerator": false,
-          "seconds": 445.0341064000095,
+          "seconds": 457.7004636999918,
           "stable_capability": true
         },
-        "tests": 19
+        "tests": 20
       },
       {
         "log": {
-          "bytes": 6132,
+          "bytes": 6133,
           "raw_path": "post-commit-compatibility-tests.log",
-          "sha256": "065b217825e561cb92b772ee0fd70a7c5a56857041ef621dcf23ddcfbfc717b3"
+          "sha256": "c327a2755976ac66791ee4d3f2327a5b2ae0855a5457b9aba2d3685aacf4faca"
         },
         "name": "compatibility",
         "receipt": {
           "bytes": 1122,
           "raw_path": "post-commit-compatibility-tests.json",
-          "sha256": "ed3357afae24fae8bf93c6d6949facb755057e731d744391b316cf2802604a0c"
+          "sha256": "18f5fcea372bc6ff8799224a16b506b6de9532cebc4883257e5c9a87beb46c26"
         },
         "result": {
-          "after_capability": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
-          "before_capability": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
+          "after_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
+          "before_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
           "command": [
             "python",
             "-B",
@@ -2278,11 +2967,11 @@
             "tests.test_forge_research_flow_reliability_v1.CrashReservationRecoveryTests"
           ],
           "exit_code": 0,
-          "log_sha256": "065b217825e561cb92b772ee0fd70a7c5a56857041ef621dcf23ddcfbfc717b3",
+          "log_sha256": "c327a2755976ac66791ee4d3f2327a5b2ae0855a5457b9aba2d3685aacf4faca",
           "roots_class": "DISPOSABLE_SYNTHETIC",
           "schema": "smial.egg-compatibility-validation",
           "scripted_native_quality_numerator": false,
-          "seconds": 91.17272770000272,
+          "seconds": 103.8368345000199,
           "stable_capability": true
         },
         "tests": 30
@@ -2291,17 +2980,17 @@
         "log": {
           "bytes": 552,
           "raw_path": "post-commit-phase-tests.log",
-          "sha256": "ec017b6867f47be3fc4ea37d7114f3ed8e070465abea07a5db8271a034594ef5"
+          "sha256": "9f83e66580473840e7266b8ce120c20f76d3e3e74f7d5c591a81ca1fd13e911e"
         },
         "name": "phase",
         "receipt": {
-          "bytes": 796,
+          "bytes": 797,
           "raw_path": "post-commit-phase-tests.json",
-          "sha256": "1fa26ab563b7f34d532810d312f32466893f448bc07c06c75449db9858758349"
+          "sha256": "36accd45519ac50989db11dbf72a73acd7223bff0f7d152cda64b7ec1dd043c6"
         },
         "result": {
-          "after_capability": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
-          "before_capability": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
+          "after_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
+          "before_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
           "command": [
             "python",
             "-B",
@@ -2312,11 +3001,11 @@
             "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_real_normalized_prefix_reader_does_not_access_future_values"
           ],
           "exit_code": 0,
-          "log_sha256": "ec017b6867f47be3fc4ea37d7114f3ed8e070465abea07a5db8271a034594ef5",
+          "log_sha256": "9f83e66580473840e7266b8ce120c20f76d3e3e74f7d5c591a81ca1fd13e911e",
           "roots_class": "DISPOSABLE_SYNTHETIC",
           "schema": "smial.egg-phase-validation",
           "scripted_native_quality_numerator": false,
-          "seconds": 165.6354981000186,
+          "seconds": 182.78857750000316,
           "stable_capability": true
         },
         "tests": 2
@@ -2325,17 +3014,17 @@
         "log": {
           "bytes": 513,
           "raw_path": "post-commit-producer-tests.log",
-          "sha256": "86213c825ee07c2c89a502fec6a7cc1adc6de9919177d617de0d26d252e8a08c"
+          "sha256": "cc1ebb9e37bf469b11475a67c37d3fc05b978c18e611ef07b164204f1ca1ba29"
         },
         "name": "producer",
         "receipt": {
-          "bytes": 787,
+          "bytes": 788,
           "raw_path": "post-commit-producer-tests.json",
-          "sha256": "679bab64bb806d6874edca2f5e4df7e9684af80c25ed27a2fc3f740e92decb18"
+          "sha256": "974766445d11e904c2ed7b1650e97ac48f452935b4986374bd67548e64d0aee2"
         },
         "result": {
-          "after_capability": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
-          "before_capability": "3dcbe81e981c29488b22c3a41479962233b17d49aec2c3869eb3752372e58b72",
+          "after_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
+          "before_capability": "51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1",
           "command": [
             "python",
             "-B",
@@ -2346,18 +3035,59 @@
             "tests.test_forge_runtime_discovery_binding_v1.PublishedDiscoveryBindingTests.test_protected_unknown_and_hash_stop_before_the_loader"
           ],
           "exit_code": 0,
-          "log_sha256": "86213c825ee07c2c89a502fec6a7cc1adc6de9919177d617de0d26d252e8a08c",
+          "log_sha256": "cc1ebb9e37bf469b11475a67c37d3fc05b978c18e611ef07b164204f1ca1ba29",
           "roots_class": "DISPOSABLE_SYNTHETIC",
           "schema": "smial.egg-producer-validation",
           "scripted_native_quality_numerator": false,
-          "seconds": 31.71475709998049,
+          "seconds": 30.862256399996113,
           "stable_capability": true
         },
         "tests": 2
       }
     ],
+    "epochs_not_relabelled": true,
+    "final_delta_checks": [
+      {
+        "log": {
+          "bytes": 974,
+          "raw_path": "recovery-delta-after.log",
+          "sha256": "2152eac49b2c01dbb254279ee5e7ed5a2d90baa680ff6563c6e0532cfc5656f7"
+        },
+        "name": "final_recovery_and_hidden_corruption",
+        "receipt": {
+          "bytes": 1100,
+          "raw_path": "recovery-delta-after.json",
+          "sha256": "f2fdc03f885de824f35a2ce2ec303b9b7b5bfab4af4f8491d69e10fd7ae9985d"
+        },
+        "result": {
+          "after_capability": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "before_capability": "ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13",
+          "command": [
+            "python",
+            "-B",
+            "-m",
+            "unittest",
+            "-v",
+            "tests.test_forge_evidence_guided_generation_v1.OrdinaryWorkingMemoryTests.test_detail_missing_context_preserves_exact_recovery_locator",
+            "tests.test_forge_evidence_guided_generation_v1.OrdinaryWorkingMemoryTests.test_bound_detail_is_read_only_and_writer_invalidates_locator",
+            "tests.test_forge_evidence_guided_generation_v1.OrdinaryWorkingMemoryTests.test_mandatory_overflow_refuses_before_generated_draft_or_slot_write",
+            "tests.test_forge_evidence_guided_generation_v1.OrdinaryWorkingMemoryTests.test_hidden_corrupt_archive_partition_blocks_public_context_without_writes"
+          ],
+          "exit_code": 0,
+          "log_sha256": "2152eac49b2c01dbb254279ee5e7ed5a2d90baa680ff6563c6e0532cfc5656f7",
+          "new_native_calls": 0,
+          "roots_class": "DISPOSABLE_SYNTHETIC",
+          "schema": "smial.egg-recovery-and-hidden-corruption-validation",
+          "seconds": 82.8042165999941,
+          "stable_capability": true,
+          "tests": 4
+        },
+        "tests": 4
+      }
+    ],
+    "final_delta_passed_checks": 4,
     "full_local_gate_executed": false,
-    "passed_tests": 53,
+    "intermediate_passed_checks": 54,
     "previous_failures_retained_in_raw": true
   },
   "verdicts": {
