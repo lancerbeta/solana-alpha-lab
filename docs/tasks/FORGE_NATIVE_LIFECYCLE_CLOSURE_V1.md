@@ -244,3 +244,18 @@ query/card/frozen packet saved terminal/fresh reader PASS mechanics. No native
 acceptance inferred. Affected delta verification is part of the one early
 consultation. Native budget remains Generator4/Critic1. Evaluation candidate
 will freeze at <ARTIFACT_HOME>/evaluation-replan-v2 after this delta readback.
+
+
+V2 material replan after Generator5: actual compound question frozen/finalized
+on17b680f6 as SYNTHESIS_COMPLETE/KILL_STATISTICALLY_UNIDENTIFIABLE. This verdict
+is immutable, and recovery of its actual artifacts passed without new calls or
+charges. Independent exact source arithmetic exposed a separate inclusive
+downside boundary defect: saved baseline2/11 versus exact source3/11. It is not
+counted toward final native closure/Q1. Existing temporal episode target/ratio
+owner now rounds canonical decimal input ratios once (standard Fraction),
+publishes EPISODES_V2 for fresh writers, retains V1 readers/replay/charges and
+strict thresholds; legacy BASE_X is unchanged. Targeted30 checks PASS.
+Reserve activation is justified by this proved arithmetic defect, not by the
+scientific KILL. Final compatible primary/transfer are next on frozen repaired
+code using the same source recipe/history. Total spent Generator5/8, Critic2/6,
+native MAIN5/PREVIEW3/ADAPTIVE0; three Generator slots remain. No budget reset.

@@ -198,3 +198,44 @@ class ReplanV2AdmissionTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class EpisodeRatioBoundaryTests(unittest.TestCase):
+    def project(self, price, scale=1, *, episode=True):
+        from datetime import datetime, timezone
+        from unittest.mock import patch
+        from solana_alpha_lab.factory import hfic_temporal_discovery as t
+        at = datetime(2026, 10, 8, tzinfo=timezone.utc)
+        body = {'target': {'reference_point': 'Y3600', 'exit_point': 'Y7200'},
+                'entry_model': {'assumed_latency_seconds': 0},
+                'schedule_lateness_seconds': 0}
+        selected = {'status': 'OBSERVED', 'value': price}
+        reference = {'status': 'OBSERVED', 'value': scale}
+        with patch.object(t, '_select_event_time_exit', return_value=(selected, None)), patch.object(t, '_cell', return_value=reference):
+            value, observed, exclusion, _ = t._target_projection({}, body, {'schedule_lateness_seconds': 0},
+                cohort='fixed', release='fixed', mint='fixed', anchor=at,
+                decision_deadline=at,
+                point_window=(lambda _: (at, at)) if episode else None)
+        self.assertTrue(observed)
+        self.assertIsNone(exclusion)
+        return value
+
+    def test_actual_target_projection_inclusive_boundary_and_scale_transfer(self):
+        from solana_alpha_lab.factory.hfic_temporal_discovery import downside_descriptive
+        values = [self.project(.8), self.project(8, 10), self.project(.5)]
+        self.assertEqual(values, [-.2, -.2, -.5])
+        profile = downside_descriptive(values, missing_n=1)
+        self.assertEqual((profile['le_minus_20_n'], profile['le_minus_50_n']), (3, 1))
+        self.assertEqual((profile['observed_n'], profile['missing_n']), (3, 1))
+
+    def test_true_above_boundary_is_not_rounded_or_tolerated_into_event(self):
+        from solana_alpha_lab.factory.hfic_temporal_discovery import downside_descriptive
+        value = self.project(.8000000000000001)
+        self.assertGreater(value, -.2)
+        self.assertEqual(downside_descriptive([value], missing_n=0)['le_minus_20_n'], 0)
+
+    def test_legacy_target_and_saved_episode_replay_are_not_reinterpreted(self):
+        from solana_alpha_lab.factory import hfic_temporal_discovery as t
+        self.assertEqual(self.project(.8, episode=False), .8 / 1 - 1)
+        self.assertIn(t.TEMPORAL_CALCULATION_VERSION_EPISODES_V1, t.TEMPORAL_CALCULATION_VERSIONS_READABLE)
+        self.assertIn(t.TEMPORAL_CALCULATION_VERSION_EPISODES_V1, t.TEMPORAL_CURRENT_CALCULATION_VERSIONS)

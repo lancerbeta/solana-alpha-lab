@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "historical_checkpoint": "1381b7753a12ea8688030781e7ba342f958db88f",
+  "bundles": {
+    "docs/evidence/forge_native_lifecycle_closure_v1/critic-primary-final-originals.json": "4cf582f8810b61679f67c764fe55ce6c2ed34b0fc3d89c9e35bbd2dda9b4124f",
+    "docs/evidence/forge_native_lifecycle_closure_v1/engineering-reviews-wave1-originals.json": "4349e32863340ca0e48ab55cbba76cddbf33fc434802093d821140d823ab1b6b",
+    "docs/evidence/forge_native_lifecycle_closure_v1/engineering-reviews-wave2-originals.json": "a59f5341d9c7e049cee7c1c896fb2f935b05522267f47af433cfa41777ea23f9",
+    "docs/evidence/forge_native_lifecycle_closure_v1/native-primary-final-originals.json": "79329072978fe00b7f5b285ac32976920f6d4c818ef670447218dce910892489",
+    "docs/evidence/forge_native_lifecycle_closure_v1/native-primary-originals.json": "628c16c236639a6eebbc5e69fd4a1244c9df5c8e3362efc6bcec743298cdfb05",
+    "docs/evidence/forge_native_lifecycle_closure_v1/native-transfer-final-originals.json": "5d965969efc25dc80fab875833fb3100f79be5d06abd7dfc798525e944c4fb98",
+    "docs/evidence/forge_native_lifecycle_closure_v1/native-transfer-originals.json": "7b9956e2d654fa469f7fe102884748db9c85592d85cd9b235540dc4c7fec75c2",
+    "docs/evidence/forge_native_lifecycle_closure_v1/recovery-primary-final-originals.json": "49cd0034cacff38c9807be65f319fd38c1fc36e291e9974c756c8653ab807d26"
+  },
+  "lossless_originals": 234,
+  "local_only_hashes": 36,
+  "original_files_changed": 0,
+  "historical_verdict_changes": 0,
+  "new_looks": 0
+}

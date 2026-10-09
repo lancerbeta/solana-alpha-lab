@@ -13,6 +13,7 @@ import math
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta, timezone
+from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
@@ -58,12 +59,16 @@ TEMPORAL_CALCULATION_VERSION_V5 = "HFIC_TEMPORAL_DISCOVERY_CALC_V5"
 TEMPORAL_CALCULATION_VERSION = TEMPORAL_CALCULATION_VERSION_V5
 # V5 arithmetic read through the episode point/clock resolver binding.
 TEMPORAL_CALCULATION_VERSION_EPISODES_V1 = "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V1"
-# The episode collection has exactly one calculation version, so it is current for episode looks: an exact
-# repeat of an episode query in another operation or cycle is a replay, never a calculation revision.
-TEMPORAL_CURRENT_CALCULATION_VERSIONS = frozenset({TEMPORAL_CALCULATION_VERSION_V5, TEMPORAL_CALCULATION_VERSION_EPISODES_V1})
+# V2 rounds the ratio of canonical decimal source cells once, avoiding loss
+# of exact inclusive downside boundaries during binary division/subtraction.
+TEMPORAL_CALCULATION_VERSION_EPISODES_V2 = "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V2"
+# Saved V1 episode looks remain current replay artifacts: the arithmetic fix
+# never automatically recomputes/rebinds their original values or charges.
+TEMPORAL_CURRENT_CALCULATION_VERSIONS = frozenset({TEMPORAL_CALCULATION_VERSION_V5, TEMPORAL_CALCULATION_VERSION_EPISODES_V1, TEMPORAL_CALCULATION_VERSION_EPISODES_V2})
 TEMPORAL_CALCULATION_VERSIONS_READABLE = frozenset(
     {
         TEMPORAL_CALCULATION_VERSION_EPISODES_V1,
+        TEMPORAL_CALCULATION_VERSION_EPISODES_V2,
         TEMPORAL_CALCULATION_VERSION_V1,
         TEMPORAL_CALCULATION_VERSION_V2,
         TEMPORAL_CALCULATION_VERSION_V3,
@@ -1032,6 +1037,12 @@ def _predicate_holds(value: float | None, predicate: Mapping[str, Any]) -> bool 
     return float(predicate["lower"]) <= value < float(predicate["upper"])
 
 
+def _episode_return_ratio(numerator: object, denominator: object) -> float:
+    """One rounding from canonical numeric text; no epsilon in predicates."""
+    base = Fraction(str(denominator))
+    return float(Fraction(str(numerator)) / base - 1)
+
+
 def _feature_value_with_lineage(
     grouped: Mapping[Any, Sequence[Mapping[str, Any]]],
     *,
@@ -1166,7 +1177,11 @@ def _feature_value_with_lineage(
             if detail is not None:
                 detail["reason"] = "NONPOSITIVE_DENOMINATOR"
             return None, lineage
-        value = float(end["value"]) / denominator - 1.0
+        value = (
+            _episode_return_ratio(end["value"], start["value"])
+            if point_window is not None
+            else float(end["value"]) / denominator - 1.0
+        )
         if feature.get("field_id") == HOLDER_COUNT and not math.isfinite(value):
             if detail is not None:
                 detail["reason"] = "NONFINITE_RESULT"
@@ -2123,6 +2138,7 @@ def temporal_result_coherence(summary: Mapping[str, Any]) -> dict[str, Any]:
     if summary.get("calculation_version") in {
         TEMPORAL_CALCULATION_VERSION_V5,
         TEMPORAL_CALCULATION_VERSION_EPISODES_V1,
+        TEMPORAL_CALCULATION_VERSION_EPISODES_V2,
     }:
         issues.extend(
             _downside_issues(
@@ -2776,7 +2792,11 @@ def _target_projection(grouped, body, item, *, cohort, release, mint, anchor, de
         and reference.get("status") == "OBSERVED"
         and float(reference["value"]) > 0
     ):
-        target_value = float(selected["value"]) / float(reference["value"]) - 1.0
+        target_value = (
+            _episode_return_ratio(selected["value"], reference["value"])
+            if point_window is not None
+            else float(selected["value"]) / float(reference["value"]) - 1.0
+        )
         target_observed = True
         target_exclusion = None
         source_event = selected.get("source_price_event_time")
@@ -3643,7 +3663,7 @@ def execute_temporal_discovery(
     summary = {
         "contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
         "calculation_version": (
-            TEMPORAL_CALCULATION_VERSION_EPISODES_V1
+            TEMPORAL_CALCULATION_VERSION_EPISODES_V2
             if episode_population
             else TEMPORAL_CALCULATION_VERSION
         ),
