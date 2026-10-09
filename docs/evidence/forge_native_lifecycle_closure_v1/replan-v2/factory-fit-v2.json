@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1-V2-FIT",
+  "as_of": "2026-10-10",
+  "task_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "Source-grounded synthetic question-to-saved-terminal lifecycle, scoped closure judged by independent Goal/DoD Q1-Q4.",
+    "flexibility_and_history": "Old four attempts/charges/verdicts unchanged; source recipe unchanged; V1 numerical replay remains readable and current, fresh episode writer V2.",
+    "context_efficiency": "Public method and own inputs for native roles; one early consultation, one final role-set; focused tests, no pre-PR full gate.",
+    "research_truth": "Substantive rejection preserved; empty primary group means UNKNOWN, transfer tiny-N descriptive contrast is inconclusive. Historical incomplete prior remains UNKNOWN with provenance and no novelty assertion.",
+    "owner_operability": "One current V2 readout and pinned two-session reader; historical checkpoint separately retained; review+CI+machine phrase is the delivery gate.",
+    "execution_to_cashflow": "NOT_EVALUATED; no live/OOS/paper/trading/promotion/provider/deploy authority.",
+    "monitoring_and_recovery": "Actual original native frozen artifacts recovered before finalize and after committed-reply-loss; one terminal, no extra look, identical replay and conflict distinguished.",
+    "build_vs_buy": "Existing CLI/scope/prior/temporal/session owners and cached locked runtime; standard Fraction for exact input-ratio boundary; no dependency or framework.",
+    "security": "No credentials/providers/external settings; native scientific contexts logically isolated; machine paths neutralized in Git-safe projections.",
+    "red_team": "Actual frozen-state copy rejects Git/context/definition drift with unchanged records; targeted fresh admission, late/PIT/list-UNKNOWN and budget regressions pass."
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Measure repeated question/recipe or public-binding incidents before considering any new tool; no adoption authority."
+  },
+  "recovery": "Both actual final native artifacts; reply loss/replay/conflict PASS, no new model or look.",
+  "limits": [
+    "SYNTHETIC_DEVELOPMENT_TRANSFER_NOT_UNTOUCHED_HOLDOUT",
+    "TWO_CASES_NOT_STATISTICAL_RELIABILITY",
+    "NO_ALPHA_CAUSAL_OOS_PROOF",
+    "OS_MODEL_COST_SEED_TOKENS_UNKNOWN",
+    "GENERATOR8_OF8_CRITIC5_OF6_INCLUDING_CONTINUATION",
+    "SCIENTIFIC_GATES_AND_OLD_VERDICTS_UNCHANGED"
+  ]
+}

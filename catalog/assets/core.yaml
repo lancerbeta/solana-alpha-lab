@@ -40868,7 +40868,7 @@ records:
     repository_path: docs/tasks/FORGE_NATIVE_LIFECYCLE_CLOSURE_V1.md
   integrity:
     kind: sha256
-    sha256: 78b2b237a467ea0a61847918bad0b1f6915439e7c0acdc2970591ca1cedf854b
+    sha256: 8930f03aa8c3f911f1bca29b3d7b6ab1cb32e07796e910fee98991cac17f5629
   access:
     mode: read_only
     method: file
@@ -41012,19 +41012,58 @@ records:
 - asset_id: DOC-FORGE-NATIVE-LIFECYCLE-READOUT-001
   record_version: '1.0'
   asset_type: control_document
-  purpose: 'Owner readout: native0/2, technical terminal recovery, failed budget denominator
-    and unresolved public seams.'
+  purpose: 'Current V2 owner readout: two saved substantive native terminals, original
+    failures and counted continuations, recovery and independent quality/delivery gates.'
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-10-09'
+  as_of: '2026-10-10'
   truth_owner: FORGE_NATIVE_LIFECYCLE_CLOSURE_V1
   location:
     kind: git_path
-    logical_uri: repo://docs/evidence/forge_native_lifecycle_closure_v1/READOUT.md
-    repository_path: docs/evidence/forge_native_lifecycle_closure_v1/READOUT.md
+    logical_uri: repo://docs/evidence/forge_native_lifecycle_closure_v1/replan-v2/READOUT_V2.md
+    repository_path: docs/evidence/forge_native_lifecycle_closure_v1/replan-v2/READOUT_V2.md
   integrity:
     kind: sha256
-    sha256: 2ee676ddd162e84e7ff8bcf887c9ab317f52f497aec79900024376634dfae65b
+    sha256: 634b11c2edbe099016c540911c8732ffa93ce503a618961d57da2e48c38d6360
+  access:
+    mode: read_only
+    method: file
+    network_required: false
+    secrets_required: false
+  relations:
+  - relation_type: governed_by
+    target_asset_id: CTRL-FORGE-NATIVE-LIFECYCLE-CLOSURE-001
+  consumers:
+  - FACTORY-001
+  - GOAL-OWNER
+  - HYPOTHESIS-FORGE
+  evidence: []
+  search_terms:
+  - FORGE_NATIVE_LIFECYCLE_CLOSURE_V1
+  - SEM-HYPOTHESIS-FORGE
+  - native closure
+  - recovery
+  classification:
+    contains_secrets: false
+    contains_raw_data: false
+    sensitivity: INTERNAL_NON_SECRET
+
+- asset_id: EVID-FORGE-NATIVE-LIFECYCLE-V2-001
+  record_version: '1.0'
+  asset_type: evidence
+  purpose: Two saved substantive V2 native outcomes on one code epoch, exact original
+    artifacts, charged history and final independent quality gate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-10-10'
+  truth_owner: FORGE_NATIVE_LIFECYCLE_CLOSURE_V1
+  location:
+    kind: git_path
+    logical_uri: repo://docs/evidence/forge_native_lifecycle_closure_v1/replan-v2/final-native-outcomes.json
+    repository_path: docs/evidence/forge_native_lifecycle_closure_v1/replan-v2/final-native-outcomes.json
+  integrity:
+    kind: sha256
+    sha256: 10c519c59a1d8ef981347e6490db68c7b2114f58bd4e6d9f2a725ca7b6affc1f
   access:
     mode: read_only
     method: file

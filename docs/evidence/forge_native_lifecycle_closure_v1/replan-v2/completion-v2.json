@@ -1,0 +1,64 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1-V2-CANDIDATE",
+  "as_of": "2026-10-10",
+  "task_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1",
+  "state_change": "Two saved substantive native synthetic primary/transfer terminals on one fixed code epoch; current-scope/prior seams and numeric boundary repaired. Independent quality review and exact CI remain delivery gates.",
+  "base_main": "d2cd1fdf6fb10b5efc3e3b7f7b752bcee574f8dc",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "docs/tasks/FORGE_NATIVE_LIFECYCLE_CLOSURE_V1.md": "78b2b237a467ea0a61847918bad0b1f6915439e7c0acdc2970591ca1cedf854b"
+  },
+  "active_stop_conditions": [
+    "INDEPENDENT_REVIEW_PENDING"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_native_lifecycle_closure_v1/replan-v2/factory-fit-v2.json",
+    "sha256": "b69c169d1def59df133b4811308b10c6b450a639f45ef87c2f4737bca9b43722",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_SCOPE_PRIOR_NUMERIC_BOUNDARY_DIRECT_CONSUMERS_AND_NATIVE_RECOVERY",
+    "independent_review": {
+      "path": "docs/evidence/forge_native_lifecycle_closure_v1/replan-v2/independent-reviews-v2.json",
+      "sha256": "d49c9418813cc91a16a485a0b93993111e4610252496dc41f8b6ad5e9cb8d7cd",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_EXISTING_OWNER_TARGETED_TESTS",
+      "PASS_NATIVE_SOURCE_INDEPENDENT_RATIONAL_ORACLE",
+      "PASS_ACTUAL_NATIVE_RECOVERY_AND_NEGATIVE_GUARDS",
+      "PASS_ORIGINAL_HISTORY_PRESERVATION"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA_OOS_CAUSAL_RELIABILITY_PROOF",
+    "NO_CANONICAL_DONE_OR_MERGE_AUTHORITY_FROM_LOCAL_EVIDENCE",
+    "NO_OLD_VERDICT_CHANGE",
+    "NO_MODEL_OR_OS_ISOLATION_PROOF"
+  ],
+  "side_effects": {
+    "synthetic_stores_only": true,
+    "new_native_generator_episodes_v2": 4,
+    "new_native_critic_episodes_v2_including_binding_continuation": 4,
+    "native_total_main": 7,
+    "native_total_preview": 3,
+    "adaptive": 0,
+    "scripted_controls_main_separate": 4,
+    "recovery_new_looks": 0,
+    "provider_live_deploy_money": 0
+  },
+  "capability_radar_now": "NONE"
+}

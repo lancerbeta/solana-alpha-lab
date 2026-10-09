@@ -1,0 +1,50 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1-V2-FINAL",
+  "as_of": "2026-10-10",
+  "task_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_INDEPENDENT_FINAL_REVIEW"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_INDEPENDENT_FINAL_REVIEW"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_INDEPENDENT_FINAL_REVIEW"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_INDEPENDENT_FINAL_REVIEW"
+      ]
+    }
+  ],
+  "verdict": "PENDING",
+  "non_claims": [
+    "NO_SCIENTIFIC_OR_CANONICAL_DONE_AUTHORITY_FROM_DELIVERY",
+    "PROCESS_OBLIGATION_LOGICAL_CONTEXT_ISOLATION_ONLY"
+  ]
+}

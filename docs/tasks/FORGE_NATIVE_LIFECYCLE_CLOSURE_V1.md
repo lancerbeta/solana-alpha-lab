@@ -69,9 +69,9 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
     - docs/contracts/forge_native_lifecycle_closure_v1.md
     DELIVERY_EVIDENCE:
-    - docs/evidence/forge_native_lifecycle_closure_v1/checkpoint.json
-    - docs/evidence/forge_native_lifecycle_closure_v1/READOUT.md
-    - docs/evidence/forge_native_lifecycle_closure_v1/recovery-proof.json
+    - docs/evidence/forge_native_lifecycle_closure_v1/replan-v2/completion-v2.json
+    - docs/evidence/forge_native_lifecycle_closure_v1/replan-v2/independent-reviews-v2.json
+    - docs/evidence/forge_native_lifecycle_closure_v1/replan-v2/factory-fit-v2.json
     HISTORICAL_CONTEXT: []
 ---
 
@@ -259,3 +259,5 @@ Reserve activation is justified by this proved arithmetic defect, not by the
 scientific KILL. Final compatible primary/transfer are next on frozen repaired
 code using the same source recipe/history. Total spent Generator5/8, Critic2/6,
 native MAIN5/PREVIEW3/ADAPTIVE0; three Generator slots remain. No budget reset.
+
+V2 final saved-state checkpoint: one immutable2cace49f8443e3cd25f243ac0b740c9f1b290b29 epoch/composite4c9ed13d. Primary and transfer have actual SYNTHESIS_COMPLETE substantive terminals with fresh readers. Primary Generator first submission accepted; transfer required one counted placement-only continuation with identical scientific fields and no new look. Critic primary had one conservatively counted mechanical binding-only continuation, original semantic KILL unchanged. Total Generator8/8, Critic5/6, native MAIN7/PREVIEW3/ADAPTIVE0; separate scripted controls MAIN4. Both native actual-artifact recovery/reply-loss/replay/conflict pass. Existing focused residual V5/V6 checks8 PASS; independent rational source arithmetic passes both. Final Q1-Q4 acceptance belongs to canonical final independent review; PR/CI/readiness remain. No more Generator execution. Transfer was launched in parallel with independent primary Critic after its valid frozen question, inside V2 local-tactic authority; no cross-case scientific input exposure. Old historical progress/verdicts stay unchanged.

@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "scope": "ACTUAL_FROZEN_NATIVE_ARTIFACTS_DISPOSABLE_COPY",
+  "session_id": "HFIC-SESS-0A904ED27BA2B142",
+  "checks": [
+    "GIT_COMPOSITE_CHANGED",
+    "FORGE_CONTEXT_ARTIFACT_MISSING",
+    "FORGE_CONTEXT_HASH_MISMATCH",
+    "CRITIC_DEFINITION_HASH_MISMATCH"
+  ],
+  "logical_store_changes": 0,
+  "new_main": 0,
+  "new_preview": 0,
+  "new_generator": 0,
+  "new_critic": 0,
+  "original_context_restored_exactly": true,
+  "original_execution_snapshot_unchanged": true,
+  "copied_state_before": "FROZEN_AWAITING_CRITIC",
+  "copied_state_after": "FROZEN_AWAITING_CRITIC",
+  "git_composite_sha256": "4c9ed13d6624d49f0819069f646f1977d57152b2f9e375431970bd88002769a9"
+}

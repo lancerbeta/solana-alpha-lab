@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "test_count": 8,
+  "elapsed_s": 0.799,
+  "execution_head": "2cace49f8443e3cd25f243ac0b740c9f1b290b29",
+  "locators": [
+    "tests.test_hfic_session.HficFreezeFinalizeTests.test_finalize_rejects_mismatched_git_composite",
+    "tests.test_hfic_session.HficHashBoundAndRevisionClosureTests.test_draft_forge_context_binding_rejects_truth_roots_drift",
+    "tests.test_hfic_list_scope_executor_v1.ScopedExecutorTests.test_unknown_membership_refuses_before_values",
+    "tests.test_hfic_list_scope_executor_v1.ScopedExecutorTests.test_scope_cannot_be_dropped_or_swapped",
+    "tests.test_hfic_temporal_discovery_v1.TemporalArithmeticTests.test_t02_pit_conflict_zero_and_order",
+    "tests.test_hfic_temporal_result_coherence_v1.ConditionalSampleContractTests.test_missing_is_not_zero_and_unknown_is_not_matched",
+    "tests.test_hfic_grounded_discovery_v1.GroundedDiscoveryTests.test_same_bytes_are_not_a_new_look_and_budget_is_finite",
+    "tests.test_hfic_grounded_discovery_v1.ProductionRowRecipeTests.test_explanatory_after_decision_and_censored_target_are_refused"
+  ],
+  "scope": "Focused residual V5/V6 risks; prior30+1 numeric/direct-consumer checks retained, not a local full gate"
+}

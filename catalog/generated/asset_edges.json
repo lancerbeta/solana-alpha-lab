@@ -6428,6 +6428,11 @@
       "target_asset_id": "CTRL-FORGE-NATIVE-LIFECYCLE-CLOSURE-001"
     },
     {
+      "source_asset_id": "EVID-FORGE-NATIVE-LIFECYCLE-V2-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-NATIVE-LIFECYCLE-CLOSURE-001"
+    },
+    {
       "source_asset_id": "EVIDENCE-ATOM3A-RECEIPT-001",
       "relation": "evidenced_by",
       "target_asset_id": "CATALOG-ROOT-001"
