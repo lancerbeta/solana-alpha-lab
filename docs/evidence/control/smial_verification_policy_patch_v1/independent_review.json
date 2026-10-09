@@ -1,0 +1,43 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "SMIAL_VERIFICATION_POLICY_PATCH_V1-REVIEW",
+  "as_of": "2026-10-09",
+  "task_id": "SMIAL_VERIFICATION_POLICY_PATCH_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY",
+      "findings": [
+        "REVIEW_PENDING_NOT_EXECUTED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "REVIEW_PENDING_NOT_EXECUTED"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "REVIEW_PENDING_NOT_EXECUTED"
+      ]
+    }
+  ],
+  "verdict": "PENDING",
+  "non_claims": [
+    "NO_MERGE_AUTHORITY",
+    "NO_MEASURED_QUALITY_OR_COST_GAIN",
+    "MODEL_DIVERSITY_UNPROVEN"
+  ]
+}

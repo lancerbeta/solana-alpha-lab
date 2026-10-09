@@ -1,0 +1,65 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "SMIAL_VERIFICATION_POLICY_PATCH_V1-DELIVERY",
+  "as_of": "2026-10-09",
+  "task_id": "SMIAL_VERIFICATION_POLICY_PATCH_V1",
+  "state_change": "IMPLEMENTED_UNVERIFIED",
+  "base_main": "0f89ffd8018c05fbafaf79ef609c7dadf888807f",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Git instruction patch only; cloud exports remain optional owner-managed context."
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    ".agents/skills/delivery-harness/SKILL.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/control/smial_verification_policy_patch_v1/factory_fit.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_EXISTING_32_TESTS_462_SUBTESTS",
+    "independent_review": {
+      "path": "docs/evidence/control/smial_verification_policy_patch_v1/independent_review.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_HARNESS_CHECK",
+      "PASS_ENTRY_CONTEXT",
+      "PASS_TARGETED_AFTER_SOURCE_REHASH",
+      "PASS_SOURCE_REHASH_IDEMPOTENCY",
+      "PASS_FOUR_SIMULATION_ONLY_APPLICABILITY_CASES"
+    ]
+  },
+  "non_claims": [
+    "NO_MERGE_AUTHORITY",
+    "NO_SCIENTIFIC_OR_LIVE_AUTHORITY",
+    "NO_MEASURED_QUALITY_OR_COST_GAIN",
+    "SIMULATION_ONLY_NOT_PRODUCT_EXECUTION",
+    "THREE_NATURAL_OBSERVATIONS_NOT_STARTED"
+  ],
+  "side_effects": {
+    "provider_calls": 0,
+    "deployments": 0,
+    "settings_changes": 0,
+    "scientific_trials": 0,
+    "new_test_files": 0,
+    "modified_test_files": 0
+  }
+}
