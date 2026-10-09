@@ -8,7 +8,7 @@
 Постановка: SMIAL_Evidence_Guided_Generator_PRD_SSD_V1_2026-10-09.md,
 R1–R10, P1–P8, отдельные оси §14. Base:
 `fb65d69f6e48c49b26937bb6caf324b3417b094e` / PR388.
-Финальная реализация: `20cdc7f3fe5bdb541d6961fe996b379bec0ddd90`;
+Реализация до первого CI: `20cdc7f3fe5bdb541d6961fe996b379bec0ddd90`;
 capability `ba8d2b3b6a3ded23f3147466a752596932bc82aa0e31a52cc5fe50ba30810a13`.
 Исторические native inputs относятся к исходной реализации706e917; их
 Git/capability bindings сохранены и не переименованы в финальный epoch.
@@ -61,7 +61,7 @@ feature/predicate nodes. Late consulted details не превращаются з
 На intermediate capability51f21e3702f641e8718976fc9d3a4316c3012afcf57047e5439a5cf7593409b1
 прошли54 проверки:20 новых/direct consumer,30 legacy/recovery,2 future-prefix,
 2 producer/protected guards. Последняя узкая правка recovery отдельно проверена
-на финальном capabilityba8d2b:4/4 PASS,82.804s. В них входят exact recovery
+на capabilityba8d2b до CI-исправления:4/4 PASS,82.804s. В них входят exact recovery
 locator, stale detail, mandatory overflow и повреждённый hidden archive вне
 выбранных8 источников: public refusal и unchanged hashes всего store.
 Commands, log hashes, before/after capability находятся в manifest и raw bundle.
@@ -268,3 +268,26 @@ cold-recovery tests выполнены; production settings rollback не вып
 Следующая decision — только реальный delivery gate после независимой проверки
 и exact-head CI. Полную native formulation capability этот атом не объявляет;
 новый science/live/repair cycle требует отдельного exact scope.
+
+## Точечное исправление первого CI
+
+Первый полный PR390 CI37967455802 на8ed1c31d завершился четырьмя
+ошибками: старый standalone capsule schema path, устаревшее ожидание
+списка packet versions, test-only preflight copy внутри grounded look
+и projection рабочей памяти до STOP на неполном market import.
+Сохранены terminal CI и три исходных failed-shard logs.
+
+Исправление: `c24a70594373b0758fe0cf9017ce4363229c3881`; capability `3e9fedd984bddb7bf19cd2ef64fbaa48c26dc157ba94863137b0e259c8f25ca6`.
+Первый адресный прогон:14/15 PASS на capabilitye4c1c390b5095d01cce9fb315be7d803e146dd22183dec07d8dae1e48203f175;
+повторный отказ итогового отчёта сохранён. После точечного исправления:
+3/3 PASS, 250.713s на указанном current capability.
+На intermediate проверены прежний capsule reader, packet-version consumer,
+list-aware lifecycle, legacy/fresh compatibility и mandatory overflow;
+на current — producer/torn-import/cold replay, hidden archive corruption
+и forced vision blocker на всех surfaces. Строгие snapshot branches
+и whole-packet bound65536B сохранены. Только exact consumer tests
+добавлены к write set; native calls0, прежние1493 raw files byte-identical.
+Evidence: manifest.ci_consumer_repair; raw ci-repair/summary.json,
+targeted-tests.json/.log, terminal-repair-tests.json/.log, first-ci.json
+и job-*.log. Исторические54+4
+проверки, growth и native остаются в собственных recorded epochs.

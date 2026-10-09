@@ -595,6 +595,80 @@
     }
   },
   "as_of": "2026-10-09",
+  "ci_consumer_repair": {
+    "capability_epoch_sha256": "3e9fedd984bddb7bf19cd2ef64fbaa48c26dc157ba94863137b0e259c8f25ca6",
+    "historical_epochs_relabelled": false,
+    "intermediate_tests": {
+      "capability_epoch_sha256": "e4c1c390b5095d01cce9fb315be7d803e146dd22183dec07d8dae1e48203f175",
+      "count": 15,
+      "failed": 1,
+      "failure": "FINAL_RECEIPT_REPLACES_MARKET_PREREQUISITE_WITH_GENERIC_VISION_BLOCKER",
+      "log": {
+        "bytes": 3607,
+        "raw_path": "ci-repair/targeted-tests.log",
+        "sha256": "6428bd824ee1713be04bd667c0197e17a3cb59fb12e33cfcf48053b7f45e0e3e"
+      },
+      "passed": 14,
+      "receipt": {
+        "bytes": 1405,
+        "raw_path": "ci-repair/targeted-tests.json",
+        "sha256": "22ba32ab1fc6f601adb9884f5d676195ce629bf9cbdee6aa4b85a61a8127679c"
+      }
+    },
+    "legacy_and_fresh_strict_snapshot_branches": "UNCHANGED",
+    "native_originals_mutated": false,
+    "new_native_calls": 0,
+    "original_ci": {
+      "bytes": 22509,
+      "raw_path": "ci-repair/first-ci.json",
+      "sha256": "e9b3d48c5cca8fba8e890e187e1aa669e3c0c007bdfbcbaa2fcd5adb86c120b1"
+    },
+    "original_failed_job_logs": [
+      {
+        "bytes": 107930,
+        "raw_path": "ci-repair/job-113945267547.log",
+        "sha256": "18c9ea0acbbf4fb0e8b43dd79aa1904836882947b642913eee5a1b0959624136"
+      },
+      {
+        "bytes": 92492,
+        "raw_path": "ci-repair/job-113945267587.log",
+        "sha256": "0868f84354744f5cda1463b6984cea46b02fba41494892a9d036c85ac4d45479"
+      },
+      {
+        "bytes": 447304,
+        "raw_path": "ci-repair/job-113945267873.log",
+        "sha256": "70d920d4ffc643407b05284103074b7011ee9a9e53e23c1cd354477deebccb4c"
+      }
+    ],
+    "product_head": "c24a70594373b0758fe0cf9017ce4363229c3881",
+    "repairs": [
+      "RESTORE_STANDALONE_LEGACY_AND_FRESH_CAPSULE_SCHEMA_FRAGMENT",
+      "EXPOSE_AUTHORIZED_PACKET_1_5_IN_DIRECT_CONSUMER_EXPECTATION",
+      "REMOVE_TEST_ONLY_PREFLIGHT_COPY_FROM_GROUNDED_LOOK",
+      "MARKET_ADMISSION_PREREQUISITE_PRECEDES_WORKING_MEMORY_PROJECTION"
+    ],
+    "schema": "smial.egg-ci-consumer-repair",
+    "scope": "FOUR_FIRST_CI_FAILURES_AND_DIRECT_SAFETY_COMPATIBILITY_CONSUMERS",
+    "summary": {
+      "bytes": 2514,
+      "raw_path": "ci-repair/summary.json",
+      "sha256": "54e256ac786e7a29a1e688dcbb54ece6ddca7c2354c47c5b9606051798c5fd0b"
+    },
+    "targeted_tests": {
+      "count": 3,
+      "log": {
+        "bytes": 705,
+        "raw_path": "ci-repair/terminal-repair-tests.log",
+        "sha256": "bbb1a247586b9bcffd100d7b54867f34af5f883f0898c794fcda4c5432046dcd"
+      },
+      "receipt": {
+        "bytes": 988,
+        "raw_path": "ci-repair/terminal-repair-tests.json",
+        "sha256": "94300793d3795c27df7c7558948354a750101c0e15b3bb394a208295435b2ab5"
+      }
+    },
+    "whole_packet_bound_bytes": 65536
+  },
   "critic_paths": [
     {
       "kind": "SCRIPTED_FIRST_CYCLE_NATIVE_CRITIC",
@@ -635,6 +709,12 @@
       "verdict": "KILL_UNBOUND_EVIDENCE"
     }
   ],
+  "current_implementation_identity": {
+    "capability_epoch_sha256": "3e9fedd984bddb7bf19cd2ef64fbaa48c26dc157ba94863137b0e259c8f25ca6",
+    "delivery_base": "0f89ffd8018c05fbafaf79ef609c7dadf888807f",
+    "historical_identity_and_measurements_preserved": true,
+    "product_commit": "c24a70594373b0758fe0cf9017ce4363229c3881"
+  },
   "factory_fit": {
     "capability_radar_now": "NONE",
     "mode": "FULL_REVIEW",
@@ -2805,18 +2885,18 @@
     "path": "docs/evidence/forge_evidence_guided_generation_v1/raw-evidence.json",
     "proof": {
       "all_original_hashes_verified": true,
-      "bundle_bytes": 6731700,
-      "bundle_sha256": "687f603996921ce54f2010a34d77c484b0f7bfa0c91e96a47927a790b7913909",
+      "bundle_bytes": 6855101,
+      "bundle_sha256": "e5c7f13310c82abf3662b4f8253ec640143aa3af84c6a3fa548b626dde4d0068",
       "decompressed_private_prefix_scan": "PASS",
       "excluded_store_and_capture_binaries": "REPRODUCIBLE_SYNTHETIC_FIXTURE_OWNERS_RETAINED_LOCALLY",
-      "files": 1493,
+      "files": 1507,
       "native_generator_calls_not_modified": true,
-      "normalized_unique_objects": 1019,
-      "original_bytes": 19960747,
+      "normalized_unique_objects": 1033,
+      "original_bytes": 20653083,
       "private_paths_in_output_only": true,
       "status": "LOSSLESS_BYTE_HASH_PASS"
     },
-    "sha256": "687f603996921ce54f2010a34d77c484b0f7bfa0c91e96a47927a790b7913909"
+    "sha256": "e5c7f13310c82abf3662b4f8253ec640143aa3af84c6a3fa548b626dde4d0068"
   },
   "requirements": {
     "R1": [
