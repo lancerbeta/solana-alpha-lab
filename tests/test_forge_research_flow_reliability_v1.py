@@ -155,6 +155,84 @@ class CrashReservationRecoveryTests(unittest.TestCase):
                 )
             self.assertEqual(saved["session_id"], session_id)
 
+    def test_changed_orphan_binding_reports_safe_public_locator(self):
+        import tempfile
+        from contextlib import redirect_stdout
+        from io import StringIO
+        from unittest.mock import patch
+        from scripts.hypothesis_forge import cmd_persist_draft
+        from solana_alpha_lab.factory.hfic_session import (
+            canonical_preflight_receipt_sha256, list_scientific_slot_admissions,
+            persist_scientific_slot_admission,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from tests.test_forge_evidence_identity_and_owner_gold_v1 import (
+            _enumerate_production_fixture, _ordinary_stamped_preflight,
+            _write_lineage,
+        )
+        from tests.test_hfic_cli import bind_draft
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            original = _ordinary_stamped_preflight(
+                data_root, store, model_provenance_sha256="11" * 32
+            )
+            session_id = "HFIC-SESS-" + str(original["search_key_sha256"])[
+                :16
+            ].upper()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_production_fixture,
+            ):
+                persist_scientific_slot_admission(
+                    store, {**original, "session_id": session_id}, repo_root=ROOT
+                )
+            drifted = dict(original)
+            drifted["model_provenance_sha256"] = "22" * 32
+            drifted["preflight_receipt_sha256"] = canonical_preflight_receipt_sha256(
+                drifted
+            )
+            draft = json.loads(
+                (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json")
+                .read_text(encoding="utf-8")
+            )
+            draft = bind_draft(draft, drifted)
+            draft_path = data_root / "drifted-draft.json"
+            receipt_path = data_root / "drifted-receipt.json"
+            draft_path.write_text(json.dumps(draft), encoding="utf-8")
+            receipt_path.write_text(json.dumps(drifted), encoding="utf-8")
+            before = store.diagnostics().committed_inventory_sha256
+            output = StringIO()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_production_fixture,
+            ), redirect_stdout(output):
+                code = cmd_persist_draft(
+                    ROOT, draft_path, receipt_path, data_root,
+                    representation_id="BASE", model_provenance_sha256="22" * 32,
+                )
+            self.assertEqual(code, 2)
+            blocked = json.loads(output.getvalue())
+            self.assertEqual(blocked["status"], "BLOCKED")
+            self.assertEqual(
+                blocked["reason_code"],
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            )
+            self.assertEqual(blocked["next_action"], "INSPECT_SAVED_SLOT_AND_PREFLIGHT")
+            self.assertEqual(
+                blocked["detail"]["scientific_slot_sha256"],
+                list_scientific_slot_admissions(store)[0]["scientific_slot_sha256"],
+            )
+            self.assertEqual(
+                blocked["detail"]["saved_reservation"]["model_provenance_sha256"],
+                "11" * 32,
+            )
+            self.assertEqual(blocked["detail"]["requested_model_provenance_sha256"], "22" * 32)
+            self.assertNotIn(str(data_root), output.getvalue())
+            self.assertEqual(store.diagnostics().committed_inventory_sha256, before)
+
 # Synthetic input only. Producers, importers, admission, selectors and evaluators remain real.
 TABLE = {
     "r1": ("A", True, .30), "r2": ("A", True, .10),

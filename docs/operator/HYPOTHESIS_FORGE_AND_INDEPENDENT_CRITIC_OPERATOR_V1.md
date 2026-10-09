@@ -634,6 +634,16 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
 
 Если `persist-draft`/`freeze` вернул `FORGE_CONTEXT_REQUIRED` и `RUN_PERSISTENT_PREFLIGHT_REUSE_SAVED_LOOK`, выполните новый persistent preflight на том же data root с тем же discovery contract и используйте его receipt с уже сохранённым look; исходный context ещё не привязан, восстанавливать файл по locator нечего. Повторный look не открывайте.
 
+Если повтор `persist-draft`/`freeze` остановлен с
+`SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING` или
+`PREFLIGHT_STORE_DIGEST_MISMATCH`, ответ `BLOCKED` содержит
+`detail.scientific_slot_sha256`, ID исходного preflight, исходный и текущий
+inventory digest и сохранённый binding reservation. Сверьте эти hash/ID с
+исходным receipt и immutable slot; выполните только read-only
+`preflight --no-auto-commission` с тем же owner focus. При расхождении
+остановитесь до отдельного решения о provenance. Не повторяйте запись, не
+создавайте новый trial и не сбрасывайте budget.
+
 Если `EXACT_PRIOR_SCOPE_MATCH` отказал в повторном look, передайте исходную карточку в `prior --candidate <canonical-candidate-json>` на том же `--data-root`. При непустом `session_id` точного совпадения откройте `show-session --session-id <session_id>`. Если `session_id=null`, сохраните `candidate_id` как указатель на историческую запись и остановитесь до проверки результата: `show-session` без сессии невозможен. Повторный look запрещён; новый вопрос требует новой области доказательства и отдельного основания.
 
 Если `CLOSED_FAMILY_REOPEN` вернул `BLOCKED`, проверьте `detail.scope_id`, `detail.source_receipt` и `detail.source_terminal` по typed ledger. Если locator отсутствует, проверьте ledger до нового решения. Сохраните закрытие; переименование карточки не создаёт новый scope. Существенно иной scope допускается только с отдельным основанием.

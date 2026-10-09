@@ -63,6 +63,7 @@ from solana_alpha_lab.factory.hfic_prospects import (  # noqa: E402
 )
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     HficSessionError,
+    _execution_identity_fields,
     PENDING_STATES,
     apply_classification,
     apply_revision,
@@ -71,6 +72,7 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     find_session_by_search_key,
     freeze_draft,
     list_hfic_sessions,
+    list_scientific_slot_admissions,
     lookup_prior,
     persist_generated_draft,
     prove_runtime,
@@ -3387,6 +3389,68 @@ def cmd_commission_reopened_priors(
     return emit(payload)
 
 
+def _slot_recovery_block(
+    exc: HficSessionError,
+    *,
+    receipt: Mapping[str, Any],
+    store: ResearchStore,
+    data_root: Path,
+    repo_root: Path,
+    requested_model_provenance_sha256: str | None = None,
+) -> int:
+    """Report a stopped retry using only bounded immutable slot identities."""
+
+    try:
+        slot = _execution_identity_fields(receipt).get("scientific_slot_sha256")
+    except HficSessionError:
+        slot = None
+    search_key = receipt.get("search_key_sha256")
+    session_id = (
+        "HFIC-SESS-" + search_key[:16].upper()
+        if isinstance(search_key, str) and len(search_key) == 64 else None
+    )
+    saved = next(
+        (
+            row for row in list_scientific_slot_admissions(store)
+            if row.get("scientific_slot_sha256") == slot
+        ), None,
+    ) if isinstance(slot, str) else None
+    detail = {
+        "scientific_slot_sha256": slot if isinstance(slot, str) else None,
+        "session_id": session_id,
+        "source_preflight_receipt_id": receipt.get("receipt_id"),
+        "preflight_store_inventory_digest": receipt.get("store_inventory_digest"),
+        "current_store_inventory_digest": store.diagnostics().committed_inventory_sha256,
+        "requested_model_provenance_sha256": (
+            requested_model_provenance_sha256
+            or receipt.get("model_provenance_sha256")
+        ),
+        "saved_reservation": (
+            {key: saved.get(key) for key in (
+                "session_id", "model_provenance_sha256",
+                "execution_binding_sha256", "capability_epoch_sha256",
+            )} if saved is not None else None
+        ),
+    }
+    payload = {
+        "reason_code": str(exc), "status": "BLOCKED",
+        "scientific_negative": False, "writes": False,
+        "detail": detail,
+        "next_action": "INSPECT_SAVED_SLOT_AND_PREFLIGHT",
+        "owner_readout": (
+            "Сверьте detail.scientific_slot_sha256 и source_preflight_receipt_id "
+            "с immutable reservation; сравните requested_model_provenance_sha256, "
+            "saved_reservation и два inventory digest. Выполните только read-only "
+            "preflight --no-auto-commission с тем же owner focus. При расхождении "
+            "сохраните BLOCKED до отдельного решения о provenance; не повторяйте "
+            "persist-draft/freeze, не создавайте trial и не сбрасывайте budget."
+        ),
+    }
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    print(str(exc), file=sys.stderr)
+    return emit(payload, exit_code=2)
+
+
 def cmd_freeze(
     repo_root: Path,
     draft_path: Path,
@@ -3407,17 +3471,28 @@ def cmd_freeze(
         _assert_no_path_leak(next_action_draft, str(repo_root))
     data_root = _store_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root)
-    frozen = freeze_draft(
-        draft,
-        preflight_receipt=receipt,
-        store=store,
-        repo_root=repo_root,
-        next_action_draft=next_action_draft,
-        # A production freeze must re-read the current A3 market surface
-        # before writing lifecycle bytes.  Fixture/unit callers retain the
-        # explicit default and do not gain a synthetic market authority.
-        verify_current_market_identity=True,
-    )
+    try:
+        frozen = freeze_draft(
+            draft,
+            preflight_receipt=receipt,
+            store=store,
+            repo_root=repo_root,
+            next_action_draft=next_action_draft,
+            # A production freeze must re-read the current A3 market surface
+            # before writing lifecycle bytes. Fixture/unit callers retain the
+            # explicit default and do not gain a synthetic market authority.
+            verify_current_market_identity=True,
+        )
+    except HficSessionError as exc:
+        if str(exc) not in {
+            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            "PREFLIGHT_STORE_DIGEST_MISMATCH",
+        }:
+            raise
+        return _slot_recovery_block(
+            exc, receipt=receipt, store=store,
+            data_root=data_root, repo_root=repo_root,
+        )
     git_after = repository_git_snapshot(repo_root)
     if not git_before.unchanged(git_after):
         raise HficCliError("GIT_MUTATION_DETECTED")
@@ -3447,14 +3522,26 @@ def cmd_persist_draft(
     data_root = _existing_data_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root, create_if_missing=False)
     before_digest = store.diagnostics().committed_inventory_sha256
-    generated = persist_generated_draft(
-        store,
-        draft,
-        preflight_receipt=receipt,
-        repo_root=repo_root,
-        representation_id=representation_id,
-        model_provenance_sha256=model_provenance_sha256,
-    )
+    try:
+        generated = persist_generated_draft(
+            store,
+            draft,
+            preflight_receipt=receipt,
+            repo_root=repo_root,
+            representation_id=representation_id,
+            model_provenance_sha256=model_provenance_sha256,
+        )
+    except HficSessionError as exc:
+        if str(exc) not in {
+            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            "PREFLIGHT_STORE_DIGEST_MISMATCH",
+        }:
+            raise
+        return _slot_recovery_block(
+            exc, receipt=receipt, store=store,
+            data_root=data_root, repo_root=repo_root,
+            requested_model_provenance_sha256=model_provenance_sha256,
+        )
     git_after = repository_git_snapshot(repo_root)
     if not git_before.unchanged(git_after):
         raise HficCliError("GIT_MUTATION_DETECTED")
