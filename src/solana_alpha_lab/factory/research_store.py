@@ -1159,7 +1159,9 @@ def _completed_run_passport(
     return passport
 
 
-def _assert_stable_id_lineage(related: Sequence[ResearchEvent]) -> None:
+def _assert_stable_id_lineage(
+    related: Sequence[ResearchEvent], *, allow_legacy_identical_hypotheses: bool = False,
+) -> None:
     """HYP identities require a chain; other kinds retain same-payload replay."""
     strict_hypothesis = bool(related) and (
         related[0].record_kind == RecordKind.HYPOTHESIS_VERSION
@@ -1167,6 +1169,13 @@ def _assert_stable_id_lineage(related: Sequence[ResearchEvent]) -> None:
     by_id = {record.record_id: record for record in related}
     if len(by_id) != len(related):
         raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
+    # BASE accepted same-payload unlinked HYP rows. Existing immutable logs
+    # must remain cold-rebuildable; writer admission keeps the strict chain.
+    if (allow_legacy_identical_hypotheses and strict_hypothesis
+            and len(related) > 1
+            and all(record.supersedes_record_id is None for record in related)
+            and len({record.payload_sha256 for record in related}) == 1):
+        return
     ancestors: dict[str, set[str]] = {}
     for record in related:
         seen: set[str] = set()
@@ -2003,7 +2012,7 @@ class ResearchStore:
             key = (str(record.record_kind), stable_id)
             stable_ids.setdefault(key, []).append(record)
         for related in stable_ids.values():
-            _assert_stable_id_lineage(related)
+            _assert_stable_id_lineage(related, allow_legacy_identical_hypotheses=True)
 
         projection_path = _target_path(
             self._root,

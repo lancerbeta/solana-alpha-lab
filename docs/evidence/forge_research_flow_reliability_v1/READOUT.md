@@ -23,11 +23,11 @@ T = tests/test_forge_research_flow_reliability_v1.py; прочие cases — в 
 | D11 | PASS | Passive actual loader trace requests E300/E900/E1800 only; produced future poison leaves prefix/panels/scope counts equal while authorized target numeric changes. Existing protected/late/unavailable controls pass. |
 | D12 | PASS | Native packet → Generator → original draft → persist/freeze → Critic KILL → final. Separate packet-only recheck matches; original launch UNKNOWN. Original3/6, total4/6; no reroll. |
 | D13 | PASS | Scripted Critic PASS only. Public classify/final, production Runner/literal oracle, classifier REPLAY_AVAILABLE old runid/no writes. |
-| D14 | PASS | OS persist then os._exit(73), lost reply, moved root + fresh processes resume original draft/hash/charge; corrupt/parent guards. OS lease and final-slot race verify bounded same-event publication. |
+| D14 | PASS | Lost reply, moved root and fresh process resume original draft/hash/charge; corrupt/parent guards. OS lease and final-slot race pass. |
 | D15 | PASS | Missing context: SHA/relative locator + RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY, exit2/no writes. Exact prior null session blocks show-session; typed close names scope/receipt. Native 7lines retain gaps. |
-| D16 | PASS | Independent projector/policy/operation/prior/outcome mutations alter capability only; market/inventory/counters unchanged. Strict saved repair readback remains. |
-| D17 | PASS | Verified 40/400 roots, three fresh samples, identical result SHA; physical verify 2040→40 and 20400→400. 51 logical traversals retained; writer invalidates snapshot+generation. |
-| D18 | PASS | One bounded change; compact native evidence. No full dump, dependency, provider, live or science mutation; four reviews and exact-head gates remain. |
+| D16 | PASS | Projector/policy/operation/prior/outcome mutations alter capability only; market/inventory/counters unchanged. |
+| D17 | PASS | Verified 40/400 roots, three samples, identical result SHA; physical verify 2040→40 and 20400→400. Writer invalidates snapshot. |
+| D18 | PASS | One bounded change and compact native evidence; four reviews and exact-head gates remain. |
 
 ## Native: неизменённый original input/output
 
@@ -53,9 +53,9 @@ Predeclared T.TABLE/LITERAL_ORACLE: N8 observed7/missing1; listA 4/3/1, mean .10
 
 resource-proof.json: cold40 median3.7985704→.1220622s (31.12x), 400 median38.7618921→.8603608s (45.05x); 12 result/state/counter hashes equal. Physical -98.04%, logical51calls unchanged; three samples/arm; writer invalidates snapshot.
 
-failure-proof.json: BASE, C01–C13 и UX falsifiers RED→GREEN. Busy retry only WRITER_BUSY,40×50ms; integrity refuses. Old race site UNKNOWN. Historical44eda5d/22 pins byte-bound; drift/loss/unavailable Git DENY.
+failure-proof.json: BASE, C01–C15 и UX falsifiers RED→GREEN. Busy retry only WRITER_BUSY,40×50ms; integrity refuses. Old race site UNKNOWN. Historical44eda5d/22 pins byte-bound; drift/loss/unavailable Git DENY.
 
-D10: candidate/definition stable; session rows append-only. Writer checks HYP lineage before publish; identical non-HYP rebuild. Capped prior ranks known ancestry without future state. Forge/Critic use bound session_started_at for HYP/DEC/scope/quarantine, requiring effective and available time. Market research_memory_as_of is separate; SQL views are current. Old/new raw outcomes survive.
+D10: candidate/definition stable; session rows append-only. Writer checks HYP lineage before publish; identical non-HYP and legacy identical-HYP rebuild. Capped prior ranks known ancestry without future state. Forge/Critic use bound session_started_at for HYP/DEC/scope/quarantine, requiring effective and available time. Market research_memory_as_of is separate; SQL views are current. Old/new raw outcomes survive.
 
 ## Ограничения и delivery
 

@@ -462,6 +462,33 @@ class SessionHistoryTests(unittest.TestCase):
         with self.assertRaisesRegex(HficMemoryPolicyError,'HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS'):
             iter_search_memory_hypothesis_payloads(store)
 
+    def test_legacy_identical_unlinked_hypotheses_rebuild_and_read_without_new_fork(self):
+        import tempfile
+        from unittest.mock import patch
+        from tests.test_research_store import event_fixture
+        from solana_alpha_lab.factory.research_store import ResearchStore, ResearchStoreError
+        from solana_alpha_lab.factory.hfic_memory_policy import iter_search_memory_hypothesis_payloads
+        from solana_alpha_lab.factory.hfic_prior_memory import build_prior_memory_snapshot
+        with tempfile.TemporaryDirectory() as temporary:
+            store=ResearchStore(Path(temporary))
+            payload={'hypothesis_version_id':'HYP-LEGACY-SAME','session_id':'SESS-LEGACY-SAME','hfic_protocol':'HFIC-V1','definition_sha256':'a'*64}
+            for suffix in ('A','B'):
+                row=event_fixture(record_id='HYP-LEGACY-'+suffix,record_kind='HYPOTHESIS_VERSION',transaction_id='RESEARCH-TXN-LEGACY-'+suffix,payload=payload).model_copy(update={'run_id':None,'hypothesis_version_id':'HYP-LEGACY-SAME'})
+                if suffix=='B':
+                    # BASE permitted this immutable partition; only its old admission is simulated.
+                    with patch('solana_alpha_lab.factory.research_store._assert_stable_id_lineage'):
+                        store.append([row],transaction_id=row.transaction_id)
+                else:
+                    store.append([row],transaction_id=row.transaction_id)
+            store.rebuild_projection()
+            self.assertEqual([item['session_id'] for item in iter_search_memory_hypothesis_payloads(store)],['SESS-LEGACY-SAME'])
+            self.assertEqual(build_prior_memory_snapshot(store,store_inventory_digest=store.diagnostics().committed_inventory_sha256,repo_root=ROOT)['emitted_count'],1)
+            third=event_fixture(record_id='HYP-LEGACY-C',record_kind='HYPOTHESIS_VERSION',transaction_id='RESEARCH-TXN-LEGACY-C',payload=payload).model_copy(update={'run_id':None,'hypothesis_version_id':'HYP-LEGACY-SAME'})
+            before=store.diagnostics().committed_inventory_sha256
+            with self.assertRaisesRegex(ResearchStoreError,'DUPLICATE_STABLE_ID_CONFLICT'):
+                store.append([third],transaction_id=third.transaction_id)
+            self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
+
     def test_cyclic_legacy_hypothesis_history_refuses_compaction(self):
         from types import SimpleNamespace
         from tests.test_research_store import event_fixture

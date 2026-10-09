@@ -32073,7 +32073,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_store.py', repository_path: src/solana_alpha_lab/factory/research_store.py}
-  integrity: {kind: sha256, sha256: b1a5d71465ecf1ce75d5a2107f773a3009d8e9d25db299328313da45f4ec4326}
+  integrity: {kind: sha256, sha256: 02e383c3163a0cc88f0c4eab1f6c8f5287bcd121f78c41a061bcb7e54295de3d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -37090,7 +37090,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: HFIC_OPERATIONAL_MEMORY_QUARANTINE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_memory_policy.py', repository_path: src/solana_alpha_lab/factory/hfic_memory_policy.py}
-  integrity: {kind: sha256, sha256: 8a9c552a2b08c6a91bd5d4dd6fb1f5b749fb650fdc6d8ca69150df58bdfb55c7}
+  integrity: {kind: sha256, sha256: 50bf483ab8a10c7ef5e2ef26a009ded3d8e20bfe8193960b003bdeea43393770}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001}

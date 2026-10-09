@@ -299,6 +299,17 @@ def iter_search_memory_hypothesis_payloads(
 
     selected: dict[str, dict[str, Any]] = {}
     for hyp_id, records in grouped.items():
+        # BASE could publish byte-identical unlinked versions of one stable
+        # hypothesis. They represent one historical card, not a new branch.
+        if (len(records) > 1
+                and all(record.supersedes_record_id is None for record, _ in records.values())
+                and len({record.payload_sha256 for record, _ in records.values()}) == 1):
+            visible = [record_id for record_id, (record, payload) in records.items()
+                       if hypothesis_search_eligible(payload, blocked)
+                       and research_record_visible_as_of(record, cutoff)]
+            if visible:
+                selected[hyp_id] = records[min(visible)][1]
+            continue
         ancestors: dict[str, set[str]] = {}
         for record_id, (record, _) in records.items():
             seen: set[str] = set()
