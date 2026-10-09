@@ -185,6 +185,56 @@ class ExplicitOutcomeTests(unittest.TestCase):
             self.assertIn('сам вердикт не закрывает семейство',text)
 
 class SessionHistoryTests(unittest.TestCase):
+    def test_empty_and_absent_session_ids_share_only_legacy_attribution(self):
+        import tempfile
+        import duckdb
+        from tests.test_research_projection import event,completed_payload
+        from tests.test_research_store import NOW
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from solana_alpha_lab.factory.prior_work import query_hypotheses,query_data_plane_prior_work
+        with tempfile.TemporaryDirectory() as raw:
+            store=ResearchStore(Path(raw))
+            records=[
+                event('HYP-EMPTY','HYPOTHESIS_VERSION',{'hypothesis_version_id':'HYP-EMPTY','session_id':'','definition_sha256':'1'*64,'origin_id':'ORIGIN-EMPTY'},hypothesis_version_id='HYP-EMPTY'),
+                event('HYP-ABSENT','HYPOTHESIS_VERSION',{'hypothesis_version_id':'HYP-ABSENT','definition_sha256':'1'*64,'origin_id':'ORIGIN-ABSENT'},hypothesis_version_id='HYP-ABSENT'),
+                event('ORIGIN-EMPTY','HYPOTHESIS_ORIGIN',{'origin_id':'ORIGIN-EMPTY','origin_kind':'EMPTY_HYP_ABSENT_ORIGIN'},hypothesis_version_id='HYP-EMPTY'),
+                event('ORIGIN-ABSENT','HYPOTHESIS_ORIGIN',{'origin_id':'ORIGIN-ABSENT','session_id':'','origin_kind':'ABSENT_HYP_EMPTY_ORIGIN'},hypothesis_version_id='HYP-ABSENT'),
+                event('DEC-EMPTY','DECISION_EVENT',{'decision_event_id':'DEC-EMPTY','hypothesis_version_id':'HYP-EMPTY','decision_kind':'REJECT','reason_code':'KILL_LOW_INFORMATION_VALUE'},hypothesis_version_id='HYP-EMPTY'),
+            ]
+            run_payload=completed_payload('RUN-EMPTY-SESSION','a'*64)
+            run_payload.update({'hypothesis_version_id':'HYP-ABSENT','session_id':''})
+            records.append(event('RUN-EMPTY-ROW','RUN_COMPLETED',run_payload,hypothesis_version_id='HYP-ABSENT',run_id='RUN-EMPTY-SESSION'))
+            for index,row in enumerate(records):
+                row=row.model_copy(update={'transaction_id':f'RESEARCH-TXN-EMPTY-{index}'})
+                store.append([row],transaction_id=row.transaction_id)
+            store.rebuild_projection()
+            projection=Path(raw)/'projections'/'research_memory.duckdb'
+            with duckdb.connect(str(projection),read_only=True) as db:
+                direct=db.execute('SELECT hypothesis_version_id,session_id,origin_kind,derived_state FROM hypotheses').fetchall()
+                self.assertEqual({r[0]:(r[1],r[2],r[3]) for r in direct},{'HYP-EMPTY':(None,'EMPTY_HYP_ABSENT_ORIGIN','REJECTED'),'HYP-ABSENT':(None,'ABSENT_HYP_EMPTY_ORIGIN','RETAINED')})
+            rows=query_hypotheses(projection,'2026-08-25T12:30:10Z')
+            self.assertEqual({r['hypothesis_version_id']:(r['session_id'],r['origin_kind'],r['derived_state']) for r in rows},{'HYP-EMPTY':(None,'EMPTY_HYP_ABSENT_ORIGIN','REJECTED'),'HYP-ABSENT':(None,'ABSENT_HYP_EMPTY_ORIGIN','RETAINED')})
+            result=query_data_plane_prior_work(projection,{'query_id':'EMPTY-LEGACY-SESSION','as_of':'2026-08-25T12:30:10Z','max_results':10,'predicates':{'origin_kinds':['EMPTY_HYP_ABSENT_ORIGIN','ABSENT_HYP_EMPTY_ORIGIN']}})
+            self.assertEqual(result['result_count'],2)
+
+    def test_same_payload_stale_predecessor_refuses_before_publication(self):
+        import tempfile
+        from datetime import timedelta
+        from tests.test_research_store import event_fixture,NOW
+        from solana_alpha_lab.factory.research_store import ResearchStore,ResearchStoreError
+        with tempfile.TemporaryDirectory() as raw:
+            store=ResearchStore(Path(raw))
+            payload={'hypothesis_version_id':'HYP-SAME-BYTES','definition_sha256':'a'*64}
+            first=event_fixture(record_id='HYP-FIRST',record_kind='HYPOTHESIS_VERSION',transaction_id='RESEARCH-TXN-SAME-FIRST',payload=payload).model_copy(update={'run_id':None,'hypothesis_version_id':'HYP-SAME-BYTES'})
+            store.append([first],transaction_id=first.transaction_id)
+            before=store.diagnostics().committed_inventory_sha256
+            for index,parent in enumerate((None,'ABSENT-PREDECESSOR')):
+                stale=first.model_copy(update={'record_id':f'HYP-STALE-{index}','transaction_id':f'RESEARCH-TXN-SAME-STALE-{index}','effective_at':NOW+timedelta(seconds=index+1),'supersedes_record_id':parent})
+                with self.subTest(parent=parent),self.assertRaisesRegex(ResearchStoreError,'DUPLICATE_STABLE_ID_CONFLICT'):
+                    store.append([stale],transaction_id=stale.transaction_id)
+                self.assertEqual(store.diagnostics().committed_inventory_sha256,before)
+            self.assertEqual(len(list(store.iter_committed_records())),1)
+
     def test_origin_fallback_and_search_facet_stay_in_their_session(self):
         from datetime import timedelta
         from tests.test_research_store import event_fixture,NOW

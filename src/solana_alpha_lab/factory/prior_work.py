@@ -302,9 +302,13 @@ def _eligible_rows(
     )
 
 
+def _session_identity(value: Any) -> str | None:
+    return value if isinstance(value, str) and value else None
+
+
 def _same_session(row: Mapping[str, Any], session_id: str | None) -> bool:
     """Legacy unbound records match legacy cards; known sessions stay separate."""
-    return row.get("session_id") == session_id
+    return _session_identity(row.get("session_id")) == _session_identity(session_id)
 
 
 def _derived_state(
@@ -362,7 +366,7 @@ def _bind_origin_as_of(
         connection,
         """
         SELECT record_id, record_kind, stable_id, hypothesis_version_id,
-               json_extract_string(payload_json, '$.session_id') AS session_id,
+               NULLIF(json_extract_string(payload_json, '$.session_id'), '') AS session_id,
                json_extract_string(payload_json, '$.origin_id') AS origin_id,
                json_extract_string(payload_json, '$.origin_kind') AS origin_kind,
                effective_at, first_reliable_available_at
@@ -389,7 +393,7 @@ def _bind_origin_as_of(
         ):
             if not stable:
                 continue
-            key = (str(stable), record.get("session_id"))
+            key = (str(stable), _session_identity(record.get("session_id")))
             previous = index.get(key)
             if previous is None or newer(record) > newer(previous):
                 index[key] = record
@@ -400,7 +404,7 @@ def _bind_origin_as_of(
         if source.get("origin_kind") is not None:
             hypothesis["origin_kind"] = source["origin_kind"]
             continue
-        session = hypothesis.get("session_id")
+        session = _session_identity(hypothesis.get("session_id"))
         matches = [
             row for row in (
                 by_hypothesis.get((hypothesis["hypothesis_version_id"], session)),

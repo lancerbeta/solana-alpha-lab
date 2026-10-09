@@ -1162,6 +1162,8 @@ def _completed_run_passport(
 def _assert_stable_id_lineage(related: Sequence[ResearchEvent]) -> None:
     """The same stable identity may evolve only along one explicit record chain."""
     by_id = {record.record_id: record for record in related}
+    if len(by_id) != len(related):
+        raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
     ancestors: dict[str, set[str]] = {}
     for record in related:
         seen: set[str] = set()
@@ -1175,8 +1177,7 @@ def _assert_stable_id_lineage(related: Sequence[ResearchEvent]) -> None:
     for index, record in enumerate(related):
         for previous in related[:index]:
             if (
-                previous.payload_sha256 != record.payload_sha256
-                and previous.record_id not in ancestors[record.record_id]
+                previous.record_id not in ancestors[record.record_id]
                 and record.record_id not in ancestors[previous.record_id]
             ):
                 raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
