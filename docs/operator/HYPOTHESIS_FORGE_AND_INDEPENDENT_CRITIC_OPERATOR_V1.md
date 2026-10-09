@@ -39,6 +39,17 @@ Critic #2 on the pre-frozen C2 packet → `finalize`. C2 `REVISE_ONCE` is typed
 PAUSE, not a second wording repair. До commissioning preflight сам выполняет безопасный offline Fast Lane
 commissioning.
 
+Если preflight останавливается с `REAL_DATA_MIGRATION_AMBIGUOUS` и
+`next=INSPECT_HYPOTHESIS_HISTORY`, поле `hypothesis_history_locator` содержит
+`hypothesis_version_id`, ограниченный список `record_ids` и общее
+`record_count`. По этим ID прочитайте соответствующие immutable
+`HYPOTHESIS_VERSION` records в canonical ResearchStore и сверьте
+`supersedes_record_id`, payload hash и provenance. При `record_count` больше
+длины списка продолжите read-only сверку всех записей с тем же HYP ID.
+Сохраните остановку до отдельного решения о конфликтующей истории: не
+переписывайте records, не запускайте повторный trial/preflight и не
+сбрасывайте budget. Locator не выдаёт разрешения на миграцию.
+
 `FORGE_CONTEXT_PACKET` includes bounded `semantic_capability_entries` (Forge-visible
 semantic routes only, `authority_granted=false`, ≤3072 bytes). Before proposing a
 new capability/collector/provider/infrastructure path, compare against those

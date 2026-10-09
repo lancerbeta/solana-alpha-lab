@@ -68,8 +68,9 @@ _PENDING_PHASES = frozenset(
 class HficMemoryPolicyError(ValueError):
     """Fail-closed HFIC search-memory policy error."""
 
-    def __init__(self, code: str) -> None:
+    def __init__(self, code: str, *, locator: dict[str, Any] | None = None) -> None:
         self.code = code
+        self.locator = locator
         super().__init__(code)
 
 
@@ -294,7 +295,12 @@ def iter_search_memory_hypothesis_payloads(
             continue
         records = grouped.setdefault(hyp_id, {})
         if record.record_id in records:
-            raise HficMemoryPolicyError("HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS")
+            raise HficMemoryPolicyError(
+                "HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS",
+                locator={"hypothesis_version_id": hyp_id,
+                         "record_ids": sorted({*records, record.record_id})[:8],
+                         "record_count": len(records) + 1},
+            )
         records[record.record_id] = (record, payload)
 
     selected: dict[str, dict[str, Any]] = {}
@@ -314,7 +320,12 @@ def iter_search_memory_hypothesis_payloads(
             parent = record.supersedes_record_id
             while parent is not None:
                 if parent not in records or parent == record_id or parent in seen:
-                    raise HficMemoryPolicyError("HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS")
+                    raise HficMemoryPolicyError(
+                        "HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS",
+                        locator={"hypothesis_version_id": hyp_id,
+                                 "record_ids": sorted(records)[:8],
+                                 "record_count": len(records)},
+                    )
                 seen.add(parent)
                 parent = records[parent][0].supersedes_record_id
             if record_id in legacy_roots or seen.intersection(legacy_roots):
@@ -327,7 +338,12 @@ def iter_search_memory_hypothesis_payloads(
                     continue
                 if (previous_id not in ancestors[record_id]
                         and record_id not in ancestors[previous_id]):
-                    raise HficMemoryPolicyError("HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS")
+                    raise HficMemoryPolicyError(
+                        "HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS",
+                        locator={"hypothesis_version_id": hyp_id,
+                                 "record_ids": sorted(records)[:8],
+                                 "record_count": len(records)},
+                    )
 
         eligible = [record_id for record_id, (record, payload) in records.items()
                     if hypothesis_search_eligible(payload, blocked)

@@ -115,8 +115,9 @@ _EPOCH_FILES = (
 class HficPreflightError(ValueError):
     """Fail-closed preflight / commissioning proof error."""
 
-    def __init__(self, code: str) -> None:
+    def __init__(self, code: str, *, locator: dict[str, Any] | None = None) -> None:
         self.code = code
+        self.locator = locator
         super().__init__(code)
 
 
@@ -2890,7 +2891,9 @@ def run_preflight(
     except HficMemoryPolicyError as exc:
         if exc.code != "HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS":
             raise
-        raise HficPreflightError("REAL_DATA_MIGRATION_AMBIGUOUS") from exc
+        raise HficPreflightError(
+            "REAL_DATA_MIGRATION_AMBIGUOUS", locator=exc.locator,
+        ) from exc
     stop_input = _forge_input_requires_preflight_stop(forge_input, control_mode)
     if stop_input:
         focus = owner_focus if owner_focus.strip() else AUTO_FOCUS

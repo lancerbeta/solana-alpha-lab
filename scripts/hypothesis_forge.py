@@ -640,6 +640,15 @@ def _preflight_owner_readout(body: Mapping[str, Any]) -> str:
             "market/representation/focus readback; не регенерируйте и не "
             "сбрасывайте budget"
         )
+    elif terminal == "REAL_DATA_MIGRATION_AMBIGUOUS" and isinstance(
+        body.get("hypothesis_history_locator"), Mapping
+    ):
+        next_line = (
+            "next: INSPECT_HYPOTHESIS_HISTORY — только read-only сверка "
+            "указанных immutable HYP records и supersedes lineage; "
+            "конфликт provenance требует отдельного решения, не повторяйте "
+            "preflight, не сбрасывайте budget и не создавайте trial"
+        )
     elif terminal == "MARKET_EPOCH_CONTINUITY_UNRESOLVED":
         next_line = (
             "next: PROVE_MARKET_CONTINUITY - compare the saved frozen basis with "
@@ -675,12 +684,21 @@ def _preflight_owner_readout(body: Mapping[str, Any]) -> str:
         if selection_router or selection_caveat
         else ""
     )
+    history_line = (
+        "hypothesis_history_locator: "
+        + json.dumps(body["hypothesis_history_locator"], ensure_ascii=False, sort_keys=True)
+        + "\n"
+        if terminal == "REAL_DATA_MIGRATION_AMBIGUOUS"
+        and isinstance(body.get("hypothesis_history_locator"), Mapping)
+        else ""
+    )
     return (
         "PREFLIGHT\n"
         "status: BLOCKED — preflight не разрешил scientific admission; "
         "это не научный negative\n"
         f"reason: {terminal}\n"
         + selection_line
+        + history_line
         + f"{next_line}; не создавайте trial вручную\n"
         + _preflight_writes_note(body)
     )
@@ -752,19 +770,31 @@ def cmd_preflight(
             additional_cycle=additional_cycle,
         )
     except HficPreflightError as exc:
+        history_locator = (
+            exc.locator
+            if str(exc) == "REAL_DATA_MIGRATION_AMBIGUOUS"
+            and isinstance(exc.locator, dict)
+            else None
+        )
         payload = {
             "action": "STOP",
             "terminal": str(exc),
             "owner_class": _owner_class_for_preflight_stop({"terminal": str(exc)}),
             "owner_focus": owner_focus,
             **active.redacted_receipt(),
-            "next": "RESOLVE_TYPED_PREFLIGHT_BLOCK",
+            "next": (
+                "INSPECT_HYPOTHESIS_HISTORY"
+                if history_locator is not None
+                else "RESOLVE_TYPED_PREFLIGHT_BLOCK"
+            ),
             "writes": {
-                "research_store": int(auto_commission),
+                "research_store": 0 if history_locator is not None else int(auto_commission),
                 "forge_context": 0,
                 "session": 0,
             },
         }
+        if history_locator is not None:
+            payload["hypothesis_history_locator"] = history_locator
         payload["owner_readout"] = _preflight_owner_readout(payload)
         _assert_no_path_leak(payload, str(data_root), str(repo_root))
         return emit(payload, exit_code=2)
