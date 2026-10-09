@@ -41,14 +41,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/paper_plane_read_freshness/a1_delivery_factory_fit_v1.json",
-    "sha256": "PENDING_BIND_EVIDENCE",
+    "sha256": "adc52cb6cb1b9207d20a7d8bb67b5b4e031cd6739be98790271c64532a963e27",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_185_EXECUTION_DOMAIN_TESTS_TWO_EXISTING_LOCAL_A4_ABSENT_SKIPS",
     "independent_review": {
       "path": "docs/evidence/paper_plane_read_freshness/a1_delivery_independent_review_v1.json",
-      "sha256": "PENDING_ISOLATED_REVIEW",
+      "sha256": "b9ad9c9500bc7b21dd7461534d118047b488914d1adb7d17dff6a504877f04c3",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

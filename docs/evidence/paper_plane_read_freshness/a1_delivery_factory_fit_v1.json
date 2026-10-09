@@ -4,8 +4,8 @@
   "review_id": "PAPER-PLANE-READ-FRESHNESS-FACTORY-FIT-001",
   "as_of": "2026-10-09",
   "task_id": "PAPER_PLANE_READ_FRESHNESS_V1",
-  "reviewed_bindings_sha256": "35914833c9d195d27c5679b12bce184db6c62f8aa7c77c26b861a8d522cd8992",
-  "reviewed_inventory_sha256": "eb581f613f024168954921ac7a2afcbb26fe1cbf11da3b5032e7a840420e0450",
+  "reviewed_bindings_sha256": "f7f46683768e9df92bdecdccdca50afe4c179235c5dfec73104534a250d71d12",
+  "reviewed_inventory_sha256": "6607d1ece19a474d6d50bd49848ae253a3820ddc85c13df3d6c7d830c030179c",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
