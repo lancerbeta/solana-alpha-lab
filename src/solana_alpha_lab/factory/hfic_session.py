@@ -5000,8 +5000,18 @@ def _session_hypothesis_supersedes(store: Any, candidate_id: str, definition_sha
         prior.append(record)
     if not prior:
         return None
+    roots = [row for row in prior if row.supersedes_record_id is None]
+    legacy_roots = (
+        {row.record_id for row in roots}
+        if len(roots) > 1 and len({row.payload_sha256 for row in roots}) == 1
+        else set()
+    )
     superseded = {row.supersedes_record_id for row in prior}
+    if legacy_roots.intersection(superseded):
+        superseded.update(legacy_roots)
     heads = [row for row in prior if row.record_id not in superseded]
+    if len(heads) > 1 and {row.record_id for row in heads} == legacy_roots:
+        return min(legacy_roots)
     if len(heads) != 1:
         raise HficSessionError("HFIC_HYPOTHESIS_HISTORY_IDENTITY_UNBOUND")
     return heads[0].record_id

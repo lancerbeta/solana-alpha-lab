@@ -469,6 +469,7 @@ class SessionHistoryTests(unittest.TestCase):
         from solana_alpha_lab.factory.research_store import ResearchStore, ResearchStoreError
         from solana_alpha_lab.factory.hfic_memory_policy import iter_search_memory_hypothesis_payloads
         from solana_alpha_lab.factory.hfic_prior_memory import build_prior_memory_snapshot
+        from solana_alpha_lab.factory.hfic_session import _session_hypothesis_supersedes
         with tempfile.TemporaryDirectory() as temporary:
             store=ResearchStore(Path(temporary))
             payload={'hypothesis_version_id':'HYP-LEGACY-SAME','session_id':'SESS-LEGACY-SAME','hfic_protocol':'HFIC-V1','definition_sha256':'a'*64}
@@ -483,7 +484,15 @@ class SessionHistoryTests(unittest.TestCase):
             store.rebuild_projection()
             self.assertEqual([item['session_id'] for item in iter_search_memory_hypothesis_payloads(store)],['SESS-LEGACY-SAME'])
             self.assertEqual(build_prior_memory_snapshot(store,store_inventory_digest=store.diagnostics().committed_inventory_sha256,repo_root=ROOT)['emitted_count'],1)
-            third=event_fixture(record_id='HYP-LEGACY-C',record_kind='HYPOTHESIS_VERSION',transaction_id='RESEARCH-TXN-LEGACY-C',payload=payload).model_copy(update={'run_id':None,'hypothesis_version_id':'HYP-LEGACY-SAME'})
+            parent=_session_hypothesis_supersedes(store,'HYP-LEGACY-SAME','a'*64)
+            self.assertEqual(parent,'HYP-LEGACY-A')
+            child=event_fixture(record_id='HYP-LEGACY-C',record_kind='HYPOTHESIS_VERSION',transaction_id='RESEARCH-TXN-LEGACY-C',payload={**payload,'session_id':'SESS-NEW'}).model_copy(update={'run_id':None,'hypothesis_version_id':'HYP-LEGACY-SAME','supersedes_record_id':parent})
+            store.append([child],transaction_id=child.transaction_id)
+            store.rebuild_projection()
+            self.assertEqual(_session_hypothesis_supersedes(store,'HYP-LEGACY-SAME','a'*64),child.record_id)
+            self.assertEqual([item['session_id'] for item in iter_search_memory_hypothesis_payloads(store)],['SESS-NEW'])
+            self.assertEqual(build_prior_memory_snapshot(store,store_inventory_digest=store.diagnostics().committed_inventory_sha256,repo_root=ROOT)['capsules'][0]['session_id'],'SESS-NEW')
+            third=event_fixture(record_id='HYP-LEGACY-D',record_kind='HYPOTHESIS_VERSION',transaction_id='RESEARCH-TXN-LEGACY-D',payload=payload).model_copy(update={'run_id':None,'hypothesis_version_id':'HYP-LEGACY-SAME'})
             before=store.diagnostics().committed_inventory_sha256
             with self.assertRaisesRegex(ResearchStoreError,'DUPLICATE_STABLE_ID_CONFLICT'):
                 store.append([third],transaction_id=third.transaction_id)
@@ -946,12 +955,21 @@ class EpisodeFlowTests(unittest.TestCase):
         from tests import test_hfic_list_aware_vertical_v1 as lav
         from solana_alpha_lab.factory.research_store import ResearchStore
         from tests.test_hfic_cli import critic_result_from_packet_only
+        from unittest.mock import patch
         evidence,scope,query,initial=self.look('FLOW_NEW_DATA')
         body,pre=self.authored_draft(evidence,scope,initial['owner_focus'])
         generated,frozen=self.persist_and_freeze(body,pre)
         critic=critic_result_from_packet_only(frozen['critic_input_packet'],terminal='KILL_STATISTICALLY_UNIDENTIFIABLE')
         self.cli('finalize','--session-id',frozen['session_id'],'--critic-result',self.write('kill.json',critic))
         self.cli('forge-run','--owner-focus',pre['owner_focus'],'--persist')
+        store=ResearchStore(self.plane)
+        old_hyp=next(row for row in store.iter_committed_records() if str(getattr(row.record_kind,'value',row.record_kind))=='HYPOTHESIS_VERSION' and row.hypothesis_version_id==frozen['selected_candidate_id'])
+        legacy=old_hyp.model_copy(update={'record_id':'ZZZ-LEGACY-IDENTICAL-HYP','transaction_id':'RESEARCH-TXN-LEGACY-IDENTICAL-HYP'})
+        # A BASE-valid immutable replay is injected without weakening current writer admission.
+        with patch('solana_alpha_lab.factory.research_store._assert_stable_id_lineage'):
+            store.append([legacy],transaction_id=legacy.transaction_id)
+        store.rebuild_projection()
+        self.assertEqual(legacy.payload_sha256,old_hyp.payload_sha256)
         before=self.preflight(pre['owner_focus'])
         replay=lav._consume(self.packets[:1],source=self.source,mirror=self.work/'mirror',plane=self.plane)
         self.assertEqual(replay['_exit_code'],0,replay)

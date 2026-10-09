@@ -1,6 +1,6 @@
 # FORGE_RESEARCH_FLOW_RELIABILITY_V1 — evidence index
 
-Закрыты transport, routing, recovery и стоимость ordinary OPPORTUNITY_EPISODES. Native KILL → NON_SCIENTIFIC_STOP; scripted positive проходит classify/final/Runner/replay. Без alpha/OOS/live claims.
+Ordinary OPPORTUNITY_EPISODES: transport, routing, recovery, read cost. Native KILL→STOP; scripted positive exercises Runner. No alpha/OOS/live.
 
 BASE: 44eda5d72dccd569e9766a74046ce8b2ec47f417; native producer: cc7836aa79f5e5535dc51d02115b0f301a09179d. Original bytes неизменны.
 
@@ -10,24 +10,24 @@ T = tests/test_forge_research_flow_reliability_v1.py; прочие cases — в 
 
 | ID | Verdict | Проверенный результат / falsifier |
 |---|---|---|
-| D01 | PASS | Field map/active authoring_contract/Prompt A/B agree; frozen max_generated wins, default6 unchanged. Native draft1.3: one PREDICTIVE card. |
-| D02 | PASS | T.CardTransportTests: четыре risk fields, string/list/absent/empty/false/0/object/mixed/null; Critic schema, labeled PIT/dependency arrays, aliases/conflicts, bindings, обе alternatives. |
-| D03 | PASS | Invalid selected/runner shape отказывается до records; precise candidates[i].field, ordinal/type/next; inventory/counters equal. |
-| D04 | PASS | BASE persist legacy string draft → freeze HFIC_PROTOCOL_INVALID → saved resume/freeze; source bytes, payload/IDs/look/accounting unchanged. No rewrite/new root. |
-| D05 | PASS | 0/1/10 cards; primary9/runner10, invalid runner pre-persist refusal, KILL → runner REVISE pause; other8 NOT_SELECTED; one-card revision same look. |
-| D06 | PASS | Actual PREDICTIVE no actor/mechanism, LIST_CONTRAST no artificial numeric predicate. Unsupported EMA explicit gap, no invented capability. |
-| D07 | PASS | All16 schema Critic enums table-tested; unknown future KILL stays UNMAPPED/OBSERVABILITY_BLOCKED. Raw source unchanged; candidate review rejection is not family authority. |
-| D08 | PASS | Public BASE NO_WORTHY → eligible NORMALIZED_TRAJECTORY_EPISODES_V1 → real prefix/query/freeze/terminal; advance/resume/pause guards retained. |
-| D09 | PASS | Public prior matrix: EXACT refuses, mixed question retains RELATED/PARK/TECHNICAL; typed close refuses pre-persist. All4 capsules freeze, technical Critic → NON_SCIENTIFIC_STOP; history/budget unchanged. prior-matrix-proof.json. |
-| D10 | PASS | Identical import preserves epoch/search; admitted10 changes them. Fresh persist/freeze/final/readback uses same candidate/new session; old records unchanged, freeze replay writes0/looks0 (new-data-proof.json). |
-| D11 | PASS | Passive actual loader trace requests E300/E900/E1800 only; produced future poison leaves prefix/panels/scope counts equal while authorized target numeric changes. Existing protected/late/unavailable controls pass. |
-| D12 | PASS | Native packet → Generator → original draft → persist/freeze → Critic KILL → final. Separate packet-only recheck matches; original launch UNKNOWN. Original3/6, total4/6; no reroll. |
-| D13 | PASS | Scripted Critic PASS only. Public classify/final, production Runner/literal oracle, classifier REPLAY_AVAILABLE old runid/no writes. |
-| D14 | PASS | Lost reply, moved root and fresh process resume original draft/hash/charge; corrupt/parent guards. OS lease and final-slot race pass. |
-| D15 | PASS | Missing context: SHA/relative locator + RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY, exit2/no writes. Exact prior null session blocks show-session; typed close names scope/receipt. Native 7lines retain gaps. |
-| D16 | PASS | Projector/policy/operation/prior/outcome mutations alter capability only; market/inventory/counters unchanged. |
-| D17 | PASS | Verified 40/400 roots, three samples, identical result SHA; physical verify 2040→40 and 20400→400. Writer invalidates snapshot. |
-| D18 | BLOCKED | Content and compact evidence ready; four reviews, one PR and exact-head CI are live gates. Their final IDs/verdict belong in the PR description. |
+| D01 | PASS | Contract/Prompt A/B agree; frozen max_generated wins, default6. Native draft1.3 PREDICTIVE. |
+| D02 | PASS | Four risks retain string/list/missing/empty/invalid; schema, PIT components, aliases and both alternatives. |
+| D03 | PASS | Invalid selected/runner fails before records with exact field; inventory/counters equal. |
+| D04 | PASS | BASE saved string draft resumes/freezes after repair; original bytes, IDs, look, charge retained. |
+| D05 | PASS | 0/1/10 cards; primary9/runner10; bad runner refuses, KILL→REVISE pause; other8 NOT_SELECTED. |
+| D06 | PASS | PREDICTIVE without invented actor/mechanism; LIST_CONTRAST without numeric predicate; EMA gap explicit. |
+| D07 | PASS | All16 Critic enums; unknown KILL stays UNMAPPED. Raw rejection cannot close family. |
+| D08 | PASS | Public BASE NO_WORTHY→trajectory fallback, real query/freeze/terminal; guards retained. |
+| D09 | PASS | Public EXACT/RELATED/PARK/TECHNICAL matrix, typed-close refusal, four capsules, NON_SCIENTIFIC_STOP; budget stable. |
+| D10 | PASS | Identical import keeps epoch; admitted10 changes it. New-session public lifecycle after legacy HYP replay; old bytes stable, replay writes0. |
+| D11 | PASS | Loader requests E300/E900/E1800; future poison changes no prefix/scope while authorized target changes. |
+| D12 | PASS | Native packet/draft/persist/freeze/KILL/final; fresh isolated packet-only Critic recheck matched KILL with exact input/output hashes and read-set. Original launch UNKNOWN; 5/6 outputs. |
+| D13 | PASS | Scripted Critic PASS; real classify/final/Runner/literal oracle; replay old runid/no writes. |
+| D14 | PASS | Lost reply/moved root resumes original draft/hash/charge; corruption and OS race guarded. |
+| D15 | PASS | Missing context gives SHA locator/exit2/no writes; null-session exact prior blocks navigation; typed close names scope/receipt. |
+| D16 | PASS | Capability mutations leave market, inventory and counters unchanged. |
+| D17 | PASS | 40/400 roots: equal result SHA, physical reads 2040→40 and 20400→400; writer invalidates snapshot. |
+| D18 | BLOCKED | Compact content ready; four reviews, one PR and exact-head CI pending. Final IDs/verdict in PR description. |
 
 ## Native: неизменённый original input/output
 
@@ -35,7 +35,7 @@ native-evidence.json deduplicates originals; materializer restores exact bytes a
 
 `uv run --locked --managed-python python -B tests/fixtures/forge_research_flow_reliability_v1/materialize_native_evidence.py docs/evidence/forge_research_flow_reliability_v1/native-evidence.json local/flow-native-readback`
 
-Session HFIC-SESS-7AF2CBC076DD99FD; candidate HFIC-CAND-4CCB3BB855AA. Bundle has original hashes/preflight/look/packet/final. Packet-only Critic recheck matched KILL; output in independent-critic-result.json.zlib, SHA in independent-critic-recheck.json. Original launch UNKNOWN; model diversity UNPROVEN.
+Session HFIC-SESS-7AF2CBC076DD99FD; candidate HFIC-CAND-4CCB3BB855AA. Bundle preserves original bytes. Fresh isolated Critic KILL is in independent-critic-result.json.zlib with read-set/hash in independent-critic-recheck.json. Original launch UNKNOWN; model diversity UNPROVEN.
 
 Owner 7-line readout:
 
@@ -43,22 +43,22 @@ Owner 7-line readout:
 - Объект: HFIC-CAND-4CCB3BB855AA, ListA → E14400 proxy при E1800 decision.
 - Source: KILL_LOW_INFORMATION_VALUE — synthetic contrast не даёт нового научного решения.
 - Applicability: exact candidate/evidence; family authority=false; transferability UNKNOWN.
-- Сохранено: original draft, scoped look, Critic, final; MAIN1/6, ADAPTIVE0/2, PREVIEW0/2, pending0; terminal не добавил расход.
-- Next: STOP по этому synthetic candidate; новая evidence/научная validation требуют отдельного основания.
-- Запреты: no reroll, no zero-fill, no causal/alpha/strategy/live/deploy claims.
+- Сохранено: draft/look/Critic/final; MAIN1/6, ADAPTIVE0/2, PREVIEW0/2, pending0.
+- Next: STOP; новая evidence/validation требует отдельного основания.
+- Запреты: no reroll, zero-fill, causal/alpha/strategy/live/deploy claims.
 
 ## Арифметика, ресурс и восстановление
 
-Predeclared T.TABLE/LITERAL_ORACLE: N8 observed7/missing1; listA 4/3/1, mean .10 vs -.10, diff .20; numeric-in-A 3/2/1, mean .20 vs .10; mixed .20 vs pooled -1/70, drop-numeric .10. Runner matches; N32 repeats dependent.
+T.TABLE oracle: N8 observed7/missing1; listA 4/3/1 mean .10 vs -.10, diff .20; numeric-in-A 3/2/1 mean .20 vs .10; mixed .20 vs pooled -1/70. Runner matches; N32 dependent.
 
-resource-proof.json: cold40 median3.7985704→.1220622s (31.12x), 400 median38.7618921→.8603608s (45.05x); 12 result/state/counter hashes equal. Physical -98.04%, logical51calls unchanged; three samples/arm; writer invalidates snapshot.
+resource-proof.json: cold40 31.12x, cold400 45.05x; 12 result/state/counter hashes equal. Physical -98.04%; three samples/arm; writer invalidates snapshot.
 
-failure-proof.json: BASE, C01–C15 и UX falsifiers RED→GREEN. Busy retry only WRITER_BUSY,40×50ms; integrity refuses. Old race site UNKNOWN. Historical44eda5d/22 pins byte-bound; drift/loss/unavailable Git DENY.
+failure-proof.json: BASE, C01–C16 and UX RED→GREEN. Retry only WRITER_BUSY; integrity refuses. Old race site UNKNOWN; historical22 pins byte-bound.
 
-D10: candidate/definition stable; session rows append-only. Writer checks HYP lineage before publish; identical non-HYP and legacy identical-HYP rebuild. Capped prior ranks known ancestry without future state. Forge/Critic use bound session_started_at for HYP/DEC/scope/quarantine, requiring effective and available time. Market research_memory_as_of is separate; SQL views are current. Old/new raw outcomes survive.
+D10/C16: writer admits one successor to legacy-equivalent HYP roots under lease; new fork refuses. Forge/Critic prior uses bound session_started_at and both time axes; market research_memory_as_of stays separate.
 
 ## Ограничения и delivery
 
-Spec1.1 Runner is mechanical; native Spec1.3 gains no chronology. Scripted positive does not convert native KILL to PASS or family closure. Whole Forge audit remains incomplete; D01–D18 engineering only.
+Spec1.1 Runner is mechanical; native KILL grants no chronology, alpha or family closure. Whole Forge audit remains separate.
 
-validation-proof.json retains counts/skips/initial failures. Guarded merge owns full gate; exact PR CI/readiness precede owner-authorized phrase. Horizon NOW=NONE, WATCH=chronology/science. Synthetic roots only; no provider, holdout, VPS, deploy, credentials, money or budget increase. Rollback never resets raw history.
+validation-proof.json retains tests/skips/failures. Guarded merge owns full gate after exact-head CI/readiness. Horizon NOW=NONE, WATCH=chronology/science. No provider, holdout, deploy, credentials, money or budget increase; raw history never resets.

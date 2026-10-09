@@ -299,17 +299,15 @@ def iter_search_memory_hypothesis_payloads(
 
     selected: dict[str, dict[str, Any]] = {}
     for hyp_id, records in grouped.items():
-        # BASE could publish byte-identical unlinked versions of one stable
-        # hypothesis. They represent one historical card, not a new branch.
-        if (len(records) > 1
-                and all(record.supersedes_record_id is None for record, _ in records.values())
-                and len({record.payload_sha256 for record, _ in records.values()}) == 1):
-            visible = [record_id for record_id, (record, payload) in records.items()
-                       if hypothesis_search_eligible(payload, blocked)
-                       and research_record_visible_as_of(record, cutoff)]
-            if visible:
-                selected[hyp_id] = records[min(visible)][1]
-            continue
+        # BASE could publish identical unlinked roots. Treat those immutable
+        # rows as one predecessor even after a new explicit child is appended.
+        roots = [record for record, _ in records.values()
+                 if record.supersedes_record_id is None]
+        legacy_roots = (
+            {record.record_id for record in roots}
+            if len(roots) > 1 and len({record.payload_sha256 for record in roots}) == 1
+            else set()
+        )
         ancestors: dict[str, set[str]] = {}
         for record_id, (record, _) in records.items():
             seen: set[str] = set()
@@ -319,10 +317,14 @@ def iter_search_memory_hypothesis_payloads(
                     raise HficMemoryPolicyError("HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS")
                 seen.add(parent)
                 parent = records[parent][0].supersedes_record_id
+            if record_id in legacy_roots or seen.intersection(legacy_roots):
+                seen.update(legacy_roots - {record_id})
             ancestors[record_id] = seen
         record_ids = list(records)
         for index, record_id in enumerate(record_ids):
             for previous_id in record_ids[:index]:
+                if record_id in legacy_roots and previous_id in legacy_roots:
+                    continue
                 if (previous_id not in ancestors[record_id]
                         and record_id not in ancestors[previous_id]):
                     raise HficMemoryPolicyError("HFIC_HYPOTHESIS_HISTORY_AMBIGUOUS")

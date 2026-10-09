@@ -1161,6 +1161,7 @@ def _completed_run_passport(
 
 def _assert_stable_id_lineage(
     related: Sequence[ResearchEvent], *, allow_legacy_identical_hypotheses: bool = False,
+    existing_record_ids: set[str] | None = None,
 ) -> None:
     """HYP identities require a chain; other kinds retain same-payload replay."""
     strict_hypothesis = bool(related) and (
@@ -1171,11 +1172,16 @@ def _assert_stable_id_lineage(
         raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
     # BASE accepted same-payload unlinked HYP rows. Existing immutable logs
     # must remain cold-rebuildable; writer admission keeps the strict chain.
-    if (allow_legacy_identical_hypotheses and strict_hypothesis
-            and len(related) > 1
-            and all(record.supersedes_record_id is None for record in related)
-            and len({record.payload_sha256 for record in related}) == 1):
-        return
+    roots = [record for record in related if record.supersedes_record_id is None]
+    legacy_roots = (
+        {record.record_id for record in roots}
+        if strict_hypothesis and len(roots) > 1
+        and len({record.payload_sha256 for record in roots}) == 1
+        and (allow_legacy_identical_hypotheses
+             or (existing_record_ids is not None
+                 and all(record.record_id in existing_record_ids for record in roots)))
+        else set()
+    )
     ancestors: dict[str, set[str]] = {}
     for record in related:
         seen: set[str] = set()
@@ -1187,9 +1193,13 @@ def _assert_stable_id_lineage(
             parent = by_id[parent].supersedes_record_id
         if strict_hypothesis and parent is not None:
             raise ResearchStoreError("DUPLICATE_STABLE_ID_CONFLICT")
+        if record.record_id in legacy_roots or seen.intersection(legacy_roots):
+            seen.update(legacy_roots - {record.record_id})
         ancestors[record.record_id] = seen
     for index, record in enumerate(related):
         for previous in related[:index]:
+            if (record.record_id in legacy_roots and previous.record_id in legacy_roots):
+                continue
             if (
                 (strict_hypothesis or previous.payload_sha256 != record.payload_sha256)
                 and previous.record_id not in ancestors[record.record_id]
@@ -1714,8 +1724,13 @@ class ResearchStore:
                 for record in new_hypotheses:
                     stable_id = _projection_stable_id(record, _payload_object(record))
                     related[stable_id].append(record)
+                new_record_ids = {record.record_id for record in new_hypotheses}
                 for lineage in related.values():
-                    _assert_stable_id_lineage(lineage)
+                    _assert_stable_id_lineage(
+                        lineage,
+                        existing_record_ids={record.record_id for record in lineage
+                                             if record.record_id not in new_record_ids},
+                    )
 
             parquet_path = _target_path(
                 self._root,
