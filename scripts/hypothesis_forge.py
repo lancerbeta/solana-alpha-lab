@@ -1476,6 +1476,31 @@ def _cmd_discovery_execute(
             "source_result_ref": str(correct_result_ref),
             "source_result_sha256": str(correct_result_sha256),
         }
+    # NEW ordinary request validation precedes operation creation/reservation
+    # and any partition value loader. The actual executor repeats the same
+    # scope validator; no separate check result is reused across changed bytes.
+    if temporal_query and correction is None:
+        from solana_alpha_lab.factory.hfic_grounded_discovery import validate_discovery_request_scope
+        from solana_alpha_lab.factory.hfic_generation_context import (
+            GenerationContextError, collect_verified_priors, check_full_prior_scope,
+        )
+        try:
+            request_for_readback = json.loads(operation_path.read_text(encoding="utf-8")) if operation_path is not None else None
+            scope_store = ResearchStore(store_root, create_if_missing=False)
+            saved = _saved_result_readback(scope_store, request=request_for_readback,
+                operation_sha256=operation_sha256, spec=spec, journal_scope=journal_scope)
+            if not saved:
+                candidate_scope = validate_discovery_request_scope(spec, candidate_scope)
+                archive = collect_verified_priors(scope_store, as_of=None)
+                check_full_prior_scope(archive, evidence={"candidate_scope": candidate_scope},
+                    inventory_digest=scope_store.diagnostics().committed_inventory_sha256)
+        except (GroundedDiscoveryError, GenerationContextError) as exc:
+            return emit({"reason_code": exc.code, "detail": getattr(exc, "detail", {}),
+                "stage": "REQUEST_ADMISSION_BEFORE_MAIN", "values_loaded": False,
+                "writes": False, "scientific_negative": False,
+                "scientific_look_delta": {"main": 0, "adaptive": 0}}, exit_code=2)
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            return emit_error("DISCOVERY_INPUT_INVALID")
     gate: dict[str, object] = {"disposition": "EXECUTE"}
     market_root: Path | None = None
     if temporal_query:

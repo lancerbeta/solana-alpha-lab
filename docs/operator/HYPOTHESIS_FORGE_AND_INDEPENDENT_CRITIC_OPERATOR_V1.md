@@ -2095,3 +2095,25 @@ fees or fills. A SIMPLE version keeps the holder feature/predicate alone,
 sets `search_tier=SIMPLE_SCREEN` and `budget_allocation=AUTO`; it preserves
 decision/target/clock/entry/baseline. For relative growth use holder
 `return_ratio` with the same explicit start/end and positive-base constraint.
+
+## V2 ordinary request admission and incomplete historical context
+
+For a new ordinary temporal MAIN, `--candidate-scope` needs only the already
+authored `estimand` and `explanatory_condition` (optional supported representation
+scope stays explicit). The existing validator derives population, decision,
+target, list-rule hash/statement and ordinary route mode from the validated
+query. Explicit conflicting machine fields refuse; omitted mode is distinct
+from null, unknown enum and conflicting route. The execute boundary validates
+before operation creation/reservation/value loading and repeats the shared
+scope validator in the actual executor. Full-archive source/ledger guards
+still run. A refusal reports current vs prior stage, missing/conflicting
+fields, provenance and zero new effects. No old saved look is rebound.
+
+Incomplete historical context remains UNKNOWN with its exact source refs;
+no novelty or scope difference is inferred. No block established by the
+full-scope guards is not proof of distinction. Such context alone is not a
+global veto of an independent grounded claim. Critic still checks whether
+the current claim relies on the missing fact, claims unsupported novelty,
+or has an actually applicable close. Exact close, potentially applicable
+near-close, scientific quality and current binding defects remain blocking.
+The V2 matrix applies to new decisions; old packets/verdicts keep their epoch.

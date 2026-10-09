@@ -1342,6 +1342,51 @@ def scope_bound_to_spec(
     return bound
 
 
+def validate_discovery_request_scope(
+    spec: Mapping[str, Any], candidate_scope: Mapping[str, Any],
+) -> dict[str, str]:
+    """Validate a NEW ordinary request before reservation or value loading.
+
+    Resolver-owned axes are copied from the canonical query. Authored intent
+    is required, never synthesized from either the query or its outcomes.
+    Historical readback/corrections retain their original binding.
+    """
+    declared = dict(candidate_scope)
+    mode = declared.get("evidence_surface_mode")
+    if "evidence_surface_mode" in declared and mode != ORDINARY_GROUNDED_DISCOVERY_V1:
+        known = {ORDINARY_GROUNDED_DISCOVERY_V1, "CURRENT_REPRESENTATION_CONTROL_V1"}
+        code = "LOOK_SCOPE_CONTRADICTION" if isinstance(mode, str) and mode in known else "CANDIDATE_SCOPE_INVALID"
+        raise GroundedDiscoveryError(code, {
+            "stage": "CURRENT_REQUEST_BEFORE_MAIN", "invalid_fields": ["evidence_surface_mode"],
+            "mode_state": "EXPLICIT_NULL" if mode is None else "CONFLICT" if mode in tuple(known) else "UNKNOWN_OR_INVALID",
+            "expected_mode": ORDINARY_GROUNDED_DISCOVERY_V1,
+            "next_action": "CORRECT_FRESH_REQUEST_BEFORE_MAIN",
+        })
+    machine_axes = ("population", "decision_timestamp", "target", "research_scope_rule_sha256", "research_scope_statement")
+    bound = scope_bound_to_spec(spec, {k: v for k, v in declared.items() if k not in machine_axes})
+    validated = validate_query_spec(spec)
+    body = validated.get("scientific_body")
+    if isinstance(body, Mapping) and "research_scope" in body:
+        from solana_alpha_lab.factory.hfic_research_scope import scope_statement
+        bound["research_scope_statement"] = scope_statement(body)
+    machine_axes = ("population", "decision_timestamp", "target", "research_scope_rule_sha256", "research_scope_statement")
+    conflicts = [key for key in machine_axes if key in declared and declared[key] != bound.get(key)]
+    if conflicts:
+        raise GroundedDiscoveryError("LOOK_SPEC_SCOPE_MISMATCH", {
+            "stage": "CURRENT_REQUEST_BEFORE_MAIN", "conflicting_fields": conflicts,
+            "expected_binding": {key: bound.get(key) for key in conflicts},
+            "next_action": "CORRECT_FRESH_REQUEST_BEFORE_MAIN",
+        })
+    try:
+        validate_fresh_card_scope(bound, look_scope=bound, require_look_axes=True)
+    except GroundedDiscoveryError as exc:
+        raise GroundedDiscoveryError(exc.code, {**exc.detail,
+            "stage": "CURRENT_REQUEST_BEFORE_MAIN",
+            "next_action": "CORRECT_FRESH_REQUEST_BEFORE_MAIN",
+        }) from exc
+    return bound
+
+
 def card_claim_scope(card: Mapping[str, Any] | None) -> dict[str, str]:
     if not isinstance(card, Mapping):
         return {}
@@ -1512,16 +1557,28 @@ def bind_prior_scope_evidence(
     if not merged:
         return body
     if not isinstance(candidate_scope, Mapping) or _scope_missing(candidate_scope, prefix=""):
-        raise GroundedDiscoveryError("UNKNOWN_PRIOR_SCOPE")
+        raise GroundedDiscoveryError("UNKNOWN_PRIOR_SCOPE", {
+            "stage": "CURRENT_CANDIDATE_SCOPE", "missing_fields": _scope_missing(candidate_scope or {}, prefix=""),
+            "next_action": "CORRECT_CURRENT_SCOPE_WITHOUT_CHANGING_SAVED_LOOK",
+        })
     relations = []
     for prior in merged:
         relation = prior_scope_relation(candidate_scope, prior)
         if relation in _BLOCKING_RELATIONS:
-            raise GroundedDiscoveryError("EXACT_PRIOR_SCOPE_MATCH")
+            raise GroundedDiscoveryError("EXACT_PRIOR_SCOPE_MATCH", {
+                "stage": "PRIOR_SCOPE_RESTRICTION", "hypothesis_version_id": prior.get("hypothesis_version_id"),
+                "relation": relation, "source_refs": (prior.get("source_detail") or {}).get("hypothesis_source_refs", []),
+                "next_action": "REUSE_EXISTING_PRIOR_RULE_NO_NEW_LOOK",
+            })
         if relation == "UNKNOWN_SCOPE_NEEDS_RESOLUTION" and _near_close_unresolved(
             candidate_scope, prior
         ):
-            raise GroundedDiscoveryError("UNKNOWN_PRIOR_SCOPE")
+            raise GroundedDiscoveryError("UNKNOWN_PRIOR_SCOPE", {
+                "stage": "POTENTIALLY_APPLICABLE_PRIOR_CLOSE", "hypothesis_version_id": prior.get("hypothesis_version_id"),
+                "missing_fields": _scope_missing(prior, prefix="prior."),
+                "source_refs": (prior.get("source_detail") or {}).get("hypothesis_source_refs", []),
+                "next_action": "RESOLVE_BOUND_PRIOR_RESTRICTION_NO_NEW_LOOK",
+            })
         if _non_blocking_prior(prior) and relation == "UNKNOWN_SCOPE_NEEDS_RESOLUTION":
             relation = "NON_BLOCKING_PRIOR"
         relations.append(
@@ -1530,6 +1587,15 @@ def bind_prior_scope_evidence(
                 "hypothesis_version_id": prior.get("hypothesis_version_id"),
                 "relation": relation,
                 "question_id_is_not_a_scientific_difference": True,
+                **({
+                    "applicability": "UNKNOWN", "novelty": "UNKNOWN",
+                    "active_scope_restriction_established": False,
+                    "guard_assessment": "NO_BLOCK_ESTABLISHED_BY_SCOPE_GUARD",
+                    "claim_dependency": "REQUIRES_INDEPENDENT_CLAIM_ASSESSMENT",
+                    "unknown_prior_is_evidence": False,
+                    "missing_fields": _scope_missing(prior, prefix="prior."),
+                    "source_refs": (prior.get("source_detail") or {}).get("hypothesis_source_refs", []),
+                } if relation == "UNKNOWN_SCOPE_NEEDS_RESOLUTION" else {}),
             }
         )
     body["prior_scope_relations"] = relations
@@ -2472,6 +2538,13 @@ def run_recorded_discovery_query(
     if not isinstance(git_sha, str) or len(git_sha) != 40:
         raise GroundedDiscoveryError("GIT_SHA_REQUIRED")
     bound_scope = scope_bound_to_spec(spec, candidate_scope)
+    if _is_temporal_query(spec) and correction is None:
+        # Saved results remain bound to their original bytes, including old gaps.
+        identity = validate_query_spec(spec)["spec_sha256"]
+        saved = any(item.get("spec_sha256") == identity and item.get("operation_sha256") == operation_sha256
+                    and isinstance(item.get("result"), Mapping) for item in list_discovery_looks(store, journal_scope))
+        if not saved:
+            bound_scope = validate_discovery_request_scope(spec, candidate_scope)
     if _is_temporal_query(spec):
         if not isinstance(operation_sha256, str) or not operation_sha256.strip():
             raise GroundedDiscoveryError("ORDINARY_OPERATION_REQUIRED")

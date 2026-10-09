@@ -1,8 +1,8 @@
 ---
 task_id: FORGE_NATIVE_LIFECYCLE_CLOSURE_V1
-task_version: '1.1'
+task_version: '2.0'
 status: IN_PROGRESS
-as_of: '2026-10-09'
+as_of: '2026-10-10'
 owner: GOAL_OWNER
 allowed_routes: [DIRECT_CODEX_DELIVERY]
 required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
@@ -26,9 +26,20 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hfic_grounded_discovery.py
 - src/solana_alpha_lab/factory/hfic_card_projection.py
 - src/solana_alpha_lab/factory/hfic_session.py
+- src/solana_alpha_lab/factory/hfic_ordinary_operation.py
+- src/solana_alpha_lab/factory/hfic_research_scope.py
+- src/solana_alpha_lab/factory/hfic_temporal_discovery.py
+- src/solana_alpha_lab/factory/hfic_prior_memory.py
+- src/solana_alpha_lab/factory/hfic_generation_context.py
+- src/solana_alpha_lab/factory/hfic_preflight.py
 - scripts/hypothesis_forge.py
 - tests/test_forge_native_lifecycle_closure_v1.py
 - tests/test_forge_research_flow_reliability_v1.py
+- tests/test_hfic_grounded_discovery_v1.py
+- tests/test_hfic_temporal_discovery_v1.py
+- tests/test_hfic_ordinary_operation_v1.py
+- tests/test_hfic_list_scope_executor_v1.py
+- tests/test_hfic_critic_prior_memory_closure_v1.py
 - tests/fixtures/forge_native_lifecycle_closure_v1/**
 - catalog/assets/**
 - catalog/catalog_manifest.yaml
@@ -46,7 +57,7 @@ stop_conditions:
 - STOP_EXACT_HEAD_CI_AND_MACHINE_MERGE_READINESS_THEN_EXACT_OWNER_PHRASE
 - STOP_MATERIAL_PRODUCT_ESTIMAND_SCOPE_PIT_ADMISSION_OR_AUTHORITY_CHANGE
 - STOP_NEW_DEPENDENCY_FRAMEWORK_STORAGE_PROVIDER_LIVE_REAL_DATA_HOLDOUT_OR_MONEY
-- STOP_NATIVE_BUDGET_OR_REPEATED_SEAM_FAILURE_REPLAN_WITH_RETAINED_DENOMINATOR
+- STOP_NATIVE_ENVELOPE_EXHAUSTED_OR_AUTHORITY_CONFLICT_WITH_RETAINED_DENOMINATOR
 context_requirements:
   catalog_asset_ids: []
   l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
@@ -102,15 +113,17 @@ Phases A-D are internal phases of this one atom: bind/control; narrow repair
 if proved; primary/transfer plus recovery; durable review/PR/CI/readiness.
 No routine approval between them. Preserve original failures and looks.
 
-Budget: two primary/transfer Generator episodes; at most four new Generators
-including one post-material-repair final pair. At most two lawful REVISE_ONCE
-continuations; total Generator episodes <=6, revisions not reusable as new
-questions. Native Critic <=6 including schema repair/revisions. Quality grading
-uses required Goal/DoD reviewer; at most one extra grader if necessary.
-Each question MAIN<=1, PREVIEW<=1, ADAPTIVE=0; existing tighter policy wins.
-Synthetic prior/control separately counted; clones never double-count science.
-Plan <=2 final-review waves; early targeted architecture consultation separately
-recorded. More review requires local replan, never bypass mandatory failures.
+Budget V2 (supersedes V1 allocations and ordinary procedural stops): total
+Generator episodes <=8 including all new launches, unfinished episodes and
+continuations. Already consumed4; remaining<=4. Two primary/transfer episodes
+are the principal allocation; reserve2 may be used autonomously only after a
+documented material repair with targeted evidence, lawful revision or lost
+reply recovery. Old unused revision slots are inside8, never additional.
+Native Critic total<=6, already1; preserve and replay every obtained verdict.
+Per new question MAIN<=1, PREVIEW<=1, ADAPTIVE=0. Old roots/charges remain.
+One targeted early architecture/DoD consultation and one final required-role
+set; meaningful findings receive affected delta review under base policy.
+Native ceiling stops new native calls, not authorized deterministic repair.
 
 Two final paths must satisfy grounding, specific discriminator, faithful
 canonical query/card/packet and falsifiability/restraint. Substantive KILL may
@@ -178,3 +191,45 @@ regenerated local snapshot. Pin original head/composite in the wrapper and
 check stored fence, then one bounded CODE_REVIEWER targeted continuation.
 This is not a third full review wave or another native trial. Preserve the
 ec195ddf observations; all required full-DoD verdicts remain NOT_READY.
+
+## Owner-authorized local replan V2 — 2026-10-10
+
+Authority: direct owner command "Выполняй local replan V2" and explicit
+approval of SMIAL_Forge_Native_Closure_Replan_V2.md sections4/7. This resumes
+the same outcome through native primary/transfer, recovery, review, PR, CI
+and merge-readiness. Final merge still requires the separately machine-bound
+owner phrase. Historical V1 stops/verdicts above remain execution history;
+V2 replaces the exhausted allocation, not their truth or scientific charges.
+Entry readback: clean1381b7753a12ea8688030781e7ba342f958db88f; remote main
+d2cd1fdf6fb10b5efc3e3b7f7b752bcee574f8dc unchanged. Original primary epoch
+838753ba/compositea13130ec remains immutable. Generator4, Critic1,
+MAIN4/PREVIEW3/ADAPTIVE0; original primary technical KILL, transfer no session.
+Tool Entry: existing locked runtime, Git/gh and required isolated roles;
+CAPABILITY_RADAR_NOW=NONE. No installs, frameworks, provider/live or money.
+DECISION_DELTA: validate the complete authored request before charged MAIN,
+and distinguish incomplete historical context from a material unknown prior.
+Prior matrix: incomplete CURRENT scope refuses before values/reservation;
+exact/typed close and potentially applicable near-close still block; proven
+source-bound distinction uses existing relation owner. Incomplete historical
+context remains UNKNOWN with provenance and no novelty proof. It alone is
+not a global veto when full-archive guards establish no active restriction
+and the current claim does not rely on it. Material reliance on unknown prior
+or unsupported novelty remains grounds for refusal. No old result regrading.
+PROGRESS: empty transfer MAIN scope and actual frozen prior capsule confirmed
+from original bytes. Earliest repair boundary is ordinary discovery admission;
+next probe: public input refusal before operation/value effects and emitted
+packet retaining UNKNOWN context plus independent current bindings. Final
+evaluation epoch will be frozen only after mechanics and one targeted early
+architecture/DoD consultation; then primary before transfer, no mechanical
+repeat without new evidence. All local replans inside this outcome authorized.
+
+V2 mechanics checkpoint: actual public development control completed ordinary
+query->look->card->frozen1.5 packet->saved terminal->fresh reader. Canonical
+authorial axes match independently; UNKNOWN prior retained with exact source
+and no established restriction/novelty assertion. Public invalid requests
+refuse before loader/reservation, actual inventory/look/operation unchanged.
+Twelve V2 contract checks and15 affected direct consumers PASS. This is
+scripted mechanics only (extra synthetic control MAIN1/PREVIEW0), excluded
+from native8 envelope/numerator. Original Generator4/Critic1 remain. Next:
+one early architecture/DoD consultation, freeze compatible evaluation epoch,
+then native primary followed by transfer only after substantive closure.

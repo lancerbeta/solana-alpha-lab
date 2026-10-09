@@ -125,8 +125,8 @@ agree with the canonical query. Example shape (placeholders, no scientific grant
 The operation spec alone does not supply these authored meanings. Copying them
 only into a card after MAIN does not bind that saved look; an existing empty-scope
 look stays blocked. Do not retrofit the stored MAIN or consume another look.
-Runtime pre-charge completeness validation remains the named local replan;
-this documentation correction is not evidence that the current writer enforces it.
+V2 runtime now enforces fresh request completeness before MAIN; historical
+empty-scope looks remain unchanged and are never rebound.
 
 For a selected candidate bound to a saved look, use the public
 `candidate_authoring_contract.saved_look_bindings` source map. Paths are relative
@@ -166,3 +166,25 @@ session and accounting owners, with no repeated generation or new look.
 Evidence and verdicts live in docs/evidence/forge_evidence_guided_generation_v1.
 Synthetic implementation, safety, formulation, comparison and delivery are
 separate axes. Market alpha, chronology and live economics are NOT_EVALUATED.
+
+## V2 ordinary request admission and incomplete historical context
+
+For a new ordinary temporal MAIN, `--candidate-scope` needs only the already
+authored `estimand` and `explanatory_condition` (optional supported representation
+scope stays explicit). The existing validator derives population, decision,
+target, list-rule hash/statement and ordinary route mode from the validated
+query. Explicit conflicting machine fields refuse; omitted mode is distinct
+from null, unknown enum and conflicting route. The execute boundary validates
+before operation creation/reservation/value loading and repeats the shared
+scope validator in the actual executor. Full-archive source/ledger guards
+still run. A refusal reports current vs prior stage, missing/conflicting
+fields, provenance and zero new effects. No old saved look is rebound.
+
+Incomplete historical context remains UNKNOWN with its exact source refs;
+no novelty or scope difference is inferred. No block established by the
+full-scope guards is not proof of distinction. Such context alone is not a
+global veto of an independent grounded claim. Critic still checks whether
+the current claim relies on the missing fact, claims unsupported novelty,
+or has an actually applicable close. Exact close, potentially applicable
+near-close, scientific quality and current binding defects remain blocking.
+The V2 matrix applies to new decisions; old packets/verdicts keep their epoch.

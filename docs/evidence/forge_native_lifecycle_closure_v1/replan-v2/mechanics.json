@@ -1,0 +1,70 @@
+{
+  "status": "PASS_SCOPED_MECHANICS_NOT_NATIVE",
+  "generator_count": 4,
+  "critic_count": 1,
+  "remaining_generator": 4,
+  "native_closed": 0,
+  "checks": {
+    "current_scope_before_main": "PASS_PUBLIC_COMMAND_STORE_COUNTERS_AND_LOADER_NO_EFFECT",
+    "canonical_query_look_card_packet": "PASS_INDEPENDENT_AXIS_EQUALITY",
+    "unknown_prior_provenance_and_no_global_veto": "PASS_ACTUAL_FROZEN_PACKET",
+    "exact_and_near_close_blocking": "PASS_REGRESSION",
+    "legacy_pit_history_budget": "PASS_AFFECTED_REGRESSIONS"
+  },
+  "targeted_tests": {
+    "v2_contract": {
+      "count": 12,
+      "status": "PASS",
+      "elapsed_s": 0.898
+    },
+    "direct_consumers": {
+      "count": 15,
+      "status": "PASS",
+      "elapsed_s": 3.436
+    }
+  },
+  "oracle_repair_note": "Initial effects test wrongly prohibited readonly record_operation(create_if_missing=false); corrected to authoritative inventory/look/operation and loader/reservation effects. No native calls consumed.",
+  "scripted_control": {
+    "native": false,
+    "main": 1,
+    "preview": 0,
+    "session_id": "HFIC-SESS-1F57BFD214469412",
+    "terminal": "KILL_LOW_INFORMATION_VALUE",
+    "scope_match": true,
+    "unknown_prior_relations": [
+      {
+        "active_scope_restriction_established": false,
+        "applicability": "UNKNOWN",
+        "claim_dependency": "REQUIRES_INDEPENDENT_CLAIM_ASSESSMENT",
+        "guard_assessment": "NO_BLOCK_ESTABLISHED_BY_SCOPE_GUARD",
+        "hypothesis_version_id": "HYP-QUOTE-NATIVE-FRICTION-H900-V1",
+        "missing_fields": [
+          "prior.population",
+          "prior.decision_timestamp",
+          "prior.target",
+          "prior.estimand",
+          "prior.explanatory_condition",
+          "prior.evidence_surface_mode"
+        ],
+        "novelty": "UNKNOWN",
+        "question_id": null,
+        "question_id_is_not_a_scientific_difference": true,
+        "relation": "UNKNOWN_SCOPE_NEEDS_RESOLUTION",
+        "source_refs": [
+          {
+            "effective_at": "2026-08-25T00:00:00+00:00",
+            "first_reliable_available_at": "2026-08-25T00:00:00+00:00",
+            "payload_sha256": "7c47d4a2b89caf51d1dc418d560710759acaf008dab9149e8d4b8cb471a32eaf",
+            "record_id": "HYPOTHESIS-VERSION-C50FBC675FD24361"
+          }
+        ],
+        "unknown_prior_is_evidence": false
+      }
+    ],
+    "frozen_sha256": "b96eeb5e1bc7e44ae22af74b1ae3d5aa9dde68564bdd37818f6c5d5a39b19533",
+    "summary_sha256": "cc4f49f05afcbb5b9dcd5c36062cf8eb6e5f336fbf8aa7f5320d8828bdf32e3c",
+    "reproduce": "uv run --locked --managed-python python -B <ARTIFACT_HOME>/scripted_control.py --root <CODE_ROOT> --source <PRESERVED_BASE_SOURCE> --work <FRESH_DISPOSABLE_WORK>"
+  },
+  "source_provenance_recovery": "EXACT_SOURCE_LACKS_AXES_AND_SESSION_UNKNOWN_RETAINED",
+  "limits": "SYNTHETIC_ONLY_NO_NEW_NATIVE_ACCEPTANCE_OR_OLD_VERDICT_CHANGE"
+}

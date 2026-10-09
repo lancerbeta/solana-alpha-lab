@@ -112,5 +112,85 @@ class LosslessCaptureTests(unittest.TestCase):
             child.assert_not_called()
 
 
+
+class ReplanV2AdmissionTests(unittest.TestCase):
+    def setUp(self):
+        self.fixture = json.loads((ROOT / 'tests/fixtures/forge_native_lifecycle_closure_v1/public_mode_regression.json').read_text(encoding='utf-8'))
+        self.spec = self.fixture['canonical_query']
+        self.intent = {k:self.fixture['candidate_scope'][k] for k in ('estimand','explanatory_condition')}
+
+    def test_minimal_authored_intent_derives_canonical_machine_bindings(self):
+        from solana_alpha_lab.factory.hfic_grounded_discovery import validate_discovery_request_scope
+        from solana_alpha_lab.factory.hfic_research_scope import scope_statement
+        from solana_alpha_lab.factory.hfic_temporal_discovery import validate_temporal_query
+        result=validate_discovery_request_scope(self.spec,self.intent)
+        self.assertEqual(result['estimand'],self.intent['estimand'])
+        self.assertEqual(result['explanatory_condition'],self.intent['explanatory_condition'])
+        self.assertEqual(result['population'],self.spec['population'])
+        self.assertEqual(result['evidence_surface_mode'],'ORDINARY_GROUNDED_DISCOVERY_V1')
+        self.assertEqual(result['research_scope_statement'],scope_statement(validate_temporal_query(self.spec)['scientific_body']))
+
+    def test_unknown_null_and_conflicting_modes_are_distinct_refusals(self):
+        from solana_alpha_lab.factory.hfic_grounded_discovery import validate_discovery_request_scope
+        for value,state in ((None,'EXPLICIT_NULL'),('unknown-mode','UNKNOWN_OR_INVALID'),('CURRENT_REPRESENTATION_CONTROL_V1','CONFLICT')):
+            with self.subTest(value=value),self.assertRaises(GroundedDiscoveryError) as stopped:
+                validate_discovery_request_scope(self.spec,{**self.intent,'evidence_surface_mode':value})
+            self.assertEqual(stopped.exception.detail['mode_state'],state)
+
+    def test_conflicting_machine_binding_is_not_silently_replaced(self):
+        from solana_alpha_lab.factory.hfic_grounded_discovery import validate_discovery_request_scope
+        for key in ('population','decision_timestamp','target','research_scope_rule_sha256','research_scope_statement'):
+            with self.subTest(key=key),self.assertRaises(GroundedDiscoveryError) as stopped:
+                validate_discovery_request_scope(self.spec,{**self.intent,key:'contradictory'})
+            self.assertIn(key,stopped.exception.detail['conflicting_fields'])
+
+    def test_public_execute_rejects_incomplete_intent_before_store_and_value_effects(self):
+        import contextlib,io,tempfile
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        from scripts import hypothesis_forge as cli
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks
+        from solana_alpha_lab.factory.hfic_ordinary_operation import list_operations
+        for scope in ({},{'estimand':'already chosen'},{'estimand':'already chosen','explanatory_condition':'','evidence_surface_mode':'ORDINARY_GROUNDED_DISCOVERY_V1'}):
+            with self.subTest(scope=scope),tempfile.TemporaryDirectory() as folder:
+                home=Path(folder);store=ResearchStore(home/'plane');before=store.diagnostics().committed_inventory_sha256
+                for name,obj in (('spec',self.spec),('scope',scope),('op',{})):
+                    (home/(name+'.json')).write_text(json.dumps(obj),encoding='utf-8')
+                stdout=io.StringIO()
+                with patch.object(cli,'repository_git_snapshot',return_value=SimpleNamespace(head_sha='a'*40)),patch('solana_alpha_lab.factory.hfic_grounded_discovery.load_admitted_partition_rows') as loader,patch('solana_alpha_lab.factory.hfic_ordinary_operation.gate_before_values') as reserve,contextlib.redirect_stdout(stdout):
+                    status=cli.cmd_discovery_execute(ROOT,store_root=home/'plane',census_path=None,observations_path=None,binding_path=None,spec_path=home/'spec.json',journal_scope='scope-negative',candidate_scope_path=home/'scope.json',operation_path=home/'op.json')
+                body=json.loads(stdout.getvalue());self.assertEqual(status,2)
+                self.assertEqual(body['reason_code'],'CANDIDATE_SCOPE_FIELDS_REQUIRED')
+                self.assertEqual(body['detail']['stage'],'CURRENT_REQUEST_BEFORE_MAIN')
+                self.assertFalse(body['values_loaded']);self.assertFalse(body['writes'])
+                loader.assert_not_called();reserve.assert_not_called()
+                self.assertEqual(ResearchStore(home/'plane').diagnostics().committed_inventory_sha256,before)
+                self.assertEqual(list_operations(store),[]);self.assertEqual(list_discovery_looks(store,'scope-negative'),[])
+
+    def test_unknown_context_retains_provenance_without_proving_distinction(self):
+        from solana_alpha_lab.factory.hfic_grounded_discovery import validate_discovery_request_scope,bind_prior_scope_evidence
+        scope=validate_discovery_request_scope(self.spec,self.intent)
+        prior={'hypothesis_version_id':'historical-context','memory_status':'HISTORICAL','source_detail':{'hypothesis_source_refs':[{'record_id':'immutable-prior','payload_sha256':'1'*64}]}}
+        relation=bind_prior_scope_evidence({'candidate_scope':scope},[prior])['prior_scope_relations'][0]
+        self.assertEqual(relation['relation'],'UNKNOWN_SCOPE_NEEDS_RESOLUTION')
+        self.assertEqual(relation['applicability'],'UNKNOWN');self.assertEqual(relation['novelty'],'UNKNOWN')
+        self.assertFalse(relation['active_scope_restriction_established']);self.assertFalse(relation['unknown_prior_is_evidence'])
+        self.assertEqual(relation['source_refs'],prior['source_detail']['hypothesis_source_refs'])
+        self.assertEqual(relation['claim_dependency'],'REQUIRES_INDEPENDENT_CLAIM_ASSESSMENT')
+
+    def test_exact_close_and_potentially_applicable_incomplete_close_still_block(self):
+        from solana_alpha_lab.factory.hfic_grounded_discovery import validate_discovery_request_scope,bind_prior_scope_evidence
+        scope=validate_discovery_request_scope(self.spec,self.intent)
+        exact={**scope,'hypothesis_version_id':'renamed-close','memory_status':'HARD_CLOSE'}
+        with self.assertRaises(GroundedDiscoveryError) as stopped:
+            bind_prior_scope_evidence({'candidate_scope':scope},[exact])
+        self.assertEqual(stopped.exception.code,'EXACT_PRIOR_SCOPE_MATCH')
+        partial={k:v for k,v in exact.items() if k not in ('estimand','explanatory_condition')}
+        with self.assertRaises(GroundedDiscoveryError) as stopped:
+            bind_prior_scope_evidence({'candidate_scope':scope},[partial])
+        self.assertEqual(stopped.exception.code,'UNKNOWN_PRIOR_SCOPE')
+        self.assertEqual(stopped.exception.detail['stage'],'POTENTIALLY_APPLICABLE_PRIOR_CLOSE')
+
 if __name__ == '__main__':
     unittest.main()
