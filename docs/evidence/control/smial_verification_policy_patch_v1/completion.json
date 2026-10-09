@@ -39,7 +39,7 @@
     "independent_review": {
       "path": "docs/evidence/control/smial_verification_policy_patch_v1/independent_review.json",
       "sha256": "f0a0c22c9849f396caab8c265713612b944390df4aa786a371a723dea7cb4f28",
-      "verdict": "PENDING"
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
@@ -49,7 +49,13 @@
       "PASS_TARGETED_WITH_DIRECT_LINK_CONSUMER",
       "PASS_EXACT_RECEIPT_SINGLE_DIGEST_JSON_CHANGE",
       "PASS_SOURCE_REHASH_IDEMPOTENCY",
-      "PASS_FOUR_SIMULATION_ONLY_APPLICABILITY_CASES"
+      "PASS_FOUR_SIMULATION_ONLY_APPLICABILITY_CASES",
+      "PASS_FRESH_ISOLATED_CODE_REVIEW",
+      "PASS_FRESH_ISOLATED_GOAL_DOD_REVIEW",
+      "PASS_FRESH_SEMANTIC_PREMISE_ARCHITECTURE_REVIEW",
+      "PASS_FINAL_SEMANTIC_PACKET_LAUNCH",
+      "PASS_SHADOW_PIN_WORKING_PATH",
+      "PASS_ROLLBACK_LINK_REMEDIATION"
     ]
   },
   "non_claims": [

@@ -14,31 +14,55 @@
   "reviews": [
     {
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "NEW_BASE_REVIEW_PENDING; prior review snapshot remains in Git."
+        "Fresh isolated read-only review at content_head=6765c45633d412e19da1e3e1ae9f70f2df86c36e; no open findings on the exact six-path inventory.",
+        "Prior P2 resolved: task and readout rollback now restore the same TASK-30 live policy digest, scoped Catalog integrity and unchanged owner gate.",
+        "All TASK-30 JSON values except artifact_bindings.domain_policy.sha256 match base; no Forge delta or primary policy/test change in recovery correction.",
+        "Review plan remains sufficient; actual 37/465 stdout digest verified, without replaying passing tests."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "NEW_BASE_REVIEW_PENDING; prior review snapshot remains in Git."
+        "Fresh isolated read-only final review at content_head=6765c45633d412e19da1e3e1ae9f70f2df86c36e; exact six-path diff matches Git and no evidenced DoD gap remains.",
+        "Full agreed outcome, sufficient risk evidence, useful regressions/TDD, independent oracle and actual path preserved.",
+        "Rollback maintenance of the same live digest and Catalog integrity is explicit; authority and outcome not expanded.",
+        "Actual output digest and 37 passed/465 subtests verified; simulations SIMULATION_ONLY, natural observations NOT_STARTED and quality/cost effects UNKNOWN."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "NEW_BASE_REVIEW_PENDING; prior review snapshot remains in Git."
+        "Fresh isolated read-only SEMANTIC_PREMISE review: SEMANTIC_PASS at content_head=6765c45633d412e19da1e3e1ae9f70f2df86c36e; no blocking premise defect or authority widening.",
+        "packet_fingerprint_sha256=bd629d458ec85a7bf70914237a15ece1b9d7dbcc76297fa270cbf71344eb8cc2",
+        "Fingerprint, all 13 evidence hashes, committed/worktree bytes and exact six-path diff independently confirmed.",
+        "Recovery C7 verified: inverse two policy owners, re-pin same TASK-30 live digest, scoped Catalog sync and unchanged owner gate. Restored base policy digest matches base receipt, inverse single digest replacement restores exact base receipt bytes; no performed runtime rollback is claimed.",
+        "Only one TASK-30 integrity digest changes; provider observation, timestamp, status, scientific claims and authority remain equal to base.",
+        "Material PIT risks can still be missed or an independent oracle can be wrong; actual risks/examples/readback remain required and test PASS does not establish scientific truth.",
+        "Retries preserve all outcomes and grant no scientific/provider reruns or lucky rerolls. SIMULATION_ONLY and UNKNOWN/NOT_STARTED are not widened into global effects or acceptance.",
+        "Finite five-atom freeze elapsed with exact ancestor product/evidence commits; no general control-plane or scientific promotion authority follows.",
+        "Git policy/task/evidence blobs remain truth; no runtime/schema/private-API change or new subsystem. Model diversity UNPROVEN, packet information-path and actual isolated-launch obligation remain distinct."
       ]
     }
   ],
-  "verdict": "PENDING",
+  "verdict": "PASS",
   "non_claims": [
     "NO_MERGE_AUTHORITY",
     "NO_MEASURED_QUALITY_OR_COST_GAIN",
     "MODEL_DIVERSITY_UNPROVEN",
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "P2: rollback omitted the existing TASK-30 live domain-policy integrity digest; add exact digest re-pin and scoped Catalog sync in contract/readout.",
+      "observed_head": "0df83a6033cb295aefd9cfc9379412198de9f59a",
+      "resolved_by_head": "6765c45633d412e19da1e3e1ae9f70f2df86c36e"
+    }
   ]
 }
