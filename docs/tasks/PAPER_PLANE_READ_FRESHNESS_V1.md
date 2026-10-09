@@ -1,6 +1,6 @@
 ---
 task_id: PAPER_PLANE_READ_FRESHNESS_V1
-task_version: '1.3'
+task_version: '1.4'
 status: IMPLEMENTED_UNVERIFIED
 as_of: '2026-10-09'
 owner: GOAL_OWNER
@@ -27,6 +27,7 @@ managed_write_set:
   - tests/test_paper_shadow_execution_integrity_vertical_v1.py
   - tests/test_trading_operations_workbench_v2.py
   - tests/test_risk_and_economics_v1.py
+  - tests/test_factory_ordinary_market_hypothesis.py
   - catalog/assets/core.yaml
   - catalog/assets/lifecycle.yaml
   - catalog/catalog_manifest.yaml
@@ -166,3 +167,10 @@ Version 1.3 resolves architecture finding A4-ARCH-01: request-thread ownership
 and bounded concurrent HTTP proof, inside the same application/test/design
 write set. INV-11 and the owner readout now state snapshot/sidecar limits and
 explain residual F04. No new subsystem or writable semantics.
+
+Version 1.4 adds only `tests/test_factory_ordinary_market_hypothesis.py`: exact
+PR CI exposed its static application.py base hash. Update that single pin for
+the already reviewed A4 readonly change, retain the other five pins and all
+ordinary composition/scientific guard assertions. Vertical acceptance now
+explicitly declares NO_CHANGE for optional cloud-export registry; no historical
+evidence, cloud payload, harness, CI architecture or science semantics change.

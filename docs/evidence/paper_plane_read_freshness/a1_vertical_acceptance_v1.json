@@ -133,7 +133,30 @@
         "LOCAL_A4_ABSENT"
       ]
     ],
-    "run_log_sha256": "291cb7c4ef41f9c421ef76bcadb21bec7098eaab09e51625fbcbfe8dc9dfb6e6"
+    "run_log_sha256": "291cb7c4ef41f9c421ef76bcadb21bec7098eaab09e51625fbcbfe8dc9dfb6e6",
+    "ci_first_candidate": {
+      "head": "a966fedc710833930245f74a3dea23c7add31de0",
+      "run_id": 37957205106,
+      "execution_domain": "PASS_187_TESTS_ZERO_FAILURES_TWO_EXISTING_LOCAL_A4_ABSENT_SKIPS",
+      "execution_os": "Linux",
+      "execution_job_id": 113911233534,
+      "failed_shards": [
+        3,
+        5
+      ],
+      "failures": [
+        "SOURCE_DISPOSITION_REQUIRED",
+        "STATIC_APPLICATION_BASE_PIN_MISMATCH"
+      ],
+      "final_ci": "ENFORCED_LIVE_AT_MERGE_READINESS"
+    },
+    "ci_compatibility_recheck": {
+      "tests": 26,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "log_sha256": "b25ae2ab2b034c5ae3cd24889c262786abcda940bcfb8b25afc0ff4f20e0cce9"
+    }
   },
   "source_bindings": {
     "src/solana_alpha_lab/factory/paper_plane.py": "65ef55800b857659445cb6478cd5406eed70a0b4e6227f5672bd3a4f65c84804",
@@ -141,7 +164,8 @@
     "src/solana_alpha_lab/factory/lifecycle_projection.py": "73e1eae462536f07c0a8ff597ebbea37925eae11864b13fe67c43daca7457820",
     "tests/test_paper_shadow_execution_integrity_vertical_v1.py": "a3e63f01c96ebd7bb4a74118b29f7ccaaa6b1820bd12cb8402f56d1a49d83da4",
     "tests/test_trading_operations_workbench_v2.py": "0764f3652f042d2306e70defc3de3462d3c4ff5606f24bef048d8c34d49e7a32",
-    "tests/test_risk_and_economics_v1.py": "6d0742193f5fd20ec9a660074a826561b9f0b27e443b09efee11c880c9681a2e"
+    "tests/test_risk_and_economics_v1.py": "6d0742193f5fd20ec9a660074a826561b9f0b27e443b09efee11c880c9681a2e",
+    "tests/test_factory_ordinary_market_hypothesis.py": "4b61fe4dac3c21cb2696afe7581dc028b36e8f31498c4cf0483bdc0a6837fce9"
   },
   "failure_history": [
     "fixture strategy hash recomputation setup error, corrected before baseline proof",
@@ -150,7 +174,9 @@
     "HTTP/lifecycle missing fixture contracts and spec setup corrected",
     "purity exception initially patched wrong assertion, corrected; missing-source no-file assertion restored; intended closed-WAL case passed",
     "architecture A4-ARCH-01 shared reader closure across HTTP requests; deterministic overlap exited 0xC0000005 on Windows before ownership repair",
-    "owner UX residual F04 explanation added"
+    "owner UX residual F04 explanation added",
+    "PR CI head a966fedc710833930245f74a3dea23c7add31de0: SOURCE_DISPOSITION_REQUIRED in new acceptance receipt; explicit NO_CHANGE added without release mutation",
+    "PR CI head a966fedc710833930245f74a3dea23c7add31de0: static ordinary-hypothesis application.py base pin mismatched authorized A4 change; only that pin updated and composition regressions preserved"
   ],
   "limits": [
     "NO_ALPHA",
@@ -169,5 +195,9 @@
     "red_log_sha256": "cf0774f0797248366fcc5eecd78fc00f2f9383bc26f81f1babe9cc75d0471f63",
     "after": "PASS_DISTINCT_READERS_BOTH_PRESENT_CLOSED_HANDLES_AND_NEXT_READ_FRESH",
     "test": "ReadFreshnessTests.test_overlapping_http_gets_do_not_close_each_others_reader"
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT; A4 does not change release registry or cloud payload and requires no activation/smoke."
   }
 }

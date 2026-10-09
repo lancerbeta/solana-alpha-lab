@@ -27664,7 +27664,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 01b8d921d55e24ca7afbeb04622448c930492e70b52630df28b5475b9a1ba290}
+  integrity: {kind: sha256, sha256: 4b61fe4dac3c21cb2696afe7581dc028b36e8f31498c4cf0483bdc0a6837fce9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -40581,7 +40581,7 @@ records:
     repository_path: docs/tasks/PAPER_PLANE_READ_FRESHNESS_V1.md
   integrity:
     kind: sha256
-    sha256: 397722865eaa487929f7fce768120b3552d32af644f3f0a4f23f6ee59e225264
+    sha256: 148c1d1be27c9f74e8e96f897d173fdd70d54a5e5ef76725d25f7cec2e31b96a
   access:
     mode: read_only
     method: file
@@ -40627,7 +40627,7 @@ records:
     repository_path: docs/reports/paper_plane_read_freshness/a1_owner_readout_v1.md
   integrity:
     kind: sha256
-    sha256: 3934b72babc78ce48213474f3fb19cb832bd308bc2ee057efc536bfe56419df6
+    sha256: 7c48f1bed692031f8f77ae36486a36c67afd94144b76d01f3f98d66bed984460
   access:
     mode: read_only
     method: file
@@ -40663,7 +40663,7 @@ records:
     repository_path: docs/evidence/paper_plane_read_freshness/a1_vertical_acceptance_v1.json
   integrity:
     kind: sha256
-    sha256: f3c0446d13c1cb171a623d09b67731de050ef765267ebf81c9cd085e7a2411d1
+    sha256: 067196ef524e2436583a68c472866e6d5fce50ad234bad30a686425375cb2f9d
   access:
     mode: read_only
     method: file

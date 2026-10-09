@@ -64,6 +64,15 @@ inventory проверяется независимо от `total_changes` од�
 `0xC0000005` до ownership fix; после fix оба GET проходят и закрывают только
 свои handles. Общий полный local merge gate не запускался.
 
+Первый PR CI подтвердил 187 execution-domain cases на Linux, включая
+реальный отказ OS без skip. Общие shards нашли два compatibility-сбоя:
+новый acceptance receipt не объявлял optional cloud-export disposition, а
+старый ordinary-hypothesis hash-тест фиксировал application.py на base.
+Добавлен NO_CHANGE без cloud mutation и обновлён только application pin
+для A4; остальные пять pins и поведенческие научные guards сохранены.
+Оба затронутых compatibility-модуля повторены: 26 tests PASS, без skip.
+Финальный точный head должен пройти весь CI до запроса owner phrase.
+
 Recovery: обычный code revert без data migration. Он вернёт прежний stale
 readback и не является решением свежести. Чужая generator branch и её dirty
 работа сохранены в исходном checkout. F01/F03/F04 остаются открыты;
