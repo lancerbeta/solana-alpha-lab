@@ -88,7 +88,8 @@ Engine: `src/solana_alpha_lab/factory/paper_plane.py` (`PaperPlaneStore`, `accep
 
 Writable connections use `isolation_level=None` (autocommit) and `busy_timeout=5000`; only
 `immediate_write()` opens `BEGIN IMMEDIATE` (thread-local depth, nesting is a no-op). Readonly
-connections use `mode=ro&immutable=1`.
+connections at the series baseline used `mode=ro&immutable=1`; A4 replaces
+this mutable-runtime reader with `mode=ro` and scoped read snapshots (§8).
 
 State-set definitions currently disagree: `OPEN_RISK_STATES` (7 states, admission), local
 `TERMINAL_SETTLED` in both `paper_shadow_commands.py` and `paper_shadow_operations.py`,
@@ -253,10 +254,18 @@ sets trace blocker `INTENT_CANCELLED`. Workbench needs no change (`CANCELLED` is
 
 ## 8. Readonly freshness (A4)
 
-`_connect_sqlite(readonly=True)`: if `<db>-wal` exists → `mode=ro` (WAL-aware, sees committed frames);
-otherwise → `mode=ro&immutable=1` (no WAL means the main file is complete; creates no file). A failure to
-open WAL-aware falls back to immutable. `PaperPlaneStore.read_mode` ∈ `WAL_AWARE`, `IMMUTABLE_SNAPSHOT`,
-`IMMUTABLE_FALLBACK`. Same helper is a candidate for `OperationalStore` later (non-goal here).
+`_connect_sqlite(readonly=True)` always uses SQLite `mode=ro` with normal locking/change detection.
+There is no immutable fallback and no correctness inference from absent WAL. Each independent owner
+request opens a fresh readonly store; positions, economics and policy share `read_snapshot()` and release
+it on success/failure. Lifecycle uses the same PaperPlaneStore owner. Missing source and unavailable
+source remain distinct; a failed read never bootstraps, migrates, checkpoints, repairs or returns stale
+success. Historical admission stays frozen; current policy is only read.
+
+Owner clarification 2026-10-09 explicitly permits native SQLite `-wal/-shm` coordination creation and
+updates during readonly GET. This is not permission to create data-root/DB/tables or write business
+state. Tests exclude only these two named sidecars from byte-purity comparisons and verify source DB,
+business rows, schema and forbidden new files separately. No read_mode enum/second reader is added.
+`OperationalStore` and other immutable evidence readers remain outside A4.
 
 ## 9. Execution attempt seam (A5)
 

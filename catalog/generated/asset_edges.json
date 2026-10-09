@@ -4423,6 +4423,36 @@
       "target_asset_id": "TEST-OWNER-OPERATIONS-COCKPIT-001"
     },
     {
+      "source_asset_id": "CTRL-PAPER-PLANE-READ-FRESHNESS-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-PAPER-PLANE-READ-FRESHNESS-READOUT-001"
+    },
+    {
+      "source_asset_id": "CTRL-PAPER-PLANE-READ-FRESHNESS-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-PAPER-SHADOW-EXECUTION-INTEGRITY-PRD-SSD-001"
+    },
+    {
+      "source_asset_id": "CTRL-PAPER-PLANE-READ-FRESHNESS-001",
+      "relation": "contains",
+      "target_asset_id": "EVIDENCE-PAPER-PLANE-READ-FRESHNESS-VERTICAL-001"
+    },
+    {
+      "source_asset_id": "CTRL-PAPER-PLANE-READ-FRESHNESS-001",
+      "relation": "contains",
+      "target_asset_id": "TEST-PAPER-SHADOW-EXECUTION-INTEGRITY-VERTICAL-001"
+    },
+    {
+      "source_asset_id": "CTRL-PAPER-PLANE-READ-FRESHNESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "CTRL-PAPER-PLANE-READ-FRESHNESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-TRADING-OPERATIONS-001"
+    },
+    {
       "source_asset_id": "CTRL-PAPER-PLANE-WRITE-INTEGRITY-001",
       "relation": "contains",
       "target_asset_id": "DOC-PAPER-SHADOW-EXECUTION-INTEGRITY-PRD-SSD-001"
@@ -6188,6 +6218,11 @@
       "target_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001"
     },
     {
+      "source_asset_id": "DOC-PAPER-PLANE-READ-FRESHNESS-READOUT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PAPER-PLANE-READ-FRESHNESS-001"
+    },
+    {
       "source_asset_id": "DOC-PAPER-SHADOW-EXECUTION-INTEGRITY-PRD-SSD-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-PAPER-PLANE-WRITE-INTEGRITY-001"
@@ -7511,6 +7546,26 @@
       "source_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-OWNER-AUTHORITY-PACKET-A2-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PAPER-PLANE-READ-FRESHNESS-COMPLETION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PAPER-PLANE-READ-FRESHNESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PAPER-PLANE-READ-FRESHNESS-FACTORY-FIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PAPER-PLANE-READ-FRESHNESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PAPER-PLANE-READ-FRESHNESS-REVIEW-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PAPER-PLANE-READ-FRESHNESS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-PAPER-PLANE-READ-FRESHNESS-VERTICAL-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PAPER-PLANE-READ-FRESHNESS-001"
     },
     {
       "source_asset_id": "EVIDENCE-PAPER-PLANE-WRITE-INTEGRITY-COMPLETION-001",

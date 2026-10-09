@@ -634,7 +634,12 @@ class RiskAndEconomicsV1Tests(unittest.TestCase):
             self.assertIn("NOT_AVAILABLE", economics)
             self.assertNotIn('name="command" value="PAUSE_NEW_ENTRIES"', economics)
             self.assertNotIn("PROFITABLE", economics)
-            self.assertEqual(before, _walk(root))
+            sidecars = {"local/factory_v1/paper_plane_state.sqlite-wal",
+                        "local/factory_v1/paper_plane_state.sqlite-shm"}
+            after = _walk(root)
+            self.assertEqual({k: v for k, v in before.items() if k not in sidecars},
+                             {k: v for k, v in after.items() if k not in sidecars})
+            self.assertLessEqual(set(after) - set(before), sidecars)
             self.assertEqual(
                 paper_hash,
                 hashlib.sha256(

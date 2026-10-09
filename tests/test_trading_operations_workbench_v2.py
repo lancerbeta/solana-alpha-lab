@@ -202,7 +202,18 @@ class TradingOperationsWorkbenchV2Tests(unittest.TestCase):
             app = FactoryApplication(root=root)
             for path in GET_PATHS:
                 _get(app, path)
-            self.assertEqual(before, _walk_relatives(root))
+            # A4 owner clarification permits SQLite coordination sidecars,
+            # not new source/business files or changes to the database bytes.
+            sidecars = {
+                "local/factory_v1/paper_plane_state.sqlite-wal",
+                "local/factory_v1/paper_plane_state.sqlite-shm",
+            }
+            after = _walk_relatives(root)
+            self.assertEqual(
+                {k: v for k, v in before.items() if k not in sidecars},
+                {k: v for k, v in after.items() if k not in sidecars},
+            )
+            self.assertLessEqual(set(after) - set(before), sidecars)
             self.assertEqual(app._paper_plane_source_status, "PRESENT")
 
     def test_b_c_strategy_bot_lineage_and_activation_gap(self) -> None:
