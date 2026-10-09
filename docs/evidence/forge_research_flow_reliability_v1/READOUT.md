@@ -27,7 +27,7 @@ T = tests/test_forge_research_flow_reliability_v1.py; прочие cases — в 
 | D15 | PASS | Missing context gives SHA locator/exit2/no writes; null-session exact prior blocks navigation; typed close names scope/receipt. |
 | D16 | PASS | Capability mutations leave market, inventory and counters unchanged. |
 | D17 | PASS | 40/400 roots: equal result SHA, physical reads 2040→40 and 20400→400; writer invalidates snapshot. |
-| D18 | PARTIAL | PR #388 открыт. Первый CI выявил direct-consumer и admission regressions; адресные исправления проверены. Финальные четыре ревью, exact-head CI и merge-readiness ещё требуются. |
+| D18 | BLOCKED | PR #388 открыт. Первый CI выявил direct-consumer и admission regressions; адресные исправления проверены. Финальные четыре ревью, exact-head CI и merge-readiness ещё требуются. |
 
 ## Native: неизменённый original input/output
 
@@ -63,4 +63,4 @@ Spec1.1 Runner is mechanical; native KILL grants no chronology, alpha or family 
 
 validation-proof.json retains tests/skips/failures. Guarded merge owns full gate after exact-head CI/readiness. Horizon NOW=NONE, WATCH=chronology/science. No provider, holdout, deploy, credentials, money or budget increase; raw history never resets.
 
-PR #388, первый CI run 37882482555: shard 0/2/4/5 FAIL, core/execution/resources PASS. Исправлены преждевременный preflight inventory check при persist, сохранены ранние exact-prior и typed-close запреты, Linux BASE import, session-bound legacy DEC, HYP migration predecessor и исторические прямые тесты. Этот CI не считается зелёным; результат следующего exact-head run будет в PR.
+PR #388, первый CI run 37882482555: shard 0/2/4/5 FAIL, core/execution/resources PASS. Исправлены преждевременный preflight inventory check при persist, сохранены ранние selected/runner exact-prior и typed-close запреты, Linux BASE import, явное provenance у legacy DEC fixtures и HYP migration predecessor. Sessionless DEC не приписывается единственной известной сессии. Этот CI не считается зелёным; результат следующего exact-head run будет в PR.

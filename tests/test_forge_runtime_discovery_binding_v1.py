@@ -438,6 +438,7 @@ class PriorScopeTransportTests(unittest.TestCase):
                         "HFIC-DEC-CONTROL",
                         {
                             "hypothesis_version_id": prior["hypothesis_version_id"],
+                            "session_id": prior["session_id"],
                             "decision_kind": "REJECT",
                             "reason_code": "KILL_PREPARATORY_LOOP",
                         },
@@ -1330,6 +1331,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                         "HFIC-DEC-UNBOUND",
                         {
                             "hypothesis_version_id": unbound_id,
+                            "session_id": common["session_id"],
                             "decision_kind": "REJECT",
                             "reason_code": "KILL_UNBOUND_EVIDENCE",
                         },
@@ -1340,6 +1342,7 @@ class PerCandidateScopePersistenceTests(unittest.TestCase):
                         "HFIC-DEC-MECHANISM",
                         {
                             "hypothesis_version_id": mechanism_id,
+                            "session_id": common["session_id"],
                             "decision_kind": "REJECT",
                             "reason_code": "KILL_MECHANISM",
                         },

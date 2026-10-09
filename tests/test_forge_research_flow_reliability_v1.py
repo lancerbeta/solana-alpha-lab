@@ -627,6 +627,23 @@ class SessionHistoryTests(unittest.TestCase):
                     self.assertEqual(prior.get('decision_kind'), 'REJECT' if retained else None)
                     self.assertEqual('outcome_semantics' in prior,retained)
 
+    def test_sessionless_decision_does_not_attach_to_only_visible_known_session(self):
+        import tempfile
+        from tests.test_research_store import event_fixture
+        from solana_alpha_lab.factory.hfic_prior_memory import build_prior_memory_snapshot
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        hyp_id='HYP-SINGLE-KNOWN-SESSION'
+        with tempfile.TemporaryDirectory() as raw:
+            store=ResearchStore(Path(raw))
+            hyp=event_fixture(record_id='HYP-SINGLE',record_kind='HYPOTHESIS_VERSION',transaction_id='RESEARCH-TXN-SINGLE',payload={'hypothesis_version_id':hyp_id,'session_id':'SESS-ONLY','hfic_protocol':'HFIC-V1.2','definition_sha256':'a'*64}).model_copy(update={'run_id':None,'hypothesis_version_id':hyp_id})
+            dec=event_fixture(record_id='DEC-UNBOUND',record_kind='DECISION_EVENT',transaction_id='RESEARCH-TXN-SINGLE',payload={'hypothesis_version_id':hyp_id,'decision_kind':'REJECT','reason_code':'KILL_MECHANISM'}).model_copy(update={'run_id':None,'hypothesis_version_id':hyp_id})
+            store.append([hyp,dec],transaction_id='RESEARCH-TXN-SINGLE')
+            snapshot=build_prior_memory_snapshot(store,store_inventory_digest=store.diagnostics().committed_inventory_sha256,repo_root=ROOT)
+            capsule=snapshot['capsules'][0]
+            self.assertEqual(capsule['session_id'],'SESS-ONLY')
+            self.assertIsNone(capsule['reason_code'])
+            self.assertEqual(capsule['memory_status'],'AMBIGUOUS')
+
 class CapabilityBindingTests(unittest.TestCase):
     def test_changed_direct_owners_are_part_of_capability_provenance(self):
         from solana_alpha_lab.factory.hfic_evidence_identity import _CAPABILITY_PROTOCOL_FILES
@@ -1016,6 +1033,31 @@ class EpisodeFlowTests(unittest.TestCase):
         if os.environ.get('FLOW_D10_PROOF'):
             proof={'schema':'smial.forge-flow-new-data-proof.v1','synthetic_mechanical_only':True,'old_market_evidence_epoch_sha256':before['market_evidence_epoch_sha256'],'new_market_evidence_epoch_sha256':after['market_evidence_epoch_sha256'],'identical_import_changes_epoch':False,'old_session_id':frozen['session_id'],'new_session_id':fresh_frozen['session_id'],'same_semantic_candidate_id':frozen['selected_candidate_id'],'fresh_generated_draft_sha256':fresh_generated['payload_sha256'],'old_verdict':'KILL_STATISTICALLY_UNIDENTIFIABLE','new_verdict':'KILL_LOW_INFORMATION_VALUE','admitted_n':10,'historical_records_unchanged_n':len(old_records),'same_session_replay_writes':0,'same_session_replay_extra_looks':0,'ordinary_current_session_id':current['stages'][0]['session_id'],'alpha_or_scientific_acceptance':False}
             Path(os.environ['FLOW_D10_PROOF']).write_text(json.dumps(proof,ensure_ascii=False,sort_keys=True,indent=2)+'\n',encoding='utf-8',newline='\n')
+
+    def test_runner_up_exact_prior_refuses_before_generated_draft(self):
+        from datetime import UTC,datetime
+        from tests.test_hfic_critic_prior_memory_closure_v1 import _event
+        from solana_alpha_lab.factory.hfic_card_projection import project_material_card
+        from solana_alpha_lab.factory.hfic_identity import candidate_identity
+        from solana_alpha_lab.factory.research_store import RecordKind,ResearchStore
+        evidence,scope,query,initial=self.look('FLOW_RUNNER_PRIOR')
+        body,_=self.authored_draft(evidence,scope,initial['owner_focus'],n=2)
+        runner=body['candidates'][1]
+        runner['target']='RUNNER_DISTINCT_TARGET'
+        runner['primary_y']='RUNNER_DISTINCT_TARGET'
+        prior=project_material_card(runner)
+        prior['hypothesis_version_id']='HYP-FLOW-RUNNER-EXACT'
+        prior['definition_sha256']=candidate_identity(prior).full_sha256
+        prior['hfic_protocol']='HFIC-V1.2'
+        store=ResearchStore(self.plane)
+        store.append([_event(record_id='HYP-FLOW-RUNNER-EXACT',kind=RecordKind.HYPOTHESIS_VERSION,entity_id=prior['hypothesis_version_id'],hypothesis_version_id=prior['hypothesis_version_id'],payload=prior,created=datetime(2026,10,8,tzinfo=UTC),transaction_id='RESEARCH-TXN-RUNNER-PRIOR')],transaction_id='RESEARCH-TXN-RUNNER-PRIOR')
+        body,pre=self.authored_draft(evidence,scope,initial['owner_focus'],n=2)
+        body['candidates'][1]['target']='RUNNER_DISTINCT_TARGET'
+        body['candidates'][1]['primary_y']='RUNNER_DISTINCT_TARGET'
+        before=store.diagnostics().committed_inventory_sha256
+        denied=self.cli('persist-draft','--draft',self.write('runner-prior.json',body),'--preflight-receipt',self.write('runner-pre.json',pre),ok=False)
+        self.assertEqual(denied.get('reason_code'),'EXACT_PRIOR_SCOPE_MATCH',denied)
+        self.assertEqual(ResearchStore(self.plane).diagnostics().committed_inventory_sha256,before)
 
     def test_ten_cards_primary_nine_runner_ten_and_bad_runner_are_bound(self):
         from tests.test_hfic_cli import critic_result_from_packet_only

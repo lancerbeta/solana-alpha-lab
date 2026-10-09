@@ -162,7 +162,10 @@ missing-versus-empty data, legacy commissioning, and frozen harness evidence.
 The commissioning link now names its immutable HYP predecessor; historical
 test fixtures alone simulate BASE's unlinked imports. Production writer lineage
 remains strict and the old acceptance receipt still verifies against its own
-Git commit.
+Git commit. A sessionless DEC stays unbound even if only one known-session HYP
+is visible; direct consumers now author an explicit session where provenance
+is known. Pre-persist admission checks selected and runner-up exact priors plus
+the typed family ledger without treating saved look writes as receipt drift.
 
 Direct generated consumers: Catalog generated navigation/PROJECT_MAP follow
 harness_sync. The existing Forge config now states frozen-policy precedence

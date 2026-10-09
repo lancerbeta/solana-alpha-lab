@@ -453,6 +453,7 @@ def _decision_event(hyp_id: str, kind: str, reason: str, transaction_id: str):
         payload={
             "decision_event_id": f"DEC-{hyp_id}",
             "hypothesis_version_id": hyp_id,
+            "session_id": ELIGIBLE_SESSION,
             "decision_kind": kind,
             "reason_code": reason,
         },

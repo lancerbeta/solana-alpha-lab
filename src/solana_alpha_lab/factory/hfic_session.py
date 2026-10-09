@@ -4669,6 +4669,7 @@ def persist_generated_draft(
     except HficIdentityError as exc:
         raise HficSessionError(str(exc)) from exc
     selected_ref = draft.get("selected_candidate_ref")
+    runner_up_index = -1
     if selected_ref not in (None, ""):
         selected_index = _resolve_ref(selected_ref, identities)
         optional_single = (
@@ -4826,8 +4827,8 @@ def persist_generated_draft(
         from solana_alpha_lab.factory.hfic_memory_policy import HficMemoryPolicyError
 
         selected_card = candidates[selected_index]
-        grounded = _bind_selected_look(grounded, selected_card, store=store)
-        if grounded.get("look_confirms_selected") is not False:
+        selected_grounded = _bind_selected_look(grounded, selected_card, store=store)
+        if selected_grounded.get("look_confirms_selected") is not False or runner_up_index >= 0:
             try:
                 prior = build_prior_memory_snapshot(
                     store,
@@ -4835,12 +4836,24 @@ def persist_generated_draft(
                     repo_root=repo_root,
                     as_of=receipt.get("session_started_at"),
                 )
-                bind_prior_scope_evidence(
-                    grounded, canonical_priors=prior["capsules"]
-                )
+                if selected_grounded.get("look_confirms_selected") is not False:
+                    bind_prior_scope_evidence(
+                        selected_grounded, canonical_priors=prior["capsules"]
+                    )
+                if runner_up_index >= 0:
+                    _rebind_runner_up_grounded_evidence(
+                        {"grounded_evidence": dict(grounded),
+                         "prior_memory": {"capsules": prior["capsules"]}},
+                        candidates[runner_up_index],
+                    )
             except (GroundedDiscoveryError, PriorMemoryCapacityError,
                     PriorMemoryUnidentifiedError, HficMemoryPolicyError) as exc:
                 raise HficSessionError(exc.code) from exc
+    if not _ordinary_discovery_requested(draft, receipt):
+        freeze_draft(
+            draft, preflight_receipt=preflight_receipt, store=store,
+            repo_root=repo_root, verify_current_market_identity=True, persist=False,
+        )
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
