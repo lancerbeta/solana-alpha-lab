@@ -1,15 +1,15 @@
 ---
 task_id: SMIAL_VERIFICATION_POLICY_PATCH_V1
-task_version: '1.0'
+task_version: '1.1'
 status: IMPLEMENTED_UNVERIFIED
 as_of: '2026-10-09'
 owner: GOAL_OWNER
 allowed_routes: [DIRECT_CODEX_DELIVERY]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 0f89ffd8018c05fbafaf79ef609c7dadf888807f
+  expected_base: 45bbdc6d992e2c45d1b1ff2260ee415476dff711
   expected_upstream: origin/main
-  expected_upstream_oid: 0f89ffd8018c05fbafaf79ef609c7dadf888807f
+  expected_upstream_oid: 45bbdc6d992e2c45d1b1ff2260ee415476dff711
   expected_branch: codex/smial-verification-policy-v1
   dirty_mode: ALLOW_REPORTED
 objective: Replace unconditional test-first with sufficient risk-based verification in the existing elected-agent skill and domain policy while preserving agreed outcomes, exact contracts and all mandatory gates.
@@ -18,6 +18,7 @@ managed_write_set:
   - delivery-harness/policies/solana-alpha-lab.md
   - docs/tasks/SMIAL_VERIFICATION_POLICY_PATCH_V1.md
   - docs/evidence/control/smial_verification_policy_patch_v1/**
+  - docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
   - catalog/assets/core.yaml
   - catalog/catalog_manifest.yaml
   - docs/PROJECT_MAP.md
@@ -76,12 +77,14 @@ Oracle: owner brief, frozen base authority and independently specified expected
 outcomes; policy delivery does not measure defect-rate or cost reduction.
 Material risk: discretion misread as zero verification, self-confirming tests,
 loss of a mandatory gate, or retries misread as permission to reroll to green.
-Evidence budget: one focused local test batch, scoped generated sync, three
-isolated critics and ordinary exact-head CI; no pre-PR local full gate.
+Evidence budget: a focused local batch and direct linkage consumer on the new
+base, scoped generated sync, three fresh isolated critics and ordinary exact-head
+CI; no pre-PR local full gate. Prior checks remain historical evidence only.
 REPLAN_TRIGGER: repeated blocker, new runtime/framework or evidence-budget breach.
 
 Non-goals: runtime/provider/science/live actions, global skills/settings,
-historical evidence/contracts rewrite, test-suite audit or test removal,
+frozen contracts or historical semantic claims/timestamps, mass historical
+evidence rewrite, test-suite audit or test removal,
 new registry/schema/critic/dependency and Project Instruction activation.
 Capability radar NOW: NONE. WATCH: a named risk missed in a natural follow-up
 atom; PATCH the concrete gap under a new exact scope if observed.
@@ -103,6 +106,27 @@ Five subsequent distinct merged atoms with product/research evidence:
 All active time-gate records are terminal; historical optional-export prose
 selects no work. GitHub task transport is routine base-policy authority only.
 No unrelated external authority is granted by the external_caps block.
+
+## Exact base reconciliation and affected-link maintenance
+
+Owner continuation after the pre-push checkpoint: `продолжай, main другой`.
+REPLAN: contract 1.1 freezes the new exact main while preserving objective,
+route and roles. The original brief permits maintenance of genuinely affected
+existing text/link checks. The machine preflight gives the prescribed repair:
+re-pin SEPARATE evidence and name that exact file in managed_write_set.
+Direct consumer tests/test_provider_route_capability_registry_v4.py:118-122
+verifies artifact_bindings against current files, not a frozen historical commit.
+
+Only artifact_bindings.domain_policy.sha256 in
+`docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json`
+is updated to the current policy blob. All other JSON values, timestamps,
+provider/runtime/registry/scientific claims, status and authority are unchanged;
+old bytes remain in Git. The corresponding Catalog integrity is regenerated.
+This is the one affected-link maintenance exception, not a mass evidence rewrite
+or new provider/science acceptance. No frozen-commit evidence is changed.
+New main's Forge changes are carried verbatim, never included in this PR delta.
+Rebuild context, targeted checks, independent reviews and evidence bindings on
+this base before preflight/push. Old-base review is not current readiness.
 
 ## Definition of done
 

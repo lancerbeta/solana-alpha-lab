@@ -5,7 +5,7 @@
   "as_of": "2026-10-09",
   "task_id": "SMIAL_VERIFICATION_POLICY_PATCH_V1",
   "state_change": "IMPLEMENTED_UNVERIFIED",
-  "base_main": "0f89ffd8018c05fbafaf79ef609c7dadf888807f",
+  "base_main": "45bbdc6d992e2c45d1b1ff2260ee415476dff711",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
@@ -35,24 +35,21 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_EXISTING_32_TESTS_462_SUBTESTS",
+    "targeted": "PASS_NEW_BASE_EXISTING_TARGETED_AND_REGISTRY_V4_CONSUMER",
     "independent_review": {
       "path": "docs/evidence/control/smial_verification_policy_patch_v1/independent_review.json",
       "sha256": "f0a0c22c9849f396caab8c265713612b944390df4aa786a371a723dea7cb4f28",
-      "verdict": "PASS"
+      "verdict": "PENDING"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": [
-      "PASS_HARNESS_CHECK",
-      "PASS_ENTRY_CONTEXT",
-      "PASS_TARGETED_AFTER_SOURCE_REHASH",
+      "PASS_NEW_BASE_HARNESS_CHECK",
+      "PASS_RECONCILED_ENTRY_CONTEXT",
+      "PASS_TARGETED_WITH_DIRECT_LINK_CONSUMER",
+      "PASS_EXACT_RECEIPT_SINGLE_DIGEST_JSON_CHANGE",
       "PASS_SOURCE_REHASH_IDEMPOTENCY",
-      "PASS_FOUR_SIMULATION_ONLY_APPLICABILITY_CASES",
-      "PASS_ISOLATED_CODE_REVIEW",
-      "PASS_ISOLATED_GOAL_DOD_REVIEW",
-      "PASS_ISOLATED_SEMANTIC_PREMISE_ARCHITECTURE_REVIEW",
-      "PASS_SEMANTIC_PACKET_LAUNCH_VALIDATION"
+      "PASS_FOUR_SIMULATION_ONLY_APPLICABILITY_CASES"
     ]
   },
   "non_claims": [

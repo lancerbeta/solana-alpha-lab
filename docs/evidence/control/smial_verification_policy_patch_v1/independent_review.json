@@ -14,41 +14,27 @@
   "reviews": [
     {
       "role": "CODE_REVIEWER",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "Isolated read-only critic at content_head=3c96e42b9486cb5a0937ceb7afc4d239ee6ddd89: no actionable findings in the exact five-path implementation inventory.",
-        "Owner brief, schema, Catalog skill SHA256 and committed/worktree bytes match; existing gates and useful/required TDD remain.",
-        "Four cases match the owner-prescribed SIMULATION_ONLY tactics; quality/cost effects remain UNKNOWN.",
-        "Internal delivery handback changes no operator behavior and does not trigger OWNER_UX_CRITIC.",
-        "Reported pytest/sync numbers agree with parent compact machine outputs; reviewer did not independently replay tests or confirm CI/merge readiness."
+        "NEW_BASE_REVIEW_PENDING; prior review snapshot remains in Git."
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "Isolated read-only critic at content_head=3c96e42b9486cb5a0937ceb7afc4d239ee6ddd89: no evidenced outcome/DoD gap; exact diff matches frozen inventory excluding receipt bodies.",
-        "Sufficient evidence remains required when no new tests are written; full agreed outcome, independent oracle, actual boundary and useful regressions are preserved.",
-        "All four applicability cases remain SIMULATION_ONLY; future observations NOT_STARTED; quality/cost improvement UNKNOWN.",
-        "Contract evidence budget matches delivered scope; this verdict claims content conformance only, not CI or merge readiness."
+        "NEW_BASE_REVIEW_PENDING; prior review snapshot remains in Git."
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "PASS",
+      "verdict": "NOT_READY",
       "findings": [
-        "Isolated read-only SEMANTIC_PREMISE critic: SEMANTIC_PASS at content_head=3c96e42b9486cb5a0937ceb7afc4d239ee6ddd89; no blocking premise defect or authority widening.",
-        "packet_fingerprint_sha256=9b46bcb90ec11c96c457d9070e0143d9d8c3bf4f484b9ad4b11a081423ff8545",
-        "Passing document tests can still hide a missed PIT risk or shared mistaken expected result; Entry risk/oracle, independent examples and real-path verification address that premise without proving behavioral adoption.",
-        "Reproducibility/race/flakiness exception does not authorize scientific reruns/provider calls, lucky rerolls, family/global conclusions or treating UNKNOWN as negative.",
-        "Finite five-atom freeze elapsed: five named merge commits are ancestors of base and carry product/runtime/evidence; no general control-plane authority follows.",
-        "Five-path review inventory matches existing scripts/harness_sync.py exclusion of completion/review/factory-fit; Git policy/task/readout bytes remain truth owners and Catalog hash is derived.",
-        "No runtime/schema/enum/private-API change; rollback remains an inverse policy patch through the same owner gate.",
-        "Packet launch validation passed; launch isolation uses a fresh read-only context, packet claims PACKET_INFORMATION_PATH only and model diversity is UNPROVEN."
+        "NEW_BASE_REVIEW_PENDING; prior review snapshot remains in Git."
       ]
     }
   ],
-  "verdict": "PASS",
+  "verdict": "PENDING",
   "non_claims": [
     "NO_MERGE_AUTHORITY",
     "NO_MEASURED_QUALITY_OR_COST_GAIN",

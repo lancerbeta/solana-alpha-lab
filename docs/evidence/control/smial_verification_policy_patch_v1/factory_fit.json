@@ -10,9 +10,9 @@
   "verdict": "PASS",
   "dimensions": {
     "mission": "Risk-sufficient verification supports the elected agent without a cashflow/alpha claim.",
-    "flexibility_and_history": "Existing useful tests and frozen contracts/evidence remain; suitable TDD stays optional.",
-    "context_efficiency": "One existing policy owner; two primary files; no new framework, registry, schema or mandatory metric.",
-    "research_truth": "Independent oracles, real-path boundaries, truthful UNKNOWN and scoped evidence preserve scientific admissibility.",
+    "flexibility_and_history": "One legacy acceptance live-policy digest re-pinned under its current-file test contract; all other JSON values and claims unchanged; old bytes retained in Git. Frozen contracts/evidence untouched.",
+    "context_efficiency": "One policy owner; two primary files; one exact existing link repair with ordinary new-base reconciliation. No new framework, registry, schema or metric.",
+    "research_truth": "Independent oracles and real paths remain; receipt JSON comparison proves provider/scientific claims, timestamps, status and authority unchanged.",
     "owner_operability": "Ordinary bounded autonomy and exact-head owner merge phrase remain unchanged.",
     "execution_to_cashflow": "NEUTRAL: instruction patch only; no measured economics gain.",
     "monitoring_and_recovery": "No runtime changes; ordinary inverse policy patch preserves regression evidence.",
