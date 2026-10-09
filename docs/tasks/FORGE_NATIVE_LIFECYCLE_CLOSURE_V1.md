@@ -23,6 +23,7 @@ managed_write_set:
 - .agents/skills/hypothesis-forge/SKILL.md
 - .agents/skills/independent-hypothesis-critic/SKILL.md
 - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
+- src/solana_alpha_lab/factory/hfic_grounded_discovery.py
 - src/solana_alpha_lab/factory/hfic_card_projection.py
 - src/solana_alpha_lab/factory/hfic_session.py
 - scripts/hypothesis_forge.py
@@ -131,3 +132,11 @@ WATCH: repeated question/recipe mismatches on future authorized tasks justify
 measuring the specific interface; no speculative framework adapter.
 Delivery transport is authorized by base harness; external_caps do not grant
 provider calls, credentials, new packages, deployment, signer or spend.
+
+Material repair checkpoint: first native pair both refused before persistence
+with UNKNOWN_PRIOR_SCOPE. Actual saved MAIN scope lacked evidence_surface_mode;
+prior guard requires that route label. Ordinary scope owner now publishes its
+existing ordinary mode only when omitted, preserving explicit labels and all
+scientific axes. Retain both original drafts/look charges, no retroactive
+rebind; use the one authorized post-repair final pair on a fresh exact epoch.
+Native denominator so far Generator2, Critic0, MAIN2, PREVIEW2, ADAPTIVE0.

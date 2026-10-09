@@ -1,0 +1,104 @@
+{
+  "provenance": "ACTUAL_FIRST_NATIVE_MAIN_SCOPE_OMISSION_REGRESSION_NOT_NATIVE_AUTHORING_INPUT",
+  "canonical_query": {
+    "all": [
+      {
+        "feature": "holder_growth_early",
+        "op": "gt",
+        "value": 0
+      },
+      {
+        "feature": "holder_growth_late",
+        "op": "gt",
+        "value": 0
+      }
+    ],
+    "anchor_kind": "NOMINATION_T0",
+    "budget_allocation": "COMPOUND_FIRST",
+    "decision": {
+      "point_id": "E1800"
+    },
+    "diagnostic_slices": [],
+    "entry_model": {
+      "assumed_latency_seconds": 0,
+      "kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT"
+    },
+    "features": [
+      {
+        "end": "E900",
+        "field_id": "FIELD-HOLDER-COUNT-001",
+        "name": "holder_growth_early",
+        "op": "delta",
+        "start": "E300"
+      },
+      {
+        "end": "E1800",
+        "field_id": "FIELD-HOLDER-COUNT-001",
+        "name": "holder_growth_late",
+        "op": "delta",
+        "start": "E900"
+      }
+    ],
+    "hypothesis_kind": "NUMERIC_IN_SCOPE",
+    "population": "OPPORTUNITY_EPISODES",
+    "query_id": "HOLDER_SUSTAINED_GROWTH_TRENDING_E1800_E14400",
+    "research_scope": {
+      "anchor_kind": "NOMINATION_T0",
+      "coverage_policy": "REQUIRE_KNOWN_REFERENCED",
+      "definition_refs": {
+        "JUPITER:toptrending:5m": "427b9047bcab312689f4c5f8b6871f9a0eac48ab3940b8e76714982fb6ff0fb4"
+      },
+      "evidence_selection": {
+        "kind": "EXPLICIT_VERIFIED_RELEASE_SET"
+      },
+      "membership_time_basis": "EPISODE_T0",
+      "population": "OPPORTUNITY_EPISODES",
+      "schema": "smial.research-scope",
+      "schema_version": "2.0",
+      "universe_selector": {
+        "clauses": [
+          {
+            "all_of": [
+              "JUPITER:toptrending:5m"
+            ],
+            "any_of": [],
+            "count": null,
+            "none_of": []
+          }
+        ],
+        "required_observed_lists": [
+          "JUPITER:toptrending:5m"
+        ],
+        "schema": "smial.list-selector",
+        "schema_version": "1.0"
+      }
+    },
+    "schema": "smial.hfic-temporal-query",
+    "schema_version": "1.2",
+    "search_tier": "COMPOUND_SCREEN",
+    "target": {
+      "exit_point": "E14400",
+      "field_id": "FIELD-USD-PRICE-001",
+      "kind": "PRICE_RELATIVE_PROXY",
+      "reference_point": "E1800"
+    },
+    "time_contract": {
+      "schedule_contract": "OPPORTUNITY_EPISODE_SCHEDULE_V1",
+      "time_feature_clock": "FIRST_RELIABLE_AVAILABLE_AT"
+    }
+  },
+  "candidate_scope": {
+    "decision_timestamp": "E1800",
+    "estimand": "Signed difference in mean PRICE_RELATIVE_PROXY E1800 -> E14400 between matched sustained-holder-growth episodes and the admitted baseline in the same JUPITER:toptrending:5m universe, with explicit target missingness.",
+    "explanatory_condition": "JUPITER:toptrending:5m membership at T0; delta holders E300 -> E900 > 0 AND delta holders E900 -> E1800 > 0, both PIT usable at E1800.",
+    "population": "OPPORTUNITY_EPISODES",
+    "representation_scope": "BASE",
+    "research_scope_rule_sha256": "f8710ba10794f1fcbf84a41a079ed677d45ab11746be16a6c253f6d0164316a0",
+    "target": "PRICE_RELATIVE_PROXY:E1800:E14400:FIELD-USD-PRICE-001"
+  },
+  "technical_prior": {
+    "hypothesis_version_id": "HYP-LC-TECHNICAL-PRIOR-001",
+    "memory_status": "TECHNICAL_STOP",
+    "reason_code": "KILL_UNBOUND_EVIDENCE"
+  }
+}

@@ -114,7 +114,7 @@ def authoring_contract() -> dict[str, Any]:
         "saved_look_bindings": {
             "condition": "selected candidate bound to a saved discovery-execute look",
             "placement": "copy exact emitted fields to candidate top level before persist",
-            "required_top_level": ["population", "decision_timestamp", "target", "estimand", "explanatory_condition"],
+            "required_top_level": ["population", "decision_timestamp", "target", "estimand", "explanatory_condition", "evidence_surface_mode"],
             "conditional_top_level": ["representation_scope", "research_scope_rule_sha256", "research_scope_statement"],
             "sources": {
                 "population": "candidate_scope.population",

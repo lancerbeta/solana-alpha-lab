@@ -46,5 +46,28 @@ class PublicBindingContractTests(unittest.TestCase):
         self.assertIn('research_scope_statement', caught.exception.detail['missing_top_level'])
 
 
+class OrdinarySavedModeTests(unittest.TestCase):
+    def setUp(self):
+        self.fixture = json.loads((ROOT / 'tests/fixtures/forge_native_lifecycle_closure_v1/public_mode_regression.json').read_text(encoding='utf-8'))
+
+    def test_omitted_ordinary_mode_can_reach_the_actual_prior_guard(self):
+        from solana_alpha_lab.factory.hfic_grounded_discovery import scope_bound_to_spec, bind_prior_scope_evidence
+        scope = scope_bound_to_spec(self.fixture['canonical_query'], self.fixture['candidate_scope'])
+        evidence = bind_prior_scope_evidence({'candidate_scope': scope}, [self.fixture['technical_prior']])
+        self.assertEqual(evidence['candidate_scope']['evidence_surface_mode'], 'ORDINARY_GROUNDED_DISCOVERY_V1')
+        self.assertEqual(evidence['prior_scope_relations'][0]['relation'], 'NON_BLOCKING_PRIOR')
+
+    def test_explicit_mode_is_not_overwritten_to_hide_a_contradiction(self):
+        from solana_alpha_lab.factory.hfic_grounded_discovery import scope_bound_to_spec
+        authored = {**self.fixture['candidate_scope'], 'evidence_surface_mode': 'CURRENT_REPRESENTATION_CONTROL_V1'}
+        conflicting = scope_bound_to_spec(self.fixture['canonical_query'], authored)
+        self.assertEqual(conflicting['evidence_surface_mode'], authored['evidence_surface_mode'])
+        ordinary = {**conflicting, 'evidence_surface_mode': 'ORDINARY_GROUNDED_DISCOVERY_V1'}
+        from solana_alpha_lab.factory.hfic_session import _bind_selected_look, HficSessionError
+        with self.assertRaises(HficSessionError) as caught:
+            _bind_selected_look({'candidate_scope': conflicting}, conflicting, store=None, evidence_surface_mode=ordinary['evidence_surface_mode'])
+        self.assertEqual(caught.exception.code, 'LOOK_SCOPE_CONTRADICTION')
+
+
 if __name__ == '__main__':
     unittest.main()

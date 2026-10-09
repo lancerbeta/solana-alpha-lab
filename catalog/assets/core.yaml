@@ -40579,7 +40579,7 @@ records:
   as_of: '2026-10-09'
   truth_owner: FORGE_EVIDENCE_GUIDED_GENERATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_evidence_guided_generation_v1.md', repository_path: docs/contracts/forge_evidence_guided_generation_v1.md}
-  integrity: {kind: sha256, sha256: 7b460f26af89f038a3e01d86d491e32190fb5864e313f906e11f7a8121bbe227}
+  integrity: {kind: sha256, sha256: 81da5c595a2ed531f47328aff8645b3facb54faf82392564f5bc0c4e0cc51c39}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -40868,7 +40868,7 @@ records:
     repository_path: docs/tasks/FORGE_NATIVE_LIFECYCLE_CLOSURE_V1.md
   integrity:
     kind: sha256
-    sha256: da28e45cb1c78dc86b31a0bb1b07ce52b1b56a938730b8c9e9015e3af6060ebe
+    sha256: 2997712f3b8f4e0bd35e6195e338a55f2445952d199ec2d2656be67878905688
   access:
     mode: read_only
     method: file
@@ -40946,7 +40946,7 @@ records:
     repository_path: tests/test_forge_native_lifecycle_closure_v1.py
   integrity:
     kind: sha256
-    sha256: ae97807db948bfb5831ebc9b57b030a22c7a6ffb888f53d5ed646de4602e4892
+    sha256: 1d79ad3cd8530e81cf18e685f4e166a16910e7c103365f3ade60f04ef6b7eb1c
   access:
     mode: read_only
     method: file

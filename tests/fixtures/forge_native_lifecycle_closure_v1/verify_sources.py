@@ -13,7 +13,7 @@ root = a.root.resolve()
 sys.path[:0] = [str(root), str(root / 'src')]
 import pyarrow.parquet as pq
 from tests.test_forge_research_flow_reliability_v1 import public_cli
-from tests.test_hfic_list_aware_vertical_v1 import mint_of
+from tests.test_hfic_list_aware_vertical_v1 import mint_of, CATEGORY
 
 proofs = []
 for variant in ('primary', 'transfer'):
@@ -32,6 +32,10 @@ for variant in ('primary', 'transfer'):
         mint = mint_of(label)
         assert sum(row['mint'] == mint for row in census) == 1
         list_role, start_h, target = description['rows'][index]
+        admission = next(row for row in census if row['mint'] == mint)
+        assert admission['witness_source_id'] == CATEGORY[list_role] + '_5m', (mint, admission['witness_source_id'], list_role)
+        assert admission['membership_state'] == 'ADMITTED'
+        assert admission['anchor_kind'] == 'NOMINATION_T0'
         rows = [row for row in observations if row['mint'] == mint]
 
         def cell(point, field):
@@ -53,7 +57,7 @@ for variant in ('primary', 'transfer'):
             assert measured is None
         else:
             assert measured is not None and abs(measured - Decimal(target)) < Decimal('1e-12'), (mint, measured, target)
-        actual.append({'neutral_seat': n + 1, 'start': str(start) if start is not None else None, 'end': str(end), 'proxy': str(measured) if measured is not None else None, 'expected_list_role': list_role})
+        actual.append({'neutral_seat': n + 1, 'start': str(start) if start is not None else None, 'end': str(end), 'proxy': str(measured) if measured is not None else None, 'verified_list_role': list_role, 'actual_witness_source_id': admission['witness_source_id']})
     proofs.append({'variant': variant, 'status': 'PASS', 'source_rows': actual,
                    'census_sha256': f['census_sha256'], 'observations_sha256': f['observations_sha256'],
                    'metadata_cli_scientific_writes': binding['scientific_writes'], 'new_looks': 0})

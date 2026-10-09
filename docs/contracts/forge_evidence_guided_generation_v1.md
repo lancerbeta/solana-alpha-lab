@@ -99,9 +99,10 @@ returned by research-scope-resolve. MAIN=1 requires an explicit valid spec.
 LIMITED_RESULT stops after the admitted bounded result; it does not claim a
 scientific terminal. Reuse the returned operation_sha256 for continuation.
 Changing code, prompt or process does not refund exposure or mint a new slot.
-Use `preflight.evidence_surface_mode` in the independently authored candidate
-scope. The verified ingress may fill an omitted mode; a conflicting supplied
-mode is `LOOK_SCOPE_CONTRADICTION`. Population is not a substitute for mode.
+For ordinary discovery, the saved look publishes `candidate_scope.evidence_surface_mode`.
+The ordinary scope owner fills an omitted route label with its existing
+`ORDINARY_GROUNDED_DISCOVERY_V1`; copy that emitted binding before persist.
+An explicitly conflicting supplied mode remains `LOOK_SCOPE_CONTRADICTION`. Population is not a substitute for mode.
 No guessed hashes, new cycle, parent link or representation fields are needed
 for an ordinary BASE request. Legacy, additional-cycle and representation
 routes retain their existing stricter contracts.

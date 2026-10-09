@@ -1322,6 +1322,9 @@ def scope_bound_to_spec(
         from solana_alpha_lab.factory.hfic_research_scope import rule_sha256_of_body
 
         bound["research_scope_rule_sha256"] = rule_sha256_of_body(scientific_body)
+    # This owner executes ordinary discovery; missing route labels are not
+    # missing scientific intent. Explicit supplied labels remain untouched.
+    bound.setdefault("evidence_surface_mode", ORDINARY_GROUNDED_DISCOVERY_V1)
     bound["population"] = spec_population
     bound["decision_timestamp"] = last_decision
     bound["target"] = (
