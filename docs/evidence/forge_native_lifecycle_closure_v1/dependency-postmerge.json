@@ -1,0 +1,19 @@
+{
+  "approved_head": "15f3a282e43871bd7d6d3d9ee20307286d4bc059",
+  "base_branch": "main",
+  "base_head": "0f89ffd8018c05fbafaf79ef609c7dadf888807f",
+  "context_receipt_sha256": "77027fb976d3b55ccc7cd72461f873688a48761fda044e93c44f80b1f6ab261e",
+  "default_branch_ci": {
+    "conclusion": "success",
+    "run_id": 37982636234
+  },
+  "default_branch_head": "45bbdc6d992e2c45d1b1ff2260ee415476dff711",
+  "head_branch": "codex/forge-evidence-guided-generation-v1",
+  "pr_number": 390,
+  "receipt_sha256": "ede47bcd131f87c56bed754d502076fea434ae18a656174a125968534edbc9e2",
+  "repository": "lancerbeta/solana-alpha-lab",
+  "route": "DIRECT_CODEX_DELIVERY",
+  "schema": "smial.delivery-post-merge-receipt",
+  "schema_version": "1.1",
+  "submission_receipt_sha256": "a495a32c3917c6766f181538bbea63f78b6c31ca2d1b4ba2cd6fe6c27b244898"
+}

@@ -56,6 +56,20 @@ Copy `evidence_surface_mode` from the verified preflight into candidate scope;
 never infer it from a population name. Omission is filled only from that same
 verified ingress, and a contradictory supplied value refuses.
 
+For a selected candidate bound to a saved look, use the public
+`candidate_authoring_contract.saved_look_bindings` source map. Paths are relative
+to the `discovery-execute` response. Copy `candidate_scope` axes and available
+`descriptive_readout.scientific_identity` labels to candidate top level;
+the scope statement/hash and representation are conditional on the saved look.
+Missing identity is unavailable, never reconstructed from result values.
+Question, estimand and condition remain the ones fixed before MAIN. This copies
+machine bindings; it does not author or improve the scientific claim.
+Before persist, read the current authoring contract and keep every consulted
+material prior in `prior_work_refs`. After persist, refresh preflight for the same
+focus and freeze the original draft. A restart reads saved state and continues
+the same draft/packet/result before any new model or value invocation.
+
+
 Fresh grounded handoff contract:
 `docs/contracts/forge_grounded_handoff_closure_v1.md`; working flat card:
 `tests/fixtures/forge_grounded_handoff_closure_v1/flat_card.json`.
@@ -778,3 +792,7 @@ Critic. Critic `prior_memory` continues to use the fuller
 
 Use `SOL_XHIGH` for mechanism/PIT/estimand reasoning. Critic handoff may use the
 same or a different strong model; isolation matters more than model identity.
+
+Native synthetic sentinel and execution-snapshot/recovery acceptance owner:
+`docs/contracts/forge_native_lifecycle_closure_v1.md`. This grants no real-data
+run, new look or external authority.

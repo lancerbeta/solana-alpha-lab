@@ -106,6 +106,20 @@ No guessed hashes, new cycle, parent link or representation fields are needed
 for an ordinary BASE request. Legacy, additional-cycle and representation
 routes retain their existing stricter contracts.
 
+For a selected candidate bound to a saved look, use the public
+`candidate_authoring_contract.saved_look_bindings` source map. Paths are relative
+to the `discovery-execute` response. Copy `candidate_scope` axes and available
+`descriptive_readout.scientific_identity` labels to candidate top level;
+the scope statement/hash and representation are conditional on the saved look.
+Missing identity is unavailable, never reconstructed from result values.
+Question, estimand and condition remain the ones fixed before MAIN. This copies
+machine bindings; it does not author or improve the scientific claim.
+Before persist, read the current authoring contract and keep every consulted
+material prior in `prior_work_refs`. After persist, refresh preflight for the same
+focus and freeze the original draft. A restart reads saved state and continues
+the same draft/packet/result before any new model or value invocation.
+
+
 ## Consumer and recovery boundaries
 
 Scientific core precedes transport: observable uncertainty, competing mundane
