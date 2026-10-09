@@ -1,7 +1,87 @@
 {
-  "task_id": "PAPER_PLANE_READ_FRESHNESS_V1",
-  "status": "PENDING_NOT_EXECUTED",
-  "phase": "ENTRY_PLACEHOLDER_NO_PASS_CLAIM",
   "schema": "smial.delivery-independent-review-evidence",
-  "schema_version": "1.0"
+  "schema_version": "1.0",
+  "review_id": "PAPER-PLANE-READ-FRESHNESS-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-10-09",
+  "task_id": "PAPER_PLANE_READ_FRESHNESS_V1",
+  "reviewed_bindings_sha256": "f7f46683768e9df92bdecdccdca50afe4c179235c5dfec73104534a250d71d12",
+  "reviewed_inventory_sha256": "6607d1ece19a474d6d50bd49848ae253a3820ddc85c13df3d6c7d830c030179c",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_REVIEW_PLAN_FOUR_ROLES_SUFFICIENT",
+        "PASS_REQUEST_THREAD_READER_STATUS_OWNERSHIP_AND_FINALLY_CLOSE",
+        "PASS_HTTP_USES_MATERIALIZED_OPERATIONS_ECONOMICS",
+        "PASS_15_BINDINGS_MATCH_CURRENT_INVENTORY"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_PUBLIC_P6_2_OF_2_POLICY_HASH_AND_FROZEN_ADMISSION",
+        "PASS_DOD6_TWO_OVERLAPPING_GETS_DISTINCT_CLOSED_READERS_AND_NEXT_COMMIT",
+        "PASS_187_CASES_185_PASS_TWO_EXISTING_LOCAL_A4_ABSENT_SKIPS",
+        "PASS_ONE_F01_NEXT_SCOPE_O1_O8_NO_ADJACENT_IMPLEMENTATION"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_TYPED_UNAVAILABLE_AND_RECOVERY_OWNER_MEANING",
+        "PASS_F04_RESIDUAL_MEANING_EXPLAINED",
+        "PASS_CURRENT_IMPLEMENTATION_INVENTORY_NO_OWNER_OPERABILITY_GAPS"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=f0cb994b5f54949299b85f03a01dfeafa4131984a64e8999f596f98cc62d85e7",
+        "PASS_SEMANTIC_PREMISE_AND_PACKET_BINDINGS",
+        "PASS_READONLY_REQUEST_OWNERSHIP_SNAPSHOT_LIFETIME_AND_MATERIALIZATION",
+        "PASS_NATIVE_SIDECARS_ONLY_NO_BOOTSTRAP_CHECKPOINT_REPAIR_BUSINESS_WRITES",
+        "PASS_EXECUTION_TRUTH_OWNER_AND_TYPED_GAPS",
+        "F04_RISK_DRAIN_CLASSIFICATION_CAN_BE_WRONG_DESPITE_FRESH_READ",
+        "CURRENT_POLICY_IS_NOT_HISTORICAL_ADMISSION_OR_SCIENTIFIC_PIT_EVIDENCE",
+        "WRITABLE_INJECTION_RETAINS_EXISTING_SEMANTICS_NOT_COVERED_BY_READONLY_SNAPSHOT_CLAIM"
+      ]
+    }
+  ],
+  "remediation_history": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "A4-ARCH-01 shared application reader could close another public HTTP request snapshot; request-thread ownership and bounded overlap proof resolve it. INV-11 aligned with snapshot and owner-approved sidecars.",
+      "observed_head": "6f0fa0dbf8bbbc36f7b51fd968a7cd719c3169d8",
+      "resolved_by_head": "fa58d409dccb8b4cffdcb024fb120f6b0a56bd30"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MINOR",
+      "finding": "Residual F04 owner meaning was opaque; readout now explains inconsistent risk/settlement/drain classification preserved outside A4.",
+      "observed_head": "6f0fa0dbf8bbbc36f7b51fd968a7cd719c3169d8",
+      "resolved_by_head": "fa58d409dccb8b4cffdcb024fb120f6b0a56bd30"
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "MODEL_DIVERSITY_UNPROVEN",
+    "NO_ALPHA_OR_SCIENTIFIC_ACCEPTANCE",
+    "NO_MERGE_OR_DEPLOY",
+    "F01_F03_F04_REMAIN_OPEN",
+    "REVIEW_SCOPE_EXCLUDES_THREE_DELIVERY_RECEIPT_BYTES"
+  ]
 }
