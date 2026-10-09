@@ -405,8 +405,15 @@ def build_forge_input_receipt(
         owner_class = OWNER_CLASS_OBSERVABILITY_BLOCKED
     vision_integrity = vision.get("vision_integrity") or {}
     if str(vision_integrity.get("status") or "") != "PASS":
-        blocking.append(FORGE_VISION_INTEGRITY_BLOCKED)
-        owner_class = OWNER_CLASS_OBSERVABILITY_BLOCKED
+        if vision.get("reason_code") == "MARKET_EVIDENCE_BASIS_INCOMPLETE":
+            # Packet projection is blocked by admission, rather than by a
+            # second independent vision failure. Retain the actionable cause.
+            blocking.append("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+            if owner_class == OWNER_CLASS_READY:
+                owner_class = OWNER_CLASS_INPUT_NOT_READY
+        else:
+            blocking.append(FORGE_VISION_INTEGRITY_BLOCKED)
+            owner_class = OWNER_CLASS_OBSERVABILITY_BLOCKED
 
     if collection == EPISODE_COLLECTION:
         # Support is decided per population/anchor/scope, never by "a contract file exists".

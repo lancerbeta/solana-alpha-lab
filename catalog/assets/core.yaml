@@ -38379,7 +38379,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_INPUT_TRUTH_AND_VISIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/forge_input_receipt.py', repository_path: src/solana_alpha_lab/factory/forge_input_receipt.py}
-  integrity: {kind: sha256, sha256: fe9ece95eb693452e4a30d2f486b7021e87e355d305334a7da2a2f0d9799b86a}
+  integrity: {kind: sha256, sha256: 5434e06ed9ba9dd4a04adb9f7ef4004752a50d9fb027bd37d26dec949d337b37}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001}
