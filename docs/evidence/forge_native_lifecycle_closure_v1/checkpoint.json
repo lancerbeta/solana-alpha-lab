@@ -90,7 +90,7 @@
   },
   "unresolved_seams": [
     "Discovery execute accepted empty authored scope before one scientific charge; persistence later refuses meaning attached only after values.",
-    "Frozen primary includes unscoped legacy quote history; public Critic treats UNKNOWN_SCOPE_NEEDS_RESOLUTION as no PASS while runtime archive safety allows unrelated incomplete history. Resolve semantics through existing owner, never invent missing axes or silently erase history."
+    "Frozen primary includes legacy quote history of unresolved applicability; public Critic treats UNKNOWN_SCOPE_NEEDS_RESOLUTION as no PASS while runtime archive safety permits this incomplete prior without demonstrating SCOPE_DISTINCT. Resolve semantics through existing owner, never invent missing axes or silently erase history."
   ],
   "exposure_limitations": [
     "Native logical contexts isolated; OS sandbox/model diversity UNPROVEN.",
@@ -160,11 +160,72 @@
       }
     }
   },
-  "next_action": "Owner approves one local replan of the same task: complete authored-scope validation before MAIN plus reconcile incomplete unrelated historical prior interpretation, then explicitly authorize one fresh final primary/transfer pair on a committed implementation snapshot. No new looks before that budget change.",
-  "engineering_review": "PENDING_INDEPENDENT_REQUIRED_ROLES",
+  "next_action": "Owner approves one local replan of the same task: complete authored-scope validation before MAIN plus reconcile incomplete historical prior applicability, then explicitly authorize one fresh final primary/transfer pair on a committed implementation snapshot. No new looks before that budget change.",
+  "engineering_review": {
+    "wave1": {
+      "code": "NOT_READY_WITH2_P2",
+      "architecture": "NOT_READY_WITH_MALFORMED_MODE_AND_PRIOR_APPLICABILITY",
+      "goal_dod": "FAIL_FULL_DOD",
+      "owner_ux": "NOT_READY_WITH3_GUIDANCE_GAPS"
+    },
+    "wave2": "PENDING_BOUNDED_FIX_READBACK",
+    "merge_ready": false
+  },
   "readout": "docs/evidence/forge_native_lifecycle_closure_v1/READOUT.md",
   "completion_evidence": "NOT_CREATED_FAILED_DOD",
   "merge_readiness": "NOT_REQUESTED_FAILED_DOD",
   "owner_phrase": null,
-  "method_correction_after_native": "Skill distinguishes ordinary saved MAIN mode from mode absent in preflight; no native proof claimed for that corrected entry method."
+  "method_correction_after_native": "Skill distinguishes ordinary saved MAIN mode from mode absent in preflight; no native proof claimed for that corrected entry method.",
+  "post_native_review_repairs": [
+    "Explicit malformed evidence mode now refuses; omitted mode remains the ordinary default.",
+    "Regression covers actual ordinary ingress with no published mode; legacy explicit labels retained, conditional verified-mode conflict documented.",
+    "Capture timeout preserves partial output and identity; logical side effect UNKNOWN until public saved-state readback.",
+    "Unrelated historical prior attribution removed; applicability remains unresolved."
+  ],
+  "review_repair_native_status": "NOT_REEXECUTED_NATIVE_BUDGET_EXHAUSTED_ORIGINAL_EPOCH_PROOF_RETAINED",
+  "ordinary_resume_hint_limitation": "Saved transfer forge-run readout recommends AUTHORIZE_ADDITIONAL_LOOKS in PAUSED_CAP. This generic operation hint does not authorize new look: task MAIN<=1 per question and Generator4/4 stop; fix binding/replan before any explicit new final-pair authority.",
+  "next_model_effort": "SOL_XHIGH",
+  "original_export_validation": {
+    "status": "PASS",
+    "lossless_originals": 216,
+    "local_only_hashes": 31,
+    "bundles": 6,
+    "original_files_changed": 0,
+    "machine_path_export": false,
+    "native_input_mutation": false
+  },
+  "readback": {
+    "local_alias_owner": "artifact://local-locators.json",
+    "command": "powershell -NoProfile -File \"<ARTIFACT_HOME>/readback-primary.ps1\"",
+    "portable_template": "tests/fixtures/forge_native_lifecycle_closure_v1/readback-primary.ps1",
+    "expected": "SYNTHESIS_COMPLETE/KILL_UNBOUND_EVIDENCE; MAIN1/PREVIEW0/ADAPTIVE0",
+    "allowed_effect": "READ_ONLY_EXACT_SNAPSHOT_AND_SAVED_SESSION"
+  },
+  "semantic_quality_independent_goal_review": {
+    "reviewed_head": "a2e2d3b932ece77878a132083dc513763dc286fd",
+    "primary": {
+      "Q1": "PASS_BOUNDED_DESCRIPTION",
+      "Q2": "PASS",
+      "Q3": "PASS_OWN_QUESTION_BINDINGS",
+      "Q4": "PASS_OWNER_ENGINEERING_RUBRIC"
+    },
+    "transfer": {
+      "Q1": "PASS_LIMITED_SOURCE_RESULT_SCOPE",
+      "Q2": "PASS",
+      "Q3": "FAIL_EMPTY_MAIN_AUTHORED_SCOPE",
+      "Q4": "PASS_OWNER_ENGINEERING_RUBRIC"
+    },
+    "native_closure_acceptance": "0/2",
+    "scientific_power_causal_control": "Not added as engineering DoD; no scientific advancement claimed.",
+    "verification_axes": {
+      "V1": "PRIMARY_PASS_TRANSFER_PARTIAL",
+      "V2": "FAIL",
+      "V3": "BLOCKED",
+      "V4": "PASS_TECHNICAL_PRIMARY_ONLY",
+      "V5": "PARTIAL_SCOPED_NEGATIVE_EVIDENCE_AND_PRIOR_EPOCH_REUSE",
+      "V6": "PARTIAL_SCOPED_PIT_LIST_BUDGET_EVIDENCE",
+      "V7": "PRIMARY_TECHNICAL_PASS_TRANSFER_BLOCKED"
+    },
+    "full_dod": "FAIL"
+  }
 }

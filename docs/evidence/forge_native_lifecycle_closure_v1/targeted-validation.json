@@ -30,5 +30,16 @@
     "status": "PASS",
     "wall_seconds": 1.323
   },
-  "candidate_ci": "NOT_RUN_AT_BUDGET_CHECKPOINT"
+  "candidate_ci": "NOT_RUN_AT_BUDGET_CHECKPOINT",
+  "post_native_review_delta": {
+    "status": "PASS",
+    "checks": 6,
+    "groups": [
+      "5 mode/descriptor tests including7 explicit malformed-mode subcases and actual ordinary ingress",
+      "1 actual capture-script timeout regression, partial bytes and reserved invocation name"
+    ],
+    "wall_seconds": 0.635,
+    "native_reexecution": false,
+    "initial_red": "Explicit None reproduced default-to-known bug; test context nesting corrected after first expected failure before all7 subcases were checked."
+  }
 }

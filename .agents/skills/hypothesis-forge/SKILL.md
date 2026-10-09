@@ -55,8 +55,10 @@ their original versions and completeness meanings.
 Use `evidence_surface_mode` from verified preflight when that route publishes
 it. Ordinary discovery publishes its bound mode in the saved MAIN
 `candidate_scope`; copy that mode, never infer it from a population name or Y.
-The bound owner fills an omitted ordinary route label; an explicit contradictory
-supplied value refuses. Declare the already-authored `estimand` and
+The bound owner fills an omitted ordinary route label; an explicit malformed
+value refuses. Conflict refuses where verified ingress publishes the
+authoritative mode; ordinary preflight has no such published mode and retains
+legacy explicit labels. This repair grants no control-route authority. Declare the already-authored `estimand` and
 `explanatory_condition` in MAIN `--candidate-scope` before values. Missing
 authorial intent is unavailable and cannot be repaired from the result.
 

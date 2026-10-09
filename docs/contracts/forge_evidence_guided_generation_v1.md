@@ -102,10 +102,31 @@ Changing code, prompt or process does not refund exposure or mint a new slot.
 For ordinary discovery, the saved look publishes `candidate_scope.evidence_surface_mode`.
 The ordinary scope owner fills an omitted route label with its existing
 `ORDINARY_GROUNDED_DISCOVERY_V1`; copy that emitted binding before persist.
-An explicitly conflicting supplied mode remains `LOOK_SCOPE_CONTRADICTION`. Population is not a substitute for mode.
+An explicit malformed mode refuses. `LOOK_SCOPE_CONTRADICTION` enforces an
+authoritative mode only where verified ingress publishes it; ordinary preflight
+does not publish mode and retains legacy explicit labels. Population is not a
+substitute for mode, and this repair grants no control-route authority.
 No guessed hashes, new cycle, parent link or representation fields are needed
 for an ordinary BASE request. Legacy, additional-cycle and representation
 routes retain their existing stricter contracts.
+
+Before MAIN, write the already-authored meaning into the file supplied via
+`discovery-execute --candidate-scope scope.json`. At minimum its authorial fields
+are `estimand` and `explanatory_condition`; population, decision and target must
+agree with the canonical query. Example shape (placeholders, no scientific grant):
+
+```json
+{
+  "estimand": "<fixed comparison authored before values>",
+  "explanatory_condition": "<fixed observable condition authored before values>"
+}
+```
+
+The operation spec alone does not supply these authored meanings. Copying them
+only into a card after MAIN does not bind that saved look; an existing empty-scope
+look stays blocked. Do not retrofit the stored MAIN or consume another look.
+Runtime pre-charge completeness validation remains the named local replan;
+this documentation correction is not evidence that the current writer enforces it.
 
 For a selected candidate bound to a saved look, use the public
 `candidate_authoring_contract.saved_look_bindings` source map. Paths are relative

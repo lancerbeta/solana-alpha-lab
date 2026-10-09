@@ -34680,7 +34680,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: 9c042329480c43b63650fbd1304f256af48ed74c06640938f1e0632f6ea48e5a}
+  integrity: {kind: sha256, sha256: cb3e04f04d59960c908a2d416ba21b87d6616c89c8a4d3753a7ba129c54b5329}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-NATIVE-LIFECYCLE-CLOSURE-001}
@@ -40579,7 +40579,7 @@ records:
   as_of: '2026-10-09'
   truth_owner: FORGE_EVIDENCE_GUIDED_GENERATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/forge_evidence_guided_generation_v1.md', repository_path: docs/contracts/forge_evidence_guided_generation_v1.md}
-  integrity: {kind: sha256, sha256: 81da5c595a2ed531f47328aff8645b3facb54faf82392564f5bc0c4e0cc51c39}
+  integrity: {kind: sha256, sha256: 270ce2c9be10c5a03cadcefb406eac8043b66d8708c80538ff5298d621a8f2a1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -40868,7 +40868,7 @@ records:
     repository_path: docs/tasks/FORGE_NATIVE_LIFECYCLE_CLOSURE_V1.md
   integrity:
     kind: sha256
-    sha256: aa3b59a621ad0b2209df69c9de043c0054622fc7f8148e22f0090bcc9b792a76
+    sha256: 8fb30d9d5f4a2c5ed21948648cd8a3adc6a9e21b50bdf02e4577da2e901074d3
   access:
     mode: read_only
     method: file
@@ -40907,7 +40907,7 @@ records:
     repository_path: docs/contracts/forge_native_lifecycle_closure_v1.md
   integrity:
     kind: sha256
-    sha256: 4431ae40cd266f92acd01738f763a4d02358f9d40fdcf9091d4b838daf95ce7e
+    sha256: 643e251cb01fc06511fb8cd93c717c8b50b3cbdf4e47865117a7913d814b7931
   access:
     mode: read_only
     method: file
@@ -40946,7 +40946,7 @@ records:
     repository_path: tests/test_forge_native_lifecycle_closure_v1.py
   integrity:
     kind: sha256
-    sha256: 1d79ad3cd8530e81cf18e685f4e166a16910e7c103365f3ade60f04ef6b7eb1c
+    sha256: 69c2b74a5c8d4ac3e2355aff7bc99c8169c371440b5895827be678d08d89b4c4
   access:
     mode: read_only
     method: file
@@ -40985,7 +40985,7 @@ records:
     repository_path: docs/evidence/forge_native_lifecycle_closure_v1/checkpoint.json
   integrity:
     kind: sha256
-    sha256: 4945042274394444b2356672cf50a0df0268ac7ca0e602d700ee259039590622
+    sha256: 0f2d4bc8a23a70e586b94c20353f133cb7c8a3ed179cfa26fc7722fa86c92811
   access:
     mode: read_only
     method: file
@@ -41024,7 +41024,7 @@ records:
     repository_path: docs/evidence/forge_native_lifecycle_closure_v1/READOUT.md
   integrity:
     kind: sha256
-    sha256: 03696e0947a1f481eb30fb956e0dc63d70234ba43f050a71ddebb23c6d2546a7
+    sha256: 740cd42f194ef7eeeb63979c748966249d507238ef8cc7e9fb8682bd19e73305
   access:
     mode: read_only
     method: file

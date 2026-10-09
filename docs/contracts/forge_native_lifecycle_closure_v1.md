@@ -11,6 +11,24 @@ This is a narrow implementation/verification contract, not a scientific grant.
 -> independent Critic -> finalize [existing classify/revise if required]
 -> durable terminal -> fresh-process show-session`.
 
+Before MAIN, write the already-authored meaning into the file supplied via
+`discovery-execute --candidate-scope scope.json`. At minimum its authorial fields
+are `estimand` and `explanatory_condition`; population, decision and target must
+agree with the canonical query. Example shape (placeholders, no scientific grant):
+
+```json
+{
+  "estimand": "<fixed comparison authored before values>",
+  "explanatory_condition": "<fixed observable condition authored before values>"
+}
+```
+
+The operation spec alone does not supply these authored meanings. Copying them
+only into a card after MAIN does not bind that saved look; an existing empty-scope
+look stays blocked. Do not retrofit the stored MAIN or consume another look.
+Runtime pre-charge completeness validation remains the named local replan;
+this documentation correction is not evidence that the current writer enforces it.
+
 `discovery-execute.candidate_scope` carries the exact population, decision,
 machine target, authored estimand/condition, evidence mode and optional scope
 hash/representation. `descriptive_readout.scientific_identity` carries available

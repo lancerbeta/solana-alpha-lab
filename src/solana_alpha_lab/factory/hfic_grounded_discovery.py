@@ -1303,6 +1303,13 @@ def scope_bound_to_spec(
 
     validated = validate_query_spec(spec)
     declared = candidate_scope if isinstance(candidate_scope, Mapping) else {}
+    # Omission has a route default; an explicit malformed label remains invalid.
+    if "evidence_surface_mode" in declared and not _axis_text(declared["evidence_surface_mode"]):
+        raise GroundedDiscoveryError("CANDIDATE_SCOPE_FIELDS_REQUIRED", {
+            "missing_top_level": ["evidence_surface_mode"],
+            "scientific_result_created": False,
+            "next_action": "CORRECT_DECLARED_FIELD_PLACEMENT_REUSE_SAVED_LOOK",
+        })
     spec_population = _axis_text(validated.get("population"))
     declared_population = _axis_text(declared.get("population"))
     if declared_population and declared_population != spec_population:

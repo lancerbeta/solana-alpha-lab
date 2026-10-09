@@ -58,7 +58,9 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
     - docs/contracts/forge_native_lifecycle_closure_v1.md
     DELIVERY_EVIDENCE:
-    - docs/evidence/forge_native_lifecycle_closure_v1/dependency-postmerge.json
+    - docs/evidence/forge_native_lifecycle_closure_v1/checkpoint.json
+    - docs/evidence/forge_native_lifecycle_closure_v1/READOUT.md
+    - docs/evidence/forge_native_lifecycle_closure_v1/recovery-proof.json
     HISTORICAL_CONTEXT: []
 ---
 
@@ -159,9 +161,14 @@ or owner phrase. Exact evidence/checkpoint/READOUT is the sole continuation
 owner; existing code commits are a partial repair, not two closed lifecycles.
 
 One recommended local replan of this same task: validate authored scientific
-scope before MAIN and reconcile incomplete unrelated prior interpretation in
+scope before MAIN and reconcile incomplete historical prior applicability in
 existing owners, then obtain an explicit budget change for one fresh final
 primary/transfer pair. Preserve the four failed attempts and their charges.
 No new runtime mechanism is silently implemented at this stop. Current skill
 corrects preflight-mode source guidance after observed ordinary mode absence;
 this method correction is not claimed as native-proven by the original epoch.
+
+Risk-review local repairs after native stop do not grant another epoch trial:
+explicit malformed mode typed refusal, actual ordinary ingress oracle, timeout
+partial capture and unresolved historical applicability. Their targeted checks
+are engineering evidence only; original native identities remain unchanged.
