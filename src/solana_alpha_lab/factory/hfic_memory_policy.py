@@ -136,8 +136,11 @@ def session_memory_eligibility(item: Mapping[str, Any] | None) -> str:
     return GENESIS_MEMORY_ELIGIBILITY_SHA256
 
 
-def load_policy_records(store: Any) -> list[dict[str, Any]]:
-    found: list[tuple[int, str, dict[str, Any]]] = []
+def load_policy_records(
+    store: Any, *, as_of: str | datetime | None = None,
+) -> list[dict[str, Any]]:
+    cutoff = research_memory_cutoff(as_of)
+    found: list[tuple[int, str, dict[str, Any], Any]] = []
     seen_seq: dict[int, str] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
@@ -153,14 +156,16 @@ def load_policy_records(store: Any) -> list[dict[str, Any]]:
         if previous is not None and previous != sha:
             raise HficMemoryPolicyError("HFIC_MEMORY_POLICY_FORK")
         seen_seq[seq] = sha
-        found.append((seq, str(getattr(record, "record_id", "") or ""), body))
+        found.append((seq, str(getattr(record, "record_id", "") or ""), body, record))
     found.sort(key=lambda item: (item[0], item[1]))
     if not found:
         return []
     expected_previous = GENESIS_POLICY_SHA256
     expected_seq = 1
     chain: list[dict[str, Any]] = []
-    for seq, _record_id, body in found:
+    visible_chain: list[dict[str, Any]] = []
+    invisible_predecessor = False
+    for seq, _record_id, body, record in found:
         if seq != expected_seq:
             raise HficMemoryPolicyError("HFIC_MEMORY_POLICY_INVALID")
         if str(body.get("previous_policy_sha256") or "") != expected_previous:
@@ -174,9 +179,17 @@ def load_policy_records(store: Any) -> list[dict[str, Any]]:
         if expected != str(body.get("memory_eligibility_sha256") or ""):
             raise HficMemoryPolicyError("HFIC_MEMORY_POLICY_INVALID")
         chain.append(body)
+        if cutoff is not None:
+            visible = research_record_visible_as_of(record, cutoff)
+            if visible and invisible_predecessor:
+                raise HficMemoryPolicyError("HFIC_MEMORY_POLICY_PIT_CHAIN_INVALID")
+            if visible:
+                visible_chain.append(body)
+            else:
+                invisible_predecessor = True
         expected_previous = str(body["policy_sha256"])
         expected_seq += 1
-    return chain
+    return visible_chain if cutoff is not None else chain
 
 
 def genesis_policy_head() -> dict[str, Any]:
@@ -203,17 +216,21 @@ def genesis_policy_head() -> dict[str, Any]:
     }
 
 
-def effective_policy(store: Any | None) -> dict[str, Any]:
+def effective_policy(
+    store: Any | None, *, as_of: str | datetime | None = None,
+) -> dict[str, Any]:
     if store is None:
         return genesis_policy_head()
-    chain = load_policy_records(store)
+    chain = load_policy_records(store, as_of=as_of)
     if not chain:
         return genesis_policy_head()
     return dict(chain[-1])
 
 
-def quarantined_session_ids(store: Any | None) -> list[str]:
-    return list(effective_policy(store).get("quarantined_session_ids") or [])
+def quarantined_session_ids(
+    store: Any | None, *, as_of: str | datetime | None = None,
+) -> list[str]:
+    return list(effective_policy(store, as_of=as_of).get("quarantined_session_ids") or [])
 
 
 def hypothesis_search_eligible(
@@ -260,7 +277,7 @@ def iter_search_memory_hypothesis_payloads(
     if store is None:
         return []
     cutoff = research_memory_cutoff(as_of)
-    blocked = set(quarantined_session_ids(store))
+    blocked = set(quarantined_session_ids(store, as_of=cutoff))
     grouped: dict[str, dict[str, tuple[ResearchEvent, dict[str, Any]]]] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)

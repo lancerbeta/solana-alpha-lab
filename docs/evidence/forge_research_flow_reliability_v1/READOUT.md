@@ -1,8 +1,8 @@
 # FORGE_RESEARCH_FLOW_RELIABILITY_V1 — evidence index
 
-Закрыты transport, routing, recovery и стоимость ordinary OPPORTUNITY_EPISODES. Native: сохранённый KILL_LOW_INFORMATION_VALUE → NON_SCIENTIFIC_STOP; SCRIPTED_CRITIC_MECHANICAL проходит classify/final/Runner/replay. Ни alpha, OOS, ни live readiness.
+Закрыты transport, routing, recovery и стоимость ordinary OPPORTUNITY_EPISODES. Native KILL → NON_SCIENTIFIC_STOP; scripted positive проходит classify/final/Runner/replay. Без alpha/OOS/live claims.
 
-BASE: 44eda5d72dccd569e9766a74046ce8b2ec47f417; native producer: cc7836aa79f5e5535dc51d02115b0f301a09179d; design ancestor: fd00836ea6066b2c47216e89b0187d1a096f8643. Позднее менялся лишь CI timeout; native bytes неизменны.
+BASE: 44eda5d72dccd569e9766a74046ce8b2ec47f417; native producer: cc7836aa79f5e5535dc51d02115b0f301a09179d. Original bytes неизменны.
 
 ## Результат D01–D18
 
@@ -53,9 +53,9 @@ Predeclared T.TABLE/LITERAL_ORACLE: N8 observed7/missing1; listA 4/3/1, mean .10
 
 resource-proof.json: cold40 median3.7985704→.1220622s (31.12x), 400 median38.7618921→.8603608s (45.05x); 12 result/state/counter hashes equal. Physical -98.04%, logical51calls unchanged; three samples/arm; writer invalidates snapshot.
 
-failure-proof.json: BASE, C01–C12 и UX falsifiers RED→GREEN. Busy retry only WRITER_BUSY,40×50ms; integrity refuses. Old race site UNKNOWN. Historical44eda5d/22 pins byte-bound; drift/loss/unavailable Git DENY.
+failure-proof.json: BASE, C01–C13 и UX falsifiers RED→GREEN. Busy retry only WRITER_BUSY,40×50ms; integrity refuses. Old race site UNKNOWN. Historical44eda5d/22 pins byte-bound; drift/loss/unavailable Git DENY.
 
-D10: candidate/definition stable; session rows append-only. Writer checks HYP lineage before publish; identical non-HYP rebuild. Capped prior ranks availability-known ancestry without future state. Compact Forge/Critic uses bound preflight session_started_at for HYP/DEC/scope, distinct from market research_memory_as_of. Python as-of requires availability AND effective time; SQL views are current. Old/new raw outcomes survive; synthetic proof.
+D10: candidate/definition stable; session rows append-only. Writer checks HYP lineage before publish; identical non-HYP rebuild. Capped prior ranks known ancestry without future state. Forge/Critic use bound session_started_at for HYP/DEC/scope/quarantine, requiring effective and available time. Market research_memory_as_of is separate; SQL views are current. Old/new raw outcomes survive.
 
 ## Ограничения и delivery
 

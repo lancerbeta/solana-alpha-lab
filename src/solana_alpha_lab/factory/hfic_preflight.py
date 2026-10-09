@@ -3012,6 +3012,12 @@ def run_preflight(
         proof=proof,
         selection_caveat=None,
     )
+    # The search key and the prior packet must use the same policy at the
+    # captured session time. A future-effective policy may be committed already.
+    from solana_alpha_lab.factory.hfic_memory_policy import effective_policy as memory_policy_at
+
+    if memory_policy_at(store, as_of=session_started)["policy_sha256"] != ident["policy_head"]["policy_sha256"]:
+        raise HficPreflightError("HFIC_MEMORY_POLICY_PIT_MISMATCH")
 
     # A legacy combined epoch is search continuity only. Incomplete market
     # cannot mint START_NEW_SESSION. Exact readback of an already-admitted

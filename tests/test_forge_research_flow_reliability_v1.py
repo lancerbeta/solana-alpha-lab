@@ -413,6 +413,44 @@ class SessionHistoryTests(unittest.TestCase):
                     self.assertEqual(ranked[0]['reason_code'],reason)
                     self.assertEqual(query_hypotheses(projection,as_of)[-1]['session_id'],session)
 
+    def test_later_quarantine_cannot_retroactively_remove_cutoff_memory(self):
+        import tempfile
+        from datetime import timedelta
+        from tests.test_research_store import event_fixture, NOW
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        from solana_alpha_lab.factory.run_passport import canonical_sha256
+        from solana_alpha_lab.factory.hfic_memory_policy import (
+            GENESIS_POLICY_SHA256, POLICY_ARTIFACT_KIND,
+            genesis_policy_head, iter_search_memory_hypothesis_payloads,
+            memory_eligibility_sha256,
+        )
+        from solana_alpha_lab.factory.hfic_prior_memory import build_prior_memory_snapshot
+        for delayed_axis in ('effective_at','first_reliable_available_at'):
+          with self.subTest(delayed_axis=delayed_axis), tempfile.TemporaryDirectory() as temporary:
+            store=ResearchStore(Path(temporary))
+            payload={'hypothesis_version_id':'HYP-POLICY-PIT','session_id':'SESS-POLICY-PIT','hfic_protocol':'HFIC-V1','definition_sha256':'a'*64}
+            hyp=event_fixture(record_id='HYP-POLICY-PIT',record_kind='HYPOTHESIS_VERSION',transaction_id='RESEARCH-TXN-HYP-POLICY-PIT',payload=payload).model_copy(update={'run_id':None,'hypothesis_version_id':'HYP-POLICY-PIT'})
+            store.append([hyp],transaction_id=hyp.transaction_id)
+            later=NOW+timedelta(seconds=4)
+            unsigned={
+                'schema':'smial.hfic-search-memory-policy','schema_version':'1.0',
+                'policy_id':'HFIC-MEMPOL-0001','policy_sequence':1,
+                'previous_policy_sha256':GENESIS_POLICY_SHA256,
+                'quarantined_session_ids':['SESS-POLICY-PIT'],
+                'reason_code':'OWNER_CALIBRATION_RESET','created_at':later.isoformat(),
+                'producer_git_sha':'a'*40,
+                'memory_eligibility_sha256':memory_eligibility_sha256(['SESS-POLICY-PIT']),
+                'authority':genesis_policy_head()['authority'],
+                'non_claims':genesis_policy_head()['non_claims'],
+            }
+            policy={'research_artifact_id':'HFIC-MEMPOL-PIT','artifact_kind':POLICY_ARTIFACT_KIND,**unsigned,'policy_sha256':canonical_sha256(unsigned)}
+            row=event_fixture(record_id='HFIC-MEMPOL-PIT',record_kind='RESEARCH_ARTIFACT',transaction_id='RESEARCH-TXN-HFIC-MEMPOL-PIT',payload=policy).model_copy(update={'run_id':None,'hypothesis_version_id':None,'effective_at':later if delayed_axis=='effective_at' else NOW+timedelta(seconds=1),'first_reliable_available_at':later,'created_at':later})
+            store.append([row],transaction_id=row.transaction_id)
+            cutoff=NOW+timedelta(seconds=2)
+            self.assertEqual([item['session_id'] for item in iter_search_memory_hypothesis_payloads(store,as_of=cutoff)],['SESS-POLICY-PIT'])
+            self.assertEqual(build_prior_memory_snapshot(store,store_inventory_digest=store.diagnostics().committed_inventory_sha256,repo_root=ROOT,as_of=cutoff)['emitted_count'],1)
+            self.assertEqual(iter_search_memory_hypothesis_payloads(store,as_of=later),[])
+
     def test_ambiguous_hypothesis_memory_history_refuses_compaction(self):
         from types import SimpleNamespace
         from tests.test_research_store import event_fixture
