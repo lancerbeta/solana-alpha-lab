@@ -27,7 +27,7 @@ T = tests/test_forge_research_flow_reliability_v1.py; прочие cases — в 
 | D15 | PASS | Missing context: SHA/relative locator + RESTORE_EXACT_SAVED_CONTEXT_DEPENDENCY, exit2/no writes. Exact prior null session blocks show-session; typed close names scope/receipt. Native 7lines retain gaps. |
 | D16 | PASS | Projector/policy/operation/prior/outcome mutations alter capability only; market/inventory/counters unchanged. |
 | D17 | PASS | Verified 40/400 roots, three samples, identical result SHA; physical verify 2040→40 and 20400→400. Writer invalidates snapshot. |
-| D18 | PASS | One bounded change and compact native evidence; four reviews and exact-head gates remain. |
+| D18 | BLOCKED | Content and compact evidence ready; four reviews, one PR and exact-head CI are live gates. Their final IDs/verdict belong in the PR description. |
 
 ## Native: неизменённый original input/output
 

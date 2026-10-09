@@ -4,7 +4,7 @@
   "as_of": "2026-10-08",
   "task_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1",
   "acceptance_id": "FORGE_RESEARCH_FLOW_RELIABILITY_V1-COMPLETION",
-  "state_change": "ORDINARY_FLOW_ENGINEERING_D01_D18_NATIVE_SOURCE_KILL_MECHANICAL_POSITIVE_RECOVERY_BOUNDED_READS",
+  "state_change": "ORDINARY_FLOW_ENGINEERING_D01_D17_D18_CONTENT_PENDING_LIVE_GATES",
   "implementation_bindings": {},
   "active_stop_conditions": [],
   "owner_attention_triggers": {
