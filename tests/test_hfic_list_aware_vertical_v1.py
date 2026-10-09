@@ -392,7 +392,12 @@ class ListAwareVerticalTests(unittest.TestCase):
         draft_doc.pop("runner_up_candidate_ref", None)
         draft_doc.pop("strongest_rejected_alternative", None)
         draft_doc["selected_candidate_ref"] = card["label"]
-        draft_doc["grounded_evidence"] = evidence
+        # The lifecycle receives the computed look, not the test's helper
+        # copies of the complete preflight and command bookkeeping.
+        draft_doc["grounded_evidence"] = {
+            key: value for key, value in evidence.items()
+            if key not in {"_preflight", "_scope", "_exit_code"}
+        }
         draft_path, receipt_path = self.work / "lc-draft.json", self.work / "lc-receipt.json"
         draft_path.write_text(json.dumps(draft_doc), encoding="utf-8")
         receipt_path.write_text(json.dumps(fresh), encoding="utf-8")

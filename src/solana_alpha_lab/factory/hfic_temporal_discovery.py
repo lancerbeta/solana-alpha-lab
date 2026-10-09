@@ -3991,6 +3991,68 @@ def universe_population_counts(
     }
 
 
+def build_episode_feature_preview(census, observations, body, binding, *,
+                                  scope=None, universe_policy=None,
+                                  prior_preview_hashes=(), preview_total=MAX_PREVIEW_SPECS,
+                                  seed: str):
+    """Reuse the admitted episode projector in prefix-only mode, never a target."""
+    require_episode_binding_rows(binding)
+    if scope is not None:
+        _bind_scope_to_body(scope, body, census)
+    prefix = {k: v for k, v in body.items() if k not in {"target", "entry_model", "cost_profile", "evaluation"}}
+    prefix["predicates"] = []
+    recipe = {"population": EPISODE_POPULATION, "decision_point": body["decision_point"],
+              "features": body["features"], "time_contract": body["time_contract"],
+              "observation_clock_policy": body["observation_clock_policy"]}
+    for key in ("research_scope", "list_condition"):
+        if key in body:
+            recipe[key] = body[key]
+    frozen = temporal_frozen_input(binding)
+    from solana_alpha_lab.factory.hfic_research_universe_policy import snapshot
+    policy = snapshot(universe_policy) if universe_policy is not None else None
+    identity = _sha256({"recipe": recipe, "seed": seed, "input": frozen, "policy": policy})
+    if identity not in prior_preview_hashes and len(set(prior_preview_hashes)) >= preview_total:
+        raise GroundedDiscoveryError("PREVIEW_ENVELOPE_EXHAUSTED")
+    members, _cohorts, _seen, duplicates, conflicts, mints = _project_episode_members(
+        census, observations, prefix, binding, universe_policy=universe_policy,
+        prefix_only=True, scope=scope)
+    eligible = [m for m in members if m.get("decision_eligible")]
+    joint = sum(all(m.get("feature_values", {}).get(f["name"]) is not None for f in body["features"]) for m in eligible)
+    features = {}
+    for feature in body["features"]:
+        name = feature["name"]
+        reasons = defaultdict(int)
+        for member in eligible:
+            if member.get("feature_values", {}).get(name) is None:
+                reasons[member.get("feature_reasons", {}).get(name) or "FEATURE_UNAVAILABLE"] += 1
+        unavailable = sum(reasons.values())
+        features[name] = {"calculable_n": len(eligible)-unavailable, "unavailable_n": unavailable,
+                          "reason_counts": dict(sorted(reasons.items()))}
+    examples = [{"anonymous_id": hashlib.sha256(f"{seed}:{m['identity']}".encode()).hexdigest()[:16],
+                 "feature_values": m["feature_values"],
+                 "feature_status": {f["name"]: m.get("feature_reasons", {}).get(f["name"], "OBSERVED") for f in body["features"]}}
+                for m in eligible]
+    examples.sort(key=lambda item: item["anonymous_id"])
+    payload = {"schema": "smial.hfic-temporal-preview", "schema_version": "1.0",
+               "population": EPISODE_POPULATION, "preview_sha256": identity,
+               "decision_point": body["decision_point"], "target_included": False,
+               "sampling_rule": "HASH_MEMBERSHIP_SEED", "selected_count": min(len(examples),PREVIEW_EXAMPLE_LIMIT),
+               "total_count": len(members), "sample_population_n": len(eligible),
+               "examples_truncated": len(examples)>PREVIEW_EXAMPLE_LIMIT, "silent_truncation": False,
+               "examples": examples[:PREVIEW_EXAMPLE_LIMIT], "feature_recipe": recipe,
+               "feature_recipe_sha256": _sha256(recipe), "frozen_input": frozen,
+               "input_sha256": _sha256({"input": frozen}), "universe_policy": policy,
+               "support_summary": {"grain": "UNIQUE_EPISODE_DECISION_TIMESTAMP",
+                   "denominator": "DECISION_ELIGIBLE", "counts_truncated": False,
+                   "pooled": {"admitted_n": len(members), "decision_eligible_n": len(eligible),
+                              "joint_calculable_n": joint, "joint_unavailable_n": len(eligible)-joint, "features": features},
+                   "unique_mint_n":len(set(mints.values())), "duplicate_delivery_count":duplicates,
+                   "membership_integrity_conflict_count":conflicts, "independence":"UNKNOWN"}}
+    if len(_canonical(payload).encode("utf-8")) > PREVIEW_BYTE_LIMIT:
+        raise GroundedDiscoveryError("PREVIEW_TOO_LARGE")
+    return payload
+
+
 def build_feature_preview(
     census: Sequence[Mapping[str, Any]],
     observations: Sequence[Mapping[str, Any]],
@@ -4277,6 +4339,44 @@ def episode_query_capabilities() -> dict[str, Any]:
         },
         "max_query_points": MAX_SCHEDULE_POINTS,
         "operators": recipe_capabilities(),
+        "current_scoped_query_version": TEMPORAL_SCHEMA_VERSION_EPISODES_SCOPED,
+        "query_authoring_contract": {
+            "owner": "hfic_temporal_discovery.validate_temporal_query",
+            "method_contract": "docs/contracts/forge_list_aware_research_scope_v1.md",
+            "required_envelope": {
+                "schema": TEMPORAL_SCHEMA,
+                "schema_version": TEMPORAL_SCHEMA_VERSION_EPISODES_SCOPED,
+                "query_id": "<AUTHOR_FIXED_QUESTION_ID>",
+                "population": EPISODE_POPULATION,
+                "anchor_kind": EPISODE_ANCHOR_KIND,
+                "time_contract": {"schedule_contract": SCHEDULE_CONTRACT, "time_feature_clock": EPISODE_TIME_FEATURE_CLOCK},
+                "search_tier": "COMPOUND_SCREEN", "budget_allocation": "COMPOUND_FIRST",
+                "decision": {"point_id": "<AUTHOR_DECISION_POINT>"},
+                "features": [], "all": [],
+                "target": {"kind": "PRICE_RELATIVE_PROXY", "reference_point": "<AUTHOR_REFERENCE_POINT>", "exit_point": "<AUTHOR_EXIT_POINT>", "field_id": PRICE},
+                "entry_model": {"kind": "LAST_AVAILABLE_MARK_WITH_HAIRCUT", "assumed_latency_seconds": 0},
+                "hypothesis_kind": "<NUMERIC_IN_SCOPE|LIST_CONTRAST|MIXED_LIST_NUMERIC>",
+                "research_scope": {},
+            },
+            "feature_node": {
+                "required": ["name", "op"],
+                "name": "Author-defined nonempty unique alias; not episode_id, cohort_id or mint.",
+                "operator_parameters": recipe_capabilities()["parameters"],
+                "parameters_rule": "Add exactly the supported operator parameters; field_id is the stable field ID, name is the alias used by all[].feature.",
+            },
+            "predicate_node": {
+                "feature": "Exact name of one declared feature node, not its field_id.",
+                "operators": sorted(COMPARISONS),
+                "scalar_shape": {"feature": "<AUTHOR_FEATURE_NAME>", "op": "<gt|gte|lt|lte>", "value": "<AUTHOR_FINITE_NUMBER>"},
+                "range_shape": {"feature": "<AUTHOR_FEATURE_NAME>", "op": "between", "lower": "<AUTHOR_FINITE_NUMBER>", "upper": "<AUTHOR_FINITE_NUMBER_GREATER_THAN_LOWER>", "closed": "left"},
+                "symbolic_comparators_supported": False,
+            },
+            "features_and_predicates": "Choose an observable prediction independently; templates are grammar, not a scientific recipe.",
+            "list_roles": "research_scope.universe_selector, top-level list_condition and top-level diagnostic_slices; use canonical list_ids from list_dimension_context and the existing method_contract.",
+            "resolve_first": "research-scope-resolve --spec <query.json>; consume canonical_query unchanged",
+            "scientific_permission": "EXISTING_OPERATION_ADMISSION_ONLY",
+            "template_is_executable": False,
+        },
         "rules": [
             "FEATURE_POINTS_LE_DECISION",
             "EXIT_AFTER_WORST_DECISION_CUTOFF",
