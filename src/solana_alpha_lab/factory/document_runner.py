@@ -472,6 +472,8 @@ class DocumentRunner(ExperimentRunner):
         if git_mutation_count:
             invalid_payload = {
                 "run_id": run_id,
+                "experiment_id": str(spec["experiment_id"]),
+                "experiment_spec_sha256": spec_sha256,
                 "run_key_sha256": lane.run_key_sha256,
                 "reason_code": "GIT_MUTATION_DETECTED",
                 "git_snapshot_before_sha256": git_before.composite_sha256,
@@ -585,6 +587,7 @@ class DocumentRunner(ExperimentRunner):
 
         passport_payload: dict[str, Any] = {
             "run_id": run_id,
+            "experiment_id": str(spec["experiment_id"]),
             "run_key_sha256": lane.run_key_sha256,
             "trial_id": (replay_lineage["existing_look_ref"] if replay_lineage is not None
                          else f"TRIAL-{run_id.removeprefix('RUN-')}"),
@@ -734,7 +737,12 @@ class DocumentRunner(ExperimentRunner):
                 run_id=run_id,
                 transaction_id=transaction_id,
                 effective_at=now,
-                payload={"run_id": run_id, "run_key_sha256": lane.run_key_sha256},
+                payload={
+                    "run_id": run_id,
+                    "run_key_sha256": lane.run_key_sha256,
+                    "experiment_id": str(spec["experiment_id"]),
+                    "experiment_spec_sha256": spec_sha256,
+                },
                 producer_capability_id=capability_id,
                 producer_git_sha=producer_git_sha,
             ),

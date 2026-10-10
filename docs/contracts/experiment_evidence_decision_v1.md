@@ -76,6 +76,33 @@ relation are `RELATED PRIOR MEMORY`. They must not strengthen this
 experiment. Filename, directory, date, prose or LLM similarity is
 `EVIDENCE_RELATION_GAP`, not a join.
 
+Native DocumentRunner events preserve validated `experiment_id` and canonical
+`experiment_spec_sha256` on RUN_STARTED, RUN_COMPLETED and applicable RUN_INVALID.
+Run key, trial charge, logical transaction and scientific look meanings do not
+change. The passport's existing additive-field policy preserves this identity.
+The canonical document hash excludes `what_changed`; the dossier's original
+`spec_sha256` remains the YAML byte hash used by existing decision bindings.
+
+A matching legacy RUN_COMPLETED may establish a DIRECT run by its validated
+passport and exact canonical spec hash (which includes experiment identity).
+Contradictory execution rows sharing a run key quarantine that key for this
+dossier, including weak scientific joins. Malformed legacy completion cannot
+borrow an otherwise valid RUN_STARTED seed. Every legacy terminal is checked
+before classification, not only when collecting direct IDs. Direct IDs are
+collected after quarantine. A TRIAL on a quarantined run or with conflicting
+experiment/spec identity quarantines its trial key and dependent weak joins.
+An unambiguously
+foreign experiment with a disjoint run is not an unresolved own execution.
+No backfill, latest-run selection or repeat scientific look is required.
+Explicit foreign/conflicting experiment or run identities, and an explicit
+execution hash for a different spec version, cannot fall back to weaker joins.
+Foreign decisions/trials may remain RELATED prior context, never current science.
+Unresolved execution is UNKNOWN with `execution_relation_gaps` and a safe source
+verification action; source absence is NO_RUN only in the checked absent scope.
+An unavailable reader is UNKNOWN. RUN_* fields still satisfy zero scientific
+obligations. Snapshot hashes include current canonical spec and relation gaps,
+so a decision from before a version/lineage change is stale.
+
 ## 4. Evidence obligations
 
 No quality score. Status vocabulary:
@@ -151,6 +178,16 @@ WRITE = UNAVAILABLE
 
 GET remains usable. GET must not mkdir, take a writer lease, append,
 rebuild a writable projection, or mutate Git/SQLite.
+
+Current OperationalStore/LifecycleProjection reads use SQLite `mode=ro` with
+`query_only`, including committed WAL while a writer stays open. A new read
+transaction sees a later commit; an already-open transaction may retain its
+stable snapshot. No GET checkpoint, writer-close requirement or immutable
+fallback is allowed. Source access failures remain typed unavailable diagnostics.
+GET changes no business records or durable DB/WAL state; SQLite SHM coordination
+is volatile and must be measured separately with the writer behind a barrier.
+Absent/unreadable sources must create no directories, database or sidecars.
+Protected source access must be tested under actual permissions/mounts.
 
 ## 7. Language
 

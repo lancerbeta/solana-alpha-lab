@@ -938,6 +938,45 @@ class EpisodeFlowTests(unittest.TestCase):
         frozen=self.cli('freeze','--draft',draft_path,'--preflight-receipt',self.write('resume.json',resume),'--format','json')
         return generated,frozen
 
+    def test_trust_closure_new_evidence_preserves_pending_reservation_and_safe_stop_recovery(self):
+        from tests import test_hfic_list_aware_vertical_v1 as lav
+        from tests.test_hfic_ordinary_operation_acceptance_v1 import _operation
+        from solana_alpha_lab.factory.hfic_ordinary_operation import (
+            record_operation, gate_before_values, journal_occupancy, get_operation,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        query=lav.draft('LIST_CONTRAST',list_condition={'clauses':[{'all_of':['A']}]})
+        resolved=self.cli('research-scope-resolve','--spec',self.write('pending-query.json',query))['canonical_query']
+        pre=self.preflight('FTC_PENDING_NEW_EVIDENCE')
+        request=_operation(resolved,focus=pre['owner_focus'],journal=pre['search_key_sha256'],
+            market=pre['market_evidence_epoch_sha256'],text='Synthetic pending reservation',
+            cap={'main':1,'adaptive':0,'preview':2},completion='LIMITED_RESULT')
+        store=ResearchStore(self.plane)
+        operation=record_operation(store,request)
+        digest=operation['operation_sha256']
+        reserved=gate_before_values(store,operation_sha256=digest,spec=resolved,
+            journal_scope=pre['search_key_sha256'],verified_market=pre['market_evidence_epoch_sha256'],
+            repo_root=ROOT,data_root=self.plane)
+        self.assertEqual(reserved['disposition'],'RESERVED')
+        before=journal_occupancy(store,pre['search_key_sha256'])
+        landed=lav._consume(self.packets[1:],source=self.source,mirror=self.work/'pending-mirror',plane=self.plane)
+        self.assertEqual(landed['_exit_code'],0,landed)
+        changed=self.preflight(pre['owner_focus'])
+        self.assertNotEqual(changed['market_evidence_epoch_sha256'],pre['market_evidence_epoch_sha256'])
+        status=self.cli('universe-policy-status','--format','json')
+        self.assertTrue(status['pending_operation'],status)
+        self.assertEqual(get_operation(ResearchStore(self.plane),digest)['status'],'OPEN')
+        self.assertEqual(journal_occupancy(ResearchStore(self.plane),pre['search_key_sha256']),before)
+        preview=self.cli('operation-stop-preview','--operation-sha256',digest,
+                         '--owner-request-text','Synthetic corpus changed before pending result landed')
+        self.assertEqual(preview['status'],'PROPOSED')
+        self.cli('operation-stop','--proposal',self.write('pending-stop.json',preview['proposal']),
+                 '--confirm-append-only')
+        after=self.cli('universe-policy-status','--format','json')
+        self.assertFalse(after['pending_operation'],after)
+        self.assertEqual(get_operation(ResearchStore(self.plane),digest)['status'],'STOPPED')
+        self.assertEqual(journal_occupancy(ResearchStore(self.plane),pre['search_key_sha256']),before)
+
     def test_primary_revision_projects_authored_aliases_and_keeps_same_look(self):
         from tests.test_hfic_cli import critic_result_from_packet_only
         from solana_alpha_lab.factory.hfic_ordinary_operation import journal_occupancy

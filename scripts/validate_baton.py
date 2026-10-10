@@ -695,7 +695,8 @@ def validate_cursor_and_templates() -> None:
         assert_check(f"precommit_jit_hook:{needle}", needle in hook)
     for needle in [
         "[switch]$PreCommit",
-        '"diff", "--cached", "--check"',
+        r".\scripts\precommit_diff_check.py",
+        'throw "STAGED_DIFF_CHECK_FAILED"',
         r".\scripts\secret_scan.py",
         r".\scripts\harness_sync.py",
         "--paths-from-staging",
@@ -704,6 +705,15 @@ def validate_cursor_and_templates() -> None:
         r".\scripts\validate_ci.py",
     ]:
         assert_check(f"precommit_jit_wrapper:{needle}", needle in wrapper)
+    diff_helper = (ROOT / "scripts/precommit_diff_check.py").read_text(encoding="utf-8")
+    for needle in [
+        '["diff", "--cached", "--check"]',
+        '"MERGE_HEAD"',
+        '"refs/remotes/origin/main"',
+        'incoming == upstream.stdout.strip()',
+        'return result.returncode',
+    ]:
+        assert_check(f"precommit_diff_helper:{needle}", needle in diff_helper)
     issue = yaml.safe_load(
         (ROOT / ".github/ISSUE_TEMPLATE/control-atom.yml").read_text(encoding="utf-8")
     )

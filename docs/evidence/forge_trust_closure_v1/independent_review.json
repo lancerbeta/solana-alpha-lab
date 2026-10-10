@@ -1,0 +1,129 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-TRUST-CLOSURE-REVIEW-001",
+  "as_of": "2026-10-10",
+  "task_id": "FORGE_TRUST_CLOSURE_V1",
+  "reviewed_bindings_sha256": "bade0c68268d10753fe3524978c52bea2a2e4eb7ecb012fe3c309d6cc55b43a6",
+  "reviewed_inventory_sha256": "e67aed110fbff97662be95654915371239c2f30bdd20d4b3de7d924a34ae66b6",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "reviewed_head=f6ae6bef86ae1c58bc631360e5fbdffbf514678f",
+        "reviewed_inventory_sha256=e67aed110fbff97662be95654915371239c2f30bdd20d4b3de7d924a34ae66b6",
+        "reviewed_bindings_sha256=bade0c68268d10753fe3524978c52bea2a2e4eb7ecb012fe3c309d6cc55b43a6",
+        "ISOLATED_READONLY_REVIEW_NOT_CONFINED_ACTOR_EVIDENCE",
+        "PRIOR_PRODUCT_REPAIRS_AND_REPLAY_BYTES_UNCHANGED_SINCE_REQUALIFIED_B50_SOURCE",
+        "INITIAL_CI_FAILURES_RETAINED_FRESH_EXACT_HEAD_CI_AND_READINESS_PENDING",
+        "CHECKED_PER_COMMAND_SYNTHETIC_GIT_IDENTITY_EXPLICIT_LF_WITHOUT_GIT_CONFIG_MUTATION",
+        "CHECKED_CONFIG_FREE_BEFORE_MERGE_EXIT_128_AND_AFTER_THREE_PASS_REAL_GIT_CASES",
+        "CHECKED_CURRENT_WORKBENCH_PIN_AND_THIRTEEN_ORDINARY_MARKET_BEHAVIOR_ASSERTIONS_RETAINED",
+        "CHECKED_EXACT_DIFF_WRITE_SET_AND_FOUR_REQUIRED_ROLES"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "reviewed_head=f6ae6bef86ae1c58bc631360e5fbdffbf514678f",
+        "reviewed_inventory_sha256=e67aed110fbff97662be95654915371239c2f30bdd20d4b3de7d924a34ae66b6",
+        "reviewed_bindings_sha256=bade0c68268d10753fe3524978c52bea2a2e4eb7ecb012fe3c309d6cc55b43a6",
+        "ISOLATED_READONLY_REVIEW_NOT_CONFINED_ACTOR_EVIDENCE",
+        "PRIOR_PRODUCT_REPAIRS_AND_REPLAY_BYTES_UNCHANGED_SINCE_REQUALIFIED_B50_SOURCE",
+        "INITIAL_CI_FAILURES_RETAINED_FRESH_EXACT_HEAD_CI_AND_READINESS_PENDING",
+        "CHECKED_ORIGINAL_TC_BINDINGS_HISTORICAL_CHARTERS_SCIENTIFIC_C_ACTOR_UNVERIFIED_UNCHANGED",
+        "CHECKED_CORE_FAILURE_TEST_SHARD_FAILURE_DEPENDENT_SKIP_AND_TARGETED_REPAIR_HASHES",
+        "PASS_BOUNDED_TECHNICAL_REQUALIFICATION_WITH_NO_PREASSERTED_FRESH_CI_OR_MERGE"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "reviewed_head=f6ae6bef86ae1c58bc631360e5fbdffbf514678f",
+        "reviewed_inventory_sha256=e67aed110fbff97662be95654915371239c2f30bdd20d4b3de7d924a34ae66b6",
+        "reviewed_bindings_sha256=bade0c68268d10753fe3524978c52bea2a2e4eb7ecb012fe3c309d6cc55b43a6",
+        "ISOLATED_READONLY_REVIEW_NOT_CONFINED_ACTOR_EVIDENCE",
+        "PRIOR_PRODUCT_REPAIRS_AND_REPLAY_BYTES_UNCHANGED_SINCE_REQUALIFIED_B50_SOURCE",
+        "INITIAL_CI_FAILURES_RETAINED_FRESH_EXACT_HEAD_CI_AND_READINESS_PENDING",
+        "packet_fingerprint_sha256=0b742c660a2a4c84ed5c6a3e49822bc8d399caa43f2d98cb4b832b92baf7ebd9",
+        "SEMANTIC_PREMISE_PASS_EXACT_PACKET_DIFF_AND_SOURCE_BINDINGS",
+        "CHECKED_CURRENT_READ_DURABLE_DB_WAL_SHM_AND_IDENTITY_QUARANTINE_SOURCE_OWNERS",
+        "CHECKED_EXECUTION_DOES_NOT_GRANT_SCIENCE_AND_CONTROL_HELPER_DOES_NOT_GRANT_MERGE",
+        "TESTS_COULD_PASS_YET_RESEARCH_FAIL_IF_CURRENT_READ_BECOMES_HISTORICAL_PIT_PROXY_BECOMES_OOS_DEPENDENT_EPISODES_BECOME_IID_OR_REVIEW_BECOMES_CONFINED_ACTOR;CONTRACTS_FORBID_ALL_FOUR",
+        "PACKET_INFORMATION_PATH_ONLY_PROCESS_ISOLATION_OBLIGATION_MODEL_DIVERSITY_UNPROVEN"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "reviewed_head=f6ae6bef86ae1c58bc631360e5fbdffbf514678f",
+        "reviewed_inventory_sha256=e67aed110fbff97662be95654915371239c2f30bdd20d4b3de7d924a34ae66b6",
+        "reviewed_bindings_sha256=bade0c68268d10753fe3524978c52bea2a2e4eb7ecb012fe3c309d6cc55b43a6",
+        "ISOLATED_READONLY_REVIEW_NOT_CONFINED_ACTOR_EVIDENCE",
+        "PRIOR_PRODUCT_REPAIRS_AND_REPLAY_BYTES_UNCHANGED_SINCE_REQUALIFIED_B50_SOURCE",
+        "INITIAL_CI_FAILURES_RETAINED_FRESH_EXACT_HEAD_CI_AND_READINESS_PENDING",
+        "CHECKED_RUSSIAN_READOUT_INITIAL_CI_FAILURES_REPAIR_EVIDENCE_AND_FRESH_CI_REQUIREMENT",
+        "CHECKED_TERMINAL_REPLAY_GRADE_EXIT_RECOVERY_AND_INTEGRITY_ONLY_SEPARATION_UNCHANGED",
+        "CHECKED_SCIENTIFIC_C_ACTOR_UNVERIFIED_AND_HISTORICAL_VERDICTS_SEPARATE_NO_PIXEL_CLAIM"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_CONFINED_ACTOR",
+    "NO_MODEL_DIVERSITY_ATTESTATION"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Quarantined or superseding foreign trial seeded weak scientific metric through trial_id.",
+      "observed_head": "1b5c2240806b49f40812a9f49aac96bfe57f1443",
+      "resolved_by_head": "3119c05d18b6c3a59dfb2719c4e0b8dad4a918a7"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Missing harness evidence could return shell success; failed attach return code was ignored.",
+      "observed_head": "1b5c2240806b49f40812a9f49aac96bfe57f1443",
+      "resolved_by_head": "3119c05d18b6c3a59dfb2719c4e0b8dad4a918a7"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Acceptance TC08/09/10 IDs diverged from the original PRD obligations.",
+      "observed_head": "1b5c2240806b49f40812a9f49aac96bfe57f1443",
+      "resolved_by_head": "3119c05d18b6c3a59dfb2719c4e0b8dad4a918a7"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Replay missing safety or summary could return zero despite HARNESS_ERROR.",
+      "observed_head": "1b5c2240806b49f40812a9f49aac96bfe57f1443",
+      "resolved_by_head": "3119c05d18b6c3a59dfb2719c4e0b8dad4a918a7"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Replay stdout/exit concealed harness failure and integrity verdict needed explicit replay status and recovery.",
+      "observed_head": "1b5c2240806b49f40812a9f49aac96bfe57f1443",
+      "resolved_by_head": "3119c05d18b6c3a59dfb2719c4e0b8dad4a918a7"
+    }
+  ]
+}

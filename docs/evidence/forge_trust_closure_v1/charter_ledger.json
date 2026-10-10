@@ -1,0 +1,969 @@
+{
+  "schema": "ftc.charter-obligations.v1",
+  "audit_head": "ea4afb52b9d188c378d2a9850ba1b26c85496821",
+  "original_coverage_sha256": "785e069a3a788683827767bf5ebb9c3874c74ad0ac82b01f5c741dd70bce1c16",
+  "denominator": 56,
+  "original_counts": {
+    "PASS": 35,
+    "UNKNOWN": 17,
+    "BLOCKED": 2,
+    "FAIL": 2
+  },
+  "charters": [
+    {
+      "charter_id": "A01",
+      "goal": "Валидная одна когорта; несколько когорт; visible и actually used различаются",
+      "oracle": "Scope/denominator и readout отражают реально использованный input",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "ORIGINAL_SCOPE_RETAINED_NO_NEW_BLANKET_GRADE",
+      "obligation_and_boundary": "Original baseline result retained. No new candidate PASS inferred from a historical row; changed material consumers separately requalified.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "A02",
+      "goal": "Новая когорта появляется после frozen input",
+      "oracle": "Старый run не поглощает новые данные незаметно; новый evidence рассматривается отдельно",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_new_admitted_cohort_changes_evidence_while_identical_import_does_not",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "A03",
+      "goal": "Hash/content/schema mismatch; отсутствующий decision-bearing partition",
+      "oracle": "Typed integrity stop до science; не manufactured epoch",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "ORIGINAL_SCOPE_RETAINED_NO_NEW_BLANKET_GRADE",
+      "obligation_and_boundary": "Original baseline result retained. No new candidate PASS inferred from a historical row; changed material consumers separately requalified.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "A04",
+      "goal": "`event_time < decision_time < available_to_strategy_at`",
+      "oracle": "Будущее по availability не влияет на решение",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_public_prefix_is_invariant_to_produced_future_poison_but_authorized_numeric_changes",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "A05",
+      "goal": "Late arrival, correction/backfill, reordered observations",
+      "oracle": "Нет fictional historical availability и стирания revision lineage",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "REQUALIFIED_NATIVE_SYNTHETIC_PUBLICATION_SEGMENT",
+      "obligation_and_boundary": "Native published episodes + future poison/prefix route; production collector and source quality remain outside synthetic proof.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_hfic_temporal_discovery_v1.TemporalArithmeticTests.test_t02_pit_conflict_zero_and_order",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "A06",
+      "goal": "Missing, null, zero, stale, unknown различаются",
+      "oracle": "Не сливаются в одно числовое значение или «здоровый» статус",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "REQUALIFIED_TYPED_REFUSAL_SEGMENT",
+      "obligation_and_boundary": "Real availability gate and critic-claimed-PASS downgrade reach persisted session and readback; no fabricated OOS.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "A07",
+      "goal": "Dead/inactive/no-route/failed-exit cases в допустимом scientific fixture",
+      "oracle": "Не исчезают из population/outcomes; evidence class честная",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "PARTIAL_EXACT_EXECUTION_NET_BOUNDARY",
+      "obligation_and_boundary": "Proxy denominator/missing/duplicate/cost arithmetic rerun; failed exit/dead/no-route realizable NetReturn needs accepted execution estimator, not a dropped row.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_hfic_temporal_discovery_v1.TemporalArithmeticTests.test_t04_denominators_duplicate_and_missing_stress",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "A08",
+      "goal": "Absolute + relative + smoothed dynamics в одной разрешённой hypothesis; units/anchor/warm-up",
+      "oracle": "Признаки сохраняют определение; unsupported representation — gap, не silent substitution",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "ORIGINAL_SCOPE_RETAINED_NO_NEW_BLANKET_GRADE",
+      "obligation_and_boundary": "Original baseline result retained. No new candidate PASS inferred from a historical row; changed material consumers separately requalified.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "A09",
+      "goal": "Нормализованная trajectory и исходный absolute filter",
+      "oracle": "Scale invariance только там, где она математически обещана; baseline и filter не перепутаны",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_hfic_temporal_discovery_v1.TemporalArithmeticTests.test_t01_relative_return_is_unit_invariant_and_v1_stays_raw",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "A10",
+      "goal": "Episodes/lists/повторяющийся mint/nomination time, если admitted representation",
+      "oracle": "Unit of analysis не превращается незаметно из episode в token; overlap/cluster не теряются",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "ORIGINAL_SCOPE_RETAINED_NO_NEW_BLANKET_GRADE",
+      "obligation_and_boundary": "Original baseline result retained. No new candidate PASS inferred from a historical row; changed material consumers separately requalified.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "B01",
+      "goal": "0, 1 и несколько кандидатов",
+      "oracle": "Валидные shapes; один кандидат не требует выдуманного runner-up",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "REQUALIFIED_ORDINARY_SINGLETON_SEGMENT",
+      "obligation_and_boundary": "Public singleton and two-partition ordinary owner path reaches freeze with computed source; singleton has no invented C2.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "B02",
+      "goal": "SAME evidence + SAME запрос: repeat; restart; новый model/prompt/code provenance",
+      "oracle": "Replay/resume/new look различаются; научный budget не сбрасывается технической сменой",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "REQUALIFIED_LINKED_PENDING_EPOCH_STOP_RECOVERY",
+      "obligation_and_boundary": "New admitted evidence while reservation stays OPEN; no silent loss/reset/refund. Public append-only STOP preserves quota. This is safe STOP recovery, not a claim of resume across changed evidence.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_direct_owner_mutation_changes_only_capability_not_market_or_charges",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_direct_owner_mutation_changes_only_capability_not_market_or_charges",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "19ffd3e87775-producer-r1",
+          "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_scripted_positive_boundary_runs_real_classify_final_runner_replay",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "19ffd3e87775-producer-r1",
+          "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_scripted_positive_boundary_runs_real_classify_final_runner_replay",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_os_reply_loss_then_moved_root_resume_uses_original_draft_and_charge",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "B03",
+      "goal": "Изменение только publication metadata vs реально нового market evidence",
+      "oracle": "Первое не создаёт новый scientific market; второе не получает stale answer автоматически",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_new_admitted_cohort_changes_evidence_while_identical_import_does_not",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "B04",
+      "goal": "Лимит preview/main/adaptive; reservation до результата",
+      "oracle": "Счётчики не обходятся; значения не читаются до запрещающего gate",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "ORIGINAL_SCOPE_RETAINED_NO_NEW_BLANKET_GRADE",
+      "obligation_and_boundary": "Original baseline result retained. No new candidate PASS inferred from a historical row; changed material consumers separately requalified.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "B05",
+      "goal": "Prior exact negative, related negative, stale assessment, bounded-memory overflow",
+      "oracle": "Applicability и omission видимы; related не подавляет новую гипотезу без основания",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "ORIGINAL_SCOPE_RETAINED_NO_NEW_BLANKET_GRADE",
+      "obligation_and_boundary": "Original baseline result retained. No new candidate PASS inferred from a historical row; changed material consumers separately requalified.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "B06",
+      "goal": "BASE не нашёл; eligible representation/compound screen ещё не пройдены",
+      "oracle": "Не объявлять исчерпание всей science; пройти только разрешённое продолжение",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "ORIGINAL_SCOPE_RETAINED_NO_NEW_BLANKET_GRADE",
+      "obligation_and_boundary": "Original baseline result retained. No new candidate PASS inferred from a historical row; changed material consumers separately requalified.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "B07",
+      "goal": "Technical cap/provider failure/observability stop",
+      "oracle": "Technical terminal не превращается в `NO_WORTHY` или family close",
+      "original_result": "PASS",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "ORIGINAL_SCOPE_RETAINED_NO_NEW_BLANKET_GRADE",
+      "obligation_and_boundary": "Original baseline result retained. No new candidate PASS inferred from a historical row; changed material consumers separately requalified.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "B08",
+      "goal": "Syntactically valid LLM output с выдуманным feature/ref/capability",
+      "oracle": "Machine grounding отказывает; красивый текст не создаёт capability",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "REQUALIFIED_TYPED_REFERENCE_REFUSAL",
+      "obligation_and_boundary": "Native classifier/grounding checks plus original typed refusal fixtures; false accepted feature/capability cannot create execution authority.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "B09",
+      "goal": "Untrusted instruction внутри data field/tool output: «ignore gate», «пропусти holdout»",
+      "oracle": "Данные остаются данными; tools/authority не расширяются",
+      "original_result": "BLOCKED",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "AGENT_BEHAVIOR_UNVERIFIED",
+      "obligation_and_boundary": "Native collaboration actors inherit host tools. No tool-less actor or authorized model transport/budget. Scripted controls and readonly critics are not actors.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_semantic_anti_hijack",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "B10",
+      "goal": "Гипотезы с одинаковой сутью и разной формулировкой/порядком полей",
+      "oracle": "Identity/prior/budget обрабатываются по canonical semantics, не по случайной прозе",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "REQUALIFIED_CANONICAL_IDENTITY_SCOPE",
+      "obligation_and_boundary": "NFKC/casefold/whitespace/order canonicalization rerun. Semantic synonym equivalence is not an accepted resolver contract.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "C01",
+      "goal": "Freeze → isolated Critic → classify → finalize",
+      "oracle": "Все artifacts source-bound; final machine state прочитан независимо",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-producer-r1",
+          "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_scripted_positive_boundary_runs_real_classify_final_runner_replay",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "19ffd3e87775-producer-r1",
+          "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_scripted_positive_boundary_runs_real_classify_final_runner_replay",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "C02",
+      "goal": "Primary `REVISE_ONCE`, повторная revision",
+      "oracle": "Только разрешённое число/тип изменений; meaning change не маскируется wording repair",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "ORIGINAL_SCOPE_RETAINED_NO_NEW_BLANKET_GRADE",
+      "obligation_and_boundary": "Original baseline result retained. No new candidate PASS inferred from a historical row; changed material consumers separately requalified.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "C03",
+      "goal": "Primary KILL → уже frozen runner-up; runner-up revision request",
+      "oracle": "Нет C3/post-hoc selection; соблюдён typed pause и pre-freeze binding",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "ORIGINAL_SCOPE_RETAINED_NO_NEW_BLANKET_GRADE",
+      "obligation_and_boundary": "Original baseline result retained. No new candidate PASS inferred from a historical row; changed material consumers separately requalified.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "C04",
+      "goal": "Critic недоступен, timeout, malformed result, incompatible packet",
+      "oracle": "Нет silent self-critic или manufactured approval; typed recovery/blocker",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "PARTIAL_ACTOR_TIMEOUT_UNVERIFIED",
+      "obligation_and_boundary": "Native lost-reply cold resume and typed malformed/pending gates; actual model timeout/behavior unavailable for the precise actor capability reason.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "C05",
+      "goal": "Candidate/packet/spec/hash изменён между стадиями",
+      "oracle": "Stale/tamper rejection; ноль неверных science writes",
+      "original_result": "PASS",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "ORIGINAL_SCOPE_RETAINED_NO_NEW_BLANKET_GRADE",
+      "obligation_and_boundary": "Original baseline result retained. No new candidate PASS inferred from a historical row; changed material consumers separately requalified.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "C06",
+      "goal": "Availability gate понижает заявленный PASS",
+      "oracle": "Downstream/owner readout не сохраняет более сильный ложный PASS",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "REQUALIFIED_NATIVE_DOWNGRADE_TO_READBACK",
+      "obligation_and_boundary": "Real classifier/PIT availability downgrade, source-owned persisted terminal, show-session/forge-run consumers. Contract-only matrix is explicitly separate.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "C07",
+      "goal": "FAST/CHANGE/DATA lane и unsupported capability",
+      "oracle": "Корректный route + exact gap; нет самовольного code/provider/collection work",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "REQUALIFIED_NATIVE_CLASSIFIER_TO_COLD_CONSUMER",
+      "obligation_and_boundary": "Added real FAST_LANE_READY, CHANGE_LANE_CAPABILITY_GAP and BLOCKED_DATA -> apply_classification -> ResearchStore -> fresh show_session; no classifier mock and no runs created.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "C08",
+      "goal": "Session terminal есть, run-level terminal ещё нет",
+      "oracle": "Не завершать весь search преждевременно; продолжить правильный next action",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "REQUALIFIED_ORDINARY_LIFECYCLE_SEGMENT",
+      "obligation_and_boundary": "Native two-cycle profile continuation and STOP/late landing/profile interaction rerun; session/operation separation remains explicit.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "D01",
+      "goal": "Crash после reservation, до result append",
+      "oracle": "Unknown attempt сохраняется; retry не получает бесплатный look",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "ORIGINAL_SCOPE_RETAINED_NO_NEW_BLANKET_GRADE",
+      "obligation_and_boundary": "Original baseline result retained. No new candidate PASS inferred from a historical row; changed material consumers separately requalified.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "D02",
+      "goal": "Crash после durable append, до acknowledgement/readout",
+      "oracle": "Восстановление через readback/idempotency, без duplicate logical outcome",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_os_reply_loss_then_moved_root_resume_uses_original_draft_and_charge",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "D03",
+      "goal": "Freeze/draft/Critic result сохранён частично",
+      "oracle": "Resume с реального earliest incomplete stage; без нового search",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "ORIGINAL_SCOPE_RETAINED_NO_NEW_BLANKET_GRADE",
+      "obligation_and_boundary": "Original baseline result retained. No new candidate PASS inferred from a historical row; changed material consumers separately requalified.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "D04",
+      "goal": "Два competing actors, writer busy, stale lease/preview",
+      "oracle": "Нет lost update/двойного admitted slot; конфликт typed и actionable",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "ORIGINAL_SCOPE_RETAINED_NO_NEW_BLANKET_GRADE",
+      "obligation_and_boundary": "Original baseline result retained. No new candidate PASS inferred from a historical row; changed material consumers separately requalified.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "D05",
+      "goal": "`OPEN` → owner-final ещё не persisted → persist → readback",
+      "oracle": "`COMPLETED` доказан bound receipt; UI word не заменяет commit",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_forge_ordinary_operation_lifecycle_v1.OperationCompletionBindingTests.test_bound_owner_final_completes_and_each_binding_is_required",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_forge_ordinary_operation_lifecycle_v1.OperationCompletionBindingTests.test_completion_is_monotone",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "D06",
+      "goal": "STOP/PAUSED_CAP/COMPLETED + retry/readback/correction",
+      "oracle": "Stop не стирает trial history; completion не самопроизвольно reopen",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_forge_ordinary_operation_lifecycle_v1.OrdinaryOperationLifecycleTests.test_r2_r4_r5_owner_stop_without_profile_keeps_history_and_quota",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "D07",
+      "goal": "Read-only views при активном writer, WAL/локальная projection freshness",
+      "oracle": "Важный committed state не теряется; read-only не означает stale/immutable snapshot",
+      "original_result": "FAIL",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "REPAIRED_CURRENT_WAL_READ",
+      "obligation_and_boundary": "Original baseline failure reproduced; independent mode=ro reference and both actual readers see COMPLETE before writer close. Actual OS write denial and durable hash readback in joint proof.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "D08",
+      "goal": "Healthy heartbeat без progress; свежий лог при неверном universe",
+      "oracle": "Отдельные freshness/progress/integrity signals; нет ложного «всё работает»",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "MODEL_ONLY",
+      "candidate_disposition": "EXACT_MONITORING_CAPABILITY_GAP",
+      "obligation_and_boundary": "Forge stages/next-action readouts are supported; no accepted Forge heartbeat scientific-health contract. Existing external collector heartbeat is not reused as scientific health. Next delta: owner elects whether a Forge liveness-only monitor is needed.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "E01",
+      "goal": "Accepted hypothesis → bound frozen experiment → реальный доступный runner",
+      "oracle": "Spec действительно связан с candidate; отсутствие runner не закрывается mock",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-producer-r1",
+          "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_scripted_positive_boundary_runs_real_classify_final_runner_replay",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "19ffd3e87775-producer-r1",
+          "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_scripted_positive_boundary_runs_real_classify_final_runner_replay",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "E02",
+      "goal": "Cheap falsifier reject; valid continuation; insufficient information",
+      "oracle": "Разные корректные terminals, отрицательное evidence не теряется",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "PARTIAL_NEGATIVE_BRANCH_BOUNDARY",
+      "obligation_and_boundary": "Real negative SIMPLE pauses; native finalize from explicitly scripted critic emits source decision and next prior reads it. This proves transport, not an independent scientific negative from a confined critic.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "E03",
+      "goal": "Chronological split и окна, пересекающие границы",
+      "oracle": "No future leakage; purge/embargo — если это требует текущая семантика",
+      "original_result": "BLOCKED",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "BLOCKED_SCIENTIFIC_PROTOCOL_C",
+      "obligation_and_boundary": "Selected List A price-relative recipe has no accepted bound chronological/OOS protocol; SCIENTIFIC_DECISION.md freezes the exact proposed delta, all authority remains with owner.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "E04",
+      "goal": "Holdout доступен в файле, но запрещён phase/role",
+      "oracle": "Доступ блокируется до row/value reads; не только после scoring",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "REQUALIFIED_PHYSICAL_HOLDOUT_REFUSAL",
+      "obligation_and_boundary": "Physical synthetic parquet plus real metadata gate: HOLDOUT_PROTECTED before ParquetFile, zero value-reader entries, source bytes unchanged. Live holdout not touched.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "E05",
+      "goal": "Tiny N, repeated token episodes, один cluster/winner, conflicting cohorts",
+      "oracle": "Nominal rows не равны independent N; uncertainty/robustness не fabricated",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_hfic_temporal_discovery_v1.TemporalArithmeticTests.test_t04_denominators_duplicate_and_missing_stress",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "E06",
+      "goal": "Distribution с равной median и разными tails",
+      "oracle": "Вывод соответствует заявленной metric, а не удобному summary",
+      "original_result": "PASS",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "ORIGINAL_SCOPE_RETAINED_NO_NEW_BLANKET_GRADE",
+      "obligation_and_boundary": "Original baseline result retained. No new candidate PASS inferred from a historical row; changed material consumers separately requalified.",
+      "matching_rerun_witnesses": [],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "E07",
+      "goal": "Price touch/gross/proxy vs executable/net label",
+      "oracle": "Класс evidence не усиливается на переходе",
+      "original_result": "PASS",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_hfic_temporal_discovery_v1.TemporalArithmeticTests.test_t05_cost_oracle_does_not_double_count_or_pretend_calibration",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_run_completed_does_not_satisfy_pit",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "E08",
+      "goal": "Costs/failed routes/unresolved inventory в supported model",
+      "oracle": "Нет double count и выпадения неуспехов; UNKNOWN не превращается в нулевую потерю",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "PARTIAL_EXACT_EXECUTION_NET_BOUNDARY",
+      "obligation_and_boundary": "Missing/selection/cost arithmetic supported; executable failed-exit/dead/no-route net estimator remains unaccepted. Do not call proxy NetReturn or missing zero.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_hfic_temporal_discovery_v1.TemporalArithmeticTests.test_t05_cost_oracle_does_not_double_count_or_pretend_calibration",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "E09",
+      "goal": "Post-hoc parameter/spec edit, rerun и calculation correction",
+      "oracle": "Новая science version/trial отличается от допустимой technical revision; история сохранена",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "REQUALIFIED_NATIVE_CALCULATION_CORRECTION",
+      "obligation_and_boundary": "Native saved wrong SIMPLE revision public route rerun: old main historical record remains, no new MAIN/look, revised result cold-readable.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_direct_owner_mutation_changes_only_capability_not_market_or_charges",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "19ffd3e87775-residual-r1",
+          "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_direct_owner_mutation_changes_only_capability_not_market_or_charges",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "E10",
+      "goal": "Успешный technical execution с плохим/недостаточным result",
+      "oracle": "`RUN_COMPLETED` не означает scientific PASS",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_run_completed_does_not_satisfy_pit",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "F01",
+      "goal": "DIRECT evidence vs похожее RELATED evidence другого experiment",
+      "oracle": "Related не закрывает obligations; joins по refs/hashes, не по названию",
+      "original_result": "PASS",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_direct_vs_related_classification",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "F02",
+      "goal": "Missing/unknown/conflict/explicit N/A обязательства",
+      "oracle": "Каждый статус различим; отсутствующее не превращается в PRESENT/N/A",
+      "original_result": "PASS",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_conflict_and_holdout_empty_list_stay_distinct",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_degraded_source_keeps_definition_and_unknown_obligations",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "F03",
+      "goal": "`REJECT/REVISE/PAUSE/PROMOTE`, stale snapshot, retry, unverified write",
+      "oracle": "Correct action/readback; stale zero-write; unknown append не blindly retried",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_decision_loop_stale_retry_and_writer_busy",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_http_records_reject_and_surfaces_done",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_promote_guard_and_strategy_untouched",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "F04",
+      "goal": "Legacy PROMOTE без manifest; manifest 1.0/1.1; mismatch decision clock/ID",
+      "oracle": "Не реконструировать историю из latest; typed legacy/binding gaps",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_c_legacy_promote_is_explicit_gap",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_mismatched_decision_event_or_clock_is_invalid",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_handoff_contract_names_manifest_1_1_when_binding_is_present",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "F05",
+      "goal": "Frozen manifest валиден, source позднее недоступен",
+      "oracle": "Stable receipt и revalidation availability не смешиваются; contract-specific disposition",
+      "original_result": "UNKNOWN",
+      "original_fidelity": "CONTRACT_ONLY",
+      "candidate_disposition": "REQUALIFIED_SOURCE_UNAVAILABLE_AND_RECOVERY",
+      "obligation_and_boundary": "Physically remove the committed scientific parquet: fresh API reports SOURCE_UNAVAILABLE, retained decision segment unchanged, restoration recovers same frozen manifest. During outage no successful source revalidation/strategy claim.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_b_later_evidence_does_not_rewrite_manifest",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_materialized_keeps_evidence_hash_conflict",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "F06",
+      "goal": "Explicit execution inputs missing/wrong types; bool-as-int; field provenance",
+      "oracle": "Не подставлять defaults/соседнюю strategy/LLM guesses",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_coerced_execution_inputs_are_gaps",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_d_execution_input_gap",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "F07",
+      "goal": "Same identity+same content; same identity+different content",
+      "oracle": "Idempotent replay либо conflict; никакого silent overwrite",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_e_and_f_collision_and_replay",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "F08",
+      "goal": "CLI/store/Workbench/agent readout одного experiment",
+      "oracle": "Одинаковый scope и сила claim; overview не выдумывает detail-only counters",
+      "original_result": "FAIL",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "REPAIRED_NATIVE_LINKED_CONSUMERS",
+      "obligation_and_boundary": "Native producer records and exact current spec reach fresh dossier/API/HTTP Workbench. Joint independent operational job input proves live WAL freshness; job itself is not execution evidence.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_overview_ready_is_not_available",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "F09",
+      "goal": "Read-only GET/diagnostics на новом/readonly store",
+      "oracle": "Не создаёт каталоги, leases, records или writable projections",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_g_get_is_non_mutating",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_get_experiment_detail_is_non_mutating",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    },
+    {
+      "charter_id": "F10",
+      "goal": "Candidate artifact принят существующим выходным consumer",
+      "oracle": "Provenance/contract acceptance; ноль activation/bot/provider/wallet side effects",
+      "original_result": "PASS",
+      "original_fidelity": "SEGMENT_PRODUCT_PATH",
+      "candidate_disposition": "RERUN_SEGMENT_SOURCE_MATCH",
+      "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
+      "matching_rerun_witnesses": [
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_a_happy_path_vertical",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_h_no_activation",
+          "status": "PASS",
+          "seconds": null
+        },
+        {
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
+          "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_verify_rejects_lineage_or_clock_mismatch",
+          "status": "PASS",
+          "seconds": null
+        }
+      ],
+      "full_product_path_proven": false
+    }
+  ],
+  "interactions": [
+    {
+      "name": "NEW_EVIDENCE_x_PENDING_RESERVATION_x_RECOVERY",
+      "status": "PASS_SAFE_STOP_NO_REFUND",
+      "witness": "EpisodeFlowTests.test_trust_closure_new_evidence_preserves_pending_reservation_and_safe_stop_recovery"
+    },
+    {
+      "name": "RELATED_PRIOR_x_SHARED_RUN_x_CHANGED_SPEC_HASH",
+      "status": "PASS_FAIL_CLOSED_EXECUTION_AND_WEAK_SCIENCE",
+      "witness": "ExecutionIdentityTests.test_conflicting_execution_rows_quarantine_shared_run_and_weak_metric; test_explicit_scientific_version_cannot_mix_with_current_run"
+    },
+    {
+      "name": "STOP_x_LATE_LOOK_x_CHANGED_UNIVERSE_PROFILE",
+      "status": "PASS_NATIVE_LIFECYCLE_SEGMENT",
+      "witness": "OrdinaryOperationLifecycleTests.test_r2_r4_r5_owner_stop_without_profile_keeps_history_and_quota"
+    },
+    {
+      "name": "OPEN_WAL_x_NATIVE_EXACT_SPEC_RUN_x_FRESH_CONSUMER",
+      "status": "PASS_LINKED_NATIVE_SEGMENTS",
+      "witness": "ftc-7a3361b3e1dc-joint-r2"
+    },
+    {
+      "name": "QUARANTINED_RUN_x_SHARED_TRIAL_x_WEAK_SCIENTIFIC_METRIC",
+      "status": "PASS_FAIL_CLOSED_BEFORE_SEEDING",
+      "witness": "ExecutionIdentityTests.test_quarantined_or_conflicting_trial_cannot_seed_weak_scientific_metric",
+      "run_id": "b50a4a95df48-residual-review-fix-r1"
+    }
+  ],
+  "remaining_full_positive_boundary": "SCIENTIFIC_PROTOCOL_C_AND_GENUINE_ACTOR_UNVERIFIED"
+}

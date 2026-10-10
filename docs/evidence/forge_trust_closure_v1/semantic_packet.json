@@ -1,0 +1,196 @@
+{
+  "candidate": {
+    "base": "96eb087224f012ccb028ba468d4e0a7cd7ca1506",
+    "diff_sha256": "2b50f981539dbc3b125660b9fec3561dd98286e933e93e6e06d242625b6f61cf",
+    "head": "8bd8336597bbb4d747cdd39847d360dcd8669d49"
+  },
+  "evidence": [
+    {
+      "logical_ref": "repo://docs/tasks/FORGE_TRUST_CLOSURE_V1.md",
+      "sha256_or_fingerprint": "17249ec707a8f17df26997f779619ea7561c14df761d2514a589597558a62178"
+    },
+    {
+      "logical_ref": "repo://docs/reports/forge_trust_closure_v1/READOUT.md",
+      "sha256_or_fingerprint": "01a3afb616b79692be337238d3596b980fcd6e2841fb9ba7bdb5bb47c896fde8"
+    },
+    {
+      "logical_ref": "repo://docs/reports/forge_trust_closure_v1/SCIENTIFIC_DECISION.md",
+      "sha256_or_fingerprint": "2931500249887f45bf7c9a1d56cd521b64d6a81e69141d369390e9dbd046933f"
+    },
+    {
+      "logical_ref": "repo://docs/evidence/forge_trust_closure_v1/run_index.json",
+      "sha256_or_fingerprint": "3dfa135e5a448030193a256d757f37140c7fdfadffb72fc745736441efce6c32"
+    },
+    {
+      "logical_ref": "repo://docs/evidence/forge_trust_closure_v1/charter_ledger.json",
+      "sha256_or_fingerprint": "8a2119630509dd6f445f70c71ea1a81e8deab22ed8d8a9d84ca85f689f1dba15"
+    },
+    {
+      "logical_ref": "repo://docs/evidence/forge_trust_closure_v1/dependency_closure.json",
+      "sha256_or_fingerprint": "d34be40b9834d90cb2d8fe2a2874ea47ca713791da4d01bf86393324cadd7006"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/document_runner.py",
+      "sha256_or_fingerprint": "56c6bf0ba1932c175b5f9c18414a50c8ad138269eb34bdcf2ec4a73e2ce159fb"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/experiment_evidence.py",
+      "sha256_or_fingerprint": "8cdc314f482297420c08f81523273439654aa42c0c8d915462d55c861d404eb5"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/operational_store.py",
+      "sha256_or_fingerprint": "3f81ad434fa0524be398c953b7c804fc1b96cdc1d30b600053238e6704ba4e41"
+    },
+    {
+      "logical_ref": "repo://src/solana_alpha_lab/factory/lifecycle_projection.py",
+      "sha256_or_fingerprint": "b5be044c88194c8ad3e5a984ca3170a28b0fda0ee4a704466a2e6d2cc4f97f04"
+    },
+    {
+      "logical_ref": "repo://catalog/schemas/run_passport.schema.json",
+      "sha256_or_fingerprint": "c94117601db59dab3392fe1cd0e4e7d8eca4256875ca453268d3061af635f0e7"
+    },
+    {
+      "logical_ref": "repo://tests/test_forge_trust_closure_v1.py",
+      "sha256_or_fingerprint": "30bbd068fa91c45a60684d4f8a9aaac136748b1d9788ea043031b356bc448b5e"
+    },
+    {
+      "logical_ref": "repo://configs/experiment_capability_registry_v2.yaml",
+      "sha256_or_fingerprint": "49edf7b770d37db38edb89a49dcb66f73b6212d62642cda2faa14880456e4430"
+    },
+    {
+      "logical_ref": "repo://docs/contracts/experiment_evidence_decision_v1.md",
+      "sha256_or_fingerprint": "bb661ae114d4cfd0f697ed6be10d41a10725bb358e1999abb92819b229d6e251"
+    },
+    {
+      "logical_ref": "repo://scripts/precommit_diff_check.py",
+      "sha256_or_fingerprint": "d78f5e878c83da53e9e003c95d0e8e3bd134c90ae6d56d61ec7cb3b207e05520"
+    },
+    {
+      "logical_ref": "repo://scripts/validate.ps1",
+      "sha256_or_fingerprint": "67255a82c800cf6bcbebac02d805b272fdddc8793e6b589a609ff768abb8534b"
+    },
+    {
+      "logical_ref": "repo://tests/test_precommit_diff_check_v1.py",
+      "sha256_or_fingerprint": "0df718884afb1a3a87a74141d661ec7f8e5917e1121970cf218b1fd5ea88044a"
+    },
+    {
+      "logical_ref": "repo://tests/fixtures/forge_trust_closure_v1/replay.py",
+      "sha256_or_fingerprint": "e9ef780532f790c2e537a94a3ebc8fa8832c0c462059e7b7b5f9b4dd1b79e292"
+    },
+    {
+      "logical_ref": "repo://docs/evidence/forge_trust_closure_v1/resource_readback.json",
+      "sha256_or_fingerprint": "2994f2243ff860e7c14faa94bc723f3c0b8ed0d3d4687cb5b08050e93ef8302f"
+    },
+    {
+      "logical_ref": "repo://scripts/validate_baton.py",
+      "sha256_or_fingerprint": "baafd69db4f8b874f6794222e911f250d015e57a3009adde993be5bb8a71e343"
+    },
+    {
+      "logical_ref": "repo://docs/evidence/forge_trust_closure_v1/ci_repair.json",
+      "sha256_or_fingerprint": "3b93689dbfbf997c364a79fbb24ec77f61fe8a07788cdd9c7da9fb634c288481"
+    },
+    {
+      "logical_ref": "repo://tests/test_factory_ordinary_market_hypothesis.py",
+      "sha256_or_fingerprint": "7c525abea77ff80f4633d802fb00b521525a275eb58e7ef4a4c9335ca79b71d3"
+    }
+  ],
+  "independence": {
+    "claim_scope": "PACKET_INFORMATION_PATH",
+    "context_isolated": true,
+    "implementation_transcript_seen": false,
+    "launch_isolation": "PROCESS_OBLIGATION",
+    "model_diversity": "UNPROVEN",
+    "model_diversity_identity": null,
+    "packet_bound": true,
+    "readonly": true
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_OOS_VALIDATION",
+    "NO_FULL_POSITIVE_SCIENCE_TO_STRATEGY",
+    "AGENT_BEHAVIOR_UNVERIFIED",
+    "NO_REAL_DATA",
+    "NO_HOLDOUT_OPEN",
+    "NO_MODEL_DIVERSITY_ATTESTATION",
+    "NO_MERGE"
+  ],
+  "packet_fingerprint_sha256": "0b742c660a2a4c84ed5c6a3e49822bc8d399caa43f2d98cb4b832b92baf7ebd9",
+  "questions": [
+    "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
+    "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
+    "IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL",
+    "IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE",
+    "DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY",
+    "DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING",
+    "IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER",
+    "WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE",
+    "WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM",
+    "WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS"
+  ],
+  "review": {
+    "architecture_owner": "ARCHITECTURE_CRITIC",
+    "profile": "SEMANTIC_PREMISE",
+    "risk_dimensions": [
+      "SCIENTIFIC_ESTIMAND",
+      "FALSIFIER_OR_ENDPOINT",
+      "EVIDENCE_ADMISSIBILITY",
+      "PIT_OR_AVAILABILITY_SEMANTICS",
+      "RESEARCH_TRUTH_OWNERSHIP",
+      "HYPOTHESIS_OR_FAMILY_CLOSURE",
+      "PROMOTION_OR_SUPPRESSION_AUTHORITY",
+      "UNKNOWN_VS_NEGATIVE_EVIDENCE",
+      "EXECUTION_TRUTH_SEMANTICS",
+      "DURABLE_SCIENCE_SCHEMA",
+      "OWNER_AUTHORITY_SEMANTICS",
+      "HARNESS_PREMISE_OR_MERGE_AUTHORITY"
+    ]
+  },
+  "schema": "smial.semantic-premise-review-packet",
+  "schema_version": "1.0",
+  "semantic_claims": [
+    {
+      "claim": "Current mode=ro consumers see committed WAL before writer close; readonly means no business or durable DB/WAL writes, SHM coordination is separate.",
+      "claim_id": "C1",
+      "scope": "BOUNDED_SYNTHETIC_FORGE_TRUST_CLOSURE"
+    },
+    {
+      "claim": "Native execution events carry experiment identity; validated exact legacy passports can link without rewriting history; contradictory shared run/trial keys quarantine weak joins before seeding.",
+      "claim_id": "C2",
+      "scope": "BOUNDED_SYNTHETIC_FORGE_TRUST_CLOSURE"
+    },
+    {
+      "claim": "Native producer and fresh dossier/API/HTTP Workbench agree on exact execution COMPLETED; scientific PROMOTE remains refused, not inferred from completion.",
+      "claim_id": "C3",
+      "scope": "BOUNDED_SYNTHETIC_FORGE_TRUST_CLOSURE"
+    },
+    {
+      "claim": "Selected List A recipe has accepted fixed-time proxy but no accepted bound chronological/OOS protocol; disposition C retains a single precise proposed owner decision without scientific grant.",
+      "claim_id": "C4",
+      "scope": "BOUNDED_SYNTHETIC_FORGE_TRUST_CLOSURE"
+    },
+    {
+      "claim": "Genuine actors remain NOT_RUN/AGENT_BEHAVIOR_UNVERIFIED; readonly reviewers and scripted native replay never become confined actors; original 56-charter baseline is not blanket regraded.",
+      "claim_id": "C5",
+      "scope": "BOUNDED_SYNTHETIC_FORGE_TRUST_CLOSURE"
+    },
+    {
+      "claim": "Only a graded replay PASS returns shell success; receipt integrity is separate from replay status, and missing terminal evidence fails even when the real product process exits zero.",
+      "claim_id": "C8",
+      "scope": "BOUNDED_SYNTHETIC_FORGE_TRUST_CLOSURE"
+    },
+    {
+      "claim": "During an ordinary merge of exact origin/main, staged whitespace validation compares the whole candidate against that already accepted main; other merges and ordinary staged changes keep their original strict check, with no authority bypass.",
+      "claim_id": "C7",
+      "scope": "BOUNDED_SYNTHETIC_FORGE_TRUST_CLOSURE"
+    },
+    {
+      "claim": "Routine source-owner recovery preserves records/budgets, source disappearance fails closed and restoration recovers frozen manifest; no real values, holdout, provider, deploy or strategy activation.",
+      "claim_id": "C6",
+      "scope": "BOUNDED_SYNTHETIC_FORGE_TRUST_CLOSURE"
+    }
+  ],
+  "task": {
+    "task_contract_sha256": "17249ec707a8f17df26997f779619ea7561c14df761d2514a589597558a62178",
+    "task_id": "FORGE_TRUST_CLOSURE_V1"
+  }
+}

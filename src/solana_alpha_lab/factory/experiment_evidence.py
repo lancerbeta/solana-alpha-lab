@@ -9,6 +9,11 @@ from typing import Any, Mapping, Sequence
 
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec, spec_sha256
 from solana_alpha_lab.factory.owner_language import DEFAULT_RATIONALE
+from solana_alpha_lab.factory.run_passport import (
+    RunPassportError,
+    experiment_spec_sha256,
+    validate_run_passport,
+)
 from solana_alpha_lab.factory.research_workbench import (
     LifecycleEntityLocatorV1,
     ResearchWorkbenchError,
@@ -112,7 +117,8 @@ def logical_decision_ids(
     )
 
 
-def _explicit_experiment_id(payload: Mapping[str, Any], record: Any) -> str | None:
+def _explicit_experiment_ids(payload: Mapping[str, Any], record: Any) -> set[str]:
+    ids: set[str] = set()
     for key in EXPLICIT_EXPERIMENT_KEYS:
         value = _text(payload.get(key))
         if value:
@@ -121,27 +127,116 @@ def _explicit_experiment_id(payload: Mapping[str, Any], record: Any) -> str | No
                 "EXPERIMENT_SPEC",
             }:
                 continue
-            return value
+            ids.add(value)
     if _kind(record) == "EVIDENCE_BINDING":
-        return _text(payload.get("bound_entity_id"))
+        bound = _text(payload.get("bound_entity_id"))
+        if bound:
+            ids.add(bound)
+    return ids
+
+
+def _explicit_experiment_id(payload: Mapping[str, Any], record: Any) -> str | None:
+    ids = _explicit_experiment_ids(payload, record)
+    return next(iter(ids)) if len(ids) == 1 else None
+
+
+def _identity_conflict(
+    record: Any, experiment_id: str, spec_digest: str | None,
+) -> str | None:
+    payload = _payload(record)
+    ids = _explicit_experiment_ids(payload, record)
+    if ids and ids != {experiment_id}:
+        return "EXPERIMENT_IDENTITY_CONFLICT"
+    native_run = _text(getattr(record, "run_id", None))
+    payload_run = _text(payload.get("run_id"))
+    if native_run and payload_run and native_run != payload_run:
+        return "RUN_IDENTITY_CONFLICT"
+    # Run passports use canonical document hashes, not YAML file byte hashes.
+    if (spec_digest
+            and "experiment_spec_sha256" in payload
+            and payload.get("experiment_spec_sha256") != spec_digest):
+        return "EXPERIMENT_SPEC_VERSION_CONFLICT"
     return None
 
 
-def _collect_direct_ids(experiment_id: str, records: Sequence[Any]) -> tuple[set[str], set[str]]:
+def _legacy_exact_completed(record: Any, spec_digest: str | None) -> bool:
+    payload = _payload(record)
+    if (_kind(record) != "RUN_COMPLETED" or not spec_digest
+            or _explicit_experiment_ids(payload, record)
+            or payload.get("experiment_spec_sha256") != spec_digest):
+        return False
+    try:
+        validate_run_passport(payload)
+    except RunPassportError:
+        return False
+    return True
+
+
+def _collect_direct_ids(
+    experiment_id: str, records: Sequence[Any], spec_digest: str | None = None,
+    *, conflicted_run_ids: set[str] | None = None,
+    conflicted_trial_ids: set[str] | None = None,
+) -> tuple[set[str], set[str]]:
     run_ids: set[str] = set()
     trial_ids: set[str] = set()
     for record in records:
         payload = _payload(record)
-        if _explicit_experiment_id(payload, record) != experiment_id:
+        if _identity_conflict(record, experiment_id, spec_digest):
+            continue
+        if (_explicit_experiment_id(payload, record) != experiment_id
+                and not _legacy_exact_completed(record, spec_digest)):
             continue
         kind = _kind(record)
         run_id = _text(getattr(record, "run_id", None) or payload.get("run_id"))
         trial_id = _text(payload.get("trial_id"))
+        if (run_id and run_id in (conflicted_run_ids or set())
+                or trial_id and trial_id in (conflicted_trial_ids or set())):
+            continue
         if run_id and kind in EXECUTION_RECORD_KINDS:
             run_ids.add(run_id)
         if trial_id and kind == "TRIAL":
             trial_ids.add(trial_id)
     return run_ids, trial_ids
+
+
+def _conflicted_execution_keys(
+    experiment_id: str, records: Sequence[Any], spec_digest: str | None,
+) -> set[str]:
+    """A shared run key cannot launder contradictory execution identities."""
+    keys: set[str] = set()
+    for record in records:
+        if _kind(record) not in EXECUTION_RECORD_KINDS:
+            continue
+        payload = _payload(record)
+        conflict = _identity_conflict(record, experiment_id, spec_digest)
+        malformed_legacy = (
+            _kind(record) == "RUN_COMPLETED"
+            and not _explicit_experiment_ids(payload, record)
+            and not _legacy_exact_completed(record, spec_digest)
+        )
+        if conflict or malformed_legacy:
+            keys.update(value for value in (
+                _text(getattr(record, "run_id", None)), _text(payload.get("run_id")),
+            ) if value)
+    return keys
+
+
+def _conflicted_trial_keys(
+    experiment_id: str, records: Sequence[Any], spec_digest: str | None,
+    conflicted_run_ids: set[str],
+) -> set[str]:
+    """A rejected trial must not seed indirect scientific evidence."""
+    keys: set[str] = set()
+    for record in records:
+        if _kind(record) != "TRIAL":
+            continue
+        payload = _payload(record)
+        trial_id = _text(payload.get("trial_id"))
+        run_id = _text(getattr(record, "run_id", None) or payload.get("run_id"))
+        if trial_id and (_identity_conflict(record, experiment_id, spec_digest)
+                         or run_id in conflicted_run_ids):
+            keys.add(trial_id)
+    return keys
 
 
 def classify_record(
@@ -151,6 +246,9 @@ def classify_record(
     hypothesis_version_id: str | None,
     direct_run_ids: set[str],
     direct_trial_ids: set[str],
+    spec_digest: str | None = None,
+    conflicted_run_ids: set[str] | None = None,
+    conflicted_trial_ids: set[str] | None = None,
 ) -> str | None:
     payload = _payload(record)
     kind = _kind(record)
@@ -158,6 +256,18 @@ def classify_record(
     run_id = _text(getattr(record, "run_id", None) or payload.get("run_id"))
     trial_id = _text(payload.get("trial_id"))
     hyp = _text(getattr(record, "hypothesis_version_id", None) or payload.get("hypothesis_version_id"))
+    if run_id and run_id in (conflicted_run_ids or set()):
+        return None
+    if trial_id and trial_id in (conflicted_trial_ids or set()):
+        return None
+    # A contradictory explicit identity can never fall back to a weaker run join.
+    if _identity_conflict(record, experiment_id, spec_digest):
+        if hypothesis_version_id and hyp == hypothesis_version_id and kind in RELATED_RECORD_KINDS:
+            return "RELATED"
+        return None
+    if (kind == "RUN_COMPLETED" and spec_digest and explicit is None
+            and not _legacy_exact_completed(record, spec_digest)):
+        return None
     if explicit == experiment_id:
         return "DIRECT"
     if run_id and run_id in direct_run_ids:
@@ -713,10 +823,21 @@ def compose_experiment_dossier(
     spec_digest = spec_sha256(root, relative) if relative else None
     hypothesis_version_id = _text(spec.get("hypothesis_version"))
     store_records = tuple(records or ())
-    direct_run_ids, direct_trial_ids = _collect_direct_ids(locator.entity_id, store_records)
+    canonical_spec_digest = experiment_spec_sha256(spec) if spec else None
+    conflicted_run_ids = _conflicted_execution_keys(
+        locator.entity_id, store_records, canonical_spec_digest,
+    )
+    conflicted_trial_ids = _conflicted_trial_keys(
+        locator.entity_id, store_records, canonical_spec_digest, conflicted_run_ids,
+    )
+    direct_run_ids, direct_trial_ids = _collect_direct_ids(
+        locator.entity_id, store_records, canonical_spec_digest,
+        conflicted_run_ids=conflicted_run_ids, conflicted_trial_ids=conflicted_trial_ids,
+    )
     direct: list[dict[str, Any]] = []
     related: list[dict[str, Any]] = []
     history: list[dict[str, Any]] = []
+    relation_gaps: list[dict[str, Any]] = []
     for record in store_records:
         relation = classify_record(
             record,
@@ -724,8 +845,25 @@ def compose_experiment_dossier(
             hypothesis_version_id=hypothesis_version_id,
             direct_run_ids=direct_run_ids,
             direct_trial_ids=direct_trial_ids,
+            spec_digest=canonical_spec_digest,
+            conflicted_run_ids=conflicted_run_ids,
+            conflicted_trial_ids=conflicted_trial_ids,
         )
         if relation is None:
+            payload = _payload(record)
+            explicit_ids = _explicit_experiment_ids(payload, record)
+            if (_kind(record) in EXECUTION_RECORD_KINDS
+                    and ((not explicit_ids and getattr(record, "hypothesis_version_id", None) == hypothesis_version_id)
+                         or locator.entity_id in explicit_ids)):
+                relation_gaps.append({
+                    "record_id": getattr(record, "record_id", None),
+                    "reason_code": _identity_conflict(
+                        record, locator.entity_id, canonical_spec_digest,
+                    ) or ("RUN_IDENTITY_CONFLICT" if _text(
+                        getattr(record, "run_id", None) or payload.get("run_id")
+                    ) in conflicted_run_ids else "EVIDENCE_RELATION_GAP"),
+                    "next_safe_action": "VERIFY_SOURCE_BOUND_EXPERIMENT_IDENTITY",
+                })
             continue
         card = _record_card(record, relation)
         if relation == "DIRECT":
@@ -786,6 +924,8 @@ def compose_experiment_dossier(
                 str(item.get("payload_sha256") or "") for item in direct
             ),
             "promotion_packet_sha256": packet,
+            "canonical_experiment_spec_sha256": canonical_spec_digest,
+            "execution_relation_gaps": relation_gaps,
         }
     )
     tested = {
@@ -812,7 +952,11 @@ def compose_experiment_dossier(
             "native_kind": locator.native_kind,
         },
         "planes": {
-            "execution": _execution_state(direct),
+            "execution": (
+                "UNKNOWN" if (_execution_state(direct) == "NO_RUN"
+                              and (relation_gaps or records_status not in {"AVAILABLE", "NOT_PRESENT"}))
+                else _execution_state(direct)
+            ),
             "evidence": _evidence_state(guard, obligations),
             "decision": _decision_state(history),
         },
@@ -820,6 +964,7 @@ def compose_experiment_dossier(
         "obligations": obligations,
         "result": result_values,
         "direct_evidence": direct,
+        "execution_relation_gaps": relation_gaps,
         "related_prior_memory": related,
         "decision_history": history,
         "science_guard": guard,
@@ -829,6 +974,7 @@ def compose_experiment_dossier(
             "source_kind": source_ref.get("kind"),
             "source_value": relative or None,
             "spec_sha256": spec_digest,
+            "canonical_spec_sha256": canonical_spec_digest,
         },
         "write_capability": dict(write_capability or {"read": "AVAILABLE", "write": "UNKNOWN"}),
         "owner_decision_kinds": list(OWNER_DECISION_KINDS),

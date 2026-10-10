@@ -38,14 +38,15 @@ RESEARCH_CYCLES = ROOT / "registries/research_cycles.yaml"
 PRODUCT_TERMINAL = "ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE"
 # capabilities.py moved only to register CAP-HFIC-TEMPORAL-FIXED-TIME-PROXY-001.
 # application.py moved only for PAPER_PLANE_READ_FRESHNESS_V1 readonly
-# request ownership, snapshots and materialized owner projections. The other
-# four files retain the ordinary-hypothesis pin. Composition tests below remain
+# request ownership, snapshots and materialized owner projections. Workbench
+# moved only for FORGE_TRUST_CLOSURE_V1 lineage-gap readout. The other three
+# files retain the ordinary-hypothesis pin. Composition tests below remain
 # the behavioral regression; these hashes are not a scientific result.
 FACTORY_CORE = {
     "src/solana_alpha_lab/factory/runner.py": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
     "src/solana_alpha_lab/factory/capabilities.py": "6e88094c7bb9f9bbd13cd5316c8ac20001592eb1782fe1243b805fe949814e13",
     "src/solana_alpha_lab/factory/read_model.py": "107e91ef8e9aef8e09e2733fd93407c873f80ddf8feeeaab07bf5d4a3684ed9a",
-    "src/solana_alpha_lab/factory/workbench.py": "e959369b6c2fa3395838a391bccf38beab37ffd3193ca1ce28b7f01172fa53dc",
+    "src/solana_alpha_lab/factory/workbench.py": "3a59bcf2bd4951784b401bcbd250b4e99ee7f68be423964832760f1649f0218e",
     "src/solana_alpha_lab/factory/market_feature_surface.py": "e6bbb655629da5582eaf30571a07ca37dac28aefdb93a4b808cf57ae45958e2b",
     "src/solana_alpha_lab/factory/application.py": "73e02402a8f6e0a294a9c580a64c623f3c6bb6fe4f1afd31557edc0cf3ea6fc3",
 }

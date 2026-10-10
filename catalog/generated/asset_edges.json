@@ -6123,6 +6123,21 @@
       "target_asset_id": "MODULE-HFIC-TEMPORAL-DISCOVERY-001"
     },
     {
+      "source_asset_id": "DOC-FORGE-TRUST-CLOSURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "TASK-FORGE-TRUST-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "DOC-FORGE-TRUST-CLOSURE-REPLAY-001",
+      "relation": "governed_by",
+      "target_asset_id": "TASK-FORGE-TRUST-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "DOC-FORGE-TRUST-CLOSURE-SCIENCE-001",
+      "relation": "governed_by",
+      "target_asset_id": "TASK-FORGE-TRUST-CLOSURE-001"
+    },
+    {
       "source_asset_id": "DOC-HFIC-SCIENTIFIC-DISCOVERY-PROSPECTS-001",
       "relation": "derived_from",
       "target_asset_id": "DOC-HFIC-SCIENTIFIC-DISCOVERY-RESEARCH-001"
@@ -7141,6 +7156,16 @@
       "source_asset_id": "EVIDENCE-FORGE-COMPOSITE-FEATURE-RECIPES-001",
       "relation": "depends_on",
       "target_asset_id": "TEST-FORGE-COMPOSITE-FEATURE-RECIPES-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FORGE-TRUST-CLOSURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "TASK-FORGE-TRUST-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FORGE-TRUST-CLOSURE-LEDGER-001",
+      "relation": "governed_by",
+      "target_asset_id": "TASK-FORGE-TRUST-CLOSURE-001"
     },
     {
       "source_asset_id": "EVIDENCE-FRESH-OOS-FRICTION-VETO-ACCEPTANCE-001",
@@ -17521,6 +17546,11 @@
       "source_asset_id": "TEST-FORGE-REPRESENTATION-LADDER-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FORGE-REPRESENTATION-LADDER-001"
+    },
+    {
+      "source_asset_id": "TEST-FORGE-TRUST-CLOSURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "TASK-FORGE-TRUST-CLOSURE-001"
     },
     {
       "source_asset_id": "TEST-FORWARD-H900-QUOTE-CAPTURE-001",
