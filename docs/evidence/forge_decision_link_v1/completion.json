@@ -2,9 +2,9 @@
   "schema": "smial.delivery-completion-evidence",
   "schema_version": "1.0",
   "acceptance_id": "FORGE_DECISION_LINK_V1-TECHNICAL-CANDIDATE",
-  "as_of": "2026-10-10",
+  "as_of": "2026-10-11",
   "task_id": "FORGE_DECISION_LINK_V1",
-  "state_change": "Exact per-test original request/result/applicability and positive source links exposed; foreign pending retry prevented. Review and CI/owner authority remain delivery gates.",
+  "state_change": "Cold per-test original request/result/applicability and exact native candidate source links exposed; pending and already-landed same-policy/corpus reservations refused before values. Four isolated content reviews PASS; exact-head CI/readiness and owner merge authority remain gates.",
   "base_main": "76993054cfaeeee7e9fb6e7b718add8cf27e404a",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
@@ -30,14 +30,18 @@
     "independent_review": {
       "path": "docs/evidence/forge_decision_link_v1/independent-review.json",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "verdict": "PENDING"
+      "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": [
       "PASS_RETENTION_CANARIES",
       "PASS_COMPOUND_RECOVERY",
-      "PASS_PROPAGATION"
+      "PASS_PROPAGATION",
+      "PASS_NATIVE_LANDED_BEFORE_OTHER_LEASE_DISTINCT13_PLUS1",
+      "PASS_READER_LOCATOR_PAGE_INTEGRITY",
+      "PASS_RELEVANT_NATIVE_SOURCE_FRONTIER_SCOPED",
+      "PASS_FRESH_POSITIVE_OWN_SCRIPTED_CRITIC_CONSUMER"
     ]
   },
   "non_claims": [
