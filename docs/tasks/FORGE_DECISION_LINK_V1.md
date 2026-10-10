@@ -358,3 +358,14 @@ non-creating root/open boundaries; no other command change or data-owner bypass.
 Current code/architecture v3 reviews stopped before root writes and are not
 PASS evidence. Retain second UX NOT_READY, freeze final content and launch
 four fresh isolated roles before evidence binding and normal delivery.
+
+SOURCE_REFUSAL_REPLAN: code and goal reviews of f0efc30 returned NOT_READY:
+an unreadable discovery wrapper is discarded before operation selection and
+can yield a successful empty/partial page and false pending reservation.
+Refuse unreadable discovery sources before pagination for both locators;
+unverifiable operation/journal affiliation cannot be used to hide the fault.
+Check result integrity for the whole selected set before pagination. Preserve
+real pending and legal empty-page behavior; no new store, schema or writer.
+Qualify controlled read-view faults over retained native producer records,
+including off-page/ambiguous scope and valid cold counterparts. Preserve all
+prior source epochs and NOT_READY; fresh four-role review/rebind required.

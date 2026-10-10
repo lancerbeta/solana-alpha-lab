@@ -61,6 +61,7 @@ def discovery_detail(
     snapshot = _Snapshot(store)
     bodies: dict[str, dict[str, Any]] = {}
     invalid: set[str] = set()
+    unreadable_discovery = False
     operations: dict[str, list[dict[str, Any]]] = {}
     reservations = []
     looks = []
@@ -69,19 +70,27 @@ def discovery_detail(
         ref = str(record.record_id)
         if getattr(record.record_kind, "value", record.record_kind) != "RESEARCH_ARTIFACT":
             continue
+        is_discovery = ref.startswith("HFIC-ART-DISCOVERY-")
         try:
             wrapper = json.loads(record.payload_json)
+            if not isinstance(wrapper, dict):
+                raise TypeError("ARTIFACT_WRAPPER_NOT_OBJECT")
+            kind = wrapper.get("artifact_kind")
+            is_discovery = is_discovery or kind == "DISCOVERY_QUERY_LOOK"
             canonical = wrapper["payload_canonical"]
             body = json.loads(canonical)
-            if not isinstance(body, dict) or hashlib.sha256(canonical.encode("utf-8")).hexdigest() != wrapper["payload_sha256"]:
+            if (not isinstance(body, dict)
+                or hashlib.sha256(canonical.encode("utf-8")).hexdigest() != wrapper["payload_sha256"]
+                or is_discovery and kind != "DISCOVERY_QUERY_LOOK"):
                 invalid.add(ref)
+                unreadable_discovery = unreadable_discovery or is_discovery
                 continue
         except (KeyError, TypeError, ValueError):
             invalid.add(ref)
+            unreadable_discovery = unreadable_discovery or is_discovery
             continue
         body = {**body, "record_id": ref}
         bodies[ref] = body
-        kind = wrapper.get("artifact_kind")
         if kind == OPERATION_KIND:
             body["_recorded_at"] = record.created_at.isoformat()
             operations.setdefault(str(body.get("operation_sha256")), []).append(body)
@@ -91,8 +100,14 @@ def discovery_detail(
             looks.append(body)
         elif kind in {"FORGE_DRAFT", "CRITIC_INPUT_PACKET"}:
             candidate_sources.append({"body": body, "wrapper": wrapper, "ref": ref})
-    if result_ref in invalid:
+    # An unreadable look has no verified operation/journal affiliation. It
+    # cannot safely be omitted from a page, current-look or pending calculation.
+    if unreadable_discovery or result_ref in invalid:
         raise DiscoveryDetailError("DISCOVERY_DETAIL_SOURCE_UNREADABLE")
+    for look in looks:
+        result = look.get("result")
+        if not isinstance(result, Mapping) or result_sha256(result) != look.get("result_sha256"):
+            raise DiscoveryDetailError("DISCOVERY_DETAIL_RESULT_HASH_MISMATCH")
     selected = [look for look in looks if (not result_ref or look["record_id"] == result_ref)
         and (not operation_sha256 or look.get("operation_sha256") == operation_sha256)]
     if result_ref and not selected:
@@ -105,9 +120,6 @@ def discovery_detail(
     grouped = view.by_subject()
     entries = []
     for look in selected[offset:offset + limit]:
-        result = look.get("result")
-        if not isinstance(result, Mapping) or result_sha256(result) != look.get("result_sha256"):
-            raise DiscoveryDetailError("DISCOVERY_DETAIL_RESULT_HASH_MISMATCH")
         digest = str(look.get("operation_sha256") or "")
         rows = operations.get(digest, [])
         # Immutable request fields are identical across lifecycle snapshots.

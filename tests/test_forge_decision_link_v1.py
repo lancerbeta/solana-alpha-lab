@@ -278,9 +278,45 @@ class NativeSavedSourceProjectionTests(_Base):
             for record in records:
                 yield record.model_copy(update={"payload_json": "{"}) if record.record_id == self.look["record_id"] else record
         before = self.store.diagnostics().committed_inventory_sha256
+        for locator in ({"result_ref": self.look["record_id"]},
+                        {"operation_sha256": self.look["operation_sha256"]},
+                        {"operation_sha256": self.look["operation_sha256"], "offset": 1, "limit": 1}):
+            with self.subTest(locator=locator):
+                with self.assertRaises(DiscoveryDetailError) as stopped:
+                    discovery_detail(self.view(corrupted), **locator, current_market=self.ctx["market"])
+                self.assertEqual(stopped.exception.code, "DISCOVERY_DETAIL_SOURCE_UNREADABLE")
+        # The same native snapshot contains q2 from a different operation.
+        # Once unreadable, its affiliation cannot be trusted to exempt q1.
+        other_ref = self.ctx["q2"]["record_id"]
+        def ambiguous(records):
+            for record in records:
+                yield record.model_copy(update={"payload_json": "{"}) if record.record_id == other_ref else record
         with self.assertRaises(DiscoveryDetailError) as stopped:
-            discovery_detail(self.view(corrupted), result_ref=self.look["record_id"], current_market=self.ctx["market"])
+            discovery_detail(self.view(ambiguous), operation_sha256=self.look["operation_sha256"], limit=1)
         self.assertEqual(stopped.exception.code, "DISCOVERY_DETAIL_SOURCE_UNREADABLE")
+        self.assertEqual(self.store.diagnostics().committed_inventory_sha256, before)
+
+    def test_result_integrity_is_checked_before_pagination(self):
+        import hashlib
+        from solana_alpha_lab.factory.hfic_discovery_detail import DiscoveryDetailError, discovery_detail
+        def corrupted(records):
+            for record in records:
+                if record.record_id != self.look["record_id"]:
+                    yield record
+                    continue
+                wrapper = json.loads(record.payload_json)
+                body = json.loads(wrapper["payload_canonical"])
+                body["result_sha256"] = "ff" * 32
+                canonical = json.dumps(body, sort_keys=True, separators=(",", ":"))
+                wrapper.update(payload_canonical=canonical, payload_sha256=hashlib.sha256(canonical.encode()).hexdigest())
+                yield record.model_copy(update={"payload_json": json.dumps(wrapper)})
+        before = self.store.diagnostics().committed_inventory_sha256
+        for locator in ({"result_ref": self.look["record_id"], "offset": 1},
+                        {"operation_sha256": self.look["operation_sha256"], "offset": 1}):
+            with self.subTest(locator=locator):
+                with self.assertRaises(DiscoveryDetailError) as stopped:
+                    discovery_detail(self.view(corrupted), **locator)
+                self.assertEqual(stopped.exception.code, "DISCOVERY_DETAIL_RESULT_HASH_MISMATCH")
         self.assertEqual(self.store.diagnostics().committed_inventory_sha256, before)
 
     def test_malformed_saved_query_pin_refuses_with_a_valid_source_counterpart(self):

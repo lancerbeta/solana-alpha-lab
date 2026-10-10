@@ -214,3 +214,23 @@ exit2, `RESEARCH_STORE_NOT_PRESENT`, safe Russian next action, values/writes=0.
 Resource и точные hashes — `native-qualification.json`; нет нового science run.
 При найденном gap code/architecture v3 reviews прерваны до изменений;
 они не используются как PASS. Финальный candidate получает fresh четыре reviews.
+
+
+## Integrity before pagination
+
+Code и goal reviews f0efc30 — `NOT_READY`: unreadable discovery wrapper
+мог исчезнуть из operation-only страницы, а landed reservation стать pending.
+Теперь оба locator получают typed source refusal до pagination/current/pending;
+result hashes проверяются во всём discovery snapshot. Нечитаемый artifact
+нельзя достоверно отнести к другой operation/journal и исключить из проверки.
+Это консервативная потеря доступности чтения, а не отрицательный научный результат.
+
+Четыре focused native projection tests PASS: оба locator, off-page hash,
+ambiguous source в snapshot с двумя настоящими результатами разных operations,
+валидный landed result, законная пустая страница и настоящая pending reservation.
+Девять fresh public reads PASS;230 native файлов неизменны, успешный result
+побайтно соответствует original JSON payload. Faults изменяют только read view;
+нет нового scientific look или producer terminal. Первые red/green failures и
+частичная CLI попытка сохранены: ошибочное требование body artifact_kind было
+убрано после проверки native writer, который хранит kind в wrapper.
+Точные source epochs, hashes и времена — `native-qualification.json`.
