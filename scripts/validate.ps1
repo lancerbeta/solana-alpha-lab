@@ -58,8 +58,9 @@ try {
     Push-Location $root.Text.Trim()
     try {
         if ($PreCommit) {
-            $diffCheck = Invoke-NativeResult -File "git.exe" -Arguments @(
-                "diff", "--cached", "--check"
+            $diffCheck = Invoke-NativeResult -File "uv.exe" -Arguments @(
+                "run", "--locked", "--managed-python", "python", "-B",
+                ".\scripts\precommit_diff_check.py"
             )
             $diffCheck.Lines | ForEach-Object { Write-Output $_ }
             if ($diffCheck.ExitCode -ne 0) {

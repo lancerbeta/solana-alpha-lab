@@ -1,0 +1,31 @@
+{
+  "schema": "baa.kit-validation.v1",
+  "focused_controls": {
+    "command": "uv run --offline --locked --managed-python python -B -m unittest tests.test_big_agentic_audit_v1 -q",
+    "result": "PASS",
+    "tests": 13
+  },
+  "credential_scan": {
+    "result": "PASS",
+    "fake_secret_rejection": "PASS"
+  },
+  "actual_nonoverwrite_probe": {
+    "phase": "metrics",
+    "attempt": "a1",
+    "result": "PASS_REFUSAL_BEFORE_MUTATION",
+    "observed_error": "AUDIT_ATTEMPT_ALREADY_EXISTS",
+    "exit_code": 1
+  },
+  "review_repairs": [
+    "Reject existing container, volume and output before mutation; verify campaign ownership",
+    "Bridge and WAL graders enforce all readonly/science guards",
+    "Unittest coverage requires complete trace; bespoke proof lane explicit",
+    "Interaction results derive from retained completed witnesses",
+    "B01 and C06 downgraded UNKNOWN; C08 nonexistent selector removed",
+    "Replay output separate; baseline overwrite requires explicit builder flag",
+    "Persist failed preflight keys and owner recovery instructions",
+    "Partial replay does not inherit unvisited baseline failures, sequences, refusal or fixture handoff"
+  ],
+  "product_repairs": 0,
+  "no_full_gate_run": true
+}

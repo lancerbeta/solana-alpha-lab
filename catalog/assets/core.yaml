@@ -2,6 +2,22 @@ schema_version: '1.1'
 registry_id: CATALOG-ASSET-REGISTRY-CORE-001
 as_of: '2026-08-10'
 records:
+- asset_id: DOC-BIG-AGENTIC-AUDIT-V1-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Russian PARTIAL_BLOCKED synthetic audit checkpoint, retained coverage/backlog and reusable offline replay kit; no scientific or production acceptance.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-10-10'
+  truth_owner: BIG_AGENTIC_AUDIT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/big_agentic_audit_v1/REPORT.md', repository_path: docs/reports/big_agentic_audit_v1/REPORT.md}
+  integrity: {kind: sha256, sha256: 22c410bc7e5313d9e781e3cff4f1f4be3df7ac745ff4d9f43b46adb651f1dd1f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations: [{relation_type: depends_on, target_asset_id: DOC-EXPERIMENT-EVIDENCE-DECISION-001}, {relation_type: depends_on, target_asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001}]
+  consumers: [BIG-AGENTIC-AUDIT-V1, FACTORY-001, NEXT-REPAIR-EXECUTOR]
+  evidence: []
+  search_terms: [BIG_AGENTIC_AUDIT_V1, synthetic sandbox, coverage, BAA-001, BAA-002, run dossier linkage, WAL, audit replay]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: SCM-BASELINE-COMMIT-001
   record_version: '1.0'
   asset_type: repository_snapshot
@@ -865,7 +881,7 @@ records:
     repository_path: scripts/validate.ps1
   integrity:
     kind: sha256
-    sha256: b8cfec45d197bc9c0fcfa9ca8776efcc17383e3853b7bf810cc8c408c66ae993
+    sha256: 67255a82c800cf6bcbebac02d805b272fdddc8793e6b589a609ff768abb8534b
   access:
     mode: read_only
     method: command
@@ -41101,7 +41117,7 @@ records:
     repository_path: docs/tasks/FORGE_TRUST_CLOSURE_V1.md
   integrity:
     kind: sha256
-    sha256: 17e6473a6797070f840ba24ef73e48fcc91a9e241c9e153c9541d5fa79b7e3c6
+    sha256: 81b4ae75d010cad4b19add23cabdf83c744b7ddc88382b8973f4093952544a16
   access:
     mode: read_only
     method: file
@@ -41138,7 +41154,7 @@ records:
     repository_path: docs/reports/forge_trust_closure_v1/READOUT.md
   integrity:
     kind: sha256
-    sha256: ed12fc0e25b0a16844e0efd17dd9f0791ebb63664678a73829b9c5cdcdb3c1ed
+    sha256: 17cc7a5be8ae7d8a32628d6d6705267be584a287248459863fe24c1d6876f83b
   access:
     mode: read_only
     method: file
@@ -41255,7 +41271,7 @@ records:
     repository_path: docs/evidence/forge_trust_closure_v1/run_index.json
   integrity:
     kind: sha256
-    sha256: bb31230d58e8d4e8ff7e2a8bedee3955cd12e389b88b72db0a3299bd4f8d93c9
+    sha256: 39893e187f8438e4e9b32f7cc4edccc3c05d84eac97e784b5c6bf77898c564f7
   access:
     mode: read_only
     method: file

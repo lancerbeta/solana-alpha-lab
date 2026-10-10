@@ -8,7 +8,11 @@ AGENT_BEHAVIOR_UNVERIFIED сохраняется. Это разные verdicts, 
 
 Основание: product base `90ba76e37515b3d521478a6d05a149fb0f1d2b75`,
 PR393 audit head `ea4afb52b9d188c378d2a9850ba1b26c85496821` (OPEN при Entry).
-Исходный audit не изменён и не принят как main truth. Owner PRD+SSD hash:
+На Entry audit ещё не был main. Перед frozen review PR393 merged с final head
+`d1e66ede07ff2586580a74f2b8e35fa0c5f9308d` в main
+`96eb087224f012ccb028ba468d4e0a7cd7ca1506`; добавлено уточнение audit stop semantics,
+product source не изменён. Task branch включила этот main обычным merge, без
+history rewrite. Audit bytes сохранены; исторический PARTIAL не повышен. Owner PRD+SSD hash:
 `8c614c82e29969f5428ae498f47a28d22c7dc9c81d2aaafdc3d4445c73308215`.
 
 | Граница | До ремонта, фактический baseline | После ремонта, фактический readback |
@@ -100,3 +104,12 @@ Rollback обычным owner-gated revert не меняет records/budget, н�
 Delivery завершается проверенным PR и exact-head merge-readiness. Merge, canonical
 DONE и post-merge acceptance требуют отдельной точной owner phrase и guarded
 readback; этот документ не выдаёт разрешение.
+
+Upstream reconciliation выявил связанный mechanical blocker: обычный precommit
+whitespace check сравнивал весь incoming accepted audit с прежним task HEAD,
+включая две исторические строки SPEC. Audit не переписан, hook не обходился.
+Для pending merge exact `origin/main` новый helper проверяет весь staged candidate
+delta относительно incoming main; ordinary/non-main merge сохраняет прежнюю
+границу. Три реальные Git проверки PASS: accepted history сохраняется; новый
+candidate whitespace и non-main incoming whitespace дают nonzero. Эта узкая
+инженерная корректировка включена в contract write set и независимый review.

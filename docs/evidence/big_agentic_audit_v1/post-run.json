@@ -1,0 +1,608 @@
+{
+  "schema": "baa.post-run-containment.v1",
+  "volumes": [
+    {
+      "volume": "baa-branches-a2-evidence",
+      "bytes": 165687207
+    },
+    {
+      "volume": "baa-bridge-a1-evidence",
+      "bytes": 4840819
+    },
+    {
+      "volume": "baa-bridge-a2-evidence",
+      "bytes": 4842640
+    },
+    {
+      "volume": "baa-bridge-a3-evidence",
+      "bytes": 4842640
+    },
+    {
+      "volume": "baa-bridge-b1-evidence",
+      "bytes": 4842640
+    },
+    {
+      "volume": "baa-core-a2-evidence",
+      "bytes": 45532036
+    },
+    {
+      "volume": "baa-critic-a1-evidence",
+      "bytes": 36578111
+    },
+    {
+      "volume": "baa-interactions-a1-evidence",
+      "bytes": 1677247
+    },
+    {
+      "volume": "baa-metrics-a1-evidence",
+      "bytes": 9306
+    },
+    {
+      "volume": "baa-probes-a1-evidence",
+      "bytes": 1015665
+    },
+    {
+      "volume": "baa-probes-a2-evidence",
+      "bytes": 2816269
+    },
+    {
+      "volume": "baa-producer-a1-evidence",
+      "bytes": 20227761
+    },
+    {
+      "volume": "baa-recovery-a1-evidence",
+      "bytes": 207181691
+    },
+    {
+      "volume": "baa-science-a1-evidence",
+      "bytes": 149183
+    },
+    {
+      "volume": "baa-spine-a2-evidence",
+      "bytes": 162480818
+    },
+    {
+      "volume": "baa-wal-a1-evidence",
+      "bytes": 985272
+    }
+  ],
+  "native_evidence_bytes": 663709305.0,
+  "native_under_2_gib": true,
+  "states": [
+    {
+      "container": "baa-metrics-a1",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false,
+      "started": "2026-10-10T08:00:14.753539468Z",
+      "finished": "2026-10-10T08:00:15.98312542Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        }
+      ]
+    },
+    {
+      "container": "baa-bridge-b1",
+      "running": false,
+      "exit_code": 1,
+      "oom_killed": false,
+      "started": "2026-10-10T07:58:50.69206251Z",
+      "finished": "2026-10-10T07:58:52.133300856Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/input",
+          "RW": false,
+          "Type": "volume"
+        },
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        }
+      ]
+    },
+    {
+      "container": "baa-interactions-a1",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false,
+      "started": "2026-10-10T07:57:02.031395917Z",
+      "finished": "2026-10-10T07:57:07.918173792Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        }
+      ]
+    },
+    {
+      "container": "baa-producer-a1",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false,
+      "started": "2026-10-10T07:55:14.588238062Z",
+      "finished": "2026-10-10T07:56:53.055673889Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        },
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        }
+      ]
+    },
+    {
+      "container": "baa-critic-a1",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false,
+      "started": "2026-10-10T07:50:00.306153228Z",
+      "finished": "2026-10-10T07:52:01.728577832Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        }
+      ]
+    },
+    {
+      "container": "baa-bridge-a3",
+      "running": false,
+      "exit_code": 1,
+      "oom_killed": false,
+      "started": "2026-10-10T07:46:05.020836757Z",
+      "finished": "2026-10-10T07:46:06.506399062Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        },
+        {
+          "Destination": "/input",
+          "RW": false,
+          "Type": "volume"
+        }
+      ]
+    },
+    {
+      "container": "baa-bridge-a2",
+      "running": false,
+      "exit_code": 1,
+      "oom_killed": false,
+      "started": "2026-10-10T07:44:07.951514034Z",
+      "finished": "2026-10-10T07:44:09.430495156Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        },
+        {
+          "Destination": "/input",
+          "RW": false,
+          "Type": "volume"
+        },
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        }
+      ]
+    },
+    {
+      "container": "baa-bridge-a1",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false,
+      "started": "2026-10-10T07:42:40.674313289Z",
+      "finished": "2026-10-10T07:42:42.154113499Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        },
+        {
+          "Destination": "/input",
+          "RW": false,
+          "Type": "volume"
+        },
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        }
+      ]
+    },
+    {
+      "container": "baa-science-a1",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false,
+      "started": "2026-10-10T07:41:18.555110525Z",
+      "finished": "2026-10-10T07:43:19.539310915Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        }
+      ]
+    },
+    {
+      "container": "baa-wal-a1",
+      "running": false,
+      "exit_code": 1,
+      "oom_killed": false,
+      "started": "2026-10-10T07:40:57.200031738Z",
+      "finished": "2026-10-10T07:40:58.548643175Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        }
+      ]
+    },
+    {
+      "container": "baa-recovery-a1",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false,
+      "started": "2026-10-10T07:37:32.728907805Z",
+      "finished": "2026-10-10T07:39:16.985427915Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        }
+      ]
+    },
+    {
+      "container": "baa-probes-a2",
+      "running": false,
+      "exit_code": 1,
+      "oom_killed": false,
+      "started": "2026-10-10T07:31:58.115385492Z",
+      "finished": "2026-10-10T07:32:06.160314834Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        },
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        }
+      ]
+    },
+    {
+      "container": "baa-probes-a1",
+      "running": false,
+      "exit_code": 1,
+      "oom_killed": false,
+      "started": "2026-10-10T07:31:05.605943139Z",
+      "finished": "2026-10-10T07:31:08.694083478Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        }
+      ]
+    },
+    {
+      "container": "baa-branches-a2",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false,
+      "started": "2026-10-10T07:24:09.79016843Z",
+      "finished": "2026-10-10T07:40:35.362913537Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        }
+      ]
+    },
+    {
+      "container": "baa-spine-a2",
+      "running": false,
+      "exit_code": 1,
+      "oom_killed": false,
+      "started": "2026-10-10T07:24:09.570803824Z",
+      "finished": "2026-10-10T07:50:37.699816413Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        }
+      ]
+    },
+    {
+      "container": "baa-core-a2",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false,
+      "started": "2026-10-10T07:24:08.568704805Z",
+      "finished": "2026-10-10T07:26:33.440743734Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "volume"
+        }
+      ]
+    },
+    {
+      "container": "baa-spine-a1",
+      "running": false,
+      "exit_code": 143,
+      "oom_killed": false,
+      "started": "2026-10-10T07:19:49.54620893Z",
+      "finished": "2026-10-10T07:22:22.878406067Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/repo",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "bind"
+        }
+      ]
+    },
+    {
+      "container": "baa-core-a1",
+      "running": false,
+      "exit_code": 143,
+      "oom_killed": false,
+      "started": "2026-10-10T07:19:22.578690604Z",
+      "finished": "2026-10-10T07:22:22.870225478Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/repo",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "bind"
+        }
+      ]
+    },
+    {
+      "container": "baa-smoke-a2",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false,
+      "started": "2026-10-10T07:17:50.423155449Z",
+      "finished": "2026-10-10T07:17:59.090819482Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/repo",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "bind"
+        }
+      ]
+    },
+    {
+      "container": "baa-smoke-a1",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false,
+      "started": "2026-10-10T07:17:07.05041125Z",
+      "finished": "2026-10-10T07:17:16.200461856Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/repo",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "bind"
+        }
+      ]
+    },
+    {
+      "container": "baa-preflight-a2",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false,
+      "started": "2026-10-10T07:15:17.35316933Z",
+      "finished": "2026-10-10T07:15:17.584230749Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/repo",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "bind"
+        }
+      ]
+    },
+    {
+      "container": "baa-preflight-a1",
+      "running": false,
+      "exit_code": 1,
+      "oom_killed": false,
+      "started": "2026-10-10T07:14:04.563529893Z",
+      "finished": "2026-10-10T07:14:04.913264234Z",
+      "network": "none",
+      "readonly": true,
+      "mounts": [
+        {
+          "Destination": "/kit",
+          "RW": false,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/audit",
+          "RW": true,
+          "Type": "bind"
+        },
+        {
+          "Destination": "/repo",
+          "RW": false,
+          "Type": "bind"
+        }
+      ]
+    }
+  ],
+  "owned_background_processes": 0
+}

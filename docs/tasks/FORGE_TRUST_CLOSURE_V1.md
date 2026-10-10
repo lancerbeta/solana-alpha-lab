@@ -8,9 +8,9 @@ allowed_routes: [DIRECT_CODEX_DELIVERY]
 required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 90ba76e37515b3d521478a6d05a149fb0f1d2b75
+  expected_base: 96eb087224f012ccb028ba468d4e0a7cd7ca1506
   expected_upstream: origin/main
-  expected_upstream_oid: 90ba76e37515b3d521478a6d05a149fb0f1d2b75
+  expected_upstream_oid: 96eb087224f012ccb028ba468d4e0a7cd7ca1506
   expected_branch: codex/forge-trust-closure-v1
   dirty_mode: ALLOW_REPORTED
 objective: Repair and requalify the implemented Forge producer-to-owner vertical in synthetic scope, preserving current read freshness, exact execution identity, scientific guards, history and recovery; resolve BAA-003 to an evidenced route or exact scientific decision boundary.
@@ -20,6 +20,9 @@ managed_write_set:
 - docs/evidence/forge_trust_closure_v1/**
 - tests/fixtures/forge_trust_closure_v1/**
 - tests/test_forge_trust_closure_v1.py
+- tests/test_precommit_diff_check_v1.py
+- scripts/precommit_diff_check.py
+- scripts/validate.ps1
 - tests/test_factory_operational_store_readonly_schema_compat_v1.py
 - tests/test_experiment_evidence_decision_v1.py
 - tests/test_owner_lifecycle_projection_spine_v1.py
@@ -109,6 +112,10 @@ preparatory-only output, second provider/route pivot, resource boundary.
 
 Reuse: WRAP the pinned audit kit and existing runtime; BUILD only bounded
 project-owned identity/reader repairs. CAPABILITY_RADAR_NOW=NONE.
+Engineering replan: reconcile merged PR393 at exact main 96eb087224f012ccb028ba468d4e0a7cd7ca1506.
+Preserve audit bytes. Repair precommit whitespace reference only for a pending
+merge of exact origin/main; all new task whitespace and ordinary/non-main merge
+checks stay fail-closed. No hook bypass, Git settings change or authority grant.
 PRODUCT_HORIZON_NOW: restore this implemented consumer loop.
 PRODUCT_HORIZON_WATCH: chronological recipe successor, activated only by the
 exact scientific/capability disposition proved in this atom.

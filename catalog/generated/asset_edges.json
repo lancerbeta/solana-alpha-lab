@@ -5923,6 +5923,16 @@
       "target_asset_id": "EVIDENCE-T25-A4-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "DOC-BIG-AGENTIC-AUDIT-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-EXPERIMENT-EVIDENCE-DECISION-001"
+    },
+    {
+      "source_asset_id": "DOC-BIG-AGENTIC-AUDIT-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
       "source_asset_id": "DOC-CANARY-SPECIFICATION-ONLY-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001"

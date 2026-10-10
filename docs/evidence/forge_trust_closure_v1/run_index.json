@@ -2520,5 +2520,12 @@
     "NO_CONFINED_ACTOR",
     "NO_PIXEL_BROWSER_UX",
     "NO_BLANKET_56_CHARTER_PASS"
-  ]
+  ],
+  "precommit_merge_reference_probe": {
+    "status": "PASS",
+    "tests_run": 3,
+    "witness": "tests.test_precommit_diff_check_v1",
+    "scope": "REAL_GIT_EXACT_MAIN_HISTORY_VS_NEW_CANDIDATE_AND_NONMAIN_DIFF",
+    "invocation": "uv run --locked --managed-python python -B -m unittest tests.test_precommit_diff_check_v1"
+  }
 }
