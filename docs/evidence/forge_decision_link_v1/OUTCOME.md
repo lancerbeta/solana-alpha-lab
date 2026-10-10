@@ -234,3 +234,25 @@ ambiguous source в snapshot с двумя настоящими результа
 частичная CLI попытка сохранены: ошибочное требование body artifact_kind было
 убрано после проверки native writer, который хранит kind в wrapper.
 Точные source epochs, hashes и времена — `native-qualification.json`.
+
+
+## Relevant native source frontier
+
+e6109ee code/goal/architecture — `NOT_READY`, semantic premise `FAIL`:
+readout мог скрыть unreadable reservation или unscoped disposition. Теперь
+existing reserved refs/kinds определяют относящиеся к projection native frames;
+повреждённая целостность даёт typed source refusal. Existing disposition owner
+сохраняет scoped UNREADABLE; его unscoped unavailable marker блокирует только
+этот read command. Subject не угадывается, чужие произвольные artifacts не
+блокируют чтение; scientific suppression/новых owners/schemas/writers нет.
+
+Два focused native tests PASS. Genuine request/reservation и scripted native
+assessment→successor→withdrawal проверены controlled read-view faults, включая
+оба locator и unscoped schema marker.13 успешных r07 public outputs сохранены;
+четыре r08 reads PASS на actual committed refs. R07 и первый green остаются
+частичными/failed: helper адресовал derived locator из record_operation,
+не реальный ref из get_operation. Полный успешный r07 batch не выдумывается.
+248/6 файлов owned native stores и230 исходных файлов неизменны при tail reads.
+После изменения frontier заново PASS existing positive native candidate→own
+scripted Critic consumer; это механическое покрытие, не scientific acceptance.
+Все hashes/source epochs/resource gaps — native-qualification.json.

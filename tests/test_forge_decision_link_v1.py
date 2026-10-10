@@ -134,8 +134,28 @@ class PendingAuthoredBasisTests(unittest.TestCase):
         self.assertEqual(answer["writes"], {"research_store": 0})
         self.assertEqual(self.store.diagnostics().committed_inventory_sha256, before)
 
+    def test_unreadable_native_request_or_reservation_is_not_empty_pending(self):
+        from solana_alpha_lab.factory.hfic_discovery_detail import DiscoveryDetailError, discovery_detail
+        records = tuple(self.store.iter_committed_records())
+        before = self.store.diagnostics().committed_inventory_sha256
+        class View:
+            def __init__(self, target): self.target = target
+            def iter_committed_records(self):
+                return iter(record.model_copy(update={"payload_json": "{"}) if record.record_id == self.target else record for record in records)
+        valid = discovery_detail(View(None), operation_sha256=self.operation["operation_sha256"])
+        self.assertEqual(len(valid["pending_reservations"]), 1)
+        request_ref = ordinary.get_operation(self.store, self.operation["operation_sha256"])["record_id"]
+        for target in (request_ref, ordinary._reservations(self.store, self.operation["operation_sha256"])[0]["record_id"]):
+            self.assertIn(target, {record.record_id for record in records})
+            with self.subTest(target=target):
+                with self.assertRaises(DiscoveryDetailError) as stopped:
+                    discovery_detail(View(target), operation_sha256=self.operation["operation_sha256"])
+                self.assertEqual(stopped.exception.code, "DISCOVERY_DETAIL_SOURCE_UNREADABLE")
+        self.assertEqual(discovery_detail(View(None), operation_sha256=self.operation["operation_sha256"]), valid)
+        self.assertEqual(self.store.diagnostics().committed_inventory_sha256, before)
 
-from tests.test_hfic_scientific_disposition_continuity_v1 import _Base, _ctx
+
+from tests.test_hfic_scientific_disposition_continuity_v1 import _Base, _ctx, question_packet
 
 
 class NativeSavedSourceProjectionTests(_Base):
@@ -155,6 +175,54 @@ class NativeSavedSourceProjectionTests(_Base):
                 self.calls += 1
                 return iter(transform(owner.records) if transform else owner.records)
         return View()
+
+    def test_unscoped_disposition_source_cannot_look_absent_or_leave_a_clean_prior_head(self):
+        from solana_alpha_lab.factory import hfic_scientific_disposition as disp
+        from solana_alpha_lab.factory.hfic_discovery_detail import DiscoveryDetailError, discovery_detail
+        self.store.prepare_write_lookup()
+        packet = question_packet(self.ctx, self.look)
+        first = disp.record_disposition(self.store, packet, current_market=self.ctx["market"])
+        successor = copy.deepcopy(packet)
+        successor["judgement"].update(verdict="INSUFFICIENT_EVIDENCE", recommendation="REVIEW_BOUNDED_SCOPE")
+        successor["supersedes"] = {"record_id": first["record_id"], "disposition_sha256": first["disposition_sha256"]}
+        second = disp.record_disposition(self.store, successor, current_market=self.ctx["market"])
+        withdrawal = {"entry": "WITHDRAWAL", "subject": packet["subject"],
+            "withdrawal": {"reason": "Synthetic source-integrity counterpart."},
+            "supersedes": {"record_id": second["record_id"], "disposition_sha256": second["disposition_sha256"]},
+            "provenance": {"author_role": "OPERATOR", "source_episode": "SYNTHETIC-SOURCE-FAULT", "source_refs": []}}
+        last = disp.record_disposition(self.store, withdrawal, current_market=self.ctx["market"])
+        self.records = tuple(self.store.iter_committed_records())
+        before = self.store.diagnostics().committed_inventory_sha256
+        valid = discovery_detail(self.view(), result_ref=self.look["record_id"], current_market=self.ctx["market"])
+        self.assertEqual(valid["entries"][0]["scientific_disposition"]["status"], "WITHDRAWN")
+        import hashlib
+        def unscoped(records):
+            for record in records:
+                if record.record_id != last["record_id"]:
+                    yield record
+                    continue
+                wrapper = json.loads(record.payload_json)
+                wrapper.update(payload_canonical="{}", payload_sha256=hashlib.sha256(b"{}").hexdigest())
+                yield record.model_copy(update={"payload_json": json.dumps(wrapper)})
+        self.assertTrue(any(not item["readable"] and not item.get("subject_key") for item in disp._View(self.view(unscoped)).dispositions))
+        with self.assertRaises(DiscoveryDetailError) as stopped:
+            discovery_detail(self.view(unscoped), operation_sha256=self.look["operation_sha256"], current_market=self.ctx["market"])
+        self.assertEqual(stopped.exception.code, "DISCOVERY_DETAIL_SOURCE_UNREADABLE")
+        def unrelated(records):
+            yield from records
+            yield records[0].model_copy(update={"record_id": "UNRELATED-RESEARCH-READ-CANARY", "record_kind": "RESEARCH_ARTIFACT", "payload_json": "{"})
+        self.assertEqual(discovery_detail(self.view(unrelated), result_ref=self.look["record_id"], current_market=self.ctx["market"]), valid)
+        for target in [first["record_id"], second["record_id"], last["record_id"]]:
+            def corrupted(records):
+                for record in records:
+                    yield record.model_copy(update={"payload_json": "{"}) if record.record_id == target else record
+            for locator in ({"result_ref": self.look["record_id"]}, {"operation_sha256": self.look["operation_sha256"]}):
+                with self.subTest(target=target, locator=locator):
+                    with self.assertRaises(DiscoveryDetailError) as stopped:
+                        discovery_detail(self.view(corrupted), **locator, current_market=self.ctx["market"])
+                    self.assertEqual(stopped.exception.code, "DISCOVERY_DETAIL_SOURCE_UNREADABLE")
+        self.assertEqual(discovery_detail(self.view(), result_ref=self.look["record_id"], current_market=self.ctx["market"]), valid)
+        self.assertEqual(self.store.diagnostics().committed_inventory_sha256, before)
 
     def new_reservation_request(self, text):
         from tests.test_hfic_ordinary_operation_acceptance_v1 import _operation as native_request

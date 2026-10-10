@@ -369,3 +369,15 @@ real pending and legal empty-page behavior; no new store, schema or writer.
 Qualify controlled read-view faults over retained native producer records,
 including off-page/ambiguous scope and valid cold counterparts. Preserve all
 prior source epochs and NOT_READY; fresh four-role review/rebind required.
+
+NATIVE_SOURCE_FRONTIER_REPLAN: e6109ee code/goal/architecture NOT_READY
+reveals the shared read-boundary defect: dropping unreadable native frames
+can hide a pending reservation or the existing disposition owner's unscoped
+unreadable signal. Validate relevant native artifact frames through their
+existing reserved refs/kinds before projection; arbitrary foreign artifacts
+stay outside this predicate. Preserve scoped disposition UNKNOWN semantics;
+unscoped unreadability may cause only a typed read-source refusal, never
+scientific suppression or history rewrite. Qualify real native request/reserve
+and assessment/successor/withdrawal bytes through controlled read-view faults,
+both locators, valid counterparts and zero scientific look delta. Reuse current
+owners; no new ledger/schema/evaluator/lifecycle. Retain all review/source epochs.

@@ -12,7 +12,7 @@ from typing import Any, Mapping
 
 from .hfic_grounded_discovery import result_sha256
 from .hfic_ordinary_operation import OPERATION_KIND, RESERVATION_KIND, _sha, result_readout
-from .hfic_scientific_disposition import _View, _applicability, resolve_subject, subject_key
+from .hfic_scientific_disposition import ARTIFACT_KIND as DISPOSITION_KIND, RECORD_PREFIX as DISPOSITION_PREFIX, _View, _applicability, resolve_subject, subject_key
 from .hfic_temporal_discovery import _public_query_from_recipe, canonical_temporal_spec, current_look_evidence, validate_temporal_query
 
 
@@ -28,6 +28,16 @@ class _Snapshot:
 
     def iter_committed_records(self):
         return iter(self.records)
+
+
+_SOURCE_KINDS_BY_PREFIX = {
+    "HFIC-ART-OP-": OPERATION_KIND,
+    "HFIC-ART-OPRES-": RESERVATION_KIND,
+    "HFIC-ART-DISCOVERY-": "DISCOVERY_QUERY_LOOK",
+    DISPOSITION_PREFIX + "-": DISPOSITION_KIND,
+    "HFIC-ART-FORGE-DRAFT-": "FORGE_DRAFT",
+    "HFIC-ART-CRITIC-INPUT-": "CRITIC_INPUT_PACKET",
+}
 
 
 def _original_request(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
@@ -61,7 +71,7 @@ def discovery_detail(
     snapshot = _Snapshot(store)
     bodies: dict[str, dict[str, Any]] = {}
     invalid: set[str] = set()
-    unreadable_discovery = False
+    unreadable_source = False
     operations: dict[str, list[dict[str, Any]]] = {}
     reservations = []
     looks = []
@@ -70,24 +80,25 @@ def discovery_detail(
         ref = str(record.record_id)
         if getattr(record.record_kind, "value", record.record_kind) != "RESEARCH_ARTIFACT":
             continue
-        is_discovery = ref.startswith("HFIC-ART-DISCOVERY-")
+        expected_kind = next((kind for prefix, kind in _SOURCE_KINDS_BY_PREFIX.items() if ref.startswith(prefix)), None)
+        is_source = expected_kind is not None
         try:
             wrapper = json.loads(record.payload_json)
             if not isinstance(wrapper, dict):
                 raise TypeError("ARTIFACT_WRAPPER_NOT_OBJECT")
             kind = wrapper.get("artifact_kind")
-            is_discovery = is_discovery or kind == "DISCOVERY_QUERY_LOOK"
+            is_source = is_source or kind in _SOURCE_KINDS_BY_PREFIX.values()
             canonical = wrapper["payload_canonical"]
             body = json.loads(canonical)
             if (not isinstance(body, dict)
                 or hashlib.sha256(canonical.encode("utf-8")).hexdigest() != wrapper["payload_sha256"]
-                or is_discovery and kind != "DISCOVERY_QUERY_LOOK"):
+                or expected_kind is not None and kind != expected_kind):
                 invalid.add(ref)
-                unreadable_discovery = unreadable_discovery or is_discovery
+                unreadable_source = unreadable_source or is_source
                 continue
         except (KeyError, TypeError, ValueError):
             invalid.add(ref)
-            unreadable_discovery = unreadable_discovery or is_discovery
+            unreadable_source = unreadable_source or is_source
             continue
         body = {**body, "record_id": ref}
         bodies[ref] = body
@@ -100,9 +111,10 @@ def discovery_detail(
             looks.append(body)
         elif kind in {"FORGE_DRAFT", "CRITIC_INPUT_PACKET"}:
             candidate_sources.append({"body": body, "wrapper": wrapper, "ref": ref})
-    # An unreadable look has no verified operation/journal affiliation. It
-    # cannot safely be omitted from a page, current-look or pending calculation.
-    if unreadable_discovery or result_ref in invalid:
+    # An unreadable native source has no verified affiliation. Omitting it
+    # could turn unavailable request/reservation/assessment/link evidence into
+    # false absence. This refusal limits only this derived read command.
+    if unreadable_source or result_ref in invalid:
         raise DiscoveryDetailError("DISCOVERY_DETAIL_SOURCE_UNREADABLE")
     for look in looks:
         result = look.get("result")
@@ -117,6 +129,8 @@ def discovery_detail(
         raise DiscoveryDetailError("DISCOVERY_DETAIL_OPERATION_NOT_FOUND")
     selected.sort(key=lambda row: row["record_id"])
     view = _View(snapshot)
+    if any(not item["readable"] and not item.get("subject_key") for item in view.dispositions):
+        raise DiscoveryDetailError("DISCOVERY_DETAIL_SOURCE_UNREADABLE")
     grouped = view.by_subject()
     entries = []
     for look in selected[offset:offset + limit]:
