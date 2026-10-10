@@ -128,3 +128,12 @@ delta относительно incoming main; ordinary/non-main merge сохра
 границу. Три реальные Git проверки PASS: accepted history сохраняется; новый
 candidate whitespace и non-main incoming whitespace дают nonzero. Эта узкая
 инженерная корректировка включена в contract write set и независимый review.
+
+Первый exact-head CI PR394 (`f658c897329f`, workflow38046484381) получил core
+FAILURE: legacy validate_baton ожидал inline whitespace command в PowerShell,
+хотя он уже перенесён в strict helper. Downstream execution job SKIPPED по этой
+зависимости; оставшиеся test jobs на момент диагностики IN_PROGRESS, их PASS
+не предполагается. Validator теперь проверяет actual delegated wrapper/helper
+boundary, ordinary staged Git command и nonzero propagation; focused validator
+и три реальные Git regressions PASS. Product source/science не изменены.
+Failure/retry сохранены в ci_repair.json; новый head требует fresh review/bind/CI.

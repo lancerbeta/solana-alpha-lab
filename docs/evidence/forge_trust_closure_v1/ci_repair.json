@@ -1,0 +1,38 @@
+{
+  "schema": "ftc.ci-repair.v1",
+  "task_id": "FORGE_TRUST_CLOSURE_V1",
+  "original_workflow_id": 38046484381,
+  "original_pr": 394,
+  "original_head": "f658c897329f348674fe5994e95f415bb6b0a3de",
+  "original_job_id": 114196952154,
+  "observed_job_result": "FAILURE",
+  "cause": "LEGACY_INLINE_DIFF_NEEDLE_AFTER_DELEGATION_TO_STRICT_HELPER",
+  "dependency_job": "validate-execution",
+  "dependency_observed_result": "SKIPPED_AFTER_CORE_FAILURE",
+  "remaining_test_jobs_at_diagnosis": "IN_PROGRESS_NOT_CLAIMED_PASS",
+  "original_log_sha256": "d91328aa22da248767836a95dec4410b10933ffbc7696918c3eaac1187342cf9",
+  "repair_owner": "scripts/validate_baton.py",
+  "repair_scope": "CHECK_DELEGATED_WRAPPER_HELPER_GIT_COMMAND_AND_FAILURE_PROPAGATION",
+  "targeted_validation": {
+    "command": "uv run --locked --managed-python python -B scripts/validate_baton.py --focused",
+    "status": "PASS",
+    "source_sha256": "baafd69db4f8b874f6794222e911f250d015e57a3009adde993be5bb8a71e343",
+    "output_sha256": "f3f42929d8e154efd432d463c723f8cfeeac27926d3728117bdfef9c6d8b76fe",
+    "real_git_regressions": 3,
+    "real_git_status": "PASS"
+  },
+  "new_full_ci_result": "REQUIRED_AT_NEW_EXACT_HEAD_NOT_PREASSERTED",
+  "product_source_changed_by_ci_repair": false,
+  "science_authority_changed": false,
+  "validator_bypass": false,
+  "non_claims": [
+    "NO_INITIAL_WORKFLOW_PASS",
+    "NO_CI_READINESS_YET",
+    "NO_MERGE"
+  ],
+  "local_nonfocused_probe": {
+    "status": "INTERRUPTED_NOT_USED_AS_PASS",
+    "reason": "DUPLICATE_CANONICAL_CATALOG_SWEEP_AFTER_FOCUSED_VALIDATOR_PASS",
+    "catalog_owner": "HARNESS_SYNC_AND_EXACT_HEAD_CI"
+  }
+}

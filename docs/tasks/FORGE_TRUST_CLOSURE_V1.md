@@ -23,6 +23,7 @@ managed_write_set:
 - tests/test_precommit_diff_check_v1.py
 - scripts/precommit_diff_check.py
 - scripts/validate.ps1
+- scripts/validate_baton.py
 - tests/test_factory_operational_store_readonly_schema_compat_v1.py
 - tests/test_experiment_evidence_decision_v1.py
 - tests/test_owner_lifecycle_projection_spine_v1.py
@@ -116,6 +117,10 @@ Engineering replan: reconcile merged PR393 at exact main 96eb087224f012ccb028ba4
 Preserve audit bytes. Repair precommit whitespace reference only for a pending
 merge of exact origin/main; all new task whitespace and ordinary/non-main merge
 checks stay fail-closed. No hook bypass, Git settings change or authority grant.
+CI replan: validate_baton checks the delegated wrapper/helper boundary and its
+ordinary staged Git check/strict exit propagation instead of an obsolete inline
+PowerShell string. The first failed exact-head CI is retained as evidence;
+product code and scientific protocol are unchanged by this validator repair.
 PRODUCT_HORIZON_NOW: restore this implemented consumer loop.
 PRODUCT_HORIZON_WATCH: chronological recipe successor, activated only by the
 exact scientific/capability disposition proved in this atom.

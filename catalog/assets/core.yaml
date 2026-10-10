@@ -4810,7 +4810,7 @@ records:
     repository_path: scripts/validate_baton.py
   integrity:
     kind: sha256
-    sha256: f8c59f75a956cfb2304ab435257e442a01e212362b4fb953e1cb0ecb24880e6a
+    sha256: baafd69db4f8b874f6794222e911f250d015e57a3009adde993be5bb8a71e343
   access:
     mode: read_only
     method: file
@@ -41117,7 +41117,7 @@ records:
     repository_path: docs/tasks/FORGE_TRUST_CLOSURE_V1.md
   integrity:
     kind: sha256
-    sha256: 81b4ae75d010cad4b19add23cabdf83c744b7ddc88382b8973f4093952544a16
+    sha256: 20d940226600a30fa342d4d5f9a354a8fafbe1aa1f30e4130592af3e4fcf195f
   access:
     mode: read_only
     method: file
@@ -41154,7 +41154,7 @@ records:
     repository_path: docs/reports/forge_trust_closure_v1/READOUT.md
   integrity:
     kind: sha256
-    sha256: 7e02c23c98a7e1aa57512aac74a7b4ff5dcf30fee2d3aab81c8d62efff585886
+    sha256: fd08463d70bfa8d77a570e015917e96695d7e68745cc319b89f95a4fd2cfb541
   access:
     mode: read_only
     method: file
