@@ -1,0 +1,61 @@
+{
+  "status": "DETERMINISTIC_REPAIR_VERIFIED_FINAL_NATIVE_CONFIRMATION_PENDING",
+  "observed_head": "01a7d00a0e45e6075c81fa31c96a6d57b109b0dd",
+  "original_execution_head": "2cace49f8443e3cd25f243ac0b740c9f1b290b29",
+  "findings": {
+    "authored_scope": "Explicit types/nested conflicts are checked before filtering and before store/reservation/value effects. Valid actual original request scopes remain equal.",
+    "numeric_precision": "Original supported decimal strings stay Fraction through fresh episode ratios, canonical predicates and downside events. No epsilon; JSON continuous metrics round at output. New EPISODES_V3 is explicit; V1/V2 saved artifacts remain current/readable with unchanged values/charges.",
+    "reader_transport": "Windows PowerShell code transport uses stdin; actual old two-session pinned readback succeeds with unchanged identities/terminals/accounting.",
+    "mode_summary": "Current derived mode comes from exact frozen grounded scope; original scientific artifacts unchanged."
+  },
+  "targeted_checks": [
+    {
+      "scope": "native scope/source/mode/capture, scoped episode consumers, fixed downside numerics, independent episode literal vectors",
+      "tests": 46,
+      "elapsed_s": 0.615,
+      "status": "PASS"
+    },
+    {
+      "scope": "strict current scope and existing revision gate consumers",
+      "tests": 22,
+      "elapsed_s": 9.28,
+      "status": "PASS"
+    },
+    {
+      "scope": "holder policy, temporal BASE_X math/budget/replay/cohort consumers",
+      "tests": 26,
+      "elapsed_s": 4.714,
+      "status": "PASS"
+    },
+    {
+      "scope": "conditional sample, missingness/coherence/tier and published source oracle",
+      "tests": 18,
+      "elapsed_s": 1.443,
+      "status": "PASS"
+    }
+  ],
+  "initial_extended_regression": {
+    "tests": 79,
+    "status": "FAIL_DEVELOPMENT_RETAINED",
+    "failures": [
+      "Four fresh test calls used empty scope; tests now author their existing test question explicitly, strict admission retained.",
+      "Document consumer checked committed implementation against dirty repaired bytes; repeat after repair commit, no gate relaxation.",
+      "Additional episode golden originally asserted fresh V1 writer bytes; unchanged original V1 golden now retained and tested independently from explicitly repaired fresh V3 literal values."
+    ]
+  },
+  "legacy_original_golden_sha256": "ea362e98ea083068408c6dad94671e04a9a91e2a121331a8ee539dc557a4461d",
+  "compatibility_proof": "post-review-compatibility.json",
+  "history_preservation": "PASS234lossless36local_hashes8original_bundles_zero_changes",
+  "new_native_calls": 0,
+  "new_scientific_looks": 0,
+  "accounting_before_additional_native": {
+    "generator": 8,
+    "critic": 5,
+    "main": 7,
+    "preview": 3,
+    "adaptive": 0,
+    "owner_approved_generator_ceiling": 10,
+    "owner_approved_critic_ceiling": 7
+  },
+  "acceptance_boundary": "Two actual independent native questions and original Critics on one new fixed final implementation epoch are still required; deterministic compatibility is not native acceptance."
+}

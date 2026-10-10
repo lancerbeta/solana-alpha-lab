@@ -4,7 +4,7 @@
   "acceptance_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1-V2-CANDIDATE",
   "as_of": "2026-10-10",
   "task_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1",
-  "state_change": "Two saved substantive native synthetic primary/transfer terminals on one fixed code epoch; current-scope/prior seams and numeric boundary repaired. Independent quality review and exact CI remain delivery gates.",
+  "state_change": "Deterministic final-review repair and owner-authorized10/7 extension; old substantive native pair retains epoch2c, new final native confirmation pending.",
   "base_main": "d2cd1fdf6fb10b5efc3e3b7f7b752bcee574f8dc",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
@@ -13,7 +13,7 @@
     "docs/tasks/FORGE_NATIVE_LIFECYCLE_CLOSURE_V1.md": "78b2b237a467ea0a61847918bad0b1f6915439e7c0acdc2970591ca1cedf854b"
   },
   "active_stop_conditions": [
-    "INDEPENDENT_REVIEW_PENDING"
+    "NEW_FINAL_NATIVE_PAIR_AND_AFFECTED_REVIEW_PENDING"
   ],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,

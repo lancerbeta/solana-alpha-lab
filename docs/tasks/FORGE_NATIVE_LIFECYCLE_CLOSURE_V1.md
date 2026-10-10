@@ -37,6 +37,7 @@ managed_write_set:
 - tests/test_forge_research_flow_reliability_v1.py
 - tests/test_hfic_grounded_discovery_v1.py
 - tests/test_hfic_temporal_discovery_v1.py
+- tests/test_hfic_temporal_result_coherence_v1.py
 - tests/test_hfic_ordinary_operation_v1.py
 - tests/test_hfic_list_scope_executor_v1.py
 - tests/test_hfic_critic_prior_memory_closure_v1.py
@@ -113,16 +114,16 @@ Phases A-D are internal phases of this one atom: bind/control; narrow repair
 if proved; primary/transfer plus recovery; durable review/PR/CI/readiness.
 No routine approval between them. Preserve original failures and looks.
 
-Budget V2 (supersedes V1 allocations and ordinary procedural stops): total
-Generator episodes <=8 including all new launches, unfinished episodes and
-continuations. Already consumed4; remaining<=4. Two primary/transfer episodes
-are the principal allocation; reserve2 may be used autonomously only after a
-documented material repair with targeted evidence, lawful revision or lost
-reply recovery. Old unused revision slots are inside8, never additional.
-Native Critic total<=6, already1; preserve and replay every obtained verdict.
-Per new question MAIN<=1, PREVIEW<=1, ADAPTIVE=0. Old roots/charges remain.
-One targeted early architecture/DoD consultation and one final required-role
-set; meaningful findings receive affected delta review under base policy.
+Budget current (V2 plus direct owner extension on2026-10-10): total
+Generator episodes <=10 including all old launches, unfinished episodes and
+continuations; currently8 consumed, two remaining for the repaired final pair.
+Native domain Critic total<=7, currently5 consumed; two remaining. Original
+V2 baseline was8/6, original V1 costs4/1. No charges, failed attempts or unused
+revision slots are reset or added outside these ceilings. Proper old Critic
+verdicts stay immutable and are never rerolled. Per new question MAIN<=1,
+PREVIEW<=1, ADAPTIVE=0. Original source recipe and full eligible history remain.
+One early consultation and one final required-role wave remain; addressed
+findings use affected delta reviews, no automatic full review recirculation.
 Native ceiling stops new native calls, not authorized deterministic repair.
 
 Two final paths must satisfy grounding, specific discriminator, faithful
@@ -261,3 +262,29 @@ code using the same source recipe/history. Total spent Generator5/8, Critic2/6,
 native MAIN5/PREVIEW3/ADAPTIVE0; three Generator slots remain. No budget reset.
 
 V2 final saved-state checkpoint: one immutable2cace49f8443e3cd25f243ac0b740c9f1b290b29 epoch/composite4c9ed13d. Primary and transfer have actual SYNTHESIS_COMPLETE substantive terminals with fresh readers. Primary Generator first submission accepted; transfer required one counted placement-only continuation with identical scientific fields and no new look. Critic primary had one conservatively counted mechanical binding-only continuation, original semantic KILL unchanged. Total Generator8/8, Critic5/6, native MAIN7/PREVIEW3/ADAPTIVE0; separate scripted controls MAIN4. Both native actual-artifact recovery/reply-loss/replay/conflict pass. Existing focused residual V5/V6 checks8 PASS; independent rational source arithmetic passes both. Final Q1-Q4 acceptance belongs to canonical final independent review; PR/CI/readiness remain. No more Generator execution. Transfer was launched in parallel with independent primary Critic after its valid frozen question, inside V2 local-tactic authority; no cross-case scientific input exposure. Old historical progress/verdicts stay unchanged.
+
+
+Owner-authorized final-review continuation — 2026-10-10:
+The owner accepted the concrete bounded recommendation to extend total
+Generator8 to10 and domain Critic6 to7 after the supported source-decimal
+precision defect was independently reproduced. This is the same atom and
+strict original DoD, not a reset or acceptance concession. All episodes,
+original cards/packets/terminals, scientific close guards and charges persist.
+Two additional Generator and two domain Critic episodes are reserved for
+new independently authored primary/transfer questions on one repaired final
+execution epoch. No reroll/regrade of a proper old KILL; MAIN<=1, PREVIEW<=1,
+ADAPTIVE0 per question, provider/live/money0. Tools and ordinary self-correction
+inside an ongoing episode are not a new context; all context continuations
+still count. Merge requires unchanged exact-head CI/readiness and separate
+machine owner phrase. Native ceiling cannot grow silently above10/7.
+
+Final review findings preserved for01a7d00a: malformed optional/nested authored
+scope was filtered before validation; original decimal text was rounded before
+Fraction; PowerShell -c lost quotes in the documented reader. Current repair
+checks all explicit declarations before filtering, preserves exact source
+ratio through predicates/downside event decisions in fresh EPISODES_V3, keeps
+V1/V2 saved readers/replay, and passes Python reader code via stdin. Original
+2cace49f pair remains correct evidence of its own epoch; deterministic equality
+does not substitute for two new native confirmations of the material repair.
+Next: affected regression/review, freeze final code/source with prior history,
+new primary/transfer, recovery, delta reviews, ordinary PR/CI/readiness.

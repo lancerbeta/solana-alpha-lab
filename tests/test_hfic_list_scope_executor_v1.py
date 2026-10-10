@@ -262,7 +262,7 @@ def rs_fields():
 
 
 class LegacyGoldenTests(unittest.TestCase):
-    """D28: the unscoped 1.1 path is byte-identical to base 77eb427a (values pinned on base)."""
+    """D28: query identity and saved V1 bytes stay pinned; fresh V3 is explicit."""
 
     def test_unscoped_query_and_result_are_unchanged(self) -> None:
         import hashlib
@@ -276,8 +276,20 @@ class LegacyGoldenTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(canonical).hexdigest(), "d6d9bf1cc1067b1af61f1be511bf5c75b8c9053c7570bac33fef4023e91602b0")
         census, rows = prd_vector()
         summary = execute_temporal_discovery(census, rows, episode_spec(), [binding_item()])["summary"]
-        digest = hashlib.sha256(json.dumps(summary, sort_keys=True, default=str).encode()).hexdigest()
-        self.assertEqual(digest, "ea362e98ea083068408c6dad94671e04a9a91e2a121331a8ee539dc557a4461d")
+        from solana_alpha_lab.factory import hfic_temporal_discovery as temporal
+        legacy_path = ROOT / "tests/fixtures/forge_native_lifecycle_closure_v1/legacy-unscoped-episode-result-v1.json"
+        legacy_raw = legacy_path.read_bytes()
+        self.assertEqual(hashlib.sha256(legacy_raw).hexdigest(), "ea362e98ea083068408c6dad94671e04a9a91e2a121331a8ee539dc557a4461d")
+        legacy = json.loads(legacy_raw)
+        look = {"record_id": "immutable-v1-golden", "calculation_version": legacy["calculation_version"], "result": legacy}
+        self.assertIs(temporal.current_look_evidence(look, [look]), look)
+        self.assertEqual(json.dumps(look["result"], sort_keys=True, default=str).encode(), legacy_raw)
+        self.assertIn(legacy["calculation_version"], temporal.TEMPORAL_CURRENT_CALCULATION_VERSIONS)
+        self.assertEqual(summary["calculation_version"], temporal.TEMPORAL_CALCULATION_VERSION_EPISODES_V3)
+        # Independent literal PRD vector: two matches, one censored exit,
+        # observed return 1.122/1.02-1 = 0.1. No legacy result is recomputed.
+        self.assertEqual((summary["matched_n"],summary["observed_target_n"],summary["missing_target_n"]),(2,1,1))
+        self.assertEqual(summary["mean_target"],0.1)
         self.assertNotIn("research_scope", summary)
 
 

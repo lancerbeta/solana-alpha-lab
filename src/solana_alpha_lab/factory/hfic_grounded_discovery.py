@@ -1378,7 +1378,9 @@ def validate_discovery_request_scope(
             "next_action": "CORRECT_FRESH_REQUEST_BEFORE_MAIN",
         })
     try:
-        validate_fresh_card_scope(bound, look_scope=bound, require_look_axes=True)
+        # Preserve every explicit declaration until the strict validator has
+        # checked types and nested conflicts; resolver filtering is not admission.
+        validate_fresh_card_scope({**bound, **declared}, look_scope=bound, require_look_axes=True)
     except GroundedDiscoveryError as exc:
         raise GroundedDiscoveryError(exc.code, {**exc.detail,
             "stage": "CURRENT_REQUEST_BEFORE_MAIN",

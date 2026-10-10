@@ -30,7 +30,7 @@
         "target": "PRICE_RELATIVE_PROXY:E1800:E14400:FIELD-USD-PRICE-001",
         "research_scope_rule_sha256": "f8f09a2f20656cbb2c6aa27143c06531df27ff2a2ee54204f9ac9ddc8f5d412b",
         "research_scope_statement": "KIND=NUMERIC_IN_SCOPE; UNIVERSE=(ALL); SIGNAL=NONE; NUMERIC=2_PREDICATES; CONTRAST=SAME_DECISION_ELIGIBLE_BASELINE; SLICES=NONE; BASIS=EPISODE_T0; COVERAGE=REQUIRE_KNOWN_REFERENCED",
-        "evidence_surface_mode": null
+        "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1"
       },
       "arithmetic": {
         "population_n": 12,
@@ -70,7 +70,7 @@
         "target": "PRICE_RELATIVE_PROXY:E1800:E14400:FIELD-USD-PRICE-001",
         "research_scope_rule_sha256": "f8f09a2f20656cbb2c6aa27143c06531df27ff2a2ee54204f9ac9ddc8f5d412b",
         "research_scope_statement": "KIND=NUMERIC_IN_SCOPE; UNIVERSE=(ALL); SIGNAL=NONE; NUMERIC=2_PREDICATES; CONTRAST=SAME_DECISION_ELIGIBLE_BASELINE; SLICES=NONE; BASIS=EPISODE_T0; COVERAGE=REQUIRE_KNOWN_REFERENCED",
-        "evidence_surface_mode": null
+        "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1"
       },
       "arithmetic": {
         "population_n": 12,

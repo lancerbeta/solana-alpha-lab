@@ -152,7 +152,14 @@ class ReplanV2AdmissionTests(unittest.TestCase):
         from solana_alpha_lab.factory.research_store import ResearchStore
         from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks
         from solana_alpha_lab.factory.hfic_ordinary_operation import list_operations
-        for scope in ({},{'estimand':'already chosen'},{'estimand':'already chosen','explanatory_condition':'','evidence_surface_mode':'ORDINARY_GROUNDED_DISCOVERY_V1'}):
+        cases = [({}, 'CANDIDATE_SCOPE_FIELDS_REQUIRED'),
+                 ({'estimand':'already chosen'}, 'CANDIDATE_SCOPE_FIELDS_REQUIRED'),
+                 ({'estimand':'already chosen','explanatory_condition':''}, 'CANDIDATE_SCOPE_INVALID')]
+        cases += [({**self.intent, 'representation_scope': value}, 'CANDIDATE_SCOPE_INVALID')
+                  for value in (None, {}, [])]
+        cases += [({**self.intent, 'candidate_scope': {'estimand': 'conflict'}}, 'CANDIDATE_SCOPE_FIELDS_CONFLICT'),
+                  ({**self.intent, 'candidate_scope': None}, 'CANDIDATE_SCOPE_INVALID')]
+        for scope, reason in cases:
             with self.subTest(scope=scope),tempfile.TemporaryDirectory() as folder:
                 home=Path(folder);store=ResearchStore(home/'plane');before=store.diagnostics().committed_inventory_sha256
                 for name,obj in (('spec',self.spec),('scope',scope),('op',{})):
@@ -161,7 +168,7 @@ class ReplanV2AdmissionTests(unittest.TestCase):
                 with patch.object(cli,'repository_git_snapshot',return_value=SimpleNamespace(head_sha='a'*40)),patch('solana_alpha_lab.factory.hfic_grounded_discovery.load_admitted_partition_rows') as loader,patch('solana_alpha_lab.factory.hfic_ordinary_operation.gate_before_values') as reserve,contextlib.redirect_stdout(stdout):
                     status=cli.cmd_discovery_execute(ROOT,store_root=home/'plane',census_path=None,observations_path=None,binding_path=None,spec_path=home/'spec.json',journal_scope='scope-negative',candidate_scope_path=home/'scope.json',operation_path=home/'op.json')
                 body=json.loads(stdout.getvalue());self.assertEqual(status,2)
-                self.assertEqual(body['reason_code'],'CANDIDATE_SCOPE_FIELDS_REQUIRED')
+                self.assertEqual(body['reason_code'],reason)
                 self.assertEqual(body['detail']['stage'],'CURRENT_REQUEST_BEFORE_MAIN')
                 self.assertFalse(body['values_loaded']);self.assertFalse(body['writes'])
                 import hashlib
@@ -223,7 +230,8 @@ class EpisodeRatioBoundaryTests(unittest.TestCase):
     def test_actual_target_projection_inclusive_boundary_and_scale_transfer(self):
         from solana_alpha_lab.factory.hfic_temporal_discovery import downside_descriptive
         values = [self.project(.8), self.project(8, 10), self.project(.5)]
-        self.assertEqual(values, [-.2, -.2, -.5])
+        from fractions import Fraction
+        self.assertEqual(values, [Fraction('-0.2'), Fraction('-0.2'), Fraction('-0.5')])
         profile = downside_descriptive(values, missing_n=1)
         self.assertEqual((profile['le_minus_20_n'], profile['le_minus_50_n']), (3, 1))
         self.assertEqual((profile['observed_n'], profile['missing_n']), (3, 1))
@@ -239,3 +247,64 @@ class EpisodeRatioBoundaryTests(unittest.TestCase):
         self.assertEqual(self.project(.8, episode=False), .8 / 1 - 1)
         self.assertIn(t.TEMPORAL_CALCULATION_VERSION_EPISODES_V1, t.TEMPORAL_CALCULATION_VERSIONS_READABLE)
         self.assertIn(t.TEMPORAL_CALCULATION_VERSION_EPISODES_V1, t.TEMPORAL_CURRENT_CALCULATION_VERSIONS)
+        self.assertIn(t.TEMPORAL_CALCULATION_VERSION_EPISODES_V2, t.TEMPORAL_CURRENT_CALCULATION_VERSIONS)
+
+
+class SourceDecimalRatioTests(unittest.TestCase):
+    """Exercise real source selection before ratios and event membership."""
+    def setUp(self):
+        from datetime import datetime, timedelta, timezone
+        self.at = datetime(2026, 10, 8, tzinfo=timezone.utc)
+        self.exit = self.at + timedelta(seconds=7200)
+
+    def cell(self, value, moment):
+        return {'state': 'OBSERVED', 'typed_value': value,
+                'first_reliable_available_at': moment.isoformat(),
+                'event_time': moment.isoformat()}
+
+    def target(self, numerator, denominator='1'):
+        from solana_alpha_lab.factory import hfic_temporal_discovery as t
+        grouped = {('c','r','mint','Y3600',t.PRICE): [self.cell(denominator, self.at)],
+                   ('c','r','mint','Y7200',t.PRICE): [self.cell(numerator, self.exit)]}
+        body = {'target': {'reference_point': 'Y3600', 'exit_point': 'Y7200'},
+                'entry_model': {'assumed_latency_seconds': 0}, 'schedule_lateness_seconds': 0}
+        value, observed, exclusion, _ = t._target_projection(grouped, body, {},
+            cohort='c', release='r', mint='mint', anchor=self.at,
+            decision_deadline=self.at,
+            point_window=lambda point: (self.at, self.at) if point=='Y3600' else (self.exit,self.exit))
+        self.assertTrue(observed); self.assertIsNone(exclusion)
+        return value
+
+    def test_decimal_source_membership_stays_exact_even_when_json_number_rounds(self):
+        from fractions import Fraction
+        from solana_alpha_lab.factory import hfic_temporal_discovery as t
+        for price, expected in [('0.8', 1), ('0.80000000000000004', 0),
+                                ('0.800000000000000000001', 0),
+                                ('0.799999999999999999999', 1)]:
+            with self.subTest(price=price):
+                value = self.target(price)
+                self.assertEqual(value, Fraction(price)-1)
+                profile = t.downside_descriptive([value],missing_n=0)
+                self.assertEqual(profile['le_minus_20_n'],expected)
+                json.dumps(profile,allow_nan=False)
+        self.assertEqual(self.target('8','10'),Fraction('-0.2'))
+        self.assertEqual(self.target('8e-401','1e-400'),Fraction('-0.2'))
+
+    def test_return_ratio_predicate_uses_selected_source_text_and_canonical_threshold(self):
+        from fractions import Fraction
+        from solana_alpha_lab.factory import hfic_temporal_discovery as t
+        grouped={('c','r','mint','X300',t.HOLDER_COUNT): [self.cell('10',self.at)],
+                 ('c','r','mint','Y900',t.HOLDER_COUNT): [self.cell('11.00000000000000000001',self.at)]}
+        value, lineage=t._feature_value_with_lineage(grouped,cohort='c',release='r',mint='mint',
+            anchor=self.at,feature={'op':'return_ratio','start':'X300','end':'Y900','field_id':t.HOLDER_COUNT},
+            lateness=0,decision_deadline=self.at,point_window=lambda _: (self.at,self.at))
+        self.assertIsNone(lineage)
+        self.assertGreater(value,Fraction('0.1'))
+        self.assertTrue(t._predicate_holds(value,{'op':'gt','value':0.1}))
+        self.assertFalse(t._predicate_holds(value,{'op':'lte','value':0.1}))
+
+    def test_exact_ties_conflict_without_changing_legacy_selector(self):
+        from solana_alpha_lab.factory import hfic_temporal_discovery as t
+        rows=[self.cell('0.8',self.at),self.cell('0.800000000000000000001',self.at)]
+        self.assertEqual(t._select_cell(rows,self.at,exact_numeric=True)['status'],'CONFLICT')
+        self.assertEqual(t._select_cell(rows,self.at)['status'],'OBSERVED')
