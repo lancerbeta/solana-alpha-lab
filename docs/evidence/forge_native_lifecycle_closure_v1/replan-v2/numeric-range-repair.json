@@ -1,0 +1,25 @@
+{
+  "status": "PASS_TYPED_RANGE_REFUSAL_WITH_UNCHANGED_COHERENCE_GATES",
+  "observed_head": "b8b651bb9debbccdd44af145c2c6bf46a8e8a10e",
+  "original_finding": "Exact finite nonzero ratio below binary64 range had negative_n1 but serialized negative_mass0.0; unchanged coherence gate refused too late.",
+  "repair": "Refuse TEMPORAL_TARGET_UNREPRESENTABLE at ratio producer before membership/evidence persistence; standalone downside refuses too. No rounding to a fake magnitude, count change, epsilon, missing-value coercion, or gate weakening.",
+  "source_probe": [
+    "0. followed by400 nines /1 -> explicit refusal",
+    "1. followed by399 zeros and1 /1 -> explicit refusal",
+    "8e-401/1e-400 -> exact -1/5 accepted",
+    "smallest representable negative ratio -> negative_n1 zero_n0 positive mass"
+  ],
+  "validation": {
+    "command": "python -X utf8 -B -m unittest tests.test_forge_native_lifecycle_closure_v1 tests.test_hfic_temporal_discovery_v1.TemporalBoundaryTests",
+    "tests": 20,
+    "elapsed_s": 0.512,
+    "status": "PASS"
+  },
+  "old_saved_versions": "UNCHANGED_READABLE_CURRENT_V1_V2",
+  "new_native_calls": 0,
+  "new_scientific_looks": 0,
+  "non_claims": [
+    "NO_NATIVE_FINAL_CONFIRMATION_YET",
+    "NO_UNREPRESENTABLE_CONTINUOUS_VALUE_SUPPORT"
+  ]
+}

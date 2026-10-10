@@ -308,3 +308,25 @@ class SourceDecimalRatioTests(unittest.TestCase):
         rows=[self.cell('0.8',self.at),self.cell('0.800000000000000000001',self.at)]
         self.assertEqual(t._select_cell(rows,self.at,exact_numeric=True)['status'],'CONFLICT')
         self.assertEqual(t._select_cell(rows,self.at)['status'],'OBSERVED')
+
+    def test_nonzero_underflow_refuses_before_an_incoherent_result(self):
+        from fractions import Fraction
+        from solana_alpha_lab.factory import hfic_temporal_discovery as t
+        from solana_alpha_lab.factory.hfic_grounded_discovery import GroundedDiscoveryError
+        for price in ['0.'+'9'*400, '1.'+'0'*399+'1']:
+            with self.subTest(price_length=len(price)):
+                with self.assertRaises(GroundedDiscoveryError) as stopped:
+                    self.target(price)
+                self.assertEqual(stopped.exception.code, 'TEMPORAL_TARGET_UNREPRESENTABLE')
+        with self.assertRaises(GroundedDiscoveryError) as stopped:
+            t.downside_descriptive([Fraction(-1,10**400)], missing_n=0)
+        self.assertEqual(stopped.exception.code, 'TEMPORAL_TARGET_UNREPRESENTABLE')
+        # Small source magnitude is fine when its final ratio is representable.
+        self.assertEqual(self.target('8e-401','1e-400'), Fraction('-0.2'))
+        # The smallest representable negative ratio keeps its sign and mass.
+        value=t._episode_return_ratio(Fraction(1)-Fraction('5e-324'), 1)
+        profile=t.downside_descriptive([value],missing_n=0)
+        self.assertEqual((profile['negative_n'],profile['zero_n']), (1,0))
+        self.assertGreater(profile['negative_mass'], 0)
+        self.assertEqual(profile['worst_negative_share'], 1)
+        json.dumps(profile,allow_nan=False)

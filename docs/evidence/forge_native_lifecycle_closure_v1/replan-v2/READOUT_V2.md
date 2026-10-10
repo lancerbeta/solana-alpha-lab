@@ -9,7 +9,7 @@
 
 Основной source recipe, missing states и prior history сохранены. Transfer — development fixture с переставленными neutral identities, holders×2 и price×10; не untouched holdout. Независимый Fraction-расчёт фактических исходных cells подтвердил группы, missingness, средние и включённую границу−20%.
 
-Исправлены три доказанные причины: fresh authored estimand/condition проверяются до MAIN; incomplete historical prior остаётся UNKNOWN с provenance и materiality assessment; свежий EPISODES_V3 сохраняет исходные decimal ratios точно до predicate/downside event membership и округляет непрерывные JSON statistics при выдаче. Старые V1/V2 расчёты, packets, replay и charges не пересчитываются. Legacy BASE_X сохранён.
+Исправлены три доказанные причины: fresh authored estimand/condition проверяются до MAIN; incomplete historical prior остаётся UNKNOWN с provenance и materiality assessment; свежий EPISODES_V3 сохраняет исходные decimal ratios точно до predicate/downside event membership и округляет непрерывные JSON statistics при выдаче. Старые V1/V2 расчёты, packets, replay и charges не пересчитываются. Legacy BASE_X сохранён. Если конечный ненулевой ratio нельзя представить числом действующего JSON contract без обнуления, producer явно отказывает `TEMPORAL_TARGET_UNREPRESENTABLE` до публикации результата; исходные малые значения разрешены, когда их ratio представим. Scientific/coherence gates не меняются.
 
 Учёт: Generator8/8, Critic5/6 (включая same-context binding continuation), native MAIN7/PREVIEW3/ADAPTIVE0. Финальная пара — MAIN2/PREVIEW0. Четыре scripted MAIN учтены отдельно. Recovery clones не новые независимые результаты. Стоимость, seed, tokens, OS/model diversity — UNKNOWN.
 

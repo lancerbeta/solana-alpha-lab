@@ -124,3 +124,15 @@ the current claim relies on the missing fact, claims unsupported novelty,
 or has an actually applicable close. Exact close, potentially applicable
 near-close, scientific quality and current binding defects remain blocking.
 The V2 matrix applies to new decisions; old packets/verdicts keep their epoch.
+
+
+## Fresh episode numeric output range
+
+EPISODES_V3 keeps the original selected decimal strings exact through target
+and return_ratio feature predicates and fixed downside membership. Continuous
+statistics retain the existing finite binary64 JSON-number contract. A nonzero
+final target or feature ratio whose JSON number would underflow to zero refuses
+`TEMPORAL_TARGET_UNREPRESENTABLE` at the producer, before evidence persistence;
+it is not MISSING, FALSE, a zero target or a scientific KILL. Small input values
+remain supported when their final ratio is representable. No epsilon, fabricated
+magnitude, coherence relaxation or historical recalculation is permitted.

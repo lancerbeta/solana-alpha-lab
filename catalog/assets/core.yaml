@@ -37996,7 +37996,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: 0e24cb31253a2733bcc516bda390018911fb959ad9555d7ca9593b5fa2324e04}
+  integrity: {kind: sha256, sha256: fff58b4310362652bf8753ca939d4cce9808f07530cec190d970675c66a80f0d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -40907,7 +40907,7 @@ records:
     repository_path: docs/contracts/forge_native_lifecycle_closure_v1.md
   integrity:
     kind: sha256
-    sha256: 47764766d98af82c2dec8d4a10f75fe3a41873e6e0330e62066647e1ea72cc46
+    sha256: 0476c250bdd4cbf803bf564ec6fc923b2cffeb81db6915ee63e4c5e0038807f0
   access:
     mode: read_only
     method: file
@@ -40946,7 +40946,7 @@ records:
     repository_path: tests/test_forge_native_lifecycle_closure_v1.py
   integrity:
     kind: sha256
-    sha256: 58fda2030c80e446fa250766ecb92046a34246b6b726f8baca1e86f5c88df38e
+    sha256: a9a48ed4e1e3c267006a2600de3ce946ea06dd85ea35cd061fc88ca5d13c29b1
   access:
     mode: read_only
     method: file
@@ -41024,7 +41024,7 @@ records:
     repository_path: docs/evidence/forge_native_lifecycle_closure_v1/replan-v2/READOUT_V2.md
   integrity:
     kind: sha256
-    sha256: 9bb3e100b30a69b1b6d809c88c749d52ae91548b9a060a0ca274917c0c6c54ac
+    sha256: 3ebf61996b4204932ffe23468557a961224dd029f8e50ed4cdb22b8a8cbe44e2
   access:
     mode: read_only
     method: file

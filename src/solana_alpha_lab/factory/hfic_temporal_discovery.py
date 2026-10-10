@@ -1051,11 +1051,16 @@ def _episode_return_ratio(numerator: object, denominator: object) -> Fraction:
     """Keep exact source ratio through predicates and downside event counts."""
     value = Fraction(str(numerator)) / Fraction(str(denominator)) - 1
     try:
-        finite = math.isfinite(float(value))
+        serialized = float(value)
     except OverflowError:
-        finite = False
-    if not finite:
+        serialized = math.inf
+    if not math.isfinite(serialized):
         raise GroundedDiscoveryError("TEMPORAL_TARGET_NONFINITE")
+    if value and serialized == 0:
+        # The existing numeric result contract cannot encode a nonzero ratio
+        # at this magnitude. Refuse before membership/evidence persistence;
+        # never publish an exact negative count alongside zero negative mass.
+        raise GroundedDiscoveryError("TEMPORAL_TARGET_UNREPRESENTABLE")
     return value
 
 
@@ -1770,6 +1775,8 @@ def downside_descriptive(values: Sequence[float | Fraction], *, missing_n: int) 
         raise GroundedDiscoveryError("DOWNSIDE_SUPPORT_INVALID")
     if any(not math.isfinite(value) for value in values):
         raise GroundedDiscoveryError("TEMPORAL_TARGET_NONFINITE")
+    if any(value and float(value) == 0 for value in values):
+        raise GroundedDiscoveryError("TEMPORAL_TARGET_UNREPRESENTABLE")
     exact_ordered = sorted(values)
     n = len(exact_ordered)
     negative = [-value for value in exact_ordered if value < 0]

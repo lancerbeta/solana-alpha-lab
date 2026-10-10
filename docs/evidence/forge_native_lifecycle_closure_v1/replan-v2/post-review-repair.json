@@ -32,6 +32,12 @@
       "tests": 18,
       "elapsed_s": 1.443,
       "status": "PASS"
+    },
+    {
+      "scope": "saved wrong-simple result revision on clean committed b8 implementation; no extra MAIN",
+      "tests": 1,
+      "elapsed_s": 69.924,
+      "status": "PASS"
     }
   ],
   "initial_extended_regression": {
