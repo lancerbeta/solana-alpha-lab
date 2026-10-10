@@ -12,11 +12,113 @@
     "ARCHITECTURE_CRITIC",
     "OWNER_UX_CRITIC"
   ],
-  "reviews": [],
-  "verdict": "NOT_READY",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "reviewed_head=3119c05d18b6c3a59dfb2719c4e0b8dad4a918a7",
+        "reviewed_inventory_sha256=71b2fe65fa0669253f6be2cab505f43e9a2f78872d17541d86aeb803ead5a8e3",
+        "reviewed_bindings_sha256=d2d46d0e21e02d62b8bb2851d5e8233be0a87c7ad291f4b711b765cb9eb3c17b",
+        "ISOLATED_READONLY_REVIEW_NOT_CONFINED_ACTOR_EVIDENCE",
+        "RESOLVED_QUARANTINED_RUN_AND_FOREIGN_SHARED_TRIAL_METRIC_LAUNDERING_BY_PRESEED_QUARANTINE",
+        "RESOLVED_MISSING_EVIDENCE_AND_FAILED_ATTACH_SHELL_SUCCESS",
+        "CHECKED_38_FOCUSED_TESTS_47_RETAINED_CLOSURE_NATIVE_JOINT_AND_149_SOURCE_PINS",
+        "CHECKED_EXACT_DIFF_WRITE_SET_AND_FOUR_REQUIRED_ROLES"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "reviewed_head=3119c05d18b6c3a59dfb2719c4e0b8dad4a918a7",
+        "reviewed_inventory_sha256=71b2fe65fa0669253f6be2cab505f43e9a2f78872d17541d86aeb803ead5a8e3",
+        "reviewed_bindings_sha256=d2d46d0e21e02d62b8bb2851d5e8233be0a87c7ad291f4b711b765cb9eb3c17b",
+        "ISOLATED_READONLY_REVIEW_NOT_CONFINED_ACTOR_EVIDENCE",
+        "RESOLVED_TC08_CHARTER_TC09_INTERACTION_TC10_SCIENTIFIC_C_EXACT_PRD_BINDING",
+        "RESOLVED_REPLAY_HARNESS_ERROR_SUCCESSFUL_EXIT_WITH_REAL_CANARY",
+        "CHECKED_92_INDEXED_ARTIFACT_HASHES_AND_SOURCE_EQUIVALENCE",
+        "PASS_BOUNDED_TECHNICAL_REQUALIFICATION_WITH_SCIENTIFIC_C_AND_ACTOR_UNVERIFIED_RETAINED"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "reviewed_head=3119c05d18b6c3a59dfb2719c4e0b8dad4a918a7",
+        "reviewed_inventory_sha256=71b2fe65fa0669253f6be2cab505f43e9a2f78872d17541d86aeb803ead5a8e3",
+        "reviewed_bindings_sha256=d2d46d0e21e02d62b8bb2851d5e8233be0a87c7ad291f4b711b765cb9eb3c17b",
+        "ISOLATED_READONLY_REVIEW_NOT_CONFINED_ACTOR_EVIDENCE",
+        "packet_fingerprint_sha256=3b495860d8f23dc03e0f41bf77c4b6a7bed320a8da17fd869cc19af58fe6b853",
+        "SEMANTIC_PREMISE_PASS_19_PACKET_PINS_149_SOURCE_PINS_AND_19_FOCUSED_TESTS",
+        "CHECKED_CURRENT_READ_AND_DURABLE_DB_WAL_VS_SHM_SNAPSHOT_BOUNDARIES",
+        "CHECKED_IDENTITY_VERSION_QUARANTINE_LEGACY_SOURCE_OWNERS_AND_UNKNOWN_VS_ABSENCE",
+        "CHECKED_EXECUTION_DOES_NOT_GRANT_SCIENCE_AND_EXACT_MAIN_WHITESPACE_CHECK_DOES_NOT_GRANT_MERGE",
+        "TESTS_COULD_PASS_YET_RESEARCH_FAIL_IF_CURRENT_READ_BECOMES_HISTORICAL_PIT_DEPENDENT_EPISODES_BECOME_IID_OR_SCRIPTED_CRITIC_BECOMES_SCIENTIFIC_ACTOR;CONTRACTS_FORBID_ALL_THREE",
+        "PACKET_INFORMATION_PATH_ONLY_PROCESS_ISOLATION_OBLIGATION_MODEL_DIVERSITY_UNPROVEN"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "reviewed_head=3119c05d18b6c3a59dfb2719c4e0b8dad4a918a7",
+        "reviewed_inventory_sha256=71b2fe65fa0669253f6be2cab505f43e9a2f78872d17541d86aeb803ead5a8e3",
+        "reviewed_bindings_sha256=d2d46d0e21e02d62b8bb2851d5e8233be0a87c7ad291f4b711b765cb9eb3c17b",
+        "ISOLATED_READONLY_REVIEW_NOT_CONFINED_ACTOR_EVIDENCE",
+        "RESOLVED_TERMINAL_STATUS_EXIT_NEXT_ACTION_AND_RECOVERY_VISIBILITY",
+        "CHECKED_INTEGRITY_ONLY_VERDICT_SEPARATE_FROM_FAILED_REPLAY_STATUS",
+        "CHECKED_REAL_MISSING_SUMMARY_CANARY_PROCESS_ZERO_LAUNCHER_TWO",
+        "CHECKED_RUSSIAN_LINEAGE_GAPS_AND_SCIENTIFIC_C_ACTOR_UNVERIFIED_HISTORICAL_VERDICTS_REMAIN_SEPARATE_NO_PIXEL_CLAIM"
+      ]
+    }
+  ],
+  "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "NO_CONFINED_ACTOR",
     "NO_MODEL_DIVERSITY_ATTESTATION"
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Quarantined or superseding foreign trial seeded weak scientific metric through trial_id.",
+      "observed_head": "1b5c2240806b49f40812a9f49aac96bfe57f1443",
+      "resolved_by_head": "3119c05d18b6c3a59dfb2719c4e0b8dad4a918a7"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Missing harness evidence could return shell success; failed attach return code was ignored.",
+      "observed_head": "1b5c2240806b49f40812a9f49aac96bfe57f1443",
+      "resolved_by_head": "3119c05d18b6c3a59dfb2719c4e0b8dad4a918a7"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Acceptance TC08/09/10 IDs diverged from the original PRD obligations.",
+      "observed_head": "1b5c2240806b49f40812a9f49aac96bfe57f1443",
+      "resolved_by_head": "3119c05d18b6c3a59dfb2719c4e0b8dad4a918a7"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Replay missing safety or summary could return zero despite HARNESS_ERROR.",
+      "observed_head": "1b5c2240806b49f40812a9f49aac96bfe57f1443",
+      "resolved_by_head": "3119c05d18b6c3a59dfb2719c4e0b8dad4a918a7"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Replay stdout/exit concealed harness failure and integrity verdict needed explicit replay status and recovery.",
+      "observed_head": "1b5c2240806b49f40812a9f49aac96bfe57f1443",
+      "resolved_by_head": "3119c05d18b6c3a59dfb2719c4e0b8dad4a918a7"
+    }
   ]
 }
