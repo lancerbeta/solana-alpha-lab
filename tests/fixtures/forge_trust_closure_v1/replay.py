@@ -48,6 +48,7 @@ def main():
     p.add_argument("--expected-receipt-sha256")
     p.add_argument("--producer-volume")
     p.add_argument("--residual-group", choices=["all", "closure"], default="all")
+    p.add_argument("--timeout-seconds", type=int, default=1800)
     p.add_argument("--docker", default="docker")
     a = p.parse_args()
     if a.verify:
@@ -60,6 +61,8 @@ def main():
         p.error("SOURCE_PHASE_ATTEMPT_OUTPUT_REQUIRED")
     if a.producer_volume and a.phase not in {"bridge", "joint"}:
         p.error("PRODUCER_VOLUME_FOR_CONSUMER_PHASES_ONLY")
+    if not 1 <= a.timeout_seconds <= 1800:
+        p.error("TIME_BOUND_OUTSIDE_ENVELOPE")
     if not re.fullmatch(r"[0-9a-f]{40}", a.source_commit) or not re.fullmatch(r"[a-z0-9-]{1,32}", a.attempt):
         p.error("INVALID_SOURCE_OR_ATTEMPT")
     if git("rev-parse", "HEAD").decode().strip() != a.source_commit:
@@ -75,6 +78,7 @@ def main():
         p.error("INVALID_OUTPUT_OWNER_ROOT")
     out = output_root / f"{a.source_commit[:12]}-{a.phase}-{a.attempt}"
     out.mkdir(parents=True, exist_ok=False)
+    (out / "terminal.json").write_text(json.dumps({"status": "NOT_RUN", "stage": "SETUP"}), encoding="utf-8")
     name = f"ftc-{a.source_commit[:12]}-{a.phase}-{a.attempt}"
     volume = name + "-evidence"
     existing = call([a.docker, "container", "ls", "--all", "--format", "{{.Names}}"],
@@ -154,15 +158,27 @@ def main():
                     original_kit_hashes=originals,
                     active_kit_hashes={f.name: hashlib.sha256(f.read_bytes()).hexdigest() for f in kit.iterdir()},
                     phase=a.phase, attempt=a.attempt, container=name, volume=volume,
+                    timeout_seconds=a.timeout_seconds,
                     producer_volume=a.producer_volume, containment=inspect["HostConfig"],
                     external_model_calls=0, product_network="NONE")
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     # Runtime preflight inside each pinned entry probes real UID/mount/egress/children.
-    result = subprocess.run([a.docker, "start", "--attach", name],
-                            stdout=(out / "run.log").open("wb"), stderr=subprocess.STDOUT)
+    interrupted = None
+    start_returncode = None
+    with (out / "run.log").open("wb") as log:
+        try:
+            result = subprocess.run([a.docker, "start", "--attach", name],
+                                    stdout=log, stderr=subprocess.STDOUT, timeout=a.timeout_seconds)
+            start_returncode = result.returncode
+        except subprocess.TimeoutExpired:
+            interrupted = "TIMEOUT"
+        except KeyboardInterrupt:
+            interrupted = "INTERRUPTED"
+        if interrupted:
+            call([a.docker, "stop", "--time", "10", name], capture_output=True, timeout=30)
     state = json.loads(call([a.docker, "inspect", name], capture_output=True, text=True).stdout)[0]["State"]
     terminal = dict(status="INCOMPLETE",
-                    state=state, start_returncode=result.returncode)
+                    state=state, start_returncode=start_returncode)
     files = {"wal": "wal/probes-summary.json", "producer": "producer/producer-summary.json",
              "bridge": "bridge-summary.json", "residual": "residual/residual-summary.json",
              "joint": "joint-summary.json"}
@@ -170,7 +186,9 @@ def main():
         subprocess.run([a.docker, "cp", name + ":/audit/" + native, str(out / local)],
                        capture_output=True, check=False)
     safety = json.loads((out / "safety-preflight.json").read_text()) if (out / "safety-preflight.json").exists() else {}
-    if state["OOMKilled"] or state["ExitCode"] in {137, 143}:
+    if interrupted:
+        terminal["status"] = interrupted
+    elif state["OOMKilled"] or state["ExitCode"] in {137, 143}:
         terminal["status"] = "INTERRUPTED_RESOURCE_OR_SIGNAL"
     elif not safety.get("pass"):
         terminal["status"] = "HARNESS_ERROR"
@@ -185,7 +203,7 @@ def main():
     (out / "receipt.json").write_text(json.dumps(receipt, indent=2), encoding="utf-8")
     print(json.dumps(dict(container=name, volume=volume, exit_code=state["ExitCode"],
                           receipt_sha256=hashlib.sha256((out / "receipt.json").read_bytes()).hexdigest())))
-    return state["ExitCode"]
+    return 124 if interrupted == "TIMEOUT" else 130 if interrupted else state["ExitCode"]
 
 
 if __name__ == "__main__":
