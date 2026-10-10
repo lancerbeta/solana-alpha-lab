@@ -56,7 +56,6 @@ context_requirements:
       - docs/contracts/experiment_evidence_decision_v1.md
       - docs/contracts/science_to_strategy_handoff_v1.md
     DELIVERY_EVIDENCE:
-      - docs/evidence/big_agentic_audit_v1/campaign-summary.json
       - docs/evidence/big_agentic_audit_v1/completion.json
       - docs/evidence/big_agentic_audit_v1/independent-review.json
       - docs/evidence/big_agentic_audit_v1/factory-fit.json
