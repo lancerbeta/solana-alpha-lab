@@ -1,0 +1,162 @@
+{
+  "status": "PROVED_ROOT_CAUSES_AND_REPAIRED",
+  "initial_scope_failures": [
+    "CANDIDATE_SCOPE_FIELDS_REQUIRED",
+    "LOOK_SPEC_SCOPE_MISMATCH"
+  ],
+  "constant_return_quantile_reproducer": {
+    "raw_sha256": "75ccb38cb34711982fb3bd31aedc5f79a2c0dc0f7dea1d3554f8ee9ebac70296",
+    "verdict": "INCOHERENT",
+    "issues": [
+      {
+        "view": "summary",
+        "field": "downside.quantiles",
+        "expected": "p05<=p10<=p25",
+        "actual": [
+          0.10000000000000002,
+          0.1,
+          0.1
+        ]
+      },
+      {
+        "view": "pooled",
+        "field": "downside.quantiles",
+        "expected": "p05<=p10<=p25",
+        "actual": [
+          0.10000000000000002,
+          0.1,
+          0.1
+        ]
+      },
+      {
+        "view": "ablations:ABLATION_DROP_d_holders",
+        "field": "downside.quantiles",
+        "expected": "p05<=p10<=p25",
+        "actual": [
+          0.10000000000000002,
+          0.1,
+          0.1
+        ]
+      },
+      {
+        "view": "ablations:ABLATION_DROP_elapsed",
+        "field": "downside.quantiles",
+        "expected": "p05<=p10<=p25",
+        "actual": [
+          0.10000000000000002,
+          0.1,
+          0.1
+        ]
+      },
+      {
+        "view": "ablations:ABLATION_DROP_liq",
+        "field": "downside.quantiles",
+        "expected": "p05<=p10<=p25",
+        "actual": [
+          0.10000000000000002,
+          0.1,
+          0.1
+        ]
+      },
+      {
+        "view": "ablations:ABLATION_DROP_pret",
+        "field": "downside.quantiles",
+        "expected": "p05<=p10<=p25",
+        "actual": [
+          0.10000000000000002,
+          0.1,
+          0.1
+        ]
+      },
+      {
+        "view": "by_calendar_block:2026-10-08",
+        "field": "downside.quantiles",
+        "expected": "p05<=p10<=p25",
+        "actual": [
+          0.10000000000000002,
+          0.1,
+          0.1
+        ]
+      },
+      {
+        "view": "by_cohort:REL-20261008T000000Z-20261009T000000Z",
+        "field": "downside.quantiles",
+        "expected": "p05<=p10<=p25",
+        "actual": [
+          0.10000000000000002,
+          0.1,
+          0.1
+        ]
+      }
+    ]
+  },
+  "earlier_source_guard": [
+    {
+      "case": "published_observation_drift",
+      "raw_sha256": "959883f459886dfa26708e7ee3e1ce983caff25ebf960c84fa63ab58f28318e5",
+      "refusal": {
+        "detail": {
+          "hypothesis_version_id": "HFIC-CAND-0289F70B5939",
+          "source_error": "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE"
+        },
+        "reason_code": "GENERATION_SAVED_SOURCE_INADMISSIBLE",
+        "scientific_look_delta": {
+          "adaptive": 0,
+          "main": 0
+        },
+        "scientific_negative": false,
+        "source_refs": [
+          {
+            "input_kind": "QUERY_SPEC",
+            "raw_sha256": "24f631383873349919cc785b9f99cdf8a44c4b9c5b2641f67d5e876ece2117f5"
+          },
+          {
+            "input_kind": "AUTHORED_SCOPE",
+            "raw_sha256": "71f7fc716a90f3525d6a38740c90a856a00fd29c63424be18454e4bac2241506"
+          }
+        ],
+        "stage": "REQUEST_ADMISSION_BEFORE_MAIN",
+        "values_loaded": false,
+        "writes": false
+      }
+    },
+    {
+      "case": "census_hash_tamper",
+      "raw_sha256": "5c4b7a46891f62f2cf74deaa05d86a004bf450d0af0beed12d431de28320500b",
+      "refusal": {
+        "detail": {
+          "hypothesis_version_id": "HFIC-CAND-223A16B04721",
+          "source_error": "BINDING_HASH_MISMATCH"
+        },
+        "reason_code": "GENERATION_SAVED_SOURCE_INADMISSIBLE",
+        "scientific_look_delta": {
+          "adaptive": 0,
+          "main": 0
+        },
+        "scientific_negative": false,
+        "source_refs": [
+          {
+            "input_kind": "QUERY_SPEC",
+            "raw_sha256": "4c731421ccba05650acd0d79923bf5c4421037757b2bf65cf9de076a1fabbdc9"
+          },
+          {
+            "input_kind": "AUTHORED_SCOPE",
+            "raw_sha256": "06e74ad85e0cb8a04fbe9134941faef1690614645ccd6c95422253dfed27edce"
+          }
+        ],
+        "stage": "REQUEST_ADMISSION_BEFORE_MAIN",
+        "values_loaded": false,
+        "writes": false
+      }
+    }
+  ],
+  "repair": "Exact type7 Fraction interpolation before JSON rounding; authored scope before MAIN; consumer checks earlier wrapper plus exact source_error and no-effects. Legacy float interpolation and strict guards remain unchanged.",
+  "reproduce": {
+    "helper_ref": "{ARTIFACT_HOME}/prove_quantile_native_applicability.py",
+    "helper_sha256": "67f1d9539500ebc584ea7ce037783b3adf49ec8e841d80997d59732339693967",
+    "entry": "Use the locked cached Python with the elected root argument; pure execution only, no operation, freeze, finalize or result persistence."
+  },
+  "native_generator_delta": 0,
+  "native_critic_delta": 0,
+  "native_main_delta": 0
+}

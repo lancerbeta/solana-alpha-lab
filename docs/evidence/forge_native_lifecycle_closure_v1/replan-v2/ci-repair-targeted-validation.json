@@ -1,0 +1,53 @@
+{
+  "status": "PASS",
+  "candidate_runtime_head": "c15517fd7d567917dd849cb17b0316434c13226c",
+  "groups": [
+    {
+      "group": "admission",
+      "head": "c15517fd7d567917dd849cb17b0316434c13226c",
+      "tests": [
+        "tests.test_forge_native_lifecycle_closure_v1",
+        "tests.test_hfic_scientific_disposition_continuity_v1.V3CalculationRevisionTests",
+        "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_search_terminal_conflict_refuses_before_values",
+        "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_closed_repair_without_operation_artifact_still_reads",
+        "tests.test_forge_research_universe_policy_v1.UniversePolicyTests.test_public_owner_path_filters_and_keeps_the_first_binding",
+        "tests.test_hfic_temporal_owner_path_v1.TemporalOwnerPathTests.test_published_binding_reaches_freeze_and_fixed_time_consumer"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 217.792,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "1695c9c4f8414cdbcd74dfb442bbab0b3a7881bcbee6ce1ec62085dc79d7dca8",
+      "executed_test_count": 26
+    },
+    {
+      "group": "continuation",
+      "head": "c15517fd7d567917dd849cb17b0316434c13226c",
+      "tests": [
+        "tests.test_hfic_legacy_parent_continuation_compat_v1",
+        "tests.test_hfic_temporal_operability_repair_v1.AcceptanceVerticalADataPathTests",
+        "tests.test_hfic_temporal_operability_repair_v1.AcceptanceVerticalBContinuationTests",
+        "tests.test_hfic_temporal_operability_repair_v1.MetadataStopAndPostCloseReadbackTests.test_post_close_forge_run_prefers_repair_terminal_over_parent",
+        "tests.test_hfic_temporal_operability_repair_v1.OwnerDataScenarioTechnicalAndScientificTests.test_technical_stop_journal_blocks_scientific_exhaustion_readout"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 304.194,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "d19e1e52e9b2f69b6ea2acfd95e34177d1a6ce0ababd67c17c6650edd0153c46",
+      "executed_test_count": 21
+    },
+    {
+      "group": "vertical",
+      "head": "c15517fd7d567917dd849cb17b0316434c13226c",
+      "tests": [
+        "tests.test_opportunity_episodes_vertical_v1.ThreeProcessVerticalTests.test_producer_to_ordinary_forge_to_cold_replay"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 228.606,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c2de94ebf79b6d8b002ca1ec00371173721d34df61325e0bef40b62c674c1b7d",
+      "executed_test_count": 1
+    }
+  ],
+  "executed_test_count": 48,
+  "scope": "Affected consumer regressions only; no local full gate, no native model episode or scientific look on actual evidence planes."
+}

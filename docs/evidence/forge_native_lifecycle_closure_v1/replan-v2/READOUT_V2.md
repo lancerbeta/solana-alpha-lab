@@ -28,3 +28,25 @@ powershell -NoProfile -File tests/fixtures/forge_native_lifecycle_closure_v1/rea
 Reader проверяет жёстко заданные epoch/composite, stored packet/candidate/terminal, identity BOUND, provenance VALID и MAIN1/PREVIEW0/ADAPTIVE0 обоих случаев. <ARTIFACT_HOME> — локальный каталог сохранённых isolated execution/source planes; один Git checkout сам этих mutable stores не содержит. Local locators сохранены вне Git. Старый readback-v2.ps1 остаётся читателем2c, readback-primary.ps1 — первоначальной V1 epoch.
 
 Исходный полный DoD, Q1–Q4 и V1–V7 сохранены. Три canonical V2 receipts — completion-v2.json, independent-reviews-v2.json, factory-fit-v2.json — отвечают за актуальное delivery binding; исторические NOT_READY originals не переписываются. Результат пригоден как доказанный offline synthetic lifecycle repair и регрессия; live, OOS, profitability, причинность, statistical reliability и новая научная authority не установлены.
+
+После первого PR CI38013825076 выявлены20 отказавших тестовых сценариев.
+Шесть старых потребителей приведены к прежнему авторскому вопросу до MAIN
+или проверяют новый ранний отказ с той же точной причиной повреждения
+источника и нулевыми writes/MAIN. Проверки continuation/crash/replay сохранены.
+Дополнительно исправлены семь строк exact episode-квантилей: интерполяция
+type7 сохраняет Fraction до единственного округления в JSON, устраняя
+ложную инверсию квантилей одинаковой доходности. Coherence остаётся строгой;
+legacy float-ветка и stored originals не менялись.
+
+Применимость финальной3ba native-пары проверена отдельно на её исходных
+literal source bytes. Полные summaries/recipes совпали во всех полях кроме
+16 primary и4 transfer последних разрядов p05/p10/p25. Выборки, predicates,
+counts, пропуски, mean/median и scientific выводы совпали; mutable research
+records и immutable3ba Git fence неизменны. Это pure read-only applicability,
+не новая native-попытка и не rebind старого результата. Итоговые native
+сессии и recovery остаются воспроизводимыми на собственном exact3ba snapshot.
+Новый расход Generator/Critic/MAIN равен0; весь старый учёт10/7 сохранён.
+Доказательства: ci-repair-native-applicability.json,
+ci-repair-targeted-validation.json, ci-repair-initial-ci.json и
+ci-repair-reproducer.json. Старые PASS review receipts и последующий CI FAIL
+сохранены отдельно в ci-initial-candidate-originals.json; fresh CI обязательна.
