@@ -152,7 +152,7 @@ def _identity_conflict(
     if native_run and payload_run and native_run != payload_run:
         return "RUN_IDENTITY_CONFLICT"
     # Run passports use canonical document hashes, not YAML file byte hashes.
-    if (_kind(record) in EXECUTION_RECORD_KINDS and spec_digest
+    if (spec_digest
             and "experiment_spec_sha256" in payload
             and payload.get("experiment_spec_sha256") != spec_digest):
         return "EXPERIMENT_SPEC_VERSION_CONFLICT"
@@ -194,6 +194,28 @@ def _collect_direct_ids(
     return run_ids, trial_ids
 
 
+def _conflicted_execution_keys(
+    experiment_id: str, records: Sequence[Any], spec_digest: str | None,
+) -> set[str]:
+    """A shared run key cannot launder contradictory execution identities."""
+    keys: set[str] = set()
+    for record in records:
+        if _kind(record) not in EXECUTION_RECORD_KINDS:
+            continue
+        payload = _payload(record)
+        conflict = _identity_conflict(record, experiment_id, spec_digest)
+        malformed_legacy = (
+            _kind(record) == "RUN_COMPLETED"
+            and not _explicit_experiment_ids(payload, record)
+            and not _legacy_exact_completed(record, spec_digest)
+        )
+        if conflict or malformed_legacy:
+            keys.update(value for value in (
+                _text(getattr(record, "run_id", None)), _text(payload.get("run_id")),
+            ) if value)
+    return keys
+
+
 def classify_record(
     record: Any,
     *,
@@ -202,6 +224,7 @@ def classify_record(
     direct_run_ids: set[str],
     direct_trial_ids: set[str],
     spec_digest: str | None = None,
+    conflicted_run_ids: set[str] | None = None,
 ) -> str | None:
     payload = _payload(record)
     kind = _kind(record)
@@ -209,10 +232,15 @@ def classify_record(
     run_id = _text(getattr(record, "run_id", None) or payload.get("run_id"))
     trial_id = _text(payload.get("trial_id"))
     hyp = _text(getattr(record, "hypothesis_version_id", None) or payload.get("hypothesis_version_id"))
+    if run_id and run_id in (conflicted_run_ids or set()):
+        return None
     # A contradictory explicit identity can never fall back to a weaker run join.
     if _identity_conflict(record, experiment_id, spec_digest):
         if hypothesis_version_id and hyp == hypothesis_version_id and kind in RELATED_RECORD_KINDS:
             return "RELATED"
+        return None
+    if (kind == "RUN_COMPLETED" and spec_digest and explicit is None
+            and not _legacy_exact_completed(record, spec_digest)):
         return None
     if explicit == experiment_id:
         return "DIRECT"
@@ -773,6 +801,10 @@ def compose_experiment_dossier(
     direct_run_ids, direct_trial_ids = _collect_direct_ids(
         locator.entity_id, store_records, canonical_spec_digest,
     )
+    conflicted_run_ids = _conflicted_execution_keys(
+        locator.entity_id, store_records, canonical_spec_digest,
+    )
+    direct_run_ids.difference_update(conflicted_run_ids)
     direct: list[dict[str, Any]] = []
     related: list[dict[str, Any]] = []
     history: list[dict[str, Any]] = []
@@ -785,17 +817,21 @@ def compose_experiment_dossier(
             direct_run_ids=direct_run_ids,
             direct_trial_ids=direct_trial_ids,
             spec_digest=canonical_spec_digest,
+            conflicted_run_ids=conflicted_run_ids,
         )
         if relation is None:
             payload = _payload(record)
+            explicit_ids = _explicit_experiment_ids(payload, record)
             if (_kind(record) in EXECUTION_RECORD_KINDS
-                    and (getattr(record, "hypothesis_version_id", None) == hypothesis_version_id
-                         or locator.entity_id in _explicit_experiment_ids(payload, record))):
+                    and ((not explicit_ids and getattr(record, "hypothesis_version_id", None) == hypothesis_version_id)
+                         or locator.entity_id in explicit_ids)):
                 relation_gaps.append({
                     "record_id": getattr(record, "record_id", None),
                     "reason_code": _identity_conflict(
                         record, locator.entity_id, canonical_spec_digest,
-                    ) or "EVIDENCE_RELATION_GAP",
+                    ) or ("RUN_IDENTITY_CONFLICT" if _text(
+                        getattr(record, "run_id", None) or payload.get("run_id")
+                    ) in conflicted_run_ids else "EVIDENCE_RELATION_GAP"),
                     "next_safe_action": "VERIFY_SOURCE_BOUND_EXPERIMENT_IDENTITY",
                 })
             continue

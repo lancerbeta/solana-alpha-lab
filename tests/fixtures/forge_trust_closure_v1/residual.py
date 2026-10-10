@@ -31,22 +31,31 @@ SELECTORS = [
     "tests.test_science_to_strategy_handoff_v1",
 ]
 
+CLOSURE_SELECTORS = [
+    "tests.test_forge_trust_closure_v1",
+    "tests.test_experiment_evidence_decision_v1",
+    "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_trust_closure_new_evidence_preserves_pending_reservation_and_safe_stop_recovery",
+    "tests.test_science_to_strategy_handoff_v1",
+]
+
 
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--phase", choices=["residual"], required=True)
     p.add_argument("--output", type=Path, required=True)
+    p.add_argument("--group", choices=["all", "closure"], default="all")
     a = p.parse_args()
     if not check()["pass"]:
         return 2
     a.output.mkdir(parents=True, exist_ok=False)
     observer = Observer(a.output, "residual")
     observer.retain_tempdirs()
-    observer.emit("HEADER", selectors=SELECTORS, baseline_verdicts_imported=False,
+    selectors = CLOSURE_SELECTORS if a.group == "closure" else SELECTORS
+    observer.emit("HEADER", selectors=selectors, baseline_verdicts_imported=False,
                   full_product_path_claim=False, genuine_actor=False)
     result = Result(observer)
     sys.setprofile(observer.profile)
-    suite = unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromName(s) for s in SELECTORS)
+    suite = unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromName(s) for s in selectors)
     suite.run(result)
     sys.setprofile(None)
     seen = {row["test_id"] for row in result.rows}

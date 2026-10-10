@@ -104,6 +104,53 @@ class ExecutionIdentityTests(unittest.TestCase):
         self.assertEqual(self.dossier((), "UNAVAILABLE")["planes"]["execution"], "UNKNOWN")
         self.assertEqual(self.dossier((), "NOT_PRESENT")["planes"]["execution"], "NO_RUN")
 
+    def test_explicit_scientific_version_cannot_mix_with_current_run(self):
+        own = _eligible_run()
+        wrong = _event(record_id="METRIC-OLD-VERSION-001", record_kind="EXPERIMENT_METRIC",
+                       entity_id="METRIC-OLD-VERSION-001", run_id=own.run_id,
+                       hypothesis_version_id=HYPOTHESIS_ID,
+                       payload=_scientific_payload(experiment_spec_sha256="f" * 64),
+                       transaction_id="RESEARCH-TXN-OLD-VERSION-001")
+        dossier = self.dossier((own, wrong))
+        self.assertNotIn(wrong.record_id, {c["record_id"] for c in dossier["direct_evidence"]})
+        self.assertFalse(dossier["science_guard"]["allowed"])
+
+    def test_conflicting_execution_rows_quarantine_shared_run_and_weak_metric(self):
+        own = self.legacy(experiment_id=EXPERIMENT_ID)
+        for changes in ({"experiment_id": "EXP-FOREIGN-001"},
+                        {"experiment_spec_sha256": "f" * 64},
+                        {"runner_git_sha": "not-a-sha"}):
+            with self.subTest(changes=changes):
+                conflict = self.legacy(**changes)
+                metric = _event(record_id="METRIC-WEAK-JOIN-001", record_kind="EXPERIMENT_METRIC",
+                                entity_id="METRIC-WEAK-JOIN-001", run_id=own.run_id,
+                                hypothesis_version_id=HYPOTHESIS_ID,
+                                payload={k: v for k, v in _scientific_payload().items()
+                                         if k != "experiment_id"},
+                                transaction_id="RESEARCH-TXN-WEAK-JOIN-001")
+                dossier = self.dossier((own, conflict, metric))
+                self.assertEqual(dossier["planes"]["execution"], "UNKNOWN")
+                self.assertFalse(dossier["direct_evidence"])
+                self.assertTrue(dossier["execution_relation_gaps"])
+                self.assertFalse(dossier["science_guard"]["allowed"])
+
+    def test_invalid_legacy_completion_cannot_borrow_valid_started_run(self):
+        bad = self.legacy(runner_git_sha="not-a-sha")
+        started = _event(record_id="RUN-START-NATIVE-001", record_kind="RUN_STARTED",
+                         entity_id=bad.run_id, run_id=bad.run_id,
+                         hypothesis_version_id=HYPOTHESIS_ID,
+                         payload={"experiment_id": EXPERIMENT_ID,
+                                  "experiment_spec_sha256": self.digest, "run_id": bad.run_id},
+                         transaction_id="RESEARCH-TXN-NATIVE-START-001")
+        dossier = self.dossier((started, bad))
+        self.assertEqual(dossier["planes"]["execution"], "UNKNOWN")
+        self.assertFalse(dossier["science_guard"]["allowed"])
+
+    def test_unambiguous_foreign_run_is_not_an_unresolved_own_execution(self):
+        dossier = self.dossier((self.legacy(experiment_id="EXP-FOREIGN-001"),))
+        self.assertEqual(dossier["planes"]["execution"], "NO_RUN")
+        self.assertFalse(dossier["execution_relation_gaps"])
+
 
 class CurrentReadTests(unittest.TestCase):
     def test_child_commit_barriers_old_snapshot_new_consumers_and_oracle_canary(self):
@@ -176,6 +223,93 @@ s.close()
                     child.stdin.write("EXIT\n"); child.stdin.flush()
                 _, error = child.communicate(timeout=15)
                 self.assertEqual(child.returncode, 0, error)
+
+
+class GuardBoundaryTests(unittest.TestCase):
+    def test_replay_artifact_tamper_and_unowned_input_mount_are_rejected(self):
+        entry = ROOT / "tests/fixtures/forge_trust_closure_v1/replay.py"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            artifact = root / "summary.json"
+            artifact.write_text('{"actual_observation":"RUNNING"}')
+            receipt = root / "receipt.json"
+            receipt.write_text(json.dumps({"artifacts": {artifact.name: hashlib.sha256(artifact.read_bytes()).hexdigest()}}))
+            digest = hashlib.sha256(receipt.read_bytes()).hexdigest()
+            command = [sys.executable, "-B", str(entry), "--verify", str(receipt), "--expected-receipt-sha256", digest]
+            clean = subprocess.run(command, capture_output=True, text=True, timeout=15)
+            self.assertEqual(clean.returncode, 0, clean.stderr)
+            artifact.write_text('{"actual_observation":"COMPLETE"}')
+            tamper = subprocess.run(command, capture_output=True, text=True, timeout=15)
+            self.assertNotEqual(tamper.returncode, 0)
+            self.assertIn("ARTIFACT_HASH_MISMATCH", tamper.stderr)
+        refused = subprocess.run([sys.executable, "-B", str(entry), "--phase", "wal",
+                                  "--source-commit", "a" * 40, "--attempt", "deny",
+                                  "--output-root", "local/should-not-exist",
+                                  "--producer-volume", "foreign-volume"],
+                                 capture_output=True, text=True, timeout=15)
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertIn("PRODUCER_VOLUME_FOR_CONSUMER_PHASES_ONLY", refused.stderr)
+
+    def test_physical_holdout_is_refused_before_parquet_value_reader(self):
+        from unittest.mock import patch
+        from tests.test_hfic_grounded_discovery_v1 import _binding, _rows
+        from solana_alpha_lab.factory.hfic_grounded_discovery import (
+            GroundedDiscoveryError, verify_frozen_discovery_source_metadata,
+        )
+        from solana_alpha_lab.factory.live_cohort_discovery_release import REQUIRED_LABELS
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            binding = {**_binding()[0], "dataset_manifest_id": "DSM-FTC-HOLDOUT-001"}
+            manifests = root / "datasets/manifests"
+            manifests.mkdir(parents=True)
+            manifest = {"dataset_manifest_id": binding["dataset_manifest_id"], "dataset_id": binding["dataset_id"]}
+            labels = {**REQUIRED_LABELS, "logical_dataset_id": binding["dataset_id"],
+                      "cohort_lineage": [binding["cohort_id"]], "holdout": True}
+            for suffix, data in ((".json", manifest), (".labels.json", labels)):
+                (manifests / (binding["dataset_manifest_id"] + suffix)).write_text(json.dumps(data))
+            census, observations = _rows()
+            census_path, observations_path = root / "census.parquet", root / "observations.parquet"
+            pq.write_table(pa.Table.from_pylist(census), census_path)
+            pq.write_table(pa.Table.from_pylist(observations), observations_path)
+            before = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in root.glob("*.parquet")}
+            # Instrument entry only: the refusal comes from the real metadata gate.
+            with patch.object(pq, "ParquetFile", side_effect=AssertionError("VALUE_READ_BEFORE_PERMISSION")) as value_read:
+                with self.assertRaises(GroundedDiscoveryError) as error:
+                    verify_frozen_discovery_source_metadata(root, binding, census_path, observations_path)
+                self.assertEqual(error.exception.code, "HOLDOUT_PROTECTED")
+                self.assertEqual(value_read.call_count, 0)
+            self.assertEqual(before, {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in root.glob("*.parquet")})
+
+    def test_missing_physical_science_source_keeps_manifest_and_denies_materialization(self):
+        from tests.test_science_to_strategy_handoff_v1 import _eligible_records, _app, _promote
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        with tempfile.TemporaryDirectory() as tmp:
+            plane = Path(tmp) / "plane"
+            store = ResearchStore(plane)
+            store.append(_eligible_records(), transaction_id="RESEARCH-TXN-ELIGIBLE-001")
+            app = _app(plane)
+            recorded = _promote(app)
+            decision_id = recorded["decision_result"]["decision_event_id"]
+            before = next(json.loads(r.payload_json)["promotion_handoff_manifest"]
+                          for r in store.iter_committed_records() if r.record_id == decision_id)
+            # Disappear source files in this owned fixture, retain the decision segment.
+            # Source identities are resolved by a fresh real reader, never by a fake status.
+            segments = list(plane.rglob("RESEARCH-TXN-ELIGIBLE-001.parquet"))
+            self.assertEqual(len(segments), 1, "PHYSICAL_COMMITTED_SOURCE_NOT_LOCATED")
+            retained = {str(p.relative_to(plane)): hashlib.sha256(p.read_bytes()).hexdigest()
+                        for p in plane.rglob("*.parquet") if p not in segments}
+            path = segments[0]
+            path.rename(path.with_suffix(".missing"))
+            later = _app(plane).research_detail(LOCATOR)["dossier"]["science_to_strategy_handoff"]
+            self.assertIn("SOURCE_UNAVAILABLE", later["state"]["blocker_codes"])
+            self.assertFalse(later["activation_created"])
+            self.assertEqual(retained, {str(p.relative_to(plane)): hashlib.sha256(p.read_bytes()).hexdigest()
+                                       for p in plane.rglob("*.parquet")})
+            path.with_suffix(".missing").rename(path)
+            recovered = _app(plane).research_detail(LOCATOR)["dossier"]["science_to_strategy_handoff"]
+            self.assertEqual(recovered["science"]["handoff_manifest_sha256"], before["manifest_sha256"])
 
 
 if __name__ == "__main__":

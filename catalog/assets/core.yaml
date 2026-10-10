@@ -36308,7 +36308,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/experiment_evidence.py', repository_path: src/solana_alpha_lab/factory/experiment_evidence.py}
-  integrity: {kind: sha256, sha256: 1447fa0ecd6ce46f71be339d76d5823b164446b73bf48fdc31fc76ca3f0bf63b}
+  integrity: {kind: sha256, sha256: b262393a57d35f00f86b925d5489b7e97c9154efbb478a19d3929e9fecb3f39a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}

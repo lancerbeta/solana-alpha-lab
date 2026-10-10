@@ -6,7 +6,6 @@ import hashlib
 import io
 import json
 import re
-import shutil
 import subprocess
 import tarfile
 from pathlib import Path
@@ -26,15 +25,41 @@ def git(*args):
     return call(["git", "-C", str(ROOT), *args], capture_output=True).stdout
 
 
+def verify_receipt(path: Path, expected: str) -> None:
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != expected:
+        raise ValueError("RECEIPT_HASH_MISMATCH")
+    receipt = json.loads(raw)
+    for relative, digest in receipt["artifacts"].items():
+        candidate = (path.parent / relative).resolve()
+        if not candidate.is_relative_to(path.parent.resolve()) or candidate.is_symlink():
+            raise ValueError("ARTIFACT_PATH_REJECTED")
+        if hashlib.sha256(candidate.read_bytes()).hexdigest() != digest:
+            raise ValueError("ARTIFACT_HASH_MISMATCH")
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--source-commit", required=True)
-    p.add_argument("--phase", required=True, choices=("wal", "producer", "bridge", "residual"))
-    p.add_argument("--attempt", required=True)
-    p.add_argument("--output-root", type=Path, required=True)
+    p.add_argument("--source-commit")
+    p.add_argument("--phase", choices=("wal", "producer", "bridge", "residual", "joint"))
+    p.add_argument("--attempt")
+    p.add_argument("--output-root", type=Path)
+    p.add_argument("--verify", type=Path)
+    p.add_argument("--expected-receipt-sha256")
     p.add_argument("--producer-volume")
+    p.add_argument("--residual-group", choices=["all", "closure"], default="all")
     p.add_argument("--docker", default="docker")
     a = p.parse_args()
+    if a.verify:
+        if not re.fullmatch(r"[0-9a-f]{64}", a.expected_receipt_sha256 or ""):
+            p.error("EXACT_RECEIPT_HASH_REQUIRED")
+        verify_receipt(a.verify, a.expected_receipt_sha256)
+        print("RECEIPT_AND_ARTIFACTS_PASS")
+        return 0
+    if not all((a.source_commit, a.phase, a.attempt, a.output_root)):
+        p.error("SOURCE_PHASE_ATTEMPT_OUTPUT_REQUIRED")
+    if a.producer_volume and a.phase not in {"bridge", "joint"}:
+        p.error("PRODUCER_VOLUME_FOR_CONSUMER_PHASES_ONLY")
     if not re.fullmatch(r"[0-9a-f]{40}", a.source_commit) or not re.fullmatch(r"[a-z0-9-]{1,32}", a.attempt):
         p.error("INVALID_SOURCE_OR_ATTEMPT")
     if git("rev-parse", "HEAD").decode().strip() != a.source_commit:
@@ -58,7 +83,7 @@ def main():
                    capture_output=True, text=True).stdout.splitlines()
     if name in existing or volume in volumes:
         p.error("ATTEMPT_ALREADY_EXISTS")
-    if a.phase == "bridge":
+    if a.phase in {"bridge", "joint"}:
         if not a.producer_volume or not re.fullmatch(r"ftc-[a-z0-9-]+-evidence", a.producer_volume):
             p.error("OWNED_PRODUCER_VOLUME_REQUIRED")
         producer = json.loads(call([a.docker, "volume", "inspect", a.producer_volume],
@@ -84,9 +109,9 @@ def main():
             if filename.endswith(".py"):
                 data = data.replace(BASE.encode(), a.source_commit.encode())
             (kit / filename).write_bytes(data)
-    if a.phase == "residual":
-        data = (ROOT / "tests/fixtures/forge_trust_closure_v1/residual.py").read_bytes()
-        (kit / "residual.py").write_bytes(data)
+    if a.phase in {"residual", "joint"}:
+        data = (ROOT / f"tests/fixtures/forge_trust_closure_v1/{a.phase}.py").read_bytes()
+        (kit / f"{a.phase}.py").write_bytes(data)
     snapshot = IMAGE
     if a.source_commit != BASE:
         build = out / "build"
@@ -106,7 +131,7 @@ def main():
           "--cap-drop", "ALL", "--cap-add", "CHOWN", "--mount",
           f"type=volume,source={volume},target=/audit", snapshot, "/bin/chown", "1000:1000", "/audit"])
     entry = {"wal": "product_probes.py", "producer": "run_campaign.py",
-             "bridge": "bridge_probe.py", "residual": "residual.py"}[a.phase]
+             "bridge": "bridge_probe.py", "residual": "residual.py", "joint": "joint.py"}[a.phase]
     argv = [a.docker, "create", "--name", name, "--label", "ftc.campaign=FORGE_TRUST_CLOSURE_V1",
             "--network", "none", "--read-only", "--user", "1000:1000", "--cap-drop", "ALL",
             "--security-opt", "no-new-privileges", "--pids-limit", "128", "--memory", "2g",
@@ -117,8 +142,10 @@ def main():
     if a.producer_volume:
         argv += ["--mount", f"type=volume,source={a.producer_volume},target=/input,readonly"]
     argv += [snapshot, "/opt/venv/bin/python", "-B", "/kit/" + entry]
-    if a.phase != "bridge":
+    if a.phase not in {"bridge", "joint"}:
         argv += ["--phase", a.phase, "--output", "/audit/" + a.phase]
+    if a.phase == "residual":
+        argv += ["--group", a.residual_group]
     call(argv, capture_output=True)
     inspect = json.loads(call([a.docker, "inspect", name], capture_output=True, text=True).stdout)[0]
     manifest = dict(campaign_id="FORGE_TRUST_CLOSURE_V1", source_commit=a.source_commit,
@@ -134,15 +161,30 @@ def main():
     result = subprocess.run([a.docker, "start", "--attach", name],
                             stdout=(out / "run.log").open("wb"), stderr=subprocess.STDOUT)
     state = json.loads(call([a.docker, "inspect", name], capture_output=True, text=True).stdout)[0]["State"]
-    terminal = dict(status="PASS" if state["ExitCode"] == 0 else "FAIL_OR_ENVIRONMENT_ERROR",
+    terminal = dict(status="INCOMPLETE",
                     state=state, start_returncode=result.returncode)
-    (out / "terminal.json").write_text(json.dumps(terminal, indent=2), encoding="utf-8")
     files = {"wal": "wal/probes-summary.json", "producer": "producer/producer-summary.json",
-             "bridge": "bridge-summary.json", "residual": "residual/residual-summary.json"}
-    call([a.docker, "cp", name + ":/audit/" + files[a.phase], str(out / "summary.json")])
-    call([a.docker, "cp", name + ":/audit/safety-preflight.json", str(out / "safety-preflight.json")])
+             "bridge": "bridge-summary.json", "residual": "residual/residual-summary.json",
+             "joint": "joint-summary.json"}
+    for native, local in ((files[a.phase], "summary.json"), ("safety-preflight.json", "safety-preflight.json")):
+        subprocess.run([a.docker, "cp", name + ":/audit/" + native, str(out / local)],
+                       capture_output=True, check=False)
+    safety = json.loads((out / "safety-preflight.json").read_text()) if (out / "safety-preflight.json").exists() else {}
+    if state["OOMKilled"] or state["ExitCode"] in {137, 143}:
+        terminal["status"] = "INTERRUPTED_RESOURCE_OR_SIGNAL"
+    elif not safety.get("pass"):
+        terminal["status"] = "HARNESS_ERROR"
+    elif not (out / "summary.json").exists():
+        terminal["status"] = "HARNESS_ERROR_NO_TERMINAL_EVIDENCE"
+    else:
+        terminal["status"] = "PASS" if state["ExitCode"] == 0 else "PRODUCT_TEST_FAILURE"
+    (out / "terminal.json").write_text(json.dumps(terminal, indent=2), encoding="utf-8")
+    receipt = {"source_commit": a.source_commit, "status": terminal["status"], "artifacts": {
+        f.name: hashlib.sha256(f.read_bytes()).hexdigest() for f in out.iterdir()
+        if f.is_file() and f.name != "receipt.json"}}
+    (out / "receipt.json").write_text(json.dumps(receipt, indent=2), encoding="utf-8")
     print(json.dumps(dict(container=name, volume=volume, exit_code=state["ExitCode"],
-                          summary_sha256=hashlib.sha256((out / "summary.json").read_bytes()).hexdigest())))
+                          receipt_sha256=hashlib.sha256((out / "receipt.json").read_bytes()).hexdigest())))
     return state["ExitCode"]
 
 
