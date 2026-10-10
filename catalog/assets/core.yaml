@@ -36305,7 +36305,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/experiment_evidence_decision_v1.md', repository_path: docs/contracts/experiment_evidence_decision_v1.md}
-  integrity: {kind: sha256, sha256: e314bb69eb839c4bdac8ac497385a9f370de8e31288023f459b30bf22c723353}
+  integrity: {kind: sha256, sha256: bb661ae114d4cfd0f697ed6be10d41a10725bb358e1999abb92819b229d6e251}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -41154,7 +41154,7 @@ records:
     repository_path: docs/reports/forge_trust_closure_v1/READOUT.md
   integrity:
     kind: sha256
-    sha256: 458503377c15ae4f9d02436cda073bae8dbb83aec55d4b70499fb31bd35c4b18
+    sha256: 7e02c23c98a7e1aa57512aac74a7b4ff5dcf30fee2d3aab81c8d62efff585886
   access:
     mode: read_only
     method: file
@@ -41271,7 +41271,7 @@ records:
     repository_path: docs/evidence/forge_trust_closure_v1/run_index.json
   integrity:
     kind: sha256
-    sha256: 39893e187f8438e4e9b32f7cc4edccc3c05d84eac97e784b5c6bf77898c564f7
+    sha256: 3dfa135e5a448030193a256d757f37140c7fdfadffb72fc745736441efce6c32
   access:
     mode: read_only
     method: file
@@ -41311,7 +41311,7 @@ records:
     repository_path: docs/evidence/forge_trust_closure_v1/charter_ledger.json
   integrity:
     kind: sha256
-    sha256: cffdc676181d7e64e94685f75799697836d9c2aa252a5e77d249572c7fe12ee4
+    sha256: 8a2119630509dd6f445f70c71ea1a81e8deab22ed8d8a9d84ca85f689f1dba15
   access:
     mode: read_only
     method: file

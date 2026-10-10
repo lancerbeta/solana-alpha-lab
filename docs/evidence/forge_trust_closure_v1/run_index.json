@@ -3,7 +3,7 @@
   "task_id": "FORGE_TRUST_CLOSURE_V1",
   "base": "90ba76e37515b3d521478a6d05a149fb0f1d2b75",
   "audit_head": "ea4afb52b9d188c378d2a9850ba1b26c85496821",
-  "product_revision": "f64d275717cc7e011233b6e530655293b75f8ebc",
+  "product_revision": "b50a4a95df4802be4aa5e584dfe8144f27aabf93",
   "baseline": {
     "wal": {
       "schema": "baa.product-probes.v1",
@@ -1112,6 +1112,278 @@
           ]
         }
       }
+    },
+    {
+      "run_id": "b50a4a95df48-joint-review-fix-r1",
+      "source_commit": "b50a4a95df4802be4aa5e584dfe8144f27aabf93",
+      "phase": "joint",
+      "status": "PASS",
+      "container_exit_code": 0,
+      "container_running_at_readback": false,
+      "container": "ftc-b50a4a95df48-joint-review-fix-r1",
+      "volume": "ftc-b50a4a95df48-joint-review-fix-r1-evidence",
+      "producer_volume": "ftc-0fe35ffafa5e-producer-r1-evidence",
+      "source_image": "sha256:c9bb05df3db54cdefcfdabb366644d3513889d7ff3e3434a4b93f5085f0844a7",
+      "parent_runtime_image": "sha256:b1a9aeff235915d05f6b6d0436972e5609b631a6c77e2a9e0a664a04d36e96bb",
+      "original_kit_hashes": {
+        "Dockerfile": "54766159b4b3c9f5d111fb116cfb27444612edad98b77cfa25822397f2abb85a",
+        "Snapshot.Dockerfile": "cdf1e3dbf7ab0e571dee0ed7b903e7da7d9bd856a6377ce2cb6312fbf0249cd3",
+        "actor_missions.json": "6c78fe85d099ae970975c41cdb86b500e2245e93497e5d8a9c6e26703a56eaf1",
+        "assemble_coverage.py": "c983cbc79a682cff114a6c178c1c0a83df04572e031ffa4f2e3bd6e59bdd571f",
+        "bootstrap.ps1": "523bafc6e66fe29d260afd071928f940d8c71bf8ee52632a3be15829bc1c86ab",
+        "bridge_probe.py": "7a467a54b09abc1d00988700be4a5ff1f5a220e5d3739b8f72d03f78ff10ef75",
+        "charter_bindings.json": "7281c0dc6ef7d2ca9bd3c1e8afc509e3d540c767136e49bf5be0ad755b195f20",
+        "collect_evidence.py": "1b1a4ee88aea408bdca96c0504a9f2310346645c641288966949e0c2435ff488",
+        "finalize_metadata.py": "07042264b4f9b62c4f19244244e949ac0195f1d26f983dbe69c7e387aba53603",
+        "launch.ps1": "4a308a5c68c04a0f75413fe7b62fcc355d90ad04389cc00dd839cca8d62fe9ab",
+        "metric_probe.py": "6f3a9d137cd72fbf7d875cec460d7a51ec581e7abab0669c883fc08fa517c2d4",
+        "oracles.py": "b83479bf62614402ca265b0e542f4d485223d0b940426b3735a45cd1b55f6a29",
+        "product_probes.py": "129ee396320e4be65333f36984d10e311361afa9b84e5c3df6abc64968dfa0af",
+        "run_campaign.py": "c4ce81b8314cf1d9fb90b345362baad774f2f035c1141ab5799f9bf4637d39d5",
+        "safety_preflight.py": "0befc5f19544c649d98b0ab7663b4ed64e847f86484ca663ddf2a0fdeba722e5",
+        "targeted_interactions.py": "e0a522dfce7384df9c902cf24b3bb93261a047480c04a8333ff459f1eea7c4a9"
+      },
+      "active_kit_hashes": {
+        "actor_missions.json": "6c78fe85d099ae970975c41cdb86b500e2245e93497e5d8a9c6e26703a56eaf1",
+        "assemble_coverage.py": "c983cbc79a682cff114a6c178c1c0a83df04572e031ffa4f2e3bd6e59bdd571f",
+        "bootstrap.ps1": "523bafc6e66fe29d260afd071928f940d8c71bf8ee52632a3be15829bc1c86ab",
+        "bridge_probe.py": "7a467a54b09abc1d00988700be4a5ff1f5a220e5d3739b8f72d03f78ff10ef75",
+        "charter_bindings.json": "7281c0dc6ef7d2ca9bd3c1e8afc509e3d540c767136e49bf5be0ad755b195f20",
+        "collect_evidence.py": "1b1a4ee88aea408bdca96c0504a9f2310346645c641288966949e0c2435ff488",
+        "Dockerfile": "54766159b4b3c9f5d111fb116cfb27444612edad98b77cfa25822397f2abb85a",
+        "finalize_metadata.py": "b753f07191a2c901174f9752409ab6790ebb5fd4032988b05fc609f135a015c3",
+        "joint.py": "0976cb2839a638973c769e135bf3a8985332d41e8712b3cefcc2f6de5d5ac6a5",
+        "launch.ps1": "4a308a5c68c04a0f75413fe7b62fcc355d90ad04389cc00dd839cca8d62fe9ab",
+        "metric_probe.py": "6f3a9d137cd72fbf7d875cec460d7a51ec581e7abab0669c883fc08fa517c2d4",
+        "oracles.py": "b83479bf62614402ca265b0e542f4d485223d0b940426b3735a45cd1b55f6a29",
+        "product_probes.py": "65bddec44089f5ee2741d923ee1bc70cdac081f901dc137159854d899486acf1",
+        "run_campaign.py": "06fcad6108e4d5fd79b71b4dc3e4f01835b6130ae735aecc6a24adb6851a234f",
+        "safety_preflight.py": "d82524a0fd6a565c5ac380dc6b7ec5de66ea1b99564b1cd743898920369531ce",
+        "Snapshot.Dockerfile": "cdf1e3dbf7ab0e571dee0ed7b903e7da7d9bd856a6377ce2cb6312fbf0249cd3",
+        "targeted_interactions.py": "e0a522dfce7384df9c902cf24b3bb93261a047480c04a8333ff459f1eea7c4a9"
+      },
+      "artifact_hashes": {
+        "manifest.json": "33954e5bd890fcac9ea2931d643a10c99cc67a187db6f0a9cd310df2c234aedc",
+        "receipt.json": "ad995c386f75466489ac3f3efbaaf9ff5876892eb265a27a2426753d1bdaff70",
+        "run.log": "3683ee4d716e4448c710e5ee5e1be9feabc69c812480f99477cd9a45fad433f7",
+        "safety-preflight.json": "50d6a8cb70892b541a78d5e4184f364e426e4bef1fa238d1d670f9d3507d5d1d",
+        "snapshot-build.log": "1b564af9bfa95c5f874c88ef5b07cbc3d0108020deaea8f60072b1f94023fa47",
+        "summary.json": "1cb71bc90573a06cbac0a93658dcd0826f22af7711770e322ea9a1a2b7b1cdcd",
+        "terminal.json": "a8c14558b5719fb4df39784e2a09610667bc51ad8efe02797d012a3ab881dc21"
+      },
+      "raw_availability": "RETAINED_LOCAL_DOCKER_VOLUME_AND_IGNORED_RUN_DIRECTORY_NOT_EXTERNALLY_PUBLISHED",
+      "containment": {
+        "uid": "1000:1000",
+        "network": "none",
+        "rootfs_readonly": true,
+        "cap_drop": [
+          "ALL"
+        ],
+        "no_new_privileges": true,
+        "cpus": 2,
+        "memory_bytes": 2147483648,
+        "pids": 128
+      },
+      "tests_run": null,
+      "row_counts": {},
+      "observable": {
+        "fidelity": "LINKED_NATIVE_PRODUCT_SEGMENTS",
+        "fresh_process": true,
+        "writer_alive_at_read": true,
+        "os_denied_writes": 3,
+        "durable_db_wal_before": {
+          "ops.sqlite": "473f56974dbd47e795aa306036a60fcc17c070731d3ed8a2965ba68ea60338e2",
+          "ops.sqlite-wal": "09b69962221d8c17939f5b0c9488a3636f3fcbf35a7bdb45b5cc79ef0754a0b5"
+        },
+        "durable_db_wal_after": {
+          "ops.sqlite": "473f56974dbd47e795aa306036a60fcc17c070731d3ed8a2965ba68ea60338e2",
+          "ops.sqlite-wal": "09b69962221d8c17939f5b0c9488a3636f3fcbf35a7bdb45b5cc79ef0754a0b5"
+        },
+        "shm": "VOLATILE_COORDINATION_NOT_DURABLE_TRUTH",
+        "synthetic_operational_job": "SEPARATE_NATIVE_INPUT_NOT_EXECUTION_EVIDENCE",
+        "inserted_scientific_records": 0,
+        "consumer": {
+          "operational_store": "COMPLETE",
+          "lifecycle_projection": "COMPLETE",
+          "api_dossier": {
+            "execution": "COMPLETED",
+            "evidence": "CONFLICT",
+            "decision": "NO_DECISION"
+          },
+          "http_status": 200,
+          "http_completed": true,
+          "science_guard_allowed": false,
+          "execution_relation_gaps": [
+            {
+              "record_id": "RUN-COMPLETED-B0646F71606E48B1",
+              "reason_code": "EXPERIMENT_SPEC_VERSION_CONFLICT",
+              "next_safe_action": "VERIFY_SOURCE_BOUND_EXPERIMENT_IDENTITY"
+            },
+            {
+              "record_id": "RUN-STARTED-B0646F71606E48B1",
+              "reason_code": "EXPERIMENT_SPEC_VERSION_CONFLICT",
+              "next_safe_action": "VERIFY_SOURCE_BOUND_EXPERIMENT_IDENTITY"
+            }
+          ],
+          "native_execution_ids": [
+            "RUN-COMPLETED-D35A231133834E28",
+            "RUN-STARTED-D35A231133834E28"
+          ]
+        }
+      }
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "source_commit": "b50a4a95df4802be4aa5e584dfe8144f27aabf93",
+      "phase": "residual",
+      "status": "PASS",
+      "container_exit_code": 0,
+      "container_running_at_readback": false,
+      "container": "ftc-b50a4a95df48-residual-review-fix-r1",
+      "volume": "ftc-b50a4a95df48-residual-review-fix-r1-evidence",
+      "producer_volume": null,
+      "source_image": "sha256:6dc2d6c3ec34054b7138acfffa9da4e0dff4e6bbdd3a6cada9b42204db18f63e",
+      "parent_runtime_image": "sha256:b1a9aeff235915d05f6b6d0436972e5609b631a6c77e2a9e0a664a04d36e96bb",
+      "original_kit_hashes": {
+        "Dockerfile": "54766159b4b3c9f5d111fb116cfb27444612edad98b77cfa25822397f2abb85a",
+        "Snapshot.Dockerfile": "cdf1e3dbf7ab0e571dee0ed7b903e7da7d9bd856a6377ce2cb6312fbf0249cd3",
+        "actor_missions.json": "6c78fe85d099ae970975c41cdb86b500e2245e93497e5d8a9c6e26703a56eaf1",
+        "assemble_coverage.py": "c983cbc79a682cff114a6c178c1c0a83df04572e031ffa4f2e3bd6e59bdd571f",
+        "bootstrap.ps1": "523bafc6e66fe29d260afd071928f940d8c71bf8ee52632a3be15829bc1c86ab",
+        "bridge_probe.py": "7a467a54b09abc1d00988700be4a5ff1f5a220e5d3739b8f72d03f78ff10ef75",
+        "charter_bindings.json": "7281c0dc6ef7d2ca9bd3c1e8afc509e3d540c767136e49bf5be0ad755b195f20",
+        "collect_evidence.py": "1b1a4ee88aea408bdca96c0504a9f2310346645c641288966949e0c2435ff488",
+        "finalize_metadata.py": "07042264b4f9b62c4f19244244e949ac0195f1d26f983dbe69c7e387aba53603",
+        "launch.ps1": "4a308a5c68c04a0f75413fe7b62fcc355d90ad04389cc00dd839cca8d62fe9ab",
+        "metric_probe.py": "6f3a9d137cd72fbf7d875cec460d7a51ec581e7abab0669c883fc08fa517c2d4",
+        "oracles.py": "b83479bf62614402ca265b0e542f4d485223d0b940426b3735a45cd1b55f6a29",
+        "product_probes.py": "129ee396320e4be65333f36984d10e311361afa9b84e5c3df6abc64968dfa0af",
+        "run_campaign.py": "c4ce81b8314cf1d9fb90b345362baad774f2f035c1141ab5799f9bf4637d39d5",
+        "safety_preflight.py": "0befc5f19544c649d98b0ab7663b4ed64e847f86484ca663ddf2a0fdeba722e5",
+        "targeted_interactions.py": "e0a522dfce7384df9c902cf24b3bb93261a047480c04a8333ff459f1eea7c4a9"
+      },
+      "active_kit_hashes": {
+        "actor_missions.json": "6c78fe85d099ae970975c41cdb86b500e2245e93497e5d8a9c6e26703a56eaf1",
+        "assemble_coverage.py": "c983cbc79a682cff114a6c178c1c0a83df04572e031ffa4f2e3bd6e59bdd571f",
+        "bootstrap.ps1": "523bafc6e66fe29d260afd071928f940d8c71bf8ee52632a3be15829bc1c86ab",
+        "bridge_probe.py": "7a467a54b09abc1d00988700be4a5ff1f5a220e5d3739b8f72d03f78ff10ef75",
+        "charter_bindings.json": "7281c0dc6ef7d2ca9bd3c1e8afc509e3d540c767136e49bf5be0ad755b195f20",
+        "collect_evidence.py": "1b1a4ee88aea408bdca96c0504a9f2310346645c641288966949e0c2435ff488",
+        "Dockerfile": "54766159b4b3c9f5d111fb116cfb27444612edad98b77cfa25822397f2abb85a",
+        "finalize_metadata.py": "b753f07191a2c901174f9752409ab6790ebb5fd4032988b05fc609f135a015c3",
+        "launch.ps1": "4a308a5c68c04a0f75413fe7b62fcc355d90ad04389cc00dd839cca8d62fe9ab",
+        "metric_probe.py": "6f3a9d137cd72fbf7d875cec460d7a51ec581e7abab0669c883fc08fa517c2d4",
+        "oracles.py": "b83479bf62614402ca265b0e542f4d485223d0b940426b3735a45cd1b55f6a29",
+        "product_probes.py": "65bddec44089f5ee2741d923ee1bc70cdac081f901dc137159854d899486acf1",
+        "residual.py": "ca4bcf1c048350b8b3b6d17431bac370dc1affcbd9c23e3a2ed6bc7a431ba0ba",
+        "run_campaign.py": "06fcad6108e4d5fd79b71b4dc3e4f01835b6130ae735aecc6a24adb6851a234f",
+        "safety_preflight.py": "d82524a0fd6a565c5ac380dc6b7ec5de66ea1b99564b1cd743898920369531ce",
+        "Snapshot.Dockerfile": "cdf1e3dbf7ab0e571dee0ed7b903e7da7d9bd856a6377ce2cb6312fbf0249cd3",
+        "targeted_interactions.py": "e0a522dfce7384df9c902cf24b3bb93261a047480c04a8333ff459f1eea7c4a9"
+      },
+      "artifact_hashes": {
+        "manifest.json": "e44c6e3ef9f80e0c097d19913d0808ab9564c72b7ba897b347ff2fc7cfc7a932",
+        "receipt.json": "1dcd2f1100dbd383cf052e8c464eb88e377bbb2e947b5ac727fd58aa9fe3cda5",
+        "run.log": "364ac68c239c78520dfac1ae33508160251e6d4a55834f0968a0b670cc4b9aec",
+        "safety-preflight.json": "50d6a8cb70892b541a78d5e4184f364e426e4bef1fa238d1d670f9d3507d5d1d",
+        "snapshot-build.log": "e252b5166f500cb5ba6f4701423bc56dbc37e2ab18a8b571747d481787292fd4",
+        "summary.json": "6a9f1d4c24b0b20ba9ba8d9d95debf01e4d5700c7c59dad52456ebb5d2a91625",
+        "terminal.json": "6edf1633a6afeafcf622774f7ba47d327e4ddfaa0097df14ff1b350ea9fb47c3"
+      },
+      "raw_availability": "RETAINED_LOCAL_DOCKER_VOLUME_AND_IGNORED_RUN_DIRECTORY_NOT_EXTERNALLY_PUBLISHED",
+      "containment": {
+        "uid": "1000:1000",
+        "network": "none",
+        "rootfs_readonly": true,
+        "cap_drop": [
+          "ALL"
+        ],
+        "no_new_privileges": true,
+        "cpus": 2,
+        "memory_bytes": 2147483648,
+        "pids": 128
+      },
+      "tests_run": 47,
+      "row_counts": {
+        "PASS": 47
+      }
+    },
+    {
+      "run_id": "b50a4a95df48-wal-missing-summary-canary",
+      "source_commit": "b50a4a95df4802be4aa5e584dfe8144f27aabf93",
+      "phase": "wal",
+      "status": "HARNESS_ERROR_NO_TERMINAL_EVIDENCE",
+      "container_exit_code": 0,
+      "container_running_at_readback": false,
+      "container": "ftc-b50a4a95df48-wal-missing-summary-canary",
+      "volume": "ftc-b50a4a95df48-wal-missing-summary-canary-evidence",
+      "producer_volume": null,
+      "source_image": "sha256:24756b930a05912affa82c7c801cbb8704b0a132da72d6b412ca338219f07387",
+      "parent_runtime_image": "sha256:b1a9aeff235915d05f6b6d0436972e5609b631a6c77e2a9e0a664a04d36e96bb",
+      "original_kit_hashes": {
+        "Dockerfile": "54766159b4b3c9f5d111fb116cfb27444612edad98b77cfa25822397f2abb85a",
+        "Snapshot.Dockerfile": "cdf1e3dbf7ab0e571dee0ed7b903e7da7d9bd856a6377ce2cb6312fbf0249cd3",
+        "actor_missions.json": "6c78fe85d099ae970975c41cdb86b500e2245e93497e5d8a9c6e26703a56eaf1",
+        "assemble_coverage.py": "c983cbc79a682cff114a6c178c1c0a83df04572e031ffa4f2e3bd6e59bdd571f",
+        "bootstrap.ps1": "523bafc6e66fe29d260afd071928f940d8c71bf8ee52632a3be15829bc1c86ab",
+        "bridge_probe.py": "7a467a54b09abc1d00988700be4a5ff1f5a220e5d3739b8f72d03f78ff10ef75",
+        "charter_bindings.json": "7281c0dc6ef7d2ca9bd3c1e8afc509e3d540c767136e49bf5be0ad755b195f20",
+        "collect_evidence.py": "1b1a4ee88aea408bdca96c0504a9f2310346645c641288966949e0c2435ff488",
+        "finalize_metadata.py": "07042264b4f9b62c4f19244244e949ac0195f1d26f983dbe69c7e387aba53603",
+        "launch.ps1": "4a308a5c68c04a0f75413fe7b62fcc355d90ad04389cc00dd839cca8d62fe9ab",
+        "metric_probe.py": "6f3a9d137cd72fbf7d875cec460d7a51ec581e7abab0669c883fc08fa517c2d4",
+        "oracles.py": "b83479bf62614402ca265b0e542f4d485223d0b940426b3735a45cd1b55f6a29",
+        "product_probes.py": "129ee396320e4be65333f36984d10e311361afa9b84e5c3df6abc64968dfa0af",
+        "run_campaign.py": "c4ce81b8314cf1d9fb90b345362baad774f2f035c1141ab5799f9bf4637d39d5",
+        "safety_preflight.py": "0befc5f19544c649d98b0ab7663b4ed64e847f86484ca663ddf2a0fdeba722e5",
+        "targeted_interactions.py": "e0a522dfce7384df9c902cf24b3bb93261a047480c04a8333ff459f1eea7c4a9"
+      },
+      "active_kit_hashes": {
+        "actor_missions.json": "6c78fe85d099ae970975c41cdb86b500e2245e93497e5d8a9c6e26703a56eaf1",
+        "assemble_coverage.py": "c983cbc79a682cff114a6c178c1c0a83df04572e031ffa4f2e3bd6e59bdd571f",
+        "bootstrap.ps1": "523bafc6e66fe29d260afd071928f940d8c71bf8ee52632a3be15829bc1c86ab",
+        "bridge_probe.py": "7a467a54b09abc1d00988700be4a5ff1f5a220e5d3739b8f72d03f78ff10ef75",
+        "charter_bindings.json": "7281c0dc6ef7d2ca9bd3c1e8afc509e3d540c767136e49bf5be0ad755b195f20",
+        "collect_evidence.py": "1b1a4ee88aea408bdca96c0504a9f2310346645c641288966949e0c2435ff488",
+        "Dockerfile": "54766159b4b3c9f5d111fb116cfb27444612edad98b77cfa25822397f2abb85a",
+        "finalize_metadata.py": "b753f07191a2c901174f9752409ab6790ebb5fd4032988b05fc609f135a015c3",
+        "launch.ps1": "4a308a5c68c04a0f75413fe7b62fcc355d90ad04389cc00dd839cca8d62fe9ab",
+        "metric_probe.py": "6f3a9d137cd72fbf7d875cec460d7a51ec581e7abab0669c883fc08fa517c2d4",
+        "oracles.py": "b83479bf62614402ca265b0e542f4d485223d0b940426b3735a45cd1b55f6a29",
+        "product_probes.py": "65bddec44089f5ee2741d923ee1bc70cdac081f901dc137159854d899486acf1",
+        "run_campaign.py": "06fcad6108e4d5fd79b71b4dc3e4f01835b6130ae735aecc6a24adb6851a234f",
+        "safety_preflight.py": "d82524a0fd6a565c5ac380dc6b7ec5de66ea1b99564b1cd743898920369531ce",
+        "Snapshot.Dockerfile": "cdf1e3dbf7ab0e571dee0ed7b903e7da7d9bd856a6377ce2cb6312fbf0249cd3",
+        "targeted_interactions.py": "e0a522dfce7384df9c902cf24b3bb93261a047480c04a8333ff459f1eea7c4a9"
+      },
+      "artifact_hashes": {
+        "manifest.json": "7b6db0186184f750445128876819acbd8aa9824288c4991efdbab6d12e96ba64",
+        "receipt.json": "c0d1a3f8c7ddd4301dad0fede846cedff0e00befe0315458b3cde72e6dc740c6",
+        "run.log": "70411ffac734fe92e375b029f10e417dda4ce73f9d5918654e5dec6f5b116e69",
+        "safety-preflight.json": "50d6a8cb70892b541a78d5e4184f364e426e4bef1fa238d1d670f9d3507d5d1d",
+        "snapshot-build.log": "149f273c09515e2d4a248e3b538da96491906d2873de896aa1edf646cee2090d",
+        "terminal.json": "5fa5a6ae0ce761a7eb9522149fbe34c16602d812be69b0d89d85bd40e436ad06"
+      },
+      "raw_availability": "RETAINED_LOCAL_DOCKER_VOLUME_AND_IGNORED_RUN_DIRECTORY_NOT_EXTERNALLY_PUBLISHED",
+      "containment": {
+        "uid": "1000:1000",
+        "network": "none",
+        "rootfs_readonly": true,
+        "cap_drop": [
+          "ALL"
+        ],
+        "no_new_privileges": true,
+        "cpus": 2,
+        "memory_bytes": 2147483648,
+        "pids": 128
+      },
+      "expected_control_result": true,
+      "fidelity": "REAL_OFFLINE_WAL_CONTAINER_EXIT_ZERO_WITH_INTENTIONAL_HOST_SUMMARY_EXTRACTION_FAILURE",
+      "control_adapter_logical_ref": "ignored://local/forge-trust-closure-v1/missing_summary_canary.py",
+      "control_adapter_sha256": "7ba169603ec5d046521b7dda0ba620d0e63cf4ae96136ea043829adfc771f15c",
+      "observed_process_exit": 0,
+      "observed_launcher_exit": 2,
+      "integrity_check": "PASS_WITH_FAILED_REPLAY_STATUS_RETAINED"
     },
     {
       "run_id": "f64d275717cc-producer-timeout-canary",
@@ -2502,6 +2774,288 @@
       "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_verify_rejects_lineage_or_clock_mismatch",
       "status": "PASS",
       "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.CurrentReadTests.test_child_commit_barriers_old_snapshot_new_consumers_and_oracle_canary",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.ExecutionIdentityTests.test_changed_spec_conflicting_alias_and_unverified_legacy_are_unknown",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.ExecutionIdentityTests.test_conflicting_execution_rows_quarantine_shared_run_and_weak_metric",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.ExecutionIdentityTests.test_explicit_foreign_identity_cannot_borrow_own_run_or_science",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.ExecutionIdentityTests.test_explicit_scientific_version_cannot_mix_with_current_run",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.ExecutionIdentityTests.test_invalid_legacy_completion_cannot_borrow_valid_started_run",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.ExecutionIdentityTests.test_quarantined_or_conflicting_trial_cannot_seed_weak_scientific_metric",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.ExecutionIdentityTests.test_run_payload_poison_is_not_scientific_evidence_and_version_invalidates_snapshot",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.ExecutionIdentityTests.test_unambiguous_foreign_run_is_not_an_unresolved_own_execution",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.ExecutionIdentityTests.test_unavailable_is_unknown_absent_is_no_run",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.ExecutionIdentityTests.test_valid_legacy_passport_exact_hash_and_forward_extra_identity",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.GuardBoundaryTests.test_missing_physical_science_source_keeps_manifest_and_denies_materialization",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.GuardBoundaryTests.test_native_classifier_terminals_reach_fresh_persisted_consumer",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.GuardBoundaryTests.test_physical_holdout_is_refused_before_parquet_value_reader",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.GuardBoundaryTests.test_replay_artifact_tamper_and_unowned_input_mount_are_rejected",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_trust_closure_v1.GuardBoundaryTests.test_replay_shell_success_requires_graded_pass",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_conflict_and_holdout_empty_list_stay_distinct",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_decision_loop_stale_retry_and_writer_busy",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_degraded_source_keeps_definition_and_unknown_obligations",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_direct_vs_related_classification",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_get_experiment_detail_is_non_mutating",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_html_decision_and_promote_guard_copy",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_http_records_reject_and_surfaces_done",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_owner_language_ru_pass",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_promote_guard_and_strategy_untouched",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_real_incomplete_experiment_is_truthful",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_run_completed_does_not_satisfy_pit",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_semantic_anti_hijack",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_forge_research_flow_reliability_v1.EpisodeFlowTests.test_trust_closure_new_evidence_preserves_pending_reservation_and_safe_stop_recovery",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_check_mismatch_does_not_report_materialized",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_check_rejects_tampered_manifest",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_coerced_execution_inputs_are_gaps",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_deterministic_render_and_snapshot_meaning",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_handoff_contract_names_manifest_1_1_when_binding_is_present",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_materialized_keeps_evidence_hash_conflict",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_mismatched_decision_event_or_clock_is_invalid",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_overview_ready_is_not_available",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_a_happy_path_vertical",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_b_later_evidence_does_not_rewrite_manifest",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_c_legacy_promote_is_explicit_gap",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_d_execution_input_gap",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_e_and_f_collision_and_replay",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_g_get_is_non_mutating",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_h_no_activation",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_semantic_gold_query",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_unreadable_strategy_file_is_conflict",
+      "status": "PASS",
+      "seconds": null
+    },
+    {
+      "run_id": "b50a4a95df48-residual-review-fix-r1",
+      "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_verify_rejects_lineage_or_clock_mismatch",
+      "status": "PASS",
+      "seconds": null
     }
   ],
   "planned_but_not_executed": [
@@ -2509,10 +3063,11 @@
     "CHRONOLOGICAL_POSITIVE_SCIENCE_TO_STRATEGY"
   ],
   "local_current_identity_guard_tests": {
-    "tests_run": 14,
+    "tests_run": 16,
     "status": "PASS",
-    "source_commit": "7a3361b3e1dcc2fe72879d6a97bf377c21bb3b67",
-    "new_native_matrix": "FAST_LANE_READY_CHANGE_LANE_CAPABILITY_GAP_BLOCKED_DATA_TO_PERSISTED_FRESH_READ"
+    "source_commit": "b50a4a95df4802be4aa5e584dfe8144f27aabf93",
+    "new_native_matrix": "FAST_LANE_READY_CHANGE_LANE_CAPABILITY_GAP_BLOCKED_DATA_TO_PERSISTED_FRESH_READ",
+    "witness": "b50a4a95df48-residual-review-fix-r1"
   },
   "non_claims": [
     "NO_ALPHA",
@@ -2527,5 +3082,23 @@
     "witness": "tests.test_precommit_diff_check_v1",
     "scope": "REAL_GIT_EXACT_MAIN_HISTORY_VS_NEW_CANDIDATE_AND_NONMAIN_DIFF",
     "invocation": "uv run --locked --managed-python python -B -m unittest tests.test_precommit_diff_check_v1"
+  },
+  "review_remediation_proof": {
+    "source_commit": "b50a4a95df4802be4aa5e584dfe8144f27aabf93",
+    "closure_tests_run": 47,
+    "status": "PASS",
+    "identity_cases": [
+      "QUARANTINED_RUN_TRIAL_SEED",
+      "FOREIGN_SHARED_TRIAL_SEED",
+      "OLD_SPEC_SHARED_TRIAL_SEED"
+    ],
+    "shell_grading_controls": [
+      "MISSING_SAFETY",
+      "MISSING_SUMMARY",
+      "NONZERO_START_RETURN_CODE",
+      "TIMEOUT",
+      "INTERRUPTED"
+    ],
+    "scope": "DETERMINISTIC_CONTRACT_REGRESSION_PLUS_REAL_NATIVE_LINKED_CONSUMER"
   }
 }

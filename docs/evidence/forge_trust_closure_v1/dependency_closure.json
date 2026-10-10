@@ -1,7 +1,7 @@
 {
   "schema": "ftc.segment-reuse-closure.v1",
   "earlier_source": "19ffd3e877754c7fb5f29e04d3e83a82a71bf7e5",
-  "current_product_revision": "f64d275717cc7e011233b6e530655293b75f8ebc",
+  "current_product_revision": "b50a4a95df4802be4aa5e584dfe8144f27aabf93",
   "factory_source_files_unchanged": [
     {
       "path": "src/solana_alpha_lab/factory/__init__.py",
@@ -748,7 +748,7 @@
     {
       "path": "src/solana_alpha_lab/factory/experiment_evidence.py",
       "old_sha256": "1447fa0ecd6ce46f71be339d76d5823b164446b73bf48fdc31fc76ca3f0bf63b",
-      "candidate_sha256": "b262393a57d35f00f86b925d5489b7e97c9154efbb478a19d3929e9fecb3f39a"
+      "candidate_sha256": "8cdc314f482297420c08f81523273439654aa42c0c8d915462d55c861d404eb5"
     }
   ],
   "changed_consumer_requalification": "experiment_evidence.py: 12 existing dossier tests + current identity tests + science handoff consumer suite + fresh joint/legacy bridge rerun",

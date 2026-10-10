@@ -17,7 +17,7 @@
 | TC-11 | Genuine actors NOT_RUN: inherited host tools, no enforced tool-less actor transport/budget; allowed precise UNVERIFIED disposition; no false actor/pixel claim |
 | TC-12 | New empty owned sandbox through reusable entry; real stale observer/identity/artifact/mount canaries; deadline control preserved TIMEOUT and stopped process |
 | TC-13 | Current source contract, Russian operator limits, Catalog task/report/evidence/test routes and generated navigation; no new scientific authority or unsupported accepted capability |
-| TC-14 | Four isolated roles, deterministic checks, exact-head CI and merge-readiness required; cleanup readback zero running containers, retained 14 owned volumes, 540555165 accounted bytes <2GiB |
+| TC-14 | Four isolated roles, deterministic checks, exact-head CI and merge-readiness required; cleanup readback zero running containers, retained 17 owned volumes, 584980092 accounted bytes <2GiB |
 
 TC-08 is not 56 green full paths. Per-row original fidelity and new proof boundary
 are in `docs/evidence/forge_trust_closure_v1/charter_ledger.json`. Actor/scientific/

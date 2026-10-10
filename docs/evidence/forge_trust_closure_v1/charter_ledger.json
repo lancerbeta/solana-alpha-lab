@@ -291,7 +291,7 @@
       "obligation_and_boundary": "Native collaboration actors inherit host tools. No tool-less actor or authorized model transport/budget. Scripted controls and readonly critics are not actors.",
       "matching_rerun_witnesses": [
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_semantic_anti_hijack",
           "status": "PASS",
           "seconds": null
@@ -628,7 +628,7 @@
           "seconds": null
         },
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_run_completed_does_not_satisfy_pit",
           "status": "PASS",
           "seconds": null
@@ -688,7 +688,7 @@
       "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
       "matching_rerun_witnesses": [
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_run_completed_does_not_satisfy_pit",
           "status": "PASS",
           "seconds": null
@@ -706,7 +706,7 @@
       "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
       "matching_rerun_witnesses": [
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_direct_vs_related_classification",
           "status": "PASS",
           "seconds": null
@@ -724,13 +724,13 @@
       "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
       "matching_rerun_witnesses": [
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_conflict_and_holdout_empty_list_stay_distinct",
           "status": "PASS",
           "seconds": null
         },
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_degraded_source_keeps_definition_and_unknown_obligations",
           "status": "PASS",
           "seconds": null
@@ -748,19 +748,19 @@
       "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
       "matching_rerun_witnesses": [
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_decision_loop_stale_retry_and_writer_busy",
           "status": "PASS",
           "seconds": null
         },
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_http_records_reject_and_surfaces_done",
           "status": "PASS",
           "seconds": null
         },
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_promote_guard_and_strategy_untouched",
           "status": "PASS",
           "seconds": null
@@ -778,19 +778,19 @@
       "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
       "matching_rerun_witnesses": [
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_c_legacy_promote_is_explicit_gap",
           "status": "PASS",
           "seconds": null
         },
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_mismatched_decision_event_or_clock_is_invalid",
           "status": "PASS",
           "seconds": null
         },
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_handoff_contract_names_manifest_1_1_when_binding_is_present",
           "status": "PASS",
           "seconds": null
@@ -808,13 +808,13 @@
       "obligation_and_boundary": "Physically remove the committed scientific parquet: fresh API reports SOURCE_UNAVAILABLE, retained decision segment unchanged, restoration recovers same frozen manifest. During outage no successful source revalidation/strategy claim.",
       "matching_rerun_witnesses": [
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_b_later_evidence_does_not_rewrite_manifest",
           "status": "PASS",
           "seconds": null
         },
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_materialized_keeps_evidence_hash_conflict",
           "status": "PASS",
           "seconds": null
@@ -832,13 +832,13 @@
       "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
       "matching_rerun_witnesses": [
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_coerced_execution_inputs_are_gaps",
           "status": "PASS",
           "seconds": null
         },
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_d_execution_input_gap",
           "status": "PASS",
           "seconds": null
@@ -856,7 +856,7 @@
       "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
       "matching_rerun_witnesses": [
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_e_and_f_collision_and_replay",
           "status": "PASS",
           "seconds": null
@@ -874,7 +874,7 @@
       "obligation_and_boundary": "Native producer records and exact current spec reach fresh dossier/API/HTTP Workbench. Joint independent operational job input proves live WAL freshness; job itself is not execution evidence.",
       "matching_rerun_witnesses": [
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_overview_ready_is_not_available",
           "status": "PASS",
           "seconds": null
@@ -892,13 +892,13 @@
       "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
       "matching_rerun_witnesses": [
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_g_get_is_non_mutating",
           "status": "PASS",
           "seconds": null
         },
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_experiment_evidence_decision_v1.ExperimentEvidenceDecisionTests.test_get_experiment_detail_is_non_mutating",
           "status": "PASS",
           "seconds": null
@@ -916,19 +916,19 @@
       "obligation_and_boundary": "Same named source assertions rerun in candidate segment; original full-path limit remains.",
       "matching_rerun_witnesses": [
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_a_happy_path_vertical",
           "status": "PASS",
           "seconds": null
         },
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_scenario_h_no_activation",
           "status": "PASS",
           "seconds": null
         },
         {
-          "run_id": "19ffd3e87775-residual-r1",
+          "run_id": "b50a4a95df48-residual-review-fix-r1",
           "test_id": "tests.test_science_to_strategy_handoff_v1.ScienceToStrategyHandoffTests.test_verify_rejects_lineage_or_clock_mismatch",
           "status": "PASS",
           "seconds": null
@@ -957,6 +957,12 @@
       "name": "OPEN_WAL_x_NATIVE_EXACT_SPEC_RUN_x_FRESH_CONSUMER",
       "status": "PASS_LINKED_NATIVE_SEGMENTS",
       "witness": "ftc-7a3361b3e1dc-joint-r2"
+    },
+    {
+      "name": "QUARANTINED_RUN_x_SHARED_TRIAL_x_WEAK_SCIENTIFIC_METRIC",
+      "status": "PASS_FAIL_CLOSED_BEFORE_SEEDING",
+      "witness": "ExecutionIdentityTests.test_quarantined_or_conflicting_trial_cannot_seed_weak_scientific_metric",
+      "run_id": "b50a4a95df48-residual-review-fix-r1"
     }
   ],
   "remaining_full_positive_boundary": "SCIENTIFIC_PROTOCOL_C_AND_GENUINE_ACTOR_UNVERIFIED"

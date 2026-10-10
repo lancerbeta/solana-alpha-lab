@@ -88,9 +88,10 @@ passport and exact canonical spec hash (which includes experiment identity).
 Contradictory execution rows sharing a run key quarantine that key for this
 dossier, including weak scientific joins. Malformed legacy completion cannot
 borrow an otherwise valid RUN_STARTED seed. Every legacy terminal is checked
-before collecting direct IDs. A TRIAL on a quarantined run or with conflicting
-experiment/spec identity quarantines its trial key and dependent weak joins
-before classification, not only when collecting direct IDs. An unambiguously
+before classification, not only when collecting direct IDs. Direct IDs are
+collected after quarantine. A TRIAL on a quarantined run or with conflicting
+experiment/spec identity quarantines its trial key and dependent weak joins.
+An unambiguously
 foreign experiment with a disjoint run is not an unresolved own execution.
 No backfill, latest-run selection or repeat scientific look is required.
 Explicit foreign/conflicting experiment or run identities, and an explicit

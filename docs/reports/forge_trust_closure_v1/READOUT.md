@@ -30,6 +30,16 @@ identity. Trial/run key, бюджет, транзакции и прежние re
 Чужой однозначный experiment не объявляется unresolved own execution. Неясный
 legacy с общей hypothesis остаётся видимым gap; по нему не угадывается связь.
 
+Isolated review нашёл и воспроизвёл обход quarantine по trial ID: отброшенный
+TRIAL ещё мог seed слабую metric, открывая scientific guard. `b50a4a95df48`
+вычисляет run/trial quarantine до seeding; regression проверяет общий конфликтный
+run, чужой trial и старый spec hash. Native joint повторён на этой версии: PASS.
+Тот же review нашёл successful shell exit при missing harness evidence. Реальный
+WAL container завершился с exit=0; intentional отказ extraction summary дал
+HARNESS_ERROR_NO_TERMINAL_EVIDENCE и launcher exit=2. `--verify` отдельно
+показывает integrity PASS и исходный failed replay_status. Это наблюдательный
+canary стенда, а не product/scientific failure или genuine actor.
+
 Readonly означает отсутствие business/SQL/durable DB/WAL writes. Живой SQLite WAL
 использует SHM как volatile coordination; обещания неизменности всех SHM bytes
 нет. В joint proof реальные права запрещают запись в DB, WAL и каталог, writer
@@ -50,6 +60,9 @@ Readonly означает отсутствие business/SQL/durable DB/WAL write
 - `f64d275717cc`: финальный reusable entry WAL PASS; intentional one-second
   timeout остановил owned producer и вернул TIMEOUT/nonzero. Неверная identity,
   stale observer, изменённый artifact и чужой mount дают реальные отказы.
+- `b50a4a95df48`: повторённый linked joint PASS; 47 closure/consumer tests PASS,
+  включая trial quarantine и правильный shell verdict. Intentional missing-summary
+  canary сохраняет HARNESS_ERROR, container exit=0 / launcher exit=2.
 
 Source equivalence и requalification изменённого consumer лежат в
 [dependency_closure.json](../../evidence/forge_trust_closure_v1/dependency_closure.json).
@@ -94,6 +107,8 @@ network none, no socket/home/credentials, cap-drop ALL, no-new-privileges,
 2CPU/2GiB/128PIDs. Новые stores принадлежат этой campaign. Volumes/raw traces
 сохранены вне Git; одних hashes недостаточно, чтобы сделать их доступными на
 другом host. Как воспроизвести и где readback: [REPRODUCE.md](REPRODUCE.md).
+Cleanup readback: 0 running campaign containers, 17 retained owned volumes,
+584980092 accounted evidence bytes (<2GiB). Новых generated state sequences: 0.
 
 Factory Fit: FULL_REVIEW, narrow project-owned repair; WRAP существующий audit
 kit/runtime. Product Horizon NOW — этот current-read/execution/guard loop;
