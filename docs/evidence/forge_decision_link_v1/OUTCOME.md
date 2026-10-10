@@ -135,3 +135,43 @@ uv run --locked --managed-python python -B tests/fixtures/forge_decision_link_v1
 uv run --locked --managed-python python -B tests/fixtures/forge_decision_link_v1/multi_look_probe.py --verify-retained local/forge_decision_link_v1/multi-b06
 uv run --locked --managed-python python -B -m unittest tests.test_forge_decision_link_v1
 ```
+
+## Review repair и повторная квалификация
+
+Первый independent review candidate59ddfc8 — `NOT_READY`: найдено окно,
+где B проходит раннюю проверку, A сохраняет результат, затем B получает writer
+lease. Pending-only guard уже не видит A и допускает лишнюю reservation/loader;
+повторный evaluator в этом окне не утверждается. Existing saved-look owner
+теперь повторно проверяет точный active-policy/corpus результат под тем же lease
+и возвращает `ORDINARY_LOOK_LANDED_DURING_RESERVATION` с original result locator
+до append/values. Новый ledger/lock service не нужен.
+
+`land-race-c01` использует настоящие matcher, reserve, writer и evaluator:
+B entry PASS → barrier до native append → A durable result → исходный
+B before_commit отказывает. B reservation/loader/evaluator=0/0/0;
+A literal oracle matched/observed/missing=4/3/1, mean.10, contrast.20.
+Cold replay/read сохранил230 файлов и inventory; audit проверил84 artifacts
+и19 source snapshots. Native child windows29.893s, helper elapsed30.391s.
+
+13 unit assertions PASS в c01; один policy counterpart сначала имел ошибку
+порядка fixture: policy activation после нового ACTIVE operation. Existing owner
+корректно отказал. C01 остаётся `HARNESS_ERROR13PASS/1ERROR`; c02 проверил только
+исправленный порядок и PASS. Это distinct13+1, не успешный all14 batch.
+Changed corpus/policy проверены через native reservation seam unit counterparts;
+полный public admission новой policy не заявлен. Между c01/c02 изменился только
+этот порядок в тесте; runtime/helper совпадают с native snapshot.
+Parent windows66.594s/25.238s,600s watchdog не сработал, product children180s.
+
+Пять S0 JSON остались исходными CRLF, их historical hashes не переписаны.
+Первый commit использовал старый LF cache Git index; scoped renormalization
+пяти entries и новый ordinary commit сохраняют исходные bytes. Первые review
+findings сохранены, исправленный committed inventory получает fresh reviews.
+Сводный raw receipt boundSHA611e3882da78d6fddc025db82692a4d3ad0372375093192f69ed3141e611b851;
+ключевые числа и source bindings — `native-qualification.json`.
+
+Fresh fixture для этого schedule сначала создать entry producer, как выше;
+output нового run должен отсутствовать:
+
+```text
+uv run --locked --managed-python python -B tests/fixtures/forge_decision_link_v1/multi_look_probe.py --output local/forge_decision_link_v1/land-race-reproduce-r01 --fixture-source local/forge_decision_link_v1/entry-reproduce-r01/fixture --land-race-only
+```

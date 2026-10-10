@@ -156,6 +156,73 @@ class NativeSavedSourceProjectionTests(_Base):
                 return iter(transform(owner.records) if transform else owner.records)
         return View()
 
+    def new_reservation_request(self, text):
+        from tests.test_hfic_ordinary_operation_acceptance_v1 import _operation as native_request
+        from solana_alpha_lab.factory.hfic_grounded_discovery import resolve_published_discovery_binding
+        # Relocation rebuilds only the native lookup, never producer records.
+        inventory = self.store.diagnostics().committed_inventory_sha256
+        self.store.prepare_write_lookup()
+        self.assertEqual(self.store.diagnostics().committed_inventory_sha256, inventory)
+        original = ordinary.get_operation(self.store, self.look["operation_sha256"])
+        spec = json.loads(original["spec_canonical"])
+        operation = ordinary.record_operation(self.store, native_request(spec,
+            focus=original["owner_focus"], journal=self.ctx["journal"], market=self.ctx["market"],
+            text=text, cap={"main": 1, "adaptive": 1, "preview": 0}))
+        fingerprint = ordinary.binding_fingerprint(resolve_published_discovery_binding(self.ctx["root"])["cohorts"])
+        self.assertTrue(fingerprint)
+        return ordinary._stamp_fingerprint(self.store, operation["operation_sha256"], fingerprint)
+
+    def test_landed_native_result_refuses_another_reservation_before_append(self):
+        operation = self.new_reservation_request("Same native corpus and policy; new authored request.")
+        before = self.store.diagnostics().committed_inventory_sha256
+        for kind in ("main", "adaptive"):
+            with self.subTest(kind=kind), self.assertRaises(ordinary.OrdinaryOperationError) as stopped:
+                ordinary._reserve(self.store, operation, spec_sha256=self.look["spec_sha256"], look_class=kind)
+            self.assertEqual(stopped.exception.code, "ORDINARY_LOOK_LANDED_DURING_RESERVATION")
+            self.assertEqual(stopped.exception.detail, {
+                "original_operation_sha256": self.look["operation_sha256"],
+                "original_result_ref": self.look["record_id"], "result_sha256": self.look["result_sha256"],
+                "spec_sha256": self.look["spec_sha256"], "next_action": "REPLAY_SAVED_RESULT"})
+        self.assertEqual(ordinary._reservations(self.store, operation["operation_sha256"]), [])
+        self.assertEqual(self.store.diagnostics().committed_inventory_sha256, before)
+
+    def test_real_policy_change_is_not_blanket_blocked_by_same_spec(self):
+        from solana_alpha_lab.factory.hfic_research_universe_policy import effective_policy, ensure_profile
+        self.store.prepare_write_lookup()
+        prior = effective_policy(self.store)["semantic_sha256"]
+        changed = ensure_profile(self.store, repo_root=ROOT, min_holders=1, min_liquidity_usd=0)
+        self.assertNotEqual(changed["semantic_sha256"], prior)
+        # Policy changes precede a new active operation, as the policy owner
+        # requires; the producer's original paused operations stay intact.
+        operation = self.new_reservation_request("Native policy-change reservation seam counterpart.")
+        # Exercise the reservation seam, not a claim about full public admission.
+        # The existing matcher and native policy reader are never replaced.
+        ordinary._reserve(self.store, operation, spec_sha256=self.look["spec_sha256"], look_class="adaptive")
+        reservations = ordinary._reservations(self.store, operation["operation_sha256"])
+        self.assertEqual(len(reservations), 1)
+        self.assertEqual(reservations[0]["look_class"], "ADAPTIVE")
+        self.assertEqual(ordinary._operation_result(ordinary._looks(self.store, self.ctx["journal"]),
+            self.look["operation_sha256"], self.look["spec_sha256"])["result_sha256"], self.look["result_sha256"])
+
+    def test_real_added_cohort_is_not_blanket_blocked_by_same_spec(self):
+        from tests.test_hfic_temporal_production_runner_v1 import _publish
+        from solana_alpha_lab.factory.hfic_grounded_discovery import resolve_published_discovery_binding
+        original = ordinary.get_operation(self.store, self.look["operation_sha256"])
+        self.store.prepare_write_lookup()
+        # A genuine new sealed/imported/published cohort changes corpus metadata;
+        # no look or operation/result relationship is injected or corrupted.
+        _publish(self.ctx["root"], self.ctx["root"].parent, week=1)
+        actual = ordinary.binding_fingerprint(resolve_published_discovery_binding(self.ctx["root"])["cohorts"])
+        self.assertNotEqual(actual, original["corpus_fingerprint"])
+        operation = self.new_reservation_request("Native added-cohort reservation seam counterpart.")
+        self.assertEqual(operation["corpus_fingerprint"], actual)
+        ordinary._reserve(self.store, operation, spec_sha256=self.look["spec_sha256"])
+        reservations = ordinary._reservations(self.store, operation["operation_sha256"])
+        self.assertEqual(len(reservations), 1)
+        self.assertEqual(reservations[0]["look_class"], "MAIN")
+        self.assertEqual(ordinary._operation_result(ordinary._looks(self.store, self.ctx["journal"]),
+            self.look["operation_sha256"], self.look["spec_sha256"])["result_sha256"], self.look["result_sha256"])
+
     def test_real_saved_sources_have_single_scan_and_addressed_empty_page_is_read_only(self):
         from solana_alpha_lab.factory.hfic_discovery_detail import discovery_detail
         before = self.store.diagnostics().committed_inventory_sha256

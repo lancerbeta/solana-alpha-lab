@@ -1010,7 +1010,7 @@
     "verifier_source_sha256": "d3bbbb5614356519ba8ad67c5a1fcb9e2cd415aa2f2450a61bf2eafef8a4bb35"
   },
   "resource_ledger": {
-    "named_retained_attempt_count": 17,
+    "named_retained_attempt_count": 19,
     "process_measurements": [
       {
         "run": "entry-b01",
@@ -1101,9 +1101,21 @@
         "run": "multi-b06-original-producer",
         "reported_process_window_seconds": "UNKNOWN",
         "elapsed_window_seconds": "UNKNOWN"
+      },
+      {
+        "run": "land-race-qualification-c01",
+        "reported_process_window_seconds": 66.593644,
+        "elapsed_window_seconds": "NOT_SEPARATELY_MEASURED",
+        "product_and_unit_subprocesses": "Nested components reported separately in the retained proof; not counted twice."
+      },
+      {
+        "run": "land-race-qualification-c02",
+        "reported_process_window_seconds": 25.2376294,
+        "elapsed_window_seconds": "NOT_SEPARATELY_MEASURED",
+        "product_and_unit_subprocesses": "Nested components reported separately in the retained proof; not counted twice."
       }
     ],
-    "known_reported_process_window_component_sum_seconds": 2259.025746799991,
+    "known_reported_process_window_component_sum_seconds": 2350.857020199991,
     "interpretation": "Non-overlapping named campaign measurement components; CLI invocation windows and whole unittest subprocess windows have different measured boundaries. Not CPU time or complete compute. S0 is historical separately, copied producer snapshot not counted twice.",
     "cpu_ram_preparation_model_cost": "UNKNOWN"
   },
@@ -1537,5 +1549,194 @@
         }
       }
     }
-  ]
+  ],
+  "landed_before_other_lease_qualification": {
+    "c01": {
+      "parent": {
+        "exit_code": 1,
+        "measured_seconds": 66.593644,
+        "owned_process_tree_cleanup": "Kill(true) only if watchdog fires",
+        "parent_watchdog_seconds": 600,
+        "timed_out": false
+      },
+      "source_before_after_exact_equal": true,
+      "status": "HARNESS_ERROR",
+      "tests": {
+        "command": [
+          "<PYTHON>",
+          "-B",
+          "-m",
+          "unittest",
+          "tests.test_forge_decision_link_v1"
+        ],
+        "errors": 1,
+        "failures": 0,
+        "output_sha256": "db8b5309171b46a8e132e2da7e1c5178f4008ffbe830065c72886f0d3c844c64",
+        "seconds": 35.2755588,
+        "successful": false,
+        "tests_run": 14,
+        "transient_public_cli_timeout_seconds": 180
+      }
+    },
+    "c02": {
+      "parent": {
+        "exit_code": 0,
+        "measured_seconds": 25.2376294,
+        "owned_process_tree_cleanup": "Kill(true) only if watchdog fires",
+        "parent_watchdog_seconds": 600,
+        "timed_out": false
+      },
+      "source_before_after_exact_equal": true,
+      "status": "PASS",
+      "tests": {
+        "command": [
+          "<PYTHON>",
+          "-B",
+          "-m",
+          "unittest",
+          "tests.test_forge_decision_link_v1.NativeSavedSourceProjectionTests.test_real_policy_change_is_not_blanket_blocked_by_same_spec"
+        ],
+        "errors": 0,
+        "failures": 0,
+        "output_sha256": "5a4e64d95df72158815e5035db0a4f07c71b1b5e7d6047867f41bf963dabe514",
+        "seconds": 24.9212340999984,
+        "successful": true,
+        "tests_run": 1,
+        "transient_public_cli_timeout_seconds": 180
+      }
+    },
+    "checks": {
+      "a_literal_oracle": "PASS",
+      "a_real_reserve_loader_evaluator_result": "PASS",
+      "b_native_entry_pass_before_a": "PASS",
+      "b_original_writer_lease_refusal": "PASS",
+      "b_zero_reservation_loader_evaluator": "PASS",
+      "cold_original_replay_unchanged": "PASS",
+      "typed_original_result_locator": "PASS"
+    },
+    "choice_quality": "UNVERIFIED",
+    "cpu_ram_peak": "UNKNOWN",
+    "current_product_helper_exact_equal_native_snapshot": true,
+    "final_source_sha256": {
+      "configs/factory_semantic_operability_v1.yaml": "0ee76b9a73b21a8cad6eb0574580e1253773c57a3e67ce8246630a498d9ddcf9",
+      "scripts/hypothesis_forge.py": "ba27dd6fbac74772e58a3ffe65cd5e513e9071998f465f6a1d9dbc37c2981c97",
+      "src/solana_alpha_lab/factory/hfic_card_projection.py": "bba3769cecff9e4d5a489bf615bad52f48bf311e853c15aa8aa142a1389fb251",
+      "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "b2582ca103222f7500a6eb4036769b13df6e3d969c85a7008fafd0688f1d7425",
+      "src/solana_alpha_lab/factory/hfic_generation_context.py": "d347b585770f6f81e19bc6f2ddbe27031059754878a73b022bd8b5c99acde719",
+      "src/solana_alpha_lab/factory/hfic_grounded_discovery.py": "9b1904f0439547f895a58a94989568273bcfd010a388f9900a5fbe4a64d8847e",
+      "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "e645de68f43b8242acb387c493c0232cad0deecc0bf2efff00e4a4c74725bebd",
+      "src/solana_alpha_lab/factory/hfic_preflight.py": "a4b866b352249e124cba6bb83c07b23e624f43848a7037dfc77ca087203f2d23",
+      "src/solana_alpha_lab/factory/hfic_research_universe_policy.py": "a03082fd63d98d1f60124b9b07f89d8b06dacd03b8c89f198730cefa137e5c2e",
+      "src/solana_alpha_lab/factory/hfic_scientific_disposition.py": "d2b980f20cb7e703d4d61033ca4481d58de39d8ed149b16b5b64d013859aac75",
+      "src/solana_alpha_lab/factory/hfic_temporal_discovery.py": "b530aa119d81bac8eb49e3c818e0ed481e4ff02489254ddbe55a55236c4cb65e",
+      "src/solana_alpha_lab/factory/research_store.py": "38d6c17bea38a4388fa14509dfb401b1f4e6cdda74de7e41cf032debe080ef49",
+      "tests/fixtures/forge_decision_link_v1/entry_probe.py": "275653deb5db29d48aecdbf9e94c0442b8e8fc73de1c6ddac8ac3ea3c88c0748",
+      "tests/fixtures/forge_decision_link_v1/multi_look_probe.py": "689c7d5aabdfc4083abfb39ab248d533a95dabfebe35bdf3675cad72fd6597a5",
+      "tests/fixtures/forge_decision_link_v1/verify_terminal.py": "80ad4ec015c386be8e7e406823b10a4fc9ce9534faed403b932c2751028d1831",
+      "tests/test_forge_decision_link_v1.py": "a0723e96453a3a3f87f09b1ac8d74cf7025ac40b9772b8a4336fa8dae290ff69",
+      "tests/test_forge_research_flow_reliability_v1.py": "817280ef9bf67644c088ea6f9a75f012f9fc1d875bf768fc6d80e97df7eeba2a",
+      "tests/test_hfic_list_aware_vertical_v1.py": "91c8b7ee89b54e1060b7f01c0662af5ff6d7681fb7cabd94152d8c9988190bc2",
+      "tests/test_hfic_ordinary_operation_acceptance_v1.py": "c4b5f9873d31dc98f95ae9826ee05075a5211775de9ba0f93a4a9107b9b29741",
+      "tests/test_hfic_scientific_disposition_continuity_v1.py": "6debae314f3134b351d52a251d5beaa6342ed119f2f4cfb5e8cccc3fdeac7a32",
+      "tests/test_hfic_temporal_production_runner_v1.py": "2374ffaa6e0b62321ce71749c5b9af44b6ecda15a82da3be2ea185c7a1203992"
+    },
+    "live_use": "NOT_EXECUTED",
+    "market_alpha_oos_economics": "NOT_EVALUATED",
+    "model_calls": 0,
+    "native_cold_before_after_current_exact_equal": true,
+    "native_cold_file_count": 230,
+    "native_cold_inventory_sha256": "2342ec96e317277978a28687b0cc7d3066a76efc6f14521fccb6aa3eb1cd24ff",
+    "native_manifest_artifacts_verified": 84,
+    "native_resource": {
+      "cold_only_this_invocation": false,
+      "cpu_ram_peak": "UNKNOWN",
+      "elapsed_window_seconds": 30.391409,
+      "invocation_count": 1,
+      "measured_subprocess_wall_seconds": 29.892507200002,
+      "model_calls": 0,
+      "owned_output_guard_bytes": 1073741824,
+      "preparation_outside_helper_seconds": "UNKNOWN",
+      "watchdog_seconds": 180
+    },
+    "native_source_snapshots_verified": 19,
+    "native_status": "NATIVE_LANDED_BEFORE_OTHER_LEASE_VERIFIED",
+    "policy_corpus_counterparts": "NATIVE_RESERVATION_SEAM_UNIT_ONLY_NOT_FULL_PUBLIC_ADMISSION",
+    "reproduce": {
+      "native": "uv run --locked --managed-python python -B tests/fixtures/forge_decision_link_v1/multi_look_probe.py --output local/forge_decision_link_v1/land-race-reproduce-r01 --fixture-source local/forge_decision_link_v1/entry-b01/fixture --land-race-only",
+      "policy_counterpart": "uv run --locked --managed-python python -B -m unittest tests.test_forge_decision_link_v1.NativeSavedSourceProjectionTests.test_real_policy_change_is_not_blanket_blocked_by_same_spec"
+    },
+    "resource_status": "PASS_EACH_DECLARED_COHORT_NO_WATCHDOG",
+    "retained_artifact_sha256": {
+      "land-race-c01/invocations/0001/003-land-race-author-a/native-trace.json": "5e5e77ad5a59f1399d15ff922e4c183487e835380a6218960ed08524489d0f4b",
+      "land-race-c01/invocations/0001/003-land-race-author-b/native-trace.json": "67d64e61c5d55decfb18bdf256ebe0488095210c269d63577194d77df16e6d55",
+      "land-race-c01/land-race-author-a.json": "62ad60b89fb52fb293e26b3a1527bcc0aa87d8587cdf99deb93ad4310b2b77ac",
+      "land-race-c01/land-race-author-b.json": "9c699c7986773f56f939d910860d8fee7488492c53703e615fe71ea34fac225c",
+      "land-race-c01/land-race-cold-replay-b.json": "48bfed3f2665966301c0d28bae9c4d24d0789839974e660867e327003729d694",
+      "land-race-c01/land-race-cold-store-after.json": "0a5a33310fcb23f7515f5935a884971cc4f3a53f7726053ca6b20d678b3cf778",
+      "land-race-c01/land-race-cold-store-before.json": "0a5a33310fcb23f7515f5935a884971cc4f3a53f7726053ca6b20d678b3cf778",
+      "land-race-c01/land-race-persisted-links.json": "fa0d45b8ba803a8571f6f6c6d7c640ff87bb9e0437e21beeda0b700a49e9ef26",
+      "land-race-c01/terminal.json": "88102d8f05d8f5eef5a4b298a5643e54692a4e93b0efc5461beef35c1bfabe42",
+      "land-race-cheap-api-shape.json": "abb14523075d9cb50900be0e4e4dc66f718b42367c0c6030aa461b3c1dbb28ae",
+      "land-race-qualification-c01/native-receipt.json": "f6b2cae21e62d107e1ef182af24e7e4e6c812d36ee5d792e41cf9baf84bc71d9",
+      "land-race-qualification-c01/parent-receipt.json": "623625bd965f054dd7f982dd7bfac2188e911829431dc85c166a8475ef196a93",
+      "land-race-qualification-c01/terminal.json": "a6ea0bcc1031deb1f8e973b5ed00eba5b0cbaa9d7890a352ae1f340d5ebf1ba6",
+      "land-race-qualification-c01/tests-output.txt": "db8b5309171b46a8e132e2da7e1c5178f4008ffbe830065c72886f0d3c844c64",
+      "land-race-qualification-c01/tests-receipt.json": "6127e13165d987ff26b1e00ca01d7bffe1871414ad99efb9c305da204314bdc5",
+      "land-race-qualification-c02/parent-receipt.json": "a410afd14c120493777ccdc5bde4bf8603c04529cedc16aa0aaf4a84b3d86635",
+      "land-race-qualification-c02/terminal.json": "d17ee3f14b6791c9138b810c25d490b555a24c3f2d4e2e02f5fbb863b91925a2",
+      "land-race-qualification-c02/test-only-source-delta.diff": "c60714c760746495d6d68110b72317f06f45d4043534fef56a4618221a8c4de1",
+      "land-race-qualification-c02/tests-output.txt": "5a4e64d95df72158815e5035db0a4f07c71b1b5e7d6047867f41bf963dabe514",
+      "land-race-qualification-c02/tests-receipt.json": "5bb5571513c3bbbf90ca33467c00492b08b70ad1932c7630df413b8a4613ebdb"
+    },
+    "source_delta_test_only": {
+      "tests/test_forge_decision_link_v1.py": {
+        "final": "a0723e96453a3a3f87f09b1ac8d74cf7025ac40b9772b8a4336fa8dae290ff69",
+        "prior": "21e5d89218537b1e70f77d486efb624980ab278e8ec70e1554b55aa8c48329ef"
+      }
+    },
+    "status": "QUALIFIED_DISTINCT_13_PLUS_1_ASSERTIONS",
+    "retained_receipt": "local/forge_decision_link_v1/land-race-final-qualification.json",
+    "retained_receipt_sha256": "611e3882da78d6fddc025db82692a4d3ad0372375093192f69ed3141e611b851",
+    "projection": "BOUNDED_NATIVE_PROOF_AND_COHORT_SUMMARY_NOT_RAW_PROCESS_LOG"
+  },
+  "first_independent_review": {
+    "projection": "NORMALIZED_CRITIC_FINDINGS_NOT_VERBATIM_OR_CRYPTOGRAPHIC_IDENTITY",
+    "observed_head": "59ddfc8a19ba8974d45f454529b5742b3298adcc",
+    "prior_verdict": "NOT_READY",
+    "findings": [
+      {
+        "role": "CODE_REVIEWER",
+        "severity": "MAJOR",
+        "finding": "The pending-only reservation recheck permits a second reservation and value loader when the first operation lands after the early gate but before the other writer lease; inner replay may prevent a second evaluator, so duplicate evaluation is not asserted for this schedule."
+      },
+      {
+        "role": "CODE_REVIEWER",
+        "severity": "MAJOR",
+        "finding": "Five immutable S0 archives were committed from an earlier LF index cache while their original worktree bytes and historical pins are CRLF."
+      },
+      {
+        "role": "GOAL_DOD_CRITIC",
+        "severity": "MAJOR",
+        "finding": "D10/D11 archival fidelity is not met while the five committed S0 JSON blobs differ from the original pinned worktree bytes."
+      },
+      {
+        "role": "ARCHITECTURE_CRITIC",
+        "severity": "MAJOR",
+        "finding": "The reservation-only race fixture does not falsify landing before the second writer lease; an extra reservation/exposure and orphan pending can survive the existing test despite eventual inner replay."
+      },
+      {
+        "role": "ARCHITECTURE_CRITIC",
+        "severity": "MAJOR",
+        "finding": "Worktree-derived historical evidence pins do not establish Git delivery fidelity when five committed archive blobs remain LF rather than their original CRLF bytes."
+      }
+    ],
+    "nonblocking": "Private read-projection imports couple existing owners and are a maintenance seam, not a general stable API guarantee."
+  },
+  "historical_archival_bytes": {
+    "checkpoint.json": "146de29faa18b34bc038d39e275465ed037abca5a94cb58c25741102f90af08b",
+    "entry-result.json": "9d8769b0aa0c625a1dfb878c97c420bc5b1530c7af7be059a3e81612ab166a92",
+    "obligations.json": "483fb69a3f745f47fb74cdc29486b2d151255e3a0497f073daeedfe2ba034f5a",
+    "repair-history.json": "34fc3fd2233753ebe5b9aee6a7427c2beb0a23dc45be7524e93900d2082714b5",
+    "stage-review.json": "d7daebc30919d60e76d369eb26e2427531e31d302e32ad8f8a875ddb7a4bc0b8"
+  }
 }

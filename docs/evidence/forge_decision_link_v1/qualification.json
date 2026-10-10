@@ -78,7 +78,7 @@
       "oracle": "barrier-based commit schedule",
       "status": "PASS_SCOPED",
       "evidence": "native-qualification.json",
-      "qualification": "race-b02 two real writers pass outer gate, unrelated native append, one durable reservation, typed loser and loader/evaluator zero. Legacy duplicate pending refuses arbitration."
+      "qualification": "race-b02 two real writers pass outer gate, unrelated native append, one durable reservation, typed loser and loader/evaluator zero. Legacy duplicate pending refuses arbitration. land-race-c01 proves B entry PASS, A durable result, then original B writer-lease refusal before its reservation/loader/evaluator (0/0/0). Changed policy/corpus native reservation-seam unit counterparts remain allowed; full public changed-policy admission is not claimed. Distinct13+1 assertions from c01/c02; c01 HARNESS_ERROR13PASS/1ERROR fixture-order failure remains historical."
     },
     {
       "id": "V08",
@@ -317,6 +317,8 @@
     "A9/A10 policy unchanged; no quality uplift claim.",
     "Positive Critic fixtures scripted mechanical; no independent scientific verdict claimed.",
     "impact-d01 assertions44PASS but resource900watchdog failed; d02 pre-product CRLF launcher HARNESS_ERROR; new cause-dependent qualification kept separately.",
-    "CPU/RAM, preparation, total model usage and cost UNKNOWN."
+    "CPU/RAM, preparation, total model usage and cost UNKNOWN.",
+    "First independent review NOT_READY for landed-before-other-lease gap and five LF Git index cache archives is retained; ordinary repairs and fresh inventory/review required.",
+    "land-race-qualification-c01 retains a fixture-order HARNESS_ERROR with13PASS/1ERROR; c02 reruns only the repaired policy test. No fabricated all14 passing batch."
   ]
 }

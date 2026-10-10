@@ -1650,9 +1650,22 @@ def _assert_no_foreign_pending(store: Any, operation: Mapping[str, Any], spec_sh
         "spec_sha256": spec_sha256, "next_action": "RESUME_ORIGINAL_OPERATION"})
 
 
+def _assert_no_landed_result(store: Any, operation: Mapping[str, Any], spec_sha256: str) -> None:
+    """An outer gate cannot authorize a reservation after an exact look lands."""
+    saved = _same_active_profile_look(store, _looks(store, str(operation.get("journal_scope") or "")),
+        spec_sha256, fingerprint=operation.get("corpus_fingerprint"))
+    if saved is not None:
+        raise OrdinaryOperationError("ORDINARY_LOOK_LANDED_DURING_RESERVATION", detail={
+            "original_operation_sha256": saved.get("operation_sha256"),
+            "original_result_ref": saved.get("record_id"), "result_sha256": saved.get("result_sha256"),
+            "spec_sha256": spec_sha256, "next_action": "REPLAY_SAVED_RESULT"})
+
+
 def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look_class: str = "main") -> None:
     digest = str(operation.get("operation_sha256") or "")
     stored_class = {"adaptive": "ADAPTIVE", "preview": "PREVIEW"}.get(look_class, "MAIN")
+    if look_class in {"main", "adaptive"}:
+        _assert_no_landed_result(store, get_operation(store, digest), spec_sha256)
     for item in _reservations(store, digest):
         if item.get("spec_sha256") == spec_sha256:
             return
@@ -1670,6 +1683,7 @@ def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look
         current = get_operation(store, digest)
         if look_class in {"main", "adaptive"}:
             _assert_no_foreign_pending(store, current, spec_sha256)
+            _assert_no_landed_result(store, current, spec_sha256)
         if any(item.get("spec_sha256") == spec_sha256 for item in _reservations(store, digest)):
             return
         _refuse_closed(store, current)
@@ -1720,6 +1734,7 @@ def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look
             current = get_operation(store, digest)
             if look_class in {"main", "adaptive"}:
                 _assert_no_foreign_pending(store, current, spec_sha256)
+                _assert_no_landed_result(store, current, spec_sha256)
             if owner_allowance(store, current, look_class) < 1:
                 raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
             if attempt >= 39:

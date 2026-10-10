@@ -62,6 +62,8 @@ EXTRA_SOURCES = ["tests/fixtures/forge_decision_link_v1/multi_look_probe.py", "t
     "src/solana_alpha_lab/factory/hfic_card_projection.py",
     "src/solana_alpha_lab/factory/hfic_preflight.py",
     "src/solana_alpha_lab/factory/hfic_temporal_discovery.py",
+    "src/solana_alpha_lab/factory/hfic_research_universe_policy.py",
+    "src/solana_alpha_lab/factory/research_store.py",
     "configs/factory_semantic_operability_v1.yaml"]
 
 
@@ -96,9 +98,50 @@ def fault_child(mode: str, trace: Path, argv: list[str], barrier: Path | None = 
         print(json.dumps(state, ensure_ascii=False), flush=True)
         os._exit(code)
 
-    if mode in {"reservation", "observe", "race"}:
+    if mode == "land-race":
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        native_append = ResearchStore.append
+        native_landed_check = ordinary._assert_no_landed_result
+        def landed_check(*args, **kwargs):
+            state["landed_check_calls"] = state.get("landed_check_calls", 0) + 1
+            phase = state["landed_check_calls"]
+            try:
+                answer = native_landed_check(*args, **kwargs)
+            except ordinary.OrdinaryOperationError as stopped:
+                state["trace"].append(f"LANDED_CHECK_{phase}_REFUSED")
+                state["landed_refusal"] = {"reason_code": stopped.code, "detail": stopped.detail}
+                save(trace, state)
+                raise
+            state["trace"].append(f"LANDED_CHECK_{phase}_PASS")
+            save(trace, state)
+            return answer
+        ordinary._assert_no_landed_result = landed_check
+        def append(store, events, *args, **kwargs):
+            if any(event.record_id.startswith("HFIC-ART-OPRES-") for event in events):
+                if barrier is None:
+                    raise ValueError("LAND_RACE_BARRIER_REQUIRED")
+                assert state.get("landed_check_calls") == 1, "LAND_RACE_ENTRY_CHECK_NOT_PASSED"
+                state["trace"].append("BEFORE_NATIVE_APPEND_WRITER_LEASE")
+                state["precommit_barrier"] = "NATIVE_ENTRY_PASSED_WAITING_BEFORE_WRITER_LEASE"
+                save(trace, state)
+                save(barrier / (trace.parent.name + ".ready.json"), {
+                    "native_reservation_event_ref": events[0].record_id,
+                    "entry_landed_check": "PASS", "process_id": os.getpid(), "reached_at": utc_now()})
+                began = time.monotonic()
+                while not (barrier / "release.json").exists():
+                    if time.monotonic() - began > 150:
+                        raise AssertionError("LAND_RACE_BARRIER_WATCHDOG")
+                    time.sleep(.02)
+            return native_append(store, events, *args, **kwargs)
+        ResearchStore.append = append
+
+    if mode in {"reservation", "observe", "race", "land-race"}:
         native = ordinary._reserve
         def reserve(store, operation, **kwargs):
+            if mode == "land-race":
+                state["trace"].append("NATIVE_RESERVATION_ENTRY_AFTER_OUTER_GATE")
+                state["attempted_operation_sha256"] = operation["operation_sha256"]
+                save(trace, state)
             if mode == "race":
                 if barrier is None:
                     raise ValueError("RACE_BARRIER_REQUIRED")
@@ -220,7 +263,7 @@ class ProbeInvocation(Invocation):
         save(self.out / (name + ".json"), body)
         return body
 
-    def race(self, plane: Path, actors: list[tuple[str, tuple[str, ...]]], *, unrelated_append) -> list[dict]:
+    def race(self, plane: Path, actors: list[tuple[str, tuple[str, ...]]], *, unrelated_append, mode="race") -> list[dict]:
         """The declared V07 race is the sole two-process product window."""
         barrier = self.path / "race-barrier"
         barrier.mkdir()
@@ -239,12 +282,12 @@ class ProbeInvocation(Invocation):
                     retained.parent.mkdir(parents=True, exist_ok=True)
                     retained.write_bytes(candidate.read_bytes())
                     inputs[relative] = hashlib.sha256(retained.read_bytes()).hexdigest()
-            command = [sys.executable, "-B", str(Path(__file__).resolve()), "--fault-child", "race",
+            command = [sys.executable, "-B", str(Path(__file__).resolve()), "--fault-child", mode,
                 "--trace", str(directory / "native-trace.json"), "--barrier", str(barrier), "--",
                 "--root", str(ROOT), "--data-root", str(plane), *argv]
             safe = ["<PYTHON>", *[self.normalize(value) for value in command[1:]]]
             save(directory / "request.json", {"name": name, "argv": safe, "input_sha256": inputs,
-                "expected_exit_codes": [74, 2], "watchdog_seconds": 180})
+                "expected_exit_codes": [2] if mode == "land-race" else [74, 2], "watchdog_seconds": 180})
             children.append((name, directory, safe, time.monotonic(), utc_now(),
                 subprocess.Popen(command, cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)))
         failure = None
@@ -374,6 +417,8 @@ def execute(out: Path, invocation: ProbeInvocation, args) -> dict:
 
     if args.race_only:
         return race_campaign(out, invocation, store, plane, cli, input_file)
+    if args.land_race_only:
+        return landed_race_campaign(out, invocation, store, plane, cli, input_file)
 
     if args.cold_only:
         # Original files below are an independent expected-query oracle only.
@@ -604,6 +649,109 @@ def race_campaign(out, invocation, store, plane, cli, input_file):
         "live_use": "NOT_EXECUTED", "market_alpha_oos_economics": "NOT_EVALUATED"}
 
 
+def landed_race_campaign(out, invocation, store, plane, cli, input_file):
+    """B passes native entry, A lands, then B's original writer lease refuses."""
+    from tests.test_hfic_list_aware_vertical_v1 import draft
+    from tests.test_hfic_ordinary_operation_acceptance_v1 import _operation
+    from solana_alpha_lab.factory import hfic_ordinary_operation as ordinary
+    from solana_alpha_lab.factory.hfic_grounded_discovery import list_discovery_looks
+    from solana_alpha_lab.factory.hfic_temporal_discovery import temporal_target_label, validate_temporal_query
+    save(out / "campaign.json", {"synthetic_only": True,
+        "purpose": "REVIEW_REPAIR_LANDED_BEFORE_OTHER_WRITER_LEASE", "main": 1, "adaptive": 0, "preview": 0,
+        "schedule": ["B_NATIVE_ENTRY_PASS", "B_BEFORE_NATIVE_APPEND_BARRIER", "A_NATIVE_DURABLE_RESULT",
+            "RELEASE_B", "B_NATIVE_WRITER_LEASE_REFUSAL", "COLD_ORIGINAL_REPLAY"],
+        "declared_two_child_window": "B_WAITING_AND_A_NATIVE_EXECUTION", "parent_watchdog_seconds": 600})
+    query = cli("land-race-resolve", "research-scope-resolve", "--spec", input_file("land-race-draft",
+        draft("LIST_CONTRAST", list_condition={"clauses": [{"all_of": ["A"]}]})))["canonical_query"]
+    pre = cli("land-race-preflight", "preflight", "--discovery-contract", "--collection", "OPPORTUNITY_EPISODES",
+        "--owner-focus", FOCUS + "_LANDED_RACE", "--format", "json")
+    journal, market, focus = pre["search_key_sha256"], pre["market_evidence_epoch_sha256"], pre["owner_focus"]
+    context = frozen_context_binding(plane, store, pre)
+    save(out / "frozen-context-bindings.json", context)
+    scope = {"estimand": "price_relative_proxy", "explanatory_condition": "LIST_CONTRAST",
+        "population": "OPPORTUNITY_EPISODES", "decision_timestamp": "E1800", "target": temporal_target_label(query)}
+    actor_a = _operation(query, focus=focus, journal=journal, market=market,
+        text="One fixed synthetic MAIN; B must reuse A's saved result after it lands.",
+        cap={"main": 1, "adaptive": 0, "preview": 0})
+    actor_b = copy.deepcopy(actor_a)
+    actor_a["question_text"] = authored_plan(PLAN_ONE + " LANDED_RACE_AUTHOR=A", query, context)
+    actor_b["question_text"] = authored_plan(PLAN_ONE + " LANDED_RACE_AUTHOR=B", query, context)
+    base = ("discovery-execute", "--store", str(plane), "--spec", input_file("land-race-query", query),
+        "--candidate-scope", input_file("land-race-scope", scope), "--journal-scope", journal, "--format", "json")
+    actors = [("land-race-author-b", (*base, "--operation", input_file("land-race-request-b", actor_b)))]
+    saved_a = {}
+    def land_a_before_release():
+        assert not list_discovery_looks(store, journal), "A_RESULT_ALREADY_PRESENT_BEFORE_SCHEDULE"
+        assert not [r for r in ordinary._iter_kind(store, ordinary.RESERVATION_KIND) if r["journal_scope"] == journal]
+        result = invocation.fault(plane, "land-race-author-a", "observe",
+            (*base, "--operation", input_file("land-race-request-a", actor_a)), 0)
+        trace_a = result["_native_trace"]
+        assert trace_a["trace"][0] == "DURABLE_RESERVATION_BEFORE_VALUES"
+        assert trace_a["loader_calls"] >= 1 and trace_a["evaluator_calls"] == 1
+        looks = list_discovery_looks(store, journal)
+        assert len(looks) == 1
+        look = looks[0]
+        assert result["result_refs"] == [look["record_id"]] and result["result_sha256"] == look["result_sha256"]
+        assert look["spec_sha256"] == validate_temporal_query(query)["spec_sha256"]
+        matched, contrast = result["result"]["research_scope"]["matched"], result["result"]["research_scope"]["contrast"]
+        assert (matched["n"], matched["target_observed_n"], matched["target_missing_n"]) == (4, 3, 1)
+        assert math.isclose(matched["mean_target"], .1, abs_tol=1e-9)
+        assert math.isclose(contrast["observed_target_difference"], .2, abs_tol=1e-9)
+        saved_a.update(result=result, look=look, inventory=store.diagnostics().committed_inventory_sha256)
+        save(out / "land-race-after-a-before-release.json", {"result": result, "look": look,
+            "committed_inventory_sha256": saved_a["inventory"], "file_sha256": files(plane),
+            "literal_oracle": {"matched": 4, "observed": 3, "missing": 1, "mean": .1, "difference": .2}})
+    answers = invocation.race(plane, actors, unrelated_append=land_a_before_release, mode="land-race")
+    assert len(answers) == 1 and answers[0]["_exit_code"] == 2
+    loser, look = answers[0], saved_a["look"]
+    trace_b = loser["_native_trace"]
+    assert trace_b["trace"] == ["NATIVE_RESERVATION_ENTRY_AFTER_OUTER_GATE", "LANDED_CHECK_1_PASS",
+        "BEFORE_NATIVE_APPEND_WRITER_LEASE", "LANDED_CHECK_2_REFUSED"]
+    assert trace_b["loader_calls"] == trace_b["evaluator_calls"] == 0
+    assert loser["reason_code"] == "ORDINARY_LOOK_LANDED_DURING_RESERVATION"
+    assert loser["detail"] == {"original_operation_sha256": look["operation_sha256"],
+        "original_result_ref": look["record_id"], "result_sha256": look["result_sha256"],
+        "spec_sha256": look["spec_sha256"], "next_action": "REPLAY_SAVED_RESULT"}
+    assert loser["values_loaded"] is False
+    operation_b = ordinary.get_operation(store, trace_b["attempted_operation_sha256"])
+    assert operation_b["question_text"] == actor_b["question_text"]
+    assert ordinary._reservations(store, operation_b["operation_sha256"]) == []
+    assert list_discovery_looks(store, journal) == [look]
+    assert store.diagnostics().committed_inventory_sha256 == saved_a["inventory"]
+    occupancy = ordinary.journal_occupancy(store, journal)
+    assert (occupancy["main"]["completed"], occupancy["main"]["pending"], occupancy["main"]["occupied"]) == (1, 0, 1)
+    before, inventory = files(plane), store.diagnostics().committed_inventory_sha256
+    save(out / "land-race-cold-store-before.json", {"file_sha256": before, "committed_inventory_sha256": inventory})
+    replay = invocation.fault(plane, "land-race-cold-replay-b", "observe",
+        (*base, "--operation-sha256", operation_b["operation_sha256"]), 0)
+    assert replay["values_loaded"] is False and replay["replayed_without_evaluator"] is True
+    assert replay["_native_trace"]["loader_calls"] == replay["_native_trace"]["evaluator_calls"] == 0
+    assert replay["result_refs"] == [look["record_id"]] and replay["result_sha256"] == look["result_sha256"]
+    assert replay["result_operation_sha256"] == look["operation_sha256"]
+    assert replay["operation_sha256"] == operation_b["operation_sha256"]
+    assert replay["question_text"] == actor_a["question_text"]
+    cold = cli("land-race-cold-original", "discovery-show", "--result-ref", look["record_id"])
+    assert cold["values_loaded"] is False and cold["writes"] == {"research_store": 0}
+    entry = cold["entries"][0]
+    assert entry["result_sha256"] == look["result_sha256"] and entry["operation_sha256"] == look["operation_sha256"]
+    assert entry["operation_request"]["question_text"] == actor_a["question_text"]
+    after_files, after_inventory = files(plane), store.diagnostics().committed_inventory_sha256
+    save(out / "land-race-cold-store-after.json", {"file_sha256": after_files, "committed_inventory_sha256": after_inventory})
+    assert after_files == before and after_inventory == inventory
+    save(out / "land-race-persisted-links.json", {"look": look, "operation_b": operation_b,
+        "operations": ordinary.list_operations(store), "reservations": ordinary._iter_kind(store, ordinary.RESERVATION_KIND),
+        "occupancy": occupancy, "b_pending": [], "a_result_ref": look["record_id"], "a_result_sha256": look["result_sha256"]})
+    return {"status": "NATIVE_LANDED_BEFORE_OTHER_LEASE_VERIFIED", "gap": "REPAIRED_LANDED_PRECOMMIT_GUARD",
+        "journal_scope": journal, "original_operation_sha256": look["operation_sha256"],
+        "attempted_operation_sha256": operation_b["operation_sha256"], "result_ref": look["record_id"],
+        "result_sha256": look["result_sha256"], "occupancy": occupancy,
+        "checks": {"b_native_entry_pass_before_a": "PASS", "a_real_reserve_loader_evaluator_result": "PASS",
+            "b_original_writer_lease_refusal": "PASS", "b_zero_reservation_loader_evaluator": "PASS",
+            "a_literal_oracle": "PASS", "typed_original_result_locator": "PASS", "cold_original_replay_unchanged": "PASS"},
+        "technical_continuity": "VERIFIED_IN_SYNTHETIC_LANDED_RACE_SCOPE", "choice_quality": "UNVERIFIED",
+        "live_use": "NOT_EXECUTED", "market_alpha_oos_economics": "NOT_EVALUATED"}
+
+
 def cold_consumer(plane, store, cli, invocation, *, journal, focus, look1, look2, op1, op2, q1, q2, plan1, plan2, occupancy):
     from solana_alpha_lab.factory import hfic_ordinary_operation as ordinary
     from solana_alpha_lab.factory.hfic_temporal_discovery import canonical_temporal_spec, validate_temporal_query
@@ -744,7 +892,8 @@ def main() -> int:
     parser.add_argument("--fixture-source", type=Path, help="Reuse an already native-produced synthetic fixture into a new owned campaign")
     parser.add_argument("--cold-only", action="store_true", help="Read an existing native attempt; no setup, writers or value rerun")
     parser.add_argument("--race-only", action="store_true", help="Separate native two-author precommit race; no values are reached")
-    parser.add_argument("--fault-child", choices=("reservation", "result", "observe", "race", "rollback"))
+    parser.add_argument("--land-race-only", action="store_true", help="B passes native entry, A lands, B refuses under the native writer lease")
+    parser.add_argument("--fault-child", choices=("reservation", "result", "observe", "race", "land-race", "rollback"))
     parser.add_argument("--trace", type=Path)
     parser.add_argument("--barrier", type=Path)
     parser.add_argument("--verify-retained", type=Path,
@@ -754,7 +903,7 @@ def main() -> int:
     if args.verify_retained:
         out = args.verify_retained.resolve()
         owned = (ROOT / "local/forge_decision_link_v1").resolve()
-        if not out.is_relative_to(owned) or out == owned or args.output or args.fault_child or args.cold_only or args.race_only:
+        if not out.is_relative_to(owned) or out == owned or args.output or args.fault_child or args.cold_only or args.race_only or args.land_race_only:
             parser.error("OWNED_RETAINED_PROOF_REQUIRED")
         try:
             result = verify_retained(out)
@@ -769,7 +918,7 @@ def main() -> int:
             parser.error("FAULT_TRACE_REQUIRED")
         product = args.product_argv[1:] if args.product_argv[:1] == ["--"] else args.product_argv
         return fault_child(args.fault_child, args.trace, product, args.barrier)
-    if args.race_only and args.cold_only:
+    if sum((args.race_only, args.land_race_only, args.cold_only)) > 1:
         parser.error("RACE_REQUIRES_NEW_CAMPAIGN")
     if args.output is None:
         parser.error("OUTPUT_REQUIRED")

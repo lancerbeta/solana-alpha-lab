@@ -290,3 +290,33 @@ active and cr-at-eol recognizes their preserved CRLF line endings. The first
 ordinary commit hook rejected CR as trailing whitespace; no commit landed.
 The scoped format declaration fixes that mechanical mismatch, without changing
 the hook, global whitespace policy or the archived bytes.
+
+REVIEW_REPAIR_PATCH: independent code/architecture review found a second
+schedule: two requests pass the early gate; one reserves and lands before the
+other writer lease. A pending-only recheck stops seeing that winner and permits
+a redundant reservation/value loader before inner replay. Extend the existing
+reserve seam with the existing exact active-policy/corpus saved-look owner,
+returning a typed original-result locator before append/values. Do not blanket
+block the same spec across legitimately changed data/policy. Qualify the actual
+land-before-other-lease schedule, retain the first review NOT_READY and refresh
+inventory/reviews. This repairs R8/D6/V07, not a new lifecycle or scientific pool.
+The first commit also retained a previously normalized Git index cache for the
+five archives. Renormalize only those index entries under their scoped -text;
+their original worktree bytes and historical pins remain unchanged.
+
+REVIEW_REPAIR_CHECKPOINT: the named two-child land-before-other-lease schedule
+is the sole concurrent fixture window; ordinary product commands remain serial.
+It completed through the real native writer/matcher/evaluator: B entry PASS,
+A durable result, then original B before_commit typed refusal; B reservation,
+loader and evaluator are0/0/0. Cold replay/read leaves230 files/inventory equal;
+84 artifacts/19 source snapshots verified. Product/helper source pins unchanged.
+The existing active-policy/corpus matcher permits genuinely changed policy/data
+at the native reservation seam; its unit counterparts do not claim full public
+changed-policy admission. Qualification-c01 retains13PASS/1ERROR and
+HARNESS_ERROR for wrong fixture policy ordering; c02 reran only that test after
+the ordering repair and PASS. Distinct13+1 is not a fictional successful batch.
+Both declared600s parents completed66.594s/25.238s without watchdog; public
+children180s, owned output1GiB; unmeasured CPU/RAM/preparation/model cost UNKNOWN.
+Original source/raw receipts and first review NOT_READY are retained in
+native-qualification.json. New committed inventory and isolated four-role review
+must precede binding, preflight, PR, exact-head CI and machine readiness.
