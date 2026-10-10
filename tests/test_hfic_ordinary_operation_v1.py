@@ -200,7 +200,7 @@ class OrdinaryOperationTests(unittest.TestCase):
             op_path = root / "op.json"
             spec = _simple_spec()
             spec_path.write_text(json.dumps(spec), encoding="utf-8")
-            scope_path.write_text("{}", encoding="utf-8")
+            scope_path.write_text(json.dumps({"estimand": "price_relative_proxy", "explanatory_condition": "retention"}), encoding="utf-8")
             op_path.write_text(
                 json.dumps(_operation(spec, completion="SCIENTIFIC_TERMINAL", cap_main=1)),
                 encoding="utf-8",
@@ -250,7 +250,7 @@ class OrdinaryOperationTests(unittest.TestCase):
             scope_path = workspace / "scope.json"
             op_path = workspace / "op.json"
             spec_path.write_text(json.dumps(simple), encoding="utf-8")
-            scope_path.write_text("{}", encoding="utf-8")
+            scope_path.write_text(json.dumps({"estimand": "price_relative_proxy", "explanatory_condition": "mark"}), encoding="utf-8")
             op_path.write_text(
                 json.dumps(
                     {

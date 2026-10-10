@@ -13,6 +13,7 @@ import math
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta, timezone
+from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
@@ -58,12 +59,18 @@ TEMPORAL_CALCULATION_VERSION_V5 = "HFIC_TEMPORAL_DISCOVERY_CALC_V5"
 TEMPORAL_CALCULATION_VERSION = TEMPORAL_CALCULATION_VERSION_V5
 # V5 arithmetic read through the episode point/clock resolver binding.
 TEMPORAL_CALCULATION_VERSION_EPISODES_V1 = "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V1"
-# The episode collection has exactly one calculation version, so it is current for episode looks: an exact
-# repeat of an episode query in another operation or cycle is a replay, never a calculation revision.
-TEMPORAL_CURRENT_CALCULATION_VERSIONS = frozenset({TEMPORAL_CALCULATION_VERSION_V5, TEMPORAL_CALCULATION_VERSION_EPISODES_V1})
+# V2 rounds ratios of float-rendered cells once. Its saved artifacts retain
+# their original meaning; fresh V3 preserves source decimal ratios for decisions.
+TEMPORAL_CALCULATION_VERSION_EPISODES_V2 = "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V2"
+TEMPORAL_CALCULATION_VERSION_EPISODES_V3 = "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V3"
+# Saved V1 episode looks remain current replay artifacts: the arithmetic fix
+# never automatically recomputes/rebinds their original values or charges.
+TEMPORAL_CURRENT_CALCULATION_VERSIONS = frozenset({TEMPORAL_CALCULATION_VERSION_V5, TEMPORAL_CALCULATION_VERSION_EPISODES_V1, TEMPORAL_CALCULATION_VERSION_EPISODES_V2, TEMPORAL_CALCULATION_VERSION_EPISODES_V3})
 TEMPORAL_CALCULATION_VERSIONS_READABLE = frozenset(
     {
         TEMPORAL_CALCULATION_VERSION_EPISODES_V1,
+        TEMPORAL_CALCULATION_VERSION_EPISODES_V2,
+        TEMPORAL_CALCULATION_VERSION_EPISODES_V3,
         TEMPORAL_CALCULATION_VERSION_V1,
         TEMPORAL_CALCULATION_VERSION_V2,
         TEMPORAL_CALCULATION_VERSION_V3,
@@ -911,7 +918,7 @@ def _snapshot_lineage_reason(
     return None
 
 
-def _select_cell(rows: Sequence[Mapping[str, Any]], deadline: object) -> dict[str, Any]:
+def _select_cell(rows: Sequence[Mapping[str, Any]], deadline: object, *, exact_numeric: bool = False) -> dict[str, Any]:
     if deadline is None:
         return {"status": "ABSENT"}
     chosen: list[tuple[object, Mapping[str, Any]]] = []
@@ -924,7 +931,7 @@ def _select_cell(rows: Sequence[Mapping[str, Any]], deadline: object) -> dict[st
         return {"status": "ABSENT"}
     latest = max(item[0] for item in chosen)
     tied = [row for available, row in chosen if available == latest]
-    parsed: list[tuple[str, float | None]] = []
+    parsed: list[tuple[str, float | Fraction | None]] = []
     for row in tied:
         if str(row.get("state") or "") != "OBSERVED":
             parsed.append(("MISSING", None))
@@ -933,7 +940,9 @@ def _select_cell(rows: Sequence[Mapping[str, Any]], deadline: object) -> dict[st
         if number is None:
             parsed.append(("MISSING", None))
         else:
-            parsed.append(("NUM", number))
+            # Only fresh episode ratios use exact source numerics. Legacy
+            # selection/replay keeps its original binary64 interpretation.
+            parsed.append(("NUM", Fraction(str(row["typed_value"])) if exact_numeric else number))
     if len(set(parsed)) != 1:
         return {"status": "CONFLICT", "available_at": latest}
     kind, number = parsed[0]
@@ -958,6 +967,7 @@ def _select_snapshot_cell(
     query_policy: str,
     point_due_at: object | None,
     deadline: object,
+    exact_numeric: bool = False,
 ) -> dict[str, Any]:
     """Availability-bound cell read with snapshot lineage/acquisition checks."""
 
@@ -995,7 +1005,7 @@ def _select_snapshot_cell(
             if code in seen_reasons:
                 return {"status": code}
         return {"status": "ABSENT"}
-    return _select_cell([row for _, row in legal], deadline)
+    return _select_cell([row for _, row in legal], deadline, exact_numeric=exact_numeric)
 
 
 def _cell(
@@ -1005,6 +1015,7 @@ def _cell(
     *,
     snapshot_policy: str | None = None,
     point_due_at: object | None = None,
+    exact_numeric: bool = False,
 ) -> dict[str, Any]:
     rows = tuple(grouped.get(key, ()))
     if snapshot_policy:
@@ -1013,23 +1024,44 @@ def _cell(
             query_policy=snapshot_policy,
             point_due_at=point_due_at,
             deadline=deadline,
+            exact_numeric=exact_numeric,
         )
-    return _select_cell(rows, deadline)
+    return _select_cell(rows, deadline, exact_numeric=exact_numeric)
 
 
-def _predicate_holds(value: float | None, predicate: Mapping[str, Any]) -> bool | None:
+def _predicate_holds(value: float | Fraction | None, predicate: Mapping[str, Any]) -> bool | None:
     if value is None:
         return None
+    # Thresholds belong to the validated canonical query, not raw input.
+    def threshold(key: str):
+        return Fraction(str(predicate[key])) if isinstance(value, Fraction) else float(predicate[key])
     op = str(predicate["op"])
     if op == "gt":
-        return value > float(predicate["value"])
+        return value > threshold("value")
     if op == "gte":
-        return value >= float(predicate["value"])
+        return value >= threshold("value")
     if op == "lt":
-        return value < float(predicate["value"])
+        return value < threshold("value")
     if op == "lte":
-        return value <= float(predicate["value"])
-    return float(predicate["lower"]) <= value < float(predicate["upper"])
+        return value <= threshold("value")
+    return threshold("lower") <= value < threshold("upper")
+
+
+def _episode_return_ratio(numerator: object, denominator: object) -> Fraction:
+    """Keep exact source ratio through predicates and downside event counts."""
+    value = Fraction(str(numerator)) / Fraction(str(denominator)) - 1
+    try:
+        serialized = float(value)
+    except OverflowError:
+        serialized = math.inf
+    if not math.isfinite(serialized):
+        raise GroundedDiscoveryError("TEMPORAL_TARGET_NONFINITE")
+    if value and serialized == 0:
+        # The existing numeric result contract cannot encode a nonzero ratio
+        # at this magnitude. Refuse before membership/evidence persistence;
+        # never publish an exact negative count alongside zero negative mass.
+        raise GroundedDiscoveryError("TEMPORAL_TARGET_UNREPRESENTABLE")
+    return value
 
 
 def _feature_value_with_lineage(
@@ -1089,6 +1121,7 @@ def _feature_value_with_lineage(
             point_deadline,
             snapshot_policy=snapshot_policy,
             point_due_at=point_due_at if snapshot_policy else None,
+            exact_numeric=point_window is not None and feature["op"] == "return_ratio",
         )
         status = str(cell.get("status") or "")
         if detail is not None:
@@ -1154,7 +1187,7 @@ def _feature_value_with_lineage(
         end = read(str(feature["end"]), str(feature["field_id"]))
         if start.get("status") != "OBSERVED" or end.get("status") != "OBSERVED":
             return None, lineage
-        denominator = float(start["value"])
+        denominator = start["value"] if point_window is not None and op == "return_ratio" else float(start["value"])
         if op == "delta":
             value = float(end["value"]) - denominator
             if not math.isfinite(value):
@@ -1166,7 +1199,11 @@ def _feature_value_with_lineage(
             if detail is not None:
                 detail["reason"] = "NONPOSITIVE_DENOMINATOR"
             return None, lineage
-        value = float(end["value"]) / denominator - 1.0
+        value = (
+            _episode_return_ratio(end["value"], start["value"])
+            if point_window is not None
+            else float(end["value"]) / denominator - 1.0
+        )
         if feature.get("field_id") == HOLDER_COUNT and not math.isfinite(value):
             if detail is not None:
                 detail["reason"] = "NONFINITE_RESULT"
@@ -1343,6 +1380,7 @@ def _select_snapshot_exit(
     exit_due_at: object,
     exit_deadline: object,
     query_policy: str = OBSERVATION_CLOCK_PROVIDER_REPORTED_SNAPSHOT_V1,
+    exact_numeric: bool = False,
 ) -> tuple[dict[str, Any], str | None]:
     """Select a provider-reported snapshot exit under acquisition clocks.
 
@@ -1417,7 +1455,7 @@ def _select_snapshot_exit(
         return {"status": seen_reasons[0]}, seen_reasons[0]
     latest_exit = max(item[0] for item in legal)
     tied_rows = [row for available, row in legal if available == latest_exit]
-    selected = _select_cell(tied_rows, latest_exit)
+    selected = _select_cell(tied_rows, latest_exit, exact_numeric=exact_numeric)
     if selected.get("status") != "OBSERVED":
         return selected, "EXIT_NOT_OBSERVED"
     return selected, None
@@ -1428,6 +1466,7 @@ def _select_event_time_exit(
     *,
     entry_at: object,
     exit_deadline: object,
+    exact_numeric: bool = False,
 ) -> tuple[dict[str, Any], str | None]:
     """Legacy event-time exit: known event must fall after entry within deadline."""
 
@@ -1443,7 +1482,7 @@ def _select_event_time_exit(
         return {"status": "ABSENT"}, "EXIT_ABSENT"
     latest_exit = max(item[0] for item in legal)
     tied_rows = [row for available, row in legal if available == latest_exit]
-    selected = _select_cell(tied_rows, latest_exit)
+    selected = _select_cell(tied_rows, latest_exit, exact_numeric=exact_numeric)
     event_times = [
         _parse_time(row.get("event_time")) or _parse_time(row.get("observed_at"))
         for row in tied_rows
@@ -1666,7 +1705,7 @@ def _cohort_rows(
         views = list(bucket.values())
         active = [item for item in views if not item.get("integrity_excluded")]
         matched, observed_members, missing = _conditional_sample(active)
-        observed = [float(item["target"]) for item in observed_members]
+        observed = [item["target"] for item in observed_members]
         exclusions: dict[str, int] = defaultdict(int)
         for item in views:
             if item.get("integrity_excluded"):
@@ -1713,39 +1752,51 @@ def _cohort_rows(
     return rows
 
 
-def _mean(values: Sequence[float]) -> float | None:
+def _mean(values: Sequence[float | Fraction]) -> float | None:
     if not values:
         return None
-    return sum(values) / len(values)
+    return float(sum(values) / len(values))
 
 
-def _median(values: Sequence[float]) -> float | None:
+def _median(values: Sequence[float | Fraction]) -> float | None:
     if not values:
         return None
     ordered = sorted(values)
     mid = len(ordered) // 2
     if len(ordered) % 2:
-        return ordered[mid]
-    return (ordered[mid - 1] + ordered[mid]) / 2.0
+        return float(ordered[mid])
+    return float((ordered[mid - 1] + ordered[mid]) / 2)
 
 
-def downside_descriptive(values: Sequence[float], *, missing_n: int) -> dict[str, Any]:
+def downside_descriptive(values: Sequence[float | Fraction], *, missing_n: int) -> dict[str, Any]:
     """Fixed return-sign downside profile over one existing observed view."""
 
     if isinstance(missing_n, bool) or not isinstance(missing_n, int) or missing_n < 0:
         raise GroundedDiscoveryError("DOWNSIDE_SUPPORT_INVALID")
     if any(not math.isfinite(value) for value in values):
         raise GroundedDiscoveryError("TEMPORAL_TARGET_NONFINITE")
-    ordered = sorted(values)
-    n = len(ordered)
-    negative = [-value for value in ordered if value < 0]
+    if any(value and float(value) == 0 for value in values):
+        raise GroundedDiscoveryError("TEMPORAL_TARGET_UNREPRESENTABLE")
+    exact_ordered = sorted(values)
+    n = len(exact_ordered)
+    negative = [-value for value in exact_ordered if value < 0]
     negative_mass = sum(negative)
-    count20 = sum(value <= -0.20 for value in ordered)
-    count50 = sum(value <= -0.50 for value in ordered)
+    count20 = sum(value <= (Fraction(-1, 5) if isinstance(value, Fraction) else -0.20) for value in exact_ordered)
+    count50 = sum(value <= (Fraction(-1, 2) if isinstance(value, Fraction) else -0.50) for value in exact_ordered)
+    # Continuous descriptive outputs serialize as JSON numbers. Event
+    # membership above is decided before this representational rounding.
+    ordered = [float(value) for value in exact_ordered]
 
     def quantile(q: float) -> float | None:
         if not n:
             return None
+        if all(isinstance(value, Fraction) for value in exact_ordered):
+            # Fresh exact episode ratios stay exact through interpolation.
+            # Rounded weights can invert quantiles even on a constant sample.
+            h = (n - 1) * Fraction(str(q))
+            j = math.floor(h)
+            g = h - j
+            return float((1 - g) * exact_ordered[j] + g * exact_ordered[min(j + 1, n - 1)])
         h = (n - 1) * q
         j = math.floor(h)
         g = h - j
@@ -1765,7 +1816,7 @@ def downside_descriptive(values: Sequence[float], *, missing_n: int) -> dict[str
         "observed_n": n,
         "missing_n": missing_n,
         "negative_n": len(negative),
-        "zero_n": sum(value == 0 for value in ordered),
+        "zero_n": sum(value == 0 for value in exact_ordered),
         "p05": quantile(0.05),
         "p10": quantile(0.10),
         "p25": quantile(0.25),
@@ -1775,8 +1826,8 @@ def downside_descriptive(values: Sequence[float], *, missing_n: int) -> dict[str
         "le_minus_50_rate": count50 / n if n else None,
         "es10_return": tail_total / tail_mass if n else None,
         "es10_tail_mass_n": tail_mass,
-        "negative_mass": negative_mass if n else None,
-        "worst_negative_share": max(negative) / negative_mass if negative_mass else None,
+        "negative_mass": float(negative_mass) if n else None,
+        "worst_negative_share": float(max(negative) / negative_mass) if negative_mass else None,
     }
 
 
@@ -2123,6 +2174,8 @@ def temporal_result_coherence(summary: Mapping[str, Any]) -> dict[str, Any]:
     if summary.get("calculation_version") in {
         TEMPORAL_CALCULATION_VERSION_V5,
         TEMPORAL_CALCULATION_VERSION_EPISODES_V1,
+        TEMPORAL_CALCULATION_VERSION_EPISODES_V2,
+        TEMPORAL_CALCULATION_VERSION_EPISODES_V3,
     }:
         issues.extend(
             _downside_issues(
@@ -2726,12 +2779,14 @@ def _target_projection(grouped, body, item, *, cohort, release, mint, anchor, de
             exit_due_at=exit_due_at,
             exit_deadline=exit_deadline,
             query_policy=clock_policy,
+            exact_numeric=point_window is not None,
         )
     else:
         selected, target_exclusion = _select_event_time_exit(
             exit_rows,
             entry_at=entry_at,
             exit_deadline=exit_deadline,
+            exact_numeric=point_window is not None,
         )
     reference_point = str(body["target"]["reference_point"])
     if point_window is not None:
@@ -2762,6 +2817,7 @@ def _target_projection(grouped, body, item, *, cohort, release, mint, anchor, de
         ref_cutoff,
         snapshot_policy=snapshot_policy,
         point_due_at=reference_due_at if snapshot_policy else None,
+        exact_numeric=point_window is not None,
     )
     if source_detail is not None:
         # Preserve selected lawful source cells before ratio arithmetic erases
@@ -2774,9 +2830,13 @@ def _target_projection(grouped, body, item, *, cohort, release, mint, anchor, de
     if (
         selected.get("status") == "OBSERVED"
         and reference.get("status") == "OBSERVED"
-        and float(reference["value"]) > 0
+        and reference["value"] > 0
     ):
-        target_value = float(selected["value"]) / float(reference["value"]) - 1.0
+        target_value = (
+            _episode_return_ratio(selected["value"], reference["value"])
+            if point_window is not None
+            else float(selected["value"]) / float(reference["value"]) - 1.0
+        )
         target_observed = True
         target_exclusion = None
         source_event = selected.get("source_price_event_time")
@@ -3559,7 +3619,7 @@ def execute_temporal_discovery(
     base_members = [item for item in members if item["in_base"]]
     decision_members = [item for item in base_members if item["decision_eligible"]]
     matched_members, observed, missing_target = _conditional_sample(decision_members)
-    observed_values = [float(item["target"]) for item in observed]
+    observed_values = [item["target"] for item in observed]
     observed_mean = _mean(observed_values)
     matched_downside = downside_descriptive(observed_values, missing_n=len(missing_target))
     known_source_events = [
@@ -3583,7 +3643,7 @@ def execute_temporal_discovery(
                 if all(hit is True for hit in hits) and member.get("scope_signal") is not False:
                     subset_members.append(member)
             subset = [
-                float(member["target"])
+                member["target"]
                 for member in subset_members
                 if member["target_is_observed"] and member["target"] is not None
             ]
@@ -3607,13 +3667,13 @@ def execute_temporal_discovery(
                 }
             )
     baseline_values = [
-        float(item["target"])
+        item["target"]
         for item in decision_members
         if item["target_is_observed"] and item["target"] is not None
     ]
     by_block: dict[str, list[float]] = defaultdict(list)
     for item in observed:
-        by_block[str(item["block"])].append(float(item["target"]))
+        by_block[str(item["block"])].append(item["target"])
     by_block_missing: dict[str, int] = defaultdict(int)
     for item in missing_target:
         by_block_missing[str(item["block"])] += 1
@@ -3626,10 +3686,10 @@ def execute_temporal_discovery(
         viewed.append("MISSING_STRESS_MODEL")
     viewed.append(DOWNSIDE_PROFILE)
     positive = [value for value in observed_values if value > 0]
-    winner_share = max(positive) / sum(positive) if positive else None
+    winner_share = float(max(positive) / sum(positive)) if positive else None
     missing_mean_to_zero = None
     if missing_target and observed_values:
-        missing_mean_to_zero = -sum(observed_values) / len(missing_target)
+        missing_mean_to_zero = float(-sum(observed_values) / len(missing_target))
     clock_policy = str(body.get("observation_clock_policy") or OBSERVATION_CLOCK_EVENT_TIME_V1)
     target_exclusion_pooled: dict[str, int] = defaultdict(int)
     for item in members:
@@ -3643,7 +3703,7 @@ def execute_temporal_discovery(
     summary = {
         "contract_version": "FORGE_GROUNDED_DISCOVERY_V1",
         "calculation_version": (
-            TEMPORAL_CALCULATION_VERSION_EPISODES_V1
+            TEMPORAL_CALCULATION_VERSION_EPISODES_V3
             if episode_population
             else TEMPORAL_CALCULATION_VERSION
         ),
@@ -4029,7 +4089,7 @@ def build_episode_feature_preview(census, observations, body, binding, *,
         features[name] = {"calculable_n": len(eligible)-unavailable, "unavailable_n": unavailable,
                           "reason_counts": dict(sorted(reasons.items()))}
     examples = [{"anonymous_id": hashlib.sha256(f"{seed}:{m['identity']}".encode()).hexdigest()[:16],
-                 "feature_values": m["feature_values"],
+                 "feature_values": {key: float(value) if value is not None else None for key, value in m["feature_values"].items()},
                  "feature_status": {f["name"]: m.get("feature_reasons", {}).get(f["name"], "OBSERVED") for f in body["features"]}}
                 for m in eligible]
     examples.sort(key=lambda item: item["anonymous_id"])

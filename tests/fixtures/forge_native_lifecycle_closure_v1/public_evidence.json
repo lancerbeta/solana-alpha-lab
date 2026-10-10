@@ -1,0 +1,23 @@
+{
+  "candidate_scope": {
+    "decision_timestamp": "E1800",
+    "estimand": "price_relative_proxy",
+    "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1",
+    "explanatory_condition": "NUMERIC_IN_SCOPE",
+    "population": "OPPORTUNITY_EPISODES",
+    "research_scope_rule_sha256": "f8f09a2f20656cbb2c6aa27143c06531df27ff2a2ee54204f9ac9ddc8f5d412b",
+    "target": "PRICE_RELATIVE_PROXY:E1800:E14400:FIELD-USD-PRICE-001"
+  },
+  "descriptive_readout": {
+    "scientific_identity": {
+      "decision_timestamp": "E1800",
+      "horizon_notional": "E1800 -> E14400; PRICE_RELATIVE_PROXY; no executable notional",
+      "primary_x_family": "{\"features\":[{\"end\":\"E1800\",\"field_id\":\"FIELD-HOLDER-COUNT-001\",\"name\":\"d_holders\",\"op\":\"delta\",\"start\":\"E300\"}],\"predicates\":[{\"feature\":\"d_holders\",\"op\":\"gt\",\"value\":0.0}]}",
+      "primary_y": "PRICE_RELATIVE_PROXY E1800 -> E14400",
+      "research_scope_rule_sha256": "f8f09a2f20656cbb2c6aa27143c06531df27ff2a2ee54204f9ac9ddc8f5d412b",
+      "research_scope_statement": "KIND=NUMERIC_IN_SCOPE; UNIVERSE=(ALL); SIGNAL=NONE; NUMERIC=1_PREDICATES; CONTRAST=SAME_DECISION_ELIGIBLE_BASELINE; SLICES=NONE; BASIS=EPISODE_T0; COVERAGE=REQUIRE_KNOWN_REFERENCED",
+      "target": "PRICE_RELATIVE_PROXY:E1800:E14400:FIELD-USD-PRICE-001"
+    }
+  },
+  "provenance": "SCRIPTED_PUBLIC_BINDING_FIXTURE_NOT_NATIVE"
+}

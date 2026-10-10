@@ -1,0 +1,128 @@
+{
+  "schema": "smial.native-lifecycle-final-outcomes",
+  "schema_version": "2.0",
+  "task_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1",
+  "status": "TWO_SAVED_SUBSTANTIVE_TERMINALS_Q1_Q4_OWNED_BY_CANONICAL_REVIEW",
+  "execution_snapshot": {
+    "head_sha": "2cace49f8443e3cd25f243ac0b740c9f1b290b29",
+    "symbolic_ref": "refs/heads/codex/forge-native-lifecycle-closure-v1",
+    "porcelain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "index_worktree_sha256": "96a296d224f285c67bee93c30f8a309157f0daa35dc5b87e410b78630a09cfc7",
+    "refs_digest_sha256": "c8b8bab843429053cde1689f502ba9904596b64e611181e97f96bf0ecaf77c04",
+    "composite_sha256": "4c9ed13d6624d49f0819069f646f1977d57152b2f9e375431970bd88002769a9"
+  },
+  "cases": {
+    "primary": {
+      "session_id": "HFIC-SESS-0A904ED27BA2B142",
+      "candidate_id": "HFIC-CAND-EF0827DE49C2",
+      "definition_sha256": "ef0827de49c2a51d55e29c5e7530b188b1e4ed02257dff9ad0e910cc7af56182",
+      "packet_sha256": "2d6ccdd1a31f795c987ab3605527356bc133c1c2a921ab472936d92f36cb9935",
+      "critic_terminal": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+      "state": "SYNTHESIS_COMPLETE",
+      "fresh_reader_sha256": "b45ff367051975b64373dff0e83aa1be0b57b9571e85a8e2c9a99ca749c58aa4",
+      "original_critic_sha256": "19f6c52b1e254dfd76f52e3781476a412cca142bdf6c6b7cca3276f4310bd33e",
+      "question": "Траектория holders с ранним ростом E300→E900 и последующим снижением E900→E1800 предсказывает более низкий средний PRICE_RELATIVE_PROXY E1800→E14400 относительно same-decision eligible baseline.",
+      "estimand": "Разность mean PRICE_RELATIVE_PROXY E1800→E14400: matched holder-rise-then-fall episodes minus SAME_DECISION_ELIGIBLE baseline; primary directional prediction: difference < 0.",
+      "explanatory_condition": "delta(FIELD-HOLDER-COUNT-001,E300,E900)>0 AND delta(FIELD-HOLDER-COUNT-001,E900,E1800)<0, observed and PIT-available by E1800; decision universe uses unchanged active holder/liquidity minima.",
+      "scope": {
+        "population": "OPPORTUNITY_EPISODES",
+        "decision_timestamp": "E1800",
+        "target": "PRICE_RELATIVE_PROXY:E1800:E14400:FIELD-USD-PRICE-001",
+        "research_scope_rule_sha256": "f8f09a2f20656cbb2c6aa27143c06531df27ff2a2ee54204f9ac9ddc8f5d412b",
+        "research_scope_statement": "KIND=NUMERIC_IN_SCOPE; UNIVERSE=(ALL); SIGNAL=NONE; NUMERIC=2_PREDICATES; CONTRAST=SAME_DECISION_ELIGIBLE_BASELINE; SLICES=NONE; BASIS=EPISODE_T0; COVERAGE=REQUIRE_KNOWN_REFERENCED",
+        "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1"
+      },
+      "arithmetic": {
+        "population_n": 12,
+        "feature_unknown_n": 3,
+        "matched_n": 0,
+        "observed_target_n": 0,
+        "missing_target_n": 0,
+        "mean_target": null
+      },
+      "baseline": {
+        "observed_n": 11,
+        "mean_target": 0.03636363636363636
+      },
+      "MAIN": 1,
+      "PREVIEW": 0,
+      "ADAPTIVE": 0,
+      "generator_first_submission_accepted": true,
+      "scientific_revision": false,
+      "artifact_bundle_sha256": "0adc4e6c954f52b14006a0bd39791e8665eb28adf0e8a775b02a85bad2960ae7",
+      "recovery_sha256": "d167a70c08054808431ee14dce79f920eff71eab712b22bbdf51dc00e143ceb0"
+    },
+    "transfer": {
+      "session_id": "HFIC-SESS-746BAEDBA5146130",
+      "candidate_id": "HFIC-CAND-EE030DA200F0",
+      "definition_sha256": "ee030da200f0482423d3ae3bb28f4fb8e0b347d0bf655dd8d65ff308fb836c2e",
+      "packet_sha256": "72d85004abb2e975b8f1cf41f7849f4e653184e02c0bb4a79c6d15be0ac782cd",
+      "critic_terminal": "KILL_LOW_INFORMATION_VALUE",
+      "state": "SYNTHESIS_COMPLETE",
+      "fresh_reader_sha256": "c6e947f2ba545bdd6d727ec0aba7df9a19824a6943bc8cf546da873562e393a8",
+      "original_critic_sha256": "70a8baecce73f29b6ccb01be9a5115afcf3c5a4643bcd15a5649ec187b619de4",
+      "question": "Working predictive proposition: sustained holder-count expansion of at least 10 percent in each of E300-to-E900 and E900-to-E1800 identifies a higher mean fixed-time E1800-to-E14400 PRICE_RELATIVE_PROXY than SAME_DECISION_ELIGIBLE episodes; this is an unconfirmed synthetic descriptive hypothesis.",
+      "estimand": "Mean PRICE_RELATIVE_PROXY E1800-to-E14400 among episodes satisfying both predecision holder-growth predicates minus its mean in the same full decision-eligible episode population; each side uses its observed targets, with eligible and missing-target denominators disclosed separately.",
+      "explanatory_condition": "FIELD-HOLDER-COUNT-001 return_ratio(E300,E900) >= 0.10 AND FIELD-HOLDER-COUNT-001 return_ratio(E900,E1800) >= 0.10, with both positive denominators and PIT-usable cells known by E1800.",
+      "scope": {
+        "population": "OPPORTUNITY_EPISODES",
+        "decision_timestamp": "E1800",
+        "target": "PRICE_RELATIVE_PROXY:E1800:E14400:FIELD-USD-PRICE-001",
+        "research_scope_rule_sha256": "f8f09a2f20656cbb2c6aa27143c06531df27ff2a2ee54204f9ac9ddc8f5d412b",
+        "research_scope_statement": "KIND=NUMERIC_IN_SCOPE; UNIVERSE=(ALL); SIGNAL=NONE; NUMERIC=2_PREDICATES; CONTRAST=SAME_DECISION_ELIGIBLE_BASELINE; SLICES=NONE; BASIS=EPISODE_T0; COVERAGE=REQUIRE_KNOWN_REFERENCED",
+        "evidence_surface_mode": "ORDINARY_GROUNDED_DISCOVERY_V1"
+      },
+      "arithmetic": {
+        "population_n": 12,
+        "feature_unknown_n": 3,
+        "matched_n": 4,
+        "observed_target_n": 3,
+        "missing_target_n": 1,
+        "mean_target": 0.2
+      },
+      "baseline": {
+        "observed_n": 11,
+        "mean_target": 0.03636363636363636
+      },
+      "MAIN": 1,
+      "PREVIEW": 0,
+      "ADAPTIVE": 0,
+      "generator_first_submission_accepted": false,
+      "scientific_revision": false,
+      "artifact_bundle_sha256": "4e0fed5fa72a76403ec3441bab7a62ee087b2245d815b6e689b787229da82564",
+      "recovery_sha256": "d02271a9267e70c5a83ea1755bfcf1db09cc281119b14478352c457d7df5c33d"
+    }
+  },
+  "native_accounting": {
+    "generator_episodes": 8,
+    "critic_episodes_including_binding_continuation": 5,
+    "native_main": 7,
+    "native_preview": 3,
+    "native_adaptive": 0,
+    "final_pair_main": 2,
+    "scripted_control_main_separate": 4,
+    "recovery_new_looks": 0
+  },
+  "verification_axes": {
+    "V1": "PASS_IMMUTABLE_PRODUCTION_GIT_COMPOSITE",
+    "V2": "SAVED_PRIMARY_SUBSTANTIVE_TERMINAL_Q1_Q4_REVIEW_REQUIRED",
+    "V3": "SAVED_TRANSFER_SUBSTANTIVE_TERMINAL_Q1_Q4_REVIEW_REQUIRED",
+    "V4": "PASS_BOTH_ACTUAL_NATIVE_RECOVERY_REPLY_LOSS_REPLAY_CONFLICT",
+    "V5": "PASS_ACTUAL_NATIVE_COPY_TYPED_REFUSAL_NO_LOGICAL_EFFECT_PLUS_ADMISSION_TEST",
+    "V6": "PASS_EXACT_CANDIDATE_EXISTING_PIT_LIST_BUDGET_REGRESSIONS",
+    "V7": "PASS_NEW_PROCESS_CANONICAL_SAVED_READERS_EXACT_BINDINGS"
+  },
+  "quality_owner": "independent-reviews-v2.json GOAL_DOD_CRITIC Q1-Q4 per run",
+  "continuations": {
+    "generator8": "GROUNDED_EVIDENCE_REQUIRED placement only; original rejected draft retained; all scientific fields exactly equal; no new look",
+    "critic4": "Launcher filename/symbol/transport references repaired; same-context exact-copy binding only; original chosen terminal unchanged; counted conservatively"
+  },
+  "original_history": "1381b775 checkpoint and old failed verdicts unchanged;17b680f6 Gen5 substantive KILL retained but excluded for independent Q1 arithmetic defect",
+  "non_claims": [
+    "NO_ALPHA_CAUSAL_OOS_RELIABILITY_PROOF",
+    "NO_OS_MODEL_DIVERSITY_PROOF",
+    "NO_PRIOR_NOVELTY_PROOF",
+    "NO_SECOND_UNASSISTED_FIRST_PASS_TRANSFER",
+    "NO_RECOVERY_CLONE_INDEPENDENT_SCIENCE"
+  ]
+}

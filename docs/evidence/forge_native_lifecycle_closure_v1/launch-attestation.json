@@ -1,0 +1,69 @@
+{
+  "schema": "smial.native-launch-orchestration-attestation",
+  "schema_version": "1.0",
+  "proof_scope": "PARENT_ORCHESTRATION_ATTESTATION_PLUS_ORIGINAL_TRACE_NOT_OS_OR_MODEL_ISOLATION_PROOF",
+  "launch_prompt_export": "NOT_PERSISTED",
+  "tool_call_ids": "UNAVAILABLE_IN_DURABLE_EXPORT",
+  "launches": [
+    {
+      "role": "GENERATOR",
+      "agent_task_path": "/root/native_generator_primary",
+      "tool": "collaboration.spawn_agent",
+      "fork_turns": "none",
+      "execution_head": "5969585b16f8de7ccc10b99ea94ac25e6749774e",
+      "allowed_input_scope": "PRIMARY_PUBLIC_SOURCE_AND_METHOD",
+      "started_at": "UNKNOWN",
+      "status": "COMPLETED",
+      "native_originals_preserved": true
+    },
+    {
+      "role": "GENERATOR",
+      "agent_task_path": "/root/native_generator_transfer",
+      "tool": "collaboration.spawn_agent",
+      "fork_turns": "none",
+      "execution_head": "5969585b16f8de7ccc10b99ea94ac25e6749774e",
+      "allowed_input_scope": "TRANSFER_PUBLIC_SOURCE_AND_METHOD",
+      "started_at": "UNKNOWN",
+      "status": "COMPLETED",
+      "native_originals_preserved": true
+    },
+    {
+      "role": "GENERATOR",
+      "agent_task_path": "/root/native_generator_primary_final",
+      "tool": "collaboration.spawn_agent",
+      "fork_turns": "none",
+      "execution_head": "838753ba29224a4b4cfc5298637b5a03aa4dc930",
+      "allowed_input_scope": "PRIMARY_PUBLIC_SOURCE_AND_METHOD",
+      "started_at": "UNKNOWN",
+      "status": "COMPLETED",
+      "native_originals_preserved": true
+    },
+    {
+      "role": "GENERATOR",
+      "agent_task_path": "/root/native_generator_transfer_final",
+      "tool": "collaboration.spawn_agent",
+      "fork_turns": "none",
+      "execution_head": "838753ba29224a4b4cfc5298637b5a03aa4dc930",
+      "allowed_input_scope": "TRANSFER_PUBLIC_SOURCE_AND_METHOD",
+      "started_at": "UNKNOWN",
+      "status": "COMPLETED",
+      "native_originals_preserved": true
+    },
+    {
+      "role": "DOMAIN_CRITIC",
+      "agent_task_path": "/root/native_domain_critic_primary",
+      "tool": "collaboration.spawn_agent",
+      "fork_turns": "none",
+      "execution_head": "838753ba29224a4b4cfc5298637b5a03aa4dc930",
+      "allowed_input_scope": "FROZEN_PRIMARY_PACKET_AND_PUBLIC_METHOD",
+      "started_at": "UNKNOWN",
+      "status": "COMPLETED",
+      "native_originals_preserved": true
+    }
+  ],
+  "generator_revision_continuations": 0,
+  "critic_schema_repairs": 0,
+  "generator_episodes": 4,
+  "domain_critic": 1,
+  "model_effort_seed_tokens_cost": "UNKNOWN"
+}

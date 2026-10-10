@@ -195,7 +195,16 @@ need a proven actor story. Do not invent one. A `CAUSAL` claim keeps the
 identification bar. `prior_scope_relations` of `SCOPED_CONTROL_DOES_NOT_BLOCK`
 is not `KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED`. `EXACT_SCOPE_MATCH` and
 `EXACT_VALID_CLOSE` still are. A renamed `question_id` is not a scientific
-difference. `UNKNOWN_SCOPE_NEEDS_RESOLUTION` is not a pass. Predictive
+difference. `UNKNOWN_SCOPE_NEEDS_RESOLUTION` is not proof of novelty or
+scope distinction. Read its actual guard assessment and source refs. An
+incomplete historical context remains UNKNOWN; when full-archive guards
+establish no active close/near-close restriction and the current grounded
+claim does not depend on this missing fact, that gap alone is not a global
+veto. This grants no PASS: assess the current question independently. A claim
+that uses the unknown prior as evidence, asserts unsupported novelty or relies
+on an unproved difference remains unbound. Potentially applicable near-close
+and exact close stay blocking; missing current bindings remain technical
+defects. Never change the old prior, its frozen packet or verdict. Predictive
 sketches use the frozen research_policy_context.this_search.limits.max_generated
 ceiling and do not need three mechanism classes.
 Missing outcomes are not zeros and not alpha. The engine field

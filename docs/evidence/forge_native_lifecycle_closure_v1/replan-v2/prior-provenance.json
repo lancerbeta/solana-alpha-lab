@@ -1,0 +1,59 @@
+{
+  "status": "PASS_SOURCE_TRACE_UNKNOWN_RETAINED",
+  "hypothesis_source_ref": {
+    "record_id": "HYPOTHESIS-VERSION-5FC587AD40DA4369",
+    "payload_sha256": "7c47d4a2b89caf51d1dc418d560710759acaf008dab9149e8d4b8cb471a32eaf"
+  },
+  "source_fields": {
+    "definition_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "expected_regime_terms": [],
+    "falsifier": "Re-derived terminal from the canonical runtime receipt disagrees with the Git-canonical acceptance terminal.",
+    "family_id": "HYP-FAMILY-FAST-LANE-001",
+    "hypothesis_version_id": "HYP-QUOTE-NATIVE-FRICTION-H900-V1",
+    "mechanism": "classify_audition_terminal",
+    "origin_id": "HYP-ORIGIN-FAST-LANE-001",
+    "origin_kind": "DATA_ANALYSIS",
+    "research_cycle_id": "RESEARCH-CYCLE-FAST-LANE-001",
+    "statement": "Does frozen t0 quoted round-trip friction rank +15m quoted liquidation recovery on the admissible Free-key 6+6 cohort without a new live capture?",
+    "version_ordinal": 1,
+    "what_changed": "INITIAL_FAST_LANE_CLI_FIXTURE"
+  },
+  "same_hypothesis_session_refs": [],
+  "source_bound_capsule": {
+    "hypothesis_version_id": "HYP-QUOTE-NATIVE-FRICTION-H900-V1",
+    "session_id": null,
+    "hfic_protocol": null,
+    "definition_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "memory_status": "HISTORICAL",
+    "decision_kind": null,
+    "reason_code": null,
+    "claim": null,
+    "mechanism": "classify_audition_terminal",
+    "actor_counterparty": null,
+    "population": null,
+    "decision_timestamp": null,
+    "primary_x_family": null,
+    "primary_y": null,
+    "horizon_notional": null,
+    "negative_control": null,
+    "cheapest_falsifier": "Re-derived terminal from the canonical runtime receipt disagrees with the Git-canonical acceptance terminal.",
+    "source_detail": {
+      "hypothesis_source_refs": [
+        {
+          "record_id": "HYPOTHESIS-VERSION-5FC587AD40DA4369",
+          "payload_sha256": "7c47d4a2b89caf51d1dc418d560710759acaf008dab9149e8d4b8cb471a32eaf",
+          "first_reliable_available_at": "2026-08-25T00:00:00+00:00",
+          "effective_at": "2026-08-25T00:00:00+00:00"
+        }
+      ],
+      "source_outcome": null,
+      "failure_boundary": "UNKNOWN",
+      "finding": "NOT_RECORDED_IN_HYPOTHESIS_SOURCE",
+      "surviving_observation": "NOT_RECORDED",
+      "reconsideration_condition": "NOT_RECORDED",
+      "authored_text_is_authority": false
+    }
+  },
+  "axes_restoration": "NO_SOURCE_BOUND_AXES_OR_SESSION_FOUND",
+  "original_store_unchanged": true
+}

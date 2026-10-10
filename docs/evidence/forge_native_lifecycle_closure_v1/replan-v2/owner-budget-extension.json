@@ -1,0 +1,14 @@
+{
+  "as_of": "2026-10-10",
+  "prior_ceiling": {
+    "generator": 8,
+    "critic": 6
+  },
+  "current_ceiling": {
+    "generator": 10,
+    "critic": 7
+  },
+  "source": "DIRECT_OWNER_REPLY_ACCEPTING_CONCRETE_TWO_PLUS_TWO_RECOMMENDATION",
+  "reason": "Independent supported decimal source precision failure requires material deterministic repair and strict new final-epoch pair. No acceptance/gate concession.",
+  "old_usage_and_verdicts": "PRESERVED"
+}

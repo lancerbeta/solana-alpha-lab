@@ -1,0 +1,152 @@
+{
+  "status": "PASS",
+  "candidate_head": "c15517fd7d567917dd849cb17b0316434c13226c",
+  "native_execution_head": "3ba655608098f6b1bb086f90037ac64bb092db27",
+  "native_execution_composite": "ea9485a20bb42c495a98b88a4b5c700829735b93f3318c823b8d45841cb8fade",
+  "method": "READ_ONLY_PURE_RECALCULATION_OF_ORIGINAL_FROZEN_NATIVE_INPUTS_NO_OPERATION_OR_MAIN",
+  "cases": [
+    {
+      "case": "primary",
+      "old_native_main_sha256": "4857ab4e9967c307691e0c8143f68970b8c8d33961a8527df5d8c4ac4c310069",
+      "query_sha256": "654a2efe199e998517e3062c037feb3478e6d920a960db1e186029bfdba31944",
+      "source_hashes": [
+        {
+          "census": "b85dc4b066d0e6f98c76866f13dc0733c69b3d42b2e07c62cf4647d83df20078",
+          "observations": "b3a3dd52df4e2c2a07c6c5ab4e3e6bae933893f7a63136916dff746da65bea32"
+        }
+      ],
+      "old_result_sha256": "ed1f1eb729f5454b7ee9f66fb4343bf28d52987c4cfc9f8be0eb835fd5d9ef1a",
+      "new_pure_result_file": "primary-pure-calculation.json",
+      "new_pure_result_sha256": "6bdd4c2af0d5b9f74676fc2ef913ec1f9b1313dfff9b0a8eaa020b54adc41c71",
+      "quantile_representation_changes": [
+        {
+          "path": ".ablations[0].downside.p05",
+          "old": 0.11000000000000001,
+          "new": 0.11
+        },
+        {
+          "path": ".ablations[0].downside.p10",
+          "old": 0.12000000000000002,
+          "new": 0.12
+        },
+        {
+          "path": ".ablations[0].downside.p25",
+          "old": 0.15000000000000002,
+          "new": 0.15
+        },
+        {
+          "path": ".baseline.downside.p25",
+          "old": -0.15000000000000002,
+          "new": -0.15
+        },
+        {
+          "path": ".by_calendar_block[0].downside.p05",
+          "old": 0.11000000000000001,
+          "new": 0.11
+        },
+        {
+          "path": ".by_calendar_block[0].downside.p10",
+          "old": 0.12000000000000002,
+          "new": 0.12
+        },
+        {
+          "path": ".by_calendar_block[0].downside.p25",
+          "old": 0.15000000000000002,
+          "new": 0.15
+        },
+        {
+          "path": ".by_cohort[0].downside.p05",
+          "old": 0.11000000000000001,
+          "new": 0.11
+        },
+        {
+          "path": ".by_cohort[0].downside.p10",
+          "old": 0.12000000000000002,
+          "new": 0.12
+        },
+        {
+          "path": ".by_cohort[0].downside.p25",
+          "old": 0.15000000000000002,
+          "new": 0.15
+        },
+        {
+          "path": ".downside.p05",
+          "old": 0.11000000000000001,
+          "new": 0.11
+        },
+        {
+          "path": ".downside.p10",
+          "old": 0.12000000000000002,
+          "new": 0.12
+        },
+        {
+          "path": ".downside.p25",
+          "old": 0.15000000000000002,
+          "new": 0.15
+        },
+        {
+          "path": ".pooled.downside.p05",
+          "old": 0.11000000000000001,
+          "new": 0.11
+        },
+        {
+          "path": ".pooled.downside.p10",
+          "old": 0.12000000000000002,
+          "new": 0.12
+        },
+        {
+          "path": ".pooled.downside.p25",
+          "old": 0.15000000000000002,
+          "new": 0.15
+        }
+      ],
+      "all_other_summary_fields_identical": true,
+      "coherence": "COHERENT",
+      "records_digest_before_after": "04ddcb0d57e06695d6fac67898bc039aa0923934b35a2f33432680ebf7a1c74f",
+      "new_scientific_looks": 0
+    },
+    {
+      "case": "transfer",
+      "old_native_main_sha256": "f31dce45b7b94565f5d4c29673d8e6428f018ed6dd5ddde5fc4d7d0a3e8dd05e",
+      "query_sha256": "c3a519b8401a1727923135f817098117da5aa9cf090d40283588eabd281e1797",
+      "source_hashes": [
+        {
+          "census": "68be0bf1100ef0430ae87a29978d157ba48322292979b0a566a0c6f8969c2a15",
+          "observations": "25f6128f54191eb13a997d5562c91e2bee8b979dd58ef8a0c2480f6ee1b4f1f3"
+        }
+      ],
+      "old_result_sha256": "ca1c99aac045ced10acb3027bf8c0aacf3e2dc4a1da521398a873c3d924c1b80",
+      "new_pure_result_file": "transfer-pure-calculation.json",
+      "new_pure_result_sha256": "9031428238820a34bd01d03370486f9c3f8b8d93e30ed9ddd078d5b8ba40bdc6",
+      "quantile_representation_changes": [
+        {
+          "path": ".ablations[1].downside.p05",
+          "old": 0.11000000000000001,
+          "new": 0.11
+        },
+        {
+          "path": ".ablations[1].downside.p10",
+          "old": 0.12000000000000002,
+          "new": 0.12
+        },
+        {
+          "path": ".ablations[1].downside.p25",
+          "old": 0.15000000000000002,
+          "new": 0.15
+        },
+        {
+          "path": ".baseline.downside.p25",
+          "old": -0.15000000000000002,
+          "new": -0.15
+        }
+      ],
+      "all_other_summary_fields_identical": true,
+      "coherence": "COHERENT",
+      "records_digest_before_after": "81fc40d6abdc0a7c88775d7ffcc8d3f8b041184dcc46601e69817845acfc6d9a",
+      "new_scientific_looks": 0
+    }
+  ],
+  "scientific_or_authority_change": false,
+  "old_originals_rebound_or_overwritten": false,
+  "interpretation": "Same supported question, predicates, missingness, views, means and scientific conclusions; only correctly rounded type7 continuous quantiles differ. Original3ba native lifecycle/recovery retains its exact immutable execution epoch; current runtime applicability is separately demonstrated, not substituted for native generation."
+}

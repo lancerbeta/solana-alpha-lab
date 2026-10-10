@@ -1,0 +1,22 @@
+{
+  "status": "DERIVED_METADATA_PREPARATION_WITHOUT_LOGICAL_HISTORY_OR_SCIENTIFIC_EFFECT",
+  "native_initial_refusal": "WRITE_LOOKUP_STALE_PREPARATION_REQUIRED",
+  "cause": "Quiescent full source plane copy retained path-bound derived lookup state; copies needed normal local metadata preparation.",
+  "public_existing_owner": "scripts/prepare_research_write_lookup.py --isolated-copy / ResearchStore.prepare_write_lookup",
+  "cases": {
+    "primary": {
+      "record_count": 31,
+      "records_root_sha256": "22683151622daebaa8c0646d09f7579e928ed2e631634414b86986b1d9413425"
+    },
+    "transfer": {
+      "record_count": 30,
+      "records_root_sha256": "8a9b4bb56e2f90983c77b5aefffe468e6bba42dfd3d37c0db5262abea460c747"
+    }
+  },
+  "scientific_card_or_result_edit": false,
+  "new_generator": 0,
+  "new_critic": 0,
+  "new_main": 0,
+  "new_preview": 0,
+  "original_refusals": "Preserved in both actual native captures and first_pass flags; no claim of error-free whole episode."
+}

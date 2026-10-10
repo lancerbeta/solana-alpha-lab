@@ -1,0 +1,27 @@
+{
+  "status": "PASS_FOCUSED_FINAL_IMPLEMENTATION_CONSUMERS",
+  "execution_head": "3ba655608098f6b1bb086f90037ac64bb092db27",
+  "checks": [
+    {
+      "scope": "scope/source-precision/ratio/capture plus existing temporal boundary",
+      "tests": 20,
+      "status": "PASS",
+      "review": "independent code-range-delta.md confirms exact committed inputs and actual full executor positive/negative underflow refusal, true zero/min-subnormal/normal COHERENT"
+    },
+    {
+      "scope": "saved-result revision without new MAIN on clean committed implementation",
+      "tests": 1,
+      "elapsed_s": 66.806,
+      "status": "PASS"
+    },
+    {
+      "scope": "Git/context/list-scope/PIT/missingness/budget/refusal direct consumers",
+      "tests": 8,
+      "elapsed_s": 0.644,
+      "status": "PASS"
+    }
+  ],
+  "local_full_gate": "NOT_RUN_BEFORE_PR_PROJECT_BOUND_GUARDED_MERGE_IS_SOLE_EXECUTOR",
+  "new_native_calls": 0,
+  "new_scientific_looks": 0
+}

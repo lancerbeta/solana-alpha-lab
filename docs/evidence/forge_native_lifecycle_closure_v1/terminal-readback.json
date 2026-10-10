@@ -1,0 +1,28 @@
+{
+  "session_id": "HFIC-SESS-2949E0B69BDF6189",
+  "session_state": "SYNTHESIS_COMPLETE",
+  "critic_terminal": "KILL_UNBOUND_EVIDENCE",
+  "final_session_terminal": "KILL_UNBOUND_EVIDENCE",
+  "selected_candidate_id": "HFIC-CAND-815D590CB33E",
+  "selected_definition_sha256": null,
+  "critic_input_packet_sha256": "ab940ca0d223e1558c7f93bddb5cbd4ef32759daff5e52fb77902e5486f7bf83",
+  "critic_result_sha256": "bea9d73c2a87737cb65b09755eae1edef4ef7a5727735cdc089c98216528f04b",
+  "decision_event_ids": [
+    "HFIC-DEC-HFIC-CAND-815D590CB33E-HFIC-SESS-2949E0B69BDF6189"
+  ],
+  "provenance_time_status": "VALID",
+  "identity_status": "BOUND",
+  "spent_main_looks": 1,
+  "spent_preview_looks": 0,
+  "spent_adaptive_looks": 0,
+  "store_inventory_digest": "879b16aade4199d51c9dc4537896a052f481d17a9d39fac6968370cd00e9b6e9",
+  "no_git_fence_receipt": {
+    "final_git_composite_sha256": "a13130ec4dc5ac1b581f3332bf610df7d09c8f3df9b6615dc1019b8660a45557",
+    "final_live_git_head": "838753ba29224a4b4cfc5298637b5a03aa4dc930",
+    "git_composite_unchanged": true,
+    "preflight_git_composite_sha256": "a13130ec4dc5ac1b581f3332bf610df7d09c8f3df9b6615dc1019b8660a45557",
+    "preflight_live_git_head": "838753ba29224a4b4cfc5298637b5a03aa4dc930",
+    "provider_calls_actual": 0
+  },
+  "terminal_receipt_sha256": "61480428066c0794aa52cb4869c4c71b202b56f32b15cfe59c37f5a9880a19b4"
+}

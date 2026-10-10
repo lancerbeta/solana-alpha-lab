@@ -1,0 +1,36 @@
+{
+  "status": "PASS_LITERAL_WINDOWS_POWERSHELL_READER",
+  "reader": "repo://tests/fixtures/forge_native_lifecycle_closure_v1/readback-reviewed-v2.ps1",
+  "reader_sha256": "b12e14e54ad28954af9f3e6716c2837cb289a7c2f64467c2dc6e5c2f52ff0b54",
+  "stdout_sha256": "e1807aedec708d468da988c6e4e457911d861cc44614ee9102dc9a389069d8ae",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "exit_code": 0,
+  "answers": [
+    {
+      "session_id": "HFIC-SESS-772AA79664D4C890",
+      "session_state": "SYNTHESIS_COMPLETE",
+      "critic_terminal": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+      "selected_candidate_id": "HFIC-CAND-738E0E758871",
+      "identity_status": "BOUND",
+      "provenance_time_status": "VALID",
+      "spent_main_looks": 1,
+      "spent_preview_looks": 0,
+      "spent_adaptive_looks": 0
+    },
+    {
+      "session_id": "HFIC-SESS-3ED5130357EC3D74",
+      "session_state": "SYNTHESIS_COMPLETE",
+      "critic_terminal": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+      "selected_candidate_id": "HFIC-CAND-9123918BD5A2",
+      "identity_status": "BOUND",
+      "provenance_time_status": "VALID",
+      "spent_main_looks": 1,
+      "spent_preview_looks": 0,
+      "spent_adaptive_looks": 0
+    }
+  ],
+  "writes": 0,
+  "new_looks": 0,
+  "execution_head": "3ba655608098f6b1bb086f90037ac64bb092db27",
+  "execution_composite": "ea9485a20bb42c495a98b88a4b5c700829735b93f3318c823b8d45841cb8fade"
+}

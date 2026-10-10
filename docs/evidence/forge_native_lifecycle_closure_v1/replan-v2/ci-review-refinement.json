@@ -1,0 +1,44 @@
+{
+  "status": "CORRECTED_AND_TARGETED_PASS",
+  "reviewed_candidate": "d7b2b0284b7ae0e3a0d538e66bd15060d81616e0",
+  "finding": "The first ordinary terminal-conflict fixture declared mark while its query tests liquidity retention>=0.5; early refusal before values made the test green despite unfaithful authored intent.",
+  "repair": "Only the first explanatory_condition is now retention; second mark scope and all original assertions unchanged.",
+  "corrective_head": "7b2e47b35b9eeffbecd750d431f8578e175f39d1",
+  "targeted_recheck": {
+    "group": "scope_condition",
+    "head": "7b2e47b35b9eeffbecd750d431f8578e175f39d1",
+    "tests": [
+      "tests.test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_search_terminal_conflict_refuses_before_values"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 15.618,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "b33b4b28d4cde2ddb7bc9e00f093a42b1577d9900de06d7a1fc1423da087edd5"
+  },
+  "executed_test_count": 1,
+  "runtime_bytes_unchanged_from_reviewed_candidate": true,
+  "native_applicability_evidence_reused": "Original exact3ba/native source calculations and current Fraction quantile implementation unchanged; no new native execution or silent result rebind.",
+  "prior_reports": [
+    {
+      "name": "initial-code-review.md",
+      "sha256": "b3e5e394f12fd82a0249c045212c943a1513467ab5704e16cd15fe6591411a55",
+      "verdict": "NOT_READY",
+      "retained_original": true
+    },
+    {
+      "name": "initial-architecture-review.md",
+      "sha256": "d443bb69dc36c990913811bc9531dc69d97a24c7ad3a1cb6fe45ab25d31e2361",
+      "verdict": "NOT_READY",
+      "retained_original": true
+    },
+    {
+      "name": "goal-final-delta.md",
+      "sha256": "1294351280fa27feb5d4a1fe3a0e54a8bad97438b36ddae2c4abfa6d28609d75",
+      "verdict": "SCOPED_NATIVE_APPLICABILITY_PASS_FINAL_DELIVERY_PENDING",
+      "retained_original": true
+    }
+  ],
+  "prior_report_home_ref": "{ARTIFACT_HOME}/ci-repair-v2-delivery-review",
+  "new_native_generator_critic_main": 0,
+  "remaining": "Final exact content required-role affected recheck, canonical evidence rebinding and fresh exact-head CI/readiness."
+}

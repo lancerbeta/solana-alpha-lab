@@ -1,0 +1,63 @@
+{
+  "status": "PASS",
+  "evaluation_git": "5969585b16f8de7ccc10b99ea94ac25e6749774e",
+  "tests": 9,
+  "elapsed_seconds": 356.803,
+  "groups": [
+    "saved public binding descriptor positive and missing-source negative (2)",
+    "OS reply loss moved-root original draft and charge",
+    "ordinary missing saved context locator",
+    "future poison invariant and authorized numeric sensitivity",
+    "normalized reader never reads future",
+    "preview and replay no second look",
+    "missing context exact recovery locator",
+    "finalize Git composite mismatch refusal"
+  ],
+  "baseline_before_patch": {
+    "transport_and_recovery_tests": 12,
+    "status": "PASS"
+  },
+  "initial_descriptor_red": {
+    "tests": 2,
+    "status": "EXPECTED_MISSING_SOURCE_MAP_FAILURE"
+  },
+  "static_factory": "PASS",
+  "local_full_gate": "NOT_RUN_REQUIRED_EXACT_HEAD_CI_CONSUMED_AT_GUARDED_MERGE",
+  "final_epoch": {
+    "head": "838753ba29224a4b4cfc5298637b5a03aa4dc930",
+    "checks": "4 compact changed-behavior regressions plus9 unchanged scope/row consumers",
+    "count": 13,
+    "status": "PASS",
+    "wall_seconds": 1.323
+  },
+  "candidate_ci": "NOT_RUN_AT_BUDGET_CHECKPOINT",
+  "post_native_review_delta": {
+    "status": "PASS",
+    "checks": 6,
+    "groups": [
+      "5 mode/descriptor tests including7 explicit malformed-mode subcases and actual ordinary ingress",
+      "1 actual capture-script timeout regression, partial bytes and reserved invocation name"
+    ],
+    "wall_seconds": 0.635,
+    "native_reexecution": false,
+    "initial_red": "Explicit None reproduced default-to-known bug; test context nesting corrected after first expected failure before all7 subcases were checked."
+  },
+  "post_review_direct_consumers": {
+    "tests": 9,
+    "status": "PASS",
+    "wall_seconds": 1.121,
+    "scope": "Existing ordinary scope isolation, same bytes not new look, production row recipes after malformed label guard."
+  },
+  "reader_anchor": {
+    "status": "PASS",
+    "scope": "EXACT_READER_EXPRESSION_REJECTS_SIMULATED_MATCHING_DRIFT_AND_REPINNED_LOCAL_JSON",
+    "actual_git_mutations": 0,
+    "native_model_calls": 0,
+    "scientific_looks": 0,
+    "refusal": "ORIGINAL_EXECUTION_ANCHOR_MISMATCH",
+    "original_head": "838753ba29224a4b4cfc5298637b5a03aa4dc930",
+    "original_composite": "a13130ec4dc5ac1b581f3332bf610df7d09c8f3df9b6615dc1019b8660a45557",
+    "positive_actual_reader": "PASS_ORIGINAL_SAVED_TERMINAL_1_0_0"
+  },
+  "setup_sync_failure": "One NAV_GENERATOR_FAILED after task bytes changed during async sync; final quiescent scoped sync idempotent PASS, no hash manual override."
+}

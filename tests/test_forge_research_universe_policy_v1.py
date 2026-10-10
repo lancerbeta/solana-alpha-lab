@@ -488,12 +488,12 @@ class UniversePolicyTests(unittest.TestCase):
             )
             self.assertNotEqual(grown.returncode, 0)
             grown_body = json.loads(grown.stdout)
-            self.assertEqual(grown_body["reason_code"], "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
+            self.assertEqual(grown_body["reason_code"], "GENERATION_SAVED_SOURCE_INADMISSIBLE")
+            self.assertEqual(grown_body["detail"]["source_error"], "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE")
+            self.assertEqual(grown_body["stage"], "REQUEST_ADMISSION_BEFORE_MAIN")
+            self.assertFalse(grown_body["values_loaded"])
             self.assertFalse(grown_body["writes"])
-            self.assertEqual(
-                grown_body["next_action"],
-                "RESTORE_PUBLISHED_PARTITION_BYTES_THEN_RETRY_DISCOVERY_EXECUTE",
-            )
+            self.assertEqual(grown_body["scientific_look_delta"], {"main": 0, "adaptive": 0})
             self.assertNotEqual(grown_body.get("scientific_look_delta", {}).get("main"), 1)
             grown_status = json.loads(run_cli("universe-policy-status", "--format", "json", data_root=grown_root).stdout)
             self.assertFalse(grown_status["pending_operation"])

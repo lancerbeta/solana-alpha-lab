@@ -1,0 +1,47 @@
+{
+  "status": "REPAIRED_TARGETED_TESTS_PASS_PENDING_FIXED_EPOCH_NATIVE_PAIR",
+  "reason": "Independent decimal source oracle found a boundary event omitted by binary ratio/subtraction before inclusive <=-20% evaluation. Native episode5 retained as development observation, excluded from final compatible pair. Correct scientific verdict is not the reason for rerun.",
+  "before_head": "17b680f638d5d0cba8bd965d79cef4d44416e8e1",
+  "before_session": "HFIC-SESS-E279BBFE788DA0BE",
+  "original_packet_canonical_sha256": "3f4bd6b4376d1e95cf0e87bf42eff84f91faeb3cb8ad7725876b37314baffeae",
+  "original_critic_raw_sha256": "4cfb68a9a1a4795f130ff3ac25fdbf3d8ad48bb964a2d4f29466253345cb598d",
+  "original_critic_terminal": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+  "saved_baseline_le_minus20": {
+    "events": 2,
+    "observed": 11,
+    "missing": 1
+  },
+  "independent_exact_source_oracle": {
+    "baseline_events": 3,
+    "observed": 11,
+    "missing": 1,
+    "matched_events": 0,
+    "matched_observed": 3,
+    "matched_missing": 1
+  },
+  "repair": "Standard-library Fraction over canonical decimal cell text; one final float rounding for fresh episode target/return_ratio only. Strict predicates unchanged, no epsilon. New EPISODES_V2 writer; V1 stays readable/current replay with original values/charges. Legacy BASE_X arithmetic unchanged.",
+  "targeted_validation": {
+    "status": "PASS",
+    "tests": 30,
+    "seconds": 1.229,
+    "groups": [
+      "Actual source-cell target projection with .8/1 and 8/10 inclusive threshold",
+      "Genuinely above threshold excluded without epsilon",
+      "Legacy arithmetic and old calculation labels preserved",
+      "Existing scope/mode/capture/UNKNOWN matrix",
+      "Existing downside arithmetic/support and production-row recipes"
+    ],
+    "initial_setup_error": "New legacy test omitted required schedule context; setup corrected without weakening guard."
+  },
+  "native_generator_total": 5,
+  "native_generator_ceiling": 8,
+  "native_critic_total": 2,
+  "native_critic_ceiling": 6,
+  "native_main_total": 5,
+  "native_preview_total": 3,
+  "native_adaptive_total": 0,
+  "remaining_generator": 3,
+  "next": "Freeze repaired code; same fixed source recipe/history and independent final primary/transfer. No desired question/terminal is supplied. Original trial/verdict/charges remain saved.",
+  "authority": "OWNER_LOCAL_REPLAN_V2_SECTIONS_5_7_8",
+  "scientific_gates_changed": false
+}

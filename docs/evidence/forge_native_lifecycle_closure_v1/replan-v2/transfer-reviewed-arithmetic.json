@@ -1,0 +1,147 @@
+{
+  "status": "PASS",
+  "oracle": "LITERAL_VERIFIED_CELLS_STANDARD_FRACTION_NO_PRODUCTION_FORMULA",
+  "query_sha256": "c3a519b8401a1727923135f817098117da5aa9cf090d40283588eabd281e1797",
+  "main_raw_sha256": "f31dce45b7b94565f5d4c29673d8e6428f018ed6dd5ddde5fc4d7d0a3e8dd05e",
+  "source_hashes": [
+    "68be0bf1100ef0430ae87a29978d157ba48322292979b0a566a0c6f8969c2a15",
+    "25f6128f54191eb13a997d5562c91e2bee8b979dd58ef8a0c2480f6ee1b4f1f3"
+  ],
+  "actual_expected": {
+    "population_n": 12,
+    "feature_unknown_n": 3,
+    "matched_n": 0,
+    "observed_target_n": 0,
+    "missing_target_n": 0,
+    "mean_target": null
+  },
+  "baseline_expected": {
+    "observed_n": 11,
+    "mean_target": 0.03636363636363636
+  },
+  "rows": [
+    {
+      "mint": "SynthLAVlct07x111111111111111111111111111111",
+      "features": {
+        "holder_prefix_expansion": "-80",
+        "price_prefix_fade": "0"
+      },
+      "joint_known": true,
+      "matched": false,
+      "target": "-1/10"
+    },
+    {
+      "mint": "SynthLAVlct12x111111111111111111111111111111",
+      "features": {
+        "holder_prefix_expansion": "-80",
+        "price_prefix_fade": "0"
+      },
+      "joint_known": true,
+      "matched": false,
+      "target": "-1/5"
+    },
+    {
+      "mint": "SynthLAVlct01x111111111111111111111111111111",
+      "features": {
+        "holder_prefix_expansion": "-80",
+        "price_prefix_fade": "0"
+      },
+      "joint_known": true,
+      "matched": false,
+      "target": "-3/10"
+    },
+    {
+      "mint": "SynthLAVlct08x111111111111111111111111111111",
+      "features": {
+        "holder_prefix_expansion": null,
+        "price_prefix_fade": "0"
+      },
+      "joint_known": false,
+      "matched": false,
+      "target": "1/2"
+    },
+    {
+      "mint": "SynthLAVlct06x111111111111111111111111111111",
+      "features": {
+        "holder_prefix_expansion": null,
+        "price_prefix_fade": "0"
+      },
+      "joint_known": false,
+      "matched": false,
+      "target": "2/5"
+    },
+    {
+      "mint": "SynthLAVlct03x111111111111111111111111111111",
+      "features": {
+        "holder_prefix_expansion": null,
+        "price_prefix_fade": "0"
+      },
+      "joint_known": false,
+      "matched": false,
+      "target": "-1/2"
+    },
+    {
+      "mint": "SynthLAVlct11x111111111111111111111111111111",
+      "features": {
+        "holder_prefix_expansion": "0",
+        "price_prefix_fade": "0"
+      },
+      "joint_known": true,
+      "matched": false,
+      "target": "0"
+    },
+    {
+      "mint": "SynthLAVlct10x111111111111111111111111111111",
+      "features": {
+        "holder_prefix_expansion": "80",
+        "price_prefix_fade": "0"
+      },
+      "joint_known": true,
+      "matched": false,
+      "target": null
+    },
+    {
+      "mint": "SynthLAVlct04x111111111111111111111111111111",
+      "features": {
+        "holder_prefix_expansion": "0",
+        "price_prefix_fade": "0"
+      },
+      "joint_known": true,
+      "matched": false,
+      "target": "0"
+    },
+    {
+      "mint": "SynthLAVlct09x111111111111111111111111111111",
+      "features": {
+        "holder_prefix_expansion": "80",
+        "price_prefix_fade": "0"
+      },
+      "joint_known": true,
+      "matched": false,
+      "target": "1/10"
+    },
+    {
+      "mint": "SynthLAVlct02x111111111111111111111111111111",
+      "features": {
+        "holder_prefix_expansion": "80",
+        "price_prefix_fade": "0"
+      },
+      "joint_known": true,
+      "matched": false,
+      "target": "3/10"
+    },
+    {
+      "mint": "SynthLAVlct05x111111111111111111111111111111",
+      "features": {
+        "holder_prefix_expansion": "80",
+        "price_prefix_fade": "0"
+      },
+      "joint_known": true,
+      "matched": false,
+      "target": "1/5"
+    }
+  ],
+  "new_scientific_looks": 0,
+  "native_input": false,
+  "missing_is_not_zero": true
+}

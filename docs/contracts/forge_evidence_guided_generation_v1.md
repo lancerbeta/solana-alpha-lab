@@ -99,12 +99,48 @@ returned by research-scope-resolve. MAIN=1 requires an explicit valid spec.
 LIMITED_RESULT stops after the admitted bounded result; it does not claim a
 scientific terminal. Reuse the returned operation_sha256 for continuation.
 Changing code, prompt or process does not refund exposure or mint a new slot.
-Use `preflight.evidence_surface_mode` in the independently authored candidate
-scope. The verified ingress may fill an omitted mode; a conflicting supplied
-mode is `LOOK_SCOPE_CONTRADICTION`. Population is not a substitute for mode.
+For ordinary discovery, the saved look publishes `candidate_scope.evidence_surface_mode`.
+The ordinary scope owner fills an omitted route label with its existing
+`ORDINARY_GROUNDED_DISCOVERY_V1`; copy that emitted binding before persist.
+An explicit malformed mode refuses. `LOOK_SCOPE_CONTRADICTION` enforces an
+authoritative mode only where verified ingress publishes it; ordinary preflight
+does not publish mode and retains legacy explicit labels. Population is not a
+substitute for mode, and this repair grants no control-route authority.
 No guessed hashes, new cycle, parent link or representation fields are needed
 for an ordinary BASE request. Legacy, additional-cycle and representation
 routes retain their existing stricter contracts.
+
+Before MAIN, write the already-authored meaning into the file supplied via
+`discovery-execute --candidate-scope scope.json`. At minimum its authorial fields
+are `estimand` and `explanatory_condition`; population, decision and target must
+agree with the canonical query. Example shape (placeholders, no scientific grant):
+
+```json
+{
+  "estimand": "<fixed comparison authored before values>",
+  "explanatory_condition": "<fixed observable condition authored before values>"
+}
+```
+
+The operation spec alone does not supply these authored meanings. Copying them
+only into a card after MAIN does not bind that saved look; an existing empty-scope
+look stays blocked. Do not retrofit the stored MAIN or consume another look.
+V2 runtime now enforces fresh request completeness before MAIN; historical
+empty-scope looks remain unchanged and are never rebound.
+
+For a selected candidate bound to a saved look, use the public
+`candidate_authoring_contract.saved_look_bindings` source map. Paths are relative
+to the `discovery-execute` response. Copy `candidate_scope` axes and available
+`descriptive_readout.scientific_identity` labels to candidate top level;
+the scope statement/hash and representation are conditional on the saved look.
+Missing identity is unavailable, never reconstructed from result values.
+Question, estimand and condition remain the ones fixed before MAIN. This copies
+machine bindings; it does not author or improve the scientific claim.
+Before persist, read the current authoring contract and keep every consulted
+material prior in `prior_work_refs`. After persist, refresh preflight for the same
+focus and freeze the original draft. A restart reads saved state and continues
+the same draft/packet/result before any new model or value invocation.
+
 
 ## Consumer and recovery boundaries
 
@@ -130,3 +166,25 @@ session and accounting owners, with no repeated generation or new look.
 Evidence and verdicts live in docs/evidence/forge_evidence_guided_generation_v1.
 Synthetic implementation, safety, formulation, comparison and delivery are
 separate axes. Market alpha, chronology and live economics are NOT_EVALUATED.
+
+## V2 ordinary request admission and incomplete historical context
+
+For a new ordinary temporal MAIN, `--candidate-scope` needs only the already
+authored `estimand` and `explanatory_condition` (optional supported representation
+scope stays explicit). The existing validator derives population, decision,
+target, list-rule hash/statement and ordinary route mode from the validated
+query. Explicit conflicting machine fields refuse; omitted mode is distinct
+from null, unknown enum and conflicting route. The execute boundary validates
+before operation creation/reservation/value loading and repeats the shared
+scope validator in the actual executor. Full-archive source/ledger guards
+still run. A refusal reports current vs prior stage, missing/conflicting
+fields, provenance and zero new effects. No old saved look is rebound.
+
+Incomplete historical context remains UNKNOWN with its exact source refs;
+no novelty or scope difference is inferred. No block established by the
+full-scope guards is not proof of distinction. Such context alone is not a
+global veto of an independent grounded claim. Critic still checks whether
+the current claim relies on the missing fact, claims unsupported novelty,
+or has an actually applicable close. Exact close, potentially applicable
+near-close, scientific quality and current binding defects remain blocking.
+The V2 matrix applies to new decisions; old packets/verdicts keep their epoch.

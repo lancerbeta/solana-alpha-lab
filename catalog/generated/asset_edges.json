@@ -3398,6 +3398,11 @@
       "target_asset_id": "TEST-FORGE-INPUT-TRUTH-AND-VISIBILITY-001"
     },
     {
+      "source_asset_id": "CTRL-FORGE-NATIVE-LIFECYCLE-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FORGE-EVIDENCE-GUIDED-GENERATION-001"
+    },
+    {
       "source_asset_id": "CTRL-FORGE-REPRESENTATION-LADDER-001",
       "relation": "contains",
       "target_asset_id": "CONFIG-HFIC-REPRESENTATION-LADDER-001"
@@ -6068,6 +6073,16 @@
       "target_asset_id": "MODULE-NORMALIZED-TRAJECTORY-EPISODES-V1-001"
     },
     {
+      "source_asset_id": "DOC-FORGE-NATIVE-LIFECYCLE-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FORGE-EVIDENCE-GUIDED-GENERATION-001"
+    },
+    {
+      "source_asset_id": "DOC-FORGE-NATIVE-LIFECYCLE-READOUT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-NATIVE-LIFECYCLE-CLOSURE-001"
+    },
+    {
       "source_asset_id": "DOC-FORGE-RESEARCH-POLICY-RUNTIME-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-HFIC-PREFLIGHT-ADMISSION-001"
@@ -6406,6 +6421,16 @@
       "source_asset_id": "ENV-WORKSTATION-001",
       "relation": "produces",
       "target_asset_id": "SCM-BASELINE-COMMIT-001"
+    },
+    {
+      "source_asset_id": "EVID-FORGE-NATIVE-LIFECYCLE-CHECKPOINT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-NATIVE-LIFECYCLE-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "EVID-FORGE-NATIVE-LIFECYCLE-V2-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-NATIVE-LIFECYCLE-CLOSURE-001"
     },
     {
       "source_asset_id": "EVIDENCE-ATOM3A-RECEIPT-001",
@@ -16925,6 +16950,11 @@
     {
       "source_asset_id": "SKILL-HYPOTHESIS-FORGE-001",
       "relation": "depends_on",
+      "target_asset_id": "DOC-FORGE-NATIVE-LIFECYCLE-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "SKILL-HYPOTHESIS-FORGE-001",
+      "relation": "depends_on",
       "target_asset_id": "DOC-HFIC-SCIENTIFIC-DISPOSITION-CONTINUITY-001"
     },
     {
@@ -17466,6 +17496,11 @@
       "source_asset_id": "TEST-FORGE-INPUT-TRUTH-AND-VISIBILITY-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001"
+    },
+    {
+      "source_asset_id": "TEST-FORGE-NATIVE-LIFECYCLE-CLOSURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-FORGE-NATIVE-LIFECYCLE-CLOSURE-001"
     },
     {
       "source_asset_id": "TEST-FORGE-REPRESENTATION-LADDER-001",

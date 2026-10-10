@@ -1,0 +1,147 @@
+{
+  "status": "PASS",
+  "oracle": "LITERAL_VERIFIED_CELLS_STANDARD_FRACTION_NO_PRODUCTION_FORMULA",
+  "query_sha256": "654a2efe199e998517e3062c037feb3478e6d920a960db1e186029bfdba31944",
+  "main_raw_sha256": "4857ab4e9967c307691e0c8143f68970b8c8d33961a8527df5d8c4ac4c310069",
+  "source_hashes": [
+    "b85dc4b066d0e6f98c76866f13dc0733c69b3d42b2e07c62cf4647d83df20078",
+    "b3a3dd52df4e2c2a07c6c5ab4e3e6bae933893f7a63136916dff746da65bea32"
+  ],
+  "actual_expected": {
+    "population_n": 12,
+    "feature_unknown_n": 3,
+    "matched_n": 4,
+    "observed_target_n": 3,
+    "missing_target_n": 1,
+    "mean_target": 0.2
+  },
+  "baseline_expected": {
+    "observed_n": 11,
+    "mean_target": 0.03636363636363636
+  },
+  "rows": [
+    {
+      "mint": "SynthLAVlcp11x111111111111111111111111111111",
+      "features": {
+        "holder_early_gain": "20",
+        "holder_continuing_gain": "20"
+      },
+      "joint_known": true,
+      "matched": true,
+      "target": null
+    },
+    {
+      "mint": "SynthLAVlcp04x111111111111111111111111111111",
+      "features": {
+        "holder_early_gain": "-20",
+        "holder_continuing_gain": "-20"
+      },
+      "joint_known": true,
+      "matched": false,
+      "target": "-1/5"
+    },
+    {
+      "mint": "SynthLAVlcp03x111111111111111111111111111111",
+      "features": {
+        "holder_early_gain": "20",
+        "holder_continuing_gain": "20"
+      },
+      "joint_known": true,
+      "matched": true,
+      "target": "3/10"
+    },
+    {
+      "mint": "SynthLAVlcp01x111111111111111111111111111111",
+      "features": {
+        "holder_early_gain": "20",
+        "holder_continuing_gain": "20"
+      },
+      "joint_known": true,
+      "matched": true,
+      "target": "1/5"
+    },
+    {
+      "mint": "SynthLAVlcp07x111111111111111111111111111111",
+      "features": {
+        "holder_early_gain": "0",
+        "holder_continuing_gain": "0"
+      },
+      "joint_known": true,
+      "matched": false,
+      "target": "0"
+    },
+    {
+      "mint": "SynthLAVlcp12x111111111111111111111111111111",
+      "features": {
+        "holder_early_gain": null,
+        "holder_continuing_gain": "20"
+      },
+      "joint_known": false,
+      "matched": false,
+      "target": "2/5"
+    },
+    {
+      "mint": "SynthLAVlcp10x111111111111111111111111111111",
+      "features": {
+        "holder_early_gain": null,
+        "holder_continuing_gain": "20"
+      },
+      "joint_known": false,
+      "matched": false,
+      "target": "-1/2"
+    },
+    {
+      "mint": "SynthLAVlcp02x111111111111111111111111111111",
+      "features": {
+        "holder_early_gain": "20",
+        "holder_continuing_gain": "20"
+      },
+      "joint_known": true,
+      "matched": true,
+      "target": "1/10"
+    },
+    {
+      "mint": "SynthLAVlcp05x111111111111111111111111111111",
+      "features": {
+        "holder_early_gain": "-20",
+        "holder_continuing_gain": "-20"
+      },
+      "joint_known": true,
+      "matched": false,
+      "target": "-1/10"
+    },
+    {
+      "mint": "SynthLAVlcp09x111111111111111111111111111111",
+      "features": {
+        "holder_early_gain": null,
+        "holder_continuing_gain": "20"
+      },
+      "joint_known": false,
+      "matched": false,
+      "target": "1/2"
+    },
+    {
+      "mint": "SynthLAVlcp08x111111111111111111111111111111",
+      "features": {
+        "holder_early_gain": "0",
+        "holder_continuing_gain": "0"
+      },
+      "joint_known": true,
+      "matched": false,
+      "target": "0"
+    },
+    {
+      "mint": "SynthLAVlcp06x111111111111111111111111111111",
+      "features": {
+        "holder_early_gain": "-20",
+        "holder_continuing_gain": "-20"
+      },
+      "joint_known": true,
+      "matched": false,
+      "target": "-3/10"
+    }
+  ],
+  "new_scientific_looks": 0,
+  "native_input": false,
+  "missing_is_not_zero": true
+}

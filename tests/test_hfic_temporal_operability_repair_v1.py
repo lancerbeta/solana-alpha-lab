@@ -1030,7 +1030,7 @@ class AcceptanceVerticalADataPathTests(unittest.TestCase):
                 spec=snapshot_spec,
                 binding=cohort_binding,
                 journal_scope=journal,
-                candidate_scope={"schema": "test", "target": snapshot_spec["target"]},
+                candidate_scope={"estimand": "price_relative_proxy", "explanatory_condition": "mark"},
                 git_sha=git.head_sha,
 
                 **_ordinary_gate(store, journal),
@@ -1404,7 +1404,7 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                     spec=spec,
                     binding=binding,
                     journal_scope=journal,
-                    candidate_scope={"schema": "test", "target": spec["target"]},
+                    candidate_scope={"estimand": "price_relative_proxy", "explanatory_condition": "mark"},
                     git_sha=git.head_sha,
 
                     **_ordinary_gate(store, journal),
@@ -1533,7 +1533,7 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                 spec=third,
                 binding=binding,
                 journal_scope=journal,
-                candidate_scope={"schema": "test", "target": third["target"]},
+                candidate_scope={"estimand": "price_relative_proxy", "explanatory_condition": "mark"},
                 git_sha=git.head_sha,
 
                 **_ordinary_gate(store, journal),
@@ -1700,7 +1700,7 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                     spec=spec,
                     binding=binding,
                     journal_scope=journal,
-                    candidate_scope={"schema": "test", "target": spec["target"]},
+                    candidate_scope={"estimand": "price_relative_proxy", "explanatory_condition": "mark"},
                     git_sha=git.head_sha,
 
                     **_ordinary_gate(store, journal),
@@ -1814,7 +1814,7 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                 spec=third,
                 binding=binding,
                 journal_scope=journal,
-                candidate_scope={"schema": "test", "target": third["target"]},
+                candidate_scope={"estimand": "price_relative_proxy", "explanatory_condition": "mark"},
                 git_sha=git.head_sha,
 
                 **_ordinary_gate(store, journal),
@@ -1999,7 +1999,7 @@ class AcceptanceVerticalBContinuationTests(unittest.TestCase):
                 spec=third,
                 binding=binding,
                 journal_scope=journal,
-                candidate_scope={"schema": "test", "target": third["target"]},
+                candidate_scope={"estimand": "price_relative_proxy", "explanatory_condition": "mark"},
                 git_sha=git.head_sha,
 
                 **_ordinary_gate(store, journal),
@@ -2356,7 +2356,7 @@ class MetadataStopAndPostCloseReadbackTests(unittest.TestCase):
                     spec=spec,
                     binding=binding,
                     journal_scope=journal,
-                    candidate_scope={"schema": "test", "target": spec["target"]},
+                    candidate_scope={"estimand": "price_relative_proxy", "explanatory_condition": "mark"},
                     git_sha=git.head_sha,
 
                     **_ordinary_gate(store, journal),
@@ -2478,7 +2478,7 @@ class MetadataStopAndPostCloseReadbackTests(unittest.TestCase):
                 spec=third,
                 binding=binding,
                 journal_scope=journal,
-                candidate_scope={"schema": "test", "target": third["target"]},
+                candidate_scope={"estimand": "price_relative_proxy", "explanatory_condition": "mark"},
                 git_sha=git.head_sha,
 
                 **_ordinary_gate(store, journal),
@@ -3653,10 +3653,7 @@ class OwnerDataScenarioTechnicalAndScientificTests(unittest.TestCase):
                 spec=_spec_snapshot(query_id="owner-data-tech"),
                 binding=_binding_mixed(),
                 journal_scope=journal,
-                candidate_scope={
-                    "schema": "test",
-                    "target": _spec_snapshot()["target"],
-                },
+                candidate_scope={"estimand": "price_relative_proxy", "explanatory_condition": "mark"},
                 git_sha=git.head_sha,
 
                 **_ordinary_gate(store, journal),

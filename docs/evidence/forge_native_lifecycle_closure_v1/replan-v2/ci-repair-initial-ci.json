@@ -1,0 +1,114 @@
+{
+  "run_id": 38013825076,
+  "pr_number": 392,
+  "head": "5937d090991bb05c5b635e8b23b266c2d4a7d5b3",
+  "verdict": "FAIL",
+  "failed_test_count": 20,
+  "failure_shards": [
+    {
+      "shard": 1,
+      "raw_job_log_sha256": "71f99dc04418c1d9e02dedaf75030e3d20b84f9ea805c415bf4f848e8c23cbd4",
+      "failures": [
+        {
+          "kind": "ERROR",
+          "test": "test_revision_requires_new_assessment_then_successor_is_current (test_hfic_scientific_disposition_continuity_v1.V3CalculationRevisionTests.test_revision_requires_new_assessment_then_successor_is_current)"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_producer_to_ordinary_forge_to_cold_replay (test_opportunity_episodes_vertical_v1.ThreeProcessVerticalTests.test_producer_to_ordinary_forge_to_cold_replay)"
+        }
+      ]
+    },
+    {
+      "shard": 2,
+      "raw_job_log_sha256": "867121c6ed6c49147d51f96737fe062758b3d3ce7dd3fa25cc9add28e25d18f4",
+      "failures": [
+        {
+          "kind": "ERROR",
+          "test": "test_new_and_legacy_published_bytes_match_journal_and_consumer (test_hfic_temporal_operability_repair_v1.AcceptanceVerticalADataPathTests.test_new_and_legacy_published_bytes_match_journal_and_consumer)"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_completed_parent_third_look_new_terminal_and_close (test_hfic_temporal_operability_repair_v1.AcceptanceVerticalBContinuationTests.test_completed_parent_third_look_new_terminal_and_close)"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_selected_repair_with_new_execution_binding_finalize_and_replay (test_hfic_temporal_operability_repair_v1.AcceptanceVerticalBContinuationTests.test_selected_repair_with_new_execution_binding_finalize_and_replay)"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_post_close_forge_run_prefers_repair_terminal_over_parent (test_hfic_temporal_operability_repair_v1.MetadataStopAndPostCloseReadbackTests.test_post_close_forge_run_prefers_repair_terminal_over_parent)"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_technical_stop_journal_blocks_scientific_exhaustion_readout (test_hfic_temporal_operability_repair_v1.OwnerDataScenarioTechnicalAndScientificTests.test_technical_stop_journal_blocks_scientific_exhaustion_readout)"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_public_owner_path_filters_and_keeps_the_first_binding (test_forge_research_universe_policy_v1.UniversePolicyTests.test_public_owner_path_filters_and_keeps_the_first_binding)"
+        }
+      ]
+    },
+    {
+      "shard": 4,
+      "raw_job_log_sha256": "cade27838d743675d17b7171d5fd2268fa668dd422d834e63fa02b88e466d2e7",
+      "failures": [
+        {
+          "kind": "FAIL",
+          "test": "test_published_binding_reaches_freeze_and_fixed_time_consumer (test_hfic_temporal_owner_path_v1.TemporalOwnerPathTests.test_published_binding_reaches_freeze_and_fixed_time_consumer)"
+        }
+      ]
+    },
+    {
+      "shard": 5,
+      "raw_job_log_sha256": "91edae675aed8531067f7affebd2e5c7065f0c349687fbc96de288b9c3cf4a39",
+      "failures": [
+        {
+          "kind": "ERROR",
+          "test": "test_capability_drift_freeze_is_store_disposition_not_parent_terminal (test_hfic_legacy_parent_continuation_compat_v1.LegacyParentContinuationCompatTests.test_capability_drift_freeze_is_store_disposition_not_parent_terminal)"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_cli_capability_drift_freeze_close_and_readback (test_hfic_legacy_parent_continuation_compat_v1.LegacyParentContinuationCompatTests.test_cli_capability_drift_freeze_close_and_readback)"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_close_crash_retries_without_a_new_look (test_hfic_legacy_parent_continuation_compat_v1.LegacyParentContinuationCompatTests.test_close_crash_retries_without_a_new_look)"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_draft_plan_apply_and_close_before_execution_writes_nothing (test_hfic_legacy_parent_continuation_compat_v1.LegacyParentContinuationCompatTests.test_draft_plan_apply_and_close_before_execution_writes_nothing)"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_foreign_binding_conflict_and_exhausted_budget_are_refused (test_hfic_legacy_parent_continuation_compat_v1.LegacyParentContinuationCompatTests.test_foreign_binding_conflict_and_exhausted_budget_are_refused)"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_no_worthy_close_readback_budget_and_replay (test_hfic_legacy_parent_continuation_compat_v1.LegacyParentContinuationCompatTests.test_no_worthy_close_readback_budget_and_replay)"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_ordinary_no_worthy_readback_after_reopen (test_hfic_legacy_parent_continuation_compat_v1.LegacyParentContinuationCompatTests.test_ordinary_no_worthy_readback_after_reopen)"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_ordinary_runner_up_readback_after_reopen (test_hfic_legacy_parent_continuation_compat_v1.LegacyParentContinuationCompatTests.test_ordinary_runner_up_readback_after_reopen)"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_runner_up_pass_readback_uses_pinned_binding (test_hfic_legacy_parent_continuation_compat_v1.LegacyParentContinuationCompatTests.test_runner_up_pass_readback_uses_pinned_binding)"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_closed_repair_without_operation_artifact_still_reads (test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_closed_repair_without_operation_artifact_still_reads)"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_search_terminal_conflict_refuses_before_values (test_hfic_ordinary_operation_v1.OrdinaryOperationTests.test_search_terminal_conflict_refuses_before_values)"
+        }
+      ]
+    }
+  ],
+  "next": "Fresh exact-head CI required; initial failure retained, never regraded."
+}

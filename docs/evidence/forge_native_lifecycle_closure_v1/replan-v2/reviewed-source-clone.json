@@ -1,0 +1,33 @@
+{
+  "status": "PREPARED_SAME_RECIPE_AND_FULL_HISTORY_AFTER_MATERIAL_REPAIR",
+  "head": "3ba655608098f6b1bb086f90037ac64bb092db27",
+  "sources": [
+    {
+      "case": "primary",
+      "source_origin": "sources-replan-v2-final/primary",
+      "target_origin": "sources-replan-v2-reviewed/primary",
+      "unchanged_source_sha256": {
+        "census": "b85dc4b066d0e6f98c76866f13dc0733c69b3d42b2e07c62cf4647d83df20078",
+        "observations": "b3a3dd52df4e2c2a07c6c5ab4e3e6bae933893f7a63136916dff746da65bea32"
+      },
+      "history": "QUIESCENT_FULL_COPY_INCLUDING_ORIGINAL_CURRENT_SAVED_TRIAL_RECORDS_AND_PRIOR_HISTORY",
+      "new_scientific_looks": 0,
+      "original_packet_raw_sha256": "79cbe97784fe90436bb1cbe5a25ba5a6568a5b607754893c90cc0419013b86c6"
+    },
+    {
+      "case": "transfer",
+      "source_origin": "sources-replan-v2-final/transfer",
+      "target_origin": "sources-replan-v2-reviewed/transfer",
+      "unchanged_source_sha256": {
+        "census": "68be0bf1100ef0430ae87a29978d157ba48322292979b0a566a0c6f8969c2a15",
+        "observations": "25f6128f54191eb13a997d5562c91e2bee8b979dd58ef8a0c2480f6ee1b4f1f3"
+      },
+      "history": "QUIESCENT_FULL_COPY_INCLUDING_ORIGINAL_CURRENT_SAVED_TRIAL_RECORDS_AND_PRIOR_HISTORY",
+      "new_scientific_looks": 0,
+      "original_packet_raw_sha256": "db015a907e26a369301825fb9d0ec782517a291c1d5557983c0616b1fb4f4755"
+    }
+  ],
+  "model_calls": 0,
+  "new_scientific_looks": 0,
+  "native_input_proof": "EXECUTOR_ONLY_NOT_FOR_GENERATORS"
+}
