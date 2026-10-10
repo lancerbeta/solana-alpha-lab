@@ -226,6 +226,38 @@ s.close()
 
 
 class GuardBoundaryTests(unittest.TestCase):
+    def test_native_classifier_terminals_reach_fresh_persisted_consumer(self):
+        from tests.test_hfic_classification_outcome_integrity_v1 import (
+            _freeze_bound, _awaiting_store, _fast_lane_packet, FORWARD_LABEL,
+        )
+        from solana_alpha_lab.factory.hfic_session import apply_classification, show_session
+        from solana_alpha_lab.factory.research_store import ResearchStore
+        for kind, expected in (("ready", "FAST_LANE_READY"),
+                               ("change", "CHANGE_LANE_CAPABILITY_GAP"),
+                               ("data", "BLOCKED_DATA")):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as tmp:
+                plane = Path(tmp)
+                frozen = _freeze_bound(plane, "HFIC-V12-C1-PIT-LIQUIDITY-RATIO", FORWARD_LABEL)
+                store = _awaiting_store(plane, frozen)
+                packet = _fast_lane_packet(frozen)
+                if kind == "change":
+                    packet["experiment_spec"]["capability_id"] = "CAP-FTC-UNREGISTERED-001"
+                    packet["experiment_spec"]["capabilities"] = ["CAP-FTC-UNREGISTERED-001"]
+                elif kind == "data":
+                    packet["experiment_spec"]["data_bindings"] = [{
+                        "binding_id": "BINDING-FTC-MISSING-001", "source_kind": "DATASET_MANIFEST",
+                        "stable_id": "DATASET-MANIFEST-FTC-MISSING-001",
+                        "expected_content_sha256_or_dataset_fingerprint": "a" * 64,
+                    }]
+                else:
+                    packet["available_data_binding_ids"] = [b["binding_id"] for b in packet["experiment_spec"]["data_bindings"]]
+                done = apply_classification(frozen, packet, store=store, repo_root=ROOT, data_root=plane)
+                shown = show_session(ResearchStore(plane, create_if_missing=False), frozen["session_id"], repo_root=ROOT)
+                self.assertNotEqual(shown["session_state"], "AWAITING_CLASSIFICATION")
+                self.assertEqual(shown["lane_classifier_terminal"], expected)
+                self.assertFalse(any(str(r.record_kind) in {"RUN_STARTED", "RUN_COMPLETED"}
+                                     for r in ResearchStore(plane).iter_committed_records()))
+
     def test_replay_artifact_tamper_and_unowned_input_mount_are_rejected(self):
         entry = ROOT / "tests/fixtures/forge_trust_closure_v1/replay.py"
         with tempfile.TemporaryDirectory() as tmp:
