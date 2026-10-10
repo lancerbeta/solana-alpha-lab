@@ -55,10 +55,10 @@ external_caps:
   cash_spend: false
   deployment: false
 stop_conditions:
-- STOP_EXACT_HEAD_CI_AND_MACHINE_MERGE_READINESS_THEN_EXACT_OWNER_PHRASE
+- COMPLETE_EXACT_HEAD_CI_MACHINE_READINESS_OWNER_DELEGATED_PHRASE_GUARDED_MERGE_POST_READBACK
 - STOP_MATERIAL_PRODUCT_ESTIMAND_SCOPE_PIT_ADMISSION_OR_AUTHORITY_CHANGE
 - STOP_NEW_DEPENDENCY_FRAMEWORK_STORAGE_PROVIDER_LIVE_REAL_DATA_HOLDOUT_OR_MONEY
-- STOP_NATIVE_ENVELOPE_EXHAUSTED_OR_AUTHORITY_CONFLICT_WITH_RETAINED_DENOMINATOR
+- STOP_UNJUSTIFIED_NATIVE_EXTENSION_OR_AUTHORITY_CONFLICT_WITH_RETAINED_DENOMINATOR
 context_requirements:
   catalog_asset_ids: []
   l2_roles: [ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
@@ -99,8 +99,9 @@ UNCERTAINTY_REMOVED: interface discoverability vs setup drift vs reasoning;
 fresh-process durable terminal/replay and actual exposure accounting.
 CAPABILITY_OR_EVIDENCE: two native coherent saved outcomes on fixed primary
 and transfer sources plus regression/recovery; consumer Generator, Critic,
-next process and owner. STOP: machine-ready PR then exact owner phrase.
-NEXT: guarded merge and exact post-merge readback only after owner approval.
+next process and owner. STOP: exact-head CI/readiness, owner-delegated machine
+phrase, guarded merge and exact post-merge readback. NEXT: retained bounded
+acceptance evidence; no automatic scientific promotion or deployment.
 REPLAN_TRIGGER: repeated seam failure, impossible falsifier, required new
 science/representation/dependency, material semantic drift or budget breach.
 
@@ -116,8 +117,8 @@ No routine approval between them. Preserve original failures and looks.
 
 Budget current (V2 plus direct owner extension on2026-10-10): total
 Generator episodes <=10 including all old launches, unfinished episodes and
-continuations; currently8 consumed, two remaining for the repaired final pair.
-Native domain Critic total<=7, currently5 consumed; two remaining. Original
+continuations; currently10 consumed, repaired final pair complete.
+Native domain Critic total<=7, currently7 consumed; repaired pair complete. Original
 V2 baseline was8/6, original V1 costs4/1. No charges, failed attempts or unused
 revision slots are reset or added outside these ceilings. Proper old Critic
 verdicts stay immutable and are never rerolled. Per new question MAIN<=1,
@@ -288,3 +289,38 @@ V1/V2 saved readers/replay, and passes Python reader code via stdin. Original
 does not substitute for two new native confirmations of the material repair.
 Next: affected regression/review, freeze final code/source with prior history,
 new primary/transfer, recovery, delta reviews, ordinary PR/CI/readiness.
+
+
+Direct owner continuation authorization2026-10-10: complete a coherent useful
+outcome and green PR autonomously; if another proved repair consumes the bounded
+native allowance, choose and document a justified small extension based on its
+specific cause and credible completion path. Keep all old costs, original bytes,
+verdicts and scientific/authority gates; no unlimited speculative rerolls.
+Current planned ceiling remains10/7 until an actual justified extension is used.
+The owner explicitly authorized obtaining the exact machine merge phrase after
+passing exact-head CI/merge-readiness and substituting it without another human
+prompt. This supersedes this task's previous separate-response stop only. Use
+ordinary guarded-merge on that unchanged bound head, then exact post-merge main
+and CI readback. No gate/policy/settings modification or fabricated machine PASS.
+
+
+Repaired final epoch checkpoint — 2026-10-10:
+Both actual independently authored primary/transfer questions on3ba655608098f6b1bb086f90037ac64bb092db27
+(compositeea9485a20bb42c495a98b88a4b5c700829735b93f3318c823b8d45841cb8fade)
+are saved SYNTHESIS_COMPLETE/KILL_STATISTICALLY_UNIDENTIFIABLE. Each MAIN1,
+PREVIEW0, ADAPTIVE0; scientific query/card/freeze accepted on first submission
+without a scientific revision. Both initial metadata preflights refused stale
+write lookup on quiescent copied stores; existing deterministic preparation
+repaired derived path-bound metadata with unchanged sources/logical history and
+zero looks. Whole-episode first_pass=false is preserved; no error-free startup
+claim. Two new independent native questions are not old KILL rerolls.
+Current total Generator10/10, Critic7/7, native MAIN9/PREVIEW3/ADAPTIVE0;
+separate scripted MAIN5, recovery new looks0. No additional extension used.
+Actual native pre-finalize restart, committed reply loss, identical retry and
+conflict refusal PASS for both; one terminal, unchanged occupancy/history.
+Literal Windows reader and ordinary saved readback PASS: limited-result
+operation complete, no completion gap, search closed; owner cap remains0.
+Independent exact literal-source arithmetic and each prespecified ablation
+PASS. Final Q1-Q4 belongs to the canonical affected four-role review, with
+old NOT_READY and original2c pair retained. Finish exact-head delivery gates
+under the directly delegated machine phrase authorization above.

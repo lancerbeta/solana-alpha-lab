@@ -1,0 +1,101 @@
+{
+  "status": "PASS",
+  "scope": "RECOVERY_OF_ORIGINAL_NATIVE_ARTIFACTS_NO_NEW_SCIENTIFIC_INDEPENDENCE",
+  "session_id": "HFIC-SESS-772AA79664D4C890",
+  "critic_bytes_sha256": "328b0c8d229e4b20011431c52a44fce1133f0339498c8d937e1aab5efb251525",
+  "restart_before_finalize": true,
+  "lost_reply_exit": 73,
+  "lost_reply_stdout_bytes": 0,
+  "fresh_readback_state": "SYNTHESIS_COMPLETE",
+  "critic_terminal": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+  "terminal_decision_count": 1,
+  "identical_retry_state": "SYNTHESIS_COMPLETE",
+  "different_result_refusal": {
+    "reason": "SESSION_CONFLICT",
+    "channel": "STDERR"
+  },
+  "different_result_store_changes": 0,
+  "retry_added_records": 0,
+  "original_records_changed": 0,
+  "finalize_added_records": {
+    "HFIC-ART-CRITIC-RESULT-HFIC-SESS-772AA79664D4C890-76B7D87FC4E6": [
+      "RESEARCH_ARTIFACT",
+      "06171564f57b2fb33f13cebcec42138087463b95e006929268044ca7099bbb8d"
+    ],
+    "HFIC-ART-SESSION-RECEIPT-HFIC-SESS-772AA79664D4C890": [
+      "RESEARCH_ARTIFACT",
+      "6a05eaab03ca92b69fab62031c1e74bc0dac6925c44a270f64fab3630284c88c"
+    ],
+    "HFIC-CYCLE-HFIC-SESS-772AA79664D4C890-COMPLETE": [
+      "RESEARCH_CYCLE",
+      "3c87af3023821867fd9d66220b88b3d41fa9541fd9e3f781abe528492e7c2e14"
+    ],
+    "HFIC-DEC-HFIC-CAND-738E0E758871-HFIC-SESS-772AA79664D4C890": [
+      "DECISION_EVENT",
+      "d0c1bd149dbeb2c2a10510e15ce62f532ba8a04e63d1de30f04fd5dbc1cfa5d3"
+    ]
+  },
+  "occupancy_before": {
+    "772aa79664d4c89001f329782948693b0114bd8926ab6c6ddbeb8b1ba4bafc14": {
+      "adaptive": {
+        "completed": 0,
+        "deficit": 0,
+        "limit": 2,
+        "occupied": 0,
+        "pending": 0,
+        "remaining": 2
+      },
+      "main": {
+        "completed": 1,
+        "deficit": 0,
+        "limit": 6,
+        "occupied": 1,
+        "pending": 0,
+        "remaining": 5
+      },
+      "preview": {
+        "completed": 0,
+        "deficit": 0,
+        "limit": 2,
+        "occupied": 0,
+        "pending": 0,
+        "remaining": 2
+      }
+    }
+  },
+  "occupancy_after": {
+    "772aa79664d4c89001f329782948693b0114bd8926ab6c6ddbeb8b1ba4bafc14": {
+      "adaptive": {
+        "completed": 0,
+        "deficit": 0,
+        "limit": 2,
+        "occupied": 0,
+        "pending": 0,
+        "remaining": 2
+      },
+      "main": {
+        "completed": 1,
+        "deficit": 0,
+        "limit": 6,
+        "occupied": 1,
+        "pending": 0,
+        "remaining": 5
+      },
+      "preview": {
+        "completed": 0,
+        "deficit": 0,
+        "limit": 2,
+        "occupied": 0,
+        "pending": 0,
+        "remaining": 2
+      }
+    }
+  },
+  "new_generator": 0,
+  "new_critic": 0,
+  "new_main": 0,
+  "new_preview": 0,
+  "new_adaptive": 0,
+  "same_git_composite": "ea9485a20bb42c495a98b88a4b5c700829735b93f3318c823b8d45841cb8fade",
+  "clone_semantics": "SAME_SAVED_ARTIFACTS_RECOVERY_NOT_INDEPENDENT_SCIENCE"
+}

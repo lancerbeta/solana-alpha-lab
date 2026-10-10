@@ -4,7 +4,7 @@
   "acceptance_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1-V2-CANDIDATE",
   "as_of": "2026-10-10",
   "task_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1",
-  "state_change": "Deterministic final-review repair and owner-authorized10/7 extension; old substantive native pair retains epoch2c, new final native confirmation pending.",
+  "state_change": "Narrow ordinary scope/prior/source-precision repairs plus two actual independent native saved substantive terminals on one repaired3ba epoch; fresh recovery/readback, complete historical accounting and affected exact-bound review.",
   "base_main": "d2cd1fdf6fb10b5efc3e3b7f7b752bcee574f8dc",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
@@ -13,7 +13,7 @@
     "docs/tasks/FORGE_NATIVE_LIFECYCLE_CLOSURE_V1.md": "78b2b237a467ea0a61847918bad0b1f6915439e7c0acdc2970591ca1cedf854b"
   },
   "active_stop_conditions": [
-    "NEW_FINAL_NATIVE_PAIR_AND_AFFECTED_REVIEW_PENDING"
+    "AFFECTED_EXACT_BOUND_REVIEW_AND_MACHINE_DELIVERY_GATES_PENDING"
   ],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -37,9 +37,11 @@
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": [
-      "PASS_EXISTING_OWNER_TARGETED_TESTS",
-      "PASS_NATIVE_SOURCE_INDEPENDENT_RATIONAL_ORACLE",
-      "PASS_ACTUAL_NATIVE_RECOVERY_AND_NEGATIVE_GUARDS",
+      "PASS_FOCUSED_IMPLEMENTATION_CONSUMERS",
+      "PASS_BOTH_EXACT_SOURCE_AND_ABLATION_ORACLES",
+      "PASS_BOTH_ACTUAL_NATIVE_RECOVERY_REPLAY_CONFLICT",
+      "PASS_LITERAL_WINDOWS_FRESH_READER",
+      "PASS_ACTUAL_NEGATIVE_GUARDS",
       "PASS_ORIGINAL_HISTORY_PRESERVATION"
     ]
   },
@@ -51,12 +53,12 @@
   ],
   "side_effects": {
     "synthetic_stores_only": true,
-    "new_native_generator_episodes_v2": 4,
-    "new_native_critic_episodes_v2_including_binding_continuation": 4,
-    "native_total_main": 7,
+    "new_native_generator_episodes_v2": 6,
+    "new_native_critic_episodes_v2_including_binding_continuation": 6,
+    "native_total_main": 9,
     "native_total_preview": 3,
     "adaptive": 0,
-    "scripted_controls_main_separate": 4,
+    "scripted_controls_main_separate": 5,
     "recovery_new_looks": 0,
     "provider_live_deploy_money": 0
   },

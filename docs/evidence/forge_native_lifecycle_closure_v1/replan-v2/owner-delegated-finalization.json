@@ -1,0 +1,22 @@
+{
+  "status": "DIRECT_OWNER_DELEGATED_CONTINGENT_FINALIZATION",
+  "as_of": "2026-10-10",
+  "task_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1",
+  "authority_source": "DIRECT_HUMAN_USER_MESSAGE_DURING_ACTIVE_ATOM",
+  "owner_merge_authorization_original": "так или иначе доведешьт до зеленого PR, получишь мерж фразу и сам ее подставь не спрашивая меня, разрешаю",
+  "merge_conditions": [
+    "EXACT_HEAD_CI_SUCCESS",
+    "MACHINE_MERGE_READINESS_TRUE",
+    "EXACT_MACHINE_RENDERED_PHRASE_FOR_UNCHANGED_PR_HEAD",
+    "ONE_ORDINARY_GUARDED_MERGE",
+    "EXACT_POST_MERGE_MAIN_AND_CI_READBACK"
+  ],
+  "budget": "Planned10Generator/7Critic; justified small extensions after proved repairs may be chosen autonomously with preserved costs and evidence; no blanket unlimited reroll.",
+  "unchanged_boundaries": [
+    "ORIGINAL_DOD_Q1_Q4_TWO_COHERENT_NATIVE_PATHS",
+    "OLD_VERDICTS_RAW_BYTES_AND_CHARGES",
+    "SCIENTIFIC_AUTHORITY_PIT_PRIOR_AND_ACCOUNTING_GATES",
+    "NO_PROVIDER_DEPLOY_REAL_DATA_OR_MONEY",
+    "NO_GLOBAL_HARNESS_POLICY_OR_SETTINGS_CHANGE"
+  ]
+}

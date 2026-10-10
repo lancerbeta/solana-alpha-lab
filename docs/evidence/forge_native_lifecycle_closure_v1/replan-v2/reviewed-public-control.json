@@ -1,0 +1,20 @@
+{
+  "status": "PASS_EXISTING_PUBLIC_CONTROL_ON_REPAIRED_SNAPSHOT",
+  "execution_snapshot": {
+    "head_sha": "3ba655608098f6b1bb086f90037ac64bb092db27",
+    "symbolic_ref": "refs/heads/codex/forge-native-lifecycle-closure-v1",
+    "porcelain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "index_worktree_sha256": "96a296d224f285c67bee93c30f8a309157f0daa35dc5b87e410b78630a09cfc7",
+    "refs_digest_sha256": "ff4059d7fb223fc124750d9140eb42c07bdaea20cf5a9aa0cc228ee918603f33",
+    "composite_sha256": "ea9485a20bb42c495a98b88a4b5c700829735b93f3318c823b8d45841cb8fade"
+  },
+  "native_calls": 0,
+  "scripted_main": 1,
+  "scripted_preview": 0,
+  "scripted_adaptive": 0,
+  "actual_packet_canonical_sha256": "bb6cb784ab4bd8f39c0fe3d127fde7b9f6143d28c010cc023b2cf40bf6992c29",
+  "original_frozen_raw_sha256": "273abada77302819825aa89c8e063ab3aea49d9a80ee38daf1a58d1a43c8d0a0",
+  "fresh_calculation_version": "HFIC_TEMPORAL_DISCOVERY_CALC_EPISODES_V3",
+  "source_attestation": "reviewed-source-clone.json",
+  "acceptance": "SCRIPTED_EXCLUDED_FROM_NATIVE_DENOMINATOR"
+}

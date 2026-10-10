@@ -40868,7 +40868,7 @@ records:
     repository_path: docs/tasks/FORGE_NATIVE_LIFECYCLE_CLOSURE_V1.md
   integrity:
     kind: sha256
-    sha256: 5585cdf7e2d2477cb117c0a32900a8350dd3f2eafbabbd6cf211f1f4e9ca5844
+    sha256: b824f6e5bc071200198dde2ac28aa213d2eb3e2a2cf7d46dd16274af9bc57d2d
   access:
     mode: read_only
     method: file
@@ -41024,7 +41024,7 @@ records:
     repository_path: docs/evidence/forge_native_lifecycle_closure_v1/replan-v2/READOUT_V2.md
   integrity:
     kind: sha256
-    sha256: 3ebf61996b4204932ffe23468557a961224dd029f8e50ed4cdb22b8a8cbe44e2
+    sha256: 6af187e955f5fdfc706591d360cfd4f3ab7fa1f740a93672fd642d9673183eac
   access:
     mode: read_only
     method: file
@@ -41051,19 +41051,19 @@ records:
 - asset_id: EVID-FORGE-NATIVE-LIFECYCLE-V2-001
   record_version: '1.0'
   asset_type: evidence
-  purpose: Two saved substantive V2 native outcomes on one code epoch, exact original
-    artifacts, charged history and final independent quality gate.
+  purpose: Two saved substantive repaired-final native outcomes on epoch3ba6556, exact
+    original artifacts, immutable charged history and canonical independent quality gate.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-10-10'
   truth_owner: FORGE_NATIVE_LIFECYCLE_CLOSURE_V1
   location:
     kind: git_path
-    logical_uri: repo://docs/evidence/forge_native_lifecycle_closure_v1/replan-v2/final-native-outcomes.json
-    repository_path: docs/evidence/forge_native_lifecycle_closure_v1/replan-v2/final-native-outcomes.json
+    logical_uri: repo://docs/evidence/forge_native_lifecycle_closure_v1/replan-v2/reviewed-native-outcomes.json
+    repository_path: docs/evidence/forge_native_lifecycle_closure_v1/replan-v2/reviewed-native-outcomes.json
   integrity:
     kind: sha256
-    sha256: 2d35f8ca310727e78b16e749574f333821cf06cb529902ce28a701d1f9a13aed
+    sha256: 877ebc398430955d685a8f2fddfec37d887c67213c3646187970deb7f8acf919
   access:
     mode: read_only
     method: file

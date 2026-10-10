@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "oracle": "EXACT_LITERAL_CELL_VALUES_AND_PREDICATES_NOT_PRODUCTION_ABLATION_FORMULA",
+  "actual_main_sha256": "f31dce45b7b94565f5d4c29673d8e6428f018ed6dd5ddde5fc4d7d0a3e8dd05e",
+  "actual_query_sha256": "c3a519b8401a1727923135f817098117da5aa9cf090d40283588eabd281e1797",
+  "checks": [
+    {
+      "dropped_feature": "holder_prefix_expansion",
+      "eligible_n": 0,
+      "observed_n": 0,
+      "missing_n": 0,
+      "mean_target": null,
+      "le_minus_20_n": 0,
+      "le_minus_50_n": 0
+    },
+    {
+      "dropped_feature": "price_prefix_fade",
+      "eligible_n": 4,
+      "observed_n": 3,
+      "missing_n": 1,
+      "mean_target": 0.2,
+      "le_minus_20_n": 0,
+      "le_minus_50_n": 0
+    }
+  ],
+  "new_scientific_looks": 0,
+  "native_input": false
+}

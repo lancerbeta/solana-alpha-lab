@@ -1,0 +1,38 @@
+{
+  "status": "PASS_BOTH_ORDINARY_SAVED_OPERATIONS_COMPLETE",
+  "writes": 0,
+  "new_looks": 0,
+  "cases": {
+    "primary": {
+      "original_readback_sha256": "fdf584422e20d0b276eda8a59fd2e7ffc565ae865e0096397db523677883e18f",
+      "owner_final": "NON_SCIENTIFIC_STOP",
+      "completed": {
+        "look": true,
+        "operation": true,
+        "scientific_search": false
+      },
+      "completion_gap": null,
+      "ordinary_state": "PAUSED_CAP",
+      "next_action": "READ_SAVED_RESULT",
+      "owner_main_remaining": 0,
+      "operation_sha256": "82693aa3e33d611c5d3476bea0b2d7ad748483dd755bc0a9748a66d0b07faaef",
+      "claim_boundary": "PRICE_RELATIVE_PROXY is not net return; cohorts are not independent replications"
+    },
+    "transfer": {
+      "original_readback_sha256": "f4c5baae21ac8a24a4f698f79fd088d1483e3b56b415b785f2069f9ec919d789",
+      "owner_final": "NON_SCIENTIFIC_STOP",
+      "completed": {
+        "look": true,
+        "operation": true,
+        "scientific_search": false
+      },
+      "completion_gap": null,
+      "ordinary_state": "PAUSED_CAP",
+      "next_action": "READ_SAVED_RESULT",
+      "owner_main_remaining": 0,
+      "operation_sha256": "5ad4b4696598eaa3cda8699b0e85f65d313a7907d125691cbaaac3bfbd7b59ee",
+      "claim_boundary": "PRICE_RELATIVE_PROXY is not net return; cohorts are not independent replications"
+    }
+  },
+  "interpretation": "PAUSED_CAP describes exhausted owner MAIN allowance; saved limited-result operation is complete, search closed and completion_gap absent. Scientific disposition/family promotion is not inferred or written."
+}
