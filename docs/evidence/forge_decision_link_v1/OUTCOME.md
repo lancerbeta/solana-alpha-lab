@@ -197,3 +197,20 @@ child components3.082s/elapsed3.251s,180s child/600s parent envelope.
 Частичные timingsR01/R02 UNKNOWN; failures сохранены, единого успешного batch
 не объявлено. Raw receiptSHA237fbaaed4c4a770a0c524f2021ef8ae48f3ad56dc17a99a31fa2f51923f4f24.
 Fresh content inventory и четыре reviews повторяются после этой copy-only правки.
+
+## Whole read-command boundary
+
+Второй owner-UX review16fff800 — `NOT_READY`: существующий store открывался
+до try и обходил новый safe readout. Теперь весь discovery-show, включая
+non-creating root resolution/opening, обрабатывает existing typed errors;
+исходный error code сохранён. `BLOCKED_STORE_NOT_AVAILABLE` требует проверки
+исходного data-root или read-only проверки владельцем ResearchStore.
+Другие команды не изменены; storage/права/settings автоматически не меняются.
+
+owner-store-r04 проверил настоящие отсутствующий и non-directory data-root:
+exit2, `RESEARCH_STORE_NOT_PRESENT`, safe Russian next action, values/writes=0.
+Отсутствующий root остался отсутствующим; owned file-sentinel не изменился.
+Текущее успешное native cold чтение равно оригиналу,230 native файлов неизменны.
+Resource и точные hashes — `native-qualification.json`; нет нового science run.
+При найденном gap code/architecture v3 reviews прерваны до изменений;
+они не используются как PASS. Финальный candidate получает fresh четыре reviews.

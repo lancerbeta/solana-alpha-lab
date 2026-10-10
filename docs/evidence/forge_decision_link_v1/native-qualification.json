@@ -1010,7 +1010,7 @@
     "verifier_source_sha256": "d3bbbb5614356519ba8ad67c5a1fcb9e2cd415aa2f2450a61bf2eafef8a4bb35"
   },
   "resource_ledger": {
-    "named_retained_attempt_count": 22,
+    "named_retained_attempt_count": 23,
     "process_measurements": [
       {
         "run": "entry-b01",
@@ -1119,9 +1119,14 @@
         "reported_process_window_seconds": 3.081947800004855,
         "elapsed_window_seconds": 3.2508109000009426,
         "partial_r01_r02_process_measurements": "UNKNOWN; two failed helper attempts and four successful public outputs retained, not retroactively resource-qualified."
+      },
+      {
+        "run": "owner-store-r04",
+        "reported_process_window_seconds": 4.758069600004092,
+        "elapsed_window_seconds": 4.904792700002872
       }
     ],
-    "known_reported_process_window_component_sum_seconds": 2353.938967999996,
+    "known_reported_process_window_component_sum_seconds": 2358.6970376,
     "interpretation": "Non-overlapping named campaign measurement components; CLI invocation windows and whole unittest subprocess windows have different measured boundaries. Not CPU time or complete compute. S0 is historical separately, copied producer snapshot not counted twice.",
     "cpu_ram_preparation_model_cost": "UNKNOWN"
   },
@@ -1845,5 +1850,75 @@
     "prior_verdict": "NOT_READY",
     "severity": "MAJOR",
     "finding": "discovery-show source/input refusals provide a canonical error code but no safe Russian recovery action; operator cannot distinguish correctible input from integrity/unavailability requiring source-owner review."
+  },
+  "owner_store_refusal_qualification": {
+    "schema": "sal.forge-decision-link-store-refusal-copy",
+    "status": "PASS",
+    "problems": [],
+    "cases": [
+      {
+        "case": "absent-store",
+        "exit_code": 2,
+        "refusal_code": "RESEARCH_STORE_NOT_PRESENT",
+        "status": "BLOCKED_STORE_NOT_AVAILABLE",
+        "next_action": "VERIFY_EXISTING_DATA_ROOT_OR_REQUEST_SOURCE_OWNER_REVIEW",
+        "subprocess_wall_seconds": 1.4286377000025823,
+        "stdout_sha256": "612b09fad394a94ff515b6a55ec06fefba2d9c5e17f5a67ed7508dd30a726a1b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "fidelity": "FRESH_PUBLIC_CLI_REAL_ABSENT_OR_NON_DIRECTORY_INPUT"
+      },
+      {
+        "case": "non-directory-store",
+        "exit_code": 2,
+        "refusal_code": "RESEARCH_STORE_NOT_PRESENT",
+        "status": "BLOCKED_STORE_NOT_AVAILABLE",
+        "next_action": "VERIFY_EXISTING_DATA_ROOT_OR_REQUEST_SOURCE_OWNER_REVIEW",
+        "subprocess_wall_seconds": 0.7551213000006101,
+        "stdout_sha256": "612b09fad394a94ff515b6a55ec06fefba2d9c5e17f5a67ed7508dd30a726a1b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "fidelity": "FRESH_PUBLIC_CLI_REAL_ABSENT_OR_NON_DIRECTORY_INPUT"
+      },
+      {
+        "case": "valid-native-cold",
+        "exit_code": 0,
+        "refusal_code": null,
+        "status": null,
+        "next_action": null,
+        "subprocess_wall_seconds": 2.5743106000008993,
+        "stdout_sha256": "110beaf43bc7569466b3c1126dda21427592410c6713afa41fbe466937da4ee3",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "fidelity": "FRESH_PUBLIC_CLI_RETAINED_NATIVE_SOURCE"
+      }
+    ],
+    "source_sha256": {
+      "scripts/hypothesis_forge.py": "0780ccee7fda1bceddedc5002aef9e40bbed69389a02a653bd7a15fa6156624d",
+      "src/solana_alpha_lab/factory/hfic_discovery_detail.py": "b2582ca103222f7500a6eb4036769b13df6e3d969c85a7008fafd0688f1d7425",
+      "src/solana_alpha_lab/factory/hfic_ordinary_operation.py": "e645de68f43b8242acb387c493c0232cad0deecc0bf2efff00e4a4c74725bebd",
+      "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "a0e7680f98f23ab9a61ec5faf0c1c16676fc078c9e7f31532a461d8ad81c0f64",
+      "docs/tasks/FORGE_DECISION_LINK_V1.md": "35101897d997a8722446602aba939e55c8b8f69ea33273380f9ed208072672cb"
+    },
+    "source_before_after_exact_equal": true,
+    "native_files_unchanged": 230,
+    "native_files_before_after_exact_equal": true,
+    "absent_store_still_absent": true,
+    "non_directory_sentinel_sha256": "85f32ae0a31e6b99ef27251fc5adc9eeec2057de199a02543063cfd31c9979b7",
+    "non_directory_sentinel_unchanged": true,
+    "measured_process_components_seconds": 4.758069600004092,
+    "elapsed_window_seconds": 4.904792700002872,
+    "product_child_watchdog_seconds": 180,
+    "parent_watchdog_seconds": 600,
+    "owned_output_guard_bytes": 1073741824,
+    "cpu_ram_preparation_model_cost": "UNKNOWN",
+    "no_new_science_storage_acl_or_settings_authority": true,
+    "retained_receipt": "local/forge_decision_link_v1/owner-store-r04/qualification.json",
+    "retained_receipt_sha256": "b81c01ad640a01fc2d97e6a4ad1cb1ea0146cdcb5a7ece338c043f996dbe6d45",
+    "source_epoch_note": "Named current whole-command store-opening qualification; later checkpoint text does not silently rebind earlier producer pins."
+  },
+  "owner_ux_store_not_ready": {
+    "role": "OWNER_UX_CRITIC",
+    "prior_verdict": "NOT_READY",
+    "severity": "MAJOR",
+    "observed_head": "16fff80025cee60f619e566f2d1526fcce210e64",
+    "finding": "Existing data-root resolution and read-only ResearchStore opening occur before the discovery-show try, so unavailable store bypasses promised safe JSON recovery and exits through generic main stderr."
   }
 }

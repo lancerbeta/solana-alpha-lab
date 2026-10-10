@@ -340,3 +340,21 @@ drift retained; R02 accidentally valid read not qualified as a source fault.
 R03 runs only unfinished fault and closing valid read:3.082s child components,
 3.251s elapsed,180s/600s envelopes. Partial R01/R02 timing UNKNOWN; no new look.
 Only operator refusal copy changed; fresh inventory and four-role review remain.
+
+OWNER_UX_REPLAN: review16fff800 returned NOT_READY for the uncovered unavailable
+store edge before the discovery-show try. The current copy repair must cover the
+whole existing read command, including non-creating root resolution/opening,
+rather than only projection errors. Catch existing typed DataRoot/ResearchStore/
+CLI errors, preserve their canonical code, provide BLOCKED store recovery with
+exit2 and zero writes/values; other commands unchanged. Verify real absent and
+non-directory data-root plus retained valid cold reader, with no storage creation,
+ACL/settings changes or new science. Earlier PASS scopes and NOT_READY remain.
+
+WHOLE_READ_CHECKPOINT: actual missing and non-directory data-root return safe
+exit2 JSON with original RESEARCH_STORE_NOT_PRESENT and no new storage;
+missing root stays absent, owned sentinel bytes unchanged. Current valid native
+cold read equals original;230files unchanged. Current typed handler includes
+non-creating root/open boundaries; no other command change or data-owner bypass.
+Current code/architecture v3 reviews stopped before root writes and are not
+PASS evidence. Retain second UX NOT_READY, freeze final content and launch
+four fresh isolated roles before evidence binding and normal delivery.

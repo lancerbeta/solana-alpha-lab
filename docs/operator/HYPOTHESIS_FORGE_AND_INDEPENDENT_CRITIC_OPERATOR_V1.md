@@ -1144,6 +1144,7 @@ look. Команда только читает: она не обновляет p
 |---|---|
 | `INPUT_ERROR` | Исправь исходный locator/страницу и повтори только чтение: result-ref и operation-sha256 должны согласоваться, offset >= 0, limit 1–100. |
 | `BLOCKED_LOCATOR_NOT_RESOLVED` | Проверь исходный locator и data-root. Если они достоверны, остановись: отсутствие источника требует read-only проверки его владельцем. |
+| `BLOCKED_STORE_NOT_AVAILABLE` | Проверь исходный data-root; если он достоверен, остановись и передай исходный refusal_code владельцу ResearchStore для read-only проверки доступности. Storage не создавай, права не меняй. |
 | `BLOCKED_SOURCE_REVIEW_REQUIRED` | Остановись из-за unavailable/identity/hash/binding gap; передай refusal_code и locator владельцу ResearchStore/operation/result для read-only проверки. |
 
 Source refusal не разрешает новый look, переписывание истории или refreeze packet.

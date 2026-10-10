@@ -1321,14 +1321,14 @@ def cmd_discovery_show(
     """Original request, saved query/result and applicable assessment; no value reads."""
     from solana_alpha_lab.factory.hfic_discovery_detail import DiscoveryDetailError, discovery_detail
 
-    data_root = _existing_data_root(repo_root, explicit_data_root)
-    store = ResearchStore(data_root, create_if_missing=False)
     try:
+        data_root = _existing_data_root(repo_root, explicit_data_root)
+        store = ResearchStore(data_root, create_if_missing=False)
         payload = discovery_detail(store, result_ref=result_ref, operation_sha256=operation_sha256,
             current_market=_current_market(repo_root, data_root, store), offset=offset, limit=limit)
         _assert_no_path_leak(payload, str(data_root), str(repo_root))
-    except (DiscoveryDetailError, HficCliError) as exc:
-        code = exc.code if isinstance(exc, DiscoveryDetailError) else "DISCOVERY_DETAIL_PATH_LEAK"
+    except (DiscoveryDetailError, HficCliError, DataRootError, ResearchStoreError) as exc:
+        code = "DISCOVERY_DETAIL_PATH_LEAK" if exc.code == "PHYSICAL_PATH_LEAK" else exc.code
         if code in {"DISCOVERY_DETAIL_LOCATOR_REQUIRED", "DISCOVERY_DETAIL_OPERATION_INVALID",
                 "DISCOVERY_DETAIL_RESULT_REF_INVALID", "DISCOVERY_DETAIL_PAGE_INVALID",
                 "DISCOVERY_DETAIL_LOCATOR_MISMATCH"}:
@@ -1336,6 +1336,13 @@ def cmd_discovery_show(
             explanation = "Неверный locator или параметры страницы; evidence не изменён."
             next_action = "CORRECT_LOCATOR_OR_PAGE_AND_RETRY"
             recovery = "Укажи исходный result-ref или operation-sha256, согласованные между собой; offset >= 0, limit от 1 до 100. Повтори только чтение."
+        elif code in {"RESEARCH_STORE_NOT_PRESENT", "DATA_ROOT_INVALID", "DATA_ROOT_UNAVAILABLE",
+                "DATA_ROOT_MUST_BE_PATH", "DATA_ROOT_MUST_BE_ABSOLUTE", "DATA_ROOT_MUST_BE_DIRECTORY",
+                "DATA_ROOT_SYMLINK_FORBIDDEN", "DATA_ROOT_NON_GIT_CONTEXT", "DATA_ROOT_SPLIT_BRAIN"}:
+            status = "BLOCKED_STORE_NOT_AVAILABLE"
+            explanation = "Существующий store недоступен или data-root не разрешён; storage не создавался."
+            next_action = "VERIFY_EXISTING_DATA_ROOT_OR_REQUEST_SOURCE_OWNER_REVIEW"
+            recovery = "Проверь исходный data-root. Если он достоверен, остановись и запроси read-only проверку доступности у владельца ResearchStore; не создавай storage, не меняй права и не запускай новый look для восстановления evidence."
         elif code in {"DISCOVERY_DETAIL_RESULT_NOT_FOUND", "DISCOVERY_DETAIL_OPERATION_NOT_FOUND"}:
             status = "BLOCKED_LOCATOR_NOT_RESOLVED"
             explanation = "Источник по этому locator не найден; это не научный отрицательный результат."
