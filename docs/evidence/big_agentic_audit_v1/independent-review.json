@@ -1,0 +1,13 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "BIG_AGENTIC_AUDIT_V1-REVIEW",
+  "as_of": "2026-10-10",
+  "task_id": "BIG_AGENTIC_AUDIT_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": ["CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC", "OWNER_UX_CRITIC"],
+  "reviews": [],
+  "verdict": "PENDING",
+  "non_claims": ["NOT_MERGE_READY", "NO_AUDIT_FULL_DOD", "NO_SCIENCE_ACCEPTANCE", "NO_ALPHA"]
+}

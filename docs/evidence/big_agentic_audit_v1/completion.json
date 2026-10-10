@@ -1,0 +1,26 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "BIG_AGENTIC_AUDIT_V1-PARTIAL-CHECKPOINT",
+  "as_of": "2026-10-10",
+  "task_id": "BIG_AGENTIC_AUDIT_V1",
+  "state_change": "PARTIAL_BLOCKED audit checkpoint: complete fixed charter accounting, offline real segments and retained failure/recovery evidence, two reproduced product defects, one selected recipe route gap, six unexecuted actor missions and one NOW repair. Full audit/science DoD is explicitly incomplete; no product fix or production authority granted.",
+  "base_main": "90ba76e37515b3d521478a6d05a149fb0f1d2b75",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {"docs/tasks/BIG_AGENTIC_AUDIT_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"},
+  "active_stop_conditions": ["STOP_BEFORE_PRODUCT_REPAIR_OR_SCIENCE_CHANGE", "STOP_GENUINE_ACTOR_WITHOUT_CONFINED_TOOL_RUNTIME", "STOP_BEFORE_OWNER_MERGE_PHRASE"],
+  "owner_attention_triggers": {"auth_or_access_recovery": false, "material_owner_decision": false, "user_only_activation": false, "external_material_action": false, "unresolved_safety_or_truth_conflict": false},
+  "factory_fit": {"path": "docs/evidence/big_agentic_audit_v1/factory-fit.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "verdict": "PASS"},
+  "validation": {
+    "targeted": "PASS_AUDIT_ORACLE_CONTROLS_WITH_PRODUCT_FAILURES_RETAINED_AND_FULL_DOD_EXPLICITLY_PARTIAL",
+    "independent_review": {"path": "docs/evidence/big_agentic_audit_v1/independent-review.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "verdict": "PENDING"},
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": []
+  },
+  "non_claims": ["AUDIT_FULL_DOD_INCOMPLETE", "NO_FULL_PRODUCT_PATH", "AGENT_BEHAVIOR_UNVERIFIED", "NO_ALPHA", "NO_OOS", "NO_SCIENCE_ACCEPTANCE", "NO_STRATEGY_ACTIVATION", "NO_PRODUCT_REPAIR", "NO_REAL_HOLDOUT", "NO_PRODUCTION_HEALTH", "NO_DEPLOY", "NO_MERGE"],
+  "side_effects": {"production_writes": 0, "product_source_repairs": 0, "product_external_calls": 0, "scope": "Product-domain effects exclude explicitly approved official runtime bootstrap and routine bounded Git/GitHub delivery"},
+  "capability_radar_now": "NONE"
+}

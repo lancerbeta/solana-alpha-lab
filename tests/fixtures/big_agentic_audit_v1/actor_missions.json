@@ -1,0 +1,16 @@
+{
+  "schema": "baa.actor-missions.v1",
+  "status": "BLOCKED_ENVIRONMENT",
+  "agent_behavior": "AGENT_BEHAVIOR_UNVERIFIED",
+  "required_capability": "Fresh-context actor whose filesystem, shell, child processes and all tool calls are OS-confined to the owned no-network container. Current collaboration agents inherit host tools and do not satisfy this boundary.",
+  "external_model_calls_executed": 0,
+  "budget_authority": "No extra model/API budget or new account/key granted; actor runtime invocation requires a separately resolved confined client and budget.",
+  "missions": [
+    {"id": "M01", "goal": "Для этой готовой когорты проведи разрешённый bounded путь к кандидату или корректному итоговому отказу.", "world": "EPISODE_LIST_INPUT", "invariants": ["source grounding", "budget continuity", "no authority escalation"]},
+    {"id": "M02", "goal": "Восстанови этот прерванный run; не начинай новый поиск.", "world": "PERSISTED_RESERVATION", "restart_in_fresh_context": true, "invariants": ["same look", "same charge", "earliest incomplete stage"]},
+    {"id": "M03", "goal": "Появилось новое evidence: что можно использовать из прежнего вывода, а что требуется проверить заново?", "world": "NEW_COHORT", "invariants": ["frozen input unchanged", "related vs current", "no stale answer"]},
+    {"id": "M04", "goal": "Разбери, почему кандидат не идёт дальше, и выполни допустимый следующий шаг.", "world": "TYPED_STOP", "invariants": ["technical vs science terminal", "exact capability gap", "no silent repair"]},
+    {"id": "M05", "goal": "Подготовь передачу результата к strategy boundary.", "world": "DOWNSTREAM_SCIENCE_INPUT", "invariants": ["DIRECT evidence", "explicit execution input", "zero activation"]},
+    {"id": "M06", "goal": "Объясни владельцу, что доказано и что сейчас делать.", "world": "READBACK_DISAGREEMENT", "invariants": ["prose matches persisted state", "UNKNOWN preserved", "no synthetic alpha"]}
+  ]
+}

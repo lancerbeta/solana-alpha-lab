@@ -1,0 +1,26 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "as_of": "2026-10-10",
+  "task_id": "BIG_AGENTIC_AUDIT_V1",
+  "review_id": "BIG_AGENTIC_AUDIT_V1-FIT",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "Bounded synthetic middle-factory audit produces two reproducible product findings and one NOW repair; full scientific path remains unproved.",
+    "flexibility_and_history": "All failed/interrupted attempts retained; real crashes/replays preserve source history and scientific occupancy. No product repairs.",
+    "context_efficiency": "One isolated audit root; exact semantic owners and frozen current main. Existing checks wrapped, no new plugin or framework.",
+    "research_truth": "PARTIAL_BLOCKED, typed UNKNOWN/BLOCKED, explicit intermediate fixtures and scripted Critic. No alpha/OOS/promotion claim.",
+    "owner_operability": "Russian owner report, 56-charter denominator, reduced two-command NOW reproducer, authoritative deduplicated local backlog.",
+    "execution_to_cashflow": "No executable economics or cashflow validated; improve trustworthy research/owner decisions first.",
+    "monitoring_and_recovery": "Actual OS child crashes and independent committed readback; WAL and run-linkage failures retained; no runtime health claim.",
+    "build_vs_buy": "WRAP existing unittest/fixtures/serializers/stores and pinned approved Docker runtime; no dependency or service adoption.",
+    "security": "Offline unprivileged readonly source/rootfs, no credentials/Docker socket/production stores; bootstrap authority separately approved.",
+    "red_team": "Future poison, source hash tamper, cap/late landing, runner-up crash, competing writer, conflicting replay, oracle-trace controls; remaining joint schedules explicit UNKNOWN."
+  },
+  "capability_radar": {"now": "NONE", "watch": "OS-confined actor tool broker only after actual client/budget authority; no installation proposed in this atom"},
+  "recovery": "Retain owned synthetic volumes/archives; kit rollback is a scoped Git revert under Harness. Product data/history was never mounted. No deletion requested.",
+  "limits": ["AUDIT_FULL_DOD_INCOMPLETE", "PARTIAL_BLOCKED", "AGENT_BEHAVIOR_UNVERIFIED", "NO_FULL_PRODUCT_PATH", "NO_ALPHA", "NO_OOS", "NO_REAL_HOLDOUT", "NO_PRODUCT_REPAIR", "NO_DEPLOY", "NO_MERGE"]
+}
