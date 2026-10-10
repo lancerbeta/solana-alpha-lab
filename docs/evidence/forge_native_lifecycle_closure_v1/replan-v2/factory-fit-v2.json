@@ -4,8 +4,8 @@
   "review_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1-V2-FIT",
   "as_of": "2026-10-10",
   "task_id": "FORGE_NATIVE_LIFECYCLE_CLOSURE_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "110d746b1719f6359dbbe0ab39c2f8c250aa827fe9b4aab005710758e62a0975",
+  "reviewed_inventory_sha256": "4bec069be92c8a327d9dc8ee70b782c9a82b08030fcbf331815031fbfc6aa4de",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
