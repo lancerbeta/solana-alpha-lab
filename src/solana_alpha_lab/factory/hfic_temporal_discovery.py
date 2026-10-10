@@ -1790,6 +1790,13 @@ def downside_descriptive(values: Sequence[float | Fraction], *, missing_n: int) 
     def quantile(q: float) -> float | None:
         if not n:
             return None
+        if all(isinstance(value, Fraction) for value in exact_ordered):
+            # Fresh exact episode ratios stay exact through interpolation.
+            # Rounded weights can invert quantiles even on a constant sample.
+            h = (n - 1) * Fraction(str(q))
+            j = math.floor(h)
+            g = h - j
+            return float((1 - g) * exact_ordered[j] + g * exact_ordered[min(j + 1, n - 1)])
         h = (n - 1) * q
         j = math.floor(h)
         g = h - j

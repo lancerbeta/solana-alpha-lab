@@ -41,6 +41,12 @@ managed_write_set:
 - tests/test_hfic_ordinary_operation_v1.py
 - tests/test_hfic_list_scope_executor_v1.py
 - tests/test_hfic_critic_prior_memory_closure_v1.py
+- tests/test_hfic_scientific_disposition_continuity_v1.py
+- tests/test_opportunity_episodes_vertical_v1.py
+- tests/test_hfic_legacy_parent_continuation_compat_v1.py
+- tests/test_hfic_temporal_operability_repair_v1.py
+- tests/test_forge_research_universe_policy_v1.py
+- tests/test_hfic_temporal_owner_path_v1.py
 - tests/fixtures/forge_native_lifecycle_closure_v1/**
 - catalog/assets/**
 - catalog/catalog_manifest.yaml
@@ -324,3 +330,55 @@ Independent exact literal-source arithmetic and each prespecified ablation
 PASS. Final Q1-Q4 belongs to the canonical affected four-role review, with
 old NOT_READY and original2c pair retained. Finish exact-head delivery gates
 under the directly delegated machine phrase authorization above.
+
+
+Bounded CI consumer repair replan — 2026-10-10:
+PR392 exact candidate5937d090991bb05c5b635e8b23b266c2d4a7d5b3 CI38013825076
+shard1 exposed two existing direct consumer failures. Calculation-revision
+fixture submits empty authored scope and receives CANDIDATE_SCOPE_FIELDS_REQUIRED;
+its prior authored mark/proxy intent must be supplied before the initial MAIN,
+without weakening fresh admission or any revision/disposition assertion.
+Three-process episode vertical fixture receives a public refusal before result
+and then indexes a missing result; exact cause is under a bounded reproducer,
+not assumed to be another scope omission. Expand only these two direct test
+consumer paths in the managed write set before editing them. Retain failed CI
+provenance and all old receipts/review reports; restore the existing intended
+consumer scenario with the smallest correct patch and targeted actual checks.
+No new native episode/look, production semantic concession, new dependency or
+full local gate. Final3ba native originals/recovery remain immutable; if runtime
+changes become necessary, re-evaluate final evidence applicability explicitly.
+Affected review/evidence rebinding/exact-head CI/readiness remain required
+before the directly delegated ordinary guarded merge.
+
+CI consumer repair scope refinement (same failing run38013825076/head5937):
+Shard5 proves legacy-parent seeders pass a raw target object and ordinary
+terminal-conflict setup passes empty authored scope. Shard2 proves the same
+raw target setup in temporal-operability acceptance and the universe-policy
+consumer expects an older outer refusal code. Add the three exact test paths
+above before editing; preserve each scientific, continuation, crash, replay,
+and no-effects assertion. Scope authorial estimand/condition must precede MAIN.
+For universe drift, require the actual admission wrapper and the original
+source_error, values_loaded=false/writes=false/MAIN=0, not a blanket refusal.
+No changes to production gates or runtime are authorized by this test-only
+repair claim. The vertical coherence refusal remains a separate diagnostic;
+any proven runtime repair needs an explicit applicability re-evaluation.
+
+CI repair root cause and applicability refinement:
+The final shard4 owner-path mutation consumer expects stderr from a later
+binding guard; validate the actual earlier JSON admission failure and its
+exact underlying hash error before updating that assertion.
+The vertical pure calculator independently proves unchanged identical 1/10
+returns generate p05=0.10000000000000002 > p10=p25=0.1 by floating weighted
+interpolation. Existing coherence correctly refuses; keep this strict guard.
+Repair only fresh Fraction-based episode quantile interpolation using exact
+Hyndman-Fan type7 weights before the single JSON-number conversion. Retain
+legacy float calculation and saved V1/V2/V3 original bytes unchanged; no
+threshold epsilon or observation/membership/missingness change. Add real
+equal-return and independent rational quantile regression checks.
+Explicitly verify the repaired calculator against literal source rows of both
+final3ba native questions and preserve old frozen terminal/packet/snapshot:
+identical membership, support, mean/median and scientific conclusions; any
+quantile representation delta must be measured, never silently rebind it.
+This is a numerical repair, not new scientific authority or a native reroll.
+If applicability cannot be demonstrated, use the owner's directly delegated
+bounded extension to obtain new faithful native evidence with all costs kept.

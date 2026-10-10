@@ -442,7 +442,13 @@ class TemporalOwnerPathTests(unittest.TestCase):
                 data_root=data_root,
             )
             self.assertNotEqual(tampered.returncode, 0)
-            self.assertIn("BINDING_HASH_MISMATCH", tampered.stderr)
+            refusal = json.loads(tampered.stdout)
+            self.assertEqual(refusal["reason_code"], "GENERATION_SAVED_SOURCE_INADMISSIBLE")
+            self.assertEqual(refusal["detail"]["source_error"], "BINDING_HASH_MISMATCH")
+            self.assertEqual(refusal["stage"], "REQUEST_ADMISSION_BEFORE_MAIN")
+            self.assertFalse(refusal["values_loaded"])
+            self.assertFalse(refusal["writes"])
+            self.assertEqual(refusal["scientific_look_delta"], {"main": 0, "adaptive": 0})
             census_path.write_bytes(original)
 
 

@@ -182,7 +182,7 @@ class LegacyParentContinuationCompatTests(TestCase):
                 spec=spec,
                 binding=binding,
                 journal_scope=journal,
-                candidate_scope={"schema": "test", "target": spec["target"]},
+                candidate_scope={"estimand": "price_relative_proxy", "explanatory_condition": "mark"},
                 git_sha=git.head_sha,
                 **gate,
             )
@@ -352,7 +352,7 @@ class LegacyParentContinuationCompatTests(TestCase):
                 spec=third,
                 binding=opened["binding"],
                 journal_scope=opened["journal"],
-                candidate_scope={"schema": "test", "target": third["target"]},
+                candidate_scope={"estimand": "price_relative_proxy", "explanatory_condition": "mark"},
                 git_sha=opened["git"].head_sha,
                 **self._recorded_gate(
                     store, opened["journal"], opened["market"], opened["focus"]
@@ -410,7 +410,7 @@ class LegacyParentContinuationCompatTests(TestCase):
                 spec=third,
                 binding=opened["binding"],
                 journal_scope=opened["journal"],
-                candidate_scope={"schema": "test", "target": third["target"]},
+                candidate_scope={"estimand": "price_relative_proxy", "explanatory_condition": "mark"},
                 git_sha=opened["git"].head_sha,
                 **self._recorded_gate(
                     store, opened["journal"], opened["market"], opened["focus"]
@@ -1091,7 +1091,7 @@ class LegacyParentContinuationCompatTests(TestCase):
                     spec=spec,
                     binding=binding,
                     journal_scope=journal,
-                    candidate_scope={"schema": "test", "target": spec["target"]},
+                    candidate_scope={"estimand": "price_relative_proxy", "explanatory_condition": "mark"},
                     git_sha=git.head_sha,
                     **gate,
                 )
@@ -1210,7 +1210,7 @@ class LegacyParentContinuationCompatTests(TestCase):
             binding=opened["binding"],
             journal_scope=opened["journal"],
             candidate_scope=candidate_scope
-            or {"schema": "test", "target": spec["target"]},
+            or {"estimand": "price_relative_proxy", "explanatory_condition": "mark"},
             git_sha=opened["git"].head_sha,
             **self._recorded_gate(
                 opened["store"], opened["journal"], opened["market"], opened["focus"]

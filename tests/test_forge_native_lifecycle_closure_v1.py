@@ -330,3 +330,29 @@ class SourceDecimalRatioTests(unittest.TestCase):
         self.assertGreater(profile['negative_mass'], 0)
         self.assertEqual(profile['worst_negative_share'], 1)
         json.dumps(profile,allow_nan=False)
+
+
+class ExactEpisodeQuantileTests(unittest.TestCase):
+    def test_equal_episode_returns_keep_quantiles_identical(self):
+        from fractions import Fraction
+        from solana_alpha_lab.factory import hfic_temporal_discovery as t
+        for n in (2, 3, 12, 20):
+            for value in (Fraction(1, 10), Fraction(-1, 10), Fraction(0)):
+                with self.subTest(n=n, value=str(value)):
+                    profile = t.downside_descriptive([value] * n, missing_n=2)
+                    self.assertEqual([profile[k] for k in ('p05', 'p10', 'p25')], [float(value)] * 3)
+                    self.assertEqual(profile['missing_n'], 2)
+
+    def test_episode_quantiles_match_independent_type7_rational_oracle(self):
+        from fractions import Fraction
+        from solana_alpha_lab.factory import hfic_temporal_discovery as t
+        values = [Fraction(x) for x in ('-0.5', '-0.2', '0.1', '0.1', '0.9')]
+        profile = t.downside_descriptive(values, missing_n=1)
+        for key, percentile in (('p05', Fraction(1, 20)), ('p10', Fraction(1, 10)), ('p25', Fraction(1, 4))):
+            position = percentile * (len(values) - 1)
+            lower = position.numerator // position.denominator
+            weight = position - lower
+            expected = values[lower] + weight * (values[min(lower + 1, len(values) - 1)] - values[lower])
+            self.assertEqual(profile[key], float(expected))
+        self.assertEqual(profile['le_minus_20_n'], 2)
+        self.assertEqual(profile['le_minus_50_n'], 1)

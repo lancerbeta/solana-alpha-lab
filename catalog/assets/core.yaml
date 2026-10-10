@@ -32824,7 +32824,7 @@ records:
   as_of: '2026-09-30'
   truth_owner: FORGE_SCIENTIFIC_DISPOSITION_CONTINUITY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_scientific_disposition_continuity_v1.py', repository_path: tests/test_hfic_scientific_disposition_continuity_v1.py}
-  integrity: {kind: sha256, sha256: d4776b68365a547d6e0be58543e23b27a7940d1465eeb42a0a61180a766893fc}
+  integrity: {kind: sha256, sha256: 8d131e7c2a6fc752813694da4a3568027ef1ba52651e424c40b3a92f1ca9bddc}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-SCIENTIFIC-DISPOSITION-CONTINUITY-001}
@@ -37996,7 +37996,7 @@ records:
   as_of: '2026-09-28'
   truth_owner: COMPOUND_TEMPORAL_DISCOVERY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_temporal_discovery.py', repository_path: src/solana_alpha_lab/factory/hfic_temporal_discovery.py}
-  integrity: {kind: sha256, sha256: fff58b4310362652bf8753ca939d4cce9808f07530cec190d970675c66a80f0d}
+  integrity: {kind: sha256, sha256: b530aa119d81bac8eb49e3c818e0ed481e4ff02489254ddbe55a55236c4cb65e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FORGE-COMPOSITE-FEATURE-RECIPES-001}
@@ -40868,7 +40868,7 @@ records:
     repository_path: docs/tasks/FORGE_NATIVE_LIFECYCLE_CLOSURE_V1.md
   integrity:
     kind: sha256
-    sha256: b824f6e5bc071200198dde2ac28aa213d2eb3e2a2cf7d46dd16274af9bc57d2d
+    sha256: fb5ee9cf390097a7c472e2d2f67d7dcf34e218b0c869d730acadc6eadd89bcc7
   access:
     mode: read_only
     method: file
@@ -40946,7 +40946,7 @@ records:
     repository_path: tests/test_forge_native_lifecycle_closure_v1.py
   integrity:
     kind: sha256
-    sha256: a9a48ed4e1e3c267006a2600de3ce946ea06dd85ea35cd061fc88ca5d13c29b1
+    sha256: 694f355e1f52ff8d837c2d7478a082a35c66236c691c06290c12dc30cd61f3a4
   access:
     mode: read_only
     method: file

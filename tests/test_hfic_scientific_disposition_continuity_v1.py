@@ -755,7 +755,7 @@ class V3CalculationRevisionTests(unittest.TestCase):
                 spec=spec,
                 binding=[_bind(COHORT, RELEASE)],
                 journal_scope=journal,
-                candidate_scope={},
+                candidate_scope={"estimand": "price_relative_proxy", "explanatory_condition": "mark"},
                 git_sha=GIT_SHA,
                 operation_sha256=operation["operation_sha256"],
                 verified_market=market,
