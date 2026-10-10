@@ -1,17 +1,17 @@
 {
   "candidate": {
     "base": "96eb087224f012ccb028ba468d4e0a7cd7ca1506",
-    "diff_sha256": "d268eea5ae7e9df29ca02fa3d1a8617c0b969e223559e2a669f7e7733285359f",
-    "head": "dab668e479b0ff42a4963c16c2b299dce1368dc1"
+    "diff_sha256": "2b50f981539dbc3b125660b9fec3561dd98286e933e93e6e06d242625b6f61cf",
+    "head": "8bd8336597bbb4d747cdd39847d360dcd8669d49"
   },
   "evidence": [
     {
       "logical_ref": "repo://docs/tasks/FORGE_TRUST_CLOSURE_V1.md",
-      "sha256_or_fingerprint": "20d940226600a30fa342d4d5f9a354a8fafbe1aa1f30e4130592af3e4fcf195f"
+      "sha256_or_fingerprint": "17249ec707a8f17df26997f779619ea7561c14df761d2514a589597558a62178"
     },
     {
       "logical_ref": "repo://docs/reports/forge_trust_closure_v1/READOUT.md",
-      "sha256_or_fingerprint": "fd08463d70bfa8d77a570e015917e96695d7e68745cc319b89f95a4fd2cfb541"
+      "sha256_or_fingerprint": "01a3afb616b79692be337238d3596b980fcd6e2841fb9ba7bdb5bb47c896fde8"
     },
     {
       "logical_ref": "repo://docs/reports/forge_trust_closure_v1/SCIENTIFIC_DECISION.md",
@@ -71,7 +71,7 @@
     },
     {
       "logical_ref": "repo://tests/test_precommit_diff_check_v1.py",
-      "sha256_or_fingerprint": "ae3b9cd5181b1e690ead5e1c1e0978093b9f2dc4088106a859b7b2eefb7652e4"
+      "sha256_or_fingerprint": "0df718884afb1a3a87a74141d661ec7f8e5917e1121970cf218b1fd5ea88044a"
     },
     {
       "logical_ref": "repo://tests/fixtures/forge_trust_closure_v1/replay.py",
@@ -87,7 +87,11 @@
     },
     {
       "logical_ref": "repo://docs/evidence/forge_trust_closure_v1/ci_repair.json",
-      "sha256_or_fingerprint": "52a06ae17013adc0d95976bbb34984a84cf111b9efdd8fc94ce535e35860dc3b"
+      "sha256_or_fingerprint": "3b93689dbfbf997c364a79fbb24ec77f61fe8a07788cdd9c7da9fb634c288481"
+    },
+    {
+      "logical_ref": "repo://tests/test_factory_ordinary_market_hypothesis.py",
+      "sha256_or_fingerprint": "7c525abea77ff80f4633d802fb00b521525a275eb58e7ef4a4c9335ca79b71d3"
     }
   ],
   "independence": {
@@ -110,7 +114,7 @@
     "NO_MODEL_DIVERSITY_ATTESTATION",
     "NO_MERGE"
   ],
-  "packet_fingerprint_sha256": "70847bd6d219978fdd4c2d886c96c33cae65aa67408c7c7298d213c49eae32fa",
+  "packet_fingerprint_sha256": "0b742c660a2a4c84ed5c6a3e49822bc8d399caa43f2d98cb4b832b92baf7ebd9",
   "questions": [
     "HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG",
     "WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE",
@@ -186,7 +190,7 @@
     }
   ],
   "task": {
-    "task_contract_sha256": "20d940226600a30fa342d4d5f9a354a8fafbe1aa1f30e4130592af3e4fcf195f",
+    "task_contract_sha256": "17249ec707a8f17df26997f779619ea7561c14df761d2514a589597558a62178",
     "task_id": "FORGE_TRUST_CLOSURE_V1"
   }
 }
