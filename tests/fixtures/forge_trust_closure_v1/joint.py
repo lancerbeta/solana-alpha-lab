@@ -59,9 +59,9 @@ assert not detail['dossier']['science_guard']['allowed']
 status,html=_http(app,'GET','/research?entity_id='+experiment+'&truth_plane=GIT&native_kind=EXPERIMENT_SPEC')
 assert status==200
 assert 'COMPLETED' in html
-assert not detail['dossier']['execution_relation_gaps']
 print(json.dumps({'operational_store':'COMPLETE','lifecycle_projection':'COMPLETE','api_dossier':detail['dossier']['planes'],
                   'http_status':status,'http_completed':True,'science_guard_allowed':False,
+                  'execution_relation_gaps':detail['dossier']['execution_relation_gaps'],
                   'native_execution_ids':[r['record_id'] for r in detail['dossier']['direct_evidence'] if r['record_kind'] in ('RUN_STARTED','RUN_COMPLETED')]}))
 app._close_operational_readonly()
 '''
@@ -81,6 +81,11 @@ app._close_operational_readonly()
                                 spec["experiment_id"], relative], capture_output=True, text=True, timeout=90)
         assert child.returncode == 0, child.stderr
         observed = json.loads(child.stdout.strip().splitlines()[-1])
+        exact = {r['record_id'] for r in bridged['execution_records']
+                 if r['experiment_id'] == spec['experiment_id']
+                 and r['experiment_spec_sha256'] == bridged['experiment_spec_sha256']}
+        assert exact and exact.issubset(set(observed['native_execution_ids']))
+        assert exact.isdisjoint({r['record_id'] for r in observed['execution_relation_gaps']})
         assert before == durable()
         result = dict(status="PASS", fidelity="LINKED_NATIVE_PRODUCT_SEGMENTS", fresh_process=True,
                       writer_alive_at_read=True, os_denied_writes=denied, durable_db_wal_before=before,
