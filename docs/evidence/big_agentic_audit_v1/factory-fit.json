@@ -4,8 +4,8 @@
   "as_of": "2026-10-10",
   "task_id": "BIG_AGENTIC_AUDIT_V1",
   "review_id": "BIG_AGENTIC_AUDIT_V1-FIT",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "441ce170b5e486ed4cf7676ee03e0f72e6630ef74076b41999e1726c080179c4",
+  "reviewed_inventory_sha256": "e4561191742b61c8dfc457c25a0e0fe6816c0bdf348ca3f4f02b0c53bb140369",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
@@ -20,7 +20,21 @@
     "security": "Offline unprivileged readonly source/rootfs, no credentials/Docker socket/production stores; bootstrap authority separately approved.",
     "red_team": "Future poison, source hash tamper, cap/late landing, runner-up crash, competing writer, conflicting replay, oracle-trace controls; remaining joint schedules explicit UNKNOWN."
   },
-  "capability_radar": {"now": "NONE", "watch": "OS-confined actor tool broker only after actual client/budget authority; no installation proposed in this atom"},
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "OS-confined actor tool broker only after actual client/budget authority; no installation proposed in this atom"
+  },
   "recovery": "Retain owned synthetic volumes/archives; kit rollback is a scoped Git revert under Harness. Product data/history was never mounted. No deletion requested.",
-  "limits": ["AUDIT_FULL_DOD_INCOMPLETE", "PARTIAL_BLOCKED", "AGENT_BEHAVIOR_UNVERIFIED", "NO_FULL_PRODUCT_PATH", "NO_ALPHA", "NO_OOS", "NO_REAL_HOLDOUT", "NO_PRODUCT_REPAIR", "NO_DEPLOY", "NO_MERGE"]
+  "limits": [
+    "AUDIT_FULL_DOD_INCOMPLETE",
+    "PARTIAL_BLOCKED",
+    "AGENT_BEHAVIOR_UNVERIFIED",
+    "NO_FULL_PRODUCT_PATH",
+    "NO_ALPHA",
+    "NO_OOS",
+    "NO_REAL_HOLDOUT",
+    "NO_PRODUCT_REPAIR",
+    "NO_DEPLOY",
+    "NO_MERGE"
+  ]
 }

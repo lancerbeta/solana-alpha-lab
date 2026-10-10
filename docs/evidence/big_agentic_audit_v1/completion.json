@@ -9,18 +9,89 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "implementation_bindings": {"docs/tasks/BIG_AGENTIC_AUDIT_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"},
-  "active_stop_conditions": ["STOP_BEFORE_PRODUCT_REPAIR_OR_SCIENCE_CHANGE", "STOP_GENUINE_ACTOR_WITHOUT_CONFINED_TOOL_RUNTIME", "STOP_BEFORE_OWNER_MERGE_PHRASE"],
-  "owner_attention_triggers": {"auth_or_access_recovery": false, "material_owner_decision": false, "user_only_activation": false, "external_material_action": false, "unresolved_safety_or_truth_conflict": false},
-  "factory_fit": {"path": "docs/evidence/big_agentic_audit_v1/factory-fit.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "verdict": "PASS"},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "ac50f4dd568a4984e70927724e708020888c9c4e2ab8c275735b98a139d14c06",
+    "catalog/assets/lifecycle.yaml": "3a804b27bc177ceb42b88d49a7be2b9b0b412da6dfde708a0f11b8de581f2fa2",
+    "catalog/catalog_manifest.yaml": "72025ea1f8c7f0d3c378ee5f797bf9d801c93682031098809e26f8e36751c02b",
+    "catalog/generated/asset_edges.json": "1e075dae931997ed7d9b7b2a64e06a2a721eef6079696951e559d8dab0b116ac",
+    "docs/PROJECT_MAP.md": "480f8e6563ee23ad80ca10e522bc0191f7e6fb80dcee299cf5ec066dec0d7ae0",
+    "docs/evidence/big_agentic_audit_v1/auxiliary-attempts.json": "a0e5616622ce5d1d4de839d0e08a46567f467692d73319978977e9077d30ae9b",
+    "docs/evidence/big_agentic_audit_v1/campaign-manifest.json": "7fae5bf79068afb37017fc2e5330dee2032d86db3745aff32d1a144ea3a40fe9",
+    "docs/evidence/big_agentic_audit_v1/campaign-summary.json": "20ce905cf3c6aa87fae0e6e446da3a2ef246dd28e69cc25d5382cf31a02fdd78",
+    "docs/evidence/big_agentic_audit_v1/coverage.json": "785e069a3a788683827767bf5ebb9c3874c74ad0ac82b01f5c741dd70bce1c16",
+    "docs/evidence/big_agentic_audit_v1/findings.jsonl": "9a9987f8e77a6d62f1e6182c3cbba9ce11fcac57be6e470a459423f2cdd39fb3",
+    "docs/evidence/big_agentic_audit_v1/kit-validation.json": "8d314c7aa59eef107a8cde0f6b20b3fe488dbd9ad2d7592be7916a26fe88426b",
+    "docs/evidence/big_agentic_audit_v1/post-run.json": "feadc71b877e6a46dcd61d3a4a719bc8a8ff033499e9d63b4fe0b2f0f9e42cf4",
+    "docs/evidence/big_agentic_audit_v1/run-ledger.json": "5d888b8e44847534231f337152999c45aa9e14b10ecc0a869251adce464d1c35",
+    "docs/reports/big_agentic_audit_v1/REPLAY.md": "b740d44b6de8da9496775ce55b6485037f4815cd0f1525c715683b6030e614d8",
+    "docs/reports/big_agentic_audit_v1/REPORT.md": "22c410bc7e5313d9e781e3cff4f1f4be3df7ac745ff4d9f43b46adb651f1dd1f",
+    "docs/reports/big_agentic_audit_v1/SPEC.md": "cae0400ae48b79bec7c980c260c121a390363d3fd566f285aa86ab2c58524ace",
+    "docs/tasks/BIG_AGENTIC_AUDIT_V1.md": "12386655b1843e969d9fd8182cc62146451a02af8a3ef3ff06ccdfe12168ce60",
+    "tests/fixtures/big_agentic_audit_v1/Dockerfile": "54766159b4b3c9f5d111fb116cfb27444612edad98b77cfa25822397f2abb85a",
+    "tests/fixtures/big_agentic_audit_v1/Snapshot.Dockerfile": "cdf1e3dbf7ab0e571dee0ed7b903e7da7d9bd856a6377ce2cb6312fbf0249cd3",
+    "tests/fixtures/big_agentic_audit_v1/actor_missions.json": "6c78fe85d099ae970975c41cdb86b500e2245e93497e5d8a9c6e26703a56eaf1",
+    "tests/fixtures/big_agentic_audit_v1/assemble_coverage.py": "c983cbc79a682cff114a6c178c1c0a83df04572e031ffa4f2e3bd6e59bdd571f",
+    "tests/fixtures/big_agentic_audit_v1/bootstrap.ps1": "523bafc6e66fe29d260afd071928f940d8c71bf8ee52632a3be15829bc1c86ab",
+    "tests/fixtures/big_agentic_audit_v1/bridge_probe.py": "7a467a54b09abc1d00988700be4a5ff1f5a220e5d3739b8f72d03f78ff10ef75",
+    "tests/fixtures/big_agentic_audit_v1/charter_bindings.json": "7281c0dc6ef7d2ca9bd3c1e8afc509e3d540c767136e49bf5be0ad755b195f20",
+    "tests/fixtures/big_agentic_audit_v1/collect_evidence.py": "1b1a4ee88aea408bdca96c0504a9f2310346645c641288966949e0c2435ff488",
+    "tests/fixtures/big_agentic_audit_v1/finalize_metadata.py": "07042264b4f9b62c4f19244244e949ac0195f1d26f983dbe69c7e387aba53603",
+    "tests/fixtures/big_agentic_audit_v1/launch.ps1": "4a308a5c68c04a0f75413fe7b62fcc355d90ad04389cc00dd839cca8d62fe9ab",
+    "tests/fixtures/big_agentic_audit_v1/metric_probe.py": "6f3a9d137cd72fbf7d875cec460d7a51ec581e7abab0669c883fc08fa517c2d4",
+    "tests/fixtures/big_agentic_audit_v1/oracles.py": "b83479bf62614402ca265b0e542f4d485223d0b940426b3735a45cd1b55f6a29",
+    "tests/fixtures/big_agentic_audit_v1/product_probes.py": "129ee396320e4be65333f36984d10e311361afa9b84e5c3df6abc64968dfa0af",
+    "tests/fixtures/big_agentic_audit_v1/run_campaign.py": "c4ce81b8314cf1d9fb90b345362baad774f2f035c1141ab5799f9bf4637d39d5",
+    "tests/fixtures/big_agentic_audit_v1/safety_preflight.py": "0befc5f19544c649d98b0ab7663b4ed64e847f86484ca663ddf2a0fdeba722e5",
+    "tests/fixtures/big_agentic_audit_v1/targeted_interactions.py": "e0a522dfce7384df9c902cf24b3bb93261a047480c04a8333ff459f1eea7c4a9",
+    "tests/test_big_agentic_audit_v1.py": "9de029662690f54a5a22c326cd2206be222aee6ef311d2d326e6514aacdb8e1e"
+  },
+  "active_stop_conditions": [
+    "STOP_BEFORE_PRODUCT_REPAIR_OR_SCIENCE_CHANGE",
+    "STOP_GENUINE_ACTOR_WITHOUT_CONFINED_TOOL_RUNTIME",
+    "STOP_BEFORE_OWNER_MERGE_PHRASE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/big_agentic_audit_v1/factory-fit.json",
+    "sha256": "e83e9219dee21be4e06abb23209eb0bfd450bc4ab8b5af6c11c8eef1bc445861",
+    "verdict": "PASS"
+  },
   "validation": {
     "targeted": "PASS_AUDIT_ORACLE_CONTROLS_WITH_PRODUCT_FAILURES_RETAINED_AND_FULL_DOD_EXPLICITLY_PARTIAL",
-    "independent_review": {"path": "docs/evidence/big_agentic_audit_v1/independent-review.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "verdict": "PENDING"},
+    "independent_review": {
+      "path": "docs/evidence/big_agentic_audit_v1/independent-review.json",
+      "sha256": "42a5da453d800838fc9a14b04ce545ff50bda561d66e92961a96101a62c0b97b",
+      "verdict": "PASS"
+    },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": []
   },
-  "non_claims": ["AUDIT_FULL_DOD_INCOMPLETE", "NO_FULL_PRODUCT_PATH", "AGENT_BEHAVIOR_UNVERIFIED", "NO_ALPHA", "NO_OOS", "NO_SCIENCE_ACCEPTANCE", "NO_STRATEGY_ACTIVATION", "NO_PRODUCT_REPAIR", "NO_REAL_HOLDOUT", "NO_PRODUCTION_HEALTH", "NO_DEPLOY", "NO_MERGE"],
-  "side_effects": {"production_writes": 0, "product_source_repairs": 0, "product_external_calls": 0, "scope": "Product-domain effects exclude explicitly approved official runtime bootstrap and routine bounded Git/GitHub delivery"},
+  "non_claims": [
+    "AUDIT_FULL_DOD_INCOMPLETE",
+    "NO_FULL_PRODUCT_PATH",
+    "AGENT_BEHAVIOR_UNVERIFIED",
+    "NO_ALPHA",
+    "NO_OOS",
+    "NO_SCIENCE_ACCEPTANCE",
+    "NO_STRATEGY_ACTIVATION",
+    "NO_PRODUCT_REPAIR",
+    "NO_REAL_HOLDOUT",
+    "NO_PRODUCTION_HEALTH",
+    "NO_DEPLOY",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "production_writes": 0,
+    "product_source_repairs": 0,
+    "product_external_calls": 0,
+    "scope": "Product-domain effects exclude explicitly approved official runtime bootstrap and routine bounded Git/GitHub delivery"
+  },
   "capability_radar_now": "NONE"
 }
