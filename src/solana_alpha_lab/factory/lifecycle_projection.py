@@ -273,9 +273,10 @@ def _load_registry(root: Path, relative: str) -> tuple[str, dict[str, Any] | Non
 
 
 def _sqlite_readonly(path: Path) -> sqlite3.Connection:
-    uri = path.resolve().as_uri() + "?mode=ro&immutable=1"
+    uri = path.resolve().as_uri() + "?mode=ro"
     conn = sqlite3.connect(uri, uri=True)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA query_only=ON")
     return conn
 
 

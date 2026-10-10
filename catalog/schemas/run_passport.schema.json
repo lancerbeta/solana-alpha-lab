@@ -40,6 +40,7 @@
   ],
   "properties": {
     "run_id": {"$ref": "#/$defs/stable_id"},
+    "experiment_id": {"$ref": "#/$defs/stable_id"},
     "run_key_sha256": {"$ref": "#/$defs/sha256"},
     "trial_id": {"$ref": "#/$defs/stable_id"},
     "hypothesis_version_id": {"$ref": "#/$defs/stable_id"},

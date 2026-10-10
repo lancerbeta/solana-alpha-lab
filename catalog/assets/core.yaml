@@ -25710,7 +25710,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/operational_store.py', repository_path: src/solana_alpha_lab/factory/operational_store.py}
-  integrity: {kind: sha256, sha256: 509477535d82e1d3471014d0da59f25e48e4dd3a594f2e011c0ed4ab727500b1}
+  integrity: {kind: sha256, sha256: 3f81ad434fa0524be398c953b7c804fc1b96cdc1d30b600053238e6704ba4e41}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25728,7 +25728,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: e959369b6c2fa3395838a391bccf38beab37ffd3193ca1ce28b7f01172fa53dc}
+  integrity: {kind: sha256, sha256: 3a59bcf2bd4951784b401bcbd250b4e99ee7f68be423964832760f1649f0218e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -31966,7 +31966,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/run_passport.schema.json', repository_path: catalog/schemas/run_passport.schema.json}
-  integrity: {kind: sha256, sha256: 5ee436960c30263b3358de55c2653d8b80446d2df5eef0d1c9293e0c81dbdbec}
+  integrity: {kind: sha256, sha256: c94117601db59dab3392fe1cd0e4e7d8eca4256875ca453268d3061af635f0e7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -36137,7 +36137,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lifecycle_projection.py', repository_path: src/solana_alpha_lab/factory/lifecycle_projection.py}
-  integrity: {kind: sha256, sha256: 73e1eae462536f07c0a8ff597ebbea37925eae11864b13fe67c43daca7457820}
+  integrity: {kind: sha256, sha256: b5be044c88194c8ad3e5a984ca3170a28b0fda0ee4a704466a2e6d2cc4f97f04}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -36289,7 +36289,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/experiment_evidence_decision_v1.md', repository_path: docs/contracts/experiment_evidence_decision_v1.md}
-  integrity: {kind: sha256, sha256: 155cee013011939295e3b0a16396d95dc8663a6ab511133c7b109d3c54b9e861}
+  integrity: {kind: sha256, sha256: 94e88a39626793c5edda9955c5334ae7e64af10dd1e005ba1d533acb9e92302d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -36308,7 +36308,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/experiment_evidence.py', repository_path: src/solana_alpha_lab/factory/experiment_evidence.py}
-  integrity: {kind: sha256, sha256: ce040faa3b58ec2b4242a8721ffb0de059c53ff0b0d78d2c70ddd93374f00d43}
+  integrity: {kind: sha256, sha256: 1447fa0ecd6ce46f71be339d76d5823b164446b73bf48fdc31fc76ca3f0bf63b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}

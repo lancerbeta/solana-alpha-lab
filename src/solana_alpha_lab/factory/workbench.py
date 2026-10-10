@@ -1683,6 +1683,14 @@ def _handoff_html(handoff: Any) -> str:
 def _dossier_html(dossier: Mapping[str, Any]) -> str:
     tested = dossier.get("tested") if isinstance(dossier.get("tested"), dict) else {}
     planes = dossier.get("planes") if isinstance(dossier.get("planes"), dict) else {}
+    execution_gaps = dossier.get("execution_relation_gaps") or []
+    lineage_warning = (
+        '<p class="semantic-warning">Исполнение обнаружено, но принадлежность '
+        'этой версии эксперимента не подтверждена. Проверьте исходную спецификацию '
+        'и связь с сохранённым run; повторный научный прогон не требуется для диагностики.</p>'
+        + technical(execution_gaps, title="Источник неопределённости исполнения")
+        if execution_gaps else ""
+    )
     obligations = "".join(
         "<tr class=\"obligation-"
         + html.escape(str(item.get("status") or "UNKNOWN"))
@@ -1778,6 +1786,7 @@ def _dossier_html(dossier: Mapping[str, Any]) -> str:
             }
         )
         + "</table>"
+        + lineage_warning
         + f"<h3>{html.escape(research_copy('what_was_tested'))}</h3>"
         + f"<p class=\"legacy-note\">{html.escape(research_copy('original_source'))} "
         + f"<span class=\"mono\">{html.escape(research_copy('legacy_en'))}</span></p>"

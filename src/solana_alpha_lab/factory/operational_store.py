@@ -70,13 +70,14 @@ class OperationalStore:
                 raise OperationalStoreError("SOURCE_NOT_PRESENT")
             try:
                 self._conn = sqlite3.connect(
-                    path.resolve().as_uri() + "?mode=ro&immutable=1",
+                    path.resolve().as_uri() + "?mode=ro",
                     uri=True,
                     check_same_thread=False,
                 )
             except sqlite3.Error as exc:
                 raise OperationalStoreError("OPS_STORE_UNAVAILABLE") from exc
             self._conn.row_factory = sqlite3.Row
+            self._conn.execute("PRAGMA query_only=ON")
             self.schema_status = _jobs_schema_status(self._conn)
             return
         path.parent.mkdir(parents=True, exist_ok=True)
