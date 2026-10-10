@@ -1,8 +1,8 @@
 ---
 task_id: FORGE_DECISION_LINK_V1
-task_version: '1.3'
+task_version: '1.4'
 status: IN_PROGRESS
-as_of: '2026-10-10'
+as_of: '2026-10-11'
 owner: GOAL_OWNER
 allowed_routes: [DIRECT_CODEX_DELIVERY]
 required_review_roles: [CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC, OWNER_UX_CRITIC]
@@ -381,3 +381,17 @@ scientific suppression or history rewrite. Qualify real native request/reserve
 and assessment/successor/withdrawal bytes through controlled read-view faults,
 both locators, valid counterparts and zero scientific look delta. Reuse current
 owners; no new ledger/schema/evaluator/lifecycle. Retain all review/source epochs.
+
+CI_ROW_CONTEXT_REPLAN: PR395 exact head0d2d223c CI shard5 exposed a regression
+in the existing public universe-policy counterpart: a genuinely changed row
+after policy adaptation must remain a new MAIN under existing classification,
+but the new reservation recheck used only the coarse corpus fingerprint.
+Forward the same census/observations/admitted/current scope-mask context already
+used by the outer gate to the existing same-active-profile matcher at reservation
+entry, writer lease and busy retry. Metadata-only callers retain the existing
+fingerprint fallback. No identity, data-binding algorithm, classification,
+policy, budget, evaluator, schema or durable reservation bytes may change.
+Retain the failed exact-head CI and local red reproduction; use the existing
+universe-policy tests plus occupied-look/real-policy/cohort counterparts and
+the real landed-before-other-lease schedule. Refresh content review, bind all
+evidence, and require new exact-head CI/readiness before the owner merge phrase.

@@ -1594,7 +1594,11 @@ def gate_before_values(
     if fingerprint and not stamped:
         operation = _stamp_fingerprint(store, operation_sha256, fingerprint)
     _require_published_logical_content(data_root)
-    _reserve(store, operation, spec_sha256=validated["spec_sha256"], look_class=kind)
+    _reserve(
+        store, operation, spec_sha256=validated["spec_sha256"], look_class=kind,
+        census=census, observations=observations, admitted=admitted,
+        scope_applied_sha256=scope_applied_sha256,
+    )
     return {
         "disposition": "RESERVED",
         "values_loaded": False,
@@ -1650,10 +1654,18 @@ def _assert_no_foreign_pending(store: Any, operation: Mapping[str, Any], spec_sh
         "spec_sha256": spec_sha256, "next_action": "RESUME_ORIGINAL_OPERATION"})
 
 
-def _assert_no_landed_result(store: Any, operation: Mapping[str, Any], spec_sha256: str) -> None:
+def _assert_no_landed_result(
+    store: Any, operation: Mapping[str, Any], spec_sha256: str, *,
+    census: Sequence[Mapping[str, Any]] | None = None,
+    observations: Sequence[Mapping[str, Any]] | None = None,
+    admitted: Mapping[str, Any] | None = None,
+    scope_applied_sha256: str | None = None,
+) -> None:
     """An outer gate cannot authorize a reservation after an exact look lands."""
     saved = _same_active_profile_look(store, _looks(store, str(operation.get("journal_scope") or "")),
-        spec_sha256, fingerprint=operation.get("corpus_fingerprint"))
+        spec_sha256, fingerprint=operation.get("corpus_fingerprint"),
+        census=census, observations=observations, admitted=admitted,
+        scope_applied_sha256=scope_applied_sha256)
     if saved is not None:
         raise OrdinaryOperationError("ORDINARY_LOOK_LANDED_DURING_RESERVATION", detail={
             "original_operation_sha256": saved.get("operation_sha256"),
@@ -1661,11 +1673,21 @@ def _assert_no_landed_result(store: Any, operation: Mapping[str, Any], spec_sha2
             "spec_sha256": spec_sha256, "next_action": "REPLAY_SAVED_RESULT"})
 
 
-def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look_class: str = "main") -> None:
+def _reserve(
+    store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look_class: str = "main",
+    census: Sequence[Mapping[str, Any]] | None = None,
+    observations: Sequence[Mapping[str, Any]] | None = None,
+    admitted: Mapping[str, Any] | None = None,
+    scope_applied_sha256: str | None = None,
+) -> None:
     digest = str(operation.get("operation_sha256") or "")
     stored_class = {"adaptive": "ADAPTIVE", "preview": "PREVIEW"}.get(look_class, "MAIN")
+    # Reuse the outer gate's exact rows/list-mask comparison when supplied;
+    # metadata-only callers keep the published-corpus fingerprint fallback.
+    row_context = dict(census=census, observations=observations, admitted=admitted,
+                       scope_applied_sha256=scope_applied_sha256)
     if look_class in {"main", "adaptive"}:
-        _assert_no_landed_result(store, get_operation(store, digest), spec_sha256)
+        _assert_no_landed_result(store, get_operation(store, digest), spec_sha256, **row_context)
     for item in _reservations(store, digest):
         if item.get("spec_sha256") == spec_sha256:
             return
@@ -1683,7 +1705,7 @@ def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look
         current = get_operation(store, digest)
         if look_class in {"main", "adaptive"}:
             _assert_no_foreign_pending(store, current, spec_sha256)
-            _assert_no_landed_result(store, current, spec_sha256)
+            _assert_no_landed_result(store, current, spec_sha256, **row_context)
         if any(item.get("spec_sha256") == spec_sha256 for item in _reservations(store, digest)):
             return
         _refuse_closed(store, current)
@@ -1734,7 +1756,7 @@ def _reserve(store: Any, operation: Mapping[str, Any], *, spec_sha256: str, look
             current = get_operation(store, digest)
             if look_class in {"main", "adaptive"}:
                 _assert_no_foreign_pending(store, current, spec_sha256)
-                _assert_no_landed_result(store, current, spec_sha256)
+                _assert_no_landed_result(store, current, spec_sha256, **row_context)
             if owner_allowance(store, current, look_class) < 1:
                 raise OrdinaryOperationError("OWNER_CAP_EXHAUSTED")
             if attempt >= 39:

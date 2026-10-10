@@ -256,3 +256,25 @@ assessment→successor→withdrawal проверены controlled read-view faul
 После изменения frontier заново PASS existing positive native candidate→own
 scripted Critic consumer; это механическое покрытие, не scientific acceptance.
 Все hashes/source epochs/resource gaps — native-qualification.json.
+
+
+## Exact-head CI: сохранение row context под lease
+
+PR395 head0d2d223c: shard5 FAIL на existing public universe-policy test.
+Внешний gate различал genuine changed rows через existing matcher, а новый
+reservation guard терял этот контекст и совпадал только по coarse corpus
+fingerprint. Локальный red воспроизвёл ложный occupied-look отказ.
+
+Теперь те же census/observations/admitted/current list masks передаются
+existing matcher на reservation entry, writer lease и busy retry. Для
+metadata-only caller остаётся existing fingerprint fallback. Identity,
+data-binding algorithm, MAIN/ADAPTIVE classification, budgets и writers не
+менялись. Existing universe-policy suite + три seam counterparts — PASS8;
+policy-only adaptation остаётся ADAPTIVE, genuine changed rows дают MAIN.
+Real landed-before-lease schedule заново PASS: B reservation/loader/evaluator
+0/0/0; positive native source→own scripted Critic consumer заново PASS.
+
+Первый CI failure, red и прежние четыре content PASS сохранены отдельными
+эпохами: ревью не доказывало full CI. Финальные review/rebind/exact-head CI
+и machine readiness требуются заново. Это scoped synthetic coverage,
+не приёмка реального изменённого market data или независимой науки.
