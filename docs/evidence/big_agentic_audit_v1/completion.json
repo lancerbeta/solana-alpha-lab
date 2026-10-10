@@ -45,11 +45,7 @@
     "tests/fixtures/big_agentic_audit_v1/targeted_interactions.py": "e0a522dfce7384df9c902cf24b3bb93261a047480c04a8333ff459f1eea7c4a9",
     "tests/test_big_agentic_audit_v1.py": "9de029662690f54a5a22c326cd2206be222aee6ef311d2d326e6514aacdb8e1e"
   },
-  "active_stop_conditions": [
-    "STOP_BEFORE_PRODUCT_REPAIR_OR_SCIENCE_CHANGE",
-    "STOP_GENUINE_ACTOR_WITHOUT_CONFINED_TOOL_RUNTIME",
-    "STOP_BEFORE_OWNER_MERGE_PHRASE"
-  ],
+  "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
     "material_owner_decision": false,
